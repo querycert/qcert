@@ -1,0 +1,5 @@
+html/
+*.vo
+*.v.d
+*.aux
+Makefile.coq

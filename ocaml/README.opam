@@ -1,0 +1,100 @@
+Those are directions for building CACo from scratch using Opam, OCaml
+package manager.
+
+This assumes a fresh install, i.e., no guarantees as to what happens if
+you have an existing OCaml or Coq installation.
+
+Opam is a package manager for OCaml (http://opam.ocaml.org). It
+faciliates the build process, especially if one wants to easily switch
+between different versions of OCaml. This notably allows to build both
+native CACo (using e.g., ocaml-4.02.3) and Java (using e.g.,
+ocamljava-2.0-alpha3) more easily.
+
+
+1. Install Opam
+---------------
+
+wget https://raw.github.com/ocaml/opam/master/shell/opam_installer.sh -O - | sh -s /usr/local/bin
+
+Follow additional configuration instructions from Opam's installer. I have used:
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+1. To configure OPAM in the current shell session, you need to run:
+
+      eval `opam config env`
+
+2. To correctly configure OPAM for subsequent use, add the following
+   line to your profile file (for instance ~/.bash_profile):
+
+      . /Users/simeon/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+
+3. To avoid issues related to non-system installations of `ocamlfind`
+   add the following lines to ~/.ocamlinit (create it if necessary):
+
+      let () =
+        try Topdirs.dir_directory (Sys.getenv "OCAML_TOPLEVEL_PATH")
+        with Not_found -> ()
+      ;;
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+
+2. Add Opam libraries
+---------------------
+
+CACo requires you to obtain the following Opam libraries:
+  - menhir as a parser (menhir version 20151112)
+  - camlp5, the OCaml pre-processor used by Coq
+[[[  - The Coq proof assistant as the main development language ]]]
+
+opam install menhir
+opam install camlp5
+opam install coq
+
+
+3. (Optional) install ocamljava
+-------------------------------
+
+This step is only necessary to build the jar variants for the CAMP
+compiler. Default compilation uses the standard OCaml compiler instead
+and produces native code for your machine.
+
+To install ocamljava as one of opam's supported compiler, do:
+
+opam remote add ocj http://opam.ocamljava.org
+opam switch ocamljava-2.0-alpha3
+
+This first switch will trigger a full compilation of the OCamlJava compiler.
+
+To switch back to the default Ocaml compiler, do:
+
+opam switch 4.02.1
+eval `opam config env`
+
+
+4. Compile CACo:
+----------------
+
+make
+cd ocaml
+make realclean
+make all
+cd ..
+
+5. (Optional) Compile Java versions:
+------------------------------------
+
+opam switch ocamljava-2.0-alpha3
+eval `opam config env`
+
+cd ocaml
+make clean
+make japi
+cd ..
+
+[ Then don't forget to switch back:
+  opam switch 4.02.1
+  eval `opam config env` ]
+
+

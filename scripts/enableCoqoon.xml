@@ -1,0 +1,9 @@
+<project name="enableCoqoon" default="copy-to-bin">
+	<target name="copy-to-bin">
+		<delete dir="bin/coq"/>
+		<mkdir dir="bin/coq"/>
+		<copy todir="bin/coq" overwrite="true">
+			<fileset dir="coq" includes="**/*.vo"/>
+		</copy>
+	</target>
+</project>

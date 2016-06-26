@@ -1,0 +1,74 @@
+Building CACo from source
+-------------------------
+
+CACo is the CAMP Compiler
+
+To compile you need:
+ - Coq 8.5pl1 (https://coq.inria.fr/)
+ - OCaml. It should work with OCaml 4.01 or later
+ - The Menhir parser generator. It has been tested with version 20151112
+   http://gallium.inria.fr/~fpottier/menhir/
+
+First you need to build the compiler in Coq:
+
+cd ../qcert ; make clean ; make
+
+Then extract the OCaml code for the compiler and build it:
+
+make realclean ; make
+
+
+
+Building CACo jars (Experimental)
+---------------------------------
+
+It is also possible to build the compiler as jar file (which can be
+useful for portability). To do so you need a separate OCaml compiler
+for Java (http://www.ocamljava.org -- take version 2.0-alpha3).
+
+Make sure to specify an install directory for ocamljava that is
+different than your primary OCaml compiler, to avoid conflicts.  Once
+ocamljava has been compiled/installed, you need to update the top
+level Makefile in the ocaml directory to point the following variable
+to the ocamlbuild tool for java. Here is mine, for instance:
+
+## Configuration for the separate ocamljava compiler
+OCAMLBUILDJAVA=/Users/simeon/.opam/ocamljava-2.0-alpha3/bin/ocamlbuild
+
+Then you can use the following to build the jars:
+
+make clean ; make jars
+
+Et voila!
+
+
+Usage
+-----
+
+CACo -help gives some usage
+
+CaCo [-target language] [-source language] [-dir output] [-harness file] [-io file] [-display-ils] [-prefix name] [-curl] rule1 rule2 ...
+  -target (JS/Spark/Cloudant)
+  -source (Rule/OQL)
+  -dir Target directory
+  -harness Javascript Harness
+  -io Hierarchy
+  -stats Produce statistics for produced query plans
+  -display-ils Display Intermediate Languages (NRAEnv, NNRC)
+  -display-ascii Avoid unicode symbols
+  -display-margin Set right margin for pretty printer
+  -display-dir Target directory for IL files
+  -prefix Cloudant DB prefix
+  -curl Uses Curl for Cloudant
+
+Example:
+
+./CACo -target JS rule1.camp 
+
+parses rule1.camp and compiles it to rule1_js.js
+
+./CACo -target Spark -io wm.json rule1.camp
+
+parses rule1.camp, assuming an io file (used for the type hierarchy)
+and compiles it to rule1_spark.scala
+

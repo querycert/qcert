@@ -1,0 +1,422 @@
+(*
+ * Copyright 2015-2016 IBM Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *)
+
+Require Import List String.
+Require Import Peano_dec.
+Require Import EquivDec.
+
+Require Import Utils BasicRuntime.
+Require Import NNRCRuntime.
+Require Import ForeignToJavascript.
+Local Open Scope string_scope.
+
+
+Section sanitizer.
+  Import ListNotations.
+  Require Import Ascii.
+  
+  (* javascript allows identifiers that begin with a unicode letter, underscore, or dollar sign.
+         We avoid beginning with an underscore or dollar sign to 
+         avoid problems with frameworks/libraries.
+         Since Coq does not seem to have a unicode library, 
+         we just allow ascii characters.
+   *)
+
+  Definition jsAllowedIdentifierInitialCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z"]%char.
+
+  (* javascript identifiers can have (after the first character), a unicode letter, digit, underscore, or dollar sign.
+         Since Coq does not seem to have a unicode library, we just
+         allow ascii characters,
+   *)
+  Definition jsAllowedIdentifierCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z";"0";"1";"2";"3";"4";"5";"6";"7";"8";"9";"_";"$"]%char.
+
+  Definition jsIdentifierInitialCharacterToAdd := "X"%char.
+  Definition jsIdenitiferCharacterForReplacement := "X"%char.
+
+  Definition jsIdentifierFixInitial (ident:string) : string
+    := match ident with
+       (* We also don't want empty identifier names *)
+       | EmptyString =>
+         String jsIdentifierInitialCharacterToAdd EmptyString
+       | String a _ =>
+         if in_dec ascii_dec a jsAllowedIdentifierInitialCharacters
+         then ident
+         else String jsIdentifierInitialCharacterToAdd ident
+       end.
+
+  Definition jsIdentifierSanitizeChar (a:ascii)
+    := if in_dec ascii_dec a jsAllowedIdentifierCharacters
+       then a
+       else jsIdenitiferCharacterForReplacement.
+
+  Definition jsIdentifierSanitizeBody (ident:string)
+    := map_string jsIdentifierSanitizeChar ident.
+
+  (* Java equivalent: JavaScriptBackend.jsIdentifierSanitize *)  
+  Definition jsIdentifierSanitize (ident:string)
+    := jsIdentifierFixInitial (jsIdentifierSanitizeBody ident).
+
+  Definition jsSafeSeparator := "_".
+
+  (* pulled of off various lists of javascript reserved keywords 
+         as well some common html/java words that should be avoided
+          in case of shared context/interop *)
+  Definition jsAvoidList :=
+    ["Array"; "Date"; "Infinity"; "JavaArray"; "JavaObject"; "JavaPackage"
+     ; "Math"; "NaN"; "Number"; "Object"; "String"
+     ; "abstract"; "alert" ; "all"; "anchor"; "anchors"; "area"; "arguments"
+     ; "assign"; "await"
+     ; "blur"; "boolean"; "break"; "button"; "byte"
+     ; "case"; "catch"; "char"; "checkbox"; "class"; "clearInterval"
+     ; "clearTimeout"; "clientInformation"; "close"; "closed"; "confirm"
+     ; "const"; "constructor"; "continue"; "crypto"
+     ; "debugger"; "decodeURI"; "decodeURIComponent"; "default"
+     ; "defaultStatus"; "delete"; "do"; "document"; "double"
+     ; "element"; "elements"; "else"; "embed"; "embeds"; "encodeURI"
+     ; "encodeURIComponent"; "enum"; "escape"; "eval"; "eval"; "event"
+     ; "export"; "extends"
+     ; "false"; "fileUpload"; "final"; "finally"; "float"; "focus"; "for"
+     ; "form"; "forms"; "frame"; "frameRate"; "frames"; "function"; "function"
+     ; "getClass"; "goto"
+     ; "hasOwnProperty"; "hidden"; "history"
+     ; "if"; "image"; "images"; "implements"; "import"; "in"; "innerHeight"
+     ; "innerWidth"; "instanceof"; "int"; "interface"; "isFinite"; "isNaN"
+     ; "isPrototypeOf"
+     ; "java"; "javaClass"
+     ; "layer"; "layers"; "length"; "let"; "link"; "location"; "long"
+     ; "mimeTypes"
+     ; "name"; "native"; "navigate"; "navigator"; "new"; "null"
+     ; "offscreenBuffering"; "open"; "opener"; "option"; "outerHeight"
+     ; "outerWidth"
+     ; "package"; "packages"; "pageXOffset"; "pageYOffset"; "parent"
+     ; "parseFloat"; "parseInt"; "password"; "pkcs11"; "plugin"; "private"
+     ; "prompt"; "propertyIsEnum"; "protected"; "prototype"; "public"
+     ; "radio"; "reset"; "return"
+     ; "screenX"; "screenY"; "scroll"; "secure"; "select"; "self"
+     ; "setInterval"; "setTimeout"; "short"; "static"; "status"
+     ; "submit"; "super"; "switch"; "synchronized"
+     ; "taint"; "text"; "textarea"; "this"; "throw"; "throws"; "toString"
+     ; "top"; "transient"; "true"; "try"; "typeof"
+     ; "undefined"; "unescape"; "untaint"
+     ; "valueOf"; "var"; "void"; "volatile"
+     ; "while"; "window"; "with"
+     ; "yield"].
+
+  (* Java equivalent: JavaScriptBackend.unshadow_js *)
+  Definition unshadow_js {fruntime:foreign_runtime} (avoid:list var) (e:nrc) : nrc
+    := unshadow jsSafeSeparator jsIdentifierSanitize (avoid++jsAvoidList) e.
+
+  Definition jsSanitizeNNRC {fruntime:foreign_runtime} (e:nrc) : nrc
+    := unshadow_js nil e.
+
+End sanitizer.
+
+Section NNRCtoJavascript.
+
+  Context {fruntime:foreign_runtime}.
+  Context {ftojavascript:foreign_to_javascript}.
+
+  Definition varvalue := 100.
+  Definition varenv := 1.
+
+  Section JSUtil.
+    Definition eol_newline := String (Ascii.ascii_of_nat 10) EmptyString.
+    Definition eol_backn := "\n".
+
+    Definition quotel_double := """".
+    Definition quotel_backdouble := "\""".
+    
+    (* Java equivalent: JavaScriptBackend.indent *)
+    Fixpoint indent (i : nat) : string
+      := match i with
+         | 0 => ""
+         | S j => "  " ++ (indent j)
+         end.
+
+  End JSUtil.
+
+  Section DataJS.
+
+    (* Java equivalent: JavaScriptBackend.brandsToJS *)
+    Definition brandsToJs (quotel:string) (b:brands)
+      := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
+    
+    (* Java equivalent: JavaScriptBackend.dataToJS *)
+    Fixpoint dataToJS (quotel:string) (d : data) : string
+      := match d with
+         | dunit => "null" (* to be discussed *)
+         | dnat n => Z_to_string10 n
+         | dbool b => if b then "true" else "false"
+         | dstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
+         | dcoll ls =>
+           let ss := (string_sort (map (dataToJS quotel) ls)) in
+           "[" ++ (joinStrings ", " ss) ++ "]"
+         | drec ls =>
+           let ss := (map (fun kv => let '(k,v) := kv in
+                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (dataToJS quotel v)) ls) in
+           "{" ++ (joinStrings ", " ss) ++ "}"
+         | dleft d => "{" ++ quotel ++ "left" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
+         | dright d => "{" ++ quotel ++ "right" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
+         | dbrand b d =>
+           "{" ++ quotel ++ "type" ++ quotel ++ ":" ++ (brandsToJs quotel b) ++ ","
+               ++ quotel ++ "data" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
+         | dforeign fd => foreign_to_javascript_data quotel fd
+         end.
+
+    Fixpoint dataToJSPlain (quotel:string) (d : data) : string
+      := match d with
+         | dunit => "unit"
+         | dnat n => Z_to_string10 n
+         | dbool b => if b then "true" else "false"
+         | dstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
+         | dcoll ls =>
+           let ss := (map (dataToJS quotel) ls) in
+           "[" ++ (joinStrings ", " ss) ++ "]"
+         | drec ls =>
+           let ss := (map (fun kv => let '(k,v) := kv in
+                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (dataToJS quotel v)) ls) in
+           "{" ++ (joinStrings ", " ss) ++ "}"
+         | dleft d => "{" ++ quotel ++ "left" ++ quotel ++ ":" ++ (dataToJSPlain quotel d) ++ "}"
+         | dright d => "{" ++ quotel ++ "right" ++ quotel ++ ":" ++ (dataToJSPlain quotel d) ++ "}"
+         | dbrand b d =>
+           "{" ++ quotel ++ "type" ++ quotel ++ ":" ++ brandsToJs quotel b ++ ","
+               ++ quotel ++ "data" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
+         | dforeign fd => foreign_to_javascript_dataPlain quotel fd
+         end.
+
+    Definition hierarchyToJS (quotel:string) (h:list (string*string)) :=
+      dataToJS quotel (dcoll (map (fun x => drec (("sub",dstring (fst x)) :: ("sup", (dstring (snd x))) :: nil)) h)).
+    
+    End DataJS.
+
+    Section NRCJS.
+
+      (* Java equivalent: JavaScriptBackend.uarithToJS *)
+      Definition uarithToJs (u:ArithUOp) (e:string) :=
+        match u with
+          | ArithAbs => "Math.abs (" ++ e ++ ")"
+          | ArithLog2 => "Math.log2(" ++ e ++ ")"
+          | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
+        end.
+
+      (* Java equivalent: JavaScriptBackend.barithToJs *)
+      Definition barithToJs (b:ArithBOp) (e1 e2:string) :=
+        match b with
+          | ArithPlus => e1 ++ "+" ++ e2
+          | ArithMinus => e1 ++ "-" ++ e2
+          | ArithMult => e1 ++ "*" ++ e2
+          | ArithDivide => e1 ++ "/" ++ e2
+          | ArithRem => e1 ++ "%" ++ e2
+          | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
+          | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
+        end.
+
+    (* Java equivalent: JavaScript.Backend.nrcToJS *)
+    Fixpoint nrcToJS
+             (n : nrc)                    (* NNRC expression to translate *)
+             (t : nat)                    (* next available unused temporary *)
+             (i : nat)                    (* indentation level *)
+             (eol : string)               (* Choice of end of line character *)
+             (quotel : string)            (* Choice of quote character *)
+             (ivs : list (string * string))  (* Input variables and their corresponding string representation -- should be free in the nrc expression *)
+      : string                            (* JavaScript statements for computing result *)
+        * string                          (* JavaScript expression holding result *)
+        * nat                             (* next available unused temporary *)
+      := match n with
+         | NRCVar v =>
+           match assoc_lookupr equiv_dec ivs v with
+           | Some v_string => ("", v_string, t)
+           | None => ("", "v" ++ v, t)
+           end
+         | NRCConst d => ("", (dataToJS quotel d), t)
+         | NRCUnop op n1 =>
+           let '(s1, e1, t0) := nrcToJS n1 t i eol quotel ivs in
+           let e0 := match op with
+                     | AIdOp => e1
+                     | AUArith u => uarithToJs u e1
+                     | ANeg => "!(" ++ e1 ++ ")"
+                     | AColl => "[" ++ e1 ++ "]"
+                     | ACount => e1 ++ ".length"
+                     | AFlatten => "flatten(" ++ e1 ++ ")"
+                     | ARec s => "{" ++ quotel ++ s ++ quotel ++ ": " ++ e1 ++ "}"
+                     | ADot s => "deref(" ++ e1 ++ ", " ++ quotel ++ s  ++ quotel ++ ")"
+                     | ARecRemove s => "remove(" ++ e1 ++ ", " ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ")"
+                     | ARecProject sl => "project(" ++ e1 ++ ", " ++ (dataToJSPlain quotel (dcoll (map dstring sl))) ++ ")"
+                     | ADistinct => "distinct(" ++ e1 ++ ")"
+                     | ASum => "sum(" ++ e1 ++ ")"
+                     | AArithMean => "arithMean(" ++ e1 ++ ")"
+                     | AToString => "toString(" ++ e1 ++ ")"
+                     | ALeft => "{" ++ quotel ++ "left" ++ quotel  ++ e1 ++ "}"
+                     | ARight => "{" ++ quotel ++ "right" ++ quotel  ++ e1 ++ "}"
+                     | ABrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
+                     | AUnbrand => "unbrand(" ++ e1 ++ ")"
+                     | ACast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
+                     | ASingleton => "singleton(" ++ e1 ++ ")"
+                     | ANumMin => "Math.min.apply(Math," ++ e1 ++ ")"
+                     | ANumMax => "Math.max.apply(Math," ++ e1 ++ ")"
+                     | AForeignUnaryOp fu
+                       => foreign_to_javascript_unary_op i eol quotel fu e1
+                     end in
+           (s1, e0, t0)
+         | NRCBinop op n1 n2 =>
+           let '(s1, e1, t2) := nrcToJS n1 t i eol quotel ivs in
+           let '(s2, e2, t0) := nrcToJS n2 t2 i eol quotel ivs in
+           let e0 := match op with
+                     | ABArith b => barithToJs b e1 e2
+                     | AEq => "equal(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AUnion => "bunion(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AConcat => "concat(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AMergeConcat => "mergeConcat(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AAnd => "(" ++ e1 ++ " && " ++ e2 ++ ")"
+                     | AOr => "(" ++ e1 ++ " || " ++ e2 ++ ")"
+                     | ALt => "(" ++ e1 ++ " < " ++ e2 ++ ")"
+                     | ALe => "(" ++ e1 ++ " <= " ++ e2 ++ ")"
+                     | AMinus => "bminus(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AMin => "bmin(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AMax => "bmax(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | AContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | ASConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
+                     | AForeignBinaryOp fb
+                       => foreign_to_javascript_binary_op i eol quotel fb e1 e2
+                     end in
+           (s1 ++ s2, e0, t0)
+         | NRCLet v bind body =>
+           let '(s1, e1, t2) := nrcToJS bind t i eol quotel ivs in
+           let '(s2, e2, t0) := nrcToJS body t2 i eol quotel ivs in
+           let v0 := "v" ++ v in
+           (s1 ++ (indent i) ++ "var " ++ v0 ++ " = " ++ e1 ++ ";" ++ eol
+               ++ s2,
+            e2, t0)
+         | NRCFor v iter body =>
+           let '(s1, e1, t2) := nrcToJS iter t i eol quotel ivs in
+           let '(s2, e2, t0) := nrcToJS body t2 (i+1) eol quotel ivs in
+           let elm := "v" ++ v in
+           let src := "src" ++ (nat_to_string10 t0) in
+           let idx := "i" ++ (nat_to_string10 t0) in
+           let dst := "dst" ++ (nat_to_string10 t0) in
+           (s1 ++ (indent i) ++ "var " ++ dst ++ " = [];" ++ eol
+               ++ (indent i) ++ ("for (var "
+                                   ++ src ++ "=" ++ e1 ++ ", "
+                                   ++ idx ++ "=0; "
+                                   ++ idx ++ "<" ++ src ++ ".length; "
+                                   ++ idx ++ "++) {" ++ eol)
+               ++ (indent (i+1)) ++ ("var " ++ elm ++ " = " ++ src
+                                            ++ "[" ++ idx ++ "];" ++ eol)
+               ++ s2
+               ++ (indent (i+1)) ++ dst ++ ".push(" ++ e2 ++ ");" ++ eol
+               ++ (indent i) ++ "}" ++ eol,
+            dst, t0 + 1)
+         | NRCIf c n1 n2 =>
+           let '(s1, e1, t2) := nrcToJS c t i eol quotel ivs in
+           let '(s2, e2, t3) := nrcToJS n1 t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t0) := nrcToJS n2 t3 (i+1) eol quotel ivs in
+           let v0 := "t" ++ (nat_to_string10 t0) in
+           (s1 ++ (indent i) ++ "var " ++ v0 ++ ";" ++ eol
+               ++ (indent i) ++ "if (" ++ e1 ++ ") {" ++ eol
+               ++ s2
+               ++ (indent (i+1)) ++ v0 ++ " = " ++ e2 ++ ";" ++ eol
+               ++ (indent i) ++ "} else {" ++ eol
+               ++ s3
+               ++ (indent (i+1)) ++ v0 ++ " = " ++ e3 ++ ";" ++ eol
+               ++ (indent i) ++ "}" ++ eol,
+            v0, t0 + 1)
+         | NRCEither nd xl nl xr nr =>
+           let '(s1, e1, t2) := nrcToJS nd t i eol quotel ivs in
+           let '(s2, e2, t0) := nrcToJS nl t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t1) := nrcToJS nr t2 (i+1) eol quotel ivs in
+           let vl := "v" ++ xl in
+           let vr := "v" ++ xr in
+           let res := "res" ++ (nat_to_string10 t1) in  (* Stores the result from either left or right evaluation so it can be returned *)
+           (s1 ++ (indent i) ++ "var " ++ res ++ " = null;" ++ eol
+               ++ (indent i) ++ "if (either(" ++ e1 ++ ")) {" ++ eol
+               ++ (indent (i+1)) ++ "var " ++ vl ++ " = null;" ++ eol
+               ++ (indent (i+1)) ++ vl ++ " = toLeft(" ++ e1 ++ ");" ++ eol
+               ++ s2
+               ++ (indent (i+1)) ++ res ++ " = " ++ e2 ++ ";" ++ eol
+               ++ (indent i) ++ "} else {" ++ eol
+               ++ (indent (i+1)) ++ "var " ++ vr ++ " = null;" ++ eol
+               ++ (indent (i+1)) ++ vr ++ " = toRight(" ++ e1 ++ ");" ++ eol
+               ++ s3
+               ++ (indent (i+1)) ++ res ++ " = " ++ e3 ++ ";" ++ eol
+               ++ (indent i) ++ "}" ++ eol,
+            res, t0)
+       end.
+
+    (* Java equivalent: JavaScriptBackend.nrcToJSunshadow *)
+    Definition nrcToJSunshadow (n : nrc) (t : nat) (i : nat) (eol : string) (quotel : string) (avoid: list var) (ivs : list (string * string)) :=
+      let n := unshadow_js avoid n in
+      nrcToJS n t i eol quotel ivs.
+
+    (* Java equivalent: JavaScriptBackend.makeJSParams *)
+    Definition makeJSParams (ivs: list string) :=
+      joinStrings ", " ivs.
+
+    (* Free variables are assumed to be constant lookups *)
+    Require Import NShadow.
+    (* Java equivalent: JavaScriptBackend.closeFreeVars *)
+    Definition closeFreeVars (input:string) (e:nrc) (params:list string) : nrc :=
+      let all_free_vars := nrc_free_vars e in
+      let wrap_one_free_var (e':nrc) (fv:string) : nrc :=
+          if (in_dec string_dec fv params)
+          then e'
+          else (NRCLet fv (NRCUnop (ADot fv) (NRCVar input)) e')
+      in
+      fold_left wrap_one_free_var all_free_vars e.
+
+    (* Java equivalent: JavaScriptBackend.paramsToStringedParams *)
+    Definition paramsToStringedParams (params : list string) :=
+      map (fun x => (x,x)) params.
+
+    (* Java equivalent: JavaScriptBackend.nrcToJSFunStub *)    
+    Definition nrcToJSFunStub (harness:bool) (e:nrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
+      let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
+      "function " ++ fname
+                  ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+                  ++ j0
+                  ++ "  return " ++ v0 ++ ";" ++ eol
+                  ++ "}" ++ eol
+                  ++ (if harness then "%HARNESS%" else "").
+
+    (* Java equivalent: JavaScriptBackend.nrcToJSFunStubConstants *)
+    Definition nrcToJSFunStubConstants (e:nrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
+      let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
+      "function " ++ fname
+                  ++ "("++ (makeJSParams params) ++ ") {" ++ eol
+                  ++ "  var constants = mkWorld(constants);" ++ eol
+                  ++ j0
+                  ++ "  return " ++ v0 ++ ";" ++ eol
+                  ++ "}".
+
+    (* Java equivalent: JavaScriptBackend.nrcToJSFun *)
+    Definition nrcToJSFun (input_v:string) (e:nrc) (eol:string) (quotel:string) (ivs : list string) (fname:string) :=
+      let e' := closeFreeVars input_v e ivs in
+      nrcToJSFunStubConstants e' eol quotel ivs fname.
+
+    (* Java equivalent: JavaScriptBackend.generateJavaScript *)
+    Definition nrcToJSTop (e:nrc) : string :=
+      let input_f := "query" in
+      let input_v := "constants" in
+      nrcToJSFun input_v e eol_newline quotel_double (input_v::nil) input_f.
+
+  End NRCJS.
+
+End NNRCtoJavascript.
+
+(* 
+*** Local Variables: ***
+*** coq-load-path: (("../../coq" "QCert")) ***
+*** End: ***
+*)

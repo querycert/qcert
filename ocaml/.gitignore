@@ -1,0 +1,16 @@
+/CACo
+/CAEv
+/CADa
+/*.vo
+/*.aux
+/Test
+/_build/
+/generated/
+/out/
+/CACo.jar
+/CADa.jar
+/CAEv.jar
+/CALib.jar
+/*.aux
+/CALib.cma
+/CALib.cmi
