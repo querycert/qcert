@@ -1,0 +1,2 @@
+select p
+from p in Persons
