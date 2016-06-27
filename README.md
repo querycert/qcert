@@ -35,16 +35,28 @@ This should produce a few executables: CACo for the Q*cert compiler,
 CAEv for the QCert interpreter, and CADa for the Q*cert data
 processor.
 
+3. Compile the supporting runtime for the Java target:
 
-### Testing
+	make java-runtime
+
+
+### Trying Q*cert
 
 see ./samples/README.md
+
+
+## Caveats
+
+- The Spark 2 target is not operational
+- The documentation is based on an early version of the compiler and is outdated
+- Support for the source miniOQL language is very preliminary
 
 
 ## Code Organization
 
 ./coq contains the Coq source code
 ./ocaml contains the toplevel compiler and code extraction from Coq
+./runtime contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
 
 Inside the ./coq directory, the organization is as follows.
 
