@@ -2,12 +2,93 @@
 
 http://github.com/querycert/qcert
 
-## Overview
+## About
 
 This is the source code for the Q*cert certified query compiler. The
-primary focus is on building a state of the art query compiler for
-languages over a rich data model (nested, hierarchical, etc), and an
-implementation which provides correctness guarantees.
+goal of the project is to develop a state of the art query compiler
+for languages over a rich data model (nested, hierarchical, etc), with
+an implementation which provides strong correctness guarantees.
+
+## Installing Q*cert
+
+### Prerequisites
+
+To compile Q*cert from the source, you will need:
+
+ - Coq 8.5pl1 (https://coq.inria.fr/)
+ - OCaml. It should work with OCaml 4.01 or later
+ - The Menhir parser generator. It has been tested with version 20151112
+   http://gallium.inria.fr/~fpottier/menhir/
+
+### Compilation
+
+1. Compile the Coq source:
+
+	make qcert
+	(Note: this will take a while, you can run make faster with 'make -j 8 qcert')
+
+2. Extract the compiler and built the OCaml frontend:
+
+	make extraction
+
+This should produce a few executables: CACo for the Q*cert compiler,
+CAEv for the QCert interpreter, and CADa for the Q*cert data
+processor.
+
+
+### Testing
+
+see ./samples/README.md
+
+
+## Code Organization
+
+./coq contains the Coq source code
+./ocaml contains the toplevel compiler and code extraction from Coq
+
+Inside the ./coq directory, the organization is as follows.
+
+Foundational modules:
+
+./Basic/Util contains useful libraries and lemmas, independant of QCert itself
+./Basic/Data contains the core data model
+./Basic/Operators contains unary/binary operators shared across ILs
+./Basic/TypeSystem contains the core type system
+./Basic/Typing contains typing and type inference for data and operators
+
+Intermediate languages (ILs), including eval, typing, type inference,
+and equivalences/rewrites:
+
+./CAMP contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+./NRA contains support for the Nested Relational Algebra (NRA)
+./NRAEnv contains support for the extension of NRA with environments
+./NNRC contains support for the Named Nested Relational Calculus (NNRC)
+./DNNRC contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+
+Translations:
+
+./Translation contains translations between ILs
+./Backend contains backend support and code generation
+./Frontend contains surface language support (except for jRules)
+
+Toplevel:
+
+./Compiler contains the overall compiler instructure and functional optimizers
+./Tests contains various coq self-tests
+
+(./Updates is early code for updates that isn't part of the actual compiler)
+
+## License
+
+Q*cert is distributed under the terms of the Apache 2.0 License, see ./LICENSE.txt
+
+## Contributions
+
+Q*cert is still at an early phase of development and we welcome
+contributions. Contributors are expected to submit a 'Developer's
+Certificate of Origin' which can be found in ./DCO1.1.txt.
+
+## Background
 
 Current source languages include:
 
@@ -94,86 +175,4 @@ Languages". Technical Report, IBM. July 2016
 [Zah12] Matei Zaharia, et al. "Fast and interactive analytics over
 Hadoop data with Spark." USENIX; login 37.4 (2012): 45-51.
 
-
-
-# Q*cert Code
-
-## Prerequisites
-
-
-To compiler Q*cert from the source, you will need:
-
- - Coq 8.5pl1 (https://coq.inria.fr/)
- - OCaml. It should work with OCaml 4.01 or later
- - The Menhir parser generator. It has been tested with version 20151112
-   http://gallium.inria.fr/~fpottier/menhir/
-
-## Compilation
-
-1. Compile the Coq source:
-
-	make
-	(or to run make faster: make -j 8)
-
-2. Extract the compiler and built the OCaml frontend:
-
-    cd ./ocaml
-	make
-
-This should produce a few executables: CACo for the Q*cert compiler,
-CAEv for the QCert interpreter, and CADa for the Q*cert data
-processor.
-
-
-## Testing
-
-see ./samples/README.md
-
-
-## Code Organization
-
-./coq contains the Coq source code
-./ocaml contains the toplevel compiler and code extraction from Coq
-
-Inside the ./coq directory, the organization is as follows.
-
-Foundational modules:
-
-./Basic/Util contains useful libraries and lemmas, independant of QCert itself
-./Basic/Data contains the core data model
-./Basic/Operators contains unary/binary operators shared across ILs
-./Basic/TypeSystem contains the core type system
-./Basic/Typing contains typing and type inference for data and operators
-
-Intermediate languages (ILs), including eval, typing, type inference,
-and equivalences/rewrites:
-
-./CAMP contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-./NRA contains support for the Nested Relational Algebra (NRA)
-./NRAEnv contains support for the extension of NRA with environments
-./NNRC contains support for the Named Nested Relational Calculus (NNRC)
-./DNNRC contains support for the Distributed Named Nested Relational Calculus (DNNRC)
-
-Translations:
-
-./Translation contains translations between ILs
-./Backend contains backend support and code generation
-./Frontend contains surface language support (except for jRules)
-
-Toplevel:
-
-./Compiler contains the overall compiler instructure and functional optimizers
-./Tests contains various coq self-tests
-
-(./Updates is early code for updates that isn't part of the actual compiler)
-
-## License
-
-Q*cert is distributed under the terms of the Apache 2.0 License, see ./LICENSE.txt
-
-## Contributions
-
-Q*cert is still at an early phase of development and we welcome
-contributions. Contributors are expected to submit a 'Developer's
-Certificate of Origin' which can be found in ./DCO1.1.txt.
 

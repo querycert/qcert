@@ -229,29 +229,29 @@ MODULES = \
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
 
 all:
-	@$(MAKE) qcert-src
-	@$(MAKE) ocaml-extraction
+	@$(MAKE) qcert
+	@$(MAKE) extraction
 	@$(MAKE) java-runtime
 
 java-runtime:
 	@$(MAKE) -C runtime/java
 
 japi:
-	@$(MAKE) ocaml-java-extraction
+	@$(MAKE) java-extraction
 
-qcert-src: Makefile.coq
+qcert: Makefile.coq
 	@echo "[QCert] "
 	@echo "[QCert] Compiling Coq source"
 	@echo "[QCert] "
 	@$(MAKE) -f Makefile.coq
 
-ocaml-extraction:
+extraction:
 	@echo "[QCert] "
 	@echo "[QCert] Extracting compiler to OCaml"
 	@echo "[QCert] "
 	@$(MAKE) -C ocaml realclean all
 
-ocaml-java-extraction:
+java-extraction:
 	@echo "[QCert] "
 	@echo "[QCert] Extracting compiler to OCaml + Java"
 	@echo "[QCert] "

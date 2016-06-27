@@ -31,14 +31,14 @@ OCAMLWRAP=$(OCAMLJAVA)/bin/ocamlwrap
 MENHIRFLAG=-use-menhir
 #MENHIRFLAG=
 
-MAIN=CACo
-MAIN2=CAEv
-MAIN3=CADa
+MAIN=../bin/CACo
+MAIN2=../bin/CAEv
+MAIN3=../bin/CADa
 TARGET=native
 JAR=jar
 
-LIB=CALib
-LIBJS=CALibJS
+LIB=../lib/CALib
+LIBJS=../lib/CALibJS
 
 all: $(MAIN) $(MAIN2) $(MAIN3)
 jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(LIB).jar
