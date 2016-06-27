@@ -56,7 +56,6 @@ abstract class QCertRuntime {
 
   val CONST$WORLD_07 = Nil
 
-
   val CONST$WORLD = CONST$WORLD_07
 
   def run(world: Dataset[Row])
@@ -164,7 +163,7 @@ abstract class QCertRuntime {
   type Either = Row
 
   def eitherStructType(l: DataType, r: DataType): StructType =
-    StructType(StructField("left", l, true) :: StructField("right", r, true) :: Nil)
+    StructType(StructField("$left", l, true) :: StructField("$right", r, true) :: Nil)
 
   // Not sure we can abuse dispatch like this to "infer" the schema. Seems to work...
   def left(v: Int): Either =
@@ -179,8 +178,8 @@ abstract class QCertRuntime {
   // In general, there is no way to infer the types S and R.
   // We need to put annotations on the parameters of left and right during codegen.
   def either[S, T, R](v: Either, left: (S) => T, right: (R) => T): T =
-    if (v.isNullAt(1 /* right! */)) left(v.getAs[S]("left"))
-    else right(v.getAs[R]("right"))
+    if (v.isNullAt(1 /* right! */)) left(v.getAs[S]("$left"))
+    else right(v.getAs[R]("$right"))
 
   /* Brands
  * ======
@@ -193,8 +192,8 @@ abstract class QCertRuntime {
   type BrandedValue = Row
 
   def brandStructType(t: DataType): StructType =
-    StructType(StructField("data", t, false)
-      :: StructField("type", ArrayType(StringType, false), false) :: Nil)
+    StructType(StructField("$data", t, false)
+      :: StructField("$type", ArrayType(StringType, false), false) :: Nil)
 
   // Same thing as with either, need to infer/pass the Spark type. Can we factor this out?
   def brand(v: Int, b: Brand*): BrandedValue =
@@ -204,7 +203,7 @@ abstract class QCertRuntime {
     srow(brandStructType(v.schema), v, b)
 
   def unbrand[T](bv: BrandedValue): T =
-    bv.getAs[T]("data")
+    bv.getAs[T]("$data")
 
   // TODO
   def isSubBrand(a: Brand, b: Brand) =
@@ -215,7 +214,7 @@ abstract class QCertRuntime {
     if (bs == Seq("Any"))
       left(v)
     else if (bs.forall((brand: Brand) => {
-      v.getAs[Seq[Brand]]("type").exists((typ: Brand) => {
+      v.getAs[Seq[Brand]]("$type").exists((typ: Brand) => {
         typ == brand || isSubBrand(typ, brand)
       })
     }))

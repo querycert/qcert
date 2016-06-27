@@ -76,7 +76,7 @@ Section DNNRCtoScala.
     | dunit => "null"
     | dbool true => "true"
     | dbool false => "false"
-    | dcoll l => "Array(" ++ joinStrings ", " (map (scala_of_data m) l) ++ ").sorted"
+    | dcoll l => "Array/*[TODO]*/(" ++ joinStrings ", " (map (scala_of_data m) l) ++ ").sorted"
     | dleft v => "left(" ++ (scala_of_data m v) ++ ")"
     | dright v => "right(" ++ (scala_of_data m v) ++ ")"
     | drec fields =>
