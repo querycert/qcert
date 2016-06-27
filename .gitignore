@@ -5,3 +5,6 @@
 *.glob
 *.aux
 Makefile.coq
+bin/CACo
+bin/CADa
+bin/CAEv

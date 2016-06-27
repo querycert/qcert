@@ -31,9 +31,9 @@ OCAMLWRAP=$(OCAMLJAVA)/bin/ocamlwrap
 MENHIRFLAG=-use-menhir
 #MENHIRFLAG=
 
-MAIN=../bin/CACo
-MAIN2=../bin/CAEv
-MAIN3=../bin/CADa
+MAIN=CACo
+MAIN2=CAEv
+MAIN3=CADa
 TARGET=native
 JAR=jar
 
@@ -50,7 +50,7 @@ generated:
 
 # OCaml build
 $(MAIN): generated $(MAIN).$(TARGET)
-	cp _build/$(MAIN).$(TARGET) $(MAIN)
+	cp _build/$(MAIN).$(TARGET) ../bin/$(MAIN)
 
 $(MAIN).$(TARGET): generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(TARGET)
@@ -60,7 +60,7 @@ $(MAIN).$(JAR): generated
 	cp _build/$(MAIN).$(JAR) $(MAIN).$(JAR)
 
 $(MAIN2): generated $(MAIN2).$(TARGET)
-	cp _build/$(MAIN2).$(TARGET) $(MAIN2)
+	cp _build/$(MAIN2).$(TARGET) ../bin/$(MAIN2)
 
 $(MAIN2).$(TARGET): generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(TARGET)
@@ -70,7 +70,7 @@ $(MAIN2).$(JAR): generated
 	cp _build/$(MAIN2).$(JAR) $(MAIN2).$(JAR)
 
 $(MAIN3): generated $(MAIN3).$(TARGET)
-	cp _build/$(MAIN3).$(TARGET) $(MAIN3)
+	cp _build/$(MAIN3).$(TARGET) ../bin/$(MAIN3)
 
 $(MAIN3).$(TARGET): generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN3).$(TARGET)
