@@ -16,66 +16,76 @@
 
 package org.qcert
 
-import java.util
 import java.util.Comparator
 
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
-
-import scala.reflect.ClassTag
+import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.{SparkConf, SparkContext}
 
 abstract class QCertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
 
-  def customerType() =
+  def customerType =
     StructType(
       StructField("age", IntegerType)::
       StructField("cid", IntegerType)::
       StructField("name", StringType)::Nil)
 
-  def purchaseType() =
+  def purchaseType =
     StructType(
       StructField("cid", IntegerType)::
       StructField("name", StringType)::
       StructField("pid", IntegerType)::
       StructField("quantity", IntegerType)::Nil)
 
-  def mainEntityType() =
+  def mainEntityType =
     StructType(
       StructField("doubleAttribute", DoubleType)::
       StructField("id", IntegerType)::
       StructField("stringId", StringType)::Nil)
 
-  val CONST$WORLD_07 = Array(
-    brand(srow(customerType(), 32, 123, "John Doe"), "entities.Customer"),
-    brand(srow(customerType(), 32, 124, "Jane Doe"), "entities.Customer"),
-    brand(srow(customerType(), 34, 125, "Jim Does"), "entities.Customer"),
-    brand(srow(customerType(), 32, 126, "Jill Does"), "entities.Customer"),
-    brand(srow(customerType(), 34, 127, "Joan Doe"), "entities.Customer"),
-    brand(srow(customerType(), 35, 128, "James Do"), "entities.Customer"),
+  def test07InputType =
+    StructType(
+      StructField("$type", ArrayType(StringType))::
+      StructField("$data", StructType(
+        StructField("$known", StructType(Nil))::
+        StructField("$blob", StringType)::Nil
+      ))::Nil
+    )
 
-    brand(srow(purchaseType(), 123, "Tomatoe", 1, 3), "entities.Purchase"),
-    brand(srow(purchaseType(), 123, "Potatoe", 2, 1), "entities.Purchase"),
-    brand(srow(purchaseType(), 125, "Stiletto", 3, 64), "entities.Purchase"),
-    brand(srow(purchaseType(), 126, "Libretto", 4, 62), "entities.Purchase"),
-    brand(srow(purchaseType(), 128, "Dough", 5, 4), "entities.Purchase"),
-    brand(srow(purchaseType(), 128, "Croissant", 6, 2), "entities.Purchase"),
-
-    brand(srow(mainEntityType(), 4, 201, "201"), "entities.MainEntity"),
-    brand(srow(mainEntityType(), 100, 202, "202"), "entities.MainEntity"))
+  val CONST$WORLD_07 = Nil
 
 
   val CONST$WORLD = CONST$WORLD_07
 
-  /* Data
-   * ====
-   *
-   * Int, Double, String, Boolean
-   * Records are Rows with schema with fields in lexicographic order.
-   * Bags are arrays, unordered. TODO change this!
-   * Either and Branded values are encoded as Rows.
-   */
+  def run(world: Dataset[Row])
+
+  def main(args: Array[String]): Unit = {
+    val sparkCtx = new SparkContext("local", "Test 07", new SparkConf())
+    sparkCtx.setLogLevel("ERROR")
+    val session = SparkSession.builder().getOrCreate()
+
+    val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
+    val df0 = session.read.schema(test07InputType).json(jsonFile)
+    //printing some debugging output for sanity-checking
+    System.out.println("--- input schema ---")
+    df0.printSchema()
+    System.out.println("--- input documents ---")
+    df0.show()
+
+    run(df0)
+    sparkCtx.stop()
+  }
+
+    /* Data
+     * ====
+     *
+     * Int, Double, String, Boolean
+     * Records are Rows with schema with fields in lexicographic order.
+     * Bags are arrays, unordered. TODO change this!
+     * Either and Branded values are encoded as Rows.
+     */
 
   /* Records
  * =======
@@ -84,7 +94,9 @@ abstract class QCertRuntime {
  * Rows are glorified tuples. We can access fields by name, but most operations are by position only.
  * Fields must be ordered by field name!
  */
-  type Record = Row
+  // This seems to cause trouble, because scala can't find an ordering, or something.
+  // This might allow us to override the default ordering for Rows, maybe.
+  // type Record = Row
 
   /** More convenient record (row with schema) construction.
     * Splice array into varargs call: let a = Array(1, 2); srow(schema, a:_*) */
@@ -97,7 +109,7 @@ abstract class QCertRuntime {
   }
 
   // TODO this is a mess
-  def recordConcat(l: Record, r: Record): Record = {
+  def recordConcat(l: Row, r: Row): Row = {
     val rightFieldNames = r.schema.fieldNames diff l.schema.fieldNames
     val rightFieldNamesSet = rightFieldNames.toSet
     val allFieldNames = (rightFieldNames ++ l.schema.fieldNames).distinct.sorted
@@ -115,9 +127,9 @@ abstract class QCertRuntime {
 
   // Ugh. To do stuff with the result, we have to pass T to dot.
   // Alternatively, we can return Object, or Any, or something and write runtime functions that cast their arguments to whatever they need first.
-  def dot[T](n: String)(l: Record): T = l.getAs[T](n)
+  def dot[T](n: String)(l: Row): T = l.getAs[T](n)
 
-  def mergeConcat(l: Record, r: Record): Array[Record] = {
+  def mergeConcat(l: Row, r: Row): Array[Row] = {
     val concatenated = recordConcat(l, r)
     val duplicates = l.schema.fieldNames intersect r.schema.fieldNames
     // TODO could do this before...
@@ -128,11 +140,11 @@ abstract class QCertRuntime {
   }
 
   /** UnaryOp ARec */
-  def singletonRecord(n: String, v: Int): Record = {
+  def singletonRecord(n: String, v: Int): Row = {
     srow(StructType(StructField(n, IntegerType, false) :: Nil), v)
   }
 
-  def singletonRecord(n: String, v: Record): Record = {
+  def singletonRecord(n: String, v: Row): Row = {
     srow(StructType(StructField(n, v.schema, false) :: Nil), v)
   }
 
