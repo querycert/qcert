@@ -49,7 +49,7 @@ generated:
 	(cd generated; coqc -R ../../coq QCert ../Extraction.v)
 
 # OCaml build
-$(MAIN): $(MAIN).$(TARGET)
+$(MAIN): generated $(MAIN).$(TARGET)
 	cp _build/$(MAIN).$(TARGET) $(MAIN)
 
 $(MAIN).$(TARGET): generated
@@ -59,7 +59,7 @@ $(MAIN).$(JAR): generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(JAR)
 	cp _build/$(MAIN).$(JAR) $(MAIN).$(JAR)
 
-$(MAIN2): $(MAIN2).$(TARGET)
+$(MAIN2): generated $(MAIN2).$(TARGET)
 	cp _build/$(MAIN2).$(TARGET) $(MAIN2)
 
 $(MAIN2).$(TARGET): generated
@@ -69,7 +69,7 @@ $(MAIN2).$(JAR): generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(JAR)
 	cp _build/$(MAIN2).$(JAR) $(MAIN2).$(JAR)
 
-$(MAIN3): $(MAIN3).$(TARGET)
+$(MAIN3): generated $(MAIN3).$(TARGET)
 	cp _build/$(MAIN3).$(TARGET) $(MAIN3)
 
 $(MAIN3).$(TARGET): generated
