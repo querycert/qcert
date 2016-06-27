@@ -26,6 +26,8 @@ mechanization is meant as an accompaniment to the ECOOP 2015
 paper(59): "A Pattern Calculus for Rule Languages: Expressiveness,
 Compilation, and Mechanization".</p>
 
+<p><b>WARNING: This documentation is outdated, and reflect early versions of the compiler.</b></p>
+
 <p>It contains source files for a mechanization of the four languages
 presented in the paper: CAMP (Calculus for Aggregating Matching
 Patterns), Rules built on top of CAMP, NRA (Nested Relational Algebra)

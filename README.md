@@ -24,9 +24,9 @@ optimization and code-generation, notably:
 
 A calculus for pattern-matching with aggregation:
 
-     - CAMP, the Calculus of Aggregating Matching Patterns [SSH15]
-       used to capture the pattern matching and data processing
-       semantics of rules languages, such as jRules [BM11]
+     - We use the Calculus of Aggregating Matching Patterns (CAMP)
+       from [SSH15] to capture the pattern matching and data
+       processing semantics of rules languages, such as jRules [BM11]
 
 A nested-relational algebra:
 
@@ -89,7 +89,7 @@ Mechanization." 29th European Conference on Object-Oriented
 Programming. 2015.
 
 [SS16] Avraham Shinnar and Jérôme Siméon. "Nominal Typing for Data
-Languages". Technical Report, IBM. May 2016
+Languages". Technical Report, IBM. July 2016
 
 [Zah12] Matei Zaharia, et al. "Fast and interactive analytics over
 Hadoop data with Spark." USENIX; login 37.4 (2012): 45-51.
