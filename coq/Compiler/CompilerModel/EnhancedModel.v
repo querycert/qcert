@@ -1722,33 +1722,28 @@ Proof.
   intros.
   destruct fb; simpl.
   - destruct f; simpl in *;
-    destruct τ₁; destruct τ₂; simpl in *; try congruence;
-    unfold isFloat in *; destruct x; destruct x0; simpl in *;
-    try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence;
-    destruct ft; destruct ft0; simpl in *; try congruence;
-    inversion H; subst; clear H;
-    constructor;
-    repeat rewrite Foreign_canon;
-    constructor.
+    destruct τ₁; destruct τ₂; simpl in *; try discriminate
+    ; unfold isFloat in *
+    ; destruct x; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; destruct x0; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; invcs H
+    ; constructor
+    ; repeat rewrite Foreign_canon
+    ; constructor.
   - destruct t; simpl in *;
-    try (destruct τ₁; destruct τ₂; simpl in *; try congruence;
-    unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *;
-    destruct x; destruct x0; simpl in *;
-    try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence;
-    destruct ft; destruct ft0; simpl in *; try congruence;
-    inversion H; subst; clear H;
-    constructor;
-    repeat rewrite Foreign_canon;
-    constructor).
-    + destruct τ₁; destruct τ₂; simpl in *; try congruence;
-      unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *;
-      destruct x; destruct x0; simpl in *;
-      try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence.
-      destruct ft; simpl in *; try congruence.
-      inversion H; subst; clear H.
-      constructor.
-      rewrite Nat_canon. rewrite Foreign_canon.
-      constructor.
+    destruct τ₁; destruct τ₂; simpl in *; try discriminate;
+         unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *
+         ; destruct x; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; destruct x0; simpl in H; try discriminate
+    ; try (destruct ft; simpl in H; try discriminate)
+    ; invcs H
+    ; constructor
+    ; repeat rewrite Nat_canon
+    ; repeat rewrite Foreign_canon
+    ; constructor.
 Qed.
 
 Lemma enhanced_binary_op_typing_infer_least
@@ -1762,37 +1757,29 @@ Proof.
   intros.
   destruct fb; simpl.
   - destruct f; simpl in *;
-    destruct τ₁; destruct τ₂; simpl in *; try congruence;
-      unfold isFloat in *; destruct x; destruct x0; simpl in *;
-      try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence;
-      destruct ft; destruct ft0; simpl in *; try congruence;
-      inversion H; subst; clear H;
-      repeat rewrite Foreign_canon in H0;
-      inversion H0; subst; clear H0;
-      inversion H1; subst; clear H1;
-      reflexivity.
+    destruct τ₁; destruct τ₂; simpl in *; try discriminate
+    ;  unfold isFloat in *
+    ; destruct x; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; destruct x0; simpl in H; try discriminate
+    ; try (destruct ft; simpl in H; try discriminate)
+    ; invcs H
+    ; repeat rewrite Foreign_canon in H0
+    ; invcs H0
+    ; invcs H1
+    ; reflexivity.
   - destruct t; simpl in *;
-    try (destruct τ₁; destruct τ₂; simpl in *; try congruence;
-      unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *;
-      destruct x; destruct x0; simpl in *;
-      try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence;
-      destruct ft; destruct ft0; simpl in *; try congruence;
-      inversion H; subst; clear H;
-      repeat rewrite Foreign_canon in H0;
-      inversion H0; subst; clear H0;
-      inversion H1; subst; clear H1;
-      reflexivity).
-    + destruct τ₁; destruct τ₂; simpl in *; try congruence;
-      unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *;
-      destruct x; destruct x0; simpl in *;
-      try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence.
-      destruct ft; simpl in *; try congruence;
-      inversion H; subst; clear H;
-      rewrite Foreign_canon in H0;
-      rewrite Nat_canon in H0;
-      inversion H0; subst; clear H0;
-      inversion H1; subst; clear H1;
-      reflexivity.
+    destruct τ₁; destruct τ₂; simpl in *; try discriminate
+    ; unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *
+    ; destruct x; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; destruct x0; simpl in H; try discriminate
+    ; try (destruct ft; simpl in H; try discriminate)
+    ; invcs H
+    ; repeat rewrite Foreign_canon in H0
+    ; invcs H0
+    ; invcs H1
+    ; reflexivity.
 Qed.
 
 Lemma enhanced_binary_op_typing_infer_complete
@@ -1803,23 +1790,10 @@ Lemma enhanced_binary_op_typing_infer_complete
   ~ enhanced_binary_op_has_type fb τ₁ τ₂ τout.
 Proof.
   destruct fb; simpl; intros.
-  - destruct f; simpl in *;
-    destruct τ₁; destruct τ₂; simpl in *; try congruence;
-    unfold isFloat in *; destruct x; destruct x0; simpl in *;
-    try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence;
-    unfold not; intros;
-    inversion H0; subst; simpl in *;
-    inversion H2; subst; simpl in *;
-    congruence.
-  - destruct t; simpl in *;
-    destruct τ₁; destruct τ₂; simpl in *; try congruence;
-    unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *;
-    destruct x; destruct x0; simpl in *;
-    try (rewrite Bool.andb_false_r in H; simpl in H; congruence); try congruence;
-    unfold not; intros;
-    inversion H0; subst; simpl in *;
-    inversion H2; subst; simpl in *;
-    try congruence.
+  - intro HH; invcs HH.
+    destruct f; simpl in *; invcs H1; simpl in H; try discriminate.
+  - intro HH; invcs HH.
+    destruct t; simpl in *; invcs H1; simpl in H; try discriminate.
 Qed.
 
 Lemma enhanced_binary_op_typing_sound {model : brand_model}
