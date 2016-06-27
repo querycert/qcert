@@ -102,7 +102,7 @@ Section DNNRCtoScala.
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
     | ANeg => prefix "!"
-    | ARec n => "singletonRecord(" ++ n ++ ", " ++ x ++ ")" (* TODO need to pass schema *)
+    | ARec n => "singletonRecord(" ++ quote_string n ++ ", " ++ x ++ ")" (* TODO need to pass schema *)
     | ARight => prefix "right"
     | ASum => postfix "sum"
     | AToString => postfix "toString"
@@ -189,7 +189,7 @@ Section DNNRCtoScala.
 
   Definition dnrcToSpark2Top {A : Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (name: string) (e: dnrc) : string :=
     "object "
-      ++ name ++ " extends com.ibm.qcert.CAMPRuntime {" ++ eol
+      ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
       ++ "def main(args: Array[String]) = {" ++ eol
       ++ "println(" ++ eol
       ++ @scala_of_dnrc A ft fdt m e ++ eol
