@@ -37,8 +37,8 @@ MAIN3=CADa
 TARGET=native
 JAR=jar
 
-LIB=../lib/CALib
-LIBJS=../lib/CALibJS
+LIB=CALib
+LIBJS=CALibJS
 
 all: $(MAIN) $(MAIN2) $(MAIN3)
 jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(LIB).jar
@@ -84,15 +84,15 @@ $(LIBJS).cma: generated
         -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
 	cp _build/$(LIBJS).cma jsapi/$(LIBJS).cma
 
-$(LIB).jar: generated
+../lib/$(LIB).jar _build/$(LIB).cmi: generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).jar
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).cmi
-	cp _build/$(LIB).jar $(LIB).jar
-	cp _build/$(LIB).cmi $(LIB).cmi
+	cp _build/$(LIB).jar ../lib/$(LIB).jar
+	cp _build/$(LIB).cmi ../lib/$(LIB).cmi
 
 # Java API
 
-japi: japi/lib/$(LIB).jar _build/$(LIB).cmi
+japi: ../lib/$(LIB).jar _build/$(LIB).cmi
 	cd _build ; $(OCAMLWRAP) -package "org.qcert.calib" CALib.cmi
 	cp _build/CALibWrapper.java japi/src/org/qcert/calib
 	$(MAKE) -C japi all
@@ -106,7 +106,7 @@ clean:
 	ocamlbuild -clean
 	rm -rf _build
 	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR)
-	rm -f $(LIB).cma $(LIB).jar $(LIB).cmi
+	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi
 	rm -f japi/lib/CALib.jar
 	rm -f japi/src/org/qcert/calib/CALibWrapper.java
 	$(MAKE) -C japi clean
@@ -121,6 +121,6 @@ realclean:
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
 	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3)
-	rm ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3)
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3)
 
 cleanall: realclean
