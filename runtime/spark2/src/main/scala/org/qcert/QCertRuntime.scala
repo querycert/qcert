@@ -86,6 +86,34 @@ abstract class QCertRuntime {
      * Either and Branded values are encoded as Rows.
      */
 
+  def fromBlob(t: DataType, b: JsonElement): Any = t match {
+    case t: IntegerType => b.getAsInt
+    case t: BooleanType => b.getAsBoolean
+    case t: StringType => b.getAsString
+    case t: ArrayType => {
+      import scala.collection.JavaConverters._
+      b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
+    }
+    case t: StructType => t.fieldNames match {
+      case Array("$left", "$right") => sys.error("either")
+      case Array("$type", "$data") => sys.error("brand")
+      case Array("$blob", "$known") =>
+        val r = b.getAsJsonObject
+        val knownFieldValues = t("$known").dataType.asInstanceOf[StructType].fields map ((field: StructField) => {
+          fromBlob(field.dataType, r.get(field.name))
+        })
+        srow(t,
+          // We have the full record in the blob field, even for closed records // TODO change?
+          r.toString,
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues:_*))
+      case _ =>
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))):_*)
+    }
+  }
+
+  def fromBlob(t: DataType, b: String): Any =
+    fromBlob(t, new com.google.gson.JsonParser().parse(b))
+
   /* Records
  * =======
  *
@@ -99,7 +127,7 @@ abstract class QCertRuntime {
 
   /** More convenient record (row with schema) construction.
     * Splice array into varargs call: let a = Array(1, 2); srow(schema, a:_*) */
-  private def srow(s: StructType, vals: Any*): Row = {
+  def srow(s: StructType, vals: Any*): Row = {
     assert(s.fields.length == vals.length,
       "Number of record fields does not match the schema. Did you forget to splice an array parameter?")
     assert(s.fieldNames.sorted.distinct.sameElements(s.fieldNames),
@@ -124,9 +152,8 @@ abstract class QCertRuntime {
     srow(schema, sortedValues: _*)
   }
 
-  // Ugh. To do stuff with the result, we have to pass T to dot.
-  // Alternatively, we can return Object, or Any, or something and write runtime functions that cast their arguments to whatever they need first.
-  def dot[T](n: String)(l: Row): T = l.getAs[T](n)
+  def dot[T](n: String)(l: Row): T =
+    l.getAs[Row]("$known").getAs[T](n)
 
   def mergeConcat(l: Row, r: Row): Array[Row] = {
     val concatenated = recordConcat(l, r)
