@@ -393,7 +393,9 @@ Section NNRCtoJava.
       then ""
       else "package " ++ package_name ++ ";" ++ eol ++ eol)
         ++ "import com.google.gson.*;" ++ eol
-        ++ "import " ++ imports ++ ";" ++ eol
+        ++ (if(imports == "")
+            then ""
+            else "import " ++ imports ++ ";" ++ eol)
         ++ (if(package_name == "org.qcert.runtime")
             then ""
             else "import org.qcert.runtime.*;" ++ eol)

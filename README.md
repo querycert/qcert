@@ -1,24 +1,44 @@
-# Q*cert
+# Q\*cert
 
 http://github.com/querycert/qcert
 
 ## About
 
-This is the source code for the Q*cert certified query compiler. The
+This is the source code for the Q\*cert certified query compiler. The
 goal of the project is to develop a state of the art query compiler
 for languages over a rich data model (nested, hierarchical, etc), with
 an implementation which provides strong correctness guarantees.
 
-## Installing Q*cert
+Q\*cert is built and verified using the Coq proof assistant. A working
+compiler can be obtained by 'extracting' OCaml code from the source
+in Coq.
+
+## Building Q\*cert
 
 ### Prerequisites
 
-To compile Q*cert from the source, you will need:
+To build Q\*cert from the source, you will need:
 
- - Coq 8.5pl1 (https://coq.inria.fr/)
- - OCaml. It should work with OCaml 4.01 or later
- - The Menhir parser generator. It has been tested with version 20151112
-   http://gallium.inria.fr/~fpottier/menhir/
+ - OCaml 4.01 or later (http://ocaml.org/) along with the following libraries:
+  - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
+  - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
+  - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
+ - Coq 8.5pl1 or later (https://coq.inria.fr/)
+
+An easy way to get set up on most platforms is to use the OCaml
+package manager (https://opam.ocaml.org). Once opam is installed, you
+can just add the corresponding libraries:
+
+```
+opam install ocamlbuild
+opam install menhir
+opam install camlp5
+opam install coq
+```
+
+One platform that isn't directly supported by the OCaml package
+manager is Windows. We do not currently have detailed instructions for
+how to build on Windows.
 
 ### Compilation
 
@@ -27,15 +47,52 @@ To compile Q*cert from the source, you will need:
 	make qcert
 	(Note: this will take a while, you can run make faster with 'make -j 8 qcert')
 
-2. Extract the compiler and built the OCaml frontend:
+2. Extract the compiler and build the OCaml frontend:
 
 	make extraction
 
-This should produce a few executables: CACo for the Q*cert compiler,
-CAEv for the QCert interpreter, and CADa for the Q*cert data
-processor.
+This should produce the following executables in the ./bin directory:
+CACo for the Q\*cert compiler, CAEv for the Q\*cert evaluator, and
+CADa for the Q\*cert data processor.
 
-3. Compile the supporting runtime for the Java target:
+## Try Q\*cert
+
+Once the compiler is built, one can use it to compile queries. The
+`samples` directory contains a few examples written in OQL (Object
+Query Language) syntax. For instance:
+
+```bash$ cat samples/oql/test1.oql 
+select p
+from p in Persons
+where p.age = 32```
+
+Calling the compiler on that sample with OQL as source language and
+Javascript as target language can be done as follows:
+
+```bash$ ./bin/CACo -source OQL -target JS samples/oql/test1.oql```
+
+This will produce a javascript file called `test1_js.js` in the
+`samples/oql` directory.
+
+Similarly for Java:
+
+```bash$ ./bin/CACo -source OQL -target Java samples/oql/test1.oql```
+
+## Run queries compiled with Q\*cert
+
+1. Build additional Q\*cert runtimes:
+
+Q\*cert targets a number of languages and data processors as backends
+(currently: Javascript, Java, Cloudant and Spark). The way you run the
+compiled queries varies depending on the target. Usually you need two
+things: (i) a run-time library that implements some of the core
+operators assumed by the compiler (e.g., ways to access records or
+manipulate collections), and (ii) a *query runner* which allows to
+execute the query on some input data.
+
+## Build the Q\*cert runtimes
+
+1. Compile the supporting runtime for the Java target:
 
 	make java-runtime
 
@@ -62,7 +119,7 @@ Inside the ./coq directory, the organization is as follows.
 
 Foundational modules:
 
-./Basic/Util contains useful libraries and lemmas, independant of QCert itself
+./Basic/Util contains useful libraries and lemmas, independant of Q*cert itself
 ./Basic/Data contains the core data model
 ./Basic/Operators contains unary/binary operators shared across ILs
 ./Basic/TypeSystem contains the core type system
