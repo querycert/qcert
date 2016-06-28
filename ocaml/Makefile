@@ -84,7 +84,7 @@ $(LIBJS).cma: generated
         -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
 	cp _build/$(LIBJS).cma jsapi/$(LIBJS).cma
 
-../lib/$(LIB).jar _build/$(LIB).cmi: generated
+../lib/$(LIB).jar ../lib/$(LIB).cmi: generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).jar
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).cmi
 	cp _build/$(LIB).jar ../lib/$(LIB).jar
@@ -122,5 +122,6 @@ realclean:
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
 	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3)
 	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3)
+	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
 
 cleanall: realclean
