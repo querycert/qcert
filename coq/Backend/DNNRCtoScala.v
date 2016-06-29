@@ -94,7 +94,7 @@ Section DNNRCtoScala.
     match op with
     | AArithMean => prefix "arithMean"
     | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
-    | ACast bs => "cast(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
+    | ACast bs => "cast(" ++ joinStrings ", " (x::"/*TODO*/"::(map quote_string bs)) ++ ")" (* TODO need to pass intersection of brands *)
     | AColl => prefix "Array"
     | ACount => postfix "length"
     | ADot n => prefix ("dot/*[TODO]*/(""" ++ n ++ """)")

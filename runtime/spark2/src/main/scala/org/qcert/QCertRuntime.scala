@@ -24,6 +24,8 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.collection.mutable
+
 object test extends QCertRuntime {
 
   def castToCustomerAndUnbrand(r: Row): Either = {
@@ -363,6 +365,23 @@ abstract class QCertRuntime {
       case (x: String, y: String) => x compareTo y
       // Bags
       case (a: Array[_], b: Array[_]) =>
+        // Shorter arrays sort before longer arrays
+        if (a.length.compareTo(b.length) != 0)
+          return a.length.compareTo(b.length)
+        // Sort elements
+        val lt = compare(_: Any, _: Any) < 0
+        val l = List(a: _*).sortWith(lt)
+        val r = List(b: _*).sortWith(lt)
+        // The first unequal element between the two arrays determines array sort order
+        for ((le, re) <- l zip r) {
+          if (le < re)
+            return -1
+          if (le > re)
+            return 1
+        }
+        0
+        // TODO this is copy&pasted from above -- factor out, support combinations, or find something more general
+      case (a: mutable.WrappedArray[_], b: mutable.WrappedArray[_]) =>
         // Shorter arrays sort before longer arrays
         if (a.length.compareTo(b.length) != 0)
           return a.length.compareTo(b.length)
