@@ -232,7 +232,7 @@ all:
 	@$(MAKE) qcert
 	@$(MAKE) extraction
 	@$(MAKE) java-runtime
-	@$(MAKE) spark2-runtime
+#	@$(MAKE) spark2-runtime
 
 java-runtime:
 	@$(MAKE) -C runtime/java
@@ -277,9 +277,27 @@ clean:: Makefile.coq remove_all_derived
 	@$(MAKE) -f Makefile.coq clean
 	@$(MAKE) -C ocaml realclean
 	@$(MAKE) -C runtime/java clean
+	@$(MAKE) -C runtime/spark2 clean
+	@$(MAKE) -C samples clean
 	@rm -f Makefile.coq
 	@rm -f *~
 	@rm -f index.html
+
+DISTDIR=../qcert-0.1.0
+
+$(DISTDIR):
+	@cp -R ../qcert $(DISTDIR)
+	@rm -rf $(DISTDIR)/.git
+	@$(MAKE) -C $(DISTDIR) clean remove_all_derived
+
+dist:
+	$(MAKE) $(DISTDIR)
+	tar cvf $(DISTDIR).tar $(DISTDIR)
+	gzip $(DISTDIR).tar 
+
+cleandist:
+	rm -rf $(DISTDIR)
+	rm -f $(DISTDIR).tar.gz
 
 HTML=index.html
 

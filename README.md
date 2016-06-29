@@ -61,22 +61,28 @@ Once the compiler is built, one can use it to compile queries. The
 `samples` directory contains a few examples written in OQL (Object
 Query Language) syntax. For instance:
 
-```bash$ cat samples/oql/test1.oql 
+```
+$ cat samples/oql/test1.oql 
 select p
 from p in Persons
-where p.age = 32```
+where p.age = 32
+```
 
 Calling the compiler on that sample with OQL as source language and
 Javascript as target language can be done as follows:
 
-```bash$ ./bin/CACo -source OQL -target JS samples/oql/test1.oql```
+```
+$ ./bin/CACo -source OQL -target JS samples/oql/test1.oql
+```
 
 This will produce a javascript file called `test1_js.js` in the
 `samples/oql` directory.
 
 Similarly for Java:
 
-```bash$ ./bin/CACo -source OQL -target Java samples/oql/test1.oql```
+```
+$ ./bin/CACo -source OQL -target Java samples/oql/test1.oql
+```
 
 ## Run queries compiled with Q\*cert
 
