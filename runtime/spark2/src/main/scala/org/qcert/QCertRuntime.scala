@@ -18,6 +18,7 @@ package org.qcert
 
 import java.util.Comparator
 
+import com.google.gson.{JsonElement, JsonNull, JsonObject, JsonPrimitive}
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
