@@ -24,14 +24,52 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 
+object test extends QCertRuntime {
+
+  def castToCustomerAndUnbrand(r: Row): Either = {
+    if (r.getSeq[String](r.fieldIndex("$type")).contains("entities.Customer")) {
+      val blob = r.getAs[Row]("$data").getAs[String]("$blob")
+      left(fromBlob(wrappedCustomerType, blob).asInstanceOf[Row])
+    } else {
+      right(srow(StructType(Seq())))
+    }
+  }
+
+  override def run(world: Dataset[Either]): Unit = {
+    val f = world.first()
+    val bar = cast(f, wrappedCustomerType, "entities.Customer")
+    println(bar)
+
+    val foo = world.collect().map((world_element: Row) => {
+      either(cast(world_element, wrappedCustomerType, "entities.Customer")/* castToCustomerAndUnbrand(world_element) */,
+        (customer: Row) => {
+          println(customer)
+          dot[String]("name")(unbrand(customer))
+          // val blob = customer.getAs[Row]("$data").getAs[String]("$blob")
+          // println(blob)
+          // println(fromBlob(customerType, blob))
+        },
+        (not_a_customer: Row) => {
+          "bla"
+        })
+    })
+    foo foreach((n: String) => println(n))
+  }
+}
+
 abstract class QCertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
 
   def customerType =
-    StructType(
-      StructField("age", IntegerType)::
-      StructField("cid", IntegerType)::
-      StructField("name", StringType)::Nil)
+    StructType(Seq(
+      StructField("age", IntegerType),
+      StructField("cid", IntegerType),
+      StructField("name", StringType)))
+
+  def wrappedCustomerType =
+    StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", customerType)))
 
   def purchaseType =
     StructType(
@@ -203,11 +241,14 @@ abstract class QCertRuntime {
   def right(v: Row): Either =
     srow(eitherStructType(DataTypes.NullType, v.schema), null, v)
 
+  def none(): Either =
+    srow(eitherStructType(DataTypes.NullType, DataTypes.NullType), null, null)
+
   // In general, there is no way to infer the types S and R.
   // We need to put annotations on the parameters of left and right during codegen.
-  def either[S, T, R](v: Either, left: (S) => T, right: (R) => T): T =
-    if (v.isNullAt(1 /* right! */)) left(v.getAs[S]("$left"))
-    else right(v.getAs[R]("$right"))
+  def either[L, T, R](v: Either, left: (L) => T, right: (R) => T): T =
+    if (v.isNullAt(0)) right(v.getAs[R]("$right"))
+    else left(v.getAs[L]("$left"))
 
   /* Brands
  * ======
@@ -237,18 +278,39 @@ abstract class QCertRuntime {
   def isSubBrand(a: Brand, b: Brand) =
     false
 
-  def cast(v: BrandedValue, bs: Brand*): Either = {
-    // Why is this special cased for a singleton list? Don't we have to do that for subtyping too?
-    if (bs == Seq("Any"))
-      left(v)
-    else if (bs.forall((brand: Brand) => {
+  def reshape(v: Any, t: DataType): Any = (v, t) match {
+    case (i: Int, t: IntegerType) => i
+    case (s: String, t: StringType) => s
+    case (b: Boolean, t: BooleanType) => b
+    case (r: Row, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") =>
+        val blob = r.getAs[String]("$blob")
+        // NOTE We get all the known fields from the blob. If we ever decide to only keep unknown fields in the blob we have to change this.
+        val known = fromBlob(t("$known").dataType, blob)
+        srow(t, blob, known)
+      // TODO incomplete
+      }
+    // TODO incomplete
+  }
+
+  /** QCert cast operator
+    *
+    * @param v The value has to be a branded value, that is a Row with fields $data : τ and $type : Array[String].
+    * @param t The intersection type of the brands we are casting to. The data will be reshaped to match this type.
+    * @param bs The brands we are casting to.
+    * @return Either a right, if the cast fails, or a branded value with the data reshaped to fit the intersection.
+    */
+  def cast(v: BrandedValue, t: DataType, bs: Brand*): Either = {
+    // First, check whether the cast succeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
+    if (!bs.forall((brand: Brand) => {
       v.getAs[Seq[Brand]]("$type").exists((typ: Brand) => {
         typ == brand || isSubBrand(typ, brand)
       })
-    }))
-      left(v)
-    else
-      right(null)
+    })) return none()
+    // Second, if the cast succeeds, reshape data to match the intersection type
+    val data = v.get(v.fieldIndex("$data"))
+    val reshaped = reshape(data, t).asInstanceOf[Row] // TODO this cast is wrong. Write a brand(Any, Brand*) method
+    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")):_*))
   }
 
   /* Bags
