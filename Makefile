@@ -61,6 +61,7 @@ MODULES = \
 	Basic/BasicRuntime \
 	Basic/TypeSystem/ForeignType \
 	Basic/TypeSystem/RType \
+	Basic/TypeSystem/DType \
         Basic/TypeSystem/TBrandContext \
 	Basic/TypeSystem/RSubtype \
 	Basic/TypeSystem/RSubtypeProp \
@@ -72,6 +73,9 @@ MODULES = \
 	Basic/TypeSystem/Types \
 	Basic/Typing/ForeignDataTyping \
 	Basic/Typing/TData \
+	Basic/Typing/TDData \
+	Basic/Typing/TBindings \
+	Basic/Typing/TDBindings \
 	Basic/Typing/ForeignOpsTyping \
 	Basic/Typing/TDataInfer \
 	Basic/Typing/TOps \
@@ -140,6 +144,7 @@ MODULES = \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCEq \
 	DNNRC/Calculus/SparkIR \
+	DNNRC/Typing/TDNNRC \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
 	CAMP/Rules/PatternSugar \

@@ -25,10 +25,11 @@ Section DNNRC.
   Require Import Utils BasicRuntime.
   Require Import DData.
 
+  Context {fruntime:foreign_runtime}.
+  Context {h:brand_relation_t}.
+  
   (** Named Nested Relational Calculus *)
   
-  Context {fruntime:foreign_runtime}.
-
   Definition var := string.
 
   Section plug.
@@ -36,11 +37,11 @@ Section DNNRC.
 
     Class AlgPlug :=
       mkAlgPlug {
-          plug_eval : list (string*string) -> bindings -> T -> option data;
-          plug_normalized {h} :
+          plug_eval : bindings -> T -> option data;
+          plug_normalized :
             forall op:T, forall (constant_env:bindings) (o:data),
                 Forall (fun x => data_normalized h (snd x)) constant_env ->
-                plug_eval h constant_env op = Some o -> data_normalized h o;
+                plug_eval constant_env op = Some o -> data_normalized h o;
 (*        plug_equiv {h} (op1 op2:T) :
             forall (env:bindings),
               Forall (data_normalized h) (map snd env) ->
@@ -48,6 +49,8 @@ Section DNNRC.
         }.
 
     Definition plug_abst : Type := (list string) * T.
+
+    Generalizable Variables T.
   End plug.
   
   Section GenDNNRC.
@@ -161,9 +164,7 @@ Section DNNRC.
       apply dnrc_ind; trivial.
     Qed.
 
-    Context (h:brand_relation_t).
-
-    Fixpoint dnrc_eval {T} {plug: @AlgPlug T} (env:dbindings) (e:dnrc) : option ddata :=
+    Fixpoint dnrc_eval `{plug: AlgPlug} (env:dbindings) (e:dnrc) : option ddata :=
       match e with
       | DNRCVar _ x =>
         lookup equiv_dec env x
@@ -217,7 +218,7 @@ Section DNNRC.
         match listo_to_olist (map (fun a => olift checkDistrAndCollect (dnrc_eval env a)) nrclist) with
         | Some args =>
           let aconstant_env := combine (fst closure) args in
-          match @plug_eval T plug h aconstant_env (snd closure) with
+          match @plug_eval T plug aconstant_env (snd closure) with
           | None => None
           | Some (dcoll c) => Some (Ddistr c)
           | Some _ => None
@@ -229,7 +230,7 @@ Section DNNRC.
     (* evaluation preserves normalization *)
     Require Import DDataNorm.
 
-    Lemma dnrc_alg_bindings_normalized {T} {plug:@AlgPlug T} denv l l1 r :
+    Lemma dnrc_alg_bindings_normalized `{plug:AlgPlug} denv l l1 r :
       Forall (ddata_normalized h) (map snd denv) ->
       (Forall
         (fun n : dnrc =>
@@ -293,7 +294,7 @@ Section DNNRC.
           apply (IHl (s,d0)); simpl in *.
           assumption.
     Qed.
-      
+
     Lemma dnrc_eval_normalized {T} {plug:@AlgPlug T} denv e {o} :
       dnrc_eval denv e = Some o ->
       Forall (ddata_normalized h) (map snd denv) ->
@@ -406,14 +407,14 @@ Section DNNRC.
         case_eq (rmap
                    (fun a : dnrc => olift checkDistrAndCollect (dnrc_eval denv a))
                    r); intros; rewrite H2 in H0; try discriminate.
-        case_eq (plug_eval h (combine (fst op) l) (snd op)); intros;
+        case_eq (plug_eval (combine (fst op) l) (snd op)); intros;
         rewrite H3 in H0; simpl in *; try discriminate.
         destruct d; try discriminate.
         inversion H0; subst; clear H0.
         destruct plug.
         assert (data_normalized h (dcoll l0)).
         + destruct op; simpl in *.
-          apply (plug_normalized0 h t (combine l1 l)).
+          apply (plug_normalized0 t (combine l1 l)).
           * (* Prove constant env is normalized *)
             apply (dnrc_alg_bindings_normalized denv l l1 r H1 H H2).
           * assumption.
@@ -515,19 +516,17 @@ Section DNNRC.
       - apply IHdenv. apply H.
     Qed.
       
-    Context (h:brand_relation_t).
-
     Lemma rmap_nrc_to_dnrc_correct {A} {T} {plug:@AlgPlug T} (annot:A) tenv denv v l n2 :
       wf_denv tenv denv ->
       (forall (tenv : list (var * dlocalization))
              (denv : list (var * ddata)),
         wf_denv tenv denv ->
         lift Dlocal (nrc_eval h (localize_denv denv) n2) =
-        dnrc_eval h denv (nrc_to_dnrc annot tenv n2)) ->
+        dnrc_eval denv (nrc_to_dnrc annot tenv n2)) ->
         rmap
           (fun d1 : data =>
              olift checkLocal
-                   (dnrc_eval h ((v, Dlocal d1) :: denv)
+                   (dnrc_eval ((v, Dlocal d1) :: denv)
                                (nrc_to_dnrc annot ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nrc_eval h ((v, d1) :: localize_denv denv) n2) l.
     Proof.
       intros Hwf; intros.
@@ -547,7 +546,7 @@ Section DNNRC.
     Lemma nrc_to_dnrc_correct {A} {T} (annot:A) {plug:@AlgPlug T} (tenv:list (var*dlocalization)) (n:nrc) :
       forall denv:list (var*ddata),
         wf_denv tenv denv ->
-        lift Dlocal (nrc_eval h (localize_denv denv) n) = dnrc_eval h denv (nrc_to_dnrc annot tenv n).
+        lift Dlocal (nrc_eval h (localize_denv denv) n) = dnrc_eval denv (nrc_to_dnrc annot tenv n).
     Proof.
       revert tenv; nrc_cases (induction n) Case; intros; simpl; intros.
       unfold wf_denv in H;
@@ -634,15 +633,15 @@ Section DNNRC.
     
     Definition nraenv_closure : Set := (list string) * algenv.
 
-    Definition nraenv_eval h aconstant_env op :=
+    Definition nraenv_eval aconstant_env op :=
       let aenv := drec nil in (* empty local environment to start, which is an empty record *)
       let aid := dcoll ((drec nil)::nil) in (* to be checked *)
       fun_of_algenv h aconstant_env op aenv aid.
 
     Lemma nraenv_eval_normalized :
-      forall h, forall op:algenv, forall (constant_env:bindings) (o:data),
+      forall op:algenv, forall (constant_env:bindings) (o:data),
       Forall (fun x => data_normalized h (snd x)) constant_env ->
-      nraenv_eval h constant_env op = Some o ->
+      nraenv_eval constant_env op = Some o ->
       data_normalized h o.
     Proof.
       intros.

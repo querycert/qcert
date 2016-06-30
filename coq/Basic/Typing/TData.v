@@ -41,11 +41,11 @@ Section TData.
   Context {fdata:foreign_data}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
+  Context {m:brand_model}.
 
-    Definition Rrec (r1 r2:(string*data)) :=
+  Definition Rrec (r1 r2:(string*data)) :=
     ODT_lt_dec (fst r1) (fst r2).
 
-  Context {m:brand_model}.
 
   Inductive data_type : data -> rtype -> Prop :=
   | dttop d : data_normalized brand_relation_brands d -> data_type d Top
@@ -837,42 +837,6 @@ Qed.
     auto 2.
   Qed.
 
-  Definition bindings_type (b:list (string*data)) (t:tbindings)
-    := Forall2 (fun xy1 xy2 =>
-                      (fst xy1) = (fst xy2)
-                  /\ data_type (snd xy1) (snd xy2)) b t.
-
-  Lemma bindings_type_has_type {env Γ} pf :
-      bindings_type  env Γ ->
-      data_type (drec env) (Rec Closed Γ pf).
-  Proof.
-    intros.
-    apply dtrec_full.
-    assumption.
-  Qed.
-
-  Lemma bindings_type_sort c τc :
-    bindings_type c τc ->
-    bindings_type (rec_sort c) (rec_sort τc).
-  Proof.
-    unfold bindings_type.
-    intros.
-    apply rec_sort_Forall2; trivial.
-    apply sorted_forall_same_domain; trivial.
-  Qed.
-
-  Hint Resolve data_type_normalized.
-  Lemma bindings_type_Forall_normalized c τc :
-    bindings_type c τc ->
-    Forall
-      (fun d : string * data => data_normalized brand_relation_brands (snd d))
-      c.
-  Proof.
-    induction 1; trivial.
-    intuition.
-    eauto.
-  Qed.
-
 End TData.
 
 (* expands well-typed data with a specific type *)
@@ -1566,7 +1530,6 @@ Global Instance data_type_subtype_prop
 End subtype.
 
 Hint Resolve data_type_normalized. 
-Hint Resolve bindings_type_Forall_normalized.
 
 (* 
 *** Local Variables: ***

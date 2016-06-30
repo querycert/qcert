@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TType.
+Section RType.
   Require Import String.
   Require Import List.
   Require Import Sorting.
@@ -691,7 +691,7 @@ Qed.
     destruct (string_dec s s0); subst; intuition discriminate.
   Qed.
 
-End TType.
+End RType.
 
 Section recmaybe.
   Context {ftype:foreign_type}.
@@ -1025,8 +1025,6 @@ Section other.
   Proof.
     destruct τ using rtype_rect; intuition.
   Qed.
-
-  Definition tbindings := list (string*rtype).
 
 End other.
 

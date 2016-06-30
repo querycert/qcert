@@ -28,19 +28,16 @@ Section DNNRCEq.
   Require Import Utils BasicRuntime.
   Require Import DData DDataNorm DNNRC.
 
-  Context {fruntime:foreign_runtime}.
   Context {A:Type}.
   Context {eqdec:EqDec A eq}.
-  Context {T:Type}.
-  Context {plug:@AlgPlug fruntime T}.
+  Context `{plug:AlgPlug}.
 
   (** Equivalence between expressions in the Named Nested Relational Calculus *)
 
   Definition dnnrc_eq (e1 e2:dnrc) : Prop :=
-    forall (h:brand_relation_t),
     forall (denv:dbindings),
       Forall (ddata_normalized h) (map snd denv) ->
-      @dnrc_eval _ A h T plug denv e1 = @dnrc_eval _ A h T plug denv e2.
+      @dnrc_eval _ h A T plug denv e1 = @dnrc_eval _ h A T plug denv e2.
 
   Global Instance dnnrc_equiv : Equivalence dnnrc_eq.
   Proof.
@@ -48,10 +45,10 @@ Section DNNRCEq.
     - unfold Reflexive, dnnrc_eq.
       intros; reflexivity.
     - unfold Symmetric, dnnrc_eq.
-      intros; rewrite (H h denv) by trivial; reflexivity.
+      intros; rewrite (H denv) by trivial; reflexivity.
     - unfold Transitive, dnnrc_eq.
-      intros; rewrite (H h denv) by trivial;
-      rewrite (H0 h denv) by trivial; reflexivity.
+      intros; rewrite (H denv) by trivial;
+      rewrite (H0 denv) by trivial; reflexivity.
   Qed.
 
   (* all the dnnrc constructors are proper wrt. equivalence *)
@@ -79,8 +76,8 @@ Section DNNRCEq.
     intros; simpl. subst.
     rewrite H1 by trivial.
     rewrite H2 by trivial.
-    case_eq (@dnrc_eval _ _ h _ plug denv y1);
-      case_eq (@dnrc_eval _ _ h _ plug denv y2); intros; simpl; trivial.
+    case_eq (@dnrc_eval _ _ _ _ plug denv y1);
+      case_eq (@dnrc_eval _ _ _ _ plug denv y2); intros; simpl; trivial.
     destruct d0; destruct d; try reflexivity; simpl.
     rewrite H0; [reflexivity| | ].
     apply (@dnrc_eval_normalized_local _ _ _ _ plug denv y1); try assumption.
@@ -94,7 +91,7 @@ Section DNNRCEq.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst.
     rewrite H1 by trivial.
-    case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
+    case_eq (dnrc_eval denv y1); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     rewrite H0; [reflexivity| ].
     apply (@dnrc_eval_normalized_local _ _ _ _ plug denv y1); try assumption.
@@ -106,13 +103,13 @@ Section DNNRCEq.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. rewrite H0; clear H0; rewrite H1 by trivial; clear H1.
-    case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
+    case_eq (dnrc_eval denv y1); simpl; trivial; intros.
     rewrite H2; eauto.
     constructor; eauto.
     simpl.
     apply (@dnrc_eval_normalized _ _ _ _ plug denv y1 d); try assumption.
   Qed.
-    
+
   (* DNRCFor *)
 
   Hint Resolve data_normalized_dcoll_in.
@@ -121,7 +118,7 @@ Section DNNRCEq.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. rewrite H1 by trivial; clear H1. subst.
-    case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
+    case_eq (dnrc_eval denv y1); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     f_equal.
@@ -143,7 +140,7 @@ Section DNNRCEq.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst. rewrite H0 by trivial; clear H0.
-    case_eq (dnrc_eval h denv y0); simpl; trivial; intros.
+    case_eq (dnrc_eval denv y0); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     destruct b; eauto.
@@ -160,7 +157,7 @@ Section DNNRCEq.
       rewrite Forall_forall; intros.
       inversion H; subst.
       unfold olift, checkLocal in eqq1.
-      case_eq (dnrc_eval h denv y0); intros; rewrite H1 in eqq1; try congruence;
+      case_eq (dnrc_eval denv y0); intros; rewrite H1 in eqq1; try congruence;
       destruct d0; try congruence; inversion eqq1; subst.
       assert (ddata_normalized h (Dlocal (dleft d))).
       apply (@dnrc_eval_normalized _ _ _ _ plug denv y0); assumption.
@@ -172,7 +169,7 @@ Section DNNRCEq.
       rewrite Forall_forall; intros.
       inversion H; subst.
       unfold olift, checkLocal in eqq1.
-      case_eq (dnrc_eval h denv y0); intros; rewrite H1 in eqq1; try congruence;
+      case_eq (dnrc_eval denv y0); intros; rewrite H1 in eqq1; try congruence;
       destruct d0; try congruence; inversion eqq1; subst.
       assert (ddata_normalized h (Dlocal (dright d))).
       apply (@dnrc_eval_normalized _ _ _ _ plug denv y0); assumption.

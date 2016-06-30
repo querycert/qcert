@@ -30,7 +30,7 @@ Section TAlgEnv.
   (** Typing for NRA *)
   Section typ.
     Context {m:basic_model}.
-    Context (τconstants:list (string*rtype)).
+    Context (τconstants:tbindings).
   
   Inductive algenv_type : algenv -> rtype -> rtype -> rtype -> Prop :=
   | ANTID {τenv τ} :
