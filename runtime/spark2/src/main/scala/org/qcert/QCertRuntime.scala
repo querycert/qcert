@@ -18,46 +18,89 @@ package org.qcert
 
 import java.util.Comparator
 
-import com.google.gson.{JsonElement, JsonNull, JsonObject, JsonPrimitive}
+import com.google.gson.JsonElement
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.collection.mutable
+
+object test extends QCertRuntime {
+
+  def castToCustomerAndUnbrand(r: Row): Either = {
+    if (r.getSeq[String](r.fieldIndex("$type")).contains("entities.Customer")) {
+      val blob = r.getAs[Row]("$data").getAs[String]("$blob")
+      left(fromBlob(wrappedCustomerType, blob).asInstanceOf[Row])
+    } else {
+      right(srow(StructType(Seq())))
+    }
+  }
+
+  override def run(world: Dataset[Either]): Unit = {
+    val f = world.first()
+    val bar = cast(f, wrappedCustomerType, "entities.Customer")
+    println(bar)
+
+    val foo = world.collect().map((world_element: Row) => {
+      either(cast(world_element, wrappedCustomerType, "entities.Customer") /* castToCustomerAndUnbrand(world_element) */ ,
+        (customer: Row) => {
+          println(toBlob(world_element))
+          println(toBlob(customer))
+          dot[String]("name")(unbrand(customer))
+          // val blob = customer.getAs[Row]("$data").getAs[String]("$blob")
+          // println(blob)
+          // println(fromBlob(customerType, blob))
+        },
+        (not_a_customer: Row) => {
+          "bla"
+        })
+    })
+    foo foreach ((n: String) => println(n))
+  }
+}
+
 abstract class QCertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
 
   def customerType =
-    StructType(
-      StructField("age", IntegerType)::
-      StructField("cid", IntegerType)::
-      StructField("name", StringType)::Nil)
+    StructType(Seq(
+      StructField("age", IntegerType),
+      StructField("cid", IntegerType),
+      StructField("name", StringType)))
+
+  def wrappedCustomerType =
+    StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", customerType)))
 
   def purchaseType =
     StructType(
-      StructField("cid", IntegerType)::
-      StructField("name", StringType)::
-      StructField("pid", IntegerType)::
-      StructField("quantity", IntegerType)::Nil)
+      StructField("cid", IntegerType) ::
+        StructField("name", StringType) ::
+        StructField("pid", IntegerType) ::
+        StructField("quantity", IntegerType) :: Nil)
 
   def mainEntityType =
     StructType(
-      StructField("doubleAttribute", DoubleType)::
-      StructField("id", IntegerType)::
-      StructField("stringId", StringType)::Nil)
+      StructField("doubleAttribute", DoubleType) ::
+        StructField("id", IntegerType) ::
+        StructField("stringId", StringType) :: Nil)
 
   def test07InputType =
     StructType(
-      StructField("$type", ArrayType(StringType))::
-      StructField("$data", StructType(
-        StructField("$known", StructType(Nil))::
-        StructField("$blob", StringType)::Nil
-      ))::Nil
+      StructField("$type", ArrayType(StringType)) ::
+        StructField("$data", StructType(
+          StructField("$known", StructType(Nil)) ::
+            StructField("$blob", StringType) :: Nil
+        )) :: Nil
     )
 
   val CONST$WORLD_07 = Nil
 
   val CONST$WORLD = CONST$WORLD_07
+
+  val gson = new com.google.gson.Gson()
 
   def run(world: Dataset[Row])
 
@@ -78,23 +121,13 @@ abstract class QCertRuntime {
     sparkCtx.stop()
   }
 
-    /* Data
-     * ====
-     *
-     * Int, Double, String, Boolean
-     * Records are Rows with schema with fields in lexicographic order.
-     * Bags are arrays, unordered. TODO change this!
-     * Either and Branded values are encoded as Rows.
-     */
-
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
     case t: IntegerType => b.getAsInt
     case t: BooleanType => b.getAsBoolean
     case t: StringType => b.getAsString
-    case t: ArrayType => {
+    case t: ArrayType =>
       import scala.collection.JavaConverters._
       b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
-    }
     case t: StructType => t.fieldNames match {
       case Array("$left", "$right") => sys.error("either")
       case Array("$type", "$data") => sys.error("brand")
@@ -104,16 +137,29 @@ abstract class QCertRuntime {
           fromBlob(field.dataType, r.get(field.name))
         })
         srow(t,
-          // We have the full record in the blob field, even for closed records // TODO change?
+          // We have the full record in the blob field, even for closed records
           r.toString,
-          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues:_*))
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
       case _ =>
-        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))):_*)
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
     }
   }
 
   def fromBlob(t: DataType, b: String): Any =
     fromBlob(t, new com.google.gson.JsonParser().parse(b))
+
+  // TODO we might be better off writing a custom gson serializer
+  def toBlob(v: Any): String = v match {
+    case i: Int => i.toString
+    case true => "true"
+    case false => "false"
+    case s: String => gson.toJson(s)
+    case a: mutable.WrappedArray[_] =>
+      a.map(toBlob(_)).mkString("[", ", ", "]")
+    case r: Row =>
+      // https://issues.scala-lang.org/browse/SI-6476
+      r.schema.fieldNames.map(f => "\"" + f + "\" : " + toBlob(r.getAs[Any](f))).mkString("{", ", ", "}")
+  }
 
   /* Records
  * =======
@@ -139,14 +185,11 @@ abstract class QCertRuntime {
   // TODO this is a mess
   def recordConcat(l: Row, r: Row): Row = {
     val rightFieldNames = r.schema.fieldNames diff l.schema.fieldNames
-    val rightFieldNamesSet = rightFieldNames.toSet
     val allFieldNames = (rightFieldNames ++ l.schema.fieldNames).distinct.sorted
     val schema = allFieldNames.foldLeft(new StructType())((schema: StructType, field: String) => {
       val inLeft = l.schema.fieldNames.indexOf(field)
       schema.add(if (inLeft == -1) r.schema.fields(r.schema.fieldNames.indexOf(field)) else l.schema.fields(inLeft))
     })
-    // val schema: StructType = rightFieldNames.foldLeft(l.schema)((schema: StructType, rfn: String) =>
-    //  schema.add(r.schema.fields(r.fieldIndex(rfn))))
     val names = l.schema.fieldNames ++ rightFieldNames
     val values = l.toSeq ++ rightFieldNames.map((rfn: String) => r.get(r.fieldIndex(rfn)))
     val sortedValues = (names zip values).sortBy(_._1).map(_._2)
@@ -156,6 +199,7 @@ abstract class QCertRuntime {
   def dot[T](n: String)(l: Row): T =
     l.getAs[Row]("$known").getAs[T](n)
 
+  // TODO adapt to new record representation ($blob + $known)
   def mergeConcat(l: Row, r: Row): Array[Row] = {
     val concatenated = recordConcat(l, r)
     val duplicates = l.schema.fieldNames intersect r.schema.fieldNames
@@ -203,11 +247,14 @@ abstract class QCertRuntime {
   def right(v: Row): Either =
     srow(eitherStructType(DataTypes.NullType, v.schema), null, v)
 
+  def none(): Either =
+    srow(eitherStructType(DataTypes.NullType, DataTypes.NullType), null, null)
+
   // In general, there is no way to infer the types S and R.
   // We need to put annotations on the parameters of left and right during codegen.
-  def either[S, T, R](v: Either, left: (S) => T, right: (R) => T): T =
-    if (v.isNullAt(1 /* right! */)) left(v.getAs[S]("$left"))
-    else right(v.getAs[R]("$right"))
+  def either[L, T, R](v: Either, left: (L) => T, right: (R) => T): T =
+    if (v.isNullAt(0)) right(v.getAs[R]("$right"))
+    else left(v.getAs[L]("$left"))
 
   /* Brands
  * ======
@@ -237,18 +284,39 @@ abstract class QCertRuntime {
   def isSubBrand(a: Brand, b: Brand) =
     false
 
-  def cast(v: BrandedValue, bs: Brand*): Either = {
-    // Why is this special cased for a singleton list? Don't we have to do that for subtyping too?
-    if (bs == Seq("Any"))
-      left(v)
-    else if (bs.forall((brand: Brand) => {
+  def reshape(v: Any, t: DataType): Any = (v, t) match {
+    case (i: Int, t: IntegerType) => i
+    case (s: String, t: StringType) => s
+    case (b: Boolean, t: BooleanType) => b
+    case (r: Row, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") =>
+        val blob = r.getAs[String]("$blob")
+        // NOTE We get all the known fields from the blob. If we ever decide to only keep unknown fields in the blob we have to change this.
+        val known = fromBlob(t("$known").dataType, blob)
+        srow(t, blob, known)
+      // TODO incomplete
+    }
+    // TODO incomplete
+  }
+
+  /** QCert cast operator
+    *
+    * @param v  The value has to be a branded value, that is a Row with fields $data : τ and $type : Array[String].
+    * @param t  The intersection type of the brands we are casting to. The data will be reshaped to match this type.
+    * @param bs The brands we are casting to.
+    * @return Either a right, if the cast fails, or a branded value with the data reshaped to fit the intersection.
+    */
+  def cast(v: BrandedValue, t: DataType, bs: Brand*): Either = {
+    // First, check whether the cast succeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
+    if (!bs.forall((brand: Brand) => {
       v.getAs[Seq[Brand]]("$type").exists((typ: Brand) => {
         typ == brand || isSubBrand(typ, brand)
       })
-    }))
-      left(v)
-    else
-      right(null)
+    })) return none()
+    // Second, if the cast succeeds, reshape data to match the intersection type
+    val data = v.get(v.fieldIndex("$data"))
+    val reshaped = reshape(data, t).asInstanceOf[Row] // TODO this cast is wrong. Write a brand(Any, Brand*) method
+    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")): _*))
   }
 
   /* Bags
@@ -301,6 +369,23 @@ abstract class QCertRuntime {
       case (x: String, y: String) => x compareTo y
       // Bags
       case (a: Array[_], b: Array[_]) =>
+        // Shorter arrays sort before longer arrays
+        if (a.length.compareTo(b.length) != 0)
+          return a.length.compareTo(b.length)
+        // Sort elements
+        val lt = compare(_: Any, _: Any) < 0
+        val l = List(a: _*).sortWith(lt)
+        val r = List(b: _*).sortWith(lt)
+        // The first unequal element between the two arrays determines array sort order
+        for ((le, re) <- l zip r) {
+          if (le < re)
+            return -1
+          if (le > re)
+            return 1
+        }
+        0
+      // TODO this is copy&pasted from above -- factor out, support combinations, or find something more general
+      case (a: mutable.WrappedArray[_], b: mutable.WrappedArray[_]) =>
         // Shorter arrays sort before longer arrays
         if (a.length.compareTo(b.length) != 0)
           return a.length.compareTo(b.length)

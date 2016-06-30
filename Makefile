@@ -232,7 +232,7 @@ all:
 	@$(MAKE) qcert
 	@$(MAKE) extraction
 	@$(MAKE) java-runtime
-#	@$(MAKE) spark2-runtime
+	@$(MAKE) spark2-runtime
 
 java-runtime:
 	@$(MAKE) -C runtime/java
