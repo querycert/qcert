@@ -66,7 +66,7 @@ Section SparkData.
 
   Definition brand_content_rtype (bl: list string) : rtype₀ :=
     (* TODO *)
-    Bottom₀.
+    Top₀.
 
   Definition brand_content_stype (bl: list string) : stype :=
     (* TODO Intersection of brands models, or something *)
@@ -212,7 +212,22 @@ Section SparkData.
       rewrite H0.
       eauto.
     - destruct (istop r); try (subst; apply top_typed_data_to_some_sdata).
-  Admitted.
+      inversion H. subst.
+      discriminate e.
+      subst.
+      destruct (data_type_Brand_inv H).
+      unfold typed_data_to_sdata. simpl.
+      unfold brand_content_rtype.
+      (* TODO Need to change this once we have an actual implementation of brand_content_rtype *)
+      specialize (IHd Top).
+      unfold typed_data_to_sdata in IHd.
+      simpl in IHd.
+      specialize (IHd (dttop d H3)).
+      inversion IHd.
+      rewrite H0.
+      eauto.
+Admitted.
+  
 
 End SparkData.
 
