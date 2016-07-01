@@ -148,7 +148,7 @@ Section DNNRCtoScala.
     | AMergeConcat => prefix "mergeConcat"
     | AOr => infix "||"
     | ASConcat => infix "++" (* string concat *)
-    | AUnion => infix "++" (* bag union *)
+    | AUnion => infix "++" ++ ".sorted(QCertOrdering)" (* bag union *)
 
     (* TODO *)
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
