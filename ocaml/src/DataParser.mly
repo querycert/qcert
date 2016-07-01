@@ -30,44 +30,44 @@
 %%
 
 main:
-| d = data EOF
+| d = json EOF
     { d }
 
-data:
+json:
 | NULL
-    { Data.dunit }
+    { Data.jnil }
 | i = INT
-    { Data.dnat (Util.coq_Z_of_int i) }
+    { Data.jnumber (Util.coq_Z_of_int i) }
 | f = FLOAT
-    { Enhanced.Data.dfloat f }
+    { Enhanced.Data.jfloat f }
 | s = STRING
-    { Data.dstring (Util.char_list_of_string s) }
+    { Data.jstring (Util.char_list_of_string s) }
 | TRUE
-    { Data.dbool true }
+    { Data.jbool true }
 | FALSE
-    { Data.dbool false }
-| LCURLY r = jrec RCURLY
-    { Data.drec r }
+    { Data.jbool false }
+| LCURLY r = jobject RCURLY
+    { Data.jobject r }
 | LCURLY RCURLY
-    { Data.drec [] }
+    { Data.jobject [] }
 | LBRACKET l = jarray RBRACKET
-    { Data.dcoll l }
+    { Data.jarray l }
 | LBRACKET RBRACKET
-    { Data.dcoll [] }
+    { Data.jarray [] }
 
-jrec:
+jobject:
 | a = attribute
     { [a] }
-| a = attribute COMMA r = jrec
+| a = attribute COMMA r = jobject
     { a :: r }
 
 attribute:
-| s = STRING COLON d = data
+| s = STRING COLON d = json
     { ((Util.char_list_of_string s), d) }
 
 jarray:
-| d = data
+| d = json
     { [d] }
-| d = data COMMA l = jarray
+| d = json COMMA l = jarray
     { d :: l }
 

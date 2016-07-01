@@ -27,8 +27,9 @@ open SExp
 
 type sexp_ast = sexp
 
-type io_ast = Data.data
-type json_ast = Data.data
+type data_ast = Data.data
+type io_ast = Data.json
+type json_ast = Data.json
 
 type rule_ast = string * Rule.rule
 type camp = Pattern.pat

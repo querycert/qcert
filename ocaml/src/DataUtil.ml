@@ -20,20 +20,21 @@ open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
-type io_hierarchy = Data.data
+type io_hierarchy = Data.json
+type io_json = Data.json option
+
 type io_hierarchy_list = (string * string) list
 type io_input = Data.data list
 type io_output = Data.data list
 
-type io_data = Data.data option
 
-let get_io_content (od:Data.data option) : Data.data * Data.data * Data.data =
+let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json =
     match od with
     | Some d ->
 	begin
 	  try
 	    match d with
-	    | Compiler.Drec r ->
+	    | Compiler.Jobject r ->
 		let input = List.assoc ['i';'n';'p';'u';'t'] r in
 		let output = List.assoc ['o';'u';'t';'p';'u';'t'] r in
 		let hierarchy = List.assoc ['i';'n';'h';'e';'r';'i';'t';'a';'n';'c';'e'] r in
@@ -56,15 +57,15 @@ let get_hierarchy_cloudant od =
     match get_io_content od with
     | (_, h, _) -> h
   with
-  | _ -> Compiler.Dcoll []
+  | _ -> Compiler.Jarray []
 
 let build_hierarchy h =
   match h with
-  | Compiler.Dcoll l ->
+  | Compiler.Jarray l ->
       List.map (function
-        | Compiler.Drec
-            ( [(['s';'u';'b'], Compiler.Dstring sub); (['s';'u';'p'],Compiler.Dstring sup)]
-            | [(['s';'u';'p'], Compiler.Dstring sup); (['s';'u';'b'], Compiler.Dstring sub)] ) ->
+        | Compiler.Jobject
+            ( [(['s';'u';'b'], Compiler.Jstring sub); (['s';'u';'p'], Compiler.Jstring sup)]
+            | [(['s';'u';'p'], Compiler.Jstring sup); (['s';'u';'b'], Compiler.Jstring sub)] ) ->
                 (Util.string_of_char_list sub, Util.string_of_char_list sup)
         | _ ->
             raise (CACo_Error "Ill-formed hierarchy"))
@@ -77,7 +78,7 @@ let get_input conf od =
   | (i, h, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match i with
-      | Compiler.Dcoll l ->
+      | Compiler.Jarray l ->
 	  begin
 	    match get_format conf with
 	    | META -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
@@ -91,7 +92,7 @@ let get_output od =
   | (_, h, o) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match o with
-      | Compiler.Dcoll l -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
+      | Compiler.Jarray l -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
       | _ ->
 	  raise (CACo_Error "Ill-formed expected result")
 

@@ -17,14 +17,29 @@
 Require Import CompilerRuntime.
 Module CompData(runtime:CompilerRuntime).
 
-  Require String RData JSON.
+  Require String RData JSON JSONtoData.
   Require NNRCtoJavascript.
   
+  Definition json : Set 
+    := JSON.json.
   Definition data : Set 
     := RData.data.
   Definition t : Set 
     := data.
   
+  Definition jnil : json
+    := JSON.jnil.
+  Definition jnumber z : json 
+    := JSON.jnumber z.
+  Definition jbool b : json 
+    := JSON.jbool b.
+  Definition jstring s : json
+    := JSON.jstring s.
+  Definition jarray jl : json
+    := JSON.jarray jl.
+  Definition jobject jl : json
+    := JSON.jobject jl.
+
   Definition dunit : data 
     := RData.dunit.
   Definition dnat z : data 
@@ -46,11 +61,11 @@ Module CompData(runtime:CompilerRuntime).
   (* foreign data is supported via the model *)
   
   (** JSON -> data conversion (META variant) *)
-  Definition json_to_data br : data -> data 
-    := JSON.json_to_data br.
+  Definition json_to_data br : JSON.json -> data 
+    := JSONtoData.json_to_data br.
   (** JSON -> data conversion (Enhanced variant) *)
-  Definition json_enhanced_to_data br : data -> data 
-    := JSON.json_enhanced_to_data br.
+  Definition json_enhanced_to_data br : JSON.json -> data 
+    := JSONtoData.json_enhanced_to_data br.
   (** data -> JSON *string* conversion *)
   Definition dataToJS s : data -> String.string 
     := NNRCtoJavascript.dataToJS s.

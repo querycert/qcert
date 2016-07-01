@@ -25,7 +25,7 @@ Section TDNRCInfer.
   Require Import Utils BasicSystem.
   Require Import DNNRC.
 
-  Require Import TDNNRC.
+  Require Import TDNRC.
 
   Context {m:basic_model}.
 

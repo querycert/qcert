@@ -36,7 +36,7 @@ val parse_oql : Lexing.lexbuf -> oql_ast
 (****************)
 
 val parse_sexp : Lexing.lexbuf -> sexp_ast
-val parse_io_sexp : Lexing.lexbuf -> io_ast
+val parse_io_sexp : Lexing.lexbuf -> data_ast
 val parse_nra_sexp : Lexing.lexbuf -> algenv
 val parse_nrc_sexp : Lexing.lexbuf -> nrc
 val parse_nrcmr_sexp : Lexing.lexbuf -> nrcmr

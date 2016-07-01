@@ -123,6 +123,12 @@ Definition denhancedtimescale ts := dforeign (enhancedtimescale ts).
 Definition denhancedtimeduration td := dforeign (enhancedtimeduration td).
 Definition denhancedtimepoint tp := dforeign (enhancedtimepoint tp).
 
+Require Import JSON.
+Definition jenhancedfloat f := jforeign (enhancedfloat f).
+Definition jenhancedstring s := jforeign (enhancedstring s).
+Definition jenhancedtimescale ts := jforeign (enhancedtimescale ts).
+Definition jenhancedtimeduration td := jforeign (enhancedtimeduration td).
+Definition jenhancedtimepoint tp := jforeign (enhancedtimepoint tp).
 
 Inductive enhanced_unary_op
   :=
@@ -451,6 +457,8 @@ Instance enhanced_foreign_to_javascript :
     timescale/timepoint.  just using a string may work for now.
 *)
 
+
+
 Program Instance enhanced_foreign_to_JSON : foreign_to_JSON
   := mk_foreign_to_JSON enhanced_foreign_data _ _.
 Next Obligation.
@@ -459,11 +467,11 @@ Next Obligation.
 Defined.
 Next Obligation.
   destruct fd.
-  - exact (denhancedfloat f).
-  - exact (denhancedstring s).
-  - exact (dstring (toString t)).
-  - exact (dstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
-  - exact (dstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
+  - exact (jenhancedfloat f).
+  - exact (jenhancedstring s).
+  - exact (jstring (toString t)).
+  - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
+  - exact (jstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
 Defined.
 
   Inductive enhanced_numeric_type :=
@@ -1890,6 +1898,11 @@ Module CompEnhanced.
         := dforeign (enhancedfloat f).
       Definition dstringblob (s : STRING) : data
         := dforeign (enhancedstring s).
+
+      Definition jfloat (f : FLOAT) : json
+        := jforeign (enhancedfloat f).
+      Definition jstringblob (s : STRING) : json
+        := jforeign (enhancedstring s).
 
       Definition scale_kind := time_scale.
 

@@ -31,8 +31,9 @@ type cldmr = Compiler.cld_mrl
 
 type sexp_ast = SExp.sexp
 
-type io_ast = Data.data
-type json_ast = Data.data
+type data_ast = Data.data
+type io_ast = Data.json
+type json_ast = Data.json
 
 type rule_ast = string * Rule.rule
 
@@ -44,8 +45,8 @@ type oql_ast = OQL.expr
 
 (* AST <-> S-Expr *)
 
-val sexp_to_data : sexp_ast -> io_ast
-val data_to_sexp : io_ast -> sexp_ast
+val sexp_to_data : sexp_ast -> data_ast
+val data_to_sexp : data_ast -> sexp_ast
 
 val sexp_to_alg : sexp_ast -> algenv
 val alg_to_sexp : algenv -> sexp_ast

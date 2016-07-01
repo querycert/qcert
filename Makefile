@@ -177,6 +177,7 @@ MODULES = \
 	Frontend/ODMG/OQLSize \
 	Frontend/ODMG/OQLtoNRAEnv \
 	Frontend/ODMGRuntime \
+	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignCloudant \
 	Backend/ForeignToJava \
@@ -185,7 +186,7 @@ MODULES = \
 	Backend/CloudantMR \
 	Backend/ForeignToCloudant \
 	Backend/ForeignToSpark \
-	Backend/JSON \
+	Backend/JSONtoData \
 	Backend/NNRCtoJava \
 	Backend/NNRCtoJavascript \
 	Backend/NNRCMRtoSpark \
