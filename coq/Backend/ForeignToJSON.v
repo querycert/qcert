@@ -18,6 +18,7 @@ Require Import List String.
 
 Require Import Utils ForeignRuntime.
 Require Import NNRCRuntime.
+Require Import JSON.
 
 Local Open Scope string_scope.
 
@@ -28,9 +29,9 @@ Section ForeigntoJSON.
 Class foreign_to_JSON {fdata:foreign_data}: Type
   := mk_foreign_to_JSON {
          foreign_to_JSON_to_data
-           (d:data) : option foreign_data_type
+           (j:json) : option foreign_data_type
          ; foreign_to_JSON_from_data
-             (fd:foreign_data_type) : data
+             (fd:foreign_data_type) : json
        }.
   
 End ForeigntoJSON.

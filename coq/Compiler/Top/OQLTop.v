@@ -74,7 +74,7 @@ Module OQLTop(runtime:CompilerRuntime).
    * NNRCMR Section *
    ******************)
 
-  Require Import LData NNRCMRRuntime.
+  Require Import NNRCMRRuntime.
 
   (* Typed compilation from OQL to NNRC + Map Reduce *)
 
@@ -83,7 +83,7 @@ Module OQLTop(runtime:CompilerRuntime).
      - The free variables are obtained after nrc rewrites
      - one has to be careful to pass those free variables to the mr-optimizer *)
   
-  Definition tcompile_oql_to_nnrcmr_chain (e:oql_expr) : list (var * localization) * nrcmr :=
+  Definition tcompile_oql_to_nnrcmr_chain (e:oql_expr) : list (var * dlocalization) * nrcmr :=
     (* Produces the initial plan *)
     let op_init := CF.translate_oql_to_algenv e in
     (* Compile/Optimize to NNRCMR *)

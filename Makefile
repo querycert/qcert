@@ -46,7 +46,6 @@ MODULES = \
 	Basic/Data/RDataNorm \
 	Basic/Data/RRelation \
 	Basic/Data/RGroupBy \
-	Basic/Data/LData \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
 	Basic/Operators/RUtilOps \
@@ -61,6 +60,7 @@ MODULES = \
 	Basic/BasicRuntime \
 	Basic/TypeSystem/ForeignType \
 	Basic/TypeSystem/RType \
+	Basic/TypeSystem/DType \
         Basic/TypeSystem/TBrandContext \
 	Basic/TypeSystem/RSubtype \
 	Basic/TypeSystem/RSubtypeProp \
@@ -72,6 +72,9 @@ MODULES = \
 	Basic/TypeSystem/Types \
 	Basic/Typing/ForeignDataTyping \
 	Basic/Typing/TData \
+	Basic/Typing/TDData \
+	Basic/Typing/TBindings \
+	Basic/Typing/TDBindings \
 	Basic/Typing/ForeignOpsTyping \
 	Basic/Typing/TDataInfer \
 	Basic/Typing/TOps \
@@ -140,6 +143,8 @@ MODULES = \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCEq \
 	DNNRC/Calculus/SparkIR \
+	DNNRC/Typing/TDNRC \
+	DNNRC/Typing/TDNRCInfer \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
 	CAMP/Rules/PatternSugar \
@@ -172,6 +177,7 @@ MODULES = \
 	Frontend/ODMG/OQLSize \
 	Frontend/ODMG/OQLtoNRAEnv \
 	Frontend/ODMGRuntime \
+	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignCloudant \
 	Backend/ForeignToJava \
@@ -180,12 +186,13 @@ MODULES = \
 	Backend/CloudantMR \
 	Backend/ForeignToCloudant \
 	Backend/ForeignToSpark \
-	Backend/JSON \
+	Backend/JSONtoData \
 	Backend/NNRCtoJava \
 	Backend/NNRCtoJavascript \
 	Backend/NNRCMRtoSpark \
 	Backend/NNRCMRtoCloudant \
 	Backend/CloudantMRtoJavascript \
+	Backend/SparkData \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/ROptimEnvFunc \

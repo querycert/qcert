@@ -27,15 +27,16 @@ open SExp
 
 type sexp_ast = sexp
 
-type io_ast = Data.data
-type json_ast = Data.data
+type data_ast = Data.data
+type io_ast = Data.json
+type json_ast = Data.json
 
 type rule_ast = string * Rule.rule
 type camp = Pattern.pat
 type algenv = Compiler.algenv
 type nrc = Compiler.nrc
 type dnrc = (Compiler.__, algenv) Compiler.dnrc
-type nrcmr = (Compiler.var * Compiler.localization) list * Compiler.nrcmr
+type nrcmr = (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr
 type cldmr = Compiler.cld_mrl
 
 type rORc_ast =
@@ -515,15 +516,15 @@ let sexp_to_mr_chain (sel:sexp list) : mr list =
 
 let loc_to_sexp l =
   match l with
-  | Vscalar -> SString "Vscalar"
-  | Vdistributed -> SString "Vdistributed"
+  | Vlocal -> SString "Vscalar"
+  | Vdistr -> SString "Vdistributed"
 
 let sexp_to_loc (se:sexp) =
   match se with
-  | SString "Vscalar" -> Vscalar
-  | SString "Vdistributed" -> Vdistributed
+  | SString "Vscalar" -> Vlocal
+  | SString "Vdistributed" -> Vdistr
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside localization")
+      raise (Util.CACo_Error "Not well-formed S-expr inside dlocalization")
 
 
 let var_loc_to_sexp (v,l) =
@@ -534,7 +535,7 @@ let sexp_to_var_loc (se:sexp) =
   | STerm ("var_loc", (SString v)::l::[]) ->
       (Util.char_list_of_string v, sexp_to_loc l)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside var-localization pair")
+      raise (Util.CACo_Error "Not well-formed S-expr inside var-dlocalization pair")
     
 let var_locs_to_sexp env : sexp list =
   map var_loc_to_sexp env
@@ -543,14 +544,14 @@ let sexp_to_var_locs (se:sexp list) =
   map sexp_to_var_loc se
 
 
-let mr_last_to_sexp (last: (var list * nrc) * (var * localization) list) =
+let mr_last_to_sexp (last: (var list * nrc) * (var * dlocalization) list) =
   match last with
   | (f, var_locs)
     ->
       (STerm ("mr_last",
 	      (fun_to_sexp f) :: (var_locs_to_sexp var_locs)))
 
-let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * localization) list =
+let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
   match se with
   | STerm ("mr_last", f :: var_locs) ->
       (sexp_to_fun f, sexp_to_var_locs var_locs)

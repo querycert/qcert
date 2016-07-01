@@ -16,6 +16,7 @@
 
 Require Export ForeignType.
 Require Export RType.
+Require Export DType.
 Require Export RTypeMeetJoin.
 Require Export RSubtype.
 Require Export RSubtypeProp.

@@ -40,7 +40,7 @@ One platform that isn't directly supported by the OCaml package
 manager is Windows. We do not currently have detailed instructions for
 how to build on Windows.
 
-### Compilation
+### Compile Q*cert
 
 1. Compile the Coq source:
 
@@ -55,7 +55,7 @@ This should produce the following executables in the ./bin directory:
 CACo for the Q\*cert compiler, CAEv for the Q\*cert evaluator, and
 CADa for the Q\*cert data processor.
 
-## Try Q\*cert
+## Compile Queries
 
 Once the compiler is built, one can use it to compile queries. The
 `samples` directory contains a few examples written in OQL (Object
@@ -75,8 +75,7 @@ Javascript as target language can be done as follows:
 $ ./bin/CACo -source OQL -target JS samples/oql/test1.oql
 ```
 
-This will produce a javascript file called `test1_js.js` in the
-`samples/oql` directory.
+This will produce a javascript file called `samples/oql/test1.js`.
 
 Similarly for Java:
 
@@ -84,9 +83,9 @@ Similarly for Java:
 $ ./bin/CACo -source OQL -target Java samples/oql/test1.oql
 ```
 
-## Run queries compiled with Q\*cert
+This will produce a java file called `samples/oql/test1.java`.
 
-1. Build additional Q\*cert runtimes:
+## Run compiled queries
 
 Q\*cert targets a number of languages and data processors as backends
 (currently: Javascript, Java, Cloudant and Spark). The way you run the
@@ -96,17 +95,21 @@ operators assumed by the compiler (e.g., ways to access records or
 manipulate collections), and (ii) a *query runner* which allows to
 execute the query on some input data.
 
-## Build the Q\*cert runtimes
+Runtime libraries are in the ./runtime directory. We include simple
+query runners in the .samples directory in order to try the examples.
 
-1. Compile the supporting runtime for the Java target:
+### Prerequisites
 
-	make java-runtime
+To compile the Java runtime library or the provided query runner, you
+will need a Java compiler (Java 7 or later).
 
+### Build the Q\*cert runtimes
 
-### Trying Q*cert
+To compile the supporting runtime for the Java target:
 
-see ./samples/README.md
-
+```
+make java-runtime
+```
 
 ## Caveats
 
@@ -117,45 +120,45 @@ see ./samples/README.md
 
 ## Code Organization
 
-./coq contains the Coq source code
-./ocaml contains the toplevel compiler and code extraction from Coq
-./runtime contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
+`./coq` contains the Coq source code
+`./ocaml` contains the toplevel compiler and code extraction from Coq
+`./runtime` contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
 
-Inside the ./coq directory, the organization is as follows.
+Inside the `./coq` directory, the organization is as follows.
 
 Foundational modules:
 
-./Basic/Util contains useful libraries and lemmas, independant of Q*cert itself
-./Basic/Data contains the core data model
-./Basic/Operators contains unary/binary operators shared across ILs
-./Basic/TypeSystem contains the core type system
-./Basic/Typing contains typing and type inference for data and operators
+`./Basic/Util` contains useful libraries and lemmas, independant of Q*cert itself
+`./Basic/Data` contains the core data model
+`./Basic/Operators` contains unary/binary operators shared across ILs
+`./Basic/TypeSystem` contains the core type system
+`./Basic/Typing` contains typing and type inference for data and operators
 
 Intermediate languages (ILs), including eval, typing, type inference,
 and equivalences/rewrites:
 
-./CAMP contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-./NRA contains support for the Nested Relational Algebra (NRA)
-./NRAEnv contains support for the extension of NRA with environments
-./NNRC contains support for the Named Nested Relational Calculus (NNRC)
-./DNNRC contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+`./CAMP` contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+`./NRA` contains support for the Nested Relational Algebra (NRA)
+`./NRAEnv` contains support for the extension of NRA with environments
+`./NNRC` contains support for the Named Nested Relational Calculus (NNRC)
+`./DNNRC` contains support for the Distributed Named Nested Relational Calculus (DNNRC)
 
 Translations:
 
-./Translation contains translations between ILs
-./Backend contains backend support and code generation
-./Frontend contains surface language support (except for jRules)
+`./Translation` contains translations between ILs
+`./Backend` contains backend support and code generation
+`./Frontend` contains surface language support (except for jRules)
 
 Toplevel:
 
-./Compiler contains the overall compiler instructure and functional optimizers
-./Tests contains various coq self-tests
+`./Compiler` contains the overall compiler instructure and functional optimizers
+`./Tests` contains various coq self-tests
 
-(./Updates is early code for updates that isn't part of the actual compiler)
+(`./Updates` is early code for updates that isn't part of the actual compiler)
 
 ## License
 
-Q*cert is distributed under the terms of the Apache 2.0 License, see ./LICENSE.txt
+Q*cert is distributed under the terms of the Apache 2.0 License, see `./LICENSE.txt`
 
 ## Contributions
 
@@ -167,37 +170,37 @@ Certificate of Origin' which can be found in ./DCO1.1.txt.
 
 Current source languages include:
 
-     - mini-OQL [SS16], a usable query language for objects, which is
-       a subset of OQL [ODMG30].
+- mini-OQL [SS16], a usable query language for objects, which is
+  a subset of OQL [ODMG30].
 
 Current targets include:
 
-     - Javascript [JS06], Java [Java7], Cloudant (CouchDB), and Spark
-       [Zah12].
+- Javascript [JS06], Java [Java7], Cloudant (CouchDB), and Spark
+  [Zah12].
 
 The compiler relies a number of intermediate languages for
 optimization and code-generation, notably:
 
 A calculus for pattern-matching with aggregation:
 
-     - We use the Calculus of Aggregating Matching Patterns (CAMP)
-       from [SSH15] to capture the pattern matching and data
-       processing semantics of rules languages, such as jRules [BM11]
+- We use the Calculus of Aggregating Matching Patterns (CAMP)
+  from [SSH15] to capture the pattern matching and data
+  processing semantics of rules languages, such as jRules [BM11]
 
 A nested-relational algebra:
 
-     - We use the nested relational algebra (NRA) from [Clu93,Moe09],
-       which is designed for optimization purposes. It includes the
-       relational algebra as a subset and has been applied
-       successfully to a variety of query languages, notably OQL and
-       XQuery.
+- We use the nested relational algebra (NRA) from [Clu93,Moe09],
+  which is designed for optimization purposes. It includes the
+  relational algebra as a subset and has been applied
+  successfully to a variety of query languages, notably OQL and
+  XQuery.
 
 A nested-relational calculus:
 
-     - We use the Named Nested Relational Calculus (NNRC) from
-       [Bus07], which makes the encoding of NRA operators natural, and
-       is closely related to the 'XQuery core' used in [FSW01], and
-       comprehensions.
+- We use the Named Nested Relational Calculus (NNRC) from
+  [Bus07], which makes the encoding of NRA operators natural, and
+  is closely related to the 'XQuery core' used in [FSW01], and
+  comprehensions.
 
 The compiler includes translations from source to target and an
 optimizer which leverages the database algebra and calculus. Those

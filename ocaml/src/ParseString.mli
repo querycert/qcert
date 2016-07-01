@@ -37,7 +37,7 @@ val parse_oql_from_string : string -> oql_ast
 (****************)
 
 val parse_sexp_from_string : string -> sexp_ast
-val parse_io_sexp_from_string : string -> io_ast
+val parse_io_sexp_from_string : string -> data_ast
 val parse_nra_sexp_from_string : string -> algenv
 val parse_nrc_sexp_from_string : string -> nrc
 val parse_nrcmr_sexp_from_string : string -> nrcmr

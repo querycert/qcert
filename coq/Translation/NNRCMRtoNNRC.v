@@ -21,7 +21,6 @@ Require Import List.
 Require Import EquivDec.
 
 Require Import Utils BasicRuntime.
-Require Import LData.
 Require Import NNRCRuntime NNRCMRRuntime ForeignToReduceOps.
 
 Local Open Scope list_scope.
@@ -44,12 +43,6 @@ Section NNRCMRtoNNRC.
       NRCUnop AFlatten (NRCFor v (NRCUnop AColl inputn) n)
     end.
 
-  Definition unlocalized (input_d:localized_data) : data :=
-    match input_d with
-    | Dscalar d => d
-    | Ddistributed dl => dcoll dl
-    end.
-  
   Lemma rmap_function_with_no_free_vars_env v n l env :
     function_with_no_free_vars (v, n) ->
     rmap (fun d : data => nrc_eval h ((v, d) :: nil) n) l =
@@ -65,10 +58,10 @@ Section NNRCMRtoNNRC.
     - reflexivity.
   Qed.
   
-  Lemma map_to_nnrc_correct env (map:map_fun) (input_d:localized_data) (inputn:nrc) :
+  Lemma map_to_nnrc_correct env (map:map_fun) (input_d:ddata) (inputn:nrc) :
     map_well_formed map ->
     map_well_localized map input_d ->
-    nrc_eval h env inputn = Some (unlocalized input_d) ->
+    nrc_eval h env inputn = Some (unlocalize_data input_d) ->
     lift dcoll (mr_map_eval h map input_d) = nrc_eval h env (map_to_nnrc map inputn).
   Proof.
     intros.
@@ -108,7 +101,7 @@ Section NNRCMRtoNNRC.
   Lemma reduce_to_nnrc_correct env (red:reduce_fun) (input_d:list data) (inputn:nrc) :
     reduce_well_formed red ->
     nrc_eval h env inputn = Some (dcoll input_d) ->
-    lift unlocalized (mr_reduce_eval h red input_d) = nrc_eval h env (reduce_to_nnrc red inputn).
+    lift unlocalize_data (mr_reduce_eval h red input_d) = nrc_eval h env (reduce_to_nnrc red inputn).
   Proof.
     intros.
     destruct red; simpl in *.

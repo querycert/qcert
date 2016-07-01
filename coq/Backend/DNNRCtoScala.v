@@ -76,7 +76,7 @@ Section DNNRCtoScala.
     | dunit => "null"
     | dbool true => "true"
     | dbool false => "false"
-    | dcoll l => "Array/*[TODO]*/(" ++ joinStrings ", " (map (scala_of_data m) l) ++ ").sorted"
+    | dcoll l => "Array/*[TODO]*/(" ++ joinStrings ", " (map (scala_of_data m) l) ++ ").sorted(QCertOrdering)"
     | dleft v => "left(" ++ (scala_of_data m v) ++ ")"
     | dright v => "right(" ++ (scala_of_data m v) ++ ")"
     | drec fields =>
@@ -98,7 +98,7 @@ Section DNNRCtoScala.
     | AColl => prefix "Array"
     | ACount => postfix "length"
     | ADot n => prefix ("dot/*[TODO]*/(""" ++ n ++ """)")
-    | AFlatten => postfix "flatten.sorted"
+    | AFlatten => postfix "flatten.sorted(QCertOrdering)"
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
     | ANeg => prefix "!"
@@ -148,7 +148,7 @@ Section DNNRCtoScala.
     | AMergeConcat => prefix "mergeConcat"
     | AOr => infix "||"
     | ASConcat => infix "++" (* string concat *)
-    | AUnion => infix "++" (* bag union *)
+    | AUnion => infix "++" ++ ".sorted(QCertOrdering)" (* bag union *)
 
     (* TODO *)
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"

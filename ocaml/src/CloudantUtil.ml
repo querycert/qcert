@@ -44,7 +44,7 @@ let set_prefix conf s = conf.prefix <- s
 
 (* Javascript harness (for inlining in Cloudant) *)
 
-let print_hierarchy d = Util.string_of_char_list (Data.dataToJS (Util.char_list_of_string "\"") d)
+let print_hierarchy d = Util.string_of_char_list (Data.dataToJS (Util.char_list_of_string "\"") (Data.json_to_data [] d))
 
 let fix_harness harness h =
   let hs =

@@ -22,7 +22,6 @@ Section CloudantMR.
 
   Require Import Utils BasicRuntime.
   Require Import NNRCRuntime NNRCMRRuntime.
-  Require Import LData.
   Require Import CloudantKV ForeignCloudant.
   
   Local Open Scope list_scope.
@@ -271,7 +270,7 @@ Section CloudantMR.
     end.
 
   Lemma mapIdDist_is_map (map:var*nrc) (coll:list data) :
-    lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitDist)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistributed coll)).
+    lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitDist)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
     unfold cld_mr_map_eval; simpl.
     unfold init_keys; generalize 0.
@@ -306,7 +305,7 @@ Section CloudantMR.
   Qed.
 
   Lemma mapIdCollect_is_map (map:var*nrc) (n:nat) (coll:list data) :
-    lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitCollect n)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistributed coll)).
+    lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitCollect n)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
     unfold cld_mr_map_eval; simpl.
     unfold init_keys; generalize 0.

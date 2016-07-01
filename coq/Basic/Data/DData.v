@@ -86,6 +86,18 @@ Section DData.
     | Ddistr coll => Some (dcoll coll)
     end.
   
+  Definition unlocalize_data (dd:ddata) :=
+    match dd with
+    | Ddistr coll => dcoll coll
+    | Dlocal d => d
+    end.
+
+  Lemma unlocalize_distributed_id (l:list data) :
+    unlocalize_data (Ddistr l) = dcoll l.
+  Proof.
+    reflexivity.
+  Qed.
+
   Definition dbindings := list (string*ddata).
 
   (* Localized variable annotations *)

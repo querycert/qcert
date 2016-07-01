@@ -139,7 +139,7 @@ let suffix_target conf =
 type eval_config =
     { debug : bool ref;
       eval_only : bool ref;
-      mutable eval_io : Data.data option;
+      mutable eval_io : Data.json option;
       mutable format : serialization_format;
       mutable eval_inputs : string list;
       eval_lang_config : lang_config }
@@ -171,7 +171,7 @@ let get_eval_inputs conf = conf.eval_inputs
 (* Data Section *)
   
 type data_config =
-    { mutable in_jsons : Data.data list;
+    { mutable in_jsons : Data.json list;
       mutable data_args : string list }
 
 let default_data_config () =
@@ -184,7 +184,7 @@ let set_json conf json =
 (* Compiler Section *)
   
 type comp_config =
-    { mutable comp_io : Data.data option;
+    { mutable comp_io : Data.json option;
       mutable dir : string option;
       mutable display_dir : string option;
       mutable comp_inputs : string list;

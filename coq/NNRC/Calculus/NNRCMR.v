@@ -20,7 +20,6 @@ Section NNRCMR.
   Require Import EquivDec.
   
   Require Import Utils BasicRuntime.
-  Require Import LData.
 
   Require Import NNRC NShadow ForeignReduceOps.
 
@@ -30,7 +29,7 @@ Section NNRCMR.
   Context {fruntime:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
   
-  Definition nrcmr_env := list (var * localized_data).
+  Definition nrcmr_env := list (var * ddata).
 
   (** Named Nested Relational Calculus + Map Reduce *)
 
@@ -85,7 +84,7 @@ Section NNRCMR.
   (* Java equivalent: MRChain *)
   Record nrcmr := mkMRChain
     { mr_chain: list mr;
-      mr_last: (list var * nrc) * list (var * localization); }.
+      mr_last: (list var * nrc) * list (var * dlocalization); }.
 
   Section sanitize_local.
     Context (sep:string).
@@ -251,25 +250,25 @@ Section NNRCMR.
   (* Java equivalent: NnrcToNrcmr.mr_input_localized *)
   Definition mr_input_localized mr :=
     match mr.(mr_map) with
-    | MapDist _ => (mr.(mr_input), Vdistributed)
-    | MapDistFlatten _ => (mr.(mr_input), Vdistributed)
-    | MapScalar _ => (mr.(mr_input), Vscalar)
+    | MapDist _ => (mr.(mr_input), Vdistr)
+    | MapDistFlatten _ => (mr.(mr_input), Vdistr)
+    | MapScalar _ => (mr.(mr_input), Vlocal)
     end.
 
   (* Java equivalent: NnrcToNrcmr.mr_output_localized *)
   Definition mr_output_localized mr :=
     match mr.(mr_reduce) with
-    | RedId => (mr.(mr_output), Vdistributed)
-    | RedCollect _ => (mr.(mr_output), Vscalar)
-    | RedOp op => (mr.(mr_output), Vscalar)
-    | RedSingleton => (mr.(mr_output), Vscalar)
+    | RedId => (mr.(mr_output), Vdistr)
+    | RedCollect _ => (mr.(mr_output), Vlocal)
+    | RedOp op => (mr.(mr_output), Vlocal)
+    | RedSingleton => (mr.(mr_output), Vlocal)
     end.
 
   Definition map_well_localized map d :=
     match map, d with
-    | MapDist _, Ddistributed _ => True
-    | MapDistFlatten _, Ddistributed _ => True
-    | MapScalar _, Dscalar _ => True
+    | MapDist _, Ddistr _ => True
+    | MapDistFlatten _, Ddistr _ => True
+    | MapScalar _, Dlocal _ => True
     | _, _ => False
     end.
 
@@ -285,7 +284,7 @@ Section NNRCMR.
    ********************)
 
   (* Note: flattens on output, allowing multiple emits ... *)
-  Definition mr_map_eval (map: map_fun) (input_d: localized_data) : option (list data) :=
+  Definition mr_map_eval (map: map_fun) (input_d: ddata) : option (list data) :=
     match map with
     | MapDist f =>
       let f_map (d:data) : option data :=
@@ -293,9 +292,9 @@ Section NNRCMR.
           nrc_eval h ((doc,d)::nil) body
       in
       match input_d with
-      | Ddistributed coll =>
+      | Ddistr coll =>
         rmap f_map coll
-      | Dscalar d => None
+      | Dlocal d => None
       end
     | MapDistFlatten f =>
       let f_map (d:data) : option data :=
@@ -303,10 +302,10 @@ Section NNRCMR.
           nrc_eval h ((doc,d)::nil) body
       in
       match input_d with
-      | Ddistributed coll =>
+      | Ddistr coll =>
         let nested_coll := rmap f_map coll in
         olift rflatten nested_coll
-      | Dscalar d => None
+      | Dlocal d => None
       end
     | MapScalar f =>
       let f_map (d:data) : option data :=
@@ -314,8 +313,8 @@ Section NNRCMR.
           nrc_eval h ((doc,d)::nil) body
       in
       match input_d with
-      | Ddistributed coll => None
-      | Dscalar d =>
+      | Ddistr coll => None
+      | Dlocal d =>
         match f_map d with
         | Some (dcoll coll) => Some coll
         | _ => None
@@ -335,18 +334,18 @@ Section NNRCMR.
          => foreign_reduce_op_interp h op dl
        end.
   
-  Definition mr_reduce_eval (reduce: reduce_fun) (values_v: list data) : option (localized_data) :=
+  Definition mr_reduce_eval (reduce: reduce_fun) (values_v: list data) : option (ddata) :=
     match reduce with
-    | RedId => Some (Ddistributed values_v)
+    | RedId => Some (Ddistr values_v)
     | RedCollect f =>
       let (values_arg, body) := f in
       let v := nrc_eval h ((values_arg, dcoll values_v) :: nil) body in
-      lift (fun res => Dscalar res) v
+      lift (fun res => Dlocal res) v
     | RedOp op =>
-      lift (fun res => Dscalar res) (reduce_op_eval op values_v)
+      lift (fun res => Dlocal res) (reduce_op_eval op values_v)
     | RedSingleton =>
       match values_v with
-      | d :: nil => Some (Dscalar d)
+      | d :: nil => Some (Dlocal d)
       | _ => None
       end
     end.
@@ -355,13 +354,13 @@ Section NNRCMR.
    * Semantics of one map-reduce *
    *******************************)
 
-  Definition mr_eval (mr:mr) (d: localized_data) : option (localized_data) :=
+  Definition mr_eval (mr:mr) (d: ddata) : option (ddata) :=
     let map_result := mr_map_eval mr.(mr_map) d in
     olift (mr_reduce_eval mr.(mr_reduce)) map_result.
 
   Lemma mr_eval_ignores_env map_fun red :
     forall (mr_input1 mr_input2 mr_output1 mr_output2:var),
-    forall (d:localized_data),
+    forall (d:ddata),
       mr_eval (mkMR mr_input1 mr_output1 map_fun red) d =
       mr_eval (mkMR mr_input2 mr_output2 map_fun red) d.
   Proof.
@@ -372,22 +371,22 @@ Section NNRCMR.
    * Semantics of a chain of map-reduce *
    **************************************)
 
-  Definition merge_env (x: var) (d: localized_data) (env: nrcmr_env) : option nrcmr_env :=
+  Definition merge_env (x: var) (d: ddata) (env: nrcmr_env) : option nrcmr_env :=
     match d with
-    | Ddistributed coll =>
+    | Ddistr coll =>
       match lookup equiv_dec env x with
-      | None => Some ((x, Ddistributed coll)::env)
-      | Some (Ddistributed coll') => Some ((x, Ddistributed (coll ++ coll') )::env)
+      | None => Some ((x, Ddistr coll)::env)
+      | Some (Ddistr coll') => Some ((x, Ddistr (coll ++ coll') )::env)
       | Some _ => None
       end
-    | Dscalar v =>
+    | Dlocal v =>
       match lookup equiv_dec env x with
-      | None => Some ((x, Dscalar v)::env)
+      | None => Some ((x, Dlocal v)::env)
       | Some d' => None
       end
     end.
 
-  Definition mr_chain_eval (env:nrcmr_env) (l:list mr) : nrcmr_env * option localized_data :=
+  Definition mr_chain_eval (env:nrcmr_env) (l:list mr) : nrcmr_env * option ddata :=
     List.fold_left
       (fun acc mr =>
          match acc with
@@ -400,9 +399,9 @@ Section NNRCMR.
            | _, _ => (env', None)
            end
          end)
-      l (env, Some (Ddistributed nil)).
+      l (env, Some (Ddistr nil)).
 
-  Fixpoint build_nrc_env' (mr_env:nrcmr_env) (params: list var) (args: list (var * localization)) :=
+  Fixpoint build_nrc_env' (mr_env:nrcmr_env) (params: list var) (args: list (var * dlocalization)) :=
     match (params, args) with
     | (nil, nil) => Some nil
     | (x1::params, (x2, loc)::args) => (* Note: this ignores loc...i.e., doesn't check type consistency *)
@@ -417,17 +416,17 @@ Section NNRCMR.
   Definition nrc_env_build (form:list var) (eff: option (list data)): option bindings :=
     olift (zip form) eff. 
 
-  Definition effective_params_from_bindings (args:list (var * localization)) (mr_env:nrcmr_env) : option (list data) :=
+  Definition effective_params_from_bindings (args:list (var * dlocalization)) (mr_env:nrcmr_env) : option (list data) :=
     lift_map
       (fun (v : var) =>
          lift unlocalize_data (lookup equiv_dec mr_env v))
       (map fst args).
   
-  Definition build_nrc_env (mr_env:nrcmr_env) (params: list var) (args: list (var * localization)) :=
+  Definition build_nrc_env (mr_env:nrcmr_env) (params: list var) (args: list (var * dlocalization)) :=
     let eff_params := effective_params_from_bindings args mr_env in
     nrc_env_build params eff_params.
   
-  Definition mr_last_eval (mr_env:nrcmr_env) (mr_last: (list var * nrc) * list (var * localization)) :=
+  Definition mr_last_eval (mr_env:nrcmr_env) (mr_last: (list var * nrc) * list (var * dlocalization)) :=
     let (params, n) := fst mr_last in
     let args := snd mr_last in
     let nrc_env := build_nrc_env mr_env params args in
@@ -449,7 +448,7 @@ Section NNRCMR.
     unfold mr_chain_eval.
     rewrite fold_left_app.
     generalize (fold_left
-        (fun (acc : list (var * localized_data) * option localized_data)
+        (fun (acc : list (var * ddata) * option ddata)
            (mr0 : NNRCMR.mr) =>
          let (env', y) := acc in
          match y with
@@ -460,7 +459,7 @@ Section NNRCMR.
              | Some res =>
                  match
                    olift
-                     (fun res0 : localized_data =>
+                     (fun res0 : ddata =>
                       merge_env (mr_output mr0) res0 env')
                      (Some res)
                  with
@@ -470,7 +469,7 @@ Section NNRCMR.
              | None => (env', None)
              end
          | None => (env', None)
-         end) l1 (env, Some (Ddistributed nil))) as res1.
+         end) l1 (env, Some (Ddistr nil))) as res1.
     intros res1 Hres1.
     rewrite Hres1.
     reflexivity.
@@ -486,7 +485,7 @@ Section NNRCMR.
     unfold mr_chain_eval.
     rewrite fold_left_app.
     case (fold_left
-        (fun (acc : list (var * localized_data) * option localized_data)
+        (fun (acc : list (var * ddata) * option ddata)
            (mr : mr) =>
          let (env'0, y) := acc in
          match y with
@@ -497,7 +496,7 @@ Section NNRCMR.
              | Some res =>
                  match
                    olift
-                     (fun res0 : localized_data =>
+                     (fun res0 : ddata =>
                       merge_env (mr_output mr) res0 env'0)
                      (Some res)
                  with
@@ -507,13 +506,13 @@ Section NNRCMR.
              | None => (env'0, None)
              end
          | None => (env'0, None)
-         end) l1 (env, Some (Ddistributed nil))).
+         end) l1 (env, Some (Ddistr nil))).
     intros env1 o1.
     destruct o1; simpl.
     - Case "Some"%string.
       intros.
       exists env1.
-      exists l.
+      exists d.
       reflexivity.
     - Case "None"%string.
       induction l2;
@@ -525,9 +524,9 @@ Section NNRCMR.
 
   Section LazyEval.
 
-  Definition mr_lazy_eval (mr:mr) (d: localized_data) : option (localized_data) :=
+  Definition mr_lazy_eval (mr:mr) (d: ddata) : option (ddata) :=
     match d with
-    | Ddistributed nil => None
+    | Ddistr nil => None
     | _ =>
       match mr_map_eval mr.(mr_map) d with
       | Some nil => None
@@ -536,9 +535,9 @@ Section NNRCMR.
       end
     end.
 
-  Definition mr_chain_lazy_eval (env:nrcmr_env) (l:list mr) : nrcmr_env * option localized_data :=
+  Definition mr_chain_lazy_eval (env:nrcmr_env) (l:list mr) : nrcmr_env * option ddata :=
     List.fold_left
-      (fun (acc: nrcmr_env * option localized_data) mr =>
+      (fun (acc: nrcmr_env * option ddata) mr =>
          match acc with
          | (env', None) => (env', None)
          | (env', Some _) =>
@@ -549,7 +548,7 @@ Section NNRCMR.
            | _, _ => (env', None)
            end
        end)
-      l (env, Some (Ddistributed nil)).
+      l (env, Some (Ddistr nil)).
 
   Definition nrcmr_lazy_eval (env:nrcmr_env) (mrl:nrcmr) : option data :=
     match mr_chain_lazy_eval env mrl.(mr_chain) with
@@ -567,7 +566,7 @@ Section NNRCMR.
     unfold mr_chain_lazy_eval.
     rewrite fold_left_app.
     generalize (fold_left
-        (fun (acc : nrcmr_env * option localized_data) (mr0 : NNRCMR.mr) =>
+        (fun (acc : nrcmr_env * option ddata) (mr0 : NNRCMR.mr) =>
          let (env', o) := acc in
          match o with
          | Some _ =>
@@ -578,7 +577,7 @@ Section NNRCMR.
              | Some res =>
                  match
                    olift
-                     (fun res0 : localized_data =>
+                     (fun res0 : ddata =>
                       merge_env (mr_output mr0) res0 env')
                      (Some res)
                  with
@@ -588,7 +587,7 @@ Section NNRCMR.
              | None => (env', None)
              end
          | None => (env', None)
-         end) l1 (env, Some (Ddistributed nil))) as res1.
+         end) l1 (env, Some (Ddistr nil))) as res1.
     intros res1 Hres1.
     rewrite Hres1.
     reflexivity.
@@ -604,7 +603,7 @@ Section NNRCMR.
     unfold mr_chain_lazy_eval.
     rewrite fold_left_app.
     case (fold_left
-        (fun (acc : nrcmr_env * option localized_data) (mr : mr) =>
+        (fun (acc : nrcmr_env * option ddata) (mr : mr) =>
          let (env'0, o) := acc in
          match o with
          | Some _ =>
@@ -614,7 +613,7 @@ Section NNRCMR.
              | Some res =>
                  match
                    olift
-                     (fun res0 : localized_data =>
+                     (fun res0 : ddata =>
                       merge_env (mr_output mr) res0 env'0)
                      (Some res)
                  with
@@ -624,13 +623,13 @@ Section NNRCMR.
              | None => (env'0, None)
              end
          | None => (env'0, None)
-         end) l1 (env, Some (Ddistributed nil))).
+         end) l1 (env, Some (Ddistr nil))).
     intros env1 o1.
     destruct o1; simpl.
     - Case "Some"%string.
       intros.
       exists env1.
-      exists l.
+      exists d.
       reflexivity.
     - Case "None"%string.
       induction l2;
@@ -665,15 +664,15 @@ Section NNRCMR.
         simpl in *; try congruence.
       unfold mr_lazy_eval in Hlazy; simpl in *.
       unfold mr_eval; simpl in *.
-      destruct l0; simpl in *.
-      + destruct (mr_map_eval (mr_map x) (Dscalar d));
+      destruct d; simpl in *.
+      + destruct (mr_map_eval (mr_map x) (Dlocal d));
         simpl in *; try congruence.
         destruct l0;
         simpl in *; try congruence.
         assumption.
       + destruct l0;
         simpl in *; try congruence.
-        destruct (mr_map_eval (mr_map x) (Ddistributed (d :: l0)));
+        destruct (mr_map_eval (mr_map x) (Ddistr (d :: l0)));
         simpl in *; try congruence.
         destruct l1;
         simpl in *; try congruence.
@@ -701,7 +700,7 @@ Section NNRCMR.
         end
       end.
 
-    Definition get_mr_chain_result (res: nrcmr_env * option localized_data) : option data :=
+    Definition get_mr_chain_result (res: nrcmr_env * option ddata) : option data :=
       match res with
       | (_, Some ld) => Some (unlocalize_data ld)
       | (_, None) => None
@@ -728,9 +727,9 @@ Section NNRCMR.
           simpl in *; try congruence.
         unfold mr_eval in Heval_mr_get_res; simpl in *.
         unfold mr_lazy_eval in Hlazy_mr_snd; simpl in *.
-        destruct l; simpl in *.
+        destruct d; simpl in *.
         + SCase "scalar"%string.
-          destruct (mr_map_eval mr_map0 (Dscalar d));
+          destruct (mr_map_eval mr_map0 (Dlocal d));
             simpl in *; try congruence.
           destruct l; simpl in *.
           * SSCase "coll = nil"%string.
@@ -738,25 +737,25 @@ Section NNRCMR.
             SSSCase "RedId"%string. {
               simpl in *.
               destruct (match
-                              @lookup var localized_data
+                              @lookup var ddata
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
                                 mr_output0 return (option nrcmr_env)
                             with
                             | Some l =>
                                 match l return (option nrcmr_env) with
-                                | Dscalar _ => @None nrcmr_env
-                                | Ddistributed coll' =>
-                                    @Some (list (prod var localized_data))
-                                      (@cons (prod var localized_data)
-                                         (@pair var localized_data mr_output0
-                                            (Ddistributed coll')) env)
+                                | Dlocal _ => @None nrcmr_env
+                                | Ddistr coll' =>
+                                    @Some (list (prod var ddata))
+                                      (@cons (prod var ddata)
+                                         (@pair var ddata mr_output0
+                                            (Ddistr coll')) env)
                                 end
                             | None =>
-                                @Some (list (prod var localized_data))
-                                  (@cons (prod var localized_data)
-                                     (@pair var localized_data mr_output0
-                                        (Ddistributed
+                                @Some (list (prod var ddata))
+                                  (@cons (prod var ddata)
+                                     (@pair var ddata mr_output0
+                                        (Ddistr
                                            (@nil
                                               (@data
                                                  (@foreign_runtime_data
@@ -781,7 +780,7 @@ Section NNRCMR.
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
-                                (@localized_data
+                                (@ddata
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
@@ -792,17 +791,17 @@ Section NNRCMR.
                                 @Some
                                   (list
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))))
                                   (@cons
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime)))
                                      (@pair var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))
                                         mr_output0
-                                        (@Dscalar
+                                        (@Dlocal
                                            (@foreign_runtime_data fruntime)
                                            d0)) env)
                             end);
@@ -814,7 +813,7 @@ Section NNRCMR.
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
-                                (@localized_data
+                                (@ddata
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
@@ -825,17 +824,17 @@ Section NNRCMR.
                                 @Some
                                   (list
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))))
                                   (@cons
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime)))
                                      (@pair var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))
                                         mr_output0
-                                        (@Dscalar
+                                        (@Dlocal
                                            (@foreign_runtime_data fruntime)
                                            d0)) env)
                             end);
@@ -851,7 +850,7 @@ Section NNRCMR.
           * SSCase "coll <> nil"%string. {
               destruct (mr_reduce_eval mr_reduce0 (d0 :: l));
               simpl in *; try congruence.
-              destruct (merge_env mr_output0 l0 env);
+              destruct (merge_env mr_output0 d1 env);
                 simpl in *; try congruence.
             }
         + SCase "distributed"%string.
@@ -865,13 +864,13 @@ Section NNRCMR.
                 simpl in *.
                 destruct (lookup equiv_dec env mr_output0);
                   simpl in *; try congruence.
-                destruct (match l return (option nrcmr_env) with
-                            | Dscalar _ => @None nrcmr_env
-                            | Ddistributed coll' =>
-                                @Some (list (prod var localized_data))
-                                  (@cons (prod var localized_data)
-                                     (@pair var localized_data mr_output0
-                                        (Ddistributed coll')) env)
+                destruct (match d return (option nrcmr_env) with
+                            | Dlocal _ => @None nrcmr_env
+                            | Ddistr coll' =>
+                                @Some (list (prod var ddata))
+                                  (@cons (prod var ddata)
+                                     (@pair var ddata mr_output0
+                                        (Ddistr coll')) env)
                             end);
                   simpl in *; try congruence.
               }
@@ -892,7 +891,7 @@ Section NNRCMR.
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
-                                (@localized_data
+                                (@ddata
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
@@ -903,17 +902,17 @@ Section NNRCMR.
                                 @Some
                                   (list
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))))
                                   (@cons
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime)))
                                      (@pair var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))
                                         mr_output0
-                                        (@Dscalar
+                                        (@Dlocal
                                            (@foreign_runtime_data fruntime)
                                            d)) env)
                             end);
@@ -925,7 +924,7 @@ Section NNRCMR.
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
-                                  (@localized_data
+                                  (@ddata
                                      (@foreign_runtime_data fruntime))
                                   (@equiv_dec var (@eq var)
                                      (@eq_equivalence var) string_eqdec) env
@@ -936,17 +935,17 @@ Section NNRCMR.
                                   @Some
                                     (list
                                        (prod var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime))))
                                     (@cons
                                        (prod var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime)))
                                        (@pair var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime))
                                           mr_output0
-                                          (@Dscalar
+                                          (@Dlocal
                                              (@foreign_runtime_data fruntime)
                                              d)) env)
                               end);
@@ -967,13 +966,13 @@ Section NNRCMR.
                 simpl in *.
                 destruct (lookup equiv_dec env mr_output0);
                   simpl in *; try congruence.
-                destruct (match l return (option nrcmr_env) with
-                                | Dscalar _ => @None nrcmr_env
-                                | Ddistributed coll' =>
-                                    @Some (list (prod var localized_data))
-                                      (@cons (prod var localized_data)
-                                         (@pair var localized_data mr_output0
-                                            (Ddistributed coll')) env)
+                destruct (match d return (option nrcmr_env) with
+                                | Dlocal _ => @None nrcmr_env
+                                | Ddistr coll' =>
+                                    @Some (list (prod var ddata))
+                                      (@cons (prod var ddata)
+                                         (@pair var ddata mr_output0
+                                            (Ddistr coll')) env)
                                 end);
                   simpl in *; try congruence.
               }
@@ -994,7 +993,7 @@ Section NNRCMR.
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
-                                  (@localized_data
+                                  (@ddata
                                      (@foreign_runtime_data fruntime))
                                   (@equiv_dec var (@eq var)
                                      (@eq_equivalence var) string_eqdec) env
@@ -1005,17 +1004,17 @@ Section NNRCMR.
                                   @Some
                                     (list
                                        (prod var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime))))
                                     (@cons
                                        (prod var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime)))
                                        (@pair var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime))
                                           mr_output0
-                                          (@Dscalar
+                                          (@Dlocal
                                              (@foreign_runtime_data fruntime)
                                              d)) env)
                               end);
@@ -1027,7 +1026,7 @@ Section NNRCMR.
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
-                                  (@localized_data
+                                  (@ddata
                                      (@foreign_runtime_data fruntime))
                                   (@equiv_dec var (@eq var)
                                      (@eq_equivalence var) string_eqdec) env
@@ -1038,17 +1037,17 @@ Section NNRCMR.
                                   @Some
                                     (list
                                        (prod var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime))))
                                     (@cons
                                        (prod var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime)))
                                        (@pair var
-                                          (@localized_data
+                                          (@ddata
                                              (@foreign_runtime_data fruntime))
                                           mr_output0
-                                          (@Dscalar
+                                          (@Dlocal
                                              (@foreign_runtime_data fruntime)
                                              d)) env)
                               end);
@@ -1066,25 +1065,25 @@ Section NNRCMR.
             simpl in *.
             congruence.
           * SSCase "coll = nil"%string.
-            destruct (mr_map_eval mr_map0 (Ddistributed (d :: l)));
+            destruct (mr_map_eval mr_map0 (Ddistr (d :: l)));
               simpl in *; try congruence.
             destruct l0;
-              [ | destruct (mr_reduce_eval mr_reduce0 (d0 :: l0));
+            [ | destruct (mr_reduce_eval mr_reduce0 (d0 :: l0));
                   simpl in *; try congruence;
-                  destruct (merge_env mr_output0 l1 env);
+                  destruct (merge_env mr_output0 d1 env);
                   simpl in *; try congruence ].
             destruct mr_reduce0.
             SSSSCase "RedId"%string. {
               simpl in *.
               destruct (lookup equiv_dec env mr_output0);
                 simpl in *; try congruence.
-              destruct (match l0 return (option nrcmr_env) with
-                              | Dscalar _ => @None nrcmr_env
-                              | Ddistributed coll' =>
-                                  @Some (list (prod var localized_data))
-                                    (@cons (prod var localized_data)
-                                       (@pair var localized_data mr_output0
-                                          (Ddistributed coll')) env)
+              destruct (match d0 return (option nrcmr_env) with
+                              | Dlocal _ => @None nrcmr_env
+                              | Ddistr coll' =>
+                                  @Some (list (prod var ddata))
+                                    (@cons (prod var ddata)
+                                       (@pair var ddata mr_output0
+                                          (Ddistr coll')) env)
                               end);
                 simpl in *; try congruence.
             }
@@ -1105,7 +1104,7 @@ Section NNRCMR.
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
-                                (@localized_data
+                                (@ddata
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
@@ -1116,17 +1115,17 @@ Section NNRCMR.
                                 @Some
                                   (list
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))))
                                   (@cons
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime)))
                                      (@pair var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))
                                         mr_output0
-                                        (@Dscalar
+                                        (@Dlocal
                                            (@foreign_runtime_data fruntime)
                                            d0)) env)
                             end);
@@ -1139,7 +1138,7 @@ Section NNRCMR.
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
-                                (@localized_data
+                                (@ddata
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
@@ -1150,17 +1149,17 @@ Section NNRCMR.
                                 @Some
                                   (list
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))))
                                   (@cons
                                      (prod var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime)))
                                      (@pair var
-                                        (@localized_data
+                                        (@ddata
                                            (@foreign_runtime_data fruntime))
                                         mr_output0
-                                        (@Dscalar
+                                        (@Dlocal
                                            (@foreign_runtime_data fruntime)
                                            d0)) env)
                             end);
@@ -1186,7 +1185,7 @@ Section NNRCMR.
         intros env_eval_a_l_mr o Heval_a_l_mr.
         destruct o;
         [ | rewrite Heval_a_l_mr in Heval_a_l_mr_get_result; simpl in *; congruence ].
-        rename l0 into loc_res.
+        rename d into loc_res.
         assert (unlocalize_data loc_res = normalize_data h res) as Hres_loc_res;
           [ rewrite Heval_a_l_mr in Heval_a_l_mr_get_result; simpl in *; congruence
           | rewrite <- Hres_loc_res in * ].
@@ -1195,9 +1194,9 @@ Section NNRCMR.
         intros env_lazy_a_l o Hlazy_a_l.
         destruct o;
         [ | rewrite Hlazy_a_l in Hlazy_a_l_snd; simpl in *; congruence ].
-        assert (l0 = pre_res) as Heq;
+        assert (d = pre_res) as Heq;
           [ rewrite Hlazy_a_l in Hlazy_a_l_snd; simpl in *; congruence
-          | rewrite Heq in *; clear Heq l0 ].
+          | rewrite Heq in *; clear Heq d ].
         clear Hlazy_a_l_snd.
         case_eq (mr_chain_lazy_eval env ((a :: nil) ++ l ++ mr :: nil)).
         intros env_lazy_a_l_mr o Hlazy_a_l_mr.
@@ -1235,7 +1234,7 @@ Section NNRCMR.
         assert (exists pre_res, snd (mr_chain_lazy_eval env_a l) = Some pre_res) as Hlazy_l_snd. {
           destruct l.
           + simpl.
-            exists (Ddistributed nil).
+            exists (Ddistr nil).
             reflexivity.
           + exists pre_res.
             assert ((a :: nil) ++ (m :: l) ++ mr :: nil =
@@ -1329,7 +1328,7 @@ Section NNRCMR.
     (*       unfold mr_lazy_eval in Hlazy_12 at 1; simpl in *. *)
     (*       destruct l. *)
     (*       * SSCase "scalar"%string. *)
-    (*         destruct (mr_map_eval mr_map1 (Dscalar d)); *)
+    (*         destruct (mr_map_eval mr_map1 (Dlocal d)); *)
     (*           simpl in *; try congruence. *)
     (*         { *)
     (*           destruct l. *)

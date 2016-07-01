@@ -60,7 +60,7 @@ Section DDataNorm.
         auto.
   Qed.
 
-  Theorem normalize_normalized_eq {d} :
+  Theorem dnormalize_normalized_eq {d} :
     ddata_normalized d ->
     normalize_ddata d = d.
   Proof.
@@ -93,10 +93,10 @@ Section DDataNorm.
         assumption.
   Qed.
 
-  Corollary normalize_idem d :
+  Corollary dnormalize_idem d :
     normalize_ddata (normalize_ddata d) = normalize_ddata d.
   Proof.
-    rewrite normalize_normalized_eq.
+    rewrite dnormalize_normalized_eq.
     reflexivity.
     apply dnormalize_normalizes.
   Qed.

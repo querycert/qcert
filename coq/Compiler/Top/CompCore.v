@@ -56,7 +56,7 @@ Module CompCore(runtime:CompilerRuntime).
 
   Require Import NNRCRuntime NNRCMRRuntime.
   Require Import NRAEnvtoNNRC NRewFunc.
-  Require Import NNRCtoNNRCMR NRewMR LData.
+  Require Import NNRCtoNNRCMR NRewMR .
 
   (* Calculus rewriter *)
 
@@ -175,8 +175,8 @@ Module CompCore(runtime:CompilerRuntime).
     let e_rew := trew e_nrc_no_id in
     let e_rew_free_vars := (* bdistinct !!! *) nrc_free_vars e_rew in
     let env_variables :=
-        (init_vid, Vscalar)
-          ::(init_vinit, Vscalar)
+        (init_vid, Vlocal)
+          ::(init_vinit, Vlocal)
           ::(localize_names e_rew_free_vars)
     in
     let e_mr :=
@@ -186,16 +186,16 @@ Module CompCore(runtime:CompilerRuntime).
     in
     (env_variables, e_mr).
   
-  Definition tcompile_nraenv_to_nnrcmr_chain_no_optim (op_init:algenv) : list (var * localization) * nrcmr :=
+  Definition tcompile_nraenv_to_nnrcmr_chain_no_optim (op_init:algenv) : list (var * dlocalization) * nrcmr :=
     let e_nrc := tcompile_nraenv_to_nnrc_typed_opt op_init in
     translate_nnrc_to_nnrcmr_chain e_nrc.
 
-  Definition tcompile_nnrc_to_nnrcmr_chain_typed_opt (e_nrc:nrc) : list (var * localization) * nrcmr :=
+  Definition tcompile_nnrc_to_nnrcmr_chain_typed_opt (e_nrc:nrc) : list (var * dlocalization) * nrcmr :=
     let (env_vars, e_mr) := translate_nnrc_to_nnrcmr_chain e_nrc in
     let e_mr_optim := mr_optimize e_mr in
     (env_vars, e_mr_optim).
 
-  Definition tcompile_nraenv_to_nnrcmr_chain_typed_opt (op_init:algenv) : list (var * localization) * nrcmr :=
+  Definition tcompile_nraenv_to_nnrcmr_chain_typed_opt (op_init:algenv) : list (var * dlocalization) * nrcmr :=
     let (env_vars, e_mr) := tcompile_nraenv_to_nnrcmr_chain_no_optim op_init in
     let e_mr_optim := mr_optimize e_mr in
     (env_vars, e_mr_optim).

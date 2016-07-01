@@ -76,14 +76,14 @@ type eval_config
 
 val default_eval_config : unit -> eval_config
 
-val set_eval_io : eval_config -> Data.data -> unit
+val set_eval_io : eval_config -> Data.json -> unit
 val set_input : eval_config -> string -> unit
 val set_format : eval_config -> string -> unit
 
 val get_format : eval_config -> serialization_format
 val get_eval_only : eval_config -> bool ref
 val get_debug : eval_config -> bool ref
-val get_eval_io : eval_config -> Data.data option
+val get_eval_io : eval_config -> Data.json option
 val get_eval_inputs : eval_config -> string list
 val get_eval_lang_config : eval_config -> lang_config
 
@@ -93,7 +93,7 @@ type data_config
 
 val default_data_config : unit -> data_config
 
-val set_json : data_config -> Data.data -> unit
+val set_json : data_config -> Data.json -> unit
 
 (* Compiler Section *)
   
@@ -101,7 +101,7 @@ type comp_config
 
 val default_comp_config : unit -> comp_config
 
-val set_comp_io : comp_config -> Data.data -> unit
+val set_comp_io : comp_config -> Data.json -> unit
 val set_comp_input : comp_config -> string -> unit
 val set_dir : comp_config -> string -> unit
 val set_display_dir : comp_config -> string -> unit
@@ -110,7 +110,7 @@ val set_display : comp_config -> unit -> unit
 val set_display_sexp : comp_config -> unit -> unit
 val set_test_sexp : comp_config -> unit -> unit
 
-val get_comp_io : comp_config -> Data.data option
+val get_comp_io : comp_config -> Data.json option
 val get_dir : comp_config -> string option
 val get_display_dir : comp_config -> string option
 val get_target_display : comp_config -> bool ref

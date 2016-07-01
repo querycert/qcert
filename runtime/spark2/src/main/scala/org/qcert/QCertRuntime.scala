@@ -16,6 +16,7 @@
 
 package org.qcert
 
+import java.io.FileReader
 import java.util.Comparator
 
 import com.google.gson.JsonElement
@@ -25,6 +26,7 @@ import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
 
@@ -104,7 +106,26 @@ abstract class QCertRuntime {
 
   def run(world: Dataset[Row])
 
+  // TODO take the iofile as a parameter somehow
+  def initializeBrandHierarchy() = {
+    val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
+    val io = new com.google.gson.JsonParser().parse(new FileReader(iofile))
+    val hc = io.getAsJsonObject.get("inheritance").getAsJsonArray
+    hc.iterator().asScala.foreach((subsup: JsonElement) => {
+      val sub = subsup.getAsJsonObject.get("sub").getAsString
+      val sup = subsup.getAsJsonObject.get("sup").getAsString
+      brandHierarchy.get(sub) match {
+        case None => brandHierarchy += sub -> mutable.HashSet(sup)
+        case Some(hs) => hs += sup
+      }
+    })
+  }
+
   def main(args: Array[String]): Unit = {
+    println("Initializing brand hierarchy")
+    initializeBrandHierarchy()
+    println(brandHierarchy)
+
     val sparkCtx = new SparkContext("local", "Test 07", new SparkConf())
     sparkCtx.setLogLevel("ERROR")
     val session = SparkSession.builder().getOrCreate()
@@ -126,7 +147,6 @@ abstract class QCertRuntime {
     case t: BooleanType => b.getAsBoolean
     case t: StringType => b.getAsString
     case t: ArrayType =>
-      import scala.collection.JavaConverters._
       b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
     case t: StructType => t.fieldNames match {
       case Array("$left", "$right") => sys.error("either")
@@ -139,9 +159,9 @@ abstract class QCertRuntime {
         srow(t,
           // We have the full record in the blob field, even for closed records
           r.toString,
-          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues:_*))
       case _ =>
-        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))):_*)
     }
   }
 
@@ -280,9 +300,14 @@ abstract class QCertRuntime {
   def unbrand[T](bv: BrandedValue): T =
     bv.getAs[T]("$data")
 
-  // TODO
-  def isSubBrand(a: Brand, b: Brand) =
-    false
+  // From sub type to immediate super types
+  val brandHierarchy = mutable.HashMap[String, mutable.HashSet[String]]()
+
+  def isSubBrand(sub: Brand, sup: Brand): Boolean = {
+    if (sub == sup || sup == "Any")
+      return true
+    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(dsup, sup))
+  }
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
     case (i: Int, t: IntegerType) => i
@@ -308,15 +333,14 @@ abstract class QCertRuntime {
     */
   def cast(v: BrandedValue, t: DataType, bs: Brand*): Either = {
     // First, check whether the cast succeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
-    if (!bs.forall((brand: Brand) => {
-      v.getAs[Seq[Brand]]("$type").exists((typ: Brand) => {
-        typ == brand || isSubBrand(typ, brand)
-      })
-    })) return none()
+    if (!bs.forall((brand: Brand) =>
+      v.getAs[Seq[Brand]]("$type").exists((typ: Brand) =>
+        isSubBrand(typ, brand))))
+      return none()
     // Second, if the cast succeeds, reshape data to match the intersection type
     val data = v.get(v.fieldIndex("$data"))
     val reshaped = reshape(data, t).asInstanceOf[Row] // TODO this cast is wrong. Write a brand(Any, Brand*) method
-    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")): _*))
+    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")):_*))
   }
 
   /* Bags

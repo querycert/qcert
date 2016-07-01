@@ -31,13 +31,11 @@ Section CompUtil.
   Definition init_venv := "env"%string.
   Definition init_vinit := "init"%string.
 
-  Require Import LData.
-  
   (* Java equivalent: NnrcToNrcmr.localize_names *)
-  Definition localize_names (names: list string) : list (string * localization) :=
-    map (fun x => (x, Vdistributed)) names.
+  Definition localize_names (names: list string) : list (string * dlocalization) :=
+    map (fun x => (x, Vdistr)) names.
 
-  Definition localize_bindings {A} (cenv: list (string * A)) : list (string * localization) :=
+  Definition localize_bindings {A} (cenv: list (string * A)) : list (string * dlocalization) :=
     localize_names (map fst cenv).
 
   Context {fdata:foreign_data}.
