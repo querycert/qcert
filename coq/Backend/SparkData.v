@@ -33,13 +33,14 @@ Require Import TDataInfer.
 Require Import BrandRelation.
 Require Import Utils Types BasicRuntime.
 Require Import ForeignDataTyping.
+Require Import NNRCtoJavascript.
 
 
 Section SparkData.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
-  Context {fdata:foreign_data}.
+  Context {fttojs: ForeignToJavascript.foreign_to_javascript}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
@@ -63,6 +64,27 @@ Section SparkData.
   | Sarray  : list sdata -> sdata
   | Srow    : list (string * sdata) -> option data -> sdata
   .
+
+  (** sdata to simple data (no either/open records/...)
+   * Convert data to a simple format that we can just serialize to JSON *)
+  Fixpoint sdata_to_plain_data (s: sdata) : data :=
+    match s with
+    | Sblob data => dstring (dataToJS "\""" data)
+    | Snull => dunit
+    | Sint i => dnat i
+    | Sstring s => dstring s
+    | Sbool b => dbool b
+    | Sarray el => dcoll (map sdata_to_plain_data el)
+    | Srow known dotdot =>
+      let known_fields := map (fun p => (fst p, sdata_to_plain_data (snd p))) known in
+      let dotdot_string := match dotdot with
+                             None => ""%string
+                           | Some d => dataToJS "\""" d end in
+      drec (("$blob"%string, dstring dotdot_string)::("$known"%string, drec known_fields)::nil)
+    end.
+
+  Definition sdata_to_json (s: sdata) : string :=
+    dataToJS "\""" (sdata_to_plain_data s).
 
   Definition brand_content_rtype (bl: list string) : rtype₀ :=
     (* TODO *)
@@ -158,8 +180,8 @@ Section SparkData.
     | dbrand bs v, Brand₀ bts =>
       let type := brand_content_rtype bts in
       match typed_data_to_sdata_0 v type with
-      | Some data => Some (Srow (("$type"%string, Sarray (map Sstring bs))
-                                   ::("$data"%string, data)::nil)
+      | Some data => Some (Srow (("$data"%string, data)
+                                   ::("$type"%string, Sarray (map Sstring bs))::nil)
                                 None)
       | None => None
       end
@@ -167,7 +189,7 @@ Section SparkData.
     | _, _ => None
     end.
 
-  Definition typed_data_to_sdata (d: data) (r: rtype) := typed_data_to_sdata_0 d (proj1_sig r).
+  Definition typed_data_to_sdata (d: data) (r: rtype) : option sdata := typed_data_to_sdata_0 d (proj1_sig r).
 
   Lemma top_typed_data_to_some_sdata (d: data) :
     exists x : sdata, typed_data_to_sdata d ⊤ = Some x.
@@ -227,7 +249,6 @@ Section SparkData.
       rewrite H0.
       eauto.
 Admitted.
-  
 
 End SparkData.
 
