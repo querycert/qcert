@@ -75,7 +75,7 @@ Module CompTop(runtime:CompilerRuntime).
 
   Require Import NNRCRuntime NNRCMRRuntime.
   Require Import NRAEnvtoNNRC NRewFunc.
-  Require Import LData NNRCtoNNRCMR NRewMR.
+  Require Import NNRCtoNNRCMR NRewMR.
 
   (* Calculus rewriter *)
 
@@ -180,14 +180,14 @@ Module CompTop(runtime:CompilerRuntime).
      - The free variables are obtained after nrc rewrites
      - one has to be careful to pass those free variables to the mr-optimizer *)
   
-  Definition tcompile_rule_to_nnrcmr_chain_no_optim (r:rule) : list (var * localization) * nrcmr :=
+  Definition tcompile_rule_to_nnrcmr_chain_no_optim (r:rule) : list (var * dlocalization) * nrcmr :=
     let e_nrc := tcompile_rule_to_nnrc_topt r in
     let e_nrc_no_id := nrc_subst e_nrc init_vid (NRCConst dunit) in
     let e_rew := trew e_nrc_no_id in
     let e_rew_free_vars := nrc_free_vars e_rew in
     let env_variables :=
-        ((init_vid, Vscalar)
-           ::(init_vinit, Vscalar)
+        ((init_vid, Vlocal)
+           ::(init_vinit, Vlocal)
            ::(localize_names e_rew_free_vars))
     in
     let e_mr :=
@@ -197,7 +197,7 @@ Module CompTop(runtime:CompilerRuntime).
     in
     (env_variables, e_mr).
 
-  Definition tcompile_rule_to_nnrcmr_chain (r:rule) : list (var * localization) * nrcmr :=
+  Definition tcompile_rule_to_nnrcmr_chain (r:rule) : list (var * dlocalization) * nrcmr :=
     let (env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain_no_optim r in
     let e_mr_optim := mr_optimize e_mr in
     (env_vars, e_mr_optim).
@@ -230,7 +230,7 @@ Module CompTop(runtime:CompilerRuntime).
   (* Hard-coding the WORLD variable for now. Generalizing will require
      more work on the Spark code-generation side. *)
   
-  Definition mrchain_to_spark_data_from_file_caco rulename (env_vars:list (var * localization)) mrchain :=
+  Definition mrchain_to_spark_data_from_file_caco rulename (env_vars:list (var * dlocalization)) mrchain :=
     CB.mrchain_to_spark_code_gen_with_prepare rulename env_vars mrchain.
 
 End CompTop.

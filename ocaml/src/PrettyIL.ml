@@ -747,8 +747,8 @@ let pretty_mr_last sym ff mr_last =
   in
   let pretty_arg ff (x, loc) =
     match loc with
-    | Hack.Vscalar ->  fprintf ff "(%s: Scalar)" (Util.string_of_char_list x)
-    | Hack.Vdistributed ->  fprintf ff "(%s: Distributed)" (Util.string_of_char_list x)
+    | Hack.Vlocal ->  fprintf ff "(%s: Scalar)" (Util.string_of_char_list x)
+    | Hack.Vdistr ->  fprintf ff "(%s: Distributed)" (Util.string_of_char_list x)
   in
   fprintf ff "@[(fun (%a) => %a) (%a)@]@\n"
     (pretty_list pretty_param ",") params

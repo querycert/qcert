@@ -21,7 +21,6 @@ Section NRewMR.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import LData.
   Require Import NNRC NShadow NNRCMR ForeignReduceOps.
 
   Local Open Scope list_scope.
@@ -135,7 +134,7 @@ Section NRewMR.
 
   Lemma id_scalar_map_correct mr_map d :
     is_id_scalar_map mr_map = true ->
-    mr_map_eval h mr_map (Dscalar d) = Some (d::nil).
+    mr_map_eval h mr_map (Dlocal d) = Some (d::nil).
   Proof.
     intros H_is_id_map.
     destruct mr_map; simpl in *; try congruence.
@@ -159,7 +158,7 @@ Section NRewMR.
 
   Lemma id_dist_map_correct mr_map coll :
     is_id_dist_map mr_map = true ->
-    mr_map_eval h mr_map (Ddistributed coll) = Some coll.
+    mr_map_eval h mr_map (Ddistr coll) = Some coll.
   Proof.
     intros H_is_id_dist_map.
     destruct mr_map.
@@ -201,7 +200,7 @@ Section NRewMR.
 
   Lemma dispatch_map_correct mr_map coll:
     is_dispatch_map mr_map = true ->
-    mr_map_eval h mr_map (Dscalar (dcoll coll)) = Some coll.
+    mr_map_eval h mr_map (Dlocal (dcoll coll)) = Some coll.
   Proof.
     intros.
     unfold mr_map_eval; simpl.
@@ -236,7 +235,7 @@ Section NRewMR.
 
   Lemma flatten_dist_map_correct mr_map coll:
     is_flatten_dist_map mr_map = true ->
-    mr_map_eval h mr_map (Ddistributed coll) = rflatten coll.
+    mr_map_eval h mr_map (Ddistr coll) = rflatten coll.
   Proof.
     intros.
     unfold mr_map_eval; simpl.
@@ -285,7 +284,7 @@ Section NRewMR.
 
   Lemma id_reduce_correct red coll:
     is_id_reduce red = true ->
-    mr_reduce_eval h red coll = Some (Ddistributed coll).
+    mr_reduce_eval h red coll = Some (Ddistr coll).
   Proof.
     destruct red; simpl; try congruence.
   Qed.
@@ -303,7 +302,7 @@ Section NRewMR.
 
   Lemma id_collect_correct red coll:
     is_id_collect red = true ->
-    mr_reduce_eval h red coll = Some (Dscalar (dcoll coll)).
+    mr_reduce_eval h red coll = Some (Dlocal (dcoll coll)).
   Proof.
     intros Hred.
     destruct red; simpl in *; try congruence;
@@ -329,7 +328,7 @@ Section NRewMR.
 
   Lemma singleton_reduce_correct red d:
     is_singleton_reduce red = true ->
-    mr_reduce_eval h red (d::nil) = Some (Dscalar d).
+    mr_reduce_eval h red (d::nil) = Some (Dlocal d).
   Proof.
     intros Hred.
     destruct red; simpl in *; try congruence;
@@ -421,10 +420,10 @@ Section NRewMR.
     forall loc_d,
       map_well_localized mr.(mr_map) loc_d ->
       match loc_d with
-      | Ddistributed coll =>
-        mr_eval h mr loc_d = Some (Ddistributed coll)
-      | Dscalar d =>
-        mr_eval h mr loc_d = Some (Ddistributed (d::nil))
+      | Ddistr coll =>
+        mr_eval h mr loc_d = Some (Ddistr coll)
+      | Dlocal d =>
+        mr_eval h mr loc_d = Some (Ddistr (d::nil))
       end.
   Proof.
     intros H_is_id_mr loc_d H_well_localized.
@@ -458,9 +457,9 @@ Section NRewMR.
     forall loc_d,
       map_well_localized mr.(mr_map) loc_d ->
       match loc_d with
-      | Ddistributed coll => False
-      | Dscalar d =>
-        mr_eval h mr loc_d = Some (Dscalar d)
+      | Ddistr coll => False
+      | Dlocal d =>
+        mr_eval h mr loc_d = Some (Dlocal d)
       end.
   Proof.
     intros H_is_id_mr loc_d H_well_localized.
@@ -485,14 +484,14 @@ Section NRewMR.
   Definition is_kindofflatten_mr mr :=
       is_id_dist_map mr.(mr_map) && is_flatten_collect mr.(mr_reduce).
 
-  Lemma is_kindofflatten_mr_correct (mr:mr) (loc_d: localized_data) :
+  Lemma is_kindofflatten_mr_correct (mr:mr) (loc_d: ddata) :
     is_kindofflatten_mr mr = true ->
     map_well_localized mr.(mr_map) loc_d ->
     match loc_d with
-    | Ddistributed coll =>
-      mr_eval h mr loc_d = lift (fun l => Dscalar (dcoll l)) (rflatten coll)
-    | Dscalar d =>
-      mr_eval h mr loc_d = lift (fun l => Dscalar (dcoll l)) (rflatten (d::nil))
+    | Ddistr coll =>
+      mr_eval h mr loc_d = lift (fun l => Dlocal (dcoll l)) (rflatten coll)
+    | Dlocal d =>
+      mr_eval h mr loc_d = lift (fun l => Dlocal (dcoll l)) (rflatten (d::nil))
     end.
   Proof.
     intros Hmr Hwell_localized.
@@ -536,14 +535,14 @@ Section NRewMR.
   Definition is_collect_mr mr :=
     is_id_dist_map mr.(mr_map) && is_id_collect mr.(mr_reduce).
 
-  Lemma mr_collect_collects (mr:mr) (loc_d:localized_data) :
+  Lemma mr_collect_collects (mr:mr) (loc_d:ddata) :
     is_collect_mr mr = true ->
     map_well_localized mr.(mr_map) loc_d ->
     match loc_d with
-    | Ddistributed coll =>
-      mr_eval h mr loc_d = Some (Dscalar (dcoll coll))
-    | Dscalar d =>
-      mr_eval h mr loc_d = Some (Dscalar (dcoll (d::nil)))
+    | Ddistr coll =>
+      mr_eval h mr loc_d = Some (Dlocal (dcoll coll))
+    | Dlocal d =>
+      mr_eval h mr loc_d = Some (Dlocal (dcoll (d::nil)))
     end.
   Proof.
     intros Hmr Hwell_localized.
@@ -598,7 +597,7 @@ Section NRewMR.
 
   Lemma mr_dispatch_correct (mr:mr) (coll:list data) :
     is_dispatch_mr mr = true ->
-    mr_eval h mr (Dscalar (dcoll coll)) = Some (Ddistributed coll).
+    mr_eval h mr (Dlocal (dcoll coll)) = Some (Ddistr coll).
   Proof.
     intros.
     unfold is_dispatch_mr in H.
@@ -656,7 +655,7 @@ Section NRewMR.
     destruct n; simpl in *; try congruence.
     - destruct u; simpl in *; try congruence.
       destruct n; simpl in *; try congruence.
-      destruct l; try reflexivity.
+      destruct d; try reflexivity.
       unfold mr_eval; simpl.
       unfold mr_reduce_eval; simpl.
       unfold equiv_decb in *;
@@ -673,7 +672,7 @@ Section NRewMR.
       destruct n1; simpl in *; try congruence.
       destruct n2; simpl in *; try congruence.
       unfold mr_eval; simpl.
-      destruct l; try reflexivity.
+      destruct d; try reflexivity.
       rewrite Bool.andb_true_iff in Heq.
       destruct Heq.
       destruct
@@ -704,7 +703,7 @@ Section NRewMR.
       m2.(mr_output) <> m2.(mr_input) ->
       m2.(mr_output) <> m1.(mr_input) ->
       mf m1 m2 = Some m3 ->
-      forall (loc_d: localized_data),
+      forall (loc_d: ddata),
         map_well_localized m1.(mr_map) loc_d ->
         get_mr_chain_result
           (mr_chain_eval h ((m1.(mr_input),loc_d)::nil) (m1::m2::nil)) =
@@ -717,7 +716,7 @@ Section NRewMR.
       m2.(mr_output) <> m2.(mr_input) ->
       m2.(mr_output) <> m1.(mr_input) ->
       mf m1 m2 = Some m3 ->
-      forall (loc_d: localized_data),
+      forall (loc_d: ddata),
         forall (result: data),
           map_well_localized m1.(mr_map) loc_d ->
           get_mr_chain_result
@@ -774,7 +773,7 @@ Section NRewMR.
     destruct (mr_reduce_eval h (mr_reduce mr2) coll); try reflexivity.
     rewrite e1 in *.
     unfold merge_env.
-    destruct l;
+    destruct d;
     simpl;
     unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl;
@@ -831,9 +830,9 @@ Section NRewMR.
       repeat dest_eqdec; try congruence; simpl.
       unfold mr_eval; simpl.
       generalize (olift (mr_reduce_eval h (mr_reduce mr2))
-                        (mr_map_eval h (NNRCMR.mr_map mr2) (Ddistributed l))).
+                        (mr_map_eval h (NNRCMR.mr_map mr2) (Ddistr l))).
       destruct o; try reflexivity; simpl.
-      destruct l0; try reflexivity.
+      destruct d; try reflexivity.
   Qed.
 
   (* Java equivalent: MROptimizer.merge_mr_id_scalar_l *)
@@ -878,9 +877,9 @@ Section NRewMR.
       repeat dest_eqdec; try congruence; simpl.
       unfold mr_eval; simpl.
       generalize (olift (mr_reduce_eval h (mr_reduce mr2))
-                        (mr_map_eval h (NNRCMR.mr_map mr2) (Dscalar d))).
+                        (mr_map_eval h (NNRCMR.mr_map mr2) (Dlocal d))).
       destruct o; try reflexivity; simpl.
-      destruct l; try reflexivity.
+      destruct d0; try reflexivity.
     - Case "loc_d is distributed"%string.
       destruct mr_map;
         simpl in *;
@@ -967,7 +966,7 @@ Section NRewMR.
     destruct (mr_reduce_eval h (mr_reduce mr2) l); simpl; try congruence.
     unfold merge_env; simpl.
     repeat dest_eqdec; try congruence; simpl.
-    destruct l0; simpl; try congruence.
+    destruct d; simpl; try congruence.
   Qed.
 
   (* map-singleton + id-red = map-red *)
@@ -1021,7 +1020,7 @@ Section NRewMR.
     destruct (mr_reduce_eval h (mr_reduce mr2) (x :: nil)); simpl; try congruence.
     unfold merge_env; simpl.
     repeat dest_eqdec; try congruence; simpl.
-    destruct l; simpl; try congruence.
+    destruct d; simpl; try congruence.
   Qed.
 
   (* MapDist(m)-RedId + flatten-red = MapDistFlatten(m)-red *)
@@ -1083,7 +1082,7 @@ Section NRewMR.
       simpl; try congruence.
     unfold merge_env; simpl.
     repeat dest_eqdec; try congruence; simpl.
-    destruct l1; simpl; try congruence.
+    destruct d; simpl; try congruence.
   Qed.
 
 
@@ -1164,7 +1163,7 @@ Section NRewMR.
       destruct (olift (mr_reduce_eval h (mr_reduce mr2))); simpl; try congruence.
       unfold merge_env; simpl.
       repeat dest_eqdec; try congruence; simpl.
-      destruct l; simpl; try congruence.
+      destruct d2; simpl; try congruence.
   Qed.
 
   (* *)
@@ -1308,7 +1307,7 @@ Section NRewMR.
    * Last expression  *
    ********************)
 
-  Definition merge_mr_last mr (last: ((list var * nrc) * list (var * localization)) ) :=
+  Definition merge_mr_last mr (last: ((list var * nrc) * list (var * dlocalization)) ) :=
     let '((params, n), args) := last in
     match (params, args) with
     | (x::nil, (output, Vscalar)::nil) =>

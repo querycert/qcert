@@ -46,7 +46,6 @@ MODULES = \
 	Basic/Data/RDataNorm \
 	Basic/Data/RRelation \
 	Basic/Data/RGroupBy \
-	Basic/Data/LData \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
 	Basic/Operators/RUtilOps \

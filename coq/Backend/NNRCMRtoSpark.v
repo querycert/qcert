@@ -21,7 +21,7 @@ Require Import Utils BasicRuntime.
 Require Import NNRCRuntime NNRCMRRuntime.
 Require Import NNRCtoJavascript.
 Require Import ForeignToJavascript ForeignToSpark.
-Require Import LData NNRCMR.
+Require Import NNRCMR.
 
 Local Open Scope string_scope.
 
@@ -225,7 +225,7 @@ Section NNRCMRtoSpark.
 
 
     Lemma var_loc_eq_dec:
-      forall x_loc y_loc : (var * localization),
+      forall x_loc y_loc : (var * dlocalization),
         { x_loc = y_loc } + { x_loc <> y_loc }.
     Proof.
       intros.
@@ -233,20 +233,20 @@ Section NNRCMRtoSpark.
       destruct y_loc as [ y loc2 ]; simpl.
       apply pair_eq_dec.
       - apply string_dec.
-      - apply localization_eq_dec.
+      - apply dlocalization_eq_dec.
     Qed.
 
-    Definition load_env (env_vars: list (var * localization)) (scala_endl:string) (quotel:string) :=
+    Definition load_env (env_vars: list (var * dlocalization)) (scala_endl:string) (quotel:string) :=
       let env_vars := List.nodup var_loc_eq_dec env_vars in
       "val e = get_engine()" ++ scala_endl ++
       "val world = mkWorld(e)" ++ scala_endl ++
       List.fold_left
-        (fun acc (x_loc: var * localization) =>
+        (fun acc (x_loc: var * dlocalization) =>
            let (x, loc) := x_loc in
            let load_func :=
                match loc with
-               | Vscalar => "loadScalar"
-               | Vdistributed => "loadDistributed"
+               | Vlocal => "loadScalar"
+               | Vdistr => "loadDistributed"
                end
            in
            acc ++
@@ -461,7 +461,7 @@ Section NNRCMRtoSpark.
       | s::l => s++sep++(string_of_list sep l)
       end.
 
-    Definition scala_of_mr_last (mr_last: ((list var * nrc) * list (var * localization))) (scala_endl:string) (quotel:string) :=
+    Definition scala_of_mr_last (mr_last: ((list var * nrc) * list (var * dlocalization))) (scala_endl:string) (quotel:string) :=
       (* We suppose that this code is put into a context where there is a JavaScript engine e *)
       let params_js :=
           List.map (fun x => "v"++x) (fst (fst mr_last))
@@ -470,8 +470,8 @@ Section NNRCMRtoSpark.
           List.map
             (fun x_loc =>
                match x_loc with
-               | (x, Vscalar) => """+"++(rdd_env_id x)++".collect()(0)"++"+"""
-               | (x, Vdistributed) => """+"++(rdd_env_id x)++".collect()"++"+"""
+               | (x, Vlocal) => """+"++(rdd_env_id x)++".collect()(0)"++"+"""
+               | (x, Vdistr) => """+"++(rdd_env_id x)++".collect()"++"+"""
                end)
             (snd mr_last)
       in
@@ -488,7 +488,7 @@ Section NNRCMRtoSpark.
       scala_of_mr_chain mrl.(mr_chain) scala_endl quotel ++
       scala_of_mr_last mrl.(mr_last) scala_endl quotel.
 
-    Definition nrcmrToSparkTopDataFromFile (test_name: string) (init: var) (env_vars: list (var * localization)) (l:nrcmr) (scala_endl:string) (quotel: string) :=
+    Definition nrcmrToSparkTopDataFromFile (test_name: string) (init: var) (env_vars: list (var * dlocalization)) (l:nrcmr) (scala_endl:string) (quotel: string) :=
       "import org.apache.spark.SparkContext" ++ scala_endl ++
       "import org.apache.spark.SparkContext._" ++ scala_endl ++
       "import org.apache.spark.SparkConf" ++ scala_endl ++
@@ -542,7 +542,7 @@ Section NNRCMRtoSpark.
 
   End MRSpark.
 
-  Definition nrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (env_vars: list (var * localization)) (l:nrcmr) : string :=
+  Definition nrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (env_vars: list (var * dlocalization)) (l:nrcmr) : string :=
     nrcmrToSparkTopDataFromFile test_name init env_vars l eol_newline "'".
 
 End NNRCMRtoSpark.

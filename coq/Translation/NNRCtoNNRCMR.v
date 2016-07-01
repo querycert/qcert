@@ -21,7 +21,6 @@ Require Import List.
 Require Import EquivDec.
 
 Require Import Utils BasicRuntime.
-Require Import LData.
 Require Import NNRCRuntime NNRCMRRuntime ForeignToReduceOps.
 Require Import NNRCRuntime .
 
@@ -34,7 +33,7 @@ Section NNRCtoNNRCMR.
   Context {ftoredop:foreign_to_reduce_op}.
 
   (* Java equivalent: NnrcToNrcmr.fresh_mr_var *)
-  Definition fresh_mr_var (prefix: string) (loc: localization) (vars_loc: list (var * localization)) :=
+  Definition fresh_mr_var (prefix: string) (loc: dlocalization) (vars_loc: list (var * dlocalization)) :=
     let x := fresh_var prefix (domain vars_loc) in
     (x, (x, loc)::vars_loc).
 
@@ -52,23 +51,23 @@ Section NNRCtoNNRCMR.
       the environment to use to execute the translation of this
       expression as a map-reduce chain. [vars] is the list of
       variables that have to be stored in the map-reduce with
-      their localization kind.
+      their dlocalization kind.
 
       This function also add to the map-reduce environment and entry
       [init] that contains the unit value.
    *)
-  Definition load_init_env' (initunit: var) (vars_loc: list (var * localization)) (env: bindings) : option nrcmr_env :=
+  Definition load_init_env' (initunit: var) (vars_loc: list (var * dlocalization)) (env: bindings) : option nrcmr_env :=
     let mr_env :=
         List.fold_left
-          (fun acc (x_loc: var * localization) =>
+          (fun acc (x_loc: var * dlocalization) =>
              let (x, loc) := x_loc in
              match lookup equiv_dec env x with
              | Some d =>
                match loc with
-               | Vscalar => lift (fun env' => (x, Dscalar d) :: env') acc
-               | Vdistributed =>
+               | Vlocal => lift (fun env' => (x, Dlocal d) :: env') acc
+               | Vdistr =>
                  match d with
-                 | dcoll coll => lift (fun env' => (x, Ddistributed coll) :: env') acc
+                 | dcoll coll => lift (fun env' => (x, Ddistr coll) :: env') acc
                  | _ => None
                  end
                end
@@ -78,20 +77,20 @@ Section NNRCtoNNRCMR.
           (Some nil)
     in
     match mr_env with
-    | Some env => Some ((initunit, Dscalar dunit) :: env)
+    | Some env => Some ((initunit, Dlocal dunit) :: env)
     | None => None
     end.
 
-  Definition load_init_env (initunit: var) (vars_loc: list (var * localization)) (env: bindings) : option nrcmr_env :=
-    let one (x_loc: var * localization) :=
+  Definition load_init_env (initunit: var) (vars_loc: list (var * dlocalization)) (env: bindings) : option nrcmr_env :=
+    let one (x_loc: var * dlocalization) :=
         let (x, loc) := x_loc in
         match lookup equiv_dec env x with
         | Some d =>
           match loc with
-          | Vscalar => Some (x, Dscalar d)
+          | Vlocal => Some (x, Dlocal d)
           | Vdistrubuted =>
             match d with
-            | dcoll coll => Some (x, Ddistributed coll)
+            | dcoll coll => Some (x, Ddistr coll)
             | _ => None
             end
           end
@@ -100,24 +99,24 @@ Section NNRCtoNNRCMR.
     in
     let mr_env := rmap one vars_loc in
     match mr_env with
-    | Some env => Some ((initunit, Dscalar dunit) :: env)
+    | Some env => Some ((initunit, Dlocal dunit) :: env)
     | None => None
     end.
 
   Definition load_init_env_success initunit vars_loc nrc_env mr_env :=
     load_init_env initunit vars_loc nrc_env = Some mr_env /\
     (forall x,
-       lookup equiv_dec vars_loc x = Some Vscalar ->
-       lift Dscalar (lookup equiv_dec nrc_env x) = lookup equiv_dec mr_env x) /\
+       lookup equiv_dec vars_loc x = Some Vlocal ->
+       lift Dlocal (lookup equiv_dec nrc_env x) = lookup equiv_dec mr_env x) /\
     (forall x,
-       lookup equiv_dec vars_loc x = Some Vdistributed ->
+       lookup equiv_dec vars_loc x = Some Vdistr ->
        exists coll,
          lookup equiv_dec nrc_env x = Some (dcoll coll) /\
-         lookup equiv_dec mr_env x = Some (Ddistributed coll)).
+         lookup equiv_dec mr_env x = Some (Ddistr coll)).
 
   Lemma load_env_lookup_initunit initunit vars_loc nrc_env mr_env:
     load_init_env_success initunit vars_loc nrc_env mr_env ->
-    lookup equiv_dec mr_env initunit = Some (Dscalar dunit).
+    lookup equiv_dec mr_env initunit = Some (Dlocal dunit).
   Proof.
     intros Hmr_env.
     unfold load_init_env_success in Hmr_env.
@@ -125,19 +124,19 @@ Section NNRCtoNNRCMR.
     destruct H0.
     unfold load_init_env in H.
     destruct (rmap
-          (fun x_loc : var * localization =>
+          (fun x_loc : var * dlocalization =>
            let (x, loc) := x_loc in
            match lookup equiv_dec nrc_env x with
            | Some d =>
                match loc with
-               | Vscalar => Some (x, Dscalar d)
-               | Vdistributed =>
+               | Vlocal => Some (x, Dlocal d)
+               | Vdistr =>
                    match d with
                    | dunit => None
                    | dnat _ => None
                    | dbool _ => None
                    | dstring _ => None
-                   | dcoll coll => Some (x, Ddistributed coll)
+                   | dcoll coll => Some (x, Ddistr coll)
                    | drec _ => None
                    | dleft _ => None
                    | dright _ => None
@@ -189,7 +188,7 @@ Section NNRCtoNNRCMR.
   Definition nnrcmr_of_nnrc_with_no_free_var (n: nrc) (initunit: var) (output: var) :=
     mkMRChain
       (mr_chain_of_nnrc_with_no_free_var n initunit output)
-      ((output::nil, (NRCVar output)), (output, Vscalar)::nil).
+      ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
   Lemma nnrcmr_of_nnrc_with_no_free_var_wf (n: nrc) (initunit: var) (output: var):
     nrc_free_vars n = nil ->
@@ -214,7 +213,7 @@ Section NNRCtoNNRCMR.
   Lemma nnrcmr_of_nnrc_with_no_free_var_correct h mr_env n:
     forall initunit output,
     forall (Hfv: nrc_free_vars n = nil),
-    forall (Hinitunit: lookup equiv_dec mr_env initunit = Some (Dscalar dunit)),
+    forall (Hinitunit: lookup equiv_dec mr_env initunit = Some (Dlocal dunit)),
     forall (Houtput: lookup equiv_dec mr_env output = None),
       nrc_eval h nil n =
       nrcmr_eval h mr_env (nnrcmr_of_nnrc_with_no_free_var n initunit output).
@@ -263,9 +262,9 @@ Section NNRCtoNNRCMR.
    * ---------------------------- *)
 
   (* Java equivalent: NnrcToNrcmr.mr_chain_of_nnrc_with_one_free_var *)
-  Definition mr_chain_of_nnrc_with_one_free_var (n: nrc) (x_loc: var * localization) (output:var) :=
+  Definition mr_chain_of_nnrc_with_one_free_var (n: nrc) (x_loc: var * dlocalization) (output:var) :=
     match x_loc with
-    | (x, Vscalar) =>
+    | (x, Vlocal) =>
       let mr :=
           mkMR
             x
@@ -274,7 +273,7 @@ Section NNRCtoNNRCMR.
             RedSingleton
       in
       (mr::nil)
-    | (x, Vdistributed) =>
+    | (x, Vdistr) =>
       let values := x in
       let mr :=
           mkMR
@@ -286,13 +285,13 @@ Section NNRCtoNNRCMR.
       (mr::nil)
     end.
 
-  Definition nnrcmr_of_nnrc_with_one_free_var (n: nrc) (x_loc: var * localization) (output:var) :=
+  Definition nnrcmr_of_nnrc_with_one_free_var (n: nrc) (x_loc: var * dlocalization) (output:var) :=
     mkMRChain
       (mr_chain_of_nnrc_with_one_free_var n x_loc output)
-      ((output::nil, (NRCVar output)), (output, Vscalar)::nil).
+      ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
 
-  Lemma nnrcmr_of_nnrc_with_one_free_var_wf (n: nrc) (x_loc: var * localization) (output:var):
+  Lemma nnrcmr_of_nnrc_with_one_free_var_wf (n: nrc) (x_loc: var * dlocalization) (output:var):
     function_with_no_free_vars (fst x_loc, n) ->
     nrcmr_well_formed (nnrcmr_of_nnrc_with_one_free_var n x_loc output).
   Proof.
@@ -301,7 +300,7 @@ Section NNRCtoNNRCMR.
     intros mr.
     unfold nnrcmr_of_nnrc_with_one_free_var; simpl.
     destruct x_loc.
-    destruct l; simpl;
+    destruct d; simpl;
       intros Hmr;
       destruct Hmr; try contradiction;
       subst;
@@ -330,18 +329,18 @@ Section NNRCtoNNRCMR.
     destruct H0.
     unfold nnrcmr_of_nnrc_with_one_free_var.
     destruct x_loc; simpl.
-    destruct l.
+    destruct d.
     - specialize (H0 v); clear H1.
       simpl in *.
       dest_eqdec; try congruence.
-      assert (Some Vscalar = Some Vscalar) as Htrivial; [ reflexivity | ].
+      assert (Some Vlocal = Some Vlocal) as Htrivial; [ reflexivity | ].
       specialize (H0 Htrivial); clear Htrivial e.
       unfold nrcmr_eval; simpl.
       unfold mr_chain_eval; simpl.
-      assert (@lookup var localized_data
+      assert (@lookup var ddata
                       (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec)
                       mr_env v =
-              (@lift data localized_data Dscalar
+              (@lift data ddata Dlocal
                      (@lookup string data
                               (@equiv_dec string (@eq string) (@eq_equivalence string)
                                           string_eqdec) nrc_env v))) as Heq;
@@ -383,16 +382,16 @@ Section NNRCtoNNRCMR.
     - specialize (H1 v); clear H0.
       simpl in *.
       dest_eqdec; try congruence.
-      assert (Some Vdistributed = Some Vdistributed) as Htrivial; [ reflexivity | ].
+      assert (Some Vdistr = Some Vdistr) as Htrivial; [ reflexivity | ].
       specialize (H1 Htrivial); clear Htrivial e.
       unfold nrcmr_eval; simpl.
       unfold mr_chain_eval; simpl.
       destruct H1.
       destruct H0.
-      assert (@lookup var localized_data
+      assert (@lookup var ddata
                       (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec)
                       mr_env v =
-              @Some localized_data (Ddistributed x)) as Heq;
+              @Some ddata (Ddistr x)) as Heq;
         [ assumption | rewrite Heq; clear Heq].
       unfold mr_eval; simpl.
       rewrite rmap_id.
@@ -443,15 +442,15 @@ Section NNRCtoNNRCMR.
         (fun d => Brand "fv" d)
    *)
   (* Java equivalent: NnrcToNrcmr.pack_closure_env *)
-  Definition pack_closure_env (free_vars_loc: list (var * localization)) (closure_env_name: var) : list mr :=
+  Definition pack_closure_env (free_vars_loc: list (var * dlocalization)) (closure_env_name: var) : list mr :=
     List.map
-      (fun (fv_loc: var * localization) =>
+      (fun (fv_loc: var * dlocalization) =>
          let (fv, loc) := fv_loc in
          let mr_reduce_brand :=
              RedId
          in
          match loc with
-         | Vscalar =>
+         | Vlocal =>
            let mr_map_brand :=
                let d:var := "x"%string in
                (d, NRCUnop AColl
@@ -462,7 +461,7 @@ Section NNRCtoNNRCMR.
              closure_env_name
              (MapScalar mr_map_brand)
              mr_reduce_brand
-         | Vdistributed =>
+         | Vdistr =>
            let mr_map_brand :=
                let d:var := "x"%string in
                (d, NRCUnop (ABrand (singleton (brand_of_var fv))) (NRCVar d))
@@ -501,11 +500,11 @@ Section NNRCtoNNRCMR.
         k
    *)
   (* Java equivalent: NnrcToNrcmr.unpack_closure_env *)
-  Definition unpack_closure_env (closure_env_name: var) (free_vars_loc: list (var * localization)) (k: nrc) : nrc :=
+  Definition unpack_closure_env (closure_env_name: var) (free_vars_loc: list (var * dlocalization)) (k: nrc) : nrc :=
     List.fold_right
       (fun fv_loc k =>
          match fv_loc with
-         | (fv, Vdistributed) =>
+         | (fv, Vdistr) =>
            let d : var := fresh_var "unpackdistributed$" (closure_env_name :: nil) in
            NRCLet fv
                   (NRCUnop AFlatten
@@ -514,7 +513,7 @@ Section NNRCtoNNRCMR.
                                               d (NRCUnop AColl (NRCUnop AUnbrand (NRCVar d)))
                                               d (NRCConst (dcoll nil)))))
                   k
-         | (fv, Vscalar) =>
+         | (fv, Vlocal) =>
            let d : var := fresh_var "unpackscalar$" (closure_env_name :: nil) in
            NRCLet fv
                   (NRCEither (NRCUnop ASingleton
@@ -532,13 +531,13 @@ Section NNRCtoNNRCMR.
   (**
     Convert an NNRC expression [n] into a Map-Reduce fetching the
     values of the free variables from the environment. The list
-    [vars_loc] give the localization of each free variable of [n].
+    [vars_loc] give the dlocalization of each free variable of [n].
     This list must contain all the variables that are in the
     map-reduce environment (it may contain variables that are not
     free in [n]).
    *)
   (* Java equivalent: NnrcToNrcmr.mr_chain_of_nnrc_with_free_vars *)
-  Definition mr_chain_of_nnrc_with_free_vars (n: nrc) (vars_loc: list (var * localization)) (output: var): list mr :=
+  Definition mr_chain_of_nnrc_with_free_vars (n: nrc) (vars_loc: list (var * dlocalization)) (output: var): list mr :=
     let free_vars := bdistinct (nrc_free_vars n) in
     match
       List.fold_right
@@ -549,7 +548,7 @@ Section NNRCtoNNRCMR.
         (Some nil) free_vars
     with
     | Some free_vars_loc =>
-      let (closure_env_name, vars_loc) := fresh_mr_var "closure$" Vdistributed vars_loc in
+      let (closure_env_name, vars_loc) := fresh_mr_var "closure$" Vdistr vars_loc in
       let pack_closure_env := pack_closure_env free_vars_loc closure_env_name in
       let final_reduce :=
           (closure_env_name, unpack_closure_env closure_env_name free_vars_loc n)
@@ -565,14 +564,14 @@ Section NNRCtoNNRCMR.
     | None => nil
     end.
 
-  Definition nnrcmr_of_nnrc_with_free_vars (n: nrc) (vars_loc: list (var * localization)) (output: var): nrcmr :=
+  Definition nnrcmr_of_nnrc_with_free_vars (n: nrc) (vars_loc: list (var * dlocalization)) (output: var): nrcmr :=
     mkMRChain
       (mr_chain_of_nnrc_with_free_vars n vars_loc output)
-      ((output::nil, (NRCVar output)), (output, Vscalar)::nil).
+      ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
   (* Well formation *)
 
-  Lemma pack_closure_env_wf (free_vars_loc: list (var * localization)) (closure_env_name: var):
+  Lemma pack_closure_env_wf (free_vars_loc: list (var * dlocalization)) (closure_env_name: var):
     mr_chain_well_formed (pack_closure_env free_vars_loc closure_env_name).
   Proof.
     induction free_vars_loc.
@@ -588,7 +587,7 @@ Section NNRCtoNNRCMR.
       destruct Hmr.
       subst.
       + unfold mr_well_formed.
-        destruct l.
+        destruct d.
         * SCase "Scalar"%string.
           repeat split.
           simpl.
@@ -607,7 +606,7 @@ Section NNRCtoNNRCMR.
         assumption.
   Qed.
 
-  Lemma unpack_closure_env_free_vars (closure_env_name: var) (free_vars_loc: list (var * localization)) (k: nrc) :
+  Lemma unpack_closure_env_free_vars (closure_env_name: var) (free_vars_loc: list (var * dlocalization)) (k: nrc) :
     forall x,
       let free_vars := List.map fst free_vars_loc in
       In x (nrc_free_vars (unpack_closure_env closure_env_name free_vars_loc k)) ->
@@ -647,7 +646,7 @@ Section NNRCtoNNRCMR.
       (*   rewrite mult_on_remove; trivial. *)
   Admitted.
 
-  Lemma nnrcmr_of_nnrc_with_free_vars_wf (n: nrc) (vars_loc: list (var * localization)) (output: var):
+  Lemma nnrcmr_of_nnrc_with_free_vars_wf (n: nrc) (vars_loc: list (var * dlocalization)) (output: var):
     (forall x, In x (nrc_free_vars n) -> In x (List.map fst vars_loc)) ->
     nrcmr_well_formed (nnrcmr_of_nnrc_with_free_vars n vars_loc output).
   Proof.
@@ -658,11 +657,11 @@ Section NNRCtoNNRCMR.
     intros Hmr.
     admit. (* XXXXXXXXXX TODO XXXXXXXXXX *)
     (* destruct (List.fold_right *)
-    (*           (fun (x : var) (oacc : option (list (var * localization))) => *)
+    (*           (fun (x : var) (oacc : option (list (var * dlocalization))) => *)
     (*            olift *)
-    (*              (fun loc : localization => *)
+    (*              (fun loc : dlocalization => *)
     (*               lift *)
-    (*                 (fun acc : list (var * localization) => (x, loc) :: acc) *)
+    (*                 (fun acc : list (var * dlocalization) => (x, loc) :: acc) *)
     (*                 oacc) (lookup equiv_dec vars_loc x)) *)
     (*           (Some nil) (bdistinct (nrc_free_vars n))); *)
     (*   [ | apply in_nil in Hmr; *)
@@ -788,7 +787,7 @@ Section NNRCtoNNRCMR.
     the translation.
   *)
   (* Java equivalent: NnrcToNrcmr.mr_chain_of_nnrc *)
-  Definition mr_chain_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * localization)) (output: var): list mr * list (var * localization) :=
+  Definition mr_chain_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var): list mr * list (var * dlocalization) :=
     let mr_chain :=
         match bdistinct (nrc_free_vars n) with
         | nil =>
@@ -805,14 +804,14 @@ Section NNRCtoNNRCMR.
     let nrcmr_vars := get_nrcmr_vars mr_chain in
     (mr_chain, nrcmr_vars ++ vars_loc).
 
-  Definition nnrcmr_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * localization)) (output: var): nrcmr * list (var * localization) :=
+  Definition nnrcmr_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var): nrcmr * list (var * dlocalization) :=
     let (mr_chain, vars_loc) := mr_chain_of_nnrc n initunit vars_loc output in
     (mkMRChain
        mr_chain
-       ((output::nil, (NRCVar output)), (output, Vscalar)::nil),
+       ((output::nil, (NRCVar output)), (output, Vlocal)::nil),
      vars_loc).
 
-  Lemma nnrcmr_of_nnrc_wf (n: nrc) (initunit: var) (vars_loc: list (var * localization)) (output: var):
+  Lemma nnrcmr_of_nnrc_wf (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var):
     nrcmr_well_formed (fst (nnrcmr_of_nnrc n initunit vars_loc output)).
   Proof.
     unfold nnrcmr_of_nnrc.
@@ -823,16 +822,16 @@ Section NNRCtoNNRCMR.
 (* *)
 
   (* Java equivalent: NnrcToNrcmr.mr_chain_distributed_of_nnrc *)
-  Definition mr_chain_distributed_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * localization)) (output: var): list mr * list (var * localization) :=
-    let (tmp, vars_loc) := fresh_mr_var "scalarcoll$"%string Vdistributed vars_loc in
+  Definition mr_chain_distributed_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var): list mr * list (var * dlocalization) :=
+    let (tmp, vars_loc) := fresh_mr_var "scalarcoll$"%string Vdistr vars_loc in
     let (mr_chain, vars_loc) := mr_chain_of_nnrc n initunit vars_loc tmp in
     (mr_chain ++ ((mr_scalar_to_distributed tmp output)::nil), vars_loc).
 
 
   (* Java equivalent: NnrcToNrcmr.mk_loop *)
-  Definition mk_loop (x: var) (n1: nrc) (n2: nrc) (mr_list1: list mr) (initunit: var) (vars_loc: list (var * localization)) : nrc * list mr * list (var * localization) :=
-    let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistributed vars_loc in
-    let (n_result_var, vars_loc) := fresh_mr_var "loop_result$"%string Vscalar vars_loc in
+  Definition mk_loop (x: var) (n1: nrc) (n2: nrc) (mr_list1: list mr) (initunit: var) (vars_loc: list (var * dlocalization)) : nrc * list mr * list (var * dlocalization) :=
+    let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistr vars_loc in
+    let (n_result_var, vars_loc) := fresh_mr_var "loop_result$"%string Vlocal vars_loc in
     let (mr_n1, vars_loc) := mr_chain_distributed_of_nnrc n1 initunit vars_loc n1_distributed_result_var in
     let mr_n2 :=
         mkMR
@@ -847,7 +846,7 @@ Section NNRCtoNNRCMR.
     (NRCVar n_result_var, mr_list, vars_loc).
 
   (* Java equivalent: NnrcToNrcmr.try_mk_loop *)
-  Definition try_mk_loop (x: var) (n1: nrc) (n2: nrc) (mr_list1: list mr) (initunit: var) (vars_loc: list (var * localization)) : option (nrc * list mr * list (var * localization)) :=
+  Definition try_mk_loop (x: var) (n1: nrc) (n2: nrc) (mr_list1: list mr) (initunit: var) (vars_loc: list (var * dlocalization)) : option (nrc * list mr * list (var * dlocalization)) :=
     match bdistinct (nrc_free_vars n2) with
     | nil =>
       Some (mk_loop x n1 n2 mr_list1 initunit vars_loc)
@@ -880,7 +879,7 @@ Section NNRCtoNNRCMR.
    *)
               
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain_ns_aux *)
-  Fixpoint nnrc_to_nnrcmr_chain_ns_aux (n: nrc) (initunit: var) (vars_loc: list (var * localization)): nrc * list mr * list (var * localization) :=
+  Fixpoint nnrc_to_nnrcmr_chain_ns_aux (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)): nrc * list mr * list (var * dlocalization) :=
     match n with
     | NRCFor x n1 n2 =>
       let '(n1', mr_list1, avoid) := nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc in
@@ -897,9 +896,9 @@ Section NNRCtoNNRCMR.
       let '(n1', mr_list1, vars_loc) := nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc in
       match foreign_to_reduce_op_of_unary_op op with
       | Some red_op =>
-        let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistributed vars_loc in
+        let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistr vars_loc in
         let (mr_n1, vars_loc) := mr_chain_distributed_of_nnrc n1' initunit vars_loc n1_distributed_result_var in
-        let (result_var, vars_loc) := fresh_mr_var "res$"%string Vscalar vars_loc in
+        let (result_var, vars_loc) := fresh_mr_var "res$"%string Vlocal vars_loc in
         let mr :=
             mkMR
               n1_distributed_result_var
@@ -911,9 +910,9 @@ Section NNRCtoNNRCMR.
       | None =>
         match op with
         | AFlatten =>
-          let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistributed vars_loc in
+          let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistr vars_loc in
           let (mr_n1, vars_loc) := mr_chain_distributed_of_nnrc n1' initunit vars_loc n1_distributed_result_var in
-          let (flatten_result_var, vars_loc) := fresh_mr_var "flat$"%string Vdistributed vars_loc in
+          let (flatten_result_var, vars_loc) := fresh_mr_var "flat$"%string Vdistr vars_loc in
           let mr_flatten :=
               mkMR
                 n1_distributed_result_var
@@ -943,7 +942,7 @@ Section NNRCtoNNRCMR.
       (n, nil, vars_loc) (* XXX TODO? *)
     end.
 
-  Lemma nnrc_to_nnrcmr_chain_aux_causally_consistent (n: nrc) (initunit: var) (vars_loc: list (var * localization)) :
+  Lemma nnrc_to_nnrcmr_chain_aux_causally_consistent (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) :
     shadow_free n = true ->
     let '(_, mr_chain, _) := nnrc_to_nnrcmr_chain_ns_aux n initunit vars_loc in
     mr_chain_causally_consistent mr_chain = true.
@@ -973,22 +972,22 @@ Section NNRCtoNNRCMR.
   Admitted.
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_mr_chain_ns *)
-  Definition nnrc_to_mr_chain_ns (n: nrc) (initunit: var) (vars_loc: list (var * localization)) (output: var) : list mr :=
+  Definition nnrc_to_mr_chain_ns (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var) : list mr :=
     let '(n', mr_list, vars_loc) := nnrc_to_nnrcmr_chain_ns_aux n initunit vars_loc in
     let (final_mr, _) := mr_chain_of_nnrc n' initunit vars_loc output in
     mr_list ++ final_mr.
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain_ns *)
-  Definition nnrc_to_nnrcmr_chain_ns (n: nrc) (initunit: var) (vars_loc: list (var * localization)) : nrcmr :=
+  Definition nnrc_to_nnrcmr_chain_ns (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) : nrcmr :=
     let output := fresh_var "output" (domain vars_loc) in
     mkMRChain
       (nnrc_to_mr_chain_ns n initunit vars_loc output)
-      ((output::nil, (NRCVar output)), (output, Vscalar)::nil).
+      ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain *)
-  Definition nnrc_to_nnrcmr_chain (n: nrc) (initunit: var) (vars_loc: list (var * localization)) : nrcmr :=
+  Definition nnrc_to_nnrcmr_chain (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) : nrcmr :=
     let n_ns := unshadow_simpl (initunit::nil) n in
-    let vars_loc := vars_loc ++ List.map (fun x => (x, Vscalar)) (nrc_bound_vars n_ns) in
+    let vars_loc := vars_loc ++ List.map (fun x => (x, Vlocal)) (nrc_bound_vars n_ns) in
     nnrc_to_nnrcmr_chain_ns n_ns initunit vars_loc.
 
   (* Theorem nnrc_to_nnrcmr_chain_correct h env n initdb initunit output: *)
@@ -1008,7 +1007,7 @@ Section NNRCtoNNRCMR.
   (* Qed. *)
 
 
-  Definition nnrc_to_nnrcmr_no_chain (n: nrc) (vars_loc: list (var * localization)) : nrcmr :=
+  Definition nnrc_to_nnrcmr_no_chain (n: nrc) (vars_loc: list (var * dlocalization)) : nrcmr :=
     mkMRChain
       nil
       ((List.map fst vars_loc, n), vars_loc).
@@ -1022,7 +1021,7 @@ Section NNRCtoNNRCMR.
     induction vars_loc; simpl in *; intros.
   Admitted.
 
-  Theorem nnrc_to_nnrcmr_no_chain_correct h env initunit mr_env (n:nrc) (vars_loc: list (var * localization)) :
+  Theorem nnrc_to_nnrcmr_no_chain_correct h env initunit mr_env (n:nrc) (vars_loc: list (var * dlocalization)) :
       load_init_env initunit vars_loc env = Some mr_env ->
       nrc_eval h env n = nrcmr_eval h mr_env (nnrc_to_nnrcmr_no_chain n vars_loc).
   Proof.

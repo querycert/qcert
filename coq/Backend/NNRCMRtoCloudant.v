@@ -21,7 +21,6 @@ Section NNRCMRToCloudantMR.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import LData.
   Require Import NNRCRuntime NNRCMRRuntime.
   Require Import CloudantKV.
   Require Import ForeignCloudant ForeignToCloudant.
@@ -159,10 +158,10 @@ Section NNRCMRToCloudantMR.
                        (* EMPTY REDUCE IS EMPTY COLL IF REDUCE IS PUSHED! *)
     end.
   
-  Definition cld_data_of_localized_data (locd:localized_data) : list data :=
+  Definition cld_data_of_localized_data (locd:ddata) : list data :=
     match locd with
-    | Dscalar d => (d::nil)
-    | Ddistributed dl => dl
+    | Dlocal d => (d::nil)
+    | Ddistr dl => dl
     end.
 
   (* For now keep that based on single inputdb ... *)
@@ -348,7 +347,7 @@ Section NNRCMRToCloudantMR.
 
   (* Java equivalent: NrcmrToCldmr.mr_last_to_cld_mr_last *)
   Definition mr_last_to_cld_mr_last
-             (mr_last_closure:(list var * nrc) * list (var * localization))
+             (mr_last_closure:(list var * nrc) * list (var * dlocalization))
     : (list var * nrc) * list var :=
     let (fvs, mr_last) := fst mr_last_closure in
     let vars_loc := snd mr_last_closure in
@@ -357,10 +356,10 @@ Section NNRCMRToCloudantMR.
           (fun fv k =>
              match lookup equiv_dec vars_loc fv with
              | None => k (* assert false: should not occur *)
-             | Some Vdistributed =>
+             | Some Vdistr =>
                (* let kv : var := really_fresh_in "$"%string "kv"%string nil k in *)
                NRCLet fv (NRCVar fv) k
-             | Some Vscalar =>
+             | Some Vlocal =>
                NRCLet fv
                       (NRCEither (NRCUnop ASingleton (NRCVar fv))
                                  fv (NRCVar fv)
@@ -372,7 +371,7 @@ Section NNRCMRToCloudantMR.
     ((fvs, cld_mr_last), map fst vars_loc).
 
   (* Java equivalent: nrcmrToCldmr.NNRCMRtoNNRCMRCloudant *)
-  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (env_vars:list (var * localization)) (mrl: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (env_vars:list (var * dlocalization)) (mrl: nrcmr) : cld_mrl :=
     (* Used to compute a separate var_locs distinct from mr_last effective params -- removed now.
        This should be reviewed by Louis *)
     mkMRCldChain
@@ -702,7 +701,7 @@ Proof.
 *)
 
   (* Java equivalent: NrcmrToCldmr.convert *)
-  Definition NNRCMRtoNNRCMRCloudantTop (env_vars:list (var * localization)) (mrl: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudantTop (env_vars:list (var * dlocalization)) (mrl: nrcmr) : cld_mrl :=
     let avoiddb := List.map mr_input mrl.(mr_chain) ++ List.map mr_output mrl.(mr_chain) in
     NNRCMRtoNNRCMRCloudant avoiddb env_vars mrl.
 
