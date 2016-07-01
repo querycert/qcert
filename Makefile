@@ -143,7 +143,8 @@ MODULES = \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCEq \
 	DNNRC/Calculus/SparkIR \
-	DNNRC/Typing/TDNNRC \
+	DNNRC/Typing/TDNRC \
+	DNNRC/Typing/TDNRCInfer \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
 	CAMP/Rules/PatternSugar \

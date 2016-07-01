@@ -23,7 +23,7 @@
   Require Import Utils BasicSystem.
   Require Import DNNRC.
 
-  Section TDNNRC.
+  Section TDNRC.
 
     Context {m:basic_model}.
     Section tplug.
@@ -284,7 +284,7 @@
       (* We will need a special inductive principle because of the list of expressions in TDNRAlg *)
   Admitted.
 
-End TDNNRC.
+End TDNRC.
 
 (* 
 *** Local Variables: ***
