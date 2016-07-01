@@ -190,6 +190,7 @@ MODULES = \
 	Backend/NNRCMRtoSpark \
 	Backend/NNRCMRtoCloudant \
 	Backend/CloudantMRtoJavascript \
+	Backend/SparkData \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/ROptimEnvFunc \
