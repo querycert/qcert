@@ -159,9 +159,9 @@ abstract class QCertRuntime {
         srow(t,
           // We have the full record in the blob field, even for closed records
           r.toString,
-          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues:_*))
       case _ =>
-        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))):_*)
     }
   }
 
@@ -306,12 +306,8 @@ abstract class QCertRuntime {
   def isSubBrand(sub: Brand, sup: Brand): Boolean = {
     if (sub == sup || sup == "Any")
       return true
-    val supertypes = brandHierarchy(sub)
-    if (supertypes.contains(sup))
-      return true
-    supertypes.exists(isSubBrand(sub, _))
+    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(dsup, sup))
   }
-
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
     case (i: Int, t: IntegerType) => i
@@ -337,15 +333,14 @@ abstract class QCertRuntime {
     */
   def cast(v: BrandedValue, t: DataType, bs: Brand*): Either = {
     // First, check whether the cast succeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
-    if (!bs.forall((brand: Brand) => {
-      v.getAs[Seq[Brand]]("$type").exists((typ: Brand) => {
-        typ == brand || isSubBrand(typ, brand)
-      })
-    })) return none()
+    if (!bs.forall((brand: Brand) =>
+      v.getAs[Seq[Brand]]("$type").exists((typ: Brand) =>
+        isSubBrand(typ, brand))))
+      return none()
     // Second, if the cast succeeds, reshape data to match the intersection type
     val data = v.get(v.fieldIndex("$data"))
     val reshaped = reshape(data, t).asInstanceOf[Row] // TODO this cast is wrong. Write a brand(Any, Brand*) method
-    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")): _*))
+    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")):_*))
   }
 
   /* Bags
