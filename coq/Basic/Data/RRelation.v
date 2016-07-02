@@ -759,6 +759,27 @@ Section RRelation.
 
 End RRelation.
 
+Section Misc.
+  Lemma in_rec_sort_insert {A} `{EqDec A eq} (x:string * A) (s:string) (a:A) l:
+    In x (insertion_sort_insert rec_field_lt_dec (s, a) l) ->
+    x = (s, a) \/ In x l.
+  Proof.
+    revert x a. induction l; simpl; [intuition | ].
+    intros x a0.
+    destruct a; simpl in *.
+    destruct (StringOrder.lt_dec s s0); simpl; intros; trivial.
+    - elim H0; clear H0; intros; [left|]; auto.
+    - destruct (StringOrder.lt_dec s0 s); simpl; intros; intuition.
+      simpl in H0.
+      elim H0; clear H0; intros.
+      + intuition.
+      + destruct (IHl _ _ H0); intuition.
+  Qed.
+
+End Misc.
+
+
+
 Require Import Permutation.
 
 Section MergeBindings.
