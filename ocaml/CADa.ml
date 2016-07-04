@@ -23,7 +23,28 @@ open Compiler.EnhancedCompiler
 
 (* Command line args *)
 let args conf = []
-let anon_args conf f = set_json conf (parse_json_from_file f)
+
+let print_hierarchy h =
+  let hi = DataUtil.build_hierarchy h in
+  List.iter (fun (x,y) -> Printf.printf "\t\t%s derives from %s\n" x y) hi
+
+let print_brand_types bts =
+  List.iter (fun (x,y) -> Printf.printf "\t\t\tBrand %s = %s\n" x y) bts
+
+let anon_args conf f =
+  begin
+    Printf.printf "Parsing I/O file: %s\n" f;
+    let json : Data.json = parse_json_from_file f in
+    Printf.printf "\tExtracting components from I/O file: %s\n" f;
+    let (input,hierarchy,output,model) = DataUtil.get_io_content (Some json) in
+    Printf.printf "\tHierarchy:\n";
+    print_hierarchy hierarchy;
+    let (modelName,brandTypes,typeDefs) = DataUtil.get_model_content model in
+    Printf.printf "\tModel:\n";
+    Printf.printf "\t\tmodelName: %s\n" modelName;
+    Printf.printf "\t\tbrandTypes:\n";
+    print_brand_types brandTypes
+  end
 
 let usage = Sys.argv.(0)^" jsonfile1 jsonfile2 ..."
 
