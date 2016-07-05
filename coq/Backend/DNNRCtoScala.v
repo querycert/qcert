@@ -45,7 +45,7 @@ Section DNNRCtoScala.
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
 
-  (** Construct a org.apache.spark.sql.types.DataType from an rtype₀ *)
+  (* TODO replace this by stuff from SparkData *)
   Fixpoint dataType_of_rtype₀ {ft:foreign_type} (t: rtype₀) :=
     match t with
     | Bottom₀ => "BOTTOM?"
@@ -69,6 +69,7 @@ Section DNNRCtoScala.
     | Foreign₀ f => "TODO FIGURE OUT WHAT TO DO WITH FOREIGN TYPES"
     end.
 
+  (* TODO replace this by stuff from SparkData *)
   Fixpoint scala_of_data {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (d: data) : string :=
     match d with
     | dstring s => quote_string s
@@ -154,7 +155,6 @@ Section DNNRCtoScala.
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
     end.
 
-  (* T and A are a bit confusing. T is the plug, A is the type of types... *)
   Fixpoint scala_of_dnrc {T: Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (d: @dnrc _ bool T) : string :=
     match d with
     | DNRCVar t n => n (* TODO might need an environment or something... *)
