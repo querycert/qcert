@@ -49,7 +49,11 @@ Module CompType(runtime:CompilerRuntime).
   Definition brand_model : Set := brand_model.
   Definition make_brand_model := make_brand_model_fails.
   Definition typing_runtime : Set := typing_runtime.
+
+  (* Additional support for json to rtype conversion *)
+  Require Import JSONtoData.
   
+  Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
 End CompType.
 
 (* 

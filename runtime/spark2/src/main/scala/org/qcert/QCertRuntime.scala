@@ -30,6 +30,8 @@ import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
 
+  val worldType = test07InputType
+
   def castToCustomerAndUnbrand(r: Row): Either = {
     if (r.getSeq[String](r.fieldIndex("$type")).contains("entities.Customer")) {
       val blob = r.getAs[Row]("$data").getAs[String]("$blob")
@@ -106,9 +108,8 @@ abstract class QCertRuntime {
 
   def run(world: Dataset[Row])
 
-  // TODO take the iofile as a parameter somehow
-  def initializeBrandHierarchy() = {
-    val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
+  def initializeBrandHierarchy(iofile: String) = {
+    // val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
     val io = new com.google.gson.JsonParser().parse(new FileReader(iofile))
     val hc = io.getAsJsonObject.get("inheritance").getAsJsonArray
     hc.iterator().asScala.foreach((subsup: JsonElement) => {
@@ -121,17 +122,26 @@ abstract class QCertRuntime {
     })
   }
 
+  val worldType : StructType
+
   def main(args: Array[String]): Unit = {
+    if (args.length != 2) {
+      println("Expected two arguments: the iofile containing the brand hierarchy, and the sparkio file containing the data")
+      sys.exit(1)
+    }
+    val iofileHierarchy = args(0)
+    val iofileData = args(1)
+
     println("Initializing brand hierarchy")
-    initializeBrandHierarchy()
+    initializeBrandHierarchy(iofileHierarchy)
     println(brandHierarchy)
 
     val sparkCtx = new SparkContext("local", "Test 07", new SparkConf())
     sparkCtx.setLogLevel("ERROR")
     val session = SparkSession.builder().getOrCreate()
 
-    val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
-    val df0 = session.read.schema(test07InputType).json(jsonFile)
+    // val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
+    val df0 = session.read.schema(worldType).json(iofileData)
     //printing some debugging output for sanity-checking
     System.out.println("--- input schema ---")
     df0.printSchema()

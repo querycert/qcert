@@ -232,6 +232,31 @@ Section JSONtoData.
     - assumption.
   Qed.
 
+  (* JSON to RType *)
+  Require Import Types.
+  Context {ftype:foreign_type}.
+
+  Fixpoint json_to_rtype₀ (j:json) : rtype₀ :=
+    match j with
+    | jnil => Unit₀
+    | jnumber _ => Unit₀
+    | jbool _ => Unit₀
+    | jarray _ => Unit₀
+    | jstring "String" => String₀
+    | jstring "Nat" => Nat₀
+    | jstring "Bool" => Bool₀
+    | jstring _ => Unit₀
+    | jobject nil => Rec₀ Open nil
+    | jobject (("$coll"%string,j')::nil) => Coll₀ (json_to_rtype₀ j')
+    | jobject (("$option"%string,j')::nil) => Either₀ (json_to_rtype₀ j') Unit₀
+    | jobject jl => Rec₀ Open (map (fun kj => ((fst kj), (json_to_rtype₀ (snd kj)))) jl)
+    | jforeign _ => Unit₀
+    end.
+
+  Require Import RTypeNorm.
+  Definition json_to_rtype {br:brand_relation} (j:json) :=
+    normalize_rtype₀_to_rtype (json_to_rtype₀ j).
+
 End JSONtoData.
 
 (* 

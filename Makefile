@@ -60,6 +60,7 @@ MODULES = \
 	Basic/BasicRuntime \
 	Basic/TypeSystem/ForeignType \
 	Basic/TypeSystem/RType \
+	Basic/TypeSystem/RTypeNorm \
 	Basic/TypeSystem/DType \
         Basic/TypeSystem/TBrandContext \
 	Basic/TypeSystem/RSubtype \
