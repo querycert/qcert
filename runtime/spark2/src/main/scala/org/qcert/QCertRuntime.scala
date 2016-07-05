@@ -30,6 +30,8 @@ import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
 
+  val worldType = test07InputType
+
   def castToCustomerAndUnbrand(r: Row): Either = {
     if (r.getSeq[String](r.fieldIndex("$type")).contains("entities.Customer")) {
       val blob = r.getAs[Row]("$data").getAs[String]("$blob")
@@ -120,6 +122,8 @@ abstract class QCertRuntime {
     })
   }
 
+  val worldType : StructType
+
   def main(args: Array[String]): Unit = {
     if (args.length != 2) {
       println("Expected two arguments: the iofile containing the brand hierarchy, and the sparkio file containing the data")
@@ -137,7 +141,7 @@ abstract class QCertRuntime {
     val session = SparkSession.builder().getOrCreate()
 
     // val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
-    val df0 = session.read.schema(test07InputType).json(iofileData)
+    val df0 = session.read.schema(worldType).json(iofileData)
     //printing some debugging output for sanity-checking
     System.out.println("--- input schema ---")
     df0.printSchema()

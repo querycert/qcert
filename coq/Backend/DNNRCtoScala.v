@@ -190,6 +190,7 @@ Section DNNRCtoScala.
   Definition dnrcToSpark2Top {A : Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (name: string) (e: dnrc) : string :=
     "object "
       ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
+      ++ "val worldType = " ++ "test07InputType /* TODO replace by actual input type */" ++ eol
       ++ "def run(CONST$WORLD: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row]) = {" ++ eol
       ++ "println(" ++ eol
       ++ @scala_of_dnrc A ft fdt m e ++ eol
