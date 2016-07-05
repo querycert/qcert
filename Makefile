@@ -250,6 +250,7 @@ spark2-runtime:
 
 japi:
 	@$(MAKE) java-extraction
+#	@jar cf lib/qcert.jar ocaml/japi/bin lib/CALib.jar 
 
 qcert: Makefile.coq
 	@echo "[QCert] "
