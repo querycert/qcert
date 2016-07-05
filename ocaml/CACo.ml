@@ -20,7 +20,6 @@ open Util
 open ConfigUtil
 open ParseUtil
 open CloudantUtil
-open Stats
 open DisplayUtil
 open FrontUtil
 open Compiler.EnhancedCompiler
@@ -89,7 +88,7 @@ let compile_main conf f =
       compile_algenv_top conf (fname,sname,op);
       if !(get_target_display conf) then display_algenv_top conf (fname,op) else ();
       if !(get_target_display_sexp conf) then sexp_algenv_top conf (fname,op) else ();
-      if !(get_target_stats conf) then display_algenv_top conf (fname,op) else ()
+      if !(get_target_stats conf) then Stats.display_stats conf fname else ()
     end
 
 let () =
