@@ -26,79 +26,86 @@ Require Import ODMGRuntime.
 Require Import CompilerRuntime.
 Module CompStat(runtime:CompilerRuntime).
 
-  Require Import PatterntoNRAEnv NRAtoNNRC.
-
-    Definition stat_rule_source (r:rule) : Z :=
-    (Z_of_nat (pat_size (rule_to_pattern r))).
-  
-    Definition stat_pattern_source (p:pat) : Z :=
-    (Z_of_nat (pat_size p)).
-  
-    Definition stat_oql_source (e:oql_expr) : Z :=
-      (Z_of_nat (oql_size e)).
-  
-  (* Naive *)
-
-  Definition stat_algenv_no_optim (op:algenv) : Z * Z :=
-    let algenv := op in
-    (Z_of_nat (algenv_size algenv), Z_of_nat (algenv_depth algenv)).
-  
-  Definition stat_alg_no_optim (op:algenv) : Z * Z :=
-    let alg := alg_of_algenv op in
-    (Z_of_nat (alg_size alg), Z_of_nat (alg_depth alg)).
-  
-  Definition stat_nrc_no_optim (op:algenv) : Z :=
-    let alg := alg_of_algenv op in
-    Z_of_nat (nrc_size (nra_to_nnrc alg "id"%string)).
-
-  (* Compiler *)
-
+  Require Import PatterntoNRAEnv NRAtoNNRC NRAEnvtoNNRC.
   Require Import CompCore.
+  Require Import TRewFunc.
 
   Module CC := CompCore runtime.
 
-  Definition tstat_algenv_typed_opt (op:algenv) : Z * Z :=
-    let algenv := CC.toptimize_algenv_typed_opt op in
-    (Z_of_nat (algenv_size algenv), Z_of_nat (algenv_depth algenv)).
-
-  Definition tstat_alg_typed_opt (op:algenv) : Z * Z :=
-    let alg := alg_of_algenv (CC.toptimize_algenv_typed_opt op) in
-    (Z_of_nat (alg_size alg), Z_of_nat (alg_depth alg)).
-
-  Definition tstat_nrc_typed_opt (op:algenv) : Z :=
-    Z_of_nat (nrc_size (CC.tcompile_nraenv_to_nnrc_typed_opt op)).
-
   Local Open Scope string_scope.
 
-  Definition full_stats (sname:string) (ssize:Z) (op:algenv) : data :=
-    let (st_algenv_no1, st_algenv_no2) := (stat_algenv_no_optim op) in 
-    let (st_alg_no1, st_alg_no2) := (stat_alg_no_optim op) in 
-    let (tst_algenv_no1, tst_algenv_no2) := (tstat_algenv_typed_opt op) in 
-    let (tst_alg_no1, tst_alg_no2) := (tstat_alg_typed_opt op) in 
+  Definition stat_rule_source (r:rule) : data :=
+    dnat (Z_of_nat (pat_size (rule_to_pattern r))).
+
+  Definition stat_pattern_source (p:pat) : data :=
+    dnat (Z_of_nat (pat_size p)).
+
+  Definition stat_oql_source (e:oql_expr) : data :=
+    dnat (Z_of_nat (oql_size e)).
+
+  Definition stat_algenv (op:algenv) : data :=
+    let size := algenv_size op in
+    let depth := algenv_depth op in
+    drec
+      (("size", dnat (Z_of_nat size))
+         :: ("depth", dnat (Z_of_nat depth))
+         :: nil).
+
+  Definition stat_alg (op:alg) : data :=
+    let size := alg_size op in
+    let depth := alg_depth op in
+    drec
+      (("size", dnat (Z_of_nat size))
+         :: ("depth", dnat (Z_of_nat depth))
+         :: nil).
+
+  Definition stat_nrc (e: nrc) : data :=
+    let e_opt := trew e in
+    drec
+      (("size", dnat (Z_of_nat (nrc_size e)))
+         :: ("size optim", dnat (Z_of_nat (nrc_size e_opt)))
+         :: nil).
+
+  Definition nra_optim (op: alg) : alg :=
+    let algenv_opt := (CC.toptimize_algenv_typed_opt (algenv_of_alg op)) in
+    if is_nra_fun algenv_opt then
+      deenv_alg algenv_opt
+    else
+      alg_of_algenv algenv_opt.
+
+  Definition full_stats (sname:string) (ssize:data) (nraenv_no_op:algenv) : data :=
+    let vid := "vid" in
+    let venv := "venv" in
+    let nra_of_nraenv_no_op := alg_of_algenv nraenv_no_op in
+    let nra_op_of_nraenv_no_op := nra_optim nra_of_nraenv_no_op in
+    let nraenv_op := CC.toptimize_algenv_typed_opt nraenv_no_op in
+    let nra_of_nraenv_op := alg_of_algenv nraenv_op in
+    let nra_op_of_nraenv_op := nra_optim nra_of_nraenv_op in
     drec (("Source", dstring sname)
-            :: ("Source Size", dnat ssize)
-            :: ("No Optim Size", drec (("NRAEnv", dnat st_algenv_no1)
-                                         :: ("NRAEnv Depth", dnat st_algenv_no2)
-                                         :: ("NRA",dnat st_alg_no1)
-                                         :: ("NRA Depth", dnat st_alg_no2)
-                                         :: ("NNRC",dnat (stat_nrc_no_optim op))
-                                         :: nil))
-            :: ("[TYPED] Optimized Size", drec (("NRAEnv", dnat tst_algenv_no1)
-                                         :: ("NRAEnv Depth", dnat tst_algenv_no2)
-                                         :: ("NRA",dnat tst_alg_no1)
-                                         :: ("NRA Depth", dnat tst_alg_no2)
-                                         :: ("NNRC",dnat (tstat_nrc_typed_opt op))
-                                         :: nil))
+            :: ("Source Size", ssize)
+            :: ("NRAEnv", stat_algenv nraenv_no_op)
+            :: ("NRAEnv -> NNRC", stat_nrc (algenv_to_nnrc nraenv_no_op vid venv))
+            :: ("NRAEnv -> NRA", stat_alg nra_of_nraenv_no_op)
+            :: ("NRAEnv -> NRA -> NNRC", stat_nrc (nra_to_nnrc nra_of_nraenv_no_op vid))
+            :: ("NRAEnv -> NRA optim", stat_alg nra_op_of_nraenv_no_op)
+            :: ("NRAEnv -> NRA optim -> NNRC", stat_nrc (nra_to_nnrc nra_op_of_nraenv_no_op vid))
+            :: ("NRAEnv -> NRAEnv optim", stat_algenv nraenv_op)
+            :: ("NRAEnv -> NRAEnv optim -> NNRC", stat_nrc (algenv_to_nnrc nraenv_op vid venv))
+            :: ("NRAEnv -> NRAEnv optim -> NRA", stat_alg nra_of_nraenv_op)
+            :: ("NRAEnv -> NRAEnv optim -> NRA -> NNRC", stat_nrc (nra_to_nnrc nra_of_nraenv_op vid))
+            :: ("NRAEnv -> NRAEnv optim -> NRA optim", stat_alg nra_op_of_nraenv_op)
+            :: ("NRAEnv -> NRAEnv optim -> NRA optim -> NNRC", stat_nrc (nra_to_nnrc nra_op_of_nraenv_op vid))
+            :: ("compiler", stat_nrc (CC.tcompile_nraenv_to_nnrc_typed_opt nraenv_no_op))
             :: nil).
 
 
   (* Top level *)
-  
+
   Require Import CompFront.
   Require Import NNRCtoJavascript.
 
   Module CF := CompFront runtime.
-  
+
   Definition json_stats_oql (sname:string) (oql:oql_expr) : string :=
     let ssize := stat_oql_source oql in
     let op := CF.translate_oql_to_algenv oql in
@@ -119,7 +126,7 @@ Module CompStat(runtime:CompilerRuntime).
 
 End CompStat.
 
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***
