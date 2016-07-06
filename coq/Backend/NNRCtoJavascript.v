@@ -155,47 +155,29 @@ Section NNRCtoJavascript.
       := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
     
     (* Java equivalent: JavaScriptBackend.dataToJS *)
-    Fixpoint dataToJS (quotel:string) (d : data) : string
-      := match d with
-         | dunit => "null" (* to be discussed *)
-         | dnat n => Z_to_string10 n
-         | dbool b => if b then "true" else "false"
-         | dstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
-         | dcoll ls =>
-           let ss := (string_sort (map (dataToJS quotel) ls)) in
+    Require Import JSON.
+    Fixpoint jsonToJS (quotel:string) (j : json) : string
+      := match j with
+         | jnil => "null" (* to be discussed *)
+         | jnumber n => Z_to_string10 n
+         | jbool b => if b then "true" else "false"
+         | jstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
+         | jarray ls =>
+           let ss := (string_sort (map (jsonToJS quotel) ls)) in
            "[" ++ (joinStrings ", " ss) ++ "]"
-         | drec ls =>
+         | jobject ls =>
            let ss := (map (fun kv => let '(k,v) := kv in
-                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (dataToJS quotel v)) ls) in
+                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (jsonToJS quotel v)) ls) in
            "{" ++ (joinStrings ", " ss) ++ "}"
-         | dleft d => "{" ++ quotel ++ "left" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
-         | dright d => "{" ++ quotel ++ "right" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
-         | dbrand b d =>
-           "{" ++ quotel ++ "type" ++ quotel ++ ":" ++ (brandsToJs quotel b) ++ ","
-               ++ quotel ++ "data" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
-         | dforeign fd => foreign_to_javascript_data quotel fd
+         | jforeign fd => foreign_to_javascript_data quotel fd
          end.
 
-    Fixpoint dataToJSPlain (quotel:string) (d : data) : string
-      := match d with
-         | dunit => "unit"
-         | dnat n => Z_to_string10 n
-         | dbool b => if b then "true" else "false"
-         | dstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
-         | dcoll ls =>
-           let ss := (map (dataToJS quotel) ls) in
-           "[" ++ (joinStrings ", " ss) ++ "]"
-         | drec ls =>
-           let ss := (map (fun kv => let '(k,v) := kv in
-                                     "" ++ quotel ++ "" ++ k ++ "" ++ quotel ++ ": " ++ (dataToJS quotel v)) ls) in
-           "{" ++ (joinStrings ", " ss) ++ "}"
-         | dleft d => "{" ++ quotel ++ "left" ++ quotel ++ ":" ++ (dataToJSPlain quotel d) ++ "}"
-         | dright d => "{" ++ quotel ++ "right" ++ quotel ++ ":" ++ (dataToJSPlain quotel d) ++ "}"
-         | dbrand b d =>
-           "{" ++ quotel ++ "type" ++ quotel ++ ":" ++ brandsToJs quotel b ++ ","
-               ++ quotel ++ "data" ++ quotel ++ ":" ++ (dataToJS quotel d) ++ "}"
-         | dforeign fd => foreign_to_javascript_dataPlain quotel fd
-         end.
+    Require Import JSONtoData.
+    Definition dataToJS (quotel:string) (d : data) : string :=
+      jsonToJS quotel (data_to_js quotel d).
+
+    Definition dataEnhancedToJS (quotel:string) (d : data) : string :=
+      jsonToJS quotel (data_enhanced_to_js quotel d).
 
     Definition hierarchyToJS (quotel:string) (h:list (string*string)) :=
       dataToJS quotel (dcoll (map (fun x => drec (("sub",dstring (fst x)) :: ("sup", (dstring (snd x))) :: nil)) h)).
@@ -254,7 +236,7 @@ Section NNRCtoJavascript.
                      | ARec s => "{" ++ quotel ++ s ++ quotel ++ ": " ++ e1 ++ "}"
                      | ADot s => "deref(" ++ e1 ++ ", " ++ quotel ++ s  ++ quotel ++ ")"
                      | ARecRemove s => "remove(" ++ e1 ++ ", " ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ")"
-                     | ARecProject sl => "project(" ++ e1 ++ ", " ++ (dataToJSPlain quotel (dcoll (map dstring sl))) ++ ")"
+                     | ARecProject sl => "project(" ++ e1 ++ ", " ++ (brandsToJs quotel sl) ++ ")"
                      | ADistinct => "distinct(" ++ e1 ++ ")"
                      | ASum => "sum(" ++ e1 ++ ")"
                      | AArithMean => "arithMean(" ++ e1 ++ ")"

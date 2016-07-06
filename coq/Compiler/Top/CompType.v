@@ -54,6 +54,13 @@ Module CompType(runtime:CompilerRuntime).
   Require Import JSONtoData.
   
   Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
+
+  (* JSON -> sdata string *)
+  Require SparkData.
+
+  Definition json_to_sjson br (m:brand_model) : JSON.json -> JSON.json -> option String.string
+    := @SparkData.json_to_sjson _ br _ _ m _.
+
 End CompType.
 
 (* 

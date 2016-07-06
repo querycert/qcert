@@ -27,7 +27,7 @@ type io_hierarchy_list = (string * string) list
 type io_input = Data.data list
 type io_output = Data.data list
 
-val get_io_content : io_json -> Data.json * Data.json * Data.json * Data.json
+val get_io_content : io_json -> Data.json * Data.json * Data.json * Data.json * Data.json
 val get_hierarchy : io_json -> io_hierarchy
 val get_hierarchy_cloudant : io_json -> io_hierarchy
 val build_hierarchy : io_hierarchy -> io_hierarchy_list

@@ -28,7 +28,7 @@ type io_input = Data.data list
 type io_output = Data.data list
 
 
-let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * Data.json =
+let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * Data.json * Data.json =
     match od with
     | Some d ->
 	begin
@@ -39,7 +39,8 @@ let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * D
 		let output = List.assoc ['o';'u';'t';'p';'u';'t'] r in
 		let hierarchy = List.assoc ['i';'n';'h';'e';'r';'i';'t';'a';'n';'c';'e'] r in
 		let model = List.assoc ['m';'o';'d';'e';'l'] r in
-		(input, hierarchy, output, model)
+		let wmType = List.assoc ['W';'M';'T';'y';'p';'e'] r in
+		(input, hierarchy, output, model, wmType)
 	    | _ ->
 		raise Not_found
 	  with
@@ -51,12 +52,12 @@ let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * D
 
 let get_hierarchy od =
   match get_io_content od with
-  | (_, h, _, _) -> h
+  | (_, h, _, _, _) -> h
 
 let get_hierarchy_cloudant od =
   try
     match get_io_content od with
-    | (_, h, _, _) -> h
+    | (_, h, _, _, _) -> h
   with
   | _ -> Compiler.Jarray []
 
@@ -104,7 +105,7 @@ let build_type_defs bts =
 
 let get_input conf od =
   match get_io_content od with
-  | (i, h, _, _) ->
+  | (i, h, _, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match i with
       | Compiler.Jarray l ->
@@ -134,7 +135,7 @@ let get_model_content (j:Data.json) =
 
 let get_output od =
   match get_io_content od with
-  | (_, h, o, _) ->
+  | (_, h, o, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match o with
       | Compiler.Jarray l -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)

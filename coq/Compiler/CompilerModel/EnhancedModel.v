@@ -415,10 +415,6 @@ Definition enhanced_to_javascript_data
      | enhancedtimepoint tp => (@toString _ time_point_foreign_data.(@foreign_data_tostring ) tp)
      end.
 
-Definition enhanced_to_javascript_dataPlain
-           (quotel:String.string) (fd:foreign_data_type) : String.string
-  := enhanced_to_javascript_data quotel fd.
-
 (* Java equivalent: JavaScriptBackend.foreign_to_javascript_unary_op *)
 Definition enhanced_to_javascript_unary_op
              (indent:nat) (eol:String.string)
@@ -448,7 +444,6 @@ Instance enhanced_foreign_to_javascript :
   := mk_foreign_to_javascript
        enhanced_foreign_runtime
        enhanced_to_javascript_data
-       enhanced_to_javascript_dataPlain
        enhanced_to_javascript_unary_op
        enhanced_to_javascript_binary_op.
 

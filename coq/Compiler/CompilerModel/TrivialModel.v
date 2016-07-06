@@ -228,7 +228,7 @@ Defined.
     @foreign_to_javascript trivial_foreign_runtime
     := mk_foreign_to_javascript
          trivial_foreign_runtime
-         _ _ _ _.
+         _ _ _.
 
   Program Instance trivial_foreign_to_JSON : foreign_to_JSON
     := mk_foreign_to_JSON trivial_foreign_data _ _.

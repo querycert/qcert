@@ -36,7 +36,7 @@ let anon_args conf f =
     Printf.printf "Parsing I/O file: %s\n" f;
     let json : Data.json = parse_json_from_file f in
     Printf.printf "\tExtracting components from I/O file: %s\n" f;
-    let (input,hierarchy,output,model) = DataUtil.get_io_content (Some json) in
+    let (input,hierarchy,output,model,wmType) = DataUtil.get_io_content (Some json) in
     Printf.printf "\tHierarchy:\n";
     print_hierarchy hierarchy;
     let (modelName,brandTypes,typeDefs) = DataUtil.get_model_content model in

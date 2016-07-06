@@ -27,8 +27,6 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
   := mk_foreign_to_javascript {
          foreign_to_javascript_data
            (quotel:string) (fd:foreign_data_type) : string
-         ; foreign_to_javascript_dataPlain
-             (quotel:string) (fd:foreign_data_type) : string
          ; foreign_to_javascript_unary_op
              (indent:nat) (eol:string)
              (quotel:string) (fu:foreign_unary_op_type)

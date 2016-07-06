@@ -81,7 +81,7 @@ Section SparkData.
         "StructType(Seq(" ++ joinStrings ", " fieldTypes ++ "))"
       end.
 
-    (** sdata to simple data (no either/open records/...)
+    (** sdata to json AST
      * Convert data to a simple format that we can just serialize to JSON *)
     Fixpoint sdata_to_plain_data (s: sdata) : data :=
       match s with
@@ -267,6 +267,17 @@ Section SparkData.
       rewrite H0.
       eauto.
 Admitted.
+
+  (* Added calls for integration within the compiler interface *)
+  Require Import ForeignToJSON.
+  Require Import JSON JSONtoData.
+
+  Context {ftojson:foreign_to_JSON}.
+
+  Definition json_to_sjson (j:JSON.json) (jt:JSON.json) : option string :=
+    let d := json_to_data h j in
+    let r := json_to_rtype jt in
+    lift sdata_to_json (typed_data_to_sdata d r).
 
 End SparkData.
 
