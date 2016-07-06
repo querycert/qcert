@@ -102,14 +102,6 @@ Section SparkData.
     Definition sdata_to_json (s: sdata) : string :=
       dataToJS "\""" (sdata_to_plain_data s).
 
-    Definition brand_content_rtype (bl: list string) : rtype₀ :=
-      (* TODO *)
-      Top₀.
-
-    Definition brand_content_stype (bl: list string) : stype :=
-      (* TODO Intersection of brands models, or something *)
-      STnull.
-
     Fixpoint rtype_to_stype (r: rtype₀) : stype :=
       match r with
       | Bottom₀ => STnull
@@ -125,8 +117,11 @@ Section SparkData.
         STstruct (("$blob", STstring)::("$known", STstruct known_fields)::nil)
       | Either₀ l r => STstruct (("$left", rtype_to_stype l)::("$right", rtype_to_stype r)::nil)
       | Brand₀ brands =>
+        let t := rtype_to_stype (proj1_sig (brands_type brands)) in
+        (* TODO should use the above, but the termination checker won't let me :/ *)
+        let t := STnull in
         STstruct (("$type", STarray STstring)
-                    ::("$data", brand_content_stype brands)::nil)
+                    ::("$data", t)::nil)
       (* should not occur *)
       | Arrow₀ _ _ => STnull
       | Foreign₀ ft => STnull
@@ -196,7 +191,7 @@ Section SparkData.
       | None => None
       end
     | dbrand bs v, Brand₀ bts =>
-      let type := brand_content_rtype bts in
+      let type := proj1_sig (brands_type bts) in
       match typed_data_to_sdata_0 v type with
       | Some data => Some (Srow (("$data"%string, data)
                                    ::("$type"%string, Sarray (map Sstring bs))::nil)
@@ -257,15 +252,7 @@ Section SparkData.
       subst.
       destruct (data_type_Brand_inv H).
       unfold typed_data_to_sdata. simpl.
-      unfold brand_content_rtype.
-      (* TODO Need to change this once we have an actual implementation of brand_content_rtype *)
-      specialize (IHd Top).
-      unfold typed_data_to_sdata in IHd.
-      simpl in IHd.
-      specialize (IHd (dttop d H3)).
-      inversion IHd.
-      rewrite H0.
-      eauto.
+      admit.
 Admitted.
 
   (* Added calls for integration within the compiler interface *)

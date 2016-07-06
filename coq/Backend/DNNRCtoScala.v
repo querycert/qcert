@@ -35,6 +35,7 @@ Require Import NNRCRuntime ForeignToJava.
 Require Import DNNRC.
 Require Import RType.
 Require Import TDataInfer.
+Require Import SparkData.
 Local Open Scope string_scope.
 
 Section DNNRCtoScala.
@@ -89,13 +90,15 @@ Section DNNRCtoScala.
     | dforeign _ => "DFOREIGN???"
     end.
 
-  Definition scala_of_unop (op: unaryOp) (x: string) : string :=
+  Definition scala_of_unop {ftype: foreign_type} {m: brand_model} (op: unaryOp) (x: string) : string :=
     let prefix s := s ++ "(" ++ x ++ ")" in
     let postfix s := x ++ "." ++ s in
     match op with
     | AArithMean => prefix "arithMean"
     | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
-    | ACast bs => "cast(" ++ joinStrings ", " (x::"/*TODO*/"::(map quote_string bs)) ++ ")" (* TODO need to pass intersection of brands *)
+    | ACast bs =>
+      let t := stype_to_datatype (rtype_to_stype (proj1_sig (brands_type bs))) in
+      "cast(" ++ joinStrings ", " (x:: t ::(map quote_string bs)) ++ ")"
     | AColl => prefix "Array"
     | ACount => postfix "length"
     | ADot n => prefix ("dot/*[TODO]*/(""" ++ n ++ """)")
