@@ -55,6 +55,8 @@ Module CompType(runtime:CompilerRuntime).
   
   Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
 
+  Definition json_to_rtype_with_fail {m:brand_relation} := json_to_rtype_with_fail.
+
   (* JSON -> sdata string *)
   Require SparkData.
 

@@ -70,6 +70,9 @@ Module CompData(runtime:CompilerRuntime).
   Definition dataToJS s : data -> String.string 
     := NNRCtoJavascript.dataToJS s.
 
+  Definition jsonToJS s : JSON.json -> String.string 
+    := NNRCtoJavascript.jsonToJS s.
+
 
 End CompData.
 

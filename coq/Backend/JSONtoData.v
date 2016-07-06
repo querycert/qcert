@@ -196,7 +196,10 @@ Section JSONtoData.
   (* JSON to RType *)
   Section toRType.
     Require Import Types.
+    Require Import RTypeNorm.
+    Require Import ForeignTypeToJSON.
     Context {ftype:foreign_type}.
+    Context {ftypeToJSON:foreign_type_to_JSON}.
 
     Fixpoint json_to_rtype₀ (j:json) : rtype₀ :=
       match j with
@@ -220,9 +223,47 @@ Section JSONtoData.
       | jforeign _ => Unit₀
       end.
 
-    Require Import RTypeNorm.
     Definition json_to_rtype {br:brand_relation} (j:json) :=
       normalize_rtype₀_to_rtype (json_to_rtype₀ j).
+
+    Fixpoint json_to_rtype₀_with_fail (j:json) : option rtype₀ :=
+      match j with
+      | jnil => Some Unit₀
+      | jnumber _ => None
+      | jbool _ => None
+      | jarray _ => None
+      | jstring "String" => Some String₀
+      | jstring "Nat" => Some Nat₀
+      | jstring "Bool" => Some Bool₀
+      | jstring s => lift Foreign₀ (foreign_to_string_to_type s)
+      | jobject nil => Some (Rec₀ Open nil)
+      | jobject (("$brand"%string,jarray jl)::nil) =>
+        match json_brands jl with
+        | Some brs => Some (Brand₀ brs)
+        | None => None
+        end
+      | jobject (("$coll"%string,j')::nil) => lift Coll₀ (json_to_rtype₀_with_fail j')
+      | jobject (("$option"%string,j')::nil) => lift (fun x => Either₀ x Unit₀) (json_to_rtype₀_with_fail j')
+      | jobject jl =>
+        lift (fun x => Rec₀ Open x)
+             ((fix rmap_rec (l: list (string * json)) : option (list (string * rtype₀)) :=
+                 match l with
+                 | nil => Some nil
+                 | (x,y)::l' =>
+                   match rmap_rec l' with
+                   | None => None
+                   | Some l'' =>
+                     match json_to_rtype₀_with_fail y with
+                     | None => None
+                     | Some y'' => Some ((x,y'') :: l'')
+                     end
+                   end
+                 end) jl)
+      | jforeign _ => None
+      end.
+
+    Definition json_to_rtype_with_fail {br:brand_relation} (j:json) : option rtype :=
+      lift normalize_rtype₀_to_rtype (json_to_rtype₀_with_fail j).
 
   End toRType.
 

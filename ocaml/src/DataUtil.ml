@@ -27,6 +27,8 @@ type io_hierarchy_list = (string * string) list
 type io_input = Data.data list
 type io_output = Data.data list
 
+type rtype_content = Data.json
+type model_content = string * (string * string) list * (string * rtype_content) list
 
 let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * Data.json * Data.json =
     match od with

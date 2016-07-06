@@ -16,26 +16,10 @@
 
 open Util
 open ConfigUtil
+open DataUtil
 open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
-type io_hierarchy = Data.json
-type io_json = Data.json option
-
-type io_hierarchy_list = (string * string) list
-type io_input = Data.data list
-type io_output = Data.data list
-
-type rtype_content = Data.json
-type model_content = string * (string * string) list * (string * rtype_content) list
-      
-val get_io_content : io_json -> Data.json * Data.json * Data.json * Data.json * Data.json
-val get_hierarchy : io_json -> io_hierarchy
-val get_hierarchy_cloudant : io_json -> io_hierarchy
-val build_hierarchy : io_hierarchy -> io_hierarchy_list
-val get_input : ConfigUtil.eval_config -> io_json -> io_input
-val get_output : io_json -> io_output
-
-val get_model_content : Data.json -> model_content
-
+val rtype_content_to_rtype : (string * string) list -> rtype_content -> RType.camp_type
+  

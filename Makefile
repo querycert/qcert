@@ -181,6 +181,7 @@ MODULES = \
 	Frontend/ODMGRuntime \
 	Backend/JSON \
 	Backend/ForeignToJSON \
+	Backend/ForeignTypeToJSON \
 	Backend/ForeignCloudant \
 	Backend/ForeignToJava \
 	Backend/ForeignToJavascript \

@@ -24,12 +24,15 @@ open Compiler.EnhancedCompiler
 (* Command line args *)
 let args conf = []
 
-let print_hierarchy h =
-  let hi = DataUtil.build_hierarchy h in
+let print_hierarchy hi =
   List.iter (fun (x,y) -> Printf.printf "\t\t%s derives from %s\n" x y) hi
 
 let print_brand_types bts =
   List.iter (fun (x,y) -> Printf.printf "\t\t\tBrand %s = %s\n" x y) bts
+
+let print_type_defs br bts =
+  List.iter (fun (x,y) -> (ignore (TypeUtil.rtype_content_to_rtype br y))) bts;
+  List.iter (fun (x,y) -> Printf.printf "\t\t\ttypeDef %s = isValid\n" x) bts
 
 let anon_args conf f =
   begin
@@ -38,12 +41,15 @@ let anon_args conf f =
     Printf.printf "\tExtracting components from I/O file: %s\n" f;
     let (input,hierarchy,output,model,wmType) = DataUtil.get_io_content (Some json) in
     Printf.printf "\tHierarchy:\n";
-    print_hierarchy hierarchy;
+    let hi = DataUtil.build_hierarchy hierarchy in
+    print_hierarchy hi;
     let (modelName,brandTypes,typeDefs) = DataUtil.get_model_content model in
     Printf.printf "\tModel:\n";
     Printf.printf "\t\tmodelName: %s\n" modelName;
     Printf.printf "\t\tbrandTypes:\n";
-    print_brand_types brandTypes
+    print_brand_types brandTypes;
+    Printf.printf "\t\ttypeDefs:\n";
+    print_type_defs hi typeDefs
   end
 
 let usage = Sys.argv.(0)^" jsonfile1 jsonfile2 ..."

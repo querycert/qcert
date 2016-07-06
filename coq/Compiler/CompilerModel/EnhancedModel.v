@@ -17,7 +17,7 @@
 Require Import List EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -49,6 +49,29 @@ Inductive enhanced_type : Set
   | enhancedTimeDuration : enhanced_type
   | enhancedTimePoint : enhanced_type
 .
+
+Definition enhanced_type_to_string (et:enhanced_type) : string :=
+  match et with
+  | enhancedTop => "ETop"
+  | enhancedBottom => "EBottom"
+  | enhancedFloat => "EFloat"
+  | enhancedString => "EString"
+  | enhancedTimeScale => "ETimeScale"
+  | enhancedTimeDuration => "ETimeDuration"
+  | enhancedTimePoint => "ETimePoint"
+  end.
+
+Definition string_to_enhanced_type (s:string) : option enhanced_type :=
+  match s with
+  | "ETop"%string => Some enhancedTop
+  | "EBottom"%string => Some enhancedBottom
+  | "EFloat"%string => Some enhancedFloat
+  | "EString"%string => Some enhancedString
+  | "ETimeScale"%string => Some enhancedTimeScale
+  | "ETimeDuration"%string => Some enhancedTimeDuration
+  | "ETimePoint"%string => Some enhancedTimePoint
+  | _ => None
+  end.
 
 Require Import RelationClasses Equivalence.
 
@@ -1111,6 +1134,15 @@ Next Obligation.
   destruct a; destruct b; try solve [left; constructor | right; inversion 1].
 Defined.
 
+Program Instance enhanced_foreign_type_to_JSON : foreign_type_to_JSON
+  := mk_foreign_type_to_JSON enhanced_foreign_type _ _.
+Next Obligation.
+  exact (string_to_enhanced_type s).
+Defined.
+Next Obligation.
+  exact (enhanced_type_to_string fd).
+Defined.
+
 Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 | enhanced_has_type_top fd : enhanced_has_type fd enhancedTop
 | enhanced_has_type_float (f:FLOAT) : enhanced_has_type (enhancedfloat f) enhancedFloat
@@ -1176,6 +1208,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_javascript.
   Definition compiler_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
+  Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
+    := enhanced_foreign_type_to_JSON.
   Definition compiler_foreign_reduce_op : foreign_reduce_op
     := enhanced_foreign_reduce_op.
   Definition compiler_foreign_to_reduce_op : foreign_to_reduce_op
@@ -1868,6 +1902,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_javascript.
   Definition compiler_model_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
+  Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
+    := enhanced_foreign_type_to_JSON.
   Definition compiler_model_foreign_reduce_op : foreign_reduce_op
     := enhanced_foreign_reduce_op.
   Definition compiler_model_foreign_to_reduce_op : foreign_to_reduce_op
