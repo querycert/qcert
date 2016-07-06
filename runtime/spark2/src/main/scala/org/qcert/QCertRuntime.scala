@@ -92,13 +92,11 @@ abstract class QCertRuntime {
         StructField("stringId", StringType) :: Nil)
 
   def test07InputType =
-    StructType(
-      StructField("$type", ArrayType(StringType)) ::
-        StructField("$data", StructType(
-          StructField("$known", StructType(Nil)) ::
-            StructField("$blob", StringType) :: Nil
-        )) :: Nil
-    )
+    StructType(Seq(
+      StructField("$data", StructType(Seq(
+        StructField("$blob", StringType),
+        StructField("$known", StructType(Nil))))),
+      StructField("$type", ArrayType(StringType))))
 
   val CONST$WORLD_07 = Nil
 
@@ -178,7 +176,6 @@ abstract class QCertRuntime {
   def fromBlob(t: DataType, b: String): Any =
     fromBlob(t, new com.google.gson.JsonParser().parse(b))
 
-  // TODO we might be better off writing a custom gson serializer
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
     case true => "true"
@@ -186,9 +183,21 @@ abstract class QCertRuntime {
     case s: String => gson.toJson(s)
     case a: mutable.WrappedArray[_] =>
       a.map(toBlob(_)).mkString("[", ", ", "]")
-    case r: Row =>
-      // https://issues.scala-lang.org/browse/SI-6476
-      r.schema.fieldNames.map(f => "\"" + f + "\" : " + toBlob(r.getAs[Any](f))).mkString("{", ", ", "}")
+    case a: Array[_] =>
+      a.map(toBlob(_)).mkString("[", ", ", "]")
+    case r: Row => r.schema.fieldNames match {
+      case Array("$left", "$right") =>
+        if (r.isNullAt(1))
+          "{\"left\":" ++ toBlob(r(0))
+        else
+          "{\"right\":" ++ toBlob(r(1))
+      case Array("$data", "$type") =>
+        "{\"type\": " ++ toBlob(r(1)) ++ ", \"data\": " ++ toBlob(r(0)) ++ "}"
+      case Array("$blob", "$known") =>
+        // NOTE we keep the full record in the blob field
+        r.getString(0)
+      case _ => sys.error("Illformed record schema: " ++ r.schema.toString())
+    }
   }
 
   /* Records
