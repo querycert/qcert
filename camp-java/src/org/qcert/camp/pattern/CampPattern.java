@@ -22,6 +22,15 @@ import org.qcert.camp.CampAST;
  * Represents all Patterns (expressions in CAMP rather than Rules or Data)
  */
 public abstract class CampPattern extends CampAST {
+	/** Single instance of the env pattern */
+	public static final EnvPattern ENV = new EnvPattern();
+	/** Single instance of the it pattern */
+	public static final ItPattern IT = new ItPattern();
+	/** Single instance of the left pattern */
+	public static final LeftPattern LEFT = new LeftPattern();
+	/** Single instance of the right pattern */
+	public static final RightPattern RIGHT = new RightPattern();
+	
 	public enum Kind {
 		  pconst, punop, pbinop, pmap, passert, 
 		  porElse, pit, pletIt, pgetconstant, penv, 
@@ -30,7 +39,7 @@ public abstract class CampPattern extends CampAST {
 	
 	private final CampPattern[] operands;
 	
-	protected CampPattern(CampPattern ... operands) {
+	CampPattern(CampPattern ... operands) {
 		this.operands = operands;
 	}
 	
