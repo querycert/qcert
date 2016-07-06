@@ -49,7 +49,10 @@ let anon_args conf f =
     Printf.printf "\t\tbrandTypes:\n";
     print_brand_types brandTypes;
     Printf.printf "\t\ttypeDefs:\n";
-    print_type_defs hi typeDefs
+    print_type_defs hi typeDefs;
+    Printf.printf "\t\tLOADING BRAND MODEL...\n";
+    ignore(TypeUtil.model_content_to_model hi (modelName,brandTypes,typeDefs));
+    Printf.printf "\t\t... DONE!\n"
   end
 
 let usage = Sys.argv.(0)^" jsonfile1 jsonfile2 ..."

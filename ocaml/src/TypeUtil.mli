@@ -23,3 +23,5 @@ open Compiler.EnhancedCompiler
 
 val rtype_content_to_rtype : (string * string) list -> rtype_content -> RType.camp_type
   
+val model_content_to_model : (string * string) list -> model_content -> RType.brand_model option
+
