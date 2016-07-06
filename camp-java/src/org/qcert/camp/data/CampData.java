@@ -15,12 +15,27 @@
  */
 package org.qcert.camp.data;
 
+import java.util.Collections;
+
 import org.qcert.camp.CampAST;
 
 /**
  * Represents CAMP data (for use in constants) 
  */
 public abstract class CampData extends CampAST {
+	/** Single instance of dunit */
+	public static final UnitData UNIT = new UnitData();
+	/** Single instance of dright of dunit */
+	public static final RightData RIGHT_UNIT = new RightData(UNIT);
+	/** Single instance of the true dbool */
+	public static final BoolData TRUE = new BoolData(true);
+	/** Single instance of the false dbool */
+	public static final BoolData FALSE = new BoolData(false);
+	/** Single instance of the empty collection */
+	public static final CollData EMPTY_COLL = new CollData(Collections.emptyList());
+	/** Single instance of the empty record */
+	public static final RecData EMPTY_REC = new RecData(Collections.emptyMap());
+	
 	public abstract Kind getKind();
 	
 	public enum Kind {
