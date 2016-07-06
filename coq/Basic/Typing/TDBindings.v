@@ -55,6 +55,55 @@ Section TDBindings.
     - auto.
   Qed.
 
+  Definition tdbindings_sub : tdbindings -> tdbindings -> Prop
+      := Forall2
+         (fun (xy1 : string * drtype) (xy2 : string * drtype) =>
+            fst xy1 = fst xy2 /\ drtype_sub (snd xy1) (snd xy2)).
+
+  Global Instance eq_and_drtype_pre : PreOrder 
+                                        (fun xy1 xy2 : string * drtype => fst xy1 = fst xy2 /\ drtype_sub (snd xy1) (snd xy2)).
+  Proof.
+    constructor; red.
+    - intuition; reflexivity.
+    - intuition; etransitivity; eauto.
+  Qed.
+    
+  Global Instance tdbindings_sub_pre : PreOrder tdbindings_sub.
+  Proof.
+    unfold tdbindings_sub.
+    apply Forall2_pre.
+    apply eq_and_drtype_pre.
+  Qed.
+
+  Global Instance tdbindings_sub_part : PartialOrder eq tdbindings_sub.
+  Proof.
+    unfold tdbindings_sub.
+    eapply Forall2_part_eq.
+    intros sdτ₁ sdτ₂.
+    unfold flip.
+    split; intros H.
+    - repeat red; simpl; subst; intuition.
+    - repeat red in H; intuition.
+      destruct sdτ₁; destruct sdτ₂
+      ; simpl in * .
+      f_equal; trivial.
+      apply antisymmetry; auto.
+  Qed.
+
+  Global Instance tdbindings_type_sub :
+    Proper (eq ==> tdbindings_sub ==> impl) dbindings_type.
+  Proof.
+    unfold Proper, respectful, impl
+    ; intros d d' ? dτ₁ dτ₂ sub typ
+    ; subst d'.
+    unfold tdbindings_sub, dbindings_type in *.
+    eapply Forall2_trans_relations_weak; eauto.
+    simpl.
+    destruct a; destruct b; destruct c; simpl; intuition; subst; trivial.
+    rewrite H3 in H2.
+    trivial.
+  Qed.
+    
 End TDBindings.
 
 Hint Resolve dbindings_type_Forall_normalized.

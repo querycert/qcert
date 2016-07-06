@@ -57,60 +57,6 @@
         end
       end.
 
-      Definition drtype_sub (dτ₁ dτ₂:drtype) : Prop
-        := match dτ₁, dτ₂ with
-           | Tlocal τ₁, Tlocal τ₂ => τ₁ ≤ τ₂
-           | Tdistr τ₁, Tdistr τ₂ => τ₁ ≤ τ₂
-           | _, _ => False
-           end.
-
-      Global Instance drtype_sub_pre : PreOrder drtype_sub.
-      Proof.
-        constructor; red; intros.
-        - destruct x; constructor.
-        - destruct x; destruct y
-          ; simpl in * ; try tauto
-          ; destruct z
-          ; simpl in * ; try tauto
-          ; etransitivity; eauto.
-      Qed.
-
-      Global Instance drtype_sub_part : PartialOrder eq drtype_sub.
-      Proof.
-        intros dτ₁ dτ₂.
-        split; intros H.
-        - repeat red; subst; intuition.
-        - repeat red in H; intuition.
-          unfold flip in H1.
-          destruct dτ₁; destruct dτ₂
-          ; simpl in * ; try tauto
-          ; f_equal
-          ; apply antisymmetry; auto.
-      Qed.
-
-      Global Instance ddata_type_sub :
-        Proper (eq ==> drtype_sub ==> impl) ddata_type.
-      Proof.
-        unfold Proper, respectful, impl
-        ; intros d d' ? dτ₁ dτ₂ sub typ
-        ; subst d'.
-        destruct d; destruct dτ₁
-        ; simpl in *; invcs typ
-        ; destruct dτ₂; try tauto
-        ; constructor.
-        - rewrite sub in H1; trivial.
-        - rewrite Forall_forall in *.
-          intros d ind.
-          specialize (H1 _ ind).
-          rewrite sub in H1.
-          trivial.
-      Qed.
-
-      Definition tdbindings_sub (τenv₁ τenv₂ : tdbindings) : Prop
-      := Forall2
-           (fun (xy1 : string * drtype) (xy2 : string * drtype) =>
-              fst xy1 = fst xy2 /\ drtype_sub (snd xy1) (snd xy2)) τenv₁ τenv₂.
-
       Inductive dnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> dnrc A plug_type -> drtype -> Prop :=
       | TDNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnrc_type tenv (DNRCVar a v) τ
       | TDNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnrc_type tenv (DNRCConst a c) (Tlocal τ)
