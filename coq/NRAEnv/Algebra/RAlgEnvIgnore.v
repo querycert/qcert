@@ -49,7 +49,42 @@ Section RAlgEnvIgnore.
       | ANAppEnv e1 e2 => False
       | ANMapEnv e1 => False
     end.
-  
+
+  Fixpoint is_nra_fun (e:algenv) : bool :=
+    match e with
+      | ANID => true
+      | ANConst rd => true
+      | ANBinop bop e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANUnop uop e1 => is_nra_fun e1
+      | ANMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANMapConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANSelect e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANDefault e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANEither e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANEitherConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANApp e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANGetConstant _ => false
+      | ANEnv => false
+      | ANAppEnv e1 e2 => false
+      | ANMapEnv e1 => false
+    end.
+
+  Lemma is_nra_eq (e:algenv):
+    is_nra e <-> (is_nra_fun e = true).
+  Proof.
+    induction e; split; simpl; intros; try auto; try congruence;
+    try (rewrite IHe1 in H; rewrite IHe2 in H;
+         elim H; clear H; intros;
+         rewrite H; rewrite H0; reflexivity);
+    try (rewrite andb_true_inversion in H;
+         elim H; clear H; intros;
+         rewrite <- IHe1 in H; rewrite <- IHe2 in H0;
+         split; assumption).
+    - rewrite IHe in H; assumption.
+    - rewrite <- IHe in H; assumption.
+  Qed.
+
   Fixpoint ignores_env (e:algenv) : Prop :=
     match e with
       | ANID => True
