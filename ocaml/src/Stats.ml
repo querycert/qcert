@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+open Util
 open ConfigUtil
 open ParseFile
 open Compiler.EnhancedCompiler
@@ -35,3 +36,9 @@ let make_stats conf f =
       let o = parse_oql_from_file f in
       CompStat.json_stats_oql (Util.char_list_of_string "[OQL]") o
 
+
+let display_stats conf fname =
+  let stats = make_stats (get_comp_lang_config conf) fname in
+  let fpref = Filename.chop_extension fname in
+  let fout = outname (target_f (get_display_dir conf) fpref) (suffix_stats ()) in
+  make_file fout (string_of_char_list stats)

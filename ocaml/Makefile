@@ -84,7 +84,7 @@ $(LIBJS).cma: generated
         -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
 	cp _build/$(LIBJS).cma jsapi/$(LIBJS).cma
 
-../lib/$(LIB).jar ../lib/$(LIB).cmi: generated
+../lib/$(LIB).jar ../lib/$(LIB).cmi _build/$(LIB).cmi: generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).jar
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).cmi
 	cp _build/$(LIB).jar ../lib/$(LIB).jar
@@ -92,7 +92,7 @@ $(LIBJS).cma: generated
 
 # Java API
 
-japi: ../lib/$(LIB).jar _build/$(LIB).cmi
+japi: ../lib/$(LIB).jar ../lib/$(LIB).cmi _build/CALib.cmi
 	cd _build ; $(OCAMLWRAP) -package "org.qcert.calib" CALib.cmi
 	cp _build/CALibWrapper.java japi/src/org/qcert/calib
 	$(MAKE) -C japi all
@@ -101,7 +101,7 @@ japi/lib/$(LIB).jar: $(LIB).jar
 	mkdir -p japi/lib
 	cp $(LIB).jar japi/lib/$(LIB).jar
 
-# Cleanup
+
 clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build

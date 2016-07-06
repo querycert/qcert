@@ -145,6 +145,7 @@ MODULES = \
 	DNNRC/Calculus/DNNRCEq \
 	DNNRC/Calculus/SparkIR \
 	DNNRC/Typing/TDNRC \
+	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
@@ -250,6 +251,7 @@ spark2-runtime:
 
 japi:
 	@$(MAKE) java-extraction
+#	@jar cf lib/qcert.jar ocaml/japi/bin lib/CALib.jar 
 
 qcert: Makefile.coq
 	@echo "[QCert] "

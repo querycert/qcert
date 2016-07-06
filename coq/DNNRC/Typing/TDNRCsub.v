@@ -1,19 +1,3 @@
-(*
- * Copyright 2015-2016 IBM Corporation
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *)
-
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -21,157 +5,119 @@
   Require Import EquivDec Morphisms.
 
   Require Import Utils BasicSystem.
-  Require Import DNNRC.
+  Require Import DNNRC TDNRC.
 
-  Section TDNRC.
+  Section TDNRCsub.
 
     Context {m:basic_model}.
-    Section tplug.
-      Class TAlgPlug {T} {plug:@AlgPlug _ brand_relation_brands T} :=
-        mkTAlgPlug {
-            plug_typing : T -> tbindings -> rtype -> Prop;
-          }.
-      Generalizable Variables T.
 
-    End tplug.
-
-    (** Typing rules for NNRC *)
     Section typ.
-
-      (* When applying the parameters to an algebra closure, we need to check that
-         those parameters are distributed *)
-      Fixpoint tcombine (l:list string) (l':list drtype) {struct l} : option tbindings :=
-      match l with
-      | [] => Some []
-      | x :: tl =>
-        match l' with
-        | [] => Some []
-        | (Tlocal _) :: _ => None
-        | (Tdistr y) :: tl' =>
-          match tcombine tl tl' with
-          | Some tl'' => Some ((x,y) :: tl'')
-          | None => None
-          end
-        end
-      end.
-
-      Definition drtype_sub (dτ₁ dτ₂:drtype) : Prop
-        := match dτ₁, dτ₂ with
-           | Tlocal τ₁, Tlocal τ₂ => τ₁ ≤ τ₂
-           | Tdistr τ₁, Tdistr τ₂ => τ₁ ≤ τ₂
-           | _, _ => False
-           end.
-
-      Global Instance drtype_sub_pre : PreOrder drtype_sub.
-      Proof.
-        constructor; red; intros.
-        - destruct x; constructor.
-        - destruct x; destruct y
-          ; simpl in * ; try tauto
-          ; destruct z
-          ; simpl in * ; try tauto
-          ; etransitivity; eauto.
-      Qed.
-
-      Global Instance drtype_sub_part : PartialOrder eq drtype_sub.
-      Proof.
-        intros dτ₁ dτ₂.
-        split; intros H.
-        - repeat red; subst; intuition.
-        - repeat red in H; intuition.
-          unfold flip in H1.
-          destruct dτ₁; destruct dτ₂
-          ; simpl in * ; try tauto
-          ; f_equal
-          ; apply antisymmetry; auto.
-      Qed.
-
-      Global Instance ddata_type_sub :
-        Proper (eq ==> drtype_sub ==> impl) ddata_type.
-      Proof.
-        unfold Proper, respectful, impl
-        ; intros d d' ? dτ₁ dτ₂ sub typ
-        ; subst d'.
-        destruct d; destruct dτ₁
-        ; simpl in *; invcs typ
-        ; destruct dτ₂; try tauto
-        ; constructor.
-        - rewrite sub in H1; trivial.
-        - rewrite Forall_forall in *.
-          intros d ind.
-          specialize (H1 _ ind).
-          rewrite sub in H1.
-          trivial.
-      Qed.
-
-      Definition tdbindings_sub (τenv₁ τenv₂ : tdbindings) : Prop
-      := Forall2
-           (fun (xy1 : string * drtype) (xy2 : string * drtype) =>
-              fst xy1 = fst xy2 /\ drtype_sub (snd xy1) (snd xy2)) τenv₁ τenv₂.
-
-      Inductive dnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> @dnrc _ A T -> drtype -> Prop :=
-      | TDNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnrc_type tenv (DNRCVar a v) τ
-      | TDNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnrc_type tenv (DNRCConst a c) (Tlocal τ)
+      
+  Inductive dnrc_type_sub `{tplug: TAlgPlug} {A} : tdbindings -> @dnrc _ A T -> drtype -> Prop :=
+      | TDNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnrc_type_sub tenv (DNRCVar a v) τ
+      | TDNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnrc_type_sub tenv (DNRCConst a c) (Tlocal τ)
       | TDNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
           forall (a:A),
             binOp_type b τ₁ τ₂ τ ->
-            dnrc_type tenv e1 (Tlocal τ₁) ->
-            dnrc_type tenv e2 (Tlocal τ₂) ->
-            dnrc_type tenv (DNRCBinop a b e1 e2) (Tlocal τ)
+            dnrc_type_sub tenv e1 (Tlocal τ₁) ->
+            dnrc_type_sub tenv e2 (Tlocal τ₂) ->
+            dnrc_type_sub tenv (DNRCBinop a b e1 e2) (Tlocal τ)
       | TDNRCUnop {τ₁ τ} tenv u e1 :
           forall (a:A), 
             unaryOp_type u τ₁ τ ->
-            dnrc_type tenv e1 (Tlocal τ₁) ->
-            dnrc_type tenv (DNRCUnop a u e1) (Tlocal τ)
+            dnrc_type_sub tenv e1 (Tlocal τ₁) ->
+            dnrc_type_sub tenv (DNRCUnop a u e1) (Tlocal τ)
       | TDNRCLet {τ₁ τ₂} v tenv e1 e2 :
           forall (a:A), 
-            dnrc_type tenv e1 τ₁ ->
-            dnrc_type ((v,τ₁)::tenv) e2 τ₂ ->
-            dnrc_type tenv (DNRCLet a v e1 e2) τ₂
+            dnrc_type_sub tenv e1 τ₁ ->
+            dnrc_type_sub ((v,τ₁)::tenv) e2 τ₂ ->
+            dnrc_type_sub tenv (DNRCLet a v e1 e2) τ₂
       | TDNRCFor {τ₁ τ₂} v tenv e1 e2 :
           forall (a:A), 
-            dnrc_type tenv e1 (Tlocal (Coll τ₁)) ->
-            dnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
-            dnrc_type tenv (DNRCFor a v e1 e2) (Tlocal (Coll τ₂))
+            dnrc_type_sub tenv e1 (Tlocal (Coll τ₁)) ->
+            dnrc_type_sub ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
+            dnrc_type_sub tenv (DNRCFor a v e1 e2) (Tlocal (Coll τ₂))
       | TDNRCIf {τ} tenv e1 e2 e3 :
           forall (a:A), 
-            dnrc_type tenv e1 (Tlocal Bool) ->
-            dnrc_type tenv e2 τ ->
-            dnrc_type tenv e3 τ ->
-            dnrc_type tenv (DNRCIf a e1 e2 e3) τ
+            dnrc_type_sub tenv e1 (Tlocal Bool) ->
+            dnrc_type_sub tenv e2 τ ->
+            dnrc_type_sub tenv e3 τ ->
+            dnrc_type_sub tenv (DNRCIf a e1 e2 e3) τ
       | TDNRCEither {τ τl τr} tenv ed xl el xr er :
           forall (a:A), 
-            dnrc_type tenv ed (Tlocal (Either τl τr)) ->
-            dnrc_type ((xl,(Tlocal τl))::tenv) el τ ->
-            dnrc_type ((xr,(Tlocal τr))::tenv) er τ ->
-            dnrc_type tenv (DNRCEither a ed xl el xr er) τ
+            dnrc_type_sub tenv ed (Tlocal (Either τl τr)) ->
+            dnrc_type_sub ((xl,(Tlocal τl))::tenv) el τ ->
+            dnrc_type_sub ((xr,(Tlocal τr))::tenv) er τ ->
+            dnrc_type_sub tenv (DNRCEither a ed xl el xr er) τ
       | TDNRCCollect {τ} tenv e :
           forall (a:A),
-            dnrc_type tenv e (Tdistr τ) ->
-            dnrc_type tenv (DNRCCollect a e) (Tlocal (Coll τ))
+            dnrc_type_sub tenv e (Tdistr τ) ->
+            dnrc_type_sub tenv (DNRCCollect a e) (Tlocal (Coll τ))
       | TDNRCDispatch {τ} tenv e :
           forall (a:A),
-            dnrc_type tenv e (Tlocal (Coll τ)) ->
-            dnrc_type tenv (DNRCDispatch a e) (Tdistr τ)
+            dnrc_type_sub tenv e (Tlocal (Coll τ)) ->
+            dnrc_type_sub tenv (DNRCDispatch a e) (Tdistr τ)
       (* Note: algebra 'plugged' expression is only well typed within distributed
          NNRC if it returns a collection *)
       | TDNRCAlg {τl τout} tenv tbindings plug_abst tclosure nl :
         forall (a:A),
-          Forall2 (fun n τ => dnrc_type tenv n τ) nl τl ->
+          Forall2 (fun n τ => dnrc_type_sub tenv n τ) nl τl ->
           tcombine (fst tclosure) τl = Some tbindings ->
            plug_typing (snd tclosure) tbindings (Coll τout) -> 
-           dnrc_type tenv (DNRCAlg a plug_abst nl) (Tdistr τout)
+           dnrc_type_sub tenv (DNRCAlg a plug_abst nl) (Tdistr τout)
+      | TDNRCSubsumption {τenv τout} τenv' τout' e:
+         tdbindings_sub τenv' τenv ->
+         drtype_sub τout τout' ->
+         dnrc_type_sub τenv e τout ->
+         dnrc_type_sub τenv' e τout'
       .
-      (* Print dnrc_type_ind. We will need a special inductive principle because of the list of expressions in TDNRAlg *)
+
+      Global Instance dnrc_type_sub_proper `{tplug: TAlgPlug} {A} :
+        Proper (tdbindings_sub --> eq ==> drtype_sub ==> impl) (dnrc_type_sub (A:=A)).
+      Proof.
+        unfold Proper, respectful, flip, impl; intros.
+        subst.
+        eapply TDNRCSubsumption; eauto.
+      Qed.
+      
+     Global Instance dbindings_type_proper :
+       Proper (eq ==> tdbindings_sub ==> impl) dbindings_type.
+     Proof.
+       unfold Proper, respectful, flip, impl, tdbindings_sub, dbindings_type; intros.
+       subst.
+       revert y y0 H0 H1.
+       induction x0; intros x y0 F1 F2
+       ; invcs F1; invcs F2; trivial.
+       destruct a; destruct y; destruct x1; intuition; simpl in *; subst.
+       rewrite H0 in H2.
+       auto.
+     Qed.    
+
+      (* Print dnrc_type_sub_ind. We will need a special inductive principle because of the list of expressions in TDNRAlg *)
       
   End typ.
 
-  (** Main lemma for the type correctness of DNNRC *)
-    Theorem typed_dnrc_yields_typed_data {A} {τ} `{tplug:TAlgPlug} (env:dbindings) (tenv:tdbindings) (e:@dnrc _ A T) :
+    Section lift.
+
+      Lemma dnrc_type_to_dnrc_type_sub {A} {T} (plug:AlgPlug) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnrc _ A T) :
+        dnrc_type tenv e τ ->
+        dnrc_type_sub tenv e τ.
+      Proof.
+        Hint Constructors dnrc_type_sub.
+        induction 1; trivial; eauto 2.
+        econstructor; eauto.
+        (* same problem with the induction principle.  I should fix this *)
+        - admit.
+      Admitted.
+
+    End lift.
+
+    (** Main lemma for the type correctness of DNNRC *)
+    Theorem typed_dnrc_yields_typed_data {A} {T} (plug:AlgPlug) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnrc _ A T) :
     dbindings_type env tenv ->
-    dnrc_type tenv e τ ->
+    dnrc_type_sub tenv e τ ->
     (exists x, (dnrc_eval env e) = Some x /\ (ddata_type x τ)).
-  Proof.
+    Proof.
     intros.
     revert env H.
     dependent induction H0; simpl; intros.
@@ -193,9 +139,9 @@
       assumption.
     - exists (Dlocal (normalize_data brand_relation_brands c)).
       intros. split; [reflexivity|constructor; assumption].
-    - specialize (IHdnrc_type1 env H0); specialize (IHdnrc_type2 env H0).
-      elim IHdnrc_type1; intros; clear IHdnrc_type1;
-      elim IHdnrc_type2; intros; clear IHdnrc_type2.
+    - specialize (IHdnrc_type_sub1 env H0); specialize (IHdnrc_type_sub2 env H0).
+      elim IHdnrc_type_sub1; intros; clear IHdnrc_type_sub1;
+      elim IHdnrc_type_sub2; intros; clear IHdnrc_type_sub2.
       elim H1; clear H1; intros.
       elim H2; clear H2; intros.
       rewrite H1; rewrite H2.
@@ -208,8 +154,8 @@
       split.
       + rewrite H3; reflexivity.
       + constructor; assumption.
-    - specialize (IHdnrc_type env H1).
-      elim IHdnrc_type; intros; clear IHdnrc_type.
+    - specialize (IHdnrc_type_sub env H1).
+      elim IHdnrc_type_sub; intros; clear IHdnrc_type_sub.
       elim H2; clear H2; intros.
       rewrite H2; clear H2.
       inversion H3; clear H3; intros; subst.
@@ -219,14 +165,14 @@
       split.
       + rewrite H2; reflexivity.
       + constructor; assumption.
-    - destruct (IHdnrc_type1 _ H) as [?[re1 ?]].
-      destruct (IHdnrc_type2 ((v,x)::env)) as [?[re2 ?]].
+    - destruct (IHdnrc_type_sub1 _ H) as [?[re1 ?]].
+      destruct (IHdnrc_type_sub2 ((v,x)::env)) as [?[re2 ?]].
       + apply Forall2_cons; intuition.
       + unfold var in *.
         rewrite re1, re2.
         eauto.
-    - specialize (IHdnrc_type1 env H).
-      elim IHdnrc_type1; intros; clear IHdnrc_type1.
+    - specialize (IHdnrc_type_sub1 env H).
+      elim IHdnrc_type_sub1; intros; clear IHdnrc_type_sub1.
       elim H0; clear H0; intros.
       rewrite H0; clear H0; simpl.
       inversion H1; clear H1; subst.
@@ -261,7 +207,7 @@
         elim H3; clear H3; intros.
         rewrite H3.
         rewrite <- H4 in *; clear H1 H3 H4; simpl.
-        specialize (IHdnrc_type2 ((v,Dlocal a0)::env)).
+        specialize (IHdnrc_type_sub2 ((v,Dlocal a0)::env)).
         assert (dbindings_type ((v, Dlocal a0) :: env) ((v, Tlocal τ₁) :: tenv)).
         unfold dbindings_type.
         apply Forall2_cons; try assumption.
@@ -269,8 +215,8 @@
         assert (r = τ₁) by (apply rtype_fequal; assumption).
         rewrite H1 in *; clear H1 x.
         constructor. apply (H0 a0); left; reflexivity.
-        specialize (IHdnrc_type2 H1); clear H1.
-        elim IHdnrc_type2; clear IHdnrc_type2; intros.
+        specialize (IHdnrc_type_sub2 H1); clear H1.
+        elim IHdnrc_type_sub2; clear IHdnrc_type_sub2; intros.
         elim H1; clear H1; intros.
         rewrite H1; simpl.
         inversion H3; clear H3; subst.
@@ -285,10 +231,10 @@
         assert (r0 = τ₂) by (apply rtype_fequal; assumption).
         subst.
         apply (H2 x2); assumption.
-    - specialize (IHdnrc_type1 env H); specialize (IHdnrc_type2 env H); specialize (IHdnrc_type3 env H).
-      elim IHdnrc_type1; intros; clear IHdnrc_type1;
-      elim IHdnrc_type2; intros; clear IHdnrc_type2;
-      elim IHdnrc_type3; intros; clear IHdnrc_type3.
+    - specialize (IHdnrc_type_sub1 env H); specialize (IHdnrc_type_sub2 env H); specialize (IHdnrc_type_sub3 env H).
+      elim IHdnrc_type_sub1; intros; clear IHdnrc_type_sub1;
+      elim IHdnrc_type_sub2; intros; clear IHdnrc_type_sub2;
+      elim IHdnrc_type_sub3; intros; clear IHdnrc_type_sub3.
       elim H0; clear H0; intros.
       elim H1; clear H1; intros.
       elim H2; clear H2; intros.
@@ -301,21 +247,21 @@
         exists x0; split; [reflexivity|assumption].
       + rewrite H2.
         exists x1; split; [reflexivity|assumption].
-    - destruct (IHdnrc_type1 _ H) as [dd [evald typd]].
+    - destruct (IHdnrc_type_sub1 _ H) as [dd [evald typd]].
       inversion typd; clear typd; subst.
       apply data_type_Either_inv in H2.
       rewrite evald.
       simpl.
       destruct H2 as [[ddl[? typd]]|[ddr[? typd]]]; subst.
-      + destruct (IHdnrc_type2 ((xl,Dlocal ddl)::env));
+      + destruct (IHdnrc_type_sub2 ((xl,Dlocal ddl)::env));
         unfold dbindings_type in *; auto.
         apply Forall2_cons; auto; split; [auto|constructor;auto].
         exists x; auto.
-      + destruct (IHdnrc_type3 ((xr,Dlocal ddr)::env));
+      + destruct (IHdnrc_type_sub3 ((xr,Dlocal ddr)::env));
         unfold dbindings_type in *; auto.
         apply Forall2_cons; auto; split; [auto|constructor;auto].
         exists x; auto.
-    - elim (IHdnrc_type env H); intros.
+    - elim (IHdnrc_type_sub env H); intros.
       elim H1; clear H1; intros.
       rewrite H1; simpl.
       inversion H2; clear H2; subst.
@@ -324,7 +270,7 @@
       constructor.
       constructor.
       assumption.
-    - elim (IHdnrc_type env H); intros.
+    - elim (IHdnrc_type_sub env H); intros.
       elim H1; clear H1; intros.
       rewrite H1; simpl.
       inversion H2; clear H2; subst; simpl.
@@ -336,9 +282,13 @@
       subst; assumption.
     - admit.
       (* We will need a special inductive principle because of the list of expressions in TDNRAlg *)
+    - rewrite H in H2.
+      destruct (IHdnrc_type_sub _ H2) as [dd [dd_eval dd_typ]].
+      rewrite H0 in dd_typ.
+      eauto.
   Admitted.
 
-End TDNRC.
+  End TDNRCsub.
 
 (* 
 *** Local Variables: ***

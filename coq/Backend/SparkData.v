@@ -65,56 +65,74 @@ Section SparkData.
   | Srow    : list (string * sdata) -> option data -> sdata
   .
 
-  (** sdata to simple data (no either/open records/...)
-   * Convert data to a simple format that we can just serialize to JSON *)
-  Fixpoint sdata_to_plain_data (s: sdata) : data :=
-    match s with
-    | Sblob data => dstring (dataToJS "\""" data)
-    | Snull => dunit
-    | Sint i => dnat i
-    | Sstring s => dstring s
-    | Sbool b => dbool b
-    | Sarray el => dcoll (map sdata_to_plain_data el)
-    | Srow known dotdot =>
-      let known_fields := map (fun p => (fst p, sdata_to_plain_data (snd p))) known in
-      let dotdot_string := match dotdot with
-                             None => ""%string
-                           | Some d => dataToJS "\""" d end in
-      drec (("$blob"%string, dstring dotdot_string)::("$known"%string, drec known_fields)::nil)
-    end.
+  Section with_string_scope.
+    Local Open Scope string_scope.
+    Fixpoint stype_to_datatype (s: stype) : string :=
+      match s with
+      | STnull => "NullType"
+      | STint => "IntegerType"
+      | STstring => "StringType"
+      | STbool => "BooleanType"
+      | STarray e => "ArrayType(" ++ stype_to_datatype e ++ ")"
+      | STstruct fields =>
+        let fieldTypes :=
+            map (fun p => "StructField(\""" ++ fst p ++ "\"", " ++ stype_to_datatype (snd p) ++ ")")
+                fields in
+        "StructType(Seq(" ++ joinStrings ", " fieldTypes ++ "))"
+      end.
 
-  Definition sdata_to_json (s: sdata) : string :=
-    dataToJS "\""" (sdata_to_plain_data s).
+    (** sdata to json AST
+     * Convert data to a simple format that we can just serialize to JSON *)
+    Fixpoint sdata_to_plain_data (s: sdata) : data :=
+      match s with
+      | Sblob data => dstring (dataToJS "\""" data)
+      | Snull => dunit
+      | Sint i => dnat i
+      | Sstring s => dstring s
+      | Sbool b => dbool b
+      | Sarray el => dcoll (map sdata_to_plain_data el)
+      | Srow known dotdot =>
+        let known_fields := map (fun p => (fst p, sdata_to_plain_data (snd p))) known in
+        let dotdot_string := match dotdot with
+                               None => ""
+                             | Some d => dataToJS "\""" d end in
+        drec (("$blob", dstring dotdot_string)::("$known", drec known_fields)::nil)
+      end.
 
-  Definition brand_content_rtype (bl: list string) : rtype₀ :=
-    (* TODO *)
-    Top₀.
+    Definition sdata_to_json (s: sdata) : string :=
+      dataToJS "\""" (sdata_to_plain_data s).
 
-  Definition brand_content_stype (bl: list string) : stype :=
-    (* TODO Intersection of brands models, or something *)
-    STnull.
+    Definition brand_content_rtype (bl: list string) : rtype₀ :=
+      (* TODO *)
+      Top₀.
 
-  Fixpoint rtype_to_stype (r: rtype₀) : stype :=
-    match r with
-    | Bottom₀ => STnull
-    | Top₀ => STstring
-    | Unit₀ => STnull
-    | Nat₀ => STint
-    | Bool₀ => STbool
-    | String₀ => STstring
-    | Coll₀ e_type => STarray (rtype_to_stype e_type)
-    | Rec₀ _ fields =>
-      let known_fields : list (string * stype) :=
-          map (fun p => (fst p, rtype_to_stype (snd p))) fields in
-      STstruct (("$blob"%string, STstring)::("$known"%string, STstruct known_fields)::nil)
-    | Either₀ l r => STstruct (("$left"%string, rtype_to_stype l)::("$right"%string, rtype_to_stype r)::nil)
-    | Brand₀ brands =>
-      STstruct (("$type"%string, STarray STstring)
-                  ::("$data"%string, brand_content_stype brands)::nil)
-    (* should not occur *)
-    | Arrow₀ _ _ => STnull
-    | Foreign₀ ft => STnull
-    end.
+    Definition brand_content_stype (bl: list string) : stype :=
+      (* TODO Intersection of brands models, or something *)
+      STnull.
+
+    Fixpoint rtype_to_stype (r: rtype₀) : stype :=
+      match r with
+      | Bottom₀ => STnull
+      | Top₀ => STstring
+      | Unit₀ => STnull
+      | Nat₀ => STint
+      | Bool₀ => STbool
+      | String₀ => STstring
+      | Coll₀ e_type => STarray (rtype_to_stype e_type)
+      | Rec₀ _ fields =>
+        let known_fields : list (string * stype) :=
+            map (fun p => (fst p, rtype_to_stype (snd p))) fields in
+        STstruct (("$blob", STstring)::("$known", STstruct known_fields)::nil)
+      | Either₀ l r => STstruct (("$left", rtype_to_stype l)::("$right", rtype_to_stype r)::nil)
+      | Brand₀ brands =>
+        STstruct (("$type", STarray STstring)
+                    ::("$data", brand_content_stype brands)::nil)
+      (* should not occur *)
+      | Arrow₀ _ _ => STnull
+      | Foreign₀ ft => STnull
+      end.
+
+  End with_string_scope.
 
   Definition flip {a b c} (f : a -> b -> c) : b -> a -> c :=
     fun b a => f a b.
@@ -249,6 +267,17 @@ Section SparkData.
       rewrite H0.
       eauto.
 Admitted.
+
+  (* Added calls for integration within the compiler interface *)
+  Require Import ForeignToJSON.
+  Require Import JSON JSONtoData.
+
+  Context {ftojson:foreign_to_JSON}.
+
+  Definition json_to_sjson (j:JSON.json) (jt:JSON.json) : option string :=
+    let d := json_to_data h j in
+    let r := json_to_rtype jt in
+    lift sdata_to_json (typed_data_to_sdata d r).
 
 End SparkData.
 

@@ -19,4 +19,4 @@ open ConfigUtil
 (* ILs Stats *)
 
 val make_stats : lang_config -> string -> char list
-
+val display_stats : comp_config -> string -> unit
