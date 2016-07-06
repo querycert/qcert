@@ -158,27 +158,27 @@ Section DNNRCtoScala.
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
     end.
 
-  Fixpoint scala_of_dnrc {T: Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (d: @dnrc _ bool T) : string :=
+  Fixpoint scala_of_dnrc {A plug_set: Set} {ft:foreign_type} {fdt:foreign_data_typing} {m:brand_model} (d: dnrc A plug_set) : string :=
     match d with
     | DNRCVar t n => n (* TODO might need an environment or something... *)
     | DNRCConst t c => scala_of_data m c
     | DNRCBinop t op x y =>
-      scala_of_binop op (scala_of_dnrc m x) (scala_of_dnrc m y)
+      scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
     | DNRCUnop t op x =>
-      scala_of_unop op (scala_of_dnrc m x)
+      scala_of_unop op (scala_of_dnrc x)
     | DNRCLet t n x y => (* let n: t = x in y *) (* TODO might need braces, could use line break *)
-      "val " ++ n ++ " = " ++ scala_of_dnrc m x ++ "; " ++
-             scala_of_dnrc m y
+      "val " ++ n ++ " = " ++ scala_of_dnrc x ++ "; " ++
+             scala_of_dnrc y
     | DNRCFor t n x y => (* x.map((n: t) => y) *) (* TODO might not need braces, could use line breaks *)
-      scala_of_dnrc m x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc m y ++ " })"
+      scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
     | DNRCIf t x y z => (* if (x) y else z *) (* TODO might not need parentheses *)
-      "(if (" ++ scala_of_dnrc m x ++ ") " ++ scala_of_dnrc m y ++ " else " ++ scala_of_dnrc m z ++ ")"
+      "(if (" ++ scala_of_dnrc x ++ ") " ++ scala_of_dnrc y ++ " else " ++ scala_of_dnrc z ++ ")"
     | DNRCEither t x vy y vz z =>
       (* TODO This will not work. We need to annotate the two lambdas with their input types. *)
-      "either(" ++ scala_of_dnrc m x ++ ", (" ++
-                vy ++ "/*: TODO*/) => { " ++ scala_of_dnrc m y ++ " }, (" ++
-                vz ++ "/*: TODO*/) => { " ++ scala_of_dnrc m z ++ "})"
-    | DNRCCollect t x => scala_of_dnrc m x ++ ".collect()"
+      "either(" ++ scala_of_dnrc x ++ ", (" ++
+                vy ++ "/*: TODO*/) => { " ++ scala_of_dnrc y ++ " }, (" ++
+                vz ++ "/*: TODO*/) => { " ++ scala_of_dnrc z ++ "})"
+    | DNRCCollect t x => scala_of_dnrc x ++ ".collect()"
     (* Dispatch is a bit tricky, because it requires the global SparkSession,
      * of which there can be only one, if I understand correctly.
      * It also requires the type, to construct the appropriate schema.
@@ -197,14 +197,14 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnrcToSpark2Top {A : Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (name: string) (e: dnrc) : string :=
+  Definition dnrcToSpark2Top {A : Set} {plug_set:Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (name: string) (e: dnrc A plug_set) : string :=
     "object "
       ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
       ++ @populateBrandTypes ft m ++ eol
       ++ "val worldType = " ++ "test07InputType /* TODO replace by actual input type */" ++ eol
       ++ "def run(CONST$WORLD: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row]) = {" ++ eol
       ++ "println(" ++ eol
-      ++ @scala_of_dnrc A ft fdt m e ++ eol
+      ++ scala_of_dnrc e ++ eol
       ++ ")" ++ eol
       ++ "}" ++ eol
       ++ "}".

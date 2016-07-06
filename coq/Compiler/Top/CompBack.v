@@ -42,7 +42,7 @@ Module CompBack(runtime:CompilerRuntime).
   Require Import TypingRuntime.
 
   Definition dnrc_to_scala_code_gen {h:brand_relation_t} (bm:brand_model) (name:string) (e:dnrc_algenv) : string :=
-    @dnrcToSpark2Top _ h _ _ _ bm name e.
+    @dnrcToSpark2Top _ h bool _ _ _ bm name e.
 
   (* Compilation from NNRCMR to CloudantMR *)
 

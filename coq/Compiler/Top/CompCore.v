@@ -139,10 +139,10 @@ Module CompCore(runtime:CompilerRuntime).
     let de_init := @nrc_to_dnrc_algenv _ bool true mkDistLoc e_rew in
     de_init.
 
-  Definition tcompile_nraenv_to_dnnrc_none (op_init:algenv) : dnrc :=
+  Definition tcompile_nraenv_to_dnnrc_none (op_init:algenv) : dnrc bool algenv :=
     tcompile_nraenv_to_dnnrc optimizer_no_optim rewriter_no_rew op_init.
 
-  Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc :=
+  Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc bool algenv :=
     tcompile_nraenv_to_dnnrc toptim trew op_init.
 
   (*****************
@@ -153,8 +153,8 @@ Module CompCore(runtime:CompilerRuntime).
 
   (* compilation from nnrc to dnnrc *)
 
-  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc_algenv :=
-    nrc_to_dnrc unit tenv e_nrc. (* empty annotation and algenv plug *)
+  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc bool algenv :=
+    nrc_to_dnrc true tenv e_nrc. (* empty annotation and algenv plug *)
   
   (******************
    * NNRCMR Section *

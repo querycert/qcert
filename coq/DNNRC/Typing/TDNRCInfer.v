@@ -45,10 +45,33 @@ Section TDNRCInfer.
     | Tlocal _ => None
     | Tdistr τ => Some (Coll τ)
     end.
-
+(*
   Context {T:Type}.
   Context {plug:@AlgPlug _ brand_relation_brands T}.
-  Context {tplug: @TAlgPlug m T plug}.
+  Context {tplug: @TAlgPlug m T plug}.             
+  
+  Definition dnrc_infer_type_of {A B} d
+    := fst (drnc_annotation_of d).
+  
+  Fixpoint infer_dnrc_type {A} (tenv:tdbindings) (n:@dnrc _ A T) :
+    option (@dnrc _ (A*drtype) (T*list rtype))
+    := match n with
+       | DNRCVar a v =>
+         lift (fun τ => DNRCVar (a,τ) v)
+              (lookup equiv_dec tenv v)
+       | DNRCConst a d => lift (fun τ => DNRCConst (a,Tlocal τ) d)
+                               (infer_data_type (normalize_data brand_relation_brands d))
+    | DNRCBinop _ b n1 n2 =>
+      let binf (dτ₁ dτ₂:dnrc) : option dnrc :=
+          match dτ₁, dτ₂ with
+          olift2 (fun τ₁ τ₂ => lift Tlocal (infer_binop_type b τ₁ τ₂))
+                 (lift_tlocal dτ₁) (lift_tlocal dτ₂)
+      in
+      olift2 binf (infer_dnrc_type tenv n1) (infer_dnrc_type tenv n2)
+
+       | _ => None
+       end.
+  
   (*
   Fixpoint infer_dnrc_type (tenv:tdbindings) (n:dnrc) {struct n} : option drtype :=
     match n with
@@ -249,6 +272,7 @@ Section TDNRCInfer.
       rewrite H in IHn1. 
       apply (TNRCEither tenv n1 v n2 v0 n3 IHn1 IHn2 IHn3).
   Qed.
+*)
   *)
 End TDNRCInfer.
 
