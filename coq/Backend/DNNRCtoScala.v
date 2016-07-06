@@ -98,7 +98,7 @@ Section DNNRCtoScala.
     | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
     | ACast bs =>
       let t := stype_to_datatype (rtype_to_stype (proj1_sig (brands_type bs))) in
-      "cast(" ++ joinStrings ", " (x:: t ::(map quote_string bs)) ++ ")"
+      "cast(" ++ joinStrings ", " (x :: t :: (map quote_string bs)) ++ ")"
     | AColl => prefix "Array"
     | ACount => postfix "length"
     | ADot n => prefix ("dot/*[TODO]*/(""" ++ n ++ """)")
@@ -188,11 +188,19 @@ Section DNNRCtoScala.
     | DNRCAlg t a xs => "ALG???" (* TODO *)
     end.
 
+  Definition populateBrandTypes {ft: foreign_type} {bm : brand_model} : string :=
+    let elements :=
+        map (fun p => "\""" ++ fst p ++ "\"" -> " ++ stype_to_datatype (rtype_to_stype (proj1_sig (snd p))))
+            brand_context_types in
+    "val BRAND_TYPES = Map(" ++ joinStrings ", " elements ++ ")".
+
+
   (** Toplevel entry to Spark2/Scala codegen *)
 
   Definition dnrcToSpark2Top {A : Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (name: string) (e: dnrc) : string :=
     "object "
       ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
+      ++ @populateBrandTypes ft m ++ eol
       ++ "val worldType = " ++ "test07InputType /* TODO replace by actual input type */" ++ eol
       ++ "def run(CONST$WORLD: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row]) = {" ++ eol
       ++ "println(" ++ eol

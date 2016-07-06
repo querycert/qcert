@@ -46,6 +46,7 @@ Section SparkData.
   Context {m:brand_model}.
 
   Inductive stype :=
+  | STbrand  : string -> stype
   | STnull   : stype
   | STint    : stype
   | STstring : stype
@@ -69,6 +70,7 @@ Section SparkData.
     Local Open Scope string_scope.
     Fixpoint stype_to_datatype (s: stype) : string :=
       match s with
+      | STbrand name => "BRAND_TYPES(\""" ++ name ++ "\"")"
       | STnull => "NullType"
       | STint => "IntegerType"
       | STstring => "StringType"
@@ -116,12 +118,10 @@ Section SparkData.
             map (fun p => (fst p, rtype_to_stype (snd p))) fields in
         STstruct (("$blob", STstring)::("$known", STstruct known_fields)::nil)
       | Either₀ l r => STstruct (("$left", rtype_to_stype l)::("$right", rtype_to_stype r)::nil)
-      | Brand₀ brands =>
-        let t := rtype_to_stype (proj1_sig (brands_type brands)) in
-        (* TODO should use the above, but the termination checker won't let me :/ *)
-        let t := STnull in
+      | Brand₀ (b::nil) =>
         STstruct (("$type", STarray STstring)
-                    ::("$data", t)::nil)
+                    ::("$data", STbrand b)::nil)
+      | Brand₀ _ => STnull (* This does not happen for data. Right?! *)
       (* should not occur *)
       | Arrow₀ _ _ => STnull
       | Foreign₀ ft => STnull
