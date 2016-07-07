@@ -261,8 +261,7 @@ Admitted.
 
   Context {ftojson:foreign_to_JSON}.
 
-  Definition data_to_sjson (d:data) (jt:JSON.json) : option string :=
-    let r := json_to_rtype jt in
+  Definition data_to_sjson (d:data) (r:rtype) : option string :=
     lift sdata_to_json (typed_data_to_sdata d r).
 
 End SparkData.

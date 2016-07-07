@@ -35,7 +35,6 @@ let print_type_defs br bts =
   List.iter (fun (x,y) -> Printf.printf "\t\t\ttypeDef %s = isValid\n" x) bts
 
 let print_wm_type br wmType =
-  ignore (TypeUtil.rtype_content_to_rtype br wmType);
   Printf.printf "\t\t%s\n" "TYPE"
     
 let anon_args conf f =
@@ -54,19 +53,25 @@ let anon_args conf f =
     print_brand_types brandTypes;
     Printf.printf "\t\ttypeDefs:\n";
     print_type_defs hi typeDefs;
-    Printf.printf "\tWorking Memory Type:";
-    print_wm_type hi wmType;
     Printf.printf "\t\tLOADING BRAND MODEL...\n";
     let brand_model = TypeUtil.model_content_to_model hi (modelName,brandTypes,typeDefs) in
     Printf.printf "\t\t... DONE!\n";
     match brand_model with
     | Some bm ->
-	let datalist = (DataUtil.get_input (get_data_format conf) (Some json)) in
-	List.iter (fun d ->
-	  match RType.data_to_sjson bm d wmType with
-	  | Some sdata -> Printf.printf "SDATA:%s\n" (Util.string_of_char_list sdata)
-	  | None -> Printf.printf "SDATA Serialization failed!")
-	  datalist
+	Printf.printf "\tWorking Memory Type:";
+	let wmTypeContent = RType.camp_type_uncoll bm (TypeUtil.rtype_content_to_rtype hi wmType) in
+	begin
+	  match wmTypeContent with
+	  | Some wmTypeC ->
+	      print_wm_type hi wmTypeC;
+	      let datalist = (DataUtil.get_input (get_data_format conf) (Some json)) in
+	      List.iter (fun d ->
+		match RType.data_to_sjson bm d wmTypeC with
+		| Some sdata -> Printf.printf "SDATA:%s\n" (Util.string_of_char_list sdata)
+		| None -> Printf.printf "SDATA Serialization failed!")
+		datalist
+	  | None -> Printf.printf "WMType isn't a collection!"
+	end
     | None ->
 	raise (Failure "...BRAND MODEL CREATION FAILED!")
   end

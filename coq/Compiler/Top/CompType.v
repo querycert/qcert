@@ -60,8 +60,12 @@ Module CompType(runtime:CompilerRuntime).
   (* JSON -> sdata string *)
   Require SparkData.
   Require RData.
+  Require TOpsInfer.
 
-  Definition data_to_sjson (m:brand_model) : data -> JSON.json -> option String.string
+  Definition camp_type_uncoll (m:brand_model) : camp_type -> option camp_type
+    := @TOpsInfer.tuncoll _ m.
+  
+  Definition data_to_sjson (m:brand_model) : data -> camp_type -> option String.string
     := @SparkData.data_to_sjson _ _ _ m.
 
 End CompType.
