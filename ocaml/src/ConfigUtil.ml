@@ -110,6 +110,8 @@ let suffix_cld_design () = "_cloudant_design.json"
 let suffix_cld_curl () = "_cloudant.sh"
 let suffix_stats () = "_stats.json"
 
+let suffix_sdata () = "_sdata.io"
+
 let suffix_target conf =
   match conf.tlang with
   | ORIG ->
@@ -173,21 +175,30 @@ let get_eval_inputs conf = conf.eval_inputs
 type data_config =
     { mutable in_jsons : Data.json list;
       mutable data_format : serialization_format;
-      mutable data_args : string list }
+      mutable data_args : string list;
+      mutable data_dir : string option }
 
 let default_data_config () =
   { in_jsons = [];
     data_format = META;
-    data_args = [] }
+    data_args = [];
+    data_dir = None }
 
 let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
 
-let set_data_format conf x =
-  conf.data_format <- x
+let set_data_format conf s =
+  match s with
+  | "META" -> conf.data_format <- META
+  | "ENHANCED" -> conf.data_format <- ENHANCED
+  | _ -> ()
+
+let set_data_dir conf d = conf.data_dir <- Some d
 
 let get_data_format conf =
   conf.data_format
+let get_data_dir conf =
+  conf.data_dir
       
 (* Compiler Section *)
   

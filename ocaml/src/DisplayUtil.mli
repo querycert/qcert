@@ -42,3 +42,7 @@ val cldmr_to_sexp_string : cldmr -> string
 
 val sexp_algenv_top : comp_config -> (string * algenv) -> unit
 
+(* Data Display *)
+
+val display_sdata : data_config -> string -> string list -> unit
+
