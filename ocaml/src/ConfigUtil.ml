@@ -110,7 +110,7 @@ let suffix_cld_design () = "_cloudant_design.json"
 let suffix_cld_curl () = "_cloudant.sh"
 let suffix_stats () = "_stats.json"
 
-let suffix_sdata () = "_sdata.io"
+let suffix_sdata () = ".sio"
 
 let suffix_target conf =
   match conf.tlang with

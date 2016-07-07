@@ -74,7 +74,9 @@ type nra_sym =
       wedge: (string*int);
       leq: (string*int);
       sin: (string*int);
-      neg: (string*int) }
+      neg: (string*int);
+      top: (string*int);
+      bot: (string*int) }
 
 let textsym =
   { chi = ("Map", 3);
@@ -98,7 +100,9 @@ let textsym =
     wedge = ("/\\",2);
     leq = ("<=",2);
     sin = ("{in}",4);
-    neg = ("|",1) }
+    neg = ("|",1);
+    top = ("Top",3);
+    bot = ("Bot",3) }
 let greeksym =
   { chi = ("χ", 1);
     chie = ("χᵉ", 2);
@@ -121,7 +125,9 @@ let greeksym =
     wedge = ("∧",1);
     leq = ("≤",1);
     sin = ("∈",1);
-    neg = ("¬",1) }
+    neg = ("¬",1);
+    top = ("⊤",1);
+    bot = ("⊥",1) }
 
 (* Data PP *)
 
@@ -770,5 +776,43 @@ let pretty_nnrcmr greek margin mr_chain =
       | Ascii -> textsym
     in
     fprintf ff "@[%a@]@." (pretty_nnrcmr_aux sym) mr_chain;
+    flush_str_formatter ()
+  end
+
+(* Pretty RType *)
+
+let rec pretty_rtype_aux sym ff rt =
+  match rt with
+  | Hack.Bottom__U2080_ -> fprintf ff "%a" pretty_sym sym.bot
+  | Hack.Top__U2080_ ->  fprintf ff "%a" pretty_sym sym.top
+  | Hack.Unit__U2080_ -> fprintf ff "Unit" 
+  | Hack.Nat__U2080_ -> fprintf ff "Nat"
+  | Hack.Bool__U2080_ -> fprintf ff "Bool"
+  | Hack.String__U2080_ -> fprintf ff "String"
+  | Hack.Coll__U2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
+  | Hack.Rec__U2080_ (Hack.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
+  | Hack.Rec__U2080_ (Hack.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
+  | Hack.Either__U2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Hack.Arrow__U2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Hack.Brand__U2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
+  | Hack.Foreign__U2080_ rf -> fprintf ff "Foreign"
+
+and pretty_rec_type sym ff rl =
+  match rl with
+    [] -> ()
+  | (ra,rd) :: [] -> fprintf ff "%s : %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd
+  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd (pretty_rec_type sym) rl'
+
+let pretty_rtype greek margin rt =
+  let conf = make_pretty_config greek margin in
+  let ff = str_formatter in
+  begin
+    pp_set_margin ff (get_margin conf);
+    let sym =
+      match (get_charset conf) with
+      | Greek -> greeksym
+      | Ascii -> textsym
+    in
+    fprintf ff "@[%a@]@." (pretty_rtype_aux sym) rt;
     flush_str_formatter ()
   end

@@ -54,7 +54,7 @@ let print_type_defs br bts =
 let print_wm_type br wmType =
   if !verbose
   then
-    Printf.printf "\t\t%s\n" "TYPE"
+    Printf.printf "\t\t%s\n" (PrettyIL.pretty_rtype true 0 wmType)
   else
     ()
     
