@@ -71,3 +71,7 @@ val pretty_nnrc : bool -> int -> Compiler.nrc -> string
 val pretty_nnrcmr : bool -> int -> Compiler.nrcmr -> string
 
 
+(* Pretty RType *)
+
+val pretty_rtype : bool -> int -> RType.camp_type -> string
+
