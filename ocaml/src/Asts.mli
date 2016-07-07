@@ -25,7 +25,7 @@ open Compiler.EnhancedCompiler
 type camp = Compiler.pat
 type algenv = Compiler.algenv
 type nrc = Compiler.nrc
-type dnrc = (Compiler.__, algenv) Compiler.dnrc
+type dnrc = (bool, algenv) Compiler.dnrc
 type nrcmr = (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr
 type cldmr = Compiler.cld_mrl
 
