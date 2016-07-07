@@ -21,6 +21,8 @@ open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
+val make_brand_relation : (string * string) list -> (char list * char list) list
+  
 val rtype_content_to_rtype : (string * string) list -> rtype_content -> RType.camp_type
   
 val model_content_to_model : (string * string) list -> model_content -> RType.brand_model option

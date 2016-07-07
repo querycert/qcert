@@ -59,9 +59,10 @@ Module CompType(runtime:CompilerRuntime).
 
   (* JSON -> sdata string *)
   Require SparkData.
+  Require RData.
 
-  Definition json_to_sjson br (m:brand_model) : JSON.json -> JSON.json -> option String.string
-    := @SparkData.json_to_sjson _ br _ _ m _.
+  Definition json_to_sjson (m:brand_model) : data -> JSON.json -> option String.string
+    := @SparkData.data_to_sjson _ _ _ m.
 
 End CompType.
 

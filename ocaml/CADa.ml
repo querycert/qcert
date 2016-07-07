@@ -51,8 +51,14 @@ let anon_args conf f =
     Printf.printf "\t\ttypeDefs:\n";
     print_type_defs hi typeDefs;
     Printf.printf "\t\tLOADING BRAND MODEL...\n";
-    ignore(TypeUtil.model_content_to_model hi (modelName,brandTypes,typeDefs));
-    Printf.printf "\t\t... DONE!\n"
+    let brand_model = TypeUtil.model_content_to_model hi (modelName,brandTypes,typeDefs) in
+    Printf.printf "\t\t... DONE!\n";
+(*     match brand_model with
+    | Some bm ->
+	let sdata = RType.json_to_sjson (TypeUtil.make_brand_relation hi) bm (DataUtil.get_input conf (Some json)) in
+	ignore (sdata)
+    | None ->
+	raise (Failure "...BRAND MODEL CREATION FAILED!") *)
   end
 
 let usage = Sys.argv.(0)^" jsonfile1 jsonfile2 ..."

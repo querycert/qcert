@@ -261,8 +261,7 @@ Admitted.
 
   Context {ftojson:foreign_to_JSON}.
 
-  Definition json_to_sjson (j:JSON.json) (jt:JSON.json) : option string :=
-    let d := json_to_data h j in
+  Definition data_to_sjson (d:data) (jt:JSON.json) : option string :=
     let r := json_to_rtype jt in
     lift sdata_to_json (typed_data_to_sdata d r).
 
