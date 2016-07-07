@@ -69,7 +69,7 @@ let eval_main conf io f =
   if f <> "" then
     let lconf = get_eval_lang_config conf in
     let h = build_hierarchy (get_hierarchy io) in
-    let world = get_input conf io in
+    let world = get_input (get_format conf) io in
     begin match get_source_lang lconf with
       | RULE -> rule_main conf io h world f
       | OQL -> oql_main conf io h world f

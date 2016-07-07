@@ -34,6 +34,10 @@ let print_type_defs br bts =
   List.iter (fun (x,y) -> (ignore (TypeUtil.rtype_content_to_rtype br y))) bts;
   List.iter (fun (x,y) -> Printf.printf "\t\t\ttypeDef %s = isValid\n" x) bts
 
+let print_wm_type br wmType =
+  ignore (TypeUtil.rtype_content_to_rtype br wmType);
+  Printf.printf "\t\t%s\n" "TYPE"
+    
 let anon_args conf f =
   begin
     Printf.printf "Parsing I/O file: %s\n" f;
@@ -50,15 +54,21 @@ let anon_args conf f =
     print_brand_types brandTypes;
     Printf.printf "\t\ttypeDefs:\n";
     print_type_defs hi typeDefs;
+    Printf.printf "\tWorking Memory Type:";
+    print_wm_type hi wmType;
     Printf.printf "\t\tLOADING BRAND MODEL...\n";
     let brand_model = TypeUtil.model_content_to_model hi (modelName,brandTypes,typeDefs) in
     Printf.printf "\t\t... DONE!\n";
-(*     match brand_model with
+    match brand_model with
     | Some bm ->
-	let sdata = RType.json_to_sjson (TypeUtil.make_brand_relation hi) bm (DataUtil.get_input conf (Some json)) in
-	ignore (sdata)
+	let datalist = (DataUtil.get_input (get_data_format conf) (Some json)) in
+	List.iter (fun d ->
+	  match RType.data_to_sjson bm d wmType with
+	  | Some sdata -> Printf.printf "SDATA:%s\n" (Util.string_of_char_list sdata)
+	  | None -> Printf.printf "SDATA Serialization failed!")
+	  datalist
     | None ->
-	raise (Failure "...BRAND MODEL CREATION FAILED!") *)
+	raise (Failure "...BRAND MODEL CREATION FAILED!")
   end
 
 let usage = Sys.argv.(0)^" jsonfile1 jsonfile2 ..."

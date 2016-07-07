@@ -94,6 +94,8 @@ type data_config
 val default_data_config : unit -> data_config
 
 val set_json : data_config -> Data.json -> unit
+val set_data_format : data_config -> serialization_format -> unit
+val get_data_format : data_config -> serialization_format
 
 (* Compiler Section *)
   

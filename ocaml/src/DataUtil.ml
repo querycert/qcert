@@ -105,14 +105,14 @@ let build_type_defs bts =
   | _ ->
       raise (CACo_Error "Ill-formed typeDefs")
 
-let get_input conf od =
+let get_input format od =
   match get_io_content od with
   | (i, h, _, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match i with
       | Compiler.Jarray l ->
 	  begin
-	    match get_format conf with
+	    match format with
 	    | META -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
 	    | ENHANCED -> List.map (Data.json_enhanced_to_data h) l (* in coq so we can prove properties on conversions *)
 	  end

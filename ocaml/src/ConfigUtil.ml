@@ -172,15 +172,23 @@ let get_eval_inputs conf = conf.eval_inputs
   
 type data_config =
     { mutable in_jsons : Data.json list;
+      mutable data_format : serialization_format;
       mutable data_args : string list }
 
 let default_data_config () =
   { in_jsons = [];
+    data_format = META;
     data_args = [] }
 
 let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
 
+let set_data_format conf x =
+  conf.data_format <- x
+
+let get_data_format conf =
+  conf.data_format
+      
 (* Compiler Section *)
   
 type comp_config =
