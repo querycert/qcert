@@ -62,7 +62,7 @@ Section SparkData.
         let known_fields: list string :=
             map (fun p => "StructField(""" ++ fst p ++ """, " ++ rtype_to_scala (snd p) ++ ")")
                 fields in
-        let known_struct := "StructType(Seq(" ++ joinStrings ", " known_fields ++ ")" in
+        let known_struct := "StructType(Seq(" ++ joinStrings ", " known_fields ++ "))" in
         "StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_struct ++ ")))"
       | Either₀ l r =>
         "StructType(Seq(StructField(""$left"", " ++ rtype_to_scala l ++ "), StructField(""$right"", " ++ rtype_to_scala r ++ ")))"

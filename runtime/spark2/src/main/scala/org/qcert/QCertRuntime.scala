@@ -30,16 +30,7 @@ import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
 
-  val worldType = test07InputType
-
-  def castToCustomerAndUnbrand(r: Row): Either = {
-    if (r.getSeq[String](r.fieldIndex("$type")).contains("entities.Customer")) {
-      val blob = r.getAs[Row]("$data").getAs[String]("$blob")
-      left(fromBlob(wrappedCustomerType, blob).asInstanceOf[Row])
-    } else {
-      right(srow(StructType(Seq())))
-    }
-  }
+  val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(world: Dataset[Either]): Unit = {
     val f = world.first()
@@ -90,13 +81,6 @@ abstract class QCertRuntime {
       StructField("doubleAttribute", DoubleType) ::
         StructField("id", IntegerType) ::
         StructField("stringId", StringType) :: Nil)
-
-  def test07InputType =
-    StructType(Seq(
-      StructField("$data", StructType(Seq(
-        StructField("$blob", StringType),
-        StructField("$known", StructType(Nil))))),
-      StructField("$type", ArrayType(StringType))))
 
   val CONST$WORLD_07 = Nil
 
@@ -338,6 +322,10 @@ abstract class QCertRuntime {
         // NOTE We get all the known fields from the blob. If we ever decide to only keep unknown fields in the blob we have to change this.
         val known = fromBlob(t("$known").dataType, blob)
         srow(t, blob, known)
+      // TODO incomplete
+    }
+    case (blob: String, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") => fromBlob(t, blob)
       // TODO incomplete
     }
     // TODO incomplete
