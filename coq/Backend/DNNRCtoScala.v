@@ -188,21 +188,13 @@ Section DNNRCtoScala.
     | DNRCAlg t a xs => "ALG???" (* TODO *)
     end.
 
-  Definition populateBrandTypes {ft: foreign_type} {bm : brand_model} : string :=
-    let elements :=
-        map (fun p => """" ++ fst p ++ """ -> " ++ rtype_to_scala (proj1_sig (snd p)))
-            brand_context_types in
-    "val BRAND_TYPES = Map(" ++ joinStrings ", " elements ++ ")".
-
-
   (** Toplevel entry to Spark2/Scala codegen *)
 
   Definition dnrcToSpark2Top {A : Set} {plug_set:Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (inputType:rtype) (name: string) (e: dnrc A plug_set) : string :=
     ""
       ++ "import org.apache.spark.sql.types._" ++ eol
       ++ "object " ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
-      ++ @populateBrandTypes ft m ++ eol
-      ++ "val worldType = " ++ "test07InputType /* TODO replace by actual input type */" ++ eol
+      ++ "val worldType = " ++ rtype_to_scala (proj1_sig inputType) ++ eol
       ++ "def run(CONST$WORLD: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row]) = {" ++ eol
       ++ "println(" ++ eol
       ++ scala_of_dnrc e ++ eol
