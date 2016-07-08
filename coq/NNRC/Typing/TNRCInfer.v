@@ -155,78 +155,20 @@ Section TNRCInfer.
       specialize (IHn1 tenv).
       destruct (infer_nrc_type tenv n1); simpl in *; try discriminate.
       unfold tuneither in H.
-      destruct r; simpl in H; try congruence.
-      destruct x; simpl in H; try congruence.
-      unfold and_rec, and_rect in H.
-      destruct (Either₀_wf_inv e); simpl in *.
-      specialize (IHn2 ((v, exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0)
-                          :: tenv)).
-      specialize (IHn3 ((v0, exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e1)
-                          :: tenv)).
-      assert
-        (infer_nrc_type
-           ((v, exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0)
-              :: tenv) n2 =
-         infer_nrc_type
-           (@cons
-              (prod var
-                    (@rtype (@basic_model_foreign_type m)
-                            (@brand_model_relation (@basic_model_foreign_type m)
-                                                   (@basic_model_brand_model m))))
-              (@pair var
-                     (@rtype (@basic_model_foreign_type m)
-                             (@brand_model_relation (@basic_model_foreign_type m)
-                                                    (@basic_model_brand_model m))) v
-                     (@exist (@rtype₀ (@basic_model_foreign_type m))
-                             (fun τ₀ : @rtype₀ (@basic_model_foreign_type m) =>
-                                @eq bool
-                                    (@wf_rtype₀ (@basic_model_foreign_type m)
-                                                (@brand_model_relation
-                                                   (@basic_model_foreign_type m)
-                                                   (@basic_model_brand_model m)) τ₀) true) x1
-                             e0)) tenv) n2) by reflexivity.
-      rewrite <- H0 in H; clear H0.
-      destruct (infer_nrc_type ((v, exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0)
-                                  :: tenv) n2); simpl in H; try congruence.
-      assert
-        (infer_nrc_type
-           ((v0, exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e1)
-              :: tenv) n3 =
-         infer_nrc_type
-           (@cons
-              (prod var
-                    (@rtype (@basic_model_foreign_type m)
-                            (@brand_model_relation (@basic_model_foreign_type m)
-                                                   (@basic_model_brand_model m))))
-              (@pair var
-                     (@rtype (@basic_model_foreign_type m)
-                             (@brand_model_relation (@basic_model_foreign_type m)
-                                                    (@basic_model_brand_model m))) v0
-                     (@exist (@rtype₀ (@basic_model_foreign_type m))
-                             (fun τ₀ : @rtype₀ (@basic_model_foreign_type m) =>
-                                @eq bool
-                                    (@wf_rtype₀ (@basic_model_foreign_type m)
-                                                (@brand_model_relation
-                                                   (@basic_model_foreign_type m)
-                                                   (@basic_model_brand_model m)) τ₀) true) x2
-                             e1)) tenv) n3) by reflexivity.
-      rewrite <- H0 in H; clear H0.
-      destruct (infer_nrc_type ((v0, exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e1)
-                                  :: tenv) n3); simpl in H; try congruence.
-      destruct (rtype_eq_dec r r0); try congruence; simpl.
-      rewrite e2 in *; clear e2.
-      inversion H; subst; clear H.
+      destruct r; simpl in H; try discriminate.
+      destruct x; simpl in H; try discriminate.
+      match_case_in H; intros; rewrite H0 in H; try discriminate.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      match_destr_in H.
+      red in e0.
+      invcs H; subst.
       specialize (IHn1 (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) 
                               (Either₀ x1 x2) e) eq_refl).
-      specialize (IHn2 τout eq_refl).
-      specialize (IHn3 τout eq_refl).
-      assert ((exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) (Either₀ x1 x2) e)
-              = Either (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0)
-                       (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e1))
-        by (apply rtype_fequal; reflexivity).
-      rewrite H in IHn1. 
-      apply (TNRCEither tenv n1 v n2 v0 n3 IHn1 IHn2 IHn3).
-  Qed.
+      specialize (IHn2 _ _ H0).
+      specialize (IHn3 _ _ H1).
+      eapply TNRCEither; eauto.
+      erewrite <- Either_canon; eauto.
+  Qed.      
 
 End TNRCInfer.
 
