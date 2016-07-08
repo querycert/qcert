@@ -19,6 +19,12 @@ open ConfigUtil
 open DataUtil
 open Compiler.EnhancedCompiler
 
+type schema_content =
+    ((string * string) list
+       * string
+       * (string * string) list
+       * (string * rtype_content) list)
+
 (* Data utils for the Camp evaluator and compiler *)
 
 let make_brand_relation (br:  (string * string) list) = 
@@ -43,3 +49,22 @@ let model_content_to_model (br: (string * string) list) (mc: model_content) : RT
   let brand_relation = make_brand_relation br in
   let brand_context = make_brand_context br brand_types type_defs in
   RType.make_brand_model brand_relation brand_context
+
+let extract_schema io =
+  let (_,hierarchy,_,model,wmType) = DataUtil.get_io_content (Some io) in
+  let (modelName,brandTypes,typeDefs) = DataUtil.get_model_content model in
+  ((DataUtil.build_hierarchy hierarchy,modelName,brandTypes,typeDefs),wmType)
+
+let process_schema (hierarchy,modelName,brandTypes,typeDefs) wmType =
+  let bm =
+    match model_content_to_model hierarchy (modelName,brandTypes,typeDefs) with
+    | Some bm -> bm
+    | None -> raise (Failure "...Brand model creation failed")
+  in
+  let wmTypeC =
+    match RType.camp_type_uncoll bm (rtype_content_to_rtype hierarchy wmType) with
+    | Some wmTypeC -> wmTypeC
+    | None -> raise (Failure "WMType isn't a collection")
+  in
+  (bm,wmTypeC)
+	

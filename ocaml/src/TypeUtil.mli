@@ -21,9 +21,19 @@ open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
+type schema_content =
+    ((string * string) list
+       * string
+       * (string * string) list
+       * (string * rtype_content) list)
+
 val make_brand_relation : (string * string) list -> (char list * char list) list
   
 val rtype_content_to_rtype : (string * string) list -> rtype_content -> RType.camp_type
   
 val model_content_to_model : (string * string) list -> model_content -> RType.brand_model option
+
+val extract_schema : Data.json -> schema_content * rtype_content
+
+val process_schema : schema_content -> rtype_content -> RType.brand_model * RType.camp_type
 

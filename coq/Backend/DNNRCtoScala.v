@@ -197,7 +197,7 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnrcToSpark2Top {A : Set} {plug_set:Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (name: string) (e: dnrc A plug_set) : string :=
+  Definition dnrcToSpark2Top {A : Set} {plug_set:Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (inputType:rtype) (name: string) (e: dnrc A plug_set) : string :=
     ""
       ++ "import org.apache.spark.sql.types._" ++ eol
       ++ "object " ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol

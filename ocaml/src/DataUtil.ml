@@ -15,10 +15,13 @@
  *)
 
 open Util
-open ConfigUtil
 open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
+
+type serialization_format =
+  | META
+  | ENHANCED
 
 type io_hierarchy = Data.json
 type io_json = Data.json option
@@ -28,6 +31,7 @@ type io_input = Data.data list
 type io_output = Data.data list
 
 type rtype_content = Data.json
+type json_schema = (io_hierarchy_list * Data.json * Data.json) option
 type model_content = string * (string * string) list * (string * rtype_content) list
 
 let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * Data.json * Data.json =

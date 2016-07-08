@@ -16,13 +16,10 @@
 
 open Util
 open CloudantUtil
+open DataUtil
 open Compiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
-
-type serialization_format =
-  | META
-  | ENHANCED
 
 type source_lang =
   | RULE
@@ -176,13 +173,15 @@ type data_config =
     { mutable in_jsons : Data.json list;
       mutable data_format : serialization_format;
       mutable data_args : string list;
-      mutable data_dir : string option }
+      mutable data_dir : string option;
+      mutable data_schema : Data.json option }
 
 let default_data_config () =
   { in_jsons = [];
     data_format = META;
     data_args = [];
-    data_dir = None }
+    data_dir = None;
+    data_schema = None }
 
 let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
@@ -194,9 +193,12 @@ let set_data_format conf s =
   | _ -> ()
 
 let set_data_dir conf d = conf.data_dir <- Some d
+let set_data_schema conf s = conf.data_schema <- Some s
 
 let get_data_format conf =
   conf.data_format
+let get_data_schema conf =
+  conf.data_schema
 let get_data_dir conf =
   conf.data_dir
       
@@ -248,7 +250,6 @@ let get_test_sexp conf = conf.test_sexp
 let get_target_stats conf = conf.target_stats
 let get_comp_lang_config conf = conf.comp_lang_config
 let get_pretty_config conf = conf.comp_pretty_config
-
 
 (* Backend Section *)
 

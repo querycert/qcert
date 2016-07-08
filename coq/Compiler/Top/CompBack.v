@@ -41,8 +41,8 @@ Module CompBack(runtime:CompilerRuntime).
   Require Import DNNRCtoScala RAlgEnv.
   Require Import TypingRuntime.
 
-  Definition dnrc_to_scala_code_gen {h:brand_relation_t} (bm:brand_model) (name:string) (e:dnrc_algenv) : string :=
-    @dnrcToSpark2Top _ h bool _ _ _ bm name e.
+  Definition dnrc_to_scala_code_gen {h:brand_relation_t} (bm:brand_model) (inputType:rtype) (name:string) (e:dnrc_algenv) : string :=
+    @dnrcToSpark2Top _ h bool _ _ _ bm inputType name e.
 
   (* Compilation from NNRCMR to CloudantMR *)
 

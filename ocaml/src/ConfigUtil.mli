@@ -14,13 +14,10 @@
  * limitations under the License.
  *)
 
+open DataUtil
 open Compiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
-
-type serialization_format =
-  | META
-  | ENHANCED
 
 type source_lang =
   | RULE
@@ -97,9 +94,11 @@ val default_data_config : unit -> data_config
 
 val set_json : data_config -> Data.json -> unit
 val set_data_format : data_config -> string -> unit
+val set_data_schema : data_config -> Data.json -> unit
 val set_data_dir : data_config -> string -> unit
 
 val get_data_format : data_config -> serialization_format
+val get_data_schema : data_config -> Data.json option
 val get_data_dir : data_config -> string option
 
 (* Compiler Section *)
