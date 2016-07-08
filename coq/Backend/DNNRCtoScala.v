@@ -91,6 +91,12 @@ Section DNNRCtoScala.
     | dforeign _ => "DFOREIGN???"
     end.
 
+  Definition scala_of_data2 {fttojs: ForeignToJavascript.foreign_to_javascript} {ftype: foreign_type} {m: brand_model} (d: data) (t: rtype) : string :=
+    let schema := rtype_to_scala (proj1_sig t) in
+    let scala_type := rtype_to_scala_type (proj1_sig t) in
+    let blob := typed_data_to_json_string d Top in
+    "fromBlob(" ++ schema ++ ", " ++ blob ++ ").asInstanceOf[" ++ scala_type ++ "]".
+
   Definition scala_of_unop {ftype: foreign_type} {m: brand_model} (op: unaryOp) (x: string) : string :=
     let prefix s := s ++ "(" ++ x ++ ")" in
     let postfix s := x ++ "." ++ s in
