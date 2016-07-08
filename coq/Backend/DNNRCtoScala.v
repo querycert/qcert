@@ -47,30 +47,6 @@ Section DNNRCtoScala.
     """" ++ s ++ """".
 
   (* TODO replace this by stuff from SparkData *)
-  Fixpoint dataType_of_rtype₀ {ft:foreign_type} (t: rtype₀) :=
-    match t with
-    | Bottom₀ => "BOTTOM?"
-    | Top₀ => "TOP?"
-    | Unit₀ => "DataTypes.NullType"
-    | Nat₀ => "DataTypes.IntegerType"
-    | Bool₀ => "DataTypes.BooleanType"
-    | String₀ => "DataTypes.StringType"
-    | Coll₀ r => "ArrayType(" ++ dataType_of_rtype₀ r ++ ")"
-    | Rec₀ Closed fs =>
-      let fields :=
-          map (fun (p : string * rtype₀) =>
-                 let (n, t) := p in
-                 "StructField(" ++ n ++ ", " ++ dataType_of_rtype₀ t ++ ")")
-              fs in
-      "StructType(" ++ fold_left (fun a b => a ++ "::" ++ b) fields "Nil" ++ ")"
-    | Rec₀ Open _ => "DO NOT KNOW HOW TO DEAL WITH OPEN RECORDS YET"
-    | Either₀ tl t => "eitherStructType(" ++ dataType_of_rtype₀ tl ++ ", " ++ dataType_of_rtype₀ t ++ ")"
-    | Arrow₀ tin t => "CANNOT PUT AN ARROW INTO A DATASET"
-    | Brand₀ bs => "UHM. WE NEED THE STRUCTURAL TYPE THAT IS BRANDED..."
-    | Foreign₀ f => "TODO FIGURE OUT WHAT TO DO WITH FOREIGN TYPES"
-    end.
-
-  (* TODO replace this by stuff from SparkData *)
   Fixpoint scala_of_data {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (d: data) : string :=
     match d with
     | dstring s => quote_string s
@@ -83,7 +59,7 @@ Section DNNRCtoScala.
     | dright v => "right(" ++ (scala_of_data m v) ++ ")"
     | drec fields =>
       match @infer_data_type _ ft fdt m (normalize_data h d) with
-      | Some t => dataType_of_rtype₀ (proj1_sig t)
+      | Some t => rtype_to_scala (proj1_sig t)
       | None => "CANNOT INFER TYPE FROM DATA. SOMETHING IS SERIOUSLY BROKEN."
       end
     | dbrand _ _ => "DBRAND???"
