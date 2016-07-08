@@ -152,6 +152,49 @@ Section SparkData.
     | None => "typed_data_to_json_string failed. This cannot happen. Get rid of this case by proving that typed_data_to_json always succeeds for well-typed data."
     end.
 
+  Lemma test_json_with_toplevel_brand:
+    (typed_data_to_json
+       (dbrand ("Person"%string::nil)
+               (drec (("age"%string, dnat 35)
+                        :: ("name"%string, dstring "Fred")
+                        :: ("friends"%string, dcoll ((dbrand ("Person"%string::nil)
+                                                             (drec (("age"%string, dnat 42)
+                                                                      :: ("name"%string, dstring "Berta")
+                                                                      :: ("friends"%string, dcoll nil) :: nil))) :: nil)) :: nil)))
+       (Brand₀ ("Person"%string::nil)))
+    = Some
+        (jobject
+           (("$data"%string,
+             jstring
+               "{\""age\"": 35, \""name\"": \""Fred\"", \""friends\"": [{\""type\"": [\""Person\""], \""data\"": {\""age\"": 42, \""name\"": \""Berta\"", \""friends\"": []}}]}")
+              :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil)).
+  Proof. vm_compute. reflexivity. Qed.
+
+  Lemma test_json_with_nested_brand:
+    (typed_data_to_json
+       (drec (("age"%string, dnat 35)
+                :: ("name"%string, dstring "Fred")
+                :: ("friends"%string, dcoll ((dbrand ("Person"%string::nil)
+                                                     (drec (("age"%string, dnat 42)
+                                                              :: ("name"%string, dstring "Berta")
+                                                              :: ("friends"%string, dcoll nil) :: nil))) :: nil)) :: nil))
+       (Rec₀ Closed (("age"%string, Nat₀)
+                       :: ("name"%string, String₀)
+                       :: ("friends"%string, (Coll₀ (Brand₀ ("Person"%string::nil)))) :: nil)))
+    = Some
+        (jobject
+           (("$blob"%string, jstring "")
+              :: ("$known"%string,
+                  jobject
+                    (("age"%string, jnumber 35)
+                       :: ("name"%string, jstring "Fred")
+                       :: ("friends"%string,
+                           jarray
+                             (jobject
+                                (("$data"%string, jstring "{\""age\"": 42, \""name\"": \""Berta\"", \""friends\"": []}")
+                                   :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil) :: nil)) :: nil)) :: nil)).
+  Proof. vm_compute. reflexivity. Qed.
+
   (* Added calls for integration within the compiler interface *)
   Require Import ForeignToJSON.
   Require Import JSON JSONtoData.
