@@ -120,7 +120,7 @@ make java-runtime
 
 ## Code Organization
 
-`./coq` contains the Coq source code
+[`./coq`](./coq) contains the Coq source code
 `./ocaml` contains the toplevel compiler and code extraction from Coq
 `./runtime` contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
 
@@ -240,17 +240,17 @@ Manuscript. http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf
 
 [ODMG30] Jeff Eastman, et al. The object data standard: ODMG
 3.0. Eds. Roderic Geoffrey Galton Cattell, and Douglas
-K. Barry. Vol. 1. San Francisco: Morgan Kaufmann, 2000.
+K. Barry. Vol. 1. San Francisco: Morgan Kaufmann, 2000. http://www.odbms.org/odmg-standard/odmg-book/
 
 [SSH15] Avraham Shinnar, Jérôme Siméon, and Martin Hirzel. "A Pattern
 Calculus for Rule Languages: Expressiveness, Compilation, and
 Mechanization." 29th European Conference on Object-Oriented
-Programming. 2015.
+Programming. 2015. http://hirzels.com/martin/papers/ecoop15-rules-nra.pdf
 
 [SS16] Avraham Shinnar and Jérôme Siméon. "Nominal Typing for Data
 Languages". Technical Report, IBM. July 2016
 
 [Zah12] Matei Zaharia, et al. "Fast and interactive analytics over
-Hadoop data with Spark." USENIX; login 37.4 (2012): 45-51.
+Hadoop data with Spark." USENIX; login 37.4 (2012): 45-51. https://www.usenix.org/publications/login/august-2012-volume-37-number-4/fast-and-interactive-analytics-over-hadoop-data
 
 
