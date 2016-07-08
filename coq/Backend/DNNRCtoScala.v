@@ -113,21 +113,23 @@ Section DNNRCtoScala.
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
     | ANeg => prefix "!"
+    | ANumMax => prefix "anummax"
+    | ANumMin => prefix "anummin"
     | ARec n => "singletonRecord(" ++ quote_string n ++ ", " ++ x ++ ")" (* TODO need to pass schema *)
     | ARight => prefix "right"
     | ASum => postfix "sum"
     | AToString => postfix "toString"
+    | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand => prefix "unbrand/*[TODO]*/" (* TODO pass type *)
     | ADistinct => postfix "distinct"
 
     (* TODO *)
     | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"
-    | ANumMax => "ANUMMAX???" (* Maximum element in a bag? [] => 0 *)
-    | ANumMin => "ANUMMIN???" (* Minimum element in a bag? [] => 0 *)
     | ARecProject _ => "ARECPROJECT???"
     | ARecRemove _ => "ARECREMOVE???"
     | ASingleton => "SINGLETON???"
-    | AUArith _ => "AUARITH???"
+    | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
+    | AUArith ArithSqrt => "SQRT???" (* Integer sqrt? Not sure what the Coq semantics are. *)
     end.
 
   Definition scala_of_binop (op: binOp) (l: string) (r: string) : string :=

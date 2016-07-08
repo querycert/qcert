@@ -380,6 +380,14 @@ abstract class QCertRuntime {
     res
   }*/
 
+  // We can do O(1) min and max, because we keep bags sorted
+  // The default 0 for empty bags comes from the Coq semantics
+  def anummax(b: Array[Int]): Int =
+    if (b.isEmpty) 0 else b(b.length-1)
+
+  def anummin(b: Array[Int]): Int =
+    if (b.isEmpty) 0 else b(0)
+
   /* Sorting & equality
  * ==================
  */
