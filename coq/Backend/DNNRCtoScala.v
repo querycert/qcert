@@ -46,6 +46,31 @@ Section DNNRCtoScala.
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
 
+  (** Scala-level type of an rtype.
+   *
+   * These are things like Int, String, Boolean, Array[...], Row.
+   *
+   * We need to annotate some expressions with Scala-level types
+   * (e.g. Array[Row]() for an empty Array of Records) to help
+   * the Scala compiler because it does not infer types everywhere.
+   *)
+  Fixpoint rtype_to_scala_type {ftype: foreign_type} (t: rtype₀): string :=
+    match t with
+    | Bottom₀ => "BOTTOM?"
+    | Top₀ => "String"
+    | Unit₀ => "UNIT?"
+    | Nat₀ => "Int"
+    | Bool₀ => "Boolean"
+    | String₀ => "String"
+    | Coll₀ r => "Array[" ++ rtype_to_scala_type r ++ "]"
+    | Rec₀ _ _ => "Row"
+    (* TODO we have/used to have some aliases in the runtime, should we use them? *)
+    | Either₀ tl t => "Row"
+    | Brand₀ bs => "Row" (* BrandedValue ?? *)
+    | Arrow₀ tin t => "CANNOT PUT AN ARROW INTO A DATASET"
+    | Foreign₀ f => "FOREIGN?"
+    end.
+
   (* TODO replace this by stuff from SparkData *)
   Fixpoint scala_of_data {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (d: data) : string :=
     match d with
