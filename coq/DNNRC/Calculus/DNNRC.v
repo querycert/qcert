@@ -163,7 +163,7 @@ Section DNNRC.
       apply dnrc_ind; trivial.
     Qed.
 
-    Definition dnrc_annotation_of (d:dnrc) : A
+    Definition dnrc_annotation_get (d:dnrc) : A
       := match d with
          | DNRCVar a _ => a
          | DNRCConst a _ => a
@@ -176,6 +176,21 @@ Section DNNRC.
          | DNRCCollect a _ => a
          | DNRCDispatch a _ => a
          | DNRCAlg a _ _ => a
+         end.
+
+    Definition dnrc_annotation_update (f:A->A) (d:dnrc) : dnrc
+      := match d with
+         | DNRCVar a v => DNRCVar (f a) v
+         | DNRCConst a c => DNRCConst (f a) c
+         | DNRCBinop a b d₁ d₂ => DNRCBinop (f a) b d₁ d₂
+         | DNRCUnop a u d₁ => DNRCUnop (f a) u d₁
+         | DNRCLet a x d₁ d₂ => DNRCLet (f a) x d₁ d₂
+         | DNRCFor a x d₁ d₂ => DNRCFor (f a) x d₁ d₂
+         | DNRCIf a d₀ d₁ d₂ => DNRCIf (f a) d₀ d₁ d₂
+         | DNRCEither a d₀ x₁ d₁ x₂ d₂ => DNRCEither (f a) d₀ x₁ d₁ x₂ d₂
+         | DNRCCollect a d₀ => DNRCCollect (f a) d₀
+         | DNRCDispatch a d₀ => DNRCDispatch (f a) d₀
+         | DNRCAlg a p args => DNRCAlg (f a) p args
          end .
 
     Context (h:brand_relation_t).

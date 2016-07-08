@@ -100,6 +100,17 @@ Section TDData.
       rewrite sub in H1.
       trivial.
   Qed.
+
+  Lemma drtype_sub_dec (dτ₁ dτ₂:drtype) :
+    {drtype_sub dτ₁ dτ₂} + {~ drtype_sub dτ₁ dτ₂}.
+  Proof.
+    destruct dτ₁; destruct dτ₂
+    ; simpl.
+    - apply subtype_dec.
+    - right; tauto.
+    - right; tauto.
+    - apply subtype_dec.
+  Defined.
   
 End TDData.
 
