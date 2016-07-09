@@ -120,41 +120,42 @@ make java-runtime
 
 ## Code Organization
 
-[`./coq`](./coq) contains the Coq source code
-`./ocaml` contains the toplevel compiler and code extraction from Coq
-`./runtime` contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
+The code is in three main directories:
 
-Inside the `./coq` directory, the organization is as follows.
+- [`./coq`](./coq) contains the Coq source code
+- [`./ocaml`](./ocaml) contains the toplevel compiler and code extraction from Coq
+- [`./runtime`](./runtime) contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
 
-Foundational modules:
+Inside the [`./coq`](./coq) directory, the organization is as follows.
 
-`./Basic/Util` contains useful libraries and lemmas, independant of Q*cert itself
-`./Basic/Data` contains the core data model
-`./Basic/Operators` contains unary/binary operators shared across ILs
-`./Basic/TypeSystem` contains the core type system
-`./Basic/Typing` contains typing and type inference for data and operators
+- Foundational modules:
 
-Intermediate languages (ILs), including eval, typing, type inference,
-and equivalences/rewrites:
+..[`./Basic/Util`](./Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
+..[`./Basic/Data`](./Basic/Data) contains the core data model
+..[`./Basic/Operators`](./Basic/Operators) contains unary/binary operators shared across ILs
+..[`./Basic/TypeSystem`](./Basic/TypeSystem) contains the core type system
+..[`./Basic/Typing`](./Basic/Typing) contains typing and type inference for data and operators
 
-`./CAMP` contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-`./NRA` contains support for the Nested Relational Algebra (NRA)
-`./NRAEnv` contains support for the extension of NRA with environments
-`./NNRC` contains support for the Named Nested Relational Calculus (NNRC)
-`./DNNRC` contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+- Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
 
-Translations:
+..[`./CAMP`](./CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+..[`./NRA`](./NRA) contains support for the Nested Relational Algebra (NRA)
+..[`./NRAEnv`](./NRAEnv) contains support for the extension of NRA with environments
+..[`./NNRC`](./NNRC) contains support for the Named Nested Relational Calculus (NNRC)
+..[`./DNNRC`](./DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
 
-`./Translation` contains translations between ILs
-`./Backend` contains backend support and code generation
-`./Frontend` contains surface language support (except for jRules)
+- Translations:
 
-Toplevel:
+..[`./Translation`](./Translation) contains translations between ILs
+..[`./Backend`](./Backend) contains backend support and code generation
+..[`./Frontend`](./Frontend) contains surface language support (except for jRules)
 
-`./Compiler` contains the overall compiler instructure and functional optimizers
-`./Tests` contains various coq self-tests
+- Toplevel:
 
-(`./Updates` is early code for updates that isn't part of the actual compiler)
+..[`./Compiler`](./Compiler) contains the overall compiler instructure and functional optimizers
+..[`./Tests`](./Tests) contains various coq self-tests
+
+..([`./Updates`](./Updates) is early code for updates that isn't part of the actual compiler)
 
 ## License
 
