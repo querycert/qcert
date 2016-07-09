@@ -130,32 +130,32 @@ Inside the [`./coq`](./coq) directory, the organization is as follows.
 
 - Foundational modules:
 
-..[`./Basic/Util`](./Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
-..[`./Basic/Data`](./Basic/Data) contains the core data model
-..[`./Basic/Operators`](./Basic/Operators) contains unary/binary operators shared across ILs
-..[`./Basic/TypeSystem`](./Basic/TypeSystem) contains the core type system
-..[`./Basic/Typing`](./Basic/Typing) contains typing and type inference for data and operators
+  [`./Basic/Util`](./Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
+  [`./Basic/Data`](./Basic/Data) contains the core data model
+  [`./Basic/Operators`](./Basic/Operators) contains unary/binary operators shared across ILs
+  [`./Basic/TypeSystem`](./Basic/TypeSystem) contains the core type system
+  [`./Basic/Typing`](./Basic/Typing) contains typing and type inference for data and operators
 
 - Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
 
-..[`./CAMP`](./CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-..[`./NRA`](./NRA) contains support for the Nested Relational Algebra (NRA)
-..[`./NRAEnv`](./NRAEnv) contains support for the extension of NRA with environments
-..[`./NNRC`](./NNRC) contains support for the Named Nested Relational Calculus (NNRC)
-..[`./DNNRC`](./DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+  [`./CAMP`](./CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+  [`./NRA`](./NRA) contains support for the Nested Relational Algebra (NRA)
+  [`./NRAEnv`](./NRAEnv) contains support for the extension of NRA with environments
+  [`./NNRC`](./NNRC) contains support for the Named Nested Relational Calculus (NNRC)
+  [`./DNNRC`](./DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
 
 - Translations:
 
-..[`./Translation`](./Translation) contains translations between ILs
-..[`./Backend`](./Backend) contains backend support and code generation
-..[`./Frontend`](./Frontend) contains surface language support (except for jRules)
+  [`./Translation`](./Translation) contains translations between ILs
+  [`./Backend`](./Backend) contains backend support and code generation
+  [`./Frontend`](./Frontend) contains surface language support (except for jRules)
 
 - Toplevel:
 
-..[`./Compiler`](./Compiler) contains the overall compiler instructure and functional optimizers
-..[`./Tests`](./Tests) contains various coq self-tests
+  [`./Compiler`](./Compiler) contains the overall compiler instructure and functional optimizers
+  [`./Tests`](./Tests) contains various coq self-tests
 
-..([`./Updates`](./Updates) is early code for updates that isn't part of the actual compiler)
+  ([`./Updates`](./Updates) is early code for updates that isn't part of the actual compiler)
 
 ## License
 
