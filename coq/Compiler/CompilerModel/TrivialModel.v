@@ -142,8 +142,11 @@ Defined.
       trivial_foreign_data_typing
       model
     := mk_foreign_unary_op_typing
-         _ _ _ _ _
+         _ _ _ _ _ _
          _ _ _ _ _ _.
+  Next Obligation.
+    destruct fu.
+  Defined.
   Next Obligation.
     destruct fu.
   Defined.
@@ -173,8 +176,11 @@ Defined.
       trivial_foreign_data_typing
       model
     := mk_foreign_binary_op_typing
-         _ _ _ _ _
+         _ _ _ _ _ _
          _ _ _ _ _ _.
+  Next Obligation.
+    destruct fb.
+  Defined.
   Next Obligation.
     destruct fb.
   Defined.

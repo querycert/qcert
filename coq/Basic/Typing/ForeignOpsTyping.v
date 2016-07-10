@@ -58,6 +58,12 @@ Section ForeignOpsTyping.
                {τ₁ τout} : 
                foreign_unary_op_typing_infer fu τ₁ = None ->
                ~ foreign_unary_op_typing_has_type fu τ₁ τout
+           (* returns an optional tuple containing:
+       1) the inferred type of the binary operation
+       2) the required type of the first argument (will be a non-proper supertype of τ₁)
+            *)
+           ; foreign_unary_op_typing_infer_sub (fu:foreign_unary_op_type)
+             : rtype -> option (rtype*rtype)
          }.
 
     Class foreign_binary_op_typing
@@ -100,6 +106,14 @@ Section ForeignOpsTyping.
                {τ₁ τ₂ τout} : 
                foreign_binary_op_typing_infer fb τ₁ τ₂ = None ->
                ~ foreign_binary_op_typing_has_type fb τ₁ τ₂ τout
+           (* returns an optional tuple containing:
+       1) the inferred type of the binary operation
+       2) the required type of the first argument (will be a non-proper supertype of τ₁)
+       3)  the required type of the second argument (will be a non-proper supertype of τ₂) 
+            *)
+           ; foreign_binary_op_typing_infer_sub (fb:foreign_binary_op_type)
+             : rtype -> rtype -> option (rtype*rtype*rtype)
+
          }.
   
 End ForeignOpsTyping.

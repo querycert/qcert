@@ -112,8 +112,7 @@ Section TOpsInferSub.
         | _, _ => None
         end
       | AForeignBinaryOp fb =>
-        None
-(*        foreign_binary_op_typing_infer fb τ₁ τ₂ *)
+        foreign_binary_op_typing_infer_sub fb τ₁ τ₂
       end.
 
   End b.
@@ -204,8 +203,7 @@ Section TOpsInferSub.
       then Some (Nat, Nat)
       else None
     | AForeignUnaryOp fu =>
-      None
-(*        foreign_unary_op_typing_infer fu τ₁ *)
+        foreign_unary_op_typing_infer_sub fu τ₁
       end.
 
   End u.
