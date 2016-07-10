@@ -34,6 +34,7 @@ Section TDNRCInfer.
 
   Require Import TDataInfer.
   Require Import TOpsInfer.
+  Require Import TOpsInferSub.
 
   Definition lift_tlocal (dτ:drtype) : option rtype :=
     match dτ with
@@ -87,9 +88,7 @@ Section TDNRCInfer.
     := dnrc_annotation_update
          (fun a:type_annotation A =>
             mkType_annotation (ta_base a) (ta_inferred a) dτ) d.
-      
-  Definition bind {A B:Type} := flip (@olift A B).
-
+  
   Definition drtype_map (f:rtype->rtype) (d:drtype) : drtype
     := match d with
        | Tlocal t => Tlocal (f t)
@@ -118,8 +117,14 @@ Section TDNRCInfer.
              := let dτ₁ := (di_typeof n₁) in
                 let dτ₂ := (di_typeof n₂) in
                 olift2 (fun τ₁ τ₂ =>
-                          lift (fun τ => DNRCBinop (ta_mk a (Tlocal τ)) b n₁ n₂)
-                          (infer_binop_type b τ₁ τ₂))
+                          lift (fun τs =>
+                                  let '(τ, τ₁', τ₂') := τs in
+                                  DNRCBinop
+                                    (ta_mk a (Tlocal τ))
+                                    b
+                                    (ta_require (Tlocal τ₁') n₁)
+                                    (ta_require (Tlocal τ₂') n₂))
+                          (infer_binop_type_sub b τ₁ τ₂))
                        (lift_tlocal dτ₁) (lift_tlocal dτ₂)
          in
          olift2 binf (infer_dnrc_type tenv n1) (infer_dnrc_type tenv n2)
@@ -128,8 +133,13 @@ Section TDNRCInfer.
          let unf (n₁:dnrc (type_annotation A) plug_type) : option (dnrc (type_annotation A) plug_type)
              := let dτ₁ := (di_typeof n₁) in
                 olift (fun τ₁ =>
-                          lift (fun τ => DNRCUnop (ta_mk a (Tlocal τ)) u n₁)
-                          (infer_unop_type u τ₁))
+                         lift (fun τs =>
+                                 let '(τ, τ₁') := τs in
+                                 DNRCUnop
+                                   (ta_mk a (Tlocal τ))
+                                   u
+                                   (ta_require (Tlocal τ₁') n₁))
+                          (infer_unop_type_sub u τ₁))
                        (lift_tlocal dτ₁)
          in
          olift unf (infer_dnrc_type tenv n1)
@@ -257,9 +267,9 @@ Section TDNRCInfer.
                (DNRCEither tt
                            (DNRCVar tt "x"%string)
                            "x1"%string
-                           (DNRCConst tt (dcoll ((dbool true)::nil)))
+                           (DNRCUnop tt ASum (DNRCConst tt (dcoll (nil))))
                            "x2"%string
-                       (DNRCConst tt (dcoll ((dnat 3)::nil)))).
+                       (DNRCConst tt (dcoll ((dbool true)::nil)))).
 
     (*
   Eval vm_compute in infer_dnrc_type nil ex1.

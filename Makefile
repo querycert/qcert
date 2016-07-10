@@ -147,6 +147,7 @@ MODULES = \
 	DNNRC/Typing/TDNRC \
 	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
+	DNNRC/Typing/TOpsInferSub \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
 	CAMP/Rules/PatternSugar \
