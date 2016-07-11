@@ -18,17 +18,17 @@ Require Import CompilerRuntime.
 Module CompBack(runtime:CompilerRuntime).
 
   Require Import String List String EquivDec.
-  
+
   Require Import BasicSystem.
 
   Require Import CompUtil.
-  
+
   (* Compilation from NNRC to Javascript *)
 
   Require Import NNRC.
   Require Import NNRCtoJava ForeignToJava .
   Require Import NNRCtoJavascript ForeignToJavascript.
-  
+
   Definition nrc_to_java_code_gen (class_name:string) (imports:string) (e:nrc) : string :=
     nrcToJavaTop class_name imports e.
 
@@ -41,8 +41,15 @@ Module CompBack(runtime:CompilerRuntime).
   Require Import DNNRCtoScala RAlgEnv.
   Require Import TypingRuntime.
 
-  Definition dnrc_to_scala_code_gen {h:brand_relation_t} (bm:brand_model) (inputType:rtype) (name:string) (e:dnrc_algenv) : string :=
-    @dnrcToSpark2Top _ h bool _ _ _ bm inputType name e.
+  Definition dnrc_to_scala_code_gen
+             {ftype: foreign_type}
+             {bm:brand_model}
+             {fdt: foreign_data_typing}
+             {h:brand_relation_t}
+             {fbot: foreign_binary_op_typing}
+             {fuot: foreign_unary_op_typing}
+             (inputType:rtype) (name:string) (e:dnrc_algenv) : string :=
+    @dnrcToSpark2Top _ h ftype bm fdt fbot fuot _ unit inputType name e.
 
   (* Compilation from NNRCMR to CloudantMR *)
 
@@ -77,7 +84,7 @@ Module CompBack(runtime:CompilerRuntime).
 
   Definition cldmr_code_gen (h:list (string*string)) (mrl:cld_mrl) (rulename:string) :=
     mapReducePairstoCloudant h mrl rulename.
-  
+
   (* To Spark *)
 
   Require Import NNRCMRtoSpark ForeignToSpark.
@@ -99,7 +106,7 @@ Module CompBack(runtime:CompilerRuntime).
 
 End CompBack.
 
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***

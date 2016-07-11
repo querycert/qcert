@@ -50,7 +50,7 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
       string_of_char_list
 	(CompBack.dnrc_to_scala_code_gen
 	   []
-	   brand_model wmRType (Util.char_list_of_string nrule) e)
+	   (basic_model brand_model) wmRType (Util.char_list_of_string nrule) e)
   | Cloudant ->
       let cld_conf = get_cld_config lconf in
       cloudant_compile_from_nra (get_cld cld_conf) (get_harness cld_conf) (idioticize (get_prefix cld_conf) nrule) op (DataUtil.get_hierarchy_cloudant (get_comp_io conf))

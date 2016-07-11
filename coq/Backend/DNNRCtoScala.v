@@ -35,6 +35,7 @@ Require Import NNRCRuntime ForeignToJava.
 Require Import DNNRC.
 Require Import RType.
 Require Import TDataInfer.
+Require Import TDNRCInfer.
 Require Import SparkData.
 Local Open Scope string_scope.
 
@@ -199,7 +200,20 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnrcToSpark2Top {A : Set} {plug_set:Set} {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (inputType:rtype) (name: string) (e: dnrc A plug_set) : string :=
+  Context {ftype:foreign_type}.
+  Context {m:brand_model}.
+  Context {fdtyping:foreign_data_typing}.
+  Context {fboptyping:foreign_binary_op_typing}.
+  Context {fuoptyping:foreign_unary_op_typing}.
+  Context {plug_type:Set}.
+
+  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A plug_type) : string :=
+    let tdb : tdbindings (* = list (string*drtype) *) :=
+        ("CONST$WORLD", (Tdistr inputType))::nil
+    in
+    match infer_dnrc_type tdb e with
+    | None => ""
+    | Some e' =>
     ""
       ++ "import org.apache.spark.sql.types._" ++ eol
       ++ "object " ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
@@ -209,7 +223,8 @@ Section DNNRCtoScala.
       ++ scala_of_dnrc e ++ eol
       ++ ")" ++ eol
       ++ "}" ++ eol
-      ++ "}".
+      ++ "}"
+    end.
 
 End DNNRCtoScala.
 
