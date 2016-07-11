@@ -28,14 +28,22 @@ Section TDNRCInfer.
 
   Require Import TDNRC.
 
-  Context {m:basic_model}.
-
   (** Type inference for NNRC when given the type of the environment *)
 
   Require Import TDataInfer.
   Require Import TOpsInfer.
   Require Import TOpsInferSub.
 
+  Context {fruntime:foreign_runtime}.
+  Context {ftype:foreign_type}.
+  Context {m:brand_model}.
+  Context {fdtyping:foreign_data_typing}.
+  Context {fboptyping:foreign_binary_op_typing}.
+  Context {fuoptyping:foreign_unary_op_typing}.
+  Context {plug_type:Set}.
+  Context {plug:AlgPlug plug_type}.
+  (*  Context {tplug:TAlgPlug plug_type}. *)
+  
   Definition lift_tlocal (dτ:drtype) : option rtype :=
     match dτ with
     | Tlocal τ => Some τ
@@ -54,10 +62,6 @@ Section TDNRCInfer.
        | Tdistr τ₁, Tdistr τ₂ => Some (Tdistr (τ₁ ⊔ τ₂))
        | _, _ => None
        end.
-
-  Context {plug_type:Set}.
-  Context {plug:AlgPlug plug_type}.
-  Context {tplug:TAlgPlug plug_type}.
 
   Record type_annotation {A:Set} : Set :=
     mkType_annotation {
