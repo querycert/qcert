@@ -123,7 +123,7 @@ Section ROptimEnvFunc.
     let p' := optim p in
     match nat_compare (cost p') (cost p) with
       | Lt => optim_cost optim cost p'
-      | _ => p'
+      | _ => p
     end.
   Proof.
     intros optim cost p Hcmp.
@@ -138,7 +138,7 @@ Section ROptimEnvFunc.
     functional induction optim_cost optim cost p.
     - rewrite IHa.
       apply Hoptim.
-    - apply Hoptim.
+    - reflexivity.
   Qed.
 
   Hint Rewrite optim_cost_correctness : optim_correct.

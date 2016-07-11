@@ -111,7 +111,7 @@ Section TOptimEnvFunc.
     - apply (talgenv_rewrites_to_trans p (optim p)).
       + apply Hoptim.
       + apply IHa.
-    - apply Hoptim.
+    - reflexivity.
   Qed.
   Hint Rewrite @optim_cost_correctness : optim_correct.
 

@@ -84,14 +84,14 @@ Module CompStat(runtime:CompilerRuntime).
     drec
       (("pat_size", dnat (Z_of_nat (pat_size p)))
          :: ("pat_to_nraenv", stat_nraenv (CF.translate_pat_to_algenv p))
-         :: ("pat_to_nra", stat_nra (alg_of_pat p)) (* XXX check with Jerome XXX *)
+         :: ("pat_to_nra", stat_nra (alg_of_pat p))
          :: nil).
 
   Definition stat_rule (r:rule) : data :=
     drec
-      (("rule_size", dnat (Z_of_nat (pat_size (rule_to_pattern r)))) (* XXX check with Jerome XXX *)
+      (("rule_size", dnat (Z_of_nat (pat_size (rule_to_pattern r))))
          :: ("rule_to_nraenv", stat_nraenv (CF.translate_rule_to_algenv r))
-         :: ("rule_to_nra", stat_nra (alg_of_rule r)) (* XXX check with Jerome XXX *)
+         :: ("rule_to_nra", stat_nra (alg_of_rule r))
          :: nil).
 
   Definition stat_oql (e:oql_expr) : data :=
