@@ -2035,6 +2035,9 @@ End EnhancedModel.
 
 Module CompEnhanced.
   Module Enhanced.
+    Definition basic_model (bm:brand_model) : basic_model
+      := @enhanced_basic_model bm.
+      
     Module Data.
       Definition dfloat (f : FLOAT) : data
         := dforeign (enhancedfloat f).
