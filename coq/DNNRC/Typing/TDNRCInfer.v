@@ -162,17 +162,17 @@ Section TDNRCInfer.
                       (fun τ₁l =>
                          let τ₁l' := τ₁l ⊔ (Coll ⊥) in
                          bind (tuncoll τ₁l')
-                      (fun τ₁ =>
-                         bind (infer_dnrc_type ((v,Tlocal τ₁)::tenv) n2)
-                              (fun n₂ =>
-                                 let τ₂ := di_typeof n₂ in
-                                 lift (fun τ₂' =>
-                                         DNRCFor
-                                           (ta_mk a (Tlocal (Coll τ₂')))
-                                           v
-                                           (ta_require (Tlocal τ₁l') n₁)
-                                           n₂)
-                                      (lift_tlocal τ₂)))))
+                              (fun τ₁ =>
+                                 bind (infer_dnrc_type ((v,Tlocal τ₁)::tenv) n2)
+                                      (fun n₂ =>
+                                         let τ₂ := di_typeof n₂ in
+                                         lift (fun τ₂' =>
+                                                 DNRCFor
+                                                   (ta_mk a (Tlocal (Coll τ₂')))
+                                                   v
+                                                   (ta_require (Tlocal τ₁l') n₁)
+                                                   n₂)
+                                              (lift_tlocal τ₂)))))
 
        | DNRCIf a n0 n1 n2 =>
          bind (infer_dnrc_type tenv n0)
@@ -229,7 +229,7 @@ Section TDNRCInfer.
               (fun n₀ =>
                  bind (lift_tdistr (di_typeof n₀))
                       (fun τ₀ =>
-                         let τ := Tlocal (Coll τ₀) in
+                         let τ := Tlocal τ₀ in
                          Some (DNRCCollect
                                  (ta_mk a τ)
                                  n₀)))
@@ -273,7 +273,15 @@ Section TDNRCInfer.
                            "x1"%string
                            (DNRCUnop tt ASum (DNRCConst tt (dcoll (nil))))
                            "x2"%string
-                       (DNRCConst tt (dcoll ((dbool true)::nil)))).
+                           (DNRCConst tt (dcoll ((dbool true)::nil)))).
+    Example ex4 : dnrc unit plug_type :=
+      DNRCFor tt "el"%string
+              (DNRCCollect tt (DNRCVar tt "WORLD"%string))
+              (DNRCUnop tt AToString (DNRCVar tt "el"%string)).
+
+(*    Eval simpl in infer_dnrc_type
+                         (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
+                         ex4. *)
 
     (*
   Eval vm_compute in infer_dnrc_type nil ex1.
