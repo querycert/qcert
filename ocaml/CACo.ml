@@ -47,12 +47,12 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
       let (schema_content,wmType) = TypeUtil.extract_schema io in
       let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
       let e = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
-      let m = Enhanced.basic_model brand_model in
+      let m = Enhanced.Model.basic_model brand_model in
       string_of_char_list
 	(CompBack.dnrc_to_scala_code_gen
-           m.basic_model_foreign_type
+           Enhanced.Model.foreign_type
            brand_model
-           m.basic_model_foreign_typing
+           (Enhanced.Model.foreign_typing brand_model)
 	   wmRType (Util.char_list_of_string nrule) e)
   | Cloudant ->
       let cld_conf = get_cld_config lconf in
