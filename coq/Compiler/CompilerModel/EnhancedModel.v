@@ -2035,9 +2035,18 @@ End EnhancedModel.
 
 Module CompEnhanced.
   Module Enhanced.
+  Module Model.
     Definition basic_model (bm:brand_model) : basic_model
       := @enhanced_basic_model bm.
-      
+
+    Definition foreign_type : foreign_type
+      := enhanced_foreign_type.
+
+    Definition foreign_typing (bm:brand_model) : foreign_typing
+      := @enhanced_foreign_typing bm.
+
+  End Model.
+
     Module Data.
       Definition dfloat (f : FLOAT) : data
         := dforeign (enhancedfloat f).
