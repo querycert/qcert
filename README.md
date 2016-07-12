@@ -120,41 +120,32 @@ make java-runtime
 
 ## Code Organization
 
-`./coq` contains the Coq source code
-`./ocaml` contains the toplevel compiler and code extraction from Coq
-`./runtime` contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
+The code is in three main directories:
+- [`./coq`](./coq) contains the Coq source code
+- [`./ocaml`](./ocaml) contains the toplevel compiler and code extraction from Coq
+- [`./runtime`](./runtime) contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
 
-Inside the `./coq` directory, the organization is as follows.
-
-Foundational modules:
-
-`./Basic/Util` contains useful libraries and lemmas, independant of Q*cert itself
-`./Basic/Data` contains the core data model
-`./Basic/Operators` contains unary/binary operators shared across ILs
-`./Basic/TypeSystem` contains the core type system
-`./Basic/Typing` contains typing and type inference for data and operators
-
-Intermediate languages (ILs), including eval, typing, type inference,
-and equivalences/rewrites:
-
-`./CAMP` contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-`./NRA` contains support for the Nested Relational Algebra (NRA)
-`./NRAEnv` contains support for the extension of NRA with environments
-`./NNRC` contains support for the Named Nested Relational Calculus (NNRC)
-`./DNNRC` contains support for the Distributed Named Nested Relational Calculus (DNNRC)
-
-Translations:
-
-`./Translation` contains translations between ILs
-`./Backend` contains backend support and code generation
-`./Frontend` contains surface language support (except for jRules)
-
-Toplevel:
-
-`./Compiler` contains the overall compiler instructure and functional optimizers
-`./Tests` contains various coq self-tests
-
-(`./Updates` is early code for updates that isn't part of the actual compiler)
+Inside the [`./coq`](./coq) directory, the organization is as follows.
+- Foundational modules:
+  [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
+  [`./Basic/Data`](./coq/Basic/Data) contains the core data model
+  [`./Basic/Operators`](./coq/Basic/Operators) contains unary/binary operators shared across ILs
+  [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
+  [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
+- Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
+  [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+  [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
+  [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
+  [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
+  [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+- Translations:
+  [`./Translation`](./coq/Translation) contains translations between ILs
+  [`./Backend`](./coq/Backend) contains backend support and code generation
+  [`./Frontend`](./coq/Frontend) contains surface language support (except for jRules)
+- Toplevel:
+  [`./Compiler`](./coq/Compiler) contains the overall compiler instructure and functional optimizers
+  [`./Tests`](./coq/Tests) contains various coq self-tests
+  ([`./Updates`](./coq/Updates) is early code for updates that isn't part of the actual compiler)
 
 ## License
 
@@ -240,17 +231,17 @@ Manuscript. http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf
 
 [ODMG30] Jeff Eastman, et al. The object data standard: ODMG
 3.0. Eds. Roderic Geoffrey Galton Cattell, and Douglas
-K. Barry. Vol. 1. San Francisco: Morgan Kaufmann, 2000.
+K. Barry. Vol. 1. San Francisco: Morgan Kaufmann, 2000. http://www.odbms.org/odmg-standard/odmg-book/
 
 [SSH15] Avraham Shinnar, Jérôme Siméon, and Martin Hirzel. "A Pattern
 Calculus for Rule Languages: Expressiveness, Compilation, and
 Mechanization." 29th European Conference on Object-Oriented
-Programming. 2015.
+Programming. 2015. http://hirzels.com/martin/papers/ecoop15-rules-nra.pdf
 
 [SS16] Avraham Shinnar and Jérôme Siméon. "Nominal Typing for Data
 Languages". Technical Report, IBM. July 2016
 
 [Zah12] Matei Zaharia, et al. "Fast and interactive analytics over
-Hadoop data with Spark." USENIX; login 37.4 (2012): 45-51.
+Hadoop data with Spark." USENIX; login 37.4 (2012): 45-51. https://www.usenix.org/publications/login/august-2012-volume-37-number-4/fast-and-interactive-analytics-over-hadoop-data
 
 

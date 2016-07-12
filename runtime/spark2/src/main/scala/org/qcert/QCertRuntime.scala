@@ -30,16 +30,7 @@ import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
 
-  val worldType = test07InputType
-
-  def castToCustomerAndUnbrand(r: Row): Either = {
-    if (r.getSeq[String](r.fieldIndex("$type")).contains("entities.Customer")) {
-      val blob = r.getAs[Row]("$data").getAs[String]("$blob")
-      left(fromBlob(wrappedCustomerType, blob).asInstanceOf[Row])
-    } else {
-      right(srow(StructType(Seq())))
-    }
-  }
+  val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(world: Dataset[Either]): Unit = {
     val f = world.first()
@@ -90,15 +81,6 @@ abstract class QCertRuntime {
       StructField("doubleAttribute", DoubleType) ::
         StructField("id", IntegerType) ::
         StructField("stringId", StringType) :: Nil)
-
-  def test07InputType =
-    StructType(
-      StructField("$type", ArrayType(StringType)) ::
-        StructField("$data", StructType(
-          StructField("$known", StructType(Nil)) ::
-            StructField("$blob", StringType) :: Nil
-        )) :: Nil
-    )
 
   val CONST$WORLD_07 = Nil
 
@@ -178,7 +160,6 @@ abstract class QCertRuntime {
   def fromBlob(t: DataType, b: String): Any =
     fromBlob(t, new com.google.gson.JsonParser().parse(b))
 
-  // TODO we might be better off writing a custom gson serializer
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
     case true => "true"
@@ -186,9 +167,21 @@ abstract class QCertRuntime {
     case s: String => gson.toJson(s)
     case a: mutable.WrappedArray[_] =>
       a.map(toBlob(_)).mkString("[", ", ", "]")
-    case r: Row =>
-      // https://issues.scala-lang.org/browse/SI-6476
-      r.schema.fieldNames.map(f => "\"" + f + "\" : " + toBlob(r.getAs[Any](f))).mkString("{", ", ", "}")
+    case a: Array[_] =>
+      a.map(toBlob(_)).mkString("[", ", ", "]")
+    case r: Row => r.schema.fieldNames match {
+      case Array("$left", "$right") =>
+        if (r.isNullAt(1))
+          "{\"left\":" ++ toBlob(r(0))
+        else
+          "{\"right\":" ++ toBlob(r(1))
+      case Array("$data", "$type") =>
+        "{\"type\": " ++ toBlob(r(1)) ++ ", \"data\": " ++ toBlob(r(0)) ++ "}"
+      case Array("$blob", "$known") =>
+        // NOTE we keep the full record in the blob field
+        r.getString(0)
+      case _ => sys.error("Illformed record schema: " ++ r.schema.toString())
+    }
   }
 
   /* Records
@@ -331,6 +324,10 @@ abstract class QCertRuntime {
         srow(t, blob, known)
       // TODO incomplete
     }
+    case (blob: String, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") => fromBlob(t, blob)
+      // TODO incomplete
+    }
     // TODO incomplete
   }
 
@@ -382,6 +379,14 @@ abstract class QCertRuntime {
     }
     res
   }*/
+
+  // We can do O(1) min and max, because we keep bags sorted
+  // The default 0 for empty bags comes from the Coq semantics
+  def anummax(b: Array[Int]): Int =
+    if (b.isEmpty) 0 else b(b.length-1)
+
+  def anummin(b: Array[Int]): Int =
+    if (b.isEmpty) 0 else b(0)
 
   /* Sorting & equality
  * ==================

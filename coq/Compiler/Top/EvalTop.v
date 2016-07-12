@@ -84,7 +84,7 @@ Module EvalTop(runtime:CompilerRuntime).
   Definition dnrc_eval_top (h:list (string*string))
              (e:@dnrc_algenv _ bool) (world:list data) : option data :=
     let tenv := mkDistWorld world in
-    lift localize_data (@dnrc_eval _ h _ _ _ tenv e).
+    lift localize_data (dnrc_eval h tenv e).
   
   (******************
    * NNRCMR Section *

@@ -97,3 +97,12 @@ let sexp_algenv_top conf (fname,op) =
     make_file fout_nrcmr_cldmr display_nrcmr_cldmr
   end
 
+let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
+  let fpref = Filename.chop_extension fname in
+  let fout_sdata = outname (target_f (get_data_dir conf) fpref) (suffix_sdata ()) in
+  let sdata =
+    String.concat "\n" sdata
+  in
+  make_file fout_sdata sdata
+
+

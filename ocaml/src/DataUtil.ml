@@ -15,10 +15,13 @@
  *)
 
 open Util
-open ConfigUtil
 open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
+
+type serialization_format =
+  | META
+  | ENHANCED
 
 type io_hierarchy = Data.json
 type io_json = Data.json option
@@ -27,6 +30,9 @@ type io_hierarchy_list = (string * string) list
 type io_input = Data.data list
 type io_output = Data.data list
 
+type rtype_content = Data.json
+type json_schema = (io_hierarchy_list * Data.json * Data.json) option
+type model_content = string * (string * string) list * (string * rtype_content) list
 
 let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * Data.json * Data.json =
     match od with
@@ -103,14 +109,14 @@ let build_type_defs bts =
   | _ ->
       raise (CACo_Error "Ill-formed typeDefs")
 
-let get_input conf od =
+let get_input format od =
   match get_io_content od with
   | (i, h, _, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match i with
       | Compiler.Jarray l ->
 	  begin
-	    match get_format conf with
+	    match format with
 	    | META -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
 	    | ENHANCED -> List.map (Data.json_enhanced_to_data h) l (* in coq so we can prove properties on conversions *)
 	  end

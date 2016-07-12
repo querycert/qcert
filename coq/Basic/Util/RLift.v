@@ -31,6 +31,8 @@ Section RLift.
       | Some x' => f x'
     end.
 
+  Definition bind {A B:Type} a b := (@olift A B b a).
+
   Definition olift_some {A B} (f:A -> option B) (x:A) :
     olift f (Some x) = f x.
   Proof. reflexivity. Qed.

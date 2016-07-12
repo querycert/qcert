@@ -55,11 +55,18 @@ Module CompType(runtime:CompilerRuntime).
   
   Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
 
+  Definition json_to_rtype_with_fail {m:brand_relation} := json_to_rtype_with_fail.
+
   (* JSON -> sdata string *)
   Require SparkData.
+  Require RData.
+  Require TOpsInfer.
 
-  Definition json_to_sjson br (m:brand_model) : JSON.json -> JSON.json -> option String.string
-    := @SparkData.json_to_sjson _ br _ _ m _.
+  Definition camp_type_uncoll (m:brand_model) : camp_type -> option camp_type
+    := @TOpsInfer.tuncoll _ m.
+  
+  Definition data_to_sjson (m:brand_model) : data -> camp_type -> option String.string
+    := @SparkData.data_to_sjson _ _ _ m.
 
 End CompType.
 

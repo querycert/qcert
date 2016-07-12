@@ -16,7 +16,7 @@
 
 Require Import String.
 Require Import Utils BasicRuntime.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -30,6 +30,7 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_to_java : foreign_to_java.
   Axiom compiler_foreign_to_javascript : foreign_to_javascript.
   Axiom compiler_foreign_to_JSON : foreign_to_JSON.
+  Axiom compiler_foreign_type_to_JSON : foreign_type_to_JSON.
   Axiom compiler_foreign_reduce_op : foreign_reduce_op.
   Axiom compiler_foreign_to_reduce_op : foreign_to_reduce_op.
   Axiom compiler_foreign_to_spark : foreign_to_spark.

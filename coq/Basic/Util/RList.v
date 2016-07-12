@@ -510,6 +510,39 @@ Section RList.
       constructor; eauto.
     Qed.
 
+  Global Instance Forall2_pre {A} R `{PreOrder A R} : PreOrder (Forall2 R).
+  Proof.
+    destruct H.
+      constructor; red.
+    - apply Forall2_refl; trivial.
+    - apply Forall2_trans; trivial.
+  Qed.
+
+  Global Instance Forall2_part_eq {A} R `{PartialOrder A eq R } :
+    PartialOrder eq (Forall2 R).
+  Proof.
+    intros l1 l2.
+    split; intros HH.
+    - repeat red; subst; intuition.
+    - repeat red in HH; intuition.
+      revert l2 H0 H1.
+      induction l1; destruct l2; trivial; intros F1 F2;
+        invcs F1; invcs F2.
+      + f_equal.
+        * apply antisymmetry; trivial.
+        * apply IHl1; trivial.
+  Qed.
+  
+  Lemma Forall2_trans_relations_weak {A B C}
+        (R1:A->B->Prop) (R2:B->C->Prop) (R3:A->C->Prop):
+    (forall a b c, R1 a b -> R2 b c -> R3 a c) ->
+    forall a b c, Forall2 R1 a b -> Forall2 R2 b c -> Forall2 R3 a c.
+  Proof.
+    intros pf.
+    induction a; intros b c Fab Fbc
+    ; invcs Fab; invcs Fbc; eauto.
+  Qed.
+
     Lemma Forall2_eq {A} (l1 l2:list A): Forall2 eq l1 l2 <-> l1 = l2.
     Proof.
       split; intros; subst; [ | reflexivity ].

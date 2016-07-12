@@ -17,7 +17,7 @@
 Require Import List EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -28,7 +28,34 @@ Require Import DateTimeModelPart.
 Require NNRCMR CloudantMR.
 Require Import OptimizerLogger String RAlgEnv NNRC.
 
+Import ListNotations.
+
 Local Open Scope list_scope.
+
+(* TODO: these should move *)
+Definition check_subtype_pairs
+           {br:brand_relation}
+           {fr:foreign_type}
+           (l:list (rtype*rtype)) : bool
+  := forallb (fun τs => if subtype_dec (fst τs) (snd τs) then true else false) l.
+
+Definition enforce_unary_op_schema
+           {br:brand_relation}
+           {fr:foreign_type}
+           (ts1:rtype*rtype) (tr:rtype)
+  : option (rtype*rtype)
+  := if check_subtype_pairs (ts1::nil)
+    then Some (tr, (snd ts1))
+    else None.
+
+Definition enforce_binary_op_schema
+           {br:brand_relation}
+           {fr:foreign_type}
+           (ts1:rtype*rtype) (ts2:rtype*rtype) (tr:rtype)
+  : option (rtype*rtype*rtype)
+  := if check_subtype_pairs (ts1::ts2::nil)
+    then Some (tr, (snd ts1), (snd ts2))
+    else None.
 
 Inductive enhanced_data : Set
   :=
@@ -49,6 +76,29 @@ Inductive enhanced_type : Set
   | enhancedTimeDuration : enhanced_type
   | enhancedTimePoint : enhanced_type
 .
+
+Definition enhanced_type_to_string (et:enhanced_type) : string :=
+  match et with
+  | enhancedTop => "ETop"
+  | enhancedBottom => "EBottom"
+  | enhancedFloat => "EFloat"
+  | enhancedString => "EString"
+  | enhancedTimeScale => "ETimeScale"
+  | enhancedTimeDuration => "ETimeDuration"
+  | enhancedTimePoint => "ETimePoint"
+  end.
+
+Definition string_to_enhanced_type (s:string) : option enhanced_type :=
+  match s with
+  | "ETop"%string => Some enhancedTop
+  | "EBottom"%string => Some enhancedBottom
+  | "EFloat"%string => Some enhancedFloat
+  | "EString"%string => Some enhancedString
+  | "ETimeScale"%string => Some enhancedTimeScale
+  | "ETimeDuration"%string => Some enhancedTimeDuration
+  | "ETimePoint"%string => Some enhancedTimePoint
+  | _ => None
+  end.
 
 Require Import RelationClasses Equivalence.
 
@@ -1111,6 +1161,15 @@ Next Obligation.
   destruct a; destruct b; try solve [left; constructor | right; inversion 1].
 Defined.
 
+Program Instance enhanced_foreign_type_to_JSON : foreign_type_to_JSON
+  := mk_foreign_type_to_JSON enhanced_foreign_type _ _.
+Next Obligation.
+  exact (string_to_enhanced_type s).
+Defined.
+Next Obligation.
+  exact (enhanced_type_to_string fd).
+Defined.
+
 Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 | enhanced_has_type_top fd : enhanced_has_type fd enhancedTop
 | enhanced_has_type_float (f:FLOAT) : enhanced_has_type (enhancedfloat f) enhancedFloat
@@ -1176,6 +1235,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_javascript.
   Definition compiler_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
+  Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
+    := enhanced_foreign_type_to_JSON.
   Definition compiler_foreign_reduce_op : foreign_reduce_op
     := enhanced_foreign_reduce_op.
   Definition compiler_foreign_to_reduce_op : foreign_to_reduce_op
@@ -1307,6 +1368,28 @@ Definition float_unary_op_type_infer {model : brand_model} (op:float_unary_op) (
     end
   end.
 
+Definition float_unary_op_type_infer_sub {model : brand_model} (op:float_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
+  match op with
+  | uop_float_neg
+  | uop_float_sqrt
+  | uop_float_exp
+  | uop_float_log
+  | uop_float_log10
+  | uop_float_ceil
+  | uop_float_floor
+  | uop_float_abs =>
+    enforce_unary_op_schema (τ₁,Float) Float
+  | uop_float_of_int =>
+    enforce_unary_op_schema (τ₁,Nat) Float
+  | uop_float_truncate =>
+    enforce_unary_op_schema (τ₁,Float) Nat
+  | uop_float_sum
+  | uop_float_arithmean
+  | uop_float_listmin
+  | uop_float_listmax =>
+    enforce_unary_op_schema (τ₁,Coll Float) Float
+  end.
+
 Lemma rondcollfloat_typed_some
       {model:brand_model}
       (f: list FLOAT -> FLOAT)
@@ -1372,6 +1455,16 @@ Definition time_unary_op_type_infer {model : brand_model} (op:time_unary_op) (τ
     if isString τ₁ then Some TimePoint else None
   | uop_time_duration_from_string =>
     if isString τ₁ then Some TimeDuration else None
+  end.
+
+Definition time_unary_op_type_infer_sub {model : brand_model} (op:time_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
+  match op with
+  | uop_time_to_scale =>
+    enforce_unary_op_schema (τ₁,TimePoint) TimeScale
+  | uop_time_from_string =>
+    enforce_unary_op_schema (τ₁,RType.String) TimePoint
+  | uop_time_duration_from_string =>
+    enforce_unary_op_schema (τ₁,RType.String) TimeDuration
   end.
 
 Lemma time_unary_op_typing_sound {model : brand_model}
@@ -1530,6 +1623,13 @@ Qed.
       inversion H2; subst; clear H2.
       + simpl in H; congruence.
   Qed.
+
+  Definition enhanced_unary_op_typing_infer_sub {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option (rtype*rtype) :=
+    match fu with
+    | enhanced_unary_float_op op => float_unary_op_type_infer_sub op τ
+    | enhanced_unary_time_op op => time_unary_op_type_infer_sub op τ
+    end.
+
     
 Lemma enhanced_unary_op_typing_sound {model : brand_model}
       (fu : foreign_unary_op_type) (τin τout : rtype) :
@@ -1559,6 +1659,7 @@ Instance enhanced_foreign_unary_op_typing
        ; foreign_unary_op_typing_infer_correct := enhanced_unary_op_typing_infer_correct
        ; foreign_unary_op_typing_infer_least := enhanced_unary_op_typing_infer_least
        ; foreign_unary_op_typing_infer_complete := enhanced_unary_op_typing_infer_complete
+       ; foreign_unary_op_typing_infer_sub := enhanced_unary_op_typing_infer_sub
      }.
 
 Inductive float_binary_op_has_type {model:brand_model} :
@@ -1633,6 +1734,24 @@ Proof.
           repeat constructor.
 Qed.
 
+Definition float_binary_op_type_infer_sub {model : brand_model} (op:float_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype):=
+  match op with
+  | bop_float_plus
+  | bop_float_minus
+  | bop_float_mult
+  | bop_float_div
+  | bop_float_pow
+  | bop_float_min
+  | bop_float_max =>
+    enforce_binary_op_schema (τ₁, Float) (τ₂, Float) Float
+  | bop_float_ne
+  | bop_float_lt
+  | bop_float_le
+  | bop_float_gt
+  | bop_float_ge =>
+    enforce_binary_op_schema (τ₁, Float) (τ₂, Float) Bool
+  end.
+
 Inductive time_binary_op_has_type {model:brand_model} :
   time_binary_op -> rtype -> rtype -> rtype -> Prop
   :=
@@ -1698,6 +1817,24 @@ Proof.
         eexists; split; try reflexivity;
           repeat constructor.
 Qed.
+           
+Definition time_binary_op_type_infer_sub {model : brand_model} (op:time_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
+  match op with
+  | bop_time_as =>
+    enforce_binary_op_schema (τ₁,TimePoint) (τ₂,TimeScale) TimePoint
+  | bop_time_shift =>
+    enforce_binary_op_schema (τ₁,TimePoint) (τ₂,TimeDuration) TimePoint
+  | bop_time_ne
+  | bop_time_lt
+  | bop_time_le
+  | bop_time_gt
+  | bop_time_ge =>
+    enforce_binary_op_schema (τ₁,TimePoint) (τ₂,TimePoint) Bool
+  | bop_time_duration_from_scale =>
+    enforce_binary_op_schema (τ₁,TimeScale) (τ₂,Nat) TimeDuration
+  | bop_time_duration_between  =>
+    enforce_binary_op_schema (τ₁,TimePoint) (τ₂,TimePoint) TimeDuration
+  end.
 
 Inductive enhanced_binary_op_has_type {model:brand_model} :
   enhanced_binary_op -> rtype -> rtype -> rtype -> Prop
@@ -1799,6 +1936,12 @@ Proof.
     destruct t; simpl in *; invcs H1; simpl in H; try discriminate.
 Qed.
 
+Definition enhanced_binary_op_typing_infer_sub {model:brand_model} (op:enhanced_binary_op) (τ₁ τ₂:rtype) :=
+  match op with
+  | enhanced_binary_float_op fb => float_binary_op_type_infer_sub fb τ₁ τ₂
+  | enhanced_binary_time_op fb => time_binary_op_type_infer_sub fb τ₁ τ₂
+  end.
+
 Lemma enhanced_binary_op_typing_sound {model : brand_model}
       (fu : foreign_binary_op_type) (τin₁ τin₂ τout : rtype) :
   enhanced_binary_op_has_type fu τin₁ τin₂ τout ->
@@ -1827,7 +1970,9 @@ Program Instance enhanced_foreign_binary_op_typing
        ; foreign_binary_op_typing_infer := enhanced_binary_op_typing_infer
        ; foreign_binary_op_typing_infer_correct := enhanced_binary_op_typing_infer_correct
        ; foreign_binary_op_typing_infer_least := enhanced_binary_op_typing_infer_least
-       ; foreign_binary_op_typing_infer_complete := enhanced_binary_op_typing_infer_complete }.
+       ; foreign_binary_op_typing_infer_complete := enhanced_binary_op_typing_infer_complete
+       ; foreign_binary_op_typing_infer_sub := enhanced_binary_op_typing_infer_sub
+     }.
 
 Instance enhanced_foreign_typing {model:brand_model}:
   @foreign_typing
@@ -1868,6 +2013,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_javascript.
   Definition compiler_model_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
+  Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
+    := enhanced_foreign_type_to_JSON.
   Definition compiler_model_foreign_reduce_op : foreign_reduce_op
     := enhanced_foreign_reduce_op.
   Definition compiler_model_foreign_to_reduce_op : foreign_to_reduce_op
@@ -1888,6 +2035,18 @@ End EnhancedModel.
 
 Module CompEnhanced.
   Module Enhanced.
+  Module Model.
+    Definition basic_model (bm:brand_model) : basic_model
+      := @enhanced_basic_model bm.
+
+    Definition foreign_type : foreign_type
+      := enhanced_foreign_type.
+
+    Definition foreign_typing (bm:brand_model) : foreign_typing
+      := @enhanced_foreign_typing bm.
+
+  End Model.
+
     Module Data.
       Definition dfloat (f : FLOAT) : data
         := dforeign (enhancedfloat f).

@@ -45,10 +45,9 @@ Section TOpsInfer.
     - exact None.
     - exact None.
     - exact None.
-    - generalize (Either₀_wf_inv e); intros.
-      elim H; intros; clear H.
-      exact (Some (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 H0,
-                   exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 H1)). 
+    - refine (Some ((exist _ x1 _),(exist _ x2 _))).
+      + simpl in e; rewrite andb_true_iff in e; tauto.
+      + simpl in e; rewrite andb_true_iff in e; tauto.
     - exact None.
     - exact None.
     - exact None.

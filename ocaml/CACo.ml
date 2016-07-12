@@ -39,11 +39,21 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
      let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) env_var mr)
   | Spark2 ->
+      let io =
+	match get_comp_io conf with
+	| Some io -> io
+	| None -> raise (Failure "Spark2 target requires a schema I/O file")
+      in
+      let (schema_content,wmType) = TypeUtil.extract_schema io in
+      let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
       let e = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
+      let m = Enhanced.Model.basic_model brand_model in
       string_of_char_list
 	(CompBack.dnrc_to_scala_code_gen
-	   []
-	   (ModelUtil.make_empty_model ()) (Util.char_list_of_string nrule) e)
+           Enhanced.Model.foreign_type
+           brand_model
+           (Enhanced.Model.foreign_typing brand_model)
+	   wmRType (Util.char_list_of_string nrule) e)
   | Cloudant ->
       let cld_conf = get_cld_config lconf in
       cloudant_compile_from_nra (get_cld cld_conf) (get_harness cld_conf) (idioticize (get_prefix cld_conf) nrule) op (DataUtil.get_hierarchy_cloudant (get_comp_io conf))
@@ -62,7 +72,7 @@ let args conf =
     ("-source", Arg.String (change_source (get_comp_lang_config conf)), "(Rule/OQL)");
     ("-dir", Arg.String (set_dir conf), "Target directory");
     ("-harness", Arg.String (set_harness (get_cld_config (get_comp_lang_config conf))), "Javascript Harness");
-    ("-io", Arg.String (fun f -> set_comp_io conf (ParseFile.parse_io_from_file f)), "Hierarchy");
+    ("-io", Arg.String (fun f -> set_comp_io conf (ParseFile.parse_io_from_file f)), "Schema");
     ("-stats", Arg.Unit (set_stats conf), "Produce statistics for produced query plans");
     ("-display-ils", Arg.Unit (set_display conf), "Display Intermediate Languages (NRAEnv, NNRC, NNRCMR)");
     ("-display-sexps", Arg.Unit (set_display_sexp conf), "Display Intermediate Languages (NRA) in S-expr form");

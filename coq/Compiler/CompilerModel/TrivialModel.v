@@ -15,7 +15,7 @@
  *)
 
 Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -142,8 +142,11 @@ Defined.
       trivial_foreign_data_typing
       model
     := mk_foreign_unary_op_typing
-         _ _ _ _ _
+         _ _ _ _ _ _
          _ _ _ _ _ _.
+  Next Obligation.
+    destruct fu.
+  Defined.
   Next Obligation.
     destruct fu.
   Defined.
@@ -173,8 +176,11 @@ Defined.
       trivial_foreign_data_typing
       model
     := mk_foreign_binary_op_typing
-         _ _ _ _ _
+         _ _ _ _ _ _
          _ _ _ _ _ _.
+  Next Obligation.
+    destruct fb.
+  Defined.
   Next Obligation.
     destruct fb.
   Defined.
@@ -232,6 +238,15 @@ Defined.
 
   Program Instance trivial_foreign_to_JSON : foreign_to_JSON
     := mk_foreign_to_JSON trivial_foreign_data _ _.
+  Next Obligation.
+    exact None.
+  Defined.
+  Next Obligation.
+     destruct fd. 
+  Defined.
+
+  Program Instance trivial_foreign_type_to_JSON : foreign_type_to_JSON
+    := mk_foreign_type_to_JSON trivial_foreign_type _ _.
   Next Obligation.
     exact None.
   Defined.
@@ -299,6 +314,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_javascript.
     Definition compiler_foreign_to_JSON : foreign_to_JSON
       := trivial_foreign_to_JSON.
+    Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
+      := trivial_foreign_type_to_JSON.
     Definition compiler_foreign_reduce_op : foreign_reduce_op
       := trivial_foreign_reduce_op.
     Definition compiler_foreign_to_reduce_op : foreign_to_reduce_op
@@ -334,6 +351,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_javascript.
     Definition compiler_model_foreign_to_JSON : foreign_to_JSON
       := trivial_foreign_to_JSON.
+    Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
+      := trivial_foreign_type_to_JSON.
     Definition compiler_model_foreign_reduce_op : foreign_reduce_op
       := trivial_foreign_reduce_op.
     Definition compiler_model_foreign_to_reduce_op : foreign_to_reduce_op

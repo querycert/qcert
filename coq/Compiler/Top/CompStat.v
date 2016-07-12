@@ -26,100 +26,114 @@ Require Import ODMGRuntime.
 Require Import CompilerRuntime.
 Module CompStat(runtime:CompilerRuntime).
 
-  Require Import PatterntoNRAEnv NRAtoNNRC.
-
-    Definition stat_rule_source (r:rule) : Z :=
-    (Z_of_nat (pat_size (rule_to_pattern r))).
-  
-    Definition stat_pattern_source (p:pat) : Z :=
-    (Z_of_nat (pat_size p)).
-  
-    Definition stat_oql_source (e:oql_expr) : Z :=
-      (Z_of_nat (oql_size e)).
-  
-  (* Naive *)
-
-  Definition stat_algenv_no_optim (op:algenv) : Z * Z :=
-    let algenv := op in
-    (Z_of_nat (algenv_size algenv), Z_of_nat (algenv_depth algenv)).
-  
-  Definition stat_alg_no_optim (op:algenv) : Z * Z :=
-    let alg := alg_of_algenv op in
-    (Z_of_nat (alg_size alg), Z_of_nat (alg_depth alg)).
-  
-  Definition stat_nrc_no_optim (op:algenv) : Z :=
-    let alg := alg_of_algenv op in
-    Z_of_nat (nrc_size (nra_to_nnrc alg "id"%string)).
-
-  (* Compiler *)
-
+  Require Import RuletoNRA PatterntoNRA PatterntoNRAEnv NRAtoNNRC NRAEnvtoNNRC.
   Require Import CompCore.
-
-  Module CC := CompCore runtime.
-
-  Definition tstat_algenv_typed_opt (op:algenv) : Z * Z :=
-    let algenv := CC.toptimize_algenv_typed_opt op in
-    (Z_of_nat (algenv_size algenv), Z_of_nat (algenv_depth algenv)).
-
-  Definition tstat_alg_typed_opt (op:algenv) : Z * Z :=
-    let alg := alg_of_algenv (CC.toptimize_algenv_typed_opt op) in
-    (Z_of_nat (alg_size alg), Z_of_nat (alg_depth alg)).
-
-  Definition tstat_nrc_typed_opt (op:algenv) : Z :=
-    Z_of_nat (nrc_size (CC.tcompile_nraenv_to_nnrc_typed_opt op)).
-
-  Local Open Scope string_scope.
-
-  Definition full_stats (sname:string) (ssize:Z) (op:algenv) : data :=
-    let (st_algenv_no1, st_algenv_no2) := (stat_algenv_no_optim op) in 
-    let (st_alg_no1, st_alg_no2) := (stat_alg_no_optim op) in 
-    let (tst_algenv_no1, tst_algenv_no2) := (tstat_algenv_typed_opt op) in 
-    let (tst_alg_no1, tst_alg_no2) := (tstat_alg_typed_opt op) in 
-    drec (("Source", dstring sname)
-            :: ("Source Size", dnat ssize)
-            :: ("No Optim Size", drec (("NRAEnv", dnat st_algenv_no1)
-                                         :: ("NRAEnv Depth", dnat st_algenv_no2)
-                                         :: ("NRA",dnat st_alg_no1)
-                                         :: ("NRA Depth", dnat st_alg_no2)
-                                         :: ("NNRC",dnat (stat_nrc_no_optim op))
-                                         :: nil))
-            :: ("[TYPED] Optimized Size", drec (("NRAEnv", dnat tst_algenv_no1)
-                                         :: ("NRAEnv Depth", dnat tst_algenv_no2)
-                                         :: ("NRA",dnat tst_alg_no1)
-                                         :: ("NRA Depth", dnat tst_alg_no2)
-                                         :: ("NNRC",dnat (tstat_nrc_typed_opt op))
-                                         :: nil))
-            :: nil).
-
-
-  (* Top level *)
-  
+  Require Import TRewFunc.
+  Require Import CompUtil.
   Require Import CompFront.
   Require Import NNRCtoJavascript.
 
   Module CF := CompFront runtime.
-  
+
+  Module CC := CompCore runtime.
+
+  Local Open Scope string_scope.
+
+  Definition nra_optim (op: alg) : alg :=
+    let algenv_opt := (CC.toptimize_algenv_typed_opt (algenv_of_alg op)) in
+    if is_nra_fun algenv_opt then
+      deenv_alg algenv_opt
+    else
+      alg_of_algenv algenv_opt.
+
+  Definition stat_nnrc (e: nrc) : data :=
+    drec
+      (("nnrc_size", dnat (Z_of_nat (nrc_size e)))
+         :: ("nnrc_optim_size", dnat (Z_of_nat (nrc_size (trew e))))
+         :: nil).
+
+  Definition stat_body_nra (op:alg) : data :=
+    drec
+      (("nra_size", dnat (Z_of_nat (alg_size op)))
+         :: ("nra_depth", dnat (Z_of_nat (alg_depth op)))
+         :: ("nra_to_nnrc", stat_nnrc (nra_to_nnrc op init_vid))
+         :: nil).
+
+  Definition stat_nra (op:alg) : data :=
+    drec
+      (("nra_no_optim", stat_body_nra op)
+         :: ("nra_optim", stat_body_nra (nra_optim op))
+         :: nil).
+
+  Definition stat_body_nraenv (op:algenv) : data :=
+    drec
+      (("nraenv_size", dnat (Z_of_nat (algenv_size op)))
+         :: ("nraenv_depth", dnat (Z_of_nat (algenv_depth op)))
+         :: ("nraenv_to_nnrc", stat_nnrc (algenv_to_nnrc op init_vid init_venv))
+         :: ("nraenv_to_nra", stat_nra (alg_of_algenv op))
+         :: nil).
+
+  Definition stat_nraenv (op:algenv) : data :=
+    drec
+      (("nraenv_no_optim", stat_body_nraenv op)
+         :: ("nraenv_optim", stat_body_nraenv (CC.toptimize_algenv_typed_opt op))
+         :: ("nraenv_compiler", stat_nnrc (CC.tcompile_nraenv_to_nnrc_typed_opt op))
+         :: nil).
+
+  Definition stat_pat (p:pat) : data :=
+    drec
+      (("pat_size", dnat (Z_of_nat (pat_size p)))
+         :: ("pat_to_nraenv", stat_nraenv (CF.translate_pat_to_algenv p))
+         :: ("pat_to_nra", stat_nra (alg_of_pat p))
+         :: nil).
+
+  Definition stat_rule (r:rule) : data :=
+    drec
+      (("rule_size", dnat (Z_of_nat (pat_size (rule_to_pattern r))))
+         :: ("rule_to_nraenv", stat_nraenv (CF.translate_rule_to_algenv r))
+         :: ("rule_to_nra", stat_nra (alg_of_rule r))
+         :: nil).
+
+  Definition stat_oql (e:oql_expr) : data :=
+    drec
+      (("oql_size", dnat (Z_of_nat (oql_size e)))
+         :: ("oql_to_nraenv", stat_nraenv (CF.translate_oql_to_algenv e))
+         :: nil).
+
+
+  (* Top level *)
+
   Definition json_stats_oql (sname:string) (oql:oql_expr) : string :=
-    let ssize := stat_oql_source oql in
-    let op := CF.translate_oql_to_algenv oql in
-    let stat := full_stats sname ssize op in
+    let stat :=
+        drec
+          (("oql_name", dstring sname)
+             :: ("oql_stat", stat_oql oql)
+             :: nil)
+    in
     dataToJS quotel_double stat.
 
   Definition json_stats_rule (sname:string) (r:rule) : string :=
-    let ssize := stat_rule_source r in
-    let op := CF.translate_rule_to_algenv r in
-    let stat := full_stats sname ssize op in
+    let stat :=
+        drec
+          (("rule_name", dstring sname)
+             :: ("rule_stat", stat_rule r)
+             :: nil)
+    in
     dataToJS quotel_double stat.
 
   Definition json_stats_pattern (sname:string) (p:pat) : string :=
-    let ssize := stat_pattern_source p in
-    let op := CF.translate_pat_to_algenv p in
-    let stat := full_stats sname ssize op in
+    let stat :=
+        drec
+          (("pat_name", dstring sname)
+             :: ("pat_stat", stat_pat p)
+             :: nil)
+    in
     dataToJS quotel_double stat.
+
 
 End CompStat.
 
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***

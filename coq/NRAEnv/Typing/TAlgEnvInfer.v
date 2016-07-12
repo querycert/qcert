@@ -377,116 +377,61 @@ Section TAlgEnvInfer.
     - Case "ANEither"%string.
       unfold tuneither in H.
       destruct τin.
-      destruct x; simpl in *; try congruence.
-      unfold and_rec, and_rect in H.
-      destruct (Either₀_wf_inv e); simpl in *.
-      specialize (IHe1 τenv (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0) τout).
-      specialize (IHe2 τenv (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e3) τout).
-      assert (wf_rtype₀ x1 = true /\ wf_rtype₀ x2 = true).
-      apply andb_true_iff; assumption; clear e.
-      elim H0; intros.
-      rewrite (Either_canon x1 x2 _ H1 H2).
-      apply ANTEither.
-      + clear H0 H2 e.
-        case_eq (infer_algenv_type e1 τenv
-                                (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0)); intros;
-        rewrite H0 in *; try congruence.
-        case_eq (infer_algenv_type e2 τenv
-                                (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e3)); intros;
-        rewrite H2 in *; try congruence.
-        destruct (rtype_eq_dec r r0); try congruence.
-        inversion H.
-        subst.
-        specialize (IHe1 eq_refl).
-        assert (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0 =
-                exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 H1).
-        apply rtype_fequal; reflexivity.
-        rewrite <- H3.
-        assumption.
-      + clear H0 H1 e.
-        case_eq (infer_algenv_type e1 τenv
-                                (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x1 e0)); intros;
-        rewrite H0 in *; try congruence.
-        case_eq (infer_algenv_type e2 τenv
-                                (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e3)); intros;
-        rewrite H1 in *; try congruence.
-        destruct (rtype_eq_dec r r0); try congruence.
-        inversion H.
-        subst.
-        rewrite e in *.
-        specialize (IHe2 eq_refl).
-        assert (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 e3 =
-                exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) x2 H2).
-        apply rtype_fequal; reflexivity.
-        rewrite <- H3.
-        assumption.
+      destruct x; simpl in *; try discriminate.
+      match_case_in H; intros; rewrite H0 in H; try discriminate.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      match_destr_in H.
+      red in e0.
+      invcs H; subst.
+      specialize (IHe1 _ _ _ H0).
+      specialize (IHe2 _ _ _ H1).
+      erewrite Either_canon
+      ; eapply ANTEither
+      ; eauto.
     - Case "ANEitherConcat"%string.
       case_eq (infer_algenv_type e1 τenv τin); case_eq (infer_algenv_type e2 τenv τin); simpl in *; intros;
       rewrite H0 in *; rewrite H1 in *; try discriminate.
       unfold tuneither in H.
       destruct r0; simpl in H.
-      destruct x; simpl in H; try congruence.
-      unfold and_rec, and_rect in *.
-      destruct (Either₀_wf_inv e).
-      destruct x1; simpl in *; try congruence.
-      destruct r; simpl in *; try congruence.
-      destruct x; simpl in *; try congruence.
-      destruct k; simpl in *; try congruence.
-      destruct k0; simpl in *; try (destruct (from_Rec₀ srl e0); destruct (from_Rec₀ srl0 e4); simpl in H; try congruence).
-      destruct (from_Rec₀ srl e0); destruct (from_Rec₀ srl0 e4); simpl in H; try congruence.
-      destruct k0; simpl in *; try congruence.
-      destruct x2; simpl in *; try (destruct (from_Rec₀ srl e0); destruct (from_Rec₀ srl0 e4); simpl in H; try congruence);
-      case_eq (@RecMaybe (@basic_model_foreign_type m)
-            (@brand_model_relation (@basic_model_foreign_type m)
-               (@basic_model_brand_model m)) Closed
-            (@rec_concat_sort string ODT_string
-               (@sig (@rtype₀ (@basic_model_foreign_type m))
-                  (fun τ₀ : @rtype₀ (@basic_model_foreign_type m) =>
-                   @eq bool
-                     (@wf_rtype₀ (@basic_model_foreign_type m)
-                        (@brand_model_relation
-                           (@basic_model_foreign_type m)
-                           (@basic_model_brand_model m)) τ₀) true)) x x0)); intros; rewrite H2 in H; simpl in H; try congruence.
-      destruct k; simpl in *; try congruence.
-      destruct (from_Rec₀ srl1 e3); simpl in H; try congruence.
-      case_eq (@from_Rec₀ _ _ Closed srl1 e3); intros; rewrite H3 in H; clear H3; simpl in H; try congruence.
-      case_eq (RecMaybe Closed (rec_concat_sort x1 x0)); intros; rewrite H3 in H; simpl in H; try congruence.
-      inversion H; clear H H5 τout.
-      generalize RecMaybe_rec_concat_sort; intros.
-      assert (Some r = Some (Rec Closed (rec_concat_sort x x0) (drec_concat_sort_sorted x x0))).
-      rewrite <- H2; apply H.
-      inversion H4; clear H4.
+      destruct x; simpl in H; try discriminate.
+      destruct x1; simpl in H; try discriminate.
+      destruct r; simpl in H; try discriminate.
+      destruct x; simpl in H; try discriminate.
+      match goal with
+      | [H:context [from_Rec₀ _ ?x] |- _ ] => revert H; generalize x;
+                                                let pff := fresh "pf" in
+                                                intros pff H
+      end.
+      destruct k; simpl in H; try discriminate
+      ; destruct k0; simpl in H; try (destruct (from_Rec₀ srl pf); destruct (from_Rec₀ srl0 e0); simpl in H; try discriminate).
+      rewrite @RecMaybe_rec_concat_sort in H.
+      destruct x2; simpl in H; try discriminate.
+      match goal with
+      | [H:context [from_Rec₀ _ ?x] |- _ ] => revert H; generalize x;
+                                                let pff := fresh "pf" in
+                                                intros pff H
+      end.
+      destruct k; simpl in H; try discriminate
+      ; [ destruct (from_Rec₀ srl1 pf0); try discriminate | ].
+      case_eq (from_Rec₀ (k:=Closed) srl1 pf0); intros.
+      rewrite H2 in H.
+      rewrite @RecMaybe_rec_concat_sort in H.
+      invcs H.
+      specialize (IHe1 _ _ _ H1).
+      specialize (IHe2 _ _ _ H0).
+      destruct e3 as [? [??]].
+      destruct e4 as [? [??]].
+      destruct e5 as [? [??]].
       subst.
-      assert (Some r0 = Some (Rec Closed (rec_concat_sort x1 x0) (drec_concat_sort_sorted x1 x0))).
-      rewrite <- H3; apply H.
-      inversion H4; clear H4.
-      subst.
-      (* Unbox the proper domain-sorted proofs *)
-      elim e6; intros.
-      elim e7; intros.
-      elim e5; intros.
-      (* Apply main typing rule for concat *)
-      apply (@ANTEitherConcat m τconstants τenv τin x x4 x1 x3 x0 x2 _ _ e1 e2); try reflexivity.
-      (* Prove consistency with operands types *)
-      + clear H H2 H3 x2 H4 H0 e7 e6 e4 e5.
-        apply IHe1.
-        rewrite H1.
-        elim H6; intros; clear H6.
-        elim H5; intros; clear H5.
-        rewrite H0; rewrite H3.
-        f_equal.
-        apply rtype_fequal.
-        reflexivity.
-      + clear H H2 H3 H4 H1 e7 e5 H5 H6.
-        apply IHe2.
-        rewrite H0.
-        elim e6; intros; clear e6.
-        elim H; intros; clear H.
-        f_equal.
-        apply rtype_fequal.
-        simpl.
-        rewrite H1.
-        reflexivity.
+      destruct (Either_canon_ex _ _ e) as [pfl [pfr eqq]].
+      rewrite eqq in IHe1.
+      clear eqq.
+      destruct (to_Rec _ _ pfl) as [? eqq1].
+      destruct (to_Rec _ _ pfr) as [? eqq2].
+      rewrite eqq1, eqq2 in IHe1.
+      destruct (to_Rec _ _ e0) as [? eqq3].
+      rewrite eqq3 in IHe2.
+      eapply ANTEitherConcat; eauto.
     - Case "ANApp"%string.
       specialize (IHe2 τenv τin).
       destruct (infer_algenv_type e2 τenv τin).

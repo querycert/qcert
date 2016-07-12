@@ -32,3 +32,18 @@ In Spark, Datasets and nested arrays have to be homogenous, so to make this work
 We chose a JSON serialization.
 Note that we only need this for data inside the unknown part of open records and things at type Top.
 Since there is nothing you can *do* with this data except for passing it along, casting, comparing for equality, and printing it, the performance hit is expected to be small.
+
+
+TODO
+----
+
+details for
+
+- Any
+- Brands (recursion!)
+- Casts are potentially expensive (can we quantify that?)
+- D ;)
+- Either
+- Open records
+- Bags (sorted?, for equality (sorting is not enough to use built-in equality if we have to deserialize for equality..))
+- Equality (esp. open and closed records)

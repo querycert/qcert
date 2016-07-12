@@ -26,40 +26,37 @@ Section DNNRC.
   Require Import DData.
 
   Context {fruntime:foreign_runtime}.
-  Context {h:brand_relation_t}.
   
   (** Named Nested Relational Calculus *)
   
   Definition var := string.
 
   Section plug.
-    Context {T:Type}.
+    Context {plug_type:Set}.
 
     Class AlgPlug :=
       mkAlgPlug {
-          plug_eval : bindings -> T -> option data;
-          plug_normalized :
-            forall op:T, forall (constant_env:bindings) (o:data),
+          plug_eval : brand_relation_t -> bindings -> plug_type -> option data
+          ; plug_normalized :
+            forall (h:brand_relation_t) (op:plug_type), forall (constant_env:bindings) (o:data),
                 Forall (fun x => data_normalized h (snd x)) constant_env ->
-                plug_eval constant_env op = Some o -> data_normalized h o;
+                plug_eval h constant_env op = Some o -> data_normalized h o;
 (*        plug_equiv {h} (op1 op2:T) :
             forall (env:bindings),
               Forall (data_normalized h) (map snd env) ->
               plug_eval h env op1 = plug_eval h env op2 *)
         }.
 
-    Definition plug_abst : Type := (list string) * T.
-
-    Generalizable Variables T.
   End plug.
+  Global Arguments AlgPlug : clear implicits. 
   
   Section GenDNNRC.
     (* Type for DNRC AST annotations *)
-    Context {A:Type}.
+    Context {A plug_type:Set}.
 
     Unset Elimination Schemes.
 
-    Inductive dnrc {T} :=
+    Inductive dnrc  : Set :=
     | DNRCVar : A -> var -> dnrc
     | DNRCConst : A -> data -> dnrc
     | DNRCBinop : A -> binOp -> dnrc -> dnrc -> dnrc
@@ -70,12 +67,13 @@ Section DNNRC.
     | DNRCEither : A -> dnrc -> var -> dnrc -> var -> dnrc -> dnrc
     | DNRCCollect : A -> dnrc -> dnrc
     | DNRCDispatch : A -> dnrc -> dnrc
-    | DNRCAlg : A -> @plug_abst T -> list dnrc -> dnrc.
+    | DNRCAlg : A -> plug_type -> list (string * dnrc) -> dnrc.
 
     Set Elimination Schemes.
 
     (** Induction principles used as backbone for inductive proofs on dnrc *)
-    Definition dnrc_rect {T} (P : dnrc -> Type)
+
+    Definition dnrc_rect (P : dnrc -> Type)
                (fdvar : forall a, forall v, P (DNRCVar a v))
                (fdconst : forall a, forall d : data, P (DNRCConst a d))
                (fdbinop : forall a, forall b, forall n1 n2 : dnrc, P n1 -> P n2 -> P (DNRCBinop a b n1 n2))
@@ -87,7 +85,7 @@ Section DNNRC.
                        P n0 -> P n1 -> P n2 -> P (DNRCEither a n0 v1 n1 v2 n2))
                (fdcollect : forall a, forall n : dnrc, P n -> P (DNRCCollect a n))
                (fddispatch : forall a, forall n : dnrc, P n -> P (DNRCDispatch a n))
-               (fdalg : forall a, forall op:(@plug_abst T), forall r : list dnrc, Forallt (fun n => P n) r -> P (DNRCAlg a op r))
+               (fdalg : forall a, forall op:plug_type, forall r : list (string*dnrc), Forallt (fun n => P (snd n)) r -> P (DNRCAlg a op r))
       :=
         fix F (n : dnrc) : P n :=
           match n as n0 return (P n0) with
@@ -102,15 +100,15 @@ Section DNNRC.
           | DNRCCollect a n => fdcollect a n (F n)
           | DNRCDispatch a n => fddispatch a n (F n)
           | DNRCAlg a op r =>
-            fdalg a op r ((fix F3 (r : list dnrc) : Forallt (fun n => P n) r :=
+            fdalg a op r ((fix F3 (r : list (string * dnrc)) : Forallt (fun n => P (snd n)) r :=
                              match r as c0 with
                              | nil => Forallt_nil _
-                             | cons n c0 => @Forallt_cons _ (fun x => P x) n c0 (F n) (F3 c0)
+                             | cons n c0 => @Forallt_cons _ _ _ _ (F (snd n)) (F3 c0)
                              end) r)
           end.
 
     (** Induction principles used as backbone for inductive proofs on dnrc *)
-    Definition dnrc_ind {T} (P : dnrc -> Prop)
+    Definition dnrc_ind (P : dnrc -> Prop)
                (fdvar : forall a, forall v, P (DNRCVar a v))
                (fdconst : forall a, forall d : data, P (DNRCConst a d))
                (fdbinop : forall a, forall b, forall n1 n2 : dnrc, P n1 -> P n2 -> P (DNRCBinop a b n1 n2))
@@ -122,7 +120,7 @@ Section DNNRC.
                        P n0 -> P n1 -> P n2 -> P (DNRCEither a n0 v1 n1 v2 n2))
                (fdcollect : forall a, forall n : dnrc, P n -> P (DNRCCollect a n))
                (fddispatch : forall a, forall n : dnrc, P n -> P (DNRCDispatch a n))
-               (fdalg : forall a, forall op:(@plug_abst T), forall r : list dnrc, Forall (fun n => P n) r -> P (DNRCAlg a op r))
+               (fdalg : forall a, forall op:plug_type, forall r : list (string*dnrc), Forall (fun n => P (snd n)) r -> P (DNRCAlg a op r))
       :=
         fix F (n : dnrc) : P n :=
           match n as n0 return (P n0) with
@@ -137,16 +135,16 @@ Section DNNRC.
           | DNRCCollect a n => fdcollect a n (F n)
           | DNRCDispatch a n => fddispatch a n (F n)
           | DNRCAlg a op r =>
-            fdalg a op r ((fix F3 (r : list dnrc) : Forall (fun n => P n) r :=
+            fdalg a op r ((fix F3 (r : list (string*dnrc)) : Forall (fun n => P (snd n)) r :=
                              match r as c0 with
                              | nil => Forall_nil _
-                             | cons n c0 => @Forall_cons _ (fun x => P x) n c0 (F n) (F3 c0)
+                             | cons n c0 => @Forall_cons _ _ _ _ (F (snd n)) (F3 c0)
                              end) r)
           end.
 
-    Definition dnrc_rec {T} (P:dnrc->Set) := @dnrc_rect T P.
+    Definition dnrc_rec (P:dnrc->Set) := @dnrc_rect P.
 
-    Lemma dnrcInd2 {T} (P : dnrc -> Prop)
+    Lemma dnrcInd2 (P : dnrc -> Prop)
           (fdvar : forall a, forall v, P (DNRCVar a v))
           (fdconst : forall a, forall d : data, P (DNRCConst a d))
           (fdbinop : forall a, forall b, forall n1 n2 : dnrc, P (DNRCBinop a b n1 n2))
@@ -158,13 +156,45 @@ Section DNNRC.
                   P (DNRCEither a n0 v1 n1 v2 n2))
           (fdcollect : forall a, forall n : dnrc, P (DNRCCollect a n))
           (fddispatch : forall a, forall n : dnrc, P (DNRCDispatch a n))
-          (fdalg : forall a, forall op:(@plug_abst T), forall r : list dnrc, Forall (fun n => P n) r -> P (DNRCAlg a op r)) : forall n, P n.
+          (fdalg : forall a, forall op:plug_type, forall r : list (string*dnrc), Forall (fun n => P (snd n)) r -> P (DNRCAlg a op r))
+: forall n, P n.
     Proof.
       intros.
       apply dnrc_ind; trivial.
     Qed.
 
-    Fixpoint dnrc_eval `{plug: AlgPlug} (env:dbindings) (e:dnrc) : option ddata :=
+    Definition dnrc_annotation_get (d:dnrc) : A
+      := match d with
+         | DNRCVar a _ => a
+         | DNRCConst a _ => a
+         | DNRCBinop a _ _ _ => a
+         | DNRCUnop a _ _ => a
+         | DNRCLet a _ _ _ => a
+         | DNRCFor a _ _ _ => a
+         | DNRCIf a _ _ _ => a
+         | DNRCEither a _ _ _ _ _ => a
+         | DNRCCollect a _ => a
+         | DNRCDispatch a _ => a
+         | DNRCAlg a _ _ => a
+         end.
+
+    Definition dnrc_annotation_update (f:A->A) (d:dnrc) : dnrc
+      := match d with
+         | DNRCVar a v => DNRCVar (f a) v
+         | DNRCConst a c => DNRCConst (f a) c
+         | DNRCBinop a b d₁ d₂ => DNRCBinop (f a) b d₁ d₂
+         | DNRCUnop a u d₁ => DNRCUnop (f a) u d₁
+         | DNRCLet a x d₁ d₂ => DNRCLet (f a) x d₁ d₂
+         | DNRCFor a x d₁ d₂ => DNRCFor (f a) x d₁ d₂
+         | DNRCIf a d₀ d₁ d₂ => DNRCIf (f a) d₀ d₁ d₂
+         | DNRCEither a d₀ x₁ d₁ x₂ d₂ => DNRCEither (f a) d₀ x₁ d₁ x₂ d₂
+         | DNRCCollect a d₀ => DNRCCollect (f a) d₀
+         | DNRCDispatch a d₀ => DNRCDispatch (f a) d₀
+         | DNRCAlg a p args => DNRCAlg (f a) p args
+         end .
+
+    Context (h:brand_relation_t).
+    Fixpoint dnrc_eval `{plug: AlgPlug plug_type} (env:dbindings) (e:dnrc) : option ddata :=
       match e with
       | DNRCVar _ x =>
         lookup equiv_dec env x
@@ -214,14 +244,16 @@ Section DNNRC.
           Some (Ddistr c1)
         | _ => None
         end
-      | DNRCAlg _ closure nrclist =>
-        match listo_to_olist (map (fun a => olift checkDistrAndCollect (dnrc_eval env a)) nrclist) with
+      | DNRCAlg _ plug nrcbindings =>
+        match listo_to_olist (map (fun x =>
+               match dnrc_eval env (snd x) with
+               | Some (Ddistr coll) => Some (fst x, dcoll coll)
+               | _ => None
+               end) nrcbindings) with 
         | Some args =>
-          let aconstant_env := combine (fst closure) args in
-          match @plug_eval T plug aconstant_env (snd closure) with
-          | None => None
+          match plug_eval h args plug with
           | Some (dcoll c) => Some (Ddistr c)
-          | Some _ => None
+          | _ => None
           end
         | None => None
         end
@@ -230,72 +262,41 @@ Section DNNRC.
     (* evaluation preserves normalization *)
     Require Import DDataNorm.
 
-    Lemma dnrc_alg_bindings_normalized `{plug:AlgPlug} denv l l1 r :
+    Lemma dnrc_alg_bindings_normalized {plug:AlgPlug plug_type} denv l r :
       Forall (ddata_normalized h) (map snd denv) ->
-      (Forall
-        (fun n : dnrc =>
-         forall (denv : dbindings) (o : ddata),
-         dnrc_eval denv n = Some o ->
-         Forall (ddata_normalized h) (map snd denv) ->
-         ddata_normalized h o) r) ->
-      (rmap
-         (fun a : dnrc => olift checkDistrAndCollect (dnrc_eval denv a)) r =
-       Some l) ->
-        Forall (fun x : string * data => data_normalized h (snd x)) (combine l1 l).
-    Proof.
-      intro nEnv.
-      revert l1 r; induction l; intros; destruct r; intros; simpl in *;
-      [destruct l1; apply Forall_nil
-      |destruct l1; apply Forall_nil
-      |discriminate
-      | ].
-      rewrite Forall_forall in *; intros; simpl in *.
-      destruct x; simpl in *.
-      destruct l1; simpl in *; try contradiction.
-      inversion H1; intros; clear H1; simpl in *.
-      - inversion H2; subst; clear H2.
-        case_eq (olift checkDistrAndCollect (dnrc_eval denv d)); intros;
-        rewrite H1 in *; [|congruence].
-        case_eq (rmap (fun a : dnrc =>
-                         olift checkDistrAndCollect (dnrc_eval denv a)) r);
-          intros; rewrite H2 in *; simpl in *; [|congruence].
-        inversion H0; clear H0; subst.
-        assert (d = d \/ In d r) by (left; reflexivity).
-        unfold checkDistrAndCollect in H1.
-        case_eq (dnrc_eval denv d); intros; rewrite H3 in H1; simpl in H1;
-        try congruence.
-        specialize (H d H0 denv d1 H3).
-        rewrite Forall_forall in H.
-        assert (ddata_normalized h d1) by
-            apply (H nEnv).
-        destruct d1; simpl in *; try congruence.
-        inversion H1; subst; clear H1.
-        inversion H4. subst. constructor. assumption.
-      - assert (Forall
-          (fun n : dnrc =>
+      Forall
+        (fun n : string * dnrc =>
            forall (denv : dbindings) (o : ddata),
-           dnrc_eval denv n = Some o ->
-           Forall (ddata_normalized h) (map snd denv) ->
-           ddata_normalized h o) r).
-        + rewrite Forall_forall.
-          intros.
-          assert (d = x \/ In x r) by (right; assumption).
-          apply (H x H5 denv0); try assumption.
-        + case_eq (olift checkDistrAndCollect (dnrc_eval denv d)); intros;
-          rewrite H3 in *; [|congruence].
-          case_eq (rmap (fun a : dnrc =>
-                           olift checkDistrAndCollect (dnrc_eval denv a)) r);
-            intros; rewrite H4 in *; simpl in *; [|congruence].
-          inversion H0; subst; clear H0.
-          specialize (IHl l1 r H1).
-          rewrite H4 in IHl.
-          specialize (IHl eq_refl).
-          rewrite Forall_forall in IHl.
-          apply (IHl (s,d0)); simpl in *.
-          assumption.
+             dnrc_eval denv (snd n) = Some o ->
+             Forall (ddata_normalized h) (map snd denv) -> ddata_normalized h o) r ->
+      rmap
+         (fun x : string * dnrc =>
+          match dnrc_eval denv (snd x) with
+          | Some (Dlocal _) => None
+          | Some (Ddistr coll) => Some (fst x, dcoll coll)
+          | None => None
+          end) r = Some l ->
+   Forall (fun x : string * data => data_normalized h (snd x)) l.
+    Proof.
+      revert r; induction l; intros; trivial.
+      destruct r; simpl in * ; [invcs H1 | ] .
+      invcs H0.
+      case_eq (dnrc_eval denv (snd p))
+      ; intros; rewrite H0 in H1
+      ; try discriminate.
+      destruct d; try discriminate.
+      apply some_lift in H1.
+      destruct H1 as [? req eqq].
+      invcs eqq.
+      specialize (IHl _ H H5 req).
+      constructor; trivial.
+      simpl.
+      specialize (H4 _ _ H0 H).
+      invcs H4.
+      constructor; trivial.
     Qed.
 
-    Lemma dnrc_eval_normalized {T} {plug:@AlgPlug T} denv e {o} :
+    Lemma dnrc_eval_normalized {plug:AlgPlug plug_type} denv e {o} :
       dnrc_eval denv e = Some o ->
       Forall (ddata_normalized h) (map snd denv) ->
       ddata_normalized h o.
@@ -405,24 +406,24 @@ Section DNNRC.
       - simpl in H0.
         rewrite <- listo_to_olist_simpl_rmap in H0.
         case_eq (rmap
-                   (fun a : dnrc => olift checkDistrAndCollect (dnrc_eval denv a))
-                   r); intros; rewrite H2 in H0; try discriminate.
-        case_eq (plug_eval (combine (fst op) l) (snd op)); intros;
+           (fun x : string * dnrc =>
+            match dnrc_eval denv (snd x) with
+            | Some (Dlocal _) => None
+            | Some (Ddistr coll) => Some (fst x, dcoll coll)
+            | None => None
+            end) r); intros; rewrite H2 in H0; try discriminate.
+        case_eq (plug_eval h l op); intros;
         rewrite H3 in H0; simpl in *; try discriminate.
         destruct d; try discriminate.
         inversion H0; subst; clear H0.
-        destruct plug.
         assert (data_normalized h (dcoll l0)).
-        + destruct op; simpl in *.
-          apply (plug_normalized0 t (combine l1 l)).
-          * (* Prove constant env is normalized *)
-            apply (dnrc_alg_bindings_normalized denv l l1 r H1 H H2).
-          * assumption.
+        + apply (plug_normalized h op l (dcoll l0)); trivial.
+          eapply dnrc_alg_bindings_normalized; eauto.
         + constructor; inversion H0; assumption.
     Qed.
 
-    Corollary dnrc_eval_normalized_local {T} {plug:@AlgPlug T} denv e {d} :
-      @dnrc_eval _ plug denv e = Some (Dlocal d) ->
+    Corollary dnrc_eval_normalized_local {plug:AlgPlug plug_type} denv e {d} :
+      dnrc_eval denv e = Some (Dlocal d) ->
       Forall (ddata_normalized h) (map snd denv) ->
       data_normalized h d.
     Proof.
@@ -434,10 +435,11 @@ Section DNNRC.
          
   End GenDNNRC.
 
+  Global Arguments dnrc : clear implicits. 
   Section translation.
     Require Import NNRC.
 
-    Fixpoint nrc_to_dnrc {A} {T} (annot:A) (tenv:list (var*dlocalization)) (n:nrc) : @dnrc A T :=
+    Fixpoint nrc_to_dnrc {A:Set} {plug_type:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nrc) : dnrc A plug_type :=
       match n with
       | NRCVar v =>
         match lookup equiv_dec tenv v with
@@ -516,17 +518,17 @@ Section DNNRC.
       - apply IHdenv. apply H.
     Qed.
       
-    Lemma rmap_nrc_to_dnrc_correct {A} {T} {plug:@AlgPlug T} (annot:A) tenv denv v l n2 :
+    Lemma rmap_nrc_to_dnrc_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) tenv denv v l n2 :
       wf_denv tenv denv ->
       (forall (tenv : list (var * dlocalization))
              (denv : list (var * ddata)),
         wf_denv tenv denv ->
         lift Dlocal (nrc_eval h (localize_denv denv) n2) =
-        dnrc_eval denv (nrc_to_dnrc annot tenv n2)) ->
+        dnrc_eval h denv (nrc_to_dnrc annot tenv n2)) ->
         rmap
           (fun d1 : data =>
              olift checkLocal
-                   (dnrc_eval ((v, Dlocal d1) :: denv)
+                   (dnrc_eval h ((v, Dlocal d1) :: denv)
                                (nrc_to_dnrc annot ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nrc_eval h ((v, d1) :: localize_denv denv) n2) l.
     Proof.
       intros Hwf; intros.
@@ -543,10 +545,10 @@ Section DNNRC.
       assumption.
     Qed.
     
-    Lemma nrc_to_dnrc_correct {A} {T} (annot:A) {plug:@AlgPlug T} (tenv:list (var*dlocalization)) (n:nrc) :
+    Lemma nrc_to_dnrc_correct {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (tenv:list (var*dlocalization)) (n:nrc) :
       forall denv:list (var*ddata),
         wf_denv tenv denv ->
-        lift Dlocal (nrc_eval h (localize_denv denv) n) = dnrc_eval denv (nrc_to_dnrc annot tenv n).
+        lift Dlocal (nrc_eval h (localize_denv denv) n) = dnrc_eval h denv (nrc_to_dnrc annot tenv n).
     Proof.
       revert tenv; nrc_cases (induction n) Case; intros; simpl; intros.
       unfold wf_denv in H;
@@ -633,15 +635,15 @@ Section DNNRC.
     
     Definition nraenv_closure : Set := (list string) * algenv.
 
-    Definition nraenv_eval aconstant_env op :=
+    Definition nraenv_eval h aconstant_env op :=
       let aenv := drec nil in (* empty local environment to start, which is an empty record *)
       let aid := dcoll ((drec nil)::nil) in (* to be checked *)
       fun_of_algenv h aconstant_env op aenv aid.
 
-    Lemma nraenv_eval_normalized :
+    Lemma nraenv_eval_normalized h :
       forall op:algenv, forall (constant_env:bindings) (o:data),
       Forall (fun x => data_normalized h (snd x)) constant_env ->
-      nraenv_eval constant_env op = Some o ->
+      nraenv_eval h constant_env op = Some o ->
       data_normalized h o.
     Proof.
       intros.
@@ -678,6 +680,9 @@ Section DNNRC.
    *)
 
 End DNNRC.
+
+Global Arguments AlgPlug {fruntime} plug_type : clear implicits. 
+Global Arguments dnrc {fruntime} A plug_type: clear implicits. 
 
 Tactic Notation "dnrc_cases" tactic(first) ident(c) :=
   first;

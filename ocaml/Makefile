@@ -125,3 +125,5 @@ realclean:
 	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
 
 cleanall: realclean
+
+.NOTPARALLEL: 

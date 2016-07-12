@@ -13,7 +13,9 @@
 
     Section typ.
       
-  Inductive dnrc_type_sub `{tplug: TAlgPlug} {A} : tdbindings -> @dnrc _ A T -> drtype -> Prop :=
+      Inductive dnrc_type_sub {A plug_type:Set}
+                {plug:AlgPlug plug_type} {tplug: TAlgPlug plug_type} :
+        tdbindings -> dnrc A plug_type -> drtype -> Prop :=
       | TDNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnrc_type_sub tenv (DNRCVar a v) τ
       | TDNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnrc_type_sub tenv (DNRCConst a c) (Tlocal τ)
       | TDNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
@@ -59,12 +61,13 @@
             dnrc_type_sub tenv (DNRCDispatch a e) (Tdistr τ)
       (* Note: algebra 'plugged' expression is only well typed within distributed
          NNRC if it returns a collection *)
-      | TDNRCAlg {τl τout} tenv tbindings plug_abst tclosure nl :
+      | TDNRCAlg {τout} tenv tbindings op nl :
         forall (a:A),
-          Forall2 (fun n τ => dnrc_type_sub tenv n τ) nl τl ->
-          tcombine (fst tclosure) τl = Some tbindings ->
-           plug_typing (snd tclosure) tbindings (Coll τout) -> 
-           dnrc_type_sub tenv (DNRCAlg a plug_abst nl) (Tdistr τout)
+          Forall2 (fun n τ => fst n = fst τ
+                              /\ dnrc_type_sub tenv (snd n) (Tdistr (snd τ)))
+                  nl tbindings ->
+           plug_typing op tbindings (Coll τout) -> 
+           dnrc_type_sub tenv (DNRCAlg a op nl) (Tdistr τout)
       | TDNRCSubsumption {τenv τout} τenv' τout' e:
          tdbindings_sub τenv' τenv ->
          drtype_sub τout τout' ->
@@ -72,7 +75,7 @@
          dnrc_type_sub τenv' e τout'
       .
 
-      Global Instance dnrc_type_sub_proper `{tplug: TAlgPlug} {A} :
+      Global Instance dnrc_type_sub_proper {A plug_type:Set} {plug:AlgPlug plug_type} {tplug: TAlgPlug plug_type} :
         Proper (tdbindings_sub --> eq ==> drtype_sub ==> impl) (dnrc_type_sub (A:=A)).
       Proof.
         unfold Proper, respectful, flip, impl; intros.
@@ -99,7 +102,7 @@
 
     Section lift.
 
-      Lemma dnrc_type_to_dnrc_type_sub {A} {T} (plug:AlgPlug) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnrc _ A T) :
+      Lemma dnrc_type_to_dnrc_type_sub {A} (plug_type:Set) (plug:AlgPlug plug_type) {tplug:TAlgPlug plug_type} {τ} (env:dbindings) (tenv:tdbindings) (e:dnrc A plug_type) :
         dnrc_type tenv e τ ->
         dnrc_type_sub tenv e τ.
       Proof.
@@ -113,10 +116,10 @@
     End lift.
 
     (** Main lemma for the type correctness of DNNRC *)
-    Theorem typed_dnrc_yields_typed_data {A} {T} (plug:AlgPlug) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnrc _ A T) :
+    Theorem typed_dnrc_yields_typed_data {A} {plug_type:Set} (plug:AlgPlug plug_type) {tplug:TAlgPlug plug_type} {τ} (env:dbindings) (tenv:tdbindings) (e:dnrc A plug_type) :
     dbindings_type env tenv ->
     dnrc_type_sub tenv e τ ->
-    (exists x, (dnrc_eval env e) = Some x /\ (ddata_type x τ)).
+    (exists x, (dnrc_eval brand_relation_brands env e) = Some x /\ (ddata_type x τ)).
     Proof.
     intros.
     revert env H.
@@ -193,13 +196,13 @@
         assert (exists x1, rmap
            (fun d1 : data =>
             olift checkLocal
-              (dnrc_eval ((v, Dlocal d1) :: env) e2))
+              (dnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Dlocal (dcoll x1)) = x0).
         revert H1.
         elim (rmap
        (fun d1 : data =>
         olift checkLocal
-              (dnrc_eval ((v, Dlocal d1) :: env) e2)) dl); intros.
+              (dnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
         inversion H1; simpl in *. subst; clear H1.
         exists a1; split; reflexivity.
         congruence.
