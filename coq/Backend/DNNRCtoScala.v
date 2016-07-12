@@ -83,8 +83,6 @@ Section DNNRCtoScala.
    * TODO actually write this. Currently this is only just enough for test07 to run. *)
   Fixpoint scala_literal_data {fttojs: ForeignToJavascript.foreign_to_javascript} {ftype: foreign_type} {m: brand_model} (d: data) (t: rtype₀) : string :=
     match t, d with
-    | Bottom₀, d => "BOTTOM_LITERAL?"
-    | Top₀, d => "TOP_LITERAL?"
     | Unit₀, d => "()"
     | Nat₀, (dnat i) => Z_to_string10 i
     | Bool₀, (dbool true) => "true"
@@ -94,13 +92,8 @@ Section DNNRCtoScala.
       let element_type := rtype_to_scala_type r in
       let elements := map (fun x => scala_literal_data x r) xs in
       "Array[" ++ element_type ++ "](" ++ joinStrings ", " elements ++ ")"
-    | Rec₀ _ _, _ => "Row"
-    (* TODO we have/used to have some aliases in the runtime, should we use them? *)
-    | Either₀ tl tr, _ => "EITHER[" ++ rtype_to_scala_type tl ++ ", " ++ rtype_to_scala_type tr ++ "]"
-    | Brand₀ bs, _ => "BrandedValue" (* BrandedValue ?? *)
-    | Arrow₀ tin t, _ => "CANNOT PUT AN ARROW INTO A DATASET"
-    | Foreign₀ f, _ => "FOREIGN?"
-    | _, _ => "LITERALDATA?"
+    (* TODO Some of these can't happen, some are just not implemented *)
+    | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
     end.
 
   Definition scala_of_unop {ftype: foreign_type} {m: brand_model} (required_type: drtype) (op: unaryOp) (x: string) : string :=
