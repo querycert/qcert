@@ -103,7 +103,7 @@ Section DNNRCtoScala.
     | _, _ => "LITERALDATA?"
     end.
 
-  Definition scala_of_unop {ftype: foreign_type} {m: brand_model} (op: unaryOp) (x: string) : string :=
+  Definition scala_of_unop {ftype: foreign_type} {m: brand_model} (required_type: drtype) (op: unaryOp) (x: string) : string :=
     let prefix s := s ++ "(" ++ x ++ ")" in
     let postfix s := x ++ "." ++ s in
     match op with
@@ -114,7 +114,12 @@ Section DNNRCtoScala.
       "cast(" ++ joinStrings ", " (x :: t :: (map quote_string bs)) ++ ")"
     | AColl => prefix "Array"
     | ACount => postfix "length"
-    | ADot n => prefix ("dot/*[TODO]*/(""" ++ n ++ """)")
+    | ADot n =>
+      match lift_tlocal required_type with
+      | Some r =>
+        prefix ("dot[" ++ rtype_to_scala_type (proj1_sig r) ++ "](""" ++ n ++ """)")
+      | None => "NONLOCAL EXPECTED TYPE IN DOT"
+      end
     | AFlatten => postfix "flatten.sorted(QCertOrdering)"
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
@@ -185,7 +190,7 @@ Section DNNRCtoScala.
         | DNRCBinop t op x y =>
           scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
         | DNRCUnop t op x =>
-          scala_of_unop op (scala_of_dnrc x)
+          scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
         | DNRCLet t n x y => (* let n: t = x in y *) (* TODO might need braces, could use line break *)
           "val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
                  scala_of_dnrc y
