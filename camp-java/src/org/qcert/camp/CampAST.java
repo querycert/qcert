@@ -16,19 +16,21 @@
 package org.qcert.camp;
 
 import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  * Describes a node in the Rules/CAMP AST
  */
 public abstract class CampAST {
 	/** Utility emit method (generally called on the top node of the AST) */
-	public String emit() {
+	public final String emit() {
+		/* TODO activate when emit(PW) is fill operational in subclasses
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		emit(pw);
 		pw.close();
 		return sw.toString();
+		TEMP replacement: */
+		return toString();
 	}
 
 	/** General purpose emit node capable of writing to any PrintWriter */
