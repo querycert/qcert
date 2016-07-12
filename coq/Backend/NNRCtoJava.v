@@ -119,8 +119,8 @@ Section NNRCtoJava.
                                          ".add("
                                          (quotel ++ (fst elem) ++ quotel ++ ", " ++
                                                  (from_java_json (snd elem)))
-                                         ").toJsonObject()")
-                                        l))).
+                                         ")") l))
+            ++ ".toJsonObject()").
                
     Definition mk_java_json_brands (quotel:string) (b:brands) : java_json
       := mk_java_json_array (map (mk_java_json_string quotel) b).
