@@ -45,4 +45,12 @@ public final class WhenRule extends PatternRule implements FunctionRule {
 	public Kind getKind() {
 		return Kind.When;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "rule_when (" + getPattern() + ")";
+	}
 }

@@ -22,11 +22,11 @@ import java.io.PrintWriter;
  */
 public class LeftData extends CampData {
 	private final CampData value;
-	
+
 	public LeftData(CampData value) {
 		this.value = value;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
@@ -50,4 +50,11 @@ public class LeftData extends CampData {
 		return value;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "left(" + value + ")";
+	}
 }

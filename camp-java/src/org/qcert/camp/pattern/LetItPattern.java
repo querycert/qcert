@@ -40,4 +40,12 @@ public class LetItPattern extends CampPattern {
 	public Kind getKind() {
 		return Kind.pletIt;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "let IT = " + getOperand1() + "in " + getOperand2();
+	}
 }

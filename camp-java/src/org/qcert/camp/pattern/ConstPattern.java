@@ -18,6 +18,7 @@ package org.qcert.camp.pattern;
 import java.io.PrintWriter;
 
 import org.qcert.camp.data.CampData;
+import org.qcert.camp.data.StringData;
 
 /**
  * Represents a CAMP Constant pattern
@@ -31,6 +32,11 @@ public final class ConstPattern extends CampPattern {
 	 */
 	public ConstPattern(CampData data) {
 		this.data = data;
+	}
+	
+	/** Convenience constructor for String constants */
+	public ConstPattern(String value) {
+		this(new StringData(value));
 	}
 
 	/* (non-Javadoc)
@@ -54,5 +60,13 @@ public final class ConstPattern extends CampPattern {
 	@Override
 	public Kind getKind() {
 		return Kind.pconst;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return data.toString();
 	}
 }

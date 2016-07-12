@@ -49,4 +49,12 @@ public class GetConstPattern extends CampPattern {
 	public String getName() {
 		return name;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "getConstant(" + name + ")";
+	}
 }

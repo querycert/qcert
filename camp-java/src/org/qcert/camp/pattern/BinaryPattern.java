@@ -23,8 +23,8 @@ import java.io.PrintWriter;
 public class BinaryPattern extends CampPattern {
 	private final BinaryOperator operator;
 	
-	public BinaryPattern(BinaryOperator operator, CampPattern operand) {
-		super(operand);
+	public BinaryPattern(BinaryOperator operator, CampPattern operand1, CampPattern operand2) {
+		super(operand1, operand2);
 		this.operator = operator;
 	}
 	
@@ -49,5 +49,13 @@ public class BinaryPattern extends CampPattern {
 	 */
 	public BinaryOperator getOperator() {
 		return operator;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return operator + "(" + getOperand1() + ", " + getOperand2() + ")";
 	}
 }

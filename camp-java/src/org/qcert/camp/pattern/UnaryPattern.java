@@ -70,6 +70,24 @@ public final class UnaryPattern extends CampPattern {
 		// TODO Auto-generated method stub
 	}
 
+	/**
+	 * Subroutine for formatting String or List<String> parameters
+	 */
+	@SuppressWarnings("unchecked")
+	private String formatParameter() {
+		if (parameter == null)
+			return "";
+		if (parameter instanceof String)
+			return " \"" + parameter + "\" ";
+		StringBuilder bldr = new StringBuilder(" [");
+		String delim = "";
+		for (String s : (List<String>) parameter) {
+			bldr.append(delim).append("\"").append(s).append("\"");
+			delim = ", ";
+		}
+		return bldr.append("] ").toString();
+	}
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
 	 */
@@ -98,5 +116,13 @@ public final class UnaryPattern extends CampPattern {
 	 */
 	public String getStringParameter() {
 		return parameter instanceof String ? (String) parameter : null;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return operator + formatParameter() + "(" + getOperand() + ")";
 	}
 }

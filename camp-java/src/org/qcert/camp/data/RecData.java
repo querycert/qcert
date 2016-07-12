@@ -17,6 +17,7 @@ package org.qcert.camp.data;
 
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Represents the drec data constructor
@@ -50,5 +51,19 @@ public class RecData extends CampData {
 	@Override
 	public Kind getKind() {
 		return Kind.drec;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder bldr = new StringBuilder("{");
+		String delim = "";
+		for (Entry<String,CampData> entry : contents.entrySet()) {
+			bldr.append(delim).append(entry.getKey()).append("=").append(entry.getValue());
+			delim = "; ";
+		}
+		return bldr.append("}").toString();
 	}
 }

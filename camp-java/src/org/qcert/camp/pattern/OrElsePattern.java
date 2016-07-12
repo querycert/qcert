@@ -40,4 +40,12 @@ public class OrElsePattern extends CampPattern {
 	public Kind getKind() {
 		return Kind.porElse;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "do " + getOperand1() + " or else " + getOperand2();
+	}
 }

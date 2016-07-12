@@ -45,4 +45,12 @@ public final class ReturnRule extends PatternRule implements SimpleRule {
 	public Kind getKind() {
 		return Kind.Return;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "rule_return (" + getPattern() + ")";
+	}
 }

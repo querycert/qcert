@@ -24,21 +24,21 @@ import java.util.List;
  * Represents a compound rule formed from other FunctionRules 
  */
 public final class CompoundRule extends CampRule implements FunctionRule {
-	private final List<FunctionRule> members;
+	private final List<CampRule> members;
 	
 	public CompoundRule(FunctionRule left, FunctionRule right) {
-		ArrayList<FunctionRule> members = new ArrayList<>();
+		ArrayList<CampRule> members = new ArrayList<>();
 		if (left instanceof CompoundRule)
 			members.addAll(((CompoundRule) left).members);
 		else
-			members.add(left);
+			members.add((CampRule) left);
 		if (right instanceof CompoundRule)
 			members.addAll(((CompoundRule) right).members);
 		else
-			members.add(right);
+			members.add((CampRule) right);
 		this.members = Collections.unmodifiableList(members);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
@@ -46,12 +46,34 @@ public final class CompoundRule extends CampRule implements FunctionRule {
 	public void emit(PrintWriter pw) {
 		// TODO Auto-generated method stub
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.Compound;
+	}
+
+	/**
+	 * @return the members
+	 */
+	public List<CampRule> getMembers() {
+		return members;
+	}
+
+	/**
+	 * If the CompoundRule is the lhs of a CompleteRule, this method is not called by the toString() method of the latter.
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		String delim = "";
+		StringBuilder bldr = new StringBuilder();
+		for (CampRule rule : members) {
+			bldr.append(delim).append(rule);
+			delim = String.format(" ;;;%n");
+		}
+		return bldr.toString();
 	}
 }

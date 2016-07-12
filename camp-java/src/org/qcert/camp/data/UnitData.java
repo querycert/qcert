@@ -39,4 +39,12 @@ public class UnitData extends CampData {
 	public Kind getKind() {
 		return Kind.dunit;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "unit";
+	}
 }

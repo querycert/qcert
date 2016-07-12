@@ -45,4 +45,12 @@ public final class GlobalRule extends PatternRule implements FunctionRule {
 	public Kind getKind() {
 		return Kind.Global;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "rule_global (" + getPattern() + ")";
+	}
 }

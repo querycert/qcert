@@ -16,6 +16,8 @@
 package org.qcert.camp.rule;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a rule formed from a chain of FunctionRules applied to a single
@@ -53,5 +55,28 @@ public final class CompleteRule extends CampRule implements SimpleRule {
 	@Override
 	public Kind getKind() {
 		return Kind.Complete;
+	}
+
+	/**
+	 * The toString() for CompleteRule overrules the toString of its 'left' functionRule so that,
+	 *   if that were to be a CompoundRule, we can write a simple application instead of forming
+	 *   the composition and then applying it.
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		List<CampRule> rules = new ArrayList<>();
+		if (left instanceof CompoundRule) {
+			rules.addAll(((CompoundRule) left).getMembers());
+		} else
+			rules.add((CampRule) left);
+		rules.add(right);
+		String delim = "";
+		StringBuilder bldr = new StringBuilder();
+		for (CampRule rule : rules) {
+			bldr.append(delim).append(rule);
+			delim = String.format(" ;;%n");
+		}
+		return bldr.toString();
 	}
 }

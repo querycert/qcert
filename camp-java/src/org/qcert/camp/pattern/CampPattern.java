@@ -45,15 +45,15 @@ public abstract class CampPattern extends CampAST {
 	
 	public abstract Kind getKind();
 	
-	public CampPattern getOperand() {
+	public final CampPattern getOperand() {
 		return getOperand1();
 	}
 	
-	public CampPattern getOperand1() {
+	public final CampPattern getOperand1() {
 		return operands[0];
 	}
 	
-	public CampPattern getOperand2() {
+	public final CampPattern getOperand2() {
 		return operands[1];
 	}
 }

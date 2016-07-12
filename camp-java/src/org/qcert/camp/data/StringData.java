@@ -49,4 +49,12 @@ public class StringData extends CampData {
 	public String getValue() {
 		return value;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return value == null ? "null" : "\"" + value.toString() + "\""; 
+	}
 }

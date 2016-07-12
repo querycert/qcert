@@ -40,4 +40,12 @@ public class MapPattern extends CampPattern {
 	public Kind getKind() {
 		return Kind.pmap;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "map " + getOperand();
+	}
 }

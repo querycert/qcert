@@ -23,7 +23,7 @@ import java.io.PrintWriter;
  */
 public class LeftPattern extends CampPattern {
 	LeftPattern() {}
-	
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
@@ -31,12 +31,20 @@ public class LeftPattern extends CampPattern {
 	public void emit(PrintWriter pw) {
 		// TODO Auto-generated method stub
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.pleft;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "LEFT";
 	}
 }

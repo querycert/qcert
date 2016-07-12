@@ -50,4 +50,12 @@ public class RightData extends CampData {
 	public CampData getValue() {
 		return value;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "right(" + value + ")";
+	}
 }

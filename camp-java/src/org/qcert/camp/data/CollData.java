@@ -54,4 +54,18 @@ public class CollData extends CampData {
 	public Kind getKind() {
 		return Kind.dcoll;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder bldr = new StringBuilder("[");
+		String delim = "";
+		for (CampData datum : contents) {
+			bldr.append(delim).append(datum);
+			delim = ", ";
+		}
+		return bldr.append("]").toString();
+	}
 }

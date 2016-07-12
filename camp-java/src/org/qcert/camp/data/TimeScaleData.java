@@ -23,11 +23,11 @@ import java.io.PrintWriter;
 public class TimeScaleData extends CampData {
 	// TODO: if we want real time support we need to decide on representation
 	private final Object timeScale;
-	
+
 	public TimeScaleData(Object timeScale) {
 		this.timeScale = timeScale;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
@@ -49,5 +49,13 @@ public class TimeScaleData extends CampData {
 	 */
 	public Object getTimeScale() {
 		return timeScale;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return timeScale.toString();
 	}
 }

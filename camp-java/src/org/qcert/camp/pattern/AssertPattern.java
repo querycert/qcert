@@ -40,4 +40,12 @@ public class AssertPattern extends CampPattern {
 	public Kind getKind() {
 		return Kind.passert;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "assert " + getOperand();
+	}
 }

@@ -50,4 +50,12 @@ public class BoolData extends CampData {
 	public boolean isTrue() {
 		return value;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return String.valueOf(value);
+	}
 }

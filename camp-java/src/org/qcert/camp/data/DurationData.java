@@ -50,4 +50,12 @@ public class DurationData extends CampData {
 	public Duration getValue() {
 		return value;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return value.toString();
+	}
 }

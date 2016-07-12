@@ -40,4 +40,12 @@ public class LetEnvPattern extends CampPattern {
 	public Kind getKind() {
 		return Kind.pletEnv;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "let ENV += " + getOperand1() + " in " + getOperand2();
+	}
 }

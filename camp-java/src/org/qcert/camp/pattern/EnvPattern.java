@@ -39,4 +39,12 @@ public class EnvPattern extends CampPattern {
 	public Kind getKind() {
 		return Kind.penv;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "ENV";
+	}
 }

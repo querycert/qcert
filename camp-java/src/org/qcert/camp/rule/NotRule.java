@@ -45,4 +45,12 @@ public final class NotRule extends PatternRule implements FunctionRule {
 	public Kind getKind() {
 		return Kind.Not;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "rule_not (" + getPattern() + ")";
+	}
 }
