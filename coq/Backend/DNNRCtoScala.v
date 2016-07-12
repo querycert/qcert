@@ -192,8 +192,8 @@ Section DNNRCtoScala.
         | DNRCUnop t op x =>
           scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
         | DNRCLet t n x y => (* let n: t = x in y *) (* TODO might need braces, could use line break *)
-          "val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
-                 scala_of_dnrc y
+          "{ val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
+                   scala_of_dnrc y ++ " }"
         | DNRCFor t n x y => (* x.map((n: t) => y) *) (* TODO might not need braces, could use line breaks *)
           scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
         | DNRCIf t x y z => (* if (x) y else z *) (* TODO might not need parentheses *)
