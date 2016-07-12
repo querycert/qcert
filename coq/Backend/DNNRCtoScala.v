@@ -158,7 +158,7 @@ Section DNNRCtoScala.
     | ABArith ArithPlus => infix "+"
     | ABArith ArithRem => infix "%" (* TODO double check the exact semantics of this *)
     | AConcat => prefix "recordConcat"
-    | AContains => infix "contains"
+    | AContains => prefix "AContains" (* left argument is the element, right element is the collection *)
     (* TODO Scala equality is WRONG for records (Row), bags (Array), and possibly more (dates?) *)
     (* TODO We also need to fix operators that use equality internally:
      *      Contains, comparisons, AMax, AMin, AMinus, AUnion *)

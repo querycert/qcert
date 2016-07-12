@@ -395,11 +395,17 @@ abstract class QCertRuntime {
   def anummin(b: Array[Int]): Int =
     if (b.isEmpty) 0 else b(0)
 
+  /** Binary operator AContains */
+  def AContains[T](e: T, l: Array[T]): Boolean =
+    l.exists(QCertOrdering.compare(e, _) == 0)
+
   /* Sorting & equality
  * ==================
  */
   object QCertOrdering extends Ordering[Any] {
     def compare(x: Any, y: Any): Int = (x, y) match {
+      // TODO how to sort ()?
+      case ((), ()) => 0
       // NULL sorts before anything else
       case (null, null) => 0
       case (null, _) => -1
