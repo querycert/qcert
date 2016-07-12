@@ -46,7 +46,7 @@ Module CompBack(runtime:CompilerRuntime).
              {bm:brand_model}
              {ftyping: foreign_typing}
              (inputType:rtype) (name:string) (e:dnrc_algenv) : string :=
-    @dnrcToSpark2Top _ brand_relation_brands ftype bm _ _ _ _ bool inputType name e.
+    @dnrcToSpark2Top _ ftype bm _ _ _ _ _ bool inputType name e.
 
   (* Compilation from NNRCMR to CloudantMR *)
 
