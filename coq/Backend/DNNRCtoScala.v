@@ -127,6 +127,7 @@ Section DNNRCtoScala.
     | ANumMax => prefix "anummax"
     | ANumMin => prefix "anummin"
     | ARec n => "singletonRecord(" ++ quote_string n ++ ", " ++ x ++ ")" (* TODO need to pass schema *)
+    | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " fs ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
     | AToString => postfix "toString"
@@ -136,7 +137,6 @@ Section DNNRCtoScala.
 
     (* TODO *)
     | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"
-    | ARecProject _ => "ARECPROJECT???"
     | ARecRemove _ => "ARECREMOVE???"
     | ASingleton => "SINGLETON???"
     | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)

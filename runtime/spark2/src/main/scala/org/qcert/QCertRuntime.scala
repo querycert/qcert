@@ -242,6 +242,13 @@ abstract class QCertRuntime {
     srow(StructType(StructField(n, v.schema, false) :: Nil), v)
   }
 
+  // TODO nope, this is how it would be in the old schema...
+  def recProject(fs: String*)(v: Row): Row = {
+    val schema = StructType(v.schema.fields.filter(f => fs.contains(f.name)))
+    val values = fs.map(v.getAs)
+    srow(schema, values:_*)
+  }
+
   // TODO Ugh, this hacky inference business works for primitives and even records, but not Arrays
   //  def singltonRecord[T](n: String, v: Array[T]): Record = {
   //    srow(StructType(StructField(n, ArrayType(T), false)::Nil), v)
