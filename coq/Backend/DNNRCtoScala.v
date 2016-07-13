@@ -128,7 +128,7 @@ Section DNNRCtoScala.
     | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " fs ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
-    | AToString => postfix "toString"
+    | AToString => prefix "toBlob" (* TODO what are the exact semantics for AToString? *)
     | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand => prefix "unbrand/*[TODO]*/" (* TODO pass type *)
     | ADistinct => postfix "distinct"
