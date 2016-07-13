@@ -34,6 +34,28 @@ object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(world: Dataset[Either]): Unit = {
+    val bv = srow(StructType(Seq(
+        StructField("$data", StringType),
+        StructField("$type", ArrayType(StringType)))),
+      "{\"age\": 5, \"cid\": 42, \"name\":\"James\"}",
+      Array("entities.Customer"))
+
+    println(bv)
+    println(toBlob(bv))
+
+    println(dot("name")(unbrand(StructType(
+      Seq(
+        StructField("$blob", StringType),
+        StructField("$known",
+          StructType(
+            Seq(StructField("age",
+              IntegerType),
+              StructField("cid",
+                IntegerType),
+              StructField(
+                "name",
+                StringType)))))), bv)))
+/*
     val f = world.first()
     val bar = cast(f, wrappedCustomerType, "entities.Customer")
     println(bar)
@@ -43,7 +65,7 @@ object test extends QCertRuntime {
         (customer: Row) => {
           println(toBlob(world_element))
           println(toBlob(customer))
-          dot[String]("name")(unbrand(customer))
+          //dot[String]("name")(unbrand(customer))
           // val blob = customer.getAs[Row]("$data").getAs[String]("$blob")
           // println(blob)
           // println(fromBlob(customerType, blob))
@@ -53,6 +75,7 @@ object test extends QCertRuntime {
         })
     })
     foo foreach ((n: String) => println(n))
+    */
   }
 }
 
@@ -326,8 +349,13 @@ abstract class QCertRuntime {
   def brand(v: Row, b: Brand*): BrandedValue =
     srow(brandStructType(v.schema), v, b)
 
-  def unbrand[T](bv: BrandedValue): T =
-    bv.getAs[T]("$data")
+  def unbrand[T](t: DataType, v: BrandedValue): T = {
+    // Second, if the cast succeeds, reshape data to match the intersection type
+    val data = v.get(v.fieldIndex("$data"))
+    // TODO this cast is wrong, we need a reshape/fromBlob that actually produces the correct type!
+    val reshaped = reshape(data, t).asInstanceOf[T]
+    reshaped
+  }
 
   // From sub type to immediate super types
   val brandHierarchy = mutable.HashMap[String, mutable.HashSet[String]]()
@@ -359,21 +387,21 @@ abstract class QCertRuntime {
 
   /** QCert cast operator
     *
+    * This is not a general cast operator, i.e. it does not give access to fields from the .. part of
+    * an open record. The input has to be a branded value.
+    *
     * @param v  The value has to be a branded value, that is a Row with fields $data : τ and $type : Array[String].
-    * @param t  The intersection type of the brands we are casting to. The data will be reshaped to match this type.
     * @param bs The brands we are casting to.
-    * @return Either a right, if the cast fails, or a branded value with the data reshaped to fit the intersection.
+    * @return Either a right, if the cast fails, or a branded value wrapped in left.
     */
-  def cast(v: BrandedValue, t: DataType, bs: Brand*): Either = {
-    // First, check whether the cast succeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
+  def cast(v: BrandedValue, bs: Brand*): Either = {
+    // First, check whether the cast succeeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
     if (!bs.forall((brand: Brand) =>
       v.getAs[Seq[Brand]]("$type").exists((typ: Brand) =>
         isSubBrand(typ, brand))))
-      return none()
-    // Second, if the cast succeeds, reshape data to match the intersection type
-    val data = v.get(v.fieldIndex("$data"))
-    val reshaped = reshape(data, t).asInstanceOf[Row] // TODO this cast is wrong. Write a brand(Any, Brand*) method
-    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")):_*))
+      none()
+    else
+      left(v)
   }
 
   /* Bags

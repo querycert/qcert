@@ -102,8 +102,7 @@ Section DNNRCtoScala.
     | AArithMean => prefix "arithMean"
     | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
     | ACast bs =>
-      let t := rtype_to_scala (proj1_sig (brands_type bs)) in
-      "cast(" ++ joinStrings ", " (x :: t :: (map quote_string bs)) ++ ")"
+      "cast(" ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
     | AColl => prefix "Array"
     | ACount => postfix "length"
     | ADot n =>
@@ -129,7 +128,14 @@ Section DNNRCtoScala.
     | ASum => postfix "sum"
     | AToString => prefix "toBlob" (* TODO what are the exact semantics for AToString? *)
     | AUArith ArithAbs => prefix "Math.abs"
-    | AUnbrand => prefix "unbrand/*[TODO]*/" (* TODO pass type *)
+    | AUnbrand =>
+      match lift_tlocal required_type with
+      | Some (exist _ r _) =>
+        let schema := rtype_to_scala r in
+        let scala := rtype_to_scala_type r in
+        "unbrand[" ++ scala ++ "](" ++ schema ++ ", " ++ x ++ ")"
+      | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
+      end
     | ADistinct => postfix "distinct"
 
     (* TODO *)
