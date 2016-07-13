@@ -17,6 +17,7 @@
 package org.qcert
 
 import java.io.FileReader
+import java.util
 import java.util.Comparator
 
 import com.google.gson.JsonElement
@@ -254,11 +255,22 @@ abstract class QCertRuntime {
       srow(known, fieldValue))
   }
 
-  // TODO nope, this is how it would be in the old schema...
-  def recProject(fs: String*)(v: Row): Row = {
-    val schema = StructType(v.schema.fields.filter(f => fs.contains(f.name)))
-    val values = fs.map(v.getAs)
-    srow(schema, values:_*)
+  def recProject(fs: String*)(v: Record): Record = {
+    val oldKnownSchema = v.schema.fields(1).dataType.asInstanceOf[StructType]
+    val knownSchema = StructType(fs.map(f => oldKnownSchema.fields(oldKnownSchema.fieldIndex(f))))
+    val data = v.get(1).asInstanceOf[GenericRowWithSchema]
+    val knownValues = fs.map(data.getAs[Any])
+    val known = srow(knownSchema, knownValues:_*)
+    val jsonBlob = gsonParser.parse(v.getAs[String]("$blob")).getAsJsonObject
+    val blobMap = new util.TreeMap[String, JsonElement]()
+    for (f <- fs)
+      blobMap.put(f, jsonBlob.get(f))
+    val blob = gson.toJson(blobMap)
+    srow(StructType(Seq(
+        StructField("$blob", StringType),
+        StructField("$known", knownSchema))),
+      blob,
+      known)
   }
 
   /* Either

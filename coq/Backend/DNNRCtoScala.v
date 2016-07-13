@@ -124,7 +124,7 @@ Section DNNRCtoScala.
         "singletonRecord(" ++ quote_string n ++ ", " ++ rtype_to_scala ft ++ ", " ++ x ++ ")"
       | _ => "AREC_WITH_UNEXPECTED_REQUIRED_TYPE"
       end
-    | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " fs ++ ")")
+    | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
     | AToString => prefix "toBlob" (* TODO what are the exact semantics for AToString? *)
