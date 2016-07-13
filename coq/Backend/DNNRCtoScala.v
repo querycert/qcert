@@ -65,10 +65,9 @@ Section DNNRCtoScala.
     | Bool₀ => "Boolean"
     | String₀ => "String"
     | Coll₀ r => "Array[" ++ rtype_to_scala_type r ++ "]"
-    | Rec₀ _ _ => "Row"
-    (* TODO we have/used to have some aliases in the runtime, should we use them? *)
-    | Either₀ tl tr => "EITHER[" ++ rtype_to_scala_type tl ++ ", " ++ rtype_to_scala_type tr ++ "]"
-    | Brand₀ bs => "BrandedValue" (* BrandedValue ?? *)
+    | Rec₀ _ _ => "Record"
+    | Either₀ tl tr => "Either"
+    | Brand₀ bs => "BrandedValue"
     | Arrow₀ tin t => "CANNOT PUT AN ARROW INTO A DATASET"
     | Foreign₀ f => "FOREIGN?"
     end.
