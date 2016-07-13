@@ -87,12 +87,13 @@ abstract class QCertRuntime {
   val CONST$WORLD = CONST$WORLD_07
 
   val gson = new com.google.gson.Gson()
+  val gsonParser = new com.google.gson.JsonParser()
 
   def run(world: Dataset[Row])
 
   def initializeBrandHierarchy(iofile: String) = {
     // val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
-    val io = new com.google.gson.JsonParser().parse(new FileReader(iofile))
+    val io = gsonParser.parse(new FileReader(iofile))
     val hc = io.getAsJsonObject.get("inheritance").getAsJsonArray
     hc.iterator().asScala.foreach((subsup: JsonElement) => {
       val sub = subsup.getAsJsonObject.get("sub").getAsString
@@ -107,6 +108,15 @@ abstract class QCertRuntime {
   val worldType : StructType
 
   def main(args: Array[String]): Unit = {
+    val a = singletonRecord("a", IntegerType, 42)
+    val b = singletonRecord("b", IntegerType, 23)
+    val c = recordConcat(a, b)
+    val d = singletonRecord("a", IntegerType, 44)
+    val e = recordConcat(d, c)
+
+    println(c)
+    println(e)
+
     if (args.length != 2) {
       println("Expected two arguments: the iofile containing the brand hierarchy, and the sparkio file containing the data")
       sys.exit(1)
@@ -158,7 +168,7 @@ abstract class QCertRuntime {
   }
 
   def fromBlob(t: DataType, b: String): Any =
-    fromBlob(t, new com.google.gson.JsonParser().parse(b))
+    fromBlob(t, gsonParser.parse(b))
 
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
@@ -197,18 +207,35 @@ abstract class QCertRuntime {
     new GenericRowWithSchema(vals.toArray, s)
   }
 
-  // TODO this is a mess
-  def recordConcat(l: Row, r: Row): Row = {
-    val rightFieldNames = r.schema.fieldNames diff l.schema.fieldNames
-    val allFieldNames = (rightFieldNames ++ l.schema.fieldNames).distinct.sorted
-    val schema = allFieldNames.foldLeft(new StructType())((schema: StructType, field: String) => {
-      val inLeft = l.schema.fieldNames.indexOf(field)
-      schema.add(if (inLeft == -1) r.schema.fields(r.schema.fieldNames.indexOf(field)) else l.schema.fields(inLeft))
-    })
-    val names = l.schema.fieldNames ++ rightFieldNames
-    val values = l.toSeq ++ rightFieldNames.map((rfn: String) => r.get(r.fieldIndex(rfn)))
-    val sortedValues = (names zip values).sortBy(_._1).map(_._2)
-    srow(schema, sortedValues: _*)
+  def recordConcat(l: Record, r: Record): Record = {
+    def concatRows(l: Row, r: Row): Row = {
+      val rightFieldNames = r.schema.fieldNames diff l.schema.fieldNames
+      val allFieldNames = (rightFieldNames ++ l.schema.fieldNames).distinct.sorted
+      val schema = allFieldNames.foldLeft(new StructType())((schema: StructType, field: String) => {
+        val inLeft = l.schema.fieldNames.indexOf(field)
+        schema.add(if (inLeft == -1) r.schema.fields(r.schema.fieldNames.indexOf(field)) else l.schema.fields(inLeft))
+      })
+      val names = l.schema.fieldNames ++ rightFieldNames
+      val values = l.toSeq ++ rightFieldNames.map((rfn: String) => r.get(r.fieldIndex(rfn)))
+      val sortedValues = (names zip values).sortBy(_._1).map(_._2)
+      srow(schema, sortedValues: _*)
+    }
+    def concatBlobs(l: String, r: String): String = {
+      val (left, right) = (gsonParser.parse(l).getAsJsonObject, gsonParser.parse(r).getAsJsonObject)
+      val sortedResultMap = new java.util.TreeMap[String, JsonElement]()
+      for (me <- right.entrySet().iterator().asScala)
+        sortedResultMap.put(me.getKey, me.getValue)
+      for (me <- left.entrySet().iterator().asScala)
+        sortedResultMap.put(me.getKey, me.getValue)
+      gson.toJson(sortedResultMap)
+    }
+    val known = concatRows(l.getAs("$known"), r.getAs("$known"))
+    val blob = concatBlobs(l.getAs("$blob"), r.getAs("$blob"))
+    srow(StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", known.schema))),
+      blob,
+      known)
   }
 
   def dot[T](n: String)(l: Record): T =
@@ -242,11 +269,6 @@ abstract class QCertRuntime {
     val values = fs.map(v.getAs)
     srow(schema, values:_*)
   }
-
-  // TODO Ugh, this hacky inference business works for primitives and even records, but not Arrays
-  //  def singltonRecord[T](n: String, v: Array[T]): Record = {
-  //    srow(StructType(StructField(n, ArrayType(T), false)::Nil), v)
-  //  }
 
   /* Either
  * ======
