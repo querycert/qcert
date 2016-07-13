@@ -115,7 +115,7 @@ Section DNNRCtoScala.
     | AFlatten => postfix "flatten.sorted(QCertOrdering)"
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
-    | ANeg => prefix "!"
+    | ANeg => "(!" ++ x ++ ")"
     | ANumMax => prefix "anummax"
     | ANumMin => prefix "anummin"
     | ARec n =>
@@ -159,9 +159,9 @@ Section DNNRCtoScala.
     (* TODO Scala equality is WRONG for records (Row), bags (Array), and possibly more (dates?) *)
     (* TODO We also need to fix operators that use equality internally:
      *      Contains, comparisons, AMax, AMin, AMinus, AUnion *)
-    | AEq => infix "=="
-    | ALe => infix "<="
-    | ALt => infix "<"
+    | AEq => prefix "equal"
+    | ALe => prefix "lessOrEqual"
+    | ALt => prefix "lessThan"
     (* TODO we might want to put convenience helpers into the runtime for these *)
     | AMax => l ++ ".++(" ++ r ++ ".diff(" ++ l ++ "))" (* l1 ⊎ (l2 ⊖ l1) *)
     | AMin => l ++ ".diff(" ++ l ++ ".diff(" ++ r ++ "))" (* l1 ⊖ (l1 ⊖ l2) Can't make recursive calls, but AMinus is weird anyways... *)

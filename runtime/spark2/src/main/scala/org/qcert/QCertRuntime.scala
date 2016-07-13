@@ -489,6 +489,13 @@ abstract class QCertRuntime {
     def compare(a: T, b: T): Int = QCertOrdering.compare(a, b)
   }
 
-  def equal(a: Any, b: Any) =
+  def equal(a: Any, b: Any): Boolean =
     QCertOrdering.compare(a, b) == 0
+
+
+  def lessOrEqual(a: Any, b: Any): Boolean =
+    QCertOrdering.compare(a, b) <= 0
+
+  def lessThan(a: Any, b: Any): Boolean =
+    QCertOrdering.compare(a, b) < 0
 }
