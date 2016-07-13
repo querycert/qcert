@@ -108,15 +108,6 @@ abstract class QCertRuntime {
   val worldType : StructType
 
   def main(args: Array[String]): Unit = {
-    val a = singletonRecord("a", IntegerType, 42)
-    val b = singletonRecord("b", IntegerType, 23)
-    val c = recordConcat(a, b)
-    val d = singletonRecord("a", IntegerType, 44)
-    val e = recordConcat(d, c)
-
-    println(c)
-    println(e)
-
     if (args.length != 2) {
       println("Expected two arguments: the iofile containing the brand hierarchy, and the sparkio file containing the data")
       sys.exit(1)
