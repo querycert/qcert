@@ -146,9 +146,12 @@ Section SparkData.
     | _, _ => None
     end.
 
+
   Definition typed_data_to_json_string (d: data) (r: rtype): string :=
     match typed_data_to_json d (proj1_sig r) with
     | Some json => jsonToJS """" json
+    (* Uhmm... this only works if we also have a proof that this d has this type r...
+     * d ◁ r is the notation, if I remember correctly *)
     | None => "typed_data_to_json_string failed. This cannot happen. Get rid of this case by proving that typed_data_to_json always succeeds for well-typed data."
     end.
 

@@ -84,11 +84,11 @@ Section DNNRCtoScala.
   Fixpoint scala_literal_data {fttojs: ForeignToJavascript.foreign_to_javascript} {ftype: foreign_type} {m: brand_model} (d: data) (t: rtype₀) : string :=
     match t, d with
     | Unit₀, d => "()"
-    | Nat₀, (dnat i) => Z_to_string10 i
-    | Bool₀, (dbool true) => "true"
-    | Bool₀, (dbool false) => "false"
-    | String₀, (dstring s) => quote_string s
-    | Coll₀ r, (dcoll xs) =>
+    | Nat₀, dnat i => Z_to_string10 i
+    | Bool₀, dbool true => "true"
+    | Bool₀, dbool false => "false"
+    | String₀, dstring s => quote_string s
+    | Coll₀ r, dcoll xs =>
       let element_type := rtype_to_scala_type r in
       let elements := map (fun x => scala_literal_data x r) xs in
       "Array[" ++ element_type ++ "](" ++ joinStrings ", " elements ++ ")"
@@ -119,7 +119,12 @@ Section DNNRCtoScala.
     | ANeg => prefix "!"
     | ANumMax => prefix "anummax"
     | ANumMin => prefix "anummin"
-    | ARec n => "singletonRecord(" ++ quote_string n ++ ", " ++ x ++ ")" (* TODO need to pass schema *)
+    | ARec n =>
+      match lift_tlocal required_type with
+      | Some (exist _ (Rec₀ Closed ((_, ft)::nil)) _) =>
+        "singletonRecord(" ++ quote_string n ++ ", " ++ rtype_to_scala ft ++ ", " ++ x ++ ")"
+      | _ => "AREC_WITH_UNEXPECTED_REQUIRED_TYPE"
+      end
     | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " fs ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
@@ -174,7 +179,7 @@ Section DNNRCtoScala.
   Fixpoint scala_of_dnrc {A plug_set: Set} {ft:foreign_type} {fdt:foreign_data_typing} {m:brand_model} {fttojs: ForeignToJavascript.foreign_to_javascript} (d: dnrc (type_annotation ft m A) plug_set) : string :=
     let code :=
         match d with
-        | DNRCVar t n => "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")"
+        | DNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
         | DNRCConst t c =>
           match (lift_tlocal (di_required_typeof d)) with
           | Some r => scala_literal_data c (proj1_sig r)

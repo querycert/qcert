@@ -184,16 +184,8 @@ abstract class QCertRuntime {
     }
   }
 
-  /* Records
- * =======
- *
- * We represent records as Rows with a schema of StructType.
- * Rows are glorified tuples. We can access fields by name, but most operations are by position only.
- * Fields must be ordered by field name!
- */
-  // This seems to cause trouble, because scala can't find an ordering, or something.
-  // This might allow us to override the default ordering for Rows, maybe.
-  // type Record = Row
+  // TODO all record construction has to properly populate the blob field!
+  type Record = Row
 
   /** More convenient record (row with schema) construction.
     * Splice array into varargs call: let a = Array(1, 2); srow(schema, a:_*) */
@@ -219,7 +211,7 @@ abstract class QCertRuntime {
     srow(schema, sortedValues: _*)
   }
 
-  def dot[T](n: String)(l: Row): T =
+  def dot[T](n: String)(l: Record): T =
     l.getAs[Row]("$known").getAs[T](n)
 
   // TODO adapt to new record representation ($blob + $known)
@@ -234,12 +226,14 @@ abstract class QCertRuntime {
   }
 
   /** UnaryOp ARec */
-  def singletonRecord(n: String, v: Int): Row = {
-    srow(StructType(StructField(n, IntegerType, false) :: Nil), v)
-  }
-
-  def singletonRecord(n: String, v: Row): Row = {
-    srow(StructType(StructField(n, v.schema, false) :: Nil), v)
+  def singletonRecord(fieldName: String, fieldType: DataType, fieldValue: Any): Record = {
+    val known = StructType(Seq(StructField(fieldName, fieldType)))
+    val schema = StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", known)))
+    srow(schema,
+      "{\"" + fieldName + "\": " + toBlob(fieldValue) + "}",
+      srow(known, fieldValue))
   }
 
   // TODO nope, this is how it would be in the old schema...
