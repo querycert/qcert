@@ -56,7 +56,7 @@ Section TOpsInferSub.
         | true, false =>
            lift (fun _ => (τ₂, ⊥, τ₂)) (tunrec τ₂)
         | false, true =>
-           lift (fun _ => (τ₁, ⊥, τ₂)) (tunrec τ₁)
+           lift (fun _ => (τ₁, ⊥, τ₁)) (tunrec τ₁)
         | false, false =>
           lift (fun τ => (τ, τ₁, τ₂)) (trecConcat τ₁ τ₂)
         end
@@ -66,7 +66,7 @@ Section TOpsInferSub.
         | true, false =>
            lift (fun _ => (Coll τ₂, ⊥, τ₂)) (tunrec τ₂)
         | false, true =>
-           lift (fun _ => (Coll τ₁, ⊥, τ₂)) (tunrec τ₁)
+           lift (fun _ => (Coll τ₁, ⊥, τ₁)) (tunrec τ₁)
         | false, false =>
           lift (fun τ => (Coll τ, τ₁, τ₂)) (tmergeConcat τ₁ τ₂)
         end
