@@ -71,8 +71,59 @@ Section TOptimEnv.
    * Record expressions *
    **********************)
 
-  (* q ⊗ [] ⇒ { q } *)
+  Lemma tconcat_empty_record_r_arrow q:
+    q ⊕ ‵[||] ⇒ q.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    inferer.
+    invcs H0.
+    rtype_equalizer.
+    subst.
+    cut_to H4; [| tauto].
+    subst.
+    invcs H5.
+    revert pf3; rewrite rec_concat_sort_nil_r.
+    rewrite sort_sorted_is_id by trivial.
+    intros pf3.
+    rewrite <- (is_list_sorted_ext StringOrder.lt_dec _ pf1 pf3).
+    clear pf3.
+    split; trivial.
+    intros.
+    input_well_typed.
+    dtype_inverter.
+    rewrite app_nil_r.
+    apply data_type_normalized in τout.
+    invcs τout.
+    rewrite sort_sorted_is_id; trivial.
+  Qed.
 
+  Lemma tconcat_empty_record_l_arrow q:
+    ‵[||] ⊕ q ⇒ q.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    inferer.
+    invcs H0.
+    rtype_equalizer.
+    subst.
+    cut_to H4; [| tauto].
+    subst.
+    invcs H5.
+    revert pf3; rewrite rec_concat_sort_nil_l.
+    rewrite sort_sorted_is_id by trivial.
+    intros pf3.
+    rewrite <- (is_list_sorted_ext StringOrder.lt_dec _ pf2 pf3).
+    clear pf3.
+    split; trivial.
+    intros.
+    input_well_typed.
+    dtype_inverter.
+    apply data_type_normalized in τout.
+    invcs τout.
+    rewrite sort_sorted_is_id; trivial.
+  Qed.
+    
+
+  (* q ⊗ [] ⇒ { q } *)
   Lemma tmerge_empty_record_r_arrow q:
     q ⊗ ‵[||] ⇒ ‵{| q |}.
   Proof.
@@ -178,6 +229,77 @@ Section TOptimEnv.
     inferer.
     unfold tdot, edot in H4; simpl in H4.
     destruct (string_eqdec s s); congruence.
+  Qed.
+
+  (* Note that concat favors the right side *)
+  Lemma tdot_over_concat_eq_r_arrow a (q₁ q₂:algenv) :
+    (q₁ ⊕ ‵[| (a, q₂) |])·a ⇒ q₂.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    inferer.
+    unfold tdot, edot, rec_concat_sort in H0.
+    rewrite assoc_lookupr_drec_sort
+    , (@assoc_lookupr_app string) in H0.
+    simpl in H0.
+    destruct (string_eqdec s s); [| congruence].
+    invcs H0.
+    split; trivial.
+    intros.
+    input_well_typed.
+    dtype_inverter.
+    unfold edot.
+    rewrite assoc_lookupr_drec_sort
+    , (@assoc_lookupr_app string).
+    simpl.
+    destruct (string_eqdec s s); [| congruence].
+    trivial.
+  Qed.
+
+  Lemma tdot_over_concat_neq_r_arrow a₁ a₂ (q₁ q₂:algenv) :
+    a₁ <> a₂ ->
+    (q₁ ⊕ ‵[| (a₁, q₂) |])·a₂ ⇒ q₁·a₂.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    inferer.
+    unfold tdot, edot, rec_concat_sort in H1.
+    rewrite assoc_lookupr_drec_sort
+    , (@assoc_lookupr_app string) in H1.
+    simpl in H1.
+    destruct (string_eqdec a₂ s); [congruence | ].
+    split.
+    - inferer.
+    - intros.
+      input_well_typed.
+      dtype_inverter.
+    unfold edot, rec_concat_sort.
+    rewrite assoc_lookupr_drec_sort
+    , (@assoc_lookupr_app string).
+    simpl.
+    destruct (string_eqdec a₂ s); [congruence | ].
+    trivial.
+  Qed.
+
+  Lemma tdot_over_concat_neq_l_arrow a₁ a₂ (q₁ q₂:algenv) :
+    a₁ <> a₂ ->
+    (‵[| (a₁, q₁) |] ⊕ q₂ )·a₂ ⇒ q₂·a₂.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    inferer.
+    unfold tdot, edot, rec_concat_sort in H1.
+    rewrite assoc_lookupr_drec_sort
+    , (@assoc_lookupr_app string) in H1.
+    simpl in H1.
+    destruct (string_eqdec a₂ s); [congruence | ].
+    match_case_in H1; intros; rewrite H0 in H1; invcs H1.
+    split.
+    - inferer.
+    - intros.
+      input_well_typed.
+      dtype_inverter.
+      unfold edot, rec_concat_sort.
+      rewrite assoc_lookupr_insertion_sort_insert_neq; trivial.
+      rewrite assoc_lookupr_drec_sort.
+      trivial.
   Qed.
 
   (* [ a₁ : q₁; a₂ : q₂ ].a₂ ⇒ q₂ *)
