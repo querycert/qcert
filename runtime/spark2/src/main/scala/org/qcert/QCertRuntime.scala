@@ -256,13 +256,19 @@ abstract class QCertRuntime {
   def dot[T](n: String)(l: Record): T =
     l.getAs[Row]("$known").getAs[T](n)
 
-  // TODO adapt to new record representation ($blob + $known)
-  def mergeConcat(l: Row, r: Row): Array[Row] = {
+  def mergeConcat(l: Record, r: Record): Array[Record] = {
+    def allFieldNames(rr: Record) = {
+      val known = rr.schema.fields(1).dataType.asInstanceOf[StructType].fieldNames
+      val blob = gsonParser.parse(rr.getAs[String]("$blob")).getAsJsonObject.entrySet().iterator().asScala.map(e => e.getKey).toArray
+      known.union(blob).distinct.sorted
+    }
+    def blobDot(n: String, r: Record) = gsonParser.parse(r.getAs[String]("$blob")).getAsJsonObject.get(n)
     val concatenated = recordConcat(l, r)
-    val duplicates = l.schema.fieldNames intersect r.schema.fieldNames
-    // TODO could do this before...
+    val duplicates = allFieldNames(l) intersect allFieldNames(r)
     for (field <- duplicates)
-      if (!equal(r.get(r.fieldIndex(field)), concatenated.get(concatenated.fieldIndex(field))))
+      // TODO This uses JsonElement equality. Unless we can guarantee that the JSON serialization is unique, this is likely incorrect
+      // What we should do is use QCert equality. Unfortunately, we would need to deserialize for that, which we can't, because we don't have the type!
+      if (blobDot(field, r) != blobDot(field, concatenated))
         return Array()
     Array(concatenated)
   }
