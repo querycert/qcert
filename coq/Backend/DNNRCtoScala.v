@@ -80,7 +80,7 @@ Section DNNRCtoScala.
 
   (* This produces literal data at the correct type.
    * TODO actually write this. Currently this is only just enough for test07 to run. *)
-  Fixpoint scala_literal_data {fttojs: ForeignToJavascript.foreign_to_javascript} {ftype: foreign_type} {m: brand_model} (d: data) (t: rtype₀) : string :=
+  Fixpoint scala_literal_data {fttojs: ForeignToJavascript.foreign_to_javascript} {ftype: foreign_type} {m: brand_model} (d: data) (t: rtype₀) {struct t}: string :=
     match t, d with
     | Unit₀, d => "()"
     | Nat₀, dnat i => Z_to_string10 i
@@ -91,6 +91,21 @@ Section DNNRCtoScala.
       let element_type := rtype_to_scala_type r in
       let elements := map (fun x => scala_literal_data x r) xs in
       "Array[" ++ element_type ++ "](" ++ joinStrings ", " elements ++ ")"
+    | Rec₀ _ fts, drec fds =>
+      let blob := quote_string (data_to_blob d) in
+      let known_schema :=
+          "StructType(Seq("
+            ++ joinStrings ", "
+            (map (fun ft =>
+                    "StructField(""" ++ fst ft ++ """, " ++ rtype_to_scala (snd ft) ++ ")")
+                 fts)
+            ++ "))" in
+      let fields := map (fun ft => match lookup string_dec fds (fst ft) with
+                                   | Some d => scala_literal_data d (snd ft)
+                                   | None => "FIELD_IN_TYPE_BUT_NOT_IN_DATA"
+                                   end) fts in
+      let known := "srow(" ++ joinStrings ", " (known_schema :: fields) ++ ")" in
+      "srow(StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_schema ++ "))), " ++ blob ++ ", " ++ known ++ ")"
     (* TODO Some of these can't happen, some are just not implemented *)
     | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
     end.
