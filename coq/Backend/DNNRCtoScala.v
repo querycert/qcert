@@ -177,7 +177,6 @@ Section DNNRCtoScala.
     | ABArith ArithRem => infix "%" (* TODO double check the exact semantics of this *)
     | AConcat => prefix "recordConcat"
     | AContains => prefix "AContains" (* left argument is the element, right element is the collection *)
-    (* TODO Scala equality is WRONG for records (Row), bags (Array), and possibly more (dates?) *)
     (* TODO We also need to fix operators that use equality internally:
      *      Contains, comparisons, AMax, AMin, AMinus, AUnion *)
     | AEq => prefix "equal"
@@ -209,7 +208,7 @@ Section DNNRCtoScala.
           scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
         | DNRCUnop t op x =>
           scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
-        | DNRCLet t n x y => (* let n: t = x in y *) (* TODO might need braces, could use line break *)
+        | DNRCLet t n x y => (* let n: t = x in y *) (* TODO could use line break *)
           "{ val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
                    scala_of_dnrc y ++ " }"
         | DNRCFor t n x y => (* x.map((n: t) => y) *) (* TODO might not need braces, could use line breaks *)
@@ -227,12 +226,13 @@ Section DNNRCtoScala.
           | None => "DNRCEither's first argument is not of type Either"
           end
         | DNRCCollect t x => scala_of_dnrc x ++ ".collect()"
-        (* Dispatch is a bit tricky, because it requires the global SparkSession,
-         * of which there can be only one, if I understand correctly.
-         * It also requires the type, to construct the appropriate schema.
-         * Last but not least, if the result of dispatch should always be a DataFrame (= Dataset[Row]),
-         * then the element type has to be records, or we need to invent a column name. *)
-        | DNRCDispatch t x => "DISPATCH???" (* TODO *)
+        (* TODO handle bags of non-record types (ints, strings, bags, ...) *)
+        | DNRCDispatch t x =>
+          match olift tuncoll (lift_tlocal (di_typeof x)) with
+          | Some et =>
+            "dispatch(" ++ rtype_to_scala (proj1_sig et) ++ ", " ++ scala_of_dnrc x ++ ")"
+          | None => "Argument to dispatch is not a local collection."
+          end
         | DNRCAlg t a xs => "ALG???" (* TODO *)
         end in
     if di_typeof d == di_required_typeof d then code else

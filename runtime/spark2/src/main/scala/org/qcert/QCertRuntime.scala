@@ -23,7 +23,7 @@ import java.util.Comparator
 import com.google.gson.JsonElement
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable
@@ -130,6 +130,9 @@ abstract class QCertRuntime {
   }
 
   val worldType : StructType
+  val sparkContext = new SparkContext("local", "QCERT", new SparkConf())
+  val sparkSession = SparkSession.builder().getOrCreate()
+
 
   def main(args: Array[String]): Unit = {
     if (args.length != 2) {
@@ -143,12 +146,8 @@ abstract class QCertRuntime {
     initializeBrandHierarchy(iofileHierarchy)
     println(brandHierarchy)
 
-    val sparkCtx = new SparkContext("local", "Test 07", new SparkConf())
-    sparkCtx.setLogLevel("ERROR")
-    val session = SparkSession.builder().getOrCreate()
-
     // val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
-    val df0 = session.read.schema(worldType).json(iofileData)
+    val df0 = sparkSession.read.schema(worldType).json(iofileData)
     //printing some debugging output for sanity-checking
     System.out.println("--- input schema ---")
     df0.printSchema()
@@ -156,7 +155,13 @@ abstract class QCertRuntime {
     df0.show()
 
     run(df0)
-    sparkCtx.stop()
+    sparkContext.stop()
+  }
+
+  // TODO handle bags of non-Row types (Int, String, Bags, ...)
+  def dispatch(schema: StructType, a: Array[Row]): DataFrame = {
+    val l: util.List[Row] = a.toList.asJava
+    sparkSession.createDataFrame(l, schema)
   }
 
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
