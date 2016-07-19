@@ -39,6 +39,7 @@ Section SparkIR.
   | CEq0   : string -> data   -> column -> column
   | CEq1   : string -> column -> column -> column
   | CNeg   : string -> column ->           column
+  | CUDFCast : string -> list string -> column -> column (* TODO might want to factor UDFs out *)
   .
 
   Inductive spark_aggregate :=
@@ -59,12 +60,18 @@ Section SparkIR.
   (* We might want to move CollectList from the aggregate functions to a toplevel operation here *)
   .
 
+  Definition quote_string (s: string) : string :=
+    """" ++ s ++ """".
+  
   Fixpoint code_of_column (c: column) : string :=
     match c with
     | CCol s => "column(""" ++ s ++ """)"
     | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
     | CEq1 new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | _ => ""
+    | CEq0 new d c => code_of_column c ++ ".equalTo(" ++ "TODO_LITERAL_DATA" ++ ").as(""" ++ new ++ """)"
+    | CUDFCast new bs c =>
+      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+    | _ => "UNIMPLEMENTED_COLUMN"
     end.
 
   Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
@@ -83,12 +90,17 @@ Section SparkIR.
     match e with
     | DSVar s => s
     | DSSelect cs d => code_of_dataset d ++ ".select(" ++ joinStrings ", " (map code_of_column cs) ++ ")"
-    | DSFilter c d => code_of_dataset d ++ ".where(" ++ code_of_column c ++ ")"
+    | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
     | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
     | DSGroupBy gcs acs d => code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " (map code_of_column gcs) ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
     | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
+  Example ex1 :=
+    DSFilter (CEq0 "f" (dnat 25) (CCol "age")) (DSVar "CONST$WORLD").
+
+  Eval vm_compute in code_of_dataset ex1.
+  
   Section eval.
 
     Definition srec n v :=
@@ -155,6 +167,7 @@ Section SparkIR.
           | Some (_, (dbool x)) => Some (srec n (dbool (negb x)))
           | _ => None
           end
+        | _ => None (* TODO at least UDFs are unimplemented *)
         end.
 
     (* Used in selection *)

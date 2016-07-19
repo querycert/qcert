@@ -128,7 +128,7 @@ Module CompCore(runtime:CompilerRuntime).
    * Typed DNNRC Section *
    ***********************)
   
-  Require Import DData DNNRC.
+  Require Import DData DNNRC SparkIR.
   
   (* Typed compilation from NRAEnv to DNNRC *)
 
@@ -144,6 +144,20 @@ Module CompCore(runtime:CompilerRuntime).
 
   Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc bool algenv :=
     tcompile_nraenv_to_dnnrc toptim trew op_init.
+
+  Definition tcompile_nraenv_to_dnnrc_dataset (optim:optimizer) (rew:rewriter) (op_init:algenv) : dnrc unit dataset :=
+    let op_optim := optimize_algenv optim op_init in
+    let e_init := translate_nraenv_to_nnrc op_optim in
+    let e_rew := rew e_init in
+    let de_init := @nrc_to_dnrc_dataset _ unit tt mkDistLoc e_rew in
+    de_init.
+
+  Definition tcompile_nraenv_to_dnnrc_none_dataset (op_init:algenv) : dnrc unit dataset :=
+    tcompile_nraenv_to_dnnrc_dataset optimizer_no_optim rewriter_no_rew op_init.
+
+  Definition tcompile_nraenv_to_dnnrc_typed_opt_dataset (op_init:algenv) : dnrc unit dataset :=
+    tcompile_nraenv_to_dnnrc_dataset toptim trew op_init.
+
 
   (*****************
    * DNNRC Section *

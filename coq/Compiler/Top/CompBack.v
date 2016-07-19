@@ -38,15 +38,15 @@ Module CompBack(runtime:CompilerRuntime).
   (* Compilation from DNNRC to Scala *)
 
   Require Import DNNRC.
-  Require Import DNNRCtoScala RAlgEnv.
+  Require Import DNNRCtoScala SparkIR.
   Require Import TypingRuntime.
 
   Definition dnrc_to_scala_code_gen
              {ftype: foreign_type}
              {bm:brand_model}
              {ftyping: foreign_typing}
-             (inputType:rtype) (name:string) (e:dnrc_algenv) : string :=
-    @dnrcToSpark2Top _ ftype bm _ _ _ _ _ bool inputType name e.
+             (inputType:rtype) (name:string) (e:dnrc unit dataset) : string :=
+    @dnrcToSpark2Top _ ftype bm _ _ _ _ _ inputType name e.
 
   (* Compilation from NNRCMR to CloudantMR *)
 

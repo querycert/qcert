@@ -661,6 +661,13 @@ Section DNNRC.
     Definition nrc_to_dnrc_algenv {A} := @nrc_to_dnrc A algenv.
     
   End NraEnvPlug.
+
+  Section DatasetEnvPlug.
+    Require Import SparkIR.
+
+    Definition nrc_to_dnrc_dataset {A} := @nrc_to_dnrc A dataset.
+    
+  End DatasetEnvPlug.
   
   (*
   Section DatasetPlug.

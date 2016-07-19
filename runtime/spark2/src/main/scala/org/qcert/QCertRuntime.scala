@@ -25,96 +25,67 @@ import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
-
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
-  override def run(world: Dataset[Either]): Unit = {
-    val bv = srow(StructType(Seq(
-        StructField("$data", StringType),
-        StructField("$type", ArrayType(StringType)))),
-      "{\"age\": 5, \"cid\": 42, \"name\":\"James\"}",
-      Array("entities.Customer"))
+  override def run(CONST$WORLD: Dataset[Row]): Unit = {
 
-    println(bv)
-    println(toBlob(bv))
+    // TODO move into object
+    def unbrandData[T](t: DataType) = (data: T) =>
+      // TODO need to wrap primitive data in a record
+      reshape(data, t).asInstanceOf[AnyRef]
 
-    println(dot("name")(unbrand(StructType(
-      Seq(
-        StructField("$blob", StringType),
-        StructField("$known",
-          StructType(
-            Seq(StructField("age",
-              IntegerType),
-              StructField("cid",
-                IntegerType),
-              StructField(
-                "name",
-                StringType)))))), bv)))
-/*
-    val f = world.first()
-    val bar = cast(f, wrappedCustomerType, "entities.Customer")
-    println(bar)
+    def unbrandUDF[T](t: DataType) =
+      udf(unbrandData(t), t)
 
-    val foo = world.collect().map((world_element: Row) => {
-      either(cast(world_element, wrappedCustomerType, "entities.Customer") /* castToCustomerAndUnbrand(world_element) */ ,
-        (customer: Row) => {
-          println(toBlob(world_element))
-          println(toBlob(customer))
-          //dot[String]("name")(unbrand(customer))
-          // val blob = customer.getAs[Row]("$data").getAs[String]("$blob")
-          // println(blob)
-          // println(fromBlob(customerType, blob))
-        },
-        (not_a_customer: Row) => {
-          "bla"
-        })
-    })
-    foo foreach ((n: String) => println(n))
-    */
+    val res = CONST$WORLD.where(QCertRuntime.castUDF(brandHierarchy, "entities.Customer")(column("$type"))).count()
+
+    println(res)
   }
+}
+
+/** QCertRuntime static functions
+  *
+  * Turns out SparkSQL only accepts locally bound lambdas and static functions as user-defined functions.
+  * Most of the runtime functions are declared in the abstract class QCertRuntime, which makes them methods.
+  *
+  * TODO move more of the runtime in here, so it can potentially be used from SparkSQL
+  *
+  * We cannot get rid of the QCertRuntime *class* completely:
+  * The class has the main method (which cannot be in the object, even though it is static?!?)
+  * It declares abstract members like `run` and the world type for initial data loading.
+  */
+object QCertRuntime {
+  def isSubBrand(brandHierarchy: mutable.HashMap[String, mutable.HashSet[String]], sub: String, sup: String): Boolean = {
+    if (sub == sup || sup == "Any")
+      return true
+    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(brandHierarchy, dsup, sup))
+  }
+
+  def castUDFHelper(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) = (ts: mutable.WrappedArray[String]) =>
+    bs.forall((brand: String) =>
+      ts.exists((typ: String) =>
+        isSubBrand(h, typ, brand)))
+
+  // TODO Can we somehow avoid passing the hierarchy at every call site?
+  def castUDF(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) =
+    udf(QCertRuntime.castUDFHelper(h, bs:_*), BooleanType)
 }
 
 abstract class QCertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
-
-  def customerType =
-    StructType(Seq(
-      StructField("age", IntegerType),
-      StructField("cid", IntegerType),
-      StructField("name", StringType)))
-
-  def wrappedCustomerType =
-    StructType(Seq(
-      StructField("$blob", StringType),
-      StructField("$known", customerType)))
-
-  def purchaseType =
-    StructType(
-      StructField("cid", IntegerType) ::
-        StructField("name", StringType) ::
-        StructField("pid", IntegerType) ::
-        StructField("quantity", IntegerType) :: Nil)
-
-  def mainEntityType =
-    StructType(
-      StructField("doubleAttribute", DoubleType) ::
-        StructField("id", IntegerType) ::
-        StructField("stringId", StringType) :: Nil)
-
-  val CONST$WORLD_07 = Nil
-
-  val CONST$WORLD = CONST$WORLD_07
 
   val gson = new com.google.gson.Gson()
   val gsonParser = new com.google.gson.JsonParser()
 
   def run(world: Dataset[Row])
 
+  // TODO populate this from codegen instead of reading an external file
   def initializeBrandHierarchy(iofile: String) = {
     // val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
     val io = gsonParser.parse(new FileReader(iofile))
@@ -129,7 +100,7 @@ abstract class QCertRuntime {
     })
   }
 
-  val worldType : StructType
+  val worldType: StructType
   val sparkContext = new SparkContext("local", "QCERT", new SparkConf())
   val sparkSession = SparkSession.builder().getOrCreate()
 
@@ -154,7 +125,9 @@ abstract class QCertRuntime {
     System.out.println("--- input documents ---")
     df0.show()
 
+    println("about to call run(df0)")
     run(df0)
+    println("about to call sparkContext.stop()")
     sparkContext.stop()
   }
 
@@ -181,9 +154,9 @@ abstract class QCertRuntime {
         srow(t,
           // We have the full record in the blob field, even for closed records
           r.toString,
-          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues:_*))
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
       case _ =>
-        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))):_*)
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
     }
   }
 
@@ -271,8 +244,8 @@ abstract class QCertRuntime {
     val concatenated = recordConcat(l, r)
     val duplicates = allFieldNames(l) intersect allFieldNames(r)
     for (field <- duplicates)
-      // TODO This uses JsonElement equality. Unless we can guarantee that the JSON serialization is unique, this is likely incorrect
-      // What we should do is use QCert equality. Unfortunately, we would need to deserialize for that, which we can't, because we don't have the type!
+    // TODO This uses JsonElement equality. Unless we can guarantee that the JSON serialization is unique, this is likely incorrect
+    // What we should do is use QCert equality. Unfortunately, we would need to deserialize for that, which we can't, because we don't have the type!
       if (blobDot(field, r) != blobDot(field, concatenated))
         return Array()
     Array(concatenated)
@@ -294,15 +267,15 @@ abstract class QCertRuntime {
     val knownSchema = StructType(fs.map(f => oldKnownSchema.fields(oldKnownSchema.fieldIndex(f))))
     val data = v.get(1).asInstanceOf[GenericRowWithSchema]
     val knownValues = fs.map(data.getAs[Any])
-    val known = srow(knownSchema, knownValues:_*)
+    val known = srow(knownSchema, knownValues: _*)
     val jsonBlob = gsonParser.parse(v.getAs[String]("$blob")).getAsJsonObject
     val blobMap = new util.TreeMap[String, JsonElement]()
     for (f <- fs)
       blobMap.put(f, jsonBlob.get(f))
     val blob = gson.toJson(blobMap)
     srow(StructType(Seq(
-        StructField("$blob", StringType),
-        StructField("$known", knownSchema))),
+      StructField("$blob", StringType),
+      StructField("$known", knownSchema))),
       blob,
       known)
   }
@@ -371,10 +344,11 @@ abstract class QCertRuntime {
   // From sub type to immediate super types
   val brandHierarchy = mutable.HashMap[String, mutable.HashSet[String]]()
 
-  def isSubBrand(sub: Brand, sup: Brand): Boolean = {
+  // TODO replace by static helper
+  def isSubBrand(brandHierarchy: mutable.HashMap[String, mutable.HashSet[String]], sub: Brand, sup: Brand): Boolean = {
     if (sub == sup || sup == "Any")
       return true
-    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(dsup, sup))
+    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(brandHierarchy, dsup, sup))
   }
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
@@ -396,7 +370,7 @@ abstract class QCertRuntime {
     // TODO incomplete
   }
 
-  /** QCert cast operator
+  /** QCert cast operator (DNRC version)
     *
     * This is not a general cast operator, i.e. it does not give access to fields from the .. part of
     * an open record. The input has to be a branded value.
@@ -406,10 +380,10 @@ abstract class QCertRuntime {
     * @return Either a right, if the cast fails, or a branded value wrapped in left.
     */
   def cast(v: BrandedValue, bs: Brand*): Either = {
-    // First, check whether the cast succeeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
+    // TODO use castUDF helper
     if (!bs.forall((brand: Brand) =>
       v.getAs[Seq[Brand]]("$type").exists((typ: Brand) =>
-        isSubBrand(typ, brand))))
+        isSubBrand(brandHierarchy, typ, brand))))
       none()
     else
       left(v)

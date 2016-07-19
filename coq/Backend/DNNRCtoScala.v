@@ -38,6 +38,8 @@ Require Import TDataInfer.
 Require Import TDNRCInfer.
 Require Import TOpsInfer.
 Require Import SparkData.
+Require Import SparkIR.
+
 Local Open Scope string_scope.
 
 Section DNNRCtoScala.
@@ -195,7 +197,7 @@ Section DNNRCtoScala.
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
     end.
 
-  Fixpoint scala_of_dnrc {A plug_set: Set} {ft:foreign_type} {fdt:foreign_data_typing} {m:brand_model} {fttojs: ForeignToJavascript.foreign_to_javascript} (d: dnrc (type_annotation ft m A) plug_set) : string :=
+  Fixpoint scala_of_dnrc {A: Set} {ft:foreign_type} {fdt:foreign_data_typing} {m:brand_model} {fttojs: ForeignToJavascript.foreign_to_javascript} (d: dnrc (type_annotation ft m A) dataset) : string :=
     let code :=
         match d with
         | DNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
@@ -233,7 +235,13 @@ Section DNNRCtoScala.
             "dispatch(" ++ rtype_to_scala (proj1_sig et) ++ ", " ++ scala_of_dnrc x ++ ")"
           | None => "Argument to dispatch is not a local collection."
           end
-        | DNRCAlg t a xs => "ALG???" (* TODO *)
+        | DNRCAlg t a ((x, d)::nil) =>
+          (* TODO think again about how to pass arguments to algebra code.. *)
+          "{ val " ++ x ++ " = " ++ scala_of_dnrc d ++ "; " ++
+                   code_of_dataset a
+                   ++ " }"
+        | DNRCAlg _ _ _ =>
+          "NON_UNARY_ALG_CODEGEN_IS_NOT_CURRENTLY_IMPLEMENTED"
         end in
     if di_typeof d == di_required_typeof d then code else
       match lift_tlocal (di_required_typeof d) with
@@ -252,17 +260,97 @@ Section DNNRCtoScala.
       | None => "CANTCASTTODISTRIBUTEDTYPE"
       end.
 
-  (** Toplevel entry to Spark2/Scala codegen *)
-
   Context {ftype:foreign_type}.
   Context {m:brand_model}.
   Context {fdtyping:foreign_data_typing}.
   Context {fboptyping:foreign_binary_op_typing}.
   Context {fuoptyping:foreign_unary_op_typing}.
   Context {fttjs: ForeignToJavascript.foreign_to_javascript}.
-  Context {plug_type:Set}.
 
-  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A plug_type) : string :=
+  Require Import SparkIR.
+
+  (** Discover the traditional casting the world pattern:
+   * Iterate over a collection (the world), cast the element and perform some action on success, return the empty collection otherwise, and flatten at the end.
+   * We can translate this into a filter with a user defined cast function.
+   * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
+   *)
+  Definition rec_cast_to_filter {A: Set}
+             (e: dnrc (type_annotation _ _ A) dataset) :=
+    match e with
+    | DNRCUnop t1 AFlatten
+               (DNRCFor t2 x
+                        (DNRCCollect t3 xs)
+                        (DNRCEither _ (DNRCUnop _ (ACast brands) (DNRCVar _ x'))
+                                    leftVar
+                                    leftE
+                                    _
+                                    (DNNRC.DNRCConst _ (dcoll nil)))) =>
+      if (x == x')
+      then
+        let ALG := (DNRCAlg (dnrc_annotation_get xs)
+                            (DSFilter (CUDFCast "_ignored" brands (CCol "$type"))
+                                      (DSVar "map_cast"))
+                            (("map_cast", xs)::nil))
+        in
+        Some (DNRCUnop t1 AFlatten
+                       (DNRCFor t2 leftVar (DNRCCollect t3 ALG)
+                                leftE))
+      else None
+    | _ => None
+    end.
+
+  (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego. *)
+  Fixpoint tryBottomUp {A: Set} {plug_type: Set}
+           (f: dnrc (type_annotation _ _ A) _ -> option (dnrc (type_annotation _ _ A) _))
+           (e: dnrc (type_annotation _ _ A) _)
+    : dnrc (type_annotation _ _ A) plug_type :=
+    let try := fun e =>
+                 match f e with
+                 | Some e' => e'
+                 | None => e
+                 end in
+    match e with
+    | DNRCVar _ _ => try e
+    | DNRCConst _ _ => try e
+    | DNRCBinop a b x y =>
+      let x' := tryBottomUp f x in
+      let y' := tryBottomUp f y in
+      try (DNRCBinop a b x' y')
+    | DNRCUnop a b x =>
+      let x' := tryBottomUp f x in
+      try (DNRCUnop a b x')
+    | DNRCLet a b x y =>
+      let x' := tryBottomUp f x in
+      let y' := tryBottomUp f y in
+      try (DNRCLet a b x' y')
+    | DNRCFor a b x y =>
+      let x' := tryBottomUp f x in
+      let y' := tryBottomUp f y in
+      try (DNRCFor a b x' y')
+    | DNRCIf a x y z =>
+      let x' := tryBottomUp f x in
+      let y' := tryBottomUp f y in
+      let z' := tryBottomUp f z in
+      try (DNRCIf a x' y' z')
+    | DNRCEither a x b y c z =>
+      let x' := tryBottomUp f x in
+      let y' := tryBottomUp f y in
+      let z' := tryBottomUp f z in
+      try (DNRCEither a x' b y' c z')
+    | DNRCCollect a x =>
+      let x' := tryBottomUp f x in
+      try (DNRCCollect a x')
+    | DNRCDispatch a x =>
+      let x' := tryBottomUp f x in
+      try (DNRCDispatch a x')
+    | DNRCAlg a b c =>
+      (* TODO Should I try to match on the dnrc environment? *)
+      try e
+    end.
+
+  (** Toplevel entry to Spark2/Scala codegen *)
+
+  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A dataset) : string :=
     let tdb: tdbindings :=
         ("CONST$WORLD", (Tdistr inputType))::nil
     in
@@ -270,14 +358,17 @@ Section DNNRCtoScala.
     | None =>
       "TYPE INFERENCE FAILED "
     | Some e' =>
+      let e'' := tryBottomUp rec_cast_to_filter e' in
       ""
         ++ "import org.apache.spark.sql.types._" ++ eol
         ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
-        ++ "object " ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
+        ++ "import org.apache.spark.sql.functions._" ++ eol
+        ++ "import org.qcert.QCertRuntime" ++ eol
+        ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
         ++ "val worldType = " ++ rtype_to_scala (proj1_sig inputType) ++ eol
         ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
         ++ "println(toBlob(" ++ eol
-        ++ scala_of_dnrc e' ++ eol
+        ++ scala_of_dnrc e'' ++ eol
         ++ "))" ++ eol
         ++ "}" ++ eol
         ++ "}"

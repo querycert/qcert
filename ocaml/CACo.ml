@@ -46,7 +46,7 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
       in
       let (schema_content,wmType) = TypeUtil.extract_schema io in
       let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
-      let e = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
+      let e = CompCore.tcompile_nraenv_to_dnnrc_typed_opt_dataset op in
       let m = Enhanced.Model.basic_model brand_model in
       string_of_char_list
 	(CompBack.dnrc_to_scala_code_gen
