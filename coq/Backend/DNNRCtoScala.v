@@ -357,13 +357,17 @@ Section DNNRCtoScala.
     | _ => None
     end.
 
+  (* Replace (Unbrand (Var s)) expressions by just (Var s), for one specific s.
+   * If there are uses of (Var s) outside Unbrand, fail. We use this to lift
+   * unbranding into a map, but only if the value is not used unbranded. This is
+   * a very limited instance of common subexpression elimination.
+   *)
   Fixpoint rewrite_unbrand_or_fail
            {A: Set} {P: Set}
            (s: string)
            (e: dnrc A P) :=
     match e with
     | DNRCUnop t1 AUnbrand (DNRCVar t2 v) =>
-      (* TODO check that t1 is a closed record *)
       if (s == v)
       then Some (DNRCVar t1 s)
       else None
@@ -414,8 +418,8 @@ Section DNNRCtoScala.
                       (DSSelect ((CAs "$blob" (CCol "unbranded.$blob"))
                                    ::(CAs "$known" (CCol "unbranded.$known"))::nil)
                                 (DSSelect ((CUDFUnbrand "unbranded" t (CCol "$data"))::nil)
-                                          (DSVar "unbrand_into_closed_record")))
-                      (("unbrand_into_closed_record", xs)::nil)
+                                          (DSVar "lift_unbrand")))
+                      (("lift_unbrand", xs)::nil)
           in
           Some (DNRCFor t1 x (DNRCCollect t2 ALG) e')
         | None => None
