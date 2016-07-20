@@ -344,6 +344,13 @@ Section DNNRCtoScala.
         | Some (castSuccessType, _) =>
           let algTypeA := ta_mk (ta_base t4) (Tdistr castSuccessType) in
           let collectTypeA := ta_mk (ta_base t3) (Tlocal (Coll castSuccessType)) in
+          (* We need a fresh name for the DNRCAlg environment that binds DNNRC terms to
+           * be referred to by name in the algebra part.
+           * I talked to Avi about it and this is what needs to happen:
+           * - TODO write a function that finds free (and possibly bound) names in SparkIR
+           * - TODO use existing fresh_var-related functions in Basic.Util.RFresh
+           * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
+           *)
           let ALG := (DNRCAlg algTypeA
                             (DSFilter (CUDFCast "_ignored" brands (CCol "$type"))
                                       (DSVar "map_cast"))
@@ -414,6 +421,7 @@ Section DNNRCtoScala.
         match rewrite_unbrand_or_fail x e with
         | Some e' =>
           let ALG :=
+              (* TODO fresh name for lift_unbrand! *)
               DNRCAlg (dnrc_annotation_get xs)
                       (DSSelect ((CAs "$blob" (CCol "unbranded.$blob"))
                                    ::(CAs "$known" (CCol "unbranded.$known"))::nil)
