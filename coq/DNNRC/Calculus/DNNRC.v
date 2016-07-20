@@ -659,16 +659,18 @@ Section DNNRC.
     Definition dnrc_algenv {A} := @dnrc A algenv.
 
     Definition nrc_to_dnrc_algenv {A} := @nrc_to_dnrc A algenv.
-    
+
   End NraEnvPlug.
 
   Section DatasetEnvPlug.
     Require Import SparkIR.
 
+    Context {ftype: ForeignType.foreign_type}.
+
     Definition nrc_to_dnrc_dataset {A} := @nrc_to_dnrc A dataset.
-    
+
   End DatasetEnvPlug.
-  
+
   (*
   Section DatasetPlug.
     Definition dataset_closure : Set := (list string) * algenv.

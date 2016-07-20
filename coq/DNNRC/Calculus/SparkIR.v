@@ -27,7 +27,10 @@ Section SparkIR.
   Require Import DData.
   Require Import RAlgEnv.
 
+  Require Import RType.
+
   Context {fruntime:foreign_runtime}.
+  Context {ftype: ForeignType.foreign_type}.
 
   Definition var := string.
 
@@ -40,6 +43,7 @@ Section SparkIR.
   | CEq1   : string -> column -> column -> column
   | CNeg   : string -> column ->           column
   | CUDFCast : string -> list string -> column -> column (* TODO might want to factor UDFs out *)
+  | CUDFUnbrand : string -> rtype₀ -> column -> column
   .
 
   Inductive spark_aggregate :=
@@ -62,15 +66,19 @@ Section SparkIR.
 
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
-  
+
+  Require Import SparkData.
+
   Fixpoint code_of_column (c: column) : string :=
     match c with
     | CCol s => "column(""" ++ s ++ """)"
     | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
     | CEq1 new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CEq0 new d c => code_of_column c ++ ".equalTo(" ++ "TODO_LITERAL_DATA" ++ ").as(""" ++ new ++ """)"
+    | CEq0 new d c => code_of_column c ++ ".equalTo(" ++ "32/*TODO_LITERAL_DATA*/" ++ ").as(""" ++ new ++ """)"
     | CUDFCast new bs c =>
-      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
+    | CUDFUnbrand new t c =>
+      "QCertRuntime.unbrandUDF(" ++ rtype_to_scala t ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
     | _ => "UNIMPLEMENTED_COLUMN"
     end.
 

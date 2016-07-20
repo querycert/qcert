@@ -149,7 +149,7 @@ Module CompCore(runtime:CompilerRuntime).
     let op_optim := optimize_algenv optim op_init in
     let e_init := translate_nraenv_to_nnrc op_optim in
     let e_rew := rew e_init in
-    let de_init := @nrc_to_dnrc_dataset _ unit tt mkDistLoc e_rew in
+    let de_init := @nrc_to_dnrc_dataset _ _ unit tt mkDistLoc e_rew in
     de_init.
 
   Definition tcompile_nraenv_to_dnnrc_none_dataset (op_init:algenv) : dnrc unit dataset :=

@@ -34,18 +34,36 @@ object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
-
+/*
     // TODO move into object
     def unbrandData[T](t: DataType) = (data: T) =>
       // TODO need to wrap primitive data in a record
       reshape(data, t).asInstanceOf[AnyRef]
+*/
 
-    def unbrandUDF[T](t: DataType) =
-      udf(unbrandData(t), t)
+    val unbrandType = StructType(
+      Seq(
+        StructField("$blob", StringType),
+        StructField("$known",
+          StructType(Seq(StructField(
+            "age",
+            IntegerType),
+            StructField(
+              "cid",
+              IntegerType),
+            StructField(
+              "name",
+              StringType))))))
 
-    val res = CONST$WORLD.where(QCertRuntime.castUDF(brandHierarchy, "entities.Customer")(column("$type"))).count()
+    val res = CONST$WORLD.where(QCertRuntime.castUDF(brandHierarchy, "entities.Customer")(column("$type")))
+      .select(QCertRuntime.unbrandUDF(unbrandType)(column("$data")).getField("$blob"), QCertRuntime.unbrandUDF(unbrandType)(column("$data")).getField("$known"))
+      //.filter(column("unbranded").getField("$known").getField("age").equalTo(32))
 
-    println(res)
+    res.explain(true)
+
+    res.show()
+
+    res.foreach(println(_))
   }
 }
 
@@ -61,6 +79,10 @@ object test extends QCertRuntime {
   * It declares abstract members like `run` and the world type for initial data loading.
   */
 object QCertRuntime {
+  // TODO
+  // We might want to change all of these to pass around a runtime support object with the hierarchy, gson parser, ...
+  // basically everything that's currently in the QCertRuntime abstract class
+
   def isSubBrand(brandHierarchy: mutable.HashMap[String, mutable.HashSet[String]], sub: String, sup: String): Boolean = {
     if (sub == sup || sup == "Any")
       return true
@@ -75,6 +97,64 @@ object QCertRuntime {
   // TODO Can we somehow avoid passing the hierarchy at every call site?
   def castUDF(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) =
     udf(QCertRuntime.castUDFHelper(h, bs:_*), BooleanType)
+
+
+  def srow(s: StructType, vals: Any*): Row = {
+    assert(s.fields.length == vals.length,
+      "Number of record fields does not match the schema. Did you forget to splice an array parameter?")
+    assert(s.fieldNames.sorted.distinct.sameElements(s.fieldNames),
+      "Field names must be unique and sorted!")
+    new GenericRowWithSchema(vals.toArray, s)
+  }
+
+  def fromBlob(t: DataType, b: JsonElement): Any = t match {
+    case t: IntegerType => b.getAsInt
+    case t: BooleanType => b.getAsBoolean
+    case t: StringType => b.getAsString
+    case t: ArrayType =>
+      b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
+    case t: StructType => t.fieldNames match {
+      case Array("$left", "$right") => sys.error("either")
+      case Array("$type", "$data") => sys.error("brand")
+      case Array("$blob", "$known") =>
+        val r = b.getAsJsonObject
+        val knownFieldValues = t("$known").dataType.asInstanceOf[StructType].fields map ((field: StructField) => {
+          fromBlob(field.dataType, r.get(field.name))
+        })
+        srow(t,
+          // We have the full record in the blob field, even for closed records
+          r.toString,
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
+      case _ =>
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
+    }
+  }
+
+  def fromBlob(t: DataType, b: String): Any =
+    // TODO because this is static now, we instantiate a new gson parser every time, fix this
+    fromBlob(t, new com.google.gson.JsonParser().parse(b))
+
+  def reshape(v: Any, t: DataType): Any = (v, t) match {
+    case (i: Int, t: IntegerType) => i
+    case (s: String, t: StringType) => s
+    case (b: Boolean, t: BooleanType) => b
+    case (r: Row, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") =>
+        val blob = r.getAs[String]("$blob")
+        // NOTE We get all the known fields from the blob. If we ever decide to only keep unknown fields in the blob we have to change this.
+        val known = fromBlob(t("$known").dataType, blob)
+        srow(t, blob, known)
+      // TODO incomplete
+    }
+    case (blob: String, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") => fromBlob(t, blob)
+      // TODO incomplete
+    }
+    // TODO incomplete
+  }
+
+  def unbrandUDF[T](t: DataType) =
+    udf((data: T) => reshape(data, t), t)
 }
 
 abstract class QCertRuntime {

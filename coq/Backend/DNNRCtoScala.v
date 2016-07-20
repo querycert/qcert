@@ -269,41 +269,15 @@ Section DNNRCtoScala.
 
   Require Import SparkIR.
 
-  (** Discover the traditional casting the world pattern:
-   * Iterate over a collection (the world), cast the element and perform some action on success, return the empty collection otherwise, and flatten at the end.
-   * We can translate this into a filter with a user defined cast function.
-   * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
-   *)
-  Definition rec_cast_to_filter {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset) :=
-    match e with
-    | DNRCUnop t1 AFlatten
-               (DNRCFor t2 x
-                        (DNRCCollect t3 xs)
-                        (DNRCEither _ (DNRCUnop _ (ACast brands) (DNRCVar _ x'))
-                                    leftVar
-                                    leftE
-                                    _
-                                    (DNNRC.DNRCConst _ (dcoll nil)))) =>
-      if (x == x')
-      then
-        let ALG := (DNRCAlg (dnrc_annotation_get xs)
-                            (DSFilter (CUDFCast "_ignored" brands (CCol "$type"))
-                                      (DSVar "map_cast"))
-                            (("map_cast", xs)::nil))
-        in
-        Some (DNRCUnop t1 AFlatten
-                       (DNRCFor t2 leftVar (DNRCCollect t3 ALG)
-                                leftE))
-      else None
-    | _ => None
-    end.
-
-  (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego. *)
-  Fixpoint tryBottomUp {A: Set} {plug_type: Set}
-           (f: dnrc (type_annotation _ _ A) _ -> option (dnrc (type_annotation _ _ A) _))
-           (e: dnrc (type_annotation _ _ A) _)
-    : dnrc (type_annotation _ _ A) plug_type :=
+    (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego.
+     *
+     * A Haskell Hosted DSL for Writing Transformation Systems.
+     * Andy Gill. IFIP Working Conference on DSLs, 2009.
+     * http://ku-fpg.github.io/files/Gill-09-KUREDSL.pdf *)
+  Fixpoint tryBottomUp {A: Set} {P: Set}
+           (f: dnrc A P -> option (dnrc A P))
+           (e: dnrc A P)
+    : dnrc A P :=
     let try := fun e =>
                  match f e with
                  | Some e' => e'
@@ -348,6 +322,109 @@ Section DNNRCtoScala.
       try e
     end.
 
+  (** Discover the traditional casting the world pattern:
+   * Iterate over a collection (the world), cast the element and perform some action on success, return the empty collection otherwise, and flatten at the end.
+   * We can translate this into a filter with a user defined cast function.
+   * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
+   *)
+  Definition rec_cast_to_filter {A: Set}
+             (e: dnrc (type_annotation _ _ A) dataset) :=
+    match e with
+    | DNRCUnop t1 AFlatten
+               (DNRCFor t2 x
+                        (DNRCCollect t3 xs)
+                        (DNRCEither _ (DNRCUnop t4 (ACast brands) (DNRCVar _ x'))
+                                    leftVar
+                                    leftE
+                                    _
+                                    (DNNRC.DNRCConst _ (dcoll nil)))) =>
+      if (x == x')
+      then
+        match olift tuneither (lift_tlocal (ta_inferred t4)) with
+        | Some (castSuccessType, _) =>
+          let algTypeA := ta_mk (ta_base t4) (Tdistr castSuccessType) in
+          let collectTypeA := ta_mk (ta_base t3) (Tlocal (Coll castSuccessType)) in
+          let ALG := (DNRCAlg algTypeA
+                            (DSFilter (CUDFCast "_ignored" brands (CCol "$type"))
+                                      (DSVar "map_cast"))
+                            (("map_cast", xs)::nil)) in
+          Some (DNRCUnop t1 AFlatten
+                         (DNRCFor t2 leftVar (DNRCCollect collectTypeA ALG)
+                                  leftE))
+        | _ => None
+        end
+      else None
+    | _ => None
+    end.
+
+  Fixpoint rewrite_unbrand_or_fail
+           {A: Set} {P: Set}
+           (s: string)
+           (e: dnrc A P) :=
+    match e with
+    | DNRCUnop t1 AUnbrand (DNRCVar t2 v) =>
+      (* TODO check that t1 is a closed record *)
+      if (s == v)
+      then Some (DNRCVar t1 s)
+      else None
+    | DNRCVar _ v =>
+      if (s == v)
+      then None
+      else Some e
+    | DNRCConst _ _ => Some e
+    | DNRCBinop a b x y =>
+      lift2 (DNRCBinop a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
+    | DNRCUnop a b x =>
+      lift (DNRCUnop a b) (rewrite_unbrand_or_fail s x)
+    | DNRCLet a b x y =>
+      lift2 (DNRCLet a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
+    | DNRCFor a b x y =>
+      lift2 (DNRCFor a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
+    | DNRCIf a x y z =>
+      match rewrite_unbrand_or_fail s x, rewrite_unbrand_or_fail s y, rewrite_unbrand_or_fail s z with
+      | Some x', Some y', Some z' => Some (DNRCIf a x' y' z')
+      | _, _, _ => None
+      end
+    | DNRCEither a x b y c z =>
+      match rewrite_unbrand_or_fail s x, rewrite_unbrand_or_fail s y, rewrite_unbrand_or_fail s z with
+      | Some x', Some y', Some z' => Some (DNRCEither a x' b y' c z')
+      | _, _, _ => None
+      end
+    | DNRCCollect a x =>
+      lift (DNRCCollect a) (rewrite_unbrand_or_fail s x)
+    | DNRCDispatch a x =>
+      lift (DNRCDispatch a) (rewrite_unbrand_or_fail s x)
+    (* TODO Can we discover uses of the variable s in an algebra expression? *)
+    | DNRCAlg _ _ _ => None
+    end.
+
+  Definition rec_lift_unbrand
+             {A : Set}
+             (e: dnrc (type_annotation _ _ A) dataset):
+    option (dnrc (type_annotation _ _ _) dataset) :=
+    match e with
+    | DNRCFor t1 x (DNRCCollect t2 xs as c) e =>
+      match lift_tlocal (di_required_typeof c) with
+      | Some (exist _ (Coll₀ (Brand₀ bs)) _) =>
+        let t := proj1_sig (brands_type bs) in
+        match rewrite_unbrand_or_fail x e with
+        | Some e' =>
+          let ALG :=
+              DNRCAlg (dnrc_annotation_get xs)
+                      (DSSelect ((CCol "unbranded.$blob")::(CCol "unbranded.$known")::nil)
+                                (DSSelect ((CUDFUnbrand "unbranded" t (CCol "$data"))::nil)
+                                          (DSVar "unbrand_into_closed_record")))
+                      (("unbrand_into_closed_record", xs)::nil)
+          in
+          Some (DNRCFor t1 x (DNRCCollect t2 ALG) e')
+        | None => None
+        end
+      | _ => None
+      end
+    | _ => None
+    end.
+
+
   (** Toplevel entry to Spark2/Scala codegen *)
 
   Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A dataset) : string :=
@@ -359,6 +436,7 @@ Section DNNRCtoScala.
       "TYPE INFERENCE FAILED "
     | Some e' =>
       let e'' := tryBottomUp rec_cast_to_filter e' in
+      let e''' := tryBottomUp rec_lift_unbrand e'' in
       ""
         ++ "import org.apache.spark.sql.types._" ++ eol
         ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
@@ -368,7 +446,7 @@ Section DNNRCtoScala.
         ++ "val worldType = " ++ rtype_to_scala (proj1_sig inputType) ++ eol
         ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
         ++ "println(toBlob(" ++ eol
-        ++ scala_of_dnrc e'' ++ eol
+        ++ scala_of_dnrc e''' ++ eol
         ++ "))" ++ eol
         ++ "}" ++ eol
         ++ "}"
