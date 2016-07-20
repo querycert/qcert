@@ -411,7 +411,8 @@ Section DNNRCtoScala.
         | Some e' =>
           let ALG :=
               DNRCAlg (dnrc_annotation_get xs)
-                      (DSSelect ((CCol "unbranded.$blob")::(CCol "unbranded.$known")::nil)
+                      (DSSelect ((CAs "$blob" (CCol "unbranded.$blob"))
+                                   ::(CAs "$known" (CCol "unbranded.$known"))::nil)
                                 (DSSelect ((CUDFUnbrand "unbranded" t (CCol "$data"))::nil)
                                           (DSVar "unbrand_into_closed_record")))
                       (("unbrand_into_closed_record", xs)::nil)

@@ -34,30 +34,25 @@ object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
-/*
-    // TODO move into object
-    def unbrandData[T](t: DataType) = (data: T) =>
-      // TODO need to wrap primitive data in a record
-      reshape(data, t).asInstanceOf[AnyRef]
-*/
 
-    val unbrandType = StructType(
-      Seq(
-        StructField("$blob", StringType),
-        StructField("$known",
-          StructType(Seq(StructField(
-            "age",
-            IntegerType),
-            StructField(
-              "cid",
-              IntegerType),
-            StructField(
-              "name",
-              StringType))))))
-
-    val res = CONST$WORLD.where(QCertRuntime.castUDF(brandHierarchy, "entities.Customer")(column("$type")))
-      .select(QCertRuntime.unbrandUDF(unbrandType)(column("$data")).getField("$blob"), QCertRuntime.unbrandUDF(unbrandType)(column("$data")).getField("$known"))
-      //.filter(column("unbranded").getField("$known").getField("age").equalTo(32))
+    val res = {
+      val unbrand_into_closed_record = {
+        val map_cast = CONST$WORLD;
+        map_cast.filter(
+          QCertRuntime
+            .castUDF(brandHierarchy, "entities.Customer")(
+              column("$type"))
+            .as("_ignored"))
+      }
+      unbrand_into_closed_record
+        .select(QCertRuntime.unbrandUDF(StructType(
+              Seq(StructField("$blob", StringType),
+                StructField("$known",
+                  StructType(Seq(StructField("age", IntegerType),
+                      StructField("cid", IntegerType),
+                      StructField("name", StringType)))))))(column("$data")).as("unbranded"))
+        .select(column("unbranded.$blob").as("$blob"), column("unbranded.$known").as("$known"))
+    }
 
     res.explain(true)
 
