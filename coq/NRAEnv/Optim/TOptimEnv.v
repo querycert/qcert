@@ -3082,42 +3082,18 @@ Section TOptimEnv.
                   | _ => None
                   end) dout); simpl in *; congruence.
   Qed.
-
-  Definition algenv_always_ensures (P:data->Prop) (q:algenv) :=
-      forall
-      (h:list(string*string))
-      (c:list (string*data))
-      (dn_c:Forall (fun d => data_normalized h (snd d)) c)
-      (env:data)
-      (dn_env:data_normalized h env)
-      (x:data)
-      (dn_x:data_normalized h x)
-      (d:data),
-        h ⊢ₑ q @ₑ x ⊣ c;env = Some d -> P d.
-
-  Definition nodupA : algenv -> Prop :=
-    algenv_always_ensures
-      (fun d => match d with
-                | dcoll dl => NoDup dl
-                | _ => True
-                end).
   
   Lemma tdup_elim (q:algenv) :
     nodupA q -> ANUnop ADistinct q  ⇒  q.
   Proof.
-    red; intros; split; intros; inferer; invcs H3.
-    - trivial.
-    - input_well_typed.
-      dtype_inverter.
-      rewrite rondcoll_dcoll.
-      f_equal.
-      f_equal.
-      apply bindings_type_Forall_normalized in dt_c.
-      apply data_type_normalized in dt_env.
-      apply data_type_normalized in dt_x.
-      specialize (H brand_relation_brands c dt_c env dt_env x dt_x (dcoll dout) eout).
-      simpl in H.
-      apply NoDup_bdistinct; trivial.
+    intros nd.
+    apply rewrites_typed_with_untyped.
+    - rewrite dup_elim by trivial.
+      reflexivity.
+    - intros.
+      inferer.
+      invcs H2.
+      trivial.
   Qed.
 
 End TOptimEnv.

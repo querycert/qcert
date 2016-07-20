@@ -459,6 +459,18 @@ Section RAlgEnvEq.
       auto.
     Qed.
 
+    Definition algenv_always_ensures (P:data->Prop) (q:algenv) :=
+      forall
+        (h:list(string*string))
+        (c:list (string*data))
+        (dn_c:Forall (fun d => data_normalized h (snd d)) c)
+        (env:data)
+        (dn_env:data_normalized h env)
+        (x:data)
+        (dn_x:data_normalized h x)
+        (d:data),
+        h ⊢ₑ q @ₑ x ⊣ c;env = Some d -> P d.
+
 End RAlgEnvEq.
 
 Notation "X ≡ₑ Y" := (algenv_eq X Y) (at level 90) : algenv_scope.                             (* ≡ = \equiv *)

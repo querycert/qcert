@@ -1723,6 +1723,28 @@ Section ROptimEnv.
           end) d); trivial.
   Qed.
 
+  (* optimization for distinct *)
+    Definition nodupA : algenv -> Prop :=
+    algenv_always_ensures
+      (fun d => match d with
+                | dcoll dl => NoDup dl
+                | _ => False
+                end).
+  
+  Lemma dup_elim (q:algenv) :
+    nodupA q -> ANUnop ADistinct q  ≡ₑ  q.
+  Proof.
+    intros nd.
+    red; intros.
+    simpl.
+    case_eq (h ⊢ₑ q @ₑ x ⊣ c; env); simpl; trivial; intros.
+    specialize (nd h c dn_c env dn_env x dn_x d H).
+    simpl in nd.
+    match_destr_in nd; try tauto.
+    rewrite rondcoll_dcoll.
+    rewrite NoDup_bdistinct; trivial.
+  Qed.
+
   (** Some optimizations are best seen through outlining -- the 
        opposite of inlining.  This allows sharing of common sub-expressions.
        To enable this, we first define the "last" part of a computation.
@@ -1774,7 +1796,8 @@ This is the first operation that
          | ANAppEnv e1 e2 => (ANAppEnv e1 e2, ANID)
          | ANMapEnv e => (ANMapEnv e, ANID)
        end.
-    
+
+  
 End ROptimEnv.
 
 (* begin hide *)
