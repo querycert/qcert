@@ -41,6 +41,7 @@ Section SparkIR.
   Inductive column :=
   | CCol   : string                     -> column (* column("name") *)
   | CAs    : string -> column           -> column (* .as("new_name") *)
+  | CDot   : string -> string -> column -> column (* .getField(fld).as(name) *)
   | CLit   : string -> data * rtype₀    -> column (* lit(d).as("name") *)
   | CPlus  : string -> column -> column -> column (* $column1.plus($column2) *)
   | CEq    : string -> column -> column -> column

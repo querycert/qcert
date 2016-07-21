@@ -34,32 +34,64 @@ object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
+    val map_cast = CONST$WORLD;
+    val lift_unbrand = {
+
+      map_cast.filter(
+        QCertRuntime
+          .castUDF(brandHierarchy, "entities.Customer")(
+            column("$type"))
+          .as("_ignored"))
+    };
+
+    lift_unbrand.show()
+
+
+    val if_else_empty_to_filter = {
+
+      lift_unbrand
+        .select(
+          QCertRuntime
+            .unbrandUDF(
+              StructType(
+                Seq(StructField("$blob", StringType),
+                  StructField(
+                    "$known",
+                    StructType(
+                      Seq(StructField("age", IntegerType),
+                        StructField("cid", IntegerType),
+                        StructField("name",
+                          StringType)))))))(
+              column("$data"))
+            .as("unbranded"))
+        .select(column("unbranded.$blob").as("$blob"),
+          column("unbranded.$known").as("$known"))
+    };
+
+    if_else_empty_to_filter.explain()
+    if_else_empty_to_filter.show()
+
+    if_else_empty_to_filter.select(column("$known.age").as("l").equalTo(32)).explain()
+    if_else_empty_to_filter.filter(column("$known.age").as("l").equalTo(32)).explain()
+
 
     val res = {
-      val unbrand_into_closed_record = {
-        val map_cast = CONST$WORLD;
-        map_cast.filter(
-          QCertRuntime
-            .castUDF(brandHierarchy, "entities.Customer")(
-              column("$type"))
-            .as("_ignored"))
-      }
-      unbrand_into_closed_record
-        .select(QCertRuntime.unbrandUDF(StructType(
-              Seq(StructField("$blob", StringType),
-                StructField("$known",
-                  StructType(Seq(StructField("age", IntegerType),
-                      StructField("cid", IntegerType),
-                      StructField("name", StringType)))))))(column("$data")).as("unbranded"))
-        .select(column("unbranded.$blob").as("$blob"), column("unbranded.$known").as("$known"))
-        .filter(lit(5).leq(column("$blob.age")))
+      if_else_empty_to_filter.filter(
+        column("$known.age").as("l").equalTo(lit(32)).as("ignored"))
     }
 
     res.explain(true)
 
     res.show()
 
+
+    res.collect()
+      .map((teitherL$0) => {
+        Array("Customer =".+(toBlob(dot[String]("name")(teitherL$0))))
+      }).foreach(println(_))
+
     res.foreach(println(_))
+
   }
 }
 
@@ -93,7 +125,6 @@ object QCertRuntime {
   // TODO Can we somehow avoid passing the hierarchy at every call site?
   def castUDF(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) =
     udf(QCertRuntime.castUDFHelper(h, bs:_*), BooleanType)
-
 
   def srow(s: StructType, vals: Any*): Row = {
     assert(s.fields.length == vals.length,

@@ -205,6 +205,39 @@ Section DNNRCSparkIRRewrites.
     | _ => None
     end.
 
+  Fixpoint condition_to_column {A: Set}
+           (e: dnrc (type_annotation _ _ A) dataset)
+           (cname: string)
+           (binding: (string * column)) :=
+    match e with
+    (* TODO figure out how to properly handle vars and projections *)
+    | DNRCUnop _ (ADot fld) (DNRCVar _ n) =>
+      let (var, _) := binding in
+      if (n == var)
+      then Some (CAs cname (CCol ("$known."%string ++ fld)))
+      else None
+(*    | DNRCVar _ n =>
+      (* TODO generalize to multiple bindings, for joins *)
+      let (var, expr) := binding in
+      if (n == var)
+      then Some expr
+      else None
+    | DNRCUnop _ (ADot fld) c =>
+      lift (fun c =>
+              (CDot cname fld c))
+           (condition_to_column c "c" binding) *)
+    | DNRCConst _ d =>
+      lift (fun t => CLit cname (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
+    | DNRCBinop _ AEq l r =>
+      (* TODO check that the types of l and r admit Spark built-in equality *)
+      match condition_to_column l "l" binding, condition_to_column r "r" binding with
+      | Some l', Some r' =>
+        Some (CEq cname l' r')
+      | _, _ => None
+      end
+    | _ => None
+    end.
+
   Definition rec_if_else_empty_to_filter {A: Set}
              (e: dnrc (type_annotation _ _ A) dataset):
     option (dnrc (type_annotation _ _ A) dataset) :=
@@ -214,14 +247,18 @@ Section DNNRCSparkIRRewrites.
                         (DNRCIf _ condition
                                 thenE
                                 (DNNRC.DNRCConst _ (dcoll nil)))) =>
-      let ALG :=
-          DNRCAlg (dnrc_annotation_get xs)
-                  (DSVar "if_else_empty_to_filter")
-                  (("if_else_empty_to_filter"%string, xs)::nil)
-      in
-      Some (DNRCUnop t1 AFlatten
-                     (DNRCFor t2 x (DNRCCollect t3 ALG)
-                              thenE))
+      match condition_to_column condition "ignored" (x, CCol "abc") with
+      | Some c' =>
+        let ALG :=
+            DNRCAlg (dnrc_annotation_get xs)
+                    (DSFilter c' (DSVar "if_else_empty_to_filter"))
+                    (("if_else_empty_to_filter"%string, xs)::nil)
+        in
+        Some (DNRCUnop t1 AFlatten
+                       (DNRCFor t2 x (DNRCCollect t3 ALG)
+                                thenE))
+      | None => None
+      end
     | _ => None
     end.
 

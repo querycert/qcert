@@ -144,17 +144,22 @@ Section DNNRCtoScala.
     | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
     end.
 
+  (* TODO get rid of the new name
+   * I think having the new name be part of every column expression was a bad choice.
+   * Most of the time the name is ignored anyways, and if we really need it, there is always CAs. *)
   Fixpoint code_of_column (c: column) : string :=
     match c with
     | CCol s => "column(""" ++ s ++ """)"
     | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
+    | CDot new fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ").as(""" ++ new ++ """)"
     | CEq new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
     | CLit new (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
+    | CNeg new c => "not(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
+    | CPlus new c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
     | CUDFCast new bs c =>
       "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
     | CUDFUnbrand new t c =>
       "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | _ => "UNIMPLEMENTED_COLUMN"
     end.
 
   Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
@@ -351,7 +356,7 @@ Section DNNRCtoScala.
         ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
         ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
         ++ "println(toBlob(" ++ eol
-        ++ scala_of_dnrc e''' ++ eol
+        ++ scala_of_dnrc e'''' ++ eol
         ++ "))" ++ eol
         ++ "}" ++ eol
         ++ "}"
