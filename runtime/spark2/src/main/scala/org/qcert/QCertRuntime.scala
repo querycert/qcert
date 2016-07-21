@@ -149,8 +149,34 @@ object QCertRuntime {
     // TODO incomplete
   }
 
-  def unbrandUDF[T](t: DataType) =
-    udf((data: T) => reshape(data, t), t)
+  def unbrandUDF[T](t: DataType) = {
+    /* Work around a bug in the SparkSQL optimizer
+     *
+     * https://issues.apache.org/jira/browse/SPARK-13773
+     *
+     * reshape is not total, it expects the data and type to match up.
+     * If the data does not match the type, it will throw an exception.
+     * Normally this does not happen, because the type checker ensures
+     * that the data has the correct type. Most queries perform a cast
+     * and then unbrand, if the cast succeeds. Due to a bug in the SparkSQL
+     * optimizer, in some cases the order of operations gets turned around,
+     * and we end up unbranding values that should not have passed the cast.
+     *
+     * We work around by making reshape "total" by returning null in case it
+     * throws. This is not ideal, because the nulls may be used in further
+     * filter conditions, but we assume SparkSQL built-ins deal with null
+     * correctly. The nulls should not escape out of a filter condition,
+     * because the cast condition is still checked, eventually.
+     */
+    def workaround(data: T, t: DataType) =
+      try {
+        reshape(data, t)
+      } catch {
+        case e: NullPointerException =>
+          null
+      }
+    udf((data: T) => workaround(data, t), t)
+  }
 }
 
 abstract class QCertRuntime {
