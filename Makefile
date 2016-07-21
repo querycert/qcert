@@ -176,6 +176,7 @@ MODULES = \
 	Translation/TPatterntoNRA \
 	Translation/TPatterntoNRAEnv \
 	Frontend/LambdaNRA/LambdaAlg \
+	Frontend/LambdaNRA/LambdaAlgEq \
 	Frontend/LambdaNRA/LambdaAlgtoNRAEnv \
 	Frontend/LambdaNRA/LambdaAlgExamples \
 	Frontend/ODMG/OQL \

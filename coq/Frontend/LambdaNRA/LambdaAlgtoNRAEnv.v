@@ -30,62 +30,6 @@ Section LambdaNRAtoNRAEnv.
     end.
 
   Context (h:brand_relation_t).
-
-  Lemma fun_of_lalg_lambda_lambda_eq env x lop d:
-    fun_of_lalg_lambda h env (LALambda x lop) d =
-    (fun_of_lalg h (env++((x,d)::nil)) lop).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma fun_of_lalg_map_eq env lop1 op2 :
-    fun_of_lalg h env (LAMap lop1 op2) = 
-        let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (fun_of_lalg_lambda h env lop1) c1)) d
-        in olift aux_map (fun_of_lalg h env op2).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma fun_of_lalg_map_concat_eq env lop1 op2 :
-    fun_of_lalg h env (LAMapConcat lop1 op2) = 
-      let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun_of_lalg_lambda h env lop1) c1)) d
-      in olift aux_mapconcat (fun_of_lalg h env op2).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma fun_of_lalg_product_eq env op1 op2 :
-    fun_of_lalg h env (LAProduct op1 op2) = 
-        let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => fun_of_lalg h env op2) c1)) d
-        in olift aux_product (fun_of_lalg h env op1).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma fun_of_lalg_select_eq env lop1 op2 :
-    fun_of_lalg h env (LASelect lop1 op2) = 
-      let pred x' :=
-          match fun_of_lalg_lambda h env lop1 x' with
-          | Some (dbool b) => Some b
-          | _ => None
-          end
-      in
-      let aux_select d :=
-          lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
-      in
-      olift aux_select (fun_of_lalg h env op2).
-  Proof.
-    reflexivity.
-  Qed.
-  
-  Hint Rewrite fun_of_lalg_lambda_lambda_eq : lalg_lambda.
-  Hint Rewrite fun_of_lalg_map_eq : lalg_lambda.
-  Hint Rewrite fun_of_lalg_map_concat_eq : lalg_lambda.
-  Hint Rewrite fun_of_lalg_product_eq : lalg_lambda.
-  Hint Rewrite fun_of_lalg_select_eq : lalg_lambda.
     
   Theorem algenv_of_lalg_lambda_correct (env:bindings) (lop:lalg_lambda) (d:data) :
     fun_of_lalg_lambda h env lop d = fun_of_algenv h nil (algenv_of_lalg_lambda lop) (drec env) d.
@@ -94,7 +38,7 @@ Section LambdaNRAtoNRAEnv.
     revert env s d.
     lalg_cases (induction l) Case
     ; intros; simpl in *
-    ; autorewrite with lalg_lambda.
+    ; autorewrite with lalg.
     - Case "LAVar"%string.
       unfold edot, rec_concat_sort.
       rewrite assoc_lookupr_drec_sort.

@@ -115,7 +115,195 @@ Section LambdaNRA.
   Definition eval_q (Q:lalg -> lalg) (input:data) : option data :=
     fun_of_lalg_lambda nil (q_to_lambda Q) input.
 
+
+  Lemma fun_of_lalg_lambda_lambda_eq env x lop d:
+    fun_of_lalg_lambda env (LALambda x lop) d =
+    (fun_of_lalg (env++((x,d)::nil)) lop).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma fun_of_lalg_map_eq env lop1 op2 :
+    fun_of_lalg env (LAMap lop1 op2) = 
+        let aux_map d :=
+            lift_oncoll (fun c1 => lift dcoll (rmap (fun_of_lalg_lambda env lop1) c1)) d
+        in olift aux_map (fun_of_lalg env op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma fun_of_lalg_map_concat_eq env lop1 op2 :
+    fun_of_lalg env (LAMapConcat lop1 op2) = 
+      let aux_mapconcat d :=
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun_of_lalg_lambda env lop1) c1)) d
+      in olift aux_mapconcat (fun_of_lalg env op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma fun_of_lalg_product_eq env op1 op2 :
+    fun_of_lalg env (LAProduct op1 op2) = 
+        let aux_product d :=
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => fun_of_lalg env op2) c1)) d
+        in olift aux_product (fun_of_lalg env op1).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma fun_of_lalg_select_eq env lop1 op2 :
+    fun_of_lalg env (LASelect lop1 op2) = 
+      let pred x' :=
+          match fun_of_lalg_lambda env lop1 x' with
+          | Some (dbool b) => Some b
+          | _ => None
+          end
+      in
+      let aux_select d :=
+          lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
+      in
+      olift aux_select (fun_of_lalg env op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma fun_of_lalg_normalized {op:lalg} {env:bindings} {o} :
+    fun_of_lalg env op= Some o ->
+    Forall (fun x => data_normalized h (snd x)) env ->
+    data_normalized h o.
+  Proof.
+    revert env o.
+    lalg_cases (induction op) Case
+    ; intros; simpl in *.
+    - Case "LAVar"%string.
+      unfold edot in H.
+      apply assoc_lookupr_in in H.
+      rewrite Forall_forall in H0.
+      specialize (H0 _ H).
+      simpl in H0.
+      trivial.
+    - Case "LAConst"%string.
+      invcs H.
+      apply normalize_normalizes.
+    - Case "LABinop"%string.
+      unfold olift2 in H.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      match_case_in H; intros; rewrite H2 in H; try discriminate.
+      eapply fun_of_binop_normalized; eauto.
+    - Case "LAUnop"%string.
+      unfold olift in H.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      eapply fun_of_unaryop_normalized; eauto.
+    - Case "LAMap"%string.
+      unfold olift in H.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      specialize (IHop2 _ _ H1 H0).
+      unfold lift_oncoll in H.
+      match_destr_in H.
+      apply some_lift in H.
+      destruct H as [? ? ?]; subst.
+      constructor.
+      invcs IHop2.
+      eapply (rmap_Forall e).
+      + apply H2.
+      + intros. eapply IHop1; eauto.
+        apply Forall_app; auto.
+    - Case "LAMapConcat"%string.
+      unfold olift in H.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      specialize (IHop2 _ _ H1 H0).
+      unfold lift_oncoll in H.
+      match_destr_in H.
+      apply some_lift in H.
+      destruct H as [? ? ?]; subst.
+      constructor.
+      invcs IHop2.
+      unfold rmap_concat in e.
+      eapply (oflat_map_Forall e).
+      + apply H2.
+      + intros.
+        unfold oomap_concat in H.
+        match_case_in H; intros; rewrite H4 in H; try discriminate.
+        match_destr_in H.
+        unfold omap_concat in H.
+        specialize (IHop1 _ _ H4).
+        cut_to IHop1.
+        { invcs IHop1.
+          eapply (rmap_Forall H).
+          - eapply H6.
+          - intros.
+            simpl in *.
+            unfold orecconcat in H5.
+            match_destr_in H5.
+            match_destr_in H5.
+            invcs H5.
+            constructor.
+            + apply Forall_sorted.
+              apply Forall_app.
+              * invcs H3; trivial.
+              * invcs H7; trivial.
+            + eauto.
+        }
+        apply Forall_app; trivial.
+        constructor; trivial.
+    - Case "LAProduct"%string.
+      unfold olift in H.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      specialize (IHop1 _ _ H1 H0).
+      unfold lift_oncoll in H.
+      match_destr_in H.
+      apply some_lift in H.
+      destruct H as [? ? ?]; subst.
+      constructor.
+      invcs IHop1.
+      unfold rmap_concat in e.
+      eapply (oflat_map_Forall e).
+      + apply H2.
+      + intros.
+        unfold oomap_concat in H.
+        match_case_in H; intros; rewrite H4 in H; try discriminate.
+        match_destr_in H.
+        unfold omap_concat in H.
+        specialize (IHop2 _ _ H4).
+        cut_to IHop2.
+        { invcs IHop2.
+          eapply (rmap_Forall H).
+          - eapply H6.
+          - intros.
+            simpl in *.
+            unfold orecconcat in H5.
+            match_destr_in H5.
+            match_destr_in H5.
+            invcs H5.
+            constructor.
+            + apply Forall_sorted.
+              apply Forall_app.
+              * invcs H3; trivial.
+              * invcs H7; trivial.
+            + eauto.
+        }
+        trivial.
+    - Case "LASelect"%string.
+      unfold olift in H.
+      match_case_in H; intros; rewrite H1 in H; try discriminate.
+      specialize (IHop2 _ _ H1 H0).
+      unfold lift_oncoll in H.
+      match_destr_in H.
+      apply some_lift in H.
+      destruct H as [? ? ?]; subst.
+      constructor.
+      invcs IHop2.
+      unfold rmap_concat in e.
+      eapply (lift_filter_Forall e).
+      trivial.
+  Qed.
+  
 End LambdaNRA.
+
+Hint Rewrite @fun_of_lalg_lambda_lambda_eq : lalg.
+Hint Rewrite @fun_of_lalg_map_eq : lalg.
+Hint Rewrite @fun_of_lalg_map_concat_eq : lalg.
+Hint Rewrite @fun_of_lalg_product_eq : lalg.
+Hint Rewrite @fun_of_lalg_select_eq : lalg.
 
 Tactic Notation "lalg_cases" tactic(first) ident(c) :=
   first;
