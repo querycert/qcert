@@ -437,6 +437,25 @@ Section DNNRCtoScala.
     | _ => None
     end.
 
+  Definition rec_if_else_empty_to_filter {A: Set}
+             (e: dnrc (type_annotation _ _ A) dataset):
+    option (dnrc (type_annotation _ _ A) dataset) :=
+    match e with
+    | DNRCUnop t1 AFlatten
+               (DNRCFor t2 x (DNRCCollect t3 xs)
+                        (DNRCIf _ condition
+                                thenE
+                                (DNNRC.DNRCConst _ (dcoll nil)))) =>
+      let ALG :=
+          DNRCAlg (dnrc_annotation_get xs)
+                  (DSVar "if_else_empty_to_filter")
+                  (("if_else_empty_to_filter", xs)::nil)
+      in
+      Some (DNRCUnop t1 AFlatten
+                     (DNRCFor t2 x (DNRCCollect t3 ALG)
+                              thenE))
+    | _ => None
+    end.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
@@ -450,6 +469,7 @@ Section DNNRCtoScala.
     | Some e' =>
       let e'' := tryBottomUp rec_cast_to_filter e' in
       let e''' := tryBottomUp rec_lift_unbrand e'' in
+      let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
       ""
         ++ "import org.apache.spark.sql.types._" ++ eol
         ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
