@@ -14,28 +14,14 @@
  * limitations under the License.
  *)
 
+Require Import Basics.
 Require Import List String.
-Require Import Peano_dec.
 Require Import EquivDec.
 
-Require Import Utils BasicSystem.
-Require Import NNRCRuntime ForeignToJava.
-Require Import RType.
-Require Import Sumbool.
-Require Import ZArith.
-Require Import Bool.
-Require Import Utils.
-Require Import BrandRelation.
-Require Import ForeignData.
-Require Import RData.
-
-Require Import TDataInfer.
-Require Import BrandRelation.
-Require Import Utils Types BasicRuntime.
+Require Import Types BasicRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavascript.
 Require Import JSON.
-
 
 Section SparkData.
 
@@ -46,39 +32,7 @@ Section SparkData.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
-  Section with_string_scope.
-    Local Open Scope string_scope.
-
-    Fixpoint rtype_to_scala (r: rtype₀) : string :=
-      match r with
-      | Bottom₀ => "NullType"
-      | Top₀ => "StringType"
-      | Unit₀ => "NullType"
-      | Nat₀ => "IntegerType"
-      | Bool₀ => "BooleanType"
-      | String₀ => "StringType"
-      | Coll₀ e => "ArrayType(" ++ rtype_to_scala e ++ ")"
-      | Rec₀ _ fields =>
-        let known_fields: list string :=
-            map (fun p => "StructField(""" ++ fst p ++ """, " ++ rtype_to_scala (snd p) ++ ")")
-                fields in
-        let known_struct := "StructType(Seq(" ++ joinStrings ", " known_fields ++ "))" in
-        "StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_struct ++ ")))"
-      | Either₀ l r =>
-        "StructType(Seq(StructField(""$left"", " ++ rtype_to_scala l ++ "), StructField(""$right"", " ++ rtype_to_scala r ++ ")))"
-      | Brand₀ _ =>
-        "StructType(Seq(StructField(""$data"", StringType), StructField(""$type"", ArrayType(StringType))))"
-      (* should not occur *)
-      | Arrow₀ _ _ => "ARROW TYPE?"
-      | Foreign₀ ft => "FOREIGN TYPE?"
-      end.
-
-  End with_string_scope.
-
-  Definition flip {a b c} (f : a -> b -> c) : b -> a -> c :=
-    fun b a => f a b.
-
-  Fixpoint data_to_blob (d: data): string :=
+  Definition data_to_blob (d: data): string :=
     dataToJS "\""" d.
 
   Lemma dataToJS_correctly_escapes_quote_inside_string:

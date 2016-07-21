@@ -67,45 +67,6 @@ Section SparkIR.
   (* We might want to move CollectList from the aggregate functions to a toplevel operation here *)
   .
 
-  Definition quote_string (s: string) : string :=
-    """" ++ s ++ """".
-
-  Require Import SparkData.
-
-  Fixpoint code_of_column (c: column) : string :=
-    match c with
-    | CCol s => "column(""" ++ s ++ """)"
-    | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
-    | CEq new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CLit new (d, r) => "lit(" ++ "LITERAL_DATA_NOT_IMPLEMENTED" (* scala_literal_data d r *) ++ ")"
-    | CUDFCast new bs c =>
-      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CUDFUnbrand new t c =>
-      "QCertRuntime.unbrandUDF(" ++ rtype_to_scala t ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | _ => "UNIMPLEMENTED_COLUMN"
-    end.
-
-  Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
-    match a with
-      (n, a, c) =>
-      let c := code_of_column c in
-      let f := match a with
-               | SACount => "count"%string
-               | SASum => "sum"%string
-               | SACollectList => "collect_list"%string
-               end
-      in f ++ "(" ++ c ++ ").as(""" ++ n ++ """)"
-    end.
-
-  Fixpoint code_of_dataset (e: dataset) : string :=
-    match e with
-    | DSVar s => s
-    | DSSelect cs d => code_of_dataset d ++ ".select(" ++ joinStrings ", " (map code_of_column cs) ++ ")"
-    | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
-    | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
-    | DSGroupBy gcs acs d => code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " (map code_of_column gcs) ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
-    | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
-    end.
 
   Section eval.
 
