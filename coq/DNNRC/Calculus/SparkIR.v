@@ -23,24 +23,27 @@ Section SparkIR.
   Require Import EquivDec.
   Require Import Morphisms.
 
-  Require Import Utils BasicRuntime.
+  Require Import Utils BasicSystem.
   Require Import DData.
   Require Import RAlgEnv.
+  Require Import ForeignToJavascript.
 
   Require Import RType.
 
+
   Context {fruntime:foreign_runtime}.
   Context {ftype: ForeignType.foreign_type}.
+  Context {fttojs : ForeignToJavascript.foreign_to_javascript}.
+  Context {m : TBrandModel.brand_model}.
 
   Definition var := string.
 
   Inductive column :=
   | CCol   : string                     -> column (* column("name") *)
   | CAs    : string -> column           -> column (* .as("new_name") *)
-  | CPlus0 : string -> data   -> column -> column (* .plus(5).as("first") *)
-  | CPlus1 : string -> column -> column -> column (* $column1.plus($column2) *)
-  | CEq0   : string -> data   -> column -> column
-  | CEq1   : string -> column -> column -> column
+  | CLit   : string -> data * rtype₀    -> column (* lit(d).as("name") *)
+  | CPlus  : string -> column -> column -> column (* $column1.plus($column2) *)
+  | CEq    : string -> column -> column -> column
   | CNeg   : string -> column ->           column
   | CUDFCast : string -> list string -> column -> column (* TODO might want to factor UDFs out *)
   | CUDFUnbrand : string -> rtype₀ -> column -> column
@@ -73,8 +76,8 @@ Section SparkIR.
     match c with
     | CCol s => "column(""" ++ s ++ """)"
     | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
-    | CEq1 new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CEq0 new d c => code_of_column c ++ ".equalTo(" ++ "32/*TODO_LITERAL_DATA*/" ++ ").as(""" ++ new ++ """)"
+    | CEq new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
+    | CLit new (d, r) => "lit(" ++ "LITERAL_DATA_NOT_IMPLEMENTED" (* scala_literal_data d r *) ++ ")"
     | CUDFCast new bs c =>
       "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
     | CUDFUnbrand new t c =>
@@ -104,11 +107,6 @@ Section SparkIR.
     | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
-  Example ex1 :=
-    DSFilter (CEq0 "f" (dnat 25) (CCol "age")) (DSVar "CONST$WORLD").
-
-  Eval vm_compute in code_of_dataset ex1.
-  
   Section eval.
 
     Definition srec n v :=
@@ -150,32 +148,12 @@ Section SparkIR.
           | Some (_, d) => Some (srec s d)
           | _ => None
           end
-        | CEq0 n d c1 =>
-          match unsrec (fun_of_column c1 x) with
-          | Some (_, x) => Some (srec n (dbool (equiv_decb x d)))
-          | _ => None
-          end
-        | CEq1 n c1 c2 =>
-          match unsrec (fun_of_column c1 x), unsrec (fun_of_column c2 x) with
-          | Some (n1, v1), Some (n2, v2) => Some (srec n (dbool (equiv_decb v1 v2)))
-          | _, _ => None
-          end
-        | CPlus0 n d c1 =>
-          match d, unsrec (fun_of_column c1 x) with
-          | dnat d, Some (_, (dnat x)) => Some (srec n (dnat (Z.add x d)))
-          | _, _ => None
-          end
-        | CPlus1 n c1 c2 =>
-          match unsrec (fun_of_column c1 x), unsrec (fun_of_column c2 x) with
-          | Some (_, (dnat v1)), Some (_, (dnat v2)) => Some (srec n (dnat (Z.add v1 v2)))
-          | _, _ => None
-          end
         | CNeg n c1 =>
           match unsrec (fun_of_column c1 x) with
           | Some (_, (dbool x)) => Some (srec n (dbool (negb x)))
           | _ => None
           end
-        | _ => None (* TODO at least UDFs are unimplemented *)
+        | _ => None (* TODO at least UDFs, Eq, Plus are unimplemented *)
         end.
 
     (* Used in selection *)

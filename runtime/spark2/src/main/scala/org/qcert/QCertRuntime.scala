@@ -52,6 +52,7 @@ object test extends QCertRuntime {
                       StructField("cid", IntegerType),
                       StructField("name", StringType)))))))(column("$data")).as("unbranded"))
         .select(column("unbranded.$blob").as("$blob"), column("unbranded.$known").as("$known"))
+        .filter(lit(5).leq(column("$blob.age")))
     }
 
     res.explain(true)

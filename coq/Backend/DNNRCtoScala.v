@@ -269,11 +269,12 @@ Section DNNRCtoScala.
 
   Require Import SparkIR.
 
-    (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego.
-     *
-     * A Haskell Hosted DSL for Writing Transformation Systems.
-     * Andy Gill. IFIP Working Conference on DSLs, 2009.
-     * http://ku-fpg.github.io/files/Gill-09-KUREDSL.pdf *)
+
+  (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego.
+   *
+   * A Haskell Hosted DSL for Writing Transformation Systems.
+   * Andy Gill. IFIP Working Conference on DSLs, 2009.
+   * http://ku-fpg.github.io/files/Gill-09-KUREDSL.pdf *)
   Fixpoint tryBottomUp {A: Set} {P: Set}
            (f: dnrc A P -> option (dnrc A P))
            (e: dnrc A P)
