@@ -1259,11 +1259,7 @@ Section TOptimEnvFunc.
     p ⇒ tmap_over_flatten_map_fun p.
   Proof.
     tprove_correctness p.
-    rewrite tmap_over_flatten.
-    rewrite tenvmap_map_compose_arrow.
-    rewrite tapp_over_map_arrow.
-    rewrite tapp_over_id_l_arrow.
-    reflexivity.
+    apply tmap_over_flatten_map.
   Qed.
 
   Hint Rewrite @tmap_over_flatten_map_fun_correctness : toptim_correct.

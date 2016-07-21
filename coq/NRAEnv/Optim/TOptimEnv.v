@@ -3082,6 +3082,19 @@ Section TOptimEnv.
                   | _ => None
                   end) dout); simpl in *; congruence.
   Qed.
+
+  (** composite lemmas: these are just composites of previous rewrites.
+      They are here since the optimizer uses them. *)
+  
+  Lemma  tmap_over_flatten_map (p₁ p₂ p₃: algenv) :
+    χ⟨p₁⟩(♯flatten(χ⟨p₂⟩(p₃))) ⇒ ♯flatten(χ⟨χ⟨p₁⟩(p₂)⟩(p₃)).
+  Proof.
+    rewrite tmap_over_flatten.
+    rewrite tenvmap_map_compose_arrow.
+    rewrite tapp_over_map_arrow.
+    rewrite tapp_over_id_l_arrow.
+    reflexivity.
+  Qed.
   
   Lemma tdup_elim (q:algenv) :
     nodupA q -> ANUnop ADistinct q  ⇒  q.
