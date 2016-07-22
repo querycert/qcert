@@ -114,6 +114,14 @@ Section ROptimEnv.
       + autorewrite with alg. reflexivity. 
   Qed.
 
+  (* this is the name we give it in the paper *)
+    (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
+  Lemma select_union_distr (q q₁ q₂: algenv) :
+    σ⟨ q ⟩(q₁ ⋃ q₂) ≡ₑ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
+  Proof.
+    apply envunion_select_distr.
+  Qed.
+
   (* χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 } *)
 
   Lemma envmap_singleton (p1 p2:algenv) :
