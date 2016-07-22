@@ -90,6 +90,14 @@ Section ROptimContext.
     apply unnest_singleton; trivial.
   Qed.
 
+  Lemma ctxt_select_union_distr :
+    σ⟨ $0 ⟩($1 ⋃ $2) ≡ₐ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).
+  Proof.
+    intros.
+    simpl_ctxt_equiv.
+    apply union_select_distr.
+  Qed.
+
 End ROptimContext.
   
 (* 
