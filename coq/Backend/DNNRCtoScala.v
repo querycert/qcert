@@ -156,6 +156,11 @@ Section DNNRCtoScala.
     | CLit new (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
     | CNeg new c => "not(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
     | CPlus new c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
+    | CSConcat new c1 c2 =>
+      "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
+    | CToString new c =>
+      (* TODO should call the proper QCert printing function as a UDF here *)
+      "format_string(""%s"", " ++ code_of_column c ++ ").as(""" ++ new ++ """)"
     | CUDFCast new bs c =>
       "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
     | CUDFUnbrand new t c =>
@@ -269,6 +274,15 @@ Section DNNRCtoScala.
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
     end.
 
+  (* TODO Move this somewhere, I think rewriting needs something similar *)
+  Definition primitive_type (t: rtype) :=
+    match proj1_sig t with
+    | ⊥₀ | ⊤₀ | Unit₀ | Nat₀ | String₀ | Bool₀ => true
+    | Coll₀ _ | Rec₀ _ _ | Either₀ _ _ | Arrow₀ _ _ | Brand₀ _ => false
+    (* TODO foreign? *)
+    | Foreign₀ _ => false
+    end.
+
   Fixpoint scala_of_dnrc {A: Set} (d: dnrc (type_annotation _ m A) dataset) : string :=
     let code :=
         match d with
@@ -299,7 +313,16 @@ Section DNNRCtoScala.
                       ") => { " ++ scala_of_dnrc z ++ " })"
           | None => "DNRCEither's first argument is not of type Either"
           end
-        | DNRCCollect t x => scala_of_dnrc x ++ ".collect()"
+        | DNRCCollect t x =>
+          (* Distributed collections of primitives are wrapped in a singleton record.
+           * We need to unwrap them after the call to collect(). *)
+          let postfix :=
+              match lift primitive_type (olift tuncoll (lift_tdistr (di_typeof x))) with
+              | Some true => ".map((row) => row(0))"
+              | Some false => ""
+              | None => "ARGUMENT_TO_COLLECT_SHOULD_BE_DISTRIBUTED"
+              end in
+          scala_of_dnrc x ++ ".collect()" ++ postfix
         (* TODO handle bags of non-record types (ints, strings, bags, ...) *)
         | DNRCDispatch t x =>
           match olift tuncoll (lift_tlocal (di_typeof x)) with
@@ -347,6 +370,8 @@ Section DNNRCtoScala.
       let e'' := tryBottomUp rec_cast_to_filter e' in
       let e''' := tryBottomUp rec_lift_unbrand e'' in
       let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
+      let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
+      let e'''''' := tryBottomUp rec_for_to_select e''''' in
       ""
         ++ "import org.apache.spark.sql.types._" ++ eol
         ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
@@ -356,7 +381,7 @@ Section DNNRCtoScala.
         ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
         ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
         ++ "println(toBlob(" ++ eol
-        ++ scala_of_dnrc e'''' ++ eol
+        ++ scala_of_dnrc e'''''' ++ eol
         ++ "))" ++ eol
         ++ "}" ++ eol
         ++ "}"

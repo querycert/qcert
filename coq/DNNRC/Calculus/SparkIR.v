@@ -46,6 +46,8 @@ Section SparkIR.
   | CPlus  : string -> column -> column -> column (* $column1.plus($column2) *)
   | CEq    : string -> column -> column -> column
   | CNeg   : string -> column ->           column
+  | CToString : string -> column -> column
+  | CSConcat : string -> column -> column -> column
   | CUDFCast : string -> list string -> column -> column (* TODO might want to factor UDFs out *)
   | CUDFUnbrand : string -> rtype₀ -> column -> column
   .

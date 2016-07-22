@@ -235,6 +235,15 @@ Section DNNRCSparkIRRewrites.
         Some (CEq cname l' r')
       | _, _ => None
       end
+    | DNRCBinop _ ASConcat l r =>
+      lift2 (CSConcat cname)
+            (condition_to_column l "l" binding)
+            (condition_to_column r "r" binding)
+    (* TODO properly implement this *)
+    | DNRCUnop _ AToString x =>
+      lift (CToString cname)
+           (condition_to_column x "x" binding)
+
     | _ => None
     end.
 
@@ -258,6 +267,44 @@ Section DNNRCSparkIRRewrites.
                        (DNRCFor t2 x (DNRCCollect t3 ALG)
                                 thenE))
       | None => None
+      end
+    | _ => None
+    end.
+
+  Definition rec_remove_map_singletoncoll_flatten {A: Set}
+             (e: dnrc (type_annotation _ _ A) dataset):
+    option (dnrc (type_annotation _ _ A) dataset) :=
+    match e with
+    | DNRCUnop t1 AFlatten
+               (DNRCFor t2 x xs
+                        (DNRCUnop t3 AColl e)) =>
+      Some (DNRCFor t1 x xs e)
+    | _ => None
+    end.
+
+  Definition rec_for_to_select {A: Set}
+             (e: dnrc (type_annotation _ _ A) dataset):
+    option (dnrc (type_annotation _ _ A) dataset) :=
+    match e with
+    | DNRCFor t1 x (DNRCCollect t2 xs) body =>
+      match lift_tlocal (di_typeof body) with
+      (* TODO generalize to other types than String ...
+       * This involves returning more than one column ... *)
+      | Some String =>
+        (* TODO rename condition_to_column, if this works *)
+        match condition_to_column body "value" (x, CCol "abc") with
+        | Some body' =>
+          (* TODO generalize to other types than String ... *)
+          let ALG_type := Tdistr String in
+          let ALG :=
+              DNRCAlg (ta_mk (ta_base t1) ALG_type)
+                      (DSSelect (body'::nil) (DSVar "for_to_select"))
+                      (("for_to_select"%string, xs)::nil)
+          in
+          Some (DNRCCollect t1 ALG)
+        | None => None
+        end
+      | _ => None
       end
     | _ => None
     end.
