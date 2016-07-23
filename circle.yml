@@ -10,4 +10,5 @@ dependencies:
 
 test:
   override:
+    - eval `opam config env`
     - make
