@@ -6,12 +6,9 @@ dependencies:
     - sudo apt-get -qq update
     - sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
     - opam init -a
-    - eval `opam config env`
     - opam install -y menhir ocamlbuild camlp5 coq:
         timeout: 1200
 
 test:
   override:
-    - echo $PATH
-    - ls -l ~/.opam/*/bin/
-    - bash -c make
+    - eval `opam config env` && make
