@@ -9,5 +9,5 @@ dependencies:
     - opam install -y menhir ocamlbuild camlp5 coq
 
 test:
-  pre:
+  override:
     - make
