@@ -12,5 +12,6 @@ dependencies:
 
 test:
   override:
-    - eval `opam config env`
-    - make
+    - echo $PATH
+    - ls -l ~/.opam/*/bin/
+    - bash -c make
