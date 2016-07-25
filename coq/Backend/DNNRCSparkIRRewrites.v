@@ -120,7 +120,7 @@ Section DNNRCSparkIRRewrites.
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
           let ALG := (DNRCAlg algTypeA
-                            (DSFilter (CUDFCast "_ignored" brands (CCol "$type"))
+                            (DSFilter (CUDFCast brands (CCol "$type"))
                                       (DSVar "map_cast"))
                             (("map_cast"%string, xs)::nil)) in
           Some (DNRCUnop t1 AFlatten
@@ -193,7 +193,7 @@ Section DNNRCSparkIRRewrites.
               DNRCAlg (dnrc_annotation_get xs)
                       (DSSelect ((CAs "$blob" (CCol "unbranded.$blob"))
                                    ::(CAs "$known" (CCol "unbranded.$known"))::nil)
-                                (DSSelect ((CUDFUnbrand "unbranded" t (CCol "$data"))::nil)
+                                (DSSelect ((CAs "unbranded" (CUDFUnbrand t (CCol "$data")))::nil)
                                           (DSVar "lift_unbrand")))
                       (("lift_unbrand"%string, xs)::nil)
           in
@@ -227,21 +227,21 @@ Section DNNRCSparkIRRewrites.
               (CDot cname fld c))
            (condition_to_column c "c" binding) *)
     | DNRCConst _ d =>
-      lift (fun t => CLit cname (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
+      lift (fun t => CLit (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
     | DNRCBinop _ AEq l r =>
       (* TODO check that the types of l and r admit Spark built-in equality *)
       match condition_to_column l "l" binding, condition_to_column r "r" binding with
       | Some l', Some r' =>
-        Some (CEq cname l' r')
+        Some (CEq l' r')
       | _, _ => None
       end
     | DNRCBinop _ ASConcat l r =>
-      lift2 (CSConcat cname)
+      lift2 CSConcat
             (condition_to_column l "l" binding)
             (condition_to_column r "r" binding)
     (* TODO properly implement this *)
     | DNRCUnop _ AToString x =>
-      lift (CToString cname)
+      lift CToString
            (condition_to_column x "x" binding)
 
     | _ => None

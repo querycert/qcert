@@ -151,20 +151,20 @@ Section DNNRCtoScala.
     match c with
     | CCol s => "column(""" ++ s ++ """)"
     | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
-    | CDot new fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ").as(""" ++ new ++ """)"
-    | CEq new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CLit new (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
-    | CNeg new c => "not(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CPlus new c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CSConcat new c1 c2 =>
-      "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CToString new c =>
+    | CDot fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ")"
+    | CEq c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ")"
+    | CLit (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
+    | CNeg c => "not(" ++ code_of_column c ++ ")"
+    | CPlus c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ")"
+    | CSConcat c1 c2 =>
+      "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ")"
+    | CToString c =>
       (* TODO should call the proper QCert printing function as a UDF here *)
-      "format_string(""%s"", " ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CUDFCast new bs c =>
-      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CUDFUnbrand new t c =>
-      "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
+      "format_string(""%s"", " ++ code_of_column c ++ ")"
+    | CUDFCast bs c =>
+      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+    | CUDFUnbrand t c =>
+      "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
 
   Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=

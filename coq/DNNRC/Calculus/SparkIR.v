@@ -39,36 +39,31 @@ Section SparkIR.
   Definition var := string.
 
   Inductive column :=
-  | CCol   : string                     -> column (* column("name") *)
-  | CAs    : string -> column           -> column (* .as("new_name") *)
-  | CDot   : string -> string -> column -> column (* .getField(fld).as(name) *)
-  | CLit   : string -> data * rtype₀    -> column (* lit(d).as("name") *)
-  | CPlus  : string -> column -> column -> column (* $column1.plus($column2) *)
-  | CEq    : string -> column -> column -> column
-  | CNeg   : string -> column ->           column
-  | CToString : string -> column -> column
-  | CSConcat : string -> column -> column -> column
-  | CUDFCast : string -> list string -> column -> column (* TODO might want to factor UDFs out *)
-  | CUDFUnbrand : string -> rtype₀ -> column -> column
-  .
+  | CCol   : string -> column
+  | CAs    : string -> column -> column
+  | CDot   : string -> column -> column
+  | CLit   : data * rtype₀ -> column
+  | CPlus  : column -> column -> column
+  | CEq    : column -> column -> column
+  | CNeg   : column -> column
+  | CToString : column -> column
+  | CSConcat : column -> column -> column
+  | CUDFCast : list string -> column -> column
+  | CUDFUnbrand : rtype₀ -> column -> column.
 
   Inductive spark_aggregate :=
   | SACount : spark_aggregate
   | SASum : spark_aggregate
-  | SACollectList : spark_aggregate (* collect values into nested array *)
-  .
+  | SACollectList : spark_aggregate.
 
   Inductive dataset :=
-  | DSVar : string -> dataset (* ds *)
-  | DSSelect : list column -> dataset -> dataset (* ds.select( ... ) *)
-  | DSFilter : column -> dataset -> dataset (* ds.filter( ... ) *)
+  | DSVar : string -> dataset
+  | DSSelect : list column -> dataset -> dataset
+  | DSFilter : column -> dataset -> dataset
   (* ds.groupBy( grouping columns ).agg( aggregate expressions ) *)
   | DSGroupBy : list column -> list (string * spark_aggregate * column) -> dataset -> dataset
   | DSCartesian : dataset -> dataset -> dataset
-  (* Rename DSUnnest? *)
-  | DSExplode : string -> dataset -> dataset
-  (* We might want to move CollectList from the aggregate functions to a toplevel operation here *)
-  .
+  | DSExplode : string -> dataset -> dataset.
 
 
   Section eval.
@@ -112,9 +107,9 @@ Section SparkIR.
           | Some (_, d) => Some (srec s d)
           | _ => None
           end
-        | CNeg n c1 =>
+        | CNeg c1 =>
           match unsrec (fun_of_column c1 x) with
-          | Some (_, (dbool x)) => Some (srec n (dbool (negb x)))
+          | Some (n, (dbool x)) => Some (srec n (dbool (negb x)))
           | _ => None
           end
         | _ => None (* TODO at least UDFs, Eq, Plus are unimplemented *)
