@@ -255,8 +255,8 @@ Section RType.
     Proof.
       red; unfold equiv, complement.
       intros [x₀ xwf] [y₀ ywf].
-      destruct (x₀ == y₀); unfold equiv, complement in *; subst.
-      - left. f_equal. apply eq_proofs_unicity; decide equality.
+      destruct (x₀ == y₀); unfold equiv, complement in *.
+      - left. apply rtype_fequal; simpl; trivial.
       - right; congruence.
     Defined.
 
