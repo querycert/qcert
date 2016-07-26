@@ -22,7 +22,7 @@ open PrettyIL
 
 (* Display ILs *)
 
-val display_to_string : pretty_config -> algenv -> (string * string * string * string * string)
+val display_to_string : pretty_config -> algenv -> (string * string * string * string * string * string * string)
 
 val display_algenv_top : comp_config -> (string * algenv) -> unit
 

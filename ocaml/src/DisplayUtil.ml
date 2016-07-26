@@ -27,15 +27,19 @@ let display_to_string conf op =
   let (env_var, opt_nnrcmr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   let nnrcmr_spark = CompBack.nrcmr_to_nrcmr_prepared_for_spark env_var opt_nnrcmr in
   let nnrcmr_cldmr = CompBack.nrcmr_to_nrcmr_prepared_for_cldmr env_var opt_nnrcmr in
+  let opt_dnrc = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
+  let opt_dnrc_dataset = CompCore.tcompile_nraenv_to_dnnrc_typed_opt_dataset op in 
   let nrastring = PrettyIL.pretty_nraenv (get_charset_bool conf) (get_margin conf) opt_nraenv in
   let nrcstring = PrettyIL.pretty_nnrc (get_charset_bool conf) (get_margin conf) opt_nnrc in
   let nrcmrstring = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) opt_nnrcmr in
   let nrcmr_spark_string = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) nnrcmr_spark in
   let nrcmr_cldmr_string = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) nnrcmr_cldmr in
-  (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string)
+  let opt_dnrc_string = PrettyIL.pretty_dnrc PrettyIL.pretty_annotate_ignore (PrettyIL.pretty_plug_nraenv (get_charset_bool conf)) (get_charset_bool conf) (get_margin conf) opt_dnrc in
+  let opt_dnrc_dataset_string = PrettyIL.pretty_dnrc PrettyIL.pretty_annotate_ignore (PrettyIL.pretty_plug_ignore) (get_charset_bool conf) (get_margin conf) opt_dnrc_dataset in
+  (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string, opt_dnrc_string, opt_dnrc_dataset_string)
 
 let display_algenv_top conf (fname,op) =
-    let (display_nra,display_nrc,display_nrcmr,display_nrcmr_spark,display_nrcmr_cldmr) =
+    let (display_nra,display_nrc,display_nrcmr,display_nrcmr_spark,display_nrcmr_cldmr, display_opt_dnrc, display_opt_dnrc_dataset) =
       display_to_string (get_pretty_config conf) op
     in
     let fpref = Filename.chop_extension fname in
@@ -44,12 +48,16 @@ let display_algenv_top conf (fname,op) =
     let fout_nrcmr = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr ()) in
     let fout_nrcmr_spark = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr_spark ()) in
     let fout_nrcmr_cldmr = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr_cldmr ()) in
+    let fout_dnrc = outname (target_f (get_display_dir conf) fpref) (suffix_dnrc ()) in
+    let fout_dnrc_dataset = outname (target_f (get_display_dir conf) fpref) (suffix_dnrc_dataset ()) in
     begin
       make_file fout_nra display_nra;
       make_file fout_nrc display_nrc;
       make_file fout_nrcmr display_nrcmr;
       make_file fout_nrcmr_spark display_nrcmr_spark;
       make_file fout_nrcmr_cldmr display_nrcmr_cldmr;
+      make_file fout_dnrc display_opt_dnrc;
+      make_file fout_dnrc_dataset display_opt_dnrc_dataset;
     end
 
 let sexp_string_to_nra s =

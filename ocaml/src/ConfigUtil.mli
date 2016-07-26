@@ -57,6 +57,8 @@ val suffix_nrc : unit -> string
 val suffix_nrcsexp : unit -> string
 val suffix_dnrc : unit -> string
 val suffix_dnrcsexp : unit -> string
+val suffix_dnrc_dataset : unit -> string
+val suffix_dnrc_datasetsexp : unit -> string
 val suffix_nrcmr : unit -> string
 val suffix_nrcmr_sparksexp : unit -> string
 val suffix_nrcmr_spark : unit -> string

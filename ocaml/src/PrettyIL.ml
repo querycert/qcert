@@ -60,6 +60,8 @@ type nra_sym =
       sigma: (string*int);
       langle: (string*int);
       rangle: (string*int);
+      llangle: (string*int);
+      rrangle: (string*int);
       bars: (string*int);
       lrarrow: (string*int);
       sqlrarrow: (string*int);
@@ -86,6 +88,8 @@ let textsym =
     sigma = ("Select", 6);
     langle = ("<", 1);
     rangle = (">", 1);
+    llangle = ("<<", 2);
+    rrangle = (">>", 2);
     bars = ("||", 2);
     lrarrow = ("<->", 3);
     sqlrarrow = ("[<->]", 5);
@@ -111,6 +115,8 @@ let greeksym =
     sigma = ("σ", 1);
     langle = ("⟨", 1);
     rangle = ("⟩", 1);
+    llangle = ("⟪", 1);
+    rrangle = ("⟫", 1);
     bars = ("∥", 1);
     lrarrow = ("↔", 1);
     sqlrarrow = ("[↔]", 3);
@@ -779,6 +785,85 @@ let pretty_nnrcmr greek margin mr_chain =
     flush_str_formatter ()
   end
 
+(* dnrc PP *)
+
+(* what is going on here with the arguments to pretty_list???? *)
+let pretty_list (comma:string) (pr:Format.formatter->'a->unit) (ff:Format.formatter) (l:'a list) =
+  match l with
+  | [] -> ()
+  | h :: [] -> fprintf ff "%a" pr h
+  | h :: tl' -> fprintf ff "%a%s %a" pr h comma (pretty_list pr comma) tl'
+
+let rec pretty_dnrc_aux ann plug p sym ff n =
+  match n with
+  | Hack.DNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v) 
+  | Hack.DNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
+  | Hack.DNRCBinop (a, b,n1,n2) ->
+      fprintf ff "%a" ann a;
+	      ((pretty_binop p sym (pretty_dnrc_aux ann plug)) ff b n1 n2)
+  | Hack.DNRCUnop (a,u,n1) ->
+     fprintf ff "%a" ann a ;
+	     ((pretty_unop p sym (pretty_dnrc_aux ann plug)) ff u n1)
+  | Hack.DNRCLet (a,v,n1,n2) ->
+     fprintf ff "@[<hv 0>@[<hv 2>%a let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
+	     ann a
+	 (Util.string_of_char_list v)
+	(pretty_dnrc_aux ann plug p sym) n1
+	(pretty_dnrc_aux ann plug p sym) n2
+  | Hack.DNRCFor (a,v,n1,n2) ->
+     fprintf ff "@[<hv 0>%a{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
+	     ann a
+	(pretty_dnrc_aux ann plug 0 sym) n2
+	 (Util.string_of_char_list v) pretty_sym sym.sin
+	(pretty_dnrc_aux ann plug 0 sym) n1
+  | Hack.DNRCIf (a,n1,n2,n3) ->
+     fprintf ff "@[<hv 0>@[<hv 2>%a if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
+	     ann a
+	(pretty_dnrc_aux ann plug p sym) n1
+	(pretty_dnrc_aux ann plug p sym) n2
+	(pretty_dnrc_aux ann plug p sym) n3
+  | Hack.DNRCEither (a,n0,v1,n1,v2,n2) ->
+     fprintf ff "@[<hv 0>@[<hv 2>%a match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
+	     ann a
+	(pretty_dnrc_aux ann plug p sym) n0
+	 (Util.string_of_char_list v1) (pretty_dnrc_aux ann plug p sym) n1
+	 (Util.string_of_char_list v2) (pretty_dnrc_aux ann plug p sym) n2
+  | Hack.DNRCCollect (a,n1) ->
+     fprintf ff "@[%a COLLECT[@[%a@]]@]"
+	     ann a
+	(pretty_dnrc_aux ann plug p sym) n1
+  | Hack.DNRCDispatch (a,n1) ->
+     fprintf ff "@[%a DISPATCH[@[%a@]]@]"
+	     ann a
+	     (pretty_dnrc_aux ann plug p sym) n1
+  | Hack.DNRCAlg (a,body,arglist) ->
+     fprintf ff "@[%a (@[fun %a => @] %a)@[(%a)@]@]"
+	     ann a
+             (pretty_list "," (fun ff s -> fprintf ff "%s" s)) (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
+             plug body
+	     (pretty_list ", " (pretty_dnrc_aux ann plug p sym)) (List.map snd arglist)
+
+let pretty_dnrc ann plug greek margin n =
+  let conf = make_pretty_config greek margin in
+  let ff = str_formatter in
+  begin
+    pp_set_margin ff (get_margin conf);
+    let sym =
+      match (get_charset conf) with
+      | Greek -> greeksym
+      | Ascii -> textsym
+    in
+    fprintf ff "@[%a@]@." (pretty_dnrc_aux ann plug 0 sym) n;
+    flush_str_formatter ()
+  end
+
+let pretty_annotate_ignore ff a = ()
+let pretty_plug_ignore ff a = ()
+
+let pretty_plug_nraenv greek ff a = 
+  let sym = if greek then greeksym else textsym in
+  pretty_nraenv_aux 0 sym ff a
+
 (* Pretty RType *)
 
 let rec pretty_rtype_aux sym ff rt =
@@ -816,3 +901,7 @@ let pretty_rtype greek margin rt =
     fprintf ff "@[%a@]@." (pretty_rtype_aux sym) rt;
     flush_str_formatter ()
   end
+
+let pretty_annotate_rtype greek ff r =
+    let sym = if greek then greeksym else textsym in
+    fprintf ff "@[%a%a%a@]" pretty_sym sym.llangle (pretty_rtype_aux sym) r pretty_sym sym.rrangle
