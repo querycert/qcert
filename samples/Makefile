@@ -43,6 +43,7 @@ all-java:
 	$(QCERTCOMP) -source OQL -target Java oql/*.oql
 
 clean:
+	@rm -rf bin/*
 	@rm -f oql/*.js
 	@rm -f oql/*.java
 

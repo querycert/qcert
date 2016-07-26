@@ -377,7 +377,7 @@ Section NNRCtoJavascript.
       let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
       "function " ++ fname
                   ++ "("++ (makeJSParams params) ++ ") {" ++ eol
-                  ++ "  var constants = mkWorld(constants);" ++ eol
+(*                ++ "  var constants = mkWorld(constants);" ++ eol *) (* Moved to caller, i.e., TestUtil.java in queryTests *)
                   ++ j0
                   ++ "  return " ++ v0 ++ ";" ++ eol
                   ++ "}".

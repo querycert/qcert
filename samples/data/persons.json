@@ -1,6 +1,7 @@
-[{"name": "John Doe", "age":32, "cid":123},
- {"name": "Jane Doe", "age":32, "cid":124},
- {"name": "Jim Does", "age":34, "cid":125},
- {"name": "Jill Does", "age":32, "cid":126},
- {"name": "Joan Doe", "age":34, "cid":127},
- {"name": "James Do", "age":35, "cid":128}]
+{ "CONST$Persons" :
+   [{"name": "John Doe", "age":32, "cid":123},
+    {"name": "Jane Doe", "age":32, "cid":124},
+    {"name": "Jim Does", "age":34, "cid":125},
+    {"name": "Jill Does", "age":32, "cid":126},
+    {"name": "Joan Doe", "age":34, "cid":127},
+    {"name": "James Do", "age":35, "cid":128}] }
