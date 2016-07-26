@@ -1,0 +1,3 @@
+select p
+from p in Persons
+where p.age = 32

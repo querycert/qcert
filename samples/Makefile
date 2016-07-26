@@ -17,7 +17,7 @@ endif
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-RAWCPATH=bin $(wildcard ../../lib/*.jar)
+RAWCPATH=bin
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
 
