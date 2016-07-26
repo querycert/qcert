@@ -204,19 +204,11 @@ abstract class QCertRuntime {
 
   def run(world: Dataset[Row])
 
-  // TODO populate this from codegen instead of reading an external file
-  def initializeBrandHierarchy(iofile: String) = {
-    // val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
-    val io = gsonParser.parse(new FileReader(iofile))
-    val hc = io.getAsJsonObject.get("inheritance").getAsJsonArray
-    hc.iterator().asScala.foreach((subsup: JsonElement) => {
-      val sub = subsup.getAsJsonObject.get("sub").getAsString
-      val sup = subsup.getAsJsonObject.get("sup").getAsString
-      brandHierarchy.get(sub) match {
-        case None => brandHierarchy += sub -> mutable.HashSet(sup)
-        case Some(hs) => hs += sup
-      }
-    })
+  def addToBrandHierarchy(sub: String, sup: String): Unit = {
+    brandHierarchy.get(sub) match {
+      case None => brandHierarchy += sub -> mutable.HashSet(sup)
+      case Some(hs) => hs += sup
+    }
   }
 
   val worldType: StructType
@@ -225,15 +217,13 @@ abstract class QCertRuntime {
 
 
   def main(args: Array[String]): Unit = {
-    if (args.length != 2) {
-      println("Expected two arguments: the iofile containing the brand hierarchy, and the sparkio file containing the data")
+    if (args.length != 1) {
+      println("Expected exactly one argument: the sparkio file containing the data")
       sys.exit(1)
     }
-    val iofileHierarchy = args(0)
-    val iofileData = args(1)
+    val iofileData = args(0)
 
-    println("Initializing brand hierarchy")
-    initializeBrandHierarchy(iofileHierarchy)
+    println("Brand hierarchy:")
     println(brandHierarchy)
 
     // val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"

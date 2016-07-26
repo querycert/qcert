@@ -357,6 +357,12 @@ Section DNNRCtoScala.
 
   Require Import DNNRCSparkIRRewrites.
 
+  Definition initBrandHierarchy : string :=
+    let lines :=
+        map (fun p => "addToBrandHierarchy(""" ++ (fst p) ++ """, """ ++ snd p ++ """);")
+            brand_relation_brands in
+    joinStrings " " lines.
+
   (** Toplevel entry to Spark2/Scala codegen *)
 
   Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A dataset) : string :=
@@ -378,6 +384,7 @@ Section DNNRCtoScala.
         ++ "import org.apache.spark.sql.functions._" ++ eol
         ++ "import org.qcert.QCertRuntime" ++ eol
         ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
+        ++ initBrandHierarchy ++ eol
         ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
         ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
         ++ "println(toBlob(" ++ eol
