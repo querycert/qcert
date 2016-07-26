@@ -355,7 +355,11 @@ Section DNNRCtoScala.
       | None => "CANTCASTTODISTRIBUTEDTYPE"
       end.
 
-  Require Import DNNRCSparkIRRewrites.
+  Definition dnnrc_infer_type {A: Set} (e: dnrc A dataset) (inputType: rtype)
+    : option (dnrc (type_annotation _ _ A) dataset) :=
+    let tdb: tdbindings :=
+        ("CONST$WORLD"%string, (Tdistr inputType))::nil in
+    infer_dnrc_type tdb e.
 
   Definition initBrandHierarchy : string :=
     let lines :=
@@ -365,34 +369,23 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A dataset) : string :=
-    let tdb: tdbindings :=
-        ("CONST$WORLD", (Tdistr inputType))::nil
-    in
-    match infer_dnrc_type tdb e with
-    | None =>
-      "TYPE INFERENCE FAILED "
-    | Some e' =>
-      let e'' := tryBottomUp rec_cast_to_filter e' in
-      let e''' := tryBottomUp rec_lift_unbrand e'' in
-      let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
-      let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
-      let e'''''' := tryBottomUp rec_for_to_select e''''' in
-      ""
-        ++ "import org.apache.spark.sql.types._" ++ eol
-        ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
-        ++ "import org.apache.spark.sql.functions._" ++ eol
-        ++ "import org.qcert.QCertRuntime" ++ eol
-        ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
-        ++ initBrandHierarchy ++ eol
-        ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
-        ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
-        ++ "println(toBlob(" ++ eol
-        ++ scala_of_dnrc e'''''' ++ eol
-        ++ "))" ++ eol
-        ++ "}" ++ eol
-        ++ "}"
-    end.
+  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
+             (e: dnrc (type_annotation _ _ A) dataset) : string :=
+    ""
+      ++ "import org.apache.spark.sql.types._" ++ eol
+      ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
+      ++ "import org.apache.spark.sql.functions._" ++ eol
+      ++ "import org.qcert.QCertRuntime" ++ eol
+      ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
+      ++ initBrandHierarchy ++ eol
+      ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
+      ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
+      ++ "println(toBlob(" ++ eol
+      ++ scala_of_dnrc e ++ eol
+      ++ "))" ++ eol
+      ++ "}" ++ eol
+      ++ "}"
+  .
 
 End DNNRCtoScala.
 

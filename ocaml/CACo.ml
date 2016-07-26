@@ -23,7 +23,7 @@ open CloudantUtil
 open DisplayUtil
 open FrontUtil
 open Compiler.EnhancedCompiler
-   
+
 (* Compile from NRAEnv *)
 
 let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string) op =
@@ -46,14 +46,22 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
       in
       let (schema_content,wmType) = TypeUtil.extract_schema io in
       let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
-      let e = CompCore.tcompile_nraenv_to_dnnrc_typed_opt_dataset op in
-      let m = Enhanced.Model.basic_model brand_model in
-      string_of_char_list
-	(CompBack.dnrc_to_scala_code_gen
-           Enhanced.Model.foreign_type
-           brand_model
-           (Enhanced.Model.foreign_typing brand_model)
-	   wmRType (Util.char_list_of_string nrule) e)
+      let oe = CompCore.tcompile_nraenv_to_dnnrc_dataset_opt
+                brand_model
+                (Enhanced.Model.foreign_typing brand_model)
+                op
+                wmRType
+      in
+      begin
+        match oe with
+          Some e ->
+          string_of_char_list
+	    (CompBack.dnrc_to_scala_code_gen
+               brand_model
+               (Enhanced.Model.foreign_typing brand_model)
+	       wmRType (Util.char_list_of_string nrule) e)
+        | None -> raise (CACo_Error ("Type inference failed"))
+      end
   | Cloudant ->
       let cld_conf = get_cld_config lconf in
       cloudant_compile_from_nra (get_cld cld_conf) (get_harness cld_conf) (idioticize (get_prefix cld_conf) nrule) op (DataUtil.get_hierarchy_cloudant (get_comp_io conf))
@@ -88,7 +96,7 @@ let args conf =
 let anon_args conf f = set_comp_input conf f
 
 let usage = "CaCo [-target language] [-source language] [-dir output] [-harness file] [-io file] [-display-ils] [-prefix name] [-curl] rule1 rule2 ..."
-      
+
 (* Main *)
 
 let compile_main conf f =
@@ -107,4 +115,3 @@ let () =
     Arg.parse (args conf) (anon_args conf) usage;
     List.iter (compile_main conf) (get_comp_inputs conf)
   end
-

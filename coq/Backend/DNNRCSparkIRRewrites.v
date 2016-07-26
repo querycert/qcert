@@ -309,6 +309,18 @@ Section DNNRCSparkIRRewrites.
     | _ => None
     end.
 
+  Definition dnnrcToDatasetRewrite {A : Set}
+             (e: dnrc (type_annotation _ _ A) dataset)
+    :=
+      let e' := e in
+      let e'' := tryBottomUp rec_cast_to_filter e' in
+      let e''' := tryBottomUp rec_lift_unbrand e'' in
+      let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
+      let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
+      let e'''''' := tryBottomUp rec_for_to_select e''''' in
+      e'''''.
+
+
 End DNNRCSparkIRRewrites.
 
 (*
