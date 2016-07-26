@@ -16,7 +16,6 @@
 
 package org.qcert
 
-import java.io.FileReader
 import java.util
 import java.util.Comparator
 
