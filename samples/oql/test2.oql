@@ -1,3 +1,4 @@
 select struct(company: c.cname, dept: d)
 from c in Companies,
      d in c.departments
+

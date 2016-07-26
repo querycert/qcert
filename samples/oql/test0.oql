@@ -1,3 +1,4 @@
-select p
-from p in Persons
-where p.age = 32
+/* Returns all the persons in the input Persons collection */
+
+Persons
+

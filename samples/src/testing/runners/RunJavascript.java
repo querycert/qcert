@@ -46,7 +46,6 @@ public class RunJavascript {
 		// Load input JSON
 		if (ioFile != null) {
 		    String funCall = "var world = " + readFile(ioFile) + ";";
-		    System.out.println(funCall);
 		    engine.eval(funCall);
 		} else {
 		    throw new IllegalArgumentException("Input Data File Missing");
