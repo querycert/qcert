@@ -32,14 +32,14 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
   match get_target_lang lconf with
   | Java ->
       (* this uses 'basename': the file name since the java class name needs to be the same as the file name *)
-      string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string (get_java_imports conf)) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+      (string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string (get_java_imports conf)) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op)), None)
   | JS ->
-      string_of_char_list (CompBack.nrc_to_js_code_gen (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+     (string_of_char_list (CompBack.nrc_to_js_code_gen (CompCore.tcompile_nraenv_to_nnrc_typed_opt op)), None)
   | Spark ->
-     let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-      string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) env_var mr)
+     (let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+      string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) env_var mr), None)
   | Spark2 ->
-      let io =
+     let io =
 	match get_comp_io conf with
 	| Some io -> io
 	| None -> raise (Failure "Spark2 target requires a schema I/O file")
@@ -55,24 +55,26 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
       begin
         match oe with
           Some e ->
-          string_of_char_list
+          (string_of_char_list
 	    (CompBack.dnrc_to_scala_code_gen
                brand_model
                (Enhanced.Model.foreign_typing brand_model)
-	       wmRType (Util.char_list_of_string nrule) e)
+	       wmRType (Util.char_list_of_string nrule) e),
+	   Some (brand_model, wmRType))
         | None -> raise (CACo_Error ("Type inference failed"))
       end
   | Cloudant ->
-      let cld_conf = get_cld_config lconf in
-      cloudant_compile_from_nra (get_cld cld_conf) (get_harness cld_conf) (idioticize (get_prefix cld_conf) nrule) op (DataUtil.get_hierarchy_cloudant (get_comp_io conf))
+     (let cld_conf = get_cld_config lconf in
+      cloudant_compile_from_nra (get_cld cld_conf) (get_harness cld_conf) (idioticize (get_prefix cld_conf) nrule) op (DataUtil.get_hierarchy_cloudant (get_comp_io conf)), None)
   | _ ->
       raise (CACo_Error ("Target not supported by CACo"))
 
 let compile_algenv_top conf (fname,sname,alg) =
   let fpref = Filename.chop_extension fname in
-  let scomp = compile_algenv_to_string conf sname (Filename.basename fpref) alg in
+  let (scomp,rest) = compile_algenv_to_string conf sname (Filename.basename fpref) alg in
   let fout = outname (target_f (get_dir conf) fpref) (suffix_target (get_comp_lang_config conf)) in
-  make_file fout scomp
+  make_file fout scomp;
+  rest
 
 (* Command line args *)
 let args conf =
@@ -103,8 +105,8 @@ let compile_main conf f =
   if f <> "" then
     let (fname,sname,op) = alg_of_input (get_comp_lang_config conf) f in
     begin
-      compile_algenv_top conf (fname,sname,op);
-      if !(get_target_display conf) then display_algenv_top conf (fname,op) else ();
+      let modelandtype = compile_algenv_top conf (fname,sname,op) in
+      if !(get_target_display conf) then display_algenv_top conf modelandtype (fname,op) else ();
       if !(get_target_display_sexp conf) then sexp_algenv_top conf (fname,op) else ();
       if !(get_target_stats conf) then Stats.display_stats conf fname else ()
     end
