@@ -35,7 +35,7 @@ let display_to_string conf op =
   let nrcmr_spark_string = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) nnrcmr_spark in
   let nrcmr_cldmr_string = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) nnrcmr_cldmr in
   let opt_dnrc_string = PrettyIL.pretty_dnrc PrettyIL.pretty_annotate_ignore (PrettyIL.pretty_plug_nraenv (get_charset_bool conf)) (get_charset_bool conf) (get_margin conf) opt_dnrc in
-  let opt_dnrc_dataset_string = PrettyIL.pretty_dnrc PrettyIL.pretty_annotate_ignore (PrettyIL.pretty_plug_ignore) (get_charset_bool conf) (get_margin conf) opt_dnrc_dataset in
+  let opt_dnrc_dataset_string = PrettyIL.pretty_dnrc PrettyIL.pretty_annotate_ignore (PrettyIL.pretty_plug_dataset (get_charset_bool conf)) (get_charset_bool conf) (get_margin conf) opt_dnrc_dataset in
   (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string, opt_dnrc_string, opt_dnrc_dataset_string)
 
 let display_algenv_top conf (fname,op) =

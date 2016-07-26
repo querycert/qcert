@@ -104,7 +104,7 @@ let textsym =
     wedge = ("/\\",2);
     leq = ("<=",2);
     sin = ("{in}",4);
-    neg = ("|",1);
+    neg = ("~",1);
     top = ("Top",3);
     bot = ("Bot",3) }
 let greeksym =
@@ -787,13 +787,6 @@ let pretty_nnrcmr greek margin mr_chain =
 
 (* dnrc PP *)
 
-(* what is going on here with the arguments to pretty_list???? *)
-let pretty_list (comma:string) (pr:Format.formatter->'a->unit) (ff:Format.formatter) (l:'a list) =
-  match l with
-  | [] -> ()
-  | h :: [] -> fprintf ff "%a" pr h
-  | h :: tl' -> fprintf ff "%a%s %a" pr h comma (pretty_list pr comma) tl'
-
 let rec pretty_dnrc_aux ann plug p sym ff n =
   match n with
   | Hack.DNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v) 
@@ -839,9 +832,9 @@ let rec pretty_dnrc_aux ann plug p sym ff n =
   | Hack.DNRCAlg (a,body,arglist) ->
      fprintf ff "@[%a (@[fun %a => @] %a)@[(%a)@]@]"
 	     ann a
-             (pretty_list "," (fun ff s -> fprintf ff "%s" s)) (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
+             (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
              plug body
-	     (pretty_list ", " (pretty_dnrc_aux ann plug p sym)) (List.map snd arglist)
+	     (pretty_list (pretty_dnrc_aux ann plug p sym) ",") (List.map snd arglist)
 
 let pretty_dnrc ann plug greek margin n =
   let conf = make_pretty_config greek margin in
@@ -863,7 +856,7 @@ let pretty_plug_ignore ff a = ()
 let pretty_plug_nraenv greek ff a = 
   let sym = if greek then greeksym else textsym in
   pretty_nraenv_aux 0 sym ff a
-
+    
 (* Pretty RType *)
 
 let rec pretty_rtype_aux sym ff rt =
@@ -905,3 +898,61 @@ let pretty_rtype greek margin rt =
 let pretty_annotate_rtype greek ff r =
     let sym = if greek then greeksym else textsym in
     fprintf ff "@[%a%a%a@]" pretty_sym sym.llangle (pretty_rtype_aux sym) r pretty_sym sym.rrangle
+
+(* Pretty Spark IR *)
+let rec pretty_column_aux p sym ff col =
+  match col with
+  | Hack.CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (Util.string_of_char_list v) pretty_sym sym.rangle
+  | Hack.CAs (v,c) -> fprintf ff "%s@%a" (Util.string_of_char_list v) (pretty_column_aux 0 sym) c 
+  | Hack.CDot (v,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ADot v) c
+  | Hack.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rangle pretty_data d
+  | Hack.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (Hack.ABArith Hack.ArithPlus) c1 c2
+  | Hack.CEq (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.AEq c1 c2
+  | Hack.CNeg c -> pretty_unop p sym pretty_column_aux ff Hack.ANeg c
+  | Hack.CToString c -> pretty_unop p sym pretty_column_aux ff Hack.AToString c
+  | Hack.CSConcat (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ASConcat c1 c2
+  | Hack.CUDFCast (bs,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ACast bs) c
+  | Hack.CUDFUnbrand (rt,c) -> fprintf ff "@[!%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rangle (pretty_column_aux p sym) c
+
+let rec pretty_spark_aggregate_aux p sym ff agg =
+  match agg with
+  | Hack.SACount -> fprintf ff "%s" "Count"
+  | Hack.SASum -> fprintf ff "%s" "Sum"
+  | Hack.SACollectList -> fprintf ff "%s" "CollectList"
+
+let rec pretty_dataset_aux p sym ff ds =
+  match ds with
+  | Hack.DSVar v -> fprintf ff "$v%s" (Util.string_of_char_list v)
+  | Hack.DSSelect (cl,ds1) -> fprintf ff "@[select %a [@<hv 2>from %a@] @]"
+				      (pretty_list (pretty_column_aux p sym) ",") cl (pretty_dataset_aux p sym) ds1
+  | Hack.DSFilter (c,ds1) -> fprintf ff "@[filter %a [@<hv 2>from %a@] @]"
+				      (pretty_column_aux p sym) c (pretty_dataset_aux p sym) ds1
+  | Hack.DSGroupBy (cl,al,ds1) -> fprintf ff "@[group %a [@<hv 2>by %a@] [@<hv 2>using %a@]@]"
+					  (pretty_dataset_aux p sym) ds1
+					  (pretty_list (pretty_column_aux p sym) ",") cl
+					  (pretty_list (fun ff ((s,a),c) ->
+					       fprintf ff "%s@%a of %a"
+						       (Util.string_of_char_list s)
+						       (pretty_spark_aggregate_aux p sym) a
+						       (pretty_column_aux p sym) c
+						       ) ",") al
+  | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataset_aux ff Hack.AConcat ds1 ds2
+  | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s [@<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataset_aux p sym) ds
+
+let pretty_dataset greek margin ds =
+  let conf = make_pretty_config greek margin in
+  let ff = str_formatter in
+  begin
+    pp_set_margin ff (get_margin conf);
+    let sym =
+      match (get_charset conf) with
+      | Greek -> greeksym
+      | Ascii -> textsym
+    in
+    fprintf ff "@[%a@]@." (pretty_dataset_aux 0 sym) ds;
+    flush_str_formatter ()
+  end
+
+let pretty_plug_dataset greek ff a = 
+  let sym = if greek then greeksym else textsym in
+  pretty_dataset_aux 0 sym ff a
