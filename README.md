@@ -4,7 +4,7 @@ http://github.com/querycert/qcert
 
 ## About
 
-This is the source code for the Q\*cert certified query compiler. The
+This is the source code for the Q\*cert verified query compiler. The
 goal of the project is to develop a state of the art query compiler
 for languages over a rich data model (nested, hierarchical, etc), with
 an implementation which provides strong correctness guarantees.
@@ -57,8 +57,8 @@ CADa for the Q\*cert data processor.
 
 ## Compile Queries
 
-Once the compiler is built, one can use it to compile queries. The
-`samples` directory contains a few examples written in OQL (Object
+Once the compiler is built, it can be used to compile queries. The
+[`./samples`](./samples) directory contains a few examples written in OQL (Object
 Query Language) syntax. For instance:
 
 ```
@@ -95,8 +95,8 @@ operators assumed by the compiler (e.g., ways to access records or
 manipulate collections), and (ii) a *query runner* which allows to
 execute the query on some input data.
 
-Runtime libraries are in the ./runtime directory. We include simple
-query runners in the .samples directory in order to try the examples.
+Runtime libraries are in the [`./runtime`](./runtime) directory. We include simple
+query runners in the [`./samples`](./samples) directory in order to try the examples.
 
 ### Prerequisites
 
@@ -111,11 +111,90 @@ To compile the supporting runtime for the Java target:
 make java-runtime
 ```
 
+### Build the sample query runners
+
+To compile the small query runners:
+
+```
+cd samples
+make
+```
+
+Now, you're good to go! Next step: run your compiled queries.
+
+### Run queries compiled to Javascript
+
+(In the [`./samples`](./samples) directory)
+
+To run a query compiled to Javascript, you can call `java` for the
+`RunJavascript` query runner (It uses uses the Nashorn Javascript
+engine for the JVM). You will need to pass it two pieces of
+information: (i) the location of the Q\*cert runtime for javascript,
+and (ii) some input data on which to run the query. From the command
+line, you can do it as follows:
+
+```
+java -cp bin testing.runners.RunJavascript \
+     -input data/persons.json \
+	 -runtime ../runtime/javascript/qcert-runtime.js
+	 oql/test1.js
+```
+
+The input data in [`data/persons.json`](./samples/data/persons.json)
+contains a collection of persons and a collection of companies in JSON
+format and can be used for all the tests. If you run test1, it should
+return all persons whose age is 32:
+
+```
+[{"pid":1,"name":"John Doe","age":32,"company":101},
+ {"pid":2,"name":"Jane Doe","age":32,"company":103},
+ {"pid":4,"name":"Jill Does","age":32,"company":102}]
+```
+
+Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
+can compile and run a given test for you:
+
+```
+make run_js_test1
+```
+### Run queries compiled to Java
+
+(In the [`./samples`](./samples) directory)
+
+To run a query compiled to Java, you must first compiler it by calling
+`javac` for the produced Java code, then call `java` with the
+`RunJava` query runner. You will need to pass it three pieces of
+information: (i) the location of the gson jar which is used to parse
+the input, (ii) the location of the Q\*cert runtime for java, both as
+part of the classpath, and (ii) some input data on which to run the
+query. From the command line, you can do it as follows, first to
+compile the Java code:
+
+```
+javac -cp bin:../runtime/java/bin:../lib/gson-2.7.jar oql/test1.java
+```
+
+Then to run the compiled Class:
+
+```
+java -cp bin:../runtime/java/bin:../lib/gson-2.7.jar:oql testing.runners.RunJava \
+     -input data/persons.json \
+	 test1
+```
+
+Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
+can compile and run a given test for you:
+
+```
+make run_java_test1
+```
+
 ## Caveats
 
-- The Spark 2 target is not operational
+- There is no official support for Windows, although some success has been reported (See [Issue #1](https://github.com/querycert/qcert/issues/1))
+- The Spark 2 target is in development, and not yet operational
 - The documentation is based on an early version of the compiler and is outdated
-- Support for the source miniOQL language is very preliminary
+- Support for the source miniOQL language is preliminary
 
 
 ## Code Organization
@@ -127,25 +206,25 @@ The code is in three main directories:
 
 Inside the [`./coq`](./coq) directory, the organization is as follows.
 - Foundational modules:
-  [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
-  [`./Basic/Data`](./coq/Basic/Data) contains the core data model
-  [`./Basic/Operators`](./coq/Basic/Operators) contains unary/binary operators shared across ILs
-  [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
-  [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
+  - [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
+  - [`./Basic/Data`](./coq/Basic/Data) contains the core data model
+  - [`./Basic/Operators`](./coq/Basic/Operators) contains unary/binary operators shared across ILs
+  - [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
+  - [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
 - Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
-  [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-  [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
-  [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
-  [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
-  [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+  - [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+  - [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
+  - [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
+  - [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
+  - [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
 - Translations:
-  [`./Translation`](./coq/Translation) contains translations between ILs
-  [`./Backend`](./coq/Backend) contains backend support and code generation
-  [`./Frontend`](./coq/Frontend) contains surface language support (except for jRules)
+  - [`./Translation`](./coq/Translation) contains translations between ILs
+  - [`./Backend`](./coq/Backend) contains backend support and code generation
+  - [`./Frontend`](./coq/Frontend) contains surface language support (except for jRules)
 - Toplevel:
-  [`./Compiler`](./coq/Compiler) contains the overall compiler instructure and functional optimizers
-  [`./Tests`](./coq/Tests) contains various coq self-tests
-  ([`./Updates`](./coq/Updates) is early code for updates that isn't part of the actual compiler)
+  - [`./Compiler`](./coq/Compiler) contains the overall compiler instructure and functional optimizers
+  - [`./Tests`](./coq/Tests) contains various coq self-tests
+  - ([`./Updates`](./coq/Updates) is early code for updates that isn't part of the actual compiler)
 
 ## License
 

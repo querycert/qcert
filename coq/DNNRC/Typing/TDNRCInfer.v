@@ -34,21 +34,15 @@ Section TDNRCInfer.
   Require Import TOpsInfer.
   Require Import TOpsInferSub.
 
-  Context {fruntime:foreign_runtime}.
-  Context {ftype:foreign_type}.
-  Context {m:brand_model}.
-  Context {fdtyping:foreign_data_typing}.
-  Context {fboptyping:foreign_binary_op_typing}.
-  Context {fuoptyping:foreign_unary_op_typing}.
-  Context {plug_type:Set}.
-  Context {plug:AlgPlug plug_type}.
-  (*  Context {tplug:TAlgPlug plug_type}. *)
-  
-  Definition lift_tlocal (dτ:drtype) : option rtype :=
+  Section helpers.
+    Context {ftype:foreign_type}.
+    Context {br:brand_relation}.
+    
+    Definition lift_tlocal (dτ:drtype) : option rtype :=
     match dτ with
     | Tlocal τ => Some τ
     | Tdistr _ => None
-    end.
+    end.  
   
   Definition lift_tdistr (dτ:drtype) : option rtype :=
     match dτ with
@@ -76,9 +70,33 @@ Section TDNRCInfer.
 
       }.
 
+    Definition drtype_map (f:rtype->rtype) (d:drtype) : drtype
+    := match d with
+       | Tlocal t => Tlocal (f t)
+       | Tdistr t => Tdistr (f t)
+       end.
+
+    Definition drtype_omap (f:rtype->option rtype) (d:drtype) : option drtype
+    := match d with
+       | Tlocal t => lift Tlocal (f t)
+       | Tdistr t => lift Tdistr (f t)
+       end.
+
   Global Arguments type_annotation : clear implicits. 
   Global Arguments mkType_annotation {A} ta_base ta_inferred ta_required.
+
+    End helpers.
   
+  Context {fruntime:foreign_runtime}.
+  Context {ftype:foreign_type}.
+  Context {m:brand_model}.
+  Context {fdtyping:foreign_data_typing}.
+  Context {fboptyping:foreign_binary_op_typing}.
+  Context {fuoptyping:foreign_unary_op_typing}.
+  Context {plug_type:Set}.
+  Context {plug:AlgPlug plug_type}.
+  (*  Context {tplug:TAlgPlug plug_type}. *)
+
   Definition di_typeof {A} (d:dnrc (type_annotation A) plug_type)
     := ta_inferred (dnrc_annotation_get d).
 
@@ -93,17 +111,6 @@ Section TDNRCInfer.
          (fun a:type_annotation A =>
             mkType_annotation (ta_base a) (ta_inferred a) dτ) d.
   
-  Definition drtype_map (f:rtype->rtype) (d:drtype) : drtype
-    := match d with
-       | Tlocal t => Tlocal (f t)
-       | Tdistr t => Tdistr (f t)
-       end.
-
-    Definition drtype_omap (f:rtype->option rtype) (d:drtype) : option drtype
-    := match d with
-       | Tlocal t => lift Tlocal (f t)
-       | Tdistr t => lift Tdistr (f t)
-       end.
 
     Fixpoint infer_dnrc_type {A} (tenv:tdbindings) (n:dnrc A plug_type) :
     option (dnrc (type_annotation A) plug_type)
@@ -291,7 +298,7 @@ Section TDNRCInfer.
 
 End TDNRCInfer.
 
-Global Arguments type_annotation : clear implicits. 
+Global Arguments type_annotation {ftype br} A: clear implicits. 
 
 (* 
 *** Local Variables: ***

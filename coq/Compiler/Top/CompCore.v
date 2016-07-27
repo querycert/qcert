@@ -164,14 +164,14 @@ Module CompCore(runtime:CompilerRuntime).
              {bm:brand_model}
              {ftyping: foreign_typing}
              (e: dnrc unit dataset) (inputType: rtype)
-    : option (dnrc (type_annotation _ _ unit) dataset) :=
+    : option (dnrc (type_annotation unit) dataset) :=
     dnnrc_infer_type e inputType.
 
   Definition tcompile_nraenv_to_dnnrc_dataset_opt
              {bm:brand_model}
              {ftyping: foreign_typing}
              (op_init: algenv) (inputType: rtype)
-    : option (dnrc (type_annotation _ _ unit) dataset) :=
+    : option (dnrc (type_annotation unit) dataset) :=
     let e := tcompile_nraenv_to_dnnrc_typed_opt_dataset op_init in
     let typed := dnnrc_to_typeannotated_dnnrc e inputType in
     lift dnnrcToDatasetRewrite typed.
@@ -234,6 +234,16 @@ Module CompCore(runtime:CompilerRuntime).
   Definition trew_nnrcmr_typed_opt (e_mr:nrcmr) : nrcmr :=
     mr_optimize e_mr.
 
+  Definition type_annotation {br:brand_relation} (A:Set): Set
+    := TDNRCInfer.type_annotation A.
+
+  Definition ta_base {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_base ta.
+  Definition ta_inferred {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_inferred ta .
+  Definition ta_required {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_required ta.
+  
 End CompCore.
 
 (*

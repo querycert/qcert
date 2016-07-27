@@ -40,11 +40,11 @@
 
 %right FROM IN AS WHERE
 %right COMMA
-%left DOT ARROW
 %right EQUAL NEQUAL
 %right PLUS MINUS
 %right AND OR
 %right STAR
+%left DOT ARROW
 
 %start <Compiler.EnhancedCompiler.OQL.expr> main
 

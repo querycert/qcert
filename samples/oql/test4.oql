@@ -1,0 +1,7 @@
+/* Example of Join: between Persons and Companies */
+
+select struct(name:p.name, worksfor: c.cname)
+from c in Companies,
+     p in Persons
+where p.company = c.cid
+

@@ -96,7 +96,7 @@ Section DNNRCSparkIRRewrites.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCUnop t1 AFlatten
                (DNRCFor t2 x
@@ -179,8 +179,8 @@ Section DNNRCSparkIRRewrites.
 
   Definition rec_lift_unbrand
              {A : Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ _) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation _) dataset) :=
     match e with
     | DNRCFor t1 x (DNRCCollect t2 xs as c) e =>
       match lift_tlocal (di_required_typeof c) with
@@ -206,7 +206,7 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Fixpoint condition_to_column {A: Set}
-           (e: dnrc (type_annotation _ _ A) dataset)
+           (e: dnrc (type_annotation A) dataset)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
@@ -247,8 +247,8 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition rec_if_else_empty_to_filter {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCUnop t1 AFlatten
                (DNRCFor t2 x (DNRCCollect t3 xs)
@@ -271,8 +271,8 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCUnop t1 AFlatten
                (DNRCFor t2 x xs
@@ -282,8 +282,8 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition rec_for_to_select {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCFor t1 x (DNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
@@ -309,7 +309,7 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition dnnrcToDatasetRewrite {A : Set}
-             (e: dnrc (type_annotation _ _ A) dataset)
+             (e: dnrc (type_annotation A) dataset)
     :=
       let e' := e in
       let e'' := tryBottomUp rec_cast_to_filter e' in
