@@ -126,12 +126,12 @@ Now, you're good to go, and you can then run your compiled queries!
 
 (In the [`./samples`](./samples) directory)
 
-To run a compiled query, you can call java using the RunJavascript
-query runner (It uses uses the Nashorn Javascript engine for the
-JVM). You will need to pass it two pieces of information: (i) the
-location of the Q\*cert runtime for javascript, and (ii) some input
-data on which to run the query. From the command line, you can do it
-as follows:
+To run a query compiled to Javascript, you can call `java` for the
+`RunJavascript` query runner (It uses uses the Nashorn Javascript
+engine for the JVM). You will need to pass it two pieces of
+information: (i) the location of the Q\*cert runtime for javascript,
+and (ii) some input data on which to run the query. From the command
+line, you can do it as follows:
 
 ```
 java -cp bin testing.runners.RunJavascript \
@@ -142,8 +142,8 @@ java -cp bin testing.runners.RunJavascript \
 
 The input data in [`data/persons.json`](./samples/data/persons.json)
 contains a collection of persons and a collection of companies in JSON
-format. If you run test1, it should return you all persons whose age
-is 32:
+format and can be used for all the tests. If you run test1, it should
+return all persons whose age is 32:
 
 ```
 [{"pid":1,"name":"John Doe","age":32,"company":101},
@@ -151,9 +151,8 @@ is 32:
  {"pid":4,"name":"Jill Does","age":32,"company":102}]
 ```
 
-Alternatively the Makefile provided inside the
-[`./samples`](./samples) directory can compile and run a given test
-for you:
+Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
+can compile and run a given test for you:
 
 ```
 make run_js_test1

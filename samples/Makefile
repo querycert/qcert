@@ -20,10 +20,11 @@ BLANK=$(EMPTY) $(EMPTY)
 RAWCPATH=bin
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
-RAWRUNCPATH=bin $(wildcard ../lib/*.jar)
-RUNCPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
+RAWRUNCPATH=bin ../runtime/java/bin $(wildcard ../lib/*.jar)
+RUNCPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWRUNCPATH))
 
 JAVA=java
+JAVAC=javac
 QCERTCOMP=../bin/CACo
 QCERTEVAL=../bin/CAEv
 
@@ -45,6 +46,11 @@ oql/%.java: oql/%.oql
 	@echo
 	@echo "Compiling test: '"$<"' to '"$@"'"
 	$(QCERTCOMP) -source OQL -target Java $<
+
+oql/%.class: oql/%.java
+	@echo
+	@echo "Compiling test: '"$<"' to '"$@"'"
+	$(JAVAC) -cp $(RUNCPATH) $<
 
 run_js_%: oql/%.js
 	@echo
