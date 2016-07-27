@@ -135,7 +135,7 @@ as follows:
 
 ```
 java -cp bin testing.runners.RunJavascript \
-     -io data/persons.json \
+     -input data/persons.json \
 	 -runtime ../runtime/javascript/qcert-runtime.js
 	 oql/test1.js
 ```
@@ -151,7 +151,9 @@ is 32:
  {"pid":4,"name":"Jill Does","age":32,"company":102}]
 ```
 
-Alternatively the makefile can compile and run a given test for you:
+Alternatively the Makefile provided inside the
+[`./samples`](./samples) directory can compile and run a given test
+for you:
 
 ```
 make run_js_test1
@@ -159,9 +161,10 @@ make run_js_test1
 
 ## Caveats
 
-- The Spark 2 target is not operational
+- There is no official support for Windows, although some success has been reported (See [Issue #1](https://github.com/querycert/qcert/issues/1))
+- The Spark 2 target is in development, and not yet operational
 - The documentation is based on an early version of the compiler and is outdated
-- Support for the source miniOQL language is very preliminary
+- Support for the source miniOQL language is preliminary
 
 
 ## Code Organization

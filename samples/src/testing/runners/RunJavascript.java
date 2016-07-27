@@ -38,8 +38,8 @@ public class RunJavascript {
 	
 	for (int i = 0; i < args.length; i++) {
 	    String arg = args[i];
-	    // Must have a -io option for the input JSON
-	    if ("-io".equals(arg)) { ioFile = args[i+1]; i++; }
+	    // Must have a -input option for the input JSON
+	    if ("-input".equals(arg)) { ioFile = args[i+1]; i++; }
 	    // Must have a -runtime option for the Q*cert Javascript runtime
 	    else if ("-runtime".equals(arg)) { runtimeFile = args[i+1]; i++; }
 	    else {
