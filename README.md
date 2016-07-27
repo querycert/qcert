@@ -58,7 +58,7 @@ CADa for the Q\*cert data processor.
 ## Compile Queries
 
 Once the compiler is built, it can be used to compile queries. The
-`samples` directory contains a few examples written in OQL (Object
+[`./samples`](./samples) directory contains a few examples written in OQL (Object
 Query Language) syntax. For instance:
 
 ```
@@ -95,8 +95,8 @@ operators assumed by the compiler (e.g., ways to access records or
 manipulate collections), and (ii) a *query runner* which allows to
 execute the query on some input data.
 
-Runtime libraries are in the ./runtime directory. We include simple
-query runners in the .samples directory in order to try the examples.
+Runtime libraries are in the [`./runtime`](./runtime) directory. We include simple
+query runners in the [`./samples`](./samples) directory in order to try the examples.
 
 ### Prerequisites
 
@@ -109,6 +109,48 @@ To compile the supporting runtime for the Java target:
 
 ```
 make java-runtime
+```
+
+### Build the sample query runners
+
+To compile the small query runners:
+
+```
+cd samples
+make
+```
+
+Now, you're good to go, and you can then run your compiled queries!
+
+### Run queries compiled to Javascript
+
+(In the [`./samples`](./samples) directory)
+
+To run a compiled query, you can call java using the RunJavascript
+query runner (It uses uses the Nashorn Javascript engine for the
+JVM). You will need to pass it two pieces of information: (i) the
+location of the Q\*cert runtime for javascript, and (ii) some input
+data on which to run the query. From the command line, you can do it
+as follows:
+
+```
+java -cp bin testing.runners.RunJavascript -io data/persons.json -runtime ../runtime/javascript/qcert-runtime.js oql/test1.js
+```
+
+The input data in `data/persons.json` contains a collection of persons
+and a collection of companies in JSON format. If you run test1, it
+should return you all persons whose age is 32:
+
+```
+[{"pid":1,"name":"John Doe","age":32,"company":101},
+ {"pid":2,"name":"Jane Doe","age":32,"company":103},
+ {"pid":4,"name":"Jill Does","age":32,"company":102}]
+```
+
+Alternatively the makefile can compile and run a given test for you:
+
+```
+make run_js_test1
 ```
 
 ## Caveats

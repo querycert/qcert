@@ -50,7 +50,7 @@ run_js_%: oql/%.js
 	@echo
 	@echo "Running test: '"$<"' on data: data/persons.json"
 	@echo
-	@$(JAVA) -cp $(RUNCPATH) testing.runners.RunJavascript -io data/persons.json -runtime ../runtime/javascript/qcert-runtime.js $< 
+	$(JAVA) -cp $(RUNCPATH) testing.runners.RunJavascript -io data/persons.json -runtime ../runtime/javascript/qcert-runtime.js $< 
 
 clean:
 	@rm -rf bin/*
