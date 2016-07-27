@@ -60,7 +60,8 @@ Section SparkIR.
 
 
   Section eval.
-    (** Denotation of a column expression in an environment of toplevel columns in the dataset. *)
+    (** Evaluate a column expression in an environment of toplevel columns
+     * i.e. a row in a dataset. *)
     Fixpoint fun_of_column (c: column) (row: list (string * data)) : option data :=
       let fc := flip fun_of_column row in
       match c with
@@ -80,6 +81,7 @@ Section SparkIR.
         | _, _ => None
         end
       | CEq c1 c2 =>
+        (* TODO We use QCert equality here, but we should define and use Spark equality. *)
         lift2 (fun x y => dbool (if data_eq_dec x y then true else false)) (fc c1) (fc c2)
       | CToString c1 =>
         lift (compose dstring dataToString) (fc c1)
