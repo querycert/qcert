@@ -105,11 +105,9 @@ Section SparkIR.
       | DSSelect cs d =>
         match dataset_eval dsenv d with
         | Some (Ddistr rows) =>
-          (* List of column names paired with their functions.
-           * Sorted by name, so we can just wrap the result in a record, later. *)
-          (* TODO Spark does not care about duplicates or sorting! *)
+          (* List of column names paired with their functions. *)
           let cfuns: list (string * (list (string * data) -> option data)) :=
-              rec_sort (map (fun p => (fst p, fun_of_column (snd p))) cs) in
+              map (fun p => (fst p, fun_of_column (snd p))) cs in
           (* Call this function on every row in the input dataset.
            * It calls every column function in the context of the row. *)
           let rfun: data -> option (list (string * data)) :=
@@ -121,7 +119,8 @@ Section SparkIR.
                 end
           in
           (* Call the row function on every row, and wrap the result in a record.
-           * We know the fields are sorted, because we sorted the columns earlier. *)
+           * For the result to be a legal record in the QCert data model,
+           * the field names must be in order and not contain duplicates. *)
           let results := map (compose (lift drec) rfun) rows in
           lift Ddistr (listo_to_olist results)
         | _ => None
@@ -139,14 +138,17 @@ Section SparkIR.
                                end
                              | _ => false
                              end))
+      (* NOTE Spark / QCert semantics mismatch
+       * Sparks join operation just appends the columns from the left side to the right,
+       * and this is what the semantics model. For the result to be legal in QCert, great
+       * care must be taken to ensure that this results in unique and sorted column names. *)
       | DSCartesian d1 d2 =>
         match dataset_eval dsenv d1, dataset_eval dsenv d2 with
         | Some (Ddistr rs1), Some (Ddistr rs2) =>
           let data :=
               flat_map (fun r1 => map (fun r2 =>
                                          match r1, r2 with
-                                         (* NOTE we sort and remove duplicate column names. This is not what Spark does. *)
-                                         | drec a, drec b => Some (drec (rec_sort (a ++ b)))
+                                         | drec a, drec b => Some (drec (a ++ b))
                                          | _, _ => None
                                          end)
                                       rs2)
