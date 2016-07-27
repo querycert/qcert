@@ -134,12 +134,16 @@ data on which to run the query. From the command line, you can do it
 as follows:
 
 ```
-java -cp bin testing.runners.RunJavascript -io data/persons.json -runtime ../runtime/javascript/qcert-runtime.js oql/test1.js
+java -cp bin testing.runners.RunJavascript \
+     -io data/persons.json \
+	 -runtime ../runtime/javascript/qcert-runtime.js
+	 oql/test1.js
 ```
 
-The input data in `data/persons.json` contains a collection of persons
-and a collection of companies in JSON format. If you run test1, it
-should return you all persons whose age is 32:
+The input data in [`data/persons.json`](./samples/data/persons.json)
+contains a collection of persons and a collection of companies in JSON
+format. If you run test1, it should return you all persons whose age
+is 32:
 
 ```
 [{"pid":1,"name":"John Doe","age":32,"company":101},
@@ -169,25 +173,25 @@ The code is in three main directories:
 
 Inside the [`./coq`](./coq) directory, the organization is as follows.
 - Foundational modules:
-  [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
-  [`./Basic/Data`](./coq/Basic/Data) contains the core data model
-  [`./Basic/Operators`](./coq/Basic/Operators) contains unary/binary operators shared across ILs
-  [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
-  [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
+  - [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
+  - [`./Basic/Data`](./coq/Basic/Data) contains the core data model
+  - [`./Basic/Operators`](./coq/Basic/Operators) contains unary/binary operators shared across ILs
+  - [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
+  - [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
 - Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
-  [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-  [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
-  [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
-  [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
-  [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+  - [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
+  - [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
+  - [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
+  - [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
+  - [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
 - Translations:
-  [`./Translation`](./coq/Translation) contains translations between ILs
-  [`./Backend`](./coq/Backend) contains backend support and code generation
-  [`./Frontend`](./coq/Frontend) contains surface language support (except for jRules)
+  - [`./Translation`](./coq/Translation) contains translations between ILs
+  - [`./Backend`](./coq/Backend) contains backend support and code generation
+  - [`./Frontend`](./coq/Frontend) contains surface language support (except for jRules)
 - Toplevel:
-  [`./Compiler`](./coq/Compiler) contains the overall compiler instructure and functional optimizers
-  [`./Tests`](./coq/Tests) contains various coq self-tests
-  ([`./Updates`](./coq/Updates) is early code for updates that isn't part of the actual compiler)
+  - [`./Compiler`](./coq/Compiler) contains the overall compiler instructure and functional optimizers
+  - [`./Tests`](./coq/Tests) contains various coq self-tests
+  - ([`./Updates`](./coq/Updates) is early code for updates that isn't part of the actual compiler)
 
 ## License
 
