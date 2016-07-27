@@ -247,19 +247,41 @@ Section RBag.
       assumption.
   Qed.
 
+  Lemma remove_one_sublist l a : sublist (remove_one a l) l.
+  Proof.
+    induction l; simpl.
+    - constructor.
+    - match_destr.
+      + constructor; reflexivity.
+      + constructor.
+         trivial.
+  Qed.
+  
+  Lemma bminus_sublist (l1 l2:list A) :
+    sublist (bminus l1 l2) l2.
+  Proof.
+    revert l2.
+    induction l1; simpl; intros.
+    - reflexivity.
+    - rewrite IHl1.
+      apply remove_one_sublist.
+  Qed.
+
   Lemma bminus_Forall (l1 l2:list A) p :
-    Forall p l1 -> Forall p l2 -> Forall p (bminus l1 l2).
+    Forall p l2 -> Forall p (bminus l1 l2).
   Proof.
     intros.
-    induction l1; simpl in *. assumption.
-    inversion H. specialize (IHl1 H4). clear H.
-    apply Forall_forall; intros.
-    assert (In x0 (bminus l1 l2)).
-    apply remove_one_In with (a:= a). assumption.
-    rewrite Forall_forall in IHl1.
-    apply IHl1; assumption.
+    rewrite bminus_sublist.
+    trivial.
   Qed.
-    
+
+  Lemma bminus_NoDup  (l1 l2:list A) : NoDup l2 -> NoDup (bminus l1 l2).
+  Proof.
+    intros.
+    rewrite bminus_sublist.
+    trivial.
+  Qed.
+                                       
   Hint Rewrite bunion_bminus remove_one_consed : bag.
   
   (* not used, unfollowed thought from now... *)

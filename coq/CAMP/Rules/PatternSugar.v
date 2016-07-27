@@ -162,7 +162,7 @@ Section PatternSugar.
 
   (* Java equivalent: CampVariablesMacro *)
   Definition returnVariables (sl:list string) : pat
-    := punop (ARecProject sl) penv.
+    := punop (ARecProject (insertion_sort ODT_lt_dec sl)) penv.
 
   (** Useful definitions *)
   (* Java equivalent: CampNowMacro *)

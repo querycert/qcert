@@ -175,6 +175,10 @@ MODULES = \
 	Translation/TNNRCtoPattern \
 	Translation/TPatterntoNRA \
 	Translation/TPatterntoNRAEnv \
+	Frontend/LambdaNRA/LambdaAlg \
+	Frontend/LambdaNRA/LambdaAlgEq \
+	Frontend/LambdaNRA/LambdaAlgtoNRAEnv \
+	Frontend/LambdaNRA/LambdaAlgExamples \
 	Frontend/ODMG/OQL \
 	Frontend/ODMG/OQLSugar \
 	Frontend/ODMG/OQLSize \
@@ -197,6 +201,7 @@ MODULES = \
 	Backend/NNRCMRtoCloudant \
 	Backend/CloudantMRtoJavascript \
 	Backend/SparkData \
+	Backend/DNNRCSparkIRRewrites \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/ROptimEnvFunc \

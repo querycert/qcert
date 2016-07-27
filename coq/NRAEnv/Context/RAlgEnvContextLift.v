@@ -587,6 +587,23 @@ Section RAlgEnvContext.
     apply lift_alg_context_proper; trivial.
   Qed.
 
+  Local Open Scope alg_ctxt.
+  Local Open Scope algenv_ctxt.
+
+  (** This is just a restatement of lift_alg_context_proper
+        which visually looks more like the paper version.
+        For the mechanization, lift_alg_context_proper 
+        is nicer, since it explicitly states that lift_alg_context
+        is a morphism between the two equivalences
+        and registers that relationship with the rewriting infrastructure
+        of Coq.
+   *)
+  Theorem contextual_equivalence_lifting (c₁ c₂:alg_ctxt) :
+    c₁ ≡ₐ c₂ -> lift_alg_context c₁ ≡ₑ lift_alg_context c₂.
+  Proof.
+    apply lift_alg_context_proper.
+  Qed.
+
 End RAlgEnvContext.
 
 (* 

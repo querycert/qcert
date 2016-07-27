@@ -18,12 +18,12 @@ Require Import CompilerRuntime.
 Module CompCore(runtime:CompilerRuntime).
 
   Require Import String List String EquivDec.
-  
+
   Require Import BasicRuntime.
   Require Import Pattern Rule.
 
   Require Import CompUtil.
-  
+
   (***************
    * NRA Section *
    ***************)
@@ -41,7 +41,7 @@ Module CompCore(runtime:CompilerRuntime).
   Definition optimizer_untyped_opt : optimizer := ROptimEnvFunc.optim.
 
   (* Optimize NRA+Env *)
-  
+
   Definition optimize_algenv (optim:optimizer) (op_init:algenv) : algenv :=
     (* Optimization pass over the initial plan *)
     optim op_init.
@@ -71,7 +71,7 @@ Module CompCore(runtime:CompilerRuntime).
   (* Java equivalent: NraToNnrc.convert *)
   Definition translate_nraenv_to_nnrc (op:algenv) : nrc :=
     algenv_to_nnrc op init_vid init_venv.
-  
+
   Definition compile_nraenv_to_nnrc (optim:optimizer) (rew:rewriter) (op_init:algenv) : nrc :=
     let op_optim := optimize_algenv optim op_init in
     let e_init := translate_nraenv_to_nnrc op_optim in
@@ -81,11 +81,11 @@ Module CompCore(runtime:CompilerRuntime).
   Definition compile_nraenv_to_nnrc_untyped_opt :=
     compile_nraenv_to_nnrc optimizer_untyped_opt rewriter_simpl_rew.
 
-  
+
   (************************
    * Typed NRAEnv Section *
    ************************)
-  
+
   (* Typed Optimizer for NRA+Env *)
 
   Require Import BasicTypes NRAEnvTypes.
@@ -102,11 +102,11 @@ Module CompCore(runtime:CompilerRuntime).
   (**********************
    * Typed NNRC Section *
    **********************)
-  
+
   Require Import NNRCTypes.
   Require Import TNRAEnvtoNNRC.
   Require Import TRewFunc.
-  
+
   (* Typed compilation from NRAEnv to NNRC *)
 
   Definition tcompile_nraenv_to_nnrc (optim:optimizer) (rew:rewriter) (op_init:algenv) : nrc :=
@@ -127,9 +127,9 @@ Module CompCore(runtime:CompilerRuntime).
   (***********************
    * Typed DNNRC Section *
    ***********************)
-  
-  Require Import DData DNNRC.
-  
+
+  Require Import DData DNNRC SparkIR.
+
   (* Typed compilation from NRAEnv to DNNRC *)
 
   Definition tcompile_nraenv_to_dnnrc (optim:optimizer) (rew:rewriter) (op_init:algenv) : dnrc_algenv :=
@@ -145,6 +145,37 @@ Module CompCore(runtime:CompilerRuntime).
   Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc bool algenv :=
     tcompile_nraenv_to_dnnrc toptim trew op_init.
 
+  Definition tcompile_nraenv_to_dnnrc_dataset (optim:optimizer) (rew:rewriter) (op_init:algenv) : dnrc unit dataset :=
+    let op_optim := optimize_algenv optim op_init in
+    let e_init := translate_nraenv_to_nnrc op_optim in
+    let e_rew := rew e_init in
+    let de_init := @nrc_to_dnrc_dataset _ _ unit tt mkDistLoc e_rew in
+    de_init.
+
+  Definition tcompile_nraenv_to_dnnrc_none_dataset (op_init:algenv) : dnrc unit dataset :=
+    tcompile_nraenv_to_dnnrc_dataset optimizer_no_optim rewriter_no_rew op_init.
+
+  Definition tcompile_nraenv_to_dnnrc_typed_opt_dataset (op_init:algenv) : dnrc unit dataset :=
+    tcompile_nraenv_to_dnnrc_dataset toptim trew op_init.
+
+  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
+
+  Definition dnnrc_to_typeannotated_dnnrc
+             {bm:brand_model}
+             {ftyping: foreign_typing}
+             (e: dnrc unit dataset) (inputType: rtype)
+    : option (dnrc (type_annotation unit) dataset) :=
+    dnnrc_infer_type e inputType.
+
+  Definition tcompile_nraenv_to_dnnrc_dataset_opt
+             {bm:brand_model}
+             {ftyping: foreign_typing}
+             (op_init: algenv) (inputType: rtype)
+    : option (dnrc (type_annotation unit) dataset) :=
+    let e := tcompile_nraenv_to_dnnrc_typed_opt_dataset op_init in
+    let typed := dnnrc_to_typeannotated_dnnrc e inputType in
+    lift dnnrcToDatasetRewrite typed.
+
   (*****************
    * DNNRC Section *
    *****************)
@@ -155,7 +186,7 @@ Module CompCore(runtime:CompilerRuntime).
 
   Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc bool algenv :=
     nrc_to_dnrc true tenv e_nrc. (* empty annotation and algenv plug *)
-  
+
   (******************
    * NNRCMR Section *
    ******************)
@@ -163,7 +194,7 @@ Module CompCore(runtime:CompilerRuntime).
   (* HACK: mr_reduce_empty isn't a field of mr so it needs to be exposed *)
 
   Definition mr_reduce_empty := mr_reduce_empty.
-  
+
   (* - For now the assumption is that all free vars in the original nrc
        expression are collections and will be distributed.
      - The free variables are obtained after nrc rewrites
@@ -185,7 +216,7 @@ Module CompCore(runtime:CompilerRuntime).
                              env_variables
     in
     (env_variables, e_mr).
-  
+
   Definition tcompile_nraenv_to_nnrcmr_chain_no_optim (op_init:algenv) : list (var * dlocalization) * nrcmr :=
     let e_nrc := tcompile_nraenv_to_nnrc_typed_opt op_init in
     translate_nnrc_to_nnrcmr_chain e_nrc.
@@ -203,9 +234,19 @@ Module CompCore(runtime:CompilerRuntime).
   Definition trew_nnrcmr_typed_opt (e_mr:nrcmr) : nrcmr :=
     mr_optimize e_mr.
 
+  Definition type_annotation {br:brand_relation} (A:Set): Set
+    := TDNRCInfer.type_annotation A.
+
+  Definition ta_base {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_base ta.
+  Definition ta_inferred {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_inferred ta .
+  Definition ta_required {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_required ta.
+  
 End CompCore.
 
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***

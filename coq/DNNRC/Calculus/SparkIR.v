@@ -23,71 +23,48 @@ Section SparkIR.
   Require Import EquivDec.
   Require Import Morphisms.
 
-  Require Import Utils BasicRuntime.
+  Require Import Utils BasicSystem.
   Require Import DData.
   Require Import RAlgEnv.
+  Require Import ForeignToJavascript.
+
+  Require Import RType.
+
 
   Context {fruntime:foreign_runtime}.
+  Context {ftype: ForeignType.foreign_type}.
+  Context {fttojs : ForeignToJavascript.foreign_to_javascript}.
+  Context {m : TBrandModel.brand_model}.
 
   Definition var := string.
 
   Inductive column :=
-  | CCol   : string                     -> column (* column("name") *)
-  | CAs    : string -> column           -> column (* .as("new_name") *)
-  | CPlus0 : string -> data   -> column -> column (* .plus(5).as("first") *)
-  | CPlus1 : string -> column -> column -> column (* $column1.plus($column2) *)
-  | CEq0   : string -> data   -> column -> column
-  | CEq1   : string -> column -> column -> column
-  | CNeg   : string -> column ->           column
-  .
+  | CCol   : string -> column
+  | CAs    : string -> column -> column
+  | CDot   : string -> column -> column
+  | CLit   : data * rtype₀ -> column
+  | CPlus  : column -> column -> column
+  | CEq    : column -> column -> column
+  | CNeg   : column -> column
+  | CToString : column -> column
+  | CSConcat : column -> column -> column
+  | CUDFCast : list string -> column -> column
+  | CUDFUnbrand : rtype₀ -> column -> column.
 
   Inductive spark_aggregate :=
   | SACount : spark_aggregate
   | SASum : spark_aggregate
-  | SACollectList : spark_aggregate (* collect values into nested array *)
-  .
+  | SACollectList : spark_aggregate.
 
   Inductive dataset :=
-  | DSVar : string -> dataset (* ds *)
-  | DSSelect : list column -> dataset -> dataset (* ds.select( ... ) *)
-  | DSFilter : column -> dataset -> dataset (* ds.filter( ... ) *)
+  | DSVar : string -> dataset
+  | DSSelect : list column -> dataset -> dataset
+  | DSFilter : column -> dataset -> dataset
   (* ds.groupBy( grouping columns ).agg( aggregate expressions ) *)
   | DSGroupBy : list column -> list (string * spark_aggregate * column) -> dataset -> dataset
   | DSCartesian : dataset -> dataset -> dataset
-  (* Rename DSUnnest? *)
-  | DSExplode : string -> dataset -> dataset
-  (* We might want to move CollectList from the aggregate functions to a toplevel operation here *)
-  .
+  | DSExplode : string -> dataset -> dataset.
 
-  Fixpoint code_of_column (c: column) : string :=
-    match c with
-    | CCol s => "column(""" ++ s ++ """)"
-    | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
-    | CEq1 new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | _ => ""
-    end.
-
-  Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
-    match a with
-      (n, a, c) =>
-      let c := code_of_column c in
-      let f := match a with
-               | SACount => "count"%string
-               | SASum => "sum"%string
-               | SACollectList => "collect_list"%string
-               end
-      in f ++ "(" ++ c ++ ").as(""" ++ n ++ """)"
-    end.
-
-  Fixpoint code_of_dataset (e: dataset) : string :=
-    match e with
-    | DSVar s => s
-    | DSSelect cs d => code_of_dataset d ++ ".select(" ++ joinStrings ", " (map code_of_column cs) ++ ")"
-    | DSFilter c d => code_of_dataset d ++ ".where(" ++ code_of_column c ++ ")"
-    | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
-    | DSGroupBy gcs acs d => code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " (map code_of_column gcs) ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
-    | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
-    end.
 
   Section eval.
 
@@ -130,31 +107,12 @@ Section SparkIR.
           | Some (_, d) => Some (srec s d)
           | _ => None
           end
-        | CEq0 n d c1 =>
+        | CNeg c1 =>
           match unsrec (fun_of_column c1 x) with
-          | Some (_, x) => Some (srec n (dbool (equiv_decb x d)))
+          | Some (n, (dbool x)) => Some (srec n (dbool (negb x)))
           | _ => None
           end
-        | CEq1 n c1 c2 =>
-          match unsrec (fun_of_column c1 x), unsrec (fun_of_column c2 x) with
-          | Some (n1, v1), Some (n2, v2) => Some (srec n (dbool (equiv_decb v1 v2)))
-          | _, _ => None
-          end
-        | CPlus0 n d c1 =>
-          match d, unsrec (fun_of_column c1 x) with
-          | dnat d, Some (_, (dnat x)) => Some (srec n (dnat (Z.add x d)))
-          | _, _ => None
-          end
-        | CPlus1 n c1 c2 =>
-          match unsrec (fun_of_column c1 x), unsrec (fun_of_column c2 x) with
-          | Some (_, (dnat v1)), Some (_, (dnat v2)) => Some (srec n (dnat (Z.add v1 v2)))
-          | _, _ => None
-          end
-        | CNeg n c1 =>
-          match unsrec (fun_of_column c1 x) with
-          | Some (_, (dbool x)) => Some (srec n (dbool (negb x)))
-          | _ => None
-          end
+        | _ => None (* TODO at least UDFs, Eq, Plus are unimplemented *)
         end.
 
     (* Used in selection *)

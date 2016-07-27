@@ -31,15 +31,32 @@ Section MRTest.
   
   (* Small instrumentation for NNRCMR and CloudantMR *)
 
-  Require Import Arith.
+  Require Import Arith NNRCMR.
   
-  Fixpoint nfirsts {A} (n:nat) (l:list A) : list A :=
-    if (eq_nat_dec n O) then nil
+  Fixpoint nfirsts_aux (n:nat) (l:list mr): (list mr * option mr) :=
+    if (eq_nat_dec n O) then (nil, None)
     else
-      match l with
-      | nil => nil
-      | x :: l' => x :: (nfirsts (pred n) l')
-      end.
+      if (eq_nat_dec n 1) then
+        match l with
+        | nil => (nil, None)
+        | x :: l' => (x::nil, Some x)
+        end
+      else
+        match l with
+        | nil => (nil, None)
+        | x :: nil => (x::nil, Some x)
+        | x :: l' =>
+          let (chain, last) := nfirsts_aux (pred n) l' in
+          (x :: chain, last)
+        end.
+
+  Definition nfirsts n (chain: nrcmr) :=
+    match nfirsts_aux n chain.(mr_chain) with
+    | (l, None) => mkMRChain l (("x"%string::nil, NRCVar "x"%string), nil)
+    | (l, Some mr) =>
+      let x_loc := mr_output_localized mr in
+      mkMRChain l (("x"%string::nil, NRCVar "x"%string), x_loc::nil)
+    end.
 
   
   

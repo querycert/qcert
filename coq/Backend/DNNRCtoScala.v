@@ -18,12 +18,6 @@ Section Helpers.
   Require Import String.
   Definition eol := String (Ascii.ascii_of_nat 10) EmptyString.
 
-  Fixpoint indent (i : nat) : string
-    := match i with
-       | 0 => ""
-       | S j => "  " ++ (indent j)
-       end.
-
 End Helpers.
 
 Require Import List String.
@@ -36,16 +30,57 @@ Require Import DNNRC.
 Require Import RType.
 Require Import TDataInfer.
 Require Import TDNRCInfer.
+Require Import TOpsInfer.
 Require Import SparkData.
+Require Import SparkIR.
+
 Local Open Scope string_scope.
 
 Section DNNRCtoScala.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
+  Context {ftype:foreign_type}.
+  Context {m:brand_model}.
+  Context {fdtyping:foreign_data_typing}.
+  Context {fboptyping:foreign_binary_op_typing}.
+  Context {fuoptyping:foreign_unary_op_typing}.
+  Context {fttjs: ForeignToJavascript.foreign_to_javascript}.
 
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
+
+  (** Get code for a Spark DataType corresping to an rtype.
+   *
+   * These are things like StringType, ArrayType(...), StructType(Seq(FieldType(...), ...)), ...
+   *
+   * This function encodes details of our data representation, e.g. records are StructFields
+   * with two toplevel fields $blob and $known, and the $known contains a record with the
+   * statically known fields and their types.
+   *)
+  Fixpoint rtype_to_spark_DataType (r: rtype₀) : string :=
+    match r with
+    | Bottom₀ => "NullType"
+    | Top₀ => "StringType"
+    | Unit₀ => "NullType"
+    | Nat₀ => "IntegerType"
+    | Bool₀ => "BooleanType"
+    | String₀ => "StringType"
+    | Coll₀ e => "ArrayType(" ++ rtype_to_spark_DataType e ++ ")"
+    | Rec₀ _ fields =>
+      let known_fields: list string :=
+          map (fun p => "StructField(""" ++ fst p ++ """, " ++ rtype_to_spark_DataType (snd p) ++ ")")
+              fields in
+      let known_struct := "StructType(Seq(" ++ joinStrings ", " known_fields ++ "))" in
+      "StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_struct ++ ")))"
+    | Either₀ l r =>
+      "StructType(Seq(StructField(""$left"", " ++ rtype_to_spark_DataType l ++ "), StructField(""$right"", " ++ rtype_to_spark_DataType r ++ ")))"
+    | Brand₀ _ =>
+      "StructType(Seq(StructField(""$data"", StringType), StructField(""$type"", ArrayType(StringType))))"
+    (* should not occur *)
+    | Arrow₀ _ _ => "ARROW TYPE?"
+    | Foreign₀ ft => "FOREIGN TYPE?"
+    end.
 
   (** Scala-level type of an rtype.
    *
@@ -55,78 +90,150 @@ Section DNNRCtoScala.
    * (e.g. Array[Row]() for an empty Array of Records) to help
    * the Scala compiler because it does not infer types everywhere.
    *)
-  Fixpoint rtype_to_scala_type {ftype: foreign_type} (t: rtype₀): string :=
+  Fixpoint rtype_to_scala_type (t: rtype₀): string :=
     match t with
     | Bottom₀ => "BOTTOM?"
-    | Top₀ => "String"
-    | Unit₀ => "UNIT?"
+    | Top₀ => "TOP?"
+    | Unit₀ => "Unit"
     | Nat₀ => "Int"
     | Bool₀ => "Boolean"
     | String₀ => "String"
     | Coll₀ r => "Array[" ++ rtype_to_scala_type r ++ "]"
-    | Rec₀ _ _ => "Row"
-    (* TODO we have/used to have some aliases in the runtime, should we use them? *)
-    | Either₀ tl t => "Row"
-    | Brand₀ bs => "Row" (* BrandedValue ?? *)
+    | Rec₀ _ _ => "Record"
+    | Either₀ tl tr => "Either"
+    | Brand₀ bs => "BrandedValue"
     | Arrow₀ tin t => "CANNOT PUT AN ARROW INTO A DATASET"
     | Foreign₀ f => "FOREIGN?"
     end.
 
-  (* TODO replace this by stuff from SparkData *)
-  Fixpoint scala_of_data {ft:foreign_type} {fdt:foreign_data_typing} (m:brand_model) (d: data) : string :=
-    match d with
-    | dstring s => quote_string s
-    | dnat n => Z_to_string10 n
-    | dunit => "null"
-    | dbool true => "true"
-    | dbool false => "false"
-    | dcoll l => "Array/*[TODO]*/(" ++ joinStrings ", " (map (scala_of_data m) l) ++ ").sorted(QCertOrdering)"
-    | dleft v => "left(" ++ (scala_of_data m v) ++ ")"
-    | dright v => "right(" ++ (scala_of_data m v) ++ ")"
-    | drec fields =>
-      match @infer_data_type _ ft fdt m (normalize_data h d) with
-      | Some t => rtype_to_scala (proj1_sig t)
-      | None => "CANNOT INFER TYPE FROM DATA. SOMETHING IS SERIOUSLY BROKEN."
-      end
-    | dbrand _ _ => "DBRAND???"
-    | dforeign _ => "DFOREIGN???"
+  Definition drtype_to_scala (t: drtype): string :=
+    match t with
+    | Tlocal r => rtype_to_scala_type (proj1_sig r)
+    | Tdistr r => "Dataset[" ++ rtype_to_scala_type (proj1_sig r) ++ "]"
     end.
 
-  Definition scala_of_data2 {fttojs: ForeignToJavascript.foreign_to_javascript} {ftype: foreign_type} {m: brand_model} (d: data) (t: rtype) : string :=
-    let schema := rtype_to_scala (proj1_sig t) in
-    let scala_type := rtype_to_scala_type (proj1_sig t) in
-    let blob := typed_data_to_json_string d Top in
-    "fromBlob(" ++ schema ++ ", " ++ blob ++ ").asInstanceOf[" ++ scala_type ++ "]".
+  (* This produces literal data at the correct type.
+   * TODO actually write this. Currently this is only just enough for test07 to run. *)
+  Fixpoint scala_literal_data (d: data) (t: rtype₀) {struct t}: string :=
+    match t, d with
+    | Unit₀, d => "()"
+    | Nat₀, dnat i => Z_to_string10 i
+    | Bool₀, dbool true => "true"
+    | Bool₀, dbool false => "false"
+    | String₀, dstring s => quote_string s
+    | Coll₀ r, dcoll xs =>
+      let element_type := rtype_to_scala_type r in
+      let elements := map (fun x => scala_literal_data x r) xs in
+      "Array[" ++ element_type ++ "](" ++ joinStrings ", " elements ++ ")"
+    | Rec₀ _ fts, drec fds =>
+      let blob := quote_string (data_to_blob d) in
+      let known_schema :=
+          "StructType(Seq("
+            ++ joinStrings ", "
+            (map (fun ft =>
+                    "StructField(""" ++ fst ft ++ """, " ++ rtype_to_spark_DataType (snd ft) ++ ")")
+                 fts)
+            ++ "))" in
+      let fields := map (fun ft => match lookup string_dec fds (fst ft) with
+                                   | Some d => scala_literal_data d (snd ft)
+                                   | None => "FIELD_IN_TYPE_BUT_NOT_IN_DATA"
+                                   end) fts in
+      let known := "srow(" ++ joinStrings ", " (known_schema :: fields) ++ ")" in
+      "srow(StructType(Seq(StructField(""$blob"", StringType), StructField(""$known"", " ++ known_schema ++ "))), " ++ blob ++ ", " ++ known ++ ")"
+    (* TODO Some of these can't happen, some are just not implemented *)
+    | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
+    end.
 
-  Definition scala_of_unop {ftype: foreign_type} {m: brand_model} (op: unaryOp) (x: string) : string :=
+  (* TODO get rid of the new name
+   * I think having the new name be part of every column expression was a bad choice.
+   * Most of the time the name is ignored anyways, and if we really need it, there is always CAs. *)
+  Fixpoint code_of_column (c: column) : string :=
+    match c with
+    | CCol s => "column(""" ++ s ++ """)"
+    | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
+    | CDot fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ")"
+    | CEq c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ")"
+    | CLit (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
+    | CNeg c => "not(" ++ code_of_column c ++ ")"
+    | CPlus c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ")"
+    | CSConcat c1 c2 =>
+      "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ")"
+    | CToString c =>
+      (* TODO should call the proper QCert printing function as a UDF here *)
+      "format_string(""%s"", " ++ code_of_column c ++ ")"
+    | CUDFCast bs c =>
+      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+    | CUDFUnbrand t c =>
+      "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
+    end.
+
+  Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
+    match a with
+      (n, a, c) =>
+      let c := code_of_column c in
+      let f := match a with
+               | SACount => "count"%string
+               | SASum => "sum"%string
+               | SACollectList => "collect_list"%string
+               end
+      in f ++ "(" ++ c ++ ").as(""" ++ n ++ """)"
+    end.
+
+  Fixpoint code_of_dataset (e: dataset) : string :=
+    match e with
+    | DSVar s => s
+    | DSSelect cs d => code_of_dataset d ++ ".select(" ++ joinStrings ", " (map code_of_column cs) ++ ")"
+    | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
+    | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
+    | DSGroupBy gcs acs d => code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " (map code_of_column gcs) ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
+    | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
+    end.
+
+  Definition scala_of_unop (required_type: drtype) (op: unaryOp) (x: string) : string :=
     let prefix s := s ++ "(" ++ x ++ ")" in
     let postfix s := x ++ "." ++ s in
     match op with
     | AArithMean => prefix "arithMean"
     | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
     | ACast bs =>
-      let t := rtype_to_scala (proj1_sig (brands_type bs)) in
-      "cast(" ++ joinStrings ", " (x :: t :: (map quote_string bs)) ++ ")"
+      "cast(" ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
     | AColl => prefix "Array"
     | ACount => postfix "length"
-    | ADot n => prefix ("dot/*[TODO]*/(""" ++ n ++ """)")
+    | ADot n =>
+      match lift_tlocal required_type with
+      | Some r =>
+        prefix ("dot[" ++ rtype_to_scala_type (proj1_sig r) ++ "](""" ++ n ++ """)")
+      | None => "NONLOCAL EXPECTED TYPE IN DOT"
+      end
     | AFlatten => postfix "flatten.sorted(QCertOrdering)"
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
-    | ANeg => prefix "!"
+    | ANeg => "(!" ++ x ++ ")"
     | ANumMax => prefix "anummax"
     | ANumMin => prefix "anummin"
-    | ARec n => "singletonRecord(" ++ quote_string n ++ ", " ++ x ++ ")" (* TODO need to pass schema *)
+    | ARec n =>
+      match lift_tlocal required_type with
+      | Some (exist _ (Rec₀ Closed ((_, ft)::nil)) _) =>
+        "singletonRecord(" ++ quote_string n ++ ", " ++ rtype_to_spark_DataType ft ++ ", " ++ x ++ ")"
+      | _ => "AREC_WITH_UNEXPECTED_REQUIRED_TYPE"
+      end
+    | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
-    | AToString => postfix "toString"
+    | AToString => prefix "toBlob" (* TODO what are the exact semantics for AToString? *)
     | AUArith ArithAbs => prefix "Math.abs"
-    | AUnbrand => prefix "unbrand/*[TODO]*/" (* TODO pass type *)
+    | AUnbrand =>
+      match lift_tlocal required_type with
+      | Some (exist _ r _) =>
+        let schema := rtype_to_spark_DataType r in
+        let scala := rtype_to_scala_type r in
+        "unbrand[" ++ scala ++ "](" ++ schema ++ ", " ++ x ++ ")"
+      | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
+      end
     | ADistinct => postfix "distinct"
 
     (* TODO *)
     | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"
-    | ARecProject _ => "ARECPROJECT???"
     | ARecRemove _ => "ARECREMOVE???"
     | ASingleton => "SINGLETON???"
     | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
@@ -148,83 +255,137 @@ Section DNNRCtoScala.
     | ABArith ArithPlus => infix "+"
     | ABArith ArithRem => infix "%" (* TODO double check the exact semantics of this *)
     | AConcat => prefix "recordConcat"
-    | AContains => infix "contains"
-    (* TODO Scala equality is WRONG for records (Row), bags (Array), and possibly more (dates?) *)
+    | AContains => prefix "AContains" (* left argument is the element, right element is the collection *)
     (* TODO We also need to fix operators that use equality internally:
      *      Contains, comparisons, AMax, AMin, AMinus, AUnion *)
-    | AEq => infix "=="
-    | ALe => infix "<="
-    | ALt => infix "<"
+    | AEq => prefix "equal"
+    | ALe => prefix "lessOrEqual"
+    | ALt => prefix "lessThan"
     (* TODO we might want to put convenience helpers into the runtime for these *)
     | AMax => l ++ ".++(" ++ r ++ ".diff(" ++ l ++ "))" (* l1 ⊎ (l2 ⊖ l1) *)
     | AMin => l ++ ".diff(" ++ l ++ ".diff(" ++ r ++ "))" (* l1 ⊖ (l1 ⊖ l2) Can't make recursive calls, but AMinus is weird anyways... *)
     | AMinus => r ++ ".diff(" ++ l ++ ")" (* bag minus has operands "the wrong way" around *)
     | AMergeConcat => prefix "mergeConcat"
     | AOr => infix "||"
-    | ASConcat => infix "++" (* string concat *)
+    | ASConcat => infix "+" (* string concat *)
     | AUnion => infix "++" ++ ".sorted(QCertOrdering)" (* bag union *)
 
     (* TODO *)
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
     end.
 
-  Fixpoint scala_of_dnrc {A plug_set: Set} {ft:foreign_type} {fdt:foreign_data_typing} {m:brand_model} (d: dnrc A plug_set) : string :=
-    match d with
-    | DNRCVar t n => n (* TODO might need an environment or something... *)
-    | DNRCConst t c => scala_of_data m c
-    | DNRCBinop t op x y =>
-      scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
-    | DNRCUnop t op x =>
-      scala_of_unop op (scala_of_dnrc x)
-    | DNRCLet t n x y => (* let n: t = x in y *) (* TODO might need braces, could use line break *)
-      "val " ++ n ++ " = " ++ scala_of_dnrc x ++ "; " ++
-             scala_of_dnrc y
-    | DNRCFor t n x y => (* x.map((n: t) => y) *) (* TODO might not need braces, could use line breaks *)
-      scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
-    | DNRCIf t x y z => (* if (x) y else z *) (* TODO might not need parentheses *)
-      "(if (" ++ scala_of_dnrc x ++ ") " ++ scala_of_dnrc y ++ " else " ++ scala_of_dnrc z ++ ")"
-    | DNRCEither t x vy y vz z =>
-      (* TODO This will not work. We need to annotate the two lambdas with their input types. *)
-      "either(" ++ scala_of_dnrc x ++ ", (" ++
-                vy ++ "/*: TODO*/) => { " ++ scala_of_dnrc y ++ " }, (" ++
-                vz ++ "/*: TODO*/) => { " ++ scala_of_dnrc z ++ "})"
-    | DNRCCollect t x => scala_of_dnrc x ++ ".collect()"
-    (* Dispatch is a bit tricky, because it requires the global SparkSession,
-     * of which there can be only one, if I understand correctly.
-     * It also requires the type, to construct the appropriate schema.
-     * Last but not least, if the result of dispatch should always be a DataFrame (= Dataset[Row]),
-     * then the element type has to be records, or we need to invent a column name. *)
-    | DNRCDispatch t x => "DISPATCH???" (* TODO *)
-    | DNRCAlg t a xs => "ALG???" (* TODO *)
+  (* TODO Move this somewhere, I think rewriting needs something similar *)
+  Definition primitive_type (t: rtype) :=
+    match proj1_sig t with
+    | ⊥₀ | ⊤₀ | Unit₀ | Nat₀ | String₀ | Bool₀ => true
+    | Coll₀ _ | Rec₀ _ _ | Either₀ _ _ | Arrow₀ _ _ | Brand₀ _ => false
+    (* TODO foreign? *)
+    | Foreign₀ _ => false
     end.
+
+  Fixpoint scala_of_dnrc {A: Set} (d: dnrc (type_annotation A) dataset) : string :=
+    let code :=
+        match d with
+        | DNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
+        | DNRCConst t c =>
+          match (lift_tlocal (di_required_typeof d)) with
+          | Some r => scala_literal_data c (proj1_sig r)
+          | None => "Don't know how to construct a distributed constant"
+          end
+        | DNRCBinop t op x y =>
+          scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
+        | DNRCUnop t op x =>
+          scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
+        | DNRCLet t n x y => (* let n: t = x in y *) (* TODO could use line break *)
+          "{ val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
+                   scala_of_dnrc y ++ " }"
+        | DNRCFor t n x y => (* x.map((n: t) => y) *) (* TODO might not need braces, could use line breaks *)
+          scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
+        | DNRCIf t x y z => (* if (x) y else z *) (* TODO might not need parentheses *)
+          "(if (" ++ scala_of_dnrc x ++ ") " ++ scala_of_dnrc y ++ " else " ++ scala_of_dnrc z ++ ")"
+        | DNRCEither t x vy y vz z =>
+          match olift tuneither (lift_tlocal (di_required_typeof x)) with
+          | Some (lt, rt) =>
+            "either(" ++ scala_of_dnrc x ++ ", (" ++
+                      vy ++ ": " ++ rtype_to_scala_type (proj1_sig lt) ++
+                      ") => { " ++ scala_of_dnrc y ++ " }, (" ++
+                      vz ++ ": " ++ rtype_to_scala_type (proj1_sig rt) ++
+                      ") => { " ++ scala_of_dnrc z ++ " })"
+          | None => "DNRCEither's first argument is not of type Either"
+          end
+        | DNRCCollect t x =>
+          (* Distributed collections of primitives are wrapped in a singleton record.
+           * We need to unwrap them after the call to collect(). *)
+          let postfix :=
+              match lift primitive_type (olift tuncoll (lift_tdistr (di_typeof x))) with
+              | Some true => ".map((row) => row(0))"
+              | Some false => ""
+              | None => "ARGUMENT_TO_COLLECT_SHOULD_BE_DISTRIBUTED"
+              end in
+          scala_of_dnrc x ++ ".collect()" ++ postfix
+        (* TODO handle bags of non-record types (ints, strings, bags, ...) *)
+        | DNRCDispatch t x =>
+          match olift tuncoll (lift_tlocal (di_typeof x)) with
+          | Some et =>
+            "dispatch(" ++ rtype_to_spark_DataType (proj1_sig et) ++ ", " ++ scala_of_dnrc x ++ ")"
+          | None => "Argument to dispatch is not a local collection."
+          end
+        | DNRCAlg t a ((x, d)::nil) =>
+          (* TODO think again about how to pass arguments to algebra code.. *)
+          "{ val " ++ x ++ " = " ++ scala_of_dnrc d ++ "; " ++
+                   code_of_dataset a
+                   ++ " }"
+        | DNRCAlg _ _ _ =>
+          "NON_UNARY_ALG_CODEGEN_IS_NOT_CURRENTLY_IMPLEMENTED"
+        end in
+    if di_typeof d == di_required_typeof d then code else
+      match lift_tlocal (di_required_typeof d) with
+      (* TODO Actually have a way to do arbitrary casts.
+       *
+       * Going through blobs did not quite work, because the fromBlob code in the runtime
+       * has (Scala-level) type safety issues.
+       * We think that perhaps we only need a different required type for literal data.
+       * That would be great, because that already works by emitting the data at the
+       * correct type in the first place. If this is indeed the only case, we can just
+       * remove this whole casting business here. We would need to prove that of course...
+       *
+       * For now, use identity as a marker.
+       *)
+      | Some r => "identity/*CAST*/(" ++ code ++ ")"
+      | None => "CANTCASTTODISTRIBUTEDTYPE"
+      end.
+
+  Definition dnnrc_infer_type {A: Set} (e: dnrc A dataset) (inputType: rtype)
+    : option (dnrc (type_annotation A) dataset) :=
+    let tdb: tdbindings :=
+        ("CONST$WORLD"%string, (Tdistr inputType))::nil in
+    infer_dnrc_type tdb e.
+
+  Definition initBrandHierarchy : string :=
+    let lines :=
+        map (fun p => "addToBrandHierarchy(""" ++ (fst p) ++ """, """ ++ snd p ++ """);")
+            brand_relation_brands in
+    joinStrings " " lines.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Context {ftype:foreign_type}.
-  Context {m:brand_model}.
-  Context {fdtyping:foreign_data_typing}.
-  Context {fboptyping:foreign_binary_op_typing}.
-  Context {fuoptyping:foreign_unary_op_typing}.
-  Context {plug_type:Set}.
-
-  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A plug_type) : string :=
-    let tdb : tdbindings (* = list (string*drtype) *) :=
-        ("CONST$WORLD", (Tdistr inputType))::nil
-    in
-    match infer_dnrc_type tdb e with
-    | None => ""
-    | Some e' =>
+  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
+             (e: dnrc (type_annotation A) dataset) : string :=
     ""
       ++ "import org.apache.spark.sql.types._" ++ eol
-      ++ "object " ++ name ++ " extends org.qcert.QCertRuntime {" ++ eol
-      ++ "val worldType = " ++ rtype_to_scala (proj1_sig inputType) ++ eol
-      ++ "def run(CONST$WORLD: org.apache.spark.sql.Dataset[org.apache.spark.sql.Row]) = {" ++ eol
-      ++ "println(" ++ eol
+      ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
+      ++ "import org.apache.spark.sql.functions._" ++ eol
+      ++ "import org.qcert.QCertRuntime" ++ eol
+      ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
+      ++ initBrandHierarchy ++ eol
+      ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
+      ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
+      ++ "println(toBlob(" ++ eol
       ++ scala_of_dnrc e ++ eol
-      ++ ")" ++ eol
+      ++ "))" ++ eol
       ++ "}" ++ eol
       ++ "}"
-    end.
+  .
 
 End DNNRCtoScala.
 

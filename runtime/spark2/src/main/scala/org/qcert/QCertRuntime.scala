@@ -16,122 +16,107 @@
 
 package org.qcert
 
-import java.io.FileReader
+import java.util
 import java.util.Comparator
 
 import com.google.gson.JsonElement
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.functions._
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 object test extends QCertRuntime {
-
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
-  override def run(world: Dataset[Either]): Unit = {
-    val f = world.first()
-    val bar = cast(f, wrappedCustomerType, "entities.Customer")
-    println(bar)
+  override def run(CONST$WORLD: Dataset[Row]): Unit = {
+    val res = {
+      val for_to_select = {
+        val if_else_empty_to_filter = {
+          val lift_unbrand = {
+            val map_cast = CONST$WORLD;
+            map_cast.filter(
+              QCertRuntime
+                .castUDF(brandHierarchy, "entities.Customer")(
+                  column("$type"))
+                .as("_ignored"))
+          };
+          lift_unbrand
+            .select(
+              QCertRuntime
+                .unbrandUDF(
+                  StructType(
+                    Seq(StructField("$blob", StringType),
+                      StructField(
+                        "$known",
+                        StructType(
+                          Seq(StructField("age", IntegerType),
+                            StructField("cid", IntegerType),
+                            StructField("name",
+                              StringType)))))))(
+                  column("$data"))
+                .as("unbranded"))
+            .select(column("unbranded.$blob").as("$blob"),
+              column("unbranded.$known").as("$known"))
+        };
+        if_else_empty_to_filter.filter(
+          column("$known.age").as("l").equalTo(lit(32)).as("ignored"))
+      };
+      for_to_select.select(
+        concat(lit("Customer ="),
+          format_string("%s", column("$known.name").as("x")).as(
+            "r")).as("value"))
+    }
 
-    val foo = world.collect().map((world_element: Row) => {
-      either(cast(world_element, wrappedCustomerType, "entities.Customer") /* castToCustomerAndUnbrand(world_element) */ ,
-        (customer: Row) => {
-          println(toBlob(world_element))
-          println(toBlob(customer))
-          dot[String]("name")(unbrand(customer))
-          // val blob = customer.getAs[Row]("$data").getAs[String]("$blob")
-          // println(blob)
-          // println(fromBlob(customerType, blob))
-        },
-        (not_a_customer: Row) => {
-          "bla"
-        })
-    })
-    foo foreach ((n: String) => println(n))
+    res.explain(true)
+
+    res.show()
+
+    res.collect().map((row) => row(0)).foreach(println(_))
+
   }
 }
 
-abstract class QCertRuntime {
-  // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
+/** QCertRuntime static functions
+  *
+  * Turns out SparkSQL only accepts locally bound lambdas and static functions as user-defined functions.
+  * Most of the runtime functions are declared in the abstract class QCertRuntime, which makes them methods.
+  *
+  * TODO move more of the runtime in here, so it can potentially be used from SparkSQL
+  *
+  * We cannot get rid of the QCertRuntime *class* completely:
+  * The class has the main method (which cannot be in the object, even though it is static?!?)
+  * It declares abstract members like `run` and the world type for initial data loading.
+  */
+object QCertRuntime {
+  // TODO
+  // We might want to change all of these to pass around a runtime support object with the hierarchy, gson parser, ...
+  // basically everything that's currently in the QCertRuntime abstract class
 
-  def customerType =
-    StructType(Seq(
-      StructField("age", IntegerType),
-      StructField("cid", IntegerType),
-      StructField("name", StringType)))
-
-  def wrappedCustomerType =
-    StructType(Seq(
-      StructField("$blob", StringType),
-      StructField("$known", customerType)))
-
-  def purchaseType =
-    StructType(
-      StructField("cid", IntegerType) ::
-        StructField("name", StringType) ::
-        StructField("pid", IntegerType) ::
-        StructField("quantity", IntegerType) :: Nil)
-
-  def mainEntityType =
-    StructType(
-      StructField("doubleAttribute", DoubleType) ::
-        StructField("id", IntegerType) ::
-        StructField("stringId", StringType) :: Nil)
-
-  val CONST$WORLD_07 = Nil
-
-  val CONST$WORLD = CONST$WORLD_07
-
-  val gson = new com.google.gson.Gson()
-
-  def run(world: Dataset[Row])
-
-  def initializeBrandHierarchy(iofile: String) = {
-    // val iofile = "/Users/stefanfehrenbach/global-rules/queryTests/test.rhino/test07_js.io"
-    val io = new com.google.gson.JsonParser().parse(new FileReader(iofile))
-    val hc = io.getAsJsonObject.get("inheritance").getAsJsonArray
-    hc.iterator().asScala.foreach((subsup: JsonElement) => {
-      val sub = subsup.getAsJsonObject.get("sub").getAsString
-      val sup = subsup.getAsJsonObject.get("sup").getAsString
-      brandHierarchy.get(sub) match {
-        case None => brandHierarchy += sub -> mutable.HashSet(sup)
-        case Some(hs) => hs += sup
-      }
-    })
+  def isSubBrand(brandHierarchy: mutable.HashMap[String, mutable.HashSet[String]], sub: String, sup: String): Boolean = {
+    if (sub == sup || sup == "Any")
+      return true
+    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(brandHierarchy, dsup, sup))
   }
 
-  val worldType : StructType
+  def castUDFHelper(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) = (ts: mutable.WrappedArray[String]) =>
+    bs.forall((brand: String) =>
+      ts.exists((typ: String) =>
+        isSubBrand(h, typ, brand)))
 
-  def main(args: Array[String]): Unit = {
-    if (args.length != 2) {
-      println("Expected two arguments: the iofile containing the brand hierarchy, and the sparkio file containing the data")
-      sys.exit(1)
-    }
-    val iofileHierarchy = args(0)
-    val iofileData = args(1)
+  // TODO Can we somehow avoid passing the hierarchy at every call site?
+  def castUDF(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) =
+    udf(QCertRuntime.castUDFHelper(h, bs:_*), BooleanType)
 
-    println("Initializing brand hierarchy")
-    initializeBrandHierarchy(iofileHierarchy)
-    println(brandHierarchy)
-
-    val sparkCtx = new SparkContext("local", "Test 07", new SparkConf())
-    sparkCtx.setLogLevel("ERROR")
-    val session = SparkSession.builder().getOrCreate()
-
-    // val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
-    val df0 = session.read.schema(worldType).json(iofileData)
-    //printing some debugging output for sanity-checking
-    System.out.println("--- input schema ---")
-    df0.printSchema()
-    System.out.println("--- input documents ---")
-    df0.show()
-
-    run(df0)
-    sparkCtx.stop()
+  def srow(s: StructType, vals: Any*): Row = {
+    assert(s.fields.length == vals.length,
+      "Number of record fields does not match the schema. Did you forget to splice an array parameter?")
+    assert(s.fieldNames.sorted.distinct.sameElements(s.fieldNames),
+      "Field names must be unique and sorted!")
+    new GenericRowWithSchema(vals.toArray, s)
   }
 
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
@@ -151,14 +136,140 @@ abstract class QCertRuntime {
         srow(t,
           // We have the full record in the blob field, even for closed records
           r.toString,
-          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues:_*))
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
       case _ =>
-        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))):_*)
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
     }
   }
 
   def fromBlob(t: DataType, b: String): Any =
+    // TODO because this is static now, we instantiate a new gson parser every time, fix this
     fromBlob(t, new com.google.gson.JsonParser().parse(b))
+
+  def reshape(v: Any, t: DataType): Any = (v, t) match {
+    case (i: Int, t: IntegerType) => i
+    case (s: String, t: StringType) => s
+    case (b: Boolean, t: BooleanType) => b
+    case (r: Row, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") =>
+        val blob = r.getAs[String]("$blob")
+        // NOTE We get all the known fields from the blob. If we ever decide to only keep unknown fields in the blob we have to change this.
+        val known = fromBlob(t("$known").dataType, blob)
+        srow(t, blob, known)
+      // TODO incomplete
+    }
+    case (blob: String, t: StructType) => t.fieldNames match {
+      case Array("$blob", "$known") => fromBlob(t, blob)
+      // TODO incomplete
+    }
+    // TODO incomplete
+  }
+
+  def unbrandUDF[T](t: DataType) = {
+    /* Work around a bug in the SparkSQL optimizer
+     *
+     * https://issues.apache.org/jira/browse/SPARK-13773
+     *
+     * reshape is not total, it expects the data and type to match up.
+     * If the data does not match the type, it will throw an exception.
+     * Normally this does not happen, because the type checker ensures
+     * that the data has the correct type. Most queries perform a cast
+     * and then unbrand, if the cast succeeds. Due to a bug in the SparkSQL
+     * optimizer, in some cases the order of operations gets turned around,
+     * and we end up unbranding values that should not have passed the cast.
+     *
+     * We work around by making reshape "total" by returning null in case it
+     * throws. This is not ideal, because the nulls may be used in further
+     * filter conditions, but we assume SparkSQL built-ins deal with null
+     * correctly. The nulls should not escape out of a filter condition,
+     * because the cast condition is still checked, eventually.
+     */
+    def workaround(data: T, t: DataType) =
+      try {
+        reshape(data, t)
+      } catch {
+        case e: NullPointerException =>
+          null
+      }
+    udf((data: T) => workaround(data, t), t)
+  }
+}
+
+abstract class QCertRuntime {
+  // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
+
+  val gson = new com.google.gson.Gson()
+  val gsonParser = new com.google.gson.JsonParser()
+
+  def run(world: Dataset[Row])
+
+  def addToBrandHierarchy(sub: String, sup: String): Unit = {
+    brandHierarchy.get(sub) match {
+      case None => brandHierarchy += sub -> mutable.HashSet(sup)
+      case Some(hs) => hs += sup
+    }
+  }
+
+  val worldType: StructType
+  val sparkContext = new SparkContext("local", "QCERT", new SparkConf())
+  val sparkSession = SparkSession.builder().getOrCreate()
+
+
+  def main(args: Array[String]): Unit = {
+    if (args.length != 1) {
+      println("Expected exactly one argument: the sparkio file containing the data")
+      sys.exit(1)
+    }
+    val iofileData = args(0)
+
+    println("Brand hierarchy:")
+    println(brandHierarchy)
+
+    // val jsonFile = "/Users/stefanfehrenbach/global-rules/docs/notes/test07-sparkio.json"
+    val df0 = sparkSession.read.schema(worldType).json(iofileData)
+    //printing some debugging output for sanity-checking
+    System.out.println("--- input schema ---")
+    df0.printSchema()
+    System.out.println("--- input documents ---")
+    df0.show()
+
+    println("about to call run(df0)")
+    run(df0)
+    println("about to call sparkContext.stop()")
+    sparkContext.stop()
+  }
+
+  // TODO handle bags of non-Row types (Int, String, Bags, ...)
+  def dispatch(schema: StructType, a: Array[Row]): DataFrame = {
+    val l: util.List[Row] = a.toList.asJava
+    sparkSession.createDataFrame(l, schema)
+  }
+
+  def fromBlob(t: DataType, b: JsonElement): Any = t match {
+    case t: IntegerType => b.getAsInt
+    case t: BooleanType => b.getAsBoolean
+    case t: StringType => b.getAsString
+    case t: ArrayType =>
+      b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
+    case t: StructType => t.fieldNames match {
+      case Array("$left", "$right") => sys.error("either")
+      case Array("$type", "$data") => sys.error("brand")
+      case Array("$blob", "$known") =>
+        val r = b.getAsJsonObject
+        val knownFieldValues = t("$known").dataType.asInstanceOf[StructType].fields map ((field: StructField) => {
+          fromBlob(field.dataType, r.get(field.name))
+        })
+        srow(t,
+          // We have the full record in the blob field, even for closed records
+          r.toString,
+          srow(t("$known").dataType.asInstanceOf[StructType], knownFieldValues: _*))
+      case _ =>
+        srow(t, t.fields.map((field) => fromBlob(field.dataType, b.getAsJsonObject.get(field.name))): _*)
+    }
+  }
+
+  def fromBlob(t: DataType, b: String): Any =
+    fromBlob(t, gsonParser.parse(b))
 
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
@@ -184,16 +295,8 @@ abstract class QCertRuntime {
     }
   }
 
-  /* Records
- * =======
- *
- * We represent records as Rows with a schema of StructType.
- * Rows are glorified tuples. We can access fields by name, but most operations are by position only.
- * Fields must be ordered by field name!
- */
-  // This seems to cause trouble, because scala can't find an ordering, or something.
-  // This might allow us to override the default ordering for Rows, maybe.
-  // type Record = Row
+  // TODO all record construction has to properly populate the blob field!
+  type Record = Row
 
   /** More convenient record (row with schema) construction.
     * Splice array into varargs call: let a = Array(1, 2); srow(schema, a:_*) */
@@ -205,47 +308,85 @@ abstract class QCertRuntime {
     new GenericRowWithSchema(vals.toArray, s)
   }
 
-  // TODO this is a mess
-  def recordConcat(l: Row, r: Row): Row = {
-    val rightFieldNames = r.schema.fieldNames diff l.schema.fieldNames
-    val allFieldNames = (rightFieldNames ++ l.schema.fieldNames).distinct.sorted
-    val schema = allFieldNames.foldLeft(new StructType())((schema: StructType, field: String) => {
-      val inLeft = l.schema.fieldNames.indexOf(field)
-      schema.add(if (inLeft == -1) r.schema.fields(r.schema.fieldNames.indexOf(field)) else l.schema.fields(inLeft))
-    })
-    val names = l.schema.fieldNames ++ rightFieldNames
-    val values = l.toSeq ++ rightFieldNames.map((rfn: String) => r.get(r.fieldIndex(rfn)))
-    val sortedValues = (names zip values).sortBy(_._1).map(_._2)
-    srow(schema, sortedValues: _*)
+  def recordConcat(l: Record, r: Record): Record = {
+    def concatRows(l: Row, r: Row): Row = {
+      val rightFieldNames = r.schema.fieldNames diff l.schema.fieldNames
+      val allFieldNames = (rightFieldNames ++ l.schema.fieldNames).distinct.sorted
+      val schema = allFieldNames.foldLeft(new StructType())((schema: StructType, field: String) => {
+        val inLeft = l.schema.fieldNames.indexOf(field)
+        schema.add(if (inLeft == -1) r.schema.fields(r.schema.fieldNames.indexOf(field)) else l.schema.fields(inLeft))
+      })
+      val names = l.schema.fieldNames ++ rightFieldNames
+      val values = l.toSeq ++ rightFieldNames.map((rfn: String) => r.get(r.fieldIndex(rfn)))
+      val sortedValues = (names zip values).sortBy(_._1).map(_._2)
+      srow(schema, sortedValues: _*)
+    }
+    def concatBlobs(l: String, r: String): String = {
+      val (left, right) = (gsonParser.parse(l).getAsJsonObject, gsonParser.parse(r).getAsJsonObject)
+      val sortedResultMap = new java.util.TreeMap[String, JsonElement]()
+      for (me <- right.entrySet().iterator().asScala)
+        sortedResultMap.put(me.getKey, me.getValue)
+      for (me <- left.entrySet().iterator().asScala)
+        sortedResultMap.put(me.getKey, me.getValue)
+      gson.toJson(sortedResultMap)
+    }
+    val known = concatRows(l.getAs("$known"), r.getAs("$known"))
+    val blob = concatBlobs(l.getAs("$blob"), r.getAs("$blob"))
+    srow(StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", known.schema))),
+      blob,
+      known)
   }
 
-  def dot[T](n: String)(l: Row): T =
+  def dot[T](n: String)(l: Record): T =
     l.getAs[Row]("$known").getAs[T](n)
 
-  // TODO adapt to new record representation ($blob + $known)
-  def mergeConcat(l: Row, r: Row): Array[Row] = {
+  def mergeConcat(l: Record, r: Record): Array[Record] = {
+    def allFieldNames(rr: Record) = {
+      val known = rr.schema.fields(1).dataType.asInstanceOf[StructType].fieldNames
+      val blob = gsonParser.parse(rr.getAs[String]("$blob")).getAsJsonObject.entrySet().iterator().asScala.map(e => e.getKey).toArray
+      known.union(blob).distinct.sorted
+    }
+    def blobDot(n: String, r: Record) = gsonParser.parse(r.getAs[String]("$blob")).getAsJsonObject.get(n)
     val concatenated = recordConcat(l, r)
-    val duplicates = l.schema.fieldNames intersect r.schema.fieldNames
-    // TODO could do this before...
+    val duplicates = allFieldNames(l) intersect allFieldNames(r)
     for (field <- duplicates)
-      if (!equal(r.get(r.fieldIndex(field)), concatenated.get(concatenated.fieldIndex(field))))
+    // TODO This uses JsonElement equality. Unless we can guarantee that the JSON serialization is unique, this is likely incorrect
+    // What we should do is use QCert equality. Unfortunately, we would need to deserialize for that, which we can't, because we don't have the type!
+      if (blobDot(field, r) != blobDot(field, concatenated))
         return Array()
     Array(concatenated)
   }
 
   /** UnaryOp ARec */
-  def singletonRecord(n: String, v: Int): Row = {
-    srow(StructType(StructField(n, IntegerType, false) :: Nil), v)
+  def singletonRecord(fieldName: String, fieldType: DataType, fieldValue: Any): Record = {
+    val known = StructType(Seq(StructField(fieldName, fieldType)))
+    val schema = StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", known)))
+    srow(schema,
+      "{\"" + fieldName + "\": " + toBlob(fieldValue) + "}",
+      srow(known, fieldValue))
   }
 
-  def singletonRecord(n: String, v: Row): Row = {
-    srow(StructType(StructField(n, v.schema, false) :: Nil), v)
+  def recProject(fs: String*)(v: Record): Record = {
+    val oldKnownSchema = v.schema.fields(1).dataType.asInstanceOf[StructType]
+    val knownSchema = StructType(fs.map(f => oldKnownSchema.fields(oldKnownSchema.fieldIndex(f))))
+    val data = v.get(1).asInstanceOf[GenericRowWithSchema]
+    val knownValues = fs.map(data.getAs[Any])
+    val known = srow(knownSchema, knownValues: _*)
+    val jsonBlob = gsonParser.parse(v.getAs[String]("$blob")).getAsJsonObject
+    val blobMap = new util.TreeMap[String, JsonElement]()
+    for (f <- fs)
+      blobMap.put(f, jsonBlob.get(f))
+    val blob = gson.toJson(blobMap)
+    srow(StructType(Seq(
+      StructField("$blob", StringType),
+      StructField("$known", knownSchema))),
+      blob,
+      known)
   }
-
-  // TODO Ugh, this hacky inference business works for primitives and even records, but not Arrays
-  //  def singltonRecord[T](n: String, v: Array[T]): Record = {
-  //    srow(StructType(StructField(n, ArrayType(T), false)::Nil), v)
-  //  }
 
   /* Either
  * ======
@@ -300,16 +441,22 @@ abstract class QCertRuntime {
   def brand(v: Row, b: Brand*): BrandedValue =
     srow(brandStructType(v.schema), v, b)
 
-  def unbrand[T](bv: BrandedValue): T =
-    bv.getAs[T]("$data")
+  def unbrand[T](t: DataType, v: BrandedValue): T = {
+    // Second, if the cast succeeds, reshape data to match the intersection type
+    val data = v.get(v.fieldIndex("$data"))
+    // TODO this cast is wrong, we need a reshape/fromBlob that actually produces the correct type!
+    val reshaped = reshape(data, t).asInstanceOf[T]
+    reshaped
+  }
 
   // From sub type to immediate super types
   val brandHierarchy = mutable.HashMap[String, mutable.HashSet[String]]()
 
-  def isSubBrand(sub: Brand, sup: Brand): Boolean = {
+  // TODO replace by static helper
+  def isSubBrand(brandHierarchy: mutable.HashMap[String, mutable.HashSet[String]], sub: Brand, sup: Brand): Boolean = {
     if (sub == sup || sup == "Any")
       return true
-    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(dsup, sup))
+    brandHierarchy.getOrElse(sub, Seq()).exists(dsup => isSubBrand(brandHierarchy, dsup, sup))
   }
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
@@ -331,23 +478,23 @@ abstract class QCertRuntime {
     // TODO incomplete
   }
 
-  /** QCert cast operator
+  /** QCert cast operator (DNRC version)
+    *
+    * This is not a general cast operator, i.e. it does not give access to fields from the .. part of
+    * an open record. The input has to be a branded value.
     *
     * @param v  The value has to be a branded value, that is a Row with fields $data : τ and $type : Array[String].
-    * @param t  The intersection type of the brands we are casting to. The data will be reshaped to match this type.
     * @param bs The brands we are casting to.
-    * @return Either a right, if the cast fails, or a branded value with the data reshaped to fit the intersection.
+    * @return Either a right, if the cast fails, or a branded value wrapped in left.
     */
-  def cast(v: BrandedValue, t: DataType, bs: Brand*): Either = {
-    // First, check whether the cast succeds, that is, for every brand to cast to, is there a runtime tag that is a subtype
+  def cast(v: BrandedValue, bs: Brand*): Either = {
+    // TODO use castUDF helper
     if (!bs.forall((brand: Brand) =>
       v.getAs[Seq[Brand]]("$type").exists((typ: Brand) =>
-        isSubBrand(typ, brand))))
-      return none()
-    // Second, if the cast succeeds, reshape data to match the intersection type
-    val data = v.get(v.fieldIndex("$data"))
-    val reshaped = reshape(data, t).asInstanceOf[Row] // TODO this cast is wrong. Write a brand(Any, Brand*) method
-    left(brand(reshaped, v.getSeq[String](v.fieldIndex("$type")):_*))
+        isSubBrand(brandHierarchy, typ, brand))))
+      none()
+    else
+      left(v)
   }
 
   /* Bags
@@ -388,11 +535,17 @@ abstract class QCertRuntime {
   def anummin(b: Array[Int]): Int =
     if (b.isEmpty) 0 else b(0)
 
+  /** Binary operator AContains */
+  def AContains[T](e: T, l: Array[T]): Boolean =
+    l.exists(QCertOrdering.compare(e, _) == 0)
+
   /* Sorting & equality
  * ==================
  */
   object QCertOrdering extends Ordering[Any] {
     def compare(x: Any, y: Any): Int = (x, y) match {
+      // TODO how to sort ()?
+      case ((), ()) => 0
       // NULL sorts before anything else
       case (null, null) => 0
       case (null, _) => -1
@@ -457,6 +610,13 @@ abstract class QCertRuntime {
     def compare(a: T, b: T): Int = QCertOrdering.compare(a, b)
   }
 
-  def equal(a: Any, b: Any) =
+  def equal(a: Any, b: Any): Boolean =
     QCertOrdering.compare(a, b) == 0
+
+
+  def lessOrEqual(a: Any, b: Any): Boolean =
+    QCertOrdering.compare(a, b) <= 0
+
+  def lessThan(a: Any, b: Any): Boolean =
+    QCertOrdering.compare(a, b) < 0
 }

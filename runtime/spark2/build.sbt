@@ -1,6 +1,8 @@
-name := "spark2runtime"
+name := "qcert-spark2-runtime"
 
-version := "1.0"
+organization := "org.qcert"
+
+version := "0.1.0-SNAPSHOT"
 
 scalaVersion := "2.11.8"
 

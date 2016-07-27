@@ -882,7 +882,7 @@ Section NNRCtoNNRCMR.
   Fixpoint nnrc_to_nnrcmr_chain_ns_aux (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)): nrc * list mr * list (var * dlocalization) :=
     match n with
     | NRCFor x n1 n2 =>
-      let '(n1', mr_list1, avoid) := nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc in
+      let '(n1', mr_list1, vars_loc) := nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc in
       match try_mk_loop x n1' n2 mr_list1 initunit vars_loc with
       | Some (n', mr_list, vars_loc) => (n', mr_list, vars_loc)
       | None =>

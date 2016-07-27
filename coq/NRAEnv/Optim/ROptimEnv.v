@@ -114,6 +114,14 @@ Section ROptimEnv.
       + autorewrite with alg. reflexivity. 
   Qed.
 
+  (* this is the name we give it in the paper *)
+    (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
+  Lemma select_union_distr (q q₁ q₂: algenv) :
+    σ⟨ q ⟩(q₁ ⋃ q₂) ≡ₑ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
+  Proof.
+    apply envunion_select_distr.
+  Qed.
+
   (* χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 } *)
 
   Lemma envmap_singleton (p1 p2:algenv) :
@@ -1723,6 +1731,28 @@ Section ROptimEnv.
           end) d); trivial.
   Qed.
 
+  (* optimization for distinct *)
+    Definition nodupA : algenv -> Prop :=
+    algenv_always_ensures
+      (fun d => match d with
+                | dcoll dl => NoDup dl
+                | _ => False
+                end).
+  
+  Lemma dup_elim (q:algenv) :
+    nodupA q -> ANUnop ADistinct q  ≡ₑ  q.
+  Proof.
+    intros nd.
+    red; intros.
+    simpl.
+    case_eq (h ⊢ₑ q @ₑ x ⊣ c; env); simpl; trivial; intros.
+    specialize (nd h c dn_c env dn_env x dn_x d H).
+    simpl in nd.
+    match_destr_in nd; try tauto.
+    rewrite rondcoll_dcoll.
+    rewrite NoDup_bdistinct; trivial.
+  Qed.
+
   (** Some optimizations are best seen through outlining -- the 
        opposite of inlining.  This allows sharing of common sub-expressions.
        To enable this, we first define the "last" part of a computation.
@@ -1774,7 +1804,8 @@ This is the first operation that
          | ANAppEnv e1 e2 => (ANAppEnv e1 e2, ANID)
          | ANMapEnv e => (ANMapEnv e, ANID)
        end.
-    
+
+  
 End ROptimEnv.
 
 (* begin hide *)

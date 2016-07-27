@@ -34,14 +34,15 @@ MENHIRFLAG=-use-menhir
 MAIN=CACo
 MAIN2=CAEv
 MAIN3=CADa
+MAIN4=CAPp
 TARGET=native
 JAR=jar
 
 LIB=CALib
 LIBJS=CALibJS
 
-all: $(MAIN) $(MAIN2) $(MAIN3)
-jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(LIB).jar
+all: $(MAIN) $(MAIN2) $(MAIN3) $(MAIN4)
+jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR) $(LIB).jar
 
 # Extraction from Coq
 generated:
@@ -79,6 +80,16 @@ $(MAIN3).$(JAR): generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN3).$(JAR)
 	cp _build/$(MAIN3).$(JAR) $(MAIN3).$(JAR)
 
+$(MAIN4): generated $(MAIN4).$(TARGET)
+	cp _build/$(MAIN4).$(TARGET) ../bin/$(MAIN4)
+
+$(MAIN4).$(TARGET): generated
+	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN4).$(TARGET)
+
+$(MAIN4).$(JAR): generated
+	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN4).$(JAR)
+	cp _build/$(MAIN4).$(JAR) $(MAIN4).$(JAR)
+
 $(LIBJS).cma: generated
 	$(OCAMLBUILD) -libs js_of_ocaml -pp "camlp4o -I /Users/simeon/.opam/4.02.1/lib/js_of_ocaml pa_js.cmo" \
         -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
@@ -105,7 +116,7 @@ japi/lib/$(LIB).jar: $(LIB).jar
 clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build
-	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR)
+	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR)
 	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi
 	rm -f japi/lib/CALib.jar
 	rm -f japi/src/org/qcert/calib/CALibWrapper.java
@@ -120,8 +131,8 @@ realclean:
 	rm -f DataLexer.ml DataParser.ml DataParser.mli
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
-	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3)
-	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3)
+	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3) $(MAIN4)
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/$(MAIN4)
 	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
 
 cleanall: realclean

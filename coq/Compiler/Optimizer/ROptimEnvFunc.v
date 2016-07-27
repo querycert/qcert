@@ -788,6 +788,76 @@ Section ROptimEnvFunc.
 
   Hint Rewrite rproject_over_either_fun_correctness : optim_correct.
 
+  (* optimization for distinct *)
+
+    Fixpoint nodupA_checker (p:algenv) : bool
+    := match p with
+       | ANUnop ADistinct _ => true
+       | ANBinop AMinus p₁ p₂ => nodupA_checker p₂
+       | _ => false
+       end.
+
+  Lemma nodupA_checker_correct (p:algenv) :
+    nodupA_checker p = true -> nodupA p.
+  Proof.
+    induction p; simpl; try discriminate.
+    - destruct b; try discriminate.
+      intros nd.
+      repeat red; intros.
+      simpl in H.
+      unfold olift2 in H.
+      match_case_in H
+      ; intros; rewrite H0 in H; try discriminate.
+      match_case_in H
+      ; intros; rewrite H1 in H; try discriminate.
+      unfold rondcoll2 in H.
+      apply some_lift in H.
+      destruct H as [? ? ?].
+      subst.
+      unfold ondcoll2 in e.
+      match_destr_in e.
+      match_destr_in e.
+      invcs e.
+      apply bminus_NoDup.
+      specialize (IHp2 nd).
+      specialize (IHp2 h c dn_c env dn_env x dn_x _ H1).
+      simpl in IHp2.
+      trivial.
+    - destruct u; try discriminate.
+      intros _ .
+      repeat red; intros.
+      simpl in H.
+      unfold olift in H.
+      match_case_in H
+      ; intros; rewrite H0 in H; try discriminate.
+      unfold rondcoll in H.
+      apply some_lift in H.
+      destruct H as [? ? ?].
+      invcs e0.
+      unfold ondcoll in e.
+      match_destr_in e.
+      invcs e.
+      apply bdistinct_NoDup.
+  Qed.
+      
+  Definition dup_elim_fun (p:algenv) :=
+    match p with
+    | ANUnop ADistinct q  =>
+      if nodupA_checker q then q else p
+    | _ => p
+    end.
+
+  Lemma dup_elim_fun_correctness (p:algenv) :
+    dup_elim_fun p ≡ₑ p.
+  Proof.
+    destruct p; simpl; try reflexivity.
+    destruct u; simpl; try reflexivity.
+    match_case; try reflexivity.
+    intros nd.
+    symmetry.
+    apply dup_elim.
+    apply nodupA_checker_correct; trivial.
+  Qed.
   
   (* *************************** *)
   Definition head_optim (p: algenv) :=

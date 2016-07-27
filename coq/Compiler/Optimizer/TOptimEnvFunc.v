@@ -241,6 +241,76 @@ Section TOptimEnvFunc.
   Qed.
   Hint Rewrite @tenvflatten_coll_fun_correctness : optim_correct.
 
+    (* p ⊕ [] ⇒ p when p returns a record *)
+  (* Java equivalent: NraOptimizer.[same] *)
+  Definition tconcat_empty_record_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+    match p with
+      |  ANBinop AConcat p (ANConst (drec [])) =>
+        p
+      | _ => p
+    end.
+
+  Lemma tconcat_empty_record_r_fun_correctness {model:basic_model} (p:algenv) :
+    p ⇒ tconcat_empty_record_r_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tconcat_empty_record_r_arrow.
+  Qed.
+  Hint Rewrite @tconcat_empty_record_r_fun_correctness : optim_correct.
+
+  (* [] ⊕ p ⇒ p when p returns a record *)
+  (* Java equivalent: NraOptimizer.[same] *)
+  Definition tconcat_empty_record_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+    match p with
+      |  ANBinop AConcat (ANConst (drec [])) p =>
+         p
+      | _ => p
+    end.
+
+  Lemma tconcat_empty_record_l_fun_correctness {model:basic_model} (p:algenv) :
+    p ⇒ tconcat_empty_record_l_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tconcat_empty_record_l_arrow.
+  Qed.
+  Hint Rewrite @tconcat_empty_record_l_fun_correctness : optim_correct.
+
+  Definition tdot_over_concat_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+    match p with
+    |  (q₁ ⊕ ‵[| (a₁, q₂) |])·a₂ =>
+       if a₁ == a₂
+       then q₂
+       else q₁·a₂
+      | _ => p
+    end.
+
+  Lemma tdot_over_concat_r_fun_correctness {model:basic_model} (p:algenv) :
+    p ⇒ tdot_over_concat_r_fun p.
+  Proof.
+    tprove_correctness p.
+    - apply tdot_over_concat_eq_r_arrow.
+    - apply tdot_over_concat_neq_r_arrow.
+      congruence.
+  Qed.
+  Hint Rewrite @tdot_over_concat_r_fun_correctness : optim_correct.
+
+  Definition tdot_over_concat_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+    match p with
+    |  ( ‵[| (a₁, q₁) |]⊕ q₂ )·a₂ =>
+       if a₁ == a₂
+       then p
+       else q₂·a₂
+      | _ => p
+    end.
+
+  Lemma tdot_over_concat_l_fun_correctness {model:basic_model} (p:algenv) :
+    p ⇒ tdot_over_concat_l_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tdot_over_concat_neq_l_arrow.
+    congruence.
+  Qed.
+  Hint Rewrite @tdot_over_concat_l_fun_correctness : optim_correct.
 
   (* p ⊗ [] ⇒ { p } when p returns a record *)
   (* Java equivalent: NraOptimizer.[same] *)
@@ -1189,11 +1259,7 @@ Section TOptimEnvFunc.
     p ⇒ tmap_over_flatten_map_fun p.
   Proof.
     tprove_correctness p.
-    rewrite tmap_over_flatten.
-    rewrite tenvmap_map_compose_arrow.
-    rewrite tapp_over_map_arrow.
-    rewrite tapp_over_id_l_arrow.
-    reflexivity.
+    apply tmap_over_flatten_map.
   Qed.
 
   Hint Rewrite @tmap_over_flatten_map_fun_correctness : toptim_correct.
@@ -1689,6 +1755,22 @@ Section TOptimEnvFunc.
   Qed.
   Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
 
+  Definition tdup_elim_fun {fruntime:foreign_runtime} (p:algenv) :=
+    dup_elim_fun p.
+
+  Lemma tdup_elim_fun_correctness {model:basic_model} (p:algenv) :
+    p ⇒ tdup_elim_fun p.
+  Proof.
+    destruct p; simpl; try reflexivity.
+    destruct u; simpl; try reflexivity.
+    match_case; try reflexivity; intros nd.
+    apply tdup_elim.
+    apply nodupA_checker_correct.
+    trivial.
+  Qed.
+
+  Hint Rewrite @tdup_elim_fun_correctness : optim_correct.
+
   
   (* *************************** *)
   Local Open Scope string.
@@ -1721,6 +1803,10 @@ Section TOptimEnvFunc.
         ("tselect_and_fun", tselect_and_fun);
         ("tenvdot_from_duplicate_r_fun", tenvdot_from_duplicate_r_fun);
         ("tenvdot_from_duplicate_l_fun", tenvdot_from_duplicate_l_fun);
+        ("tconcat_empty_record_r_fun", tconcat_empty_record_r_fun);
+        ("tconcat_empty_record_l_fun", tconcat_empty_record_l_fun);
+        ("tdot_over_concat_r_fun", tdot_over_concat_r_fun);
+        ("tdot_over_concat_l_fun", tdot_over_concat_l_fun);
         ("tmerge_empty_record_r_fun", tmerge_empty_record_r_fun);
         ("tmerge_empty_record_l_fun", tmerge_empty_record_l_fun);
         ("tmapenv_to_env_fun", tmapenv_to_env_fun);
@@ -1838,6 +1924,10 @@ Section TOptimEnvFunc.
     rewrite tmapenv_to_env_fun_correctness at 1.
     rewrite tmerge_empty_record_l_fun_correctness at 1.
     rewrite tmerge_empty_record_r_fun_correctness at 1.
+    rewrite tdot_over_concat_l_fun_correctness at 1.
+    rewrite tdot_over_concat_r_fun_correctness at 1.
+    rewrite tconcat_empty_record_l_fun_correctness at 1.
+    rewrite tconcat_empty_record_r_fun_correctness at 1.
     rewrite tenvdot_from_duplicate_l_fun_correctness at 1.
     rewrite tenvdot_from_duplicate_r_fun_correctness at 1.
     rewrite tselect_and_fun_correctness at 1.
@@ -1907,6 +1997,10 @@ Section TOptimEnvFunc.
         ("tselect_and_fun", tselect_and_fun);
         ("tenvdot_from_duplicate_r_fun", tenvdot_from_duplicate_r_fun);
         ("tenvdot_from_duplicate_l_fun", tenvdot_from_duplicate_l_fun);
+        ("tconcat_empty_record_r_fun", tconcat_empty_record_r_fun);
+        ("tconcat_empty_record_l_fun", tconcat_empty_record_l_fun);
+        ("tdot_over_concat_r_fun", tdot_over_concat_r_fun);
+        ("tdot_over_concat_l_fun", tdot_over_concat_l_fun);
         ("tmerge_empty_record_r_fun", tmerge_empty_record_r_fun);
         ("tmerge_empty_record_l_fun", tmerge_empty_record_l_fun);
         ("tmapenv_to_env_fun", tmapenv_to_env_fun);
@@ -2017,6 +2111,10 @@ Section TOptimEnvFunc.
     rewrite tmapenv_to_env_fun_correctness at 1.
     rewrite tmerge_empty_record_l_fun_correctness at 1.
     rewrite tmerge_empty_record_r_fun_correctness at 1.
+    rewrite tdot_over_concat_l_fun_correctness at 1.
+    rewrite tdot_over_concat_r_fun_correctness at 1.
+    rewrite tconcat_empty_record_l_fun_correctness at 1.
+    rewrite tconcat_empty_record_r_fun_correctness at 1.
     rewrite tenvdot_from_duplicate_l_fun_correctness at 1.
     rewrite tenvdot_from_duplicate_r_fun_correctness at 1.
     rewrite tselect_and_fun_correctness at 1.

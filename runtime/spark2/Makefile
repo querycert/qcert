@@ -27,7 +27,7 @@ else
 endif
 
 all:
-	$(SBT) package
+	$(SBT) publishLocal
 
 clean:
 	-rm -fr target project

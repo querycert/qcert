@@ -84,6 +84,15 @@ Section ROptimEnvContext.
     apply app_over_merge.
   Qed.
 
+  Lemma envctxt_select_union_distr :
+    σ⟨ $0 ⟩($1 ⋃ $2) ≡ₑ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).
+  Proof.
+    generalize ctxt_select_union_distr; intros pf.
+    apply lift_alg_context_proper in pf.
+    simpl in pf; trivial.
+  Qed.
+
+
 End ROptimEnvContext.
   
 (* 
