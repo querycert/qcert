@@ -949,12 +949,6 @@ let rec pretty_column_aux p sym ff col =
   | Hack.CUDFCast (bs,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ACast bs) c
   | Hack.CUDFUnbrand (rt,c) -> fprintf ff "@[!%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle (pretty_column_aux p sym) c
 
-let rec pretty_spark_aggregate_aux p sym ff agg =
-  match agg with
-  | Hack.SACount -> fprintf ff "%s" "Count"
-  | Hack.SASum -> fprintf ff "%s" "Sum"
-  | Hack.SACollectList -> fprintf ff "%s" "CollectList"
-
 let pretty_named_column_aux p sym ff (name, col) =
   fprintf ff "%s%@%a" (Util.string_of_char_list name) (pretty_column_aux p sym) col
 
@@ -965,15 +959,6 @@ let rec pretty_dataset_aux p sym ff ds =
 				      (pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataset_aux p sym) ds1
   | Hack.DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
 				      (pretty_column_aux p sym) c (pretty_dataset_aux p sym) ds1
-  | Hack.DSGroupBy (cl,al,ds1) -> fprintf ff "@[group %a @[<hv 2>by %a@] @[<hv 2>using %a@]@]"
-					  (pretty_dataset_aux p sym) ds1
-					  (pretty_list (pretty_named_column_aux p sym) ",") cl
-					  (pretty_list (fun ff ((s,a),c) ->
-					       fprintf ff "%s@%a of %a"
-						       (Util.string_of_char_list s)
-						       (pretty_spark_aggregate_aux p sym) a
-						       (pretty_column_aux p sym) c
-						       ) ",") al
   | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataset_aux ff Hack.AConcat ds1 ds2
   | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataset_aux p sym) ds
 

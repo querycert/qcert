@@ -51,17 +51,10 @@ Section SparkIR.
   | CUDFCast : list string -> column -> column
   | CUDFUnbrand : rtype₀ -> column -> column.
 
-  Inductive spark_aggregate :=
-  | SACount : spark_aggregate
-  | SASum : spark_aggregate
-  | SACollectList : spark_aggregate.
-
   Inductive dataset :=
   | DSVar : string -> dataset
   | DSSelect : list (string * column) -> dataset -> dataset
   | DSFilter : column -> dataset -> dataset
-  (* ds.groupBy( grouping columns ).agg( aggregate expressions ) *)
-  | DSGroupBy : list (string * column) -> list (string * spark_aggregate * column) -> dataset -> dataset
   | DSCartesian : dataset -> dataset -> dataset
   | DSExplode : string -> dataset -> dataset.
 
@@ -98,68 +91,6 @@ Section SparkIR.
       | CUDFCast _ _ => None (* TODO *)
       | CUDFUnbrand _ _ => None (* TODO *)
       end.
-
-    (** Value of an aggregation over an empty set. *)
-    Definition empty_aggregate (a : spark_aggregate) : data :=
-      match a with
-      | SACount => dnat 0
-      | SASum => dnat 0
-      | SACollectList => dcoll nil
-      end.
-
-    (* TODO This will also need an environment, like fun_of_column *)
-    (*
-    (** Interpretation of a Spark aggregation function.
-      * Should be suitable for folding over a list of data. *)
-    Definition fun_of_aggregate (a : spark_aggregate) : option data -> data -> option data :=
-      fun acc x =>
-        match acc with
-        | Some acc =>
-          match a with
-          | SACount => match acc, x with
-                       | dnat acc, dnat x => Some (dnat (Z.add acc 1))
-                       | _, _ => None
-                       end
-          | SASum => match acc, x with
-                     | dnat acc, dnat x => Some (dnat (Z.add acc x))
-                     | _, _ => None
-                     end
-          | SACollectList => match acc with
-                             | dcoll acc => Some (dcoll (acc ++ (x::nil)))
-                             | _ => None
-                             end
-          end
-        | None => None
-        end.
-
-    (** Interpretation of one aggregation column. *)
-    Definition fun_of_aggregation (agg: string * spark_aggregate * column) : list data -> option data := fun x => None.
-      let extract_values c l :=
-          let cfun := fun_of_column c in
-          listo_to_olist (map (fun_of_column c) (fun x => match unsrec (cfun x) with
-                                              | Some (_, v) => Some v
-                                              | _ => None
-                                              end)
-                              l) in
-      match agg with
-      | (n, a, c) =>
-        fun l =>
-          match extract_values c l with
-          | Some values =>
-            match fold_left (fun_of_aggregate a) values (Some (empty_aggregate a)) with
-            | Some v => Some (srec n v)
-            | None => None
-            end
-          | None => None
-          end
-      end.
-
-
-    Definition fun_of_aggregations (aggs: list (string * spark_aggregate * column)) : list data -> option data :=
-      fun l =>
-        merge_spark_columns (map (fun a => fun_of_aggregation a l) aggs).
-    *)
-
 
     (** On some option ddata of the form (Some (Ddistr x)) perform some action f. *)
     Definition unuddistr (od : option ddata) (f: list data -> list data) :=
@@ -208,43 +139,6 @@ Section SparkIR.
                                end
                              | _ => false
                              end))
-      | DSGroupBy gcs ags d =>
-        let gfun :=
-            fun row =>
-              match row with
-              | drec fs =>
-                let column_results :=
-                    map (fun nc => lift (fun res => (fst nc, res))
-                                        (fun_of_column (snd nc) fs))
-                        gcs in
-                lift (compose drec rec_sort) (listo_to_olist column_results)
-              | _ => None
-              end in
-        let afun := fun x => None (* TODO function of aggregate columns *) in
-
-        match dataset_eval dsenv d with
-        | Some (Ddistr rows) =>
-          match group_by_nested_eval gfun rows with
-          | Some grouped =>
-            match listo_to_olist (map (fun g => match afun (snd g) with
-                                                | Some v => Some ((fst g), v)
-                                                | None => None
-                                                end)
-                                      grouped) with
-            | Some aggregated =>
-              let records := map (fun a => match a with
-                                           | (drec group, drec agg) =>
-                                             (* NOTE we sort and remove duplicate column names. This is not what Spark does. *)
-                                             Some (drec (rec_sort (group ++ agg)))
-                                           | _ => None
-                                           end) aggregated in
-              lift Ddistr (listo_to_olist records)
-            | _ => None
-            end
-          | None => None
-          end
-        | _ => None
-        end
       | DSCartesian d1 d2 =>
         match dataset_eval dsenv d1, dataset_eval dsenv d2 with
         | Some (Ddistr rs1), Some (Ddistr rs2) =>

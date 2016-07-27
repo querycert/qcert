@@ -144,9 +144,6 @@ Section DNNRCtoScala.
     | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
     end.
 
-  (* TODO get rid of the new name
-   * I think having the new name be part of every column expression was a bad choice.
-   * Most of the time the name is ignored anyways, and if we really need it, there is always CAs. *)
   Fixpoint code_of_column (c: column) : string :=
     match c with
     | CCol s => "column(""" ++ s ++ """)"
@@ -166,18 +163,6 @@ Section DNNRCtoScala.
       "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
 
-  Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
-    match a with
-      (n, a, c) =>
-      let c := code_of_column c in
-      let f := match a with
-               | SACount => "count"%string
-               | SASum => "sum"%string
-               | SACollectList => "collect_list"%string
-               end
-      in f ++ "(" ++ c ++ ").as(""" ++ n ++ """)"
-    end.
-
   Fixpoint code_of_dataset (e: dataset) : string :=
     match e with
     | DSVar s => s
@@ -187,10 +172,6 @@ Section DNNRCtoScala.
       code_of_dataset d ++ ".select(" ++ joinStrings ", " columns ++ ")"
     | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
     | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
-    | DSGroupBy gcs acs d =>
-      let group_columns :=
-          map (fun nc => code_of_column (snd nc) ++ ".as(""" ++ fst nc ++ """)") gcs in
-      code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " group_columns ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
     | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
