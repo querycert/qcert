@@ -162,13 +162,13 @@ make run_js_test1
 (In the [`./samples`](./samples) directory)
 
 To run a query compiled to Java, you must first compiler it by calling
-`javac` for produced Java code, then call `java` with the `RunJava`
-query runner. You will need to pass it three pieces of information:
-(i) the location of the gson jar which is used to parse the input,
-(ii) the location of the Q\*cert runtime for java, both as part of the
-classpath, and (ii) some input data on which to run the query. From
-the command line, you can do it as follows, first to compile the Java
-code:
+`javac` for the produced Java code, then call `java` with the
+`RunJava` query runner. You will need to pass it three pieces of
+information: (i) the location of the gson jar which is used to parse
+the input, (ii) the location of the Q\*cert runtime for java, both as
+part of the classpath, and (ii) some input data on which to run the
+query. From the command line, you can do it as follows, first to
+compile the Java code:
 
 ```
 javac -cp bin:../runtime/java/bin:../lib/gson-2.7.jar oql/test1.java
