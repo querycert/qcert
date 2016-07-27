@@ -150,7 +150,6 @@ Section DNNRCtoScala.
   Fixpoint code_of_column (c: column) : string :=
     match c with
     | CCol s => "column(""" ++ s ++ """)"
-    | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
     | CDot fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ")"
     | CEq c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ")"
     | CLit (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
@@ -182,10 +181,16 @@ Section DNNRCtoScala.
   Fixpoint code_of_dataset (e: dataset) : string :=
     match e with
     | DSVar s => s
-    | DSSelect cs d => code_of_dataset d ++ ".select(" ++ joinStrings ", " (map code_of_column cs) ++ ")"
+    | DSSelect cs d =>
+      let columns :=
+          map (fun nc => code_of_column (snd nc) ++ ".as(""" ++ fst nc ++ """)") cs in
+      code_of_dataset d ++ ".select(" ++ joinStrings ", " columns ++ ")"
     | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
     | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
-    | DSGroupBy gcs acs d => code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " (map code_of_column gcs) ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
+    | DSGroupBy gcs acs d =>
+      let group_columns :=
+          map (fun nc => code_of_column (snd nc) ++ ".as(""" ++ fst nc ++ """)") gcs in
+      code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " group_columns ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
     | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
