@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+Require Import Basics.
 Require Import List String.
 Require Import Peano_dec.
 Require Import EquivDec.
@@ -205,6 +206,27 @@ Section DNNRCSparkIRRewrites.
     | _ => None
     end.
 
+
+  Fixpoint spark_equality_matches_qcert_equality_for_type (r: rtype₀) :=
+    match r with
+    | Nat₀
+    | Bool₀
+    | String₀ => true
+    | Rec₀ Closed fs =>
+      forallb (compose spark_equality_matches_qcert_equality_for_type snd) fs
+    | Either₀ l r  =>
+      andb (spark_equality_matches_qcert_equality_for_type l)
+           (spark_equality_matches_qcert_equality_for_type r)
+    | Bottom₀
+    | Top₀
+    | Unit₀ (* lit(null).equalTo(lit(null)) => NULL *)
+    | Coll₀ _ (* NOTE collections would work, if we kept them in order *)
+    | Rec₀ Open _
+    | Arrow₀ _ _
+    | Brand₀ _
+    | Foreign₀ _ => false
+    end.
+
   Fixpoint condition_to_column {A: Set}
            (e: dnrc (type_annotation A) dataset)
            (binding: (string * column)) :=
@@ -215,7 +237,7 @@ Section DNNRCSparkIRRewrites.
       if (n == var)
       then Some (CCol ("$known."%string ++ fld))
       else None
-(*    | DNRCVar _ n =>
+    (*    | DNRCVar _ n =>
       (* TODO generalize to multiple bindings, for joins *)
       let (var, expr) := binding in
       if (n == var)
@@ -228,11 +250,14 @@ Section DNNRCSparkIRRewrites.
     | DNRCConst _ d =>
       lift (fun t => CLit (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
     | DNRCBinop _ AEq l r =>
-      (* TODO check that the types of l and r admit Spark built-in equality *)
-      match condition_to_column l binding, condition_to_column r binding with
-      | Some l', Some r' =>
+      let types_are_okay :=
+          lift2 (fun lt rt => andb (equiv_decb lt rt)
+                                   (spark_equality_matches_qcert_equality_for_type (proj1_sig lt)))
+                (lift_tlocal (di_typeof l)) (lift_tlocal (di_typeof r)) in
+      match types_are_okay, condition_to_column l binding, condition_to_column r binding with
+      | Some true, Some l', Some r' =>
         Some (CEq l' r')
-      | _, _ => None
+      | _, _, _ => None
       end
     | DNRCBinop _ ASConcat l r =>
       lift2 CSConcat

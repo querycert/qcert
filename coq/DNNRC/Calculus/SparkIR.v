@@ -81,7 +81,9 @@ Section SparkIR.
         | _, _ => None
         end
       | CEq c1 c2 =>
-        (* TODO We use QCert equality here, but we should define and use Spark equality. *)
+        (* TODO We use QCert equality here. Define and use Spark equality.
+         * Spark has a three-valued logic, meaning special treatment for NULL.
+         * In contrast to QCert it also does not deal with brands, bags, open records, ... *)
         lift2 (fun x y => dbool (if data_eq_dec x y then true else false)) (fc c1) (fc c2)
       | CToString c1 =>
         lift (compose dstring dataToString) (fc c1)

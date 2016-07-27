@@ -33,43 +33,7 @@ object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
-    val res = {
-      val for_to_select = {
-        val if_else_empty_to_filter = {
-          val lift_unbrand = {
-            val map_cast = CONST$WORLD;
-            map_cast.filter(
-              QCertRuntime
-                .castUDF(brandHierarchy, "entities.Customer")(
-                  column("$type"))
-                .as("_ignored"))
-          };
-          lift_unbrand
-            .select(
-              QCertRuntime
-                .unbrandUDF(
-                  StructType(
-                    Seq(StructField("$blob", StringType),
-                      StructField(
-                        "$known",
-                        StructType(
-                          Seq(StructField("age", IntegerType),
-                            StructField("cid", IntegerType),
-                            StructField("name",
-                              StringType)))))))(
-                  column("$data"))
-                .as("unbranded"))
-            .select(column("unbranded.$blob").as("$blob"),
-              column("unbranded.$known").as("$known"))
-        };
-        if_else_empty_to_filter.filter(
-          column("$known.age").as("l").equalTo(lit(32)).as("ignored"))
-      };
-      for_to_select.select(
-        concat(lit("Customer ="),
-          format_string("%s", column("$known.name").as("x")).as(
-            "r")).as("value"))
-    }
+    val res = {CONST$WORLD.select(lit(null).equalTo(lit(null)))}
 
     res.explain(true)
 
