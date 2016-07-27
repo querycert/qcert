@@ -45,7 +45,7 @@ Module CompBack(runtime:CompilerRuntime).
   Definition dnrc_to_scala_code_gen
              {bm:brand_model}
              {ftyping: foreign_typing}
-             (inputType:rtype) (name:string) (e:dnrc (type_annotation _ _ unit) dataset) : string :=
+             (inputType:rtype) (name:string) (e:dnrc (type_annotation unit) dataset) : string :=
     @dnrcToSpark2Top _ _ bm _ unit inputType name e.
 
   (* Compilation from NNRCMR to CloudantMR *)
