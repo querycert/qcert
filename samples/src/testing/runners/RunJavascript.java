@@ -2,50 +2,52 @@
 // http://docs.oracle.com/javase/7/docs/technotes/guides/scripting/programmer_guide/
 package testing.runners;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+/* Standard Libraries */
+import java.io.File;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import java.io.IOException;
 
+/* Nashorn Javascript Libraries */
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 public class RunJavascript {
 
-    // Small load-file utility
+    // Small load-file method
     private static String readFile(String fileName) throws IOException {
-	BufferedReader br = new BufferedReader(new FileReader(fileName));
-	try {
-	    StringBuilder sb = new StringBuilder();
-	    String line = br.readLine();
-	    
-	    while (line != null) {
-		sb.append(line);
-		sb.append("\n");
-		line = br.readLine();
-	    }
-	    return sb.toString();
-	} finally {
-	    br.close();
-	}
+	return new String(Files.readAllBytes(Paths.get(fileName)));
     }
 
+    // Usage
+    private static void usage() {
+	System.err.println("Q*cert Javascript Runner expects two options:\n [-runtime filename] for the Q*cert Javscript runtime\n [-input filename] for the input data\nAnd the Javascript file\n");
+    }
+
+    // Main
     public static void main(String[] args) throws Exception {
+	if(args.length != 5) {
+	    usage();
+	}
+
 	ScriptEngineManager factory = new ScriptEngineManager();
 	ScriptEngine engine = factory.getEngineByName("JavaScript");
 	
-	String ioFile = null;
+	String inputFile = null;
 	String runtimeFile = null;
 	
 	for (int i = 0; i < args.length; i++) {
 	    String arg = args[i];
 	    // Must have a -input option for the input JSON
-	    if ("-input".equals(arg)) { ioFile = args[i+1]; i++; }
+	    if ("-input".equals(arg)) { inputFile = args[i+1]; i++; }
 	    // Must have a -runtime option for the Q*cert Javascript runtime
 	    else if ("-runtime".equals(arg)) { runtimeFile = args[i+1]; i++; }
 	    else {
 		// Load input JSON
-		if (ioFile != null) {
-		    String funCall = "var world = " + readFile(ioFile) + ";";
+		if (inputFile != null) {
+		    String funCall = "var world = " + readFile(inputFile) + ";";
 		    engine.eval(funCall);
 		} else {
 		    throw new IllegalArgumentException("Input Data File Missing");

@@ -120,7 +120,7 @@ cd samples
 make
 ```
 
-Now, you're good to go, and you can then run your compiled queries!
+Now, you're good to go! Next step: run your compiled queries.
 
 ### Run queries compiled to Javascript
 
@@ -156,6 +156,37 @@ can compile and run a given test for you:
 
 ```
 make run_js_test1
+```
+### Run queries compiled to Java
+
+(In the [`./samples`](./samples) directory)
+
+To run a query compiled to Java, you must first compiler it by calling
+`javac` for produced Java code, then call `java` with the `RunJava`
+query runner. You will need to pass it three pieces of information:
+(i) the location of the gson jar which is used to parse the input,
+(ii) the location of the Q\*cert runtime for java, both as part of the
+classpath, and (ii) some input data on which to run the query. From
+the command line, you can do it as follows, first to compile the Java
+code:
+
+```
+javac -cp bin:../runtime/java/bin:../lib/gson-2.7.jar oql/test1.java
+```
+
+Then to run the compiled Class:
+
+```
+java -cp bin:../runtime/java/bin:../lib/gson-2.7.jar:oql testing.runners.RunJava \
+     -input data/persons.json \
+	 test1
+```
+
+Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
+can compile and run a given test for you:
+
+```
+make run_java_test1
 ```
 
 ## Caveats
