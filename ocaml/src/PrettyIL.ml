@@ -197,7 +197,13 @@ let pretty_foreign_data ff fd =
   | Hack.Enhancedtimescale ts -> pretty_timescale ff ts
   | Hack.Enhancedtimeduration td -> raise Not_found
   | Hack.Enhancedtimepoint tp -> raise Not_found
-  
+
+let rec pretty_names ff nl =
+  match nl with
+    [] -> ()
+  | n :: [] -> fprintf ff "%s" (Util.string_of_char_list n)
+  | n :: nl' -> fprintf ff "%s,@ %a" (Util.string_of_char_list n) pretty_names nl'
+
 let rec pretty_data ff d =
   match d with
   | Hack.Dunit -> fprintf ff "null"
@@ -209,7 +215,9 @@ let rec pretty_data ff d =
   | Hack.Drec rl -> fprintf ff "[@[<hv 0>%a@]]" pretty_rec rl
   | Hack.Dleft d -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@]" pretty_data d
   | Hack.Dright d -> fprintf ff "@[<hv 2>right {@,%a@;<0 -2>}@]" pretty_data d
-  | Hack.Dbrand (brands,d) -> fprintf ff "@[<hv 2>brands [BRANDS] {@,%a@;<0 -2>}@]" pretty_data d
+  | Hack.Dbrand (brands,d) -> fprintf ff "@[<hv 2>brands [@[<hv 0>%a@]] {@,%a@;<0 -2>}@]"
+				      pretty_names brands
+				      pretty_data d
   | Hack.Dforeign fd -> pretty_foreign_data ff (Obj.magic fd)
 
 and pretty_coll ff dl =
@@ -231,12 +239,6 @@ let pretty_sym ff sym =
       let (asym,asize) = sym in
       pp_print_as ff asize asym
     end
-
-let rec pretty_names ff nl =
-  match nl with
-    [] -> ()
-  | n :: [] -> fprintf ff "%s" (Util.string_of_char_list n)
-  | n :: nl' -> fprintf ff "%s,@ %a" (Util.string_of_char_list n) pretty_names nl'
 
 let pretty_squared_names sym ff nl =
   fprintf ff "%a@[<hv 0>%a@]%a" pretty_sym sym.lfloor pretty_names nl pretty_sym sym.rfloor
@@ -882,7 +884,7 @@ let rec pretty_rtype_aux sym ff rt =
   | Hack.Rec__U2080_ (Hack.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
   | Hack.Either__U2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
   | Hack.Arrow__U2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Hack.Brand__U2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
+  | Hack.Brand__U2080_ bds -> fprintf ff "@[<hv 2>Brands [@[<hv 0>%a@]]@]" pretty_names bds
   | Hack.Foreign__U2080_ rf -> fprintf ff "Foreign"
 
 and pretty_rec_type sym ff rl =
