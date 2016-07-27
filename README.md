@@ -4,7 +4,7 @@ http://github.com/querycert/qcert
 
 ## About
 
-This is the source code for the Q\*cert certified query compiler. The
+This is the source code for the Q\*cert verified query compiler. The
 goal of the project is to develop a state of the art query compiler
 for languages over a rich data model (nested, hierarchical, etc), with
 an implementation which provides strong correctness guarantees.
@@ -57,7 +57,7 @@ CADa for the Q\*cert data processor.
 
 ## Compile Queries
 
-Once the compiler is built, one can use it to compile queries. The
+Once the compiler is built, it can be used to compile queries. The
 `samples` directory contains a few examples written in OQL (Object
 Query Language) syntax. For instance:
 

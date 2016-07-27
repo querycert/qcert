@@ -20,14 +20,14 @@ BLANK=$(EMPTY) $(EMPTY)
 RAWCPATH=bin
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
+RAWRUNCPATH=bin $(wildcard ../lib/*.jar)
+RUNCPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
-
+JAVA=java
 QCERTCOMP=../bin/CACo
 QCERTEVAL=../bin/CAEv
 
 all:
-	$(MAKE) all-javascript
-	$(MAKE) all-java
 	$(MAKE) classes
 
 classes: $(CLASSES)
@@ -36,11 +36,21 @@ $(CLASSES): $(JAVA_SRCS)
 	-mkdir -p bin
 	$(JAVABASE)javac -g -sourcepath src -d bin -cp $(CPATH) $(JAVA_SRCS)
 
-all-javascript:
-	$(QCERTCOMP) -source OQL -target JS oql/*.oql
+oql/%.js: oql/%.oql
+	@echo
+	@echo "Compiling test: '"$<"' to '"$@"'"
+	$(QCERTCOMP) -source OQL -target JS $<
 
-all-java:
-	$(QCERTCOMP) -source OQL -target Java oql/*.oql
+oql/%.java: oql/%.oql
+	@echo
+	@echo "Compiling test: '"$<"' to '"$@"'"
+	$(QCERTCOMP) -source OQL -target Java $<
+
+run_js_%: oql/%.js
+	@echo
+	@echo "Running test: '"$<"' on data: data/persons.json"
+	@echo
+	@$(JAVA) -cp $(RUNCPATH) testing.runners.RunJavascript -io data/persons.json -runtime ../runtime/javascript/qcert-runtime.js $< 
 
 clean:
 	@rm -rf bin/*
