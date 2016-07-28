@@ -46,8 +46,11 @@ Section SparkIR.
   | CPlus  : column -> column -> column
   | CEq    : column -> column -> column
   | CNeg   : column -> column
+  (* TODO rename this once we use a UDF for printing *)
   | CToString : column -> column
   | CSConcat : column -> column -> column
+  (* In contrast to QCert cast, this takes the runtime brands as input (as a column),
+   * not the data, and returns a boolean suitable for filtering, not left(data)/right(null). *)
   | CUDFCast : list string -> column -> column
   | CUDFUnbrand : rtype₀ -> column -> column.
 
@@ -58,7 +61,7 @@ Section SparkIR.
   | DSCartesian : dataset -> dataset -> dataset
   | DSExplode : string -> dataset -> dataset.
 
-
+  Context (h:brand_relation_t).
   Section eval.
     (** Evaluate a column expression in an environment of toplevel columns
      * i.e. a row in a dataset. *)
@@ -92,7 +95,14 @@ Section SparkIR.
         | Some (dstring l), Some (dstring r) => Some (dstring (l ++ r))
         | _, _ => None
         end
-      | CUDFCast _ _ => None (* TODO *)
+      | CUDFCast target_brands column_of_runtime_brands =>
+        match fc column_of_runtime_brands with
+        | Some (dcoll runtime_brand_strings) =>
+          lift (fun runtime_brands =>
+                  dbool (if sub_brands_dec h runtime_brands target_brands then true else false))
+               (listo_to_olist (map (fun s => match s with dstring s => Some s | _ => None end) runtime_brand_strings))
+        | _ => None
+        end
       | CUDFUnbrand _ _ => None (* TODO *)
       end.
 
