@@ -155,8 +155,7 @@ Section DNNRCtoScala.
     | CSConcat c1 c2 =>
       "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ")"
     | CToString c =>
-      (* TODO should call the proper QCert printing function as a UDF here *)
-      "format_string(""%s"", " ++ code_of_column c ++ ")"
+      "QCertRuntime.toQCertStringUDF(" ++ code_of_column c ++ ")"
     | CUDFCast bs c =>
       "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
     | CUDFUnbrand t c =>

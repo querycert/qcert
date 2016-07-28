@@ -342,7 +342,7 @@ Section DNNRCSparkIRRewrites.
       let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
       let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
       let e'''''' := tryBottomUp rec_for_to_select e''''' in
-      e'''''.
+      e''''''.
 
 
 End DNNRCSparkIRRewrites.

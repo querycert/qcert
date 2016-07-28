@@ -35,6 +35,7 @@ object test extends QCertRuntime {
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
     val res = {CONST$WORLD.select(lit(null).equalTo(lit(null)))}
 
+
     res.explain(true)
 
     res.show()
@@ -56,6 +57,20 @@ object test extends QCertRuntime {
   * It declares abstract members like `run` and the world type for initial data loading.
   */
 object QCertRuntime {
+  def toQCertString(x: Any): String = x match {
+    case null => "UNIT" // null is unit, right?
+    case x: Int => x.toString
+    case true => "TRUE"
+    case false => "FALSE"
+    case x: String => x // no quotes!
+    case x: Array[_] => x.map(QCertRuntime.toQCertString).mkString("[", ", ", "]")
+    // Open records, as always, are being bloody difficult...
+    case x: Row => x.toString // TODO
+  }
+
+  def toQCertStringUDF =
+    udf((x: Any) => QCertRuntime.toQCertString(x), StringType)
+
   // TODO
   // We might want to change all of these to pass around a runtime support object with the hierarchy, gson parser, ...
   // basically everything that's currently in the QCertRuntime abstract class

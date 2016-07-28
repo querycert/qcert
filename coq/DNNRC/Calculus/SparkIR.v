@@ -46,7 +46,7 @@ Section SparkIR.
   | CPlus  : column -> column -> column
   | CEq    : column -> column -> column
   | CNeg   : column -> column
-  (* TODO rename this once we use a UDF for printing *)
+  (* NOTE we actually codegen to a UDF for this, not Spark's printing *)
   | CToString : column -> column
   | CSConcat : column -> column -> column
   (* In contrast to QCert cast, this takes the runtime brands as input (as a column),
