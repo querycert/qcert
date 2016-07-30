@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+Require Import Basics.
 Require Import List String.
 Require Import Peano_dec.
 Require Import EquivDec.
@@ -191,9 +192,9 @@ Section DNNRCSparkIRRewrites.
           let ALG :=
               (* TODO fresh name for lift_unbrand! *)
               DNRCAlg (dnrc_annotation_get xs)
-                      (DSSelect ((CAs "$blob" (CCol "unbranded.$blob"))
-                                   ::(CAs "$known" (CCol "unbranded.$known"))::nil)
-                                (DSSelect ((CAs "unbranded" (CUDFUnbrand t (CCol "$data")))::nil)
+                      (DSSelect (("$blob"%string, CCol "unbranded.$blob")
+                                   :: ("$known"%string, CCol "unbranded.$known")::nil)
+                                (DSSelect (("unbranded"%string, CUDFUnbrand t (CCol "$data"))::nil)
                                           (DSVar "lift_unbrand")))
                       (("lift_unbrand"%string, xs)::nil)
           in
@@ -205,18 +206,38 @@ Section DNNRCSparkIRRewrites.
     | _ => None
     end.
 
+
+  Fixpoint spark_equality_matches_qcert_equality_for_type (r: rtype₀) :=
+    match r with
+    | Nat₀
+    | Bool₀
+    | String₀ => true
+    | Rec₀ Closed fs =>
+      forallb (compose spark_equality_matches_qcert_equality_for_type snd) fs
+    | Either₀ l r  =>
+      andb (spark_equality_matches_qcert_equality_for_type l)
+           (spark_equality_matches_qcert_equality_for_type r)
+    | Bottom₀
+    | Top₀
+    | Unit₀ (* lit(null).equalTo(lit(null)) => NULL *)
+    | Coll₀ _ (* NOTE collections would work, if we kept them in order *)
+    | Rec₀ Open _
+    | Arrow₀ _ _
+    | Brand₀ _
+    | Foreign₀ _ => false
+    end.
+
   Fixpoint condition_to_column {A: Set}
            (e: dnrc (type_annotation A) dataset)
-           (cname: string)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
     | DNRCUnop _ (ADot fld) (DNRCVar _ n) =>
       let (var, _) := binding in
       if (n == var)
-      then Some (CAs cname (CCol ("$known."%string ++ fld)))
+      then Some (CCol ("$known."%string ++ fld))
       else None
-(*    | DNRCVar _ n =>
+    (*    | DNRCVar _ n =>
       (* TODO generalize to multiple bindings, for joins *)
       let (var, expr) := binding in
       if (n == var)
@@ -229,20 +250,23 @@ Section DNNRCSparkIRRewrites.
     | DNRCConst _ d =>
       lift (fun t => CLit (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
     | DNRCBinop _ AEq l r =>
-      (* TODO check that the types of l and r admit Spark built-in equality *)
-      match condition_to_column l "l" binding, condition_to_column r "r" binding with
-      | Some l', Some r' =>
+      let types_are_okay :=
+          lift2 (fun lt rt => andb (equiv_decb lt rt)
+                                   (spark_equality_matches_qcert_equality_for_type (proj1_sig lt)))
+                (lift_tlocal (di_typeof l)) (lift_tlocal (di_typeof r)) in
+      match types_are_okay, condition_to_column l binding, condition_to_column r binding with
+      | Some true, Some l', Some r' =>
         Some (CEq l' r')
-      | _, _ => None
+      | _, _, _ => None
       end
     | DNRCBinop _ ASConcat l r =>
       lift2 CSConcat
-            (condition_to_column l "l" binding)
-            (condition_to_column r "r" binding)
+            (condition_to_column l binding)
+            (condition_to_column r binding)
     (* TODO properly implement this *)
     | DNRCUnop _ AToString x =>
       lift CToString
-           (condition_to_column x "x" binding)
+           (condition_to_column x binding)
 
     | _ => None
     end.
@@ -256,7 +280,7 @@ Section DNNRCSparkIRRewrites.
                         (DNRCIf _ condition
                                 thenE
                                 (DNNRC.DNRCConst _ (dcoll nil)))) =>
-      match condition_to_column condition "ignored" (x, CCol "abc") with
+      match condition_to_column condition (x, CCol "abc") with
       | Some c' =>
         let ALG :=
             DNRCAlg (dnrc_annotation_get xs)
@@ -292,13 +316,13 @@ Section DNNRCSparkIRRewrites.
        * This involves returning more than one column ... *)
       | Some String =>
         (* TODO rename condition_to_column, if this works *)
-        match condition_to_column body "value" (x, CCol "abc") with
+        match condition_to_column body (x, CCol "abc") with
         | Some body' =>
           (* TODO generalize to other types than String ... *)
           let ALG_type := Tdistr String in
           let ALG :=
               DNRCAlg (ta_mk (ta_base t1) ALG_type)
-                      (DSSelect (body'::nil) (DSVar "for_to_select"))
+                      (DSSelect (("value"%string, body')::nil) (DSVar "for_to_select"))
                       (("for_to_select"%string, xs)::nil)
           in
           Some (DNRCCollect t1 ALG)
@@ -318,7 +342,7 @@ Section DNNRCSparkIRRewrites.
       let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
       let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
       let e'''''' := tryBottomUp rec_for_to_select e''''' in
-      e'''''.
+      e''''''.
 
 
 End DNNRCSparkIRRewrites.

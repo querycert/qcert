@@ -33,43 +33,8 @@ object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
-    val res = {
-      val for_to_select = {
-        val if_else_empty_to_filter = {
-          val lift_unbrand = {
-            val map_cast = CONST$WORLD;
-            map_cast.filter(
-              QCertRuntime
-                .castUDF(brandHierarchy, "entities.Customer")(
-                  column("$type"))
-                .as("_ignored"))
-          };
-          lift_unbrand
-            .select(
-              QCertRuntime
-                .unbrandUDF(
-                  StructType(
-                    Seq(StructField("$blob", StringType),
-                      StructField(
-                        "$known",
-                        StructType(
-                          Seq(StructField("age", IntegerType),
-                            StructField("cid", IntegerType),
-                            StructField("name",
-                              StringType)))))))(
-                  column("$data"))
-                .as("unbranded"))
-            .select(column("unbranded.$blob").as("$blob"),
-              column("unbranded.$known").as("$known"))
-        };
-        if_else_empty_to_filter.filter(
-          column("$known.age").as("l").equalTo(lit(32)).as("ignored"))
-      };
-      for_to_select.select(
-        concat(lit("Customer ="),
-          format_string("%s", column("$known.name").as("x")).as(
-            "r")).as("value"))
-    }
+    val res = {CONST$WORLD.select(lit(null).equalTo(lit(null)))}
+
 
     res.explain(true)
 
@@ -92,6 +57,20 @@ object test extends QCertRuntime {
   * It declares abstract members like `run` and the world type for initial data loading.
   */
 object QCertRuntime {
+  def toQCertString(x: Any): String = x match {
+    case null => "UNIT" // null is unit, right?
+    case x: Int => x.toString
+    case true => "TRUE"
+    case false => "FALSE"
+    case x: String => x // no quotes!
+    case x: Array[_] => x.map(QCertRuntime.toQCertString).mkString("[", ", ", "]")
+    // Open records, as always, are being bloody difficult...
+    case x: Row => x.toString // TODO
+  }
+
+  def toQCertStringUDF =
+    udf((x: Any) => QCertRuntime.toQCertString(x), StringType)
+
   // TODO
   // We might want to change all of these to pass around a runtime support object with the hierarchy, gson parser, ...
   // basically everything that's currently in the QCertRuntime abstract class

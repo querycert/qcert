@@ -152,10 +152,10 @@ let timescale_as_string ts =
   | Hack.Ts_week -> "WEEK"
   | Hack.Ts_month -> "MONTH"
   | Hack.Ts_year -> "YEAR"
-  
+
 let pretty_timescale ff ts =
   fprintf ff "%s" (timescale_as_string ts)
-		  
+
 let string_of_foreign_data (fd:Hack.enhanced_data) : string =
   match fd with
   | Hack.Enhancedfloat f -> string_of_float f
@@ -189,7 +189,7 @@ let foreign_data_of_string s =
 	    | _ ->
 		raise Not_found
       end
-	
+
 let pretty_foreign_data ff fd =
   match fd with
   | Hack.Enhancedfloat f -> fprintf ff "%f" f
@@ -298,7 +298,7 @@ let string_of_foreign_unop fu : string =
   | Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale -> "TimeToScale"
   | Hack.Enhanced_unary_time_op Hack.Uop_time_from_string -> "TimeFromString"
   | Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string -> "TimeDurationFromString"
-								   
+
 let foreign_unop_of_string s =
   match s with
   | "Fneg" -> Hack.Enhanced_unary_float_op Hack.Uop_float_neg
@@ -409,7 +409,7 @@ let pretty_unop p sym callb ff u a =
    < <=                                	           17
                in                      	           16
    =                       	       	           15
-   
+
    Infix AlgOp
    -----------
    o^e                                             10
@@ -430,7 +430,7 @@ let string_of_binarith ba =
   | Hack.ArithMax -> "max"
   | Hack.ArithDivide -> "divide"
   | Hack.ArithRem -> "rem"
-	
+
 let binarith_of_string s =
   match s with
   | "plus" -> Hack.ArithPlus
@@ -441,7 +441,7 @@ let binarith_of_string s =
   | "divide" -> Hack.ArithDivide
   | "rem" -> Hack.ArithRem
   | _ -> raise Not_found
-	
+
 let pretty_binarith p sym callb ff ba a1 a2 =
   match ba with
   | Hack.ArithPlus -> pretty_infix_exp p 18 sym callb ("+",1) ff a1 a2
@@ -545,7 +545,7 @@ let pretty_foreign_binop p sym callb ff fb a1 a2 =
      pretty_infix_exp p 18 sym callb ("TD_fs",1) ff a1 a2
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between ->
      pretty_infix_exp p 18 sym callb ("TD_be",1) ff a1 a2
-    
+
 let string_of_binop b =
   match b with
   | Hack.AEq -> "aeq"
@@ -584,7 +584,7 @@ let pretty_binop p sym callb ff b a1 a2 =
 
 
 (* NRAEnv PP *)
-    
+
 let rec pretty_nraenv_aux p sym ff a =
   match a with
   | Hack.ANID -> fprintf ff "%s" "ID"
@@ -623,7 +623,7 @@ and pretty_nra_exp p sym thissym ff a1 oa2 =
       else
 	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nraenv_aux 0 sym) a2
 
-	
+
 let pretty_nraenv greek margin a =
   let conf = make_pretty_config greek margin in
   let ff = str_formatter in
@@ -705,7 +705,7 @@ let pretty_reduce_op_to_string op =
   | Hack.RedOpArithMean typ -> "arithmean"
   | Hack.RedOpStats typ -> "stats"
 
-  
+
 let pretty_nnrcmr_job_aux sym ff mr =
   let distributed = "distributed" in
   let scalar = "scalar" in
@@ -797,7 +797,7 @@ let pretty_nnrcmr greek margin mr_chain =
 
 let rec pretty_dnrc_aux ann plug p sym ff n =
   match n with
-  | Hack.DNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v) 
+  | Hack.DNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v)
   | Hack.DNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
   | Hack.DNRCBinop (a, b,n1,n2) ->
       fprintf ff "%a(" ann a
@@ -865,17 +865,17 @@ let pretty_dnrc ann plug greek margin n =
 let pretty_annotate_ignore ff a = ()
 let pretty_plug_ignore ff a = ()
 
-let pretty_plug_nraenv greek ff a = 
+let pretty_plug_nraenv greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_nraenv_aux 0 sym ff a
-    
+
 (* Pretty RType *)
 
 let rec pretty_rtype_aux sym ff rt =
   match rt with
   | Hack.Bottom__U2080_ -> fprintf ff "%a" pretty_sym sym.bot
   | Hack.Top__U2080_ ->  fprintf ff "%a" pretty_sym sym.top
-  | Hack.Unit__U2080_ -> fprintf ff "Unit" 
+  | Hack.Unit__U2080_ -> fprintf ff "Unit"
   | Hack.Nat__U2080_ -> fprintf ff "Nat"
   | Hack.Bool__U2080_ -> fprintf ff "Bool"
   | Hack.String__U2080_ -> fprintf ff "String"
@@ -939,7 +939,6 @@ let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.EnhancedCompi
 let rec pretty_column_aux p sym ff col =
   match col with
   | Hack.CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (Util.string_of_char_list v) pretty_sym sym.rangle
-  | Hack.CAs (v,c) -> fprintf ff "%s@%a" (Util.string_of_char_list v) (pretty_column_aux 0 sym) c 
   | Hack.CDot (v,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ADot v) c
   | Hack.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
   | Hack.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (Hack.ABArith Hack.ArithPlus) c1 c2
@@ -950,28 +949,16 @@ let rec pretty_column_aux p sym ff col =
   | Hack.CUDFCast (bs,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ACast bs) c
   | Hack.CUDFUnbrand (rt,c) -> fprintf ff "@[!%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle (pretty_column_aux p sym) c
 
-let rec pretty_spark_aggregate_aux p sym ff agg =
-  match agg with
-  | Hack.SACount -> fprintf ff "%s" "Count"
-  | Hack.SASum -> fprintf ff "%s" "Sum"
-  | Hack.SACollectList -> fprintf ff "%s" "CollectList"
+let pretty_named_column_aux p sym ff (name, col) =
+  fprintf ff "%s%@%a" (Util.string_of_char_list name) (pretty_column_aux p sym) col
 
 let rec pretty_dataset_aux p sym ff ds =
   match ds with
   | Hack.DSVar v -> fprintf ff "$%s" (Util.string_of_char_list v)
   | Hack.DSSelect (cl,ds1) -> fprintf ff "@[select %a @[<hv 2>from %a@] @]"
-				      (pretty_list (pretty_column_aux p sym) ",") cl (pretty_dataset_aux p sym) ds1
+				      (pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataset_aux p sym) ds1
   | Hack.DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
 				      (pretty_column_aux p sym) c (pretty_dataset_aux p sym) ds1
-  | Hack.DSGroupBy (cl,al,ds1) -> fprintf ff "@[group %a @[<hv 2>by %a@] @[<hv 2>using %a@]@]"
-					  (pretty_dataset_aux p sym) ds1
-					  (pretty_list (pretty_column_aux p sym) ",") cl
-					  (pretty_list (fun ff ((s,a),c) ->
-					       fprintf ff "%s@%a of %a"
-						       (Util.string_of_char_list s)
-						       (pretty_spark_aggregate_aux p sym) a
-						       (pretty_column_aux p sym) c
-						       ) ",") al
   | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataset_aux ff Hack.AConcat ds1 ds2
   | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataset_aux p sym) ds
 
@@ -989,6 +976,6 @@ let pretty_dataset greek margin ds =
     flush_str_formatter ()
   end
 
-let pretty_plug_dataset greek ff a = 
+let pretty_plug_dataset greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_dataset_aux 0 sym ff a
