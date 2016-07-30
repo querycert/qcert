@@ -1,3 +1,6 @@
+/* Example of returning a record (struct in OQL terminology) */
+
 select struct(company: c.cname, dept: d)
 from c in Companies,
      d in c.departments
+

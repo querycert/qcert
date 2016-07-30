@@ -70,8 +70,30 @@ val pretty_nnrc : bool -> int -> Compiler.nrc -> string
 
 val pretty_nnrcmr : bool -> int -> Compiler.nrcmr -> string
 
+(* Pretty DNRC *)
+
+val pretty_dnrc : (Format.formatter -> 'a -> unit) ->
+		  (Format.formatter -> 'plug_type -> unit) ->
+		  bool -> int -> ('a, 'plug_type) Compiler.dnrc -> string
+
+(* Pretty Spark IR *)
+
+val pretty_dataset : bool -> int -> Compiler.dataset -> string
+
+(* Pretty printers for various annotation types *)
+val pretty_annotate_ignore : Format.formatter -> 'a -> unit
+val pretty_annotate_rtype : bool -> Format.formatter -> RType.camp_type -> unit
+val pretty_annotate_annotated_rtype : bool -> 
+				      (Format.formatter -> 'a -> unit) ->
+				      Format.formatter ->
+				      'a CompCore.type_annotation -> unit
+
+
+(* Pretty printers for various plug types *)
+val pretty_plug_ignore : Format.formatter -> 'a -> unit
+val pretty_plug_nraenv : bool -> Format.formatter -> Compiler.algenv -> unit
+val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
 
 (* Pretty RType *)
 
 val pretty_rtype : bool -> int -> RType.camp_type -> string
-

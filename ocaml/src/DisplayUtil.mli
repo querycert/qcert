@@ -22,9 +22,9 @@ open PrettyIL
 
 (* Display ILs *)
 
-val display_to_string : pretty_config -> algenv -> (string * string * string * string * string)
+val display_to_string : pretty_config -> (RType.brand_model * RType.camp_type) option -> algenv -> (string * string * string * string * string * string)
 
-val display_algenv_top : comp_config -> (string * algenv) -> unit
+val display_algenv_top : comp_config -> (RType.brand_model * RType.camp_type) option -> (string * algenv) -> unit
 
 (* SExp ILs *)
     

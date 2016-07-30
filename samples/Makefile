@@ -17,17 +17,15 @@ endif
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-RAWCPATH=bin $(wildcard ../../lib/*.jar)
+RAWCPATH=bin ../runtime/java/bin $(wildcard ../lib/*.jar)
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
-
-
+JAVA=java
+JAVAC=javac
 QCERTCOMP=../bin/CACo
 QCERTEVAL=../bin/CAEv
 
 all:
-	$(MAKE) all-javascript
-	$(MAKE) all-java
 	$(MAKE) classes
 
 classes: $(CLASSES)
@@ -36,13 +34,36 @@ $(CLASSES): $(JAVA_SRCS)
 	-mkdir -p bin
 	$(JAVABASE)javac -g -sourcepath src -d bin -cp $(CPATH) $(JAVA_SRCS)
 
-all-javascript:
-	$(QCERTCOMP) -source OQL -target JS oql/*.oql
+oql/%.js: oql/%.oql
+	@echo
+	@echo "Compiling test with Q*cert: '"$<"' to '"$@"'"
+	$(QCERTCOMP) -source OQL -target JS $<
 
-all-java:
-	$(QCERTCOMP) -source OQL -target Java oql/*.oql
+oql/%.java: oql/%.oql
+	@echo
+	@echo "Compiling test with Q*cert: '"$<"' to '"$@"'"
+	$(QCERTCOMP) -source OQL -target Java $<
+
+oql/%.class: oql/%.java
+	@echo
+	@echo "Compiling test with javac: '"$<"' to '"$@"'"
+	$(JAVAC) -cp $(CPATH) $<
+
+run_js_%: oql/%.js
+	@echo
+	@echo "Running test: '"$<"' on data: data/persons.json"
+	@echo
+	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input data/persons.json -runtime ../runtime/javascript/qcert-runtime.js $< 
+
+run_java_%: oql/%.class
+	@echo
+	@echo "Running test: '"$<"' on data: data/persons.json"
+	@echo
+	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input data/persons.json $*
 
 clean:
+	@rm -rf bin/*
 	@rm -f oql/*.js
 	@rm -f oql/*.java
+	@rm -f oql/*.class
 

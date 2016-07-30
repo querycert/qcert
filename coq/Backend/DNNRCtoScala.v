@@ -144,48 +144,33 @@ Section DNNRCtoScala.
     | _, _ => "UNIMPLEMENTED_SCALA_LITERAL_DATA"
     end.
 
-  (* TODO get rid of the new name
-   * I think having the new name be part of every column expression was a bad choice.
-   * Most of the time the name is ignored anyways, and if we really need it, there is always CAs. *)
   Fixpoint code_of_column (c: column) : string :=
     match c with
     | CCol s => "column(""" ++ s ++ """)"
-    | CAs new c => code_of_column c ++ ".as(""" ++ new ++ """)"
-    | CDot new fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ").as(""" ++ new ++ """)"
-    | CEq new c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CLit new (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
-    | CNeg new c => "not(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CPlus new c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CSConcat new c1 c2 =>
-      "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ").as(""" ++ new ++ """)"
-    | CToString new c =>
-      (* TODO should call the proper QCert printing function as a UDF here *)
-      "format_string(""%s"", " ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CUDFCast new bs c =>
-      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    | CUDFUnbrand new t c =>
-      "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ").as(""" ++ new ++ """)"
-    end.
-
-  Definition code_of_aggregate (a : (string * spark_aggregate * column)) : string :=
-    match a with
-      (n, a, c) =>
-      let c := code_of_column c in
-      let f := match a with
-               | SACount => "count"%string
-               | SASum => "sum"%string
-               | SACollectList => "collect_list"%string
-               end
-      in f ++ "(" ++ c ++ ").as(""" ++ n ++ """)"
+    | CDot fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ")"
+    | CEq c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ")"
+    | CLit (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
+    | CNeg c => "not(" ++ code_of_column c ++ ")"
+    | CPlus c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ")"
+    | CSConcat c1 c2 =>
+      "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ")"
+    | CToString c =>
+      "QCertRuntime.toQCertStringUDF(" ++ code_of_column c ++ ")"
+    | CUDFCast bs c =>
+      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+    | CUDFUnbrand t c =>
+      "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
 
   Fixpoint code_of_dataset (e: dataset) : string :=
     match e with
     | DSVar s => s
-    | DSSelect cs d => code_of_dataset d ++ ".select(" ++ joinStrings ", " (map code_of_column cs) ++ ")"
+    | DSSelect cs d =>
+      let columns :=
+          map (fun nc => code_of_column (snd nc) ++ ".as(""" ++ fst nc ++ """)") cs in
+      code_of_dataset d ++ ".select(" ++ joinStrings ", " columns ++ ")"
     | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
     | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
-    | DSGroupBy gcs acs d => code_of_dataset d ++ ".groupBy(" ++ joinStrings ", " (map code_of_column gcs) ++ ").agg(" ++ joinStrings ", " (map code_of_aggregate acs) ++ ")"
     | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
@@ -283,7 +268,7 @@ Section DNNRCtoScala.
     | Foreign₀ _ => false
     end.
 
-  Fixpoint scala_of_dnrc {A: Set} (d: dnrc (type_annotation _ m A) dataset) : string :=
+  Fixpoint scala_of_dnrc {A: Set} (d: dnrc (type_annotation A) dataset) : string :=
     let code :=
         match d with
         | DNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
@@ -355,37 +340,37 @@ Section DNNRCtoScala.
       | None => "CANTCASTTODISTRIBUTEDTYPE"
       end.
 
-  Require Import DNNRCSparkIRRewrites.
+  Definition dnnrc_infer_type {A: Set} (e: dnrc A dataset) (inputType: rtype)
+    : option (dnrc (type_annotation A) dataset) :=
+    let tdb: tdbindings :=
+        ("CONST$WORLD"%string, (Tdistr inputType))::nil in
+    infer_dnrc_type tdb e.
+
+  Definition initBrandHierarchy : string :=
+    let lines :=
+        map (fun p => "addToBrandHierarchy(""" ++ (fst p) ++ """, """ ++ snd p ++ """);")
+            brand_relation_brands in
+    joinStrings " " lines.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string) (e: dnrc A dataset) : string :=
-    let tdb: tdbindings :=
-        ("CONST$WORLD", (Tdistr inputType))::nil
-    in
-    match infer_dnrc_type tdb e with
-    | None =>
-      "TYPE INFERENCE FAILED "
-    | Some e' =>
-      let e'' := tryBottomUp rec_cast_to_filter e' in
-      let e''' := tryBottomUp rec_lift_unbrand e'' in
-      let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
-      let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
-      let e'''''' := tryBottomUp rec_for_to_select e''''' in
-      ""
-        ++ "import org.apache.spark.sql.types._" ++ eol
-        ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
-        ++ "import org.apache.spark.sql.functions._" ++ eol
-        ++ "import org.qcert.QCertRuntime" ++ eol
-        ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
-        ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
-        ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
-        ++ "println(toBlob(" ++ eol
-        ++ scala_of_dnrc e'''''' ++ eol
-        ++ "))" ++ eol
-        ++ "}" ++ eol
-        ++ "}"
-    end.
+  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
+             (e: dnrc (type_annotation A) dataset) : string :=
+    ""
+      ++ "import org.apache.spark.sql.types._" ++ eol
+      ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
+      ++ "import org.apache.spark.sql.functions._" ++ eol
+      ++ "import org.qcert.QCertRuntime" ++ eol
+      ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
+      ++ initBrandHierarchy ++ eol
+      ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
+      ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
+      ++ "println(toBlob(" ++ eol
+      ++ scala_of_dnrc e ++ eol
+      ++ "))" ++ eol
+      ++ "}" ++ eol
+      ++ "}"
+  .
 
 End DNNRCtoScala.
 

@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+Require Import Basics.
 Require Import List String.
 Require Import Peano_dec.
 Require Import EquivDec.
@@ -96,7 +97,7 @@ Section DNNRCSparkIRRewrites.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCUnop t1 AFlatten
                (DNRCFor t2 x
@@ -120,7 +121,7 @@ Section DNNRCSparkIRRewrites.
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
           let ALG := (DNRCAlg algTypeA
-                            (DSFilter (CUDFCast "_ignored" brands (CCol "$type"))
+                            (DSFilter (CUDFCast brands (CCol "$type"))
                                       (DSVar "map_cast"))
                             (("map_cast"%string, xs)::nil)) in
           Some (DNRCUnop t1 AFlatten
@@ -179,8 +180,8 @@ Section DNNRCSparkIRRewrites.
 
   Definition rec_lift_unbrand
              {A : Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ _) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation _) dataset) :=
     match e with
     | DNRCFor t1 x (DNRCCollect t2 xs as c) e =>
       match lift_tlocal (di_required_typeof c) with
@@ -191,9 +192,9 @@ Section DNNRCSparkIRRewrites.
           let ALG :=
               (* TODO fresh name for lift_unbrand! *)
               DNRCAlg (dnrc_annotation_get xs)
-                      (DSSelect ((CAs "$blob" (CCol "unbranded.$blob"))
-                                   ::(CAs "$known" (CCol "unbranded.$known"))::nil)
-                                (DSSelect ((CUDFUnbrand "unbranded" t (CCol "$data"))::nil)
+                      (DSSelect (("$blob"%string, CCol "unbranded.$blob")
+                                   :: ("$known"%string, CCol "unbranded.$known")::nil)
+                                (DSSelect (("unbranded"%string, CUDFUnbrand t (CCol "$data"))::nil)
                                           (DSVar "lift_unbrand")))
                       (("lift_unbrand"%string, xs)::nil)
           in
@@ -205,18 +206,38 @@ Section DNNRCSparkIRRewrites.
     | _ => None
     end.
 
+
+  Fixpoint spark_equality_matches_qcert_equality_for_type (r: rtype₀) :=
+    match r with
+    | Nat₀
+    | Bool₀
+    | String₀ => true
+    | Rec₀ Closed fs =>
+      forallb (compose spark_equality_matches_qcert_equality_for_type snd) fs
+    | Either₀ l r  =>
+      andb (spark_equality_matches_qcert_equality_for_type l)
+           (spark_equality_matches_qcert_equality_for_type r)
+    | Bottom₀
+    | Top₀
+    | Unit₀ (* lit(null).equalTo(lit(null)) => NULL *)
+    | Coll₀ _ (* NOTE collections would work, if we kept them in order *)
+    | Rec₀ Open _
+    | Arrow₀ _ _
+    | Brand₀ _
+    | Foreign₀ _ => false
+    end.
+
   Fixpoint condition_to_column {A: Set}
-           (e: dnrc (type_annotation _ _ A) dataset)
-           (cname: string)
+           (e: dnrc (type_annotation A) dataset)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
     | DNRCUnop _ (ADot fld) (DNRCVar _ n) =>
       let (var, _) := binding in
       if (n == var)
-      then Some (CAs cname (CCol ("$known."%string ++ fld)))
+      then Some (CCol ("$known."%string ++ fld))
       else None
-(*    | DNRCVar _ n =>
+    (*    | DNRCVar _ n =>
       (* TODO generalize to multiple bindings, for joins *)
       let (var, expr) := binding in
       if (n == var)
@@ -227,36 +248,39 @@ Section DNNRCSparkIRRewrites.
               (CDot cname fld c))
            (condition_to_column c "c" binding) *)
     | DNRCConst _ d =>
-      lift (fun t => CLit cname (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
+      lift (fun t => CLit (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
     | DNRCBinop _ AEq l r =>
-      (* TODO check that the types of l and r admit Spark built-in equality *)
-      match condition_to_column l "l" binding, condition_to_column r "r" binding with
-      | Some l', Some r' =>
-        Some (CEq cname l' r')
-      | _, _ => None
+      let types_are_okay :=
+          lift2 (fun lt rt => andb (equiv_decb lt rt)
+                                   (spark_equality_matches_qcert_equality_for_type (proj1_sig lt)))
+                (lift_tlocal (di_typeof l)) (lift_tlocal (di_typeof r)) in
+      match types_are_okay, condition_to_column l binding, condition_to_column r binding with
+      | Some true, Some l', Some r' =>
+        Some (CEq l' r')
+      | _, _, _ => None
       end
     | DNRCBinop _ ASConcat l r =>
-      lift2 (CSConcat cname)
-            (condition_to_column l "l" binding)
-            (condition_to_column r "r" binding)
+      lift2 CSConcat
+            (condition_to_column l binding)
+            (condition_to_column r binding)
     (* TODO properly implement this *)
     | DNRCUnop _ AToString x =>
-      lift (CToString cname)
-           (condition_to_column x "x" binding)
+      lift CToString
+           (condition_to_column x binding)
 
     | _ => None
     end.
 
   Definition rec_if_else_empty_to_filter {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCUnop t1 AFlatten
                (DNRCFor t2 x (DNRCCollect t3 xs)
                         (DNRCIf _ condition
                                 thenE
                                 (DNNRC.DNRCConst _ (dcoll nil)))) =>
-      match condition_to_column condition "ignored" (x, CCol "abc") with
+      match condition_to_column condition (x, CCol "abc") with
       | Some c' =>
         let ALG :=
             DNRCAlg (dnrc_annotation_get xs)
@@ -272,8 +296,8 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCUnop t1 AFlatten
                (DNRCFor t2 x xs
@@ -283,8 +307,8 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition rec_for_to_select {A: Set}
-             (e: dnrc (type_annotation _ _ A) dataset):
-    option (dnrc (type_annotation _ _ A) dataset) :=
+             (e: dnrc (type_annotation A) dataset):
+    option (dnrc (type_annotation A) dataset) :=
     match e with
     | DNRCFor t1 x (DNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
@@ -292,13 +316,13 @@ Section DNNRCSparkIRRewrites.
        * This involves returning more than one column ... *)
       | Some String =>
         (* TODO rename condition_to_column, if this works *)
-        match condition_to_column body "value" (x, CCol "abc") with
+        match condition_to_column body (x, CCol "abc") with
         | Some body' =>
           (* TODO generalize to other types than String ... *)
           let ALG_type := Tdistr String in
           let ALG :=
               DNRCAlg (ta_mk (ta_base t1) ALG_type)
-                      (DSSelect (body'::nil) (DSVar "for_to_select"))
+                      (DSSelect (("value"%string, body')::nil) (DSVar "for_to_select"))
                       (("for_to_select"%string, xs)::nil)
           in
           Some (DNRCCollect t1 ALG)
@@ -308,6 +332,18 @@ Section DNNRCSparkIRRewrites.
       end
     | _ => None
     end.
+
+  Definition dnnrcToDatasetRewrite {A : Set}
+             (e: dnrc (type_annotation A) dataset)
+    :=
+      let e' := e in
+      let e'' := tryBottomUp rec_cast_to_filter e' in
+      let e''' := tryBottomUp rec_lift_unbrand e'' in
+      let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
+      let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
+      let e'''''' := tryBottomUp rec_for_to_select e''''' in
+      e''''''.
+
 
 End DNNRCSparkIRRewrites.
 
