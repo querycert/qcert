@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 
 /**
  * Represents a CAMP Map pattern 
@@ -24,14 +23,6 @@ public class MapPattern extends CampPattern {
 	public MapPattern(CampPattern operand) {
 		super(operand);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
 
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
@@ -39,6 +30,14 @@ public class MapPattern extends CampPattern {
 	@Override
 	public Kind getKind() {
 		return Kind.pmap;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "pmap";
 	}
 
 	/* (non-Javadoc)

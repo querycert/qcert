@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.data;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the dnat data constructor
@@ -29,19 +28,27 @@ public class NatData extends CampData {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-Javadoc)
 	 * @see org.qcert.camp.data.CampData#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.dnat;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[] {value};
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "dnat";
 	}
 
 	/**

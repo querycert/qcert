@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.data;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the dunit data constructor
@@ -23,14 +22,6 @@ import java.io.PrintWriter;
  */
 public class UnitData extends CampData {
 	UnitData() {}
-	
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
 
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.data.CampData#getKind()
@@ -38,6 +29,22 @@ public class UnitData extends CampData {
 	@Override
 	public Kind getKind() {
 		return Kind.dunit;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[0];
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "dunit";
 	}
 
 	/* (non-Javadoc)

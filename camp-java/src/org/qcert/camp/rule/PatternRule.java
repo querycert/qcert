@@ -24,12 +24,20 @@ import org.qcert.camp.pattern.CampPattern;
  */
 public abstract class PatternRule extends CampRule {
 	private final CampPattern pattern;
-	
+
 	/**
 	 * Subroutine constructor
 	 */
 	protected PatternRule(CampPattern pattern) {
 		this.pattern = pattern;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected final Object[] getOperands() {
+		return new Object[] {pattern};
 	}
 
 	public final CampPattern getPattern() {

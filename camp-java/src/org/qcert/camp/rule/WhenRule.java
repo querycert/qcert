@@ -15,8 +15,6 @@
  */
 package org.qcert.camp.rule;
 
-import java.io.PrintWriter;
-
 import org.qcert.camp.pattern.CampPattern;
 
 /**
@@ -31,19 +29,19 @@ public final class WhenRule extends PatternRule implements FunctionRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.When;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "rule_when";
 	}
 
 	/* (non-Javadoc)

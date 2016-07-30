@@ -20,8 +20,8 @@ import static org.qcert.camp.CampMacros.dot;
 import static org.qcert.camp.CampMacros.eq;
 import static org.qcert.camp.CampMacros.pand;
 import static org.qcert.camp.CampMacros.rec;
-import org.junit.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.qcert.camp.pattern.BinaryOperator;
 import org.qcert.camp.pattern.BinaryPattern;

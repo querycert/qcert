@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the CAMP letIt pattern
@@ -24,14 +23,6 @@ public class LetItPattern extends CampPattern {
 	public LetItPattern(CampPattern operand1, CampPattern operand2) {
 		super(operand1, operand2);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
 
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
@@ -39,6 +30,14 @@ public class LetItPattern extends CampPattern {
 	@Override
 	public Kind getKind() {
 		return Kind.pletIt;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "pletIt";
 	}
 
 	/* (non-Javadoc)

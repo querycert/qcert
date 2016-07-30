@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the CAMP It pattern
@@ -25,19 +24,19 @@ public class ItPattern extends CampPattern {
 	ItPattern() {}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.pit;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "pit";
 	}
 
 	/* (non-Javadoc)

@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.data;
 
-import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -28,14 +27,6 @@ public class RecData extends CampData {
 
 	public RecData(Map<String, CampData> contents) {
 		this.contents = contents;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -51,6 +42,22 @@ public class RecData extends CampData {
 	@Override
 	public Kind getKind() {
 		return Kind.drec;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return contents.entrySet().toArray();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "drec";
 	}
 
 	/* (non-Javadoc)

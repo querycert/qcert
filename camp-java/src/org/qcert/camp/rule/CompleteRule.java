@@ -19,14 +19,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.qcert.camp.CampAST;
+
 /**
  * Represents a rule formed from a chain of FunctionRules applied to a single
  *   RuleReturn on the right (right-associative application)
  */
 public final class CompleteRule extends CampRule implements SimpleRule {
 	private final FunctionRule left;
+
 	private final ReturnRule right;
-	
+
 	public CompleteRule(FunctionRule left, SimpleRule right) {
 		FunctionRule effectiveLeft;
 		ReturnRule effectiveRight;
@@ -40,21 +43,51 @@ public final class CompleteRule extends CampRule implements SimpleRule {
 		this.left = effectiveLeft;
 		this.right = effectiveRight;
 	}
-	
-	/* (non-Javadoc)
+
+	/**
+	 * Override emit to apply all rules right-associatively.
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
 	@Override
 	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
+		pw.append("(");
+		int close = 1;
+		if (left instanceof CompoundRule) {
+			for (CampRule rule : ((CompoundRule) left).getMembers()) {
+				rule.emit(pw);
+				pw.append(" (");
+				close++;
+			}
+		} else {
+			((CampRule) left).emit(pw);
+			pw.append(" ");
+		}
+		right.emit(pw);
+		pw.append(new String(new char[close]).replace('\0', ')'));
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.Complete;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // should not be called since we override emit
 	}
 
 	/**

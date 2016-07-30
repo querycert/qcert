@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the CAMP getConstant pattern
@@ -25,14 +24,6 @@ public class GetConstPattern extends CampPattern {
 
 	public GetConstPattern(String name) {
 		this.name = name;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
 	}
 
 	/* (non-Javadoc)
@@ -48,6 +39,22 @@ public class GetConstPattern extends CampPattern {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[] {name};
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "pgetconstant";
 	}
 
 	/* (non-Javadoc)

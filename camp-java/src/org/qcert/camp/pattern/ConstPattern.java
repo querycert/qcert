@@ -15,8 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
-
 import org.qcert.camp.data.CampData;
 import org.qcert.camp.data.StringData;
 
@@ -25,7 +23,7 @@ import org.qcert.camp.data.StringData;
  */
 public final class ConstPattern extends CampPattern {
 	private final CampData data;
-	
+
 	/**
 	 * Make a new PatternConst
 	 * @param data the CampData for the represented constant
@@ -33,33 +31,41 @@ public final class ConstPattern extends CampPattern {
 	public ConstPattern(CampData data) {
 		this.data = data;
 	}
-	
+
 	/** Convenience constructor for String constants */
 	public ConstPattern(String value) {
 		this(new StringData(value));
 	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
+	
 	/**
 	 * @return the data
 	 */
 	public CampData getData() {
 		return data;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.pconst;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[] {data};
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "pconst";
 	}
 
 	/* (non-Javadoc)

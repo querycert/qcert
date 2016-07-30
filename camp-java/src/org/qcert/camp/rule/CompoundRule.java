@@ -25,7 +25,7 @@ import java.util.List;
  */
 public final class CompoundRule extends CampRule implements FunctionRule {
 	private final List<CampRule> members;
-	
+
 	public CompoundRule(FunctionRule left, FunctionRule right) {
 		ArrayList<CampRule> members = new ArrayList<>();
 		if (left instanceof CompoundRule)
@@ -39,12 +39,18 @@ public final class CompoundRule extends CampRule implements FunctionRule {
 		this.members = Collections.unmodifiableList(members);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Special emitting function.  Note: the format for this case is not well-established.
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
 	@Override
 	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
+		pw.append("(compound ");
+		for (CampRule rule : members) {
+			rule.emit(pw);
+			pw.append(" ");
+		}
+		pw.append(")");
 	}
 	
 	/* (non-Javadoc)
@@ -60,6 +66,22 @@ public final class CompoundRule extends CampRule implements FunctionRule {
 	 */
 	public List<CampRule> getMembers() {
 		return members;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // should not be called since we override emit
 	}
 
 	/**

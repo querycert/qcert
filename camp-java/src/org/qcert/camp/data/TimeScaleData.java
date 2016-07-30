@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.data;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the time scale data constructor 
@@ -27,14 +26,6 @@ public class TimeScaleData extends CampData {
 	public TimeScaleData(Object timeScale) {
 		this.timeScale = timeScale;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
 
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.data.CampData#getKind()
@@ -42,6 +33,22 @@ public class TimeScaleData extends CampData {
 	@Override
 	public Kind getKind() {
 		return Kind.dtime_scale;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[] {timeScale};
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "dtime_scale";
 	}
 
 	/**

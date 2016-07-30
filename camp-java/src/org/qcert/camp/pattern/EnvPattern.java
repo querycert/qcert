@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 
 /**
  * Represents the CAMP env pattern
@@ -23,14 +22,6 @@ import java.io.PrintWriter;
  */
 public class EnvPattern extends CampPattern {
 	EnvPattern() {}
-	
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
 
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
@@ -38,6 +29,14 @@ public class EnvPattern extends CampPattern {
 	@Override
 	public Kind getKind() {
 		return Kind.penv;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "penv";
 	}
 
 	/* (non-Javadoc)

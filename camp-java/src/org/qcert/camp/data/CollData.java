@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.data;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -32,14 +31,6 @@ public class CollData extends CampData {
 		this.contents = contents;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
 	/**
 	 * @return the contents
 	 */
@@ -53,6 +44,22 @@ public class CollData extends CampData {
 	@Override
 	public Kind getKind() {
 		return Kind.dcoll;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return contents.toArray();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "dcoll";
 	}
 
 	/* (non-Javadoc)

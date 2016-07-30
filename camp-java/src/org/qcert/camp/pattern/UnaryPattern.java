@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -62,14 +61,6 @@ public final class UnaryPattern extends CampPattern {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
 	/**
 	 * Subroutine for formatting String or List<String> parameters
 	 */
@@ -96,6 +87,14 @@ public final class UnaryPattern extends CampPattern {
 		return Kind.punop;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[] {operator, getOperand()};
+	}
+
 	/**
 	 * @return the operator
 	 */
@@ -116,6 +115,14 @@ public final class UnaryPattern extends CampPattern {
 	 */
 	public String getStringParameter() {
 		return parameter instanceof String ? (String) parameter : null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "punop";
 	}
 
 	/* (non-Javadoc)

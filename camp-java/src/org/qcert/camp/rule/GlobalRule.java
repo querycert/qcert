@@ -15,8 +15,6 @@
  */
 package org.qcert.camp.rule;
 
-import java.io.PrintWriter;
-
 import org.qcert.camp.pattern.CampPattern;
 
 /**
@@ -29,14 +27,6 @@ public final class GlobalRule extends PatternRule implements FunctionRule {
 	public GlobalRule(CampPattern pattern) {
 		super(pattern);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
 
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
@@ -44,6 +34,14 @@ public final class GlobalRule extends PatternRule implements FunctionRule {
 	@Override
 	public Kind getKind() {
 		return Kind.Global;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "rule_global";
 	}
 
 	/* (non-Javadoc)

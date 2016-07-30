@@ -67,14 +67,14 @@ public enum UnaryOperator {
 	/** The kind of parameter taken by this operator */
 	private ParameterKind parameterKind;
 
-	/** Constructor */
-	UnaryOperator(ParameterKind parameterKind) {
-		this.parameterKind = parameterKind;
-	}
-	
 	/** Alternate constructor for the usual case of no parameter */
 	UnaryOperator() {
 		this(ParameterKind.None);
+	}
+	
+	/** Constructor */
+	UnaryOperator(ParameterKind parameterKind) {
+		this.parameterKind = parameterKind;
 	}
 	
 	/**

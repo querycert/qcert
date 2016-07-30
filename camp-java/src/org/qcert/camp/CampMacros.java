@@ -27,9 +27,9 @@ import org.qcert.camp.pattern.UnaryPattern;
  * Static macro constructions on top of Rules or CAMP
  */
 public class CampMacros {
-	/** The ^ macro from the paper, called 'pand' in the coq */
-	public static LetEnvPattern pand(CampPattern asserted, CampPattern successor) {
-		return new LetEnvPattern(new AssertPattern(asserted), successor);
+	/** A convenient macro for AConcat */
+	public static BinaryPattern concat(CampPattern left, CampPattern right) {
+		return new BinaryPattern(BinaryOperator.AConcat, left, right);
 	}
 	
 	/** A convenient macro for 'dot' */
@@ -42,13 +42,13 @@ public class CampMacros {
 		return new BinaryPattern(BinaryOperator.AEq, left, right);
 	}
 	
+	/** The ^ macro from the paper, called 'pand' in the coq */
+	public static LetEnvPattern pand(CampPattern asserted, CampPattern successor) {
+		return new LetEnvPattern(new AssertPattern(asserted), successor);
+	}
+	
 	/** A convenient macro for ARec */
 	public static UnaryPattern rec(String name, CampPattern value) {
 		return new UnaryPattern(UnaryOperator.ARec, name, value);
-	}
-	
-	/** A convenient macro for AConcat */
-	public static BinaryPattern concat(CampPattern left, CampPattern right) {
-		return new BinaryPattern(BinaryOperator.AConcat, left, right);
 	}
 }

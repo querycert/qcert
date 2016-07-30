@@ -17,11 +17,18 @@ package org.qcert.camp;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Map.Entry;
+
+import org.qcert.camp.data.CampData;
+import org.qcert.camp.pattern.BinaryOperator;
+import org.qcert.camp.pattern.UnaryOperator;
 
 /**
  * Describes a node in the Rules/CAMP AST
  */
 public abstract class CampAST {
+	private static final CharSequence ENTRY_TAG = "datt";
+
 	/** Utility emit method (generally called on the top node of the AST) */
 	public final String emit() {
 		StringWriter sw = new StringWriter();
@@ -32,6 +39,35 @@ public abstract class CampAST {
 	}
 
 	/** General purpose emit node capable of writing any node to any PrintWriter and called
-	 * recursively on an entire AST. */
-	public abstract void emit(PrintWriter pw);
+	 * recursively on an entire AST. 
+	 * This implementation serves for almost all nodes.  Overriding should be rare. */
+	public void emit(PrintWriter pw) {
+		pw.append("(").append(getTag());
+		for (Object op : getOperands()) {
+			if (op instanceof CampAST)
+				((CampAST) op).emit(pw.append(" "));
+			else if (op instanceof String)
+				pw.append(" \"").append((String) op).append("\"");
+			else if (op instanceof BinaryOperator || op instanceof UnaryOperator)
+				pw.append(" (").append(String.valueOf(op)).append(")");
+			else if (op instanceof Entry<?,?>) {
+				@SuppressWarnings("unchecked")
+				Entry<String, CampData> entry = (Entry<String, CampData>) op;
+				pw.append("(").append(ENTRY_TAG).append(" \"").append(entry.getKey()).append("\" ");
+				entry.getValue().emit(pw);
+				pw.append(")");
+			}
+		}
+		pw.append(")");
+	}
+
+	/**
+	 * @return the operands for the s-expression form of this node (Strings and/or CampASTs)
+	 */
+	protected abstract Object[] getOperands();
+
+	/**
+	 * @return the s-expression tag for this node 
+	 */
+	protected abstract String getTag();
 }

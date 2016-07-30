@@ -23,6 +23,10 @@ import org.qcert.camp.CampAST;
  * Represents CAMP data (for use in constants) 
  */
 public abstract class CampData extends CampAST {
+	public enum Kind {
+		  dunit, dnat, dbool, dstring, dcoll, drec, dleft, dright, dbrand,
+		  dfloat, dtime_scale, dtime_duration, dtime_point;
+	}
 	/** Single instance of dunit */
 	public static final UnitData UNIT = new UnitData();
 	/** Single instance of dright of dunit */
@@ -33,13 +37,9 @@ public abstract class CampData extends CampAST {
 	public static final BoolData FALSE = new BoolData(false);
 	/** Single instance of the empty collection */
 	public static final CollData EMPTY_COLL = new CollData(Collections.emptyList());
+	
 	/** Single instance of the empty record */
 	public static final RecData EMPTY_REC = new RecData(Collections.emptyMap());
 	
 	public abstract Kind getKind();
-	
-	public enum Kind {
-		  dunit, dnat, dbool, dstring, dcoll, drec, dleft, dright, dbrand,
-		  dfloat, dtime_scale, dtime_duration, dtime_point;
-	}
 }

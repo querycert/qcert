@@ -15,7 +15,6 @@
  */
 package org.qcert.camp.pattern;
 
-import java.io.PrintWriter;
 
 /**
  * Represents a CAMP Binary Operator pattern 
@@ -29,14 +28,6 @@ public class BinaryPattern extends CampPattern {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
-	 */
-	@Override
-	public void emit(PrintWriter pw) {
-		// TODO Auto-generated method stub
-	}
-
-	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
 	 */
 	@Override
@@ -44,11 +35,27 @@ public class BinaryPattern extends CampPattern {
 		return Kind.pbinop;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		return new Object[] {operator, getOperand1(), getOperand2()};
+	}
+
 	/**
 	 * @return the operator
 	 */
 	public BinaryOperator getOperator() {
 		return operator;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "pbinop";
 	}
 
 	/* (non-Javadoc)
