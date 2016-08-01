@@ -1,0 +1,9 @@
+{ "CONST$Persons" :
+  { "$coll" : { "pid" : "Nat",
+		"name" : "String",
+		"age" : "Nat",
+		"company" : "Nat" } },
+  "CONST$Companies" :
+  { "$coll" : { "cid" : "Nat",
+		"cname" : "String",
+		"departments" : { "$coll" : "String" } } } }
