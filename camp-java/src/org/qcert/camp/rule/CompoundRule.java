@@ -23,22 +23,39 @@ import java.util.List;
 /**
  * Represents a compound rule formed from other FunctionRules 
  */
-public final class CompoundRule extends CampRule implements FunctionRule {
+public final class CompoundRule extends CampRule {
 	private final List<CampRule> members;
 
-	public CompoundRule(FunctionRule left, FunctionRule right) {
+	public CompoundRule(CampRule left, CampRule right) {
 		ArrayList<CampRule> members = new ArrayList<>();
 		if (left instanceof CompoundRule)
 			members.addAll(((CompoundRule) left).members);
+		else if (left.isFunction())
+			members.add(left);
 		else
-			members.add((CampRule) left);
+			throw new IllegalArgumentException("First rule argment is not a function");
 		if (right instanceof CompoundRule)
 			members.addAll(((CompoundRule) right).members);
+		else if (right.isFunction())
+			members.add(right);
 		else
-			members.add((CampRule) right);
+			throw new IllegalArgumentException("Second rule argment is not a function");
 		this.members = Collections.unmodifiableList(members);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
+	 */
+	@Override
+	public CampRule apply(CampRule rule) {
+		List<CampRule> toApply = new ArrayList<>(members);
+		Collections.reverse(toApply);
+		for (CampRule next : toApply) {
+			rule = next.apply(rule);
+		}
+		return rule;
+	}
+	
 	/**
 	 * Special emitting function.  Note: the format for this case is not well-established.
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
@@ -52,7 +69,7 @@ public final class CompoundRule extends CampRule implements FunctionRule {
 		}
 		pw.append(")");
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
@@ -82,6 +99,14 @@ public final class CompoundRule extends CampRule implements FunctionRule {
 	@Override
 	protected String getTag() {
 		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#isFunction()
+	 */
+	@Override
+	public boolean isFunction() {
+		return true;
 	}
 
 	/**

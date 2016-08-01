@@ -20,12 +20,29 @@ import org.qcert.camp.pattern.CampPattern;
 /**
  * Represnts rule_when in the Rule macro language 
  */
-public final class WhenRule extends PatternRule implements FunctionRule {
+public final class WhenRule extends PatternRule {
 	/**
-	 * Make a RuleWhen given its pattern
+	 * Make a WhenRule in functional form, given its pattern
 	 */
 	public WhenRule(CampPattern pattern) {
-		super(pattern);
+		super(pattern, null);
+	}
+
+	/**
+	 * Make a new WhenRule from a functional WhenRule and an operand 
+	 * @param functional the functional WhenRule
+	 * @param operand the operand
+	 */
+	private WhenRule(WhenRule functional, CampRule operand) {
+		super(functional.getPattern(), operand);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
+	 */
+	@Override
+	public CampRule apply(CampRule operand) {
+		return new WhenRule(this, operand);
 	}
 
 	/* (non-Javadoc)

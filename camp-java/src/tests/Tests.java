@@ -29,19 +29,18 @@ import org.qcert.camp.pattern.CampPattern;
 import org.qcert.camp.pattern.ConstPattern;
 import org.qcert.camp.pattern.LetEnvPattern;
 import org.qcert.camp.pattern.UnaryPattern;
-import org.qcert.camp.rule.CompleteRule;
-import org.qcert.camp.rule.CompoundRule;
+import org.qcert.camp.rule.CampRule;
 import org.qcert.camp.rule.ReturnRule;
 import org.qcert.camp.rule.WhenRule;
 
 /** Constructs the example in the ECOOP 2013 paper, Figure 6 */
 public class Tests {
-	private static final String compare = String.format(
-    "rule_when (let ENV += assert AEq(ADot \"type\" (IT), \"Client\") in let ENV += ARec \"C\" (IT) in ENV) ;;%n" +
-	"rule_when (let ENV += assert let ENV += assert AEq(ADot \"type\" (IT), \"Marketer\") in AContains(ADot \"id\" " + 
-	   "(ADot \"data\" (ADot \"C\" (ENV))), ADot \"clients\" (ADot \"data\" (IT))) in let ENV += ARec \"M\" (IT) in ENV) ;;%n" +
-	"rule_return (AConcat(ARec \"type\" (\"C2M\"), ARec \"data\" (AConcat(ARec \"client\" (ADot \"C\" (ENV)), " + 
-	   "ARec \"marketer\" (ADot \"M\" (ENV))))))");
+	private static final String compare = "(rule_when (pletEnv (passert (pbinop (AEq) (punop (ADot) (pit))" +
+			" (pconst (dstring \"Client\")))) (pletEnv (punop (ARec) (pit)) (penv))) (rule_when (pletEnv (passert (pletEnv " +
+			"(passert (pbinop (AEq) (punop (ADot) (pit)) (pconst (dstring \"Marketer\")))) (pbinop (AContains) (punop (ADot)" +
+			" (punop (ADot) (punop (ADot) (penv)))) (punop (ADot) (punop (ADot) (pit)))))) (pletEnv (punop (ARec) (pit)) (penv))) " +
+			"(rule_return (pbinop (AConcat) (punop (ARec) (pconst (dstring \"C2M\"))) (punop (ARec) (pbinop (AConcat) (punop " +
+			"(ARec) (punop (ADot) (penv))) (punop (ARec) (punop (ADot) (penv)))))))))";
 
 	@Test
 	public void Test1() {
@@ -73,7 +72,7 @@ public class Tests {
 		CampPattern marketer = rec("marketer", dot(ConstPattern.ENV, "M"));
 		CampPattern data = rec("data", concat(client, marketer));
 		ReturnRule ret = new ReturnRule(concat(type, data));
-		CompleteRule ans = new CompleteRule(new CompoundRule(when1, when2), ret);
+		CampRule ans = when1.apply(when2.apply(ret));
 		String result = ans.emit();
 		System.out.println(result);
 		Assert.assertEquals("incorrect result. ", compare, result);

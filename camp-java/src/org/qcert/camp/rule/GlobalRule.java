@@ -20,12 +20,29 @@ import org.qcert.camp.pattern.CampPattern;
 /**
  * Represnts rule_global in the Rule macro language 
  */
-public final class GlobalRule extends PatternRule implements FunctionRule {
+public final class GlobalRule extends PatternRule {
 	/**
-	 * Make a new RuleGlobal given its pattern
+	 * Make a new GlobalRule in functional form, given its pattern
 	 */
 	public GlobalRule(CampPattern pattern) {
-		super(pattern);
+		super(pattern, null);
+	}
+	
+	/**
+	 * Make a new GlobalRule from a functional GlobalRule and an operand 
+	 * @param functional the functional GlobalRule
+	 * @param operand the operand
+	 */
+	private GlobalRule(GlobalRule functional, CampRule operand) {
+		super(functional.getPattern(), operand);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
+	 */
+	@Override
+	public CampRule apply(CampRule operand) {
+		return new GlobalRule(this, operand);
 	}
 
 	/* (non-Javadoc)

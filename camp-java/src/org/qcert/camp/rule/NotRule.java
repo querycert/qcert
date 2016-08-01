@@ -20,12 +20,29 @@ import org.qcert.camp.pattern.CampPattern;
 /**
  * Represents rule_not in the Rule macro language
  */
-public final class NotRule extends PatternRule implements FunctionRule {
+public final class NotRule extends PatternRule {
 	/**
-	 * Make a RuleNot given its pattern
+	 * Make a NotRule in functional form, given its pattern
 	 */
 	public NotRule(CampPattern pattern) {
-		super(pattern);
+		super(pattern, null);
+	}
+	
+	/**
+	 * Make a new NotRule from a functional NotRule and an operand 
+	 * @param functional the functional NotRule
+	 * @param operand the operand
+	 */
+	private NotRule(NotRule functional, CampRule operand) {
+		super(functional.getPattern(), operand);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
+	 */
+	@Override
+	public CampRule apply(CampRule operand) {
+		return new NotRule(this, operand);
 	}
 
 	/* (non-Javadoc)

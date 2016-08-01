@@ -26,4 +26,8 @@ public abstract class CampRule extends CampAST {
 	}
 	
 	public abstract Kind getKind();
+	
+	public abstract boolean isFunction();
+	
+	public abstract CampRule apply(CampRule operand);
 }

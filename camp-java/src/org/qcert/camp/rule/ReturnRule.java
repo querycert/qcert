@@ -20,12 +20,20 @@ import org.qcert.camp.pattern.CampPattern;
 /**
  * Represnts rule_return in the Rule macro language 
  */
-public final class ReturnRule extends PatternRule implements SimpleRule {
+public final class ReturnRule extends PatternRule {
 	/**
-	 * Make a RuleReturn given its pattern
+	 * Make a ReturnRule given its pattern
 	 */
 	public ReturnRule(CampPattern pattern) {
-		super(pattern);
+		super(pattern, null); // never has a rule operand
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
+	 */
+	@Override
+	public CampRule apply(CampRule operand) {
+		throw new IllegalStateException("A ReturnRule cannot be applied as a function");
 	}
 
 	/* (non-Javadoc)

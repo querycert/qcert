@@ -19,28 +19,60 @@ import org.qcert.camp.pattern.CampPattern;
 
 /**
  * Abstract parent of all CampRule specializations that contain a pattern.  This covers all
- *   four kinds defined in the Rule ADT  ... however, Rules formed from composing or applying
- *   simpler rules do not directly contain a pattern and so do not inherit from this parent.
+ *   four kinds defined in the Rule ADT  ... however, Rules formed from composing simpler rules 
+ *   do not directly contain a pattern and so do not inherit from this parent.
+ * This class also provides a field for a rule operand.  However, a ReturnRule never has one
+ *   and other pattern rules may or may not have one depending on whether they are in their
+ *   functional form or applied form.
  */
 public abstract class PatternRule extends CampRule {
 	private final CampPattern pattern;
+	private final CampRule operand;
 
 	/**
 	 * Subroutine constructor
 	 */
-	protected PatternRule(CampPattern pattern) {
+	protected PatternRule(CampPattern pattern, CampRule operand) {
 		this.pattern = pattern;
+		this.operand = operand;
 	}
 	
+	/**
+	 * @return the rule operand
+	 */
+	public CampRule getOperand() {
+		return operand;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.CampAST#getOperands()
 	 */
 	@Override
 	protected final Object[] getOperands() {
-		return new Object[] {pattern};
+		if (operand == null)
+			return new Object[] {pattern};
+		else
+			return new Object[] {pattern, operand};
 	}
 
 	public final CampPattern getPattern() {
 		return pattern;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.rule.CampRule#isFunction()
+	 */
+	@Override
+	public boolean isFunction() {
+		return operand == null;
 	}
 }
