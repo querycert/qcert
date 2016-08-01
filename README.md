@@ -161,7 +161,7 @@ make run_js_test1
 
 (In the [`./samples`](./samples) directory)
 
-To run a query compiled to Java, you must first compiler it by calling
+To run a query compiled to Java, you must first compile it by calling
 `javac` for the produced Java code, then call `java` with the
 `RunJava` query runner. You will need to pass it three pieces of
 information: (i) the location of the gson jar which is used to parse
