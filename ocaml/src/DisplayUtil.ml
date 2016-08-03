@@ -89,30 +89,25 @@ let display_algenv_top conf modelandtype (fname,op) =
       make_file fout_dnrc_dataset display_opt_dnrc_dataset;
     end
 
-let sexp_string_to_nra s =
-  ParseString.parse_nra_sexp_from_string s
+(* S-expression hooks *)
+      
+let sexp_string_to_camp s = ParseString.parse_camp_sexp_from_string s
+let camp_to_sexp_string p = SExp.sexp_to_string (Asts.camp_to_sexp p)
 
-let nra_to_sexp_string op =
-  SExp.sexp_to_string (Asts.alg_to_sexp op)
+let sexp_string_to_nra s = ParseString.parse_nra_sexp_from_string s
+let nra_to_sexp_string op = SExp.sexp_to_string (Asts.alg_to_sexp op)
 
-let sexp_string_to_nrc s =
-  ParseString.parse_nrc_sexp_from_string s
+let sexp_string_to_nrc s = ParseString.parse_nrc_sexp_from_string s
+let nrc_to_sexp_string n = SExp.sexp_to_string (Asts.nrc_to_sexp n)
 
-let nrc_to_sexp_string n =
-  SExp.sexp_to_string (Asts.nrc_to_sexp n)
+let sexp_string_to_nrcmr s = ParseString.parse_nrcmr_sexp_from_string s
+let nrcmr_to_sexp_string n = SExp.sexp_to_string (Asts.nrcmr_to_sexp n)
 
-let sexp_string_to_nrcmr s =
-  ParseString.parse_nrcmr_sexp_from_string s
+let sexp_string_to_cldmr s = ParseString.parse_cldmr_sexp_from_string s
+let cldmr_to_sexp_string n = SExp.sexp_to_string (Asts.cldmr_to_sexp n)
 
-let nrcmr_to_sexp_string n =
-  SExp.sexp_to_string (Asts.nrcmr_to_sexp n)
-
-let sexp_string_to_cldmr s =
-  ParseString.parse_cldmr_sexp_from_string s
-
-let cldmr_to_sexp_string n =
-  SExp.sexp_to_string (Asts.cldmr_to_sexp n)
-
+(* Top-level *)
+    
 let sexp_algenv_top conf (fname,op) =
   let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
   let display_nra = nra_to_sexp_string op in
@@ -134,6 +129,8 @@ let sexp_algenv_top conf (fname,op) =
     make_file fout_nrcmr_cldmr display_nrcmr_cldmr
   end
 
+(* SData section *)
+    
 let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
   let fpref = Filename.chop_extension fname in
   let fout_sdata = outname (target_f (get_data_dir conf) fpref) (suffix_sdata ()) in
@@ -141,5 +138,4 @@ let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
     String.concat "\n" sdata
   in
   make_file fout_sdata sdata
-
 

@@ -62,6 +62,7 @@ let parse_oql_from_file f : oql_ast = parse_file parse_oql f
 
 let parse_sexp_from_file s : sexp_ast = parse_file parse_sexp s
 let parse_io_sexp_from_file s : data_ast = parse_file parse_io_sexp s
+let parse_camp_sexp_from_file s : camp = parse_file parse_camp_sexp s
 let parse_nra_sexp_from_file s : algenv = parse_file parse_nra_sexp s
 let parse_nrc_sexp_from_file s : nrc = parse_file parse_nrc_sexp s
 let parse_nrcmr_sexp_from_file s : nrcmr = parse_file parse_nrcmr_sexp s

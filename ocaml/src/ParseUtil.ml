@@ -64,6 +64,7 @@ let parse_oql f : oql_ast = OQL.tableify (parse OQLParser.main (OQLLexer.token (
 
 let parse_sexp f : sexp_ast = parse SExpParser.main (SExpLexer.token (string_buff ())) f
 let parse_io_sexp f : data_ast = sexp_to_data (parse_sexp f)
+let parse_camp_sexp f : camp = sexp_to_camp (parse_sexp f)
 let parse_nra_sexp f : algenv = sexp_to_alg (parse_sexp f)
 let parse_nrc_sexp f : nrc = sexp_to_nrc (parse_sexp f)
 let parse_nrcmr_sexp f : nrcmr = sexp_to_nrcmr (parse_sexp f)

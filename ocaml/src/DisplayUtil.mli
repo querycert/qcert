@@ -28,6 +28,9 @@ val display_algenv_top : comp_config -> (RType.brand_model * RType.camp_type) op
 
 (* SExp ILs *)
     
+val sexp_string_to_camp : string -> camp
+val camp_to_sexp_string : camp -> string
+
 val sexp_string_to_nra : string -> algenv
 val nra_to_sexp_string : algenv -> string
 
