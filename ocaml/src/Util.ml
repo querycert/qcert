@@ -150,3 +150,6 @@ let float_listmax l =
   match l with
   | [] -> neg_infinity
   | c :: ls -> float_listmax_aux ls c
+
+let qcert_string_of_float f =
+  string_of_float f
