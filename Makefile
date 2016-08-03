@@ -199,6 +199,7 @@ MODULES = \
 	Backend/NNRCtoJavascript \
 	Backend/NNRCMRtoSpark \
 	Backend/NNRCMRtoCloudant \
+	Backend/NNRCMRtoDNNRC \
 	Backend/CloudantMRtoJavascript \
 	Backend/SparkData \
 	Backend/DNNRCSparkIRRewrites \
