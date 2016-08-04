@@ -32,6 +32,12 @@ let display_to_string conf modelandtype op =
   let nrcmrstring = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) opt_nnrcmr in
   let nrcmr_spark_string = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) nnrcmr_spark in
   let nrcmr_cldmr_string = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) nnrcmr_cldmr in
+  let untyped_dnrc_string_thunk (_:unit) =
+    PrettyIL.pretty_dnrc
+      PrettyIL.pretty_annotate_ignore
+      (PrettyIL.pretty_plug_nraenv (get_charset_bool conf))
+      (get_charset_bool conf) (get_margin conf)
+      (CompCore.tcompile_nraenv_to_dnnrc_typed_opt op) in
   let opt_dnrc_dataset_string =
     begin
     match modelandtype with
@@ -47,9 +53,9 @@ let display_to_string conf modelandtype op =
 			   (get_charset_bool conf) PrettyIL.pretty_annotate_ignore)
 			(PrettyIL.pretty_plug_dataset (get_charset_bool conf))
 			(get_charset_bool conf) (get_margin conf) ds
-	 | None -> "DNRC expression was not well typed"
+	 | None -> "DNRC expression was not well typed.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
        end
-    | None -> "Optimized DNRC expression can't be determined without a schema"
+    | None -> "Optimized DNRC expression can't be determined without a schema.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
     end
   in (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string, opt_dnrc_dataset_string)
 
