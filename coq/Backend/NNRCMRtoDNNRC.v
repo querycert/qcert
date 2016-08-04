@@ -75,27 +75,25 @@ Section NNRCMRToDNNRC.
   Definition dnnrc_distr_of_mr_map (annot:A) (input: var) (mr_map: map_fun) : (@dnrc _ A plug_type) :=
     match mr_map with
     | MapDist (x, n) =>
-      (* XXX TODO: check Distributed map XXX*)
       DNRCFor annot x (DNRCVar annot input) (nrc_to_dnrc annot ((x, Vlocal)::nil) n)
     | MapDistFlatten (x, n) =>
-      (* XXX TODO: change to Distributed FlatMap !!!!!!!! XXX*)
-      DNRCFor annot x (DNRCVar annot input) (nrc_to_dnrc annot ((x, Vlocal)::nil) n)
+      let res_map :=
+          DNRCFor annot x (DNRCVar annot input) (nrc_to_dnrc annot ((x, Vlocal)::nil) n)
+      in
+      DNRCUnop annot AFlatten res_map
     | MapScalar (x, n) =>
       let distr_input := DNRCDispatch annot (DNRCVar annot input) in
-      (* XXX TODO: check Distributed map XXX*)
       DNRCFor annot x distr_input (nrc_to_dnrc annot ((x, Vlocal)::nil) n)
     end.
 
   Definition dnnrc_local_of_mr_map (annot:A) (input: var) (mr_map: map_fun) : (@dnrc _ A plug_type) :=
     match mr_map with
     | MapDist (x, n) =>
-      (* XXX TODO: check Distributed map XXX*)
       let res_map := DNRCFor annot x (DNRCVar annot input) (nrc_to_dnrc annot ((x, Vlocal)::nil) n) in
       DNRCCollect annot res_map
     | MapDistFlatten (x, n) =>
-      (* XXX TODO: change to Distributed FlatMap !!!!!!!! XXX *)
       let res_map := DNRCFor annot x (DNRCVar annot input) (nrc_to_dnrc annot ((x, Vlocal)::nil) n) in
-      DNRCCollect annot res_map
+      DNRCCollect annot (DNRCUnop annot AFlatten res_map)
     | MapScalar (x, n) =>
       DNRCFor annot x (DNRCVar annot input) (nrc_to_dnrc annot ((x, Vlocal)::nil) n)
     end.
@@ -123,7 +121,7 @@ Section NNRCMRToDNNRC.
         Some (DNRCLet annot
                       (mr_output mr)
                       (if in_dec equiv_dec (mr_output mr) outputs then
-                         DNRCBinop annot AUnion (DNRCVar annot (mr_output mr)) n (* XXX TODO: does it work on distributed collection? *)
+                         DNRCBinop annot AUnion (DNRCVar annot (mr_output mr)) n
                        else n)
                       k)
       | _ => None
@@ -213,8 +211,7 @@ Section NNRCMRToSequentialDNNRC.
          match x_loc with
          | (x, Vdistr) => lift (DNRCLet annot x (DNRCCollect annot (DNRCVar annot x))) k
          | (x, Vlocal) => k
-         end
-      )
+         end)
       (olift (seq_dnnrc_of_mr_chain annot nil (mr_chain l)) k)
       last_args.
 
