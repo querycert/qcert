@@ -873,19 +873,19 @@ let pretty_plug_nraenv greek ff a =
 
 let rec pretty_rtype_aux sym ff rt =
   match rt with
-  | Hack.Bottom__U2080_ -> fprintf ff "%a" pretty_sym sym.bot
-  | Hack.Top__U2080_ ->  fprintf ff "%a" pretty_sym sym.top
-  | Hack.Unit__U2080_ -> fprintf ff "Unit"
-  | Hack.Nat__U2080_ -> fprintf ff "Nat"
-  | Hack.Bool__U2080_ -> fprintf ff "Bool"
-  | Hack.String__U2080_ -> fprintf ff "String"
-  | Hack.Coll__U2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
-  | Hack.Rec__U2080_ (Hack.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
-  | Hack.Rec__U2080_ (Hack.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
-  | Hack.Either__U2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Hack.Arrow__U2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Hack.Brand__U2080_ bds -> fprintf ff "@[<hv 2>Brands [@[<hv 0>%a@]]@]" pretty_names bds
-  | Hack.Foreign__U2080_ rf -> fprintf ff "Foreign"
+  | Hack.Bottom_UU2080_ -> fprintf ff "%a" pretty_sym sym.bot
+  | Hack.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
+  | Hack.Unit_UU2080_ -> fprintf ff "Unit"
+  | Hack.Nat_UU2080_ -> fprintf ff "Nat"
+  | Hack.Bool_UU2080_ -> fprintf ff "Bool"
+  | Hack.String_UU2080_ -> fprintf ff "String"
+  | Hack.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
+  | Hack.Rec_UU2080_ (Hack.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
+  | Hack.Rec_UU2080_ (Hack.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
+  | Hack.Either_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Hack.Arrow_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Hack.Brand_UU2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
+  | Hack.Foreign_UU2080_ rf -> fprintf ff "Foreign"
 
 and pretty_rec_type sym ff rl =
   match rl with
