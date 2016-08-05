@@ -174,6 +174,12 @@ Section DNNRCtoScala.
     | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
+  Definition spark_of_unop (op: unaryOp) (x: string) : string :=
+    match op with
+    | ACount => x ++ ".count()" (* This returns a long, is this a problem? *)
+    | _ => "SPARK_OF_UNOP don't know how to generate Spark code for this operator"
+    end.
+
   Definition scala_of_unop (required_type: drtype) (op: unaryOp) (x: string) : string :=
     let prefix s := s ++ "(" ++ x ++ ")" in
     let postfix s := x ++ "." ++ s in
@@ -205,7 +211,7 @@ Section DNNRCtoScala.
     | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
-    | AToString => prefix "toBlob" (* TODO what are the exact semantics for AToString? *)
+    | AToString => prefix "QCertRuntime.toQCertString"
     | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand =>
       match lift_tlocal required_type with
@@ -223,6 +229,12 @@ Section DNNRCtoScala.
     | ASingleton => "SINGLETON???"
     | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
     | AUArith ArithSqrt => "SQRT???" (* Integer sqrt? Not sure what the Coq semantics are. *)
+    end.
+
+  Definition spark_of_binop (op: binOp) (x: string) (y: string) : string :=
+    match op with
+    | AUnion => x ++ ".union(" ++ y ++ ")"
+    | _ => "SPARK_OF_BINOP don't know how to generate Spark code for this operator"
     end.
 
   Definition scala_of_binop (op: binOp) (l: string) (r: string) : string :=
@@ -278,15 +290,23 @@ Section DNNRCtoScala.
           | None => "Don't know how to construct a distributed constant"
           end
         | DNRCBinop t op x y =>
-          scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
+          match di_typeof x, di_typeof y with
+          | Tlocal _, Tlocal _ => scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
+          | Tdistr _, Tdistr _ => spark_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
+          | _, _ => "DONT_SUPPORT_MIXED_LOCAL_DISTRIBUTED_BINARY_OPERATORS"
+          end
         | DNRCUnop t op x =>
-          scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
+          match di_typeof x with
+          | Tlocal _ => scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
+          | Tdistr _ => spark_of_unop op (scala_of_dnrc x)
+          end
         | DNRCLet t n x y => (* let n: t = x in y *) (* TODO could use line break *)
           "{ val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
                    scala_of_dnrc y ++ " }"
-        | DNRCFor t n x y => (* x.map((n: t) => y) *) (* TODO might not need braces, could use line breaks *)
+        | DNRCFor t n x y =>
+          (* TODO for distributed map of non-record-like-things we have to unwrap *)
           scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
-        | DNRCIf t x y z => (* if (x) y else z *) (* TODO might not need parentheses *)
+        | DNRCIf t x y z =>
           "(if (" ++ scala_of_dnrc x ++ ") " ++ scala_of_dnrc y ++ " else " ++ scala_of_dnrc z ++ ")"
         | DNRCEither t x vy y vz z =>
           match olift tuneither (lift_tlocal (di_required_typeof x)) with
@@ -365,6 +385,8 @@ Section DNNRCtoScala.
       ++ initBrandHierarchy ++ eol
       ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
       ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
+      (* sparkSession is a field in QCertRuntime. What it does in an import? I have no idea! *)
+      ++ "  import sparkSession.implicits._" ++ eol
       ++ "println(toBlob(" ++ eol
       ++ scala_of_dnrc e ++ eol
       ++ "))" ++ eol

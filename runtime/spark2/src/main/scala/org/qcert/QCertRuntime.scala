@@ -19,7 +19,7 @@ package org.qcert
 import java.util
 import java.util.Comparator
 
-import com.google.gson.JsonElement
+import com.google.gson.{GsonBuilder, JsonElement}
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
@@ -29,19 +29,20 @@ import org.apache.spark.sql.functions._
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
+
+
+
 object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
-    val res = {CONST$WORLD.select(lit(null).equalTo(lit(null)))}
-
-
-    res.explain(true)
-
-    res.show()
-
-    res.collect().map((row) => row(0)).foreach(println(_))
-
+    val df1 = sparkSession.read.json("/Users/stefanfehrenbach/or.json")
+    import sparkSession.implicits._
+    df1.printSchema()
+    df1.show()
+    df1.count()
+    df1.map(r => r.getAs[Long](0)).show()
+    df1.union(df1).show()
   }
 }
 
@@ -57,6 +58,8 @@ object test extends QCertRuntime {
   * It declares abstract members like `run` and the world type for initial data loading.
   */
 object QCertRuntime {
+  def blobToQCertString(x: String): String = x // TODO
+
   def toQCertString(x: Any): String = x match {
     case null => "UNIT" // null is unit, right?
     case x: Int => x.toString
@@ -64,8 +67,19 @@ object QCertRuntime {
     case false => "FALSE"
     case x: String => x // no quotes!
     case x: Array[_] => x.map(QCertRuntime.toQCertString).mkString("[", ", ", "]")
-    // Open records, as always, are being bloody difficult...
-    case x: Row => x.toString // TODO
+    case x: Row => x.schema.fieldNames match {
+      case Array("$left", "$right") =>
+        if (x.isNullAt(0))
+          "Right(" + toQCertString(x(0)) + ")"
+        else
+          "Left(" + toQCertString(x(1)) + ")"
+      case Array("$type", "$data") =>
+        val brands = x.getSeq[String](0).mkString(" & ")
+        val data = blobToQCertString(x.getAs[String](1))
+        s"<$brands:$data>"
+      case Array("$blob", "$known") =>
+        blobToQCertString(x.getAs[String](0))
+    }
   }
 
   def toQCertStringUDF =
@@ -177,7 +191,7 @@ object QCertRuntime {
 abstract class QCertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
 
-  val gson = new com.google.gson.Gson()
+  val gson = new GsonBuilder().disableHtmlEscaping().create()
   val gsonParser = new com.google.gson.JsonParser()
 
   def run(world: Dataset[Row])
