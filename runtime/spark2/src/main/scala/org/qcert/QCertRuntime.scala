@@ -29,19 +29,20 @@ import org.apache.spark.sql.functions._
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 
+
+
+
 object test extends QCertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
-    val res = {CONST$WORLD.select(lit(null).equalTo(lit(null)))}
-
-
-    res.explain(true)
-
-    res.show()
-
-    res.collect().map((row) => row(0)).foreach(println(_))
-
+    val df1 = sparkSession.read.json("/Users/stefanfehrenbach/or.json")
+    import sparkSession.implicits._
+    df1.printSchema()
+    df1.show()
+    df1.count()
+    df1.map(r => r.getAs[Long](0)).show()
+    df1.union(df1).show()
   }
 }
 
