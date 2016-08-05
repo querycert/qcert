@@ -21,9 +21,9 @@ in Coq.
 
 To build Q\*cert from the source, you will need:
 
- - OCaml 4.01 or later (http://ocaml.org/) along with the following libraries:
-  - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
+ - OCaml 4.02 or later (http://ocaml.org/) along with the following libraries:
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
+  - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
   - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
  - Coq 8.5pl2 or later (https://coq.inria.fr/)
 
@@ -32,8 +32,8 @@ package manager (https://opam.ocaml.org). Once opam is installed, you
 can just add the corresponding libraries:
 
 ```
-opam install ocamlbuild
 opam install menhir
+opam install ocamlbuild
 opam install camlp5
 opam install coq
 ```
