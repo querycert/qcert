@@ -211,7 +211,7 @@ Section DNNRCtoScala.
     | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
-    | AToString => prefix "toBlob" (* TODO what are the exact semantics for AToString? *)
+    | AToString => prefix "QCertRuntime.toQCertString"
     | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand =>
       match lift_tlocal required_type with

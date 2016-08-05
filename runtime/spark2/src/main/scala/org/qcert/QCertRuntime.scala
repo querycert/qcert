@@ -58,6 +58,8 @@ object test extends QCertRuntime {
   * It declares abstract members like `run` and the world type for initial data loading.
   */
 object QCertRuntime {
+  def blobToQCertString(x: String): String = x // TODO
+
   def toQCertString(x: Any): String = x match {
     case null => "UNIT" // null is unit, right?
     case x: Int => x.toString
@@ -65,8 +67,19 @@ object QCertRuntime {
     case false => "FALSE"
     case x: String => x // no quotes!
     case x: Array[_] => x.map(QCertRuntime.toQCertString).mkString("[", ", ", "]")
-    // Open records, as always, are being bloody difficult...
-    case x: Row => x.toString // TODO
+    case x: Row => x.schema.fieldNames match {
+      case Array("$left", "$right") =>
+        if (x.isNullAt(0))
+          "Right(" + toQCertString(x(0)) + ")"
+        else
+          "Left(" + toQCertString(x(1)) + ")"
+      case Array("$type", "$data") =>
+        val brands = x.getSeq[String](0).mkString(" & ")
+        val data = blobToQCertString(x.getAs[String](1))
+        s"<$brands:$data>"
+      case Array("$blob", "$known") =>
+        blobToQCertString(x.getAs[String](0))
+    }
   }
 
   def toQCertStringUDF =
