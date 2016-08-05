@@ -23,7 +23,7 @@ To build Q\*cert from the source, you will need:
   - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
- - Coq 8.5pl1 or later (https://coq.inria.fr/)
+ - Coq 8.5pl2 or later (https://coq.inria.fr/)
 
 An easy way to get set up on most platforms is to use the OCaml
 package manager (https://opam.ocaml.org). Once opam is installed, you
