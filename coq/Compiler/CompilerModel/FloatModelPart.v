@@ -36,7 +36,7 @@ Hypothesis FLOAT_eq_correct :
   forall f1 f2, (FLOAT_eq f1 f2 = true <-> f1 = f2).
 
 Axiom FLOAT_tostring : FLOAT -> String.string.
-Extract Inlined Constant FLOAT_tostring => "(fun x -> Util.char_list_of_string (string_of_float x))".
+Extract Inlined Constant FLOAT_tostring => "(fun x -> Util.char_list_of_string (Util.qcert_string_of_float x))".
 
 Program Instance float_foreign_data : foreign_data
   := {foreign_data_type := FLOAT}.

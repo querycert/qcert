@@ -128,7 +128,7 @@ Module CompCore(runtime:CompilerRuntime).
    * Typed DNNRC Section *
    ***********************)
 
-  Require Import DData DNNRC SparkIR.
+  Require Import DData DNNRC NNRCtoDNNRC SparkIR.
 
   (* Typed compilation from NRAEnv to DNNRC *)
 
@@ -139,23 +139,23 @@ Module CompCore(runtime:CompilerRuntime).
     let de_init := @nrc_to_dnrc_algenv _ bool true mkDistLoc e_rew in
     de_init.
 
-  Definition tcompile_nraenv_to_dnnrc_none (op_init:algenv) : dnrc bool algenv :=
+  Definition tcompile_nraenv_to_dnnrc_none (op_init:algenv) : dnrc _ bool algenv :=
     tcompile_nraenv_to_dnnrc optimizer_no_optim rewriter_no_rew op_init.
 
-  Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc bool algenv :=
+  Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc _ bool algenv :=
     tcompile_nraenv_to_dnnrc toptim trew op_init.
 
-  Definition tcompile_nraenv_to_dnnrc_dataset (optim:optimizer) (rew:rewriter) (op_init:algenv) : dnrc unit dataset :=
+  Definition tcompile_nraenv_to_dnnrc_dataset (optim:optimizer) (rew:rewriter) (op_init:algenv) : dnrc _ unit dataset :=
     let op_optim := optimize_algenv optim op_init in
     let e_init := translate_nraenv_to_nnrc op_optim in
     let e_rew := rew e_init in
     let de_init := @nrc_to_dnrc_dataset _ _ unit tt mkDistLoc e_rew in
     de_init.
 
-  Definition tcompile_nraenv_to_dnnrc_none_dataset (op_init:algenv) : dnrc unit dataset :=
+  Definition tcompile_nraenv_to_dnnrc_none_dataset (op_init:algenv) : dnrc _ unit dataset :=
     tcompile_nraenv_to_dnnrc_dataset optimizer_no_optim rewriter_no_rew op_init.
 
-  Definition tcompile_nraenv_to_dnnrc_typed_opt_dataset (op_init:algenv) : dnrc unit dataset :=
+  Definition tcompile_nraenv_to_dnnrc_typed_opt_dataset (op_init:algenv) : dnrc _ unit dataset :=
     tcompile_nraenv_to_dnnrc_dataset toptim trew op_init.
 
   Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
@@ -163,15 +163,15 @@ Module CompCore(runtime:CompilerRuntime).
   Definition dnnrc_to_typeannotated_dnnrc
              {bm:brand_model}
              {ftyping: foreign_typing}
-             (e: dnrc unit dataset) (inputType: rtype)
-    : option (dnrc (type_annotation unit) dataset) :=
+             (e: dnrc _ unit dataset) (inputType: rtype)
+    : option (dnrc _ (type_annotation unit) dataset) :=
     dnnrc_infer_type e inputType.
 
   Definition tcompile_nraenv_to_dnnrc_dataset_opt
              {bm:brand_model}
              {ftyping: foreign_typing}
              (op_init: algenv) (inputType: rtype)
-    : option (dnrc (type_annotation unit) dataset) :=
+    : option (dnrc _ (type_annotation unit) dataset) :=
     let e := tcompile_nraenv_to_dnnrc_typed_opt_dataset op_init in
     let typed := dnnrc_to_typeannotated_dnnrc e inputType in
     lift dnnrcToDatasetRewrite typed.
@@ -184,7 +184,7 @@ Module CompCore(runtime:CompilerRuntime).
 
   (* compilation from nnrc to dnnrc *)
 
-  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc bool algenv :=
+  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc _ bool algenv :=
     nrc_to_dnrc true tenv e_nrc. (* empty annotation and algenv plug *)
 
   (******************

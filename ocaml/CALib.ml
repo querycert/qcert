@@ -149,8 +149,8 @@ let compile_nnrcmr_to_cloudant (prefix:string) (nrule:string) (n:nnrcmr) : strin
 
 (* Import/Export ASTs *)
 
-let export_camp (p:camp) = raise (CACo_Error "CAMP export not implemented")
-let import_camp (ps:string) = raise (CACo_Error "CAMP import not implemented")
+let export_camp (p:camp) = DisplayUtil.camp_to_sexp_string p
+let import_camp (ps:string) = DisplayUtil.sexp_string_to_camp ps
 
 let export_nraenv (op:nraenv) = DisplayUtil.nra_to_sexp_string op
 let import_nraenv (ops:string) = DisplayUtil.sexp_string_to_nra ops

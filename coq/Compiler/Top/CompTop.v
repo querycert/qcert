@@ -158,19 +158,19 @@ Module CompTop(runtime:CompilerRuntime).
   (* Note: only the algebra rewrites leverage types, the DNNRC rewrites
   (at this point) are operating on the untyped form *)
 
-  Require Import DData NNRC DNNRC.
+  Require Import DData NNRC DNNRC NNRCtoDNNRC.
 
-  Definition tcompile_rule_to_dnrc (optim:optimizer) (rew:rewriter) (r:rule) : dnrc bool algenv :=
+  Definition tcompile_rule_to_dnrc (optim:optimizer) (rew:rewriter) (r:rule) : dnrc _ bool algenv :=
     let op_optim := compile_rule_to_algenv optim r in
     let e_init := algenv_to_nnrc op_optim init_vid init_venv in
     let e_rew := rew e_init in
     let de_init := @nrc_to_dnrc_algenv _ bool true mkDistLoc e_rew in
     de_init.
 
-  Definition tcompile_rule_to_dnrc_none (r:rule) : dnrc bool algenv :=
+  Definition tcompile_rule_to_dnrc_none (r:rule) : dnrc _ bool algenv :=
     tcompile_rule_to_dnrc optimizer_no_optim rewriter_no_rew r.
 
-  Definition tcompile_rule_to_dnrc_topt (r:rule) : dnrc bool algenv :=
+  Definition tcompile_rule_to_dnrc_topt (r:rule) : dnrc _ bool algenv :=
     tcompile_rule_to_dnrc toptim trew r.
 
   (* Typed compilation from rules to NNRC + Map Reduce *)

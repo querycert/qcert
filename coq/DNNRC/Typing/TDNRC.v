@@ -76,11 +76,16 @@
             dnrc_type tenv e1 τ₁ ->
             dnrc_type ((v,τ₁)::tenv) e2 τ₂ ->
             dnrc_type tenv (DNRCLet a v e1 e2) τ₂
-      | TDNRCFor {τ₁ τ₂} v tenv e1 e2 :
-          forall (a:A), 
+      | TDNRCForLocal {τ₁ τ₂} v tenv e1 e2 :
+          forall (a:A),
             dnrc_type tenv e1 (Tlocal (Coll τ₁)) ->
             dnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
             dnrc_type tenv (DNRCFor a v e1 e2) (Tlocal (Coll τ₂))
+      | TDNRCForDist {τ₁ τ₂} v tenv e1 e2 :
+          forall (a:A),
+            dnrc_type tenv e1 (Tdistr τ₁) ->
+            dnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
+            dnrc_type tenv (DNRCFor a v e1 e2) (Tdistr τ₂)
       | TDNRCIf {τ} tenv e1 e2 e3 :
           forall (a:A), 
             dnrc_type tenv e1 (Tlocal Bool) ->
@@ -235,6 +240,69 @@
         assert (r0 = τ₂) by (apply rtype_fequal; assumption).
         subst.
         apply (H2 x2); assumption.
+    - specialize (IHdnrc_type1 env H).
+      elim IHdnrc_type1; intros; clear IHdnrc_type1.
+      elim H0; clear H0; intros.
+      rewrite H0; clear H0; simpl.
+      inversion H1; clear H1; subst.
+      induction dl; simpl in *.
+      + exists (Ddistr []).
+        split; [reflexivity|].
+        constructor; apply Forall_nil.
+      + rewrite Forall_forall in *.
+        simpl in *.
+        assert (forall x : data, In x dl -> data_type x τ₁)
+          by (intros; apply (H3 x); right; assumption).
+        specialize (IHdl H0); clear H0.
+        elim IHdl; intros; clear IHdl.
+        elim H0; clear H0; intros.
+        unfold lift in H0.
+        unfold var in *.
+        assert (exists x1, rmap
+           (fun d1 : data =>
+            olift checkLocal
+              (dnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2))
+           dl = Some x1 /\ (Ddistr x1) = x).
+        revert H0.
+        elim (rmap
+                (fun d1 : data =>
+                   olift checkLocal
+                         (dnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
+        inversion H0; simpl in *. subst; clear H0.
+        exists a1; split; reflexivity.
+        congruence.
+        elim H2; clear H2; intros.
+        elim H2; clear H2; intros.
+        subst.
+        inversion H1; subst.
+        specialize (IHdnrc_type2 ((v,Dlocal a0)::env)).
+        assert (dbindings_type ((v, Dlocal a0) :: env) ((v, Tlocal τ₁) :: tenv)).
+        unfold dbindings_type.
+        apply Forall2_cons; try assumption.
+        simpl; split; try reflexivity.
+        constructor.
+        apply (H3 a0); left; reflexivity.
+        specialize (IHdnrc_type2 H4); clear H4.
+        elim IHdnrc_type2; clear IHdnrc_type2; intros.
+        elim H4; clear H4; intros.
+        rewrite H4; simpl.
+        inversion H5; clear H5; subst.
+        exists (Ddistr (d::x0)); split; try reflexivity.
+        simpl.
+        revert H0.
+        elim (rmap
+       (fun d1 : data =>
+        olift checkLocal
+              (dnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
+        inversion H0.
+        subst.
+        reflexivity.
+        congruence.
+        constructor.
+        rewrite Forall_forall in *; simpl; intros.
+        elim H5; clear H5; intros.
+        subst; assumption.
+        auto.
     - specialize (IHdnrc_type1 env H); specialize (IHdnrc_type2 env H); specialize (IHdnrc_type3 env H).
       elim IHdnrc_type1; intros; clear IHdnrc_type1;
       elim IHdnrc_type2; intros; clear IHdnrc_type2;
@@ -290,7 +358,7 @@
 
 End TDNRC.
 
-  Global Arguments TAlgPlug {m} plug_type {plug} : clear implicits. 
+Global Arguments TAlgPlug {m} plug_type {plug} : clear implicits. 
 
 (* 
 *** Local Variables: ***

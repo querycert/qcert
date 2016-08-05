@@ -213,6 +213,7 @@ abstract class QCertRuntime {
     df0.show()
 
     println("about to call run(df0)")
+    print("[RESULT] ")
     run(df0)
     println("about to call sparkContext.stop()")
     sparkContext.stop()

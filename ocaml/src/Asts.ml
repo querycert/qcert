@@ -267,7 +267,46 @@ let sexp_to_unop (se:sexp) : unaryOp =
       raise (Util.CACo_Error "Not well-formed S-expr inside unop")
 
 (* CAMP Section *)
-(* TBD *)
+
+let rec camp_to_sexp (p : camp) : sexp =
+  match p with
+  | Pconst d -> STerm ("Pconst", [data_to_sexp d])
+  | Punop (u, p1) -> STerm ("Punop", (unop_to_sexp u) :: [camp_to_sexp p1])
+  | Pbinop (b, p1, p2) -> STerm ("Pbinop", (binop_to_sexp b) :: [camp_to_sexp p1; camp_to_sexp p2])
+  | Pmap p1 -> STerm ("Pmap", [camp_to_sexp p1])
+  | Passert p1 -> STerm ("Passert", [camp_to_sexp p1]) 
+  | PorElse (p1,p2) -> STerm ("PorElse", [camp_to_sexp p1; camp_to_sexp p2])
+  | Pit -> STerm ("Pit", [])
+  | PletIt (p1,p2) -> STerm ("PletIt", [camp_to_sexp p1; camp_to_sexp p2])
+  | Pgetconstant sl -> STerm ("Pgetconstant", [coq_string_to_sstring sl])
+  | Penv -> STerm ("Penv", [])
+  | PletEnv (p1,p2) -> STerm ("PletEnv", [camp_to_sexp p1; camp_to_sexp p2])
+  | Pleft -> STerm ("Pleft", [])
+  | Pright -> STerm ("Pright", [])
+
+let rec sexp_to_camp (se : sexp) : camp =
+  match se with
+  | STerm ("Pconst", [d]) -> Pconst (sexp_to_data d)
+  | STerm ("Punop", use :: [se1]) ->
+      let u = sexp_to_unop use in
+      Punop (u, sexp_to_camp se1)
+  | STerm ("Pbinop", bse :: [se1;se2]) ->
+      let b = sexp_to_binop bse in
+      Pbinop (b, sexp_to_camp se1, sexp_to_camp se2)
+  | STerm ("Pmap", [se1]) -> Pmap (sexp_to_camp se1)
+  | STerm ("Passert", [se1])  -> Passert (sexp_to_camp se1)
+  | STerm ("PorElse", [se1;se2]) -> PorElse (sexp_to_camp se1,sexp_to_camp se2)
+  | STerm ("Pit", []) -> Pit
+  | STerm ("PletIt", [se1;se2]) -> PletIt (sexp_to_camp se1,sexp_to_camp se2)
+  | STerm ("Pgetconstant", [sl]) -> Pgetconstant (sstring_to_coq_string sl)
+  | STerm ("Penv", []) -> Penv
+  | STerm ("PletEnv", [se1;se2]) -> PletEnv (sexp_to_camp se1,sexp_to_camp se2)
+  | STerm ("Pleft", []) -> Pleft
+  | STerm ("Pright", []) -> Pright
+  | STerm (t, _) ->
+      raise (Util.CACo_Error ("Not well-formed S-expr inside camp with name " ^ t))
+  | _ ->
+      raise (Util.CACo_Error "Not well-formed S-expr inside camp")
 
 (* NRA Section *)
 

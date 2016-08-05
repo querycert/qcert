@@ -69,3 +69,5 @@ val float_arithmean : float list -> float
 val float_listmin : float list -> float
 val float_listmax : float list -> float
 
+val qcert_string_of_float : float -> string
+

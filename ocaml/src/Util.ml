@@ -150,3 +150,12 @@ let float_listmax l =
   match l with
   | [] -> neg_infinity
   | c :: ls -> float_listmax_aux ls c
+
+let qcert_string_of_float f =
+  let ocaml_string = string_of_float f in
+  let last_char = ocaml_string.[String.length ocaml_string] in
+  match last_char with
+  | '.' -> ocaml_string ^ "0"
+  | _ -> ocaml_string
+
+

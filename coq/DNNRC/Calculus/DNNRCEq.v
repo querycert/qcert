@@ -122,18 +122,28 @@ Section DNNRCEq.
     intros; simpl. rewrite H1 by trivial; clear H1. subst.
     case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
-    destruct d; try reflexivity; simpl.
-    f_equal.
-    apply rmap_ext; intros.
-    rewrite H2; simpl; eauto.
-    constructor; [|assumption].
-    assert (ddata_normalized h (Dlocal (dcoll l))).
-    - eapply dnrc_eval_normalized; eauto.
-    - inversion H1; subst; clear H1.
-      constructor.
-      inversion H5; subst; clear H5.
-      rewrite Forall_forall in H4.
-      auto.
+    { destruct d; try reflexivity; simpl.
+      f_equal.
+      apply rmap_ext; intros.
+      rewrite H2; simpl; eauto.
+      constructor; [|assumption].
+      assert (ddata_normalized h (Dlocal (dcoll l))).
+      - eapply dnrc_eval_normalized; eauto.
+      - inversion H1; subst; clear H1.
+        constructor.
+        inversion H5; subst; clear H5.
+        rewrite Forall_forall in H4.
+        auto. }
+    { f_equal.
+      apply rmap_ext; intros.
+      rewrite H2; simpl; eauto.
+      constructor; [|assumption].
+      assert (ddata_normalized h (Ddistr l)).
+      - eapply dnrc_eval_normalized; eauto.
+      - inversion H1; subst; clear H1.
+        constructor.
+        rewrite Forall_forall in H5.
+        auto. }
   Qed.
 
   (* DNRCIf *)

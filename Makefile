@@ -165,6 +165,7 @@ MODULES = \
 	Translation/NNRCtoPattern \
 	Translation/NNRCtoNNRCMR \
 	Translation/NNRCMRtoNNRC \
+	Translation/NNRCtoDNNRC \
 	Translation/PatterntoNRA \
 	Translation/PatterntoNRAEnv \
 	Translation/PatternSugartoNRA \
@@ -199,6 +200,7 @@ MODULES = \
 	Backend/NNRCtoJavascript \
 	Backend/NNRCMRtoSpark \
 	Backend/NNRCMRtoCloudant \
+	Backend/NNRCMRtoDNNRC \
 	Backend/CloudantMRtoJavascript \
 	Backend/SparkData \
 	Backend/DNNRCSparkIRRewrites \
