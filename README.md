@@ -1,5 +1,7 @@
 # Q\*cert
 
+[![CircleCI](https://circleci.com/gh/querycert/qcert.svg?style=svg)](https://circleci.com/gh/querycert/qcert)
+
 http://github.com/querycert/qcert
 
 ## About
