@@ -211,13 +211,19 @@ Section DNNRC.
         | _ => None
         end
       | DNRCFor _ x e1 e2 =>
-        match olift checkLocal (dnrc_eval env e1) with
-        | Some (dcoll c1) =>
+        match dnrc_eval env e1 with
+        | Some (Ddistr c1) =>
+          let inner_eval d1 :=
+              let env' := (x,Dlocal d1) :: env in olift checkLocal (dnrc_eval env' e2)
+          in
+          lift (fun coll => Ddistr coll) (rmap inner_eval c1)
+        | Some (Dlocal (dcoll c1)) =>
           let inner_eval d1 :=
               let env' := (x,Dlocal d1) :: env in olift checkLocal (dnrc_eval env' e2)
           in
           lift (fun coll => Dlocal (dcoll coll)) (rmap inner_eval c1)
-        | _ => None
+        | Some (Dlocal _) => None
+        | None => None
         end
       | DNRCIf _ e1 e2 e3 =>
         let aux_if d :=
@@ -349,24 +355,40 @@ Section DNNRC.
         simpl in *; try discriminate;
         unfold checkLocal in H; simpl in H.
         destruct d; try discriminate.
-        destruct d; try discriminate.
-        specialize (IHe1 _ _ eqq1 H0).
-        inversion IHe1; subst.
-        apply some_lift in H.
-        destruct H; subst.
-        constructor; constructor.
-        inversion H2; subst; clear H2.
-        apply (rmap_Forall e H1); intros.
-        case_eq (dnrc_eval ((v, Dlocal x0) :: denv) e2); intros;
-        rewrite H3 in H; simpl in H; try congruence.
-        destruct d; simpl in H; try congruence.
-        inversion H; subst; clear H.
-        specialize (IHe2 _ _ H3).
-        assert (ddata_normalized h (Dlocal z)).
-        apply IHe2.
-        constructor; eauto.
-        constructor; assumption.
-        inversion H; assumption.
+        { destruct d; try discriminate. (* Local case for DNRCFor *)
+          specialize (IHe1 _ _ eqq1 H0).
+          inversion IHe1; subst.
+          apply some_lift in H.
+          destruct H; subst.
+          constructor; constructor.
+          inversion H2; subst; clear H2.
+          apply (rmap_Forall e H1); intros.
+          case_eq (dnrc_eval ((v, Dlocal x0) :: denv) e2); intros;
+          rewrite H3 in H; simpl in H; try congruence.
+          destruct d; simpl in H; try congruence.
+          inversion H; subst; clear H.
+          specialize (IHe2 _ _ H3).
+          assert (ddata_normalized h (Dlocal z)).
+          apply IHe2.
+          constructor; eauto.
+          constructor; assumption.
+          inversion H; assumption. }
+        { specialize (IHe1 _ _ eqq1 H0). (* Distr case for DNRCFor *)
+          inversion IHe1; subst.
+          apply some_lift in H.
+          destruct H; subst.
+          constructor.
+          apply (rmap_Forall e H2); intros.
+          case_eq (dnrc_eval ((v, Dlocal x0) :: denv) e2); intros;
+          rewrite H3 in H; simpl in H; try congruence.
+          destruct d; simpl in H; try congruence.
+          inversion H; subst; clear H.
+          specialize (IHe2 _ _ H3).
+          assert (ddata_normalized h (Dlocal z)).
+          apply IHe2.
+          constructor; eauto.
+          constructor; assumption.
+          inversion H; assumption. }
       - case_eq (dnrc_eval denv e1); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;
         simpl in *; try discriminate.
