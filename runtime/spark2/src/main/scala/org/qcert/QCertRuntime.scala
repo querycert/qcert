@@ -19,7 +19,7 @@ package org.qcert
 import java.util
 import java.util.Comparator
 
-import com.google.gson.JsonElement
+import com.google.gson.{GsonBuilder, JsonElement}
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
@@ -178,7 +178,7 @@ object QCertRuntime {
 abstract class QCertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
 
-  val gson = new com.google.gson.Gson()
+  val gson = new GsonBuilder().disableHtmlEscaping().create()
   val gsonParser = new com.google.gson.JsonParser()
 
   def run(world: Dataset[Row])
