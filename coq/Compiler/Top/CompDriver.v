@@ -39,6 +39,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import NNRCMRtoSpark ForeignToSpark.
   Require Import NNRCMRtoCloudant ForeignToCloudant.
   Require Import CloudantMRtoJavascript.
+  Require Import NNRCtoDNNRC.
   Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
 
   Module CF := CompFront runtime.
@@ -57,8 +58,8 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrc := nrc.
   Definition nnrcmr := nrcmr.
   Definition cldmr := cld_mrl.
-  Definition dnnrc_dataset := dnrc unit dataset.
-  Definition dnnrc_typed_dataset := dnrc unit (* (type_annotation unit) *) dataset. (* XXXXXXX TODO XXXX *)
+  Definition dnnrc_dataset := dnrc _ unit dataset.
+  Definition dnnrc_typed_dataset := dnrc _ unit (* (type_annotation unit) *) dataset. (* XXXXXXX TODO XXXX *)
   Definition javascript := string.
   Definition java := string.
   Definition spark := string.

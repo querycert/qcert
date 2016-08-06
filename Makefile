@@ -164,6 +164,7 @@ MODULES = \
 	Translation/NRAEnvtoNNRC \
 	Translation/NNRCtoPattern \
 	Translation/NNRCtoNNRCMR \
+	Translation/NNRCtoDNNRC \
 	Translation/NNRCMRtoNNRC \
 	Translation/NNRCMRtoDNNRC \
 	Translation/PatterntoNRA \
