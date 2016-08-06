@@ -153,7 +153,7 @@ let float_listmax l =
 
 let qcert_string_of_float f =
   let ocaml_string = string_of_float f in
-  let last_char = ocaml_string.[String.length ocaml_string] in
+  let last_char = ocaml_string.[(String.length ocaml_string)-1] in
   match last_char with
   | '.' -> ocaml_string ^ "0"
   | _ -> ocaml_string
