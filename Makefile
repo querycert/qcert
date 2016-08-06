@@ -220,6 +220,7 @@ MODULES = \
 	Compiler/Top/CompCore \
 	Compiler/Top/CompBack \
 	Compiler/Top/CompTop \
+	Compiler/Top/CompDriver \
 	Compiler/Top/EvalTop \
 	Compiler/Top/OQLTop \
 	Compiler/CompilerModel/CompilerModel \
