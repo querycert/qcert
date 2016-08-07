@@ -83,7 +83,8 @@ Section NNRCMR.
 
   (* Java equivalent: MRChain *)
   Record nrcmr := mkMRChain
-    { mr_chain: list mr;
+    { mr_inputs_loc: vdbindings;
+      mr_chain: list mr;
       mr_last: (list var * nrc) * list (var * dlocalization); }.
 
   Section sanitize_local.
@@ -130,6 +131,7 @@ Section NNRCMR.
     (* Java equivalent: MROptimizer.nrcmr_rename_local *)
     Definition nrcmr_rename_local (mrl:nrcmr)
       := mkMRChain
+           mrl.(mr_inputs_loc)
            (map mr_rename_local mrl.(mr_chain))
            mrl.(mr_last).
     
@@ -166,34 +168,33 @@ Section NNRCMR.
              ((params, n), args)
          in
          mkMRChain
+           mrl.(mr_inputs_loc)
            chain
            last.
 
     Context (sep:string).
     Context (renamer:string->string).
     Context (avoid:list var).
-    (* list of names that we are not allowed to rename *)
-    Context (leave_alone:list var).
 
     (* Java equivalent MROptimizer.nrcmr_mk_rename_list *)
-    Fixpoint nrcmr_mk_rename_list (names:list var) (acc:list (var*var))
+    Fixpoint nrcmr_mk_rename_list (leave_alone:list var) (names:list var) (acc:list (var*var))
       := match names with
          | nil => acc
          | x::l => if (in_dec string_dec x leave_alone)
-                   then nrcmr_mk_rename_list l ((x,x)::acc)
+                   then nrcmr_mk_rename_list leave_alone l ((x,x)::acc)
                    else
                      let proposedname := renamer x in
                      let newname :=
-                         
                          fresh_var_from sep proposedname
                                         (l++(map snd acc)++avoid) in
-                     nrcmr_mk_rename_list l ((x,newname)::acc)
+                     nrcmr_mk_rename_list leave_alone l ((x,newname)::acc)
          end.
 
-    (* Java equivalent (used in): MROptimizer.nrcmr_rename_graph_for_cloudant *)    
+    (* Java equivalent (used in): MROptimizer.nrcmr_rename_graph_for_cloudant *)
     Definition nrcmr_rename_graph (mrl:nrcmr)
-      := let names := nrcmr_inoutlist mrl in
-         let substlist_rev := nrcmr_mk_rename_list names nil in
+      := let leave_alone := List.map fst (mrl.(mr_inputs_loc)) in
+         let names := nrcmr_inoutlist mrl in
+         let substlist_rev := nrcmr_mk_rename_list leave_alone names nil in
          let substlist := rev substlist_rev in
          nrcmr_subst_io substlist mrl.
 

@@ -47,18 +47,16 @@ Section NNRCMRToCloudantMR.
              mrl.
 
 	  (* Java equivalent: MROptimizer.nrc_mr_rename_graph_for_cloudant *)
-      Definition nrcmr_rename_graph_for_cloudant (leave_alone:list var) (mrl:nrcmr)
+      Definition nrcmr_rename_graph_for_cloudant (mrl:nrcmr)
         := nrcmr_rename_graph
              cldSafeSeparator
              cldIdentifierSanitize
              cldAvoidList 
-             leave_alone
              mrl.
 
 	  (* Java equivalent: MROptimizer.nrc_mr_rename_for_cloudant *)
-      Definition nrcmr_rename_for_cloudant (leave_alone:list var) (mrl:nrcmr)
+      Definition nrcmr_rename_for_cloudant (mrl:nrcmr)
         := nrcmr_rename_graph_for_cloudant
-             leave_alone
              (nrcmr_rename_local_for_cloudant mrl).
 
   End sanitize.
@@ -371,7 +369,7 @@ Section NNRCMRToCloudantMR.
     ((fvs, cld_mr_last), map fst vars_loc).
 
   (* Java equivalent: nrcmrToCldmr.NNRCMRtoNNRCMRCloudant *)
-  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (env_vars:list (var * dlocalization)) (mrl: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (mrl: nrcmr) : cld_mrl :=
     (* Used to compute a separate var_locs distinct from mr_last effective params -- removed now.
        This should be reviewed by Louis *)
     mkMRCldChain
@@ -701,13 +699,13 @@ Proof.
 *)
 
   (* Java equivalent: NrcmrToCldmr.convert *)
-  Definition NNRCMRtoNNRCMRCloudantTop (env_vars:list (var * dlocalization)) (mrl: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudantTop (mrl: nrcmr) : cld_mrl :=
     let avoiddb := List.map mr_input mrl.(mr_chain) ++ List.map mr_output mrl.(mr_chain) in
-    NNRCMRtoNNRCMRCloudant avoiddb env_vars mrl.
+    NNRCMRtoNNRCMRCloudant avoiddb mrl.
 
-  Lemma NNRCMRtoNNRCMRCloudantTop_causally_consistent env_vars mrl :
+  Lemma NNRCMRtoNNRCMRCloudantTop_causally_consistent mrl :
     nrcmr_causally_consistent mrl = true ->
-    cld_mr_chain_causally_consistent (NNRCMRtoNNRCMRCloudantTop env_vars mrl).(cld_mr_chain) = true.
+    cld_mr_chain_causally_consistent (NNRCMRtoNNRCMRCloudantTop mrl).(cld_mr_chain) = true.
   Proof.
     intros cc.
     unfold NNRCMRtoNNRCMRCloudantTop.

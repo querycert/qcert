@@ -37,7 +37,7 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
      (string_of_char_list (CompBack.nrc_to_js_code_gen (CompCore.tcompile_nraenv_to_nnrc_typed_opt op)), None)
   | Spark ->
      (let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-      string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) env_var mr), None)
+      string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) mr), None)
   | Spark2 ->
      let io =
 	match get_comp_io conf with

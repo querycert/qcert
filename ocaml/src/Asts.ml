@@ -614,7 +614,8 @@ let sexp_to_nrcmr (se:sexp) : nrcmr =
 	   :: [])
     ->
       (sexp_to_var_locs env,
-       { mr_chain = sexp_to_mr_chain chain;
+       { mr_inputs_loc = sexp_to_var_locs env;
+         mr_chain = sexp_to_mr_chain chain;
 	 mr_last = sexp_to_mr_last last })
   | _ ->
       raise (Util.CACo_Error "Not well-formed S-expr inside nrcmr")

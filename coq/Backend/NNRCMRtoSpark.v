@@ -94,17 +94,15 @@ Section NNRCMRtoSpark.
          jsAvoidList
          mrl.
   
-  Definition nrcmr_rename_graph_for_scala (leave_alone:list var) (mrl:nrcmr)
+  Definition nrcmr_rename_graph_for_scala (mrl:nrcmr)
     := nrcmr_rename_graph
          scalaSafeSeparator
          scalaIdentifierSanitize
          scalaAvoidList 
-         leave_alone
          mrl.
 
-  Definition nrcmr_rename_for_spark (leave_alone:list var) (mrl:nrcmr)
+  Definition nrcmr_rename_for_spark (mrl:nrcmr)
     := nrcmr_rename_graph_for_scala
-         leave_alone
          (nrcmr_rename_local_for_js mrl).
 
     End sanitize.
@@ -488,7 +486,7 @@ Section NNRCMRtoSpark.
       scala_of_mr_chain mrl.(mr_chain) scala_endl quotel ++
       scala_of_mr_last mrl.(mr_last) scala_endl quotel.
 
-    Definition nrcmrToSparkTopDataFromFile (test_name: string) (init: var) (env_vars: list (var * dlocalization)) (l:nrcmr) (scala_endl:string) (quotel: string) :=
+    Definition nrcmrToSparkTopDataFromFile (test_name: string) (init: var) (l:nrcmr) (scala_endl:string) (quotel: string) :=
       "import org.apache.spark.SparkContext" ++ scala_endl ++
       "import org.apache.spark.SparkContext._" ++ scala_endl ++
       "import org.apache.spark.SparkConf" ++ scala_endl ++
@@ -514,7 +512,7 @@ Section NNRCMRtoSpark.
       scala_endl ++
       "def run(sc: SparkContext): String = {" ++ scala_endl ++
       get_engine_func scala_endl ++ scala_endl ++
-      load_env env_vars scala_endl quotel ++ scala_endl ++
+      load_env l.(mr_inputs_loc) scala_endl quotel ++ scala_endl ++
       scala_of_nrcmr l scala_endl quotel ++
       "}" ++ scala_endl ++
       scala_endl ++
@@ -542,8 +540,8 @@ Section NNRCMRtoSpark.
 
   End MRSpark.
 
-  Definition nrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (env_vars: list (var * dlocalization)) (l:nrcmr) : string :=
-    nrcmrToSparkTopDataFromFile test_name init env_vars l eol_newline "'".
+  Definition nrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (l:nrcmr) : string :=
+    nrcmrToSparkTopDataFromFile test_name init l eol_newline "'".
 
 End NNRCMRtoSpark.
 

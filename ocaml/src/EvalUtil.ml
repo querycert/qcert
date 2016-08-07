@@ -57,7 +57,7 @@ let eval_alg conf h world op : Data.data option =
       EvalTop.nrcmr_chain_eval_top h mrchain world
   | CLDMR ->
       let (env_var, mrchain) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-      let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h env_var mrchain in
+      let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->
       Printf.fprintf stderr "Target not supported in CAEv\n";

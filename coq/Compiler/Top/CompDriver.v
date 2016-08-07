@@ -126,19 +126,19 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nrcmr q.
 
-  Definition nnrcmr_to_cldmr  (h:list (string*string)) (env_vars:list (var * dlocalization)) (q: nnrcmr) : cldmr :=
+  Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
     let q := foreign_to_cloudant_prepare_nrcmr q in
     let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_cloudant_prepare_nrcmr q in
-    let q := nrcmr_rename_for_cloudant (List.map fst env_vars) q in
-    NNRCMRtoNNRCMRCloudantTop h env_vars q.
+    let q := nrcmr_rename_for_cloudant q in
+    NNRCMRtoNNRCMRCloudantTop h q.
 
-  Definition nnrcmr_to_spark (rulename: string) (env_vars:list (var * dlocalization)) (q: nrcmr) : spark :=
+  Definition nnrcmr_to_spark (rulename: string) (q: nrcmr) : spark :=
     let q := foreign_to_spark_prepare_nrcmr q in
     let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_spark_prepare_nrcmr q in
-    let q := nrcmr_rename_for_spark (List.map fst env_vars) q in
-    nrcmrToSparkTopDataFromFileTop rulename init_vinit env_vars q. (* XXX init_vinit should be a parameter? *)
+    let q := nrcmr_rename_for_spark q in
+    nrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
 
   Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
     mapReducePairstoCloudant h q rulename.
@@ -194,9 +194,9 @@ Module CompDriver(runtime:CompilerRuntime).
   with nnrcmr_driver : Set :=
     | Dv_nnrcmr : nnrcmr_driver
     | Dv_nnrcmr_optim : nnrcmr_driver -> nnrcmr_driver
-    | Dv_nnrcmr_to_spark : (* rulename *) string -> (* env_vars *)list (var * dlocalization) -> spark_driver -> nnrcmr_driver
+    | Dv_nnrcmr_to_spark : (* rulename *) string -> spark_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_nnrc : nnrc_driver -> nnrcmr_driver
-    | Dv_nnrcmr_to_cldmr : (* h *) list (string*string) -> (* env_vars *)list (var * dlocalization) -> cldmr_driver -> nnrcmr_driver
+    | Dv_nnrcmr_to_cldmr : (* h *) list (string*string) -> cldmr_driver -> nnrcmr_driver
 
   with cldmr_driver : Set :=
     | Dv_cldmr : cldmr_driver
@@ -336,8 +336,8 @@ Module CompDriver(runtime:CompilerRuntime).
         | Dv_nnrcmr_optim dv =>
           let q := nnrcmr_optim q in
           compile_nnrcmr dv q
-        | Dv_nnrcmr_to_spark rulename env_vars dv =>
-          let q := nnrcmr_to_spark rulename env_vars q in
+        | Dv_nnrcmr_to_spark rulename dv =>
+          let q := nnrcmr_to_spark rulename q in
           compile_spark dv q
         | Dv_nnrcmr_to_nnrc dv =>
           let q_opt := nnrcmr_to_nnrc q in
@@ -345,8 +345,8 @@ Module CompDriver(runtime:CompilerRuntime).
           | Some q => compile_nnrc dv q
           | None => (Q_error "Unable to compile NNRCMR to NNRC") :: nil
           end
-        | Dv_nnrcmr_to_cldmr h env_vars dv =>
-          let q := nnrcmr_to_cldmr h env_vars q in
+        | Dv_nnrcmr_to_cldmr h dv =>
+          let q := nnrcmr_to_cldmr h q in
           compile_cldmr dv q
         end
     in

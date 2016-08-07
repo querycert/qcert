@@ -103,7 +103,7 @@ Module OQLTop(runtime:CompilerRuntime).
     (* Compile/Optimize to NNRCMR *)
     let (env_vars, e_nrcmr) := CC.tcompile_nraenv_to_nnrcmr_chain_typed_opt op_init in
     (* Generate for Cloudant *)
-    let e_cld_mr := CB.nrcmr_to_cldmr_chain_with_prepare h env_vars e_nrcmr in
+    let e_cld_mr := CB.nrcmr_to_cldmr_chain_with_prepare h e_nrcmr in
     e_cld_mr.
 
   (* Typed compilation from OQL to Cloudant *NEW* *)
@@ -114,7 +114,7 @@ Module OQLTop(runtime:CompilerRuntime).
     (* Compile/Optimize to NNRCMR *)
     let (env_vars, e_nrcmr) := CC.tcompile_nraenv_to_nnrcmr_chain_typed_opt op_init in
     (* Generate for Cloudant *)
-    CB.nrcmr_to_cloudant_code_gen_with_prepare h env_vars e_nrcmr rulename.
+    CB.nrcmr_to_cloudant_code_gen_with_prepare h e_nrcmr rulename.
 
 End OQLTop.
 

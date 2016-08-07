@@ -107,6 +107,8 @@ Section DData.
   | Vlocal : dlocalization
   | Vdistr : dlocalization.
 
+  Definition vdbindings := list (string*dlocalization).
+
   Require Import EquivDec.
   Lemma dlocalization_eq_dec : EqDec dlocalization eq.
   Proof.

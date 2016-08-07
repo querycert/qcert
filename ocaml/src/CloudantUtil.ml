@@ -111,7 +111,7 @@ let rec print_string_list = function
 
 let cloudant_compile_from_nra cld harness nrule op h =
   let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] env_var mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
   let harnessed_design_docs = List.map (add_harness harness h) design_docs in
   match cld with
   | Design -> fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
@@ -119,7 +119,7 @@ let cloudant_compile_from_nra cld harness nrule op h =
 
 let cloudant_compile_from_nnrcmr cld harness nrule nnrcmr h =
   let (env_var,mr) = nnrcmr in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] env_var mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
   let harnessed_design_docs = List.map (add_harness harness h) design_docs in
   match cld with
   | Design -> fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
@@ -127,17 +127,17 @@ let cloudant_compile_from_nnrcmr cld harness nrule nnrcmr h =
 
 let cloudant_compile_no_harness_from_nra nrule op =
   let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] env_var mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
   fold_design (List.map dont_add_harness design_docs) (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_compile_no_harness_from_nnrcmr nrule nnrcmr =
   let (env_var,mr) = nnrcmr in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] env_var mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
   fold_design (List.map dont_add_harness design_docs) (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_translate_no_harness nnrcmr =
   let (env_var,mr) = nnrcmr in
-  CompBack.nrcmr_to_cldmr_chain_translate [] env_var mr
+  CompBack.nrcmr_to_cldmr_chain_translate [] mr
 
 (* Java equivalent: CloudantBackend.generateCloudantDesign *)
 let cloudant_code_gen_no_harness nrule cldmr =

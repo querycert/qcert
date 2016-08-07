@@ -52,17 +52,15 @@ Section MRTest.
 
   Definition nfirsts n (chain: nrcmr) :=
     match nfirsts_aux n chain.(mr_chain) with
-    | (l, None) => mkMRChain l (("x"%string::nil, NRCVar "x"%string), nil)
+    | (l, None) => mkMRChain chain.(mr_inputs_loc) l (("x"%string::nil, NRCVar "x"%string), nil)
     | (l, Some mr) =>
       let x_loc := mr_output_localized mr in
-      mkMRChain l (("x"%string::nil, NRCVar "x"%string), x_loc::nil)
+      mkMRChain chain.(mr_inputs_loc) l (("x"%string::nil, NRCVar "x"%string), x_loc::nil)
     end.
 
-  
-  
 End MRTest.
 
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "QCert")) ***
 *** End: ***

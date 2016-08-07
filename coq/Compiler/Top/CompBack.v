@@ -56,27 +56,27 @@ Module CompBack(runtime:CompilerRuntime).
   Require Import NRewMR.
 
   (* Java equivalent: MROptimizer.optimize *)
-  Definition nrcmr_to_nrcmr_prepared_for_cldmr (env_vars:list (var * dlocalization)) (e_mr:nrcmr) : nrcmr :=
+  Definition nrcmr_to_nrcmr_prepared_for_cldmr (e_mr:nrcmr) : nrcmr :=
     let e_mr := foreign_to_cloudant_prepare_nrcmr e_mr in
     let e_mr := mr_optimize e_mr in
     (* Maybe add call to nnrc_to_nnrcmr_no_chain in case e_mr is more than one Map/Reduce *)
     let e_mr := foreign_to_cloudant_prepare_nrcmr e_mr in
-    let e_mr := nrcmr_rename_for_cloudant (List.map fst env_vars) e_mr in
+    let e_mr := nrcmr_rename_for_cloudant e_mr in
     e_mr.
 
-  Definition nrcmr_to_cldmr_chain_translate (h:list (string*string)) (env_vars:list (var * dlocalization)) (e_mr:nrcmr) : cld_mrl :=
-    NNRCMRtoNNRCMRCloudantTop h env_vars e_mr.
+  Definition nrcmr_to_cldmr_chain_translate (h:list (string*string)) (e_mr:nrcmr) : cld_mrl :=
+    NNRCMRtoNNRCMRCloudantTop h e_mr.
 
-  Definition nrcmr_to_cldmr_chain_with_prepare (h:list (string*string)) (env_vars:list (var * dlocalization)) (e_mr:nrcmr) : cld_mrl :=
-    let e_mr := nrcmr_to_nrcmr_prepared_for_cldmr env_vars e_mr in
-    let cld_mr := NNRCMRtoNNRCMRCloudantTop h env_vars e_mr in
+  Definition nrcmr_to_cldmr_chain_with_prepare (h:list (string*string)) (e_mr:nrcmr) : cld_mrl :=
+    let e_mr := nrcmr_to_nrcmr_prepared_for_cldmr e_mr in
+    let cld_mr := NNRCMRtoNNRCMRCloudantTop h e_mr in
     cld_mr.
 
   (* To Cloudant *)
 
   Definition nrcmr_to_cloudant_code_gen_with_prepare
-             (h:list (string*string)) (env_vars:list (var * dlocalization)) (e_mr:nrcmr) (rulename:string) : (list (string*string) * (string * list string)) :=
-    let mrl := nrcmr_to_cldmr_chain_with_prepare h env_vars e_mr in
+             (h:list (string*string)) (e_mr:nrcmr) (rulename:string) : (list (string*string) * (string * list string)) :=
+    let mrl := nrcmr_to_cldmr_chain_with_prepare h e_mr in
     mapReducePairstoCloudant h mrl rulename.
 
   Definition cldmr_code_gen (h:list (string*string)) (mrl:cld_mrl) (rulename:string) :=
@@ -86,20 +86,20 @@ Module CompBack(runtime:CompilerRuntime).
 
   Require Import NNRCMRtoSpark ForeignToSpark.
 
-  Definition nrcmr_to_nrcmr_prepared_for_spark (env_vars:list (var * dlocalization)) (e_mr:nrcmr) : nrcmr :=
+  Definition nrcmr_to_nrcmr_prepared_for_spark (e_mr:nrcmr) : nrcmr :=
     let e_mr := foreign_to_spark_prepare_nrcmr e_mr in
     let e_mr := mr_optimize e_mr in
     let e_mr := foreign_to_spark_prepare_nrcmr e_mr in
-    let e_mr := nrcmr_rename_for_spark (List.map fst env_vars) e_mr in
+    let e_mr := nrcmr_rename_for_spark e_mr in
     e_mr.
 
-  Definition mrchain_to_spark_code_gen_with_prepare rulename (env_vars:list (var * dlocalization)) (e_mr:nrcmr) :=
-    let e_mr := nrcmr_to_nrcmr_prepared_for_spark env_vars e_mr in
-    let spark_mr := nrcmrToSparkTopDataFromFileTop rulename init_vinit env_vars e_mr in
+  Definition mrchain_to_spark_code_gen_with_prepare rulename (e_mr:nrcmr) :=
+    let e_mr := nrcmr_to_nrcmr_prepared_for_spark e_mr in
+    let spark_mr := nrcmrToSparkTopDataFromFileTop rulename init_vinit e_mr in
     spark_mr.
 
   Definition mrchain_to_spark_code_gen rulename (env_vars:list (var * dlocalization)) (e_mr:nrcmr) :=
-    nrcmrToSparkTopDataFromFileTop rulename init_vinit env_vars e_mr.
+    nrcmrToSparkTopDataFromFileTop rulename init_vinit e_mr.
 
 End CompBack.
 

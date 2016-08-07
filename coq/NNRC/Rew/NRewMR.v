@@ -1342,7 +1342,7 @@ Section NRewMR.
     in
     match output with
     | None => None
-    | Some output => Some (mkMRChain chain last)
+    | Some output => Some (mkMRChain mrl.(mr_inputs_loc) chain last)
     end.
 
 
@@ -1363,6 +1363,7 @@ Section NRewMR.
   (* Java equivalent: MROptimizer.applyRewrite *)
   Definition apply_rewrite (rew: mr -> option (list mr)) mrl :=
     mkMRChain
+      mrl.(mr_inputs_loc)
       (mr_chain_apply_rewrite rew mrl.(mr_chain))
       mrl.(mr_last).
 
@@ -1389,6 +1390,7 @@ Section NRewMR.
   (* Java equivalent: MROptimizer.applyMerge *)
   Definition apply_merge (merge: mr -> mr -> option mr) mrl :=
     mkMRChain
+      mrl.(mr_inputs_loc)
       (mr_chain_apply_merge merge mrl.(mr_chain))
       mrl.(mr_last).
 
@@ -1409,6 +1411,7 @@ Section NRewMR.
   (* Java equivalent: MROptimizer.mr_cleanup *)
   Definition mr_cleanup mrl to_keep :=
     mkMRChain
+      mrl.(mr_inputs_loc)
       (mr_chain_cleanup mrl.(mr_chain) to_keep)
       mrl.(mr_last).
 

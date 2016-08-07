@@ -209,7 +209,7 @@ Module CompTop(runtime:CompilerRuntime).
 
   Definition tcompile_rule_to_cldmr_chain (h:list (string*string)) (r:rule) : cld_mrl :=
     let '(env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain r in
-    CB.nrcmr_to_cldmr_chain_with_prepare h env_vars e_mr.
+    CB.nrcmr_to_cldmr_chain_with_prepare h e_mr.
 
   (* Typed compilation from rules to Javascript *)
 
@@ -230,8 +230,8 @@ Module CompTop(runtime:CompilerRuntime).
   (* Hard-coding the WORLD variable for now. Generalizing will require
      more work on the Spark code-generation side. *)
   
-  Definition mrchain_to_spark_data_from_file_caco rulename (env_vars:list (var * dlocalization)) mrchain :=
-    CB.mrchain_to_spark_code_gen_with_prepare rulename env_vars mrchain.
+  Definition mrchain_to_spark_data_from_file_caco rulename mrchain :=
+    CB.mrchain_to_spark_code_gen_with_prepare rulename mrchain.
 
 End CompTop.
 

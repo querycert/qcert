@@ -185,14 +185,15 @@ Section NNRCtoNNRCMR.
     in
     (mr::nil).
 
-  Definition nnrcmr_of_nnrc_with_no_free_var (n: nrc) (initunit: var) (output: var) :=
+  Definition nnrcmr_of_nnrc_with_no_free_var (n: nrc) (free_vars_loc: vdbindings) (initunit: var) (output: var) :=
     mkMRChain
+      free_vars_loc
       (mr_chain_of_nnrc_with_no_free_var n initunit output)
       ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
-  Lemma nnrcmr_of_nnrc_with_no_free_var_wf (n: nrc) (initunit: var) (output: var):
+  Lemma nnrcmr_of_nnrc_with_no_free_var_wf (n: nrc) (free_vars_loc: vdbindings) (initunit: var) (output: var):
     nrc_free_vars n = nil ->
-    nrcmr_well_formed (nnrcmr_of_nnrc_with_no_free_var n initunit output).
+    nrcmr_well_formed (nnrcmr_of_nnrc_with_no_free_var n free_vars_loc initunit output).
   Proof.
     intros Hfv.
     unfold nrcmr_well_formed.
@@ -211,12 +212,12 @@ Section NNRCtoNNRCMR.
   Qed.
 
   Lemma nnrcmr_of_nnrc_with_no_free_var_correct h mr_env n:
-    forall initunit output,
+    forall free_vars_loc initunit output,
     forall (Hfv: nrc_free_vars n = nil),
     forall (Hinitunit: lookup equiv_dec mr_env initunit = Some (Dlocal dunit)),
     forall (Houtput: lookup equiv_dec mr_env output = None),
       nrc_eval h nil n =
-      nrcmr_eval h mr_env (nnrcmr_of_nnrc_with_no_free_var n initunit output).
+      nrcmr_eval h mr_env (nnrcmr_of_nnrc_with_no_free_var n free_vars_loc initunit output).
   Proof.
     intros.
     unfold nnrcmr_of_nnrc_with_no_free_var.
@@ -285,15 +286,16 @@ Section NNRCtoNNRCMR.
       (mr::nil)
     end.
 
-  Definition nnrcmr_of_nnrc_with_one_free_var (n: nrc) (x_loc: var * dlocalization) (output:var) :=
+  Definition nnrcmr_of_nnrc_with_one_free_var (n: nrc) (x_loc: var * dlocalization) (free_vars_loc: vdbindings)  (output:var) :=
     mkMRChain
+      free_vars_loc
       (mr_chain_of_nnrc_with_one_free_var n x_loc output)
       ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
 
-  Lemma nnrcmr_of_nnrc_with_one_free_var_wf (n: nrc) (x_loc: var * dlocalization) (output:var):
+  Lemma nnrcmr_of_nnrc_with_one_free_var_wf (free_vars_loc: vdbindings) (n: nrc) (x_loc: var * dlocalization) (output:var):
     function_with_no_free_vars (fst x_loc, n) ->
-    nrcmr_well_formed (nnrcmr_of_nnrc_with_one_free_var n x_loc output).
+    nrcmr_well_formed (nnrcmr_of_nnrc_with_one_free_var n x_loc free_vars_loc output).
   Proof.
     intros Hfv.
     unfold nrcmr_well_formed.
@@ -315,13 +317,13 @@ Section NNRCtoNNRCMR.
   Qed.
 
   Lemma nnrcmr_of_nnrc_with_one_free_var_correct h nrc_env mr_env n x_loc:
-    forall output initunit,
+    forall free_vars_loc output initunit,
     forall (Hnrc_env: exists d, lookup equiv_dec nrc_env (fst x_loc) = Some d),
     forall (Hmr_env: load_init_env_success initunit (x_loc::nil) nrc_env mr_env),
     forall (Hfv: function_with_no_free_vars (fst x_loc, n)),
     forall (Houtput: lookup equiv_dec mr_env output = None),
       nrc_eval h nrc_env n =
-      nrcmr_eval h mr_env (nnrcmr_of_nnrc_with_one_free_var n x_loc output).
+      nrcmr_eval h mr_env (nnrcmr_of_nnrc_with_one_free_var n x_loc free_vars_loc output).
   Proof.
     intros.
     unfold load_init_env_success in Hmr_env.
@@ -566,6 +568,7 @@ Section NNRCtoNNRCMR.
 
   Definition nnrcmr_of_nnrc_with_free_vars (n: nrc) (vars_loc: list (var * dlocalization)) (output: var): nrcmr :=
     mkMRChain
+      vars_loc
       (mr_chain_of_nnrc_with_free_vars n vars_loc output)
       ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
@@ -804,9 +807,10 @@ Section NNRCtoNNRCMR.
     let nrcmr_vars := get_nrcmr_vars mr_chain in
     (mr_chain, nrcmr_vars ++ vars_loc).
 
-  Definition nnrcmr_of_nnrc (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var): nrcmr * list (var * dlocalization) :=
-    let (mr_chain, vars_loc) := mr_chain_of_nnrc n initunit vars_loc output in
+  Definition nnrcmr_of_nnrc (n: nrc) (initunit: var) (inputs_loc: list (var * dlocalization)) (output: var): nrcmr * list (var * dlocalization) :=
+    let (mr_chain, vars_loc) := mr_chain_of_nnrc n initunit inputs_loc output in
     (mkMRChain
+       inputs_loc
        mr_chain
        ((output::nil, (NRCVar output)), (output, Vlocal)::nil),
      vars_loc).
@@ -978,17 +982,18 @@ Section NNRCtoNNRCMR.
     mr_list ++ final_mr.
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain_ns *)
-  Definition nnrc_to_nnrcmr_chain_ns (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) : nrcmr :=
+  Definition nnrc_to_nnrcmr_chain_ns (n: nrc) (initunit: var) (inputs_loc: vdbindings) (vars_loc: vdbindings) : nrcmr :=
     let output := fresh_var "output" (domain vars_loc) in
     mkMRChain
+      inputs_loc
       (nnrc_to_mr_chain_ns n initunit vars_loc output)
       ((output::nil, (NRCVar output)), (output, Vlocal)::nil).
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain *)
-  Definition nnrc_to_nnrcmr_chain (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) : nrcmr :=
+  Definition nnrc_to_nnrcmr_chain (n: nrc) (initunit: var) (inputs_loc: vdbindings) : nrcmr :=
     let n_ns := unshadow_simpl (initunit::nil) n in
-    let vars_loc := vars_loc ++ List.map (fun x => (x, Vlocal)) (nrc_bound_vars n_ns) in
-    nnrc_to_nnrcmr_chain_ns n_ns initunit vars_loc.
+    let vars_loc := inputs_loc ++ List.map (fun x => (x, Vlocal)) (nrc_bound_vars n_ns) in
+    nnrc_to_nnrcmr_chain_ns n_ns initunit inputs_loc vars_loc.
 
   (* Theorem nnrc_to_nnrcmr_chain_correct h env n initdb initunit output: *)
   (*   (forall x d, *)
@@ -1007,10 +1012,11 @@ Section NNRCtoNNRCMR.
   (* Qed. *)
 
 
-  Definition nnrc_to_nnrcmr_no_chain (n: nrc) (vars_loc: list (var * dlocalization)) : nrcmr :=
+  Definition nnrc_to_nnrcmr_no_chain (n: nrc) (inputs_loc: list (var * dlocalization)) : nrcmr :=
     mkMRChain
+      inputs_loc
       nil
-      ((List.map fst vars_loc, n), vars_loc).
+      ((List.map fst inputs_loc, n), inputs_loc).
 
   Lemma load_init_env_build_nrc_env_id env initunit mr_env vars_loc :
     load_init_env initunit vars_loc env = Some mr_env ->
@@ -1021,15 +1027,15 @@ Section NNRCtoNNRCMR.
     induction vars_loc; simpl in *; intros.
   Admitted.
 
-  Theorem nnrc_to_nnrcmr_no_chain_correct h env initunit mr_env (n:nrc) (vars_loc: list (var * dlocalization)) :
-      load_init_env initunit vars_loc env = Some mr_env ->
-      nrc_eval h env n = nrcmr_eval h mr_env (nnrc_to_nnrcmr_no_chain n vars_loc).
+  Theorem nnrc_to_nnrcmr_no_chain_correct h env initunit mr_env (n:nrc) (inputs_loc: list (var * dlocalization)) :
+      load_init_env initunit inputs_loc env = Some mr_env ->
+      nrc_eval h env n = nrcmr_eval h mr_env (nnrc_to_nnrcmr_no_chain n inputs_loc).
   Proof.
     intros.
     unfold nnrc_to_nnrcmr_no_chain; simpl.
     unfold nrcmr_eval; simpl.
     unfold mr_last_eval; simpl.
-    rewrite (load_init_env_build_nrc_env_id env initunit mr_env vars_loc).
+    rewrite (load_init_env_build_nrc_env_id env initunit mr_env inputs_loc).
     simpl.
     admit.
     assumption.
