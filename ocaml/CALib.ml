@@ -90,11 +90,11 @@ let optimize_nnrcmr (n:nnrcmr) =
 
 let optimize_nnrcmr_for_cloudant (n:nnrcmr) =
   let (vars,n) = n in
-  (vars,CompBack.nrcmr_to_nrcmr_prepared_for_cldmr vars n)
+  (vars,CompBack.nrcmr_to_nrcmr_prepared_for_cldmr n)
 
 let optimize_nnrcmr_for_spark (n:nnrcmr) =
   let (vars,n) = n in
-  (vars,CompBack.nrcmr_to_nrcmr_prepared_for_spark vars n)
+  (vars,CompBack.nrcmr_to_nrcmr_prepared_for_spark n)
 
 (* For convenience *)
 (* Note: This includes optimization phases *)
@@ -132,7 +132,7 @@ let compile_nraenv_to_java (basename:string) (imports:string) (op:nraenv) : stri
 
 let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
   let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) env_var mr)
+  string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) mr)
 
 let compile_nraenv_to_cloudant (prefix:string) (nrule:string) (op:nraenv) : string =
   cloudant_compile_no_harness_from_nra (idioticize prefix nrule) op
@@ -171,10 +171,10 @@ let pretty_nraenv (greek:bool) (margin:int) (op:nraenv) = PrettyIL.pretty_nraenv
 let pretty_nnrc (greek:bool) (margin:int) (n:nnrc) = PrettyIL.pretty_nnrc greek margin n
 let pretty_nnrcmr_for_spark (greek:bool) (margin:int) (nmr:nnrcmr) =
   let (env_var, opt_nnrcmr) = nmr in
-  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_spark env_var opt_nnrcmr)
+  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_spark opt_nnrcmr)
 let pretty_nnrcmr_for_cloudant (greek:bool) (margin:int) (nmr:nnrcmr) =
   let (env_var, opt_nnrcmr) = nmr in
-  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_cldmr env_var opt_nnrcmr)
+  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_cldmr opt_nnrcmr)
 
 (* Options *)
 
