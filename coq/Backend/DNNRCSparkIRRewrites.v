@@ -20,7 +20,7 @@ Require Import Peano_dec.
 Require Import EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import NNRCRuntime ForeignToJava.
+Require Import NNRCRuntime ForeignToJava ForeignToJavascript.
 Require Import DNNRC.
 Require Import RType.
 Require Import TDNRCInfer.
@@ -36,7 +36,7 @@ Section DNNRCSparkIRRewrites.
   Context {fdtyping:foreign_data_typing}.
   Context {fboptyping:foreign_binary_op_typing}.
   Context {fuoptyping:foreign_unary_op_typing}.
-  Context {fttjs: ForeignToJavascript.foreign_to_javascript}.
+  Context {fttjs: foreign_to_javascript}.
 
   (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego.
    *

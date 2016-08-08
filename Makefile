@@ -180,7 +180,6 @@ MODULES = \
 	Frontend/LambdaNRA/LambdaAlg \
 	Frontend/LambdaNRA/LambdaAlgEq \
 	Frontend/LambdaNRA/LambdaAlgtoNRAEnv \
-	Frontend/LambdaNRA/LambdaAlgExamples \
 	Frontend/ODMG/OQL \
 	Frontend/ODMG/OQLSugar \
 	Frontend/ODMG/OQLSize \
@@ -211,6 +210,12 @@ MODULES = \
 	Compiler/Optimizer/NRewFunc \
 	Compiler/Optimizer/TRewFunc \
 	Compiler/CompilerModel/CompilerRuntime \
+	Compiler/CompilerModel/CompilerModel \
+	Compiler/CompilerModel/FloatModelPart \
+	Compiler/CompilerModel/StringModelPart \
+	Compiler/CompilerModel/DateTimeModelPart \
+	Compiler/CompilerModel/EnhancedModel \
+	Compiler/CompilerModel/TrivialModel \
 	Compiler/Top/CompData \
 	Compiler/Top/CompOperators \
 	Compiler/Top/CompPattern \
@@ -224,26 +229,21 @@ MODULES = \
 	Compiler/Top/CompDriver \
 	Compiler/Top/EvalTop \
 	Compiler/Top/OQLTop \
-	Compiler/CompilerModel/CompilerModel \
 	Compiler/Top/CompCorrect \
 	Compiler/Top/CompStat \
 	Compiler/Top/CompType \
-	Compiler/CompilerModel/FloatModelPart \
-	Compiler/CompilerModel/StringModelPart \
-	Compiler/CompilerModel/DateTimeModelPart \
-	Compiler/CompilerModel/EnhancedModel \
-	Compiler/CompilerModel/TrivialModel \
-	Tests/PatternTest \
 	Compiler/Compiler \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
+	Compiler/CompilerExports \
 	Tests/RAlgTest \
 	Tests/TAlgTest \
 	Tests/BrandTest \
 	Tests/TBrandTest \
 	Tests/CompilerTest \
 	Tests/MRTest \
-	Tests/OQLTest
+	Tests/OQLTest \
+	Tests/LambdaAlgTests
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
 

@@ -14,7 +14,14 @@
  * limitations under the License.
  *)
 
-Require Import PatternTest.
+Require Import ZArith.
+Local Open Scope Z_scope.
+Require Import String.
+Local Open Scope string.
+Require Import List.
+Import ListNotations.
+
+Require Import BasicSystem CAMPRuntime.
 Require Import TrivialModel.
 
 Require Compiler CompTop CompilerRuntime.

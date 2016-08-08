@@ -27,14 +27,12 @@ Section SparkIR.
   Require Import Utils BasicSystem.
   Require Import DData.
   Require Import RAlgEnv.
-  Require Import ForeignToJavascript.
 
   Require Import RType.
 
 
   Context {fruntime:foreign_runtime}.
   Context {ftype: ForeignType.foreign_type}.
-  Context {fttojs : ForeignToJavascript.foreign_to_javascript}.
   Context {m : TBrandModel.brand_model}.
 
   Definition var := string.

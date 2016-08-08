@@ -16,18 +16,20 @@
 
 (** * Examples manually translated from arl (JRules) *)
 
-Require Import PatternTest.
 Require Import BrandRelation.
 
 Require Import ZArith.
 Local Open Scope Z_scope.
-
-Local Open Scope rule_scope.
+Require Import String.
 Local Open Scope string.
+Require Import List.
+Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section BrandTest.
 
+  Require Import BasicSystem CAMPRuntime.
+  Local Open Scope rule_scope.
   Require Import TrivialModel.
   
   (* This was copy/pastes from sample-rules (with [] added in at the top level *)
@@ -76,6 +78,7 @@ Section BrandTest.
           "Customer =John Doe"].
 
   (* Eval vm_compute in R1_result. *)
+  Require Import CompUtil.
   Example R1_verify : validate_success R1_result R1_expected = true.
   Proof. fast_refl. Qed.
 
@@ -462,8 +465,6 @@ all customers. *)
 *)
 
 End BrandTest.
-
-
 
 (* 
 *** Local Variables: ***

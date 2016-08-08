@@ -11,7 +11,7 @@ Require Import TrivialCompiler.
 Import TrivialCompiler.
 
 (* Examples from [CZ96] Figure 2. 'as is' *)
-Section LambdaNRAExamples.
+Section LambdaNRATests.
 
   (* Prep *)
   Definition h : brand_relation_t := nil.
@@ -198,7 +198,7 @@ Section LambdaNRAExamples.
   (* Eval vm_compute in (eval_q h A4 db2). *)
   (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda A4)) db2). *)
 
-End LambdaNRAExamples.
+End LambdaNRATests.
 
 
 (* Now let's see if we can optimize *)
@@ -227,6 +227,6 @@ Definition T2nnrc_opt := TrivialCompiler.CompCore.tcompile_nraenv_to_nnrc_typed_
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../coq" "QCert")) ***
 *** End: ***
 *)

@@ -19,8 +19,7 @@ Module Compiler (runtime:CompilerRuntime).
 
   Require CompData CompOperators.
   Require CompOQL CompPattern CompRule.
-  Require CompFront CompCore CompBack EvalTop CompStat CompType.
-  Require PatternTest.
+  Require CompUtil CompFront CompCore CompBack EvalTop CompStat CompType.
 
   Module RType := CompType.CompType runtime.
   Module Data := CompData.CompData runtime.
@@ -36,10 +35,8 @@ Module Compiler (runtime:CompilerRuntime).
   Module EvalTop := EvalTop.EvalTop runtime.
   Module CompStat := CompStat.CompStat runtime.
 
-  Section PatternTest.
-   Definition validate_rule_success := PatternTest.validate_rule_success.
-   Definition validate_lifted_success := PatternTest.validate_lifted_success.
-  End PatternTest.
+  Definition validate_rule_success := CompUtil.validate_rule_success.
+  Definition validate_lifted_success := CompUtil.validate_lifted_success.
   
 End Compiler.
 

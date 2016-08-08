@@ -51,7 +51,43 @@ Section CompUtil.
   Definition mkDistLoc : list (string*dlocalization)
     := ("CONST$WORLD"%string, Vdistr)::nil.
 
+  Definition validate (oresult oexpected:option (list data))
+    := match oresult, oexpected with
+       | None, None => true
+       | Some ((dcoll result)::nil), Some expected =>
+         if permutation_dec result expected 
+         then true
+         else false
+       | _,_ => false
+       end.
+  (* validate a successful run *)
+  Definition validate_success (oresult:option (list data)) (expected:list data)
+    := validate oresult (Some expected).
+  
+  (* We want to prove things of the form 
+    validate result expected = true
+    This can be proven just by eq_refl and implicit normalization,
+    but normalization using compute (the default) is slow.
+    This tactic explicitly normalizes using vm_compute.
+    and then applies reflexivity.  This is *much* faster.
+   *)
+
+  (* Check Rule/CAMP result *)
+
+  Definition validate_rule_success res exp : bool :=
+    validate_success res exp.
+
+  (* Check NRAEnv/NNRC/NNRCMR/CloudantMR result *)
+  
+  Definition validate_lifted_success res exp : bool :=
+    validate_success (unwrap_result res) exp.
+
 End CompUtil.
+
+(* validate that the answer is correct.  Since the result is unordered,
+      we check that the result answer is a permutation of the expected
+       answer *)
+Ltac fast_refl := vm_compute; reflexivity.
 
 (* 
 *** Local Variables: ***

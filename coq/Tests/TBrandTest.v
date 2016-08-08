@@ -16,20 +16,21 @@
 
 (** * EXAMPLES manually translated from arl (JRules) *)
 
-Require Import PatternTest.
-Require Import BrandTest.
-Require Import BasicSystem.
-
-Local Open Scope rule_scope.
+Require Import ZArith.
+Local Open Scope Z_scope.
+Require Import String.
 Local Open Scope string.
+Require Import List.
+Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section TBrandTest.
 
+  Require Import BrandTest.
+  Require Import BasicSystem.
   Require Import TrivialModel.
-  
+
   Require Import Program.
-  Import ListNotations.
   
   (******* Defining model – should be automatized, but for now *** *)
 
@@ -87,9 +88,11 @@ Section TBrandTest.
       + econstructor.
         * econstructor; eauto.
           econstructor; eauto.
+          econstructor; eauto.
         * econstructor; eauto.
       + econstructor.
         * econstructor; eauto.
+          econstructor; eauto.
           econstructor; eauto.
         * econstructor.
         * { econstructor.
@@ -97,6 +100,7 @@ Section TBrandTest.
               econstructor; eauto.
               + econstructor; eauto.
                 * econstructor; eauto.
+                  econstructor; eauto.
                   econstructor; eauto.
                 * econstructor; eauto; [| econstructor ].
                   econstructor; eauto.
@@ -106,6 +110,7 @@ Section TBrandTest.
                   econstructor; reflexivity.
               + econstructor.
                 simpl. eapply @dtnat.
+              + econstructor.
             - reflexivity.
             - econstructor; eauto.
               + econstructor; eauto.
@@ -121,6 +126,7 @@ Section TBrandTest.
         repeat (econstructor; eauto).
         rewrite brands_type_singleton.
         simpl. econstructor. reflexivity.
+      + econstructor.
       + econstructor.
     Grab Existential Variables.
     eauto. eauto. eauto. eauto.
