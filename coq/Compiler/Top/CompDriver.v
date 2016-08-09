@@ -39,6 +39,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSpark ForeignToSpark.
   Require Import NNRCMRtoCloudant ForeignToCloudant.
+  Require Import NNRCMRtoDNNRC.
   Require Import CloudantMRtoJavascript.
   Require Import NNRCtoDNNRC.
   Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
@@ -134,6 +135,8 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nrcmr q.
 
+  Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nrcmr tt q.
+
   Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
     let q := foreign_to_cloudant_prepare_nrcmr q in
     let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
@@ -204,6 +207,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_nnrcmr_optim : nnrcmr_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_spark : (* rulename *) string -> spark_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_nnrc : nnrc_driver -> nnrcmr_driver
+    | Dv_nnrcmr_to_dnnrc_dataset : dnnrc_dataset_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_cldmr : (* h *) list (string*string) -> cldmr_driver -> nnrcmr_driver
 
   with cldmr_driver : Set :=
@@ -356,6 +360,12 @@ Module CompDriver(runtime:CompilerRuntime).
         | Dv_nnrcmr_to_cldmr h dv =>
           let q := nnrcmr_to_cldmr h q in
           compile_cldmr dv q
+        | Dv_nnrcmr_to_dnnrc_dataset dv =>
+          let q_opt := nnrcmr_to_dnnrc_dataset q in
+          match q_opt with
+          | Some q => compile_dnnrc_dataset dv q
+          | None => (Q_error "Unable to compile NNRCMR to NNRC") :: nil
+          end
         end
     in
     (Q_nnrcmr q) :: queries
