@@ -35,6 +35,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import CompFront.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
+  Require Import NNRCtoNNRCMR.
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSpark ForeignToSpark.
   Require Import NNRCMRtoCloudant ForeignToCloudant.
@@ -119,8 +120,15 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrc_optim (q: nnrc) : nnrc := trew q.
 
-  Definition nnrc_to_nnrcmr (q: nnrc) : nnrcmr := (* XXX TODO: localization env XXX *)
-    snd (CC.translate_nnrc_to_nnrcmr_chain q).
+  Definition nnrc_to_nnrcmr (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
+    let inputs_loc :=
+        (init_vid, Vlocal)
+          ::(init_vinit, Vlocal)
+          :: inputs_loc
+    in
+    nnrc_to_nnrcmr_chain q
+                         init_vinit
+                         inputs_loc.
 
   Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := mr_optimize q.
 
@@ -186,7 +194,7 @@ Module CompDriver(runtime:CompilerRuntime).
   with nnrc_driver : Set :=
     | Dv_nnrc : nnrc_driver
     | Dv_nnrc_optim : nnrc_driver -> nnrc_driver
-    | Dv_nnrc_to_nnrcmr : nnrcmr_driver -> nnrc_driver
+    | Dv_nnrc_to_nnrcmr : (* inputs_loc *) vdbindings ->nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc_dataset : dnnrc_dataset_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
@@ -313,8 +321,8 @@ Module CompDriver(runtime:CompilerRuntime).
         | Dv_nnrc_optim dv =>
           let q := nnrc_optim q in
           compile_nnrc dv q
-        | Dv_nnrc_to_nnrcmr dv =>
-          let q := nnrc_to_nnrcmr q in
+        | Dv_nnrc_to_nnrcmr inputs_loc dv =>
+          let q := nnrc_to_nnrcmr inputs_loc q in
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset dv =>
           let q := nnrc_to_dnnrc_dataset q in
