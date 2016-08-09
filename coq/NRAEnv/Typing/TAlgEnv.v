@@ -402,7 +402,7 @@ Section TAlgEnv.
     apply data_type_concat; assumption.
   Qed.
 
-  (** Main typing soundness theorem for the NRA *)
+  (** Main typing soundness theorem for NRAEnv *)
 
   Theorem typed_algenv_yields_typed_data {τc} {τenv τin τout} c (env:data) (d:data) (op:algenv):
     bindings_type c τc ->

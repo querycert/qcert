@@ -258,7 +258,7 @@ Section OQL.
   Fixpoint oql_interp (q:oql_expr) (env:oql_env) : option data :=
     match q with
     | OConst d => Some (normalize_data h d)
-    | OVar n => assoc_lookupr string_dec env n
+    | OVar n => edot env n
     | OTable t => edot constant_env t
     | OBinop bop q1 q2 => olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (oql_interp q1 env) (oql_interp q2 env)
     | OUnop uop q1 => olift (fun d1 => fun_of_unaryop h uop d1) (oql_interp q1 env)
