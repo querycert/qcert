@@ -41,11 +41,20 @@ Section TOQL.
     | OTVar {τ} tenv v :
         edot tenv v = Some τ -> oql_expr_type tenv (OVar v) τ
     | OTTable {τ} tenv s :
-      tdot τconstants s = Some τ ->
-      oql_expr_type tenv (OTable s) τ
+        tdot τconstants s = Some τ ->
+        oql_expr_type tenv (OTable s) τ
+    | OTBinop {τ₁ τ₂ τout} tenv b e₁ e₂ :
+        oql_expr_type tenv e₁ τ₁ ->
+        oql_expr_type tenv e₂ τ₂ ->
+        binOp_type b τ₁ τ₂ τout ->
+        oql_expr_type tenv (OBinop b e₁ e₂) τout
+    | OTUnop {τ₁ τout} tenv u e₁ :
+        oql_expr_type tenv e₁ τ₁ ->
+        unaryOp_type u τ₁ τout ->
+        oql_expr_type tenv (OUnop u e₁) τout
     .
   End typ.
-    
+
   (** Main typing soundness theorem for OQL *)
 
   Theorem typed_oql_yields_typed_data {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
@@ -65,6 +74,20 @@ Section TOQL.
     - unfold bindings_type in H0.
       apply (Forall2_lookupr_some _ _ _ _ H0).
       assumption.
+    - elim (IHoql_expr_type1 _ _ H0 H1); intros.
+      elim (IHoql_expr_type2 _ _ H0 H1); intros.
+      elim H2; clear H2; intros.
+      elim H3; clear H3; intros.
+      rewrite H2; rewrite H3; simpl.
+      destruct (typed_binop_yields_typed_data _ _ _ H4 H5 H) as [?[??]].
+      rewrite H6.
+      exists x1; auto.
+    - elim (IHoql_expr_type _ _ H0 H2); intros.
+      elim H3; clear H3; intros.
+      rewrite H3; simpl.
+      destruct (typed_unop_yields_typed_data _ _ H4 H) as [?[??]].
+      rewrite H5.
+      exists x0; auto.
   Qed.
   
 End TOQL.
