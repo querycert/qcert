@@ -184,8 +184,8 @@ Module CompCore(runtime:CompilerRuntime).
 
   (* compilation from nnrc to dnnrc *)
 
-  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc _ bool algenv :=
-    nrc_to_dnrc true tenv e_nrc. (* empty annotation and algenv plug *)
+  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc _ unit dataset :=
+    nrc_to_dnrc tt tenv e_nrc. (* empty annotation and algenv plug *)
 
   (******************
    * NNRCMR Section *

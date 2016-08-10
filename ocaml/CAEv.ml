@@ -50,7 +50,7 @@ let rule_main conf io h world f =
   | ORIG ->
       check_rule_result conf (get_output io) f source_result debug_result
   | _ ->
-      let (fname,sname,op) = alg_of_input lconf f in
+      let (sname,op) = alg_of_input lconf f in
       let actual_result = eval_alg lconf h world op in
       check_alg_result conf (get_output io) f actual_result debug_result
 
@@ -61,7 +61,7 @@ let oql_main conf io h world f =
   | ORIG ->
       check_oql_result (get_output io) f source_result debug_result
   | _ ->
-      let (fname,sname,op) = alg_of_input lconf f in
+      let (sname,op) = alg_of_input lconf f in
       let actual_result = eval_alg lconf h world op in
       check_alg_result conf (get_output io) f actual_result "[OQL]"
 

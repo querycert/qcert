@@ -126,12 +126,7 @@ let suffix_target conf =
   | JS -> suffix_js ()
   | Spark -> suffix_spark ()
   | Spark2 -> suffix_spark2 ()
-  | Cloudant ->
-      begin
-	match get_cld (get_cld_config conf) with
-	| Design -> suffix_cld_design ()
-	| Curl -> suffix_cld_curl ()
-      end
+  | Cloudant -> suffix_cld_design ()
 
 (* Evaluator Section *)
   
@@ -205,7 +200,7 @@ let get_data_dir conf =
 (* Compiler Section *)
   
 type comp_config =
-    { mutable comp_io : Data.json option;
+    { mutable comp_io : string option;
       mutable dir : string option;
       mutable display_dir : string option;
       mutable comp_inputs : string list;

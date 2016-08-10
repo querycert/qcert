@@ -20,16 +20,9 @@ open Compiler.EnhancedCompiler
 
 (* Cloudant format *)
 
-type cldkind =
-  | Curl
-  | Design
-
 type cld_config
 
 val default_cld_config : unit -> cld_config
-
-val get_cld : cld_config -> cldkind
-val set_curl : cld_config -> unit -> unit
 
 val get_prefix : cld_config -> string
 val set_prefix : cld_config -> string -> unit
@@ -43,8 +36,8 @@ val set_harness : cld_config -> string -> unit
 
 val idioticize : string -> string -> string
 
-val cloudant_compile_from_nra : cldkind -> string -> string -> Compiler.algenv -> Data.json -> string
-val cloudant_compile_from_nnrcmr : cldkind -> string -> string -> (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr -> Data.json -> string
+val cloudant_compile_from_nra : string -> string -> Compiler.algenv -> Data.json -> string
+val cloudant_compile_from_nnrcmr : string -> string -> (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr -> Data.json -> string
 
 val cloudant_compile_no_harness_from_nra : string -> Compiler.algenv -> string
 val cloudant_compile_no_harness_from_nnrcmr : string -> (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr -> string

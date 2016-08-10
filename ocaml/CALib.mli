@@ -19,12 +19,19 @@
 (* Note: Attempt for now is no visible dependency on any other module.
    I.e., they will be hiden and the API is self contained. *)
 
+(* Schema Section *)
+
+type schema
+
+val schema_of_io : string -> schema
+
 (* Abstract AST types *)
 
 type camp
 type nraenv
 type nnrc
-type dnnrc
+type dnnrc_dataset
+type dnnrc_typed_dataset
 type nnrcmr
 type cldmr
 
@@ -39,7 +46,9 @@ val rule_to_camp : string -> camp
 val camp_to_nraenv : camp -> nraenv
 
 (* From source to NRAEnv *)
+val rule_to_nraenv_name : string -> string
 val rule_to_nraenv : string -> nraenv
+val oql_to_nraenv_name : string -> string
 val oql_to_nraenv : string -> nraenv
 
 (*
@@ -51,6 +60,8 @@ val translate_nraenv_to_nnrc : nraenv -> nnrc
 val translate_nnrc_to_nnrcmr : nnrc -> nnrcmr
 (* Doesn't work on ocamljava with Java 8 (generics typing issue with the way lists are wrapped by ocamljava *)
 (* val translate_nnrc_to_dnnrc : string list -> nnrc -> dnnrc *)
+val translate_nraenv_to_dnnrc_typed_dataset : schema -> nraenv -> dnnrc_typed_dataset
+val dnnrc_typed_dataset_to_spark2 : string -> schema -> dnnrc_typed_dataset -> string
 
 (* NRAEnv Optimizer *)
 val optimize_nraenv : nraenv -> nraenv
@@ -67,7 +78,6 @@ val optimize_nnrcmr_for_spark : nnrcmr -> nnrcmr
 (* Note: This includes optimization phases *)
 val compile_nraenv_to_nnrc : nraenv -> nnrc
 val compile_nraenv_to_nnrcmr : nraenv -> nnrcmr
-
 
 (*
  *  Backend section
@@ -87,8 +97,9 @@ val compile_nraenv_to_js : nraenv -> string
 val compile_nraenv_to_java : string -> string -> nraenv -> string
 val compile_nraenv_to_spark : string -> nraenv -> string
 val compile_nraenv_to_cloudant : string -> string -> nraenv -> string
+val compile_nraenv_to_cloudant_with_harness : string -> string -> nraenv -> string -> string
+val compile_nraenv_to_cloudant_with_harness_no_hierarchy : string -> string -> nraenv -> string
 val compile_nnrcmr_to_cloudant : string -> string -> nnrcmr -> string
-
 
 (*
  *  ASTs support
@@ -124,4 +135,12 @@ val pretty_nnrcmr_for_cloudant : bool -> int -> nnrcmr -> string
 val set_optim_trace : unit -> unit
 val unset_optim_trace : unit -> unit
 
+
+(* Display *)
+
+val display_nraenv : bool -> int -> schema -> string -> string -> nraenv -> unit
+val display_nraenv_no_schema : bool -> int -> string -> string -> nraenv -> unit
+val display_nraenv_no_io : bool -> int -> schema -> string -> nraenv -> unit
+val display_nraenv_no_schema_no_io : bool -> int -> string -> nraenv -> unit
+val display_nraenv_sexp : string -> nraenv -> unit
 

@@ -22,22 +22,13 @@ open Compiler.EnhancedCompiler
 
 (* Cloudant format *)
 
-type cldkind =
-  | Curl
-  | Design
-
 type cld_config =
-    { mutable cld : cldkind;
-      mutable prefix : string;
+    { mutable prefix : string;
       mutable harness : string }
 
 let default_cld_config () =
-  { cld = Design;
-    prefix = "";
+  { prefix = "";
     harness = "" }
-
-let get_cld conf = conf.cld
-let set_curl conf () = conf.cld <- Curl
 
 let get_prefix conf = conf.prefix
 let set_prefix conf s = conf.prefix <- s
@@ -92,9 +83,6 @@ let makeLastInputs (last_inputs:char list list) =
 let makeTopCld dbs last last_inputs : string =
   "{ \"designs\": " ^ dbs ^ ",\n  \"post\":\ \"" ^ last ^ "\",\n \"post_input\":\ " ^ (makeLastInputs last_inputs) ^ " }"
 
-let makeOneCurl (db,dd) : string =
-  "curl -X PUT \"https://fe0a4004-9ff8-4bc4-9de8-906e1831cc78-bluemix:8a67972aa73304b3b7cc9b0cc4525d2e6c26988dd08c787ae29d5d68079c0b54@fe0a4004-9ff8-4bc4-9de8-906e1831cc78-bluemix.cloudant.com/" ^ db ^ "/_design/" ^ db ^ "\" -H 'Content-type: application/json' -d '" ^ dd ^ "'"
-
 (* Java equivalent: CloudantBackend.fold_design *)
 let fold_design (dds:(string * string) list) (last_expr:string) (last_inputs: char list list) : string =
   makeTopCld
@@ -102,28 +90,21 @@ let fold_design (dds:(string * string) list) (last_expr:string) (last_inputs: ch
     last_expr
     last_inputs
 
-let fold_curl (dds:(string * string) list) : string =
-  String.concat Util.os_newline (List.map makeOneCurl dds)
-
 let rec print_string_list = function 
     [] -> ()
   | e::l -> print_string (string_of_char_list e) ; print_string " " ; print_string_list l
 
-let cloudant_compile_from_nra cld harness nrule op h =
+let cloudant_compile_from_nra harness nrule op h =
   let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
   let harnessed_design_docs = List.map (add_harness harness h) design_docs in
-  match cld with
-  | Design -> fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
-  | Curl -> fold_curl harnessed_design_docs
+  fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
 
-let cloudant_compile_from_nnrcmr cld harness nrule nnrcmr h =
+let cloudant_compile_from_nnrcmr harness nrule nnrcmr h =
   let (env_var,mr) = nnrcmr in
   let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
   let harnessed_design_docs = List.map (add_harness harness h) design_docs in
-  match cld with
-  | Design -> fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
-  | Curl -> fold_curl harnessed_design_docs
+  fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_compile_no_harness_from_nra nrule op =
   let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
@@ -144,4 +125,3 @@ let cloudant_code_gen_no_harness nrule cldmr =
   let (design_docs, (last_expr, last_inputs)) = CompBack.cldmr_code_gen [] cldmr (char_list_of_string nrule) in
   fold_design (List.map dont_add_harness design_docs) (Util.string_of_char_list last_expr) last_inputs
   
-

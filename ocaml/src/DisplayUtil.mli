@@ -20,11 +20,14 @@ open Util
 open ConfigUtil
 open PrettyIL
 
+(* Util *)
+
+val get_display_fname : comp_config -> string -> string
+
 (* Display ILs *)
 
 val display_to_string : pretty_config -> (RType.brand_model * RType.camp_type) option -> algenv -> (string * string * string * string * string * string)
-
-val display_algenv_top : comp_config -> (RType.brand_model * RType.camp_type) option -> (string * algenv) -> unit
+val display_algenv_top : PrettyIL.charkind -> int -> (RType.brand_model * RType.camp_type) option -> string option -> string -> algenv -> unit
 
 (* SExp ILs *)
     
@@ -43,7 +46,7 @@ val nrcmr_to_sexp_string : nrcmr -> string
 val sexp_string_to_cldmr : string -> cldmr
 val cldmr_to_sexp_string : cldmr -> string
 
-val sexp_algenv_top : comp_config -> (string * algenv) -> unit
+val sexp_algenv_top : string -> algenv -> unit
 
 (* Data Display *)
 

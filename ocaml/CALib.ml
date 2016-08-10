@@ -26,12 +26,21 @@ open FrontUtil
 open Compiler.EnhancedCompiler
 
 
+(* Schema Section *)
+
+type schema = RType.brand_model * RType.camp_type
+
+let schema_of_io (io:string) =
+  let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string io) in
+  TypeUtil.process_schema schema_content wmType
+
 (* Abstract AST types *)
 
 type camp = Asts.camp
 type nraenv = Asts.algenv
 type nnrc = Asts.nrc
-type dnnrc = Asts.dnrc
+type dnnrc_dataset = Asts.dnrc_dataset
+type dnnrc_typed_dataset = Asts.dnrc_typed_dataset
 type nnrcmr = Asts.nrcmr
 type cldmr = Asts.cldmr
 
@@ -40,7 +49,7 @@ let dlocal_conv l =
 
 let dvar_conv x =
   (Util.char_list_of_string x, Compiler.Vdistr)
-    
+
 (*
  *  Frontend section
  *)
@@ -57,11 +66,17 @@ let camp_to_nraenv (c:camp) =
 
 (* From source to NRAEnv *)
 
+let rule_to_nraenv_name (s:string) : string =
+  fst (alg_of_rule_string s)
+
 let rule_to_nraenv (s:string) : nraenv =
-  let (_,op) = alg_of_rule_string s in op
+  snd (alg_of_rule_string s)
+
+let oql_to_nraenv_name (s:string) : string =
+  fst (alg_of_oql_string s)
 
 let oql_to_nraenv (s:string) : nraenv =
-  let (_,op) = alg_of_oql_string s in op
+  snd (alg_of_oql_string s)
 
 (*
  *  Core compiler section
@@ -71,9 +86,29 @@ let oql_to_nraenv (s:string) : nraenv =
 
 let translate_nraenv_to_nnrc (op:nraenv) : nnrc = CompCore.translate_nraenv_to_nnrc op
 let translate_nnrc_to_nnrcmr (n:nnrc) : nnrcmr = CompCore.translate_nnrc_to_nnrcmr_chain n
-let translate_nnrc_to_dnnrc (tenv: string list) (n:nnrc) : dnnrc =
+let translate_nnrc_to_dnnrc (tenv: string list) (n:nnrc) : dnnrc_dataset =
   let tenv = List.map dvar_conv tenv in
   CompCore.translate_nnrc_to_dnnrc tenv n
+
+let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
+  match
+    let (brand_model,wmRType) = sc in
+    CompCore.tcompile_nraenv_to_dnnrc_dataset_opt
+      brand_model
+      (Enhanced.Model.foreign_typing brand_model)
+      op
+      wmRType
+  with
+  | Some x -> x
+  | None -> raise (CACo_Error "Spark2 target compilation failed")
+
+let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_dataset) : string =
+  let (brand_model,wmRType) = sc in
+  string_of_char_list
+    (CompBack.dnrc_to_scala_code_gen
+       brand_model
+       (Enhanced.Model.foreign_typing brand_model)
+       wmRType (Util.char_list_of_string nrule) e)
 
 (* NRAEnv Optimizer *)
 let optimize_nraenv (op:nraenv) =
@@ -137,6 +172,12 @@ let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
 let compile_nraenv_to_cloudant (prefix:string) (nrule:string) (op:nraenv) : string =
   cloudant_compile_no_harness_from_nra (idioticize prefix nrule) op
 
+let compile_nraenv_to_cloudant_with_harness (harness:string) (cldrule:string) (op:nraenv) (io:string) =
+  cloudant_compile_from_nra harness cldrule op (DataUtil.get_hierarchy_cloudant (Some (ParseString.parse_io_from_string io)))
+
+let compile_nraenv_to_cloudant_with_harness_no_hierarchy (harness:string) (cldrule:string) (op:nraenv) =
+  cloudant_compile_from_nra harness cldrule op (DataUtil.get_hierarchy_cloudant None)
+
 let compile_nnrcmr_to_cloudant (prefix:string) (nrule:string) (n:nnrcmr) : string =
   cloudant_compile_no_harness_from_nnrcmr (idioticize prefix nrule) n
   
@@ -180,4 +221,29 @@ let pretty_nnrcmr_for_cloudant (greek:bool) (margin:int) (nmr:nnrcmr) =
 
 let set_optim_trace = Logger.set_trace
 let unset_optim_trace = Logger.unset_trace
+
+(* Display *)
+
+let display_nraenv (charbool:bool) (margin:int) modelandtype io dfname op =
+  if charbool
+  then display_algenv_top PrettyIL.Greek margin (Some modelandtype) (Some io) dfname op
+  else display_algenv_top PrettyIL.Ascii margin (Some modelandtype) (Some io) dfname op
+
+let display_nraenv_no_schema (charbool:bool) (margin:int) io dfname op =
+  if charbool
+  then display_algenv_top PrettyIL.Greek margin None (Some io) dfname op
+  else display_algenv_top PrettyIL.Ascii margin None (Some io) dfname op
+
+let display_nraenv_no_io (charbool:bool) (margin:int) modelandtype dfname op =
+  if charbool
+  then display_algenv_top PrettyIL.Greek margin (Some modelandtype) None dfname op
+  else display_algenv_top PrettyIL.Ascii margin (Some modelandtype) None dfname op
+
+let display_nraenv_no_schema_no_io (charbool:bool) (margin:int) dfname op =
+  if charbool
+  then display_algenv_top PrettyIL.Greek margin None None dfname op
+  else display_algenv_top PrettyIL.Ascii margin None None dfname op
+
+let display_nraenv_sexp dfname op =
+  sexp_algenv_top dfname op
 

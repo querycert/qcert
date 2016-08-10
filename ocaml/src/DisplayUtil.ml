@@ -59,41 +59,53 @@ let display_to_string conf modelandtype op =
     end
   in (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string, opt_dnrc_dataset_string)
 
+let get_display_fname conf fname =
+  let fpref = Filename.chop_extension fname in
+  target_f (get_display_dir conf) fpref
 
-let display_algenv_top conf modelandtype (fname,op) =
+let make_pretty_config charkind margin =
+  let dpc = default_pretty_config () in
+  begin
+    match charkind with
+    | Ascii -> set_ascii dpc ()
+    | Greek -> set_greek dpc ()
+  end;
+  set_margin dpc margin;
+  dpc
+    
+let display_algenv_top (ck:charkind) (margin:int) modelandtype (ios:string option) (dfname:string) op =
   let modelandtype' =
     begin
     match modelandtype with
     | Some bm -> Some bm
     | None ->
-       begin
-       match get_comp_io conf with
-       | Some io ->
-	  let (schema_content,wmType) = TypeUtil.extract_schema io in
-	  let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
-	  Some (brand_model, wmRType)
-	| None -> None
-       end
+	begin
+	  match ios with
+	  | Some io ->
+	      let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string io) in
+	      let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
+	      Some (brand_model, wmRType)
+	  | None -> None
+	end
     end
-    in
-    let (display_nra,display_nrc,display_nrcmr,display_nrcmr_spark,display_nrcmr_cldmr, display_opt_dnrc_dataset) =
-      display_to_string (get_pretty_config conf) modelandtype' op
-    in
-    let fpref = Filename.chop_extension fname in
-    let fout_nra = outname (target_f (get_display_dir conf) fpref) (suffix_nra ()) in
-    let fout_nrc = outname (target_f (get_display_dir conf) fpref) (suffix_nrc ()) in
-    let fout_nrcmr = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr ()) in
-    let fout_nrcmr_spark = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr_spark ()) in
-    let fout_nrcmr_cldmr = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr_cldmr ()) in
-    let fout_dnrc_dataset = outname (target_f (get_display_dir conf) fpref) (suffix_dnrc ()) in
-    begin
-      make_file fout_nra display_nra;
-      make_file fout_nrc display_nrc;
-      make_file fout_nrcmr display_nrcmr;
-      make_file fout_nrcmr_spark display_nrcmr_spark;
-      make_file fout_nrcmr_cldmr display_nrcmr_cldmr;
-      make_file fout_dnrc_dataset display_opt_dnrc_dataset;
-    end
+  in
+  let (display_nra,display_nrc,display_nrcmr,display_nrcmr_spark,display_nrcmr_cldmr, display_opt_dnrc_dataset) =
+    display_to_string (make_pretty_config ck margin) modelandtype' op
+  in
+  let fout_nra = outname dfname (suffix_nra ()) in
+  let fout_nrc = outname dfname (suffix_nrc ()) in
+  let fout_nrcmr = outname dfname (suffix_nrcmr ()) in
+  let fout_nrcmr_spark = outname dfname (suffix_nrcmr_spark ()) in
+  let fout_nrcmr_cldmr = outname dfname (suffix_nrcmr_cldmr ()) in
+  let fout_dnrc_dataset = outname dfname (suffix_dnrc ()) in
+  begin
+    make_file fout_nra display_nra;
+    make_file fout_nrc display_nrc;
+    make_file fout_nrcmr display_nrcmr;
+    make_file fout_nrcmr_spark display_nrcmr_spark;
+    make_file fout_nrcmr_cldmr display_nrcmr_cldmr;
+    make_file fout_dnrc_dataset display_opt_dnrc_dataset;
+  end
 
 (* S-expression hooks *)
       
@@ -114,7 +126,7 @@ let cldmr_to_sexp_string n = SExp.sexp_to_string (Asts.cldmr_to_sexp n)
 
 (* Top-level *)
     
-let sexp_algenv_top conf (fname,op) =
+let sexp_algenv_top dfname op =
   let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
   let display_nra = nra_to_sexp_string op in
   let display_nrc = nrc_to_sexp_string opt_nnrc in
@@ -123,11 +135,10 @@ let sexp_algenv_top conf (fname,op) =
   let nrcmr_cldmr = CompBack.nrcmr_to_nrcmr_prepared_for_cldmr nnrcmr in
   let display_nrcmr_spark = nrcmr_to_sexp_string (env_var,nrcmr_spark) in
   let display_nrcmr_cldmr = nrcmr_to_sexp_string (env_var,nrcmr_cldmr) in
-  let fpref = Filename.chop_extension fname in
-  let fout_nra = outname (target_f (get_display_dir conf) fpref) (suffix_nrasexp ()) in
-  let fout_nrc = outname (target_f (get_display_dir conf) fpref) (suffix_nrcsexp ()) in
-  let fout_nrcmr_spark = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr_sparksexp ()) in
-  let fout_nrcmr_cldmr = outname (target_f (get_display_dir conf) fpref) (suffix_nrcmr_cldmrsexp ()) in
+  let fout_nra = outname dfname (suffix_nrasexp ()) in
+  let fout_nrc = outname dfname (suffix_nrcsexp ()) in
+  let fout_nrcmr_spark = outname dfname (suffix_nrcmr_sparksexp ()) in
+  let fout_nrcmr_cldmr = outname dfname (suffix_nrcmr_cldmrsexp ()) in
   begin
     make_file fout_nra display_nra;
     make_file fout_nrc display_nrc;

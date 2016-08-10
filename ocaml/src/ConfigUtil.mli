@@ -107,7 +107,7 @@ type comp_config
 
 val default_comp_config : unit -> comp_config
 
-val set_comp_io : comp_config -> Data.json -> unit
+val set_comp_io : comp_config -> string -> unit
 val set_comp_input : comp_config -> string -> unit
 val set_dir : comp_config -> string -> unit
 val set_display_dir : comp_config -> string -> unit
@@ -116,7 +116,7 @@ val set_display : comp_config -> unit -> unit
 val set_display_sexp : comp_config -> unit -> unit
 val set_test_sexp : comp_config -> unit -> unit
 
-val get_comp_io : comp_config -> Data.json option
+val get_comp_io : comp_config -> string option
 val get_dir : comp_config -> string option
 val get_display_dir : comp_config -> string option
 val get_target_display : comp_config -> bool ref

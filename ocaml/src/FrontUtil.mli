@@ -24,10 +24,10 @@ open Compiler.EnhancedCompiler
 val camp_of_rule_string : string -> (string * Compiler.pat)
 val alg_of_camp : Compiler.pat -> Compiler.algenv
 
-val alg_of_rule : string -> (string * string * Compiler.algenv)
+val alg_of_rule : string -> (string * Compiler.algenv)
 val alg_of_rule_string : string -> (string * Compiler.algenv)
-val alg_of_oql : string -> (string * string * Compiler.algenv)
+val alg_of_oql : string -> (string * Compiler.algenv)
 val alg_of_oql_string : string -> (string * Compiler.algenv)
 
-val alg_of_input : lang_config -> string -> (string * string * Compiler.algenv)
+val alg_of_input : lang_config -> string -> (string * Compiler.algenv)
 

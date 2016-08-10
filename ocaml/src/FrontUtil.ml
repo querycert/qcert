@@ -47,9 +47,9 @@ let alg_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
   | Asts.RuleAst ru ->
-      (f,rn,CompFront.translate_rule_to_algenv ru)
+      (rn,CompFront.translate_rule_to_algenv ru)
   | Asts.CampAst ru ->
-      (f,rn,CompFront.translate_pat_to_algenv ru)
+      (rn,CompFront.translate_pat_to_algenv ru)
 
 let alg_of_oql_string s =
   let o = parse_oql_from_string s in
@@ -57,7 +57,7 @@ let alg_of_oql_string s =
   
 let alg_of_oql f =
   let o = parse_oql_from_file f in
-  (f,"OQL",CompFront.translate_oql_to_algenv o)
+  ("OQL",CompFront.translate_oql_to_algenv o)
   
 let alg_of_input conf f =
   match get_source_lang conf with
