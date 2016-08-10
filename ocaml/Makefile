@@ -114,7 +114,7 @@ japi/lib/$(LIB).jar: $(LIB).jar
 
 
 clean:
-	ocamlbuild -clean
+	ocamlbuild -clean -no-log
 	rm -rf _build
 	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR)
 	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi

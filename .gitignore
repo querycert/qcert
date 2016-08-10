@@ -8,5 +8,7 @@ Makefile.coq
 bin/CACo
 bin/CADa
 bin/CAEv
+/.project
+/.README.md.html
 bin/CAPp
 html
