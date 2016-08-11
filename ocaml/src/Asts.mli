@@ -31,8 +31,6 @@ type dnnrc_typed_dataset = CompDriver.dnnrc_typed_dataset
 type nnrcmr = CompDriver.nnrcmr
 type cldmr = CompDriver.cldmr
 
-type sexp_ast = SExp.sexp
-
 type data_ast = Data.data
 type io_ast = Data.json
 type json_ast = Data.json
@@ -44,24 +42,4 @@ type rORc_ast =
   | CampAst of camp
       
 type oql_ast = OQL.expr
-
-(* AST <-> S-Expr *)
-
-val sexp_to_data : sexp_ast -> data_ast
-val data_to_sexp : data_ast -> sexp_ast
-
-val sexp_to_camp : sexp_ast -> camp
-val camp_to_sexp : camp -> sexp_ast
-
-val sexp_to_nraenv : sexp_ast -> nraenv
-val nraenv_to_sexp : nraenv -> sexp_ast
-
-val sexp_to_nnrc : sexp_ast -> nnrc
-val nnrc_to_sexp : nnrc -> sexp_ast
-
-val sexp_to_nnrcmr : sexp_ast -> nnrcmr
-val nnrcmr_to_sexp : nnrcmr -> sexp_ast
-
-val sexp_to_cldmr : sexp_ast -> cldmr
-val cldmr_to_sexp : cldmr -> sexp_ast
 

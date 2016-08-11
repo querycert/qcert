@@ -62,11 +62,11 @@ let parse_oql f : oql_ast = OQL.tableify (parse OQLParser.main (OQLLexer.token (
 (* S-Expr Parse *)
 (****************)
 
-let parse_sexp f : sexp_ast = parse SExpParser.main (SExpLexer.token (string_buff ())) f
-let parse_io_sexp f : data_ast = sexp_to_data (parse_sexp f)
-let parse_camp_sexp f : camp = sexp_to_camp (parse_sexp f)
-let parse_nraenv_sexp f : nraenv = sexp_to_nraenv (parse_sexp f)
-let parse_nnrc_sexp f : nnrc = sexp_to_nnrc (parse_sexp f)
-let parse_nnrcmr_sexp f : nnrcmr = sexp_to_nnrcmr (parse_sexp f)
-let parse_cldmr_sexp f : cldmr = sexp_to_cldmr (parse_sexp f)
+let parse_sexp f : SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
+let parse_io_sexp f : data_ast = AstsToSExp.sexp_to_data (parse_sexp f)
+let parse_camp_sexp f : camp = AstsToSExp.sexp_to_camp (parse_sexp f)
+let parse_nraenv_sexp f : nraenv = AstsToSExp.sexp_to_nraenv (parse_sexp f)
+let parse_nnrc_sexp f : nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
+let parse_nnrcmr_sexp f : nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
+let parse_cldmr_sexp f : cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 

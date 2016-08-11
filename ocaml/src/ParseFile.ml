@@ -60,7 +60,7 @@ let parse_oql_from_file f : oql_ast = parse_file parse_oql f
 (* S-Expr Parse *)
 (****************)
 
-let parse_sexp_from_file s : sexp_ast = parse_file parse_sexp s
+let parse_sexp_from_file s : SExp.sexp = parse_file parse_sexp s
 let parse_io_sexp_from_file s : data_ast = parse_file parse_io_sexp s
 let parse_camp_sexp_from_file s : camp = parse_file parse_camp_sexp s
 let parse_nraenv_sexp_from_file s : nraenv = parse_file parse_nraenv_sexp s

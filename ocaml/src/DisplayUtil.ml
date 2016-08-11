@@ -110,19 +110,19 @@ let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
 (* S-expression hooks *)
       
 let sexp_string_to_camp s = ParseString.parse_camp_sexp_from_string s
-let camp_to_sexp_string p = SExp.sexp_to_string (Asts.camp_to_sexp p)
+let camp_to_sexp_string p = SExp.sexp_to_string (AstsToSExp.camp_to_sexp p)
 
 let sexp_string_to_nraenv s = ParseString.parse_nraenv_sexp_from_string s
-let nraenv_to_sexp_string op = SExp.sexp_to_string (Asts.nraenv_to_sexp op)
+let nraenv_to_sexp_string op = SExp.sexp_to_string (AstsToSExp.nraenv_to_sexp op)
 
 let sexp_string_to_nnrc s = ParseString.parse_nnrc_sexp_from_string s
-let nnrc_to_sexp_string n = SExp.sexp_to_string (Asts.nnrc_to_sexp n)
+let nnrc_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.nnrc_to_sexp n)
 
 let sexp_string_to_nnrcmr s = ParseString.parse_nnrcmr_sexp_from_string s
-let nnrcmr_to_sexp_string n = SExp.sexp_to_string (Asts.nnrcmr_to_sexp n)
+let nnrcmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.nnrcmr_to_sexp n)
 
 let sexp_string_to_cldmr s = ParseString.parse_cldmr_sexp_from_string s
-let cldmr_to_sexp_string n = SExp.sexp_to_string (Asts.cldmr_to_sexp n)
+let cldmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.cldmr_to_sexp n)
 
 (* Top-level *)
     

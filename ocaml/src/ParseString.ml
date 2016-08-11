@@ -55,7 +55,7 @@ let parse_oql_from_string s : oql_ast = parse_string parse_oql s
 (* S-Expr Parse *)
 (****************)
 
-let parse_sexp_from_string s : sexp_ast = parse_string parse_sexp s
+let parse_sexp_from_string s : SExp.sexp = parse_string parse_sexp s
 let parse_io_sexp_from_string s : data_ast = parse_string parse_io_sexp s
 let parse_camp_sexp_from_string s : camp = parse_string parse_camp_sexp s
 let parse_nraenv_sexp_from_string s : nraenv = parse_string parse_nraenv_sexp s

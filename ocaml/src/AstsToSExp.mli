@@ -17,30 +17,29 @@
 (* This module contains parsing utilities *)
 
 open Compiler.EnhancedCompiler
+open SExp
+open Asts
 
 
-(********)
-(* ASTs *)
-(********)
+(******************
+ * AST <-> S-Expr *
+ ******************)
 
-type data_ast = Data.data
-type io_ast = Data.json
-type json_ast = Data.json
+val sexp_to_data : sexp -> data_ast
+val data_to_sexp : data_ast -> sexp
 
-type rule = CompDriver.rule
-type camp = CompDriver.camp
-type nraenv = CompDriver.nraenv
-type nnrc = CompDriver.nnrc
-type dnnrc_dataset = CompDriver.dnnrc_dataset
-type dnnrc_typed_dataset = CompDriver.dnnrc_typed_dataset
-type nnrcmr = CompDriver.nnrcmr
-type cldmr = CompDriver.cldmr
+val sexp_to_camp : sexp -> camp
+val camp_to_sexp : camp -> sexp
 
-type rule_ast = string * rule
+val sexp_to_nraenv : sexp -> nraenv
+val nraenv_to_sexp : nraenv -> sexp
 
-type rORc_ast =
-  | RuleAst of rule
-  | CampAst of camp
-      
-type oql_ast = OQL.expr
+val sexp_to_nnrc : sexp -> nnrc
+val nnrc_to_sexp : nnrc -> sexp
+
+val sexp_to_nnrcmr : sexp -> nnrcmr
+val nnrcmr_to_sexp : nnrcmr -> sexp
+
+val sexp_to_cldmr : sexp -> cldmr
+val cldmr_to_sexp : cldmr -> sexp
 

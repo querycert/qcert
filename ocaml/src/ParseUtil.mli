@@ -35,7 +35,7 @@ val parse_oql : Lexing.lexbuf -> oql_ast
 (* S-Expr Parse *)
 (****************)
 
-val parse_sexp : Lexing.lexbuf -> sexp_ast
+val parse_sexp : Lexing.lexbuf -> SExp.sexp
 val parse_io_sexp : Lexing.lexbuf -> data_ast
 val parse_camp_sexp : Lexing.lexbuf -> camp
 val parse_nraenv_sexp : Lexing.lexbuf -> nraenv
