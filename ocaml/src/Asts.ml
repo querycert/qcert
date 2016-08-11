@@ -36,7 +36,7 @@ type camp = CompDriver.camp
 type nraenv = CompDriver.nraenv
 type nnrc = CompDriver.nnrc
 type dnnrc_dataset = CompDriver.dnnrc_dataset
-type dnnrc_typed_dataset = (unit Compiler.type_annotation, Compiler.dataset) Compiler.dnrc
+type dnnrc_typed_dataset = CompDriver.dnnrc_typed_dataset
 type nnrcmr = CompDriver.nnrcmr
 type cldmr = CompDriver.cldmr
 
