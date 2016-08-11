@@ -215,21 +215,21 @@ Module CompCore(runtime:CompilerRuntime).
                              init_vinit
                              env_variables
     in
-    (env_variables, e_mr).
+    e_mr.
 
-  Definition tcompile_nraenv_to_nnrcmr_chain_no_optim (op_init:algenv) : list (var * dlocalization) * nrcmr :=
+  Definition tcompile_nraenv_to_nnrcmr_chain_no_optim (op_init:algenv) : nrcmr :=
     let e_nrc := tcompile_nraenv_to_nnrc_typed_opt op_init in
     translate_nnrc_to_nnrcmr_chain e_nrc.
 
-  Definition tcompile_nnrc_to_nnrcmr_chain_typed_opt (e_nrc:nrc) : list (var * dlocalization) * nrcmr :=
-    let (env_vars, e_mr) := translate_nnrc_to_nnrcmr_chain e_nrc in
+  Definition tcompile_nnrc_to_nnrcmr_chain_typed_opt (e_nrc:nrc) : nrcmr :=
+    let e_mr := translate_nnrc_to_nnrcmr_chain e_nrc in
     let e_mr_optim := mr_optimize e_mr in
-    (env_vars, e_mr_optim).
+    e_mr_optim.
 
-  Definition tcompile_nraenv_to_nnrcmr_chain_typed_opt (op_init:algenv) : list (var * dlocalization) * nrcmr :=
-    let (env_vars, e_mr) := tcompile_nraenv_to_nnrcmr_chain_no_optim op_init in
+  Definition tcompile_nraenv_to_nnrcmr_chain_typed_opt (op_init:algenv) : nrcmr :=
+    let e_mr := tcompile_nraenv_to_nnrcmr_chain_no_optim op_init in
     let e_mr_optim := mr_optimize e_mr in
-    (env_vars, e_mr_optim).
+    e_mr_optim.
 
   Definition trew_nnrcmr_typed_opt (e_mr:nrcmr) : nrcmr :=
     mr_optimize e_mr.

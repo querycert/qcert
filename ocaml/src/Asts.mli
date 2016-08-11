@@ -22,13 +22,13 @@ open Compiler.EnhancedCompiler
 (* ASTs *)
 (********)
 
-type camp = Compiler.pat
-type algenv = Compiler.algenv
-type nrc = Compiler.nrc
-type dnrc_dataset = (unit, Compiler.dataset) Compiler.dnrc
+type camp = CompDriver.camp
+type algenv = CompDriver.nraenv
+type nrc = CompDriver.nnrc
+type dnrc_dataset = CompDriver.dnnrc_dataset
 type dnrc_typed_dataset = (unit Compiler.type_annotation, Compiler.dataset) Compiler.dnrc
-type nrcmr = (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr
-type cldmr = Compiler.cld_mrl
+type nrcmr = CompDriver.nnrcmr
+type cldmr = CompDriver.cldmr
 
 type sexp_ast = SExp.sexp
 

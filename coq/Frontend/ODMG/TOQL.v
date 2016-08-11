@@ -51,8 +51,7 @@ Section TOQL.
     | OTUnop {τ₁ τout} tenv u e₁ :
         oql_expr_type tenv e₁ τ₁ ->
         unaryOp_type u τ₁ τout ->
-        oql_expr_type tenv (OUnop u e₁) τout
-    .
+        oql_expr_type tenv (OUnop u e₁) τout.
   End typ.
 
   (** Main typing soundness theorem for OQL *)

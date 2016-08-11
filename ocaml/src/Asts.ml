@@ -32,13 +32,14 @@ type io_ast = Data.json
 type json_ast = Data.json
 
 type rule_ast = string * Rule.rule
-type camp = Pattern.pat
-type algenv = Compiler.algenv
-type nrc = Compiler.nrc
-type dnrc_dataset = (unit, Compiler.dataset) Compiler.dnrc
+
+type camp = CompDriver.camp
+type algenv = CompDriver.nraenv
+type nrc = CompDriver.nnrc
+type dnrc_dataset = CompDriver.dnnrc_dataset
 type dnrc_typed_dataset = (unit Compiler.type_annotation, Compiler.dataset) Compiler.dnrc
-type nrcmr = (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr
-type cldmr = Compiler.cld_mrl
+type nrcmr = CompDriver.nnrcmr
+type cldmr = CompDriver.cldmr
 
 type rORc_ast =
   | RuleAst of Rule.rule
@@ -599,9 +600,9 @@ let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
       raise (Util.CACo_Error "Not well-formed S-expr inside mr_last")
 
 let nrcmr_to_sexp (n:nrcmr) : sexp =
-  let (env,nrcmr) = n in
+  let nrcmr = n in
   STerm ("nrcmr",
-	 (STerm ("mr_env", var_locs_to_sexp env))
+	 (STerm ("mr_env", var_locs_to_sexp nrcmr.mr_inputs_loc))
 	 :: (STerm ("mr_chain", mr_chain_to_sexp (nrcmr.mr_chain)))
 	 :: (mr_last_to_sexp nrcmr.mr_last)
 	 :: [])
@@ -614,10 +615,9 @@ let sexp_to_nrcmr (se:sexp) : nrcmr =
 	   :: last
 	   :: [])
     ->
-      (sexp_to_var_locs env,
-       { mr_inputs_loc = sexp_to_var_locs env;
-         mr_chain = sexp_to_mr_chain chain;
-	 mr_last = sexp_to_mr_last last })
+      { mr_inputs_loc = sexp_to_var_locs env;
+        mr_chain = sexp_to_mr_chain chain;
+	mr_last = sexp_to_mr_last last }
   | _ ->
       raise (Util.CACo_Error "Not well-formed S-expr inside nrcmr")
 

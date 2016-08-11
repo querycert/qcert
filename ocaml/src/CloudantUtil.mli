@@ -37,12 +37,11 @@ val set_harness : cld_config -> string -> unit
 val idioticize : string -> string -> string
 
 val cloudant_compile_from_nra : string -> string -> Compiler.algenv -> Data.json -> string
-val cloudant_compile_from_nnrcmr : string -> string -> (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr -> Data.json -> string
+val cloudant_compile_from_nnrcmr : string -> string -> Compiler.nrcmr -> Data.json -> string
 
 val cloudant_compile_no_harness_from_nra : string -> Compiler.algenv -> string
-val cloudant_compile_no_harness_from_nnrcmr : string -> (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr -> string
+val cloudant_compile_no_harness_from_nnrcmr : string -> Compiler.nrcmr -> string
 
-val cloudant_translate_no_harness : (Compiler.var * Compiler.dlocalization) list * Compiler.nrcmr -> Compiler.cld_mrl
-
+val cloudant_translate_no_harness : Compiler.nrcmr -> Compiler.cld_mrl
 val cloudant_code_gen_no_harness : string -> Compiler.cld_mrl -> string
 

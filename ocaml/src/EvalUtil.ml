@@ -53,10 +53,10 @@ let eval_alg conf h world op : Data.data option =
       let nrc = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
       EvalTop.dnrc_eval_top h nrc world
   | NNRCMR ->
-      let (env_var, mrchain) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       EvalTop.nrcmr_chain_eval_top h mrchain world
   | CLDMR ->
-      let (env_var, mrchain) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->

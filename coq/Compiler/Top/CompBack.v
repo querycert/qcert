@@ -98,7 +98,7 @@ Module CompBack(runtime:CompilerRuntime).
     let spark_mr := nrcmrToSparkTopDataFromFileTop rulename init_vinit e_mr in
     spark_mr.
 
-  Definition mrchain_to_spark_code_gen rulename (env_vars:list (var * dlocalization)) (e_mr:nrcmr) :=
+  Definition mrchain_to_spark_code_gen rulename (e_mr:nrcmr) :=
     nrcmrToSparkTopDataFromFileTop rulename init_vinit e_mr.
 
 End CompBack.
