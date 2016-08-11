@@ -38,8 +38,8 @@ val parse_oql : Lexing.lexbuf -> oql_ast
 val parse_sexp : Lexing.lexbuf -> sexp_ast
 val parse_io_sexp : Lexing.lexbuf -> data_ast
 val parse_camp_sexp : Lexing.lexbuf -> camp
-val parse_nra_sexp : Lexing.lexbuf -> algenv
-val parse_nrc_sexp : Lexing.lexbuf -> nrc
-val parse_nrcmr_sexp : Lexing.lexbuf -> nrcmr
+val parse_nraenv_sexp : Lexing.lexbuf -> nraenv
+val parse_nnrc_sexp : Lexing.lexbuf -> nnrc
+val parse_nnrcmr_sexp : Lexing.lexbuf -> nnrcmr
 val parse_cldmr_sexp : Lexing.lexbuf -> cldmr
 

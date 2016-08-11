@@ -26,27 +26,27 @@ val get_display_fname : comp_config -> string -> string
 
 (* Display ILs *)
 
-val display_to_string : pretty_config -> (RType.brand_model * RType.camp_type) option -> algenv -> (string * string * string * string * string * string)
-val display_algenv_top : PrettyIL.charkind -> int -> (RType.brand_model * RType.camp_type) option -> string option -> string -> algenv -> unit
+val display_to_string : pretty_config -> (RType.brand_model * RType.camp_type) option -> nraenv -> (string * string * string * string * string * string)
+val display_nraenv_top : PrettyIL.charkind -> int -> (RType.brand_model * RType.camp_type) option -> string option -> string -> nraenv -> unit
 
 (* SExp ILs *)
     
 val sexp_string_to_camp : string -> camp
 val camp_to_sexp_string : camp -> string
 
-val sexp_string_to_nra : string -> algenv
-val nra_to_sexp_string : algenv -> string
+val sexp_string_to_nraenv : string -> nraenv
+val nraenv_to_sexp_string : nraenv -> string
 
-val sexp_string_to_nrc : string -> nrc
-val nrc_to_sexp_string : nrc -> string
+val sexp_string_to_nnrc : string -> nnrc
+val nnrc_to_sexp_string : nnrc -> string
 
-val sexp_string_to_nrcmr : string -> nrcmr
-val nrcmr_to_sexp_string : nrcmr -> string
+val sexp_string_to_nnrcmr : string -> nnrcmr
+val nnrcmr_to_sexp_string : nnrcmr -> string
 
 val sexp_string_to_cldmr : string -> cldmr
 val cldmr_to_sexp_string : cldmr -> string
 
-val sexp_algenv_top : string -> algenv -> unit
+val sexp_nraenv_top : string -> nraenv -> unit
 
 (* Data Display *)
 

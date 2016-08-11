@@ -37,11 +37,11 @@ let schema_of_io (io:string) =
 (* Abstract AST types *)
 
 type camp = Asts.camp
-type nraenv = Asts.algenv
-type nnrc = Asts.nrc
-type dnnrc_dataset = Asts.dnrc_dataset
-type dnnrc_typed_dataset = Asts.dnrc_typed_dataset
-type nnrcmr = Asts.nrcmr
+type nraenv = Asts.nraenv
+type nnrc = Asts.nnrc
+type dnnrc_dataset = Asts.dnnrc_dataset
+type dnnrc_typed_dataset = Asts.dnnrc_typed_dataset
+type nnrcmr = Asts.nnrcmr
 type cldmr = Asts.cldmr
 
 let dlocal_conv l =
@@ -62,21 +62,21 @@ let rule_to_camp (s:string) : camp =
 (* From camp to NRAEnv *)
 
 let camp_to_nraenv (c:camp) =
-  alg_of_camp c
+  nraenv_of_camp c
 
 (* From source to NRAEnv *)
 
 let rule_to_nraenv_name (s:string) : string =
-  fst (alg_of_rule_string s)
+  fst (nraenv_of_rule_string s)
 
 let rule_to_nraenv (s:string) : nraenv =
-  snd (alg_of_rule_string s)
+  snd (nraenv_of_rule_string s)
 
 let oql_to_nraenv_name (s:string) : string =
-  fst (alg_of_oql_string s)
+  fst (nraenv_of_oql_string s)
 
 let oql_to_nraenv (s:string) : nraenv =
-  snd (alg_of_oql_string s)
+  snd (nraenv_of_oql_string s)
 
 (*
  *  Core compiler section
@@ -190,14 +190,14 @@ let compile_nnrcmr_to_cloudant (prefix:string) (nrule:string) (n:nnrcmr) : strin
 let export_camp (p:camp) = DisplayUtil.camp_to_sexp_string p
 let import_camp (ps:string) = DisplayUtil.sexp_string_to_camp ps
 
-let export_nraenv (op:nraenv) = DisplayUtil.nra_to_sexp_string op
-let import_nraenv (ops:string) = DisplayUtil.sexp_string_to_nra ops
+let export_nraenv (op:nraenv) = DisplayUtil.nraenv_to_sexp_string op
+let import_nraenv (ops:string) = DisplayUtil.sexp_string_to_nraenv ops
 
-let export_nnrc (n:nnrc) = DisplayUtil.nrc_to_sexp_string n
-let import_nnrc (ns:string) = DisplayUtil.sexp_string_to_nrc ns
+let export_nnrc (n:nnrc) = DisplayUtil.nnrc_to_sexp_string n
+let import_nnrc (ns:string) = DisplayUtil.sexp_string_to_nnrc ns
 
-let export_nnrcmr (n:nnrcmr) = DisplayUtil.nrcmr_to_sexp_string n
-let import_nnrcmr (ns:string) = DisplayUtil.sexp_string_to_nrcmr ns
+let export_nnrcmr (n:nnrcmr) = DisplayUtil.nnrcmr_to_sexp_string n
+let import_nnrcmr (ns:string) = DisplayUtil.sexp_string_to_nnrcmr ns
 
 let export_cldmr (n:cldmr) = DisplayUtil.cldmr_to_sexp_string n
 let import_cldmr (ns:string) = DisplayUtil.sexp_string_to_cldmr ns
@@ -223,24 +223,24 @@ let unset_optim_trace = Logger.unset_trace
 
 let display_nraenv (charbool:bool) (margin:int) modelandtype io dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin (Some modelandtype) (Some io) dfname op
-  else display_algenv_top PrettyIL.Ascii margin (Some modelandtype) (Some io) dfname op
+  then display_nraenv_top PrettyIL.Greek margin (Some modelandtype) (Some io) dfname op
+  else display_nraenv_top PrettyIL.Ascii margin (Some modelandtype) (Some io) dfname op
 
 let display_nraenv_no_schema (charbool:bool) (margin:int) io dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin None (Some io) dfname op
-  else display_algenv_top PrettyIL.Ascii margin None (Some io) dfname op
+  then display_nraenv_top PrettyIL.Greek margin None (Some io) dfname op
+  else display_nraenv_top PrettyIL.Ascii margin None (Some io) dfname op
 
 let display_nraenv_no_io (charbool:bool) (margin:int) modelandtype dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin (Some modelandtype) None dfname op
-  else display_algenv_top PrettyIL.Ascii margin (Some modelandtype) None dfname op
+  then display_nraenv_top PrettyIL.Greek margin (Some modelandtype) None dfname op
+  else display_nraenv_top PrettyIL.Ascii margin (Some modelandtype) None dfname op
 
 let display_nraenv_no_schema_no_io (charbool:bool) (margin:int) dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin None None dfname op
-  else display_algenv_top PrettyIL.Ascii margin None None dfname op
+  then display_nraenv_top PrettyIL.Greek margin None None dfname op
+  else display_nraenv_top PrettyIL.Ascii margin None None dfname op
 
 let display_nraenv_sexp dfname op =
-  sexp_algenv_top dfname op
+  sexp_nraenv_top dfname op
 

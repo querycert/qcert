@@ -31,19 +31,20 @@ type data_ast = Data.data
 type io_ast = Data.json
 type json_ast = Data.json
 
-type rule_ast = string * Rule.rule
-
+type rule = CompDriver.rule
 type camp = CompDriver.camp
-type algenv = CompDriver.nraenv
-type nrc = CompDriver.nnrc
-type dnrc_dataset = CompDriver.dnnrc_dataset
-type dnrc_typed_dataset = (unit Compiler.type_annotation, Compiler.dataset) Compiler.dnrc
-type nrcmr = CompDriver.nnrcmr
+type nraenv = CompDriver.nraenv
+type nnrc = CompDriver.nnrc
+type dnnrc_dataset = CompDriver.dnnrc_dataset
+type dnnrc_typed_dataset = (unit Compiler.type_annotation, Compiler.dataset) Compiler.dnrc
+type nnrcmr = CompDriver.nnrcmr
 type cldmr = CompDriver.cldmr
 
+type rule_ast = string * rule
+
 type rORc_ast =
-  | RuleAst of Rule.rule
-  | CampAst of Pattern.pat
+  | RuleAst of rule
+  | CampAst of camp
       
 type oql_ast = OQL.expr
 
@@ -312,83 +313,83 @@ let rec sexp_to_camp (se : sexp) : camp =
 
 (* NRA Section *)
 
-let rec alg_to_sexp (op : algenv) : sexp =
+let rec nraenv_to_sexp (op : nraenv) : sexp =
   match op with
   | ANID -> STerm ("ANID",[])
   | ANConst d -> STerm ("ANConst", [data_to_sexp d])
-  | ANBinop (b, op1, op2) -> STerm ("ANBinop", (binop_to_sexp b) :: [alg_to_sexp op1;alg_to_sexp op2])
-  | ANUnop (u, op1) -> STerm ("ANUnop", (unop_to_sexp u) :: [alg_to_sexp op1])
-  | ANMap (op1,op2) -> STerm ("ANMap", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANMapConcat (op1,op2) -> STerm ("ANMapConcat", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANProduct (op1,op2) -> STerm ("ANProduct", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANSelect (op1,op2) -> STerm ("ANSelect", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANDefault (op1,op2) -> STerm ("ANDefault", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANEither (op1,op2) -> STerm ("ANEither", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANEitherConcat (op1,op2) -> STerm ("ANEitherConcat", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANApp (op1,op2) -> STerm ("ANApp", [alg_to_sexp op1;alg_to_sexp op2])
+  | ANBinop (b, op1, op2) -> STerm ("ANBinop", (binop_to_sexp b) :: [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANUnop (u, op1) -> STerm ("ANUnop", (unop_to_sexp u) :: [nraenv_to_sexp op1])
+  | ANMap (op1,op2) -> STerm ("ANMap", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANMapConcat (op1,op2) -> STerm ("ANMapConcat", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANProduct (op1,op2) -> STerm ("ANProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANSelect (op1,op2) -> STerm ("ANSelect", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANDefault (op1,op2) -> STerm ("ANDefault", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANEither (op1,op2) -> STerm ("ANEither", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANEitherConcat (op1,op2) -> STerm ("ANEitherConcat", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANApp (op1,op2) -> STerm ("ANApp", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANGetConstant sl -> STerm ("ANGetConstant", [coq_string_to_sstring sl])
   | ANEnv -> STerm ("ANEnv",[])
-  | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [alg_to_sexp op1;alg_to_sexp op2])
-  | ANMapEnv op1 -> STerm ("ANMapEnv", [alg_to_sexp op1])
+  | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
 
-let rec sexp_to_alg (se : sexp) : algenv =
+let rec sexp_to_nraenv (se : sexp) : nraenv =
   match se with
   | STerm ("ANID",[]) -> ANID
   | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
   | STerm ("ANBinop", bse :: [se1;se2]) ->
       let b = sexp_to_binop bse in
-      ANBinop (b, sexp_to_alg se1, sexp_to_alg se2)
+      ANBinop (b, sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANUnop", use :: [se1]) ->
       let u = sexp_to_unop use in
-      ANUnop (u, sexp_to_alg se1)
-  | STerm ("ANMap", [se1;se2]) -> ANMap (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANMapConcat", [se1;se2]) -> ANMapConcat (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANProduct", [se1;se2]) -> ANProduct (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANSelect", [se1;se2]) -> ANSelect (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANDefault", [se1;se2]) -> ANDefault (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANEither", [se1;se2]) -> ANEither (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANEitherConcat", [se1;se2]) -> ANEitherConcat (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANApp", [se1;se2]) -> ANApp (sexp_to_alg se1, sexp_to_alg se2)
+      ANUnop (u, sexp_to_nraenv se1)
+  | STerm ("ANMap", [se1;se2]) -> ANMap (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANMapConcat", [se1;se2]) -> ANMapConcat (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANProduct", [se1;se2]) -> ANProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANSelect", [se1;se2]) -> ANSelect (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANDefault", [se1;se2]) -> ANDefault (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANEither", [se1;se2]) -> ANEither (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANEitherConcat", [se1;se2]) -> ANEitherConcat (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANApp", [se1;se2]) -> ANApp (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANGetConstant", [sl]) -> ANGetConstant (sstring_to_coq_string sl)
   | STerm ("ANEnv",[]) -> ANEnv
-  | STerm ("ANAppEnv", [se1;se2]) -> ANAppEnv (sexp_to_alg se1, sexp_to_alg se2)
-  | STerm ("ANMapEnv", [se1]) -> ANMapEnv (sexp_to_alg se1)
+  | STerm ("ANAppEnv", [se1;se2]) -> ANAppEnv (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANMapEnv", [se1]) -> ANMapEnv (sexp_to_nraenv se1)
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside alg with name " ^ t))
+      raise (Util.CACo_Error ("Not well-formed S-expr inside NRAEnv with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside alg")
+      raise (Util.CACo_Error "Not well-formed S-expr inside NRAEnv")
 
 (* NNRC Section *)
 
-let rec nrc_to_sexp (n : nrc) : sexp =
+let rec nnrc_to_sexp (n : nnrc) : sexp =
   match n with
   | NRCVar v -> STerm ("NRCVar", [SString (Util.string_of_char_list v)])
   | NRCConst d -> STerm ("NRCConst", [data_to_sexp d])
-  | NRCBinop (b, n1, n2) -> STerm ("NRCBinop", (binop_to_sexp b) :: [nrc_to_sexp n1;nrc_to_sexp n2])
-  | NRCUnop (u, n1) -> STerm ("NRCUnop", (unop_to_sexp u) :: [nrc_to_sexp n1])
-  | NRCLet (v, n1, n2) -> STerm ("NRCLet", (SString (Util.string_of_char_list v)) :: [nrc_to_sexp n1;nrc_to_sexp n2])
-  | NRCFor (v, n1, n2) -> STerm ("NRCFor", (SString (Util.string_of_char_list v)) :: [nrc_to_sexp n1;nrc_to_sexp n2])
-  | NRCIf (n1, n2, n3) -> STerm ("NRCIf", [nrc_to_sexp n1;nrc_to_sexp n2;nrc_to_sexp n3])
+  | NRCBinop (b, n1, n2) -> STerm ("NRCBinop", (binop_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NRCUnop (u, n1) -> STerm ("NRCUnop", (unop_to_sexp u) :: [nnrc_to_sexp n1])
+  | NRCLet (v, n1, n2) -> STerm ("NRCLet", (SString (Util.string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NRCFor (v, n1, n2) -> STerm ("NRCFor", (SString (Util.string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NRCIf (n1, n2, n3) -> STerm ("NRCIf", [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
   | NRCEither (n1,v1,n2,v2,n3) -> STerm ("NRCEither",
 					 (SString (Util.string_of_char_list v1))
 					 :: (SString (Util.string_of_char_list v2))
-					 :: [nrc_to_sexp n1;nrc_to_sexp n2;nrc_to_sexp n3])
+					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
 
-let rec sexp_to_nrc (se:sexp) : nrc =
+let rec sexp_to_nnrc (se:sexp) : nnrc =
   match se with
   | STerm ("NRCVar", [SString v]) -> NRCVar (Util.char_list_of_string v)
   | STerm ("NRCConst", [d]) -> NRCConst (sexp_to_data d)
-  | STerm ("NRCBinop", b :: [n1;n2]) -> NRCBinop (sexp_to_binop b, sexp_to_nrc n1, sexp_to_nrc n2)
-  | STerm ("NRCUnop", u :: [n1]) -> NRCUnop (sexp_to_unop u, sexp_to_nrc n1)
-  | STerm ("NRCLet", (SString v) :: [n1;n2]) -> NRCLet (Util.char_list_of_string v, sexp_to_nrc n1, sexp_to_nrc n2)
-  | STerm ("NRCFor", (SString v) :: [n1;n2]) -> NRCFor (Util.char_list_of_string v, sexp_to_nrc n1, sexp_to_nrc n2)
-  | STerm ("NRCIf", [n1;n2;n3]) -> NRCIf (sexp_to_nrc n1, sexp_to_nrc n2, sexp_to_nrc n3)
+  | STerm ("NRCBinop", b :: [n1;n2]) -> NRCBinop (sexp_to_binop b, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NRCUnop", u :: [n1]) -> NRCUnop (sexp_to_unop u, sexp_to_nnrc n1)
+  | STerm ("NRCLet", (SString v) :: [n1;n2]) -> NRCLet (Util.char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NRCFor", (SString v) :: [n1;n2]) -> NRCFor (Util.char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NRCIf", [n1;n2;n3]) -> NRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)
   | STerm ("NRCEither", (SString v1) :: (SString v2) :: [n1;n2;n3]) ->
-      NRCEither (sexp_to_nrc n1,Util.char_list_of_string v1,sexp_to_nrc n2,Util.char_list_of_string v2,sexp_to_nrc n3)
+      NRCEither (sexp_to_nnrc n1,Util.char_list_of_string v1,sexp_to_nnrc n2,Util.char_list_of_string v2,sexp_to_nnrc n3)
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside nrc with name " ^ t))
+      raise (Util.CACo_Error ("Not well-formed S-expr inside nnrc with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside nrc")
+      raise (Util.CACo_Error "Not well-formed S-expr inside nnrc")
 
 (* NNRCMR section *)
 
@@ -429,12 +430,12 @@ let sexp_to_params (se:sexp) =
       raise (Util.CACo_Error "Not well-formed S-expr inside var list")
 
 let fun_to_sexp (f:(var list * nrc)) : sexp =
-  STerm ("lambda", (params_to_sexp (fst f)) :: (nrc_to_sexp (snd f)) :: [])
+  STerm ("lambda", (params_to_sexp (fst f)) :: (nnrc_to_sexp (snd f)) :: [])
 
 let sexp_to_fun (se:sexp) : (var list * nrc) =
   match se with
   | STerm ("lambda", params :: sen :: []) ->
-      (sexp_to_params params, sexp_to_nrc sen)
+      (sexp_to_params params, sexp_to_nnrc sen)
   | _ ->
       raise (Util.CACo_Error "Not well-formed S-expr inside lambda")
 
@@ -599,15 +600,14 @@ let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
   | _ ->
       raise (Util.CACo_Error "Not well-formed S-expr inside mr_last")
 
-let nrcmr_to_sexp (n:nrcmr) : sexp =
-  let nrcmr = n in
+let nnrcmr_to_sexp (n:nnrcmr) : sexp =
   STerm ("nrcmr",
-	 (STerm ("mr_env", var_locs_to_sexp nrcmr.mr_inputs_loc))
-	 :: (STerm ("mr_chain", mr_chain_to_sexp (nrcmr.mr_chain)))
-	 :: (mr_last_to_sexp nrcmr.mr_last)
+	 (STerm ("mr_env", var_locs_to_sexp n.mr_inputs_loc))
+	 :: (STerm ("mr_chain", mr_chain_to_sexp (n.mr_chain)))
+	 :: (mr_last_to_sexp n.mr_last)
 	 :: [])
 
-let sexp_to_nrcmr (se:sexp) : nrcmr =
+let sexp_to_nnrcmr (se:sexp) : nnrcmr =
   match se with
   | STerm ("nrcmr",
 	   (STerm ("mr_env", env))
@@ -711,12 +711,12 @@ let sexp_to_cld_red_opt sel =
 let cld_reduce_default_to_sexp def =
   match def with
   | None -> []
-  | Some n -> (nrc_to_sexp n) :: []
+  | Some n -> (nnrc_to_sexp n) :: []
 
 let sexp_to_cld_reduce_default se =
   match se with
   | [] -> None
-  | n :: [] -> Some (sexp_to_nrc n)
+  | n :: [] -> Some (sexp_to_nnrc n)
   | _ ->
       raise (Util.CACo_Error "Not well-formed S-expr inside cld_reduce_default")
 

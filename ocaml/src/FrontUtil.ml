@@ -32,10 +32,10 @@ let camp_of_rule_string s =
   | Asts.CampAst ru ->
       (rn,ru)
 
-let alg_of_camp p =
+let nraenv_of_camp p =
   CompFront.translate_pat_to_algenv p
 
-let alg_of_rule_string s =
+let nraenv_of_rule_string s =
   let (rn,ru) = parse_rule_from_string s in
   match ru with
   | Asts.RuleAst ru ->
@@ -43,7 +43,7 @@ let alg_of_rule_string s =
   | Asts.CampAst ru ->
       (rn,CompFront.translate_pat_to_algenv ru)
 
-let alg_of_rule f =
+let nraenv_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
   | Asts.RuleAst ru ->
@@ -51,18 +51,18 @@ let alg_of_rule f =
   | Asts.CampAst ru ->
       (rn,CompFront.translate_pat_to_algenv ru)
 
-let alg_of_oql_string s =
+let nraenv_of_oql_string s =
   let o = parse_oql_from_string s in
   ("OQL",CompFront.translate_oql_to_algenv o)
   
-let alg_of_oql f =
+let nraenv_of_oql f =
   let o = parse_oql_from_file f in
   ("OQL",CompFront.translate_oql_to_algenv o)
   
-let alg_of_input conf f =
+let nraenv_of_input conf f =
   match get_source_lang conf with
   | RULE ->
-      alg_of_rule f
+      nraenv_of_rule f
   | OQL ->
-      alg_of_oql f
+      nraenv_of_oql f
 

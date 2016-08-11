@@ -38,7 +38,7 @@ let eval_oql h world f : Data.data option * string =
 
 exception OQL_eval of string
       
-let eval_alg conf h world op : Data.data option =
+let eval_nraenv conf h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   match get_target_lang conf with
   | ORIG ->

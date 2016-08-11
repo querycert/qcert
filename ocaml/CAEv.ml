@@ -50,9 +50,9 @@ let rule_main conf io h world f =
   | ORIG ->
       check_rule_result conf (get_output io) f source_result debug_result
   | _ ->
-      let (sname,op) = alg_of_input lconf f in
-      let actual_result = eval_alg lconf h world op in
-      check_alg_result conf (get_output io) f actual_result debug_result
+      let (sname,op) = nraenv_of_input lconf f in
+      let actual_result = eval_nraenv lconf h world op in
+      check_nraenv_result conf (get_output io) f actual_result debug_result
 
 let oql_main conf io h world f =
   let lconf = get_eval_lang_config conf in
@@ -61,9 +61,9 @@ let oql_main conf io h world f =
   | ORIG ->
       check_oql_result (get_output io) f source_result debug_result
   | _ ->
-      let (sname,op) = alg_of_input lconf f in
-      let actual_result = eval_alg lconf h world op in
-      check_alg_result conf (get_output io) f actual_result "[OQL]"
+      let (sname,op) = nraenv_of_input lconf f in
+      let actual_result = eval_nraenv lconf h world op in
+      check_nraenv_result conf (get_output io) f actual_result "[OQL]"
 
 let eval_main conf io f =
   if f <> "" then

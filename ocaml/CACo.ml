@@ -22,7 +22,7 @@ open CloudantUtil
 
 (* Compile from NRAEnv *)
 
-let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string) (op:CALib.nraenv) =
+let compile_nraenv_to_string (conf:comp_config) (nrule:string) (basename:string) (op:CALib.nraenv) =
   let lconf = get_comp_lang_config conf in
   match get_target_lang lconf with
   | Java ->
@@ -53,9 +53,9 @@ let compile_algenv_to_string (conf:comp_config) (nrule:string) (basename:string)
   | _ ->
       raise (CACo_Error ("Target not supported by CACo"))
 
-let compile_algenv_top conf (fname,sname,alg) =
+let compile_nraenv_top conf (fname,sname,op) =
   let fpref = Filename.chop_extension fname in
-  let (scomp,rest) = compile_algenv_to_string conf sname (Filename.basename fpref) alg in
+  let (scomp,rest) = compile_nraenv_to_string conf sname (Filename.basename fpref) op in
   let fout = outname (target_f (get_dir conf) fpref) (suffix_target (get_comp_lang_config conf)) in
   make_file fout scomp;
   rest
@@ -87,7 +87,7 @@ let usage = "CaCo [-target language] [-source language] [-dir output] [-harness 
 
 (* Main *)
 
-let alg_of_input conf f : (string * CALib.nraenv) =
+let nraenv_of_input conf f : (string * CALib.nraenv) =
   match get_source_lang conf with
   | RULE ->
       let s = Util.string_of_file f in
@@ -109,9 +109,9 @@ let display_dispatch charsetbool margin modelandtype conf fname op =
 	
 let compile_main conf fname =
   if fname <> "" then
-    let (sname,op) = alg_of_input (get_comp_lang_config conf) fname in
+    let (sname,op) = nraenv_of_input (get_comp_lang_config conf) fname in
     begin
-      let modelandtype = compile_algenv_top conf (fname,sname,op) in
+      let modelandtype = compile_nraenv_top conf (fname,sname,op) in
       if !(get_target_display conf) then display_dispatch !charsetbool !margin modelandtype conf fname op else ();
       if !(get_target_display_sexp conf) then CALib.display_nraenv_sexp (DisplayUtil.get_display_fname conf fname) op else ();
       if !(get_target_stats conf) then Stats.display_stats conf fname else ()

@@ -58,8 +58,8 @@ let parse_oql_from_string s : oql_ast = parse_string parse_oql s
 let parse_sexp_from_string s : sexp_ast = parse_string parse_sexp s
 let parse_io_sexp_from_string s : data_ast = parse_string parse_io_sexp s
 let parse_camp_sexp_from_string s : camp = parse_string parse_camp_sexp s
-let parse_nra_sexp_from_string s : algenv = parse_string parse_nra_sexp s
-let parse_nrc_sexp_from_string s : nrc = parse_string parse_nrc_sexp s
-let parse_nrcmr_sexp_from_string s : nrcmr = parse_string parse_nrcmr_sexp s
+let parse_nraenv_sexp_from_string s : nraenv = parse_string parse_nraenv_sexp s
+let parse_nnrc_sexp_from_string s : nnrc = parse_string parse_nnrc_sexp s
+let parse_nnrcmr_sexp_from_string s : nnrcmr = parse_string parse_nnrcmr_sexp s
 let parse_cldmr_sexp_from_string s : cldmr = parse_string parse_cldmr_sexp s
 

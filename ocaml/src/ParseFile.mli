@@ -39,8 +39,8 @@ val parse_oql_from_file : string -> oql_ast
 val parse_sexp_from_file : string -> sexp_ast
 val parse_io_sexp_from_file : string -> data_ast
 val parse_camp_sexp_from_file : string -> camp
-val parse_nra_sexp_from_file : string -> algenv
-val parse_nrc_sexp_from_file : string -> nrc
-val parse_nrcmr_sexp_from_file : string -> nrcmr
+val parse_nraenv_sexp_from_file : string -> nraenv
+val parse_nnrc_sexp_from_file : string -> nnrc
+val parse_nnrcmr_sexp_from_file : string -> nnrcmr
 val parse_cldmr_sexp_from_file : string -> cldmr
 
