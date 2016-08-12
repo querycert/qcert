@@ -43,3 +43,9 @@ val parse_nnrc_sexp_from_file : string -> CompDriver.nnrc
 val parse_nnrcmr_sexp_from_file : string -> CompDriver.nnrcmr
 val parse_cldmr_sexp_from_file : string -> CompDriver.cldmr
 
+(*******************
+ * Languages Parse *
+ *******************)
+
+val parse_language_from_file : CompDriver.language -> string -> string * CompDriver.query
+

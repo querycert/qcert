@@ -42,26 +42,28 @@ exception OQL_eval of string
       
 let eval_nraenv conf h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
-  match get_target_lang conf with
-  | ORIG ->
-      raise (OQL_eval "Orig eval not supported once compiled into algebra")
-  | NRAEnv ->
+  match language_of_name (get_target_lang conf) with
+  | CompDriver.L_rule ->
+      raise (CACo_Error "Rule eval not supported once compiled into algebra")
+  | CompDriver.L_oql ->
+      raise (OQL_eval "OQL eval not supported once compiled into algebra")
+  | CompDriver.L_nraenv ->
       let op = CompCore.toptimize_algenv_typed_opt op in
       EvalTop.algenv_eval_top h op world
-  | NNRC ->
+  | CompDriver.L_nnrc ->
       let nrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
       EvalTop.nrc_eval_top h nrc world
-  | DNNRC ->
+  | CompDriver.L_dnnrc_dataset ->
       let nrc = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
       EvalTop.dnrc_eval_top h nrc world
-  | NNRCMR ->
+  | CompDriver.L_nnrcmr ->
       let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       EvalTop.nrcmr_chain_eval_top h mrchain world
-  | CLDMR ->
+  | CompDriver.L_cldmr ->
       let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->
-      Printf.fprintf stderr "Target not supported in CAEv\n";
-      raise (CACo_Error "Target not supported in CAEv")
+      Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang conf);
+      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang conf)))
 

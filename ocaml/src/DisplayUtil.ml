@@ -92,12 +92,12 @@ let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
   let (display_nra,display_nrc,display_nrcmr,display_nrcmr_spark,display_nrcmr_cldmr, display_opt_dnrc_dataset) =
     display_to_string (make_pretty_config ck margin) modelandtype' op
   in
-  let fout_nra = outname dfname (suffix_nra ()) in
-  let fout_nrc = outname dfname (suffix_nrc ()) in
-  let fout_nrcmr = outname dfname (suffix_nrcmr ()) in
-  let fout_nrcmr_spark = outname dfname (suffix_nrcmr_spark ()) in
-  let fout_nrcmr_cldmr = outname dfname (suffix_nrcmr_cldmr ()) in
-  let fout_dnrc_dataset = outname dfname (suffix_dnrc ()) in
+  let fout_nra = outname dfname (suffix_nraenv ()) in
+  let fout_nrc = outname dfname (suffix_nnrc ()) in
+  let fout_nrcmr = outname dfname (suffix_nnrcmr ()) in
+  let fout_nrcmr_spark = outname dfname (suffix_nnrcmr_spark ()) in
+  let fout_nrcmr_cldmr = outname dfname (suffix_nnrcmr_cldmr ()) in
+  let fout_dnrc_dataset = outname dfname (suffix_dnnrc_dataset ()) in
   begin
     make_file fout_nra display_nra;
     make_file fout_nrc display_nrc;
@@ -136,9 +136,9 @@ let sexp_nraenv_top dfname op =
   let display_nrcmr_spark = nnrcmr_to_sexp_string nrcmr_spark in
   let display_nrcmr_cldmr = nnrcmr_to_sexp_string nrcmr_cldmr in
   let fout_nra = outname dfname (suffix_nrasexp ()) in
-  let fout_nrc = outname dfname (suffix_nrcsexp ()) in
-  let fout_nrcmr_spark = outname dfname (suffix_nrcmr_sparksexp ()) in
-  let fout_nrcmr_cldmr = outname dfname (suffix_nrcmr_cldmrsexp ()) in
+  let fout_nrc = outname dfname (suffix_nnrcsexp ()) in
+  let fout_nrcmr_spark = outname dfname (suffix_nnrcmr_sparksexp ()) in
+  let fout_nrcmr_cldmr = outname dfname (suffix_nnrcmr_cldmrsexp ()) in
   begin
     make_file fout_nra display_nra;
     make_file fout_nrc display_nrc;

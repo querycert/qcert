@@ -21,112 +21,97 @@ open Compiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
-type source_lang =
-  | RULE
-  | OQL
-
-type target_lang =
-  | ORIG
-  | NRAEnv
-  | NNRC
-  | DNNRC
-  | NNRCMR
-  | CLDMR
-  | Java
-  | JS
-  | Spark
-  | Spark2
-  | Cloudant
-
+let language_of_name name =
+  match name with
+  | "Rule" -> CompDriver.L_rule
+  | "CAMP" -> CompDriver.L_camp
+  | "OQL" -> CompDriver.L_oql
+  | "NRAEnv" -> CompDriver.L_nraenv
+  | "NNRC" -> CompDriver.L_nnrc
+  | "NNRCMR" -> CompDriver.L_nnrcmr
+  | "CLDMR" -> CompDriver.L_cldmr
+  | "DNNRC" -> CompDriver.L_dnnrc_dataset
+  | "RHINO" | "JS" -> CompDriver.L_javascript
+  | "Java" -> CompDriver.L_java
+  | "Spark" -> CompDriver.L_spark
+  | "Spark2" -> CompDriver.L_spark2
+  | "Cloudant" -> CompDriver.L_cloudant
+  | _ -> raise (CACo_Error ("Not a valid language: " ^ name))
+(* Not supported:
+   | CompDriver.L_nra
+   | CompDriver.L_dnnrc_typed_dataset
+   | CompDriver.L_error
+*)
+      
 type lang_config =
-    { mutable slang : source_lang;
-      mutable tlang : target_lang;
+    { mutable slang : string;
+      mutable tlang : string;
       cld_conf : cld_config }
 
 let default_eval_lang_config () =
-  { slang = RULE;
-    tlang = ORIG;
+  { slang = "Rule";
+    tlang = "Rule";
     cld_conf = default_cld_config () }
       
 let default_comp_lang_config () =
-  { slang = RULE;
-    tlang = JS;
+  { slang = "Rule";
+    tlang = "JS";
     cld_conf = default_cld_config () }
       
 let get_source_lang conf = conf.slang
-let change_source conf s =
-  match s with
-  | "Rule" -> conf.slang <- RULE
-  | "OQL" -> conf.slang <- OQL
-  | _ ->
-      Printf.fprintf stderr "Unknown source: %s\n" s;
-      raise (CACo_Error ("Unknown source: " ^ s))
-
+let change_source conf s = conf.slang <- s
 let get_target_lang conf = conf.tlang
-let change_target conf s =
-  match s with
-  | "Orig" -> conf.tlang <- ORIG
-  | "CAMP" -> conf.tlang <- ORIG (* Deprecated *)
-  | "NRAEnv" -> conf.tlang <- NRAEnv
-  | "NNRC" -> conf.tlang <- NNRC
-  | "DNNRC" -> conf.tlang <- DNNRC
-  | "NNRCMR" -> conf.tlang <- NNRCMR
-  | "CLDMR" -> conf.tlang <- CLDMR
-  | "Java" -> conf.tlang <- Java
-  | "JS" | "RHINO" -> conf.tlang <- JS
-  | "Spark" -> conf.tlang <- Spark
-  | "Spark2" -> conf.tlang <- Spark2
-  | "Cloudant" -> conf.tlang <- Cloudant
-  | _ ->
-      Printf.fprintf stderr "Unknown target: %s\n" s;
-      raise (CACo_Error ("Unknown target: " ^ s))
+let change_target conf s = conf.tlang <- s
 
 let get_cld_config conf = conf.cld_conf
 
 (* Target language *)
 let suffix_rule () = "_rule.camp"
+let suffix_camp () = ".camp"
 let suffix_oql () = "_oql.txt"
-let suffix_nra () = "_nraenv.txt"
+let suffix_nra () = "_nra.txt"
+let suffix_nraenv () = "_nraenv.txt"
 let suffix_nrasexp () = "_nraenv.sexp"
-let suffix_nrc () = "_nnrc.txt"
-let suffix_nrcsexp () = "_nnrc.sexp"
-let suffix_dnrc () = "_dnnrc.txt"
-let suffix_dnrcsexp () = "_dnnrc.sexp"
-let suffix_nrcmr () = "_nnrcmr.txt"
-let suffix_nrcmr_spark () = "_nnrcmr_spark.txt"
-let suffix_nrcmr_sparksexp () = "_nnrcmr_spark.sexp"
-let suffix_nrcmr_spark2 () = "_nnrcmr_spark2.txt"
-let suffix_nrcmr_spark2sexp () = "_nnrcmr_spark2.sexp"
-let suffix_nrcmr_cldmr () = "_nnrcmr_cldmr.txt"
-let suffix_nrcmr_cldmrsexp () = "_nnrcmr_cldmr.sexp"
+let suffix_nnrc () = "_nnrc.txt"
+let suffix_nnrcsexp () = "_nnrc.sexp"
+let suffix_dnnrc_dataset () = "_dnnrc.txt"
+let suffix_dnnrc_typed_dataset () = "_dnnrc.txt"
+let suffix_dnnrcsexp () = "_dnnrc.sexp"
+let suffix_nnrcmr () = "_nnrcmr.txt"
+let suffix_nnrcmr_spark () = "_nnrcmr_spark.txt"
+let suffix_nnrcmr_sparksexp () = "_nnrcmr_spark.sexp"
+let suffix_nnrcmr_spark2 () = "_nnrcmr_spark2.txt"
+let suffix_nnrcmr_spark2sexp () = "_nnrcmr_spark2.sexp"
+let suffix_nnrcmr_cldmr () = "_nnrcmr_cldmr.txt"
+let suffix_nnrcmr_cldmrsexp () = "_nnrcmr_cldmr.sexp"
 let suffix_java () = ".java"
-let suffix_js () = ".js"
+let suffix_javascript () = ".js"
 let suffix_spark () = "_spark.scala"
 let suffix_spark2 () = "_spark2.scala"
 let suffix_cld_design () = "_cloudant_design.json"
-let suffix_cld_curl () = "_cloudant.sh"
 let suffix_stats () = "_stats.json"
+let suffix_error () = ".error"
 
 let suffix_sdata () = ".sio"
 
 let suffix_target conf =
-  match conf.tlang with
-  | ORIG ->
-      begin
-	match conf.slang with
-	| RULE -> suffix_rule ()
-	| OQL -> suffix_oql ()
-      end
-  | NRAEnv -> suffix_nra ()
-  | NNRC -> suffix_nrc ()
-  | DNNRC -> suffix_dnrc ()
-  | NNRCMR -> suffix_nrcmr ()
-  | CLDMR -> suffix_nrcmr_cldmr ()
-  | Java -> suffix_java ()
-  | JS -> suffix_js ()
-  | Spark -> suffix_spark ()
-  | Spark2 -> suffix_spark2 ()
-  | Cloudant -> suffix_cld_design ()
+  match language_of_name (conf.tlang) with
+  | CompDriver.L_rule -> suffix_rule ()
+  | CompDriver.L_camp -> suffix_camp ()
+  | CompDriver.L_oql -> suffix_oql ()
+  | CompDriver.L_nra -> suffix_nra ()
+  | CompDriver.L_nraenv -> suffix_nraenv ()
+  | CompDriver.L_nnrc -> suffix_nnrc ()
+  | CompDriver.L_dnnrc_dataset -> suffix_dnnrc_dataset ()
+  | CompDriver.L_dnnrc_typed_dataset -> suffix_dnnrc_typed_dataset ()
+  | CompDriver.L_nnrcmr -> suffix_nnrcmr ()
+  | CompDriver.L_cldmr -> suffix_nnrcmr_cldmr ()
+  | CompDriver.L_javascript -> suffix_javascript ()
+  | CompDriver.L_java -> suffix_java ()
+  | CompDriver.L_spark -> suffix_spark ()
+  | CompDriver.L_spark2 -> suffix_spark2 ()
+  | CompDriver.L_cloudant -> suffix_cld_design ()
+  | CompDriver.L_error -> suffix_error ()
 
 (* Evaluator Section *)
   

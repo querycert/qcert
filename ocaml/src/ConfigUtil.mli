@@ -19,51 +19,37 @@ open Compiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
-type source_lang =
-  | RULE
-  | OQL
-
-type target_lang =
-  | ORIG
-  | NRAEnv
-  | NNRC
-  | DNNRC
-  | NNRCMR
-  | CLDMR
-  | Java
-  | JS
-  | Spark
-  | Spark2
-  | Cloudant
-
 type lang_config
 
 val default_eval_lang_config : unit -> lang_config
 val default_comp_lang_config : unit -> lang_config
 
-val get_source_lang : lang_config -> source_lang
-val get_target_lang : lang_config -> target_lang
+val get_source_lang : lang_config -> string
+val get_target_lang : lang_config -> string
 
 val change_source : lang_config -> string -> unit
 val change_target : lang_config -> string -> unit
 
 val get_cld_config : lang_config -> CloudantUtil.cld_config
 
+val language_of_name : string -> CompDriver.language
+
 (* Target language *)
 
 val suffix_nra : unit -> string
+val suffix_nraenv : unit -> string
 val suffix_nrasexp : unit -> string
-val suffix_nrc : unit -> string
-val suffix_nrcsexp : unit -> string
-val suffix_dnrc : unit -> string
-val suffix_dnrcsexp : unit -> string
-val suffix_nrcmr : unit -> string
-val suffix_nrcmr_sparksexp : unit -> string
-val suffix_nrcmr_spark : unit -> string
-val suffix_nrcmr_spark2sexp : unit -> string
-val suffix_nrcmr_spark2 : unit -> string
-val suffix_nrcmr_cldmr : unit -> string
-val suffix_nrcmr_cldmrsexp : unit -> string
+val suffix_nnrc : unit -> string
+val suffix_nnrcsexp : unit -> string
+val suffix_dnnrc_dataset : unit -> string
+val suffix_dnnrcsexp : unit -> string
+val suffix_nnrcmr : unit -> string
+val suffix_nnrcmr_sparksexp : unit -> string
+val suffix_nnrcmr_spark : unit -> string
+val suffix_nnrcmr_spark2sexp : unit -> string
+val suffix_nnrcmr_spark2 : unit -> string
+val suffix_nnrcmr_cldmr : unit -> string
+val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
 val suffix_target : lang_config -> string
 

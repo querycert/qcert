@@ -67,9 +67,11 @@ let nraenv_of_oql f =
   ("OQL",CompFront.translate_oql_to_algenv o)
   
 let nraenv_of_input conf f =
-  match get_source_lang conf with
-  | RULE ->
+  match language_of_name (get_source_lang conf) with
+  | CompDriver.L_rule ->
       nraenv_of_rule f
-  | OQL ->
+  | CompDriver.L_oql ->
       nraenv_of_oql f
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 

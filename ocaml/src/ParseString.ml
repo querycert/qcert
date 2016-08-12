@@ -61,3 +61,10 @@ let parse_nnrc_sexp_from_string s : CompDriver.nnrc = parse_string parse_nnrc_se
 let parse_nnrcmr_sexp_from_string s : CompDriver.nnrcmr = parse_string parse_nnrcmr_sexp s
 let parse_cldmr_sexp_from_string s : CompDriver.cldmr = parse_string parse_cldmr_sexp s
 
+(*******************
+ * Languages Parse *
+ *******************)
+
+let parse_language_from_string l s : string * CompDriver.query =
+  parse_string (parse_language l) s
+

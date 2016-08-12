@@ -46,8 +46,8 @@ let usage = Sys.argv.(0)^" [-target language] [-source language] [-eval-only] [-
 let rule_main conf io h world f =
   let lconf = get_eval_lang_config conf in
   let (source_result, debug_result) = eval_rule h world f in
-  match get_target_lang lconf with
-  | ORIG ->
+  match language_of_name (get_target_lang lconf) with
+  | CompDriver.L_rule ->
       check_rule_result conf (get_output io) f source_result debug_result
   | _ ->
       let (sname,op) = nraenv_of_input lconf f in
@@ -57,8 +57,8 @@ let rule_main conf io h world f =
 let oql_main conf io h world f =
   let lconf = get_eval_lang_config conf in
   let (source_result, debug_result) = eval_oql h world f in
-  match get_target_lang lconf with
-  | ORIG ->
+  match language_of_name (get_target_lang lconf) with
+  | CompDriver.L_rule | CompDriver.L_oql -> (* XXX TODO : Fix the default target for OQL XXX *)
       check_oql_result (get_output io) f source_result debug_result
   | _ ->
       let (sname,op) = nraenv_of_input lconf f in
@@ -70,9 +70,12 @@ let eval_main conf io f =
     let lconf = get_eval_lang_config conf in
     let h = build_hierarchy (get_hierarchy io) in
     let world = get_input (get_format conf) io in
-    begin match get_source_lang lconf with
-      | RULE -> rule_main conf io h world f
-      | OQL -> oql_main conf io h world f
+    begin
+      match language_of_name (get_source_lang lconf) with
+      | CompDriver.L_rule -> rule_main conf io h world f
+      | CompDriver.L_oql -> oql_main conf io h world f
+      | _ ->
+	  raise (CACo_Error "Source language not supported")
     end
 
 let () =

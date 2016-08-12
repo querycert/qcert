@@ -125,20 +125,23 @@ let pp_oql e =
 
 
 let pp_source conf f =
-  begin match get_source_lang conf with
-  | RULE ->
-      let (rn,ru) = ParseFile.parse_rule_from_file f in
-      begin match ru with
-      | CompDriver.Q_rule ru ->
-          Pp_rule (rn, pp_rule ru)
-      | CompDriver.Q_camp ru ->
-          Pp_pat (rn, pp_pat ru)
-      | _ ->
-	  raise (CACo_Error "Input language not supported")
-      end
-  | OQL ->
-      let o = ParseFile.parse_oql_from_file f in
-      Pp_oql (f, pp_oql o)
+  begin
+    match language_of_name (get_source_lang conf) with
+    | CompDriver.L_rule ->
+	let (rn,ru) = ParseFile.parse_rule_from_file f in
+	begin match ru with
+	| CompDriver.Q_rule ru ->
+            Pp_rule (rn, pp_rule ru)
+	| CompDriver.Q_camp ru ->
+            Pp_pat (rn, pp_pat ru)
+	| _ ->
+	    raise (CACo_Error "Input language not supported")
+	end
+    | CompDriver.L_oql ->
+	let o = ParseFile.parse_oql_from_file f in
+	Pp_oql (f, pp_oql o)
+    | _ ->
+	raise (CACo_Error "Input language not supported")
   end
 
 

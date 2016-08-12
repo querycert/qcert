@@ -68,6 +68,24 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition spark2 := string.
   Definition cloudant := (list (string * string) * (string * list string))%type.
 
+  Inductive language : Set :=
+    | L_rule : language
+    | L_camp : language
+    | L_oql : language
+    | L_nra : language
+    | L_nraenv : language
+    | L_nnrc : language
+    | L_nnrcmr : language
+    | L_cldmr : language
+    | L_dnnrc_dataset : language
+    | L_dnnrc_typed_dataset : language
+    | L_javascript : language
+    | L_java : language
+    | L_spark : language
+    | L_spark2 : language
+    | L_cloudant : language
+    | L_error : language.
+
   Inductive query {br:brand_relation} : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query
