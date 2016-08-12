@@ -22,24 +22,7 @@ open Compiler.EnhancedCompiler
 (* ASTs *)
 (********)
 
-type rule = CompDriver.rule
-type camp = CompDriver.camp
-type nraenv = CompDriver.nraenv
-type nnrc = CompDriver.nnrc
-type dnnrc_dataset = CompDriver.dnnrc_dataset
-type dnnrc_typed_dataset = CompDriver.dnnrc_typed_dataset
-type nnrcmr = CompDriver.nnrcmr
-type cldmr = CompDriver.cldmr
-
 type data_ast = Data.data
 type io_ast = Data.json
 type json_ast = Data.json
-
-type rule_ast = string * rule
-
-type rORc_ast =
-  | RuleAst of rule
-  | CampAst of camp
-      
-type oql_ast = OQL.expr
 

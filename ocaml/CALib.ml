@@ -36,13 +36,13 @@ let schema_of_io (io:string) =
 
 (* Abstract AST types *)
 
-type camp = Asts.camp
-type nraenv = Asts.nraenv
-type nnrc = Asts.nnrc
-type dnnrc_dataset = Asts.dnnrc_dataset
-type dnnrc_typed_dataset = Asts.dnnrc_typed_dataset
-type nnrcmr = Asts.nnrcmr
-type cldmr = Asts.cldmr
+type camp = CompDriver.camp
+type nraenv = CompDriver.nraenv
+type nnrc = CompDriver.nnrc
+type dnnrc_dataset = CompDriver.dnnrc_dataset
+type dnnrc_typed_dataset = CompDriver.dnnrc_typed_dataset
+type nnrcmr = CompDriver.nnrcmr
+type cldmr = CompDriver.cldmr
 
 let dlocal_conv l =
   if l then Compiler.Vlocal else Compiler.Vdistr

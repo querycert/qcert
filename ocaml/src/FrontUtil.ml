@@ -16,6 +16,7 @@
 
 (* Front end utilities *)
 
+open Util
 open ConfigUtil
 open ParseFile
 open ParseString
@@ -27,10 +28,12 @@ open Compiler.EnhancedCompiler
 let camp_of_rule_string s =
   let (rn,ru) = parse_rule_from_string s in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (rn,CompFront.translate_rule_to_pat ru)
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (rn,ru)
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
 let nraenv_of_camp p =
   CompFront.translate_pat_to_algenv p
@@ -38,18 +41,22 @@ let nraenv_of_camp p =
 let nraenv_of_rule_string s =
   let (rn,ru) = parse_rule_from_string s in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (rn,CompFront.translate_rule_to_algenv ru)
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (rn,CompFront.translate_pat_to_algenv ru)
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
 let nraenv_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (rn,CompFront.translate_rule_to_algenv ru)
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (rn,CompFront.translate_pat_to_algenv ru)
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
 let nraenv_of_oql_string s =
   let o = parse_oql_from_string s in

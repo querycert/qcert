@@ -18,29 +18,28 @@
 
 open Compiler.EnhancedCompiler
 open ParseUtil
-open Asts
 
 (*********************)
 (* Parse from string *)
 (*********************)
 
-val parse_io_from_string : string -> io_ast
-val parse_json_from_string : string -> json_ast
+val parse_io_from_string : string -> Asts.io_ast
+val parse_json_from_string : string -> Asts.json_ast
 
-val parse_rule_from_string : string -> string * rORc_ast
-val parse_camp_from_string : string -> camp
+val parse_rule_from_string : string -> string * CompDriver.query
+val parse_camp_from_string : string -> CompDriver.camp
   
-val parse_oql_from_string : string -> oql_ast
+val parse_oql_from_string : string -> CompDriver.oql
 
 (****************)
 (* S-Expr Parse *)
 (****************)
 
 val parse_sexp_from_string : string -> SExp.sexp
-val parse_io_sexp_from_string : string -> data_ast
-val parse_camp_sexp_from_string : string -> camp
-val parse_nraenv_sexp_from_string : string -> nraenv
-val parse_nnrc_sexp_from_string : string -> nnrc
-val parse_nnrcmr_sexp_from_string : string -> nnrcmr
-val parse_cldmr_sexp_from_string : string -> cldmr
+val parse_io_sexp_from_string : string -> Asts.data_ast
+val parse_camp_sexp_from_string : string -> CompDriver.camp
+val parse_nraenv_sexp_from_string : string -> CompDriver.nraenv
+val parse_nnrc_sexp_from_string : string -> CompDriver.nnrc
+val parse_nnrcmr_sexp_from_string : string -> CompDriver.nnrcmr
+val parse_cldmr_sexp_from_string : string -> CompDriver.cldmr
 

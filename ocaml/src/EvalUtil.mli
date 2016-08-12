@@ -27,5 +27,5 @@ val eval_oql : (string * string) list -> Data.data list -> string -> Data.data o
 
 (* Core Eval *)
 
-val eval_nraenv : lang_config -> (string * string) list -> Data.data list -> Asts.nraenv -> Data.data option
+val eval_nraenv : lang_config -> (string * string) list -> Data.data list -> CompDriver.nraenv -> Data.data option
 

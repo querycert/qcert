@@ -20,7 +20,6 @@ open Compiler.EnhancedCompiler
 open Compiler
 
 open SExp
-open Asts
 
 
 (****************
@@ -43,7 +42,7 @@ let sstring_list_to_coq_string_list = sexp_to_dbrands
 
 (* Data Section *)
       
-let rec data_to_sexp (d : Data.data) : sexp =
+let rec data_to_sexp (d : Asts.data_ast) : sexp =
   match d with
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
@@ -58,7 +57,7 @@ let rec data_to_sexp (d : Data.data) : sexp =
 and drec_to_sexp (ad : char list * Data.data) : sexp =
   STerm ("datt", (SString (Util.string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
 
-let rec sexp_to_data (se:sexp) : Data.data =
+let rec sexp_to_data (se:sexp) : Asts.data_ast =
   match se with
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b
@@ -246,7 +245,7 @@ let sexp_to_unop (se:sexp) : unaryOp =
 
 (* CAMP Section *)
 
-let rec camp_to_sexp (p : camp) : sexp =
+let rec camp_to_sexp (p : CompDriver.camp) : sexp =
   match p with
   | Pconst d -> STerm ("Pconst", [data_to_sexp d])
   | Punop (u, p1) -> STerm ("Punop", (unop_to_sexp u) :: [camp_to_sexp p1])
@@ -262,7 +261,7 @@ let rec camp_to_sexp (p : camp) : sexp =
   | Pleft -> STerm ("Pleft", [])
   | Pright -> STerm ("Pright", [])
 
-let rec sexp_to_camp (se : sexp) : camp =
+let rec sexp_to_camp (se : sexp) : CompDriver.camp =
   match se with
   | STerm ("Pconst", [d]) -> Pconst (sexp_to_data d)
   | STerm ("Punop", use :: [se1]) ->
@@ -288,7 +287,7 @@ let rec sexp_to_camp (se : sexp) : camp =
 
 (* NRA Section *)
 
-let rec nraenv_to_sexp (op : nraenv) : sexp =
+let rec nraenv_to_sexp (op : CompDriver.nraenv) : sexp =
   match op with
   | ANID -> STerm ("ANID",[])
   | ANConst d -> STerm ("ANConst", [data_to_sexp d])
@@ -307,7 +306,7 @@ let rec nraenv_to_sexp (op : nraenv) : sexp =
   | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
 
-let rec sexp_to_nraenv (se : sexp) : nraenv =
+let rec sexp_to_nraenv (se : sexp) : CompDriver.nraenv =
   match se with
   | STerm ("ANID",[]) -> ANID
   | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
@@ -336,7 +335,7 @@ let rec sexp_to_nraenv (se : sexp) : nraenv =
 
 (* NNRC Section *)
 
-let rec nnrc_to_sexp (n : nnrc) : sexp =
+let rec nnrc_to_sexp (n : CompDriver.nnrc) : sexp =
   match n with
   | NRCVar v -> STerm ("NRCVar", [SString (Util.string_of_char_list v)])
   | NRCConst d -> STerm ("NRCConst", [data_to_sexp d])
@@ -350,7 +349,7 @@ let rec nnrc_to_sexp (n : nnrc) : sexp =
 					 :: (SString (Util.string_of_char_list v2))
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
 
-let rec sexp_to_nnrc (se:sexp) : nnrc =
+let rec sexp_to_nnrc (se:sexp) : CompDriver.nnrc =
   match se with
   | STerm ("NRCVar", [SString v]) -> NRCVar (Util.char_list_of_string v)
   | STerm ("NRCConst", [d]) -> NRCConst (sexp_to_data d)
@@ -575,14 +574,14 @@ let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
   | _ ->
       raise (Util.CACo_Error "Not well-formed S-expr inside mr_last")
 
-let nnrcmr_to_sexp (n:nnrcmr) : sexp =
+let nnrcmr_to_sexp (n:CompDriver.nnrcmr) : sexp =
   STerm ("nrcmr",
 	 (STerm ("mr_env", var_locs_to_sexp n.mr_inputs_loc))
 	 :: (STerm ("mr_chain", mr_chain_to_sexp (n.mr_chain)))
 	 :: (mr_last_to_sexp n.mr_last)
 	 :: [])
 
-let sexp_to_nnrcmr (se:sexp) : nnrcmr =
+let sexp_to_nnrcmr (se:sexp) : CompDriver.nnrcmr =
   match se with
   | STerm ("nrcmr",
 	   (STerm ("mr_env", env))
@@ -744,13 +743,13 @@ let sexp_to_cld_mr_last (sel:sexp list) : (var list * nrc) * var list =
       raise (Util.CACo_Error "Not well-formed S-expr inside cld_mr_last")
 
 
-let cldmr_to_sexp (c:cldmr) : sexp =
+let cldmr_to_sexp (c:CompDriver.cldmr) : sexp =
   STerm ("cld_mrl",
 	  (STerm ("cld_mr_chain", cld_mr_chain_to_sexp c.cld_mr_chain))
 	  :: (STerm ("cld_mr_last", cld_mr_last_to_sexp c.cld_mr_last))
 	  :: [])
 
-let sexp_to_cldmr (se:sexp) : cldmr =
+let sexp_to_cldmr (se:sexp) : CompDriver.cldmr =
   match se with
   | STerm ("cld_mrl",
 	   (STerm ("cld_mr_chain", chain))

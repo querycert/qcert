@@ -27,18 +27,20 @@ let make_stats conf f =
       let (rn,ru) = parse_rule_from_file f in
       begin
 	match ru with
-	| Asts.RuleAst ru ->
+	| CompDriver.Q_rule ru ->
 	    CompStat.json_stats_rule (Util.char_list_of_string rn) ru
-	| Asts.CampAst ru ->
+	| CompDriver.Q_camp ru ->
 	    CompStat.json_stats_pattern (Util.char_list_of_string rn) ru
+	| _ ->
+	    raise (CACo_Error "Input language not supported")
       end
   | OQL ->
       let o = parse_oql_from_file f in
       CompStat.json_stats_oql (Util.char_list_of_string "[OQL]") o
-
 
 let display_stats conf fname =
   let stats = make_stats (get_comp_lang_config conf) fname in
   let fpref = Filename.chop_extension fname in
   let fout = outname (target_f (get_display_dir conf) fpref) (suffix_stats ()) in
   make_file fout (string_of_char_list stats)
+

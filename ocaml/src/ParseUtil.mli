@@ -17,29 +17,30 @@
 (* This module contains parsing utilities *)
 
 open Compiler.EnhancedCompiler
-open Asts
+
 
 (******************)
 (* Specific Parse *)
 (******************)
 
-val parse_io : Lexing.lexbuf -> io_ast
-val parse_json : Lexing.lexbuf -> json_ast
+val parse_io : Lexing.lexbuf -> Asts.io_ast
+val parse_json : Lexing.lexbuf -> Asts.json_ast
 
-val parse_rule : Lexing.lexbuf -> string * Asts.rORc_ast
-val parse_camp : Lexing.lexbuf -> camp
+val parse_rule : Lexing.lexbuf -> string * CompDriver.query
+val parse_camp : Lexing.lexbuf -> CompDriver.camp
 
-val parse_oql : Lexing.lexbuf -> oql_ast
+val parse_oql : Lexing.lexbuf -> CompDriver.oql
 
 (****************)
 (* S-Expr Parse *)
 (****************)
 
 val parse_sexp : Lexing.lexbuf -> SExp.sexp
-val parse_io_sexp : Lexing.lexbuf -> data_ast
-val parse_camp_sexp : Lexing.lexbuf -> camp
-val parse_nraenv_sexp : Lexing.lexbuf -> nraenv
-val parse_nnrc_sexp : Lexing.lexbuf -> nnrc
-val parse_nnrcmr_sexp : Lexing.lexbuf -> nnrcmr
-val parse_cldmr_sexp : Lexing.lexbuf -> cldmr
+val parse_io_sexp : Lexing.lexbuf -> Asts.data_ast
+
+val parse_camp_sexp : Lexing.lexbuf -> CompDriver.camp
+val parse_nraenv_sexp : Lexing.lexbuf -> CompDriver.nraenv
+val parse_nnrc_sexp : Lexing.lexbuf -> CompDriver.nnrc
+val parse_nnrcmr_sexp : Lexing.lexbuf -> CompDriver.nnrcmr
+val parse_cldmr_sexp : Lexing.lexbuf -> CompDriver.cldmr
 

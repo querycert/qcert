@@ -25,10 +25,12 @@ let eval_rule h world f : Data.data list option * string =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (EvalTop.rule_eval_top h ru world, Util.string_of_char_list (EvalTop.rule_eval_top_debug h false ru world))
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (EvalTop.pattern_eval_top h ru world, Util.string_of_char_list (EvalTop.pattern_eval_top_debug h false ru world))
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
 let eval_oql h world f : Data.data option * string =
   let o = parse_oql_from_file f in

@@ -18,28 +18,27 @@
 
 open Compiler.EnhancedCompiler
 open SExp
-open Asts
 
 
 (******************
  * AST <-> S-Expr *
  ******************)
 
-val sexp_to_data : sexp -> data_ast
-val data_to_sexp : data_ast -> sexp
+val sexp_to_data : sexp -> Asts.data_ast
+val data_to_sexp : Asts.data_ast -> sexp
 
-val sexp_to_camp : sexp -> camp
-val camp_to_sexp : camp -> sexp
+val sexp_to_camp : sexp -> CompDriver.camp
+val camp_to_sexp : CompDriver.camp -> sexp
 
-val sexp_to_nraenv : sexp -> nraenv
-val nraenv_to_sexp : nraenv -> sexp
+val sexp_to_nraenv : sexp -> CompDriver.nraenv
+val nraenv_to_sexp : CompDriver.nraenv -> sexp
 
-val sexp_to_nnrc : sexp -> nnrc
-val nnrc_to_sexp : nnrc -> sexp
+val sexp_to_nnrc : sexp -> CompDriver.nnrc
+val nnrc_to_sexp : CompDriver.nnrc -> sexp
 
-val sexp_to_nnrcmr : sexp -> nnrcmr
-val nnrcmr_to_sexp : nnrcmr -> sexp
+val sexp_to_nnrcmr : sexp -> CompDriver.nnrcmr
+val nnrcmr_to_sexp : CompDriver.nnrcmr -> sexp
 
-val sexp_to_cldmr : sexp -> cldmr
-val cldmr_to_sexp : cldmr -> sexp
+val sexp_to_cldmr : sexp -> CompDriver.cldmr
+val cldmr_to_sexp : CompDriver.cldmr -> sexp
 
