@@ -41,8 +41,8 @@ let sexp_to_dbrands (bs:sexp list) : (char list) list =
 let sstring_list_to_coq_string_list = sexp_to_dbrands
 
 (* Data Section *)
-      
-let rec data_to_sexp (d : Asts.data_ast) : sexp =
+
+let rec data_to_sexp (d : Data.data) : sexp =
   match d with
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
@@ -57,7 +57,7 @@ let rec data_to_sexp (d : Asts.data_ast) : sexp =
 and drec_to_sexp (ad : char list * Data.data) : sexp =
   STerm ("datt", (SString (Util.string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
 
-let rec sexp_to_data (se:sexp) : Asts.data_ast =
+let rec sexp_to_data (se:sexp) : Data.data =
   match se with
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b

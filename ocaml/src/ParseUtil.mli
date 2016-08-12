@@ -23,8 +23,8 @@ open Compiler.EnhancedCompiler
 (* Specific Parse *)
 (******************)
 
-val parse_io : Lexing.lexbuf -> Asts.io_ast
-val parse_json : Lexing.lexbuf -> Asts.json_ast
+val parse_io : Lexing.lexbuf -> Data.json
+val parse_json : Lexing.lexbuf -> Data.json
 
 val parse_rule : Lexing.lexbuf -> string * CompDriver.query
 val parse_camp : Lexing.lexbuf -> CompDriver.camp
@@ -36,7 +36,7 @@ val parse_oql : Lexing.lexbuf -> CompDriver.oql
 (****************)
 
 val parse_sexp : Lexing.lexbuf -> SExp.sexp
-val parse_io_sexp : Lexing.lexbuf -> Asts.data_ast
+val parse_io_sexp : Lexing.lexbuf -> Data.data
 
 val parse_camp_sexp : Lexing.lexbuf -> CompDriver.camp
 val parse_nraenv_sexp : Lexing.lexbuf -> CompDriver.nraenv

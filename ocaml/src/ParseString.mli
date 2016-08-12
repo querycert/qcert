@@ -23,8 +23,8 @@ open ParseUtil
 (* Parse from string *)
 (*********************)
 
-val parse_io_from_string : string -> Asts.io_ast
-val parse_json_from_string : string -> Asts.json_ast
+val parse_io_from_string : string -> Data.json
+val parse_json_from_string : string -> Data.json
 
 val parse_rule_from_string : string -> string * CompDriver.query
 val parse_camp_from_string : string -> CompDriver.camp
@@ -36,7 +36,7 @@ val parse_oql_from_string : string -> CompDriver.oql
 (****************)
 
 val parse_sexp_from_string : string -> SExp.sexp
-val parse_io_sexp_from_string : string -> Asts.data_ast
+val parse_io_sexp_from_string : string -> Data.data
 val parse_camp_sexp_from_string : string -> CompDriver.camp
 val parse_nraenv_sexp_from_string : string -> CompDriver.nraenv
 val parse_nnrc_sexp_from_string : string -> CompDriver.nnrc

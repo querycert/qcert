@@ -24,8 +24,8 @@ open SExp
  * AST <-> S-Expr *
  ******************)
 
-val sexp_to_data : sexp -> Asts.data_ast
-val data_to_sexp : Asts.data_ast -> sexp
+val sexp_to_data : sexp -> Data.data
+val data_to_sexp : Data.data -> sexp
 
 val sexp_to_camp : sexp -> CompDriver.camp
 val camp_to_sexp : CompDriver.camp -> sexp

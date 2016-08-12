@@ -41,8 +41,8 @@ let parse_string p_fun s =
 (* Specific Parse *)
 (******************)
 
-let parse_io_from_string s : Asts.io_ast = parse_string parse_io s
-let parse_json_from_string s : Asts.json_ast = parse_string parse_json s
+let parse_io_from_string s : Data.json = parse_string parse_io s
+let parse_json_from_string s : Data.json = parse_string parse_json s
 
 let parse_rule_from_string s : string * CompDriver.query = parse_string parse_rule s
 let parse_camp_from_string s : CompDriver.camp = parse_string parse_camp s
@@ -54,7 +54,7 @@ let parse_oql_from_string s : CompDriver.oql = parse_string parse_oql s
 (****************)
 
 let parse_sexp_from_string s : SExp.sexp = parse_string parse_sexp s
-let parse_io_sexp_from_string s : Asts.data_ast = parse_string parse_io_sexp s
+let parse_io_sexp_from_string s : Data.data = parse_string parse_io_sexp s
 let parse_camp_sexp_from_string s : CompDriver.camp = parse_string parse_camp_sexp s
 let parse_nraenv_sexp_from_string s : CompDriver.nraenv = parse_string parse_nraenv_sexp s
 let parse_nnrc_sexp_from_string s : CompDriver.nnrc = parse_string parse_nnrc_sexp s
