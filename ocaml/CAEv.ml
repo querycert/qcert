@@ -72,7 +72,7 @@ let eval_main conf io f =
     let world = get_input (get_format conf) io in
     begin
       match language_of_name (get_source_lang lconf) with
-      | CompDriver.L_rule -> rule_main conf io h world f
+      | CompDriver.L_rule | CompDriver.L_camp -> rule_main conf io h world f
       | CompDriver.L_oql -> oql_main conf io h world f
       | _ ->
 	  raise (CACo_Error "Source language not supported")
