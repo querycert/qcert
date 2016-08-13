@@ -24,7 +24,7 @@ open PrettyIL
 let display_to_string conf modelandtype op =
   let opt_nraenv = CompCore.toptimize_algenv_typed_opt op in
   let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
-  let (env_var, opt_nnrcmr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  let opt_nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   let nnrcmr_spark = CompBack.nrcmr_to_nrcmr_prepared_for_spark opt_nnrcmr in
   let nnrcmr_cldmr = CompBack.nrcmr_to_nrcmr_prepared_for_cldmr opt_nnrcmr in
   let nrastring = PrettyIL.pretty_nraenv (get_charset_bool conf) (get_margin conf) opt_nraenv in
@@ -73,7 +73,7 @@ let make_pretty_config charkind margin =
   set_margin dpc margin;
   dpc
     
-let display_algenv_top (ck:charkind) (margin:int) modelandtype (ios:string option) (dfname:string) op =
+let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string option) (dfname:string) op =
   let modelandtype' =
     begin
     match modelandtype with
@@ -92,12 +92,12 @@ let display_algenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
   let (display_nra,display_nrc,display_nrcmr,display_nrcmr_spark,display_nrcmr_cldmr, display_opt_dnrc_dataset) =
     display_to_string (make_pretty_config ck margin) modelandtype' op
   in
-  let fout_nra = outname dfname (suffix_nra ()) in
-  let fout_nrc = outname dfname (suffix_nrc ()) in
-  let fout_nrcmr = outname dfname (suffix_nrcmr ()) in
-  let fout_nrcmr_spark = outname dfname (suffix_nrcmr_spark ()) in
-  let fout_nrcmr_cldmr = outname dfname (suffix_nrcmr_cldmr ()) in
-  let fout_dnrc_dataset = outname dfname (suffix_dnrc ()) in
+  let fout_nra = outname dfname (suffix_nraenv ()) in
+  let fout_nrc = outname dfname (suffix_nnrc ()) in
+  let fout_nrcmr = outname dfname (suffix_nnrcmr ()) in
+  let fout_nrcmr_spark = outname dfname (suffix_nnrcmr_spark ()) in
+  let fout_nrcmr_cldmr = outname dfname (suffix_nnrcmr_cldmr ()) in
+  let fout_dnrc_dataset = outname dfname (suffix_dnnrc_dataset ()) in
   begin
     make_file fout_nra display_nra;
     make_file fout_nrc display_nrc;
@@ -110,35 +110,35 @@ let display_algenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
 (* S-expression hooks *)
       
 let sexp_string_to_camp s = ParseString.parse_camp_sexp_from_string s
-let camp_to_sexp_string p = SExp.sexp_to_string (Asts.camp_to_sexp p)
+let camp_to_sexp_string p = SExp.sexp_to_string (AstsToSExp.camp_to_sexp p)
 
-let sexp_string_to_nra s = ParseString.parse_nra_sexp_from_string s
-let nra_to_sexp_string op = SExp.sexp_to_string (Asts.alg_to_sexp op)
+let sexp_string_to_nraenv s = ParseString.parse_nraenv_sexp_from_string s
+let nraenv_to_sexp_string op = SExp.sexp_to_string (AstsToSExp.nraenv_to_sexp op)
 
-let sexp_string_to_nrc s = ParseString.parse_nrc_sexp_from_string s
-let nrc_to_sexp_string n = SExp.sexp_to_string (Asts.nrc_to_sexp n)
+let sexp_string_to_nnrc s = ParseString.parse_nnrc_sexp_from_string s
+let nnrc_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.nnrc_to_sexp n)
 
-let sexp_string_to_nrcmr s = ParseString.parse_nrcmr_sexp_from_string s
-let nrcmr_to_sexp_string n = SExp.sexp_to_string (Asts.nrcmr_to_sexp n)
+let sexp_string_to_nnrcmr s = ParseString.parse_nnrcmr_sexp_from_string s
+let nnrcmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.nnrcmr_to_sexp n)
 
 let sexp_string_to_cldmr s = ParseString.parse_cldmr_sexp_from_string s
-let cldmr_to_sexp_string n = SExp.sexp_to_string (Asts.cldmr_to_sexp n)
+let cldmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.cldmr_to_sexp n)
 
 (* Top-level *)
     
-let sexp_algenv_top dfname op =
+let sexp_nraenv_top dfname op =
   let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
-  let display_nra = nra_to_sexp_string op in
-  let display_nrc = nrc_to_sexp_string opt_nnrc in
-  let (env_var, nnrcmr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  let display_nra = nraenv_to_sexp_string op in
+  let display_nrc = nnrc_to_sexp_string opt_nnrc in
+  let nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   let nrcmr_spark = CompBack.nrcmr_to_nrcmr_prepared_for_spark nnrcmr in
   let nrcmr_cldmr = CompBack.nrcmr_to_nrcmr_prepared_for_cldmr nnrcmr in
-  let display_nrcmr_spark = nrcmr_to_sexp_string (env_var,nrcmr_spark) in
-  let display_nrcmr_cldmr = nrcmr_to_sexp_string (env_var,nrcmr_cldmr) in
+  let display_nrcmr_spark = nnrcmr_to_sexp_string nrcmr_spark in
+  let display_nrcmr_cldmr = nnrcmr_to_sexp_string nrcmr_cldmr in
   let fout_nra = outname dfname (suffix_nrasexp ()) in
-  let fout_nrc = outname dfname (suffix_nrcsexp ()) in
-  let fout_nrcmr_spark = outname dfname (suffix_nrcmr_sparksexp ()) in
-  let fout_nrcmr_cldmr = outname dfname (suffix_nrcmr_cldmrsexp ()) in
+  let fout_nrc = outname dfname (suffix_nnrcsexp ()) in
+  let fout_nrcmr_spark = outname dfname (suffix_nnrcmr_sparksexp ()) in
+  let fout_nrcmr_cldmr = outname dfname (suffix_nnrcmr_cldmrsexp ()) in
   begin
     make_file fout_nra display_nra;
     make_file fout_nrc display_nrc;

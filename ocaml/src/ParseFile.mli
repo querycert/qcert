@@ -18,29 +18,34 @@
 
 open Compiler.EnhancedCompiler
 open ParseUtil
-open Asts
 
 (*******************)
 (* Parse from file *)
 (*******************)
 
-val parse_io_from_file : string -> io_ast
-val parse_json_from_file : string -> json_ast
+val parse_io_from_file : string -> Data.json
+val parse_json_from_file : string -> Data.json
 
-val parse_rule_from_file : string -> string * rORc_ast
-val parse_camp_from_file : string -> camp
+val parse_rule_from_file : string -> string * CompDriver.query
+val parse_camp_from_file : string -> CompDriver.camp
 
-val parse_oql_from_file : string -> oql_ast
+val parse_oql_from_file : string -> CompDriver.oql
 
 (****************)
 (* S-Expr Parse *)
 (****************)
 
-val parse_sexp_from_file : string -> sexp_ast
-val parse_io_sexp_from_file : string -> data_ast
-val parse_camp_sexp_from_file : string -> camp
-val parse_nra_sexp_from_file : string -> algenv
-val parse_nrc_sexp_from_file : string -> nrc
-val parse_nrcmr_sexp_from_file : string -> nrcmr
-val parse_cldmr_sexp_from_file : string -> cldmr
+val parse_sexp_from_file : string -> SExp.sexp
+val parse_io_sexp_from_file : string -> Data.data
+val parse_camp_sexp_from_file : string -> CompDriver.camp
+val parse_nraenv_sexp_from_file : string -> CompDriver.nraenv
+val parse_nnrc_sexp_from_file : string -> CompDriver.nnrc
+val parse_nnrcmr_sexp_from_file : string -> CompDriver.nnrcmr
+val parse_cldmr_sexp_from_file : string -> CompDriver.cldmr
+
+(*******************
+ * Languages Parse *
+ *******************)
+
+val parse_language_from_file : CompDriver.language -> string -> string * CompDriver.query
 

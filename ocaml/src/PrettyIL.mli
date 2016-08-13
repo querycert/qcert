@@ -60,15 +60,15 @@ val string_of_binop : Compiler.binOp -> string
 
 (* Pretty NRA^e *)
 	
-val pretty_nraenv : bool -> int -> Compiler.algenv -> string
+val pretty_nraenv : bool -> int -> CompDriver.nraenv -> string
 
 (* Pretty NNRC *)
 
-val pretty_nnrc : bool -> int -> Compiler.nrc -> string
+val pretty_nnrc : bool -> int -> CompDriver.nnrc -> string
 
 (* Pretty NNRCMR *)
 
-val pretty_nnrcmr : bool -> int -> Compiler.nrcmr -> string
+val pretty_nnrcmr : bool -> int -> CompDriver.nnrcmr -> string
 
 (* Pretty DNRC *)
 
@@ -91,7 +91,7 @@ val pretty_annotate_annotated_rtype : bool ->
 
 (* Pretty printers for various plug types *)
 val pretty_plug_ignore : Format.formatter -> 'a -> unit
-val pretty_plug_nraenv : bool -> Format.formatter -> Compiler.algenv -> unit
+val pretty_plug_nraenv : bool -> Format.formatter -> CompDriver.nraenv -> unit
 val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
 
 (* Pretty RType *)

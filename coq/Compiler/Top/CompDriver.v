@@ -61,14 +61,32 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrcmr := nrcmr.
   Definition cldmr := cld_mrl.
   Definition dnnrc_dataset := dnrc _ unit dataset.
-  Definition dnnrc_typed_dataset := dnrc _ unit (* (type_annotation unit) *) dataset. (* XXXXXXX TODO XXXX *)
+  Definition dnnrc_typed_dataset {br:brand_relation} := dnrc _ (type_annotation unit) dataset.
   Definition javascript := string.
   Definition java := string.
   Definition spark := string.
   Definition spark2 := string.
   Definition cloudant := (list (string * string) * (string * list string))%type.
 
-  Inductive query : Set :=
+  Inductive language : Set :=
+    | L_rule : language
+    | L_camp : language
+    | L_oql : language
+    | L_nra : language
+    | L_nraenv : language
+    | L_nnrc : language
+    | L_nnrcmr : language
+    | L_cldmr : language
+    | L_dnnrc_dataset : language
+    | L_dnnrc_typed_dataset : language
+    | L_javascript : language
+    | L_java : language
+    | L_spark : language
+    | L_spark2 : language
+    | L_cloudant : language
+    | L_error : language.
+
+  Inductive query {br:brand_relation} : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query
     | Q_oql : oql -> query
@@ -242,6 +260,8 @@ Module CompDriver(runtime:CompilerRuntime).
 
   (* Compilers function *)
 
+  Section CompDriverCompile.
+  Context {br:brand_relation}.
   Fixpoint compile_rule (dv: rule_driver) (q: rule) : list query :=
     let queries :=
         match dv with
@@ -437,7 +457,7 @@ Module CompDriver(runtime:CompilerRuntime).
     in
     (Q_cloudant q) :: queries.
 
-
+  End CompDriverCompile.
 End CompDriver.
 
 

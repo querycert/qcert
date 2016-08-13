@@ -25,10 +25,12 @@ let eval_rule h world f : Data.data list option * string =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (EvalTop.rule_eval_top h ru world, Util.string_of_char_list (EvalTop.rule_eval_top_debug h false ru world))
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (EvalTop.pattern_eval_top h ru world, Util.string_of_char_list (EvalTop.pattern_eval_top_debug h false ru world))
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
 let eval_oql h world f : Data.data option * string =
   let o = parse_oql_from_file f in
@@ -38,28 +40,30 @@ let eval_oql h world f : Data.data option * string =
 
 exception OQL_eval of string
       
-let eval_alg conf h world op : Data.data option =
+let eval_nraenv conf h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
-  match get_target_lang conf with
-  | ORIG ->
-      raise (OQL_eval "Orig eval not supported once compiled into algebra")
-  | NRAEnv ->
+  match language_of_name (get_target_lang conf) with
+  | CompDriver.L_rule ->
+      raise (CACo_Error "Rule eval not supported once compiled into algebra")
+  | CompDriver.L_oql ->
+      raise (OQL_eval "OQL eval not supported once compiled into algebra")
+  | CompDriver.L_nraenv ->
       let op = CompCore.toptimize_algenv_typed_opt op in
       EvalTop.algenv_eval_top h op world
-  | NNRC ->
+  | CompDriver.L_nnrc ->
       let nrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
       EvalTop.nrc_eval_top h nrc world
-  | DNNRC ->
+  | CompDriver.L_dnnrc_dataset ->
       let nrc = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
       EvalTop.dnrc_eval_top h nrc world
-  | NNRCMR ->
-      let (env_var, mrchain) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  | CompDriver.L_nnrcmr ->
+      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       EvalTop.nrcmr_chain_eval_top h mrchain world
-  | CLDMR ->
-      let (env_var, mrchain) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  | CompDriver.L_cldmr ->
+      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->
-      Printf.fprintf stderr "Target not supported in CAEv\n";
-      raise (CACo_Error "Target not supported in CAEv")
+      Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang conf);
+      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang conf)))
 

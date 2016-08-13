@@ -20,8 +20,6 @@ open Util
 open LexUtil
 open ParseUtil
 open Compiler.EnhancedCompiler
-open Asts
-
 
 (*****************)
 (* Generic Parse *)
@@ -43,23 +41,30 @@ let parse_string p_fun s =
 (* Specific Parse *)
 (******************)
 
-let parse_io_from_string s : io_ast = parse_string parse_io s
-let parse_json_from_string s : json_ast = parse_string parse_json s
+let parse_io_from_string s : Data.json = parse_string parse_io s
+let parse_json_from_string s : Data.json = parse_string parse_json s
 
-let parse_rule_from_string s : string * rORc_ast = parse_string parse_rule s
-let parse_camp_from_string s : camp = parse_string parse_camp s
+let parse_rule_from_string s : string * CompDriver.query = parse_string parse_rule s
+let parse_camp_from_string s : CompDriver.camp = parse_string parse_camp s
   
-let parse_oql_from_string s : oql_ast = parse_string parse_oql s
+let parse_oql_from_string s : CompDriver.oql = parse_string parse_oql s
 
 (****************)
 (* S-Expr Parse *)
 (****************)
 
-let parse_sexp_from_string s : sexp_ast = parse_string parse_sexp s
-let parse_io_sexp_from_string s : data_ast = parse_string parse_io_sexp s
-let parse_camp_sexp_from_string s : camp = parse_string parse_camp_sexp s
-let parse_nra_sexp_from_string s : algenv = parse_string parse_nra_sexp s
-let parse_nrc_sexp_from_string s : nrc = parse_string parse_nrc_sexp s
-let parse_nrcmr_sexp_from_string s : nrcmr = parse_string parse_nrcmr_sexp s
-let parse_cldmr_sexp_from_string s : cldmr = parse_string parse_cldmr_sexp s
+let parse_sexp_from_string s : SExp.sexp = parse_string parse_sexp s
+let parse_io_sexp_from_string s : Data.data = parse_string parse_io_sexp s
+let parse_camp_sexp_from_string s : CompDriver.camp = parse_string parse_camp_sexp s
+let parse_nraenv_sexp_from_string s : CompDriver.nraenv = parse_string parse_nraenv_sexp s
+let parse_nnrc_sexp_from_string s : CompDriver.nnrc = parse_string parse_nnrc_sexp s
+let parse_nnrcmr_sexp_from_string s : CompDriver.nnrcmr = parse_string parse_nnrcmr_sexp s
+let parse_cldmr_sexp_from_string s : CompDriver.cldmr = parse_string parse_cldmr_sexp s
+
+(*******************
+ * Languages Parse *
+ *******************)
+
+let parse_language_from_string l s : string * CompDriver.query =
+  parse_string (parse_language l) s
 

@@ -184,6 +184,7 @@ MODULES = \
 	Frontend/ODMG/OQLSugar \
 	Frontend/ODMG/OQLSize \
 	Frontend/ODMG/OQLtoNRAEnv \
+	Frontend/ODMG/TOQL \
 	Frontend/ODMGRuntime \
 	Backend/JSON \
 	Backend/ForeignToJSON \

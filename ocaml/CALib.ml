@@ -36,13 +36,13 @@ let schema_of_io (io:string) =
 
 (* Abstract AST types *)
 
-type camp = Asts.camp
-type nraenv = Asts.algenv
-type nnrc = Asts.nrc
-type dnnrc_dataset = Asts.dnrc_dataset
-type dnnrc_typed_dataset = Asts.dnrc_typed_dataset
-type nnrcmr = Asts.nrcmr
-type cldmr = Asts.cldmr
+type camp = CompDriver.camp
+type nraenv = CompDriver.nraenv
+type nnrc = CompDriver.nnrc
+type dnnrc_dataset = CompDriver.dnnrc_dataset
+type dnnrc_typed_dataset = CompDriver.dnnrc_typed_dataset
+type nnrcmr = CompDriver.nnrcmr
+type cldmr = CompDriver.cldmr
 
 let dlocal_conv l =
   if l then Compiler.Vlocal else Compiler.Vdistr
@@ -62,21 +62,21 @@ let rule_to_camp (s:string) : camp =
 (* From camp to NRAEnv *)
 
 let camp_to_nraenv (c:camp) =
-  alg_of_camp c
+  nraenv_of_camp c
 
 (* From source to NRAEnv *)
 
 let rule_to_nraenv_name (s:string) : string =
-  fst (alg_of_rule_string s)
+  fst (nraenv_of_rule_string s)
 
 let rule_to_nraenv (s:string) : nraenv =
-  snd (alg_of_rule_string s)
+  snd (nraenv_of_rule_string s)
 
 let oql_to_nraenv_name (s:string) : string =
-  fst (alg_of_oql_string s)
+  fst (nraenv_of_oql_string s)
 
 let oql_to_nraenv (s:string) : nraenv =
-  snd (alg_of_oql_string s)
+  snd (nraenv_of_oql_string s)
 
 (*
  *  Core compiler section
@@ -120,16 +120,13 @@ let optimize_nnrc (n:nnrc) =
 
 (* NNRCMR Optimizer *)
 let optimize_nnrcmr (n:nnrcmr) =
-  let (vars,n) = n in
-  (vars, CompCore.trew_nnrcmr_typed_opt n)
+  CompCore.trew_nnrcmr_typed_opt n
 
 let optimize_nnrcmr_for_cloudant (n:nnrcmr) =
-  let (vars,n) = n in
-  (vars,CompBack.nrcmr_to_nrcmr_prepared_for_cldmr n)
+  CompBack.nrcmr_to_nrcmr_prepared_for_cldmr n
 
 let optimize_nnrcmr_for_spark (n:nnrcmr) =
-  let (vars,n) = n in
-  (vars,CompBack.nrcmr_to_nrcmr_prepared_for_spark n)
+  CompBack.nrcmr_to_nrcmr_prepared_for_spark n
 
 (* For convenience *)
 (* Note: This includes optimization phases *)
@@ -149,7 +146,7 @@ let nnrc_to_js (n:nnrc) =
 let nnrc_to_java (basename:string) (imports:string) (n:nnrc) =
   string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string imports) n)
 let nnrcmr_to_spark (nrule:string) (n:nnrcmr) =
-  string_of_char_list (CompBack.mrchain_to_spark_code_gen (Util.char_list_of_string nrule) (fst n) (snd n))
+  string_of_char_list (CompBack.mrchain_to_spark_code_gen (Util.char_list_of_string nrule) n)
 
 let translate_nnrcmr_to_cldmr (n:nnrcmr) : cldmr =
   CloudantUtil.cloudant_translate_no_harness n
@@ -166,7 +163,7 @@ let compile_nraenv_to_java (basename:string) (imports:string) (op:nraenv) : stri
   string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
 
 let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
-  let (env_var,mr) = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) mr)
 
 let compile_nraenv_to_cloudant (prefix:string) (nrule:string) (op:nraenv) : string =
@@ -193,14 +190,14 @@ let compile_nnrcmr_to_cloudant (prefix:string) (nrule:string) (n:nnrcmr) : strin
 let export_camp (p:camp) = DisplayUtil.camp_to_sexp_string p
 let import_camp (ps:string) = DisplayUtil.sexp_string_to_camp ps
 
-let export_nraenv (op:nraenv) = DisplayUtil.nra_to_sexp_string op
-let import_nraenv (ops:string) = DisplayUtil.sexp_string_to_nra ops
+let export_nraenv (op:nraenv) = DisplayUtil.nraenv_to_sexp_string op
+let import_nraenv (ops:string) = DisplayUtil.sexp_string_to_nraenv ops
 
-let export_nnrc (n:nnrc) = DisplayUtil.nrc_to_sexp_string n
-let import_nnrc (ns:string) = DisplayUtil.sexp_string_to_nrc ns
+let export_nnrc (n:nnrc) = DisplayUtil.nnrc_to_sexp_string n
+let import_nnrc (ns:string) = DisplayUtil.sexp_string_to_nnrc ns
 
-let export_nnrcmr (n:nnrcmr) = DisplayUtil.nrcmr_to_sexp_string n
-let import_nnrcmr (ns:string) = DisplayUtil.sexp_string_to_nrcmr ns
+let export_nnrcmr (n:nnrcmr) = DisplayUtil.nnrcmr_to_sexp_string n
+let import_nnrcmr (ns:string) = DisplayUtil.sexp_string_to_nnrcmr ns
 
 let export_cldmr (n:cldmr) = DisplayUtil.cldmr_to_sexp_string n
 let import_cldmr (ns:string) = DisplayUtil.sexp_string_to_cldmr ns
@@ -211,10 +208,10 @@ let import_cldmr (ns:string) = DisplayUtil.sexp_string_to_cldmr ns
 let pretty_nraenv (greek:bool) (margin:int) (op:nraenv) = PrettyIL.pretty_nraenv greek margin op
 let pretty_nnrc (greek:bool) (margin:int) (n:nnrc) = PrettyIL.pretty_nnrc greek margin n
 let pretty_nnrcmr_for_spark (greek:bool) (margin:int) (nmr:nnrcmr) =
-  let (env_var, opt_nnrcmr) = nmr in
+  let opt_nnrcmr = nmr in
   PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_spark opt_nnrcmr)
 let pretty_nnrcmr_for_cloudant (greek:bool) (margin:int) (nmr:nnrcmr) =
-  let (env_var, opt_nnrcmr) = nmr in
+  let opt_nnrcmr = nmr in
   PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_cldmr opt_nnrcmr)
 
 (* Options *)
@@ -226,24 +223,24 @@ let unset_optim_trace = Logger.unset_trace
 
 let display_nraenv (charbool:bool) (margin:int) modelandtype io dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin (Some modelandtype) (Some io) dfname op
-  else display_algenv_top PrettyIL.Ascii margin (Some modelandtype) (Some io) dfname op
+  then display_nraenv_top PrettyIL.Greek margin (Some modelandtype) (Some io) dfname op
+  else display_nraenv_top PrettyIL.Ascii margin (Some modelandtype) (Some io) dfname op
 
 let display_nraenv_no_schema (charbool:bool) (margin:int) io dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin None (Some io) dfname op
-  else display_algenv_top PrettyIL.Ascii margin None (Some io) dfname op
+  then display_nraenv_top PrettyIL.Greek margin None (Some io) dfname op
+  else display_nraenv_top PrettyIL.Ascii margin None (Some io) dfname op
 
 let display_nraenv_no_io (charbool:bool) (margin:int) modelandtype dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin (Some modelandtype) None dfname op
-  else display_algenv_top PrettyIL.Ascii margin (Some modelandtype) None dfname op
+  then display_nraenv_top PrettyIL.Greek margin (Some modelandtype) None dfname op
+  else display_nraenv_top PrettyIL.Ascii margin (Some modelandtype) None dfname op
 
 let display_nraenv_no_schema_no_io (charbool:bool) (margin:int) dfname op =
   if charbool
-  then display_algenv_top PrettyIL.Greek margin None None dfname op
-  else display_algenv_top PrettyIL.Ascii margin None None dfname op
+  then display_nraenv_top PrettyIL.Greek margin None None dfname op
+  else display_nraenv_top PrettyIL.Ascii margin None None dfname op
 
 let display_nraenv_sexp dfname op =
-  sexp_algenv_top dfname op
+  sexp_nraenv_top dfname op
 

@@ -21,13 +21,13 @@ open Compiler.EnhancedCompiler
 
 (* Parse/translate input *)
 
-val camp_of_rule_string : string -> (string * Compiler.pat)
-val alg_of_camp : Compiler.pat -> Compiler.algenv
+val camp_of_rule_string : string -> (string * CompDriver.camp)
+val nraenv_of_camp : CompDriver.camp -> CompDriver.nraenv
 
-val alg_of_rule : string -> (string * Compiler.algenv)
-val alg_of_rule_string : string -> (string * Compiler.algenv)
-val alg_of_oql : string -> (string * Compiler.algenv)
-val alg_of_oql_string : string -> (string * Compiler.algenv)
+val nraenv_of_rule : string -> (string * CompDriver.nraenv)
+val nraenv_of_rule_string : string -> (string * CompDriver.nraenv)
+val nraenv_of_oql : string -> (string * CompDriver.nraenv)
+val nraenv_of_oql_string : string -> (string * CompDriver.nraenv)
 
-val alg_of_input : lang_config -> string -> (string * Compiler.algenv)
+val nraenv_of_input : lang_config -> string -> (string * CompDriver.nraenv)
 

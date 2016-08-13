@@ -16,6 +16,7 @@
 
 (* Front end utilities *)
 
+open Util
 open ConfigUtil
 open ParseFile
 open ParseString
@@ -27,42 +28,50 @@ open Compiler.EnhancedCompiler
 let camp_of_rule_string s =
   let (rn,ru) = parse_rule_from_string s in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (rn,CompFront.translate_rule_to_pat ru)
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (rn,ru)
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
-let alg_of_camp p =
+let nraenv_of_camp p =
   CompFront.translate_pat_to_algenv p
 
-let alg_of_rule_string s =
+let nraenv_of_rule_string s =
   let (rn,ru) = parse_rule_from_string s in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (rn,CompFront.translate_rule_to_algenv ru)
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (rn,CompFront.translate_pat_to_algenv ru)
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
-let alg_of_rule f =
+let nraenv_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | Asts.RuleAst ru ->
+  | CompDriver.Q_rule ru ->
       (rn,CompFront.translate_rule_to_algenv ru)
-  | Asts.CampAst ru ->
+  | CompDriver.Q_camp ru ->
       (rn,CompFront.translate_pat_to_algenv ru)
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 
-let alg_of_oql_string s =
+let nraenv_of_oql_string s =
   let o = parse_oql_from_string s in
   ("OQL",CompFront.translate_oql_to_algenv o)
   
-let alg_of_oql f =
+let nraenv_of_oql f =
   let o = parse_oql_from_file f in
   ("OQL",CompFront.translate_oql_to_algenv o)
   
-let alg_of_input conf f =
-  match get_source_lang conf with
-  | RULE ->
-      alg_of_rule f
-  | OQL ->
-      alg_of_oql f
+let nraenv_of_input conf f =
+  match language_of_name (get_source_lang conf) with
+  | CompDriver.L_rule ->
+      nraenv_of_rule f
+  | CompDriver.L_oql ->
+      nraenv_of_oql f
+  | _ ->
+      raise (CACo_Error "Input language not supported")
 

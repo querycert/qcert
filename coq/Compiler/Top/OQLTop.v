@@ -83,7 +83,7 @@ Module OQLTop(runtime:CompilerRuntime).
      - The free variables are obtained after nrc rewrites
      - one has to be careful to pass those free variables to the mr-optimizer *)
   
-  Definition tcompile_oql_to_nnrcmr_chain (e:oql_expr) : list (var * dlocalization) * nrcmr :=
+  Definition tcompile_oql_to_nnrcmr_chain (e:oql_expr) : nrcmr :=
     (* Produces the initial plan *)
     let op_init := CF.translate_oql_to_algenv e in
     (* Compile/Optimize to NNRCMR *)
@@ -101,7 +101,7 @@ Module OQLTop(runtime:CompilerRuntime).
     (* Produces the initial plan *)
     let op_init := CF.translate_oql_to_algenv e in
     (* Compile/Optimize to NNRCMR *)
-    let (env_vars, e_nrcmr) := CC.tcompile_nraenv_to_nnrcmr_chain_typed_opt op_init in
+    let e_nrcmr := CC.tcompile_nraenv_to_nnrcmr_chain_typed_opt op_init in
     (* Generate for Cloudant *)
     let e_cld_mr := CB.nrcmr_to_cldmr_chain_with_prepare h e_nrcmr in
     e_cld_mr.
@@ -112,7 +112,7 @@ Module OQLTop(runtime:CompilerRuntime).
     (* Produces the initial plan *)
     let op_init := CF.translate_oql_to_algenv e in
     (* Compile/Optimize to NNRCMR *)
-    let (env_vars, e_nrcmr) := CC.tcompile_nraenv_to_nnrcmr_chain_typed_opt op_init in
+    let e_nrcmr := CC.tcompile_nraenv_to_nnrcmr_chain_typed_opt op_init in
     (* Generate for Cloudant *)
     CB.nrcmr_to_cloudant_code_gen_with_prepare h e_nrcmr rulename.
 

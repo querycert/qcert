@@ -26,7 +26,7 @@
 %token LBRACKET RBRACKET
 %token EOF
   
-%start <Asts.json_ast> main
+%start <Compiler.EnhancedCompiler.Data.json> main
 %%
 
 main:
