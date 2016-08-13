@@ -30,5 +30,6 @@
 	<classpathentry kind="var" path="JENA_JARS/slf4j-log4j12-1.7.20.jar"/>
 	<classpathentry kind="var" path="JENA_JARS/xercesImpl-2.11.0.jar"/>
 	<classpathentry kind="var" path="JENA_JARS/xml-apis-1.4.01.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/camp-java"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
