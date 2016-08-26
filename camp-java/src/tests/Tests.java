@@ -73,7 +73,7 @@ public class Tests {
 		CampPattern data = rec("data", concat(client, marketer));
 		ReturnRule ret = new ReturnRule(concat(type, data));
 		CampRule ans = when1.apply(when2.apply(ret));
-		String result = ans.emit();
+		String result = ans.emit(true);
 		System.out.println(result);
 		Assert.assertEquals("incorrect result. ", compare, result);
 	}

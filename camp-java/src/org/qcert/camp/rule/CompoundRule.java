@@ -58,13 +58,13 @@ public final class CompoundRule extends CampRule {
 	
 	/**
 	 * Special emitting function.  Note: the format for this case is not well-established.
-	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
+	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter, boolean)
 	 */
 	@Override
-	public void emit(PrintWriter pw) {
+	public void emit(PrintWriter pw, boolean sexp) {
 		pw.append("(compound ");
 		for (CampRule rule : members) {
-			rule.emit(pw);
+			rule.emit(pw, sexp);
 			pw.append(" ");
 		}
 		pw.append(")");
