@@ -21,7 +21,6 @@ import java.util.Map.Entry;
 
 import org.qcert.camp.data.CampData;
 import org.qcert.camp.pattern.BinaryOperator;
-import org.qcert.camp.pattern.UnaryOperator;
 
 /**
  * Describes a node in the Rules/CAMP AST
@@ -40,7 +39,8 @@ public abstract class CampAST {
 
 	/** General purpose emit node capable of writing any node to any PrintWriter and called
 	 * recursively on an entire AST. 
-	 * This implementation serves for almost all nodes.  Overriding should be rare.
+	 * This implementation serves for almost all nodes, by having the nodes implement
+	 *   getTag() and getOperands().  Overriding should be rare, but it done in a few cases.
 	 * @param pw the PrintWriter to which to emit
 	 */
 	public void emit(PrintWriter pw) {
@@ -51,7 +51,7 @@ public abstract class CampAST {
 				((CampAST) op).emit(pw.append(" "));
 			else if (op instanceof String)
 				pw.append(" \"").append((String) op).append("\"");
-			else if (op instanceof BinaryOperator || op instanceof UnaryOperator)
+			else if (op instanceof BinaryOperator)
 				pw.append(" (").append(String.valueOf(op)).append(")");
 			else if (op instanceof Entry<?,?>) {
 				@SuppressWarnings("unchecked")

@@ -13,38 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.qcert.camp.pattern;
+package org.qcert.camp;
 
+import org.qcert.calib.CACoEngine;
+import org.qcert.calib.CACoEngineAPI;
+import org.qcert.calib.CALibWrapper.camp;
+import org.qcert.camp.pattern.CampPattern;
 
 /**
- * Represents a CAMP Map pattern 
+ * Contains utilities to drive Java AST forms through the ML/Coq code as needed (via CALib)
  */
-public class MapPattern extends CampPattern {
-	public MapPattern(CampPattern operand) {
-		super(operand);
+public class BridgeToML {
+	private CACoEngineAPI caco = new CACoEngine();
+	
+	public camp importCAMP(CampPattern pattern) {
+		return new CACoEngine().import_camp(pattern.emit());
 	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.pattern.CampPattern#getKind()
-	 */
-	@Override
-	public Kind getKind() {
-		return Kind.pmap;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "Pmap";
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "map " + getOperand();
+	
+	public String dumpCAMP(camp toDump) {
+		return new CACoEngine().export_camp(toDump);
 	}
 }

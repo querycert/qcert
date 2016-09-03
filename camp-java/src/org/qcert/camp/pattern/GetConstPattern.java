@@ -54,7 +54,7 @@ public class GetConstPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "pgetconstant";
+		return "Pgetconstant";
 	}
 
 	/* (non-Javadoc)

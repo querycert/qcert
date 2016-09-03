@@ -15,6 +15,7 @@
  */
 package org.qcert.camp.pattern;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -61,11 +62,21 @@ public final class UnaryPattern extends CampPattern {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
+	 */
+	@Override
+	public void emit(PrintWriter pw) {
+		pw.append("(Punop (").append(operator.name()).append(formatParameter()).append(") ");
+		getOperand().emit(pw);
+		pw.append(")");
+	}
+
 	/**
 	 * Subroutine for formatting String or List<String> parameters
 	 */
 	@SuppressWarnings("unchecked")
-	private String formatParameter() {
+	public String formatParameter() {
 		if (parameter == null)
 			return "";
 		if (parameter instanceof String)
@@ -85,14 +96,6 @@ public final class UnaryPattern extends CampPattern {
 	@Override
 	public Kind getKind() {
 		return Kind.punop;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getOperands()
-	 */
-	@Override
-	protected Object[] getOperands() {
-		return new Object[] {operator, getOperand()};
 	}
 
 	/**
@@ -118,18 +121,26 @@ public final class UnaryPattern extends CampPattern {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "punop";
-	}
-
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return operator + formatParameter() + "(" + getOperand() + ")";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // should not be called since we override emit
 	}
 }

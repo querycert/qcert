@@ -23,6 +23,7 @@ import static org.qcert.camp.CampMacros.rec;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.qcert.camp.BridgeToML;
 import org.qcert.camp.pattern.BinaryOperator;
 import org.qcert.camp.pattern.BinaryPattern;
 import org.qcert.camp.pattern.CampPattern;
@@ -35,12 +36,24 @@ import org.qcert.camp.rule.WhenRule;
 
 /** Constructs the example in the ECOOP 2013 paper, Figure 6 */
 public class Tests {
-	private static final String compare = "(rule_when (pletEnv (passert (pbinop (AEq) (punop (ADot) (pit))" +
-			" (pconst (dstring \"Client\")))) (pletEnv (punop (ARec) (pit)) (penv))) (rule_when (pletEnv (passert (pletEnv " +
-			"(passert (pbinop (AEq) (punop (ADot) (pit)) (pconst (dstring \"Marketer\")))) (pbinop (AContains) (punop (ADot)" +
-			" (punop (ADot) (punop (ADot) (penv)))) (punop (ADot) (punop (ADot) (pit)))))) (pletEnv (punop (ARec) (pit)) (penv))) " +
-			"(rule_return (pbinop (AConcat) (punop (ARec) (pconst (dstring \"C2M\"))) (punop (ARec) (pbinop (AConcat) (punop " +
-			"(ARec) (punop (ADot) (penv))) (punop (ARec) (punop (ADot) (penv)))))))))";
+	private static final String compare = 
+			"(rule_when (PletEnv (Passert (Pbinop (AEq) (Punop (ADot \"type\" ) (Pit)) (Pconst \"Client\")))" +
+			" (PletEnv (Punop (ARec \"C\" ) (Pit)) (Penv))) (rule_when (PletEnv (Passert (PletEnv (Passert (Pbinop (AEq)" +
+			" (Punop (ADot \"type\" ) (Pit)) (Pconst \"Marketer\"))) (Pbinop (AContains) (Punop (ADot \"id\" )" +
+			" (Punop (ADot \"data\" ) (Punop (ADot \"C\" ) (Penv)))) (Punop (ADot \"clients\" ) (Punop (ADot \"data\" ) (Pit))))))" +
+			" (PletEnv (Punop (ARec \"M\" ) (Pit)) (Penv))) (rule_return (Pbinop (AConcat) (Punop (ARec \"type\" )" +
+			" (Pconst \"C2M\")) (Punop (ARec \"data\" ) (Pbinop (AConcat) (Punop (ARec \"client\" ) (Punop (ADot \"C\" )" +
+			" (Penv))) (Punop (ARec \"marketer\" ) (Punop (ADot \"M\" ) (Penv)))))))))";
+	private String compare2 =
+			"(Punop (AFlatten) (PletIt (Pgetconstant \"WORLD\") (Pmap (PletEnv (PletEnv (Passert (Pbinop (AEq)" +
+			" (Punop (ADot \"type\" ) (Pit)) (Pconst \"Client\"))) (PletEnv (Punop (ARec \"C\" ) (Pit)) (Penv)))" +
+			" (Punop (AFlatten) (PletIt (Pgetconstant \"WORLD\") (Pmap (PletEnv (PletEnv (Passert (PletEnv" +
+			" (Passert (Pbinop (AEq) (Punop (ADot \"type\" ) (Pit)) (Pconst \"Marketer\"))) (Pbinop (AContains)" + 
+			" (Punop (ADot \"id\" ) (Punop (ADot \"data\" ) (Punop (ADot \"C\" ) (Penv)))) (Punop (ADot \"clients\" )" + 
+			" (Punop (ADot \"data\" ) (Pit)))))) (PletEnv (Punop (ARec \"M\" ) (Pit)) (Penv))) (Punop (AColl)" +
+			" (Pbinop (AConcat) (Punop (ARec \"type\" ) (Pconst \"C2M\")) (Punop (ARec \"data\" ) (Pbinop (AConcat)" +
+			" (Punop (ARec \"client\" ) (Punop (ADot \"C\" ) (Penv))) (Punop (ARec \"marketer\" ) (Punop (ADot \"M\" )" +
+			" (Penv)))))))))))))))";
 
 	@Test
 	public void Test1() {
@@ -74,7 +87,16 @@ public class Tests {
 		ReturnRule ret = new ReturnRule(concat(type, data));
 		CampRule ans = when1.apply(when2.apply(ret));
 		String result = ans.emit();
+		System.out.println("Original (with rules):");
 		System.out.println(result);
-		Assert.assertEquals("incorrect result. ", compare, result);
+		Assert.assertEquals("incorrect raw result. ", compare, result);
+		CampPattern expanded = ans.convertToPattern();
+		System.out.println("After expansion:");
+		System.out.println(expanded.emit());
+		Assert.assertEquals("incorrect expanded result. ", compare2, expanded.emit());
+		// Probably temporary (basis of new tests):
+		System.out.println("After round trip through CALib");
+		BridgeToML bridge = new BridgeToML();
+		System.out.println(bridge.dumpCAMP(bridge.importCAMP(expanded)));
 	}
 }

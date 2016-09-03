@@ -47,7 +47,7 @@ public class FloatData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dfloat";
+		return "Dfloat";
 	}
 
 	/**

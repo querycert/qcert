@@ -16,6 +16,7 @@
 package org.qcert.camp.pattern;
 
 import org.qcert.camp.data.CampData;
+import org.qcert.camp.data.NatData;
 import org.qcert.camp.data.StringData;
 
 /**
@@ -35,6 +36,11 @@ public final class ConstPattern extends CampPattern {
 	/** Convenience constructor for String constants */
 	public ConstPattern(String value) {
 		this(new StringData(value));
+	}
+	
+	/** Convenience constructor for integral constants */
+	public ConstPattern(long value) {
+		this(new NatData(value));
 	}
 	
 	/**
@@ -65,7 +71,7 @@ public final class ConstPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "pconst";
+		return "Pconst";
 	}
 
 	/* (non-Javadoc)

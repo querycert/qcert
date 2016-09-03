@@ -44,7 +44,7 @@ public class UnitData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dunit";
+		return "Dunit";
 	}
 
 	/* (non-Javadoc)

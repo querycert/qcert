@@ -48,7 +48,7 @@ public class TimePointData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dtime_point";
+		return "Dtime_point";
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class LetItPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "pletIt";
+		return "PletIt";
 	}
 
 	/* (non-Javadoc)

@@ -15,6 +15,8 @@
  */
 package org.qcert.camp.data;
 
+import java.io.PrintWriter;
+
 
 /**
  * Represents the dstring data constructor
@@ -27,27 +29,19 @@ public class StringData extends CampData {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
+	 */
+	@Override
+	public void emit(PrintWriter pw) {
+		pw.append("\"").append(value).append("\"");
+	}
+
+	/* (non-Javadoc)
 	 * @see org.qcert.camp.data.CampData#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.dstring;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getOperands()
-	 */
-	@Override
-	protected Object[] getOperands() {
-		return new Object[] {value};
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "dstring";
 	}
 
 	/**
@@ -63,5 +57,21 @@ public class StringData extends CampData {
 	@Override
 	public String toString() {
 		return value == null ? "null" : "\"" + value.toString() + "\""; 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // emit is overridden, this should not be called
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // emit is overridden, this should not be called
 	}
 }

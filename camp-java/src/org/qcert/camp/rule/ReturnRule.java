@@ -15,6 +15,7 @@
  */
 package org.qcert.camp.rule;
 
+import org.qcert.camp.CampMacros;
 import org.qcert.camp.pattern.CampPattern;
 
 /**
@@ -36,6 +37,17 @@ public final class ReturnRule extends PatternRule {
 		throw new IllegalStateException("A ReturnRule cannot be applied as a function");
 	}
 
+	/**
+	 * Implement according to logic in rule_to_pattern in Coq code
+         | rule_return p =>
+           makeSingleton p
+	 * @see org.qcert.camp.rule.CampRule#convertToPattern()
+	 */
+	@Override
+	public CampPattern convertToPattern() {
+		return CampMacros.makeSingleton(getPattern());
+	}
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
@@ -45,18 +57,18 @@ public final class ReturnRule extends PatternRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "rule_return";
-	}
-
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return "rule_return (" + getPattern() + ")";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "rule_return";
 	}
 }

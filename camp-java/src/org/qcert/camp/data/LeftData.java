@@ -47,7 +47,7 @@ public class LeftData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dleft";
+		return "Dleft";
 	}
 
 	/**

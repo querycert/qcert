@@ -57,7 +57,7 @@ public class RecData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "drec";
+		return "Drec";
 	}
 
 	/* (non-Javadoc)

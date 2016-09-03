@@ -15,7 +15,12 @@
  */
 package org.qcert.camp.rule;
 
+import org.qcert.camp.CampMacros;
 import org.qcert.camp.pattern.CampPattern;
+import org.qcert.camp.pattern.LetEnvPattern;
+import org.qcert.camp.pattern.MapPattern;
+import org.qcert.camp.pattern.UnaryOperator;
+import org.qcert.camp.pattern.UnaryPattern;
 
 /**
  * Represnts rule_when in the Rule macro language 
@@ -45,6 +50,24 @@ public final class WhenRule extends PatternRule {
 		return new WhenRule(this, operand);
 	}
 
+	/**
+	 * Implement according to logic in rule_to_pattern in Coq code
+         | rule_when p ps =>
+           punop AFlatten
+                 (WW
+                    (pmap
+                       (pletEnv
+                          p
+                          (rule_to_pattern ps))))
+	 * @see org.qcert.camp.rule.CampRule#convertToPattern()
+	 */
+	@Override
+	public CampPattern convertToPattern() {
+		CampPattern op = getOperand().convertToPattern();
+		CampPattern map = new MapPattern(new LetEnvPattern(getPattern(), op));
+		return new UnaryPattern(UnaryOperator.AFlatten, CampMacros.WW(map));
+	}
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
@@ -54,18 +77,18 @@ public final class WhenRule extends PatternRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "rule_when";
-	}
-
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return "rule_when (" + getPattern() + ")";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "rule_when";
 	}
 }

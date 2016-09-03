@@ -37,7 +37,7 @@ public class LetEnvPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "pletEnv";
+		return "PletEnv";
 	}
 
 	/* (non-Javadoc)
