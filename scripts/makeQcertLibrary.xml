@@ -1,0 +1,21 @@
+<project name="makeQcertLibrary" default="make">
+	<property name="extraction.dir" value="../ocaml"/>
+	<property name="calib.src" value="${extraction.dir}/japi/src"/>
+	<property name="calib.bin" value="${extraction.dir}/japi/bin"/>
+	
+	<target name="make" depends="compile">
+		<delete file="${extraction.dir}/../lib/QcertLib.jar"/>
+		<jar destfile="${extraction.dir}/../lib/QcertLib.jar">
+			<zipfileset src="${extraction.dir}/../lib/CALib.jar"/>
+			<zipfileset dir="${calib.bin}" includes="org/qcert/calib/**"/>
+			<zipfileset dir="${calib.src}" includes="org/qcert/calib/**"/>
+		</jar>
+	</target>
+
+	<target name="compile">
+		<pathconvert property="cpath">
+			<fileset dir="${extraction.dir}" includes="*.jar"/>
+		</pathconvert>
+		<javac srcdir="${calib.src}" destdir="${calib.bin}" includeAntRuntime="false" classpath="${cpath}"/>
+	</target>
+</project>
