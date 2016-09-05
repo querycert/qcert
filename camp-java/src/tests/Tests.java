@@ -15,28 +15,33 @@
  */
 package tests;
 
-import static org.qcert.camp.CampMacros.concat;
-import static org.qcert.camp.CampMacros.dot;
-import static org.qcert.camp.CampMacros.eq;
-import static org.qcert.camp.CampMacros.pand;
-import static org.qcert.camp.CampMacros.rec;
+import static org.qcert.camp.CampMacros.*;
+
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.qcert.camp.BridgeToML;
+import org.qcert.camp.data.NatData;
+import org.qcert.camp.data.StringData;
+import org.qcert.camp.pattern.AssertPattern;
 import org.qcert.camp.pattern.BinaryOperator;
 import org.qcert.camp.pattern.BinaryPattern;
 import org.qcert.camp.pattern.CampPattern;
 import org.qcert.camp.pattern.ConstPattern;
+import org.qcert.camp.pattern.GetConstPattern;
 import org.qcert.camp.pattern.LetEnvPattern;
+import org.qcert.camp.pattern.LetItPattern;
+import org.qcert.camp.pattern.MapPattern;
+import org.qcert.camp.pattern.UnaryOperator;
 import org.qcert.camp.pattern.UnaryPattern;
 import org.qcert.camp.rule.CampRule;
 import org.qcert.camp.rule.ReturnRule;
 import org.qcert.camp.rule.WhenRule;
 
-/** Constructs the example in the ECOOP 2013 paper, Figure 6 */
+/** Various simple tests of AST functionality */ 
 public class Tests {
-	private static final String compare = 
+	private static final String test1Raw = 
 			"(rule_when (PletEnv (Passert (Pbinop (AEq) (Punop (ADot \"type\" ) (Pit)) (Pconst \"Client\")))" +
 			" (PletEnv (Punop (ARec \"C\" ) (Pit)) (Penv))) (rule_when (PletEnv (Passert (PletEnv (Passert (Pbinop (AEq)" +
 			" (Punop (ADot \"type\" ) (Pit)) (Pconst \"Marketer\"))) (Pbinop (AContains) (Punop (ADot \"id\" )" +
@@ -44,7 +49,7 @@ public class Tests {
 			" (PletEnv (Punop (ARec \"M\" ) (Pit)) (Penv))) (rule_return (Pbinop (AConcat) (Punop (ARec \"type\" )" +
 			" (Pconst \"C2M\")) (Punop (ARec \"data\" ) (Pbinop (AConcat) (Punop (ARec \"client\" ) (Punop (ADot \"C\" )" +
 			" (Penv))) (Punop (ARec \"marketer\" ) (Punop (ADot \"M\" ) (Penv)))))))))";
-	private String compare2 =
+	private static final String test1Expanded =
 			"(Punop (AFlatten) (PletIt (Pgetconstant \"WORLD\") (Pmap (PletEnv (PletEnv (Passert (Pbinop (AEq)" +
 			" (Punop (ADot \"type\" ) (Pit)) (Pconst \"Client\"))) (PletEnv (Punop (ARec \"C\" ) (Pit)) (Penv)))" +
 			" (Punop (AFlatten) (PletIt (Pgetconstant \"WORLD\") (Pmap (PletEnv (PletEnv (Passert (PletEnv" +
@@ -54,7 +59,14 @@ public class Tests {
 			" (Pbinop (AConcat) (Punop (ARec \"type\" ) (Pconst \"C2M\")) (Punop (ARec \"data\" ) (Pbinop (AConcat)" +
 			" (Punop (ARec \"client\" ) (Punop (ADot \"C\" ) (Penv))) (Punop (ARec \"marketer\" ) (Punop (ADot \"M\" )" +
 			" (Penv)))))))))))))))";
-
+	private static final String test2 = "(Punop (AFlatten) (PletIt (Pgetconstant \"WORLD\") (Pmap (PletEnv (PletIt" +
+			" (PletIt (Punop (ACast \"entities.Customer\" ) (Pit)) (Pleft)) (PletEnv (Punop (ARec \"c\" ) (Pit)) (PletEnv" +
+			" (Passert (Pbinop (AEq) (PletIt (Punop (AUnbrand) (Pit)) (PletIt (Punop (ADot \"age\" ) (Pit)) (Pit)))"+ 
+			" (Pconst 32))) (PletIt (Penv) (Pit))))) (Punop (AColl) (Pbinop (ASConcat) (Punop (AToString)"+ 
+			" (Pconst \"Customer =\")) (Punop (AToString) (PletIt (PletIt (Penv) (Punop (ADot \"c\" ) (Pit))) (PletIt"+ 
+			" (Punop (AUnbrand) (Pit)) (PletIt (Punop (ADot \"name\" ) (Pit)) (Pit)))))))))))";
+	
+	/** Constructs the example in the ECOOP 2013 paper, Figure 6 */
 	@Test
 	public void Test1() {
 		/* [when] it.type = “Client” */
@@ -89,14 +101,62 @@ public class Tests {
 		String result = ans.emit();
 		System.out.println("Original (with rules):");
 		System.out.println(result);
-		Assert.assertEquals("incorrect raw result. ", compare, result);
+		Assert.assertEquals("incorrect raw result. ", test1Raw, result);
 		CampPattern expanded = ans.convertToPattern();
 		System.out.println("After expansion:");
 		System.out.println(expanded.emit());
-		Assert.assertEquals("incorrect expanded result. ", compare2, expanded.emit());
+		Assert.assertEquals("incorrect expanded result. ", test1Expanded, expanded.emit());
 		// Probably temporary (basis of new tests):
 		System.out.println("After round trip through CALib");
 		BridgeToML bridge = new BridgeToML();
 		System.out.println(bridge.dumpCAMP(bridge.importCAMP(expanded)));
+	}
+	
+	/** Constructs the equivalent of the test01 sample provided by qcert open source:
+	  Example R01 :=
+        punop AFlatten (pletIt ((pgetconstant "WORLD")) 
+           (pmap (pletEnv 
+              (pletIt 
+                 (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft))
+                 (pletEnv (punop (ARec "c") (pit)) 
+                   (pletEnv 
+                     (passert (pbinop AEq 
+                       (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) 
+                     (pletIt (penv) (pit))
+                   )
+                 )
+              ) 
+              (punop AColl (pbinop ASConcat 
+                (punop AToString (#` "Customer =")) 
+                (punop AToString (pletIt (pletIt (penv) 
+                  (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit)))))
+              ))
+           ))
+        )
+	 */
+	@Test
+	public void test2() throws Exception {
+		CampPattern itop1 = new LetItPattern(new UnaryPattern(UnaryOperator.ACast, Collections.singletonList("entities.Customer"),
+				CampPattern.IT), CampPattern.LEFT);
+		CampPattern unbrandAge = new LetItPattern(unbrandIt(), 
+				new LetItPattern(dot(CampPattern.IT, "age"), CampPattern.IT));
+		CampPattern envAssert = new LetEnvPattern(new AssertPattern(eq(unbrandAge, new ConstPattern(new NatData(32)))), 
+				new LetItPattern(CampPattern.ENV, CampPattern.IT));
+		CampPattern itop2 = new LetEnvPattern(new UnaryPattern(UnaryOperator.ARec, "c", CampPattern.IT), envAssert);
+		CampPattern envop1 = new LetItPattern(itop1, itop2);
+		CampPattern cName = stringify(new LetItPattern(new LetItPattern(CampPattern.ENV, dot(CampPattern.IT, "c")), 
+				new LetItPattern(unbrandIt(), new LetItPattern(dot(CampPattern.IT, "name"), CampPattern.IT))));
+		CampPattern binop = new BinaryPattern(BinaryOperator.ASConcat, stringify(new ConstPattern(new StringData("Customer ="))), 
+				cName);
+		CampPattern envop2 = new UnaryPattern(UnaryOperator.AColl, binop);
+		CampPattern map = new MapPattern(new LetEnvPattern(envop1, envop2));
+		CampPattern ans = new UnaryPattern(UnaryOperator.AFlatten, new LetItPattern(new GetConstPattern("WORLD"), map));
+		System.out.println("Original:");
+		String result = ans.emit();
+		System.out.println(result);
+		Assert.assertEquals("incorrect result. ", test2, result);
+		System.out.println("After round trip through CALib");
+		BridgeToML bridge = new BridgeToML();
+		System.out.println(bridge.dumpCAMP(bridge.importCAMP(ans)));
 	}
 }

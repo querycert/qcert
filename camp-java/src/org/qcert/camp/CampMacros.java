@@ -37,7 +37,7 @@ public class CampMacros {
 	public static CampPattern BINDINGS() {
 		return new LetItPattern(CampPattern.ENV, CampPattern.IT);
 	}
-	
+
 	/** A convenient macro for AConcat */
 	public static BinaryPattern concat(CampPattern left, CampPattern right) {
 		return new BinaryPattern(BinaryOperator.AConcat, left, right);
@@ -66,7 +66,7 @@ public class CampMacros {
 	public static CampPattern notholds(CampPattern p) {
 		return WW(mapsnone(p));
 	}
-
+	
 	/** The ^ macro from the paper, called 'pand' in the coq */
 	public static LetEnvPattern pand(CampPattern asserted, CampPattern successor) {
 		return new LetEnvPattern(new AssertPattern(asserted), successor);
@@ -80,6 +80,16 @@ public class CampMacros {
 	/** A macro equivalent to the 'RETURN' notion in Coq (which is an infix for pletEnv) */
 	public static CampPattern RETURN(CampPattern op1, CampPattern op2) {
 		return new LetEnvPattern(op1,  op2);
+	}
+	
+	/** Convenience macro for toString */
+	public static UnaryPattern stringify(CampPattern arg) {
+		return new UnaryPattern(UnaryOperator.AToString, arg);
+	}
+
+	/** Convenience macro for unbranding "it" */
+	public static UnaryPattern unbrandIt() {
+		return new UnaryPattern(UnaryOperator.AUnbrand, CampPattern.IT);
 	}
 
 	/** A macro equivalent to the WW macro in coq, used in rule expansion
