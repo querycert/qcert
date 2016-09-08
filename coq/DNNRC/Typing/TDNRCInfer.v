@@ -169,9 +169,9 @@ Section TDNRCInfer.
                                               let '(τ, τ₁') := τs in
                                               DNRCUnop
                                                 (ta_mk a (Tlocal τ))
-                                                u
+                                                ACount
                                                 (ta_require (Tlocal τ₁') n₁))
-                                           (infer_unop_type_sub u (Coll τ₁))
+                                           (infer_unop_type_sub ACount (Coll τ₁))
                                     | ADistinct =>
                                       olift (fun τs =>
                                               let '(τ, τ₁') := τs in
@@ -179,11 +179,11 @@ Section TDNRCInfer.
                                                        fun τc₁' =>
                                                          DNRCUnop
                                                            (ta_mk a (Tdistr τc))
-                                                           u
+                                                           ADistinct
                                                            (ta_require (Tdistr τc₁') n₁))
                                                     (tuncoll τ)
-                                                    (tuncoll τ₁')) (* XXX Avi: Is the required type also Tdistr (uncoll τ1') ? XXX *)
-                                           (infer_unop_type_sub u (Coll τ₁))
+                                                    (tuncoll τ₁')) (* Note: tuncoll is safe because the inference for ADistinct does a join with (Coll ⊥) ensuring that tuncoll would work *)
+                                           (infer_unop_type_sub ADistinct (Coll τ₁))
                                     | _ => None
                                     end
                                  )
