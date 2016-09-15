@@ -266,23 +266,21 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_oql_to_nraenv : nraenv_driver -> oql_driver.
 
   Inductive driver : Set :=
-  | Dv_rule : driver
-  | Dv_camp : driver
-  | Dv_oql : driver
-  | Dv_nra : driver
-  | Dv_nraenv : driver
-  | Dv_nnrc : driver
-  | Dv_nnrcmr : driver
-  | Dv_cldmr : driver
-  | Dv_dnnrc_dataset : driver
-  | Dv_dnnrc_typed_dataset : driver
-  | Dv_javascript : driver
-  | Dv_java : driver
-  | Dv_spark : driver
-  | Dv_spark2 : driver
-  | Dv_cloudant : driver
-  | Dv_error : driver.
-
+  | Dv_rule : rule_driver -> driver
+  | Dv_camp : camp_driver -> driver
+  | Dv_oql : oql_driver -> driver
+  | Dv_nra : nra_driver -> driver
+  | Dv_nraenv : nraenv_driver -> driver
+  | Dv_nnrc : nnrc_driver -> driver
+  | Dv_nnrcmr : nnrcmr_driver -> driver
+  | Dv_cldmr : cldmr_driver -> driver
+  | Dv_dnnrc_dataset : dnnrc_dataset_driver -> driver
+  | Dv_dnnrc_typed_dataset : dnnrc_typed_dataset_driver -> driver
+  | Dv_javascript : javascript_driver -> driver
+  | Dv_java : java_driver -> driver
+  | Dv_spark : spark_driver -> driver
+  | Dv_spark2 : spark2_driver -> driver
+  | Dv_cloudant : cloudant_driver -> driver.
 
   (* Compilers function *)
 
@@ -487,6 +485,26 @@ Module CompDriver(runtime:CompilerRuntime).
         end
     in
     (Q_oql q) :: queries.
+
+  Definition compile (dv: driver) (q: query) : list query :=
+    match (dv, q) with
+    | (Dv_rule dv, Q_rule q) => compile_rule dv q
+    | (Dv_camp dv, Q_camp q) => compile_camp dv q
+    | (Dv_oql dv, Q_oql q) => compile_oql dv q
+    | (Dv_nra dv, Q_nra q) => compile_nra dv q
+    | (Dv_nraenv dv, Q_nraenv q) => compile_nraenv dv q
+    | (Dv_nnrc dv, Q_nnrc q) => compile_nnrc dv q
+    | (Dv_nnrcmr dv, Q_nnrcmr q) => compile_nnrcmr dv q
+    | (Dv_cldmr dv, Q_cldmr q) => compile_cldmr dv q
+    | (Dv_dnnrc_dataset dv, Q_dnnrc_dataset q) => compile_dnnrc_dataset dv q
+    | (Dv_dnnrc_typed_dataset dv, Q_dnnrc_typed_dataset q) => compile_dnnrc_typed_dataset dv q
+    | (Dv_javascript dv, Q_javascript q) => compile_javascript dv q
+    | (Dv_java dv, Q_java q) => compile_java dv q
+    | (Dv_spark dv, Q_spark q) => compile_spark dv q
+    | (Dv_spark2 dv, Q_spark2 q) => compile_spark2 dv q
+    | (Dv_cloudant dv, Q_cloudant q) => compile_cloudant dv q
+    | (_, _) => (Q_error "incompatible query and driver") :: nil
+    end.
 
   End CompDriverCompile.
 
