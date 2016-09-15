@@ -17,7 +17,6 @@
 (* This is main interface for CALib, the CAMP Compiler library *)
 
 open Util
-open ConfigUtil
 open ParseString
 open CloudantUtil
 open Stats
