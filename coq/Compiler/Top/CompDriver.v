@@ -54,6 +54,8 @@ Module CompDriver(runtime:CompilerRuntime).
   
   Local Open Scope list_scope.
 
+  Definition vdbindings := vdbindings.
+
   (* Languages *)
 
   Definition rule := rule.
@@ -258,7 +260,7 @@ Module CompDriver(runtime:CompilerRuntime).
   with nnrc_driver : Set :=
     | Dv_nnrc_stop : nnrc_driver
     | Dv_nnrc_optim : nnrc_driver -> nnrc_driver
-    | Dv_nnrc_to_nnrcmr : (* inputs_loc *) vdbindings ->nnrcmr_driver -> nnrc_driver
+    | Dv_nnrc_to_nnrcmr : (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc_dataset : dnnrc_dataset_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver

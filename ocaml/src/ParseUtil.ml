@@ -73,7 +73,7 @@ let parse_cldmr_sexp f : CompDriver.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp
  * Languages Parse *
  *******************)
 
-let parse_language l f : (string * CompDriver.query) =
+let parse_query l f : (string * CompDriver.query) =
   match l with
   | CompDriver.L_rule -> parse_rule f
   | CompDriver.L_camp -> ("CAMP", CompDriver.Q_camp (parse_camp f))

@@ -21,47 +21,33 @@ open Compiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
-let language_of_name name =
-  match name with
-  | "Rule" -> CompDriver.L_rule
-  | "CAMP" -> CompDriver.L_camp
-  | "OQL" -> CompDriver.L_oql
-  | "NRAEnv" -> CompDriver.L_nraenv
-  | "NNRC" -> CompDriver.L_nnrc
-  | "NNRCMR" -> CompDriver.L_nnrcmr
-  | "CLDMR" -> CompDriver.L_cldmr
-  | "DNNRC" -> CompDriver.L_dnnrc_dataset
-  | "RHINO" | "JS" -> CompDriver.L_javascript
-  | "Java" -> CompDriver.L_java
-  | "Spark" -> CompDriver.L_spark
-  | "Spark2" -> CompDriver.L_spark2
-  | "Cloudant" -> CompDriver.L_cloudant
-  | _ -> raise (CACo_Error ("Not a valid language: " ^ name))
-(* Not supported:
-   | CompDriver.L_nra
-   | CompDriver.L_dnnrc_typed_dataset
-   | CompDriver.L_error
-*)
-      
+let language_of_name = CompConfig.language_of_name
+
 type lang_config =
     { mutable slang : string;
       mutable tlang : string;
+      mutable path : string list;
       cld_conf : cld_config }
 
 let default_eval_lang_config () =
-  { slang = "Rule";
-    tlang = "Rule";
+  { slang = "rule";
+    tlang = "rule";
+    path = [];
     cld_conf = default_cld_config () }
-      
+
 let default_comp_lang_config () =
-  { slang = "Rule";
-    tlang = "JS";
+  { slang = "rule";
+    tlang = "js";
+    path = [];
     cld_conf = default_cld_config () }
-      
+
 let get_source_lang conf = conf.slang
 let change_source conf s = conf.slang <- s
 let get_target_lang conf = conf.tlang
 let change_target conf s = conf.tlang <- s
+
+let add_path conf s = conf.path <- conf.path @ [s]
+let get_path conf = conf.path
 
 let get_cld_config conf = conf.cld_conf
 
@@ -114,7 +100,7 @@ let suffix_target conf =
   | CompDriver.L_error -> suffix_error ()
 
 (* Evaluator Section *)
-  
+
 type eval_config =
     { debug : bool ref;
       eval_only : bool ref;
@@ -135,9 +121,9 @@ let set_eval_io conf io = conf.eval_io <- Some io
 let set_input conf f = conf.eval_inputs <- f :: conf.eval_inputs
 
 let set_format conf s =
-  match s with
-  | "META" -> conf.format <- META
-  | "ENHANCED" -> conf.format <- ENHANCED
+  match String.lowercase s with
+  | "meta" -> conf.format <- META
+  | "enhanced" -> conf.format <- ENHANCED
   | _ -> ()
 
 let get_format conf = conf.format
@@ -148,7 +134,7 @@ let get_eval_io conf = conf.eval_io
 let get_eval_inputs conf = conf.eval_inputs
 
 (* Data Section *)
-  
+
 type data_config =
     { mutable in_jsons : Data.json list;
       mutable data_format : serialization_format;
@@ -167,9 +153,9 @@ let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
 
 let set_data_format conf s =
-  match s with
-  | "META" -> conf.data_format <- META
-  | "ENHANCED" -> conf.data_format <- ENHANCED
+  match String.lowercase s with
+  | "meta" -> conf.data_format <- META
+  | "enhanced" -> conf.data_format <- ENHANCED
   | _ -> ()
 
 let set_data_dir conf d = conf.data_dir <- Some d
@@ -181,9 +167,9 @@ let get_data_schema conf =
   conf.data_schema
 let get_data_dir conf =
   conf.data_dir
-      
+
 (* Compiler Section *)
-  
+
 type comp_config =
     { mutable comp_io : string option;
       mutable dir : string option;
@@ -236,4 +222,27 @@ let get_pretty_config conf = conf.comp_pretty_config
 let set_java_imports conf imports = conf.java_imports <- imports
 let get_java_imports conf = conf.java_imports
 
+
+(* Driver config *)
+open CompConfig
+
+let driver_conf_of_args args qname =
+  let path =
+    [] (* XXX TODO XXX *)
+  in
+  let brand =
+    [] (* XXX TODO XXX *)
+  in
+  let vdbindings =
+    [] (* XXX TODO XXX *)
+  in
+  let schema =
+    assert false (* XXX TODO XXX *)
+  in
+  { comp_qname = char_list_of_string qname;
+    comp_path = path;
+    comp_brand = brand;
+    comp_schema = schema;
+    comp_vdbindings = vdbindings;
+    comp_java_imports = char_list_of_string args.java_imports; }
 

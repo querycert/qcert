@@ -47,5 +47,5 @@ val parse_cldmr_sexp_from_string : string -> CompDriver.cldmr
  * Languages Parse *
  *******************)
 
-val parse_language_from_string : CompDriver.language -> string -> string * CompDriver.query
+val parse_query_from_string : CompDriver.language -> string -> string * CompDriver.query
 

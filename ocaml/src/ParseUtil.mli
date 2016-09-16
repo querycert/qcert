@@ -48,5 +48,5 @@ val parse_cldmr_sexp : Lexing.lexbuf -> CompDriver.cldmr
  * Languages Parse *
  *******************)
 
-val parse_language : CompDriver.language -> Lexing.lexbuf -> string * CompDriver.query
+val parse_query : CompDriver.language -> Lexing.lexbuf -> string * CompDriver.query
 

@@ -26,9 +26,11 @@ val default_comp_lang_config : unit -> lang_config
 
 val get_source_lang : lang_config -> string
 val get_target_lang : lang_config -> string
+val get_path : lang_config -> string list
 
 val change_source : lang_config -> string -> unit
 val change_target : lang_config -> string -> unit
+val add_path : lang_config -> string -> unit
 
 val get_cld_config : lang_config -> CloudantUtil.cld_config
 
@@ -54,9 +56,9 @@ val suffix_stats : unit -> string
 val suffix_target : lang_config -> string
 
 val suffix_sdata : unit -> string
-    
+
 (* Evaluator Section *)
-  
+
 type eval_config
 
 val default_eval_config : unit -> eval_config
@@ -73,7 +75,7 @@ val get_eval_inputs : eval_config -> string list
 val get_eval_lang_config : eval_config -> lang_config
 
 (* Data Section *)
-  
+
 type data_config
 
 val default_data_config : unit -> data_config
@@ -88,7 +90,7 @@ val get_data_schema : data_config -> Data.json option
 val get_data_dir : data_config -> string option
 
 (* Compiler Section *)
-  
+
 type comp_config
 
 val default_comp_config : unit -> comp_config
@@ -119,3 +121,6 @@ val set_java_imports : comp_config -> string -> unit
 val get_java_imports : comp_config -> string
 
 
+(* Driver config *)
+
+val driver_conf_of_args : comp_config -> string -> CompConfig.driver_config
