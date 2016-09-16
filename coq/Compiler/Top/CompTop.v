@@ -133,10 +133,10 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import TNRAEnvtoNNRC.
   Require Import TOptimEnvFunc.
   
-  Definition toptimizer_typed_opt : optimizer := TOptimEnvFunc.toptim.
+  Definition toptimizer_typed_opt : optimizer := TOptimEnvFunc.toptim_nraenv.
 
   Definition tcompile_rule_to_algenv_topt (r:rule) : algenv :=
-    compile_rule_to_algenv toptim r.
+    compile_rule_to_algenv toptim_nraenv r.
 
   (* Typed compilation from rules to NNRC *)
 
@@ -155,7 +155,7 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import TRewFunc.
   
   Definition tcompile_rule_to_nnrc_topt (r:rule) : nrc :=
-    tcompile_rule_to_nnrc toptim trew r.
+    tcompile_rule_to_nnrc toptim_nraenv trew r.
 
   (* Typed compilation from rules to DNNRC *)
 
@@ -175,7 +175,7 @@ Module CompTop(runtime:CompilerRuntime).
     tcompile_rule_to_dnrc optimizer_no_optim rewriter_no_rew r.
 
   Definition tcompile_rule_to_dnrc_topt (r:rule) : dnrc _ bool algenv :=
-    tcompile_rule_to_dnrc toptim trew r.
+    tcompile_rule_to_dnrc toptim_nraenv trew r.
 
   (* Typed compilation from rules to NNRC + Map Reduce *)
 

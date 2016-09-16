@@ -48,7 +48,7 @@ let eval_nraenv conf h world op : Data.data option =
   | CompDriver.L_oql ->
       raise (OQL_eval "OQL eval not supported once compiled into algebra")
   | CompDriver.L_nraenv ->
-      let op = CompCore.toptimize_algenv_typed_opt op in
+      let op = CompDriver.nraenv_optim op in
       EvalTop.algenv_eval_top h op world
   | CompDriver.L_nnrc ->
       let nrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in

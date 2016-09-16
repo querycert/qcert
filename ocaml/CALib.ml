@@ -111,7 +111,7 @@ let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_data
 
 (* NRAEnv Optimizer *)
 let optimize_nraenv (op:nraenv) =
-  CompCore.toptimize_algenv_typed_opt op
+  CompDriver.nraenv_optim op
 
 (* NNRC Optimizer *)
 let optimize_nnrc (n:nnrc) =
@@ -119,7 +119,7 @@ let optimize_nnrc (n:nnrc) =
 
 (* NNRCMR Optimizer *)
 let optimize_nnrcmr (n:nnrcmr) =
-  CompCore.trew_nnrcmr_typed_opt n
+  CompDriver.nnrcmr_optim n
 
 let optimize_nnrcmr_for_cloudant (n:nnrcmr) =
   CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare n

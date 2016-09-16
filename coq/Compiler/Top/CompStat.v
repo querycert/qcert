@@ -50,7 +50,7 @@ Module CompStat(runtime:CompilerRuntime).
 
   Definition pat_to_nra (p:pat) : alg := alg_of_pat p.
 
-  Definition nraenv_optim (op: algenv) : algenv := CC.toptimize_algenv_typed_opt op.
+  Definition nraenv_optim (op: algenv) : algenv := TOptimEnvFunc.toptim_nraenv op.
 
   Definition nraenv_compiler (op: algenv) : nrc := CC.tcompile_nraenv_to_nnrc_typed_opt op.
 
@@ -61,7 +61,7 @@ Module CompStat(runtime:CompilerRuntime).
   Definition nra_to_nraenv (op: alg) : algenv := algenv_of_alg op.
 
   Definition nra_optim (op: alg) : alg :=
-    let algenv_opt := (CC.toptimize_algenv_typed_opt (algenv_of_alg op)) in
+    let algenv_opt := (TOptimEnvFunc.toptim_nraenv (algenv_of_alg op)) in
     if is_nra_fun algenv_opt then
       deenv_alg algenv_opt
     else

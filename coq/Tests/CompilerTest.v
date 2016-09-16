@@ -145,15 +145,13 @@ Section CompilerUntypedTest.
 
   End CompilerBrandModelTest.
 
-  Require Import CompilerModel CompCorrect.
+  Require Import CompilerModel.
   
   Module MyBrandModel <: CompilerBrandModel(TrivialForeignType).
     Definition compiler_brand_model := CPModel.
   End MyBrandModel.
   Module TM := TrivialModel(MyBrandModel).
   
-  Module CC := CompCorrect.CompCorrect(TM).
-
   Section CompilerTypedTest.
     Existing Instance CPModel.
   

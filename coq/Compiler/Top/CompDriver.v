@@ -124,8 +124,9 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
 
-  Definition nraenv_optim (q: nraenv) : nraenv := CC.toptimize_algenv_typed_opt q.
+  Definition nraenv_optim (q: nraenv) : nraenv := TOptimEnvFunc.toptim_nraenv q.
 
+  (* XXX doesn't look like a single-edge ; should be removed? XXX *)
   Definition nraenv_compiler (q: nraenv) : nnrc := CC.tcompile_nraenv_to_nnrc_typed_opt q.
 
   Definition nraenv_to_nnrc (q: nraenv) : nnrc := algenv_to_nnrc q init_vid init_venv.
@@ -135,7 +136,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nra_to_nraenv (q: nra) : nraenv := algenv_of_alg q.
 
   Definition nra_optim (q: nra) : nra :=
-    let nraenv_opt := (CC.toptimize_algenv_typed_opt (algenv_of_alg q)) in
+    let nraenv_opt := (nraenv_optim (algenv_of_alg q)) in
     if is_nra_fun nraenv_opt then
       deenv_alg nraenv_opt
     else

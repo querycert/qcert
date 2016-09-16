@@ -22,7 +22,7 @@ open PrettyIL
 (* Display ILs *)
 
 let display_to_string conf modelandtype op =
-  let opt_nraenv = CompCore.toptimize_algenv_typed_opt op in
+  let opt_nraenv = CompDriver.nraenv_optim op in
   let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
   let opt_nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   let nnrcmr_spark = CompDriver.nnrcmr_to_nnrcmr_spark_prepare opt_nnrcmr in
