@@ -96,30 +96,30 @@ let rec print_string_list = function
 
 let cloudant_compile_from_nra harness nrule op h =
   let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = CompDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (CompDriver.nnrcmr_to_cldmr [] mr) in
   let harnessed_design_docs = List.map (add_harness harness h) design_docs in
   fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_compile_from_nnrcmr harness nrule nnrcmr h =
   let mr = nnrcmr in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = CompDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (CompDriver.nnrcmr_to_cldmr [] mr) in
   let harnessed_design_docs = List.map (add_harness harness h) design_docs in
   fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_compile_no_harness_from_nra nrule op =
   let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] mr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = CompDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (CompDriver.nnrcmr_to_cldmr [] mr) in
   fold_design (List.map dont_add_harness design_docs) (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_compile_no_harness_from_nnrcmr nrule nnrcmr =
-  let (design_docs, (last_expr, last_inputs)) = (CompBack.nrcmr_to_cloudant_code_gen_with_prepare [] nnrcmr (char_list_of_string nrule)) in
+  let (design_docs, (last_expr, last_inputs)) = CompDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (CompDriver.nnrcmr_to_cldmr [] nnrcmr) in
   fold_design (List.map dont_add_harness design_docs) (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_translate_no_harness nnrcmr =
-  CompBack.nrcmr_to_cldmr_chain_translate [] nnrcmr
+  CompDriver.nnrcmr_prepared_to_cldmr [] nnrcmr
 
 (* Java equivalent: CloudantBackend.generateCloudantDesign *)
 let cloudant_code_gen_no_harness nrule cldmr =
-  let (design_docs, (last_expr, last_inputs)) = CompBack.cldmr_code_gen [] cldmr (char_list_of_string nrule) in
+  let (design_docs, (last_expr, last_inputs)) = CompDriver.cldmr_to_cloudant (char_list_of_string nrule) [] cldmr in
   fold_design (List.map dont_add_harness design_docs) (Util.string_of_char_list last_expr) last_inputs
   

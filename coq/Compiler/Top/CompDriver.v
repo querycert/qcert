@@ -160,19 +160,29 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nrcmr tt q.
 
-  Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
+  Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
     let q := foreign_to_cloudant_prepare_nrcmr q in
     let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_cloudant_prepare_nrcmr q in
-    let q := nrcmr_rename_for_cloudant q in
-    NNRCMRtoNNRCMRCloudantTop h q.
+    nrcmr_rename_for_cloudant q.
 
-  Definition nnrcmr_to_spark (rulename: string) (q: nrcmr) : spark :=
+  Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
+    NNRCMRtoNNRCMRCloudantTop h q.
+  
+  Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
+    nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
+
+  Definition nnrcmr_to_nnrcmr_spark_prepare (q: nnrcmr) : nnrcmr :=
     let q := foreign_to_spark_prepare_nrcmr q in
     let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_spark_prepare_nrcmr q in
-    let q := nrcmr_rename_for_spark q in
+    nrcmr_rename_for_spark q.
+
+  Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
+    
+  Definition nnrcmr_to_spark (rulename: string) (q: nnrcmr) : spark :=
+    nnrcmr_prepared_to_spark rulename (nnrcmr_to_nnrcmr_spark_prepare q).
 
   Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
     mapReducePairstoCloudant h q rulename.

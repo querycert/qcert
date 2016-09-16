@@ -122,10 +122,10 @@ let optimize_nnrcmr (n:nnrcmr) =
   CompCore.trew_nnrcmr_typed_opt n
 
 let optimize_nnrcmr_for_cloudant (n:nnrcmr) =
-  CompBack.nrcmr_to_nrcmr_prepared_for_cldmr n
+  CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare n
 
 let optimize_nnrcmr_for_spark (n:nnrcmr) =
-  CompBack.nrcmr_to_nrcmr_prepared_for_spark n
+  CompDriver.nnrcmr_to_nnrcmr_spark_prepare n
 
 (* For convenience *)
 (* Note: This includes optimization phases *)
@@ -141,11 +141,11 @@ let compile_nraenv_to_nnrcmr (op:nraenv) =
  *)
 
 let nnrc_to_js (n:nnrc) =
-  string_of_char_list (CompBack.nrc_to_js_code_gen n)
+  string_of_char_list (CompDriver.nnrc_to_javascript n)
 let nnrc_to_java (basename:string) (imports:string) (n:nnrc) =
-  string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string imports) n)
+  string_of_char_list (CompDriver.nnrc_to_java (Util.char_list_of_string basename) (Util.char_list_of_string imports) n)
 let nnrcmr_to_spark (nrule:string) (n:nnrcmr) =
-  string_of_char_list (CompBack.mrchain_to_spark_code_gen (Util.char_list_of_string nrule) n)
+  string_of_char_list (CompDriver.nnrcmr_prepared_to_spark (Util.char_list_of_string nrule) n)
 
 let translate_nnrcmr_to_cldmr (n:nnrcmr) : cldmr =
   CloudantUtil.cloudant_translate_no_harness n
@@ -156,14 +156,14 @@ let cldmr_to_cloudant (prefix:string) (nrule:string) (cl:cldmr) : string =
 (* For convenience *)
       
 let compile_nraenv_to_js (op:nraenv) : string =
-  string_of_char_list (CompBack.nrc_to_js_code_gen (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+  string_of_char_list (CompDriver.nnrc_to_javascript (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
 
 let compile_nraenv_to_java (basename:string) (imports:string) (op:nraenv) : string =
-  string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+  string_of_char_list (CompDriver.nnrc_to_java (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
 
 let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
   let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) mr)
+  string_of_char_list (CompDriver.nnrcmr_to_spark (Util.char_list_of_string nrule) mr)
 
 let compile_nraenv_to_cloudant (prefix:string) (nrule:string) (op:nraenv) : string =
   cloudant_compile_no_harness_from_nra (idioticize prefix nrule) op
@@ -207,11 +207,9 @@ let import_cldmr (ns:string) = DisplayUtil.sexp_string_to_cldmr ns
 let pretty_nraenv (greek:bool) (margin:int) (op:nraenv) = PrettyIL.pretty_nraenv greek margin op
 let pretty_nnrc (greek:bool) (margin:int) (n:nnrc) = PrettyIL.pretty_nnrc greek margin n
 let pretty_nnrcmr_for_spark (greek:bool) (margin:int) (nmr:nnrcmr) =
-  let opt_nnrcmr = nmr in
-  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_spark opt_nnrcmr)
+  PrettyIL.pretty_nnrcmr greek margin (CompDriver.nnrcmr_to_nnrcmr_spark_prepare nmr)
 let pretty_nnrcmr_for_cloudant (greek:bool) (margin:int) (nmr:nnrcmr) =
-  let opt_nnrcmr = nmr in
-  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_cldmr opt_nnrcmr)
+  PrettyIL.pretty_nnrcmr greek margin (CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare nmr)
 
 (* Options *)
 

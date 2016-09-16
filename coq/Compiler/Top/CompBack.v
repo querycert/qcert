@@ -23,20 +23,9 @@ Module CompBack(runtime:CompilerRuntime).
 
   Require Import CompUtil.
 
-  (* Compilation from NNRC to Javascript *)
-
-  Require Import NNRC.
-  Require Import NNRCtoJava ForeignToJava .
-  Require Import NNRCtoJavascript ForeignToJavascript.
-
-  Definition nrc_to_java_code_gen (class_name:string) (imports:string) (e:nrc) : string :=
-    nrcToJavaTop class_name imports e.
-
-  Definition nrc_to_js_code_gen (e:nrc) : string :=
-    nrcToJSTop e.
-
   (* Compilation from DNNRC to Scala *)
 
+  Require Import NNRC.
   Require Import DNNRC.
   Require Import DNNRCtoScala SparkIR.
   Require Import TypingRuntime.
@@ -47,59 +36,6 @@ Module CompBack(runtime:CompilerRuntime).
              {ftyping: foreign_typing}
              (inputType:rtype) (name:string) (e:dnrc (type_annotation unit) dataset) : string :=
     @dnrcToSpark2Top _ _ bm _ unit inputType name e.
-
-  (* Compilation from NNRCMR to CloudantMR *)
-
-  Definition localization := DData.dlocalization.
-
-  Require Import NNRCMR CloudantMR NNRCMRtoCloudant CloudantMRtoJavascript ForeignToCloudant.
-  Require Import NRewMR.
-
-  (* Java equivalent: MROptimizer.optimize *)
-  Definition nrcmr_to_nrcmr_prepared_for_cldmr (e_mr:nrcmr) : nrcmr :=
-    let e_mr := foreign_to_cloudant_prepare_nrcmr e_mr in
-    let e_mr := mr_optimize e_mr in
-    (* Maybe add call to nnrc_to_nnrcmr_no_chain in case e_mr is more than one Map/Reduce *)
-    let e_mr := foreign_to_cloudant_prepare_nrcmr e_mr in
-    let e_mr := nrcmr_rename_for_cloudant e_mr in
-    e_mr.
-
-  Definition nrcmr_to_cldmr_chain_translate (h:list (string*string)) (e_mr:nrcmr) : cld_mrl :=
-    NNRCMRtoNNRCMRCloudantTop h e_mr.
-
-  Definition nrcmr_to_cldmr_chain_with_prepare (h:list (string*string)) (e_mr:nrcmr) : cld_mrl :=
-    let e_mr := nrcmr_to_nrcmr_prepared_for_cldmr e_mr in
-    let cld_mr := NNRCMRtoNNRCMRCloudantTop h e_mr in
-    cld_mr.
-
-  (* To Cloudant *)
-
-  Definition nrcmr_to_cloudant_code_gen_with_prepare
-             (h:list (string*string)) (e_mr:nrcmr) (rulename:string) : (list (string*string) * (string * list string)) :=
-    let mrl := nrcmr_to_cldmr_chain_with_prepare h e_mr in
-    mapReducePairstoCloudant h mrl rulename.
-
-  Definition cldmr_code_gen (h:list (string*string)) (mrl:cld_mrl) (rulename:string) :=
-    mapReducePairstoCloudant h mrl rulename.
-
-  (* To Spark *)
-
-  Require Import NNRCMRtoSpark ForeignToSpark.
-
-  Definition nrcmr_to_nrcmr_prepared_for_spark (e_mr:nrcmr) : nrcmr :=
-    let e_mr := foreign_to_spark_prepare_nrcmr e_mr in
-    let e_mr := mr_optimize e_mr in
-    let e_mr := foreign_to_spark_prepare_nrcmr e_mr in
-    let e_mr := nrcmr_rename_for_spark e_mr in
-    e_mr.
-
-  Definition mrchain_to_spark_code_gen_with_prepare rulename (e_mr:nrcmr) :=
-    let e_mr := nrcmr_to_nrcmr_prepared_for_spark e_mr in
-    let spark_mr := nrcmrToSparkTopDataFromFileTop rulename init_vinit e_mr in
-    spark_mr.
-
-  Definition mrchain_to_spark_code_gen rulename (e_mr:nrcmr) :=
-    nrcmrToSparkTopDataFromFileTop rulename init_vinit e_mr.
 
 End CompBack.
 

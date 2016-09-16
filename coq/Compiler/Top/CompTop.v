@@ -15,6 +15,7 @@
  *)
 
 Require Import CompilerRuntime.
+  
 Module CompTop(runtime:CompilerRuntime).
 
   Require Import String List String EquivDec.
@@ -24,8 +25,11 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import Pattern Rule.
 
   Require Import CompUtil CompBack.
+  Require Import CompDriver.
   Module CB := CompBack runtime.
-  
+
+  Module CD := CompDriver runtime.
+
   (***************
    * NRA Section *
    ***************)
@@ -48,7 +52,7 @@ Module CompTop(runtime:CompilerRuntime).
   Require PatterntoNRAEnv.
   Definition compile_pat_to_algenv (optim:optimizer) (p:pat) : algenv :=
     (* Produces the initial plan *)
-    let op_init := PatterntoNRAEnv.translate_pat_to_algenv p in
+    let op_init := CD.camp_to_nraenv p in
     (* Optimization pass over the initial plan *)
     let op_optim := optim op_init
     in op_optim.
@@ -61,7 +65,7 @@ Module CompTop(runtime:CompilerRuntime).
   Require RuletoNRAEnv.
   Definition compile_rule_to_algenv (optim:optimizer) (r:rule) : algenv :=
     (* Produces the initial plan *)
-    let op_init := RuletoNRAEnv.translate_rule_to_algenv r in
+    let op_init := CD.rule_to_nraenv r in
     (* Optimization pass over the initial plan *)
     let op_optim := optim op_init
     in op_optim.
@@ -210,7 +214,7 @@ Module CompTop(runtime:CompilerRuntime).
 
   Definition tcompile_rule_to_cldmr_chain (h:list (string*string)) (r:rule) : cld_mrl :=
     let '(env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain r in
-    CB.nrcmr_to_cldmr_chain_with_prepare h e_mr.
+    CD.nnrcmr_to_cldmr h e_mr.
 
   (* Typed compilation from rules to Javascript *)
 
@@ -230,9 +234,8 @@ Module CompTop(runtime:CompilerRuntime).
 
   (* Hard-coding the WORLD variable for now. Generalizing will require
      more work on the Spark code-generation side. *)
-  
   Definition mrchain_to_spark_data_from_file_caco rulename mrchain :=
-    CB.mrchain_to_spark_code_gen_with_prepare rulename mrchain.
+    CD.nnrcmr_to_spark rulename mrchain.
 
 End CompTop.
 

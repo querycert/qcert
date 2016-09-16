@@ -61,7 +61,7 @@ let eval_nraenv conf h world op : Data.data option =
       EvalTop.nrcmr_chain_eval_top h mrchain world
   | CompDriver.L_cldmr ->
       let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-      let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h mrchain in
+      let mrchain = CompDriver.nnrcmr_to_cldmr [] mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->
       Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang conf);
