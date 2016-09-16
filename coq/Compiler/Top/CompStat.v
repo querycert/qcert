@@ -30,24 +30,23 @@ Module CompStat(runtime:CompilerRuntime).
   Require Import CompCore.
   Require Import TRewFunc.
   Require Import CompUtil.
-  Require Import CompFront.
   Require Import NNRCtoJavascript.
-
-  Module CF := CompFront runtime.
 
   Module CC := CompCore runtime.
 
+  Require Import PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
+ 
   Local Open Scope string_scope.
 
   (* Compilation functions *)
 
-  Definition oql_to_nraenv (oql:oql_expr) : algenv := CF.translate_oql_to_algenv oql.
+  Definition oql_to_nraenv (oql:oql_expr) : algenv := OQLtoNRAEnv.translate_oql_to_algenv oql.
 
-  Definition rule_to_nraenv (r:rule) : algenv := CF.translate_rule_to_algenv r.
+  Definition rule_to_nraenv (r:rule) : algenv := RuletoNRAEnv.translate_rule_to_algenv r.
 
   Definition rule_to_nra (r:rule) : alg := alg_of_rule r.
 
-  Definition pat_to_nraenv (p:pat) : algenv := CF.translate_pat_to_algenv p.
+  Definition pat_to_nraenv (p:pat) : algenv := PatterntoNRAEnv.translate_pat_to_algenv p.
 
   Definition pat_to_nra (p:pat) : alg := alg_of_pat p.
 

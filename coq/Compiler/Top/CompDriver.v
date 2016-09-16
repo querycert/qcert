@@ -28,11 +28,10 @@ Require Import ODMGRuntime.
 Require Import CompilerRuntime.
 Module CompDriver(runtime:CompilerRuntime).
 
-  Require Import RuletoNRA PatterntoNRA PatterntoNRAEnv NRAtoNNRC NRAEnvtoNNRC.
+  Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
   Require Import CompCore.
   Require Import TRewFunc.
   Require Import CompUtil.
-  Require Import CompFront.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
@@ -45,9 +44,11 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import NNRCtoDNNRC.
   Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
 
-  Module CF := CompFront runtime.
   Module CC := CompCore runtime.
 
+  Require Rule.
+  Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
+  
   Local Open Scope list_scope.
 
 
@@ -107,15 +108,15 @@ Module CompDriver(runtime:CompilerRuntime).
 
   (* Translation functions *)
 
-  Definition oql_to_nraenv (q:oql) : nraenv := CF.translate_oql_to_algenv q.
+  Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_algenv q.
 
-  Definition rule_to_nraenv (q:rule) : nraenv := CF.translate_rule_to_algenv q.
+  Definition rule_to_nraenv (q:rule) : nraenv := RuletoNRAEnv.translate_rule_to_algenv q.
 
-  Definition rule_to_camp (q:rule) : camp := rule_to_pattern q.
+  Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
 
   Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
 
-  Definition camp_to_nraenv (q:camp) : nraenv := CF.translate_pat_to_algenv q.
+  Definition camp_to_nraenv (q:camp) : nraenv := PatterntoNRAEnv.translate_pat_to_algenv q.
 
   Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
 

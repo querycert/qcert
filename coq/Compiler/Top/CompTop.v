@@ -23,8 +23,7 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import ForeignToJavascript.
   Require Import Pattern Rule.
 
-  Require Import CompUtil CompFront CompBack.
-  Module CF := CompFront runtime.
+  Require Import CompUtil CompBack.
   Module CB := CompBack runtime.
   
   (***************
@@ -46,9 +45,10 @@ Module CompTop(runtime:CompilerRuntime).
 
   (* Compiler from CAMP to NRA+Env *)
   
+  Require PatterntoNRAEnv.
   Definition compile_pat_to_algenv (optim:optimizer) (p:pat) : algenv :=
     (* Produces the initial plan *)
-    let op_init := CF.translate_pat_to_algenv p in
+    let op_init := PatterntoNRAEnv.translate_pat_to_algenv p in
     (* Optimization pass over the initial plan *)
     let op_optim := optim op_init
     in op_optim.
@@ -57,10 +57,11 @@ Module CompTop(runtime:CompilerRuntime).
   Definition compile_pat_to_algenv_untyped_opt := compile_pat_to_algenv optimizer_untyped_opt.
   
   (* Compiler from Rules to NRA+Env *)
-  
+
+  Require RuletoNRAEnv.
   Definition compile_rule_to_algenv (optim:optimizer) (r:rule) : algenv :=
     (* Produces the initial plan *)
-    let op_init := CF.translate_rule_to_algenv r in
+    let op_init := RuletoNRAEnv.translate_rule_to_algenv r in
     (* Optimization pass over the initial plan *)
     let op_optim := optim op_init
     in op_optim.

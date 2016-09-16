@@ -200,19 +200,25 @@ Section PatterntoNRAEnv.
     rewrite pat_trans_top_pat_context; trivial; reflexivity.
   Qed.
 
-Section size.
-  Require Import PatternSize.
-  Require Import RAlgEnvSize.
-  Require Import Omega.
+  (* Java equivalent: CampToNra.convert *)
+  (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
+  Definition translate_pat_to_algenv (p:pat) : algenv :=
+    (* Produces the initial plan *)
+    ANAppEnv (algenv_of_pat p) (ANConst (drec nil)).
 
-  (** Proof showing linear size translation *)
-  Lemma pat_trans_size p :
-    algenv_size (algenv_of_pat p) <= 13 * pat_size p.
-  Proof.
-    induction p; simpl; omega.
-  Qed.
+  Section size.
+    Require Import PatternSize.
+    Require Import RAlgEnvSize.
+    Require Import Omega.
+    
+    (** Proof showing linear size translation *)
+    Lemma pat_trans_size p :
+      algenv_size (algenv_of_pat p) <= 13 * pat_size p.
+    Proof.
+      induction p; simpl; omega.
+    Qed.
 
-End size.
+  End size.
 
 End PatterntoNRAEnv.
 

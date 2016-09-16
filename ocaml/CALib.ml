@@ -61,7 +61,7 @@ let rule_to_camp (s:string) : camp =
 (* From camp to NRAEnv *)
 
 let camp_to_nraenv (c:camp) =
-  nraenv_of_camp c
+  CompDriver.camp_to_nraenv c
 
 (* From source to NRAEnv *)
 

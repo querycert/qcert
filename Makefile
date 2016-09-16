@@ -223,13 +223,11 @@ MODULES = \
 	Compiler/Top/CompRule \
 	Compiler/Top/CompOQL \
 	Compiler/Top/CompUtil \
-	Compiler/Top/CompFront \
 	Compiler/Top/CompCore \
 	Compiler/Top/CompBack \
 	Compiler/Top/CompTop \
 	Compiler/Top/CompDriver \
 	Compiler/Top/EvalTop \
-	Compiler/Top/OQLTop \
 	Compiler/Top/CompCorrect \
 	Compiler/Top/CompStat \
 	Compiler/Top/CompType \

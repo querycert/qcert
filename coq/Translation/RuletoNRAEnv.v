@@ -91,6 +91,12 @@ Section RuletoNRAEnv.
     destruct (interp h c p bind d); simpl; eauto.
   Qed.
 
+  (* Top-level translation call *)
+
+  Definition translate_rule_to_algenv (r:rule) : algenv :=
+    (* Produces the initial plan *)
+    ANAppEnv (algenv_of_rule r) (ANConst (drec nil)).
+
 End RuletoNRAEnv.
 
 (* 
