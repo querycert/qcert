@@ -28,6 +28,9 @@ Require Import ODMGRuntime.
 Require Import CompilerRuntime.
 Module CompDriver(runtime:CompilerRuntime).
 
+  Require Import BasicSystem.
+  Require Import TypingRuntime.
+
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
   Require Import CompCore.
   Require Import TRewFunc.
@@ -42,7 +45,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import NNRCMRtoDNNRC.
   Require Import CloudantMRtoJavascript.
   Require Import NNRCtoDNNRC.
-  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
+  Require Import TDNRCInfer DNNRCtoScala SparkIR DNNRCSparkIRRewrites.
 
   Module CC := CompCore runtime.
 
@@ -50,7 +53,6 @@ Module CompDriver(runtime:CompilerRuntime).
   Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
   
   Local Open Scope list_scope.
-
 
   (* Languages *)
 
@@ -63,7 +65,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrcmr := nrcmr.
   Definition cldmr := cld_mrl.
   Definition dnnrc_dataset := dnrc _ unit dataset.
-  Definition dnnrc_typed_dataset {br:brand_relation} := dnrc _ (type_annotation unit) dataset.
+  Definition dnnrc_typed_dataset {bm:brand_model} := dnrc _ (type_annotation unit) dataset.
   Definition javascript := string.
   Definition java := string.
   Definition spark := string.
@@ -88,7 +90,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | L_cloudant : language
     | L_error : language.
 
-  Inductive query {br:brand_relation} : Set :=
+  Inductive query {bm:brand_model} : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query
     | Q_oql : oql -> query
@@ -196,7 +198,11 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
     nrcToJavaTop class_name imports q.
 
-
+  Definition dnnrc_to_dnnrc_typed_dataset
+             {bm:brand_model}
+             {ftyping: foreign_typing}
+             (inputType:rtype) (name:string) (e:@dnnrc_typed_dataset _) : string :=
+    @dnrcToSpark2Top _ _ bm _ unit inputType name e.
 
   (* Drivers *)
 
@@ -219,11 +225,11 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_cldmr_stop : cldmr_driver
     | Dv_cldmr_to_cloudant : (* rulename *) string -> (* h *) list (string*string) -> cloudant_driver -> cldmr_driver.
 
-  Inductive dnnrc_typed_dataset_driver : Set :=
+  Inductive dnnrc_typed_dataset_driver {bm:brand_model} : Set :=
     | Dv_dnnrc_typed_dataset_stop : dnnrc_typed_dataset_driver
     (* XXX TODO XXX *)
     (* | Dv_dnnrc_typed_dataset_optim : dnnrc_typed_dataset_driver -> dnnrc_typed_dataset_driver *)
-    (* | Dv_dnnrc_typed_dataset_to_spark2 : spark2_driver -> dnnrc_typed_dataset_driver *)
+    | Dv_dnnrc_typed_dataset_to_spark2 : rtype -> string -> spark2_driver -> dnnrc_typed_dataset_driver
   .
 
   Inductive dnnrc_dataset_driver : Set :=
@@ -276,7 +282,10 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_oql_stop : oql_driver
     | Dv_oql_to_nraenv : nraenv_driver -> oql_driver.
 
-  Inductive driver : Set :=
+  Inductive driver
+            {bm:brand_model}
+            {ftyping: foreign_typing}
+    : Set :=
   | Dv_rule : rule_driver -> driver
   | Dv_camp : camp_driver -> driver
   | Dv_oql : oql_driver -> driver
@@ -296,8 +305,8 @@ Module CompDriver(runtime:CompilerRuntime).
   (* Compilers function *)
 
   Section CompDriverCompile.
-  Context {br:brand_relation}.
-
+    Context {bm:brand_model}.
+    Context {ftyping: foreign_typing}.
 
   Definition compile_javascript (dv: javascript_driver) (q: javascript) : list query :=
     let queries :=
@@ -350,10 +359,13 @@ Module CompDriver(runtime:CompilerRuntime).
     in
     (Q_cldmr q) :: queries.
 
-  Definition compile_dnnrc_typed_dataset (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
+  Definition compile_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
     let queries :=
         match dv with
         | Dv_dnnrc_typed_dataset_stop => nil
+        | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv =>
+          let q := dnnrc_to_dnnrc_typed_dataset rt rulename q in
+          compile_spark2 dv q
         end
     in
     (Q_dnnrc_typed_dataset q) :: queries.

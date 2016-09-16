@@ -224,7 +224,6 @@ MODULES = \
 	Compiler/Top/CompOQL \
 	Compiler/Top/CompUtil \
 	Compiler/Top/CompCore \
-	Compiler/Top/CompBack \
 	Compiler/Top/CompDriver \
 	Compiler/Top/CompTop \
 	Compiler/Top/EvalTop \

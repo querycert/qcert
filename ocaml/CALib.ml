@@ -104,7 +104,7 @@ let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_type
 let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_dataset) : string =
   let (brand_model,wmRType) = sc in
   string_of_char_list
-    (CompBack.dnrc_to_scala_code_gen
+    (CompDriver.dnnrc_to_dnnrc_typed_dataset
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
        wmRType (Util.char_list_of_string nrule) e)

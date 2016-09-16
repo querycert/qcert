@@ -24,9 +24,8 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import ForeignToJavascript.
   Require Import Pattern Rule.
 
-  Require Import CompUtil CompBack.
+  Require Import CompUtil.
   Require Import CompDriver.
-  Module CB := CompBack runtime.
 
   Module CD := CompDriver runtime.
 
