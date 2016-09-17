@@ -21,7 +21,11 @@ open Compiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
-let language_of_name = CompConfig.language_of_name
+let language_of_name name =
+  let name =
+    char_list_of_string (String.lowercase name)
+  in
+  CompDriver.language_of_name name
 
 type lang_config =
     { mutable slang : string;
@@ -227,9 +231,8 @@ let get_java_imports conf = conf.java_imports
 
 
 (* Driver config *)
-open CompConfig
 
-let driver_conf_of_args args schema qname =
+let driver_conf_of_args args (* schema *) qname =
   let path =
     List.map language_of_name (get_comp_lang_config args).path
   in
@@ -239,19 +242,19 @@ let driver_conf_of_args args schema qname =
   let vdbindings =
     [] (* XXX TODO XXX *)
   in
-  let schema =
-    begin match schema with
-    | Some schema -> schema
-    | None ->
-        (* XXX TODO XXX *)
-        (* (RType.make_brand_model brand_rel [], []) *)
-        assert false
-    end
-  in
-  { comp_qname = char_list_of_string qname;
+  (* let schema = *)
+  (*   begin match schema with *)
+  (*   | Some schema -> schema *)
+  (*   | None -> *)
+  (*       (\* XXX TODO XXX *\) *)
+  (*       (\* (RType.make_brand_model brand_rel [], []) *\) *)
+  (*       assert false *)
+  (*   end *)
+  (* in *)
+  { CompDriver.comp_qname = char_list_of_string qname;
     comp_path = path;
     comp_brand_rel = brand_rel;
-    comp_schema = schema;
+    (* comp_schema = schema; *)
     comp_vdbindings = vdbindings;
     comp_java_imports = char_list_of_string args.java_imports; }
 

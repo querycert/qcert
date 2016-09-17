@@ -125,4 +125,4 @@ val get_java_imports : comp_config -> string
 
 (* Driver config *)
 
-val driver_conf_of_args : comp_config -> (RType.brand_model * RType.camp_type) option -> string -> CompConfig.driver_config
+val driver_conf_of_args : comp_config -> (* (RType.brand_model * RType.camp_type) option -> *) string -> CompDriver.driver_config

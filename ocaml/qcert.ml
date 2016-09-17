@@ -16,7 +16,6 @@
 
 open Util
 open Compiler.EnhancedCompiler
-open CompConfig
 open ConfigUtil
 open CloudantUtil
 
@@ -72,18 +71,19 @@ let parse_file (qconf: comp_config) (file_name: string) =
 
 (* Compilation *)
 
-let compile_file (dv_conf: driver_config) (q: CompDriver.query) : CompDriver.query list =
-  let dv = driver_of_conf dv_conf in
-  let dv = fix_driver dv q in
-  let brand_model, camp_type = get_schema dv_conf in
-  CompDriver.compile brand_model (Enhanced.Model.foreign_typing brand_model) dv q
+let compile_file (dv_conf: CompDriver.driver_config) schema (q: CompDriver.query) : CompDriver.query list =
+  let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
+  let dv = CompDriver.driver_of_conf brand_model foreign_typing dv_conf in
+  let dv = CompDriver.fix_driver brand_model foreign_typing dv q in
+  CompDriver.compile brand_model foreign_typing dv q
 
 (* Emit *)
 
-let emit_file conf file_name q =
+let emit_file conf schema file_name q =
+  let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
   let s = PrettyIL.pretty_query !charsetbool !margin q in
   let fpref = Filename.chop_extension file_name in
-  let ext = suffix_of_language (language_of_query q) in
+  let ext = suffix_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f (get_dir conf) fpref) ext in
   make_file fout s
 
@@ -91,9 +91,10 @@ let emit_file conf file_name q =
 (* Main *)
 
 let main_one_file qconf schema file_name =
+  let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
   let (qname, q_source) = parse_file qconf file_name in
-  let dv_conf = driver_conf_of_args qconf schema qname in
-  let queries = compile_file dv_conf q_source in
+  let dv_conf = driver_conf_of_args qconf (* schema *) qname in
+  let queries = compile_file dv_conf schema q_source in
   let q_target =
     begin match List.rev queries with
     | q :: _ -> q
@@ -105,12 +106,14 @@ let main_one_file qconf schema file_name =
       let _ =
         List.fold_left
           (fun fname q ->
-            emit_file qconf fname q;
-            let suff = suffix_of_language (language_of_query q) in
+            emit_file qconf schema fname q;
+            let suff =
+              suffix_of_language (CompDriver.language_of_query brand_model q)
+            in
             (Filename.chop_extension fname)^suff)
           file_name queries
       in ()
-  | false -> emit_file qconf file_name q_target
+  | false -> emit_file qconf schema file_name q_target
   end
 
 let () =
@@ -121,8 +124,14 @@ let () =
         let (schema_content, camp_type) =
           TypeUtil.extract_schema (ParseString.parse_io_from_string io)
         in
-        Some (TypeUtil.process_schema schema_content camp_type)
-    | None -> None
+        let brand_model, camp_type =
+          TypeUtil.process_schema schema_content camp_type
+        in
+        (brand_model, camp_type, Enhanced.Model.foreign_typing brand_model)
+    | None ->
+        (* XXX TODO XXX *)
+        (* (RType.make_brand_model brand_rel [], []) *)
+        assert false
     end
   in
   List.iter
