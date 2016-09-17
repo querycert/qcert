@@ -74,7 +74,7 @@ let parse_cldmr_sexp f : CompDriver.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp
  *******************)
 
 let parse_query l f : (string * CompDriver.query) =
-  match l with
+  begin match l with
   | CompDriver.L_rule -> parse_rule f
   | CompDriver.L_camp -> ("CAMP", CompDriver.Q_camp (parse_camp f))
   | CompDriver.L_oql -> ("OQL", CompDriver.Q_oql (parse_oql f))
@@ -91,4 +91,4 @@ let parse_query l f : (string * CompDriver.query) =
   | CompDriver.L_spark2 -> raise (CACo_Error "No parser for Spark 2.0 available")
   | CompDriver.L_cloudant -> raise (CACo_Error "No parser for Cloudant available")
   | CompDriver.L_error -> raise (CACo_Error "No parser for Error language available")
-
+  end

@@ -53,6 +53,8 @@ val suffix_nnrcmr_spark2 : unit -> string
 val suffix_nnrcmr_cldmr : unit -> string
 val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
+
+val suffix_of_language : CompDriver.language -> string
 val suffix_target : lang_config -> string
 
 val suffix_sdata : unit -> string
@@ -123,4 +125,4 @@ val get_java_imports : comp_config -> string
 
 (* Driver config *)
 
-val driver_conf_of_args : comp_config -> string -> CompConfig.driver_config
+val driver_conf_of_args : comp_config -> (RType.brand_model * RType.camp_type) option -> string -> CompConfig.driver_config

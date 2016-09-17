@@ -1036,14 +1036,14 @@ let pretty_plug_dataset greek ff a =
 
 let pretty_query greek margin q =
   begin match q with
-  | Q_rule q -> "(* There is no rule pretty printer for the moment. *)"  (* XXX TODO XXX *)
-  | Q_camp q -> "(* There is no camp pretty printer for the moment. *)"  (* XXX TODO XXX *)
-  | Q_oql q -> "(* There is no oql pretty printer for the moment. *)"  (* XXX TODO XXX *)
+  | Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Q_nra q -> pretty_nra greek margin q
   | Q_nraenv q -> pretty_nraenv greek margin q
   | Q_nnrc q -> pretty_nnrc greek margin q
   | Q_nnrcmr q -> pretty_nnrcmr greek margin q
-  | Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)"  (* XXX TODO XXX *)
+  | Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Q_dnnrc_dataset q ->
       let ann = pretty_annotate_ignore in
       let plug = pretty_plug_dataset greek in

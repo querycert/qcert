@@ -53,7 +53,7 @@ let get_cld_config conf = conf.cld_conf
 
 (* Target language *)
 let suffix_rule () = "_rule.camp"
-let suffix_camp () = ".camp"
+let suffix_camp () = "_camp.camp"
 let suffix_oql () = "_oql.txt"
 let suffix_nra () = "_nra.txt"
 let suffix_nraenv () = "_nraenv.txt"
@@ -80,8 +80,8 @@ let suffix_error () = ".error"
 
 let suffix_sdata () = ".sio"
 
-let suffix_target conf =
-  match language_of_name (conf.tlang) with
+let suffix_of_language lang =
+  match lang with
   | CompDriver.L_rule -> suffix_rule ()
   | CompDriver.L_camp -> suffix_camp ()
   | CompDriver.L_oql -> suffix_oql ()
@@ -98,6 +98,9 @@ let suffix_target conf =
   | CompDriver.L_spark2 -> suffix_spark2 ()
   | CompDriver.L_cloudant -> suffix_cld_design ()
   | CompDriver.L_error -> suffix_error ()
+
+let suffix_target conf =
+  suffix_of_language (language_of_name (conf.tlang))
 
 (* Evaluator Section *)
 
@@ -226,22 +229,28 @@ let get_java_imports conf = conf.java_imports
 (* Driver config *)
 open CompConfig
 
-let driver_conf_of_args args qname =
+let driver_conf_of_args args schema qname =
   let path =
-    [] (* XXX TODO XXX *)
+    List.map language_of_name (get_comp_lang_config args).path
   in
-  let brand =
+  let brand_rel =
     [] (* XXX TODO XXX *)
   in
   let vdbindings =
     [] (* XXX TODO XXX *)
   in
   let schema =
-    assert false (* XXX TODO XXX *)
+    begin match schema with
+    | Some schema -> schema
+    | None ->
+        (* XXX TODO XXX *)
+        (* (RType.make_brand_model brand_rel [], []) *)
+        assert false
+    end
   in
   { comp_qname = char_list_of_string qname;
     comp_path = path;
-    comp_brand = brand;
+    comp_brand_rel = brand_rel;
     comp_schema = schema;
     comp_vdbindings = vdbindings;
     comp_java_imports = char_list_of_string args.java_imports; }

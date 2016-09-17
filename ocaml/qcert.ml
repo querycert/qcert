@@ -16,7 +16,6 @@
 
 open Util
 open Compiler.EnhancedCompiler
-open CompDriver
 open CompConfig
 open ConfigUtil
 open CloudantUtil
@@ -29,6 +28,7 @@ let charsetbool = ref true
 let args_list conf =
   [ ("-target", Arg.String (change_target (get_comp_lang_config conf)), "(Java/JS/Spark/Spark2/Cloudant)");
     ("-source", Arg.String (change_source (get_comp_lang_config conf)), "(Rule/OQL)");
+    ("-path", Arg.String (add_path  (get_comp_lang_config conf)), "(rule/camp/oql/nra/nraenv/nnrc/nnrcmr/cldmr/dnnrc/dnnrc_typed/js/java/spark/spark2/cloudant)");
     ("-dir", Arg.String (set_dir conf), "Target directory");
     ("-harness", Arg.String (set_harness (get_cld_config (get_comp_lang_config conf))), "Javascript Harness");
     ("-io", Arg.String (fun f -> set_comp_io conf (Util.string_of_file f)), "Schema");
@@ -50,17 +50,17 @@ let usage =
   ^" [-target language] [-source language] [-dir output] [-harness file] [-io file] [-display-ils] [-prefix name] rule1 rule2 ..."
 
 
-(* Compilation *)
+let parse_args () =
+  let qconf = default_comp_config () in
+  Arg.parse (args_list qconf) (anon_args qconf) usage;
+  qconf
 
-let compile (conf: comp_config) (file_name: string) : query list =
+(* Parsing *)
+
+let parse_file (qconf: comp_config) (file_name: string) =
   let slang =
-    begin match get_path (get_comp_lang_config conf) with
-    | name :: _ ->
-        begin match language_or_optim_of_name name with
-        | LoO_language lang -> lang
-        | _ ->
-            raise (CACo_Error "The language of the source file must be specified")
-        end
+    begin match get_path (get_comp_lang_config qconf) with
+    | name :: _ -> language_of_name name
     | [] ->
         raise (CACo_Error "The language of the source file must be specified")
     end
@@ -68,62 +68,63 @@ let compile (conf: comp_config) (file_name: string) : query list =
   let qname, q =
     ParseFile.parse_query_from_file slang file_name
   in
-  let dv_conf = driver_conf_of_args conf qname in
+  (qname, q)
+
+(* Compilation *)
+
+let compile_file (dv_conf: driver_config) (q: CompDriver.query) : CompDriver.query list =
   let dv = driver_of_conf dv_conf in
+  let dv = fix_driver dv q in
   let brand_model, camp_type = get_schema dv_conf in
   CompDriver.compile brand_model (Enhanced.Model.foreign_typing brand_model) dv q
 
 (* Emit *)
 
-let emit conf fname q =
-  let fpref = Filename.chop_extension fname in
+let emit_file conf file_name q =
   let s = PrettyIL.pretty_query !charsetbool !margin q in
-  let fout = outname (target_f (get_dir conf) fpref) (suffix_target (get_comp_lang_config conf)) in
+  let fpref = Filename.chop_extension file_name in
+  let ext = suffix_of_language (language_of_query q) in
+  let fout = outname (target_f (get_dir conf) fpref) ext in
   make_file fout s
 
 
-(* Display *)
-
-let display_dispatch charsetbool margin schema conf fname op =
-  begin match (schema, get_comp_io conf) with
-  | (Some schema, Some io) ->
-      CALib.display_nraenv charsetbool margin
-        schema io
-        (DisplayUtil.get_display_fname conf fname) op
-  | (None, Some io) ->
-      CALib.display_nraenv_no_schema charsetbool margin
-        io
-        (DisplayUtil.get_display_fname conf fname) op
-  | (Some schema, None) ->
-      CALib.display_nraenv_no_io charsetbool margin
-        schema
-        (DisplayUtil.get_display_fname conf fname) op
-  | (None, None) ->
-      CALib.display_nraenv_no_schema_no_io charsetbool margin
-        (DisplayUtil.get_display_fname conf fname) op
-  end
-
 (* Main *)
 
+let main_one_file qconf schema file_name =
+  let (qname, q_source) = parse_file qconf file_name in
+  let dv_conf = driver_conf_of_args qconf schema qname in
+  let queries = compile_file dv_conf q_source in
+  let q_target =
+    begin match List.rev queries with
+    | q :: _ -> q
+    | _ -> raise (CACo_Error "No compilation result!")
+    end
+  in
+  begin match !(get_target_display qconf) with
+  | true ->
+      let _ =
+        List.fold_left
+          (fun fname q ->
+            emit_file qconf fname q;
+            let suff = suffix_of_language (language_of_query q) in
+            (Filename.chop_extension fname)^suff)
+          file_name queries
+      in ()
+  | false -> emit_file qconf file_name q_target
+  end
+
 let () =
-  let qconf = default_comp_config () in
-  Arg.parse (args_list qconf) (anon_args qconf) usage;
+  let qconf = parse_args () in
   let schema =
     begin match get_comp_io qconf with
-    | Some io -> Some (CALib.schema_of_io io)
+    | Some io ->
+        let (schema_content, camp_type) =
+          TypeUtil.extract_schema (ParseString.parse_io_from_string io)
+        in
+        Some (TypeUtil.process_schema schema_content camp_type)
     | None -> None
     end
   in
-  let queries =
-    List.map
-      (fun file_name -> compile qconf)
-      (get_comp_inputs qconf)
-  in
-  (* begin match !(get_target_display qconf) with *)
-  (* | true -> *)
-  (*     List.iter *)
-  (*       (fun fname -> *)
-  (*         display_dispatch !charsetbool !margin schema qconf fname op) *)
-  (* | false -> () *)
-  (* end; *)
-  assert false (* XXX TODO XXX *)
+  List.iter
+    (fun file_name -> main_one_file qconf schema file_name)
+    (get_comp_inputs qconf)
