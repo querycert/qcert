@@ -126,9 +126,6 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nraenv_optim (q: nraenv) : nraenv := TOptimEnvFunc.toptim_nraenv q.
 
-  (* XXX doesn't look like a single-edge ; should be removed? XXX *)
-  Definition nraenv_compiler (q: nraenv) : nnrc := CC.tcompile_nraenv_to_nnrc_typed_opt q.
-
   Definition nraenv_to_nnrc (q: nraenv) : nnrc := algenv_to_nnrc q init_vid init_venv.
 
   Definition nraenv_to_nra (q: nraenv) : nra := alg_of_algenv q.
@@ -147,7 +144,6 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrc_optim (q: nnrc) : nnrc := trew q.
 
   Definition nnrc_to_camp (avoid: list var) (q: nnrc) : camp := nrcToPat_let avoid q. (* XXX avoid ? XXX *)
-
 
   Definition nnrc_to_nnrcmr (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
     let inputs_loc :=
@@ -303,7 +299,8 @@ Module CompDriver(runtime:CompilerRuntime).
   | Dv_java : java_driver -> driver
   | Dv_spark : spark_driver -> driver
   | Dv_spark2 : spark2_driver -> driver
-  | Dv_cloudant : cloudant_driver -> driver.
+  | Dv_cloudant : cloudant_driver -> driver
+  | Dv_error : string -> driver.
 
   (* Compilers function *)
 
@@ -529,13 +526,43 @@ Module CompDriver(runtime:CompilerRuntime).
     | (Dv_spark dv, Q_spark q) => compile_spark dv q
     | (Dv_spark2 dv, Q_spark2 q) => compile_spark2 dv q
     | (Dv_cloudant dv, Q_cloudant q) => compile_cloudant dv q
+    | (Dv_error s, _) => (Q_error ("[Driver Error]" ++ s)) :: nil
     | (_, _) => (Q_error "incompatible query and driver") :: nil
     end.
 
   End CompDriverCompile.
 
-End CompDriver.
+  Section CompPaths.
+    Context {bm:brand_model}.
+    Context {ftyping: foreign_typing}.
 
+    (* Comp *)
+    (* XXX TODO : use driver *)
+    Definition get_driver_from_path (source:language) (target:language) : driver :=
+      match source, target with
+      | L_rule, L_javascript =>
+        Dv_rule
+          (Dv_rule_to_nraenv
+          (Dv_nraenv_optim
+          (Dv_nraenv_to_nnrc
+          (Dv_nnrc_to_javascript
+          (Dv_javascript_stop)))))
+      | _, _ => Dv_error "No default path defined"
+      end.
+
+    (* Some macros, that aren't really just about source-target *)
+    (* Used in CompStat: *)
+    Definition nraenv_optim_to_nnrc (q: nraenv) : nnrc :=
+      nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
+
+    (* Used in CompTest: *)
+    Definition rule_to_nraenv_optim (q: rule) : nraenv :=
+      (nraenv_optim (rule_to_nraenv q)).
+    Definition rule_to_nnrc_optim (q: rule) : nnrc :=
+      nnrc_optim (nraenv_to_nnrc (nraenv_optim (rule_to_nraenv q))).
+
+  End CompPaths.
+End CompDriver.
 
 
 (*

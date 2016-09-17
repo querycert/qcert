@@ -29,49 +29,22 @@ Module CompTop(runtime:CompilerRuntime).
 
   Module CD := CompDriver runtime.
 
-  (***************
-   * NRA Section *
-   ***************)
-
   Require Import NRAEnvRuntime.
 
   Local Open Scope algenv_scope.
 
   Hint Constructors data_normalized.
-  Definition optimizer : Type := algenv -> algenv.
-  (* Algebraic optimizers *)
-
-  Require Import ROptimEnvFunc.
-
-  Definition optimizer_no_optim : optimizer := (fun op:algenv => op).
-  Definition optimizer_untyped_opt : optimizer := ROptimEnvFunc.optim.
-
-  (* Compiler from CAMP to NRA+Env *)
   
   Require PatterntoNRAEnv.
-  Definition compile_pat_to_algenv (optim:optimizer) (p:pat) : algenv :=
-    (* Produces the initial plan *)
-    let op_init := CD.camp_to_nraenv p in
-    (* Optimization pass over the initial plan *)
-    let op_optim := optim op_init
-    in op_optim.
+  Definition compile_pat_to_algenv (q:CD.camp) : CD.nraenv :=
+    CD.nraenv_optim (CD.camp_to_nraenv q).
 
-  Definition compile_pat_to_algenv_no_optim := compile_pat_to_algenv optimizer_no_optim.
-  Definition compile_pat_to_algenv_untyped_opt := compile_pat_to_algenv optimizer_untyped_opt.
-  
   (* Compiler from Rules to NRA+Env *)
 
   Require RuletoNRAEnv.
-  Definition compile_rule_to_algenv (optim:optimizer) (r:rule) : algenv :=
-    (* Produces the initial plan *)
-    let op_init := CD.rule_to_nraenv r in
-    (* Optimization pass over the initial plan *)
-    let op_optim := optim op_init
-    in op_optim.
+  Definition compile_rule_to_algenv (q:CD.rule) : CD.nraenv :=
+    CD.nraenv_optim (CD.rule_to_nraenv q).
 
-  Definition compile_rule_to_algenv_no_optim := compile_rule_to_algenv optimizer_no_optim.
-  Definition compile_rule_to_algenv_untyped_opt := compile_rule_to_algenv optimizer_untyped_opt.
-  
 
   (********************
    * Calculus Section *
@@ -80,36 +53,6 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import NNRCRuntime NNRCMRRuntime.
   Require Import NRAEnvtoNNRC NRewFunc.
   Require Import NNRCtoNNRCMR NRewMR.
-
-  (* Calculus rewriter *)
-
-  Definition rewriter : Type := nrc -> nrc.
-
-  Definition rewriter_no_rew : rewriter := (fun e:nrc => e).
-
-  Definition rewriter_simpl_rew : rewriter := head_rew.
-
-  (* Compiler from CAMP to NNRC *)
-  
-  Definition compile_pat_to_nnrc (optim:optimizer) (rew:rewriter) (p:pat) : nrc :=
-    let op_optim := compile_pat_to_algenv optim p in
-    let e_init := algenv_to_nnrc op_optim init_vid init_venv in
-    let e_rew := rew e_init in
-    e_rew.
-
-  Definition compile_pat_to_nnrc_untyped_opt :=
-    compile_pat_to_nnrc optimizer_untyped_opt rewriter_simpl_rew.
-
-  (* Compiler from CAMP to NNRC *)
-  
-  Definition compile_rule_to_nnrc (optim:optimizer) (rew:rewriter) (r:rule) : nrc :=
-    let op_optim := compile_rule_to_algenv optim r in
-    let e_init := algenv_to_nnrc op_optim init_vid init_venv in
-    let e_rew := rew e_init in
-    e_rew.
-
-  Definition compile_rule_to_nnrc_untyped_opt :=
-    compile_rule_to_nnrc optimizer_untyped_opt rewriter_simpl_rew.
 
   (* Compiler from CAMP to JavaScript *)
 
@@ -126,36 +69,22 @@ Module CompTop(runtime:CompilerRuntime).
   Require Import BasicTypes CAMPTypes NRAEnvTypes.
   Require Import TPatterntoNRAEnv.
 
-  Definition tcompile_rule_to_algenv_none (r:rule) : algenv :=
-    compile_rule_to_algenv optimizer_no_optim r.
-
   Require Import NNRCTypes.
   Require Import TNRAEnvtoNNRC.
   Require Import TOptimEnvFunc.
   
-  Definition toptimizer_typed_opt : optimizer := TOptimEnvFunc.toptim_nraenv.
-
-  Definition tcompile_rule_to_algenv_topt (r:rule) : algenv :=
-    compile_rule_to_algenv toptim_nraenv r.
+  Definition tcompile_rule_to_algenv_topt (q:CD.rule) : CD.nraenv :=
+    CD.rule_to_nraenv q.
 
   (* Typed compilation from rules to NNRC *)
 
   (* Note: only the algebra rewrites leverage types, the NNRC rewrites
   (at this point) are operating on the untyped form *)
   
-  Definition tcompile_rule_to_nnrc (optim:optimizer) (rew:rewriter) (r:rule) : nrc :=
-    let op_optim := compile_rule_to_algenv optim r in
-    let e_init := algenv_to_nnrc op_optim init_vid init_venv in
-    let e_rew := rew e_init in
-    e_rew.
-
-  Definition tcompile_rule_to_nnrc_none (r:rule) : nrc :=
-    tcompile_rule_to_nnrc optimizer_no_optim rewriter_no_rew r.
-
   Require Import TRewFunc.
   
-  Definition tcompile_rule_to_nnrc_topt (r:rule) : nrc :=
-    tcompile_rule_to_nnrc toptim_nraenv trew r.
+  Definition tcompile_rule_to_nnrc_topt (q:CD.rule) : CD.nnrc :=
+    CD.nnrc_optim (CD.nraenv_to_nnrc (CD.rule_to_nraenv q)).
 
   (* Typed compilation from rules to DNNRC *)
 
@@ -164,18 +93,9 @@ Module CompTop(runtime:CompilerRuntime).
 
   Require Import DData NNRC DNNRC NNRCtoDNNRC.
 
-  Definition tcompile_rule_to_dnrc (optim:optimizer) (rew:rewriter) (r:rule) : dnrc _ bool algenv :=
-    let op_optim := compile_rule_to_algenv optim r in
-    let e_init := algenv_to_nnrc op_optim init_vid init_venv in
-    let e_rew := rew e_init in
-    let de_init := @nrc_to_dnrc_algenv _ bool true mkDistLoc e_rew in
-    de_init.
-
-  Definition tcompile_rule_to_dnrc_none (r:rule) : dnrc _ bool algenv :=
-    tcompile_rule_to_dnrc optimizer_no_optim rewriter_no_rew r.
-
-  Definition tcompile_rule_to_dnrc_topt (r:rule) : dnrc _ bool algenv :=
-    tcompile_rule_to_dnrc toptim_nraenv trew r.
+  Definition tcompile_rule_to_dnrc_topt (q:CD.rule) : dnrc _ unit algenv :=
+    let q := CD.nnrc_optim (CD.nraenv_to_nnrc (CD.rule_to_nraenv q)) in
+    @nrc_to_dnrc_algenv _ _ tt mkDistLoc q.
 
   (* Typed compilation from rules to NNRC + Map Reduce *)
 
@@ -184,8 +104,8 @@ Module CompTop(runtime:CompilerRuntime).
      - The free variables are obtained after nrc rewrites
      - one has to be careful to pass those free variables to the mr-optimizer *)
   
-  Definition tcompile_rule_to_nnrcmr_chain_no_optim (r:rule) : list (var * dlocalization) * nrcmr :=
-    let e_nrc := tcompile_rule_to_nnrc_topt r in
+  Definition tcompile_rule_to_nnrcmr_chain_no_optim (q:CD.rule) : list (var * dlocalization) * CD.nnrcmr :=
+    let e_nrc := tcompile_rule_to_nnrc_topt q in
     let e_nrc_no_id := nrc_subst e_nrc init_vid (NRCConst dunit) in
     let e_rew := trew e_nrc_no_id in
     let e_rew_free_vars := nrc_free_vars e_rew in
@@ -201,9 +121,9 @@ Module CompTop(runtime:CompilerRuntime).
     in
     (env_variables, e_mr).
 
-  Definition tcompile_rule_to_nnrcmr_chain (r:rule) : list (var * dlocalization) * nrcmr :=
-    let (env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain_no_optim r in
-    let e_mr_optim := mr_optimize e_mr in
+  Definition tcompile_rule_to_nnrcmr_chain (q:CD.rule) : list (var * dlocalization) * CD.nnrcmr :=
+    let (env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain_no_optim q in
+    let e_mr_optim := CD.nnrcmr_optim e_mr in
     (env_vars, e_mr_optim).
 
 
@@ -211,30 +131,15 @@ Module CompTop(runtime:CompilerRuntime).
 
   Require Import CloudantMR NNRCMRtoCloudant ForeignToCloudant.
 
-  Definition tcompile_rule_to_cldmr_chain (h:list (string*string)) (r:rule) : cld_mrl :=
-    let '(env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain r in
+  Definition tcompile_rule_to_cldmr_chain (h:list (string*string)) (q:CD.rule) : CD.cldmr :=
+    let '(env_vars, e_mr) := tcompile_rule_to_nnrcmr_chain q in
     CD.nnrcmr_to_cldmr h e_mr.
 
   (* Typed compilation from rules to Javascript *)
 
-  Definition tcompile_rule_to_js_caco (r:rule) : string :=
-    let nnrc := tcompile_rule_to_nnrc_topt r in
+  Definition tcompile_rule_to_js_caco (q:CD.rule) : string :=
+    let nnrc := tcompile_rule_to_nnrc_topt q in
     nrcToJSTop nnrc.
-
-  (* Typed compilation from rules to Cloudant *NEW* *)
-
-  Definition tcompile_rule_to_cloudant_caco (h:list (string*string)) (r:rule) (rulename:string) : (list (string*string) * (string * list string)) :=
-    let mrl := tcompile_rule_to_cldmr_chain h r in
-    mapReducePairstoCloudant h mrl rulename.
-
-  (* To Spark *)
-
-  Require Import NNRCMRtoSpark ForeignToSpark.
-
-  (* Hard-coding the WORLD variable for now. Generalizing will require
-     more work on the Spark code-generation side. *)
-  Definition mrchain_to_spark_data_from_file_caco rulename mrchain :=
-    CD.nnrcmr_to_spark rulename mrchain.
 
 End CompTop.
 
