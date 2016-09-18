@@ -1,10 +1,9 @@
 (* Compiler Top *)
 Require Export EnhancedCompiler EnhancedModel.
-Require Export CompTop.
-Module Export CompTop := CompTop EnhancedModel.EnhancedRuntime.
+Require Export CompDriver.
+Module Export CD := CompDriver EnhancedModel.EnhancedRuntime.
 
 Export EnhancedCompiler.EvalTop.
-Export CompTop.
 Export CompEnhanced.
 Export Enhanced.Data Enhanced.Ops.Unary Enhanced.Ops.Binary.
 

@@ -143,7 +143,21 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrc_to_camp (avoid: list var) (q: nnrc) : camp := nrcToPat_let avoid q. (* XXX avoid ? XXX *)
 
-  Definition nnrc_to_nnrcmr (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
+  (* Java equivalent: NnrcToNrcmr.convert *)
+  Definition nnrc_to_nnrcmr_comptop (q: nnrc) : nnrcmr :=
+    let q : nnrc := nrc_subst q init_vid (NRCConst dunit) in
+    let q : nnrc := nnrc_optim q in
+    let q_free_vars := (* bdistinct !!! *) nrc_free_vars q in
+    let inputs_loc :=
+        (init_vid, Vlocal)
+          ::(init_vinit, Vlocal)
+          ::(localize_names q_free_vars)
+    in
+    nnrc_to_nnrcmr_chain q
+                         init_vinit
+                         inputs_loc.
+
+  Definition nnrc_to_nnrcmr_compdriver (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
     let inputs_loc :=
         (init_vid, Vlocal)
           ::(init_vinit, Vlocal)
@@ -440,7 +454,10 @@ Module CompDriver(runtime:CompilerRuntime).
           let q := nnrc_optim q in
           compile_nnrc dv q
         | Dv_nnrc_to_nnrcmr inputs_loc dv =>
-          let q := nnrc_to_nnrcmr inputs_loc q in
+          let q := nnrc_to_nnrcmr_comptop (* inputs_loc *) q in
+          (* XXX Should be: XXX
+             let q := nnrc_to_nnrcmr_compdriver inputs_loc q in
+          *)
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
           let q := nnrc_to_dnnrc_dataset inputs_loc q in
@@ -925,6 +942,22 @@ Module CompDriver(runtime:CompilerRuntime).
       nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
     Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc_dataset :=
       nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (nraenv_optim q))).
+    Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim (q:nraenv) : nrcmr :=
+      nnrcmr_optim (nnrc_to_nnrcmr_comptop (nnrc_optim (nraenv_to_nnrc (nraenv_optim q)))).
+
+
+    (* Used in queryTests: *)
+    Definition rule_to_nraenv_to_nnrc_optim (q:rule) : nnrc :=
+      nnrc_optim (nraenv_to_nnrc (rule_to_nraenv q)).
+    Definition rule_to_nraenv_to_nnrc_optim_to_dnnrc
+               (inputs_loc:vdbindings) (q:rule) : dnnrc_dataset :=
+      nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (rule_to_nraenv q))).
+    Definition rule_to_nraenv_to_nnrc_optim_to_javascript (q:rule) : string :=
+      nnrc_to_javascript (nnrc_optim (nraenv_to_nnrc (rule_to_nraenv q))).
+    Definition rule_to_nnrcmr (q:rule) : nnrcmr :=
+      nnrcmr_optim (nnrc_to_nnrcmr_comptop (rule_to_nraenv_to_nnrc_optim q)).
+    Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=
+      nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop (rule_to_nraenv_to_nnrc_optim q))).
 
   End CompPaths.
 End CompDriver.

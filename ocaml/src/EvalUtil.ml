@@ -69,10 +69,10 @@ let eval_nraenv conf schema h world op : Data.data option =
       let nrc = CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc Compiler.mkDistLoc op in
       EvalTop.dnrc_eval_top brand_model h nrc world
   | CompDriver.L_nnrcmr ->
-      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+      let mrchain = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
       EvalTop.nrcmr_chain_eval_top h mrchain world
   | CompDriver.L_cldmr ->
-      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+      let mrchain = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
       let mrchain = CompDriver.nnrcmr_to_cldmr [] mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->

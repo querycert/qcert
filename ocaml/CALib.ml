@@ -84,7 +84,7 @@ let oql_to_nraenv (s:string) : nraenv =
 (* Translations *)
 
 let translate_nraenv_to_nnrc (q:nraenv) : nnrc = CompDriver.nraenv_to_nnrc q
-let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompCore.translate_nnrc_to_nnrcmr_chain q
+let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompDriver.nnrc_to_nnrcmr_comptop q
 let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset mkDistLoc n
 
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
@@ -131,7 +131,7 @@ let optimize_nnrcmr_for_spark (n:nnrcmr) =
 let compile_nraenv_to_nnrc (op:nraenv) =
   CompDriver.nraenv_optim_to_nnrc_optim op
 let compile_nraenv_to_nnrcmr (op:nraenv) =
-  CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op
+  CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op
 
 
 (*
@@ -154,14 +154,19 @@ let cldmr_to_cloudant (prefix:string) (nrule:string) (cl:cldmr) : string =
 (* For convenience *)
       
 let compile_nraenv_to_js (op:nraenv) : string =
-  string_of_char_list (CompDriver.nnrc_to_javascript (CompDriver.nraenv_optim_to_nnrc_optim op))
+  string_of_char_list (CompDriver.nnrc_to_javascript
+			 (CompDriver.nraenv_optim_to_nnrc_optim op))
 
 let compile_nraenv_to_java (basename:string) (imports:string) (op:nraenv) : string =
-  string_of_char_list (CompDriver.nnrc_to_java (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompDriver.nraenv_optim_to_nnrc_optim op))
+  string_of_char_list (CompDriver.nnrc_to_java
+			 (Util.char_list_of_string basename)
+			 (Util.char_list_of_string imports)
+			 (CompDriver.nraenv_optim_to_nnrc_optim op))
 
 let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
-  let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  string_of_char_list (CompDriver.nnrcmr_to_spark (Util.char_list_of_string nrule) mr)
+  string_of_char_list (CompDriver.nnrcmr_to_spark
+			 (Util.char_list_of_string nrule)
+			 (CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op))
 
 let compile_nraenv_to_cloudant (prefix:string) (nrule:string) (op:nraenv) : string =
   cloudant_compile_no_harness_from_nra (idioticize prefix nrule) op

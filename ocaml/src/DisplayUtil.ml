@@ -24,7 +24,7 @@ open PrettyIL
 let display_to_string conf modelandtype op =
   let opt_nraenv = CompDriver.nraenv_optim op in
   let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
-  let opt_nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  let opt_nnrcmr = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
   let nnrcmr_spark = CompDriver.nnrcmr_to_nnrcmr_spark_prepare opt_nnrcmr in
   let nnrcmr_cldmr = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare opt_nnrcmr in
   let nrastring = PrettyIL.pretty_nraenv (get_charset_bool conf) (get_margin conf) opt_nraenv in
@@ -132,7 +132,7 @@ let sexp_nraenv_top dfname op =
   let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
   let display_nra = nraenv_to_sexp_string op in
   let display_nrc = nnrc_to_sexp_string opt_nnrc in
-  let nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+  let nnrcmr = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
   let nrcmr_spark = CompDriver.nnrcmr_to_nnrcmr_spark_prepare nnrcmr in
   let nrcmr_cldmr = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare nnrcmr in
   let display_nrcmr_spark = nnrcmr_to_sexp_string nrcmr_spark in
