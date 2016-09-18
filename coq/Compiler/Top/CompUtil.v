@@ -20,7 +20,7 @@ Module CompUtil(runtime:CompilerRuntime).
   Require Import BasicRuntime NNRCMRRuntime.
   Require Import TDNRCInfer.
   
-  (* HACK: mr_reduce_empty isn't a field of mr so it needs to be exposed *)
+  (* mr_reduce_empty isn't a field of mr so it needs to be exposed *)
   Definition mr_reduce_empty := mr_reduce_empty.
 
   (* Access to type annotations *)
@@ -34,6 +34,7 @@ Module CompUtil(runtime:CompilerRuntime).
   Definition ta_required {br:brand_relation} (A:Set) (ta:type_annotation A)
     := TDNRCInfer.ta_required ta.
 
+  (* Processing for input or output of queries *)
   Require Import CompEnv.
   Definition validate_rule_success := validate_rule_success.
   Definition validate_lifted_success := validate_lifted_success.

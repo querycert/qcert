@@ -124,23 +124,23 @@ MODULES = \
 	NRAEnv/NRAEnvTypes \
 	NRAEnv/NRAEnvSystem \
 	NNRC/Calculus/NNRC \
-	NNRC/Calculus/ForeignReduceOps \
 	NNRC/Calculus/NNRCEq \
 	NNRC/Calculus/NNRCSize \
 	NNRC/Calculus/NShadow \
-	NNRC/Calculus/NNRCMR \
 	NNRC/Typing/TNRC \
 	NNRC/Typing/TNRCInfer \
 	NNRC/Typing/TNRCEq \
 	NNRC/Typing/TShadow \
 	NNRC/Rew/NRewUtil \
 	NNRC/Rew/NRew \
-	NNRC/Rew/NRewMR \
 	NNRC/Rew/TRew \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \
-	NNRC/NNRCMRRuntime \
+	NNRCMR/Calculus/ForeignReduceOps \
+	NNRCMR/Calculus/NNRCMR \
+	NNRCMR/Rew/NRewMR \
+	NNRCMR/NNRCMRRuntime \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCEq \
 	DNNRC/Calculus/SparkIR \
