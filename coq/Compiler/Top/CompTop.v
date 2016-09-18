@@ -29,34 +29,15 @@ Module CompTop(runtime:CompilerRuntime).
 
   Module CD := CompDriver runtime.
 
-  Require Import NRAEnvRuntime.
-
-  Local Open Scope algenv_scope.
-
   Hint Constructors data_normalized.
   
-  Require PatterntoNRAEnv.
-  Definition compile_pat_to_algenv (q:CD.camp) : CD.nraenv :=
-    CD.nraenv_optim (CD.camp_to_nraenv q).
-
-  (* Compiler from Rules to NRA+Env *)
-
-  Require RuletoNRAEnv.
-  Definition compile_rule_to_algenv (q:CD.rule) : CD.nraenv :=
-    CD.nraenv_optim (CD.rule_to_nraenv q).
-
-
-  (********************
-   * Calculus Section *
-   ********************)
-
+  Require Import NRAEnvRuntime.
   Require Import NNRCRuntime NNRCMRRuntime.
   Require Import NRAEnvtoNNRC NRewFunc.
   Require Import NNRCtoNNRCMR NRewMR.
-
-  (* Compiler from CAMP to JavaScript *)
-
   Require Import NNRCtoJavascript CloudantMRtoJavascript.
+
+  Local Open Scope algenv_scope.
   Local Open Scope string_scope.
 
   
@@ -93,8 +74,8 @@ Module CompTop(runtime:CompilerRuntime).
 
   Require Import DData NNRC DNNRC NNRCtoDNNRC.
 
-  Definition tcompile_rule_to_dnrc_topt (q:CD.rule) : CD.dnnrc_dataset :=
-    CD.nnrc_to_dnnrc_dataset (CD.nnrc_optim (CD.nraenv_to_nnrc (CD.rule_to_nraenv q))).
+  Definition tcompile_rule_to_dnrc_topt (inputs_loc:vdbindings) (q:CD.rule) : CD.dnnrc_dataset :=
+    CD.nnrc_to_dnnrc_dataset inputs_loc (CD.nnrc_optim (CD.nraenv_to_nnrc (CD.rule_to_nraenv q))).
 
   (* Typed compilation from rules to NNRC + Map Reduce *)
 

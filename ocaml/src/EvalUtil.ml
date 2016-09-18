@@ -51,7 +51,7 @@ let eval_nraenv conf schema h world op : Data.data option =
       let op = CompDriver.nraenv_optim op in
       EvalTop.algenv_eval_top h op world
   | CompDriver.L_nnrc ->
-      let nrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
+      let nrc = CompDriver.nraenv_optim_to_nnrc_optim op in
       EvalTop.nrc_eval_top h nrc world
   | CompDriver.L_dnnrc_dataset ->
       let (brand_model,_) =
@@ -66,7 +66,7 @@ let eval_nraenv conf schema h world op : Data.data option =
 	| None -> raise (CACo_Error "Spark2 target requires a schema I/O file")
 	end
       in
-      let nrc = CompCore.tcompile_nraenv_to_dnnrc op in
+      let nrc = CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc Compiler.mkDistLoc op in
       EvalTop.dnrc_eval_top brand_model h nrc world
   | CompDriver.L_nnrcmr ->
       let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in

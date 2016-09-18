@@ -25,61 +25,12 @@ Module CompCore(runtime:CompilerRuntime).
   Require Import NNRCRuntime NNRCMRRuntime.
   Require Import NRAEnvtoNNRC NRewFunc.
   Require Import NNRCtoNNRCMR NRewMR .
+  Require Import TOptimEnvFunc.
+  Require Import NNRCTypes.
 
   Require Import CompDriver.
   Module CD := CompDriver runtime.
   
-  (* Compiler from NRAEnv to NNRC *)
-
-  (* Java equivalent: NraToNnrc.convert *)
-  Definition translate_nraenv_to_nnrc (q:CD.nraenv) : CD.nnrc :=
-    CD.nraenv_to_nnrc q.
-
-  Require Import TOptimEnvFunc.
-
-  (**********************
-   * Typed NNRC Section *
-   **********************)
-
-  Require Import NNRCTypes.
-  Require Import TNRAEnvtoNNRC.
-  Require Import TRewFunc.
-
-  (* Typed compilation from NRAEnv to NNRC *)
-
-  Definition tcompile_nraenv_to_nnrc_typed_opt (q:CD.nraenv) : CD.nnrc :=
-    let op_optim := toptim_nraenv q in
-    let e_init := translate_nraenv_to_nnrc op_optim in
-    let e_rew := trew e_init in
-    e_rew.
-
-  Definition trew_nnrc_typed_opt (q:CD.nnrc) : CD.nnrc :=
-    trew q.
-
-  (***********************
-   * Typed DNNRC Section *
-   ***********************)
-
-  Require Import DData DNNRC NNRCtoDNNRC SparkIR.
-
-  (* Typed compilation from NRAEnv to DNNRC *)
-
-  Definition translate_nnrc_to_dnnrc
-             (tenv:list(var*dlocalization)) (e_nrc:nrc) : CD.dnnrc_dataset :=
-    nrc_to_dnrc tt tenv e_nrc.
-
-  Definition tcompile_nraenv_to_dnnrc (q:CD.nraenv) : CD.dnnrc_dataset :=
-    CD.nnrc_to_dnnrc_dataset (CD.nnrc_optim (CD.nraenv_to_nnrc (CD.nraenv_optim q))).
-
-  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
-
-  Definition dnnrc_to_typeannotated_dnnrc
-             {bm:brand_model}
-             {ftyping: foreign_typing}
-             (e: dnrc _ unit dataset) (inputType: rtype)
-    : option (dnrc _ (type_annotation unit) dataset) :=
-    dnnrc_infer_type e inputType.
-
   (******************
    * NNRCMR Section *
    ******************)
@@ -92,7 +43,7 @@ Module CompCore(runtime:CompilerRuntime).
   (* Java equivalent: NnrcToNrcmr.convert *)
   Definition translate_nnrc_to_nnrcmr_chain (e_nrc:nrc) :=
     let e_nrc_no_id := nrc_subst e_nrc init_vid (NRCConst dunit) in
-    let e_rew := trew e_nrc_no_id in
+    let e_rew := CD.nnrc_optim e_nrc_no_id in
     let e_rew_free_vars := (* bdistinct !!! *) nrc_free_vars e_rew in
     let env_variables :=
         (init_vid, Vlocal)
@@ -107,7 +58,7 @@ Module CompCore(runtime:CompilerRuntime).
     e_mr.
 
   Definition tcompile_nraenv_to_nnrcmr_chain_no_optim (op_init:algenv) : nrcmr :=
-    let e_nrc := tcompile_nraenv_to_nnrc_typed_opt op_init in
+    let e_nrc := CD.nraenv_optim_to_nnrc_optim op_init in
     translate_nnrc_to_nnrcmr_chain e_nrc.
 
   Definition tcompile_nnrc_to_nnrcmr_chain_typed_opt (e_nrc:nrc) : nrcmr :=

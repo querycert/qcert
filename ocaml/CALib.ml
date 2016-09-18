@@ -83,19 +83,17 @@ let oql_to_nraenv (s:string) : nraenv =
 
 (* Translations *)
 
-let translate_nraenv_to_nnrc (op:nraenv) : nnrc = CompCore.translate_nraenv_to_nnrc op
-let translate_nnrc_to_nnrcmr (n:nnrc) : nnrcmr = CompCore.translate_nnrc_to_nnrcmr_chain n
-let translate_nnrc_to_dnnrc (tenv: string list) (n:nnrc) : dnnrc_dataset =
-  let tenv = List.map dvar_conv tenv in
-  CompCore.translate_nnrc_to_dnnrc tenv n
+let translate_nraenv_to_nnrc (q:nraenv) : nnrc = CompDriver.nraenv_to_nnrc q
+let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompCore.translate_nnrc_to_nnrcmr_chain q
+let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset mkDistLoc n
 
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
   match
     let (brand_model,wmRType) = sc in
-    (CompCore.dnnrc_to_typeannotated_dnnrc
+    (CompDriver.dnnrc_to_dnnrc_typed_dataset
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
-       (CompCore.tcompile_nraenv_to_dnnrc op)
+       (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc mkDistLoc op)
        wmRType)
   with
   | Some x -> x
@@ -115,7 +113,7 @@ let optimize_nraenv (op:nraenv) =
 
 (* NNRC Optimizer *)
 let optimize_nnrc (n:nnrc) =
-  CompCore.trew_nnrc_typed_opt n
+  CompDriver.nnrc_optim n
 
 (* NNRCMR Optimizer *)
 let optimize_nnrcmr (n:nnrcmr) =
@@ -131,7 +129,7 @@ let optimize_nnrcmr_for_spark (n:nnrcmr) =
 (* Note: This includes optimization phases *)
 
 let compile_nraenv_to_nnrc (op:nraenv) =
-  CompCore.tcompile_nraenv_to_nnrc_typed_opt op
+  CompDriver.nraenv_optim_to_nnrc_optim op
 let compile_nraenv_to_nnrcmr (op:nraenv) =
   CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op
 
@@ -156,10 +154,10 @@ let cldmr_to_cloudant (prefix:string) (nrule:string) (cl:cldmr) : string =
 (* For convenience *)
       
 let compile_nraenv_to_js (op:nraenv) : string =
-  string_of_char_list (CompDriver.nnrc_to_javascript (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+  string_of_char_list (CompDriver.nnrc_to_javascript (CompDriver.nraenv_optim_to_nnrc_optim op))
 
 let compile_nraenv_to_java (basename:string) (imports:string) (op:nraenv) : string =
-  string_of_char_list (CompDriver.nnrc_to_java (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+  string_of_char_list (CompDriver.nnrc_to_java (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompDriver.nraenv_optim_to_nnrc_optim op))
 
 let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
   let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in

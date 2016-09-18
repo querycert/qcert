@@ -23,7 +23,7 @@ open PrettyIL
 
 let display_to_string conf modelandtype op =
   let opt_nraenv = CompDriver.nraenv_optim op in
-  let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
+  let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
   let opt_nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
   let nnrcmr_spark = CompDriver.nnrcmr_to_nnrcmr_spark_prepare opt_nnrcmr in
   let nnrcmr_cldmr = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare opt_nnrcmr in
@@ -37,17 +37,17 @@ let display_to_string conf modelandtype op =
       PrettyIL.pretty_annotate_ignore
       (PrettyIL.pretty_plug_dataset (get_charset_bool conf))
       (get_charset_bool conf) (get_margin conf)
-      (CompCore.tcompile_nraenv_to_dnnrc op) in
+      (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc mkDistLoc op) in
   let opt_dnrc_dataset_string =
     begin
       match modelandtype with
       | Some (brand_model, inputType) ->
 	  begin
 	    match
-	      CompCore.dnnrc_to_typeannotated_dnnrc
+	      CompDriver.dnnrc_to_dnnrc_typed_dataset
 		brand_model
 		(Enhanced.Model.foreign_typing brand_model)
-		(CompCore.tcompile_nraenv_to_dnnrc op)
+		(CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc mkDistLoc op)
 		inputType
 	    with
 	    | Some ds -> PrettyIL.pretty_dnrc
@@ -129,7 +129,7 @@ let cldmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.cldmr_to_sexp n)
 (* Top-level *)
     
 let sexp_nraenv_top dfname op =
-  let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
+  let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
   let display_nra = nraenv_to_sexp_string op in
   let display_nrc = nnrc_to_sexp_string opt_nnrc in
   let nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in

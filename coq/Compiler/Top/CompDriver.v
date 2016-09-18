@@ -186,14 +186,21 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
     mapReducePairstoCloudant h q rulename.
 
-  Definition nnrc_to_dnnrc_dataset (q: nnrc) : dnnrc_dataset :=
-    nrc_to_dnrc tt mkDistLoc q.
+  Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
+    nrc_to_dnrc tt inputs_loc q.
 
   Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Check XXX *)
     nrcToJSTop q.
 
   Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
     nrcToJavaTop class_name imports q.
+
+  Definition dnnrc_to_dnnrc_typed_dataset
+             {bm:brand_model}
+             {ftyping: foreign_typing}
+             (e: dnnrc_dataset) (inputType: rtype)
+    : option dnnrc_typed_dataset :=
+    dnnrc_infer_type e inputType.
 
   Definition dnnrc_typed_dataset_to_spark2
              {bm:brand_model}
@@ -232,6 +239,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Inductive dnnrc_dataset_driver : Set :=
     | Dv_dnnrc_dataset_stop : dnnrc_dataset_driver
     (* XXX TODO XXX *)
+    (* XXX Need help figuring this one out -JS XXX *)                              
     (* | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : dnnrc_typed_dataset -> dnnrc_dataset_driver *)
   .
 
@@ -256,7 +264,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_nnrc_stop : nnrc_driver
     | Dv_nnrc_optim : nnrc_driver -> nnrc_driver
     | Dv_nnrc_to_nnrcmr : (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
-    | Dv_nnrc_to_dnnrc_dataset : dnnrc_dataset_driver -> nnrc_driver
+    | Dv_nnrc_to_dnnrc_dataset : (* inputs_loc *) vdbindings -> dnnrc_dataset_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
     | Dv_nnrc_to_camp : (* avoid *) list var -> camp_driver -> nnrc_driver
@@ -434,8 +442,8 @@ Module CompDriver(runtime:CompilerRuntime).
         | Dv_nnrc_to_nnrcmr inputs_loc dv =>
           let q := nnrc_to_nnrcmr inputs_loc q in
           compile_nnrcmr dv q
-        | Dv_nnrc_to_dnnrc_dataset dv =>
-          let q := nnrc_to_dnnrc_dataset q in
+        | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
+          let q := nnrc_to_dnnrc_dataset inputs_loc q in
           compile_dnnrc_dataset dv q
         | Dv_nnrc_to_javascript dv =>
           let q := nnrc_to_javascript q in
@@ -734,7 +742,7 @@ Module CompDriver(runtime:CompilerRuntime).
   | L_nnrc =>
       match dv with
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_vdbindings) dv)
-      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset dv)
+      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_qname) config.(comp_java_imports) dv)
       | Dv_camp dv => Dv_nnrc (Dv_nnrc_to_camp (List.map fst config.(comp_vdbindings)) dv) (* XXX to check XXX *)
@@ -911,6 +919,12 @@ Module CompDriver(runtime:CompilerRuntime).
       (nraenv_optim (rule_to_nraenv q)).
     Definition rule_to_nnrc_optim (q: rule) : nnrc :=
       nnrc_optim (nraenv_to_nnrc (nraenv_optim (rule_to_nraenv q))).
+
+    (* Used in CALib: *)
+    Definition nraenv_optim_to_nnrc_optim (q:nraenv) : nnrc :=
+      nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
+    Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc_dataset :=
+      nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (nraenv_optim q))).
 
   End CompPaths.
 End CompDriver.

@@ -82,9 +82,6 @@ Module EvalTop(runtime:CompilerRuntime).
   Require Import DData DNNRC SparkIR.
   Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
   
-  Definition mkDistWorld (world:list data) : list (string*ddata)
-    := ("CONST$WORLD"%string, Ddistr world)::nil.
-
   Require Import BasicSystem.
   Require Import TypingRuntime.
  

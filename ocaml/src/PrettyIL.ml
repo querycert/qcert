@@ -967,7 +967,7 @@ let pretty_drtype_aux sym ff drt =
   | Hack.Tlocal tr -> fprintf ff "L%a" (pretty_rtype_aux sym) tr
   | Hack.Tdistr tr -> fprintf ff "D%a" (pretty_rtype_aux sym) tr
 
-let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.EnhancedCompiler.CompCore.type_annotation) =
+let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
   let sym = if greek then greeksym else textsym in
   let inf = Compiler.EnhancedCompiler.CompCore.ta_inferred [] at in
   let req = Compiler.EnhancedCompiler.CompCore.ta_required [] at in

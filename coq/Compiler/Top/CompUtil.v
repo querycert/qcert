@@ -48,6 +48,11 @@ Section CompUtil.
     end.
 
   Require Import DData.
+
+  (* Declares single distributed input collection containing world -- Bindings and Data *)
+  Definition mkDistWorld (world:list data) : list (string*ddata)
+    := ("CONST$WORLD"%string, Ddistr world)::nil.
+
   Definition mkDistLoc : list (string*dlocalization)
     := ("CONST$WORLD"%string, Vdistr)::nil.
 

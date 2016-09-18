@@ -87,7 +87,7 @@ val pretty_annotate_rtype : bool -> Format.formatter -> RType.camp_type -> unit
 val pretty_annotate_annotated_rtype : bool ->
 				      (Format.formatter -> 'a -> unit) ->
 				      Format.formatter ->
-				      'a CompCore.type_annotation -> unit
+				      'a Compiler.type_annotation -> unit
 
 
 (* Pretty printers for various plug types *)
