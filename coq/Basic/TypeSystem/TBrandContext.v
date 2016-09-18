@@ -40,8 +40,8 @@ Section TBrandContext.
   (** Represents a mapping from brands to types *)
   Class brand_context :=
      mkBrand_context {
-        brand_context_types : list (string*rtype);
-        brand_context_types_sorted : is_list_sorted ODT_lt_dec (domain brand_context_types) = true
+         brand_context_types : list (string*rtype);
+         brand_context_types_sorted : is_list_sorted ODT_lt_dec (domain brand_context_types) = true
       }.
 
   Lemma brand_context_nodup {m:brand_context} : NoDup (domain brand_context_types).

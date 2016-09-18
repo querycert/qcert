@@ -24,6 +24,7 @@ Require Import CloudantMR.
 Require Import DNNRC SparkIR.
 Require Import CAMPRuntime.
 Require Import ODMGRuntime.
+Require Import TOptimEnvFunc.
 
 Require Import CompilerRuntime.
 Module CompDriver(runtime:CompilerRuntime).
@@ -32,7 +33,6 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import TypingRuntime.
 
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
-  Require Import CompCore.
   Require Import TRewFunc.
   Require Import CompUtil.
   Require Import NNRCtoJavascript.
@@ -45,9 +45,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import NNRCMRtoDNNRC.
   Require Import CloudantMRtoJavascript.
   Require Import NNRCtoDNNRC.
-  Require Import TDNRCInfer DNNRCtoScala SparkIR DNNRCSparkIRRewrites.
-
-  Module CC := CompCore runtime.
+  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
 
   Require Rule.
   Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
@@ -189,7 +187,7 @@ Module CompDriver(runtime:CompilerRuntime).
     mapReducePairstoCloudant h q rulename.
 
   Definition nnrc_to_dnnrc_dataset (q: nnrc) : dnnrc_dataset :=
-    @nrc_to_dnrc_dataset _ _ unit tt mkDistLoc q.
+    nrc_to_dnrc tt mkDistLoc q.
 
   Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Check XXX *)
     nrcToJSTop q.
@@ -197,7 +195,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
     nrcToJavaTop class_name imports q.
 
-  Definition dnnrc_to_dnnrc_typed_dataset
+  Definition dnnrc_typed_dataset_to_spark2
              {bm:brand_model}
              {ftyping: foreign_typing}
              (inputType:rtype) (name:string) (e:@dnnrc_typed_dataset _) : string :=
@@ -364,7 +362,7 @@ Module CompDriver(runtime:CompilerRuntime).
         match dv with
         | Dv_dnnrc_typed_dataset_stop => nil
         | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv =>
-          let q := dnnrc_to_dnnrc_typed_dataset rt rulename q in
+          let q := dnnrc_typed_dataset_to_spark2 rt rulename q in
           compile_spark2 dv q
         end
     in

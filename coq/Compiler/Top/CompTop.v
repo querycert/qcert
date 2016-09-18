@@ -93,9 +93,8 @@ Module CompTop(runtime:CompilerRuntime).
 
   Require Import DData NNRC DNNRC NNRCtoDNNRC.
 
-  Definition tcompile_rule_to_dnrc_topt (q:CD.rule) : dnrc _ unit algenv :=
-    let q := CD.nnrc_optim (CD.nraenv_to_nnrc (CD.rule_to_nraenv q)) in
-    @nrc_to_dnrc_algenv _ _ tt mkDistLoc q.
+  Definition tcompile_rule_to_dnrc_topt (q:CD.rule) : CD.dnnrc_dataset :=
+    CD.nnrc_to_dnnrc_dataset (CD.nnrc_optim (CD.nraenv_to_nnrc (CD.rule_to_nraenv q))).
 
   (* Typed compilation from rules to NNRC + Map Reduce *)
 

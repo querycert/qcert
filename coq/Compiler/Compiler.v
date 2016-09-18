@@ -37,7 +37,7 @@ Module Compiler (runtime:CompilerRuntime).
 
   Definition validate_rule_success := CompUtil.validate_rule_success.
   Definition validate_lifted_success := CompUtil.validate_lifted_success.
-  
+
 End Compiler.
 
 (* 

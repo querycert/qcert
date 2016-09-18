@@ -66,6 +66,7 @@ type eval_config
 val default_eval_config : unit -> eval_config
 
 val set_eval_io : eval_config -> Data.json -> unit
+val set_eval_schema : eval_config -> string -> unit
 val set_input : eval_config -> string -> unit
 val set_format : eval_config -> string -> unit
 
@@ -73,6 +74,7 @@ val get_format : eval_config -> serialization_format
 val get_eval_only : eval_config -> bool ref
 val get_debug : eval_config -> bool ref
 val get_eval_io : eval_config -> Data.json option
+val get_eval_schema : eval_config -> string option
 val get_eval_inputs : eval_config -> string list
 val get_eval_lang_config : eval_config -> lang_config
 

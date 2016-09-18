@@ -34,12 +34,17 @@ Section DNNRC.
   Section plug.
     Context {plug_type:Set}.
 
+    Definition coll_bindings := list (string * (list data)).
+
+    Definition bindings_of_coll_bindings (cb:coll_bindings) : bindings :=
+      map (fun xy => (fst xy, dcoll (snd xy))) cb.
+    
     Class AlgPlug :=
       mkAlgPlug {
-          plug_eval : brand_relation_t -> bindings -> plug_type -> option data
+          plug_eval : brand_relation_t -> coll_bindings -> plug_type -> option data
           ; plug_normalized :
-            forall (h:brand_relation_t) (op:plug_type), forall (constant_env:bindings) (o:data),
-                Forall (fun x => data_normalized h (snd x)) constant_env ->
+            forall (h:brand_relation_t) (op:plug_type), forall (constant_env:coll_bindings) (o:data),
+                Forall (fun x => data_normalized h (snd x)) (bindings_of_coll_bindings constant_env) ->
                 plug_eval h constant_env op = Some o -> data_normalized h o;
 (*        plug_equiv {h} (op1 op2:T) :
             forall (env:bindings),
@@ -253,7 +258,7 @@ Section DNNRC.
       | DNRCAlg _ plug nrcbindings =>
         match listo_to_olist (map (fun x =>
                match dnrc_eval env (snd x) with
-               | Some (Ddistr coll) => Some (fst x, dcoll coll)
+               | Some (Ddistr coll) => Some (fst x, coll)
                | _ => None
                end) nrcbindings) with 
         | Some args =>
@@ -268,6 +273,61 @@ Section DNNRC.
     (* evaluation preserves normalization *)
     Require Import DDataNorm.
 
+    Lemma Forall_dcoll_map_lift l:
+      Forall (fun x : string * (list data) => data_normalized h (dcoll (snd x))) l ->
+      Forall (fun x : string * data => data_normalized h (snd x))
+             (map (fun xy : string * list data => (fst xy, dcoll (snd xy))) l).
+    Proof.
+      intros; induction l; simpl in *.
+      - apply Forall_nil.
+      - rewrite Forall_forall in *; intros.
+        simpl in *.
+        assert (forall x : string * list data,
+                   In x l -> data_normalized h (dcoll (snd x)))
+          by (intros; apply H; auto).
+        specialize (IHl H1).
+        elim H0; clear H0; intros.
+        subst; simpl.
+        apply H.
+        left; auto.
+        rewrite Forall_forall in IHl.
+        apply IHl.
+        assumption.
+    Qed.
+
+    Lemma Forall_dcoll_map_lift2 l:
+      Forall (fun x : string * data => data_normalized h (snd x))
+             (map (fun xy : string * list data => (fst xy, dcoll (snd xy))) l) ->
+      Forall (fun x : string * (list data) => data_normalized h (dcoll (snd x))) l.
+    Proof.
+      intros.
+      induction l; simpl in *.
+      - apply Forall_nil.
+      - assert (Forall (fun x : string * data => data_normalized h (snd x))
+                       (map (fun xy : string * list data => (fst xy, dcoll (snd xy))) l)).
+        + clear IHl. rewrite Forall_forall in *; intros.
+          apply H.
+          simpl.
+          auto.
+        + specialize (IHl H0); clear H0.
+          rewrite Forall_forall in *; intros.
+          simpl in *.
+          elim H0; clear H0; intros.
+          subst.
+          apply (H (fst x, (dcoll (snd x)))); left; auto.
+          auto.
+    Qed.
+
+    Lemma Forall_dcoll_map_lift3 l:
+      Forall (fun x : string * data => data_normalized h (snd x))
+             (map (fun xy : string * list data => (fst xy, dcoll (snd xy))) l) <->
+      Forall (fun x : string * (list data) => data_normalized h (dcoll (snd x))) l.
+    Proof.
+      split.
+      apply Forall_dcoll_map_lift2.
+      apply Forall_dcoll_map_lift.
+    Qed.
+
     Lemma dnrc_alg_bindings_normalized {plug:AlgPlug plug_type} denv l r :
       Forall (ddata_normalized h) (map snd denv) ->
       Forall
@@ -279,10 +339,10 @@ Section DNNRC.
          (fun x : string * dnrc =>
           match dnrc_eval denv (snd x) with
           | Some (Dlocal _) => None
-          | Some (Ddistr coll) => Some (fst x, dcoll coll)
+          | Some (Ddistr coll) => Some (fst x, coll)
           | None => None
           end) r = Some l ->
-   Forall (fun x : string * data => data_normalized h (snd x)) l.
+      Forall (fun x : string * (list data) => data_normalized h (dcoll (snd x))) l.
     Proof.
       revert r; induction l; intros; trivial.
       destruct r; simpl in * ; [invcs H1 | ] .
@@ -431,7 +491,7 @@ Section DNNRC.
            (fun x : string * dnrc =>
             match dnrc_eval denv (snd x) with
             | Some (Dlocal _) => None
-            | Some (Ddistr coll) => Some (fst x, dcoll coll)
+            | Some (Ddistr coll) => Some (fst x, coll)
             | None => None
             end) r); intros; rewrite H2 in H0; try discriminate.
         case_eq (plug_eval h l op); intros;
@@ -440,6 +500,8 @@ Section DNNRC.
         inversion H0; subst; clear H0.
         assert (data_normalized h (dcoll l0)).
         + apply (plug_normalized h op l (dcoll l0)); trivial.
+          apply Forall_dcoll_map_lift.
+          unfold bindings_of_coll_bindings.
           eapply dnrc_alg_bindings_normalized; eauto.
         + constructor; inversion H0; assumption.
     Qed.
@@ -460,21 +522,20 @@ Section DNNRC.
   Section NraEnvPlug.
     Require Import RAlgEnv.
     
-    Definition nraenv_closure : Set := (list string) * algenv.
-
     Definition nraenv_eval h aconstant_env op :=
       let aenv := drec nil in (* empty local environment to start, which is an empty record *)
       let aid := dcoll ((drec nil)::nil) in (* to be checked *)
-      fun_of_algenv h aconstant_env op aenv aid.
+      fun_of_algenv h (bindings_of_coll_bindings aconstant_env) op aenv aid.
 
     Lemma nraenv_eval_normalized h :
-      forall op:algenv, forall (constant_env:bindings) (o:data),
-      Forall (fun x => data_normalized h (snd x)) constant_env ->
+      forall op:algenv, forall (constant_env:coll_bindings) (o:data),
+      Forall (fun x => data_normalized h (snd x)) (bindings_of_coll_bindings constant_env) ->
       nraenv_eval h constant_env op = Some o ->
       data_normalized h o.
     Proof.
       intros.
-      specialize (@fun_of_algenv_normalized _ h constant_env op (drec nil) (dcoll ((drec nil)::nil))); intros.
+      specialize (@fun_of_algenv_normalized _ h (bindings_of_coll_bindings constant_env) op (drec nil) (dcoll ((drec nil)::nil))); intros.
+      unfold bindings_of_coll_bindings.
       apply H1; try assumption.
       repeat constructor.
       repeat constructor.

@@ -35,27 +35,29 @@ let display_to_string conf modelandtype op =
   let untyped_dnrc_string_thunk (_:unit) =
     PrettyIL.pretty_dnrc
       PrettyIL.pretty_annotate_ignore
-      (PrettyIL.pretty_plug_nraenv (get_charset_bool conf))
+      (PrettyIL.pretty_plug_dataset (get_charset_bool conf))
       (get_charset_bool conf) (get_margin conf)
-      (CompCore.tcompile_nraenv_to_dnnrc_typed_opt op) in
+      (CompCore.tcompile_nraenv_to_dnnrc op) in
   let opt_dnrc_dataset_string =
     begin
-    match modelandtype with
-    | Some (brand_model, inputType) ->
-       begin
-	 match CompCore.tcompile_nraenv_to_dnnrc_dataset_opt
-				brand_model
-				(Enhanced.Model.foreign_typing brand_model)
-				op
-				inputType with
-	 | Some ds -> PrettyIL.pretty_dnrc
-			(PrettyIL.pretty_annotate_annotated_rtype
-			   (get_charset_bool conf) PrettyIL.pretty_annotate_ignore)
-			(PrettyIL.pretty_plug_dataset (get_charset_bool conf))
-			(get_charset_bool conf) (get_margin conf) ds
-	 | None -> "DNRC expression was not well typed.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
-       end
-    | None -> "Optimized DNRC expression can't be determined without a schema.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
+      match modelandtype with
+      | Some (brand_model, inputType) ->
+	  begin
+	    match
+	      CompCore.dnnrc_to_typeannotated_dnnrc
+		brand_model
+		(Enhanced.Model.foreign_typing brand_model)
+		(CompCore.tcompile_nraenv_to_dnnrc op)
+		inputType
+	    with
+	    | Some ds -> PrettyIL.pretty_dnrc
+		  (PrettyIL.pretty_annotate_annotated_rtype
+		     (get_charset_bool conf) PrettyIL.pretty_annotate_ignore)
+		  (PrettyIL.pretty_plug_dataset (get_charset_bool conf))
+		  (get_charset_bool conf) (get_margin conf) ds
+	    | None -> "DNRC expression was not well typed.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
+	  end
+      | None -> "Optimized DNRC expression can't be determined without a schema.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
     end
   in (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string, opt_dnrc_dataset_string)
 

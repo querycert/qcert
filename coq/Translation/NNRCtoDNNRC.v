@@ -229,7 +229,6 @@ Section NNRCtoDNNRC.
   Qed.
 
   Require Import NRAEnvRuntime.
-  Definition nrc_to_dnrc_algenv {A} := @nrc_to_dnrc A algenv.
   Require Import SparkIR.
   Context {ftype: ForeignType.foreign_type}.
   Definition nrc_to_dnrc_dataset {A} := @nrc_to_dnrc A dataset.

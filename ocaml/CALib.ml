@@ -92,11 +92,11 @@ let translate_nnrc_to_dnnrc (tenv: string list) (n:nnrc) : dnnrc_dataset =
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
   match
     let (brand_model,wmRType) = sc in
-    CompCore.tcompile_nraenv_to_dnnrc_dataset_opt
-      brand_model
-      (Enhanced.Model.foreign_typing brand_model)
-      op
-      wmRType
+    (CompCore.dnnrc_to_typeannotated_dnnrc
+       brand_model
+       (Enhanced.Model.foreign_typing brand_model)
+       (CompCore.tcompile_nraenv_to_dnnrc op)
+       wmRType)
   with
   | Some x -> x
   | None -> raise (CACo_Error "Spark2 target compilation failed")
@@ -104,7 +104,7 @@ let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_type
 let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_dataset) : string =
   let (brand_model,wmRType) = sc in
   string_of_char_list
-    (CompDriver.dnnrc_to_dnnrc_typed_dataset
+    (CompDriver.dnnrc_typed_dataset_to_spark2
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
        wmRType (Util.char_list_of_string nrule) e)

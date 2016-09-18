@@ -39,8 +39,8 @@ let eval_oql h world f : Data.data option * string =
 (* Core Eval *)
 
 exception OQL_eval of string
-      
-let eval_nraenv conf h world op : Data.data option =
+
+let eval_nraenv conf schema h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   match language_of_name (get_target_lang conf) with
   | CompDriver.L_rule ->
@@ -54,8 +54,20 @@ let eval_nraenv conf h world op : Data.data option =
       let nrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
       EvalTop.nrc_eval_top h nrc world
   | CompDriver.L_dnnrc_dataset ->
-      let nrc = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
-      EvalTop.dnrc_eval_top h nrc world
+      let (brand_model,_) =
+	begin match schema with
+	| Some sc ->
+	    begin try
+	      let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string sc) in
+	      TypeUtil.process_schema schema_content wmType
+	    with
+	    | _ -> raise (CACo_Error "Spark2 target requires a valid schema I/O file")
+	    end
+	| None -> raise (CACo_Error "Spark2 target requires a schema I/O file")
+	end
+      in
+      let nrc = CompCore.tcompile_nraenv_to_dnnrc op in
+      EvalTop.dnrc_eval_top brand_model h nrc world
   | CompDriver.L_nnrcmr ->
       let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
       EvalTop.nrcmr_chain_eval_top h mrchain world

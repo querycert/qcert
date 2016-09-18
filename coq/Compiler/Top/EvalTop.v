@@ -21,6 +21,9 @@ Module EvalTop(runtime:CompilerRuntime).
   
   Require Import BasicRuntime.
   Require Import CompUtil.
+  Require CompDriver.
+
+  Module CD := CompDriver.CompDriver(runtime).
 
   (****************
    * Rule Section *
@@ -76,16 +79,20 @@ Module EvalTop(runtime:CompilerRuntime).
    * DNNRC Section *
    *****************)
 
-  Require Import DData DNNRC.
+  Require Import DData DNNRC SparkIR.
+  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
   
   Definition mkDistWorld (world:list data) : list (string*ddata)
     := ("CONST$WORLD"%string, Ddistr world)::nil.
 
-  Definition dnrc_eval_top (h:list (string*string))
-             (e:@dnrc_algenv _ bool) (world:list data) : option data :=
+  Require Import BasicSystem.
+  Require Import TypingRuntime.
+ 
+  Definition dnrc_eval_top {bm:brand_model} (h:list (string*string)) 
+             (e:CD.dnnrc_dataset) (world:list data) : option data :=
     let tenv := mkDistWorld world in
-    lift localize_data (dnrc_eval h tenv e).
-  
+    lift localize_data (@dnrc_eval _ _ _ h SparkIRPlug tenv e).
+
   (******************
    * NNRCMR Section *
    ******************)

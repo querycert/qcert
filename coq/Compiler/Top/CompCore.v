@@ -26,12 +26,14 @@ Module CompCore(runtime:CompilerRuntime).
   Require Import NRAEnvtoNNRC NRewFunc.
   Require Import NNRCtoNNRCMR NRewMR .
 
+  Require Import CompDriver.
+  Module CD := CompDriver runtime.
+  
   (* Compiler from NRAEnv to NNRC *)
 
   (* Java equivalent: NraToNnrc.convert *)
-  Definition translate_nraenv_to_nnrc (op:algenv) : nrc :=
-    algenv_to_nnrc op init_vid init_venv.
-
+  Definition translate_nraenv_to_nnrc (q:CD.nraenv) : CD.nnrc :=
+    CD.nraenv_to_nnrc q.
 
   Require Import TOptimEnvFunc.
 
@@ -45,14 +47,14 @@ Module CompCore(runtime:CompilerRuntime).
 
   (* Typed compilation from NRAEnv to NNRC *)
 
-  Definition tcompile_nraenv_to_nnrc_typed_opt (op_init:algenv) : nrc :=
-    let op_optim := toptim_nraenv op_init in
+  Definition tcompile_nraenv_to_nnrc_typed_opt (q:CD.nraenv) : CD.nnrc :=
+    let op_optim := toptim_nraenv q in
     let e_init := translate_nraenv_to_nnrc op_optim in
     let e_rew := trew e_init in
     e_rew.
 
-  Definition trew_nnrc_typed_opt (e_init:nrc) : nrc :=
-    trew e_init.
+  Definition trew_nnrc_typed_opt (q:CD.nnrc) : CD.nnrc :=
+    trew q.
 
   (***********************
    * Typed DNNRC Section *
@@ -62,25 +64,12 @@ Module CompCore(runtime:CompilerRuntime).
 
   (* Typed compilation from NRAEnv to DNNRC *)
 
-  Definition tcompile_nraenv_to_dnnrc (op_init:algenv) : dnrc_algenv :=
-    let op_optim := toptim_nraenv op_init in
-    let e_init := translate_nraenv_to_nnrc op_optim in
-    let e_rew := trew e_init in
-    let de_init := @nrc_to_dnrc_algenv _ bool true mkDistLoc e_rew in
-    de_init.
+  Definition translate_nnrc_to_dnnrc
+             (tenv:list(var*dlocalization)) (e_nrc:nrc) : CD.dnnrc_dataset :=
+    nrc_to_dnrc tt tenv e_nrc.
 
-  Definition tcompile_nraenv_to_dnnrc_typed_opt (op_init:algenv) : dnrc _ bool algenv :=
-    tcompile_nraenv_to_dnnrc op_init.
-
-  Definition tcompile_nraenv_to_dnnrc_dataset (op_init:algenv) : dnrc _ unit dataset :=
-    let op_optim := toptim_nraenv op_init in
-    let e_init := translate_nraenv_to_nnrc op_optim in
-    let e_rew := trew e_init in
-    let de_init := @nrc_to_dnrc_dataset _ _ unit tt mkDistLoc e_rew in
-    de_init.
-
-  Definition tcompile_nraenv_to_dnnrc_typed_opt_dataset (op_init:algenv) : dnrc _ unit dataset :=
-    tcompile_nraenv_to_dnnrc_dataset op_init.
+  Definition tcompile_nraenv_to_dnnrc (q:CD.nraenv) : CD.dnnrc_dataset :=
+    CD.nnrc_to_dnnrc_dataset (CD.nnrc_optim (CD.nraenv_to_nnrc (CD.nraenv_optim q))).
 
   Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
 
@@ -90,26 +79,6 @@ Module CompCore(runtime:CompilerRuntime).
              (e: dnrc _ unit dataset) (inputType: rtype)
     : option (dnrc _ (type_annotation unit) dataset) :=
     dnnrc_infer_type e inputType.
-
-  Definition tcompile_nraenv_to_dnnrc_dataset_opt
-             {bm:brand_model}
-             {ftyping: foreign_typing}
-             (op_init: algenv) (inputType: rtype)
-    : option (dnrc _ (type_annotation unit) dataset) :=
-    let e := tcompile_nraenv_to_dnnrc_typed_opt_dataset op_init in
-    let typed := dnnrc_to_typeannotated_dnnrc e inputType in
-    lift dnnrcToDatasetRewrite typed.
-
-  (*****************
-   * DNNRC Section *
-   *****************)
-
-  Require Import DData DNNRC.
-
-  (* compilation from nnrc to dnnrc *)
-
-  Definition translate_nnrc_to_dnnrc (tenv:list(var*dlocalization)) (e_nrc:nrc) : dnrc _ unit dataset :=
-    nrc_to_dnrc tt tenv e_nrc. (* empty annotation and algenv plug *)
 
   (******************
    * NNRCMR Section *
