@@ -18,8 +18,8 @@ Require Import CompilerRuntime.
 Module Compiler (runtime:CompilerRuntime).
 
   Require CompData CompOperators.
-  Require CompOQL CompPattern CompRule.
-  Require CompUtil CompCore CompDriver EvalTop CompStat CompType.
+  Require CompOQL CompPattern CompRule CompEnv.
+  Require CompDriver CompUtil CompStat CompType EvalTop.
 
   Module RType := CompType.CompType runtime.
   Module Data := CompData.CompData runtime.
@@ -29,17 +29,12 @@ Module Compiler (runtime:CompilerRuntime).
   Module Pattern := CompPattern.CompPattern runtime.
   Module Rule := CompRule.CompRule runtime.
 
-  Module CompCore := CompCore.CompCore runtime.
   Module CompDriver := CompDriver.CompDriver runtime.
-
-  Module EvalTop := EvalTop.EvalTop runtime.
+  Module CompUtil := CompUtil.CompUtil runtime.
   Module CompStat := CompStat.CompStat runtime.
 
-  Definition validate_rule_success := CompUtil.validate_rule_success.
-  Definition validate_lifted_success := CompUtil.validate_lifted_success.
+  Module EvalTop := EvalTop.EvalTop runtime.
 
-  Definition mkDistLoc := CompUtil.mkDistLoc.
-  Definition mkDistWorld := CompUtil.mkDistWorld.
 End Compiler.
 
 (* 

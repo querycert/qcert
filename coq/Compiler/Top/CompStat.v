@@ -26,11 +26,12 @@ Require Import ODMGRuntime.
 Require Import CompilerRuntime.
 Module CompStat(runtime:CompilerRuntime).
 
-  Require Import CompUtil.
   Require Import NNRCtoJavascript.
-  Require Import CompDriver.
 
-  Module CD := CompDriver runtime.
+  Require Import CompEnv.
+  Require CompDriver.
+
+  Module CD := CompDriver.CompDriver runtime.
 
   Local Open Scope string_scope.
 

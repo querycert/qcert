@@ -222,9 +222,9 @@ MODULES = \
 	Compiler/Top/CompPattern \
 	Compiler/Top/CompRule \
 	Compiler/Top/CompOQL \
-	Compiler/Top/CompUtil \
-	Compiler/Top/CompCore \
+	Compiler/Top/CompEnv \
 	Compiler/Top/CompDriver \
+	Compiler/Top/CompUtil \
 	Compiler/Top/EvalTop \
 	Compiler/Top/CompStat \
 	Compiler/Top/CompType \

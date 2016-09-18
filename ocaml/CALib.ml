@@ -85,7 +85,7 @@ let oql_to_nraenv (s:string) : nraenv =
 
 let translate_nraenv_to_nnrc (q:nraenv) : nnrc = CompDriver.nraenv_to_nnrc q
 let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompDriver.nnrc_to_nnrcmr_comptop q
-let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset mkDistLoc n
+let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset CompUtil.mkDistLoc n
 
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
   match
@@ -93,7 +93,7 @@ let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_type
     (CompDriver.dnnrc_to_dnnrc_typed_dataset
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
-       (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc mkDistLoc op)
+       (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)
        wmRType)
   with
   | Some x -> x
@@ -108,30 +108,22 @@ let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_data
        wmRType (Util.char_list_of_string nrule) e)
 
 (* NRAEnv Optimizer *)
-let optimize_nraenv (op:nraenv) =
-  CompDriver.nraenv_optim op
+let optimize_nraenv (op:nraenv) = CompDriver.nraenv_optim op
 
 (* NNRC Optimizer *)
-let optimize_nnrc (n:nnrc) =
-  CompDriver.nnrc_optim n
+let optimize_nnrc (n:nnrc) = CompDriver.nnrc_optim n
 
 (* NNRCMR Optimizer *)
-let optimize_nnrcmr (n:nnrcmr) =
-  CompDriver.nnrcmr_optim n
+let optimize_nnrcmr (n:nnrcmr) = CompDriver.nnrcmr_optim n
 
-let optimize_nnrcmr_for_cloudant (n:nnrcmr) =
-  CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare n
-
-let optimize_nnrcmr_for_spark (n:nnrcmr) =
-  CompDriver.nnrcmr_to_nnrcmr_spark_prepare n
+let optimize_nnrcmr_for_cloudant (n:nnrcmr) = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare n
+let optimize_nnrcmr_for_spark (n:nnrcmr) = CompDriver.nnrcmr_to_nnrcmr_spark_prepare n
 
 (* For convenience *)
 (* Note: This includes optimization phases *)
 
-let compile_nraenv_to_nnrc (op:nraenv) =
-  CompDriver.nraenv_optim_to_nnrc_optim op
-let compile_nraenv_to_nnrcmr (op:nraenv) =
-  CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op
+let compile_nraenv_to_nnrc (op:nraenv) = CompDriver.nraenv_optim_to_nnrc_optim op
+let compile_nraenv_to_nnrcmr (op:nraenv) = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op
 
 
 (*
@@ -139,11 +131,17 @@ let compile_nraenv_to_nnrcmr (op:nraenv) =
  *)
 
 let nnrc_to_js (n:nnrc) =
-  string_of_char_list (CompDriver.nnrc_to_javascript n)
+  string_of_char_list
+    (CompDriver.nnrc_to_javascript n)
 let nnrc_to_java (basename:string) (imports:string) (n:nnrc) =
-  string_of_char_list (CompDriver.nnrc_to_java (Util.char_list_of_string basename) (Util.char_list_of_string imports) n)
+  string_of_char_list
+    (CompDriver.nnrc_to_java
+       (Util.char_list_of_string basename)
+       (Util.char_list_of_string imports) n)
 let nnrcmr_to_spark (nrule:string) (n:nnrcmr) =
-  string_of_char_list (CompDriver.nnrcmr_prepared_to_spark (Util.char_list_of_string nrule) n)
+  string_of_char_list
+    (CompDriver.nnrcmr_prepared_to_spark
+       (Util.char_list_of_string nrule) n)
 
 let translate_nnrcmr_to_cldmr (n:nnrcmr) : cldmr =
   CloudantUtil.cloudant_translate_no_harness n

@@ -37,7 +37,7 @@ let display_to_string conf modelandtype op =
       PrettyIL.pretty_annotate_ignore
       (PrettyIL.pretty_plug_dataset (get_charset_bool conf))
       (get_charset_bool conf) (get_margin conf)
-      (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc mkDistLoc op) in
+      (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op) in
   let opt_dnrc_dataset_string =
     begin
       match modelandtype with
@@ -47,7 +47,7 @@ let display_to_string conf modelandtype op =
 	      CompDriver.dnnrc_to_dnnrc_typed_dataset
 		brand_model
 		(Enhanced.Model.foreign_typing brand_model)
-		(CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc mkDistLoc op)
+		(CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)
 		inputType
 	    with
 	    | Some ds -> PrettyIL.pretty_dnrc

@@ -20,7 +20,7 @@ Module EvalTop(runtime:CompilerRuntime).
   Require Import String List String EquivDec.
   
   Require Import BasicRuntime.
-  Require Import CompUtil.
+  Require Import CompEnv.
   Require CompDriver.
 
   Module CD := CompDriver.CompDriver(runtime).

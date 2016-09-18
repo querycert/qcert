@@ -34,7 +34,7 @@ let check_nraenv_result conf expected_res fname actual_res debug_res =
   if !(get_eval_only conf) then
     print_nraenv_result fname actual_res
   else
-    let ok = validate_lifted_success actual_res expected_res in
+    let ok = CompUtil.validate_lifted_success actual_res expected_res in
     if ok then
       Format.printf "OK@."
     else
@@ -56,7 +56,7 @@ let check_rule_result conf expected_res fname actual_res debug_res =
   if !(get_eval_only conf) then
     print_rule_result fname actual_res
   else
-    let ok = validate_rule_success actual_res expected_res in
+    let ok = CompUtil.validate_rule_success actual_res expected_res in
     if ok then
       Format.printf "OK@."
     else

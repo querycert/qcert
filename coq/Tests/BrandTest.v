@@ -78,7 +78,7 @@ Section BrandTest.
           "Customer =John Doe"].
 
   (* Eval vm_compute in R1_result. *)
-  Require Import CompUtil.
+  Require Import CompEnv.
   Example R1_verify : validate_success R1_result R1_expected = true.
   Proof. fast_refl. Qed.
 

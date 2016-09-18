@@ -34,7 +34,6 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
   Require Import TRewFunc.
-  Require Import CompUtil.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
@@ -50,6 +49,8 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Rule.
   Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
   
+  Require Import CompEnv.
+
   Local Open Scope list_scope.
 
   Definition vdbindings := vdbindings.
