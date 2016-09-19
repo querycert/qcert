@@ -24,24 +24,27 @@ let args_list qconf =
     ("-source", Arg.String (QcertArg.set_source qconf), "(Rule/OQL)");
     ("-path", Arg.String (QcertArg.add_path qconf), "(rule/camp/oql/nra/nraenv/nnrc/nnrcmr/cldmr/dnnrc/dnnrc_typed/js/java/spark/spark2/cloudant)");
     ("-dir", Arg.String (QcertArg.set_dir qconf), "Target directory");
-    ("-harness", Arg.String (CloudantUtil.set_harness qconf.QcertArg.qconf_cld_conf), "Javascript Harness");
+    ("-js-runtime", Arg.String (CloudantUtil.set_harness qconf.QcertArg.qconf_cld_conf), "JavaScript runtime");
     ("-io", Arg.String (QcertArg.set_io qconf), "Schema");
-    (* ("-stats", Arg.Unit (set_stats conf), "Produce statistics for produced query plans"); *)
-    ("-display-ils", Arg.Unit (QcertArg.set_display qconf), "Display Intermediate Languages (NRAEnv, NNRC, NNRCMR)");
-    (* ("-display-sexps", Arg.Unit (set_display_sexp conf), "Display Intermediate Languages (NRA) in S-expr form"); *)
+    (* ("-stats", Arg.Unit (set_stats conf), "Produce statistics for the target query"); *)
+    (* ("-stats-all", Arg.Unit (set_stats conf), "Produce statistics for all intermediate queries"); *)
+    ("-emit-all", Arg.Unit (QcertArg.set_emit_all qconf), "Emit generated code of all intermediate queries");
+    (* ("-emit-sexp", Arg.Unit (QcertArg.set_sexpr qconf), "Emit the target query as an s-expression"); *)
+    (* ("-emit-sexp-all", Arg.Unit (QcertArg.set_sexprs qconf), "Emit all intermediate queries as s-expressions"); *)
     (* ("-log-optims", Arg.Unit (Logger.set_trace), "Logs the optimizations/rewrites during compilation"); *)
-    (* ("-test-sexps", Arg.Unit (set_test_sexp conf), "Test Intermediate Languages (NRA) translation to/from S-expr"); *)
-    ("-display-ascii", Arg.Unit (PrettyIL.set_ascii qconf.QcertArg.qconf_display_config), "Avoid unicode symbols");
-    ("-display-margin", Arg.Int (PrettyIL.set_margin qconf.QcertArg.qconf_display_config), "Set right margin for pretty printer");
-    ("-display-dir", Arg.String (QcertArg.set_display_dir qconf), "Target directory for IL files");
-    ("-prefix", Arg.String (CloudantUtil.set_prefix qconf.QcertArg.qconf_cld_conf), "Cloudant DB prefix");
-    ("-java-imports", Arg.String (QcertArg.set_java_imports qconf), "Additional imports for the Java runtime") ]
+    ("-ascii", Arg.Unit (PrettyIL.set_ascii qconf.QcertArg.qconf_pretty_config), "Avoid unicode symbols in emited queries");
+    ("-margin", Arg.Int (PrettyIL.set_margin qconf.QcertArg.qconf_pretty_config), "Set right margin for emited queries");
+    ("-cld-prefix", Arg.String (CloudantUtil.set_prefix qconf.QcertArg.qconf_cld_conf), "Cloudant DB prefix");
+    ("-java-imports", Arg.String (QcertArg.set_java_imports qconf), "Additional imports for the Java runtime");
+    (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
+    (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
+    (* ("-vdistr") *)
+  ]
 
 let anon_args qconf f = QcertArg.add_input_file qconf f
 
 let usage =
-  Sys.argv.(0)
-  ^" [-target language] [-source language] [-dir output] [-harness file] [-io file] [-display-ils] [-prefix name] rule1 rule2 ..."
+  Sys.argv.(0)^" [options] query1 query2 ..."
 
 
 let parse_args () =
@@ -107,9 +110,9 @@ let compile_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) (q
 
 (* Emit *)
 
-let emit_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) display_conf dir file_name q =
+let emit_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) pretty_conf dir file_name q =
   let brand_model, camp_type, foreign_typing = schema(* CompDriver.get_schema dv_conf *) in
-  let s = PrettyIL.pretty_query display_conf q in
+  let s = PrettyIL.pretty_query pretty_conf q in
   let fpref = Filename.chop_extension file_name in
   let ext = ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir fpref) ext in
@@ -141,20 +144,20 @@ let main_one_file qconf schema file_name =
   in
   let () =
     (* emit compiled query *)
-    let dconf = qconf.QcertArg.qconf_display_config in
+    let pconf = qconf.QcertArg.qconf_pretty_config in
     let dir = qconf.QcertArg.qconf_dir in
-    emit_file dv_conf schema dconf dir file_name q_target
+    emit_file dv_conf schema pconf dir file_name q_target
   in
   let () =
-    (* display intermediate languages *)
-    begin match qconf.QcertArg.qconf_display with
+    (* Emit intermediate queries *)
+    begin match qconf.QcertArg.qconf_emit_all with
     | true ->
         let _ =
           List.fold_left
             (fun fname q ->
-              let dconf = qconf.QcertArg.qconf_display_config in
-              let dir = qconf.QcertArg.qconf_display_dir in
-              emit_file dv_conf schema dconf dir fname q;
+              let pconf = qconf.QcertArg.qconf_pretty_config in
+              let dir = qconf.QcertArg.qconf_dir in
+              emit_file dv_conf schema pconf dir fname q;
               let suff =
                 ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
               in

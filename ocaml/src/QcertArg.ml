@@ -25,9 +25,8 @@ type qcert_config = {
     mutable qconf_dir : string option;
     mutable qconf_io : string option;
     qconf_cld_conf : CloudantUtil.cld_config;
-    mutable qconf_display : bool;
-    mutable qconf_display_dir : string option;
-    mutable qconf_display_config : PrettyIL.pretty_config;
+    mutable qconf_emit_all : bool;
+    mutable qconf_pretty_config : PrettyIL.pretty_config;
     mutable qconf_java_imports : string;
     mutable qconf_input_files : string list;
   }
@@ -48,9 +47,8 @@ let default_qconf () =
     qconf_dir = None;
     qconf_io = None;
     qconf_cld_conf = CloudantUtil.default_cld_config ();
-    qconf_display = false;
-    qconf_display_dir = None;
-    qconf_display_config = PrettyIL.default_pretty_config ();
+    qconf_emit_all = false;
+    qconf_pretty_config = PrettyIL.default_pretty_config ();
     qconf_java_imports = "";
     qconf_input_files = [];
   }
@@ -60,8 +58,7 @@ let set_target qconf s = qconf.qconf_target <- Some (language_of_name s)
 let add_path qconf s = qconf.qconf_path <- qconf.qconf_path @ [ language_of_name s ]
 let set_dir qconf s = qconf.qconf_dir <- Some s
 let set_io qconf file_name = qconf.qconf_io <- Some (Util.string_of_file file_name)
-let set_display qconf () = qconf.qconf_display <- true
-let set_display_dir qconf d = qconf.qconf_display_dir <- Some d
+let set_emit_all qconf () = qconf.qconf_emit_all <- true
 let set_java_imports qconf s = qconf.qconf_java_imports <- s
 let add_input_file qconf file = qconf.qconf_input_files <- qconf.qconf_input_files @ [ file ]
 
