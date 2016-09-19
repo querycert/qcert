@@ -839,7 +839,6 @@ Module CompDriver(runtime:CompilerRuntime).
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
-        comp_path : list language;
         comp_brand_rel : list (string * string)(* brand_relation *);
         (* comp_schema : brand_model * camp_type; *)
         comp_vdbindings : vdbindings;
@@ -1102,8 +1101,8 @@ Module CompDriver(runtime:CompilerRuntime).
         driver_of_rev_path config (push_translation config lang dv) rev_path
     end.
 
-  Definition driver_of_conf config :=
-    match List.rev config.(comp_path) with
+  Definition driver_of_path config path :=
+    match List.rev path with
     | nil => Dv_error "Empty compilation path"
     | target :: rev_path =>
         driver_of_rev_path config (driver_of_language target) rev_path
@@ -1220,16 +1219,15 @@ Module CompDriver(runtime:CompilerRuntime).
         admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
   Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
 
-  Theorem driver_of_conf_completeness:
+  Theorem driver_of_path_completeness:
     forall dv,
     forall config,
       is_driver_config config dv ->
       exists target_lang path,
-        config.(comp_path) = path ++ target_lang :: nil ->
-        driver_of_conf config = dv.
+        driver_of_path config (path ++ target_lang :: nil) = dv.
   Proof.
     intros dv config H_dv_config.
-    unfold driver_of_conf.
+    unfold driver_of_path.
     exists (target_language_of_driver dv).
     assert (is_postfix_driver (driver_of_language (target_language_of_driver dv)) dv) as Hpost;
       [ apply target_language_of_driver_is_postfix | ].
@@ -1237,7 +1235,6 @@ Module CompDriver(runtime:CompilerRuntime).
     intros H_exists.
     destruct H_exists.
     exists (List.rev x).
-    intros H_path; rewrite H_path in *; clear H_path.
     rewrite List.rev_unit.
     rewrite List.rev_involutive.
     assumption.

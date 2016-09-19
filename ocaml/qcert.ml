@@ -102,9 +102,9 @@ let parse_file (qconf: QcertArg.qcert_config) (file_name: string) =
 
 (* Compilation *)
 
-let compile_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) (q: CompDriver.query) : CompDriver.query list =
+let compile_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) (path: CompDriver.language list) (q: CompDriver.query) : CompDriver.query list =
   let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
-  let dv = CompDriver.driver_of_conf brand_model foreign_typing dv_conf in
+  let dv = CompDriver.driver_of_path brand_model foreign_typing dv_conf path in
   let dv = CompDriver.fix_driver brand_model foreign_typing dv q in
   CompDriver.compile brand_model foreign_typing dv q
 
@@ -135,7 +135,7 @@ let main_one_file qconf schema file_name =
   let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
   let (qname, q_source) = parse_file qconf file_name in
   let dv_conf = QcertArg.driver_conf_of_qcert_conf qconf (* schema *) qname in
-  let queries = compile_file dv_conf schema q_source in
+  let queries = compile_file dv_conf schema qconf.QcertArg.qconf_path q_source in
   let q_target =
     begin match List.rev queries with
     | q :: _ -> q

@@ -66,7 +66,6 @@ let add_input_file qconf file = qconf.qconf_input_files <- qconf.qconf_input_fil
 (* Driver config *)
 
 let driver_conf_of_qcert_conf qconf (* schema *) qname =
-  let path = qconf.qconf_path in
   let brand_rel =
     [] (* XXX TODO XXX *)
   in
@@ -83,7 +82,6 @@ let driver_conf_of_qcert_conf qconf (* schema *) qname =
   (*   end *)
   (* in *)
   { CompDriver.comp_qname = char_list_of_string qname;
-    comp_path = path;
     comp_brand_rel = brand_rel;
     (* comp_schema = schema; *)
     comp_vdbindings = vdbindings;
