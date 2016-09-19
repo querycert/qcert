@@ -126,7 +126,7 @@ let pp_oql e =
 
 let pp_source conf f =
   begin
-    match language_of_name (get_source_lang conf) with
+    match language_of_name (get_source_lang_caco conf) with
     | CompDriver.L_rule ->
 	let (rn,ru) = ParseFile.parse_rule_from_file f in
 	begin match ru with

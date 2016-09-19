@@ -90,5 +90,7 @@ let parse_query l f : (string * CompDriver.query) =
   | CompDriver.L_spark -> raise (CACo_Error "No parser for Spark available")
   | CompDriver.L_spark2 -> raise (CACo_Error "No parser for Spark 2.0 available")
   | CompDriver.L_cloudant -> raise (CACo_Error "No parser for Cloudant available")
-  | CompDriver.L_error -> raise (CACo_Error "No parser for Error language available")
+  | CompDriver.L_error err ->
+      let err = string_of_char_list err in
+      raise (CACo_Error ("No parser for Error language available: "^err))
   end

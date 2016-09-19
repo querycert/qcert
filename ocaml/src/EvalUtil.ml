@@ -42,7 +42,7 @@ exception OQL_eval of string
 
 let eval_nraenv conf schema h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
-  match language_of_name (get_target_lang conf) with
+  match language_of_name (get_target_lang_caev conf) with
   | CompDriver.L_rule ->
       raise (CACo_Error "Rule eval not supported once compiled into algebra")
   | CompDriver.L_oql ->
@@ -76,6 +76,6 @@ let eval_nraenv conf schema h world op : Data.data option =
       let mrchain = CompDriver.nnrcmr_to_cldmr [] mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->
-      Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang conf);
-      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang conf)))
+      Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang_caev conf);
+      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang_caev conf)))
 

@@ -88,7 +88,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | L_spark : language
     | L_spark2 : language
     | L_cloudant : language
-    | L_error : language.
+    | L_error : string -> language.
 
   Tactic Notation "language_cases" tactic(first) ident(c) :=
     first;
@@ -618,7 +618,7 @@ Module CompDriver(runtime:CompilerRuntime).
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 
-  Definition language_of_name name :=
+  Definition language_of_name name : language:=
     match name with
     | "rule"%string => L_rule
     | "camp"%string => L_camp
@@ -630,13 +630,13 @@ Module CompDriver(runtime:CompilerRuntime).
     | "cldmr"%string => L_cldmr
     | "dnnrc"%string => L_dnnrc_dataset
     | "dnnrc_typed"%string => L_dnnrc_typed_dataset
-    | "rhino"%string | "js"%string => L_javascript
+    | "js"%string | "rhino"%string | "javascript"%string => L_javascript
     | "java"%string => L_java
     | "spark"%string => L_spark
     | "spark2"%string => L_spark2
     | "cloudant"%string => L_cloudant
-    | "error"%string => L_error
-    | _ => L_error
+    | "error"%string => L_error ""
+    | _ => L_error ("'"++name++"' is not a language name")
     end.
 
   Definition name_of_language lang :=
@@ -651,12 +651,12 @@ Module CompDriver(runtime:CompilerRuntime).
     | L_cldmr => "cldmr"%string
     | L_dnnrc_dataset => "dnnrc"%string
     | L_dnnrc_typed_dataset => "dnnrc_typed"%string
-    | L_javascript => "javascript"%string
+    | L_javascript => "js"%string
     | L_java => "java"%string
     | L_spark => "spark"%string
     | L_spark2 => "spark2"%string
     | L_cloudant => "cloudant"%string
-    | L_error => "error"%string
+    | L_error _ => "error"%string
     end.
 
   Definition language_of_driver (dv: driver) :=
@@ -676,7 +676,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_spark _ => L_spark
     | Dv_spark2 _ => L_spark2
     | Dv_cloudant _ => L_cloudant
-    | Dv_error _ => L_error
+    | Dv_error err => L_error ("language of "++err)
     end.
 
   Definition name_of_driver dv :=
@@ -699,8 +699,8 @@ Module CompDriver(runtime:CompilerRuntime).
     | Q_spark _ => L_spark
     | Q_spark2 _ => L_spark2
     | Q_cloudant _ => L_cloudant
-    | Q_error q =>
-      L_error (* "No language corresponding to error query '"++err++"'" *)
+    | Q_error err =>
+      L_error ("No language corresponding to error query '"++err++"'")
     end.
 
   Definition name_of_query q :=
@@ -844,9 +844,6 @@ Module CompDriver(runtime:CompilerRuntime).
         comp_vdbindings : vdbindings;
         comp_java_imports : string; }.
 
-  Definition get_path conf := conf.(comp_path).
-  Definition get_brand_rel conf := conf.(comp_brand_rel).
-
   Definition push_translation config lang dv :=
     match lang with
     | L_rule =>
@@ -865,9 +862,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_java _
       | Dv_spark _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_camp =>
       match dv with
@@ -885,9 +883,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_java _
       | Dv_spark _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_oql =>
       match dv with
@@ -905,9 +904,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_java _
       | Dv_spark _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_nra =>
       match dv with
@@ -925,9 +925,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_java _
       | Dv_spark _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_nraenv =>
       match dv with
@@ -945,9 +946,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_java _
       | Dv_spark _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_nnrc =>
       match dv with
@@ -965,9 +967,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_dnnrc_typed_dataset _
       | Dv_spark _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_nnrcmr =>
       match dv with
@@ -985,9 +988,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_javascript _
       | Dv_java _
       | Dv_spark2 _
-      | Dv_cloudant _
-      | Dv_error _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_cldmr =>
       match dv with
@@ -1005,9 +1009,10 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_javascript _
       | Dv_java _
       | Dv_spark _
-      | Dv_spark2 _
-      | Dv_error _ =>
+      | Dv_spark2 _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_dnnrc_dataset =>
       match dv with
@@ -1051,9 +1056,10 @@ Module CompDriver(runtime:CompilerRuntime).
   | L_java
   | L_spark
   | L_spark2
-  | L_cloudant
-  | L_error =>
-      Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+  | L_cloudant =>
+    Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+  | L_error err =>
+    Dv_error ("No compilation from error ("++err++")")
   end.
 
   Definition driver_of_language lang :=
@@ -1073,7 +1079,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | L_spark => Dv_spark Dv_spark_stop
     | L_spark2 => Dv_spark2 Dv_spark2_stop
     | L_cloudant => Dv_cloudant Dv_cloudant_stop
-    | L_error => Dv_error "Cannot optimize an error"
+    | L_error err => Dv_error ("Cannot optimize an error: "++err)
     end.
 
   Fixpoint driver_of_rev_path config dv rev_path :=
@@ -1166,7 +1172,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_spark (Dv_spark_stop) => (L_spark, None)
     | Dv_spark2 (Dv_spark2_stop) => (L_spark2, None)
     | Dv_cloudant (Dv_cloudant_stop) => (L_cloudant, None)
-    | Dv_error (Dv_error_stop) => (L_error, None)
+    | Dv_error err => (L_error err, None)
     end.
 
   Function target_language_of_driver dv { measure driver_length dv } :=
@@ -1229,6 +1235,25 @@ Module CompDriver(runtime:CompilerRuntime).
   Section CompPaths.
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
+
+    Local Open Scope string_scope.
+
+    Definition get_path_from_source_target (source:language) (target:language) : list language :=
+      match source, target with
+      | L_rule, L_javascript =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | _, _ =>
+        let err :=
+            "No default path defined from "++(name_of_language source)++" to "++(name_of_language target)
+        in
+        L_error err :: nil
+      end.
 
     (* Comp *)
     (* XXX TODO : use driver *)

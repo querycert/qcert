@@ -52,6 +52,42 @@ let usage =
 let parse_args () =
   let qconf = default_comp_config () in
   Arg.parse (args_list qconf) (anon_args qconf) usage;
+  let lconf = get_comp_lang_config qconf in
+  begin match get_source_lang lconf, get_target_lang lconf, get_path lconf with
+  | Some _, _, _ :: _ ->
+      raise (CACo_Error "options -source and -path can not be used simultaneously")
+  | _, Some _, _ :: _ ->
+      raise (CACo_Error "options -target and -path can not be used simultaneously")
+  | None, None, ((source :: _) as path) ->
+      let target =
+        begin match List.rev path with
+        | target :: _ -> target
+        | [] -> assert false
+        end
+      in
+      change_source lconf source;
+      change_target lconf target
+  | source_opt, target_opt, [] ->
+      let source =
+        begin match source_opt with
+        | Some s -> s
+        | None -> "rule"
+        end
+      in
+      let target =
+        begin match target_opt with
+        | Some t -> t
+        | None -> "js"
+        end
+      in
+      let path =
+        CompDriver.get_path_from_source_target (language_of_name source) (language_of_name target)
+      in
+      let path_string =
+        List.map (fun lang -> string_of_char_list (CompDriver.name_of_language lang)) path
+      in
+      set_path lconf path_string
+  end;
   qconf
 
 (* Parsing *)
@@ -87,6 +123,16 @@ let emit_file conf schema file_name q =
   let fout = outname (target_f (get_dir conf) fpref) ext in
   make_file fout s
 
+(* S-expr *)
+(* XXX TODO XXX *)
+let emit_sexp_file conf schema file_name q = ()
+  (* let brand_model, camp_type, foreign_typing = schema (\* CompDriver.get_schema dv_conf *\) in *)
+  (* let s = PrettyIL.pretty_query !charsetbool !margin q in *)
+  (* let fpref = Filename.chop_extension file_name in *)
+  (* let ext = suffix_of_language (CompDriver.language_of_query brand_model q) in *)
+  (* let fout = outname (target_f (get_dir conf) fpref) ext in *)
+  (* make_file fout s *)
+
 
 (* Main *)
 
@@ -101,20 +147,45 @@ let main_one_file qconf schema file_name =
     | _ -> raise (CACo_Error "No compilation result!")
     end
   in
-  begin match !(get_target_display qconf) with
-  | true ->
-      let _ =
-        List.fold_left
-          (fun fname q ->
-            emit_file qconf schema fname q;
-            let suff =
-              suffix_of_language (CompDriver.language_of_query brand_model q)
-            in
-            (Filename.chop_extension fname)^suff)
-          file_name queries
-      in ()
-  | false -> emit_file qconf schema file_name q_target
-  end
+  let () =
+    (* emit compiled query *)
+    emit_file qconf schema file_name q_target
+  in
+  let () =
+    (* display intermediate languages *)
+    begin match !(get_target_display qconf) with
+    | true ->
+        let _ =
+          List.fold_left
+            (fun fname q ->
+              emit_file qconf schema fname q;
+              let suff =
+                suffix_of_language (CompDriver.language_of_query brand_model q)
+              in
+              (Filename.chop_extension fname)^suff)
+            file_name queries
+        in ()
+    | false -> ()
+    end
+  in
+  let () =
+    (* Display S-expr *)
+    begin match !(get_target_display_sexp qconf) with
+    | true ->
+        let _ =
+          List.fold_left
+            (fun fname q ->
+              emit_sexp_file qconf schema fname q;
+              let suff =
+                suffix_of_language (CompDriver.language_of_query brand_model q)
+              in
+              (Filename.chop_extension fname)^suff)
+            file_name queries
+        in ()
+    | false -> ()
+    end
+  in
+  ()
 
 let () =
   let qconf = parse_args () in

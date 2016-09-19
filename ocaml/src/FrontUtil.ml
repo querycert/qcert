@@ -64,7 +64,7 @@ let nraenv_of_oql f =
   ("OQL",CompDriver.oql_to_nraenv o)
   
 let nraenv_of_input conf f =
-  match language_of_name (get_source_lang conf) with
+  match language_of_name (get_source_lang_caco conf) with
   | CompDriver.L_rule ->
       nraenv_of_rule f
   | CompDriver.L_oql ->

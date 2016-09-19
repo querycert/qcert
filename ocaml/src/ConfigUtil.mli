@@ -24,13 +24,18 @@ type lang_config
 val default_eval_lang_config : unit -> lang_config
 val default_comp_lang_config : unit -> lang_config
 
-val get_source_lang : lang_config -> string
-val get_target_lang : lang_config -> string
+val get_source_lang : lang_config -> string option
+val get_source_lang_caco : lang_config -> string
+val get_source_lang_caev : lang_config -> string
+val get_target_lang : lang_config -> string option
+val get_target_lang_caco : lang_config -> string
+val get_target_lang_caev : lang_config -> string
 val get_path : lang_config -> string list
 
 val change_source : lang_config -> string -> unit
 val change_target : lang_config -> string -> unit
 val add_path : lang_config -> string -> unit
+val set_path : lang_config -> string list -> unit
 
 val get_cld_config : lang_config -> CloudantUtil.cld_config
 
@@ -55,7 +60,7 @@ val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
 
 val suffix_of_language : CompDriver.language -> string
-val suffix_target : lang_config -> string
+(* val suffix_target : lang_config -> string *)
 
 val suffix_sdata : unit -> string
 

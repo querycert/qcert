@@ -28,29 +28,53 @@ let language_of_name name =
   CompDriver.language_of_name name
 
 type lang_config =
-    { mutable slang : string;
-      mutable tlang : string;
+    { mutable slang : string option;
+      mutable tlang : string option;
       mutable path : string list;
       cld_conf : cld_config }
 
 let default_eval_lang_config () =
-  { slang = "rule";
-    tlang = "rule";
+  { slang = None; (* default: "rule" *)
+    tlang = None; (* default: "rule" *)
     path = [];
     cld_conf = default_cld_config () }
 
 let default_comp_lang_config () =
-  { slang = "rule";
-    tlang = "js";
+  { slang = None; (* default: "rule" *)
+    tlang = None; (* default: "js" *)
     path = [];
     cld_conf = default_cld_config () }
 
 let get_source_lang conf = conf.slang
-let change_source conf s = conf.slang <- s
+let change_source conf s = conf.slang <- Some s
 let get_target_lang conf = conf.tlang
-let change_target conf s = conf.tlang <- s
+let change_target conf s = conf.tlang <- Some s
+
+let get_source_lang_caco conf =
+  begin match get_source_lang conf with
+  | Some s -> s
+  | None -> "rule"
+  end
+let get_source_lang_caev conf =
+  begin match get_source_lang conf with
+  | Some s -> s
+  | None -> "rule"
+  end
+
+let get_target_lang_caco conf =
+  begin match get_target_lang conf with
+  | Some s -> s
+  | None -> "js"
+  end
+let get_target_lang_caev conf =
+  begin match get_target_lang conf with
+  | Some s -> s
+  | None -> "rule"
+  end
+
 
 let add_path conf s = conf.path <- conf.path @ [s]
+let set_path conf path = conf.path <- conf.path @ path
 let get_path conf = conf.path
 
 let get_cld_config conf = conf.cld_conf
@@ -101,10 +125,10 @@ let suffix_of_language lang =
   | CompDriver.L_spark -> suffix_spark ()
   | CompDriver.L_spark2 -> suffix_spark2 ()
   | CompDriver.L_cloudant -> suffix_cld_design ()
-  | CompDriver.L_error -> suffix_error ()
+  | CompDriver.L_error _ -> suffix_error ()
 
-let suffix_target conf =
-  suffix_of_language (language_of_name (conf.tlang))
+(* let suffix_target conf = *)
+(*   suffix_of_language (language_of_name (conf.tlang)) *)
 
 (* Evaluator Section *)
 
