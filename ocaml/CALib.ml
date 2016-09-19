@@ -30,8 +30,10 @@ open Compiler.EnhancedCompiler
 type schema = RType.brand_model * RType.camp_type
 
 let schema_of_io (io:string) =
-  let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string io) in
-  TypeUtil.process_schema schema_content wmType
+  let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io) in
+  let brand_model = sch.TypeUtil.sch_brand_model in
+  let camp_type = sch.TypeUtil.sch_camp_type in
+  (brand_model, camp_type)
 
 (* Abstract AST types *)
 

@@ -50,6 +50,14 @@ let usage =
 let parse_args () =
   let qconf = QcertArg.default_qconf () in
   Arg.parse (args_list qconf) (anon_args qconf) usage;
+  let _schema =
+    begin match qconf.QcertArg.qconf_io with
+    | Some io ->
+        qconf.QcertArg.qconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
+    | None ->
+        ()
+    end
+  in
   begin match qconf.QcertArg.qconf_source, qconf.QcertArg.qconf_target, qconf.QcertArg.qconf_path with
   | None, None, ((source :: _) as path) ->
       let target =
@@ -102,16 +110,17 @@ let parse_file (qconf: QcertArg.qcert_config) (file_name: string) =
 
 (* Compilation *)
 
-let compile_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) (path: CompDriver.language list) (q: CompDriver.query) : CompDriver.query list =
-  let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
+let compile_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) (path: CompDriver.language list) (q: CompDriver.query) : CompDriver.query list =
+  let brand_model = schema.TypeUtil.sch_brand_model in
+  let foreign_typing = schema.TypeUtil.sch_foreign_typing in
   let dv = CompDriver.driver_of_path brand_model foreign_typing dv_conf path in
   let dv = CompDriver.fix_driver brand_model foreign_typing dv q in
   CompDriver.compile brand_model foreign_typing dv q
 
 (* Emit *)
 
-let emit_file (dv_conf: CompDriver.driver_config) (* XXX *)schema(* XXX *) pretty_conf dir file_name q =
-  let brand_model, camp_type, foreign_typing = schema(* CompDriver.get_schema dv_conf *) in
+let emit_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
+  let brand_model = schema.TypeUtil.sch_brand_model (* CompDriver.get_schema dv_conf *) in
   let s = PrettyIL.pretty_query pretty_conf q in
   let fpref = Filename.chop_extension file_name in
   let ext = ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q) in
@@ -131,8 +140,9 @@ let emit_sexp_file conf schema file_name q = ()
 
 (* Main *)
 
-let main_one_file qconf schema file_name =
-  let brand_model, camp_type, foreign_typing = schema (* CompDriver.get_schema dv_conf *) in
+let main_one_file qconf file_name =
+  let schema = qconf.QcertArg.qconf_schema in
+  let brand_model = schema.TypeUtil.sch_brand_model (* CompDriver.get_schema dv_conf *) in
   let (qname, q_source) = parse_file qconf file_name in
   let dv_conf = QcertArg.driver_conf_of_qcert_conf qconf (* schema *) qname in
   let queries = compile_file dv_conf schema qconf.QcertArg.qconf_path q_source in
@@ -188,22 +198,6 @@ let main_one_file qconf schema file_name =
 
 let () =
   let qconf = parse_args () in
-  let schema =
-    begin match qconf.QcertArg.qconf_io with
-    | Some io ->
-        let (schema_content, camp_type) =
-          TypeUtil.extract_schema (ParseString.parse_io_from_string io)
-        in
-        let brand_model, camp_type =
-          TypeUtil.process_schema schema_content camp_type
-        in
-        (brand_model, camp_type, Enhanced.Model.foreign_typing brand_model)
-    | None ->
-        (* XXX TODO XXX *)
-        (* (RType.make_brand_model brand_rel [], []) *)
-        assert false
-    end
-  in
   List.iter
-    (fun file_name -> main_one_file qconf schema file_name)
+    (fun file_name -> main_one_file qconf file_name)
     qconf.QcertArg.qconf_input_files

@@ -839,8 +839,8 @@ Module CompDriver(runtime:CompilerRuntime).
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
-        comp_brand_rel : list (string * string)(* brand_relation *);
-        (* comp_schema : brand_model * camp_type; *)
+        comp_brand_rel : list (string * string) (* brand_relation *);
+        (* comp_schema : brand_model * rtype; *)
         comp_vdbindings : vdbindings;
         comp_java_imports : string; }.
 

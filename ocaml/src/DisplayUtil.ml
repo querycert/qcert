@@ -74,7 +74,7 @@ let make_pretty_config charkind margin =
   end;
   set_margin dpc margin;
   dpc
-    
+
 let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string option) (dfname:string) op =
   let modelandtype' =
     begin
@@ -84,8 +84,9 @@ let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
 	begin
 	  match ios with
 	  | Some io ->
-	      let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string io) in
-	      let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
+              let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io) in
+              let brand_model = sch.TypeUtil.sch_brand_model in
+              let wmRType = sch.TypeUtil.sch_camp_type in
 	      Some (brand_model, wmRType)
 	  | None -> None
 	end
@@ -110,7 +111,7 @@ let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
   end
 
 (* S-expression hooks *)
-      
+
 let sexp_string_to_camp s = ParseString.parse_camp_sexp_from_string s
 let camp_to_sexp_string p = SExp.sexp_to_string (AstsToSExp.camp_to_sexp p)
 
@@ -127,7 +128,7 @@ let sexp_string_to_cldmr s = ParseString.parse_cldmr_sexp_from_string s
 let cldmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.cldmr_to_sexp n)
 
 (* Top-level *)
-    
+
 let sexp_nraenv_top dfname op =
   let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
   let display_nra = nraenv_to_sexp_string op in
@@ -149,7 +150,7 @@ let sexp_nraenv_top dfname op =
   end
 
 (* SData section *)
-    
+
 let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
   let fpref = Filename.chop_extension fname in
   let fout_sdata = outname (target_f (get_data_dir conf) fpref) (suffix_sdata ()) in
@@ -157,4 +158,3 @@ let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
     String.concat "\n" sdata
   in
   make_file fout_sdata sdata
-

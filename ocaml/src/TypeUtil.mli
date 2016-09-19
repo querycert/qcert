@@ -15,25 +15,25 @@
  *)
 
 open Util
-open ConfigUtil
 open DataUtil
 open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
-type schema_content =
-    ((string * string) list
-       * string
-       * (string * string) list
-       * (string * rtype_content) list)
+type io_schema = {
+    io_brand_model : (string * string) list;
+    io_name : string;
+    io_brand_type : (string * string) list;
+    io_type_definitions : (string * rtype_content) list;
+  }
 
-val make_brand_relation : (string * string) list -> (char list * char list) list
-  
-val rtype_content_to_rtype : (string * string) list -> rtype_content -> RType.camp_type
-  
-val model_content_to_model : (string * string) list -> model_content -> RType.brand_model option
+type schema = {
+    sch_brand_model : RType.brand_model;
+    sch_camp_type : RType.camp_type;
+    sch_foreign_typing : Compiler.foreign_typing;
+    sch_io_schema : io_schema option;
+  }
 
-val extract_schema : Data.json -> schema_content * rtype_content
+val empty_schema : schema
 
-val process_schema : schema_content -> rtype_content -> RType.brand_model * RType.camp_type
-
+val schema_of_io_json : Data.json -> schema

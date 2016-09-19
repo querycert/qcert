@@ -24,6 +24,7 @@ type qcert_config = {
     mutable qconf_path : CompDriver.language list;
     mutable qconf_dir : string option;
     mutable qconf_io : string option;
+    mutable qconf_schema : TypeUtil.schema;
     qconf_cld_conf : CloudantUtil.cld_config;
     mutable qconf_emit_all : bool;
     mutable qconf_pretty_config : PrettyIL.pretty_config;
@@ -46,6 +47,7 @@ let default_qconf () =
     qconf_path = [];
     qconf_dir = None;
     qconf_io = None;
+    qconf_schema = TypeUtil.empty_schema;
     qconf_cld_conf = CloudantUtil.default_cld_config ();
     qconf_emit_all = false;
     qconf_pretty_config = PrettyIL.default_pretty_config ();

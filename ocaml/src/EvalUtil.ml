@@ -55,12 +55,12 @@ let eval_nraenv conf schema h world op : Data.data option =
       let nrc = CompDriver.nraenv_optim_to_nnrc_optim op in
       EvalTop.nrc_eval_top h nrc world
   | CompDriver.L_dnnrc_dataset ->
-      let (brand_model,_) =
+      let brand_model =
 	begin match schema with
 	| Some sc ->
 	    begin try
-	      let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string sc) in
-	      TypeUtil.process_schema schema_content wmType
+              let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string sc) in
+              sch.TypeUtil.sch_brand_model
 	    with
 	    | _ -> raise (CACo_Error "Spark2 target requires a valid schema I/O file")
 	    end
