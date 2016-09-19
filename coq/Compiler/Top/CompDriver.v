@@ -90,6 +90,26 @@ Module CompDriver(runtime:CompilerRuntime).
     | L_cloudant : language
     | L_error : language.
 
+  Tactic Notation "language_cases" tactic(first) ident(c) :=
+    first;
+    [ Case_aux c "L_rule"%string
+    | Case_aux c "L_camp"%string
+    | Case_aux c "L_oql"%string
+    | Case_aux c "L_nra"%string
+    | Case_aux c "L_nraenv"%string
+    | Case_aux c "L_nnrc"%string
+    | Case_aux c "L_nnrcmr"%string
+    | Case_aux c "L_cldmr"%string
+    | Case_aux c "L_dnnrc_dataset"%string
+    | Case_aux c "L_dnnrc_typed_dataset"%string
+    | Case_aux c "L_javascript"%string
+    | Case_aux c "L_java"%string
+    | Case_aux c "L_spark"%string
+    | Case_aux c "L_spark2"%string
+    | Case_aux c "L_cloudant"%string
+    | Case_aux c "L_error"%string].
+
+
   Inductive query {bm:brand_model} : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query
@@ -107,6 +127,25 @@ Module CompDriver(runtime:CompilerRuntime).
     | Q_spark2 : spark2 -> query
     | Q_cloudant : cloudant -> query
     | Q_error : string -> query.
+
+  Tactic Notation "query_cases" tactic(first) ident(c) :=
+    first;
+    [ Case_aux c "Q_rule"%string
+    | Case_aux c "Q_camp"%string
+    | Case_aux c "Q_oql"%string
+    | Case_aux c "Q_nra"%string
+    | Case_aux c "Q_nraenv"%string
+    | Case_aux c "Q_nnrc"%string
+    | Case_aux c "Q_nnrcmr"%string
+    | Case_aux c "Q_cldmr"%string
+    | Case_aux c "Q_dnnrc_dataset"%string
+    | Case_aux c "Q_dnnrc_typed_dataset"%string
+    | Case_aux c "Q_javascript"%string
+    | Case_aux c "Q_java"%string
+    | Case_aux c "Q_spark"%string
+    | Case_aux c "Q_spark2"%string
+    | Case_aux c "Q_cloudant"%string
+    | Case_aux c "Q_error"%string].
 
   (* Translation functions *)
 
@@ -321,6 +360,26 @@ Module CompDriver(runtime:CompilerRuntime).
   | Dv_spark2 : spark2_driver -> driver
   | Dv_cloudant : cloudant_driver -> driver
   | Dv_error : string -> driver.
+
+
+  Tactic Notation "driver_cases" tactic(first) ident(c) :=
+    first;
+    [ Case_aux c "Dv_rule"%string
+    | Case_aux c "Dv_camp"%string
+    | Case_aux c "Dv_oql"%string
+    | Case_aux c "Dv_nra"%string
+    | Case_aux c "Dv_nraenv"%string
+    | Case_aux c "Dv_nnrc"%string
+    | Case_aux c "Dv_nnrcmr"%string
+    | Case_aux c "Dv_cldmr"%string
+    | Case_aux c "Dv_dnnrc_dataset"%string
+    | Case_aux c "Dv_dnnrc_typed_dataset"%string
+    | Case_aux c "Dv_javascript"%string
+    | Case_aux c "Dv_java"%string
+    | Case_aux c "Dv_spark"%string
+    | Case_aux c "Dv_spark2"%string
+    | Case_aux c "Dv_cloudant"%string
+    | Case_aux c "Dv_error"%string ].
 
   (* Compilers function *)
 
@@ -553,18 +612,11 @@ Module CompDriver(runtime:CompilerRuntime).
     | (_, _) => (Q_error "incompatible query and driver") :: nil
     end.
 
+  End CompDriverCompile.
 
-  Record driver_config :=
-    mkDvConfig
-      { comp_qname : string;
-        comp_path : list language;
-        comp_brand_rel : list (string * string)(* brand_relation *);
-        (* comp_schema : brand_model * camp_type; *)
-        comp_vdbindings : vdbindings;
-        comp_java_imports : string; }.
-
-  Definition get_path conf := conf.(comp_path).
-  Definition get_brand_rel conf := conf.(comp_brand_rel).
+  Section CompDriverUtil.
+    Context {bm:brand_model}.
+    Context {ftyping: foreign_typing}.
 
   Definition language_of_name name :=
     match name with
@@ -653,6 +705,147 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition name_of_query q :=
     name_of_language (language_of_query q).
+
+  Definition driver_length_javascript (dv: javascript_driver) :=
+  match dv with
+  | Dv_javascript_stop => 1
+  end.
+
+  Definition driver_length_java (dv: java_driver) :=
+    match dv with
+    | Dv_java_stop => 1
+    end.
+
+  Definition driver_length_spark (dv: spark_driver) :=
+    match dv with
+    | Dv_spark_stop => 1
+    end.
+
+  Definition driver_length_spark2 (dv: spark2_driver) :=
+    match dv with
+    | Dv_spark2_stop => 1
+    end.
+
+  Definition driver_length_cloudant (dv: cloudant_driver) :=
+    match dv with
+    | Dv_cloudant_stop => 1
+    end.
+
+  Definition driver_length_cldmr (dv: cldmr_driver) :=
+    match dv with
+    | Dv_cldmr_stop => 1
+    | Dv_cldmr_to_cloudant rulename h dv => 1 + driver_length_cloudant dv
+    end.
+
+  Definition driver_length_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) :=
+    match dv with
+    | Dv_dnnrc_typed_dataset_stop => 1
+    | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv => 1 + driver_length_spark2 dv
+    end.
+
+  Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
+    match dv with
+    | Dv_dnnrc_dataset_stop => 1
+    end.
+
+  Fixpoint driver_length_camp (dv: camp_driver) :=
+    match dv with
+    | Dv_camp_stop => 1
+    | Dv_camp_to_nraenv dv => 1 + driver_length_nraenv dv
+    | Dv_camp_to_nra dv => 1 + driver_length_nra dv
+    end
+
+  with driver_length_nra (dv: nra_driver)  :=
+    match dv with
+    | Dv_nra_stop => 1
+    | Dv_nra_optim dv => 1 + driver_length_nra dv
+    | Dv_nra_to_nnrc dv => 1 + driver_length_nnrc dv
+    | Dv_nra_to_nraenv dv => 1 + driver_length_nraenv dv
+    end
+
+  with driver_length_nraenv (dv: nraenv_driver) :=
+    match dv with
+    | Dv_nraenv_stop => 1
+    | Dv_nraenv_optim dv => 1 + driver_length_nraenv dv
+    | Dv_nraenv_to_nnrc dv => 1 + driver_length_nnrc dv
+    | Dv_nraenv_to_nra dv => 1 + driver_length_nra dv
+    end
+
+  with driver_length_nnrc (dv: nnrc_driver) :=
+    match dv with
+    | Dv_nnrc_stop => 1
+    | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
+    | Dv_nnrc_to_nnrcmr inputs_loc dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrc_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
+    | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
+    | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
+    | Dv_nnrc_to_camp avoid dv => 1 + driver_length_camp dv
+    end
+
+  with driver_length_nnrcmr (dv: nnrcmr_driver) :=
+    match dv with
+    | Dv_nnrcmr_stop => 1
+    | Dv_nnrcmr_optim dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrcmr_to_spark rulename dv => 1 + driver_length_spark dv
+    | Dv_nnrcmr_to_nnrc dv => 1 + driver_length_nnrc dv
+    | Dv_nnrcmr_to_cldmr h dv => 1 + driver_length_cldmr dv
+    | Dv_nnrcmr_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
+    end.
+
+  Definition driver_length_rule (dv: rule_driver) :=
+    match dv with
+    | Dv_rule_stop => 1
+    | Dv_rule_to_camp dv => 1 + driver_length_camp dv
+    | Dv_rule_to_nraenv dv => 1 + driver_length_nraenv dv
+    | Dv_rule_to_nra dv => 1 + driver_length_nra dv
+    end.
+
+  Definition driver_length_oql (dv: oql_driver) :=
+    match dv with
+    | Dv_oql_stop => 1
+    | Dv_oql_to_nraenv dv => 1 + driver_length_nraenv dv
+    end.
+
+  Definition driver_length (dv: driver)  :=
+    match dv with
+    | Dv_rule dv => driver_length_rule dv
+    | Dv_camp dv => driver_length_camp dv
+    | Dv_oql dv => driver_length_oql dv
+    | Dv_nra dv => driver_length_nra dv
+    | Dv_nraenv dv => driver_length_nraenv dv
+    | Dv_nnrc dv => driver_length_nnrc dv
+    | Dv_nnrcmr dv => driver_length_nnrcmr dv
+    | Dv_cldmr dv => driver_length_cldmr dv
+    | Dv_dnnrc_dataset dv => driver_length_dnnrc_dataset dv
+    | Dv_dnnrc_typed_dataset dv => driver_length_dnnrc_typed_dataset dv
+    | Dv_javascript dv => driver_length_javascript dv
+    | Dv_java dv => driver_length_java dv
+    | Dv_spark dv => driver_length_spark dv
+    | Dv_spark2 dv => driver_length_spark2 dv
+    | Dv_cloudant dv => driver_length_cloudant dv
+    | Dv_error s => 1
+    end.
+
+
+  End CompDriverUtil.
+
+  (* Compilers config *)
+
+  Section CompDriverConfig.
+    Context {bm:brand_model}.
+    Context {ftyping: foreign_typing}.
+
+  Record driver_config :=
+    mkDvConfig
+      { comp_qname : string;
+        comp_path : list language;
+        comp_brand_rel : list (string * string)(* brand_relation *);
+        (* comp_schema : brand_model * camp_type; *)
+        comp_vdbindings : vdbindings;
+        comp_java_imports : string; }.
+
+  Definition get_path conf := conf.(comp_path).
+  Definition get_brand_rel conf := conf.(comp_brand_rel).
 
   Definition push_translation config lang dv :=
     match lang with
@@ -906,7 +1099,132 @@ Module CompDriver(runtime:CompilerRuntime).
     | (_, _) => dv
     end.
 
-  End CompDriverCompile.
+
+  (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+  (* XXX Definir le principe d'induction sur driver !!!! XXX *)
+
+  Definition is_driver_config (config: driver_config) (dv: driver) : Prop :=
+    (* XXXX TODO XXX *)
+    True.
+
+  Definition no_dv_error (dv: driver) : Prop :=
+    match dv with
+    | Dv_error _ => False
+    | _ => True
+    end.
+
+  Inductive is_postfix_driver : driver -> driver -> Prop :=
+  | is_postfix_eq :
+      forall dv' dv, dv' = dv -> is_postfix_driver dv' dv
+  | is_postfix_plus_one :
+      forall dv' dv,
+      forall config lang dv_plus_one,
+        is_postfix_driver dv' dv ->
+        push_translation config lang dv = dv_plus_one ->
+        no_dv_error dv_plus_one ->
+        is_postfix_driver dv' dv_plus_one.
+
+  Definition pop_transition dv : language * option driver :=
+    match dv with
+    | Dv_rule (Dv_rule_stop) => (L_rule, None)
+    | Dv_rule (Dv_rule_to_camp dv) => (L_rule, Some (Dv_camp dv))
+    | Dv_rule (Dv_rule_to_nraenv dv) => (L_rule, Some (Dv_nraenv dv))
+    | Dv_rule (Dv_rule_to_nra dv) => (L_rule, Some (Dv_nra dv))
+    | Dv_camp (Dv_camp_stop) => (L_camp, None)
+    | Dv_camp (Dv_camp_to_nraenv dv) => (L_camp, Some (Dv_nraenv dv))
+    | Dv_camp (Dv_camp_to_nra dv) => (L_camp, Some (Dv_nra dv))
+    | Dv_oql (Dv_oql_stop) => (L_oql, None)
+    | Dv_oql (Dv_oql_to_nraenv dv) => (L_oql, Some (Dv_nraenv dv))
+    | Dv_nra (Dv_nra_stop) => (L_nra, None)
+    | Dv_nra (Dv_nra_to_nnrc dv) => (L_nra, Some (Dv_nnrc dv))
+    | Dv_nra (Dv_nra_to_nraenv dv) => (L_nra, Some (Dv_nraenv dv))
+    | Dv_nra (Dv_nra_optim dv) => (L_nra, Some (Dv_nra dv))
+    | Dv_nraenv (Dv_nraenv_stop) => (L_nraenv, None)
+    | Dv_nraenv (Dv_nraenv_to_nnrc dv) => (L_nraenv, Some (Dv_nnrc dv))
+    | Dv_nraenv (Dv_nraenv_to_nra dv) => (L_nraenv, Some (Dv_nra dv))
+    | Dv_nraenv (Dv_nraenv_optim dv) => (L_nraenv, Some (Dv_nraenv dv))
+    | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
+    | Dv_nnrc (Dv_nnrc_to_nnrcmr vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
+    | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
+    | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
+    | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
+    | Dv_nnrc (Dv_nnrc_to_camp vdbindings dv) => (L_nnrc, Some (Dv_camp dv))
+    | Dv_nnrc (Dv_nnrc_optim dv) => (L_nnrc, Some (Dv_nnrc dv))
+    | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
+    | Dv_nnrcmr (Dv_nnrcmr_to_spark name dv) => (L_nnrcmr, Some (Dv_spark dv))
+    | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
+    | Dv_nnrcmr (Dv_nnrcmr_to_dnnrc_dataset dv) => (L_nnrcmr, Some (Dv_dnnrc_dataset dv))
+    | Dv_nnrcmr (Dv_nnrcmr_to_cldmr brand_rel dv) => (L_nnrcmr, Some (Dv_cldmr dv))
+    | Dv_nnrcmr (Dv_nnrcmr_optim dv) => (L_nnrcmr, Some (Dv_nnrcmr dv))
+    | Dv_cldmr (Dv_cldmr_stop) => (L_cldmr, None)
+    | Dv_cldmr (Dv_cldmr_to_cloudant name brand_rel dv) => (L_cldmr, Some (Dv_cloudant dv))
+    | Dv_dnnrc_dataset (Dv_dnnrc_dataset_stop) => (L_dnnrc_dataset, None)
+    | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_stop) => (L_dnnrc_typed_dataset, None)
+    | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 rtype _ dv) => (L_dnnrc_typed_dataset, Some (Dv_spark2 dv))
+    | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
+    | Dv_java (Dv_java_stop) => (L_java, None)
+    | Dv_spark (Dv_spark_stop) => (L_spark, None)
+    | Dv_spark2 (Dv_spark2_stop) => (L_spark2, None)
+    | Dv_cloudant (Dv_cloudant_stop) => (L_cloudant, None)
+    | Dv_error (Dv_error_stop) => (L_error, None)
+    end.
+
+  Function target_language_of_driver dv { measure driver_length dv } :=
+    match pop_transition dv with
+    | (lang, None) => lang
+    | (_, Some dv) => target_language_of_driver dv
+    end.
+  Proof.
+      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+  Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+
+  Lemma target_language_of_driver_is_postfix:
+    forall dv,
+      let target := target_language_of_driver dv in
+      is_postfix_driver (driver_of_language target) dv.
+  Proof.
+    driver_cases (induction dv) Case;
+      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+  Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+
+
+  Lemma driver_of_rev_path_completeness:
+    forall dv dv',
+      is_postfix_driver dv' dv ->
+      forall config,
+        is_driver_config config dv ->
+        exists rev_path,
+          driver_of_rev_path config dv' rev_path = dv.
+  Proof.
+    driver_cases (induction dv) Case;
+      simpl; intros dv' H_post config H_config;
+        admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+  Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+
+  Theorem driver_of_conf_completeness:
+    forall dv,
+    forall config,
+      is_driver_config config dv ->
+      exists target_lang path,
+        config.(comp_path) = path ++ target_lang :: nil ->
+        driver_of_conf config = dv.
+  Proof.
+    intros dv config H_dv_config.
+    unfold driver_of_conf.
+    exists (target_language_of_driver dv).
+    assert (is_postfix_driver (driver_of_language (target_language_of_driver dv)) dv) as Hpost;
+      [ apply target_language_of_driver_is_postfix | ].
+    generalize (driver_of_rev_path_completeness dv ((driver_of_language (target_language_of_driver dv))) Hpost config H_dv_config).
+    intros H_exists.
+    destruct H_exists.
+    exists (List.rev x).
+    intros H_path; rewrite H_path in *; clear H_path.
+    rewrite List.rev_unit.
+    rewrite List.rev_involutive.
+    assumption.
+  Qed.
+
+  End CompDriverConfig.
 
   Section CompPaths.
     Context {bm:brand_model}.
