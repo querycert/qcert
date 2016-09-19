@@ -1301,12 +1301,12 @@ Module CompDriver(runtime:CompilerRuntime).
 
     (* Used in queryTests: *)
     Definition rule_to_nraenv_to_nnrc_optim (q:rule) : nnrc :=
-      nnrc_optim (nraenv_to_nnrc (rule_to_nraenv q)).
+      nnrc_optim (nraenv_to_nnrc (nraenv_optim (rule_to_nraenv q))).
     Definition rule_to_nraenv_to_nnrc_optim_to_dnnrc
                (inputs_loc:vdbindings) (q:rule) : dnnrc_dataset :=
-      nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (rule_to_nraenv q))).
+      nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (nraenv_optim (rule_to_nraenv q)))).
     Definition rule_to_nraenv_to_nnrc_optim_to_javascript (q:rule) : string :=
-      nnrc_to_javascript (nnrc_optim (nraenv_to_nnrc (rule_to_nraenv q))).
+      nnrc_to_javascript (nnrc_optim (nraenv_to_nnrc (nraenv_optim (rule_to_nraenv q)))).
     Definition rule_to_nnrcmr (q:rule) : nnrcmr :=
       nnrcmr_optim (nnrc_to_nnrcmr_comptop (rule_to_nraenv_to_nnrc_optim q)).
     Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=
