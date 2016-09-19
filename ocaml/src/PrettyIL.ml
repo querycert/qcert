@@ -1034,7 +1034,9 @@ let pretty_plug_dataset greek ff a =
 
 (* Pretty languages *)
 
-let pretty_query greek margin q =
+let pretty_query pconf q =
+  let greek = get_charset_bool pconf in
+  let margin = pconf.margin in
   begin match q with
   | Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)

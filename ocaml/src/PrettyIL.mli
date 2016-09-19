@@ -102,4 +102,4 @@ val pretty_rtype : bool -> int -> RType.camp_type -> string
 
 (* Pretty query *)
 
-val pretty_query : bool -> int -> CompDriver.query -> string
+val pretty_query : pretty_config -> CompDriver.query -> string

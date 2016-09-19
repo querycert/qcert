@@ -18,14 +18,10 @@ open Util
 open CloudantUtil
 open DataUtil
 open Compiler.EnhancedCompiler
+open QcertArg
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
-let language_of_name name =
-  let name =
-    char_list_of_string (String.lowercase name)
-  in
-  CompDriver.language_of_name name
 
 type lang_config =
     { mutable slang : string option;
@@ -256,33 +252,3 @@ let get_pretty_config conf = conf.comp_pretty_config
 
 let set_java_imports conf imports = conf.java_imports <- imports
 let get_java_imports conf = conf.java_imports
-
-
-(* Driver config *)
-
-let driver_conf_of_args args (* schema *) qname =
-  let path =
-    List.map language_of_name (get_comp_lang_config args).path
-  in
-  let brand_rel =
-    [] (* XXX TODO XXX *)
-  in
-  let vdbindings =
-    [] (* XXX TODO XXX *)
-  in
-  (* let schema = *)
-  (*   begin match schema with *)
-  (*   | Some schema -> schema *)
-  (*   | None -> *)
-  (*       (\* XXX TODO XXX *\) *)
-  (*       (\* (RType.make_brand_model brand_rel [], []) *\) *)
-  (*       assert false *)
-  (*   end *)
-  (* in *)
-  { CompDriver.comp_qname = char_list_of_string qname;
-    comp_path = path;
-    comp_brand_rel = brand_rel;
-    (* comp_schema = schema; *)
-    comp_vdbindings = vdbindings;
-    comp_java_imports = char_list_of_string args.java_imports; }
-

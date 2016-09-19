@@ -619,7 +619,7 @@ Module CompDriver(runtime:CompilerRuntime).
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 
-  Definition language_of_name name : language:=
+  Definition language_of_name_case_sensitive name : language:=
     match name with
     | "rule"%string => L_rule
     | "camp"%string => L_camp

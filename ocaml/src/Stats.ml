@@ -15,6 +15,7 @@
  *)
 
 open Util
+open QcertArg
 open ConfigUtil
 open ParseFile
 open Compiler.EnhancedCompiler

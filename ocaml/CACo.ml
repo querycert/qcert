@@ -17,6 +17,7 @@
 (* This is main for the Camp Compiler *)
 
 open Util
+open QcertArg
 open ConfigUtil
 open CloudantUtil
 open Compiler.EnhancedCompiler

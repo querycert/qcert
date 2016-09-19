@@ -18,6 +18,7 @@ open Util
 open ConfigUtil
 open ParseFile
 open Compiler.EnhancedCompiler
+open QcertArg
 
 (* Frontend Eval *)
 

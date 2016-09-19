@@ -39,8 +39,6 @@ val set_path : lang_config -> string list -> unit
 
 val get_cld_config : lang_config -> CloudantUtil.cld_config
 
-val language_of_name : string -> CompDriver.language
-
 (* Target language *)
 
 val suffix_nra : unit -> string
@@ -128,8 +126,3 @@ val get_pretty_config : comp_config -> PrettyIL.pretty_config
 
 val set_java_imports : comp_config -> string -> unit
 val get_java_imports : comp_config -> string
-
-
-(* Driver config *)
-
-val driver_conf_of_args : comp_config -> (* (RType.brand_model * RType.camp_type) option -> *) string -> CompDriver.driver_config
