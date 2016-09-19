@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section SparkIR.
+Section Dataset.
 
   Require Import Basics.
   Require Import String.
@@ -185,7 +185,7 @@ Section SparkIR.
       end.
   End eval.
 
-  Section SparkIRPlug.
+  Section DatasetPlug.
 
     Definition wrap_dataset_eval h dsenv q :=
       lift dcoll (@dataset_eval h dsenv q).
@@ -203,9 +203,9 @@ Section SparkIR.
     Global Program Instance SparkIRPlug : (@AlgPlug _ dataset) :=
       mkAlgPlug wrap_dataset_eval dataset_eval_normalized.
 
-  End SparkIRPlug.
+  End DatasetPlug.
 
-End SparkIR.
+End Dataset.
 
 (*
 *** Local Variables: ***

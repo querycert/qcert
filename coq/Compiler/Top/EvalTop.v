@@ -79,8 +79,8 @@ Module EvalTop(runtime:CompilerRuntime).
    * DNNRC Section *
    *****************)
 
-  Require Import DData DNNRC SparkIR.
-  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
+  Require Import DData DNNRC Dataset.
+  Require Import TDNRCInfer DNNRCtoScala.
   
   Require Import BasicSystem.
   Require Import TypingRuntime.

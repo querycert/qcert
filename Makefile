@@ -143,7 +143,7 @@ MODULES = \
 	NNRCMR/NNRCMRRuntime \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCEq \
-	DNNRC/Calculus/SparkIR \
+	DNNRC/Calculus/Dataset \
 	DNNRC/Typing/TDNRC \
 	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
@@ -203,7 +203,7 @@ MODULES = \
 	Backend/NNRCMRtoCloudant \
 	Backend/CloudantMRtoJavascript \
 	Backend/SparkData \
-	Backend/DNNRCSparkIRRewrites \
+	Backend/DNNRCDatasetRewrites \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/ROptimEnvFunc \

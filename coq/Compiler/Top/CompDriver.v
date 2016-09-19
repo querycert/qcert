@@ -21,7 +21,7 @@ Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRCMRRuntime.
 Require Import CloudantMR.
-Require Import DNNRC SparkIR.
+Require Import DNNRC Dataset.
 Require Import CAMPRuntime.
 Require Import ODMGRuntime.
 Require Import TOptimEnvFunc.
@@ -44,7 +44,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Require Import NNRCMRtoDNNRC.
   Require Import CloudantMRtoJavascript.
   Require Import NNRCtoDNNRC.
-  Require Import TDNRCInfer DNNRCtoScala DNNRCSparkIRRewrites.
+  Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
 
   Require Rule.
   Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.

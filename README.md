@@ -214,11 +214,12 @@ Inside the [`./coq`](./coq) directory, the organization is as follows.
   - [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
   - [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
 - Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
-  - [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-  - [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
+  - [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns
+  - [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra
   - [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
-  - [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
-  - [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+  - [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus
+  - [`./NNRCMR`](./coq/NNRCMR) contains support for the Named Nested Relational Calculus with Map-Reduce
+  - [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus
 - Translations:
   - [`./Translation`](./coq/Translation) contains translations between ILs
   - [`./Backend`](./coq/Backend) contains backend support and code generation
