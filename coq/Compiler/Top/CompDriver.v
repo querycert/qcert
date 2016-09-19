@@ -1016,41 +1016,53 @@ Module CompDriver(runtime:CompilerRuntime).
       end
   | L_dnnrc_dataset =>
       match dv with
-      | _ => Dv_error "TODO" (* XXX TODO XXX *)
-  (*     | Dv_rule dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_camp dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_oql dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_nra dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_nraenv dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_nnrc dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_nnrcmr dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_cldmr dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_dnnrc_dataset dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_dnnrc_typed_dataset dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_javascript dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_java dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_spark dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_spark2 dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
-  (*     | Dv_cloudant dv => Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_ dv) *)
+      | Dv_dnnrc_typed_dataset dv =>
+        (* Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset dv) *)
+        Dv_error "DNNRC -> Typed DNNRC: TODO" (* XXX TODO XXX *)
+      | Dv_dnnrc_dataset dv =>
+        (* Dv_dnnrc_dataset (Dv_dnnrc_dataset_optim dv) *)
+        Dv_error "DNNRC optim: TODO?" (* XXX TODO XXX *)
+      | Dv_rule _
+      | Dv_camp _
+      | Dv_oql _
+      | Dv_nra _
+      | Dv_nraenv _
+      | Dv_nnrc _
+      | Dv_nnrcmr _
+      | Dv_cldmr _
+      | Dv_javascript _
+      | Dv_java _
+      | Dv_spark _
+      | Dv_spark2 _
+      | Dv_cloudant _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_dnnrc_typed_dataset =>
       match dv with
-      | _ => Dv_error "TODO" (* XXX TODO XXX *)
-  (*     | Dv_rule dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_camp dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_oql dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_nra dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_nraenv dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_nnrc dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_nnrcmr dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_cldmr dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_dnnrc_dataset dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_dnnrc_typed_dataset dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_javascript dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_java dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_spark dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_spark2 dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
-  (*     | Dv_cloudant dv => Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_ dv) *)
+      | Dv_spark2 dv =>
+        (* Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 dv) *)
+        Dv_error "Typed DNNRC -> Spark2: TODO" (* XXX TODO XXX *)
+      | Dv_dnnrc_typed_dataset dv =>
+        (* Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv) *)
+        Dv_error "Typed DNNRC optim: TODO?" (* XXX TODO XXX *)
+      | Dv_rule _
+      | Dv_camp _
+      | Dv_oql _
+      | Dv_nra _
+      | Dv_nraenv _
+      | Dv_nnrc _
+      | Dv_nnrcmr _
+      | Dv_cldmr _
+      | Dv_dnnrc_dataset _
+      | Dv_javascript _
+      | Dv_java _
+      | Dv_spark _
+      | Dv_cloudant _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
       end
   | L_javascript
   | L_java
