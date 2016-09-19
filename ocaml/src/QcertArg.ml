@@ -67,25 +67,15 @@ let add_input_file qconf file = qconf.qconf_input_files <- qconf.qconf_input_fil
 
 (* Driver config *)
 
-let driver_conf_of_qcert_conf qconf (* schema *) qname =
+let driver_conf_of_qcert_conf qconf qname =
   let brand_rel =
-    [] (* XXX TODO XXX *)
+    TypeUtil.brand_relation_of_brand_model qconf.qconf_schema.TypeUtil.sch_brand_model
   in
   let vdbindings =
     [] (* XXX TODO XXX *)
   in
-  (* let schema = *)
-  (*   begin match schema with *)
-  (*   | Some schema -> schema *)
-  (*   | None -> *)
-  (*       (\* XXX TODO XXX *\) *)
-  (*       (\* (RType.make_brand_model brand_rel [], []) *\) *)
-  (*       assert false *)
-  (*   end *)
-  (* in *)
   { CompDriver.comp_qname = char_list_of_string qname;
     comp_brand_rel = brand_rel;
-    (* comp_schema = schema; *)
     comp_vdbindings = vdbindings;
     comp_java_imports = char_list_of_string qconf.qconf_java_imports; }
 

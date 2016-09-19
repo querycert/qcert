@@ -37,3 +37,5 @@ type schema = {
 val empty_schema : schema
 
 val schema_of_io_json : Data.json -> schema
+
+val brand_relation_of_brand_model : RType.brand_model -> Compiler.brand_relation

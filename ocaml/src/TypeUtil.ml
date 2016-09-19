@@ -85,11 +85,14 @@ let process_schema io_sch wmType =
   (bm,wmTypeC)
 
 
-(* The only functions that should be exported *)
+(* The functions that should be exported *)
+
+let brand_relation_of_brand_model brand_model =
+  brand_model.Compiler.brand_model_relation
 
 let empty_schema =
   let brand_model = RType.empty_brand_model () in
-  let camp_type = RType.bottom brand_model.Compiler.brand_model_relation in (* XXX TODO: ask Jerome XXX *)
+  let camp_type = RType.bottom (brand_relation_of_brand_model brand_model) in (* XXX TODO: ask Jerome XXX *)
   let foreign_typing = Enhanced.Model.foreign_typing brand_model in
   { sch_brand_model = brand_model;
     sch_camp_type = camp_type;
