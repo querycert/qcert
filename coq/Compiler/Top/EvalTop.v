@@ -97,6 +97,7 @@ Module EvalTop(runtime:CompilerRuntime).
   Definition nrcmr_chain_eval_top (h:list(string*string)) (e:nrcmr) (world:list data) : option data :=
     let env_with_world := mkWorld world in
     let cenv := mkConstants env_with_world in
+    (* Note: localize_bindings turns all variables distributed! *)
     let loc_cenv := localize_bindings cenv in
     let res :=
         match load_init_env init_vinit loc_cenv cenv with
@@ -110,7 +111,7 @@ Module EvalTop(runtime:CompilerRuntime).
    * CLDMR Section *
    *****************)
 
-  Require Import CloudantMR.
+  Require Import CloudantMR. (* contains cld_load_init_env *)
 
   Definition cldmr_chain_eval_top (h:list(string*string)) (e:cld_mrl) (world:list data) : option data :=
     (* mkWorldColl does not wrap cenv in a dcoll quite yet, since we

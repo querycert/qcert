@@ -191,6 +191,7 @@ Section PatterntoNRAEnv.
   
   Lemma epat_trans_top_correct h c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
+    (* XXX Why nil for local-env there?! Probably should have a interp_top with fixed nil local-env XXX *)
     lift_failure (interp h c p nil d) = fun_of_algenv h c (algenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.
