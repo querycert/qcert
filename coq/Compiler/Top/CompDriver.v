@@ -776,7 +776,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_nnrc_stop => 1
     | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
     | Dv_nnrc_to_nnrcmr inputs_loc dv => 1 + driver_length_nnrcmr dv
-    | Dv_nnrc_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
+    | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
     | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
     | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
     | Dv_nnrc_to_camp avoid dv => 1 + driver_length_camp dv
@@ -1145,7 +1145,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_nraenv (Dv_nraenv_optim dv) => (L_nraenv, Some (Dv_nraenv dv))
     | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
     | Dv_nnrc (Dv_nnrc_to_nnrcmr vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
-    | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
+    | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
     | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
     | Dv_nnrc (Dv_nnrc_to_camp vdbindings dv) => (L_nnrc, Some (Dv_camp dv))
