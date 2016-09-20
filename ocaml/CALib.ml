@@ -86,7 +86,7 @@ let oql_to_nraenv (s:string) : nraenv =
 (* Translations *)
 
 let translate_nraenv_to_nnrc (q:nraenv) : nnrc = CompDriver.nraenv_to_nnrc q
-let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompDriver.nnrc_to_nnrcmr_comptop q
+let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompDriver.nnrc_to_nnrcmr_comptop Compiler.init_vinit q
 let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset CompUtil.mkDistLoc n
 
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =

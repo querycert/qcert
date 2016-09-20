@@ -30,6 +30,7 @@ type qcert_config = {
     mutable qconf_pretty_config : PrettyIL.pretty_config;
     mutable qconf_java_imports : string;
     mutable qconf_input_files : string list;
+    mutable qconf_mr_vinit : string;
     mutable qconf_vdbindings : CompDriver.vdbindings;
   }
 
@@ -54,6 +55,7 @@ let default_qconf () =
     qconf_pretty_config = PrettyIL.default_pretty_config ();
     qconf_java_imports = "";
     qconf_input_files = [];
+    qconf_mr_vinit = "init";
     qconf_vdbindings = [];
   }
 
@@ -65,6 +67,7 @@ let set_io qconf file_name = qconf.qconf_io <- Some (Util.string_of_file file_na
 let set_emit_all qconf () = qconf.qconf_emit_all <- true
 let set_java_imports qconf s = qconf.qconf_java_imports <- s
 let add_input_file qconf file = qconf.qconf_input_files <- qconf.qconf_input_files @ [ file ]
+let set_mr_vinit qconf x = qconf.qconf_mr_vinit <- x
 let add_vdirst qconf x =
   let x = char_list_of_string x in
   qconf.qconf_vdbindings <- (x, Compiler.Vdistr) :: qconf.qconf_vdbindings
@@ -80,6 +83,7 @@ let driver_conf_of_qcert_conf qconf qname =
   in
   { CompDriver.comp_qname = char_list_of_string qname;
     comp_brand_rel = brand_rel;
+    comp_mr_vinit = char_list_of_string qconf.qconf_mr_vinit;
     comp_vdbindings = qconf.qconf_vdbindings;
     comp_java_imports = char_list_of_string qconf.qconf_java_imports; }
 

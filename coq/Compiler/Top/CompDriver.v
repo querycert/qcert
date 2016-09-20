@@ -184,23 +184,26 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrc_to_camp (avoid: list var) (q: nnrc) : camp := nrcToPat_let avoid q. (* XXX avoid ? XXX *)
 
   (* Java equivalent: NnrcToNrcmr.convert *)
-  Definition nnrc_to_nnrcmr_comptop (q: nnrc) : nnrcmr :=
+  Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
     let q : nnrc := nrc_subst q init_vid (NRCConst dunit) in
     let q : nnrc := nnrc_optim q in
     let q_free_vars := (* bdistinct !!! *) nrc_free_vars q in
     let inputs_loc :=
         (init_vid, Vlocal)
-          ::(init_vinit, Vlocal)
+          ::(vinit, Vlocal)
           ::(localize_names q_free_vars)
     in
     nnrc_to_nnrcmr_chain q
                          init_vinit
                          inputs_loc.
 
-  Definition nnrc_to_nnrcmr_compdriver (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
+  Definition nnrc_to_nnrcmr_compdriver (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
+    (* XXX TODO: Handling of vid? XXX *)
+    (* let q : nnrc := nrc_subst q init_vid (NRCConst dunit) in *)
+    (* let q : nnrc := nnrc_optim q in *)
     let inputs_loc :=
-        (init_vid, Vlocal)
-          ::(init_vinit, Vlocal)
+        (init_vid, Vlocal) (* XXX suppr vid? XXX *)
+          ::(vinit, Vlocal)
           :: inputs_loc
     in
     nnrc_to_nnrcmr_chain q
@@ -317,7 +320,7 @@ Module CompDriver(runtime:CompilerRuntime).
   with nnrc_driver : Set :=
     | Dv_nnrc_stop : nnrc_driver
     | Dv_nnrc_optim : nnrc_driver -> nnrc_driver
-    | Dv_nnrc_to_nnrcmr : (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
+    | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc_dataset : (* inputs_loc *) vdbindings -> dnnrc_dataset_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
@@ -513,10 +516,10 @@ Module CompDriver(runtime:CompilerRuntime).
         | Dv_nnrc_optim dv =>
           let q := nnrc_optim q in
           compile_nnrc dv q
-        | Dv_nnrc_to_nnrcmr inputs_loc dv =>
-          let q := nnrc_to_nnrcmr_comptop (* inputs_loc *) q in
+        | Dv_nnrc_to_nnrcmr vinit inputs_loc dv =>
+          let q := nnrc_to_nnrcmr_comptop vinit (* inputs_loc *) q in
           (* XXX TODO Should be: XXX*)
-          (* let q := nnrc_to_nnrcmr_compdriver inputs_loc q in *)
+          (* let q := nnrc_to_nnrcmr_compdriver vinit inputs_loc q in *)
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
           let q := nnrc_to_dnnrc_dataset inputs_loc q in
@@ -775,7 +778,7 @@ Module CompDriver(runtime:CompilerRuntime).
     match dv with
     | Dv_nnrc_stop => 1
     | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
-    | Dv_nnrc_to_nnrcmr inputs_loc dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => 1 + driver_length_nnrcmr dv
     | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
     | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
     | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
@@ -840,6 +843,7 @@ Module CompDriver(runtime:CompilerRuntime).
       { comp_qname : string;
         comp_brand_rel : list (string * string) (* brand_relation *);
         (* comp_schema : brand_model * rtype; *)
+        comp_mr_vinit : var;
         comp_vdbindings : vdbindings;
         comp_java_imports : string; }.
 
@@ -952,7 +956,7 @@ Module CompDriver(runtime:CompilerRuntime).
       end
   | L_nnrc =>
       match dv with
-      | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_vdbindings) dv)
+      | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) config.(comp_vdbindings) dv)
       | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_qname) config.(comp_java_imports) dv)
@@ -1161,7 +1165,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_nraenv (Dv_nraenv_to_nra dv) => (L_nraenv, Some (Dv_nra dv))
     | Dv_nraenv (Dv_nraenv_optim dv) => (L_nraenv, Some (Dv_nraenv dv))
     | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
-    | Dv_nnrc (Dv_nnrc_to_nnrcmr vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
+    | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
     | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
     | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
@@ -1295,7 +1299,7 @@ Module CompDriver(runtime:CompilerRuntime).
     Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc_dataset :=
       nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (nraenv_optim q))).
     Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim (q:nraenv) : nrcmr :=
-      nnrcmr_optim (nnrc_to_nnrcmr_comptop (nnrc_optim (nraenv_to_nnrc (nraenv_optim q)))).
+      nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (nnrc_optim (nraenv_to_nnrc (nraenv_optim q)))).
 
 
     (* Used in queryTests: *)
@@ -1307,9 +1311,9 @@ Module CompDriver(runtime:CompilerRuntime).
     Definition rule_to_nraenv_to_nnrc_optim_to_javascript (q:rule) : string :=
       nnrc_to_javascript (nnrc_optim (nraenv_to_nnrc (nraenv_optim (rule_to_nraenv q)))).
     Definition rule_to_nnrcmr (q:rule) : nnrcmr :=
-      nnrcmr_optim (nnrc_to_nnrcmr_comptop (rule_to_nraenv_to_nnrc_optim q)).
+      nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q)).
     Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=
-      nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop (rule_to_nraenv_to_nnrc_optim q))).
+      nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q))).
 
   End CompPaths.
 End CompDriver.
