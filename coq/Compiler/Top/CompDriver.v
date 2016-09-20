@@ -1821,7 +1821,7 @@ Module CompDriver(runtime:CompilerRuntime).
 
     (* Some macros, that aren't really just about source-target *)
 
-    Definition defaut_dv_config :=
+    Definition default_dv_config :=
       mkDvConfig
         (* comp_qname = *) "query"
         (* comp_brand_rel = *) nil
@@ -1829,21 +1829,18 @@ Module CompDriver(runtime:CompilerRuntime).
         (* comp_vdbindings = *) nil
         (* comp_java_imports = *) "".
 
+    Definition compile_from_source_target (conf: driver_config) (source:language) (target:language) (q: query) : query :=
+      let path := get_path_from_source_target source target in
+      let dv := driver_of_path conf path in
+      match compile dv q with
+      | nil => Q_error "No compilation result!"
+      | target :: _ => target
+      end.
+
+
     (* Used in CompStat: *)
     Definition nraenv_optim_to_nnrc (q: nraenv) : nnrc :=
       nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
-
-    (* Definition nraenv_optim_to_nnrc (q: nraenv) : nnrc option := *)
-    (*   let path := get_path_from_source_target L_nraenv L_nnrc in *)
-    (*   let dv := driver_of_conf conf in *)
-    (*   let queries = compile dv (Q_nraenv q) in *)
-    (*   match List.rev queries with *)
-    (*   | Q_nraenv res -> Some res *)
-    (*   | Q_error err -> None *)
-    (*   | _ -> None. *)
-    (*   end. *)
-
-
 
     (* Used in CompTest: *)
     Definition rule_to_nraenv_optim (q: rule) : nraenv :=
