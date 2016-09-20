@@ -14,19 +14,24 @@
  * limitations under the License.
  *)
 
-(* Front end utilities *)
-
-open ConfigUtil
+open Util
 open Compiler.EnhancedCompiler
 
-(* Parse/translate input *)
+let language_of_name name =
+  let name =
+    char_list_of_string (String.lowercase name)
+  in
+  begin match CompDriver.language_of_name_case_sensitive name with
+  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string_of_char_list err)))
+  | lang -> lang
+  end
 
-(* val camp_of_rule_string : string -> (string * CompDriver.camp) *)
+let name_of_language lang =
+  let name = CompDriver.name_of_language lang in
+  string_of_char_list name
 
-(* val nraenv_of_rule : string -> (string * CompDriver.nraenv) *)
-(* val nraenv_of_rule_string : string -> (string * CompDriver.nraenv) *)
-(* val nraenv_of_oql : string -> (string * CompDriver.nraenv) *)
-(* val nraenv_of_oql_string : string -> (string * CompDriver.nraenv) *)
 
-val nraenv_of_input : lang_config -> string -> (string * CompDriver.nraenv)
+let name_of_query (q: CompDriver.query) =
+  let name = CompDriver.name_of_query (RType.empty_brand_model ()) q in
+  string_of_char_list name
 

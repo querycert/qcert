@@ -17,6 +17,7 @@
 (* Front end utilities *)
 
 open Util
+open ConversionUtil
 open QcertArg
 open ConfigUtil
 open ParseFile

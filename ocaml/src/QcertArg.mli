@@ -36,9 +36,6 @@ val default_qconf : unit -> qcert_config
 
 val driver_conf_of_qcert_conf : qcert_config -> string -> CompDriver.driver_config
 
-val language_of_name : string -> CompDriver.language
-val name_of_language : CompDriver.language -> string
-
 val set_source : qcert_config -> string -> unit
 val set_target : qcert_config -> string -> unit
 val add_path : qcert_config -> string -> unit

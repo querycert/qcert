@@ -18,6 +18,7 @@
 
 open Format
 open Util
+open ConversionUtil
 open QcertArg
 open ConfigUtil
 open ParseUtil

@@ -15,6 +15,7 @@
  *)
 
 open Util
+open ConversionUtil
 open ConfigUtil
 open ParseFile
 open Compiler.EnhancedCompiler

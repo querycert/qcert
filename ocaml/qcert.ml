@@ -89,7 +89,7 @@ let languages_string =
     Format.fprintf str_ff "%a"
       (Format.pp_print_list
          ~pp_sep:(fun ff () -> Format.fprintf ff ", ")
-         (fun ff lang -> Format.fprintf ff "%s" (QcertArg.name_of_language lang)))
+         (fun ff lang -> Format.fprintf ff "%s" (ConversionUtil.name_of_language lang)))
       languages
   in
   Format.pp_print_flush str_ff ();

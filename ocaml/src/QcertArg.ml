@@ -15,6 +15,7 @@
  *)
 
 open Util
+open ConversionUtil
 open Compiler.EnhancedCompiler
 
 
@@ -49,19 +50,6 @@ let default_qconf () =
     qconf_mr_vinit = "init";
     qconf_vdbindings = [];
   }
-
-let language_of_name name =
-  let name =
-    char_list_of_string (String.lowercase name)
-  in
-  begin match CompDriver.language_of_name_case_sensitive name with
-  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string_of_char_list err)))
-  | lang -> lang
-  end
-
-let name_of_language lang =
-  let name = CompDriver.name_of_language lang in
-  string_of_char_list name
 
 let set_source qconf s = qconf.qconf_source <- Some (language_of_name s)
 let set_target qconf s = qconf.qconf_target <- Some (language_of_name s)

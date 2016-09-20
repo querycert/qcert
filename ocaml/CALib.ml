@@ -21,7 +21,6 @@ open ParseString
 open CloudantUtil
 open Stats
 open DisplayUtil
-open FrontUtil
 open Compiler.EnhancedCompiler
 
 
@@ -58,7 +57,15 @@ let dvar_conv x =
 (* From source to CAMP *)
 
 let rule_to_camp (s:string) : camp =
-  let (_,op) = camp_of_rule_string s in op
+  begin match ParseString.parse_rule_from_string s with
+  | _, CompDriver.Q_rule q -> CompDriver.rule_to_camp q
+  | _, CompDriver.Q_camp q -> q
+  | _, CompDriver.Q_error err -> raise (CACo_Error (string_of_char_list err))
+  | _ -> assert false
+  end
+
+
+
 
 (* From camp to NRAEnv *)
 
@@ -68,16 +75,22 @@ let camp_to_nraenv (c:camp) =
 (* From source to NRAEnv *)
 
 let rule_to_nraenv_name (s:string) : string =
-  fst (nraenv_of_rule_string s)
+  fst (ParseString.parse_rule_from_string s)
 
 let rule_to_nraenv (s:string) : nraenv =
-  snd (nraenv_of_rule_string s)
+  begin match ParseString.parse_rule_from_string s with
+  | _, CompDriver.Q_rule q -> CompDriver.rule_to_nraenv q
+  | _, CompDriver.Q_camp q -> CompDriver.camp_to_nraenv q
+  | _, CompDriver.Q_error err -> raise (CACo_Error (string_of_char_list err))
+  | _ -> assert false
+  end
 
 let oql_to_nraenv_name (s:string) : string =
-  fst (nraenv_of_oql_string s)
+  "OQL"
 
 let oql_to_nraenv (s:string) : nraenv =
-  snd (nraenv_of_oql_string s)
+  let q = ParseString.parse_oql_from_string s in
+  CompDriver.oql_to_nraenv q
 
 (*
  *  Core compiler section
