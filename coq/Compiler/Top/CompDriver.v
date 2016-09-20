@@ -515,9 +515,8 @@ Module CompDriver(runtime:CompilerRuntime).
           compile_nnrc dv q
         | Dv_nnrc_to_nnrcmr inputs_loc dv =>
           let q := nnrc_to_nnrcmr_comptop (* inputs_loc *) q in
-          (* XXX Should be: XXX
-             let q := nnrc_to_nnrcmr_compdriver inputs_loc q in
-          *)
+          (* XXX TODO Should be: XXX*)
+          (* let q := nnrc_to_nnrcmr_compdriver inputs_loc q in *)
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
           let q := nnrc_to_dnnrc_dataset inputs_loc q in

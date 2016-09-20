@@ -30,6 +30,7 @@ type qcert_config = {
     mutable qconf_pretty_config : PrettyIL.pretty_config;
     mutable qconf_java_imports : string;
     mutable qconf_input_files : string list;
+    mutable qconf_vdbindings : CompDriver.vdbindings;
   }
 
 let language_of_name name =
@@ -53,6 +54,7 @@ let default_qconf () =
     qconf_pretty_config = PrettyIL.default_pretty_config ();
     qconf_java_imports = "";
     qconf_input_files = [];
+    qconf_vdbindings = [];
   }
 
 let set_source qconf s = qconf.qconf_source <- Some (language_of_name s)
@@ -63,7 +65,12 @@ let set_io qconf file_name = qconf.qconf_io <- Some (Util.string_of_file file_na
 let set_emit_all qconf () = qconf.qconf_emit_all <- true
 let set_java_imports qconf s = qconf.qconf_java_imports <- s
 let add_input_file qconf file = qconf.qconf_input_files <- qconf.qconf_input_files @ [ file ]
-
+let add_vdirst qconf x =
+  let x = char_list_of_string x in
+  qconf.qconf_vdbindings <- (x, Compiler.Vdistr) :: qconf.qconf_vdbindings
+let add_vlocal qconf x =
+  let x = char_list_of_string x in
+  qconf.qconf_vdbindings <- (x, Compiler.Vlocal) :: qconf.qconf_vdbindings
 
 (* Driver config *)
 
@@ -71,11 +78,8 @@ let driver_conf_of_qcert_conf qconf qname =
   let brand_rel =
     TypeUtil.brand_relation_of_brand_model qconf.qconf_schema.TypeUtil.sch_brand_model
   in
-  let vdbindings =
-    [] (* XXX TODO XXX *)
-  in
   { CompDriver.comp_qname = char_list_of_string qname;
     comp_brand_rel = brand_rel;
-    comp_vdbindings = vdbindings;
+    comp_vdbindings = qconf.qconf_vdbindings;
     comp_java_imports = char_list_of_string qconf.qconf_java_imports; }
 

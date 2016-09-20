@@ -38,7 +38,8 @@ let args_list qconf =
     ("-java-imports", Arg.String (QcertArg.set_java_imports qconf), "Additional imports for the Java runtime");
     (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
     (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
-    (* ("-vdistr") *)
+    ("-vdistr", Arg.String (QcertArg.add_vdirst qconf), "x");
+    ("-vlocal", Arg.String (QcertArg.add_vlocal qconf), "x");
   ]
 
 let anon_args qconf f = QcertArg.add_input_file qconf f
