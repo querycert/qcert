@@ -20,51 +20,87 @@ open Compiler.EnhancedCompiler
 (* Command line args *)
 
 let args_list qconf =
-  [ ("-source", Arg.String (QcertArg.set_source qconf),
-     "<lang> Indicates the language for of thesource file (lang = Rule|OQL)");
-    ("-target", Arg.String (QcertArg.set_target qconf),
-     "<lang> Indicates the language for the target query (lang = Java|JS|Spark|Spark2|Cloudant)");
-    ("-path", Arg.String (QcertArg.add_path qconf),
-     "<lang> Use to define compilation path (lang = rule|camp|oql|nra|nraenv|nnrc|nnrcmr|cldmr|dnnrc|dnnrc_typed|js|java|spark|spark2|cloudant)");
-    ("-dir", Arg.String (QcertArg.set_dir qconf),
-     "<dir> Target directory for the emited code");
-    ("-js-runtime", Arg.String (CloudantUtil.set_harness qconf.QcertArg.qconf_cld_conf), "<harness.js> JavaScript runtime");
-    ("-io", Arg.String (QcertArg.set_io qconf),
-     "<file.io> Schema and inputs data for evaluation");
-    (* ("-stats", Arg.Unit (set_stats conf), *)
-    (*    "Produce statistics for the target query"); *)
-    (* ("-stats-all", Arg.Unit (set_stats conf), *)
-    (*    "Produce statistics for all intermediate queries"); *)
-    ("-emit-all", Arg.Unit (QcertArg.set_emit_all qconf),
-     "Emit generated code of all intermediate queries");
-    (* ("-emit-sexp", Arg.Unit (QcertArg.set_sexpr qconf), *)
-    (*  "Emit the target query as an s-expression"); *)
-    (* ("-emit-sexp-all", Arg.Unit (QcertArg.set_sexprs qconf), *)
-    (*  "Emit all intermediate queries as s-expressions"); *)
-    (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
-    (*  "Logs the optimizations/rewrites during compilation"); *)
-    ("-ascii", Arg.Unit (PrettyIL.set_ascii qconf.QcertArg.qconf_pretty_config),
-     "Avoid unicode symbols in emited queries");
-    ("-margin", Arg.Int (PrettyIL.set_margin qconf.QcertArg.qconf_pretty_config),
-     "<n> Set right margin for emited queries");
-    ("-cld-prefix", Arg.String (CloudantUtil.set_prefix qconf.QcertArg.qconf_cld_conf),
-     "<pref> Cloudant DB prefix");
-    ("-java-imports", Arg.String (QcertArg.set_java_imports qconf),
-     "<imports> Additional imports for the Java runtime");
-    (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
-    (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
-    ("-vinit", Arg.String (QcertArg.add_vdirst qconf),
-     "<init> Set the name init variable for the map-reduce backends");
-    ("-vdistr", Arg.String (QcertArg.add_vdirst qconf),
-     "<x> Declare <x> as a distributed variable");
-    ("-vlocal", Arg.String (QcertArg.add_vlocal qconf),
-     "<x> Declare <x> as a local variable");
-  ]
+  Arg.align
+    [ ("-source", Arg.String (QcertArg.set_source qconf),
+       "<lang> Indicates the language for of thesource file (default: Rule)");
+      ("-target", Arg.String (QcertArg.set_target qconf),
+       "<lang> Indicates the language for the target query (default: js)");
+      ("-path", Arg.String (QcertArg.add_path qconf),
+       "<lang> Use to define compilation path");
+      ("-dir", Arg.String (QcertArg.set_dir qconf),
+       "<dir> Target directory for the emited code");
+      ("-js-runtime", Arg.String (CloudantUtil.set_harness qconf.QcertArg.qconf_cld_conf),
+       "<harness.js> JavaScript runtime");
+      ("-io", Arg.String (QcertArg.set_io qconf),
+       "<file.io> Schema and inputs data for evaluation");
+      (* ("-stats", Arg.Unit (set_stats conf), *)
+      (*    " Produce statistics for the target query"); *)
+      (* ("-stats-all", Arg.Unit (set_stats conf), *)
+      (*    " Produce statistics for all intermediate queries"); *)
+      ("-emit-all", Arg.Unit (QcertArg.set_emit_all qconf),
+       " Emit generated code of all intermediate queries");
+      (* ("-emit-sexp", Arg.Unit (QcertArg.set_sexpr qconf), *)
+      (*  " Emit the target query as an s-expression"); *)
+      (* ("-emit-sexp-all", Arg.Unit (QcertArg.set_sexprs qconf), *)
+      (*  " Emit all intermediate queries as s-expressions"); *)
+      (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
+      (*  " Logs the optimizations/rewrites during compilation"); *)
+      ("-ascii", Arg.Unit (PrettyIL.set_ascii qconf.QcertArg.qconf_pretty_config),
+       " Avoid unicode symbols in emited queries");
+      ("-margin", Arg.Int (PrettyIL.set_margin qconf.QcertArg.qconf_pretty_config),
+       "<n> Set right margin for emited queries");
+      ("-cld-prefix", Arg.String (CloudantUtil.set_prefix qconf.QcertArg.qconf_cld_conf),
+       "<pref> Cloudant DB prefix");
+      ("-java-imports", Arg.String (QcertArg.set_java_imports qconf),
+       "<imports> Additional imports for the Java runtime");
+      (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
+      (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
+      ("-vinit", Arg.String (QcertArg.add_vdirst qconf),
+       "<init> Set the name init variable for the map-reduce backends");
+      ("-vdistr", Arg.String (QcertArg.add_vdirst qconf),
+       "<x> Declare x as a distributed variable");
+      ("-vlocal", Arg.String (QcertArg.add_vlocal qconf),
+       "<x> Declare x as a local variable");
+    ]
 
 let anon_args qconf f = QcertArg.add_input_file qconf f
 
+let languages =
+  [ CompDriver.L_rule;
+    CompDriver.L_camp;
+    CompDriver.L_oql;
+    CompDriver.L_nra;
+    CompDriver.L_nraenv;
+    CompDriver.L_nnrc;
+    CompDriver.L_nnrcmr;
+    CompDriver.L_cldmr;
+    CompDriver.L_dnnrc_dataset;
+    CompDriver.L_dnnrc_typed_dataset;
+    CompDriver.L_javascript;
+    CompDriver.L_java;
+    CompDriver.L_spark;
+    CompDriver.L_spark2;
+    CompDriver.L_cloudant; ]
+
+let languages_string =
+  let buff = Buffer.create 128 in
+  let str_ff = Format.formatter_of_buffer buff in
+  let () =
+    Format.fprintf str_ff "%a"
+      (Format.pp_print_list
+         ~pp_sep:(fun ff () -> Format.fprintf ff ", ")
+         (fun ff lang -> Format.fprintf ff "%s" (QcertArg.name_of_language lang)))
+      languages
+  in
+  Format.pp_print_flush str_ff ();
+  Buffer.contents buff
+
 let usage =
-  Sys.argv.(0)^" [options] query1 query2 ..."
+  "Q*cert - Query compiler\n"^
+  "Supported languages are:\n"^
+  "  "^languages_string^
+  "\n"^
+  "Usage: "^Sys.argv.(0)^" [options] query1 query2 ..."
 
 
 let parse_args () =

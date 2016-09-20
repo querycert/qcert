@@ -59,6 +59,10 @@ let language_of_name name =
   | lang -> lang
   end
 
+let name_of_language lang =
+  let name = CompDriver.name_of_language lang in
+  string_of_char_list name
+
 let set_source qconf s = qconf.qconf_source <- Some (language_of_name s)
 let set_target qconf s = qconf.qconf_target <- Some (language_of_name s)
 let add_path qconf s = qconf.qconf_path <- qconf.qconf_path @ [ language_of_name s ]
