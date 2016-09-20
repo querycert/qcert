@@ -71,15 +71,6 @@ Section NNRCtoDNNRC.
     - apply H1; assumption.
   Qed.
 
-  Definition localize_denv (denv:list (var*ddata)) :=
-    map (fun x => (fst x, localize_data (snd x))) denv.
-
-  Lemma localize_denv_cons v d (denv:list (var*ddata)) :
-    localize_denv ((v,Dlocal d) :: denv) = (v,d) :: localize_denv denv.
-  Proof.
-    reflexivity.
-  Qed.
-
   Lemma lookup_denv_local v d denv :
     lookup equiv_dec denv v = Some (Dlocal d) ->
     lift Dlocal (lookup equiv_dec (localize_denv denv) v) =
@@ -87,7 +78,7 @@ Section NNRCtoDNNRC.
   Proof.
     intros; induction denv; simpl in *; [reflexivity| ].
     destruct a; simpl in *.
-    destruct (equiv_dec v v0); try congruence.
+    destruct (equiv_dec v s); try congruence.
     - rewrite e in *; clear e.
       inversion H; subst; clear H.
       reflexivity.
@@ -102,7 +93,7 @@ Section NNRCtoDNNRC.
     intros.
     induction denv; [reflexivity| ]; simpl in *.
     destruct a; simpl in *.
-    destruct (equiv_dec v v0); simpl in *.
+    destruct (equiv_dec v s); simpl in *.
     - inversion H; subst; reflexivity.
     - apply IHdenv. apply H.
   Qed.
@@ -126,6 +117,16 @@ Section NNRCtoDNNRC.
     specialize (H ((v, Vlocal) :: tenv) ((v, Dlocal a) :: denv)).
     rewrite <- H; simpl.
     unfold lift.
+    assert (@nrc_eval fruntime h
+        (@cons (prod var (@data (@foreign_runtime_data fruntime)))
+           (@pair var (@data (@foreign_runtime_data fruntime)) v a)
+           (@localize_denv (@foreign_runtime_data fruntime) denv)) n2 =
+            @nrc_eval fruntime h
+            (@cons (prod string (@data (@foreign_runtime_data fruntime)))
+               (@pair string (@data (@foreign_runtime_data fruntime)) v a)
+               (@localize_denv (@foreign_runtime_data fruntime) denv)) n2).
+    reflexivity.
+    rewrite <- H0; clear H0.
     destruct (nrc_eval h ((v, a) :: localize_denv denv) n2); try reflexivity.
     simpl.
     rewrite <- IHl.

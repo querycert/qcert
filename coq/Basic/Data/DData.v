@@ -100,6 +100,15 @@ Section DData.
 
   Definition dbindings := list (string*ddata).
 
+  Definition localize_denv (denv:dbindings) : bindings :=
+    map (fun x => (fst x, localize_data (snd x))) denv.
+
+  Lemma localize_denv_cons v d (denv:dbindings) :
+    localize_denv ((v,Dlocal d) :: denv) = (v,d) :: localize_denv denv.
+  Proof.
+    reflexivity.
+  Qed.
+
   (* Localized variable annotations *)
   
   (* Java equivalent: NnrcToNrcmr.localization (an enum) *)
