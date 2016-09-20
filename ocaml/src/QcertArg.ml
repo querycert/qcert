@@ -27,21 +27,12 @@ type qcert_config = {
     mutable qconf_schema : TypeUtil.schema;
     qconf_cld_conf : CloudantUtil.cld_config;
     mutable qconf_emit_all : bool;
-    mutable qconf_pretty_config : PrettyIL.pretty_config;
+    qconf_pretty_config : PrettyIL.pretty_config;
     mutable qconf_java_imports : string;
     mutable qconf_input_files : string list;
     mutable qconf_mr_vinit : string;
     mutable qconf_vdbindings : CompDriver.vdbindings;
   }
-
-let language_of_name name =
-  let name =
-    char_list_of_string (String.lowercase name)
-  in
-  begin match CompDriver.language_of_name_case_sensitive name with
-  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string_of_char_list err)))
-  | lang -> lang
-  end
 
 let default_qconf () =
   { qconf_source = None;
@@ -58,6 +49,15 @@ let default_qconf () =
     qconf_mr_vinit = "init";
     qconf_vdbindings = [];
   }
+
+let language_of_name name =
+  let name =
+    char_list_of_string (String.lowercase name)
+  in
+  begin match CompDriver.language_of_name_case_sensitive name with
+  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string_of_char_list err)))
+  | lang -> lang
+  end
 
 let set_source qconf s = qconf.qconf_source <- Some (language_of_name s)
 let set_target qconf s = qconf.qconf_target <- Some (language_of_name s)
