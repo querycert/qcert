@@ -842,7 +842,6 @@ Module CompDriver(runtime:CompilerRuntime).
     mkDvConfig
       { comp_qname : string;
         comp_brand_rel : list (string * string) (* brand_relation *);
-        (* comp_schema : brand_model * rtype; *)
         comp_mr_vinit : var;
         comp_vdbindings : vdbindings;
         comp_java_imports : string; }.
@@ -1253,6 +1252,31 @@ Module CompDriver(runtime:CompilerRuntime).
 
     Definition get_path_from_source_target (source:language) (target:language) : list language :=
       match source, target with
+      (* From rule: *)
+      | L_rule, L_rule =>
+        L_rule
+          :: nil
+      | L_rule, L_camp =>
+        L_rule
+          :: L_camp
+          :: nil
+      | L_rule, L_nra =>
+        L_rule
+          :: L_nra
+          (* :: L_nra *)
+          :: nil
+      | L_rule, L_nraenv =>
+        L_rule
+          :: L_nraenv
+          (* :: L_nraenv *)
+          :: nil
+      | L_rule, L_nnrc =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          (* :: L_nnrc *)
+          :: nil
       | L_rule, L_javascript =>
         L_rule
           :: L_nraenv
@@ -1261,6 +1285,490 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_javascript
           :: nil
+      | L_rule, L_java =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_rule, L_nnrcmr =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          (* :: L_nnrcmr *)
+          :: nil
+      | L_rule, L_spark =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_rule, L_cldmr =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_rule, L_cloudant =>
+        L_rule
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      (* From camp: *)
+      | L_camp, L_camp =>
+        L_camp
+          :: nil
+      | L_camp, L_nra =>
+        L_camp
+          :: L_nra
+          (* :: L_nra *)
+          :: nil
+      | L_camp, L_nraenv =>
+        L_camp
+          :: L_nraenv
+          (* :: L_nraenv *)
+          :: nil
+      | L_camp, L_nnrc =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          (* :: L_nnrc *)
+          :: nil
+      | L_camp, L_javascript =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_camp, L_java =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_camp, L_nnrcmr =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          (* :: L_nnrcmr *)
+          :: nil
+      | L_camp, L_spark =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_camp, L_cldmr =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_camp, L_cloudant =>
+        L_camp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      (* From oql: *)
+      | L_oql, L_oql =>
+        L_oql
+          :: nil
+      | L_oql, L_nraenv =>
+        L_oql
+          :: L_nraenv
+          (* :: L_nraenv *)
+          :: nil
+      | L_oql, L_nnrc =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          (* :: L_nnrc *)
+          :: nil
+      | L_oql, L_javascript =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_oql, L_java =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_oql, L_nnrcmr =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          (* :: L_nnrcmr *)
+          :: nil
+      | L_oql, L_spark =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_oql, L_cldmr =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_oql, L_cloudant =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      (* From nra: *)
+      | L_nra, L_nra =>
+        L_nra
+          :: L_nra
+          :: nil
+      | L_nra, L_nraenv =>
+        L_nra
+          :: L_nra
+          :: L_nraenv
+          (* :: L_nraenv *)
+          :: nil
+      | L_nra, L_nnrc =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          (* :: L_nnrc *)
+          :: nil
+      | L_nra, L_camp =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: nil
+      | L_nra, L_javascript =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_nra, L_java =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_nra, L_nnrcmr =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          (* :: L_nnrcmr *)
+          :: nil
+      | L_nra, L_spark =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_nra, L_cldmr =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_nra, L_cloudant =>
+        L_nra
+          :: L_nra
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      (* From nraenv: *)
+      | L_nraenv, L_nraenv =>
+        L_nraenv
+          :: L_nraenv
+          :: nil
+      | L_nraenv, L_nra =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nra
+          :: nil
+      | L_nraenv, L_nnrc =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          (* :: L_nnrc *)
+          :: nil
+      | L_nraenv, L_camp =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: nil
+      | L_nraenv, L_javascript =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_nraenv, L_java =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_nraenv, L_nnrcmr =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          (* :: L_nnrcmr *)
+          :: nil
+      | L_nraenv, L_spark =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_nraenv, L_cldmr =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_nraenv, L_cloudant =>
+        L_nraenv
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      (* From nnrc: *)
+      | L_nnrc, L_nnrc =>
+        L_nnrc
+          :: L_nnrc
+          :: nil
+      | L_nnrc, L_camp =>
+        L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: nil
+      | L_nnrc, L_nraenv =>
+        L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: L_nraenv
+          (* :: L_nraenv *)
+          :: nil
+      | L_nnrc, L_nra =>
+        L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: L_nra
+          (* :: L_nra *)
+          :: nil
+      | L_nnrc, L_javascript =>
+        L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_nnrc, L_java =>
+        L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_nnrc, L_nnrcmr =>
+        L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          (* :: L_nnrcmr *)
+          :: nil
+      | L_nnrc, L_spark =>
+        L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_nnrc, L_cldmr =>
+        L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_nnrc, L_cloudant =>
+        L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      (* From nnrcmr: *)
+      | L_nnrcmr, L_nnrcmr =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: nil
+      | L_nnrcmr, L_spark =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_nnrcmr, L_cldmr =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_nnrcmr, L_cloudant =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      | L_nnrcmr, L_nnrc =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: nil
+      | L_nnrcmr, L_javascript =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_nnrcmr, L_java =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_nnrcmr, L_camp =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: nil
+      | L_nnrcmr, L_nraenv =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: L_nraenv
+          (* :: L_nraenv *)
+          :: nil
+      | L_nnrcmr, L_nra =>
+        L_nnrcmr
+          :: L_nnrcmr
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: L_nra
+          (* :: L_nra *)
+          :: nil
+      (* From cldmr: *)
+      | L_cldmr, L_cldmr =>
+        L_cldmr
+          :: nil
+      | L_cldmr, L_cloudant =>
+        L_cldmr
+          :: L_cloudant
+          :: nil
       | _, _ =>
         let err :=
             "No default path defined from "++(name_of_language source)++" to "++(name_of_language target)
@@ -1268,24 +1776,74 @@ Module CompDriver(runtime:CompilerRuntime).
         L_error err :: nil
       end.
 
+    Property get_path_from_source_target_correct:
+      forall source target,
+        forall config,
+          match get_path_from_source_target source target with
+          | L_error _ :: nil => True
+          | path =>
+            match driver_of_path config path with
+            | Dv_error _ => False
+            | _ =>
+              match path with
+              | nil => False
+              | source' :: _ =>
+                match List.rev path with
+                | nil => False
+                | target' :: _ =>
+                  (source = source') /\ (target = target')
+                end
+              end
+            end
+          end.
+    Proof.
+      destruct source; destruct target;
+        intros; simpl; split; reflexivity.
+    Qed.
+
+    Property get_path_from_source_target_completeness:
+      forall dv,
+        let source := language_of_driver dv in
+        let target := target_language_of_driver dv in
+        match get_path_from_source_target source target with
+        | L_error _ :: nil => False
+        | path => True
+        end.
+    Proof.
+      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+    Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+
     (* Comp *)
     (* XXX TODO : use driver *)
-    Definition get_driver_from_path (source:language) (target:language) : driver :=
-      match source, target with
-      | L_rule, L_javascript =>
-        Dv_rule
-          (Dv_rule_to_nraenv
-          (Dv_nraenv_optim
-          (Dv_nraenv_to_nnrc
-          (Dv_nnrc_to_javascript
-          (Dv_javascript_stop)))))
-      | _, _ => Dv_error "No default path defined"
-      end.
+    Definition get_driver_from_source_target (conf: driver_config) (source:language) (target:language) : driver :=
+      let path := get_path_from_source_target source target in
+      driver_of_path conf path.
 
     (* Some macros, that aren't really just about source-target *)
+
+    Definition defaut_dv_config :=
+      mkDvConfig
+        (* comp_qname = *) "query"
+        (* comp_brand_rel = *) nil
+        (* comp_mr_vinit = *) init_vinit
+        (* comp_vdbindings = *) nil
+        (* comp_java_imports = *) "".
+
     (* Used in CompStat: *)
     Definition nraenv_optim_to_nnrc (q: nraenv) : nnrc :=
       nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
+
+    (* Definition nraenv_optim_to_nnrc (q: nraenv) : nnrc option := *)
+    (*   let path := get_path_from_source_target L_nraenv L_nnrc in *)
+    (*   let dv := driver_of_conf conf in *)
+    (*   let queries = compile dv (Q_nraenv q) in *)
+    (*   match List.rev queries with *)
+    (*   | Q_nraenv res -> Some res *)
+    (*   | Q_error err -> None *)
+    (*   | _ -> None. *)
+    (*   end. *)
+
+
 
     (* Used in CompTest: *)
     Definition rule_to_nraenv_optim (q: rule) : nraenv :=
