@@ -75,6 +75,7 @@ let driver_conf_of_qcert_conf qconf qname =
   in
   { CompDriver.comp_qname = char_list_of_string qname;
     comp_brand_rel = brand_rel;
+    comp_input_type = qconf.qconf_schema.TypeUtil.sch_camp_type;
     comp_mr_vinit = char_list_of_string qconf.qconf_mr_vinit;
     comp_vdbindings = qconf.qconf_vdbindings;
     comp_java_imports = char_list_of_string qconf.qconf_java_imports; }

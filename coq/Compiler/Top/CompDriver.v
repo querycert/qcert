@@ -836,6 +836,7 @@ Module CompDriver(runtime:CompilerRuntime).
     mkDvConfig
       { comp_qname : string;
         comp_brand_rel : list (string * string) (* brand_relation *);
+        comp_input_type : rtype (* input type for inference *);
         comp_mr_vinit : var;
         comp_vdbindings : vdbindings;
         comp_java_imports : string; }.
@@ -1013,8 +1014,8 @@ Module CompDriver(runtime:CompilerRuntime).
   | L_dnnrc_dataset =>
       match dv with
       | Dv_dnnrc_typed_dataset dv =>
-        (* Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset dv) *)
-        Dv_error "DNNRC -> Typed DNNRC: TODO" (* XXX TODO XXX *)
+        Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset config.(comp_input_type) dv)
+                         (* Dv_error "DNNRC -> Typed DNNRC: TODO" *) (* XXX TODO XXX *)
       | Dv_dnnrc_dataset dv =>
         (* Dv_dnnrc_dataset (Dv_dnnrc_dataset_optim dv) *)
         Dv_error "DNNRC optim: TODO?" (* XXX TODO XXX *)
@@ -1173,7 +1174,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_cldmr (Dv_cldmr_stop) => (L_cldmr, None)
     | Dv_cldmr (Dv_cldmr_to_cloudant name brand_rel dv) => (L_cldmr, Some (Dv_cloudant dv))
     | Dv_dnnrc_dataset (Dv_dnnrc_dataset_stop) => (L_dnnrc_dataset, None)
-    | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset rtype dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv))
+    | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset rtype dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv)) (* XXX TO BE CHECKED XXX *)
     | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_stop) => (L_dnnrc_typed_dataset, None)
     | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 rtype _ dv) => (L_dnnrc_typed_dataset, Some (Dv_spark2 dv))
     | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
@@ -1817,6 +1818,7 @@ Module CompDriver(runtime:CompilerRuntime).
       mkDvConfig
         (* comp_qname = *) "query"
         (* comp_brand_rel = *) nil
+        (* comp_input_type = *) RType.Unit
         (* comp_mr_vinit = *) init_vinit
         (* comp_vdbindings = *) nil
         (* comp_java_imports = *) "".
