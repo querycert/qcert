@@ -44,7 +44,7 @@ let display_to_string conf modelandtype op =
       | Some (brand_model, inputType) ->
 	  begin
 	    match
-	      CompDriver.dnnrc_to_dnnrc_typed_dataset
+	      CompDriver.dnnrc_dataset_to_dnnrc_typed_dataset
 		brand_model
 		(Enhanced.Model.foreign_typing brand_model)
 		(CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)

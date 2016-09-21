@@ -57,6 +57,10 @@ Module CompDriver(runtime:CompilerRuntime).
 
   (* Languages *)
 
+  Section CompD.
+    Context {bm:brand_model}.
+    Context {ftyping: foreign_typing}.
+
   Definition rule := rule.
   Definition camp := pat.
   Definition oql := oql_expr.
@@ -111,7 +115,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Case_aux c "L_error"%string].
 
 
-  Inductive query {bm:brand_model} : Set :=
+  Inductive query : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query
     | Q_oql : oql -> query
@@ -252,16 +256,12 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
     nrcToJavaTop class_name imports q.
 
-  Definition dnnrc_to_dnnrc_typed_dataset
-             {bm:brand_model}
-             {ftyping: foreign_typing}
+  Definition dnnrc_dataset_to_dnnrc_typed_dataset
              (e: dnnrc_dataset) (inputType: rtype)
     : option dnnrc_typed_dataset :=
     dnnrc_infer_type e inputType.
 
   Definition dnnrc_typed_dataset_to_spark2
-             {bm:brand_model}
-             {ftyping: foreign_typing}
              (inputType:rtype) (name:string) (e:@dnnrc_typed_dataset _) : string :=
     @dnrcToSpark2Top _ _ bm _ unit inputType name e.
 
@@ -286,7 +286,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_cldmr_stop : cldmr_driver
     | Dv_cldmr_to_cloudant : (* rulename *) string -> (* h *) list (string*string) -> cloudant_driver -> cldmr_driver.
 
-  Inductive dnnrc_typed_dataset_driver {bm:brand_model} : Set :=
+  Inductive dnnrc_typed_dataset_driver : Set :=
     | Dv_dnnrc_typed_dataset_stop : dnnrc_typed_dataset_driver
     (* XXX TODO XXX *)
     (* | Dv_dnnrc_typed_dataset_optim : dnnrc_typed_dataset_driver -> dnnrc_typed_dataset_driver *)
@@ -295,9 +295,7 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Inductive dnnrc_dataset_driver : Set :=
     | Dv_dnnrc_dataset_stop : dnnrc_dataset_driver
-    (* XXX TODO XXX *)
-    (* XXX Need help figuring this one out -JS XXX *)                              
-    (* | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : dnnrc_typed_dataset -> dnnrc_dataset_driver *)
+    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : rtype -> dnnrc_typed_dataset_driver -> dnnrc_dataset_driver
   .
 
   Inductive camp_driver : Set :=
@@ -345,8 +343,6 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_oql_to_nraenv : nraenv_driver -> oql_driver.
 
   Inductive driver
-            {bm:brand_model}
-            {ftyping: foreign_typing}
     : Set :=
   | Dv_rule : rule_driver -> driver
   | Dv_camp : camp_driver -> driver
@@ -388,9 +384,6 @@ Module CompDriver(runtime:CompilerRuntime).
   (* Compilers function *)
 
   Section CompDriverCompile.
-    Context {bm:brand_model}.
-    Context {ftyping: foreign_typing}.
-
   Definition compile_javascript (dv: javascript_driver) (q: javascript) : list query :=
     let queries :=
         match dv with
@@ -442,7 +435,7 @@ Module CompDriver(runtime:CompilerRuntime).
     in
     (Q_cldmr q) :: queries.
 
-  Definition compile_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
+  Definition compile_dnnrc_typed_dataset (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
     let queries :=
         match dv with
         | Dv_dnnrc_typed_dataset_stop => nil
@@ -457,6 +450,12 @@ Module CompDriver(runtime:CompilerRuntime).
     let queries :=
         match dv with
         | Dv_dnnrc_dataset_stop => nil
+        | Dv_dnnrc_dataset_to_dnnrc_typed_dataset rt dv =>
+          let q := dnnrc_dataset_to_dnnrc_typed_dataset q rt in
+          match q with
+          | Some q => compile_dnnrc_typed_dataset dv q
+          | None => (Q_error "Type checking failed for dnnrc query") :: nil
+          end
         end
     in
     (Q_dnnrc_dataset q) :: queries.
@@ -618,9 +617,6 @@ Module CompDriver(runtime:CompilerRuntime).
   End CompDriverCompile.
 
   Section CompDriverUtil.
-    Context {bm:brand_model}.
-    Context {ftyping: foreign_typing}.
-
   Definition language_of_name_case_sensitive name : language:=
     match name with
     | "rule"%string => L_rule
@@ -749,6 +745,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
     match dv with
     | Dv_dnnrc_dataset_stop => 1
+    | Dv_dnnrc_dataset_to_typed_dataset => 1
     end.
 
   Fixpoint driver_length_camp (dv: camp_driver) :=
@@ -835,9 +832,6 @@ Module CompDriver(runtime:CompilerRuntime).
   (* Compilers config *)
 
   Section CompDriverConfig.
-    Context {bm:brand_model}.
-    Context {ftyping: foreign_typing}.
-
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
@@ -1179,6 +1173,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_cldmr (Dv_cldmr_stop) => (L_cldmr, None)
     | Dv_cldmr (Dv_cldmr_to_cloudant name brand_rel dv) => (L_cldmr, Some (Dv_cloudant dv))
     | Dv_dnnrc_dataset (Dv_dnnrc_dataset_stop) => (L_dnnrc_dataset, None)
+    | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset rtype dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv))
     | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_stop) => (L_dnnrc_typed_dataset, None)
     | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 rtype _ dv) => (L_dnnrc_typed_dataset, Some (Dv_spark2 dv))
     | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
@@ -1245,9 +1240,6 @@ Module CompDriver(runtime:CompilerRuntime).
   End CompDriverConfig.
 
   Section CompPaths.
-    Context {bm:brand_model}.
-    Context {ftyping: foreign_typing}.
-
     Local Open Scope string_scope.
 
     Definition get_path_from_source_target (source:language) (target:language) : list language :=
@@ -1871,6 +1863,7 @@ Module CompDriver(runtime:CompilerRuntime).
       nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q))).
 
   End CompPaths.
+  End CompD.
 End CompDriver.
 
 

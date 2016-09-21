@@ -105,7 +105,7 @@ let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
   match
     let (brand_model,wmRType) = sc in
-    (CompDriver.dnnrc_to_dnnrc_typed_dataset
+    (CompDriver.dnnrc_dataset_to_dnnrc_typed_dataset
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
        (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)
@@ -119,7 +119,6 @@ let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_data
   string_of_char_list
     (CompDriver.dnnrc_typed_dataset_to_spark2
        brand_model
-       (Enhanced.Model.foreign_typing brand_model)
        wmRType (Util.char_list_of_string nrule) e)
 
 (* NRAEnv Optimizer *)

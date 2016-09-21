@@ -169,10 +169,9 @@ let parse_file (qconf: QcertArg.qcert_config) (file_name: string) =
 let compile_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) (path: CompDriver.language list) (q: CompDriver.query) : CompDriver.query list =
   let brand_model = schema.TypeUtil.sch_brand_model in
   let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-  let dv = CompDriver.driver_of_path brand_model foreign_typing dv_conf path in
-  let dv = CompDriver.fix_driver brand_model foreign_typing dv q in
+  let dv = CompDriver.driver_of_path brand_model dv_conf path in
+  let dv = CompDriver.fix_driver brand_model dv q in
   CompDriver.compile brand_model foreign_typing dv q
-
 (* Emit *)
 
 let emit_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
