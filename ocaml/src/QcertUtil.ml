@@ -22,16 +22,33 @@ let language_of_name name =
     char_list_of_string (String.lowercase name)
   in
   begin match CompDriver.language_of_name_case_sensitive name with
-  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string_of_char_list err)))
+  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string err)))
   | lang -> lang
   end
 
 let name_of_language lang =
   let name = CompDriver.name_of_language lang in
-  string_of_char_list name
+  string name
 
 
 let name_of_query (q: CompDriver.query) =
   let name = CompDriver.name_of_query (RType.empty_brand_model ()) q in
-  string_of_char_list name
+  string name
 
+let driver_no_error dv =
+  begin match dv with
+  | CompDriver.Dv_error err -> raise (CACo_Error (string err))
+  | _ -> ()
+  end
+
+let language_no_error lang =
+  begin match lang with
+  | CompDriver.L_error err -> raise (CACo_Error (string err))
+  | _ -> ()
+  end
+
+let query_no_error q =
+  begin match q with
+  | CompDriver.Q_error err -> raise (CACo_Error (string err))
+  | _ -> ()
+  end

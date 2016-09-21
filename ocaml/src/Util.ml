@@ -39,6 +39,8 @@ let char_list_of_string s =
   String.iter (fun c -> l := c :: !l) s;
   List.rev !l
 
+let string = string_of_char_list
+
 (* coq Z's are now replaced by native OCaml ints, but here is the way to get things back to coq Z's:
 
 open BinNums

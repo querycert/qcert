@@ -170,8 +170,12 @@ let compile_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) (
   let brand_model = schema.TypeUtil.sch_brand_model in
   let foreign_typing = schema.TypeUtil.sch_foreign_typing in
   let dv = CompDriver.driver_of_path brand_model dv_conf path in
+  let () = QcertUtil.driver_no_error dv in
   let dv = CompDriver.fix_driver brand_model dv q in
-  CompDriver.compile brand_model foreign_typing dv q
+  let queries = CompDriver.compile brand_model foreign_typing dv q in
+  let () = List.iter QcertUtil.query_no_error queries in
+  queries
+
 (* Emit *)
 
 let emit_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
