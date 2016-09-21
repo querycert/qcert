@@ -1256,19 +1256,19 @@ Module CompDriver(runtime:CompilerRuntime).
       | L_rule, L_nra =>
         L_rule
           :: L_nra
-          (* :: L_nra *)
+          :: L_nra
           :: nil
       | L_rule, L_nraenv =>
         L_rule
           :: L_nraenv
-          (* :: L_nraenv *)
+          :: L_nraenv
           :: nil
       | L_rule, L_nnrc =>
         L_rule
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
-          (* :: L_nnrc *)
+          :: L_nnrc
           :: nil
       | L_rule, L_javascript =>
         L_rule
@@ -1293,7 +1293,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_nnrc
           :: L_nnrcmr
-          (* :: L_nnrcmr *)
+          :: L_nnrcmr
           :: nil
       | L_rule, L_spark =>
         L_rule
@@ -1333,19 +1333,19 @@ Module CompDriver(runtime:CompilerRuntime).
       | L_camp, L_nra =>
         L_camp
           :: L_nra
-          (* :: L_nra *)
+          :: L_nra
           :: nil
       | L_camp, L_nraenv =>
         L_camp
           :: L_nraenv
-          (* :: L_nraenv *)
+          :: L_nraenv
           :: nil
       | L_camp, L_nnrc =>
         L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
-          (* :: L_nnrc *)
+          :: L_nnrc
           :: nil
       | L_camp, L_javascript =>
         L_camp
@@ -1370,7 +1370,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_nnrc
           :: L_nnrcmr
-          (* :: L_nnrcmr *)
+          :: L_nnrcmr
           :: nil
       | L_camp, L_spark =>
         L_camp
@@ -1410,14 +1410,14 @@ Module CompDriver(runtime:CompilerRuntime).
       | L_oql, L_nraenv =>
         L_oql
           :: L_nraenv
-          (* :: L_nraenv *)
+          :: L_nraenv
           :: nil
       | L_oql, L_nnrc =>
         L_oql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
-          (* :: L_nnrc *)
+          :: L_nnrc
           :: nil
       | L_oql, L_javascript =>
         L_oql
@@ -1442,7 +1442,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_nnrc
           :: L_nnrcmr
-          (* :: L_nnrcmr *)
+          :: L_nnrcmr
           :: nil
       | L_oql, L_spark =>
         L_oql
@@ -1484,13 +1484,13 @@ Module CompDriver(runtime:CompilerRuntime).
         L_nra
           :: L_nra
           :: L_nraenv
-          (* :: L_nraenv *)
+          :: L_nraenv
           :: nil
       | L_nra, L_nnrc =>
         L_nra
           :: L_nra
           :: L_nnrc
-          (* :: L_nnrc *)
+          :: L_nnrc
           :: nil
       | L_nra, L_camp =>
         L_nra
@@ -1519,7 +1519,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_nnrc
           :: L_nnrcmr
-          (* :: L_nnrcmr *)
+          :: L_nnrcmr
           :: nil
       | L_nra, L_spark =>
         L_nra
@@ -1563,7 +1563,7 @@ Module CompDriver(runtime:CompilerRuntime).
         L_nraenv
           :: L_nraenv
           :: L_nnrc
-          (* :: L_nnrc *)
+          :: L_nnrc
           :: nil
       | L_nraenv, L_camp =>
         L_nraenv
@@ -1594,7 +1594,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_nnrc
           :: L_nnrcmr
-          (* :: L_nnrcmr *)
+          :: L_nnrcmr
           :: nil
       | L_nraenv, L_spark =>
         L_nraenv
@@ -1642,14 +1642,14 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_camp
           :: L_nraenv
-          (* :: L_nraenv *)
+          :: L_nraenv
           :: nil
       | L_nnrc, L_nra =>
         L_nnrc
           :: L_nnrc
           :: L_camp
           :: L_nra
-          (* :: L_nra *)
+          :: L_nra
           :: nil
       | L_nnrc, L_javascript =>
         L_nnrc
@@ -1665,7 +1665,7 @@ Module CompDriver(runtime:CompilerRuntime).
         L_nnrc
           :: L_nnrc
           :: L_nnrcmr
-          (* :: L_nnrcmr *)
+          :: L_nnrcmr
           :: nil
       | L_nnrc, L_spark =>
         L_nnrc
@@ -1743,7 +1743,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_camp
           :: L_nraenv
-          (* :: L_nraenv *)
+          :: L_nraenv
           :: nil
       | L_nnrcmr, L_nra =>
         L_nnrcmr
@@ -1752,7 +1752,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_camp
           :: L_nra
-          (* :: L_nra *)
+          :: L_nra
           :: nil
       (* From cldmr: *)
       | L_cldmr, L_cldmr =>
