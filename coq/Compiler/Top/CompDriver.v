@@ -1826,7 +1826,7 @@ Module CompDriver(runtime:CompilerRuntime).
     Definition compile_from_source_target (conf: driver_config) (source:language) (target:language) (q: query) : query :=
       let path := get_path_from_source_target source target in
       let dv := driver_of_path conf path in
-      match compile dv q with
+      match List.rev (compile dv q) with
       | nil => Q_error "No compilation result!"
       | target :: _ => target
       end.
