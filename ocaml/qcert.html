@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang = "en">
+  <head>
+    <title>Q*cert demo</title>
+    <meta charset = "UTF-8" />
+    <script src="../bin/qcertJS.js"></script>
+    <script>
+      function compileButton() {
+        var input = { 'source' : document.getElementById("source").value,
+                      'target' : document.getElementById("target").value,
+                      'query' : document.getElementById("query").value };
+        document.getElementById("result").innerHTML = main(input).result;
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Q*cert demo</h1>
+    <form>
+      <fieldset>
+        <legend>Query compiler</legend>
+        <p>
+          <label>source</label>
+          <input type = "text"
+                 id = "source"
+                 value = "camp" />
+        </p>
+        <p>
+          <label>target</label>
+          <input type = "text"
+                 id = "target"
+                 value = "nnrc" />
+        </p>
+        <p>
+          <label>query</label>
+          <textarea id = "query"
+                    rows = "10"
+                    cols = "80" />punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))</textarea>
+        </p>
+      </fieldset>
+    </form>
+    <button type="button"
+	    onclick="compileButton()">compile</button>
+    <p><pre id="result"></pre></p>
+  </body>
+</html>

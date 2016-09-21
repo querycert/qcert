@@ -44,6 +44,7 @@ LIBJS=CALibJS
 
 all: $(MAIN) $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
 jars: $(MAIN).$(JAR) $(MAIN1).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR) $(LIB).jar
+js: qcertJS.js
 
 # Extraction from Coq
 generated:
@@ -123,6 +124,25 @@ japi/lib/$(LIB).jar: $(LIB).jar
 	mkdir -p japi/lib
 	cp $(LIB).jar japi/lib/$(LIB).jar
 
+# JavaScript
+
+qcertJS.js: qcertJS.byte
+	js_of_ocaml _build/qcertJS.byte
+	cp _build/qcertJS.js ../bin/qcertJS.js
+
+qcertJS.byte: generated
+	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
+# <qcertJS.{cmo,byte}>: package(js_of_ocaml), package(js_of_ocaml.ppx)
+
+wsk-update:
+	wsk action update qcert _build/qcertJS.js
+
+wsk-invoke:
+	wsk action invoke -br qcert -p source camp -p target nraenv \
+		-p query pit
+# -p query 'punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))'
+
+# clean
 
 clean:
 	ocamlbuild -clean -no-log
@@ -143,7 +163,7 @@ realclean:
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
 	rm -rf *~ generated $(MAIN) $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
-	rm -f ../bin/$(MAIN) ../bin/$(MAIN1) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/$(MAIN4)
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN1) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/$(MAIN4) ../bin/qcertJS.js
 	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
 
 cleanall: realclean
