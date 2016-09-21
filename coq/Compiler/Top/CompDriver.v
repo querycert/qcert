@@ -1039,8 +1039,8 @@ Module CompDriver(runtime:CompilerRuntime).
   | L_dnnrc_typed_dataset =>
       match dv with
       | Dv_spark2 dv =>
-        (* Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 dv) *)
-        Dv_error "Typed DNNRC -> Spark2: TODO" (* XXX TODO XXX *)
+        Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 config.(comp_input_type) config.(comp_qname) dv)
+                               (* Dv_error "Typed DNNRC -> Spark2: TODO" (* XXX TODO XXX *) *)
       | Dv_dnnrc_typed_dataset dv =>
         (* Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv) *)
         Dv_error "Typed DNNRC optim: TODO?" (* XXX TODO XXX *)
