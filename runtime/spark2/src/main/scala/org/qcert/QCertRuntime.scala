@@ -204,7 +204,7 @@ abstract class QCertRuntime {
   }
 
   val worldType: StructType
-  val sparkContext = new SparkContext("local", "QCERT", new SparkConf())
+  val sparkContext = new SparkContext()
   val sparkSession = SparkSession.builder().getOrCreate()
 
 
