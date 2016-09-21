@@ -184,6 +184,18 @@ Section TDNRCInfer.
                                                     (tuncoll τ)
                                                     (tuncoll τ₁')) (* Note: tuncoll is safe because the inference for ADistinct does a join with (Coll ⊥) ensuring that tuncoll would work *)
                                            (infer_unop_type_sub ADistinct (Coll τ₁))
+                                    | AFlatten =>
+                                      olift (fun τs =>
+                                              let '(τ, τ₁') := τs in
+                                              lift2 (fun τc =>
+                                                       fun τc₁' =>
+                                                         DNRCUnop
+                                                           (ta_mk a (Tdistr τc))
+                                                           AFlatten
+                                                           (ta_require (Tdistr τc₁') n₁))
+                                                    (tuncoll τ)
+                                                    (tuncoll τ₁')) (* Note: tuncoll is safe because the inference for ADistinct does a join with (Coll ⊥) ensuring that tuncoll would work *)
+                                           (infer_unop_type_sub AFlatten (Coll τ₁))
                                     | _ => None
                                     end
                                  )
