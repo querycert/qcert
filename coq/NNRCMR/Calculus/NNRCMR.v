@@ -278,6 +278,8 @@ Section NNRCMR.
    ** Semantics of NNRCMR **
    *************************)
 
+  Section Semantics.
+
   Context (h:brand_relation_t).
 
   (********************
@@ -522,17 +524,20 @@ Section NNRCMR.
       apply (IHl2 Hl2).
   Qed.
 
+  End Semantics.
 
-  Section LazyEval.
+  Section SemanticsLazy.
+
+  Context (h:brand_relation_t).
 
   Definition mr_lazy_eval (mr:mr) (d: ddata) : option (ddata) :=
     match d with
     | Ddistr nil => None
     | _ =>
-      match mr_map_eval mr.(mr_map) d with
+      match mr_map_eval h mr.(mr_map) d with
       | Some nil => None
       | map_result =>
-        olift (mr_reduce_eval mr.(mr_reduce)) map_result
+        olift (mr_reduce_eval h mr.(mr_reduce)) map_result
       end
     end.
 
@@ -554,7 +559,7 @@ Section NNRCMR.
   Definition nrcmr_lazy_eval (env:nrcmr_env) (mrl:nrcmr) : option data :=
     match mr_chain_lazy_eval env mrl.(mr_chain) with
     | (mr_env, Some _) =>
-      mr_last_eval mr_env mrl.(mr_last)
+      mr_last_eval h mr_env mrl.(mr_last)
     | (_, None) => None
     end.
 
@@ -642,7 +647,7 @@ Section NNRCMR.
   Lemma mr_chain_lazy_eval_correct (env:nrcmr_env) (l:list mr):
     forall env' res,
       mr_chain_lazy_eval env l = (env', Some res) ->
-      mr_chain_eval env l = (env', Some res).
+      mr_chain_eval h env l = (env', Some res).
   Proof.
     induction l using @rev_ind.
     - Case "l = nil"%string.
@@ -657,7 +662,7 @@ Section NNRCMR.
       intros Hlazy_l.
       inversion Hlazy_l as [env1 Htmp]; clear Hlazy_l.
       inversion Htmp as [loc_d1 Hlazy_l]; clear Htmp.
-      rewrite (mr_chain_eval_split env l x nil env1 loc_d1 (IHl env1 loc_d1 Hlazy_l)).
+      rewrite (mr_chain_eval_split h env l x nil env1 loc_d1 (IHl env1 loc_d1 Hlazy_l)).
       rewrite (mr_chain_lazy_eval_split env l x nil env1 loc_d1 Hlazy_l) in Hlazy.
       unfold mr_chain_lazy_eval in Hlazy; simpl in *.
       unfold mr_chain_eval; simpl in *.
@@ -666,23 +671,25 @@ Section NNRCMR.
       unfold mr_lazy_eval in Hlazy; simpl in *.
       unfold mr_eval; simpl in *.
       destruct d; simpl in *.
-      + destruct (mr_map_eval (mr_map x) (Dlocal d));
+      + destruct (mr_map_eval h (mr_map x) (Dlocal d));
         simpl in *; try congruence.
         destruct l0;
         simpl in *; try congruence.
         assumption.
       + destruct l0;
         simpl in *; try congruence.
-        destruct (mr_map_eval (mr_map x) (Ddistr (d :: l0)));
+        destruct (mr_map_eval h (mr_map x) (Ddistr (d :: l0)));
         simpl in *; try congruence.
         destruct l1;
         simpl in *; try congruence.
         assumption.
   Qed.
 
-  End LazyEval.
+  End SemanticsLazy.
 
   Section ReduceEmpty.
+
+    Context (h:brand_relation_t).
 
     (* Java equivalent: NrcmrToCldmr.mr_reduce_empty *)
     Definition mr_reduce_empty (mr: mr): option nrc :=
@@ -692,7 +699,7 @@ Section NNRCMR.
       | RedCollect (x, n) =>
         Some (nrc_subst n x (NRCConst (dcoll nil)))
       | RedOp op =>
-        lift (fun d => NRCConst d) (reduce_op_eval op nil)
+        lift (fun d => NRCConst d) (reduce_op_eval h op nil)
       | RedSingleton =>
         match mr.(mr_map) with
         | MapScalar (x, n) =>
@@ -710,9 +717,9 @@ Section NNRCMR.
     Lemma mr_reduce_empty_correct:
       forall (l:list mr) (mr:mr) (env:nrcmr_env),
       forall res,
-        get_mr_chain_result (mr_chain_eval env (l ++ mr::nil)) = Some (normalize_data h res) ->
-        (exists pre_res, snd (mr_chain_lazy_eval env l) = Some pre_res) ->
-        snd (mr_chain_lazy_eval env (l ++ mr::nil)) = None ->
+        get_mr_chain_result (mr_chain_eval h env (l ++ mr::nil)) = Some (normalize_data h res) ->
+        (exists pre_res, snd (mr_chain_lazy_eval h env l) = Some pre_res) ->
+        snd (mr_chain_lazy_eval h env (l ++ mr::nil)) = None ->
         olift (fun n => nrc_eval h nil n) (mr_reduce_empty mr) = Some (normalize_data h res).
     Proof.
       induction l.
@@ -730,7 +737,7 @@ Section NNRCMR.
         unfold mr_lazy_eval in Hlazy_mr_snd; simpl in *.
         destruct d; simpl in *.
         + SCase "scalar"%string.
-          destruct (mr_map_eval mr_map0 (Dlocal d));
+          destruct (mr_map_eval h mr_map0 (Dlocal d));
             simpl in *; try congruence.
           destruct l; simpl in *.
           * SSCase "coll = nil"%string.
@@ -810,7 +817,7 @@ Section NNRCMR.
             }
             SSSCase "RedOp"%string. {
               simpl in *.
-              destruct (reduce_op_eval r nil);
+              destruct (reduce_op_eval h r nil);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -849,7 +856,7 @@ Section NNRCMR.
               congruence.
             }
           * SSCase "coll <> nil"%string. {
-              destruct (mr_reduce_eval mr_reduce0 (d0 :: l));
+              destruct (mr_reduce_eval h mr_reduce0 (d0 :: l));
               simpl in *; try congruence.
               destruct (merge_env mr_output0 d1 env);
                 simpl in *; try congruence.
@@ -921,7 +928,7 @@ Section NNRCMR.
               }
               SSSSCase "RedOp"%string. {
                 simpl in *.
-                destruct (reduce_op_eval r nil);
+                destruct (reduce_op_eval h r nil);
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
@@ -1023,7 +1030,7 @@ Section NNRCMR.
               }
               SSSSCase "RedOp"%string. {
                 simpl in *.
-                destruct (reduce_op_eval r nil);
+                destruct (reduce_op_eval h r nil);
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
@@ -1066,10 +1073,10 @@ Section NNRCMR.
             simpl in *.
             congruence.
           * SSCase "coll = nil"%string.
-            destruct (mr_map_eval mr_map0 (Ddistr (d :: l)));
+            destruct (mr_map_eval h mr_map0 (Ddistr (d :: l)));
               simpl in *; try congruence.
             destruct l0;
-            [ | destruct (mr_reduce_eval mr_reduce0 (d0 :: l0));
+            [ | destruct (mr_reduce_eval h mr_reduce0 (d0 :: l0));
                   simpl in *; try congruence;
                   destruct (merge_env mr_output0 d1 env);
                   simpl in *; try congruence ].
@@ -1135,7 +1142,7 @@ Section NNRCMR.
             }
             SSSSCase "RedOp"%string. {
               simpl in *.
-              destruct (reduce_op_eval r nil);
+              destruct (reduce_op_eval h r nil);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -1182,7 +1189,7 @@ Section NNRCMR.
           [ reflexivity | rewrite Heq in *; clear Heq].
         assert (((a :: nil) ++ l) ++ mr :: nil = (a :: nil) ++ (l ++ mr :: nil)) as Heq;
           [ reflexivity | rewrite Heq in *; clear Heq].
-        case_eq (mr_chain_eval env ((a :: nil) ++ l ++ mr :: nil)).
+        case_eq (mr_chain_eval h env ((a :: nil) ++ l ++ mr :: nil)).
         intros env_eval_a_l_mr o Heval_a_l_mr.
         destruct o;
         [ | rewrite Heval_a_l_mr in Heval_a_l_mr_get_result; simpl in *; congruence ].
@@ -1191,7 +1198,7 @@ Section NNRCMR.
           [ rewrite Heval_a_l_mr in Heval_a_l_mr_get_result; simpl in *; congruence
           | rewrite <- Hres_loc_res in * ].
         clear Heval_a_l_mr_get_result.
-        case_eq (mr_chain_lazy_eval env ((a :: nil) ++ l)).
+        case_eq (mr_chain_lazy_eval h env ((a :: nil) ++ l)).
         intros env_lazy_a_l o Hlazy_a_l.
         destruct o;
         [ | rewrite Hlazy_a_l in Hlazy_a_l_snd; simpl in *; congruence ].
@@ -1199,24 +1206,24 @@ Section NNRCMR.
           [ rewrite Hlazy_a_l in Hlazy_a_l_snd; simpl in *; congruence
           | rewrite Heq in *; clear Heq d ].
         clear Hlazy_a_l_snd.
-        case_eq (mr_chain_lazy_eval env ((a :: nil) ++ l ++ mr :: nil)).
+        case_eq (mr_chain_lazy_eval h env ((a :: nil) ++ l ++ mr :: nil)).
         intros env_lazy_a_l_mr o Hlazy_a_l_mr.
         destruct o;
         [ rewrite Hlazy_a_l_mr in Hlazy_a_l_mr_snd; simpl in *; congruence | ].
         clear Hlazy_a_l_mr_snd.
-        generalize (mr_chain_lazy_eval_progress env (a::nil) l _ _ Hlazy_a_l).
+        generalize (mr_chain_lazy_eval_progress h env (a::nil) l _ _ Hlazy_a_l).
         intros Hlazy_a.
         inversion Hlazy_a as [env_a Htmp]; clear Hlazy_a.
         inversion Htmp as [loc_d_a Hlazy_a]; clear Htmp.
         specialize (IHl env_a res).
-        generalize (mr_chain_lazy_eval_correct _ _ _ _ Hlazy_a).
+        generalize (mr_chain_lazy_eval_correct _ _ _ _ _ Hlazy_a).
         intros Heval_a.
-        assert (get_mr_chain_result (mr_chain_eval env_a (l ++ mr :: nil)) = Some (normalize_data h res)) as Heval_l_mr_snd. {
+        assert (get_mr_chain_result (mr_chain_eval h env_a (l ++ mr :: nil)) = Some (normalize_data h res)) as Heval_l_mr_snd. {
           destruct l.
-          + assert (mr_chain_eval env ((a :: nil) ++ nil ++ mr :: nil) =
-                    mr_chain_eval env ((a :: nil) ++ mr :: nil)) as Heq;
+          + assert (mr_chain_eval h env ((a :: nil) ++ nil ++ mr :: nil) =
+                    mr_chain_eval h env ((a :: nil) ++ mr :: nil)) as Heq;
             [ reflexivity | rewrite Heq in *; clear Heq ].
-            rewrite (mr_chain_eval_split env _ _ _ _ _ Heval_a) in Heval_a_l_mr.
+            rewrite (mr_chain_eval_split h env _ _ _ _ _ Heval_a) in Heval_a_l_mr.
             simpl in *.
             rewrite Heval_a_l_mr.
             simpl.
@@ -1225,14 +1232,14 @@ Section NNRCMR.
           + assert (((a :: nil) ++ (m :: l) ++ mr :: nil) =
                     ((a :: nil) ++ (m :: l ++ mr :: nil))) as Heq;
             [ reflexivity | rewrite Heq in *; clear Heq ].
-            rewrite (mr_chain_eval_split env _ _ _ _ _ Heval_a) in Heval_a_l_mr.
+            rewrite (mr_chain_eval_split h env _ _ _ _ _ Heval_a) in Heval_a_l_mr.
             simpl in *.
             rewrite Heval_a_l_mr.
             rewrite <- Hres_loc_res.
             reflexivity.
         }
         specialize (IHl Heval_l_mr_snd).
-        assert (exists pre_res, snd (mr_chain_lazy_eval env_a l) = Some pre_res) as Hlazy_l_snd. {
+        assert (exists pre_res, snd (mr_chain_lazy_eval h env_a l) = Some pre_res) as Hlazy_l_snd. {
           destruct l.
           + simpl.
             exists (Ddistr nil).
@@ -1241,25 +1248,25 @@ Section NNRCMR.
             assert ((a :: nil) ++ (m :: l) ++ mr :: nil =
                     (a :: nil) ++ m :: (l ++ mr :: nil)) as Heq;
             [ reflexivity | rewrite Heq in *; clear Heq ].
-            rewrite (mr_chain_lazy_eval_split env _ _ _ _ _ Hlazy_a) in Hlazy_a_l.
+            rewrite (mr_chain_lazy_eval_split h env _ _ _ _ _ Hlazy_a) in Hlazy_a_l.
             simpl in *.
             rewrite Hlazy_a_l.
             reflexivity.
         }
         specialize (IHl Hlazy_l_snd).
-        assert (snd (mr_chain_lazy_eval env_a (l ++ mr :: nil)) = None) as Hlazy_l_mr_snd. {
+        assert (snd (mr_chain_lazy_eval h env_a (l ++ mr :: nil)) = None) as Hlazy_l_mr_snd. {
           destruct l.
           + assert ((a :: nil) ++ nil ++ mr :: nil =
                     (a :: nil) ++ mr :: nil) as Heq;
             [ reflexivity | rewrite Heq in *; clear Heq ].
-            rewrite (mr_chain_lazy_eval_split env _ _ _ _ _ Hlazy_a) in Hlazy_a_l_mr.
+            rewrite (mr_chain_lazy_eval_split h env _ _ _ _ _ Hlazy_a) in Hlazy_a_l_mr.
             simpl in *.
             rewrite Hlazy_a_l_mr.
             reflexivity.
           + assert (((a :: nil) ++ (m :: l) ++ mr :: nil) =
                     ((a :: nil) ++ (m :: l ++ mr :: nil))) as Heq;
             [ reflexivity | rewrite Heq in *; clear Heq ].
-            rewrite (mr_chain_lazy_eval_split env _ _ _ _ _ Hlazy_a) in Hlazy_a_l_mr.
+            rewrite (mr_chain_lazy_eval_split h env _ _ _ _ _ Hlazy_a) in Hlazy_a_l_mr.
             simpl in *.
             rewrite Hlazy_a_l_mr.
             reflexivity.

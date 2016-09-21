@@ -34,8 +34,17 @@ Section ForeignToReduceOps.
                  (br:brand_relation_t)
                  (dl:list data) :
                  foreign_to_reduce_op_of_unary_op uop = Some rop ->
-                 fun_of_unaryop br uop (dcoll dl) = 
+                 fun_of_unaryop br uop (dcoll dl) =
                  reduce_op_eval br rop dl
+             ; foreign_to_reduce_op_to_unary_op
+               (uop:reduce_op) : option unaryOp
+             ; foreign_to_reduce_op_to_unary_op_correct
+                 (rop:reduce_op) (uop:unaryOp)
+                 (br:brand_relation_t)
+                 (dl:list data) :
+                 foreign_to_reduce_op_to_unary_op rop = Some uop ->
+                 reduce_op_eval br rop dl =
+                 fun_of_unaryop br uop (dcoll dl)
          }.
 
 End ForeignToReduceOps.

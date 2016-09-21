@@ -766,6 +766,7 @@ Section NRAEnvtoNNRC.
   Qed.
 
   End size.
+
 End NRAEnvtoNNRC.
 
 (* 

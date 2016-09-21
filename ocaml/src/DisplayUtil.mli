@@ -25,11 +25,11 @@ val get_display_fname : comp_config -> string -> string
 
 (* Display ILs *)
 
-val display_to_string : pretty_config -> (RType.brand_model * RType.camp_type) option -> CompDriver.nraenv -> (string * string * string * string * string * string)
+(* val display_to_string : pretty_config -> (RType.brand_model * RType.camp_type) option -> CompDriver.nraenv -> (string * string * string * string * string * string) *)
 val display_nraenv_top : PrettyIL.charkind -> int -> (RType.brand_model * RType.camp_type) option -> string option -> string -> CompDriver.nraenv -> unit
 
 (* SExp ILs *)
-    
+
 val sexp_string_to_camp : string -> CompDriver.camp
 val camp_to_sexp_string : CompDriver.camp -> string
 

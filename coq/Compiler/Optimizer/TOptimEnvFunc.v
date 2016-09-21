@@ -2187,14 +2187,14 @@ Section TOptimEnvFunc.
   Qed.
 
   (* Java equivalent: NraOptimizer.optimize *)
-  Definition toptim {fruntime:foreign_runtime} {logger:optimizer_logger string algenv} (p:algenv) :=
+  Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string algenv} (p:algenv) :=
     let pass1p := (optim_size (optim_iter optim1 5) p) in
     (optim_size (optim_iter optim2 15) pass1p).
 
-  Lemma toptim_correctness {model:basic_model} {logger:optimizer_logger string algenv} p:
-    p ⇒ toptim p.
+  Lemma toptim_nraenv_correctness {model:basic_model} {logger:optimizer_logger string algenv} p:
+    p ⇒ toptim_nraenv p.
   Proof.
-    unfold toptim.
+    unfold toptim_nraenv.
     rewrite optim_size_correctness at 1; try reflexivity.
     rewrite optim_size_correctness at 1; try reflexivity.
     intros p1.

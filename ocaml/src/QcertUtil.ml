@@ -15,27 +15,23 @@
  *)
 
 open Util
-open DataUtil
 open Compiler.EnhancedCompiler
 
-(* Data utils for the Camp evaluator and compiler *)
+let language_of_name name =
+  let name =
+    char_list_of_string (String.lowercase name)
+  in
+  begin match CompDriver.language_of_name_case_sensitive name with
+  | CompDriver.L_error err -> raise (CACo_Error ("Unknown language: "^(string_of_char_list err)))
+  | lang -> lang
+  end
 
-type io_schema = {
-    io_brand_model : (string * string) list;
-    io_name : string;
-    io_brand_type : (string * string) list;
-    io_type_definitions : (string * rtype_content) list;
-  }
+let name_of_language lang =
+  let name = CompDriver.name_of_language lang in
+  string_of_char_list name
 
-type schema = {
-    sch_brand_model : RType.brand_model;
-    sch_camp_type : RType.camp_type;
-    sch_foreign_typing : Compiler.foreign_typing;
-    sch_io_schema : io_schema option;
-  }
 
-val empty_schema : schema
+let name_of_query (q: CompDriver.query) =
+  let name = CompDriver.name_of_query (RType.empty_brand_model ()) q in
+  string_of_char_list name
 
-val schema_of_io_json : Data.json -> schema
-
-val brand_relation_of_brand_model : RType.brand_model -> Compiler.brand_relation

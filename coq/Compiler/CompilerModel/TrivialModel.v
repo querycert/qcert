@@ -274,7 +274,10 @@ Defined.
 
   Program Instance trivial_foreign_to_reduce_op :
       foreign_to_reduce_op
-    := mk_foreign_to_reduce_op trivial_foreign_runtime trivial_foreign_reduce_op _ _.
+    := mk_foreign_to_reduce_op trivial_foreign_runtime trivial_foreign_reduce_op _ _ _ _.
+  Next Obligation.
+    exact None.
+  Defined.
   Next Obligation.
     exact None.
   Defined.

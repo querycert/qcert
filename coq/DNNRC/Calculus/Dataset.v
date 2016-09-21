@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section SparkIR.
+Section Dataset.
 
   Require Import Basics.
   Require Import String.
@@ -29,7 +29,6 @@ Section SparkIR.
   Require Import RAlgEnv.
 
   Require Import RType.
-
 
   Context {fruntime:foreign_runtime}.
   Context {ftype: ForeignType.foreign_type}.
@@ -59,8 +58,9 @@ Section SparkIR.
   | DSCartesian : dataset -> dataset -> dataset
   | DSExplode : string -> dataset -> dataset.
 
-  Context (h:brand_relation_t).
   Section eval.
+    Context (h:brand_relation_t).
+
     (** Evaluate a column expression in an environment of toplevel columns
      * i.e. a row in a dataset. *)
     Fixpoint fun_of_column (c: column) (row: list (string * data)) : option data :=
@@ -104,19 +104,13 @@ Section SparkIR.
       | CUDFUnbrand _ _ => None (* TODO *)
       end.
 
-    (** On some option ddata of the form (Some (Ddistr x)) perform some action f. *)
-    Definition unuddistr (od : option ddata) (f: list data -> list data) :=
-      match od with
-      | Some (Ddistr x) => Some (Ddistr (f x))
-      | _ => None
-      end.
-
-    Fixpoint dataset_eval (dsenv : list (string * ddata)) (e: dataset) : option ddata :=
+    Require Import DNNRC.
+    Fixpoint dataset_eval (dsenv : coll_bindings) (e: dataset) : option (list data) :=
       match e with
       | DSVar s => lookup equiv_dec dsenv s
       | DSSelect cs d =>
         match dataset_eval dsenv d with
-        | Some (Ddistr rows) =>
+        | Some rows =>
           (* List of column names paired with their functions. *)
           let cfuns: list (string * (list (string * data) -> option data)) :=
               map (fun p => (fst p, fun_of_column (snd p))) cs in
@@ -134,13 +128,12 @@ Section SparkIR.
            * For the result to be a legal record in the QCert data model,
            * the field names must be in order and not contain duplicates. *)
           let results := map (compose (lift drec) rfun) rows in
-          lift Ddistr (listo_to_olist results)
+          listo_to_olist results
         | _ => None
         end
       | DSFilter c d =>
         let cfun := fun_of_column c in
-        unuddistr (dataset_eval dsenv d)
-                  (* TODO This silently swallows eval errors. Don't do that. *)
+        lift (* TODO This silently swallows eval errors. Don't do that. *)
                   (filter (fun row =>
                              match row with
                              | drec fs =>
@@ -150,13 +143,14 @@ Section SparkIR.
                                end
                              | _ => false
                              end))
+                  (dataset_eval dsenv d)
       (* NOTE Spark / QCert semantics mismatch
        * Sparks join operation just appends the columns from the left side to the right,
        * and this is what the semantics model. For the result to be legal in QCert, great
        * care must be taken to ensure that this results in unique and sorted column names. *)
       | DSCartesian d1 d2 =>
         match dataset_eval dsenv d1, dataset_eval dsenv d2 with
-        | Some (Ddistr rs1), Some (Ddistr rs2) =>
+        | Some rs1, Some rs2 =>
           let data :=
               flat_map (fun r1 => map (fun r2 =>
                                          match r1, r2 with
@@ -165,12 +159,12 @@ Section SparkIR.
                                          end)
                                       rs2)
                        rs1 in
-          lift Ddistr (listo_to_olist data)
+          listo_to_olist data
         | _, _ => None
         end
       | DSExplode s d1 =>
         match dataset_eval dsenv d1 with
-        | Some (Ddistr l) =>
+        | Some l =>
           let data :=
               flat_map (fun row =>
                           match row with
@@ -185,13 +179,33 @@ Section SparkIR.
                           | _ => None::nil
                           end)
                        l in
-          lift Ddistr (listo_to_olist data)
+          listo_to_olist data
         | _ => None
         end
       end.
   End eval.
 
-End SparkIR.
+  Section DatasetPlug.
+
+    Definition wrap_dataset_eval h dsenv q :=
+      lift dcoll (@dataset_eval h dsenv q).
+
+    Lemma dataset_eval_normalized h :
+      forall q:dataset, forall (constant_env:coll_bindings) (o:data),
+      Forall (fun x => data_normalized h (snd x)) (bindings_of_coll_bindings constant_env) ->
+      wrap_dataset_eval h constant_env q = Some o ->
+      data_normalized h o.
+    Proof.
+      intros.
+      admit.
+    Admitted.
+
+    Global Program Instance SparkIRPlug : (@AlgPlug _ dataset) :=
+      mkAlgPlug wrap_dataset_eval dataset_eval_normalized.
+
+  End DatasetPlug.
+
+End Dataset.
 
 (*
 *** Local Variables: ***

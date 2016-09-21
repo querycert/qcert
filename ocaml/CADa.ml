@@ -37,7 +37,6 @@ let print_brand_types bts =
   List.iter (fun (x,y) -> Printf.printf "\t\t\tBrand %s = %s\n" x y) bts
 
 let print_type_defs br bts =
-  List.iter (fun (x,y) -> (ignore (TypeUtil.rtype_content_to_rtype br y))) bts;
   List.iter (fun (x,y) -> Printf.printf "\t\t\ttypeDef %s = isValid\n" x) bts
 
 let print_wm_type br wmType =
@@ -48,12 +47,24 @@ let process_data_file_verbose conf f : string list =
     Printf.printf "Parsing I/O file: %s\n" f;
     let io : Data.json = parse_io_from_file f in
     Printf.printf "\tExtracting schema components...\n";
-    let schema_io =
+    let json_schema_io =
       match get_data_schema conf with
       | Some sio -> sio
       | None -> io
     in
-    let ((hierarchy,modelName,brandTypes,typeDefs),wmType) = TypeUtil.extract_schema schema_io in
+    let sch = TypeUtil.schema_of_io_json json_schema_io in
+    let ((hierarchy,modelName,brandTypes,typeDefs),wmType) =
+      let open TypeUtil in
+      begin match sch.sch_io_schema with
+      | Some io_sch ->
+          ((io_sch.io_brand_model,
+            io_sch.io_name,
+            io_sch.io_brand_type,
+            io_sch.io_type_definitions),
+           sch.sch_camp_type)
+      | None -> assert false
+      end
+    in
     begin
       Printf.printf "\tHierarchy:\n";
       print_hierarchy hierarchy;
@@ -65,7 +76,10 @@ let process_data_file_verbose conf f : string list =
       print_type_defs hierarchy typeDefs
     end;
     Printf.printf "\t\tLoading schema components...\n";
-    let (brand_model,wmTypeC) = TypeUtil.process_schema (hierarchy,modelName,brandTypes,typeDefs) wmType in
+    let (brand_model,wmTypeC) =
+      (sch.TypeUtil.sch_brand_model,
+       sch.TypeUtil.sch_camp_type)
+    in
     Printf.printf "\t\t... DONE\n";
     print_wm_type hierarchy wmTypeC;
     Printf.printf "\tParsing I/O file\n";
@@ -85,13 +99,16 @@ let process_data_file_verbose conf f : string list =
 let process_data_file conf f : string list =
   begin
     let io : Data.json = parse_io_from_file f in
-    let schema_io =
+    let json_schema_io =
       match get_data_schema conf with
       | Some sio -> sio
       | None -> io
     in
-    let (schema_content,wmType) = TypeUtil.extract_schema schema_io in
-    let (brand_model,wmTypeC) = TypeUtil.process_schema schema_content wmType in
+    let sch = TypeUtil.schema_of_io_json json_schema_io in
+    let (brand_model,wmTypeC) =
+      (sch.TypeUtil.sch_brand_model,
+       sch.TypeUtil.sch_camp_type)
+    in
     let datalist = (DataUtil.get_input (get_data_format conf) (Some io)) in
     List.map (fun d ->
       match RType.data_to_sjson brand_model d wmTypeC with

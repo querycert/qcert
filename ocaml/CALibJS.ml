@@ -14,12 +14,6 @@
  * limitations under the License.
  *)
 
-(***********************************************************************)
-(*                                                                     *)
-(*                         CAMP Compiler                               *)
-(*                                                                     *)
-(***********************************************************************)
-
 (* This is main for the JS variant of the Camp Library *)
 
 open CALib

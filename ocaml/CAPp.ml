@@ -15,6 +15,8 @@
  *)
 
 open Util
+open QcertUtil
+open QcertArg
 open ConfigUtil
 open ParseUtil
 open CloudantUtil
@@ -22,7 +24,7 @@ open DisplayUtil
 open FrontUtil
 open Compiler.EnhancedCompiler
 
-module C = CompStat
+module CD = CompDriver
 
 
 (* Set configuration *)
@@ -84,61 +86,64 @@ let greek = false (* PrettyIL.get_charset_bool (get_pretty_config conf) *)
 let margin = PrettyIL.get_margin (get_pretty_config conf)
 
 let pretty_nnrc op = String.escaped (PrettyIL.pretty_nnrc greek margin op)
-let pretty_nra op = String.escaped (PrettyIL.pretty_nraenv greek margin (C.nra_to_nraenv op))
+let pretty_nra op = String.escaped (PrettyIL.pretty_nraenv greek margin (CD.nra_to_nraenv op))
 let pretty_nraenv op = String.escaped (PrettyIL.pretty_nraenv greek margin op)
 
 let pp_nnrc e =
   { nnrc_no_optim_string = pretty_nnrc e;
-    nnrc_optim_string = pretty_nnrc (C.nnrc_optim e); }
+    nnrc_optim_string = pretty_nnrc (CD.nnrc_optim e); }
 
 let pp_body_nra op =
   { nra_string = pretty_nra op;
-    nra_to_nnrc = pp_nnrc (C.nra_to_nnrc op); }
+    nra_to_nnrc = pp_nnrc (CD.nra_to_nnrc op); }
 
 let pp_nra op =
   { nra_no_optim = pp_body_nra op;
-    nra_optim = pp_body_nra (C.nra_optim op); }
+    nra_optim = pp_body_nra (CD.nra_optim op); }
 
 let pp_body_nraenv op =
   { nraenv_string = pretty_nraenv op;
-    nraenv_to_nnrc = pp_nnrc (C.nraenv_to_nnrc op);
-    nraenv_to_nra = pp_nra (C.nraenv_to_nra op); }
+    nraenv_to_nnrc = pp_nnrc (CD.nraenv_to_nnrc op);
+    nraenv_to_nra = pp_nra (CD.nraenv_to_nra op); }
 
 let pp_nraenv op =
   { nraenv_no_optim = pp_body_nraenv op;
-    nraenv_optim = pp_body_nraenv (C.nraenv_optim op);
-    nraenv_compiler = pp_nnrc (C.nraenv_compiler op); }
+    nraenv_optim = pp_body_nraenv (CD.nraenv_optim op);
+    nraenv_compiler = pp_nnrc (CD.nraenv_optim_to_nnrc op); }
 
 let pp_pat p =
   { pat_string = "pat";
-    pat_to_nraenv = pp_nraenv (C.pat_to_nraenv p);
-    pat_to_nra = pp_nra (C.pat_to_nra p); }
+    pat_to_nraenv = pp_nraenv (CD.camp_to_nraenv p);
+    pat_to_nra = pp_nra (CD.camp_to_nra p); }
 
 let pp_rule r =
   { rule_string = "TODO";
-    rule_to_nraenv = pp_nraenv (C.rule_to_nraenv r);
-    rule_to_nra = pp_nra (C.rule_to_nra r); }
+    rule_to_nraenv = pp_nraenv (CD.rule_to_nraenv r);
+    rule_to_nra = pp_nra (CD.rule_to_nra r); }
 
 let pp_oql e =
   { oql_string = "TODO";
-    oql_to_nraenv = pp_nraenv (C.oql_to_nraenv e); }
+    oql_to_nraenv = pp_nraenv (CD.oql_to_nraenv e); }
 
 
 let pp_source conf f =
-  begin match get_source_lang conf with
-  | RULE ->
-      let (rn,ru) = ParseFile.parse_rule_from_file f in
-      begin match ru with
-      | CompDriver.Q_rule ru ->
-          Pp_rule (rn, pp_rule ru)
-      | CompDriver.Q_camp ru ->
-          Pp_pat (rn, pp_pat ru)
-      | _ ->
-	  raise (CACo_Error "Input language not supported")
-      end
-  | OQL ->
-      let o = ParseFile.parse_oql_from_file f in
-      Pp_oql (f, pp_oql o)
+  begin
+    match language_of_name (get_source_lang_caco conf) with
+    | CompDriver.L_rule ->
+	let (rn,ru) = ParseFile.parse_rule_from_file f in
+	begin match ru with
+	| CompDriver.Q_rule ru ->
+            Pp_rule (rn, pp_rule ru)
+	| CompDriver.Q_camp ru ->
+            Pp_pat (rn, pp_pat ru)
+	| _ ->
+	    raise (CACo_Error "Input language not supported")
+	end
+    | CompDriver.L_oql ->
+	let o = ParseFile.parse_oql_from_file f in
+	Pp_oql (f, pp_oql o)
+    | _ ->
+	raise (CACo_Error "Input language not supported")
   end
 
 

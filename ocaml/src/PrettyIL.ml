@@ -18,7 +18,7 @@
 
 open Format
 module Hack = Compiler
-
+open Compiler.EnhancedCompiler.CompDriver
 
 (* Character sets *)
 
@@ -583,6 +583,57 @@ let pretty_binop p sym callb ff b a1 a2 =
   | Hack.AForeignBinaryOp fb -> pretty_foreign_binop p sym callb ff (Obj.magic fb) a1 a2
 
 
+(* NRA PP *)
+
+let rec pretty_nra_aux p sym ff a =
+  match a with
+  | Hack.AID -> fprintf ff "%s" "ID"
+  | Hack.AConst d -> fprintf ff "%a" pretty_data d
+  | Hack.ABinop (b,a1,a2) -> (pretty_binop p sym pretty_nra_aux) ff b a1 a2
+  | Hack.AUnop (u,a1) -> (pretty_unop p sym pretty_nra_aux) ff u a1
+  | Hack.AMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
+  | Hack.AMapConcat (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
+  | Hack.AProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
+  | Hack.ASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
+  | Hack.ADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
+  | Hack.AEither (a1,a2) ->
+      fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
+	 (pretty_nra_aux p sym) a1
+	 (pretty_nra_aux p sym) a2
+  | Hack.AEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
+  | Hack.AApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
+
+(* resets precedence back to 0 *)
+and pretty_nra_exp p sym thissym ff a1 oa2 =
+  match oa2 with
+  | None ->
+      if p > 22
+      then
+	fprintf ff "@[<hv 1>(%a%a%a%a())@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle
+      else
+	fprintf ff "@[<hv 0>%a%a%a%a()@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle
+  | Some a2 ->
+      if p > 22
+      then
+	fprintf ff "@[<hv 3>(%a%a%a%a(@,%a@;<0 -2>))@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nra_aux 0 sym) a2
+      else
+	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nra_aux 0 sym) a2
+
+
+let pretty_nra greek margin a =
+  let conf = make_pretty_config greek margin in
+  let ff = str_formatter in
+  begin
+    pp_set_margin ff (get_margin conf);
+    let sym =
+      match get_charset conf with
+      | Greek -> greeksym
+      | Ascii -> textsym
+    in
+    fprintf ff "@[%a@]@." (pretty_nra_aux 0 sym) a;
+    flush_str_formatter ()
+  end
+
 (* NRAEnv PP *)
 
 let rec pretty_nraenv_aux p sym ff a =
@@ -591,10 +642,10 @@ let rec pretty_nraenv_aux p sym ff a =
   | Hack.ANConst d -> fprintf ff "%a" pretty_data d
   | Hack.ANBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
   | Hack.ANUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
-  | Hack.ANMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
-  | Hack.ANMapConcat (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
+  | Hack.ANMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
+  | Hack.ANMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
   | Hack.ANProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
-  | Hack.ANSelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
+  | Hack.ANSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
   | Hack.ANDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
   | Hack.ANEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
@@ -605,10 +656,10 @@ let rec pretty_nraenv_aux p sym ff a =
   | Hack.ANGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
   | Hack.ANEnv -> fprintf ff "%s" "ENV"
   | Hack.ANAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
-  | Hack.ANMapEnv a1 -> pretty_nra_exp p sym sym.chie ff a1 None
+  | Hack.ANMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
 
 (* resets precedence back to 0 *)
-and pretty_nra_exp p sym thissym ff a1 oa2 =
+and pretty_nraenv_exp p sym thissym ff a1 oa2 =
   match oa2 with
   | None ->
       if p > 22
@@ -742,7 +793,7 @@ let pretty_nnrcmr_job_aux sym ff mr =
   | Hack.RedSingleton ->       fprintf ff "reduce(singleton);"
   end;
   fprintf ff "@\n";
-  begin match Hack.EnhancedCompiler.CompCore.mr_reduce_empty [] mr with
+  begin match Hack.EnhancedCompiler.CompUtil.mr_reduce_empty [] mr with
   | None -> ()
   | Some f -> fprintf ff "default(@[%a@]);" (pretty_default_fun sym) f
   end
@@ -916,24 +967,24 @@ let pretty_drtype_aux sym ff drt =
   | Hack.Tlocal tr -> fprintf ff "L%a" (pretty_rtype_aux sym) tr
   | Hack.Tdistr tr -> fprintf ff "D%a" (pretty_rtype_aux sym) tr
 
-let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.EnhancedCompiler.CompCore.type_annotation) =
+let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
   let sym = if greek then greeksym else textsym in
-  let inf = Compiler.EnhancedCompiler.CompCore.ta_inferred [] at in
-  let req = Compiler.EnhancedCompiler.CompCore.ta_required [] at in
+  let inf = Compiler.EnhancedCompiler.CompUtil.ta_inferred [] at in
+  let req = Compiler.EnhancedCompiler.CompUtil.ta_required [] at in
   if Hack.equiv_dec (Hack.drtype_eqdec Hack.EnhancedRuntime.compiler_foreign_type []) inf req
   then
     fprintf ff "@[%a%a%a%a@]"
 	    pretty_sym sym.lpangle
 	    (pretty_drtype_aux sym) inf
 	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.CompCore.ta_base [] at)
+            subpr (Compiler.EnhancedCompiler.CompUtil.ta_base [] at)
   else
     fprintf ff "@[%a%a -> %a%a%a@]"
 	    pretty_sym sym.lpangle
 	    (pretty_drtype_aux sym) inf
 	    (pretty_drtype_aux sym) req
 	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.CompCore.ta_base [] at)
+            subpr (Compiler.EnhancedCompiler.CompUtil.ta_base [] at)
 
 (* Pretty Spark IR *)
 let rec pretty_column_aux p sym ff col =
@@ -979,3 +1030,36 @@ let pretty_dataset greek margin ds =
 let pretty_plug_dataset greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_dataset_aux 0 sym ff a
+
+
+(* Pretty languages *)
+
+let pretty_query pconf q =
+  let greek = get_charset_bool pconf in
+  let margin = pconf.margin in
+  begin match q with
+  | Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_nra q -> pretty_nra greek margin q
+  | Q_nraenv q -> pretty_nraenv greek margin q
+  | Q_nnrc q -> pretty_nnrc greek margin q
+  | Q_nnrcmr q -> pretty_nnrcmr greek margin q
+  | Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_dnnrc_dataset q ->
+      let ann = pretty_annotate_ignore in
+      let plug = pretty_plug_dataset greek in
+      pretty_dnrc ann plug greek margin q
+  | Q_dnnrc_typed_dataset q ->
+      let ann =
+        pretty_annotate_annotated_rtype greek pretty_annotate_ignore
+      in
+      let plug = pretty_plug_dataset greek in
+      pretty_dnrc ann plug greek margin q
+  | Q_javascript q -> Util.string_of_char_list q
+  | Q_java q -> Util.string_of_char_list q
+  | Q_spark q -> Util.string_of_char_list q
+  | Q_spark2 q -> Util.string_of_char_list q
+  | Q_cloudant q -> CloudantUtil.string_of_cloudant q
+  | Q_error q -> "Error: "^(Util.string_of_char_list q)
+  end

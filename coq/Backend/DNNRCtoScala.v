@@ -31,8 +31,8 @@ Require Import RType.
 Require Import TDataInfer.
 Require Import TDNRCInfer.
 Require Import TOpsInfer.
+Require Import Dataset.
 Require Import SparkData.
-Require Import SparkIR.
 
 Local Open Scope string_scope.
 

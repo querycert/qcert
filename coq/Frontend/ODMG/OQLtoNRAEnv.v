@@ -433,6 +433,11 @@ Section OQLtoNRAEnv.
         reflexivity.
   Qed.
 
+  (* Top-level translation call *)
+
+  Definition translate_oql_to_algenv (e:oql_expr) : algenv :=
+    (* Produces the initial plan *)
+    ANApp (algenv_of_oql e) (ANConst (drec nil)).
 
   (********************************************
    * Additional properties of the translation *
@@ -473,55 +478,6 @@ Section OQLtoNRAEnv.
     apply fold_left_ignore_env; simpl; auto.
   Qed.
 
-  Section size.
-    Require Import OQLSize.
-    Require Import RAlgEnvSize.
-    Require Import Omega.
-
-    Lemma from_in_fold_size el op n:
-      Forall
-        (fun ab : oql_in_expr =>
-         algenv_size (algenv_of_oql (oin_expr ab)) <=
-         4 * oql_size (oin_expr ab)) el ->
-      algenv_size op <= n ->
-      algenv_size
-        (fold_left
-           (fun (opacc : algenv) (from_in_expr : oql_in_expr) =>
-              let (in_v, from_expr) := from_in_expr in
-              (⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩( algenv_of_oql from_expr) ⟩( opacc))%algenv)
-           el op)
-      <= fold_left (fun (x : nat) (e : oql_in_expr) => (S (S (S (S (x + (4 * oql_in_size e))))))) el n.
-    Proof.
-      revert op n.
-      induction el; intros; try (simpl; omega).
-      destruct a; simpl.
-      specialize (IHel (⋈ᵈ⟨χ⟨‵[| (s, ID)|] ⟩( algenv_of_oql o) ⟩( op))%algenv (S (S (S (S (n + (4 * oql_size o ))))))).
-      simpl in *.
-      inversion H; subst; clear H.
-      specialize (IHel H4); clear H4.
-      simpl in H3.
-      assert (S (S (S (S (algenv_size (algenv_of_oql o) + algenv_size op)))) <=
-         S
-           (S
-              (S (S (n + (oql_size o + (oql_size o + (oql_size o + (oql_size o + 0)))))))))
-        by (simpl in H3; omega).
-      specialize (IHel H); clear H; simpl in *.
-      admit.
-      (*
-      simpl (oql_in_size (OIn s)).
-      omega.
-       *)
-    Admitted.
-
-    (** Proof showing linear size translation *)
-    Lemma alg_trans_size e :
-      algenv_size (algenv_of_oql e) <= 4 * oql_size e.
-    Proof.
-      induction e; try (simpl; omega).
-    Admitted.
-    
-  End size.
-  
 End OQLtoNRAEnv.
 
 (* 

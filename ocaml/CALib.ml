@@ -17,12 +17,10 @@
 (* This is main interface for CALib, the CAMP Compiler library *)
 
 open Util
-open ConfigUtil
 open ParseString
 open CloudantUtil
 open Stats
 open DisplayUtil
-open FrontUtil
 open Compiler.EnhancedCompiler
 
 
@@ -31,8 +29,10 @@ open Compiler.EnhancedCompiler
 type schema = RType.brand_model * RType.camp_type
 
 let schema_of_io (io:string) =
-  let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string io) in
-  TypeUtil.process_schema schema_content wmType
+  let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io) in
+  let brand_model = sch.TypeUtil.sch_brand_model in
+  let camp_type = sch.TypeUtil.sch_camp_type in
+  (brand_model, camp_type)
 
 (* Abstract AST types *)
 
@@ -57,26 +57,40 @@ let dvar_conv x =
 (* From source to CAMP *)
 
 let rule_to_camp (s:string) : camp =
-  let (_,op) = camp_of_rule_string s in op
+  begin match ParseString.parse_rule_from_string s with
+  | _, CompDriver.Q_rule q -> CompDriver.rule_to_camp q
+  | _, CompDriver.Q_camp q -> q
+  | _, CompDriver.Q_error err -> raise (CACo_Error (string_of_char_list err))
+  | _ -> assert false
+  end
+
+
+
 
 (* From camp to NRAEnv *)
 
 let camp_to_nraenv (c:camp) =
-  nraenv_of_camp c
+  CompDriver.camp_to_nraenv c
 
 (* From source to NRAEnv *)
 
 let rule_to_nraenv_name (s:string) : string =
-  fst (nraenv_of_rule_string s)
+  fst (ParseString.parse_rule_from_string s)
 
 let rule_to_nraenv (s:string) : nraenv =
-  snd (nraenv_of_rule_string s)
+  begin match ParseString.parse_rule_from_string s with
+  | _, CompDriver.Q_rule q -> CompDriver.rule_to_nraenv q
+  | _, CompDriver.Q_camp q -> CompDriver.camp_to_nraenv q
+  | _, CompDriver.Q_error err -> raise (CACo_Error (string_of_char_list err))
+  | _ -> assert false
+  end
 
 let oql_to_nraenv_name (s:string) : string =
-  fst (nraenv_of_oql_string s)
+  "OQL"
 
 let oql_to_nraenv (s:string) : nraenv =
-  snd (nraenv_of_oql_string s)
+  let q = ParseString.parse_oql_from_string s in
+  CompDriver.oql_to_nraenv q
 
 (*
  *  Core compiler section
@@ -84,20 +98,18 @@ let oql_to_nraenv (s:string) : nraenv =
 
 (* Translations *)
 
-let translate_nraenv_to_nnrc (op:nraenv) : nnrc = CompCore.translate_nraenv_to_nnrc op
-let translate_nnrc_to_nnrcmr (n:nnrc) : nnrcmr = CompCore.translate_nnrc_to_nnrcmr_chain n
-let translate_nnrc_to_dnnrc (tenv: string list) (n:nnrc) : dnnrc_dataset =
-  let tenv = List.map dvar_conv tenv in
-  CompCore.translate_nnrc_to_dnnrc tenv n
+let translate_nraenv_to_nnrc (q:nraenv) : nnrc = CompDriver.nraenv_to_nnrc q
+let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompDriver.nnrc_to_nnrcmr_comptop Compiler.init_vinit q
+let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset CompUtil.mkDistLoc n
 
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
   match
     let (brand_model,wmRType) = sc in
-    CompCore.tcompile_nraenv_to_dnnrc_dataset_opt
-      brand_model
-      (Enhanced.Model.foreign_typing brand_model)
-      op
-      wmRType
+    (CompDriver.dnnrc_to_dnnrc_typed_dataset
+       brand_model
+       (Enhanced.Model.foreign_typing brand_model)
+       (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)
+       wmRType)
   with
   | Some x -> x
   | None -> raise (CACo_Error "Spark2 target compilation failed")
@@ -105,36 +117,28 @@ let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_type
 let dnnrc_typed_dataset_to_spark2 (nrule:string) (sc:schema) (e:dnnrc_typed_dataset) : string =
   let (brand_model,wmRType) = sc in
   string_of_char_list
-    (CompBack.dnrc_to_scala_code_gen
+    (CompDriver.dnnrc_typed_dataset_to_spark2
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
        wmRType (Util.char_list_of_string nrule) e)
 
 (* NRAEnv Optimizer *)
-let optimize_nraenv (op:nraenv) =
-  CompCore.toptimize_algenv_typed_opt op
+let optimize_nraenv (op:nraenv) = CompDriver.nraenv_optim op
 
 (* NNRC Optimizer *)
-let optimize_nnrc (n:nnrc) =
-  CompCore.trew_nnrc_typed_opt n
+let optimize_nnrc (n:nnrc) = CompDriver.nnrc_optim n
 
 (* NNRCMR Optimizer *)
-let optimize_nnrcmr (n:nnrcmr) =
-  CompCore.trew_nnrcmr_typed_opt n
+let optimize_nnrcmr (n:nnrcmr) = CompDriver.nnrcmr_optim n
 
-let optimize_nnrcmr_for_cloudant (n:nnrcmr) =
-  CompBack.nrcmr_to_nrcmr_prepared_for_cldmr n
-
-let optimize_nnrcmr_for_spark (n:nnrcmr) =
-  CompBack.nrcmr_to_nrcmr_prepared_for_spark n
+let optimize_nnrcmr_for_cloudant (n:nnrcmr) = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare n
+let optimize_nnrcmr_for_spark (n:nnrcmr) = CompDriver.nnrcmr_to_nnrcmr_spark_prepare n
 
 (* For convenience *)
 (* Note: This includes optimization phases *)
 
-let compile_nraenv_to_nnrc (op:nraenv) =
-  CompCore.tcompile_nraenv_to_nnrc_typed_opt op
-let compile_nraenv_to_nnrcmr (op:nraenv) =
-  CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op
+let compile_nraenv_to_nnrc (op:nraenv) = CompDriver.nraenv_optim_to_nnrc_optim op
+let compile_nraenv_to_nnrcmr (op:nraenv) = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op
 
 
 (*
@@ -142,11 +146,17 @@ let compile_nraenv_to_nnrcmr (op:nraenv) =
  *)
 
 let nnrc_to_js (n:nnrc) =
-  string_of_char_list (CompBack.nrc_to_js_code_gen n)
+  string_of_char_list
+    (CompDriver.nnrc_to_javascript n)
 let nnrc_to_java (basename:string) (imports:string) (n:nnrc) =
-  string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string imports) n)
+  string_of_char_list
+    (CompDriver.nnrc_to_java
+       (Util.char_list_of_string basename)
+       (Util.char_list_of_string imports) n)
 let nnrcmr_to_spark (nrule:string) (n:nnrcmr) =
-  string_of_char_list (CompBack.mrchain_to_spark_code_gen (Util.char_list_of_string nrule) n)
+  string_of_char_list
+    (CompDriver.nnrcmr_prepared_to_spark
+       (Util.char_list_of_string nrule) n)
 
 let translate_nnrcmr_to_cldmr (n:nnrcmr) : cldmr =
   CloudantUtil.cloudant_translate_no_harness n
@@ -157,14 +167,19 @@ let cldmr_to_cloudant (prefix:string) (nrule:string) (cl:cldmr) : string =
 (* For convenience *)
       
 let compile_nraenv_to_js (op:nraenv) : string =
-  string_of_char_list (CompBack.nrc_to_js_code_gen (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+  string_of_char_list (CompDriver.nnrc_to_javascript
+			 (CompDriver.nraenv_optim_to_nnrc_optim op))
 
 let compile_nraenv_to_java (basename:string) (imports:string) (op:nraenv) : string =
-  string_of_char_list (CompBack.nrc_to_java_code_gen (Util.char_list_of_string basename) (Util.char_list_of_string imports) (CompCore.tcompile_nraenv_to_nnrc_typed_opt op))
+  string_of_char_list (CompDriver.nnrc_to_java
+			 (Util.char_list_of_string basename)
+			 (Util.char_list_of_string imports)
+			 (CompDriver.nraenv_optim_to_nnrc_optim op))
 
 let compile_nraenv_to_spark (nrule:string) (op:nraenv) : string =
-  let mr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  string_of_char_list (CompBack.mrchain_to_spark_code_gen_with_prepare (Util.char_list_of_string nrule) mr)
+  string_of_char_list (CompDriver.nnrcmr_to_spark
+			 (Util.char_list_of_string nrule)
+			 (CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op))
 
 let compile_nraenv_to_cloudant (prefix:string) (nrule:string) (op:nraenv) : string =
   cloudant_compile_no_harness_from_nra (idioticize prefix nrule) op
@@ -208,11 +223,9 @@ let import_cldmr (ns:string) = DisplayUtil.sexp_string_to_cldmr ns
 let pretty_nraenv (greek:bool) (margin:int) (op:nraenv) = PrettyIL.pretty_nraenv greek margin op
 let pretty_nnrc (greek:bool) (margin:int) (n:nnrc) = PrettyIL.pretty_nnrc greek margin n
 let pretty_nnrcmr_for_spark (greek:bool) (margin:int) (nmr:nnrcmr) =
-  let opt_nnrcmr = nmr in
-  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_spark opt_nnrcmr)
+  PrettyIL.pretty_nnrcmr greek margin (CompDriver.nnrcmr_to_nnrcmr_spark_prepare nmr)
 let pretty_nnrcmr_for_cloudant (greek:bool) (margin:int) (nmr:nnrcmr) =
-  let opt_nnrcmr = nmr in
-  PrettyIL.pretty_nnrcmr greek margin (CompBack.nrcmr_to_nrcmr_prepared_for_cldmr opt_nnrcmr)
+  PrettyIL.pretty_nnrcmr greek margin (CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare nmr)
 
 (* Options *)
 

@@ -18,122 +18,121 @@ open Util
 open CloudantUtil
 open DataUtil
 open Compiler.EnhancedCompiler
+open QcertArg
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
-type source_lang =
-  | RULE
-  | OQL
-
-type target_lang =
-  | ORIG
-  | NRAEnv
-  | NNRC
-  | DNNRC
-  | NNRCMR
-  | CLDMR
-  | Java
-  | JS
-  | Spark
-  | Spark2
-  | Cloudant
 
 type lang_config =
-    { mutable slang : source_lang;
-      mutable tlang : target_lang;
+    { mutable slang : string option;
+      mutable tlang : string option;
+      mutable path : string list;
       cld_conf : cld_config }
 
 let default_eval_lang_config () =
-  { slang = RULE;
-    tlang = ORIG;
+  { slang = None; (* default: "rule" *)
+    tlang = None; (* default: "rule" *)
+    path = [];
     cld_conf = default_cld_config () }
-      
-let default_comp_lang_config () =
-  { slang = RULE;
-    tlang = JS;
-    cld_conf = default_cld_config () }
-      
-let get_source_lang conf = conf.slang
-let change_source conf s =
-  match s with
-  | "Rule" -> conf.slang <- RULE
-  | "OQL" -> conf.slang <- OQL
-  | _ ->
-      Printf.fprintf stderr "Unknown source: %s\n" s;
-      raise (CACo_Error ("Unknown source: " ^ s))
 
+let default_comp_lang_config () =
+  { slang = None; (* default: "rule" *)
+    tlang = None; (* default: "js" *)
+    path = [];
+    cld_conf = default_cld_config () }
+
+let get_source_lang conf = conf.slang
+let change_source conf s = conf.slang <- Some s
 let get_target_lang conf = conf.tlang
-let change_target conf s =
-  match s with
-  | "Orig" -> conf.tlang <- ORIG
-  | "CAMP" -> conf.tlang <- ORIG (* Deprecated *)
-  | "NRAEnv" -> conf.tlang <- NRAEnv
-  | "NNRC" -> conf.tlang <- NNRC
-  | "DNNRC" -> conf.tlang <- DNNRC
-  | "NNRCMR" -> conf.tlang <- NNRCMR
-  | "CLDMR" -> conf.tlang <- CLDMR
-  | "Java" -> conf.tlang <- Java
-  | "JS" | "RHINO" -> conf.tlang <- JS
-  | "Spark" -> conf.tlang <- Spark
-  | "Spark2" -> conf.tlang <- Spark2
-  | "Cloudant" -> conf.tlang <- Cloudant
-  | _ ->
-      Printf.fprintf stderr "Unknown target: %s\n" s;
-      raise (CACo_Error ("Unknown target: " ^ s))
+let change_target conf s = conf.tlang <- Some s
+
+let get_source_lang_caco conf =
+  begin match get_source_lang conf with
+  | Some s -> s
+  | None -> "rule"
+  end
+let get_source_lang_caev conf =
+  begin match get_source_lang conf with
+  | Some s -> s
+  | None -> "rule"
+  end
+
+let get_target_lang_caco conf =
+  begin match get_target_lang conf with
+  | Some s -> s
+  | None -> "js"
+  end
+let get_target_lang_caev conf =
+  begin match get_target_lang conf with
+  | Some s -> s
+  | None -> "rule"
+  end
+
+
+let add_path conf s = conf.path <- conf.path @ [s]
+let set_path conf path = conf.path <- conf.path @ path
+let get_path conf = conf.path
 
 let get_cld_config conf = conf.cld_conf
 
 (* Target language *)
 let suffix_rule () = "_rule.camp"
+let suffix_camp () = "_camp.camp"
 let suffix_oql () = "_oql.txt"
-let suffix_nra () = "_nraenv.txt"
+let suffix_nra () = "_nra.txt"
+let suffix_nraenv () = "_nraenv.txt"
 let suffix_nrasexp () = "_nraenv.sexp"
-let suffix_nrc () = "_nnrc.txt"
-let suffix_nrcsexp () = "_nnrc.sexp"
-let suffix_dnrc () = "_dnnrc.txt"
-let suffix_dnrcsexp () = "_dnnrc.sexp"
-let suffix_nrcmr () = "_nnrcmr.txt"
-let suffix_nrcmr_spark () = "_nnrcmr_spark.txt"
-let suffix_nrcmr_sparksexp () = "_nnrcmr_spark.sexp"
-let suffix_nrcmr_spark2 () = "_nnrcmr_spark2.txt"
-let suffix_nrcmr_spark2sexp () = "_nnrcmr_spark2.sexp"
-let suffix_nrcmr_cldmr () = "_nnrcmr_cldmr.txt"
-let suffix_nrcmr_cldmrsexp () = "_nnrcmr_cldmr.sexp"
+let suffix_nnrc () = "_nnrc.txt"
+let suffix_nnrcsexp () = "_nnrc.sexp"
+let suffix_dnnrc_dataset () = "_dnnrc.txt"
+let suffix_dnnrc_typed_dataset () = "_dnnrc.txt"
+let suffix_dnnrcsexp () = "_dnnrc.sexp"
+let suffix_nnrcmr () = "_nnrcmr.txt"
+let suffix_nnrcmr_spark () = "_nnrcmr_spark.txt"
+let suffix_nnrcmr_sparksexp () = "_nnrcmr_spark.sexp"
+let suffix_nnrcmr_spark2 () = "_nnrcmr_spark2.txt"
+let suffix_nnrcmr_spark2sexp () = "_nnrcmr_spark2.sexp"
+let suffix_nnrcmr_cldmr () = "_nnrcmr_cldmr.txt"
+let suffix_nnrcmr_cldmrsexp () = "_nnrcmr_cldmr.sexp"
 let suffix_java () = ".java"
-let suffix_js () = ".js"
+let suffix_javascript () = ".js"
 let suffix_spark () = "_spark.scala"
 let suffix_spark2 () = "_spark2.scala"
 let suffix_cld_design () = "_cloudant_design.json"
-let suffix_cld_curl () = "_cloudant.sh"
 let suffix_stats () = "_stats.json"
+let suffix_error () = ".error"
 
 let suffix_sdata () = ".sio"
 
-let suffix_target conf =
-  match conf.tlang with
-  | ORIG ->
-      begin
-	match conf.slang with
-	| RULE -> suffix_rule ()
-	| OQL -> suffix_oql ()
-      end
-  | NRAEnv -> suffix_nra ()
-  | NNRC -> suffix_nrc ()
-  | DNNRC -> suffix_dnrc ()
-  | NNRCMR -> suffix_nrcmr ()
-  | CLDMR -> suffix_nrcmr_cldmr ()
-  | Java -> suffix_java ()
-  | JS -> suffix_js ()
-  | Spark -> suffix_spark ()
-  | Spark2 -> suffix_spark2 ()
-  | Cloudant -> suffix_cld_design ()
+let suffix_of_language lang =
+  match lang with
+  | CompDriver.L_rule -> suffix_rule ()
+  | CompDriver.L_camp -> suffix_camp ()
+  | CompDriver.L_oql -> suffix_oql ()
+  | CompDriver.L_nra -> suffix_nra ()
+  | CompDriver.L_nraenv -> suffix_nraenv ()
+  | CompDriver.L_nnrc -> suffix_nnrc ()
+  | CompDriver.L_dnnrc_dataset -> suffix_dnnrc_dataset ()
+  | CompDriver.L_dnnrc_typed_dataset -> suffix_dnnrc_typed_dataset ()
+  | CompDriver.L_nnrcmr -> suffix_nnrcmr ()
+  | CompDriver.L_cldmr -> suffix_nnrcmr_cldmr ()
+  | CompDriver.L_javascript -> suffix_javascript ()
+  | CompDriver.L_java -> suffix_java ()
+  | CompDriver.L_spark -> suffix_spark ()
+  | CompDriver.L_spark2 -> suffix_spark2 ()
+  | CompDriver.L_cloudant -> suffix_cld_design ()
+  | CompDriver.L_error _ -> suffix_error ()
+
+(* let suffix_target conf = *)
+(*   suffix_of_language (language_of_name (conf.tlang)) *)
 
 (* Evaluator Section *)
-  
+
 type eval_config =
     { debug : bool ref;
       eval_only : bool ref;
       mutable eval_io : Data.json option;
+      mutable eval_schema : string option;
       mutable format : serialization_format;
       mutable eval_inputs : string list;
       eval_lang_config : lang_config }
@@ -142,17 +141,19 @@ let default_eval_config () =
   { debug = ref false;
     eval_only = ref false;
     eval_io = None;
+    eval_schema = None;
     format = META;
     eval_inputs = [];
     eval_lang_config = default_eval_lang_config () }
 
 let set_eval_io conf io = conf.eval_io <- Some io
+let set_eval_schema conf schema = conf.eval_schema <- Some schema
 let set_input conf f = conf.eval_inputs <- f :: conf.eval_inputs
 
 let set_format conf s =
-  match s with
-  | "META" -> conf.format <- META
-  | "ENHANCED" -> conf.format <- ENHANCED
+  match String.lowercase s with
+  | "meta" -> conf.format <- META
+  | "enhanced" -> conf.format <- ENHANCED
   | _ -> ()
 
 let get_format conf = conf.format
@@ -160,10 +161,11 @@ let get_eval_lang_config conf = conf.eval_lang_config
 let get_eval_only conf = conf.eval_only
 let get_debug conf = conf.debug
 let get_eval_io conf = conf.eval_io
+let get_eval_schema conf = conf.eval_schema
 let get_eval_inputs conf = conf.eval_inputs
 
 (* Data Section *)
-  
+
 type data_config =
     { mutable in_jsons : Data.json list;
       mutable data_format : serialization_format;
@@ -182,9 +184,9 @@ let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
 
 let set_data_format conf s =
-  match s with
-  | "META" -> conf.data_format <- META
-  | "ENHANCED" -> conf.data_format <- ENHANCED
+  match String.lowercase s with
+  | "meta" -> conf.data_format <- META
+  | "enhanced" -> conf.data_format <- ENHANCED
   | _ -> ()
 
 let set_data_dir conf d = conf.data_dir <- Some d
@@ -196,9 +198,9 @@ let get_data_schema conf =
   conf.data_schema
 let get_data_dir conf =
   conf.data_dir
-      
+
 (* Compiler Section *)
-  
+
 type comp_config =
     { mutable comp_io : string option;
       mutable dir : string option;
@@ -250,5 +252,3 @@ let get_pretty_config conf = conf.comp_pretty_config
 
 let set_java_imports conf imports = conf.java_imports <- imports
 let get_java_imports conf = conf.java_imports
-
-

@@ -21,13 +21,12 @@ open Compiler.EnhancedCompiler
 
 (* Parse/translate input *)
 
-val camp_of_rule_string : string -> (string * CompDriver.camp)
-val nraenv_of_camp : CompDriver.camp -> CompDriver.nraenv
+(* val camp_of_rule_string : string -> (string * CompDriver.camp) *)
 
-val nraenv_of_rule : string -> (string * CompDriver.nraenv)
-val nraenv_of_rule_string : string -> (string * CompDriver.nraenv)
-val nraenv_of_oql : string -> (string * CompDriver.nraenv)
-val nraenv_of_oql_string : string -> (string * CompDriver.nraenv)
+(* val nraenv_of_rule : string -> (string * CompDriver.nraenv) *)
+(* val nraenv_of_rule_string : string -> (string * CompDriver.nraenv) *)
+(* val nraenv_of_oql : string -> (string * CompDriver.nraenv) *)
+(* val nraenv_of_oql_string : string -> (string * CompDriver.nraenv) *)
 
 val nraenv_of_input : lang_config -> string -> (string * CompDriver.nraenv)
 

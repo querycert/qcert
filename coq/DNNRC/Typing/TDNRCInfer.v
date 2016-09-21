@@ -149,15 +149,44 @@ Section TDNRCInfer.
        | DNRCUnop a u n1 =>
          let unf (n₁:dnrc (type_annotation A) plug_type) : option (dnrc (type_annotation A) plug_type)
              := let dτ₁ := (di_typeof n₁) in
-                olift (fun τ₁ =>
-                         lift (fun τs =>
-                                 let '(τ, τ₁') := τs in
-                                 DNRCUnop
-                                   (ta_mk a (Tlocal τ))
-                                   u
-                                   (ta_require (Tlocal τ₁') n₁))
-                          (infer_unop_type_sub u τ₁))
-                       (lift_tlocal dτ₁)
+                bind_local_distr dτ₁
+                                 (* Infer for local values *)
+                                 (fun τ₁ =>
+                                    lift (fun τs =>
+                                            let '(τ, τ₁') := τs in
+                                            DNRCUnop
+                                              (ta_mk a (Tlocal τ))
+                                              u
+                                              (ta_require (Tlocal τ₁') n₁))
+                                         (infer_unop_type_sub u τ₁))
+                                 (* Infer for distributed values *)
+                                 (* Note: one example of unop from distr to local ;
+                                          one example from distr to distr ... *)
+                                 (fun τ₁ =>
+                                    match u with
+                                    | ACount =>
+                                      lift (fun τs =>
+                                              let '(τ, τ₁') := τs in
+                                              DNRCUnop
+                                                (ta_mk a (Tlocal τ))
+                                                ACount
+                                                (ta_require (Tlocal τ₁') n₁))
+                                           (infer_unop_type_sub ACount (Coll τ₁))
+                                    | ADistinct =>
+                                      olift (fun τs =>
+                                              let '(τ, τ₁') := τs in
+                                              lift2 (fun τc =>
+                                                       fun τc₁' =>
+                                                         DNRCUnop
+                                                           (ta_mk a (Tdistr τc))
+                                                           ADistinct
+                                                           (ta_require (Tdistr τc₁') n₁))
+                                                    (tuncoll τ)
+                                                    (tuncoll τ₁')) (* Note: tuncoll is safe because the inference for ADistinct does a join with (Coll ⊥) ensuring that tuncoll would work *)
+                                           (infer_unop_type_sub ADistinct (Coll τ₁))
+                                    | _ => None
+                                    end
+                                 )
          in
          olift unf (infer_dnrc_type tenv n1)
 
@@ -312,22 +341,58 @@ Section TDNRCInfer.
             (DNRCVar tt "WORLD"%string)
             (DNRCUnop tt AToString (DNRCVar tt "el"%string)).
 
+  Example ex6 : dnrc unit plug_type :=
+    DNRCUnop tt ACount
+             (DNRCCollect tt (DNRCVar tt "WORLD"%string)).
+
+  Example ex7 : dnrc unit plug_type :=
+    DNRCUnop tt ACount (DNRCVar tt "WORLD"%string).
+
+  Example ex8 : dnrc unit plug_type :=
+    DNRCUnop tt ADistinct
+             (DNRCCollect tt (DNRCVar tt "WORLD"%string)).
+
+  Example ex9 : dnrc unit plug_type :=
+    DNRCUnop tt ADistinct (DNRCVar tt "WORLD"%string).
+
+  Example ex10 : dnrc unit plug_type :=
+    DNRCCollect tt (DNRCUnop tt ADistinct (DNRCVar tt "WORLD"%string)).
+
   (*
     Eval simpl in infer_dnrc_type
                          (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
                          ex4.
-
     Eval simpl in infer_dnrc_type
                          (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
                          ex5.
+    Eval simpl in infer_dnrc_type
+                         (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
+                         ex6.
+    Eval simpl in infer_dnrc_type
+                         (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
+                         ex7.
+
+    Eval simpl in infer_dnrc_type
+                         (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
+                         ex8.
+
+    Eval simpl in infer_dnrc_type
+                         (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
+                         ex9.
+
+    Eval simpl in infer_dnrc_type
+                         (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
+                         ex10.
    *)
 
-    (*
+(*
   Eval vm_compute in infer_dnrc_type nil ex1.
   Eval vm_compute in infer_dnrc_type nil ex2.
   Eval vm_compute in infer_dnrc_type nil ex3.
   Eval vm_compute in infer_dnrc_type nil ex4.
-     *)
+  Eval vm_compute in infer_dnrc_type nil ex5.
+  Eval vm_compute in infer_dnrc_type nil ex6.
+ *)
 
 End TDNRCInfer.
 

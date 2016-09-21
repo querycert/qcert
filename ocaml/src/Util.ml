@@ -22,7 +22,7 @@ exception CACo_Error of string
 
 (* this can't go in Logger, since that creates a circular dependency *)
 type logger_token_type = string
-				      
+
 (**************)
 (* Data types *)
 (**************)
@@ -45,10 +45,10 @@ open BinNums
 
 let rec coq_nat_of_pos i =
   if i = 0 then Datatypes.O else Datatypes.S (coq_nat_of_pos (i-1))
-  
+
 let coq_positive_of_pos i =
   BinPos.Pos.of_nat (coq_nat_of_pos i)
-  
+
 let coq_Z_of_int i =
   if (i = 0) then Z0
   else if (i < 0)
@@ -66,7 +66,7 @@ let coq_Z_of_int i = i
 (* Temporarily disabled -- JS
    let os_newline = if Sys.win32 then "\r\n" else "\n" *)
 let os_newline = "\n"
-	
+
 let string_of_file file =
   try
     let inchan = open_in_bin file in
@@ -135,7 +135,7 @@ let rec float_listmin_aux l x =
   match l with
   | [] -> x
   | c :: ls -> float_listmin_aux ls (if x<c then x else c)
-  
+
 let float_listmin l =
   match l with
   | [] -> infinity
@@ -145,7 +145,7 @@ let rec float_listmax_aux l x =
   match l with
   | [] -> x
   | c :: ls -> float_listmax_aux ls (if x>c then x else c)
-  
+
 let float_listmax l =
   match l with
   | [] -> neg_infinity

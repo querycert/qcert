@@ -17,22 +17,25 @@
 (* This is main for the Camp Compiler *)
 
 open Util
+open QcertUtil
+open QcertArg
 open ConfigUtil
 open CloudantUtil
+open Compiler.EnhancedCompiler
 
 (* Compile from NRAEnv *)
 
 let compile_nraenv_to_string (conf:comp_config) (nrule:string) (basename:string) (op:CALib.nraenv) =
   let lconf = get_comp_lang_config conf in
-  match get_target_lang lconf with
-  | Java ->
+  match language_of_name (get_target_lang_caco lconf) with
+  | CompDriver.L_java ->
       (* this uses 'basename': the file name since the java class name needs to be the same as the file name *)
       (CALib.nnrc_to_java basename (get_java_imports conf) (CALib.compile_nraenv_to_nnrc op), None)
-  | JS ->
+  | CompDriver.L_javascript ->
       (CALib.nnrc_to_js (CALib.compile_nraenv_to_nnrc op), None)
-  | Spark ->
+  | CompDriver.L_spark ->
       (CALib.compile_nraenv_to_spark nrule op, None)
-  | Spark2 ->
+  | CompDriver.L_spark2 ->
       let io =
 	match get_comp_io conf with
 	| Some io -> io
@@ -41,7 +44,7 @@ let compile_nraenv_to_string (conf:comp_config) (nrule:string) (basename:string)
       let schema = CALib.schema_of_io io in
       let e = CALib.translate_nraenv_to_dnnrc_typed_dataset schema op in
       (CALib.dnnrc_typed_dataset_to_spark2 nrule schema e, Some schema)
-  | Cloudant ->
+  | CompDriver.L_cloudant ->
       let cld_conf = get_cld_config lconf in
       begin
 	match get_comp_io conf with
@@ -50,13 +53,16 @@ let compile_nraenv_to_string (conf:comp_config) (nrule:string) (basename:string)
 	| None ->
 	    (CALib.compile_nraenv_to_cloudant_with_harness_no_hierarchy (get_harness cld_conf) (idioticize (get_prefix cld_conf) nrule) op, None)
       end
-  | _ ->
-      raise (CACo_Error ("Target not supported by CACo"))
+  | lang ->
+      raise (CACo_Error ("Unsupported target language: " ^ (string_of_char_list (CompDriver.name_of_language lang))))
 
 let compile_nraenv_top conf (fname,sname,op) =
   let fpref = Filename.chop_extension fname in
   let (scomp,rest) = compile_nraenv_to_string conf sname (Filename.basename fpref) op in
-  let fout = outname (target_f (get_dir conf) fpref) (suffix_target (get_comp_lang_config conf)) in
+  let fout =
+    outname (target_f (get_dir conf) fpref)
+      (suffix_of_language (language_of_name (get_target_lang_caco (get_comp_lang_config conf))))
+  in
   make_file fout scomp;
   rest
 
@@ -87,14 +93,16 @@ let usage = "CaCo [-target language] [-source language] [-dir output] [-harness 
 
 (* Main *)
 
-let nraenv_of_input conf f : (string * CALib.nraenv) =
-  match get_source_lang conf with
-  | RULE ->
+let nraenv_of_input lconf f : (string * CALib.nraenv) =
+  match language_of_name (get_source_lang_caco lconf) with
+  | CompDriver.L_rule ->
       let s = Util.string_of_file f in
       (CALib.rule_to_nraenv_name s, CALib.rule_to_nraenv s)
-  | OQL ->
+  | CompDriver.L_oql ->
       let s = Util.string_of_file f in
       (CALib.oql_to_nraenv_name s, CALib.rule_to_nraenv s)
+  | _ ->
+      raise (CACo_Error ("Unsupported source language: " ^ (get_source_lang_caco lconf)))
 
 let display_dispatch charsetbool margin modelandtype conf fname op =
   match (modelandtype,get_comp_io conf) with
