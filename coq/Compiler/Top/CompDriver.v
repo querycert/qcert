@@ -1345,7 +1345,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_rule, L_spark2 =>
         L_rule
@@ -1355,7 +1355,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From camp: *)
@@ -1451,7 +1451,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_camp, L_spark2 =>
         L_camp
@@ -1461,7 +1461,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From oql: *)
@@ -1552,7 +1552,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_oql, L_spark2 =>
         L_oql
@@ -1562,7 +1562,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From nra: *)
@@ -1653,7 +1653,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_nra, L_spark2 =>
         L_nra
@@ -1662,7 +1662,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From nraenv: *)
@@ -1757,7 +1757,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_nraenv, L_spark2 =>
         L_nraenv
@@ -1766,7 +1766,7 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From nnrc: *)
@@ -1841,14 +1841,14 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_nnrc, L_spark2 =>
         L_nnrc
           :: L_nnrc
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From nnrcmr: *)
