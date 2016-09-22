@@ -53,9 +53,7 @@ how to build on Windows.
 
 	make extraction
 
-This should produce the following executables in the ./bin directory:
-CACo for the Q\*cert compiler, CAEv for the Q\*cert evaluator, and
-CADa for the Q\*cert data processor.
+This should produce the `./bin/qcert` executable.
 
 ## Compile Queries
 
@@ -74,15 +72,22 @@ Calling the compiler on that sample with OQL as source language and
 Javascript as target language can be done as follows:
 
 ```
-$ ./bin/CACo -source OQL -target JS samples/oql/test1.oql
+$ ./bin/qcert -source OQL -target JS samples/oql/test1.oql
 ```
 
-This will produce a javascript file called `samples/oql/test1.js`.
+This will tell you the compilation steps being used:
+
+```
+Compiling from oql to js:
+  oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
+```
+
+and produce a javascript file called `samples/oql/test1.js`.
 
 Similarly for Java:
 
 ```
-$ ./bin/CACo -source OQL -target Java samples/oql/test1.oql
+$ ./bin/qcert -source OQL -target Java samples/oql/test1.oql
 ```
 
 This will produce a java file called `samples/oql/test1.java`.
