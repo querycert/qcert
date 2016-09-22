@@ -301,9 +301,8 @@ Section DNNRCtoScala.
           | Tlocal _ => scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
           | Tdistr _ => spark_of_unop op (scala_of_dnrc x)
           end
-        | DNRCLet t n x y => (* let n: t = x in y *) (* TODO could use line break *)
-          "{ val " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ " = " ++ scala_of_dnrc x ++ "; " ++
-                   scala_of_dnrc y ++ " }"
+        | DNRCLet t n x y => (* Scala val is letrec, use anonymous function instead *)
+          "((( " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ ") => " ++ scala_of_dnrc y ++ ")(" ++ scala_of_dnrc x ++ "))"
         | DNRCFor t n x y =>
           (* TODO for distributed map of non-record-like-things we have to unwrap *)
           scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
