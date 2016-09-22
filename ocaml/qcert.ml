@@ -31,7 +31,9 @@ let args_list gconf =
       ("-exact-path", Arg.Unit (QcertArg.set_exact_path gconf),
        " Use exactly the given path (do not infer intermediate steps nor add optimization)");
       ("-dir", Arg.String (QcertArg.set_dir gconf),
-       "<dir> Target directory for the emited code");
+       "<dir> Directory for the emited code");
+      ("-dir-target", Arg.String (QcertArg.set_dir_target gconf),
+       "<dir> Directory for the emitied code of target (if not specified use the one given by -dir)");
       ("-js-runtime", Arg.String (CloudantUtil.set_harness gconf.gconf_cld_conf),
        "<harness.js> JavaScript runtime");
       ("-io", Arg.String (QcertArg.set_io gconf),
@@ -117,6 +119,7 @@ let parse_args () =
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
+      gconf_dir_target = None;
       gconf_io = None;
       gconf_schema = TypeUtil.empty_schema;
       gconf_cld_conf = CloudantUtil.default_cld_config ();
@@ -226,7 +229,12 @@ let main_one_file gconf file_name =
   let () =
     (* emit compiled query *)
     let pconf = gconf.gconf_pretty_config in
-    let dir = gconf.gconf_dir in
+    let dir =
+      begin match gconf.gconf_dir_target with
+      | Some dir -> Some dir
+      | None -> gconf.gconf_dir
+      end
+    in
     emit_file dv_conf schema pconf dir file_name q_target
   in
   let () =

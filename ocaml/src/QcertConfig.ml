@@ -23,6 +23,7 @@ type global_config = {
     mutable gconf_path : CompDriver.language list; (* the first element of the path must be source and the last target *)
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
+    mutable gconf_dir_target : string option;
     mutable gconf_io : string option;
     mutable gconf_schema : TypeUtil.schema;
     gconf_cld_conf : CloudantUtil.cld_config;

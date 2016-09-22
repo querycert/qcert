@@ -25,6 +25,7 @@ let set_target gconf s = gconf.gconf_target <- language_of_name s
 let add_path gconf s = gconf.gconf_path <- gconf.gconf_path @ [ language_of_name s ]
 let set_exact_path gconf () = gconf.gconf_exact_path <- true
 let set_dir gconf s = gconf.gconf_dir <- Some s
+let set_dir_target gconf s = gconf.gconf_dir_target <- Some s
 let set_io gconf file_name = gconf.gconf_io <- Some (Util.string_of_file file_name)
 let set_emit_all gconf () = gconf.gconf_emit_all <- true
 let set_emit_sexp gconf () = gconf.gconf_emit_sexp <- true

@@ -21,6 +21,7 @@ val set_target : QcertConfig.global_config -> string -> unit
 val set_exact_path : QcertConfig.global_config -> unit -> unit
 val add_path : QcertConfig.global_config -> string -> unit
 val set_dir : QcertConfig.global_config -> string -> unit
+val set_dir_target : QcertConfig.global_config -> string -> unit
 val set_io : QcertConfig.global_config -> string -> unit
 val set_emit_all : QcertConfig.global_config -> unit -> unit
 val set_emit_sexp : QcertConfig.global_config -> unit -> unit
