@@ -259,6 +259,9 @@ japi:
 	@$(MAKE) java-extraction
 	@$(MAKE) lib/QcertLibrary.jar
 
+jsapi:
+	@$(MAKE) js-extraction
+
 lib/QcertLibrary.jar:
 	ant -f scripts/makeQcertLibrary.xml
 
@@ -279,6 +282,12 @@ java-extraction:
 	@echo "[QCert] Extracting compiler to OCaml + Java"
 	@echo "[QCert] "
 	@$(MAKE) -C ocaml clean japi
+
+js-extraction:
+	@echo "[QCert] "
+	@echo "[QCert] Extracting compiler to OCaml + Javascript"
+	@echo "[QCert] "
+	@$(MAKE) -C ocaml js
 
 Makefile.coq: Makefile $(VS) $(FILES)
 	@coq_makefile -R coq QCert $(FILES) -o Makefile.coq

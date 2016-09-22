@@ -6,11 +6,11 @@ dependencies:
     - sudo apt-get -qq update
     - sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
     - opam init -a
-    - opam install -y menhir ocamlbuild camlp5 coq:
+    - opam install -y menhir ocamlbuild camlp5 coq js_of_ocaml:
         timeout: 1200
   override:
     - make spark2-runtime
 
 test:
   override:
-    - eval `opam config env` && make -j4
+    - eval `opam config env` && make -j4 && make jsapi
