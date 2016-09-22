@@ -85,18 +85,22 @@ let languages =
     CompDriver.L_spark2;
     CompDriver.L_cloudant; ]
 
-let languages_string =
+let string_of_path sep path =
   let buff = Buffer.create 128 in
   let str_ff = Format.formatter_of_buffer buff in
   let () =
     Format.fprintf str_ff "%a"
       (Format.pp_print_list
-         ~pp_sep:(fun ff () -> Format.fprintf ff ", ")
+         ~pp_sep:(fun ff () -> Format.fprintf ff "%(%)" sep)
          (fun ff lang -> Format.fprintf ff "%s" (QcertUtil.name_of_language lang)))
-      languages
+      path
   in
   Format.pp_print_flush str_ff ();
   Buffer.contents buff
+
+
+let languages_string =
+  string_of_path ", " languages
 
 let usage =
   "Q*cert - Query compiler\n"^
@@ -159,6 +163,15 @@ let parse_file (gconf: QcertConfig.global_config) (file_name: string) =
     ParseFile.parse_query_from_file slang file_name
   in
   (qname, q)
+
+(* Message *)
+
+let print_comilation_path gconf =
+  let spath = string_of_path " -> " gconf.gconf_path in
+  Format.printf "Compiling from %s to %s:@\n"
+    (QcertUtil.name_of_language gconf.gconf_source)
+    (QcertUtil.name_of_language gconf.gconf_target);
+  Format.printf "  %s@." spath
 
 (* Compilation *)
 
@@ -258,6 +271,7 @@ let main_one_file gconf file_name =
 
 let () =
   let gconf = parse_args () in
+  print_comilation_path gconf;
   List.iter
     (fun file_name -> main_one_file gconf file_name)
     gconf.gconf_input_files
