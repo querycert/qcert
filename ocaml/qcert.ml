@@ -197,7 +197,8 @@ let main_one_file gconf file_name =
   let schema = gconf.gconf_schema in
   let brand_model = schema.TypeUtil.sch_brand_model (* CompDriver.get_schema dv_conf *) in
   let (qname, q_source) = parse_file gconf file_name in
-  let dv_conf = QcertArg.driver_conf_of_qcert_conf gconf (* schema *) qname in
+  let cname = (Filename.basename (Filename.chop_extension file_name)) in (* for Java code generation *)
+  let dv_conf = QcertArg.driver_conf_of_qcert_conf gconf (* schema *) qname (* class name *) cname in
   let queries = compile_file dv_conf schema gconf.gconf_path q_source in
   let q_target =
     begin match List.rev queries with

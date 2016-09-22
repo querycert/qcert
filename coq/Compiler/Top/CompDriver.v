@@ -835,6 +835,7 @@ Module CompDriver(runtime:CompilerRuntime).
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
+        comp_class_name : string; (* Class name different from rule name in Java case *)
         comp_brand_rel : list (string * string) (* brand_relation *);
         comp_input_type : rtype (* input type for inference *);
         comp_mr_vinit : var;
@@ -953,7 +954,7 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) config.(comp_vdbindings) dv)
       | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
-      | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_qname) config.(comp_java_imports) dv)
+      | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
       | Dv_camp dv => Dv_nnrc (Dv_nnrc_to_camp (List.map fst config.(comp_vdbindings)) dv) (* XXX to check XXX *)
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim dv)
       | Dv_rule _
@@ -2019,6 +2020,7 @@ Module CompDriver(runtime:CompilerRuntime).
     Definition default_dv_config :=
       mkDvConfig
         (* comp_qname = *) "query"
+        (* class_name = *) "query"
         (* comp_brand_rel = *) nil
         (* comp_input_type = *) RType.Unit
         (* comp_mr_vinit = *) init_vinit
