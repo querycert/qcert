@@ -121,7 +121,6 @@ qcertJS.js: qcertJS.byte
 
 qcertJS.byte: generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
-# <qcertJS.{cmo,byte}>: package(js_of_ocaml), package(js_of_ocaml.ppx)
 
 wsk-update:
 	wsk action update qcert _build/qcertJS.js

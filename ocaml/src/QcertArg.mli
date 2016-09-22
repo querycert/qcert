@@ -23,6 +23,8 @@ val add_path : QcertConfig.global_config -> string -> unit
 val set_dir : QcertConfig.global_config -> string -> unit
 val set_io : QcertConfig.global_config -> string -> unit
 val set_emit_all : QcertConfig.global_config -> unit -> unit
+val set_emit_sexp : QcertConfig.global_config -> unit -> unit
+val set_emit_sexp_all : QcertConfig.global_config -> unit -> unit
 val set_java_imports : QcertConfig.global_config -> string -> unit
 val add_input_file : QcertConfig.global_config -> string -> unit
 val set_mr_vinit : QcertConfig.global_config -> string -> unit

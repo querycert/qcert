@@ -794,30 +794,30 @@ let sexp_to_query (lang: CompDriver.language) (se: sexp) : CompDriver.query =
 let query_to_sexp (q: CompDriver.query) : sexp =
   begin match q with
   | CompDriver.Q_rule _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_camp q -> camp_to_sexp q
   | CompDriver.Q_oql _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_nra _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_nraenv q -> nraenv_to_sexp q
   | CompDriver.Q_nnrc q -> nnrc_to_sexp q
   | CompDriver.Q_nnrcmr q -> nnrcmr_to_sexp q
   | CompDriver.Q_cldmr q -> cldmr_to_sexp q
   | CompDriver.Q_dnnrc_dataset _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_dnnrc_typed_dataset _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_javascript _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_java _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_spark _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_spark2 _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_cloudant _ ->
-      raise (CACo_Error ((QcertUtil.name_of_query q)^" to sexp not yet implemented")) (* XXX TODO XXX *)
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_error err ->
-      raise (CACo_Error ("query_to_sexp: "^(Util.string_of_char_list err)))
+      SString ("query_to_sexp: "^(Util.string_of_char_list err))
   end

@@ -28,6 +28,8 @@ type global_config = {
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
+    mutable gconf_emit_sexp : bool;
+    mutable gconf_emit_sexp_all : bool;
     mutable gconf_java_imports : string;
     mutable gconf_input_files : string list;
     mutable gconf_mr_vinit : string;

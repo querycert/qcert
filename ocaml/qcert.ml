@@ -42,10 +42,10 @@ let args_list gconf =
       (*    " Produce statistics for all intermediate queries"); *)
       ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
        " Emit generated code of all intermediate queries");
-      (* ("-emit-sexp", Arg.Unit (QcertArg.set_sexpr gconf), *)
-      (*  " Emit the target query as an s-expression"); *)
-      (* ("-emit-sexp-all", Arg.Unit (QcertArg.set_sexprs gconf), *)
-      (*  " Emit all intermediate queries as s-expressions"); *)
+      ("-emit-sexp", Arg.Unit (QcertArg.set_emit_sexp gconf),
+       " Emit the target query as an s-expression");
+      ("-emit-sexp-all", Arg.Unit (QcertArg.set_emit_sexp_all gconf),
+       " Emit all intermediate queries as s-expressions");
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
@@ -117,6 +117,8 @@ let parse_args () =
       gconf_schema = TypeUtil.empty_schema;
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
+      gconf_emit_sexp = false;
+      gconf_emit_sexp_all = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_input_files = [];
@@ -173,11 +175,23 @@ let compile_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) (
 (* Emit *)
 
 let emit_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
-  let brand_model = schema.TypeUtil.sch_brand_model in
   let s = PrettyIL.pretty_query pretty_conf q in
+  let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
   let ext = ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir fpref) ext in
+  make_file fout s
+
+
+(* Emit s-expr *)
+
+let emit_sexpr_file (schema: TypeUtil.schema) dir file_name q =
+  let sexp = AstsToSExp.query_to_sexp q in
+  let s = SExp.sexp_to_string sexp in
+  let brand_model = schema.TypeUtil.sch_brand_model in
+  let fpref = Filename.chop_extension file_name in
+  let fpost = QcertUtil.name_of_language (CompDriver.language_of_query brand_model q) in
+  let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
   make_file fout s
 
 
@@ -204,21 +218,40 @@ let main_one_file gconf file_name =
   in
   let () =
     (* Emit intermediate queries *)
-    begin match gconf.gconf_emit_all with
-    | true ->
-        let _ =
-          List.fold_left
-            (fun fname q ->
-              let pconf = gconf.gconf_pretty_config in
-              let dir = gconf.gconf_dir in
-              emit_file dv_conf schema pconf dir fname q;
-              let suff =
-                ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
-              in
-              (Filename.chop_extension fname)^suff)
-            file_name queries
-        in ()
-    | false -> ()
+    if gconf.gconf_emit_all then begin
+      let _ =
+        List.fold_left
+          (fun fname q ->
+            let pconf = gconf.gconf_pretty_config in
+            let dir = gconf.gconf_dir in
+            emit_file dv_conf schema pconf dir fname q;
+            let suff =
+              ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
+            in
+            (Filename.chop_extension fname)^suff)
+          file_name queries
+      in ()
+    end
+  in
+  let () =
+    (* emit-sexp compiled query *)
+    if gconf.gconf_emit_sexp then begin
+      emit_sexpr_file schema gconf.gconf_dir file_name q_target
+    end
+  in
+  let () =
+    (* emit-sexp-all intermediate queries *)
+    if gconf.gconf_emit_sexp_all then begin
+      let _ =
+        List.fold_left
+          (fun fname q ->
+            emit_sexpr_file schema gconf.gconf_dir fname q;
+            let suff =
+              ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
+            in
+            (Filename.chop_extension fname)^suff)
+          file_name queries
+      in ()
     end
   in
   ()
