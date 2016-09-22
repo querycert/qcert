@@ -106,7 +106,7 @@ japi/lib/$(LIB).jar: $(LIB).jar
 
 qcertJS.js: qcertJS.byte
 	js_of_ocaml _build/qcertJS.byte
-	cp _build/qcertJS.js ../bin/qcertJS.js
+	cp _build/qcertJS.js ../lib/qcertJS.js
 
 qcertJS.byte: generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
