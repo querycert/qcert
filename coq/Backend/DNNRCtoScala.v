@@ -176,8 +176,9 @@ Section DNNRCtoScala.
 
   Definition spark_of_unop (op: unaryOp) (x: string) : string :=
     match op with
-    | ACount => x ++ ".count()" (* This returns a long, is this a problem? *)
-    | _ => "SPARK_OF_UNOP don't know how to generate Spark code for this operator"
+      | ACount => x ++ ".count()" (* This returns a long, is this a problem? *)
+      | AFlatten => x ++ ".flatMap(r => r)"
+      | _ => "SPARK_OF_UNOP don't know how to generate Spark code for this operator"
     end.
 
   Definition scala_of_unop (required_type: drtype) (op: unaryOp) (x: string) : string :=
@@ -323,7 +324,7 @@ Section DNNRCtoScala.
            * We need to unwrap them after the call to collect(). *)
           let postfix :=
               match lift primitive_type (olift tuncoll (lift_tdistr (di_typeof x))) with
-              | Some true => ".map((row) => row(0))"
+              | Some true => "/*UHM, do we need to unwrap the single ""res/val"" column or not?*/" (* ".map((row) => row(0))" (* I am confused at the moment about when this is needed.*) *)
               | Some false => ""
               | None => "ARGUMENT_TO_COLLECT_SHOULD_BE_DISTRIBUTED"
               end in
