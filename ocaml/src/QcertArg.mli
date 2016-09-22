@@ -16,34 +16,17 @@
 
 open Compiler.EnhancedCompiler
 
-type qcert_config = {
-    mutable qconf_source : CompDriver.language option;
-    mutable qconf_target : CompDriver.language option;
-    mutable qconf_path : CompDriver.language list;
-    mutable qconf_dir : string option;
-    mutable qconf_io : string option;
-    mutable qconf_schema : TypeUtil.schema;
-    qconf_cld_conf : CloudantUtil.cld_config;
-    mutable qconf_emit_all : bool;
-    qconf_pretty_config : PrettyIL.pretty_config;
-    mutable qconf_java_imports : string;
-    mutable qconf_input_files : string list;
-    mutable qconf_mr_vinit : string;
-    mutable qconf_vdbindings : CompDriver.vdbindings;
-  }
+val driver_conf_of_qcert_conf : QcertConfig.global_config -> string -> CompDriver.driver_config
 
-val default_qconf : unit -> qcert_config
-
-val driver_conf_of_qcert_conf : qcert_config -> string -> CompDriver.driver_config
-
-val set_source : qcert_config -> string -> unit
-val set_target : qcert_config -> string -> unit
-val add_path : qcert_config -> string -> unit
-val set_dir : qcert_config -> string -> unit
-val set_io : qcert_config -> string -> unit
-val set_emit_all : qcert_config -> unit -> unit
-val set_java_imports : qcert_config -> string -> unit
-val add_input_file : qcert_config -> string -> unit
-val set_mr_vinit : qcert_config -> string -> unit
-val add_vdirst : qcert_config -> string -> unit
-val add_vlocal : qcert_config -> string -> unit
+val set_source : QcertConfig.global_config -> string -> unit
+val set_target : QcertConfig.global_config -> string -> unit
+val set_exact_path : QcertConfig.global_config -> unit -> unit
+val add_path : QcertConfig.global_config -> string -> unit
+val set_dir : QcertConfig.global_config -> string -> unit
+val set_io : QcertConfig.global_config -> string -> unit
+val set_emit_all : QcertConfig.global_config -> unit -> unit
+val set_java_imports : QcertConfig.global_config -> string -> unit
+val add_input_file : QcertConfig.global_config -> string -> unit
+val set_mr_vinit : QcertConfig.global_config -> string -> unit
+val add_vdirst : QcertConfig.global_config -> string -> unit
+val add_vlocal : QcertConfig.global_config -> string -> unit

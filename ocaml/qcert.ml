@@ -15,55 +15,58 @@
  *)
 
 open Util
+open QcertConfig
 open Compiler.EnhancedCompiler
 
 (* Command line args *)
 
-let args_list qconf =
+let args_list gconf =
   Arg.align
-    [ ("-source", Arg.String (QcertArg.set_source qconf),
+    [ ("-source", Arg.String (QcertArg.set_source gconf),
        "<lang> Indicates the language for of thesource file (default: Rule)");
-      ("-target", Arg.String (QcertArg.set_target qconf),
+      ("-target", Arg.String (QcertArg.set_target gconf),
        "<lang> Indicates the language for the target query (default: js)");
-      ("-path", Arg.String (QcertArg.add_path qconf),
-       "<lang> Use to define compilation path");
-      ("-dir", Arg.String (QcertArg.set_dir qconf),
+      ("-path", Arg.String (QcertArg.add_path gconf),
+       "<lang> Specify an intermediate language in the compilation path");
+      ("-exact-path", Arg.Unit (QcertArg.set_exact_path gconf),
+       " Use exactly the given path (do not infer intermediate steps nor add optimization)");
+      ("-dir", Arg.String (QcertArg.set_dir gconf),
        "<dir> Target directory for the emited code");
-      ("-js-runtime", Arg.String (CloudantUtil.set_harness qconf.QcertArg.qconf_cld_conf),
+      ("-js-runtime", Arg.String (CloudantUtil.set_harness gconf.gconf_cld_conf),
        "<harness.js> JavaScript runtime");
-      ("-io", Arg.String (QcertArg.set_io qconf),
+      ("-io", Arg.String (QcertArg.set_io gconf),
        "<file.io> Schema and inputs data for evaluation");
       (* ("-stats", Arg.Unit (set_stats conf), *)
       (*    " Produce statistics for the target query"); *)
       (* ("-stats-all", Arg.Unit (set_stats conf), *)
       (*    " Produce statistics for all intermediate queries"); *)
-      ("-emit-all", Arg.Unit (QcertArg.set_emit_all qconf),
+      ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
        " Emit generated code of all intermediate queries");
-      (* ("-emit-sexp", Arg.Unit (QcertArg.set_sexpr qconf), *)
+      (* ("-emit-sexp", Arg.Unit (QcertArg.set_sexpr gconf), *)
       (*  " Emit the target query as an s-expression"); *)
-      (* ("-emit-sexp-all", Arg.Unit (QcertArg.set_sexprs qconf), *)
+      (* ("-emit-sexp-all", Arg.Unit (QcertArg.set_sexprs gconf), *)
       (*  " Emit all intermediate queries as s-expressions"); *)
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
-      ("-ascii", Arg.Unit (PrettyIL.set_ascii qconf.QcertArg.qconf_pretty_config),
+      ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
        " Avoid unicode symbols in emited queries");
-      ("-margin", Arg.Int (PrettyIL.set_margin qconf.QcertArg.qconf_pretty_config),
+      ("-margin", Arg.Int (PrettyIL.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
-      ("-cld-prefix", Arg.String (CloudantUtil.set_prefix qconf.QcertArg.qconf_cld_conf),
+      ("-cld-prefix", Arg.String (CloudantUtil.set_prefix gconf.gconf_cld_conf),
        "<pref> Cloudant DB prefix");
-      ("-java-imports", Arg.String (QcertArg.set_java_imports qconf),
+      ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
        "<imports> Additional imports for the Java runtime");
       (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
       (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
-      ("-vinit", Arg.String (QcertArg.add_vdirst qconf),
+      ("-vinit", Arg.String (QcertArg.add_vdirst gconf),
        "<init> Set the name init variable for the map-reduce backends");
-      ("-vdistr", Arg.String (QcertArg.add_vdirst qconf),
+      ("-vdistr", Arg.String (QcertArg.add_vdirst gconf),
        "<x> Declare x as a distributed variable");
-      ("-vlocal", Arg.String (QcertArg.add_vlocal qconf),
+      ("-vlocal", Arg.String (QcertArg.add_vlocal gconf),
        "<x> Declare x as a local variable");
     ]
 
-let anon_args qconf f = QcertArg.add_input_file qconf f
+let anon_args gconf f = QcertArg.add_input_file gconf f
 
 let languages =
   [ CompDriver.L_rule;
@@ -104,61 +107,52 @@ let usage =
 
 
 let parse_args () =
-  let qconf = QcertArg.default_qconf () in
-  Arg.parse (args_list qconf) (anon_args qconf) usage;
+  let gconf =
+    { gconf_source = CompDriver.L_rule;
+      gconf_target = CompDriver.L_javascript;
+      gconf_path = [];
+      gconf_exact_path = false;
+      gconf_dir = None;
+      gconf_io = None;
+      gconf_schema = TypeUtil.empty_schema;
+      gconf_cld_conf = CloudantUtil.default_cld_config ();
+      gconf_emit_all = false;
+      gconf_pretty_config = PrettyIL.default_pretty_config ();
+      gconf_java_imports = "";
+      gconf_input_files = [];
+      gconf_mr_vinit = "init";
+      gconf_vdbindings = []; }
+  in
+  Arg.parse (args_list gconf) (anon_args gconf) usage;
   let _schema =
-    begin match qconf.QcertArg.qconf_io with
+    begin match gconf.gconf_io with
     | Some io ->
-        qconf.QcertArg.qconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
+        gconf.gconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
     | None ->
         ()
     end
   in
-  begin match qconf.QcertArg.qconf_source, qconf.QcertArg.qconf_target, qconf.QcertArg.qconf_path with
-  | None, None, ((source :: _) as path) ->
-      let target =
-        begin match List.rev path with
-        | target :: _ -> target
-        | [] -> assert false
-        end
-      in
-      qconf.QcertArg.qconf_source <- (Some source);
-      qconf.QcertArg.qconf_target <- (Some target)
-  | source_opt, target_opt, [] ->
-      let source =
-        begin match source_opt with
-        | Some s -> s
-        | None -> CompDriver.L_rule
-        end
-      in
-      let target =
-        begin match target_opt with
-        | Some t -> t
-        | None -> CompDriver.L_javascript
-        end
-      in
-      let path =
-        CompDriver.get_path_from_source_target source target
-      in
-      qconf.QcertArg.qconf_source <- (Some source);
-      qconf.QcertArg.qconf_target <- (Some target);
-      qconf.QcertArg.qconf_path <- path
-  | Some _, _, _ :: _ ->
-      raise (CACo_Error "options -source and -path can not be used simultaneously")
-  | _, Some _, _ :: _ ->
-      raise (CACo_Error "options -target and -path can not be used simultaneously")
+  begin match gconf.gconf_exact_path with
+  | true ->
+      gconf.gconf_path <-
+        gconf.gconf_source :: gconf.gconf_path @ [ gconf.gconf_target ]
+  | false ->
+      gconf.gconf_path <-
+        List.fold_right
+          (fun lang1 acc ->
+            begin match acc with
+            | lang2 :: post ->
+                (CompDriver.get_path_from_source_target lang1 lang2) @ post
+            | [] -> assert false
+            end)
+          (gconf.gconf_source :: gconf.gconf_path) [ gconf.gconf_target ]
   end;
-  qconf
+  gconf
 
 (* Parsing *)
 
-let parse_file (qconf: QcertArg.qcert_config) (file_name: string) =
-  let slang =
-    begin match qconf.QcertArg.qconf_source with
-    | Some lang -> lang
-    | None -> assert false
-    end
-  in
+let parse_file (gconf: QcertConfig.global_config) (file_name: string) =
+  let slang = gconf.gconf_source in
   let qname, q =
     ParseFile.parse_query_from_file slang file_name
   in
@@ -199,12 +193,12 @@ let emit_sexp_file conf schema file_name q = ()
 
 (* Main *)
 
-let main_one_file qconf file_name =
-  let schema = qconf.QcertArg.qconf_schema in
+let main_one_file gconf file_name =
+  let schema = gconf.gconf_schema in
   let brand_model = schema.TypeUtil.sch_brand_model (* CompDriver.get_schema dv_conf *) in
-  let (qname, q_source) = parse_file qconf file_name in
-  let dv_conf = QcertArg.driver_conf_of_qcert_conf qconf (* schema *) qname in
-  let queries = compile_file dv_conf schema qconf.QcertArg.qconf_path q_source in
+  let (qname, q_source) = parse_file gconf file_name in
+  let dv_conf = QcertArg.driver_conf_of_qcert_conf gconf (* schema *) qname in
+  let queries = compile_file dv_conf schema gconf.gconf_path q_source in
   let q_target =
     begin match List.rev queries with
     | q :: _ -> q
@@ -213,19 +207,19 @@ let main_one_file qconf file_name =
   in
   let () =
     (* emit compiled query *)
-    let pconf = qconf.QcertArg.qconf_pretty_config in
-    let dir = qconf.QcertArg.qconf_dir in
+    let pconf = gconf.gconf_pretty_config in
+    let dir = gconf.gconf_dir in
     emit_file dv_conf schema pconf dir file_name q_target
   in
   let () =
     (* Emit intermediate queries *)
-    begin match qconf.QcertArg.qconf_emit_all with
+    begin match gconf.gconf_emit_all with
     | true ->
         let _ =
           List.fold_left
             (fun fname q ->
-              let pconf = qconf.QcertArg.qconf_pretty_config in
-              let dir = qconf.QcertArg.qconf_dir in
+              let pconf = gconf.gconf_pretty_config in
+              let dir = gconf.gconf_dir in
               emit_file dv_conf schema pconf dir fname q;
               let suff =
                 ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
@@ -238,12 +232,12 @@ let main_one_file qconf file_name =
   in
   (* let () = *)
   (*   (\* Display S-expr *\) *)
-  (*   begin match !(get_target_display_sexp qconf) with *)
+  (*   begin match !(get_target_display_sexp gconf) with *)
   (*   | true -> *)
   (*       let _ = *)
   (*         List.fold_left *)
   (*           (fun fname q -> *)
-  (*             emit_sexp_file qconf schema fname q; *)
+  (*             emit_sexp_file gconf schema fname q; *)
   (*             let suff = *)
   (*               suffix_of_language (CompDriver.language_of_query brand_model q) *)
   (*             in *)
@@ -256,7 +250,7 @@ let main_one_file qconf file_name =
   ()
 
 let () =
-  let qconf = parse_args () in
+  let gconf = parse_args () in
   List.iter
-    (fun file_name -> main_one_file qconf file_name)
-    qconf.QcertArg.qconf_input_files
+    (fun file_name -> main_one_file gconf file_name)
+    gconf.gconf_input_files

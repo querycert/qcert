@@ -16,67 +16,37 @@
 
 open Util
 open QcertUtil
+open QcertConfig
 open Compiler.EnhancedCompiler
 
 
-type qcert_config = {
-    mutable qconf_source : CompDriver.language option;
-    mutable qconf_target : CompDriver.language option;
-    mutable qconf_path : CompDriver.language list;
-    mutable qconf_dir : string option;
-    mutable qconf_io : string option;
-    mutable qconf_schema : TypeUtil.schema;
-    qconf_cld_conf : CloudantUtil.cld_config;
-    mutable qconf_emit_all : bool;
-    qconf_pretty_config : PrettyIL.pretty_config;
-    mutable qconf_java_imports : string;
-    mutable qconf_input_files : string list;
-    mutable qconf_mr_vinit : string;
-    mutable qconf_vdbindings : CompDriver.vdbindings;
-  }
-
-let default_qconf () =
-  { qconf_source = None;
-    qconf_target = None;
-    qconf_path = [];
-    qconf_dir = None;
-    qconf_io = None;
-    qconf_schema = TypeUtil.empty_schema;
-    qconf_cld_conf = CloudantUtil.default_cld_config ();
-    qconf_emit_all = false;
-    qconf_pretty_config = PrettyIL.default_pretty_config ();
-    qconf_java_imports = "";
-    qconf_input_files = [];
-    qconf_mr_vinit = "init";
-    qconf_vdbindings = [];
-  }
-
-let set_source qconf s = qconf.qconf_source <- Some (language_of_name s)
-let set_target qconf s = qconf.qconf_target <- Some (language_of_name s)
-let add_path qconf s = qconf.qconf_path <- qconf.qconf_path @ [ language_of_name s ]
-let set_dir qconf s = qconf.qconf_dir <- Some s
-let set_io qconf file_name = qconf.qconf_io <- Some (Util.string_of_file file_name)
-let set_emit_all qconf () = qconf.qconf_emit_all <- true
-let set_java_imports qconf s = qconf.qconf_java_imports <- s
-let add_input_file qconf file = qconf.qconf_input_files <- qconf.qconf_input_files @ [ file ]
-let set_mr_vinit qconf x = qconf.qconf_mr_vinit <- x
-let add_vdirst qconf x =
+let set_source gconf s = gconf.gconf_source <- language_of_name s
+let set_target gconf s = gconf.gconf_target <- language_of_name s
+let add_path gconf s = gconf.gconf_path <- gconf.gconf_path @ [ language_of_name s ]
+let set_exact_path gconf () = gconf.gconf_exact_path <- true
+let set_dir gconf s = gconf.gconf_dir <- Some s
+let set_io gconf file_name = gconf.gconf_io <- Some (Util.string_of_file file_name)
+let set_emit_all gconf () = gconf.gconf_emit_all <- true
+let set_java_imports gconf s = gconf.gconf_java_imports <- s
+let add_input_file gconf file = gconf.gconf_input_files <- gconf.gconf_input_files @ [ file ]
+let set_mr_vinit gconf x = gconf.gconf_mr_vinit <- x
+let add_vdirst gconf x =
   let x = char_list_of_string x in
-  qconf.qconf_vdbindings <- (x, Compiler.Vdistr) :: qconf.qconf_vdbindings
-let add_vlocal qconf x =
+  gconf.gconf_vdbindings <- (x, Compiler.Vdistr) :: gconf.gconf_vdbindings
+let add_vlocal gconf x =
   let x = char_list_of_string x in
-  qconf.qconf_vdbindings <- (x, Compiler.Vlocal) :: qconf.qconf_vdbindings
+  gconf.gconf_vdbindings <- (x, Compiler.Vlocal) :: gconf.gconf_vdbindings
 
 (* Driver config *)
 
-let driver_conf_of_qcert_conf qconf qname =
+let driver_conf_of_qcert_conf gconf qname =
   let brand_rel =
-    TypeUtil.brand_relation_of_brand_model qconf.qconf_schema.TypeUtil.sch_brand_model
+    TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model
   in
   { CompDriver.comp_qname = char_list_of_string qname;
     comp_brand_rel = brand_rel;
-    comp_input_type = qconf.qconf_schema.TypeUtil.sch_camp_type;
-    comp_mr_vinit = char_list_of_string qconf.qconf_mr_vinit;
-    comp_vdbindings = qconf.qconf_vdbindings;
-    comp_java_imports = char_list_of_string qconf.qconf_java_imports; }
+    comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
+    comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
+    comp_vdbindings = gconf.gconf_vdbindings;
+    comp_java_imports = char_list_of_string gconf.gconf_java_imports; }
 

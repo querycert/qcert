@@ -1086,7 +1086,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | L_spark => Dv_spark Dv_spark_stop
     | L_spark2 => Dv_spark2 Dv_spark2_stop
     | L_cloudant => Dv_cloudant Dv_cloudant_stop
-    | L_error err => Dv_error ("Cannot optimize an error: "++err)
+    | L_error err => Dv_error ("No driver for error: "++err)
     end.
 
   Fixpoint driver_of_rev_path config dv rev_path :=
@@ -1846,7 +1846,6 @@ Module CompDriver(runtime:CompilerRuntime).
           (* :: L_dnnrc_typed_dataset *)
           :: L_spark2
           :: nil
-
       (* From nnrcmr: *)
       | L_nnrcmr, L_nnrcmr =>
         L_nnrcmr
@@ -1939,6 +1938,31 @@ Module CompDriver(runtime:CompilerRuntime).
       | L_cldmr, L_cloudant =>
         L_cldmr
           :: L_cloudant
+          :: nil
+      (* From dnnrc_dataset: *)
+      | L_dnnrc_dataset, L_dnnrc_dataset =>
+        L_dnnrc_dataset
+          :: nil
+      | L_dnnrc_dataset, L_dnnrc_typed_dataset =>
+        L_dnnrc_dataset
+          :: L_dnnrc_typed_dataset
+          (* :: L_dnnrc_typed_dataset *)
+          :: nil
+      | L_dnnrc_dataset, L_spark2 =>
+        L_dnnrc_dataset
+          :: L_dnnrc_typed_dataset
+          (* :: L_dnnrc_typed_dataset *)
+          :: L_spark2
+          :: nil
+      (* From dnnrc_typed_dataset: *)
+      | L_dnnrc_typed_dataset, L_dnnrc_typed_dataset =>
+        L_dnnrc_typed_dataset
+          (* :: L_dnnrc_typed_dataset *)
+          :: nil
+      | L_dnnrc_typed_dataset, L_spark2 =>
+        L_dnnrc_typed_dataset
+          (* :: L_dnnrc_typed_dataset *)
+          :: L_spark2
           :: nil
       | _, _ =>
         let err :=
