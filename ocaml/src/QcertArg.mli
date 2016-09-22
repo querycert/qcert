@@ -16,8 +16,6 @@
 
 open Compiler.EnhancedCompiler
 
-val driver_conf_of_qcert_conf : QcertConfig.global_config -> string -> string -> CompDriver.driver_config
-
 val set_source : QcertConfig.global_config -> string -> unit
 val set_target : QcertConfig.global_config -> string -> unit
 val set_exact_path : QcertConfig.global_config -> unit -> unit

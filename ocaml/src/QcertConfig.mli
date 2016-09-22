@@ -14,7 +14,6 @@
  * limitations under the License.
  *)
 
-open Util
 open Compiler.EnhancedCompiler
 
 type global_config = {
@@ -34,16 +33,4 @@ type global_config = {
     mutable gconf_vdbindings : CompDriver.vdbindings;
   }
 
-(* Driver config *)
-
-let driver_conf_of_global_conf gconf qname cname =
-  let brand_rel =
-    TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model
-  in
-  { CompDriver.comp_qname = char_list_of_string qname;
-    CompDriver.comp_class_name = char_list_of_string cname;
-    comp_brand_rel = brand_rel;
-    comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
-    comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
-    comp_vdbindings = gconf.gconf_vdbindings;
-    comp_java_imports = char_list_of_string gconf.gconf_java_imports; }
+val driver_conf_of_global_conf : global_config -> string -> string -> CompDriver.driver_config

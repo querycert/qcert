@@ -173,32 +173,22 @@ let compile_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) (
 (* Emit *)
 
 let emit_file (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
-  let brand_model = schema.TypeUtil.sch_brand_model (* CompDriver.get_schema dv_conf *) in
+  let brand_model = schema.TypeUtil.sch_brand_model in
   let s = PrettyIL.pretty_query pretty_conf q in
   let fpref = Filename.chop_extension file_name in
   let ext = ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir fpref) ext in
   make_file fout s
 
-(* S-expr *)
-(* XXX TODO XXX *)
-let emit_sexp_file conf schema file_name q = ()
-  (* let brand_model, camp_type, foreign_typing = schema (\* CompDriver.get_schema dv_conf *\) in *)
-  (* let s = PrettyIL.pretty_query !charsetbool !margin q in *)
-  (* let fpref = Filename.chop_extension file_name in *)
-  (* let ext = suffix_of_language (CompDriver.language_of_query brand_model q) in *)
-  (* let fout = outname (target_f (get_dir conf) fpref) ext in *)
-  (* make_file fout s *)
-
 
 (* Main *)
 
 let main_one_file gconf file_name =
   let schema = gconf.gconf_schema in
-  let brand_model = schema.TypeUtil.sch_brand_model (* CompDriver.get_schema dv_conf *) in
+  let brand_model = schema.TypeUtil.sch_brand_model in
   let (qname, q_source) = parse_file gconf file_name in
   let cname = (Filename.basename (Filename.chop_extension file_name)) in (* for Java code generation *)
-  let dv_conf = QcertArg.driver_conf_of_qcert_conf gconf (* schema *) qname (* class name *) cname in
+  let dv_conf = QcertConfig.driver_conf_of_global_conf gconf (* schema *) qname (* class name *) cname in
   let queries = compile_file dv_conf schema gconf.gconf_path q_source in
   let q_target =
     begin match List.rev queries with
@@ -231,23 +221,6 @@ let main_one_file gconf file_name =
     | false -> ()
     end
   in
-  (* let () = *)
-  (*   (\* Display S-expr *\) *)
-  (*   begin match !(get_target_display_sexp gconf) with *)
-  (*   | true -> *)
-  (*       let _ = *)
-  (*         List.fold_left *)
-  (*           (fun fname q -> *)
-  (*             emit_sexp_file gconf schema fname q; *)
-  (*             let suff = *)
-  (*               suffix_of_language (CompDriver.language_of_query brand_model q) *)
-  (*             in *)
-  (*             (Filename.chop_extension fname)^suff) *)
-  (*           file_name queries *)
-  (*       in () *)
-  (*   | false -> () *)
-  (*   end *)
-  (* in *)
   ()
 
 let () =
