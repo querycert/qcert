@@ -32,7 +32,6 @@ MENHIRFLAG=-use-menhir
 #MENHIRFLAG=
 
 MAIN=qcert
-MAIN1=CACo
 MAIN2=CAEv
 MAIN3=CADa
 MAIN4=CAPp
@@ -42,8 +41,8 @@ JAR=jar
 LIB=CALib
 LIBJS=CALibJS
 
-all: $(MAIN) $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
-jars: $(MAIN).$(JAR) $(MAIN1).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR) $(LIB).jar
+all: $(MAIN) $(MAIN2) $(MAIN3) $(MAIN4)
+jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR) $(LIB).jar
 js: qcertJS.js
 
 # Extraction from Coq
@@ -61,16 +60,6 @@ $(MAIN).$(TARGET): generated
 $(MAIN).$(JAR): generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(JAR)
 	cp _build/$(MAIN).$(JAR) $(MAIN).$(JAR)
-
-$(MAIN1): generated $(MAIN1).$(TARGET)
-	cp _build/$(MAIN1).$(TARGET) ../bin/$(MAIN1)
-
-$(MAIN1).$(TARGET): generated
-	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN1).$(TARGET)
-
-$(MAIN1).$(JAR): generated
-	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN1).$(JAR)
-	cp _build/$(MAIN1).$(JAR) $(MAIN1).$(JAR)
 
 $(MAIN2): generated $(MAIN2).$(TARGET)
 	cp _build/$(MAIN2).$(TARGET) ../bin/$(MAIN2)
@@ -147,7 +136,7 @@ wsk-invoke:
 clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build
-	rm -f $(MAIN).$(JAR) $(MAIN1).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR)
+	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR)
 	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi
 	rm -f japi/lib/CALib.jar
 	rm -f japi/src/org/qcert/calib/CALibWrapper.java
@@ -162,8 +151,8 @@ realclean:
 	rm -f DataLexer.ml DataParser.ml DataParser.mli
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
-	rm -rf *~ generated $(MAIN) $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
-	rm -f ../bin/$(MAIN) ../bin/$(MAIN1) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/$(MAIN4) ../bin/qcertJS.js
+	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3) $(MAIN4)
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/$(MAIN4) ../bin/qcertJS.js
 	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
 
 cleanall: realclean
