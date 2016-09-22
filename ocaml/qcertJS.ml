@@ -19,30 +19,33 @@ open QcertUtil
 open Compiler.EnhancedCompiler
 
 let compile source_lang_s target_lang_s q_s =
-  begin try
-    let source_lang = language_of_name source_lang_s in
-    let target_lang = language_of_name target_lang_s in
-    let (qname, q) = ParseString.parse_query_from_string source_lang q_s in
-    let schema = TypeUtil.empty_schema in
-    let brand_model = schema.TypeUtil.sch_brand_model in
-    let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-    let dv_conf = CompDriver.default_dv_config brand_model in
-    let q_target =
-      CompDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
-    in
-    let p_conf = PrettyIL.default_pretty_config () in
-    PrettyIL.pretty_query p_conf q_target
-  with CACo_Error err -> "compilation error: "^err
-  | _ -> "compilation error"
-  end
+  let result =
+    begin try
+      let source_lang = language_of_name (Js.to_string source_lang_s) in
+      let target_lang = language_of_name (Js.to_string target_lang_s) in
+      let (qname, q) = ParseString.parse_query_from_string source_lang (Js.to_string q_s) in
+      let schema = TypeUtil.empty_schema in
+      let brand_model = schema.TypeUtil.sch_brand_model in
+      let foreign_typing = schema.TypeUtil.sch_foreign_typing in
+      let dv_conf = CompDriver.default_dv_config brand_model in
+      let q_target =
+        CompDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
+      in
+      let p_conf = PrettyIL.default_pretty_config () in
+      PrettyIL.pretty_query p_conf q_target
+    with CACo_Error err -> "compilation error: "^err
+    | _ -> "compilation error"
+    end
+  in
+  Js.string result
 
 let main input =
-    let source = Js.to_string input##.source in
-    let target = Js.to_string input##.target in
-    let q = Js.to_string input##.query in
+    let source = input##.source in
+    let target = input##.target in
+    let q = input##.query in
     let q_res = compile source target q in
     object%js
-        val result = Js.string q_res
+        val result = q_res
     end
 
 let _ = Js.Unsafe.global##.main :=
