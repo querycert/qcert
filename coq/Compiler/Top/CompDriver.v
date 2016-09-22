@@ -262,9 +262,12 @@ Module CompDriver(runtime:CompilerRuntime).
     dnnrc_infer_type e inputType.
 
   Definition dnnrc_typed_dataset_to_spark2
-             (inputType:rtype) (name:string) (e:@dnnrc_typed_dataset _) : string :=
-    @dnrcToSpark2Top _ _ bm _ unit inputType name e.
+             (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
+    @dnrcToSpark2Top _ _ bm _ unit inputType name q.
 
+  Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
+    dnnrcToDatasetRewrite q.
+  
   (* Drivers *)
 
   Inductive javascript_driver : Set :=
@@ -288,8 +291,7 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Inductive dnnrc_typed_dataset_driver : Set :=
     | Dv_dnnrc_typed_dataset_stop : dnnrc_typed_dataset_driver
-    (* XXX TODO XXX *)
-    (* | Dv_dnnrc_typed_dataset_optim : dnnrc_typed_dataset_driver -> dnnrc_typed_dataset_driver *)
+    | Dv_dnnrc_typed_dataset_optim : dnnrc_typed_dataset_driver -> dnnrc_typed_dataset_driver
     | Dv_dnnrc_typed_dataset_to_spark2 : rtype -> string -> spark2_driver -> dnnrc_typed_dataset_driver
   .
 
@@ -435,10 +437,13 @@ Module CompDriver(runtime:CompilerRuntime).
     in
     (Q_cldmr q) :: queries.
 
-  Definition compile_dnnrc_typed_dataset (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
+  Fixpoint compile_dnnrc_typed_dataset (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
     let queries :=
         match dv with
         | Dv_dnnrc_typed_dataset_stop => nil
+        | Dv_dnnrc_typed_dataset_optim dv =>
+          let q := dnnrc_typed_dataset_optim q in
+          compile_dnnrc_typed_dataset dv q
         | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv =>
           let q := dnnrc_typed_dataset_to_spark2 rt rulename q in
           compile_spark2 dv q
@@ -736,9 +741,10 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_cldmr_to_cloudant rulename h dv => 1 + driver_length_cloudant dv
     end.
 
-  Definition driver_length_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) :=
+  Fixpoint driver_length_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) :=
     match dv with
     | Dv_dnnrc_typed_dataset_stop => 1
+    | Dv_dnnrc_typed_dataset_optim dv => 1 + driver_length_dnnrc_typed_dataset dv
     | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv => 1 + driver_length_spark2 dv
     end.
 
@@ -1016,9 +1022,7 @@ Module CompDriver(runtime:CompilerRuntime).
       match dv with
       | Dv_dnnrc_typed_dataset dv =>
         Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset config.(comp_input_type) dv)
-      | Dv_dnnrc_dataset dv =>
-        (* Dv_dnnrc_dataset (Dv_dnnrc_dataset_optim dv) *)
-        Dv_error "DNNRC optim: TODO?" (* XXX TODO XXX *)
+      | Dv_dnnrc_dataset _
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
@@ -1041,8 +1045,7 @@ Module CompDriver(runtime:CompilerRuntime).
       | Dv_spark2 dv =>
         Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 config.(comp_input_type) config.(comp_qname) dv)
       | Dv_dnnrc_typed_dataset dv =>
-        (* Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv) *)
-        Dv_error "Typed DNNRC optim: TODO?" (* XXX TODO XXX *)
+        Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv)
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
@@ -1175,6 +1178,7 @@ Module CompDriver(runtime:CompilerRuntime).
     | Dv_dnnrc_dataset (Dv_dnnrc_dataset_stop) => (L_dnnrc_dataset, None)
     | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset rtype dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv)) (* XXX TO BE CHECKED XXX *)
     | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_stop) => (L_dnnrc_typed_dataset, None)
+    | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv)) (* XXX TO BE CHECKED XXX *)
     | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 rtype _ dv) => (L_dnnrc_typed_dataset, Some (Dv_spark2 dv))
     | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
     | Dv_java (Dv_java_stop) => (L_java, None)
@@ -1947,22 +1951,22 @@ Module CompDriver(runtime:CompilerRuntime).
       | L_dnnrc_dataset, L_dnnrc_typed_dataset =>
         L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_dnnrc_dataset, L_spark2 =>
         L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       (* From dnnrc_typed_dataset: *)
       | L_dnnrc_typed_dataset, L_dnnrc_typed_dataset =>
         L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_dnnrc_typed_dataset, L_spark2 =>
         L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       | _, _ =>

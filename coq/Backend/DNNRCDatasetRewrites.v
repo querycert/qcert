@@ -334,7 +334,7 @@ Section DNNRCDatasetRewrites.
     end.
 
   Definition dnnrcToDatasetRewrite {A : Set}
-             (e: dnrc (type_annotation A) dataset)
+             (e: dnrc (type_annotation A) dataset) : dnrc (type_annotation A) dataset
     :=
       let e' := e in
       let e'' := tryBottomUp rec_cast_to_filter e' in
