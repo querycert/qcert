@@ -19,7 +19,7 @@ open QcertUtil
 open QcertConfig
 open Compiler.EnhancedCompiler
 
-let global_config_of_json j =
+let global_config_and_query_of_json j =
   let gconf =
     { gconf_source = CompDriver.L_rule;
       gconf_target = CompDriver.L_javascript;
@@ -51,13 +51,13 @@ let global_config_of_json j =
   iter_array QcertArg.add_path j##.path;
   Js.Optdef.iter j##.exact_path (fun b -> gconf.gconf_exact_path <- Js.to_bool b);
   apply QcertArg.set_dir j##.dir;
-  apply QcertArg.set_dir j##.dir_target;
-  Js.Optdef.iter j##.js_runtime
+  apply QcertArg.set_dir j##.dirtarget;
+  Js.Optdef.iter j##.jsruntime
     (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
   apply QcertArg.set_io j##.io;
-  Js.Optdef.iter j##.emit_all (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
-  Js.Optdef.iter j##.emit_sexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
-  Js.Optdef.iter j##.emit_sexp_all (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
+  Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
+  Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
+  Js.Optdef.iter j##.emitsexpall (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
   Js.Optdef.iter j##.ascii
     (fun b -> if Js.to_bool b then
       PrettyIL.set_ascii gconf.gconf_pretty_config ()
@@ -69,26 +69,26 @@ let global_config_of_json j =
       PrettyIL.set_margin gconf.gconf_pretty_config n);
   Js.Optdef.iter j##.cld_prefix
     (fun s -> CloudantUtil.set_prefix gconf.gconf_cld_conf (Js.to_string s));
-  apply QcertArg.set_java_imports j##.java_imports;
+  apply QcertArg.set_java_imports j##.javaimports;
   apply QcertArg.set_vinit j##.vinit;
   iter_array QcertArg.add_vdirst j##.vdistr;
   iter_array QcertArg.add_vlocal j##.vlocal;
-  complet_configuration gconf
+  (complet_configuration gconf, j##.query)
 
-let compile source_lang_s target_lang_s q_s =
+let compile gconf q_s =
   let result =
     begin try
-      let source_lang = language_of_name (Js.to_string source_lang_s) in
-      let target_lang = language_of_name (Js.to_string target_lang_s) in
+      let source_lang = gconf.gconf_source in
+      let target_lang = gconf.gconf_target in
       let (qname, q) = ParseString.parse_query_from_string source_lang (Js.to_string q_s) in
       let schema = TypeUtil.empty_schema in
       let brand_model = schema.TypeUtil.sch_brand_model in
       let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-      let dv_conf = CompDriver.default_dv_config brand_model in
+      let dv_conf = QcertConfig.driver_conf_of_global_conf gconf "MyQuery" "MyClass" in
       let q_target =
         CompDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
       in
-      let p_conf = PrettyIL.default_pretty_config () in
+      let p_conf = gconf.gconf_pretty_config in
       PrettyIL.pretty_query p_conf q_target
     with CACo_Error err -> "compilation error: "^err
     | _ -> "compilation error"
@@ -97,12 +97,20 @@ let compile source_lang_s target_lang_s q_s =
   Js.string result
 
 let main input =
-    let source = input##.source in
-    let target = input##.target in
-    let q = input##.query in
-    let q_res = compile source target q in
+  try
+    let (gconf,q_s) =
+      try
+	global_config_and_query_of_json input
+      with _ -> raise (CACo_Error "[Couldn't load configuration]")
+    in
+    let q_res = compile gconf q_s in
     object%js
         val result = q_res
+    end
+  with
+  | CACo_Error msg ->
+      object%js
+        val result = Js.string msg
     end
 
 let _ =
