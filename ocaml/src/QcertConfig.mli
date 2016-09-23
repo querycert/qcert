@@ -36,4 +36,6 @@ type global_config = {
     mutable gconf_vdbindings : CompDriver.vdbindings;
   }
 
+val complet_configuration : global_config -> global_config
+
 val driver_conf_of_global_conf : global_config -> string -> string -> CompDriver.driver_config

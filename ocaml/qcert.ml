@@ -60,7 +60,7 @@ let args_list gconf =
        "<imports> Additional imports for the Java runtime");
       (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
       (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
-      ("-vinit", Arg.String (QcertArg.add_vdirst gconf),
+      ("-vinit", Arg.String (QcertArg.set_vinit gconf),
        "<init> Set the name init variable for the map-reduce backends");
       ("-vdistr", Arg.String (QcertArg.add_vdirst gconf),
        "<x> Declare x as a distributed variable");
@@ -133,30 +133,7 @@ let parse_args () =
       gconf_vdbindings = []; }
   in
   Arg.parse (args_list gconf) (anon_args gconf) usage;
-  let _schema =
-    begin match gconf.gconf_io with
-    | Some io ->
-        gconf.gconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
-    | None ->
-        ()
-    end
-  in
-  begin match gconf.gconf_exact_path with
-  | true ->
-      gconf.gconf_path <-
-        gconf.gconf_source :: gconf.gconf_path @ [ gconf.gconf_target ]
-  | false ->
-      gconf.gconf_path <-
-        List.fold_right
-          (fun lang1 acc ->
-            begin match acc with
-            | lang2 :: post ->
-                (CompDriver.get_path_from_source_target lang1 lang2) @ post
-            | [] -> assert false
-            end)
-          (gconf.gconf_source :: gconf.gconf_path) [ gconf.gconf_target ]
-  end;
-  gconf
+  complet_configuration gconf
 
 (* Parsing *)
 

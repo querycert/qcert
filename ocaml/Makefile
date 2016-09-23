@@ -108,14 +108,14 @@ qcertJS.js: qcertJS.byte
 	js_of_ocaml _build/qcertJS.byte
 	cp _build/qcertJS.js ../lib/qcertJS.js
 
-qcertJS.byte: generated
+qcertJS.byte: generated qcertJS.ml
 	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
 
 wsk-update:
 	wsk action update qcert _build/qcertJS.js
 
 wsk-invoke:
-	wsk action invoke -br qcert -p source camp -p target nraenv \
+	wsk action invoke -v -br qcert -p source camp -p target nraenv \
 		-p query pit
 # -p query 'punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))'
 

@@ -16,7 +16,64 @@
 
 open Util
 open QcertUtil
+open QcertConfig
 open Compiler.EnhancedCompiler
+
+let global_config_of_json j =
+  let gconf =
+    { gconf_source = CompDriver.L_rule;
+      gconf_target = CompDriver.L_javascript;
+      gconf_path = [];
+      gconf_exact_path = false;
+      gconf_dir = None;
+      gconf_dir_target = None;
+      gconf_io = None;
+      gconf_schema = TypeUtil.empty_schema;
+      gconf_cld_conf = CloudantUtil.default_cld_config ();
+      gconf_emit_all = false;
+      gconf_emit_sexp = false;
+      gconf_emit_sexp_all = false;
+      gconf_pretty_config = PrettyIL.default_pretty_config ();
+      gconf_java_imports = "";
+      gconf_input_files = [];
+      gconf_mr_vinit = "init";
+      gconf_vdbindings = []; }
+  in
+  let apply f o =
+    Js.Optdef.iter o (fun s -> f gconf (Js.to_string s));
+  in
+  let iter_array f o =
+    Js.Optdef.iter o
+      (fun a -> ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
+  in
+  apply QcertArg.set_source j##.source;
+  apply QcertArg.set_target j##.target;
+  iter_array QcertArg.add_path j##.path;
+  Js.Optdef.iter j##.exact_path (fun b -> gconf.gconf_exact_path <- Js.to_bool b);
+  apply QcertArg.set_dir j##.dir;
+  apply QcertArg.set_dir j##.dir_target;
+  Js.Optdef.iter j##.js_runtime
+    (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
+  apply QcertArg.set_io j##.io;
+  Js.Optdef.iter j##.emit_all (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
+  Js.Optdef.iter j##.emit_sexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
+  Js.Optdef.iter j##.emit_sexp_all (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
+  Js.Optdef.iter j##.ascii
+    (fun b -> if Js.to_bool b then
+      PrettyIL.set_ascii gconf.gconf_pretty_config ()
+    else
+      PrettyIL.set_greek gconf.gconf_pretty_config ());
+  Js.Optdef.iter j##.margin
+    (fun num ->
+      let n = int_of_float (Js.float_of_number num) in
+      PrettyIL.set_margin gconf.gconf_pretty_config n);
+  Js.Optdef.iter j##.cld_prefix
+    (fun s -> CloudantUtil.set_prefix gconf.gconf_cld_conf (Js.to_string s));
+  apply QcertArg.set_java_imports j##.java_imports;
+  apply QcertArg.set_vinit j##.vinit;
+  iter_array QcertArg.add_vdirst j##.vdistr;
+  iter_array QcertArg.add_vlocal j##.vlocal;
+  complet_configuration gconf
 
 let compile source_lang_s target_lang_s q_s =
   let result =
@@ -48,5 +105,6 @@ let main input =
         val result = q_res
     end
 
-let _ = Js.Unsafe.global##.main :=
+let _ =
+  Js.Unsafe.global##.main :=
     Js.wrap_callback main

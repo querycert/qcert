@@ -32,7 +32,7 @@ let set_emit_sexp gconf () = gconf.gconf_emit_sexp <- true
 let set_emit_sexp_all gconf () = gconf.gconf_emit_sexp_all <- true
 let set_java_imports gconf s = gconf.gconf_java_imports <- s
 let add_input_file gconf file = gconf.gconf_input_files <- gconf.gconf_input_files @ [ file ]
-let set_mr_vinit gconf x = gconf.gconf_mr_vinit <- x
+let set_vinit gconf x = gconf.gconf_mr_vinit <- x
 let add_vdirst gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vdistr) :: gconf.gconf_vdbindings

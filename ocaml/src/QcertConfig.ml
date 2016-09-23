@@ -37,6 +37,32 @@ type global_config = {
     mutable gconf_vdbindings : CompDriver.vdbindings;
   }
 
+let complet_configuration gconf =
+  let _schema =
+    begin match gconf.gconf_io with
+    | Some io ->
+        gconf.gconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
+    | None ->
+        ()
+    end
+  in
+  begin match gconf.gconf_exact_path with
+  | true ->
+      gconf.gconf_path <-
+        gconf.gconf_source :: gconf.gconf_path @ [ gconf.gconf_target ]
+  | false ->
+      gconf.gconf_path <-
+        List.fold_right
+          (fun lang1 acc ->
+            begin match acc with
+            | lang2 :: post ->
+                (CompDriver.get_path_from_source_target lang1 lang2) @ post
+            | [] -> assert false
+            end)
+          (gconf.gconf_source :: gconf.gconf_path) [ gconf.gconf_target ]
+  end;
+  gconf
+
 (* Driver config *)
 
 let driver_conf_of_global_conf gconf qname cname =
