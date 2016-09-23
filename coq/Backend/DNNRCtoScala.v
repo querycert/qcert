@@ -336,7 +336,7 @@ Section DNNRCtoScala.
           | None => "Argument to dispatch is not a local collection."
           end
         | DNRCAlg t a ((x, d)::nil) =>
-          (* TODO think again about how to pass arguments to algebra code.. *)
+          (* TODO does this also need the lambda encoding for let? *)
           "{ val " ++ x ++ " = " ++ scala_of_dnrc d ++ "; " ++
                    code_of_dataset a
                    ++ " }"
