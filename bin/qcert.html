@@ -1,17 +1,31 @@
 <!DOCTYPE HTML>
 <html lang = "en">
   <head>
-    <title>Q*cert demo</title>
+    <title>Q*cert online form</title>
     <meta charset = "UTF-8" />
     <script src="../lib/qcertJS.js"></script>
     <script>
+      var entityMap = {
+      	"&": "&amp;",
+      	"<": "&lt;",
+      	">": "&gt;",
+      	'"': '&quot;',
+      	"'": '&#39;',
+      	"/": '&#x2F;'
+      };
+	
+      function escapeHtml(string) {
+	return String(string).replace(/[&<>"'\/]/g, function (s) {
+	  return entityMap[s];
+	  });
+      }
       function compileButton() {
         var input = { 'source' : document.getElementById("source").value,
                       'target' : document.getElementById("target").value,
                       /* 'ascii' : if document.getElementByID("charset").value, */
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
-        document.getElementById("result").innerHTML = main(input).result;
+        document.getElementById("result").innerHTML = escapeHtml(main(input).result);
       }
       function clearButton() {
         document.getElementById("result").innerHTML = "";
@@ -19,7 +33,7 @@
     </script>
   </head>
   <body>
-    <h1>Q*cert demo</h1>
+    <h1>Q*cert online form</h1>
     <form>
       <fieldset>
         <legend>Query compiler</legend>
