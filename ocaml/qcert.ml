@@ -68,7 +68,7 @@ let args_list gconf =
        "<x> Declare x as a local variable");
     ]
 
-let anon_args gconf f = QcertArg.add_input_file gconf f
+let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
   [ CompDriver.L_rule;
@@ -100,6 +100,7 @@ let usage =
 
 
 let parse_args () =
+  let input_files = ref [] in
   let gconf =
     { gconf_source = CompDriver.L_rule;
       gconf_target = CompDriver.L_javascript;
@@ -115,22 +116,21 @@ let parse_args () =
       gconf_emit_sexp_all = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
-      gconf_input_files = [];
       gconf_mr_vinit = "init";
       gconf_vdbindings = []; }
   in
-  Arg.parse (args_list gconf) (anon_args gconf) usage;
-  complet_configuration gconf
+  Arg.parse (args_list gconf) (anon_args input_files) usage;
+  (complet_configuration gconf, List.rev !input_files)
 
 
 
 let () =
-  let gconf = parse_args () in
+  let gconf, input_files = parse_args () in
   Format.printf "%a" QcertCore.fprint_comilation_path gconf;
   let results =
     List.map
       (fun file_name -> QcertCore.main gconf (file_name, string_of_file file_name))
-      gconf.gconf_input_files
+      input_files
   in
   let output_res (file_name, s) =
     if file_name <> "" then

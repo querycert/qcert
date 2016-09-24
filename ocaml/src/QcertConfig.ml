@@ -32,7 +32,6 @@ type global_config = {
     mutable gconf_emit_sexp : bool;
     mutable gconf_emit_sexp_all : bool;
     mutable gconf_java_imports : string;
-    mutable gconf_input_files : string list;
     mutable gconf_mr_vinit : string;
     mutable gconf_vdbindings : CompDriver.vdbindings;
   }

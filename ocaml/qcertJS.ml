@@ -64,7 +64,6 @@ let global_config_of_json j =
       gconf_emit_sexp_all = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
-      gconf_input_files = [];
       gconf_mr_vinit = "init";
       gconf_vdbindings = []; }
   in
