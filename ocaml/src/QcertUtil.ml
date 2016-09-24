@@ -52,3 +52,17 @@ let query_no_error q =
   | CompDriver.Q_error err -> raise (CACo_Error (string err))
   | _ -> ()
   end
+
+
+let string_of_path sep path =
+  let buff = Buffer.create 128 in
+  let str_ff = Format.formatter_of_buffer buff in
+  let () =
+    Format.fprintf str_ff "%a"
+      (Format.pp_print_list
+         ~pp_sep:(fun ff () -> Format.fprintf ff "%(%)" sep)
+         (fun ff lang -> Format.fprintf ff "%s" (name_of_language lang)))
+      path
+  in
+  Format.pp_print_flush str_ff ();
+  Buffer.contents buff
