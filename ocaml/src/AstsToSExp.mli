@@ -42,3 +42,5 @@ val nnrcmr_to_sexp : CompDriver.nnrcmr -> sexp
 val sexp_to_cldmr : sexp -> CompDriver.cldmr
 val cldmr_to_sexp : CompDriver.cldmr -> sexp
 
+val sexp_to_query : CompDriver.language -> sexp -> CompDriver.query
+val query_to_sexp : CompDriver.query -> sexp

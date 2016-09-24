@@ -31,18 +31,18 @@ OCAMLWRAP=$(OCAMLJAVA)/bin/ocamlwrap
 MENHIRFLAG=-use-menhir
 #MENHIRFLAG=
 
-MAIN=CACo
+MAIN=qcert
 MAIN2=CAEv
 MAIN3=CADa
-MAIN4=CAPp
 TARGET=native
 JAR=jar
 
 LIB=CALib
 LIBJS=CALibJS
 
-all: $(MAIN) $(MAIN2) $(MAIN3) $(MAIN4)
-jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR) $(LIB).jar
+all: $(MAIN) $(MAIN2) $(MAIN3)
+jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(LIB).jar
+js: qcertJS.js
 
 # Extraction from Coq
 generated:
@@ -80,16 +80,6 @@ $(MAIN3).$(JAR): generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN3).$(JAR)
 	cp _build/$(MAIN3).$(JAR) $(MAIN3).$(JAR)
 
-$(MAIN4): generated $(MAIN4).$(TARGET)
-	cp _build/$(MAIN4).$(TARGET) ../bin/$(MAIN4)
-
-$(MAIN4).$(TARGET): generated
-	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN4).$(TARGET)
-
-$(MAIN4).$(JAR): generated
-	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN4).$(JAR)
-	cp _build/$(MAIN4).$(JAR) $(MAIN4).$(JAR)
-
 $(LIBJS).cma: generated
 	$(OCAMLBUILD) -libs js_of_ocaml -pp "camlp4o -I /Users/simeon/.opam/4.02.1/lib/js_of_ocaml pa_js.cmo" \
         -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
@@ -112,11 +102,29 @@ japi/lib/$(LIB).jar: $(LIB).jar
 	mkdir -p japi/lib
 	cp $(LIB).jar japi/lib/$(LIB).jar
 
+# JavaScript
+
+qcertJS.js: qcertJS.byte
+	js_of_ocaml _build/qcertJS.byte
+	cp _build/qcertJS.js ../lib/qcertJS.js
+
+qcertJS.byte: generated qcertJS.ml
+	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
+
+wsk-update:
+	wsk action update qcert _build/qcertJS.js
+
+wsk-invoke:
+	wsk action invoke -v -br qcert -p source camp -p target nraenv \
+		-p query pit
+# -p query 'punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))'
+
+# clean
 
 clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build
-	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR) $(MAIN4).$(JAR)
+	rm -f $(MAIN).$(JAR) $(MAIN2).$(JAR) $(MAIN3).$(JAR)
 	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi
 	rm -f japi/lib/CALib.jar
 	rm -f japi/src/org/qcert/calib/CALibWrapper.java
@@ -131,8 +139,8 @@ realclean:
 	rm -f DataLexer.ml DataParser.ml DataParser.mli
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
-	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3) $(MAIN4)
-	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/$(MAIN4)
+	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3)
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/qcertJS.js
 	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
 
 cleanall: realclean

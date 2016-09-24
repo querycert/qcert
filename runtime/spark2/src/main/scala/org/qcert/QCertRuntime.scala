@@ -204,7 +204,7 @@ abstract class QCertRuntime {
   }
 
   val worldType: StructType
-  val sparkContext = new SparkContext("local", "QCERT", new SparkConf())
+  val sparkContext = new SparkContext()
   val sparkSession = SparkSession.builder().getOrCreate()
 
 
@@ -285,6 +285,9 @@ abstract class QCertRuntime {
       case Array("$blob", "$known") =>
         // NOTE we keep the full record in the blob field
         r.getString(0)
+      // TODO rename $value for consistency?
+      case Array("value") =>
+        toBlob(r(0))
       case _ => sys.error("Illformed record schema: " ++ r.schema.toString())
     }
   }

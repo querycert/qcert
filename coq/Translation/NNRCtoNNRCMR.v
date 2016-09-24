@@ -88,7 +88,7 @@ Section NNRCtoNNRCMR.
         | Some d =>
           match loc with
           | Vlocal => Some (x, Dlocal d)
-          | Vdistrubuted =>
+          | Vdistributed =>
             match d with
             | dcoll coll => Some (x, Ddistr coll)
             | _ => None

@@ -21,11 +21,14 @@ Section NNRCMRtoDNNRC.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC NNRCMR ForeignReduceOps DNNRC NNRCtoDNNRC.
+  Require Import NNRC NNRCMR.
+  Require Import ForeignReduceOps ForeignToReduceOps.
+  Require Import DNNRC NNRCtoDNNRC.
   Local Open Scope string_scope.
 
   Context {fruntime:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
+  Context {ftoredop:foreign_to_reduce_op}.
 
   Context (h:list(string*string)).
 
@@ -110,7 +113,12 @@ Section NNRCMRtoDNNRC.
     | (map, RedCollect red_fun) =>
       let map_expr := dnnrc_local_of_mr_map annot (mr_input m) map in
       Some (gen_apply_fun annot red_fun map_expr)
-    | (map, RedOp _) => None (* XXXXXXXX TODO XXXXXXXXXXXXX *)
+    | (map, RedOp op) =>
+      match op with
+      | RedOpForeign frop =>
+        let map_expr := dnnrc_distr_of_mr_map annot (mr_input m) map in
+        lift (fun op => DNRCUnop annot op map_expr) (foreign_to_reduce_op_to_unary_op op)
+      end
     end.
 
   Fixpoint dnnrc_of_mr_chain (annot: A) (outputs: list var) (l: list mr) (k: @dnrc _ A plug_type) : option (@dnrc _ A plug_type) :=

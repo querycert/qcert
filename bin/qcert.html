@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html lang = "en">
+  <head>
+    <title>Q*cert online form</title>
+    <meta charset = "UTF-8" />
+    <script src="../lib/qcertJS.js"></script>
+    <script>
+      var entityMap = {
+      	"&": "&amp;",
+      	"<": "&lt;",
+      	">": "&gt;",
+      	'"': '&quot;',
+      	"'": '&#39;',
+      	"/": '&#x2F;'
+      };
+      function escapeHtml(string) {
+	return String(string).replace(/[&<>"'\/]/g, function (s) {
+	  return entityMap[s];
+	  });
+      }
+      function compileButton() {
+        var input = { 'source' : document.getElementById("source").value,
+                      'target' : document.getElementById("target").value,
+                      'ascii' : document.getElementById("charset").value === "Ascii",
+                      'javaimports' : document.getElementById("java_imports").value,
+                      'query' : document.getElementById("query").value };
+        document.getElementById("result").innerHTML = escapeHtml(main(input).result);
+      }
+      function clearButton() {
+        document.getElementById("result").innerHTML = "";
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Q*cert online form</h1>
+    <form>
+      <fieldset>
+        <legend>Query compiler</legend>
+        <p>
+          <label>source</label>
+          <select id = "source">
+	      <option>rule</option>
+	      <option selected="selected">camp</option>
+	      <option>oql</option>
+	      <option>nra</option>
+	      <option>nraenv</option>
+	      <option>nnrc</option>
+	      <option>nnrcmr</option>
+	      <option>cldmr</option>
+	      <option>dnnrc</option>
+	      <option>dnnrc_typed</option>
+	      <option>js</option>
+	      <option>java</option>
+	      <option>spark</option>
+	      <option>spark2</option>
+	      <option>cloudant</option>
+	  </select>
+          <label>target</label>
+          <select id = "target">
+	      <option>rule</option>
+	      <option>camp</option>
+	      <option>oql</option>
+	      <option>nra</option>
+	      <option>nraenv</option>
+	      <option selected="selected">nnrc</option>
+	      <option>nnrcmr</option>
+	      <option>cldmr</option>
+	      <option>dnnrc</option>
+	      <option>dnnrc_typed</option>
+	      <option>js</option>
+	      <option>java</option>
+	      <option>spark</option>
+	      <option>spark2</option>
+	      <option>cloudant</option>
+	  </select>
+        </p>
+        <p>
+          <label>source query</label>
+	  <br/>
+          <textarea id = "query"
+                    rows = "10"
+                    cols = "80" />punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))</textarea>
+        </p>
+        <p>
+          <label>io</label><br/>
+          <textarea id = "io"
+                    rows = "10"
+                    cols = "80" />{"inheritance": [
+{"sub":"entities.MainEntity", "sup":"org.qcert.TopEntity"},
+   {"sub":"entities.Purchase", "sup":"org.qcert.TopEntity"},
+   {"sub":"entities.Customer", "sup":"org.qcert.TopEntity"}
+]
+,"model":
+{"modelName": "test01",
+ "brandTypes" :[{ "brand":"org.qcert.TopEntity", "typeName":"org_qcert_TopEntity"},
+   { "brand":"entities.Customer", "typeName":"entities_Customer"},
+   { "brand":"entities.Purchase", "typeName":"entities_Purchase"},
+   { "brand":"entities.MainEntity", "typeName":"entities_MainEntity"}],
+   "typeDefs" :[{ "typeName": "org_qcert_TopEntity", "typeDef": { }},
+   { "typeName": "entities_Customer", "typeDef": { "cid": "Nat", "age": "Nat", "name": "String"}},
+   { "typeName": "entities_Purchase", "typeDef": { "cid": "Nat", "pid": "Nat", "name": "String", "quantity": "Nat"}},
+   { "typeName": "entities_MainEntity", "typeDef": { "id": "Nat", "doubleAttribute": "Nat", "stringId": "String"}}]
+}
+, "WMType" : { "$coll" : { "$brand" : ["entities.MainEntity"] } },
+"input": [
+  {"type":["entities.Customer"],"data":{"name":"John Doe", "cid":123, "age":32}},
+  {"type":["entities.Customer"],"data":{"name":"Jane Doe", "cid":124, "age":32}},
+  {"type":["entities.Customer"],"data":{"name":"Jim Does", "cid":125, "age":34}},
+  {"type":["entities.Customer"],"data":{"name":"Jill Does", "cid":126, "age":32}},
+  {"type":["entities.Customer"],"data":{"name":"Joan Doe", "cid":127, "age":34}},
+  {"type":["entities.Customer"],"data":{"name":"James Do", "cid":128, "age":35}},
+  {"type":["entities.Purchase"],"data":{"name":"Tomatoe", "cid":123, "pid":1, "quantity":3}},
+  {"type":["entities.Purchase"],"data":{"name":"Potatoe", "cid":123, "pid":2, "quantity":1}},
+  {"type":["entities.Purchase"],"data":{"name":"Stiletto", "cid":125, "pid":3, "quantity":64}},
+  {"type":["entities.Purchase"],"data":{"name":"Libretto", "cid":126, "pid":4, "quantity":62}},
+  {"type":["entities.Purchase"],"data":{"name":"Dough", "cid":128, "pid":5, "quantity":4}},
+  {"type":["entities.Purchase"],"data":{"name":"Croissant", "cid":128, "pid":6, "quantity":2}},
+  {"type":["entities.MainEntity"],"data":{"id":201, "doubleAttribute":4, "stringId":"201"}},
+  {"type":["entities.MainEntity"],"data":{"id":202, "doubleAttribute":100, "stringId":"202"}}
+],
+
+"partitionedInput": {"entities.Purchase":[
+    {"type":["entities.Purchase"],"data":{"name":"Stiletto", "cid":125, "pid":3, "quantity":64}},
+    {"type":["entities.Purchase"],"data":{"name":"Dough", "cid":128, "pid":5, "quantity":4}},
+    {"type":["entities.Purchase"],"data":{"name":"Tomatoe", "cid":123, "pid":1, "quantity":3}},
+    {"type":["entities.Purchase"],"data":{"name":"Libretto", "cid":126, "pid":4, "quantity":62}},
+    {"type":["entities.Purchase"],"data":{"name":"Croissant", "cid":128, "pid":6, "quantity":2}},
+    {"type":["entities.Purchase"],"data":{"name":"Potatoe", "cid":123, "pid":2, "quantity":1}}],
+  "entities.MainEntity":[
+    {"type":["entities.MainEntity"],"data":{"id":201, "doubleAttribute":4, "stringId":"201"}},
+    {"type":["entities.MainEntity"],"data":{"id":202, "doubleAttribute":100, "stringId":"202"}}],
+  "entities.Customer":[
+    {"type":["entities.Customer"],"data":{"name":"Jane Doe", "cid":124, "age":32}},
+    {"type":["entities.Customer"],"data":{"name":"Joan Doe", "cid":127, "age":34}},
+    {"type":["entities.Customer"],"data":{"name":"Jill Does", "cid":126, "age":32}},
+    {"type":["entities.Customer"],"data":{"name":"John Doe", "cid":123, "age":32}},
+    {"type":["entities.Customer"],"data":{"name":"Jim Does", "cid":125, "age":34}},
+    {"type":["entities.Customer"],"data":{"name":"James Do", "cid":128, "age":35}}]
+},
+
+"output": [
+  "Customer =John Doe",
+  "Customer =Jane Doe",
+  "Customer =Jill Does"
+]}
+</textarea>
+</fieldset>
+<p/>
+    <button type="button"
+	    onclick="compileButton()"><b>compile</b></button>
+    <button type="button"
+	    onclick="clearButton()"><b>clear</b></button>
+    <fieldset>
+      <legend>Result</legend>
+      <p><pre id="result"></pre></p>
+    </fieldset>
+    <fieldset>
+      <legend>Options</legend>
+        <p>
+          <label>character set</label>
+	  <select id = "charset">
+	      <option>Ascii</option>
+	      <option selected="selected">Greek</option>
+	  </select>
+        </p>
+        <p>
+          <label>java imports</label>
+          <input type = "text"
+                 id = "java_imports"
+                 value = "" />
+        </p>
+    </fieldset>
+    </form>
+  </body>
+</html>

@@ -15,6 +15,8 @@
  *)
 
 open Util
+open QcertUtil
+open QcertArg
 open ConfigUtil
 open ParseFile
 open Compiler.EnhancedCompiler
@@ -22,7 +24,7 @@ open Compiler.EnhancedCompiler
 (* ILs Stats *)
 
 let make_stats conf f =
-  match language_of_name (get_source_lang conf) with
+  match language_of_name (get_source_lang_caco conf) with
   | CompDriver.L_rule ->
       let (rn,ru) = parse_rule_from_file f in
       begin

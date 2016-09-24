@@ -53,9 +53,7 @@ how to build on Windows.
 
 	make extraction
 
-This should produce the following executables in the ./bin directory:
-CACo for the Q\*cert compiler, CAEv for the Q\*cert evaluator, and
-CADa for the Q\*cert data processor.
+This should produce the `./bin/qcert` executable.
 
 ## Compile Queries
 
@@ -74,15 +72,22 @@ Calling the compiler on that sample with OQL as source language and
 Javascript as target language can be done as follows:
 
 ```
-$ ./bin/CACo -source OQL -target JS samples/oql/test1.oql
+$ ./bin/qcert -source OQL -target JS samples/oql/test1.oql
 ```
 
-This will produce a javascript file called `samples/oql/test1.js`.
+This will tell you the compilation steps being used:
+
+```
+Compiling from oql to js:
+  oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
+```
+
+and produce a javascript file called `samples/oql/test1.js`.
 
 Similarly for Java:
 
 ```
-$ ./bin/CACo -source OQL -target Java samples/oql/test1.oql
+$ ./bin/qcert -source OQL -target Java samples/oql/test1.oql
 ```
 
 This will produce a java file called `samples/oql/test1.java`.
@@ -214,11 +219,12 @@ Inside the [`./coq`](./coq) directory, the organization is as follows.
   - [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
   - [`./Basic/Typing`](./coq/Basic/Typing) contains typing and type inference for data and operators
 - Intermediate languages (ILs), including eval, typing, type inference, and equivalences/rewrites:
-  - [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns (CAMP)
-  - [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra (NRA)
+  - [`./CAMP`](./coq/CAMP) contains support for the Calculus of Aggregating Matching Patterns
+  - [`./NRA`](./coq/NRA) contains support for the Nested Relational Algebra
   - [`./NRAEnv`](./coq/NRAEnv) contains support for the extension of NRA with environments
-  - [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus (NNRC)
-  - [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus (DNNRC)
+  - [`./NNRC`](./coq/NNRC) contains support for the Named Nested Relational Calculus
+  - [`./NNRCMR`](./coq/NNRCMR) contains support for the Named Nested Relational Calculus with Map-Reduce
+  - [`./DNNRC`](./coq/DNNRC) contains support for the Distributed Named Nested Relational Calculus
 - Translations:
   - [`./Translation`](./coq/Translation) contains translations between ILs
   - [`./Backend`](./coq/Backend) contains backend support and code generation

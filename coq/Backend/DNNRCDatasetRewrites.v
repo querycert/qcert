@@ -25,9 +25,9 @@ Require Import DNNRC.
 Require Import RType.
 Require Import TDNRCInfer.
 Require Import TOpsInfer.
-Require Import SparkIR.
+Require Import Dataset.
 
-Section DNNRCSparkIRRewrites.
+Section DNNRCDatasetRewrites.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
@@ -116,7 +116,7 @@ Section DNNRCSparkIRRewrites.
           (* We need a fresh name for the DNRCAlg environment that binds DNNRC terms to
            * be referred to by name in the algebra part.
            * I talked to Avi about it and this is what needs to happen:
-           * - TODO write a function that finds free (and possibly bound) names in SparkIR
+           * - TODO write a function that finds free (and possibly bound) names in Dataset
            * - TODO use existing fresh_var-related functions in Basic.Util.RFresh
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
@@ -334,7 +334,7 @@ Section DNNRCSparkIRRewrites.
     end.
 
   Definition dnnrcToDatasetRewrite {A : Set}
-             (e: dnrc (type_annotation A) dataset)
+             (e: dnrc (type_annotation A) dataset) : dnrc (type_annotation A) dataset
     :=
       let e' := e in
       let e'' := tryBottomUp rec_cast_to_filter e' in
@@ -345,7 +345,7 @@ Section DNNRCSparkIRRewrites.
       e''''''.
 
 
-End DNNRCSparkIRRewrites.
+End DNNRCDatasetRewrites.
 
 (*
 *** Local Variables: ***

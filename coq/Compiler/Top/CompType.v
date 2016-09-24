@@ -3,6 +3,8 @@ Require Import CompilerRuntime Types.
 Module CompType(runtime:CompilerRuntime).
   Require RType String.
 
+  Definition empty_brand_model (x:unit) := TBrandModel.empty_brand_model.
+
   Definition record_kind : Set
     := RType.record_kind.
 

@@ -205,6 +205,14 @@ Qed.
     - exact None.
   Defined.
 
+  Program Definition empty_brand_model := make_brand_model (mkBrand_relation nil _ _) (mkBrand_context nil _).
+  Next Obligation.
+    unfold holds. auto.
+  Qed.
+  Next Obligation.
+    unfold holds. auto.
+  Defined.
+
 End TBrandModel.
 
 

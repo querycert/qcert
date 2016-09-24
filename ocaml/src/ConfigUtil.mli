@@ -24,15 +24,20 @@ type lang_config
 val default_eval_lang_config : unit -> lang_config
 val default_comp_lang_config : unit -> lang_config
 
-val get_source_lang : lang_config -> string
-val get_target_lang : lang_config -> string
+val get_source_lang : lang_config -> string option
+val get_source_lang_caco : lang_config -> string
+val get_source_lang_caev : lang_config -> string
+val get_target_lang : lang_config -> string option
+val get_target_lang_caco : lang_config -> string
+val get_target_lang_caev : lang_config -> string
+val get_path : lang_config -> string list
 
 val change_source : lang_config -> string -> unit
 val change_target : lang_config -> string -> unit
+val add_path : lang_config -> string -> unit
+val set_path : lang_config -> string list -> unit
 
 val get_cld_config : lang_config -> CloudantUtil.cld_config
-
-val language_of_name : string -> CompDriver.language
 
 (* Target language *)
 
@@ -51,17 +56,20 @@ val suffix_nnrcmr_spark2 : unit -> string
 val suffix_nnrcmr_cldmr : unit -> string
 val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
-val suffix_target : lang_config -> string
+
+val suffix_of_language : CompDriver.language -> string
+(* val suffix_target : lang_config -> string *)
 
 val suffix_sdata : unit -> string
-    
+
 (* Evaluator Section *)
-  
+
 type eval_config
 
 val default_eval_config : unit -> eval_config
 
 val set_eval_io : eval_config -> Data.json -> unit
+val set_eval_schema : eval_config -> string -> unit
 val set_input : eval_config -> string -> unit
 val set_format : eval_config -> string -> unit
 
@@ -69,11 +77,12 @@ val get_format : eval_config -> serialization_format
 val get_eval_only : eval_config -> bool ref
 val get_debug : eval_config -> bool ref
 val get_eval_io : eval_config -> Data.json option
+val get_eval_schema : eval_config -> string option
 val get_eval_inputs : eval_config -> string list
 val get_eval_lang_config : eval_config -> lang_config
 
 (* Data Section *)
-  
+
 type data_config
 
 val default_data_config : unit -> data_config
@@ -88,7 +97,7 @@ val get_data_schema : data_config -> Data.json option
 val get_data_dir : data_config -> string option
 
 (* Compiler Section *)
-  
+
 type comp_config
 
 val default_comp_config : unit -> comp_config
@@ -117,5 +126,3 @@ val get_pretty_config : comp_config -> PrettyIL.pretty_config
 
 val set_java_imports : comp_config -> string -> unit
 val get_java_imports : comp_config -> string
-
-

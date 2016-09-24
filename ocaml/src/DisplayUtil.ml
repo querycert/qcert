@@ -22,11 +22,11 @@ open PrettyIL
 (* Display ILs *)
 
 let display_to_string conf modelandtype op =
-  let opt_nraenv = CompCore.toptimize_algenv_typed_opt op in
-  let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
-  let opt_nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  let nnrcmr_spark = CompBack.nrcmr_to_nrcmr_prepared_for_spark opt_nnrcmr in
-  let nnrcmr_cldmr = CompBack.nrcmr_to_nrcmr_prepared_for_cldmr opt_nnrcmr in
+  let opt_nraenv = CompDriver.nraenv_optim op in
+  let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
+  let opt_nnrcmr = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+  let nnrcmr_spark = CompDriver.nnrcmr_to_nnrcmr_spark_prepare opt_nnrcmr in
+  let nnrcmr_cldmr = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare opt_nnrcmr in
   let nrastring = PrettyIL.pretty_nraenv (get_charset_bool conf) (get_margin conf) opt_nraenv in
   let nrcstring = PrettyIL.pretty_nnrc (get_charset_bool conf) (get_margin conf) opt_nnrc in
   let nrcmrstring = PrettyIL.pretty_nnrcmr (get_charset_bool conf) (get_margin conf) opt_nnrcmr in
@@ -35,27 +35,29 @@ let display_to_string conf modelandtype op =
   let untyped_dnrc_string_thunk (_:unit) =
     PrettyIL.pretty_dnrc
       PrettyIL.pretty_annotate_ignore
-      (PrettyIL.pretty_plug_nraenv (get_charset_bool conf))
+      (PrettyIL.pretty_plug_dataset (get_charset_bool conf))
       (get_charset_bool conf) (get_margin conf)
-      (CompCore.tcompile_nraenv_to_dnnrc_typed_opt op) in
+      (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op) in
   let opt_dnrc_dataset_string =
     begin
-    match modelandtype with
-    | Some (brand_model, inputType) ->
-       begin
-	 match CompCore.tcompile_nraenv_to_dnnrc_dataset_opt
-				brand_model
-				(Enhanced.Model.foreign_typing brand_model)
-				op
-				inputType with
-	 | Some ds -> PrettyIL.pretty_dnrc
-			(PrettyIL.pretty_annotate_annotated_rtype
-			   (get_charset_bool conf) PrettyIL.pretty_annotate_ignore)
-			(PrettyIL.pretty_plug_dataset (get_charset_bool conf))
-			(get_charset_bool conf) (get_margin conf) ds
-	 | None -> "DNRC expression was not well typed.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
-       end
-    | None -> "Optimized DNRC expression can't be determined without a schema.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
+      match modelandtype with
+      | Some (brand_model, inputType) ->
+	  begin
+	    match
+	      CompDriver.dnnrc_dataset_to_dnnrc_typed_dataset
+		brand_model
+		(Enhanced.Model.foreign_typing brand_model)
+		(CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)
+		inputType
+	    with
+	    | Some ds -> PrettyIL.pretty_dnrc
+		  (PrettyIL.pretty_annotate_annotated_rtype
+		     (get_charset_bool conf) PrettyIL.pretty_annotate_ignore)
+		  (PrettyIL.pretty_plug_dataset (get_charset_bool conf))
+		  (get_charset_bool conf) (get_margin conf) ds
+	    | None -> "DNRC expression was not well typed.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
+	  end
+      | None -> "Optimized DNRC expression can't be determined without a schema.  The untyped/unoptimized dnrc expression is:\n" ^ untyped_dnrc_string_thunk ()
     end
   in (nrastring,nrcstring, nrcmrstring, nrcmr_spark_string, nrcmr_cldmr_string, opt_dnrc_dataset_string)
 
@@ -72,7 +74,7 @@ let make_pretty_config charkind margin =
   end;
   set_margin dpc margin;
   dpc
-    
+
 let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string option) (dfname:string) op =
   let modelandtype' =
     begin
@@ -82,8 +84,9 @@ let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
 	begin
 	  match ios with
 	  | Some io ->
-	      let (schema_content,wmType) = TypeUtil.extract_schema (ParseString.parse_io_from_string io) in
-	      let (brand_model,wmRType) = TypeUtil.process_schema schema_content wmType in
+              let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io) in
+              let brand_model = sch.TypeUtil.sch_brand_model in
+              let wmRType = sch.TypeUtil.sch_camp_type in
 	      Some (brand_model, wmRType)
 	  | None -> None
 	end
@@ -108,7 +111,7 @@ let display_nraenv_top (ck:charkind) (margin:int) modelandtype (ios:string optio
   end
 
 (* S-expression hooks *)
-      
+
 let sexp_string_to_camp s = ParseString.parse_camp_sexp_from_string s
 let camp_to_sexp_string p = SExp.sexp_to_string (AstsToSExp.camp_to_sexp p)
 
@@ -125,14 +128,14 @@ let sexp_string_to_cldmr s = ParseString.parse_cldmr_sexp_from_string s
 let cldmr_to_sexp_string n = SExp.sexp_to_string (AstsToSExp.cldmr_to_sexp n)
 
 (* Top-level *)
-    
+
 let sexp_nraenv_top dfname op =
-  let opt_nnrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
+  let opt_nnrc = CompDriver.nraenv_optim_to_nnrc_optim op in
   let display_nra = nraenv_to_sexp_string op in
   let display_nrc = nnrc_to_sexp_string opt_nnrc in
-  let nnrcmr = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-  let nrcmr_spark = CompBack.nrcmr_to_nrcmr_prepared_for_spark nnrcmr in
-  let nrcmr_cldmr = CompBack.nrcmr_to_nrcmr_prepared_for_cldmr nnrcmr in
+  let nnrcmr = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+  let nrcmr_spark = CompDriver.nnrcmr_to_nnrcmr_spark_prepare nnrcmr in
+  let nrcmr_cldmr = CompDriver.nnrcmr_to_nnrcmr_cldmr_prepare nnrcmr in
   let display_nrcmr_spark = nnrcmr_to_sexp_string nrcmr_spark in
   let display_nrcmr_cldmr = nnrcmr_to_sexp_string nrcmr_cldmr in
   let fout_nra = outname dfname (suffix_nrasexp ()) in
@@ -147,7 +150,7 @@ let sexp_nraenv_top dfname op =
   end
 
 (* SData section *)
-    
+
 let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
   let fpref = Filename.chop_extension fname in
   let fout_sdata = outname (target_f (get_data_dir conf) fpref) (suffix_sdata ()) in
@@ -155,4 +158,3 @@ let display_sdata (conf : data_config) (fname:string) (sdata:string list) =
     String.concat "\n" sdata
   in
   make_file fout_sdata sdata
-

@@ -185,7 +185,12 @@ Section NNRCMRtoNNRC.
     | (map, RedCollect red_fun) =>
       let map_expr := nnrc_of_mr_map (mr_input m) map in
       Some (gen_apply_fun red_fun map_expr)
-    | (map, RedOp _) => None (* XXXXXXXX TODO XXXXXXXXXXXXX *)
+    | (map, RedOp op) =>
+      match op with
+      | RedOpForeign frop =>
+        let map_expr := nnrc_of_mr_map (mr_input m) map in
+        lift (fun op => NRCUnop op map_expr) (foreign_to_reduce_op_to_unary_op op)
+      end
     end.
 
   Fixpoint nnrc_of_mr_chain (outputs: list var) (l: list mr) (k: nrc) : option nrc :=

@@ -14,82 +14,36 @@
  * limitations under the License.
  *)
 
-Section CompUtil.
+Require Import CompilerRuntime.
+Module CompUtil(runtime:CompilerRuntime).
 
-  Require Import String List String EquivDec.
+  Require Import BasicRuntime NNRCMRRuntime.
+  Require Import TDNRCInfer.
   
-  Require Import BasicRuntime.
-  Require Import Pattern Rule.
+  (* mr_reduce_empty isn't a field of mr so it needs to be exposed *)
+  Definition mr_reduce_empty := mr_reduce_empty.
 
-  (*********
-   * Utils *
-   *********)
+  (* Access to type annotations *)
+  Definition type_annotation {br:brand_relation} (A:Set): Set
+    := TDNRCInfer.type_annotation A.
 
-  (* Initial variables for the input and environment *)
-  (* Java equivalents: in NnrcToNrcmr as static fields *)
-  Definition init_vid := "id"%string.
-  Definition init_venv := "env"%string.
-  Definition init_vinit := "init"%string.
+  Definition ta_base {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_base ta.
+  Definition ta_inferred {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_inferred ta .
+  Definition ta_required {br:brand_relation} (A:Set) (ta:type_annotation A)
+    := TDNRCInfer.ta_required ta.
 
-  (* Java equivalent: NnrcToNrcmr.localize_names *)
-  Definition localize_names (names: list string) : list (string * dlocalization) :=
-    map (fun x => (x, Vdistr)) names.
+  (* Processing for input or output of queries *)
+  Require Import CompEnv.
+  Definition validate_rule_success := validate_rule_success.
+  Definition validate_lifted_success := validate_lifted_success.
 
-  Definition localize_bindings {A} (cenv: list (string * A)) : list (string * dlocalization) :=
-    localize_names (map fst cenv).
-
-  Context {fdata:foreign_data}.
-  
-  Definition unwrap_result res :=
-    match res with
-    | None => None
-    | Some (dcoll l) => Some l
-    | Some _ => None
-    end.
-
-  Require Import DData.
-  Definition mkDistLoc : list (string*dlocalization)
-    := ("CONST$WORLD"%string, Vdistr)::nil.
-
-  Definition validate (oresult oexpected:option (list data))
-    := match oresult, oexpected with
-       | None, None => true
-       | Some ((dcoll result)::nil), Some expected =>
-         if permutation_dec result expected 
-         then true
-         else false
-       | _,_ => false
-       end.
-  (* validate a successful run *)
-  Definition validate_success (oresult:option (list data)) (expected:list data)
-    := validate oresult (Some expected).
-  
-  (* We want to prove things of the form 
-    validate result expected = true
-    This can be proven just by eq_refl and implicit normalization,
-    but normalization using compute (the default) is slow.
-    This tactic explicitly normalizes using vm_compute.
-    and then applies reflexivity.  This is *much* faster.
-   *)
-
-  (* Check Rule/CAMP result *)
-
-  Definition validate_rule_success res exp : bool :=
-    validate_success res exp.
-
-  (* Check NRAEnv/NNRC/NNRCMR/CloudantMR result *)
-  
-  Definition validate_lifted_success res exp : bool :=
-    validate_success (unwrap_result res) exp.
-
+  Definition mkDistLoc := mkDistLoc.
+  Definition mkDistWorld := mkDistWorld.
 End CompUtil.
 
-(* validate that the answer is correct.  Since the result is unordered,
-      we check that the result answer is a permutation of the expected
-       answer *)
-Ltac fast_refl := vm_compute; reflexivity.
-
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***

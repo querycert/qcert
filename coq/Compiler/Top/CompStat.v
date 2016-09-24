@@ -26,112 +26,75 @@ Require Import ODMGRuntime.
 Require Import CompilerRuntime.
 Module CompStat(runtime:CompilerRuntime).
 
-  Require Import RuletoNRA PatterntoNRA PatterntoNRAEnv NRAtoNNRC NRAEnvtoNNRC.
-  Require Import CompCore.
-  Require Import TRewFunc.
-  Require Import CompUtil.
-  Require Import CompFront.
   Require Import NNRCtoJavascript.
 
-  Module CF := CompFront runtime.
+  Require Import CompEnv.
+  Require CompDriver.
 
-  Module CC := CompCore runtime.
+  Module CD := CompDriver.CompDriver runtime.
 
   Local Open Scope string_scope.
 
-  (* Compilation functions *)
-
-  Definition oql_to_nraenv (oql:oql_expr) : algenv := CF.translate_oql_to_algenv oql.
-
-  Definition rule_to_nraenv (r:rule) : algenv := CF.translate_rule_to_algenv r.
-
-  Definition rule_to_nra (r:rule) : alg := alg_of_rule r.
-
-  Definition pat_to_nraenv (p:pat) : algenv := CF.translate_pat_to_algenv p.
-
-  Definition pat_to_nra (p:pat) : alg := alg_of_pat p.
-
-  Definition nraenv_optim (op: algenv) : algenv := CC.toptimize_algenv_typed_opt op.
-
-  Definition nraenv_compiler (op: algenv) : nrc := CC.tcompile_nraenv_to_nnrc_typed_opt op.
-
-  Definition nraenv_to_nnrc (op: algenv) : nrc := algenv_to_nnrc op init_vid init_venv.
-
-  Definition nraenv_to_nra (op: algenv) : alg := alg_of_algenv op.
-
-  Definition nra_to_nraenv (op: alg) : algenv := algenv_of_alg op.
-
-  Definition nra_optim (op: alg) : alg :=
-    let algenv_opt := (CC.toptimize_algenv_typed_opt (algenv_of_alg op)) in
-    if is_nra_fun algenv_opt then
-      deenv_alg algenv_opt
-    else
-      alg_of_algenv algenv_opt.
-
-  Definition nra_to_nnrc (op: alg) : nrc := nra_to_nnrc op init_vid.
-
-  Definition nnrc_optim (e: nrc) : nrc := trew e.
-
   (* Stats computation functions *)
 
-  Definition stat_nnrc (e: nrc) : data :=
+  Definition stat_nnrc (e: CD.nnrc) : data :=
     drec
       (("nnrc_size", dnat (Z_of_nat (nrc_size e)))
-         :: ("nnrc_optim_size", dnat (Z_of_nat (nrc_size (nnrc_optim e))))
+         :: ("nnrc_optim_size", dnat (Z_of_nat (nrc_size (CD.nnrc_optim e))))
          :: nil).
 
-  Definition stat_body_nra (op:alg) : data :=
+  Definition stat_body_nra (op:CD.nra) : data :=
     drec
       (("nra_size", dnat (Z_of_nat (alg_size op)))
          :: ("nra_depth", dnat (Z_of_nat (alg_depth op)))
-         :: ("nra_to_nnrc", stat_nnrc (nra_to_nnrc op))
+         :: ("nra_to_nnrc", stat_nnrc (CD.nra_to_nnrc op))
          :: nil).
 
-  Definition stat_nra (op:alg) : data :=
+  Definition stat_nra (op:CD.nra) : data :=
     drec
       (("nra_no_optim", stat_body_nra op)
-         :: ("nra_optim", stat_body_nra (nra_optim op))
+         :: ("nra_optim", stat_body_nra (CD.nra_optim op))
          :: nil).
 
-  Definition stat_body_nraenv (op:algenv) : data :=
+  Definition stat_body_nraenv (op:CD.nraenv) : data :=
     drec
       (("nraenv_size", dnat (Z_of_nat (algenv_size op)))
          :: ("nraenv_depth", dnat (Z_of_nat (algenv_depth op)))
-         :: ("nraenv_to_nnrc", stat_nnrc (nraenv_to_nnrc op))
-         :: ("nraenv_to_nra", stat_nra (nraenv_to_nra op))
+         :: ("nraenv_to_nnrc", stat_nnrc (CD.nraenv_to_nnrc op))
+         :: ("nraenv_to_nra", stat_nra (CD.nraenv_to_nra op))
          :: nil).
 
-  Definition stat_nraenv (op:algenv) : data :=
+  Definition stat_nraenv (op:CD.nraenv) : data :=
     drec
       (("nraenv_no_optim", stat_body_nraenv op)
-         :: ("nraenv_optim", stat_body_nraenv (nraenv_optim op))
-         :: ("nraenv_compiler", stat_nnrc (nraenv_compiler op))
+         :: ("nraenv_optim", stat_body_nraenv (CD.nraenv_optim op))
+         :: ("nraenv_compiler", stat_nnrc (CD.nraenv_optim_to_nnrc op))
          :: nil).
 
-  Definition stat_pat (p:pat) : data :=
+  Definition stat_pat (p:CD.camp) : data :=
     drec
       (("pat_size", dnat (Z_of_nat (pat_size p)))
-         :: ("pat_to_nraenv", stat_nraenv (pat_to_nraenv p))
-         :: ("pat_to_nra", stat_nra (pat_to_nra p))
+         :: ("pat_to_nraenv", stat_nraenv (CD.camp_to_nraenv p))
+         :: ("pat_to_nra", stat_nra (CD.camp_to_nra p))
          :: nil).
 
-  Definition stat_rule (r:rule) : data :=
+  Definition stat_rule (r:CD.rule) : data :=
     drec
-      (("rule_size", dnat (Z_of_nat (pat_size (rule_to_pattern r))))
-         :: ("rule_to_nraenv", stat_nraenv (rule_to_nraenv r))
-         :: ("rule_to_nra", stat_nra (rule_to_nra r))
+      (("rule_size", dnat (Z_of_nat (pat_size (CD.rule_to_camp r))))
+         :: ("rule_to_nraenv", stat_nraenv (CD.rule_to_nraenv r))
+         :: ("rule_to_nra", stat_nra (CD.rule_to_nra r))
          :: nil).
 
-  Definition stat_oql (e:oql_expr) : data :=
+  Definition stat_oql (e:CD.oql) : data :=
     drec
       (("oql_size", dnat (Z_of_nat (oql_size e)))
-         :: ("oql_to_nraenv", stat_nraenv (oql_to_nraenv e))
+         :: ("oql_to_nraenv", stat_nraenv (CD.oql_to_nraenv e))
          :: nil).
 
 
   (* Top level *)
 
-  Definition json_stats_oql (sname:string) (oql:oql_expr) : string :=
+  Definition json_stats_oql (sname:string) (oql:CD.oql) : string :=
     let stat :=
         drec
           (("oql_name", dstring sname)
@@ -140,7 +103,7 @@ Module CompStat(runtime:CompilerRuntime).
     in
     dataToJS quotel_double stat.
 
-  Definition json_stats_rule (sname:string) (r:rule) : string :=
+  Definition json_stats_rule (sname:string) (r:CD.rule) : string :=
     let stat :=
         drec
           (("rule_name", dstring sname)
@@ -149,7 +112,7 @@ Module CompStat(runtime:CompilerRuntime).
     in
     dataToJS quotel_double stat.
 
-  Definition json_stats_pattern (sname:string) (p:pat) : string :=
+  Definition json_stats_pattern (sname:string) (p:CD.camp) : string :=
     let stat :=
         drec
           (("pat_name", dstring sname)

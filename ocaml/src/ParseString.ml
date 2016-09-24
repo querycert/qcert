@@ -65,6 +65,6 @@ let parse_cldmr_sexp_from_string s : CompDriver.cldmr = parse_string parse_cldmr
  * Languages Parse *
  *******************)
 
-let parse_language_from_string l s : string * CompDriver.query =
-  parse_string (parse_language l) s
+let parse_query_from_string l s : string * CompDriver.query =
+  parse_string (parse_query l) s
 

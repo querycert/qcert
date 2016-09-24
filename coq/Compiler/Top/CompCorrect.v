@@ -22,12 +22,11 @@ Module CompCorrect(model:CompilerModel).
   Require Import BasicSystem.
   Require Import Pattern Rule.
 
-  Require Import CompUtil CompFront.
+  Require Import CompUtil.
   Require Import CompTop.
   Require Import EvalTop.
 
   Module runtime:=CompilerModelRuntime model.
-  Module CF := CompFront runtime.
   Module CT := CompTop runtime.
   Module ET := EvalTop runtime.
   

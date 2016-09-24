@@ -12,7 +12,7 @@ level Makefile in the ocaml directory to point the following variable
 to the ocamlbuild tool for java. Here is mine, for instance:
 
 ## Configuration for the separate ocamljava compiler
-OCAMLBUILDJAVA=/Users/simeon/.opam/ocamljava-2.0-alpha3/bin/ocamlbuild
+OCAMLBUILDJAVA=$(HOME)/.opam/ocamljava-2.0-alpha3/bin/ocamlbuild
 
 Then you can use the following to build the jars:
 

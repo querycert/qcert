@@ -124,26 +124,26 @@ MODULES = \
 	NRAEnv/NRAEnvTypes \
 	NRAEnv/NRAEnvSystem \
 	NNRC/Calculus/NNRC \
-	NNRC/Calculus/ForeignReduceOps \
 	NNRC/Calculus/NNRCEq \
 	NNRC/Calculus/NNRCSize \
 	NNRC/Calculus/NShadow \
-	NNRC/Calculus/NNRCMR \
 	NNRC/Typing/TNRC \
 	NNRC/Typing/TNRCInfer \
 	NNRC/Typing/TNRCEq \
 	NNRC/Typing/TShadow \
 	NNRC/Rew/NRewUtil \
 	NNRC/Rew/NRew \
-	NNRC/Rew/NRewMR \
 	NNRC/Rew/TRew \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \
-	NNRC/NNRCMRRuntime \
+	NNRCMR/Calculus/ForeignReduceOps \
+	NNRCMR/Calculus/NNRCMR \
+	NNRCMR/Rew/NRewMR \
+	NNRCMR/NNRCMRRuntime \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCEq \
-	DNNRC/Calculus/SparkIR \
+	DNNRC/Calculus/Dataset \
 	DNNRC/Typing/TDNRC \
 	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
@@ -203,7 +203,7 @@ MODULES = \
 	Backend/NNRCMRtoCloudant \
 	Backend/CloudantMRtoJavascript \
 	Backend/SparkData \
-	Backend/DNNRCSparkIRRewrites \
+	Backend/DNNRCDatasetRewrites \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/ROptimEnvFunc \
@@ -222,15 +222,10 @@ MODULES = \
 	Compiler/Top/CompPattern \
 	Compiler/Top/CompRule \
 	Compiler/Top/CompOQL \
-	Compiler/Top/CompUtil \
-	Compiler/Top/CompFront \
-	Compiler/Top/CompCore \
-	Compiler/Top/CompBack \
-	Compiler/Top/CompTop \
+	Compiler/Top/CompEnv \
 	Compiler/Top/CompDriver \
+	Compiler/Top/CompUtil \
 	Compiler/Top/EvalTop \
-	Compiler/Top/OQLTop \
-	Compiler/Top/CompCorrect \
 	Compiler/Top/CompStat \
 	Compiler/Top/CompType \
 	Compiler/Compiler \
@@ -264,6 +259,9 @@ japi:
 	@$(MAKE) java-extraction
 	@$(MAKE) lib/QcertLibrary.jar
 
+jsapi:
+	@$(MAKE) js-extraction
+
 lib/QcertLibrary.jar:
 	ant -f scripts/makeQcertLibrary.xml
 
@@ -284,6 +282,12 @@ java-extraction:
 	@echo "[QCert] Extracting compiler to OCaml + Java"
 	@echo "[QCert] "
 	@$(MAKE) -C ocaml clean japi
+
+js-extraction:
+	@echo "[QCert] "
+	@echo "[QCert] Extracting compiler to OCaml + Javascript"
+	@echo "[QCert] "
+	@$(MAKE) -C ocaml js
 
 Makefile.coq: Makefile $(VS) $(FILES)
 	@coq_makefile -R coq QCert $(FILES) -o Makefile.coq

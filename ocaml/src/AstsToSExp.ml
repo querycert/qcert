@@ -16,6 +16,7 @@
 
 (* This module contains parsing utilities *)
 
+open Util
 open Compiler.EnhancedCompiler
 open Compiler
 
@@ -27,15 +28,15 @@ open SExp
  ****************)
 
 let coq_string_to_sstring (cl:char list) : sexp =
-  SString (Util.string_of_char_list cl)
+  SString (string_of_char_list cl)
 let dbrands_to_sexp (bs:(char list) list) : sexp list =
   List.map coq_string_to_sstring bs
 let coq_string_list_to_sstring_list = dbrands_to_sexp
     
 let sstring_to_coq_string (se:sexp) : char list =
   match se with
-  | SString s -> Util.char_list_of_string s
-  | _ -> raise (Util.CACo_Error "Not well-formed S-expr for Coq string")
+  | SString s -> char_list_of_string s
+  | _ -> raise (CACo_Error "Not well-formed S-expr for Coq string")
 let sexp_to_dbrands (bs:sexp list) : (char list) list =
   List.map sstring_to_coq_string bs
 let sstring_list_to_coq_string_list = sexp_to_dbrands
@@ -47,7 +48,7 @@ let rec data_to_sexp (d : Data.data) : sexp =
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
   | Dbool b -> SBool b
-  | Dstring s -> SString (Util.string_of_char_list s)
+  | Dstring s -> SString (string_of_char_list s)
   | Dcoll dl -> STerm ("dcoll", List.map data_to_sexp dl)
   | Drec adl -> STerm ("drec", List.map drec_to_sexp adl)
   | Dleft d -> STerm ("dleft", data_to_sexp d :: [])
@@ -55,14 +56,14 @@ let rec data_to_sexp (d : Data.data) : sexp =
   | Dbrand (bs,d) -> STerm ("dbrand", (STerm ("brands", dbrands_to_sexp bs)) :: (STerm ("value", (data_to_sexp d) :: [])) :: [])
   | Dforeign fdt -> STerm ("dtime_scale", (SString (PrettyIL.string_of_foreign_data (Obj.magic fdt))) :: [])
 and drec_to_sexp (ad : char list * Data.data) : sexp =
-  STerm ("datt", (SString (Util.string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
+  STerm ("datt", (SString (string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
 
 let rec sexp_to_data (se:sexp) : Data.data =
   match se with
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b
   | SInt n -> Dnat n
-  | SString s -> Dstring (Util.char_list_of_string s)
+  | SString s -> Dstring (char_list_of_string s)
   | STerm ("dcoll", sel) ->
       Dcoll (List.map sexp_to_data sel)
   | STerm ("drec", asel) ->
@@ -76,15 +77,15 @@ let rec sexp_to_data (se:sexp) : Data.data =
   | STerm ("dtime_scale", [SString s]) ->
       Dforeign (Obj.magic (PrettyIL.foreign_data_of_string s))
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr with name " ^ t))
+      raise (CACo_Error ("Not well-formed S-expr with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr")
+      raise (CACo_Error "Not well-formed S-expr")
 and sexp_to_drec (sel:sexp) : (char list * Data.data) =
   match sel with
   | STerm ("datt", (SString s) :: se :: []) ->
-      (Util.char_list_of_string s, sexp_to_data se)
+      (char_list_of_string s, sexp_to_data se)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside drec")
+      raise (CACo_Error "Not well-formed S-expr inside drec")
 
 (* Operators Section *)
 
@@ -95,7 +96,7 @@ let sexp_to_arithbop (se:sexp) : arithBOp =
   match se with
   | STerm (s,[]) -> PrettyIL.binarith_of_string s
   | _ ->
-      raise  (Util.CACo_Error "Not well-formed S-expr inside arith binop")
+      raise  (CACo_Error "Not well-formed S-expr inside arith binop")
   
 let binop_to_sexp (b:binOp) : sexp =
   match b with
@@ -155,8 +156,8 @@ let sexp_to_binop (se:sexp) : binOp =
   | STerm ("ATimeDurationFromScale",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationFromScale
   | STerm ("ATimeDurationBetween",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationBetween
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside arith binop with name " ^ t))
-  | _ -> raise  (Util.CACo_Error "Not well-formed S-expr inside arith binop")
+      raise (CACo_Error ("Not well-formed S-expr inside arith binop with name " ^ t))
+  | _ -> raise  (CACo_Error "Not well-formed S-expr inside arith binop")
 
 let arithuop_to_sexp (b:arithUOp) : sexp =
   STerm (PrettyIL.string_of_unarith b,[])
@@ -165,7 +166,7 @@ let sexp_to_arithuop (se:sexp) : arithUOp =
   match se with
   | STerm (s,[]) -> PrettyIL.unarith_of_string s
   | _ ->
-      raise  (Util.CACo_Error "Not well-formed S-expr inside arith unop")
+      raise  (CACo_Error "Not well-formed S-expr inside arith unop")
 
 let unop_to_sexp (u:unaryOp) : sexp =
   match u with
@@ -239,9 +240,9 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ATimeFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeFromString
   | STerm ("ATimeDurationFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeDurationFromString
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside unop with name " ^ t))
+      raise (CACo_Error ("Not well-formed S-expr inside unop with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside unop")
+      raise (CACo_Error "Not well-formed S-expr inside unop")
 
 (* CAMP Section *)
 
@@ -281,9 +282,9 @@ let rec sexp_to_camp (se : sexp) : CompDriver.camp =
   | STerm ("Pleft", []) -> Pleft
   | STerm ("Pright", []) -> Pright
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside camp with name " ^ t))
+      raise (CACo_Error ("Not well-formed S-expr inside camp with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside camp")
+      raise (CACo_Error "Not well-formed S-expr inside camp")
 
 (* NRA Section *)
 
@@ -329,46 +330,46 @@ let rec sexp_to_nraenv (se : sexp) : CompDriver.nraenv =
   | STerm ("ANAppEnv", [se1;se2]) -> ANAppEnv (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANMapEnv", [se1]) -> ANMapEnv (sexp_to_nraenv se1)
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside NRAEnv with name " ^ t))
+      raise (CACo_Error ("Not well-formed S-expr inside NRAEnv with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside NRAEnv")
+      raise (CACo_Error "Not well-formed S-expr inside NRAEnv")
 
 (* NNRC Section *)
 
 let rec nnrc_to_sexp (n : CompDriver.nnrc) : sexp =
   match n with
-  | NRCVar v -> STerm ("NRCVar", [SString (Util.string_of_char_list v)])
+  | NRCVar v -> STerm ("NRCVar", [SString (string_of_char_list v)])
   | NRCConst d -> STerm ("NRCConst", [data_to_sexp d])
   | NRCBinop (b, n1, n2) -> STerm ("NRCBinop", (binop_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
   | NRCUnop (u, n1) -> STerm ("NRCUnop", (unop_to_sexp u) :: [nnrc_to_sexp n1])
-  | NRCLet (v, n1, n2) -> STerm ("NRCLet", (SString (Util.string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
-  | NRCFor (v, n1, n2) -> STerm ("NRCFor", (SString (Util.string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NRCLet (v, n1, n2) -> STerm ("NRCLet", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NRCFor (v, n1, n2) -> STerm ("NRCFor", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
   | NRCIf (n1, n2, n3) -> STerm ("NRCIf", [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
   | NRCEither (n1,v1,n2,v2,n3) -> STerm ("NRCEither",
-					 (SString (Util.string_of_char_list v1))
-					 :: (SString (Util.string_of_char_list v2))
+					 (SString (string_of_char_list v1))
+					 :: (SString (string_of_char_list v2))
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
 
 let rec sexp_to_nnrc (se:sexp) : CompDriver.nnrc =
   match se with
-  | STerm ("NRCVar", [SString v]) -> NRCVar (Util.char_list_of_string v)
+  | STerm ("NRCVar", [SString v]) -> NRCVar (char_list_of_string v)
   | STerm ("NRCConst", [d]) -> NRCConst (sexp_to_data d)
   | STerm ("NRCBinop", b :: [n1;n2]) -> NRCBinop (sexp_to_binop b, sexp_to_nnrc n1, sexp_to_nnrc n2)
   | STerm ("NRCUnop", u :: [n1]) -> NRCUnop (sexp_to_unop u, sexp_to_nnrc n1)
-  | STerm ("NRCLet", (SString v) :: [n1;n2]) -> NRCLet (Util.char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
-  | STerm ("NRCFor", (SString v) :: [n1;n2]) -> NRCFor (Util.char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NRCLet", (SString v) :: [n1;n2]) -> NRCLet (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NRCFor", (SString v) :: [n1;n2]) -> NRCFor (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
   | STerm ("NRCIf", [n1;n2;n3]) -> NRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)
   | STerm ("NRCEither", (SString v1) :: (SString v2) :: [n1;n2;n3]) ->
-      NRCEither (sexp_to_nnrc n1,Util.char_list_of_string v1,sexp_to_nnrc n2,Util.char_list_of_string v2,sexp_to_nnrc n3)
+      NRCEither (sexp_to_nnrc n1,char_list_of_string v1,sexp_to_nnrc n2,char_list_of_string v2,sexp_to_nnrc n3)
   | STerm (t, _) ->
-      raise (Util.CACo_Error ("Not well-formed S-expr inside nnrc with name " ^ t))
+      raise (CACo_Error ("Not well-formed S-expr inside nnrc with name " ^ t))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside nnrc")
+      raise (CACo_Error "Not well-formed S-expr inside nnrc")
 
 (* NNRCMR section *)
 
 let var_to_sexp (v:var) : sexp =
-  SString (Util.string_of_char_list v)
+  SString (string_of_char_list v)
 
 let opt_var_to_sexp (vo:var option) : sexp list =
   match vo with
@@ -377,19 +378,19 @@ let opt_var_to_sexp (vo:var option) : sexp list =
     
 let sexp_to_var (se:sexp) : var =
   match se with
-  | SString v -> Util.char_list_of_string v
+  | SString v -> char_list_of_string v
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside var")
+      raise (CACo_Error "Not well-formed S-expr inside var")
 
 let sexp_to_var_opt (sel:sexp list) : var option =
   match sel with
   | [] -> None
   | [se] -> Some (sexp_to_var se)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside optional var")
+      raise (CACo_Error "Not well-formed S-expr inside optional var")
 
 let var_list_to_sexp (vl:var list) : sexp list =
-  map (fun v -> (SString (Util.string_of_char_list v))) vl
+  map (fun v -> (SString (string_of_char_list v))) vl
 
 let sexp_to_var_list (sel:sexp list) =
   List.map sexp_to_var sel
@@ -401,7 +402,7 @@ let sexp_to_params (se:sexp) =
   match se with
   | STerm ("params", vars) -> sexp_to_var_list vars
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside var list")
+      raise (CACo_Error "Not well-formed S-expr inside var list")
 
 let fun_to_sexp (f:(var list * nrc)) : sexp =
   STerm ("lambda", (params_to_sexp (fst f)) :: (nnrc_to_sexp (snd f)) :: [])
@@ -411,7 +412,7 @@ let sexp_to_fun (se:sexp) : (var list * nrc) =
   | STerm ("lambda", params :: sen :: []) ->
       (sexp_to_params params, sexp_to_nnrc sen)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside lambda")
+      raise (CACo_Error "Not well-formed S-expr inside lambda")
 
 let unary_fun_to_sexp (f:var * nrc) : sexp =
   fun_to_sexp ([fst f], snd f)
@@ -420,7 +421,7 @@ let sexp_to_unary_fun (se:sexp) : var * nrc =
   match sexp_to_fun se with
   | ([var], n) -> (var, n)
   | _ ->
-      raise (Util.CACo_Error "Map or Reduce lambda isn't unary")
+      raise (CACo_Error "Map or Reduce lambda isn't unary")
   
 let binary_fun_to_sexp (f:(var * var) * nrc) : sexp =
   fun_to_sexp ([fst (fst f); (snd (fst f))], snd f)
@@ -429,7 +430,7 @@ let sexp_to_binary_fun (se:sexp) : (var * var) * nrc =
   match sexp_to_fun se with
   | ([var1; var2], n) -> ((var1, var2), n)
   | _ ->
-      raise (Util.CACo_Error "Map or Reduce lambda isn't binary")
+      raise (CACo_Error "Map or Reduce lambda isn't binary")
   
     
 let map_fun_to_sexp (mf:map_fun) =
@@ -444,7 +445,7 @@ let sexp_to_map_fun (se:sexp) =
   | STerm ("MapDistFlatten", sef::[]) -> MapDistFlatten (sexp_to_unary_fun sef)
   | STerm ("MapScalar", sef::[]) -> MapScalar (sexp_to_unary_fun sef)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside map_fun")
+      raise (CACo_Error "Not well-formed S-expr inside map_fun")
 
 
 let numeric_type_to_sexp nt =
@@ -457,7 +458,7 @@ let sexp_to_numeric_type se =
   | SString "Enhanced_numeric_int" -> Enhanced_numeric_int
   | SString "Enhanced_numeric_float" -> Enhanced_numeric_float
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside numeric_type")
+      raise (CACo_Error "Not well-formed S-expr inside numeric_type")
 
 
 let reduce_op_to_sexp se =
@@ -478,7 +479,7 @@ let sexp_to_reduce_op se =
   | STerm ("RedOpArithMean", nt::[]) -> RedOpArithMean (sexp_to_numeric_type nt)
   | STerm ("RedOpStats", nt::[]) -> RedOpStats (sexp_to_numeric_type nt)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside reduce_op")
+      raise (CACo_Error "Not well-formed S-expr inside reduce_op")
 
 
 let reduce_fun_to_sexp (rf:reduce_fun) =
@@ -495,13 +496,13 @@ let sexp_to_reduce_fun (se:sexp) =
   | STerm ("foreign_reduce_op", ro::[]) -> RedOp (Obj.magic (sexp_to_reduce_op ro))
   | STerm ("RedSingleton", []) -> RedSingleton
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside reduce_fun")
+      raise (CACo_Error "Not well-formed S-expr inside reduce_fun")
 
 
 let mr_to_sexp (mr:mr) : sexp =
   STerm ("mr",
-	 (STerm ("mr_input", (SString (Util.string_of_char_list mr.mr_input))::[]))
-	 :: (STerm ("mr_output", (SString (Util.string_of_char_list mr.mr_output))::[]))
+	 (STerm ("mr_input", (SString (string_of_char_list mr.mr_input))::[]))
+	 :: (STerm ("mr_output", (SString (string_of_char_list mr.mr_output))::[]))
 	 :: (map_fun_to_sexp mr.mr_map)
 	 :: (reduce_fun_to_sexp mr.mr_reduce)
 	 :: [])
@@ -515,12 +516,12 @@ let sexp_to_mr (se:sexp) : mr =
 	   :: reduce
 	   :: [])
     ->
-      { mr_input = Util.char_list_of_string input;
-	mr_output = Util.char_list_of_string output;
+      { mr_input = char_list_of_string input;
+	mr_output = char_list_of_string output;
 	mr_map = sexp_to_map_fun map;
 	mr_reduce = sexp_to_reduce_fun reduce }
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside mr")
+      raise (CACo_Error "Not well-formed S-expr inside mr")
 
 
 let mr_chain_to_sexp (mrl:mr list) : sexp list =
@@ -540,18 +541,18 @@ let sexp_to_loc (se:sexp) =
   | SString "Vscalar" -> Vlocal
   | SString "Vdistributed" -> Vdistr
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside dlocalization")
+      raise (CACo_Error "Not well-formed S-expr inside dlocalization")
 
 
 let var_loc_to_sexp (v,l) =
-  STerm ("var_loc", (SString (Util.string_of_char_list v))::(loc_to_sexp l)::[])
+  STerm ("var_loc", (SString (string_of_char_list v))::(loc_to_sexp l)::[])
     
 let sexp_to_var_loc (se:sexp) =
   match se with
   | STerm ("var_loc", (SString v)::l::[]) ->
-      (Util.char_list_of_string v, sexp_to_loc l)
+      (char_list_of_string v, sexp_to_loc l)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside var-dlocalization pair")
+      raise (CACo_Error "Not well-formed S-expr inside var-dlocalization pair")
     
 let var_locs_to_sexp env : sexp list =
   map var_loc_to_sexp env
@@ -572,7 +573,7 @@ let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
   | STerm ("mr_last", f :: var_locs) ->
       (sexp_to_fun f, sexp_to_var_locs var_locs)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside mr_last")
+      raise (CACo_Error "Not well-formed S-expr inside mr_last")
 
 let nnrcmr_to_sexp (n:CompDriver.nnrcmr) : sexp =
   STerm ("nrcmr",
@@ -593,7 +594,7 @@ let sexp_to_nnrcmr (se:sexp) : CompDriver.nnrcmr =
         mr_chain = sexp_to_mr_chain chain;
 	mr_last = sexp_to_mr_last last }
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside nrcmr")
+      raise (CACo_Error "Not well-formed S-expr inside nrcmr")
 
 (* CldMR section *)
 
@@ -607,7 +608,7 @@ let sexp_to_cld_map_fun (se:sexp) : cld_map_fun =
   | STerm ("CldMapId", sef::[]) -> CldMapId (sexp_to_unary_fun sef)
   | STerm ("CldMapFlatten", sef::[]) -> CldMapFlatten (sexp_to_unary_fun sef)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_map_fun")
+      raise (CACo_Error "Not well-formed S-expr inside cld_map_fun")
 
 
 let cld_map_emit_to_sexp (me:cld_map_emit) =
@@ -620,7 +621,7 @@ let sexp_to_cld_map_emit (se:sexp) : cld_map_emit =
   | STerm ("CldEmitDist", []) -> CldEmitDist
   | STerm ("CldEmitCollect", (SInt i)::[]) -> CldEmitCollect i
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_map_emit")
+      raise (CACo_Error "Not well-formed S-expr inside cld_map_emit")
 
 
 let cld_numeric_type_to_sexp nt =
@@ -633,7 +634,7 @@ let sexp_to_cld_numeric_type se =
   | SString "Cld_int" -> Cld_int
   | SString "Cld_float" -> Cld_float
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_numeric_type")
+      raise (CACo_Error "Not well-formed S-expr inside cld_numeric_type")
 
 
 let cld_reduce_op_to_sexp se =
@@ -648,7 +649,7 @@ let sexp_to_cld_reduce_op se =
   | STerm ("CldRedOpSum", nt::[]) -> CldRedOpSum (sexp_to_cld_numeric_type nt)
   | STerm ("CldRedOpStats", nt::[]) -> CldRedOpStats (sexp_to_cld_numeric_type nt)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_reduce_op")
+      raise (CACo_Error "Not well-formed S-expr inside cld_reduce_op")
 
 
 let cld_reduce_fun_to_sexp (rf:cld_reduce_fun) =
@@ -663,7 +664,7 @@ let sexp_to_cld_reduce_fun (se:sexp) : cld_reduce_fun =
   | STerm ("CldRedAggregate", fred::frered::[]) -> CldRedAggregate (sexp_to_binary_fun fred, sexp_to_unary_fun frered)
   | STerm ("CldRedOp", ro::[]) -> CldRedOp (Obj.magic (sexp_to_cld_reduce_op ro))
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_reduce_fun")
+      raise (CACo_Error "Not well-formed S-expr inside cld_reduce_fun")
 
 
 let cld_red_opt_to_sexp red =
@@ -679,7 +680,7 @@ let sexp_to_cld_red_opt sel =
       Some { reduce_fun0 = sexp_to_cld_reduce_fun reduce;
 	     reduce_output = sexp_to_var_opt reduce_out }
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_reduce")
+      raise (CACo_Error "Not well-formed S-expr inside cld_reduce")
 
 
 let cld_reduce_default_to_sexp def =
@@ -692,12 +693,12 @@ let sexp_to_cld_reduce_default se =
   | [] -> None
   | n :: [] -> Some (sexp_to_nnrc n)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_reduce_default")
+      raise (CACo_Error "Not well-formed S-expr inside cld_reduce_default")
 
 
 let cld_mr_to_sexp (mr:cld_mr) : sexp =
   STerm ("cld_mr",
-	 (STerm ("cld_mr_input", (SString (Util.string_of_char_list mr.cld_mr_input))::[]))
+	 (STerm ("cld_mr_input", (SString (string_of_char_list mr.cld_mr_input))::[]))
 	 :: (STerm ("cld_mr_map", (cld_map_fun_to_sexp mr.cld_mr_map.map_fun0)
 		    :: (cld_map_emit_to_sexp mr.cld_mr_map.map_emit) :: []))
 	 :: (STerm ("cld_mr_reduce", cld_red_opt_to_sexp mr.cld_mr_reduce))
@@ -713,13 +714,13 @@ let sexp_to_cld_mr (se:sexp) : cld_mr =
 	   :: (STerm ("cld_mr_reduce_default", default))
 	   :: [])
     ->
-      { cld_mr_input = Util.char_list_of_string input;
+      { cld_mr_input = char_list_of_string input;
 	cld_mr_map = { map_fun0 = sexp_to_cld_map_fun mapf;
 		       map_emit = sexp_to_cld_map_emit mape };
 	cld_mr_reduce = sexp_to_cld_red_opt reduce_opt;
         cld_mr_reduce_default = sexp_to_cld_reduce_default default }
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_mr")
+      raise (CACo_Error "Not well-formed S-expr inside cld_mr")
 
 
 let cld_mr_chain_to_sexp (mrl:cld_mr list) : sexp list =
@@ -740,7 +741,7 @@ let sexp_to_cld_mr_last (sel:sexp list) : (var list * nrc) * var list =
   | f :: vars ->
       (sexp_to_fun f, sexp_to_var_list vars)
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cld_mr_last")
+      raise (CACo_Error "Not well-formed S-expr inside cld_mr_last")
 
 
 let cldmr_to_sexp (c:CompDriver.cldmr) : sexp =
@@ -756,8 +757,67 @@ let sexp_to_cldmr (se:sexp) : CompDriver.cldmr =
 	   :: (STerm ("cld_mr_last", last))
 	   :: [])
     ->
-      { cld_mr_chain = sexp_to_cld_mr_chain chain;
+      { cld_mr_chain = 
+sexp_to_cld_mr_chain chain;
 	cld_mr_last = sexp_to_cld_mr_last last }
   | _ ->
-      raise (Util.CACo_Error "Not well-formed S-expr inside cldmr")
+      raise (CACo_Error "Not well-formed S-expr inside cldmr")
 
+(* Query translations *)
+let sexp_to_query (lang: CompDriver.language) (se: sexp) : CompDriver.query =
+  begin match lang with
+  | CompDriver.L_rule ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_camp -> CompDriver.Q_camp (sexp_to_camp se)
+  | CompDriver.L_oql ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_nra ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_nraenv -> CompDriver.Q_nraenv (sexp_to_nraenv se)
+  | CompDriver.L_nnrc -> CompDriver.Q_nnrc (sexp_to_nnrc se)
+  | CompDriver.L_nnrcmr -> CompDriver.Q_nnrcmr (sexp_to_nnrcmr se)
+  | CompDriver.L_cldmr -> CompDriver.Q_cldmr (sexp_to_cldmr se)
+  | CompDriver.L_dnnrc_dataset ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_dnnrc_typed_dataset ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_javascript
+  | CompDriver.L_java
+  | CompDriver.L_spark
+  | CompDriver.L_spark2
+  | CompDriver.L_cloudant ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_error err ->
+      raise (CACo_Error ("sexp_to_query: "^(Util.string_of_char_list err)))
+  end
+
+let query_to_sexp (q: CompDriver.query) : sexp =
+  begin match q with
+  | CompDriver.Q_rule _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_camp q -> camp_to_sexp q
+  | CompDriver.Q_oql _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_nra _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_nraenv q -> nraenv_to_sexp q
+  | CompDriver.Q_nnrc q -> nnrc_to_sexp q
+  | CompDriver.Q_nnrcmr q -> nnrcmr_to_sexp q
+  | CompDriver.Q_cldmr q -> cldmr_to_sexp q
+  | CompDriver.Q_dnnrc_dataset _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_dnnrc_typed_dataset _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_javascript _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_java _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_spark _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_spark2 _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_cloudant _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_error err ->
+      SString ("query_to_sexp: "^(Util.string_of_char_list err))
+  end

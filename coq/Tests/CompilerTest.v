@@ -24,15 +24,14 @@ Import ListNotations.
 Require Import BasicSystem CAMPRuntime.
 Require Import TrivialModel.
 
-Require Compiler CompTop CompilerRuntime.
+Require Compiler CompDriver CompilerRuntime.
 
 Definition CPRModel := ("MainEntity", "Entity") :: nil.
 Instance CPRModel_relation : brand_relation
   := mkBrand_relation CPRModel (eq_refl _) (eq_refl _).
 
 Module TR := TrivialRuntime.
-Module C := Compiler.Compiler(TR).
-Module CompTop := CompTop.CompTop(TR).
+Module CD := CompDriver.CompDriver(TR).
 
 (* This module encodes the examples in sample-rules.txt *)
 Section CompilerUntypedTest.
@@ -108,16 +107,12 @@ Section CompilerUntypedTest.
   Example Example1_expected := map dconst
                                    ["MainEntitys with doubleAttribute 50: 2"].
 
-  Definition pat5 : pat := Eval compute in Example1'.
-  Definition alg5 : RAlgEnv.algenv := CompTop.compile_pat_to_algenv_no_optim Example1'.
-  Definition algopt5 : RAlgEnv.algenv := CompTop.compile_pat_to_algenv_untyped_opt Example1'.
-  Definition nnrc5 : NNRC.nrc := CompTop.compile_pat_to_nnrc_untyped_opt Example1'.
+  Definition pat5 : CD.camp := Eval compute in Example1'.
+  Definition algopt5 : CD.nraenv := CD.camp_to_nraenv Example1'.
   
-  Definition rpat5 : rule := Eval compute in Example1.
-  Definition ralg5 : RAlgEnv.algenv := CompTop.compile_rule_to_algenv_no_optim Example1.
-  Definition ralgopt5 : RAlgEnv.algenv := CompTop.compile_rule_to_algenv_untyped_opt Example1.
-  Definition rnnrc5 : NNRC.nrc := CompTop.compile_rule_to_nnrc_untyped_opt Example1.
-  Definition rnnrcmr5 := CompTop.tcompile_rule_to_nnrcmr_chain Example1.
+  Definition rpat5 : CD.rule := Eval compute in Example1.
+  Definition ralgopt5 : CD.nraenv  := CD.rule_to_nraenv_optim Example1.
+  Definition rnnrc5 : CD.nnrc := CD.rule_to_nnrc_optim Example1.
   
   Definition inp1 : (list (string*data)) := (("WORLD", dcoll exampleWM)::nil).
   Definition inp2 : data := dunit.
@@ -145,15 +140,13 @@ Section CompilerUntypedTest.
 
   End CompilerBrandModelTest.
 
-  Require Import CompilerModel CompCorrect.
+  Require Import CompilerModel.
   
   Module MyBrandModel <: CompilerBrandModel(TrivialForeignType).
     Definition compiler_brand_model := CPModel.
   End MyBrandModel.
   Module TM := TrivialModel(MyBrandModel).
   
-  Module CC := CompCorrect.CompCorrect(TM).
-
   Section CompilerTypedTest.
     Existing Instance CPModel.
   
@@ -262,10 +255,11 @@ Section CompilerUntypedTest.
   Require Import TAlgEnv TPatterntoNRAEnv.
   
   Lemma alg5_wt τ :
-    alg5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
+    algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
-    unfold alg5, CompTop.compile_pat_to_algenv_no_optim, CompTop.compile_pat_to_algenv.
-    unfold CompTop.optimizer_no_optim.
+    unfold algopt5, CD.camp_to_nraenv.
+    unfold PatterntoNRAEnv.translate_pat_to_algenv.
+    unfold PatterntoNRAEnv.algenv_of_pat.
     econstructor; eauto.
     econstructor; eauto.
     Focus 2.

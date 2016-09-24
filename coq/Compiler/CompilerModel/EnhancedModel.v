@@ -731,13 +731,45 @@ Definition enhanced_to_reduce_op (uop:unaryOp) : option NNRCMR.reduce_op
      | _ => None
      end.
 
+Definition enhanced_of_reduce_op (rop:NNRCMR.reduce_op) : option unaryOp
+  := match rop with
+     | NNRCMR.RedOpForeign RedOpCount => Some ACount
+     | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_int) =>
+       Some (ASum)
+     | NNRCMR.RedOpForeign (RedOpSum enhanced_numeric_float) =>
+       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_sum))
+     | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_int) =>
+       Some (ANumMin)
+     | NNRCMR.RedOpForeign (RedOpMin enhanced_numeric_float) =>
+       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmin))
+     | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_int) =>
+       Some (ANumMax)
+     | NNRCMR.RedOpForeign (RedOpMax enhanced_numeric_float) =>
+       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax))
+     | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_int) =>
+       Some (AArithMean)
+     | NNRCMR.RedOpForeign (RedOpArithMean enhanced_numeric_float) =>
+       Some (AForeignUnaryOp (enhanced_unary_float_op uop_float_arithmean))
+     | NNRCMR.RedOpForeign (RedOpStats _) =>
+       None (* XXX TODO? XXX *)
+     end.
+
 Program Instance enhanced_foreign_to_reduce_op : foreign_to_reduce_op
-  := mk_foreign_to_reduce_op enhanced_foreign_runtime enhanced_foreign_reduce_op enhanced_to_reduce_op _.
+  := mk_foreign_to_reduce_op enhanced_foreign_runtime enhanced_foreign_reduce_op enhanced_to_reduce_op _ enhanced_of_reduce_op _.
 Next Obligation.
   unfold NNRCMR.reduce_op_eval.
   destruct uop; simpl in *; invcs H; try reflexivity.
   destruct fu; try discriminate.
   destruct f; invcs H1; reflexivity.
+Qed.
+Next Obligation.
+  unfold NNRCMR.reduce_op_eval.
+  destruct rop; simpl in *; invcs H; try reflexivity.
+  destruct f; invcs H1; simpl; try reflexivity.
+  destruct typ; invcs H0; reflexivity.
+  destruct typ; invcs H0; reflexivity.
+  destruct typ; invcs H0; reflexivity.
+  destruct typ; invcs H0; reflexivity.
 Qed.
 
 Local Open Scope string_scope.

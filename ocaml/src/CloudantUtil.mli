@@ -32,9 +32,15 @@ val set_prefix : cld_config -> string -> unit
 val get_harness : cld_config -> string
 val set_harness : cld_config -> string -> unit
 
+(* Important functions *)
+val add_harness : string -> Data.json -> CompDriver.cloudant -> CompDriver.cloudant
+val string_of_cloudant : CompDriver.cloudant -> string
+
 (* Cloudant stuff *)
 
 val idioticize : string -> string -> string
+
+(* Convenience function *)
 
 val cloudant_compile_from_nra : string -> string -> CompDriver.nraenv -> Data.json -> string
 val cloudant_compile_from_nnrcmr : string -> string -> CompDriver.nnrcmr -> Data.json -> string

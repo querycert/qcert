@@ -8,6 +8,8 @@ Makefile.coq
 bin/CACo
 bin/CADa
 bin/CAEv
+bin/qcert
+bin/qcertJS.js
 /.project
 /.README.md.html
 bin/CAPp

@@ -15,9 +15,11 @@
  *)
 
 open Util
+open QcertUtil
 open ConfigUtil
 open ParseFile
 open Compiler.EnhancedCompiler
+open QcertArg
 
 (* Frontend Eval *)
 
@@ -39,31 +41,43 @@ let eval_oql h world f : Data.data option * string =
 (* Core Eval *)
 
 exception OQL_eval of string
-      
-let eval_nraenv conf h world op : Data.data option =
+
+let eval_nraenv conf schema h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
-  match language_of_name (get_target_lang conf) with
+  match language_of_name (get_target_lang_caev conf) with
   | CompDriver.L_rule ->
       raise (CACo_Error "Rule eval not supported once compiled into algebra")
   | CompDriver.L_oql ->
       raise (OQL_eval "OQL eval not supported once compiled into algebra")
   | CompDriver.L_nraenv ->
-      let op = CompCore.toptimize_algenv_typed_opt op in
+      let op = CompDriver.nraenv_optim op in
       EvalTop.algenv_eval_top h op world
   | CompDriver.L_nnrc ->
-      let nrc = CompCore.tcompile_nraenv_to_nnrc_typed_opt op in
+      let nrc = CompDriver.nraenv_optim_to_nnrc_optim op in
       EvalTop.nrc_eval_top h nrc world
   | CompDriver.L_dnnrc_dataset ->
-      let nrc = CompCore.tcompile_nraenv_to_dnnrc_typed_opt op in
-      EvalTop.dnrc_eval_top h nrc world
+      let brand_model =
+	begin match schema with
+	| Some sc ->
+	    begin try
+              let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string sc) in
+              sch.TypeUtil.sch_brand_model
+	    with
+	    | _ -> raise (CACo_Error "Spark2 target requires a valid schema I/O file")
+	    end
+	| None -> raise (CACo_Error "Spark2 target requires a schema I/O file")
+	end
+      in
+      let nrc = CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc Compiler.mkDistLoc op in
+      EvalTop.dnrc_eval_top brand_model h nrc world
   | CompDriver.L_nnrcmr ->
-      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
+      let mrchain = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
       EvalTop.nrcmr_chain_eval_top h mrchain world
   | CompDriver.L_cldmr ->
-      let mrchain = CompCore.tcompile_nraenv_to_nnrcmr_chain_typed_opt op in
-      let mrchain = CompBack.nrcmr_to_cldmr_chain_with_prepare h mrchain in
+      let mrchain = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+      let mrchain = CompDriver.nnrcmr_to_cldmr [] mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world
   | _ ->
-      Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang conf);
-      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang conf)))
+      Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang_caev conf);
+      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang_caev conf)))
 
