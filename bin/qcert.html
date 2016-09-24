@@ -13,7 +13,6 @@
       	"'": '&#39;',
       	"/": '&#x2F;'
       };
-	
       function escapeHtml(string) {
 	return String(string).replace(/[&<>"'\/]/g, function (s) {
 	  return entityMap[s];
@@ -22,7 +21,7 @@
       function compileButton() {
         var input = { 'source' : document.getElementById("source").value,
                       'target' : document.getElementById("target").value,
-                      /* 'ascii' : if document.getElementByID("charset").value, */
+                      'ascii' : document.getElementById("charset").value === "Ascii",
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
         document.getElementById("result").innerHTML = escapeHtml(main(input).result);
@@ -159,11 +158,13 @@
       <legend>Options</legend>
         <p>
           <label>character set</label>
-	  <input type="radio" id="charset" name="charset" value="true">Ascii
-	  <input type="radio" id="charset" name="charset" value="false" checked="checked">Greek
+	  <select id = "charset">
+	      <option>Ascii</option>
+	      <option selected="selected">Greek</option>
+	  </select>
         </p>
         <p>
-          <label>java_imports</label>
+          <label>java imports</label>
           <input type = "text"
                  id = "java_imports"
                  value = "" />

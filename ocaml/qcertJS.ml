@@ -48,7 +48,7 @@ let compile source_lang_s target_lang_s q_s =
 (* Equivalent to qcert cmd        *)
 (**********************************)
 
-let global_config_and_query_of_json j =
+let global_config_of_json j =
   let gconf =
     { gconf_source = CompDriver.L_rule;
       gconf_target = CompDriver.L_javascript;
@@ -102,45 +102,44 @@ let global_config_and_query_of_json j =
   apply QcertArg.set_vinit j##.vinit;
   iter_array QcertArg.add_vdirst j##.vdistr;
   iter_array QcertArg.add_vlocal j##.vlocal;
-  (complet_configuration gconf, j##.query)
-
-let compile gconf q_s =
-  let result =
-    begin try
-      let source_lang = gconf.gconf_source in
-      let target_lang = gconf.gconf_target in
-      let (qname, q) = ParseString.parse_query_from_string source_lang (Js.to_string q_s) in
-      let schema = TypeUtil.empty_schema in
-      let brand_model = schema.TypeUtil.sch_brand_model in
-      let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-      let dv_conf = QcertConfig.driver_conf_of_global_conf gconf "MyQuery" "MyClass" in
-      let q_target =
-        CompDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
-      in
-      let p_conf = gconf.gconf_pretty_config in
-      PrettyIL.pretty_query p_conf q_target
-    with CACo_Error err -> "compilation error: "^err
-    | _ -> "compilation error"
-    end
-  in
-  Js.string result
+  complet_configuration gconf
 
 let main input =
-  try
-    let (gconf,q_s) =
-      try
-	global_config_and_query_of_json input
-      with _ -> raise (CACo_Error "[Couldn't load configuration]")
+  begin try
+    let gconf =
+      begin try
+	global_config_of_json input
+      with exn ->
+        raise (CACo_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
+      end
     in
-    let q_res = compile gconf q_s in
+    let q_s =
+      begin try
+       Js.to_string input##.query
+      with exn ->
+        raise (CACo_Error ("[Couldn't load query: "^(Printexc.to_string exn)^"]"))
+      end
+    in
+    let res =
+      begin try
+        QcertCore.main gconf ("Query.string", q_s)
+      with CACo_Error err -> raise (CACo_Error ("[Compilation error: "^err^"]"))
+      | exn -> raise (CACo_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
+      end
+    in
     object%js
-        val result = q_res
+        val result = Js.string (snd res.QcertCore.res_emit)
     end
   with
   | CACo_Error msg ->
       object%js
         val result = Js.string msg
-    end
+      end
+  | exn ->
+      object%js
+        val result = Js.string ("[Main error: "^(Printexc.to_string exn)^"]")
+      end
+  end
 
 let _ =
   Js.Unsafe.global##.main :=
