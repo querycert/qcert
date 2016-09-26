@@ -72,7 +72,9 @@ let global_config_of_json j =
   in
   let iter_array f o =
     Js.Optdef.iter o
-      (fun a -> ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
+      (fun a ->
+        let a = Js.str_array a in
+        ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
   in
   apply QcertArg.set_source j##.source;
   apply QcertArg.set_target j##.target;
