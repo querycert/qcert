@@ -178,6 +178,7 @@ MODULES = \
 	Translation/TPatterntoNRA \
 	Translation/TPatterntoNRAEnv \
 	Frontend/LambdaNRA/LambdaAlg \
+	Frontend/LambdaNRA/LambdaAlgSugar \
 	Frontend/LambdaNRA/LambdaAlgEq \
 	Frontend/LambdaNRA/LambdaAlgtoNRAEnv \
 	Frontend/ODMG/OQL \
@@ -222,6 +223,7 @@ MODULES = \
 	Compiler/Top/CompPattern \
 	Compiler/Top/CompRule \
 	Compiler/Top/CompOQL \
+	Compiler/Top/CompLambdaNRA \
 	Compiler/Top/CompEnv \
 	Compiler/Top/CompDriver \
 	Compiler/Top/CompUtil \

@@ -140,8 +140,8 @@ realclean:
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
 	rm -rf *~ generated $(MAIN) $(MAIN2) $(MAIN3)
-	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3) ../bin/qcertJS.js
-	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN2) ../bin/$(MAIN3)
+	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi ../lib/qcertJS.js
 
 cleanall: realclean
 

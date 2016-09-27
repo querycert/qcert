@@ -57,6 +57,8 @@ let parse_camp f : CompDriver.camp = parse RuleParser.patmain (RuleLexer.token (
   
 let parse_oql f : CompDriver.oql = OQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f)
 
+let parse_lambda_nra f : CompDriver.lambda_nra = LambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
+
 (****************)
 (* S-Expr Parse *)
 (****************)
@@ -78,6 +80,7 @@ let parse_query l f : (string * CompDriver.query) =
   | CompDriver.L_rule -> parse_rule f
   | CompDriver.L_camp -> ("CAMP", CompDriver.Q_camp (parse_camp f))
   | CompDriver.L_oql -> ("OQL", CompDriver.Q_oql (parse_oql f))
+  | CompDriver.L_lambda_nra -> ("LambdaNRA", CompDriver.Q_lambda_nra (parse_lambda_nra f))
   | CompDriver.L_nra -> raise (CACo_Error "No parser for NRA available")
   | CompDriver.L_nraenv -> ("NRAEnv", CompDriver.Q_nraenv (parse_nraenv_sexp f))
   | CompDriver.L_nnrc -> ("NNRC", CompDriver.Q_nnrc (parse_nnrc_sexp f))

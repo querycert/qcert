@@ -1,3 +1,19 @@
+(*
+ * Copyright 2015-2016 IBM Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *)
+
 Require Import String.
 Require Import List.
 Require Import Arith.
@@ -14,18 +30,22 @@ Section LambdaNRAEq.
     Definition lalg_eq (op1 op2:lalg) : Prop :=
     forall
       (h:list(string*string))
+      (cenv:bindings)
       (env:bindings)
+      (dn_cenv:Forall (fun d => data_normalized h (snd d)) cenv)
       (dn_env:Forall (fun d => data_normalized h (snd d)) env),
-       fun_of_lalg h env op1 = fun_of_lalg h env op2.
+       fun_of_lalg h cenv env op1 = fun_of_lalg h cenv env op2.
 
     Definition lalg_lambda_eq (op1 op2:lalg_lambda) : Prop :=
     forall
       (h:list(string*string))
+      (cenv:bindings)
       (env:bindings)
+      (dn_cenv:Forall (fun d => data_normalized h (snd d)) cenv)
       (dn_env:Forall (fun d => data_normalized h (snd d)) env)
       (d:data)
       (dn_d:data_normalized h d),
-      fun_of_lalg_lambda h env op1 d = fun_of_lalg_lambda h env op2 d.
+      fun_of_lalg_lambda h cenv env op1 d = fun_of_lalg_lambda h cenv env op2 d.
 
   Global Instance lalg_equiv : Equivalence lalg_eq.
   Proof.
@@ -33,9 +53,9 @@ Section LambdaNRAEq.
     - unfold Reflexive, lalg_eq.
       intros; reflexivity.
     - unfold Symmetric, lalg_eq.
-      intros. rewrite (H h env dn_env) by trivial; reflexivity.
+      intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; reflexivity.
     - unfold Transitive, lalg_eq.
-      intros. rewrite (H h env dn_env) by trivial; rewrite (H0 h env dn_env) by trivial; reflexivity.
+      intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; rewrite (H0 h cenv env dn_cenv dn_env) by trivial; reflexivity.
   Qed.
 
   Global Instance lalg_lambda_equiv : Equivalence lalg_lambda_eq.
@@ -44,12 +64,19 @@ Section LambdaNRAEq.
     - unfold Reflexive, lalg_lambda_eq.
       intros; reflexivity.
     - unfold Symmetric, lalg_lambda_eq.
-      intros. rewrite (H h env dn_env) by trivial; reflexivity.
+      intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; reflexivity.
     - unfold Transitive, lalg_lambda_eq.
-      intros. rewrite (H h env dn_env) by trivial; rewrite (H0 h env dn_env) by trivial; reflexivity.
+      intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; rewrite (H0 h cenv env dn_cenv dn_env) by trivial; reflexivity.
   Qed.
 
   Global Instance lavar_proper : Proper (eq ==> lalg_eq) LAVar.
+  Proof.
+    unfold Proper, respectful, lalg_eq; intros.
+    subst.
+    reflexivity.
+  Qed.
+
+  Global Instance latable_proper : Proper (eq ==> lalg_eq) LATable.
   Proof.
     unfold Proper, respectful, lalg_eq; intros.
     subst.
@@ -152,6 +179,7 @@ Section LambdaNRAEq.
     autorewrite with lalg.
     rewrite H0.
     - reflexivity.
+    - trivial.
     - apply Forall_app; auto.
   Qed.
 

@@ -72,7 +72,9 @@ let global_config_of_json j =
   in
   let iter_array f o =
     Js.Optdef.iter o
-      (fun a -> ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
+      (fun a ->
+        let a = Js.str_array a in
+        ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
   in
   apply QcertArg.set_source j##.source;
   apply QcertArg.set_target j##.target;
@@ -103,6 +105,37 @@ let global_config_of_json j =
   iter_array QcertArg.add_vlocal j##.vlocal;
   complet_configuration gconf
 
+
+let json_of_result res =
+  let wrap (file_name, s) =
+      object%js
+        val name = Js.string file_name
+        val value = Js.string s
+      end
+  in
+  let wrap_all l =
+    let a = new%js Js.array_empty in
+    List.iter (fun x -> ignore (a##push (wrap x))) l;
+    a
+  in
+  object%js
+    val emit = Js.def (wrap res.QcertCore.res_emit)
+    val emitall = Js.def (wrap_all res.QcertCore.res_emit_all)
+    val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
+    val emitsexpall = Js.def (wrap_all res.QcertCore.res_emit_sexp_all)
+    val result = Js.string (snd res.QcertCore.res_emit)
+  end
+
+let json_of_error msg =
+  object%js
+    val emit = Js.undefined
+    val emitall = Js.undefined
+    val emitsexp = Js.undefined
+    val emitsexpall = Js.undefined
+    val result = Js.string msg
+  end
+
+
 let main input =
   begin try
     let gconf =
@@ -126,18 +159,10 @@ let main input =
       | exn -> raise (CACo_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
       end
     in
-    object%js
-        val result = Js.string (snd res.QcertCore.res_emit)
-    end
+    json_of_result res
   with
-  | CACo_Error msg ->
-      object%js
-        val result = Js.string msg
-      end
-  | exn ->
-      object%js
-        val result = Js.string ("[Main error: "^(Printexc.to_string exn)^"]")
-      end
+  | CACo_Error msg -> json_of_error msg
+  | exn -> json_of_error ("[Main error: "^(Printexc.to_string exn)^"]")
   end
 
 let _ =
