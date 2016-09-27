@@ -38,8 +38,8 @@ Module CompLambdaNRA(runtime:CompilerRuntime).
     := LambdaAlg.LAVar.
   Definition laconst : Data.data -> expr
     := LambdaAlg.LAConst.
-(*  Definition ltable  : String.string -> expr
-    := LambdaAlg.LATable. *)
+  Definition ltable  : String.string -> expr
+    := LambdaAlg.LATable.
   Definition labinop : Ops.Binary.op -> expr -> expr -> expr
     := LambdaAlg.LABinop.
   Definition launop : Ops.Unary.op -> expr -> expr
