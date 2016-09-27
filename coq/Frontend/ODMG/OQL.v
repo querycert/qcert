@@ -234,7 +234,7 @@ Section OQL.
 
   (** Semantics of OQL *)
 
-  Context (h:list(string*string)).
+  Context (h:brand_relation_t).
   Context (constant_env:list (string*data)).
 
   Definition env_map_concat_single (a:oql_env) (xl:list oql_env) : list oql_env :=

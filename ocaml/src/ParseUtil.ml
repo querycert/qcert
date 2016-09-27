@@ -57,7 +57,7 @@ let parse_camp f : CompDriver.camp = parse RuleParser.patmain (RuleLexer.token (
   
 let parse_oql f : CompDriver.oql = OQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f)
 
-let parse_lambda_nra f : CompDriver.lambda_nra = parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f
+let parse_lambda_nra f : CompDriver.lambda_nra = LambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
 
 (****************)
 (* S-Expr Parse *)

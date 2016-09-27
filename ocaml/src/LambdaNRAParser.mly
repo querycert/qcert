@@ -48,7 +48,7 @@
 %right PLUS MINUS
 %right AND OR
 %right STAR
-%left DOT ARROW
+%left NOT DOT ARROW
 
 %start <Compiler.EnhancedCompiler.LambdaNRA.expr> main
 

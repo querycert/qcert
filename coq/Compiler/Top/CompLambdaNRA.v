@@ -58,10 +58,8 @@ Module CompLambdaNRA(runtime:CompilerRuntime).
   Definition lastruct : list (String.string * expr) -> expr 
     := LambdaAlgSugar.LAStruct.
 
-  (*
-  Definition tableify : expr -> expr
-    := OQLSugar.tableify.
-   *)
+  Definition latableify : expr -> expr
+    := LambdaAlgSugar.la_tableify.
 
 End CompLambdaNRA.
 (* 

@@ -41,14 +41,12 @@ Section LambdaAlgSugar.
   Definition LAArrow (s:string) (e:lalg) := LAUnop (ADot s) (LAUnop AUnbrand e).
   
   (* replaces free variables by table lookups -- used in parser *)
-  (*
-  Definition tableify_one_var (e:oql_expr) (v:string) : oql_expr :=
-    oql_subst e v (OTable v).
+  Definition la_tableify_one_var (e:lalg) (v:string) : lalg :=
+    lalg_subst e v (LATable v).
 
-  Definition tableify (e:oql_expr) : oql_expr :=
-    let free_vars := oql_free_vars e in
-    fold_left tableify_one_var free_vars e.
-  *)
+  Definition la_tableify (e:lalg) : lalg :=
+    let free_vars := lalg_free_vars e in
+    fold_left la_tableify_one_var free_vars e.
   
 End LambdaAlgSugar.
 
