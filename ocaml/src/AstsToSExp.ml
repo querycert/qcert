@@ -771,6 +771,8 @@ let sexp_to_query (lang: CompDriver.language) (se: sexp) : CompDriver.query =
   | CompDriver.L_camp -> CompDriver.Q_camp (sexp_to_camp se)
   | CompDriver.L_oql ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | CompDriver.L_lambda_nra ->
+      raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | CompDriver.L_nra ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | CompDriver.L_nraenv -> CompDriver.Q_nraenv (sexp_to_nraenv se)
@@ -797,6 +799,8 @@ let query_to_sexp (q: CompDriver.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_camp q -> camp_to_sexp q
   | CompDriver.Q_oql _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | CompDriver.Q_lambda_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | CompDriver.Q_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)

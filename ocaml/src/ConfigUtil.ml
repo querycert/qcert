@@ -80,8 +80,10 @@ let suffix_rule () = "_rule.camp"
 let suffix_camp () = "_camp.camp"
 let suffix_oql () = "_oql.txt"
 let suffix_nra () = "_nra.txt"
+let suffix_lambda_nra () = "_lambda_nra.txt"
 let suffix_nraenv () = "_nraenv.txt"
 let suffix_nrasexp () = "_nraenv.sexp"
+let suffix_lambda_nrasexp () = "_lambda_nra.sexp"
 let suffix_nnrc () = "_nnrc.txt"
 let suffix_nnrcsexp () = "_nnrc.sexp"
 let suffix_dnnrc_dataset () = "_dnnrc.txt"
@@ -109,6 +111,7 @@ let suffix_of_language lang =
   | CompDriver.L_rule -> suffix_rule ()
   | CompDriver.L_camp -> suffix_camp ()
   | CompDriver.L_oql -> suffix_oql ()
+  | CompDriver.L_lambda_nra -> suffix_lambda_nra ()
   | CompDriver.L_nra -> suffix_nra ()
   | CompDriver.L_nraenv -> suffix_nraenv ()
   | CompDriver.L_nnrc -> suffix_nnrc ()

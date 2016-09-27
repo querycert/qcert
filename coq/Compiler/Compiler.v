@@ -18,7 +18,7 @@ Require Import CompilerRuntime.
 Module Compiler (runtime:CompilerRuntime).
 
   Require CompData CompOperators.
-  Require CompOQL CompPattern CompRule CompEnv.
+  Require CompOQL CompLambdaNRA CompPattern CompRule CompEnv.
   Require CompDriver CompUtil CompStat CompType EvalTop.
 
   Module RType := CompType.CompType runtime.
@@ -26,6 +26,7 @@ Module Compiler (runtime:CompilerRuntime).
   Module Ops := CompOperators.CompOperators runtime.
 
   Module OQL := CompOQL.CompOQL runtime.
+  Module LambdaNRA := CompLambdaNRA.CompLambdaNRA runtime.
   Module Pattern := CompPattern.CompPattern runtime.
   Module Rule := CompRule.CompRule runtime.
 

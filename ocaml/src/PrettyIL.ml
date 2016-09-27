@@ -1041,6 +1041,7 @@ let pretty_query pconf q =
   | Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Q_nra q -> pretty_nra greek margin q
   | Q_nraenv q -> pretty_nraenv greek margin q
   | Q_nnrc q -> pretty_nnrc greek margin q
