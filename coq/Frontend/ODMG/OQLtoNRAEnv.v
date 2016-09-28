@@ -45,8 +45,20 @@ Section OQLtoNRAEnv.
     | OUnop u e1 => ANUnop u (algenv_of_oql e1)
     | OSFW select_clause from_clause where_clause =>
       let algenv_of_from (opacc:algenv) (from_in_expr : oql_in_expr) :=
-          let (in_v, from_expr) := from_in_expr in
-          ANMapConcat (ANMap (ANUnop (ARec in_v) ANID) (algenv_of_oql from_expr)) opacc
+          match from_in_expr with
+            | OIn in_v from_expr =>
+              ANMapConcat (ANMap (ANUnop (ARec in_v) ANID) (algenv_of_oql from_expr)) opacc
+            | OInCast in_v brand_name from_expr =>
+              ANMapConcat (ANMap (ANUnop (ARec in_v) ANID)
+                                 (ANUnop AFlatten
+                                         (ANMap
+                                            (ANEither (ANUnop AColl ANID)
+                                                      (ANConst (dcoll nil)))
+                                            (ANMap (ANUnop (ACast (brand_name::nil)) ANID)
+                                                   (algenv_of_oql from_expr))
+                                         )))
+                          opacc
+          end
       in
       let algenv_of_from_clause :=
           fold_left algenv_of_from from_clause (ANUnop AColl ANID)
@@ -289,41 +301,61 @@ Section OQLtoNRAEnv.
           (fold_left
              (fun (envl : option (list oql_env))
                   (from_in_expr : oql_in_expr) =>
-                let (in_v, from_expr) := from_in_expr in
-                match envl with
-                | Some envl' =>
-                  env_map_concat in_v (oql_interp h constant_env from_expr) envl'
-                | None => None
-                end) el envs0)) =
+          match from_in_expr with
+          | OIn in_v from_expr =>
+            match envl with
+            | None => None
+            | Some envl' =>
+              env_map_concat in_v (oql_interp h constant_env from_expr) envl'
+            end
+          | OInCast in_v brand_name from_expr =>
+            match envl with
+            | None => None
+            | Some envl' =>
+              env_map_concat_cast h in_v brand_name (oql_interp h constant_env from_expr) envl'
+            end
+          end
+             ) el envs0)) =
     (h
        ⊢ₑ fold_left
        (fun (opacc : algenv) (from_in_expr : oql_in_expr) =>
-          let (in_v, from_expr) := from_in_expr in
-          ⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩( algenv_of_oql from_expr) ⟩(opacc))
+          match from_in_expr with
+          | OIn in_v from_expr =>
+            ⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩( algenv_of_oql from_expr) ⟩(opacc)
+          | OInCast in_v brand_name from_expr =>
+            ⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩(
+                  ♯flatten(χ⟨ ANEither (ANUnop AColl ANID)
+                              (ANConst (dcoll nil)) ⟩(
+                     χ⟨ ANUnop (ACast (brand_name::nil)) ANID ⟩(algenv_of_oql from_expr)))) ⟩(opacc)
+          end
+       )
        el op @ₑ envs ⊣ constant_env; xenv)%algenv.
   Proof.
     intros.
     revert op xenv envs0 envs H0.
     induction el; simpl in *; intros; try (rewrite H0; reflexivity).
     destruct a; simpl in *.
-    inversion H; subst; simpl in *.
-    specialize (IHel H4); clear H H4.
-    specialize (IHel (⋈ᵈ⟨χ⟨‵[| (s, ID)|] ⟩( algenv_of_oql o) ⟩( op))%algenv).
-    assert ((h ⊢ₑ (⋈ᵈ⟨χ⟨‵[| (s, ID)|] ⟩( algenv_of_oql o) ⟩( op))%algenv
-               @ₑ envs ⊣ constant_env; xenv)%algenv =
-            lift (fun x : list (list (string * data)) => dcoll (map drec x))
-                 (match envs0 with
-        | Some envl' =>
-            env_map_concat s (oql_interp h constant_env o) envl'
-        | None => None
-                  end))
-      by (apply one_from_fold_step_is_map_concat; assumption).
-    apply (IHel xenv (match envs0 with
-                      | Some envl' =>
-                        env_map_concat s (oql_interp h constant_env o) envl'
-                      | None => None
-                      end) envs H).
-  Qed.
+    (* OIn case *)
+    - inversion H; subst; simpl in *.
+      specialize (IHel H4); clear H H4.
+      specialize (IHel (⋈ᵈ⟨χ⟨‵[| (s, ID)|] ⟩( algenv_of_oql o) ⟩( op))%algenv).
+      assert ((h ⊢ₑ (⋈ᵈ⟨χ⟨‵[| (s, ID)|] ⟩( algenv_of_oql o) ⟩( op))%algenv
+                 @ₑ envs ⊣ constant_env; xenv)%algenv =
+              lift (fun x : list (list (string * data)) => dcoll (map drec x))
+                   (match envs0 with
+                    | Some envl' =>
+                      env_map_concat s (oql_interp h constant_env o) envl'
+                    | None => None
+                    end))
+        by (apply one_from_fold_step_is_map_concat; assumption).
+      apply (IHel xenv (match envs0 with
+                        | Some envl' =>
+                          env_map_concat s (oql_interp h constant_env o) envl'
+                        | None => None
+                        end) envs H).
+    (* OInCast case *)
+    - admit.
+  Admitted.
 
 
   (****************************
@@ -454,8 +486,15 @@ Section OQLtoNRAEnv.
     ignores_env
       (fold_left
          (fun (opacc : algenv) (from_in_expr : oql_in_expr) =>
-            let (in_v, from_expr) := from_in_expr in
-            (⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩( algenv_of_oql from_expr) ⟩( opacc))%algenv)
+            match from_in_expr with
+            | OIn in_v from_expr =>
+              (⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩( algenv_of_oql from_expr) ⟩( opacc))%algenv
+            | OInCast in_v brand_name from_expr =>
+              ⋈ᵈ⟨χ⟨‵[| (in_v, ID)|] ⟩(
+                  ♯flatten(χ⟨ ANEither (ANUnop AColl ANID)
+                              (ANConst (dcoll nil)) ⟩(
+                     χ⟨ ANUnop (ACast (brand_name::nil)) ANID ⟩(algenv_of_oql from_expr)))) ⟩(opacc)%algenv
+            end)
          el a).
   Proof.
     intros.
@@ -464,8 +503,10 @@ Section OQLtoNRAEnv.
     inversion H0; clear H0; subst.
     specialize (IHel H4); clear H4.
     destruct a; simpl in *.
-    apply IHel.
-    simpl; auto.
+    - apply IHel.
+      simpl; auto.
+    - apply IHel.
+      simpl; auto.
   Qed.
     
   Lemma oql_to_nraenv_ignores_env (e:oql_expr) :

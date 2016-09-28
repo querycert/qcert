@@ -1,0 +1,5 @@
+/* Example of simple select-from-where */
+
+select x->pid
+from x as entities.Purchase in WORLD
+where x->name = "Croissant"

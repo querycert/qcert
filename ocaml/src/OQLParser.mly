@@ -38,7 +38,7 @@
 %token LPAREN RPAREN
 %token EOF
 
-%right FROM IN AS WHERE
+%right FROM IN WHERE
 %right COMMA
 %right EQUAL NEQUAL
 %right PLUS MINUS
@@ -123,12 +123,18 @@ expr:
 from_clause:
 | v = IDENT IN e = expr
     { (OQL.oin (Util.char_list_of_string v) e) :: [] }
-| v = IDENT AS e = expr
-    { (OQL.oin (Util.char_list_of_string v) e) :: [] }
+| v = IDENT AS c = qname IN e = expr
+    { (OQL.oincast (Util.char_list_of_string v) (Util.char_list_of_string c) e) :: [] }
 | v = IDENT IN e = expr COMMA fr = from_clause
     { (OQL.oin (Util.char_list_of_string v) e) :: fr }
-| v = IDENT AS e = expr COMMA fr = from_clause
-    { (OQL.oin (Util.char_list_of_string v) e) :: fr }
+| v = IDENT AS c = qname IN e = expr COMMA fr = from_clause
+    { (OQL.oincast (Util.char_list_of_string v) (Util.char_list_of_string c) e) :: fr }
+
+qname:
+| i = IDENT
+    { i }
+| i = IDENT DOT q = qname
+    { i ^ "." ^ q }
 
 reclist:
 | 

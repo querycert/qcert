@@ -55,6 +55,8 @@ Module CompOQL(runtime:CompilerRuntime).
     := OQL.OSelectDistinct.
   Definition oin : String.string -> expr -> in_expr 
     := OQL.OIn.
+  Definition oincast : String.string -> String.string -> expr -> in_expr 
+    := OQL.OInCast.
   Definition otrue : where_expr 
     := OQL.OTrue.
   Definition owhere : expr -> where_expr 
