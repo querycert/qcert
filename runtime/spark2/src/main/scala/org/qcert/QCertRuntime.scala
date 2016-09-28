@@ -290,6 +290,7 @@ abstract class QCertRuntime {
         toBlob(r(0))
       case _ => sys.error("Illformed record schema: " ++ r.schema.toString())
     }
+    case () => "UNIT"
   }
 
   // TODO all record construction has to properly populate the blob field!

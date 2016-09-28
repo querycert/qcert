@@ -322,10 +322,14 @@ Section DNNRCtoScala.
           (* Distributed collections of primitives are wrapped in a singleton record.
            * We need to unwrap them after the call to collect(). *)
           let postfix :=
-              match lift primitive_type (olift tuncoll (lift_tdistr (di_typeof x))) with
-              | Some true => "/*UHM, do we need to unwrap the single ""res/val"" column or not?*/" (* ".map((row) => row(0))" (* I am confused at the moment about when this is needed.*) *)
-              | Some false => ""
-              | None => "ARGUMENT_TO_COLLECT_SHOULD_BE_DISTRIBUTED"
+              match olift tuncoll (lift_tdistr (di_typeof x)) with
+                | Some rt =>
+                  match proj1_sig rt with
+                    | Nat₀ => ".map((row) => row.getInt(0))"
+                    | _ => "" (* TODO figure out when we actually need this *)
+                             (* ".map((row) => row(0))" (* Hope for Scala to figure it out *) *)
+                  end
+                | None => "ARGUMENT_TO_COLLECT_SHOULD_BE_A_DISTRIBUTED_COLLECTION"
               end in
           scala_of_dnrc x ++ ".collect()" ++ postfix
         (* TODO handle bags of non-record types (ints, strings, bags, ...) *)
