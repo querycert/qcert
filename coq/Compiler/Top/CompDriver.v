@@ -2055,14 +2055,14 @@ Module CompDriver(runtime:CompilerRuntime).
           :: L_nnrcmr
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: nil
       | L_nnrcmr, L_spark2 =>
         L_nnrcmr
           :: L_nnrcmr
           :: L_dnnrc_dataset
           :: L_dnnrc_typed_dataset
-          (* :: L_dnnrc_typed_dataset *)
+          :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
       | L_nnrcmr, L_nnrc =>
