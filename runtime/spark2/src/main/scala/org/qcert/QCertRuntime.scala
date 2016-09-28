@@ -63,6 +63,7 @@ object QCertRuntime {
   def toQCertString(x: Any): String = x match {
     case null => "UNIT" // null is unit, right?
     case x: Int => x.toString
+    case x: Long => x.toString
     case true => "TRUE"
     case false => "FALSE"
     case x: String => x // no quotes!
@@ -113,7 +114,8 @@ object QCertRuntime {
   }
 
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
-    case t: IntegerType => b.getAsInt
+    case t: IntegerType => b.getAsLong
+    case t: LongType => b.getAsLong
     case t: BooleanType => b.getAsBoolean
     case t: StringType => b.getAsString
     case t: ArrayType =>
@@ -140,7 +142,8 @@ object QCertRuntime {
     fromBlob(t, new com.google.gson.JsonParser().parse(b))
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
-    case (i: Int, t: IntegerType) => i
+    case (i: Int, t: LongType) => i.toLong
+    case (i: Long, t: LongType) => i
     case (s: String, t: StringType) => s
     case (b: Boolean, t: BooleanType) => b
     case (r: Row, t: StructType) => t.fieldNames match {
@@ -240,7 +243,8 @@ abstract class QCertRuntime {
   }
 
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
-    case t: IntegerType => b.getAsInt
+    case t: LongType => b.getAsLong
+    case t: IntegerType => b.getAsLong
     case t: BooleanType => b.getAsBoolean
     case t: StringType => b.getAsString
     case t: ArrayType =>
@@ -267,6 +271,7 @@ abstract class QCertRuntime {
 
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
+    case i: Long => i.toString
     case true => "true"
     case false => "false"
     case s: String => gson.toJson(s)
@@ -400,8 +405,8 @@ abstract class QCertRuntime {
     StructType(StructField("$left", l, true) :: StructField("$right", r, true) :: Nil)
 
   // Not sure we can abuse dispatch like this to "infer" the schema. Seems to work...
-  def left(v: Int): Either =
-    srow(eitherStructType(IntegerType, DataTypes.NullType), v, null)
+  def left(v: Long): Either =
+    srow(eitherStructType(LongType, DataTypes.NullType), v, null)
 
   def left(v: Row): Either =
     srow(eitherStructType(v.schema, DataTypes.NullType), v, null)
@@ -433,8 +438,8 @@ abstract class QCertRuntime {
       :: StructField("$type", ArrayType(StringType, false), false) :: Nil)
 
   // Same thing as with either, need to infer/pass the Spark type. Can we factor this out?
-  def brand(v: Int, b: Brand*): BrandedValue =
-    srow(brandStructType(IntegerType), v, b)
+  def brand(v: Long, b: Brand*): BrandedValue =
+    srow(brandStructType(LongType), v, b)
 
   def brand(v: Row, b: Brand*): BrandedValue =
     srow(brandStructType(v.schema), v, b)
@@ -458,7 +463,8 @@ abstract class QCertRuntime {
   }
 
   def reshape(v: Any, t: DataType): Any = (v, t) match {
-    case (i: Int, t: IntegerType) => i
+    case (i: Long, t: LongType) => i
+    case (i: Int, t: LongType) => i.toLong
     case (s: String, t: StringType) => s
     case (b: Boolean, t: BooleanType) => b
     case (r: Row, t: StructType) => t.fieldNames match {
@@ -501,7 +507,7 @@ abstract class QCertRuntime {
    */
   // type Bag[T] = Array[T] // Huh, with Bag alias overloading does not work.
 
-  def arithMean(b: Array[Int]): Double =
+  def arithMean(b: Array[Long]): Double =
     if (b.length == 0) 0.0
     // Cast, because it's 1960 and we don't know how to do arithmetic properly, so our default / is integer division.
     else b.sum.asInstanceOf[Double] / b.length
@@ -527,10 +533,10 @@ abstract class QCertRuntime {
 
   // We can do O(1) min and max, because we keep bags sorted
   // The default 0 for empty bags comes from the Coq semantics
-  def anummax(b: Array[Int]): Int =
+  def anummax(b: Array[Long]): Long =
     if (b.isEmpty) 0 else b(b.length-1)
 
-  def anummin(b: Array[Int]): Int =
+  def anummin(b: Array[Long]): Long =
     if (b.isEmpty) 0 else b(0)
 
   /** Binary operator AContains */
@@ -554,7 +560,7 @@ abstract class QCertRuntime {
       case (true, false) => 1
       case (true, true) => 0
       // Other primitive types
-      case (x: Int, y: Int) => x compareTo y
+      case (x: Long, y: Long) => x compareTo y
       case (x: Double, y: Double) => x compareTo y
       case (x: String, y: String) => x compareTo y
       // Bags

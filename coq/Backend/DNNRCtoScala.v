@@ -63,7 +63,7 @@ Section DNNRCtoScala.
     | Bottom₀ => "NullType"
     | Top₀ => "StringType"
     | Unit₀ => "NullType"
-    | Nat₀ => "IntegerType"
+    | Nat₀ => "LongType"
     | Bool₀ => "BooleanType"
     | String₀ => "StringType"
     | Coll₀ e => "ArrayType(" ++ rtype_to_spark_DataType e ++ ")"
@@ -84,7 +84,7 @@ Section DNNRCtoScala.
 
   (** Scala-level type of an rtype.
    *
-   * These are things like Int, String, Boolean, Array[...], Row.
+   * These are things like Long, String, Boolean, Array[...], Row.
    *
    * We need to annotate some expressions with Scala-level types
    * (e.g. Array[Row]() for an empty Array of Records) to help
@@ -95,7 +95,7 @@ Section DNNRCtoScala.
     | Bottom₀ => "BOTTOM?"
     | Top₀ => "TOP?"
     | Unit₀ => "Unit"
-    | Nat₀ => "Int"
+    | Nat₀ => "Long"
     | Bool₀ => "Boolean"
     | String₀ => "String"
     | Coll₀ r => "Array[" ++ rtype_to_scala_type r ++ "]"
@@ -176,7 +176,12 @@ Section DNNRCtoScala.
 
   Definition spark_of_unop (op: unaryOp) (x: string) : string :=
     match op with
+      (* ACount, ASum are distributed to local *)
       | ACount => x ++ ".count()" (* This returns a long, is this a problem? *)
+      | ASum => x ++ ".select(sum(""value"")).first().getLong(0)" (* This is not pretty, but there does not seem to be a .sum() *)
+      (* AFlatten is distributed to distributed *)
+      (* TODO FIXME ...but this implementation is distributed to local, right?
+        Fix this. Might make the whole collect unwrap issue go away *)
       | AFlatten => x ++ ".flatMap(r => r)"
       | _ => "SPARK_OF_UNOP don't know how to generate Spark code for this operator"
     end.
@@ -325,7 +330,7 @@ Section DNNRCtoScala.
               match olift tuncoll (lift_tdistr (di_typeof x)) with
                 | Some rt =>
                   match proj1_sig rt with
-                    | Nat₀ => ".map((row) => row.getInt(0))"
+                    | Nat₀ => ".map((row) => row.getLong(0))"
                     | _ => "" (* TODO figure out when we actually need this *)
                              (* ".map((row) => row(0))" (* Hope for Scala to figure it out *) *)
                   end
