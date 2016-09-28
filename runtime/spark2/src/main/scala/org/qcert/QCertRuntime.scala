@@ -560,6 +560,9 @@ abstract class QCertRuntime {
       case (true, false) => 1
       case (true, true) => 0
       // Other primitive types
+      case (x: Int, y: Int) => x compareTo y
+      case (x: Int, y: Long) => x.toLong compareTo y
+      case (x: Long, y: Int) => x compareTo y
       case (x: Long, y: Long) => x compareTo y
       case (x: Double, y: Double) => x compareTo y
       case (x: String, y: String) => x compareTo y
@@ -607,6 +610,8 @@ abstract class QCertRuntime {
             return 1
         }
         0
+      case (a, b) =>
+        throw new Exception("Don't know how to compare a: " + a.getClass + " = " + a + " to b: " + b.getClass + " = " + b)
     }
   }
 
