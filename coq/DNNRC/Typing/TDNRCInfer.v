@@ -172,6 +172,14 @@ Section TDNRCInfer.
                                                 ACount
                                                 (ta_require (Tlocal τ₁') n₁))
                                            (infer_unop_type_sub ACount (Coll τ₁))
+                                    | ASum =>
+                                      lift (fun τs =>
+                                              let '(τ, τ₁') := τs in
+                                              DNRCUnop
+                                                (ta_mk a (Tlocal τ))
+                                                ASum
+                                                (ta_require (Tlocal τ₁') n₁))
+                                           (infer_unop_type_sub ASum (Coll τ₁))
                                     | ADistinct =>
                                       olift (fun τs =>
                                               let '(τ, τ₁') := τs in
