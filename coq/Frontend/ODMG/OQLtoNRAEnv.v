@@ -85,6 +85,135 @@ Section OQLtoNRAEnv.
   
   (* Some useful lemmas *)
 
+  Lemma rmap_rec_concat_map_is_map_rec_concat_map a s l1 :
+    rmap
+      (fun x : data =>
+         match x with
+         | dunit => None
+         | dnat _ => None
+         | dbool _ => None
+         | dstring _ => None
+         | dcoll _ => None
+         | drec r1 => Some (drec (rec_concat_sort a r1))
+         | dleft _ => None
+         | dright _ => None
+         | dbrand _ _ => None
+         | dforeign _ => None
+         end) (map (fun d : data => drec ((s, d) :: nil)) l1) =
+    Some (map (fun x : list (string * data) => drec (rec_concat_sort a x))
+              (map (fun x : data => (s, x) :: nil) l1)).
+  Proof.
+    induction l1; [reflexivity| ]; simpl.
+    rewrite IHl1; simpl.
+    reflexivity.
+  Qed.
+                                                        
+  Lemma flatten_either_is_rmap_either bn l0:
+    (olift rflatten
+           (olift
+              (rmap
+                 (fun x : data =>
+                    match x with
+                    | dunit => None
+                    | dnat _ => None
+                    | dbool _ => None
+                    | dstring _ => None
+                    | dcoll _ => None
+                    | drec _ => None
+                    | dleft dl => Some (dcoll (dl :: nil))
+                    | dright _ => Some (dcoll nil)
+                    | dbrand _ _ => None
+                    | dforeign _ => None
+                    end))
+              (rmap
+                 (fun x : data =>
+                    match x with
+                    | dunit => None
+                    | dnat _ => None
+                    | dbool _ => None
+                    | dstring _ => None
+                    | dcoll _ => None
+                    | drec _ => None
+                    | dleft _ => None
+                    | dright _ => None
+                    | dbrand b' _ =>
+                      if sub_brands_dec h b' (bn :: nil)
+                      then Some (dsome x)
+                      else Some dnone
+                    | dforeign _ => None
+                    end) l0))) =
+    oflat_map
+      (fun x : data =>
+         match x with
+         | dunit => None
+         | dnat _ => None
+         | dbool _ => None
+         | dstring _ => None
+         | dcoll _ => None
+         | drec _ => None
+         | dleft _ => None
+         | dright _ => None
+         | dbrand b' _ =>
+           if sub_brands_dec h b' (bn :: nil)
+           then Some (x :: nil)
+           else Some nil
+         | dforeign _ => None
+         end) l0.
+  Proof.
+    induction l0; [reflexivity| ]; simpl.
+    destruct a; try reflexivity.
+    destruct (sub_brands_dec h b (bn :: nil)); simpl;
+    rewrite <- IHl0;
+      destruct ((rmap
+             (fun x : data =>
+              match x with
+              | dunit => None
+              | dnat _ => None
+              | dbool _ => None
+              | dstring _ => None
+              | dcoll _ => None
+              | drec _ => None
+              | dleft _ => None
+              | dright _ => None
+              | dbrand b' _ =>
+                  if sub_brands_dec h b' (bn :: nil)
+                  then Some (dsome x)
+                  else Some dnone
+              | dforeign _ => None
+              end) l0)); simpl; try reflexivity;
+      destruct (rmap
+          (fun x : data =>
+           match x with
+           | dunit => None
+           | dnat _ => None
+           | dbool _ => None
+           | dstring _ => None
+           | dcoll _ => None
+           | drec _ => None
+           | dleft dl => Some (dcoll (dl :: nil))
+           | dright _ => Some (dcoll nil)
+           | dbrand _ _ => None
+           | dforeign _ => None
+           end) l); reflexivity.
+  Qed.
+  
+  Lemma map_map_drec_works s a l1 l2:
+    dcoll
+      (map (fun x : list (string * data) => drec (rec_concat_sort a x))
+           (map (fun x : data => (s, x) :: nil) l1) ++ 
+           map drec l2) =
+    (dcoll
+       (map drec
+            (map (fun x : list (string * data) => rec_concat_sort a x)
+                 (map (fun x : data => (s, x) :: nil) l1) ++ l2))).
+  Proof.
+    rewrite map_map.
+    rewrite map_map.
+    rewrite map_app.
+    rewrite map_map.
+    reflexivity.
+  Qed.
+
   Lemma push_lift_coll_in_rmap l f :
     olift (fun x0 : list oql_env => lift dcoll (rmap f x0)) l =
     lift dcoll (olift (fun x0 : list oql_env => (rmap f x0)) l).
@@ -198,7 +327,7 @@ Section OQLtoNRAEnv.
    ***************************)
 
   (* first off, prove the one-step used in the fold correctly adds one
-     variable and does cartesian product (i.e., MapReduce) *)
+     variable and does cartesian product (i.e., MapConcat) *)
 
   Lemma one_from_fold_step_is_map_concat s o op xenv envs envs0:
     (h ⊢ₑ op @ₑ envs ⊣ constant_env; xenv)%algenv =
@@ -260,6 +389,493 @@ Section OQLtoNRAEnv.
     unfold env_map_concat_single; simpl.
     rewrite map_drec_app.
     reflexivity.
+  Qed.
+
+  (* re-first off, prove the one-step used in the fold for from-cast
+     correctly adds one variable and does cartesian product (i.e.,
+     MapConcat) as well *)
+
+  Lemma one_from_cast_fold_step_is_map_concat_cast s bn o op xenv envs envs0:
+    (h ⊢ₑ op @ₑ envs ⊣ constant_env; xenv)%algenv =
+    lift (fun x : list (list (string * data)) => dcoll (map drec x)) envs0 ->
+    (forall (xenv0 : data) (env : oql_env),
+       oql_interp h constant_env o env =
+       (h ⊢ₑ algenv_of_oql o @ₑ drec env ⊣ constant_env; xenv0)%algenv) ->
+    ((h ⊢ₑ (⋈ᵈ⟨ χ⟨ ‵[| (s, ID) |]
+                 ⟩( ♯flatten( χ⟨ ANEither (‵{| ID|}) ‵{||}
+                               ⟩( χ⟨ ANUnop (ACast (bn :: nil)) (ID)
+                                   ⟩( algenv_of_oql o)))) ⟩( op)) @ₑ envs
+        ⊣ constant_env; xenv)%algenv
+     =
+     lift (fun x : list (list (string * data)) => dcoll (map drec x))
+          match envs0 with
+          | Some envl' =>
+            env_map_concat_cast h s bn (oql_interp h constant_env o) envl'
+          | None => None
+          end).
+  Proof.
+    intros; simpl.
+    rewrite H; simpl; clear H.
+    destruct envs0; [|reflexivity]; simpl.
+    induction l; try reflexivity; simpl.
+    unfold env_map_concat_cast in *; simpl.
+    unfold rmap_concat in *; simpl.
+    unfold oomap_concat in *; simpl.
+    unfold oenv_map_concat_single_with_cast in *; simpl.
+    rewrite (H0 xenv).
+    destruct (h ⊢ₑ algenv_of_oql o @ₑ drec a ⊣ constant_env; xenv)%algenv;
+      try reflexivity; simpl.
+    destruct d; try reflexivity; simpl.
+    unfold filter_cast in *; simpl in *.
+    autorewrite with alg; simpl.
+    rewrite flatten_either_is_rmap_either; simpl.
+    assert (           @oflat_map (@data (@foreign_runtime_data fruntime))
+             (@data (@foreign_runtime_data fruntime))
+             (fun x : @data (@foreign_runtime_data fruntime) =>
+              match
+                x
+                return
+                  (option (list (@data (@foreign_runtime_data fruntime))))
+              with
+              | dunit =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dnat _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dbool _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dstring _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dcoll _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | drec _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dleft _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dright _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | dbrand b' _ =>
+                  match
+                    sub_brands_dec h b' (@cons string bn (@nil string))
+                    return
+                      (option
+                         (list (@data (@foreign_runtime_data fruntime))))
+                  with
+                  | left _ =>
+                      @Some
+                        (list (@data (@foreign_runtime_data fruntime)))
+                        (@cons (@data (@foreign_runtime_data fruntime)) x
+                           (@nil (@data (@foreign_runtime_data fruntime))))
+                  | right _ =>
+                      @Some
+                        (list (@data (@foreign_runtime_data fruntime)))
+                        (@nil (@data (@foreign_runtime_data fruntime)))
+                  end
+              | dforeign _ =>
+                  @None (list (@data (@foreign_runtime_data fruntime)))
+              end) l0 =                (@oflat_map (@data (@foreign_runtime_data fruntime))
+                   (@data (@foreign_runtime_data fruntime))
+                   (fun x : @data (@foreign_runtime_data fruntime) =>
+                    match
+                      x
+                      return
+                        (option
+                           (list (@data (@foreign_runtime_data fruntime))))
+                    with
+                    | dunit =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dnat _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dbool _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dstring _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dcoll _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | drec _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dleft _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dright _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    | dbrand b' _ =>
+                        match
+                          sub_brands_dec h b'
+                            (@cons brand bn (@nil brand))
+                          return
+                            (option
+                               (list
+                                  (@data (@foreign_runtime_data fruntime))))
+                        with
+                        | left _ =>
+                            @Some
+                              (list
+                                 (@data (@foreign_runtime_data fruntime)))
+                              (@cons
+                                 (@data (@foreign_runtime_data fruntime))
+                                 x
+                                 (@nil
+                                    (@data
+                                       (@foreign_runtime_data fruntime))))
+                        | right _ =>
+                            @Some
+                              (list
+                                 (@data (@foreign_runtime_data fruntime)))
+                              (@nil
+                                 (@data (@foreign_runtime_data fruntime)))
+                        end
+                    | dforeign _ =>
+                        @None
+                          (list (@data (@foreign_runtime_data fruntime)))
+                    end) l0)) by reflexivity.
+    rewrite H; clear H.
+    destruct (oflat_map
+          (fun x : data =>
+           match x with
+           | dunit => None
+           | dnat _ => None
+           | dbool _ => None
+           | dstring _ => None
+           | dcoll _ => None
+           | drec _ => None
+           | dleft _ => None
+           | dright _ => None
+           | dbrand b' _ =>
+               if sub_brands_dec h b' (bn :: nil)
+               then Some (x :: nil)
+               else Some nil
+           | dforeign _ => None
+           end) l0); simpl; try reflexivity.
+    autorewrite with alg; simpl.
+    unfold env_map_concat_single in *.
+    unfold omap_concat in *.
+    autorewrite with alg; simpl.
+    rewrite rmap_rec_concat_map_is_map_rec_concat_map; simpl.
+    destruct ((@oflat_map (@oql_env fruntime) (@oql_env fruntime)
+                (fun a : @oql_env fruntime =>
+                 match
+                   @oql_interp fruntime h constant_env o a
+                   return (option (list (@oql_env fruntime)))
+                 with
+                 | Some d =>
+                     match
+                       d return (option (list (@oql_env fruntime)))
+                     with
+                     | dunit => @None (list (@oql_env fruntime))
+                     | dnat _ => @None (list (@oql_env fruntime))
+                     | dbool _ => @None (list (@oql_env fruntime))
+                     | dstring _ => @None (list (@oql_env fruntime))
+                     | dcoll y =>
+                         match
+                           @oflat_map
+                             (@data (@foreign_runtime_data fruntime))
+                             (@data (@foreign_runtime_data fruntime))
+                             (fun
+                                x : @data (@foreign_runtime_data fruntime)
+                              =>
+                              match
+                                x
+                                return
+                                  (option
+                                     (list
+                                        (@data
+                                           (@foreign_runtime_data fruntime))))
+                              with
+                              | dunit =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dnat _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dbool _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dstring _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dcoll _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | drec _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dleft _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dright _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              | dbrand b' _ =>
+                                  match
+                                    sub_brands_dec h b'
+                                      (@cons string bn (@nil string))
+                                    return
+                                      (option
+                                         (list
+                                            (@data
+                                               (@foreign_runtime_data
+                                                fruntime))))
+                                  with
+                                  | left _ =>
+                                      @Some
+                                        (list
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime)))
+                                        (@cons
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime)) x
+                                           (@nil
+                                              (@data
+                                                (@foreign_runtime_data
+                                                fruntime))))
+                                  | right _ =>
+                                      @Some
+                                        (list
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime)))
+                                        (@nil
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime)))
+                                  end
+                              | dforeign _ =>
+                                  @None
+                                    (list
+                                       (@data
+                                          (@foreign_runtime_data fruntime)))
+                              end) y
+                           return (option (list (@oql_env fruntime)))
+                         with
+                         | Some y0 =>
+                             @Some (list (@oql_env fruntime))
+                               (@map
+                                  (list
+                                     (prod string
+                                        (@data
+                                           (@foreign_runtime_data fruntime))))
+                                  (list
+                                     (prod string
+                                        (@data
+                                           (@foreign_runtime_data fruntime))))
+                                  (fun
+                                     x : list
+                                           (prod string
+                                              (@data
+                                                (@foreign_runtime_data
+                                                fruntime))) =>
+                                   @rec_concat_sort string ODT_string
+                                     (@data
+                                        (@foreign_runtime_data fruntime))
+                                     a x)
+                                  (@map
+                                     (@data
+                                        (@foreign_runtime_data fruntime))
+                                     (list
+                                        (prod string
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime))))
+                                     (fun
+                                        x : @data
+                                              (@foreign_runtime_data
+                                                fruntime) =>
+                                      @cons
+                                        (prod string
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime)))
+                                        (@pair string
+                                           (@data
+                                              (@foreign_runtime_data
+                                                fruntime)) s x)
+                                        (@nil
+                                           (prod string
+                                              (@data
+                                                (@foreign_runtime_data
+                                                fruntime))))) y0))
+                         | None => @None (list (@oql_env fruntime))
+                         end
+                     | drec _ => @None (list (@oql_env fruntime))
+                     | dleft _ => @None (list (@oql_env fruntime))
+                     | dright _ => @None (list (@oql_env fruntime))
+                     | dbrand _ _ => @None (list (@oql_env fruntime))
+                     | dforeign _ => @None (list (@oql_env fruntime))
+                     end
+                 | None => @None (list (@oql_env fruntime))
+                 end) l)); simpl in *.
+    - destruct (          (oflat_map
+             (fun a : data =>
+              match
+                olift
+                  (fun d : data =>
+                   lift_oncoll
+                     (fun c1 : list data =>
+                      lift dcoll
+                        (rmap
+                           (fun x : data => Some (drec ((s, x) :: nil)))
+                           c1)) d)
+                  (olift
+                     (fun d1 : data =>
+                      lift_oncoll
+                        (fun l : list data => lift dcoll (rflatten l)) d1)
+                     (olift
+                        (fun d : data =>
+                         lift_oncoll
+                           (fun c1 : list data =>
+                            lift dcoll
+                              (rmap
+                                 (fun x : data =>
+                                  match x with
+                                  | dunit => None
+                                  | dnat _ => None
+                                  | dbool _ => None
+                                  | dstring _ => None
+                                  | dcoll _ => None
+                                  | drec _ => None
+                                  | dleft dl => Some (dcoll (dl :: nil))
+                                  | dright _ => Some (dcoll nil)
+                                  | dbrand _ _ => None
+                                  | dforeign _ => None
+                                  end) c1)) d)
+                        (olift
+                           (fun d : data =>
+                            lift_oncoll
+                              (fun c1 : list data =>
+                               lift dcoll
+                                 (rmap
+                                    (fun x : data =>
+                                     match x with
+                                     | dunit => None
+                                     | dnat _ => None
+                                     | dbool _ => None
+                                     | dstring _ => None
+                                     | dcoll _ => None
+                                     | drec _ => None
+                                     | dleft _ => None
+                                     | dright _ => None
+                                     | dbrand b' _ =>
+                                         if
+                                          sub_brands_dec h b' (bn :: nil)
+                                         then Some (dsome x)
+                                         else Some dnone
+                                     | dforeign _ => None
+                                     end) c1)) d)
+                           (h ⊢ₑ algenv_of_oql o @ₑ a ⊣ constant_env; xenv)%algenv)))
+              with
+              | Some dunit => None
+              | Some (dnat _) => None
+              | Some (dbool _) => None
+              | Some (dstring _) => None
+              | Some (dcoll y) => rmap (fun x : data => orecconcat a x) y
+              | Some (drec _) => None
+              | Some (dleft _) => None
+              | Some (dright _) => None
+              | Some (dbrand _ _) => None
+              | Some (dforeign _) => None
+              | None => None
+              end) (map drec l))); simpl in *; try congruence.
+      inversion IHl; clear IHl.
+      subst; simpl.
+      rewrite map_map_drec_works.
+      reflexivity.
+    - destruct
+        ((oflat_map
+            (fun a : data =>
+               match
+                 olift
+                   (fun d : data =>
+                      lift_oncoll
+                        (fun c1 : list data =>
+                           lift dcoll
+                                (rmap
+                                   (fun x : data => Some (drec ((s, x) :: nil)))
+                                   c1)) d)
+                   (olift
+                      (fun d1 : data =>
+                         lift_oncoll
+                           (fun l : list data => lift dcoll (rflatten l)) d1)
+                      (olift
+                         (fun d : data =>
+                            lift_oncoll
+                              (fun c1 : list data =>
+                                 lift dcoll
+                                      (rmap
+                                         (fun x : data =>
+                                            match x with
+                                            | dunit => None
+                                            | dnat _ => None
+                                            | dbool _ => None
+                                            | dstring _ => None
+                                            | dcoll _ => None
+                                            | drec _ => None
+                                            | dleft dl => Some (dcoll (dl :: nil))
+                                            | dright _ => Some (dcoll nil)
+                                            | dbrand _ _ => None
+                                            | dforeign _ => None
+                                            end) c1)) d)
+                         (olift
+                            (fun d : data =>
+                               lift_oncoll
+                                 (fun c1 : list data =>
+                                    lift dcoll
+                                         (rmap
+                                            (fun x : data =>
+                                               match x with
+                                               | dunit => None
+                                               | dnat _ => None
+                                               | dbool _ => None
+                                               | dstring _ => None
+                                               | dcoll _ => None
+                                               | drec _ => None
+                                               | dleft _ => None
+                                               | dright _ => None
+                                               | dbrand b' _ =>
+                                                 if
+                                                   sub_brands_dec h b' (bn :: nil)
+                                                 then Some (dsome x)
+                                                 else Some dnone
+                                               | dforeign _ => None
+                                               end) c1)) d)
+                            (h ⊢ₑ algenv_of_oql o @ₑ a ⊣ constant_env; xenv)%algenv)))
+               with
+               | Some dunit => None
+               | Some (dnat _) => None
+               | Some (dbool _) => None
+               | Some (dstring _) => None
+               | Some (dcoll y) => rmap (fun x : data => orecconcat a x) y
+               | Some (drec _) => None
+               | Some (dleft _) => None
+               | Some (dright _) => None
+               | Some (dbrand _ _) => None
+               | Some (dforeign _) => None
+               | None => None
+               end) (map drec l))); simpl in *; [congruence|reflexivity].
   Qed.
 
   (* Second, show that 'x in expr' translation is correct *)
@@ -354,9 +970,31 @@ Section OQLtoNRAEnv.
                         | None => None
                         end) envs H).
     (* OInCast case *)
-    - admit.
-  Admitted.
-
+    - inversion H; subst; simpl in *.
+      specialize (IHel H4); clear H H4.
+      specialize (IHel (⋈ᵈ⟨ χ⟨ ‵[| (s, ID) |]
+                          ⟩( ♯flatten( χ⟨ ANEither (‵{| ID|}) ‵{||}
+                                        ⟩( χ⟨ ANUnop (ACast (s0 :: nil)) (ID)
+                                            ⟩( algenv_of_oql o)))) ⟩( op))%algenv).
+      assert ((h ⊢ₑ (⋈ᵈ⟨ χ⟨ ‵[| (s, ID) |]
+                          ⟩( ♯flatten( χ⟨ ANEither (‵{| ID|}) ‵{||}
+                                        ⟩( χ⟨ ANUnop (ACast (s0 :: nil)) (ID)
+                                            ⟩( algenv_of_oql o)))) ⟩( op)) @ₑ envs
+                 ⊣ constant_env; xenv)%algenv
+              =
+              lift (fun x : list (list (string * data)) => dcoll (map drec x))
+                   match envs0 with
+                   | Some envl' =>
+                     env_map_concat_cast h s s0 (oql_interp h constant_env o) envl'
+                   | None => None
+                   end)
+        by (apply one_from_cast_fold_step_is_map_concat_cast; assumption).
+      apply (IHel xenv (match envs0 with
+                        | Some envl' =>
+                          env_map_concat_cast h s s0 (oql_interp h constant_env o) envl'
+                        | None => None
+                        end) envs H).
+  Qed.
 
   (****************************
    * Where clause correctness *
