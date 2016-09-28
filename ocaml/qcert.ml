@@ -48,6 +48,8 @@ let args_list gconf =
        " Emit the target query as an s-expression");
       ("-emit-sexp-all", Arg.Unit (QcertArg.set_emit_sexp_all gconf),
        " Emit all intermediate queries as s-expressions");
+      ("-source-sexp", Arg.Unit (QcertArg.set_source_sexp gconf),
+       " Indicate that the source file is expected to be an s-expression");
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
@@ -114,6 +116,7 @@ let parse_args () =
       gconf_emit_all = false;
       gconf_emit_sexp = false;
       gconf_emit_sexp_all = false;
+      gconf_source_sexp = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";

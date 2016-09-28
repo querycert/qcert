@@ -44,7 +44,17 @@ let fprint_comilation_path ff gconf =
 
 let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
   let slang = gconf.gconf_source in
-  let qname, q = ParseString.parse_query_from_string slang query_s in
+  let qname, q =
+    begin match gconf.gconf_source_sexp with
+    | false ->
+        ParseString.parse_query_from_string slang query_s
+    | true ->
+        let sexp = ParseString.parse_sexp_from_string query_s in
+        let name = QcertUtil.name_of_language slang in (* XXX Is it a good name? XXX *)
+        let q = AstsToSExp.sexp_to_query slang sexp in
+        (name, q)
+    end
+  in
   (qname, q)
 
 (* Compilation *)
