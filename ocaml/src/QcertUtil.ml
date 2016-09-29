@@ -49,7 +49,8 @@ let language_no_error lang =
 
 let query_no_error q =
   begin match q with
-  | CompDriver.Q_error err -> raise (CACo_Error (string err))
+  | CompDriver.Q_error err ->
+      Format.eprintf "[Compilation error] %s@." (string err)
   | _ -> ()
   end
 
