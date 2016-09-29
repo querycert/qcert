@@ -19,7 +19,7 @@ Module Compiler (runtime:CompilerRuntime).
 
   Require CompData CompOperators.
   Require CompOQL CompLambdaNRA CompPattern CompRule CompEnv.
-  Require CompDriver CompUtil CompStat CompType EvalTop.
+  Require CompDriver CompUtil CompType EvalTop.
 
   Module RType := CompType.CompType runtime.
   Module Data := CompData.CompData runtime.
@@ -32,7 +32,6 @@ Module Compiler (runtime:CompilerRuntime).
 
   Module CompDriver := CompDriver.CompDriver runtime.
   Module CompUtil := CompUtil.CompUtil runtime.
-  Module CompStat := CompStat.CompStat runtime.
 
   Module EvalTop := EvalTop.EvalTop runtime.
 

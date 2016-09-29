@@ -24,6 +24,9 @@ type result = {
     res_emit_all : (string * string) list;
     res_emit_sexp : string * string;
     res_emit_sexp_all : (string * string) list;
+    res_stat : string;
+    res_stat_all : string list;
+    res_stat_tree : string;
   }
 
 
@@ -89,6 +92,21 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let fpost = QcertUtil.name_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
   (fout, s)
+
+(* Stats *)
+
+let stat_query (schema: TypeUtil.schema) q =
+  let brand_model = schema.TypeUtil.sch_brand_model in
+  string (CompDriver.json_stat_of_query brand_model q)
+
+(* Stats tree *)
+
+let stat_tree_query (schema: TypeUtil.schema) file_name q =
+  let name = char_list_of_string (Filename.chop_extension file_name) in
+  let brand_model = schema.TypeUtil.sch_brand_model in
+  let stats = CompDriver.json_stat_tree_of_query brand_model name q in
+  string stats
+
 
 (* Main *)
 
@@ -164,8 +182,29 @@ let main gconf (file_name, query_s) =
     else
       []
   in
+  let res_stat =
+    if gconf.gconf_stat then
+      stat_query schema q_target
+    else
+      ""
+  in
+  let res_stat_all =
+    if gconf.gconf_stat_all then
+      List.map (fun q -> stat_query schema q) queries
+    else
+      []
+  in
+  let res_stat_tree =
+    if gconf.gconf_stat_tree then
+      stat_tree_query schema file_name q_source
+    else
+      ""
+  in
   { res_emit = res_emit;
     res_emit_all = res_emit_all;
     res_emit_sexp = res_emit_sexp;
-    res_emit_sexp_all = res_emit_sexp_all; }
+    res_emit_sexp_all = res_emit_sexp_all;
+    res_stat = res_stat;
+    res_stat_all = res_stat_all;
+    res_stat_tree = res_stat_tree; }
 

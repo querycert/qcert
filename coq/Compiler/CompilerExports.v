@@ -17,7 +17,7 @@ Export ListNotations.
 
 (* Some additional modules, notably rules and notations *)
 Require Export Utils BasicSystem.
-Require Export Rule RuleSugar RuletoNRA CompStat CompEnv.
+Require Export Rule RuleSugar RuletoNRA CompEnv.
 Open Scope rule_scope.
 
 (* 

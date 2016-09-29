@@ -228,7 +228,6 @@ MODULES = \
 	Compiler/Top/CompDriver \
 	Compiler/Top/CompUtil \
 	Compiler/Top/EvalTop \
-	Compiler/Top/CompStat \
 	Compiler/Top/CompType \
 	Compiler/Compiler \
 	Compiler/EnhancedCompiler \

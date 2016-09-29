@@ -39,4 +39,6 @@ let add_vdirst gconf x =
 let add_vlocal gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vlocal) :: gconf.gconf_vdbindings
-
+let set_stat gconf () = gconf.gconf_stat <- true
+let set_stat_all gconf () = gconf.gconf_stat_all <- true
+let set_stat_tree gconf () = gconf.gconf_stat_tree <- true

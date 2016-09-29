@@ -34,6 +34,9 @@ type global_config = {
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
     mutable gconf_vdbindings : CompDriver.vdbindings;
+    mutable gconf_stat : bool;
+    mutable gconf_stat_all : bool;
+    mutable gconf_stat_tree : bool;
   }
 
 val complet_configuration : global_config -> global_config

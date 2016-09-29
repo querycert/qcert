@@ -38,10 +38,6 @@ let args_list gconf =
        "<harness.js> JavaScript runtime");
       ("-io", Arg.String (QcertArg.set_io gconf),
        "<file.io> Schema and inputs data for evaluation");
-      (* ("-stats", Arg.Unit (set_stats conf), *)
-      (*    " Produce statistics for the target query"); *)
-      (* ("-stats-all", Arg.Unit (set_stats conf), *)
-      (*    " Produce statistics for all intermediate queries"); *)
       ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
        " Emit generated code of all intermediate queries");
       ("-emit-sexp", Arg.Unit (QcertArg.set_emit_sexp gconf),
@@ -50,6 +46,12 @@ let args_list gconf =
        " Emit all intermediate queries as s-expressions");
       ("-source-sexp", Arg.Unit (QcertArg.set_source_sexp gconf),
        " Indicate that the source file is expected to be an s-expression");
+      ("-stat", Arg.Unit (QcertArg.set_stat gconf),
+         " Produce statistics for the target query");
+      ("-stat-all", Arg.Unit (QcertArg.set_stat_all gconf),
+         " Produce statistics for all intermediate queries");
+      ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
+         " Produce statistics for paths following starting from the source");
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
@@ -120,7 +122,10 @@ let parse_args () =
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_vdbindings = []; }
+      gconf_vdbindings = [];
+      gconf_stat = false;
+      gconf_stat_all = false;
+      gconf_stat_tree = false; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complet_configuration gconf, List.rev !input_files)
@@ -139,10 +144,23 @@ let () =
     if file_name <> "" then
       make_file file_name s
   in
+  let output_stats res =
+    if res.QcertCore.res_stat <> "" then
+      Format.printf "%s@." res.QcertCore.res_stat;
+    if res.QcertCore.res_stat_all <> [] then
+      Format.printf "[ @[%a@] ]@."
+        (Format.pp_print_list
+           ~pp_sep:(fun ff () -> Format.fprintf ff ",@\n")
+           (fun ff stat -> Format.fprintf ff "%s" stat))
+        res.QcertCore.res_stat_all;
+    if res.QcertCore.res_stat_tree <> "" then
+      Format.printf "%s@." res.QcertCore.res_stat_tree
+  in
   List.iter
     (fun res ->
       output_res res.QcertCore.res_emit;
       List.iter output_res res.QcertCore.res_emit_all;
       output_res res.QcertCore.res_emit_sexp;
-      List.iter output_res res.QcertCore.res_emit_sexp_all)
+      List.iter output_res res.QcertCore.res_emit_sexp_all;
+      output_stats res)
     results

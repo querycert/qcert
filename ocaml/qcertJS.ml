@@ -66,7 +66,10 @@ let global_config_of_json j =
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_vdbindings = []; }
+      gconf_vdbindings = [];
+      gconf_stat = false;
+      gconf_stat_all = false;
+      gconf_stat_tree = false; }
   in
   let apply f o =
     Js.Optdef.iter o (fun s -> f gconf (Js.to_string s));
