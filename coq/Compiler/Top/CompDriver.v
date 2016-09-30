@@ -230,7 +230,7 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
     let q := foreign_to_cloudant_prepare_nrcmr q in
-    let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
+    let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_cloudant_prepare_nrcmr q in
     nrcmr_rename_for_cloudant q.
 
@@ -242,7 +242,7 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition nnrcmr_to_nnrcmr_spark_prepare (q: nnrcmr) : nnrcmr :=
     let q := foreign_to_spark_prepare_nrcmr q in
-    let q := mr_optimize q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
+    let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_spark_prepare_nrcmr q in
     nrcmr_rename_for_spark q.
 
