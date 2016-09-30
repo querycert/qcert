@@ -72,8 +72,8 @@ let driver_conf_of_global_conf gconf qname cname =
   let brand_rel =
     TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model
   in
-  { CompDriver.comp_qname = char_list_of_string qname;
-    CompDriver.comp_class_name = char_list_of_string cname;
+  { Compiler.Coq__26.comp_qname = char_list_of_string qname;
+    Compiler.Coq__26.comp_class_name = char_list_of_string cname;
     comp_brand_rel = brand_rel;
     comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;

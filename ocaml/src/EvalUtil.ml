@@ -27,9 +27,9 @@ let eval_rule h world f : Data.data list option * string =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | CompDriver.Q_rule ru ->
+  | Compiler.Coq__24.Q_rule ru ->
       (EvalTop.rule_eval_top h ru world, Util.string_of_char_list (EvalTop.rule_eval_top_debug h false ru world))
-  | CompDriver.Q_camp ru ->
+  | Compiler.Coq__24.Q_camp ru ->
       (EvalTop.pattern_eval_top h ru world, Util.string_of_char_list (EvalTop.pattern_eval_top_debug h false ru world))
   | _ ->
       raise (CACo_Error "Input language not supported")
@@ -45,17 +45,17 @@ exception OQL_eval of string
 let eval_nraenv conf schema h world op : Data.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   match language_of_name (get_target_lang_caev conf) with
-  | CompDriver.L_rule ->
+  | Compiler.Coq__23.L_rule ->
       raise (CACo_Error "Rule eval not supported once compiled into algebra")
-  | CompDriver.L_oql ->
+  | Compiler.Coq__23.L_oql ->
       raise (OQL_eval "OQL eval not supported once compiled into algebra")
-  | CompDriver.L_nraenv ->
+  | Compiler.Coq__23.L_nraenv ->
       let op = CompDriver.nraenv_optim op in
       EvalTop.algenv_eval_top h op world
-  | CompDriver.L_nnrc ->
+  | Compiler.Coq__23.L_nnrc ->
       let nrc = CompDriver.nraenv_optim_to_nnrc_optim op in
       EvalTop.nrc_eval_top h nrc world
-  | CompDriver.L_dnnrc_dataset ->
+  | Compiler.Coq__23.L_dnnrc_dataset ->
       let brand_model =
 	begin match schema with
 	| Some sc ->
@@ -70,10 +70,10 @@ let eval_nraenv conf schema h world op : Data.data option =
       in
       let nrc = CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc Compiler.mkDistLoc op in
       EvalTop.dnrc_eval_top brand_model h nrc world
-  | CompDriver.L_nnrcmr ->
+  | Compiler.Coq__23.L_nnrcmr ->
       let mrchain = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
       EvalTop.nrcmr_chain_eval_top h mrchain world
-  | CompDriver.L_cldmr ->
+  | Compiler.Coq__23.L_cldmr ->
       let mrchain = CompDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
       let mrchain = CompDriver.nnrcmr_to_cldmr [] mrchain in
       EvalTop.cldmr_chain_eval_top h mrchain world

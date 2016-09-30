@@ -77,23 +77,23 @@ let parse_cldmr_sexp f : CompDriver.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp
 
 let parse_query l f : (string * CompDriver.query) =
   begin match l with
-  | CompDriver.L_rule -> parse_rule f
-  | CompDriver.L_camp -> ("CAMP", CompDriver.Q_camp (parse_camp f))
-  | CompDriver.L_oql -> ("OQL", CompDriver.Q_oql (parse_oql f))
-  | CompDriver.L_lambda_nra -> ("LambdaNRA", CompDriver.Q_lambda_nra (parse_lambda_nra f))
-  | CompDriver.L_nra -> raise (CACo_Error "No parser for NRA available")
-  | CompDriver.L_nraenv -> ("NRAEnv", CompDriver.Q_nraenv (parse_nraenv_sexp f))
-  | CompDriver.L_nnrc -> ("NNRC", CompDriver.Q_nnrc (parse_nnrc_sexp f))
-  | CompDriver.L_nnrcmr -> ("NNRCMR", CompDriver.Q_nnrcmr (parse_nnrcmr_sexp f))
-  | CompDriver.L_cldmr -> ("CldMR", CompDriver.Q_cldmr (parse_cldmr_sexp f))
-  | CompDriver.L_dnnrc_dataset -> raise (CACo_Error "No parser for DNNRC available")
-  | CompDriver.L_dnnrc_typed_dataset -> raise (CACo_Error "No parser for typed DNNRC available")
-  | CompDriver.L_javascript -> raise (CACo_Error "No parser for Javascript available")
-  | CompDriver.L_java -> raise (CACo_Error "No parser for Java available")
-  | CompDriver.L_spark -> raise (CACo_Error "No parser for Spark available")
-  | CompDriver.L_spark2 -> raise (CACo_Error "No parser for Spark 2.0 available")
-  | CompDriver.L_cloudant -> raise (CACo_Error "No parser for Cloudant available")
-  | CompDriver.L_error err ->
+  | Compiler.Coq__23.L_rule -> parse_rule f
+  | Compiler.Coq__23.L_camp -> ("CAMP", Compiler.Coq__24.Q_camp (parse_camp f))
+  | Compiler.Coq__23.L_oql -> ("OQL", Compiler.Coq__24.Q_oql (parse_oql f))
+  | Compiler.Coq__23.L_lambda_nra -> ("LambdaNRA", Compiler.Coq__24.Q_lambda_nra (parse_lambda_nra f))
+  | Compiler.Coq__23.L_nra -> raise (CACo_Error "No parser for NRA available")
+  | Compiler.Coq__23.L_nraenv -> ("NRAEnv", Compiler.Coq__24.Q_nraenv (parse_nraenv_sexp f))
+  | Compiler.Coq__23.L_nnrc -> ("NNRC", Compiler.Coq__24.Q_nnrc (parse_nnrc_sexp f))
+  | Compiler.Coq__23.L_nnrcmr -> ("NNRCMR", Compiler.Coq__24.Q_nnrcmr (parse_nnrcmr_sexp f))
+  | Compiler.Coq__23.L_cldmr -> ("CldMR", Compiler.Coq__24.Q_cldmr (parse_cldmr_sexp f))
+  | Compiler.Coq__23.L_dnnrc_dataset -> raise (CACo_Error "No parser for DNNRC available")
+  | Compiler.Coq__23.L_dnnrc_typed_dataset -> raise (CACo_Error "No parser for typed DNNRC available")
+  | Compiler.Coq__23.L_javascript -> raise (CACo_Error "No parser for Javascript available")
+  | Compiler.Coq__23.L_java -> raise (CACo_Error "No parser for Java available")
+  | Compiler.Coq__23.L_spark -> raise (CACo_Error "No parser for Spark available")
+  | Compiler.Coq__23.L_spark2 -> raise (CACo_Error "No parser for Spark 2.0 available")
+  | Compiler.Coq__23.L_cloudant -> raise (CACo_Error "No parser for Cloudant available")
+  | Compiler.Coq__23.L_error err ->
       let err = string_of_char_list err in
       raise (CACo_Error ("No parser for Error language available: "^err))
   end

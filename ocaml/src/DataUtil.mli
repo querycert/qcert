@@ -43,3 +43,4 @@ val get_output : io_json -> io_output
 
 val get_model_content : Data.json -> model_content
 
+val display_sdata : string option -> string -> string list -> string -> unit

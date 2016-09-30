@@ -225,6 +225,7 @@ MODULES = \
 	Compiler/Top/CompOQL \
 	Compiler/Top/CompLambdaNRA \
 	Compiler/Top/CompEnv \
+	Compiler/Top/DriverTop \
 	Compiler/Top/CompDriver \
 	Compiler/Top/CompUtil \
 	Compiler/Top/EvalTop \

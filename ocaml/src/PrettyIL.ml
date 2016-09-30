@@ -1034,6 +1034,8 @@ let pretty_plug_dataset greek ff a =
 
 (* Pretty languages *)
 
+open Compiler.Coq__24
+    
 let pretty_query pconf q =
   let greek = get_charset_bool pconf in
   let margin = pconf.margin in

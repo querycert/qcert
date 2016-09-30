@@ -148,3 +148,10 @@ let get_output od =
       | _ ->
 	  raise (CACo_Error "Ill-formed expected result")
 
+let display_sdata (data_dir : string option) (fname:string) (sdata:string list) (suffix:string) =
+  let fpref = Filename.chop_extension fname in
+  let fout_sdata = outname (target_f data_dir fpref) suffix in
+  let sdata =
+    String.concat "\n" sdata
+  in
+  make_file fout_sdata sdata

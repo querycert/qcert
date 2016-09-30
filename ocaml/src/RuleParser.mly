@@ -91,7 +91,7 @@
 %nonassoc UWITHVAR
 %nonassoc PASSERT
 
-%start <(string * Compiler.EnhancedCompiler.CompDriver.query)> rulemain
+%start <(string * Compiler.Coq__24.query)> rulemain
 %start <Compiler.EnhancedCompiler.Pattern.pat> patmain
 %type <Compiler.EnhancedCompiler.Rule.rule -> Compiler.EnhancedCompiler.Rule.rule> rule_rule
 
@@ -99,9 +99,9 @@
 
 rulemain:
 | EXAMPLE i=IDENT COLONEQUAL r = rule DOT EOF
-    { (i, CompDriver.Q_rule r) }
+    { (i, Compiler.Coq__24.Q_rule r) }
 | EXAMPLE i=IDENT COLONEQUAL p = pat DOT EOF
-    { (i, CompDriver.Q_camp p) }
+    { (i, Compiler.Coq__24.Q_camp p) }
 
 patmain:
 | p = pat EOF

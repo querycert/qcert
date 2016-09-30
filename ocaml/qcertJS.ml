@@ -50,8 +50,8 @@ let compile source_lang_s target_lang_s q_s =
 
 let global_config_of_json j =
   let gconf =
-    { gconf_source = CompDriver.L_rule;
-      gconf_target = CompDriver.L_javascript;
+    { gconf_source = Compiler.Coq__23.L_rule;
+      gconf_target = Compiler.Coq__23.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;

@@ -128,7 +128,7 @@ let anon_args conf f =
     else
       process_data_file conf f
   in
-  DisplayUtil.display_sdata conf f sdata_list
+  DataUtil.display_sdata (get_data_dir conf) f sdata_list (suffix_sdata ())
 
 let usage = Sys.argv.(0)^" jsonfile1 jsonfile2 ..."
 

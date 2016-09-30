@@ -766,62 +766,62 @@ sexp_to_cld_mr_chain chain;
 (* Query translations *)
 let sexp_to_query (lang: CompDriver.language) (se: sexp) : CompDriver.query =
   begin match lang with
-  | CompDriver.L_rule ->
+  | Compiler.Coq__23.L_rule ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_camp -> CompDriver.Q_camp (sexp_to_camp se)
-  | CompDriver.L_oql ->
+  | Compiler.Coq__23.L_camp -> Compiler.Coq__24.Q_camp (sexp_to_camp se)
+  | Compiler.Coq__23.L_oql ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_lambda_nra ->
+  | Compiler.Coq__23.L_lambda_nra ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_nra ->
+  | Compiler.Coq__23.L_nra ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_nraenv -> CompDriver.Q_nraenv (sexp_to_nraenv se)
-  | CompDriver.L_nnrc -> CompDriver.Q_nnrc (sexp_to_nnrc se)
-  | CompDriver.L_nnrcmr -> CompDriver.Q_nnrcmr (sexp_to_nnrcmr se)
-  | CompDriver.L_cldmr -> CompDriver.Q_cldmr (sexp_to_cldmr se)
-  | CompDriver.L_dnnrc_dataset ->
+  | Compiler.Coq__23.L_nraenv -> Compiler.Coq__24.Q_nraenv (sexp_to_nraenv se)
+  | Compiler.Coq__23.L_nnrc -> Compiler.Coq__24.Q_nnrc (sexp_to_nnrc se)
+  | Compiler.Coq__23.L_nnrcmr -> Compiler.Coq__24.Q_nnrcmr (sexp_to_nnrcmr se)
+  | Compiler.Coq__23.L_cldmr -> Compiler.Coq__24.Q_cldmr (sexp_to_cldmr se)
+  | Compiler.Coq__23.L_dnnrc_dataset ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_dnnrc_typed_dataset ->
+  | Compiler.Coq__23.L_dnnrc_typed_dataset ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_javascript
-  | CompDriver.L_java
-  | CompDriver.L_spark
-  | CompDriver.L_spark2
-  | CompDriver.L_cloudant ->
+  | Compiler.Coq__23.L_javascript
+  | Compiler.Coq__23.L_java
+  | Compiler.Coq__23.L_spark
+  | Compiler.Coq__23.L_spark2
+  | Compiler.Coq__23.L_cloudant ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | CompDriver.L_error err ->
+  | Compiler.Coq__23.L_error err ->
       raise (CACo_Error ("sexp_to_query: "^(Util.string_of_char_list err)))
   end
 
 let query_to_sexp (q: CompDriver.query) : sexp =
   begin match q with
-  | CompDriver.Q_rule _ ->
+  | Compiler.Coq__24.Q_rule _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_camp q -> camp_to_sexp q
-  | CompDriver.Q_oql _ ->
+  | Compiler.Coq__24.Q_camp q -> camp_to_sexp q
+  | Compiler.Coq__24.Q_oql _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_lambda_nra _ ->
+  | Compiler.Coq__24.Q_lambda_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_nra _ ->
+  | Compiler.Coq__24.Q_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_nraenv q -> nraenv_to_sexp q
-  | CompDriver.Q_nnrc q -> nnrc_to_sexp q
-  | CompDriver.Q_nnrcmr q -> nnrcmr_to_sexp q
-  | CompDriver.Q_cldmr q -> cldmr_to_sexp q
-  | CompDriver.Q_dnnrc_dataset _ ->
+  | Compiler.Coq__24.Q_nraenv q -> nraenv_to_sexp q
+  | Compiler.Coq__24.Q_nnrc q -> nnrc_to_sexp q
+  | Compiler.Coq__24.Q_nnrcmr q -> nnrcmr_to_sexp q
+  | Compiler.Coq__24.Q_cldmr q -> cldmr_to_sexp q
+  | Compiler.Coq__24.Q_dnnrc_dataset _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_dnnrc_typed_dataset _ ->
+  | Compiler.Coq__24.Q_dnnrc_typed_dataset _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_javascript _ ->
+  | Compiler.Coq__24.Q_javascript _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_java _ ->
+  | Compiler.Coq__24.Q_java _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_spark _ ->
+  | Compiler.Coq__24.Q_spark _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_spark2 _ ->
+  | Compiler.Coq__24.Q_spark2 _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_cloudant _ ->
+  | Compiler.Coq__24.Q_cloudant _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | CompDriver.Q_error err ->
+  | Compiler.Coq__24.Q_error err ->
       SString ("query_to_sexp: "^(Util.string_of_char_list err))
   end
