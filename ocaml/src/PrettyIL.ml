@@ -18,7 +18,8 @@
 
 open Format
 module Hack = Compiler
-open Compiler.EnhancedCompiler.CompDriver
+open Compiler.EnhancedCompiler
+open QDriver
 
 (* Character sets *)
 
@@ -793,7 +794,7 @@ let pretty_nnrcmr_job_aux sym ff mr =
   | Hack.RedSingleton ->       fprintf ff "reduce(singleton);"
   end;
   fprintf ff "@\n";
-  begin match Hack.EnhancedCompiler.CompUtil.mr_reduce_empty [] mr with
+  begin match Hack.EnhancedCompiler.QUtil.mr_reduce_empty [] mr with
   | None -> ()
   | Some f -> fprintf ff "default(@[%a@]);" (pretty_default_fun sym) f
   end
@@ -969,22 +970,22 @@ let pretty_drtype_aux sym ff drt =
 
 let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
   let sym = if greek then greeksym else textsym in
-  let inf = Compiler.EnhancedCompiler.CompUtil.ta_inferred [] at in
-  let req = Compiler.EnhancedCompiler.CompUtil.ta_required [] at in
+  let inf = Compiler.EnhancedCompiler.QUtil.ta_inferred [] at in
+  let req = Compiler.EnhancedCompiler.QUtil.ta_required [] at in
   if Hack.equiv_dec (Hack.drtype_eqdec Hack.EnhancedRuntime.compiler_foreign_type []) inf req
   then
     fprintf ff "@[%a%a%a%a@]"
 	    pretty_sym sym.lpangle
 	    (pretty_drtype_aux sym) inf
 	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.CompUtil.ta_base [] at)
+            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
   else
     fprintf ff "@[%a%a -> %a%a%a@]"
 	    pretty_sym sym.lpangle
 	    (pretty_drtype_aux sym) inf
 	    (pretty_drtype_aux sym) req
 	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.CompUtil.ta_base [] at)
+            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
 
 (* Pretty Spark IR *)
 let rec pretty_column_aux p sym ff col =

@@ -45,7 +45,7 @@ let print_wm_type br wmType =
 let process_data_file_verbose conf f : string list =
   begin
     Printf.printf "Parsing I/O file: %s\n" f;
-    let io : Data.json = parse_io_from_file f in
+    let io : QData.json = parse_io_from_file f in
     Printf.printf "\tExtracting schema components...\n";
     let json_schema_io =
       match get_data_schema conf with
@@ -86,7 +86,7 @@ let process_data_file_verbose conf f : string list =
     let datalist = (DataUtil.get_input (get_data_format conf) (Some io)) in
     Printf.printf "\tTranslating I/O file\n";
     List.map (fun d ->
-      match RType.data_to_sjson brand_model d wmTypeC with
+      match QType.data_to_sjson brand_model d wmTypeC with
       | Some sdata ->
 	  let sdata = Util.string_of_char_list sdata in
 	  Printf.printf "Spark I/O:%s\n" sdata;
@@ -98,7 +98,7 @@ let process_data_file_verbose conf f : string list =
 
 let process_data_file conf f : string list =
   begin
-    let io : Data.json = parse_io_from_file f in
+    let io : QData.json = parse_io_from_file f in
     let json_schema_io =
       match get_data_schema conf with
       | Some sio -> sio
@@ -111,7 +111,7 @@ let process_data_file conf f : string list =
     in
     let datalist = (DataUtil.get_input (get_data_format conf) (Some io)) in
     List.map (fun d ->
-      match RType.data_to_sjson brand_model d wmTypeC with
+      match QType.data_to_sjson brand_model d wmTypeC with
       | Some sdata ->
 	  let sdata = Util.string_of_char_list sdata in
 	  sdata

@@ -26,10 +26,10 @@ Require Import CAMPRuntime.
 Require Import ODMGRuntime.
 Require Import TOptimEnvFunc.
 
-Require Import DriverTop.
+Require Import CompDriver.
 
 Require Import CompilerRuntime.
-Module CompDriver(runtime:CompilerRuntime).
+Module QDriver(runtime:CompilerRuntime).
 
   Require Import BasicSystem.
   Require Import TypingRuntime.
@@ -39,11 +39,9 @@ Module CompDriver(runtime:CompilerRuntime).
 
   Definition vdbindings := vdbindings.
 
-  Require Import DriverTop.
-  
   (* Languages *)
 
-  Section CompD.
+  Section QD.
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 
@@ -153,8 +151,8 @@ Module CompDriver(runtime:CompilerRuntime).
 
     Definition json_stat_of_query : query -> string := json_stat_of_query.
     Definition json_stat_tree_of_query : string -> query -> string := json_stat_tree_of_query.
-  End CompD.
-End CompDriver.
+  End QD.
+End QDriver.
 
 
 (*

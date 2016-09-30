@@ -15,27 +15,27 @@
  *)
 
 Require Import CompilerRuntime.
-Module Compiler (runtime:CompilerRuntime).
+Module QLib(runtime:CompilerRuntime).
 
-  Require CompData CompOperators.
-  Require CompOQL CompLambdaNRA CompPattern CompRule CompEnv.
-  Require CompDriver CompUtil CompType EvalTop.
+  Require QData QOperators.
+  Require QOQL QLambdaNRA QPattern QRule.
+  Require QDriver QUtil QType QEval.
 
-  Module RType := CompType.CompType runtime.
-  Module Data := CompData.CompData runtime.
-  Module Ops := CompOperators.CompOperators runtime.
+  Module QType := QType.QType runtime.
+  Module QData := QData.QData runtime.
+  Module QOps := QOperators.QOperators runtime.
 
-  Module OQL := CompOQL.CompOQL runtime.
-  Module LambdaNRA := CompLambdaNRA.CompLambdaNRA runtime.
-  Module Pattern := CompPattern.CompPattern runtime.
-  Module Rule := CompRule.CompRule runtime.
+  Module QOQL := QOQL.QOQL runtime.
+  Module QLambdaNRA := QLambdaNRA.QLambdaNRA runtime.
+  Module QPattern := QPattern.QPattern runtime.
+  Module QRule := QRule.QRule runtime.
 
-  Module CompDriver := CompDriver.CompDriver runtime.
-  Module CompUtil := CompUtil.CompUtil runtime.
+  Module QDriver := QDriver.QDriver runtime.
+  Module QUtil := QUtil.QUtil runtime.
 
-  Module EvalTop := EvalTop.EvalTop runtime.
+  Module QEval := QEval.QEval runtime.
 
-End Compiler.
+End QLib.
 
 (* 
 *** Local Variables: ***

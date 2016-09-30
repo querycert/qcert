@@ -23,30 +23,30 @@ open Compiler.EnhancedCompiler
  * Specific Parse *
  ******************)
 
-val parse_io : Lexing.lexbuf -> Data.json
-val parse_json : Lexing.lexbuf -> Data.json
+val parse_io : Lexing.lexbuf -> QData.json
+val parse_json : Lexing.lexbuf -> QData.json
 
-val parse_rule : Lexing.lexbuf -> string * CompDriver.query
-val parse_camp : Lexing.lexbuf -> CompDriver.camp
+val parse_rule : Lexing.lexbuf -> string * QDriver.query
+val parse_camp : Lexing.lexbuf -> QDriver.camp
 
-val parse_oql : Lexing.lexbuf -> CompDriver.oql
+val parse_oql : Lexing.lexbuf -> QDriver.oql
 
 (****************
  * S-Expr Parse *
  ****************)
 
 val parse_sexp : Lexing.lexbuf -> SExp.sexp
-val parse_io_sexp : Lexing.lexbuf -> Data.data
+val parse_io_sexp : Lexing.lexbuf -> QData.data
 
-val parse_camp_sexp : Lexing.lexbuf -> CompDriver.camp
-val parse_nraenv_sexp : Lexing.lexbuf -> CompDriver.nraenv
-val parse_nnrc_sexp : Lexing.lexbuf -> CompDriver.nnrc
-val parse_nnrcmr_sexp : Lexing.lexbuf -> CompDriver.nnrcmr
-val parse_cldmr_sexp : Lexing.lexbuf -> CompDriver.cldmr
+val parse_camp_sexp : Lexing.lexbuf -> QDriver.camp
+val parse_nraenv_sexp : Lexing.lexbuf -> QDriver.nraenv
+val parse_nnrc_sexp : Lexing.lexbuf -> QDriver.nnrc
+val parse_nnrcmr_sexp : Lexing.lexbuf -> QDriver.nnrcmr
+val parse_cldmr_sexp : Lexing.lexbuf -> QDriver.cldmr
 
 (*******************
  * Languages Parse *
  *******************)
 
-val parse_query : CompDriver.language -> Lexing.lexbuf -> string * CompDriver.query
+val parse_query : QDriver.language -> Lexing.lexbuf -> string * QDriver.query
 

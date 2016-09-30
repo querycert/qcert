@@ -15,13 +15,14 @@
  *)
 
 Require Import CompilerRuntime.
-Module CompPattern(runtime:CompilerRuntime).
+Module QPattern(runtime:CompilerRuntime).
   Require String BrandRelation.
-  Require CompOperators CompData.
   Require Pattern PatternSugar RuleSugar.
 
-  Module Data := CompData.CompData(runtime).
-  Module Ops := CompOperators.CompOperators(runtime).
+  Require QOperators QData.
+
+  Module Data := QData.QData(runtime).
+  Module Ops := QOperators.QOperators(runtime).
 
   Definition expr : Set 
     := Pattern.pat.
@@ -102,7 +103,7 @@ Module CompPattern(runtime:CompilerRuntime).
   Definition lookup : String.string -> expr 
     := PatternSugar.lookup.
   
-End CompPattern.
+End QPattern.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***

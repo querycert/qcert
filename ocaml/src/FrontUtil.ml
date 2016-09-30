@@ -31,15 +31,15 @@ let nraenv_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
   | Compiler.Coq__24.Q_rule ru ->
-      (rn,CompDriver.rule_to_nraenv ru)
+      (rn,QDriver.rule_to_nraenv ru)
   | Compiler.Coq__24.Q_camp ru ->
-      (rn,CompDriver.camp_to_nraenv ru)
+      (rn,QDriver.camp_to_nraenv ru)
   | _ ->
       raise (CACo_Error "Input language not supported")
 
 let nraenv_of_oql f =
   let o = parse_oql_from_file f in
-  ("OQL",CompDriver.oql_to_nraenv o)
+  ("OQL",QDriver.oql_to_nraenv o)
   
 let nraenv_of_input conf f =
   match language_of_name (get_source_lang_caco conf) with

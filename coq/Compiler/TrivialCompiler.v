@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Require Compiler TrivialModel.
+Require QLib TrivialModel.
 
 Module TrivialCompiler.
   Module Runtime := TrivialModel.TrivialRuntime.
   
-  Module TrivialCompiler := Compiler.Compiler(Runtime).
+  Module TrivialCompiler := QLib.QLib(Runtime).
 End TrivialCompiler.
 
 (* 

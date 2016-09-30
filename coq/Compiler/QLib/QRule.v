@@ -15,14 +15,14 @@
  *)
 
 Require Import CompilerRuntime.
-Module CompRule(runtime:CompilerRuntime).
+Module QRule(runtime:CompilerRuntime).
   Require String.
-  Require CompOperators CompData CompPattern.
+  Require QOperators QData QPattern.
   Require Rule RuleSugar.
 
-  Module Data := CompData.CompData runtime.
-  Module Ops := CompOperators.CompOperators runtime.
-  Module Pattern := CompPattern.CompPattern runtime.
+  Module Data := QData.QData runtime.
+  Module Ops := QOperators.QOperators runtime.
+  Module Pattern := QPattern.QPattern runtime.
 
   Definition rule : Set 
     := Rule.rule.
@@ -41,7 +41,7 @@ Module CompRule(runtime:CompilerRuntime).
   Definition aggregate : (rule -> rule) -> Ops.Unary.op -> Pattern.expr -> nat -> Pattern.expr
     := RuleSugar.aggregate.
 
-End CompRule.
+End QRule.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***

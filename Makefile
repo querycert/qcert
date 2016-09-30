@@ -218,19 +218,19 @@ MODULES = \
 	Compiler/CompilerModel/DateTimeModelPart \
 	Compiler/CompilerModel/EnhancedModel \
 	Compiler/CompilerModel/TrivialModel \
-	Compiler/Top/CompData \
-	Compiler/Top/CompOperators \
-	Compiler/Top/CompPattern \
-	Compiler/Top/CompRule \
-	Compiler/Top/CompOQL \
-	Compiler/Top/CompLambdaNRA \
-	Compiler/Top/CompEnv \
-	Compiler/Top/DriverTop \
-	Compiler/Top/CompDriver \
-	Compiler/Top/CompUtil \
-	Compiler/Top/EvalTop \
-	Compiler/Top/CompType \
-	Compiler/Compiler \
+	Compiler/CompilerDriver/CompDriver \
+	Compiler/CompilerDriver/CompEnv \
+	Compiler/QLib/QData \
+	Compiler/QLib/QOperators \
+	Compiler/QLib/QPattern \
+	Compiler/QLib/QRule \
+	Compiler/QLib/QOQL \
+	Compiler/QLib/QLambdaNRA \
+	Compiler/QLib/QDriver \
+	Compiler/QLib/QUtil \
+	Compiler/QLib/QEval \
+	Compiler/QLib/QType \
+	Compiler/QLib \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \

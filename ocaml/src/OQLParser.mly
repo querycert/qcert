@@ -48,7 +48,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <Compiler.EnhancedCompiler.OQL.expr> main
+%start <Compiler.EnhancedCompiler.QOQL.expr> main
 
 %%
 
@@ -66,79 +66,79 @@ expr:
     { e }
 (* Constants *)
 | NIL
-    { OQL.oconst Data.dunit }
+    { QOQL.oconst QData.dunit }
 | i = INT
-    { OQL.oconst (Data.dnat (Util.coq_Z_of_int i)) }
+    { QOQL.oconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
-    { OQL.oconst (Enhanced.Data.dfloat f) }
+    { QOQL.oconst (Enhanced.Data.dfloat f) }
 | s = STRING
-    { OQL.oconst (Data.dstring (Util.char_list_of_string s)) }
+    { QOQL.oconst (QData.dstring (Util.char_list_of_string s)) }
 (* Select from where ... *)
 | SELECT e = expr FROM fc = from_clause 
-    { OQL.osfw (OQL.oselect e) fc OQL.otrue }
+    { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue }
 | SELECT e = expr FROM fc = from_clause WHERE w = expr
-    { OQL.osfw (OQL.oselect e) fc (OQL.owhere w) }
+    { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) }
 | SELECT DISTINCT e = expr FROM fc = from_clause
-    { OQL.osfw (OQL.oselectdistinct e) fc OQL.otrue }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue }
 | SELECT DISTINCT e = expr FROM fc = from_clause WHERE w = expr
-    { OQL.osfw (OQL.oselectdistinct e) fc (OQL.owhere e) }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere e) }
 (* Expressions *)
 | v = IDENT
-    { OQL.ovar (Util.char_list_of_string v) }
+    { QOQL.ovar (Util.char_list_of_string v) }
 | e = expr DOT a = IDENT
-    { OQL.odot (Util.char_list_of_string a) e }
+    { QOQL.odot (Util.char_list_of_string a) e }
 | e = expr ARROW a = IDENT
-    { OQL.oarrow (Util.char_list_of_string a) e }
+    { QOQL.oarrow (Util.char_list_of_string a) e }
 | STRUCT LPAREN r = reclist RPAREN
-    { OQL.ostruct r }
+    { QOQL.ostruct r }
 (* Functions *)
 | NOT LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.aneg e }
+    { QOQL.ounop QOps.Unary.aneg e }
 | FLATTEN LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.aflatten e }
+    { QOQL.ounop QOps.Unary.aflatten e }
 | SUM LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.asum e }
+    { QOQL.ounop QOps.Unary.asum e }
 | AVG LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.aarithmean e }
+    { QOQL.ounop QOps.Unary.aarithmean e }
 | COUNT LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.acount e }
+    { QOQL.ounop QOps.Unary.acount e }
 | MAX LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.anummax e }
+    { QOQL.ounop QOps.Unary.anummax e }
 | MIN LPAREN e = expr RPAREN
-    { OQL.ounop Ops.Unary.anummin e }
+    { QOQL.ounop QOps.Unary.anummin e }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr
-    { OQL.obinop Ops.Binary.aeq e1 e2 }
+    { QOQL.obinop QOps.Binary.aeq e1 e2 }
 | e1 = expr NEQUAL e2 = expr
-    { OQL.ounop Ops.Unary.aneg (OQL.obinop Ops.Binary.aeq e1 e2) }
+    { QOQL.ounop QOps.Unary.aneg (QOQL.obinop QOps.Binary.aeq e1 e2) }
 | e1 = expr LT e2 = expr
-    { OQL.obinop Ops.Binary.alt e1 e2 }
+    { QOQL.obinop QOps.Binary.alt e1 e2 }
 | e1 = expr LTEQ e2 = expr
-    { OQL.obinop Ops.Binary.ale e1 e2 }
+    { QOQL.obinop QOps.Binary.ale e1 e2 }
 | e1 = expr GT e2 = expr
-    { OQL.ounop Ops.Unary.aneg (OQL.obinop Ops.Binary.ale e1 e2) }
+    { QOQL.ounop QOps.Unary.aneg (QOQL.obinop QOps.Binary.ale e1 e2) }
 | e1 = expr GTEQ e2 = expr
-    { OQL.ounop Ops.Unary.aneg (OQL.obinop Ops.Binary.alt e1 e2) }
+    { QOQL.ounop QOps.Unary.aneg (QOQL.obinop QOps.Binary.alt e1 e2) }
 | e1 = expr MINUS e2 = expr
-    { OQL.obinop Ops.Binary.ZArith.aminus e1 e2 }
+    { QOQL.obinop QOps.Binary.ZArith.aminus e1 e2 }
 | e1 = expr PLUS e2 = expr
-    { OQL.obinop Ops.Binary.ZArith.aplus e1 e2 }
+    { QOQL.obinop QOps.Binary.ZArith.aplus e1 e2 }
 | e1 = expr STAR e2 = expr
-    { OQL.obinop Ops.Binary.ZArith.amult e1 e2 }
+    { QOQL.obinop QOps.Binary.ZArith.amult e1 e2 }
 | e1 = expr AND e2 = expr
-    { OQL.obinop Ops.Binary.aand e1 e2 }
+    { QOQL.obinop QOps.Binary.aand e1 e2 }
 | e1 = expr OR e2 = expr
-    { OQL.obinop Ops.Binary.aor e1 e2 }
+    { QOQL.obinop QOps.Binary.aor e1 e2 }
 
 from_clause:
 | v = IDENT IN e = expr
-    { (OQL.oin (Util.char_list_of_string v) e) :: [] }
+    { (QOQL.oin (Util.char_list_of_string v) e) :: [] }
 | v = IDENT AS c = qname IN e = expr
-    { (OQL.oincast (Util.char_list_of_string v) (Util.char_list_of_string c) e) :: [] }
+    { (QOQL.oincast (Util.char_list_of_string v) (Util.char_list_of_string c) e) :: [] }
 | v = IDENT IN e = expr COMMA fr = from_clause
-    { (OQL.oin (Util.char_list_of_string v) e) :: fr }
+    { (QOQL.oin (Util.char_list_of_string v) e) :: fr }
 | v = IDENT AS c = qname IN e = expr COMMA fr = from_clause
-    { (OQL.oincast (Util.char_list_of_string v) (Util.char_list_of_string c) e) :: fr }
+    { (QOQL.oincast (Util.char_list_of_string v) (Util.char_list_of_string c) e) :: fr }
 
 qname:
 | i = IDENT

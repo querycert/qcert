@@ -68,23 +68,23 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
 
 (* Compilation *)
 
-let compile_query (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) (path: CompDriver.language list) (q: CompDriver.query) : CompDriver.query list =
+let compile_query (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) (path: QDriver.language list) (q: QDriver.query) : QDriver.query list =
   let brand_model = schema.TypeUtil.sch_brand_model in
   let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-  let dv = CompDriver.driver_of_path brand_model dv_conf path in
+  let dv = QDriver.driver_of_path brand_model dv_conf path in
   let () = QcertUtil.driver_no_error dv in
-  let dv = CompDriver.fix_driver brand_model dv q in
-  let queries = CompDriver.compile brand_model foreign_typing dv q in
+  let dv = QDriver.fix_driver brand_model dv q in
+  let queries = QDriver.compile brand_model foreign_typing dv q in
   let () = List.iter QcertUtil.query_no_error queries in
   queries
 
 (* Emit *)
 
-let emit_string (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
+let emit_string (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) pretty_conf dir file_name q =
   let s = PrettyIL.pretty_query pretty_conf q in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
-  let ext = ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q) in
+  let ext = ConfigUtil.suffix_of_language (QDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir fpref) ext in
   { res_file = fout; res_content = s; }
 
@@ -95,7 +95,7 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let s = SExp.sexp_to_string sexp in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
-  let fpost = QcertUtil.name_of_language (CompDriver.language_of_query brand_model q) in
+  let fpost = QcertUtil.name_of_language (QDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
   { res_file = fout; res_content = s; }
 
@@ -103,14 +103,14 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
 
 let stat_query (schema: TypeUtil.schema) q =
   let brand_model = schema.TypeUtil.sch_brand_model in
-  string (CompDriver.json_stat_of_query brand_model q)
+  string (QDriver.json_stat_of_query brand_model q)
 
 (* Stats tree *)
 
 let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   let name = char_list_of_string (Filename.chop_extension file_name) in
   let brand_model = schema.TypeUtil.sch_brand_model in
-  let stats = CompDriver.json_stat_tree_of_query brand_model name q in
+  let stats = QDriver.json_stat_tree_of_query brand_model name q in
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_stats.json" in
   { res_file = fout; res_content = string stats; }
@@ -154,7 +154,7 @@ let main gconf (file_name, query_s) =
             let dir = gconf.gconf_dir in
             let res = emit_string dv_conf schema pconf dir fname q in
             let suff =
-              ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
+              ConfigUtil.suffix_of_language (QDriver.language_of_query brand_model q)
             in
             let fname = (Filename.chop_extension fname)^suff in
             (fname, res::acc))
@@ -179,7 +179,7 @@ let main gconf (file_name, query_s) =
           (fun (fname, acc) q ->
             let res = emit_sexpr_string schema gconf.gconf_dir fname q in
             let suff =
-              ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q)
+              ConfigUtil.suffix_of_language (QDriver.language_of_query brand_model q)
             in
             let fname = (Filename.chop_extension fname)^suff in
             (fname, res::acc))

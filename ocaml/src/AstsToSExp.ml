@@ -43,7 +43,7 @@ let sstring_list_to_coq_string_list = sexp_to_dbrands
 
 (* Data Section *)
 
-let rec data_to_sexp (d : Data.data) : sexp =
+let rec data_to_sexp (d : QData.data) : sexp =
   match d with
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
@@ -55,10 +55,10 @@ let rec data_to_sexp (d : Data.data) : sexp =
   | Dright d -> STerm ("dright", data_to_sexp d :: [])
   | Dbrand (bs,d) -> STerm ("dbrand", (STerm ("brands", dbrands_to_sexp bs)) :: (STerm ("value", (data_to_sexp d) :: [])) :: [])
   | Dforeign fdt -> STerm ("dtime_scale", (SString (PrettyIL.string_of_foreign_data (Obj.magic fdt))) :: [])
-and drec_to_sexp (ad : char list * Data.data) : sexp =
+and drec_to_sexp (ad : char list * QData.data) : sexp =
   STerm ("datt", (SString (string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
 
-let rec sexp_to_data (se:sexp) : Data.data =
+let rec sexp_to_data (se:sexp) : QData.data =
   match se with
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b
@@ -80,7 +80,7 @@ let rec sexp_to_data (se:sexp) : Data.data =
       raise (CACo_Error ("Not well-formed S-expr with name " ^ t))
   | _ ->
       raise (CACo_Error "Not well-formed S-expr")
-and sexp_to_drec (sel:sexp) : (char list * Data.data) =
+and sexp_to_drec (sel:sexp) : (char list * QData.data) =
   match sel with
   | STerm ("datt", (SString s) :: se :: []) ->
       (char_list_of_string s, sexp_to_data se)
@@ -246,7 +246,7 @@ let sexp_to_unop (se:sexp) : unaryOp =
 
 (* CAMP Section *)
 
-let rec camp_to_sexp (p : CompDriver.camp) : sexp =
+let rec camp_to_sexp (p : QDriver.camp) : sexp =
   match p with
   | Pconst d -> STerm ("Pconst", [data_to_sexp d])
   | Punop (u, p1) -> STerm ("Punop", (unop_to_sexp u) :: [camp_to_sexp p1])
@@ -262,7 +262,7 @@ let rec camp_to_sexp (p : CompDriver.camp) : sexp =
   | Pleft -> STerm ("Pleft", [])
   | Pright -> STerm ("Pright", [])
 
-let rec sexp_to_camp (se : sexp) : CompDriver.camp =
+let rec sexp_to_camp (se : sexp) : QDriver.camp =
   match se with
   | STerm ("Pconst", [d]) -> Pconst (sexp_to_data d)
   | STerm ("Punop", use :: [se1]) ->
@@ -288,7 +288,7 @@ let rec sexp_to_camp (se : sexp) : CompDriver.camp =
 
 (* NRA Section *)
 
-let rec nraenv_to_sexp (op : CompDriver.nraenv) : sexp =
+let rec nraenv_to_sexp (op : QDriver.nraenv) : sexp =
   match op with
   | ANID -> STerm ("ANID",[])
   | ANConst d -> STerm ("ANConst", [data_to_sexp d])
@@ -307,7 +307,7 @@ let rec nraenv_to_sexp (op : CompDriver.nraenv) : sexp =
   | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
 
-let rec sexp_to_nraenv (se : sexp) : CompDriver.nraenv =
+let rec sexp_to_nraenv (se : sexp) : QDriver.nraenv =
   match se with
   | STerm ("ANID",[]) -> ANID
   | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
@@ -336,7 +336,7 @@ let rec sexp_to_nraenv (se : sexp) : CompDriver.nraenv =
 
 (* NNRC Section *)
 
-let rec nnrc_to_sexp (n : CompDriver.nnrc) : sexp =
+let rec nnrc_to_sexp (n : QDriver.nnrc) : sexp =
   match n with
   | NRCVar v -> STerm ("NRCVar", [SString (string_of_char_list v)])
   | NRCConst d -> STerm ("NRCConst", [data_to_sexp d])
@@ -350,7 +350,7 @@ let rec nnrc_to_sexp (n : CompDriver.nnrc) : sexp =
 					 :: (SString (string_of_char_list v2))
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
 
-let rec sexp_to_nnrc (se:sexp) : CompDriver.nnrc =
+let rec sexp_to_nnrc (se:sexp) : QDriver.nnrc =
   match se with
   | STerm ("NRCVar", [SString v]) -> NRCVar (char_list_of_string v)
   | STerm ("NRCConst", [d]) -> NRCConst (sexp_to_data d)
@@ -575,14 +575,14 @@ let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
   | _ ->
       raise (CACo_Error "Not well-formed S-expr inside mr_last")
 
-let nnrcmr_to_sexp (n:CompDriver.nnrcmr) : sexp =
+let nnrcmr_to_sexp (n:QDriver.nnrcmr) : sexp =
   STerm ("nrcmr",
 	 (STerm ("mr_env", var_locs_to_sexp n.mr_inputs_loc))
 	 :: (STerm ("mr_chain", mr_chain_to_sexp (n.mr_chain)))
 	 :: (mr_last_to_sexp n.mr_last)
 	 :: [])
 
-let sexp_to_nnrcmr (se:sexp) : CompDriver.nnrcmr =
+let sexp_to_nnrcmr (se:sexp) : QDriver.nnrcmr =
   match se with
   | STerm ("nrcmr",
 	   (STerm ("mr_env", env))
@@ -744,13 +744,13 @@ let sexp_to_cld_mr_last (sel:sexp list) : (var list * nrc) * var list =
       raise (CACo_Error "Not well-formed S-expr inside cld_mr_last")
 
 
-let cldmr_to_sexp (c:CompDriver.cldmr) : sexp =
+let cldmr_to_sexp (c:QDriver.cldmr) : sexp =
   STerm ("cld_mrl",
 	  (STerm ("cld_mr_chain", cld_mr_chain_to_sexp c.cld_mr_chain))
 	  :: (STerm ("cld_mr_last", cld_mr_last_to_sexp c.cld_mr_last))
 	  :: [])
 
-let sexp_to_cldmr (se:sexp) : CompDriver.cldmr =
+let sexp_to_cldmr (se:sexp) : QDriver.cldmr =
   match se with
   | STerm ("cld_mrl",
 	   (STerm ("cld_mr_chain", chain))
@@ -764,7 +764,7 @@ sexp_to_cld_mr_chain chain;
       raise (CACo_Error "Not well-formed S-expr inside cldmr")
 
 (* Query translations *)
-let sexp_to_query (lang: CompDriver.language) (se: sexp) : CompDriver.query =
+let sexp_to_query (lang: QDriver.language) (se: sexp) : QDriver.query =
   begin match lang with
   | Compiler.Coq__23.L_rule ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
@@ -793,7 +793,7 @@ let sexp_to_query (lang: CompDriver.language) (se: sexp) : CompDriver.query =
       raise (CACo_Error ("sexp_to_query: "^(Util.string_of_char_list err)))
   end
 
-let query_to_sexp (q: CompDriver.query) : sexp =
+let query_to_sexp (q: QDriver.query) : sexp =
   begin match q with
   | Compiler.Coq__24.Q_rule _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)

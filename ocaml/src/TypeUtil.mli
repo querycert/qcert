@@ -28,14 +28,14 @@ type io_schema = {
   }
 
 type schema = {
-    sch_brand_model : RType.brand_model;
-    sch_camp_type : RType.camp_type;
+    sch_brand_model : QType.brand_model;
+    sch_camp_type : QType.camp_type;
     sch_foreign_typing : Compiler.foreign_typing;
     sch_io_schema : io_schema option;
   }
 
 val empty_schema : schema
 
-val schema_of_io_json : Data.json -> schema
+val schema_of_io_json : QData.json -> schema
 
-val brand_relation_of_brand_model : RType.brand_model -> Compiler.brand_relation
+val brand_relation_of_brand_model : QType.brand_model -> Compiler.brand_relation

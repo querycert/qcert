@@ -57,7 +57,7 @@ val suffix_nnrcmr_cldmr : unit -> string
 val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
 
-val suffix_of_language : CompDriver.language -> string
+val suffix_of_language : QDriver.language -> string
 (* val suffix_target : lang_config -> string *)
 
 val suffix_sdata : unit -> string
@@ -68,7 +68,7 @@ type eval_config
 
 val default_eval_config : unit -> eval_config
 
-val set_eval_io : eval_config -> Data.json -> unit
+val set_eval_io : eval_config -> QData.json -> unit
 val set_eval_schema : eval_config -> string -> unit
 val set_input : eval_config -> string -> unit
 val set_format : eval_config -> string -> unit
@@ -76,7 +76,7 @@ val set_format : eval_config -> string -> unit
 val get_format : eval_config -> serialization_format
 val get_eval_only : eval_config -> bool ref
 val get_debug : eval_config -> bool ref
-val get_eval_io : eval_config -> Data.json option
+val get_eval_io : eval_config -> QData.json option
 val get_eval_schema : eval_config -> string option
 val get_eval_inputs : eval_config -> string list
 val get_eval_lang_config : eval_config -> lang_config
@@ -87,13 +87,13 @@ type data_config
 
 val default_data_config : unit -> data_config
 
-val set_json : data_config -> Data.json -> unit
+val set_json : data_config -> QData.json -> unit
 val set_data_format : data_config -> string -> unit
-val set_data_schema : data_config -> Data.json -> unit
+val set_data_schema : data_config -> QData.json -> unit
 val set_data_dir : data_config -> string -> unit
 
 val get_data_format : data_config -> serialization_format
-val get_data_schema : data_config -> Data.json option
+val get_data_schema : data_config -> QData.json option
 val get_data_dir : data_config -> string option
 
 (* Compiler Section *)

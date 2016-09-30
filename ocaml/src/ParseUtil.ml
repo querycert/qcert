@@ -49,33 +49,33 @@ let parse parser lexer buf =
 (******************)
 
 
-let parse_io f : Data.json = parse DataParser.main (DataLexer.token (string_buff ())) f
-let parse_json f : Data.json = parse DataParser.main (DataLexer.token (string_buff ())) f
+let parse_io f : QData.json = parse DataParser.main (DataLexer.token (string_buff ())) f
+let parse_json f : QData.json = parse DataParser.main (DataLexer.token (string_buff ())) f
 
-let parse_rule f : string * CompDriver.query = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
-let parse_camp f : CompDriver.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
+let parse_rule f : string * QDriver.query = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
+let parse_camp f : QDriver.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
   
-let parse_oql f : CompDriver.oql = OQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f)
+let parse_oql f : QDriver.oql = QOQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f)
 
-let parse_lambda_nra f : CompDriver.lambda_nra = LambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
+let parse_lambda_nra f : QDriver.lambda_nra = QLambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
 
 (****************)
 (* S-Expr Parse *)
 (****************)
 
 let parse_sexp f : SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
-let parse_io_sexp f : Data.data = AstsToSExp.sexp_to_data (parse_sexp f)
-let parse_camp_sexp f : CompDriver.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
-let parse_nraenv_sexp f : CompDriver.nraenv = AstsToSExp.sexp_to_nraenv (parse_sexp f)
-let parse_nnrc_sexp f : CompDriver.nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
-let parse_nnrcmr_sexp f : CompDriver.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
-let parse_cldmr_sexp f : CompDriver.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
+let parse_io_sexp f : QData.data = AstsToSExp.sexp_to_data (parse_sexp f)
+let parse_camp_sexp f : QDriver.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
+let parse_nraenv_sexp f : QDriver.nraenv = AstsToSExp.sexp_to_nraenv (parse_sexp f)
+let parse_nnrc_sexp f : QDriver.nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
+let parse_nnrcmr_sexp f : QDriver.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
+let parse_cldmr_sexp f : QDriver.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
 (*******************
  * Languages Parse *
  *******************)
 
-let parse_query l f : (string * CompDriver.query) =
+let parse_query l f : (string * QDriver.query) =
   begin match l with
   | Compiler.Coq__23.L_rule -> parse_rule f
   | Compiler.Coq__23.L_camp -> ("CAMP", Compiler.Coq__24.Q_camp (parse_camp f))

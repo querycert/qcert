@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section DriverTop.
+Section CompilerDriver.
 
   Require Import String.
   Require Import NRARuntime.
@@ -50,6 +50,7 @@ Section DriverTop.
   Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
 
   Require Import OptimizerLogger.
+
   Require Import CompEnv.
 
   Local Open Scope list_scope.
@@ -2533,7 +2534,7 @@ Section DriverTop.
 
   End Stat.
 
-End DriverTop.
+End CompilerDriver.
 
 
 (*

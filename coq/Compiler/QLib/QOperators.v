@@ -16,7 +16,7 @@
 
 Require Import CompilerRuntime.
 
-Module CompOperators(runtime:CompilerRuntime).
+Module QOperators(runtime:CompilerRuntime).
   Require String.
   Require BrandRelation.
   
@@ -142,7 +142,7 @@ Module CompOperators(runtime:CompilerRuntime).
      exported as part of the model *)
 
   End Binary.
-End CompOperators.
+End QOperators.
 
 (* 
 *** Local Variables: ***

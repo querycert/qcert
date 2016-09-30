@@ -32,9 +32,9 @@ let compile source_lang_s target_lang_s q_s =
       let schema = TypeUtil.empty_schema in
       let brand_model = schema.TypeUtil.sch_brand_model in
       let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-      let dv_conf = CompDriver.default_dv_config brand_model in
+      let dv_conf = QDriver.default_dv_config brand_model in
       let q_target =
-        CompDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
+        QDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
       in
       let p_conf = PrettyIL.default_pretty_config () in
       PrettyIL.pretty_query p_conf q_target

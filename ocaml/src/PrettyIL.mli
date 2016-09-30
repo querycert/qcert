@@ -38,7 +38,7 @@ val get_margin : pretty_config -> int
 
 (* Pretty data *)
 
-val pretty_data : Format.formatter -> Data.data -> unit
+val pretty_data : Format.formatter -> QData.data -> unit
 
 (* Useful for SExp support *)
 val string_of_foreign_data : Compiler.enhanced_data -> string
@@ -60,15 +60,15 @@ val string_of_binop : Compiler.binOp -> string
 
 (* Pretty NRA^e *)
 
-val pretty_nraenv : bool -> int -> CompDriver.nraenv -> string
+val pretty_nraenv : bool -> int -> QDriver.nraenv -> string
 
 (* Pretty NNRC *)
 
-val pretty_nnrc : bool -> int -> CompDriver.nnrc -> string
+val pretty_nnrc : bool -> int -> QDriver.nnrc -> string
 
 (* Pretty NNRCMR *)
 
-val pretty_nnrcmr : bool -> int -> CompDriver.nnrcmr -> string
+val pretty_nnrcmr : bool -> int -> QDriver.nnrcmr -> string
 
 (* Pretty DNRC *)
 
@@ -83,7 +83,7 @@ val pretty_dataset : bool -> int -> Compiler.dataset -> string
 
 (* Pretty printers for various annotation types *)
 val pretty_annotate_ignore : Format.formatter -> 'a -> unit
-val pretty_annotate_rtype : bool -> Format.formatter -> RType.camp_type -> unit
+val pretty_annotate_rtype : bool -> Format.formatter -> QType.camp_type -> unit
 val pretty_annotate_annotated_rtype : bool ->
 				      (Format.formatter -> 'a -> unit) ->
 				      Format.formatter ->
@@ -92,14 +92,15 @@ val pretty_annotate_annotated_rtype : bool ->
 
 (* Pretty printers for various plug types *)
 val pretty_plug_ignore : Format.formatter -> 'a -> unit
-val pretty_plug_nraenv : bool -> Format.formatter -> CompDriver.nraenv -> unit
+val pretty_plug_nraenv : bool -> Format.formatter -> QDriver.nraenv -> unit
 val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
 
-(* Pretty RType *)
+(* Pretty types *)
 
-val pretty_rtype : bool -> int -> RType.camp_type -> string
-
+val pretty_rtype : bool -> int -> QType.camp_type -> string
 
 (* Pretty query *)
 
-val pretty_query : pretty_config -> CompDriver.query -> string
+val pretty_query : pretty_config -> QDriver.query -> string
+
+

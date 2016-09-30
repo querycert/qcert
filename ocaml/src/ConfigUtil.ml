@@ -134,7 +134,7 @@ let suffix_of_language lang =
 type eval_config =
     { debug : bool ref;
       eval_only : bool ref;
-      mutable eval_io : Data.json option;
+      mutable eval_io : QData.json option;
       mutable eval_schema : string option;
       mutable format : serialization_format;
       mutable eval_inputs : string list;
@@ -170,11 +170,11 @@ let get_eval_inputs conf = conf.eval_inputs
 (* Data Section *)
 
 type data_config =
-    { mutable in_jsons : Data.json list;
+    { mutable in_jsons : QData.json list;
       mutable data_format : serialization_format;
       mutable data_args : string list;
       mutable data_dir : string option;
-      mutable data_schema : Data.json option }
+      mutable data_schema : QData.json option }
 
 let default_data_config () =
   { in_jsons = [];

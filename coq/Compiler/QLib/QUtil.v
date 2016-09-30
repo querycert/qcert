@@ -15,7 +15,7 @@
  *)
 
 Require Import CompilerRuntime.
-Module CompUtil(runtime:CompilerRuntime).
+Module QUtil(runtime:CompilerRuntime).
 
   Require Import BasicRuntime NNRCMRRuntime.
   Require Import TDNRCInfer.
@@ -41,7 +41,7 @@ Module CompUtil(runtime:CompilerRuntime).
 
   Definition mkDistLoc := mkDistLoc.
   Definition mkDistWorld := mkDistWorld.
-End CompUtil.
+End QUtil.
 
 (*
 *** Local Variables: ***

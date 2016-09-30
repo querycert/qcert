@@ -23,29 +23,29 @@ open ParseUtil
 (* Parse from file *)
 (*******************)
 
-val parse_io_from_file : string -> Data.json
-val parse_json_from_file : string -> Data.json
+val parse_io_from_file : string -> QData.json
+val parse_json_from_file : string -> QData.json
 
-val parse_rule_from_file : string -> string * CompDriver.query
-val parse_camp_from_file : string -> CompDriver.camp
+val parse_rule_from_file : string -> string * QDriver.query
+val parse_camp_from_file : string -> QDriver.camp
 
-val parse_oql_from_file : string -> CompDriver.oql
+val parse_oql_from_file : string -> QDriver.oql
 
 (****************)
 (* S-Expr Parse *)
 (****************)
 
 val parse_sexp_from_file : string -> SExp.sexp
-val parse_io_sexp_from_file : string -> Data.data
-val parse_camp_sexp_from_file : string -> CompDriver.camp
-val parse_nraenv_sexp_from_file : string -> CompDriver.nraenv
-val parse_nnrc_sexp_from_file : string -> CompDriver.nnrc
-val parse_nnrcmr_sexp_from_file : string -> CompDriver.nnrcmr
-val parse_cldmr_sexp_from_file : string -> CompDriver.cldmr
+val parse_io_sexp_from_file : string -> QData.data
+val parse_camp_sexp_from_file : string -> QDriver.camp
+val parse_nraenv_sexp_from_file : string -> QDriver.nraenv
+val parse_nnrc_sexp_from_file : string -> QDriver.nnrc
+val parse_nnrcmr_sexp_from_file : string -> QDriver.nnrcmr
+val parse_cldmr_sexp_from_file : string -> QDriver.cldmr
 
 (*******************
  * Languages Parse *
  *******************)
 
-val parse_query_from_file : CompDriver.language -> string -> string * CompDriver.query
+val parse_query_from_file : QDriver.language -> string -> string * QDriver.query
 

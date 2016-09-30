@@ -22,10 +22,10 @@ exception OQL_eval of string
       
 (* Frontend Eval *)
 
-val eval_rule : (string * string) list -> Data.data list -> string -> Data.data list option * string
-val eval_oql : (string * string) list -> Data.data list -> string -> Data.data option * string
+val eval_rule : (string * string) list -> QData.data list -> string -> QData.data list option * string
+val eval_oql : (string * string) list -> QData.data list -> string -> QData.data option * string
 
 (* Core Eval *)
 
-val eval_nraenv : lang_config -> string option -> (string * string) list -> Data.data list -> CompDriver.nraenv -> Data.data option
+val eval_nraenv : lang_config -> string option -> (string * string) list -> QData.data list -> QDriver.nraenv -> QData.data option
 

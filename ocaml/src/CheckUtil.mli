@@ -21,12 +21,12 @@ open Compiler.EnhancedCompiler
 
 (* Check result *)
 
-val print_nraenv_result : string -> Data.data option -> unit
-val check_nraenv_result : eval_config -> Data.data list -> string -> Data.data option -> string -> unit
+val print_nraenv_result : string -> QData.data option -> unit
+val check_nraenv_result : eval_config -> QData.data list -> string -> QData.data option -> string -> unit
 
-val print_rule_result : string -> Data.data list option -> unit
-val print_oql_result : string -> Data.data option -> unit
+val print_rule_result : string -> QData.data list option -> unit
+val print_oql_result : string -> QData.data option -> unit
 
-val check_rule_result : eval_config -> Data.data list -> string -> Data.data list option -> string -> unit
-val check_oql_result : Data.data list -> string -> Data.data option -> string -> unit
+val check_rule_result : eval_config -> QData.data list -> string -> QData.data list option -> string -> unit
+val check_oql_result : QData.data list -> string -> QData.data option -> string -> unit
 
