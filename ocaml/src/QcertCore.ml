@@ -20,15 +20,21 @@ open Compiler.EnhancedCompiler
 
 
 type result = {
-    res_emit : string * string;
-    res_emit_all : (string * string) list;
-    res_emit_sexp : string * string;
-    res_emit_sexp_all : (string * string) list;
+    res_emit : result_file;
+    res_emit_all : result_file list;
+    res_emit_sexp : result_file;
+    res_emit_sexp_all : result_file list;
     res_stat : string;
     res_stat_all : string list;
-    res_stat_tree : string;
+    res_stat_tree : result_file;
+  }
+and result_file = {
+    res_file : string;
+    res_content : string;
   }
 
+let no_result_file =
+  { res_file = ""; res_content = ""; }
 
 (******************)
 (* Core functions *)
@@ -80,7 +86,7 @@ let emit_string (dv_conf: CompDriver.driver_config) (schema: TypeUtil.schema) pr
   let fpref = Filename.chop_extension file_name in
   let ext = ConfigUtil.suffix_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir fpref) ext in
-  (fout, s)
+  { res_file = fout; res_content = s; }
 
 (* Emit s-expr *)
 
@@ -91,7 +97,7 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let fpref = Filename.chop_extension file_name in
   let fpost = QcertUtil.name_of_language (CompDriver.language_of_query brand_model q) in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
-  (fout, s)
+  { res_file = fout; res_content = s; }
 
 (* Stats *)
 
@@ -101,12 +107,13 @@ let stat_query (schema: TypeUtil.schema) q =
 
 (* Stats tree *)
 
-let stat_tree_query (schema: TypeUtil.schema) file_name q =
+let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   let name = char_list_of_string (Filename.chop_extension file_name) in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let stats = CompDriver.json_stat_tree_of_query brand_model name q in
-  string stats
-
+  let fpref = Filename.chop_extension file_name in
+  let fout = outname (target_f dir fpref) "_stats.json" in
+  { res_file = fout; res_content = string stats; }
 
 (* Main *)
 
@@ -162,7 +169,7 @@ let main gconf (file_name, query_s) =
     if gconf.gconf_emit_sexp then
       emit_sexpr_string schema gconf.gconf_dir file_name q_target
     else
-      ("", "")
+      no_result_file
   in
   let res_emit_sexp_all =
     (* emit-sexp-all intermediate queries *)
@@ -196,9 +203,9 @@ let main gconf (file_name, query_s) =
   in
   let res_stat_tree =
     if gconf.gconf_stat_tree then
-      stat_tree_query schema file_name q_source
+      stat_tree_query schema gconf.gconf_dir file_name q_source
     else
-      ""
+      no_result_file
   in
   { res_emit = res_emit;
     res_emit_all = res_emit_all;

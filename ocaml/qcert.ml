@@ -134,15 +134,15 @@ let parse_args () =
 
 let () =
   let gconf, input_files = parse_args () in
-  Format.eprintf "%a" QcertCore.fprint_comilation_path gconf;
+  Format.printf "%a" QcertCore.fprint_comilation_path gconf;
   let results =
     List.map
       (fun file_name -> QcertCore.main gconf (file_name, string_of_file file_name))
       input_files
   in
-  let output_res (file_name, s) =
-    if file_name <> "" then
-      make_file file_name s
+  let output_res file_res =
+    if file_res.QcertCore.res_file <> "" then
+      make_file file_res.QcertCore.res_file file_res.QcertCore.res_content
   in
   let output_stats res =
     if res.QcertCore.res_stat <> "" then
@@ -153,8 +153,7 @@ let () =
            ~pp_sep:(fun ff () -> Format.fprintf ff ",@\n")
            (fun ff stat -> Format.fprintf ff "%s" stat))
         res.QcertCore.res_stat_all;
-    if res.QcertCore.res_stat_tree <> "" then
-      Format.printf "%s@." res.QcertCore.res_stat_tree
+    output_res res.QcertCore.res_stat_tree
   in
   List.iter
     (fun res ->
