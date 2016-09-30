@@ -134,7 +134,7 @@ let parse_args () =
 
 let () =
   let gconf, input_files = parse_args () in
-  Format.printf "%a" QcertCore.fprint_comilation_path gconf;
+  Format.eprintf "%a" QcertCore.fprint_comilation_path gconf;
   let results =
     List.map
       (fun file_name -> QcertCore.main gconf (file_name, string_of_file file_name))
