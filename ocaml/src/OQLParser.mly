@@ -33,6 +33,7 @@
 %token NIL
 
 %token EQUAL NEQUAL
+%token LT GT LTEQ GTEQ
 %token PLUS STAR MINUS
 %token DOT ARROW COMMA COLON
 %token LPAREN RPAREN
@@ -41,6 +42,7 @@
 %right FROM IN WHERE
 %right COMMA
 %right EQUAL NEQUAL
+%right LT GT LTEQ GTEQ
 %right PLUS MINUS
 %right AND OR
 %right STAR
@@ -109,6 +111,14 @@ expr:
     { OQL.obinop Ops.Binary.aeq e1 e2 }
 | e1 = expr NEQUAL e2 = expr
     { OQL.ounop Ops.Unary.aneg (OQL.obinop Ops.Binary.aeq e1 e2) }
+| e1 = expr LT e2 = expr
+    { OQL.obinop Ops.Binary.alt e1 e2 }
+| e1 = expr LTEQ e2 = expr
+    { OQL.obinop Ops.Binary.ale e1 e2 }
+| e1 = expr GT e2 = expr
+    { OQL.ounop Ops.Unary.aneg (OQL.obinop Ops.Binary.ale e1 e2) }
+| e1 = expr GTEQ e2 = expr
+    { OQL.ounop Ops.Unary.aneg (OQL.obinop Ops.Binary.alt e1 e2) }
 | e1 = expr MINUS e2 = expr
     { OQL.obinop Ops.Binary.ZArith.aminus e1 e2 }
 | e1 = expr PLUS e2 = expr

@@ -62,6 +62,10 @@ rule token sbuff = parse
 | eof { EOF }
 | "=" { EQUAL }
 | "!=" { NEQUAL }
+| "<" { LT }
+| ">" { GT }
+| "<=" { LTEQ }
+| ">=" { GT }
 | "+" { PLUS }
 | "*" { STAR }
 | "-" { MINUS }
