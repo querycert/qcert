@@ -222,7 +222,7 @@ Module CompDriver(runtime:CompilerRuntime).
                          init_vinit
                          inputs_loc.
 
-  Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := mr_optimize q.
+  Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := trew_nnrcmr (mr_optimize q).
 
   Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nrcmr q.
 

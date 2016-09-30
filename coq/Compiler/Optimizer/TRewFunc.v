@@ -760,6 +760,43 @@ Section TRewFunc.
     rewrite rew2_correctness at 1; try reflexivity.
   Qed.
   
+
+  Require Import NNRCMR.
+  Require Import ForeignReduceOps.
+  Definition trew_nnrcmr
+             {fruntime:foreign_runtime} {fredop:foreign_reduce_op} {logger:optimizer_logger string nrc}
+             (l: nrcmr) :=
+    let inputs_loc := l.(mr_inputs_loc) in
+    let chain :=
+        List.map
+          (fun mr =>
+             let map :=
+                 match mr.(mr_map) with
+                 | MapDist (x, n) => MapDist (x, trew n)
+                 | MapDistFlatten (x, n) => MapDistFlatten (x, trew n)
+                 | MapScalar (x, n) => MapScalar (x, trew n)
+                 end
+             in
+             let reduce :=
+                 match mr.(mr_reduce) with
+                 | RedId => RedId
+                 | RedCollect (x, n) => RedCollect (x, trew n)
+                 | RedOp op => RedOp op
+                 | RedSingleton => RedSingleton
+                 end
+             in
+             mkMR mr.(mr_input) mr.(mr_output) map reduce)
+          l.(mr_chain)
+    in
+    let last :=
+        let '((params, n), args) := l.(mr_last) in
+        ((params, trew n), args)
+    in
+    mkMRChain
+      inputs_loc
+      chain
+      last.
+
 End TRewFunc.
 
 (* 
