@@ -122,10 +122,6 @@ Module QDriver(runtime:CompilerRuntime).
     Definition rule_to_nnrcmr : rule -> nnrcmr := rule_to_nnrcmr.
     Definition rule_to_cldmr : list (string*string) -> rule -> cldmr := rule_to_cldmr.
 
-    (* Stat: Top level *)
-
-    Definition json_stat_of_query : query -> string := json_stat_of_query.
-    Definition json_stat_tree_of_query : string -> query -> string := json_stat_tree_of_query.
   End QD.
 End QDriver.
 

@@ -221,6 +221,7 @@ MODULES = \
 	Compiler/CompilerDriver/CompLang \
 	Compiler/CompilerDriver/CompEnv \
 	Compiler/CompilerDriver/CompDriver \
+	Compiler/CompilerDriver/CompStat \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QPattern \
@@ -229,6 +230,7 @@ MODULES = \
 	Compiler/QLib/QLambdaNRA \
 	Compiler/QLib/QLang \
 	Compiler/QLib/QDriver \
+	Compiler/QLib/QStat \
 	Compiler/QLib/QUtil \
 	Compiler/QLib/QEval \
 	Compiler/QLib/QType \

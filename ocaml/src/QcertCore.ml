@@ -103,14 +103,14 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
 
 let stat_query (schema: TypeUtil.schema) q =
   let brand_model = schema.TypeUtil.sch_brand_model in
-  string (QDriver.json_stat_of_query brand_model q)
+  string (QStat.json_stat_of_query brand_model q)
 
 (* Stats tree *)
 
 let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   let name = char_list_of_string (Filename.chop_extension file_name) in
   let brand_model = schema.TypeUtil.sch_brand_model in
-  let stats = QDriver.json_stat_tree_of_query brand_model name q in
+  let stats = QStat.json_stat_tree_of_query brand_model name q in
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_stats.json" in
   { res_file = fout; res_content = string stats; }
