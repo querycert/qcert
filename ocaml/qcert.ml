@@ -38,16 +38,20 @@ let args_list gconf =
        "<harness.js> JavaScript runtime");
       ("-io", Arg.String (QcertArg.set_io gconf),
        "<file.io> Schema and inputs data for evaluation");
-      (* ("-stats", Arg.Unit (set_stats conf), *)
-      (*    " Produce statistics for the target query"); *)
-      (* ("-stats-all", Arg.Unit (set_stats conf), *)
-      (*    " Produce statistics for all intermediate queries"); *)
       ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
        " Emit generated code of all intermediate queries");
       ("-emit-sexp", Arg.Unit (QcertArg.set_emit_sexp gconf),
        " Emit the target query as an s-expression");
       ("-emit-sexp-all", Arg.Unit (QcertArg.set_emit_sexp_all gconf),
        " Emit all intermediate queries as s-expressions");
+      ("-source-sexp", Arg.Unit (QcertArg.set_source_sexp gconf),
+       " Indicate that the source file is expected to be an s-expression");
+      ("-stat", Arg.Unit (QcertArg.set_stat gconf),
+         " Produce statistics for the target query");
+      ("-stat-all", Arg.Unit (QcertArg.set_stat_all gconf),
+         " Produce statistics for all intermediate queries");
+      ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
+         " Produce statistics for paths following starting from the source");
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
@@ -71,21 +75,21 @@ let args_list gconf =
 let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
-  [ CompDriver.L_rule;
-    CompDriver.L_camp;
-    CompDriver.L_oql;
-    CompDriver.L_nra;
-    CompDriver.L_nraenv;
-    CompDriver.L_nnrc;
-    CompDriver.L_nnrcmr;
-    CompDriver.L_cldmr;
-    CompDriver.L_dnnrc_dataset;
-    CompDriver.L_dnnrc_typed_dataset;
-    CompDriver.L_javascript;
-    CompDriver.L_java;
-    CompDriver.L_spark;
-    CompDriver.L_spark2;
-    CompDriver.L_cloudant; ]
+  [ Compiler.L_rule;
+    Compiler.L_camp;
+    Compiler.L_oql;
+    Compiler.L_nra;
+    Compiler.L_nraenv;
+    Compiler.L_nnrc;
+    Compiler.L_nnrcmr;
+    Compiler.L_cldmr;
+    Compiler.L_dnnrc_dataset;
+    Compiler.L_dnnrc_typed_dataset;
+    Compiler.L_javascript;
+    Compiler.L_java;
+    Compiler.L_spark;
+    Compiler.L_spark2;
+    Compiler.L_cloudant; ]
 
 
 let languages_string =
@@ -102,8 +106,8 @@ let usage =
 let parse_args () =
   let input_files = ref [] in
   let gconf =
-    { gconf_source = CompDriver.L_rule;
-      gconf_target = CompDriver.L_javascript;
+    { gconf_source = Compiler.L_rule;
+      gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -114,10 +118,14 @@ let parse_args () =
       gconf_emit_all = false;
       gconf_emit_sexp = false;
       gconf_emit_sexp_all = false;
+      gconf_source_sexp = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_vdbindings = []; }
+      gconf_vdbindings = [];
+      gconf_stat = false;
+      gconf_stat_all = false;
+      gconf_stat_tree = false; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complet_configuration gconf, List.rev !input_files)
@@ -132,14 +140,26 @@ let () =
       (fun file_name -> QcertCore.main gconf (file_name, string_of_file file_name))
       input_files
   in
-  let output_res (file_name, s) =
-    if file_name <> "" then
-      make_file file_name s
+  let output_res file_res =
+    if file_res.QcertCore.res_file <> "" then
+      make_file file_res.QcertCore.res_file file_res.QcertCore.res_content
+  in
+  let output_stats res =
+    if res.QcertCore.res_stat <> "" then
+      Format.printf "%s@." res.QcertCore.res_stat;
+    if res.QcertCore.res_stat_all <> [] then
+      Format.printf "[ @[%a@] ]@."
+        (Format.pp_print_list
+           ~pp_sep:(fun ff () -> Format.fprintf ff ",@\n")
+           (fun ff stat -> Format.fprintf ff "%s" stat))
+        res.QcertCore.res_stat_all;
+    output_res res.QcertCore.res_stat_tree
   in
   List.iter
     (fun res ->
       output_res res.QcertCore.res_emit;
       List.iter output_res res.QcertCore.res_emit_all;
       output_res res.QcertCore.res_emit_sexp;
-      List.iter output_res res.QcertCore.res_emit_sexp_all)
+      List.iter output_res res.QcertCore.res_emit_sexp_all;
+      output_stats res)
     results

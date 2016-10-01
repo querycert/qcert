@@ -21,9 +21,9 @@
 
   let resolve_nra_operator a le e =
     begin match a with
-    | "map" -> LambdaNRA.lamap le e
-    | "mapconcat" -> LambdaNRA.lamapconcat le e
-    | "select" -> LambdaNRA.laselect le e
+    | "map" -> QLambdaNRA.lamap le e
+    | "mapconcat" -> QLambdaNRA.lamapconcat le e
+    | "select" -> QLambdaNRA.laselect le e
     | _ -> raise (CACo_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
@@ -50,7 +50,7 @@
 %right STAR
 %left NOT DOT ARROW
 
-%start <Compiler.EnhancedCompiler.LambdaNRA.expr> main
+%start <Compiler.EnhancedCompiler.QLambdaNRA.expr> main
 
 %%
 
@@ -64,7 +64,7 @@ query:
 
 lambda_expr:
 | v = IDENT EQUALGT e = expr
-    { LambdaNRA.lalambda (Util.char_list_of_string v) e }
+    { QLambdaNRA.lalambda (Util.char_list_of_string v) e }
 
 expr:
 (* Parenthesized expression *)
@@ -72,42 +72,42 @@ expr:
     { e }
 (* Constants *)
 | NULL
-    { LambdaNRA.laconst Data.dunit }
+    { QLambdaNRA.laconst QData.dunit }
 | i = INT
-    { LambdaNRA.laconst (Data.dnat (Util.coq_Z_of_int i)) }
+    { QLambdaNRA.laconst (QData.dnat (Util.coq_Z_of_int i)) }
 | f = FLOAT
-    { LambdaNRA.laconst (Enhanced.Data.dfloat f) }
+    { QLambdaNRA.laconst (Enhanced.Data.dfloat f) }
 | s = STRING
-    { LambdaNRA.laconst (Data.dstring (Util.char_list_of_string s)) }
+    { QLambdaNRA.laconst (QData.dstring (Util.char_list_of_string s)) }
 (* Expressions *)
 | v = IDENT
-    { LambdaNRA.lavar (Util.char_list_of_string v) }
+    { QLambdaNRA.lavar (Util.char_list_of_string v) }
 | e = expr DOT a = IDENT LCURLY le = lambda_expr RCURLY
     { resolve_nra_operator a le e }
 | e = expr DOT a = IDENT
-    { LambdaNRA.ladot (Util.char_list_of_string a) e }
+    { QLambdaNRA.ladot (Util.char_list_of_string a) e }
 | e = expr ARROW a = IDENT
-    { LambdaNRA.laarrow (Util.char_list_of_string a) e }
+    { QLambdaNRA.laarrow (Util.char_list_of_string a) e }
 | STRUCT LPAREN r = reclist RPAREN
-    { LambdaNRA.lastruct r }
+    { QLambdaNRA.lastruct r }
 (* Unary operators *)
 | NOT e1 = expr
-    { LambdaNRA.launop Ops.Unary.aneg e1 }
+    { QLambdaNRA.launop QOps.Unary.aneg e1 }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr
-    { LambdaNRA.labinop Ops.Binary.aeq e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.aeq e1 e2 }
 | e1 = expr NEQUAL e2 = expr
-    { LambdaNRA.launop Ops.Unary.aneg (LambdaNRA.labinop Ops.Binary.aeq e1 e2) }
+    { QLambdaNRA.launop QOps.Unary.aneg (QLambdaNRA.labinop QOps.Binary.aeq e1 e2) }
 | e1 = expr MINUS e2 = expr
-    { LambdaNRA.labinop Ops.Binary.ZArith.aminus e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.ZArith.aminus e1 e2 }
 | e1 = expr PLUS e2 = expr
-    { LambdaNRA.labinop Ops.Binary.ZArith.aplus e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.ZArith.aplus e1 e2 }
 | e1 = expr STAR e2 = expr
-    { LambdaNRA.labinop Ops.Binary.ZArith.amult e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.ZArith.amult e1 e2 }
 | e1 = expr AND e2 = expr
-    { LambdaNRA.labinop Ops.Binary.aand e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.aand e1 e2 }
 | e1 = expr OR e2 = expr
-    { LambdaNRA.labinop Ops.Binary.aor e1 e2 }
+    { QLambdaNRA.labinop QOps.Binary.aor e1 e2 }
 
 reclist:
 | 

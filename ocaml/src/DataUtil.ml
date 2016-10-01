@@ -23,18 +23,18 @@ type serialization_format =
   | META
   | ENHANCED
 
-type io_hierarchy = Data.json
-type io_json = Data.json option
+type io_hierarchy = QData.json
+type io_json = QData.json option
 
 type io_hierarchy_list = (string * string) list
-type io_input = Data.data list
-type io_output = Data.data list
+type io_input = QData.data list
+type io_output = QData.data list
 
-type rtype_content = Data.json
-type json_schema = (io_hierarchy_list * Data.json * Data.json) option
+type rtype_content = QData.json
+type json_schema = (io_hierarchy_list * QData.json * QData.json) option
 type model_content = string * (string * string) list * (string * rtype_content) list
 
-let get_io_content (od:Data.json option) : Data.json * Data.json * Data.json * Data.json * Data.json =
+let get_io_content (od:QData.json option) : QData.json * QData.json * QData.json * QData.json * QData.json =
     match od with
     | Some d ->
 	begin
@@ -117,13 +117,13 @@ let get_input format od =
       | Compiler.Jarray l ->
 	  begin
 	    match format with
-	    | META -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
-	    | ENHANCED -> List.map (Data.json_enhanced_to_data h) l (* in coq so we can prove properties on conversions *)
+	    | META -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
+	    | ENHANCED -> List.map (QData.json_enhanced_to_data h) l (* in coq so we can prove properties on conversions *)
 	  end
       | _ ->
 	  raise (CACo_Error "Illed formed working memory")
 
-let get_model_content (j:Data.json) =
+let get_model_content (j:QData.json) =
   match j with
   | Compiler.Jobject r ->
       let modelName = List.assoc ['m';'o';'d';'e';'l';'N';'a';'m';'e'] r in
@@ -144,7 +144,14 @@ let get_output od =
   | (_, h, o, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match o with
-      | Compiler.Jarray l -> List.map (Data.json_to_data h) l (* in coq so we can prove properties on conversions *)
+      | Compiler.Jarray l -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
       | _ ->
 	  raise (CACo_Error "Ill-formed expected result")
 
+let display_sdata (data_dir : string option) (fname:string) (sdata:string list) (suffix:string) =
+  let fpref = Filename.chop_extension fname in
+  let fout_sdata = outname (target_f data_dir fpref) suffix in
+  let sdata =
+    String.concat "\n" sdata
+  in
+  make_file fout_sdata sdata

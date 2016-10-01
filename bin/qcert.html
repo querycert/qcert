@@ -30,6 +30,16 @@
         document.getElementById("result").innerHTML = "";
       }
     </script>
+    <script>
+      function addPath() {
+        var x = document.createElement("LI");
+        var t = document.createTextNode("bar");
+        x.appendChild(t);
+        document.getElementById("path").appendChild(x);
+        return false;
+      }
+    </script>
+
   </head>
   <body>
     <h1>Q*cert online form</h1>
@@ -56,6 +66,9 @@
 	      <option>spark2</option>
 	      <option>cloudant</option>
 	  </select>
+	  <button onclick="return addPath()">Specify an intermediate step</button>
+	  <ul id="path">
+	  </ul>
           <label>target</label>
           <select id = "target">
 	      <option>rule</option>

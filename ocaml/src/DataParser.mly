@@ -26,7 +26,7 @@
 %token LBRACKET RBRACKET
 %token EOF
   
-%start <Compiler.EnhancedCompiler.Data.json> main
+%start <Compiler.EnhancedCompiler.QData.json> main
 %%
 
 main:
@@ -35,25 +35,25 @@ main:
 
 json:
 | NULL
-    { Data.jnil }
+    { QData.jnil }
 | i = INT
-    { Data.jnumber (Util.coq_Z_of_int i) }
+    { QData.jnumber (Util.coq_Z_of_int i) }
 | f = FLOAT
     { Enhanced.Data.jfloat f }
 | s = STRING
-    { Data.jstring (Util.char_list_of_string s) }
+    { QData.jstring (Util.char_list_of_string s) }
 | TRUE
-    { Data.jbool true }
+    { QData.jbool true }
 | FALSE
-    { Data.jbool false }
+    { QData.jbool false }
 | LCURLY r = jobject RCURLY
-    { Data.jobject r }
+    { QData.jobject r }
 | LCURLY RCURLY
-    { Data.jobject [] }
+    { QData.jobject [] }
 | LBRACKET l = jarray RBRACKET
-    { Data.jarray l }
+    { QData.jarray l }
 | LBRACKET RBRACKET
-    { Data.jarray [] }
+    { QData.jarray [] }
 
 jobject:
 | a = attribute

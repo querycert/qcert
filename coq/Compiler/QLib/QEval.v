@@ -15,15 +15,12 @@
  *)
 
 Require Import CompilerRuntime.
-Module EvalTop(runtime:CompilerRuntime).
+Module QEval(runtime:CompilerRuntime).
 
   Require Import String List String EquivDec.
   
   Require Import BasicRuntime.
   Require Import CompEnv.
-  Require CompDriver.
-
-  Module CD := CompDriver.CompDriver(runtime).
 
   (****************
    * Rule Section *
@@ -86,7 +83,7 @@ Module EvalTop(runtime:CompilerRuntime).
   Require Import TypingRuntime.
  
   Definition dnrc_eval_top {bm:brand_model} (h:list (string*string)) 
-             (e:CD.dnnrc_dataset) (world:list data) : option data :=
+             (e:@dnrc _ unit dataset) (world:list data) : option data :=
     let tenv := mkDistWorld world in
     lift localize_data (@dnrc_eval _ _ _ h SparkIRPlug tenv e).
 
@@ -120,7 +117,7 @@ Module EvalTop(runtime:CompilerRuntime).
     let cenv := mkConstants env_with_world in
     cld_mrl_eval h (cld_load_init_env init_vinit cenv) e.
 
-End EvalTop.
+End QEval.
 
 (* 
 *** Local Variables: ***

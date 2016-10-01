@@ -47,6 +47,7 @@ Section OQLSize.
   with oql_in_size (ie:oql_in_expr) :=
     match ie with
     | OIn v e => oql_size e
+    | OInCast v brand_names e => oql_size e
     end
   with oql_where_size (we:oql_where_expr) :=
     match we with

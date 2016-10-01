@@ -15,13 +15,13 @@
  *)
 
 Require Import CompilerRuntime.
-Module CompOQL(runtime:CompilerRuntime).
+Module QOQL(runtime:CompilerRuntime).
   Require String.
-  Require CompData CompOperators.
+  Require QData QOperators.
   Require OQL OQLSugar.
 
-  Module Data := CompData.CompData runtime.
-  Module Ops := CompOperators.CompOperators runtime.
+  Module Data := QData.QData runtime.
+  Module Ops := QOperators.QOperators runtime.
 
   Definition expr : Set
     := OQL.oql_expr.
@@ -55,6 +55,8 @@ Module CompOQL(runtime:CompilerRuntime).
     := OQL.OSelectDistinct.
   Definition oin : String.string -> expr -> in_expr 
     := OQL.OIn.
+  Definition oincast : String.string -> String.string -> expr -> in_expr 
+    := OQL.OInCast.
   Definition otrue : where_expr 
     := OQL.OTrue.
   Definition owhere : expr -> where_expr 
@@ -70,7 +72,7 @@ Module CompOQL(runtime:CompilerRuntime).
   Definition tableify : expr -> expr
     := OQLSugar.tableify.
 
-End CompOQL.
+End QOQL.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***

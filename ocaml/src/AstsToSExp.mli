@@ -24,23 +24,23 @@ open SExp
  * AST <-> S-Expr *
  ******************)
 
-val sexp_to_data : sexp -> Data.data
-val data_to_sexp : Data.data -> sexp
+val sexp_to_data : sexp -> QData.data
+val data_to_sexp : QData.data -> sexp
 
-val sexp_to_camp : sexp -> CompDriver.camp
-val camp_to_sexp : CompDriver.camp -> sexp
+val sexp_to_camp : sexp -> QLang.camp
+val camp_to_sexp : QLang.camp -> sexp
 
-val sexp_to_nraenv : sexp -> CompDriver.nraenv
-val nraenv_to_sexp : CompDriver.nraenv -> sexp
+val sexp_to_nraenv : sexp -> QLang.nraenv
+val nraenv_to_sexp : QLang.nraenv -> sexp
 
-val sexp_to_nnrc : sexp -> CompDriver.nnrc
-val nnrc_to_sexp : CompDriver.nnrc -> sexp
+val sexp_to_nnrc : sexp -> QLang.nnrc
+val nnrc_to_sexp : QLang.nnrc -> sexp
 
-val sexp_to_nnrcmr : sexp -> CompDriver.nnrcmr
-val nnrcmr_to_sexp : CompDriver.nnrcmr -> sexp
+val sexp_to_nnrcmr : sexp -> QLang.nnrcmr
+val nnrcmr_to_sexp : QLang.nnrcmr -> sexp
 
-val sexp_to_cldmr : sexp -> CompDriver.cldmr
-val cldmr_to_sexp : CompDriver.cldmr -> sexp
+val sexp_to_cldmr : sexp -> QLang.cldmr
+val cldmr_to_sexp : QLang.cldmr -> sexp
 
-val sexp_to_query : CompDriver.language -> sexp -> CompDriver.query
-val query_to_sexp : CompDriver.query -> sexp
+val sexp_to_query : QLang.language -> sexp -> QLang.query
+val query_to_sexp : QLang.query -> sexp

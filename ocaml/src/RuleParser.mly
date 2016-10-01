@@ -91,17 +91,17 @@
 %nonassoc UWITHVAR
 %nonassoc PASSERT
 
-%start <(string * Compiler.EnhancedCompiler.CompDriver.query)> rulemain
-%start <Compiler.EnhancedCompiler.Pattern.pat> patmain
-%type <Compiler.EnhancedCompiler.Rule.rule -> Compiler.EnhancedCompiler.Rule.rule> rule_rule
+%start <(string * Compiler.EnhancedCompiler.QLang.query)> rulemain
+%start <Compiler.EnhancedCompiler.QLang.camp> patmain
+%type <Compiler.EnhancedCompiler.QLang.rule -> Compiler.EnhancedCompiler.QLang.rule> rule_rule
 
 %%
 
 rulemain:
 | EXAMPLE i=IDENT COLONEQUAL r = rule DOT EOF
-    { (i, CompDriver.Q_rule r) }
+    { (i, Compiler.Q_rule r) }
 | EXAMPLE i=IDENT COLONEQUAL p = pat DOT EOF
-    { (i, CompDriver.Q_camp p) }
+    { (i, Compiler.Q_camp p) }
 
 patmain:
 | p = pat EOF
@@ -109,27 +109,27 @@ patmain:
 
 rule:
 | RULERETURN p = pat
-    { Rule.rule_return p }
+    { QRule.rule_return p }
 | RULEWHEN p = pat SEMISEMI r = rule
-    { Rule.rule_when p r }
+    { QRule.rule_when p r }
 | RULENOT p = pat SEMISEMI r = rule
-    { Rule.rule_not p r }
+    { QRule.rule_not p r }
 | RULEGLOBAL p = pat SEMISEMI r = rule
-    { Rule.rule_global p r }
+    { QRule.rule_global p r }
 
 rule_rule:
 | RULEWHEN p = pat
-    { (fun r -> Rule.rule_when p r) }
+    { (fun r -> QRule.rule_when p r) }
 | RULENOT p = pat
-    { (fun r -> Rule.rule_not p r) }
+    { (fun r -> QRule.rule_not p r) }
 | RULEGLOBAL p = pat
-    { (fun r -> Rule.rule_global p r) }
+    { (fun r -> QRule.rule_global p r) }
 | RULEWHEN p = pat SEMISEMISEMI r = rule_rule 
-    { (fun r1 -> (Rule.rule_when p (r r1))) }
+    { (fun r1 -> (QRule.rule_when p (r r1))) }
 | RULENOT p = pat SEMISEMISEMI r = rule_rule
-    { (fun r1 -> (Rule.rule_not p (r r1))) }
+    { (fun r1 -> (QRule.rule_not p (r r1))) }
 | RULEGLOBAL p = pat SEMISEMISEMI r = rule_rule
-    { (fun r1 -> (Rule.rule_global p (r r1))) }
+    { (fun r1 -> (QRule.rule_global p (r r1))) }
 
 pat:
 (* Parenthesized pattern *)
@@ -137,101 +137,100 @@ pat:
     { p }
 (* CAMP pattern *)
 | PCONST DUNIT
-    { Pattern.pconst Data.dunit }
+    { QPattern.pconst QData.dunit }
 | PCONST LPAREN d = data RPAREN
-    { Pattern.pconst d }
+    { QPattern.pconst d }
 | PUNOP u = uop p = pat
-    { Pattern.punop u p }
+    { QPattern.punop u p }
 | PBINOP b = bop p1 = pat p2 = pat
-    { Pattern.pbinop b p1 p2 }
+    { QPattern.pbinop b p1 p2 }
 | PMAP p = pat
-    { Pattern.pmap p }
+    { QPattern.pmap p }
 | PASSERT p = pat
-    { Pattern.passert p }
+    { QPattern.passert p }
 | PORELSE p1 = pat p2 = pat
-    { Pattern.porelse p1 p2 }
+    { QPattern.porelse p1 p2 }
 | PIT
-    { Pattern.pit }
+    { QPattern.pit }
 | PLETIT p1 = pat p2 = pat
-    { Pattern.pletit p1 p2 }
+    { QPattern.pletit p1 p2 }
 | PENV
-    { Pattern.penv }
+    { QPattern.penv }
 | PLETENV p1 = pat p2 = pat
-    { Pattern.pletenv  p1 p2 }
+    { QPattern.pletenv  p1 p2 }
 | PLEFT
-    { Pattern.pleft }
+    { QPattern.pleft }
 | PRIGHT
-    { Pattern.pright }
+    { QPattern.pright }
 | PGETCONSTANT s = STRING
-    { Pattern.pgetconstant (Util.char_list_of_string s) }
+    { QPattern.pgetconstant (Util.char_list_of_string s) }
 (* Macros pattern *)
 | PNOW
-    { Pattern.pnow }
+    { QPattern.pnow }
 | PACCEPT
-    { Pattern.pconst (Data.drec []) }
+    { QPattern.pconst (QData.drec []) }
 | LOOKUP s = STRING
-    { Pattern.lookup (Util.char_list_of_string s) }
+    { QPattern.lookup (Util.char_list_of_string s) }
  | v = STRING IS p = pat %prec UIS
-    { Pattern.pIS (Util.char_list_of_string v) p }
+    { QPattern.pIS (Util.char_list_of_string v) p }
 | WITHVAR s = STRING p = pat %prec UWITHVAR
-    { Pattern.withVar (Util.char_list_of_string s) p }
+    { QPattern.withVar (Util.char_list_of_string s) p }
 | PVARWITH s = STRING p = pat %prec UWITHVAR
-    { Pattern.pvarwith (Util.char_list_of_string s) p }
+    { QPattern.pvarwith (Util.char_list_of_string s) p }
 | TOSTRING p = pat
-    { Pattern.toString p }
+    { QPattern.toString p }
 | PBINOPRED b = bop LBRACKET pl = patlist RBRACKET
-    { Pattern.pat_binop_reduce b pl }
+    { QPattern.pat_binop_reduce b pl }
 | p1 = pat PLUSSPLUS p2 = pat
-    { Pattern.stringConcat p1 p2 }
+    { QPattern.stringConcat p1 p2 }
 | DASHUNDER
-    { Pattern.pit }
+    { QPattern.pit }
 | DASHTICK c = const
-    { (Pattern.pconst c) }
+    { (QPattern.pconst c) }
 | s = STRING BANGDASHARROW p = pat
-    { Pattern.pbdot (Util.char_list_of_string s) p }
+    { QPattern.pbdot (Util.char_list_of_string s) p }
 | PBDOT s = STRING p = pat %prec PBDOT
-    { Pattern.pbdot (Util.char_list_of_string s) p }
+    { QPattern.pbdot (Util.char_list_of_string s) p }
 | PBSOMEDOT s = STRING p = pat %prec PBSOMEDOT
-    { Pattern.pbsomedot (Util.char_list_of_string s) p }
+    { QPattern.pbsomedot (Util.char_list_of_string s) p }
 | PSOME
-    { Pattern.pleft }
+    { QPattern.pleft }
 | PNULL
-    { Pattern.pnull }
+    { QPattern.pnull }
 (* INSTANCEOF, FETCH, and MATCHES temporarily have hacks because of signature changes in RuleSugar.v.  TODO fix this *)
 | n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
-    { Pattern.instanceOf (Util.char_list_of_string n) t p }
+    { QPattern.instanceOf (Util.char_list_of_string n) t p }
 | p = pat TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = pat %prec UFETCH
-    { Pattern.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
+    { QPattern.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
 | MATCHES LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
-    { Pattern.matches t p }
+    { QPattern.matches t p }
 | AGGREGATE r = rule_rule DO u = uop OVER p = pat FLATTEN f = INT
-    { Rule.aggregate r u p (Util.coq_Z_of_int f) }
+    { QRule.aggregate r u p (Util.coq_Z_of_int f) }
 | VARIABLES LBRACKET v = stringlist RBRACKET
-    { Pattern.returnVariables v }
-
+    { QPattern.returnVariables v }
 data:
 | DUNIT
-    { Data.dunit }
+    { QData.dunit }
 | DBOOL TRUE
-    { Data.dbool true }
+    { QData.dbool true }
 | DBOOL FALSE
-    { Data.dbool false }
+    { QData.dbool false }
 | DFLOAT f = FLOAT
     { Enhanced.Data.dfloat f }
 | DNAT i = INT
-    { Data.dnat (Util.coq_Z_of_int i) }
+    { QData.dnat (Util.coq_Z_of_int i) }
 | DSTRING s = STRING
-    { Data.dstring (Util.char_list_of_string s) }
+    { QData.dstring (Util.char_list_of_string s) }
 | DCOLL LBRACKET dl = datalist RBRACKET
-    { Data.dcoll dl }
+    { QData.dcoll dl }
 | DREC LBRACKET rl = reclist RBRACKET
-    { Data.drec rl }
+    { QData.drec rl }
 | DLEFT d = data
-    { Data.dleft d }
+    { QData.dleft d }
 | DRIGHT d = data
-    { Data.dright d }
+    { QData.dright d }
 | DBRAND sl = stringlist d = data
-    { Data.dbrand sl d }
+    { QData.dbrand sl d }
 | DTIMESCALE ts = timescale
     { Enhanced.Data.dtime_scale ts }
 
@@ -285,11 +284,11 @@ stringlist:
 
 const:
 | i = INT
-    { Data.dnat (Util.coq_Z_of_int i) }
+    { QData.dnat (Util.coq_Z_of_int i) }
 | f = FLOAT
     { Enhanced.Data.dfloat f }
 | s = STRING
-    { Data.dstring (Util.char_list_of_string s) }
+    { QData.dstring (Util.char_list_of_string s) }
 
 bop:
 | FLOATPLUS
@@ -336,45 +335,45 @@ bop:
 | TIMEDURATIONBETWEEN
   { Enhanced.Ops.Binary.time_duration_between }
 | AEQ
-    { Ops.Binary.aeq }
+    { QOps.Binary.aeq }
 | AUNION
-    { Ops.Binary.aunion }
+    { QOps.Binary.aunion }
 | ACONCAT
-    { Ops.Binary.aconcat }
+    { QOps.Binary.aconcat }
 | AMERGECONCAT
-    { Ops.Binary.amergeconcat }
+    { QOps.Binary.amergeconcat }
 | AAND
-    { Ops.Binary.aand }
+    { QOps.Binary.aand }
 | AOR
-    { Ops.Binary.aor }
+    { QOps.Binary.aor }
 | ALT
-    { Ops.Binary.alt }
+    { QOps.Binary.alt }
 | ALE
-    { Ops.Binary.ale }
+    { QOps.Binary.ale }
 | AMINUS
-    { Ops.Binary.aminus }
+    { QOps.Binary.aminus }
 | AMIN
-    { Ops.Binary.amin }
+    { QOps.Binary.amin }
 | AMAX
-    { Ops.Binary.amax }
+    { QOps.Binary.amax }
 | ACONTAINS
-    { Ops.Binary.acontains }
+    { QOps.Binary.acontains }
 | ASCONCAT
-    { Ops.Binary.asconcat }
+    { QOps.Binary.asconcat }
 | LPAREN ABARITH ARITHPLUS RPAREN
-    { Ops.Binary.ZArith.aplus }
+    { QOps.Binary.ZArith.aplus }
 | LPAREN ABARITH ARITHMINUS RPAREN
-    { Ops.Binary.ZArith.aminus }
+    { QOps.Binary.ZArith.aminus }
 | LPAREN ABARITH ARITHMULT RPAREN
-    { Ops.Binary.ZArith.amult }
+    { QOps.Binary.ZArith.amult }
 | LPAREN ABARITH ARITHMIN RPAREN
-    { Ops.Binary.ZArith.amin }
+    { QOps.Binary.ZArith.amin }
 | LPAREN ABARITH ARITHMAX RPAREN
-    { Ops.Binary.ZArith.amax }
+    { QOps.Binary.ZArith.amax }
 | LPAREN ABARITH ARITHDIVIDE RPAREN
-    { Ops.Binary.ZArith.adiv }
+    { QOps.Binary.ZArith.adiv }
 | LPAREN ABARITH ARITHREM RPAREN
-    { Ops.Binary.ZArith.arem }
+    { QOps.Binary.ZArith.arem }
 
 uop:
 | FLOATNEG
@@ -398,45 +397,45 @@ uop:
 | FLOATABS
   { Enhanced.Ops.Unary.float_abs }
 | AIDOP
-    { Ops.Unary.aidop }
+    { QOps.Unary.aidop }
 | ANEG
-    { Ops.Unary.aneg }
+    { QOps.Unary.aneg }
 | ACOLL
-    { Ops.Unary.acoll }
+    { QOps.Unary.acoll }
 | ACOUNT
-    { Ops.Unary.acount }
+    { QOps.Unary.acount }
 | AFLATTEN
-    { Ops.Unary.aflatten }
+    { QOps.Unary.aflatten }
 | ADISTINCT
-    { Ops.Unary.adistinct }
+    { QOps.Unary.adistinct }
 | ASUM
-    { Ops.Unary.asum }
+    { QOps.Unary.asum }
 | ATOSTRING
-    { Ops.Unary.atostring }
+    { QOps.Unary.atostring }
 | ANUMMIN
-    { Ops.Unary.anummin }
+    { QOps.Unary.anummin }
 | ANUMMAX
-    { Ops.Unary.anummax }
+    { QOps.Unary.anummax }
 | AARITHMEAN
-    { Ops.Unary.aarithmean }
+    { QOps.Unary.aarithmean }
 | LPAREN AUARITH ARITHABS RPAREN
-    { Ops.Unary.ZArith.aabs }
+    { QOps.Unary.ZArith.aabs }
 | LPAREN AUARITH ARITHLOG2 RPAREN
-    { Ops.Unary.ZArith.alog2 }
+    { QOps.Unary.ZArith.alog2 }
 | LPAREN AUARITH ARITHSQRT RPAREN
-    { Ops.Unary.ZArith.asqrt }
+    { QOps.Unary.ZArith.asqrt }
 | LPAREN ACAST LBRACKET s = stringlist RBRACKET RPAREN
-    { Ops.Unary.acast s }
+    { QOps.Unary.acast s }
 | LPAREN ARECPROJECT LBRACKET s = stringlist RBRACKET RPAREN
-    { Ops.Unary.arecproject s }
+    { QOps.Unary.arecproject s }
 | LPAREN AREC s = STRING RPAREN
-    { Ops.Unary.arec (Util.char_list_of_string s) }
+    { QOps.Unary.arec (Util.char_list_of_string s) }
 | LPAREN ADOT s = STRING RPAREN
-    { Ops.Unary.adot (Util.char_list_of_string s) }
+    { QOps.Unary.adot (Util.char_list_of_string s) }
 | AUNBRAND
-    { Ops.Unary.aunbrand }
+    { QOps.Unary.aunbrand }
 | ASINGLETON
-    { Ops.Unary.asingleton }
+    { QOps.Unary.asingleton }
 | AFLOATSUM
     { Enhanced.Ops.Unary.float_sum }
 | AFLOATARITHMEAN

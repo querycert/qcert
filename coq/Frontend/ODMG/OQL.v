@@ -41,6 +41,7 @@ Section OQL.
   | OSelectDistinct : oql_expr -> oql_select_expr
   with oql_in_expr : Set :=
   | OIn : string -> oql_expr -> oql_in_expr
+  | OInCast : string -> string -> oql_expr -> oql_in_expr
   with oql_where_expr : Set :=
   | OTrue : oql_where_expr
   | OWhere : oql_expr -> oql_where_expr
@@ -57,6 +58,7 @@ Section OQL.
   Definition oin_expr (ie:oql_in_expr) : oql_expr :=
     match ie with
     | OIn _ e => e
+    | OInCast _ _ e => e
     end.
   
   (** Induction principles used as backbone for inductive proofs on oql *)
@@ -189,22 +191,26 @@ Section OQL.
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
         destruct a; destruct o0; simpl in *;
-        destruct (H2 o0); subst.
+        destruct (H2 o0); subst; try (right;congruence).
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * right; congruence.
+        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+          right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
         left; reflexivity.
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
         destruct a; destruct o0; simpl in *;
-        destruct (H2 o0); subst.
+        destruct (H2 o0); subst; try (right;congruence).
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * right; congruence.
+        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+          right; congruence.
     - destruct o0; simpl; try (right; congruence).
       destruct (IHx0 o0); try (right; congruence); subst.
       destruct e1; destruct o; simpl in *; try (right; congruence).
@@ -214,22 +220,26 @@ Section OQL.
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
         destruct a; destruct o1; simpl in *;
-        destruct (H2 o1); subst.
+        destruct (H2 o1); subst; try (right;congruence).
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * right; congruence.
+        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+          right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
         left; reflexivity.
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
         destruct a; destruct o1; simpl in *;
-        destruct (H2 o1); subst.
+        destruct (H2 o1); subst; try (right;congruence).
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-        * right; congruence.
+        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+          right; congruence.
   Defined.
 
   (** Semantics of OQL *)
@@ -249,11 +259,45 @@ Section OQL.
       | _ => None
     end.
 
+  Definition filter_cast (b:brands) (l:list data) :=
+    let apply_cast x :=
+        match x with
+        | dbrand b' _ =>
+          if (sub_brands_dec h b' b)
+          then Some (x :: nil)
+          else Some nil
+        | _ => None
+        end
+    in
+    oflat_map apply_cast l.
+
+  Definition oenv_map_concat_single_with_cast
+             (v:string)
+             (brand_name:string)
+             (f:oql_env -> option data)
+             (a:oql_env) : option (list oql_env) :=
+    match f a with
+    | Some (dcoll y) =>
+      match filter_cast (brand_name::nil) y with
+      | Some y =>
+        Some (env_map_concat_single a (map (fun x => ((v,x)::nil)) y))
+      | None => None
+      end
+    | _ => None
+    end.
+
   Definition env_map_concat
              (v:string)
              (f:oql_env -> option data)
              (d:list oql_env) : option (list oql_env) :=
     oflat_map (oenv_map_concat_single v f) d.
+
+  Definition env_map_concat_cast
+             (v:string)
+             (brand_name:string)
+             (f:oql_env -> option data)
+             (d:list oql_env) : option (list oql_env) :=
+    oflat_map (oenv_map_concat_single_with_cast v brand_name f) d.
 
   Fixpoint oql_interp (q:oql_expr) (env:oql_env) : option data :=
     match q with
@@ -265,11 +309,19 @@ Section OQL.
     | OSFW select_clause from_clause where_clause =>
       let init_env := Some (env :: nil) in
       let from_interp (envl:option (list oql_env)) (from_in_expr : oql_in_expr) :=
-          let (in_v, from_expr) := from_in_expr in
-          match envl with
-          | None => None
-          | Some envl' =>
-            env_map_concat in_v (oql_interp from_expr) envl'
+          match from_in_expr with
+          | OIn in_v from_expr =>
+            match envl with
+            | None => None
+            | Some envl' =>
+              env_map_concat in_v (oql_interp from_expr) envl'
+            end
+          | OInCast in_v brand_name from_expr =>
+            match envl with
+            | None => None
+            | Some envl' =>
+              env_map_concat_cast in_v brand_name (oql_interp from_expr) envl'
+            end
           end
       in
       let from_result := fold_left from_interp from_clause init_env in
@@ -314,6 +366,7 @@ Section OQL.
         let one_step_scope (in_expr : oql_in_expr) previous_free_vars :=
             match in_expr with
             | OIn x e1 => oql_free_vars e1 ++ remove string_eqdec x previous_free_vars
+            | OInCast x _ e1 => oql_free_vars e1 ++ remove string_eqdec x previous_free_vars
             end
         in
         fold_right one_step_scope (oql_select_free_vars se ++ oql_where_free_vars we) el
@@ -340,7 +393,7 @@ Section OQL.
                                    (oql_subst e2 x e')
       | OUnop uop e1 => OUnop uop (oql_subst e1 x e')
       | OSFW se el we =>
-        let for_vars := map (fun x => match x with OIn v _ => v end) el in
+        let for_vars := map (fun x => match x with OIn v _ | OInCast v _ _ => v end) el in
         let el' := 
             (fix F (el:list oql_in_expr) (x:string) (e':oql_expr) :=
               match el with
@@ -349,6 +402,10 @@ Section OQL.
                 if (y == x)
                 then (OIn y (oql_subst e x e')) :: el'
                 else (OIn y (oql_subst e x e')) :: (F el' x e')
+              | (OInCast y brand_name e) :: el' =>
+                if (y == x)
+                then (OInCast y brand_name (oql_subst e x e')) :: el'
+                else (OInCast y brand_name (oql_subst e x e')) :: (F el' x e')
               end) el x e'
         in
         if in_dec string_dec x for_vars

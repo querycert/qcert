@@ -32,9 +32,9 @@ let compile source_lang_s target_lang_s q_s =
       let schema = TypeUtil.empty_schema in
       let brand_model = schema.TypeUtil.sch_brand_model in
       let foreign_typing = schema.TypeUtil.sch_foreign_typing in
-      let dv_conf = CompDriver.default_dv_config brand_model in
+      let dv_conf = QDriver.default_dv_config brand_model in
       let q_target =
-        CompDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
+        QDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
       in
       let p_conf = PrettyIL.default_pretty_config () in
       PrettyIL.pretty_query p_conf q_target
@@ -50,8 +50,8 @@ let compile source_lang_s target_lang_s q_s =
 
 let global_config_of_json j =
   let gconf =
-    { gconf_source = CompDriver.L_rule;
-      gconf_target = CompDriver.L_javascript;
+    { gconf_source = Compiler.L_rule;
+      gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -62,10 +62,14 @@ let global_config_of_json j =
       gconf_emit_all = false;
       gconf_emit_sexp = false;
       gconf_emit_sexp_all = false;
+      gconf_source_sexp = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_vdbindings = []; }
+      gconf_vdbindings = [];
+      gconf_stat = false;
+      gconf_stat_all = false;
+      gconf_stat_tree = false; }
   in
   let apply f o =
     Js.Optdef.iter o (fun s -> f gconf (Js.to_string s));
@@ -107,10 +111,10 @@ let global_config_of_json j =
 
 
 let json_of_result res =
-  let wrap (file_name, s) =
+  let wrap x = (* XXX To review XXX *)
       object%js
-        val name = Js.string file_name
-        val value = Js.string s
+        val name = Js.string x.QcertCore.res_file
+        val value = Js.string x.QcertCore.res_content
       end
   in
   let wrap_all l =
@@ -123,7 +127,7 @@ let json_of_result res =
     val emitall = Js.def (wrap_all res.QcertCore.res_emit_all)
     val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
     val emitsexpall = Js.def (wrap_all res.QcertCore.res_emit_sexp_all)
-    val result = Js.string (snd res.QcertCore.res_emit)
+    val result = Js.string res.QcertCore.res_emit.QcertCore.res_content (* XXX To review XXX *)
   end
 
 let json_of_error msg =

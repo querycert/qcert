@@ -24,14 +24,14 @@ Import ListNotations.
 Require Import BasicSystem CAMPRuntime.
 Require Import TrivialModel.
 
-Require Compiler CompDriver CompilerRuntime.
+Require CompilerRuntime.
 
 Definition CPRModel := ("MainEntity", "Entity") :: nil.
 Instance CPRModel_relation : brand_relation
   := mkBrand_relation CPRModel (eq_refl _) (eq_refl _).
 
 Module TR := TrivialRuntime.
-Module CD := CompDriver.CompDriver(TR).
+Require Import CompLang CompDriver.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section CompilerUntypedTest.
@@ -107,12 +107,12 @@ Section CompilerUntypedTest.
   Example Example1_expected := map dconst
                                    ["MainEntitys with doubleAttribute 50: 2"].
 
-  Definition pat5 : CD.camp := Eval compute in Example1'.
-  Definition algopt5 : CD.nraenv := CD.camp_to_nraenv Example1'.
+  Definition pat5 : camp := Eval compute in Example1'.
+  Definition algopt5 : nraenv := camp_to_nraenv Example1'.
   
-  Definition rpat5 : CD.rule := Eval compute in Example1.
-  Definition ralgopt5 : CD.nraenv  := CD.rule_to_nraenv_optim Example1.
-  Definition rnnrc5 : CD.nnrc := CD.rule_to_nnrc_optim Example1.
+  Definition rpat5 : rule := Eval compute in Example1.
+  Definition ralgopt5 : nraenv  := rule_to_nraenv_optim Example1.
+  Definition rnnrc5 : nnrc := rule_to_nnrc_optim Example1.
   
   Definition inp1 : (list (string*data)) := (("WORLD", dcoll exampleWM)::nil).
   Definition inp2 : data := dunit.
@@ -257,7 +257,7 @@ Section CompilerUntypedTest.
   Lemma alg5_wt τ :
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
-    unfold algopt5, CD.camp_to_nraenv.
+    unfold algopt5, camp_to_nraenv.
     unfold PatterntoNRAEnv.translate_pat_to_algenv.
     unfold PatterntoNRAEnv.algenv_of_pat.
     econstructor; eauto.

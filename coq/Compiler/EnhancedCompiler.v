@@ -14,10 +14,10 @@
  * limitations under the License.
  *)
 
-Require Compiler EnhancedModel.
+Require QLib EnhancedModel.
 
 Module EnhancedCompiler
-  := Compiler.Compiler(EnhancedModel.EnhancedRuntime)
+  := QLib.QLib(EnhancedModel.EnhancedRuntime)
                       <+ EnhancedModel.CompEnhanced.
 
 (* 

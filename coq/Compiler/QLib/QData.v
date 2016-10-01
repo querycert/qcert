@@ -15,7 +15,7 @@
  *)
 
 Require Import CompilerRuntime.
-Module CompData(runtime:CompilerRuntime).
+Module QData(runtime:CompilerRuntime).
 
   Require String RData JSON JSONtoData.
   Require NNRCtoJavascript.
@@ -74,7 +74,7 @@ Module CompData(runtime:CompilerRuntime).
     := NNRCtoJavascript.jsonToJS s.
 
 
-End CompData.
+End QData.
 
 (* 
 *** Local Variables: ***

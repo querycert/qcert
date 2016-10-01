@@ -33,8 +33,8 @@ val get_harness : cld_config -> string
 val set_harness : cld_config -> string -> unit
 
 (* Important functions *)
-val add_harness : string -> Data.json -> CompDriver.cloudant -> CompDriver.cloudant
-val string_of_cloudant : CompDriver.cloudant -> string
+val add_harness : string -> QData.json -> QLang.cloudant -> QLang.cloudant
+val string_of_cloudant : QLang.cloudant -> string
 
 (* Cloudant stuff *)
 
@@ -42,12 +42,12 @@ val idioticize : string -> string -> string
 
 (* Convenience function *)
 
-val cloudant_compile_from_nra : string -> string -> CompDriver.nraenv -> Data.json -> string
-val cloudant_compile_from_nnrcmr : string -> string -> CompDriver.nnrcmr -> Data.json -> string
+val cloudant_compile_from_nra : string -> string -> QLang.nraenv -> QData.json -> string
+val cloudant_compile_from_nnrcmr : string -> string -> QLang.nnrcmr -> QData.json -> string
 
-val cloudant_compile_no_harness_from_nra : string -> CompDriver.nraenv -> string
-val cloudant_compile_no_harness_from_nnrcmr : string -> CompDriver.nnrcmr -> string
+val cloudant_compile_no_harness_from_nra : string -> QLang.nraenv -> string
+val cloudant_compile_no_harness_from_nnrcmr : string -> QLang.nnrcmr -> string
 
-val cloudant_translate_no_harness : CompDriver.nnrcmr -> CompDriver.cldmr
-val cloudant_code_gen_no_harness : string -> CompDriver.cldmr -> string
+val cloudant_translate_no_harness : QLang.nnrcmr -> QLang.cldmr
+val cloudant_code_gen_no_harness : string -> QLang.cldmr -> string
 

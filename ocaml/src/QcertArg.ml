@@ -30,6 +30,7 @@ let set_io gconf file_name = gconf.gconf_io <- Some (Util.string_of_file file_na
 let set_emit_all gconf () = gconf.gconf_emit_all <- true
 let set_emit_sexp gconf () = gconf.gconf_emit_sexp <- true
 let set_emit_sexp_all gconf () = gconf.gconf_emit_sexp_all <- true
+let set_source_sexp gconf () = gconf.gconf_source_sexp <- true
 let set_java_imports gconf s = gconf.gconf_java_imports <- s
 let set_vinit gconf x = gconf.gconf_mr_vinit <- x
 let add_vdirst gconf x =
@@ -38,4 +39,6 @@ let add_vdirst gconf x =
 let add_vlocal gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vlocal) :: gconf.gconf_vdbindings
-
+let set_stat gconf () = gconf.gconf_stat <- true
+let set_stat_all gconf () = gconf.gconf_stat_all <- true
+let set_stat_tree gconf () = gconf.gconf_stat_tree <- true

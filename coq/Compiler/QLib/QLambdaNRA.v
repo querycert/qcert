@@ -15,13 +15,14 @@
  *)
 
 Require Import CompilerRuntime.
-Module CompLambdaNRA(runtime:CompilerRuntime).
+
+Module QLambdaNRA(runtime:CompilerRuntime).
   Require String.
-  Require CompData CompOperators.
+  Require QData QOperators.
   Require LambdaAlg LambdaAlgSugar.
 
-  Module Data := CompData.CompData runtime.
-  Module Ops := CompOperators.CompOperators runtime.
+  Module Data := QData.QData runtime.
+  Module Ops := QOperators.QOperators runtime.
 
   Definition expr : Set
     := LambdaAlg.lalg.
@@ -38,8 +39,8 @@ Module CompLambdaNRA(runtime:CompilerRuntime).
     := LambdaAlg.LAVar.
   Definition laconst : Data.data -> expr
     := LambdaAlg.LAConst.
-(*  Definition ltable  : String.string -> expr
-    := LambdaAlg.LATable. *)
+  Definition ltable  : String.string -> expr
+    := LambdaAlg.LATable.
   Definition labinop : Ops.Binary.op -> expr -> expr -> expr
     := LambdaAlg.LABinop.
   Definition launop : Ops.Unary.op -> expr -> expr
@@ -61,7 +62,7 @@ Module CompLambdaNRA(runtime:CompilerRuntime).
   Definition latableify : expr -> expr
     := LambdaAlgSugar.la_tableify.
 
-End CompLambdaNRA.
+End QLambdaNRA.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***

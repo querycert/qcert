@@ -108,23 +108,23 @@ let suffix_sdata () = ".sio"
 
 let suffix_of_language lang =
   match lang with
-  | CompDriver.L_rule -> suffix_rule ()
-  | CompDriver.L_camp -> suffix_camp ()
-  | CompDriver.L_oql -> suffix_oql ()
-  | CompDriver.L_lambda_nra -> suffix_lambda_nra ()
-  | CompDriver.L_nra -> suffix_nra ()
-  | CompDriver.L_nraenv -> suffix_nraenv ()
-  | CompDriver.L_nnrc -> suffix_nnrc ()
-  | CompDriver.L_dnnrc_dataset -> suffix_dnnrc_dataset ()
-  | CompDriver.L_dnnrc_typed_dataset -> suffix_dnnrc_typed_dataset ()
-  | CompDriver.L_nnrcmr -> suffix_nnrcmr ()
-  | CompDriver.L_cldmr -> suffix_nnrcmr_cldmr ()
-  | CompDriver.L_javascript -> suffix_javascript ()
-  | CompDriver.L_java -> suffix_java ()
-  | CompDriver.L_spark -> suffix_spark ()
-  | CompDriver.L_spark2 -> suffix_spark2 ()
-  | CompDriver.L_cloudant -> suffix_cld_design ()
-  | CompDriver.L_error _ -> suffix_error ()
+  | Compiler.L_rule -> suffix_rule ()
+  | Compiler.L_camp -> suffix_camp ()
+  | Compiler.L_oql -> suffix_oql ()
+  | Compiler.L_lambda_nra -> suffix_lambda_nra ()
+  | Compiler.L_nra -> suffix_nra ()
+  | Compiler.L_nraenv -> suffix_nraenv ()
+  | Compiler.L_nnrc -> suffix_nnrc ()
+  | Compiler.L_dnnrc_dataset -> suffix_dnnrc_dataset ()
+  | Compiler.L_dnnrc_typed_dataset -> suffix_dnnrc_typed_dataset ()
+  | Compiler.L_nnrcmr -> suffix_nnrcmr ()
+  | Compiler.L_cldmr -> suffix_nnrcmr_cldmr ()
+  | Compiler.L_javascript -> suffix_javascript ()
+  | Compiler.L_java -> suffix_java ()
+  | Compiler.L_spark -> suffix_spark ()
+  | Compiler.L_spark2 -> suffix_spark2 ()
+  | Compiler.L_cloudant -> suffix_cld_design ()
+  | Compiler.L_error _ -> suffix_error ()
 
 (* let suffix_target conf = *)
 (*   suffix_of_language (language_of_name (conf.tlang)) *)
@@ -134,7 +134,7 @@ let suffix_of_language lang =
 type eval_config =
     { debug : bool ref;
       eval_only : bool ref;
-      mutable eval_io : Data.json option;
+      mutable eval_io : QData.json option;
       mutable eval_schema : string option;
       mutable format : serialization_format;
       mutable eval_inputs : string list;
@@ -170,11 +170,11 @@ let get_eval_inputs conf = conf.eval_inputs
 (* Data Section *)
 
 type data_config =
-    { mutable in_jsons : Data.json list;
+    { mutable in_jsons : QData.json list;
       mutable data_format : serialization_format;
       mutable data_args : string list;
       mutable data_dir : string option;
-      mutable data_schema : Data.json option }
+      mutable data_schema : QData.json option }
 
 let default_data_config () =
   { in_jsons = [];

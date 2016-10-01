@@ -18,7 +18,8 @@
 
 open Format
 module Hack = Compiler
-open Compiler.EnhancedCompiler.CompDriver
+open Compiler.EnhancedCompiler
+open QDriver
 
 (* Character sets *)
 
@@ -793,7 +794,7 @@ let pretty_nnrcmr_job_aux sym ff mr =
   | Hack.RedSingleton ->       fprintf ff "reduce(singleton);"
   end;
   fprintf ff "@\n";
-  begin match Hack.EnhancedCompiler.CompUtil.mr_reduce_empty [] mr with
+  begin match Hack.EnhancedCompiler.QUtil.mr_reduce_empty [] mr with
   | None -> ()
   | Some f -> fprintf ff "default(@[%a@]);" (pretty_default_fun sym) f
   end
@@ -969,22 +970,22 @@ let pretty_drtype_aux sym ff drt =
 
 let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
   let sym = if greek then greeksym else textsym in
-  let inf = Compiler.EnhancedCompiler.CompUtil.ta_inferred [] at in
-  let req = Compiler.EnhancedCompiler.CompUtil.ta_required [] at in
+  let inf = Compiler.EnhancedCompiler.QUtil.ta_inferred [] at in
+  let req = Compiler.EnhancedCompiler.QUtil.ta_required [] at in
   if Hack.equiv_dec (Hack.drtype_eqdec Hack.EnhancedRuntime.compiler_foreign_type []) inf req
   then
     fprintf ff "@[%a%a%a%a@]"
 	    pretty_sym sym.lpangle
 	    (pretty_drtype_aux sym) inf
 	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.CompUtil.ta_base [] at)
+            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
   else
     fprintf ff "@[%a%a -> %a%a%a@]"
 	    pretty_sym sym.lpangle
 	    (pretty_drtype_aux sym) inf
 	    (pretty_drtype_aux sym) req
 	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.CompUtil.ta_base [] at)
+            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
 
 (* Pretty Spark IR *)
 let rec pretty_column_aux p sym ff col =
@@ -1038,29 +1039,29 @@ let pretty_query pconf q =
   let greek = get_charset_bool pconf in
   let margin = pconf.margin in
   begin match q with
-  | Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Q_nra q -> pretty_nra greek margin q
-  | Q_nraenv q -> pretty_nraenv greek margin q
-  | Q_nnrc q -> pretty_nnrc greek margin q
-  | Q_nnrcmr q -> pretty_nnrcmr greek margin q
-  | Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Q_dnnrc_dataset q ->
+  | Compiler.Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_nra q -> pretty_nra greek margin q
+  | Compiler.Q_nraenv q -> pretty_nraenv greek margin q
+  | Compiler.Q_nnrc q -> pretty_nnrc greek margin q
+  | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin q
+  | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_dnnrc_dataset q ->
       let ann = pretty_annotate_ignore in
       let plug = pretty_plug_dataset greek in
       pretty_dnrc ann plug greek margin q
-  | Q_dnnrc_typed_dataset q ->
+  | Compiler.Q_dnnrc_typed_dataset q ->
       let ann =
         pretty_annotate_annotated_rtype greek pretty_annotate_ignore
       in
       let plug = pretty_plug_dataset greek in
       pretty_dnrc ann plug greek margin q
-  | Q_javascript q -> Util.string_of_char_list q
-  | Q_java q -> Util.string_of_char_list q
-  | Q_spark q -> Util.string_of_char_list q
-  | Q_spark2 q -> Util.string_of_char_list q
-  | Q_cloudant q -> CloudantUtil.string_of_cloudant q
-  | Q_error q -> "Error: "^(Util.string_of_char_list q)
+  | Compiler.Q_javascript q -> Util.string_of_char_list q
+  | Compiler.Q_java q -> Util.string_of_char_list q
+  | Compiler.Q_spark q -> Util.string_of_char_list q
+  | Compiler.Q_spark2 q -> Util.string_of_char_list q
+  | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant q
+  | Compiler.Q_error q -> "Error: "^(Util.string_of_char_list q)
   end

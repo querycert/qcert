@@ -27,49 +27,25 @@ open Compiler.EnhancedCompiler
 
 (* Parse/translate input *)
 
-let camp_of_rule_string s =
-  let (rn,ru) = parse_rule_from_string s in
-  match ru with
-  | CompDriver.Q_rule ru ->
-      (rn,CompDriver.rule_to_camp ru)
-  | CompDriver.Q_camp ru ->
-      (rn,ru)
-  | _ ->
-      raise (CACo_Error "Input language not supported")
-
-let nraenv_of_rule_string s =
-  let (rn,ru) = parse_rule_from_string s in
-  match ru with
-  | CompDriver.Q_rule ru ->
-      (rn,CompDriver.rule_to_nraenv ru)
-  | CompDriver.Q_camp ru ->
-      (rn,CompDriver.camp_to_nraenv ru)
-  | _ ->
-      raise (CACo_Error "Input language not supported")
-
 let nraenv_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | CompDriver.Q_rule ru ->
-      (rn,CompDriver.rule_to_nraenv ru)
-  | CompDriver.Q_camp ru ->
-      (rn,CompDriver.camp_to_nraenv ru)
+  | Compiler.Q_rule ru ->
+      (rn,QDriver.rule_to_nraenv ru)
+  | Compiler.Q_camp ru ->
+      (rn,QDriver.camp_to_nraenv ru)
   | _ ->
       raise (CACo_Error "Input language not supported")
 
-let nraenv_of_oql_string s =
-  let o = parse_oql_from_string s in
-  ("OQL",CompDriver.oql_to_nraenv o)
-  
 let nraenv_of_oql f =
   let o = parse_oql_from_file f in
-  ("OQL",CompDriver.oql_to_nraenv o)
+  ("OQL",QDriver.oql_to_nraenv o)
   
 let nraenv_of_input conf f =
   match language_of_name (get_source_lang_caco conf) with
-  | CompDriver.L_rule ->
+  | Compiler.L_rule ->
       nraenv_of_rule f
-  | CompDriver.L_oql ->
+  | Compiler.L_oql ->
       nraenv_of_oql f
   | _ ->
       raise (CACo_Error "Input language not supported")

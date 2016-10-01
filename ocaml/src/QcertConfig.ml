@@ -18,9 +18,9 @@ open Util
 open Compiler.EnhancedCompiler
 
 type global_config = {
-    mutable gconf_source : CompDriver.language;
-    mutable gconf_target : CompDriver.language;
-    mutable gconf_path : CompDriver.language list; (* the first element of the path must be source and the last target *)
+    mutable gconf_source : QLang.language;
+    mutable gconf_target : QLang.language;
+    mutable gconf_path : QLang.language list; (* the first element of the path must be source and the last target *)
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
@@ -31,9 +31,13 @@ type global_config = {
     gconf_pretty_config : PrettyIL.pretty_config;
     mutable gconf_emit_sexp : bool;
     mutable gconf_emit_sexp_all : bool;
+    mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_vdbindings : CompDriver.vdbindings;
+    mutable gconf_vdbindings : QLang.vdbindings;
+    mutable gconf_stat : bool;
+    mutable gconf_stat_all : bool;
+    mutable gconf_stat_tree : bool;
   }
 
 let complet_configuration gconf =
@@ -55,7 +59,7 @@ let complet_configuration gconf =
           (fun lang1 acc ->
             begin match acc with
             | lang2 :: post ->
-                (CompDriver.get_path_from_source_target lang1 lang2) @ post
+                (QDriver.get_path_from_source_target lang1 lang2) @ post
             | [] -> assert false
             end)
           (gconf.gconf_source :: gconf.gconf_path) [ gconf.gconf_target ]
@@ -68,8 +72,8 @@ let driver_conf_of_global_conf gconf qname cname =
   let brand_rel =
     TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model
   in
-  { CompDriver.comp_qname = char_list_of_string qname;
-    CompDriver.comp_class_name = char_list_of_string cname;
+  { Compiler.comp_qname = char_list_of_string qname;
+    Compiler.comp_class_name = char_list_of_string cname;
     comp_brand_rel = brand_rel;
     comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;

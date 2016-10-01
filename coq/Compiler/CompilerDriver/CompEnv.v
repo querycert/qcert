@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section CompEnv.
+Section QEnv.
 
   Require Import String List String EquivDec.
   
@@ -87,7 +87,7 @@ Section CompEnv.
   Definition validate_lifted_success res exp : bool :=
     validate_success (unwrap_result res) exp.
 
-End CompEnv.
+End QEnv.
 
 (* validate that the answer is correct.  Since the result is unordered,
       we check that the result answer is a permutation of the expected

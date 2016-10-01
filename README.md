@@ -143,7 +143,7 @@ line, you can do it as follows:
 ```
 java -cp bin testing.runners.RunJavascript \
      -input data/persons.json \
-	 -runtime ../runtime/javascript/qcert-runtime.js
+	 -runtime ../runtime/javascript/qcert-runtime.js \
 	 oql/test1.js
 ```
 

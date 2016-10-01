@@ -228,7 +228,7 @@ Definition T1env := (algenv_of_lalg_lambda (q_to_lambda T1l)).
 (* Eval vm_compute in T1env. *)
 Definition T1env_opt := toptim_nraenv T1env.
 (* Eval vm_compute in T1env_opt. *)
-Definition T1nnrc_opt := TrivialCompiler.CompDriver.nraenv_optim_to_nnrc_optim T1env_opt.
+Definition T1nnrc_opt := TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T1env_opt.
 (* Eval vm_compute in T1nnrc_opt. *)
 
 Definition T2env := (algenv_of_lalg_lambda (q_to_lambda T2l)).
@@ -238,7 +238,7 @@ Definition T2env_opt := toptim_nraenv T2env.
 (* Note: this optimizes perfectly the access to environment, but does not yield T2r --- I believe
    this is the right plan in most cases since you would more often want to
    push the select inside the map, rather than the other way around. *)
-Definition T2nnrc_opt := TrivialCompiler.CompDriver.nraenv_optim_to_nnrc_optim T2env_opt.
+Definition T2nnrc_opt := TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T2env_opt.
 (* Eval vm_compute in T2nnrc_opt. *)
 
 (* 

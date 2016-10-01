@@ -17,9 +17,9 @@
 open Compiler.EnhancedCompiler
 
 type global_config = {
-    mutable gconf_source : CompDriver.language;
-    mutable gconf_target : CompDriver.language;
-    mutable gconf_path : CompDriver.language list; (* the first element of the path must be source and the last target *)
+    mutable gconf_source : QLang.language;
+    mutable gconf_target : QLang.language;
+    mutable gconf_path : QLang.language list; (* the first element of the path must be source and the last target *)
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
@@ -30,11 +30,15 @@ type global_config = {
     gconf_pretty_config : PrettyIL.pretty_config;
     mutable gconf_emit_sexp : bool;
     mutable gconf_emit_sexp_all : bool;
+    mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_vdbindings : CompDriver.vdbindings;
+    mutable gconf_vdbindings : QLang.vdbindings;
+    mutable gconf_stat : bool;
+    mutable gconf_stat_all : bool;
+    mutable gconf_stat_tree : bool;
   }
 
 val complet_configuration : global_config -> global_config
 
-val driver_conf_of_global_conf : global_config -> string -> string -> CompDriver.driver_config
+val driver_conf_of_global_conf : global_config -> string -> string -> QDriver.driver_config
