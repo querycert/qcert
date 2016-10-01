@@ -111,10 +111,10 @@ let global_config_of_json j =
 
 
 let json_of_result res =
-  let wrap (file_name, s) =
+  let wrap x = (* XXX To review XXX *)
       object%js
-        val name = Js.string file_name
-        val value = Js.string s
+        val name = Js.string x.QcertCore.res_file
+        val value = Js.string x.QcertCore.res_content
       end
   in
   let wrap_all l =
@@ -127,7 +127,7 @@ let json_of_result res =
     val emitall = Js.def (wrap_all res.QcertCore.res_emit_all)
     val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
     val emitsexpall = Js.def (wrap_all res.QcertCore.res_emit_sexp_all)
-    val result = Js.string (snd res.QcertCore.res_emit)
+    val result = Js.string res.QcertCore.res_emit.QcertCore.res_content (* XXX To review XXX *)
   end
 
 let json_of_error msg =
