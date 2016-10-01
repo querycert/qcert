@@ -60,15 +60,15 @@ val string_of_binop : Compiler.binOp -> string
 
 (* Pretty NRA^e *)
 
-val pretty_nraenv : bool -> int -> QDriver.nraenv -> string
+val pretty_nraenv : bool -> int -> QLang.nraenv -> string
 
 (* Pretty NNRC *)
 
-val pretty_nnrc : bool -> int -> QDriver.nnrc -> string
+val pretty_nnrc : bool -> int -> QLang.nnrc -> string
 
 (* Pretty NNRCMR *)
 
-val pretty_nnrcmr : bool -> int -> QDriver.nnrcmr -> string
+val pretty_nnrcmr : bool -> int -> QLang.nnrcmr -> string
 
 (* Pretty DNRC *)
 
@@ -92,7 +92,7 @@ val pretty_annotate_annotated_rtype : bool ->
 
 (* Pretty printers for various plug types *)
 val pretty_plug_ignore : Format.formatter -> 'a -> unit
-val pretty_plug_nraenv : bool -> Format.formatter -> QDriver.nraenv -> unit
+val pretty_plug_nraenv : bool -> Format.formatter -> QLang.nraenv -> unit
 val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
 
 (* Pretty types *)
@@ -101,6 +101,6 @@ val pretty_rtype : bool -> int -> QType.camp_type -> string
 
 (* Pretty query *)
 
-val pretty_query : pretty_config -> QDriver.query -> string
+val pretty_query : pretty_config -> QLang.query -> string
 
 

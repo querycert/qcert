@@ -26,10 +26,10 @@ open ParseUtil
 val parse_io_from_string : string -> QData.json
 val parse_json_from_string : string -> QData.json
 
-val parse_rule_from_string : string -> string * QDriver.query
-val parse_camp_from_string : string -> QDriver.camp
+val parse_rule_from_string : string -> string * QLang.query
+val parse_camp_from_string : string -> QLang.camp
   
-val parse_oql_from_string : string -> QDriver.oql
+val parse_oql_from_string : string -> QLang.oql
 
 (****************)
 (* S-Expr Parse *)
@@ -37,15 +37,15 @@ val parse_oql_from_string : string -> QDriver.oql
 
 val parse_sexp_from_string : string -> SExp.sexp
 val parse_io_sexp_from_string : string -> QData.data
-val parse_camp_sexp_from_string : string -> QDriver.camp
-val parse_nraenv_sexp_from_string : string -> QDriver.nraenv
-val parse_nnrc_sexp_from_string : string -> QDriver.nnrc
-val parse_nnrcmr_sexp_from_string : string -> QDriver.nnrcmr
-val parse_cldmr_sexp_from_string : string -> QDriver.cldmr
+val parse_camp_sexp_from_string : string -> QLang.camp
+val parse_nraenv_sexp_from_string : string -> QLang.nraenv
+val parse_nnrc_sexp_from_string : string -> QLang.nnrc
+val parse_nnrcmr_sexp_from_string : string -> QLang.nnrcmr
+val parse_cldmr_sexp_from_string : string -> QLang.cldmr
 
 (*******************
  * Languages Parse *
  *******************)
 
-val parse_query_from_string : QDriver.language -> string -> string * QDriver.query
+val parse_query_from_string : QLang.language -> string -> string * QLang.query
 

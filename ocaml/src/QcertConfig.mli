@@ -17,9 +17,9 @@
 open Compiler.EnhancedCompiler
 
 type global_config = {
-    mutable gconf_source : QDriver.language;
-    mutable gconf_target : QDriver.language;
-    mutable gconf_path : QDriver.language list; (* the first element of the path must be source and the last target *)
+    mutable gconf_source : QLang.language;
+    mutable gconf_target : QLang.language;
+    mutable gconf_path : QLang.language list; (* the first element of the path must be source and the last target *)
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
@@ -33,7 +33,7 @@ type global_config = {
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_vdbindings : QDriver.vdbindings;
+    mutable gconf_vdbindings : QLang.vdbindings;
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;

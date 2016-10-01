@@ -120,7 +120,7 @@ let cloudant_code_gen_no_harness nrule cldmr =
 
 (* Important functions *)
 
-let add_harness harness h ((design_docs, (last_expr, last_inputs)): QDriver.cloudant) : QDriver.cloudant =
+let add_harness harness h ((design_docs, (last_expr, last_inputs)): QLang.cloudant) : QLang.cloudant =
   let harnessed_design_docs = List.map (add_harness_to_designdoc harness h) design_docs in
   (harnessed_design_docs, (last_expr, last_inputs))
 

@@ -27,5 +27,5 @@ val eval_oql : (string * string) list -> QData.data list -> string -> QData.data
 
 (* Core Eval *)
 
-val eval_nraenv : lang_config -> string option -> (string * string) list -> QData.data list -> QDriver.nraenv -> QData.data option
+val eval_nraenv : lang_config -> string option -> (string * string) list -> QData.data list -> QLang.nraenv -> QData.data option
 

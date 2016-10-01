@@ -30,9 +30,9 @@ open Compiler.EnhancedCompiler
 let nraenv_of_rule f =
   let (rn,ru) = parse_rule_from_file f in
   match ru with
-  | Compiler.Coq__24.Q_rule ru ->
+  | Compiler.Q_rule ru ->
       (rn,QDriver.rule_to_nraenv ru)
-  | Compiler.Coq__24.Q_camp ru ->
+  | Compiler.Q_camp ru ->
       (rn,QDriver.camp_to_nraenv ru)
   | _ ->
       raise (CACo_Error "Input language not supported")
@@ -43,9 +43,9 @@ let nraenv_of_oql f =
   
 let nraenv_of_input conf f =
   match language_of_name (get_source_lang_caco conf) with
-  | Compiler.Coq__23.L_rule ->
+  | Compiler.L_rule ->
       nraenv_of_rule f
-  | Compiler.Coq__23.L_oql ->
+  | Compiler.L_oql ->
       nraenv_of_oql f
   | _ ->
       raise (CACo_Error "Input language not supported")

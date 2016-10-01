@@ -52,12 +52,12 @@ let parse parser lexer buf =
 let parse_io f : QData.json = parse DataParser.main (DataLexer.token (string_buff ())) f
 let parse_json f : QData.json = parse DataParser.main (DataLexer.token (string_buff ())) f
 
-let parse_rule f : string * QDriver.query = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
-let parse_camp f : QDriver.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
+let parse_rule f : string * QLang.query = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
+let parse_camp f : QLang.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
   
-let parse_oql f : QDriver.oql = QOQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f)
+let parse_oql f : QLang.oql = QOQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f)
 
-let parse_lambda_nra f : QDriver.lambda_nra = QLambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
+let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
 
 (****************)
 (* S-Expr Parse *)
@@ -65,35 +65,35 @@ let parse_lambda_nra f : QDriver.lambda_nra = QLambdaNRA.latableify (parse Lambd
 
 let parse_sexp f : SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
 let parse_io_sexp f : QData.data = AstsToSExp.sexp_to_data (parse_sexp f)
-let parse_camp_sexp f : QDriver.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
-let parse_nraenv_sexp f : QDriver.nraenv = AstsToSExp.sexp_to_nraenv (parse_sexp f)
-let parse_nnrc_sexp f : QDriver.nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
-let parse_nnrcmr_sexp f : QDriver.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
-let parse_cldmr_sexp f : QDriver.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
+let parse_camp_sexp f : QLang.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
+let parse_nraenv_sexp f : QLang.nraenv = AstsToSExp.sexp_to_nraenv (parse_sexp f)
+let parse_nnrc_sexp f : QLang.nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
+let parse_nnrcmr_sexp f : QLang.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
+let parse_cldmr_sexp f : QLang.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
 (*******************
  * Languages Parse *
  *******************)
 
-let parse_query l f : (string * QDriver.query) =
+let parse_query l f : (string * QLang.query) =
   begin match l with
-  | Compiler.Coq__23.L_rule -> parse_rule f
-  | Compiler.Coq__23.L_camp -> ("CAMP", Compiler.Coq__24.Q_camp (parse_camp f))
-  | Compiler.Coq__23.L_oql -> ("OQL", Compiler.Coq__24.Q_oql (parse_oql f))
-  | Compiler.Coq__23.L_lambda_nra -> ("LambdaNRA", Compiler.Coq__24.Q_lambda_nra (parse_lambda_nra f))
-  | Compiler.Coq__23.L_nra -> raise (CACo_Error "No parser for NRA available")
-  | Compiler.Coq__23.L_nraenv -> ("NRAEnv", Compiler.Coq__24.Q_nraenv (parse_nraenv_sexp f))
-  | Compiler.Coq__23.L_nnrc -> ("NNRC", Compiler.Coq__24.Q_nnrc (parse_nnrc_sexp f))
-  | Compiler.Coq__23.L_nnrcmr -> ("NNRCMR", Compiler.Coq__24.Q_nnrcmr (parse_nnrcmr_sexp f))
-  | Compiler.Coq__23.L_cldmr -> ("CldMR", Compiler.Coq__24.Q_cldmr (parse_cldmr_sexp f))
-  | Compiler.Coq__23.L_dnnrc_dataset -> raise (CACo_Error "No parser for DNNRC available")
-  | Compiler.Coq__23.L_dnnrc_typed_dataset -> raise (CACo_Error "No parser for typed DNNRC available")
-  | Compiler.Coq__23.L_javascript -> raise (CACo_Error "No parser for Javascript available")
-  | Compiler.Coq__23.L_java -> raise (CACo_Error "No parser for Java available")
-  | Compiler.Coq__23.L_spark -> raise (CACo_Error "No parser for Spark available")
-  | Compiler.Coq__23.L_spark2 -> raise (CACo_Error "No parser for Spark 2.0 available")
-  | Compiler.Coq__23.L_cloudant -> raise (CACo_Error "No parser for Cloudant available")
-  | Compiler.Coq__23.L_error err ->
+  | Compiler.L_rule -> parse_rule f
+  | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
+  | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
+  | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
+  | Compiler.L_nra -> raise (CACo_Error "No parser for NRA available")
+  | Compiler.L_nraenv -> ("NRAEnv", Compiler.Q_nraenv (parse_nraenv_sexp f))
+  | Compiler.L_nnrc -> ("NNRC", Compiler.Q_nnrc (parse_nnrc_sexp f))
+  | Compiler.L_nnrcmr -> ("NNRCMR", Compiler.Q_nnrcmr (parse_nnrcmr_sexp f))
+  | Compiler.L_cldmr -> ("CldMR", Compiler.Q_cldmr (parse_cldmr_sexp f))
+  | Compiler.L_dnnrc_dataset -> raise (CACo_Error "No parser for DNNRC available")
+  | Compiler.L_dnnrc_typed_dataset -> raise (CACo_Error "No parser for typed DNNRC available")
+  | Compiler.L_javascript -> raise (CACo_Error "No parser for Javascript available")
+  | Compiler.L_java -> raise (CACo_Error "No parser for Java available")
+  | Compiler.L_spark -> raise (CACo_Error "No parser for Spark available")
+  | Compiler.L_spark2 -> raise (CACo_Error "No parser for Spark 2.0 available")
+  | Compiler.L_cloudant -> raise (CACo_Error "No parser for Cloudant available")
+  | Compiler.L_error err ->
       let err = string_of_char_list err in
       raise (CACo_Error ("No parser for Error language available: "^err))
   end

@@ -218,14 +218,16 @@ MODULES = \
 	Compiler/CompilerModel/DateTimeModelPart \
 	Compiler/CompilerModel/EnhancedModel \
 	Compiler/CompilerModel/TrivialModel \
-	Compiler/CompilerDriver/CompDriver \
+	Compiler/CompilerDriver/CompLang \
 	Compiler/CompilerDriver/CompEnv \
+	Compiler/CompilerDriver/CompDriver \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QPattern \
 	Compiler/QLib/QRule \
 	Compiler/QLib/QOQL \
 	Compiler/QLib/QLambdaNRA \
+	Compiler/QLib/QLang \
 	Compiler/QLib/QDriver \
 	Compiler/QLib/QUtil \
 	Compiler/QLib/QEval \

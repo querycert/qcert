@@ -68,7 +68,7 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
 
 (* Compilation *)
 
-let compile_query (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) (path: QDriver.language list) (q: QDriver.query) : QDriver.query list =
+let compile_query (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) (path: QLang.language list) (q: QLang.query) : QLang.query list =
   let brand_model = schema.TypeUtil.sch_brand_model in
   let foreign_typing = schema.TypeUtil.sch_foreign_typing in
   let dv = QDriver.driver_of_path brand_model dv_conf path in

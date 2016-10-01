@@ -91,17 +91,17 @@
 %nonassoc UWITHVAR
 %nonassoc PASSERT
 
-%start <(string * Compiler.Coq__24.query)> rulemain
-%start <Compiler.EnhancedCompiler.QPattern.pat> patmain
-%type <Compiler.EnhancedCompiler.QRule.rule -> Compiler.EnhancedCompiler.QRule.rule> rule_rule
+%start <(string * Compiler.EnhancedCompiler.QLang.query)> rulemain
+%start <Compiler.EnhancedCompiler.QLang.camp> patmain
+%type <Compiler.EnhancedCompiler.QLang.rule -> Compiler.EnhancedCompiler.QLang.rule> rule_rule
 
 %%
 
 rulemain:
 | EXAMPLE i=IDENT COLONEQUAL r = rule DOT EOF
-    { (i, Compiler.Coq__24.Q_rule r) }
+    { (i, Compiler.Q_rule r) }
 | EXAMPLE i=IDENT COLONEQUAL p = pat DOT EOF
-    { (i, Compiler.Coq__24.Q_camp p) }
+    { (i, Compiler.Q_camp p) }
 
 patmain:
 | p = pat EOF

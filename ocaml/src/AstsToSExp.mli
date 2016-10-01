@@ -27,20 +27,20 @@ open SExp
 val sexp_to_data : sexp -> QData.data
 val data_to_sexp : QData.data -> sexp
 
-val sexp_to_camp : sexp -> QDriver.camp
-val camp_to_sexp : QDriver.camp -> sexp
+val sexp_to_camp : sexp -> QLang.camp
+val camp_to_sexp : QLang.camp -> sexp
 
-val sexp_to_nraenv : sexp -> QDriver.nraenv
-val nraenv_to_sexp : QDriver.nraenv -> sexp
+val sexp_to_nraenv : sexp -> QLang.nraenv
+val nraenv_to_sexp : QLang.nraenv -> sexp
 
-val sexp_to_nnrc : sexp -> QDriver.nnrc
-val nnrc_to_sexp : QDriver.nnrc -> sexp
+val sexp_to_nnrc : sexp -> QLang.nnrc
+val nnrc_to_sexp : QLang.nnrc -> sexp
 
-val sexp_to_nnrcmr : sexp -> QDriver.nnrcmr
-val nnrcmr_to_sexp : QDriver.nnrcmr -> sexp
+val sexp_to_nnrcmr : sexp -> QLang.nnrcmr
+val nnrcmr_to_sexp : QLang.nnrcmr -> sexp
 
-val sexp_to_cldmr : sexp -> QDriver.cldmr
-val cldmr_to_sexp : QDriver.cldmr -> sexp
+val sexp_to_cldmr : sexp -> QLang.cldmr
+val cldmr_to_sexp : QLang.cldmr -> sexp
 
-val sexp_to_query : QDriver.language -> sexp -> QDriver.query
-val query_to_sexp : QDriver.query -> sexp
+val sexp_to_query : QLang.language -> sexp -> QLang.query
+val query_to_sexp : QLang.query -> sexp

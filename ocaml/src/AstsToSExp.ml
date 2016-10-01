@@ -246,7 +246,7 @@ let sexp_to_unop (se:sexp) : unaryOp =
 
 (* CAMP Section *)
 
-let rec camp_to_sexp (p : QDriver.camp) : sexp =
+let rec camp_to_sexp (p : QLang.camp) : sexp =
   match p with
   | Pconst d -> STerm ("Pconst", [data_to_sexp d])
   | Punop (u, p1) -> STerm ("Punop", (unop_to_sexp u) :: [camp_to_sexp p1])
@@ -262,7 +262,7 @@ let rec camp_to_sexp (p : QDriver.camp) : sexp =
   | Pleft -> STerm ("Pleft", [])
   | Pright -> STerm ("Pright", [])
 
-let rec sexp_to_camp (se : sexp) : QDriver.camp =
+let rec sexp_to_camp (se : sexp) : QLang.camp =
   match se with
   | STerm ("Pconst", [d]) -> Pconst (sexp_to_data d)
   | STerm ("Punop", use :: [se1]) ->
@@ -288,7 +288,7 @@ let rec sexp_to_camp (se : sexp) : QDriver.camp =
 
 (* NRA Section *)
 
-let rec nraenv_to_sexp (op : QDriver.nraenv) : sexp =
+let rec nraenv_to_sexp (op : QLang.nraenv) : sexp =
   match op with
   | ANID -> STerm ("ANID",[])
   | ANConst d -> STerm ("ANConst", [data_to_sexp d])
@@ -307,7 +307,7 @@ let rec nraenv_to_sexp (op : QDriver.nraenv) : sexp =
   | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
 
-let rec sexp_to_nraenv (se : sexp) : QDriver.nraenv =
+let rec sexp_to_nraenv (se : sexp) : QLang.nraenv =
   match se with
   | STerm ("ANID",[]) -> ANID
   | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
@@ -336,7 +336,7 @@ let rec sexp_to_nraenv (se : sexp) : QDriver.nraenv =
 
 (* NNRC Section *)
 
-let rec nnrc_to_sexp (n : QDriver.nnrc) : sexp =
+let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
   match n with
   | NRCVar v -> STerm ("NRCVar", [SString (string_of_char_list v)])
   | NRCConst d -> STerm ("NRCConst", [data_to_sexp d])
@@ -350,7 +350,7 @@ let rec nnrc_to_sexp (n : QDriver.nnrc) : sexp =
 					 :: (SString (string_of_char_list v2))
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
 
-let rec sexp_to_nnrc (se:sexp) : QDriver.nnrc =
+let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   match se with
   | STerm ("NRCVar", [SString v]) -> NRCVar (char_list_of_string v)
   | STerm ("NRCConst", [d]) -> NRCConst (sexp_to_data d)
@@ -575,14 +575,14 @@ let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
   | _ ->
       raise (CACo_Error "Not well-formed S-expr inside mr_last")
 
-let nnrcmr_to_sexp (n:QDriver.nnrcmr) : sexp =
+let nnrcmr_to_sexp (n:QLang.nnrcmr) : sexp =
   STerm ("nrcmr",
 	 (STerm ("mr_env", var_locs_to_sexp n.mr_inputs_loc))
 	 :: (STerm ("mr_chain", mr_chain_to_sexp (n.mr_chain)))
 	 :: (mr_last_to_sexp n.mr_last)
 	 :: [])
 
-let sexp_to_nnrcmr (se:sexp) : QDriver.nnrcmr =
+let sexp_to_nnrcmr (se:sexp) : QLang.nnrcmr =
   match se with
   | STerm ("nrcmr",
 	   (STerm ("mr_env", env))
@@ -744,13 +744,13 @@ let sexp_to_cld_mr_last (sel:sexp list) : (var list * nrc) * var list =
       raise (CACo_Error "Not well-formed S-expr inside cld_mr_last")
 
 
-let cldmr_to_sexp (c:QDriver.cldmr) : sexp =
+let cldmr_to_sexp (c:QLang.cldmr) : sexp =
   STerm ("cld_mrl",
 	  (STerm ("cld_mr_chain", cld_mr_chain_to_sexp c.cld_mr_chain))
 	  :: (STerm ("cld_mr_last", cld_mr_last_to_sexp c.cld_mr_last))
 	  :: [])
 
-let sexp_to_cldmr (se:sexp) : QDriver.cldmr =
+let sexp_to_cldmr (se:sexp) : QLang.cldmr =
   match se with
   | STerm ("cld_mrl",
 	   (STerm ("cld_mr_chain", chain))
@@ -764,64 +764,64 @@ sexp_to_cld_mr_chain chain;
       raise (CACo_Error "Not well-formed S-expr inside cldmr")
 
 (* Query translations *)
-let sexp_to_query (lang: QDriver.language) (se: sexp) : QDriver.query =
+let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with
-  | Compiler.Coq__23.L_rule ->
+  | Compiler.L_rule ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_camp -> Compiler.Coq__24.Q_camp (sexp_to_camp se)
-  | Compiler.Coq__23.L_oql ->
+  | Compiler.L_camp -> Compiler.Q_camp (sexp_to_camp se)
+  | Compiler.L_oql ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_lambda_nra ->
+  | Compiler.L_lambda_nra ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_nra ->
+  | Compiler.L_nra ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_nraenv -> Compiler.Coq__24.Q_nraenv (sexp_to_nraenv se)
-  | Compiler.Coq__23.L_nnrc -> Compiler.Coq__24.Q_nnrc (sexp_to_nnrc se)
-  | Compiler.Coq__23.L_nnrcmr -> Compiler.Coq__24.Q_nnrcmr (sexp_to_nnrcmr se)
-  | Compiler.Coq__23.L_cldmr -> Compiler.Coq__24.Q_cldmr (sexp_to_cldmr se)
-  | Compiler.Coq__23.L_dnnrc_dataset ->
+  | Compiler.L_nraenv -> Compiler.Q_nraenv (sexp_to_nraenv se)
+  | Compiler.L_nnrc -> Compiler.Q_nnrc (sexp_to_nnrc se)
+  | Compiler.L_nnrcmr -> Compiler.Q_nnrcmr (sexp_to_nnrcmr se)
+  | Compiler.L_cldmr -> Compiler.Q_cldmr (sexp_to_cldmr se)
+  | Compiler.L_dnnrc_dataset ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_dnnrc_typed_dataset ->
+  | Compiler.L_dnnrc_typed_dataset ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_javascript
-  | Compiler.Coq__23.L_java
-  | Compiler.Coq__23.L_spark
-  | Compiler.Coq__23.L_spark2
-  | Compiler.Coq__23.L_cloudant ->
+  | Compiler.L_javascript
+  | Compiler.L_java
+  | Compiler.L_spark
+  | Compiler.L_spark2
+  | Compiler.L_cloudant ->
       raise (CACo_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.Coq__23.L_error err ->
+  | Compiler.L_error err ->
       raise (CACo_Error ("sexp_to_query: "^(Util.string_of_char_list err)))
   end
 
-let query_to_sexp (q: QDriver.query) : sexp =
+let query_to_sexp (q: QLang.query) : sexp =
   begin match q with
-  | Compiler.Coq__24.Q_rule _ ->
+  | Compiler.Q_rule _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_camp q -> camp_to_sexp q
-  | Compiler.Coq__24.Q_oql _ ->
+  | Compiler.Q_camp q -> camp_to_sexp q
+  | Compiler.Q_oql _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_lambda_nra _ ->
+  | Compiler.Q_lambda_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_nra _ ->
+  | Compiler.Q_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_nraenv q -> nraenv_to_sexp q
-  | Compiler.Coq__24.Q_nnrc q -> nnrc_to_sexp q
-  | Compiler.Coq__24.Q_nnrcmr q -> nnrcmr_to_sexp q
-  | Compiler.Coq__24.Q_cldmr q -> cldmr_to_sexp q
-  | Compiler.Coq__24.Q_dnnrc_dataset _ ->
+  | Compiler.Q_nraenv q -> nraenv_to_sexp q
+  | Compiler.Q_nnrc q -> nnrc_to_sexp q
+  | Compiler.Q_nnrcmr q -> nnrcmr_to_sexp q
+  | Compiler.Q_cldmr q -> cldmr_to_sexp q
+  | Compiler.Q_dnnrc_dataset _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_dnnrc_typed_dataset _ ->
+  | Compiler.Q_dnnrc_typed_dataset _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_javascript _ ->
+  | Compiler.Q_javascript _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_java _ ->
+  | Compiler.Q_java _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_spark _ ->
+  | Compiler.Q_spark _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_spark2 _ ->
+  | Compiler.Q_spark2 _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_cloudant _ ->
+  | Compiler.Q_cloudant _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Coq__24.Q_error err ->
+  | Compiler.Q_error err ->
       SString ("query_to_sexp: "^(Util.string_of_char_list err))
   end

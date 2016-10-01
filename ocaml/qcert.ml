@@ -75,21 +75,21 @@ let args_list gconf =
 let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
-  [ Compiler.Coq__23.L_rule;
-    Compiler.Coq__23.L_camp;
-    Compiler.Coq__23.L_oql;
-    Compiler.Coq__23.L_nra;
-    Compiler.Coq__23.L_nraenv;
-    Compiler.Coq__23.L_nnrc;
-    Compiler.Coq__23.L_nnrcmr;
-    Compiler.Coq__23.L_cldmr;
-    Compiler.Coq__23.L_dnnrc_dataset;
-    Compiler.Coq__23.L_dnnrc_typed_dataset;
-    Compiler.Coq__23.L_javascript;
-    Compiler.Coq__23.L_java;
-    Compiler.Coq__23.L_spark;
-    Compiler.Coq__23.L_spark2;
-    Compiler.Coq__23.L_cloudant; ]
+  [ Compiler.L_rule;
+    Compiler.L_camp;
+    Compiler.L_oql;
+    Compiler.L_nra;
+    Compiler.L_nraenv;
+    Compiler.L_nnrc;
+    Compiler.L_nnrcmr;
+    Compiler.L_cldmr;
+    Compiler.L_dnnrc_dataset;
+    Compiler.L_dnnrc_typed_dataset;
+    Compiler.L_javascript;
+    Compiler.L_java;
+    Compiler.L_spark;
+    Compiler.L_spark2;
+    Compiler.L_cloudant; ]
 
 
 let languages_string =
@@ -106,8 +106,8 @@ let usage =
 let parse_args () =
   let input_files = ref [] in
   let gconf =
-    { gconf_source = Compiler.Coq__23.L_rule;
-      gconf_target = Compiler.Coq__23.L_javascript;
+    { gconf_source = Compiler.L_rule;
+      gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;

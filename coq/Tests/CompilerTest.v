@@ -24,14 +24,14 @@ Import ListNotations.
 Require Import BasicSystem CAMPRuntime.
 Require Import TrivialModel.
 
-Require QLib QDriver CompilerRuntime.
+Require CompilerRuntime.
 
 Definition CPRModel := ("MainEntity", "Entity") :: nil.
 Instance CPRModel_relation : brand_relation
   := mkBrand_relation CPRModel (eq_refl _) (eq_refl _).
 
 Module TR := TrivialRuntime.
-Require Import CompDriver.
+Require Import CompLang CompDriver.
 
 (* This module encodes the examples in sample-rules.txt *)
 Section CompilerUntypedTest.

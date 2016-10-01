@@ -19,7 +19,8 @@ Module QLib(runtime:CompilerRuntime).
 
   Require QData QOperators.
   Require QOQL QLambdaNRA QPattern QRule.
-  Require QDriver QUtil QType QEval.
+  Require QUtil QType QEval.
+  Require QLang QDriver. 
 
   Module QType := QType.QType runtime.
   Module QData := QData.QData runtime.
@@ -30,6 +31,7 @@ Module QLib(runtime:CompilerRuntime).
   Module QPattern := QPattern.QPattern runtime.
   Module QRule := QRule.QRule runtime.
 
+  Module QLang := QLang.QLang runtime.
   Module QDriver := QDriver.QDriver runtime.
   Module QUtil := QUtil.QUtil runtime.
 

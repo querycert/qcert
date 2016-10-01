@@ -48,10 +48,10 @@ let parse_file p_fun f =
 let parse_io_from_file f : QData.json = parse_file parse_io f
 let parse_json_from_file f : QData.json = parse_file parse_json f
 
-let parse_rule_from_file f : string * QDriver.query = parse_file parse_rule f
-let parse_camp_from_file f : QDriver.camp = parse_file parse_camp f
+let parse_rule_from_file f : string * QLang.query = parse_file parse_rule f
+let parse_camp_from_file f : QLang.camp = parse_file parse_camp f
   
-let parse_oql_from_file f : QDriver.oql = parse_file parse_oql f
+let parse_oql_from_file f : QLang.oql = parse_file parse_oql f
 
 
 (****************)
@@ -60,16 +60,16 @@ let parse_oql_from_file f : QDriver.oql = parse_file parse_oql f
 
 let parse_sexp_from_file s : SExp.sexp = parse_file parse_sexp s
 let parse_io_sexp_from_file s : QData.data = parse_file parse_io_sexp s
-let parse_camp_sexp_from_file s : QDriver.camp = parse_file parse_camp_sexp s
-let parse_nraenv_sexp_from_file s : QDriver.nraenv = parse_file parse_nraenv_sexp s
-let parse_nnrc_sexp_from_file s : QDriver.nnrc = parse_file parse_nnrc_sexp s
-let parse_nnrcmr_sexp_from_file s : QDriver.nnrcmr = parse_file parse_nnrcmr_sexp s
-let parse_cldmr_sexp_from_file s : QDriver.cldmr = parse_file parse_cldmr_sexp s
+let parse_camp_sexp_from_file s : QLang.camp = parse_file parse_camp_sexp s
+let parse_nraenv_sexp_from_file s : QLang.nraenv = parse_file parse_nraenv_sexp s
+let parse_nnrc_sexp_from_file s : QLang.nnrc = parse_file parse_nnrc_sexp s
+let parse_nnrcmr_sexp_from_file s : QLang.nnrcmr = parse_file parse_nnrcmr_sexp s
+let parse_cldmr_sexp_from_file s : QLang.cldmr = parse_file parse_cldmr_sexp s
 
 (*******************
  * Languages Parse *
  *******************)
 
-let parse_query_from_file l s : string * QDriver.query =
+let parse_query_from_file l s : string * QLang.query =
   parse_file (parse_query l) s
 

@@ -21,12 +21,12 @@ open Compiler.EnhancedCompiler
 
 (* Parse/translate input *)
 
-(* val camp_of_rule_string : string -> (string * QDriver.camp) *)
+(* val camp_of_rule_string : string -> (string * QLang.camp) *)
 
-(* val nraenv_of_rule : string -> (string * QDriver.nraenv) *)
-(* val nraenv_of_rule_string : string -> (string * QDriver.nraenv) *)
-(* val nraenv_of_oql : string -> (string * QDriver.nraenv) *)
-(* val nraenv_of_oql_string : string -> (string * QDriver.nraenv) *)
+(* val nraenv_of_rule : string -> (string * QLang.nraenv) *)
+(* val nraenv_of_rule_string : string -> (string * QLang.nraenv) *)
+(* val nraenv_of_oql : string -> (string * QLang.nraenv) *)
+(* val nraenv_of_oql_string : string -> (string * QLang.nraenv) *)
 
-val nraenv_of_input : lang_config -> string -> (string * QDriver.nraenv)
+val nraenv_of_input : lang_config -> string -> (string * QLang.nraenv)
 

@@ -57,7 +57,7 @@ val suffix_nnrcmr_cldmr : unit -> string
 val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string
 
-val suffix_of_language : QDriver.language -> string
+val suffix_of_language : QLang.language -> string
 (* val suffix_target : lang_config -> string *)
 
 val suffix_sdata : unit -> string

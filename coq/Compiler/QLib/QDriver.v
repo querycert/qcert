@@ -26,7 +26,7 @@ Require Import CAMPRuntime.
 Require Import ODMGRuntime.
 Require Import TOptimEnvFunc.
 
-Require Import CompDriver.
+Require Import CompLang CompDriver.
 
 Require Import CompilerRuntime.
 Module QDriver(runtime:CompilerRuntime).
@@ -37,34 +37,9 @@ Module QDriver(runtime:CompilerRuntime).
 
   Local Open Scope list_scope.
 
-  Definition vdbindings := vdbindings.
-
-  (* Languages *)
-
   Section QD.
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
-
-    Definition rule := rule.
-    Definition camp := camp.
-    Definition oql := oql.
-    Definition lambda_nra := lambda_nra.
-    Definition nra := nra.
-    Definition nraenv := nraenv.
-    Definition nnrc := nnrc.
-    Definition nnrcmr := nnrcmr.
-    Definition cldmr := cldmr.
-    Definition dnnrc_dataset := dnnrc_dataset.
-    Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc_typed_dataset.
-    Definition javascript := javascript.
-    Definition java := java.
-    Definition spark := spark.
-    Definition spark2 := spark2.
-    Definition cloudant := cloudant.
-
-    Definition language : Set := language.
-
-    Definition query : Set := query.
 
     Definition driver : Set := driver.
     Definition compile : driver -> query -> list query := compile.
