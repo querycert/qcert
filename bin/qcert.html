@@ -31,11 +31,34 @@
       }
     </script>
     <script>
+      function addOption(sel, lang) {
+        var opt = document.createElement("option");
+        opt.setAttribute("value", lang);
+        var t = document.createTextNode(lang);
+        opt.appendChild(t);
+        sel.appendChild(opt);
+      }
       function addPath() {
-        var x = document.createElement("LI");
-        var t = document.createTextNode("bar");
-        x.appendChild(t);
-        document.getElementById("path").appendChild(x);
+        var li = document.createElement("LI");
+        var sel = document.createElement("SELECT");
+        li.appendChild(sel);
+        addOption(sel, "rule");
+        addOption(sel, "camp");
+        addOption(sel, "oql");
+        addOption(sel, "lambda_nra");
+        addOption(sel, "nra");
+        addOption(sel, "nraenv");
+        addOption(sel, "nnrc");
+        addOption(sel, "nnrcmr");
+        addOption(sel, "cldmr");
+        addOption(sel, "dnnrc");
+        addOption(sel, "dnnrc_typed");
+        addOption(sel, "js");
+        addOption(sel, "java");
+        addOption(sel, "spark");
+        addOption(sel, "spark2");
+        addOption(sel, "cloudant");
+        document.getElementById("path").appendChild(li);
         return false;
       }
     </script>
