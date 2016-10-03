@@ -94,6 +94,31 @@ function compare(v1, v2) {
 function equal(v1, v2) {
     return compare(v1, v2) == 0;
 }
+function compareOfSingleCriteria(sc) {
+    if ("asc" in sc) {
+	return function(a,b) { return compare(a[sc.asc], b[sc.asc]); }
+    } else if ("desc" in sc) { 
+	return function(a,b) { return -(compare(a[sc.desc], b[sc.desc])); }
+    } else {
+	return function (a,b) { return compare(a,b); }
+    } /* Default to just comparing values */
+}
+function sort(v,scl) {
+    var result = [ ];
+    if (scl.length == 0) { return v; } // Check for no sorting criteria
+    var compareFun = function(a,b) {
+	(compareOfSingleCriteria(scl[0]))(a,b);
+    };
+    for (var i=0; i<b.length; i++) {
+        var v = b[i];
+        var dup = false;
+        for (var j=0; j<result.length;j++) {
+          if (equal(v,result[j])) { dup = true; break; }
+        }
+        if (!(dup)) { result.push(v); } else { dup = false; }
+    }
+    return result;
+}
 function flatten(aOuter) {
   var result = [ ];
   for (var iOuter=0, nOuter=aOuter.length; iOuter<nOuter; iOuter++) {

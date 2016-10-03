@@ -228,6 +228,7 @@ Section DNNRCtoScala.
       | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
       end
     | ADistinct => postfix "distinct"
+    | AOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
 
     (* TODO *)
     | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"

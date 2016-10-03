@@ -153,7 +153,7 @@ Section NNRCtoJavascript.
     (* Java equivalent: JavaScriptBackend.brandsToJS *)
     Definition brandsToJs (quotel:string) (b:brands)
       := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
-    
+
     (* Java equivalent: JavaScriptBackend.dataToJS *)
     Require Import JSON.
     Fixpoint jsonToJS (quotel:string) (j : json) : string
@@ -182,29 +182,42 @@ Section NNRCtoJavascript.
     Definition hierarchyToJS (quotel:string) (h:list (string*string)) :=
       dataToJS quotel (dcoll (map (fun x => drec (("sub",dstring (fst x)) :: ("sup", (dstring (snd x))) :: nil)) h)).
     
-    End DataJS.
+  End DataJS.
 
-    Section NRCJS.
+  Section NRCJS.
 
-      (* Java equivalent: JavaScriptBackend.uarithToJS *)
-      Definition uarithToJs (u:ArithUOp) (e:string) :=
-        match u with
-          | ArithAbs => "Math.abs (" ++ e ++ ")"
-          | ArithLog2 => "Math.log2(" ++ e ++ ")"
-          | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
-        end.
+    (* Sort criteria *)
+    Definition singleSortCriteriaToJson (sc: string * SortDesc) : json :=
+      match snd sc with
+      | Ascending => jobject (("asc", jstring (fst sc))::nil)
+      | Descending => jobject (("desc", jstring (fst sc))::nil)
+      end.
 
-      (* Java equivalent: JavaScriptBackend.barithToJs *)
-      Definition barithToJs (b:ArithBOp) (e1 e2:string) :=
-        match b with
-          | ArithPlus => e1 ++ "+" ++ e2
-          | ArithMinus => e1 ++ "-" ++ e2
-          | ArithMult => e1 ++ "*" ++ e2
-          | ArithDivide => e1 ++ "/" ++ e2
-          | ArithRem => e1 ++ "%" ++ e2
-          | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
-          | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
-        end.
+    Definition sortCriteriaToJson (scl:SortCriteria) : json
+      := jarray (map singleSortCriteriaToJson scl).
+
+    Definition sortCriteriaToJs (quotel:string) (scl:SortCriteria) : string
+      := jsonToJS quotel (sortCriteriaToJson scl).
+    
+    (* Java equivalent: JavaScriptBackend.uarithToJS *)
+    Definition uarithToJs (u:ArithUOp) (e:string) :=
+      match u with
+      | ArithAbs => "Math.abs (" ++ e ++ ")"
+      | ArithLog2 => "Math.log2(" ++ e ++ ")"
+      | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
+      end.
+
+    (* Java equivalent: JavaScriptBackend.barithToJs *)
+    Definition barithToJs (b:ArithBOp) (e1 e2:string) :=
+      match b with
+      | ArithPlus => e1 ++ "+" ++ e2
+      | ArithMinus => e1 ++ "-" ++ e2
+      | ArithMult => e1 ++ "*" ++ e2
+      | ArithDivide => e1 ++ "/" ++ e2
+      | ArithRem => e1 ++ "%" ++ e2
+      | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
+      end.
 
     (* Java equivalent: JavaScript.Backend.nrcToJS *)
     Fixpoint nrcToJS
@@ -238,6 +251,7 @@ Section NNRCtoJavascript.
                      | ARecRemove s => "remove(" ++ e1 ++ ", " ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ")"
                      | ARecProject sl => "project(" ++ e1 ++ ", " ++ (brandsToJs quotel sl) ++ ")"
                      | ADistinct => "distinct(" ++ e1 ++ ")"
+                     | AOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
                      | ASum => "sum(" ++ e1 ++ ")"
                      | AArithMean => "arithMean(" ++ e1 ++ ")"
                      | AToString => "toString(" ++ e1 ++ ")"

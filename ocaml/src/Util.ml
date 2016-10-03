@@ -105,20 +105,6 @@ let target_f dir f =
 let outname f suff = f ^ suff
 
 
-(**********)
-(* Lookup *)
-(**********)
-
-let get_data x io =
-  try List.assoc x io
-  with Not_found ->
-    Printf.fprintf stderr "Unbound variable %s\n" x;
-    raise (CACo_Error ("Unbound variable" ^ x))
-
-let get_data_raise x io =
-  List.assoc x io
-
-
 (**********************************)
 (* Support for Enhanced operators *)
 (**********************************)

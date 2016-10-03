@@ -260,6 +260,7 @@ Section NNRCtoJava.
                      | ARecRemove s => mk_java_unary_op1 "remove"  (mk_java_string s) e1
                      | ARecProject sl => mk_java_unary_op1 "project" (mk_java_string_collection sl) e1
                      | ADistinct => mk_java_unary_op0 "distinct" e1
+                     | AOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
                      | ASum =>  mk_java_unary_op0 "sum" e1
                      | AArithMean => mk_java_unary_op0 "list_mean" e1
                      | AToString =>  mk_java_unary_op0 "tostring" e1

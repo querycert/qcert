@@ -35,13 +35,20 @@ Section RUnaryOps.
      | ArithSqrt (* square root *)
   .
 
+  Inductive SortDesc
+    := Descending | Ascending.
+
+  Definition SortCriteria :=
+    list (string * SortDesc).
+
   Inductive unaryOp : Set :=
   | AIdOp : unaryOp                       (* Identity *)
   | ANeg: unaryOp                         (* boolean negation *)
   | AColl : unaryOp                       (* singleton bag *)
   | ASingleton : unaryOp                  (* un-coll a singleton collectin *)
-  | AFlatten : unaryOp                    (* bag flatten *)
-  | ADistinct: unaryOp                    (* bag distinct *)
+  | AFlatten : unaryOp                    (* flatten *)
+  | ADistinct: unaryOp                    (* distinct *)
+  | AOrderBy : SortCriteria -> unaryOp    (* sort returns a sorted collection but no guarantee on how long order is maintained!! *)
   | ARec : string -> unaryOp              (* record construction.  Constructs a record with a single field (the string argument) *)
   | ADot : string -> unaryOp              (* record field access.  Given a record, returns the value associated with the provided field *)
   | ARecRemove : string -> unaryOp        (* record field removal.  Transforms a record by removing the named field *)
@@ -67,10 +74,19 @@ Section RUnaryOps.
     decide equality.
   Defined.
 
+  Global Instance SortCriteria_eqdec : EqDec SortCriteria eq.
+  Proof.
+    change (forall x y : SortCriteria,  {x = y} + {x <> y}).
+    decide equality; try apply string_dec.
+    decide equality; try apply string_dec.
+    decide equality; try apply string_dec.
+  Defined.
+
   Global Instance unaryOp_eqdec : EqDec unaryOp eq.
   Proof.
     change (forall x y : unaryOp,  {x = y} + {x <> y}).
     decide equality; try apply string_dec.
+    - apply SortCriteria_eqdec.
     - induction l; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
@@ -90,6 +106,16 @@ Section RUnaryOps.
             end
        }.
 
+  Definition ToString_SortDesc sd :=
+    match sd with
+    | Ascending => "asc"
+    | Descending => "desc"
+    end.
+  
+  Definition ToString_SortCriteria (sc : string * SortDesc) :=
+    let (att,sd) := sc in
+    bracketString "(" (att ++ "," ++ (ToString_SortDesc sd)) ")".
+  
   Global Instance ToString_unaryOp : ToString unaryOp
     := {toString :=
           fun (op:unaryOp) =>
@@ -100,6 +126,10 @@ Section RUnaryOps.
             | ASingleton => "ASingleton"
             | AFlatten => "AFlatten"
             | ADistinct => "ADistinct"
+            | AOrderBy ls =>
+              "(AOrderBy"
+                ++ (bracketString "[" (joinStrings "," (List.map ToString_SortCriteria ls)) "]")
+                ++ ")"
             | ARec f => "(ARec " ++ f ++ ")"
             | ADot s => "(ADot " ++ s ++ ")"
             | ARecRemove s => "(ArecRemove " ++ s ++ ")"
@@ -134,6 +164,7 @@ Tactic Notation "unaryOp_cases" tactic(first) ident(c) :=
   | Case_aux c "ASingleton"%string
   | Case_aux c "AFlatten"%string
   | Case_aux c "ADistinct"%string
+  | Case_aux c "AOrderBy"%string
   | Case_aux c "ARec"%string
   | Case_aux c "ADot"%string
   | Case_aux c "ARecRemove"%string

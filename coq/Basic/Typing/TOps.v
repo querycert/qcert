@@ -45,6 +45,9 @@ Section TOps.
         unaryOp_type ASingleton (Coll τ) (Option τ)
     | ATFlatten τ: unaryOp_type AFlatten (Coll (Coll τ)) (Coll τ)
     | ATDistinct τ: unaryOp_type ADistinct (Coll τ) (Coll τ)
+    | ATOrderBy {τ} k sl pf1 pf2:
+        sublist (List.map fst sl) (domain τ) -> 
+        unaryOp_type (AOrderBy sl) (Coll (Rec k τ pf1)) (Coll (Rec k τ pf2))
     | ATRec {τ} s pf : unaryOp_type (ARec s) τ (Rec Closed ((s,τ)::nil) pf)
     | ATDot {τ' τout} k s pf :
         tdot τ' s = Some τout ->
@@ -82,6 +85,7 @@ Section TOps.
     | Case_aux c "ATSingleton"%string
     | Case_aux c "ATFlatten"%string
     | Case_aux c "ATDistinct"%string
+    | Case_aux c "ATOrderBy"%string
     | Case_aux c "ATRec"%string
     | Case_aux c "ATDot"%string
     | Case_aux c "ATRecRemove"%string
@@ -1024,6 +1028,14 @@ Section TOps.
       assert (r = τ) by (apply rtype_fequal; assumption).
       rewrite H0 in *.
       apply forall_typed_bdistinct; assumption.
+    - Case "ATOrderBy"%string.
+      dependent induction H.
+      autorewrite with alg.
+      exists (dcoll dl).
+      split; [reflexivity|apply dtcoll].
+      assert (r = Rec k τ pf2) by (apply rtype_fequal; assumption).
+      subst; clear x.
+      assumption.
     - Case "ATRec"%string.
       exists (drec [(s,d1)]).
       split; [reflexivity|apply dtrec_full].
@@ -1194,6 +1206,7 @@ End TOps.
     | Case_aux c "ATSingleton"%string
     | Case_aux c "ATFlatten"%string
     | Case_aux c "ATDistinct"%string
+    | Case_aux c "ATOrderBy"%string
     | Case_aux c "ATRec"%string
     | Case_aux c "ATDot"%string
     | Case_aux c "ATRecRemove"%string

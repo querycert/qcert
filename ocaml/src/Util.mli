@@ -51,15 +51,6 @@ val target_f : string option -> string -> string
 val outname : string -> string -> string
 
 
-(**********)
-(* Lookup *)
-(**********)
-
-(*
-val get_data : string -> (string * 'a) list -> 'a
-val get_data_raise : string -> (string * 'a) list -> 'a
-*)
-
 (**********************************)
 (* Support for Enhanced operators *)
 (**********************************)

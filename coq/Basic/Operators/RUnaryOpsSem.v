@@ -67,6 +67,8 @@ Section RUnaryOpsSem.
       fun d => lift_oncoll (fun l => (lift dcoll (rflatten l))) d
     | ADistinct =>
       fun d => rondcoll (@bdistinct data data_eq_dec) d
+    | AOrderBy sc =>
+      fun d => Some d (* XXX To be replaced by actual sorting?! XXX *)
     | ARec s =>
       fun d => Some (drec ((s,d) :: nil))
     | ADot s =>

@@ -580,6 +580,15 @@ Section TOpsInfer.
         end
       | ADistinct =>
         olift (fun x => Some (Coll x)) (tuncoll τ₁)
+      | AOrderBy sl =>
+        match (tuncoll τ₁) with
+        | Some τ₁₀ =>
+          match tunrecproject (List.map fst sl) τ₁₀ with
+          | Some _ => Some τ₁
+          | None => None
+          end
+        | None => None
+        end
       | ARec s => Some (Rec Closed ((s, τ₁)::nil) eq_refl)
       | ADot s => tunrecdot s τ₁
       | ARecRemove s => tunrecremove s τ₁
@@ -711,6 +720,15 @@ Section TOpsInfer.
       constructor; auto.
     Qed.
 
+    Lemma ATOrderBy_tunrec {sl} {τ₁ τout} :
+      tunrecproject (List.map fst sl) τ₁ = Some τout ->
+      unaryOp_type (AOrderBy sl) (Coll τ₁) (Coll  τ₁).
+    Proof.
+      unfold tunrecproject; intros.
+      destructer.
+      constructor; auto.
+    Qed.
+
     Lemma ATSingleton_tsingleton {τ₁ τout} :
       tsingleton τ₁ = Some τout ->
       unaryOp_type ASingleton τ₁ τout.
@@ -733,14 +751,15 @@ Section TOpsInfer.
       unaryOp_type u τ₁ τout.
     Proof.
       Hint Constructors unaryOp_type.
-      Hint Resolve ATDot_tunrec ATRecRemove_tunrec ATRecProject_tunrec ATSingleton_tsingleton.
-      
+      Hint Resolve ATDot_tunrec ATRecRemove_tunrec ATRecProject_tunrec
+           ATOrderBy_tunrec ATSingleton_tsingleton.
       unaryOp_cases (case_eq u) Case; intros; simpl in *; destructer; unfold olift in *; try autorewrite with type_canon in *; destructer;
       try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
       - constructor.
       - constructor; apply foreign_unary_op_typing_infer_correct;
         apply H0.
     Qed.
+
     Lemma infer_unop_type_least (u:unaryOp) (τ₁ τout₁ τout₂:rtype) :
       infer_unop_type u τ₁ = Some τout₁ ->
       unaryOp_type u τ₁ τout₂ ->
@@ -763,6 +782,19 @@ Section TOpsInfer.
     Proof.
       intros uinf utype.
       unaryOp_cases (destruct u) Case; inversion utype; intros; simpl in *; destructer; unfold tunrecdot, tunrecremove, tunrecproject, tsingleton in *; destructer; try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity ].
+      - inversion utype; intros. simpl in *; subst.
+        destructer.
+        assert (is_list_sorted StringOrder.lt_dec (domain (rproject l (map fst s))) = true).
+        assert (l = rec_sort l) by (rewrite sort_sorted_is_id; auto).
+        rewrite H1.
+        rewrite rproject_rec_sort_commute.
+        generalize (rproject l (map fst s)); intro.
+        rewrite <- (rec_sort_sorted l0 (rec_sort l0));
+        reflexivity.
+        assert (RecMaybe Closed (rproject l (map fst s)) =
+                Some (Rec Closed (rproject l (map fst s)) H1)).
+        apply RecMaybe_pf_some.
+        congruence.
       - Case "AForeignUnaryOp"%string.
         inversion utype.
         apply (foreign_unary_op_typing_infer_complete uinf H1).

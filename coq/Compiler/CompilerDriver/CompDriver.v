@@ -562,6 +562,7 @@ Section CompDriver.
 
   End CompDriverCompile.
 
+<<<<<<< Updated upstream:coq/Compiler/CompilerDriver/CompDriver.v
   Section CompDriverUtil.
   Definition language_of_name_case_sensitive name : language:=
     match name with
@@ -2132,6 +2133,10 @@ Section CompDriver.
     Definition nraenv_optim_to_nnrc (q: nraenv) : nnrc :=
       nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
 
+=======
+  Section Comp
+          
+>>>>>>> Stashed changes:coq/Compiler/Top/CompDriver.v
     (* Used in CompTest: *)
     Definition rule_to_nraenv_optim (q: rule) : nraenv :=
       (nraenv_optim (rule_to_nraenv q)).
@@ -2160,8 +2165,12 @@ Section CompDriver.
     Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=
       nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q))).
 
+<<<<<<< Updated upstream:coq/Compiler/CompilerDriver/CompDriver.v
   End CompPaths.
 
+=======
+ 
+>>>>>>> Stashed changes:coq/Compiler/Top/CompDriver.v
 End CompDriver.
 
 
