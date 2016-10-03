@@ -52,9 +52,11 @@ Section CompDriver.
   Require Import OptimizerLogger.
 
   Require Import CompLang CompEnv.
+  Require Import ForeignToSpark.
 
   Local Open Scope list_scope.
 
+  Require Import ForeignToJavascript.
   Require Import  ForeignCloudant.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
@@ -66,6 +68,8 @@ Section CompDriver.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string algenv}.
   Context {nnrc_logger:optimizer_logger string nrc}.
+  Context {ftojs:foreign_to_javascript}.
+  Context {ftospark:foreign_to_spark}.
 
   (* Translation functions *)
 
@@ -118,7 +122,7 @@ Section CompDriver.
                          init_vinit
                          inputs_loc.
 
-  Definition nnrc_to_nnrcmr_compdriver (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
+  Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
     (* XXX TODO: Handling of vid? XXX *)
     (* let q : nnrc := nrc_subst q init_vid (NRCConst dunit) in *)
     (* let q : nnrc := nnrc_optim q in *)
@@ -149,16 +153,12 @@ Section CompDriver.
   Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
     nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
-  Require Import ForeignToSpark.
-  Context {ftospark:foreign_to_spark}.
   Definition nnrcmr_to_nnrcmr_spark_prepare (q: nnrcmr) : nnrcmr :=
     let q := foreign_to_spark_prepare_nrcmr q in
     let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
     let q := foreign_to_spark_prepare_nrcmr q in
     nrcmr_rename_for_spark q.
 
-  Require Import ForeignToJavascript.
-  Context {ftojs:foreign_to_javascript}.
   Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
     
@@ -450,9 +450,7 @@ Section CompDriver.
           let q := nnrc_optim q in
           compile_nnrc dv q
         | Dv_nnrc_to_nnrcmr vinit inputs_loc dv =>
-          let q := nnrc_to_nnrcmr_comptop vinit (* inputs_loc *) q in
-          (* XXX TODO Should be: XXX*)
-          (* let q := nnrc_to_nnrcmr_compdriver vinit inputs_loc q in *)
+          let q := nnrc_to_nnrcmr vinit inputs_loc q in
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
           let q := nnrc_to_dnnrc_dataset inputs_loc q in

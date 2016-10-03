@@ -43,6 +43,7 @@ Section CompStat.
   Context {bm:brand_model}.
   Context {nraenv_logger:optimizer_logger string algenv}.
   Context {nnrc_logger:optimizer_logger string nrc}.
+  Context {fredop:foreign_reduce_op}.
 
   Require Import ZArith.
   Local Open Scope string_scope.
@@ -97,12 +98,11 @@ Section CompStat.
       (("cldmr_stat", dstring "no stat available")
          :: nil).
 
-  Context {fredop:foreign_reduce_op}.
   Definition stat_nnrcmr (q: nnrcmr) : data :=
     drec
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
          :: nil).
-    
+
   Definition stat_nnrc (q: nnrc) : data :=
     drec
       (("nnrc_size", dnat (Z_of_nat (nrc_size q)))
