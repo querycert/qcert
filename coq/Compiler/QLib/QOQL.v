@@ -36,6 +36,8 @@ Module QOQL(runtime:CompilerRuntime).
     := OQL.oql_in_expr.
   Definition where_expr : Set
     := OQL.oql_where_expr.
+  Definition order_by_expr : Set
+    := OQL.oql_order_by_expr.
   
   Definition ovar : var -> expr
     := OQL.OVar.
@@ -47,7 +49,7 @@ Module QOQL(runtime:CompilerRuntime).
     := OQL.OBinop.
   Definition ounop : Ops.Unary.op -> expr -> expr 
     := OQL.OUnop.
-  Definition osfw : select_expr -> list in_expr -> where_expr -> expr 
+  Definition osfw : select_expr -> list in_expr -> where_expr -> order_by_expr -> expr 
     := OQL.OSFW.
   Definition oselect : expr -> select_expr 
     := OQL.OSelect.
@@ -61,6 +63,10 @@ Module QOQL(runtime:CompilerRuntime).
     := OQL.OTrue.
   Definition owhere : expr -> where_expr 
     := OQL.OWhere.
+  Definition onoorder : order_by_expr 
+    := OQL.ONoOrder.
+  Definition oorder_by : expr -> RUnaryOps.SortDesc -> order_by_expr 
+    := OQL.OOrderBy.
   
   Definition odot : String.string -> expr -> expr 
     := OQLSugar.ODot.

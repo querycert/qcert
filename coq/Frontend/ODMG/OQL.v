@@ -479,14 +479,17 @@ Section OQL.
       | OTable t => nil
       | OBinop bop e1 e2 => oql_free_vars e1 ++ oql_free_vars e2
       | OUnop uop e1 => oql_free_vars e1
-      | OSFW se el we =>
+      | OSFW se el we oe =>
         let one_step_scope (in_expr : oql_in_expr) previous_free_vars :=
             match in_expr with
             | OIn x e1 => oql_free_vars e1 ++ remove string_eqdec x previous_free_vars
             | OInCast x _ e1 => oql_free_vars e1 ++ remove string_eqdec x previous_free_vars
             end
         in
-        fold_right one_step_scope (oql_select_free_vars se ++ oql_where_free_vars we) el
+        fold_right one_step_scope
+                   (oql_select_free_vars se
+                                         ++ oql_where_free_vars we
+                                         ++ oql_order_free_vars oe) el
       end
     with oql_select_free_vars (se:oql_select_expr) :=
       match se with
@@ -497,6 +500,11 @@ Section OQL.
       match we with
       | OTrue => nil
       | OWhere e => oql_free_vars e
+      end
+    with oql_order_free_vars (oe:oql_order_by_expr) :=
+      match oe with
+      | ONoOrder => nil
+      | OOrderBy e _ => oql_free_vars e
       end.
 
   (* capture avoiding substitution *)
@@ -509,7 +517,7 @@ Section OQL.
                                    (oql_subst e1 x e') 
                                    (oql_subst e2 x e')
       | OUnop uop e1 => OUnop uop (oql_subst e1 x e')
-      | OSFW se el we =>
+      | OSFW se el we oe =>
         let for_vars := map (fun x => match x with OIn v _ | OInCast v _ _ => v end) el in
         let el' := 
             (fix F (el:list oql_in_expr) (x:string) (e':oql_expr) :=
@@ -526,8 +534,10 @@ Section OQL.
               end) el x e'
         in
         if in_dec string_dec x for_vars
-        then OSFW se el' we
-        else OSFW (oql_select_subst se x e') el' (oql_where_subst we x e')
+        then OSFW se el' we oe
+        else OSFW (oql_select_subst se x e') el'
+                  (oql_where_subst we x e')
+                  (oql_order_subst oe x e')
       end
     with oql_select_subst (se:oql_select_expr) (x:string) (e':oql_expr) :=
       match se with
@@ -538,6 +548,11 @@ Section OQL.
       match we with
       | OTrue => OTrue
       | OWhere e => OWhere (oql_subst e x e')
+      end
+    with oql_order_subst (we:oql_order_by_expr) (x:string) (e':oql_expr) :=
+      match we with
+      | ONoOrder => ONoOrder
+      | OOrderBy e sc => OOrderBy (oql_subst e x e') sc
       end.
 
   End OQLScope.

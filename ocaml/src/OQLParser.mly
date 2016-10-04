@@ -75,13 +75,13 @@ expr:
     { QOQL.oconst (QData.dstring (Util.char_list_of_string s)) }
 (* Select from where ... *)
 | SELECT e = expr FROM fc = from_clause 
-    { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue }
+    { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue QOQL.onoorder }
 | SELECT e = expr FROM fc = from_clause WHERE w = expr
-    { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) }
+    { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) QOQL.onoorder }
 | SELECT DISTINCT e = expr FROM fc = from_clause
-    { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue QOQL.onoorder }
 | SELECT DISTINCT e = expr FROM fc = from_clause WHERE w = expr
-    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere e) }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere e) QOQL.onoorder }
 (* Expressions *)
 | v = IDENT
     { QOQL.ovar (Util.char_list_of_string v) }
