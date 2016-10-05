@@ -20,65 +20,52 @@ Module QSQL(runtime:CompilerRuntime).
   Require QData QOperators.
   Require SQL.
 
-  Module Data := QData.QData runtime.
-  Module Ops := QOperators.QOperators runtime.
+  Module QData := QData.QData runtime.
+  Module QOps := QOperators.QOperators runtime.
 
-  Definition expr : Set
-    := SQL.sql_expr.
-  Definition t : Set
-    := expr.
-  Definition var : Set
-    := String.string.
-  
-  Definition select_expr : Set
-    := SQL.sql_select_expr.
-  Definition in_expr : Set
-    := SQL.sql_in_expr.
-  Definition where_expr : Set
-    := SQL.sql_where_expr.
-  Definition order_by_expr : Set
-    := SQL.sql_order_by_expr.
-  
-  Definition ovar : var -> expr
-    := SQL.OVar.
-  Definition oconst : Data.data -> expr
-    := SQL.OConst.
-  Definition otable  : String.string -> expr
-    := SQL.OTable.
-  Definition obinop : Ops.Binary.op -> expr ->expr -> expr 
-    := SQL.OBinop.
-  Definition ounop : Ops.Unary.op -> expr -> expr 
-    := SQL.OUnop.
-  Definition osfw : select_expr -> list in_expr -> where_expr -> order_by_expr -> expr 
-    := SQL.OSFW.
-  Definition oselect : expr -> select_expr 
-    := SQL.OSelect.
-  Definition oselectdistinct : expr -> select_expr 
-    := SQL.OSelectDistinct.
-  Definition oin : String.string -> expr -> in_expr 
-    := SQL.OIn.
-  Definition oincast : String.string -> String.string -> expr -> in_expr 
-    := SQL.OInCast.
-  Definition otrue : where_expr 
-    := SQL.OTrue.
-  Definition owhere : expr -> where_expr 
-    := SQL.OWhere.
-  Definition onoorder : order_by_expr 
-    := SQL.ONoOrder.
-  Definition oorder_by : expr -> RUnaryOps.SortDesc -> order_by_expr 
-    := SQL.OOrderBy.
-  
-  Definition odot : String.string -> expr -> expr 
-    := SQLSugar.ODot.
-  Definition oarrow : String.string -> expr -> expr 
-    := SQLSugar.OArrow.
-  Definition ostruct : list (String.string * expr) -> expr 
-    := SQLSugar.OStruct.
+  Definition expr : Set := SQL.sql_expr.
+  Definition t : Set := expr.
+  Definition column : Set := String.string.
+  Definition table : Set := String.string.
 
-  Definition tableify : expr -> expr
-    := SQLSugar.tableify.
+  Definition sql_table_spec : Set := SQL.sql_table_spec.
+  Definition sql_bin_cond : Set := SQL.sql_bin_cond.
+  Definition sql_bin_expr : Set := SQL.sql_bin_expr.
+  Definition sql_agg : Set := SQL.sql_agg.
+
+  Definition sql_query : Set := SQL.sql_query.
+  Definition sql_select : Set := SQL.sql_select.
+  Definition sql_from : Set := SQL.sql_from.
+  Definition sql_condition : Set := SQL.sql_condition.
+  Definition sql_expr : Set := SQL.sql_expr.
+
+  Definition sql_select_column : column -> sql_select := SQL.SSelectColumn.
+  Definition sql_select_expr : column -> sql_expr -> sql_select := SQL.SSelectExpr.
+
+  Definition sql_condition_and : sql_condition -> sql_condition -> sql_condition := SQL.SCondAnd.
+  Definition sql_condition_or : sql_condition -> sql_condition -> sql_condition := SQL.SCondOr.
+  Definition sql_condition_not : sql_condition -> sql_condition := SQL.SCondNot.
+
+  Definition sql_from_table : table -> sql_from := SQL.SFromTable.
+  Definition sql_from_query : sql_table_spec -> sql_query -> sql_from := SQL.SFromQuery.
+
+  Definition sql_cond_and := SQL.SCondAnd.
+  Definition sql_cond_or := SQL.SCondOr.
+  Definition sql_cond_not := SQL.SCondNot.
+  Definition sql_cond_binary := SQL.SCondBinary.
+  Definition sql_cond_exists := SQL.SCondExists.
+  Definition sql_cond_in := SQL.SCondIn.
+  Definition sql_cond_between := SQL.SCondBetween.
+
+  Definition sql_expr_const : QData.data -> sql_expr := SQL.SExprConst.
+  Definition sql_expr_column : String.string -> sql_expr := SQL.SExprColumn.
+  Definition sql_expr_star : sql_expr := SQL.SExprStar.
+  Definition sql_expr_binary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr := SQL.SExprBinary.
+  Definition sql_expr_agg_expr : sql_agg -> sql_expr -> sql_expr := SQL.SExprAggExpr.
+  Definition sql_expr_agg_query : sql_agg -> sql_query -> sql_expr := SQL.SExprAggQuery.
 
 End QSQL.
+
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***

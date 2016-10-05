@@ -229,6 +229,7 @@ MODULES = \
 	Compiler/QLib/QPattern \
 	Compiler/QLib/QRule \
 	Compiler/QLib/QOQL \
+	Compiler/QLib/QSQL \
 	Compiler/QLib/QLambdaNRA \
 	Compiler/QLib/QLang \
 	Compiler/QLib/QDriver \

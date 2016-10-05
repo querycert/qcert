@@ -18,7 +18,7 @@ Require Import CompilerRuntime.
 Module QLib(runtime:CompilerRuntime).
 
   Require QData QOperators.
-  Require QOQL QLambdaNRA QPattern QRule.
+  Require QOQL QSQL QLambdaNRA QPattern QRule.
   Require QUtil QType QEval.
   Require QLang QDriver QStat. 
 
@@ -27,6 +27,7 @@ Module QLib(runtime:CompilerRuntime).
   Module QOps := QOperators.QOperators runtime.
 
   Module QOQL := QOQL.QOQL runtime.
+  Module QSQL := QSQL.QSQL runtime.
   Module QLambdaNRA := QLambdaNRA.QLambdaNRA runtime.
   Module QPattern := QPattern.QPattern runtime.
   Module QRule := QRule.QRule runtime.

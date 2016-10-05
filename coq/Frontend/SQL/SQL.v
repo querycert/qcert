@@ -31,7 +31,7 @@ SelectExpr ::= Column | Expr "as" Column
 
 Agg ::= "sum" | "avg" | "count"
 
-FromExpr ::= Column | "(" Query ")" "as" TableSpec
+FromExpr ::= TableName | "(" Query ")" "as" TableSpec
 
 Condition ::= Condition ("and" | "or") Condition
       |  "not" Condition
@@ -54,7 +54,7 @@ Expr ::= Constant
       |  Agg "(" Query ")"
 
 Constant ::= INT | FLOAT | STRING | "date" STRING
-          |  "(" Constant ("," Constant)* ")
+          |  "(" Constant ("," Constant)* ")"
 
 TableSpec ::= TableName ( "(" Column ("," Column)* ")" )?
 Column ::= IDENT
@@ -63,7 +63,7 @@ TableName ::= IDENT
 Note: Do we want to support 'case' (q12) -- seems relatively big an extension
 Note: Do we want to support 'substring' (q22) -- seems just meh...
 Note: Do we want to support 'create view' (q15) -- seems relatively trivial through environments
-"
+
 *)
 
 Section SQL.
@@ -77,14 +77,17 @@ Section SQL.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition sql_env := list (string * data).
+  Require Import RDataSort. (* For SortCriterias *)
 
   Unset Elimination Schemes.
 
-  Require Import RDataSort.
-  (* TableSpec ::= TableName "(" Column, ("," Column)* ")" )? *)
-  Definition table_spec : Set := string * (option (list string)).
-  Definition order_spec : Set := SortCriterias.
+  Definition sql_env := list (string * data). (* For eval -- unused now *)
+
+  Definition sql_table_spec : Set := string * (option (list string)).
+  Definition sql_order_spec : Set := SortCriterias.
+  Inductive sql_bin_cond : Set := | SEq | SLe | SLt | SGe | SGt | SDiff.
+  Inductive sql_bin_expr : Set := | SPlus | SMinus | SMult | SDivide.
+  Inductive sql_agg : Set := | SSum | SAgv | SCount.
 
   Inductive sql_query : Set :=
   | SQuery :
@@ -92,29 +95,92 @@ Section SQL.
       list sql_from ->                                   (* From Clause *)
       option sql_condition ->                            (* Where Clause *)
       option ((list string) * (option sql_condition)) -> (* GroupBy Clause *)
-      option SortCriterias -> sql_query                  (* OrderBy Clause *)
+      option sql_order_spec -> sql_query                 (* OrderBy Clause *)
   with sql_select : Set :=
   | SSelectColumn : string -> sql_select
   | SSelectExpr : string -> sql_expr -> sql_select
   with sql_from : Set :=
-  | SFromColumn : string -> sql_from
-  | SFromQuery : table_spec -> sql_query -> sql_from
+  | SFromTable : string -> sql_from
+  | SFromQuery : sql_table_spec -> sql_query -> sql_from
   with sql_condition : Set :=
   | SCondAnd : sql_condition -> sql_condition -> sql_condition
   | SCondOr : sql_condition -> sql_condition -> sql_condition
   | SCondNot : sql_condition -> sql_condition
+  | SCondBinary : sql_bin_cond -> sql_expr -> sql_expr -> sql_condition
   | SCondExists : sql_query -> sql_condition
   | SCondIn : sql_expr -> sql_expr -> sql_condition
+  | SCondLike : sql_expr -> sql_expr -> sql_condition
+  | SCondBetween : sql_expr -> sql_expr -> sql_expr -> sql_condition
   with sql_expr : Set :=
   | SExprConst : data -> sql_expr
   | SExprColumn : string -> sql_expr
   | SExprStar : sql_expr
-  | SExprBinop : binOp -> sql_expr -> sql_expr -> sql_expr
-  | SExprAggExpr : unaryOp -> sql_expr -> sql_expr (* Has to be an aggregate unaryOp! *)
-  | SExprAggQuery : unaryOp -> sql_query -> sql_expr (* Has to be an aggregate unaryOp! *)
+  | SExprBinary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr
+  | SExprAggExpr : sql_agg -> sql_expr -> sql_expr
+  | SExprAggQuery : sql_agg -> sql_query -> sql_expr
   .
 
-  
+  Definition sql : Set := sql_query. (* Let's finally give our languages a proper name! *)
+
+  Section Translation.
+    Require Import NRAEnvRuntime.
+
+    (*
+    Fixpoint sql_to_nraenv (q:sql) : algenv :=
+      match q with
+      | SQuery selects froms opt_where opt_group_by opt_order_by =>
+        let nraenv_from_clause :=
+            fold_left sql_from_to_nraenv froms (ANUnop AColl ANID)
+        in
+        let nraenv_where_clause := nraenv_from_clause in
+        let nraenv_group_by_clause := nraenv_where_clause in
+        let nraenv_order_by_clause := nraenv_group_by_clause in
+        ANMap (sql_select_to_nraenv selects) nraenv_order_by_clause
+      end
+    with sql_from_to_nraenv (acc:algenv) (from:sql_from) :=
+      match from with
+      | (SFromTable tname) => ANProduct (ANGetConstant tname) acc
+      | _ => acc
+      end
+    with sql_select_to_nraenv (selects:list sql_select) :=
+      match selects with
+      | nil => ANConst (drec nil)
+      | SSelectColumn cname :: selects =>
+        ANBinop AConcat
+                (ANUnop (ARec cname) (ANUnop (ADot cname) ANID))
+                (sql_select_to_nraenv selects)
+      | SSelectExpr cname expr :: selects =>
+        ANBinop AConcat
+                (ANUnop (ARec cname) (ANUnop (ADot cname) (sql_expr_to_nraenv expr)))
+                (sql_select_to_nraenv selects)
+      end
+    with sql_expr_to_nraenv (expr:sql_expr) {struct expr} :=
+      match expr with
+      | SExprConst d => ANConst d
+      | SExprColumn cname => ANUnop (ADot cname) ANID
+      | SExprStar => ANID
+      | SExprBinary SPlus expr1 expr2 =>
+        ANBinop (ABArith ArithPlus)
+                (sql_expr_to_nraenv expr1)
+                (sql_expr_to_nraenv expr2)
+      | SExprBinary SMinus expr1 expr2 =>
+        ANBinop (ABArith ArithMinus)
+                (sql_expr_to_nraenv expr1)
+                (sql_expr_to_nraenv expr2)
+      | SExprBinary SMult expr1 expr2 =>
+        ANBinop (ABArith ArithMult)
+                (sql_expr_to_nraenv expr1)
+                (sql_expr_to_nraenv expr2)
+      | SExprBinary SDivide expr1 expr2 =>
+        ANBinop (ABArith ArithDivide)
+                (sql_expr_to_nraenv expr1)
+                (sql_expr_to_nraenv expr2)
+      | SExprAggExpr _ _ => ANConst dunit
+      | SExprAggQuery _ _ => ANConst dunit
+      end.
+     *)
+
+  End Translation.
 End SQL.
 
 (* 
