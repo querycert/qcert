@@ -149,6 +149,7 @@ Section DNNRCtoScala.
     | CCol s => "column(""" ++ s ++ """)"
     | CDot fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ")"
     | CEq c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ")"
+    | CLessThan c1 c2 => code_of_column c1 ++ ".lt(" ++ code_of_column c2 ++ ")"
     | CLit (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
     | CNeg c => "not(" ++ code_of_column c ++ ")"
     | CPlus c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ")"
