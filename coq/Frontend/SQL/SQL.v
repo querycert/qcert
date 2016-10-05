@@ -27,7 +27,7 @@ Query ::= "select" SelectExpr ("," SelectExpr)*
 	    ( "having" Cond )? )?                          /* having only allowed for group by */
 	  ( "order by" SortCriteria ("," SortCriteria)* )?
 	  
-SelectExpr ::= Column | Expr "as" Column
+SelectExpr ::= Column | Expr "as" Column | Agg ( Expr )
 
 Agg ::= "sum" | "avg" | "count"
 
@@ -51,7 +51,6 @@ Expr ::= Constant
       |  "*"
       |  Expr ("-" | "+" | "*" | "/") Expr
       |  Agg "(" Expr ")"
-      |  Agg "(" Query ")"
 
 Constant ::= INT | FLOAT | STRING | "date" STRING
           |  "(" Constant ("," Constant)* ")"
@@ -87,7 +86,7 @@ Section SQL.
   Definition sql_order_spec : Set := SortCriterias.
   Inductive sql_bin_cond : Set := | SEq | SLe | SLt | SGe | SGt | SDiff.
   Inductive sql_bin_expr : Set := | SPlus | SMinus | SMult | SDivide.
-  Inductive sql_agg : Set := | SSum | SAgv | SCount.
+  Inductive sql_agg : Set := | SSum | SAvg | SCount.
 
   Inductive sql_query : Set :=
   | SQuery :
@@ -117,7 +116,6 @@ Section SQL.
   | SExprStar : sql_expr
   | SExprBinary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr
   | SExprAggExpr : sql_agg -> sql_expr -> sql_expr
-  | SExprAggQuery : sql_agg -> sql_query -> sql_expr
   .
 
   Definition sql : Set := sql_query. (* Let's finally give our languages a proper name! *)
@@ -125,34 +123,40 @@ Section SQL.
   Section Translation.
     Require Import NRAEnvRuntime.
 
-    (*
-    Fixpoint sql_to_nraenv (q:sql) : algenv :=
+    Definition sql_order_to_nraenv (acc:algenv) (opt_order:option sql_order_spec) :=
+      match opt_order with
+      | None => acc
+      | Some sql_order_spec =>
+        ANUnop (AOrderBy sql_order_spec) acc
+      end.
+
+    Fixpoint sql_to_nraenv (q:sql) {struct q} : algenv :=
       match q with
-      | SQuery selects froms opt_where opt_group_by opt_order_by =>
+      | SQuery selects froms opt_where opt_group opt_order =>
         let nraenv_from_clause :=
             fold_left sql_from_to_nraenv froms (ANUnop AColl ANID)
         in
         let nraenv_where_clause := nraenv_from_clause in
         let nraenv_group_by_clause := nraenv_where_clause in
-        let nraenv_order_by_clause := nraenv_group_by_clause in
-        ANMap (sql_select_to_nraenv selects) nraenv_order_by_clause
+        let nraenv_order_by_clause := sql_order_to_nraenv nraenv_group_by_clause opt_order in
+        ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
+              nraenv_order_by_clause
       end
-    with sql_from_to_nraenv (acc:algenv) (from:sql_from) :=
+    with sql_from_to_nraenv (acc:algenv) (from:sql_from) {struct from} :=
       match from with
       | (SFromTable tname) => ANProduct (ANGetConstant tname) acc
       | _ => acc
       end
-    with sql_select_to_nraenv (selects:list sql_select) :=
-      match selects with
-      | nil => ANConst (drec nil)
-      | SSelectColumn cname :: selects =>
+    with sql_select_to_nraenv (acc:algenv) (select:sql_select) {struct select} :=
+      match select with
+      | SSelectColumn cname =>
         ANBinop AConcat
                 (ANUnop (ARec cname) (ANUnop (ADot cname) ANID))
-                (sql_select_to_nraenv selects)
-      | SSelectExpr cname expr :: selects =>
+                acc
+      | SSelectExpr cname expr =>
         ANBinop AConcat
                 (ANUnop (ARec cname) (ANUnop (ADot cname) (sql_expr_to_nraenv expr)))
-                (sql_select_to_nraenv selects)
+                acc
       end
     with sql_expr_to_nraenv (expr:sql_expr) {struct expr} :=
       match expr with
@@ -176,10 +180,63 @@ Section SQL.
                 (sql_expr_to_nraenv expr1)
                 (sql_expr_to_nraenv expr2)
       | SExprAggExpr _ _ => ANConst dunit
-      | SExprAggQuery _ _ => ANConst dunit
       end.
-     *)
 
+    Section SQLExamples.
+      (* Example *)
+
+      Require Import ZArith.
+      Definition mkperson (name:string) (age:Z) (zip:Z) (company:string) :=
+        drec (("name", dstring name)
+                :: ("age", dnat age)
+                :: ("zip", dnat zip)
+                :: ("company", dstring company)
+                :: nil)%string.
+      Definition mkpersons_aux l :=
+        map (fun x =>
+               match x with (name, age, zip, company) => mkperson name age zip company
+               end) l.
+      Definition mkpersons l :=
+        dcoll (mkpersons_aux l).
+
+      Open Scope Z_scope.
+      Definition persons :=
+        mkpersons
+          (("John",25,1008,"IBM")
+             :: ("Jane",12,1009,"AIG")
+             :: ("Jill",30,1010,"IBM")
+             :: ("Jack",56,1010,"CMU")
+             :: nil)%string.
+
+      Definition tables := (("Persons", persons)::nil)%string.
+
+      Definition sql1 :=
+        SQuery (SSelectColumn "name"::nil) (SFromTable "Persons"::nil) None None None.
+      Definition nraenv1 :=
+        sql_to_nraenv sql1.
+
+      Definition nraenv_eval (op:algenv) (constants:list (string*data))
+        := fun_of_algenv nil constants op (drec nil) (drec nil).
+      Definition sql_eval (q:sql) (constants:list (string*data))
+        := fun_of_algenv nil constants (sql_to_nraenv q) (drec nil) (drec nil).
+      
+      (* Eval vm_compute in nraenv1. *)
+      (* Eval vm_compute in (nraenv_eval nraenv1 tables). *)
+
+      Definition sql2 :=
+        SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
+               (SFromTable "Persons"::nil) None None (Some (("age"%string,Ascending)::nil)).
+
+      (* Eval vm_compute in (sql_eval sql2 tables). *)
+
+      Definition sql3 :=
+        SQuery (SSelectColumn "name"::nil)
+               (SFromTable "Persons"::nil) None None (Some (("age"%string,Ascending)::nil)).
+
+      (* Eval vm_compute in (sql_eval sql3 tables). *)
+
+    End SQLExamples.
+  
   End Translation.
 End SQL.
 
