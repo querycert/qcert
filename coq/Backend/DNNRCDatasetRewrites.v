@@ -263,6 +263,10 @@ Section DNNRCDatasetRewrites.
       lift2 CSConcat
             (condition_to_column l binding)
             (condition_to_column r binding)
+    | DNRCBinop _ ALt l r =>
+      lift2 CLessThan
+            (condition_to_column l binding)
+            (condition_to_column r binding)
     (* TODO properly implement this *)
     | DNRCUnop _ AToString x =>
       lift CToString

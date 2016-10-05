@@ -995,6 +995,7 @@ let rec pretty_column_aux p sym ff col =
   | Hack.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
   | Hack.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (Hack.ABArith Hack.ArithPlus) c1 c2
   | Hack.CEq (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.AEq c1 c2
+  | Hack.CLessThan (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ALt c1 c2
   | Hack.CNeg c -> pretty_unop p sym pretty_column_aux ff Hack.ANeg c
   | Hack.CToString c -> pretty_unop p sym pretty_column_aux ff Hack.AToString c
   | Hack.CSConcat (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ASConcat c1 c2
