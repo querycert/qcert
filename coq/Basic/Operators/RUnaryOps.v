@@ -23,6 +23,7 @@ Section RUnaryOps.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import RUtilOps.
+  Require Import RDataSort.
   Require Import ForeignData.
   Require Import ForeignOps.
 
@@ -35,12 +36,6 @@ Section RUnaryOps.
      | ArithSqrt (* square root *)
   .
 
-  Inductive SortDesc
-    := Descending | Ascending.
-
-  Definition SortCriteria :=
-    list (string * SortDesc).
-
   Inductive unaryOp : Set :=
   | AIdOp : unaryOp                       (* Identity *)
   | ANeg: unaryOp                         (* boolean negation *)
@@ -48,7 +43,7 @@ Section RUnaryOps.
   | ASingleton : unaryOp                  (* un-coll a singleton collectin *)
   | AFlatten : unaryOp                    (* flatten *)
   | ADistinct: unaryOp                    (* distinct *)
-  | AOrderBy : SortCriteria -> unaryOp    (* sort returns a sorted collection but no guarantee on how long order is maintained!! *)
+  | AOrderBy : SortCriterias -> unaryOp   (* sort returns a sorted collection but no guarantee on how long order is maintained!! *)
   | ARec : string -> unaryOp              (* record construction.  Constructs a record with a single field (the string argument) *)
   | ADot : string -> unaryOp              (* record field access.  Given a record, returns the value associated with the provided field *)
   | ARecRemove : string -> unaryOp        (* record field removal.  Transforms a record by removing the named field *)
@@ -74,9 +69,9 @@ Section RUnaryOps.
     decide equality.
   Defined.
 
-  Global Instance SortCriteria_eqdec : EqDec SortCriteria eq.
+  Global Instance SortCriterias_eqdec : EqDec SortCriterias eq.
   Proof.
-    change (forall x y : SortCriteria,  {x = y} + {x <> y}).
+    change (forall x y : SortCriterias,  {x = y} + {x <> y}).
     decide equality; try apply string_dec.
     decide equality; try apply string_dec.
     decide equality; try apply string_dec.
@@ -86,7 +81,7 @@ Section RUnaryOps.
   Proof.
     change (forall x y : unaryOp,  {x = y} + {x <> y}).
     decide equality; try apply string_dec.
-    - apply SortCriteria_eqdec.
+    - apply SortCriterias_eqdec.
     - induction l; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.

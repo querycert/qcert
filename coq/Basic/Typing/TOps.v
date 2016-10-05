@@ -37,6 +37,16 @@ Section TOps.
     Context {m:brand_model}.
     Context {fuoptyping:foreign_unary_op_typing}.
 
+    Definition sortable_type (τ : rtype) : Prop :=
+      τ = Nat /\ τ = String.
+    
+    Definition order_by_has_sortable_type
+               (τr:list (string*rtype))
+               (satts: list string) : Prop :=
+      Forall (fun s =>
+                forall τout, tdot τr s = Some τout -> sortable_type τout)
+             satts.
+    
     Inductive unaryOp_type : unaryOp -> rtype -> rtype -> Prop :=
     | ATIdOp τ : unaryOp_type AIdOp τ τ
     | ATNeg: unaryOp_type ANeg Bool Bool
@@ -46,7 +56,8 @@ Section TOps.
     | ATFlatten τ: unaryOp_type AFlatten (Coll (Coll τ)) (Coll τ)
     | ATDistinct τ: unaryOp_type ADistinct (Coll τ) (Coll τ)
     | ATOrderBy {τ} k sl pf1 pf2:
-        sublist (List.map fst sl) (domain τ) -> 
+        sublist (List.map fst sl) (domain τ) ->
+        order_by_has_sortable_type τ (List.map fst sl) ->
         unaryOp_type (AOrderBy sl) (Coll (Rec k τ pf1)) (Coll (Rec k τ pf2))
     | ATRec {τ} s pf : unaryOp_type (ARec s) τ (Rec Closed ((s,τ)::nil) pf)
     | ATDot {τ' τout} k s pf :
@@ -947,6 +958,18 @@ Section TOps.
     auto.
   Qed.
 
+  (* XXX To be proven correct – well typedness of the (limited sorting) XXX *)
+  Lemma order_by_well_typed
+        (d1:data) (sl:list (string * RDataSort.SortDesc))
+        {k τ} {pf1 pf2} :
+    d1 ▹ Coll (Rec k τ pf1) ->
+    sublist (map fst sl) (domain τ) ->
+    order_by_has_sortable_type τ (map fst sl) ->
+    exists x, RDataSort.data_sort sl d1 = Some x /\ x ▹ Coll (Rec k τ pf2).
+  Proof.
+    admit.
+  Admitted.
+
   Require Import Permutation.
 
   (** Main type-soundness lemma for unary operators *)
@@ -1029,13 +1052,7 @@ Section TOps.
       rewrite H0 in *.
       apply forall_typed_bdistinct; assumption.
     - Case "ATOrderBy"%string.
-      dependent induction H.
-      autorewrite with alg.
-      exists (dcoll dl).
-      split; [reflexivity|apply dtcoll].
-      assert (r = Rec k τ pf2) by (apply rtype_fequal; assumption).
-      subst; clear x.
-      assumption.
+      intros. apply (order_by_well_typed d1 sl H H0 H1).
     - Case "ATRec"%string.
       exists (drec [(s,d1)]).
       split; [reflexivity|apply dtrec_full].

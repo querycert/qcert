@@ -19,7 +19,7 @@ Section RUnaryOpsSem.
   Require Import String List Compare_dec ZArith.
   
   Require Import Utils.
-  Require Import RBag RData RDataNorm RRelation.
+  Require Import RBag RData RDataNorm RDataSort RRelation.
   Require Import RUtilOps.
   Require Export RUnaryOps.
   Require Import BrandRelation.
@@ -68,7 +68,7 @@ Section RUnaryOpsSem.
     | ADistinct =>
       fun d => rondcoll (@bdistinct data data_eq_dec) d
     | AOrderBy sc =>
-      fun d => Some d (* XXX To be replaced by actual sorting?! XXX *)
+      fun d => data_sort sc d (* XXX Some very limited/hackish sorting XXX *)
     | ARec s =>
       fun d => Some (drec ((s,d) :: nil))
     | ADot s =>
@@ -234,6 +234,8 @@ Section RUnaryOpsSem.
       destruct ll; subst.
       simpl in *. inversion e; subst.
       intros; apply data_normalized_bdistinct; trivial.
+    - Case "AOrderBy"%string.
+      apply data_sort_normalized.
     - Case "ADot"%string.
       destruct d; try discriminate.
       intros. eapply data_normalized_edot; eauto.

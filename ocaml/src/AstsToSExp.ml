@@ -32,14 +32,30 @@ let coq_string_to_sstring (cl:char list) : sexp =
 let dbrands_to_sexp (bs:(char list) list) : sexp list =
   List.map coq_string_to_sstring bs
 let coq_string_list_to_sstring_list = dbrands_to_sexp
-    
+
+let coq_sort_desc_to_sstring x =
+  begin match x with
+  | Compiler.Ascending -> SString "asc"
+  | Compiler.Descending -> SString "desc"
+  end
+let coq_string_list_to_sstring_list_with_order l =
+  List.concat (List.map (fun x -> [coq_string_to_sstring (fst x);coq_sort_desc_to_sstring (snd x)]) l)
+
 let sstring_to_coq_string (se:sexp) : char list =
-  match se with
+  begin match se with
   | SString s -> char_list_of_string s
   | _ -> raise (CACo_Error "Not well-formed S-expr for Coq string")
+  end
 let sexp_to_dbrands (bs:sexp list) : (char list) list =
   List.map sstring_to_coq_string bs
 let sstring_list_to_coq_string_list = sexp_to_dbrands
+let rec sstring_list_with_order_to_coq_string_list sl =
+  begin match sl with
+  | [] -> []
+  | SString att :: SString "asc" :: sl' -> (char_list_of_string att, Ascending) :: (sstring_list_with_order_to_coq_string_list sl')
+  | SString att :: SString "desc" :: sl' -> (char_list_of_string att, Descending) :: (sstring_list_with_order_to_coq_string_list sl')
+  | _ -> raise (CACo_Error "Not well-formed S-expr for Coq orderBy")
+  end
 
 (* Data Section *)
 
@@ -184,6 +200,7 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | ARecRemove s -> STerm ("ARecRemove", [coq_string_to_sstring s])
   | ARecProject sl -> STerm ("ARecProject", coq_string_list_to_sstring_list sl)
   | ADistinct -> STerm ("ADistinct",[])
+  | AOrderBy sl -> STerm ("AOrderBy", coq_string_list_to_sstring_list_with_order sl)
   | ASum -> STerm ("ASum",[])
   | AArithMean -> STerm ("AArithMean",[])
   | AToString -> STerm ("AToString",[])
@@ -212,6 +229,7 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ARecRemove", [se']) -> ARecRemove (sstring_to_coq_string se')
   | STerm ("ARecProject", sl) -> ARecProject (sstring_list_to_coq_string_list sl)
   | STerm ("ADistinct",[]) -> ADistinct
+  | STerm ("AOrderBy",sl) -> AOrderBy (sstring_list_with_order_to_coq_string_list sl)
   | STerm ("ASum",[]) -> ASum
   | STerm ("AArithMean",[]) -> AArithMean
   | STerm ("AToString",[]) -> AToString

@@ -15,70 +15,70 @@
  *)
 
 Require Import CompilerRuntime.
-Module QOQL(runtime:CompilerRuntime).
+Module QSQL(runtime:CompilerRuntime).
   Require String.
   Require QData QOperators.
-  Require OQL OQLSugar.
+  Require SQL.
 
   Module Data := QData.QData runtime.
   Module Ops := QOperators.QOperators runtime.
 
   Definition expr : Set
-    := OQL.oql_expr.
+    := SQL.sql_expr.
   Definition t : Set
     := expr.
   Definition var : Set
     := String.string.
   
   Definition select_expr : Set
-    := OQL.oql_select_expr.
+    := SQL.sql_select_expr.
   Definition in_expr : Set
-    := OQL.oql_in_expr.
+    := SQL.sql_in_expr.
   Definition where_expr : Set
-    := OQL.oql_where_expr.
+    := SQL.sql_where_expr.
   Definition order_by_expr : Set
-    := OQL.oql_order_by_expr.
+    := SQL.sql_order_by_expr.
   
   Definition ovar : var -> expr
-    := OQL.OVar.
+    := SQL.OVar.
   Definition oconst : Data.data -> expr
-    := OQL.OConst.
+    := SQL.OConst.
   Definition otable  : String.string -> expr
-    := OQL.OTable.
+    := SQL.OTable.
   Definition obinop : Ops.Binary.op -> expr ->expr -> expr 
-    := OQL.OBinop.
+    := SQL.OBinop.
   Definition ounop : Ops.Unary.op -> expr -> expr 
-    := OQL.OUnop.
+    := SQL.OUnop.
   Definition osfw : select_expr -> list in_expr -> where_expr -> order_by_expr -> expr 
-    := OQL.OSFW.
+    := SQL.OSFW.
   Definition oselect : expr -> select_expr 
-    := OQL.OSelect.
+    := SQL.OSelect.
   Definition oselectdistinct : expr -> select_expr 
-    := OQL.OSelectDistinct.
+    := SQL.OSelectDistinct.
   Definition oin : String.string -> expr -> in_expr 
-    := OQL.OIn.
+    := SQL.OIn.
   Definition oincast : String.string -> String.string -> expr -> in_expr 
-    := OQL.OInCast.
+    := SQL.OInCast.
   Definition otrue : where_expr 
-    := OQL.OTrue.
+    := SQL.OTrue.
   Definition owhere : expr -> where_expr 
-    := OQL.OWhere.
+    := SQL.OWhere.
   Definition onoorder : order_by_expr 
-    := OQL.ONoOrder.
-  Definition oorder_by : expr -> RDataSort.SortDesc -> order_by_expr 
-    := OQL.OOrderBy.
+    := SQL.ONoOrder.
+  Definition oorder_by : expr -> RUnaryOps.SortDesc -> order_by_expr 
+    := SQL.OOrderBy.
   
   Definition odot : String.string -> expr -> expr 
-    := OQLSugar.ODot.
+    := SQLSugar.ODot.
   Definition oarrow : String.string -> expr -> expr 
-    := OQLSugar.OArrow.
+    := SQLSugar.OArrow.
   Definition ostruct : list (String.string * expr) -> expr 
-    := OQLSugar.OStruct.
+    := SQLSugar.OStruct.
 
   Definition tableify : expr -> expr
-    := OQLSugar.tableify.
+    := SQLSugar.tableify.
 
-End QOQL.
+End QSQL.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***

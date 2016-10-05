@@ -46,7 +46,6 @@ Section TData.
   Definition Rrec (r1 r2:(string*data)) :=
     ODT_lt_dec (fst r1) (fst r2).
 
-
   Inductive data_type : data -> rtype -> Prop :=
   | dttop d : data_normalized brand_relation_brands d -> data_type d Top
   | dtunit : data_type dunit Unit
@@ -55,14 +54,14 @@ Section TData.
   | dtstring s : data_type (dstring s) String               
   | dtcoll dl r : Forall (fun d => data_type d r) dl ->
                   data_type (dcoll dl) (Coll r)
-  |  dtrec k dl rl rl_sub pf
-           (pf':is_list_sorted ODT_lt_dec (domain rl) = true) :
-       sublist rl_sub rl ->
-       (k = Closed -> rl_sub = rl) ->
-       Forall2
-         (fun d r => (fst d) = (fst r) /\ data_type (snd d) (snd r))
-         dl rl ->
-       data_type (drec dl) (Rec k rl_sub pf)
+  | dtrec k dl rl rl_sub pf
+          (pf':is_list_sorted ODT_lt_dec (domain rl) = true) :
+      sublist rl_sub rl ->
+      (k = Closed -> rl_sub = rl) ->
+      Forall2
+        (fun d r => (fst d) = (fst r) /\ data_type (snd d) (snd r))
+        dl rl ->
+      data_type (drec dl) (Rec k rl_sub pf)
   | dtleft {d τl} τr : data_type d τl -> data_type (dleft d) (Either τl τr)
   | dtright {d} τl {τr} : data_type d τr -> data_type (dright d) (Either τl τr)
   | dtbrand b b' d :
@@ -81,9 +80,9 @@ Section TData.
       data_type (dforeign fd) (Foreign fτ)
   .
   
-    Notation "d ▹ r" := (data_type d r) (at level 70). (* \triangleright *)
+  Notation "d ▹ r" := (data_type d r) (at level 70). (* \triangleright *)
 
-    Section opt.
+  Section opt.
     (* synonym for option type *)
 
     Lemma dtsome {d τ} :
@@ -107,8 +106,8 @@ Section TData.
       trivial.
     Qed.
 
-    End opt.
-    
+  End opt.
+  
   Lemma dtrec_closed_inv {dl rl pf} :
     data_type (drec dl) (Rec Closed rl pf) ->
     Forall2
@@ -127,7 +126,8 @@ Section TData.
     intros. apply (dtrec _ _ rl rl); intuition.
   Qed.
 
-  Lemma dtrec_open {dl rl rl_sub} pf (pf':is_list_sorted ODT_lt_dec (domain rl) = true) :
+  Lemma dtrec_open {dl : list (string*data)} {rl rl_sub : list (string*rtype)}
+        pf (pf':is_list_sorted ODT_lt_dec (domain rl) = true) :
        sublist rl_sub rl ->
        Forall2
          (fun d r => (fst d) = (fst r) /\ data_type (snd d) (snd r))
@@ -137,7 +137,8 @@ Section TData.
     intros; apply (dtrec _ _  rl rl_sub); intuition; try discriminate.
   Qed.
 
-  Lemma dtrec_open_pf {dl rl rl_sub} (pf':is_list_sorted ODT_lt_dec (domain rl) = true) :
+  Lemma dtrec_open_pf {dl : list (string*data)} {rl rl_sub : list (string*rtype)}
+        (pf':is_list_sorted ODT_lt_dec (domain rl) = true) :
     forall (sub:sublist rl_sub rl),
        Forall2
          (fun d r => (fst d) = (fst r) /\ data_type (snd d) (snd r))

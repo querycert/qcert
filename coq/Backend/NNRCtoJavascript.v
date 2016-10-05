@@ -186,6 +186,7 @@ Section NNRCtoJavascript.
 
   Section NRCJS.
 
+    Require Import RDataSort.
     (* Sort criteria *)
     Definition singleSortCriteriaToJson (sc: string * SortDesc) : json :=
       match snd sc with
@@ -193,10 +194,10 @@ Section NNRCtoJavascript.
       | Descending => jobject (("desc", jstring (fst sc))::nil)
       end.
 
-    Definition sortCriteriaToJson (scl:SortCriteria) : json
+    Definition sortCriteriaToJson (scl:SortCriterias) : json
       := jarray (map singleSortCriteriaToJson scl).
 
-    Definition sortCriteriaToJs (quotel:string) (scl:SortCriteria) : string
+    Definition sortCriteriaToJs (quotel:string) (scl:SortCriterias) : string
       := jsonToJS quotel (sortCriteriaToJson scl).
     
     (* Java equivalent: JavaScriptBackend.uarithToJS *)

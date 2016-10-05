@@ -45,6 +45,7 @@ MODULES = \
 	Basic/Data/RData \
 	Basic/Data/RDataNorm \
 	Basic/Data/RRelation \
+	Basic/Data/RDataSort \
 	Basic/Data/RGroupBy \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
@@ -187,6 +188,7 @@ MODULES = \
 	Frontend/ODMG/OQLtoNRAEnv \
 	Frontend/ODMG/TOQL \
 	Frontend/ODMGRuntime \
+	Frontend/SQL/SQL \
 	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignTypeToJSON \

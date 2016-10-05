@@ -22,6 +22,7 @@ Section OQL.
   Require Import EquivDec.
 
   Require Import Utils BasicSystem.
+  Require Import RDataSort.
 
   Context {fruntime:foreign_runtime}.
 

@@ -720,6 +720,7 @@ Section TOpsInfer.
       constructor; auto.
     Qed.
 
+    (* XXX To be proven (revise with 'orderby' using sortable type predicate) XXX *)
     Lemma ATOrderBy_tunrec {sl} {τ₁ τout} :
       tunrecproject (List.map fst sl) τ₁ = Some τout ->
       unaryOp_type (AOrderBy sl) (Coll τ₁) (Coll  τ₁).
@@ -727,7 +728,8 @@ Section TOpsInfer.
       unfold tunrecproject; intros.
       destructer.
       constructor; auto.
-    Qed.
+      admit.
+    Admitted.
 
     Lemma ATSingleton_tsingleton {τ₁ τout} :
       tsingleton τ₁ = Some τout ->
@@ -786,13 +788,13 @@ Section TOpsInfer.
         destructer.
         assert (is_list_sorted StringOrder.lt_dec (domain (rproject l (map fst s))) = true).
         assert (l = rec_sort l) by (rewrite sort_sorted_is_id; auto).
-        rewrite H1.
+        rewrite H2.
         rewrite rproject_rec_sort_commute.
         generalize (rproject l (map fst s)); intro.
         rewrite <- (rec_sort_sorted l0 (rec_sort l0));
         reflexivity.
         assert (RecMaybe Closed (rproject l (map fst s)) =
-                Some (Rec Closed (rproject l (map fst s)) H1)).
+                Some (Rec Closed (rproject l (map fst s)) H2)).
         apply RecMaybe_pf_some.
         congruence.
       - Case "AForeignUnaryOp"%string.
