@@ -136,7 +136,12 @@ Section SQL.
         let nraenv_from_clause :=
             fold_left sql_from_to_nraenv froms (ANUnop AColl ANID)
         in
-        let nraenv_where_clause := nraenv_from_clause in
+        let nraenv_where_clause :=
+            match opt_where with
+            | None => nraenv_from_clause
+            | Some cond => ANSelect (sql_condition_to_nraenv cond) nraenv_from_clause
+            end
+        in
         let nraenv_group_by_clause := nraenv_where_clause in
         let nraenv_order_by_clause := sql_order_to_nraenv nraenv_group_by_clause opt_order in
         ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
@@ -180,6 +185,45 @@ Section SQL.
                 (sql_expr_to_nraenv expr1)
                 (sql_expr_to_nraenv expr2)
       | SExprAggExpr _ _ => ANConst dunit
+      end
+    with sql_condition_to_nraenv (cond:sql_condition) {struct cond} :=
+      match cond with
+      | SCondAnd cond1 cond2 =>
+        ANBinop AAnd
+                (sql_condition_to_nraenv cond1)
+                (sql_condition_to_nraenv cond2)
+      | SCondOr cond1 cond2 =>
+        ANBinop AOr
+                (sql_condition_to_nraenv cond1)
+                (sql_condition_to_nraenv cond2)
+      | SCondNot cond1 =>
+        ANUnop ANeg
+                (sql_condition_to_nraenv cond1)
+      | SCondBinary SEq expr1 expr2 =>
+        ANBinop AEq
+               (sql_expr_to_nraenv expr1)
+               (sql_expr_to_nraenv expr2)
+      | SCondBinary SLe expr1 expr2 =>
+        ANBinop ALe
+               (sql_expr_to_nraenv expr1)
+               (sql_expr_to_nraenv expr2)
+      | SCondBinary SLt expr1 expr2 =>
+        ANBinop ALt
+               (sql_expr_to_nraenv expr1)
+               (sql_expr_to_nraenv expr2)
+      | SCondBinary SGe expr1 expr2 =>
+        ANUnop ANeg (ANBinop ALt
+                             (sql_expr_to_nraenv expr1)
+                             (sql_expr_to_nraenv expr2))
+      | SCondBinary SGt expr1 expr2 =>
+        ANUnop ANeg (ANBinop ALe
+                             (sql_expr_to_nraenv expr1)
+                             (sql_expr_to_nraenv expr2))
+      | SCondBinary SDiff expr1 expr2 =>
+        ANUnop ANeg (ANBinop AEq
+                             (sql_expr_to_nraenv expr1)
+                             (sql_expr_to_nraenv expr2))
+      | _ => ANConst (dbool true)
       end.
 
     Section SQLExamples.
@@ -202,9 +246,9 @@ Section SQL.
       Open Scope Z_scope.
       Definition persons :=
         mkpersons
-          (("John",25,1008,"IBM")
+          (("John",30,1008,"IBM")
              :: ("Jane",12,1009,"AIG")
-             :: ("Jill",30,1010,"IBM")
+             :: ("Jill",25,1010,"IBM")
              :: ("Jack",56,1010,"CMU")
              :: nil)%string.
 
@@ -234,6 +278,15 @@ Section SQL.
                (SFromTable "Persons"::nil) None None (Some (("age"%string,Ascending)::nil)).
 
       (* Eval vm_compute in (sql_eval sql3 tables). *)
+
+      Definition sql4 :=
+        SQuery (SSelectColumn "name"::nil)
+               (SFromTable "Persons"::nil)
+               (Some (SCondBinary SEq (SExprColumn "company")
+                                  (SExprConst (dstring "IBM"))))
+               None (Some (("age"%string,Ascending)::nil)).
+
+      (* Eval vm_compute in (sql_eval sql4 tables). *)
 
     End SQLExamples.
   
