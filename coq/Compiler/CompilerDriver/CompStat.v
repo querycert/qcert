@@ -232,7 +232,6 @@ Section CompStat.
     drec
       (("nraenv_no_optim", stat_tree_body_nraenv q)
          :: ("nraenv_optim", stat_tree_body_nraenv (nraenv_optim q))
-         :: ("nraenv_compiler", stat_tree_nnrc (nraenv_optim_to_nnrc q))
          :: nil).
 
   Definition stat_tree_camp (q:camp) : data :=

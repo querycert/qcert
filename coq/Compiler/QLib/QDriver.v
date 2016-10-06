@@ -44,23 +44,12 @@ Module QDriver(runtime:CompilerRuntime).
     Definition driver : Set := driver.
     Definition compile : driver -> query -> list query := compile.
 
-    Definition language_of_name_case_sensitive : string -> language :=
-      language_of_name_case_sensitive.
-    Definition name_of_language : language -> string :=
-      name_of_language.
-
     Definition language_of_driver : driver -> language := language_of_driver.
     Definition name_of_driver : driver -> string := name_of_driver.
-    Definition language_of_query : query -> language := language_of_query.
-    Definition name_of_query : query -> string := name_of_query.
 
     (* Compilers config *)
 
     Definition driver_config := driver_config.
-    Definition push_translation : driver_config -> language -> driver -> driver :=
-      push_translation.
-    Definition driver_of_language : language -> driver := driver_of_language.
-
     Definition driver_of_path : driver_config -> list language -> driver :=
       driver_of_path.
     Definition fix_driver : driver -> query -> driver := fix_driver.
@@ -79,9 +68,6 @@ Module QDriver(runtime:CompilerRuntime).
       driver_config -> language -> language -> query -> query
       := compile_from_source_target.
 
-    (* Used in CompStat: *)
-    Definition nraenv_optim_to_nnrc : nraenv -> nnrc := nraenv_optim_to_nnrc.
-
     (* Used in CompTest: *)
     Definition rule_to_nraenv_optim : rule -> nraenv := rule_to_nraenv_optim.
     Definition rule_to_nnrc_optim : rule -> nnrc := rule_to_nnrc_optim.
@@ -99,11 +85,6 @@ Module QDriver(runtime:CompilerRuntime).
     Definition rule_to_camp := rule_to_camp.
     Definition camp_to_nraenv := camp_to_nraenv.
     Definition oql_to_nraenv := oql_to_nraenv.
-
-    (* Used in DisplayUtil: *)
-    Definition nnrcmr_to_nnrcmr_spark_prepare := nnrcmr_to_nnrcmr_spark_prepare.
-    Definition nnrcmr_to_nnrcmr_cldmr_prepare := nnrcmr_to_nnrcmr_cldmr_prepare.
-    Definition dnnrc_dataset_to_dnnrc_typed_dataset := dnnrc_dataset_to_dnnrc_typed_dataset.
 
     (* Used in CloudantUtil *)
     Definition cldmr_to_cloudant : string -> list (string*string) -> cldmr -> cloudant := cldmr_to_cloudant.

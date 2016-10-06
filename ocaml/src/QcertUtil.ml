@@ -21,18 +21,18 @@ let language_of_name name =
   let name =
     char_list_of_string (String.lowercase name)
   in
-  begin match QDriver.language_of_name_case_sensitive name with
+  begin match QLang.language_of_name_case_sensitive name with
   | Compiler.L_error err -> raise (CACo_Error ("Unknown language: "^(string err)))
   | lang -> lang
   end
 
 let name_of_language lang =
-  let name = QDriver.name_of_language lang in
+  let name = QLang.name_of_language lang in
   string name
 
 
 let name_of_query (q: QLang.query) =
-  let name = QDriver.name_of_query (QType.empty_brand_model ()) q in
+  let name = QLang.name_of_query (QType.empty_brand_model ()) q in
   string name
 
 let driver_no_error dv =
