@@ -44,7 +44,8 @@ Section RAlgEnvExt.
 
   Definition map_add_rec (s:string) (op1 op2 : algenv) : algenv :=
     ANMap ((ANBinop AConcat) ANID ((ANUnop (ARec s)) op1)) op2.
-  Definition map_to_rec (s:string) (op : algenv) : algenv := ANMap ((ANUnop (ARec s)) ANID) op.
+  Definition map_to_rec (s:string) (op : algenv) : algenv :=
+    ANMap (ANUnop (ARec s) ANID) op.
 
   Definition flat_map (op1 op2 : algenv) : algenv :=
     ANUnop AFlatten (ANMap op1 op2).
@@ -76,18 +77,58 @@ Section RAlgEnvExt.
 
   Import ListNotations.
   (* g: partition name ; s1: single grouping attribute *)
-  Definition group1 (g:string) (s1:string) (op : algenv) : algenv :=
-    ANMap
-      ((ANBinop AConcat) ((ANUnop (ADot "1")) ((ANUnop (ADot "2")) ANID))
-                         ((ANUnop (ARec g))
-                  (ANMap ((ANUnop (ADot "3")) ANID)
-                            (ANSelect
-                               (ANBinop AEq ((ANUnop (ADot s1)) ((ANUnop (ADot "1")) ANID)) ((ANUnop (ADot s1)) ((ANUnop (ADot "3")) ANID)))
-                               (ANProduct ((ANUnop AColl) ((ANUnop (ADot "2")) ANID))
-                                          ((ANUnop (ADot "4")) ANID))))))
-      (ANMapConcat
-         ((ANUnop AColl) ((ANUnop (ARec "4")) (ANMap ((ANUnop (ARec "3")) ANID) op)))
-         (map_to_rec "2" (map_to_rec "1" ((ANUnop ADistinct) (project (s1::nil) op))))).
+  (* Γ₁[g][s1](op) ==
+     χ⟨
+         ID.t1.t2
+         ⊗
+         [ g : χ⟨ ID.t3 ⟩
+               (σ⟨ ID.t1.s1 = ID.t3.s1 ⟩
+                 ({ ID.t2 } × ID.t4)) ]
+       ⟩
+      ({ [ t4 : χ⟨[t3]⟩(op) ] } × (χ⟨[t2:ID]⟩(χ⟨[t1:ID]⟩(♯distinct(Π[s1](op)))))) *)
+  
+    Definition group_one (g:string) (s1:string) (op : algenv) : algenv :=
+      ANMap
+        (ANBinop AConcat
+                 (ANUnop (ADot "1") (ANUnop (ADot "2") ANID))
+                 (ANUnop (ARec g)
+                         (ANMap (ANUnop (ADot "3") ANID)
+                                (ANSelect
+                                   (ANBinop AEq
+                                            (ANUnop (ADot s1) (ANUnop (ADot "1") ANID))
+                                            (ANUnop (ADot s1) (ANUnop (ADot "3") ANID)))
+                                   (ANProduct (ANUnop AColl (ANUnop (ADot "2") ANID))
+                                              (ANUnop (ADot "4") ANID))))))
+        (ANProduct
+           (ANUnop AColl (ANUnop (ARec "4") (map_to_rec "3" op)))
+           (map_to_rec "2" (map_to_rec "1" (ANUnop ADistinct (project (s1::nil) op))))).
+
+  (* g: partition name ; sl: list of grouping attributes *)
+  (* Γ[g][sl](op) ==
+     χ⟨
+         ID.t1.t2
+         ⊗
+         [ g : χ⟨ ID.t3 ⟩
+               (σ⟨ π[sl](ID.t1) = π[sl](ID.t3) ⟩
+                 ({ ID.t2 } × ID.t4)) ]
+       ⟩
+      ({ [ t4 : χ⟨[t3]⟩(op) ] } × (χ⟨[t2:ID]⟩(χ⟨[t1:ID]⟩(♯distinct(Π[sl](op)))))) *)
+  
+    Definition group_full (g:string) (sl:list string) (op : algenv) : algenv :=
+      ANMap
+        (ANBinop AConcat
+                 (ANUnop (ADot "1") (ANUnop (ADot "2") ANID))
+                 (ANUnop (ARec g)
+                         (ANMap (ANUnop (ADot "3") ANID)
+                                (ANSelect
+                                   (ANBinop AEq
+                                            (ANUnop (ARecProject sl) (ANUnop (ADot "1") ANID))
+                                            (ANUnop (ARecProject sl) (ANUnop (ADot "3") ANID)))
+                                   (ANProduct (ANUnop AColl (ANUnop (ADot "2") ANID))
+                                              (ANUnop (ADot "4") ANID))))))
+        (ANProduct
+           (ANUnop AColl (ANUnop (ARec "4") (map_to_rec "3" op)))
+           (map_to_rec "2" (map_to_rec "1" (ANUnop ADistinct (project sl op))))).
 
   (* Unnest *)
 

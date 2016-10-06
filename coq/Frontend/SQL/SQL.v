@@ -97,6 +97,7 @@ Section SQL.
       option sql_order_spec -> sql_query                 (* OrderBy Clause *)
   with sql_select : Set :=
   | SSelectColumn : string -> sql_select
+  | SSelectStar : sql_select
   | SSelectExpr : string -> sql_expr -> sql_select
   with sql_from : Set :=
   | SFromTable : string -> sql_from
@@ -131,7 +132,7 @@ Section SQL.
     end
   with is_singleton_sql_expr (expr:sql_expr) : bool :=
     match expr with
-    | SExprConst _ => false
+    | SExprConst _ => true
     | SExprColumn _ => false
     | SExprStar => false
     | SExprBinary _ expr1 expr2 =>
@@ -153,7 +154,7 @@ Section SQL.
       end.
 
     Fixpoint sql_to_nraenv (q:sql) {struct q} : algenv :=
-      let singleton : bool := is_singleton_sql_query q in
+      let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
       | SQuery selects froms opt_where opt_group opt_order =>
         let nraenv_from_clause :=
@@ -162,18 +163,20 @@ Section SQL.
         let nraenv_where_clause :=
             match opt_where with
             | None => nraenv_from_clause
-            | Some cond => ANSelect (sql_condition_to_nraenv cond) nraenv_from_clause
+            | Some cond => ANSelect (sql_condition_to_nraenv ANID cond) nraenv_from_clause
             end
         in
         let nraenv_group_by_clause :=
             match opt_group with
             | None => nraenv_where_clause
-            | Some (s1::_,None) => group1 "partition" s1 nraenv_where_clause (* No having -- single grouping attribute *)
-            | _ => nraenv_where_clause
+            | Some (sl,None) => group_full "partition" sl nraenv_where_clause
+            | Some (sl,Some cond) =>
+              ANSelect (sql_condition_to_nraenv (ANUnop (ADot "partition") ANID) cond)
+                       (group_full "partition" sl nraenv_where_clause)
             end
         in
         let nraenv_order_by_clause := sql_order_to_nraenv nraenv_group_by_clause opt_order in
-        if singleton
+        if q_is_singleton (* XXX Two different translations here! XXX *)
         then
           match selects with
           | SSelectExpr _ expr :: nil =>
@@ -200,9 +203,11 @@ Section SQL.
         ANBinop AConcat
                 (ANUnop (ARec cname) (ANUnop (ADot cname) ANID))
                 acc
+      | SSelectStar =>
+        ANBinop AConcat ANID acc
       | SSelectExpr cname expr =>
         ANBinop AConcat
-                (ANUnop (ARec cname) (sql_expr_to_nraenv ANID expr))
+                (ANUnop (ARec cname) (sql_expr_to_nraenv (ANUnop (ADot "partition") ANID) expr))
                 acc
       end
     with sql_expr_to_nraenv (acc:algenv) (expr:sql_expr) {struct expr} :=
@@ -234,43 +239,43 @@ Section SQL.
         ANUnop ACount (ANMap (sql_expr_to_nraenv ANID expr1) acc)
       | SExprQuery q => sql_to_nraenv q
       end
-    with sql_condition_to_nraenv (cond:sql_condition) {struct cond} :=
+    with sql_condition_to_nraenv (acc:algenv) (cond:sql_condition) {struct cond} :=
       match cond with
       | SCondAnd cond1 cond2 =>
         ANBinop AAnd
-                (sql_condition_to_nraenv cond1)
-                (sql_condition_to_nraenv cond2)
+                (sql_condition_to_nraenv acc cond1)
+                (sql_condition_to_nraenv acc cond2)
       | SCondOr cond1 cond2 =>
         ANBinop AOr
-                (sql_condition_to_nraenv cond1)
-                (sql_condition_to_nraenv cond2)
+                (sql_condition_to_nraenv acc cond1)
+                (sql_condition_to_nraenv acc cond2)
       | SCondNot cond1 =>
         ANUnop ANeg
-                (sql_condition_to_nraenv cond1)
+                (sql_condition_to_nraenv acc cond1)
       | SCondBinary SEq expr1 expr2 =>
         ANBinop AEq
-               (sql_expr_to_nraenv ANID expr1)
-               (sql_expr_to_nraenv ANID expr2)
+               (sql_expr_to_nraenv acc expr1)
+               (sql_expr_to_nraenv acc expr2)
       | SCondBinary SLe expr1 expr2 =>
         ANBinop ALe
-               (sql_expr_to_nraenv ANID expr1)
-               (sql_expr_to_nraenv ANID expr2)
+               (sql_expr_to_nraenv acc expr1)
+               (sql_expr_to_nraenv acc expr2)
       | SCondBinary SLt expr1 expr2 =>
         ANBinop ALt
-               (sql_expr_to_nraenv ANID expr1)
-               (sql_expr_to_nraenv ANID expr2)
+               (sql_expr_to_nraenv acc expr1)
+               (sql_expr_to_nraenv acc expr2)
       | SCondBinary SGe expr1 expr2 =>
         ANUnop ANeg (ANBinop ALt
-                             (sql_expr_to_nraenv ANID expr1)
-                             (sql_expr_to_nraenv ANID expr2))
+                             (sql_expr_to_nraenv acc expr1)
+                             (sql_expr_to_nraenv acc expr2))
       | SCondBinary SGt expr1 expr2 =>
         ANUnop ANeg (ANBinop ALe
-                             (sql_expr_to_nraenv ANID expr1)
-                             (sql_expr_to_nraenv ANID expr2))
+                             (sql_expr_to_nraenv acc expr1)
+                             (sql_expr_to_nraenv acc expr2))
       | SCondBinary SDiff expr1 expr2 =>
         ANUnop ANeg (ANBinop AEq
-                             (sql_expr_to_nraenv ANID expr1)
-                             (sql_expr_to_nraenv ANID expr2))
+                             (sql_expr_to_nraenv acc expr1)
+                             (sql_expr_to_nraenv acc expr2))
       | _ => ANConst (dbool true)
       end.
 
@@ -307,8 +312,14 @@ Section SQL.
       mkpersons
         (("John",30,1008,"IBM")
            :: ("Jane",12,1009,"AIG")
+           :: ("Joan",30,1008,"AIG")
+           :: ("Jade",30,1008,"AIG")
+           :: ("Jacques",30,1008,"AIG")
            :: ("Jill",25,1010,"IBM")
+           :: ("Joo",25,1010,"IBM")
+           :: ("Just",12,1010,"IBM")
            :: ("Jack",56,1010,"CMU")
+           :: ("Jerome",56,1010,"CMU")
            :: nil)%string.
 
     Definition tables := (("Persons", persons)::nil)%string.
@@ -399,9 +410,65 @@ Section SQL.
         from Persons
         group by age *)
     Definition sql8 :=
-      SQuery (SSelectExpr "res" SExprStar::nil) (SFromTable "Persons"::nil) None (Some (("age"%string::nil),None)) None.
+      SQuery (SSelectExpr "res" SExprStar::nil)
+             (SFromTable "Persons"::nil) None (Some (("age"%string::nil),None)) None.
 
-    Eval vm_compute in (sql_eval sql8 tables).
+    (* Eval vm_compute in (sql_eval sql8 tables). *)
+
+    (* sql9:
+        select age, count( * ) as nb
+        from Persons
+        group by age *)
+    Definition sql9 :=
+      SQuery (SSelectColumn "age" :: SSelectExpr "nb"
+                            (SExprAggExpr SCount SExprStar)::nil)
+             (SFromTable "Persons"::nil) None (Some (("age"%string::nil),None)) None.
+
+    (* Eval vm_compute in (sql_eval sql9 tables). *)
+
+    (* sql10:
+        select age, count( * ) as nb
+        from Persons
+        group by age
+        order by age *)
+    Definition sql10 :=
+      SQuery (SSelectColumn "age" :: SSelectExpr "nb"
+                            (SExprAggExpr SCount SExprStar)::nil)
+             (SFromTable "Persons"::nil) None
+             (Some (("age"%string::nil),None)) (Some (("age"%string,Ascending)::nil)).
+
+    (* Eval vm_compute in (sql_eval sql10 tables). *)
+
+    (* sql11:
+        select age, count( * ) as nb
+        from Persons
+        group by age
+        having count( * ) > 1
+        order by age
+   *)
+    Definition sql11 :=
+      SQuery (SSelectColumn "age" :: SSelectExpr "nb"
+                            (SExprAggExpr SCount SExprStar)::nil)
+             (SFromTable "Persons"::nil)
+             None (Some (("age"%string::nil),
+                         Some (SCondBinary SGt (SExprAggExpr SCount SExprStar)
+                                           (SExprConst (dnat 1)))))
+             (Some (("age"%string,Ascending)::nil)).
+
+    (* sql12:
+        select age, company, count( * ) as nb
+        from Persons
+        group by age, company
+        // order by age  -- BUG IN ORDERBY REMOVING DUPLICATES
+     *)
+    Definition sql12 :=
+      SQuery (SSelectColumn "age" :: SSelectColumn "company" :: SSelectExpr "nb"
+                            (SExprAggExpr SCount SExprStar)::nil)
+             (SFromTable "Persons"::nil)
+             None
+             (Some (("age"%string::"company"%string::nil),None)) None.
+
+    (* Eval vm_compute in (sql_eval sql12 tables). *)
 
   End SQLExamples.
   
