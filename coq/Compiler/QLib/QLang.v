@@ -14,6 +14,7 @@
  * limitations under the License.
  *)
 
+Require Import String.
 Require Import CompLang.
 
 Require Import CompilerRuntime.
@@ -51,6 +52,13 @@ Module QLang(runtime:CompilerRuntime).
     Definition language : Set := language.
 
     Definition query : Set := query.
+
+    Definition language_of_name_case_sensitive : string -> language :=
+      language_of_name_case_sensitive.
+    Definition name_of_language : language -> string :=
+      name_of_language.
+    Definition language_of_query : query -> language := language_of_query.
+    Definition name_of_query : query -> string := name_of_query.
 
   End QL.
 End QLang.

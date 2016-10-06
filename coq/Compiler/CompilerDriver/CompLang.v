@@ -31,7 +31,7 @@ Section CompLang.
   Require Import NNRCMRtoDNNRC.
   Require Import TDNRCInfer.
   Require Import LambdaAlg.
-  
+
   Require Rule.
 
   Definition vdbindings := vdbindings.
@@ -138,6 +138,80 @@ Section CompLang.
     | Case_aux c "Q_spark2"%string
     | Case_aux c "Q_cloudant"%string
     | Case_aux c "Q_error"%string].
+
+
+  Section CompLangUtil.
+
+  Definition language_of_name_case_sensitive name : language:=
+    match name with
+    | "rule"%string => L_rule
+    | "camp"%string => L_camp
+    | "oql"%string => L_oql
+    | "lambda_nra"%string => L_lambda_nra
+    | "nra"%string => L_nra
+    | "nraenv"%string => L_nraenv
+    | "nnrc"%string => L_nnrc
+    | "nnrcmr"%string => L_nnrcmr
+    | "cldmr"%string => L_cldmr
+    | "dnnrc"%string => L_dnnrc_dataset
+    | "dnnrc_typed"%string => L_dnnrc_typed_dataset
+    | "js"%string | "rhino"%string | "javascript"%string => L_javascript
+    | "java"%string => L_java
+    | "spark"%string => L_spark
+    | "spark2"%string => L_spark2
+    | "cloudant"%string => L_cloudant
+    | "error"%string => L_error ""
+    | _ => L_error ("'"++name++"' is not a language name")
+    end.
+
+  Definition name_of_language lang :=
+    match lang with
+    | L_rule => "rule"%string
+    | L_camp => "camp"%string
+    | L_oql => "oql"%string
+    | L_lambda_nra => "lambda_nra"%string
+    | L_nra => "nra"%string
+    | L_nraenv => "nraenv"%string
+    | L_nnrc => "nnrc"%string
+    | L_nnrcmr => "nnrcmr"%string
+    | L_cldmr => "cldmr"%string
+    | L_dnnrc_dataset => "dnnrc"%string
+    | L_dnnrc_typed_dataset => "dnnrc_typed"%string
+    | L_javascript => "js"%string
+    | L_java => "java"%string
+    | L_spark => "spark"%string
+    | L_spark2 => "spark2"%string
+    | L_cloudant => "cloudant"%string
+    | L_error _ => "error"%string
+    end.
+
+  Definition language_of_query q :=
+    match q with
+    | Q_rule _ => L_rule
+    | Q_camp _ => L_camp
+    | Q_oql _ => L_oql
+    | Q_lambda_nra _ => L_lambda_nra
+    | Q_nra _ => L_nra
+    | Q_nraenv _ => L_nraenv
+    | Q_nnrc _ => L_nnrc
+    | Q_nnrcmr _ => L_nnrcmr
+    | Q_cldmr _ => L_cldmr
+    | Q_dnnrc_dataset _ => L_dnnrc_dataset
+    | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
+    | Q_javascript _ => L_javascript
+    | Q_java _ => L_java
+    | Q_spark _ => L_spark
+    | Q_spark2 _ => L_spark2
+    | Q_cloudant _ => L_cloudant
+    | Q_error err =>
+      L_error ("No language corresponding to error query '"++err++"'")
+    end.
+
+  Definition name_of_query q :=
+    name_of_language (language_of_query q).
+
+
+  End CompLangUtil.
 
 End CompLang.
 

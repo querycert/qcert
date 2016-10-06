@@ -84,7 +84,7 @@ let emit_string (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) prett
   let s = PrettyIL.pretty_query pretty_conf q in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
-  let ext = ConfigUtil.suffix_of_language (QDriver.language_of_query brand_model q) in
+  let ext = ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q) in
   let fout = outname (target_f dir fpref) ext in
   { res_file = fout; res_content = s; }
 
@@ -95,7 +95,7 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let s = SExp.sexp_to_string sexp in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
-  let fpost = QcertUtil.name_of_language (QDriver.language_of_query brand_model q) in
+  let fpost = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
   { res_file = fout; res_content = s; }
 
@@ -154,7 +154,7 @@ let main gconf (file_name, query_s) =
             let dir = gconf.gconf_dir in
             let res = emit_string dv_conf schema pconf dir fname q in
             let suff =
-              ConfigUtil.suffix_of_language (QDriver.language_of_query brand_model q)
+              ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
             in
             let fname = (Filename.chop_extension fname)^suff in
             (fname, res::acc))
@@ -179,7 +179,7 @@ let main gconf (file_name, query_s) =
           (fun (fname, acc) q ->
             let res = emit_sexpr_string schema gconf.gconf_dir fname q in
             let suff =
-              ConfigUtil.suffix_of_language (QDriver.language_of_query brand_model q)
+              ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
             in
             let fname = (Filename.chop_extension fname)^suff in
             (fname, res::acc))
