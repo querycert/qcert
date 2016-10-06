@@ -75,6 +75,7 @@ Section RAlgEnvExt.
   *)
 
   Import ListNotations.
+  (* g: partition name ; s1: single grouping attribute *)
   Definition group1 (g:string) (s1:string) (op : algenv) : algenv :=
     ANMap
       ((ANBinop AConcat) ((ANUnop (ADot "1")) ((ANUnop (ADot "2")) ANID))

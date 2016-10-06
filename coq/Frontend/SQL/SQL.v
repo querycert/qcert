@@ -143,6 +143,8 @@ Section SQL.
   Section Translation.
     Require Import NRAEnvRuntime.
 
+    Require Import RAlgEnvExt.
+    
     Definition sql_order_to_nraenv (acc:algenv) (opt_order:option sql_order_spec) :=
       match opt_order with
       | None => acc
@@ -163,7 +165,13 @@ Section SQL.
             | Some cond => ANSelect (sql_condition_to_nraenv cond) nraenv_from_clause
             end
         in
-        let nraenv_group_by_clause := nraenv_where_clause in
+        let nraenv_group_by_clause :=
+            match opt_group with
+            | None => nraenv_where_clause
+            | Some (s1::_,None) => group1 "partition" s1 nraenv_where_clause (* No having -- single grouping attribute *)
+            | _ => nraenv_where_clause
+            end
+        in
         let nraenv_order_by_clause := sql_order_to_nraenv nraenv_group_by_clause opt_order in
         if singleton
         then
@@ -194,7 +202,7 @@ Section SQL.
                 acc
       | SSelectExpr cname expr =>
         ANBinop AConcat
-                (ANUnop (ARec cname) (ANUnop (ADot cname) (sql_expr_to_nraenv ANID expr)))
+                (ANUnop (ARec cname) (sql_expr_to_nraenv ANID expr))
                 acc
       end
     with sql_expr_to_nraenv (acc:algenv) (expr:sql_expr) {struct expr} :=
@@ -370,6 +378,7 @@ Section SQL.
              (SFromTable "Persons"::nil) None None None.
 
     (* Eval vm_compute in (sql_eval sql6 tables). *)
+
     (* sql7:
          select count( * )
            from
@@ -384,6 +393,15 @@ Section SQL.
              (SFromQuery ("IBMers"%string,None) sql4 :: nil) None None None.
 
     (* Eval vm_compute in (sql_eval sql7 tables). *)
+
+    (* sql8:
+        select *
+        from Persons
+        group by age *)
+    Definition sql8 :=
+      SQuery (SSelectExpr "res" SExprStar::nil) (SFromTable "Persons"::nil) None (Some (("age"%string::nil),None)) None.
+
+    Eval vm_compute in (sql_eval sql8 tables).
 
   End SQLExamples.
   
