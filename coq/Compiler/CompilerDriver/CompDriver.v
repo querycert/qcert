@@ -581,7 +581,6 @@ Section CompDriver.
   End CompDriverCompile.
 
   Section CompDriverUtil.
-
   Definition language_of_driver (dv: driver) :=
     match dv with
     | Dv_nra _ => L_nra

@@ -153,6 +153,7 @@ Section CompLang.
     | "rule"%string => L_rule
     | "camp"%string => L_camp
     | "oql"%string => L_oql
+    | "sql"%string => L_sql
     | "lambda_nra"%string => L_lambda_nra
     | "nra"%string => L_nra
     | "nraenv"%string => L_nraenv
@@ -175,6 +176,7 @@ Section CompLang.
     | L_rule => "rule"%string
     | L_camp => "camp"%string
     | L_oql => "oql"%string
+    | L_sql => "sql"%string
     | L_lambda_nra => "lambda_nra"%string
     | L_nra => "nra"%string
     | L_nraenv => "nraenv"%string
@@ -196,6 +198,7 @@ Section CompLang.
     | Q_rule _ => L_rule
     | Q_camp _ => L_camp
     | Q_oql _ => L_oql
+    | Q_sql _ => L_sql
     | Q_lambda_nra _ => L_lambda_nra
     | Q_nra _ => L_nra
     | Q_nraenv _ => L_nraenv
