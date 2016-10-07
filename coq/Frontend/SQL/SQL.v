@@ -24,10 +24,10 @@ Query ::= "select" SelectExpr ("," SelectExpr)*
           "from" FromExpr ("," FromExpr)*
           ( "where" Cond )?
 	  ( "group by" GroupExpr ("," GroupExpr)*
-	    ( "having" Cond )? )?                          /* having only allowed for group by */
+	    ( "having" Cond )? )?                          // having only allowed for group by
 	  ( "order by" SortCriteria ("," SortCriteria)* )?
 	  
-SelectExpr ::= Column | Expr "as" Column | Agg ( Expr )
+SelectExpr ::= Column | * | Expr "as" Column
 
 Agg ::= "sum" | "avg" | "count"
 
