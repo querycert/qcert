@@ -109,7 +109,7 @@ Section SQL.
   | SCondBinary : sql_bin_cond -> sql_expr -> sql_expr -> sql_condition
   | SCondExists : sql_query -> sql_condition
   | SCondIn : sql_expr -> sql_expr -> sql_condition
-  | SCondLike : sql_expr -> sql_expr -> sql_condition
+(*| SCondLike : sql_expr -> sql_expr -> sql_condition -- XXX Missing Operator XXX *)
   | SCondBetween : sql_expr -> sql_expr -> sql_expr -> sql_condition
   with sql_expr : Set :=
   | SExprConst : data -> sql_expr
@@ -153,6 +153,31 @@ Section SQL.
         ANUnop (AOrderBy sql_order_spec) acc
       end.
 
+    Definition column_of_select (select:sql_select) : string :=
+      match select with
+      | SSelectColumn cname => cname
+      | SSelectStar => "" (* XXX Ouch ... do we need full inference because of this? XXX *)
+      | SSelectExpr cname _ => cname
+      end.
+    
+    Definition columns_of_selects (selects:list sql_select) : list string :=
+      map column_of_select selects.
+    
+    Definition columns_of_query (q:sql) : list string :=
+      match q with
+      | SQuery selects _ _ _ _ =>
+        columns_of_selects selects
+      end.
+
+    Fixpoint create_renaming (out_columns in_columns:list string) :=
+      match out_columns,in_columns with
+      | nil,_ | _,nil =>  (ANConst (drec nil))
+      | out_cname :: out_columns', in_cname :: in_columns' =>
+        ANBinop AConcat
+                (ANUnop (ARec out_cname) (ANUnop (ADot in_cname) ANID))
+                (create_renaming out_columns' in_columns')
+      end.
+    
     Fixpoint sql_to_nraenv (q:sql) {struct q} : algenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
@@ -193,7 +218,10 @@ Section SQL.
       | SFromQuery tspec q =>
         let (tname,opt_columns) := tspec in
         match opt_columns with
-        | Some columns => sql_to_nraenv q (* XXX Must add renaming in this case XXX *)
+        | Some out_columns =>
+          let in_columns := columns_of_query q in
+          ANMap (create_renaming out_columns in_columns)
+                (sql_to_nraenv q)
         | None => sql_to_nraenv q
         end
       end
@@ -276,7 +304,22 @@ Section SQL.
         ANUnop ANeg (ANBinop AEq
                              (sql_expr_to_nraenv acc expr1)
                              (sql_expr_to_nraenv acc expr2))
-      | _ => ANConst (dbool true)
+      | SCondExists q =>
+        ANUnop ANeg (ANBinop ALe
+                             (ANUnop ACount (sql_to_nraenv q))
+                             (ANConst (dnat 0)))
+      | SCondIn expr1 expr2 =>
+        ANBinop AContains
+                (sql_expr_to_nraenv acc expr1)
+                (sql_expr_to_nraenv acc expr2)
+      | SCondBetween expr1 expr2 expr3 =>
+        ANBinop AAnd
+                (ANBinop ALe
+                         (sql_expr_to_nraenv acc expr2)
+                         (sql_expr_to_nraenv acc expr1))
+                (ANBinop ALe
+                         (sql_expr_to_nraenv acc expr1)
+                         (sql_expr_to_nraenv acc expr3))
       end.
 
   End Translation.
@@ -469,6 +512,35 @@ Section SQL.
              (Some (("age"%string::"company"%string::nil),None)) None.
 
     (* Eval vm_compute in (sql_eval sql12 tables). *)
+
+    (* sql13:
+         select name
+         from Persons
+         where company = 'IBM'
+         order by age *)
+    Definition sql13 :=
+      SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
+             (SFromTable "Persons"::nil)
+             (Some (SCondBinary SEq (SExprColumn "company")
+                                (SExprConst (dstring "IBM"))))
+             None (Some (("age"%string,Ascending)::nil)).
+
+    (* Eval vm_compute in (sql_eval sql13 tables). *)
+
+    (* sql14:
+         select nom
+           from
+              ( select name,age
+                from Persons
+                where company = 'IBM'
+                order by age ) as (nom,age)
+     *)
+    Definition sql14 :=
+      SQuery (SSelectColumn "nom"::nil)
+             (SFromQuery ("IBMers"%string,Some ("nom"%string::"age"%string::nil)) sql13 :: nil)
+             None None None.
+
+    (* Eval vm_compute in (sql_eval sql14 tables). *)
 
   End SQLExamples.
   
