@@ -141,6 +141,18 @@ Section SQL.
     | SExprQuery q => is_singleton_sql_query q
     end.
   
+  (* Note: Has to be reviewed carefully -- similar predicate but
+     checking that the result is a single column (used in 'in'
+     predicate for unboxing) *)
+  
+  Fixpoint is_value_sequence_sql_query (q:sql) : bool :=
+    match q with
+    | SQuery (SSelectExpr _ expr :: nil) _ _ _ _ =>
+      if (is_singleton_sql_expr expr) then false else true
+    | SQuery (SSelectColumn _ :: nil) _ _ _ _ => true
+    | _ => false
+    end.
+  
   Section Translation.
     Require Import NRAEnvRuntime.
 
@@ -178,7 +190,7 @@ Section SQL.
                 (create_renaming out_columns' in_columns')
       end.
     
-    Fixpoint sql_to_nraenv (q:sql) {struct q} : algenv :=
+    Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql) {struct q} : algenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
       | SQuery selects froms opt_where opt_group opt_order =>
@@ -203,14 +215,28 @@ Section SQL.
         let nraenv_order_by_clause := sql_order_to_nraenv nraenv_group_by_clause opt_order in
         if q_is_singleton (* XXX Two different translations here! XXX *)
         then
-          match selects with
-          | SSelectExpr _ expr :: nil =>
-            sql_expr_to_nraenv nraenv_order_by_clause expr
-          | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
-          end
+            match selects with
+            | SSelectExpr _ expr :: nil =>
+              sql_expr_to_nraenv true nraenv_order_by_clause expr
+            | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
+            end
         else
-          ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
-                nraenv_order_by_clause
+          if create_table
+          then
+            ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
+                  nraenv_order_by_clause
+          else
+            if (is_value_sequence_sql_query q)
+            then
+              match selects with
+              | SSelectExpr _ expr :: nil =>
+                ANMap (sql_expr_to_nraenv false ANID expr) nraenv_order_by_clause
+              | SSelectColumn cname :: nil =>
+                ANMap (ANUnop (ADot cname) ANID) nraenv_order_by_clause
+              | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
+              end
+            else
+              ANConst dunit (* XXX This should be really a compilation error XXX *)
       end
     with sql_from_to_nraenv (acc:algenv) (from:sql_from) {struct from} :=
       match from with
@@ -221,8 +247,8 @@ Section SQL.
         | Some out_columns =>
           let in_columns := columns_of_query q in
           ANMap (create_renaming out_columns in_columns)
-                (sql_to_nraenv q)
-        | None => sql_to_nraenv q
+                (sql_query_to_nraenv true q)
+        | None => sql_query_to_nraenv true q
         end
       end
     with sql_select_to_nraenv (acc:algenv) (select:sql_select) {struct select} :=
@@ -235,37 +261,40 @@ Section SQL.
         ANBinop AConcat ANID acc
       | SSelectExpr cname expr =>
         ANBinop AConcat
-                (ANUnop (ARec cname) (sql_expr_to_nraenv (ANUnop (ADot "partition") ANID) expr))
+                (ANUnop (ARec cname) (sql_expr_to_nraenv false (ANUnop (ADot "partition") ANID) expr))
                 acc
       end
-    with sql_expr_to_nraenv (acc:algenv) (expr:sql_expr) {struct expr} :=
+    with sql_expr_to_nraenv (create_table:bool) (acc:algenv) (expr:sql_expr) {struct expr} :=
       match expr with
       | SExprConst d => ANConst d
       | SExprColumn cname => ANUnop (ADot cname) ANID
       | SExprStar => ANID
       | SExprBinary SPlus expr1 expr2 =>
         ANBinop (ABArith ArithPlus)
-                (sql_expr_to_nraenv acc expr1)
-                (sql_expr_to_nraenv acc expr2)
+                (sql_expr_to_nraenv create_table acc expr1)
+                (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SMinus expr1 expr2 =>
         ANBinop (ABArith ArithMinus)
-                (sql_expr_to_nraenv acc expr1)
-                (sql_expr_to_nraenv acc expr2)
+                (sql_expr_to_nraenv create_table acc expr1)
+                (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SMult expr1 expr2 =>
         ANBinop (ABArith ArithMult)
-                (sql_expr_to_nraenv acc expr1)
-                (sql_expr_to_nraenv acc expr2)
+                (sql_expr_to_nraenv create_table acc expr1)
+                (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SDivide expr1 expr2 =>
         ANBinop (ABArith ArithDivide)
-                (sql_expr_to_nraenv acc expr1)
-                (sql_expr_to_nraenv acc expr2)
+                (sql_expr_to_nraenv create_table acc expr1)
+                (sql_expr_to_nraenv create_table acc expr2)
       | SExprAggExpr SSum expr1 =>
-        ANUnop ASum (ANMap (sql_expr_to_nraenv ANID expr1) acc)
+        ANUnop ASum (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
       | SExprAggExpr SAvg expr1 =>
-        ANUnop AArithMean (ANMap (sql_expr_to_nraenv ANID expr1) acc)
+        ANUnop AArithMean (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
       | SExprAggExpr SCount expr1 =>
-        ANUnop ACount (ANMap (sql_expr_to_nraenv ANID expr1) acc)
-      | SExprQuery q => sql_to_nraenv q
+        ANUnop ACount (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+      | SExprQuery q =>
+        if create_table
+        then sql_query_to_nraenv true q
+        else sql_query_to_nraenv false q
       end
     with sql_condition_to_nraenv (acc:algenv) (cond:sql_condition) {struct cond} :=
       match cond with
@@ -282,46 +311,49 @@ Section SQL.
                 (sql_condition_to_nraenv acc cond1)
       | SCondBinary SEq expr1 expr2 =>
         ANBinop AEq
-               (sql_expr_to_nraenv acc expr1)
-               (sql_expr_to_nraenv acc expr2)
+               (sql_expr_to_nraenv true acc expr1)
+               (sql_expr_to_nraenv true acc expr2)
       | SCondBinary SLe expr1 expr2 =>
         ANBinop ALe
-               (sql_expr_to_nraenv acc expr1)
-               (sql_expr_to_nraenv acc expr2)
+               (sql_expr_to_nraenv true acc expr1)
+               (sql_expr_to_nraenv true acc expr2)
       | SCondBinary SLt expr1 expr2 =>
         ANBinop ALt
-               (sql_expr_to_nraenv acc expr1)
-               (sql_expr_to_nraenv acc expr2)
+               (sql_expr_to_nraenv true acc expr1)
+               (sql_expr_to_nraenv true acc expr2)
       | SCondBinary SGe expr1 expr2 =>
         ANUnop ANeg (ANBinop ALt
-                             (sql_expr_to_nraenv acc expr1)
-                             (sql_expr_to_nraenv acc expr2))
+                             (sql_expr_to_nraenv true acc expr1)
+                             (sql_expr_to_nraenv true acc expr2))
       | SCondBinary SGt expr1 expr2 =>
         ANUnop ANeg (ANBinop ALe
-                             (sql_expr_to_nraenv acc expr1)
-                             (sql_expr_to_nraenv acc expr2))
+                             (sql_expr_to_nraenv true acc expr1)
+                             (sql_expr_to_nraenv true acc expr2))
       | SCondBinary SDiff expr1 expr2 =>
         ANUnop ANeg (ANBinop AEq
-                             (sql_expr_to_nraenv acc expr1)
-                             (sql_expr_to_nraenv acc expr2))
+                             (sql_expr_to_nraenv true acc expr1)
+                             (sql_expr_to_nraenv true acc expr2))
       | SCondExists q =>
         ANUnop ANeg (ANBinop ALe
-                             (ANUnop ACount (sql_to_nraenv q))
+                             (ANUnop ACount (sql_query_to_nraenv true q))
                              (ANConst (dnat 0)))
       | SCondIn expr1 expr2 =>
         ANBinop AContains
-                (sql_expr_to_nraenv acc expr1)
-                (sql_expr_to_nraenv acc expr2)
+                (sql_expr_to_nraenv true acc expr1)
+                (sql_expr_to_nraenv false acc expr2)
       | SCondBetween expr1 expr2 expr3 =>
         ANBinop AAnd
                 (ANBinop ALe
-                         (sql_expr_to_nraenv acc expr2)
-                         (sql_expr_to_nraenv acc expr1))
+                         (sql_expr_to_nraenv true acc expr2)
+                         (sql_expr_to_nraenv true acc expr1))
                 (ANBinop ALe
-                         (sql_expr_to_nraenv acc expr1)
-                         (sql_expr_to_nraenv acc expr3))
+                         (sql_expr_to_nraenv true acc expr1)
+                         (sql_expr_to_nraenv true acc expr3))
       end.
 
+    Definition sql_to_nraenv (q:sql) : algenv :=
+      sql_query_to_nraenv true q.
+    
   End Translation.
 
   Section SQLEval.
@@ -332,217 +364,11 @@ Section SQL.
       := fun_of_algenv nil constants (sql_to_nraenv q) (drec nil) (drec nil).
   End SQLEval.
 
-  Section SQLExamples.
-    (* Some Working Examples *)
-
-    Require Import ZArith.
-    Open Scope Z_scope.
-
-    Definition mkperson (name:string) (age:Z) (zip:Z) (company:string) :=
-      drec (("name", dstring name)
-              :: ("age", dnat age)
-              :: ("zip", dnat zip)
-              :: ("company", dstring company)
-              :: nil)%string.
-    Definition mkpersons_aux l :=
-      map (fun x =>
-             match x with (name, age, zip, company) => mkperson name age zip company
-             end) l.
-    Definition mkpersons l :=
-      dcoll (mkpersons_aux l).
-
-    Definition persons :=
-      mkpersons
-        (("John",30,1008,"IBM")
-           :: ("Jane",12,1009,"AIG")
-           :: ("Joan",30,1008,"AIG")
-           :: ("Jade",30,1008,"AIG")
-           :: ("Jacques",30,1008,"AIG")
-           :: ("Jill",25,1010,"IBM")
-           :: ("Joo",25,1010,"IBM")
-           :: ("Just",12,1010,"IBM")
-           :: ("Jack",56,1010,"CMU")
-           :: ("Jerome",56,1010,"CMU")
-           :: nil)%string.
-
-    Definition tables := (("Persons", persons)::nil)%string.
-
-    (* sql1:
-        select name
-        from Persons *)
-    Definition sql1 :=
-      SQuery (SSelectColumn "name"::nil) (SFromTable "Persons"::nil) None None None.
-    Definition nraenv1 :=
-      sql_to_nraenv sql1.
-
-    (* Eval vm_compute in nraenv1. *)
-    (* Eval vm_compute in (nraenv_eval nraenv1 tables). *)
-
-    (* sql2:
-         select name,
-                age
-         from Persons
-         order by age *)
-    Definition sql2 :=
-      SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
-             (SFromTable "Persons"::nil) None None (Some (("age"%string,Ascending)::nil)).
-
-    (* Eval vm_compute in (sql_eval sql2 tables). *)
-
-    (* sql3:
-         select name
-         from Persons
-         order by age *)
-    Definition sql3 :=
-      SQuery (SSelectColumn "name"::nil)
-             (SFromTable "Persons"::nil) None None (Some (("age"%string,Ascending)::nil)).
-
-    (* Eval vm_compute in (sql_eval sql3 tables). *)
-
-    (* sql4:
-         select name
-         from Persons
-         where company = 'IBM'
-         order by age *)
-    Definition sql4 :=
-      SQuery (SSelectColumn "name"::nil)
-             (SFromTable "Persons"::nil)
-             (Some (SCondBinary SEq (SExprColumn "company")
-                                (SExprConst (dstring "IBM"))))
-             None (Some (("age"%string,Ascending)::nil)).
-
-    (* Eval vm_compute in (sql_eval sql4 tables). *)
-
-    (* sql5:
-         select sum(age)
-         from Persons *)
-    Definition sql5 :=
-      SQuery (SSelectExpr ""
-                          (SExprAggExpr SSum (SExprColumn "age"))::nil)
-             (SFromTable "Persons"::nil) None None None.
-
-    (* Eval vm_compute in (sql_eval sql5 tables). *)
-
-    (* sql6:
-         select count( * )
-         from Persons *)
-    Definition sql6 :=
-      SQuery (SSelectExpr ""
-                          (SExprAggExpr SCount SExprStar)::nil)
-             (SFromTable "Persons"::nil) None None None.
-
-    (* Eval vm_compute in (sql_eval sql6 tables). *)
-
-    (* sql7:
-         select count( * )
-           from
-              ( select name
-                from Persons
-                where company = 'IBM'
-                order by age ) as IBMers
-     *)
-    Definition sql7 :=
-      SQuery (SSelectExpr ""
-                          (SExprAggExpr SCount SExprStar)::nil)
-             (SFromQuery ("IBMers"%string,None) sql4 :: nil) None None None.
-
-    (* Eval vm_compute in (sql_eval sql7 tables). *)
-
-    (* sql8:
-        select *
-        from Persons
-        group by age *)
-    Definition sql8 :=
-      SQuery (SSelectExpr "res" SExprStar::nil)
-             (SFromTable "Persons"::nil) None (Some (("age"%string::nil),None)) None.
-
-    (* Eval vm_compute in (sql_eval sql8 tables). *)
-
-    (* sql9:
-        select age, count( * ) as nb
-        from Persons
-        group by age *)
-    Definition sql9 :=
-      SQuery (SSelectColumn "age" :: SSelectExpr "nb"
-                            (SExprAggExpr SCount SExprStar)::nil)
-             (SFromTable "Persons"::nil) None (Some (("age"%string::nil),None)) None.
-
-    (* Eval vm_compute in (sql_eval sql9 tables). *)
-
-    (* sql10:
-        select age, count( * ) as nb
-        from Persons
-        group by age
-        order by age *)
-    Definition sql10 :=
-      SQuery (SSelectColumn "age" :: SSelectExpr "nb"
-                            (SExprAggExpr SCount SExprStar)::nil)
-             (SFromTable "Persons"::nil) None
-             (Some (("age"%string::nil),None)) (Some (("age"%string,Ascending)::nil)).
-
-    (* Eval vm_compute in (sql_eval sql10 tables). *)
-
-    (* sql11:
-        select age, count( * ) as nb
-        from Persons
-        group by age
-        having count( * ) > 1
-        order by age
-   *)
-    Definition sql11 :=
-      SQuery (SSelectColumn "age" :: SSelectExpr "nb"
-                            (SExprAggExpr SCount SExprStar)::nil)
-             (SFromTable "Persons"::nil)
-             None (Some (("age"%string::nil),
-                         Some (SCondBinary SGt (SExprAggExpr SCount SExprStar)
-                                           (SExprConst (dnat 1)))))
-             (Some (("age"%string,Ascending)::nil)).
-
-    (* sql12:
-        select age, company, count( * ) as nb
-        from Persons
-        group by age, company
-        // order by age  -- BUG IN ORDERBY REMOVING DUPLICATES
-     *)
-    Definition sql12 :=
-      SQuery (SSelectColumn "age" :: SSelectColumn "company" :: SSelectExpr "nb"
-                            (SExprAggExpr SCount SExprStar)::nil)
-             (SFromTable "Persons"::nil)
-             None
-             (Some (("age"%string::"company"%string::nil),None)) None.
-
-    (* Eval vm_compute in (sql_eval sql12 tables). *)
-
-    (* sql13:
-         select name
-         from Persons
-         where company = 'IBM'
-         order by age *)
-    Definition sql13 :=
-      SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
-             (SFromTable "Persons"::nil)
-             (Some (SCondBinary SEq (SExprColumn "company")
-                                (SExprConst (dstring "IBM"))))
-             None (Some (("age"%string,Ascending)::nil)).
-
-    (* Eval vm_compute in (sql_eval sql13 tables). *)
-
-    (* sql14:
-         select nom
-           from
-              ( select name,age
-                from Persons
-                where company = 'IBM'
-                order by age ) as (nom,age)
-     *)
-    Definition sql14 :=
-      SQuery (SSelectColumn "nom"::nil)
-             (SFromQuery ("IBMers"%string,Some ("nom"%string::"age"%string::nil)) sql13 :: nil)
-             None None None.
-
-    (* Eval vm_compute in (sql_eval sql14 tables). *)
-
-  End SQLExamples.
+  Section SQLSize.
+    (* For now: SQL size is size of query plan *)
+    Require Import RAlgEnvSize.
+    Definition sql_size (q:sql) := algenv_size (sql_to_nraenv q).
+  End SQLSize.
   
 End SQL.
 
