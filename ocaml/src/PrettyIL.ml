@@ -372,6 +372,8 @@ let pretty_unop p sym callb ff u a =
   | Hack.ARecProject atts ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.pi (pretty_squared_names sym) atts (callb 0 sym) a
   | Hack.ADistinct -> pretty_unary_exp sym callb "distinct" ff a
+  | Hack.AOrderBy atts ->
+      fprintf ff "@[<hv 0>%s%a(%a)@]" "sort" (pretty_squared_names sym) (List.map fst atts) (callb 0 sym) a
   | Hack.ASum -> pretty_unary_exp sym callb "sum" ff a
   | Hack.AArithMean -> pretty_unary_exp sym callb "avg" ff a
   | Hack.AToString -> pretty_unary_exp sym callb "toString" ff a
@@ -1043,6 +1045,7 @@ let pretty_query pconf q =
   | Compiler.Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_nra q -> pretty_nra greek margin q
   | Compiler.Q_nraenv q -> pretty_nraenv greek margin q

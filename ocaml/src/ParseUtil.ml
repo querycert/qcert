@@ -80,6 +80,7 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_rule -> parse_rule f
   | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
+  | Compiler.L_sql -> raise (CACo_Error "No parser for SQL available")
   | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
   | Compiler.L_nra -> raise (CACo_Error "No parser for NRA available")
   | Compiler.L_nraenv -> ("NRAEnv", Compiler.Q_nraenv (parse_nraenv_sexp f))

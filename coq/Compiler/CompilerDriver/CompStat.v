@@ -25,6 +25,7 @@ Section CompStat.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
   Require Import ODMGRuntime.
+  Require Import SQL.
 
   Require Import CompilerRuntime.
   Require Import BasicSystem.
@@ -133,6 +134,11 @@ Section CompStat.
   Definition stat_oql (q:oql) : data :=
     drec
       (("oql_size", dnat (Z_of_nat (oql_size q)))
+         :: nil).
+
+  Definition stat_sql (q:sql) : data :=
+    drec
+      (("sql_size", dnat (Z_of_nat (sql_size q)))
          :: nil).
 
   Definition stat_lambda_nra (q: lambda_nra) : data :=
@@ -255,6 +261,14 @@ Section CompStat.
     | s => s
     end.
 
+  Definition stat_tree_sql (q:sql) : data :=
+    match stat_sql q with
+    | drec l =>
+      drec (l ++ ("sql_to_nraenv", stat_tree_nraenv (sql_to_nraenv q))
+              :: nil)
+    | s => s
+    end.
+
   Definition stat_tree_lambda_nra (q:lambda_nra) : data :=
     match stat_lambda_nra q with
     | drec l =>
@@ -271,6 +285,7 @@ Section CompStat.
         | Q_rule q => stat_rule q
         | Q_camp q => stat_camp q
         | Q_oql q => stat_oql q
+        | Q_sql q => stat_sql q
         | Q_lambda_nra q => stat_lambda_nra q
         | Q_nra q => stat_nra q
         | Q_nraenv q => stat_nraenv q
@@ -295,6 +310,7 @@ Section CompStat.
         | Q_rule q => stat_tree_rule q
         | Q_camp q => stat_tree_camp q
         | Q_oql q => stat_tree_oql q
+        | Q_sql q => stat_tree_sql q
         | Q_lambda_nra q => stat_tree_lambda_nra q
         | Q_nra q => stat_tree_nra q
         | Q_nraenv q => stat_tree_nraenv q

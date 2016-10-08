@@ -47,7 +47,7 @@ Section CompDriver.
   Require Import LambdaAlg LambdaAlgtoNRAEnv.
   
   Require Rule.
-  Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
+  Require PatterntoNRAEnv RuletoNRAEnv SQL OQLtoNRAEnv.
 
   Require Import OptimizerLogger.
 
@@ -80,6 +80,8 @@ Section CompDriver.
   Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
 
   Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_algenv q.
+
+  Definition sql_to_nraenv (q:sql) : nraenv := SQL.sql_to_nraenv q.
 
   Definition lambda_nra_to_nraenv (q:lambda_nra) := algenv_of_lalg q.
   
@@ -267,6 +269,10 @@ Section CompDriver.
     | Dv_oql_stop : oql_driver
     | Dv_oql_to_nraenv : nraenv_driver -> oql_driver.
 
+  Inductive sql_driver : Set :=
+    | Dv_sql_stop : sql_driver
+    | Dv_sql_to_nraenv : nraenv_driver -> sql_driver.
+
   Inductive lambda_nra_driver : Set :=
     | Dv_lambda_nra_stop : lambda_nra_driver
     | Dv_lambda_nra_to_nraenv : nraenv_driver -> lambda_nra_driver.
@@ -276,6 +282,7 @@ Section CompDriver.
   | Dv_rule : rule_driver -> driver
   | Dv_camp : camp_driver -> driver
   | Dv_oql : oql_driver -> driver
+  | Dv_sql : sql_driver -> driver
   | Dv_lambda_nra : lambda_nra_driver -> driver
   | Dv_nra : nra_driver -> driver
   | Dv_nraenv : nraenv_driver -> driver
@@ -297,6 +304,7 @@ Section CompDriver.
     [ Case_aux c "Dv_rule"%string
     | Case_aux c "Dv_camp"%string
     | Case_aux c "Dv_oql"%string
+    | Case_aux c "Dv_sql"%string
     | Case_aux c "Dv_lambda_nra"%string
     | Case_aux c "Dv_nra"%string
     | Case_aux c "Dv_nraenv"%string
@@ -525,6 +533,17 @@ Section CompDriver.
     in
     (Q_oql q) :: queries.
 
+  Definition compile_sql (dv: sql_driver) (q: sql) : list query :=
+    let queries :=
+        match dv with
+        | Dv_sql_stop => nil
+        | Dv_sql_to_nraenv dv =>
+          let q := sql_to_nraenv q in
+          compile_nraenv dv q
+        end
+    in
+    (Q_sql q) :: queries.
+
   Definition compile_lambda_nra (dv: lambda_nra_driver) (q: lambda_nra) : list query :=
     let queries :=
         match dv with
@@ -541,6 +560,7 @@ Section CompDriver.
     | (Dv_rule dv, Q_rule q) => compile_rule dv q
     | (Dv_camp dv, Q_camp q) => compile_camp dv q
     | (Dv_oql dv, Q_oql q) => compile_oql dv q
+    | (Dv_sql dv, Q_sql q) => compile_sql dv q
     | (Dv_lambda_nra dv, Q_lambda_nra q) => compile_lambda_nra dv q
     | (Dv_nra dv, Q_nra q) => compile_nra dv q
     | (Dv_nraenv dv, Q_nraenv q) => compile_nraenv dv q
@@ -566,6 +586,7 @@ Section CompDriver.
     | "rule"%string => L_rule
     | "camp"%string => L_camp
     | "oql"%string => L_oql
+    | "sql"%string => L_sql
     | "lambda_nra"%string => L_lambda_nra
     | "nra"%string => L_nra
     | "nraenv"%string => L_nraenv
@@ -588,6 +609,7 @@ Section CompDriver.
     | L_rule => "rule"%string
     | L_camp => "camp"%string
     | L_oql => "oql"%string
+    | L_sql => "sql"%string
     | L_lambda_nra => "lambda_nra"%string
     | L_nra => "nra"%string
     | L_nraenv => "nraenv"%string
@@ -613,6 +635,7 @@ Section CompDriver.
     | Dv_rule _ => L_rule
     | Dv_camp _ => L_camp
     | Dv_oql _ => L_oql
+    | Dv_sql _ => L_sql
     | Dv_lambda_nra _ => L_lambda_nra
     | Dv_cldmr _ => L_cldmr
     | Dv_dnnrc_dataset  _ => L_dnnrc_dataset
@@ -633,6 +656,7 @@ Section CompDriver.
     | Q_rule _ => L_rule
     | Q_camp _ => L_camp
     | Q_oql _ => L_oql
+    | Q_sql _ => L_sql
     | Q_lambda_nra _ => L_lambda_nra
     | Q_nra _ => L_nra
     | Q_nraenv _ => L_nraenv
@@ -755,6 +779,12 @@ Section CompDriver.
     | Dv_oql_to_nraenv dv => 1 + driver_length_nraenv dv
     end.
 
+  Definition driver_length_sql (dv: sql_driver) :=
+    match dv with
+    | Dv_sql_stop => 1
+    | Dv_sql_to_nraenv dv => 1 + driver_length_nraenv dv
+    end.
+
   Definition driver_length_lambda_nra (dv: lambda_nra_driver) :=
     match dv with
     | Dv_lambda_nra_stop => 1
@@ -766,6 +796,7 @@ Section CompDriver.
     | Dv_rule dv => driver_length_rule dv
     | Dv_camp dv => driver_length_camp dv
     | Dv_oql dv => driver_length_oql dv
+    | Dv_sql dv => driver_length_sql dv
     | Dv_lambda_nra dv => driver_length_lambda_nra dv
     | Dv_nra dv => driver_length_nra dv
     | Dv_nraenv dv => driver_length_nraenv dv
@@ -807,6 +838,7 @@ Section CompDriver.
       | Dv_nra dv => Dv_rule (Dv_rule_to_nra dv)
       | Dv_rule _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrc _
       | Dv_nnrcmr _
@@ -829,6 +861,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrc _
       | Dv_nnrcmr _
@@ -850,6 +883,30 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
+      | Dv_lambda_nra _
+      | Dv_nra _
+      | Dv_nnrc _
+      | Dv_nnrcmr _
+      | Dv_cldmr _
+      | Dv_dnnrc_dataset _
+      | Dv_dnnrc_typed_dataset _
+      | Dv_javascript _
+      | Dv_java _
+      | Dv_spark _
+      | Dv_spark2 _
+      | Dv_cloudant _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
+      end
+  | L_sql =>
+      match dv with
+      | Dv_nraenv dv => Dv_sql (Dv_sql_to_nraenv dv)
+      | Dv_rule _
+      | Dv_camp _
+      | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nnrc _
@@ -872,6 +929,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nnrc _
@@ -896,6 +954,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrcmr _
       | Dv_cldmr _
@@ -918,6 +977,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrcmr _
       | Dv_cldmr _
@@ -942,6 +1002,7 @@ Section CompDriver.
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim dv)
       | Dv_rule _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -964,6 +1025,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -982,6 +1044,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -1006,6 +1069,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -1030,6 +1094,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -1060,6 +1125,7 @@ Section CompDriver.
     | L_rule => Dv_rule Dv_rule_stop
     | L_camp => Dv_camp Dv_camp_stop
     | L_oql => Dv_oql Dv_oql_stop
+    | L_sql => Dv_sql Dv_sql_stop
     | L_lambda_nra => Dv_lambda_nra Dv_lambda_nra_stop
     | L_nra => Dv_nra Dv_nra_stop
     | L_nraenv => Dv_nraenv Dv_nraenv_stop
@@ -1135,6 +1201,8 @@ Section CompDriver.
     | Dv_camp (Dv_camp_to_nra dv) => (L_camp, Some (Dv_nra dv))
     | Dv_oql (Dv_oql_stop) => (L_oql, None)
     | Dv_oql (Dv_oql_to_nraenv dv) => (L_oql, Some (Dv_nraenv dv))
+    | Dv_sql (Dv_sql_stop) => (L_sql, None)
+    | Dv_sql (Dv_sql_to_nraenv dv) => (L_sql, Some (Dv_nraenv dv))
     | Dv_lambda_nra (Dv_lambda_nra_stop) => (L_lambda_nra, None)
     | Dv_lambda_nra (Dv_lambda_nra_to_nraenv dv) => (L_lambda_nra, Some (Dv_nraenv dv))
     | Dv_nra (Dv_nra_stop) => (L_nra, None)
@@ -1541,6 +1609,107 @@ Section CompDriver.
           :: nil
       | L_oql, L_spark2 =>
         L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc_dataset
+          :: L_dnnrc_typed_dataset
+          :: L_dnnrc_typed_dataset
+          :: L_spark2
+          :: nil
+      (* From sql: *)
+      | L_sql, L_sql =>
+        L_sql
+          :: nil
+      | L_sql, L_nraenv =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: nil
+      | L_sql, L_nnrc =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: nil
+      | L_sql, L_javascript =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_sql, L_java =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_sql, L_nnrcmr =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: nil
+      | L_sql, L_spark =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_sql, L_cldmr =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_sql, L_cloudant =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      | L_sql, L_dnnrc_dataset =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc_dataset
+          :: nil
+      | L_sql, L_dnnrc_typed_dataset =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc_dataset
+          :: L_dnnrc_typed_dataset
+          :: L_dnnrc_typed_dataset
+          :: nil
+      | L_sql, L_spark2 =>
+        L_sql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
