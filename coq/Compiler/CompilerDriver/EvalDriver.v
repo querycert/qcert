@@ -14,15 +14,64 @@
  * limitations under the License.
  *)
 
-Require Import CompilerRuntime.
-Module QEval(runtime:CompilerRuntime).
+Section EvalDriver.
 
-  Require Import String List String EquivDec.
+  Require Import String.
+  Require Import NRARuntime.
+  Require Import NRAEnvRuntime.
+  Require Import NNRCRuntime.
+  Require Import NNRCMRRuntime.
+  Require Import CloudantMR.
+  Require Import DNNRC Dataset.
+  Require Import CAMPRuntime.
+  Require Import ODMGRuntime.
+  Require Import TOptimEnvFunc.
+
+  Require Import CompilerRuntime.
+  Require Import BasicSystem.
+  Require Import TypingRuntime.
+
+  Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
+  Require Import TRewFunc.
+  Require Import NNRCtoJavascript.
+  Require Import NNRCtoJava.
+  Require Import NNRCtoNNRCMR.
+  Require Import NNRCtoPattern.
+  Require Import NNRCMRtoNNRC ForeignToReduceOps.
+  Require Import NNRCMRtoSpark ForeignToSpark.
+  Require Import NNRCMRtoCloudant ForeignCloudant ForeignToCloudant.
+  Require Import NNRCMRtoDNNRC.
+  Require Import CloudantMRtoJavascript.
+  Require Import NNRCtoDNNRC.
+  Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
+  Require Import LambdaAlg LambdaAlgtoNRAEnv.
   
-  Require Import BasicRuntime.
-  Require Import CompEnv.
+  Require Rule.
+  Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
 
-  (****************
+  Require Import OptimizerLogger.
+
+  Require Import CompLang CompEnv.
+  Require Import ForeignToSpark.
+
+  Local Open Scope list_scope.
+
+  Require Import ForeignToJavascript.
+  Require Import  ForeignCloudant.
+  Context {ft:foreign_type}.
+  Context {fr:foreign_runtime}.
+  Context {fredop:foreign_reduce_op}.
+  Context {fcloudant:foreign_cloudant}.
+  Context {ftocloudant:foreign_to_cloudant}.
+  Context {ftoredop:foreign_to_reduce_op}.
+  Context {bm:brand_model}.
+  Context {ftyping: foreign_typing}.
+  Context {nraenv_logger:optimizer_logger string algenv}.
+  Context {nnrc_logger:optimizer_logger string nrc}.
+  Context {ftojs:foreign_to_javascript}.
+  Context {ftospark:foreign_to_spark}.
+
+    (****************
    * Rule Section *
    ****************)
 
@@ -117,9 +166,10 @@ Module QEval(runtime:CompilerRuntime).
     let cenv := mkConstants env_with_world in
     cld_mrl_eval h (cld_load_init_env init_vinit cenv) e.
 
-End QEval.
+End EvalDriver.
 
-(* 
+
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***

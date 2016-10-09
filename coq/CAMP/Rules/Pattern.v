@@ -660,6 +660,31 @@ Section Pattern.
       match_destr.
   Qed.
 
+  (** Semantics of CAMP patterns, returning a presult *)
+  Definition eval_pattern_debug (h:list(string*string)) (print_env:bool) (p:pat) (world:list data)
+    : presult_debug data
+    := interp_debug h (mkWorld world) print_env nil p nil dunit.
+
+  Definition eval_pattern_res_to_string
+             (h:list(string*string)) (print_env:bool) (p:pat) (world:list data)
+    : string
+    := print_presult_debug p
+                           (interp_debug h
+                                         (mkWorld world)
+                                         print_env nil p nil dunit).
+
+  Definition eval_pattern_res (h:list(string*string)) (p:pat) (world:list data)
+    : presult data
+    := interp h (mkWorld world) p nil dunit.
+
+  Definition eval_pattern (h:list(string*string)) (p:pat) (world:list data)
+    : option (list data)
+    := match eval_pattern_res h p world with
+       | Success _ l => Some (l::nil)
+       | RecoverableError _ => Some nil
+       | _ => None
+       end.
+
 End Pattern.
 
 

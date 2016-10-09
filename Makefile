@@ -48,6 +48,8 @@ MODULES = \
 	Basic/Data/RGroupBy \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
+	Basic/Env/RConstants \
+	Basic/Env/RWorld \
 	Basic/Operators/RUtilOps \
 	Basic/Operators/ForeignOps \
 	Basic/Operators/RUnaryOps \

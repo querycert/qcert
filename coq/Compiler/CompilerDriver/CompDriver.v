@@ -17,47 +17,60 @@
 Section CompDriver.
 
   Require Import String.
+
+  (* Basic *)
+  Require Import BasicSystem.
+  Require Import TypingRuntime.
+
+  (* ASTs *)
+  Require Import ODMGRuntime.
+  Require Import LambdaAlg.
+  Require Import CAMPRuntime.
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
   Require Import CloudantMR.
   Require Import DNNRC Dataset.
-  Require Import CAMPRuntime.
-  Require Import ODMGRuntime.
   Require Import TOptimEnvFunc.
 
-  Require Import CompilerRuntime.
-  Require Import BasicSystem.
-  Require Import TypingRuntime.
 
+  (* Translations *)
+  Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
-  Require Import TRewFunc.
+  Require Import LambdaAlgtoNRAEnv.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
   Require Import NNRCtoPattern.
-  Require Import NNRCMRtoNNRC ForeignToReduceOps.
-  Require Import NNRCMRtoSpark ForeignToSpark.
-  Require Import NNRCMRtoCloudant ForeignCloudant ForeignToCloudant.
+  Require Import NNRCMRtoNNRC.
+  Require Import NNRCMRtoSpark.
+  Require Import NNRCMRtoCloudant.
   Require Import NNRCMRtoDNNRC.
   Require Import CloudantMRtoJavascript.
   Require Import NNRCtoDNNRC.
   Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
-  Require Import LambdaAlg LambdaAlgtoNRAEnv.
-  
-  Require Rule.
-  Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
 
+  (* Optimizations *)
+
+  Require Import DNNRCDatasetRewrites.
+  Require Import TRewFunc.
   Require Import OptimizerLogger.
 
-  Require Import CompLang CompEnv.
+  (* Foreign Support *)
+  Require Import ForeignToReduceOps.
   Require Import ForeignToSpark.
+  Require Import ForeignCloudant ForeignToCloudant.
+  Require Import ForeignToJavascript.
+  Require Import ForeignCloudant.
+  
+  (* Compiler Driver *)
+  Require Import CompLang CompEnv.
 
+  (* Some useful notations *)
   Local Open Scope list_scope.
 
-  Require Import ForeignToJavascript.
-  Require Import  ForeignCloudant.
+  (* Context *)
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
@@ -89,7 +102,8 @@ Section CompDriver.
 
   Definition nraenv_optim (q: nraenv) : nraenv := TOptimEnvFunc.toptim_nraenv q.
 
-  Definition nraenv_to_nnrc (q: nraenv) : nnrc := algenv_to_nnrc q init_vid init_venv.
+  Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
+    algenv_to_nnrc q init_vid init_venv.
 
   Definition nraenv_to_nra (q: nraenv) : nra := alg_of_algenv q.
 
@@ -243,7 +257,7 @@ Section CompDriver.
   with nnrc_driver : Set :=
     | Dv_nnrc_stop : nnrc_driver
     | Dv_nnrc_optim : nnrc_driver -> nnrc_driver
-    | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
+    | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* (* inputs_loc *) vdbindings -> *) nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc_dataset : (* inputs_loc *) vdbindings -> dnnrc_dataset_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
@@ -449,8 +463,8 @@ Section CompDriver.
         | Dv_nnrc_optim dv =>
           let q := nnrc_optim q in
           compile_nnrc dv q
-        | Dv_nnrc_to_nnrcmr vinit inputs_loc dv =>
-          let q := nnrc_to_nnrcmr vinit inputs_loc q in
+        | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv =>
+          let q := nnrc_to_nnrcmr_comptop vinit (* inputs_loc *) q in
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
           let q := nnrc_to_dnnrc_dataset inputs_loc q in
@@ -657,7 +671,7 @@ Section CompDriver.
     match dv with
     | Dv_nnrc_stop => 1
     | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
-    | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv => 1 + driver_length_nnrcmr dv
     | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
     | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
     | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
@@ -867,7 +881,7 @@ Section CompDriver.
       end
   | L_nnrc =>
       match dv with
-      | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) config.(comp_vdbindings) dv)
+      | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (* config.(comp_vdbindings) *) dv)
       | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
@@ -1079,7 +1093,7 @@ Section CompDriver.
     | Dv_nraenv (Dv_nraenv_to_nra dv) => (L_nraenv, Some (Dv_nra dv))
     | Dv_nraenv (Dv_nraenv_optim dv) => (L_nraenv, Some (Dv_nraenv dv))
     | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
-    | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
+    | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit (* vdbindings *) dv) => (L_nnrc, Some (Dv_nnrcmr dv))
     | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
     | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))

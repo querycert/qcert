@@ -14,16 +14,28 @@
  * limitations under the License.
  *)
 
-Require Export Utils.
-Require Export BrandRelation RBag RData RDataNorm RDomain.
-Require Export RRelation RGroupBy.
-Require Export DData DDataNorm.
-Require Export RConstants RWorld.
-Require Export ROps.
-Require Export ForeignRuntime.
+Section RWorld.
+
+  Require Import String.
+  Require Import RData.
+  
+  Local Open Scope string.
+
+  Require Import ForeignData.
+
+  Context {fdata:foreign_data}.
+
+  Definition mkWorld (world:list data) : list (string*data)
+    := ("WORLD",(dcoll world))::nil.
+
+  (* Used in CLDMR load - JS *)
+  Definition mkWorldColl (world:list data) : list (string*list data)
+    := ("WORLD",world)::nil.
+
+End RWorld.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "QCert")) ***
 *** End: ***
 *)
