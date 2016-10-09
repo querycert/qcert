@@ -1,0 +1,1 @@
+(query (select (ref "l_orderkey") (as "revenue") (function "sum" (multiply (ref "l_extendedprice") (subtract 1.000000 (ref "l_discount")))) (ref "o_orderdate") (ref "o_shippriority")) (from (join (join (table "customer") (table "orders")) (table "lineitem"))))

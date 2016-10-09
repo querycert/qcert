@@ -781,6 +781,53 @@ sexp_to_cld_mr_chain chain;
   | _ ->
       raise (CACo_Error "Not well-formed S-expr inside cldmr")
 
+(* NRA Section *)
+
+let rec sexp_to_sql (se : sexp) : QLang.sql =
+  begin match se with
+  | STerm ("query", (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses) ->
+      QSQL.sql_sql
+	(sexp_to_sql_selects selects)
+	(sexp_to_sql_froms froms)
+	None None None (* (sexp_to_sql_other_clauses other_clauses) *)
+  | _ ->
+      raise (CACo_Error "Not well-formed S-expr inside SQL")
+  end
+and sexp_to_sql_selects selects =
+  begin match selects with
+  | [] -> []
+  | (STerm ("as",[cname])) :: expr :: selects' ->
+      (QSQL.sql_select_expr (sstring_to_coq_string cname) (sexp_to_sql_expr expr))
+      :: (sexp_to_sql_selects selects')
+  | STerm ("ref",[cname]) :: selects' ->
+      (QSQL.sql_select_column (sstring_to_coq_string cname))
+      :: (sexp_to_sql_selects selects')
+  | _ ->
+      raise (CACo_Error "Not well-formed S-expr inside SQL select")
+  end
+and sexp_to_sql_froms froms =
+  begin match froms with
+  | STerm ("table",[tname]) -> [QSQL.sql_from_table (sstring_to_coq_string tname)]
+  | STerm ("join", [from1;from2]) ->
+      (sexp_to_sql_froms from1) @ (sexp_to_sql_froms from2)
+  | _ ->
+      raise (CACo_Error "Not well-formed S-expr inside SQL select")
+  end
+and sexp_to_sql_expr expr =
+  begin match expr with
+  | SString s -> QSQL.sql_expr_const (Dstring (char_list_of_string s))
+  | SFloat f -> QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
+  | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
+  | STerm ("subtract",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SMinus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("multiply",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "sum";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
+  | _ ->
+      raise (CACo_Error "Not well-formed S-expr inside SQL expr")
+  end
+
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with

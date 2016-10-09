@@ -34,6 +34,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition rule := rule.
     Definition camp := camp.
     Definition oql := oql.
+    Definition sql := sql.
     Definition lambda_nra := lambda_nra.
     Definition nra := nra.
     Definition nraenv := nraenv.

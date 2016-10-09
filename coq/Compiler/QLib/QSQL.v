@@ -39,6 +39,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_condition : Set := SQL.sql_condition.
   Definition sql_expr : Set := SQL.sql_expr.
 
+  Definition sql_sql := SQL.SQuery.
   Definition sql_select_column : column -> sql_select := SQL.SSelectColumn.
   Definition sql_select_expr : column -> sql_expr -> sql_select := SQL.SSelectExpr.
 

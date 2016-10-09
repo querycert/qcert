@@ -66,6 +66,7 @@ let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse LambdaN
 let parse_sexp f : SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
 let parse_io_sexp f : QData.data = AstsToSExp.sexp_to_data (parse_sexp f)
 let parse_camp_sexp f : QLang.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
+let parse_sql_sexp f : QLang.sql = AstsToSExp.sexp_to_sql (parse_sexp f)
 let parse_nraenv_sexp f : QLang.nraenv = AstsToSExp.sexp_to_nraenv (parse_sexp f)
 let parse_nnrc_sexp f : QLang.nnrc = AstsToSExp.sexp_to_nnrc (parse_sexp f)
 let parse_nnrcmr_sexp f : QLang.nnrcmr = AstsToSExp.sexp_to_nnrcmr (parse_sexp f)
@@ -80,7 +81,7 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_rule -> parse_rule f
   | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
-  | Compiler.L_sql -> raise (CACo_Error "No parser for SQL available")
+  | Compiler.L_sql -> ("SQL", Compiler.Q_sql (parse_sql_sexp f))
   | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
   | Compiler.L_nra -> raise (CACo_Error "No parser for NRA available")
   | Compiler.L_nraenv -> ("NRAEnv", Compiler.Q_nraenv (parse_nraenv_sexp f))
