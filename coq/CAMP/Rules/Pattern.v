@@ -682,7 +682,7 @@ Section Pattern.
     := match eval_pattern_res h p world with
        | Success _ l => Some (l::nil)
        | RecoverableError _ => Some nil
-       | _ => None
+       | TerminalError _ => None
        end.
 
 End Pattern.

@@ -390,9 +390,10 @@ Section NRewMR.
     unfold equiv_decb in *.
     repeat dest_eqdec; try congruence.
     simpl.
+    clear e0 e H H1 H2 Hred'.
     assert (nrc_eval h ((v, dcoll coll) :: (v, dcoll (dcoll coll :: nil)) :: nil) n2 =
             nrc_eval h ((v, dcoll coll) :: nil) n2) as Heq;
-      [ | rewrite Heq; reflexivity ].
+      [ | rewrite <- Heq; reflexivity ].
     apply nrc_eval_equiv_free_in_env.
     intros x Hx.
     unfold lookup.
@@ -1146,6 +1147,19 @@ Section NRewMR.
     repeat dest_eqdec; try congruence; simpl.
     unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl.
+    assert (@nrc_eval fruntime h
+               (@cons
+                  (prod NNRC.var (@data (@foreign_runtime_data fruntime)))
+                  (@pair NNRC.var (@data (@foreign_runtime_data fruntime))
+                     v0 d0)
+                  (@cons
+                     (prod var (@data (@foreign_runtime_data fruntime)))
+                     (@pair var (@data (@foreign_runtime_data fruntime)) v
+                        d)
+                     (@nil
+                        (prod var (@data (@foreign_runtime_data fruntime))))))
+               n0 = nrc_eval h ((v0, d0) :: (v, d) :: nil) n0) by reflexivity.
+    rewrite H in *; clear H.
     assert (nrc_eval h ((v0, d0) :: nil) n0 =
             nrc_eval h ((v0, d0) :: (v, d) :: nil) n0) as Heq;
       [ | rewrite Heq; clear Heq ].

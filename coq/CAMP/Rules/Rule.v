@@ -92,7 +92,7 @@ Section Rule.
     := match eval_rule_res h r world with
        | Success l => Some (l::nil)
        | RecoverableError => Some nil
-       | _ => None
+       | TerminalError => None
        end.
 
 End Rule.

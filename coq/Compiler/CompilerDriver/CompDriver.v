@@ -32,11 +32,9 @@ Section CompDriver.
   Require Import NNRCMRRuntime.
   Require Import CloudantMR.
   Require Import DNNRC Dataset.
-  Require Import TOptimEnvFunc.
-
 
   (* Translations *)
-  Require PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
+  Require Import PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
   Require Import LambdaAlgtoNRAEnv.
   Require Import NNRCtoJavascript.
@@ -52,9 +50,9 @@ Section CompDriver.
   Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
 
   (* Optimizations *)
-
-  Require Import DNNRCDatasetRewrites.
+  Require Import TOptimEnvFunc.
   Require Import TRewFunc.
+  Require Import DNNRCDatasetRewrites.
   Require Import OptimizerLogger.
 
   (* Foreign Support *)
@@ -130,7 +128,7 @@ Section CompDriver.
     let inputs_loc :=
         (init_vid, Vlocal)
           ::(vinit, Vlocal)
-          ::(localize_names q_free_vars)
+          ::(mkDistNames q_free_vars)
     in
     nnrc_to_nnrcmr_chain q
                          init_vinit

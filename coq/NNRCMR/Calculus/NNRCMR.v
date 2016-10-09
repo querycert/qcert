@@ -28,7 +28,8 @@ Section NNRCMR.
 
   Context {fruntime:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
-  
+
+  Definition var := string.
   Definition nrcmr_env := list (var * ddata).
 
   (** Named Nested Relational Calculus + Map Reduce *)
