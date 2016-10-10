@@ -39,7 +39,7 @@ object test extends QCertRuntime {
     val df1 = sparkSession.read.json("/Users/stefanfehrenbach/or.json")
     import sparkSession.implicits._
     df1.printSchema()
-    df1.show()
+    df1.show(false)
     df1.count()
     df1.map(r => r.getAs[Long](0)).show()
     df1.union(df1).show()
@@ -118,6 +118,8 @@ object QCertRuntime {
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
     case t: IntegerType => b.getAsLong
     case t: LongType => b.getAsLong
+    case t: FloatType => b.getAsFloat
+    case t: DoubleType => b.getAsDouble
     case t: BooleanType => b.getAsBoolean
     case t: StringType => b.getAsString
     case t: ArrayType =>
@@ -146,6 +148,8 @@ object QCertRuntime {
   def reshape(v: Any, t: DataType): Any = (v, t) match {
     case (i: Int, t: LongType) => i.toLong
     case (i: Long, t: LongType) => i
+    case (f: Float, t: FloatType) => f
+    case (d: Double, t: DoubleType) => d
     case (s: String, t: StringType) => s
     case (b: Boolean, t: BooleanType) => b
     case (r: Row, t: StructType) => t.fieldNames match {
@@ -471,8 +475,8 @@ abstract class QCertRuntime {
   def reshape(v: Any, t: DataType): Any = (v, t) match {
     case (i: Long, t: LongType) => i
     case (i: Int, t: LongType) => i.toLong
-    case (f: Float, t: FloatType) => f.toFloat
-    case (d: Double, t: DoubleType) => d.toDouble
+    case (f: Float, t: FloatType) => f
+    case (d: Double, t: DoubleType) => d
     case (s: String, t: StringType) => s
     case (b: Boolean, t: BooleanType) => b
     case (r: Row, t: StructType) => t.fieldNames match {
