@@ -38,6 +38,7 @@
 	  "flatten", FLATTEN;
 	  "avg", AVG;
 	  "sum", SUM;
+          "float_sum", FLOAT_SUM;
 	  "count", COUNT;
 	  "min", MIN;
 	  "max", MAX;

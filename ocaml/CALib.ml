@@ -100,7 +100,7 @@ let oql_to_nraenv (s:string) : nraenv =
 
 let translate_nraenv_to_nnrc (q:nraenv) : nnrc = CompDriver.nraenv_to_nnrc q
 let translate_nnrc_to_nnrcmr (q:nnrc) : nnrcmr = CompDriver.nnrc_to_nnrcmr_comptop Compiler.init_vinit q
-let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset CompUtil.mkDistLoc n
+let translate_nnrc_to_dnnrc (n:nnrc) : dnnrc_dataset = CompDriver.nnrc_to_dnnrc_dataset QUtil.mkDistLoc n
 
 let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_typed_dataset =
   match
@@ -108,7 +108,7 @@ let translate_nraenv_to_dnnrc_typed_dataset (sc:schema) (op:nraenv) : dnnrc_type
     (CompDriver.dnnrc_dataset_to_dnnrc_typed_dataset
        brand_model
        (Enhanced.Model.foreign_typing brand_model)
-       (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc CompUtil.mkDistLoc op)
+       (CompDriver.nraenv_optim_to_nnrc_optim_to_dnnrc QUtil.mkDistLoc op)
        wmRType)
   with
   | Some x -> x

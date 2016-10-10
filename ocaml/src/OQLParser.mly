@@ -28,7 +28,7 @@
 
 %token OR AND NOT
 %token STRUCT FLATTEN
-%token AVG SUM COUNT MIN MAX
+%token AVG SUM FLOAT_SUM COUNT MIN MAX
 
 %token NIL
 
@@ -98,6 +98,8 @@ expr:
     { QOQL.ounop QOps.Unary.aflatten e }
 | SUM LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.asum e }
+| FLOAT_SUM LPAREN e = expr RPAREN
+    { QOQL.ounop Enhanced.Ops.Unary.float_sum e }
 | AVG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.aarithmean e }
 | COUNT LPAREN e = expr RPAREN

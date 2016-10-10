@@ -43,11 +43,11 @@ let check_nraenv_result conf expected_res fname actual_res debug_res =
 	Format.printf "ERROR@."
       end
 
-let print_rule_result fname (actual_res : QData.data list option) =
+let print_rule_result fname (actual_res : QData.data option) =
   match actual_res with
   | None -> Format.printf "Evaluation for file %s : [Type Error]@." fname
   | Some res ->
-      let res_string = List.iter (PrettyIL.pretty_data Format.str_formatter) res; Format.flush_str_formatter () in
+      let res_string = PrettyIL.pretty_data Format.str_formatter res; Format.flush_str_formatter () in
       Format.printf "Evaluation for file %s : %s@." fname res_string
 
 let print_oql_result = print_nraenv_result
@@ -56,7 +56,7 @@ let check_rule_result conf expected_res fname actual_res debug_res =
   if !(get_eval_only conf) then
     print_rule_result fname actual_res
   else
-    let ok = QUtil.validate_rule_success actual_res expected_res in
+    let ok = QUtil.validate_lifted_success actual_res expected_res in
     if ok then
       Format.printf "OK@."
     else

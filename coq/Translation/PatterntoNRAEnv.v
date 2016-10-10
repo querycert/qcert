@@ -201,11 +201,14 @@ Section PatterntoNRAEnv.
     rewrite pat_trans_top_pat_context; trivial; reflexivity.
   Qed.
 
-  (* Java equivalent: CampToNra.convert *)
-  (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
-  Definition translate_pat_to_algenv (p:pat) : algenv :=
-    (* Produces the initial plan *)
-    ANAppEnv (algenv_of_pat p) (ANConst (drec nil)).
+  Section Top.
+    (* Java equivalent: CampToNra.convert *)
+    (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
+    Definition translate_pat_to_algenv (p:pat) : algenv :=
+      (* Produces the initial plan *)
+      ANAppEnv (algenv_of_pat p) (ANConst (drec nil)).
+
+  End Top.
 
   Section size.
     Require Import PatternSize.

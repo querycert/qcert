@@ -69,20 +69,9 @@ Section Rule.
            makeSingleton p
        end.
 
-  Definition mkWorld (world:list data) : list (string*data)
-    := ("WORLD",(dcoll world))::nil.
-
-  (* Used in CLDMR load - JS *)
-  Definition mkWorldColl (world:list data) : list (string*list data)
-    := ("WORLD",world)::nil.
-  
   Definition eval_rule_debug (h:list(string*string)) (print_env:bool) (r:rule) (world:list data)
     : presult_debug data
     := interp_debug h (mkWorld world) print_env nil (rule_to_pattern r) nil dunit.
-
-  Definition eval_pattern_debug (h:list(string*string)) (print_env:bool) (p:pat) (world:list data)
-    : presult_debug data
-    := interp_debug h (mkWorld world) print_env nil p nil dunit.
 
   Definition eval_rule_res_to_string
              (h:list(string*string)) (print_env:bool) (r:rule) (world:list data)
@@ -93,39 +82,17 @@ Section Rule.
                                          (mkWorld world)
                                          print_env nil pp nil dunit).
 
-  Definition eval_pattern_res_to_string
-             (h:list(string*string)) (print_env:bool) (p:pat) (world:list data)
-    : string
-    := print_presult_debug p
-                           (interp_debug h
-                                         (mkWorld world)
-                                         print_env nil p nil dunit).
-
   (** Semantics of CAMP rules, returning a presult *)
   Definition eval_rule_res (h:list(string*string)) (r:rule) (world:list data)
     : presult data
     := interp h (mkWorld world) (rule_to_pattern r) nil dunit.
 
-  Definition eval_pattern_res (h:list(string*string)) (p:pat) (world:list data)
-    : presult data
-    := interp h (mkWorld world) p nil dunit.
-
-  (** Semantics of CAMP rules, returning a presult *)
   Definition eval_rule (h:list(string*string)) (r:rule) (world:list data)
     : option (list data)
     := match eval_rule_res h r world with
        | Success l => Some (l::nil)
        | RecoverableError => Some nil
-       | _ => None
-       end.
-
-  (** Semantics of CAMP rules, returning a presult *)
-  Definition eval_pattern (h:list(string*string)) (p:pat) (world:list data)
-    : option (list data)
-    := match eval_pattern_res h p world with
-       | Success l => Some (l::nil)
-       | RecoverableError => Some nil
-       | _ => None
+       | TerminalError => None
        end.
 
 End Rule.

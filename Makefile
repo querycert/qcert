@@ -49,6 +49,8 @@ MODULES = \
 	Basic/Data/RGroupBy \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
+	Basic/Env/RConstants \
+	Basic/Env/DConstants \
 	Basic/Operators/RUtilOps \
 	Basic/Operators/ForeignOps \
 	Basic/Operators/RUnaryOps \
@@ -224,6 +226,7 @@ MODULES = \
 	Compiler/CompilerDriver/CompEnv \
 	Compiler/CompilerDriver/CompDriver \
 	Compiler/CompilerDriver/CompStat \
+	Compiler/CompilerDriver/CompEval \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QPattern \

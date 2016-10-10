@@ -23,20 +23,20 @@ open QcertArg
 
 (* Frontend Eval *)
 
-let eval_rule h world f : QData.data list option * string =
+let eval_rule h world f : QData.data option * string =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   let (rn,ru) = parse_rule_from_file f in
   match ru with
   | Compiler.Q_rule ru ->
-      (QEval.rule_eval_top h ru world, Util.string_of_char_list (QEval.rule_eval_top_debug h false ru world))
+      (QEval.eval_rule_world h ru world, Util.string_of_char_list (QEval.eval_rule_world_debug h false ru world))
   | Compiler.Q_camp ru ->
-      (QEval.pattern_eval_top h ru world, Util.string_of_char_list (QEval.pattern_eval_top_debug h false ru world))
+      (QEval.eval_camp_world h ru world, Util.string_of_char_list (QEval.eval_camp_world_debug h false ru world))
   | _ ->
       raise (CACo_Error "Input language not supported")
 
 let eval_oql h world f : QData.data option * string =
   let o = parse_oql_from_file f in
-  (QEval.oql_eval_top (List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h) o world, "[OQL Debug]")
+  (QEval.eval_oql_world (List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h) o world, "[OQL Debug]")
   
 (* Core Eval *)
 
@@ -50,11 +50,11 @@ let eval_nraenv conf schema h world op : QData.data option =
   | Compiler.L_oql ->
       raise (OQL_eval "OQL eval not supported once compiled into algebra")
   | Compiler.L_nraenv ->
-      let op = QDriver.nraenv_optim op in
-      QEval.algenv_eval_top h op world
+      let q = QDriver.nraenv_optim op in
+      QEval.eval_nraenv_world h q world
   | Compiler.L_nnrc ->
-      let nrc = QDriver.nraenv_optim_to_nnrc_optim op in
-      QEval.nrc_eval_top h nrc world
+      let q = QDriver.nraenv_optim_to_nnrc_optim op in
+      QEval.eval_nnrc_world h q world
   | Compiler.L_dnnrc_dataset ->
       let brand_model =
 	begin match schema with
@@ -68,15 +68,15 @@ let eval_nraenv conf schema h world op : QData.data option =
 	| None -> raise (CACo_Error "Spark2 target requires a schema I/O file")
 	end
       in
-      let nrc = QDriver.nraenv_optim_to_nnrc_optim_to_dnnrc Compiler.mkDistLoc op in
-      QEval.dnrc_eval_top brand_model h nrc world
+      let q = QDriver.nraenv_optim_to_nnrc_optim_to_dnnrc QUtil.mkDistLoc op in
+      QEval.eval_dnnrc_dataset_world h brand_model q world
   | Compiler.L_nnrcmr ->
-      let mrchain = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
-      QEval.nrcmr_chain_eval_top h mrchain world
+      let q = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+      QEval.eval_nnrcmr_world h q world
   | Compiler.L_cldmr ->
-      let mrchain = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
-      let mrchain = QDriver.nnrcmr_to_cldmr [] mrchain in
-      QEval.cldmr_chain_eval_top h mrchain world
+      let q = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+      let q = QDriver.nnrcmr_to_cldmr [] q in
+      QEval.eval_cldmr_world h q world
   | _ ->
       Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang_caev conf);
       raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang_caev conf)))
