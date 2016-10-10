@@ -197,6 +197,7 @@ MODULES = \
 	Backend/ForeignCloudant \
 	Backend/ForeignToJava \
 	Backend/ForeignToJavascript \
+	Backend/ForeignToScala \
 	Backend/CloudantKV \
 	Backend/CloudantMR \
 	Backend/ForeignToCloudant \

@@ -22,8 +22,8 @@ open QcertUtil
 open QcertArg
 open ConfigUtil
 open ParseUtil
+open ParseFile
 open DataUtil
-open FrontUtil
 open EvalUtil
 open CheckUtil
 
@@ -43,6 +43,33 @@ let args conf =
 let anon_args conf f = set_input conf f
 
 let usage = Sys.argv.(0)^" [-target language] [-source language] [-eval-only] [-debug] -io jsonfile rule1 rule2 ..."
+
+(* Some utility *)
+
+(* Parse/translate input *)
+
+let nraenv_of_rule f =
+  let (rn,ru) = parse_rule_from_file f in
+  match ru with
+  | Compiler.Q_rule ru ->
+      (rn,QDriver.rule_to_nraenv ru)
+  | Compiler.Q_camp ru ->
+      (rn,QDriver.camp_to_nraenv ru)
+  | _ ->
+      raise (Qcert_Error "Input language not supported")
+
+let nraenv_of_oql f =
+  let o = parse_oql_from_file f in
+  ("OQL",QDriver.oql_to_nraenv o)
+  
+let nraenv_of_input conf f =
+  match language_of_name (get_source_lang_caco conf) with
+  | Compiler.L_rule ->
+      nraenv_of_rule f
+  | Compiler.L_oql ->
+      nraenv_of_oql f
+  | _ ->
+      raise (Qcert_Error "Input language not supported")
 
 (* Main *)
 let rule_main conf io schema h world f =

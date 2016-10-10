@@ -15,7 +15,7 @@
  *)
 
 Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToScala ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -236,6 +236,15 @@ Defined.
          trivial_foreign_runtime
          _ _ _.
 
+  Program Instance trivial_foreign_to_scala :
+    @foreign_to_scala trivial_foreign_runtime trivial_foreign_type
+    := mk_foreign_to_scala
+         trivial_foreign_runtime trivial_foreign_type
+         _ _.
+  Next Obligation.
+    exact "TRIVIAL MODEL DOES NOT SUPPORT FOREIGN TYPES"%string.
+  Defined.
+  
   Program Instance trivial_foreign_to_JSON : foreign_to_JSON
     := mk_foreign_to_JSON trivial_foreign_data _ _.
   Next Obligation.
@@ -315,6 +324,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_java.
     Definition compiler_foreign_to_javascript : foreign_to_javascript
       := trivial_foreign_to_javascript.
+    Definition compiler_foreign_to_scala : foreign_to_scala
+      := trivial_foreign_to_scala.
     Definition compiler_foreign_to_JSON : foreign_to_JSON
       := trivial_foreign_to_JSON.
     Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
@@ -352,6 +363,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_java.
     Definition compiler_model_foreign_to_javascript : foreign_to_javascript
       := trivial_foreign_to_javascript.
+    Definition compiler_model_foreign_to_scala : foreign_to_scala
+      := trivial_foreign_to_scala.
     Definition compiler_model_foreign_to_JSON : foreign_to_JSON
       := trivial_foreign_to_JSON.
     Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON

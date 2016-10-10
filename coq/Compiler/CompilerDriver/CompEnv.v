@@ -33,7 +33,7 @@ Section QEnv.
 
   Context {fdata:foreign_data}.
   
-  Definition unwrap_result res :=
+  Definition lift_result res :=
     match res with
     | None => None
     | Some (dcoll l) => Some l
@@ -63,15 +63,10 @@ Section QEnv.
     and then applies reflexivity.  This is *much* faster.
    *)
 
-  (* Check Rule/CAMP result *)
-
-  Definition validate_rule_success (res:option (list data)) exp : bool :=
-    validate_success res exp.
-
-  (* Check NRAEnv/NNRC/NNRCMR/CloudantMR result *)
+  (* Check result: Top-level function *)
   
   Definition validate_lifted_success (res:option data) exp : bool :=
-    validate_success (unwrap_result res) exp.
+    validate_success (lift_result res) exp.
 
 End QEnv.
 

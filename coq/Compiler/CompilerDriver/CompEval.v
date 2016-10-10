@@ -196,7 +196,7 @@ Section CompEval.
     
   End EvalFunctions.
 
-  Section EvalQuery.
+  Section EvalDriver.
     Inductive eval_input : Set :=
     | Ev_in_world : list data -> eval_input
     | Ev_in_constant_env : list (string*data) -> eval_input
@@ -209,9 +209,10 @@ Section CompEval.
       end.
     
     Inductive eval_output : Set :=
-    | Ev_out_unsupported : eval_output
+    | Ev_out_unsupported : string -> eval_output
     | Ev_out_failed : eval_output
     | Ev_out_returned : data -> eval_output
+    | Ev_out_returned_debug : string -> eval_output
     .
 
     Definition lift_output (result:option data) :=
@@ -219,30 +220,53 @@ Section CompEval.
       | None => Ev_out_failed
       | Some d => Ev_out_returned d
       end.
-    
+
     Definition eval_query (q:query) (ev_in:eval_input) : eval_output :=
       let cenv := lift_input ev_in in
       match q with
       | Q_rule q => lift_output (eval_rule q cenv)
       | Q_camp q => lift_output (eval_camp q cenv)
       | Q_oql q => lift_output (eval_oql q cenv)
-      | Q_sql q => Ev_out_unsupported
+      | Q_sql _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
       | Q_nra q => lift_output (eval_nra q cenv)
       | Q_nraenv q => lift_output (eval_nraenv q cenv)
       | Q_nnrc q => lift_output (eval_nnrc q cenv)
       | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
       | Q_cldmr q => lift_output (eval_cldmr q cenv)
-      | Q_dnnrc_dataset _ => Ev_out_unsupported
-      | Q_dnnrc_typed_dataset _ => Ev_out_unsupported
-      | Q_javascript _ => Ev_out_unsupported
-      | Q_java _ => Ev_out_unsupported
-      | Q_spark _ => Ev_out_unsupported
-      | Q_spark2 _ => Ev_out_unsupported
-      | Q_cloudant _ => Ev_out_unsupported
-      | Q_error err => Ev_out_unsupported
+      | Q_dnnrc_dataset q => lift_output (eval_dnnrc_dataset q cenv)
+      | Q_dnnrc_typed_dataset _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_spark _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_spark2 _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_cloudant _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_error err => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       end.
-  End EvalQuery.
+
+    Definition eval_query_debug (q:query) (ev_in:eval_input) : eval_output :=
+      let cenv := lift_input ev_in in
+      match q with
+      | Q_rule q => Ev_out_returned_debug (eval_rule_debug true q cenv)
+      | Q_camp q => Ev_out_returned_debug (eval_camp_debug true q cenv)
+      | Q_oql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_sql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_lambda_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nraenv _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_dnnrc_dataset _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_dnnrc_typed_dataset _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_javascript _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_java _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_spark _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_spark2 _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_cloudant _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      end.
+  End EvalDriver.
 
 End CompEval.
 

@@ -172,6 +172,13 @@ Definition float_to_javascript_unary_op
      | uop_float_listmax => "Math.max.apply(Math," ++ d ++ ")"
      end.
 
+Definition float_to_scala_unary_op
+           (op: float_unary_op) (d: string) : string :=
+  match op with
+    | uop_float_sum => d ++ ".sum"
+    | _ => "Unsupported float unary op in FloatModelPart.float_to_scala_unary_op"
+  end.
+
 Require Import ForeignToJava NNRCtoJava.
 
 Definition float_to_java_unary_op

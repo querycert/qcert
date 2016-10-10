@@ -30,12 +30,17 @@ let set_io gconf file_name = gconf.gconf_io <- Some (Util.string_of_file file_na
 let set_emit_all gconf () = gconf.gconf_emit_all <- true
 let set_emit_sexp gconf () = gconf.gconf_emit_sexp <- true
 let set_emit_sexp_all gconf () = gconf.gconf_emit_sexp_all <- true
+let set_eval gconf () = gconf.gconf_eval <- true
+let set_eval_all gconf () = gconf.gconf_eval_all <- true
+let set_eval_debug gconf () = gconf.gconf_eval_debug <- true
+let set_eval_validate gconf () = gconf.gconf_eval_validate <- true
 let set_source_sexp gconf () = gconf.gconf_source_sexp <- true
 let set_java_imports gconf s = gconf.gconf_java_imports <- s
 let set_vinit gconf x = gconf.gconf_mr_vinit <- x
 let add_vdirst gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vdistr) :: gconf.gconf_vdbindings
+let add_vdirst_world gconf () = add_vdirst gconf "CONST$WORLD" (* XXX HACK TO BE REVIEWED XXX *)
 let add_vlocal gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vlocal) :: gconf.gconf_vdbindings

@@ -14,10 +14,26 @@
  * limitations under the License.
  *)
 
-open Util
-open Compiler.EnhancedCompiler
-   
-let make_empty_model () =
-  match RType.make_brand_model [] [] with
-  | Some m -> m
-  | None -> raise (Qcert_Error "Wrongly formed model")
+Require Import List String.
+
+Require Import Utils ForeignRuntime ForeignType.
+
+Local Open Scope string_scope.
+
+Section ForeigntoScala.
+
+Class foreign_to_scala {fruntime:foreign_runtime} {ftype: foreign_type}: Type
+  := mk_foreign_to_scala {
+         foreign_to_scala_unary_op
+           (fu:foreign_unary_op_type)
+           (d:string) : string
+         ; foreign_to_scala_spark_datatype (ft: foreign_type_type) : string
+       }.
+  
+End ForeigntoScala.
+
+(* 
+*** Local Variables: ***
+*** coq-load-path: (("../../coq" "QCert")) ***
+*** End: ***
+*)

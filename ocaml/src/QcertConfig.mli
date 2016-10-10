@@ -25,11 +25,17 @@ type global_config = {
     mutable gconf_dir_target : string option;
     mutable gconf_io : string option;
     mutable gconf_schema : TypeUtil.schema;
+    mutable gconf_data : DataUtil.io_input;
+    mutable gconf_expected_output_data : DataUtil.io_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
     mutable gconf_emit_sexp : bool;
     mutable gconf_emit_sexp_all : bool;
+    mutable gconf_eval : bool;
+    mutable gconf_eval_all : bool;
+    mutable gconf_eval_debug : bool;
+    mutable gconf_eval_validate : bool;
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
