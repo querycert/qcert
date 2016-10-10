@@ -25,7 +25,7 @@ Require Import Peano_dec.
 Require Import EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import NNRCRuntime ForeignToJava.
+Require Import NNRCRuntime ForeignToScala.
 Require Import DNNRC.
 Require Import RType.
 Require Import TDataInfer.
@@ -46,6 +46,7 @@ Section DNNRCtoScala.
   Context {fboptyping:foreign_binary_op_typing}.
   Context {fuoptyping:foreign_unary_op_typing}.
   Context {fttjs: ForeignToJavascript.foreign_to_javascript}.
+  Context {fts: ForeignToScala.foreign_to_scala}.
 
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
@@ -229,9 +230,9 @@ Section DNNRCtoScala.
       | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
       end
     | ADistinct => postfix "distinct"
+    | AForeignUnaryOp o => foreign_to_scala_unary_op o x
 
     (* TODO *)
-    | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"
     | ARecRemove _ => "ARECREMOVE???"
     | ASingleton => "SINGLETON???"
     | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)

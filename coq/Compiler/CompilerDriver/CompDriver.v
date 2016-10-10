@@ -60,6 +60,7 @@ Section CompDriver.
   Require Import ForeignToSpark.
   Require Import ForeignCloudant ForeignToCloudant.
   Require Import ForeignToJavascript.
+  Require Import ForeignToScala.
   Require Import ForeignCloudant.
   
   (* Compiler Driver *)
@@ -80,6 +81,7 @@ Section CompDriver.
   Context {nraenv_logger:optimizer_logger string algenv}.
   Context {nnrc_logger:optimizer_logger string nrc}.
   Context {ftojs:foreign_to_javascript}.
+  Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
 
   (* Translation functions *)
@@ -198,7 +200,7 @@ Section CompDriver.
 
   Definition dnnrc_typed_dataset_to_spark2
              (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
-    @dnrcToSpark2Top _ _ bm _ unit inputType name q.
+    @dnrcToSpark2Top _ _ bm _ _ unit inputType name q.
 
   Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
     dnnrcToDatasetRewrite q.

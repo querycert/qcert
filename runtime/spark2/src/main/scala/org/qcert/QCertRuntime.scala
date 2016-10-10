@@ -64,6 +64,8 @@ object QCertRuntime {
     case null => "UNIT" // null is unit, right?
     case x: Int => x.toString
     case x: Long => x.toString
+    case x: Float => x.toString
+    case x: Double => x.toString
     case true => "TRUE"
     case false => "FALSE"
     case x: String => x // no quotes!
@@ -245,6 +247,8 @@ abstract class QCertRuntime {
   def fromBlob(t: DataType, b: JsonElement): Any = t match {
     case t: LongType => b.getAsLong
     case t: IntegerType => b.getAsLong
+    case t: FloatType => b.getAsFloat
+    case t: DoubleType => b.getAsDouble
     case t: BooleanType => b.getAsBoolean
     case t: StringType => b.getAsString
     case t: ArrayType =>
@@ -272,6 +276,8 @@ abstract class QCertRuntime {
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
     case i: Long => i.toString
+    case f: Float => f.toString
+    case d: Double => d.toString
     case true => "true"
     case false => "false"
     case s: String => gson.toJson(s)
@@ -465,6 +471,8 @@ abstract class QCertRuntime {
   def reshape(v: Any, t: DataType): Any = (v, t) match {
     case (i: Long, t: LongType) => i
     case (i: Int, t: LongType) => i.toLong
+    case (f: Float, t: FloatType) => f.toFloat
+    case (d: Double, t: DoubleType) => d.toDouble
     case (s: String, t: StringType) => s
     case (b: Boolean, t: BooleanType) => b
     case (r: Row, t: StructType) => t.fieldNames match {
@@ -564,6 +572,7 @@ abstract class QCertRuntime {
       case (x: Int, y: Long) => x.toLong compareTo y
       case (x: Long, y: Int) => x compareTo y
       case (x: Long, y: Long) => x compareTo y
+      case (x: Float, y: Float) => x compareTo y
       case (x: Double, y: Double) => x compareTo y
       case (x: String, y: String) => x compareTo y
       // Bags

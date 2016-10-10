@@ -17,7 +17,7 @@
 Require Import List EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToScala ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -496,6 +496,19 @@ Instance enhanced_foreign_to_javascript :
        enhanced_to_javascript_data
        enhanced_to_javascript_unary_op
        enhanced_to_javascript_binary_op.
+
+Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: string) : string :=
+  match op with
+    | enhanced_unary_float_op op =>
+      float_to_scala_unary_op op d
+    | enhanced_unary_time_op op => "EnhancedModel: Time ops not supported for now."
+  end.
+
+Instance enhanced_foreign_to_scala :
+  @foreign_to_scala enhanced_foreign_runtime
+  := mk_foreign_to_scala
+       enhanced_foreign_runtime
+       enhanced_to_scala_unary_op.
 
 (* TODO: add general support for "tagged" stuff in JSON.
     Like our left/right encoding.  so that we can use it for
@@ -1265,6 +1278,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_java.
   Definition compiler_foreign_to_javascript : foreign_to_javascript
     := enhanced_foreign_to_javascript.
+  Definition compiler_foreign_to_scala : foreign_to_scala
+    := enhanced_foreign_to_scala.
   Definition compiler_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
@@ -2043,6 +2058,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_java.
   Definition compiler_model_foreign_to_javascript : foreign_to_javascript
     := enhanced_foreign_to_javascript.
+  Definition compiler_model_foreign_to_scala : foreign_to_scala
+    := enhanced_foreign_to_scala.
   Definition compiler_model_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
