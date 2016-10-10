@@ -233,7 +233,7 @@ Section CompEval.
       | Q_nnrc q => lift_output (eval_nnrc q cenv)
       | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
       | Q_cldmr q => lift_output (eval_cldmr q cenv)
-      | Q_dnnrc_dataset _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_dnnrc_dataset q => lift_output (eval_dnnrc_dataset q cenv)
       | Q_dnnrc_typed_dataset _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))

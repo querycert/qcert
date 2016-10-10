@@ -40,6 +40,7 @@ let set_vinit gconf x = gconf.gconf_mr_vinit <- x
 let add_vdirst gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vdistr) :: gconf.gconf_vdbindings
+let add_vdirst_world gconf () = add_vdirst gconf "CONST$WORLD" (* XXX HACK TO BE REVIEWED XXX *)
 let add_vlocal gconf x =
   let x = char_list_of_string x in
   gconf.gconf_vdbindings <- (x, Compiler.Vlocal) :: gconf.gconf_vdbindings

@@ -76,6 +76,8 @@ let args_list gconf =
        "<init> Set the name init variable for the map-reduce backends");
       ("-vdistr", Arg.String (QcertArg.add_vdirst gconf),
        "<x> Declare x as a distributed variable");
+      ("-vdistr-world", Arg.Unit (QcertArg.add_vdirst_world gconf),
+       "Declare 'CONST$WORLD' as a distributed variable");
       ("-vlocal", Arg.String (QcertArg.add_vlocal gconf),
        "<x> Declare x as a local variable");
     ]

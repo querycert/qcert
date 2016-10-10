@@ -34,6 +34,7 @@ val set_source_sexp : QcertConfig.global_config -> unit -> unit
 val set_java_imports : QcertConfig.global_config -> string -> unit
 val set_vinit : QcertConfig.global_config -> string -> unit
 val add_vdirst : QcertConfig.global_config -> string -> unit
+val add_vdirst_world : QcertConfig.global_config -> unit -> unit
 val add_vlocal : QcertConfig.global_config -> string -> unit
 val set_stat : QcertConfig.global_config -> unit -> unit
 val set_stat_all : QcertConfig.global_config -> unit -> unit
