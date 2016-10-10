@@ -24,7 +24,7 @@
     | "map" -> QLambdaNRA.lamap le e
     | "mapconcat" -> QLambdaNRA.lamapconcat le e
     | "select" -> QLambdaNRA.laselect le e
-    | _ -> raise (CACo_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
+    | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
 %}

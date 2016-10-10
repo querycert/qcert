@@ -77,7 +77,7 @@ let eval_main conf schema io f =
       | Compiler.L_rule -> rule_main conf io schema h world f
       | Compiler.L_oql -> oql_main conf io schema h world f
       | _ ->
-	  raise (CACo_Error "Source language not supported")
+	  raise (Qcert_Error "Source language not supported")
     end
 
 let () =

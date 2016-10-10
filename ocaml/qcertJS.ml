@@ -38,7 +38,7 @@ let compile source_lang_s target_lang_s q_s =
       in
       let p_conf = PrettyIL.default_pretty_config () in
       PrettyIL.pretty_query p_conf q_target
-    with CACo_Error err -> "compilation error: "^err
+    with Qcert_Error err -> "compilation error: "^err
     | _ -> "compilation error"
     end
   in
@@ -146,26 +146,26 @@ let main input =
       begin try
 	global_config_of_json input
       with exn ->
-        raise (CACo_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
+        raise (Qcert_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
       end
     in
     let q_s =
       begin try
        Js.to_string input##.query
       with exn ->
-        raise (CACo_Error ("[Couldn't load query: "^(Printexc.to_string exn)^"]"))
+        raise (Qcert_Error ("[Couldn't load query: "^(Printexc.to_string exn)^"]"))
       end
     in
     let res =
       begin try
         QcertCore.main gconf ("Query.string", q_s)
-      with CACo_Error err -> raise (CACo_Error ("[Compilation error: "^err^"]"))
-      | exn -> raise (CACo_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
+      with Qcert_Error err -> raise (Qcert_Error ("[Compilation error: "^err^"]"))
+      | exn -> raise (Qcert_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
       end
     in
     json_of_result res
   with
-  | CACo_Error msg -> json_of_error msg
+  | Qcert_Error msg -> json_of_error msg
   | exn -> json_of_error ("[Main error: "^(Printexc.to_string exn)^"]")
   end
 

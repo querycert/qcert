@@ -32,7 +32,7 @@ let eval_rule h world f : QData.data option * string =
   | Compiler.Q_camp ru ->
       (QEval.eval_camp_world h ru world, Util.string_of_char_list (QEval.eval_camp_world_debug h false ru world))
   | _ ->
-      raise (CACo_Error "Input language not supported")
+      raise (Qcert_Error "Input language not supported")
 
 let eval_oql h world f : QData.data option * string =
   let o = parse_oql_from_file f in
@@ -46,7 +46,7 @@ let eval_nraenv conf schema h world op : QData.data option =
   let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) h in
   match language_of_name (get_target_lang_caev conf) with
   | Compiler.L_rule ->
-      raise (CACo_Error "Rule eval not supported once compiled into algebra")
+      raise (Qcert_Error "Rule eval not supported once compiled into algebra")
   | Compiler.L_oql ->
       raise (OQL_eval "OQL eval not supported once compiled into algebra")
   | Compiler.L_nraenv ->
@@ -63,9 +63,9 @@ let eval_nraenv conf schema h world op : QData.data option =
               let sch = TypeUtil.schema_of_io_json (ParseString.parse_io_from_string sc) in
               sch.TypeUtil.sch_brand_model
 	    with
-	    | _ -> raise (CACo_Error "Spark2 target requires a valid schema I/O file")
+	    | _ -> raise (Qcert_Error "Spark2 target requires a valid schema I/O file")
 	    end
-	| None -> raise (CACo_Error "Spark2 target requires a schema I/O file")
+	| None -> raise (Qcert_Error "Spark2 target requires a schema I/O file")
 	end
       in
       let q = QDriver.nraenv_optim_to_nnrc_optim_to_dnnrc QUtil.mkDistLoc op in
@@ -79,5 +79,5 @@ let eval_nraenv conf schema h world op : QData.data option =
       QEval.eval_cldmr_world h q world
   | _ ->
       Printf.fprintf stderr "Target not supported in CAEv: %s\n" (get_target_lang_caev conf);
-      raise (CACo_Error ("Target not supported in CAEv: " ^ (get_target_lang_caev conf)))
+      raise (Qcert_Error ("Target not supported in CAEv: " ^ (get_target_lang_caev conf)))
 
