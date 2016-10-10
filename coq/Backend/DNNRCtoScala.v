@@ -80,7 +80,7 @@ Section DNNRCtoScala.
       "StructType(Seq(StructField(""$data"", StringType), StructField(""$type"", ArrayType(StringType))))"
     (* should not occur *)
     | Arrow₀ _ _ => "ARROW TYPE?"
-    | Foreign₀ ft => "FOREIGN TYPE?"
+    | Foreign₀ ft => foreign_to_scala_spark_datatype ft
     end.
 
   (** Scala-level type of an rtype.

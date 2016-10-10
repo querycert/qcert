@@ -504,11 +504,16 @@ Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: string) : stri
     | enhanced_unary_time_op op => "EnhancedModel: Time ops not supported for now."
   end.
 
-Instance enhanced_foreign_to_scala :
-  @foreign_to_scala enhanced_foreign_runtime
+Definition enhanced_to_scala_spark_datatype {ftype: foreign_type} (ft: foreign_type_type) : string :=
+  (* AVI: This is obviously not correct. Where is the place I should put this? *)
+  "FloatType".
+
+Instance enhanced_foreign_to_scala {ftype: foreign_type}:
+  @foreign_to_scala enhanced_foreign_runtime _
   := mk_foreign_to_scala
-       enhanced_foreign_runtime
-       enhanced_to_scala_unary_op.
+       enhanced_foreign_runtime _
+       enhanced_to_scala_unary_op
+       enhanced_to_scala_spark_datatype.
 
 (* TODO: add general support for "tagged" stuff in JSON.
     Like our left/right encoding.  so that we can use it for
