@@ -362,7 +362,7 @@ Section SQLTest.
            None
            None.
 
-   Eval vm_compute in (sql_eval sql16 tables). 
+  (* Eval vm_compute in (sql_eval sql16 tables). *)
 
 End SQLTest.
 
