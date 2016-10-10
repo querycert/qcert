@@ -30,11 +30,11 @@ let parse_string p_fun s =
     try
       p_fun buf
     with
-    | CACo_Error msg -> raise (CACo_Error msg)
+    | Qcert_Error msg -> raise (Qcert_Error msg)
     | LexError msg ->
-	Printf.fprintf stderr "[%s] in string%!\n" msg; raise (CACo_Error ("Parse error ["^ msg ^"] in string [" ^ s ^ "]"))
+	Printf.fprintf stderr "[%s] in string%!\n" msg; raise (Qcert_Error ("Parse error ["^ msg ^"] in string [" ^ s ^ "]"))
     | _ ->
-	Printf.fprintf stderr "Error in string%!\n"; raise (CACo_Error ("Parse error [???] in string"))
+	Printf.fprintf stderr "Error in string%!\n"; raise (Qcert_Error ("Parse error [???] in string"))
   
 
 (******************)

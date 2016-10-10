@@ -16,9 +16,9 @@
 
 (* This module contains a few basic utilities *)
 
-(* CACo Exception *)
+(* Qcert Exception *)
 
-exception CACo_Error of string
+exception Qcert_Error of string
 
 (* this can't go in Logger, since that creates a circular dependency *)
 type logger_token_type = string

@@ -130,7 +130,7 @@ let main gconf (file_name, query_s) =
   let q_target =
     begin match List.rev queries with
     | q :: _ -> q
-    | _ -> raise (CACo_Error "No compilation result!")
+    | _ -> raise (Qcert_Error "No compilation result!")
     end
   in
   let res_emit =

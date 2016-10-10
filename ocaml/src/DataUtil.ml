@@ -51,10 +51,10 @@ let get_io_content (od:QData.json option) : QData.json * QData.json * QData.json
 		raise Not_found
 	  with
 	  | _ ->
-	      raise (CACo_Error "Ill-formed IO")
+	      raise (Qcert_Error "Ill-formed IO")
 	end
     | None ->
-	raise (CACo_Error "No IO file provided")
+	raise (Qcert_Error "No IO file provided")
 
 let get_hierarchy od =
   match get_io_content od with
@@ -76,10 +76,10 @@ let build_hierarchy h =
             | [(['s';'u';'p'], Compiler.Jstring sup); (['s';'u';'b'], Compiler.Jstring sub)] ) ->
                 (Util.string_of_char_list sub, Util.string_of_char_list sup)
         | _ ->
-            raise (CACo_Error "Ill-formed hierarchy"))
+            raise (Qcert_Error "Ill-formed hierarchy"))
         l
   | _ ->
-      raise (CACo_Error "Ill-formed hierarchy")
+      raise (Qcert_Error "Ill-formed hierarchy")
 
 let build_brand_types bts =
   match bts with
@@ -90,10 +90,10 @@ let build_brand_types bts =
             | [(['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName); (['b';'r';'a';'n';'d'], Compiler.Jstring brandName)] ) ->
                 (Util.string_of_char_list brandName, Util.string_of_char_list typeName)
         | _ ->
-            raise (CACo_Error "Ill-formed brandTypes"))
+            raise (Qcert_Error "Ill-formed brandTypes"))
         l
   | _ ->
-      raise (CACo_Error "Ill-formed brandTypes")
+      raise (Qcert_Error "Ill-formed brandTypes")
 
 let build_type_defs bts =
   match bts with
@@ -104,10 +104,10 @@ let build_type_defs bts =
             | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName)] ) ->
                 (Util.string_of_char_list typeName, typeDef)
         | _ ->
-            raise (CACo_Error "Ill-formed typeDefs"))
+            raise (Qcert_Error "Ill-formed typeDefs"))
         l
   | _ ->
-      raise (CACo_Error "Ill-formed typeDefs")
+      raise (Qcert_Error "Ill-formed typeDefs")
 
 let get_input format od =
   match get_io_content od with
@@ -121,7 +121,7 @@ let get_input format od =
 	    | ENHANCED -> List.map (QData.json_enhanced_to_data h) l (* in coq so we can prove properties on conversions *)
 	  end
       | _ ->
-	  raise (CACo_Error "Illed formed working memory")
+	  raise (Qcert_Error "Illed formed working memory")
 
 let get_model_content (j:QData.json) =
   match j with
@@ -134,10 +134,10 @@ let get_model_content (j:QData.json) =
 	| Compiler.Jstring name ->
 	    (Util.string_of_char_list name,build_brand_types brandTypes,build_type_defs typeDefs)
 	| _ ->
-	    raise (CACo_Error "Ill-formed model")
+	    raise (Qcert_Error "Ill-formed model")
       end
   | _ ->
-      raise (CACo_Error "Ill-formed model")
+      raise (Qcert_Error "Ill-formed model")
 
 let get_output od =
   match get_io_content od with
@@ -146,7 +146,7 @@ let get_output od =
       match o with
       | Compiler.Jarray l -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
       | _ ->
-	  raise (CACo_Error "Ill-formed expected result")
+	  raise (Qcert_Error "Ill-formed expected result")
 
 let display_sdata (data_dir : string option) (fname:string) (sdata:string list) (suffix:string) =
   let fpref = Filename.chop_extension fname in

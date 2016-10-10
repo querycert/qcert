@@ -22,7 +22,7 @@ let language_of_name name =
     char_list_of_string (String.lowercase name)
   in
   begin match QLang.language_of_name_case_sensitive name with
-  | Compiler.L_error err -> raise (CACo_Error ("Unknown language: "^(string err)))
+  | Compiler.L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))
   | lang -> lang
   end
 
@@ -37,13 +37,13 @@ let name_of_query (q: QLang.query) =
 
 let driver_no_error dv =
   begin match dv with
-  | Compiler.Dv_error err -> raise (CACo_Error (string err))
+  | Compiler.Dv_error err -> raise (Qcert_Error (string err))
   | _ -> ()
   end
 
 let language_no_error lang =
   begin match lang with
-  | Compiler.L_error err -> raise (CACo_Error (string err))
+  | Compiler.L_error err -> raise (Qcert_Error (string err))
   | _ -> ()
   end
 

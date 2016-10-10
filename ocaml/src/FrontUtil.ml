@@ -35,7 +35,7 @@ let nraenv_of_rule f =
   | Compiler.Q_camp ru ->
       (rn,QDriver.camp_to_nraenv ru)
   | _ ->
-      raise (CACo_Error "Input language not supported")
+      raise (Qcert_Error "Input language not supported")
 
 let nraenv_of_oql f =
   let o = parse_oql_from_file f in
@@ -48,5 +48,5 @@ let nraenv_of_input conf f =
   | Compiler.L_oql ->
       nraenv_of_oql f
   | _ ->
-      raise (CACo_Error "Input language not supported")
+      raise (Qcert_Error "Input language not supported")
 

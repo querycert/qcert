@@ -32,13 +32,13 @@ let parse_file p_fun f =
       let res = p_fun buf in
       close_in ic; res
     with
-    | CACo_Error msg -> raise (CACo_Error msg)
+    | Qcert_Error msg -> raise (Qcert_Error msg)
     | LexError msg ->
 	close_in ic;
-	Printf.fprintf stderr "[%s] in file %s%!\n" msg f; raise (CACo_Error ("Parse error in file " ^ f))
+	Printf.fprintf stderr "[%s] in file %s%!\n" msg f; raise (Qcert_Error ("Parse error in file " ^ f))
     | _ ->
 	close_in ic;
-	Printf.fprintf stderr "Error in file %s%!\n" f; raise (CACo_Error ("Parse error in file " ^ f))
+	Printf.fprintf stderr "Error in file %s%!\n" f; raise (Qcert_Error ("Parse error in file " ^ f))
   
 
 (******************)

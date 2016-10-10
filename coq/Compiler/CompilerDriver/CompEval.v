@@ -34,52 +34,24 @@ Section CompEval.
   Require Import DNNRC Dataset.
 
   (* Translations *)
-  (*
-  Require Import PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
-  Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC.
-   *)
   Require Import LambdaAlgtoNRAEnv. (* Used for lambda_nra evaluation *)
-  Require Import NNRCtoNNRCMR.  (* XXX contains load_init_env! XXX *)
-  (* 
-  Require Import NNRCtoJavascript.
-  Require Import NNRCtoJava.
-  Require Import NNRCtoPattern.
-  Require Import NNRCMRtoNNRC.
-  Require Import NNRCMRtoSpark.
-  Require Import NNRCMRtoCloudant.
-  Require Import NNRCMRtoDNNRC.
-  Require Import CloudantMRtoJavascript.
-  Require Import NNRCtoDNNRC.
-  Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
-   *)
+  Require Import NNRCtoNNRCMR.      (* XXX contains load_init_env! XXX *)
 
   (* Foreign Support *)
   Require Import ForeignToReduceOps.
   Require Import ForeignToSpark.
   Require Import ForeignCloudant ForeignToCloudant.
-  Require Import ForeignToJavascript.
-  Require Import ForeignCloudant.
   
   (* Compiler Driver *)
   Require Import CompLang CompEnv.
 
+  (* Data *)
+  Require Import RData.
+  
   (* Some useful notations *)
   Local Open Scope list_scope.
 
   (* Context *)
-  (*
-  Context {ft:foreign_type}.
-  Context {fr:foreign_runtime}.
-  Context {ftoredop:foreign_to_reduce_op}.
-  Context {bm:brand_model}.
-  Context {ftyping: foreign_typing}.
-  Context {nraenv_logger:optimizer_logger string algenv}.
-  Context {nnrc_logger:optimizer_logger string nrc}.
-  Context {ftojs:foreign_to_javascript}.
-  Context {ftospark:foreign_to_spark}.
-   *)
-
-  Require Import RData.
   
   Context {fruntime:foreign_runtime}.   (* Necessary for everything, including data *)
   Context {fredop:foreign_reduce_op}.   (* Necessary for NNRCMR evaluation *)
@@ -87,9 +59,10 @@ Section CompEval.
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
 
+  Context {h:list(string*string)}.
+
   (* Evaluation functions *)
   Section EvalFunctions.
-    Context {h:list(string*string)}.
 
     (* Note: this is top-level so cenv is always first 'normalized' by calling rec_sort *)
     
@@ -182,6 +155,8 @@ Section CompEval.
 
     (* Evaluation functions: variant with a single world collection as input *)
     (* Note: those simply build a single WORLD constant environment by calling mkWorld *)
+    (* XXX probably should be made obsolete with the eval driver, but
+           used in ocaml and queryTests XXX *)
     Section EvalWorld.
       Definition eval_rule_world (r:rule) (world:list data) : option data :=
         eval_rule r (mkWorld world).
@@ -220,6 +195,53 @@ Section CompEval.
     End EvalWorld.
     
   End EvalFunctions.
+
+  Section EvalQuery.
+    Inductive eval_input : Set :=
+    | Ev_in_world : list data -> eval_input
+    | Ev_in_constant_env : list (string*data) -> eval_input
+    .
+
+    Definition lift_input (ev_in:eval_input) : list (string*data) :=
+      match ev_in with
+      | Ev_in_world world => mkWorld world
+      | Ev_in_constant_env cenv => cenv
+      end.
+    
+    Inductive eval_output : Set :=
+    | Ev_out_unsupported : eval_output
+    | Ev_out_failed : eval_output
+    | Ev_out_returned : data -> eval_output
+    .
+
+    Definition lift_output (result:option data) :=
+      match result with
+      | None => Ev_out_failed
+      | Some d => Ev_out_returned d
+      end.
+    
+    Definition eval_query (q:query) (ev_in:eval_input) : eval_output :=
+      let cenv := lift_input ev_in in
+      match q with
+      | Q_rule q => lift_output (eval_rule q cenv)
+      | Q_camp q => lift_output (eval_camp q cenv)
+      | Q_oql q => lift_output (eval_oql q cenv)
+      | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
+      | Q_nra q => lift_output (eval_nra q cenv)
+      | Q_nraenv q => lift_output (eval_nraenv q cenv)
+      | Q_nnrc q => lift_output (eval_nnrc q cenv)
+      | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
+      | Q_cldmr q => lift_output (eval_cldmr q cenv)
+      | Q_dnnrc_dataset _ => Ev_out_unsupported
+      | Q_dnnrc_typed_dataset _ => Ev_out_unsupported
+      | Q_javascript _ => Ev_out_unsupported
+      | Q_java _ => Ev_out_unsupported
+      | Q_spark _ => Ev_out_unsupported
+      | Q_spark2 _ => Ev_out_unsupported
+      | Q_cloudant _ => Ev_out_unsupported
+      | Q_error err => Ev_out_unsupported
+      end.
+  End EvalQuery.
 
 End CompEval.
 

@@ -20,4 +20,4 @@ open Compiler.EnhancedCompiler
 let make_empty_model () =
   match RType.make_brand_model [] [] with
   | Some m -> m
-  | None -> raise (CACo_Error "Wrongly formed model")
+  | None -> raise (Qcert_Error "Wrongly formed model")
