@@ -68,7 +68,7 @@ let eval_nraenv conf schema h world op : QData.data option =
 	| None -> raise (CACo_Error "Spark2 target requires a schema I/O file")
 	end
       in
-      let q = QDriver.nraenv_optim_to_nnrc_optim_to_dnnrc Compiler.mkDistLoc op in
+      let q = QDriver.nraenv_optim_to_nnrc_optim_to_dnnrc QUtil.mkDistLoc op in
       QEval.eval_dnnrc_dataset_world h brand_model q world
   | Compiler.L_nnrcmr ->
       let q = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
