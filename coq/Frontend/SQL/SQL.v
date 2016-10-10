@@ -352,7 +352,7 @@ Section SQL.
       end.
 
     Definition sql_to_nraenv (q:sql) : algenv :=
-      sql_query_to_nraenv true q.
+      ANApp (sql_query_to_nraenv true q) (ANConst (drec nil)). (* XXX Always initialize ID to an empty record XXX *)
     
   End Translation.
 

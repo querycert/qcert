@@ -25,6 +25,7 @@ Section CompEval.
   (* ASTs *)
   Require Import ODMGRuntime.
   Require Import LambdaAlg.
+  Require Import SQL.
   Require Import CAMPRuntime.
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
@@ -100,6 +101,11 @@ Section CompEval.
     Definition eval_oql (q:oql) (cenv: list (string*data)) : option data
       := oql_interp h (rec_sort cenv) q nil.
 
+    (* Language: sql *)
+    (* Note: eval for sql relies on translation to nraenv *)
+    Definition eval_sql (q:sql) (cenv: list (string*data)) : option data
+      := fun_of_algenv h (rec_sort cenv) (sql_to_nraenv q) (drec nil) dunit.
+
     (* Language: lambda_nra *)
     (* Note: eval for lambda_nra relies on translation to nraenv *)
     Definition eval_lambda_nra (q:lambda_nra) (cenv: list (string*data)) : option data
@@ -171,6 +177,9 @@ Section CompEval.
       Definition eval_oql_world (q:oql) (world:list data) : option data :=
         eval_oql q (mkWorld world).
 
+      Definition eval_sql_world (q:sql) (world:list data) : option data :=
+        eval_sql q (mkWorld world).
+
       Definition eval_lambda_nra_world (q:lambda_nra) (world:list data) : option data :=
         eval_lambda_nra q (mkWorld world).
 
@@ -227,7 +236,7 @@ Section CompEval.
       | Q_rule q => lift_output (eval_rule q cenv)
       | Q_camp q => lift_output (eval_camp q cenv)
       | Q_oql q => lift_output (eval_oql q cenv)
-      | Q_sql _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_sql q => lift_output (eval_sql q cenv)
       | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
       | Q_nra q => lift_output (eval_nra q cenv)
       | Q_nraenv q => lift_output (eval_nraenv q cenv)
