@@ -48,6 +48,10 @@ let args_list gconf =
        " Evaluate the target query on the input data");
       ("-eval-all", Arg.Unit (QcertArg.set_eval_all gconf),
        " Evaluate all intermediate queries on the input data");
+      ("-eval-debug", Arg.Unit (QcertArg.set_eval_debug gconf),
+       " Evaluate the target query in debug mode");
+      ("-eval-validate", Arg.Unit (QcertArg.set_eval_validate gconf),
+       " Checks the result of evaluation against the expected result");
       ("-source-sexp", Arg.Unit (QcertArg.set_source_sexp gconf),
        " Indicate that the source file is expected to be an s-expression");
       ("-stat", Arg.Unit (QcertArg.set_stat gconf),
@@ -126,6 +130,8 @@ let parse_args () =
       gconf_emit_sexp_all = false;
       gconf_eval = false;
       gconf_eval_all = false;
+      gconf_eval_debug = false;
+      gconf_eval_validate = false;
       gconf_source_sexp = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";

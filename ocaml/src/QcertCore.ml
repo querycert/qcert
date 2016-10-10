@@ -103,20 +103,27 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
 
 (* Eval *)
 
-let eval_string (data:DataUtil.io_input) (schema: TypeUtil.schema) dir file_name q =
+let eval_string (debug:bool) (data:DataUtil.io_input) (schema: TypeUtil.schema) dir file_name q =
   let ev_input = Compiler.Ev_in_world data in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let brand_relation = TypeUtil.brand_relation_of_brand_model brand_model in
   let language_name = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
-  let ev_output = QEval.eval_query brand_relation brand_model q ev_input in
+  let ev_output =
+    begin match debug with
+    | false -> QEval.eval_query brand_relation brand_model q ev_input
+    | true -> QEval.eval_query_debug brand_relation brand_model q ev_input
+    end
+  in
   let ev_data =
     begin match ev_output with
-    | Compiler.Ev_out_unsupported ->
-	QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string ("Eval not supported for" ^ language_name)))]
+    | Compiler.Ev_out_unsupported msg ->
+	QData.drec [(Util.char_list_of_string "error", QData.dstring msg)]
     | Compiler.Ev_out_failed ->
 	QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string "Eval failed"))]
     | Compiler.Ev_out_returned d ->
 	d
+    | Compiler.Ev_out_returned_debug s ->
+	QData.drec [(Util.char_list_of_string "debug", QData.dstring s)]
     end
   in
   let s = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") ev_data) in
@@ -219,7 +226,7 @@ let main gconf (file_name, query_s) =
   let res_eval =
     (* eval compiled query *)
     if gconf.gconf_eval then
-      eval_string data schema gconf.gconf_dir file_name q_target
+      eval_string gconf.gconf_eval_debug data schema gconf.gconf_dir file_name q_target
     else
       no_result_file
   in
@@ -229,7 +236,7 @@ let main gconf (file_name, query_s) =
       let _, l =
         List.fold_left
           (fun (fname, acc) q ->
-            let res = eval_string data schema gconf.gconf_dir fname q in
+            let res = eval_string gconf.gconf_eval_debug data schema gconf.gconf_dir fname q in
             let suff =
               ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
             in

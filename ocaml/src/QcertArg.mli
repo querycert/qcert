@@ -28,6 +28,8 @@ val set_emit_sexp : QcertConfig.global_config -> unit -> unit
 val set_emit_sexp_all : QcertConfig.global_config -> unit -> unit
 val set_eval : QcertConfig.global_config -> unit -> unit
 val set_eval_all : QcertConfig.global_config -> unit -> unit
+val set_eval_debug : QcertConfig.global_config -> unit -> unit
+val set_eval_validate : QcertConfig.global_config -> unit -> unit
 val set_source_sexp : QcertConfig.global_config -> unit -> unit
 val set_java_imports : QcertConfig.global_config -> string -> unit
 val set_vinit : QcertConfig.global_config -> string -> unit
