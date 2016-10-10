@@ -26,11 +26,14 @@ type global_config = {
     mutable gconf_dir_target : string option;
     mutable gconf_io : string option;
     mutable gconf_schema : TypeUtil.schema;
+    mutable gconf_data : DataUtil.io_input;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
     mutable gconf_emit_sexp : bool;
     mutable gconf_emit_sexp_all : bool;
+    mutable gconf_eval : bool;
+    mutable gconf_eval_all : bool;
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
@@ -45,6 +48,14 @@ let complet_configuration gconf =
     begin match gconf.gconf_io with
     | Some io ->
         gconf.gconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
+    | None ->
+        ()
+    end
+  in
+  let _data =
+    begin match gconf.gconf_io with
+    | Some io ->
+        gconf.gconf_data <- DataUtil.get_input DataUtil.META (Some (ParseString.parse_io_from_string io))
     | None ->
         ()
     end

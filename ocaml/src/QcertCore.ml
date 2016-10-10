@@ -24,6 +24,8 @@ type result = {
     res_emit_all : result_file list;
     res_emit_sexp : result_file;
     res_emit_sexp_all : result_file list;
+    res_eval : result_file;
+    res_eval_all : result_file list;
     res_stat : string;
     res_stat_all : string list;
     res_stat_tree : result_file;
@@ -99,6 +101,30 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
   { res_file = fout; res_content = s; }
 
+(* Eval *)
+
+let eval_string (data:DataUtil.io_input) (schema: TypeUtil.schema) dir file_name q =
+  let ev_input = Compiler.Ev_in_world data in
+  let brand_model = schema.TypeUtil.sch_brand_model in
+  let brand_relation = TypeUtil.brand_relation_of_brand_model brand_model in
+  let language_name = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
+  let ev_output = QEval.eval_query brand_relation brand_model q ev_input in
+  let ev_data =
+    begin match ev_output with
+    | Compiler.Ev_out_unsupported ->
+	QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string ("Eval not supported for" ^ language_name)))]
+    | Compiler.Ev_out_failed ->
+	QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string "Eval failed"))]
+    | Compiler.Ev_out_returned d ->
+	d
+    end
+  in
+  let s = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") ev_data) in
+  let fpref = Filename.chop_extension file_name in
+  let fpost = language_name in
+  let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in
+  { res_file = fout; res_content = s; }
+
 (* Stats *)
 
 let stat_query (schema: TypeUtil.schema) q =
@@ -119,6 +145,7 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
 
 let main gconf (file_name, query_s) =
   let schema = gconf.gconf_schema in
+  let data = gconf.gconf_data in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let (qname, q_source) = parse_string gconf query_s in
   let class_name =
@@ -189,6 +216,31 @@ let main gconf (file_name, query_s) =
     else
       []
   in
+  let res_eval =
+    (* eval compiled query *)
+    if gconf.gconf_eval then
+      eval_string data schema gconf.gconf_dir file_name q_target
+    else
+      no_result_file
+  in
+  let res_eval_all =
+    (* eval-all intermediate queries *)
+    if gconf.gconf_eval_all then
+      let _, l =
+        List.fold_left
+          (fun (fname, acc) q ->
+            let res = eval_string data schema gconf.gconf_dir fname q in
+            let suff =
+              ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
+            in
+            let fname = (Filename.chop_extension fname)^suff in
+            (fname, res::acc))
+          (file_name, []) queries
+      in
+      List.rev l
+    else
+      []
+  in
   let res_stat =
     if gconf.gconf_stat then
       stat_query schema q_target
@@ -211,6 +263,8 @@ let main gconf (file_name, query_s) =
     res_emit_all = res_emit_all;
     res_emit_sexp = res_emit_sexp;
     res_emit_sexp_all = res_emit_sexp_all;
+    res_eval = res_eval;
+    res_eval_all = res_eval_all;
     res_stat = res_stat;
     res_stat_all = res_stat_all;
     res_stat_tree = res_stat_tree; }

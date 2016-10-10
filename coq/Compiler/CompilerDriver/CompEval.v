@@ -196,7 +196,7 @@ Section CompEval.
     
   End EvalFunctions.
 
-  Section EvalQuery.
+  Section EvalDriver.
     Inductive eval_input : Set :=
     | Ev_in_world : list data -> eval_input
     | Ev_in_constant_env : list (string*data) -> eval_input
@@ -241,7 +241,7 @@ Section CompEval.
       | Q_cloudant _ => Ev_out_unsupported
       | Q_error err => Ev_out_unsupported
       end.
-  End EvalQuery.
+  End EvalDriver.
 
 End CompEval.
 
