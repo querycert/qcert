@@ -44,7 +44,7 @@ let no_result_file =
 
 (* Message *)
 
-let fprint_comilation_path ff gconf =
+let fprint_compilation_path ff gconf =
   let spath = QcertUtil.string_of_path " -> " gconf.gconf_path in
   Format.fprintf ff "Compiling from %s to %s:@\n"
     (QcertUtil.name_of_language gconf.gconf_source)
@@ -103,7 +103,7 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
 
 (* Eval *)
 
-let eval_string (debug:bool) (data:DataUtil.io_input) (schema: TypeUtil.schema) dir file_name q =
+let eval_string (validate:bool) (debug:bool) (data:DataUtil.io_input) (expected_output_data:DataUtil.io_output) (schema: TypeUtil.schema) dir file_name q =
   let ev_input = Compiler.Ev_in_world data in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let brand_relation = TypeUtil.brand_relation_of_brand_model brand_model in
@@ -125,6 +125,11 @@ let eval_string (debug:bool) (data:DataUtil.io_input) (schema: TypeUtil.schema) 
     | Compiler.Ev_out_returned_debug s ->
 	QData.drec [(Util.char_list_of_string "debug", QData.dstring s)]
     end
+  in
+  let _ =
+    if validate
+    then CheckUtil.validate_result expected_output_data (Some ev_data)
+    else ()
   in
   let s = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") ev_data) in
   let fpref = Filename.chop_extension file_name in
@@ -153,6 +158,7 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
 let main gconf (file_name, query_s) =
   let schema = gconf.gconf_schema in
   let data = gconf.gconf_data in
+  let expected_output_data = gconf.gconf_expected_output_data in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let (qname, q_source) = parse_string gconf query_s in
   let class_name =
@@ -226,7 +232,7 @@ let main gconf (file_name, query_s) =
   let res_eval =
     (* eval compiled query *)
     if gconf.gconf_eval then
-      eval_string gconf.gconf_eval_debug data schema gconf.gconf_dir file_name q_target
+      eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug data expected_output_data schema gconf.gconf_dir file_name q_target
     else
       no_result_file
   in
@@ -236,7 +242,7 @@ let main gconf (file_name, query_s) =
       let _, l =
         List.fold_left
           (fun (fname, acc) q ->
-            let res = eval_string gconf.gconf_eval_debug data schema gconf.gconf_dir fname q in
+            let res = eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug data expected_output_data schema gconf.gconf_dir fname q in
             let suff =
               ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
             in

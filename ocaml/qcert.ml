@@ -124,6 +124,7 @@ let parse_args () =
       gconf_io = None;
       gconf_schema = TypeUtil.empty_schema;
       gconf_data = [];
+      gconf_expected_output_data = [];
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;
@@ -148,7 +149,8 @@ let parse_args () =
 
 let () =
   let gconf, input_files = parse_args () in
-  Format.printf "%a" QcertCore.fprint_comilation_path gconf;
+  (* XXX qcert goes quiet if in eval-validate mode... - to be discussed with Louis XXX *)
+  if gconf.gconf_eval_validate then () else Format.printf "%a" QcertCore.fprint_compilation_path gconf;
   let results =
     List.map
       (fun file_name -> QcertCore.main gconf (file_name, string_of_file file_name))

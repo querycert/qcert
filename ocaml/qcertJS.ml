@@ -59,6 +59,7 @@ let global_config_of_json j =
       gconf_io = None;
       gconf_schema = TypeUtil.empty_schema;
       gconf_data = [];
+      gconf_expected_output_data = [];
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;

@@ -30,18 +30,28 @@ let print_nraenv_result fname actual_res =
       let res_string = PrettyIL.pretty_data str_formatter res; flush_str_formatter () in
       Format.printf "Evaluation for file %s : %s@." fname res_string
 
+let validate_result expected_res actual_res =
+  let ok = QUtil.validate_lifted_success actual_res expected_res in
+  if ok then
+    Format.printf "OK@."
+  else
+    Format.printf "ERROR@."
+	
+let validate_result_debug conf expected_res actual_res debug_res =
+  let ok = QUtil.validate_lifted_success actual_res expected_res in
+  if ok then
+    Format.printf "OK@."
+  else
+    begin
+      if !(get_debug conf) then Format.printf "CAMP evaluation: %s@." debug_res else ();
+      Format.printf "ERROR@."
+    end
+	
 let check_nraenv_result conf expected_res fname actual_res debug_res =
   if !(get_eval_only conf) then
     print_nraenv_result fname actual_res
   else
-    let ok = QUtil.validate_lifted_success actual_res expected_res in
-    if ok then
-      Format.printf "OK@."
-    else
-      begin
-	if !(get_debug conf) then Format.printf "CAMP evaluation: %s@." debug_res else ();
-	Format.printf "ERROR@."
-      end
+    validate_result_debug conf expected_res actual_res debug_res
 
 let print_rule_result fname (actual_res : QData.data option) =
   match actual_res with
@@ -56,14 +66,7 @@ let check_rule_result conf expected_res fname actual_res debug_res =
   if !(get_eval_only conf) then
     print_rule_result fname actual_res
   else
-    let ok = QUtil.validate_lifted_success actual_res expected_res in
-    if ok then
-      Format.printf "OK@."
-    else
-      begin
-	if !(get_debug conf) then Format.printf "CAMP evaluation: %s@." debug_res else ();
-	Format.printf "ERROR@."
-      end
+    validate_result_debug conf expected_res actual_res debug_res
 
 let check_oql_result output fname actual_res debug_result =
   print_oql_result fname actual_res
