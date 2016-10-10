@@ -333,6 +333,7 @@ Section DNNRCtoScala.
                 | Some rt =>
                   match proj1_sig rt with
                     | Nat₀ => ".map((row) => row.getLong(0))"
+                    | Foreign₀ _ => ".map((row) => row.getFloat(0))" (* TODO move to ForeignToScala type class *)
                     | _ => "" (* TODO figure out when we actually need this *)
                              (* ".map((row) => row(0))" (* Hope for Scala to figure it out *) *)
                   end
