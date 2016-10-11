@@ -38,6 +38,8 @@ let args_list gconf =
        "<harness.js> JavaScript runtime");
       ("-io", Arg.String (QcertArg.set_io gconf),
        "<file.io> Schema and inputs data for evaluation");
+      ("-io-use-world", Arg.Unit (QcertArg.set_io_use_world gconf),
+       "Declare 'CONST$WORLD' as a distributed variable");
       ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
        " Emit generated code of all intermediate queries");
       ("-emit-sexp", Arg.Unit (QcertArg.set_emit_sexp gconf),
@@ -76,8 +78,6 @@ let args_list gconf =
        "<init> Set the name init variable for the map-reduce backends");
       ("-vdistr", Arg.String (QcertArg.add_vdirst gconf),
        "<x> Declare x as a distributed variable");
-      ("-vdistr-world", Arg.Unit (QcertArg.add_vdirst_world gconf),
-       "Declare 'CONST$WORLD' as a distributed variable");
       ("-vlocal", Arg.String (QcertArg.add_vlocal gconf),
        "<x> Declare x as a local variable");
     ]
@@ -124,6 +124,7 @@ let parse_args () =
       gconf_dir = None;
       gconf_dir_target = None;
       gconf_io = None;
+      gconf_io_use_world = false;
       gconf_schema = TypeUtil.empty_schema;
       gconf_data = Compiler.Ev_in_world [];
       gconf_expected_output_data = [];

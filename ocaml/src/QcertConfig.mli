@@ -24,6 +24,7 @@ type global_config = {
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
     mutable gconf_io : string option;
+    mutable gconf_io_use_world : bool;
     mutable gconf_schema : TypeUtil.schema;
     mutable gconf_data : QEval.eval_input;
     mutable gconf_expected_output_data : DataUtil.io_output;

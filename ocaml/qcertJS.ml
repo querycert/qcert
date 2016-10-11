@@ -57,6 +57,7 @@ let global_config_of_json j =
       gconf_dir = None;
       gconf_dir_target = None;
       gconf_io = None;
+      gconf_io_use_world = false;
       gconf_schema = TypeUtil.empty_schema;
       gconf_data = [];
       gconf_expected_output_data = [];
