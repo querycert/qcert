@@ -58,7 +58,7 @@ let model_content_to_model (br: (string * string) list) (mc: model_content) : QT
   QType.make_brand_model brand_relation brand_context
 
 let extract_schema io =
-  let (_, hierarchy, _, model, wmType) = DataUtil.get_io_content (Some io) in
+  let (_, hierarchy, _, model, wmType, _) = DataUtil.get_io_content (Some io) in
   let (modelName, brandTypes, typeDefs) = DataUtil.get_model_content model in
   let sch =
     { io_brand_model = DataUtil.build_hierarchy hierarchy;
