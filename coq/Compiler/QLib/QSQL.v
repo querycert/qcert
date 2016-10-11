@@ -42,6 +42,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_sql := SQL.SQuery.
   Definition sql_select_column : column -> sql_select := SQL.SSelectColumn.
   Definition sql_select_expr : column -> sql_expr -> sql_select := SQL.SSelectExpr.
+  Definition sql_select_star : sql_select := SQL.SSelectStar.
 
   Definition sql_condition_and : sql_condition -> sql_condition -> sql_condition := SQL.SCondAnd.
   Definition sql_condition_or : sql_condition -> sql_condition -> sql_condition := SQL.SCondOr.
@@ -56,6 +57,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_cond_binary := SQL.SCondBinary.
   Definition sql_cond_exists := SQL.SCondExists.
   Definition sql_cond_in := SQL.SCondIn.
+  Definition sql_cond_like := SQL.SCondLike.
   Definition sql_cond_between := SQL.SCondBetween.
 
   Definition sql_expr_const : QData.data -> sql_expr := SQL.SExprConst.

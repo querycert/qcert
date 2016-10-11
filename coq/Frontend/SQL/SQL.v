@@ -109,7 +109,7 @@ Section SQL.
   | SCondBinary : sql_bin_cond -> sql_expr -> sql_expr -> sql_condition
   | SCondExists : sql_query -> sql_condition
   | SCondIn : sql_expr -> sql_expr -> sql_condition
-(*| SCondLike : sql_expr -> sql_expr -> sql_condition -- XXX Missing Operator XXX *)
+  | SCondLike : sql_expr -> string -> sql_condition
   | SCondBetween : sql_expr -> sql_expr -> sql_expr -> sql_condition
   with sql_expr : Set :=
   | SExprConst : data -> sql_expr
@@ -345,6 +345,7 @@ Section SQL.
         ANBinop AContains
                 (sql_expr_to_nraenv true acc expr1)
                 (sql_expr_to_nraenv false acc expr2)
+      | SCondLike expr1 slike => ANConst dunit (* XXX This should be really a compilation error! XXX *)
       | SCondBetween expr1 expr2 expr3 =>
         ANBinop AAnd
                 (ANBinop ALe

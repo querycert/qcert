@@ -792,11 +792,14 @@ let rec sexp_to_sql_query (se : sexp) : QLang.sql =
 	(sexp_to_sql_froms froms)
 	where group_by order_by
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside SQL")
+      raise (Qcert_Error "Not well-formed S-expr inside SQL query")
   end
 and sexp_to_sql_selects selects =
   begin match selects with
   | [] -> []
+  | (STerm ("all",[])) :: selects' ->
+      (QSQL.sql_select_star
+       :: (sexp_to_sql_selects selects'))
   | (STerm ("as",[cname])) :: expr :: selects' ->
       (QSQL.sql_select_expr (sstring_to_coq_string cname) (sexp_to_sql_expr expr))
       :: (sexp_to_sql_selects selects')
@@ -808,6 +811,8 @@ and sexp_to_sql_selects selects =
   | (STerm ("divide", _) as expr) :: selects' ->
       (QSQL.sql_select_expr (Util.char_list_of_string "") (sexp_to_sql_expr expr))
       :: (sexp_to_sql_selects selects')
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL select: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL select")
   end
@@ -871,9 +876,18 @@ and sexp_to_sql_orders orders =
   end
 and sexp_to_sql_expr expr =
   begin match expr with
-  | SString s -> QSQL.sql_expr_const (Dstring (char_list_of_string s))
-  | SFloat f -> QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
-  | STerm ("literal",[SString "date"; SString sdate]) -> QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX has to be fixed to use foreign data! XXX *)
+  | SString s ->
+      QSQL.sql_expr_const (Dstring (char_list_of_string s))
+  | SFloat f ->
+      QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
+  | STerm ("literal",[SString "date"; SString sdate]) ->
+      QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX (Dforeign (Obj.magic (Enhancedtimepoint sdate))) XXX *)
+  | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
+      QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "/00/00"))) (* XXX (Dforeign (Obj.magic (Enhancedtimeduration (sinterval ^ "/00/00")))) XXX *)
+  | STerm ("interval",[SString sinterval; STerm ("month",[])]) ->
+      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/" ^ sinterval ^ "/00"))) (* XXX (Obj.magic (Enhancedtimeduration ("0000/" ^ sinterval ^ "/00")))) XXX *)
+  | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
+      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/00/" ^ sinterval))) (* (Dforeign (Obj.magic (Enhancedtimeduration ("0000/00/" ^ sinterval)))) *)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
   | STerm ("add",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SPlus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
@@ -883,10 +897,12 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("divide",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
-  | STerm ("function",[SString "sum";expr1]) ->
-      QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "count"]) ->
+      QSQL.sql_expr_agg_expr Compiler.SCount QSQL.sql_expr_star
   | STerm ("function",[SString "count";expr1]) ->
       QSQL.sql_expr_agg_expr Compiler.SCount (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "sum";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
   | STerm ("function",[SString "avg";expr1]) ->
       QSQL.sql_expr_agg_expr Compiler.SAvg (sexp_to_sql_expr expr1)
   | STerm ("function",[SString "min";expr1]) ->
@@ -894,6 +910,8 @@ and sexp_to_sql_expr expr =
   | STerm ("function",[SString "max";expr1]) ->
       QSQL.sql_expr_agg_expr Compiler.SMax (sexp_to_sql_expr expr1)
   | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL expr")
   end
@@ -915,6 +933,12 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_binary SLt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("less_than_or_equal",[expr1;expr2]) ->
       QSQL.sql_cond_binary SLe (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("like",[expr1;slike]) ->
+      QSQL.sql_cond_like (sexp_to_sql_expr expr1) (sstring_to_coq_string slike)
+  | STerm ("exists",[query]) ->
+      QSQL.sql_cond_exists (sexp_to_sql_query query)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
   end
