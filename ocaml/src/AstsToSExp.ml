@@ -783,7 +783,7 @@ sexp_to_cld_mr_chain chain;
 
 (* NRA Section *)
 
-let rec sexp_to_sql (se : sexp) : QLang.sql =
+let rec sexp_to_sql_query (se : sexp) : QLang.sql =
   begin match se with
   | STerm ("query", (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses) ->
       let (where,group_by,order_by) = sexp_to_other_clauses other_clauses in
@@ -817,10 +817,51 @@ and sexp_to_sql_froms froms =
 and sexp_to_other_clauses other_clauses =
   begin match other_clauses with
   | [] -> (None, None, None)
-  | STerm ("where",[cond]) :: [] ->
-      (Some (sexp_to_sql_cond cond), None, None)
+  | STerm ("where",[cond]) :: rest ->
+      let (group_by,order_by) = sexp_to_sql_group_by_order_by rest in
+      (Some (sexp_to_sql_cond cond), group_by, order_by)
+  | rest ->
+      let (group_by,order_by) = sexp_to_sql_group_by_order_by rest in
+      (None, group_by, order_by)
+  end
+and sexp_to_sql_group_by_order_by rest =
+  begin match rest with
+  | [] -> (None,None)
+  | (STerm ("groupBy",groups)) :: (STerm ("having",[cond])) :: rest ->
+      let order_by = sexp_to_sql_order_by rest in
+      let group_by = Some (sexp_to_sql_groups groups, Some (sexp_to_sql_cond cond)) in
+      (group_by, order_by)
+  | STerm ("groupBy",groups) :: rest ->
+      let order_by = sexp_to_sql_order_by rest in
+      let group_by = Some (sexp_to_sql_groups groups, None) in
+      (group_by, order_by)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL other clauses")
+  end
+and sexp_to_sql_order_by rest =
+  begin match rest with
+  | [] -> None
+  | STerm ("orderBy",orders) :: [] ->
+      Some (sexp_to_sql_orders orders)
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL other clauses")
+  end
+and sexp_to_sql_groups groups =
+  begin match groups with
+  | [] -> []
+  | (STerm ("ref",[cname])) :: groups' -> (sstring_to_coq_string cname) :: sexp_to_sql_groups groups'
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL groups")
+  end
+and sexp_to_sql_orders orders =
+  begin match orders with
+  | [] -> []
+  | (STerm ("ascending",[(STerm ("ref",[cname]))])) :: orders' ->
+      (sstring_to_coq_string cname, Compiler.Ascending) :: sexp_to_sql_orders orders'
+  | (STerm ("descending",[(STerm ("ref",[cname]))])) :: orders' ->
+      (sstring_to_coq_string cname, Compiler.Descending) :: sexp_to_sql_orders orders'
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL groups")
   end
 and sexp_to_sql_expr expr =
   begin match expr with
@@ -834,6 +875,7 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "sum";expr1]) ->
       QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
+  | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL expr")
   end
@@ -855,6 +897,9 @@ and sexp_to_sql_cond cond =
       raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
   end
 
+let sexp_to_sql (se : sexp) : QLang.sql =
+  sexp_to_sql_query se
+    
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with
