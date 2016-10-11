@@ -26,7 +26,7 @@ type global_config = {
     mutable gconf_dir_target : string option;
     mutable gconf_io : string option;
     mutable gconf_schema : TypeUtil.schema;
-    mutable gconf_data : DataUtil.io_input;
+    mutable gconf_data : QEval.eval_input;
     mutable gconf_expected_output_data : DataUtil.io_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
@@ -58,7 +58,7 @@ let complet_configuration gconf =
   let _data =
     begin match gconf.gconf_io with
     | Some io ->
-        gconf.gconf_data <- DataUtil.get_input DataUtil.META (Some (ParseString.parse_io_from_string io))
+        gconf.gconf_data <- Compiler.Ev_in_world (DataUtil.get_input DataUtil.META (Some (ParseString.parse_io_from_string io)))
     | None ->
         ()
     end

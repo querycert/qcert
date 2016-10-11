@@ -103,8 +103,8 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
 
 (* Eval *)
 
-let eval_string (validate:bool) (debug:bool) (data:DataUtil.io_input) (expected_output_data:DataUtil.io_output) (schema: TypeUtil.schema) dir file_name q =
-  let ev_input = Compiler.Ev_in_world data in
+let eval_string (validate:bool) (debug:bool) (data:QEval.eval_input) (expected_output_data:DataUtil.io_output) (schema: TypeUtil.schema) dir file_name q =
+  let ev_input = data in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let brand_relation = TypeUtil.brand_relation_of_brand_model brand_model in
   let language_name = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
