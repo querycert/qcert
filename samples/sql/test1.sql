@@ -1,1 +1,1 @@
-(query (select (ref "name")) (from (table "WORLD")))
+(query (select (ref "name")) (from (table "Persons")))

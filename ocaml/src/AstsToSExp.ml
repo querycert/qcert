@@ -786,10 +786,11 @@ sexp_to_cld_mr_chain chain;
 let rec sexp_to_sql (se : sexp) : QLang.sql =
   begin match se with
   | STerm ("query", (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses) ->
+      let (where,group_by,order_by) = sexp_to_other_clauses other_clauses in
       QSQL.sql_sql
 	(sexp_to_sql_selects selects)
 	(sexp_to_sql_froms froms)
-	None None None (* (sexp_to_sql_other_clauses other_clauses) *)
+	where group_by order_by
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL")
   end
@@ -813,10 +814,19 @@ and sexp_to_sql_froms froms =
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL select")
   end
+and sexp_to_other_clauses other_clauses =
+  begin match other_clauses with
+  | [] -> (None, None, None)
+  | STerm ("where",[cond]) :: [] ->
+      (Some (sexp_to_sql_cond cond), None, None)
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL other clauses")
+  end
 and sexp_to_sql_expr expr =
   begin match expr with
   | SString s -> QSQL.sql_expr_const (Dstring (char_list_of_string s))
   | SFloat f -> QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
+  | STerm ("literal",[SString "date"; SString sdate]) -> QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX has to be fixed to use foreign data! XXX *)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
   | STerm ("subtract",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SMinus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
@@ -826,6 +836,23 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL expr")
+  end
+and sexp_to_sql_cond cond =
+  begin match cond with
+  | STerm ("and",[cond1;cond2]) ->
+      QSQL.sql_cond_and (sexp_to_sql_cond cond1) (sexp_to_sql_cond cond2)
+  | STerm ("or",[cond1;cond2]) ->
+      QSQL.sql_cond_or (sexp_to_sql_cond cond1) (sexp_to_sql_cond cond2)
+  | STerm ("not",[cond1]) ->
+      QSQL.sql_cond_not (sexp_to_sql_cond cond1)
+  | STerm ("equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("greater_than",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SGt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("less_than",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SLt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
   end
 
 (* Query translations *)
