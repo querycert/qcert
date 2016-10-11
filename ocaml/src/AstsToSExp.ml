@@ -882,6 +882,8 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_const (Dstring (char_list_of_string s))
   | SFloat f ->
       QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
+  | STerm ("list",const_list) ->
+      QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
   | STerm ("literal",[SString "date"; SString sdate]) ->
       QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX (Dforeign (Obj.magic (Enhancedtimepoint sdate))) XXX *)
   | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
@@ -917,6 +919,16 @@ and sexp_to_sql_expr expr =
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL expr")
   end
+and sexp_to_sql_const_list const_list =
+  begin match const_list with
+  | [] -> []
+  | (SString s) :: const_list' ->
+      (Dstring (char_list_of_string s)) :: (sexp_to_sql_const_list const_list')
+  | (SFloat f) :: const_list' ->
+      (Dforeign (Obj.magic (Enhancedfloat f))) :: (sexp_to_sql_const_list const_list')
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL const_list")
+  end
 and sexp_to_sql_cond cond =
   begin match cond with
   | STerm ("and",[cond1;cond2]) ->
@@ -927,6 +939,8 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_not (sexp_to_sql_cond cond1)
   | STerm ("equal",[expr1;expr2]) ->
       QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("not_equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SDiff (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("greater_than",[expr1;expr2]) ->
       QSQL.sql_cond_binary SGt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("greater_than_or_equal",[expr1;expr2]) ->
@@ -941,6 +955,8 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_exists (sexp_to_sql_query query)
   | STerm ("isBetween",[expr1;expr2;expr3]) ->
       QSQL.sql_cond_between (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2) (sexp_to_sql_expr expr3)
+  | STerm ("isIn",[expr1;expr2]) ->
+      QSQL.sql_cond_in (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
   | _ ->
