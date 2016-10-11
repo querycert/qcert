@@ -819,6 +819,8 @@ and sexp_to_sql_selects selects =
 and sexp_to_sql_froms froms =
   begin match froms with
   | STerm ("table",[tname]) -> [QSQL.sql_from_table (sstring_to_coq_string tname)]
+  | STerm ("aliasAs", [tname;query]) ->
+      [QSQL.sql_from_query (sstring_to_coq_string tname, None) (sexp_to_sql_query query)]
   | STerm ("join", [from1;from2]) ->
       (sexp_to_sql_froms from1) @ (sexp_to_sql_froms from2)
   | _ ->
@@ -937,6 +939,8 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_like (sexp_to_sql_expr expr1) (sstring_to_coq_string slike)
   | STerm ("exists",[query]) ->
       QSQL.sql_cond_exists (sexp_to_sql_query query)
+  | STerm ("isBetween",[expr1;expr2;expr3]) ->
+      QSQL.sql_cond_between (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2) (sexp_to_sql_expr expr3)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
   | _ ->
