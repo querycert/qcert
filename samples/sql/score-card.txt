@@ -1,0 +1,10 @@
+Do not parse: q1 ("(3)" on date condition), q20 (view definition)
+
+Parse and compile: q3, q11, q17
+
+Use like (string operator): q13, q14, q16, q20
+Use interval (date operator): q4, q5, q6, q10, q12, q14
+Use AliasAs (nested query in from): q7, q8, q9, q13, q21, q22
+Use isIn: q16, q18, q19, q20
+Use isBetween: q19
+Use exists: q21

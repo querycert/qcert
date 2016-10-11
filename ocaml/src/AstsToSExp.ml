@@ -803,6 +803,11 @@ and sexp_to_sql_selects selects =
   | STerm ("ref",[cname]) :: selects' ->
       (QSQL.sql_select_column (sstring_to_coq_string cname))
       :: (sexp_to_sql_selects selects')
+  | (STerm ("function", _) as expr) :: selects'
+  | (STerm ("multiply", _) as expr) :: selects'
+  | (STerm ("divide", _) as expr) :: selects' ->
+      (QSQL.sql_select_expr (Util.char_list_of_string "") (sexp_to_sql_expr expr))
+      :: (sexp_to_sql_selects selects')
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL select")
   end
@@ -812,7 +817,7 @@ and sexp_to_sql_froms froms =
   | STerm ("join", [from1;from2]) ->
       (sexp_to_sql_froms from1) @ (sexp_to_sql_froms from2)
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside SQL select")
+      raise (Qcert_Error "Not well-formed S-expr inside SQL froms")
   end
 and sexp_to_other_clauses other_clauses =
   begin match other_clauses with
@@ -835,8 +840,9 @@ and sexp_to_sql_group_by_order_by rest =
       let order_by = sexp_to_sql_order_by rest in
       let group_by = Some (sexp_to_sql_groups groups, None) in
       (group_by, order_by)
-  | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside SQL other clauses")
+  | rest ->
+      let order_by = sexp_to_sql_order_by rest in
+      (None, order_by)
   end
 and sexp_to_sql_order_by rest =
   begin match rest with
@@ -869,12 +875,24 @@ and sexp_to_sql_expr expr =
   | SFloat f -> QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
   | STerm ("literal",[SString "date"; SString sdate]) -> QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX has to be fixed to use foreign data! XXX *)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
+  | STerm ("add",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SPlus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("subtract",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SMinus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("multiply",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("divide",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "sum";expr1]) ->
       QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "count";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SCount (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "avg";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SAvg (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "min";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SMin (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "max";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SMax (sexp_to_sql_expr expr1)
   | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL expr")
@@ -891,8 +909,12 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("greater_than",[expr1;expr2]) ->
       QSQL.sql_cond_binary SGt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("greater_than_or_equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SGe (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("less_than",[expr1;expr2]) ->
       QSQL.sql_cond_binary SLt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("less_than_or_equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SLe (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
   end

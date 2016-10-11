@@ -86,7 +86,7 @@ Section SQL.
   Definition sql_order_spec : Set := SortCriterias.
   Inductive sql_bin_cond : Set := | SEq | SLe | SLt | SGe | SGt | SDiff.
   Inductive sql_bin_expr : Set := | SPlus | SMinus | SMult | SDivide.
-  Inductive sql_agg : Set := | SSum | SAvg | SCount.
+  Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
   Inductive sql_query : Set :=
   | SQuery :
@@ -291,6 +291,10 @@ Section SQL.
         ANUnop AArithMean (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
       | SExprAggExpr SCount expr1 =>
         ANUnop ACount (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+      | SExprAggExpr SMin expr1 =>
+        ANUnop ANumMin (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+      | SExprAggExpr SMax expr1 =>
+        ANUnop ANumMax (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
       | SExprQuery q =>
         if create_table
         then sql_query_to_nraenv true q
