@@ -14,16 +14,15 @@ Bugs:
   dates are treated like strings: (may affect most queries)
 
 Usage notes:
-
-Use AliasAs (nested query in from): q7, q8, q9, q13, q21, q22
-Use isIn: q12, q16, q18, q19, q20, q22
-Use isBetween: q5, q19
-Use exists: q4, q21
-Use left outer join: q13
-Use cases: q12, q14
-Use deref: q7, q8, q21
-Use interval literal: q4, q5, q6, q10, q12, q14
-Use extract: q9
-Use like: q2, q13, q14, q16, q20
-Use substring: q22
+  Use AliasAs (nested query in from): q7, q8, q9, q13, q21, q22
+  Use isIn: q12, q16, q18, q19, q20, q22
+  Use isBetween: q5, q19
+  Use exists: q4, q21
+  Use left outer join: q13
+  Use cases: q12, q14
+  Use deref: q7, q8, q21
+  Use interval literal: q4, q5, q6, q10, q12, q14
+  Use extract: q9
+  Use like: q2, q13, q14, q16, q20
+  Use substring: q22
 
