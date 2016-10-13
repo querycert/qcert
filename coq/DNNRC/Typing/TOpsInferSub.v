@@ -178,6 +178,10 @@ Section TOpsInferSub.
         else None
       | AToString =>
         Some (String, τ₁)
+      | ASubstring _ _ =>
+        if (subtype_dec τ₁ String)
+        then Some (String, String)
+        else None
       | ALeft =>
         Some (Either τ₁ ⊥, τ₁)
       | ARight =>

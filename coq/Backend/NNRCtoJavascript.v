@@ -256,6 +256,12 @@ Section NNRCtoJavascript.
                      | ASum => "sum(" ++ e1 ++ ")"
                      | AArithMean => "arithMean(" ++ e1 ++ ")"
                      | AToString => "toString(" ++ e1 ++ ")"
+                     | ASubstring start olen =>
+                       "(" ++ e1 ++ ").substring(" ++ toString start ++
+                       match olen with
+                       | Some len => ", " ++ toString len
+                       | None => ""
+                       end ++ ")"
                      | ALeft => "{" ++ quotel ++ "left" ++ quotel  ++ e1 ++ "}"
                      | ARight => "{" ++ quotel ++ "right" ++ quotel  ++ e1 ++ "}"
                      | ABrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"

@@ -206,7 +206,16 @@ public class UnaryOperators {
 		return new JsonPrimitive(sb.toString());
 	}
 	
-	
+	public static JsonElement substring(int start, int end, JsonElement e) {
+		String str = e.getAsJsonPrimitive().getAsString();
+		return new JsonPrimitive(str.substring(start, end));
+	}
+
+	public static JsonElement substring(int start, JsonElement e) {
+		String str = e.getAsJsonPrimitive().getAsString();
+		return new JsonPrimitive(str.substring(start));
+	}
+
 	public static JsonElement left(JsonElement e) {
 		return rec("left", e);
 	}

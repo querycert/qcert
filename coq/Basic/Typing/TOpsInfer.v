@@ -607,6 +607,11 @@ Section TOpsInfer.
         | _ => None
         end
       | AToString => Some String
+      | ASubstring _ _ =>
+        match `τ₁ with
+        | String₀ => Some String
+        | _ => None
+        end
       | ALeft =>
         Some (Either τ₁ ⊥)
       | ARight =>

@@ -47,7 +47,7 @@ Section RUnaryOpsSem.
   Context {fuop:foreign_unary_op}.
 
   Context (h:brand_relation_t).
-  
+
   Definition fun_of_unaryop (uop:unaryOp) : data -> option data :=
     match uop with
     | AIdOp =>
@@ -107,6 +107,30 @@ Section RUnaryOpsSem.
       fun d => lift dnat (lift_oncoll darithmean d)
     | AToString =>
       fun d => Some (dstring (dataToString d))
+    | ASubstring start olen =>
+      fun d =>
+                (match d with
+                 | dstring s =>
+                   Some (dstring (
+                   let real_start :=
+                       (match start with
+                        | 0%Z => 0
+                     | Z.pos p => Pos.to_nat p
+                     | Z.neg n => (String.length s) - (Pos.to_nat n)
+                        end) in
+                   let real_olen :=
+                       match olen with
+                       | Some len =>
+                         match len with
+                         | 0%Z => 0
+                         | Z.pos p => Pos.to_nat p
+                         | Z.neg n => 0
+                         end
+                       | None => (String.length s) - real_start
+                       end in
+                   (substring real_start real_olen s)))
+                 | _ => None
+                 end)
     | ALeft =>
       fun d => Some (dleft d)
     | ARight =>

@@ -264,6 +264,11 @@ Section NNRCtoJava.
                      | ASum =>  mk_java_unary_op0 "sum" e1
                      | AArithMean => mk_java_unary_op0 "list_mean" e1
                      | AToString =>  mk_java_unary_op0 "tostring" e1
+                     | ASubstring start olen =>
+                       match olen with
+                       | Some len => mk_java_unary_opn "substring" (map toString [start; len]) e1
+                       | None => mk_java_unary_op1 "substring" (toString start) e1
+                       end
                      | ALeft => mk_java_unary_op0 "left" e1
                      | ARight => mk_java_unary_op0 "right" e1
                      | ABrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1

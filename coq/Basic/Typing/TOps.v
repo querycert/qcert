@@ -74,6 +74,7 @@ Section TOps.
     | ATNumMax : unaryOp_type ANumMax (Coll Nat) Nat
     | ATArithMean : unaryOp_type AArithMean (Coll Nat) Nat
     | ATToString τ: unaryOp_type AToString τ String
+    | ATSubstring start olen: unaryOp_type (ASubstring start olen) String String
     | ATLeft τl τr: unaryOp_type ALeft τl (Either τl τr)
     | ATRight τl τr: unaryOp_type ARight τr (Either τl τr)
     | ATBrand b :
@@ -107,6 +108,7 @@ Section TOps.
     | Case_aux c "ATNumMax"%string
     | Case_aux c "ATArithMean"%string
     | Case_aux c "ATToString"%string
+    | Case_aux c "ATSubstring"%string
     | Case_aux c "ATLeft"%string
     | Case_aux c "ATRight"%string
     | Case_aux c "ATBrand"%string
@@ -1162,6 +1164,9 @@ Section TOps.
          destruct d1; simpl; congruence.
     - Case "ATToString"%string.
       eauto.
+    - Case "ATSubstring"%string.
+      dtype_inverter.
+      eauto.
     - Case "ATLeft"%string.
       eauto.
     - Case "ATRight"%string.
@@ -1234,6 +1239,7 @@ End TOps.
     | Case_aux c "ATNumMax"%string
     | Case_aux c "ATArithMean"%string
     | Case_aux c "ATToString"%string
+    | Case_aux c "ATSubstring"%string
     | Case_aux c "ATLeft"%string
     | Case_aux c "ATRight"%string
     | Case_aux c "ATBrand"%string

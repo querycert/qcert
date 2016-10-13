@@ -19,6 +19,7 @@
 Section RUnaryOps.
 
   Require Import String.
+  Require Import ZArith.
   Require Import EquivDec.
   Require Import Utils.
   Require Import BrandRelation.
@@ -54,6 +55,7 @@ Section RUnaryOps.
   | ANumMax : unaryOp                     (* max over a collection of numeric values *)
   | AArithMean : unaryOp                  (* arithmetic mean of natural numbers in a bag *)
   | AToString : unaryOp                   (* data to string.  Important for test cases *)
+  | ASubstring : Z -> option Z -> unaryOp (* returns the substring starting with the nth character, for m characters (or the rest of the string) *)
   | ALeft : unaryOp                       (* create a dleft *)
   | ARight : unaryOp                      (* create a dright *)
   | ABrand : brands -> unaryOp            (* box a branded value *)
@@ -83,6 +85,8 @@ Section RUnaryOps.
     decide equality; try apply string_dec.
     - apply SortCriterias_eqdec.
     - induction l; decide equality; apply string_dec.
+    - apply option_eqdec.
+    - apply Z_eqdec. 
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - apply ArithUOp_eqdec.
@@ -137,6 +141,13 @@ Section RUnaryOps.
             | ANumMax => "ANumMax"
             | AArithMean => "AArithMean"
             | AToString => "AToString"
+            | ASubstring start len => "(ASubstring " ++ (toString start)
+                                                     ++ (match len with
+                                                         | None => ""
+                                                         | Some len => " " ++ (toString len)
+                                                         end
+                                                        ) ++ ")"
+                                                              
             | ALeft => "ALeft"
             | ARight => "ARight"
             | ABrand b => "(ABrand " ++ (@toString _ ToString_brands b)++ ")"
@@ -170,6 +181,7 @@ Tactic Notation "unaryOp_cases" tactic(first) ident(c) :=
   | Case_aux c "ANumMax"%string
   | Case_aux c "AArithMean"%string
   | Case_aux c "AToString"%string
+  | Case_aux c "ASubstring"%string
   | Case_aux c "ALeft"%string
   | Case_aux c "ARight"%string
   | Case_aux c "ABrand"%string

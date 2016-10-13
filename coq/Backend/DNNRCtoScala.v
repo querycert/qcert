@@ -25,7 +25,7 @@ Require Import Peano_dec.
 Require Import EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import NNRCRuntime ForeignToScala.
+Require Import NNRCRuntime ForeignToJava.
 Require Import DNNRC.
 Require Import RType.
 Require Import TDataInfer.
@@ -46,7 +46,6 @@ Section DNNRCtoScala.
   Context {fboptyping:foreign_binary_op_typing}.
   Context {fuoptyping:foreign_unary_op_typing}.
   Context {fttjs: ForeignToJavascript.foreign_to_javascript}.
-  Context {fts: ForeignToScala.foreign_to_scala}.
 
   Definition quote_string (s: string) : string :=
     """" ++ s ++ """".
@@ -80,7 +79,7 @@ Section DNNRCtoScala.
       "StructType(Seq(StructField(""$data"", StringType), StructField(""$type"", ArrayType(StringType))))"
     (* should not occur *)
     | Arrow₀ _ _ => "ARROW TYPE?"
-    | Foreign₀ ft => foreign_to_scala_spark_datatype ft
+    | Foreign₀ ft => "FOREIGN TYPE?"
     end.
 
   (** Scala-level type of an rtype.
@@ -220,6 +219,12 @@ Section DNNRCtoScala.
     | ARight => prefix "right"
     | ASum => postfix "sum"
     | AToString => prefix "QCertRuntime.toQCertString"
+    | ASubstring start olen =>
+      "(" ++ x ++ ").substring(" ++ toString start ++
+          match olen with
+          | Some len => ", " ++ toString len
+          | None => ""
+          end ++ ")"
     | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand =>
       match lift_tlocal required_type with
@@ -231,9 +236,9 @@ Section DNNRCtoScala.
       end
     | ADistinct => postfix "distinct"
     | AOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
-    | AForeignUnaryOp o => foreign_to_scala_unary_op o x
 
     (* TODO *)
+    | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"
     | ARecRemove _ => "ARECREMOVE???"
     | ASingleton => "SINGLETON???"
     | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
@@ -334,7 +339,6 @@ Section DNNRCtoScala.
                 | Some rt =>
                   match proj1_sig rt with
                     | Nat₀ => ".map((row) => row.getLong(0))"
-                    | Foreign₀ _ => ".map((row) => row.getFloat(0))" (* TODO move to ForeignToScala type class *)
                     | _ => "" (* TODO figure out when we actually need this *)
                              (* ".map((row) => row(0))" (* Hope for Scala to figure it out *) *)
                   end
