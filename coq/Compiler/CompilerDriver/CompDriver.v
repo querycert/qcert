@@ -770,7 +770,7 @@ Section CompDriver.
     | (Dv_spark2 dv, Q_spark2 q) => compile_spark2 dv q
     | (Dv_cloudant dv, Q_cloudant q) => compile_cloudant dv q
     | (Dv_error s, _) => (Q_error ("[Driver Error]" ++ s)) :: nil
-    | (_, _) => (Q_error ("incompatible query (" ++ (name_of_query q) ++ ") and driver (" ++ (name_of_driver dv) ++ ")")) :: nil
+    | (_, _) => (Q_error "incompatible query and driver") :: nil
     end.
 
   End CompDriverCompile.
@@ -1117,7 +1117,6 @@ Section CompDriver.
 
   Definition fix_driver dv q :=
     match (dv, q) with
-    | (Dv_rule (Dv_rule_to_camp dv), Q_camp q) => Dv_camp dv
     | (Dv_rule (Dv_rule_to_nraenv dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv dv)
     | (Dv_rule (Dv_rule_to_nra dv), Q_camp q) => Dv_camp (Dv_camp_to_nra dv)
     | (Dv_camp (Dv_camp_to_nraenv dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv dv)
@@ -1129,9 +1128,11 @@ Section CompDriver.
   (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
   (* XXX Definir le principe d'induction sur driver !!!! XXX *)
 
+  (* TODO: @lmandel: This is probably wrong.  It suffces to prove what we need, but it not preserved by the induction. see the admit. not sure what to do. *)
   Definition is_driver_config (config: driver_config) (dv: driver) : Prop :=
-    (* XXXX TODO XXX *)
-    True.
+      forall config' lang dv',
+      push_translation config' lang dv' = dv ->
+      push_translation config lang dv' = dv.
 
   Definition no_dv_error (dv: driver) : Prop :=
     match dv with
@@ -1213,7 +1214,7 @@ Section CompDriver.
     destruct dv; simpl;
       try solve [match_destr; inversion 1; subst; simpl; auto 2 | inversion 1].
     - match_case; intros; subst.
-      invcs H0. 
+      invcs H0.
   Admitted.
 
   Function target_language_of_driver dv { measure driver_length dv } :=
@@ -1558,6 +1559,14 @@ Section CompDriver.
         destruct dv; auto with postfix_hints.
   Qed.
 
+  Lemma driver_of_rev_path_app config dv rev_path1 rev_path2 :
+    driver_of_rev_path config dv (rev_path1 ++ rev_path2) = 
+    driver_of_rev_path config (driver_of_rev_path config dv rev_path1) rev_path2.
+  Proof.
+    revert rev_path2 dv.
+    induction rev_path1; simpl; trivial.
+  Qed.
+
   Lemma driver_of_rev_path_completeness:
     forall dv dv',
       is_postfix_driver dv' dv ->
@@ -1566,9 +1575,17 @@ Section CompDriver.
         exists rev_path,
           driver_of_rev_path config dv' rev_path = dv.
   Proof.
-    driver_cases (induction dv) Case;
-      simpl; intros dv' H_post config H_config;
-        admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+    intros dv dv'.
+    induction 1.
+    - subst. exists nil; trivial.
+    - intros.
+      destruct (IHis_postfix_driver config0).
++        admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+      + exists (x++lang::nil).
+        rewrite driver_of_rev_path_app.
+        rewrite H3.
+        simpl.
+        eapply H2; eauto.
   Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
 
   Theorem driver_of_path_completeness:
