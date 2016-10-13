@@ -1053,6 +1053,7 @@ Section CompDriver.
 
   Definition fix_driver dv q :=
     match (dv, q) with
+    | (Dv_rule (Dv_rule_to_camp dv), Q_camp q) => Dv_camp dv
     | (Dv_rule (Dv_rule_to_nraenv dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv dv)
     | (Dv_rule (Dv_rule_to_nra dv), Q_camp q) => Dv_camp (Dv_camp_to_nra dv)
     | (Dv_camp (Dv_camp_to_nraenv dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv dv)
