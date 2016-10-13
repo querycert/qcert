@@ -1,13 +1,13 @@
-Do not parse: q1 ("(3)" on date condition), q20 (view definition)
+Do not parse: q1 ("(3)" on date condition), q15 (view definition)
 
 Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20
 
 Missing:
   Support for 'deref' (i.e., n.column idiom for renaming): q7, q8, q21
-  Support for 'extract' (i.e., access date component): q9
-  Support for 'substring' (i.e., access part of a string): q22
   Support for 'left outer join': q13
   Support for 'cases': q12, q14
+  Support for 'extract' (i.e., access date component): q9
+  Support for 'substring' (i.e., access part of a string): q22
 
 Bugs:
   like operator isn't compiled properly: q2, q13, q14, q16, q20
@@ -25,4 +25,107 @@ Usage notes:
   Use extract: q9
   Use like: q2, q13, q14, q16, q20
   Use substring: q22
+
+----
+Missing support proposals:
+
+  Do not parse: q1 ("(3)" on date condition)
+
+    Proposal: Remove "(3)" and pretend it's ok? (I couldn't find the semantics)
+
+  Do not parse: q15 (view definition)
+    Proposal: Small rewrite, which I believe to be equivalent and might(?) parse:
+
+FROM:
+
+create view revenue0 (supplier_no, total_revenue) as
+	select
+		l_suppkey,
+		sum(l_extendedprice * (1 - l_discount))
+	from
+		lineitem
+	where
+		l_shipdate >= date '1996-01-01'
+		and l_shipdate < date '1996-01-01' + interval '3' month
+	group by
+		l_suppkey;
+
+
+TO:
+
+create view revenue0 as
+	select
+		l_suppkey as supplier_no,
+		sum(l_extendedprice * (1 - l_discount)) as total_revenue
+	from
+		lineitem
+	where
+		l_shipdate >= date '1996-01-01'
+		and l_shipdate < date '1996-01-01' + interval '3' month
+	group by
+		l_suppkey;
+
+
+
+
+  Support for 'deref' (i.e., n.column idiom for renaming): q7, q8, q21
+
+Here is the idiom (from a fraction of q8):
+
+		select
+			n1.n_name as supp_nation,
+			n2.n_name as cust_nation,
+			extract(year from l_shipdate) as l_year,
+			l_extendedprice * (1 - l_discount) as volume
+		from
+			supplier,
+			lineitem,
+			orders,
+			customer,
+			nation n1,
+			nation n2
+		where
+			s_suppkey = l_suppkey
+			and o_orderkey = l_orderkey
+			and c_custkey = o_custkey
+			and s_nationkey = n1.n_nationkey
+			and c_nationkey = n2.n_nationkey
+
+Proposal:
+
+  'nation n1' mapped to: Map<[n1:ID]>(Table[nation])
+  'n1.n_name' mapped to: ID.n1.n_name
+
+  i.e., nation n1 and nation n2 naturally supported through nested
+  records (harder in pure pure relational).
+
+  Support for 'left outer join': q13
+
+  Proposal: like for group-by, use a left-outer-join macro, then
+  adjust translation. Not efficient, but should provide the right
+  semantics.
+
+  Support for 'cases': q12, q14
+
+```		select
+			c_custkey,
+			count(o_orderkey)
+		from
+			customer left outer join orders on
+				c_custkey = o_custkey
+				and o_comment not like '%special%requests%'
+		group by
+			c_custkey
+```
+
+  Add if-then-else to NRAEnv??? ouch... or maybe through either? To be
+  investigated.
+
+  Support for 'extract' (i.e., access date component): q9
+  Support for 'substring' (i.e., access part of a string): q22
+
+    Proposal: Need just to add the corresponding functions and check
+    date/time and foreign types support works as expected. Josh
+    already volunteered to look for 'simplest possible required js
+    runtime for dates'.
 
