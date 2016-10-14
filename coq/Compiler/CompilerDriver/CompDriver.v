@@ -64,7 +64,7 @@ Section CompDriver.
   Require Import ForeignToJavascript.
   Require Import ForeignToScala.
   Require Import ForeignCloudant.
-  
+
   (* Compiler Driver *)
   Require Import CompLang CompEnv.
 
@@ -97,7 +97,7 @@ Section CompDriver.
   Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_algenv q.
 
   Definition lambda_nra_to_nraenv (q:lambda_nra) := algenv_of_lalg q.
-  
+
   Definition camp_to_nraenv (q:camp) : nraenv := PatterntoNRAEnv.translate_pat_to_algenv q.
 
   Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
@@ -165,7 +165,7 @@ Section CompDriver.
 
   Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
     NNRCMRtoNNRCMRCloudantTop h q.
-  
+
   Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
     nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
@@ -177,7 +177,7 @@ Section CompDriver.
 
   Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
-    
+
   Definition nnrcmr_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nnrcmr_prepared_to_spark rulename (nnrcmr_to_nnrcmr_spark_prepare q).
 
@@ -206,7 +206,7 @@ Section CompDriver.
 
   Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
     dnnrcToDatasetRewrite q.
-  
+
   (* Drivers *)
 
   Inductive javascript_driver : Set :=
@@ -281,7 +281,7 @@ Section CompDriver.
                                                    with nraenv_driver_ind' := Induction for nraenv_driver Sort Prop
                                                                              with nnrc_driver_ind' := Induction for nnrc_driver Sort Prop
                                                                                                      with nnrcmr_driver_ind' := Induction for nnrcmr_driver Sort Prop.
-  
+
   Combined Scheme cnd_combined_ind
            from camp_driver_ind', nra_driver_ind', nraenv_driver_ind', nnrc_driver_ind', nnrcmr_driver_ind'.
 
@@ -655,7 +655,7 @@ Section CompDriver.
   Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
     match dv with
     | Dv_dnnrc_dataset_stop => 1
-    | Dv_dnnrc_dataset_to_typed_dataset => 1
+    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset _ dv => 1 + driver_length_dnnrc_typed_dataset dv
     end.
 
   Fixpoint driver_length_camp (dv: camp_driver) :=
@@ -1148,9 +1148,7 @@ Section CompDriver.
   Proof.
     destruct dv; simpl;
       try solve [match_destr; inversion 1; subst; simpl; auto 2 | inversion 1].
-    - match_case; intros; subst.
-      invcs H0.
-  Admitted.
+  Qed.
 
   Function target_language_of_driver dv { measure driver_length dv } :=
     match pop_transition dv with
@@ -1161,7 +1159,7 @@ Section CompDriver.
     intros.
     eapply pop_transition_lt_len; eauto.
   Defined.
-  
+
   Definition trivial_driver_config : driver_config
     := mkDvConfig
          EmptyString
@@ -1224,11 +1222,11 @@ Section CompDriver.
                  nil
                  EmptyString) (lang:=L_cldmr)
       ; [ eapply target_language_of_driver_is_postfix_cloudant | | ]
-      ; simpl; trivial. 
+      ; simpl; trivial.
     Qed.
 
 
-  Lemma target_language_of_driver_is_postfix_typed_dataset:
+  Lemma target_language_of_driver_is_postfix_dnnrc_typed_dataset:
     (forall d, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_typed_dataset d))) (Dv_dnnrc_typed_dataset d)).
   Proof.
     induction d; simpl
@@ -1251,7 +1249,7 @@ Section CompDriver.
       ; simpl; trivial.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_dataset:
+  Lemma target_language_of_driver_is_postfix_dnnrc_dataset:
     (forall d, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_dataset d))) (Dv_dnnrc_dataset d)).
   Proof.
     destruct d; simpl.
@@ -1267,7 +1265,7 @@ Section CompDriver.
                  EmptyString
                  nil
                  EmptyString) (lang:=L_dnnrc_dataset)
-      ; [eapply target_language_of_driver_is_postfix_typed_dataset | | ]; simpl; trivial.
+      ; [eapply target_language_of_driver_is_postfix_dnnrc_typed_dataset | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_cnd:
@@ -1322,7 +1320,7 @@ Section CompDriver.
                  EmptyString
                  v
                  EmptyString) (lang:=L_nnrc);
-        [eapply target_language_of_driver_is_postfix_dataset | | ]; simpl; trivial.
+        [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=trivial_driver_config) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_javascript | | ]; simpl; trivial.
@@ -1369,7 +1367,7 @@ Section CompDriver.
                  EmptyString
                  nil
                  EmptyString) (lang:=L_nnrcmr);
-        [eapply target_language_of_driver_is_postfix_dataset | | ]; simpl; trivial.
+        [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
@@ -1387,7 +1385,7 @@ Section CompDriver.
     Proof.
       apply target_language_of_driver_is_postfix_cnd.
     Qed.
-      
+
     Lemma target_language_of_driver_is_postfix_nra:
       (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nra n))) (Dv_nra n)).
     Proof.
@@ -1411,7 +1409,7 @@ Section CompDriver.
     Proof.
       apply target_language_of_driver_is_postfix_cnd.
     Qed.
-      
+
   Lemma target_language_of_driver_is_postfix_rule:
       (forall r, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_rule r))) (Dv_rule r)).
     Proof.
@@ -1466,8 +1464,8 @@ Section CompDriver.
          target_language_of_driver_is_postfix_spark2
          target_language_of_driver_is_postfix_cloudant
          target_language_of_driver_is_postfix_cldmr
-         target_language_of_driver_is_postfix_typed_dataset
-         target_language_of_driver_is_postfix_dataset
+         target_language_of_driver_is_postfix_dnnrc_typed_dataset
+         target_language_of_driver_is_postfix_dnnrc_dataset
          target_language_of_driver_is_postfix_camp
          target_language_of_driver_is_postfix_nra
          target_language_of_driver_is_postfix_nraenv
@@ -1483,7 +1481,7 @@ Section CompDriver.
   Qed.
 
   Lemma driver_of_rev_path_app config dv rev_path1 rev_path2 :
-    driver_of_rev_path config dv (rev_path1 ++ rev_path2) = 
+    driver_of_rev_path config dv (rev_path1 ++ rev_path2) =
     driver_of_rev_path config (driver_of_rev_path config dv rev_path1) rev_path2.
   Proof.
     revert rev_path2 dv.
