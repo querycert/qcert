@@ -910,6 +910,8 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_const (Dstring (char_list_of_string s))
   | SFloat f ->
       QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
+  | SInt i ->
+      QSQL.sql_expr_const (Dnat i)
   | STerm ("list",const_list) ->
       QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
   | STerm ("literal",[SString "date"; SString sdate]) ->
@@ -958,6 +960,8 @@ and sexp_to_sql_const_list const_list =
       (Dstring (char_list_of_string s)) :: (sexp_to_sql_const_list const_list')
   | (SFloat f) :: const_list' ->
       (Dforeign (Obj.magic (Enhancedfloat f))) :: (sexp_to_sql_const_list const_list')
+  | (SInt i) :: const_list' ->
+      (Dnat i) :: (sexp_to_sql_const_list const_list')
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL const_list")
   end
