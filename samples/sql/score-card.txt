@@ -1,12 +1,11 @@
 Do not parse: q1 ("(3)" on date condition), q15 (view definition)
 
-Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20
+Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21
 
 Missing:
-  Support for 'deref' (i.e., n.column idiom for renaming): q7, q8, q21
   Support for 'left outer join': q13
   Support for 'cases': q12, q14
-  Support for 'extract' (i.e., access date component): q9
+  Support for 'extract' (i.e., access date component): q7, q8, q9
   Support for 'substring' (i.e., access part of a string): q22
   Support for 'like' (i.e., simple matching on a string): q2, q13, q14, q16, q20
 

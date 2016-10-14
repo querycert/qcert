@@ -364,6 +364,35 @@ Section SQLTest.
 
   (* Eval vm_compute in (sql_eval sql16 tables). *)
 
+  (* sql17:
+       select p1.age,
+              p1.company,
+              p1.name as emp1,
+              p2.name as emp2
+       from persons p1, person p2
+       where p1.age = p2.age
+         and p1.company = p2.company
+         and p1.name <> p2.name *)
+  Definition sql17 :=
+    SQuery ((SSelectColumnDeref "p1" "age")
+              :: (SSelectColumnDeref "p1" "company")
+              :: (SSelectExpr "emp1" (SExprColumnDeref "p1" "name"))
+              :: (SSelectExpr "emp2" (SExprColumnDeref "p2" "name"))
+              :: nil)
+           (SFromTableAlias "p1" "persons"::SFromTableAlias "p2" "persons"::nil)
+           (Some (SCondAnd
+                    (SCondAnd
+                       (SCondBinary SEq (SExprColumnDeref "p1" "age")
+                                    (SExprColumnDeref "p2" "age"))
+                       (SCondBinary SEq (SExprColumnDeref "p1" "company")
+                                    (SExprColumnDeref "p2" "company")))
+                    (SCondBinary SDiff (SExprColumnDeref "p1" "name")
+                                 (SExprColumnDeref "p2" "name"))))
+           None
+           None.
+
+  (* Eval vm_compute in (sql_eval sql17 tables). *)
+
 End SQLTest.
 
 (* 

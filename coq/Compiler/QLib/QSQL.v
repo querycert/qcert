@@ -41,6 +41,7 @@ Module QSQL(runtime:CompilerRuntime).
 
   Definition sql_sql := SQL.SQuery.
   Definition sql_select_column : column -> sql_select := SQL.SSelectColumn.
+  Definition sql_select_column_deref : table -> column -> sql_select := SQL.SSelectColumnDeref.
   Definition sql_select_expr : column -> sql_expr -> sql_select := SQL.SSelectExpr.
   Definition sql_select_star : sql_select := SQL.SSelectStar.
 
@@ -49,6 +50,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_condition_not : sql_condition -> sql_condition := SQL.SCondNot.
 
   Definition sql_from_table : table -> sql_from := SQL.SFromTable.
+  Definition sql_from_table_alias : table -> table -> sql_from := SQL.SFromTableAlias.
   Definition sql_from_query : sql_table_spec -> sql_query -> sql_from := SQL.SFromQuery.
 
   Definition sql_cond_and := SQL.SCondAnd.
@@ -62,6 +64,7 @@ Module QSQL(runtime:CompilerRuntime).
 
   Definition sql_expr_const : QData.data -> sql_expr := SQL.SExprConst.
   Definition sql_expr_column : String.string -> sql_expr := SQL.SExprColumn.
+  Definition sql_expr_column_deref : String.string -> String.string -> sql_expr := SQL.SExprColumnDeref.
   Definition sql_expr_star : sql_expr := SQL.SExprStar.
   Definition sql_expr_binary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr := SQL.SExprBinary.
   Definition sql_expr_agg_expr : sql_agg -> sql_expr -> sql_expr := SQL.SExprAggExpr.
