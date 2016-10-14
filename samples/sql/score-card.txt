@@ -1,12 +1,11 @@
 Do not parse: q1 ("(3)" on date condition), q15 (view definition)
 
-Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21
+Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21, q22
 
 Missing:
   Support for 'left outer join': q13
   Support for 'cases': q12, q14
   Support for 'extract' (i.e., access date component): q7, q8, q9
-  Support for 'substring' (i.e., access part of a string): q22
   Support for 'like' (i.e., simple matching on a string): q2, q13, q14, q16, q20
 
 Bugs:
@@ -65,39 +64,6 @@ create view revenue0 as
 	group by
 		l_suppkey;
 
-
-
-
-  Support for 'deref' (i.e., n.column idiom for renaming): q7, q8, q21
-
-Here is the idiom (from a fraction of q8):
-
-		select
-			n1.n_name as supp_nation,
-			n2.n_name as cust_nation,
-			extract(year from l_shipdate) as l_year,
-			l_extendedprice * (1 - l_discount) as volume
-		from
-			supplier,
-			lineitem,
-			orders,
-			customer,
-			nation n1,
-			nation n2
-		where
-			s_suppkey = l_suppkey
-			and o_orderkey = l_orderkey
-			and c_custkey = o_custkey
-			and s_nationkey = n1.n_nationkey
-			and c_nationkey = n2.n_nationkey
-
-Proposal:
-
-  'nation n1' mapped to: Map<[n1:ID]>(Table[nation])
-  'n1.n_name' mapped to: ID.n1.n_name
-
-  i.e., nation n1 and nation n2 naturally supported through nested
-  records (harder in pure pure relational).
 
   Support for 'left outer join': q13
 

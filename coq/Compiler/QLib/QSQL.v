@@ -30,6 +30,7 @@ Module QSQL(runtime:CompilerRuntime).
 
   Definition sql_table_spec : Set := SQL.sql_table_spec.
   Definition sql_bin_cond : Set := SQL.sql_bin_cond.
+  Definition sql_un_expr : Set := SQL.sql_un_expr.
   Definition sql_bin_expr : Set := SQL.sql_bin_expr.
   Definition sql_agg : Set := SQL.sql_agg.
 
@@ -66,6 +67,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_expr_column : String.string -> sql_expr := SQL.SExprColumn.
   Definition sql_expr_column_deref : String.string -> String.string -> sql_expr := SQL.SExprColumnDeref.
   Definition sql_expr_star : sql_expr := SQL.SExprStar.
+  Definition sql_expr_unary : sql_un_expr -> sql_expr -> sql_expr := SQL.SExprUnary.
   Definition sql_expr_binary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr := SQL.SExprBinary.
   Definition sql_expr_agg_expr : sql_agg -> sql_expr -> sql_expr := SQL.SExprAggExpr.
   Definition sql_expr_query : sql_query -> sql_expr := SQL.SExprQuery.

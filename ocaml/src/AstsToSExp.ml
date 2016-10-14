@@ -913,6 +913,8 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("divide",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "substr";expr1;SInt n1;SInt n2]) ->
+      QSQL.sql_expr_unary (Compiler.SSubstring (n1,Some n2)) (sexp_to_sql_expr expr1)
   | STerm ("function",[SString "count"]) ->
       QSQL.sql_expr_agg_expr Compiler.SCount QSQL.sql_expr_star
   | STerm ("function",[SString "count";expr1]) ->

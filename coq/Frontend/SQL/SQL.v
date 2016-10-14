@@ -68,6 +68,7 @@ Note: Do we want to support 'create view' (q15) -- seems relatively trivial thro
 Section SQL.
 
   Require Import String.
+  Require Import ZArith.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
@@ -85,6 +86,7 @@ Section SQL.
   Definition sql_table_spec : Set := string * (option (list string)).
   Definition sql_order_spec : Set := SortCriterias.
   Inductive sql_bin_cond : Set := | SEq | SLe | SLt | SGe | SGt | SDiff.
+  Inductive sql_un_expr : Set := | SSubstring : Z -> option Z -> sql_un_expr.
   Inductive sql_bin_expr : Set := | SPlus | SMinus | SMult | SDivide.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
@@ -118,6 +120,7 @@ Section SQL.
   | SExprColumn : string -> sql_expr
   | SExprColumnDeref : string -> string -> sql_expr
   | SExprStar : sql_expr
+  | SExprUnary : sql_un_expr -> sql_expr -> sql_expr
   | SExprBinary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr
   | SExprAggExpr : sql_agg -> sql_expr -> sql_expr
   | SExprQuery : sql_query -> sql_expr (* relatively broad allowance for nesting... *)
@@ -139,6 +142,8 @@ Section SQL.
     | SExprColumn _ => false
     | SExprColumnDeref _ _ => false
     | SExprStar => false
+    | SExprUnary _ expr1 =>
+      is_singleton_sql_expr expr1
     | SExprBinary _ expr1 expr2 =>
       is_singleton_sql_expr expr1 && is_singleton_sql_expr expr2
     | SExprAggExpr _ _ => true
@@ -290,6 +295,9 @@ Section SQL.
       | SExprColumn cname => ANUnop (ADot cname) ANID
       | SExprColumnDeref tname cname => ANUnop (ADot cname) (ANUnop (ADot tname) ANID)
       | SExprStar => ANID
+      | SExprUnary (SSubstring n1 on2) expr1 =>
+        ANUnop (ASubstring n1 on2)
+                (sql_expr_to_nraenv create_table acc expr1)
       | SExprBinary SPlus expr1 expr2 =>
         ANBinop (ABArith ArithPlus)
                 (sql_expr_to_nraenv create_table acc expr1)
