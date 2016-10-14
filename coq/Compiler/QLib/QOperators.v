@@ -19,6 +19,7 @@ Require Import CompilerRuntime.
 Module QOperators(runtime:CompilerRuntime).
   Require String.
   Require BrandRelation.
+  Require Import ZArith.
   
   Module Unary.
 
@@ -69,6 +70,8 @@ Module QOperators(runtime:CompilerRuntime).
       := RUnaryOps.AArithMean.
     Definition atostring : op 
       := RUnaryOps.AToString.
+    Definition asubstring : Z -> option Z -> op 
+      := RUnaryOps.ASubstring.
     Definition acast : BrandRelation.brands -> op 
       := RUnaryOps.ACast.
     Definition aunbrand : op 

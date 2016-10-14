@@ -212,6 +212,10 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | ASum -> STerm ("ASum",[])
   | AArithMean -> STerm ("AArithMean",[])
   | AToString -> STerm ("AToString",[])
+  | ASubstring (start,olen) ->
+     (match olen with
+     | Some len -> STerm ("ASubstring", [SInt start; SInt len])
+     | None -> STerm ("ASubstr",[SInt start]))
   | ACast bl -> STerm ("ACast", dbrands_to_sexp bl)
   | AUnbrand -> STerm ("AUnbrand",[])
   | ASingleton -> STerm ("ASingleton",[])
@@ -248,6 +252,13 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ASum",[]) -> ASum
   | STerm ("AArithMean",[]) -> AArithMean
   | STerm ("AToString",[]) -> AToString
+  | STerm ("ASubstring",(SInt start::restlen)) ->
+     let olen = (match restlen with
+	      | [] -> None
+	      | [SInt len] -> Some len
+	      | _ -> raise (Qcert_Error ("Not well-formed S-expr inside ASubstring.  Too many arguments."))
+	     ) in
+     ASubstring (start, olen)
   | STerm ("ACast", bl) -> ACast (sexp_to_dbrands bl)
   | STerm ("AUnbrand",[]) -> AUnbrand
   | STerm ("ASingleton",[]) -> ASingleton
