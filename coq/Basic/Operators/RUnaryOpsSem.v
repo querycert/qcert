@@ -131,6 +131,12 @@ Section RUnaryOpsSem.
                    (substring real_start real_olen s)))
                  | _ => None
                  end)
+    | ALike pat oescape =>
+      fun d =>
+        match d with
+        | dstring s => Some (dbool (string_like s pat oescape))
+        | _ => None
+        end
     | ALeft =>
       fun d => Some (dleft d)
     | ARight =>

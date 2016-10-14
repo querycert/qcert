@@ -18,6 +18,7 @@
 
 Section RUnaryOps.
 
+  Require Import Ascii.
   Require Import String.
   Require Import ZArith.
   Require Import EquivDec.
@@ -56,6 +57,7 @@ Section RUnaryOps.
   | AArithMean : unaryOp                  (* arithmetic mean of natural numbers in a bag *)
   | AToString : unaryOp                   (* data to string.  Important for test cases *)
   | ASubstring : Z -> option Z -> unaryOp (* returns the substring starting with the nth character, for m characters (or the rest of the string) *)
+  | ALike (pattern:string) (escape:option ascii) : unaryOp (* like expression as in sql *)
   | ALeft : unaryOp                       (* create a dleft *)
   | ARight : unaryOp                      (* create a dright *)
   | ABrand : brands -> unaryOp            (* box a branded value *)
@@ -86,7 +88,8 @@ Section RUnaryOps.
     - apply SortCriterias_eqdec.
     - induction l; decide equality; apply string_dec.
     - apply option_eqdec.
-    - apply Z_eqdec. 
+    - apply Z_eqdec.
+    -  apply equiv_dec.
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - apply ArithUOp_eqdec.
@@ -147,6 +150,12 @@ Section RUnaryOps.
                                                          | Some len => " " ++ (toString len)
                                                          end
                                                         ) ++ ")"
+            | ALike pattern oescape => "(ALike " ++ pattern
+                                                     ++ (match oescape with
+                                                         | None => ""
+                                                         | Some escape => " ESCAPE " ++ (String escape EmptyString)
+                                                         end
+                                                        ) ++ ")"
                                                               
             | ALeft => "ALeft"
             | ARight => "ARight"
@@ -182,6 +191,7 @@ Tactic Notation "unaryOp_cases" tactic(first) ident(c) :=
   | Case_aux c "AArithMean"%string
   | Case_aux c "AToString"%string
   | Case_aux c "ASubstring"%string
+  | Case_aux c "ALike"%string
   | Case_aux c "ALeft"%string
   | Case_aux c "ARight"%string
   | Case_aux c "ABrand"%string

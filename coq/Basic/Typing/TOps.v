@@ -75,6 +75,7 @@ Section TOps.
     | ATArithMean : unaryOp_type AArithMean (Coll Nat) Nat
     | ATToString τ: unaryOp_type AToString τ String
     | ATSubstring start olen: unaryOp_type (ASubstring start olen) String String
+    | ATLike pat oescape: unaryOp_type (ALike pat oescape) String Bool
     | ATLeft τl τr: unaryOp_type ALeft τl (Either τl τr)
     | ATRight τl τr: unaryOp_type ARight τr (Either τl τr)
     | ATBrand b :
@@ -109,6 +110,7 @@ Section TOps.
     | Case_aux c "ATArithMean"%string
     | Case_aux c "ATToString"%string
     | Case_aux c "ATSubstring"%string
+    | Case_aux c "ATLike"%string
     | Case_aux c "ATLeft"%string
     | Case_aux c "ATRight"%string
     | Case_aux c "ATBrand"%string
@@ -664,7 +666,7 @@ Section TOps.
       intuition.
       + apply in_dom in H7. intuition.
       + congruence.
-  Qed.    
+  Qed. 
 
   Require Import Bool.
 
@@ -1167,6 +1169,9 @@ Section TOps.
     - Case "ATSubstring"%string.
       dtype_inverter.
       eauto.
+    - Case "ATLike"%string.
+      dtype_inverter.
+      eauto.
     - Case "ATLeft"%string.
       eauto.
     - Case "ATRight"%string.
@@ -1240,6 +1245,7 @@ End TOps.
     | Case_aux c "ATArithMean"%string
     | Case_aux c "ATToString"%string
     | Case_aux c "ATSubstring"%string
+    | Case_aux c "ATLike"%string
     | Case_aux c "ATLeft"%string
     | Case_aux c "ATRight"%string
     | Case_aux c "ATBrand"%string

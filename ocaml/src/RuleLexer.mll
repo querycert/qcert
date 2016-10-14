@@ -20,7 +20,7 @@
   open RuleParser
 
   let keyword_table =
-    let tbl = Hashtbl.create 94 in
+    let tbl = Hashtbl.create 97 in
     begin
       List.iter (fun (key, data) -> Hashtbl.add tbl key data)
 	[ "Example", EXAMPLE;
@@ -94,6 +94,9 @@
 	  "ADistinct", ADISTINCT;
 	  "ASum", ASUM;
 	  "AToString", ATOSTRING;
+ 	  "ASubstring", ASUBSTRING;
+	  "ALike", ALIKE;
+ 	  "ESCAPE", ESCAPE;
 	  "ANumMin", ANUMMIN;
 	  "ANumMax", ANUMMAX;
 	  "AArithMean", AARITHMEAN;

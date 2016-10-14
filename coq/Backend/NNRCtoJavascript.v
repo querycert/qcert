@@ -220,6 +220,13 @@ Section NNRCtoJavascript.
       | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
       end.
 
+        Definition like_clause_to_javascript (lc:like_clause)
+      := match lc with
+         | like_literal literal => "escapeRegExp(" ++ quotel_double ++ literal ++ quotel_double ++ ")"
+         | like_any_char => quotel_double ++ "." ++ quotel_double 
+         | like_any_string => quotel_double ++ ".*" ++ quotel_double 
+         end.
+
     (* Java equivalent: JavaScript.Backend.nrcToJS *)
     Fixpoint nrcToJS
              (n : nrc)                    (* NNRC expression to translate *)
@@ -262,6 +269,10 @@ Section NNRCtoJavascript.
                        | Some len => ", " ++ toString len
                        | None => ""
                        end ++ ")"
+                     | ALike pat oescape =>
+                       let lc := make_like_clause pat oescape in
+                       let regex := ("new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join())") in
+                       regex ++ ".test(" ++ e1 ++ ")"
                      | ALeft => "{" ++ quotel ++ "left" ++ quotel  ++ e1 ++ "}"
                      | ARight => "{" ++ quotel ++ "right" ++ quotel  ++ e1 ++ "}"
                      | ABrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"

@@ -401,6 +401,9 @@ let pretty_unop p sym callb ff u a =
   | Hack.AToString -> pretty_unary_exp sym callb "toString" ff a
   | Hack.ASubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
   | Hack.ASubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
+  | Hack.ALike (n1,None) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^"]") ff a
+  (* for some reason using String.str gives a compile error *)
+  | Hack.ALike (n1,Some n2) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^" ESCAPE "^(Util.string_of_char_list [n2])^"]") ff a
   (* resets precedence back to 0 *)
   | Hack.ACast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
   | Hack.AUnbrand ->

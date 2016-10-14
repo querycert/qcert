@@ -214,6 +214,8 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | AToString -> STerm ("AToString",[])
   | ASubstring (n,None) -> STerm ("ASubstring",[SInt n])
   | ASubstring (n1,(Some n2)) -> STerm ("ASubstring",[SInt n1;SInt n2])
+  | ALike (p,None) -> STerm ("ALike",[coq_string_to_sstring p])
+  | ALike (p,(Some esc)) -> STerm ("ALike",[coq_string_to_sstring p;coq_string_to_sstring [esc]])
   | ACast bl -> STerm ("ACast", dbrands_to_sexp bl)
   | AUnbrand -> STerm ("AUnbrand",[])
   | ASingleton -> STerm ("ASingleton",[])
@@ -252,6 +254,9 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("AToString",[]) -> AToString
   | STerm ("ASubstring",[SInt n1]) -> ASubstring (n1,None)
   | STerm ("ASubstring",[SInt n1;SInt n2]) -> ASubstring (n1,Some n2)
+  | STerm ("ALike",[p]) -> ALike (sstring_to_coq_string p,None)
+  | STerm ("ALike",[p;SString esc]) ->
+     ALike (sstring_to_coq_string p,Some (esc.[0]))
   | STerm ("ACast", bl) -> ACast (sexp_to_dbrands bl)
   | STerm ("AUnbrand",[]) -> AUnbrand
   | STerm ("ASingleton",[]) -> ASingleton

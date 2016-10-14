@@ -182,6 +182,10 @@ Section TOpsInferSub.
         if (subtype_dec τ₁ String)
         then Some (String, String)
         else None
+      | ALike _ _ =>
+        if (subtype_dec τ₁ String)
+        then Some (Bool, String)
+        else None
       | ALeft =>
         Some (Either τ₁ ⊥, τ₁)
       | ARight =>

@@ -225,6 +225,11 @@ Section DNNRCtoScala.
           | Some len => ", " ++ toString len
           | None => ""
           end ++ ")"
+    | ALike pat oescape =>
+      "ALike currently implemented.  Please implement as in the java backend"
+(*      let lc := make_like_clause pat oescape in
+      mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_scala lc)) ++ "}") e1
+*)
     | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand =>
       match lift_tlocal required_type with

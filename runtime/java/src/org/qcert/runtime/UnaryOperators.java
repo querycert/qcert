@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import com.google.gson.*;
 
@@ -401,4 +402,51 @@ public class UnaryOperators {
 		return e;
 	}
 
+	public static JsonElement string_like(LikeClause[] clauses, JsonElement elem) {
+		final String str = elem.getAsString();
+		String pat = "";
+		for(LikeClause clause : clauses) {
+			pat += clause.getRegex();
+		}
+		boolean matches = Pattern.matches(pat, str);
+		return new JsonPrimitive(matches);
+	}
+	
+	public static interface LikeClause {
+		public String getRegex();		
+	}
+	
+	public static class AnyCharLikeClause implements LikeClause {
+		public String getRegex() {
+			return Pattern.quote(".");
+		}		
+	}
+
+	public static class AnyStringLikeClause implements LikeClause {
+		public String getRegex() {
+			return Pattern.quote(".*");
+		}
+	}
+
+	public static class LiteralLikeClause implements LikeClause {
+		public LiteralLikeClause(String literal) {
+			this.literal = literal;
+		}
+		
+		private String literal;
+
+		public String getLiteral() {
+			return literal;
+		}
+
+		public void setLiteral(String literal) {
+			this.literal = literal;
+		}
+		
+		public String getRegex() {
+			return Pattern.quote(literal);
+		}
+
+	}
+	
 }
