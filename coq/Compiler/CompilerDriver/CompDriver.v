@@ -419,7 +419,7 @@ Section CompDriver.
   Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
     match dv with
     | Dv_dnnrc_dataset_stop => 1
-    | Dv_dnnrc_dataset_to_typed_dataset => 1
+    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset _ dv => 1 + driver_length_dnnrc_typed_dataset dv
     end.
 
   Fixpoint driver_length_camp (dv: camp_driver) :=
@@ -1213,9 +1213,7 @@ Section CompDriver.
   Proof.
     destruct dv; simpl;
       try solve [match_destr; inversion 1; subst; simpl; auto 2 | inversion 1].
-    - match_case; intros; subst.
-      invcs H0.
-  Admitted.
+  Qed.
 
   Function target_language_of_driver dv { measure driver_length dv } :=
     match pop_transition dv with
@@ -1226,7 +1224,7 @@ Section CompDriver.
     intros.
     eapply pop_transition_lt_len; eauto.
   Defined.
-  
+
   Definition trivial_driver_config : driver_config
     := mkDvConfig
          EmptyString
@@ -1293,7 +1291,7 @@ Section CompDriver.
     Qed.
 
 
-  Lemma target_language_of_driver_is_postfix_typed_dataset:
+  Lemma target_language_of_driver_is_postfix_dnnrc_typed_dataset:
     (forall d, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_typed_dataset d))) (Dv_dnnrc_typed_dataset d)).
   Proof.
     induction d; simpl
@@ -1316,7 +1314,7 @@ Section CompDriver.
       ; simpl; trivial.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_dataset:
+  Lemma target_language_of_driver_is_postfix_dnnrc_dataset:
     (forall d, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_dataset d))) (Dv_dnnrc_dataset d)).
   Proof.
     destruct d; simpl.
@@ -1332,7 +1330,7 @@ Section CompDriver.
                  EmptyString
                  nil
                  EmptyString) (lang:=L_dnnrc_dataset)
-      ; [eapply target_language_of_driver_is_postfix_typed_dataset | | ]; simpl; trivial.
+      ; [eapply target_language_of_driver_is_postfix_dnnrc_typed_dataset | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_cnd:
@@ -1387,7 +1385,7 @@ Section CompDriver.
                  EmptyString
                  v
                  EmptyString) (lang:=L_nnrc);
-        [eapply target_language_of_driver_is_postfix_dataset | | ]; simpl; trivial.
+        [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=trivial_driver_config) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_javascript | | ]; simpl; trivial.
@@ -1434,7 +1432,7 @@ Section CompDriver.
                  EmptyString
                  nil
                  EmptyString) (lang:=L_nnrcmr);
-        [eapply target_language_of_driver_is_postfix_dataset | | ]; simpl; trivial.
+        [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
@@ -1542,8 +1540,8 @@ Section CompDriver.
          target_language_of_driver_is_postfix_spark2
          target_language_of_driver_is_postfix_cloudant
          target_language_of_driver_is_postfix_cldmr
-         target_language_of_driver_is_postfix_typed_dataset
-         target_language_of_driver_is_postfix_dataset
+         target_language_of_driver_is_postfix_dnnrc_typed_dataset
+         target_language_of_driver_is_postfix_dnnrc_dataset
          target_language_of_driver_is_postfix_camp
          target_language_of_driver_is_postfix_nra
          target_language_of_driver_is_postfix_nraenv
