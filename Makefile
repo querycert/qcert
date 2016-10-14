@@ -221,6 +221,7 @@ MODULES = \
 	Compiler/CompilerModel/FloatModelPart \
 	Compiler/CompilerModel/StringModelPart \
 	Compiler/CompilerModel/DateTimeModelPart \
+	Compiler/CompilerModel/SqlDateModelPart \
 	Compiler/CompilerModel/EnhancedModel \
 	Compiler/CompilerModel/TrivialModel \
 	Compiler/CompilerDriver/CompLang \

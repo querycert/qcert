@@ -171,6 +171,14 @@ let sexp_to_binop (se:sexp) : binOp =
   | STerm ("ATimeGe",[]) -> Enhanced.Ops.Binary.coq_ATimeGe
   | STerm ("ATimeDurationFromScale",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationFromScale
   | STerm ("ATimeDurationBetween",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationBetween
+  | STerm ("ASqlDatePlus",[]) -> Enhanced.Ops.Binary.coq_ASqlDatePlus
+  | STerm ("ASqlDateMinus",[]) -> Enhanced.Ops.Binary.coq_ASqlDateMinus
+  | STerm ("ASqlDateNe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateNe
+  | STerm ("ASqlDateLt",[]) -> Enhanced.Ops.Binary.coq_ASqlDateLt
+  | STerm ("ASqlDateLe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateLe
+  | STerm ("ASqlDateGt",[]) -> Enhanced.Ops.Binary.coq_ASqlDateGt
+  | STerm ("ASqlDateGe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateGe
+  | STerm ("ASqlDateIntervalBetween",[]) -> Enhanced.Ops.Binary.coq_ASqlDateIntervalBetween
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside arith binop with name " ^ t))
   | _ -> raise  (Qcert_Error "Not well-formed S-expr inside arith binop")
@@ -210,7 +218,14 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | ANumMin -> STerm ("ANumMin",[])
   | ANumMax -> STerm ("ANumMax",[])
   | AForeignUnaryOp fuop -> SString (PrettyIL.string_of_foreign_unop (Obj.magic fuop))
-	
+
+let sstring_to_sql_date_component (part:sexp) : Enhanced.Data.sql_date_part =
+  match part with
+  | SString "DAY" ->   Enhanced.Data.sql_date_day
+  | SString "MONTH" -> Enhanced.Data.sql_date_month
+  | SString "YEAR" ->  Enhanced.Data.sql_date_year
+  | _ -> raise (Qcert_Error "Not well-formed S-expr for sql date component")
+			  
 let sexp_to_unop (se:sexp) : unaryOp =
   match se with
   | STerm ("AIdOp",[]) -> AIdOp
@@ -257,6 +272,9 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ATimeToSscale",[]) -> Enhanced.Ops.Unary.coq_ATimeToSscale
   | STerm ("ATimeFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeFromString
   | STerm ("ATimeDurationFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeDurationFromString
+  | STerm ("ASqlDateFromString",[]) -> Enhanced.Ops.Unary.coq_ASqlDateFromString
+  | STerm ("ASqlDateIntervalromString",[]) -> Enhanced.Ops.Unary.coq_ASqlDateIntervalFromString
+  | STerm ("ASqlGetDateComponent",[part]) -> Enhanced.Ops.Unary.coq_ASqlGetDateComponent (sstring_to_sql_date_component part)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside unop with name " ^ t))
   | _ ->

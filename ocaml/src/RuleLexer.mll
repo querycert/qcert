@@ -20,7 +20,7 @@
   open RuleParser
 
   let keyword_table =
-    let tbl = Hashtbl.create 83 in
+    let tbl = Hashtbl.create 94 in
     begin
       List.iter (fun (key, data) -> Hashtbl.add tbl key data)
 	[ "Example", EXAMPLE;
@@ -46,6 +46,14 @@
 	  "ATimeGe", TIMEGE;
 	  "ATimeDurationFromScale", TIMEDURATIONFROMSCALE;
 	  "ATimeDurationBetween", TIMEDURATIONBETWEEN;
+	  "ASqlDatePlus", SQLDATEPLUS;
+ 	  "ASqlDateMinus", SQLDATEMINUS;
+	  "ASqlDateNe", SQLDATENE;
+	  "ASqlDateLt", SQLDATELT;
+	  "ASqlDateLe", SQLDATELE;
+	  "ASqlDateGt", SQLDATEGT;
+	  "ASqlDateGe", SQLDATEGE;
+	  "ASqlDateIntervalBetween", SQLDATEINTERVALBETWEEN;
 	  "AEq", AEQ;
 	  "AUnion", AUNION;
 	  "AConcat", ACONCAT;
@@ -105,6 +113,9 @@
           "AFloatListMax", AFLOATLISTMAX;
 	  "ATimeFromString", TIMEFROMSTRING;
 	  "ATimeDurationFromString", TIMEDURATIONFROMSTRING;
+	  "ASqlDateFromString", SQLDATEFROMSTRING;
+	  "ASqlDateIntervalFromString", SQLDATEINTERVALFROMSTRING;
+ 	  "ASqlGetDateComponent", SQLGETDATECOMPONENT;
 	  (* Top-level rule *)
 	  "rule_when", RULEWHEN;
 	  "rule_global", RULEGLOBAL;

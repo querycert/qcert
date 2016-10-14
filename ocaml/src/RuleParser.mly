@@ -57,7 +57,14 @@
 %token TIMENE TIMELT TIMELE TIMEGT TIMEGE
 %token TIMEDURATIONFROMSCALE TIMEDURATIONBETWEEN
 
+%token SQLDATEPLUS SQLDATEMINUS
+%token SQLDATENE SQLDATELT SQLDATELE SQLDATEGT SQLDATEGE
+%token SQLDATEINTERVALBETWEEN
+
 %token TIMEFROMSTRING TIMEDURATIONFROMSTRING
+
+%token SQLDATEFROMSTRING SQLDATEINTERVALFROMSTRING
+%token SQLGETDATECOMPONENT
 
 %token PNOW
 
@@ -334,6 +341,22 @@ bop:
   { Enhanced.Ops.Binary.time_duration_from_scale }
 | TIMEDURATIONBETWEEN
   { Enhanced.Ops.Binary.time_duration_between }
+| SQLDATEPLUS
+  { Enhanced.Ops.Binary.sql_date_plus }
+| SQLDATEMINUS
+  { Enhanced.Ops.Binary.sql_date_minus }
+| SQLDATENE
+  { Enhanced.Ops.Binary.sql_date_ne }
+| SQLDATELT
+  { Enhanced.Ops.Binary.sql_date_lt }
+| SQLDATELE
+  { Enhanced.Ops.Binary.sql_date_le }
+| SQLDATEGT
+  { Enhanced.Ops.Binary.sql_date_gt }
+| SQLDATEGE
+  { Enhanced.Ops.Binary.sql_date_ge }
+| SQLDATEINTERVALBETWEEN
+  { Enhanced.Ops.Binary.sql_date_interval_between }
 | AEQ
     { QOps.Binary.aeq }
 | AUNION
@@ -374,6 +397,14 @@ bop:
     { QOps.Binary.ZArith.adiv }
 | LPAREN ABARITH ARITHREM RPAREN
     { QOps.Binary.ZArith.arem }
+
+sql_date_component:
+| DAY
+  { Enhanced.Data.sql_date_day }
+| MONTH
+  { Enhanced.Data.sql_date_month }
+| YEAR
+  { Enhanced.Data.sql_date_year }
 
 uop:
 | FLOATNEG
@@ -448,4 +479,11 @@ uop:
     { Enhanced.Ops.Unary.time_from_string }
 | TIMEDURATIONFROMSTRING
     { Enhanced.Ops.Unary.time_duration_from_string }
+| SQLDATEFROMSTRING
+    { Enhanced.Ops.Unary.sql_date_from_string }
+| SQLDATEINTERVALFROMSTRING
+    { Enhanced.Ops.Unary.sql_date_interval_from_string }
+| LPAREN SQLGETDATECOMPONENT c = sql_date_component RPAREN
+    { Enhanced.Ops.Unary.sql_get_date_component c }
+
 

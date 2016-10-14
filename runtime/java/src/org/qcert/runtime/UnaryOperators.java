@@ -384,4 +384,21 @@ public class UnaryOperators {
 		// since we are storing times as strings anyway
 		return e;
 	}
+	
+	public static JsonElement sql_date_from_string(JsonElement e) {
+		return e;
+	}
+
+	public static JsonElement sql_date_interval_from_string(JsonElement e) {
+		return e;
+	}
+
+	public final static int DAY = 1;
+	public final static int MONTH = 2;
+	public final static int YEAR = 3;
+	
+	public static JsonElement sql_get_date_component(int part, JsonElement e) {
+		return e;
+	}
+
 }
