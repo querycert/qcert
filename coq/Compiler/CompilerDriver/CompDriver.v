@@ -342,6 +342,164 @@ Section CompDriver.
 
   (* Compilers function *)
 
+  Section CompDriverUtil.
+
+  Definition language_of_driver (dv: driver) :=
+    match dv with
+    | Dv_nra _ => L_nra
+    | Dv_nraenv _ => L_nraenv
+    | Dv_nnrc _ => L_nnrcmr
+    | Dv_nnrcmr _ => L_nnrcmr
+    | Dv_rule _ => L_rule
+    | Dv_camp _ => L_camp
+    | Dv_oql _ => L_oql
+    | Dv_lambda_nra _ => L_lambda_nra
+    | Dv_cldmr _ => L_cldmr
+    | Dv_dnnrc_dataset  _ => L_dnnrc_dataset
+    | Dv_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
+    | Dv_javascript _ => L_javascript
+    | Dv_java _ => L_java
+    | Dv_spark _ => L_spark
+    | Dv_spark2 _ => L_spark2
+    | Dv_cloudant _ => L_cloudant
+    | Dv_error err => L_error ("language of "++err)
+    end.
+
+  Definition name_of_driver dv :=
+    name_of_language (language_of_driver dv).
+
+  Definition driver_length_javascript (dv: javascript_driver) :=
+  match dv with
+  | Dv_javascript_stop => 1
+  end.
+
+  Definition driver_length_java (dv: java_driver) :=
+    match dv with
+    | Dv_java_stop => 1
+    end.
+
+  Definition driver_length_spark (dv: spark_driver) :=
+    match dv with
+    | Dv_spark_stop => 1
+    end.
+
+  Definition driver_length_spark2 (dv: spark2_driver) :=
+    match dv with
+    | Dv_spark2_stop => 1
+    end.
+
+  Definition driver_length_cloudant (dv: cloudant_driver) :=
+    match dv with
+    | Dv_cloudant_stop => 1
+    end.
+
+  Definition driver_length_cldmr (dv: cldmr_driver) :=
+    match dv with
+    | Dv_cldmr_stop => 1
+    | Dv_cldmr_to_cloudant rulename h dv => 1 + driver_length_cloudant dv
+    end.
+
+  Fixpoint driver_length_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) :=
+    match dv with
+    | Dv_dnnrc_typed_dataset_stop => 1
+    | Dv_dnnrc_typed_dataset_optim dv => 1 + driver_length_dnnrc_typed_dataset dv
+    | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv => 1 + driver_length_spark2 dv
+    end.
+
+  Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
+    match dv with
+    | Dv_dnnrc_dataset_stop => 1
+    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset _ dv => 1 + driver_length_dnnrc_typed_dataset dv
+    end.
+
+  Fixpoint driver_length_camp (dv: camp_driver) :=
+    match dv with
+    | Dv_camp_stop => 1
+    | Dv_camp_to_nraenv dv => 1 + driver_length_nraenv dv
+    | Dv_camp_to_nra dv => 1 + driver_length_nra dv
+    end
+
+  with driver_length_nra (dv: nra_driver)  :=
+    match dv with
+    | Dv_nra_stop => 1
+    | Dv_nra_optim dv => 1 + driver_length_nra dv
+    | Dv_nra_to_nnrc dv => 1 + driver_length_nnrc dv
+    | Dv_nra_to_nraenv dv => 1 + driver_length_nraenv dv
+    end
+
+  with driver_length_nraenv (dv: nraenv_driver) :=
+    match dv with
+    | Dv_nraenv_stop => 1
+    | Dv_nraenv_optim dv => 1 + driver_length_nraenv dv
+    | Dv_nraenv_to_nnrc dv => 1 + driver_length_nnrc dv
+    | Dv_nraenv_to_nra dv => 1 + driver_length_nra dv
+    end
+
+  with driver_length_nnrc (dv: nnrc_driver) :=
+    match dv with
+    | Dv_nnrc_stop => 1
+    | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
+    | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
+    | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
+    | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
+    | Dv_nnrc_to_camp avoid dv => 1 + driver_length_camp dv
+    end
+
+  with driver_length_nnrcmr (dv: nnrcmr_driver) :=
+    match dv with
+    | Dv_nnrcmr_stop => 1
+    | Dv_nnrcmr_optim dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrcmr_to_spark rulename dv => 1 + driver_length_spark dv
+    | Dv_nnrcmr_to_nnrc dv => 1 + driver_length_nnrc dv
+    | Dv_nnrcmr_to_cldmr h dv => 1 + driver_length_cldmr dv
+    | Dv_nnrcmr_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
+    end.
+
+  Definition driver_length_rule (dv: rule_driver) :=
+    match dv with
+    | Dv_rule_stop => 1
+    | Dv_rule_to_camp dv => 1 + driver_length_camp dv
+    | Dv_rule_to_nraenv dv => 1 + driver_length_nraenv dv
+    | Dv_rule_to_nra dv => 1 + driver_length_nra dv
+    end.
+
+  Definition driver_length_oql (dv: oql_driver) :=
+    match dv with
+    | Dv_oql_stop => 1
+    | Dv_oql_to_nraenv dv => 1 + driver_length_nraenv dv
+    end.
+
+  Definition driver_length_lambda_nra (dv: lambda_nra_driver) :=
+    match dv with
+    | Dv_lambda_nra_stop => 1
+    | Dv_lambda_nra_to_nraenv dv => 1 + driver_length_nraenv dv
+    end.
+
+  Definition driver_length (dv: driver)  :=
+    match dv with
+    | Dv_rule dv => driver_length_rule dv
+    | Dv_camp dv => driver_length_camp dv
+    | Dv_oql dv => driver_length_oql dv
+    | Dv_lambda_nra dv => driver_length_lambda_nra dv
+    | Dv_nra dv => driver_length_nra dv
+    | Dv_nraenv dv => driver_length_nraenv dv
+    | Dv_nnrc dv => driver_length_nnrc dv
+    | Dv_nnrcmr dv => driver_length_nnrcmr dv
+    | Dv_cldmr dv => driver_length_cldmr dv
+    | Dv_dnnrc_dataset dv => driver_length_dnnrc_dataset dv
+    | Dv_dnnrc_typed_dataset dv => driver_length_dnnrc_typed_dataset dv
+    | Dv_javascript dv => driver_length_javascript dv
+    | Dv_java dv => driver_length_java dv
+    | Dv_spark dv => driver_length_spark dv
+    | Dv_spark2 dv => driver_length_spark2 dv
+    | Dv_cloudant dv => driver_length_cloudant dv
+    | Dv_error s => 1
+    end.
+
+
+  End CompDriverUtil.
+
   Section CompDriverCompile.
   Definition compile_javascript (dv: javascript_driver) (q: javascript) : list query :=
     let queries :=
@@ -587,164 +745,6 @@ Section CompDriver.
     end.
 
   End CompDriverCompile.
-
-  Section CompDriverUtil.
-
-  Definition language_of_driver (dv: driver) :=
-    match dv with
-    | Dv_nra _ => L_nra
-    | Dv_nraenv _ => L_nraenv
-    | Dv_nnrc _ => L_nnrcmr
-    | Dv_nnrcmr _ => L_nnrcmr
-    | Dv_rule _ => L_rule
-    | Dv_camp _ => L_camp
-    | Dv_oql _ => L_oql
-    | Dv_lambda_nra _ => L_lambda_nra
-    | Dv_cldmr _ => L_cldmr
-    | Dv_dnnrc_dataset  _ => L_dnnrc_dataset
-    | Dv_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
-    | Dv_javascript _ => L_javascript
-    | Dv_java _ => L_java
-    | Dv_spark _ => L_spark
-    | Dv_spark2 _ => L_spark2
-    | Dv_cloudant _ => L_cloudant
-    | Dv_error err => L_error ("language of "++err)
-    end.
-
-  Definition name_of_driver dv :=
-    name_of_language (language_of_driver dv).
-
-  Definition driver_length_javascript (dv: javascript_driver) :=
-  match dv with
-  | Dv_javascript_stop => 1
-  end.
-
-  Definition driver_length_java (dv: java_driver) :=
-    match dv with
-    | Dv_java_stop => 1
-    end.
-
-  Definition driver_length_spark (dv: spark_driver) :=
-    match dv with
-    | Dv_spark_stop => 1
-    end.
-
-  Definition driver_length_spark2 (dv: spark2_driver) :=
-    match dv with
-    | Dv_spark2_stop => 1
-    end.
-
-  Definition driver_length_cloudant (dv: cloudant_driver) :=
-    match dv with
-    | Dv_cloudant_stop => 1
-    end.
-
-  Definition driver_length_cldmr (dv: cldmr_driver) :=
-    match dv with
-    | Dv_cldmr_stop => 1
-    | Dv_cldmr_to_cloudant rulename h dv => 1 + driver_length_cloudant dv
-    end.
-
-  Fixpoint driver_length_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) :=
-    match dv with
-    | Dv_dnnrc_typed_dataset_stop => 1
-    | Dv_dnnrc_typed_dataset_optim dv => 1 + driver_length_dnnrc_typed_dataset dv
-    | Dv_dnnrc_typed_dataset_to_spark2 rt rulename dv => 1 + driver_length_spark2 dv
-    end.
-
-  Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
-    match dv with
-    | Dv_dnnrc_dataset_stop => 1
-    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset _ dv => 1 + driver_length_dnnrc_typed_dataset dv
-    end.
-
-  Fixpoint driver_length_camp (dv: camp_driver) :=
-    match dv with
-    | Dv_camp_stop => 1
-    | Dv_camp_to_nraenv dv => 1 + driver_length_nraenv dv
-    | Dv_camp_to_nra dv => 1 + driver_length_nra dv
-    end
-
-  with driver_length_nra (dv: nra_driver)  :=
-    match dv with
-    | Dv_nra_stop => 1
-    | Dv_nra_optim dv => 1 + driver_length_nra dv
-    | Dv_nra_to_nnrc dv => 1 + driver_length_nnrc dv
-    | Dv_nra_to_nraenv dv => 1 + driver_length_nraenv dv
-    end
-
-  with driver_length_nraenv (dv: nraenv_driver) :=
-    match dv with
-    | Dv_nraenv_stop => 1
-    | Dv_nraenv_optim dv => 1 + driver_length_nraenv dv
-    | Dv_nraenv_to_nnrc dv => 1 + driver_length_nnrc dv
-    | Dv_nraenv_to_nra dv => 1 + driver_length_nra dv
-    end
-
-  with driver_length_nnrc (dv: nnrc_driver) :=
-    match dv with
-    | Dv_nnrc_stop => 1
-    | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
-    | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv => 1 + driver_length_nnrcmr dv
-    | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
-    | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
-    | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
-    | Dv_nnrc_to_camp avoid dv => 1 + driver_length_camp dv
-    end
-
-  with driver_length_nnrcmr (dv: nnrcmr_driver) :=
-    match dv with
-    | Dv_nnrcmr_stop => 1
-    | Dv_nnrcmr_optim dv => 1 + driver_length_nnrcmr dv
-    | Dv_nnrcmr_to_spark rulename dv => 1 + driver_length_spark dv
-    | Dv_nnrcmr_to_nnrc dv => 1 + driver_length_nnrc dv
-    | Dv_nnrcmr_to_cldmr h dv => 1 + driver_length_cldmr dv
-    | Dv_nnrcmr_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
-    end.
-
-  Definition driver_length_rule (dv: rule_driver) :=
-    match dv with
-    | Dv_rule_stop => 1
-    | Dv_rule_to_camp dv => 1 + driver_length_camp dv
-    | Dv_rule_to_nraenv dv => 1 + driver_length_nraenv dv
-    | Dv_rule_to_nra dv => 1 + driver_length_nra dv
-    end.
-
-  Definition driver_length_oql (dv: oql_driver) :=
-    match dv with
-    | Dv_oql_stop => 1
-    | Dv_oql_to_nraenv dv => 1 + driver_length_nraenv dv
-    end.
-
-  Definition driver_length_lambda_nra (dv: lambda_nra_driver) :=
-    match dv with
-    | Dv_lambda_nra_stop => 1
-    | Dv_lambda_nra_to_nraenv dv => 1 + driver_length_nraenv dv
-    end.
-
-  Definition driver_length (dv: driver)  :=
-    match dv with
-    | Dv_rule dv => driver_length_rule dv
-    | Dv_camp dv => driver_length_camp dv
-    | Dv_oql dv => driver_length_oql dv
-    | Dv_lambda_nra dv => driver_length_lambda_nra dv
-    | Dv_nra dv => driver_length_nra dv
-    | Dv_nraenv dv => driver_length_nraenv dv
-    | Dv_nnrc dv => driver_length_nnrc dv
-    | Dv_nnrcmr dv => driver_length_nnrcmr dv
-    | Dv_cldmr dv => driver_length_cldmr dv
-    | Dv_dnnrc_dataset dv => driver_length_dnnrc_dataset dv
-    | Dv_dnnrc_typed_dataset dv => driver_length_dnnrc_typed_dataset dv
-    | Dv_javascript dv => driver_length_javascript dv
-    | Dv_java dv => driver_length_java dv
-    | Dv_spark dv => driver_length_spark dv
-    | Dv_spark2 dv => driver_length_spark2 dv
-    | Dv_cloudant dv => driver_length_cloudant dv
-    | Dv_error s => 1
-    end.
-
-
-  End CompDriverUtil.
 
   (* Compilers config *)
 
