@@ -65,7 +65,7 @@ Section CompDriver.
   Require Import ForeignToJavascript.
   Require Import ForeignToScala.
   Require Import ForeignCloudant.
-  
+
   (* Compiler Driver *)
   Require Import CompLang CompEnv.
 
@@ -100,7 +100,7 @@ Section CompDriver.
   Definition sql_to_nraenv (q:sql) : nraenv := SQL.sql_to_nraenv q.
 
   Definition lambda_nra_to_nraenv (q:lambda_nra) := algenv_of_lalg q.
-  
+
   Definition camp_to_nraenv (q:camp) : nraenv := PatterntoNRAEnv.translate_pat_to_algenv q.
 
   Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
@@ -168,7 +168,7 @@ Section CompDriver.
 
   Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
     NNRCMRtoNNRCMRCloudantTop h q.
-  
+
   Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
     nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
@@ -180,7 +180,7 @@ Section CompDriver.
 
   Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
-    
+
   Definition nnrcmr_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nnrcmr_prepared_to_spark rulename (nnrcmr_to_nnrcmr_spark_prepare q).
 
@@ -209,7 +209,7 @@ Section CompDriver.
 
   Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
     dnnrcToDatasetRewrite q.
-  
+
   (* Drivers *)
 
   Inductive javascript_driver : Set :=
@@ -284,7 +284,7 @@ Section CompDriver.
                                                    with nraenv_driver_ind' := Induction for nraenv_driver Sort Prop
                                                                              with nnrc_driver_ind' := Induction for nnrc_driver Sort Prop
                                                                                                      with nnrcmr_driver_ind' := Induction for nnrcmr_driver Sort Prop.
-  
+
   Combined Scheme cnd_combined_ind
            from camp_driver_ind', nra_driver_ind', nraenv_driver_ind', nnrc_driver_ind', nnrcmr_driver_ind'.
 
@@ -1289,7 +1289,7 @@ Section CompDriver.
                  nil
                  EmptyString) (lang:=L_cldmr)
       ; [ eapply target_language_of_driver_is_postfix_cloudant | | ]
-      ; simpl; trivial. 
+      ; simpl; trivial.
     Qed.
 
 
@@ -1452,7 +1452,7 @@ Section CompDriver.
     Proof.
       apply target_language_of_driver_is_postfix_cnd.
     Qed.
-      
+
     Lemma target_language_of_driver_is_postfix_nra:
       (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nra n))) (Dv_nra n)).
     Proof.
@@ -1476,7 +1476,7 @@ Section CompDriver.
     Proof.
       apply target_language_of_driver_is_postfix_cnd.
     Qed.
-      
+
   Lemma target_language_of_driver_is_postfix_rule:
       (forall r, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_rule r))) (Dv_rule r)).
     Proof.
@@ -1560,7 +1560,7 @@ Section CompDriver.
   Qed.
 
   Lemma driver_of_rev_path_app config dv rev_path1 rev_path2 :
-    driver_of_rev_path config dv (rev_path1 ++ rev_path2) = 
+    driver_of_rev_path config dv (rev_path1 ++ rev_path2) =
     driver_of_rev_path config (driver_of_rev_path config dv rev_path1) rev_path2.
   Proof.
     revert rev_path2 dv.
