@@ -783,7 +783,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_camp =>
+    | L_camp =>
       match dv with
       | Dv_nraenv dv => Dv_camp (Dv_camp_to_nraenv dv)
       | Dv_nra dv => Dv_camp (Dv_camp_to_nra dv)
@@ -805,7 +805,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_oql =>
+    | L_oql =>
       match dv with
       | Dv_nraenv dv => Dv_oql (Dv_oql_to_nraenv dv)
       | Dv_rule _
@@ -827,7 +827,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_lambda_nra =>
+    | L_lambda_nra =>
       match dv with
       | Dv_nraenv dv => Dv_lambda_nra (Dv_lambda_nra_to_nraenv dv)
       | Dv_rule _
@@ -849,7 +849,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_nra =>
+    | L_nra =>
       match dv with
       | Dv_nnrc dv => Dv_nra (Dv_nra_to_nnrc dv)
       | Dv_nraenv dv => Dv_nra (Dv_nra_to_nraenv dv)
@@ -871,7 +871,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_nraenv =>
+    | L_nraenv =>
       match dv with
       | Dv_nnrc dv => Dv_nraenv (Dv_nraenv_to_nnrc dv)
       | Dv_nra dv => Dv_nraenv (Dv_nraenv_to_nra dv)
@@ -893,7 +893,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_nnrc =>
+    | L_nnrc =>
       match dv with
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (* config.(comp_vdbindings) *) dv)
       | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
@@ -915,7 +915,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_nnrcmr =>
+    | L_nnrcmr =>
       match dv with
       | Dv_spark dv => Dv_nnrcmr (Dv_nnrcmr_to_spark config.(comp_qname) dv)
       | Dv_nnrc dv => Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv)
@@ -937,7 +937,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_cldmr =>
+    | L_cldmr =>
       match dv with
       | Dv_cloudant dv => Dv_cldmr (Dv_cldmr_to_cloudant config.(comp_qname) config.(comp_brand_rel) dv)
       | Dv_rule _
@@ -959,7 +959,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_dnnrc_dataset =>
+    | L_dnnrc_dataset =>
       match dv with
       | Dv_dnnrc_typed_dataset dv =>
         Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset config.(comp_input_type) dv)
@@ -982,7 +982,7 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_dnnrc_typed_dataset =>
+    | L_dnnrc_typed_dataset =>
       match dv with
       | Dv_spark2 dv =>
         Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 config.(comp_input_type) config.(comp_qname) dv)
@@ -1006,15 +1006,15 @@ Section CompDriver.
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-  | L_javascript
-  | L_java
-  | L_spark
-  | L_spark2
-  | L_cloudant =>
-    Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
-  | L_error err =>
-    Dv_error ("No compilation from error ("++err++")")
-  end.
+    | L_javascript
+    | L_java
+    | L_spark
+    | L_spark2
+    | L_cloudant =>
+      Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+    | L_error err =>
+      Dv_error ("No compilation from error ("++err++")")
+    end.
 
   Definition driver_of_language lang :=
     match lang with
@@ -1443,17 +1443,9 @@ Section CompDriver.
           [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
     Qed.
 
-    Lemma target_language_of_driver_is_postfix_error:
-      (forall s, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_error s))) (Dv_error s)).
-    Proof.
-      intros.
-      simpl.
-      (* This is also false! *)
-      admit.
-    Admitted.
-
   Lemma target_language_of_driver_is_postfix:
     forall dv,
+      no_dv_error dv ->
       let target := target_language_of_driver dv in
       is_postfix_driver (driver_of_language target) dv.
   Proof.
@@ -1474,10 +1466,10 @@ Section CompDriver.
          target_language_of_driver_is_postfix_rule
          target_language_of_driver_is_postfix_oql
          target_language_of_driver_is_postfix_lambda_nra
-         target_language_of_driver_is_postfix_error
         : postfix_hints.
         simpl.
         destruct dv; auto with postfix_hints.
+        contradiction.
   Qed.
 
   Lemma driver_of_rev_path_app config dv rev_path1 rev_path2 :
@@ -1512,15 +1504,16 @@ Section CompDriver.
   Theorem driver_of_path_completeness:
     forall dv,
     forall config,
+      no_dv_error dv ->
       is_driver_config config dv ->
       exists target_lang path,
         driver_of_path config (path ++ target_lang :: nil) = dv.
   Proof.
-    intros dv config H_dv_config.
+    intros dv config H_no_dv_error H_dv_config.
     unfold driver_of_path.
     exists (target_language_of_driver dv).
     assert (is_postfix_driver (driver_of_language (target_language_of_driver dv)) dv) as Hpost;
-      [ apply target_language_of_driver_is_postfix | ].
+      [ apply (target_language_of_driver_is_postfix dv H_no_dv_error) | ].
     generalize (driver_of_rev_path_completeness dv ((driver_of_language (target_language_of_driver dv))) Hpost config H_dv_config).
     intros H_exists.
     destruct H_exists.
