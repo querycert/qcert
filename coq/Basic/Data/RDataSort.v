@@ -398,8 +398,26 @@ Section DataSort.
 
   Definition sortable_data : Set := (list sdata) * data.
   Definition sortable_coll : Set := list sortable_data.
+
+  (* Collection sort *)
+
+  Definition dict_field_le {A} (a b:(list sdata)*A) :=
+    LexicographicDataOrder.le (fst a) (fst b).
+
+  Lemma dict_field_le_dec {A} (a b:(list sdata)*A) :
+    {dict_field_le a b} + {~dict_field_le a b}.
+  Proof.
+    destruct a.
+    destruct b.
+    unfold dict_field_le; simpl.
+    apply LexicographicDataOrder.le_dec.
+  Defined.
+
+  Definition dict_sort {A} :=
+    @insertion_sort ((list sdata)*A) dict_field_le dict_field_le_dec.
+
   Definition sort_sortable_coll (sc:sortable_coll) : sortable_coll :=
-    rec_sort sc.
+    dict_sort sc.
 
   Definition coll_of_sortable_coll (sc:sortable_coll) : list data :=
     map snd sc.
@@ -408,6 +426,7 @@ Section DataSort.
     ((sdnat 2::sdstring "a"::nil,dnat 10)
      :: (sdnat 3::sdstring "x"::nil,dnat 11)
      :: (sdnat 2::sdstring "b"::nil,dnat 12)
+     :: (sdnat 2::sdstring "b"::nil,dnat 2000)
      :: (sdnat 1::sdstring "a"::nil,dnat 13)
        ::nil).
 

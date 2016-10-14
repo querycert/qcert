@@ -68,6 +68,7 @@ Note: Do we want to support 'create view' (q15) -- seems relatively trivial thro
 Section SQL.
 
   Require Import String.
+  Require Import ZArith.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
@@ -85,6 +86,7 @@ Section SQL.
   Definition sql_table_spec : Set := string * (option (list string)).
   Definition sql_order_spec : Set := SortCriterias.
   Inductive sql_bin_cond : Set := | SEq | SLe | SLt | SGe | SGt | SDiff.
+  Inductive sql_un_expr : Set := | SSubstring : Z -> option Z -> sql_un_expr.
   Inductive sql_bin_expr : Set := | SPlus | SMinus | SMult | SDivide.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
@@ -97,10 +99,12 @@ Section SQL.
       option sql_order_spec -> sql_query                 (* OrderBy Clause *)
   with sql_select : Set :=
   | SSelectColumn : string -> sql_select
+  | SSelectColumnDeref : string -> string -> sql_select
   | SSelectStar : sql_select
   | SSelectExpr : string -> sql_expr -> sql_select
   with sql_from : Set :=
   | SFromTable : string -> sql_from
+  | SFromTableAlias : string -> string -> sql_from
   | SFromQuery : sql_table_spec -> sql_query -> sql_from
   with sql_condition : Set :=
   | SCondAnd : sql_condition -> sql_condition -> sql_condition
@@ -114,7 +118,9 @@ Section SQL.
   with sql_expr : Set :=
   | SExprConst : data -> sql_expr
   | SExprColumn : string -> sql_expr
+  | SExprColumnDeref : string -> string -> sql_expr
   | SExprStar : sql_expr
+  | SExprUnary : sql_un_expr -> sql_expr -> sql_expr
   | SExprBinary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr
   | SExprAggExpr : sql_agg -> sql_expr -> sql_expr
   | SExprQuery : sql_query -> sql_expr (* relatively broad allowance for nesting... *)
@@ -134,7 +140,10 @@ Section SQL.
     match expr with
     | SExprConst _ => true
     | SExprColumn _ => false
+    | SExprColumnDeref _ _ => false
     | SExprStar => false
+    | SExprUnary _ expr1 =>
+      is_singleton_sql_expr expr1
     | SExprBinary _ expr1 expr2 =>
       is_singleton_sql_expr expr1 && is_singleton_sql_expr expr2
     | SExprAggExpr _ _ => true
@@ -150,6 +159,7 @@ Section SQL.
     | SQuery (SSelectExpr _ expr :: nil) _ _ _ _ =>
       if (is_singleton_sql_expr expr) then false else true
     | SQuery (SSelectColumn _ :: nil) _ _ _ _ => true
+    | SQuery (SSelectColumnDeref _ _ :: nil) _ _ _ _ => true
     | _ => false
     end.
   
@@ -165,28 +175,35 @@ Section SQL.
         ANUnop (AOrderBy sql_order_spec) acc
       end.
 
-    Definition column_of_select (select:sql_select) : string :=
+    Definition column_of_select (select:sql_select) : (option string * string) :=
       match select with
-      | SSelectColumn cname => cname
-      | SSelectStar => "" (* XXX Ouch ... do we need full inference because of this? XXX *)
-      | SSelectExpr cname _ => cname
+      | SSelectColumn cname => (None,cname)
+      | SSelectColumnDeref tname cname => (Some tname,cname)
+      | SSelectStar => (None,""%string) (* XXX Ouch ... do we need full inference because of this? XXX *)
+      | SSelectExpr cname _ => (None,cname)
       end.
     
-    Definition columns_of_selects (selects:list sql_select) : list string :=
+    Definition columns_of_selects (selects:list sql_select) : list (option string * string) :=
       map column_of_select selects.
     
-    Definition columns_of_query (q:sql) : list string :=
+    Definition columns_of_query (q:sql) : list (option string * string) :=
       match q with
       | SQuery selects _ _ _ _ =>
         columns_of_selects selects
       end.
 
-    Fixpoint create_renaming (out_columns in_columns:list string) :=
+    Fixpoint create_renaming
+             (out_columns:list string)
+             (in_columns:list (option string * string)) :=
       match out_columns,in_columns with
       | nil,_ | _,nil =>  (ANConst (drec nil))
-      | out_cname :: out_columns', in_cname :: in_columns' =>
+      | out_cname :: out_columns', (None,in_cname) :: in_columns' =>
         ANBinop AConcat
                 (ANUnop (ARec out_cname) (ANUnop (ADot in_cname) ANID))
+                (create_renaming out_columns' in_columns')
+      | out_cname :: out_columns', (Some in_tname,in_cname) :: in_columns' =>
+        ANBinop AConcat
+                (ANUnop (ARec out_cname) (ANUnop (ADot in_cname) (ANUnop (ADot in_tname) ANID)))
                 (create_renaming out_columns' in_columns')
       end.
     
@@ -233,6 +250,8 @@ Section SQL.
                 ANMap (sql_expr_to_nraenv false ANID expr) nraenv_order_by_clause
               | SSelectColumn cname :: nil =>
                 ANMap (ANUnop (ADot cname) ANID) nraenv_order_by_clause
+              | SSelectColumnDeref tname cname :: nil =>
+                ANMap (ANUnop (ADot cname) (ANUnop (ADot tname) ANID)) nraenv_order_by_clause
               | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
               end
             else
@@ -241,6 +260,8 @@ Section SQL.
     with sql_from_to_nraenv (acc:algenv) (from:sql_from) {struct from} :=
       match from with
       | (SFromTable tname) => ANProduct (ANGetConstant tname) acc
+      | (SFromTableAlias new_name tname) =>
+        ANProduct (ANMap (ANUnop (ARec new_name) ANID) (ANGetConstant tname)) acc
       | SFromQuery tspec q =>
         let (tname,opt_columns) := tspec in
         match opt_columns with
@@ -257,6 +278,10 @@ Section SQL.
         ANBinop AConcat
                 (ANUnop (ARec cname) (ANUnop (ADot cname) ANID))
                 acc
+      | SSelectColumnDeref tname cname =>
+        ANBinop AConcat
+                (ANUnop (ARec cname) (ANUnop (ADot cname) (ANUnop (ADot tname) ANID)))
+                acc
       | SSelectStar =>
         ANBinop AConcat ANID acc
       | SSelectExpr cname expr =>
@@ -268,7 +293,11 @@ Section SQL.
       match expr with
       | SExprConst d => ANConst d
       | SExprColumn cname => ANUnop (ADot cname) ANID
+      | SExprColumnDeref tname cname => ANUnop (ADot cname) (ANUnop (ADot tname) ANID)
       | SExprStar => ANID
+      | SExprUnary (SSubstring n1 on2) expr1 =>
+        ANUnop (ASubstring n1 on2)
+                (sql_expr_to_nraenv create_table acc expr1)
       | SExprBinary SPlus expr1 expr2 =>
         ANBinop (ABArith ArithPlus)
                 (sql_expr_to_nraenv create_table acc expr1)

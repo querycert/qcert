@@ -212,10 +212,8 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | ASum -> STerm ("ASum",[])
   | AArithMean -> STerm ("AArithMean",[])
   | AToString -> STerm ("AToString",[])
-  | ASubstring (start,olen) ->
-     (match olen with
-     | Some len -> STerm ("ASubstring", [SInt start; SInt len])
-     | None -> STerm ("ASubstr",[SInt start]))
+  | ASubstring (n,None) -> STerm ("ASubstring",[SInt n])
+  | ASubstring (n1,(Some n2)) -> STerm ("ASubstring",[SInt n1;SInt n2])
   | ACast bl -> STerm ("ACast", dbrands_to_sexp bl)
   | AUnbrand -> STerm ("AUnbrand",[])
   | ASingleton -> STerm ("ASingleton",[])
@@ -252,13 +250,8 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ASum",[]) -> ASum
   | STerm ("AArithMean",[]) -> AArithMean
   | STerm ("AToString",[]) -> AToString
-  | STerm ("ASubstring",(SInt start::restlen)) ->
-     let olen = (match restlen with
-	      | [] -> None
-	      | [SInt len] -> Some len
-	      | _ -> raise (Qcert_Error ("Not well-formed S-expr inside ASubstring.  Too many arguments."))
-	     ) in
-     ASubstring (start, olen)
+  | STerm ("ASubstring",[SInt n1]) -> ASubstring (n1,None)
+  | STerm ("ASubstring",[SInt n1;SInt n2]) -> ASubstring (n1,Some n2)
   | STerm ("ACast", bl) -> ACast (sexp_to_dbrands bl)
   | STerm ("AUnbrand",[]) -> AUnbrand
   | STerm ("ASingleton",[]) -> ASingleton
@@ -832,6 +825,9 @@ and sexp_to_sql_selects selects =
   | (STerm ("as",[cname])) :: expr :: selects' ->
       (QSQL.sql_select_expr (sstring_to_coq_string cname) (sexp_to_sql_expr expr))
       :: (sexp_to_sql_selects selects')
+  | STerm ("deref",[cname;STerm ("ref",[tname])]) :: selects' ->
+      (QSQL.sql_select_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname))
+      :: (sexp_to_sql_selects selects')
   | STerm ("ref",[cname]) :: selects' ->
       (QSQL.sql_select_column (sstring_to_coq_string cname))
       :: (sexp_to_sql_selects selects')
@@ -848,6 +844,9 @@ and sexp_to_sql_selects selects =
 and sexp_to_sql_froms froms =
   begin match froms with
   | STerm ("table",[tname]) -> [QSQL.sql_from_table (sstring_to_coq_string tname)]
+  | STerm ("aliasAs", [new_tname;STerm ("table",[tname])]) ->
+      [QSQL.sql_from_table_alias (sstring_to_coq_string new_tname)
+	 (sstring_to_coq_string tname)]
   | STerm ("aliasAs", [tname;query]) ->
       [QSQL.sql_from_query (sstring_to_coq_string tname, None) (sexp_to_sql_query query)]
   | STerm ("join", [from1;from2]) ->
@@ -921,6 +920,8 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/" ^ sinterval ^ "/00"))) (* XXX (Obj.magic (Enhancedtimeduration ("0000/" ^ sinterval ^ "/00")))) XXX *)
   | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
       QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/00/" ^ sinterval))) (* (Dforeign (Obj.magic (Enhancedtimeduration ("0000/00/" ^ sinterval)))) *)
+  | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
+      QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
   | STerm ("add",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SPlus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
@@ -930,6 +931,8 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("divide",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "substr";expr1;SInt n1;SInt n2]) ->
+      QSQL.sql_expr_unary (Compiler.SSubstring (n1,Some n2)) (sexp_to_sql_expr expr1)
   | STerm ("function",[SString "count"]) ->
       QSQL.sql_expr_agg_expr Compiler.SCount QSQL.sql_expr_star
   | STerm ("function",[SString "count";expr1]) ->

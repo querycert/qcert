@@ -399,10 +399,8 @@ let pretty_unop p sym callb ff u a =
   | Hack.ASum -> pretty_unary_exp sym callb "sum" ff a
   | Hack.AArithMean -> pretty_unary_exp sym callb "avg" ff a
   | Hack.AToString -> pretty_unary_exp sym callb "toString" ff a
-  | Hack.ASubstring (start,olen) ->
-     (match olen with
-     | Some len -> pretty_unary_exp sym callb ("substring("^ (string_of_int start)^", "^(string_of_int len)^")") ff a
-     | None -> pretty_unary_exp sym callb ("substring("^(string_of_int start)^")") ff a)
+  | Hack.ASubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
+  | Hack.ASubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
   (* resets precedence back to 0 *)
   | Hack.ACast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
   | Hack.AUnbrand ->
