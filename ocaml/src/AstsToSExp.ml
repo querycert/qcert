@@ -920,13 +920,13 @@ and sexp_to_sql_expr expr =
   | STerm ("list",const_list) ->
       QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
   | STerm ("literal",[SString "date"; SString sdate]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX (Dforeign (Obj.magic (Enhancedtimepoint sdate))) XXX *)
+      QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX TO BE FIXED XXX *)
   | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "/00/00"))) (* XXX (Dforeign (Obj.magic (Enhancedtimeduration (sinterval ^ "/00/00")))) XXX *)
+      QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "/00/00"))) (* XXX TO BE FIXED XXX *)
   | STerm ("interval",[SString sinterval; STerm ("month",[])]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/" ^ sinterval ^ "/00"))) (* XXX (Obj.magic (Enhancedtimeduration ("0000/" ^ sinterval ^ "/00")))) XXX *)
+      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/" ^ sinterval ^ "/00"))) (* XXX TO BE FIXED XXX *)
   | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/00/" ^ sinterval))) (* (Dforeign (Obj.magic (Enhancedtimeduration ("0000/00/" ^ sinterval)))) *)
+      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/00/" ^ sinterval))) (* XXX TO BE FIXED XXX *)
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
@@ -939,7 +939,7 @@ and sexp_to_sql_expr expr =
   | STerm ("divide",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "substr";expr1;SInt n1;SInt n2]) ->
-      QSQL.sql_expr_unary (Compiler.SSubstring (n1,Some n2)) (sexp_to_sql_expr expr1)
+      QSQL.sql_expr_unary (Compiler.SSubstring (n1-1,Some (n1-1+n2))) (sexp_to_sql_expr expr1) (* It's 'substring (expr from n1 for n2)' i.e., from n1 for n2 characters, with initial index 1 *)
   | STerm ("function",[SString "count"]) ->
       QSQL.sql_expr_agg_expr Compiler.SCount QSQL.sql_expr_star
   | STerm ("function",[SString "count";expr1]) ->

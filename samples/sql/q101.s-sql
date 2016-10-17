@@ -1,0 +1,1 @@
+(query (select (ref "o_orderkey" ) (ref "o_orderdate" ) ) (from (table "orders" ) ) (where (and (greater_than_or_equal (ref "o_orderdate" ) (literal "date" "1994-01-01" )) (less_than (ref "o_orderdate" ) (add (literal "date" "1994-01-01" )(interval "1" (year))) ) ) ) ) 
