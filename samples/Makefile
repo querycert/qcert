@@ -22,8 +22,8 @@ CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
 JAVA=java
 JAVAC=javac
-QCERTCOMP=../bin/CACo
-QCERTEVAL=../bin/CAEv
+QCERTCOMP=../bin/qcert
+QCERTEVAL=../bin/qcert -eval
 QCERTDATA=../bin/CADa
 
 all:
@@ -38,12 +38,12 @@ $(CLASSES): $(JAVA_SRCS)
 oql/%.js: oql/%.oql
 	@echo
 	@echo "Compiling test with Q*cert: '"$<"' to '"$@"'"
-	$(QCERTCOMP) -source OQL -target JS $<
+	$(QCERTCOMP) -source oql -target js $<
 
 oql/%.java: oql/%.oql
 	@echo
 	@echo "Compiling test with Q*cert: '"$<"' to '"$@"'"
-	$(QCERTCOMP) -source OQL -target Java $<
+	$(QCERTCOMP) -source oql -target java $<
 
 oql/%.class: oql/%.java
 	@echo
@@ -75,6 +75,17 @@ run_java_%: oql/%.class
 	@echo "Running test: '"$<"' on data: data/persons.json"
 	@echo
 	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input data/persons.json $*
+
+SQLEXPERIMENT=/Users/js/git/summerCAMP/sql-experiment
+SQLTABLES=$(SQLEXPERIMENT)/tables/tpch_json.io
+
+sql_%:
+	@echo "Parsing SQL: " $(subst sql_,,$@)
+	$(MAKE) -C $(SQLEXPERIMENT) $@
+	@cp $(SQLEXPERIMENT)/sexp/$(subst sql_,,$@).s-sql sql
+	@echo "Compiling SQL:" $(subst sql_,,$@)
+	$(QCERTCOMP) -source sql -target js sql/$(subst sql_,,$@).s-sql
+	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sql_,,$@).js 
 
 clean:
 	@rm -rf bin/*
