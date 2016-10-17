@@ -374,7 +374,8 @@ Section SQL.
         ANBinop AContains
                 (sql_expr_to_nraenv true acc expr1)
                 (sql_expr_to_nraenv false acc expr2)
-      | SCondLike expr1 slike => ANConst dunit (* XXX This should be really a compilation error! XXX *)
+      | SCondLike expr1 slike =>
+        ANUnop (ALike slike None) (sql_expr_to_nraenv true acc expr1)
       | SCondBetween expr1 expr2 expr3 =>
         ANBinop AAnd
                 (ANBinop ALe

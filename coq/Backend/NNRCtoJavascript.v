@@ -271,7 +271,7 @@ Section NNRCtoJavascript.
                        end ++ ")"
                      | ALike pat oescape =>
                        let lc := make_like_clause pat oescape in
-                       let regex := ("new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join())") in
+                       let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in
                        regex ++ ".test(" ++ e1 ++ ")"
                      | ALeft => "{" ++ quotel ++ "left" ++ quotel  ++ e1 ++ "}"
                      | ARight => "{" ++ quotel ++ "right" ++ quotel  ++ e1 ++ "}"
