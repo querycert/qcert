@@ -7,9 +7,6 @@ Missing:
   Support for 'cases': q12, q14
   Support for 'extract' (i.e., access date component): q7, q8, q9
 
-Incompletely supported:
-  Support for 'like' (i.e., simple matching on a string): q2, q13, q14, q16, q20
-
 Bugs:
   like operator isn't compiled properly: q2, q13, q14, q16, q20
   dates are treated like strings: (may affect most queries)
