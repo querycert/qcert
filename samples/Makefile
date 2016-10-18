@@ -85,7 +85,16 @@ sql_%:
 	@cp $(SQLEXPERIMENT)/sexp/$(subst sql_,,$@).s-sql sql
 	@echo "Compiling SQL:" $(subst sql_,,$@)
 	$(QCERTCOMP) -source sql -target js sql/$(subst sql_,,$@).s-sql
+	@echo "Running SQL:" $(subst sql_,,$@)
 	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sql_,,$@).js 
+
+sqlall_%:
+	@echo "Parsing SQL: " $(subst sqlall_,,$@)
+	$(MAKE) -C $(SQLEXPERIMENT) $(subst sqlall_,sql_,$@)
+	@cp $(SQLEXPERIMENT)/sexp/$(subst sqlall_,,$@).s-sql sql
+	@echo "Compiling SQL:" $(subst sqlall_,,$@)
+	$(QCERTCOMP) -emit-all -source sql -target js sql/$(subst sqlall_,,$@).s-sql
+	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sqlall_,,$@).js 
 
 clean:
 	@rm -rf bin/*
