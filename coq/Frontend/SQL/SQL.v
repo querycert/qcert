@@ -136,7 +136,7 @@ Section SQL.
      widely for the 'singleton' vs 'non-singleton' case *)
   Fixpoint is_singleton_sql_query (q:sql) : bool :=
     match q with
-    | SQuery (SSelectExpr _ expr :: nil) _ _ None _ =>
+    | SQuery (SSelectExpr _ expr :: nil) _ _ None None =>
       is_singleton_sql_expr expr
     | _ => false
     end
@@ -233,33 +233,36 @@ Section SQL.
                        (group_full "partition" sl nraenv_where_clause)
             end
         in
-        let nraenv_order_by_clause := sql_order_to_nraenv nraenv_group_by_clause opt_order in
-        if q_is_singleton (* XXX Two different translations here! XXX *)
-        then
-            match selects with
-            | SSelectExpr _ expr :: nil =>
-              sql_expr_to_nraenv true nraenv_order_by_clause expr
-            | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
-            end
-        else
-          if create_table
-          then
-            ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
-                  nraenv_order_by_clause
-          else
-            if (is_value_sequence_sql_query q)
+        let nraenv_select_clause :=
+            if q_is_singleton (* XXX Two different translations here! XXX *)
             then
               match selects with
               | SSelectExpr _ expr :: nil =>
-                ANMap (sql_expr_to_nraenv false ANID expr) nraenv_order_by_clause
-              | SSelectColumn cname :: nil =>
-                ANMap (ANUnop (ADot cname) ANID) nraenv_order_by_clause
-              | SSelectColumnDeref tname cname :: nil =>
-                ANMap (ANUnop (ADot cname) (ANUnop (ADot tname) ANID)) nraenv_order_by_clause
+                sql_expr_to_nraenv true nraenv_group_by_clause expr
               | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
               end
             else
-              ANConst dunit (* XXX This should be really a compilation error XXX *)
+              if create_table
+              then
+                ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
+                      nraenv_group_by_clause
+              else
+                if (is_value_sequence_sql_query q)
+                then
+                  match selects with
+                  | SSelectExpr _ expr :: nil =>
+                    ANMap (sql_expr_to_nraenv false ANID expr) nraenv_group_by_clause
+                  | SSelectColumn cname :: nil =>
+                    ANMap (ANUnop (ADot cname) ANID) nraenv_group_by_clause
+                  | SSelectColumnDeref tname cname :: nil =>
+                    ANMap (ANUnop (ADot cname) (ANUnop (ADot tname) ANID)) nraenv_group_by_clause
+                  | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
+                  end
+                else
+                  ANConst dunit (* XXX This should be really a compilation error XXX *)
+        in
+        let nraenv_order_by_clause := sql_order_to_nraenv nraenv_select_clause opt_order in
+        nraenv_order_by_clause
       end
     with sql_from_to_nraenv (acc:algenv) (from:sql_from) {struct from} :=
       match from with

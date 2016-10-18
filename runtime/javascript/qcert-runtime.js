@@ -98,7 +98,7 @@ function compareOfSingleCriteria(sc) {
     if ("asc" in sc) {
 	return function(a,b) { return compare(deref(a,sc['asc']), deref(b,sc['asc'])); }
     } else if ("desc" in sc) { 
-	return function(a,b) { return -(compare(deref(a,sc['desc']), dref(b,sc['desc']))); }
+	return function(a,b) { return -(compare(deref(a,sc['desc']), deref(b,sc['desc']))); }
     } else {
 	return function (a,b) { return compare(a,b); }
     } /* Default to just comparing values */

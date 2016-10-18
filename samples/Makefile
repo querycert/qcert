@@ -86,7 +86,7 @@ sql_%:
 	@echo "Compiling SQL:" $(subst sql_,,$@)
 	$(QCERTCOMP) -source sql -target js sql/$(subst sql_,,$@).s-sql
 	@echo "Running SQL:" $(subst sql_,,$@)
-	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sql_,,$@).js 
+	time $(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sql_,,$@).js 
 
 sqlall_%:
 	@echo "Parsing SQL: " $(subst sqlall_,,$@)
