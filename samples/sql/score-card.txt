@@ -2,7 +2,7 @@ Do not parse: q1 ("(3)" on date condition), q15 (view definition)
 Parse: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21, q22
 Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21, q22
 
-Parse and compile and run: q22
+Parse and compile and run: q11, q22
 
 Missing:
   Support for 'left outer join': q13
@@ -10,7 +10,6 @@ Missing:
   Support for 'extract' (i.e., access date component): q7, q8, q9
 
 Bugs:
-  like operator isn't compiled properly: q2, q13, q14, q16, q20
   dates are treated like strings: (may affect most queries)
 
 Usage notes:
