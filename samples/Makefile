@@ -79,22 +79,26 @@ run_java_%: oql/%.class
 SQLEXPERIMENT=/Users/js/git/summerCAMP/sql-experiment
 SQLTABLES=$(SQLEXPERIMENT)/small-tables/tpch_json.io
 
-sql_%:
+../runtime/javascript/qcert-merged-runtime.js: ../runtime/javascript/qcert-runtime.js ../runtime/javascript/sqlDates.js
+	@echo "Creating full SQL JavaScript runtime"
+	cat ../runtime/javascript/qcert-runtime.js ../runtime/javascript/sqlDates.js > ../runtime/javascript/qcert-merged-runtime.js
+
+sql_%: ../runtime/javascript/qcert-merged-runtime.js
 	@echo "Parsing SQL: " $(subst sql_,,$@)
 	$(MAKE) -C $(SQLEXPERIMENT) $@
 	@cp $(SQLEXPERIMENT)/sexp/$(subst sql_,,$@).s-sql sql
 	@echo "Compiling SQL:" $(subst sql_,,$@)
 	$(QCERTCOMP) -source sql -target js sql/$(subst sql_,,$@).s-sql
 	@echo "Running SQL:" $(subst sql_,,$@)
-	time $(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sql_,,$@).js 
+	time $(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-merged-runtime.js sql/$(subst sql_,,$@).js 
 
-sqlall_%:
+sqlall_%: ../runtime/javascript/qcert-merged-runtime.js
 	@echo "Parsing SQL: " $(subst sqlall_,,$@)
 	$(MAKE) -C $(SQLEXPERIMENT) $(subst sqlall_,sql_,$@)
 	@cp $(SQLEXPERIMENT)/sexp/$(subst sqlall_,,$@).s-sql sql
 	@echo "Compiling SQL:" $(subst sqlall_,,$@)
 	$(QCERTCOMP) -emit-all -source sql -target js sql/$(subst sqlall_,,$@).s-sql
-	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-runtime.js sql/$(subst sqlall_,,$@).js 
+	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-merged-runtime.js sql/$(subst sqlall_,,$@).js 
 
 clean:
 	@rm -rf bin/*

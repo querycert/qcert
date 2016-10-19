@@ -920,13 +920,17 @@ and sexp_to_sql_expr expr =
   | STerm ("list",const_list) ->
       QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
   | STerm ("literal",[SString "date"; SString sdate]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string sdate)) (* XXX TO BE FIXED XXX *)
+      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
   | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "/00/00"))) (* XXX TO BE FIXED XXX *)
+      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-YEAR"))))
   | STerm ("interval",[SString sinterval; STerm ("month",[])]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/" ^ sinterval ^ "/00"))) (* XXX TO BE FIXED XXX *)
+      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-MONTH"))))
   | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
-      QSQL.sql_expr_const (Dstring (char_list_of_string ("0000/00/" ^ sinterval))) (* XXX TO BE FIXED XXX *)
+      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-DAY"))))
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
