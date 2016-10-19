@@ -82,28 +82,6 @@ Section CompLang.
     | L_cloudant : language
     | L_error : string -> language.
 
-  Tactic Notation "language_cases" tactic(first) ident(c) :=
-    first;
-    [ Case_aux c "L_rule"%string
-    | Case_aux c "L_camp"%string
-    | Case_aux c "L_oql"%string
-    | Case_aux c "L_sql"%string
-    | Case_aux c "L_lambda_nra"%string
-    | Case_aux c "L_nra"%string
-    | Case_aux c "L_nraenv"%string
-    | Case_aux c "L_nnrc"%string
-    | Case_aux c "L_nnrcmr"%string
-    | Case_aux c "L_cldmr"%string
-    | Case_aux c "L_dnnrc_dataset"%string
-    | Case_aux c "L_dnnrc_typed_dataset"%string
-    | Case_aux c "L_javascript"%string
-    | Case_aux c "L_java"%string
-    | Case_aux c "L_spark"%string
-    | Case_aux c "L_spark2"%string
-    | Case_aux c "L_cloudant"%string
-    | Case_aux c "L_error"%string].
-
-
   Inductive query : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query
@@ -223,6 +201,27 @@ Section CompLang.
   End CompLangUtil.
 
 End CompLang.
+
+Tactic Notation "language_cases" tactic(first) ident(c) :=
+  first;
+  [ Case_aux c "L_rule"%string
+  | Case_aux c "L_camp"%string
+  | Case_aux c "L_oql"%string
+  | Case_aux c "L_sql"%string
+  | Case_aux c "L_lambda_nra"%string
+  | Case_aux c "L_nra"%string
+  | Case_aux c "L_nraenv"%string
+  | Case_aux c "L_nnrc"%string
+  | Case_aux c "L_nnrcmr"%string
+  | Case_aux c "L_cldmr"%string
+  | Case_aux c "L_dnnrc_dataset"%string
+  | Case_aux c "L_dnnrc_typed_dataset"%string
+  | Case_aux c "L_javascript"%string
+  | Case_aux c "L_java"%string
+  | Case_aux c "L_spark"%string
+  | Case_aux c "L_spark2"%string
+  | Case_aux c "L_cloudant"%string
+  | Case_aux c "L_error"%string].
 
 
 (*
