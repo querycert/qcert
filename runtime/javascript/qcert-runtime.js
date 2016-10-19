@@ -94,19 +94,25 @@ function compare(v1, v2) {
 function equal(v1, v2) {
     return compare(v1, v2) == 0;
 }
-function compareOfSingleCriteria(sc) {
-    if ("asc" in sc) {
-	return function(a,b) { return compare(deref(a,sc['asc']), deref(b,sc['asc'])); }
-    } else if ("desc" in sc) { 
-	return function(a,b) { return -(compare(deref(a,sc['desc']), deref(b,sc['desc']))); }
-    } else {
-	return function (a,b) { return compare(a,b); }
-    } /* Default to just comparing values */
+function compareOfMultipleCriterias(scl) {
+    return function(a,b) {
+	var current_compare = 0;
+	for (var i=0; i<scl.length; i++) {
+	    var sc = scl[i];
+	    if ("asc" in sc) { current_compare = compare(deref(a,sc['asc']), deref(b,sc['asc'])); }
+	    else if ("desc" in sc) { current_compare = -(compare(deref(a,sc['asc']), deref(b,sc['asc']))); }
+
+	    if (current_compare == -1) { return -1; }
+	    else if(current_compare == 1) { return 1; }
+	}
+	return current_compare;
+    }
+    
 }
 function sort(b,scl) {
     var result = [ ];
     if (scl.length == 0) { return b; } // Check for no sorting criteria
-    var compareFun = compareOfSingleCriteria(scl[0]);
+    var compareFun = compareOfMultipleCriterias(scl);
     result = b.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
     result.sort(compareFun);
     return result;

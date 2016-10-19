@@ -163,7 +163,7 @@ Section NNRCtoJavascript.
          | jbool b => if b then "true" else "false"
          | jstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
          | jarray ls =>
-           let ss := (string_sort (map (jsonToJS quotel) ls)) in
+           let ss := map (jsonToJS quotel) ls in
            "[" ++ (joinStrings ", " ss) ++ "]"
          | jobject ls =>
            let ss := (map (fun kv => let '(k,v) := kv in
