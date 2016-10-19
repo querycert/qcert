@@ -77,7 +77,7 @@ run_java_%: oql/%.class
 	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input data/persons.json $*
 
 SQLEXPERIMENT=/Users/js/git/summerCAMP/sql-experiment
-SQLTABLES=$(SQLEXPERIMENT)/tables/tpch_json.io
+SQLTABLES=$(SQLEXPERIMENT)/small-tables/tpch_json.io
 
 sql_%:
 	@echo "Parsing SQL: " $(subst sql_,,$@)
