@@ -1089,8 +1089,15 @@ Section CompDriver.
   Global Instance is_postfix_driver_trans : Transitive is_postfix_driver.
   Proof.
     unfold Transitive.
-    admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-  Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+    intros dv'' dv' dv H_dv''_dv' H_dv'_dv.
+    induction 0.
+    - rewrite H in *; clear H.
+      assumption.
+    - apply (is_postfix_plus_one dv'' dv config lang);
+        try assumption.
+      apply IHH_dv'_dv.
+      assumption.
+  Qed.
 
   Definition is_driver_config (config: driver_config) (dv: driver) : Prop :=
       forall dv',
