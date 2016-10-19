@@ -1,1 +1,0 @@
-(query (select (as "avg_yearly") (divide (function "sum" (ref "l_extendedprice")) 7.000000)) (from (join (table "lineitem") (table "part"))) (where (and (and (and (equal (ref "p_partkey") (ref "l_partkey")) (equal (ref "p_brand") "Brand#23")) (equal (ref "p_container") "MED BOX")) (less_than (ref "l_quantity") 5))))
