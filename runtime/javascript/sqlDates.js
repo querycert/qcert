@@ -21,136 +21,159 @@ MONTH = "MONTH";
 YEAR = "YEAR";
 
 function sqlGetDateComponent(part, date) {
-		mustBeDate(date);
-		switch(part) {
-		case DAY:
-				return date.day;
-		case MONTH:
-				return date.month;
-		case YEAR:
-				return date.year;
-		default:
-				throw new Error("Uninterpretable part: " + part);
-		}
+	mustBeDate(date);
+	switch(part) {
+	case DAY:
+		return date.day;
+	case MONTH:
+		return date.month;
+	case YEAR:
+		return date.year;
+	default:
+		throw new Error("Uninterpretable part: " + part);
+	}
 }
 
 function sqlDateFromString(stringDate) {
-		throw new Error("We should not be seeing dates except as objects with structure");
+	if (typeof stringDate === "string") {
+		parts = stringDate.split("-");
+		if (parts.length === 3)
+			return makeDate(parts[0], parts[1], parts[2]);
+		throw new Error("Malformed string date: " + stringDate);
+	}
+	throw new Error("Expected a date in string form but got " + JSON.stringify(stringDate));
 }
 
 function sqlDateDurationFromString(stringDuration) {
-		throw new Error("We should not be seeing durations except as objects with structure");
+	// TODO verify what the string format for durations is going to be.
+	// Here we assume a number adjoined to a valid unit with a dash.
+	if (typeof stringDuration === "string") {
+		parts = stringDuration.split("-");
+		if (parts.length === 2) {
+			mustBeUnit(parts[1]);
+			return {"duration": parts[0], "unit": parts[1]};
+			throw new Error("Malformed string duration: " + stringDuration);
+		}
+		throw new Error("Expected a duration in string form but got " + JSON.stringify(stringDuration));
+	}
 }
 
 function sqlDatePointPlus(date, duration) {
-		mustBeDate(date);
-		mustBeDuration(duration);
-		switch(duration.unit) {
-		case DAY:
-				return dateNewDay(date, day.day + duration.duration);
-		case MONTH:
-				return dateNewMonth(date, day.month + duration.duration);
-		case YEAR:
-				return dateNewYear(date, day.year + duration.duration);
-		default:
-				throw new Error("Unexpected state (not supposed to happen)");
-		}
+	mustBeDate(date);
+	mustBeDuration(duration);
+	switch(duration.unit) {
+	case DAY:
+		return dateNewDay(date, day.day + duration.duration);
+	case MONTH:
+		return dateNewMonth(date, day.month + duration.duration);
+	case YEAR:
+		return dateNewYear(date, day.year + duration.duration);
+	default:
+		throw new Error("Unexpected state (not supposed to happen)");
+	}
 }
 
 function sqlDatePointMinus(date, duration) {
-		mustBeDate(date);
-		mustBeDuration(duration);
-		switch(duration.unit) {
-		case DAY:
-				return dateNewDay(date, day.day - duration.duration);
-		case MONTH:
-				return dateNewMonth(date, day.month - duration.duration);
-		case YEAR:
-				return dateNewYear(date, day.year - duration.duration);
-		default:
-				throw new Error("Unexpected state (not supposed to happen)");
-		}
+	mustBeDate(date);
+	mustBeDuration(duration);
+	switch(duration.unit) {
+	case DAY:
+		return dateNewDay(date, day.day - duration.duration);
+	case MONTH:
+		return dateNewMonth(date, day.month - duration.duration);
+	case YEAR:
+		return dateNewYear(date, day.year - duration.duration);
+	default:
+		throw new Error("Unexpected bad unit (not supposed to happen)");
+	}
 }
 
 function sqlDatePointNe(date1, date2) {
-		mustBeDate(date1);
-		mustBeDate(date2);
-		return compareDates(date1, date2) != 0;
+	mustBeDate(date1);
+	mustBeDate(date2);
+	return compareDates(date1, date2) != 0;
 }
 
 function sqlDatePointLt(date1, date2) {
-		mustBeDate(date1);
-		mustBeDate(date2);
-		return compareDates(date1, date2) < 0;
+	mustBeDate(date1);
+	mustBeDate(date2);
+	return compareDates(date1, date2) < 0;
 }
 
 function sqlDatePointLe(date, date2) {
-		mustBeDate(date1);
-		mustBeDate(date2);
-		return compareDates(date1, date2) <= 0;
+	mustBeDate(date1);
+	mustBeDate(date2);
+	return compareDates(date1, date2) <= 0;
 }
 
 function sqlDatePointGt(date1, date2) {
-		mustBeDate(date1);
-		mustBeDate(date2);
-		return compareDates(date1, date2) > 0;
+	mustBeDate(date1);
+	mustBeDate(date2);
+	return compareDates(date1, date2) > 0;
 }
 
 function sqlDatePointGe(date1, date2) {
-		mustBeDate(date1);
-		mustBeDate(date2);
-		return compareDates(date1, date2) >= 0;
+	mustBeDate(date1);
+	mustBeDate(date2);
+	return compareDates(date1, date2) >= 0;
 }
 
 function sqlDateDurationBetween(date1, date) {
-		throw new Error("We don't know how to do 'duration between' dates yet");
+	throw new Error("We don't know how to do 'duration between' dates yet");
 }
 
 function compareDates(date1, date2) {
-		if (date1.year < date2.year)
-				return -1;
-		if (date1.year > date2.year)
-				return 1;
-		if (date1.month < date2.month)
-				return -1;
-		if (date1.month > date2.month)
-				return 1;
-		if (date1.day < date2.day)
-				return -1;
-		if (date1.day > date2.day)
-				return 1;
-		return 0;
+	if (date1.year < date2.year)
+		return -1;
+	if (date1.year > date2.year)
+		return 1;
+	if (date1.month < date2.month)
+		return -1;
+	if (date1.month > date2.month)
+		return 1;
+	if (date1.day < date2.day)
+		return -1;
+	if (date1.day > date2.day)
+		return 1;
+	return 0;
 }
 
 function dateNewYear(date, year) {
-		return {"year": year, "month": date.month, "day": date.day};
+	return makeDate(year, date.month, date.day);
 }
 
 function dateNewMonth(date, month) {
-		/* Use Javascript Date object to handle wrapping */
-		var jsDate = new Date(date.year, month, date.day);
-		return jsDateToOurDate(jsDate);
+	/* Use Javascript Date object to normalize out-of-range month */
+	var jsDate = new Date(date.year, month, date.day);
+	return makeDate(jsDate.year, jsDate.month, jsDate.day);
 }
 
 function dateNewDay(date, day) {
-		/* Use Javascript Date object to handle wrapping */
-		var jsDate = new Date(date.year, date.month, day);
-		return jsDateToOurDate(jsDate);
+	/* Use Javascript Date object to normalize out-of-range day */
+	var jsDate = new Date(date.year, date.month, day);
+	return makeDate(jsDate.year, jsDate.month, jsDate.day);
 }
 
-function jsDateToOurDate(date) {
-		return {"year": date.year, "month": date.month, "day": date.day};
+function makeDate(year, month, day) {
+	return {"year": year, "month": month, "day": day};
 }
 
 function mustBeDate(date) {
-		if (typeof date === "object" && "year" in date && "month" in date && "day" in date)
-				return;
-		throw new Error("Expected a date but got " + JSON.stringify(date));
+	if (typeof date === "object" && "year" in date && "month" in date && "day" in date)
+		return;
+	throw new Error("Expected a date but got " + JSON.stringify(date));
 }
 
 function mustBeDuration(duration) {
-		if (typeof duration === "object" && "duration" in duration && "unit" in duration)
-				if (duration.unit === DAY || duration.unit === MONTH || duration.unit === YEAR)
-						return;
-		throw new Error("Expected a duration but got " + JSON.stringify(duration));
+	if (typeof duration === "object" && "duration" in duration && "unit" in duration) {
+		mustBeUnit(duration.unit);
+		return;
+	}
+	throw new Error("Expected a duration but got " + JSON.stringify(duration));
+}
+
+function mustBeUnit(unit) {
+	if (unit === DAY || unit === MONTH || unit === YEAR)
+		return;
+	throw new Error("Expected a duration unit but got " + JSON.stringify(unit));
 }
