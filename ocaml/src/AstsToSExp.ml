@@ -920,16 +920,16 @@ and sexp_to_sql_expr expr =
   | STerm ("list",const_list) ->
       QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
   | STerm ("literal",[SString "date"; SString sdate]) ->
-      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_from_string)))
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
   | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-YEAR"))))
   | STerm ("interval",[SString sinterval; STerm ("month",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-MONTH"))))
   | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
-      QSQL.sql_expr_unary (SUnaryForeign (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_interval_from_string)))
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-DAY"))))
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
@@ -957,6 +957,9 @@ and sexp_to_sql_expr expr =
   | STerm ("function",[SString "max";expr1]) ->
       QSQL.sql_expr_agg_expr Compiler.SMax (sexp_to_sql_expr expr1)
   | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
+  | STerm ("function",[SString "date_minus";expr1;expr2]) ->
+      QSQL.sql_expr_binary (Compiler.SBinaryForeignExpr (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_minus)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: " ^ sterm))
   | _ ->
@@ -1002,6 +1005,9 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_between (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2) (sexp_to_sql_expr expr3)
   | STerm ("isIn",[expr1;expr2]) ->
       QSQL.sql_cond_in (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_le";expr1;expr2]) ->
+      QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
   | _ ->

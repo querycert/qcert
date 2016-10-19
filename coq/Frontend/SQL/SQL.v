@@ -85,13 +85,15 @@ Section SQL.
 
   Definition sql_table_spec : Set := string * (option (list string)).
   Definition sql_order_spec : Set := SortCriterias.
-  Inductive sql_bin_cond : Set := | SEq | SLe | SLt | SGe | SGt | SDiff.
+  Inductive sql_bin_cond : Set :=
+  | SEq | SLe | SLt | SGe | SGt | SDiff
+  | SBinaryForeignCond (fb : foreign_binary_op_type) : sql_bin_cond.
   Inductive sql_un_expr : Set :=
   | SSubstring : Z -> option Z -> sql_un_expr
-  | SUnaryForeign (fu:foreign_unary_op_type) : sql_un_expr.
+  | SUnaryForeignExpr (fu:foreign_unary_op_type) : sql_un_expr.
   Inductive sql_bin_expr : Set :=
   | SPlus | SMinus | SMult | SDivide
-  | SBinaryForeign (fb : foreign_binary_op_type) : sql_bin_expr.
+  | SBinaryForeignExpr (fb : foreign_binary_op_type) : sql_bin_expr.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
   Inductive sql_query : Set :=
@@ -305,10 +307,10 @@ Section SQL.
       | SExprUnary (SSubstring n1 on2) expr1 =>
         ANUnop (ASubstring n1 on2)
                 (sql_expr_to_nraenv create_table acc expr1)
-      | SExprUnary (SUnaryForeign fu) expr1 =>
+      | SExprUnary (SUnaryForeignExpr fu) expr1 =>
         ANUnop (AForeignUnaryOp fu)
                 (sql_expr_to_nraenv create_table acc expr1)
-      | SExprBinary (SBinaryForeign fb) expr1 expr2 =>
+      | SExprBinary (SBinaryForeignExpr fb) expr1 expr2 =>
         ANBinop (AForeignBinaryOp fb)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
@@ -378,6 +380,10 @@ Section SQL.
                              (sql_expr_to_nraenv true acc expr2))
       | SCondBinary SDiff expr1 expr2 =>
         ANUnop ANeg (ANBinop AEq
+                             (sql_expr_to_nraenv true acc expr1)
+                             (sql_expr_to_nraenv true acc expr2))
+      | SCondBinary (SBinaryForeignCond fb) expr1 expr2 =>
+        ANUnop ANeg (ANBinop (AForeignBinaryOp fb)
                              (sql_expr_to_nraenv true acc expr1)
                              (sql_expr_to_nraenv true acc expr2))
       | SCondExists q =>

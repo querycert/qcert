@@ -63,11 +63,11 @@ function sqlDatePointPlus(date, duration) {
 	mustBeDuration(duration);
 	switch(duration.unit) {
 	case DAY:
-		return dateNewDay(date, day.day + duration.duration);
+		return dateNewDay(date, date.day + duration.duration);
 	case MONTH:
-		return dateNewMonth(date, day.month + duration.duration);
+		return dateNewMonth(date, date.month + duration.duration);
 	case YEAR:
-		return dateNewYear(date, day.year + duration.duration);
+		return dateNewYear(date, date.year + duration.duration);
 	default:
 		throw new Error("Unexpected state (not supposed to happen)");
 	}
@@ -78,11 +78,11 @@ function sqlDatePointMinus(date, duration) {
 	mustBeDuration(duration);
 	switch(duration.unit) {
 	case DAY:
-		return dateNewDay(date, day.day - duration.duration);
+		return dateNewDay(date, date.day - duration.duration);
 	case MONTH:
-		return dateNewMonth(date, day.month - duration.duration);
+		return dateNewMonth(date, date.month - duration.duration);
 	case YEAR:
-		return dateNewYear(date, day.year - duration.duration);
+		return dateNewYear(date, date.year - duration.duration);
 	default:
 		throw new Error("Unexpected bad unit (not supposed to happen)");
 	}
@@ -100,7 +100,7 @@ function sqlDatePointLt(date1, date2) {
 	return compareDates(date1, date2) < 0;
 }
 
-function sqlDatePointLe(date, date2) {
+function sqlDatePointLe(date1, date2) {
 	mustBeDate(date1);
 	mustBeDate(date2);
 	return compareDates(date1, date2) <= 0;
