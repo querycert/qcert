@@ -2918,6 +2918,7 @@ Section CompDriver.
 
     Property exists_path_from_source_target_completeness:
       forall dv,
+        no_dv_error dv ->
         let source := language_of_driver dv in
         let target := target_language_of_driver dv in
         exists_path_from_source_target source target.
@@ -2926,8 +2927,7 @@ Section CompDriver.
       ;  auto with exists_path_hints.
       - etransitivity; [ | eauto with exists_path_hints ].
         reflexivity.
-      - (* This is currently false *)
-    Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+    Qed.
 
     (* Comp *)
     (* XXX TODO : use driver *)
