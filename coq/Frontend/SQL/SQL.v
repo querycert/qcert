@@ -383,9 +383,9 @@ Section SQL.
                              (sql_expr_to_nraenv true acc expr1)
                              (sql_expr_to_nraenv true acc expr2))
       | SCondBinary (SBinaryForeignCond fb) expr1 expr2 =>
-        ANUnop ANeg (ANBinop (AForeignBinaryOp fb)
-                             (sql_expr_to_nraenv true acc expr1)
-                             (sql_expr_to_nraenv true acc expr2))
+        ANBinop (AForeignBinaryOp fb)
+                (sql_expr_to_nraenv true acc expr1)
+                (sql_expr_to_nraenv true acc expr2)
       | SCondExists q =>
         ANUnop ANeg (ANBinop ALe
                              (ANUnop ACount (sql_query_to_nraenv true q))

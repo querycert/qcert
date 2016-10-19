@@ -38,7 +38,7 @@ function sqlDateFromString(stringDate) {
 	if (typeof stringDate === "string") {
 		parts = stringDate.split("-");
 		if (parts.length === 3)
-			return makeDate(parts[0], parts[1], parts[2]);
+		    return makeDate(Number(parts[0]), Number(parts[1]), Number(parts[2]));
 		throw new Error("Malformed string date: " + stringDate);
 	}
 	throw new Error("Expected a date in string form but got " + JSON.stringify(stringDate));
@@ -51,7 +51,7 @@ function sqlDateDurationFromString(stringDuration) {
 		parts = stringDuration.split("-");
 		if (parts.length === 2) {
 			mustBeUnit(parts[1]);
-			return {"duration": parts[0], "unit": parts[1]};
+		    return {"duration": Number(parts[0]), "unit": parts[1]};
 			throw new Error("Malformed string duration: " + stringDuration);
 		}
 		throw new Error("Expected a duration in string form but got " + JSON.stringify(stringDuration));
@@ -123,6 +123,7 @@ function sqlDateDurationBetween(date1, date) {
 }
 
 function compareDates(date1, date2) {
+     // java.lang.System.out.println("Comparing " + JSON.stringify(date1) + " and " + JSON.stringify(date2) + " = ");
 	if (date1.year < date2.year)
 		return -1;
 	if (date1.year > date2.year)
@@ -144,14 +145,14 @@ function dateNewYear(date, year) {
 
 function dateNewMonth(date, month) {
 	/* Use Javascript Date object to normalize out-of-range month */
-	var jsDate = new Date(date.year, month, date.day);
-	return makeDate(jsDate.year, jsDate.month, jsDate.day);
+	var jsDate = new Date(date.year, month-1, date.day);
+        return makeDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
 }
 
 function dateNewDay(date, day) {
-	/* Use Javascript Date object to normalize out-of-range day */
-	var jsDate = new Date(date.year, date.month, day);
-	return makeDate(jsDate.year, jsDate.month, jsDate.day);
+    	/* Use Javascript Date object to normalize out-of-range day */
+    	var jsDate = new Date(date.year, date.month-1, day);
+    	return makeDate(jsDate.getFullYear(), jsDate.getMonth()+1, jsDate.getDate());
 }
 
 function makeDate(year, month, day) {

@@ -960,6 +960,9 @@ and sexp_to_sql_expr expr =
   | STerm ("function",[SString "date_minus";expr1;expr2]) ->
       QSQL.sql_expr_binary (Compiler.SBinaryForeignExpr (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_minus)))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_plus";expr1;expr2]) ->
+      QSQL.sql_expr_binary (Compiler.SBinaryForeignExpr (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_plus)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: " ^ sterm))
   | _ ->
