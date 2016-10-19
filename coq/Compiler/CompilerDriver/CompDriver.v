@@ -1063,13 +1063,6 @@ Section CompDriver.
 
 
   (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-  (* XXX Definir le principe d'induction sur driver !!!! XXX *)
-
-  (* TODO: @lmandel: This is probably wrong.  It suffces to prove what we need, but it not preserved by the induction. see the admit. not sure what to do. *)
-  Definition is_driver_config (config: driver_config) (dv: driver) : Prop :=
-      forall config' lang dv',
-      push_translation config' lang dv' = dv ->
-      push_translation config lang dv' = dv.
 
   Definition no_dv_error (dv: driver) : Prop :=
     match dv with
@@ -1091,6 +1084,51 @@ Section CompDriver.
   Global Instance is_postfix_driver_refl : Reflexive is_postfix_driver.
   Proof.
     constructor; trivial.
+  Qed.
+
+  Global Instance is_postfix_driver_trans : Transitive is_postfix_driver.
+  Proof.
+    unfold Transitive.
+    admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+  Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+
+  Definition is_driver_config (config: driver_config) (dv: driver) : Prop :=
+      forall dv',
+        is_postfix_driver dv' dv ->
+        match dv' with
+        | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit (* vdbindings *) _) =>
+          vinit = config.(comp_mr_vinit) (* /\ vdbindings = config.(comp_vdbindings) *)
+        | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset vdbindings _) =>
+          vdbindings = config.(comp_vdbindings)
+        | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
+          class_name = config.(comp_class_name) /\ imports = config.(comp_java_imports)
+        | Dv_nnrc (Dv_nnrc_to_camp avoid _) =>
+          avoid = (List.map fst config.(comp_vdbindings))
+        | Dv_nnrcmr (Dv_nnrcmr_to_spark qname _) =>
+          qname = config.(comp_qname)
+        | Dv_nnrcmr (Dv_nnrcmr_to_cldmr brand_rel _) =>
+          brand_rel = config.(comp_brand_rel)
+        | Dv_cldmr (Dv_cldmr_to_cloudant qname brand_rel _) =>
+          qname = config.(comp_qname) /\ brand_rel = config.(comp_brand_rel)
+        | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset input_type _) =>
+          input_type = config.(comp_input_type)
+        | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark2 input_type qname _) =>
+          input_type = config.(comp_input_type) /\ qname = config.(comp_qname)
+        | _ => True
+        end.
+
+  Lemma is_driver_config_trans:
+    forall config dv dv',
+      is_postfix_driver dv' dv ->
+      is_driver_config config dv ->
+      is_driver_config config dv'.
+  Proof.
+    intros config dv dv' H_is_postfix_dv' H_is_driver_config_dv'.
+    unfold is_driver_config.
+    intros dv'' H_is_postfix_dv''.
+    apply (H_is_driver_config_dv' dv'').
+    apply (is_postfix_driver_trans dv'' dv' dv);
+    assumption.
   Qed.
 
   Definition pop_transition dv : language * option driver :=
@@ -1171,44 +1209,44 @@ Section CompDriver.
          EmptyString.
 
   Lemma target_language_of_driver_is_postfix_javascript:
-      (forall j, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_javascript j))) (Dv_javascript j)).
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_javascript dv))) (Dv_javascript dv)).
     Proof.
-      destruct j.
+      destruct dv.
       reflexivity.
     Qed.
 
     Lemma target_language_of_driver_is_postfix_java:
-      (forall j, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_java j))) (Dv_java j)).
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_java dv))) (Dv_java dv)).
     Proof.
-      destruct j.
+      destruct dv.
       reflexivity.
     Qed.
 
     Lemma target_language_of_driver_is_postfix_spark:
-      (forall s, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark s))) (Dv_spark s)).
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark dv))) (Dv_spark dv)).
     Proof.
-      destruct s.
+      destruct dv.
       reflexivity.
     Qed.
 
     Lemma target_language_of_driver_is_postfix_spark2:
-      (forall s, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark2 s))) (Dv_spark2 s)).
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark2 dv))) (Dv_spark2 dv)).
     Proof.
-      destruct s.
+      destruct dv.
       reflexivity.
     Qed.
 
     Lemma target_language_of_driver_is_postfix_cloudant:
-      (forall c, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_cloudant c))) (Dv_cloudant c)).
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_cloudant dv))) (Dv_cloudant dv)).
     Proof.
-      destruct c.
+      destruct dv.
       reflexivity.
     Qed.
 
     Lemma target_language_of_driver_is_postfix_cldmr:
-      (forall c, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_cldmr c))) (Dv_cldmr c)).
+      (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_cldmr dv))) (Dv_cldmr dv)).
     Proof.
-      destruct c; simpl
+      destruct dv; simpl
       ; try reflexivity
       ; rewrite target_language_of_driver_equation
       ; simpl.
@@ -1227,9 +1265,9 @@ Section CompDriver.
 
 
   Lemma target_language_of_driver_is_postfix_dnnrc_typed_dataset:
-    (forall d, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_typed_dataset d))) (Dv_dnnrc_typed_dataset d)).
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_typed_dataset dv))) (Dv_dnnrc_typed_dataset dv)).
   Proof.
-    induction d; simpl
+    induction dv; simpl
     ; try reflexivity
     ; rewrite target_language_of_driver_equation
     ; simpl.
@@ -1250,9 +1288,9 @@ Section CompDriver.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_dnnrc_dataset:
-    (forall d, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_dataset d))) (Dv_dnnrc_dataset d)).
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_dataset dv))) (Dv_dnnrc_dataset dv)).
   Proof.
-    destruct d; simpl.
+    destruct dv; simpl.
     - reflexivity.
     - rewrite target_language_of_driver_equation
       ; simpl.
@@ -1269,16 +1307,16 @@ Section CompDriver.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_cnd:
-  (forall c, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp c)))
-                    (Dv_camp c))
-/\  (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nra n)))
-                    (Dv_nra n))
-/\  (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nraenv n)))
-                    (Dv_nraenv n))
-/\  (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrc n)))
-                    (Dv_nnrc n))
-/\  (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrcmr n)))
-                    (Dv_nnrcmr n)).
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp dv)))
+                                  (Dv_camp dv))
+    /\  (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nra dv)))
+                                      (Dv_nra dv))
+    /\  (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nraenv dv)))
+                                      (Dv_nraenv dv))
+    /\  (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrc dv)))
+                                      (Dv_nnrc dv))
+    /\  (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrcmr dv)))
+                                      (Dv_nnrcmr dv)).
   Proof.
     apply cnd_combined_ind
     ; simpl; try reflexivity; intros
@@ -1380,68 +1418,68 @@ Section CompDriver.
         [eapply target_language_of_driver_is_postfix_cldmr | | ]; simpl; trivial.
   Qed.
 
-    Lemma target_language_of_driver_is_postfix_camp:
-      (forall c, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp c))) (Dv_camp c)).
-    Proof.
-      apply target_language_of_driver_is_postfix_cnd.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_camp:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp dv))) (Dv_camp dv)).
+  Proof.
+    apply target_language_of_driver_is_postfix_cnd.
+  Qed.
 
-    Lemma target_language_of_driver_is_postfix_nra:
-      (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nra n))) (Dv_nra n)).
-    Proof.
-      apply target_language_of_driver_is_postfix_cnd.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_nra:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nra dv))) (Dv_nra dv)).
+  Proof.
+    apply target_language_of_driver_is_postfix_cnd.
+  Qed.
 
-    Lemma target_language_of_driver_is_postfix_nraenv:
-      (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nraenv n))) (Dv_nraenv n)).
-    Proof.
-      apply target_language_of_driver_is_postfix_cnd.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_nraenv:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nraenv dv))) (Dv_nraenv dv)).
+  Proof.
+    apply target_language_of_driver_is_postfix_cnd.
+  Qed.
 
-    Lemma target_language_of_driver_is_postfix_nnrc:
-      (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrc n))) (Dv_nnrc n)).
-    Proof.
-      apply target_language_of_driver_is_postfix_cnd.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_nnrc:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrc dv))) (Dv_nnrc dv)).
+  Proof.
+    apply target_language_of_driver_is_postfix_cnd.
+  Qed.
 
-    Lemma target_language_of_driver_is_postfix_nnrcmr:
-      (forall n, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrcmr n))) (Dv_nnrcmr n)).
-    Proof.
-      apply target_language_of_driver_is_postfix_cnd.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_nnrcmr:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_nnrcmr dv))) (Dv_nnrcmr dv)).
+  Proof.
+    apply target_language_of_driver_is_postfix_cnd.
+  Qed.
 
   Lemma target_language_of_driver_is_postfix_rule:
-      (forall r, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_rule r))) (Dv_rule r)).
-    Proof.
-      destruct r; simpl; try reflexivity
-      ; rewrite target_language_of_driver_equation
-      ; simpl
-      ;  try solve [eapply is_postfix_plus_one with
-        (config:=trivial_driver_config) (lang:=L_rule);
-          [apply target_language_of_driver_is_postfix_cnd | | ]; simpl; trivial].
-    Qed.
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_rule dv))) (Dv_rule dv)).
+  Proof.
+    destruct dv; simpl; try reflexivity
+    ; rewrite target_language_of_driver_equation
+    ; simpl
+    ;  try solve [eapply is_postfix_plus_one with
+                  (config:=trivial_driver_config) (lang:=L_rule);
+                  [apply target_language_of_driver_is_postfix_cnd | | ]; simpl; trivial].
+  Qed.
 
-    Lemma target_language_of_driver_is_postfix_oql:
-      (forall o, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_oql o))) (Dv_oql o)).
-    Proof.
-      destruct o; simpl; try reflexivity
-      ; rewrite target_language_of_driver_equation
-      ; simpl.
-      eapply is_postfix_plus_one with
-        (config:=trivial_driver_config) (lang:=L_oql);
-          [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_oql:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_oql dv))) (Dv_oql dv)).
+  Proof.
+    destruct dv; simpl; try reflexivity
+    ; rewrite target_language_of_driver_equation
+    ; simpl.
+    eapply is_postfix_plus_one with
+    (config:=trivial_driver_config) (lang:=L_oql);
+      [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
+  Qed.
 
-    Lemma target_language_of_driver_is_postfix_lambda_nra:
-      (forall ln, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_lambda_nra ln))) (Dv_lambda_nra ln)).
-    Proof.
-      destruct ln; simpl; try reflexivity
-      ; rewrite target_language_of_driver_equation
-      ; simpl.
-      eapply is_postfix_plus_one with
-        (config:=trivial_driver_config) (lang:=L_lambda_nra);
-          [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
-    Qed.
+  Lemma target_language_of_driver_is_postfix_lambda_nra:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_lambda_nra dv))) (Dv_lambda_nra dv)).
+  Proof.
+    destruct dv; simpl; try reflexivity
+    ; rewrite target_language_of_driver_equation
+    ; simpl.
+    eapply is_postfix_plus_one with
+    (config:=trivial_driver_config) (lang:=L_lambda_nra);
+      [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
+  Qed.
 
   Lemma target_language_of_driver_is_postfix:
     forall dv,
@@ -1449,7 +1487,7 @@ Section CompDriver.
       let target := target_language_of_driver dv in
       is_postfix_driver (driver_of_language target) dv.
   Proof.
-        Hint Resolve
+    Hint Resolve
          target_language_of_driver_is_postfix_javascript
          target_language_of_driver_is_postfix_java
          target_language_of_driver_is_postfix_spark
@@ -1466,11 +1504,23 @@ Section CompDriver.
          target_language_of_driver_is_postfix_rule
          target_language_of_driver_is_postfix_oql
          target_language_of_driver_is_postfix_lambda_nra
-        : postfix_hints.
-        simpl.
-        destruct dv; auto with postfix_hints.
-        contradiction.
+    : postfix_hints.
+    simpl.
+    destruct dv; auto with postfix_hints.
+    contradiction.
   Qed.
+
+  Lemma push_translation_is_postfix:
+    forall config lang dv,
+      let dv' := push_translation config lang dv in
+      no_dv_error dv' ->
+      is_postfix_driver dv dv'.
+  Proof.
+    intros config lang dv.
+    simpl.
+    apply (is_postfix_plus_one dv dv config lang);
+      reflexivity.
+    Qed.
 
   Lemma driver_of_rev_path_app config dv rev_path1 rev_path2 :
     driver_of_rev_path config dv (rev_path1 ++ rev_path2) =
@@ -1482,24 +1532,53 @@ Section CompDriver.
 
   Lemma driver_of_rev_path_completeness:
     forall dv dv',
+    forall config,
+      is_driver_config config dv ->
       is_postfix_driver dv' dv ->
-      forall config,
-        is_driver_config config dv ->
         exists rev_path,
           driver_of_rev_path config dv' rev_path = dv.
   Proof.
-    intros dv dv'.
+    intros dv dv' config H_config.
     induction 1.
     - subst. exists nil; trivial.
     - intros.
-      destruct (IHis_postfix_driver config0).
-+        admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+      destruct (IHis_postfix_driver).
+      + rewrite <- H0 in *; clear H0.
+        apply (is_driver_config_trans config (push_translation config0 lang dv)); try assumption.
+        apply push_translation_is_postfix.
+        assumption.
       + exists (x++lang::nil).
         rewrite driver_of_rev_path_app.
-        rewrite H3.
+        rewrite H2.
+        rewrite <- H0 in *; clear H0.
         simpl.
-        eapply H2; eauto.
-  Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+        language_cases (destruct lang) Case;
+          simpl; try reflexivity;
+            destruct dv; simpl; try reflexivity;
+              simpl in H_config.
+        * destruct (H_config ((Dv_nnrc (Dv_nnrc_to_camp (List.map fst (comp_vdbindings config0)) c))));
+            reflexivity.
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) n)));
+            reflexivity.
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (comp_vdbindings config0) d)));
+            reflexivity.
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
+            try reflexivity.
+          rewrite H0; rewrite H3; reflexivity.
+        * destruct (H_config (Dv_nnrcmr (Dv_nnrcmr_to_cldmr (comp_brand_rel config0) c)));
+            reflexivity.
+        * destruct (H_config (Dv_nnrcmr (Dv_nnrcmr_to_spark (comp_qname config0) s)));
+            reflexivity.
+        * destruct (H_config (Dv_cldmr (Dv_cldmr_to_cloudant (comp_qname config0) (comp_brand_rel config0) c)));
+            try reflexivity.
+          rewrite H0; rewrite H3; reflexivity.
+        * destruct (H_config (Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (comp_input_type config0) d)));
+            reflexivity.
+        * destruct (H_config (Dv_dnnrc_typed_dataset
+                                (Dv_dnnrc_typed_dataset_to_spark2 (comp_input_type config0) (comp_qname config0) s)));
+            try reflexivity.
+          rewrite H0; rewrite H3; reflexivity.
+  Qed.
 
   Theorem driver_of_path_completeness:
     forall dv,
@@ -1514,7 +1593,7 @@ Section CompDriver.
     exists (target_language_of_driver dv).
     assert (is_postfix_driver (driver_of_language (target_language_of_driver dv)) dv) as Hpost;
       [ apply (target_language_of_driver_is_postfix dv H_no_dv_error) | ].
-    generalize (driver_of_rev_path_completeness dv ((driver_of_language (target_language_of_driver dv))) Hpost config H_dv_config).
+    generalize (driver_of_rev_path_completeness dv ((driver_of_language (target_language_of_driver dv))) config H_dv_config Hpost).
     intros H_exists.
     destruct H_exists.
     exists (List.rev x).
