@@ -160,4 +160,15 @@ let qcert_string_of_float f =
   | '.' -> ocaml_string ^ "0"
   | _ -> ocaml_string
 
+(**********************************)
+(* Timing function for CompStat   *)
+(**********************************)
+
+let time f x =
+  let start = Sys.time() in
+  let v = f x in
+  let stop = Sys.time() in
+  let t = string_of_float (stop -. start) in
+  (char_list_of_string t, v)
+
 

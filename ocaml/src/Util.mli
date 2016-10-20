@@ -62,3 +62,8 @@ val float_listmax : float list -> float
 
 val qcert_string_of_float : float -> string
 
+(**********************************)
+(* Timing function for CompStat   *)
+(**********************************)
+
+val time : ('a -> 'b) -> 'a -> char list * 'b
