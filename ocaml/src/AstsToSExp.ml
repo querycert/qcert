@@ -943,7 +943,14 @@ and sexp_to_sql_expr expr =
   | STerm ("divide",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "substr";expr1;SInt n1;SInt n2]) ->
-      QSQL.sql_expr_unary (Compiler.SSubstring (n1-1,Some (n1-1+n2))) (sexp_to_sql_expr expr1) (* It's 'substring (expr from n1 for n2)' i.e., from n1 for n2 characters, with initial index 1 *)
+     QSQL.sql_expr_unary (Compiler.SSubstring (n1-1,Some (n1-1+n2))) (sexp_to_sql_expr expr1) (* It's 'substring (expr from n1 for n2)' i.e., from n1 for n2 characters, with initial index 1 *)
+  | STerm ("cases",
+	   [STerm ("case", [STerm ("when", [condexpr])
+			  ; STerm ("then", [expr1])])
+	   ; STerm ("default", [expr2])]) ->
+     QSQL.sql_expr_case
+       (sexp_to_sql_cond condexpr)
+       (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("function",[SString "count"]) ->
       QSQL.sql_expr_agg_expr Compiler.SCount QSQL.sql_expr_star
   | STerm ("function",[SString "count";expr1]) ->

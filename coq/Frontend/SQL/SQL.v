@@ -128,6 +128,7 @@ Section SQL.
   | SExprStar : sql_expr
   | SExprUnary : sql_un_expr -> sql_expr -> sql_expr
   | SExprBinary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr
+  | SExprCase : sql_condition -> sql_expr -> sql_expr -> sql_expr
   | SExprAggExpr : sql_agg -> sql_expr -> sql_expr
   | SExprQuery : sql_query -> sql_expr (* relatively broad allowance for nesting... *)
   .
@@ -151,6 +152,8 @@ Section SQL.
     | SExprUnary _ expr1 =>
       is_singleton_sql_expr expr1
     | SExprBinary _ expr1 expr2 =>
+      is_singleton_sql_expr expr1 && is_singleton_sql_expr expr2
+    | SExprCase _ expr1 expr2 =>
       is_singleton_sql_expr expr1 && is_singleton_sql_expr expr2
     | SExprAggExpr _ _ => true
     | SExprQuery q => is_singleton_sql_query q
@@ -212,6 +215,28 @@ Section SQL.
                 (ANUnop (ARec out_cname) (ANUnop (ADot in_cname) (ANUnop (ADot in_tname) ANID)))
                 (create_renaming out_columns' in_columns')
       end.
+
+    Definition nraenv_if b expr1 expr2
+      :=
+        ANApp
+        (ANEither
+          (ANApp expr1 (ANUnop (ADot "id"%string) ANID))
+          (ANApp expr2 (ANUnop (ADot "id"%string) ANID)))
+        (ANEitherConcat  
+           (ANApp (ANEither (ANConst (dleft (drec nil))) (ANConst (dright (drec nil))))
+                  (ANUnop ASingleton (ANSelect ANID (ANUnop AColl b))))
+           ((ANUnop (ARec "id"%string) ANID))).
+
+(*
+    Example example_nraenv_if
+      := nraenv_if
+           (ANBinop AEq (ANConst (dnat 3)) (ANID))
+           (ANBinop (ABArith ArithPlus) (ANConst (dnat 10)) ANID)
+           (ANBinop (ABArith ArithPlus) (ANConst (dnat 20)) ANID).
+
+    Eval vm_compute in fun_of_algenv nil nil example_nraenv_if (drec nil) (dnat 3).
+    Eval vm_compute in fun_of_algenv nil nil example_nraenv_if (drec nil) (dnat 4).
+*)
     
     Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql) {struct q} : algenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
@@ -330,6 +355,11 @@ Section SQL.
         ANBinop (ABArith ArithDivide)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
+      | SExprCase cond expr1 expr2 =>
+        nraenv_if
+                 (sql_condition_to_nraenv acc cond)
+                 (sql_expr_to_nraenv create_table acc expr1)
+                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprAggExpr SSum expr1 =>
         ANUnop ASum (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
       | SExprAggExpr SAvg expr1 =>

@@ -69,6 +69,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_expr_star : sql_expr := SQL.SExprStar.
   Definition sql_expr_unary : sql_un_expr -> sql_expr -> sql_expr := SQL.SExprUnary.
   Definition sql_expr_binary : sql_bin_expr -> sql_expr -> sql_expr -> sql_expr := SQL.SExprBinary.
+  Definition sql_expr_case : sql_condition -> sql_expr -> sql_expr -> sql_expr := SQL.SExprCase.
   Definition sql_expr_agg_expr : sql_agg -> sql_expr -> sql_expr := SQL.SExprAggExpr.
   Definition sql_expr_query : sql_query -> sql_expr := SQL.SExprQuery.
 
