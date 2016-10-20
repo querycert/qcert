@@ -273,8 +273,8 @@ Section NNRCtoJavascript.
                        let lc := make_like_clause pat oescape in
                        let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in
                        regex ++ ".test(" ++ e1 ++ ")"
-                     | ALeft => "{" ++ quotel ++ "left" ++ quotel  ++ e1 ++ "}"
-                     | ARight => "{" ++ quotel ++ "right" ++ quotel  ++ e1 ++ "}"
+                     | ALeft => "{" ++ quotel ++ "left" ++ quotel ++ " : " ++ e1 ++ "}"
+                     | ARight => "{" ++ quotel ++ "right" ++ quotel ++ " : " ++ e1 ++ "}"
                      | ABrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
                      | AUnbrand => "unbrand(" ++ e1 ++ ")"
                      | ACast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
@@ -350,7 +350,7 @@ Section NNRCtoJavascript.
          | NRCEither nd xl nl xr nr =>
            let '(s1, e1, t2) := nrcToJS nd t i eol quotel ivs in
            let '(s2, e2, t0) := nrcToJS nl t2 (i+1) eol quotel ivs in
-           let '(s3, e3, t1) := nrcToJS nr t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t1) := nrcToJS nr t0 (i+1) eol quotel ivs in
            let vl := "v" ++ xl in
            let vr := "v" ++ xr in
            let res := "res" ++ (nat_to_string10 t1) in  (* Stores the result from either left or right evaluation so it can be returned *)
@@ -366,7 +366,7 @@ Section NNRCtoJavascript.
                ++ s3
                ++ (indent (i+1)) ++ res ++ " = " ++ e3 ++ ";" ++ eol
                ++ (indent i) ++ "}" ++ eol,
-            res, t0)
+            res, t1 + 1)
        end.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSunshadow *)

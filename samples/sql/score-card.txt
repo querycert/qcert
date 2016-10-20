@@ -15,3 +15,13 @@ Not tested yet:
 
   q5, q7, q9, q10, q21
 
+Numbers: Rev 3. Compilation/Optimization timing on those queries. TPC-DS.
+
+Jerome: Lock on whole Paper and try and send revision today/tomorrow.
+Avi: case support. 
+Josh: long list of things! :)
+ q15 (view definition) ;
+ 'type inferrence' in AST ;
+ TPC-DS;
+ try on real DB.
+Louis: lead on compilation/optimization numbers/timing. query size.
