@@ -1923,6 +1923,7 @@ Section CompDriver.
           :: L_nraenv
           :: L_nraenv
           :: L_nra
+          :: L_nra
           :: nil
       | L_oql, L_nnrc =>
         L_oql
@@ -2038,6 +2039,7 @@ Section CompDriver.
           :: L_nraenv
           :: L_nraenv
           :: L_nra
+          :: L_nra
           :: nil
       | L_sql, L_nnrc =>
         L_sql
@@ -2152,6 +2154,7 @@ Section CompDriver.
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
+          :: L_nra
           :: L_nra
           :: nil
       | L_lambda_nra, L_nnrc =>
