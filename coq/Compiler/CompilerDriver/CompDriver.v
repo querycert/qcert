@@ -2682,7 +2682,7 @@ Section CompDriver.
         L_error err :: nil
       end.
 
-    Property get_path_from_source_target_correct:
+    Proposition get_path_from_source_target_correct:
       forall source target,
         forall config,
           match get_path_from_source_target source target with
@@ -2728,7 +2728,7 @@ Section CompDriver.
       destruct source; simpl; trivial.
     Qed.
 
-    Property exists_path_from_source_target_trans
+    Lemma exists_path_from_source_target_trans
              source middle target:
       exists_path_from_source_target source middle ->
       exists_path_from_source_target middle target ->
@@ -2919,7 +2919,7 @@ Section CompDriver.
 
     Hint Resolve exists_path_from_source_target_completeness_lambda_nra : exists_path_hints.
 
-    Property exists_path_from_source_target_completeness:
+    Proposition get_path_from_source_target_completeness:
       forall dv,
         no_dv_error dv ->
         let source := language_of_driver dv in
