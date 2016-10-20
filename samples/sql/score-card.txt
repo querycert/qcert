@@ -1,13 +1,14 @@
 Queries supported 'as is':
+  q11, q16, q17, q22
 
-  q11, q22
+Queries supported after 'adjustment':
+  q4 (q104), q6 (q106), q11 (q111), 
 
 Do not parse: q1 ("(3)" on date condition), q15 (view definition)
 
 Do not get imported in Coq: 
   Support for 'left outer join': q13
   Support for 'cases': q12, q14
-  Support for 'extract' (i.e., access date component): q7, q8, q9
 
 Parse: q101, q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21, q22
 Parse and compile: q2, q3, q4, q5, q6, q10, q11, q16, q17, q18, q19, q20, q21, q22
@@ -29,12 +30,6 @@ Usage notes:
   Use substring: q22
 
 ----
-Missing support proposals:
-
-  Do not parse: q1 ("(3)" on date condition)
-
-    Proposal: Remove "(3)" and pretend it's ok? (I couldn't find the semantics)
-
   Do not parse: q15 (view definition)
     Proposal: Small rewrite, which I believe to be equivalent and might(?) parse:
 

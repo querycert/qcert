@@ -1029,6 +1029,13 @@ and sexp_to_sql_cond cond =
   | STerm ("function",[SString "date_ge";expr1;expr2]) ->
       QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_ge)))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_between";expr1;expr2;expr3]) ->
+      let sql_expr1 = (sexp_to_sql_expr expr1) in
+      let sql_expr2 = (sexp_to_sql_expr expr2) in
+      let sql_expr3 = (sexp_to_sql_expr expr3) in
+      QSQL.sql_cond_and
+	(QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le))) sql_expr2 sql_expr1)
+	(QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le))) sql_expr1 sql_expr3)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
   | _ ->
