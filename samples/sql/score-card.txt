@@ -1,11 +1,17 @@
+Tests on small-tables (tables pruned & fixed for queries to not return empty)
+
 Queries supported 'as is':
-  q11, q16, q17, q19, q22
+  q2, q11, q16, q17, q18, q19, q20, q22
 
 Queries supported after 'adjustment':
-  q1 (q101), q4 (q104), q6 (q106)
+  q1 (q101), q3 (q103), q4 (q104), q6 (q106)
 
 Not supported:
   q15 (view definition)
   q13 (left outer join)
-  q12, q14 (cases)
+  q8, q12, q14 (cases)
+
+Not tested yet:
+
+  q5, q7, q9, q10, q21
 

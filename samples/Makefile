@@ -78,6 +78,7 @@ run_java_%: oql/%.class
 
 SQLEXPERIMENT=/Users/js/git/summerCAMP/sql-experiment
 SQLTABLES=$(SQLEXPERIMENT)/small-tables/tpch_json.io
+SQLQUERIES=q2 q11 q16 q17 q19 q22 q101 q103 q104 q106
 
 ../runtime/javascript/qcert-merged-runtime.js: ../runtime/javascript/qcert-runtime.js ../runtime/javascript/sqlDates.js
 	@echo "Creating full SQL JavaScript runtime"
@@ -99,6 +100,13 @@ sqlall_%: ../runtime/javascript/qcert-merged-runtime.js
 	@echo "Compiling SQL:" $(subst sqlall_,,$@)
 	$(QCERTCOMP) -emit-all -source sql -target js sql/$(subst sqlall_,,$@).s-sql
 	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input $(SQLTABLES) -runtime ../runtime/javascript/qcert-merged-runtime.js sql/$(subst sqlall_,,$@).js 
+
+sqlstat_%:
+	@echo "Parsing SQL: " $(subst sqlstat_,,$@)
+	$(MAKE) -C $(SQLEXPERIMENT) $(subst sqlstat_,sql_,$@)
+	@cp $(SQLEXPERIMENT)/sexp/$(subst sqlstat_,,$@).s-sql sql
+	@echo "Generating SQL Stats:" $(subst sqlstat_,,$@)
+	$(QCERTCOMP) -stat-tree -source sql -target js sql/$(subst sqlstat_,,$@).s-sql
 
 clean:
 	@rm -rf bin/*

@@ -1,3 +1,4 @@
 *.java
 *.class
 *.js
+*_stats.json
