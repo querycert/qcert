@@ -4,10 +4,9 @@ Queries supported 'as is':
   q2, q11, q16, q17, q18, q19, q20, q22
 
 Queries supported after 'adjustment':
-  q1 (q101), q3 (q103), q4 (q104), q6 (q106)
+  q1 (q101), q3 (q103), q4 (q104), q6 (q106), q15 (q115b)
 
 Not supported:
-  q15 (view definition)
   q13 (left outer join)
 
 Not tested yet:
@@ -17,7 +16,7 @@ Not tested yet:
 Numbers: Rev 3. Compilation/Optimization timing on those queries. TPC-DS.
 
 Jerome: Lock on whole Paper and try and send revision today/tomorrow.
-Avi: case support. 
+Avi: working on pushing selection through product
 Josh: long list of things! :)
  q15 (view definition) ;
  'type inferrence' in AST ;
