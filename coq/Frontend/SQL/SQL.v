@@ -482,7 +482,10 @@ Section SQL.
 
   (* If there is no select statement, we default to dunit *)
   Definition sql_to_nraenv (q:sql) : algenv
-    := ANApp (sql_statements_to_nraenv nil q) (ANConst dunit).
+    :=
+      ANAppEnv
+        (ANApp (sql_statements_to_nraenv nil q) (ANConst dunit))
+        (ANConst (drec nil)).
 
   End Translation.
 
