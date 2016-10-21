@@ -54,6 +54,28 @@ function distinct(b) {
     }
     return result;
 }
+function fastdistinct(b) {
+    b1 = b.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
+    b1.sort(compare);
+    var result = [ ];
+    var v1 = null;
+    var v2 = null;
+    for (var i=0; i<b1.length; i++) {
+        var v1 = b1[i];
+	if (i == (b1.length -1)) {
+	    result.push(v1);
+	}
+	else {
+	    v2 = b1[i+1];
+	    if (equal(v1,v2)) {
+	    } else {
+		result.push(v1);
+	    }
+	    v1 = v2;
+	}
+    }
+    return result;
+}
 function compare(v1, v2) {
     var t1 = typeof v1, t2 = typeof v2;
     if (t1 != t2)

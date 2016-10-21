@@ -130,13 +130,18 @@ Section RAlgEnvExt.
            (ANUnop AColl (ANUnop (ARec "4") (map_to_rec "3" op)))
            (map_to_rec "2" (map_to_rec "1" (ANUnop ADistinct (project sl op))))).
 
+    Definition group_full_with_env (g:string) (sl:list string) (op : algenv) : algenv :=
+      let op_result := ANUnop (ADot "$pregroup") ANEnv in
+      let group_over_op_result := group_full g sl op_result in
+      ANAppEnv group_over_op_result (ANBinop AConcat ANEnv (ANUnop (ARec "$pregroup") op)).
+
   (* Unnest *)
 
-  Definition unnest_one (s:string) (op:algenv) : algenv :=
-    ANMap ((ANUnop (ARecRemove s)) ANID) (ANMapConcat ((ANUnop (ADot s)) ANID) op).
+    Definition unnest_one (s:string) (op:algenv) : algenv :=
+      ANMap ((ANUnop (ARecRemove s)) ANID) (ANMapConcat ((ANUnop (ADot s)) ANID) op).
 
-  Definition unnest_two (s1 s2:string) (op:algenv) : algenv :=
-    ANMap ((ANUnop (ARecRemove s1)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec s2)) ANID) ((ANUnop (ADot s1)) ANID)) op).
+    Definition unnest_two (s1 s2:string) (op:algenv) : algenv :=
+      ANMap ((ANUnop (ARecRemove s1)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec s2)) ANID) ((ANUnop (ADot s1)) ANID)) op).
 
 
   (* NRAEnv for Optim *)

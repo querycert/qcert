@@ -9,11 +9,10 @@ Queries supported after 'adjustment':
 Not supported:
   q15 (view definition)
   q13 (left outer join)
-  q8, q12, q14 (cases)
 
 Not tested yet:
-
   q5, q7, q9, q10, q21
+  q8, q12, q14 (cases)
 
 Numbers: Rev 3. Compilation/Optimization timing on those queries. TPC-DS.
 
