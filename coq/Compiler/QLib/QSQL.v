@@ -23,8 +23,8 @@ Module QSQL(runtime:CompilerRuntime).
   Module QData := QData.QData runtime.
   Module QOps := QOperators.QOperators runtime.
 
-  Definition expr : Set := SQL.sql_expr.
-  Definition t : Set := expr.
+  Definition sql : Set := SQL.sql.
+  Definition t : Set := sql.
   Definition column : Set := String.string.
   Definition table : Set := String.string.
 
@@ -34,13 +34,14 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_bin_expr : Set := SQL.sql_bin_expr.
   Definition sql_agg : Set := SQL.sql_agg.
 
+  Definition sql_statement : Set := SQL.sql_statement.
   Definition sql_query : Set := SQL.sql_query.
   Definition sql_select : Set := SQL.sql_select.
   Definition sql_from : Set := SQL.sql_from.
   Definition sql_condition : Set := SQL.sql_condition.
   Definition sql_expr : Set := SQL.sql_expr.
 
-  Definition sql_sql := SQL.SQuery.
+  Definition sql_sql_query := SQL.SQuery.
   Definition sql_select_column : column -> sql_select := SQL.SSelectColumn.
   Definition sql_select_column_deref : table -> column -> sql_select := SQL.SSelectColumnDeref.
   Definition sql_select_expr : column -> sql_expr -> sql_select := SQL.SSelectExpr.
@@ -72,6 +73,13 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_expr_case : sql_condition -> sql_expr -> sql_expr -> sql_expr := SQL.SExprCase.
   Definition sql_expr_agg_expr : sql_agg -> sql_expr -> sql_expr := SQL.SExprAggExpr.
   Definition sql_expr_query : sql_query -> sql_expr := SQL.SExprQuery.
+
+  Definition sql_run_query : sql_query -> sql_statement
+    := SQL.SRunQuery.
+  Definition sql_create_view : String.string -> sql_query -> sql_statement
+    := SQL.SCreateView.
+  Definition sql_drop_view : String.string -> sql_statement
+    := SQL.SDropView.
 
 End QSQL.
 

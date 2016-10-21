@@ -133,11 +133,18 @@ Section SQL.
   | SExprQuery : sql_query -> sql_expr (* relatively broad allowance for nesting... *)
   .
 
-  Definition sql : Set := sql_query. (* Let's finally give our languages a proper name! *)
+  Inductive sql_statement : Set :=
+  | SRunQuery : sql_query -> sql_statement
+  | SCreateView : string -> sql_query -> sql_statement
+  | SDropView : string -> sql_statement
+  .
+
+  (* Let's finally give our languages a proper name! *)
+  Definition sql : Set := list sql_statement.
 
   (* Note: Has to be reviewed carefully -- The semantics differs
      widely for the 'singleton' vs 'non-singleton' case *)
-  Fixpoint is_singleton_sql_query (q:sql) : bool :=
+  Fixpoint is_singleton_sql_query (q:sql_query) : bool :=
     match q with
     | SQuery (SSelectExpr _ expr :: nil) _ _ None None =>
       is_singleton_sql_expr expr
@@ -163,7 +170,7 @@ Section SQL.
      checking that the result is a single column (used in 'in'
      predicate for unboxing) *)
   
-  Fixpoint is_value_sequence_sql_query (q:sql) : bool :=
+  Fixpoint is_value_sequence_sql_query (q:sql_query) : bool :=
     match q with
     | SQuery (SSelectExpr _ expr :: nil) _ _ _ _ =>
       if (is_singleton_sql_expr expr) then false else true
@@ -195,7 +202,7 @@ Section SQL.
     Definition columns_of_selects (selects:list sql_select) : list (option string * string) :=
       map column_of_select selects.
     
-    Definition columns_of_query (q:sql) : list (option string * string) :=
+    Definition columns_of_query (q:sql_query) : list (option string * string) :=
       match q with
       | SQuery selects _ _ _ _ =>
         columns_of_selects selects
@@ -237,8 +244,16 @@ Section SQL.
     Eval vm_compute in fun_of_algenv nil nil example_nraenv_if (drec nil) (dnat 3).
     Eval vm_compute in fun_of_algenv nil nil example_nraenv_if (drec nil) (dnat 4).
 *)
-    
-    Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql) {struct q} : algenv :=
+
+    Section queryvar.
+      Context (view_list:list string).
+
+      Definition lookup_table (table_name:string) : algenv
+        := if in_dec string_eqdec table_name view_list
+           then ANUnop (ADot table_name) ANEnv
+           else ANGetConstant table_name.
+                 
+    Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql_query) {struct q} : algenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
       | SQuery selects froms opt_where opt_group opt_order =>
@@ -293,9 +308,9 @@ Section SQL.
       end
     with sql_from_to_nraenv (acc:algenv) (from:sql_from) {struct from} :=
       match from with
-      | (SFromTable tname) => ANProduct (ANGetConstant tname) acc
+      | (SFromTable tname) => ANProduct (lookup_table tname) acc
       | (SFromTableAlias new_name tname) =>
-        ANProduct (ANMap (ANUnop (ARec new_name) ANID) (ANGetConstant tname)) acc
+        ANProduct (ANMap (ANUnop (ARec new_name) ANID) (lookup_table tname)) acc
       | SFromQuery tspec q =>
         let (tname,opt_columns) := tspec in
         match opt_columns with
@@ -436,9 +451,39 @@ Section SQL.
                          (sql_expr_to_nraenv true acc expr3))
       end.
 
-    Definition sql_to_nraenv (q:sql) : algenv :=
+    Definition sql_query_to_nraenv_top (q:sql_query) : algenv :=
       ANApp (sql_query_to_nraenv true q) (ANConst (drec nil)). (* XXX Always initialize ID to an empty record XXX *)
-    
+
+    End queryvar.
+
+    (* we currently keep only the value of the last select statement *)
+    (* the input environment is assumed to be a record with fields "view_list" *)
+    Fixpoint sql_statements_to_nraenv
+               (view_list:list string) (q:sql) : algenv
+      := match q with
+         | nil => ANID
+         | (SRunQuery q)::rest =>
+           ANApp
+             (sql_statements_to_nraenv view_list rest)
+             (sql_query_to_nraenv_top view_list q)
+         | (SCreateView s q)::rest =>
+            ANAppEnv 
+              (sql_statements_to_nraenv (s::view_list) rest)
+              (ANBinop AConcat
+                      ANEnv
+                      (ANUnop (ARec s)
+                              (sql_query_to_nraenv_top view_list q)))
+         | (SDropView s)::rest =>
+           ANAppEnv
+             (sql_statements_to_nraenv (remove_all s view_list) rest)
+             (ANUnop (ARecRemove s) ANEnv)
+         end
+    .
+
+  (* If there is no select statement, we default to dunit *)
+  Definition sql_to_nraenv (q:sql) : algenv
+    := ANApp (sql_statements_to_nraenv nil q) (ANConst dunit).
+
   End Translation.
 
   Section SQLEval.

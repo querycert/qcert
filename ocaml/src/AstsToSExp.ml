@@ -810,11 +810,11 @@ sexp_to_cld_mr_chain chain;
 
 (* NRA Section *)
 
-let rec sexp_to_sql_query (se : sexp) : QLang.sql =
+let rec sexp_to_sql_query (se : sexp) =
   begin match se with
   | STerm ("query", (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses) ->
       let (where,group_by,order_by) = sexp_to_other_clauses other_clauses in
-      QSQL.sql_sql
+      QSQL.sql_sql_query
 	(sexp_to_sql_selects selects)
 	(sexp_to_sql_froms froms)
 	where group_by order_by
@@ -1050,7 +1050,7 @@ and sexp_to_sql_cond cond =
   end
 
 let sexp_to_sql (se : sexp) : QLang.sql =
-  sexp_to_sql_query se
+  [QSQL.sql_run_query (sexp_to_sql_query se)]
     
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =

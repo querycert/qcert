@@ -17,6 +17,7 @@
 (* Notations *)
 
 Require Import List.
+Import ListNotations.
 Require Import Utils BasicRuntime.
 
 Delimit Scope data_scope with data.
@@ -136,17 +137,23 @@ Section SQLTest.
    * Queries *
    ***********)
 
+  Definition sql_just_query_to_nraenv (q:sql_query)
+    := sql_to_nraenv (SRunQuery q::nil).
+
+    Definition sql_just_query_eval (q:sql_query)
+    := sql_eval (SRunQuery q::nil).
+
   (* sql1:
        select name
        from persons *)
   Definition sql1 :=
     SQuery (SSelectColumn "name"::nil) (SFromTable "persons"::nil) None None None.
   Definition nraenv1 :=
-    sql_to_nraenv sql1.
+    sql_just_query_to_nraenv sql1.
 
   (* Eval vm_compute in nraenv1. *)
   (* Eval vm_compute in (nraenv_eval nraenv1 tables). *)
-  (* Eval vm_compute in (sql_eval sql1 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql1 tables). *)
 
   (* sql2:
        select name,
@@ -157,7 +164,7 @@ Section SQLTest.
     SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
            (SFromTable "persons"::nil) None None (Some (("age",Ascending)::nil)).
 
-  (* Eval vm_compute in (sql_eval sql2 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql2 tables). *)
 
   (* sql3:
        select name
@@ -167,7 +174,7 @@ Section SQLTest.
     SQuery (SSelectColumn "name"::nil)
            (SFromTable "persons"::nil) None None (Some (("age",Ascending)::nil)).
 
-  (* Eval vm_compute in (sql_eval sql3 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql3 tables). *)
 
   (* sql4:
        select name
@@ -181,17 +188,17 @@ Section SQLTest.
                               (SExprConst (dstring "IBM"))))
            None (Some (("age",Ascending)::nil)).
 
-  (* Eval vm_compute in (sql_eval sql4 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql4 tables). *)
 
   (* sql5:
        select sum(age)
        from persons *)
   Definition sql5 :=
-    SQuery (SSelectExpr ""
+    [SRunQuery (SQuery (SSelectExpr ""
                         (SExprAggExpr SSum (SExprColumn "age"))::nil)
-           (SFromTable "persons"::nil) None None None.
+           (SFromTable "persons"::nil) None None None)].
 
-  (* Eval vm_compute in (sql_eval sql5 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql5 tables). *)
 
   (* sql6:
        select count( * )
@@ -201,7 +208,7 @@ Section SQLTest.
                         (SExprAggExpr SCount SExprStar)::nil)
            (SFromTable "persons"::nil) None None None.
 
-  (* Eval vm_compute in (sql_eval sql6 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql6 tables). *)
 
   (* sql7:
        select count( * )
@@ -216,7 +223,7 @@ Section SQLTest.
                         (SExprAggExpr SCount SExprStar)::nil)
            (SFromQuery ("IBMers",None) sql4 :: nil) None None None.
 
-  (* Eval vm_compute in (sql_eval sql7 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql7 tables). *)
 
   (* sql8:
        select *
@@ -226,7 +233,7 @@ Section SQLTest.
     SQuery (SSelectExpr "res" SExprStar::nil)
            (SFromTable "persons"::nil) None (Some (("age"::nil),None)) None.
 
-  (* Eval vm_compute in (sql_eval sql8 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql8 tables). *)
 
   (* sql9:
        select age, count( * ) as nb
@@ -237,7 +244,7 @@ Section SQLTest.
                           (SExprAggExpr SCount SExprStar)::nil)
            (SFromTable "persons"::nil) None (Some (("age"::nil),None)) None.
 
-  (* Eval vm_compute in (sql_eval sql9 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql9 tables). *)
 
   (* sql10:
        select age, count( * ) as nb
@@ -250,7 +257,7 @@ Section SQLTest.
            (SFromTable "persons"::nil) None
            (Some (("age"::nil),None)) (Some (("age",Ascending)::nil)).
 
-  (* Eval vm_compute in (sql_eval sql10 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql10 tables). *)
 
   (* sql11:
        select age, count( * ) as nb
@@ -268,7 +275,7 @@ Section SQLTest.
                                          (SExprConst (dnat 1)))))
            (Some (("age",Ascending)::nil)).
 
-  (* Eval vm_compute in (sql_eval sql11 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql11 tables). *)
 
   (* sql12:
        select age, company, count( * ) as nb
@@ -283,7 +290,7 @@ Section SQLTest.
            None
            (Some (("age"::"company"::nil),None)) None.
 
-  (* Eval vm_compute in (sql_eval sql12 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql12 tables). *)
 
   (* sql13:
        select name
@@ -297,7 +304,7 @@ Section SQLTest.
                               (SExprConst (dstring "IBM"))))
            None (Some (("age",Ascending)::nil)).
 
-  (* Eval vm_compute in (sql_eval sql13 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql13 tables). *)
 
   (* sql14:
          select nom
@@ -312,7 +319,7 @@ Section SQLTest.
            (SFromQuery ("IBMers",Some ("nom"::"age"::nil)) sql13 :: nil)
            None None None.
 
-  (* Eval vm_compute in (sql_eval sql14 tables).  *)
+  (* Eval vm_compute in (sql_just_query_eval  sql14 tables).  *)
 
   (* sql15:
        select cname, stock, count( * ) as nb_employees
@@ -333,7 +340,7 @@ Section SQLTest.
                                     (SExprConst (dnat 50)))))
            (Some (("stock"%string,Ascending)::nil)).                               (* Order By Clause *)
 
-  (* Eval vm_compute in (sql_eval sql15 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql15 tables). *)
   (* Size of the plan: *)
   (* Eval vm_compute in (sql_size sql15).*)
 
@@ -362,7 +369,7 @@ Section SQLTest.
            None
            None.
 
-  (* Eval vm_compute in (sql_eval sql16 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql16 tables). *)
 
   (* sql17:
        select p1.age,
@@ -391,7 +398,7 @@ Section SQLTest.
            None
            None.
 
-  (* Eval vm_compute in (sql_eval sql17 tables). *)
+  (* Eval vm_compute in (sql_just_query_eval  sql17 tables). *)
 
 End SQLTest.
 
