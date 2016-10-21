@@ -1049,8 +1049,23 @@ and sexp_to_sql_cond cond =
       raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
   end
 
+let sexp_to_sql_statement (stmt : sexp)  =
+  begin match stmt with
+  | STerm ("query",_) -> QSQL.sql_run_query (sexp_to_sql_query stmt)
+  | STerm ("createView", [SString name; query]) ->
+     QSQL.sql_create_view (Util.char_list_of_string name) (sexp_to_sql_query query)
+  | STerm ("dropView",[SString name]) -> QSQL.sql_drop_view (Util.char_list_of_string name)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL statements: " ^ sterm))
+  | _ ->
+     raise (Qcert_Error "Not well-formed S-expr inside SQL statements")
+  end
+
 let sexp_to_sql (se : sexp) : QLang.sql =
-  [QSQL.sql_run_query (sexp_to_sql_query se)]
+  begin match se with
+  | STerm ("statements",stmts) ->
+     map sexp_to_sql_statement stmts
+  end
     
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
