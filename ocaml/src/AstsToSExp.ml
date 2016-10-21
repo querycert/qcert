@@ -1056,15 +1056,17 @@ let sexp_to_sql_statement (stmt : sexp)  =
      QSQL.sql_create_view (Util.char_list_of_string name) (sexp_to_sql_query query)
   | STerm ("dropView",[SString name]) -> QSQL.sql_drop_view (Util.char_list_of_string name)
   | STerm (sterm, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside SQL statements: " ^ sterm))
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL statement: " ^ sterm))
   | _ ->
-     raise (Qcert_Error "Not well-formed S-expr inside SQL statements")
+     raise (Qcert_Error "Not well-formed S-expr inside SQL statement")
   end
 
 let sexp_to_sql (se : sexp) : QLang.sql =
   begin match se with
   | STerm ("statements",stmts) ->
      map sexp_to_sql_statement stmts
+  | _ ->
+     raise (Qcert_Error "Not well-formed S-expr in top SQL statements")
   end
     
 (* Query translations *)
