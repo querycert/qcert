@@ -1,1 +1,1 @@
-(query (select (ref "p_partkey" ) (ref "p_type" ) ) (from (table "part" ) ) (where (and (equal (ref "p_size" ) 15 ) (like (ref "p_type" ) "%TIN" ) ) ) ) 
+(statements (query (select (ref "p_partkey" ) (ref "p_type" ) ) (from (table "part" ) ) (where (and (equal (ref "p_size" ) 15 ) (like (ref "p_type" ) "%TIN" ) ) ) ) )
