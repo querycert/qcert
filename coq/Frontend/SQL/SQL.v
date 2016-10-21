@@ -498,9 +498,85 @@ Section SQL.
   End SQLEval.
 
   Section SQLSize.
-    (* For now: SQL size is size of query plan *)
-    Require Import RAlgEnvSize.
-    Definition sql_size (q:sql) := algenv_size (sql_to_nraenv q).
+
+    Fixpoint sql_query_size (q:sql_query) := (* XXX To check XXX *)
+      match q with
+      | SQuery selects froms opt_where opt_group opt_order =>
+        List.fold_left (fun acc select => acc + sql_select_size select) selects 0
+        + List.fold_left (fun acc from => acc + sql_from_size from) froms 0
+        + match opt_where with
+          | None => 0
+          | Some cond => sql_condition_size cond
+          end
+        + match opt_group with
+          | None => 0
+          | Some (_, Some cond) => sql_condition_size cond
+          | Some (_, _) => 1
+          end
+        + match opt_order with
+          | None => 0
+          | Some cond => 1
+          end
+      end
+
+    with sql_select_size (select: sql_select) :=
+      match select with
+      | SSelectColumn _ => 1
+      | SSelectColumnDeref _ _ => 1
+      | SSelectStar => 1
+      | SSelectExpr _ e => sql_expr_size e
+      end
+
+    with sql_from_size (from: sql_from) :=
+      match from with
+      | SFromTable _ => 1
+      | SFromTableAlias _ _ => 1
+      | SFromQuery _ q => sql_query_size q
+      end
+
+    with sql_condition_size (cond: sql_condition) :=
+      match cond with
+      | SCondAnd c1 c2
+      | SCondOr c1 c2 =>
+        1 + sql_condition_size c1 + sql_condition_size c2
+      | SCondNot c =>
+        1 + sql_condition_size c
+      | SCondBinary _ e1 e2 =>
+        1 + sql_expr_size e1 + sql_expr_size e2
+      | SCondExists q =>
+        1 + sql_query_size q
+      | SCondIn e1 e2 =>
+        1 + sql_expr_size e1 + sql_expr_size e2
+      | SCondLike e _ =>
+        1 + sql_expr_size e
+      | SCondBetween e1 e2 e3 =>
+        1 + sql_expr_size e1 + sql_expr_size e2 + sql_expr_size e3
+      end
+
+    with sql_expr_size (expr: sql_expr) :=
+      match expr with
+      | SExprConst _ => 1
+      | SExprColumn _ => 1
+      | SExprColumnDeref _ _ => 1
+      | SExprStar => 1
+      | SExprUnary _ e => 1 + sql_expr_size e
+      | SExprBinary _ e1 e2 => 1 + sql_expr_size e1 + sql_expr_size e2
+      | SExprCase c e1 e2 =>
+        1 + sql_condition_size c + sql_expr_size e1 + sql_expr_size e2
+      | SExprAggExpr _ e => 1 + sql_expr_size e
+      | SExprQuery q => 1 + sql_query_size q
+      end.
+
+    Definition sql_statement_size (st:sql_statement) :=
+      match st with
+      | SRunQuery q => sql_query_size q
+      | SCreateView _ q => sql_query_size q
+      | SDropView _ => 1
+      end.
+
+    Definition sql_size (q:sql) :=
+      List.fold_left (fun acc st => acc + sql_statement_size st) q 0.
+
   End SQLSize.
   
 End SQL.
