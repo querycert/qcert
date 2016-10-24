@@ -891,6 +891,8 @@ and sexp_to_sql_order_by rest =
   | [] -> None
   | STerm ("orderBy",orders) :: [] ->
       Some (sexp_to_sql_orders orders)
+  | STerm ("orderBy",orders) :: STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL other clauses (after orderBy): " ^ sterm))
   | STerm (sterm, _) :: _ ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL other clauses: " ^ sterm))
   | _ ->
