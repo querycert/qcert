@@ -2,3 +2,4 @@
 *.class
 *.js
 *_stats.json
+tpcds*
