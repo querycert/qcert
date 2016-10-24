@@ -818,6 +818,8 @@ let rec sexp_to_sql_query (se : sexp) =
 	(sexp_to_sql_selects selects)
 	(sexp_to_sql_froms froms)
 	where group_by order_by
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL query: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL query")
   end
@@ -914,6 +916,10 @@ and sexp_to_sql_orders orders =
       (sstring_to_coq_string cname, Compiler.Ascending) :: sexp_to_sql_orders orders'
   | (STerm ("descending",[(STerm ("ref",[cname]))])) :: orders' ->
       (sstring_to_coq_string cname, Compiler.Descending) :: sexp_to_sql_orders orders'
+  | (STerm ("ascending",STerm (sterm,_)::_)) :: orders' ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL ascending order: " ^ sterm))
+  | (STerm ("descending",STerm (sterm,_)::_)) :: orders' ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL descending order: " ^ sterm))
   | STerm (sterm, _) :: _ ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL orders: " ^ sterm))
   | _ ->
