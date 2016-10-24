@@ -856,6 +856,8 @@ and sexp_to_sql_froms froms =
       [QSQL.sql_from_query (sstring_to_coq_string tname, None) (sexp_to_sql_query query)]
   | STerm ("join", [from1;from2]) ->
       (sexp_to_sql_froms from1) @ (sexp_to_sql_froms from2)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL froms: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL froms")
   end
@@ -889,6 +891,8 @@ and sexp_to_sql_order_by rest =
   | [] -> None
   | STerm ("orderBy",orders) :: [] ->
       Some (sexp_to_sql_orders orders)
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL other clauses: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL other clauses")
   end
@@ -896,6 +900,8 @@ and sexp_to_sql_groups groups =
   begin match groups with
   | [] -> []
   | (STerm ("ref",[cname])) :: groups' -> (sstring_to_coq_string cname) :: sexp_to_sql_groups groups'
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL groups: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL groups")
   end
