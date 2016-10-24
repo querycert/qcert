@@ -914,9 +914,12 @@ and sexp_to_sql_orders orders =
       (sstring_to_coq_string cname, Compiler.Ascending) :: sexp_to_sql_orders orders'
   | (STerm ("descending",[(STerm ("ref",[cname]))])) :: orders' ->
       (sstring_to_coq_string cname, Compiler.Descending) :: sexp_to_sql_orders orders'
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL orders: " ^ sterm))
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside SQL groups")
+      raise (Qcert_Error "Not well-formed S-expr inside SQL orders")
   end
+    
 and sexp_to_sql_expr expr =
   begin match expr with
   | SString s ->
