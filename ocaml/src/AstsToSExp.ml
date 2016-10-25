@@ -1091,12 +1091,16 @@ and sexp_to_sql_cond cond =
       raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
   end
 
-let sexp_to_sql_statement (stmt : sexp)  =
+let rec sexp_to_sql_statement (stmt : sexp)  =
   begin match stmt with
-  | STerm ("query",_) -> QSQL.sql_run_query (sexp_to_sql_query stmt)
+  (* Bypass for 'with' at the beginning of the query -- treated as a view *)
+  | STerm ("query",((STerm ("with",[STerm ("as",[SString tname]);view_query]))::rest)) ->
+      let rest_stmt = sexp_to_sql_statement (STerm ("query",rest)) in
+      (QSQL.sql_create_view (Util.char_list_of_string tname) (sexp_to_sql_query view_query))::rest_stmt
+  | STerm ("query",_) -> [QSQL.sql_run_query (sexp_to_sql_query stmt)]
   | STerm ("createView", [SString name; query]) ->
-     QSQL.sql_create_view (Util.char_list_of_string name) (sexp_to_sql_query query)
-  | STerm ("dropView",[SString name]) -> QSQL.sql_drop_view (Util.char_list_of_string name)
+     [QSQL.sql_create_view (Util.char_list_of_string name) (sexp_to_sql_query query)]
+  | STerm ("dropView",[SString name]) -> [QSQL.sql_drop_view (Util.char_list_of_string name)]
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL statement: " ^ sterm))
   | _ ->
@@ -1106,7 +1110,7 @@ let sexp_to_sql_statement (stmt : sexp)  =
 let sexp_to_sql (se : sexp) : QLang.sql =
   begin match se with
   | STerm ("statements",stmts) ->
-     map sexp_to_sql_statement stmts
+     List.concat (map sexp_to_sql_statement stmts)
   | _ ->
      raise (Qcert_Error "Not well-formed S-expr in top SQL statements")
   end
