@@ -89,10 +89,11 @@ Section SQL.
   | SEq | SLe | SLt | SGe | SGt | SDiff
   | SBinaryForeignCond (fb : foreign_binary_op_type) : sql_bin_cond.
   Inductive sql_un_expr : Set :=
+  | SMinus : sql_un_expr
   | SSubstring : Z -> option Z -> sql_un_expr
   | SUnaryForeignExpr (fu:foreign_unary_op_type) : sql_un_expr.
   Inductive sql_bin_expr : Set :=
-  | SPlus | SMinus | SMult | SDivide
+  | SPlus | SSubtract | SMult | SDivide
   | SBinaryForeignExpr (fb : foreign_binary_op_type) : sql_bin_expr.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
@@ -358,10 +359,14 @@ Section SQL.
         ANBinop (ABArith ArithPlus)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
-      | SExprBinary SMinus expr1 expr2 =>
+      | SExprBinary SSubtract expr1 expr2 =>
         ANBinop (ABArith ArithMinus)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
+      | SExprUnary SMinus expr1 =>
+        ANBinop (ABArith ArithMinus)
+                (ANConst (dnat 0))
+                (sql_expr_to_nraenv create_table acc expr1)
       | SExprBinary SMult expr1 expr2 =>
         ANBinop (ABArith ArithMult)
                 (sql_expr_to_nraenv create_table acc expr1)

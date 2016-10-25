@@ -956,10 +956,12 @@ and sexp_to_sql_expr expr =
   | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
       QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
   | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
+  | STerm ("minus",[expr1]) ->
+      QSQL.sql_expr_unary Compiler.SMinus (sexp_to_sql_expr expr1)
   | STerm ("add",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SPlus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("subtract",[expr1;expr2]) ->
-      QSQL.sql_expr_binary Compiler.SMinus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+      QSQL.sql_expr_binary Compiler.SSubtract (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("multiply",[expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
   | STerm ("divide",[expr1;expr2]) ->
