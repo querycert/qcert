@@ -578,6 +578,90 @@ Section SQL.
       List.fold_left (fun acc st => acc + sql_statement_size st) q 0.
 
   End SQLSize.
+
+  Section SQLDepth.
+
+    Fixpoint sql_query_depth (q:sql_query) := (* XXX To check XXX *)
+      match q with
+      | SQuery selects froms opt_where opt_group opt_order =>
+        max (List.fold_left (fun acc select => max acc (sql_select_depth select)) selects 0)
+            (max (List.fold_left (fun acc from => max acc (sql_from_depth from)) froms 0)
+                 (max (match opt_where with
+                       | None => 0
+                       | Some cond => sql_condition_depth cond
+                       end)
+                      (max (match opt_group with
+                            | None => 0
+                            | Some (_, Some cond) => sql_condition_depth cond
+                            | Some (_, _) => 1
+                            end)
+                           (match opt_order with
+                            | None => 0
+                            | Some cond => 1
+                            end))))
+      end
+
+    with sql_select_depth (select: sql_select) :=
+      match select with
+      | SSelectColumn _ => 1
+      | SSelectColumnDeref _ _ => 1
+      | SSelectStar => 1
+      | SSelectExpr _ e => sql_expr_depth e
+      end
+
+    with sql_from_depth (from: sql_from) :=
+      match from with
+      | SFromTable _ => 1
+      | SFromTableAlias _ _ => 1
+      | SFromQuery _ q => 1 + sql_query_depth q
+      end
+
+    with sql_condition_depth (cond: sql_condition) :=
+      match cond with
+      | SCondAnd c1 c2
+      | SCondOr c1 c2 =>
+        max (sql_condition_depth c1) (sql_condition_depth c2)
+      | SCondNot c =>
+        sql_condition_depth c
+      | SCondBinary _ e1 e2 =>
+        max (sql_expr_depth e1) (sql_expr_depth e2)
+      | SCondExists q =>
+        sql_query_depth q
+      | SCondIn e1 e2 =>
+        max (sql_expr_depth e1) (sql_expr_depth e2)
+      | SCondLike e _ =>
+        sql_expr_depth e
+      | SCondBetween e1 e2 e3 =>
+        max (sql_expr_depth e1) (max (sql_expr_depth e2) (sql_expr_depth e3))
+      end
+
+    with sql_expr_depth (expr: sql_expr) :=
+      match expr with
+      | SExprConst _ => 0
+      | SExprColumn _ => 0
+      | SExprColumnDeref _ _ => 0
+      | SExprStar => 0
+      | SExprUnary _ e => sql_expr_depth e
+      | SExprBinary _ e1 e2 => max (sql_expr_depth e1) (sql_expr_depth e2)
+      | SExprCase c e1 e2 =>
+        max (sql_condition_depth c) (max (sql_expr_depth e1) (sql_expr_depth e2))
+      | SExprAggExpr _ e => sql_expr_depth e
+      | SExprQuery q => sql_query_depth q
+      end.
+
+    Definition sql_statement_depth (st:sql_statement) :=
+      match st with
+      | SRunQuery q => sql_query_depth q
+      | SCreateView _ q => sql_query_depth q
+      | SDropView _ => 1
+      end.
+
+    Definition sql_depth (q:sql) :=
+      List.fold_left (fun acc st => max acc (sql_statement_depth st)) q 0.
+
+  End SQLDepth.
+
+
   
 End SQL.
 
