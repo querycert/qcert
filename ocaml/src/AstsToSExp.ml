@@ -812,14 +812,25 @@ sexp_to_cld_mr_chain chain;
 
 let rec sexp_to_sql_query (se : sexp) =
   begin match se with
-  | STerm ("query", (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses) ->
+  | STerm ("query", sfw) ->
+      sexp_to_sfw sfw
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL query: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL query")
+  end
+and sexp_to_sfw sfw =
+  begin match sfw with
+  | (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses ->
       let (where,group_by,order_by) = sexp_to_other_clauses other_clauses in
       QSQL.sql_sql_query
 	(sexp_to_sql_selects selects)
 	(sexp_to_sql_froms froms)
 	where group_by order_by
-  | STerm (sterm, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside SQL query: " ^ sterm))
+  | (STerm ("union", [q1;q2])) :: [] ->
+      QSQL.sql_sql_union (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL sfw block: " ^ sterm))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside SQL query")
   end
@@ -1003,6 +1014,11 @@ and sexp_to_sql_expr expr =
   | STerm ("function",[SString "date_plus";expr1;expr2]) ->
       QSQL.sql_expr_binary (Compiler.SBinaryForeignExpr (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_plus)))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "concat";expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SConcat
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function", (SString fun_name)::_) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: function " ^ fun_name))
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: " ^ sterm))
   | _ ->

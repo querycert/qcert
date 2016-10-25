@@ -94,6 +94,7 @@ Section SQL.
   | SUnaryForeignExpr (fu:foreign_unary_op_type) : sql_un_expr.
   Inductive sql_bin_expr : Set :=
   | SPlus | SSubtract | SMult | SDivide
+  | SConcat
   | SBinaryForeignExpr (fb : foreign_binary_op_type) : sql_bin_expr.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
@@ -104,6 +105,8 @@ Section SQL.
       option sql_condition ->                            (* Where Clause *)
       option ((list string) * (option sql_condition)) -> (* GroupBy Clause *)
       option sql_order_spec -> sql_query                 (* OrderBy Clause *)
+  | SUnion :
+      sql_query -> sql_query -> sql_query
   with sql_select : Set :=
   | SSelectColumn : string -> sql_select
   | SSelectColumnDeref : string -> string -> sql_select
@@ -147,9 +150,10 @@ Section SQL.
      widely for the 'singleton' vs 'non-singleton' case *)
   Fixpoint is_singleton_sql_query (q:sql_query) : bool :=
     match q with
+    | SUnion _ _ => false
     | SQuery (SSelectExpr _ expr :: nil) _ _ None None =>
       is_singleton_sql_expr expr
-    | _ => false
+    | SQuery _ _ _ _ _ => false
     end
   with is_singleton_sql_expr (expr:sql_expr) : bool :=
     match expr with
@@ -173,11 +177,15 @@ Section SQL.
   
   Fixpoint is_value_sequence_sql_query (q:sql_query) : bool :=
     match q with
+    | SUnion q1 q2 =>
+      if is_value_sequence_sql_query q1
+      then is_value_sequence_sql_query q2
+      else false
     | SQuery (SSelectExpr _ expr :: nil) _ _ _ _ =>
       if (is_singleton_sql_expr expr) then false else true
     | SQuery (SSelectColumn _ :: nil) _ _ _ _ => true
     | SQuery (SSelectColumnDeref _ _ :: nil) _ _ _ _ => true
-    | _ => false
+    | SQuery _ _ _ _ _ => false
     end.
   
   Section Translation.
@@ -203,8 +211,10 @@ Section SQL.
     Definition columns_of_selects (selects:list sql_select) : list (option string * string) :=
       map column_of_select selects.
     
-    Definition columns_of_query (q:sql_query) : list (option string * string) :=
+    Fixpoint columns_of_query (q:sql_query) : list (option string * string) :=
       match q with
+      | SUnion q1 q2 =>
+        columns_of_query q1 (* XXX WARNING: This should check that q2 has the same columns -- typing would be nice XXX *)
       | SQuery selects _ _ _ _ =>
         columns_of_selects selects
       end.
@@ -253,10 +263,14 @@ Section SQL.
         := if in_dec string_eqdec table_name view_list
            then ANUnop (ADot table_name) ANEnv
            else ANGetConstant table_name.
-                 
+
     Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql_query) {struct q} : algenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
+      | SUnion q1 q2 =>
+        ANBinop AUnion
+                (sql_query_to_nraenv create_table q1)
+                (sql_query_to_nraenv create_table q2)
       | SQuery selects froms opt_where opt_group opt_order =>
         let nraenv_from_clause :=
             fold_left sql_from_to_nraenv froms (ANUnop AColl ANID)
@@ -373,6 +387,10 @@ Section SQL.
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SDivide expr1 expr2 =>
         ANBinop (ABArith ArithDivide)
+                (sql_expr_to_nraenv create_table acc expr1)
+                (sql_expr_to_nraenv create_table acc expr2)
+      | SExprBinary SConcat expr1 expr2 =>
+        ANBinop ASConcat
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprCase cond expr1 expr2 =>
@@ -506,6 +524,8 @@ Section SQL.
 
     Fixpoint sql_query_size (q:sql_query) := (* XXX To check XXX *)
       match q with
+      | SUnion q1 q2 =>
+        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check with Louis XXX *)
       | SQuery selects froms opt_where opt_group opt_order =>
         List.fold_left (fun acc select => acc + sql_select_size select) selects 0
         + List.fold_left (fun acc from => acc + sql_from_size from) froms 0
@@ -588,6 +608,8 @@ Section SQL.
 
     Fixpoint sql_query_depth (q:sql_query) := (* XXX To check XXX *)
       match q with
+      | SUnion q1 q2 =>
+        1 + (max (sql_query_depth q1) (sql_query_depth q2)) (* XXX To check with Louis XXX *)
       | SQuery selects froms opt_where opt_group opt_order =>
         max (List.fold_left (fun acc select => max acc (sql_select_depth select)) selects 0)
             (max (List.fold_left (fun acc from => max acc (sql_from_depth from)) froms 0)
