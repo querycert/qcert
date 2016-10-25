@@ -814,6 +814,10 @@ let rec sexp_to_sql_query (se : sexp) =
   begin match se with
   | STerm ("query", sfw) ->
       sexp_to_sfw sfw
+  | STerm ("union", [q1;q2]) ->
+      QSQL.sql_sql_union (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("intersect", [q1;q2]) ->
+      QSQL.sql_sql_intersect (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL query: " ^ sterm))
   | _ ->
