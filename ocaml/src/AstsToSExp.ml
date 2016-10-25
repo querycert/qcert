@@ -934,11 +934,13 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
   | SInt i ->
       QSQL.sql_expr_const (Dnat i)
+  | STerm ("dunit",[]) ->
+      QSQL.sql_expr_const (Dunit)
   | STerm ("list",const_list) ->
       QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
-  | STerm ("cast",[STerm ("as",[SString "DATE"]); SString sdate]) ->
+  | STerm ("cast",[STerm ("as",[SString "DATE"]); expr1]) ->
       QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
-	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
+	(sexp_to_sql_expr expr1)
   | STerm ("literal",[SString "date"; SString sdate]) ->
       QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
 	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
