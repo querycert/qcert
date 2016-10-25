@@ -143,6 +143,7 @@ Section CompStat.
   Definition stat_sql (q:sql) : data :=
     drec
       (("sql_size", dnat (Z_of_nat (sql_size q)))
+         :: ("sql_depth", dnat (Z_of_nat (sql_depth q)))
          :: nil).
 
   Definition stat_lambda_nra (q: lambda_nra) : data :=
