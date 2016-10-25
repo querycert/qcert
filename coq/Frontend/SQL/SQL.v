@@ -107,6 +107,8 @@ Section SQL.
       option sql_order_spec -> sql_query                 (* OrderBy Clause *)
   | SUnion :
       sql_query -> sql_query -> sql_query
+  | SIntersect :
+      sql_query -> sql_query -> sql_query
   with sql_select : Set :=
   | SSelectColumn : string -> sql_select
   | SSelectColumnDeref : string -> string -> sql_select
@@ -151,6 +153,7 @@ Section SQL.
   Fixpoint is_singleton_sql_query (q:sql_query) : bool :=
     match q with
     | SUnion _ _ => false
+    | SIntersect _ _ => false
     | SQuery (SSelectExpr _ expr :: nil) _ _ None None =>
       is_singleton_sql_expr expr
     | SQuery _ _ _ _ _ => false
@@ -178,6 +181,10 @@ Section SQL.
   Fixpoint is_value_sequence_sql_query (q:sql_query) : bool :=
     match q with
     | SUnion q1 q2 =>
+      if is_value_sequence_sql_query q1
+      then is_value_sequence_sql_query q2
+      else false
+    | SIntersect q1 q2 =>
       if is_value_sequence_sql_query q1
       then is_value_sequence_sql_query q2
       else false
@@ -214,6 +221,8 @@ Section SQL.
     Fixpoint columns_of_query (q:sql_query) : list (option string * string) :=
       match q with
       | SUnion q1 q2 =>
+        columns_of_query q1 (* XXX WARNING: This should check that q2 has the same columns -- typing would be nice XXX *)
+      | SIntersect q1 q2 =>
         columns_of_query q1 (* XXX WARNING: This should check that q2 has the same columns -- typing would be nice XXX *)
       | SQuery selects _ _ _ _ =>
         columns_of_selects selects
@@ -269,6 +278,10 @@ Section SQL.
       match q with
       | SUnion q1 q2 =>
         ANBinop AUnion
+                (sql_query_to_nraenv create_table q1)
+                (sql_query_to_nraenv create_table q2)
+      | SIntersect q1 q2 =>
+        ANBinop AMin (* XXX Bag minimum -- to double check XXX *)
                 (sql_query_to_nraenv create_table q1)
                 (sql_query_to_nraenv create_table q2)
       | SQuery selects froms opt_where opt_group opt_order =>
@@ -526,6 +539,8 @@ Section SQL.
       match q with
       | SUnion q1 q2 =>
         (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check with Louis XXX *)
+      | SIntersect q1 q2 =>
+        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check with Louis XXX *)
       | SQuery selects froms opt_where opt_group opt_order =>
         List.fold_left (fun acc select => acc + sql_select_size select) selects 0
         + List.fold_left (fun acc from => acc + sql_from_size from) froms 0
@@ -609,6 +624,8 @@ Section SQL.
     Fixpoint sql_query_depth (q:sql_query) := (* XXX To check XXX *)
       match q with
       | SUnion q1 q2 =>
+        1 + (max (sql_query_depth q1) (sql_query_depth q2)) (* XXX To check with Louis XXX *)
+      | SIntersect q1 q2 =>
         1 + (max (sql_query_depth q1) (sql_query_depth q2)) (* XXX To check with Louis XXX *)
       | SQuery selects froms opt_where opt_group opt_order =>
         max (List.fold_left (fun acc select => max acc (sql_select_depth select)) selects 0)

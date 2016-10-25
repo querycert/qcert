@@ -829,6 +829,8 @@ and sexp_to_sfw sfw =
 	where group_by order_by
   | (STerm ("union", [q1;q2])) :: [] ->
       QSQL.sql_sql_union (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("intersect", [q1;q2])) :: [] ->
+      QSQL.sql_sql_intersect (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | STerm (sterm, _) :: _ ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL sfw block: " ^ sterm))
   | _ ->
