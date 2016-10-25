@@ -1,11 +1,9 @@
 Not supported:
   q37, q43: function stddev_samp (standard deviation?)
   q36: cast as "DECIMAL(15,4)"
-  q35, q44: union all (almost supported -- see with Josh about sexp structure)
-  q50: intersect (almost supported -- see with Josh about sexp structure)
+  full outer join, left join, join...: q48
 
 Known issues:
   with: q38, q39, q42, q46, q47, 
   expressions in order by: q40, q41
-  full outer join, left join, join...: q48
 
