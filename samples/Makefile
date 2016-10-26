@@ -80,7 +80,8 @@ SQLEXPERIMENT=/Users/js/git/summerCAMP/sql-experiment
 SQLTABLES=$(SQLEXPERIMENT)/small-tables/tpch_json.io
 SQLQUERIES=q2 q11 q16 q17 q19 q22 q101 q103 q104 q106
 # Parse failures omitted from the following.  These are currently 2, 27, 36, 70, and 86.
-SQLTPCDSNUM = 1 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 28 29 30 31 32 33 34 35 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 87 88 89 90 91 92 93 94 95 96 97 98 99
+# Split statement support activated for 14, 23, 24, and 39 (each has two statements)
+SQLTPCDSNUM = 1 3 4 5 6 7 8 9 10 11 12 13 14_0 14_1 15 16 17 18 19 20 21 22 23_0 23_1 24_0 24_1 25 26 28 29 30 31 32 33 34 35 37 38 39_0 39_1 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 87 88 89 90 91 92 93 94 95 96 97 98 99
 SQLTPCDS=$(foreach N,$(SQLTPCDSNUM),sql_tpcds_$(N))
 
 ../runtime/javascript/qcert-merged-runtime.js: ../runtime/javascript/qcert-runtime.js ../runtime/javascript/sqlDates.js
