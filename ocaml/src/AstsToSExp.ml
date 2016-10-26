@@ -971,6 +971,8 @@ and sexp_to_sql_expr expr =
       QSQL.sql_expr_const (Dunit)
   | STerm ("list",const_list) ->
       QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
+(*  | STerm ("const_list",const_list) ->
+      List.fold_left (QSQL.sql_binary (map (fun e -> (QSQL.sql_unary sexp_to_sql_expr const_list)) *)
   | STerm ("cast",[STerm ("as",[SString "DATE"]); expr1]) ->
       QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
 	(sexp_to_sql_expr expr1)
@@ -1039,8 +1041,12 @@ and sexp_to_sql_expr expr =
   | STerm ("function",[SString "concat";expr1;expr2]) ->
       QSQL.sql_expr_binary Compiler.SConcat
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",(STerm ("partitionBy",_))::(SString fun_name)::_) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: function (using 'partition by') " ^ fun_name))
   | STerm ("function", (SString fun_name)::_) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: function " ^ fun_name))
+  | STerm ("cast",(STerm ("as",[SString cast_type]))::_) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: cast as " ^ cast_type))
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: " ^ sterm))
   | _ ->
@@ -1086,6 +1092,8 @@ and sexp_to_sql_cond cond =
       QSQL.sql_cond_between (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2) (sexp_to_sql_expr expr3)
   | STerm ("isIn",[expr1;expr2]) ->
       QSQL.sql_cond_in (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("isNull",[expr1]) ->
+      QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (QSQL.sql_expr_const (Dunit))
   | STerm ("function",[SString "date_le";expr1;expr2]) ->
       QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le)))
 	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)

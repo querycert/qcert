@@ -1,9 +1,32 @@
 Not supported:
-  q37, q43: function stddev_samp (standard deviation?)
-  q36: cast as "DECIMAL(15,4)"
-  full outer join, left join, join...: q48
+  Do not parse: q2, q7, q27, q36, q70, q86
+  group by + rollup: q5, q14, q18, q22, q67, q77, q80
+  partition by (windowing): q12, q20, q98
+  full outer join, left join, join...: q40, q51, q93, q97
+  cast as "INT": q54
+  cast as "DECIMAL": q61, q75, q90, 
+
+Not supported, but would not be too difficult to add?:
+  stddev_samp (standard deviation): q17
+  upper function (uppercasing): q24
+  abs function: q53, q63
+  const_list: q29, q34, q46, q68, q73,
+  coalesce (can be expanded to case + isNull): q84, 
+    See: https://msdn.microsoft.com/en-us/library/ms190349.aspx
+
+Supported:
+  q1, q8, q9, q10, q13, q15, q19, q21, q25,
+  q26, q28, q30, q32, q37, q38, q41, q43, q45, q48, q50,
+  q55, q56, q58, q59, q60, q65, q66, q69, q71,
+  q76, q81, q82, q87, q88, 
 
 Known issues:
-  with: q38, q39, q42, q46, q47, 
-  expressions in order by: q40, q41
+  expressions in order by: q3, q4, q11, q16, q31, q33, q35, q39, q42, q44, q47,
+                           q52, q57, q62, q64, q72, q78, q79, q83, q85, q89, q90, q91, q92, q94, q95, q96, q99
+  expressions in group by: q6
+
+Special cases:
+  q23 (two statements? is the query correctly generated?)
+  q49 (uses union, but the s-exp structure seems odd)
+  q74 (order by 1,2,3 ... couldn't find clear semantics)
 
