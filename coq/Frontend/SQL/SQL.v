@@ -98,6 +98,8 @@ Section SQL.
   | SBinaryForeignExpr (fb : foreign_binary_op_type) : sql_bin_expr.
   Inductive sql_agg : Set := | SSum | SAvg | SCount | SMin | SMax.
 
+  Inductive sql_distinct : Set := SDistinct | SAll.
+  
   Inductive sql_query : Set :=
   | SQuery :
       list sql_select ->                                 (* Select Clause *)
@@ -106,9 +108,11 @@ Section SQL.
       option ((list string) * (option sql_condition)) -> (* GroupBy Clause *)
       option sql_order_spec -> sql_query                 (* OrderBy Clause *)
   | SUnion :
-      sql_query -> sql_query -> sql_query
+      sql_distinct -> sql_query -> sql_query -> sql_query
   | SIntersect :
-      sql_query -> sql_query -> sql_query
+      sql_distinct -> sql_query -> sql_query -> sql_query
+  | SExcept :
+      sql_distinct -> sql_query -> sql_query -> sql_query
   with sql_select : Set :=
   | SSelectColumn : string -> sql_select
   | SSelectColumnDeref : string -> string -> sql_select
@@ -152,8 +156,9 @@ Section SQL.
      widely for the 'singleton' vs 'non-singleton' case *)
   Fixpoint is_singleton_sql_query (q:sql_query) : bool :=
     match q with
-    | SUnion _ _ => false
-    | SIntersect _ _ => false
+    | SUnion _ _ _ => false
+    | SIntersect _ _ _ => false
+    | SExcept _ _ _ => false
     | SQuery (SSelectExpr _ expr :: nil) _ _ None None =>
       is_singleton_sql_expr expr
     | SQuery _ _ _ _ _ => false
@@ -180,11 +185,15 @@ Section SQL.
   
   Fixpoint is_value_sequence_sql_query (q:sql_query) : bool :=
     match q with
-    | SUnion q1 q2 =>
+    | SUnion _ q1 q2 =>
       if is_value_sequence_sql_query q1
       then is_value_sequence_sql_query q2
       else false
-    | SIntersect q1 q2 =>
+    | SIntersect _ q1 q2 =>
+      if is_value_sequence_sql_query q1
+      then is_value_sequence_sql_query q2
+      else false
+    | SExcept _ q1 q2 =>
       if is_value_sequence_sql_query q1
       then is_value_sequence_sql_query q2
       else false
@@ -220,9 +229,11 @@ Section SQL.
     
     Fixpoint columns_of_query (q:sql_query) : list (option string * string) :=
       match q with
-      | SUnion q1 q2 =>
+      | SUnion _ q1 q2 =>
         columns_of_query q1 (* XXX WARNING: This should check that q2 has the same columns -- typing would be nice XXX *)
-      | SIntersect q1 q2 =>
+      | SIntersect _ q1 q2 =>
+        columns_of_query q1 (* XXX WARNING: This should check that q2 has the same columns -- typing would be nice XXX *)
+      | SExcept _ q1 q2 =>
         columns_of_query q1 (* XXX WARNING: This should check that q2 has the same columns -- typing would be nice XXX *)
       | SQuery selects _ _ _ _ =>
         columns_of_selects selects
@@ -276,14 +287,33 @@ Section SQL.
     Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql_query) {struct q} : algenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
-      | SUnion q1 q2 =>
+      | SUnion SAll q1 q2 =>
         ANBinop AUnion
                 (sql_query_to_nraenv create_table q1)
                 (sql_query_to_nraenv create_table q2)
-      | SIntersect q1 q2 =>
+      | SUnion SDistinct q1 q2 =>
+        ANUnop ADistinct
+          (ANBinop AUnion
+                   (sql_query_to_nraenv create_table q1)
+                   (sql_query_to_nraenv create_table q2))
+      | SIntersect SAll q1 q2 =>
         ANBinop AMin (* XXX Bag minimum -- to double check XXX *)
                 (sql_query_to_nraenv create_table q1)
                 (sql_query_to_nraenv create_table q2)
+      | SIntersect SDistinct q1 q2 =>
+        ANUnop ADistinct
+               (ANBinop AMin (* XXX Bag minimum -- to double check XXX *)
+                        (sql_query_to_nraenv create_table q1)
+                        (sql_query_to_nraenv create_table q2))
+      | SExcept SAll q1 q2 =>
+        ANBinop AMinus (* XXX Bag difference -- to double check XXX *)
+                (sql_query_to_nraenv create_table q1)
+                (sql_query_to_nraenv create_table q2)
+      | SExcept SDistinct q1 q2 =>
+        ANUnop ADistinct
+               (ANBinop AMinus (* XXX Bag minimum -- to double check XXX *)
+                        (sql_query_to_nraenv create_table q1)
+                        (sql_query_to_nraenv create_table q2))
       | SQuery selects froms opt_where opt_group opt_order =>
         let nraenv_from_clause :=
             fold_left sql_from_to_nraenv froms (ANUnop AColl ANID)
@@ -537,10 +567,12 @@ Section SQL.
 
     Fixpoint sql_query_size (q:sql_query) := (* XXX To check XXX *)
       match q with
-      | SUnion q1 q2 =>
-        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check with Louis XXX *)
-      | SIntersect q1 q2 =>
-        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check with Louis XXX *)
+      | SUnion _ q1 q2 =>
+        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check XXX *)
+      | SIntersect _ q1 q2 =>
+        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check XXX *)
+      | SExcept _ q1 q2 =>
+        (sql_query_size q1) + (sql_query_size q2) + 1 (* XXX to check XXX *)
       | SQuery selects froms opt_where opt_group opt_order =>
         List.fold_left (fun acc select => acc + sql_select_size select) selects 0
         + List.fold_left (fun acc from => acc + sql_from_size from) froms 0
@@ -623,9 +655,11 @@ Section SQL.
 
     Fixpoint sql_query_depth (q:sql_query) := (* XXX To check XXX *)
       match q with
-      | SUnion q1 q2 =>
+      | SUnion _ q1 q2 =>
         1 + (max (sql_query_depth q1) (sql_query_depth q2)) (* XXX To check with Louis XXX *)
-      | SIntersect q1 q2 =>
+      | SIntersect _ q1 q2 =>
+        1 + (max (sql_query_depth q1) (sql_query_depth q2)) (* XXX To check with Louis XXX *)
+      | SExcept _ q1 q2 =>
         1 + (max (sql_query_depth q1) (sql_query_depth q2)) (* XXX To check with Louis XXX *)
       | SQuery selects froms opt_where opt_group opt_order =>
         max (List.fold_left (fun acc select => max acc (sql_select_depth select)) selects 0)
@@ -704,8 +738,6 @@ Section SQL.
       List.fold_left (fun acc st => max acc (sql_statement_depth st)) q 0.
 
   End SQLDepth.
-
-
   
 End SQL.
 

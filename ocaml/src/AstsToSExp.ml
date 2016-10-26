@@ -814,10 +814,18 @@ let rec sexp_to_sql_query (se : sexp) =
   begin match se with
   | STerm ("query", sfw) ->
       sexp_to_sfw sfw
+  | STerm ("union", [STerm ("distinct",[]);q1;q2]) ->
+      QSQL.sql_sql_union Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("intersect", [STerm ("distinct",[]);q1;q2]) ->
+      QSQL.sql_sql_intersect Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("except", [STerm ("distinct",[]);q1;q2]) ->
+      QSQL.sql_sql_except Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | STerm ("union", [q1;q2]) ->
-      QSQL.sql_sql_union (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+      QSQL.sql_sql_union Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | STerm ("intersect", [q1;q2]) ->
-      QSQL.sql_sql_intersect (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+      QSQL.sql_sql_intersect Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("except", [q1;q2]) ->
+      QSQL.sql_sql_except Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | STerm (sterm, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL query: " ^ sterm))
   | _ ->
@@ -831,14 +839,22 @@ and sexp_to_sfw sfw =
 	(sexp_to_sql_selects selects)
 	(sexp_to_sql_froms froms)
 	where group_by order_by
+  | (STerm ("union", [STerm ("distinct",[]);q1;q2])) :: [] ->
+      QSQL.sql_sql_union Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("intersect", [STerm ("distinct",[]);q1;q2])) :: [] ->
+      QSQL.sql_sql_intersect Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("except", [STerm ("distinct",[]);q1;q2])) :: [] ->
+      QSQL.sql_sql_except Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | (STerm ("union", [q1;q2])) :: [] ->
-      QSQL.sql_sql_union (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+      QSQL.sql_sql_union Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | (STerm ("intersect", [q1;q2])) :: [] ->
-      QSQL.sql_sql_intersect (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+      QSQL.sql_sql_intersect Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("except", [q1;q2])) :: [] ->
+      QSQL.sql_sql_except Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
   | STerm (sterm, _) :: _ ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL sfw block: " ^ sterm))
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside SQL query")
+      raise (Qcert_Error "Not well-formed S-expr inside SQL sfw block")
   end
 and sexp_to_sql_selects selects =
   begin match selects with
