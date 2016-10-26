@@ -681,16 +681,16 @@ Section SQL.
 
     with sql_select_depth (select: sql_select) :=
       match select with
-      | SSelectColumn _ => 1
-      | SSelectColumnDeref _ _ => 1
-      | SSelectStar => 1
+      | SSelectColumn _ => 0
+      | SSelectColumnDeref _ _ => 0
+      | SSelectStar => 0
       | SSelectExpr _ e => sql_expr_depth e
       end
 
     with sql_from_depth (from: sql_from) :=
       match from with
-      | SFromTable _ => 1
-      | SFromTableAlias _ _ => 1
+      | SFromTable _ => 0
+      | SFromTableAlias _ _ => 0
       | SFromQuery _ q => 1 + sql_query_depth q
       end
 
@@ -729,7 +729,7 @@ Section SQL.
 
     Definition sql_statement_depth (st:sql_statement) :=
       match st with
-      | SRunQuery q => sql_query_depth q
+      | SRunQuery q => 1 + sql_query_depth q
       | SCreateView _ q => sql_query_depth q
       | SDropView _ => 1
       end.
