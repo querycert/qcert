@@ -32,14 +32,30 @@ let coq_string_to_sstring (cl:char list) : sexp =
 let dbrands_to_sexp (bs:(char list) list) : sexp list =
   List.map coq_string_to_sstring bs
 let coq_string_list_to_sstring_list = dbrands_to_sexp
-    
+
+let coq_sort_desc_to_sstring x =
+  begin match x with
+  | Compiler.Ascending -> SString "asc"
+  | Compiler.Descending -> SString "desc"
+  end
+let coq_string_list_to_sstring_list_with_order l =
+  List.concat (List.map (fun x -> [coq_string_to_sstring (fst x);coq_sort_desc_to_sstring (snd x)]) l)
+
 let sstring_to_coq_string (se:sexp) : char list =
-  match se with
+  begin match se with
   | SString s -> char_list_of_string s
   | _ -> raise (Qcert_Error "Not well-formed S-expr for Coq string")
+  end
 let sexp_to_dbrands (bs:sexp list) : (char list) list =
   List.map sstring_to_coq_string bs
 let sstring_list_to_coq_string_list = sexp_to_dbrands
+let rec sstring_list_with_order_to_coq_string_list sl =
+  begin match sl with
+  | [] -> []
+  | SString att :: SString "asc" :: sl' -> (char_list_of_string att, Ascending) :: (sstring_list_with_order_to_coq_string_list sl')
+  | SString att :: SString "desc" :: sl' -> (char_list_of_string att, Descending) :: (sstring_list_with_order_to_coq_string_list sl')
+  | _ -> raise (Qcert_Error "Not well-formed S-expr for Coq orderBy")
+  end
 
 (* Data Section *)
 
@@ -155,6 +171,14 @@ let sexp_to_binop (se:sexp) : binOp =
   | STerm ("ATimeGe",[]) -> Enhanced.Ops.Binary.coq_ATimeGe
   | STerm ("ATimeDurationFromScale",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationFromScale
   | STerm ("ATimeDurationBetween",[]) -> Enhanced.Ops.Binary.coq_ATimeDurationBetween
+  | STerm ("ASqlDatePlus",[]) -> Enhanced.Ops.Binary.coq_ASqlDatePlus
+  | STerm ("ASqlDateMinus",[]) -> Enhanced.Ops.Binary.coq_ASqlDateMinus
+  | STerm ("ASqlDateNe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateNe
+  | STerm ("ASqlDateLt",[]) -> Enhanced.Ops.Binary.coq_ASqlDateLt
+  | STerm ("ASqlDateLe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateLe
+  | STerm ("ASqlDateGt",[]) -> Enhanced.Ops.Binary.coq_ASqlDateGt
+  | STerm ("ASqlDateGe",[]) -> Enhanced.Ops.Binary.coq_ASqlDateGe
+  | STerm ("ASqlDateIntervalBetween",[]) -> Enhanced.Ops.Binary.coq_ASqlDateIntervalBetween
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside arith binop with name " ^ t))
   | _ -> raise  (Qcert_Error "Not well-formed S-expr inside arith binop")
@@ -184,16 +208,28 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | ARecRemove s -> STerm ("ARecRemove", [coq_string_to_sstring s])
   | ARecProject sl -> STerm ("ARecProject", coq_string_list_to_sstring_list sl)
   | ADistinct -> STerm ("ADistinct",[])
+  | AOrderBy sl -> STerm ("AOrderBy", coq_string_list_to_sstring_list_with_order sl)
   | ASum -> STerm ("ASum",[])
   | AArithMean -> STerm ("AArithMean",[])
   | AToString -> STerm ("AToString",[])
+  | ASubstring (n,None) -> STerm ("ASubstring",[SInt n])
+  | ASubstring (n1,(Some n2)) -> STerm ("ASubstring",[SInt n1;SInt n2])
+  | ALike (p,None) -> STerm ("ALike",[coq_string_to_sstring p])
+  | ALike (p,(Some esc)) -> STerm ("ALike",[coq_string_to_sstring p;coq_string_to_sstring [esc]])
   | ACast bl -> STerm ("ACast", dbrands_to_sexp bl)
   | AUnbrand -> STerm ("AUnbrand",[])
   | ASingleton -> STerm ("ASingleton",[])
   | ANumMin -> STerm ("ANumMin",[])
   | ANumMax -> STerm ("ANumMax",[])
   | AForeignUnaryOp fuop -> SString (PrettyIL.string_of_foreign_unop (Obj.magic fuop))
-	
+
+let sstring_to_sql_date_component (part:sexp) : Enhanced.Data.sql_date_part =
+  match part with
+  | SString "DAY" ->   Enhanced.Data.sql_date_day
+  | SString "MONTH" -> Enhanced.Data.sql_date_month
+  | SString "YEAR" ->  Enhanced.Data.sql_date_year
+  | _ -> raise (Qcert_Error "Not well-formed S-expr for sql date component")
+			  
 let sexp_to_unop (se:sexp) : unaryOp =
   match se with
   | STerm ("AIdOp",[]) -> AIdOp
@@ -212,9 +248,15 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ARecRemove", [se']) -> ARecRemove (sstring_to_coq_string se')
   | STerm ("ARecProject", sl) -> ARecProject (sstring_list_to_coq_string_list sl)
   | STerm ("ADistinct",[]) -> ADistinct
+  | STerm ("AOrderBy",sl) -> AOrderBy (sstring_list_with_order_to_coq_string_list sl)
   | STerm ("ASum",[]) -> ASum
   | STerm ("AArithMean",[]) -> AArithMean
   | STerm ("AToString",[]) -> AToString
+  | STerm ("ASubstring",[SInt n1]) -> ASubstring (n1,None)
+  | STerm ("ASubstring",[SInt n1;SInt n2]) -> ASubstring (n1,Some n2)
+  | STerm ("ALike",[p]) -> ALike (sstring_to_coq_string p,None)
+  | STerm ("ALike",[p;SString esc]) ->
+     ALike (sstring_to_coq_string p,Some (esc.[0]))
   | STerm ("ACast", bl) -> ACast (sexp_to_dbrands bl)
   | STerm ("AUnbrand",[]) -> AUnbrand
   | STerm ("ASingleton",[]) -> ASingleton
@@ -239,6 +281,9 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ATimeToSscale",[]) -> Enhanced.Ops.Unary.coq_ATimeToSscale
   | STerm ("ATimeFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeFromString
   | STerm ("ATimeDurationFromString",[]) -> Enhanced.Ops.Unary.coq_ATimeDurationFromString
+  | STerm ("ASqlDateFromString",[]) -> Enhanced.Ops.Unary.coq_ASqlDateFromString
+  | STerm ("ASqlDateIntervalromString",[]) -> Enhanced.Ops.Unary.coq_ASqlDateIntervalFromString
+  | STerm ("ASqlGetDateComponent",[part]) -> Enhanced.Ops.Unary.coq_ASqlGetDateComponent (sstring_to_sql_date_component part)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside unop with name " ^ t))
   | _ ->
@@ -763,6 +808,341 @@ sexp_to_cld_mr_chain chain;
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside cldmr")
 
+(* NRA Section *)
+
+let rec sexp_to_sql_query (se : sexp) =
+  begin match se with
+  | STerm ("query", sfw) ->
+      sexp_to_sfw sfw
+  | STerm ("union", [STerm ("distinct",[]);q1;q2]) ->
+      QSQL.sql_sql_union Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("intersect", [STerm ("distinct",[]);q1;q2]) ->
+      QSQL.sql_sql_intersect Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("except", [STerm ("distinct",[]);q1;q2]) ->
+      QSQL.sql_sql_except Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("union", [q1;q2]) ->
+      QSQL.sql_sql_union Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("intersect", [q1;q2]) ->
+      QSQL.sql_sql_intersect Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm ("except", [q1;q2]) ->
+      QSQL.sql_sql_except Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL query: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL query")
+  end
+and sexp_to_sfw sfw =
+  begin match sfw with
+  | (STerm ("select", selects)) :: (STerm ("from", [froms])) :: other_clauses ->
+      let (where,group_by,order_by) = sexp_to_other_clauses other_clauses in
+      QSQL.sql_sql_query
+	(sexp_to_sql_selects selects)
+	(sexp_to_sql_froms froms)
+	where group_by order_by
+  | (STerm ("union", [STerm ("distinct",[]);q1;q2])) :: [] ->
+      QSQL.sql_sql_union Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("intersect", [STerm ("distinct",[]);q1;q2])) :: [] ->
+      QSQL.sql_sql_intersect Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("except", [STerm ("distinct",[]);q1;q2])) :: [] ->
+      QSQL.sql_sql_except Compiler.SDistinct (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("union", [q1;q2])) :: [] ->
+      QSQL.sql_sql_union Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("intersect", [q1;q2])) :: [] ->
+      QSQL.sql_sql_intersect Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | (STerm ("except", [q1;q2])) :: [] ->
+      QSQL.sql_sql_except Compiler.SAll (sexp_to_sql_query q1) (sexp_to_sql_query q2)
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL sfw block: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL sfw block")
+  end
+and sexp_to_sql_selects selects =
+  begin match selects with
+  | [] -> []
+  | (STerm ("all",[])) :: selects' ->
+      (QSQL.sql_select_star
+       :: (sexp_to_sql_selects selects'))
+  | (STerm ("as",[cname])) :: expr :: selects' ->
+      (QSQL.sql_select_expr (sstring_to_coq_string cname) (sexp_to_sql_expr expr))
+      :: (sexp_to_sql_selects selects')
+  | STerm ("deref",[cname;STerm ("ref",[tname])]) :: selects' ->
+      (QSQL.sql_select_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname))
+      :: (sexp_to_sql_selects selects')
+  | STerm ("ref",[cname]) :: selects' ->
+      (QSQL.sql_select_column (sstring_to_coq_string cname))
+      :: (sexp_to_sql_selects selects')
+  | (STerm ("function", _) as expr) :: selects'
+  | (STerm ("multiply", _) as expr) :: selects'
+  | (STerm ("divide", _) as expr) :: selects' ->
+      (QSQL.sql_select_expr (Util.char_list_of_string "") (sexp_to_sql_expr expr))
+      :: (sexp_to_sql_selects selects')
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL select: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL select")
+  end
+and sexp_to_sql_froms froms =
+  begin match froms with
+  | STerm ("table",[tname]) -> [QSQL.sql_from_table (sstring_to_coq_string tname)]
+  | STerm ("aliasAs", [new_tname;STerm ("table",[tname])]) ->
+      [QSQL.sql_from_table_alias (sstring_to_coq_string new_tname)
+	 (sstring_to_coq_string tname)]
+  | STerm ("aliasAs", [tname;query]) ->
+      [QSQL.sql_from_query (sstring_to_coq_string tname, None) (sexp_to_sql_query query)]
+  | STerm ("join", [from1;from2]) ->
+      (sexp_to_sql_froms from1) @ (sexp_to_sql_froms from2)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL froms: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL froms")
+  end
+and sexp_to_other_clauses other_clauses =
+  begin match other_clauses with
+  | [] -> (None, None, None)
+  | STerm ("where",[cond]) :: rest ->
+      let (group_by,order_by) = sexp_to_sql_group_by_order_by rest in
+      (Some (sexp_to_sql_cond cond), group_by, order_by)
+  | rest ->
+      let (group_by,order_by) = sexp_to_sql_group_by_order_by rest in
+      (None, group_by, order_by)
+  end
+and sexp_to_sql_group_by_order_by rest =
+  begin match rest with
+  | [] -> (None,None)
+  | (STerm ("groupBy",groups)) :: (STerm ("having",[cond])) :: rest ->
+      let order_by = sexp_to_sql_order_by rest in
+      let group_by = Some (sexp_to_sql_groups groups, Some (sexp_to_sql_cond cond)) in
+      (group_by, order_by)
+  | STerm ("groupBy",groups) :: rest ->
+      let order_by = sexp_to_sql_order_by rest in
+      let group_by = Some (sexp_to_sql_groups groups, None) in
+      (group_by, order_by)
+  | rest ->
+      let order_by = sexp_to_sql_order_by rest in
+      (None, order_by)
+  end
+and sexp_to_sql_order_by rest =
+  begin match rest with
+  | [] -> None
+  | STerm ("orderBy",orders) :: [] ->
+      Some (sexp_to_sql_orders orders)
+  | STerm ("orderBy",orders) :: STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL other clauses (after orderBy): " ^ sterm))
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL other clauses: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL other clauses")
+  end
+and sexp_to_sql_groups groups =
+  begin match groups with
+  | [] -> []
+  | (STerm ("ref",[cname])) :: groups' -> (sstring_to_coq_string cname) :: sexp_to_sql_groups groups'
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL groups: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL groups")
+  end
+and sexp_to_sql_orders orders =
+  begin match orders with
+  | [] -> []
+  | (STerm ("ascending",[(STerm ("ref",[cname]))])) :: orders' ->
+      (sstring_to_coq_string cname, Compiler.Ascending) :: sexp_to_sql_orders orders'
+  | (STerm ("descending",[(STerm ("ref",[cname]))])) :: orders' ->
+      (sstring_to_coq_string cname, Compiler.Descending) :: sexp_to_sql_orders orders'
+  | (STerm ("ascending",STerm (sterm,_)::_)) :: orders' ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL ascending order: " ^ sterm))
+  | (STerm ("descending",STerm (sterm,_)::_)) :: orders' ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL descending order: " ^ sterm))
+  | STerm (sterm, _) :: _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL orders: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL orders")
+  end
+    
+and sexp_to_sql_expr expr =
+  begin match expr with
+  | SString s ->
+      QSQL.sql_expr_const (Dstring (char_list_of_string s))
+  | SFloat f ->
+      QSQL.sql_expr_const (Dforeign (Obj.magic (Enhancedfloat f)))
+  | SInt i ->
+      QSQL.sql_expr_const (Dnat i)
+  | STerm ("dunit",[]) ->
+      QSQL.sql_expr_const (Dunit)
+  | STerm ("list",const_list) ->
+      QSQL.sql_expr_const (Dcoll (sexp_to_sql_const_list const_list))
+(*  | STerm ("const_list",const_list) ->
+      List.fold_left (QSQL.sql_binary (map (fun e -> (QSQL.sql_unary sexp_to_sql_expr const_list)) *)
+  | STerm ("cast",[STerm ("as",[SString "DATE"]); expr1]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
+	(sexp_to_sql_expr expr1)
+  | STerm ("literal",[SString "date"; SString sdate]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string sdate)))
+  | STerm ("interval",[SString sinterval; STerm ("year",[])]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-YEAR"))))
+  | STerm ("interval",[SString sinterval; STerm ("month",[])]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-MONTH"))))
+  | STerm ("interval",[SString sinterval; STerm ("day",[])]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_interval_from_string)))
+	(QSQL.sql_expr_const (Dstring (char_list_of_string (sinterval ^ "-DAY"))))
+  | STerm ("deref",[cname;STerm ("ref",[tname])]) ->
+      QSQL.sql_expr_column_deref (sstring_to_coq_string tname) (sstring_to_coq_string cname)
+  | STerm ("ref",[cname]) -> (QSQL.sql_expr_column (sstring_to_coq_string cname))
+  | STerm ("minus",[expr1]) ->
+      QSQL.sql_expr_unary Compiler.SMinus (sexp_to_sql_expr expr1)
+  | STerm ("add",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SPlus (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("subtract",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SSubtract (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("multiply",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SMult (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("divide",[expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SDivide (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "substr";expr1;SInt n1;SInt n2]) ->
+     QSQL.sql_expr_unary (Compiler.SSubstring (n1-1,Some (n1-1+n2))) (sexp_to_sql_expr expr1) (* It's 'substring (expr from n1 for n2)' i.e., from n1 for n2 characters, with initial index 1 *)
+  | STerm ("cases",
+	   [STerm ("case", [STerm ("when", [condexpr])
+			  ; STerm ("then", [expr1])])
+	   ; STerm ("default", [expr2])]) ->
+     QSQL.sql_expr_case
+       (sexp_to_sql_cond condexpr)
+       (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "count"]) ->
+      QSQL.sql_expr_agg_expr Compiler.SCount QSQL.sql_expr_star
+  | STerm ("function",[SString "count";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SCount (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "sum";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SSum (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "avg";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SAvg (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "min";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SMin (sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "max";expr1]) ->
+      QSQL.sql_expr_agg_expr Compiler.SMax (sexp_to_sql_expr expr1)
+  | STerm ("query", _) -> QSQL.sql_expr_query (sexp_to_sql_query expr) (* XXX Nested query XXX *)
+  | STerm ("extract",[STerm ("year",[]);expr1]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op (Uop_sql_get_date_component Sql_date_YEAR))))
+	(sexp_to_sql_expr expr1)
+  | STerm ("extract",[STerm ("month",[]);expr1]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op (Uop_sql_get_date_component Sql_date_MONTH))))
+	(sexp_to_sql_expr expr1)
+  | STerm ("extract",[STerm ("day",[]);expr1]) ->
+      QSQL.sql_expr_unary (Compiler.SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op (Uop_sql_get_date_component Sql_date_DAY))))
+	(sexp_to_sql_expr expr1)
+  | STerm ("function",[SString "date_minus";expr1;expr2]) ->
+      QSQL.sql_expr_binary (Compiler.SBinaryForeignExpr (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_minus)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_plus";expr1;expr2]) ->
+      QSQL.sql_expr_binary (Compiler.SBinaryForeignExpr (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_plus)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "concat";expr1;expr2]) ->
+      QSQL.sql_expr_binary Compiler.SConcat
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",(STerm ("partitionBy",_))::(SString fun_name)::_) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: function (using 'partition by') " ^ fun_name))
+  | STerm ("function", (SString fun_name)::_) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: function " ^ fun_name))
+  | STerm ("cast",(STerm ("as",[SString cast_type]))::_) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: cast as " ^ cast_type))
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL expr: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL expr")
+  end
+and sexp_to_sql_const_list const_list =
+  begin match const_list with
+  | [] -> []
+  | (SString s) :: const_list' ->
+      (Dstring (char_list_of_string s)) :: (sexp_to_sql_const_list const_list')
+  | (SFloat f) :: const_list' ->
+      (Dforeign (Obj.magic (Enhancedfloat f))) :: (sexp_to_sql_const_list const_list')
+  | (SInt i) :: const_list' ->
+      (Dnat i) :: (sexp_to_sql_const_list const_list')
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL const_list")
+  end
+and sexp_to_sql_cond cond =
+  begin match cond with
+  | STerm ("and",[cond1;cond2]) ->
+      QSQL.sql_cond_and (sexp_to_sql_cond cond1) (sexp_to_sql_cond cond2)
+  | STerm ("or",[cond1;cond2]) ->
+      QSQL.sql_cond_or (sexp_to_sql_cond cond1) (sexp_to_sql_cond cond2)
+  | STerm ("not",[cond1]) ->
+      QSQL.sql_cond_not (sexp_to_sql_cond cond1)
+  | STerm ("equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("not_equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SDiff (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("greater_than",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SGt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("greater_than_or_equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SGe (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("less_than",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SLt (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("less_than_or_equal",[expr1;expr2]) ->
+      QSQL.sql_cond_binary SLe (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("like",[expr1;slike]) ->
+      QSQL.sql_cond_like (sexp_to_sql_expr expr1) (sstring_to_coq_string slike)
+  | STerm ("exists",[query]) ->
+      QSQL.sql_cond_exists (sexp_to_sql_query query)
+  | STerm ("isBetween",[expr1;expr2;expr3]) ->
+      QSQL.sql_cond_between (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2) (sexp_to_sql_expr expr3)
+  | STerm ("isIn",[expr1;expr2]) ->
+      QSQL.sql_cond_in (sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("isNull",[expr1]) ->
+      QSQL.sql_cond_binary SEq (sexp_to_sql_expr expr1) (QSQL.sql_expr_const (Dunit))
+  | STerm ("function",[SString "date_le";expr1;expr2]) ->
+      QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_lt";expr1;expr2]) ->
+      QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_lt)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_gt";expr1;expr2]) ->
+      QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_gt)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_ge";expr1;expr2]) ->
+      QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_ge)))
+	(sexp_to_sql_expr expr1) (sexp_to_sql_expr expr2)
+  | STerm ("function",[SString "date_between";expr1;expr2;expr3]) ->
+      let sql_expr1 = (sexp_to_sql_expr expr1) in
+      let sql_expr2 = (sexp_to_sql_expr expr2) in
+      let sql_expr3 = (sexp_to_sql_expr expr3) in
+      QSQL.sql_cond_and
+	(QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le))) sql_expr2 sql_expr1)
+	(QSQL.sql_cond_binary (Compiler.SBinaryForeignCond (Obj.magic (Compiler.Enhanced_binary_sql_date_op Bop_sql_date_le))) sql_expr1 sql_expr3)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL condition: " ^ sterm))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside SQL condition")
+  end
+
+let rec sexp_to_sql_statement (stmt : sexp)  =
+  begin match stmt with
+  (* Bypass for 'with' at the beginning of the query -- treated as a view *)
+  | STerm ("query",((STerm ("with",[STerm ("as",[SString tname]);view_query]))::rest)) ->
+      let rest_stmt = sexp_to_sql_statement (STerm ("query",rest)) in
+      (QSQL.sql_create_view (Util.char_list_of_string tname) (sexp_to_sql_query view_query))::rest_stmt
+  | STerm ("query",_) -> [QSQL.sql_run_query (sexp_to_sql_query stmt)]
+  | STerm ("createView", [SString name; query]) ->
+     [QSQL.sql_create_view (Util.char_list_of_string name) (sexp_to_sql_query query)]
+  | STerm ("dropView",[SString name]) -> [QSQL.sql_drop_view (Util.char_list_of_string name)]
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL statement: " ^ sterm))
+  | _ ->
+     raise (Qcert_Error "Not well-formed S-expr inside SQL statement")
+  end
+
+let sexp_to_sql (se : sexp) : QLang.sql =
+  begin match se with
+  | STerm ("statements",stmts) ->
+     List.concat (map sexp_to_sql_statement stmts)
+  | _ ->
+     raise (Qcert_Error "Not well-formed S-expr in top SQL statements")
+  end
+    
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with
@@ -770,6 +1150,8 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_camp -> Compiler.Q_camp (sexp_to_camp se)
   | Compiler.L_oql ->
+      raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | Compiler.L_sql ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_lambda_nra ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
@@ -799,6 +1181,8 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Compiler.Q_camp q -> camp_to_sexp q
   | Compiler.Q_oql _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | Compiler.Q_sql _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)

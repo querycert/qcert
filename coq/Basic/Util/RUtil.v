@@ -617,6 +617,12 @@ Section RUtil.
       apply Pos_of_nat_inv; assumption.
     Qed.
 
+    Global Instance Z_eqdec : EqDec Z eq.
+    Proof.
+      red.
+      apply Z.eq_dec.
+    Qed.
+
   End Zutil.
 
   Section vm.

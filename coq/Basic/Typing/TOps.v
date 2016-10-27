@@ -37,6 +37,16 @@ Section TOps.
     Context {m:brand_model}.
     Context {fuoptyping:foreign_unary_op_typing}.
 
+    Definition sortable_type (τ : rtype) : Prop :=
+      τ = Nat /\ τ = String.
+    
+    Definition order_by_has_sortable_type
+               (τr:list (string*rtype))
+               (satts: list string) : Prop :=
+      Forall (fun s =>
+                forall τout, tdot τr s = Some τout -> sortable_type τout)
+             satts.
+    
     Inductive unaryOp_type : unaryOp -> rtype -> rtype -> Prop :=
     | ATIdOp τ : unaryOp_type AIdOp τ τ
     | ATNeg: unaryOp_type ANeg Bool Bool
@@ -45,6 +55,10 @@ Section TOps.
         unaryOp_type ASingleton (Coll τ) (Option τ)
     | ATFlatten τ: unaryOp_type AFlatten (Coll (Coll τ)) (Coll τ)
     | ATDistinct τ: unaryOp_type ADistinct (Coll τ) (Coll τ)
+    | ATOrderBy {τ} k sl pf1 pf2:
+        sublist (List.map fst sl) (domain τ) ->
+        order_by_has_sortable_type τ (List.map fst sl) ->
+        unaryOp_type (AOrderBy sl) (Coll (Rec k τ pf1)) (Coll (Rec k τ pf2))
     | ATRec {τ} s pf : unaryOp_type (ARec s) τ (Rec Closed ((s,τ)::nil) pf)
     | ATDot {τ' τout} k s pf :
         tdot τ' s = Some τout ->
@@ -60,6 +74,8 @@ Section TOps.
     | ATNumMax : unaryOp_type ANumMax (Coll Nat) Nat
     | ATArithMean : unaryOp_type AArithMean (Coll Nat) Nat
     | ATToString τ: unaryOp_type AToString τ String
+    | ATSubstring start olen: unaryOp_type (ASubstring start olen) String String
+    | ATLike pat oescape: unaryOp_type (ALike pat oescape) String Bool
     | ATLeft τl τr: unaryOp_type ALeft τl (Either τl τr)
     | ATRight τl τr: unaryOp_type ARight τr (Either τl τr)
     | ATBrand b :
@@ -82,6 +98,7 @@ Section TOps.
     | Case_aux c "ATSingleton"%string
     | Case_aux c "ATFlatten"%string
     | Case_aux c "ATDistinct"%string
+    | Case_aux c "ATOrderBy"%string
     | Case_aux c "ATRec"%string
     | Case_aux c "ATDot"%string
     | Case_aux c "ATRecRemove"%string
@@ -92,6 +109,8 @@ Section TOps.
     | Case_aux c "ATNumMax"%string
     | Case_aux c "ATArithMean"%string
     | Case_aux c "ATToString"%string
+    | Case_aux c "ATSubstring"%string
+    | Case_aux c "ATLike"%string
     | Case_aux c "ATLeft"%string
     | Case_aux c "ATRight"%string
     | Case_aux c "ATBrand"%string
@@ -647,7 +666,7 @@ Section TOps.
       intuition.
       + apply in_dom in H7. intuition.
       + congruence.
-  Qed.    
+  Qed. 
 
   Require Import Bool.
 
@@ -943,6 +962,18 @@ Section TOps.
     auto.
   Qed.
 
+  (* XXX To be proven correct – well typedness of the (limited sorting) XXX *)
+  Lemma order_by_well_typed
+        (d1:data) (sl:list (string * RDataSort.SortDesc))
+        {k τ} {pf1 pf2} :
+    d1 ▹ Coll (Rec k τ pf1) ->
+    sublist (map fst sl) (domain τ) ->
+    order_by_has_sortable_type τ (map fst sl) ->
+    exists x, RDataSort.data_sort sl d1 = Some x /\ x ▹ Coll (Rec k τ pf2).
+  Proof.
+    admit.
+  Admitted.
+
   Require Import Permutation.
 
   (** Main type-soundness lemma for unary operators *)
@@ -1024,6 +1055,8 @@ Section TOps.
       assert (r = τ) by (apply rtype_fequal; assumption).
       rewrite H0 in *.
       apply forall_typed_bdistinct; assumption.
+    - Case "ATOrderBy"%string.
+      intros. apply (order_by_well_typed d1 sl H H0 H1).
     - Case "ATRec"%string.
       exists (drec [(s,d1)]).
       split; [reflexivity|apply dtrec_full].
@@ -1133,6 +1166,12 @@ Section TOps.
          destruct d1; simpl; congruence.
     - Case "ATToString"%string.
       eauto.
+    - Case "ATSubstring"%string.
+      dtype_inverter.
+      eauto.
+    - Case "ATLike"%string.
+      dtype_inverter.
+      eauto.
     - Case "ATLeft"%string.
       eauto.
     - Case "ATRight"%string.
@@ -1194,6 +1233,7 @@ End TOps.
     | Case_aux c "ATSingleton"%string
     | Case_aux c "ATFlatten"%string
     | Case_aux c "ATDistinct"%string
+    | Case_aux c "ATOrderBy"%string
     | Case_aux c "ATRec"%string
     | Case_aux c "ATDot"%string
     | Case_aux c "ATRecRemove"%string
@@ -1204,6 +1244,8 @@ End TOps.
     | Case_aux c "ATNumMax"%string
     | Case_aux c "ATArithMean"%string
     | Case_aux c "ATToString"%string
+    | Case_aux c "ATSubstring"%string
+    | Case_aux c "ATLike"%string
     | Case_aux c "ATLeft"%string
     | Case_aux c "ATRight"%string
     | Case_aux c "ATBrand"%string

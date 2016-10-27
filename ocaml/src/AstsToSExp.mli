@@ -33,6 +33,9 @@ val camp_to_sexp : QLang.camp -> sexp
 val sexp_to_nraenv : sexp -> QLang.nraenv
 val nraenv_to_sexp : QLang.nraenv -> sexp
 
+val sexp_to_sql : sexp -> QLang.sql
+(* val sql_to_sexp : QLang.sql -> sexp *)
+
 val sexp_to_nnrc : sexp -> QLang.nnrc
 val nnrc_to_sexp : QLang.nnrc -> sexp
 

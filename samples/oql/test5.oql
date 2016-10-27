@@ -1,0 +1,5 @@
+/* Example of simple select-from-where */
+
+select p
+from p in Persons
+order by p.age

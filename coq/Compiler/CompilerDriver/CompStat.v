@@ -14,9 +14,13 @@
  * limitations under the License.
  *)
 
+Require Import String.
+
+Definition time {A: Type} {B: Type} (compile: A -> B) (q: A) := ("no timing info"%string, compile q).
+Extract Inlined Constant time => "(fun f x -> Util.time f x)".
+
 Section CompStat.
 
-  Require Import String.
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
@@ -25,12 +29,13 @@ Section CompStat.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
   Require Import ODMGRuntime.
+  Require Import SQL.
 
   Require Import CompilerRuntime.
   Require Import BasicSystem.
 
   Require Import NNRCtoJavascript.
-  
+
   Require Import OptimizerLogger.
 
   Require Import CompLang CompDriver.
@@ -135,13 +140,19 @@ Section CompStat.
       (("oql_size", dnat (Z_of_nat (oql_size q)))
          :: nil).
 
+  Definition stat_sql (q:sql) : data :=
+    drec
+      (("sql_size", dnat (Z_of_nat (sql_size q)))
+         :: ("sql_depth", dnat (Z_of_nat (sql_depth q)))
+         :: nil).
+
   Definition stat_lambda_nra (q: lambda_nra) : data :=
     drec
       (("lambda_nra_stat", dstring "no stat available")
          :: nil).
 
   (* Build the tree of all stats *)
-  
+
   Definition stat_tree_error (q: string) : data :=
     drec
       (("error", stat_error q)
@@ -188,51 +199,69 @@ Section CompStat.
          :: nil).
 
   Definition stat_tree_nnrcmr (q: nnrcmr) : data :=
+    let (t, q') := time nnrcmr_optim q in
     drec
       (("nnrcmr_no_optim", stat_nnrcmr q)
-         :: ("nnrcmr_optim", stat_nnrcmr (nnrcmr_optim q))
+         :: ("nnrcmr_optim", stat_nnrcmr q')
+         :: ("nnrcmr_optim_time", dstring t)
          :: nil).
 
   Definition stat_tree_nnrc (q: nnrc) : data :=
+    let (t, q') := time nnrc_optim q in
     drec
       (("nnrc_no_optim", stat_nnrc q)
-         :: ("nnrc_optim", stat_nnrc (nnrc_optim q))
+         :: ("nnrc_optim", stat_nnrc q')
+         :: ("nnrc_optim_time", dstring t)
          :: nil).
 
   Definition stat_tree_body_nra (q:nra) : data :=
     match stat_nra q with
     | drec l =>
-      drec (l ++ ("nra_to_nnrc", stat_tree_nnrc (nra_to_nnrc q))
+      let (t, q') := time nra_to_nnrc q in
+      drec (l ++ ("nra_to_nnrc", stat_tree_nnrc q')
+              :: ("nra_to_nnrc_time", dstring t)
               :: nil)
     | s => s
     end.
 
   Definition stat_tree_nra (q:nra) : data :=
+    let (t, q') := time nra_optim q in
     drec
       (("nra_no_optim", stat_tree_body_nra q)
-         :: ("nra_optim", stat_tree_body_nra (nra_optim q))
+         :: ("nra_optim", stat_tree_body_nra q')
+         :: ("nra_optim_time", dstring t)
          :: nil).
 
   Definition stat_tree_body_nraenv (q:nraenv) : data :=
     match stat_nraenv q with
     | drec l =>
-      drec (l ++ ("nraenv_to_nnrc", stat_tree_nnrc (nraenv_to_nnrc q))
-              :: ("nraenv_to_nra", stat_tree_nra (nraenv_to_nra q))
+      let (t_nnrc, q_nnrc) := time nraenv_to_nnrc q in
+      let (t_nra, q_nra) := time nraenv_to_nra q in
+      drec (l ++ ("nraenv_to_nnrc", stat_tree_nnrc q_nnrc)
+              :: ("nraenv_to_nnrc_time", dstring t_nnrc)
+              :: ("nraenv_to_nra", stat_tree_nra q_nra)
+              :: ("nraenv_to_nra_time", dstring t_nra)
               :: nil)
     | s => s
     end.
 
   Definition stat_tree_nraenv (q:nraenv) : data :=
+    let (t, q') := time nraenv_optim q in
     drec
       (("nraenv_no_optim", stat_tree_body_nraenv q)
-         :: ("nraenv_optim", stat_tree_body_nraenv (nraenv_optim q))
+         :: ("nraenv_optim", stat_tree_body_nraenv q')
+         :: ("nraenv_optim_time", dstring t)
          :: nil).
 
   Definition stat_tree_camp (q:camp) : data :=
     match stat_camp q with
     | drec l =>
-      drec (l ++ ("camp_to_nraenv", stat_tree_nraenv (camp_to_nraenv q))
-              :: ("camp_to_nra", stat_tree_nra (camp_to_nra q))
+      let (t_nraenv, q_nraenv) := time camp_to_nraenv q in
+      let (t_nra, q_nra) := time camp_to_nra q in
+      drec (l ++ ("camp_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("camp_to_nraenv_time", dstring t_nraenv)
+              :: ("camp_to_nra", stat_tree_nra q_nra)
+              :: ("camp_to_nra_time", dstring t_nra)
               :: nil)
     | s => s
     end.
@@ -240,8 +269,12 @@ Section CompStat.
   Definition stat_tree_rule (q:rule) : data :=
     match stat_rule q with
     | drec l =>
-      drec (l ++ ("rule_to_nraenv", stat_tree_nraenv (rule_to_nraenv q))
-              :: ("rule_to_nra", stat_tree_nra (rule_to_nra q))
+      let (t_nraenv, q_nraenv) := time rule_to_nraenv q in
+      let (t_nra, q_nra) := time rule_to_nra q in
+      drec (l ++ ("rule_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("rule_to_nraenv_time", dstring t_nraenv)
+              :: ("rule_to_nra", stat_tree_nra q_nra)
+              :: ("rule_to_nra_time", dstring t_nra)
               :: nil)
     | s => s
     end.
@@ -249,7 +282,19 @@ Section CompStat.
   Definition stat_tree_oql (q:oql) : data :=
     match stat_oql q with
     | drec l =>
-      drec (l ++ ("oql_to_nraenv", stat_tree_nraenv (oql_to_nraenv q))
+      let (t_nraenv, q_nraenv) := time oql_to_nraenv q in
+      drec (l ++ ("oql_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("oql_to_nraenv_time", dstring t_nraenv)
+              :: nil)
+    | s => s
+    end.
+
+  Definition stat_tree_sql (q:sql) : data :=
+    match stat_sql q with
+    | drec l =>
+      let (t_nraenv, q_nraenv) := time sql_to_nraenv q in
+      drec (l ++ ("sql_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("sql_to_nraenv_time", dstring t_nraenv)
               :: nil)
     | s => s
     end.
@@ -257,7 +302,9 @@ Section CompStat.
   Definition stat_tree_lambda_nra (q:lambda_nra) : data :=
     match stat_lambda_nra q with
     | drec l =>
-      drec (l ++ ("lambda_nra_to_nraenv", stat_tree_nraenv (lambda_nra_to_nraenv q))
+      let (t_nraenv, q_nraenv) := time lambda_nra_to_nraenv q in
+      drec (l ++ ("lambda_nra_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("lambda_nra_to_nraenv_time", dstring t_nraenv)
               :: nil)
     | s => s
     end.
@@ -270,6 +317,7 @@ Section CompStat.
         | Q_rule q => stat_rule q
         | Q_camp q => stat_camp q
         | Q_oql q => stat_oql q
+        | Q_sql q => stat_sql q
         | Q_lambda_nra q => stat_lambda_nra q
         | Q_nra q => stat_nra q
         | Q_nraenv q => stat_nraenv q
@@ -294,6 +342,7 @@ Section CompStat.
         | Q_rule q => stat_tree_rule q
         | Q_camp q => stat_tree_camp q
         | Q_oql q => stat_tree_oql q
+        | Q_sql q => stat_tree_sql q
         | Q_lambda_nra q => stat_tree_lambda_nra q
         | Q_nra q => stat_tree_nra q
         | Q_nraenv q => stat_tree_nraenv q

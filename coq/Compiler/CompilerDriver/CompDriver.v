@@ -26,6 +26,7 @@ Section CompDriver.
 
   (* ASTs *)
   Require Import ODMGRuntime.
+  Require Import SQL.
   Require Import LambdaAlg.
   Require Import CAMPRuntime.
   Require Import NRARuntime.
@@ -95,6 +96,8 @@ Section CompDriver.
   Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
 
   Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_algenv q.
+
+  Definition sql_to_nraenv (q:sql) : nraenv := SQL.sql_to_nraenv q.
 
   Definition lambda_nra_to_nraenv (q:lambda_nra) := algenv_of_lalg q.
 
@@ -202,7 +205,7 @@ Section CompDriver.
 
   Definition dnnrc_typed_dataset_to_spark2
              (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
-    @dnrcToSpark2Top _ _ bm _ _ unit inputType name q.
+    @dnrcToSpark2Top _ _ bm _ unit inputType name q.
 
   Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
     dnnrcToDatasetRewrite q.
@@ -295,6 +298,10 @@ Section CompDriver.
     | Dv_oql_stop : oql_driver
     | Dv_oql_to_nraenv : nraenv_driver -> oql_driver.
 
+  Inductive sql_driver : Set :=
+    | Dv_sql_stop : sql_driver
+    | Dv_sql_to_nraenv : nraenv_driver -> sql_driver.
+
   Inductive lambda_nra_driver : Set :=
     | Dv_lambda_nra_stop : lambda_nra_driver
     | Dv_lambda_nra_to_nraenv : nraenv_driver -> lambda_nra_driver.
@@ -304,6 +311,7 @@ Section CompDriver.
   | Dv_rule : rule_driver -> driver
   | Dv_camp : camp_driver -> driver
   | Dv_oql : oql_driver -> driver
+  | Dv_sql : sql_driver -> driver
   | Dv_lambda_nra : lambda_nra_driver -> driver
   | Dv_nra : nra_driver -> driver
   | Dv_nraenv : nraenv_driver -> driver
@@ -325,6 +333,7 @@ Section CompDriver.
     [ Case_aux c "Dv_rule"%string
     | Case_aux c "Dv_camp"%string
     | Case_aux c "Dv_oql"%string
+    | Case_aux c "Dv_sql"%string
     | Case_aux c "Dv_lambda_nra"%string
     | Case_aux c "Dv_nra"%string
     | Case_aux c "Dv_nraenv"%string
@@ -353,6 +362,7 @@ Section CompDriver.
     | Dv_rule _ => L_rule
     | Dv_camp _ => L_camp
     | Dv_oql _ => L_oql
+    | Dv_sql _ => L_sql
     | Dv_lambda_nra _ => L_lambda_nra
     | Dv_cldmr _ => L_cldmr
     | Dv_dnnrc_dataset  _ => L_dnnrc_dataset
@@ -470,6 +480,12 @@ Section CompDriver.
     | Dv_oql_to_nraenv dv => 1 + driver_length_nraenv dv
     end.
 
+  Definition driver_length_sql (dv: sql_driver) :=
+    match dv with
+    | Dv_sql_stop => 1
+    | Dv_sql_to_nraenv dv => 1 + driver_length_nraenv dv
+    end.
+
   Definition driver_length_lambda_nra (dv: lambda_nra_driver) :=
     match dv with
     | Dv_lambda_nra_stop => 1
@@ -481,6 +497,7 @@ Section CompDriver.
     | Dv_rule dv => driver_length_rule dv
     | Dv_camp dv => driver_length_camp dv
     | Dv_oql dv => driver_length_oql dv
+    | Dv_sql dv => driver_length_sql dv
     | Dv_lambda_nra dv => driver_length_lambda_nra dv
     | Dv_nra dv => driver_length_nra dv
     | Dv_nraenv dv => driver_length_nraenv dv
@@ -711,6 +728,17 @@ Section CompDriver.
     in
     (Q_oql q) :: queries.
 
+  Definition compile_sql (dv: sql_driver) (q: sql) : list query :=
+    let queries :=
+        match dv with
+        | Dv_sql_stop => nil
+        | Dv_sql_to_nraenv dv =>
+          let q := sql_to_nraenv q in
+          compile_nraenv dv q
+        end
+    in
+    (Q_sql q) :: queries.
+
   Definition compile_lambda_nra (dv: lambda_nra_driver) (q: lambda_nra) : list query :=
     let queries :=
         match dv with
@@ -727,6 +755,7 @@ Section CompDriver.
     | (Dv_rule dv, Q_rule q) => compile_rule dv q
     | (Dv_camp dv, Q_camp q) => compile_camp dv q
     | (Dv_oql dv, Q_oql q) => compile_oql dv q
+    | (Dv_sql dv, Q_sql q) => compile_sql dv q
     | (Dv_lambda_nra dv, Q_lambda_nra q) => compile_lambda_nra dv q
     | (Dv_nra dv, Q_nra q) => compile_nra dv q
     | (Dv_nraenv dv, Q_nraenv q) => compile_nraenv dv q
@@ -768,6 +797,7 @@ Section CompDriver.
       | Dv_nra dv => Dv_rule (Dv_rule_to_nra dv)
       | Dv_rule _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrc _
       | Dv_nnrcmr _
@@ -790,6 +820,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrc _
       | Dv_nnrcmr _
@@ -811,6 +842,30 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
+      | Dv_lambda_nra _
+      | Dv_nra _
+      | Dv_nnrc _
+      | Dv_nnrcmr _
+      | Dv_cldmr _
+      | Dv_dnnrc_dataset _
+      | Dv_dnnrc_typed_dataset _
+      | Dv_javascript _
+      | Dv_java _
+      | Dv_spark _
+      | Dv_spark2 _
+      | Dv_cloudant _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
+      end
+  | L_sql =>
+      match dv with
+      | Dv_nraenv dv => Dv_sql (Dv_sql_to_nraenv dv)
+      | Dv_rule _
+      | Dv_camp _
+      | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nnrc _
@@ -833,6 +888,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nnrc _
@@ -857,6 +913,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrcmr _
       | Dv_cldmr _
@@ -879,6 +936,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nnrcmr _
       | Dv_cldmr _
@@ -903,6 +961,7 @@ Section CompDriver.
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim dv)
       | Dv_rule _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -925,6 +984,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -943,6 +1003,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -967,6 +1028,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -991,6 +1053,7 @@ Section CompDriver.
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
+      | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv _
@@ -1021,6 +1084,7 @@ Section CompDriver.
     | L_rule => Dv_rule Dv_rule_stop
     | L_camp => Dv_camp Dv_camp_stop
     | L_oql => Dv_oql Dv_oql_stop
+    | L_sql => Dv_sql Dv_sql_stop
     | L_lambda_nra => Dv_lambda_nra Dv_lambda_nra_stop
     | L_nra => Dv_nra Dv_nra_stop
     | L_nraenv => Dv_nraenv Dv_nraenv_stop
@@ -1053,7 +1117,6 @@ Section CompDriver.
 
   Definition fix_driver dv q :=
     match (dv, q) with
-    | (Dv_rule (Dv_rule_to_camp dv), Q_camp q) => Dv_camp dv
     | (Dv_rule (Dv_rule_to_nraenv dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv dv)
     | (Dv_rule (Dv_rule_to_nra dv), Q_camp q) => Dv_camp (Dv_camp_to_nra dv)
     | (Dv_camp (Dv_camp_to_nraenv dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv dv)
@@ -1149,6 +1212,8 @@ Section CompDriver.
     | Dv_camp (Dv_camp_to_nra dv) => (L_camp, Some (Dv_nra dv))
     | Dv_oql (Dv_oql_stop) => (L_oql, None)
     | Dv_oql (Dv_oql_to_nraenv dv) => (L_oql, Some (Dv_nraenv dv))
+    | Dv_sql (Dv_sql_stop) => (L_sql, None)
+    | Dv_sql (Dv_sql_to_nraenv dv) => (L_sql, Some (Dv_nraenv dv))
     | Dv_lambda_nra (Dv_lambda_nra_stop) => (L_lambda_nra, None)
     | Dv_lambda_nra (Dv_lambda_nra_to_nraenv dv) => (L_lambda_nra, Some (Dv_nraenv dv))
     | Dv_nra (Dv_nra_stop) => (L_nra, None)
@@ -1466,6 +1531,17 @@ Section CompDriver.
                   [apply target_language_of_driver_is_postfix_cnd | | ]; simpl; trivial].
   Qed.
 
+  Lemma target_language_of_driver_is_postfix_sql:
+    (forall o, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_sql o))) (Dv_sql o)).
+  Proof.
+    destruct o; simpl; try reflexivity
+    ; rewrite target_language_of_driver_equation
+    ; simpl.
+    eapply is_postfix_plus_one with
+    (config:=trivial_driver_config) (lang:=L_sql);
+      [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
+  Qed.
+
   Lemma target_language_of_driver_is_postfix_oql:
     (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_oql dv))) (Dv_oql dv)).
   Proof.
@@ -1510,6 +1586,7 @@ Section CompDriver.
          target_language_of_driver_is_postfix_nnrcmr
          target_language_of_driver_is_postfix_rule
          target_language_of_driver_is_postfix_oql
+         target_language_of_driver_is_postfix_sql
          target_language_of_driver_is_postfix_lambda_nra
     : postfix_hints.
     simpl.
@@ -1841,12 +1918,27 @@ Section CompDriver.
           :: L_nraenv
           :: L_nraenv
           :: nil
+      | L_oql, L_nra =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nra
+          :: L_nra
+          :: nil
       | L_oql, L_nnrc =>
         L_oql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: nil
+      | L_oql, L_camp =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
           :: nil
       | L_oql, L_javascript =>
         L_oql
@@ -1933,6 +2025,122 @@ Section CompDriver.
           :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
+      (* From sql: *)
+      | L_sql, L_sql =>
+        L_sql
+          :: nil
+      | L_sql, L_nraenv =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: nil
+      | L_sql, L_nra =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nra
+          :: L_nra
+          :: nil
+      | L_sql, L_nnrc =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: nil
+      | L_sql, L_camp =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
+          :: nil
+      | L_sql, L_javascript =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_sql, L_java =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_sql, L_nnrcmr =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: nil
+      | L_sql, L_spark =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark
+          :: nil
+      | L_sql, L_cldmr =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_sql, L_cloudant =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      | L_sql, L_dnnrc_dataset =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc_dataset
+          :: nil
+      | L_sql, L_dnnrc_typed_dataset =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc_dataset
+          :: L_dnnrc_typed_dataset
+          :: L_dnnrc_typed_dataset
+          :: nil
+      | L_sql, L_spark2 =>
+        L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc_dataset
+          :: L_dnnrc_typed_dataset
+          :: L_dnnrc_typed_dataset
+          :: L_spark2
+          :: nil
       (* From lambda_nra: *)
       | L_lambda_nra, L_lambda_nra =>
         L_lambda_nra
@@ -1942,12 +2150,27 @@ Section CompDriver.
           :: L_nraenv
           :: L_nraenv
           :: nil
+      | L_lambda_nra, L_nra =>
+        L_lambda_nra
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nra
+          :: L_nra
+          :: nil
       | L_lambda_nra, L_nnrc =>
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
+          :: nil
+      | L_lambda_nra, L_camp =>
+        L_lambda_nra
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_camp
           :: nil
       | L_lambda_nra, L_javascript =>
         L_lambda_nra
@@ -2438,6 +2661,20 @@ Section CompDriver.
           :: L_dnnrc_typed_dataset
           :: L_spark2
           :: nil
+      (* From javascript *)
+      | L_javascript, L_javascript =>
+        L_javascript :: nil
+      (* From java *)
+      | L_java, L_java =>
+        L_java :: nil
+      (* From spark2 *)
+      | L_spark2, L_spark2 =>
+        L_spark2 :: nil
+      (* From spark *)
+      | L_spark, L_spark =>
+        L_spark :: nil
+      | L_cloudant, L_cloudant =>
+        L_cloudant :: nil
       | _, _ =>
         let err :=
             "No default path defined from "++(name_of_language source)++" to "++(name_of_language target)
@@ -2445,7 +2682,7 @@ Section CompDriver.
         L_error err :: nil
       end.
 
-    Property get_path_from_source_target_correct:
+    Proposition get_path_from_source_target_correct:
       forall source target,
         forall config,
           match get_path_from_source_target source target with
@@ -2470,17 +2707,230 @@ Section CompDriver.
         intros; try solve [ simpl; split; reflexivity ].
     Qed.
 
-    Property get_path_from_source_target_completeness:
-      forall dv,
-        let source := language_of_driver dv in
-        let target := target_language_of_driver dv in
-        match get_path_from_source_target source target with
+    Definition no_L_error (lang: language) : Prop :=
+    match lang with
+    | L_error _ => False
+    | _ => True
+    end.
+
+    Definition exists_path_from_source_target source target
+      := match get_path_from_source_target source target with
         | L_error _ :: nil => False
         | path => True
-        end.
+         end.
+
+    Lemma exists_path_from_source_target_refl
+          source :
+      no_L_error source ->
+      exists_path_from_source_target source source.
     Proof.
-      admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
-    Admitted. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX *)
+      unfold exists_path_from_source_target.
+      destruct source; simpl; trivial.
+    Qed.
+
+    Lemma exists_path_from_source_target_trans
+             source middle target:
+      exists_path_from_source_target source middle ->
+      exists_path_from_source_target middle target ->
+      exists_path_from_source_target source target.
+    Proof.
+      unfold exists_path_from_source_target.
+      case_eq source; case_eq target; simpl; trivial
+      ; case_eq middle; simpl; try tauto.
+    Qed.
+
+    Global Instance exists_path_from_source_target_trans' :
+      Transitive exists_path_from_source_target.
+    Proof.
+      red; intros.
+      eapply exists_path_from_source_target_trans; eauto.
+    Qed.
+
+    Lemma exists_path_from_source_target_completeness_javascript :
+        (forall dv,
+            exists_path_from_source_target L_javascript (target_language_of_driver (Dv_javascript dv))).
+    Proof.
+      destruct dv
+    ; simpl; try reflexivity; intros.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_javascript : exists_path_hints.
+    
+    Lemma exists_path_from_source_target_completeness_java :
+        (forall dv,
+            exists_path_from_source_target L_java (target_language_of_driver (Dv_java dv))).
+    Proof.
+      destruct dv
+    ; simpl; try reflexivity; intros.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_java : exists_path_hints.
+        
+    Ltac prove_exists_path_complete
+      := simpl; try reflexivity; intros
+         ; rewrite target_language_of_driver_equation
+         ; simpl
+         ; trivial
+         ; try solve [etransitivity; eauto with exists_path_hints; reflexivity].
+
+    Lemma exists_path_from_source_target_completeness_cloudant :
+      (forall dv,
+          exists_path_from_source_target L_cloudant (target_language_of_driver (Dv_cloudant dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+    
+    Hint Resolve exists_path_from_source_target_completeness_cloudant : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_cldmr :
+      (forall dv,
+          exists_path_from_source_target L_cldmr (target_language_of_driver (Dv_cldmr dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+    
+    Hint Resolve exists_path_from_source_target_completeness_cldmr : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_spark2 :
+      (forall dv,
+          exists_path_from_source_target L_spark2 (target_language_of_driver (Dv_spark2 dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+    
+    Hint Resolve exists_path_from_source_target_completeness_spark2 : exists_path_hints.
+    
+    Lemma exists_path_from_source_target_completeness_dnnrc_typed_dataset :
+      (forall dv,
+          exists_path_from_source_target L_dnnrc_typed_dataset (target_language_of_driver (Dv_dnnrc_typed_dataset dv))).
+    Proof.
+      induction dv; prove_exists_path_complete.
+    Qed.
+    
+    Hint Resolve exists_path_from_source_target_completeness_dnnrc_typed_dataset : exists_path_hints.
+    
+    Lemma exists_path_from_source_target_completeness_dnnrc_dataset :
+      (forall dv,
+          exists_path_from_source_target L_dnnrc_dataset (target_language_of_driver (Dv_dnnrc_dataset dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+    
+    Hint Resolve exists_path_from_source_target_completeness_dnnrc_dataset : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_spark :
+      (forall dv,
+          exists_path_from_source_target L_spark (target_language_of_driver (Dv_spark dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+    
+    Hint Resolve exists_path_from_source_target_completeness_spark : exists_path_hints.
+    
+    Lemma exists_path_from_source_target_completeness_cnd :
+        (forall dv,
+            exists_path_from_source_target L_camp (target_language_of_driver (Dv_camp dv)))
+        /\ 
+        (forall dv,
+            exists_path_from_source_target L_nra (target_language_of_driver (Dv_nra dv)))
+        /\ 
+        (forall dv,
+            exists_path_from_source_target L_nraenv (target_language_of_driver (Dv_nraenv dv)))
+        /\ 
+        (forall dv,
+            exists_path_from_source_target L_nnrc (target_language_of_driver (Dv_nnrc dv)))
+        /\ 
+        (forall dv,
+            exists_path_from_source_target L_nnrcmr (target_language_of_driver (Dv_nnrcmr dv))).
+  Proof.
+    apply cnd_combined_ind; prove_exists_path_complete.
+  Qed.
+
+    Lemma exists_path_from_source_target_completeness_camp :
+        (forall dv,
+            exists_path_from_source_target L_camp (target_language_of_driver (Dv_camp dv))).
+    Proof.
+      apply exists_path_from_source_target_completeness_cnd.
+    Qed.
+    Lemma exists_path_from_source_target_completeness_nra:
+      (forall dv,
+          exists_path_from_source_target L_nra (target_language_of_driver (Dv_nra dv))).
+    Proof.
+      apply exists_path_from_source_target_completeness_cnd.
+    Qed.
+    Lemma exists_path_from_source_target_completeness_nraenv :
+      (forall dv,
+          exists_path_from_source_target L_nraenv (target_language_of_driver (Dv_nraenv dv))).
+    Proof.
+      apply exists_path_from_source_target_completeness_cnd.
+    Qed.
+    Lemma exists_path_from_source_target_completeness_nnrc :
+      (forall dv,
+          exists_path_from_source_target L_nnrc (target_language_of_driver (Dv_nnrc dv))).
+    Proof.
+      apply exists_path_from_source_target_completeness_cnd.
+    Qed.
+    Lemma exists_path_from_source_target_completeness_nnrcmr :
+      (forall dv,
+          exists_path_from_source_target L_nnrcmr (target_language_of_driver (Dv_nnrcmr dv))).
+    Proof.
+      apply exists_path_from_source_target_completeness_cnd.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_camp : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_nra : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_nraenv : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_nnrc : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_nnrcmr : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_rule :
+        (forall dv,
+            exists_path_from_source_target L_rule (target_language_of_driver (Dv_rule dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_rule : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_oql :
+        (forall dv,
+            exists_path_from_source_target L_oql (target_language_of_driver (Dv_oql dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_oql : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_sql :
+        (forall dv,
+            exists_path_from_source_target L_sql (target_language_of_driver (Dv_sql dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_sql : exists_path_hints.
+
+    Lemma exists_path_from_source_target_completeness_lambda_nra :
+        (forall dv,
+            exists_path_from_source_target L_lambda_nra (target_language_of_driver (Dv_lambda_nra dv))).
+    Proof.
+      destruct dv; prove_exists_path_complete.
+    Qed.
+
+    Hint Resolve exists_path_from_source_target_completeness_lambda_nra : exists_path_hints.
+
+    Proposition get_path_from_source_target_completeness:
+      forall dv,
+        no_dv_error dv ->
+        let source := language_of_driver dv in
+        let target := target_language_of_driver dv in
+        exists_path_from_source_target source target.
+    Proof.
+      destruct dv; simpl
+      ;  auto with exists_path_hints.
+      - etransitivity; [ | eauto with exists_path_hints ].
+        reflexivity.
+    Qed.
 
     (* Comp *)
     (* XXX TODO : use driver *)

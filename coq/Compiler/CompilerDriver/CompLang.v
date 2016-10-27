@@ -31,7 +31,8 @@ Section CompLang.
   Require Import NNRCMRtoDNNRC.
   Require Import TDNRCInfer.
   Require Import LambdaAlg.
-
+  Require Import SQL.
+  
   Require Rule.
 
   Definition vdbindings := vdbindings.
@@ -46,6 +47,7 @@ Section CompLang.
   Definition rule := rule.
   Definition camp := pat.
   Definition oql := oql_expr.
+  Definition sql := sql.
   Definition lambda_nra := lalg.
   Definition nra := alg.
   Definition nraenv := algenv.
@@ -64,6 +66,7 @@ Section CompLang.
     | L_rule : language
     | L_camp : language
     | L_oql : language
+    | L_sql : language
     | L_lambda_nra : language
     | L_nra : language
     | L_nraenv : language
@@ -83,6 +86,7 @@ Section CompLang.
     | Q_rule : rule -> query
     | Q_camp : camp -> query
     | Q_oql : oql -> query
+    | Q_sql : sql -> query
     | Q_lambda_nra : lambda_nra -> query
     | Q_nra : nra -> query
     | Q_nraenv : nraenv -> query
@@ -103,6 +107,7 @@ Section CompLang.
     [ Case_aux c "Q_rule"%string
     | Case_aux c "Q_camp"%string
     | Case_aux c "Q_oql"%string
+    | Case_aux c "Q_sql"%string
     | Case_aux c "Q_lambda_nra"%string
     | Case_aux c "Q_nra"%string
     | Case_aux c "Q_nraenv"%string
@@ -126,6 +131,7 @@ Section CompLang.
     | "rule"%string => L_rule
     | "camp"%string => L_camp
     | "oql"%string => L_oql
+    | "sql"%string => L_sql
     | "lambda_nra"%string => L_lambda_nra
     | "nra"%string => L_nra
     | "nraenv"%string => L_nraenv
@@ -148,6 +154,7 @@ Section CompLang.
     | L_rule => "rule"%string
     | L_camp => "camp"%string
     | L_oql => "oql"%string
+    | L_sql => "sql"%string
     | L_lambda_nra => "lambda_nra"%string
     | L_nra => "nra"%string
     | L_nraenv => "nraenv"%string
@@ -169,6 +176,7 @@ Section CompLang.
     | Q_rule _ => L_rule
     | Q_camp _ => L_camp
     | Q_oql _ => L_oql
+    | Q_sql _ => L_sql
     | Q_lambda_nra _ => L_lambda_nra
     | Q_nra _ => L_nra
     | Q_nraenv _ => L_nraenv
@@ -199,6 +207,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   [ Case_aux c "L_rule"%string
   | Case_aux c "L_camp"%string
   | Case_aux c "L_oql"%string
+  | Case_aux c "L_sql"%string
   | Case_aux c "L_lambda_nra"%string
   | Case_aux c "L_nra"%string
   | Case_aux c "L_nraenv"%string

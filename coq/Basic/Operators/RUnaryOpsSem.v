@@ -19,7 +19,7 @@ Section RUnaryOpsSem.
   Require Import String List Compare_dec ZArith.
   
   Require Import Utils.
-  Require Import RBag RData RDataNorm RRelation.
+  Require Import RBag RData RDataNorm RDataSort RRelation.
   Require Import RUtilOps.
   Require Export RUnaryOps.
   Require Import BrandRelation.
@@ -47,7 +47,7 @@ Section RUnaryOpsSem.
   Context {fuop:foreign_unary_op}.
 
   Context (h:brand_relation_t).
-  
+
   Definition fun_of_unaryop (uop:unaryOp) : data -> option data :=
     match uop with
     | AIdOp =>
@@ -67,6 +67,8 @@ Section RUnaryOpsSem.
       fun d => lift_oncoll (fun l => (lift dcoll (rflatten l))) d
     | ADistinct =>
       fun d => rondcoll (@bdistinct data data_eq_dec) d
+    | AOrderBy sc =>
+      fun d => data_sort sc d (* XXX Some very limited/hackish sorting XXX *)
     | ARec s =>
       fun d => Some (drec ((s,d) :: nil))
     | ADot s =>
@@ -105,6 +107,36 @@ Section RUnaryOpsSem.
       fun d => lift dnat (lift_oncoll darithmean d)
     | AToString =>
       fun d => Some (dstring (dataToString d))
+    | ASubstring start olen =>
+      fun d =>
+                (match d with
+                 | dstring s =>
+                   Some (dstring (
+                   let real_start :=
+                       (match start with
+                        | 0%Z => 0
+                     | Z.pos p => Pos.to_nat p
+                     | Z.neg n => (String.length s) - (Pos.to_nat n)
+                        end) in
+                   let real_olen :=
+                       match olen with
+                       | Some len =>
+                         match len with
+                         | 0%Z => 0
+                         | Z.pos p => Pos.to_nat p
+                         | Z.neg n => 0
+                         end
+                       | None => (String.length s) - real_start
+                       end in
+                   (substring real_start real_olen s)))
+                 | _ => None
+                 end)
+    | ALike pat oescape =>
+      fun d =>
+        match d with
+        | dstring s => Some (dbool (string_like s pat oescape))
+        | _ => None
+        end
     | ALeft =>
       fun d => Some (dleft d)
     | ARight =>
@@ -232,6 +264,8 @@ Section RUnaryOpsSem.
       destruct ll; subst.
       simpl in *. inversion e; subst.
       intros; apply data_normalized_bdistinct; trivial.
+    - Case "AOrderBy"%string.
+      apply data_sort_normalized.
     - Case "ADot"%string.
       destruct d; try discriminate.
       intros. eapply data_normalized_edot; eauto.

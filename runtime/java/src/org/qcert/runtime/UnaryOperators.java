@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import com.google.gson.*;
 
@@ -206,7 +207,16 @@ public class UnaryOperators {
 		return new JsonPrimitive(sb.toString());
 	}
 	
-	
+	public static JsonElement substring(int start, int end, JsonElement e) {
+		String str = e.getAsJsonPrimitive().getAsString();
+		return new JsonPrimitive(str.substring(start, end));
+	}
+
+	public static JsonElement substring(int start, JsonElement e) {
+		String str = e.getAsJsonPrimitive().getAsString();
+		return new JsonPrimitive(str.substring(start));
+	}
+
 	public static JsonElement left(JsonElement e) {
 		return rec("left", e);
 	}
@@ -375,4 +385,68 @@ public class UnaryOperators {
 		// since we are storing times as strings anyway
 		return e;
 	}
+	
+	public static JsonElement sql_date_from_string(JsonElement e) {
+		return e;
+	}
+
+	public static JsonElement sql_date_interval_from_string(JsonElement e) {
+		return e;
+	}
+
+	public final static int DAY = 1;
+	public final static int MONTH = 2;
+	public final static int YEAR = 3;
+	
+	public static JsonElement sql_get_date_component(int part, JsonElement e) {
+		return e;
+	}
+
+	public static JsonElement string_like(LikeClause[] clauses, JsonElement elem) {
+		final String str = elem.getAsString();
+		String pat = "";
+		for(LikeClause clause : clauses) {
+			pat += clause.getRegex();
+		}
+		boolean matches = Pattern.matches(pat, str);
+		return new JsonPrimitive(matches);
+	}
+	
+	public static interface LikeClause {
+		public String getRegex();		
+	}
+	
+	public static class AnyCharLikeClause implements LikeClause {
+		public String getRegex() {
+			return Pattern.quote(".");
+		}		
+	}
+
+	public static class AnyStringLikeClause implements LikeClause {
+		public String getRegex() {
+			return Pattern.quote(".*");
+		}
+	}
+
+	public static class LiteralLikeClause implements LikeClause {
+		public LiteralLikeClause(String literal) {
+			this.literal = literal;
+		}
+		
+		private String literal;
+
+		public String getLiteral() {
+			return literal;
+		}
+
+		public void setLiteral(String literal) {
+			this.literal = literal;
+		}
+		
+		public String getRegex() {
+			return Pattern.quote(literal);
+		}
+
+	}
+	
 }

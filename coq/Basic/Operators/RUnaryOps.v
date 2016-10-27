@@ -18,11 +18,14 @@
 
 Section RUnaryOps.
 
+  Require Import Ascii.
   Require Import String.
+  Require Import ZArith.
   Require Import EquivDec.
   Require Import Utils.
   Require Import BrandRelation.
   Require Import RUtilOps.
+  Require Import RDataSort.
   Require Import ForeignData.
   Require Import ForeignOps.
 
@@ -40,8 +43,9 @@ Section RUnaryOps.
   | ANeg: unaryOp                         (* boolean negation *)
   | AColl : unaryOp                       (* singleton bag *)
   | ASingleton : unaryOp                  (* un-coll a singleton collectin *)
-  | AFlatten : unaryOp                    (* bag flatten *)
-  | ADistinct: unaryOp                    (* bag distinct *)
+  | AFlatten : unaryOp                    (* flatten *)
+  | ADistinct: unaryOp                    (* distinct *)
+  | AOrderBy : SortCriterias -> unaryOp   (* sort returns a sorted collection but no guarantee on how long order is maintained!! *)
   | ARec : string -> unaryOp              (* record construction.  Constructs a record with a single field (the string argument) *)
   | ADot : string -> unaryOp              (* record field access.  Given a record, returns the value associated with the provided field *)
   | ARecRemove : string -> unaryOp        (* record field removal.  Transforms a record by removing the named field *)
@@ -52,6 +56,8 @@ Section RUnaryOps.
   | ANumMax : unaryOp                     (* max over a collection of numeric values *)
   | AArithMean : unaryOp                  (* arithmetic mean of natural numbers in a bag *)
   | AToString : unaryOp                   (* data to string.  Important for test cases *)
+  | ASubstring : Z -> option Z -> unaryOp (* returns the substring starting with the nth character, for m characters (or the rest of the string) *)
+  | ALike (pattern:string) (escape:option ascii) : unaryOp (* like expression as in sql *)
   | ALeft : unaryOp                       (* create a dleft *)
   | ARight : unaryOp                      (* create a dright *)
   | ABrand : brands -> unaryOp            (* box a branded value *)
@@ -67,11 +73,23 @@ Section RUnaryOps.
     decide equality.
   Defined.
 
+  Global Instance SortCriterias_eqdec : EqDec SortCriterias eq.
+  Proof.
+    change (forall x y : SortCriterias,  {x = y} + {x <> y}).
+    decide equality; try apply string_dec.
+    decide equality; try apply string_dec.
+    decide equality; try apply string_dec.
+  Defined.
+
   Global Instance unaryOp_eqdec : EqDec unaryOp eq.
   Proof.
     change (forall x y : unaryOp,  {x = y} + {x <> y}).
     decide equality; try apply string_dec.
+    - apply SortCriterias_eqdec.
     - induction l; decide equality; apply string_dec.
+    - apply option_eqdec.
+    - apply Z_eqdec.
+    -  apply equiv_dec.
     - induction b; decide equality; apply string_dec.
     - induction b; decide equality; apply string_dec.
     - apply ArithUOp_eqdec.
@@ -90,6 +108,16 @@ Section RUnaryOps.
             end
        }.
 
+  Definition ToString_SortDesc sd :=
+    match sd with
+    | Ascending => "asc"
+    | Descending => "desc"
+    end.
+  
+  Definition ToString_SortCriteria (sc : string * SortDesc) :=
+    let (att,sd) := sc in
+    bracketString "(" (att ++ "," ++ (ToString_SortDesc sd)) ")".
+  
   Global Instance ToString_unaryOp : ToString unaryOp
     := {toString :=
           fun (op:unaryOp) =>
@@ -100,6 +128,10 @@ Section RUnaryOps.
             | ASingleton => "ASingleton"
             | AFlatten => "AFlatten"
             | ADistinct => "ADistinct"
+            | AOrderBy ls =>
+              "(AOrderBy"
+                ++ (bracketString "[" (joinStrings "," (List.map ToString_SortCriteria ls)) "]")
+                ++ ")"
             | ARec f => "(ARec " ++ f ++ ")"
             | ADot s => "(ADot " ++ s ++ ")"
             | ARecRemove s => "(ArecRemove " ++ s ++ ")"
@@ -112,6 +144,19 @@ Section RUnaryOps.
             | ANumMax => "ANumMax"
             | AArithMean => "AArithMean"
             | AToString => "AToString"
+            | ASubstring start len => "(ASubstring " ++ (toString start)
+                                                     ++ (match len with
+                                                         | None => ""
+                                                         | Some len => " " ++ (toString len)
+                                                         end
+                                                        ) ++ ")"
+            | ALike pattern oescape => "(ALike " ++ pattern
+                                                     ++ (match oescape with
+                                                         | None => ""
+                                                         | Some escape => " ESCAPE " ++ (String escape EmptyString)
+                                                         end
+                                                        ) ++ ")"
+                                                              
             | ALeft => "ALeft"
             | ARight => "ARight"
             | ABrand b => "(ABrand " ++ (@toString _ ToString_brands b)++ ")"
@@ -134,6 +179,7 @@ Tactic Notation "unaryOp_cases" tactic(first) ident(c) :=
   | Case_aux c "ASingleton"%string
   | Case_aux c "AFlatten"%string
   | Case_aux c "ADistinct"%string
+  | Case_aux c "AOrderBy"%string
   | Case_aux c "ARec"%string
   | Case_aux c "ADot"%string
   | Case_aux c "ARecRemove"%string
@@ -144,6 +190,8 @@ Tactic Notation "unaryOp_cases" tactic(first) ident(c) :=
   | Case_aux c "ANumMax"%string
   | Case_aux c "AArithMean"%string
   | Case_aux c "AToString"%string
+  | Case_aux c "ASubstring"%string
+  | Case_aux c "ALike"%string
   | Case_aux c "ALeft"%string
   | Case_aux c "ARight"%string
   | Case_aux c "ABrand"%string

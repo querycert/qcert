@@ -57,13 +57,20 @@
 %token TIMENE TIMELT TIMELE TIMEGT TIMEGE
 %token TIMEDURATIONFROMSCALE TIMEDURATIONBETWEEN
 
+%token SQLDATEPLUS SQLDATEMINUS
+%token SQLDATENE SQLDATELT SQLDATELE SQLDATEGT SQLDATEGE
+%token SQLDATEINTERVALBETWEEN
+
 %token TIMEFROMSTRING TIMEDURATIONFROMSTRING
+
+%token SQLDATEFROMSTRING SQLDATEINTERVALFROMSTRING
+%token SQLGETDATECOMPONENT
 
 %token PNOW
 
 %token AEQ AUNION ACONCAT AMERGECONCAT AAND AOR ALT ALE AMINUS AMIN AMAX ACONTAINS ASCONCAT
 %token ABARITH ARITHPLUS ARITHMINUS ARITHMULT ARITHMIN ARITHMAX ARITHDIVIDE ARITHREM
-%token AIDOP ANEG ACOLL ACOUNT AFLATTEN ADISTINCT ASUM ATOSTRING ANUMMIN ANUMMAX AARITHMEAN ACAST ADOT AREC ARECPROJECT AUNBRAND ASINGLETON
+%token AIDOP ANEG ACOLL ACOUNT AFLATTEN ADISTINCT ASUM ATOSTRING ASUBSTRING ALIKE ESCAPE ANUMMIN ANUMMAX AARITHMEAN ACAST ADOT AREC ARECPROJECT AUNBRAND ASINGLETON
 %token AUARITH ARITHABS ARITHLOG2 ARITHSQRT
 %token RULEWHEN RULEGLOBAL RULERETURN RULENOT
 %token COMMA
@@ -87,7 +94,7 @@
 %nonassoc BANGDASHARROW
 %nonassoc UIS
 %right TEMPVAR UFETCH
-%nonassoc TOSTRING  
+%nonassoc TOSTRING
 %nonassoc UWITHVAR
 %nonassoc PASSERT
 
@@ -334,6 +341,22 @@ bop:
   { Enhanced.Ops.Binary.time_duration_from_scale }
 | TIMEDURATIONBETWEEN
   { Enhanced.Ops.Binary.time_duration_between }
+| SQLDATEPLUS
+  { Enhanced.Ops.Binary.sql_date_plus }
+| SQLDATEMINUS
+  { Enhanced.Ops.Binary.sql_date_minus }
+| SQLDATENE
+  { Enhanced.Ops.Binary.sql_date_ne }
+| SQLDATELT
+  { Enhanced.Ops.Binary.sql_date_lt }
+| SQLDATELE
+  { Enhanced.Ops.Binary.sql_date_le }
+| SQLDATEGT
+  { Enhanced.Ops.Binary.sql_date_gt }
+| SQLDATEGE
+  { Enhanced.Ops.Binary.sql_date_ge }
+| SQLDATEINTERVALBETWEEN
+  { Enhanced.Ops.Binary.sql_date_interval_between }
 | AEQ
     { QOps.Binary.aeq }
 | AUNION
@@ -375,6 +398,14 @@ bop:
 | LPAREN ABARITH ARITHREM RPAREN
     { QOps.Binary.ZArith.arem }
 
+sql_date_component:
+| DAY
+  { Enhanced.Data.sql_date_day }
+| MONTH
+  { Enhanced.Data.sql_date_month }
+| YEAR
+  { Enhanced.Data.sql_date_year }
+
 uop:
 | FLOATNEG
   { Enhanced.Ops.Unary.float_neg }
@@ -412,6 +443,15 @@ uop:
     { QOps.Unary.asum }
 | ATOSTRING
     { QOps.Unary.atostring }
+| ASUBSTRING LPAREN s = INT RPAREN
+  { QOps.Unary.asubstring s None }
+| ASUBSTRING LPAREN s = INT COMMA len = INT RPAREN
+  { QOps.Unary.asubstring s (Some len) }
+| ALIKE LPAREN s = STRING RPAREN
+  { QOps.Unary.alike (Util.char_list_of_string s) None }
+(* This should really be a CHAR escape character, but I don't know how to do that *)
+| ALIKE LPAREN s = STRING ESCAPE esc = STRING RPAREN
+    { QOps.Unary.alike (Util.char_list_of_string s) (Some (esc.[0])) }
 | ANUMMIN
     { QOps.Unary.anummin }
 | ANUMMAX
@@ -448,4 +488,11 @@ uop:
     { Enhanced.Ops.Unary.time_from_string }
 | TIMEDURATIONFROMSTRING
     { Enhanced.Ops.Unary.time_duration_from_string }
+| SQLDATEFROMSTRING
+    { Enhanced.Ops.Unary.sql_date_from_string }
+| SQLDATEINTERVALFROMSTRING
+    { Enhanced.Ops.Unary.sql_date_interval_from_string }
+| LPAREN SQLGETDATECOMPONENT c = sql_date_component RPAREN
+    { Enhanced.Ops.Unary.sql_get_date_component c }
+
 

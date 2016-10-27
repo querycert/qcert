@@ -1,0 +1,25 @@
+Tests on small-tables (tables pruned & fixed for queries to not return empty)
+
+Queries supported 'as is':
+  q2, q11, q16, q17, q18, q19, q20, q22
+
+Queries supported after 'adjustment':
+  q1 (q101), q3 (q103), q4 (q104), q6 (q106), q15 (q115b)
+
+Not supported:
+  q13 (left outer join)
+
+Not tested yet:
+  q5, q7, q9, q10, q21
+  q8, q12, q14 (cases)
+
+Numbers: Rev 3. Compilation/Optimization timing on those queries. TPC-DS.
+
+Jerome: Lock on whole Paper and try and send revision today/tomorrow.
+Avi: working on pushing selection through product
+Josh: long list of things! :)
+ q15 (view definition) ;
+ 'type inferrence' in AST ;
+ TPC-DS;
+ try on real DB.
+Louis: lead on compilation/optimization numbers/timing. query size.

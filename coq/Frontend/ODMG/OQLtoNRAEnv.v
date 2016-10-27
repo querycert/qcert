@@ -43,7 +43,7 @@ Section OQLtoNRAEnv.
     | OTable t => ANGetConstant t
     | OBinop b e1 e2 => ANBinop b (algenv_of_oql e1) (algenv_of_oql e2)
     | OUnop u e1 => ANUnop u (algenv_of_oql e1)
-    | OSFW select_clause from_clause where_clause =>
+    | OSFW select_clause from_clause where_clause order_clause =>
       let algenv_of_from (opacc:algenv) (from_in_expr : oql_in_expr) :=
           match from_in_expr with
             | OIn in_v from_expr =>
@@ -70,11 +70,17 @@ Section OQLtoNRAEnv.
             ANSelect (algenv_of_oql where_expr) algenv_of_from_clause
           end
       in
+      let algenv_of_order_clause :=
+          match order_clause with
+          | ONoOrder => algenv_of_where_clause
+          | OOrderBy e sc => algenv_of_where_clause
+          end
+      in
       match select_clause with
       | OSelect select_expr =>
-        ANMap (algenv_of_oql select_expr) algenv_of_where_clause
+        ANMap (algenv_of_oql select_expr) algenv_of_order_clause
       | OSelectDistinct select_expr =>
-        ANUnop ADistinct (ANMap (algenv_of_oql select_expr) algenv_of_where_clause)
+        ANUnop ADistinct (ANMap (algenv_of_oql select_expr) algenv_of_order_clause)
       end
     end.
 
@@ -1090,7 +1096,31 @@ Section OQLtoNRAEnv.
         reflexivity.
     - destruct e1.
       + simpl in *.
+        rewrite <- (algenv_of_from_clause_correct _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
+        rewrite <- algenv_of_where_clause_correct; [|assumption].
+        rewrite <- algenv_of_select_expr_correct; [|assumption].
+        reflexivity.
+      + simpl in *.
         rewrite <- (algenv_of_from_clause_correct _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity].
+        rewrite <- algenv_of_where_clause_correct; [|assumption].
+        rewrite <- algenv_of_select_expr_correct; [|assumption].
+        rewrite push_lift_coll_in_rmap; simpl.
+        rewrite olift_rondcoll_over_dcoll.
+        reflexivity.
+    - destruct e1.
+      + simpl in *.
+        rewrite <- (algenv_of_from_clause_correct _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity].
+        rewrite <- algenv_of_select_expr_correct; [|assumption].
+        reflexivity.
+      + simpl in *.
+        rewrite <- (algenv_of_from_clause_correct _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity].
+        rewrite <- algenv_of_select_expr_correct; [|assumption].
+        rewrite push_lift_coll_in_rmap; simpl.
+        rewrite olift_rondcoll_over_dcoll.
+        reflexivity.
+    - destruct e1.
+      + simpl in *.
+        rewrite <- (algenv_of_from_clause_correct _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         rewrite <- algenv_of_where_clause_correct; [|assumption].
         rewrite <- algenv_of_select_expr_correct; [|assumption].
         reflexivity.

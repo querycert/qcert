@@ -45,6 +45,7 @@ MODULES = \
 	Basic/Data/RData \
 	Basic/Data/RDataNorm \
 	Basic/Data/RRelation \
+	Basic/Data/RDataSort \
 	Basic/Data/RGroupBy \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
@@ -189,6 +190,7 @@ MODULES = \
 	Frontend/ODMG/OQLtoNRAEnv \
 	Frontend/ODMG/TOQL \
 	Frontend/ODMGRuntime \
+	Frontend/SQL/SQL \
 	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignTypeToJSON \
@@ -219,6 +221,7 @@ MODULES = \
 	Compiler/CompilerModel/FloatModelPart \
 	Compiler/CompilerModel/StringModelPart \
 	Compiler/CompilerModel/DateTimeModelPart \
+	Compiler/CompilerModel/SqlDateModelPart \
 	Compiler/CompilerModel/EnhancedModel \
 	Compiler/CompilerModel/TrivialModel \
 	Compiler/CompilerDriver/CompLang \
@@ -231,6 +234,7 @@ MODULES = \
 	Compiler/QLib/QPattern \
 	Compiler/QLib/QRule \
 	Compiler/QLib/QOQL \
+	Compiler/QLib/QSQL \
 	Compiler/QLib/QLambdaNRA \
 	Compiler/QLib/QLang \
 	Compiler/QLib/QDriver \
@@ -249,6 +253,7 @@ MODULES = \
 	Tests/CompilerTest \
 	Tests/MRTest \
 	Tests/OQLTest \
+	Tests/SQLTest \
 	Tests/LambdaAlgTests
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))

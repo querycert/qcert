@@ -1864,24 +1864,24 @@ Qed.
   
   (** Main lemmas for the correctness of the translation *)
 
-Lemma nrcToPat_let_ns_correct h cenv n env d :
-  shadow_free n = true ->
-  NoDup (domain env) ->
-  (forall x, In x (domain env) -> ~ In x (nrc_bound_vars n)) ->
-  (forall x, In x (domain (nrc_to_pat_env env)) -> ~ In x (map loop_var (nrc_bound_vars n))) ->
-  NNRC.nrc_eval h env n = pr2op (interp h cenv (nrcToPat_ns_let n) (rec_sort (nrc_to_pat_env env)) d).
-Proof.
-  intros.
-  rewrite (nrcToPat_sem_correct_ns _ cenv); auto.
-  f_equal.
-  rewrite nrcToPat_ns_let_equiv; eauto 2.
-  - erewrite nrcToPat_data_indep; reflexivity.
-  - rewrite fresh_bindings_domain_drec_sort.
-    apply fresh_bindings_from_nrc.
-  - intros ? inn.
-    apply -> (@in_dom_rec_sort) in inn.
-    eauto 2.
-Qed.
+  Lemma nrcToPat_let_ns_correct h cenv n env d :
+    shadow_free n = true ->
+    NoDup (domain env) ->
+    (forall x, In x (domain env) -> ~ In x (nrc_bound_vars n)) ->
+    (forall x, In x (domain (nrc_to_pat_env env)) -> ~ In x (map loop_var (nrc_bound_vars n))) ->
+    NNRC.nrc_eval h env n = pr2op (interp h cenv (nrcToPat_ns_let n) (rec_sort (nrc_to_pat_env env)) d).
+  Proof.
+    intros.
+    rewrite (nrcToPat_sem_correct_ns _ cenv); auto.
+    f_equal.
+    rewrite nrcToPat_ns_let_equiv; eauto 2.
+    - erewrite nrcToPat_data_indep; reflexivity.
+    - rewrite fresh_bindings_domain_drec_sort.
+      apply fresh_bindings_from_nrc.
+    - intros ? inn.
+      apply -> (@in_dom_rec_sort string) in inn.
+      eauto 2.
+  Qed.
 
   Lemma nrcToPat_let_correct_messy h cenv avoid n env d :
     NoDup (domain env) ->

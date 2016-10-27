@@ -164,6 +164,8 @@ let string_of_foreign_data (fd:Hack.enhanced_data) : string =
   | Hack.Enhancedtimescale ts -> timescale_as_string ts
   | Hack.Enhancedtimeduration td -> raise Not_found
   | Hack.Enhancedtimepoint tp -> raise Not_found
+  | Hack.Enhancedsqldate td -> raise Not_found
+  | Hack.Enhancedsqldateinterval tp -> raise Not_found
 
 let foreign_data_of_string s =
   try
@@ -198,6 +200,8 @@ let pretty_foreign_data ff fd =
   | Hack.Enhancedtimescale ts -> pretty_timescale ff ts
   | Hack.Enhancedtimeduration td -> raise Not_found
   | Hack.Enhancedtimepoint tp -> raise Not_found
+  | Hack.Enhancedsqldate td -> raise Not_found
+  | Hack.Enhancedsqldateinterval tp -> raise Not_found
 
 let rec pretty_names ff nl =
   match nl with
@@ -280,6 +284,12 @@ let pretty_unarith p sym callb ff ua a =
   | Hack.ArithLog2 -> pretty_unary_exp sym callb "log2" ff a
   | Hack.ArithSqrt -> pretty_unary_exp sym callb "sqrt" ff a
 
+let sql_date_component_to_string part =
+  match part with
+  | Hack.Sql_date_DAY -> "DAY"
+  | Hack.Sql_date_MONTH -> "MONTH"
+  | Hack.Sql_date_YEAR -> "YEAR"
+
 let string_of_foreign_unop fu : string =
   match fu with
   | Hack.Enhanced_unary_float_op Hack.Uop_float_neg -> "Fneg"
@@ -299,7 +309,10 @@ let string_of_foreign_unop fu : string =
   | Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale -> "TimeToScale"
   | Hack.Enhanced_unary_time_op Hack.Uop_time_from_string -> "TimeFromString"
   | Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string -> "TimeDurationFromString"
-
+  | Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component part) -> "(SqlGetDateComponent " ^ (sql_date_component_to_string part) ^ ")"
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_from_string -> "SqlDateFromString"
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_interval_from_string -> "SqlDateIntervalFromString"
+									    
 let foreign_unop_of_string s =
   match s with
   | "Fneg" -> Hack.Enhanced_unary_float_op Hack.Uop_float_neg
@@ -319,6 +332,12 @@ let foreign_unop_of_string s =
   | "TimeToScale" -> Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale
   | "TimeFromString" -> Hack.Enhanced_unary_time_op Hack.Uop_time_from_string
   | "TimeDurationFromString" -> Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string
+  | "(SqlGetDateComponent DAY)"->  Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component Hack.Sql_date_DAY)
+  | "(SqlGetDateComponent MONTH)"->  Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component Hack.Sql_date_MONTH)
+  | "(SqlGetDateComponent YEAR)"->  Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component Hack.Sql_date_YEAR)
+  | "SqlDateFromString" -> Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_from_string
+  | "SqlDateIntervalFromString" -> Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_interval_from_string
+
   | _ -> raise Not_found
 
 let pretty_foreign_unop p sym callb ff fu a =
@@ -340,6 +359,9 @@ let pretty_foreign_unop p sym callb ff fu a =
   | Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale -> pretty_unary_exp sym callb "TimeToScale" ff a
   | Hack.Enhanced_unary_time_op Hack.Uop_time_from_string -> pretty_unary_exp sym callb "TimeFromString" ff a
   | Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string -> pretty_unary_exp sym callb "TimeDurationFromString" ff a
+  | Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component part) -> pretty_unary_exp sym callb ("(SqlGetDateComponent " ^ sql_date_component_to_string part ^ ")") ff a
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_from_string -> pretty_unary_exp sym callb "SqlDateFromString" ff a
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_interval_from_string -> pretty_unary_exp sym callb "SqlDateIntervalFromString" ff a
 
 let pretty_unop p sym callb ff u a =
   match u with
@@ -372,9 +394,16 @@ let pretty_unop p sym callb ff u a =
   | Hack.ARecProject atts ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.pi (pretty_squared_names sym) atts (callb 0 sym) a
   | Hack.ADistinct -> pretty_unary_exp sym callb "distinct" ff a
+  | Hack.AOrderBy atts ->
+      fprintf ff "@[<hv 0>%s%a(%a)@]" "sort" (pretty_squared_names sym) (List.map fst atts) (callb 0 sym) a
   | Hack.ASum -> pretty_unary_exp sym callb "sum" ff a
   | Hack.AArithMean -> pretty_unary_exp sym callb "avg" ff a
   | Hack.AToString -> pretty_unary_exp sym callb "toString" ff a
+  | Hack.ASubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
+  | Hack.ASubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
+  | Hack.ALike (n1,None) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^"]") ff a
+  (* for some reason using String.str gives a compile error *)
+  | Hack.ALike (n1,Some n2) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^" ESCAPE "^(Util.string_of_char_list [n2])^"]") ff a
   (* resets precedence back to 0 *)
   | Hack.ACast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
   | Hack.AUnbrand ->
@@ -476,6 +505,14 @@ let string_of_foreign_binop fb =
   | Hack.Enhanced_binary_time_op Hack.Bop_time_ge -> "time_ge"
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_from_scale -> "time_duration_from_scale"
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between -> "time_duration_between"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_plus -> "sql_date_plus"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_minus -> "sql_date_minus"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ne -> "sql_date_ne"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_lt -> "sql_date_lt"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_le -> "sql_date_le"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_gt -> "sql_date_gt"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ge -> "sql_date_ge"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_interval_between -> "sql_date_interval_between"
 
 let foreign_binop_of_string fb =
   match fb with
@@ -500,6 +537,13 @@ let foreign_binop_of_string fb =
   | "time_ge" -> Hack.Enhanced_binary_time_op Hack.Bop_time_ge
   | "time_duration_from_scale" -> Hack.Enhanced_binary_time_op Hack.Bop_time_duration_from_scale
   | "time_duration_between" -> Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between
+  | "sql_date_plus" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_plus
+  | "sql_date_ne" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ne
+  | "sql_date_lt" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_lt
+  | "sql_date_le" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_le
+  | "sql_date_gt" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_gt
+  | "sql_date_ge" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ge
+  | "sql_date_interval_between" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_interval_between
   | _ -> raise Not_found
 
 let pretty_foreign_binop p sym callb ff fb a1 a2 =
@@ -546,6 +590,22 @@ let pretty_foreign_binop p sym callb ff fb a1 a2 =
      pretty_infix_exp p 18 sym callb ("TD_fs",1) ff a1 a2
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between ->
      pretty_infix_exp p 18 sym callb ("TD_be",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_plus ->
+     pretty_infix_exp p 18 sym callb ("SD+",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_minus ->
+     pretty_infix_exp p 18 sym callb ("SD-",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ne ->
+     pretty_infix_exp p 18 sym callb ("SD!=",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_lt ->
+     pretty_infix_exp p 18 sym callb ("SD<",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_le ->
+     pretty_infix_exp p 18 sym callb ("SD<=",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_gt ->
+     pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ge ->
+     pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_interval_between ->
+     pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
 
 let string_of_binop b =
   match b with
@@ -1043,6 +1103,7 @@ let pretty_query pconf q =
   | Compiler.Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_nra q -> pretty_nra greek margin q
   | Compiler.Q_nraenv q -> pretty_nraenv greek margin q

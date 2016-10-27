@@ -37,6 +37,7 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_camp_debug : bool -> camp -> constant_env -> string := @eval_camp_debug _ h.
 
   Definition eval_oql : oql -> constant_env -> option data := @eval_oql _ h.
+  Definition eval_sql : sql -> constant_env -> option data := @eval_sql _ h.
   Definition eval_lambda_nra : lambda_nra -> constant_env -> option data := @eval_lambda_nra _ h.
 
   Definition eval_nra : nra -> constant_env -> option data := @eval_nra _ h.
@@ -56,6 +57,7 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_camp_world_debug : bool -> camp -> world_env -> string := @eval_camp_world_debug _ h.
 
   Definition eval_oql_world : oql -> world_env -> option data := @eval_oql_world _ h.
+  Definition eval_sql_world : sql -> world_env -> option data := @eval_sql_world _ h.
   Definition eval_lambda_nra_world : lambda_nra -> world_env -> option data := @eval_lambda_nra_world _ h.
 
   Definition eval_nra_world : nra -> world_env -> option data := @eval_nra_world _ h.

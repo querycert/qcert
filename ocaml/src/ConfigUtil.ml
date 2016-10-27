@@ -79,6 +79,7 @@ let get_cld_config conf = conf.cld_conf
 let suffix_rule () = "_rule.camp"
 let suffix_camp () = "_camp.camp"
 let suffix_oql () = "_oql.txt"
+let suffix_sql () = "_sql.txt"
 let suffix_nra () = "_nra.txt"
 let suffix_lambda_nra () = "_lambda_nra.txt"
 let suffix_nraenv () = "_nraenv.txt"
@@ -111,6 +112,7 @@ let suffix_of_language lang =
   | Compiler.L_rule -> suffix_rule ()
   | Compiler.L_camp -> suffix_camp ()
   | Compiler.L_oql -> suffix_oql ()
+  | Compiler.L_sql -> suffix_sql ()
   | Compiler.L_lambda_nra -> suffix_lambda_nra ()
   | Compiler.L_nra -> suffix_nra ()
   | Compiler.L_nraenv -> suffix_nraenv ()
