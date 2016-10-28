@@ -1,0 +1,28 @@
+Ext = GroupBy / Join
+Phys = GroupBy/Join as OPERATORS
+         for NNRC+Phys, need groupby join algos in runtime
+	 could instead translate to NNRC, providing naive join and group by through nested loops
+Sem = downarrow is macro-expansion
+      uparrow is pure inclusion
+Comprehension <==> NNRC provides path back to SQL? That's roughly the approach described in Links
+
+
+  Source Languages  |  Algebra  |  Calculus  |  Distributed Calculus  | Target Languages
+--------------------|---------------------------------------------------------------------
+                    |                                                 |
+    Comprehension==>|<================\                               |
+            /\      |                ||                               |
+            ||      |                ||                               |
+            \/      |                ||                               |
+        SQL========>|                \/                               |
+        OQL========>|==>NraEnvExt==>NNRC+Phys======>DNNRC+Phys=======>|==>Spark2
+        lambdaNRA==>|    /\          /\              /\               |
+                    |    ||Sem       ||Sem           ||Sem            |
+ 	     	    |    \/          \/              \/               |
+Rule====>|==>CAMP==>|==>NraEnv=====>NNRC=======>|==>DNNRC             |
+Sparql==>|          |    /\          /\         |    /\               |
+		    |    ||Sem       ||         |    ||               |
+		    |    \/          ||         |==>NNRCMR==>CldMR===>|==>Cloudant
+		    |   Nra===========/                               |
+                    |						      |
+
