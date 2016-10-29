@@ -115,7 +115,7 @@ Section TRewFunc.
     - apply (tnrc_rewrites_to_trans p (rew p)).
       + apply Hrew.
       + apply IHn.
-    - reflexivity.
+    - apply Hrew.
   Qed.
   Hint Rewrite @rew_cost_correctness : rew_correct.
 
