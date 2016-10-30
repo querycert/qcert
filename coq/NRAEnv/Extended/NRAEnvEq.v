@@ -60,6 +60,76 @@ Section NRAEnvEq.
     split; intro; assumption.
   Qed.
 
+  Notation "X ≡ₓ Y" := (nraenv_eq X Y) (at level 90) : nraenv_scope. (* ≡ = \equiv *)
+  (** Thanks to shallow semantics, lifting between algenv and nraenv is easy *)
+  Section eq_lift.
+    Require Import RAlgEnv RAlgEnvEq.
+    Open Scope algenv_scope.
+
+    Lemma lift_algenv_eq_to_nraenv_eq_r (q1 q2:algenv) :
+      q1 ≡ₑ q2 -> (nraenv_of_algenv q1) ≡ₓ (nraenv_of_algenv q2).
+    Proof.
+      unfold nraenv_eq.
+      unfold algenv_eq.
+      intros.
+      unfold nraenv_eval in *.
+      rewrite nraenv_roundtrip.
+      rewrite nraenv_roundtrip.
+      auto.
+    Qed.
+
+    Lemma lift_algenv_eq_to_nraenv_eq_l (q1 q2:algenv) :
+      (nraenv_of_algenv q1) ≡ₓ (nraenv_of_algenv q2) -> q1 ≡ₑ q2.
+    Proof.
+      unfold nraenv_eq.
+      unfold algenv_eq.
+      intros.
+      unfold nraenv_eval in *.
+      rewrite nraenv_roundtrip in H.
+      rewrite nraenv_roundtrip in H.
+      specialize (H _ _ dn_c _ dn_env _ dn_x); intros.
+      assumption.
+    Qed.
+
+    Lemma lift_algenv_eq_to_nraenv_eq (q1 q2:algenv) :
+      q1 ≡ₑ q2 <-> (nraenv_of_algenv q1) ≡ₓ (nraenv_of_algenv q2).
+    Proof.
+      split.
+      apply lift_algenv_eq_to_nraenv_eq_r.
+      apply lift_algenv_eq_to_nraenv_eq_l.
+    Qed.
+
+    Lemma lift_nraenv_eq_to_algenv_eq_r (q1 q2:nraenv) :
+      q1 ≡ₓ q2 -> (algenv_of_nraenv q1) ≡ₑ (algenv_of_nraenv q2).
+    Proof.
+      unfold nraenv_eq.
+      unfold algenv_eq.
+      intros.
+      unfold nraenv_eval in *.
+      specialize (H _ _ dn_c _ dn_env _ dn_x); intros.
+      assumption.
+    Qed.
+  
+    Lemma lift_nraenv_eq_to_algenv_eq_l (q1 q2:nraenv) :
+      (algenv_of_nraenv q1) ≡ₑ (algenv_of_nraenv q2) -> q1 ≡ₓ q2.
+    Proof.
+      unfold nraenv_eq.
+      unfold algenv_eq.
+      intros.
+      unfold nraenv_eval in *.
+      specialize (H _ _ dn_c _ dn_env _ dn_x); intros.
+      assumption.
+    Qed.
+  
+    Lemma lift_nraenv_eq_to_algenv_eq (q1 q2:nraenv) :
+      q1 ≡ₓ q2 <-> (algenv_of_nraenv q1) ≡ₑ (algenv_of_nraenv q2).
+    Proof.
+      split.
+      apply lift_nraenv_eq_to_algenv_eq_r.
+      apply lift_nraenv_eq_to_algenv_eq_l.
+    Qed.
+  End eq_lift.
+  
   (* all the extended algebraic constructors are proper wrt. equivalence *)
 
   (* NRAEnvID *)

@@ -120,7 +120,7 @@ Section TNRAEnvEq.
     Require Import RAlgEnv TAlgEnvEq.
     Open Scope algenv_scope.
 
-    Lemma lift_algenv_eq_to_nraenv_eq_r (q1 q2:algenv) :
+    Lemma lift_talgenv_eq_to_tnraenv_eq_r (q1 q2:algenv) :
       q1 ⇒ q2 -> (nraenv_of_algenv q1) ⇒ₓ (nraenv_of_algenv q2).
     Proof.
       unfold tnraenv_rewrites_to.
@@ -134,7 +134,7 @@ Section TNRAEnvEq.
       auto.
     Qed.
 
-    Lemma lift_algenv_eq_to_nraenv_eq_l (q1 q2:algenv) :
+    Lemma lift_talgenv_eq_to_tnraenv_eq_l (q1 q2:algenv) :
       (nraenv_of_algenv q1) ⇒ₓ (nraenv_of_algenv q2) -> q1 ⇒ q2.
     Proof.
       unfold tnraenv_rewrites_to.
@@ -148,15 +148,15 @@ Section TNRAEnvEq.
       assumption.
     Qed.
 
-    Lemma lift_algenv_eq_to_nraenv_eq (q1 q2:algenv) :
+    Lemma lift_talgenv_eq_to_tnraenv_eq (q1 q2:algenv) :
       q1 ⇒ q2 <-> (nraenv_of_algenv q1) ⇒ₓ (nraenv_of_algenv q2).
     Proof.
       split.
-      apply lift_algenv_eq_to_nraenv_eq_r.
-      apply lift_algenv_eq_to_nraenv_eq_l.
+      apply lift_talgenv_eq_to_tnraenv_eq_r.
+      apply lift_talgenv_eq_to_tnraenv_eq_l.
     Qed.
 
-    Lemma lift_nraenv_eq_to_algenv_eq_r (q1 q2:nraenv) :
+    Lemma lift_tnraenv_eq_to_talgenv_eq_r (q1 q2:nraenv) :
       q1 ⇒ₓ q2 -> (algenv_of_nraenv q1) ⇒ (algenv_of_nraenv q2).
     Proof.
       unfold tnraenv_rewrites_to.
@@ -168,7 +168,7 @@ Section TNRAEnvEq.
       split; assumption.
     Qed.
   
-    Lemma lift_nraenv_eq_to_algenv_eq_l (q1 q2:nraenv) :
+    Lemma lift_tnraenv_eq_to_talgenv_eq_l (q1 q2:nraenv) :
       (algenv_of_nraenv q1) ⇒ (algenv_of_nraenv q2) -> q1 ⇒ₓ q2.
     Proof.
       unfold tnraenv_rewrites_to.
@@ -180,12 +180,12 @@ Section TNRAEnvEq.
       split; assumption.
     Qed.
   
-    Lemma lift_nraenv_eq_to_algenv_eq (q1 q2:nraenv) :
+    Lemma lift_tnraenv_eq_to_talgenv_eq (q1 q2:nraenv) :
       q1 ⇒ₓ q2 <-> (algenv_of_nraenv q1) ⇒ (algenv_of_nraenv q2).
     Proof.
       split.
-      apply lift_nraenv_eq_to_algenv_eq_r.
-      apply lift_nraenv_eq_to_algenv_eq_l.
+      apply lift_tnraenv_eq_to_talgenv_eq_r.
+      apply lift_tnraenv_eq_to_talgenv_eq_l.
     Qed.
   End eq_lift.
 
@@ -238,9 +238,9 @@ Section TNRAEnvEq.
                ==> tnraenv_rewrites_to) NRAEnvBinop.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq in H1.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H1.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0; rewrite H1.
     reflexivity.
@@ -252,8 +252,8 @@ Section TNRAEnvEq.
     Proper (eq ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvUnop.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -265,9 +265,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvMap.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -279,9 +279,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvMapConcat.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -293,9 +293,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvProduct.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -307,9 +307,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvSelect.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -321,9 +321,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvDefault.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -334,9 +334,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvEither.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -347,9 +347,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvEitherConcat.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -361,9 +361,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvApp.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -384,9 +384,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvAppEnv.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H; rewrite H0.
     reflexivity.
@@ -398,8 +398,8 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvMapEnv.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
     simpl.
     rewrite H.
     reflexivity.
@@ -411,9 +411,9 @@ Section TNRAEnvEq.
     Proper (tnraenv_rewrites_to ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvFlatMap.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
     simpl.
     unfold flat_map.
     rewrite H; rewrite H0; reflexivity.
@@ -428,10 +428,10 @@ Section TNRAEnvEq.
               ==> tnraenv_rewrites_to) NRAEnvJoin.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq.
-    rewrite lift_nraenv_eq_to_algenv_eq in H.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
-    rewrite lift_nraenv_eq_to_algenv_eq in H1.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H1.
     simpl.
     unfold join.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
@@ -443,8 +443,8 @@ Section TNRAEnvEq.
     Proper (eq ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvProject.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq.
-    rewrite lift_nraenv_eq_to_algenv_eq in H0.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H0.
     simpl.
     unfold project.
     rewrite H; rewrite H0; reflexivity.
@@ -456,15 +456,14 @@ Section TNRAEnvEq.
     Proper (eq ==> eq ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvGroupBy.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite lift_nraenv_eq_to_algenv_eq.
-    rewrite lift_nraenv_eq_to_algenv_eq in H1.
+    rewrite lift_tnraenv_eq_to_talgenv_eq.
+    rewrite lift_tnraenv_eq_to_talgenv_eq in H1.
     simpl.
     unfold group_by.
     unfold map_to_rec.
     unfold project.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
-    
 
 End TNRAEnvEq.
 

@@ -216,6 +216,7 @@ MODULES = \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/ROptimEnvFunc \
 	Compiler/Optimizer/TOptimEnvFunc \
+	Compiler/Optimizer/NRAEnvOptimFunc \
 	Compiler/Optimizer/NRewFunc \
 	Compiler/Optimizer/TRewFunc \
 	Compiler/CompilerModel/CompilerRuntime \

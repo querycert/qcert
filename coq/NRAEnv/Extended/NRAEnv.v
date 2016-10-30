@@ -216,6 +216,27 @@ Section NRAEnv.
     reflexivity.
   Qed.
 
+  Section size.
+    Require Import RAlgEnvSize.
+    Definition nraenv_size (q:nraenv) :=
+      algenv_size (algenv_of_nraenv q).
+  End size.
+
+  Section ignore.
+    Require Import RAlgEnvIgnore.
+    Definition nraenv_ignores_id_fun (q:nraenv) :=
+      ignores_id_fun (algenv_of_nraenv q).
+    Definition nraenv_ignores_env_fun (q:nraenv) :=
+      ignores_env_fun (algenv_of_nraenv q).
+  End ignore.
+
+  Section dup.
+    Require Import ROptimEnv.
+    (* optimization for distinct *)
+    Definition nraenv_nodupA (q:nraenv) : Prop :=
+      nodupA (algenv_of_nraenv q).
+  End dup.
+
 End NRAEnv.
 
 (* begin hide *)

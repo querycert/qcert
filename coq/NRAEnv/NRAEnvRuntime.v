@@ -18,7 +18,7 @@ Require Export BasicRuntime.
 Require Export RAlgEnv RAlgEnvEq RAlgEnvSize RAlgEnvIgnore.
 Require Export RAlgEnvContext RAlgEnvContextLift.
 Require Export ROptimEnv ROptimEnvContext.
-Require Export NRAEnv.
+Require Export NRAEnv NRAEnvEq.
 
 (* 
 *** Local Variables: ***

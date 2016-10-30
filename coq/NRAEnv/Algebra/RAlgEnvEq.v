@@ -447,29 +447,29 @@ Section RAlgEnvEq.
   Qed.
 
   Lemma alg_of_algenv_proper_inv x y :
-      (alg_of_algenv x ≡ₐ alg_of_algenv y)%alg ->
-      (x ≡ₑ y)%algenv.
-    Proof.
-      unfold Proper, respectful; intros.
-      (* apply algenv_of_alg_proper in H. *)
-      unfold alg_eq, algenv_eq in *.
-      intros.
-      specialize (H h (pat_context_data (drec (rec_sort c)) env x0)).
-      repeat rewrite <- unfold_env_alg_sort in H by trivial.
-      auto.
-    Qed.
+    (alg_of_algenv x ≡ₐ alg_of_algenv y)%alg ->
+    (x ≡ₑ y)%algenv.
+  Proof.
+    unfold Proper, respectful; intros.
+    (* apply algenv_of_alg_proper in H. *)
+    unfold alg_eq, algenv_eq in *.
+    intros.
+    specialize (H h (pat_context_data (drec (rec_sort c)) env x0)).
+    repeat rewrite <- unfold_env_alg_sort in H by trivial.
+    auto.
+  Qed.
 
-    Definition algenv_always_ensures (P:data->Prop) (q:algenv) :=
-      forall
-        (h:list(string*string))
-        (c:list (string*data))
-        (dn_c:Forall (fun d => data_normalized h (snd d)) c)
-        (env:data)
-        (dn_env:data_normalized h env)
-        (x:data)
-        (dn_x:data_normalized h x)
-        (d:data),
-        h ⊢ₑ q @ₑ x ⊣ c;env = Some d -> P d.
+  Definition algenv_always_ensures (P:data->Prop) (q:algenv) :=
+    forall
+      (h:list(string*string))
+      (c:list (string*data))
+      (dn_c:Forall (fun d => data_normalized h (snd d)) c)
+      (env:data)
+      (dn_env:data_normalized h env)
+      (x:data)
+      (dn_x:data_normalized h x)
+      (d:data),
+      h ⊢ₑ q @ₑ x ⊣ c;env = Some d -> P d.
 
 End RAlgEnvEq.
 

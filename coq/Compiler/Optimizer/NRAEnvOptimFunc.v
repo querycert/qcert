@@ -25,7 +25,6 @@ Section NRAEnvOptimFunc.
 
   Require Import Utils BasicSystem.
   Require Import NRAEnvSystem.
-  Require Import ROptimEnvFunc.
   Require Import OptimizerLogger.
 
   Open Scope nraenv_scope.
@@ -43,14 +42,14 @@ Section NRAEnvOptimFunc.
 
   (* *************************** *)
 
-  Lemma talgenv_rewrites_to_trans {model:basic_model} p1 p2 p3:
-    p1 ⇒ p2 -> p2 ⇒ p3 -> p1 ⇒ p3.
+  Lemma tnraenv_rewrites_to_trans {model:basic_model} p1 p2 p3:
+    p1 ⇒ₓ p2 -> p2 ⇒ₓ p3 -> p1 ⇒ₓ p3.
   Proof.
     apply transitivity.
   Qed.
 
   Lemma AUX {model:basic_model} f p p':
-    (forall p, p ⇒ f p) -> p ⇒ p' -> p ⇒ f p'.
+    (forall p, p ⇒ₓ f p) -> p ⇒ₓ p' -> p ⇒ₓ f p'.
   Proof.
     intros.
     rewrite H0 at 1.
@@ -58,37 +57,193 @@ Section NRAEnvOptimFunc.
     reflexivity.
   Qed.
 
-  Definition talgenv_map {fruntime:foreign_runtime} := ROptimEnvFunc.algenv_map.
+  (** Apply the function f to the direct child of p *)
+  Section rewriter.
+    Context {fruntime:foreign_runtime}.
 
-  Lemma talgenv_map_correctness {model:basic_model}:
-    forall f: algenv -> algenv,
-    forall p: algenv,
-      (forall p', p' ⇒ f p') -> p ⇒ talgenv_map f p.
+    Definition nraenv_map (f: nraenv -> nraenv) (p: nraenv) :=
+      match p with
+      | NRAEnvID => NRAEnvID
+      | NRAEnvConst rd => NRAEnvConst rd
+      | NRAEnvBinop bop op1 op2 => NRAEnvBinop bop (f op1) (f op2)
+      | NRAEnvUnop uop op1 => NRAEnvUnop uop (f op1)
+      | NRAEnvMap op1 op2 => NRAEnvMap (f op1) (f op2)
+      | NRAEnvMapConcat op1 op2 => NRAEnvMapConcat (f op1) (f op2)
+      | NRAEnvProduct op1 op2 => NRAEnvProduct (f op1) (f op2)
+      | NRAEnvSelect op1 op2 => NRAEnvSelect (f op1) (f op2)
+      | NRAEnvEither op1 op2 => NRAEnvEither (f op1) (f op2)
+      | NRAEnvEitherConcat op1 op2 => NRAEnvEitherConcat (f op1) (f op2)
+      | NRAEnvDefault op1 op2 => NRAEnvDefault (f op1) (f op2)
+      | NRAEnvApp op1 op2 => NRAEnvApp (f op1) (f op2)
+      | NRAEnvGetConstant s => NRAEnvGetConstant s
+      | NRAEnvEnv => NRAEnvEnv
+      | NRAEnvAppEnv op1 op2 => NRAEnvAppEnv (f op1) (f op2)
+      | NRAEnvMapEnv op1 => NRAEnvMapEnv (f op1)
+      | NRAEnvFlatMap op1 op2 => NRAEnvFlatMap (f op1) (f op2)
+      | NRAEnvJoin op1 op2 op3 => NRAEnvJoin (f op1) (f op2) (f op3)
+      | NRAEnvProject sl op1 => NRAEnvProject sl (f op1)
+      | NRAEnvGroupBy s sl op1 => NRAEnvGroupBy s sl (f op1)
+      end.
+    
+    (** Apply the function f to all subexpression fo p. *)
+    (* Fixpoint nraenv_map_deep (f: nraenv -> nraenv) (p: nraenv) := *)
+    (*   f (nraenv_map (fun p' => nraenv_map_deep f p') p). *)
+    Fixpoint nraenv_map_deep (f: nraenv -> nraenv) (p: nraenv) :=
+      match p with
+      | NRAEnvID => f NRAEnvID
+      | NRAEnvConst rd => f (NRAEnvConst rd)
+      | NRAEnvBinop bop op1 op2 => f (NRAEnvBinop bop (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvUnop uop op1 => f (NRAEnvUnop uop (nraenv_map_deep f op1))
+      | NRAEnvMap op1 op2 => f (NRAEnvMap (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvMapConcat op1 op2 => f (NRAEnvMapConcat (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvProduct op1 op2 => f (NRAEnvProduct (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvSelect op1 op2 => f (NRAEnvSelect (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvDefault op1 op2 => f (NRAEnvDefault (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvEither op1 op2 => f (NRAEnvEither (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvEitherConcat op1 op2 => f (NRAEnvEitherConcat (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvApp op1 op2 => f (NRAEnvApp (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvGetConstant s => f (NRAEnvGetConstant s)
+      | NRAEnvEnv => f NRAEnvEnv
+      | NRAEnvAppEnv op1 op2 => f (NRAEnvAppEnv (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvMapEnv op1 => f (NRAEnvMapEnv (nraenv_map_deep f op1))
+      | NRAEnvFlatMap op1 op2 => f (NRAEnvFlatMap (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvJoin op1 op2 op3 => f (NRAEnvJoin (nraenv_map_deep f op1) (nraenv_map_deep f op2) (nraenv_map_deep f op3))
+      | NRAEnvProject sl op1 => f (NRAEnvProject sl (nraenv_map_deep f op1))
+      | NRAEnvGroupBy s sl op1 => f (NRAEnvGroupBy s sl (nraenv_map_deep f op1))
+    end.
+
+    Fixpoint optim_iter (optim: nraenv -> nraenv) (fuel: nat) (p: nraenv) :=
+      match fuel with
+      | 0 => p
+      | S n => optim_iter optim n (optim p)
+      end.
+
+    Require Import Recdef.
+    Require Import Compare_dec.
+
+    Function optim_cost (optim: nraenv -> nraenv) (cost: nraenv -> nat) (p: nraenv) { measure cost p } :=
+      let p' := optim p in
+      match nat_compare (cost p') (cost p) with
+      | Lt => optim_cost optim cost p'
+      | _ => p
+      end.
+    Proof.
+      intros optim cost p Hcmp.
+      apply nat_compare_lt in Hcmp.
+      exact Hcmp.
+    Defined.
+
+    Definition optim_size (optim: nraenv -> nraenv) (p: nraenv) :=
+      optim_cost optim nraenv_size p.
+
+  End rewriter.
+
+  Section dup.
+    Fixpoint nodupA_checker {bm:basic_model} (p:nraenv) : bool
+    := match p with
+       | NRAEnvUnop ADistinct _ => true
+       | NRAEnvBinop AMinus p₁ p₂ => nodupA_checker p₂
+       | _ => false
+       end.
+
+    Lemma nodupA_checker_correct {bm:basic_model} (p:nraenv) :
+      nodupA_checker p = true -> nraenv_nodupA p.
+    Proof.
+      induction p; simpl; try discriminate.
+      - destruct b; try discriminate.
+        intros nd.
+        repeat red; intros.
+        simpl in H.
+        unfold olift2 in H.
+        match_case_in H
+        ; intros; rewrite H0 in H; try discriminate.
+        match_case_in H
+        ; intros; rewrite H1 in H; try discriminate.
+        unfold rondcoll2 in H.
+        apply some_lift in H.
+        destruct H as [? ? ?].
+        subst.
+        unfold ondcoll2 in e.
+        match_destr_in e.
+        match_destr_in e.
+        invcs e.
+        apply bminus_NoDup.
+        specialize (IHp2 nd).
+        specialize (IHp2 h c dn_c env dn_env x dn_x _ H1).
+        simpl in IHp2.
+        trivial.
+      - destruct u; try discriminate.
+        intros _ .
+        repeat red; intros.
+        simpl in H.
+        unfold olift in H.
+        match_case_in H
+        ; intros; rewrite H0 in H; try discriminate.
+        unfold rondcoll in H.
+        apply some_lift in H.
+        destruct H as [? ? ?].
+        invcs e0.
+        unfold ondcoll in e.
+        match_destr_in e.
+        invcs e.
+        apply bdistinct_NoDup.
+    Qed.
+
+    Definition dup_elim_fun {bm:basic_model} (p:nraenv) :=
+      match p with
+      | NRAEnvUnop ADistinct q  =>
+        if nodupA_checker q then q else p
+      | _ => p
+      end.
+    
+    Lemma dup_elim_fun_correctness {bm:basic_model} (p:nraenv) :
+      dup_elim_fun p ≡ₓ p.
+    Proof.
+      destruct p; simpl; try reflexivity.
+      destruct u; simpl; try reflexivity.
+      match_case; try reflexivity.
+      intros nd.
+      symmetry.
+      rewrite lift_nraenv_eq_to_algenv_eq. simpl.
+      rewrite dup_elim.
+      reflexivity.
+      apply nodupA_checker_correct; trivial.
+    Qed.
+
+  End dup.
+  
+  Definition tnraenv_map {fruntime:foreign_runtime} := nraenv_map.
+
+  Lemma tnraenv_map_correctness {model:basic_model}:
+    forall f: nraenv -> nraenv,
+    forall p: nraenv,
+      (forall p', p' ⇒ₓ f p') -> p ⇒ₓ tnraenv_map f p.
   Proof.
     intros.
-    algenv_cases (induction p) Case; try solve [simpl; apply Hf]; simpl;
+    nraenv_cases (induction p) Case; try solve [simpl; apply Hf]; simpl;
     try reflexivity;
+    try (rewrite (H p1) at 1; rewrite (H p2) at 1; rewrite (H p3) at 1; reflexivity);
     try (rewrite (H p1) at 1; rewrite (H p2) at 1; reflexivity);
     try rewrite (H p) at 1; try reflexivity.
   Qed.
 
-  (* Java equivalent: NraOptimizer.talgenv_map_deep *)  
-  Definition talgenv_map_deep {fruntime:foreign_runtime} := ROptimEnvFunc.algenv_map_deep.
+  Definition tnraenv_map_deep {fruntime:foreign_runtime} := nraenv_map_deep.
   
-  Lemma algenv_map_deep_correctness {model:basic_model}:
-    forall f: algenv -> algenv,
-    forall p: algenv,
-      (forall p', p' ⇒ f p') -> p ⇒ talgenv_map_deep f p.
+  Lemma nraenv_map_deep_correctness {model:basic_model}:
+    forall f: nraenv -> nraenv,
+    forall p: nraenv,
+      (forall p', p' ⇒ₓ f p') -> p ⇒ₓ tnraenv_map_deep f p.
   Proof.
     intros f p Hf.
-    algenv_cases (induction p) Case; try solve [simpl; apply Hf];
+    nraenv_cases (induction p) Case; try solve [simpl; apply Hf];
     try reflexivity; simpl;
+    try (rewrite IHp1 at 1; rewrite IHp2 at 1; rewrite IHp3 at 1; rewrite Hf at 1; reflexivity);
     try (rewrite IHp1 at 1; rewrite IHp2 at 1; rewrite Hf at 1; reflexivity);
     rewrite IHp at 1; rewrite Hf at 1; reflexivity.
   Qed.
 
   Lemma optim_iter_correctness {model:basic_model} optim n p:
-    (forall p', p' ⇒ optim p') -> p ⇒ ROptimEnvFunc.optim_iter optim n p.
+    (forall p', p' ⇒ₓ optim p') -> p ⇒ₓ optim_iter optim n p.
   Proof.
     generalize p; clear p.
     induction n; try reflexivity.
@@ -103,19 +258,19 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @optim_iter_correctness : optim_correct.
 
   Lemma optim_cost_correctness {model:basic_model} optim cost p:
-    (forall p', p' ⇒ optim p') -> p ⇒ optim_cost optim cost p.
+    (forall p', p' ⇒ₓ optim p') -> p ⇒ₓ optim_cost optim cost p.
   Proof.
     intros Hoptim.
     functional induction optim_cost optim cost p.
-    - apply (talgenv_rewrites_to_trans p (optim p)).
+    - apply (tnraenv_rewrites_to_trans p (optim p)).
       + apply Hoptim.
-      + apply IHa.
+      + apply IHn.
     - reflexivity.
   Qed.
   Hint Rewrite @optim_cost_correctness : optim_correct.
 
   Lemma optim_size_correctness {model:basic_model} optim p:
-    (forall p', p' ⇒ optim p') -> p ⇒ optim_size optim p.
+    (forall p', p' ⇒ₓ optim p') -> p ⇒ₓ optim_size optim p.
   Proof.
     intros Hoptim.
     unfold optim_size.
@@ -126,16 +281,16 @@ Section NRAEnvOptimFunc.
 
   (****************)
 
-  (* P1 ∧ P2 ⇒ P2 ∧ P1 *)
+  (* P1 ∧ P2 ⇒ₓ P2 ∧ P1 *)
 
-  Definition tand_comm_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tand_comm_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANBinop AAnd op1 op2 => ANBinop AAnd op2 op1
+      | NRAEnvBinop AAnd op1 op2 => NRAEnvBinop AAnd op2 op1
       | _ => p
     end.
 
-  Lemma tand_comm_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tand_comm_fun p.
+  Lemma tand_comm_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tand_comm_fun p.
   Proof.
     tprove_correctness p.
     apply tand_comm_arrow.
@@ -143,48 +298,46 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tand_comm_fun_correctness : optim_correct.
 
 
-  (* σ{P1 ∧ P2}(P) ⇒ σ{P2 ∧ P1}(P) *) (* XXX Why neessary ? *)
+  (* σ{P1 ∧ P2}(P) ⇒ₓ σ{P2 ∧ P1}(P) *) (* XXX Why neessary ? *)
 
-  Definition tselect_and_comm_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tselect_and_comm_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANSelect (ANBinop AAnd op1 op2) op =>
-        ANSelect (ANBinop AAnd op2 op1) op
+      | NRAEnvSelect (NRAEnvBinop AAnd op1 op2) op =>
+        NRAEnvSelect (NRAEnvBinop AAnd op2 op1) op
       | _ => p
     end.
 
-  Lemma tselect_and_comm_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tselect_and_comm_fun p.
+  Lemma tselect_and_comm_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tselect_and_comm_fun p.
   Proof.
     tprove_correctness p.
     apply tselect_and_comm_arrow.
   Qed.
   Hint Rewrite @tselect_and_comm_fun_correctness : optim_correct.
 
-  (* σ{P1}(σ{P2}(P3)) ⇒ σ{P2 ∧ P1}(P3)) *)
+  (* σ{P1}(σ{P2}(P3)) ⇒ₓ σ{P2 ∧ P1}(P3)) *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tselect_and_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tselect_and_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANSelect op1 (ANSelect op2 op) =>
-        ANSelect (ANBinop AAnd op2 op1) op
+        NRAEnvSelect op1 (NRAEnvSelect op2 op) =>
+        NRAEnvSelect (NRAEnvBinop AAnd op2 op1) op
       | _ => p
     end.
 
-  Lemma tselect_and_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tselect_and_fun p.
+  Lemma tselect_and_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tselect_and_fun p.
   Proof.
     tprove_correctness p.
     apply tselect_and_arrow.
   Qed.
   Hint Rewrite @tselect_and_fun_correctness : optim_correct.
 
-  (* [ a1 : p1; a2 : p2 ].a2 ⇒ p2 *)
+  (* [ a1 : p1; a2 : p2 ].a2 ⇒ₓ p2 *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvdot_from_duplicate_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tenvdot_from_duplicate_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop (ADot s2)
-               (ANBinop AConcat (ANUnop (ARec s1) op1) (ANUnop (ARec s2') op2)) =>
+      | NRAEnvUnop (ADot s2)
+               (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1) op1) (NRAEnvUnop (ARec s2') op2)) =>
         if s2 == s2' then
           op2
         else
@@ -192,21 +345,20 @@ Section NRAEnvOptimFunc.
       | _ => p
     end.
 
-  Lemma tenvdot_from_duplicate_r_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvdot_from_duplicate_r_fun p.
+  Lemma tenvdot_from_duplicate_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvdot_from_duplicate_r_fun p.
   Proof.
     tprove_correctness p. 
     apply tenvdot_from_duplicate_r_arrow.
   Qed.
   Hint Rewrite @tenvdot_from_duplicate_r_fun_correctness : optim_correct.
 
-  (* [ a1 : p1; a2 : p2 ].a1 ⇒ p1 *)
+  (* [ a1 : p1; a2 : p2 ].a1 ⇒ₓ p1 *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvdot_from_duplicate_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tenvdot_from_duplicate_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop (ADot s1)
-               (ANBinop AConcat (ANUnop (ARec s1') op1) (ANUnop (ARec s2) op2)) =>
+      | NRAEnvUnop (ADot s1)
+               (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1') op1) (NRAEnvUnop (ARec s2) op2)) =>
         if (s1 <> s2) then
           if s1 == s1' then op1
           else p
@@ -214,8 +366,8 @@ Section NRAEnvOptimFunc.
       | _ => p
     end.
 
-  Lemma tenvdot_from_duplicate_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvdot_from_duplicate_l_fun p.
+  Lemma tenvdot_from_duplicate_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvdot_from_duplicate_l_fun p.
   Proof.
     tprove_correctness p. 
     apply tenvdot_from_duplicate_l_arrow.
@@ -224,67 +376,64 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tenvdot_from_duplicate_l_fun_correctness : optim_correct.
 
 
-  (* ♯flatten({ p }) ⇒ p when p's output type is a collection *)
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvflatten_coll_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ♯flatten({ p }) ⇒ₓ p when p's output type is a collection *)
+  Definition tenvflatten_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop AFlatten (ANUnop AColl p) => p
+      | NRAEnvUnop AFlatten (NRAEnvUnop AColl p) => p
       | _ => p
     end.
 
-  Lemma tenvflatten_coll_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvflatten_coll_fun p.
+  Lemma tenvflatten_coll_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvflatten_coll_fun p.
   Proof.
     tprove_correctness p.
     apply tenvflatten_coll_arrow.
   Qed.
   Hint Rewrite @tenvflatten_coll_fun_correctness : optim_correct.
 
-    (* p ⊕ [] ⇒ p when p returns a record *)
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tconcat_empty_record_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* p ⊕ [] ⇒ₓ p when p returns a record *)
+  Definition tconcat_empty_record_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  ANBinop AConcat p (ANConst (drec [])) =>
+      |  NRAEnvBinop AConcat p (NRAEnvConst (drec [])) =>
         p
       | _ => p
     end.
 
-  Lemma tconcat_empty_record_r_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tconcat_empty_record_r_fun p.
+  Lemma tconcat_empty_record_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tconcat_empty_record_r_fun p.
   Proof.
     tprove_correctness p.
     apply tconcat_empty_record_r_arrow.
   Qed.
   Hint Rewrite @tconcat_empty_record_r_fun_correctness : optim_correct.
 
-  (* [] ⊕ p ⇒ p when p returns a record *)
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tconcat_empty_record_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* [] ⊕ p ⇒ₓ p when p returns a record *)
+  Definition tconcat_empty_record_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  ANBinop AConcat (ANConst (drec [])) p =>
+      |  NRAEnvBinop AConcat (NRAEnvConst (drec [])) p =>
          p
       | _ => p
     end.
 
-  Lemma tconcat_empty_record_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tconcat_empty_record_l_fun p.
+  Lemma tconcat_empty_record_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tconcat_empty_record_l_fun p.
   Proof.
     tprove_correctness p.
     apply tconcat_empty_record_l_arrow.
   Qed.
   Hint Rewrite @tconcat_empty_record_l_fun_correctness : optim_correct.
 
-  Definition tdot_over_concat_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tdot_over_concat_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    |  (q₁ ⊕ ‵[| (a₁, q₂) |])·a₂ =>
+    |  NRAEnvUnop (ADot a₂) (NRAEnvBinop AConcat q₁ (NRAEnvUnop (ARec a₁) q₂)) =>
        if a₁ == a₂
        then q₂
-       else q₁·a₂
+       else NRAEnvUnop (ADot a₂) q₁
       | _ => p
     end.
 
-  Lemma tdot_over_concat_r_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tdot_over_concat_r_fun p.
+  Lemma tdot_over_concat_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdot_over_concat_r_fun p.
   Proof.
     tprove_correctness p.
     - apply tdot_over_concat_eq_r_arrow.
@@ -293,17 +442,17 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tdot_over_concat_r_fun_correctness : optim_correct.
 
-  Definition tdot_over_concat_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tdot_over_concat_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    |  ( ‵[| (a₁, q₁) |]⊕ q₂ )·a₂ =>
+    |  NRAEnvUnop (ADot a₂) (NRAEnvBinop AConcat (NRAEnvUnop (ARec a₁) q₁) q₂) =>
        if a₁ == a₂
        then p
-       else q₂·a₂
+       else NRAEnvUnop (ADot a₂) q₂
       | _ => p
     end.
 
-  Lemma tdot_over_concat_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tdot_over_concat_l_fun p.
+  Lemma tdot_over_concat_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdot_over_concat_l_fun p.
   Proof.
     tprove_correctness p.
     apply tdot_over_concat_neq_l_arrow.
@@ -311,51 +460,47 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tdot_over_concat_l_fun_correctness : optim_correct.
 
-  (* p ⊗ [] ⇒ { p } when p returns a record *)
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmerge_empty_record_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* p ⊗ [] ⇒ₓ { p } when p returns a record *)
+  Definition tmerge_empty_record_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  ANBinop AMergeConcat p (ANConst (drec [])) =>
-         ANUnop AColl p
+      |  NRAEnvBinop AMergeConcat p (NRAEnvConst (drec [])) =>
+         NRAEnvUnop AColl p
       | _ => p
     end.
 
-  Lemma tmerge_empty_record_r_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmerge_empty_record_r_fun p.
+  Lemma tmerge_empty_record_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmerge_empty_record_r_fun p.
   Proof.
     tprove_correctness p.
     apply tmerge_empty_record_r_arrow.
   Qed.
   Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
 
-  (* [] ⊗ p ⇒ { p } when p returns a record *)
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmerge_empty_record_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* [] ⊗ p ⇒ₓ { p } when p returns a record *)
+  Definition tmerge_empty_record_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  ANBinop AMergeConcat (ANConst (drec [])) p =>
-         ANUnop AColl p
+      |  NRAEnvBinop AMergeConcat (NRAEnvConst (drec [])) p =>
+         NRAEnvUnop AColl p
       | _ => p
     end.
 
-  Lemma tmerge_empty_record_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmerge_empty_record_l_fun p.
+  Lemma tmerge_empty_record_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmerge_empty_record_l_fun p.
   Proof.
     tprove_correctness p.
     apply tmerge_empty_record_l_arrow.
   Qed.
   Hint Rewrite @tmerge_empty_record_l_fun_correctness : optim_correct.
 
-  (* χ⟨ ID ⟩( p ) ⇒ p *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvmap_into_id_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* χ⟨ ID ⟩( p ) ⇒ₓ p *)
+  Definition tenvmap_into_id_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANMap ANID p => p
+        NRAEnvMap NRAEnvID p => p
       | _ => p
     end.
 
-  Lemma tenvmap_into_id_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvmap_into_id_fun p.
+  Lemma tenvmap_into_id_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvmap_into_id_fun p.
   Proof.
     tprove_correctness p.
     apply tenvmap_into_id_arrow.
@@ -363,34 +508,34 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tenvmap_into_id_fun_correctness : optim_correct.
 
 
-  (* ♯flatten(χ⟨ { p1 } ⟩( p2 )) ⇒ χ⟨ p1 ⟩( p2 ) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvflatten_map_coll_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ♯flatten(χ⟨ { p1 } ⟩( p2 )) ⇒ₓ χ⟨ p1 ⟩( p2 ) *)
+  Definition tenvflatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANUnop AFlatten (ANMap (ANUnop AColl p1) p2) =>
-        ANMap p1 p2
+        NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvUnop AColl p1) p2) =>
+        NRAEnvMap p1 p2
       | _ => p
     end.
 
-  Lemma tenvflatten_map_coll_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvflatten_map_coll_fun p.
+  Lemma tenvflatten_map_coll_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvflatten_map_coll_fun p.
   Proof.
     tprove_correctness p.
     apply tenvflatten_map_coll_arrow.
   Qed.
   Hint Rewrite @tenvflatten_map_coll_fun_correctness : optim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflatten_flatten_map_either_nil_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tflatten_flatten_map_either_nil_fun {fruntime:foreign_runtime} (p: nraenv) :=
       match p with
-          ♯flatten( ♯flatten(χ⟨ANEither p₁ ‵{||} ◯ p₂⟩(p₃))) =>
-          ♯flatten( χ⟨ANEither( ♯flatten(p₁)) ‵{||} ◯ p₂⟩(p₃))
+        NRAEnvUnop AFlatten
+                   (NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvApp (NRAEnvEither p₁ (NRAEnvConst (dcoll nil))) p₂) p₃)) =>
+        NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvApp
+                                          (NRAEnvEither (NRAEnvUnop AFlatten p₁)
+                                                        (NRAEnvConst (dcoll nil))) p₂) p₃)
       | _ => p
     end.
 
-  Lemma tflatten_flatten_map_either_nil_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tflatten_flatten_map_either_nil_fun p.
+  Lemma tflatten_flatten_map_either_nil_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_flatten_map_either_nil_fun p.
   Proof.
     tprove_correctness p.
     apply tflatten_flatten_map_either_nil.
@@ -398,17 +543,15 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tflatten_flatten_map_either_nil_fun_correctness : optim_correct.
 
-  (* χ⟨ P1 ⟩( χ⟨ P2 ⟩( P3 ) ) ⇒ χ⟨ P1 ◯ P2 ⟩( P3 ) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvmap_map_compose_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* χ⟨ P1 ⟩( χ⟨ P2 ⟩( P3 ) ) ⇒ₓ χ⟨ P1 ◯ P2 ⟩( P3 ) *)
+  Definition tenvmap_map_compose_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANMap p1 (ANMap p2 p3) => ANMap (ANApp p1 p2) p3
+        NRAEnvMap p1 (NRAEnvMap p2 p3) => NRAEnvMap (NRAEnvApp p1 p2) p3
       | _ => p
     end.
 
-  Lemma tenvmap_map_compose_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvmap_map_compose_fun p.
+  Lemma tenvmap_map_compose_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvmap_map_compose_fun p.
   Proof.
     tprove_correctness p.
     apply tenvmap_map_compose_arrow.
@@ -416,212 +559,190 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tenvmap_map_compose_fun_correctness : optim_correct.
 
 
-  (* χ⟨ P1 ⟩( { P2 } ) ⇒ { P1 ◯ P2 } *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenvmap_singleton_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* χ⟨ P1 ⟩( { P2 } ) ⇒ₓ { P1 ◯ P2 } *)
+  Definition tenvmap_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANMap p1 (ANUnop AColl p2) => ANUnop AColl (ANApp p1 p2)
+        NRAEnvMap p1 (NRAEnvUnop AColl p2) => NRAEnvUnop AColl (NRAEnvApp p1 p2)
       | _ => p
     end.
 
-  Lemma tenvmap_singleton_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenvmap_singleton_fun p.
+  Lemma tenvmap_singleton_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvmap_singleton_fun p.
   Proof.
     tprove_correctness p.
     apply tenvmap_singleton_arrow.
   Qed.
   Hint Rewrite @tenvmap_singleton_fun_correctness : optim_correct.
 
-  (* p ◯ ID ⇒ p *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_id_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* p ◯ ID ⇒ₓ p *)
+  Definition tapp_over_id_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp p ANID => p
+        NRAEnvApp p NRAEnvID => p
       | _ => p
     end.
 
-  Lemma tapp_over_id_r_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_id_r_fun p.
+  Lemma tapp_over_id_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_id_r_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_id_r_arrow.
   Qed.
   Hint Rewrite @tapp_over_id_r_fun_correctness : optim_correct.
 
-  (* ENV ◯ p ⇒ ENV *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_env_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ENV ◯ p ⇒ₓ ENV *)
+  Definition tapp_over_env_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANApp ANEnv p => ANEnv
+      | NRAEnvApp NRAEnvEnv p => NRAEnvEnv
       | _ => p
     end.
 
-  Lemma tapp_over_env_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_env_fun p.
+  Lemma tapp_over_env_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_env_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_env_arrow.
   Qed.
   Hint Rewrite @tapp_over_env_fun_correctness : optim_correct.
 
-  (* ID ◯ p ⇒ p *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_id_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ID ◯ p ⇒ₓ p *)
+  Definition tapp_over_id_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp ANID p => p
+      | NRAEnvApp NRAEnvID p => p
       | _ => p
     end.
 
-  Lemma tapp_over_id_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_id_l_fun p.
+  Lemma tapp_over_id_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_id_l_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_id_l_arrow.
   Qed.
   Hint Rewrite @tapp_over_id_l_fun_correctness : optim_correct.
 
-    (* ignores_id p1 -> p1 ◯ p2 ⇒ p1 *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_ignoreid_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ignores_id p1 -> p1 ◯ p2 ⇒ₓ p1 *)
+  Definition tapp_over_ignoreid_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | ANApp p1 p2 =>
-      if (ignores_id_fun p1)
+    | NRAEnvApp p1 p2 =>
+      if (nraenv_ignores_id_fun p1)
       then p1 else p
     | _ => p
     end.
 
-  Lemma tapp_over_ignoreid_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_ignoreid_fun p.
+  Lemma tapp_over_ignoreid_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_ignoreid_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
-    case_eq (ignores_id_fun p1); intros; try reflexivity.
+    case_eq (nraenv_ignores_id_fun p1); intros; try reflexivity.
     apply tapp_over_ignoreid_arrow.
     rewrite ignores_id_eq; assumption.
   Qed.
 
-  (* ENV ◯ₑ p ⇒ p *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_env_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ENV ◯ₑ p ⇒ₓ p *)
+  Definition tappenv_over_env_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANAppEnv ANEnv p => p
+        NRAEnvAppEnv NRAEnvEnv p => p
       | _ => p
     end.
 
-  Lemma tappenv_over_env_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_env_l_fun p.
+  Lemma tappenv_over_env_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_env_l_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
-    destruct p1; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
+    destruct p1; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
     apply tappenv_over_env_l_arrow.
   Qed.
 
-  (* p ◯ₑ ENV ⇒ p *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_env_r_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* p ◯ₑ ENV ⇒ₓ p *)
+  Definition tappenv_over_env_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANAppEnv p ANEnv => p
+        NRAEnvAppEnv p NRAEnvEnv => p
       | _ => p
     end.
 
-  Lemma tappenv_over_env_r_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_env_r_fun p.
+  Lemma tappenv_over_env_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_env_r_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_over_env_r_arrow.
   Qed.
 
-  (* ignores_env p1 -> p1 ◯ₑ p2 ⇒ p1 *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_ignoreenv_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ignores_env p1 -> p1 ◯ₑ p2 ⇒ₓ p1 *)
+  Definition tappenv_over_ignoreenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | ANAppEnv p1 p2 =>
-      if (ignores_env_fun p1)
+    | NRAEnvAppEnv p1 p2 =>
+      if (nraenv_ignores_env_fun p1)
       then p1 else p
     | _ => p
     end.
 
-  Lemma tappenv_over_ignoreenv_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_ignoreenv_fun p.
+  Lemma tappenv_over_ignoreenv_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_ignoreenv_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
-    case_eq (ignores_env_fun p1); intros; try reflexivity.
+    case_eq (nraenv_ignores_env_fun p1); intros; try reflexivity.
     apply tappenv_over_ignoreenv_arrow.
     rewrite ignores_env_eq; assumption.
   Qed.
 
-  (* (p1 ◯ p2) ◯ p3 ⇒ p1 ◯ (p2 ◯ p3) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_app_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* (p1 ◯ p2) ◯ p3 ⇒ₓ p1 ◯ (p2 ◯ p3) *)
+  Definition tapp_over_app_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp (ANApp p1 p2) p3 =>
-        ANApp p1 (ANApp p2 p3)
+        NRAEnvApp (NRAEnvApp p1 p2) p3 =>
+        NRAEnvApp p1 (NRAEnvApp p2 p3)
       | _ => p
     end.
 
-  Lemma tapp_over_app_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_app_fun p.
+  Lemma tapp_over_app_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_app_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
-    destruct p1; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
+    destruct p1; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
     apply tapp_over_app_arrow.
   Qed.
   Hint Rewrite @tapp_over_app_fun_correctness : optim_correct.
 
-  (* (p1 ◯ₑ p2) ◯ₑ p3 ⇒ p1 ◯ₑ (p2 ◯ₑ p3) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_appenv_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* (p1 ◯ₑ p2) ◯ₑ p3 ⇒ₓ p1 ◯ₑ (p2 ◯ₑ p3) *)
+  Definition tappenv_over_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANAppEnv (ANAppEnv p1 p2) p3 =>
-        ANAppEnv p1 (ANAppEnv p2 p3)
+        NRAEnvAppEnv (NRAEnvAppEnv p1 p2) p3 =>
+        NRAEnvAppEnv p1 (NRAEnvAppEnv p2 p3)
       | _ => p
     end.
 
-  Lemma tappenv_over_appenv_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_appenv_fun p.
+  Lemma tappenv_over_appenv_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_appenv_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_over_appenv_arrow.
   Qed.
   Hint Rewrite @tappenv_over_appenv_fun_correctness : optim_correct.
 
-  (* ignores_id p3 -> (p1 ◯ p2) ◯ₑ p3 ⇒ (p1 ◯ₑ p3) ◯ (p2 ◯ₑ p3) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_app_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ignores_id p3 -> (p1 ◯ p2) ◯ₑ p3 ⇒ₓ (p1 ◯ₑ p3) ◯ (p2 ◯ₑ p3) *)
+  Definition tappenv_over_app_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANAppEnv (ANApp p1 p2) p3 =>
-        if (ignores_env_fun p1) then
-          ANApp p1(ANAppEnv p2 p3)
-        else if (ignores_id_fun p3) then
-        ANApp (ANAppEnv p1 p3) (ANAppEnv p2 p3)
+      | NRAEnvAppEnv (NRAEnvApp p1 p2) p3 =>
+        if (nraenv_ignores_env_fun p1) then
+          NRAEnvApp p1(NRAEnvAppEnv p2 p3)
+        else if (nraenv_ignores_id_fun p3) then
+        NRAEnvApp (NRAEnvAppEnv p1 p3) (NRAEnvAppEnv p2 p3)
       else p
     | _ => p
     end.
 
-  Lemma tappenv_over_app_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_app_fun p.
+  Lemma tappenv_over_app_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_app_fun p.
   Proof.
     destruct p; try reflexivity.
     destruct p1; try reflexivity.
     simpl.
-    case_eq (ignores_env_fun p1_1); intros.
+    case_eq (nraenv_ignores_env_fun p1_1); intros.
     - apply tappenv_over_app_ie_arrow.
       apply ignores_env_eq; trivial.
-    - case_eq (ignores_id_fun p2); intros.
+    - case_eq (nraenv_ignores_id_fun p2); intros.
       + apply tappenv_over_app_arrow.
         apply ignores_id_eq; trivial.
       + reflexivity.
@@ -629,189 +750,178 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tappenv_over_app_fun_correctness : optim_correct.
 
-  (* ignores_id p1 -> (p1 ◯ₑ p2) ◯ p3 ⇒ p1 ◯ₑ (p2 ◯ p3) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_appenv_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ignores_id p1 -> (p1 ◯ₑ p2) ◯ p3 ⇒ₓ p1 ◯ₑ (p2 ◯ p3) *)
+  Definition tapp_over_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | ANApp (ANAppEnv p1 p2) p3 =>
-      if (ignores_id_fun p1) then
-        ANAppEnv p1 (ANApp p2 p3)
+    | NRAEnvApp (NRAEnvAppEnv p1 p2) p3 =>
+      if (nraenv_ignores_id_fun p1) then
+        NRAEnvAppEnv p1 (NRAEnvApp p2 p3)
       else p
     | _ => p
     end.
 
-  Lemma tapp_over_appenv_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_appenv_fun p.
+  Lemma tapp_over_appenv_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_appenv_fun p.
   Proof.
     destruct p; try reflexivity.
     destruct p1; try reflexivity.
     simpl.
-    case_eq (ignores_id_fun p1_1); intros.
+    case_eq (nraenv_ignores_id_fun p1_1); intros.
     - apply tapp_over_appenv_arrow.
       rewrite ignores_id_eq; assumption.
     - reflexivity.
   Qed.
 
-  (* (ANUnop u p1) ◯ p2 ⇒ (ANUnop u (p1 ◯ p2)) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_unop_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* (NRAEnvUnop u p1) ◯ p2 ⇒ₓ (NRAEnvUnop u (p1 ◯ p2)) *)
+  Definition tapp_over_unop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp (ANUnop u p1) p2 =>
-        ANUnop u (ANApp p1 p2)
+        NRAEnvApp (NRAEnvUnop u p1) p2 =>
+        NRAEnvUnop u (NRAEnvApp p1 p2)
       | _ => p
     end.
 
-  Lemma tapp_over_unop_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_unop_fun p.
+  Lemma tapp_over_unop_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_unop_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_unop_arrow.
   Qed.
   Hint Rewrite @tapp_over_unop_fun_correctness : optim_correct.
 
-  (* (ANUnop u p1) ◯ₑ p2 ⇒ (ANUnop u (p1 ◯ₑ p2)) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_unop_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* (NRAEnvUnop u p1) ◯ₑ p2 ⇒ₓ (NRAEnvUnop u (p1 ◯ₑ p2)) *)
+  Definition tappenv_over_unop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANAppEnv (ANUnop u p1) p2 =>
-        ANUnop u (ANAppEnv p1 p2)
+        NRAEnvAppEnv (NRAEnvUnop u p1) p2 =>
+        NRAEnvUnop u (NRAEnvAppEnv p1 p2)
       | _ => p
     end.
 
-  Lemma tappenv_over_unop_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_unop_fun p.
+  Lemma tappenv_over_unop_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_unop_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_over_unop_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tunop_over_either_const_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tunop_over_either_const_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop u (ANEither p₁ (ANConst d)) => ANEither (ANUnop u p₁) (ANUnop u (ANConst d))
+      | NRAEnvUnop u (NRAEnvEither p₁ (NRAEnvConst d)) => NRAEnvEither (NRAEnvUnop u p₁) (NRAEnvUnop u (NRAEnvConst d))
       | _ => p
     end.
 
-  Lemma tunop_over_either_const_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tunop_over_either_const_fun p.
+  Lemma tunop_over_either_const_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tunop_over_either_const_fun p.
   Proof.
     tprove_correctness p.
     apply tunop_over_either.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tunop_over_either_const_app_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tunop_over_either_const_app_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop u (ANEither p₁ (ANConst d) ◯ p₃) => ANEither (ANUnop u p₁) (ANUnop u (ANConst d)) ◯ p₃
-      | _ => p
+    | NRAEnvUnop u (NRAEnvApp (NRAEnvEither p₁ (NRAEnvConst d)) p₃) =>
+      NRAEnvApp (NRAEnvEither (NRAEnvUnop u p₁) (NRAEnvUnop u (NRAEnvConst d))) p₃
+    | _ => p
     end.
 
-  Lemma tunop_over_either_const_app_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tunop_over_either_const_app_fun p.
+  Lemma tunop_over_either_const_app_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tunop_over_either_const_app_fun p.
   Proof.
     tprove_correctness p.
     apply tunop_over_either_app.
   Qed.
   
-  (* χ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ χ⟨ p1 ⟩( p2 ◯ p0 ) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_map_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* χ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ₓ χ⟨ p1 ⟩( p2 ◯ p0 ) *)
+  Definition tapp_over_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp (ANMap p1 p2) p0 =>
-        ANMap p1 (ANApp p2 p0)
+        NRAEnvApp (NRAEnvMap p1 p2) p0 =>
+        NRAEnvMap p1 (NRAEnvApp p2 p0)
       | _ => p
     end.
 
-  Lemma tapp_over_map_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_map_fun p.
+  Lemma tapp_over_map_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_map_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_map_arrow.
   Qed.
   Hint Rewrite @tapp_over_map_fun_correctness : optim_correct.
 
-  (* ⋈ᵈ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ ⋈ᵈ⟨ q₁ ⟩( q₂ ◯ q ) *)
+  (* ⋈ᵈ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ₓ ⋈ᵈ⟨ q₁ ⟩( q₂ ◯ q ) *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_mapconcat_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tapp_over_mapconcat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp (ANMapConcat p1 p2) p0 =>
-        ANMapConcat p1 (ANApp p2 p0)
+        NRAEnvApp (NRAEnvMapConcat p1 p2) p0 =>
+        NRAEnvMapConcat p1 (NRAEnvApp p2 p0)
       | _ => p
     end.
 
-  Lemma tapp_over_mapconcat_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_mapconcat_fun p.
+  Lemma tapp_over_mapconcat_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_mapconcat_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_mapconcat_arrow.
   Qed.
   Hint Rewrite @tapp_over_mapconcat_fun_correctness : optim_correct.
 
-  (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
+  (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ₓ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_map_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tappenv_over_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANAppEnv (ANMap p1 p2) p0 =>
-        if (ignores_id_fun p0)
-        then ANMap (ANAppEnv p1 p0) (ANAppEnv p2 p0)
+      | NRAEnvAppEnv (NRAEnvMap p1 p2) p0 =>
+        if (nraenv_ignores_id_fun p0)
+        then NRAEnvMap (NRAEnvAppEnv p1 p0) (NRAEnvAppEnv p2 p0)
         else p
       | _ => p
     end.
 
-  Lemma tappenv_over_map_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_map_fun p.
+  Lemma tappenv_over_map_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_map_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
-    destruct p1; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
+    destruct p1; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
-    case_eq (ignores_id_fun p2); intros; try reflexivity.
-    rewrite (tappenv_over_map_arrow p2 p1_1 p1_2).
+    case_eq (nraenv_ignores_id_fun p2); intros; try reflexivity.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
+    rewrite tappenv_over_map_arrow.
     reflexivity.
     rewrite ignores_id_eq; assumption.
   Qed.
 
-  (* σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
+  (* σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ₓ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_select_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tappenv_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANAppEnv (ANSelect p1 p2) p0 =>
-        if (ignores_id_fun p0)
-        then ANSelect (ANAppEnv p1 p0) (ANAppEnv p2 p0)
+      | NRAEnvAppEnv (NRAEnvSelect p1 p2) p0 =>
+        if (nraenv_ignores_id_fun p0)
+        then NRAEnvSelect (NRAEnvAppEnv p1 p0) (NRAEnvAppEnv p2 p0)
         else p
       | _ => p
     end.
 
-  Lemma tappenv_over_select_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_select_fun p.
+  Lemma tappenv_over_select_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_select_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
-    destruct p1; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
+    destruct p1; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
-    case_eq (ignores_id_fun p2); intros; try reflexivity.
-    rewrite (tappenv_over_select_arrow p2 p1_1 p1_2).
+    case_eq (nraenv_ignores_id_fun p2); intros; try reflexivity.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
+    rewrite tappenv_over_select_arrow.
     reflexivity.
     rewrite ignores_id_eq; assumption.
   Qed.
 
-  (* σ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ σ⟨ p1 ⟩( p2 ◯ p0 ) *)
+  (* σ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ₓ σ⟨ p1 ⟩( p2 ◯ p0 ) *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_select_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tapp_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp (ANSelect p1 p2) p0 =>
-        ANSelect p1 (ANApp p2 p0)
+        NRAEnvApp (NRAEnvSelect p1 p2) p0 =>
+        NRAEnvSelect p1 (NRAEnvApp p2 p0)
       | _ => p
     end.
 
-  Lemma tapp_over_select_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_select_fun p.
+  Lemma tapp_over_select_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_select_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_select_arrow.
@@ -819,18 +929,16 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tapp_over_select_fun_correctness : optim_correct.
 
 
-  (* (ANBinop b p2 p3 ◯ p1) ⇒ (ANBinop b (p2 ◯ p1) (p3 ◯ p1)) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_binop_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* (NRAEnvBinop b p2 p3 ◯ p1) ⇒ₓ (NRAEnvBinop b (p2 ◯ p1) (p3 ◯ p1)) *)
+  Definition tapp_over_binop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANApp (ANBinop b p2 p3) p1 =>
-        ANBinop b (ANApp p2 p1) (ANApp p3 p1)
+        NRAEnvApp (NRAEnvBinop b p2 p3) p1 =>
+        NRAEnvBinop b (NRAEnvApp p2 p1) (NRAEnvApp p3 p1)
       | _ => p
     end.
 
-  Lemma tapp_over_binop_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tapp_over_binop_fun p.
+  Lemma tapp_over_binop_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_binop_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_binop_arrow.
@@ -838,20 +946,18 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tapp_over_binop_fun_correctness : optim_correct.
 
 
-  (* { [ s1 : p1 ] } × { [ s2 : p2 ] } ⇒ { [ s1 : p1; s2 : p2 ] } *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tproduct_singletons_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* { [ s1 : p1 ] } × { [ s2 : p2 ] } ⇒ₓ { [ s1 : p1; s2 : p2 ] } *)
+  Definition tproduct_singletons_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANProduct (ANUnop AColl (ANUnop (ARec s1) p1))
-                  (ANUnop AColl (ANUnop (ARec s2) p2)) =>
-        ANUnop AColl
-               (ANBinop AConcat (ANUnop (ARec s1) p1) (ANUnop (ARec s2) p2))
+        NRAEnvProduct (NRAEnvUnop AColl (NRAEnvUnop (ARec s1) p1))
+                  (NRAEnvUnop AColl (NRAEnvUnop (ARec s2) p2)) =>
+        NRAEnvUnop AColl
+               (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1) p1) (NRAEnvUnop (ARec s2) p2))
       | _ => p
     end.
 
-  Lemma tproduct_singletons_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tproduct_singletons_fun p.
+  Lemma tproduct_singletons_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tproduct_singletons_fun p.
   Proof.
     tprove_correctness p.
     apply tproduct_singletons_arrow.
@@ -859,129 +965,119 @@ Section NRAEnvOptimFunc.
   Hint Rewrite @tproduct_singletons_fun_correctness : optim_correct.
 
 
-  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tdouble_flatten_map_coll_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
+  Definition tdouble_flatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        ANUnop AFlatten
-               (ANMap (ANMap (ANUnop AColl p3) p1) p2) =>
-        ANMap (ANUnop AColl p3)
-              (ANUnop AFlatten (ANMap p1 p2))
+        NRAEnvUnop AFlatten
+               (NRAEnvMap (NRAEnvMap (NRAEnvUnop AColl p3) p1) p2) =>
+        NRAEnvMap (NRAEnvUnop AColl p3)
+              (NRAEnvUnop AFlatten (NRAEnvMap p1 p2))
       | _ => p
     end.
 
-  Lemma tdouble_flatten_map_coll_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tdouble_flatten_map_coll_fun p.
+  Lemma tdouble_flatten_map_coll_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdouble_flatten_map_coll_fun p.
   Proof.
     tprove_correctness p.
     apply tdouble_flatten_map_coll_arrow.
   Qed.
   Hint Rewrite @tdouble_flatten_map_coll_fun_correctness : optim_correct.
 
-  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflatten_over_double_map_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
+  Definition tflatten_over_double_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | (ANUnop AFlatten
-                (ANMap (ANMap q₁ (ANSelect q₂ (ANUnop AColl ANID))) q₃))
-        => (ANMap q₁ (ANSelect q₂ q₃))
+      | (NRAEnvUnop AFlatten
+                (NRAEnvMap (NRAEnvMap q₁ (NRAEnvSelect q₂ (NRAEnvUnop AColl NRAEnvID))) q₃))
+        => (NRAEnvMap q₁ (NRAEnvSelect q₂ q₃))
       | _ => p
     end.
 
-  Lemma tflatten_over_double_map_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tflatten_over_double_map_fun p.
+  Lemma tflatten_over_double_map_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_over_double_map_fun p.
   Proof.
     tprove_correctness p.
     apply tflatten_over_double_map_arrow.
   Qed.
   Hint Rewrite @tflatten_over_double_map_fun_correctness : optim_correct.
 
-  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflatten_over_double_map_with_either_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
+  Definition tflatten_over_double_map_with_either_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | (ANUnop AFlatten
-              (ANMap
-                 (ANMap q₁
-                        (ANSelect q₂
-                                  (ANApp
-                                     (ANEither (ANUnop AColl ANID) (ANConst (dcoll []))) q₃)))
+    | (NRAEnvUnop AFlatten
+              (NRAEnvMap
+                 (NRAEnvMap q₁
+                        (NRAEnvSelect q₂
+                                  (NRAEnvApp
+                                     (NRAEnvEither (NRAEnvUnop AColl NRAEnvID) (NRAEnvConst (dcoll []))) q₃)))
                  q₄)) =>
-      (ANMap q₁
-             (ANSelect q₂
-                       (ANUnop AFlatten
-                               (ANMap
-                                  (ANApp
-                                     (ANEither (ANUnop AColl ANID) (ANConst (dcoll []))) q₃)
+      (NRAEnvMap q₁
+             (NRAEnvSelect q₂
+                       (NRAEnvUnop AFlatten
+                               (NRAEnvMap
+                                  (NRAEnvApp
+                                     (NRAEnvEither (NRAEnvUnop AColl NRAEnvID) (NRAEnvConst (dcoll []))) q₃)
                                   q₄))))
     | _ => p
     end.
 
-  Lemma tflatten_over_double_map_with_either_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tflatten_over_double_map_with_either_fun p.
+  Lemma tflatten_over_double_map_with_either_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_over_double_map_with_either_fun p.
   Proof.
     tprove_correctness p.
     apply tflatten_over_double_map_with_either_arrow.
   Qed.
   Hint Rewrite @tflatten_over_double_map_with_either_fun_correctness : optim_correct.
 
-  (* ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ⇒ p2 ⊗ p1 *)
-  
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_env_merge_l_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ⇒ₓ p2 ⊗ p1 *)
+  Definition tappenv_over_env_merge_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANAppEnv (ENV ⊗ p1) p2 =>
-        if (ignores_env_fun p1)
-        then (p2 ⊗ p1)
+      | NRAEnvAppEnv (NRAEnvBinop AMergeConcat NRAEnvEnv p1) p2 =>
+        if (nraenv_ignores_env_fun p1)
+        then (NRAEnvBinop AMergeConcat p2 p1)
         else p
       | _ => p
     end.
     
-  Lemma tappenv_over_env_merge_l_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_env_merge_l_fun p.
+  Lemma tappenv_over_env_merge_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_env_merge_l_fun p.
   Proof.
-    destruct p; try solve [unfold talgenv_rewrites_to; simpl; auto].
+    destruct p; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     destruct p1; try reflexivity.
     destruct b; try reflexivity.
     destruct p1_1; try reflexivity.
     simpl.
-    case_eq (ignores_env_fun p1_2); intros; try reflexivity.
+    case_eq (nraenv_ignores_env_fun p1_2); intros; try reflexivity.
     apply tappenv_over_env_merge_l_arrow.
     rewrite ignores_env_eq; assumption.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmerge_with_empty_rec_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmerge_with_empty_rec_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANBinop AMergeConcat p1 (ANConst (drec nil)) =>
-        ANUnop AColl p1
+      | NRAEnvBinop AMergeConcat p1 (NRAEnvConst (drec nil)) =>
+        NRAEnvUnop AColl p1
       | _ => p
     end.
 
-  Lemma tmerge_with_empty_rec_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tmerge_with_empty_rec_fun p.
+  Lemma tmerge_with_empty_rec_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tmerge_with_empty_rec_fun p.
   Proof.
     tprove_correctness p.
     apply tmerge_empty_record_r_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition ttostring_on_string_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition ttostring_on_string_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop AToString (ANConst (dstring s)) =>
-        ANConst (dstring s)
-      | ANUnop AToString (ANUnop AToString p) =>
-        ANUnop AToString p
-      | ANUnop AToString (ANBinop ASConcat p1 p2) =>
-        (ANBinop ASConcat p1 p2)
+      | NRAEnvUnop AToString (NRAEnvConst (dstring s)) =>
+        NRAEnvConst (dstring s)
+      | NRAEnvUnop AToString (NRAEnvUnop AToString p) =>
+        NRAEnvUnop AToString p
+      | NRAEnvUnop AToString (NRAEnvBinop ASConcat p1 p2) =>
+        (NRAEnvBinop ASConcat p1 p2)
       | _ => p
     end.
 
-  Lemma ttostring_on_string_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ ttostring_on_string_fun p.
+  Lemma ttostring_on_string_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ ttostring_on_string_fun p.
   Proof.
     tprove_correctness p.
     - apply ttostring_dstring_arrow.
@@ -989,17 +1085,16 @@ Section NRAEnvOptimFunc.
     - apply ttostring_tostring_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmap_full_over_select_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmap_full_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANMap p0 (ANSelect p1 (ANUnop AColl ANID)) => p
-      | ANMap p0 (ANSelect p1 (ANUnop AColl p2)) =>
-        ANMap (ANApp p0 p2) (ANSelect (ANApp p1 p2) (ANUnop AColl ANID))
+      | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop AColl NRAEnvID)) => p
+      | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop AColl p2)) =>
+        NRAEnvMap (NRAEnvApp p0 p2) (NRAEnvSelect (NRAEnvApp p1 p2) (NRAEnvUnop AColl NRAEnvID))
       | _ => p
     end.
 
-  Lemma tmap_full_over_select_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tmap_full_over_select_fun p.
+  Lemma tmap_full_over_select_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tmap_full_over_select_fun p.
   Proof.
     destruct p; simpl; try reflexivity.
     do 3 (match_destr; simpl; try reflexivity).
@@ -1007,126 +1102,120 @@ Section NRAEnvOptimFunc.
     apply tmap_full_over_select_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tcompose_selects_in_mapenv_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tcompose_selects_in_mapenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | (ANAppEnv
-           (ANUnop AFlatten
-                   (ANMapEnv (ANMap ANEnv (ANSelect p1 (ANUnop AColl ANID)))))
-           (ANMap ANEnv (ANSelect p2 (ANUnop AColl ANID)))) =>
-        (ANMap ANEnv (ANSelect p1 (ANSelect p2 (ANUnop AColl ANID))))
+      | (NRAEnvAppEnv
+           (NRAEnvUnop AFlatten
+                   (NRAEnvMapEnv (NRAEnvMap NRAEnvEnv (NRAEnvSelect p1 (NRAEnvUnop AColl NRAEnvID)))))
+           (NRAEnvMap NRAEnvEnv (NRAEnvSelect p2 (NRAEnvUnop AColl NRAEnvID)))) =>
+        (NRAEnvMap NRAEnvEnv (NRAEnvSelect p1 (NRAEnvSelect p2 (NRAEnvUnop AColl NRAEnvID))))
       | _ => p
     end.
   
-  Lemma tcompose_selects_in_mapenv_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tcompose_selects_in_mapenv_fun p.
+  Lemma tcompose_selects_in_mapenv_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tcompose_selects_in_mapenv_fun p.
   Proof.
     tprove_correctness p.
     apply tcompose_selects_in_mapenv_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmapenv_to_env_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tmapenv_to_env_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | (ANApp (ANMapEnv ANEnv) p1) => ANEnv
+      | (NRAEnvApp (NRAEnvMapEnv NRAEnvEnv) p1) => NRAEnvEnv
       | _ => p
     end.
 
-  Lemma tmapenv_to_env_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmapenv_to_env_fun p.
+  Lemma tmapenv_to_env_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmapenv_to_env_fun p.
   Proof.
     tprove_correctness p.
     apply tmapenv_to_env_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tenv_appenv_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tenv_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANAppEnv ANEnv p1 => p1
+      | NRAEnvAppEnv NRAEnvEnv p1 => p1
       | _ => p
     end.
   
-  Lemma tenv_appenv_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tenv_appenv_fun p.
+  Lemma tenv_appenv_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenv_appenv_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_over_env_l_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflatten_mapenv_coll_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tflatten_mapenv_coll_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop AFlatten (ANMapEnv (ANUnop AColl p1)) =>
-        ANMapEnv p1
+      | NRAEnvUnop AFlatten (NRAEnvMapEnv (NRAEnvUnop AColl p1)) =>
+        NRAEnvMapEnv p1
       | _ => p
     end.
 
-  Lemma  tflatten_mapenv_coll_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tflatten_mapenv_coll_fun p.
+  Lemma  tflatten_mapenv_coll_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_mapenv_coll_fun p.
   Proof.
     tprove_correctness p.
     apply tflatten_mapenv_coll_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflatten_nil_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tflatten_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop AFlatten ‵{||} =>
-        ‵{||}
+      | NRAEnvUnop AFlatten (NRAEnvConst (dcoll nil)) =>
+        NRAEnvConst (dcoll nil)
       | _ => p
     end.
 
-  Lemma  tflatten_nil_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tflatten_nil_fun p.
+  Lemma  tflatten_nil_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_nil_fun p.
   Proof.
     tprove_correctness p.
     apply tenvflatten_nil_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflatten_through_appenv_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tflatten_through_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ANUnop AFlatten (ANAppEnv p1 p2) =>
-        ANAppEnv (ANUnop AFlatten p1) p2
+      | NRAEnvUnop AFlatten (NRAEnvAppEnv p1 p2) =>
+        NRAEnvAppEnv (NRAEnvUnop AFlatten p1) p2
       | _ => p
     end.
 
-  Lemma tflatten_through_appenv_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tflatten_through_appenv_fun p.
+  Lemma tflatten_through_appenv_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tflatten_through_appenv_fun p.
   Proof.
     tprove_correctness p.
     apply tflatten_through_appenv_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_flatten_mapenv_to_map_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tappenv_flatten_mapenv_to_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | (ANAppEnv (ANUnop AFlatten (ANMapEnv p2))
-            (ANBinop AMergeConcat ANEnv (ANUnop (ARec s) ANID))) =>
-         (ANUnop AFlatten
-            (ANMap (ANAppEnv (ANApp p2 (ANUnop (ADot s) ANEnv)) ANID)
-                   (ANBinop AMergeConcat ANEnv (ANUnop (ARec s) ANID))))
+      | (NRAEnvAppEnv (NRAEnvUnop AFlatten (NRAEnvMapEnv p2))
+            (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec s) NRAEnvID))) =>
+         (NRAEnvUnop AFlatten
+            (NRAEnvMap (NRAEnvAppEnv (NRAEnvApp p2 (NRAEnvUnop (ADot s) NRAEnvEnv)) NRAEnvID)
+                   (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec s) NRAEnvID))))
       | _ => p
     end.
   
-  Lemma tappenv_flatten_mapenv_to_map_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tappenv_flatten_mapenv_to_map_fun p.
+  Lemma tappenv_flatten_mapenv_to_map_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tappenv_flatten_mapenv_to_map_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_flatten_mapenv_to_map_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tselect_over_either_nil_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tselect_over_either_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | σ⟨p₁⟩( ANEither p₂ ‵{||}) => ANEither (σ⟨p₁⟩(p₂)) (‵{||})
-      | _ => p
+    | NRAEnvSelect p₁ (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) =>
+      NRAEnvEither (NRAEnvSelect p₁ (p₂)) (NRAEnvConst (dcoll nil))
+    | _ => p
     end.
 
-  Lemma tselect_over_either_nil_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tselect_over_either_nil_fun p.
+  Lemma tselect_over_either_nil_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tselect_over_either_nil_fun p.
   Proof.
     tprove_correctness p.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tselect_over_either.
     rewrite tselect_over_nil.
     reflexivity.
@@ -1134,17 +1223,18 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tselect_over_either_nil_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tselect_over_either_nil_app_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tselect_over_either_nil_app_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | σ⟨p₁⟩( ANEither p₂ ‵{||} ◯ p₄) => ANEither (σ⟨p₁⟩(p₂)) (‵{||}) ◯ p₄
-      | _ => p
+    | NRAEnvSelect p₁ (NRAEnvApp (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) p₄) =>
+      NRAEnvApp (NRAEnvEither (NRAEnvSelect p₁ p₂) ((NRAEnvConst (dcoll nil)))) p₄
+    | _ => p
     end.
 
-  Lemma tselect_over_either_nil_app_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tselect_over_either_nil_app_fun p.
+  Lemma tselect_over_either_nil_app_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tselect_over_either_nil_app_fun p.
   Proof.
     tprove_correctness p.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tselect_over_app_either.
     rewrite tselect_over_nil.
     reflexivity.
@@ -1152,17 +1242,18 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tselect_over_either_nil_app_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmap_over_either_nil_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tmap_over_either_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | χ⟨p₁⟩( ANEither p₂ ‵{||}) => ANEither (χ⟨p₁⟩(p₂)) (‵{||})
-      | _ => p
+    | NRAEnvMap p₁ (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) =>
+      NRAEnvEither (NRAEnvMap p₁ p₂) ((NRAEnvConst (dcoll nil)))
+    | _ => p
     end.
 
-  Lemma tmap_over_either_nil_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmap_over_either_nil_fun p.
+  Lemma tmap_over_either_nil_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_over_either_nil_fun p.
   Proof.
     tprove_correctness p.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tmap_over_either.
     rewrite tmap_over_nil.
     reflexivity.
@@ -1170,17 +1261,18 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tmap_over_either_nil_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmap_over_either_nil_app_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tmap_over_either_nil_app_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | χ⟨p₁⟩( ANEither p₂ ‵{||} ◯ p₄) => ANEither (χ⟨p₁⟩(p₂)) (‵{||}) ◯ p₄
-      | _ => p
+    | NRAEnvMap p₁ (NRAEnvApp (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) p₄) =>
+      NRAEnvApp (NRAEnvEither (NRAEnvMap p₁ p₂) (NRAEnvConst (dcoll nil))) p₄
+    | _ => p
     end.
 
-  Lemma tmap_over_either_nil_app_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmap_over_either_nil_app_fun p.
+  Lemma tmap_over_either_nil_app_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_over_either_nil_app_fun p.
   Proof.
     tprove_correctness p.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tmap_over_either_app.
     rewrite tmap_over_nil.
     reflexivity.
@@ -1188,18 +1280,17 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tmap_over_either_nil_app_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_either_nil_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tappenv_over_either_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANAppEnv (ANEither p₂ ‵{||}) p₃ =>
-        if ignores_id_fun p₃ 
-        then ANEither (ANAppEnv p₂ p₃) (‵{||})
+      | NRAEnvAppEnv (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) p₃ =>
+        if nraenv_ignores_id_fun p₃ 
+        then NRAEnvEither (NRAEnvAppEnv p₂ p₃) ((NRAEnvConst (dcoll nil)))
         else p
       | _ => p
     end.
 
-  Lemma tappenv_over_either_nil_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_over_either_nil_fun p.
+  Lemma tappenv_over_either_nil_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_over_either_nil_fun p.
   Proof.
     destruct p; simpl; try reflexivity.
     destruct p1; simpl; try reflexivity.
@@ -1207,7 +1298,9 @@ Section NRAEnvOptimFunc.
     destruct d; simpl; try reflexivity.
     destruct l; simpl; try reflexivity.
     match_case; simpl; try reflexivity.
+    unfold nraenv_ignores_id_fun.
     intros ig; apply ignores_id_eq in ig.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     autorewrite with talgenv_optim.
     - reflexivity.
     - trivial.
@@ -1215,15 +1308,15 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tappenv_over_either_nil_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tselect_over_flatten_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tselect_over_flatten_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | σ⟨p₁⟩(♯flatten(p₂)) => ♯flatten(χ⟨σ⟨p₁⟩(ID)⟩(p₂))
-      | _ => p
+    | NRAEnvSelect p₁ (NRAEnvUnop AFlatten p₂) =>
+      NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvSelect p₁ NRAEnvID) p₂)
+    | _ => p
     end.
 
-  Lemma tselect_over_flatten_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tselect_over_flatten_fun p.
+  Lemma tselect_over_flatten_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tselect_over_flatten_fun p.
   Proof.
     tprove_correctness p.
     apply tselect_over_flatten.
@@ -1231,15 +1324,15 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tselect_over_flatten_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmap_over_flatten_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmap_over_flatten_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | χ⟨p₁⟩(♯flatten(p₂)) => ♯flatten(χ⟨χ⟨p₁⟩(ID)⟩(p₂))
-      | _ => p
+    | NRAEnvMap p₁ (NRAEnvUnop AFlatten p₂) =>
+      NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvMap p₁ NRAEnvID) p₂)
+    | _ => p
     end.
 
-  Lemma tmap_over_flatten_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmap_over_flatten_fun p.
+  Lemma tmap_over_flatten_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_over_flatten_fun p.
   Proof.
     tprove_correctness p.
     apply tmap_over_flatten.
@@ -1247,15 +1340,15 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tmap_over_flatten_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmap_over_flatten_map_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmap_over_flatten_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | χ⟨p₁⟩(♯flatten(χ⟨p₂⟩(p₃))) => ♯flatten(χ⟨χ⟨p₁⟩(p₂)⟩(p₃))
+    | NRAEnvMap p₁ (NRAEnvUnop AFlatten (NRAEnvMap p₂ p₃)) =>
+      NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvMap p₁ p₂) p₃)
       | _ => p
     end.
 
-  Lemma tmap_over_flatten_map_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmap_over_flatten_map_fun p.
+  Lemma tmap_over_flatten_map_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_over_flatten_map_fun p.
   Proof.
     tprove_correctness p.
     apply tmap_over_flatten_map.
@@ -1263,70 +1356,68 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tmap_over_flatten_map_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tconcat_over_rec_eq_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tconcat_over_rec_eq_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | (ANBinop AConcat
-                 (ANUnop (ARec s₁) p₁) (ANUnop (ARec s₂) p₂))
+      | (NRAEnvBinop AConcat
+                 (NRAEnvUnop (ARec s₁) p₁) (NRAEnvUnop (ARec s₂) p₂))
         => if string_dec s₁ s₂ 
-           then (ANUnop (ARec s₂) p₂)
+           then (NRAEnvUnop (ARec s₂) p₂)
            else p
       | _ => p
     end.
 
   Definition tconcat_over_rec_eq_fun_correctness {model:basic_model} p :
-    p ⇒ tconcat_over_rec_eq_fun p.
+    p ⇒ₓ tconcat_over_rec_eq_fun p.
   Proof.
     tprove_correctness p.
+    rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tconcat_over_rec_eq.
     reflexivity.
   Qed.
                   
   Hint Rewrite @tconcat_over_rec_eq_fun_correctness : toptim_correct.
 
-
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tapp_over_const_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tapp_over_const_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        (ANApp (ANConst d) p1) => (ANConst d)
+        (NRAEnvApp (NRAEnvConst d) p1) => (NRAEnvConst d)
       | _ => p
     end.
   
-  Lemma tapp_over_const_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tapp_over_const_fun p.
+  Lemma tapp_over_const_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tapp_over_const_fun p.
   Proof.
     tprove_correctness p.
     apply tapp_over_const_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_const_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tappenv_over_const_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        (ANAppEnv (ANConst d) p1) => (ANConst d)
+        (NRAEnvAppEnv (NRAEnvConst d) p1) => (NRAEnvConst d)
       | _ => p
     end.
   
-  Lemma tappenv_over_const_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tappenv_over_const_fun p.
+  Lemma tappenv_over_const_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tappenv_over_const_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_over_const_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflip_env1_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tflip_env1_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | ANAppEnv (ANMap ANEnv (ANSelect q₁ (ANUnop AColl ANID))) q₂ =>
+    | NRAEnvAppEnv (NRAEnvMap NRAEnvEnv (NRAEnvSelect q₁ (NRAEnvUnop AColl NRAEnvID))) q₂ =>
       match q₂ with
-      | ANID => (ANAppEnv (ANSelect q₁ (ANUnop AColl ANID)) ANID)
+      | NRAEnvID => (NRAEnvAppEnv (NRAEnvSelect q₁ (NRAEnvUnop AColl NRAEnvID)) NRAEnvID)
       | _ =>
-        if (ignores_env_fun q₁) then χ⟨q₂⟩( σ⟨ q₁ ⟩(‵{|ID|}))else p
+        if (nraenv_ignores_env_fun q₁)
+        then NRAEnvMap q₂ (NRAEnvSelect q₁ (NRAEnvUnop AColl NRAEnvID))
+        else p
       end
     | _ => p
     end.
   
-  Lemma tflip_env1_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tflip_env1_fun p.
+  Lemma tflip_env1_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tflip_env1_fun p.
   Proof.
     destruct p; try reflexivity.
     destruct p1; try reflexivity.
@@ -1336,174 +1427,178 @@ Section NRAEnvOptimFunc.
     destruct u; try reflexivity.
     destruct p1_2_2; try reflexivity.
     destruct p2; simpl; try reflexivity;
-    try (case_eq (ignores_env_fun p1_2_1); try reflexivity; intros;
+    try (case_eq (nraenv_ignores_env_fun p1_2_1); try reflexivity; intros;
          apply tflip_env4_arrow; rewrite ignores_env_eq; assumption).
     apply tflip_env1_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflip_env2_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tflip_env2_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      (ANAppEnv (ANSelect p (ANUnop AColl ANID)) ANID) =>
-      (ANSelect (ANAppEnv p ANID) (ANUnop AColl ANID))
+      (NRAEnvAppEnv (NRAEnvSelect p (NRAEnvUnop AColl NRAEnvID)) NRAEnvID) =>
+      (NRAEnvSelect (NRAEnvAppEnv p NRAEnvID) (NRAEnvUnop AColl NRAEnvID))
     | _ => p
     end.
   
-  Lemma tflip_env2_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tflip_env2_fun p.
+  Lemma tflip_env2_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tflip_env2_fun p.
   Proof.
     tprove_correctness p.
     apply tflip_env2_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmapenv_over_singleton_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmapenv_over_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      (ANAppEnv (ANMapEnv p1) (ANUnop AColl p2)) =>
-      (ANUnop AColl (ANAppEnv p1 p2))
+      (NRAEnvAppEnv (NRAEnvMapEnv p1) (NRAEnvUnop AColl p2)) =>
+      (NRAEnvUnop AColl (NRAEnvAppEnv p1 p2))
     | _ => p
     end.
 
-  Lemma tmapenv_over_singleton_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tmapenv_over_singleton_fun p.
+  Lemma tmapenv_over_singleton_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tmapenv_over_singleton_fun p.
   Proof.
     tprove_correctness p.
     apply tmapenv_over_singleton_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_over_binop_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tappenv_over_binop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        (ANAppEnv (ANBinop b p1 p2) p0) =>
-         (ANBinop b (ANAppEnv p1 p0) (ANAppEnv p2 p0))
+        (NRAEnvAppEnv (NRAEnvBinop b p1 p2) p0) =>
+         (NRAEnvBinop b (NRAEnvAppEnv p1 p0) (NRAEnvAppEnv p2 p0))
       | _ => p
     end.
   
-  Lemma tappenv_over_binop_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tappenv_over_binop_fun p.
+  Lemma tappenv_over_binop_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tappenv_over_binop_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_over_binop.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tflip_env6_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tflip_env6_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | χ⟨ENV ⊗ ID⟩(σ⟨p1⟩(ENV ⊗ p2)) => χ⟨‵{|ID|}⟩(σ⟨p1⟩(ENV ⊗ p2))
-      | _ => p
+    | NRAEnvMap (NRAEnvBinop AMergeConcat NRAEnvEnv NRAEnvID)
+                (NRAEnvSelect p1 (NRAEnvBinop AMergeConcat NRAEnvEnv p2)) =>
+      NRAEnvMap (NRAEnvUnop AColl NRAEnvID)
+                (NRAEnvSelect p1 (NRAEnvBinop AMergeConcat NRAEnvEnv p2))
+    | _ => p
     end.
   
-  Lemma tflip_env6_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tflip_env6_fun p.
+  Lemma tflip_env6_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tflip_env6_fun p.
   Proof.
     tprove_correctness p.
     apply tflip_env6_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmapenv_to_map_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmapenv_to_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | (ANAppEnv (ANMapEnv p1) p2) =>
-        if (ignores_id_fun p1)
-        then (ANMap (ANAppEnv p1 ANID) p2)
+      | (NRAEnvAppEnv (NRAEnvMapEnv p1) p2) =>
+        if (nraenv_ignores_id_fun p1)
+        then (NRAEnvMap (NRAEnvAppEnv p1 NRAEnvID) p2)
         else p
       | _ => p
     end.
 
-  Lemma tmapenv_to_map_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tmapenv_to_map_fun p.
+  Lemma tmapenv_to_map_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tmapenv_to_map_fun p.
   Proof.
     destruct p; try reflexivity.
     destruct p1; try reflexivity.
     simpl.
-    case_eq (ignores_id_fun p1); try reflexivity; intros.
+    case_eq (nraenv_ignores_id_fun p1); try reflexivity; intros.
     apply tmapenv_to_map_arrow.
     rewrite ignores_id_eq; assumption.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmerge_concat_to_concat_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmerge_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ‵[| (s1, p1)|] ⊗ ‵[| (s2, p2)|] =>
-        if (s1 == s2)
-        then p
-        else ANUnop AColl (ANBinop AConcat (‵[| (s1, p1)|]) (‵[| (s2, p2)|]))
-      | _ => p
+    | NRAEnvBinop AMergeConcat (NRAEnvUnop (ARec s1) p1) (NRAEnvUnop (ARec s2) p2) =>
+      if (s1 == s2)
+      then p
+      else NRAEnvUnop AColl
+                      (NRAEnvBinop AConcat
+                                   (NRAEnvUnop (ARec s1) p1)
+                                   (NRAEnvUnop (ARec s2) p2))
+    | _ => p
     end.
-  
-  Lemma tmerge_concat_to_concat_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tmerge_concat_to_concat_fun p.
+
+  Lemma tmerge_concat_to_concat_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tmerge_concat_to_concat_fun p.
   Proof.
     tprove_correctness p.
     apply tmerge_concat_to_concat_arrow.
     trivial.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmerge_with_concat_to_concat_fun {fruntime:foreign_runtime} (p: algenv) :=
+  Definition tmerge_with_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | ‵[| (s1, p1)|] ⊗ (‵[| (s1', p1')|] ⊕ ‵[| (s2, p2)|]) =>
+    | NRAEnvBinop AMergeConcat (NRAEnvUnop (ARec s1) p1)
+                  (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1') p1')
+                               (NRAEnvUnop (ARec s2) p2)) =>
         if (s1 == s2)
         then p
         else
           if (s1 == s1')
           then
             if (p1 == p1')
-            then ANUnop AColl (ANBinop AConcat (‵[| (s1, p1)|]) (‵[| (s2, p2)|]))
+            then NRAEnvUnop AColl (NRAEnvBinop AConcat
+                                               (NRAEnvUnop (ARec s1) p1)
+                                               (NRAEnvUnop (ARec s2) p2))
             else p
           else p
       | _ => p
     end.
   
-  Lemma tmerge_with_concat_to_concat_fun_correctness {model:basic_model} (p: algenv) :
-    p ⇒ tmerge_with_concat_to_concat_fun p.
+  Lemma tmerge_with_concat_to_concat_fun_correctness {model:basic_model} (p: nraenv) :
+    p ⇒ₓ tmerge_with_concat_to_concat_fun p.
   Proof.
     tprove_correctness p.
     apply tmerge_with_concat_to_concat_arrow.
     trivial.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tdot_over_rec_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tdot_over_rec_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | (‵[| (s1, p1)|]) · s2 =>
-        if (s1 == s2) then p1
-        else p
-      | _ => p
+    | NRAEnvUnop (ADot s2)
+                 (NRAEnvUnop (ARec s1) p1) =>
+      if (s1 == s2) then p1
+      else p
+    | _ => p
     end.
 
-  Lemma tdot_over_rec_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tdot_over_rec_fun p.
+  Lemma tdot_over_rec_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdot_over_rec_fun p.
   Proof.
     tprove_correctness p.
     apply tdot_over_rec_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tnested_map_over_singletons_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tnested_map_over_singletons_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ♯flatten(χ⟨ σ⟨ q₁ ⟩(‵{|q₂|}) ⟩(q₃))
-        => σ⟨ q₁ ⟩(χ⟨ q₂ ⟩(q₃))
-      | _ => p
+    | NRAEnvUnop AFlatten
+                 (NRAEnvMap (NRAEnvSelect q₁ (NRAEnvUnop AColl q₂)) q₃) =>
+      NRAEnvSelect q₁ (NRAEnvMap q₂ q₃)
+    | _ => p
     end.
 
-  Lemma tnested_map_over_singletons_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tnested_map_over_singletons_fun p.
+  Lemma tnested_map_over_singletons_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tnested_map_over_singletons_fun p.
   Proof.
     tprove_correctness p.
     apply tnested_map_over_singletons_arrow.
   Qed.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tappenv_mapenv_to_map_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tappenv_mapenv_to_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | ANAppEnv (ANMapEnv q) (ANEnv ⊗ ‵[| (a, ID)|]) =>
-             χ⟨(q ◯ (ANUnop (ADot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) )
+    | NRAEnvAppEnv (NRAEnvMapEnv q)
+                   (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec a) NRAEnvID)) =>
+      NRAEnvMap (NRAEnvAppEnv (NRAEnvApp q (NRAEnvUnop (ADot a) NRAEnvEnv)) NRAEnvID)
+                (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec a) NRAEnvID))
     | _ => p
     end.
 
-  Lemma tappenv_mapenv_to_map_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tappenv_mapenv_to_map_fun p.
+  Lemma tappenv_mapenv_to_map_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tappenv_mapenv_to_map_fun p.
   Proof.
     tprove_correctness p.
     apply tappenv_mapenv_to_map_arrow.
@@ -1511,16 +1606,15 @@ Section NRAEnvOptimFunc.
 
   (* optimizations for rproject *)
 
-  (* Java equivalent: NraOptimizer.[same] *)
-   Definition trproject_nil_fun {fruntime:foreign_runtime} (p:algenv) :=
+   Definition trproject_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject nil) p₁
-        => ANConst (drec nil)
+      | NRAEnvUnop (ARecProject nil) p₁
+        => NRAEnvConst (drec nil)
       | _ => p
     end.
 
   Definition trproject_nil_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_nil_fun p.
+    p ⇒ₓ trproject_nil_fun p.
   Proof.
     tprove_correctness p.
     apply trproject_nil.
@@ -1528,17 +1622,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_nil_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition trproject_over_const_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition trproject_over_const_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject sl)
-          (ANConst (drec l))
-        => ANConst (drec (rproject l sl))
+      | NRAEnvUnop (ARecProject sl)
+          (NRAEnvConst (drec l))
+        => NRAEnvConst (drec (rproject l sl))
       | _ => p
     end.
 
   Definition trproject_over_const_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_over_const_fun p.
+    p ⇒ₓ trproject_over_const_fun p.
   Proof.
     tprove_correctness p.
     apply trproject_over_const.
@@ -1546,19 +1639,18 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_const_fun_correctness : toptim_correct.
   
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition trproject_over_rec_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition trproject_over_rec_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject sl)
-          (ANUnop (ARec s) p₁)
+      | NRAEnvUnop (ARecProject sl)
+          (NRAEnvUnop (ARec s) p₁)
         => if in_dec string_dec s sl
-           then ANUnop (ARec s) p₁
-           else ‵[||]
+           then NRAEnvUnop (ARec s) p₁
+           else NRAEnvConst (drec nil)
       | _ => p
     end.
 
   Definition trproject_over_rec_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_over_rec_fun p.
+    p ⇒ₓ trproject_over_rec_fun p.
   Proof.
     tprove_correctness p.
     - apply trproject_over_rec_in; trivial.
@@ -1567,64 +1659,61 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_rec_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-   Definition trproject_over_concat_r_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition trproject_over_concat_r_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject sl)
-               (ANBinop AConcat
-                        p₁ (ANUnop (ARec s) p₂))
+      | NRAEnvUnop (ARecProject sl)
+               (NRAEnvBinop AConcat
+                        p₁ (NRAEnvUnop (ARec s) p₂))
         => if in_dec string_dec s sl
-           then ANBinop AConcat
-                        (ANUnop (ARecProject (remove string_dec s sl)) p₁)
-                        (ANUnop (ARec s) p₂)
-           else (ANUnop (ARecProject sl) p₁)
+           then NRAEnvBinop AConcat
+                        (NRAEnvUnop (ARecProject (remove string_dec s sl)) p₁)
+                        (NRAEnvUnop (ARec s) p₂)
+           else (NRAEnvUnop (ARecProject sl) p₁)
       | _ => p
     end.
 
   Definition trproject_over_concat_r_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_over_concat_r_fun p.
+    p ⇒ₓ trproject_over_concat_r_fun p.
   Proof.
     tprove_correctness p.
     - apply trproject_over_concat_rec_r_in; trivial.
     - apply trproject_over_concat_rec_r_nin; trivial.
   Qed.
-                  
+
   Hint Rewrite @trproject_over_concat_r_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-     Definition trproject_over_concat_l_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition trproject_over_concat_l_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject sl)
-               (ANBinop AConcat
-                        (ANUnop (ARec s) p₁) p₂)
+      | NRAEnvUnop (ARecProject sl)
+               (NRAEnvBinop AConcat
+                        (NRAEnvUnop (ARec s) p₁) p₂)
         => if in_dec string_dec s sl
                      (* this case would need shape/type inference to handle, since we don't know if s is in p₂ *)
 
            then p
-           else (ANUnop (ARecProject sl) p₂)
+           else (NRAEnvUnop (ARecProject sl) p₂)
       | _ => p
     end.
 
   Definition trproject_over_concat_l_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_over_concat_l_fun p.
+    p ⇒ₓ trproject_over_concat_l_fun p.
   Proof.
     tprove_correctness p.
     apply trproject_over_concat_rec_l_nin; trivial.
   Qed.
-                  
+
   Hint Rewrite @trproject_over_concat_l_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition trproject_over_rproject_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition trproject_over_rproject_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject sl1)
-          (ANUnop (ARecProject sl2) p1)
-        => ANUnop (ARecProject (set_inter string_dec sl2 sl1)) p1
+      | NRAEnvUnop (ARecProject sl1)
+          (NRAEnvUnop (ARecProject sl2) p1)
+        => NRAEnvUnop (ARecProject (set_inter string_dec sl2 sl1)) p1
       | _ => p
     end.
 
   Definition trproject_over_rproject_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_over_rproject_fun p.
+    p ⇒ₓ trproject_over_rproject_fun p.
   Proof.
     tprove_correctness p.
     apply trproject_over_rproject.
@@ -1632,17 +1721,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_rproject_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-   Definition trproject_over_either_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition trproject_over_either_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ANUnop (ARecProject sl)
-          (ANEither p₁ p₂)
-        => ANEither (ANUnop (ARecProject sl) p₁) (ANUnop (ARecProject sl) p₂)
+      | NRAEnvUnop (ARecProject sl)
+          (NRAEnvEither p₁ p₂)
+        => NRAEnvEither (NRAEnvUnop (ARecProject sl) p₁) (NRAEnvUnop (ARecProject sl) p₂)
       | _ => p
     end.
 
   Definition trproject_over_either_fun_correctness {model:basic_model} p :
-    p ⇒ trproject_over_either_fun p.
+    p ⇒ₓ trproject_over_either_fun p.
   Proof.
     tprove_correctness p.
     apply trproject_over_either.
@@ -1650,15 +1738,14 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_either_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tcount_over_map_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tcount_over_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ♯count(χ⟨p₁⟩(p₂)) => ♯count(p₂)
+      | NRAEnvUnop ACount (NRAEnvMap p₁ p₂) => NRAEnvUnop ACount p₂
       | _ => p
     end.
 
   Definition tcount_over_map_fun_correctness {model:basic_model} p :
-    p ⇒ tcount_over_map_fun p.
+    p ⇒ₓ tcount_over_map_fun p.
   Proof.
     tprove_correctness p.
     apply tcount_over_map.
@@ -1666,16 +1753,17 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tcount_over_map_fun_correctness : toptim_correct.
   
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tcount_over_flat_map_map_fun {fruntime:foreign_runtime} (p:algenv) :=
-      match p with
-        | ♯count(♯flatten(χ⟨χ⟨p₁⟩(p₂)⟩(p₃))) =>
-          ♯count(♯flatten(χ⟨p₂⟩(p₃)))
-      | _ => p
+  Definition tcount_over_flat_map_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvMap p₁ p₂) p₃)) =>
+      NRAEnvUnop ACount (NRAEnvUnop AFlatten (NRAEnvMap p₂ p₃))
+    | _ => p
     end.
 
   Definition tcount_over_flat_map_map_fun_correctness {model:basic_model} p :
-    p ⇒ tcount_over_flat_map_map_fun p.
+    p ⇒ₓ tcount_over_flat_map_map_fun p.
   Proof.
     tprove_correctness p.
     apply tcount_over_flat_map_map.
@@ -1683,16 +1771,22 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tcount_over_flat_map_map_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tcount_over_flat_map_either_nil_map_fun {fruntime:foreign_runtime} (p:algenv) :=
-      match p with
-        | ♯count(♯flatten(χ⟨ANEither (χ⟨p₁⟩(p₂)) ‵{||}⟩(p₃))) =>
-          ♯count(♯flatten(χ⟨ANEither p₂ ‵{||}⟩(p₃)))
-      | _ => p
+  Definition tcount_over_flat_map_either_nil_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
+    match p with
+    | NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvEither (NRAEnvMap p₁ p₂)
+                                                      (NRAEnvConst (dcoll nil)))
+                                        p₃)) =>
+      NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvEither p₂
+                                                      (NRAEnvConst (dcoll nil))) p₃))
+    | _ => p
     end.
 
   Definition tcount_over_flat_map_either_nil_map_fun_correctness {model:basic_model} p :
-    p ⇒ tcount_over_flat_map_either_nil_map_fun p.
+    p ⇒ₓ tcount_over_flat_map_either_nil_map_fun p.
   Proof.
     tprove_correctness p.
     apply tcount_over_flat_map_either_nil_map.
@@ -1700,16 +1794,24 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tcount_over_flat_map_either_nil_map_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tcount_over_flat_map_either_nil_app_map_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tcount_over_flat_map_either_nil_app_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ♯count(♯flatten(χ⟨ANEither (χ⟨p₁⟩(p₂)) ‵{||} ◯ p₄⟩(p₃))) =>
-        ♯count(♯flatten(χ⟨ANEither p₂ ‵{||} ◯ p₄⟩(p₃)))
+    | NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvMap p₁ p₂)
+                                                                 (NRAEnvConst (dcoll nil))) p₄)
+                                        p₃)) =>
+      NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvApp
+                                           (NRAEnvEither p₂ (NRAEnvConst (dcoll nil)))
+                                           p₄)
+                                        p₃))
       | _ => p
     end.
 
   Definition tcount_over_flat_map_either_nil_app_map_fun_correctness {model:basic_model} p :
-    p ⇒ tcount_over_flat_map_either_nil_app_map_fun p.
+    p ⇒ₓ tcount_over_flat_map_either_nil_app_map_fun p.
   Proof.
     tprove_correctness p.
     apply tcount_over_flat_map_either_nil_app_map.
@@ -1717,16 +1819,21 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tcount_over_flat_map_either_nil_app_map_fun_correctness : toptim_correct.
 
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tcount_over_flat_map_either_nil_app_singleton_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tcount_over_flat_map_either_nil_app_singleton_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | ♯count(♯flatten(χ⟨ANEither (‵{| p₁ |}) ‵{||} ◯ p₃⟩(p₂))) =>
-        ♯count(♯flatten(χ⟨ANEither (‵{| ANConst dunit |}) ‵{||} ◯ p₃⟩(p₂)))
-      | _ => p
+    | NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvUnop AColl p₁)
+                                                                 (NRAEnvConst (dcoll nil))) p₃) p₂)) =>
+      NRAEnvUnop ACount
+                 (NRAEnvUnop AFlatten
+                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvUnop AColl (NRAEnvConst dunit))
+                                                                 (NRAEnvConst (dcoll nil))) p₃) p₂))
+    | _ => p
     end.
 
   Definition tcount_over_flat_map_either_nil_app_singleton_fun_correctness {model:basic_model} p :
-    p ⇒ tcount_over_flat_map_either_nil_app_singleton_fun p.
+    p ⇒ₓ tcount_over_flat_map_either_nil_app_singleton_fun p.
   Proof.
     tprove_correctness p.
     apply tcount_over_flat_map_either_nil_app_singleton.
@@ -1736,29 +1843,27 @@ Section NRAEnvOptimFunc.
 
   (* optimizations for mapconcat *)
 
-  (* ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ p₁ ◯ (‵[||]) *)
-  
-  (* Java equivalent: NraOptimizer.[same] *)
-  Definition tmapconcat_over_singleton_fun {fruntime:foreign_runtime} (p: algenv) :=
+  (* ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ₓ p₁ ◯ (‵[||]) *)
+  Definition tmapconcat_over_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  ANMapConcat p (ANUnop AColl (ANConst (drec []))) =>
-         ANApp p (ANConst (drec []))
+      |  NRAEnvMapConcat p (NRAEnvUnop AColl (NRAEnvConst (drec []))) =>
+         NRAEnvApp p (NRAEnvConst (drec []))
       | _ => p
     end.
 
-  Lemma tmapconcat_over_singleton_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tmapconcat_over_singleton_fun p.
+  Lemma tmapconcat_over_singleton_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmapconcat_over_singleton_fun p.
   Proof.
     tprove_correctness p.
     apply tmapconcat_over_singleton.
   Qed.
   Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
 
-  Definition tdup_elim_fun {fruntime:foreign_runtime} (p:algenv) :=
+  Definition tdup_elim_fun {model:basic_model} (p:nraenv) :=
     dup_elim_fun p.
 
-  Lemma tdup_elim_fun_correctness {model:basic_model} (p:algenv) :
-    p ⇒ tdup_elim_fun p.
+  Lemma tdup_elim_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdup_elim_fun p.
   Proof.
     destruct p; simpl; try reflexivity.
     destruct u; simpl; try reflexivity.
@@ -1773,8 +1878,7 @@ Section NRAEnvOptimFunc.
   
   (* *************************** *)
   Local Open Scope string.
-  (* Java equivalent: NraOptimizer.head_optim_list *)
-  Definition head_optim_list {fruntime:foreign_runtime} : list (string*(algenv -> algenv)) :=
+  Definition head_optim_list {fruntime:foreign_runtime} : list (string*(nraenv -> nraenv)) :=
     [("tapp_over_app_fun", tapp_over_app_fun);
         ("tappenv_over_appenv_fun", tappenv_over_appenv_fun);
         ("tappenv_over_app_fun", tappenv_over_app_fun);
@@ -1861,15 +1965,14 @@ Section NRAEnvOptimFunc.
         ("tmapconcat_over_singleton_fun", tmapconcat_over_singleton_fun)
     ].
 
-  (* Java equivalent: NraOptimizer.head_optim *)
   Definition head_optim
              {fruntime:foreign_runtime}
-             {logger:optimizer_logger string algenv} (name:string)
-    : algenv -> algenv :=
+             {logger:optimizer_logger string nraenv} (name:string)
+    : nraenv -> nraenv :=
     apply_steps ("nra_head" ++ name) head_optim_list.
   
-  Lemma head_optim_correctness {model:basic_model} {logger:optimizer_logger string algenv} (name:string) (p:algenv) :
-    p ⇒ head_optim name p.
+  Lemma head_optim_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (name:string) (p:nraenv) :
+    p ⇒ₓ head_optim name p.
   Proof.
     unfold head_optim.
     rewrite tmapconcat_over_singleton_fun_correctness at 1.
@@ -1963,8 +2066,7 @@ Section NRAEnvOptimFunc.
 
   (* *************************** *)
 
-  (* Java equivalent: NraOptimizer.tail_optim_list *)
-  Definition tail_optim_list {fruntime:foreign_runtime} : list (string * (algenv -> algenv)) :=
+  Definition tail_optim_list {fruntime:foreign_runtime} : list (string * (nraenv -> nraenv)) :=
     [ ("tflatten_flatten_map_either_nil_fun", tflatten_flatten_map_either_nil_fun);
         ("tmap_over_flatten_map_fun", tmap_over_flatten_map_fun);
         ("tapp_over_app_fun", tapp_over_app_fun);
@@ -2052,12 +2154,11 @@ Section NRAEnvOptimFunc.
         ("tmapconcat_over_singleton_fun", tmapconcat_over_singleton_fun)
     ].
 
-  (* Java equivalent: NraOptimizer.tail_optim *)
-  Definition tail_optim {fruntime:foreign_runtime} {logger:optimizer_logger string algenv} (name:string) : algenv -> algenv :=
+  Definition tail_optim {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (name:string) : nraenv -> nraenv :=
     apply_steps ("tail" ++ name)  tail_optim_list.
 
-  Lemma tail_optim_correctness {model:basic_model}  {logger:optimizer_logger string algenv} (name:string) (p:algenv) :
-    p ⇒ tail_optim name p.
+  Lemma tail_optim_correctness {model:basic_model}  {logger:optimizer_logger string nraenv} (name:string) (p:nraenv) :
+    p ⇒ₓ tail_optim name p.
   Proof.
     unfold tail_optim.
     rewrite tmapconcat_over_singleton_fun_correctness at 1.
@@ -2153,45 +2254,42 @@ Section NRAEnvOptimFunc.
     red; intros; split; [apply H|reflexivity].
   Qed.
 
-  (* Java equivalent: NraOptimizer.optim1 *)  
-  Definition optim1 {fruntime:foreign_runtime} {logger:optimizer_logger string algenv} (p: algenv) :=
-    talgenv_map_deep (head_optim "1") p.
+  Definition optim1 {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p: nraenv) :=
+    tnraenv_map_deep (head_optim "1") p.
 
-  Lemma optim1_correctness {model:basic_model} {logger:optimizer_logger string algenv} (p:algenv) :
-    p ⇒ optim1 p.
+  Lemma optim1_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (p:nraenv) :
+    p ⇒ₓ optim1 p.
   Proof.
     unfold optim1.
-    assert (p ⇒ talgenv_map_deep (head_optim "1") p).
-    apply algenv_map_deep_correctness.
+    assert (p ⇒ₓ tnraenv_map_deep (head_optim "1") p).
+    apply nraenv_map_deep_correctness.
     intro p'.
     rewrite head_optim_correctness at 1.
     reflexivity.
     assumption.
   Qed.
 
-  (* Java equivalent: NraOptimizer.optim2 *)  
-  Definition optim2 {fruntime:foreign_runtime} {logger:optimizer_logger string algenv} (p: algenv) :=
-    talgenv_map_deep (tail_optim "") p.
+  Definition optim2 {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p: nraenv) :=
+    tnraenv_map_deep (tail_optim "") p.
 
-  Lemma optim2_correctness {model:basic_model} {logger:optimizer_logger string algenv} (p:algenv) :
-    p ⇒ optim2 p.
+  Lemma optim2_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (p:nraenv) :
+    p ⇒ₓ optim2 p.
   Proof.
     unfold optim2.
-    assert (p ⇒ talgenv_map_deep (tail_optim "") p).
-    apply algenv_map_deep_correctness.
+    assert (p ⇒ₓ tnraenv_map_deep (tail_optim "") p).
+    apply nraenv_map_deep_correctness.
     intro p'.
     rewrite tail_optim_correctness at 1.
     reflexivity.
     assumption.
   Qed.
 
-  (* Java equivalent: NraOptimizer.optimize *)
-  Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string algenv} (p:algenv) :=
+  Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p:nraenv) :=
     let pass1p := (optim_size (optim_iter optim1 5) p) in
     (optim_size (optim_iter optim2 15) pass1p).
 
-  Lemma toptim_nraenv_correctness {model:basic_model} {logger:optimizer_logger string algenv} p:
-    p ⇒ toptim_nraenv p.
+  Lemma toptim_nraenv_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
+    p ⇒ₓ toptim_nraenv p.
   Proof.
     unfold toptim_nraenv.
     rewrite optim_size_correctness at 1; try reflexivity.
@@ -2206,7 +2304,7 @@ Section NRAEnvOptimFunc.
     rewrite optim1_correctness at 1; try reflexivity.
   Qed.
 
-End TOptimEnvFunc.
+End NRAEnvOptimFunc.
 
 (*
 *** Local Variables: ***
