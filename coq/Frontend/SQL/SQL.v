@@ -207,8 +207,6 @@ Section SQL.
   Section Translation.
     Require Import NRAEnvRuntime.
 
-    Require Import RAlgEnvExt.
-    
     Definition sql_order_to_nraenv (acc:algenv) (opt_order:option sql_order_spec) :=
       match opt_order with
       | None => acc
@@ -327,10 +325,10 @@ Section SQL.
         let nraenv_group_by_clause :=
             match opt_group with
             | None => nraenv_where_clause
-            | Some (sl,None) => group_full "partition" sl nraenv_where_clause
+            | Some (sl,None) => group_by "partition" sl nraenv_where_clause
             | Some (sl,Some cond) =>
               ANSelect (sql_condition_to_nraenv (ANUnop (ADot "partition") ANID) cond)
-                       (group_full "partition" sl nraenv_where_clause)
+                       (group_by "partition" sl nraenv_where_clause)
             end
         in
         let nraenv_select_clause :=

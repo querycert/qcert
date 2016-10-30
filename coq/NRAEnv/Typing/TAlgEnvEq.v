@@ -70,7 +70,7 @@ Section TAlgEnvEq.
   Qed.
 
   Lemma algenv_eq_pf_irrel {m:basic_model} {op} {τin τout τc τenv} (pf1 pf2: op ▷ τin >=> τout ⊣ τc;τenv) :
-    talgenv_eq (exist _ _ pf1) (exist _ _ pf2).
+    talgenv_eq (exist _ op pf1) (exist _ op pf2).
   Proof.
     red; intros; simpl.
     reflexivity.
@@ -166,7 +166,7 @@ Section TAlgEnvEq.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
     rewrite H in *; clear H.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin τ₁ H9); elim H0; clear H0 H9; intros.
     specialize (H1 τc τenv τin τ₂ H10); elim H1; clear H1 H10; intros.
     econstructor; eauto; intros.
@@ -179,7 +179,7 @@ Section TAlgEnvEq.
     Proper (eq ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANUnop.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin τ H8); elim H0; clear H0 H8; intros.
     econstructor; eauto.
     intros.
@@ -192,7 +192,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANMap.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin (Coll τ₁) H8); elim H0; clear H0 H8; intros.
     specialize (H τc τenv τ₁ τ₂ H4); elim H; clear H H4; intros.
     econstructor; eauto; intros.
@@ -217,7 +217,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANMapConcat.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin (Coll (Rec Closed τ₁ pf1)) H5); elim H0; clear H0 H5; intros.
     specialize (H τc τenv (Rec Closed τ₁ pf1) (Coll (Rec Closed τ₂ pf2)) H4); elim H; clear H H4; intros.
     econstructor; eauto; intros.
@@ -261,7 +261,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANProduct.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin (Coll (Rec Closed τ₂ pf2)) H5); elim H0; clear H0 H5; intros.
     specialize (H τc τenv τin (Coll (Rec Closed τ₁ pf1)) H4); elim H; clear H H4; intros.
     econstructor; eauto; intros.
@@ -276,7 +276,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANSelect.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin (Coll τ) H8); elim H0; clear H0 H8; intros.
     specialize (H τc τenv τ Bool H4); elim H; clear H H4; intros.
     econstructor; eauto; intros.
@@ -296,7 +296,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANDefault.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin (Coll τ) H8); elim H0; clear H0 H8; intros.
     specialize (H τc τenv τin (Coll τ) H4); elim H; clear H H4; intros.
     econstructor; eauto; intros.
@@ -337,7 +337,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANApp.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin τ1 H4); elim H0; clear H0 H4; intros.
     specialize (H τc τenv τ1 τout H8); elim H; clear H H8; intros.
     econstructor; eauto; intros.
@@ -362,7 +362,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to ==> talgenv_rewrites_to) ANAppEnv.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H0 τc τenv τin τenv' H4); elim H0; clear H0 H4; intros.
     specialize (H τc τenv' τin τout H8); elim H; clear H H8; intros.
     econstructor; eauto; intros.
@@ -378,7 +378,7 @@ Section TAlgEnvEq.
     Proper (talgenv_rewrites_to ==> talgenv_rewrites_to) ANMapEnv.
   Proof.
     unfold Proper, respectful, talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     specialize (H τc τenv0 τin τ₂ H2); elim H; clear H H2; intros.
     econstructor; eauto; intros.
     dtype_inverter.

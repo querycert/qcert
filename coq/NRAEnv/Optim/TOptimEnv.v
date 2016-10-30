@@ -50,7 +50,7 @@ Section TOptimEnv.
     q₁ ∧ q₂ ⇒ q₂ ∧ q₁.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    intuition; inferer. generalize envand_comm; intros.
+    intuition; algenv_inferer. generalize envand_comm; intros.
     unfold algenv_eq in H.
     simpl in H. apply H; eauto.
   Qed.
@@ -75,7 +75,7 @@ Section TOptimEnv.
     q ⊕ ‵[||] ⇒ q.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     invcs H0.
     rtype_equalizer.
     subst.
@@ -101,7 +101,7 @@ Section TOptimEnv.
     ‵[||] ⊕ q ⇒ q.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     invcs H0.
     rtype_equalizer.
     subst.
@@ -128,7 +128,7 @@ Section TOptimEnv.
     q ⊗ ‵[||] ⇒ ‵{| q |}.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     simpl in *.
     inversion H0; clear H0; subst.
     rtype_equalizer. subst.
@@ -143,7 +143,7 @@ Section TOptimEnv.
       assert (Rec Closed τ₃ pf1 = Rec Closed τ₃ pf3).
       apply rtype_fequal; reflexivity.
       rewrite H in H7. clear H pf1.
-      inferer.
+      algenv_inferer.
     - econstructor. elim H0; clear H0; intros. assumption.
       elim H0; clear H0; intros.
       assert ((q ⊗ ‵[||]) ▷ τin >=> Coll (Rec Closed τ₃ pf3) ⊣ τc;τenv).
@@ -197,7 +197,7 @@ Section TOptimEnv.
     ‵[||] ⊗ q  ⇒ ‵{| q |}.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer;
+    algenv_inferer;
       (inversion H0; clear H0; subst;
       rtype_equalizer; subst;
       inversion H6; clear H6; subst;
@@ -226,7 +226,7 @@ Section TOptimEnv.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (dot_over_rec a q)).
     intros.
-    inferer.
+    algenv_inferer.
     unfold tdot, edot in H4; simpl in H4.
     destruct (string_eqdec s s); congruence.
   Qed.
@@ -236,7 +236,7 @@ Section TOptimEnv.
     (q₁ ⊕ ‵[| (a, q₂) |])·a ⇒ q₂.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     unfold tdot, edot, rec_concat_sort in H0.
     rewrite assoc_lookupr_drec_sort
     , (@assoc_lookupr_app string) in H0.
@@ -260,14 +260,14 @@ Section TOptimEnv.
     (q₁ ⊕ ‵[| (a₁, q₂) |])·a₂ ⇒ q₁·a₂.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     unfold tdot, edot, rec_concat_sort in H1.
     rewrite assoc_lookupr_drec_sort
     , (@assoc_lookupr_app string) in H1.
     simpl in H1.
     destruct (string_eqdec a₂ s); [congruence | ].
     split.
-    - inferer.
+    - algenv_inferer.
     - intros.
       input_well_typed.
       dtype_inverter.
@@ -284,7 +284,7 @@ Section TOptimEnv.
     (‵[| (a₁, q₁) |] ⊕ q₂ )·a₂ ⇒ q₂·a₂.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     unfold tdot, edot, rec_concat_sort in H1.
     rewrite assoc_lookupr_drec_sort
     , (@assoc_lookupr_app string) in H1.
@@ -292,7 +292,7 @@ Section TOptimEnv.
     destruct (string_eqdec a₂ s); [congruence | ].
     match_case_in H1; intros; rewrite H0 in H1; invcs H1.
     split.
-    - inferer.
+    - algenv_inferer.
     - intros.
       input_well_typed.
       dtype_inverter.
@@ -308,7 +308,7 @@ Section TOptimEnv.
     (‵[| (a₁, q₁) |] ⊕ ‵[| (a₂, q₂) |])·a₂ ⇒ q₂.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer. econstructor; eauto.
+    algenv_inferer. econstructor; eauto.
     - unfold tdot, edot in H0.
       unfold rec_concat_sort in H0.
       simpl in H0.
@@ -337,7 +337,7 @@ Section TOptimEnv.
     a₁ <> a₂ -> (‵[| (a₁, q₁) |] ⊕ ‵[| (a₂, q₂) |])·a₁ ⇒ q₁.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer. econstructor; eauto.
+    algenv_inferer. econstructor; eauto.
     - unfold tdot, edot in H1.
       unfold rec_concat_sort in H1.
       simpl in H1.
@@ -369,7 +369,7 @@ Section TOptimEnv.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (product_singletons a₁ a₂ q₁ q₂)).
     intros.
-    inferer.
+    algenv_inferer.
     repeat (econstructor; eauto).
     Grab Existential Variables.
     eauto. eauto.
@@ -379,7 +379,7 @@ Section TOptimEnv.
      ‵[| (s, p₁) |] ⊕ ‵[| (s, p₂) |] ⇒ ‵[| (s, p₂) |].
    Proof.
      red; intros.
-     inverter.
+     algenv_inferer.
      split; simpl.
      - revert pf3.
        unfold rec_concat_sort; simpl.
@@ -403,7 +403,7 @@ Section TOptimEnv.
     intros.
     apply (rewrites_typed_with_untyped _ _ (merge_concat_to_concat a₁ a₂ q₁ q₂ H)).
     intros.
-    inferer.
+    algenv_inferer.
     unfold merge_bindings in H2.
     simpl in H2.
     unfold compatible_with in H2.
@@ -423,7 +423,7 @@ Section TOptimEnv.
     ‵[| (a₁, q₁)|] ⊗ (‵[| (a₁, q₁) |] ⊕ ‵[| (a₂, q₂) |]) ⇒ ‵{|‵[| (a₁, q₁)|] ⊕ ‵[| (a₂, q₂)|]|}.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - unfold merge_bindings in H2; simpl in H2.
       unfold compatible_with in H2; simpl in H2.
@@ -515,7 +515,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - apply select_over_nil.
-    - intros; inverter.
+    - intros; algenv_inferer.
   Qed.
 
   (* σ⟨ q₁ ∧ q₂ ⟩( q ) ⇒ σ⟨ q₂ ∧ q₁ ⟩( q ) *)
@@ -545,8 +545,8 @@ Section TOptimEnv.
     σ⟨ q₁ ⟩(σ⟨ q₂ ⟩(q)) ⇒ σ⟨ q₂ ∧ q₁ ⟩(q).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
-    split;[inferer|idtac]; intros.
+    algenv_inferer.
+    split;[algenv_inferer|idtac]; intros.
     input_well_typed.
     dtype_inverter.
     autorewrite with alg.
@@ -588,8 +588,8 @@ Section TOptimEnv.
     σ⟨ q₂ ∧ q₁ ⟩(q) ⇒ σ⟨ q₁ ⟩(σ⟨ q₂ ⟩(q)).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
-    split;[inferer|idtac]; intros.
+    algenv_inferer.
+    split;[algenv_inferer|idtac]; intros.
     input_well_typed.
     dtype_inverter.
     autorewrite with alg.
@@ -667,15 +667,15 @@ Section TOptimEnv.
     σ⟨ q₁ ⟩(σ⟨ q₂ ⟩( q )) ⇒ σ⟨ q₂ ⟩(σ⟨ q₁ ⟩( q )).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    assert (exists τ, σ⟨ q₁ ⟩(σ⟨ q₂ ⟩( q )) ▷ τin >=> Coll τ ⊣ τc;τenv) by inferer.
+    assert (exists τ, σ⟨ q₁ ⟩(σ⟨ q₂ ⟩( q )) ▷ τin >=> Coll τ ⊣ τc;τenv) by algenv_inferer.
     split; try assumption; intros.
-    inferer.
+    algenv_inferer.
     elim H0; clear H0; intros τ; intros.
     clear H τout.
-    assert (σ⟨ q₂ ⟩(σ⟨ q₁ ⟩( q )) ▷ τin >=> Coll τ ⊣ τc;τenv) by inferer.
-    assert (q ▷ τin >=> Coll τ ⊣ τc;τenv) by inferer.
-    assert (q₁ ▷ τ >=> Bool ⊣ τc;τenv) by inferer.
-    assert (q₂ ▷ τ >=> Bool ⊣ τc;τenv) by inferer.
+    assert (σ⟨ q₂ ⟩(σ⟨ q₁ ⟩( q )) ▷ τin >=> Coll τ ⊣ τc;τenv) by algenv_inferer.
+    assert (q ▷ τin >=> Coll τ ⊣ τc;τenv) by algenv_inferer.
+    assert (q₁ ▷ τ >=> Bool ⊣ τc;τenv) by algenv_inferer.
+    assert (q₂ ▷ τ >=> Bool ⊣ τc;τenv) by algenv_inferer.
     assert (σ⟨ q₁ ∧ q₂ ⟩( q ) ▷ τin >=> Coll τ ⊣ τc;τenv) by eauto.
     assert (σ⟨ q₂ ∧ q₁ ⟩( q ) ▷ τin >=> Coll τ ⊣ τc;τenv) by eauto.
     rewrite (tselect_and (exist _ q H1)
@@ -734,7 +734,7 @@ Section TOptimEnv.
     ♯flatten(‵{| q |}) ⇒ q.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     split; try assumption; intros.
     input_well_typed.
     dtype_inverter.
@@ -745,7 +745,7 @@ Section TOptimEnv.
     ♯flatten(‵{||}) ⇒ ‵{||}.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (envflatten_nil)).
-    intros. inferer.
+    intros. algenv_inferer.
     repeat (econstructor; simpl).
   Qed.
     
@@ -755,7 +755,7 @@ Section TOptimEnv.
     ♯flatten(χ⟨ ‵{| q₁ |} ⟩( q₂ )) ⇒ χ⟨ q₁ ⟩( q₂ ).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (envflatten_map_coll q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   Lemma tflatten_flatten_map_either_nil p₁ p₂ p₃ :
@@ -763,7 +763,7 @@ Section TOptimEnv.
      ♯flatten( χ⟨ANEither( ♯flatten(p₁)) ‵{||} ◯ p₂⟩(p₃)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flatten_flatten_map_either_nil p₁ p₂ p₃)).
-    intros. inferer.
+    intros. algenv_inferer.
     repeat (econstructor; simpl; eauto).
   Qed.
     
@@ -773,7 +773,7 @@ Section TOptimEnv.
     ♯flatten(ANMapEnv (‵{| q₁ |})) ⇒ ANMapEnv q₁.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flatten_mapenv_coll q₁)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   (* ♯flatten(χ⟨ χ⟨ { q₃ } ⟩( q₁ ) ⟩( q₂ )) ⇒ χ⟨ { q₃ } ⟩(♯flatten(χ⟨ q₁ ⟩( q₂ ))) *)
@@ -784,7 +784,7 @@ Section TOptimEnv.
     ♯flatten(χ⟨ χ⟨ ‵{| q₃ |} ⟩( q₁ ) ⟩( q₂ )) ⇒ χ⟨ ‵{| q₃ |} ⟩(♯flatten(χ⟨ q₁ ⟩( q₂ ))).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     input_well_typed.
@@ -898,7 +898,7 @@ Section TOptimEnv.
     ♯flatten(χ⟨ σ⟨ q₁ ⟩(‵{|q₂|}) ⟩(q₃)) ⇒ σ⟨ q₁ ⟩(χ⟨ q₂ ⟩(q₃)).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto; intros.
     input_well_typed.
     dtype_inverter.
@@ -1021,7 +1021,7 @@ Section TOptimEnv.
             ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( ♯flatten( χ⟨ (ANEither (‵{|ID|}) ‵{||}) ◯ q₃ ⟩( q₄ ) ) ) ).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - repeat (econstructor; eauto).
     - intros.
@@ -1563,7 +1563,7 @@ Section TOptimEnv.
     ♯flatten(χ⟨χ⟨ q₁ ⟩( σ⟨ q₂ ⟩(‵{|ID|}) ) ⟩( q₃ )) ⇒ χ⟨ q₁ ⟩( σ⟨ q₂ ⟩( q₃ ) ).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     input_well_typed; simpl.
@@ -1682,9 +1682,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - apply select_over_flatten.
-    - intros.
-      inverter. subst.
-      econstructor; eauto.
+    - intros; algenv_inferer.
   Qed.
   
   Lemma tselect_over_flatten_b p₁ p₂ :
@@ -1692,9 +1690,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - symmetry; apply select_over_flatten.
-    - intros.
-      inverter. subst.
-      econstructor; eauto.
+    - intros; algenv_inferer.
   Qed.
 
   Lemma tmap_over_flatten p₁ p₂ :
@@ -1702,9 +1698,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - apply map_over_flatten.
-    - intros.
-      inverter. subst.
-      econstructor; eauto.
+    - intros; algenv_inferer.
   Qed.
 
   Lemma tmap_over_flatten_b p₁ p₂ :
@@ -1712,9 +1706,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - symmetry; apply map_over_flatten.
-    - intros.
-      inverter. subst.
-      econstructor; eauto.
+    - intros; algenv_inferer.
   Qed.
 
   Lemma tselect_over_either p₁ p₂ p₃ :
@@ -1722,8 +1714,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - apply select_over_either.
-    - intros.
-      inferer.
+    - intros; algenv_inferer.
   Qed.
   
   (*******
@@ -1734,7 +1725,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - apply map_over_nil.
-    - intros; inferer.
+    - intros; algenv_inferer.
       repeat (econstructor; simpl).
   Qed.
 
@@ -1744,7 +1735,7 @@ Section TOptimEnv.
     χ⟨ ID ⟩( q ) ⇒ q.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     split; try assumption; intros; simpl.
     input_well_typed.
     dtype_inverter.
@@ -1765,7 +1756,7 @@ Section TOptimEnv.
     χ⟨ q₁ ⟩( χ⟨ q₂ ⟩( q ) ) ⇒ χ⟨ q₁ ◯ q₂ ⟩( q ).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (envmap_map_compose q₁ q₂ q)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
   
   (* χ⟨ q₁ ⟩( { q₂ } ) ⇒ { q₁ ◯ q₂ } *)
@@ -1774,7 +1765,7 @@ Section TOptimEnv.
     χ⟨ q₁ ⟩( ‵{| q₂ |} ) ⇒ ‵{| q₁ ◯ q₂ |}.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (envmap_singleton q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
   
   (* χ⟨ q₂ ⟩(σ⟨ q₁ ⟩({ q })) ⇒ χ⟨ q₂ ◯ q ⟩(σ⟨ q₁ ◯ q ⟩({ ID })) *)
@@ -1784,7 +1775,7 @@ Section TOptimEnv.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (map_full_over_select_id q₂ q₁ q)).
     intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
   Qed.
 
@@ -1792,7 +1783,7 @@ Section TOptimEnv.
     χ⟨χ⟨p₁ ⟩( p₂) ⟩( p₃)  ⇒ χ⟨χ⟨p₁ ⟩( ID) ⟩(χ⟨p₂⟩(p₃)).
     apply (rewrites_typed_with_untyped _ _ (map_over_map_split p₁ p₂ p₃)).
     intros.
-    inferer.
+    algenv_inferer.
   Qed.
     
   (* Needs to be worked on, generalized ... *)
@@ -1802,12 +1793,12 @@ Section TOptimEnv.
     χ⟨ ENV ⊗ ID ⟩(σ⟨ q₁ ⟩(ENV ⊗ q₂)) ⇒ χ⟨ ‵{|ID|} ⟩(σ⟨ q₁ ⟩(ENV ⊗ q₂)).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - assert (merge_bindings τ₁ τ₂0 = Some τ₂0).
       apply (merge_idem τ₁ τ₂2 τ₂0 pf1 pf2); assumption.
       rewrite H2 in H; inversion H.
-      inferer.
+      algenv_inferer.
       econstructor; eauto.
       econstructor; eauto.
       assert (Rec Closed τ₂0 pf3 = Rec Closed τ₂0 pf4).
@@ -1834,7 +1825,7 @@ Section TOptimEnv.
       + assert (merge_bindings τ₁ τ₂0 = Some τ₂0).
         apply (merge_idem τ₁ τ₂2 τ₂0 pf1 pf2); assumption.
         rewrite H2 in H; inversion H.
-        inferer.
+        algenv_inferer.
         econstructor; eauto.
         econstructor; eauto.
         assert (Rec Open τ₂0 pf3 = Rec Open τ₂0 pf4).
@@ -1865,7 +1856,7 @@ Section TOptimEnv.
     apply rewrites_typed_with_untyped.
     - apply envmap_over_either.
     - intros.
-      inferer.
+      algenv_inferer.
   Qed.
 
   Lemma tmap_over_either_app p₁ p₂ p₃ p₄:
@@ -1874,7 +1865,7 @@ Section TOptimEnv.
     apply rewrites_typed_with_untyped.
     - apply envmap_over_either_app.
     - intros.
-      inferer.
+      algenv_inferer.
   Qed.
   
   (********************
@@ -1887,7 +1878,7 @@ Section TOptimEnv.
     (ANConst d) ◯ q ⇒ (ANConst d).
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     input_well_typed.
@@ -1900,7 +1891,7 @@ Section TOptimEnv.
     ENV ◯ q ⇒ ENV.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto; intros.
     input_well_typed; reflexivity.
   Qed.
@@ -1911,7 +1902,7 @@ Section TOptimEnv.
     q ◯ ID ⇒ q.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_id q)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
     
   (* ID ◯ q ⇒ q *)
@@ -1920,7 +1911,7 @@ Section TOptimEnv.
     ID ◯ q ⇒ q.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_id_l q)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
  
   (* (⊕u(q₁)) ◯ q₂ ⇒ ⊕u(q₁ ◯ q₂) *)
@@ -1929,7 +1920,7 @@ Section TOptimEnv.
     (ANUnop u q₁) ◯ q₂ ⇒ (ANUnop u (q₁ ◯ q₂)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_unop u q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   (* (q₂ ⊗b q₁) ◯ q ⇒ (q₂ ◯ q) ⊗b (q₁ ◯ q) *)
@@ -1940,7 +1931,7 @@ Section TOptimEnv.
   Proof.
     intros.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto; intros.
     input_well_typed; reflexivity.
   Qed.
@@ -1951,7 +1942,7 @@ Section TOptimEnv.
     (χ⟨q₁⟩(q₂)) ◯ q ⇒ χ⟨ q₁ ⟩(q₂ ◯ q).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_map q q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   (* ⋈ᵈ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ ⋈ᵈ⟨ q₁ ⟩( q₂ ◯ q ) *)
@@ -1960,7 +1951,7 @@ Section TOptimEnv.
     ⋈ᵈ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ ⋈ᵈ⟨ q₁ ⟩( q₂ ◯ q ).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_mapconcat q q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   (* σ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ σ⟨ q₁ ⟩( q₂ ◯ q ) *)
@@ -1969,7 +1960,7 @@ Section TOptimEnv.
     (σ⟨ q₁ ⟩( q₂ )) ◯ q ⇒ (σ⟨ q₁ ⟩( q₂ ◯ q )).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_select q q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
   
   Lemma tapp_over_select_back_arrow q q₁ q₂:
@@ -1977,7 +1968,7 @@ Section TOptimEnv.
   Proof.
     apply rewrites_typed_with_untyped.
     - symmetry. apply app_over_select.
-    - intros; inferer.
+    - intros; algenv_inferer.
   Qed.
 
   (* (q₁ ◯ q₂) ◯ q₃ ⇒ q₁ ◯ (q₂ ◯ q₃) *)
@@ -1986,7 +1977,7 @@ Section TOptimEnv.
     (q₁ ◯ q₂) ◯ q₃ ⇒ q₁ ◯ (q₂ ◯ q₃).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_app q₁ q₂ q₃)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   Lemma tselect_over_app_either p₁ p₂ p₃ p₄ :
@@ -2008,7 +1999,7 @@ Section TOptimEnv.
     (ANConst d) ◯ₑ q ⇒ (ANConst d).
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     input_well_typed.
@@ -2021,7 +2012,7 @@ Section TOptimEnv.
     ID ◯ₑ q ⇒ ID.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto; intros.
     input_well_typed; reflexivity.
   Qed.
@@ -2032,7 +2023,7 @@ Section TOptimEnv.
     ignores_id q₁ -> q₁ ◯ q₂ ⇒ q₁.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     assert (q₁ ▷ τin >=> τout ⊣ τc;τenv)
            by (eapply tignores_id_swap; eauto).
     econstructor; eauto.
@@ -2048,7 +2039,7 @@ Section TOptimEnv.
     ENV ◯ₑ q ⇒ q.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_env q)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   (* q ◯ᵉ ENV ⇒ q *)
@@ -2057,7 +2048,7 @@ Section TOptimEnv.
     q ◯ₑ ENV ⇒ q.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
   Qed.
 
   (* (⊕u(q₁)) ◯ᵉ q₂ ⇒ ⊕u(q₁ ◯ᵉ q₂) *)
@@ -2066,21 +2057,21 @@ Section TOptimEnv.
     (ANUnop u q₁) ◯ₑ q₂ ⇒ (ANUnop u (q₁ ◯ₑ q₂)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_unop u q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   Lemma tunop_over_either u p₁ p₂ :
     ANUnop u (ANEither p₁ p₂)  ⇒ ANEither (ANUnop u p₁)(ANUnop u p₂).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (unop_over_either u p₁ p₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   Lemma tunop_over_either_app u p₁ p₂ p₃:
     ANUnop u (ANEither p₁ p₂ ◯ p₃) ⇒ ANEither (ANUnop u p₁)(ANUnop u p₂) ◯ p₃.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (unop_over_either_app u p₁ p₂ p₃)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   (* (q₁ ⊗b q₂) ◯ᵉ ID ⇒ (q₁ ◯ᵉ ID) ⊗b (q₂ ◯ᵉ ID) *)
@@ -2089,7 +2080,7 @@ Section TOptimEnv.
     (ANBinop b q₁ q₂) ◯ₑ q ⇒ (ANBinop b (q₁ ◯ₑ q) (q₂ ◯ₑ q)).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto; intros.
     input_well_typed.
     reflexivity.
@@ -2103,7 +2094,7 @@ Section TOptimEnv.
   Proof.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_map q q₁ q₂ H)).
-    intros; inferer.
+    intros; algenv_inferer.
     econstructor; eauto.
     econstructor; eauto.
     apply (tignores_id_swap q H _ _ _ τenv' τenv H3).
@@ -2116,7 +2107,7 @@ Section TOptimEnv.
     χ⟨ q₁ ⟩( q₂ ) ◯ₑ ANID ⇒ χ⟨ q₁ ◯ₑ ANID ⟩( q₂ ◯ₑ ANID ).
   Proof.
     unfold talgenv_rewrites_to; simpl; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - econstructor; eauto.
       econstructor; eauto.
@@ -2141,7 +2132,7 @@ Section TOptimEnv.
   Proof.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_select q q₁ q₂ H)).
-    intros; inferer.
+    intros; algenv_inferer.
     econstructor; eauto.
     econstructor; eauto.
     apply (tignores_id_swap q H _ _ _ _ _ H3).
@@ -2153,7 +2144,7 @@ Section TOptimEnv.
     (q₁ ◯ₑ q₂) ◯ₑ q ⇒ q₁ ◯ₑ (q₂ ◯ₑ q).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     input_well_typed; reflexivity.
@@ -2165,7 +2156,7 @@ Section TOptimEnv.
     ignores_id q -> (q₁ ◯ q₂) ◯ₑ q ⇒ (q₁ ◯ₑ q) ◯ (q₂ ◯ₑ q).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - repeat econstructor; eauto.
       apply (tignores_id_swap q H _ τin τ1 τenv' τenv H3).
@@ -2182,7 +2173,7 @@ Section TOptimEnv.
   Proof.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_app_ie p1 p2 p3 H)).
-    intros; inferer.
+    intros; algenv_inferer.
     econstructor; eauto.
     apply (tignores_env_swap p3 H _ _ _ _ _ H8).
   Qed.
@@ -2193,7 +2184,7 @@ Section TOptimEnv.
     ignores_id q₁ -> (q₁ ◯ₑ q₂) ◯ q ⇒ q₁ ◯ₑ (q₂ ◯ q).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - econstructor; eauto.
       apply (tignores_id_swap q₁ H _ τ1 τin τout τenv' H8).
@@ -2209,7 +2200,7 @@ Section TOptimEnv.
     ignores_env q₁ -> q₁ ◯ₑ q₂ ⇒ q₁.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     assert (q₁ ▷ τin >=> τout ⊣ τc;τenv)
       by apply (tignores_env_swap q₁ H _ τin τout τenv' τenv H7).
     econstructor; eauto.
@@ -2229,7 +2220,7 @@ Section TOptimEnv.
   Proof.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_env_merge_l q₁ q H)); intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     assert (q₁ ▷ τin >=> Rec Closed τ₂0 pf2 ⊣ τc;τenv)
       by apply (tignores_env_swap q₁ H _ τin (Rec Closed τ₂0 pf2) (Rec Closed τ₁0 pf1) τenv H10).
@@ -2247,7 +2238,7 @@ Section TOptimEnv.
     (χ⟨ ENV ⟩(σ⟨ q ⟩(‵{|ID|}))) ◯ₑ ID ⇒ σ⟨ q ⟩(‵{|ID|}) ◯ₑ ID.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flip_env1 q)).
-    intros; inferer.
+    intros; algenv_inferer.
   Qed.
 
   (* This overlaps with the previous (but neither is more general...) *)
@@ -2255,7 +2246,7 @@ Section TOptimEnv.
     ignores_env q₁ -> (χ⟨ENV⟩( σ⟨ q₁ ⟩(‵{|ID|}))) ◯ₑ q₂ ⇒ χ⟨q₂⟩( σ⟨ q₁ ⟩(‵{|ID|})).
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - repeat econstructor; eauto.
       apply (tignores_env_swap q₁ H _ τ₁ Bool τ₂ τenv H6).
@@ -2278,7 +2269,7 @@ Section TOptimEnv.
     σ⟨ q ⟩(‵{|ID|}) ◯ₑ ID ⇒ σ⟨ q ◯ₑ ID ⟩(‵{|ID|}).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flip_env2 q)).
-    intros; inferer.
+    intros; algenv_inferer.
   Qed.
 
   (* ♯flatten(q₁ ◯ᵉ q₂) ⇒ ♯flatten(q₁) ◯ᵉ q₂ *)
@@ -2288,7 +2279,7 @@ Section TOptimEnv.
     ♯flatten(q₁ ◯ₑ q₂) ⇒ ♯flatten(q₁) ◯ₑ q₂.
   Proof.
     apply (rewrites_typed_with_untyped _ _ (flatten_through_appenv q₁ q₂)).
-    intros. inferer.
+    intros. algenv_inferer.
   Qed.
 
   Lemma tappenv_through_either q₁ q₂ q₃:
@@ -2297,7 +2288,7 @@ Section TOptimEnv.
   Proof.
     intros ig.
     apply (rewrites_typed_with_untyped _ _ (appenv_through_either q₁ q₂ q₃ ig)).
-    intros. inferer.
+    intros. algenv_inferer.
     generalize (tignores_id_swap _ ig τc).
     econstructor;
       (econstructor; [| eassumption]; eauto). 
@@ -2313,7 +2304,7 @@ Section TOptimEnv.
     (ANMapEnv (ENV)) ◯ q ⇒ ENV.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     input_well_typed; simpl.
@@ -2326,7 +2317,7 @@ Section TOptimEnv.
     (ANMapEnv q₁) ◯ₑ (‵{|q₂|}) ⇒ ‵{| q₁ ◯ₑ q₂ |}.
   Proof.
     unfold talgenv_rewrites_to; intros.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     intros.
     destruct (brand_relation_brands ⊢ₑ q₂ @ₑ x ⊣ c;env); try reflexivity; simpl.
@@ -2341,7 +2332,7 @@ Section TOptimEnv.
   Proof.
     intros.
     unfold talgenv_rewrites_to; simpl; intros.
-    inferer; econstructor; eauto.
+    algenv_inferer; econstructor; eauto.
     - repeat econstructor; eauto.
       apply (tignores_id_swap q₁ H _ τin τenv0 τ₂ τenv0); assumption.
     - intros.
@@ -2368,7 +2359,7 @@ Section TOptimEnv.
                                                           ⇒ (χ⟨ENV⟩(σ⟨ q₁ ⟩(σ⟨ q₂ ⟩( ‵{| ID |})))).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (compose_selects_in_mapenv q₁ q₂)).
-    intros; inferer.
+    intros; algenv_inferer.
   Qed.
 
   (* (χᵉ⟨ q ⟩) ◯ᵉ (ENV ⊗ [ a : ID ]) ⇒ χ⟨ (q ◯ ENV·a) ◯ᵉ ID ⟩(ENV ⊗ [ a : ID ]) *)
@@ -2378,7 +2369,7 @@ Section TOptimEnv.
              χ⟨(q ◯ (ANUnop (ADot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) ).
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - assert (RSort.is_list_sorted ODT_lt_dec (domain τ₃) = true)
         by (unfold merge_bindings in *;
@@ -2427,7 +2418,7 @@ Section TOptimEnv.
            ♯flatten(χ⟨(q ◯ (ANUnop (ADot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) )).
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - assert (RSort.is_list_sorted ODT_lt_dec (domain τ₃) = true)
         by (unfold merge_bindings in *;
@@ -2478,7 +2469,7 @@ Section TOptimEnv.
     (ANUnop AToString (ANConst (dstring s))) ⇒ (ANConst (dstring s)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (tostring_dstring s)).
-    intros; inferer.
+    intros; algenv_inferer.
     inversion H2; subst.
     econstructor. apply normalize_preserves_type.
     econstructor.
@@ -2503,7 +2494,7 @@ Section TOptimEnv.
     (ANUnop AToString (ANBinop ASConcat q₁ q₂)) ⇒ (ANBinop ASConcat q₁ q₂).
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
-    inferer.
+    algenv_inferer.
     econstructor; eauto.
     - inversion H3; clear H3; subst.
       inversion H2; clear H2; subst.
@@ -2524,7 +2515,7 @@ Section TOptimEnv.
     π[nil](p) ⇒  ‵[||].
   Proof.
     red; simpl; intros.
-    inverter. split.
+    algenv_inferer. split.
     - econstructor. apply dtrec_full.
       simpl. rewrite rproject_nil_r; trivial.
     - intros. input_well_typed.
@@ -2538,7 +2529,7 @@ Section TOptimEnv.
     π[sl](p₁ ⊕ ‵[| (s, p₂) |]) ⇒ π[remove string_dec s sl](p₁) ⊕ ‵[| (s, p₂) |] .
   Proof.
     red; simpl; intros.
-    inverter.
+    algenv_inferer.
     split.
     econstructor.
     3: econstructor; [| eauto]; eauto.
@@ -2587,7 +2578,7 @@ Section TOptimEnv.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_const.
     - intros.
-      inverter.
+      algenv_inferer.
       inversion H0; subst.
       rtype_equalizer. subst.
       econstructor.
@@ -2606,7 +2597,7 @@ Section TOptimEnv.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_rec_in; trivial.
     - intros.
-      inverter.
+      algenv_inferer.
       econstructor; eauto.
       destruct (@in_dec string string_dec
               s sl); [| intuition].
@@ -2622,7 +2613,7 @@ Section TOptimEnv.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_rec_nin; trivial.
     - intros.
-      inverter.
+      algenv_inferer.
       econstructor; eauto.
       econstructor; eauto.
       destruct (@in_dec string string_dec
@@ -2635,7 +2626,7 @@ Section TOptimEnv.
     π[sl](p₁ ⊕ ‵[| (s, p₂) |]) ⇒ π[sl](p₁).
   Proof.
     red; simpl; intros.
-    inverter.
+    algenv_inferer.
     split.
     - econstructor; [ | eauto].
       revert pf2.
@@ -2679,7 +2670,7 @@ Section TOptimEnv.
     π[sl](‵[| (s, p₁) |] ⊕ p₂) ⇒ π[sl](p₂).
   Proof.
     red; intros.
-    inverter.
+    algenv_inferer.
     split.
     - econstructor; [ | eauto].
       revert pf2.
@@ -2719,37 +2710,37 @@ Section TOptimEnv.
       inversion τout0; trivial.
   Qed.
 
-    Lemma trproject_over_concat_recs_in_in sl s₁ p₁ s₂ p₂ :
-      In s₁ sl -> In s₂ sl ->
-      π[sl](‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |]) ⇒ ‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |].
-    Proof.
-      intros.
-      apply rewrites_typed_with_untyped.
-      - rewrite rproject_over_concat.
-        repeat rewrite rproject_over_rec_in by trivial.
-        reflexivity.
-      - intros.
-        inverter.
-        econstructor; eauto.
-        econstructor; eauto.
-        unfold rec_concat_sort.
-        rewrite rproject_rec_sort_commute, rproject_app.
-        simpl.
-        destruct (in_dec string_dec s sl); [| intuition ].
-        destruct (in_dec string_dec s1 sl); [| intuition ].
-        reflexivity.
+  Lemma trproject_over_concat_recs_in_in sl s₁ p₁ s₂ p₂ :
+    In s₁ sl -> In s₂ sl ->
+    π[sl](‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |]) ⇒ ‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |].
+  Proof.
+    intros.
+    apply rewrites_typed_with_untyped.
+    - rewrite rproject_over_concat.
+      repeat rewrite rproject_over_rec_in by trivial.
+      reflexivity.
+    - intros.
+      algenv_inferer.
+      econstructor; eauto.
+      econstructor; eauto.
+      unfold rec_concat_sort.
+      rewrite rproject_rec_sort_commute, rproject_app.
+      simpl.
+      destruct (in_dec string_dec s sl); [| intuition ].
+      destruct (in_dec string_dec s1 sl); [| intuition ].
+      reflexivity.
       Grab Existential Variables.
       solve[eauto].
       solve[eauto].
-    Qed.
-  
+  Qed.
+
   Lemma trproject_over_rproject sl1 sl2 p :
     π[sl1](π[sl2](p)) ⇒ π[set_inter string_dec sl2 sl1](p).
   Proof.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_rproject.
     - intros.
-      inverter.
+      algenv_inferer.
       generalize pf3.
       rewrite (rproject_rproject τ1 sl1 sl2).
       econstructor; eauto.
@@ -2764,7 +2755,7 @@ Section TOptimEnv.
     apply rewrites_typed_with_untyped.
     - apply rproject_over_either.
     - intros.
-      inverter.
+      algenv_inferer.
       econstructor; eauto.
   Qed.
 
@@ -2782,11 +2773,11 @@ Section TOptimEnv.
         ♯count(χ⟨p₁⟩(p₂)) ⇒  ♯count(p₂).
   Proof.
     red; intros; split.
-    - inferer.
+    - algenv_inferer.
       inversion H2; rtype_equalizer; subst.
-      inferer.
+      algenv_inferer.
     - intros.
-      inferer.
+      algenv_inferer.
       input_well_typed.
       destruct dout; simpl; trivial.
       clear eout.
@@ -2831,7 +2822,7 @@ Section TOptimEnv.
      - rewrite envmap_over_either.
        red; simpl; trivial.
     - intros.
-      inferer.
+      algenv_inferer.
       repeat (econstructor; simpl; eauto).
   Qed.
 
@@ -2859,14 +2850,14 @@ Section TOptimEnv.
           ♯count(♯flatten(χ⟨ANEither (‵{| ANConst dunit |}) ‵{||} ◯ p₃⟩(p₂))).
   Proof.
     red; intros; split.
-    - inferer.
+    - algenv_inferer.
       inversion H2; rtype_equalizer; subst.
-      inferer.
+      algenv_inferer.
       econstructor.
       2: (repeat econstructor; simpl; eauto).
       econstructor.
     - intros.
-      inferer.
+      algenv_inferer.
       input_well_typed.
       destruct dout; simpl; trivial.
       clear eout.
@@ -3025,7 +3016,7 @@ Section TOptimEnv.
     ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ p₁ ◯ (‵[||]).
   Proof.
     red; intros; split.
-    - inferer.
+    - algenv_inferer.
       assert (Rec Closed τ₁ pf1 = τ)
         by (apply rtype_fequal; simpl in *; auto).
       subst; clear H.
@@ -3048,7 +3039,7 @@ Section TOptimEnv.
       simpl.
       unfold rmap_concat; simpl.
       unfold oomap_concat; simpl.
-      inferer.
+      algenv_inferer.
       assert (Rec Closed τ₁ pf1 = τ)
         by (apply rtype_fequal; simpl in *; auto).
       subst; clear H.
@@ -3104,7 +3095,7 @@ Section TOptimEnv.
     - rewrite dup_elim by trivial.
       reflexivity.
     - intros.
-      inferer.
+      algenv_inferer.
       invcs H2.
       trivial.
   Qed.

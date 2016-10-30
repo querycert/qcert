@@ -111,13 +111,14 @@ MODULES = \
 	NRAEnv/Algebra/RAlgEnvSize \
 	NRAEnv/Algebra/RAlgEnvIgnore \
 	NRAEnv/Algebra/RAlgEnvEq \
-        NRAEnv/Algebra/RAlgEnvExt \
-        NRAEnv/Algebra/RAlgEnvExtEq \
+        NRAEnv/Extended/NRAEnv \
+        NRAEnv/Extended/NRAEnvEq \
 	NRAEnv/Typing/TAlgEnv \
 	NRAEnv/Typing/TAlgEnvInfer \
 	NRAEnv/Typing/TAlgEnvIgnore \
         NRAEnv/Typing/TAlgEnvEq \
-	NRAEnv/Typing/TAlgEnvExt \
+	NRAEnv/Typing/TNRAEnv \
+	NRAEnv/Typing/TNRAEnvEq \
 	NRAEnv/Context/RAlgEnvContext \
 	NRAEnv/Context/RAlgEnvContextLift \
 	NRAEnv/Optim/ROptimEnv \
@@ -173,6 +174,7 @@ MODULES = \
 	Translation/PatterntoNRA \
 	Translation/PatterntoNRAEnv \
 	Translation/PatternSugartoNRA \
+	Translation/PatternSugartoNRAEnv \
 	Translation/RuletoNRA \
 	Translation/RuletoNRAEnv \
 	Translation/TNRAtoNNRC \
