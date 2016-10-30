@@ -38,6 +38,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition sql := sql.
     Definition lambda_nra := lambda_nra.
     Definition nra := nra.
+    Definition nraenv_core := nraenv_core.
     Definition nraenv := nraenv.
     Definition nnrc := nnrc.
     Definition nnrcmr := nnrcmr.

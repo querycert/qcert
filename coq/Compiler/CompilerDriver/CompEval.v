@@ -102,12 +102,12 @@ Section CompEval.
       := oql_interp h (rec_sort cenv) q nil.
 
     (* Language: sql *)
-    (* Note: eval for sql relies on translation to nraenv *)
+    (* Note: eval for sql relies on translation to nraenv_core *)
     Definition eval_sql (q:sql) (cenv: list (string*data)) : option data
-      := fun_of_algenv h (rec_sort cenv) (sql_to_nraenv q) (drec nil) dunit.
+      := fun_of_algenv h (rec_sort cenv) (sql_to_nraenv_core q) (drec nil) dunit.
 
     (* Language: lambda_nra *)
-    (* Note: eval for lambda_nra relies on translation to nraenv *)
+    (* Note: eval for lambda_nra relies on translation to nraenv_core *)
     Definition eval_lambda_nra (q:lambda_nra) (cenv: list (string*data)) : option data
       := fun_of_algenv h (rec_sort cenv) (algenv_of_lalg q) (drec nil) dunit.
 
@@ -115,12 +115,16 @@ Section CompEval.
     Definition eval_nra (q:nra) (cenv: list (string*data)) : option data
       := fun_of_alg h q (drec (rec_sort cenv)).
       (* XXX Passing just cenv as ID value is more natural, but not
-             consistent with nraenv to nra translation which encodes
+             consistent with nraenv_core to nra translation which encodes
              ID and ENV in a records using the pat_context_data macro XXX *)
+
+    (* Language: nraenv_core *)
+    Definition eval_nraenv_core (q:nraenv_core) (cenv: list (string*data)) : option data
+      := fun_of_algenv h (rec_sort cenv) q (drec nil) dunit.
 
     (* Language: nraenv *)
     Definition eval_nraenv (q:nraenv) (cenv: list (string*data)) : option data
-      := fun_of_algenv h (rec_sort cenv) q (drec nil) dunit.
+      := NRAEnv.nraenv_eval h (rec_sort cenv) q (drec nil) dunit.
 
     (* Language: nnrc *)
     (* Note: eval_nnrc assumes constant environment has been prefixed with 'CONST$' *)
@@ -186,6 +190,9 @@ Section CompEval.
       Definition eval_nra_world (q:nra) (world:list data) : option data :=
         eval_nra q (mkWorld world).
 
+      Definition eval_nraenv_core_world (q:nraenv_core) (world:list data) : option data :=
+        eval_nraenv_core q (mkWorld world).
+
       Definition eval_nraenv_world (q:nraenv) (world:list data) : option data :=
         eval_nraenv q (mkWorld world).
 
@@ -202,7 +209,7 @@ Section CompEval.
         eval_dnnrc_dataset q (mkWorld world).
 
     End EvalWorld.
-    
+
   End EvalFunctions.
 
   Section EvalDriver.
@@ -239,6 +246,7 @@ Section CompEval.
       | Q_sql q => lift_output (eval_sql q cenv)
       | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
       | Q_nra q => lift_output (eval_nra q cenv)
+      | Q_nraenv_core q => lift_output (eval_nraenv_core q cenv)
       | Q_nraenv q => lift_output (eval_nraenv q cenv)
       | Q_nnrc q => lift_output (eval_nnrc q cenv)
       | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
@@ -262,6 +270,7 @@ Section CompEval.
       | Q_sql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_lambda_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nraenv_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nraenv _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))

@@ -50,7 +50,8 @@ Section CompLang.
   Definition sql := sql.
   Definition lambda_nra := lalg.
   Definition nra := alg.
-  Definition nraenv := algenv.
+  Definition nraenv_core := algenv.
+  Definition nraenv := nraenv.
   Definition nnrc := nrc.
   Definition nnrcmr := nrcmr.
   Definition cldmr := cld_mrl.
@@ -69,6 +70,7 @@ Section CompLang.
     | L_sql : language
     | L_lambda_nra : language
     | L_nra : language
+    | L_nraenv_core : language
     | L_nraenv : language
     | L_nnrc : language
     | L_nnrcmr : language
@@ -89,6 +91,7 @@ Section CompLang.
     | Q_sql : sql -> query
     | Q_lambda_nra : lambda_nra -> query
     | Q_nra : nra -> query
+    | Q_nraenv_core : nraenv_core -> query
     | Q_nraenv : nraenv -> query
     | Q_nnrc : nnrc -> query
     | Q_nnrcmr : nnrcmr -> query
@@ -110,6 +113,7 @@ Section CompLang.
     | Case_aux c "Q_sql"%string
     | Case_aux c "Q_lambda_nra"%string
     | Case_aux c "Q_nra"%string
+    | Case_aux c "Q_nraenv_core"%string
     | Case_aux c "Q_nraenv"%string
     | Case_aux c "Q_nnrc"%string
     | Case_aux c "Q_nnrcmr"%string
@@ -134,7 +138,8 @@ Section CompLang.
     | "sql"%string => L_sql
     | "lambda_nra"%string => L_lambda_nra
     | "nra"%string => L_nra
-    | "nraenv"%string => L_nraenv
+    | "nraenv_core"%string => L_nraenv_core
+    | "nraenv"%string => L_nraenv_core
     | "nnrc"%string => L_nnrc
     | "nnrcmr"%string => L_nnrcmr
     | "cldmr"%string => L_cldmr
@@ -157,6 +162,7 @@ Section CompLang.
     | L_sql => "sql"%string
     | L_lambda_nra => "lambda_nra"%string
     | L_nra => "nra"%string
+    | L_nraenv_core => "nraenv_core"%string
     | L_nraenv => "nraenv"%string
     | L_nnrc => "nnrc"%string
     | L_nnrcmr => "nnrcmr"%string
@@ -179,6 +185,7 @@ Section CompLang.
     | Q_sql _ => L_sql
     | Q_lambda_nra _ => L_lambda_nra
     | Q_nra _ => L_nra
+    | Q_nraenv_core _ => L_nraenv_core
     | Q_nraenv _ => L_nraenv
     | Q_nnrc _ => L_nnrc
     | Q_nnrcmr _ => L_nnrcmr
@@ -210,6 +217,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_sql"%string
   | Case_aux c "L_lambda_nra"%string
   | Case_aux c "L_nra"%string
+  | Case_aux c "L_nraenv_core"%string
   | Case_aux c "L_nraenv"%string
   | Case_aux c "L_nnrc"%string
   | Case_aux c "L_nnrcmr"%string

@@ -39,7 +39,7 @@ val parse_sexp : Lexing.lexbuf -> SExp.sexp
 val parse_io_sexp : Lexing.lexbuf -> QData.data
 
 val parse_camp_sexp : Lexing.lexbuf -> QLang.camp
-val parse_nraenv_sexp : Lexing.lexbuf -> QLang.nraenv
+val parse_nraenv_sexp : Lexing.lexbuf -> QLang.nraenv_core
 val parse_nnrc_sexp : Lexing.lexbuf -> QLang.nnrc
 val parse_nnrcmr_sexp : Lexing.lexbuf -> QLang.nnrcmr
 val parse_cldmr_sexp : Lexing.lexbuf -> QLang.cldmr

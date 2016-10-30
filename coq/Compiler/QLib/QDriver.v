@@ -69,22 +69,22 @@ Module QDriver(runtime:CompilerRuntime).
       := compile_from_source_target.
 
     (* Used in CompTest: *)
-    Definition rule_to_nraenv_optim : rule -> nraenv := rule_to_nraenv_optim.
+    Definition rule_to_nraenv_core_optim : rule -> nraenv_core := rule_to_nraenv_core_optim.
     Definition rule_to_nnrc_optim : rule -> nnrc := rule_to_nnrc_optim.
 
     (* Used in CALib: *)
-    Definition nraenv_optim_to_nnrc_optim : nraenv -> nnrc := nraenv_optim_to_nnrc_optim.
-    Definition nraenv_optim_to_nnrc_optim_to_dnnrc :
-      vdbindings -> nraenv -> dnnrc_dataset
-      := nraenv_optim_to_nnrc_optim_to_dnnrc.
-    Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim : nraenv -> nrcmr
-      := nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim.
+    Definition nraenv_core_optim_to_nnrc_optim : nraenv_core -> nnrc := nraenv_core_optim_to_nnrc_optim.
+    Definition nraenv_core_optim_to_nnrc_optim_to_dnnrc :
+      vdbindings -> nraenv_core -> dnnrc_dataset
+      := nraenv_core_optim_to_nnrc_optim_to_dnnrc.
+    Definition nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim : nraenv_core -> nrcmr
+      := nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim.
 
     (* Used in FrontUtil: *)
-    Definition rule_to_nraenv := rule_to_nraenv.
+    Definition rule_to_nraenv_core := rule_to_nraenv_core.
     Definition rule_to_camp := rule_to_camp.
-    Definition camp_to_nraenv := camp_to_nraenv.
-    Definition oql_to_nraenv := oql_to_nraenv.
+    Definition camp_to_nraenv_core := camp_to_nraenv_core.
+    Definition oql_to_nraenv_core := oql_to_nraenv_core.
 
     (* Used in CloudantUtil *)
     Definition cldmr_to_cloudant : string -> list (string*string) -> cldmr -> cloudant := cldmr_to_cloudant.
@@ -92,14 +92,14 @@ Module QDriver(runtime:CompilerRuntime).
     Definition nnrcmr_prepared_to_cldmr : list (string*string) -> nnrcmr -> cldmr := nnrcmr_prepared_to_cldmr.
 
     (* Used in EvalUtil *)
-    Definition nraenv_optim := nraenv_optim.
+    Definition nraenv_core_optim := nraenv_core_optim.
     
     (* Used in queryTests: *)
-    Definition rule_to_nraenv_to_nnrc_optim : rule -> nnrc := rule_to_nraenv_to_nnrc_optim.
-    Definition rule_to_nraenv_to_nnrc_optim_to_dnnrc :
-      vdbindings -> rule -> dnnrc_dataset := rule_to_nraenv_to_nnrc_optim_to_dnnrc.
-    Definition rule_to_nraenv_to_nnrc_optim_to_javascript :
-      rule -> string := rule_to_nraenv_to_nnrc_optim_to_javascript.
+    Definition rule_to_nraenv_core_to_nnrc_optim : rule -> nnrc := rule_to_nraenv_core_to_nnrc_optim.
+    Definition rule_to_nraenv_core_to_nnrc_optim_to_dnnrc :
+      vdbindings -> rule -> dnnrc_dataset := rule_to_nraenv_core_to_nnrc_optim_to_dnnrc.
+    Definition rule_to_nraenv_core_to_nnrc_optim_to_javascript :
+      rule -> string := rule_to_nraenv_core_to_nnrc_optim_to_javascript.
     Definition rule_to_nnrcmr : rule -> nnrcmr := rule_to_nnrcmr.
     Definition rule_to_cldmr : list (string*string) -> rule -> cldmr := rule_to_cldmr.
 

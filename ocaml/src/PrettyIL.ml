@@ -1106,7 +1106,8 @@ let pretty_query pconf q =
   | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_nra q -> pretty_nra greek margin q
-  | Compiler.Q_nraenv q -> pretty_nraenv greek margin q
+  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin q
+  | Compiler.Q_nraenv q -> "(* There is no nraenv pretty printer for the moment. *)\n"  (* XXX TOD XXX *)
   | Compiler.Q_nnrc q -> pretty_nnrc greek margin q
   | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin q
   | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)

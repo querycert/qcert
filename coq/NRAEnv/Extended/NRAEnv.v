@@ -220,6 +220,8 @@ Section NRAEnv.
     Require Import RAlgEnvSize.
     Definition nraenv_size (q:nraenv) :=
       algenv_size (algenv_of_nraenv q).
+    Definition nraenv_depth (q:nraenv) :=
+      algenv_depth (algenv_of_nraenv q).
   End size.
 
   Section ignore.

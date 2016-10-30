@@ -333,7 +333,7 @@ let rec sexp_to_camp (se : sexp) : QLang.camp =
 
 (* NRA Section *)
 
-let rec nraenv_to_sexp (op : QLang.nraenv) : sexp =
+let rec nraenv_to_sexp (op : QLang.nraenv_core) : sexp =
   match op with
   | ANID -> STerm ("ANID",[])
   | ANConst d -> STerm ("ANConst", [data_to_sexp d])
@@ -352,7 +352,7 @@ let rec nraenv_to_sexp (op : QLang.nraenv) : sexp =
   | ANAppEnv (op1,op2) -> STerm ("ANAppEnv", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANMapEnv op1 -> STerm ("ANMapEnv", [nraenv_to_sexp op1])
 
-let rec sexp_to_nraenv (se : sexp) : QLang.nraenv =
+let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
   match se with
   | STerm ("ANID",[]) -> ANID
   | STerm ("ANConst", [d]) -> ANConst (sexp_to_data d)
@@ -1157,7 +1157,9 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_nra ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.L_nraenv -> Compiler.Q_nraenv (sexp_to_nraenv se)
+  | Compiler.L_nraenv_core -> Compiler.Q_nraenv_core (sexp_to_nraenv se)
+  | Compiler.L_nraenv -> 
+      raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_nnrc -> Compiler.Q_nnrc (sexp_to_nnrc se)
   | Compiler.L_nnrcmr -> Compiler.Q_nnrcmr (sexp_to_nnrcmr se)
   | Compiler.L_cldmr -> Compiler.Q_cldmr (sexp_to_cldmr se)
@@ -1188,7 +1190,9 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Compiler.Q_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Q_nraenv q -> nraenv_to_sexp q
+  | Compiler.Q_nraenv_core q -> nraenv_to_sexp q
+  | Compiler.Q_nraenv _ -> 
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Compiler.Q_nnrc q -> nnrc_to_sexp q
   | Compiler.Q_nnrcmr q -> nnrcmr_to_sexp q
   | Compiler.Q_cldmr q -> cldmr_to_sexp q

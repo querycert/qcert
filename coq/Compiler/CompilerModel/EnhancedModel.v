@@ -27,7 +27,7 @@ Require Import FloatModelPart StringModelPart.
 Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
 Require NNRCMR CloudantMR.
-Require Import OptimizerLogger String RAlgEnv NNRC.
+Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 
 Import ListNotations.
 
@@ -1165,34 +1165,64 @@ Definition enhanced_to_cloudant_reduce_op
   Axiom OPTIMIZER_LOGGER_token_type : Set.
   Extract Constant OPTIMIZER_LOGGER_token_type => "Util.logger_token_type".
 
-  Axiom OPTIMIZER_LOGGER_nra_startPass :
+  Axiom OPTIMIZER_LOGGER_nraenv_core_startPass :
     String.string -> algenv -> OPTIMIZER_LOGGER_token_type.
 
-  Extract Constant OPTIMIZER_LOGGER_nra_startPass =>
+  Extract Constant OPTIMIZER_LOGGER_nraenv_core_startPass =>
   "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
 
-  Axiom OPTIMIZER_LOGGER_nra_step :
+  Axiom OPTIMIZER_LOGGER_nraenv_core_step :
     OPTIMIZER_LOGGER_token_type -> String.string ->
     algenv -> algenv ->
     OPTIMIZER_LOGGER_token_type.
   
-  Extract Inlined Constant OPTIMIZER_LOGGER_nra_step =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_core_step =>
   "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
 
-  Axiom OPTIMIZER_LOGGER_nra_endPass :
+  Axiom OPTIMIZER_LOGGER_nraenv_core_endPass :
     OPTIMIZER_LOGGER_token_type -> algenv -> OPTIMIZER_LOGGER_token_type.
   
-  Extract Inlined Constant OPTIMIZER_LOGGER_nra_endPass =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_core_endPass =>
   "(fun token output -> Logger.log_endPass token output)".
 
-  Instance foreign_nra_optimizer_logger :
+  Instance foreign_nraenv_core_optimizer_logger :
     optimizer_logger string algenv
     :=
       {
         optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
-        ; logStartPass := OPTIMIZER_LOGGER_nra_startPass
-        ; logStep :=  OPTIMIZER_LOGGER_nra_step
-        ; logEndPass :=  OPTIMIZER_LOGGER_nra_endPass
+        ; logStartPass := OPTIMIZER_LOGGER_nraenv_core_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nraenv_core_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_core_endPass
+      } .
+
+  Axiom OPTIMIZER_LOGGER_nraenv_startPass :
+    String.string -> nraenv -> OPTIMIZER_LOGGER_token_type.
+
+  Extract Constant OPTIMIZER_LOGGER_nraenv_startPass =>
+  "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
+
+  Axiom OPTIMIZER_LOGGER_nraenv_step :
+    OPTIMIZER_LOGGER_token_type -> String.string ->
+    nraenv -> nraenv ->
+    OPTIMIZER_LOGGER_token_type.
+  
+  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_step =>
+  "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
+
+  Axiom OPTIMIZER_LOGGER_nraenv_endPass :
+    OPTIMIZER_LOGGER_token_type -> nraenv -> OPTIMIZER_LOGGER_token_type.
+  
+  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_endPass =>
+  "(fun token output -> Logger.log_endPass token output)".
+
+  Instance foreign_nraenv_optimizer_logger :
+    optimizer_logger string nraenv
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_nraenv_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nraenv_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
       } .
 
   Axiom OPTIMIZER_LOGGER_nrc_startPass :
@@ -1426,8 +1456,10 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_cloudant.
   Definition compiler_foreign_to_cloudant : foreign_to_cloudant
     := enhanced_foreign_to_cloudant.
-  Definition compiler_nra_optimizer_logger : optimizer_logger string algenv
-    := foreign_nra_optimizer_logger.
+  Definition compiler_nraenv_core_optimizer_logger : optimizer_logger string algenv
+    := foreign_nraenv_core_optimizer_logger.
+  Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
+    := foreign_nraenv_optimizer_logger.
   Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
     := foreign_nrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
@@ -2422,8 +2454,10 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_cloudant.
   Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
     := enhanced_foreign_to_cloudant.
-  Definition compiler_model_nra_optimizer_logger : optimizer_logger string algenv
-    := foreign_nra_optimizer_logger.
+  Definition compiler_model_nraenv_core_optimizer_logger : optimizer_logger string algenv
+    := foreign_nraenv_core_optimizer_logger.
+  Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
+    := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc
     := foreign_nrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing

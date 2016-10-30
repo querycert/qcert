@@ -41,6 +41,7 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_lambda_nra : lambda_nra -> constant_env -> option data := @eval_lambda_nra _ h.
 
   Definition eval_nra : nra -> constant_env -> option data := @eval_nra _ h.
+  Definition eval_nraenv_core : nraenv_core -> constant_env -> option data := @eval_nraenv_core _ h.
   Definition eval_nraenv : nraenv -> constant_env -> option data := @eval_nraenv _ h.
 
   Definition eval_nnrc : nnrc -> constant_env -> option data := @eval_nnrc _ h.
@@ -61,6 +62,7 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_lambda_nra_world : lambda_nra -> world_env -> option data := @eval_lambda_nra_world _ h.
 
   Definition eval_nra_world : nra -> world_env -> option data := @eval_nra_world _ h.
+  Definition eval_nraenv_core_world : nraenv_core -> world_env -> option data := @eval_nraenv_core_world _ h.
   Definition eval_nraenv_world : nraenv -> world_env -> option data := @eval_nraenv_world _ h.
 
   Definition eval_nnrc_world : nnrc -> world_env -> option data := @eval_nnrc_world _ h.

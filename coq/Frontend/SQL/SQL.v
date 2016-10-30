@@ -545,7 +545,7 @@ Section SQL.
     .
 
   (* If there is no select statement, we default to dunit *)
-  Definition sql_to_nraenv (q:sql) : algenv
+  Definition sql_to_nraenv_core (q:sql) : algenv
     :=
       ANAppEnv
         (ANApp (sql_statements_to_nraenv nil q) (ANConst dunit))
@@ -558,7 +558,7 @@ Section SQL.
     Definition nraenv_eval (op:algenv) (constants:list (string*data))
       := fun_of_algenv nil constants op (drec nil) (drec nil).
     Definition sql_eval (q:sql) (constants:list (string*data))
-      := fun_of_algenv nil constants (sql_to_nraenv q) (drec nil) (drec nil).
+      := fun_of_algenv nil constants (sql_to_nraenv_core q) (drec nil) (drec nil).
   End SQLEval.
 
   Section SQLSize.

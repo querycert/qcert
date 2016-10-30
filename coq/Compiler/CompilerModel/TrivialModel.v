@@ -21,7 +21,7 @@ Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
 Require Import CompilerRuntime CompilerModel.
 Require NNRCMR CloudantMR.
-Require Import OptimizerLogger String RAlgEnv NNRC.
+Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 
 Program Instance trivial_foreign_data : foreign_data
   := mk_foreign_data Empty_set _ _ _ _ _ _.
@@ -340,8 +340,10 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_cloudant.
     Definition compiler_foreign_to_cloudant : foreign_to_cloudant
       := trivial_foreign_to_cloudant.
-    Definition compiler_nra_optimizer_logger : optimizer_logger string algenv
+    Definition compiler_nraenv_core_optimizer_logger : optimizer_logger string algenv
       := silent_optimizer_logger string algenv.
+    Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
+      := silent_optimizer_logger string nraenv.
     Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
       := silent_optimizer_logger string nrc.
     Definition compiler_foreign_data_typing : foreign_data_typing
@@ -379,8 +381,10 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_cloudant.
     Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
       := trivial_foreign_to_cloudant.
-    Definition compiler_model_nra_optimizer_logger : optimizer_logger string algenv
+    Definition compiler_model_nraenv_core_optimizer_logger : optimizer_logger string algenv
       := silent_optimizer_logger string algenv.
+    Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
+      := silent_optimizer_logger string nraenv.
     Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc
       := silent_optimizer_logger string nrc.
     Definition compiler_model_foreign_data_typing : foreign_data_typing
