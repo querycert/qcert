@@ -83,6 +83,7 @@ let suffix_sql () = "_sql.txt"
 let suffix_nra () = "_nra.txt"
 let suffix_lambda_nra () = "_lambda_nra.txt"
 let suffix_nraenv () = "_nraenv.txt"
+let suffix_nraenv_core () = "_nraenv_core.txt"
 let suffix_nrasexp () = "_nraenv.sexp"
 let suffix_lambda_nrasexp () = "_lambda_nra.sexp"
 let suffix_nnrc () = "_nnrc.txt"
@@ -116,6 +117,7 @@ let suffix_of_language lang =
   | Compiler.L_lambda_nra -> suffix_lambda_nra ()
   | Compiler.L_nra -> suffix_nra ()
   | Compiler.L_nraenv -> suffix_nraenv ()
+  | Compiler.L_nraenv_core -> suffix_nraenv_core ()
   | Compiler.L_nnrc -> suffix_nnrc ()
   | Compiler.L_dnnrc_dataset -> suffix_dnnrc_dataset ()
   | Compiler.L_dnnrc_typed_dataset -> suffix_dnnrc_typed_dataset ()

@@ -88,8 +88,10 @@ let languages =
   [ Compiler.L_rule;
     Compiler.L_camp;
     Compiler.L_oql;
+    Compiler.L_sql;
     Compiler.L_lambda_nra;
     Compiler.L_nra;
+    Compiler.L_nraenv_core;
     Compiler.L_nraenv;
     Compiler.L_nnrc;
     Compiler.L_nnrcmr;
