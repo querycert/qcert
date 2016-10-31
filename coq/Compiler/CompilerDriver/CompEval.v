@@ -104,12 +104,12 @@ Section CompEval.
     (* Language: sql *)
     (* Note: eval for sql relies on translation to nraenv_core *)
     Definition eval_sql (q:sql) (cenv: list (string*data)) : option data
-      := fun_of_algenv h (rec_sort cenv) (sql_to_nraenv_core q) (drec nil) dunit.
+      := NRAEnv.nraenv_eval h (rec_sort cenv) (sql_to_nraenv q) (drec nil) dunit.
 
     (* Language: lambda_nra *)
     (* Note: eval for lambda_nra relies on translation to nraenv_core *)
     Definition eval_lambda_nra (q:lambda_nra) (cenv: list (string*data)) : option data
-      := fun_of_algenv h (rec_sort cenv) (algenv_of_lalg q) (drec nil) dunit.
+      := NRAEnv.nraenv_eval h (rec_sort cenv) (nraenv_of_lalg q) (drec nil) dunit.
 
     (* Language: nra *)
     Definition eval_nra (q:nra) (cenv: list (string*data)) : option data

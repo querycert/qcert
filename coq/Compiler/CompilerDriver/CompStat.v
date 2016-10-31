@@ -316,9 +316,9 @@ Section CompStat.
   Definition stat_tree_sql (q:sql) : data :=
     match stat_sql q with
     | drec l =>
-      let (t_nraenv_core, q_nraenv_core) := time sql_to_nraenv_core q in
-      drec (l ++ ("sql_to_nraenv_core", stat_tree_nraenv_core q_nraenv_core)
-              :: ("sql_to_nraenv_core_time", dstring t_nraenv_core)
+      let (t_nraenv, q_nraenv) := time sql_to_nraenv q in
+      drec (l ++ ("sql_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("sql_to_nraenv_time", dstring t_nraenv)
               :: nil)
     | s => s
     end.
@@ -326,9 +326,9 @@ Section CompStat.
   Definition stat_tree_lambda_nra (q:lambda_nra) : data :=
     match stat_lambda_nra q with
     | drec l =>
-      let (t_nraenv_core, q_nraenv_core) := time lambda_nra_to_nraenv_core q in
-      drec (l ++ ("lambda_nra_to_nraenv_core", stat_tree_nraenv_core q_nraenv_core)
-              :: ("lambda_nra_to_nraenv_core_time", dstring t_nraenv_core)
+      let (t_nraenv, q_nraenv) := time lambda_nra_to_nraenv q in
+      drec (l ++ ("lambda_nra_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("lambda_nra_to_nraenv_time", dstring t_nraenv)
               :: nil)
     | s => s
     end.

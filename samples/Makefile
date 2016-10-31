@@ -77,7 +77,7 @@ run_java_%: oql/%.class
 	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input data/persons.json $*
 
 #SQLEXPERIMENT has to be set to run SQL queries
-SQLEXPERIMENT=
+SQLEXPERIMENT=../../summerCAMP/sql-experiment
 SQLTABLES=$(SQLEXPERIMENT)/small-tables/tpch_json.io
 SQLQUERIES=q2 q11 q16 q17 q19 q22 q101 q103 q104 q106
 # Parse failures omitted from the following.  These are currently 2, 27, 36, 70, and 86.

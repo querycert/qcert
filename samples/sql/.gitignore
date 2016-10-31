@@ -1,5 +1,6 @@
 *.java
 *.class
 *.js
+*.s-sql
 *_stats.json
 tpcds*

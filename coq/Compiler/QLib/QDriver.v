@@ -72,6 +72,10 @@ Module QDriver(runtime:CompilerRuntime).
     Definition rule_to_nraenv_core_optim : rule -> nraenv_core := rule_to_nraenv_core_optim.
     Definition rule_to_nnrc_optim : rule -> nnrc := rule_to_nnrc_optim.
 
+    (* Used in LambdaNRATests: *)
+    Definition nraenv_optim_to_nnrc_optim :
+      nraenv -> nnrc := nraenv_optim_to_nnrc_optim.
+    
     (* Used in CALib: *)
     Definition nraenv_core_optim_to_nnrc_optim : nraenv_core -> nnrc := nraenv_core_optim_to_nnrc_optim.
     Definition nraenv_core_optim_to_nnrc_optim_to_dnnrc :

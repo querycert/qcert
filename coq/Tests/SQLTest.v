@@ -138,7 +138,7 @@ Section SQLTest.
    ***********)
 
   Definition sql_just_query_to_nraenv (q:sql_query)
-    := sql_to_nraenv_core (SRunQuery q::nil).
+    := sql_to_nraenv (SRunQuery q::nil).
 
     Definition sql_just_query_eval (q:sql_query)
     := sql_eval (SRunQuery q::nil).
@@ -152,7 +152,7 @@ Section SQLTest.
     sql_just_query_to_nraenv sql1.
 
   (* Eval vm_compute in nraenv1. *)
-  (* Eval vm_compute in (nraenv_core_eval nraenv1 tables). *)
+  (* Eval vm_compute in (nraenv_eval nraenv1 tables). *)
   (* Eval vm_compute in (sql_just_query_eval  sql1 tables). *)
 
   (* sql2:

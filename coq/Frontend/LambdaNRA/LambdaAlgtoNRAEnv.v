@@ -28,34 +28,34 @@ Section LambdaNRAtoNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint algenv_of_lalg (op:lalg) : algenv :=
+  Fixpoint nraenv_of_lalg (op:lalg) : nraenv :=
     match op with
-    | LAVar x => ANUnop (ADot x) ANEnv
-    | LATable x => ANGetConstant x
-    | LAConst d => ANConst d
-    | LABinop b op1 op2 => ANBinop b (algenv_of_lalg op1) (algenv_of_lalg op2)
-    | LAUnop u op1 => ANUnop u (algenv_of_lalg op1)
-    | LAMap lop1 op2 => ANMap (algenv_of_lalg_lambda lop1) (algenv_of_lalg op2)
-    | LAMapConcat lop1 op2 => ANMapConcat (algenv_of_lalg_lambda lop1) (algenv_of_lalg op2)
-    | LAProduct op1 op2 => ANProduct (algenv_of_lalg op1) (algenv_of_lalg op2)
-    | LASelect lop1 op2 => ANSelect (algenv_of_lalg_lambda lop1) (algenv_of_lalg op2)
+    | LAVar x => NRAEnvUnop (ADot x) NRAEnvEnv
+    | LATable x => NRAEnvGetConstant x
+    | LAConst d => NRAEnvConst d
+    | LABinop b op1 op2 => NRAEnvBinop b (nraenv_of_lalg op1) (nraenv_of_lalg op2)
+    | LAUnop u op1 => NRAEnvUnop u (nraenv_of_lalg op1)
+    | LAMap lop1 op2 => NRAEnvMap (nraenv_of_lalg_lambda lop1) (nraenv_of_lalg op2)
+    | LAMapConcat lop1 op2 => NRAEnvMapConcat (nraenv_of_lalg_lambda lop1) (nraenv_of_lalg op2)
+    | LAProduct op1 op2 => NRAEnvProduct (nraenv_of_lalg op1) (nraenv_of_lalg op2)
+    | LASelect lop1 op2 => NRAEnvSelect (nraenv_of_lalg_lambda lop1) (nraenv_of_lalg op2)
     end
-  with algenv_of_lalg_lambda (lop:lalg_lambda) : algenv :=
+  with nraenv_of_lalg_lambda (lop:lalg_lambda) : nraenv :=
     match lop with
     | LALambda x op =>
-      ANAppEnv (algenv_of_lalg op) (ANBinop AConcat ANEnv (ANUnop (ARec x) ANID))
+      NRAEnvAppEnv (nraenv_of_lalg op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID))
     end.
 
   Context (h:brand_relation_t).
   Context (constant_env:list (string*data)).
     
-  Theorem algenv_of_lalg_lambda_correct (env:bindings) (lop:lalg_lambda) (d:data) :
-    fun_of_lalg_lambda h constant_env env lop d = fun_of_algenv h constant_env (algenv_of_lalg_lambda lop) (drec env) d.
+  Theorem nraenv_of_lalg_lambda_correct (env:bindings) (lop:lalg_lambda) (d:data) :
+    fun_of_lalg_lambda h constant_env env lop d = nraenv_eval h constant_env (nraenv_of_lalg_lambda lop) (drec env) d.
   Proof.
     destruct lop.
     revert env s d.
     lalg_cases (induction l) Case
-    ; intros; simpl in *
+    ; intros; unfold nraenv_eval in *; simpl in *
     ; autorewrite with lalg.
     - Case "LAVar"%string.
       unfold edot, rec_concat_sort.
@@ -107,14 +107,14 @@ Section LambdaNRAtoNRAEnv.
       trivial.
   Qed.
 
-  Definition eval_nraenv_q (Qe:algenv) (input:data) : option data :=
-    fun_of_algenv h constant_env Qe (drec nil) input.
+  Definition eval_nraenv_q (Qe:nraenv) (input:data) : option data :=
+    nraenv_eval h constant_env Qe (drec nil) input.
 
   Theorem eval_nraenv_q_correct (Q:lalg -> lalg) (input:data) :
-    eval_q h constant_env Q input = eval_nraenv_q (algenv_of_lalg_lambda (q_to_lambda Q)) input.
+    eval_q h constant_env Q input = eval_nraenv_q (nraenv_of_lalg_lambda (q_to_lambda Q)) input.
   Proof.
     unfold eval_q, eval_nraenv_q.
-    rewrite algenv_of_lalg_lambda_correct.
+    rewrite nraenv_of_lalg_lambda_correct.
     reflexivity.
   Qed.
 

@@ -207,11 +207,11 @@ Section SQL.
   Section Translation.
     Require Import NRAEnvRuntime.
 
-    Definition sql_order_to_nraenv (acc:algenv) (opt_order:option sql_order_spec) :=
+    Definition sql_order_to_nraenv (acc:nraenv) (opt_order:option sql_order_spec) :=
       match opt_order with
       | None => acc
       | Some sql_order_spec =>
-        ANUnop (AOrderBy sql_order_spec) acc
+        NRAEnvUnop (AOrderBy sql_order_spec) acc
       end.
 
     Definition column_of_select (select:sql_select) : (option string * string) :=
@@ -241,94 +241,94 @@ Section SQL.
              (out_columns:list string)
              (in_columns:list (option string * string)) :=
       match out_columns,in_columns with
-      | nil,_ | _,nil =>  (ANConst (drec nil))
+      | nil,_ | _,nil =>  (NRAEnvConst (drec nil))
       | out_cname :: out_columns', (None,in_cname) :: in_columns' =>
-        ANBinop AConcat
-                (ANUnop (ARec out_cname) (ANUnop (ADot in_cname) ANID))
+        NRAEnvBinop AConcat
+                (NRAEnvUnop (ARec out_cname) (NRAEnvUnop (ADot in_cname) NRAEnvID))
                 (create_renaming out_columns' in_columns')
       | out_cname :: out_columns', (Some in_tname,in_cname) :: in_columns' =>
-        ANBinop AConcat
-                (ANUnop (ARec out_cname) (ANUnop (ADot in_cname) (ANUnop (ADot in_tname) ANID)))
+        NRAEnvBinop AConcat
+                (NRAEnvUnop (ARec out_cname) (NRAEnvUnop (ADot in_cname) (NRAEnvUnop (ADot in_tname) NRAEnvID)))
                 (create_renaming out_columns' in_columns')
       end.
 
     Definition nraenv_if b expr1 expr2
       :=
-        ANApp
-        (ANEither
-          (ANApp expr1 (ANUnop (ADot "id"%string) ANID))
-          (ANApp expr2 (ANUnop (ADot "id"%string) ANID)))
-        (ANEitherConcat  
-           (ANApp (ANEither (ANConst (dleft (drec nil))) (ANConst (dright (drec nil))))
-                  (ANUnop ASingleton (ANSelect ANID (ANUnop AColl b))))
-           ((ANUnop (ARec "id"%string) ANID))).
+        NRAEnvApp
+        (NRAEnvEither
+          (NRAEnvApp expr1 (NRAEnvUnop (ADot "id"%string) NRAEnvID))
+          (NRAEnvApp expr2 (NRAEnvUnop (ADot "id"%string) NRAEnvID)))
+        (NRAEnvEitherConcat  
+           (NRAEnvApp (NRAEnvEither (NRAEnvConst (dleft (drec nil))) (NRAEnvConst (dright (drec nil))))
+                  (NRAEnvUnop ASingleton (NRAEnvSelect NRAEnvID (NRAEnvUnop AColl b))))
+           ((NRAEnvUnop (ARec "id"%string) NRAEnvID))).
 
 (*
     Example example_nraenv_if
       := nraenv_if
-           (ANBinop AEq (ANConst (dnat 3)) (ANID))
-           (ANBinop (ABArith ArithPlus) (ANConst (dnat 10)) ANID)
-           (ANBinop (ABArith ArithPlus) (ANConst (dnat 20)) ANID).
+           (NRAEnvBinop AEq (NRAEnvConst (dnat 3)) (NRAEnvID))
+           (NRAEnvBinop (ABArith ArithPlus) (NRAEnvConst (dnat 10)) NRAEnvID)
+           (NRAEnvBinop (ABArith ArithPlus) (NRAEnvConst (dnat 20)) NRAEnvID).
 
-    Eval vm_compute in fun_of_algenv nil nil example_nraenv_if (drec nil) (dnat 3).
-    Eval vm_compute in fun_of_algenv nil nil example_nraenv_if (drec nil) (dnat 4).
+    Eval vm_compute in nraenv_eval nil nil example_nraenv_if (drec nil) (dnat 3).
+    Eval vm_compute in nraenv_eval nil nil example_nraenv_if (drec nil) (dnat 4).
 *)
 
     Section queryvar.
       Context (view_list:list string).
 
-      Definition lookup_table (table_name:string) : algenv
+      Definition lookup_table (table_name:string) : nraenv
         := if in_dec string_eqdec table_name view_list
-           then ANUnop (ADot table_name) ANEnv
-           else ANGetConstant table_name.
+           then NRAEnvUnop (ADot table_name) NRAEnvEnv
+           else NRAEnvGetConstant table_name.
 
-    Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql_query) {struct q} : algenv :=
+    Fixpoint sql_query_to_nraenv (create_table:bool) (q:sql_query) {struct q} : nraenv :=
       let q_is_singleton : bool := is_singleton_sql_query q in
       match q with
       | SUnion SAll q1 q2 =>
-        ANBinop AUnion
+        NRAEnvBinop AUnion
                 (sql_query_to_nraenv create_table q1)
                 (sql_query_to_nraenv create_table q2)
       | SUnion SDistinct q1 q2 =>
-        ANUnop ADistinct
-          (ANBinop AUnion
+        NRAEnvUnop ADistinct
+          (NRAEnvBinop AUnion
                    (sql_query_to_nraenv create_table q1)
                    (sql_query_to_nraenv create_table q2))
       | SIntersect SAll q1 q2 =>
-        ANBinop AMin (* XXX Bag minimum -- to double check XXX *)
+        NRAEnvBinop AMin (* XXX Bag minimum -- to double check XXX *)
                 (sql_query_to_nraenv create_table q1)
                 (sql_query_to_nraenv create_table q2)
       | SIntersect SDistinct q1 q2 =>
-        ANUnop ADistinct
-               (ANBinop AMin (* XXX Bag minimum -- to double check XXX *)
+        NRAEnvUnop ADistinct
+               (NRAEnvBinop AMin (* XXX Bag minimum -- to double check XXX *)
                         (sql_query_to_nraenv create_table q1)
                         (sql_query_to_nraenv create_table q2))
       | SExcept SAll q1 q2 =>
-        ANBinop AMinus (* XXX Bag difference -- to double check XXX *)
+        NRAEnvBinop AMinus (* XXX Bag difference -- to double check XXX *)
                 (sql_query_to_nraenv create_table q1)
                 (sql_query_to_nraenv create_table q2)
       | SExcept SDistinct q1 q2 =>
-        ANUnop ADistinct
-               (ANBinop AMinus (* XXX Bag minimum -- to double check XXX *)
+        NRAEnvUnop ADistinct
+               (NRAEnvBinop AMinus (* XXX Bag minimum -- to double check XXX *)
                         (sql_query_to_nraenv create_table q1)
                         (sql_query_to_nraenv create_table q2))
       | SQuery selects froms opt_where opt_group opt_order =>
         let nraenv_from_clause :=
-            fold_left sql_from_to_nraenv froms (ANUnop AColl ANID)
+            fold_left sql_from_to_nraenv froms (NRAEnvUnop AColl NRAEnvID)
         in
         let nraenv_where_clause :=
             match opt_where with
             | None => nraenv_from_clause
-            | Some cond => ANSelect (sql_condition_to_nraenv ANID cond) nraenv_from_clause
+            | Some cond => NRAEnvSelect (sql_condition_to_nraenv NRAEnvID cond) nraenv_from_clause
             end
         in
         let nraenv_group_by_clause :=
             match opt_group with
             | None => nraenv_where_clause
-            | Some (sl,None) => group_by "partition" sl nraenv_where_clause
+            | Some (sl,None) => NRAEnvGroupBy "partition" sl nraenv_where_clause
             | Some (sl,Some cond) =>
-              ANSelect (sql_condition_to_nraenv (ANUnop (ADot "partition") ANID) cond)
-                       (group_by "partition" sl nraenv_where_clause)
+              NRAEnvSelect (sql_condition_to_nraenv (NRAEnvUnop (ADot "partition") NRAEnvID) cond)
+                       (NRAEnvGroupBy "partition" sl nraenv_where_clause)
             end
         in
         let nraenv_select_clause :=
@@ -337,101 +337,101 @@ Section SQL.
               match selects with
               | SSelectExpr _ expr :: nil =>
                 sql_expr_to_nraenv true nraenv_group_by_clause expr
-              | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
+              | _ => NRAEnvConst dunit (* XXX This should be really a compilation error XXX *)
               end
             else
               if create_table
               then
-                ANMap (fold_left sql_select_to_nraenv selects (ANConst (drec nil)))
+                NRAEnvMap (fold_left sql_select_to_nraenv selects (NRAEnvConst (drec nil)))
                       nraenv_group_by_clause
               else
                 if (is_value_sequence_sql_query q)
                 then
                   match selects with
                   | SSelectExpr _ expr :: nil =>
-                    ANMap (sql_expr_to_nraenv false ANID expr) nraenv_group_by_clause
+                    NRAEnvMap (sql_expr_to_nraenv false NRAEnvID expr) nraenv_group_by_clause
                   | SSelectColumn cname :: nil =>
-                    ANMap (ANUnop (ADot cname) ANID) nraenv_group_by_clause
+                    NRAEnvMap (NRAEnvUnop (ADot cname) NRAEnvID) nraenv_group_by_clause
                   | SSelectColumnDeref tname cname :: nil =>
-                    ANMap (ANUnop (ADot cname) (ANUnop (ADot tname) ANID)) nraenv_group_by_clause
-                  | _ => ANConst dunit (* XXX This should be really a compilation error XXX *)
+                    NRAEnvMap (NRAEnvUnop (ADot cname) (NRAEnvUnop (ADot tname) NRAEnvID)) nraenv_group_by_clause
+                  | _ => NRAEnvConst dunit (* XXX This should be really a compilation error XXX *)
                   end
                 else
-                  ANConst dunit (* XXX This should be really a compilation error XXX *)
+                  NRAEnvConst dunit (* XXX This should be really a compilation error XXX *)
         in
         let nraenv_order_by_clause := sql_order_to_nraenv nraenv_select_clause opt_order in
         nraenv_order_by_clause
       end
-    with sql_from_to_nraenv (acc:algenv) (from:sql_from) {struct from} :=
+    with sql_from_to_nraenv (acc:nraenv) (from:sql_from) {struct from} :=
       match from with
-      | (SFromTable tname) => ANProduct (lookup_table tname) acc
+      | (SFromTable tname) => NRAEnvProduct (lookup_table tname) acc
       | (SFromTableAlias new_name tname) =>
-        ANProduct (ANMap (ANUnop (ARec new_name) ANID) (lookup_table tname)) acc
+        NRAEnvProduct (NRAEnvMap (NRAEnvUnop (ARec new_name) NRAEnvID) (lookup_table tname)) acc
       | SFromQuery tspec q =>
         let (tname,opt_columns) := tspec in
         match opt_columns with
         | Some out_columns =>
           let in_columns := columns_of_query q in
-          ANMap (create_renaming out_columns in_columns)
+          NRAEnvMap (create_renaming out_columns in_columns)
                 (sql_query_to_nraenv true q)
         | None => sql_query_to_nraenv true q
         end
       end
-    with sql_select_to_nraenv (acc:algenv) (select:sql_select) {struct select} :=
+    with sql_select_to_nraenv (acc:nraenv) (select:sql_select) {struct select} :=
       match select with
       | SSelectColumn cname =>
-        ANBinop AConcat
-                (ANUnop (ARec cname) (ANUnop (ADot cname) ANID))
+        NRAEnvBinop AConcat
+                (NRAEnvUnop (ARec cname) (NRAEnvUnop (ADot cname) NRAEnvID))
                 acc
       | SSelectColumnDeref tname cname =>
-        ANBinop AConcat
-                (ANUnop (ARec cname) (ANUnop (ADot cname) (ANUnop (ADot tname) ANID)))
+        NRAEnvBinop AConcat
+                (NRAEnvUnop (ARec cname) (NRAEnvUnop (ADot cname) (NRAEnvUnop (ADot tname) NRAEnvID)))
                 acc
       | SSelectStar =>
-        ANBinop AConcat ANID acc
+        NRAEnvBinop AConcat NRAEnvID acc
       | SSelectExpr cname expr =>
-        ANBinop AConcat
-                (ANUnop (ARec cname) (sql_expr_to_nraenv false (ANUnop (ADot "partition") ANID) expr))
+        NRAEnvBinop AConcat
+                (NRAEnvUnop (ARec cname) (sql_expr_to_nraenv false (NRAEnvUnop (ADot "partition") NRAEnvID) expr))
                 acc
       end
-    with sql_expr_to_nraenv (create_table:bool) (acc:algenv) (expr:sql_expr) {struct expr} :=
+    with sql_expr_to_nraenv (create_table:bool) (acc:nraenv) (expr:sql_expr) {struct expr} :=
       match expr with
-      | SExprConst d => ANConst d
-      | SExprColumn cname => ANUnop (ADot cname) ANID
-      | SExprColumnDeref tname cname => ANUnop (ADot cname) (ANUnop (ADot tname) ANID)
-      | SExprStar => ANID
+      | SExprConst d => NRAEnvConst d
+      | SExprColumn cname => NRAEnvUnop (ADot cname) NRAEnvID
+      | SExprColumnDeref tname cname => NRAEnvUnop (ADot cname) (NRAEnvUnop (ADot tname) NRAEnvID)
+      | SExprStar => NRAEnvID
       | SExprUnary (SSubstring n1 on2) expr1 =>
-        ANUnop (ASubstring n1 on2)
+        NRAEnvUnop (ASubstring n1 on2)
                 (sql_expr_to_nraenv create_table acc expr1)
       | SExprUnary (SUnaryForeignExpr fu) expr1 =>
-        ANUnop (AForeignUnaryOp fu)
+        NRAEnvUnop (AForeignUnaryOp fu)
                 (sql_expr_to_nraenv create_table acc expr1)
       | SExprBinary (SBinaryForeignExpr fb) expr1 expr2 =>
-        ANBinop (AForeignBinaryOp fb)
+        NRAEnvBinop (AForeignBinaryOp fb)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SPlus expr1 expr2 =>
-        ANBinop (ABArith ArithPlus)
+        NRAEnvBinop (ABArith ArithPlus)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SSubtract expr1 expr2 =>
-        ANBinop (ABArith ArithMinus)
+        NRAEnvBinop (ABArith ArithMinus)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprUnary SMinus expr1 =>
-        ANBinop (ABArith ArithMinus)
-                (ANConst (dnat 0))
+        NRAEnvBinop (ABArith ArithMinus)
+                (NRAEnvConst (dnat 0))
                 (sql_expr_to_nraenv create_table acc expr1)
       | SExprBinary SMult expr1 expr2 =>
-        ANBinop (ABArith ArithMult)
+        NRAEnvBinop (ABArith ArithMult)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SDivide expr1 expr2 =>
-        ANBinop (ABArith ArithDivide)
+        NRAEnvBinop (ABArith ArithDivide)
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprBinary SConcat expr1 expr2 =>
-        ANBinop ASConcat
+        NRAEnvBinop ASConcat
                 (sql_expr_to_nraenv create_table acc expr1)
                 (sql_expr_to_nraenv create_table acc expr2)
       | SExprCase cond expr1 expr2 =>
@@ -440,125 +440,125 @@ Section SQL.
                  (sql_expr_to_nraenv create_table acc expr1)
                  (sql_expr_to_nraenv create_table acc expr2)
       | SExprAggExpr SSum expr1 =>
-        ANUnop ASum (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+        NRAEnvUnop ASum (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
       | SExprAggExpr SAvg expr1 =>
-        ANUnop AArithMean (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+        NRAEnvUnop AArithMean (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
       | SExprAggExpr SCount expr1 =>
-        ANUnop ACount (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+        NRAEnvUnop ACount (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
       | SExprAggExpr SMin expr1 =>
-        ANUnop ANumMin (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+        NRAEnvUnop ANumMin (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
       | SExprAggExpr SMax expr1 =>
-        ANUnop ANumMax (ANMap (sql_expr_to_nraenv create_table ANID expr1) acc)
+        NRAEnvUnop ANumMax (NRAEnvMap (sql_expr_to_nraenv create_table NRAEnvID expr1) acc)
       | SExprQuery q =>
         if create_table
         then sql_query_to_nraenv true q
         else sql_query_to_nraenv false q
       end
-    with sql_condition_to_nraenv (acc:algenv) (cond:sql_condition) {struct cond} :=
+    with sql_condition_to_nraenv (acc:nraenv) (cond:sql_condition) {struct cond} :=
       match cond with
       | SCondAnd cond1 cond2 =>
-        ANBinop AAnd
+        NRAEnvBinop AAnd
                 (sql_condition_to_nraenv acc cond1)
                 (sql_condition_to_nraenv acc cond2)
       | SCondOr cond1 cond2 =>
-        ANBinop AOr
+        NRAEnvBinop AOr
                 (sql_condition_to_nraenv acc cond1)
                 (sql_condition_to_nraenv acc cond2)
       | SCondNot cond1 =>
-        ANUnop ANeg
+        NRAEnvUnop ANeg
                 (sql_condition_to_nraenv acc cond1)
       | SCondBinary SEq expr1 expr2 =>
-        ANBinop AEq
+        NRAEnvBinop AEq
                (sql_expr_to_nraenv true acc expr1)
                (sql_expr_to_nraenv true acc expr2)
       | SCondBinary SLe expr1 expr2 =>
-        ANBinop ALe
+        NRAEnvBinop ALe
                (sql_expr_to_nraenv true acc expr1)
                (sql_expr_to_nraenv true acc expr2)
       | SCondBinary SLt expr1 expr2 =>
-        ANBinop ALt
+        NRAEnvBinop ALt
                (sql_expr_to_nraenv true acc expr1)
                (sql_expr_to_nraenv true acc expr2)
       | SCondBinary SGe expr1 expr2 =>
-        ANUnop ANeg (ANBinop ALt
+        NRAEnvUnop ANeg (NRAEnvBinop ALt
                              (sql_expr_to_nraenv true acc expr1)
                              (sql_expr_to_nraenv true acc expr2))
       | SCondBinary SGt expr1 expr2 =>
-        ANUnop ANeg (ANBinop ALe
+        NRAEnvUnop ANeg (NRAEnvBinop ALe
                              (sql_expr_to_nraenv true acc expr1)
                              (sql_expr_to_nraenv true acc expr2))
       | SCondBinary SDiff expr1 expr2 =>
-        ANUnop ANeg (ANBinop AEq
+        NRAEnvUnop ANeg (NRAEnvBinop AEq
                              (sql_expr_to_nraenv true acc expr1)
                              (sql_expr_to_nraenv true acc expr2))
       | SCondBinary (SBinaryForeignCond fb) expr1 expr2 =>
-        ANBinop (AForeignBinaryOp fb)
+        NRAEnvBinop (AForeignBinaryOp fb)
                 (sql_expr_to_nraenv true acc expr1)
                 (sql_expr_to_nraenv true acc expr2)
       | SCondExists q =>
-        ANUnop ANeg (ANBinop ALe
-                             (ANUnop ACount (sql_query_to_nraenv true q))
-                             (ANConst (dnat 0)))
+        NRAEnvUnop ANeg (NRAEnvBinop ALe
+                             (NRAEnvUnop ACount (sql_query_to_nraenv true q))
+                             (NRAEnvConst (dnat 0)))
       | SCondIn expr1 expr2 =>
-        ANBinop AContains
+        NRAEnvBinop AContains
                 (sql_expr_to_nraenv true acc expr1)
                 (sql_expr_to_nraenv false acc expr2)
       | SCondLike expr1 slike =>
-        ANUnop (ALike slike None) (sql_expr_to_nraenv true acc expr1)
+        NRAEnvUnop (ALike slike None) (sql_expr_to_nraenv true acc expr1)
       | SCondBetween expr1 expr2 expr3 =>
-        ANBinop AAnd
-                (ANBinop ALe
+        NRAEnvBinop AAnd
+                (NRAEnvBinop ALe
                          (sql_expr_to_nraenv true acc expr2)
                          (sql_expr_to_nraenv true acc expr1))
-                (ANBinop ALe
+                (NRAEnvBinop ALe
                          (sql_expr_to_nraenv true acc expr1)
                          (sql_expr_to_nraenv true acc expr3))
       end.
 
-    Definition sql_query_to_nraenv_top (q:sql_query) : algenv :=
-      ANApp (sql_query_to_nraenv true q) (ANConst (drec nil)). (* XXX Always initialize ID to an empty record XXX *)
+    Definition sql_query_to_nraenv_top (q:sql_query) : nraenv :=
+      NRAEnvApp (sql_query_to_nraenv true q) (NRAEnvConst (drec nil)). (* XXX Always initialize ID to an empty record XXX *)
 
     End queryvar.
 
     (* we currently keep only the value of the last select statement *)
     (* the input environment is assumed to be a record with fields "view_list" *)
     Fixpoint sql_statements_to_nraenv
-               (view_list:list string) (q:sql) : algenv
+               (view_list:list string) (q:sql) : nraenv
       := match q with
-         | nil => ANID
+         | nil => NRAEnvID
          | (SRunQuery q)::rest =>
-           ANApp
+           NRAEnvApp
              (sql_statements_to_nraenv view_list rest)
              (sql_query_to_nraenv_top view_list q)
          | (SCreateView s q)::rest =>
-            ANAppEnv 
+            NRAEnvAppEnv 
               (sql_statements_to_nraenv (s::view_list) rest)
-              (ANBinop AConcat
-                      ANEnv
-                      (ANUnop (ARec s)
+              (NRAEnvBinop AConcat
+                      NRAEnvEnv
+                      (NRAEnvUnop (ARec s)
                               (sql_query_to_nraenv_top view_list q)))
          | (SDropView s)::rest =>
-           ANAppEnv
+           NRAEnvAppEnv
              (sql_statements_to_nraenv (remove_all s view_list) rest)
-             (ANUnop (ARecRemove s) ANEnv)
+             (NRAEnvUnop (ARecRemove s) NRAEnvEnv)
          end
     .
 
   (* If there is no select statement, we default to dunit *)
-  Definition sql_to_nraenv_core (q:sql) : algenv
+  Definition sql_to_nraenv (q:sql) : nraenv
     :=
-      ANAppEnv
-        (ANApp (sql_statements_to_nraenv nil q) (ANConst dunit))
-        (ANConst (drec nil)).
+      NRAEnvAppEnv
+        (NRAEnvApp (sql_statements_to_nraenv nil q) (NRAEnvConst dunit))
+        (NRAEnvConst (drec nil)).
 
   End Translation.
 
   Section SQLEval.
     (* For now: SQL evaluation through translation *)
-    Definition nraenv_eval (op:algenv) (constants:list (string*data))
-      := fun_of_algenv nil constants op (drec nil) (drec nil).
+    Definition nraenv_eval_wrap (op:nraenv) (constants:list (string*data))
+      := nraenv_eval nil constants op (drec nil) (drec nil).
     Definition sql_eval (q:sql) (constants:list (string*data))
-      := fun_of_algenv nil constants (sql_to_nraenv_core q) (drec nil) (drec nil).
+      := nraenv_eval nil constants (sql_to_nraenv q) (drec nil) (drec nil).
   End SQLEval.
 
   Section SQLSize.
