@@ -226,8 +226,13 @@ Section NRAEnv.
 
   Section ignore.
     Require Import RAlgEnvIgnore.
+    Definition nraenv_ignores_id (q:nraenv) :=
+      ignores_id (algenv_of_nraenv q).
     Definition nraenv_ignores_id_fun (q:nraenv) :=
       ignores_id_fun (algenv_of_nraenv q).
+
+    Definition nraenv_ignores_env (q:nraenv) :=
+      ignores_env (algenv_of_nraenv q).
     Definition nraenv_ignores_env_fun (q:nraenv) :=
       ignores_env_fun (algenv_of_nraenv q).
   End ignore.

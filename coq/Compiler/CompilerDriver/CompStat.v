@@ -306,9 +306,9 @@ Section CompStat.
   Definition stat_tree_oql (q:oql) : data :=
     match stat_oql q with
     | drec l =>
-      let (t_nraenv_core, q_nraenv_core) := time oql_to_nraenv_core q in
-      drec (l ++ ("oql_to_nraenv_core", stat_tree_nraenv_core q_nraenv_core)
-              :: ("oql_to_nraenv_core_time", dstring t_nraenv_core)
+      let (t_nraenv, q_nraenv) := time oql_to_nraenv q in
+      drec (l ++ ("oql_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("oql_to_nraenv_time", dstring t_nraenv)
               :: nil)
     | s => s
     end.

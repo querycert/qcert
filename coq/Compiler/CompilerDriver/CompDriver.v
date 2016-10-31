@@ -97,7 +97,7 @@ Section CompDriver.
 
   Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
 
-  Definition oql_to_nraenv_core (q:oql) : nraenv_core := OQLtoNRAEnv.translate_oql_to_algenv q.
+  Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
 
   Definition sql_to_nraenv (q:sql) : nraenv := SQL.sql_to_nraenv q.
 
@@ -318,7 +318,7 @@ Section CompDriver.
 
   Inductive oql_driver : Set :=
     | Dv_oql_stop : oql_driver
-    | Dv_oql_to_nraenv_core : nraenv_core_driver -> oql_driver.
+    | Dv_oql_to_nraenv : nraenv_driver -> oql_driver.
 
   Inductive sql_driver : Set :=
     | Dv_sql_stop : sql_driver
@@ -508,7 +508,7 @@ Section CompDriver.
   Definition driver_length_oql (dv: oql_driver) :=
     match dv with
     | Dv_oql_stop => 1
-    | Dv_oql_to_nraenv_core dv => 1 + driver_length_nraenv_core dv
+    | Dv_oql_to_nraenv dv => 1 + driver_length_nraenv dv
     end.
 
   Definition driver_length_sql (dv: sql_driver) :=
@@ -767,9 +767,9 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_oql_stop => nil
-        | Dv_oql_to_nraenv_core dv =>
-          let q := oql_to_nraenv_core q in
-          compile_nraenv_core dv q
+        | Dv_oql_to_nraenv dv =>
+          let q := oql_to_nraenv q in
+          compile_nraenv dv q
         end
     in
     (Q_oql q) :: queries.
@@ -887,14 +887,14 @@ Section CompDriver.
       end
     | L_oql =>
       match dv with
-      | Dv_nraenv_core dv => Dv_oql (Dv_oql_to_nraenv_core dv)
-      | Dv_nraenv _
+      | Dv_nraenv dv => Dv_oql (Dv_oql_to_nraenv dv)
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
       | Dv_lambda_nra _
       | Dv_nra _
+      | Dv_nraenv_core _
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
@@ -1296,7 +1296,7 @@ Section CompDriver.
     | Dv_camp (Dv_camp_to_nraenv_core dv) => (L_camp, Some (Dv_nraenv_core dv))
     | Dv_camp (Dv_camp_to_nra dv) => (L_camp, Some (Dv_nra dv))
     | Dv_oql (Dv_oql_stop) => (L_oql, None)
-    | Dv_oql (Dv_oql_to_nraenv_core dv) => (L_oql, Some (Dv_nraenv_core dv))
+    | Dv_oql (Dv_oql_to_nraenv dv) => (L_oql, Some (Dv_nraenv dv))
     | Dv_sql (Dv_sql_stop) => (L_sql, None)
     | Dv_sql (Dv_sql_to_nraenv dv) => (L_sql, Some (Dv_nraenv dv))
     | Dv_lambda_nra (Dv_lambda_nra_stop) => (L_lambda_nra, None)
@@ -1648,7 +1648,7 @@ Section CompDriver.
     ; simpl.
     eapply is_postfix_plus_one with
     (config:=trivial_driver_config) (lang:=L_oql);
-      [apply target_language_of_driver_is_postfix_nraenv_core | | ]; simpl; trivial.
+      [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_lambda_nra:
@@ -2012,28 +2012,37 @@ Section CompDriver.
       | L_oql, L_oql =>
         L_oql
           :: nil
+      | L_oql, L_nraenv =>
+        L_oql
+          :: L_nraenv
+          :: L_nraenv
+          :: nil
       | L_oql, L_nraenv_core =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: nil
       | L_oql, L_nra =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nra
           :: L_nra
           :: nil
       | L_oql, L_nnrc =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
           :: nil
       | L_oql, L_camp =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2041,7 +2050,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_javascript =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2049,7 +2059,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_java =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2057,7 +2068,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_nnrcmr =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2066,7 +2078,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_spark =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2076,7 +2089,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_cldmr =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2086,7 +2100,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_cloudant =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2097,7 +2112,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_dnnrc_dataset =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2105,7 +2121,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_dnnrc_typed_dataset =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
@@ -2115,7 +2132,8 @@ Section CompDriver.
           :: nil
       | L_oql, L_spark2 =>
         L_oql
-          :: L_nraenv_core
+          :: L_nraenv
+          :: L_nraenv
           :: L_nraenv_core
           :: L_nnrc
           :: L_nnrc
