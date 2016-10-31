@@ -90,6 +90,7 @@ Module QDriver(runtime:CompilerRuntime).
     Definition nnrcmr_prepared_to_cldmr : list (string*string) -> nnrcmr -> cldmr := nnrcmr_prepared_to_cldmr.
 
     (* Used in queryTests: *)
+    Definition rule_to_nraenv_core := rule_to_nraenv_core.
     Definition rule_to_nraenv_core_to_nnrc_optim : rule -> nnrc := rule_to_nraenv_core_to_nnrc_optim.
     Definition rule_to_nraenv_core_to_nnrc_optim_to_dnnrc :
       vdbindings -> rule -> dnnrc_dataset := rule_to_nraenv_core_to_nnrc_optim_to_dnnrc.
