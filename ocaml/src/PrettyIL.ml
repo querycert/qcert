@@ -55,7 +55,9 @@ let get_margin conf = conf.margin
 
 type nra_sym =
     { chi: (string*int);
+      chiflat: (string*int);
       chie: (string*int);
+      join: (string*int);
       djoin: (string*int);
       times: (string*int);
       sigma: (string*int);
@@ -74,6 +76,8 @@ type nra_sym =
       circe: (string*int);
       sharp: (string*int);
       pi: (string*int);
+      bpi: (string*int);
+      gamma: (string*int);
       cup: (string*int);
       vee: (string*int);
       wedge: (string*int);
@@ -85,7 +89,9 @@ type nra_sym =
 
 let textsym =
   { chi = ("Map", 3);
+    chiflat = ("FlatMap", 7);
     chie = ("Map^e", 5);
+    join = ("Join", 4);
     djoin = ("DJoin", 5);
     times = ("x", 1);
     sigma = ("Select", 6);
@@ -103,7 +109,9 @@ let textsym =
     circ = ("o", 1);
     circe = ("o^e", 3);
     sharp = ("#", 1);
-    pi = ("Project", 7);
+    pi = ("project", 7);
+    bpi = ("Project", 7);
+    gamma = ("Group", 7);
     cup = ("U",1);
     vee = ("\\/",2);
     wedge = ("/\\",2);
@@ -114,7 +122,9 @@ let textsym =
     bot = ("Bot",3) }
 let greeksym =
   { chi = ("χ", 1);
+    chiflat = ("χᶠ", 2);
     chie = ("χᵉ", 2);
+    join = ("⋈", 1);
     djoin = ("⋈ᵈ", 2);
     times = ("×", 1);
     sigma = ("σ", 1);
@@ -133,6 +143,8 @@ let greeksym =
     circe = ("∘ᵉ", 2);
     sharp = ("♯", 1);
     pi = ("π", 1);
+    bpi = ("Π", 1);
+    gamma = ("Γ", 1);
     cup = ("∪",1);
     vee = ("∨",1);
     wedge = ("∧",1);
@@ -699,25 +711,31 @@ let pretty_nra greek margin a =
 
 let rec pretty_nraenv_aux p sym ff a =
   match a with
-  | Hack.ANID -> fprintf ff "%s" "ID"
-  | Hack.ANConst d -> fprintf ff "%a" pretty_data d
-  | Hack.ANBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
-  | Hack.ANUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
-  | Hack.ANMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
-  | Hack.ANMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
-  | Hack.ANProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
-  | Hack.ANSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
-  | Hack.ANDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
-  | Hack.ANEither (a1,a2) ->
+  | Hack.NRAEnvID -> fprintf ff "%s" "ID"
+  | Hack.NRAEnvConst d -> fprintf ff "%a" pretty_data d
+  | Hack.NRAEnvBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
+  | Hack.NRAEnvUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
+  | Hack.NRAEnvMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
+  | Hack.NRAEnvMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
+  | Hack.NRAEnvProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
+  | Hack.NRAEnvSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
+  | Hack.NRAEnvDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
+  | Hack.NRAEnvEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	 (pretty_nraenv_aux p sym) a1
 	 (pretty_nraenv_aux p sym) a2
-  | Hack.ANEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
-  | Hack.ANApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
-  | Hack.ANGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
-  | Hack.ANEnv -> fprintf ff "%s" "ENV"
-  | Hack.ANAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
-  | Hack.ANMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
+  | Hack.NRAEnvEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
+  | Hack.NRAEnvApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
+  | Hack.NRAEnvGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  | Hack.NRAEnvEnv -> fprintf ff "%s" "ENV"
+  | Hack.NRAEnvAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
+  | Hack.NRAEnvMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
+  | Hack.NRAEnvFlatMap (a1,a2) -> pretty_nraenv_exp p sym sym.chiflat ff a1 (Some a2)
+  | Hack.NRAEnvJoin (a1,a2,a3) -> pretty_infix_dependent p 5 sym pretty_nraenv_aux sym.join ff a1 a2 a3
+  | Hack.NRAEnvProject (atts,a1) ->
+      fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.bpi (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
+  | Hack.NRAEnvGroupBy (g,atts,a1) ->
+      fprintf ff "@[<hv 0>%a%a%a(%a)@]" pretty_sym sym.gamma (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
 
 (* resets precedence back to 0 *)
 and pretty_nraenv_exp p sym thissym ff a1 oa2 =
@@ -734,6 +752,13 @@ and pretty_nraenv_exp p sym thissym ff a1 oa2 =
 	fprintf ff "@[<hv 3>(%a%a%a%a(@,%a@;<0 -2>))@]" pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nraenv_aux 0 sym) a2
       else
 	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nraenv_aux 0 sym) a2
+
+and pretty_infix_dependent pouter pinner sym callb thissym ff a1 a2 a3 =
+  if pouter > pinner
+  then
+    fprintf ff "@[<hov 0>(%a@ %a%a%a%a@ %a)@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
+  else
+    fprintf ff "@[<hov 0>%a@ %a%a%a%a@ %a@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
 
 
 let pretty_nraenv greek margin a =
@@ -979,7 +1004,7 @@ let pretty_plug_ignore ff a = ()
 
 let pretty_plug_nraenv greek ff a =
   let sym = if greek then greeksym else textsym in
-  pretty_nraenv_aux 0 sym ff a
+  pretty_nraenv_aux 0 sym ff (nraenv_core_to_nraenv a)
 
 (* Pretty RType *)
 
@@ -1106,8 +1131,8 @@ let pretty_query pconf q =
   | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_nra q -> pretty_nra greek margin q
-  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin q
-  | Compiler.Q_nraenv q -> "(* There is no nraenv pretty printer for the moment. *)\n"  (* XXX TOD XXX *)
+  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin (QDriver.nraenv_core_to_nraenv q)
+  | Compiler.Q_nraenv q -> pretty_nraenv greek margin q
   | Compiler.Q_nnrc q -> pretty_nnrc greek margin q
   | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin q
   | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)

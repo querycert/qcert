@@ -116,6 +116,8 @@ Section CompDriver.
 
   Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := algenv_of_nraenv q.
 
+  Definition nraenv_core_to_nraenv (q: algenv) : nraenv := nraenv_of_algenv q.
+
   Definition nraenv_optim (q: nraenv) : nraenv := NRAEnvOptimFunc.toptim_nraenv q.
 
   Definition nra_to_nraenv_core (q: nra) : nraenv_core := algenv_of_alg q.
@@ -677,20 +679,6 @@ Section CompDriver.
     in
     (Q_nraenv_core q) :: queries
 
-  with compile_nraenv (dv: nraenv_driver) (q: nraenv) : list query :=
-    let queries :=
-        match dv with
-        | Dv_nraenv_stop => nil
-        | Dv_nraenv_optim dv =>
-          let q := nraenv_optim q in
-          compile_nraenv dv q
-        | Dv_nraenv_to_nraenv_core dv =>
-          let q := nraenv_to_nraenv_core q in
-          compile_nraenv_core dv q
-        end
-    in
-    (Q_nraenv q) :: queries
-
   with compile_nnrc (dv: nnrc_driver) (q: nnrc) : list query :=
     let queries :=
         match dv with
@@ -745,6 +733,20 @@ Section CompDriver.
         end
     in
     (Q_nnrcmr q) :: queries.
+
+  Fixpoint compile_nraenv (dv: nraenv_driver) (q: nraenv) : list query :=
+    let queries :=
+        match dv with
+        | Dv_nraenv_stop => nil
+        | Dv_nraenv_optim dv =>
+          let q := nraenv_optim q in
+          compile_nraenv dv q
+        | Dv_nraenv_to_nraenv_core dv =>
+          let q := nraenv_to_nraenv_core q in
+          compile_nraenv_core dv q
+        end
+    in
+    (Q_nraenv q) :: queries.
 
   Definition compile_rule (dv: rule_driver) (q: rule) : list query :=
     let queries :=

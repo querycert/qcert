@@ -60,7 +60,7 @@ val string_of_binop : Compiler.binOp -> string
 
 (* Pretty NRA^e *)
 
-val pretty_nraenv : bool -> int -> QLang.nraenv_core -> string
+val pretty_nraenv : bool -> int -> QLang.nraenv -> string
 
 (* Pretty NNRC *)
 
