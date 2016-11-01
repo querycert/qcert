@@ -107,18 +107,19 @@ Section CompDriver.
 
   Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
 
-  Definition nraenv_core_optim (q: nraenv_core) : nraenv_core := TOptimEnvFunc.toptim_nraenv q.
-
-  Definition nraenv_core_to_nnrc (q: nraenv_core) : nnrc :=
-    algenv_to_nnrc q init_vid init_venv.
-
-  Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_algenv q.
-
   Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := algenv_of_nraenv q.
 
   Definition nraenv_core_to_nraenv (q: algenv) : nraenv := nraenv_of_algenv q.
 
   Definition nraenv_optim (q: nraenv) : nraenv := NRAEnvOptimFunc.toptim_nraenv q.
+
+  Definition nraenv_core_optim (q: nraenv_core) : nraenv_core :=
+    nraenv_to_nraenv_core (nraenv_optim (nraenv_core_to_nraenv q)).
+
+  Definition nraenv_core_to_nnrc (q: nraenv_core) : nnrc :=
+    algenv_to_nnrc q init_vid init_venv.
+
+  Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_algenv q.
 
   Definition nra_to_nraenv_core (q: nra) : nraenv_core := algenv_of_alg q.
 
