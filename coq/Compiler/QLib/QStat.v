@@ -24,7 +24,6 @@ Require Import CloudantMR.
 Require Import DNNRC Dataset.
 Require Import CAMPRuntime.
 Require Import ODMGRuntime.
-Require Import TOptimEnvFunc.
 
 Require Import CompilerRuntime.
 Module QStat(runtime:CompilerRuntime).

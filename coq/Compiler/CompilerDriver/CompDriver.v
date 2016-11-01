@@ -53,7 +53,6 @@ Section CompDriver.
   Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
 
   (* Optimizations *)
-  Require Import TOptimEnvFunc.
   Require Import NRAEnvOptimFunc.
   Require Import TRewFunc.
   Require Import DNNRCDatasetRewrites.
@@ -82,7 +81,6 @@ Section CompDriver.
   Context {ftoredop:foreign_to_reduce_op}.
   Context {bm:brand_model}.
   Context {ftyping: foreign_typing}.
-  Context {nraenv_core_logger:optimizer_logger string algenv}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nrc}.
   Context {ftojs:foreign_to_javascript}.

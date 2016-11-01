@@ -214,8 +214,6 @@ MODULES = \
 	Backend/DNNRCDatasetRewrites \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
-	Compiler/Optimizer/ROptimEnvFunc \
-	Compiler/Optimizer/TOptimEnvFunc \
 	Compiler/Optimizer/NRAEnvOptimFunc \
 	Compiler/Optimizer/NRewFunc \
 	Compiler/Optimizer/TRewFunc \

@@ -1165,36 +1165,6 @@ Definition enhanced_to_cloudant_reduce_op
   Axiom OPTIMIZER_LOGGER_token_type : Set.
   Extract Constant OPTIMIZER_LOGGER_token_type => "Util.logger_token_type".
 
-  Axiom OPTIMIZER_LOGGER_nraenv_core_startPass :
-    String.string -> algenv -> OPTIMIZER_LOGGER_token_type.
-
-  Extract Constant OPTIMIZER_LOGGER_nraenv_core_startPass =>
-  "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
-
-  Axiom OPTIMIZER_LOGGER_nraenv_core_step :
-    OPTIMIZER_LOGGER_token_type -> String.string ->
-    algenv -> algenv ->
-    OPTIMIZER_LOGGER_token_type.
-  
-  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_core_step =>
-  "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
-
-  Axiom OPTIMIZER_LOGGER_nraenv_core_endPass :
-    OPTIMIZER_LOGGER_token_type -> algenv -> OPTIMIZER_LOGGER_token_type.
-  
-  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_core_endPass =>
-  "(fun token output -> Logger.log_endPass token output)".
-
-  Instance foreign_nraenv_core_optimizer_logger :
-    optimizer_logger string algenv
-    :=
-      {
-        optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
-        ; logStartPass := OPTIMIZER_LOGGER_nraenv_core_startPass
-        ; logStep :=  OPTIMIZER_LOGGER_nraenv_core_step
-        ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_core_endPass
-      } .
-
   Axiom OPTIMIZER_LOGGER_nraenv_startPass :
     String.string -> nraenv -> OPTIMIZER_LOGGER_token_type.
 
@@ -1456,8 +1426,6 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_cloudant.
   Definition compiler_foreign_to_cloudant : foreign_to_cloudant
     := enhanced_foreign_to_cloudant.
-  Definition compiler_nraenv_core_optimizer_logger : optimizer_logger string algenv
-    := foreign_nraenv_core_optimizer_logger.
   Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
     := foreign_nraenv_optimizer_logger.
   Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
@@ -2454,8 +2422,6 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_cloudant.
   Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
     := enhanced_foreign_to_cloudant.
-  Definition compiler_model_nraenv_core_optimizer_logger : optimizer_logger string algenv
-    := foreign_nraenv_core_optimizer_logger.
   Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
     := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc

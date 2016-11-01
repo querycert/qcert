@@ -37,7 +37,6 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_to_spark : foreign_to_spark.
   Axiom compiler_foreign_cloudant : foreign_cloudant.
   Axiom compiler_foreign_to_cloudant : foreign_to_cloudant.
-  Axiom compiler_nraenv_core_optimizer_logger : optimizer_logger string algenv.
   Axiom compiler_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_nrc_optimizer_logger : optimizer_logger string nrc.
   Axiom compiler_foreign_data_typing : foreign_data_typing.

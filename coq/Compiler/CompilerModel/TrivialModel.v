@@ -340,8 +340,6 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_cloudant.
     Definition compiler_foreign_to_cloudant : foreign_to_cloudant
       := trivial_foreign_to_cloudant.
-    Definition compiler_nraenv_core_optimizer_logger : optimizer_logger string algenv
-      := silent_optimizer_logger string algenv.
     Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
       := silent_optimizer_logger string nraenv.
     Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
@@ -381,8 +379,6 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_cloudant.
     Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
       := trivial_foreign_to_cloudant.
-    Definition compiler_model_nraenv_core_optimizer_logger : optimizer_logger string algenv
-      := silent_optimizer_logger string algenv.
     Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
       := silent_optimizer_logger string nraenv.
     Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc
