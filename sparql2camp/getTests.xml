@@ -1,9 +1,0 @@
-<project name="getTests" default="get">
-	<target name="get">
-		<delete file="data-r2.zip"/>
-		<delete dir="test-suite-archive"/>
-		<get src="https://www.w3.org/2001/sw/DataAccess/tests/data-r2.zip" dest="."/>
-		<unzip src="data-r2.zip" dest="."/>
-		<delete file="data-r2.zip"/>
-	</target>
-</project>
