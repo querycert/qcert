@@ -1,0 +1,18 @@
+<project name="dependencies" default="get">
+
+<property name="repo" value="http://central.maven.org/maven2/"/>
+
+<property name="presto" value="com/facebook/presto/presto-parser/0.152.3/presto-parser-0.152.3.jar"/>
+<property name="guava" value="com/google/guava/guava/19.0/guava-19.0.jar"/>
+<property name="antlr" value="org/antlr/antlr4-runtime/4.5.3/antlr4-runtime-4.5.3.jar"/>
+<property name="slice" value="io/airlift/slice/0.7/slice-0.7.jar"/>
+
+<target name="get">
+	<delete dir="lib"/>
+	<mkdir dir="lib"/>
+	<get src="${repo}${presto}" dest="lib"/>
+	<get src="${repo}${guava}" dest="lib"/>
+	<get src="${repo}${antlr}" dest="lib"/>
+	<get src="${repo}${slice}" dest="lib"/>
+</target>
+</project>
