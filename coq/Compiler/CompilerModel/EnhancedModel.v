@@ -17,7 +17,7 @@
 Require Import List EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToScala ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignToSpark.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignCloudant ForeignToCloudant.
@@ -25,8 +25,9 @@ Require Import CompilerRuntime CompilerModel.
 
 Require Import FloatModelPart StringModelPart. 
 Require Import DateTimeModelPart.
+Require Import SqlDateModelPart.
 Require NNRCMR CloudantMR.
-Require Import OptimizerLogger String RAlgEnv NNRC.
+Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 
 Import ListNotations.
 
@@ -64,6 +65,8 @@ Inductive enhanced_data : Set
   | enhancedtimescale : time_scale -> enhanced_data
   | enhancedtimeduration : TIME_DURATION -> enhanced_data
   | enhancedtimepoint : TIME_POINT -> enhanced_data
+  | enhancedsqldate : SQL_DATE -> enhanced_data
+  | enhancedsqldateinterval : SQL_DATE_INTERVAL -> enhanced_data
 .
 
 Inductive enhanced_type : Set
@@ -75,6 +78,8 @@ Inductive enhanced_type : Set
   | enhancedTimeScale : enhanced_type
   | enhancedTimeDuration : enhanced_type
   | enhancedTimePoint : enhanced_type
+  | enhancedSqlDate : enhanced_type
+  | enhancedSqlDateInterval : enhanced_type
 .
 
 Definition enhanced_type_to_string (et:enhanced_type) : string :=
@@ -86,6 +91,8 @@ Definition enhanced_type_to_string (et:enhanced_type) : string :=
   | enhancedTimeScale => "ETimeScale"
   | enhancedTimeDuration => "ETimeDuration"
   | enhancedTimePoint => "ETimePoint"
+  | enhancedSqlDate => "ESqlDate"
+  | enhancedSqlDateInterval => "ESqlDateInterval"
   end.
 
 Definition string_to_enhanced_type (s:string) : option enhanced_type :=
@@ -97,6 +104,8 @@ Definition string_to_enhanced_type (s:string) : option enhanced_type :=
   | "ETimeScale"%string => Some enhancedTimeScale
   | "ETimeDuration"%string => Some enhancedTimeDuration
   | "ETimePoint"%string => Some enhancedTimePoint
+  | "ESqlDate"%string => Some enhancedSqlDate
+  | "ESqlDateInterval"%string => Some enhancedSqlDateInterval
   | _ => None
   end.
 
@@ -106,6 +115,9 @@ Existing Instance float_foreign_data.
 Existing Instance time_scale_foreign_data.
 Existing Instance time_duration_foreign_data.
 Existing Instance time_point_foreign_data.
+Existing Instance sql_date_foreign_data.
+Existing Instance sql_date_interval_foreign_data.
+
 Program Instance enhanced_foreign_data : foreign_data
   := mk_foreign_data enhanced_data _ _ _ _ _ _.
 Next Obligation.
@@ -139,6 +151,12 @@ Next Obligation.
   - destruct (@equiv_dec _ _ _ (@foreign_data_dec time_point_foreign_data) t t0).
     + left; congruence.
     + right; congruence.
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_foreign_data) s s0).
+    + left; congruence.
+    + right; congruence.
+  - destruct (@equiv_dec _ _ _ (@foreign_data_dec sql_date_interval_foreign_data) s s0).
+    + left; congruence.
+    + right; congruence.
 Defined.
 Next Obligation.
   (* normalized? *)
@@ -148,6 +166,8 @@ Next Obligation.
   - exact (@foreign_data_normalized time_scale_foreign_data t).
   - exact (@foreign_data_normalized time_duration_foreign_data t).
   - exact (@foreign_data_normalized time_point_foreign_data t).
+  - exact (@foreign_data_normalized sql_date_foreign_data s).
+  - exact (@foreign_data_normalized sql_date_interval_foreign_data s).
 Defined.
 Next Obligation.
   destruct a.
@@ -156,6 +176,8 @@ Next Obligation.
   - exact (@foreign_data_normalize_normalizes time_scale_foreign_data t).
   - exact (@foreign_data_normalize_normalizes time_duration_foreign_data t).
   - exact (@foreign_data_normalize_normalizes time_point_foreign_data t).
+  - exact (@foreign_data_normalize_normalizes sql_date_foreign_data s).
+  - exact (@foreign_data_normalize_normalizes sql_date_interval_foreign_data s).
 Defined.
 Next Obligation.
   constructor.
@@ -165,6 +187,8 @@ Next Obligation.
   - exact (toString t).
   - exact (@toString _ (@foreign_data_tostring time_duration_foreign_data) t).
   - exact (@toString _ (@foreign_data_tostring time_point_foreign_data) t).
+  - exact (@toString _ (@foreign_data_tostring sql_date_foreign_data) s).
+  - exact (@toString _ (@foreign_data_tostring sql_date_interval_foreign_data) s).
 Defined.
 
 Definition denhancedfloat f := dforeign (enhancedfloat f).
@@ -173,21 +197,34 @@ Definition denhancedtimescale ts := dforeign (enhancedtimescale ts).
 Definition denhancedtimeduration td := dforeign (enhancedtimeduration td).
 Definition denhancedtimepoint tp := dforeign (enhancedtimepoint tp).
 
+Definition denhancedsqldate td := dforeign (enhancedsqldate td).
+Definition denhancedsqldateinterval td := dforeign (enhancedsqldateinterval td).
+
 Require Import JSON.
 Definition jenhancedfloat f := jforeign (enhancedfloat f).
 Definition jenhancedstring s := jforeign (enhancedstring s).
 Definition jenhancedtimescale ts := jforeign (enhancedtimescale ts).
 Definition jenhancedtimeduration td := jforeign (enhancedtimeduration td).
 Definition jenhancedtimepoint tp := jforeign (enhancedtimepoint tp).
+Definition jenhancedsqldate td := jforeign (enhancedsqldate td).
+Definition jenhancedsqldateinterval td := jforeign (enhancedsqldateinterval td).
+
 
 Inductive enhanced_unary_op
   :=
   | enhanced_unary_float_op : float_unary_op -> enhanced_unary_op
-  | enhanced_unary_time_op : time_unary_op -> enhanced_unary_op.
+  | enhanced_unary_time_op : time_unary_op -> enhanced_unary_op
+  | enhanced_unary_sql_date_op : sql_date_unary_op -> enhanced_unary_op.
 
 Definition ondfloat {A} (f : FLOAT -> A) (d : data) : option A
   := match d with
      | dforeign (enhancedfloat fd) => Some (f fd)
+     | _ => None
+     end.
+
+Definition ondsqldate {A} (f : SQL_DATE -> A) (d : data) : option A
+  := match d with
+     | dforeign (enhancedsqldate fd) => Some (f fd)
      | _ => None
      end.
 
@@ -238,6 +275,17 @@ Definition time_unary_op_interp (op:time_unary_op) (d:data) : option data
      | uop_time_duration_from_string => lift denhancedtimeduration (ondstring TIME_DURATION_from_string d)
      end.
 
+Definition sql_date_unary_op_interp (op:sql_date_unary_op) (d:data) : option data
+  := match op with
+     | uop_sql_get_date_component part =>
+       lift dnat (ondsqldate (SQL_DATE_get_component part) d)
+     | uop_sql_date_from_string =>
+       lift denhancedsqldate (ondstring SQL_DATE_from_string d)
+     | uop_sql_date_interval_from_string =>
+       lift denhancedsqldateinterval (ondstring SQL_DATE_INTERVAL_from_string d)
+     end.
+
+
 Definition enhanced_unary_op_interp
            (br:brand_relation_t)
            (op:enhanced_unary_op)
@@ -245,6 +293,7 @@ Definition enhanced_unary_op_interp
   := match op with
      | enhanced_unary_float_op f => float_unary_op_interp f d
      | enhanced_unary_time_op f => time_unary_op_interp f d
+     | enhanced_unary_sql_date_op f => sql_date_unary_op_interp f d
      end.
 
 Require Import String.
@@ -258,12 +307,15 @@ Next Obligation.
   decide equality.
   - decide equality.
   - decide equality.
+  - decide equality.
+    decide equality.
 Defined.
 Next Obligation.
   constructor; intros op.
   destruct op.
   - exact (float_unary_op_tostring f).
   - exact (time_unary_op_tostring t).
+  - exact (sql_date_unary_op_tostring s).
 Defined.
 Next Obligation.
   destruct op; simpl in H.
@@ -280,6 +332,12 @@ Next Obligation.
     + match_destr_in H; invcs H; repeat constructor.
   - destruct t; simpl in H;
       unfold ondtimepoint, ondstring, denhancedtimepoint, denhancedtimeduration, lift in H; simpl in H;
+        destruct d; simpl in H; try discriminate.
+    + destruct f; invcs H; repeat constructor.
+    + invcs H; repeat constructor.
+    + invcs H; repeat constructor.
+  - destruct s; simpl in H;
+      unfold ondsqldate, denhancedsqldate, denhancedsqldateinterval, lift in H; simpl in H;
         destruct d; simpl in H; try discriminate.
     + destruct f; invcs H; repeat constructor.
     + invcs H; repeat constructor.
@@ -302,6 +360,7 @@ Inductive enhanced_binary_op
   :=
   | enhanced_binary_float_op : float_binary_op -> enhanced_binary_op
   | enhanced_binary_time_op : time_binary_op -> enhanced_binary_op
+  | enhanced_binary_sql_date_op : sql_date_binary_op -> enhanced_binary_op
 .
 
 Definition float_binary_op_interp
@@ -333,6 +392,15 @@ Definition rondbooltimepoint2 (f: TIME_POINT -> TIME_POINT -> bool) (d1 d2:data)
 Definition rondtimepoint2 (f: TIME_POINT -> TIME_POINT -> TIME_POINT) (d1 d2:data) : option data
   := lift denhancedtimepoint (ondtimepoint2 f d1 d2).
 
+Definition ondsqldate2 {A} (f : SQL_DATE -> SQL_DATE -> A) (d1 d2 : data) : option A
+  := match d1, d2 with
+     | dforeign (enhancedsqldate fd1), dforeign (enhancedsqldate fd2) => Some (f fd1 fd2)
+     | _, _ => None
+     end.
+
+Definition rondboolsqldate2 (f: SQL_DATE -> SQL_DATE -> bool) (d1 d2:data) : option data
+  := lift dbool (ondsqldate2 f d1 d2).
+
 Definition time_binary_op_interp
            (op:time_binary_op) (d1 d2:data) : option data
   := match op with
@@ -362,6 +430,29 @@ Definition time_binary_op_interp
      | bop_time_duration_between => lift denhancedtimeduration (ondtimepoint2 TIME_DURATION_between d1 d2)
      end.
 
+Definition sql_date_binary_op_interp
+           (op:sql_date_binary_op) (d1 d2:data) : option data
+  := match op with
+     | bop_sql_date_plus
+       => match d1, d2 with
+       | dforeign (enhancedsqldate tp), dforeign (enhancedsqldateinterval td)
+         => Some (denhancedsqldate (SQL_DATE_plus tp td))
+       | _,_ => None
+       end
+     | bop_sql_date_minus
+       => match d1, d2 with
+       | dforeign (enhancedsqldate tp), dforeign (enhancedsqldateinterval td)
+         => Some (denhancedsqldate (SQL_DATE_minus tp td))
+       | _,_ => None
+       end
+     | bop_sql_date_ne => rondboolsqldate2 SQL_DATE_ne d1 d2
+     | bop_sql_date_lt => rondboolsqldate2 SQL_DATE_lt d1 d2
+     | bop_sql_date_le => rondboolsqldate2 SQL_DATE_le d1 d2
+     | bop_sql_date_gt => rondboolsqldate2 SQL_DATE_gt d1 d2
+     | bop_sql_date_ge => rondboolsqldate2 SQL_DATE_ge d1 d2
+     | bop_sql_date_interval_between => lift denhancedsqldateinterval (ondsqldate2 SQL_DATE_INTERVAL_between d1 d2)
+     end.
+
 Definition enhanced_binary_op_interp
            (br:brand_relation_t)
            (op:enhanced_binary_op)
@@ -369,6 +460,7 @@ Definition enhanced_binary_op_interp
   := match op with
      | enhanced_binary_float_op f => float_binary_op_interp f d1 d2
      | enhanced_binary_time_op f => time_binary_op_interp f d1 d2
+     | enhanced_binary_sql_date_op f => sql_date_binary_op_interp f d1 d2
      end.
 
 Program Instance enhanced_foreign_binary_op : foreign_binary_op
@@ -380,12 +472,14 @@ Next Obligation.
   decide equality.
   - decide equality.
   - decide equality.
+  - decide equality.
 Defined.
 Next Obligation.
   constructor; intros op.
   destruct op.
   - exact (float_binary_op_tostring f).
   - exact (time_binary_op_tostring t).
+  - exact (sql_date_binary_op_tostring s).
 Defined.
 Next Obligation.
   destruct op; simpl in H.
@@ -399,6 +493,14 @@ Next Obligation.
     ; repeat constructor.
   - destruct t; simpl in H;
       unfold rondtimepoint2, rondbooltimepoint2, denhancedtimeduration, lift in H
+      ; destruct d1; simpl in H; try discriminate
+      ; destruct f; simpl in H; try discriminate
+      ; destruct d2; simpl in H; try discriminate
+      ; try (destruct f; simpl in H; try discriminate)
+      ; invcs H
+      ; repeat constructor.
+  - destruct s; simpl in H;
+      unfold rondboolsqldate2, ondsqldate2, denhancedsqldate, lift in H
       ; destruct d1; simpl in H; try discriminate
       ; destruct f; simpl in H; try discriminate
       ; destruct d2; simpl in H; try discriminate
@@ -423,6 +525,8 @@ Definition enhanced_to_java_data
      | enhancedtimescale ts => mk_java_json (time_scale_to_java_string ts)
      | enhancedtimeduration td => mk_java_json (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) td)
      | enhancedtimepoint tp => mk_java_json (@toString _ time_point_foreign_data.(@foreign_data_tostring ) tp)
+     | enhancedsqldate tp => mk_java_json (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) tp)
+     | enhancedsqldateinterval tp => mk_java_json (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) tp)
      end.
 
 Definition enhanced_to_java_unary_op
@@ -434,6 +538,8 @@ Definition enhanced_to_java_unary_op
        float_to_java_unary_op indent eol quotel op d
      | enhanced_unary_time_op op =>
        time_to_java_unary_op indent eol quotel op d
+     | enhanced_unary_sql_date_op op =>
+       sql_date_to_java_unary_op indent eol quotel op d
      end.
 
 Definition enhanced_to_java_binary_op
@@ -445,6 +551,8 @@ Definition enhanced_to_java_binary_op
        float_to_java_binary_op indent eol quotel op d1 d2
      | enhanced_binary_time_op op =>
        time_to_java_binary_op indent eol quotel op d1 d2
+     | enhanced_binary_sql_date_op op =>
+       sql_date_to_java_binary_op indent eol quotel op d1 d2
      end.
 
 Instance enhanced_foreign_to_java :
@@ -463,6 +571,8 @@ Definition enhanced_to_javascript_data
      | enhancedtimescale ts => toString ts
      | enhancedtimeduration td => (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) td)
      | enhancedtimepoint tp => (@toString _ time_point_foreign_data.(@foreign_data_tostring ) tp)
+     | enhancedsqldate tp => (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) tp)
+     | enhancedsqldateinterval tp => (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) tp)
      end.
 
 (* Java equivalent: JavaScriptBackend.foreign_to_javascript_unary_op *)
@@ -475,6 +585,8 @@ Definition enhanced_to_javascript_unary_op
        float_to_javascript_unary_op indent eol quotel op d
      | enhanced_unary_time_op op =>
        time_to_javascript_unary_op indent eol quotel op d
+     | enhanced_unary_sql_date_op op =>
+       sql_date_to_javascript_unary_op indent eol quotel op d
      end.
 
 (* Java equivalent: JavaScriptBackend.foreign_to_javascript_binary_op *)
@@ -487,6 +599,8 @@ Definition enhanced_to_javascript_binary_op
        float_to_javascript_binary_op indent eol quotel op d1 d2
      | enhanced_binary_time_op op =>
        time_to_javascript_binary_op indent eol quotel op d1 d2
+     | enhanced_binary_sql_date_op op =>
+       sql_date_to_javascript_binary_op indent eol quotel op d1 d2
      end.
 
 Instance enhanced_foreign_to_javascript :
@@ -496,6 +610,25 @@ Instance enhanced_foreign_to_javascript :
        enhanced_to_javascript_data
        enhanced_to_javascript_unary_op
        enhanced_to_javascript_binary_op.
+
+Definition enhanced_to_scala_unary_op (op: enhanced_unary_op) (d: string) : string :=
+  match op with
+    | enhanced_unary_float_op op =>
+      float_to_scala_unary_op op d
+    | enhanced_unary_time_op op => "EnhancedModel: Time ops not supported for now."
+    | enhanced_unary_sql_date_op op => "EnhancedModel: SQL date ops not supported for now."
+  end.
+
+Definition enhanced_to_scala_spark_datatype {ftype: foreign_type} (ft: foreign_type_type) : string :=
+  (* AVI: This is obviously not correct. Where is the place I should put this? *)
+  "FloatType".
+
+Instance enhanced_foreign_to_scala {ftype: foreign_type}:
+  @foreign_to_scala enhanced_foreign_runtime _
+  := mk_foreign_to_scala
+       enhanced_foreign_runtime _
+       enhanced_to_scala_unary_op
+       enhanced_to_scala_spark_datatype.
 
 (* TODO: add general support for "tagged" stuff in JSON.
     Like our left/right encoding.  so that we can use it for
@@ -517,6 +650,8 @@ Next Obligation.
   - exact (jstring (toString t)).
   - exact (jstring (@toString _ time_duration_foreign_data.(@foreign_data_tostring ) t)).
   - exact (jstring (@toString _ time_point_foreign_data.(@foreign_data_tostring ) t)).
+  - exact (jstring (@toString _ sql_date_foreign_data.(@foreign_data_tostring ) s)).
+  - exact (jstring (@toString _ sql_date_interval_foreign_data.(@foreign_data_tostring ) s)).
 Defined.
 
   Inductive enhanced_numeric_type :=
@@ -1030,34 +1165,34 @@ Definition enhanced_to_cloudant_reduce_op
   Axiom OPTIMIZER_LOGGER_token_type : Set.
   Extract Constant OPTIMIZER_LOGGER_token_type => "Util.logger_token_type".
 
-  Axiom OPTIMIZER_LOGGER_nra_startPass :
-    String.string -> algenv -> OPTIMIZER_LOGGER_token_type.
+  Axiom OPTIMIZER_LOGGER_nraenv_startPass :
+    String.string -> nraenv -> OPTIMIZER_LOGGER_token_type.
 
-  Extract Constant OPTIMIZER_LOGGER_nra_startPass =>
+  Extract Constant OPTIMIZER_LOGGER_nraenv_startPass =>
   "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
 
-  Axiom OPTIMIZER_LOGGER_nra_step :
+  Axiom OPTIMIZER_LOGGER_nraenv_step :
     OPTIMIZER_LOGGER_token_type -> String.string ->
-    algenv -> algenv ->
+    nraenv -> nraenv ->
     OPTIMIZER_LOGGER_token_type.
   
-  Extract Inlined Constant OPTIMIZER_LOGGER_nra_step =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_step =>
   "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
 
-  Axiom OPTIMIZER_LOGGER_nra_endPass :
-    OPTIMIZER_LOGGER_token_type -> algenv -> OPTIMIZER_LOGGER_token_type.
+  Axiom OPTIMIZER_LOGGER_nraenv_endPass :
+    OPTIMIZER_LOGGER_token_type -> nraenv -> OPTIMIZER_LOGGER_token_type.
   
-  Extract Inlined Constant OPTIMIZER_LOGGER_nra_endPass =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_endPass =>
   "(fun token output -> Logger.log_endPass token output)".
 
-  Instance foreign_nra_optimizer_logger :
-    optimizer_logger string algenv
+  Instance foreign_nraenv_optimizer_logger :
+    optimizer_logger string nraenv
     :=
       {
         optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
-        ; logStartPass := OPTIMIZER_LOGGER_nra_startPass
-        ; logStep :=  OPTIMIZER_LOGGER_nra_step
-        ; logEndPass :=  OPTIMIZER_LOGGER_nra_endPass
+        ; logStartPass := OPTIMIZER_LOGGER_nraenv_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nraenv_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
       } .
 
   Axiom OPTIMIZER_LOGGER_nrc_startPass :
@@ -1102,6 +1237,8 @@ Definition enhanced_type_join (t1 t2:enhanced_type)
      | enhancedTimeScale, enhancedTimeScale => enhancedTimeScale
      | enhancedTimeDuration, enhancedTimeDuration => enhancedTimeDuration
      | enhancedTimePoint, enhancedTimePoint => enhancedTimePoint
+     | enhancedSqlDate, enhancedSqlDate => enhancedSqlDate
+     | enhancedSqlDateInterval, enhancedSqlDateInterval => enhancedSqlDateInterval
      | _, _ => enhancedTop
      end.
 
@@ -1114,6 +1251,8 @@ Definition enhanced_type_meet (t1 t2:enhanced_type)
      | enhancedTimeScale, enhancedTimeScale => enhancedTimeScale
      | enhancedTimeDuration, enhancedTimeDuration => enhancedTimeDuration
      | enhancedTimePoint, enhancedTimePoint => enhancedTimePoint
+     | enhancedSqlDate, enhancedSqlDate => enhancedSqlDate
+     | enhancedSqlDateInterval, enhancedSqlDateInterval => enhancedSqlDateInterval
      | _, _ => enhancedBottom
      end.
 
@@ -1209,6 +1348,8 @@ Inductive enhanced_has_type : enhanced_data -> enhanced_type -> Prop :=
 | enhanced_has_type_timescale (ts:time_scale) : enhanced_has_type (enhancedtimescale ts) enhancedTimeScale
 | enhanced_has_type_timepoint (tp:TIME_POINT) : enhanced_has_type (enhancedtimepoint tp) enhancedTimePoint
 | enhanced_has_type_timeduration (td:TIME_DURATION) : enhanced_has_type (enhancedtimeduration td) enhancedTimeDuration
+| enhanced_has_type_sqldate (tp:SQL_DATE) : enhanced_has_type (enhancedsqldate tp) enhancedSqlDate
+| enhanced_has_type_sqldateinterval (tp:SQL_DATE_INTERVAL) : enhanced_has_type (enhancedsqldateinterval tp) enhancedSqlDateInterval
 .
 
 Definition enhanced_infer_type (d:enhanced_data) : option enhanced_type
@@ -1218,6 +1359,8 @@ Definition enhanced_infer_type (d:enhanced_data) : option enhanced_type
      | enhancedtimescale _ => Some enhancedTimeScale
      | enhancedtimeduration _ => Some enhancedTimeDuration
      | enhancedtimepoint _ => Some enhancedTimePoint
+     | enhancedsqldate _ => Some enhancedSqlDate
+     | enhancedsqldateinterval _ => Some enhancedSqlDateInterval
      end.
 
 Program Instance enhanced_foreign_data_typing :
@@ -1232,6 +1375,8 @@ Next Obligation.
   inversion H; subst;
     simpl; trivial.
   - destruct d; simpl; constructor.
+  - constructor.
+  - constructor.
   - constructor.
   - constructor.
   - constructor.
@@ -1265,6 +1410,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_java.
   Definition compiler_foreign_to_javascript : foreign_to_javascript
     := enhanced_foreign_to_javascript.
+  Definition compiler_foreign_to_scala : foreign_to_scala
+    := enhanced_foreign_to_scala.
   Definition compiler_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
   Definition compiler_foreign_type_to_JSON : foreign_type_to_JSON
@@ -1279,8 +1426,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_cloudant.
   Definition compiler_foreign_to_cloudant : foreign_to_cloudant
     := enhanced_foreign_to_cloudant.
-  Definition compiler_nra_optimizer_logger : optimizer_logger string algenv
-    := foreign_nra_optimizer_logger.
+  Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
+    := foreign_nraenv_optimizer_logger.
   Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
     := foreign_nrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
@@ -1291,6 +1438,8 @@ Definition Float {br:brand_relation} : rtype := Foreign enhancedFloat.
 Definition TimeScale {br:brand_relation} : rtype := Foreign enhancedTimeScale.
 Definition TimeDuration {br:brand_relation} : rtype := Foreign enhancedTimeDuration.
 Definition TimePoint {br:brand_relation} : rtype := Foreign enhancedTimePoint.
+Definition SqlDate {br:brand_relation} : rtype := Foreign enhancedSqlDate.
+Definition SqlDateInterval {br:brand_relation} : rtype := Foreign enhancedSqlDateInterval.
 
 Definition isFloat {model : brand_model}  (τ:rtype) :=
   match proj1_sig τ with
@@ -1313,6 +1462,18 @@ Definition isTimeScale {model : brand_model} (τ:rtype) :=
 Definition isTimeDuration {model : brand_model} (τ:rtype) :=
   match proj1_sig τ with
   | Foreign₀ enhancedTimeDuration => true
+  | _ => false
+  end.
+
+Definition isSqlDate {model : brand_model} (τ:rtype) :=
+  match proj1_sig τ with
+  | Foreign₀ enhancedSqlDate => true
+  | _ => false
+  end.
+
+Definition isSqlDateInterval {model : brand_model} (τ:rtype) :=
+  match proj1_sig τ with
+  | Foreign₀ enhancedSqlDateInterval => true
   | _ => false
   end.
 
@@ -1516,6 +1677,51 @@ Proof.
       repeat constructor].
 Qed.
 
+Inductive sql_date_unary_op_has_type {model:brand_model} :
+  sql_date_unary_op -> rtype -> rtype -> Prop
+  :=
+  | tuop_sql_get_date_component part : sql_date_unary_op_has_type (uop_sql_get_date_component part) SqlDate Nat
+  | tuop_sql_date_from_string : sql_date_unary_op_has_type uop_sql_date_from_string RType.String SqlDate
+  | tuop_sql_date_interval_from_string : sql_date_unary_op_has_type uop_sql_date_interval_from_string RType.String SqlDateInterval
+.
+
+Definition sql_date_unary_op_type_infer {model : brand_model} (op:sql_date_unary_op) (τ₁:rtype) : option rtype :=
+  match op with
+  | uop_sql_get_date_component part =>
+    if isSqlDate τ₁ then Some Nat else None
+  | uop_sql_date_from_string =>
+    if isString τ₁ then Some SqlDate else None
+  | uop_sql_date_interval_from_string =>
+    if isString τ₁ then Some SqlDateInterval else None
+  end.
+
+Definition sql_date_unary_op_type_infer_sub {model : brand_model} (op:sql_date_unary_op) (τ₁:rtype) : option (rtype*rtype) :=
+  match op with
+  | uop_sql_get_date_component part =>
+    enforce_unary_op_schema (τ₁,SqlDate) Nat
+  | uop_sql_date_from_string =>
+    enforce_unary_op_schema (τ₁,RType.String) SqlDate
+  | uop_sql_date_interval_from_string =>
+    enforce_unary_op_schema (τ₁,RType.String) SqlDateInterval
+  end.
+
+Lemma sql_date_unary_op_typing_sound {model : brand_model}
+      (fu : sql_date_unary_op) (τin τout : rtype) :
+  sql_date_unary_op_has_type fu τin τout ->
+  forall din : data,
+    din ▹ τin ->
+    exists dout : data,
+      sql_date_unary_op_interp fu din = Some dout /\ dout ▹ τout.
+Proof.
+  inversion 1; subst;
+    try solve[inversion 1; subst;
+      try invcs H0;
+      try invcs H3;
+      simpl; unfold denhancedsqldate, denhancedsqldateinterval; simpl;
+      eexists; split; try reflexivity;
+      repeat constructor].
+Qed.
+
   Inductive enhanced_unary_op_has_type {model:brand_model} : enhanced_unary_op -> rtype -> rtype -> Prop
     :=
     | tenhanced_unary_float_op fu τin τout:
@@ -1523,12 +1729,16 @@ Qed.
         enhanced_unary_op_has_type (enhanced_unary_float_op fu) τin τout
     | tenhanced_unary_time_op fu τin τout:
         time_unary_op_has_type fu τin τout ->
-        enhanced_unary_op_has_type (enhanced_unary_time_op fu) τin τout.
+        enhanced_unary_op_has_type (enhanced_unary_time_op fu) τin τout
+    | tenhanced_unary_sql_date_op fu τin τout:
+        sql_date_unary_op_has_type fu τin τout ->
+        enhanced_unary_op_has_type (enhanced_unary_sql_date_op fu) τin τout.
 
   Definition enhanced_unary_op_typing_infer {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option rtype :=
     match fu with
     | enhanced_unary_float_op op => float_unary_op_type_infer op τ
     | enhanced_unary_time_op op => time_unary_op_type_infer op τ
+    | enhanced_unary_sql_date_op op => sql_date_unary_op_type_infer op τ
     end.
 
   Lemma enhanced_unary_op_typing_infer_correct
@@ -1562,6 +1772,20 @@ Qed.
         constructor;
         reflexivity.
     - destruct t; simpl in *.
+      + destruct τ₁; simpl in *; try congruence;
+        destruct x; simpl in *; try congruence;
+        destruct ft; simpl in *; try congruence;
+        inversion H; subst; clear H; constructor;
+        rewrite Foreign_canon; constructor.
+      + destruct τ₁; simpl in *; try congruence;
+        destruct x; simpl in *; try congruence;
+        inversion H; subst; clear H; constructor;
+        rewrite String_canon; constructor.
+      + destruct τ₁; simpl in *; try congruence;
+        destruct x; simpl in *; try congruence.
+        inversion H; subst; clear H; constructor.
+        rewrite String_canon; constructor.
+    - destruct s; simpl in *.
       + destruct τ₁; simpl in *; try congruence;
         destruct x; simpl in *; try congruence;
         destruct ft; simpl in *; try congruence;
@@ -1627,6 +1851,26 @@ Qed.
         inversion H0; subst; clear H0;
         inversion H1; subst; clear H1;
         reflexivity.
+    - destruct s; simpl in *;
+      destruct τ₁; simpl in *; try congruence;
+      destruct x; simpl in *; try congruence;
+      unfold isFloat, isNat in *.
+      + destruct ft; simpl in *; try congruence;
+        inversion H; subst; clear H;
+        rewrite Foreign_canon in H0;
+        inversion H0; subst; clear H0;
+        inversion H1; subst; clear H1;
+        reflexivity.
+      + inversion H; subst; clear H;
+        rewrite String_canon in H0;
+        inversion H0; subst; clear H0;
+        inversion H1; subst; clear H1;
+        reflexivity.
+      + inversion H; subst; clear H;
+        rewrite String_canon in H0;
+        inversion H0; subst; clear H0;
+        inversion H1; subst; clear H1;
+        reflexivity.
   Qed.
 
   Lemma enhanced_unary_op_typing_infer_complete
@@ -1654,14 +1898,22 @@ Qed.
       inversion H0; subst; clear H0;
       inversion H2; subst; clear H2.
       + simpl in H; congruence.
+    - destruct s; simpl in *;
+      destruct τ₁; simpl in *; try congruence;
+      destruct x; simpl in *; try congruence;
+      unfold isFloat, isNat in *;
+      unfold not; intros;
+      inversion H0; subst; clear H0;
+      inversion H2; subst; clear H2.
+      + simpl in H; congruence.
   Qed.
 
   Definition enhanced_unary_op_typing_infer_sub {model:brand_model} (fu:enhanced_unary_op) (τ:rtype) : option (rtype*rtype) :=
     match fu with
     | enhanced_unary_float_op op => float_unary_op_type_infer_sub op τ
     | enhanced_unary_time_op op => time_unary_op_type_infer_sub op τ
+    | enhanced_unary_sql_date_op op => sql_date_unary_op_type_infer_sub op τ
     end.
-
     
 Lemma enhanced_unary_op_typing_sound {model : brand_model}
       (fu : foreign_unary_op_type) (τin τout : rtype) :
@@ -1675,6 +1927,7 @@ Proof.
   destruct H.
   - eapply float_unary_op_typing_sound; eauto.
   - eapply time_unary_op_typing_sound; eauto.
+  - eapply sql_date_unary_op_typing_sound; eauto.
 Qed.
 
 Instance enhanced_foreign_unary_op_typing
@@ -1868,6 +2121,84 @@ Definition time_binary_op_type_infer_sub {model : brand_model} (op:time_binary_o
     enforce_binary_op_schema (τ₁,TimePoint) (τ₂,TimePoint) TimeDuration
   end.
 
+Inductive sql_date_binary_op_has_type {model:brand_model} :
+  sql_date_binary_op -> rtype -> rtype -> rtype -> Prop
+  :=
+  | tbop_sql_date_plus :
+      sql_date_binary_op_has_type bop_sql_date_plus SqlDate SqlDateInterval SqlDate 
+  | tbop_sql_date_minus :
+      sql_date_binary_op_has_type bop_sql_date_minus SqlDate SqlDateInterval SqlDate 
+  | tbop_sql_date_ne :
+      sql_date_binary_op_has_type bop_sql_date_ne SqlDate SqlDate Bool 
+  | tbop_sql_date_lt :
+      sql_date_binary_op_has_type bop_sql_date_lt SqlDate SqlDate Bool 
+  | tbop_sql_date_le :
+      sql_date_binary_op_has_type bop_sql_date_le SqlDate SqlDate Bool 
+  | tbop_sql_date_gt :
+      sql_date_binary_op_has_type bop_sql_date_gt SqlDate SqlDate Bool 
+  | tbop_sql_date_ge :
+      sql_date_binary_op_has_type bop_sql_date_ge SqlDate SqlDate Bool
+  | tbop_sql_date_interval_between  :
+      sql_date_binary_op_has_type bop_sql_date_interval_between SqlDate SqlDate SqlDateInterval
+.
+
+Definition sql_date_binary_op_type_infer {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) :=
+  match op with
+  | bop_sql_date_plus =>
+    if isSqlDate τ₁ && isSqlDateInterval τ₂ then Some SqlDate else None
+  | bop_sql_date_minus =>
+    if isSqlDate τ₁ && isSqlDateInterval τ₂ then Some SqlDate else None
+  | bop_sql_date_ne =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
+  | bop_sql_date_lt =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
+  | bop_sql_date_le =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
+  | bop_sql_date_gt =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
+  | bop_sql_date_ge =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some Bool else None
+  | bop_sql_date_interval_between  =>
+    if isSqlDate τ₁ && isSqlDate τ₂ then Some SqlDateInterval else None
+  end.
+
+Lemma sql_date_binary_op_typing_sound {model : brand_model}
+      (fb : sql_date_binary_op) (τin₁ τin₂ τout : rtype) :
+  sql_date_binary_op_has_type fb τin₁ τin₂ τout ->
+  forall din₁ din₂ : data,
+    din₁ ▹ τin₁ ->
+    din₂ ▹ τin₂ ->
+    exists dout : data,
+      sql_date_binary_op_interp fb din₁ din₂ = Some dout /\ dout ▹ τout.
+Proof.
+    inversion 1; subst;
+      inversion 1; subst;
+        inversion 1; subst;
+      try invcs H0;
+      try invcs H1;
+      invcs H3;
+      try invcs H4;
+      simpl; 
+        eexists; split; try reflexivity;
+          repeat constructor.
+Qed.
+           
+Definition sql_date_binary_op_type_infer_sub {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
+  match op with
+  | bop_sql_date_plus =>
+    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDateInterval) SqlDate
+  | bop_sql_date_minus =>
+    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDateInterval) SqlDate
+  | bop_sql_date_ne
+  | bop_sql_date_lt
+  | bop_sql_date_le
+  | bop_sql_date_gt
+  | bop_sql_date_ge =>
+    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) Bool
+  | bop_sql_date_interval_between  =>
+    enforce_binary_op_schema (τ₁,SqlDate) (τ₂,SqlDate) SqlDateInterval
+  end.
+
 Inductive enhanced_binary_op_has_type {model:brand_model} :
   enhanced_binary_op -> rtype -> rtype -> rtype -> Prop
     :=
@@ -1876,12 +2207,16 @@ Inductive enhanced_binary_op_has_type {model:brand_model} :
         enhanced_binary_op_has_type (enhanced_binary_float_op fb) τin₁ τin₂ τout
     | tenhanced_binary_time_op fb τin₁ τin₂ τout:
         time_binary_op_has_type fb τin₁ τin₂ τout ->
-        enhanced_binary_op_has_type (enhanced_binary_time_op fb) τin₁ τin₂ τout.
+        enhanced_binary_op_has_type (enhanced_binary_time_op fb) τin₁ τin₂ τout
+    | tenhanced_binary_sql_date_op fb τin₁ τin₂ τout:
+        sql_date_binary_op_has_type fb τin₁ τin₂ τout ->
+        enhanced_binary_op_has_type (enhanced_binary_sql_date_op fb) τin₁ τin₂ τout.
 
 Definition enhanced_binary_op_typing_infer {model:brand_model} (op:enhanced_binary_op) (τ₁ τ₂:rtype) :=
   match op with
   | enhanced_binary_float_op fb => float_binary_op_type_infer fb τ₁ τ₂
   | enhanced_binary_time_op fb => time_binary_op_type_infer fb τ₁ τ₂
+  | enhanced_binary_sql_date_op fb => sql_date_binary_op_type_infer fb τ₁ τ₂
   end.
 
 Lemma enhanced_binary_op_typing_infer_correct
@@ -1907,6 +2242,18 @@ Proof.
   - destruct t; simpl in *;
     destruct τ₁; destruct τ₂; simpl in *; try discriminate;
          unfold isTimePoint, isTimeScale, isTimeDuration, isNat in *
+         ; destruct x; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; destruct x0; simpl in H; try discriminate
+    ; try (destruct ft; simpl in H; try discriminate)
+    ; invcs H
+    ; constructor
+    ; repeat rewrite Nat_canon
+    ; repeat rewrite Foreign_canon
+    ; constructor.
+  - destruct s; simpl in *;
+    destruct τ₁; destruct τ₂; simpl in *; try discriminate;
+         unfold isSqlDate, isSqlDateInterval, isNat in *
          ; destruct x; simpl in H; try discriminate
     ; destruct ft; simpl in H; try discriminate
     ; destruct x0; simpl in H; try discriminate
@@ -1952,6 +2299,18 @@ Proof.
     ; invcs H0
     ; invcs H1
     ; reflexivity.
+  - destruct s; simpl in *;
+      destruct τ₁; destruct τ₂; simpl in *; try discriminate
+    ; unfold isSqlDate, isSqlDateInterval, isNat in *
+    ; destruct x; simpl in H; try discriminate
+    ; destruct ft; simpl in H; try discriminate
+    ; destruct x0; simpl in H; try discriminate
+    ; try (destruct ft; simpl in H; try discriminate)
+    ; invcs H
+    ; repeat rewrite Foreign_canon in H0
+    ; invcs H0
+    ; invcs H1
+    ; reflexivity.
 Qed.
 
 Lemma enhanced_binary_op_typing_infer_complete
@@ -1966,12 +2325,15 @@ Proof.
     destruct f; simpl in *; invcs H1; simpl in H; try discriminate.
   - intro HH; invcs HH.
     destruct t; simpl in *; invcs H1; simpl in H; try discriminate.
+  - intro HH; invcs HH.
+    destruct s; simpl in *; invcs H1; simpl in H; try discriminate.
 Qed.
 
 Definition enhanced_binary_op_typing_infer_sub {model:brand_model} (op:enhanced_binary_op) (τ₁ τ₂:rtype) :=
   match op with
   | enhanced_binary_float_op fb => float_binary_op_type_infer_sub fb τ₁ τ₂
   | enhanced_binary_time_op fb => time_binary_op_type_infer_sub fb τ₁ τ₂
+  | enhanced_binary_sql_date_op fb => sql_date_binary_op_type_infer_sub fb τ₁ τ₂
   end.
 
 Lemma enhanced_binary_op_typing_sound {model : brand_model}
@@ -1987,6 +2349,7 @@ Proof.
   destruct H.
   - eapply float_binary_op_typing_sound; eauto.
   - eapply time_binary_op_typing_sound; eauto.
+  - eapply sql_date_binary_op_typing_sound; eauto.
 Qed.
 
 Program Instance enhanced_foreign_binary_op_typing
@@ -2043,6 +2406,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_java.
   Definition compiler_model_foreign_to_javascript : foreign_to_javascript
     := enhanced_foreign_to_javascript.
+  Definition compiler_model_foreign_to_scala : foreign_to_scala
+    := enhanced_foreign_to_scala.
   Definition compiler_model_foreign_to_JSON : foreign_to_JSON
     := enhanced_foreign_to_JSON.
   Definition compiler_model_foreign_type_to_JSON : foreign_type_to_JSON
@@ -2057,8 +2422,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_cloudant.
   Definition compiler_model_foreign_to_cloudant : foreign_to_cloudant
     := enhanced_foreign_to_cloudant.
-  Definition compiler_model_nra_optimizer_logger : optimizer_logger string algenv
-    := foreign_nra_optimizer_logger.
+  Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
+    := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc
     := foreign_nrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing
@@ -2136,6 +2501,17 @@ Module CompEnhanced.
       Definition dtimepoint (tp:TIME_POINT) : data
         := dforeign (enhancedtimepoint tp).
 
+      Definition sql_date_part := sql_date_component.
+      Definition sql_date_day : sql_date_part := sql_date_DAY.
+      Definition sql_date_month : sql_date_part := sql_date_MONTH.
+      Definition sql_date_year : sql_date_part := sql_date_YEAR.
+
+      Definition dsql_date (d:SQL_DATE) : data
+        := dforeign (enhancedsqldate d).
+
+      Definition dsql_date_interval (d:SQL_DATE_INTERVAL) : data
+        := dforeign (enhancedsqldateinterval d).
+
     End Data.
 
     Module Ops.
@@ -2177,6 +2553,13 @@ Module CompEnhanced.
         Definition time_duration_from_string
           := AForeignUnaryOp (enhanced_unary_time_op uop_time_duration_from_string).
 
+        Definition sql_get_date_component (component:sql_date_component)
+          := AForeignUnaryOp (enhanced_unary_sql_date_op (uop_sql_get_date_component component)).
+        Definition sql_date_from_string
+          := AForeignUnaryOp (enhanced_unary_sql_date_op uop_sql_date_from_string).
+        Definition sql_date_interval_from_string
+          := AForeignUnaryOp (enhanced_unary_sql_date_op uop_sql_date_interval_from_string).
+
         (* for coq style syntax *)
         Definition AFloatNeg := float_neg.
         Definition AFloatSqrt := float_sqrt.
@@ -2198,6 +2581,10 @@ Module CompEnhanced.
         Definition ATimeFromString := time_from_string.
         Definition ATimeDurationFromString := time_duration_from_string.
 
+        Definition ASqlGetDateComponent := sql_get_date_component.
+        Definition ASqlDateFromString := sql_date_from_string.
+        Definition ASqlDateIntervalFromString := sql_date_interval_from_string.
+        
       End Unary.
       
       Module Binary.
@@ -2246,6 +2633,24 @@ Module CompEnhanced.
           := AForeignBinaryOp (enhanced_binary_time_op (bop_time_duration_from_scale)).               
         Definition time_duration_between 
           := AForeignBinaryOp (enhanced_binary_time_op (bop_time_duration_between)).
+
+        Definition sql_date_plus
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_plus).
+        Definition sql_date_minus
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_minus).
+        Definition sql_date_ne 
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_ne).
+        Definition sql_date_lt 
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_lt).
+        Definition sql_date_le 
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_le).
+        Definition sql_date_gt 
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_gt).
+        Definition sql_date_ge 
+          := AForeignBinaryOp (enhanced_binary_sql_date_op bop_sql_date_ge).
+
+        Definition sql_date_interval_between 
+          := AForeignBinaryOp (enhanced_binary_sql_date_op (bop_sql_date_interval_between)).
         
         (* for coq style syntax *)
         Definition AFloatPlus := float_plus.
@@ -2271,7 +2676,17 @@ Module CompEnhanced.
 
         Definition ATimeDurationFromScale := time_duration_from_scale.
         Definition ATimeDurationBetween := time_duration_between.
-        
+
+        Definition ASqlDatePlus := sql_date_plus.
+        Definition ASqlDateMinus := sql_date_minus.
+        Definition ASqlDateNe := sql_date_ne.
+        Definition ASqlDateLt := sql_date_lt.
+        Definition ASqlDateLe := sql_date_le.
+        Definition ASqlDateGt := sql_date_gt.
+        Definition ASqlDateGe := sql_date_ge.
+
+        Definition ASqlDateIntervalBetween := sql_date_interval_between.
+
       End Binary.
     End Ops.
   End Enhanced.

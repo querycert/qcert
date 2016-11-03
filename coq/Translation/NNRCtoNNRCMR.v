@@ -81,27 +81,12 @@ Section NNRCtoNNRCMR.
     | None => None
     end.
 
-  Definition load_init_env (initunit: var) (vars_loc: list (var * dlocalization)) (env: bindings) : option nrcmr_env :=
-    let one (x_loc: var * dlocalization) :=
-        let (x, loc) := x_loc in
-        match lookup equiv_dec env x with
-        | Some d =>
-          match loc with
-          | Vlocal => Some (x, Dlocal d)
-          | Vdistributed =>
-            match d with
-            | dcoll coll => Some (x, Ddistr coll)
-            | _ => None
-            end
-          end
-        | None => None
-        end
+  Definition load_init_env (initunit: var) (vars_loc: list (var * dlocalization)) (env: list (string*data)) : option (list (string*ddata)) :=
+    let add_initunit (initunit:var) (env:list (string*ddata)) :=
+        (initunit, Dlocal dunit) :: env
     in
-    let mr_env := rmap one vars_loc in
-    match mr_env with
-    | Some env => Some ((initunit, Dlocal dunit) :: env)
-    | None => None
-    end.
+    let mr_env := mkDistConstants vars_loc env in
+    lift (add_initunit initunit) mr_env.
 
   Definition load_init_env_success initunit vars_loc nrc_env mr_env :=
     load_init_env initunit vars_loc nrc_env = Some mr_env /\
@@ -122,7 +107,142 @@ Section NNRCtoNNRCMR.
     unfold load_init_env_success in Hmr_env.
     destruct Hmr_env.
     destruct H0.
-    unfold load_init_env in H.
+    unfold load_init_env, mkDistConstants in H.
+    assert (@rmap (prod string dlocalization)
+              (prod string (@ddata (@foreign_runtime_data fruntime)))
+              (fun x_loc : prod string dlocalization =>
+               match
+                 x_loc
+                 return
+                   (option
+                      (prod string
+                         (@ddata (@foreign_runtime_data fruntime))))
+               with
+               | pair x loc =>
+                   match
+                     @lookup string
+                       (@data (@foreign_runtime_data fruntime))
+                       (@equiv_dec string (@eq string)
+                          (@eq_equivalence string) string_eqdec) nrc_env x
+                     return
+                       (option
+                          (prod string
+                             (@ddata (@foreign_runtime_data fruntime))))
+                   with
+                   | Some d =>
+                       match
+                         loc
+                         return
+                           (option
+                              (prod string
+                                 (@ddata (@foreign_runtime_data fruntime))))
+                       with
+                       | Vlocal =>
+                           @Some
+                             (prod string
+                                (@ddata (@foreign_runtime_data fruntime)))
+                             (@pair string
+                                (@ddata (@foreign_runtime_data fruntime))
+                                x
+                                (@Dlocal (@foreign_runtime_data fruntime)
+                                   d))
+                       | Vdistr =>
+                           match
+                             d
+                             return
+                               (option
+                                  (prod string
+                                     (@ddata
+                                        (@foreign_runtime_data fruntime))))
+                           with
+                           | dunit =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dnat _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dbool _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dstring _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dcoll coll =>
+                               @Some
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                                 (@pair string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)) x
+                                    (@Ddistr
+                                       (@foreign_runtime_data fruntime)
+                                       coll))
+                           | drec _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dleft _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dright _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dbrand _ _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           | dforeign _ =>
+                               @None
+                                 (prod string
+                                    (@ddata
+                                       (@foreign_runtime_data fruntime)))
+                           end
+                       end
+                   | None =>
+                       @None
+                         (prod string
+                            (@ddata (@foreign_runtime_data fruntime)))
+                   end
+               end) vars_loc
+              = (rmap
+          (fun x_loc : var * dlocalization =>
+           let (x, loc) := x_loc in
+           match lookup equiv_dec nrc_env x with
+           | Some d =>
+               match loc with
+               | Vlocal => Some (x, Dlocal d)
+               | Vdistr =>
+                   match d with
+                   | dunit => None
+                   | dnat _ => None
+                   | dbool _ => None
+                   | dstring _ => None
+                   | dcoll coll => Some (x, Ddistr coll)
+                   | drec _ => None
+                   | dleft _ => None
+                   | dright _ => None
+                   | dbrand _ _ => None
+                   | dforeign _ => None
+                   end
+               end
+           | None => None
+           end) vars_loc)) by reflexivity.
+    rewrite H2 in *; clear H2.
     destruct (rmap
           (fun x_loc : var * dlocalization =>
            let (x, loc) := x_loc in
@@ -145,7 +265,7 @@ Section NNRCtoNNRCMR.
                    end
                end
            | None => None
-           end) vars_loc); try congruence.
+           end) vars_loc); simpl in *; try congruence.
     inversion H.
     simpl.
     dest_eqdec; try congruence.
@@ -326,7 +446,7 @@ Section NNRCtoNNRCMR.
       nrcmr_eval h mr_env (nnrcmr_of_nnrc_with_one_free_var n x_loc free_vars_loc output).
   Proof.
     intros.
-    unfold load_init_env_success in Hmr_env.
+    unfold load_init_env_success, mkDistConstants in Hmr_env.
     destruct Hmr_env.
     destruct H0.
     unfold nnrcmr_of_nnrc_with_one_free_var.
@@ -361,12 +481,19 @@ Section NNRCtoNNRCMR.
       * apply nrc_eval_equiv_free_in_env; intros.
         simpl.
         dest_eqdec; try congruence.
-        specialize (Hfv x0).
+        specialize (Hfv v).
         simpl in *.
         specialize (Hfv H2).
-        congruence.
+        auto.
+        specialize (Hfv x0).
+        specialize (Hfv H2).
+        simpl in *. congruence.
       * destruct (nrc_eval h nrc_env n);
-          simpl; try congruence.
+        simpl; try congruence.
+        assert (@lookup var (@ddata (@foreign_runtime_data fruntime))
+            (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec)
+            mr_env output = lookup equiv_dec mr_env output) by reflexivity.
+        rewrite H2; clear H2.
         rewrite Houtput; simpl.
         unfold mr_last_eval; simpl.
         case (equiv_dec output output);
@@ -411,6 +538,10 @@ Section NNRCtoNNRCMR.
       * rewrite Heq.
         destruct (nrc_eval h nrc_env n);
           simpl; try congruence.
+        assert (@lookup var (@ddata (@foreign_runtime_data fruntime))
+            (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec)
+            mr_env output = lookup equiv_dec mr_env output) by reflexivity.
+        rewrite H2; clear H2.
         rewrite Houtput; simpl.
         unfold mr_last_eval; simpl.
         case (equiv_dec output output);

@@ -38,7 +38,7 @@ val parse_oql_from_file : string -> QLang.oql
 val parse_sexp_from_file : string -> SExp.sexp
 val parse_io_sexp_from_file : string -> QData.data
 val parse_camp_sexp_from_file : string -> QLang.camp
-val parse_nraenv_sexp_from_file : string -> QLang.nraenv
+val parse_nraenv_sexp_from_file : string -> QLang.nraenv_core
 val parse_nnrc_sexp_from_file : string -> QLang.nnrc
 val parse_nnrcmr_sexp_from_file : string -> QLang.nnrcmr
 val parse_cldmr_sexp_from_file : string -> QLang.cldmr

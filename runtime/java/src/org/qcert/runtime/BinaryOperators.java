@@ -242,4 +242,30 @@ public class BinaryOperators {
 		return new JsonPrimitive(asDouble(e1)>=asDouble(e2));
 	}
 
+	
+	public static JsonElement sql_date_plus(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+	public static JsonElement sql_date_minus(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+	public static JsonElement sql_date_ne(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+	public static JsonElement sql_date_lt(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+	public static JsonElement sql_date_le(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+		public static JsonElement sql_date_gt(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+	public static JsonElement sql_date_ge(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+	public static JsonElement sql_date_interval_between(JsonElement e1, JsonElement e2) {
+		return null;
+	}
+
 }

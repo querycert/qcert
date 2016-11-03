@@ -42,6 +42,7 @@ Section Dataset.
   | CLit   : data * rtype₀ -> column
   | CPlus  : column -> column -> column
   | CEq    : column -> column -> column
+  | CLessThan : column -> column -> column
   | CNeg   : column -> column
   (* NOTE we actually codegen to a UDF for this, not Spark's printing *)
   | CToString : column -> column
@@ -86,6 +87,8 @@ Section Dataset.
          * Spark has a three-valued logic, meaning special treatment for NULL.
          * In contrast to QCert it also does not deal with brands, bags, open records, ... *)
         lift2 (fun x y => dbool (if data_eq_dec x y then true else false)) (fc c1) (fc c2)
+      | CLessThan c1 c2 =>
+        None (* TODO *)
       | CToString c1 =>
         lift (compose dstring dataToString) (fc c1)
       | CSConcat c1 c2 =>

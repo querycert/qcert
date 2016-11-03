@@ -146,6 +146,12 @@ Section TOpsInferSub.
       | ADistinct =>
         let τ₁' := τ₁ ⊔ (Coll ⊥) in
         lift (fun τ => (Coll τ, τ₁')) (tuncoll τ₁')
+      | AOrderBy sl =>
+        let τ₁' := τ₁ ⊔ (Coll ⊥) in
+        match (tunrecproject (List.map fst sl) τ₁') with
+        | Some _ => Some (τ₁, τ₁')
+        | None => None
+        end
       | ARec s => Some (Rec Closed ((s, τ₁)::nil) eq_refl, τ₁)
         (* Note that ⊥ does not get further constrained by these *)
       | ADot s =>
@@ -172,6 +178,14 @@ Section TOpsInferSub.
         else None
       | AToString =>
         Some (String, τ₁)
+      | ASubstring _ _ =>
+        if (subtype_dec τ₁ String)
+        then Some (String, String)
+        else None
+      | ALike _ _ =>
+        if (subtype_dec τ₁ String)
+        then Some (Bool, String)
+        else None
       | ALeft =>
         Some (Either τ₁ ⊥, τ₁)
       | ARight =>

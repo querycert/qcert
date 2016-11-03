@@ -769,7 +769,20 @@ Section RAssoc.
         apply lookup_incl_part in eqq.
         destruct eqq; intuition.
     Defined.
-    
+
+    Lemma lookup_incl_cons_l_nin (l1 l2:list (A*B)) x y :
+      lookup_incl l1 l2 ->
+      ~ In x (domain l1) ->
+      lookup_incl l1 ((x,y)::l2).
+    Proof.
+      unfold lookup_incl; simpl; intros.
+      match_destr; unfold Equivalence.equiv in *; subst.
+      - apply lookup_in in H1.
+        apply in_dom in H1.
+        intuition.
+      - auto.
+    Qed.
+
     Lemma lookup_remove_duplicate l v x l' x' l'' :
       lookup_equiv
         (l ++ (v,x)::l' ++ (v,x')::l'')
@@ -1085,7 +1098,7 @@ Section RAssoc.
       rewrite (lookup_diff_some2 dec l₁ H0) in H.
       congruence.
     Qed.
-
+    
   End ldiff.
 
   Section substlist.

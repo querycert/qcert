@@ -45,9 +45,12 @@ MODULES = \
 	Basic/Data/RData \
 	Basic/Data/RDataNorm \
 	Basic/Data/RRelation \
+	Basic/Data/RDataSort \
 	Basic/Data/RGroupBy \
 	Basic/Data/DData \
 	Basic/Data/DDataNorm \
+	Basic/Env/RConstants \
+	Basic/Env/DConstants \
 	Basic/Operators/RUtilOps \
 	Basic/Operators/ForeignOps \
 	Basic/Operators/RUnaryOps \
@@ -108,13 +111,14 @@ MODULES = \
 	NRAEnv/Algebra/RAlgEnvSize \
 	NRAEnv/Algebra/RAlgEnvIgnore \
 	NRAEnv/Algebra/RAlgEnvEq \
-        NRAEnv/Algebra/RAlgEnvExt \
-        NRAEnv/Algebra/RAlgEnvExtEq \
+        NRAEnv/Extended/NRAEnv \
+        NRAEnv/Extended/NRAEnvEq \
 	NRAEnv/Typing/TAlgEnv \
 	NRAEnv/Typing/TAlgEnvInfer \
 	NRAEnv/Typing/TAlgEnvIgnore \
         NRAEnv/Typing/TAlgEnvEq \
-	NRAEnv/Typing/TAlgEnvExt \
+	NRAEnv/Typing/TNRAEnv \
+	NRAEnv/Typing/TNRAEnvEq \
 	NRAEnv/Context/RAlgEnvContext \
 	NRAEnv/Context/RAlgEnvContextLift \
 	NRAEnv/Optim/ROptimEnv \
@@ -170,6 +174,7 @@ MODULES = \
 	Translation/PatterntoNRA \
 	Translation/PatterntoNRAEnv \
 	Translation/PatternSugartoNRA \
+	Translation/PatternSugartoNRAEnv \
 	Translation/RuletoNRA \
 	Translation/RuletoNRAEnv \
 	Translation/TNRAtoNNRC \
@@ -187,12 +192,14 @@ MODULES = \
 	Frontend/ODMG/OQLtoNRAEnv \
 	Frontend/ODMG/TOQL \
 	Frontend/ODMGRuntime \
+	Frontend/SQL/SQL \
 	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignTypeToJSON \
 	Backend/ForeignCloudant \
 	Backend/ForeignToJava \
 	Backend/ForeignToJavascript \
+	Backend/ForeignToScala \
 	Backend/CloudantKV \
 	Backend/CloudantMR \
 	Backend/ForeignToCloudant \
@@ -207,8 +214,7 @@ MODULES = \
 	Backend/DNNRCDatasetRewrites \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
-	Compiler/Optimizer/ROptimEnvFunc \
-	Compiler/Optimizer/TOptimEnvFunc \
+	Compiler/Optimizer/NRAEnvOptimFunc \
 	Compiler/Optimizer/NRewFunc \
 	Compiler/Optimizer/TRewFunc \
 	Compiler/CompilerModel/CompilerRuntime \
@@ -216,17 +222,20 @@ MODULES = \
 	Compiler/CompilerModel/FloatModelPart \
 	Compiler/CompilerModel/StringModelPart \
 	Compiler/CompilerModel/DateTimeModelPart \
+	Compiler/CompilerModel/SqlDateModelPart \
 	Compiler/CompilerModel/EnhancedModel \
 	Compiler/CompilerModel/TrivialModel \
 	Compiler/CompilerDriver/CompLang \
 	Compiler/CompilerDriver/CompEnv \
 	Compiler/CompilerDriver/CompDriver \
 	Compiler/CompilerDriver/CompStat \
+	Compiler/CompilerDriver/CompEval \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QPattern \
 	Compiler/QLib/QRule \
 	Compiler/QLib/QOQL \
+	Compiler/QLib/QSQL \
 	Compiler/QLib/QLambdaNRA \
 	Compiler/QLib/QLang \
 	Compiler/QLib/QDriver \
@@ -245,6 +254,7 @@ MODULES = \
 	Tests/CompilerTest \
 	Tests/MRTest \
 	Tests/OQLTest \
+	Tests/SQLTest \
 	Tests/LambdaAlgTests
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))

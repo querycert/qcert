@@ -55,7 +55,9 @@ let get_margin conf = conf.margin
 
 type nra_sym =
     { chi: (string*int);
+      chiflat: (string*int);
       chie: (string*int);
+      join: (string*int);
       djoin: (string*int);
       times: (string*int);
       sigma: (string*int);
@@ -74,6 +76,8 @@ type nra_sym =
       circe: (string*int);
       sharp: (string*int);
       pi: (string*int);
+      bpi: (string*int);
+      gamma: (string*int);
       cup: (string*int);
       vee: (string*int);
       wedge: (string*int);
@@ -85,7 +89,9 @@ type nra_sym =
 
 let textsym =
   { chi = ("Map", 3);
+    chiflat = ("FlatMap", 7);
     chie = ("Map^e", 5);
+    join = ("Join", 4);
     djoin = ("DJoin", 5);
     times = ("x", 1);
     sigma = ("Select", 6);
@@ -103,7 +109,9 @@ let textsym =
     circ = ("o", 1);
     circe = ("o^e", 3);
     sharp = ("#", 1);
-    pi = ("Project", 7);
+    pi = ("project", 7);
+    bpi = ("Project", 7);
+    gamma = ("Group", 7);
     cup = ("U",1);
     vee = ("\\/",2);
     wedge = ("/\\",2);
@@ -114,7 +122,9 @@ let textsym =
     bot = ("Bot",3) }
 let greeksym =
   { chi = ("χ", 1);
+    chiflat = ("χᶠ", 2);
     chie = ("χᵉ", 2);
+    join = ("⋈", 1);
     djoin = ("⋈ᵈ", 2);
     times = ("×", 1);
     sigma = ("σ", 1);
@@ -133,6 +143,8 @@ let greeksym =
     circe = ("∘ᵉ", 2);
     sharp = ("♯", 1);
     pi = ("π", 1);
+    bpi = ("Π", 1);
+    gamma = ("Γ", 1);
     cup = ("∪",1);
     vee = ("∨",1);
     wedge = ("∧",1);
@@ -164,6 +176,8 @@ let string_of_foreign_data (fd:Hack.enhanced_data) : string =
   | Hack.Enhancedtimescale ts -> timescale_as_string ts
   | Hack.Enhancedtimeduration td -> raise Not_found
   | Hack.Enhancedtimepoint tp -> raise Not_found
+  | Hack.Enhancedsqldate td -> raise Not_found
+  | Hack.Enhancedsqldateinterval tp -> raise Not_found
 
 let foreign_data_of_string s =
   try
@@ -198,6 +212,8 @@ let pretty_foreign_data ff fd =
   | Hack.Enhancedtimescale ts -> pretty_timescale ff ts
   | Hack.Enhancedtimeduration td -> raise Not_found
   | Hack.Enhancedtimepoint tp -> raise Not_found
+  | Hack.Enhancedsqldate td -> raise Not_found
+  | Hack.Enhancedsqldateinterval tp -> raise Not_found
 
 let rec pretty_names ff nl =
   match nl with
@@ -280,6 +296,12 @@ let pretty_unarith p sym callb ff ua a =
   | Hack.ArithLog2 -> pretty_unary_exp sym callb "log2" ff a
   | Hack.ArithSqrt -> pretty_unary_exp sym callb "sqrt" ff a
 
+let sql_date_component_to_string part =
+  match part with
+  | Hack.Sql_date_DAY -> "DAY"
+  | Hack.Sql_date_MONTH -> "MONTH"
+  | Hack.Sql_date_YEAR -> "YEAR"
+
 let string_of_foreign_unop fu : string =
   match fu with
   | Hack.Enhanced_unary_float_op Hack.Uop_float_neg -> "Fneg"
@@ -299,7 +321,10 @@ let string_of_foreign_unop fu : string =
   | Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale -> "TimeToScale"
   | Hack.Enhanced_unary_time_op Hack.Uop_time_from_string -> "TimeFromString"
   | Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string -> "TimeDurationFromString"
-
+  | Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component part) -> "(SqlGetDateComponent " ^ (sql_date_component_to_string part) ^ ")"
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_from_string -> "SqlDateFromString"
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_interval_from_string -> "SqlDateIntervalFromString"
+									    
 let foreign_unop_of_string s =
   match s with
   | "Fneg" -> Hack.Enhanced_unary_float_op Hack.Uop_float_neg
@@ -319,6 +344,12 @@ let foreign_unop_of_string s =
   | "TimeToScale" -> Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale
   | "TimeFromString" -> Hack.Enhanced_unary_time_op Hack.Uop_time_from_string
   | "TimeDurationFromString" -> Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string
+  | "(SqlGetDateComponent DAY)"->  Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component Hack.Sql_date_DAY)
+  | "(SqlGetDateComponent MONTH)"->  Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component Hack.Sql_date_MONTH)
+  | "(SqlGetDateComponent YEAR)"->  Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component Hack.Sql_date_YEAR)
+  | "SqlDateFromString" -> Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_from_string
+  | "SqlDateIntervalFromString" -> Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_interval_from_string
+
   | _ -> raise Not_found
 
 let pretty_foreign_unop p sym callb ff fu a =
@@ -340,6 +371,9 @@ let pretty_foreign_unop p sym callb ff fu a =
   | Hack.Enhanced_unary_time_op Hack.Uop_time_to_scale -> pretty_unary_exp sym callb "TimeToScale" ff a
   | Hack.Enhanced_unary_time_op Hack.Uop_time_from_string -> pretty_unary_exp sym callb "TimeFromString" ff a
   | Hack.Enhanced_unary_time_op Hack.Uop_time_duration_from_string -> pretty_unary_exp sym callb "TimeDurationFromString" ff a
+  | Hack.Enhanced_unary_sql_date_op (Hack.Uop_sql_get_date_component part) -> pretty_unary_exp sym callb ("(SqlGetDateComponent " ^ sql_date_component_to_string part ^ ")") ff a
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_from_string -> pretty_unary_exp sym callb "SqlDateFromString" ff a
+  | Hack.Enhanced_unary_sql_date_op Hack.Uop_sql_date_interval_from_string -> pretty_unary_exp sym callb "SqlDateIntervalFromString" ff a
 
 let pretty_unop p sym callb ff u a =
   match u with
@@ -372,9 +406,16 @@ let pretty_unop p sym callb ff u a =
   | Hack.ARecProject atts ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.pi (pretty_squared_names sym) atts (callb 0 sym) a
   | Hack.ADistinct -> pretty_unary_exp sym callb "distinct" ff a
+  | Hack.AOrderBy atts ->
+      fprintf ff "@[<hv 0>%s%a(%a)@]" "sort" (pretty_squared_names sym) (List.map fst atts) (callb 0 sym) a
   | Hack.ASum -> pretty_unary_exp sym callb "sum" ff a
   | Hack.AArithMean -> pretty_unary_exp sym callb "avg" ff a
   | Hack.AToString -> pretty_unary_exp sym callb "toString" ff a
+  | Hack.ASubstring (n1,None) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^"]") ff a
+  | Hack.ASubstring (n1,Some n2) -> pretty_unary_exp sym callb ("substring["^(string_of_int n1)^","^(string_of_int n2)^"]") ff a
+  | Hack.ALike (n1,None) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^"]") ff a
+  (* for some reason using String.str gives a compile error *)
+  | Hack.ALike (n1,Some n2) -> pretty_unary_exp sym callb ("like["^(Util.string_of_char_list n1)^" ESCAPE "^(Util.string_of_char_list [n2])^"]") ff a
   (* resets precedence back to 0 *)
   | Hack.ACast brands -> fprintf ff "@[<hv 0>%a%a(%a)@]" (pretty_sharp sym) "cast" (pretty_squared_names sym) brands (callb p sym) a
   | Hack.AUnbrand ->
@@ -476,6 +517,14 @@ let string_of_foreign_binop fb =
   | Hack.Enhanced_binary_time_op Hack.Bop_time_ge -> "time_ge"
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_from_scale -> "time_duration_from_scale"
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between -> "time_duration_between"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_plus -> "sql_date_plus"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_minus -> "sql_date_minus"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ne -> "sql_date_ne"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_lt -> "sql_date_lt"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_le -> "sql_date_le"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_gt -> "sql_date_gt"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ge -> "sql_date_ge"
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_interval_between -> "sql_date_interval_between"
 
 let foreign_binop_of_string fb =
   match fb with
@@ -500,6 +549,13 @@ let foreign_binop_of_string fb =
   | "time_ge" -> Hack.Enhanced_binary_time_op Hack.Bop_time_ge
   | "time_duration_from_scale" -> Hack.Enhanced_binary_time_op Hack.Bop_time_duration_from_scale
   | "time_duration_between" -> Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between
+  | "sql_date_plus" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_plus
+  | "sql_date_ne" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ne
+  | "sql_date_lt" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_lt
+  | "sql_date_le" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_le
+  | "sql_date_gt" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_gt
+  | "sql_date_ge" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ge
+  | "sql_date_interval_between" -> Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_interval_between
   | _ -> raise Not_found
 
 let pretty_foreign_binop p sym callb ff fb a1 a2 =
@@ -546,6 +602,22 @@ let pretty_foreign_binop p sym callb ff fb a1 a2 =
      pretty_infix_exp p 18 sym callb ("TD_fs",1) ff a1 a2
   | Hack.Enhanced_binary_time_op Hack.Bop_time_duration_between ->
      pretty_infix_exp p 18 sym callb ("TD_be",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_plus ->
+     pretty_infix_exp p 18 sym callb ("SD+",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_minus ->
+     pretty_infix_exp p 18 sym callb ("SD-",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ne ->
+     pretty_infix_exp p 18 sym callb ("SD!=",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_lt ->
+     pretty_infix_exp p 18 sym callb ("SD<",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_le ->
+     pretty_infix_exp p 18 sym callb ("SD<=",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_gt ->
+     pretty_infix_exp p 18 sym callb ("SD>",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_ge ->
+     pretty_infix_exp p 18 sym callb ("SD>=",1) ff a1 a2
+  | Hack.Enhanced_binary_sql_date_op Hack.Bop_sql_date_interval_between ->
+     pretty_infix_exp p 18 sym callb ("SDD_be",1) ff a1 a2
 
 let string_of_binop b =
   match b with
@@ -639,25 +711,31 @@ let pretty_nra greek margin a =
 
 let rec pretty_nraenv_aux p sym ff a =
   match a with
-  | Hack.ANID -> fprintf ff "%s" "ID"
-  | Hack.ANConst d -> fprintf ff "%a" pretty_data d
-  | Hack.ANBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
-  | Hack.ANUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
-  | Hack.ANMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
-  | Hack.ANMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
-  | Hack.ANProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
-  | Hack.ANSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
-  | Hack.ANDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
-  | Hack.ANEither (a1,a2) ->
+  | Hack.NRAEnvID -> fprintf ff "%s" "ID"
+  | Hack.NRAEnvConst d -> fprintf ff "%a" pretty_data d
+  | Hack.NRAEnvBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
+  | Hack.NRAEnvUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
+  | Hack.NRAEnvMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
+  | Hack.NRAEnvMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
+  | Hack.NRAEnvProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
+  | Hack.NRAEnvSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
+  | Hack.NRAEnvDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
+  | Hack.NRAEnvEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	 (pretty_nraenv_aux p sym) a1
 	 (pretty_nraenv_aux p sym) a2
-  | Hack.ANEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
-  | Hack.ANApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
-  | Hack.ANGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
-  | Hack.ANEnv -> fprintf ff "%s" "ENV"
-  | Hack.ANAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
-  | Hack.ANMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
+  | Hack.NRAEnvEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
+  | Hack.NRAEnvApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
+  | Hack.NRAEnvGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  | Hack.NRAEnvEnv -> fprintf ff "%s" "ENV"
+  | Hack.NRAEnvAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
+  | Hack.NRAEnvMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
+  | Hack.NRAEnvFlatMap (a1,a2) -> pretty_nraenv_exp p sym sym.chiflat ff a1 (Some a2)
+  | Hack.NRAEnvJoin (a1,a2,a3) -> pretty_infix_dependent p 5 sym pretty_nraenv_aux sym.join ff a1 a2 a3
+  | Hack.NRAEnvProject (atts,a1) ->
+      fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.bpi (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
+  | Hack.NRAEnvGroupBy (g,atts,a1) ->
+      fprintf ff "@[<hv 0>%a%a%a(%a)@]" pretty_sym sym.gamma (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
 
 (* resets precedence back to 0 *)
 and pretty_nraenv_exp p sym thissym ff a1 oa2 =
@@ -674,6 +752,13 @@ and pretty_nraenv_exp p sym thissym ff a1 oa2 =
 	fprintf ff "@[<hv 3>(%a%a%a%a(@,%a@;<0 -2>))@]" pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nraenv_aux 0 sym) a2
       else
 	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nraenv_aux 0 sym) a2
+
+and pretty_infix_dependent pouter pinner sym callb thissym ff a1 a2 a3 =
+  if pouter > pinner
+  then
+    fprintf ff "@[<hov 0>(%a@ %a%a%a%a@ %a)@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
+  else
+    fprintf ff "@[<hov 0>%a@ %a%a%a%a@ %a@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
 
 
 let pretty_nraenv greek margin a =
@@ -919,7 +1004,7 @@ let pretty_plug_ignore ff a = ()
 
 let pretty_plug_nraenv greek ff a =
   let sym = if greek then greeksym else textsym in
-  pretty_nraenv_aux 0 sym ff a
+  pretty_nraenv_aux 0 sym ff (nraenv_core_to_nraenv a)
 
 (* Pretty RType *)
 
@@ -995,6 +1080,7 @@ let rec pretty_column_aux p sym ff col =
   | Hack.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
   | Hack.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (Hack.ABArith Hack.ArithPlus) c1 c2
   | Hack.CEq (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.AEq c1 c2
+  | Hack.CLessThan (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ALt c1 c2
   | Hack.CNeg c -> pretty_unop p sym pretty_column_aux ff Hack.ANeg c
   | Hack.CToString c -> pretty_unop p sym pretty_column_aux ff Hack.AToString c
   | Hack.CSConcat (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ASConcat c1 c2
@@ -1042,8 +1128,10 @@ let pretty_query pconf q =
   | Compiler.Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_nra q -> pretty_nra greek margin q
+  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin (QDriver.nraenv_core_to_nraenv q)
   | Compiler.Q_nraenv q -> pretty_nraenv greek margin q
   | Compiler.Q_nnrc q -> pretty_nnrc greek margin q
   | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin q

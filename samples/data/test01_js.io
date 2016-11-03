@@ -1,54 +1,31 @@
-{"inheritance": [
-{"sub":"entities.MainEntity", "sup":"org.qcert.TopEntity"},
-   {"sub":"entities.Purchase", "sup":"org.qcert.TopEntity"},
-   {"sub":"entities.Customer", "sup":"org.qcert.TopEntity"}
-]
+{"inheritance": []
 ,"model":
 {"modelName": "test01",
- "brandTypes" :[{ "brand":"org.qcert.TopEntity", "typeName":"org_qcert_TopEntity"},
-   { "brand":"entities.Customer", "typeName":"entities_Customer"},
-   { "brand":"entities.Purchase", "typeName":"entities_Purchase"},
-   { "brand":"entities.MainEntity", "typeName":"entities_MainEntity"}],
-   "typeDefs" :[{ "typeName": "org_qcert_TopEntity", "typeDef": { }},
-   { "typeName": "entities_Customer", "typeDef": { "cid": "Nat", "age": "Nat", "name": "String"}},
-   { "typeName": "entities_Purchase", "typeDef": { "cid": "Nat", "pid": "Nat", "name": "String", "quantity": "Nat"}},
-   { "typeName": "entities_MainEntity", "typeDef": { "id": "Nat", "doubleAttribute": "Nat", "stringId": "String"}}]
+ "brandTypes" :[],
+   "typeDefs" :[]
 }
-, "WMType" : { "$coll" : { "$brand" : ["entities.MainEntity"] } },
+, "WMType" : { "$coll" : { "cid": "Nat", "age": "Nat", "name": "String"} },
 "input": [
-  {"type":["entities.Customer"],"data":{"name":"John Doe", "cid":123, "age":32}},
-  {"type":["entities.Customer"],"data":{"name":"Jane Doe", "cid":124, "age":32}},
-  {"type":["entities.Customer"],"data":{"name":"Jim Does", "cid":125, "age":34}},
-  {"type":["entities.Customer"],"data":{"name":"Jill Does", "cid":126, "age":32}},
-  {"type":["entities.Customer"],"data":{"name":"Joan Doe", "cid":127, "age":34}},
-  {"type":["entities.Customer"],"data":{"name":"James Do", "cid":128, "age":35}},
-  {"type":["entities.Purchase"],"data":{"name":"Tomatoe", "cid":123, "pid":1, "quantity":3}},
-  {"type":["entities.Purchase"],"data":{"name":"Potatoe", "cid":123, "pid":2, "quantity":1}},
-  {"type":["entities.Purchase"],"data":{"name":"Stiletto", "cid":125, "pid":3, "quantity":64}},
-  {"type":["entities.Purchase"],"data":{"name":"Libretto", "cid":126, "pid":4, "quantity":62}},
-  {"type":["entities.Purchase"],"data":{"name":"Dough", "cid":128, "pid":5, "quantity":4}},
-  {"type":["entities.Purchase"],"data":{"name":"Croissant", "cid":128, "pid":6, "quantity":2}},
-  {"type":["entities.MainEntity"],"data":{"id":201, "doubleAttribute":4, "stringId":"201"}},
-  {"type":["entities.MainEntity"],"data":{"id":202, "doubleAttribute":100, "stringId":"202"}}
-],
+  {"name":"John Doe", "cid":123, "age":32},
+  {"name":"Jane Doe", "cid":124, "age":32},
+  {"name":"Jim Does", "cid":125, "age":34},
+  {"name":"Jill Does", "cid":126, "age":32},
+  {"name":"Joan Doe", "cid":127, "age":34},
+  {"name":"James Do", "cid":128, "age":35}
+  ],
 
-"partitionedInput": {"entities.Purchase":[
-    {"type":["entities.Purchase"],"data":{"name":"Stiletto", "cid":125, "pid":3, "quantity":64}},
-    {"type":["entities.Purchase"],"data":{"name":"Dough", "cid":128, "pid":5, "quantity":4}},
-    {"type":["entities.Purchase"],"data":{"name":"Tomatoe", "cid":123, "pid":1, "quantity":3}},
-    {"type":["entities.Purchase"],"data":{"name":"Libretto", "cid":126, "pid":4, "quantity":62}},
-    {"type":["entities.Purchase"],"data":{"name":"Croissant", "cid":128, "pid":6, "quantity":2}},
-    {"type":["entities.Purchase"],"data":{"name":"Potatoe", "cid":123, "pid":2, "quantity":1}}],
-  "entities.MainEntity":[
-    {"type":["entities.MainEntity"],"data":{"id":201, "doubleAttribute":4, "stringId":"201"}},
-    {"type":["entities.MainEntity"],"data":{"id":202, "doubleAttribute":100, "stringId":"202"}}],
-  "entities.Customer":[
-    {"type":["entities.Customer"],"data":{"name":"Jane Doe", "cid":124, "age":32}},
-    {"type":["entities.Customer"],"data":{"name":"Joan Doe", "cid":127, "age":34}},
-    {"type":["entities.Customer"],"data":{"name":"Jill Does", "cid":126, "age":32}},
-    {"type":["entities.Customer"],"data":{"name":"John Doe", "cid":123, "age":32}},
-    {"type":["entities.Customer"],"data":{"name":"Jim Does", "cid":125, "age":34}},
-    {"type":["entities.Customer"],"data":{"name":"James Do", "cid":128, "age":35}}]
+"partitionedInput": {
+  "Persons" :
+  [{"pid": 1, "name": "John Doe", "age":32, "company":101},
+   {"pid": 2, "name": "Jane Doe", "age":32, "company":103},
+   {"pid": 3, "name": "Jim Does", "age":34, "company":101},
+   {"pid": 4, "name": "Jill Does","age":32, "company":102},
+   {"pid": 5, "name": "Joan Doe", "age":34, "company":101},
+   {"pid": 6, "name": "James Do", "age":35, "company":103}],
+  "Companies" :
+  [ {"cid": 101, "cname": "Blue Widget", "departments" : [ "Sales", "Manufacturing" ] },
+    {"cid": 102, "cname": "Pimble", "departments" : [] },
+    {"cid": 103, "cname": "Unter", "departments" : ["IP","M&A","Sales"] } ]
 },
 
 "output": [

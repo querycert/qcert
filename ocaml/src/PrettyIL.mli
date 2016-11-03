@@ -92,7 +92,7 @@ val pretty_annotate_annotated_rtype : bool ->
 
 (* Pretty printers for various plug types *)
 val pretty_plug_ignore : Format.formatter -> 'a -> unit
-val pretty_plug_nraenv : bool -> Format.formatter -> QLang.nraenv -> unit
+val pretty_plug_nraenv : bool -> Format.formatter -> QLang.nraenv_core -> unit
 val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
 
 (* Pretty types *)

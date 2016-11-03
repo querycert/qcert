@@ -28,13 +28,14 @@ type io_json = QData.json option
 
 type io_hierarchy_list = (string * string) list
 type io_input = QData.data list
+type io_partitioned_input = ((char list) * QData.data) list
 type io_output = QData.data list
 
 type rtype_content = QData.json
 type json_schema = (io_hierarchy_list * QData.json * QData.json) option
 type model_content = string * (string * string) list * (string * rtype_content) list
 
-let get_io_content (od:QData.json option) : QData.json * QData.json * QData.json * QData.json * QData.json =
+let get_io_content (od:QData.json option) : QData.json * QData.json * QData.json * QData.json * QData.json * QData.json =
     match od with
     | Some d ->
 	begin
@@ -46,24 +47,25 @@ let get_io_content (od:QData.json option) : QData.json * QData.json * QData.json
 		let hierarchy = List.assoc ['i';'n';'h';'e';'r';'i';'t';'a';'n';'c';'e'] r in
 		let model = List.assoc ['m';'o';'d';'e';'l'] r in
 		let wmType = List.assoc ['W';'M';'T';'y';'p';'e'] r in
-		(input, hierarchy, output, model, wmType)
+		let partitionedInput = List.assoc ['p';'a';'r';'t';'i';'t';'i';'o';'n';'e';'d';'I';'n';'p';'u';'t'] r in
+		(input, hierarchy, output, model, wmType, partitionedInput)
 	    | _ ->
 		raise Not_found
 	  with
 	  | _ ->
-	      raise (CACo_Error "Ill-formed IO")
+	      raise (Qcert_Error "Ill-formed IO")
 	end
     | None ->
-	raise (CACo_Error "No IO file provided")
+	raise (Qcert_Error "No IO file provided")
 
 let get_hierarchy od =
   match get_io_content od with
-  | (_, h, _, _, _) -> h
+  | (_, h, _, _, _, _) -> h
 
 let get_hierarchy_cloudant od =
   try
     match get_io_content od with
-    | (_, h, _, _, _) -> h
+    | (_, h, _, _, _, _) -> h
   with
   | _ -> Compiler.Jarray []
 
@@ -76,10 +78,10 @@ let build_hierarchy h =
             | [(['s';'u';'p'], Compiler.Jstring sup); (['s';'u';'b'], Compiler.Jstring sub)] ) ->
                 (Util.string_of_char_list sub, Util.string_of_char_list sup)
         | _ ->
-            raise (CACo_Error "Ill-formed hierarchy"))
+            raise (Qcert_Error "Ill-formed hierarchy"))
         l
   | _ ->
-      raise (CACo_Error "Ill-formed hierarchy")
+      raise (Qcert_Error "Ill-formed hierarchy")
 
 let build_brand_types bts =
   match bts with
@@ -90,10 +92,10 @@ let build_brand_types bts =
             | [(['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName); (['b';'r';'a';'n';'d'], Compiler.Jstring brandName)] ) ->
                 (Util.string_of_char_list brandName, Util.string_of_char_list typeName)
         | _ ->
-            raise (CACo_Error "Ill-formed brandTypes"))
+            raise (Qcert_Error "Ill-formed brandTypes"))
         l
   | _ ->
-      raise (CACo_Error "Ill-formed brandTypes")
+      raise (Qcert_Error "Ill-formed brandTypes")
 
 let build_type_defs bts =
   match bts with
@@ -104,14 +106,14 @@ let build_type_defs bts =
             | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName)] ) ->
                 (Util.string_of_char_list typeName, typeDef)
         | _ ->
-            raise (CACo_Error "Ill-formed typeDefs"))
+            raise (Qcert_Error "Ill-formed typeDefs"))
         l
   | _ ->
-      raise (CACo_Error "Ill-formed typeDefs")
+      raise (Qcert_Error "Ill-formed typeDefs")
 
 let get_input format od =
   match get_io_content od with
-  | (i, h, _, _, _) ->
+  | (i, h, _, _, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match i with
       | Compiler.Jarray l ->
@@ -121,7 +123,21 @@ let get_input format od =
 	    | ENHANCED -> List.map (QData.json_enhanced_to_data h) l (* in coq so we can prove properties on conversions *)
 	  end
       | _ ->
-	  raise (CACo_Error "Illed formed working memory")
+	  raise (Qcert_Error "Illed formed working memory: input")
+
+let get_partitioned_input format od =
+  match get_io_content od with
+  | (_, h, _, _, _, pi) ->
+      let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
+      match pi with
+      | Compiler.Jobject l ->
+	  begin
+	    match format with
+	    | META -> List.map (fun xy -> (fst xy, QData.json_to_data h (snd xy))) l (* in coq so we can prove properties on conversions *)
+	    | ENHANCED -> List.map (fun xy -> (fst xy, QData.json_enhanced_to_data h (snd xy))) l (* in coq so we can prove properties on conversions *)
+	  end
+      | _ ->
+	  raise (Qcert_Error "Illed formed working memory: partitionedInput")
 
 let get_model_content (j:QData.json) =
   match j with
@@ -134,19 +150,19 @@ let get_model_content (j:QData.json) =
 	| Compiler.Jstring name ->
 	    (Util.string_of_char_list name,build_brand_types brandTypes,build_type_defs typeDefs)
 	| _ ->
-	    raise (CACo_Error "Ill-formed model")
+	    raise (Qcert_Error "Ill-formed model")
       end
   | _ ->
-      raise (CACo_Error "Ill-formed model")
+      raise (Qcert_Error "Ill-formed model")
 
 let get_output od =
   match get_io_content od with
-  | (_, h, o, _, _) ->
+  | (_, h, o, _, _, _) ->
       let h = List.map (fun (x,y) -> (Util.char_list_of_string x, Util.char_list_of_string y)) (build_hierarchy h) in
       match o with
       | Compiler.Jarray l -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
       | _ ->
-	  raise (CACo_Error "Ill-formed expected result")
+	  raise (Qcert_Error "Ill-formed expected result")
 
 let display_sdata (data_dir : string option) (fname:string) (sdata:string list) (suffix:string) =
   let fpref = Filename.chop_extension fname in

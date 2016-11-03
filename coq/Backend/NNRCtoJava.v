@@ -228,7 +228,14 @@ Section NNRCtoJava.
       | ArithMax => "max"
       end.
 
-                 
+
+    Definition like_clause_to_java (lc:like_clause)
+      := match lc with
+         | like_literal literal => "new UnaryOperator.LiteralLikeClause(" ++ (mk_java_string literal) ++ ")"
+         | like_any_char => "new UnaryOperator.AnyCharLikeClause()"
+         | like_any_string => "new UnaryOperator.AnyStringLikeClause()"
+         end.
+    
     Fixpoint nrcToJava
              (n : nrc)                    (* NNRC expression to translate *)
              (t : nat)                    (* next available unused temporary *)
@@ -260,9 +267,18 @@ Section NNRCtoJava.
                      | ARecRemove s => mk_java_unary_op1 "remove"  (mk_java_string s) e1
                      | ARecProject sl => mk_java_unary_op1 "project" (mk_java_string_collection sl) e1
                      | ADistinct => mk_java_unary_op0 "distinct" e1
+                     | AOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
                      | ASum =>  mk_java_unary_op0 "sum" e1
                      | AArithMean => mk_java_unary_op0 "list_mean" e1
                      | AToString =>  mk_java_unary_op0 "tostring" e1
+                     | ASubstring start olen =>
+                       match olen with
+                       | Some len => mk_java_unary_opn "substring" (map toString [start; len]) e1
+                       | None => mk_java_unary_op1 "substring" (toString start) e1
+                       end
+                     | ALike pat oescape =>
+                       let lc := make_like_clause pat oescape in
+                       mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_java lc)) ++ "}") e1
                      | ALeft => mk_java_unary_op0 "left" e1
                      | ARight => mk_java_unary_op0 "right" e1
                      | ABrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1

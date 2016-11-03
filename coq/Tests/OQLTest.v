@@ -164,7 +164,8 @@ Section OQLTest.
     OSFW
       (OSelect (OUnop (ADot "age") (OUnop AUnbrand (OVar "e"))))
       ((OIn "e"  (OTable "Employees"))::nil)
-      (OWhere (OBinop AEq (OUnop (ADot "name") (OUnop AUnbrand (OVar "e"))) (OConst (dstring "John")))).
+      (OWhere (OBinop AEq (OUnop (ADot "name") (OUnop AUnbrand (OVar "e"))) (OConst (dstring "John"))))
+      ONoOrder.
   
   Definition q1_eval : option data := oql_interp CPRModel tables q1 init_env.
 
@@ -185,7 +186,8 @@ Section OQLTest.
       ((OIn "e"  (OTable "Employees"))::(OIn "c" (OTable "Companies"))::nil)
       (OWhere (OBinop AEq
                       (OUnop (ADot "company") (OUnop AUnbrand (OVar "e")))
-                      (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))).
+                      (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c")))))
+      ONoOrder.
 
   Definition q2_eval : option data := oql_interp CPRModel tables q2 init_env.
 
@@ -201,7 +203,8 @@ Section OQLTest.
       ((OIn "e"  (OTable "Employees"))::(OIn "c" (OTable "Companies"))::nil)
       (OWhere (OBinop AEq
                       (OUnop (ADot "company") (OUnop AUnbrand (OVar "e")))
-                      (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))).
+                      (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c")))))
+      ONoOrder.
 
   Definition q2'_eval : option data := oql_interp CPRModel tables q2' init_env.
 
@@ -218,7 +221,8 @@ Section OQLTest.
                        (OUnop (ARec "company") (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))
                        (OUnop (ARec "dept") (OVar "d"))))
       ((OIn "c"  (OTable "Companies"))::(OIn "d" (OUnop (ADot "departments") (OUnop AUnbrand (OVar "c"))))::nil)
-      OTrue.
+      OTrue
+      ONoOrder.
 
   Definition q3_eval : option data := oql_interp CPRModel tables q3 init_env.
 
@@ -238,7 +242,8 @@ Section OQLTest.
                        (OUnop (ARec "company") (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))
                        (OUnop (ARec "dept") (OVar "d"))))
       ((OIn "d" (OUnop (ADot "departments") (OUnop AUnbrand (OVar "c"))))::(OIn "c"  (OTable "Companies"))::nil)
-      OTrue.
+      OTrue
+      ONoOrder.
 
   Definition q3wrong_eval : option data := oql_interp CPRModel tables q3wrong init_env.
 

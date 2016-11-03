@@ -149,6 +149,7 @@ Section DNNRCtoScala.
     | CCol s => "column(""" ++ s ++ """)"
     | CDot fld c => code_of_column c ++ ".getField(" ++ quote_string fld ++ ")"
     | CEq c1 c2 => code_of_column c1 ++ ".equalTo(" ++ code_of_column c2 ++ ")"
+    | CLessThan c1 c2 => code_of_column c1 ++ ".lt(" ++ code_of_column c2 ++ ")"
     | CLit (d, r) => "lit(" ++ scala_literal_data d r ++ ")"
     | CNeg c => "not(" ++ code_of_column c ++ ")"
     | CPlus c1 c2 => code_of_column c1 ++ ".plus(" ++ code_of_column c2 ++ ")"
@@ -218,6 +219,17 @@ Section DNNRCtoScala.
     | ARight => prefix "right"
     | ASum => postfix "sum"
     | AToString => prefix "QCertRuntime.toQCertString"
+    | ASubstring start olen =>
+      "(" ++ x ++ ").substring(" ++ toString start ++
+          match olen with
+          | Some len => ", " ++ toString len
+          | None => ""
+          end ++ ")"
+    | ALike pat oescape =>
+      "ALike currently implemented.  Please implement as in the java backend"
+(*      let lc := make_like_clause pat oescape in
+      mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_scala lc)) ++ "}") e1
+*)
     | AUArith ArithAbs => prefix "Math.abs"
     | AUnbrand =>
       match lift_tlocal required_type with
@@ -228,6 +240,7 @@ Section DNNRCtoScala.
       | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
       end
     | ADistinct => postfix "distinct"
+    | AOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
 
     (* TODO *)
     | AForeignUnaryOp _ => "AFOREIGNUNARYOP???"

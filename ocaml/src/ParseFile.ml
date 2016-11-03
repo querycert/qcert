@@ -32,13 +32,13 @@ let parse_file p_fun f =
       let res = p_fun buf in
       close_in ic; res
     with
-    | CACo_Error msg -> raise (CACo_Error msg)
+    | Qcert_Error msg -> raise (Qcert_Error msg)
     | LexError msg ->
 	close_in ic;
-	Printf.fprintf stderr "[%s] in file %s%!\n" msg f; raise (CACo_Error ("Parse error in file " ^ f))
+	Printf.fprintf stderr "[%s] in file %s%!\n" msg f; raise (Qcert_Error ("Parse error in file " ^ f))
     | _ ->
 	close_in ic;
-	Printf.fprintf stderr "Error in file %s%!\n" f; raise (CACo_Error ("Parse error in file " ^ f))
+	Printf.fprintf stderr "Error in file %s%!\n" f; raise (Qcert_Error ("Parse error in file " ^ f))
   
 
 (******************)
@@ -61,7 +61,7 @@ let parse_oql_from_file f : QLang.oql = parse_file parse_oql f
 let parse_sexp_from_file s : SExp.sexp = parse_file parse_sexp s
 let parse_io_sexp_from_file s : QData.data = parse_file parse_io_sexp s
 let parse_camp_sexp_from_file s : QLang.camp = parse_file parse_camp_sexp s
-let parse_nraenv_sexp_from_file s : QLang.nraenv = parse_file parse_nraenv_sexp s
+let parse_nraenv_sexp_from_file s : QLang.nraenv_core = parse_file parse_nraenv_sexp s
 let parse_nnrc_sexp_from_file s : QLang.nnrc = parse_file parse_nnrc_sexp s
 let parse_nnrcmr_sexp_from_file s : QLang.nnrcmr = parse_file parse_nnrcmr_sexp s
 let parse_cldmr_sexp_from_file s : QLang.cldmr = parse_file parse_cldmr_sexp s

@@ -36,11 +36,10 @@ Module QUtil(runtime:CompilerRuntime).
 
   (* Processing for input or output of queries *)
   Require Import CompEnv.
-  Definition validate_rule_success := validate_rule_success.
   Definition validate_lifted_success := validate_lifted_success.
 
-  Definition mkDistLoc := mkDistLoc.
-  Definition mkDistWorld := mkDistWorld.
+  Definition mkDistLoc := mkConstants mkDistLoc. (* XXX Where should mkConstants be? *)
+  Definition mkDistWorld env := mkConstants (mkDistWorld env). (* XXX Where should mkConstants be? *)
 End QUtil.
 
 (*

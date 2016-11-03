@@ -19,103 +19,68 @@ Module QEval(runtime:CompilerRuntime).
 
   Require Import String List String EquivDec.
   
-  Require Import BasicRuntime.
-  Require Import CompEnv.
-
-  (****************
-   * Rule Section *
-   ****************)
-
-  Require Import CAMPRuntime.
-
-  Definition rule_eval_top (h:list(string*string)) (r:rule) (world:list data) : option (list data) :=
-    eval_rule h r world.
-  Definition rule_eval_top_debug (h:list(string*string)) (flag:bool) (r:rule) (world:list data) : string :=
-    eval_rule_res_to_string h flag r world.
-
-  Definition pattern_eval_top (h:list(string*string)) (p:pat) (world:list data) : option (list data) :=
-    eval_pattern h p world.
-  Definition pattern_eval_top_debug (h:list(string*string)) (flag:bool) (p:pat) (world:list data) : string :=
-    eval_pattern_res_to_string h flag p world.
-
-
-  (***************
-   * OQL Section *
-   ***************)
-  
-  Require Import OQL.
-
-  Definition oql_eval_top (h:list(string*string)) (e:oql_expr) (world:list data) : option data :=
-    oql_interp h (mkWorld world) e nil.
-
-
-  (***************
-   * NRA Section *
-   ***************)
-
-  Require Import NRAEnvRuntime.
-
-  Definition algenv_eval_top (h:list(string*string)) (op:algenv) (world:list data) : option data :=
-    fun_of_algenv h (mkWorld world) op (drec nil) dunit.
-
-
-  (****************
-   * NNRC Section *
-   ****************)
-
-  Require Import NNRCRuntime NNRCMRRuntime.
-  Require Import NRAEnvtoNNRC. (* contains mkConstants *)
-  Require Import NNRCtoNNRCMR. (* contains load_init_env *)
-
-  Definition nrc_eval_top (h:list(string*string)) (e:nrc) (world:list data) : option data :=
-    let cenv := mkWorld world in
-    nrc_eval h ((init_venv,drec nil) :: (init_vid,dunit) :: (mkConstants (rec_sort cenv))) e.
-
-
-  (*****************
-   * DNNRC Section *
-   *****************)
-
-  Require Import DData DNNRC Dataset.
-  Require Import TDNRCInfer DNNRCtoScala.
-  
   Require Import BasicSystem.
-  Require Import TypingRuntime.
- 
-  Definition dnrc_eval_top {bm:brand_model} (h:list (string*string)) 
-             (e:@dnrc _ unit dataset) (world:list data) : option data :=
-    let tenv := mkDistWorld world in
-    lift localize_data (@dnrc_eval _ _ _ h SparkIRPlug tenv e).
+  Require Import CompLang CompEval.
 
-  (******************
-   * NNRCMR Section *
-   ******************)
+  Section QE.
+  Context {h:list(string*string)}.
 
-  Definition nrcmr_chain_eval_top (h:list(string*string)) (e:nrcmr) (world:list data) : option data :=
-    let env_with_world := mkWorld world in
-    let cenv := mkConstants env_with_world in
-    (* Note: localize_bindings turns all variables distributed! *)
-    let loc_cenv := localize_bindings cenv in
-    let res :=
-        match load_init_env init_vinit loc_cenv cenv with
-        | Some mr_env => nrcmr_eval h mr_env e
-        | None => None
-        end
-    in res.
+  (* Inputs to eval *)
+  Definition constant_env : Set := list (string*data).
+  Definition world_env : Set := list data.
 
+  (* Eval for arbitrary (local) constant environments *)
+  Definition eval_rule : rule -> constant_env -> option data := @eval_rule _ h.
+  Definition eval_rule_debug : bool -> rule -> constant_env -> string := @eval_rule_debug _ h.
+  
+  Definition eval_camp : camp -> constant_env -> option data := @eval_camp _ h.
+  Definition eval_camp_debug : bool -> camp -> constant_env -> string := @eval_camp_debug _ h.
 
-  (*****************
-   * CLDMR Section *
-   *****************)
+  Definition eval_oql : oql -> constant_env -> option data := @eval_oql _ h.
+  Definition eval_sql : sql -> constant_env -> option data := @eval_sql _ h.
+  Definition eval_lambda_nra : lambda_nra -> constant_env -> option data := @eval_lambda_nra _ h.
 
-  Require Import CloudantMR. (* contains cld_load_init_env *)
+  Definition eval_nra : nra -> constant_env -> option data := @eval_nra _ h.
+  Definition eval_nraenv_core : nraenv_core -> constant_env -> option data := @eval_nraenv_core _ h.
+  Definition eval_nraenv : nraenv -> constant_env -> option data := @eval_nraenv _ h.
 
-  Definition cldmr_chain_eval_top (h:list(string*string)) (e:cld_mrl) (world:list data) : option data :=
-    (* mkWorldColl does not wrap cenv in a dcoll quite yet, since we
-    need to create the keys first (in cld_load_init_env) *)
-    let env_with_world := mkWorldColl world in
-    let cenv := mkConstants env_with_world in
-    cld_mrl_eval h (cld_load_init_env init_vinit cenv) e.
+  Definition eval_nnrc : nnrc -> constant_env -> option data := @eval_nnrc _ h.
+
+  Definition eval_nnrcmr : nnrcmr -> constant_env -> option data := @eval_nnrcmr _ _ h.
+  Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
+  Definition eval_dnnrc_dataset {bm:brand_model} : dnnrc_dataset -> constant_env -> option data := @eval_dnnrc_dataset _ _ bm h.
+
+  (* Eval for single 'world' collection *)
+  Definition eval_rule_world : rule -> world_env -> option data := @eval_rule_world _ h.
+  Definition eval_rule_world_debug : bool -> rule -> world_env -> string := @eval_rule_world_debug _ h.
+  
+  Definition eval_camp_world : camp -> world_env -> option data := @eval_camp_world _ h.
+  Definition eval_camp_world_debug : bool -> camp -> world_env -> string := @eval_camp_world_debug _ h.
+
+  Definition eval_oql_world : oql -> world_env -> option data := @eval_oql_world _ h.
+  Definition eval_sql_world : sql -> world_env -> option data := @eval_sql_world _ h.
+  Definition eval_lambda_nra_world : lambda_nra -> world_env -> option data := @eval_lambda_nra_world _ h.
+
+  Definition eval_nra_world : nra -> world_env -> option data := @eval_nra_world _ h.
+  Definition eval_nraenv_core_world : nraenv_core -> world_env -> option data := @eval_nraenv_core_world _ h.
+  Definition eval_nraenv_world : nraenv -> world_env -> option data := @eval_nraenv_world _ h.
+
+  Definition eval_nnrc_world : nnrc -> world_env -> option data := @eval_nnrc_world _ h.
+
+  Definition eval_nnrcmr_world : nnrcmr -> world_env -> option data := @eval_nnrcmr_world _ _ h.
+  Definition eval_cldmr_world : cldmr -> world_env -> option data := @eval_cldmr_world _ _ h.
+  Definition eval_dnnrc_dataset_world {bm:brand_model} : dnnrc_dataset -> world_env -> option data := @eval_dnnrc_dataset_world _ _ bm h.
+
+  (* Eval driver *)
+
+  Definition eval_input : Set := eval_input.
+  Definition eval_output : Set := eval_output.
+
+  Definition eval_query {bm:brand_model} : query -> eval_input -> eval_output := @eval_query _ _ _ _ bm h.
+
+  Definition eval_query_debug {bm:brand_model} : query -> eval_input -> eval_output := @eval_query_debug _ _ _ _ h.
+
+  End QE.
 
 End QEval.
 

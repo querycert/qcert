@@ -28,7 +28,7 @@
 
 %token OR AND NOT
 %token STRUCT FLATTEN
-%token AVG SUM COUNT MIN MAX
+%token AVG SUM FLOAT_SUM COUNT MIN MAX
 
 %token NIL
 
@@ -75,13 +75,13 @@ expr:
     { QOQL.oconst (QData.dstring (Util.char_list_of_string s)) }
 (* Select from where ... *)
 | SELECT e = expr FROM fc = from_clause 
-    { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue }
+    { QOQL.osfw (QOQL.oselect e) fc QOQL.otrue QOQL.onoorder }
 | SELECT e = expr FROM fc = from_clause WHERE w = expr
-    { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) }
+    { QOQL.osfw (QOQL.oselect e) fc (QOQL.owhere w) QOQL.onoorder }
 | SELECT DISTINCT e = expr FROM fc = from_clause
-    { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc QOQL.otrue QOQL.onoorder }
 | SELECT DISTINCT e = expr FROM fc = from_clause WHERE w = expr
-    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere e) }
+    { QOQL.osfw (QOQL.oselectdistinct e) fc (QOQL.owhere e) QOQL.onoorder }
 (* Expressions *)
 | v = IDENT
     { QOQL.ovar (Util.char_list_of_string v) }
@@ -98,6 +98,8 @@ expr:
     { QOQL.ounop QOps.Unary.aflatten e }
 | SUM LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.asum e }
+| FLOAT_SUM LPAREN e = expr RPAREN
+    { QOQL.ounop Enhanced.Ops.Unary.float_sum e }
 | AVG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.aarithmean e }
 | COUNT LPAREN e = expr RPAREN

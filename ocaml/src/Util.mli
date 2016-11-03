@@ -16,9 +16,9 @@
 
 (* This module contains a few basic utilities *)
 
-(* CACo Exception *)
+(* Qcert Exception *)
 
-exception CACo_Error of string
+exception Qcert_Error of string
 
 (* this can't go in Logger, since that creates a circular dependency *)
 type logger_token_type = string
@@ -51,15 +51,6 @@ val target_f : string option -> string -> string
 val outname : string -> string -> string
 
 
-(**********)
-(* Lookup *)
-(**********)
-
-(*
-val get_data : string -> (string * 'a) list -> 'a
-val get_data_raise : string -> (string * 'a) list -> 'a
-*)
-
 (**********************************)
 (* Support for Enhanced operators *)
 (**********************************)
@@ -71,3 +62,8 @@ val float_listmax : float list -> float
 
 val qcert_string_of_float : float -> string
 
+(**********************************)
+(* Timing function for CompStat   *)
+(**********************************)
+
+val time : ('a -> 'b) -> 'a -> char list * 'b

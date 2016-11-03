@@ -202,16 +202,28 @@ Section CloudantMR.
   Definition init_vval := "vval$"%string.
 
 
-  (*************************************
-   ** Semantics of ♥ NNRCMRCloudant ♥ **
-   *************************************)
+  (*********************************
+   ** Semantics of ♥ CloudantMR ♥ **
+   *********************************)
 
   Definition add_keys_to_binding (binding: string * (list data)) : string * data :=
     (fst binding, pack_kvl (init_keys (snd binding))).
-  
-  Definition cld_load_init_env (initunit: var) (cenv: list (string * (list data))) : bindings :=
-    let full_bindings := (initunit, (dunit::nil)) :: cenv in
-    map add_keys_to_binding full_bindings.
+
+  Definition lift_binding_to_coll (binding: string * data) : option (string * (list data)) :=
+    match snd binding with
+    | dcoll coll => Some (fst binding, coll)
+    | _ => None
+    end.
+
+  Definition cld_load_init_env
+             (initunit: var) (cenv: list (string * data)) : option bindings
+    :=
+      match lift_map lift_binding_to_coll cenv with
+      | Some cenv =>
+        let full_bindings := (initunit, (dunit::nil)) :: cenv in
+        Some (map add_keys_to_binding full_bindings)
+      | None => None
+      end.
 
   (********************
    * Semantics of map *

@@ -22,6 +22,7 @@ Section OQL.
   Require Import EquivDec.
 
   Require Import Utils BasicSystem.
+  Require Import RDataSort.
 
   Context {fruntime:foreign_runtime}.
 
@@ -35,7 +36,7 @@ Section OQL.
   | OTable : string -> oql_expr
   | OBinop : binOp -> oql_expr -> oql_expr -> oql_expr
   | OUnop : unaryOp -> oql_expr -> oql_expr
-  | OSFW : oql_select_expr -> (list oql_in_expr) -> oql_where_expr -> oql_expr
+  | OSFW : oql_select_expr -> (list oql_in_expr) -> oql_where_expr -> oql_order_by_expr -> oql_expr
   with oql_select_expr : Set :=
   | OSelect : oql_expr -> oql_select_expr
   | OSelectDistinct : oql_expr -> oql_select_expr
@@ -45,6 +46,9 @@ Section OQL.
   with oql_where_expr : Set :=
   | OTrue : oql_where_expr
   | OWhere : oql_expr -> oql_where_expr
+  with oql_order_by_expr : Set :=
+  | ONoOrder : oql_order_by_expr
+  | OOrderBy : oql_expr -> SortDesc -> oql_order_by_expr
   .
 
   Set Elimination Schemes.
@@ -71,9 +75,13 @@ Section OQL.
              (funop : forall u : unaryOp,
                  forall e1 : oql_expr, P e1 -> P (OUnop u e1))
              (fswf1 : forall e1 : oql_select_expr, forall el : list oql_in_expr,
-                   P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P (OSFW e1 el OTrue))
+                   P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P (OSFW e1 el OTrue ONoOrder))
              (fswf2 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr,
-                   P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P ew -> P (OSFW e1 el (OWhere ew)))
+                   P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P ew -> P (OSFW e1 el (OWhere ew) ONoOrder))
+             (fswf3 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall eob : oql_expr, forall sc : SortDesc,
+                   P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P eob -> P (OSFW e1 el OTrue (OOrderBy eob sc)))
+             (fswf4 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr, forall eob : oql_expr, forall sc : SortDesc,
+                   P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P ew -> P eob -> P (OSFW e1 el (OWhere ew) (OOrderBy eob sc)))
     :=
       fix F (e : oql_expr) : P e :=
     match e as e0 return (P e0) with
@@ -82,14 +90,14 @@ Section OQL.
       | OTable t => ftable t
       | OBinop b e1 e2 => fbinop b _ _ (F e1) (F e2)
       | OUnop u e1 => funop u _ (F e1)
-      | OSFW e1 el OTrue =>
+      | OSFW e1 el OTrue ONoOrder =>
         fswf1 _ el (F (oselect_expr e1))
               ((fix F1 (r : list oql_in_expr) : Forallt (fun ab => P (oin_expr ab)) r :=
                   match r as c0 with
                   | nil => Forallt_nil _
                   | cons sd c0 => @Forallt_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
                   end) el)
-      | OSFW e1 el (OWhere ew) =>
+      | OSFW e1 el (OWhere ew) ONoOrder =>
         fswf2 _ el _ (F (oselect_expr e1))
               ((fix F1 (r : list oql_in_expr) : Forallt (fun ab => P (oin_expr ab)) r :=
                   match r as c0 with
@@ -97,6 +105,23 @@ Section OQL.
                   | cons sd c0 => @Forallt_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
                   end) el)
               (F ew)
+      | OSFW e1 el OTrue (OOrderBy eob sc) =>
+        fswf3 _ el _ _ (F (oselect_expr e1))
+              ((fix F1 (r : list oql_in_expr) : Forallt (fun ab => P (oin_expr ab)) r :=
+                  match r as c0 with
+                  | nil => Forallt_nil _
+                  | cons sd c0 => @Forallt_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
+                  end) el)
+              (F eob)
+      | OSFW e1 el (OWhere ew) (OOrderBy eob sc) =>
+        fswf4 _ el _ _ _ (F (oselect_expr e1))
+              ((fix F1 (r : list oql_in_expr) : Forallt (fun ab => P (oin_expr ab)) r :=
+                  match r as c0 with
+                  | nil => Forallt_nil _
+                  | cons sd c0 => @Forallt_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
+                  end) el)
+              (F ew)
+              (F eob)
     end.
 
   Definition oql_expr_ind (P : oql_expr -> Prop)
@@ -108,9 +133,13 @@ Section OQL.
              (funop : forall u : unaryOp,
                  forall e1 : oql_expr, P e1 -> P (OUnop u e1))
              (fswf1 : forall e1 : oql_select_expr, forall el : list oql_in_expr,
-                   P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P (OSFW e1 el OTrue))
+                   P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P (OSFW e1 el OTrue ONoOrder))
              (fswf2 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr,
-                   P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P ew -> P (OSFW e1 el (OWhere ew)))
+                   P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P ew -> P (OSFW e1 el (OWhere ew) ONoOrder))
+             (fswf3 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall eob : oql_expr, forall sc : SortDesc,
+                   P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P eob -> P (OSFW e1 el OTrue (OOrderBy eob sc)))
+             (fswf4 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr, forall eob : oql_expr, forall sc : SortDesc,
+                   P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P ew -> P eob -> P (OSFW e1 el (OWhere ew) (OOrderBy eob sc)))
     :=
       fix F (e : oql_expr) : P e :=
     match e as e0 return (P e0) with
@@ -119,14 +148,14 @@ Section OQL.
       | OTable t => ftable t
       | OBinop b e1 e2 => fbinop b _ _ (F e1) (F e2)
       | OUnop u e1 => funop u _ (F e1)
-      | OSFW e1 el OTrue =>
+      | OSFW e1 el OTrue ONoOrder =>
         fswf1 _ el (F (oselect_expr e1))
               ((fix F1 (r : list oql_in_expr) : Forall (fun ab => P (oin_expr ab)) r :=
                   match r as c0 with
                   | nil => Forall_nil _
                   | cons sd c0 => @Forall_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
                   end) el)
-      | OSFW e1 el (OWhere ew) =>
+      | OSFW e1 el (OWhere ew) ONoOrder =>
         fswf2 _ el _ (F (oselect_expr e1))
               ((fix F1 (r : list oql_in_expr) : Forall (fun ab => P (oin_expr ab)) r :=
                   match r as c0 with
@@ -134,6 +163,23 @@ Section OQL.
                   | cons sd c0 => @Forall_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
                   end) el)
               (F ew)
+      | OSFW e1 el OTrue (OOrderBy eob sc) =>
+        fswf3 _ el _ _ (F (oselect_expr e1))
+              ((fix F1 (r : list oql_in_expr) : Forall (fun ab => P (oin_expr ab)) r :=
+                  match r as c0 with
+                  | nil => Forall_nil _
+                  | cons sd c0 => @Forall_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
+                  end) el)
+              (F eob)
+      | OSFW e1 el (OWhere ew) (OOrderBy eob sc) =>
+        fswf4 _ el _ _ _ (F (oselect_expr e1))
+              ((fix F1 (r : list oql_in_expr) : Forall (fun ab => P (oin_expr ab)) r :=
+                  match r as c0 with
+                  | nil => Forall_nil _
+                  | cons sd c0 => @Forall_cons _ (fun ab => P (oin_expr ab)) sd c0 (F (oin_expr sd)) (F1 c0)
+                  end) el)
+              (F ew)
+              (F eob)
     end.
 
   Definition oql_expr_rec (P:oql_expr->Set) := oql_expr_rect P.
@@ -147,13 +193,21 @@ Section OQL.
              (funop : forall u : unaryOp,
                  forall e1 : oql_expr, P e1 -> P (OUnop u e1))
              (fswf1 : forall e1 : oql_select_expr, forall el : list oql_in_expr,
-                   P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P (OSFW e1 el OTrue))
+                   P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P (OSFW e1 el OTrue ONoOrder))
              (fswf2 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr,
-                     P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P ew -> P (OSFW e1 el (OWhere ew))) :
+                     P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P ew -> P (OSFW e1 el (OWhere ew) ONoOrder))
+             (fswf3 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall eob : oql_expr, forall sc : SortDesc,
+                   P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P eob -> P (OSFW e1 el OTrue (OOrderBy eob sc)))
+             (fswf4 : forall e1 : oql_select_expr, forall el : list oql_in_expr, forall ew : oql_expr, forall eob : oql_expr, forall sc : SortDesc,
+                     P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P ew -> P eob -> P (OSFW e1 el (OWhere ew) (OOrderBy eob sc))) :
     forall e, P e.
   Proof.
     intros.
     apply oql_expr_ind; trivial.
+    - intros. rewrite Forall_forall in H0.
+      auto.
+    - intros. rewrite Forall_forall in H0.
+      auto.
     - intros. rewrite Forall_forall in H0.
       auto.
     - intros. rewrite Forall_forall in H0.
@@ -187,7 +241,7 @@ Section OQL.
       destruct e1; destruct o; simpl in *; try (right; congruence).
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
-        left; reflexivity.
+        destruct o1; [left; reflexivity|right; congruence].
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
         destruct a; destruct o0; simpl in *;
@@ -200,7 +254,7 @@ Section OQL.
           right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
-        left; reflexivity.
+        destruct o1; [left; reflexivity|right; congruence].
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
         destruct a; destruct o0; simpl in *;
@@ -216,11 +270,11 @@ Section OQL.
       destruct e1; destruct o; simpl in *; try (right; congruence).
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
-        left; reflexivity.
+        destruct o1; [left; reflexivity|right; congruence].
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
-        destruct a; destruct o1; simpl in *;
-        destruct (H2 o1); subst; try (right;congruence).
+        destruct a; destruct o2; simpl in *;
+        destruct (H2 o2); subst; try (right;congruence).
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
@@ -229,18 +283,76 @@ Section OQL.
           right; congruence.
       + destruct (IHx o); try (right; congruence); subst; clear IHx.
         revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
-        left; reflexivity.
+        destruct o1; [left; reflexivity|right; congruence].
         inversion H; subst; simpl in *.
         specialize (IHel H3); clear H.
-        destruct a; destruct o1; simpl in *;
-        destruct (H2 o1); subst; try (right;congruence).
+        destruct a; destruct o2; simpl in *;
+        destruct (H2 o2); subst; try (right;congruence).
         * destruct (string_dec s s0); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
         * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
           destruct (IHel l); try (inversion e; subst; left; reflexivity);
           right; congruence.
-  Defined.
+    - destruct o0; simpl; [|right; congruence].
+      destruct e1; destruct o; simpl in *; try (right; congruence).
+      + destruct (IHx o); try (right; congruence); subst; clear IHx.
+        revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
+        destruct o1; [right;congruence|].
+        destruct s; destruct sc; try (right; congruence).
+        destruct (IHx0 o0); try (right; congruence); subst; clear IHx0; left; reflexivity.
+        destruct (IHx0 o0); try (right; congruence); subst; clear IHx0; left; reflexivity.
+        inversion H; subst; simpl in *.
+        specialize (IHel H3); clear H.
+        destruct a; destruct o0; simpl in *;
+        destruct (H2 o0); subst; try (right;congruence).
+        * destruct (string_dec s s0); subst; 
+          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+          right; congruence.
+        * destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+          destruct (IHel l); try (inversion e; subst; left; reflexivity);
+          right; congruence.
+      + destruct (IHx o); try (right; congruence); subst; clear IHx.
+        revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
+        destruct o1; [right;congruence|].
+        destruct s; destruct sc; try (right; congruence).
+        destruct (IHx0 o0); try (right; congruence); subst; clear IHx0; left; reflexivity.
+        destruct (IHx0 o0); try (right; congruence); subst; clear IHx0; left; reflexivity.
+        destruct o1; [right;congruence|].
+        destruct s; destruct sc; try (right; congruence).
+        * destruct (IHx0 o1); try (right; congruence); subst; clear IHx0.
+          inversion H; subst; simpl in *.
+          specialize (IHel H3); clear H.
+          destruct a; destruct o0; simpl in *;
+          destruct (H2 o0); subst; try (right;congruence);
+          [destruct (string_dec s s0); subst; 
+           destruct (IHel l); try (inversion e; subst; left; reflexivity);
+           right; congruence|
+           destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+           destruct (IHel l); try (inversion e; subst; left; reflexivity);
+           right; congruence].
+        * destruct (IHx0 o1); try (right; congruence); subst; clear IHx0.
+          inversion H; subst; simpl in *.
+          specialize (IHel H3); clear H.
+          destruct a; destruct o0; simpl in *;
+          destruct (H2 o0); subst; try (right;congruence);
+          [destruct (string_dec s s0); subst; 
+           destruct (IHel l); try (inversion e; subst; left; reflexivity);
+           right; congruence|
+           destruct (string_dec s s1); destruct (string_dec s0 s2); subst; 
+           destruct (IHel l); try (inversion e; subst; left; reflexivity);
+           right; congruence].
+    - destruct o0; simpl; try (right; congruence).
+      destruct (IHx1 o0); try (right; congruence); subst.
+      destruct e1; destruct o; simpl in *; try (right; congruence).
+      + destruct (IHx1 o); try (right; congruence); subst; clear IHx1.
+        revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
+        destruct o1; [right;congruence|].
+        destruct s; destruct sc; try (right; congruence).
+        destruct (IHx3 o0); try (right; congruence); subst; clear IHx3.
+        inversion H; subst; simpl in *.
+        admit.
+  Admitted.
 
   (** Semantics of OQL *)
 
@@ -306,7 +418,7 @@ Section OQL.
     | OTable t => edot constant_env t
     | OBinop bop q1 q2 => olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (oql_interp q1 env) (oql_interp q2 env)
     | OUnop uop q1 => olift (fun d1 => fun_of_unaryop h uop d1) (oql_interp q1 env)
-    | OSFW select_clause from_clause where_clause =>
+    | OSFW select_clause from_clause where_clause order_by_clause =>
       let init_env := Some (env :: nil) in
       let from_interp (envl:option (list oql_env)) (from_in_expr : oql_in_expr) :=
           match from_in_expr with
@@ -337,15 +449,21 @@ Section OQL.
           | OWhere where_expr => olift (lift_filter (pred where_expr)) from_result
           end
       in
+      let order_by_result :=
+          match order_by_clause with
+          | ONoOrder => where_result
+          | OOrderBy scl e => where_result
+          end
+      in
       let select_result :=
           match select_clause with
           | OSelect select_expr =>
             olift (fun x => lift dcoll (rmap (oql_interp select_expr) x))
-                  where_result
+                  order_by_result
           | OSelectDistinct select_expr =>
             let select_dup :=
                 olift (fun x => (rmap (oql_interp select_expr) x))
-                      where_result
+                      order_by_result
             in
             lift (fun x => dcoll ((@bdistinct data data_eq_dec) x)) select_dup
           end
@@ -362,14 +480,17 @@ Section OQL.
       | OTable t => nil
       | OBinop bop e1 e2 => oql_free_vars e1 ++ oql_free_vars e2
       | OUnop uop e1 => oql_free_vars e1
-      | OSFW se el we =>
+      | OSFW se el we oe =>
         let one_step_scope (in_expr : oql_in_expr) previous_free_vars :=
             match in_expr with
             | OIn x e1 => oql_free_vars e1 ++ remove string_eqdec x previous_free_vars
             | OInCast x _ e1 => oql_free_vars e1 ++ remove string_eqdec x previous_free_vars
             end
         in
-        fold_right one_step_scope (oql_select_free_vars se ++ oql_where_free_vars we) el
+        fold_right one_step_scope
+                   (oql_select_free_vars se
+                                         ++ oql_where_free_vars we
+                                         ++ oql_order_free_vars oe) el
       end
     with oql_select_free_vars (se:oql_select_expr) :=
       match se with
@@ -380,6 +501,11 @@ Section OQL.
       match we with
       | OTrue => nil
       | OWhere e => oql_free_vars e
+      end
+    with oql_order_free_vars (oe:oql_order_by_expr) :=
+      match oe with
+      | ONoOrder => nil
+      | OOrderBy e _ => oql_free_vars e
       end.
 
   (* capture avoiding substitution *)
@@ -392,7 +518,7 @@ Section OQL.
                                    (oql_subst e1 x e') 
                                    (oql_subst e2 x e')
       | OUnop uop e1 => OUnop uop (oql_subst e1 x e')
-      | OSFW se el we =>
+      | OSFW se el we oe =>
         let for_vars := map (fun x => match x with OIn v _ | OInCast v _ _ => v end) el in
         let el' := 
             (fix F (el:list oql_in_expr) (x:string) (e':oql_expr) :=
@@ -409,8 +535,10 @@ Section OQL.
               end) el x e'
         in
         if in_dec string_dec x for_vars
-        then OSFW se el' we
-        else OSFW (oql_select_subst se x e') el' (oql_where_subst we x e')
+        then OSFW se el' we oe
+        else OSFW (oql_select_subst se x e') el'
+                  (oql_where_subst we x e')
+                  (oql_order_subst oe x e')
       end
     with oql_select_subst (se:oql_select_expr) (x:string) (e':oql_expr) :=
       match se with
@@ -421,6 +549,11 @@ Section OQL.
       match we with
       | OTrue => OTrue
       | OWhere e => OWhere (oql_subst e x e')
+      end
+    with oql_order_subst (we:oql_order_by_expr) (x:string) (e':oql_expr) :=
+      match we with
+      | ONoOrder => ONoOrder
+      | OOrderBy e sc => OOrderBy (oql_subst e x e') sc
       end.
 
   End OQLScope.

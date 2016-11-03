@@ -23,7 +23,7 @@ Section TAlgEnv.
   Require Import Utils BasicSystem.
 
   Require Import RAlgEnv RAlgEnvEq.
-
+  Require Import NRAEnv.
 
   Local Open Scope algenv_scope.
   
@@ -1117,7 +1117,7 @@ Hint Constructors algenv_type.
 Hint Constructors unaryOp_type.
 Hint Constructors binOp_type.
 
-Ltac inverter := 
+Ltac algenv_inverter := 
   match goal with
     | [H:Coll _ = Coll _ |- _] => inversion H; clear H
     | [H: `?τ₁ = Coll₀ (`?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
@@ -1172,10 +1172,10 @@ Ltac inverter :=
     | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
     | [H:binOp_type AAnd _ _ _ |- _ ] => inversion H; clear H
     | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
-  end; try rtype_equalizer; try assumption; try subst; simpl in *; try inverter.
+  end; try rtype_equalizer; try assumption; try subst; simpl in *; try algenv_inverter.
 
 (* inverts, then tries and solve *)
-Ltac inferer := try inverter; subst; try eauto.
+Ltac algenv_inferer := try algenv_inverter; subst; try eauto.
 
 (* simplifies when a goal evaluates an expression over well-typed data *)
 

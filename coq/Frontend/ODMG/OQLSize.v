@@ -33,11 +33,11 @@ Section OQLSize.
          | OTable v => 1
          | OBinop op n₁ n₂ => S (oql_size n₁ + oql_size n₂)
          | OUnop op n₁ => S (oql_size n₁)
-         | OSFW se el we =>
+         | OSFW se el we oe =>
            let from_size :=
                fold_left (fun x => fun e => x+oql_in_size e) el 0
            in
-           S (oql_select_size se + from_size + oql_where_size we)
+           S (oql_select_size se + from_size + oql_where_size we + oql_order_size oe)
        end
   with oql_select_size (se:oql_select_expr) :=
     match se with
@@ -53,6 +53,11 @@ Section OQLSize.
     match we with
     | OTrue => 0
     | OWhere e => oql_size e
+    end
+  with oql_order_size (oe:oql_order_by_expr) :=
+    match oe with
+    | ONoOrder => 0
+    | OOrderBy e _ => oql_size e
     end.
   
 End OQLSize.

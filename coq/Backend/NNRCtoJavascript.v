@@ -153,7 +153,7 @@ Section NNRCtoJavascript.
     (* Java equivalent: JavaScriptBackend.brandsToJS *)
     Definition brandsToJs (quotel:string) (b:brands)
       := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
-    
+
     (* Java equivalent: JavaScriptBackend.dataToJS *)
     Require Import JSON.
     Fixpoint jsonToJS (quotel:string) (j : json) : string
@@ -163,7 +163,7 @@ Section NNRCtoJavascript.
          | jbool b => if b then "true" else "false"
          | jstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
          | jarray ls =>
-           let ss := (string_sort (map (jsonToJS quotel) ls)) in
+           let ss := map (jsonToJS quotel) ls in
            "[" ++ (joinStrings ", " ss) ++ "]"
          | jobject ls =>
            let ss := (map (fun kv => let '(k,v) := kv in
@@ -182,29 +182,50 @@ Section NNRCtoJavascript.
     Definition hierarchyToJS (quotel:string) (h:list (string*string)) :=
       dataToJS quotel (dcoll (map (fun x => drec (("sub",dstring (fst x)) :: ("sup", (dstring (snd x))) :: nil)) h)).
     
-    End DataJS.
+  End DataJS.
 
-    Section NRCJS.
+  Section NRCJS.
 
-      (* Java equivalent: JavaScriptBackend.uarithToJS *)
-      Definition uarithToJs (u:ArithUOp) (e:string) :=
-        match u with
-          | ArithAbs => "Math.abs (" ++ e ++ ")"
-          | ArithLog2 => "Math.log2(" ++ e ++ ")"
-          | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
-        end.
+    Require Import RDataSort.
+    (* Sort criteria *)
+    Definition singleSortCriteriaToJson (sc: string * SortDesc) : json :=
+      match snd sc with
+      | Ascending => jobject (("asc", jstring (fst sc))::nil)
+      | Descending => jobject (("desc", jstring (fst sc))::nil)
+      end.
 
-      (* Java equivalent: JavaScriptBackend.barithToJs *)
-      Definition barithToJs (b:ArithBOp) (e1 e2:string) :=
-        match b with
-          | ArithPlus => e1 ++ "+" ++ e2
-          | ArithMinus => e1 ++ "-" ++ e2
-          | ArithMult => e1 ++ "*" ++ e2
-          | ArithDivide => e1 ++ "/" ++ e2
-          | ArithRem => e1 ++ "%" ++ e2
-          | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
-          | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
-        end.
+    Definition sortCriteriaToJson (scl:SortCriterias) : json
+      := jarray (map singleSortCriteriaToJson scl).
+
+    Definition sortCriteriaToJs (quotel:string) (scl:SortCriterias) : string
+      := jsonToJS quotel (sortCriteriaToJson scl).
+    
+    (* Java equivalent: JavaScriptBackend.uarithToJS *)
+    Definition uarithToJs (u:ArithUOp) (e:string) :=
+      match u with
+      | ArithAbs => "Math.abs (" ++ e ++ ")"
+      | ArithLog2 => "Math.log2(" ++ e ++ ")"
+      | ArithSqrt =>"Math.sqrt(" ++ e ++ ")"
+      end.
+
+    (* Java equivalent: JavaScriptBackend.barithToJs *)
+    Definition barithToJs (b:ArithBOp) (e1 e2:string) :=
+      match b with
+      | ArithPlus => e1 ++ "+" ++ e2
+      | ArithMinus => e1 ++ "-" ++ e2
+      | ArithMult => e1 ++ "*" ++ e2
+      | ArithDivide => e1 ++ "/" ++ e2
+      | ArithRem => e1 ++ "%" ++ e2
+      | ArithMin => "Math.min(" ++ e1 ++ ", " ++ e2 ++ ")"
+      | ArithMax => "Math.max(" ++ e1 ++ ", " ++ e2 ++ ")"
+      end.
+
+        Definition like_clause_to_javascript (lc:like_clause)
+      := match lc with
+         | like_literal literal => "escapeRegExp(" ++ quotel_double ++ literal ++ quotel_double ++ ")"
+         | like_any_char => quotel_double ++ "." ++ quotel_double 
+         | like_any_string => quotel_double ++ ".*" ++ quotel_double 
+         end.
 
     (* Java equivalent: JavaScript.Backend.nrcToJS *)
     Fixpoint nrcToJS
@@ -238,11 +259,22 @@ Section NNRCtoJavascript.
                      | ARecRemove s => "remove(" ++ e1 ++ ", " ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ")"
                      | ARecProject sl => "project(" ++ e1 ++ ", " ++ (brandsToJs quotel sl) ++ ")"
                      | ADistinct => "distinct(" ++ e1 ++ ")"
+                     | AOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
                      | ASum => "sum(" ++ e1 ++ ")"
                      | AArithMean => "arithMean(" ++ e1 ++ ")"
                      | AToString => "toString(" ++ e1 ++ ")"
-                     | ALeft => "{" ++ quotel ++ "left" ++ quotel  ++ e1 ++ "}"
-                     | ARight => "{" ++ quotel ++ "right" ++ quotel  ++ e1 ++ "}"
+                     | ASubstring start olen =>
+                       "(" ++ e1 ++ ").substring(" ++ toString start ++
+                       match olen with
+                       | Some len => ", " ++ toString len
+                       | None => ""
+                       end ++ ")"
+                     | ALike pat oescape =>
+                       let lc := make_like_clause pat oescape in
+                       let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in
+                       regex ++ ".test(" ++ e1 ++ ")"
+                     | ALeft => "{" ++ quotel ++ "left" ++ quotel ++ " : " ++ e1 ++ "}"
+                     | ARight => "{" ++ quotel ++ "right" ++ quotel ++ " : " ++ e1 ++ "}"
                      | ABrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
                      | AUnbrand => "unbrand(" ++ e1 ++ ")"
                      | ACast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
@@ -318,7 +350,7 @@ Section NNRCtoJavascript.
          | NRCEither nd xl nl xr nr =>
            let '(s1, e1, t2) := nrcToJS nd t i eol quotel ivs in
            let '(s2, e2, t0) := nrcToJS nl t2 (i+1) eol quotel ivs in
-           let '(s3, e3, t1) := nrcToJS nr t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t1) := nrcToJS nr t0 (i+1) eol quotel ivs in
            let vl := "v" ++ xl in
            let vr := "v" ++ xr in
            let res := "res" ++ (nat_to_string10 t1) in  (* Stores the result from either left or right evaluation so it can be returned *)
@@ -334,7 +366,7 @@ Section NNRCtoJavascript.
                ++ s3
                ++ (indent (i+1)) ++ res ++ " = " ++ e3 ++ ";" ++ eol
                ++ (indent i) ++ "}" ++ eol,
-            res, t0)
+            res, t1 + 1)
        end.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSunshadow *)

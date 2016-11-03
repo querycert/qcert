@@ -372,6 +372,108 @@ Fixpoint map_string (f:ascii->ascii) (s:string)
 Global Instance ascii_dec : EqDec ascii eq
   := ascii_dec.
 
+Section like.
+  Require Import RUtil.
+
+  (* This is intended to be like the SQL like operation *)
+  (*  Definition string_like (s:pattern) *)
+
+  Inductive like_clause :=
+  | like_literal (literal:string) : like_clause
+  | like_any_char : like_clause
+  | like_any_string : like_clause.
+
+  Require Import List.
+  
+  Fixpoint make_like_clause (s:string) (escape:option ascii) {struct s}: list like_clause
+    := match s with
+       | EmptyString => nil
+       | String "_"%char tail => like_any_char :: make_like_clause tail escape
+       | String "%"%char tail => like_any_string :: make_like_clause tail escape
+       | other =>
+         (fix make_like_literal_clause (ss:string)  (acc:string) {struct ss} : list like_clause
+          := match ss with
+             | EmptyString => like_literal (string_reverse acc) :: nil
+             | String "_"%char tail => like_literal (string_reverse acc) :: like_any_char :: make_like_clause tail escape
+             | String "%"%char tail => like_literal (string_reverse acc) :: like_any_string :: make_like_clause tail escape
+             | String h tail =>
+               if Some h == escape
+               then
+                 match tail with
+                 | EmptyString =>
+                 (* unclear what to do with an escape character at the end of the string.  We will interpret it as a literal character *)
+                   like_literal (string_reverse (String h acc)) :: nil
+                 | String "_"%char tail => make_like_literal_clause tail (String "_" acc)
+                 | String "%"%char tail => make_like_literal_clause tail (String "%" acc)
+                 | String nh ntail =>
+                   if Some nh == escape
+                   then make_like_literal_clause ntail (String nh acc)
+                   else
+                     (* unclear what to do with an escape character that is invalid.  We will interpret it as a literal character *)
+                     make_like_literal_clause ntail (String nh (String h acc))
+                 end
+               else
+                 make_like_literal_clause tail (String h acc)
+             end
+                     ) other ""%string
+         
+       end.
+
+  Example make_like_clause_example1 := make_like_clause "hello_there^^^%%" None.
+  Example make_like_clause_example2 := make_like_clause "hello_there^^^%%" (Some "^"%char).
+
+  (*
+  Eval vm_compute in make_like_clause_example1.
+  Eval vm_compute in make_like_clause_example2.
+   *)
+
+  Fixpoint  string_exists_suffix (f:string->bool) (s:string) : bool
+    := f s ||
+         match s with
+         | EmptyString => false
+         | String _ tail => string_exists_suffix f tail
+         end.
+
+  (* something like bayer-moore would be much more efficient.
+     This implementation is known to have very poor performance *)
+  Fixpoint like_clause_matches_string (pat:list like_clause) (s:string)
+    := match pat with
+       | nil => s ==b EmptyString
+       | (like_literal literal)::rest =>
+         andb (prefix literal s)
+                (like_clause_matches_string rest (substring (String.length literal) (String.length s - String.length literal) s))
+       | like_any_char::rest =>
+         match s with
+         | EmptyString => false
+         | String _ tail => like_clause_matches_string rest tail
+         end
+       | like_any_string::rest =>
+         string_exists_suffix (like_clause_matches_string rest) s
+       end.
+  
+  (* This is intended to be like the SQL like operation *)
+  Definition string_like (str pattern:string) (escape:option ascii) : bool
+    := let pat_clause := make_like_clause pattern escape in
+       like_clause_matches_string pat_clause str.
+
+  Example string_like_example1 := string_like "hello there" "hello there" None.
+  Example string_like_example2 := string_like "hello there" "hello %there" None.
+  Example string_like_example3 := string_like "hello there" "he%th_re" None.
+  Example string_like_example4 := string_like "hello there " "he%th_re" None.
+  Example string_like_example5 := string_like "hello thethare" "he%th_re" None.
+  Example string_like_example6 := string_like "hello thetheare" "he%th_re" None.
+
+  (*
+  Eval vm_compute in string_like_example1.
+  Eval vm_compute in string_like_example2.
+  Eval vm_compute in string_like_example3.
+  Eval vm_compute in string_like_example4.
+  Eval vm_compute in string_like_example5.
+  Eval vm_compute in string_like_example6.
+   *)
+
+End like.
+
 
 (* 
 *** Local Variables: ***

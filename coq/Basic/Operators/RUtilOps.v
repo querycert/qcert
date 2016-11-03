@@ -52,6 +52,9 @@ Section RUtilOps.
   Global Instance ToString_Z : ToString Z
     := { toString := Z_to_string10}.
 
+  Global Instance ToString_nat : ToString nat
+    := { toString := nat_to_string10}.
+
   Global Instance ToString_bool : ToString bool
     := { toString := boolToString}.
 

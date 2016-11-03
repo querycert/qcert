@@ -54,6 +54,28 @@ function distinct(b) {
     }
     return result;
 }
+function fastdistinct(b) {
+    b1 = b.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
+    b1.sort(compare);
+    var result = [ ];
+    var v1 = null;
+    var v2 = null;
+    for (var i=0; i<b1.length; i++) {
+        var v1 = b1[i];
+	if (i == (b1.length -1)) {
+	    result.push(v1);
+	}
+	else {
+	    v2 = b1[i+1];
+	    if (equal(v1,v2)) {
+	    } else {
+		result.push(v1);
+	    }
+	    v1 = v2;
+	}
+    }
+    return result;
+}
 function compare(v1, v2) {
     var t1 = typeof v1, t2 = typeof v2;
     if (t1 != t2)
@@ -93,6 +115,29 @@ function compare(v1, v2) {
 }
 function equal(v1, v2) {
     return compare(v1, v2) == 0;
+}
+function compareOfMultipleCriterias(scl) {
+    return function(a,b) {
+	var current_compare = 0;
+	for (var i=0; i<scl.length; i++) {
+	    var sc = scl[i];
+	    if ("asc" in sc) { current_compare = compare(deref(a,sc['asc']), deref(b,sc['asc'])); }
+	    else if ("desc" in sc) { current_compare = -(compare(deref(a,sc['asc']), deref(b,sc['asc']))); }
+
+	    if (current_compare == -1) { return -1; }
+	    else if(current_compare == 1) { return 1; }
+	}
+	return current_compare;
+    }
+    
+}
+function sort(b,scl) {
+    var result = [ ];
+    if (scl.length == 0) { return b; } // Check for no sorting criteria
+    var compareFun = compareOfMultipleCriterias(scl);
+    result = b.slice(); /* Sorting in place leads to inconsistencies, notably as it re-orders the input WM in the middle of processing */
+    result.sort(compareFun);
+    return result;
 }
 function flatten(aOuter) {
   var result = [ ];
@@ -382,4 +427,9 @@ function looksLikeRelationship(v) {
 }
 function mkWorld(v) {
   return { "CONST$WORLD" : v };
+}
+
+// from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FRegular_Expressions
+function escapeRegExp(string){
+  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }

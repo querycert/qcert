@@ -16,18 +16,19 @@
 
 Require Import String.
 Require Import CompilerRuntime Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToJSON ForeignTypeToJSON.
+Require Import ForeignToJava ForeignToJavascript ForeignToScala ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
 Require Import OptimizerLogger.
 Require Import ForeignType ForeignDataTyping.
-Require Import RAlgEnv NNRC.
+Require Import RAlgEnv NRAEnv NNRC.
 
 Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
   Axiom compiler_model_foreign_to_java : foreign_to_java.
   Axiom compiler_model_foreign_to_javascript : foreign_to_javascript.
+  Axiom compiler_model_foreign_to_scala : foreign_to_scala.
   Axiom compiler_model_foreign_to_JSON : foreign_to_JSON.
   Axiom compiler_model_foreign_type_to_JSON : foreign_type_to_JSON.
   Axiom compiler_model_foreign_reduce_op : foreign_reduce_op.
@@ -35,7 +36,7 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_to_spark : foreign_to_spark.
   Axiom compiler_model_foreign_cloudant : foreign_cloudant.
   Axiom compiler_model_foreign_to_cloudant : foreign_to_cloudant.
-  Axiom compiler_model_nra_optimizer_logger : optimizer_logger string algenv.
+  Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_model_nrc_optimizer_logger : optimizer_logger string nrc.
   Axiom compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
@@ -47,6 +48,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := basic_model_runtime.
   Definition compiler_foreign_to_javascript : foreign_to_javascript
     := model.compiler_model_foreign_to_javascript.
+  Definition compiler_foreign_to_scala : foreign_to_scala
+    := model.compiler_model_foreign_to_scala.
   Definition compiler_foreign_to_java : foreign_to_java
     := model.compiler_model_foreign_to_java.
   Definition compiler_foreign_to_JSON : foreign_to_JSON
@@ -63,8 +66,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_cloudant.
   Definition compiler_foreign_to_cloudant : foreign_to_cloudant
     := model.compiler_model_foreign_to_cloudant.
-  Definition compiler_nra_optimizer_logger : optimizer_logger string algenv
-    :=  model.compiler_model_nra_optimizer_logger.
+  Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
+    :=  model.compiler_model_nraenv_optimizer_logger.
   Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
     :=  model.compiler_model_nrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing

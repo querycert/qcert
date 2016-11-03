@@ -20,9 +20,9 @@ Section PatternSugartoNRA.
   Require Import List.
 
   Require Import Utils BasicRuntime.
-  Require Import NRARuntime NRAEnvRuntime.
+  Require Import NRARuntime.
   Require Import Pattern PatternSugar Rule.
-  Require Import PatterntoNRA PatterntoNRAEnv.
+  Require Import PatterntoNRA.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -55,30 +55,10 @@ Section PatternSugartoNRA.
     reflexivity.
   Qed.
   
-  Definition algenv_of_pand (p1 p2:pat) : algenv :=
-    algenv_of_pat (pand p1 p2).
-
-  Definition algenv_for_pand (q1 q2: algenv) : algenv :=
-    ANUnop AFlatten
-         (ANAppEnv (ANMapEnv q2)
-            (ANUnop AFlatten
-               (ANMap (ANBinop AMergeConcat ANEnv ANID)
-                  (ANMap (ANConst (drec nil))
-                     (ANSelect ANID q1))))).
-  
-  Lemma algenv_of_pand_works (p1 p2:pat) :
-    algenv_of_pat (pand p1 p2) = algenv_for_pand (algenv_of_pat p1) (algenv_of_pat p2).
-  Proof.
-    reflexivity.
-  Qed.
-
   (* WW *)
 
   Definition alg_of_WW (p:pat) :=
     alg_of_pat (WW p).
-
-  Definition algenv_of_WW (p:pat) :=
-    algenv_of_pat (WW p).
 
 End PatternSugartoNRA.
 

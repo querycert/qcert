@@ -30,11 +30,11 @@ let parse_string p_fun s =
     try
       p_fun buf
     with
-    | CACo_Error msg -> raise (CACo_Error msg)
+    | Qcert_Error msg -> raise (Qcert_Error msg)
     | LexError msg ->
-	Printf.fprintf stderr "[%s] in string%!\n" msg; raise (CACo_Error ("Parse error ["^ msg ^"] in string [" ^ s ^ "]"))
+	Printf.fprintf stderr "[%s] in string%!\n" msg; raise (Qcert_Error ("Parse error ["^ msg ^"] in string [" ^ s ^ "]"))
     | _ ->
-	Printf.fprintf stderr "Error in string%!\n"; raise (CACo_Error ("Parse error [???] in string"))
+	Printf.fprintf stderr "Error in string%!\n"; raise (Qcert_Error ("Parse error [???] in string"))
   
 
 (******************)
@@ -56,7 +56,7 @@ let parse_oql_from_string s : QLang.oql = parse_string parse_oql s
 let parse_sexp_from_string s : SExp.sexp = parse_string parse_sexp s
 let parse_io_sexp_from_string s : QData.data = parse_string parse_io_sexp s
 let parse_camp_sexp_from_string s : QLang.camp = parse_string parse_camp_sexp s
-let parse_nraenv_sexp_from_string s : QLang.nraenv = parse_string parse_nraenv_sexp s
+let parse_nraenv_sexp_from_string s : QLang.nraenv_core = parse_string parse_nraenv_sexp s
 let parse_nnrc_sexp_from_string s : QLang.nnrc = parse_string parse_nnrc_sexp s
 let parse_nnrcmr_sexp_from_string s : QLang.nnrcmr = parse_string parse_nnrcmr_sexp s
 let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp s

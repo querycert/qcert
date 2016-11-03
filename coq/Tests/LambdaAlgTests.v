@@ -219,19 +219,20 @@ End LambdaNRATests.
 
 (* Now let's see if we can optimize *)
 
-Require Import TOptimEnvFunc.
+Require Import NRAEnvOptimFunc.
 Require Import OptimizerLogger.
-Require Import RAlgEnv.
-Context {l:optimizer_logger string algenv}.
+Require Import NRAEnv.
+Context {l:optimizer_logger string nraenv}.
 
-Definition T1env := (algenv_of_lalg_lambda (q_to_lambda T1l)).
+Definition T1env : nraenv := (nraenv_of_lalg_lambda (q_to_lambda T1l)).
 (* Eval vm_compute in T1env. *)
 Definition T1env_opt := toptim_nraenv T1env.
 (* Eval vm_compute in T1env_opt. *)
-Definition T1nnrc_opt := TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T1env_opt.
+Definition T1nnrc_opt :=
+  TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T1env_opt.
 (* Eval vm_compute in T1nnrc_opt. *)
 
-Definition T2env := (algenv_of_lalg_lambda (q_to_lambda T2l)).
+Definition T2env := (nraenv_of_lalg_lambda (q_to_lambda T2l)).
 (* Eval vm_compute in T2env. *)
 Definition T2env_opt := toptim_nraenv T2env.
 (* Eval vm_compute in T2env_opt. *)

@@ -14,19 +14,26 @@
  * limitations under the License.
  *)
 
-(* Front end utilities *)
+Require Import List String.
 
-open ConfigUtil
-open Compiler.EnhancedCompiler
+Require Import Utils ForeignRuntime ForeignType.
 
-(* Parse/translate input *)
+Local Open Scope string_scope.
 
-(* val camp_of_rule_string : string -> (string * QLang.camp) *)
+Section ForeigntoScala.
 
-(* val nraenv_of_rule : string -> (string * QLang.nraenv) *)
-(* val nraenv_of_rule_string : string -> (string * QLang.nraenv) *)
-(* val nraenv_of_oql : string -> (string * QLang.nraenv) *)
-(* val nraenv_of_oql_string : string -> (string * QLang.nraenv) *)
+Class foreign_to_scala {fruntime:foreign_runtime} {ftype: foreign_type}: Type
+  := mk_foreign_to_scala {
+         foreign_to_scala_unary_op
+           (fu:foreign_unary_op_type)
+           (d:string) : string
+         ; foreign_to_scala_spark_datatype (ft: foreign_type_type) : string
+       }.
+  
+End ForeigntoScala.
 
-val nraenv_of_input : lang_config -> string -> (string * QLang.nraenv)
-
+(* 
+*** Local Variables: ***
+*** coq-load-path: (("../../coq" "QCert")) ***
+*** End: ***
+*)

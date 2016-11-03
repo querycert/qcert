@@ -31,16 +31,9 @@ Section QEnv.
   Definition init_venv := "env"%string.
   Definition init_vinit := "init"%string.
 
-  (* Java equivalent: NnrcToNrcmr.localize_names *)
-  Definition localize_names (names: list string) : list (string * dlocalization) :=
-    map (fun x => (x, Vdistr)) names.
-
-  Definition localize_bindings {A} (cenv: list (string * A)) : list (string * dlocalization) :=
-    localize_names (map fst cenv).
-
   Context {fdata:foreign_data}.
   
-  Definition unwrap_result res :=
+  Definition lift_result res :=
     match res with
     | None => None
     | Some (dcoll l) => Some l
@@ -48,13 +41,6 @@ Section QEnv.
     end.
 
   Require Import DData.
-
-  (* Declares single distributed input collection containing world -- Bindings and Data *)
-  Definition mkDistWorld (world:list data) : list (string*ddata)
-    := ("CONST$WORLD"%string, Ddistr world)::nil.
-
-  Definition mkDistLoc : list (string*dlocalization)
-    := ("CONST$WORLD"%string, Vdistr)::nil.
 
   Definition validate (oresult oexpected:option (list data))
     := match oresult, oexpected with
@@ -77,15 +63,10 @@ Section QEnv.
     and then applies reflexivity.  This is *much* faster.
    *)
 
-  (* Check Rule/CAMP result *)
-
-  Definition validate_rule_success res exp : bool :=
-    validate_success res exp.
-
-  (* Check NRAEnv/NNRC/NNRCMR/CloudantMR result *)
+  (* Check result: Top-level function *)
   
-  Definition validate_lifted_success res exp : bool :=
-    validate_success (unwrap_result res) exp.
+  Definition validate_lifted_success (res:option data) exp : bool :=
+    validate_success (lift_result res) exp.
 
 End QEnv.
 

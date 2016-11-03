@@ -42,10 +42,10 @@ val idioticize : string -> string -> string
 
 (* Convenience function *)
 
-val cloudant_compile_from_nra : string -> string -> QLang.nraenv -> QData.json -> string
+val cloudant_compile_from_nra : string -> string -> QLang.nraenv_core -> QData.json -> string
 val cloudant_compile_from_nnrcmr : string -> string -> QLang.nnrcmr -> QData.json -> string
 
-val cloudant_compile_no_harness_from_nra : string -> QLang.nraenv -> string
+val cloudant_compile_no_harness_from_nra : string -> QLang.nraenv_core -> string
 val cloudant_compile_no_harness_from_nnrcmr : string -> QLang.nnrcmr -> string
 
 val cloudant_translate_no_harness : QLang.nnrcmr -> QLang.cldmr

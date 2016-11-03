@@ -38,7 +38,7 @@ let compile source_lang_s target_lang_s q_s =
       in
       let p_conf = PrettyIL.default_pretty_config () in
       PrettyIL.pretty_query p_conf q_target
-    with CACo_Error err -> "compilation error: "^err
+    with Qcert_Error err -> "compilation error: "^err
     | _ -> "compilation error"
     end
   in
@@ -57,11 +57,18 @@ let global_config_of_json j =
       gconf_dir = None;
       gconf_dir_target = None;
       gconf_io = None;
+      gconf_io_use_world = false;
       gconf_schema = TypeUtil.empty_schema;
+      gconf_data = Compiler.Ev_in_world [];
+      gconf_expected_output_data = [];
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;
       gconf_emit_sexp_all = false;
+      gconf_eval = false;
+      gconf_eval_all = false;
+      gconf_eval_debug = false;
+      gconf_eval_validate = false;
       gconf_source_sexp = false;
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
@@ -111,7 +118,7 @@ let global_config_of_json j =
 
 
 let json_of_result res =
-  let wrap x = (* XXX To review XXX *)
+  let wrap x =
       object%js
         val name = Js.string x.QcertCore.res_file
         val value = Js.string x.QcertCore.res_content
@@ -127,7 +134,7 @@ let json_of_result res =
     val emitall = Js.def (wrap_all res.QcertCore.res_emit_all)
     val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
     val emitsexpall = Js.def (wrap_all res.QcertCore.res_emit_sexp_all)
-    val result = Js.string res.QcertCore.res_emit.QcertCore.res_content (* XXX To review XXX *)
+    val result = Js.string res.QcertCore.res_emit.QcertCore.res_content
   end
 
 let json_of_error msg =
@@ -146,26 +153,26 @@ let main input =
       begin try
 	global_config_of_json input
       with exn ->
-        raise (CACo_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
+        raise (Qcert_Error ("[Couldn't load configuration: "^(Printexc.to_string exn)^"]"))
       end
     in
     let q_s =
       begin try
        Js.to_string input##.query
       with exn ->
-        raise (CACo_Error ("[Couldn't load query: "^(Printexc.to_string exn)^"]"))
+        raise (Qcert_Error ("[Couldn't load query: "^(Printexc.to_string exn)^"]"))
       end
     in
     let res =
       begin try
         QcertCore.main gconf ("Query.string", q_s)
-      with CACo_Error err -> raise (CACo_Error ("[Compilation error: "^err^"]"))
-      | exn -> raise (CACo_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
+      with Qcert_Error err -> raise (Qcert_Error ("[Compilation error: "^err^"]"))
+      | exn -> raise (Qcert_Error ("[Compilation error: "^(Printexc.to_string exn)^"]"))
       end
     in
     json_of_result res
   with
-  | CACo_Error msg -> json_of_error msg
+  | Qcert_Error msg -> json_of_error msg
   | exn -> json_of_error ("[Main error: "^(Printexc.to_string exn)^"]")
   end
 

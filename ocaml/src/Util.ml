@@ -16,9 +16,9 @@
 
 (* This module contains a few basic utilities *)
 
-(* CACo Exception *)
+(* Qcert Exception *)
 
-exception CACo_Error of string
+exception Qcert_Error of string
 
 (* this can't go in Logger, since that creates a circular dependency *)
 type logger_token_type = string
@@ -113,7 +113,7 @@ let get_data x io =
   try List.assoc x io
   with Not_found ->
     Printf.fprintf stderr "Unbound variable %s\n" x;
-    raise (CACo_Error ("Unbound variable" ^ x))
+    raise (Qcert_Error ("Unbound variable" ^ x))
 
 let get_data_raise x io =
   List.assoc x io
@@ -159,5 +159,16 @@ let qcert_string_of_float f =
   match last_char with
   | '.' -> ocaml_string ^ "0"
   | _ -> ocaml_string
+
+(**********************************)
+(* Timing function for CompStat   *)
+(**********************************)
+
+let time f x =
+  let start = Sys.time() in
+  let v = f x in
+  let stop = Sys.time() in
+  let t = string_of_float (stop -. start) in
+  (char_list_of_string t, v)
 
 
