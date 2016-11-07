@@ -1012,9 +1012,9 @@ Section NNRCtoNNRCMR.
         with respect to the scheduling
       - the updated avoid list.
    *)
-              
+
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain_ns_aux *)
-  Fixpoint nnrc_to_nnrcmr_chain_ns_aux (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)): nrc * list mr * list (var * dlocalization) :=
+  Program Fixpoint nnrc_to_nnrcmr_chain_ns_aux (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) { measure (nrc_size n) }: nrc * list mr * list (var * dlocalization) :=
     match n with
     | NRCFor x n1 n2 =>
       let '(n1', mr_list1, vars_loc) := nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc in
@@ -1065,7 +1065,9 @@ Section NNRCtoNNRCMR.
       (NRCBinop op n1' n2', mr_list1 ++ mr_list2, vars_loc)
     | NRCLet x n1 n2 =>
       let '(n1', mr_list1, vars_loc) := nnrc_to_nnrcmr_chain_ns_aux n1 initunit vars_loc in
-      let (mr_n1, vars_loc) := mr_chain_of_nnrc n1' initunit vars_loc x in
+      let x_fresh := nrc_pick_name "$"(* nrc_unshadow_sep *) id (domain vars_loc) x n2 in
+      let n2 := nrc_rename_lazy n2 x x_fresh in
+      let (mr_n1, vars_loc) := mr_chain_of_nnrc n1' initunit vars_loc x_fresh in
       let '(n2', mr_list2, vars_loc) := nnrc_to_nnrcmr_chain_ns_aux n2 initunit vars_loc in
       (n2', mr_list1 ++ mr_n1 ++ mr_list2, vars_loc)
     | NRCIf n0 n1 n2 =>
@@ -1076,6 +1078,31 @@ Section NNRCtoNNRCMR.
     | NRCEither n0 x n1 y n2 =>
       (n, nil, vars_loc) (* XXX TODO? *)
     end.
+  Next Obligation.
+      simpl; omega.
+  Defined.
+  Next Obligation.
+      simpl; omega.
+  Defined.
+  Next Obligation.
+      simpl; omega.
+  Defined.
+  Next Obligation.
+      simpl; omega.
+  Defined.
+  Next Obligation.
+    rewrite nrc_rename_lazy_size.
+    simpl; omega.
+  Defined.
+  Next Obligation.
+      simpl; omega.
+  Defined.
+  Next Obligation.
+      simpl; omega.
+  Defined.
+  Next Obligation.
+      simpl; omega.
+  Defined.
 
   Lemma nnrc_to_nnrcmr_chain_aux_causally_consistent (n: nrc) (initunit: var) (vars_loc: list (var * dlocalization)) :
     shadow_free n = true ->
@@ -1122,7 +1149,7 @@ Section NNRCtoNNRCMR.
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain *)
   Definition nnrc_to_nnrcmr_chain (n: nrc) (initunit: var) (inputs_loc: vdbindings) : nrcmr :=
-    let n_ns := unshadow_simpl (initunit::nil) n in
+    let n_ns := (* unshadow_simpl (initunit::nil) *) n in
     let vars_loc := inputs_loc ++ List.map (fun x => (x, Vlocal)) (nrc_bound_vars n_ns) in
     nnrc_to_nnrcmr_chain_ns n_ns initunit inputs_loc vars_loc.
 

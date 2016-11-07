@@ -24,6 +24,7 @@ Section NShadow.
   Require Import Utils BasicRuntime.
 
   Require Import NNRC.
+  Require Import NNRCSize.
 
   Close Scope nrc_scope.
   
@@ -537,6 +538,45 @@ Section NShadow.
       := if oldvar == newvar
          then e
          else (nrc_subst e oldvar (NRCVar newvar)).
+
+    Lemma nrc_rename_lazy_size n x1 x2:
+      nrc_size (nrc_rename_lazy n x1 x2) = nrc_size n.
+    Proof.
+      nrc_cases (induction n) Case;
+        unfold nrc_rename_lazy in *;
+        simpl;
+        destruct (equiv_dec x1 x2);
+        simpl;
+        try reflexivity;
+        try solve [ rewrite IHn1;
+                    rewrite IHn2;
+                    rewrite IHn3;
+                    reflexivity ];
+        try solve [ rewrite IHn1;
+                    rewrite IHn2;
+                    reflexivity ];
+        try solve [ rewrite IHn;
+                    reflexivity ];
+        try solve [ rewrite IHn1;
+                    destruct (equiv_dec v x1);
+                      simpl; try reflexivity;
+                    rewrite IHn2;
+                    reflexivity ].
+      - Case "NRCVar"%string.
+        destruct (equiv_dec v x1);
+            simpl; reflexivity.
+      - rewrite IHn1.
+        destruct (equiv_dec v x1);
+          destruct (equiv_dec v0 x1);
+          simpl; try reflexivity.
+        + rewrite IHn3.
+          reflexivity.
+        + rewrite IHn2.
+          reflexivity.
+        + rewrite IHn2.
+          rewrite IHn3.
+          reflexivity.
+    Qed.
 
     Context (sep:string).
     (* as part of unshadowing, we also support a user defined renaming function *)
