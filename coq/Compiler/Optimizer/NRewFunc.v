@@ -103,7 +103,7 @@ Section NRewFunc.
     let p' := rew p in
     match nat_compare (cost p') (cost p) with
       | Lt => rew_cost rew cost p'
-      | _ => p'
+      | _ => p
     end.
   Proof.
     intros rew cost p Hcmp.
@@ -118,7 +118,7 @@ Section NRewFunc.
     functional induction rew_cost rew cost p.
     - rewrite IHn.
       apply Hrew.
-    - apply Hrew.
+    - reflexivity.
   Qed.
 
   Hint Rewrite rew_cost_correctness : rew_correct.
