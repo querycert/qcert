@@ -60,15 +60,6 @@ public abstract class PatternRule extends CampRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#isFunction()
 	 */
 	@Override

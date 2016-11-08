@@ -37,7 +37,7 @@ public class OrElsePattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "porElse";
+		return "PorElse";
 	}
 
 	/* (non-Javadoc)

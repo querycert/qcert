@@ -37,7 +37,7 @@ public class AssertPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "passert";
+		return "Passert";
 	}
 
 	/* (non-Javadoc)

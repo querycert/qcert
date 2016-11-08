@@ -36,7 +36,7 @@ public class EnvPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "penv";
+		return "Penv";
 	}
 
 	/* (non-Javadoc)

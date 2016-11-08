@@ -55,7 +55,7 @@ public class BinaryPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "pbinop";
+		return "Pbinop";
 	}
 
 	/* (non-Javadoc)

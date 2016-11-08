@@ -59,7 +59,7 @@ public class CollData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dcoll";
+		return "Dcoll";
 	}
 
 	/* (non-Javadoc)

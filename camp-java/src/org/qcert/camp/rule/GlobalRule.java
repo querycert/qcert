@@ -15,7 +15,11 @@
  */
 package org.qcert.camp.rule;
 
+import org.qcert.camp.CampMacros;
 import org.qcert.camp.pattern.CampPattern;
+import org.qcert.camp.pattern.LetEnvPattern;
+import org.qcert.camp.pattern.UnaryOperator;
+import org.qcert.camp.pattern.UnaryPattern;
 
 /**
  * Represnts rule_global in the Rule macro language 
@@ -45,6 +49,24 @@ public final class GlobalRule extends PatternRule {
 		return new GlobalRule(this, operand);
 	}
 
+	/**
+	 * Implement according to logic in rule_to_pattern in Coq code
+         | rule_global p ps =>
+           punop AFlatten
+                 (makeSingleton
+                    (pletEnv
+                       (WW p)
+                       (rule_to_pattern ps)))
+	 * @see org.qcert.camp.rule.CampRule#convertToPattern()
+	 */
+	@Override
+	public CampPattern convertToPattern() {
+		CampPattern op = getOperand().convertToPattern();
+		CampPattern ww = CampMacros.WW(getPattern());
+		CampPattern single = CampMacros.makeSingleton(new LetEnvPattern(ww, op));
+		return new UnaryPattern(UnaryOperator.AFlatten, single);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
@@ -54,18 +76,18 @@ public final class GlobalRule extends PatternRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "rule_global";
-	}
-
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return "rule_global (" + getPattern() + ")";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "rule_global";
 	}
 }

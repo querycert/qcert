@@ -36,7 +36,7 @@ public class RightPattern extends CampPattern {
 	 */
 	@Override
 	protected String getTag() {
-		return "pright";
+		return "Pright";
 	}
 
 	/* (non-Javadoc)

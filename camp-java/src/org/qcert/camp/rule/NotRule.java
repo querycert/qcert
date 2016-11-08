@@ -15,7 +15,11 @@
  */
 package org.qcert.camp.rule;
 
+import org.qcert.camp.CampMacros;
 import org.qcert.camp.pattern.CampPattern;
+import org.qcert.camp.pattern.LetEnvPattern;
+import org.qcert.camp.pattern.UnaryOperator;
+import org.qcert.camp.pattern.UnaryPattern;
 
 /**
  * Represents rule_not in the Rule macro language
@@ -45,6 +49,25 @@ public final class NotRule extends PatternRule {
 		return new NotRule(this, operand);
 	}
 
+	/**
+	 * Implement according to logic in rule_to_pattern in Coq code
+         | rule_not p ps =>
+           punop AFlatten
+                 (makeSingletonre
+                    (pletEnv
+                       (notholds p RETURN BINDINGS)
+                       (rule_to_pattern ps)))
+	 * @see org.qcert.camp.rule.CampRule#convertToPattern()
+	 */
+	@Override
+	public CampPattern convertToPattern() {
+		CampPattern op = getOperand().convertToPattern();
+		CampPattern not = CampMacros.notholds(getPattern());
+		CampPattern ret = CampMacros.RETURN(not, CampMacros.BINDINGS());
+		CampPattern single = CampMacros.makeSingleton(new LetEnvPattern(ret, op));
+		return new UnaryPattern(UnaryOperator.AFlatten, single);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#getKind()
 	 */
@@ -54,18 +77,18 @@ public final class NotRule extends PatternRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "rule_not";
-	}
-
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		return "rule_not (" + getPattern() + ")";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "rule_not";
 	}
 }

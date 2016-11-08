@@ -48,7 +48,7 @@ public class DurationData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dtime_duration";
+		return "Dtime_duration";
 	}
 
 	/**

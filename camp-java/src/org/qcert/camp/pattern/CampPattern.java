@@ -33,7 +33,7 @@ public abstract class CampPattern extends CampAST {
 	/** Single instance of the it pattern */
 	public static final ItPattern IT = new ItPattern();
 	/** Single instance of the left pattern */
-	public static final CampAST LEFT = new LeftPattern();
+	public static final CampPattern LEFT = new LeftPattern();
 	/** Single instance of the right pattern */
 	public static final RightPattern RIGHT = new RightPattern();
 	

@@ -15,6 +15,7 @@
  */
 package org.qcert.camp.pattern;
 
+
 /**
  * Enumerates the possible unary operators and describes what parameters they take 
  */
@@ -61,26 +62,27 @@ public enum UnaryOperator {
     ATimeFromString,
     ATimeDurationFromString;
 
-	/** Enumerate the kinds of parameters */
-	public enum ParameterKind {None, String, StringList }
-	
 	/** The kind of parameter taken by this operator */
 	private ParameterKind parameterKind;
-
+	
 	/** Alternate constructor for the usual case of no parameter */
 	UnaryOperator() {
 		this(ParameterKind.None);
 	}
-	
+
 	/** Constructor */
 	UnaryOperator(ParameterKind parameterKind) {
 		this.parameterKind = parameterKind;
 	}
-	
+
 	/**
 	 * @return the parameterKind
 	 */
 	public ParameterKind getParameterKind() {
 		return parameterKind;
 	}
+
+	/** Enumerate the kinds of parameters */
+	public enum ParameterKind {None, String, StringList }
 }
+

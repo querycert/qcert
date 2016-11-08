@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.qcert.camp.pattern.CampPattern;
+
 /**
  * Represents a compound rule formed from other FunctionRules 
  */
@@ -55,7 +57,26 @@ public final class CompoundRule extends CampRule {
 		}
 		return rule;
 	}
-	
+
+	/** See comment in "convertToPattern" */
+	public CampPattern convertForAggregate() {
+		return apply(new ReturnRule(CampPattern.ENV)).convertToPattern();
+	}
+
+	/**
+	 * In the Coq implementation of Rules, things of signature Rule->Rule are not converted
+	 *  to patterns as such; they typically appear inside aggregates, where they are always
+	 *  first applied to '(rule_return penv)' before conversion.
+	 * Consequently, this method is a "should not occur" to avoid accidentally calling it
+	 * in a context in which the Rule->Rule signature is invalid.   In aggregate processing,
+	 * use "convertForAggregate," which will do the right thing.
+	 * @see org.qcert.camp.rule.CampRule#convertToPattern()
+	 */
+	@Override
+	public CampPattern convertToPattern() {
+		throw new IllegalStateException("Improper context for convertToPattern on compound rule");
+	}
+
 	/**
 	 * Special emitting function.  Note: the format for this case is not well-established.
 	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
@@ -86,22 +107,6 @@ public final class CompoundRule extends CampRule {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getOperands()
-	 */
-	@Override
-	protected Object[] getOperands() {
-		throw new IllegalStateException();  // should not be called since we override emit
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		throw new IllegalStateException();  // should not be called since we override emit
-	}
-
-	/* (non-Javadoc)
 	 * @see org.qcert.camp.rule.CampRule#isFunction()
 	 */
 	@Override
@@ -122,5 +127,21 @@ public final class CompoundRule extends CampRule {
 			delim = String.format(" ;;;%n");
 		}
 		return bldr.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // should not be called since we override emit
 	}
 }

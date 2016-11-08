@@ -15,6 +15,7 @@
  */
 package org.qcert.camp.pattern;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -61,22 +62,14 @@ public final class UnaryPattern extends CampPattern {
 		}
 	}
 
-	/**
-	 * Subroutine for formatting String or List<String> parameters
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
 	 */
-	@SuppressWarnings("unchecked")
-	private String formatParameter() {
-		if (parameter == null)
-			return "";
-		if (parameter instanceof String)
-			return " \"" + parameter + "\" ";
-		StringBuilder bldr = new StringBuilder(" [");
-		String delim = "";
-		for (String s : (List<String>) parameter) {
-			bldr.append(delim).append("\"").append(s).append("\"");
-			delim = ", ";
-		}
-		return bldr.append("] ").toString();
+	@Override
+	public void emit(PrintWriter pw) {
+		pw.append("(Punop (").append(operator.name()).append(formatParameter(true)).append(") ");
+		getOperand().emit(pw);
+		pw.append(")");
 	}
 
 	/* (non-Javadoc)
@@ -85,14 +78,6 @@ public final class UnaryPattern extends CampPattern {
 	@Override
 	public Kind getKind() {
 		return Kind.punop;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getOperands()
-	 */
-	@Override
-	protected Object[] getOperands() {
-		return new Object[] {operator, getOperand()};
 	}
 
 	/**
@@ -118,18 +103,45 @@ public final class UnaryPattern extends CampPattern {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "punop";
-	}
-
-	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return operator + formatParameter() + "(" + getOperand() + ")";
+		return operator + formatParameter(false) + "(" + getOperand() + ")";
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // should not be called since we override emit
+	}
+
+	/**
+	 * Subroutine for formatting String or List<String> parameters
+	 * Formatting is different for emitting (s-expression) or toString (readable syntax)
+	 */
+	@SuppressWarnings("unchecked")
+	private String formatParameter(boolean sexp) {
+		if (parameter == null)
+			return "";
+		if (parameter instanceof String)
+			return " \"" + parameter + "\" ";
+		StringBuilder bldr = new StringBuilder(sexp ? " " : " [");
+		String delim = "";
+		for (String s : (List<String>) parameter) {
+			bldr.append(delim).append("\"").append(s).append("\"");
+			delim = ", ";
+		}
+		return bldr.append(sexp ? " " : "] ").toString();
 	}
 }

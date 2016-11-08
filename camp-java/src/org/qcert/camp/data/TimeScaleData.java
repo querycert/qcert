@@ -48,7 +48,7 @@ public class TimeScaleData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "dtime_scale";
+		return "Dtime_scale";
 	}
 
 	/**

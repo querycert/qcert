@@ -16,18 +16,21 @@
 package org.qcert.camp.rule;
 
 import org.qcert.camp.CampAST;
+import org.qcert.camp.pattern.CampPattern;
 
 /**
  * Represents Rules (macros defined on CAMP patterns)
  */
 public abstract class CampRule extends CampAST {
-	public enum Kind {
-		When, Global, Not, Return, Compound, Complete;
-	}
-	
+	public abstract CampRule apply(CampRule operand);
+
+	public abstract CampPattern convertToPattern();
+
 	public abstract Kind getKind();
 	
 	public abstract boolean isFunction();
-	
-	public abstract CampRule apply(CampRule operand);
+
+	public enum Kind {
+		When, Global, Not, Return, Compound;
+	}
 }
