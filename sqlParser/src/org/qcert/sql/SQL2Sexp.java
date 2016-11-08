@@ -19,10 +19,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+
 import util.FileUtil;
 import util.SExpParser;
 import util.SExpression;
 
+import com.facebook.presto.sql.parser.CaseInsensitiveStream;
+import com.facebook.presto.sql.parser.SqlBaseLexer;
 import com.facebook.presto.sql.parser.StatementSplitter;
 
 /**
@@ -50,7 +56,7 @@ public class SQL2Sexp {
 		int index = 0;
 		File data = dataDirectory;
 		File output = outputDirectory;
-		boolean useDaysHack = false;
+		boolean convertDateIntervals = false;
 		boolean interleaved = false;
 		boolean splitStatements = false; 
 		while (index < args.length) {
@@ -67,8 +73,8 @@ public class SQL2Sexp {
 					interleaved = true;
 				else if (arg.equals("-splitStatements"))
 					splitStatements = true;
-				else if (arg.equals("-useDaysHack"))
-					useDaysHack = true;
+				else if (arg.equals("-convertDateIntervals"))
+					convertDateIntervals = true;
 				else if (arg.startsWith("-"))
 					throw new IllegalArgumentException(arg);
 				else
@@ -78,7 +84,7 @@ public class SQL2Sexp {
 		if (sources.size() == 3 && isNumber(sources.get(1)) && isNumber(sources.get(2)))
 			sources = generateRange(sources);
 		for (String source : sources) {
-			String result = process(source, useDaysHack, interleaved, splitStatements, data, output);
+			String result = process(source, convertDateIntervals, interleaved, splitStatements, data, output);
 			if (result == null || result.length() == 0)
 				System.out.println("Query " + source + " parsed and converted");
 			else {
@@ -89,33 +95,33 @@ public class SQL2Sexp {
 	}
 	
 	/**
-	 * Basically an egregious hack to get the TPC-DS queries through presto.  These use notations like
-	 * "30 days" where presto needs to see "interval '30' day".  Since we do this without formally parsing
-	 * the query, it is highly error prone and dependent on formatting conventions of TPC-DS
+	 * Convert occurances of NN [days|months|years] to interval NN [day|month|year]. 
 	 * @param query the original query
-	 * @return the hacked query
+	 * @return the altered query
 	 */
-	private static String applyDaysHack(String query) {
-		int index = query.indexOf("days");
-		StringBuilder revision = new StringBuilder();
-		while (index != -1) {
-			String before = query.substring(0, index);
-			query = query.substring(index + 4);
-			if (query.charAt(0) == '"') {
-				/* Dirty and imprecise way of finding and skipping the quoted case */
-				revision.append(before).append("days\"");
-				query = query.substring(1);
-			} else {
-				while (before.endsWith(" "))
-					before = before.substring(0, before.length() - 1);
-				int numIndex = before.lastIndexOf(' '); // dubious, but works for present case
-				String number = before.substring(numIndex + 1);
-				before = before.substring(0, numIndex);
-				revision.append(before).append(" interval '").append(number).append("' day ");
-			}
-			index = query.indexOf("days");
+	private static String convertDateIntervals(String query) {
+        CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
+		SqlBaseLexer lexer = new SqlBaseLexer(stream);
+		StringBuilder buffer = new StringBuilder();
+		Token savedInteger = null;
+		for (Token token : lexer.getAllTokens()) {
+			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
+				savedInteger = token;
+			else if (savedInteger != null) {
+				String unit = getUnit(token.getText());
+				if (unit != null) {
+					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
+					savedInteger = null;
+				} else if (token.getType() == SqlBaseLexer.WS)
+					buffer.append(token.getText());
+				else { 
+					buffer.append(savedInteger.getText()).append(" ").append(token.getText());
+					savedInteger = null;
+				}
+			} else
+				buffer.append(token.getText());
 		}
-		return revision.append(query).toString();
+		return buffer.toString();
 	}
 
 	/** Generate a range of arguments from a stem, start index, and end index */
@@ -127,6 +133,20 @@ public class SQL2Sexp {
 		for (int i = start; i <= end; i++)
 			range.add(stem + i);
 		return range;
+	}
+
+	/**
+	 * Subroutine of convertDateIntervals to recognize interval names in the plural form and return the singular of same
+	 */
+	private static String getUnit(String text) {
+		if (text.trim().equalsIgnoreCase("days"))
+			return "day";
+		else if (text.trim().equalsIgnoreCase("months"))
+			return "month";
+		else if (text.trim().equalsIgnoreCase("years"))
+			return "year";
+		else
+			return null;
 	}
 
 	/** Determine if a "query" has multiple statements */
@@ -152,7 +172,7 @@ public class SQL2Sexp {
 		try {
 			String query = FileUtil.readFile(new File(data, String.format(inputTemplate, qn)));
 			if (useDaysHack)
-				query = applyDaysHack(query);
+				query = convertDateIntervals(query);
 			String result = PrestoEncoder.parseAndEncode(query, interleaved);
 			if (hasMultipleStatements(query) && splitStatements)
 				writeSplitOutput(result, qn, output); // subsumes sanity check
