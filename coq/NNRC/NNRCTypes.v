@@ -16,6 +16,7 @@
 
 Require Export BasicTypes.
 Require Export TNRC TNRCEq TShadow.
+Require Export TRew.
 
 (* 
 *** Local Variables: ***

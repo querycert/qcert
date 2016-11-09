@@ -15,8 +15,9 @@
  *)
 
 Require Export BasicRuntime.
-Require Export NNRC NNRCSize NNRCEq NShadow.
+Require Export NNRC NNRCNorm NNRCSize NNRCEq NNRCShadow.
 Require Export NRewUtil NRew.
+Require Export NNRCExt.
 
 (* 
 *** Local Variables: ***

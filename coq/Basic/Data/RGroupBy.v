@@ -82,7 +82,6 @@ Section RGroupBy.
     (lift_filter (fun d => key_is_eq_r eval_key d k) l).
 
   Definition group_by_nested_eval (eval_key: data -> option data) (l: list data) : option (list (data * (list data))) :=
-    let is_eq := key_is_eq eval_key in
     let dupkeys := rmap (fun d => eval_key d) l in
     let keys := lift bdistinct dupkeys in
     olift (rmap (fun k => olift (fun group => Some (k, group)) (group_of_key eval_key k l))) keys.
@@ -104,8 +103,58 @@ Section RGroupBy.
   Qed.
   *)
 
-End RGroupBy.
+  Definition group_to_partitions (g:string) (group: data * list data) : option data :=
+    match (fst group) with
+    | drec keys =>
+      Some (drec ((g,(dcoll (snd group)))::keys))
+    | _ => None
+    end.
 
+  Definition to_partitions (g:string) (l: list (data * list data)) :=
+    lift_map (group_to_partitions g) l.
+  
+  Definition group_by_nested_eval_keys_partition
+             (g:string) (eval_keys:data -> option data) (l: list data) : option (list data) :=
+    olift (to_partitions g) (group_by_nested_eval eval_keys l).
+
+  Section normalized.
+    Require Import BrandRelation.
+    Require Import RDataNorm.
+    Context (h:brand_relation_t).
+
+    Lemma group_by_nested_eval_keys_partition_normalized l0 s l o :
+      data_normalized h (dcoll l0) ->
+      lift dcoll
+           (group_by_nested_eval_keys_partition
+              s
+              (fun d : data =>
+                 match d with
+                 | dunit => None
+                 | dnat _ => None
+                 | dbool _ => None
+                 | dstring _ => None
+                 | dcoll _ => None
+                 | drec r => Some (drec (rproject r l))
+                 | dleft _ => None
+                 | dright _ => None
+                 | dbrand _ _ => None
+                 | dforeign _ => None
+                 end) l0) = Some o
+      -> data_normalized h o.
+    Proof.
+      intros.
+      induction l0; simpl in H0.
+      - inversion H0; subst.
+        constructor; constructor.
+      - inversion H; clear H; subst.
+        inversion H2; clear H2; subst.
+        destruct a; try discriminate; simpl in *.
+        admit.
+    Admitted.
+  End normalized.
+
+End RGroupBy.
+  
 
 (*
 *** Local Variables: ***

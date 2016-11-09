@@ -392,7 +392,6 @@ Section NNRCtoJavascript.
       joinStrings ", " ivs.
 
     (* Free variables are assumed to be constant lookups *)
-    Require Import NShadow.
     (* Java equivalent: JavaScriptBackend.closeFreeVars *)
     Definition closeFreeVars (input:string) (e:nrc) (params:list string) : nrc :=
       let all_free_vars := nrc_free_vars e in

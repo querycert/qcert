@@ -131,9 +131,11 @@ MODULES = \
 	NRAEnv/NRAEnvTypes \
 	NRAEnv/NRAEnvSystem \
 	NNRC/Calculus/NNRC \
+	NNRC/Calculus/NNRCShadow \
+	NNRC/Calculus/NNRCNorm \
 	NNRC/Calculus/NNRCEq \
 	NNRC/Calculus/NNRCSize \
-	NNRC/Calculus/NShadow \
+	NNRC/Extended/NNRCExt \
 	NNRC/Typing/TNRC \
 	NNRC/Typing/TNRCInfer \
 	NNRC/Typing/TNRCEq \

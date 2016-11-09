@@ -21,7 +21,7 @@ Section NRewMR.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC NShadow NNRCMR ForeignReduceOps.
+  Require Import NNRCRuntime NNRCMR ForeignReduceOps.
 
   Local Open Scope list_scope.
 

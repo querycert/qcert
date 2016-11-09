@@ -27,8 +27,8 @@ Section TRewFunc.
   Require Import Program.
 
   Require Import Utils BasicSystem.
-  Require Import NNRC NNRCEq NShadow NRew NRewFunc TShadow TNRCEq TRew.
-  Require Import NRewUtil.
+  Require Import NNRCSystem.
+  Require Import NRewFunc.
   Require Import OptimizerLogger.
 
   Local Open Scope nrc_scope.

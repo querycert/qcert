@@ -385,7 +385,6 @@ Section NNRCtoJava.
       joinStrings ", " (map (fun elem => "JsonElement " ++ snd elem) ivs).
 
     (* Free variables are assumed to be constant lookups *)
-    Require Import NShadow.
     Definition closeFreeVars (input:string) (e:nrc) (ivs:list(string*string)) : nrc :=
       let all_free_vars := nrc_free_vars e in
       let wrap_one_free_var (e':nrc) (fv:string) : nrc :=

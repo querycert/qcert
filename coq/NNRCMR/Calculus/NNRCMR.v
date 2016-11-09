@@ -21,7 +21,7 @@ Section NNRCMR.
   
   Require Import Utils BasicRuntime.
 
-  Require Import NNRC NShadow ForeignReduceOps.
+  Require Import NNRCRuntime ForeignReduceOps.
 
 
   Local Open Scope list_scope.
