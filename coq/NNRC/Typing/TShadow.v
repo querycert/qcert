@@ -23,7 +23,7 @@ Section TShadow.
 
   Require Import Utils BasicSystem.
 
-  Require Import NNRC NShadow TNRC.
+  Require Import NNRC NNRCShadow TNRC.
   
   Hint Constructors nrc_type.
 

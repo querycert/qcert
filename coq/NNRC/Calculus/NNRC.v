@@ -40,11 +40,23 @@ Section NNRC.
   | NRCIf : nrc -> nrc -> nrc -> nrc
   | NRCEither : nrc -> var -> nrc -> var -> nrc -> nrc.
 
+  Tactic Notation "nrc_cases" tactic(first) ident(c) :=
+    first;
+    [ Case_aux c "NRCVar"%string
+    | Case_aux c "NRCConst"%string
+    | Case_aux c "NRCBinop"%string
+    | Case_aux c "NRCUnop"%string
+    | Case_aux c "NRCLet"%string
+    | Case_aux c "NRCFor"%string
+    | Case_aux c "NRCIf"%string
+    | Case_aux c "NRCEither"%string].
+
   Global Instance nrc_eqdec : EqDec nrc eq.
   Proof.
     change (forall x y : nrc,  {x = y} + {x <> y}).
     decide equality;
-      try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec |     apply string_eqdec].
+      try solve [apply binOp_eqdec | apply unaryOp_eqdec
+                 | apply data_eqdec | apply string_eqdec].
   Defined.
 
   (** Semantics of NNRC *)
@@ -63,95 +75,35 @@ Section NNRC.
         olift (fun d1 => fun_of_unaryop h uop d1) (nrc_eval env e1)
       | NRCLet x e1 e2 =>
         match nrc_eval env e1 with
-          | Some d => nrc_eval ((x,d)::env) e2
-          | _ => None
+        | Some d => nrc_eval ((x,d)::env) e2
+        | _ => None
         end
       | NRCFor x e1 e2 =>
         match nrc_eval env e1 with
-          | Some (dcoll c1) =>
-            let inner_eval d1 :=
-                let env' := (x,d1) :: env in nrc_eval env' e2
-            in
-            lift dcoll (rmap inner_eval c1)
-          | _ => None
+        | Some (dcoll c1) =>
+          let inner_eval d1 :=
+              let env' := (x,d1) :: env in nrc_eval env' e2
+          in
+          lift dcoll (rmap inner_eval c1)
+        | _ => None
         end
       | NRCIf e1 e2 e3 =>
         let aux_if d :=
             match d with
-              | dbool b =>
-                if b then nrc_eval env e2 else nrc_eval env e3
-              | _ => None
+            | dbool b =>
+              if b then nrc_eval env e2 else nrc_eval env e3
+            | _ => None
             end
         in olift aux_if (nrc_eval env e1)
       | NRCEither ed xl el xr er =>
         match nrc_eval env ed with
-          | Some (dleft dl) =>
-            nrc_eval ((xl,dl)::env) el
-          | Some (dright dr) =>
-            nrc_eval ((xr,dr)::env) er
-          | _ => None
+        | Some (dleft dl) =>
+          nrc_eval ((xl,dl)::env) el
+        | Some (dright dr) =>
+          nrc_eval ((xr,dr)::env) er
+        | _ => None
         end
     end.
-
-  (* evaluation preserves normalization *)
-  Lemma nrc_eval_normalized env e {o} :
-    nrc_eval env e = Some o ->
-    Forall (data_normalized h) (map snd env) ->
-    data_normalized h o.
-  Proof.
-    revert env o. induction e; simpl; intros.
-    - rewrite Forall_forall in H0.
-      apply lookup_in in H.
-      apply (H0 o).
-      rewrite in_map_iff.
-      exists (v,o); eauto.
-    - inversion H; subst; intros.
-      apply normalize_normalizes.
-    - case_eq (nrc_eval env e1); [intros ? eqq1 | intros eqq1];
-      (rewrite eqq1 in *;
-      case_eq (nrc_eval env e2); [intros ? eqq2 | intros eqq2];
-      rewrite eqq2 in *); simpl in *; try discriminate.
-      eapply fun_of_binop_normalized; eauto.
-    - case_eq (nrc_eval env e); [intros ? eqq1 | intros eqq1];
-      rewrite eqq1 in *;
-        simpl in *; try discriminate.
-      eapply fun_of_unaryop_normalized; eauto.
-    - case_eq (nrc_eval env e1); [intros ? eqq1 | intros eqq1];
-      rewrite eqq1 in *;
-        simpl in *; try discriminate.
-      case_eq (nrc_eval ((v,d)::env) e2); [intros ? eqq2 | intros eqq2];
-      rewrite eqq2 in *;
-        simpl in *; try discriminate.
-      inversion H; subst.
-      eapply IHe2; eauto.
-      constructor; eauto.
-    - case_eq (nrc_eval env e1); [intros ? eqq1 | intros eqq1];
-      rewrite eqq1 in *;
-      simpl in *; try discriminate.
-      destruct d; try discriminate.
-      specialize (IHe1 _ _ eqq1 H0).
-      inversion IHe1; subst.
-      apply some_lift in H.
-      destruct H; subst.
-      constructor.
-      apply (rmap_Forall e H2); intros.
-      apply (IHe2 _ _ H).
-      constructor; eauto.
-    - case_eq (nrc_eval env e1); [intros ? eqq1 | intros eqq1];
-      rewrite eqq1 in *;
-      simpl in *; try discriminate.
-      destruct d; try discriminate.
-      destruct b; eauto.
-    - case_eq (nrc_eval env e1); [intros ? eqq1 | intros eqq1];
-      rewrite eqq1 in *;
-      simpl in *; try discriminate.
-      specialize (IHe1 _ _ eqq1 H0).
-      destruct d; try discriminate; inversion IHe1; subst.
-      + eapply IHe2; eauto.
-         constructor; eauto.
-      + eapply IHe3; eauto.
-         constructor; eauto.
-  Qed.
 
   (* we are only sensitive to the environment up to lookup *)
   Global Instance nrc_eval_lookup_equiv_prop :
@@ -217,8 +169,6 @@ Notation "'$$' v" := (NRCVar v%string) (at level 50, format "'$$' v") : nrc_scop
 Notation "{| e1 | '$$' x ∈ e2 |}" := (NRCFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$$' x  ∈  e2  |}") : nrc_scope.   (* ∈ = \in *)
 Notation "'LET' '$$' x ':=' e2 'IN' e1" := (NRCLet x%string e2 e1) (at level 50, format "'[hv' 'LET'  '$$' x  ':='  '[' e2 ']'  '/' 'IN'  '[' e1 ']' ']'") : nrc_scope.
 Notation "e1 ? e2 : e3" := (NRCIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nrc_scope.
-
-Hint Resolve nrc_eval_normalized.
 
 Tactic Notation "nrc_cases" tactic(first) ident(c) :=
   first;

@@ -24,7 +24,7 @@ Section TRew.
       
   Require Import Utils BasicSystem.
     
-  Require Import NNRC NNRCEq NShadow.
+  Require Import NNRC NNRCEq NNRCShadow.
   Require Import NRewUtil NRew TNRC TShadow TNRCEq.
 
   Local Open Scope nrc_scope.

@@ -26,7 +26,7 @@ Section NNRCEq.
   Require Import Arith.
   
   Require Import Utils BasicRuntime.
-  Require Import NNRC.
+  Require Import NNRC NNRCNorm.
 
   Context {fruntime:foreign_runtime}.
 

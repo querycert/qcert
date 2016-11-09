@@ -23,7 +23,7 @@ Section NRew.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC NNRCEq NShadow.
+  Require Import NNRC NNRCEq NNRCShadow.
   Require Import NRewUtil.
 
   Local Open Scope nrc_scope.

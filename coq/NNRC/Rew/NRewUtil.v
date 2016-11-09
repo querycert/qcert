@@ -22,7 +22,7 @@ Section NRewUtil.
 
   Require Import Utils BasicRuntime.
 
-  Require Import NNRC NNRCEq NShadow.
+  Require Import NNRC NNRCEq NNRCShadow.
 
   Context {fruntime:foreign_runtime}.
 
