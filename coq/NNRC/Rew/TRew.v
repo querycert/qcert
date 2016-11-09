@@ -41,7 +41,7 @@ Section TRew.
     rewrite <- unshadow_type; assumption.
   Qed.
 
-  (* { a: e }.a ≡ e *)
+  (* [ a : e ].a ≡ e *)
 
   Lemma tdot_of_rec a (e:nrc) :
     tnrc_rewrites_to (NRCUnop (ADot a) (NRCUnop (ARec a) e)) e.
@@ -55,8 +55,10 @@ Section TRew.
       trivial.
   Qed.
 
-  Lemma tnrc_dot_of_concat_rec_eq_arrow s (e1 e2:nrc) :
-    tnrc_rewrites_to (NRCUnop (ADot s) (NRCBinop AConcat e1 (NRCUnop (ARec s) e2))) e2.
+  (* (e₁ ⊕ [ a : e₂ ]).a ≡ e₂ *)
+
+  Lemma tnrc_dot_of_concat_rec_eq_arrow a (e1 e2:nrc) :
+    tnrc_rewrites_to (NRCUnop (ADot a) (NRCBinop AConcat e1 (NRCUnop (ARec a) e2))) e2.
   Proof.
     red; intros ? ? typ1.
     nrc_inverter.
@@ -76,9 +78,11 @@ Section TRew.
     trivial.
   Qed.
 
-  Lemma tnrc_dot_of_concat_rec_neq_arrow s s2 (e1 e2:nrc) :
-    s <> s2 ->
-    tnrc_rewrites_to (NRCUnop (ADot s) (NRCBinop AConcat e1 (NRCUnop (ARec s2) e2))) (NRCUnop (ADot s) e1).
+  (* a₁ <> a₂ -> (e₁ ⊕ [ a₂ : e₂ ]).a₁ ≡ e₁.a₁ *)
+
+  Lemma tnrc_dot_of_concat_rec_neq_arrow a1 a2 (e1 e2:nrc) :
+    a1 <> a2 ->
+    tnrc_rewrites_to (NRCUnop (ADot a1) (NRCBinop AConcat e1 (NRCUnop (ARec a2) e2))) (NRCUnop (ADot a1) e1).
   Proof.
     red; intros neq ? ? typ1.
     nrc_inverter.
@@ -93,15 +97,17 @@ Section TRew.
       dtype_inverter.
       unfold edot.
       rewrite assoc_lookupr_drec_sort.
-      rewrite (assoc_lookupr_app _ ((s0, _) :: nil)).
+      rewrite (assoc_lookupr_app _ ((s, _) :: nil)).
       simpl.
-      destruct (string_eqdec s s0); [congruence | ].
+      destruct (string_eqdec a1 s); [congruence | ].
       trivial.
   Qed.
 
-  Lemma tnrc_merge_concat_to_concat_arrow s1 s2 p1 p2:
-    s1 <> s2 ->
-    tnrc_rewrites_to (‵[| (s1, p1)|] ⊗ ‵[| (s2, p2)|]) (‵{|‵[| (s1, p1)|] ⊕ ‵[| (s2, p2)|]|}).
+  (* a₁ <> a₂ -> [ a₁ : e₁ ] ⊗ [ a₂ : e₂ ] ≡ [ a₁ : e₁ ] ⊕ [ a₂ : e₂ ] *)
+
+  Lemma tnrc_merge_concat_to_concat_arrow a1 a2 p1 p2:
+    a1 <> a2 ->
+    tnrc_rewrites_to (‵[| (a1, p1)|] ⊗ ‵[| (a2, p2)|]) (‵{|‵[| (a1, p1)|] ⊕ ‵[| (a2, p2)|]|}).
   Proof.
     intros.
     apply nrc_rewrites_typed_with_untyped.
@@ -119,8 +125,10 @@ Section TRew.
      solve[eauto].
   Qed.
 
-  Lemma tfor_nil_arrow x e2 :
-    tnrc_rewrites_to (NRCFor x ‵{||} e2) ‵{||}.
+  (* { e | x ∈ {} } ≡ {} *)
+
+  Lemma tfor_nil_arrow x e :
+    tnrc_rewrites_to (NRCFor x ‵{||} e) ‵{||}.
   Proof.
     apply nrc_rewrites_typed_with_untyped.
     - apply for_nil.
@@ -130,6 +138,8 @@ Section TRew.
       simpl.
       repeat econstructor.
   Qed.
+
+  (* { e₁ | $t ∈ {e₁} } ≡ { LET $t := e₁ IN e₂ } *)
 
   Lemma tfor_singleton_to_let_arrow x e1 e2:
     tnrc_rewrites_to (NRCFor x (NRCUnop AColl e1) e2)
@@ -144,6 +154,8 @@ Section TRew.
       + econstructor; eauto.
   Qed.
 
+  (* ♯flatten({}) ≡ {} *)
+
   Lemma tflatten_nil_nrc_arrow  :
     tnrc_rewrites_to (♯flatten(‵{||})) ‵{||}.
   Proof.
@@ -153,6 +165,8 @@ Section TRew.
       nrc_inverter.
       repeat (econstructor; simpl).
   Qed.
+
+  (* ♯flatten({e}) ≡ e *)
 
   Lemma tflatten_singleton_nrc_arrow e :
     tnrc_rewrites_to (♯flatten(‵{| e |})) e.
@@ -167,10 +181,11 @@ Section TRew.
     trivial.
   Qed.
 
-  (* {| e3 | $t2 ∈ ♯flatten({| e2 ? ‵{|$t1|} : ‵{||} | $t1 ∈ e1 |}) |}
-       ≡ ♯flatten({| e2 ? ‵{| LET $t2 := $t1 IN e3 ]|} : ‵{||} | $t1 ∈ e1 |}) *)
+  (*  $t₁ ∉ free(e₃) ->
+      { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {$t₁} : {} | $t₁ ∈ e₁ }) }
+        ≡ ♯flatten({ e₂ ? { LET $t₂ := $t₁ IN e₃ } : {} | $t₁ ∈ e₁ }) *)
 
-  Lemma tmap_sigma_fusion_arrow (e1 e2 e3:nrc) (v1 v2:var) :
+  Lemma tmap_sigma_fusion_arrow (v1 v2:var) (e1 e2 e3:nrc) :
     ~ In v1 (nrc_free_vars e3) ->
     tnrc_rewrites_to
       (NRCFor v2 
@@ -199,10 +214,10 @@ Section TRew.
         trivial.
   Qed.
 
-  (* {| e3 | $t2 ∈ ♯flatten({| e2 ? ‵{|$t1|} : ‵{||} | $t1 ∈ e1 |}) |}
-       ≡ ♯flatten({| e2 ? ‵{| LET $t2 := $t1 IN e3 ]|} : ‵{||} | $t1 ∈ e1 |}) *)
+  (* { e₃ | $t₂ ∈ ♯flatten({ e₂ ? {$t₁} : {} | $t₁ ∈ e₁ }) }
+       ≡ ♯flatten({ e₂ ? { LET $t₂ := $t₁ IN e₃ } : {} | $t₁ ∈ e₁ }) *)
 
-  Lemma tmap_sigma_fusion_samevar_arrow (e1 e2 e3:nrc) (v1:var) :
+  Lemma tmap_sigma_fusion_samevar_arrow (v1:var) (e1 e2 e3:nrc) :
     tnrc_rewrites_to
       (NRCFor v1 
               (NRCUnop AFlatten
@@ -223,6 +238,9 @@ Section TRew.
       repeat (econstructor; eauto 2).
   Qed.
 
+  (* bound(e2) ∩ free(e1) = ∅ ->
+       LET $t := e₁ IN e₂ ≡ e₂[$t ↦ e₁] *)
+
   Lemma tlet_inline_disjoint_arrow x e1 e2 :
     disjoint (nrc_bound_vars e2) (nrc_free_vars e1) ->
     tnrc_rewrites_to
@@ -237,6 +255,8 @@ Section TRew.
       nrc_input_well_typed.
       erewrite <- nrc_eval_cons_subst_disjoint; eauto.
   Qed.
+
+  (* LET $t := e₁ IN e₂ ≡ rename(e₂,free(e₁))[$t ↦ e₁] *)
 
   Lemma tlet_inline_arrow sep renamer x e1 e2 :
     tnrc_rewrites_to
@@ -253,6 +273,9 @@ Section TRew.
       apply (unshadow_avoid _ _ _ _ _ H0 H).
   Qed.
 
+  (* { e₀ | $t ∈ IF e₁ THEN e₂ ELSE e₃ }
+       ≡ IF e1 THEN { e₀ | $t ∈ e₂ } ELSE  { e₀ | $t ∈ e₃ } *)
+
   Lemma tfor_over_if_arrow x e1 e2  e3 ebody :
     tnrc_rewrites_to (NRCFor x (NRCIf e1 e2 e3) ebody)
                      (NRCIf e1 (NRCFor x e2 ebody)
@@ -264,7 +287,11 @@ Section TRew.
       nrc_inverter.
       repeat (econstructor; eauto 2).
   Qed.
-  
+
+  (* {$tl,$tr} ∩ free(e₀) = ∅ ->
+      { e₀ | $t ∈ (Either e₁ $tl el $tr er) } 
+        ≡ Either e₁ $tl { e₀ | $t ∈ el } $tr { e₀ | $t ∈ er} *)
+
   Lemma tfor_over_either_disjoint_arrow x e1 xl el xr er ebody:
     disjoint (xl::xr::nil) (nrc_free_vars ebody) ->
     tnrc_rewrites_to (NRCFor x (NRCEither e1 xl el xr er) ebody)
@@ -958,31 +985,31 @@ Section TRew.
       inversion τout0; trivial.
   Qed.
 
-    Lemma tnrcproject_over_concat_recs_in_in sl s₁ p₁ s₂ p₂ :
-      In s₁ sl -> In s₂ sl ->
-      π[sl](‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |]) ⇒ᶜ ‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |].
-    Proof.
-      intros.
-      apply nrc_rewrites_typed_with_untyped.
-      - rewrite nrcproject_over_concat.
-        repeat rewrite nrcproject_over_rec_in by trivial.
-        reflexivity.
-      - intros.
-        nrc_inverter.
-        econstructor; eauto 2.
-        2: repeat (econstructor; eauto 2).
-        2: repeat (econstructor; eauto 2).
-        econstructor; eauto.
-        unfold rec_concat_sort.
-        rewrite rproject_rec_sort_commute, rproject_app.
-        simpl.
-        destruct (in_dec string_dec s sl); [| intuition ].
-        destruct (in_dec string_dec s1 sl); [| intuition ].
-        reflexivity.
+  Lemma tnrcproject_over_concat_recs_in_in sl s₁ p₁ s₂ p₂ :
+    In s₁ sl -> In s₂ sl ->
+    π[sl](‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |]) ⇒ᶜ ‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |].
+  Proof.
+    intros.
+    apply nrc_rewrites_typed_with_untyped.
+    - rewrite nrcproject_over_concat.
+      repeat rewrite nrcproject_over_rec_in by trivial.
+      reflexivity.
+    - intros.
+      nrc_inverter.
+      econstructor; eauto 2.
+      2: repeat (econstructor; eauto 2).
+      2: repeat (econstructor; eauto 2).
+      econstructor; eauto.
+      unfold rec_concat_sort.
+      rewrite rproject_rec_sort_commute, rproject_app.
+      simpl.
+      destruct (in_dec string_dec s sl); [| intuition ].
+      destruct (in_dec string_dec s1 sl); [| intuition ].
+      reflexivity.
       Grab Existential Variables.
       solve[eauto].
       solve[eauto].
-    Qed.
+  Qed.
   
   Lemma tnrcproject_over_nrcproject sl1 sl2 p :
     π[sl1](π[sl2](p)) ⇒ᶜ π[set_inter string_dec sl2 sl1](p).
