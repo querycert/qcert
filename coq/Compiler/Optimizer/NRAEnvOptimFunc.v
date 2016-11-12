@@ -635,7 +635,8 @@ Section NRAEnvOptimFunc.
     simpl.
     case_eq (nraenv_ignores_id_fun p1); intros; try reflexivity.
     apply tapp_over_ignoreid_arrow.
-    rewrite ignores_id_eq; assumption.
+    rewrite <- nraenv_ignores_id_eq in H.
+    apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
   (* ENV ◯ₑ p ⇒ₓ p *)
@@ -684,7 +685,8 @@ Section NRAEnvOptimFunc.
     simpl.
     case_eq (nraenv_ignores_env_fun p1); intros; try reflexivity.
     apply tappenv_over_ignoreenv_arrow.
-    rewrite ignores_env_eq; assumption.
+    rewrite <- nraenv_ignores_env_eq in H.
+    apply nraenv_ignores_env_algenv_eq; assumption.
   Qed.
 
   (* (p1 ◯ p2) ◯ p3 ⇒ₓ p1 ◯ (p2 ◯ p3) *)
@@ -741,10 +743,16 @@ Section NRAEnvOptimFunc.
     simpl.
     case_eq (nraenv_ignores_env_fun p1_1); intros.
     - apply tappenv_over_app_ie_arrow.
-      apply ignores_env_eq; trivial.
+      rewrite <- nraenv_ignores_env_eq in H.
+      generalize nraenv_ignores_env_algenv_eq; intros.
+      unfold algenv_of_nraenv in *.
+      apply H0; assumption.
     - case_eq (nraenv_ignores_id_fun p2); intros.
       + apply tappenv_over_app_arrow.
-        apply ignores_id_eq; trivial.
+        rewrite <- nraenv_ignores_id_eq in H0.
+        generalize nraenv_ignores_id_algenv_eq; intros.
+        unfold algenv_of_nraenv in *.
+        apply H1; assumption.
       + reflexivity.
   Qed.
 
@@ -768,7 +776,10 @@ Section NRAEnvOptimFunc.
     simpl.
     case_eq (nraenv_ignores_id_fun p1_1); intros.
     - apply tapp_over_appenv_arrow.
-      rewrite ignores_id_eq; assumption.
+      rewrite <- nraenv_ignores_id_eq in H.
+      generalize nraenv_ignores_id_algenv_eq; intros.
+      unfold algenv_of_nraenv in *.
+      apply H0; assumption.
     - reflexivity.
   Qed.
 
@@ -884,7 +895,8 @@ Section NRAEnvOptimFunc.
     rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tappenv_over_map_arrow.
     reflexivity.
-    rewrite ignores_id_eq; assumption.
+    rewrite <- nraenv_ignores_id_eq in H.
+    apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
   (* σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ₓ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
@@ -908,7 +920,8 @@ Section NRAEnvOptimFunc.
     rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     rewrite tappenv_over_select_arrow.
     reflexivity.
-    rewrite ignores_id_eq; assumption.
+    rewrite <- nraenv_ignores_id_eq in H.
+    apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
   (* σ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ₓ σ⟨ p1 ⟩( p2 ◯ p0 ) *)
@@ -1048,7 +1061,10 @@ Section NRAEnvOptimFunc.
     simpl.
     case_eq (nraenv_ignores_env_fun p1_2); intros; try reflexivity.
     apply tappenv_over_env_merge_l_arrow.
-    rewrite ignores_env_eq; assumption.
+    rewrite <- nraenv_ignores_env_eq in H.
+    generalize nraenv_ignores_env_algenv_eq; intros.
+    unfold algenv_of_nraenv in *.
+    apply H0; assumption.
   Qed.
 
   Definition tmerge_with_empty_rec_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -1298,12 +1314,12 @@ Section NRAEnvOptimFunc.
     destruct d; simpl; try reflexivity.
     destruct l; simpl; try reflexivity.
     match_case; simpl; try reflexivity.
-    unfold nraenv_ignores_id_fun.
-    intros ig; apply ignores_id_eq in ig.
+    intros ig.
+    rewrite <- nraenv_ignores_id_eq in ig.
     rewrite lift_tnraenv_eq_to_talgenv_eq. simpl.
     autorewrite with talgenv_optim.
     - reflexivity.
-    - trivial.
+    - apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
   Hint Rewrite @tappenv_over_either_nil_fun_correctness : toptim_correct.
@@ -1427,9 +1443,13 @@ Section NRAEnvOptimFunc.
     destruct u; try reflexivity.
     destruct p1_2_2; try reflexivity.
     destruct p2; simpl; try reflexivity;
-    try (case_eq (nraenv_ignores_env_fun p1_2_1); try reflexivity; intros;
-         apply tflip_env4_arrow; rewrite ignores_env_eq; assumption).
-    apply tflip_env1_arrow.
+    try (apply tflip_env1_arrow);
+    case_eq (nraenv_ignores_env_fun p1_2_1);
+      try reflexivity; intros; rewrite <- nraenv_ignores_env_eq in H;
+    apply tflip_env4_arrow;
+    generalize nraenv_ignores_env_algenv_eq; intros;
+    unfold algenv_of_nraenv in *;
+    apply H0; assumption.
   Qed.
 
   Definition tflip_env2_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -1507,7 +1527,10 @@ Section NRAEnvOptimFunc.
     simpl.
     case_eq (nraenv_ignores_id_fun p1); try reflexivity; intros.
     apply tmapenv_to_map_arrow.
-    rewrite ignores_id_eq; assumption.
+    rewrite <- nraenv_ignores_id_eq in H.
+    generalize nraenv_ignores_id_algenv_eq; intros.
+    unfold algenv_of_nraenv in *.
+    apply H0; assumption.
   Qed.
 
   Definition tmerge_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=

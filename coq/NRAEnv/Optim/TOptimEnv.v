@@ -2017,19 +2017,19 @@ Section TOptimEnv.
     input_well_typed; reflexivity.
   Qed.
 
-  (* (ignores_id q₁) -> q₁ ◯ q₂ ⇒ q₁ *)
+  (* (algenv_ignores_id q₁) -> q₁ ◯ q₂ ⇒ q₁ *)
   
   Lemma tapp_over_ignoreid_arrow q₁ q₂:
-    ignores_id q₁ -> q₁ ◯ q₂ ⇒ q₁.
+    algenv_ignores_id q₁ -> q₁ ◯ q₂ ⇒ q₁.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
     algenv_inferer.
     assert (q₁ ▷ τin >=> τout ⊣ τc;τenv)
-           by (eapply tignores_id_swap; eauto).
+           by (eapply talgenv_ignores_id_swap; eauto).
     econstructor; eauto.
     intros.
     input_well_typed.
-    rewrite (ignores_id_swap q₁ H _ _ env x dout) in eout1.
+    rewrite (algenv_ignores_id_swap q₁ H _ _ env x dout) in eout1.
     congruence.
   Qed.
   
@@ -2086,10 +2086,10 @@ Section TOptimEnv.
     reflexivity.
   Qed.
     
-  (* ignores_id q -> χ⟨ q₁ ⟩( q₂ ) ◯ᵉ q ⇒ χ⟨ q₁ ◯ᵉ q ⟩( q₂ ◯ᵉ q ) *)
+  (* algenv_ignores_id q -> χ⟨ q₁ ⟩( q₂ ) ◯ᵉ q ⇒ χ⟨ q₁ ◯ᵉ q ⟩( q₂ ◯ᵉ q ) *)
   
   Lemma tappenv_over_map_arrow q q₁ q₂:
-    ignores_id q ->
+    algenv_ignores_id q ->
     χ⟨ q₁ ⟩( q₂ ) ◯ₑ q ⇒ χ⟨ q₁ ◯ₑ q ⟩( q₂ ◯ₑ q ).
   Proof.
     intros.
@@ -2097,13 +2097,13 @@ Section TOptimEnv.
     intros; algenv_inferer.
     econstructor; eauto.
     econstructor; eauto.
-    apply (tignores_id_swap q H _ _ _ τenv' τenv H3).
+    apply (talgenv_ignores_id_swap q H _ _ _ τenv' τenv H3).
   Qed.
 
-  (* ignores_env q₁ -> χ⟨ q₁ ⟩( q₂ ) ◯ᵉ q ⇒ χ⟨ q₁ ⟩( q₂ ◯ᵉ q ) *)
+  (* algenv_ignores_env q₁ -> χ⟨ q₁ ⟩( q₂ ) ◯ᵉ q ⇒ χ⟨ q₁ ⟩( q₂ ◯ᵉ q ) *)
   
-  Lemma tappenv_over_map_ignores_env_arrow q₁ q₂:
-    ignores_env q₁ ->
+  Lemma tappenv_over_map_algenv_ignores_env_arrow q₁ q₂:
+    algenv_ignores_env q₁ ->
     χ⟨ q₁ ⟩( q₂ ) ◯ₑ ANID ⇒ χ⟨ q₁ ◯ₑ ANID ⟩( q₂ ◯ₑ ANID ).
   Proof.
     unfold talgenv_rewrites_to; simpl; intros.
@@ -2111,12 +2111,12 @@ Section TOptimEnv.
     econstructor; eauto.
     - econstructor; eauto.
       econstructor; eauto.
-      apply (tignores_env_swap q₁ H _ _ _ _ _ H2).
+      apply (talgenv_ignores_env_swap q₁ H _ _ _ _ _ H2).
     - intros.
       destruct (brand_relation_brands ⊢ₑ q₂ @ₑ x ⊣ c;x); try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl.
-      rewrite (ignores_env_swap q₁ H _ c x a a).
+      rewrite (algenv_ignores_env_swap q₁ H _ c x a a).
       destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;a); try reflexivity; simpl.
       unfold lift in *.
       destruct (rmap (fun_of_algenv brand_relation_brands c q₁ x) l);
@@ -2127,7 +2127,7 @@ Section TOptimEnv.
   (* σ⟨ q₁ ⟩( q₂ ) ◯ᵉ q ⇒ σ⟨ q₁ ◯ᵉ q ⟩( q₂ ◯ᵉ q ) *)
   
   Lemma tappenv_over_select_arrow q q₁ q₂:
-    ignores_id q ->
+    algenv_ignores_id q ->
     σ⟨ q₁ ⟩( q₂ ) ◯ₑ q ⇒ σ⟨ q₁ ◯ₑ q ⟩( q₂ ◯ₑ q ).
   Proof.
     intros.
@@ -2135,7 +2135,7 @@ Section TOptimEnv.
     intros; algenv_inferer.
     econstructor; eauto.
     econstructor; eauto.
-    apply (tignores_id_swap q H _ _ _ _ _ H3).
+    apply (talgenv_ignores_id_swap q H _ _ _ _ _ H3).
   Qed.
     
   (* (q₁ ◯ₑ q₂) ◯ₑ q ⇒ q₁ ◯ₑ (q₂ ◯ₑ q) *)
@@ -2153,69 +2153,69 @@ Section TOptimEnv.
   (* (q₁ ◯ q₂) ◯ₑ q ⇒ (q₁ ◯ₑ q) ◯ (q₂ ◯ₑ q) *)
   
   Lemma tappenv_over_app_arrow q q₁ q₂:
-    ignores_id q -> (q₁ ◯ q₂) ◯ₑ q ⇒ (q₁ ◯ₑ q) ◯ (q₂ ◯ₑ q).
+    algenv_ignores_id q -> (q₁ ◯ q₂) ◯ₑ q ⇒ (q₁ ◯ₑ q) ◯ (q₂ ◯ₑ q).
   Proof.
     unfold talgenv_rewrites_to; intros.
     algenv_inferer.
     econstructor; eauto.
     - repeat econstructor; eauto.
-      apply (tignores_id_swap q H _ τin τ1 τenv' τenv H3).
+      apply (talgenv_ignores_id_swap q H _ τin τ1 τenv' τenv H3).
     - intros.
       input_well_typed; simpl.
-      rewrite (ignores_id_swap q H _ _ env dout0 x).
+      rewrite (algenv_ignores_id_swap q H _ _ env dout0 x).
       rewrite eout; simpl.
       rewrite eout1; reflexivity.
   Qed.
 
   Lemma tappenv_over_app_ie_arrow p1 p2 p3:
-    ignores_env p3 ->
+    algenv_ignores_env p3 ->
     ((p3 ◯ p2) ◯ₑ p1) ⇒ p3 ◯ (p2 ◯ₑ p1).
   Proof.
     intros.
     apply (rewrites_typed_with_untyped _ _ (appenv_over_app_ie p1 p2 p3 H)).
     intros; algenv_inferer.
     econstructor; eauto.
-    apply (tignores_env_swap p3 H _ _ _ _ _ H8).
+    apply (talgenv_ignores_env_swap p3 H _ _ _ _ _ H8).
   Qed.
     
   (* (q₁ ◯ₑ q₂) ◯ q ⇒ (q₁ ◯ q) ◯ₑ (q₂ ◯ q) *)
   
   Lemma tapp_over_appenv_arrow q q₁ q₂:
-    ignores_id q₁ -> (q₁ ◯ₑ q₂) ◯ q ⇒ q₁ ◯ₑ (q₂ ◯ q).
+    algenv_ignores_id q₁ -> (q₁ ◯ₑ q₂) ◯ q ⇒ q₁ ◯ₑ (q₂ ◯ q).
   Proof.
     unfold talgenv_rewrites_to; intros.
     algenv_inferer.
     econstructor; eauto.
     - econstructor; eauto.
-      apply (tignores_id_swap q₁ H _ τ1 τin τout τenv' H8).
+      apply (talgenv_ignores_id_swap q₁ H _ τ1 τin τout τenv' H8).
     - intros.
       input_well_typed; simpl.
-      rewrite (ignores_id_swap q₁ H _ _ dout0 x dout).
+      rewrite (algenv_ignores_id_swap q₁ H _ _ dout0 x dout).
       rewrite eout1; simpl; reflexivity.
   Qed.
     
-  (* (ignores_env q₁) -> q₁ ◯ᵉ q₂ ⇒ q₁ *)
+  (* (algenv_ignores_env q₁) -> q₁ ◯ᵉ q₂ ⇒ q₁ *)
   
   Lemma tappenv_over_ignoreenv_arrow q₁ q₂:
-    ignores_env q₁ -> q₁ ◯ₑ q₂ ⇒ q₁.
+    algenv_ignores_env q₁ -> q₁ ◯ₑ q₂ ⇒ q₁.
   Proof.
     unfold talgenv_rewrites_to; intros; simpl.
     algenv_inferer.
     assert (q₁ ▷ τin >=> τout ⊣ τc;τenv)
-      by apply (tignores_env_swap q₁ H _ τin τout τenv' τenv H7).
+      by apply (talgenv_ignores_env_swap q₁ H _ τin τout τenv' τenv H7).
     econstructor; eauto.
     intros.
     input_well_typed.
-    rewrite (ignores_env_swap q₁ H _ _ env dout x) in eout1.
+    rewrite (algenv_ignores_env_swap q₁ H _ _ env dout x) in eout1.
     rewrite eout0 in eout1.
     inversion eout1.
     reflexivity.
   Qed.
 
-  (* ignores_env q₁ -> (ENV ⊗ q₁) ◯ₑ q ⇒ q ⊗ q₁ *)
+  (* algenv_ignores_env q₁ -> (ENV ⊗ q₁) ◯ₑ q ⇒ q ⊗ q₁ *)
   
   Lemma tappenv_over_env_merge_l_arrow q₁ q:
-    ignores_env q₁ ->
+    algenv_ignores_env q₁ ->
     ANAppEnv (ENV ⊗ q₁) q ⇒ q ⊗ q₁.
   Proof.
     intros.
@@ -2223,11 +2223,11 @@ Section TOptimEnv.
     algenv_inferer.
     econstructor; eauto.
     assert (q₁ ▷ τin >=> Rec Closed τ₂0 pf2 ⊣ τc;τenv)
-      by apply (tignores_env_swap q₁ H _ τin (Rec Closed τ₂0 pf2) (Rec Closed τ₁0 pf1) τenv H10).
+      by apply (talgenv_ignores_env_swap q₁ H _ τin (Rec Closed τ₂0 pf2) (Rec Closed τ₁0 pf1) τenv H10).
     eauto.
     econstructor; eauto.
     assert (q₁ ▷ τin >=> Rec Open τ₂0 pf2 ⊣ τc;τenv)
-      by apply (tignores_env_swap q₁ H _ τin (Rec Open τ₂0 pf2) (Rec Open τ₁0 pf1) τenv H10).
+      by apply (talgenv_ignores_env_swap q₁ H _ τin (Rec Open τ₂0 pf2) (Rec Open τ₁0 pf1) τenv H10).
     eauto.
   Qed.
 
@@ -2243,16 +2243,16 @@ Section TOptimEnv.
 
   (* This overlaps with the previous (but neither is more general...) *)
   Lemma tflip_env4_arrow q₁ q₂:
-    ignores_env q₁ -> (χ⟨ENV⟩( σ⟨ q₁ ⟩(‵{|ID|}))) ◯ₑ q₂ ⇒ χ⟨q₂⟩( σ⟨ q₁ ⟩(‵{|ID|})).
+    algenv_ignores_env q₁ -> (χ⟨ENV⟩( σ⟨ q₁ ⟩(‵{|ID|}))) ◯ₑ q₂ ⇒ χ⟨q₂⟩( σ⟨ q₁ ⟩(‵{|ID|})).
   Proof.
     unfold talgenv_rewrites_to; intros.
     algenv_inferer.
     econstructor; eauto.
     - repeat econstructor; eauto.
-      apply (tignores_env_swap q₁ H _ τ₁ Bool τ₂ τenv H6).
+      apply (talgenv_ignores_env_swap q₁ H _ τ₁ Bool τ₂ τenv H6).
     - intros.
       input_well_typed.
-      rewrite (ignores_env_swap q₁ H _ _ env dout x).
+      rewrite (algenv_ignores_env_swap q₁ H _ _ env dout x).
       rewrite eout0.
       destruct dout0; try reflexivity.
       autorewrite with alg.
@@ -2283,13 +2283,13 @@ Section TOptimEnv.
   Qed.
 
   Lemma tappenv_through_either q₁ q₂ q₃:
-    ignores_id q₃ ->
+    algenv_ignores_id q₃ ->
     ANEither q₁ q₂ ◯ₑ q₃ ⇒ ANEither (q₁ ◯ₑ q₃) (q₂ ◯ₑ q₃).
   Proof.
     intros ig.
     apply (rewrites_typed_with_untyped _ _ (appenv_through_either q₁ q₂ q₃ ig)).
     intros. algenv_inferer.
-    generalize (tignores_id_swap _ ig τc).
+    generalize (talgenv_ignores_id_swap _ ig τc).
     econstructor;
       (econstructor; [| eassumption]; eauto). 
   Qed.
@@ -2324,22 +2324,22 @@ Section TOptimEnv.
     destruct (brand_relation_brands ⊢ₑ q₁ @ₑ x ⊣ c;d); reflexivity.
   Qed.
 
-  (* ignores_id q₁ -> χᵉ⟨ q₁ ⟩(ID) ◯ᵉ q₂ ⇒ χ⟨ q₁ ◯ᵉ ID ⟩(q₂) *)
+  (* algenv_ignores_id q₁ -> χᵉ⟨ q₁ ⟩(ID) ◯ᵉ q₂ ⇒ χ⟨ q₁ ◯ᵉ ID ⟩(q₂) *)
   
   Lemma tmapenv_to_map_arrow q₁ q₂:
-    ignores_id q₁ ->
+    algenv_ignores_id q₁ ->
     (ANMapEnv q₁) ◯ₑ q₂ ⇒ χ⟨ q₁ ◯ₑ ID ⟩(q₂).
   Proof.
     intros.
     unfold talgenv_rewrites_to; simpl; intros.
     algenv_inferer; econstructor; eauto.
     - repeat econstructor; eauto.
-      apply (tignores_id_swap q₁ H _ τin τenv0 τ₂ τenv0); assumption.
+      apply (talgenv_ignores_id_swap q₁ H _ τin τenv0 τ₂ τenv0); assumption.
     - intros.
       input_well_typed.
       destruct dout; try reflexivity; simpl; clear eout τout H3.
       induction l; try reflexivity; simpl.
-      rewrite (ignores_id_swap q₁ H _ _ a x a).
+      rewrite (algenv_ignores_id_swap q₁ H _ _ a x a).
       destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;a); try reflexivity; simpl.
       destruct (rmap (fun env' : data => brand_relation_brands ⊢ₑ q₁ @ₑ x ⊣ c;env') l);
         destruct (rmap (fun x0 : data => brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;x0) l);

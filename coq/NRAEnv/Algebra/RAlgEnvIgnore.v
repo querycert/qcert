@@ -30,48 +30,48 @@ Section RAlgEnvIgnore.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint is_nra (e:algenv) : Prop :=
+  Fixpoint algenv_is_nra (e:algenv) : Prop :=
     match e with
       | ANID => True
       | ANConst rd => True
-      | ANBinop bop e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANUnop uop e1 => is_nra e1
-      | ANMap e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANMapConcat e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANSelect e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANDefault e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANEither e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANEitherConcat e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | ANApp e1 e2 => (is_nra e1) /\ (is_nra e2)
+      | ANBinop bop e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANUnop uop e1 => algenv_is_nra e1
+      | ANMap e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANMapConcat e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANProduct e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANSelect e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANDefault e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANEither e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANEitherConcat e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
+      | ANApp e1 e2 => (algenv_is_nra e1) /\ (algenv_is_nra e2)
       | ANGetConstant _ => False
       | ANEnv => False
       | ANAppEnv e1 e2 => False
       | ANMapEnv e1 => False
     end.
 
-  Fixpoint is_nra_fun (e:algenv) : bool :=
+  Fixpoint algenv_is_nra_fun (e:algenv) : bool :=
     match e with
       | ANID => true
       | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANUnop uop e1 => is_nra_fun e1
-      | ANMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANMapConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANSelect e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANDefault e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANEither e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANEitherConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | ANApp e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | ANBinop bop e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANUnop uop e1 => algenv_is_nra_fun e1
+      | ANMap e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANMapConcat e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANProduct e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANSelect e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANDefault e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANEither e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANEitherConcat e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
+      | ANApp e1 e2 => andb (algenv_is_nra_fun e1) (algenv_is_nra_fun e2)
       | ANGetConstant _ => false
       | ANEnv => false
       | ANAppEnv e1 e2 => false
       | ANMapEnv e1 => false
     end.
 
-  Lemma is_nra_eq (e:algenv):
-    is_nra e <-> (is_nra_fun e = true).
+  Lemma algenv_is_nra_eq (e:algenv):
+    algenv_is_nra e <-> (algenv_is_nra_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence;
     try (rewrite IHe1 in H; rewrite IHe2 in H;
@@ -85,49 +85,49 @@ Section RAlgEnvIgnore.
     - rewrite <- IHe in H; assumption.
   Qed.
 
-  Fixpoint ignores_env (e:algenv) : Prop :=
+  Fixpoint algenv_ignores_env (e:algenv) : Prop :=
     match e with
       | ANID => True
       | ANConst rd => True
-      | ANBinop bop e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANUnop uop e1 => ignores_env e1
-      | ANMap e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANMapConcat e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANProduct e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANSelect e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANDefault e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANEither e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANEitherConcat e1 e2 => (ignores_env e1) /\ (ignores_env e2)
-      | ANApp e1 e2 => (ignores_env e1) /\ (ignores_env e2)
+      | ANBinop bop e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANUnop uop e1 => algenv_ignores_env e1
+      | ANMap e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANMapConcat e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANProduct e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANSelect e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANDefault e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANEither e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANEitherConcat e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
+      | ANApp e1 e2 => (algenv_ignores_env e1) /\ (algenv_ignores_env e2)
       | ANGetConstant _ => True
       | ANEnv => False
-      | ANAppEnv e1 e2 => (ignores_env e2)
+      | ANAppEnv e1 e2 => (algenv_ignores_env e2)
       | ANMapEnv e1 => False
     end.
 
-  (* Java equivalent: NraOptimizer.ignores_env_fun *)
-  Fixpoint ignores_env_fun (e:algenv) : bool :=
+  (* Java equivalent: NraOptimizer.algenv_ignores_env_fun *)
+  Fixpoint algenv_ignores_env_fun (e:algenv) : bool :=
     match e with
       | ANID => true
       | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANUnop uop e1 => ignores_env_fun e1
-      | ANMap e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANMapConcat e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANProduct e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANSelect e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANDefault e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANEither e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANEitherConcat e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
-      | ANApp e1 e2 => andb (ignores_env_fun e1) (ignores_env_fun e2)
+      | ANBinop bop e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANUnop uop e1 => algenv_ignores_env_fun e1
+      | ANMap e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANMapConcat e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANProduct e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANSelect e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANDefault e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANEither e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANEitherConcat e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
+      | ANApp e1 e2 => andb (algenv_ignores_env_fun e1) (algenv_ignores_env_fun e2)
       | ANGetConstant _ => true
       | ANEnv => false
-      | ANAppEnv e1 e2 => (ignores_env_fun e2)
+      | ANAppEnv e1 e2 => (algenv_ignores_env_fun e2)
       | ANMapEnv e1 => false
     end.
 
-  Lemma ignores_env_eq (e:algenv):
-    ignores_env e <-> (ignores_env_fun e = true).
+  Lemma algenv_ignores_env_eq (e:algenv):
+    algenv_ignores_env e <-> (algenv_ignores_env_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence;
     try (rewrite IHe1 in H; rewrite IHe2 in H;
@@ -145,48 +145,48 @@ Section RAlgEnvIgnore.
 
   (* Fixed environment ! *)
 
-  Fixpoint fixed_env (e:algenv) : Prop :=
+  Fixpoint algenv_fixed_env (e:algenv) : Prop :=
     match e with
       | ANID => True
       | ANConst rd => True
-      | ANBinop bop e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANUnop uop e1 => fixed_env e1
-      | ANMap e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANMapConcat e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANProduct e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANSelect e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANDefault e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANEither e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANEitherConcat e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | ANApp e1 e2 => (fixed_env e1) /\ (fixed_env e2)
+      | ANBinop bop e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANUnop uop e1 => algenv_fixed_env e1
+      | ANMap e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANMapConcat e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANProduct e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANSelect e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANDefault e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANEither e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANEitherConcat e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
+      | ANApp e1 e2 => (algenv_fixed_env e1) /\ (algenv_fixed_env e2)
       | ANGetConstant _ => True 
       | ANEnv => True (* That's the difference with ignore... *)
       | ANAppEnv e1 e2 => False (* Changes the environment *)
       | ANMapEnv e1 => False (* Changes the environment *)
     end.
 
-  Fixpoint fixed_env_fun (e:algenv) : bool :=
+  Fixpoint algenv_fixed_env_fun (e:algenv) : bool :=
     match e with
       | ANID => true
       | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANUnop uop e1 => fixed_env_fun e1
-      | ANMap e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANMapConcat e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANProduct e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANSelect e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANDefault e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANEither e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANEitherConcat e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | ANApp e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
+      | ANBinop bop e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANUnop uop e1 => algenv_fixed_env_fun e1
+      | ANMap e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANMapConcat e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANProduct e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANSelect e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANDefault e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANEither e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANEitherConcat e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
+      | ANApp e1 e2 => andb (algenv_fixed_env_fun e1) (algenv_fixed_env_fun e2)
       | ANGetConstant _ => true
       | ANEnv => true
       | ANAppEnv e1 e2 => false
       | ANMapEnv e1 => false
     end.
 
-  Lemma fixed_env_eq (e:algenv):
-    fixed_env e <-> (fixed_env_fun e = true).
+  Lemma algenv_fixed_env_eq (e:algenv):
+    algenv_fixed_env e <-> (algenv_fixed_env_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence;
     try (rewrite IHe1 in H; rewrite IHe2 in H;
@@ -202,49 +202,49 @@ Section RAlgEnvIgnore.
 
   (* Ignores ID ... *)
   
-  Fixpoint ignores_id (e:algenv) : Prop :=
+  Fixpoint algenv_ignores_id (e:algenv) : Prop :=
     match e with
       | ANID => False
       | ANConst rd => True
-      | ANBinop bop e1 e2 => (ignores_id e1) /\ (ignores_id e2)
-      | ANUnop uop e1 => ignores_id e1
-      | ANMap e1 e2 => ignores_id e2
-      | ANMapConcat e1 e2 => ignores_id e2
-      | ANProduct e1 e2 => (ignores_id e1) /\ (ignores_id e2)
-      | ANSelect e1 e2 => (ignores_id e2)
-      | ANDefault e1 e2 => (ignores_id e1) /\ (ignores_id e2)
+      | ANBinop bop e1 e2 => (algenv_ignores_id e1) /\ (algenv_ignores_id e2)
+      | ANUnop uop e1 => algenv_ignores_id e1
+      | ANMap e1 e2 => algenv_ignores_id e2
+      | ANMapConcat e1 e2 => algenv_ignores_id e2
+      | ANProduct e1 e2 => (algenv_ignores_id e1) /\ (algenv_ignores_id e2)
+      | ANSelect e1 e2 => (algenv_ignores_id e2)
+      | ANDefault e1 e2 => (algenv_ignores_id e1) /\ (algenv_ignores_id e2)
       | ANEither e1 e2 => False
-      | ANEitherConcat e1 e2 => (ignores_id e1) /\ (ignores_id e2)
-      | ANApp e1 e2 => (ignores_id e2)
+      | ANEitherConcat e1 e2 => (algenv_ignores_id e1) /\ (algenv_ignores_id e2)
+      | ANApp e1 e2 => (algenv_ignores_id e2)
       | ANGetConstant _ => True
       | ANEnv => True
-      | ANAppEnv e1 e2 => (ignores_id e1) /\ (ignores_id e2)
-      | ANMapEnv e1 => (ignores_id e1)
+      | ANAppEnv e1 e2 => (algenv_ignores_id e1) /\ (algenv_ignores_id e2)
+      | ANMapEnv e1 => (algenv_ignores_id e1)
     end.
 
-  (* Java equivalent: NraOptimizer.ignores_id_fun *)
-  Fixpoint ignores_id_fun (e:algenv) : bool :=
+  (* Java equivalent: NraOptimizer.algenv_ignores_id_fun *)
+  Fixpoint algenv_ignores_id_fun (e:algenv) : bool :=
     match e with
       | ANID => false
       | ANConst rd => true
-      | ANBinop bop e1 e2 => andb (ignores_id_fun e1) (ignores_id_fun e2)
-      | ANUnop uop e1 => ignores_id_fun e1
-      | ANMap e1 e2 => ignores_id_fun e2
-      | ANMapConcat e1 e2 => ignores_id_fun e2
-      | ANProduct e1 e2 => andb (ignores_id_fun e1) (ignores_id_fun e2)
-      | ANSelect e1 e2 => (ignores_id_fun e2)
-      | ANDefault e1 e2 => andb (ignores_id_fun e1) (ignores_id_fun e2)
+      | ANBinop bop e1 e2 => andb (algenv_ignores_id_fun e1) (algenv_ignores_id_fun e2)
+      | ANUnop uop e1 => algenv_ignores_id_fun e1
+      | ANMap e1 e2 => algenv_ignores_id_fun e2
+      | ANMapConcat e1 e2 => algenv_ignores_id_fun e2
+      | ANProduct e1 e2 => andb (algenv_ignores_id_fun e1) (algenv_ignores_id_fun e2)
+      | ANSelect e1 e2 => (algenv_ignores_id_fun e2)
+      | ANDefault e1 e2 => andb (algenv_ignores_id_fun e1) (algenv_ignores_id_fun e2)
       | ANEither e1 e2 => false
-      | ANEitherConcat e1 e2 => andb (ignores_id_fun e1) (ignores_id_fun e2)
-      | ANApp e1 e2 => (ignores_id_fun e2)
+      | ANEitherConcat e1 e2 => andb (algenv_ignores_id_fun e1) (algenv_ignores_id_fun e2)
+      | ANApp e1 e2 => (algenv_ignores_id_fun e2)
       | ANGetConstant _ => true
       | ANEnv => true
-      | ANAppEnv e1 e2 => andb (ignores_id_fun e1) (ignores_id_fun e2)
-      | ANMapEnv e1 => (ignores_id_fun e1)
+      | ANAppEnv e1 e2 => andb (algenv_ignores_id_fun e1) (algenv_ignores_id_fun e2)
+      | ANMapEnv e1 => (algenv_ignores_id_fun e1)
     end.
 
-  Lemma ignores_id_eq (e:algenv):
-    ignores_id e <-> (ignores_id_fun e = true).
+  Lemma algenv_ignores_id_eq (e:algenv):
+    algenv_ignores_id e <-> (algenv_ignores_id_fun e = true).
   Proof.
     induction e; split; simpl; intros; try auto; try congruence.
     - rewrite IHe1 in H; rewrite IHe2 in H;
@@ -294,28 +294,28 @@ Section RAlgEnvIgnore.
     - rewrite IHe; assumption.
   Qed.
   
-  Fixpoint deenv_alg (ae:algenv) : alg :=
+  Fixpoint algenv_deenv_alg (ae:algenv) : alg :=
     match ae with
       | ANID => AID
       | ANConst d => AConst d
-      | ANBinop b ae1 ae2 => ABinop b (deenv_alg ae1) (deenv_alg ae2)
-      | ANUnop u ae1 => AUnop u (deenv_alg ae1)
-      | ANMap ea1 ea2 => AMap (deenv_alg ea1) (deenv_alg ea2)
-      | ANMapConcat ea1 ea2 => AMapConcat (deenv_alg ea1) (deenv_alg ea2)
-      | ANProduct ea1 ea2 => AProduct (deenv_alg ea1) (deenv_alg ea2)
-      | ANSelect ea1 ea2 => ASelect (deenv_alg ea1) (deenv_alg ea2)
-      | ANDefault ea1 ea2 => ADefault (deenv_alg ea1) (deenv_alg ea2)
-      | ANEither ea1 ea2 => AEither (deenv_alg ea1) (deenv_alg ea2)
-      | ANEitherConcat ea1 ea2 => AEitherConcat (deenv_alg ea1) (deenv_alg ea2)
-      | ANApp ea1 ea2 => AApp (deenv_alg ea1) (deenv_alg ea2)
+      | ANBinop b ae1 ae2 => ABinop b (algenv_deenv_alg ae1) (algenv_deenv_alg ae2)
+      | ANUnop u ae1 => AUnop u (algenv_deenv_alg ae1)
+      | ANMap ea1 ea2 => AMap (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANMapConcat ea1 ea2 => AMapConcat (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANProduct ea1 ea2 => AProduct (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANSelect ea1 ea2 => ASelect (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANDefault ea1 ea2 => ADefault (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANEither ea1 ea2 => AEither (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANEitherConcat ea1 ea2 => AEitherConcat (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
+      | ANApp ea1 ea2 => AApp (algenv_deenv_alg ea1) (algenv_deenv_alg ea2)
       | ANGetConstant _ => AID
       | ANEnv => AID
       | ANAppEnv ea1 ea2 => AID
       | ANMapEnv ea1 => AID
     end.
 
-  Lemma ignores_env_swap (e:algenv) :
-    ignores_env e -> forall (h:list (string*string)) c,
+  Lemma algenv_ignores_env_swap (e:algenv) :
+    algenv_ignores_env e -> forall (h:list (string*string)) c,
                                forall (env1 env2:data), forall x:data,
                        h ⊢ₑ e @ₑ x ⊣ c;env1 = h ⊢ₑ e @ₑ x ⊣ c;env2.
   Proof.
@@ -414,8 +414,8 @@ Section RAlgEnvIgnore.
     - contradiction.
   Qed.
   
-  Lemma ignores_id_swap (e:algenv) :
-    ignores_id e -> forall h:list (string*string), forall c,
+  Lemma algenv_ignores_id_swap (e:algenv) :
+    algenv_ignores_id e -> forall h:list (string*string), forall c,
       forall env:data, forall x1 x2:data,
           h ⊢ₑ e @ₑ x1 ⊣ c;env = h ⊢ₑ e @ₑ x2 ⊣ c;env.
   Proof.
@@ -448,10 +448,10 @@ Section RAlgEnvIgnore.
   Qed.
 
   Require Import RAlgSugar.
-  Lemma is_nra_deenv (h:list (string*string)) c (e:algenv) (d1 d2:data) :
-    is_nra e ->
+  Lemma algenv_is_nra_deenv (h:list (string*string)) c (e:algenv) (d1 d2:data) :
+    algenv_is_nra e ->
         h ⊢ (alg_of_algenv e) @ₐ (pat_context_data c d1 d2) =
-        h ⊢ (deenv_alg e) @ₐ d2.
+        h ⊢ (algenv_deenv_alg e) @ₐ d2.
   Proof.
     intros.
     revert d1 d2; induction e; try reflexivity; simpl in *; try (inversion H; congruence); simpl; intros.
@@ -466,7 +466,7 @@ Section RAlgEnvIgnore.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (fun_of_alg h (deenv_alg e2) d2); intros; simpl; clear e2.
+      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -477,19 +477,19 @@ Section RAlgEnvIgnore.
       unfold pat_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl.
-      destruct (fun_of_alg h (deenv_alg e1) a); try reflexivity.
+      destruct (fun_of_alg h (algenv_deenv_alg e1) a); try reflexivity.
       unfold lift; simpl.
       revert IHl.
       generalize (rmap (fun_of_alg h (alg_of_algenv e1))
                        (map (fun x : data => drec (("PBIND"%string, d1) :: ("PCONST"%string, c):: ("PDATA"%string, x) :: nil)) l));
-        generalize (rmap (fun_of_alg h (deenv_alg e1)) l); intros.
+        generalize (rmap (fun_of_alg h (algenv_deenv_alg e1)) l); intros.
       destruct o; destruct o0; try congruence.
     - inversion H; clear H.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (fun_of_alg h (deenv_alg e2) d2); intros; simpl; clear e2.
+      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -500,7 +500,7 @@ Section RAlgEnvIgnore.
       unfold pat_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
-      generalize (fun_of_alg h (deenv_alg e1) a); intros.
+      generalize (fun_of_alg h (algenv_deenv_alg e1) a); intros.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
@@ -530,7 +530,7 @@ Section RAlgEnvIgnore.
         ); generalize (
      oflat_map
        (fun a0 : data =>
-        match fun_of_alg h (deenv_alg e1) a0 with
+        match fun_of_alg h (algenv_deenv_alg e1) a0 with
         | Some (dcoll y) => omap_concat a0 y
         | _ => None
         end) l
@@ -617,7 +617,7 @@ Section RAlgEnvIgnore.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (fun_of_alg h (deenv_alg e2) d2); intros; simpl; clear e2.
+      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -628,7 +628,7 @@ Section RAlgEnvIgnore.
       unfold pat_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
-      generalize (fun_of_alg h (deenv_alg e1) a); intros.
+      generalize (fun_of_alg h (algenv_deenv_alg e1) a); intros.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
@@ -652,7 +652,7 @@ Section RAlgEnvIgnore.
           end) l0);
         generalize (lift_filter
        (fun x' : data =>
-        match fun_of_alg h (deenv_alg e1) x' with
+        match fun_of_alg h (algenv_deenv_alg e1) x' with
         | Some (dbool b) => Some b
         | _ => None
         end) l
@@ -667,7 +667,7 @@ Section RAlgEnvIgnore.
           end) l0);
         generalize (lift_filter
        (fun x' : data =>
-        match fun_of_alg h (deenv_alg e1) x' with
+        match fun_of_alg h (algenv_deenv_alg e1) x' with
         | Some (dbool b) => Some b
         | _ => None
         end) l
@@ -676,7 +676,7 @@ Section RAlgEnvIgnore.
       * revert IHl.
         generalize (lift_filter
        (fun x' : data =>
-        match fun_of_alg h (deenv_alg e1) x' with
+        match fun_of_alg h (algenv_deenv_alg e1) x' with
         | Some (dbool b0) => Some b0
         | _ => None
         end) l); intros.
@@ -693,7 +693,7 @@ Section RAlgEnvIgnore.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; simpl; clear IHe2.
-      generalize (fun_of_alg h (deenv_alg e2) d2); intros; simpl.
+      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl;
       unfold pat_context_data in *;
       rewrite IHe1; reflexivity.
@@ -701,7 +701,7 @@ Section RAlgEnvIgnore.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; simpl; clear IHe2.
-      generalize (fun_of_alg h (deenv_alg e2) d2); intros; simpl.
+      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl.
       unfold pat_context_data in *;
       rewrite IHe1; reflexivity.
@@ -743,12 +743,12 @@ Section RAlgEnvIgnore.
     - match_destr.
   Qed.
   
-  Lemma algenv_of_alg_is_nra x : is_nra (algenv_of_alg x).
+  Lemma algenv_of_alg_is_nra x : algenv_is_nra (algenv_of_alg x).
   Proof.
     induction x; simpl; auto.
   Qed.
 
-  Lemma deenv_alg_algenv_of_alg x : deenv_alg (algenv_of_alg x) = x.
+  Lemma algenv_deenv_alg_of_alg x : algenv_deenv_alg (algenv_of_alg x) = x.
   Proof.
     induction x; simpl; try congruence.
   Qed.

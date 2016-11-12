@@ -435,14 +435,14 @@ Section RAlgEnvEq.
     assert (eq2:forall (h : list (string * string))
                        (x0 : data),
                   data_normalized h x0 ->
-                  h ⊢ deenv_alg (algenv_of_alg x) @ₐ x0 =
-                  h ⊢ deenv_alg (algenv_of_alg y) @ₐ x0).
+                  h ⊢ algenv_deenv_alg (algenv_of_alg x) @ₐ x0 =
+                  h ⊢ algenv_deenv_alg (algenv_of_alg y) @ₐ x0).
     { intros. specialize (eq1 h0 nil (Forall_nil _) dunit (dnunit _) x1 H1 ).
-      do 2 rewrite is_nra_deenv in eq1 by
+      do 2 rewrite algenv_is_nra_deenv in eq1 by
           apply algenv_of_alg_is_nra; trivial.
     }
     specialize (eq2 h x0).
-    repeat rewrite deenv_alg_algenv_of_alg in eq2.
+    repeat rewrite algenv_deenv_alg_of_alg in eq2.
     auto.
   Qed.
 

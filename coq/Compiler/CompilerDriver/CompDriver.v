@@ -123,8 +123,8 @@ Section CompDriver.
 
   Definition nra_optim (q: nra) : nra :=
     let nraenv_core_opt := (nraenv_core_optim (algenv_of_alg q)) in
-    if is_nra_fun nraenv_core_opt then
-      deenv_alg nraenv_core_opt
+    if algenv_is_nra_fun nraenv_core_opt then
+      algenv_deenv_alg nraenv_core_opt
     else
       alg_of_algenv nraenv_core_opt.
 

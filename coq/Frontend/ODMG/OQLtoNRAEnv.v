@@ -24,7 +24,7 @@ Section OQLtoNRAEnv.
   Require Import Utils BasicSystem.
 
   Require Import OQL.
-  Require Import NRAEnv.
+  Require Import NRAEnvRuntime.
 
   Context {fruntime:foreign_runtime}.
 
@@ -1262,7 +1262,7 @@ Section OQLtoNRAEnv.
       unfold nraenv_ignores_env.
       simpl; auto.
   Qed.
-    
+
   Lemma oql_to_nraenv_ignores_env (e:oql_expr) :
     nraenv_ignores_env (nraenv_of_oql e).
   Proof.

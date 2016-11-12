@@ -955,7 +955,7 @@ Section ROptimEnv.
   (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
   
   Lemma appenv_over_map p0 p1 p2:
-    ignores_id p0 ->
+    algenv_ignores_id p0 ->
     χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ₑ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ).
   Proof.
     unfold alg_eq, algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
@@ -963,7 +963,7 @@ Section ROptimEnv.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;d); try reflexivity; simpl.
     destruct d0; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    rewrite (ignores_id_swap p0 H h c env a x).
+    rewrite (algenv_ignores_id_swap p0 H h c env a x).
     rewrite H0; simpl.
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;d); try reflexivity; simpl.
     f_equal; unfold lift in *; simpl in *.
@@ -976,7 +976,7 @@ Section ROptimEnv.
   (* σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
   
   Lemma appenv_over_select p0 p1 p2:
-    ignores_id p0 ->
+    algenv_ignores_id p0 ->
     σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ₑ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ).
   Proof.
     unfold alg_eq, algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
@@ -984,7 +984,7 @@ Section ROptimEnv.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;d); try reflexivity; simpl.
     destruct d0; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    rewrite (ignores_id_swap p0 H h c env a x).
+    rewrite (algenv_ignores_id_swap p0 H h c env a x).
     rewrite H0; simpl.
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;d); try reflexivity; simpl.
     destruct d0; try reflexivity.
@@ -1049,15 +1049,15 @@ Section ROptimEnv.
     destruct x; reflexivity.
   Qed.
 
-  (* ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ≡ p2 ⊗ p1 *)
+  (* algenv_ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ≡ p2 ⊗ p1 *)
   
   Lemma appenv_over_env_merge_l p1 p2:
-    ignores_env p1 ->
+    algenv_ignores_env p1 ->
     ANAppEnv (ENV ⊗ p1) p2 ≡ₑ p2 ⊗ p1.
   Proof.
     unfold alg_eq, algenv_eq; intros; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity; simpl.
-    rewrite (ignores_env_swap p1 H h c d env x).
+    rewrite (algenv_ignores_env_swap p1 H h c d env x).
     destruct (h ⊢ₑ p1 @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
@@ -1325,7 +1325,7 @@ Section ROptimEnv.
   Qed.
 
   Lemma app_over_appenv p1 p2 p3:
-    ignores_id p3 ->
+    algenv_ignores_id p3 ->
     ((p3 ◯ₑ p2) ◯ p1) ≡ₑ p3 ◯ₑ (p2 ◯ p1).
   Proof.
     unfold algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
@@ -1333,18 +1333,18 @@ Section ROptimEnv.
     destruct o; try reflexivity; simpl.
     generalize (h ⊢ₑ p2 @ₑ d ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
-    apply ignores_id_swap; assumption.
+    apply algenv_ignores_id_swap; assumption.
   Qed.
 
   Lemma appenv_over_app_ie p1 p2 p3:
-    ignores_env p3 ->
+    algenv_ignores_env p3 ->
     ((p3 ◯ p2) ◯ₑ p1) ≡ₑ p3 ◯ (p2 ◯ₑ p1).
   Proof.
     unfold algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;d); simpl; trivial.
-    apply ignores_env_swap; assumption.
+    apply algenv_ignores_env_swap; assumption.
   Qed.
 
   Lemma app_over_appenv_over_mapenv p1 p2:
@@ -1392,13 +1392,13 @@ Section ROptimEnv.
   Qed.
 
   Lemma appenv_through_either q₁ q₂ q₃:
-    ignores_id q₃ ->
+    algenv_ignores_id q₃ ->
     ANEither q₁ q₂ ◯ₑ q₃ ≡ₑ ANEither (q₁ ◯ₑ q₃) (q₂ ◯ₑ q₃).
   Proof.
     intros.
     unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
     unfold olift.
-    generalize (ignores_id_swap q₃ H h c env x); intros eqq.
+    generalize (algenv_ignores_id_swap q₃ H h c env x); intros eqq.
     destruct (h ⊢ₑ q₃ @ₑ x ⊣ c;env); simpl in * ;
     destruct x; simpl; trivial;
     specialize (eqq x); rewrite <- eqq; trivial.
@@ -1544,14 +1544,14 @@ Section ROptimEnv.
   Qed.
 
   Lemma flip_env7 p1 p2:
-    ignores_id p1 ->
+    algenv_ignores_id p1 ->
     (ANMapEnv (‵{| p1 |})) ◯ₑ p2 ≡ₑ χ⟨‵{| p1 ◯ₑ ID |}⟩(p2).
   Proof.
     unfold algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    rewrite (ignores_id_swap p1 H h c a x a).
+    rewrite (algenv_ignores_id_swap p1 H h c a x a).
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;a); try reflexivity; simpl.
     destruct ((rmap
              (fun env' : data =>

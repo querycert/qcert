@@ -112,7 +112,9 @@ MODULES = \
 	NRAEnv/Algebra/RAlgEnvIgnore \
 	NRAEnv/Algebra/RAlgEnvEq \
         NRAEnv/Extended/NRAEnv \
+        NRAEnv/Extended/NRAEnvSize \
         NRAEnv/Extended/NRAEnvEq \
+        NRAEnv/Extended/NRAEnvIgnore \
 	NRAEnv/Typing/TAlgEnv \
 	NRAEnv/Typing/TAlgEnvInfer \
 	NRAEnv/Typing/TAlgEnvIgnore \

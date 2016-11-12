@@ -31,8 +31,8 @@ Section TAlgEnvIgnore.
   Local Open Scope alg_scope.
   Local Open Scope algenv_scope.
   
-  Lemma tignores_env_swap {m:basic_model} (e:algenv) :
-    ignores_env e ->
+  Lemma talgenv_ignores_env_swap {m:basic_model} (e:algenv) :
+    algenv_ignores_env e ->
     forall τc (τin τout τenv₁ τenv₂:rtype),
     e ▷ τin >=> τout ⊣ τc;τenv₁ -> e ▷ τin >=> τout ⊣ τc;τenv₂.
   Proof.
@@ -77,8 +77,8 @@ Section TAlgEnvIgnore.
       econstructor; eauto.
   Qed.
 
-  Lemma tignores_id_swap {m:basic_model} (e:algenv) :
-    ignores_id e ->
+  Lemma talgenv_ignores_id_swap {m:basic_model} (e:algenv) :
+    algenv_ignores_id e ->
     forall τc (τin₁ τin₂ τout τenv:rtype),
     e ▷ τin₁ >=> τout ⊣ τc;τenv -> e ▷ τin₂ >=> τout ⊣ τc;τenv.
   Proof.
