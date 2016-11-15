@@ -259,7 +259,12 @@ abstract class QCertRuntime {
       b.getAsJsonArray.iterator().asScala.map((e: JsonElement) => fromBlob(t.elementType, e)).toArray
     case t: StructType => t.fieldNames match {
       case Array("$left", "$right") => sys.error("either")
-      case Array("$type", "$data") => sys.error("brand")
+      case Array("$data", "$type") =>
+        srow(StructType(StructField("$data", StringType, false)
+                     :: StructField("$type", ArrayType(StringType, false), false)
+                     :: Nil),
+             b.getAsJsonObject.get("data").toString,
+             fromBlob(ArrayType(StringType, false), b.getAsJsonObject.get("type")))
       case Array("$blob", "$known") =>
         val r = b.getAsJsonObject
         val knownFieldValues = t("$known").dataType.asInstanceOf[StructType].fields map ((field: StructField) => {
@@ -274,8 +279,7 @@ abstract class QCertRuntime {
     }
   }
 
-  def fromBlob(t: DataType, b: String): Any =
-    fromBlob(t, gsonParser.parse(b))
+  def fromBlob(t: DataType, b: String): Any = fromBlob(t, gsonParser.parse(b))
 
   def toBlob(v: Any): String = v match {
     case i: Int => i.toString
@@ -506,7 +510,7 @@ abstract class QCertRuntime {
   def cast(v: BrandedValue, bs: Brand*): Either = {
     // TODO use castUDF helper
     if (!bs.forall((brand: Brand) =>
-      v.getAs[Seq[Brand]]("$type").exists((typ: Brand) =>
+      v.getAs[Array[Brand]]("$type").exists((typ: Brand) =>
         isSubBrand(brandHierarchy, typ, brand))))
       none()
     else
