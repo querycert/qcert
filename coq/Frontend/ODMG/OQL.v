@@ -214,7 +214,7 @@ Section OQL.
       auto.
   Qed.
 
-  Global Instance oql_eqdec : EqDec oql_expr eq.
+  Global Instance oql_expr_eqdec : EqDec oql_expr eq.  
   Proof.
     change (forall x y : oql_expr,  {x = y} + {x <> y}).
     induction x; destruct y; try solve[right; inversion 1].
@@ -343,16 +343,75 @@ Section OQL.
            destruct (IHel l); try (inversion e; subst; left; reflexivity);
            right; congruence].
     - destruct o0; simpl; try (right; congruence).
-      destruct (IHx1 o0); try (right; congruence); subst.
-      destruct e1; destruct o; simpl in *; try (right; congruence).
-      + destruct (IHx1 o); try (right; congruence); subst; clear IHx1.
-        revert l; induction el; intros; destruct l; simpl in *; try solve[right; inversion 1].
-        destruct o1; [right;congruence|].
-        destruct s; destruct sc; try (right; congruence).
-        destruct (IHx3 o0); try (right; congruence); subst; clear IHx3.
-        inversion H; subst; simpl in *.
-        admit.
-  Admitted.
+      assert (dec1:{e1 = o} + {e1 <> o}).
+      {
+        destruct e1; destruct o; try solve [right; inversion 1; congruence].
+        - destruct (IHx1 (oselect_expr (OSelect o))); simpl in *.
+          + subst; auto.
+          + right; inversion 1; congruence.
+        - destruct (IHx1 (oselect_expr (OSelect o))); simpl in *.
+          + subst; auto.
+          + right; inversion 1; congruence.
+      }
+      destruct dec1; try solve [right; inversion 1; congruence]; subst.
+
+      assert (dec2:{el = l} + {el <> l}).
+         {
+           apply list_Forallt_eq_dec.
+           apply (forallt_impl H).
+           apply forallt_weaken; intros.
+           destruct x; destruct y; try solve [right; discriminate].
+           - simpl in H0
+             ; destruct (string_dec s s0); try solve [right; inversion 1; congruence]
+             ; subst
+             ; destruct (H0 o3); [left|right;inversion 1]; congruence.
+           - simpl in H0
+            ; destruct (string_dec s s1); try solve [right; inversion 1; congruence]
+            ; destruct (string_dec s0 s2); try solve [right; inversion 1; congruence]
+            ; subst
+            ; destruct (H0 o3); [left|right;inversion 1]; congruence.
+         }
+         destruct dec2; try solve [right; inversion 1; congruence]; subst.
+         
+         destruct (IHx2 o0); try solve [right; inversion 1; congruence]; subst.
+
+         destruct o1; try solve [right; inversion 1; congruence].
+         destruct (IHx3 o1); try solve [right; inversion 1; congruence]; subst.
+         destruct (sort_desc_eq_dec sc s); try solve [right; inversion 1; congruence]; subst.
+         left; trivial.
+  Defined.
+
+  Global Instance oql_select_expr_eqdec : EqDec oql_select_expr eq.
+  Proof.
+    red; destruct x; destruct y; try solve [right; congruence].
+    - destruct (o == o0); [left|right]; congruence.
+    - destruct (o == o0); [left|right]; congruence.
+  Defined.
+
+  Global Instance oql_in_expr_eqdec : EqDec oql_in_expr eq.
+  Proof.
+    red; destruct x; destruct y; try solve [right; congruence].
+    - destruct (string_dec s s0); try solve [right; inversion 1; congruence]; subst.
+      destruct (o == o0); [left|right]; congruence.
+    - destruct (string_dec s s1); try solve [right; inversion 1; congruence]; subst.
+      destruct (string_dec s0 s2); try solve [right; inversion 1; congruence]; subst.
+      destruct (o == o0); [left|right]; congruence.
+  Defined.
+
+  Global Instance oql_where_expr_eqdec : EqDec oql_where_expr eq.
+  Proof.
+    red; destruct x; destruct y; try solve [right; congruence].
+    - left; reflexivity.
+    - destruct (o == o0); [left|right]; congruence.
+  Defined.
+
+  Global Instance oql_order_by_expr_eqdec : EqDec oql_order_by_expr eq.
+  Proof.
+    red; destruct x; destruct y; try solve [right; congruence].
+    - left; reflexivity.
+    - destruct (o == o0); try solve [right; inversion 1; congruence]; subst.
+      destruct (s == s0); [left|right]; congruence.
+  Defined.
 
   (** Semantics of OQL *)
 

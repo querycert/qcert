@@ -38,6 +38,11 @@ Section SortableData.
   | sdstring : string -> sdata
   .
 
+  Lemma sort_desc_eq_dec : forall x y:SortDesc, {x=y}+{x<>y}.
+  Proof.
+    decide equality.
+  Defined.
+  
   (** Equality is decidable for sdata *)
   Lemma sdata_eq_dec : forall x y:sdata, {x=y}+{x<>y}.
   Proof.
@@ -51,6 +56,8 @@ Section SortableData.
   Defined.
 
   (* begin hide *)
+  Global Instance oql_eqdec : EqDec SortDesc eq := sort_desc_eq_dec.
+    
   Global Instance sdata_eqdec : EqDec sdata eq := sdata_eq_dec.
   (* begin hide *)
 
