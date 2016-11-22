@@ -25,15 +25,12 @@ Example R01 :=
   rule_return (pbinop ASConcat (toString (#` "Customer =")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))
 .
 
-Definition ASSUME {A} : A.
-Admitted.
-
 Definition test01BrandRelationList := [("entities.MainEntity", "com.ibm.ia.model.Entity")
    ;("entities.Purchase", "com.ibm.ia.model.Entity")
    ;("entities.Customer", "com.ibm.ia.model.Entity")].
 
 Program Instance test01BrandRelation : brand_relation 
- := mkBrand_relation test01BrandRelationList ASSUME ASSUME.
+ := mkBrand_relation test01BrandRelationList (eq_refl _) (eq_refl _).
 
 Definition com_ibm_ia_model_Entity : rtype
  := Rec Open (rec_sort []) rec_sort_pf.
@@ -60,11 +57,11 @@ Definition test01Types :=
    ;("entities.Purchase", entities_Purchase)
    ;("entities.MainEntity", entities_MainEntity)]).
 
-Definition test01BrandContext := mkBrand_context test01Types ASSUME.
+Definition test01BrandContext := mkBrand_context test01Types (eq_refl _).
 
 Local Obligation Tactic := fast_refl.
 Program Instance test01BrandModel : brand_model 
- := mkBrand_model test01BrandRelation test01BrandContext ASSUME ASSUME.
+ := mkBrand_model test01BrandRelation test01BrandContext (eq_refl _) (eq_refl _).
 
 Definition exampleWMType : rtype := Coll (Any).
 
