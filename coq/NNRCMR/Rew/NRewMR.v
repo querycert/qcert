@@ -1248,7 +1248,7 @@ Section NRewMR.
   (*     repeat dest_eqdec; try congruence; simpl. *)
   (*   rewrite (id_scalar_map_correct _ _ Hmr2_map). *)
   (*   simpl. *)
-  (*   admit. (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX TODO XXXXXXXXX *) *)
+  (*   (* XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX TODO XXXXXXXXX *) *)
   (* Qed. *)
 
 
