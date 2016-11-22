@@ -1122,8 +1122,28 @@ Definition enhanced_to_cloudant_reduce_op
         invcs H; trivial.
       + intuition.
         invcs H; trivial.
-      + admit.
-      + admit. (* XXXXXXXXXXXXXXXX *)
+      + apply in_flat_map in inn1.
+        destruct inn1 as [? [inn1 inn3]].
+        destruct x.
+        simpl in inn3.
+        destruct mr_reduce
+        ; try solve [simpl in inn3; intuition
+                     ; invcs H].
+        destruct r; destruct f0
+        ; simpl in inn3; intuition
+        ; invcs H0
+        ; try solve [invcs H | invcs H1].
+      + apply in_flat_map in inn1.
+        destruct inn1 as [? [inn1 inn3]].
+        destruct x.
+        simpl in inn3.
+        destruct mr_reduce
+        ; try solve [simpl in inn3; intuition
+                     ; invcs H].
+        destruct r; destruct f0
+        ; simpl in inn3; intuition
+        ; invcs H0
+        ; try solve [invcs H | invcs H1].
       + intuition.
         invcs H; trivial.
         intuition.
@@ -1159,7 +1179,7 @@ Definition enhanced_to_cloudant_reduce_op
         invcs H0; trivial.
       + intuition.
         invcs H; trivial.
-  Admitted.
+  Qed.
 
   (* optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_token_type : Set.
