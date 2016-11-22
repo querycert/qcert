@@ -81,6 +81,7 @@ MODULES = \
 	Basic/Typing/TDBindings \
 	Basic/Typing/ForeignOpsTyping \
 	Basic/Typing/TDataInfer \
+	Basic/Typing/TDataSort \
 	Basic/Typing/TOps \
 	Basic/Typing/TOpsEq \
 	Basic/Typing/TOpsInfer \

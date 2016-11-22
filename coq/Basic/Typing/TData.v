@@ -532,6 +532,45 @@ Proof.
   trivial.
 Qed.
 
+Lemma dtrec_edot_parts a k τ pf s x y:
+  drec a ▹ Rec k τ pf ->
+  edot a s = Some x ->
+  edot τ s = Some y ->
+  x ▹ y.
+Proof.
+  unfold edot.
+  intros dt ina inτ.
+  invcs dt; rtype_equalizer.
+  subst.
+  apply is_list_sorted_NoDup_strlt in pf'.
+  apply (assoc_lookupr_nodup_sublist pf' H2 (R_dec:=ODT_eqdec)) in inτ.
+  clear H3 H2.
+  induction H4; simpl in *; try discriminate.
+  destruct x0; destruct y0; destruct H; simpl in *; subst.
+  invcs pf'.
+  destruct (string_eqdec s s1); unfold Equivalence.equiv in *; subst.
+  - apply sorted_forall_same_domain in H4.
+    assert (nd2:~ In s1 (domain l)) by (rewrite H4; trivial).
+    apply (assoc_lookupr_nin_none) with (dec:=string_eqdec) in H2.
+    rewrite H2 in inτ.
+    invcs inτ.
+    apply (assoc_lookupr_nin_none) with (dec:=string_eqdec) in nd2.
+    unfold Equivalence.equiv, RelationClasses.complement, not in *.
+    simpl in *.
+    rewrite nd2 in ina.
+    invcs ina.
+    trivial.
+  - match_case_in inτ
+    ; [intros ? eqq1 | intros eqq1]; rewrite eqq1 in inτ
+    ; try discriminate.
+    invcs inτ.
+    match_case_in ina
+    ; [intros ? eqq2 | intros eqq2]; rewrite eqq2 in ina
+    ; try discriminate.
+    invcs ina.
+    intuition.
+Qed.
+
 Lemma coll_type_cons a c x:
   dcoll (a :: c) ▹ Coll x ->
   a ▹ x /\ dcoll c ▹ Coll x.
@@ -1498,7 +1537,6 @@ Global Instance data_type_subtype_prop
     intuition.
     apply brands_type_Forall; intuition.
   Qed.
-
     
 (*
   Global Instance data_type_sub_model_prop : Proper (sub_model ==> eq ==> eq ==> impl) (data_type).

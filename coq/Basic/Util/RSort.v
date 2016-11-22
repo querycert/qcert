@@ -493,6 +493,15 @@ Section RSort.
      - rewrite <- IHl, sort_insert_filter_false; trivial.
    Qed.
 
+   Lemma Forall_insertion_sort {A R R_dec} {P} l :
+     Forall P l -> Forall P (@insertion_sort A R R_dec l).
+   Proof.
+     repeat rewrite Forall_forall.
+     intros fp x inx.
+     apply in_insertion_sort in inx.
+     auto.
+   Qed.
+   
   End In.
 
   Section map.

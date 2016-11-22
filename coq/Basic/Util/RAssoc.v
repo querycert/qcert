@@ -184,11 +184,29 @@ Section RAssoc.
       - eauto.
     Qed.
 
+    (* TODO: this should just replace in_dom_lookup *)      
+
+    Lemma in_dom_lookup_strong :  forall {l} {a:A}, In a (domain l) -> {v | lookup l a = Some v}.
+    Proof.
+      induction l; simpl; [tauto|]; intros.
+      destruct a; simpl in *.
+      destruct (dec a0 a); [eauto|].
+      apply IHl.
+      intuition.
+    Qed.
+
     Lemma in_dom_lookup :  forall {l} {a:A}, In a (domain l) -> exists v, lookup l a = Some v.
     Proof.
-      induction l; simpl; intuition; simpl in *; subst.
-      - destruct (dec a a); eauto; congruence.
-      - destruct (dec a a0); eauto.
+      intros ? ? ind.
+      destruct (in_dom_lookup_strong ind).
+      eauto.
+    Qed.
+
+    (* TODO: this should just replace in_lookup *)      
+    Lemma in_lookup_strong :  forall {l} {a:A} {b0:B}, In (a,b0) l -> {v | lookup l a = Some v}.
+    Proof.
+      Hint Resolve in_dom_lookup_strong in_dom.
+      intros. eauto.
     Qed.
 
     Lemma in_lookup :  forall {l} {a:A} {b0:B}, In (a,b0) l -> exists v, lookup l a = Some v.
@@ -400,21 +418,26 @@ Section RAssoc.
     rewrite rev_involutive.
     trivial.
   Qed.
-    
+
+  (* TODO: this should just replace in_dom_lookupr *)      
+  Lemma in_dom_lookupr_strong {A B:Type} (l:list (A*B)) a (dec:forall x y, {x=y} + {x <> y}) :
+    In a (domain l) -> {v|assoc_lookupr dec l a = Some v}.
+  Proof.
+    intros. induction l; simpl in *; [tauto|].
+    destruct a0.
+    simpl in *.
+    case_eq (assoc_lookupr dec l a); simpl; [eauto|].
+    destruct (dec a a0); simpl; [eauto|].
+    intros ln; elim n.
+    intuition.
+    destruct X; congruence.
+  Qed.
+
   Lemma in_dom_lookupr {A B:Type} (l:list (A*B)) a (dec:forall x y, {x=y} + {x <> y}) :
     In a (domain l) -> exists v, assoc_lookupr dec l a = Some v.
   Proof.
-    intros. induction l; simpl; intuition; simpl in *; subst.
-    elim H; clear H; intros.
-    subst.
-    - destruct a0; simpl.
-      destruct (assoc_lookupr dec l a).
-      exists b0; reflexivity.
-      destruct (dec a a); eauto. congruence.
-    - destruct a0; simpl.
-      destruct (assoc_lookupr dec l a).
-      exists b0; reflexivity.
-      destruct (dec a a0); eauto.
+    intros ind.
+    destruct (in_dom_lookupr_strong _ _ dec ind); eauto.
   Qed.
 
   Lemma assoc_lookupr_in  {A B:Type} (l :list (A*B)) a b (dec:forall x y, {x=y} + {x <> y}) :

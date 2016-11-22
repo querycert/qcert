@@ -1402,48 +1402,7 @@ Section RBindings.
     Lemma Forall_sorted {A} (P:(K*A) -> Prop) (l:list (K*A)):
       Forall P l -> Forall P (rec_sort l).
     Proof.
-      intros.
-      induction l.
-      simpl; assumption.
-      simpl in *.
-      rewrite Forall_forall in *.
-      intros.
-      revert IHl H0; generalize (rec_sort l); intros.
-      induction l0.
-      simpl in *.
-      elim H0; intros.
-      rewrite <- H1; apply (H a); left; reflexivity.
-      contradiction.
-      simpl in *.
-      revert H0.
-      assert (forall x : K * A, In x l -> P x); intros. apply (H x0); right; assumption.
-      specialize (IHl H0).
-      assert (Forall P l0).
-      rewrite Forall_forall in *; simpl in *; intros.
-      apply (IHl x0); right; assumption.
-      assert ((forall x : K * A, In x l -> P x) -> Forall P l0).
-      intros. assumption.
-      specialize (IHl0 H3); clear H3 H0.
-      rewrite Forall_forall in *; simpl in *.
-      revert H1.
-      elim (rec_field_lt_dec a a0); intros.
-      simpl in H1.
-      elim H1; intros; clear H1.
-      rewrite <- H0; apply (H a); left; reflexivity.
-      elim H0; intros; clear H0.
-      rewrite <- H1; apply (IHl a0); left; reflexivity.
-      apply IHl; right; assumption.
-      revert H1.
-      elim (rec_field_lt_dec a0 a); intros.
-      simpl in H1; elim H1; intros; clear H1.
-      rewrite <- H0.
-      apply (IHl a0); left; reflexivity.
-      apply IHl0; assumption.
-      simpl in H1.
-      elim H1; intros; clear H1.
-      rewrite <- H0.
-      apply (IHl a0); left; reflexivity.
-      apply IHl; right; assumption.
+      apply Forall_insertion_sort.
     Qed.
 
   End Forall.

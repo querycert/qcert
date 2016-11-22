@@ -19,7 +19,7 @@ Section TOps.
   Require Import Compare_dec.
   
   Require Import Utils Types BasicRuntime.
-  Require Import ForeignDataTyping ForeignOpsTyping TData.
+  Require Import ForeignDataTyping ForeignOpsTyping TData TDataSort.
 
   Require Import Program.
 
@@ -37,16 +37,6 @@ Section TOps.
     Context {m:brand_model}.
     Context {fuoptyping:foreign_unary_op_typing}.
 
-    Definition sortable_type (τ : rtype) : Prop :=
-      τ = Nat /\ τ = String.
-    
-    Definition order_by_has_sortable_type
-               (τr:list (string*rtype))
-               (satts: list string) : Prop :=
-      Forall (fun s =>
-                forall τout, tdot τr s = Some τout -> sortable_type τout)
-             satts.
-    
     Inductive unaryOp_type : unaryOp -> rtype -> rtype -> Prop :=
     | ATIdOp τ : unaryOp_type AIdOp τ τ
     | ATNeg: unaryOp_type ANeg Bool Bool
@@ -961,18 +951,6 @@ Section TOps.
     generalize (fold_right_app_map_singleton b); simpl.
     auto.
   Qed.
-
-  (* XXX To be proven correct – well typedness of the (limited sorting) XXX *)
-  Lemma order_by_well_typed
-        (d1:data) (sl:list (string * RDataSort.SortDesc))
-        {k τ} {pf1 pf2} :
-    d1 ▹ Coll (Rec k τ pf1) ->
-    sublist (map fst sl) (domain τ) ->
-    order_by_has_sortable_type τ (map fst sl) ->
-    exists x, RDataSort.data_sort sl d1 = Some x /\ x ▹ Coll (Rec k τ pf2).
-  Proof.
-    admit.
-  Admitted.
 
   Require Import Permutation.
 
