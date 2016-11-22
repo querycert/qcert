@@ -24,7 +24,7 @@ Section TOpsInfer.
   Require Import EquivDec.
   
   Require Import Utils Types BasicRuntime.
-  Require Import ForeignDataTyping ForeignOpsTyping TData TOps.
+  Require Import ForeignDataTyping ForeignOpsTyping TData TOps TDataSort.
 
   (* Lemma/definitions over types involved in the inference *)
   
@@ -246,6 +246,18 @@ Section TOpsInfer.
     - destruct p; simpl in *.
       destruct (sublist_dec sl (domain l)).
       + exact (RecMaybe Closed (rproject l sl)). (* This is always a closed record *)
+      + exact None. (* It is only well typed when sl is a sublist of domain l *)
+    - exact None.
+  Defined.
+
+  Definition tunrecsortable (sl:list string) (τ:rtype) : option rtype.
+  Proof.
+    case_eq (tunrec τ); intros.
+    - destruct p; simpl in *.
+      destruct (sublist_dec sl (domain l)).
+      + destruct (order_by_has_sortable_type_dec l sl).
+        * exact (Some τ).
+        * exact None.
       + exact None. (* It is only well typed when sl is a sublist of domain l *)
     - exact None.
   Defined.
@@ -583,7 +595,7 @@ Section TOpsInfer.
       | AOrderBy sl =>
         match (tuncoll τ₁) with
         | Some τ₁₀ =>
-          match tunrecproject (List.map fst sl) τ₁₀ with
+          match tunrecsortable (List.map fst sl) τ₁₀ with
           | Some _ => Some τ₁
           | None => None
           end
@@ -730,16 +742,14 @@ Section TOpsInfer.
       constructor; auto.
     Qed.
 
-    (* XXX To be proven (revise with 'orderby' using sortable type predicate) XXX *)
     Lemma ATOrderBy_tunrec {sl} {τ₁ τout} :
-      tunrecproject (List.map fst sl) τ₁ = Some τout ->
+      tunrecsortable (List.map fst sl) τ₁ = Some τout ->
       unaryOp_type (AOrderBy sl) (Coll τ₁) (Coll  τ₁).
     Proof.
-      unfold tunrecproject; intros.
+      unfold tunrecsortable; intros.
       destructer.
       constructor; auto.
-      admit.
-    Admitted.
+    Qed.
 
     Lemma ATSingleton_tsingleton {τ₁ τout} :
       tsingleton τ₁ = Some τout ->
@@ -766,7 +776,7 @@ Section TOpsInfer.
       Hint Resolve ATDot_tunrec ATRecRemove_tunrec ATRecProject_tunrec
            ATOrderBy_tunrec ATSingleton_tsingleton.
       unaryOp_cases (case_eq u) Case; intros; simpl in *; destructer; unfold olift in *; try autorewrite with type_canon in *; destructer;
-      try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
+        try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity]; eauto 3.
       - constructor.
       - constructor; apply foreign_unary_op_typing_infer_correct;
         apply H0.
@@ -793,39 +803,11 @@ Section TOpsInfer.
       ~ unaryOp_type u τ₁ τout.
     Proof.
       intros uinf utype.
-      unaryOp_cases (destruct u) Case; inversion utype; intros; simpl in *; destructer; unfold tunrecdot, tunrecremove, tunrecproject, tsingleton in *; destructer; try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity ].
-      - inversion utype; intros. simpl in *; subst.
-        destructer.
-        assert (is_list_sorted StringOrder.lt_dec (domain (rproject l (map fst s))) = true).
-        assert (l = rec_sort l) by (rewrite sort_sorted_is_id; auto).
-        rewrite H2.
-        rewrite rproject_rec_sort_commute.
-        generalize (rproject l (map fst s)); intro.
-        rewrite <- (rec_sort_sorted l0 (rec_sort l0));
-        reflexivity.
-        assert (RecMaybe Closed (rproject l (map fst s)) =
-                Some (Rec Closed (rproject l (map fst s)) H2)).
-        apply RecMaybe_pf_some.
-        congruence.
+      unaryOp_cases (destruct u) Case; inversion utype; intros; simpl in *; destructer; unfold tunrecdot, tunrecremove, tunrecproject, tunrecsortable, tsingleton in *; destructer; try congruence; try solve[ erewrite Rec_pr_irrel; reflexivity ].
       - Case "AForeignUnaryOp"%string.
         inversion utype.
         apply (foreign_unary_op_typing_infer_complete uinf H1).
     Qed.
-
-  (* This would be nice to prove at some point
-  
-     NB: This is not true in the current system because of bottom
-
-  Lemma unify_preserves_unaryOpType {u} {τin τout₁ τout₂} :
-    unify τout₁ τout₂ = Some τout₂ ->
-    unaryOp_type u τin τout₁ ->
-    unaryOp_type u τin τout₂.
-  Proof.
-    induction τout₁ using rtype_rect;
-    induction τout₂ using rtype_rect; inversion 1; trivial.
-    - inversion 1; subst.
-      XXX -- not true
-   *)
     
   End u.
     

@@ -31,13 +31,37 @@ Section TDataSort.
 
   Definition sortable_type (τ : rtype) : Prop :=
     τ = Nat \/ τ = String.
-  
+
   Definition order_by_has_sortable_type
              (τr:list (string*rtype))
              (satts: list string) : Prop :=
     Forall (fun s =>
               forall τout, edot τr s = Some τout -> sortable_type τout)
            satts.
+
+  Lemma sortable_type_dec (τ : rtype) : {sortable_type τ} + {~ sortable_type τ}.
+  Proof.
+    unfold sortable_type.
+    destruct τ; destruct x; simpl; try solve [right; intuition discriminate].
+    - left. left.
+      apply Nat_canon.
+    - left. right.
+      apply String_canon.
+  Defined.
+  
+  Definition order_by_has_sortable_type_dec
+             (τr:list (string*rtype))
+             (satts: list string) : {order_by_has_sortable_type τr satts} + {~order_by_has_sortable_type τr satts}.
+  Proof.
+    unfold order_by_has_sortable_type.
+    apply Forall_dec.
+    intros.
+    case_eq (edot τr x); intros.
+    - destruct (sortable_type_dec r).
+      + left; congruence.
+      + right; auto.
+    -  left; congruence.
+  Defined.
             
   Lemma order_by_has_sortable_type_sdd {τ sl a k pf1} :
     sublist (map fst sl) (domain τ) ->

@@ -148,8 +148,12 @@ Section TOpsInferSub.
         lift (fun τ => (Coll τ, τ₁')) (tuncoll τ₁')
       | AOrderBy sl =>
         let τ₁' := τ₁ ⊔ (Coll ⊥) in
-        match (tunrecproject (List.map fst sl) τ₁') with
-        | Some _ => Some (τ₁, τ₁')
+        match (tuncoll τ₁') with
+        | Some τ₁₀ =>
+          match tunrecsortable (List.map fst sl) τ₁₀ with
+          | Some _ => Some (τ₁', τ₁')
+          | None => None
+          end
         | None => None
         end
       | ARec s => Some (Rec Closed ((s, τ₁)::nil) eq_refl, τ₁)
