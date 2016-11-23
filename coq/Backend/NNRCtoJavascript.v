@@ -154,6 +154,19 @@ Section NNRCtoJavascript.
     Definition brandsToJs (quotel:string) (b:brands)
       := bracketString "[" (joinStrings "," (map (fun x => bracketString quotel x quotel) b)) "]".
 
+    Definition js_quote_char (a:ascii)
+      := match a with
+         | """"%char => "\"""
+         | _ => String a EmptyString
+         end.
+
+    Definition js_quote_string (s:string)
+      := flat_map_string js_quote_char s.
+
+    Definition stringToJS (s:string)
+      := "" ++ quotel_double ++ "" ++ js_quote_string s ++ "" ++ quotel_double ++ "".
+
+    
     (* Java equivalent: JavaScriptBackend.dataToJS *)
     Require Import JSON.
     Fixpoint jsonToJS (quotel:string) (j : json) : string
@@ -161,7 +174,7 @@ Section NNRCtoJavascript.
          | jnil => "null" (* to be discussed *)
          | jnumber n => Z_to_string10 n
          | jbool b => if b then "true" else "false"
-         | jstring s => "" ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ""
+         | jstring s => stringToJS s
          | jarray ls =>
            let ss := map (jsonToJS quotel) ls in
            "[" ++ (joinStrings ", " ss) ++ "]"
@@ -181,7 +194,7 @@ Section NNRCtoJavascript.
 
     Definition hierarchyToJS (quotel:string) (h:list (string*string)) :=
       dataToJS quotel (dcoll (map (fun x => drec (("sub",dstring (fst x)) :: ("sup", (dstring (snd x))) :: nil)) h)).
-    
+
   End DataJS.
 
   Section NRCJS.

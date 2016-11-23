@@ -369,6 +369,12 @@ Fixpoint map_string (f:ascii->ascii) (s:string)
      | String a s' => String (f a) (map_string f s')
      end.
 
+Fixpoint flat_map_string (f:ascii->string) (s:string)
+  := match s with
+     | EmptyString => EmptyString
+     | String a s' => append (f a) (flat_map_string f s')
+     end.
+
 Global Instance ascii_dec : EqDec ascii eq
   := ascii_dec.
 

@@ -33,12 +33,15 @@ Section SparkData.
   Context {m:brand_model}.
 
   Definition data_to_blob (d: data): string :=
-    dataToJS "\""" d.
+    dataToJS quotel_double d.
 
   Lemma dataToJS_correctly_escapes_quote_inside_string:
     dataToJS """" (dstring "abc""cde") = """abc\""cde"""%string.
-  Proof. vm_compute. Admitted. (* TODO I think dataToJS is broken.. *)
-
+  Proof.
+    vm_compute.
+    reflexivity.
+  Qed.
+  
   Fixpoint typed_data_to_json (d: data) (r: rtype₀): option json :=
     match d, r with
     | _, Top₀ => Some (jstring (data_to_blob d))
@@ -123,7 +126,7 @@ Section SparkData.
         (jobject
            (("$data"%string,
              jstring
-               "{\""age\"": 35, \""name\"": \""Fred\"", \""friends\"": [{\""type\"": [\""Person\""], \""data\"": {\""age\"": 42, \""name\"": \""Berta\"", \""friends\"": []}}]}")
+               "{""age"": 35, ""name"": ""Fred"", ""friends"": [{""type"": [""Person""], ""data"": {""age"": 42, ""name"": ""Berta"", ""friends"": []}}]}")
               :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil)).
   Proof. vm_compute. reflexivity. Qed.
 
@@ -148,7 +151,7 @@ Section SparkData.
                        :: ("friends"%string,
                            jarray
                              (jobject
-                                (("$data"%string, jstring "{\""age\"": 42, \""name\"": \""Berta\"", \""friends\"": []}")
+                                (("$data"%string, jstring "{""age"": 42, ""name"": ""Berta"", ""friends"": []}")
                                    :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil) :: nil)) :: nil)) :: nil)).
   Proof. vm_compute. reflexivity. Qed.
 
