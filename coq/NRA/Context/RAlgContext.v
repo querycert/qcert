@@ -177,7 +177,6 @@ Section RAlgContext.
 
   Lemma ac_simplify_idempotent c :
     ac_simplify (ac_simplify c) = ac_simplify c.
-    (* ** TODO: This proof is correct, but takes a loooong time. ***
   Proof.
     induction c; simpl; trivial;
     try solve [destruct (ac_simplify c); simpl in *; trivial;
@@ -187,8 +186,6 @@ Section RAlgContext.
                  destruct (ac_simplify c2); simpl in *; trivial;
                  match_destr; try congruence].
   Qed.
-*)
-  Admitted. (* proof takes annoyingly long to compute (but is there) *)
 
   Fixpoint ac_subst (c:alg_ctxt) (x:nat) (p:alg) : alg_ctxt :=
     match c with

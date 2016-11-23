@@ -196,8 +196,6 @@ Section RAlgEnvContext.
   Lemma aec_simplify_idempotent c :
     aec_simplify (aec_simplify c) = aec_simplify c.
   Proof.
-    (* ** TODO: This proof is correct, but takes a loooong time. ***
-
     induction c; simpl; trivial;
     try solve [destruct (aec_simplify c); simpl in *; trivial;
                match_destr; try congruence
@@ -206,8 +204,6 @@ Section RAlgEnvContext.
                  destruct (aec_simplify c2); simpl in *; trivial;
                  match_destr; try congruence].
   Qed.
-*)
-  Admitted. (* proof takes annoyingly long to compute (but is there) *)
 
   Fixpoint aec_subst (c:algenv_ctxt) (x:nat) (p:algenv) : algenv_ctxt :=
     match c with
