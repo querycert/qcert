@@ -34,11 +34,16 @@
             dnrc_type_sub tenv e1 τ₁ ->
             dnrc_type_sub ((v,τ₁)::tenv) e2 τ₂ ->
             dnrc_type_sub tenv (DNRCLet a v e1 e2) τ₂
-      | TDNRCFor {τ₁ τ₂} v tenv e1 e2 :
-          forall (a:A), 
+      | TDNRCForLocal {τ₁ τ₂} v tenv e1 e2 :
+          forall (a:A),
             dnrc_type_sub tenv e1 (Tlocal (Coll τ₁)) ->
             dnrc_type_sub ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
             dnrc_type_sub tenv (DNRCFor a v e1 e2) (Tlocal (Coll τ₂))
+      | TDNRCForDist {τ₁ τ₂} v tenv e1 e2 :
+          forall (a:A),
+            dnrc_type_sub tenv e1 (Tdistr τ₁) ->
+            dnrc_type_sub ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
+            dnrc_type_sub tenv (DNRCFor a v e1 e2) (Tdistr τ₂)                      
       | TDNRCIf {τ} tenv e1 e2 e3 :
           forall (a:A), 
             dnrc_type_sub tenv e1 (Tlocal Bool) ->
@@ -96,8 +101,6 @@
        auto.
      Qed.    
 
-      (* Print dnrc_type_sub_ind. We will need a special inductive principle because of the list of expressions in TDNRAlg *)
-      
   End typ.
 
     Section lift.
@@ -107,11 +110,15 @@
         dnrc_type_sub tenv e τ.
       Proof.
         Hint Constructors dnrc_type_sub.
-        induction 1; trivial; eauto 2.
-        econstructor; eauto.
-        (* same problem with the induction principle.  I should fix this *)
-        - admit.
-      Admitted.
+        revert tenv τ.
+        induction e; simpl; intros tenv τ dt; invcs dt; eauto.
+        - econstructor; try eassumption.
+          revert H5.
+          apply Forall2_incl.
+          rewrite Forall_forall in H.
+          intros ? ? inn1 inn2 [eqq1 eqq2].
+          auto.
+      Qed.
 
     End lift.
 
@@ -234,6 +241,7 @@
         assert (r0 = τ₂) by (apply rtype_fequal; assumption).
         subst.
         apply (H2 x2); assumption.
+    - admit.
     - specialize (IHdnrc_type_sub1 env H); specialize (IHdnrc_type_sub2 env H); specialize (IHdnrc_type_sub3 env H).
       elim IHdnrc_type_sub1; intros; clear IHdnrc_type_sub1;
       elim IHdnrc_type_sub2; intros; clear IHdnrc_type_sub2;
