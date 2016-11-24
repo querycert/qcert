@@ -48,7 +48,7 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrcmr : nnrcmr -> constant_env -> option data := @eval_nnrcmr _ _ h.
   Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
-  Definition eval_dnnrc_dataset {bm:brand_model} : dnnrc_dataset -> constant_env -> option data := @eval_dnnrc_dataset _ _ bm h.
+  Definition eval_dnnrc_dataset {bm:brand_model} : dnnrc_dataset -> constant_env -> option data := @eval_dnnrc_dataset _ _ h.
 
   (* Eval for single 'world' collection *)
   Definition eval_rule_world : rule -> world_env -> option data := @eval_rule_world _ h.
@@ -69,7 +69,7 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrcmr_world : nnrcmr -> world_env -> option data := @eval_nnrcmr_world _ _ h.
   Definition eval_cldmr_world : cldmr -> world_env -> option data := @eval_cldmr_world _ _ h.
-  Definition eval_dnnrc_dataset_world {bm:brand_model} : dnnrc_dataset -> world_env -> option data := @eval_dnnrc_dataset_world _ _ bm h.
+  Definition eval_dnnrc_dataset_world {bm:brand_model} : dnnrc_dataset -> world_env -> option data := @eval_dnnrc_dataset_world _ _ h.
 
   (* Eval driver *)
 

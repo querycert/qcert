@@ -82,6 +82,38 @@ Section RList.
 
   End misc.
 
+  Lemma map_app_break {A B:Type} (f:A->B) {a b c} :
+    map f a = b ++ c ->
+    {b':list A & {c' : list A | a = b' ++ c' /\ b = map f b' /\ c = map f c'}}.
+  Proof.
+    revert a c.
+    induction b; simpl; intros a' c eqq.
+    - exists nil; exists a'; auto.
+    - destruct a'; simpl in eqq; try discriminate.
+      invcs eqq.
+      destruct (IHb _ _ H1) as [b' [c' [? [??]]]]; subst.
+      exists (a0::b'); exists c'; auto.
+  Qed.
+
+  Lemma map_inj_strong {A B} (f g:A->B) (l1 l2:list A)
+        (inj:forall (x y:A), In (f x) (map f l1) -> In (g y) (map g l2) -> f x = g y -> x = y) :
+    map f l1 = map g l2 ->
+    l1 = l2.
+  Proof.
+    revert l2 inj.
+    induction l1; simpl; destruct l2; simpl; intros inj eqq; trivial; try discriminate.
+    invcs eqq.
+    f_equal; auto.
+  Qed.
+  
+  Lemma map_inj {A B} (f g:A->B) (l1 l2:list A)
+        (inj:forall (x y:A), f x = g y -> x = y) :
+    map f l1 = map g l2 ->
+    l1 = l2.
+  Proof.
+    apply map_inj_strong; auto.
+  Qed.
+  
   Section folds.
     Context {A B C: Type}.
     

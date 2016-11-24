@@ -289,6 +289,20 @@ Section RRelation.
       * reflexivity.
   Qed.
 
+  Lemma listo_to_olist_some {A:Type} (l:list (option A)) (l':list A) :
+    listo_to_olist l = Some l' ->
+    l = (map Some l').
+  Proof.
+    revert l'.
+    induction l; simpl; intros l' eqq.
+    - invcs eqq; simpl; trivial.
+    - destruct a; try discriminate.
+      match_destr_in eqq.
+      invcs eqq.
+      simpl.
+      rewrite <- IHl; trivial.
+  Qed.
+    
   (* filter, remove, etc *)
   Definition rfilter {A} (f:(string*A) -> bool) (l:list (string*A)) : list (string*A) :=
     filter f l.

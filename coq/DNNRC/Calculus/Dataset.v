@@ -76,7 +76,7 @@ Section Dataset.
         | Some (drec fs) => edot fs n
         | _ => None
         end
-      | CLit (d, _) => Some d
+      | CLit (d, _) => Some (normalize_data h d)
       | CPlus c1 c2 =>
         match fc c1, fc c2 with
         | Some (dnat l), Some (dnat r) => Some (dnat (Z.add l r))
@@ -108,6 +108,17 @@ Section Dataset.
       end.
 
     Require Import DNNRC.
+    (* NOTE: the semantics for records 
+       (when fields are duplicated / in the wrong order)
+       are as in QCert, which is not the same as Spark.
+       If we want to model this more accurately, we should have 
+       an alternative "lower level" semantics, along with a translation
+       fix_names:dataset->dataset which uses renaming to ensure that
+       everything works out ``naturally''.
+       and of course, we want fix_names to preserve (dataset_eval) semantics,
+       and the two evaluation results should coincide for any output of 
+       fix_names.
+     *)
     Fixpoint dataset_eval (dsenv : coll_bindings) (e: dataset) : option (list data) :=
       match e with
       | DSVar s => lookup equiv_dec dsenv s
@@ -116,7 +127,7 @@ Section Dataset.
         | Some rows =>
           (* List of column names paired with their functions. *)
           let cfuns: list (string * (list (string * data) -> option data)) :=
-              map (fun p => (fst p, fun_of_column (snd p))) cs in
+              map (fun p => (fst p, fun_of_column (snd p))) (rec_sort cs) in
           (* Call this function on every row in the input dataset.
            * It calls every column function in the context of the row. *)
           let rfun: data -> option (list (string * data)) :=
@@ -127,9 +138,6 @@ Section Dataset.
                 | _ => None
                 end
           in
-          (* Call the row function on every row, and wrap the result in a record.
-           * For the result to be a legal record in the QCert data model,
-           * the field names must be in order and not contain duplicates. *)
           let results := map (compose (lift drec) rfun) rows in
           listo_to_olist results
         | _ => None
@@ -147,17 +155,13 @@ Section Dataset.
                              | _ => false
                              end))
                   (dataset_eval dsenv d)
-      (* NOTE Spark / QCert semantics mismatch
-       * Sparks join operation just appends the columns from the left side to the right,
-       * and this is what the semantics model. For the result to be legal in QCert, great
-       * care must be taken to ensure that this results in unique and sorted column names. *)
       | DSCartesian d1 d2 =>
         match dataset_eval dsenv d1, dataset_eval dsenv d2 with
         | Some rs1, Some rs2 =>
           let data :=
               flat_map (fun r1 => map (fun r2 =>
                                          match r1, r2 with
-                                         | drec a, drec b => Some (drec (a ++ b))
+                                         | drec a, drec b => Some (drec (rec_concat_sort a b))
                                          | _, _ => None
                                          end)
                                       rs2)
@@ -193,15 +197,262 @@ Section Dataset.
     Definition wrap_dataset_eval h dsenv q :=
       lift dcoll (@dataset_eval h dsenv q).
 
+    Lemma fun_of_column_normalized {h c r o}:
+      Forall (fun d : string * data => data_normalized h (snd d)) r ->
+      fun_of_column h c r = Some o ->
+      data_normalized h o.
+    Proof.
+      revert r o.
+      induction c; simpl; intros rl o Fd; intros eqq.
+      - apply lookup_in in eqq.
+        rewrite Forall_forall in Fd.
+        apply (Fd _ eqq).
+      - unfold flip in eqq.
+        specialize (IHc rl).
+        match_destr_in eqq.
+        match_destr_in eqq.
+        specialize (IHc _ Fd (eq_refl _)).
+        eapply data_normalized_edot; eauto.
+      - destruct p.
+        invcs eqq.
+        apply normalize_normalizes.
+      - unfold flip in eqq.
+        match_destr_in eqq.
+        match_destr_in eqq.
+        match_destr_in eqq.
+        match_destr_in eqq.
+        invcs eqq.
+        constructor.
+      - unfold flip in eqq.
+        destruct (fun_of_column h c1 rl); simpl in eqq; try discriminate.
+        destruct (fun_of_column h c2 rl); simpl in eqq; try discriminate.
+        invcs eqq.
+        constructor.
+      - discriminate.
+      - unfold flip, olift in eqq.
+        match_destr_in eqq.
+        unfold unudbool in eqq.
+        match_destr_in eqq.
+        invcs eqq.
+        constructor.
+      - unfold flip, lift in eqq.
+        match_destr_in eqq.
+        invcs eqq.
+        unfold compose.
+        constructor.
+      - unfold flip in eqq.
+        repeat match_destr_in eqq.
+        invcs eqq.
+        constructor.
+      - unfold flip, lift in eqq.
+        repeat match_destr_in eqq; invcs eqq; constructor.
+      - discriminate.
+    Qed.
+
     Lemma dataset_eval_normalized h :
       forall q:dataset, forall (constant_env:coll_bindings) (o:data),
       Forall (fun x => data_normalized h (snd x)) (bindings_of_coll_bindings constant_env) ->
       wrap_dataset_eval h constant_env q = Some o ->
       data_normalized h o.
     Proof.
-      intros.
-      admit.
-    Admitted.
+      unfold wrap_dataset_eval, bindings_of_coll_bindings.
+      intros ds ce d Fb de.
+      apply some_lift in de.
+      destruct de as [dl de ?]; subst.
+      rewrite Forall_map in Fb.
+      simpl in Fb.
+      rewrite Forall_forall in Fb.
+      revert dl de.
+      induction ds; simpl; intros dl de.
+      - apply lookup_in in de.
+        specialize (Fb _ de); simpl in Fb; trivial.
+      - destruct (dataset_eval h ce ds); try discriminate.
+        specialize (IHds _ (eq_refl _)).
+        apply listo_to_olist_some in de.
+        unfold compose in de.
+        invcs IHds.
+        rename H0 into IHds.
+        constructor.
+        revert dl de.
+        induction l0; simpl; intros dl de.
+        + symmetry in de; apply map_eq_nil in de.
+           subst; trivial.
+        + destruct dl; simpl in de; try discriminate.
+          invcs de.
+          invcs IHds.
+          constructor; [| auto].
+          apply some_lift in H0.
+          destruct H0 as [? eqq ?]; subst.
+          match_destr_in eqq.
+          specialize (IHl0 H4 _ H1).
+          apply listo_to_olist_some in eqq.
+          rewrite map_map in eqq.
+          simpl in eqq.
+          constructor.
+          * {
+              revert H1 eqq.
+              generalize (rec_sort l).
+              clear l.
+              intros l H1 eqq.
+              invcs H3.
+              revert x eqq H0 dl H1 IHl0.
+              induction l; simpl; intros ll eqql dnll dl eqq2 IHl0.
+              - symmetry in eqql; apply map_eq_nil in eqql.
+                subst; trivial. 
+              - destruct ll; invcs eqql.
+                apply some_lift in H0.
+                destruct H0 as [? fc ?]; subst.
+                generalize (fun_of_column_normalized dnll fc); intros dnx.
+                constructor; simpl; trivial.
+                specialize (IHl _ H1 dnll).
+                cut (exists dl,
+        map
+          (fun x : data =>
+           lift drec
+             match x with
+             | dunit => None
+             | dnat _ => None
+             | dbool _ => None
+             | dstring _ => None
+             | dcoll _ => None
+             | drec fs =>
+                 listo_to_olist
+                   (map
+                      (fun p : string * (list (string * data) -> option data) =>
+                       lift (fun r : data => (fst p, r)) (snd p fs))
+                      (map (fun p : string * column => (fst p, fun_of_column h (snd p))) l))
+             | dleft _ => None
+             | dright _ => None
+             | dbrand _ _ => None
+             | dforeign _ => None
+             end) l0 = map Some dl /\
+        Forall (fun x : data => data_normalized h x) dl).
+                { intros [? [??]]; eauto. }
+            revert H4 dl eqq2 IHl0.
+            clear.
+            {
+              induction l0; simpl; intros Fdn1 dl eqq Fdnl.
+              - eauto.
+              - destruct dl; try discriminate.
+                simpl in eqq; invcs eqq.
+                invcs Fdn1.
+                invcs Fdnl.
+                specialize (IHl0 H4 _ H1 H6).
+                destruct IHl0 as [dl' [dl'eqq Fd']].
+                apply some_lift in H0.
+                destruct H0 as [dl'' de ?]; subst.
+                destruct a0; try discriminate.
+                case_eq (lift (fun r : data => (fst a, r)) (fun_of_column h (snd a) l1) )
+                ; [intros ? eqq2 | intros eqq2]; rewrite eqq2 in de; try discriminate.
+                match_destr_in de.
+                simpl.
+                exists (drec l2::dl'); simpl.
+                split.
+                + rewrite dl'eqq; trivial.
+                + constructor; trivial.
+                  invcs de.
+                  invcs H5.
+                  invcs H0.
+                  constructor; trivial.
+                  apply is_list_sorted_cons_inv in H2; trivial.
+            }
+            } 
+          * assert (dxdl:domain x = domain (rec_sort l)).
+            {
+              revert x eqq. clear.
+              generalize (rec_sort l).
+              induction l0; simpl; intros x eqq.
+              - symmetry in eqq; apply map_eq_nil in eqq.
+                subst; trivial.
+              - destruct x; try discriminate.
+                simpl in eqq.
+                invcs eqq.
+                apply some_lift in H0.
+                destruct H0 as [? fc ?]; subst.
+                simpl.
+                rewrite IHl0 by trivial.
+                trivial.
+            }
+            rewrite dxdl; clear dxdl.
+            eauto.
+      - apply some_lift in de.
+        destruct de as [dl' de ?]; subst.
+        specialize (IHds _ de).
+        constructor.
+        apply Forall_filter.
+        invcs IHds.
+        trivial.
+      - destruct (dataset_eval h ce ds1); try discriminate.
+        specialize (IHds1 _ (eq_refl _)).
+        destruct (dataset_eval h ce ds2); try discriminate.
+        specialize (IHds2 _ (eq_refl _)).
+        constructor.
+        invcs IHds1.
+        invcs IHds2.
+        apply listo_to_olist_some in de.
+        rewrite flat_map_concat_map in de.
+        revert dl H0 de.
+        induction l; simpl; intros dl Fdl eqq.
+        + symmetry in eqq; apply map_eq_nil in eqq; subst; trivial.
+        + invcs Fdl.
+          symmetry in eqq.
+          apply map_app_break in eqq.
+          destruct eqq as [b' [c' [eqq1 [eqq2 eqq3]]]].
+          subst.
+          apply Forall_app; auto.
+          clear eqq3 IHl.
+          revert b' H1 eqq2.
+          induction l0; simpl; intros b' Fdn eqq2.
+        * symmetry in eqq2; apply map_eq_nil in eqq2; subst; trivial.
+        * invcs Fdn.
+          destruct b'; try discriminate.
+          simpl in eqq2.
+          invcs eqq2.
+          destruct a; try discriminate.
+          destruct a0; try discriminate.
+          invcs H0.
+          constructor; auto.
+          apply data_normalized_rec_concat_sort; trivial.
+      - destruct (dataset_eval h ce ds); try discriminate.
+        specialize (IHds _ (eq_refl _)).
+        apply listo_to_olist_some in de.
+        constructor.
+        invcs IHds.
+        revert dl H0 de.
+        induction l; simpl; intros dl Fdn de.
+        + symmetry in de; apply map_eq_nil in de; subst; trivial.
+        + invcs Fdn.
+           symmetry in de.
+           apply map_app_break in de.
+           destruct de as [b' [c' [eqq1 [eqq2 eqq3]]]].
+           subst.
+           apply Forall_app; auto.
+           clear eqq3 IHl.
+           destruct a; destruct b'; simpl in *; try discriminate; try solve[constructor].
+           case_eq (edot l0 s); [intros ? eqq|intros eqq]
+           ; rewrite eqq in eqq2; try discriminate.
+           destruct d0; try discriminate.
+           destruct l1; try discriminate.
+           simpl in eqq2.
+           invcs eqq2.
+           assert (meq:map Some (map (fun inner : data => drec (rec_concat_sort l0 ((s, inner) :: nil))) l1) = map Some b')
+             by (rewrite map_map; trivial).
+           clear H3.
+           apply map_inj in meq; [|inversion 1; congruence].
+           subst.
+           generalize (data_normalized_edot _ _ _ _ eqq H1); intros dn1.
+           invcs dn1.
+           invcs H0.
+           invcs H1.
+           constructor.
+          * apply dnrec_sort.
+            apply Forall_app; auto.
+          * rewrite Forall_map.
+            revert H5.
+            apply Forall_impl; intros.
+            apply dnrec_sort.
+            apply Forall_app; auto.
+    Qed.
 
     Global Program Instance SparkIRPlug : (@AlgPlug _ dataset) :=
       mkAlgPlug wrap_dataset_eval dataset_eval_normalized.
