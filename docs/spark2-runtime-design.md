@@ -1,7 +1,7 @@
 Spark2 runtime design notes
 ===========================
 
-We need a data representation that supports the rich data model of QCert, while being close enough to what SparkSQL natively supports to take advantage of its efficient execution without converting data back and forth.
+We need a data representation that supports the rich data model of Qcert, while being close enough to what SparkSQL natively supports to take advantage of its efficient execution without converting data back and forth.
 
 Spark data model
 ----------------
@@ -18,11 +18,11 @@ Data starts with a distributed collection of basically tabular data.
 This is called a Dataframe, which might eventually become an alias for `Dataset[Row]`.
 
 
-QCert data in Spark
+Qcert data in Spark
 -------------------
 
-QCert supports a richer datamodel than Spark.
-The types of data in QCert with nonobvious counterparts in Spark are open records, either, and brands.
+Qcert supports a richer datamodel than Spark.
+The types of data in Qcert with nonobvious counterparts in Spark are open records, either, and brands.
 Brands introduce subtyping, with top and bottom types.
 
 Subtyping and open records expose a common difficulty:

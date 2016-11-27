@@ -20,6 +20,6 @@ Require Export NRewUtil NRew.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "QCert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-(* QCert Compiler *)
+(* Qcert Compiler *)
 
 (* Configuration of the extraction *)
 
@@ -26,7 +26,7 @@ Require Import Digits.
 
 Extract Constant Digits.nat_to_string10 => "(fun x -> Util.char_list_of_string (string_of_int x))".
 
-(* QCert modules *)
+(* Qcert modules *)
 
 Require EnhancedCompiler.
 

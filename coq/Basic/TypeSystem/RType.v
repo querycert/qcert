@@ -1079,6 +1079,6 @@ Ltac r_ext := solve [erewrite (rtype_ext); eauto].
     
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
  *)

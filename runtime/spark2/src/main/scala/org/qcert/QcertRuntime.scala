@@ -32,7 +32,7 @@ import scala.collection.JavaConverters._
 
 
 
-object test extends QCertRuntime {
+object test extends QcertRuntime {
   val worldType = StructType(Seq(StructField("$data", StringType), StructField("$type", ArrayType(StringType))))
 
   override def run(CONST$WORLD: Dataset[Row]): Unit = {
@@ -46,21 +46,21 @@ object test extends QCertRuntime {
   }
 }
 
-/** QCertRuntime static functions
+/** QcertRuntime static functions
   *
   * Turns out SparkSQL only accepts locally bound lambdas and static functions as user-defined functions.
-  * Most of the runtime functions are declared in the abstract class QCertRuntime, which makes them methods.
+  * Most of the runtime functions are declared in the abstract class QcertRuntime, which makes them methods.
   *
   * TODO move more of the runtime in here, so it can potentially be used from SparkSQL
   *
-  * We cannot get rid of the QCertRuntime *class* completely:
+  * We cannot get rid of the QcertRuntime *class* completely:
   * The class has the main method (which cannot be in the object, even though it is static?!?)
   * It declares abstract members like `run` and the world type for initial data loading.
   */
-object QCertRuntime {
-  def blobToQCertString(x: String): String = x // TODO
+object QcertRuntime {
+  def blobToQcertString(x: String): String = x // TODO
 
-  def toQCertString(x: Any): String = x match {
+  def toQcertString(x: Any): String = x match {
     case null => "UNIT" // null is unit, right?
     case x: Int => x.toString
     case x: Long => x.toString
@@ -69,28 +69,28 @@ object QCertRuntime {
     case true => "TRUE"
     case false => "FALSE"
     case x: String => x // no quotes!
-    case x: Array[_] => x.map(QCertRuntime.toQCertString).mkString("[", ", ", "]")
+    case x: Array[_] => x.map(QcertRuntime.toQcertString).mkString("[", ", ", "]")
     case x: Row => x.schema.fieldNames match {
       case Array("$left", "$right") =>
         if (x.isNullAt(0))
-          "Right(" + toQCertString(x(0)) + ")"
+          "Right(" + toQcertString(x(0)) + ")"
         else
-          "Left(" + toQCertString(x(1)) + ")"
+          "Left(" + toQcertString(x(1)) + ")"
       case Array("$type", "$data") =>
         val brands = x.getSeq[String](0).mkString(" & ")
-        val data = blobToQCertString(x.getAs[String](1))
+        val data = blobToQcertString(x.getAs[String](1))
         s"<$brands:$data>"
       case Array("$blob", "$known") =>
-        blobToQCertString(x.getAs[String](0))
+        blobToQcertString(x.getAs[String](0))
     }
   }
 
-  def toQCertStringUDF =
-    udf((x: Any) => QCertRuntime.toQCertString(x), StringType)
+  def toQcertStringUDF =
+    udf((x: Any) => QcertRuntime.toQcertString(x), StringType)
 
   // TODO
   // We might want to change all of these to pass around a runtime support object with the hierarchy, gson parser, ...
-  // basically everything that's currently in the QCertRuntime abstract class
+  // basically everything that's currently in the QcertRuntime abstract class
 
   def isSubBrand(brandHierarchy: mutable.HashMap[String, mutable.HashSet[String]], sub: String, sup: String): Boolean = {
     if (sub == sup || sup == "Any")
@@ -105,7 +105,7 @@ object QCertRuntime {
 
   // TODO Can we somehow avoid passing the hierarchy at every call site?
   def castUDF(h: mutable.HashMap[String, mutable.HashSet[String]], bs: String*) =
-    udf(QCertRuntime.castUDFHelper(h, bs:_*), BooleanType)
+    udf(QcertRuntime.castUDFHelper(h, bs:_*), BooleanType)
 
   def srow(s: StructType, vals: Any*): Row = {
     assert(s.fields.length == vals.length,
@@ -197,7 +197,7 @@ object QCertRuntime {
   }
 }
 
-abstract class QCertRuntime {
+abstract class QcertRuntime {
   // TODO revisit naming -- we don't want to clash with spark.sql.functions._ functions
 
   val gson = new GsonBuilder().disableHtmlEscaping().create()
@@ -370,7 +370,7 @@ abstract class QCertRuntime {
     val duplicates = allFieldNames(l) intersect allFieldNames(r)
     for (field <- duplicates)
     // TODO This uses JsonElement equality. Unless we can guarantee that the JSON serialization is unique, this is likely incorrect
-    // What we should do is use QCert equality. Unfortunately, we would need to deserialize for that, which we can't, because we don't have the type!
+    // What we should do is use Qcert equality. Unfortunately, we would need to deserialize for that, which we can't, because we don't have the type!
       if (blobDot(field, r) != blobDot(field, concatenated))
         return Array()
     Array(concatenated)
@@ -498,7 +498,7 @@ abstract class QCertRuntime {
     // TODO incomplete
   }
 
-  /** QCert cast operator (DNRC version)
+  /** Qcert cast operator (DNRC version)
     *
     * This is not a general cast operator, i.e. it does not give access to fields from the .. part of
     * an open record. The input has to be a branded value.
@@ -534,7 +534,7 @@ abstract class QCertRuntime {
 
   /*
   def distinct[T](b: Array[T])(implicit m: ClassTag[T]): Array[T] = {
-    val set = new util.TreeSet(new QCertComparator[T]())
+    val set = new util.TreeSet(new QcertComparator[T]())
     val a = util.Arrays.asList(b: _*)
     for (x <- b)
       set.add(x)
@@ -557,12 +557,12 @@ abstract class QCertRuntime {
 
   /** Binary operator AContains */
   def AContains[T](e: T, l: Array[T]): Boolean =
-    l.exists(QCertOrdering.compare(e, _) == 0)
+    l.exists(QcertOrdering.compare(e, _) == 0)
 
   /* Sorting & equality
  * ==================
  */
-  object QCertOrdering extends Ordering[Any] {
+  object QcertOrdering extends Ordering[Any] {
     def compare(x: Any, y: Any): Int = (x, y) match {
       // TODO how to sort ()?
       case ((), ()) => 0
@@ -632,17 +632,17 @@ abstract class QCertRuntime {
     }
   }
 
-  class QCertComparator[T] extends Comparator[T] {
-    def compare(a: T, b: T): Int = QCertOrdering.compare(a, b)
+  class QcertComparator[T] extends Comparator[T] {
+    def compare(a: T, b: T): Int = QcertOrdering.compare(a, b)
   }
 
   def equal(a: Any, b: Any): Boolean =
-    QCertOrdering.compare(a, b) == 0
+    QcertOrdering.compare(a, b) == 0
 
 
   def lessOrEqual(a: Any, b: Any): Boolean =
-    QCertOrdering.compare(a, b) <= 0
+    QcertOrdering.compare(a, b) <= 0
 
   def lessThan(a: Any, b: Any): Boolean =
-    QCertOrdering.compare(a, b) < 0
+    QcertOrdering.compare(a, b) < 0
 }

@@ -238,7 +238,7 @@ Global Instance ConstLiteral_string {fdata:foreign_data} : ConstLiteral string
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
 

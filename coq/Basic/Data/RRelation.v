@@ -1365,6 +1365,6 @@ Notation "distinct-b b1" := (bdistinct b1) (right associativity, at level 70) : 
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

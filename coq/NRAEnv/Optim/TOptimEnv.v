@@ -3235,6 +3235,6 @@ Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton : talgenv_optim.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

@@ -151,6 +151,6 @@ Notation "pf ⊨ 𝓐( op )" := (alg_domain op pf) (at level 70) : alg_scope.  (
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

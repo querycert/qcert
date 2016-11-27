@@ -239,6 +239,6 @@ Notation "p1 #= p2" := (passert (pbinop AEq p1 p2)) (only parsing, right associa
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

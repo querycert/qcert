@@ -196,6 +196,6 @@ Notation "X ≡ₐ Y" := (alg_eq X Y) (at level 90) : alg_scope.                
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

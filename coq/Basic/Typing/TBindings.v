@@ -77,7 +77,7 @@ Hint Resolve bindings_type_Forall_normalized.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
 

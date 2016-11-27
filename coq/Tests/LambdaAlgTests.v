@@ -244,6 +244,6 @@ Definition T2nnrc_opt := TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T2en
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "QCert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

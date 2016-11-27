@@ -18,7 +18,7 @@ Require Export NNRCMR NRewMR.
 Require Export ForeignReduceOps.
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "QCert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
 

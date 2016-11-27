@@ -290,7 +290,7 @@ Notation "X ≡ₓ Y" := (algext_eq X Y) (at level 90) : algext_scope. (* ≡ = 
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
 

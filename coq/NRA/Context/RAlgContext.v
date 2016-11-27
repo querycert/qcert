@@ -1114,6 +1114,6 @@ Notation "X ≡ₐ Y" := (alg_ctxt_equiv alg_eq X Y) (at level 90) : alg_ctxt_sc
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

@@ -355,6 +355,6 @@ Notation "[ c & g ] |= p ; a ~> b" := (pat_type c g p a b) (at level 90) : rule_
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

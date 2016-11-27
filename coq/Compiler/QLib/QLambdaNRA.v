@@ -65,6 +65,6 @@ Module QLambdaNRA(runtime:CompilerRuntime).
 End QLambdaNRA.
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

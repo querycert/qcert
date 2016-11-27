@@ -107,6 +107,6 @@ End RAlgSugar.
 Hint Resolve data_normalized_pat_context_data.  
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

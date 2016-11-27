@@ -134,6 +134,6 @@ Infix "ζ" := z (at level 70).  (* ζ = \zeta *)
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

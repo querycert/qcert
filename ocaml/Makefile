@@ -46,7 +46,7 @@ js: qcertJS.js
 # Extraction from Coq
 generated:
 	mkdir -p generated
-	(cd generated; coqc -R ../../coq QCert ../Extraction.v)
+	(cd generated; coqc -R ../../coq Qcert ../Extraction.v)
 
 # OCaml build
 $(MAIN): generated $(MAIN).$(TARGET)

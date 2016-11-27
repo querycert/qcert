@@ -156,11 +156,11 @@ Section DNNRCtoScala.
     | CSConcat c1 c2 =>
       "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ")"
     | CToString c =>
-      "QCertRuntime.toQCertStringUDF(" ++ code_of_column c ++ ")"
+      "QcertRuntime.toQcertStringUDF(" ++ code_of_column c ++ ")"
     | CUDFCast bs c =>
-      "QCertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+      "QcertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
     | CUDFUnbrand t c =>
-      "QCertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
+      "QcertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
 
   Fixpoint code_of_dataset (e: dataset) : string :=
@@ -203,7 +203,7 @@ Section DNNRCtoScala.
         prefix ("dot[" ++ rtype_to_scala_type (proj1_sig r) ++ "](""" ++ n ++ """)")
       | None => "NONLOCAL EXPECTED TYPE IN DOT"
       end
-    | AFlatten => postfix "flatten.sorted(QCertOrdering)"
+    | AFlatten => postfix "flatten.sorted(QcertOrdering)"
     | AIdOp => prefix "identity"
     | ALeft => prefix "left"
     | ANeg => "(!" ++ x ++ ")"
@@ -218,7 +218,7 @@ Section DNNRCtoScala.
     | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
-    | AToString => prefix "QCertRuntime.toQCertString"
+    | AToString => prefix "QcertRuntime.toQcertString"
     | ASubstring start olen =>
       "(" ++ x ++ ").substring(" ++ toString start ++
           match olen with
@@ -284,7 +284,7 @@ Section DNNRCtoScala.
     | AMergeConcat => prefix "mergeConcat"
     | AOr => infix "||"
     | ASConcat => infix "+" (* string concat *)
-    | AUnion => infix "++" ++ ".sorted(QCertOrdering)" (* bag union *)
+    | AUnion => infix "++" ++ ".sorted(QcertOrdering)" (* bag union *)
 
     (* TODO *)
     | AForeignBinaryOp op => "FOREIGNBINARYOP???"
@@ -402,12 +402,12 @@ Section DNNRCtoScala.
       ++ "import org.apache.spark.sql.types._" ++ eol
       ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol
-      ++ "import org.qcert.QCertRuntime" ++ eol
-      ++ "object " ++ name ++ " extends QCertRuntime {" ++ eol
+      ++ "import org.qcert.QcertRuntime" ++ eol
+      ++ "object " ++ name ++ " extends QcertRuntime {" ++ eol
       ++ initBrandHierarchy ++ eol
       ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
       ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
-      (* sparkSession is a field in QCertRuntime. What it does in an import? I have no idea! *)
+      (* sparkSession is a field in QcertRuntime. What it does in an import? I have no idea! *)
       ++ "  import sparkSession.implicits._" ++ eol
       ++ "println(toBlob(" ++ eol
       ++ scala_of_dnrc e ++ eol
@@ -420,6 +420,6 @@ End DNNRCtoScala.
 
 (*
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "QCert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

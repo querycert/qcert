@@ -227,6 +227,6 @@ Notation "X ≡ᵈ Y" := (dnnrc_eq X Y) (at level 90) : dnrc_scope.             
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

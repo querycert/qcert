@@ -1016,6 +1016,6 @@ Hint Rewrite @tfor_singleton_to_let_arrow : nrc_rew.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

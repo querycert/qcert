@@ -117,6 +117,6 @@ Notation "X ≡τ' Y" := (talg_eq (exist _ _ X) (exist _ _ Y)) (at level 80).   
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

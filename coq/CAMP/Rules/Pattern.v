@@ -713,6 +713,6 @@ Tactic Notation "pat_cases" tactic(first) ident(c) :=
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

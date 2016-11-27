@@ -81,6 +81,6 @@ Module QOQL(runtime:CompilerRuntime).
 End QOQL.
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

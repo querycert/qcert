@@ -83,6 +83,6 @@ Notation "a ;;; b" := (fun x => a (b x)) (at level 99, right associativity, only
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

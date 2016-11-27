@@ -147,6 +147,6 @@ Notation "X ≡ᶜ Y" := (nnrc_eq X Y) (at level 90) : nrc_scope.               
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

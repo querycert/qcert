@@ -36,6 +36,6 @@ Extract Inlined Constant STRING_tostring => "(fun x -> Util.char_list_of_string 
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

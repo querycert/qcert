@@ -2830,6 +2830,6 @@ Hint Rewrite @rtype_meet_Foreign_neq_l @rtype_meet_Foreign_neq_r using discrimin
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

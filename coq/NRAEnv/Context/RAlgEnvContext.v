@@ -1203,6 +1203,6 @@ Notation "X ≡ₑ Y" := (algenv_ctxt_equiv algenv_eq X Y) (at level 90) : algen
   
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

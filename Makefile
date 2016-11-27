@@ -285,31 +285,31 @@ lib/QcertLibrary.jar:
 	ant -f scripts/makeQcertLibrary.xml
 
 qcert: Makefile.coq
-	@echo "[QCert] "
-	@echo "[QCert] Compiling Coq source"
-	@echo "[QCert] "
+	@echo "[Qcert] "
+	@echo "[Qcert] Compiling Coq source"
+	@echo "[Qcert] "
 	@$(MAKE) -f Makefile.coq
 
 extraction:
-	@echo "[QCert] "
-	@echo "[QCert] Extracting compiler to OCaml"
-	@echo "[QCert] "
+	@echo "[Qcert] "
+	@echo "[Qcert] Extracting compiler to OCaml"
+	@echo "[Qcert] "
 	@$(MAKE) -C ocaml realclean all
 
 java-extraction:
-	@echo "[QCert] "
-	@echo "[QCert] Extracting compiler to OCaml + Java"
-	@echo "[QCert] "
+	@echo "[Qcert] "
+	@echo "[Qcert] Extracting compiler to OCaml + Java"
+	@echo "[Qcert] "
 	@$(MAKE) -C ocaml clean japi
 
 js-extraction:
-	@echo "[QCert] "
-	@echo "[QCert] Extracting compiler to OCaml + Javascript"
-	@echo "[QCert] "
+	@echo "[Qcert] "
+	@echo "[Qcert] Extracting compiler to OCaml + Javascript"
+	@echo "[Qcert] "
 	@$(MAKE) -C ocaml js
 
 Makefile.coq: Makefile $(VS) $(FILES)
-	@coq_makefile -R coq QCert $(FILES) -o Makefile.coq
+	@coq_makefile -R coq Qcert $(FILES) -o Makefile.coq
 
 html: Makefile.coq
 	@$(MAKE) -f Makefile.coq html

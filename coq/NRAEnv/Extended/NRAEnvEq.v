@@ -293,6 +293,6 @@ Notation "X ≡ₓ Y" := (nraenv_eq X Y) (at level 90) : nraenv_scope. (* ≡ = 
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

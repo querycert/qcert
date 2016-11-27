@@ -1572,7 +1572,7 @@ Hint Resolve is_list_sorted_NoDup_strlt.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
 

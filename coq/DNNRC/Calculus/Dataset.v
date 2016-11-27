@@ -47,7 +47,7 @@ Section Dataset.
   (* NOTE we actually codegen to a UDF for this, not Spark's printing *)
   | CToString : column -> column
   | CSConcat : column -> column -> column
-  (* In contrast to QCert cast, this takes the runtime brands as input (as a column),
+  (* In contrast to Qcert cast, this takes the runtime brands as input (as a column),
    * not the data, and returns a boolean suitable for filtering, not left(data)/right(null). *)
   | CUDFCast : list string -> column -> column
   | CUDFUnbrand : rtype₀ -> column -> column.
@@ -83,9 +83,9 @@ Section Dataset.
         | _, _ => None
         end
       | CEq c1 c2 =>
-        (* TODO We use QCert equality here. Define and use Spark equality.
+        (* TODO We use Qcert equality here. Define and use Spark equality.
          * Spark has a three-valued logic, meaning special treatment for NULL.
-         * In contrast to QCert it also does not deal with brands, bags, open records, ... *)
+         * In contrast to Qcert it also does not deal with brands, bags, open records, ... *)
         lift2 (fun x y => dbool (if data_eq_dec x y then true else false)) (fc c1) (fc c2)
       | CLessThan c1 c2 =>
         None (* TODO *)
@@ -110,7 +110,7 @@ Section Dataset.
     Require Import DNNRC.
     (* NOTE: the semantics for records 
        (when fields are duplicated / in the wrong order)
-       are as in QCert, which is not the same as Spark.
+       are as in Qcert, which is not the same as Spark.
        If we want to model this more accurately, we should have 
        an alternative "lower level" semantics, along with a translation
        fix_names:dataset->dataset which uses renaming to ensure that
@@ -463,6 +463,6 @@ End Dataset.
 
 (*
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

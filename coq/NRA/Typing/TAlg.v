@@ -539,6 +539,6 @@ Notation "Op ▷ A >=> B" := (alg_type Op A B) (at level 70).
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

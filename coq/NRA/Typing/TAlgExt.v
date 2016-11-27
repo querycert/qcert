@@ -68,6 +68,6 @@ Notation "Op @▷ d" := (talgext_eval Op d) (at level 70) : algext_scope.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

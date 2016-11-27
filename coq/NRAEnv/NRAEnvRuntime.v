@@ -22,6 +22,6 @@ Require Export NRAEnv NRAEnvSize NRAEnvIgnore NRAEnvEq.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "QCert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

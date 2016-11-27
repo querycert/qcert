@@ -1930,6 +1930,6 @@ Hint Rewrite @rproject_over_either  : algenv_optim.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

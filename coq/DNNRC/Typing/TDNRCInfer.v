@@ -420,6 +420,6 @@ Global Arguments type_annotation {ftype br} A: clear implicits.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
