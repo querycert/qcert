@@ -85,20 +85,20 @@ Section PatterntoNRAEnv.
   Require Import RAlgEq.
   Local Open Scope alg_scope.
 
-  Lemma pat_envtrans_correct h c p bind d:
-    lift_failure (interp h c p bind d) = fun_of_algenv h c (algenv_of_pat p) (drec bind) d.
+  Lemma pat_envtrans_correct h c p env d:
+    lift_failure (interp h c p env d) = fun_of_algenv h c (algenv_of_pat p) (drec env) d.
   Proof.
-    revert d bind; induction p; simpl; intros.
+    revert d env; induction p; simpl; intros.
     (* pconst *)
     - reflexivity.
     (* punop *)
     - rewrite <- IHp; clear IHp; simpl.
-      destruct (interp h c p bind d); try reflexivity.
+      destruct (interp h c p env d); try reflexivity.
       simpl; destruct (fun_of_unaryop h u res); reflexivity.
     (* pbinop *)
     - rewrite <- IHp1; rewrite <- IHp2; clear IHp1 IHp2.
-      destruct (interp h c p1 bind d); try reflexivity.
-      destruct (interp h c p2 bind d); try reflexivity.
+      destruct (interp h c p1 env d); try reflexivity.
+      destruct (interp h c p2 env d); try reflexivity.
       simpl; destruct (fun_of_binop h b res res0); reflexivity.
     (* pmap *)
     - destruct d; try reflexivity.
@@ -106,11 +106,11 @@ Section PatterntoNRAEnv.
       unfold olift, liftpr ; simpl.
       induction l; try reflexivity; simpl.
       unfold lift_failure in *.
-      rewrite <- (IHp a bind); clear IHp.
-      destruct (interp h c p bind a); try reflexivity; simpl.
+      rewrite <- (IHp a env); clear IHp.
+      destruct (interp h c p env a); try reflexivity; simpl.
       * rewrite IHl; clear IHl; simpl.
         unfold lift; simpl.
-        destruct (rmap (fun_of_algenv h c (algenv_of_pat p) (drec bind)) l); try reflexivity; simpl.
+        destruct (rmap (fun_of_algenv h c (algenv_of_pat p) (drec env)) l); try reflexivity; simpl.
         unfold rflatten, lift; simpl.
         destruct (oflat_map
             (fun x : data =>
@@ -119,9 +119,9 @@ Section PatterntoNRAEnv.
              | _ => None
              end) l0); reflexivity.
       * unfold lift, liftpr in *; simpl in *.
-        revert IHl; generalize (rmap (fun_of_algenv h c (algenv_of_pat p) (drec bind)) l); intros.
+        revert IHl; generalize (rmap (fun_of_algenv h c (algenv_of_pat p) (drec env)) l); intros.
         destruct o; simpl in *.
-        revert IHl; generalize (gather_successes (map (interp h c p bind) l)); intros.
+        revert IHl; generalize (gather_successes (map (interp h c p env) l)); intros.
         destruct p0; unfold rflatten in *; simpl in *; try congruence;
         revert IHl; generalize (oflat_map
               (fun x : data =>
@@ -130,35 +130,35 @@ Section PatterntoNRAEnv.
                | _ => None
                end) l0); simpl; intros;
         destruct o; simpl; congruence.
-        revert IHl; generalize (gather_successes (map (interp h c p bind) l)); intros.
+        revert IHl; generalize (gather_successes (map (interp h c p env) l)); intros.
         destruct p0; try congruence.
     (* passert *)
     - rewrite <- IHp; clear IHp; simpl.
-      destruct (interp h c p bind d); try reflexivity.
+      destruct (interp h c p env d); try reflexivity.
       destruct res; try reflexivity; simpl.
       destruct b; reflexivity.
     (* porElse *)
     - rewrite <- IHp1; clear IHp1; simpl.
-      destruct (interp h c p1 bind d); simpl; auto.
+      destruct (interp h c p1 env d); simpl; auto.
     (* pit *)
     - reflexivity.
     (* pletIt *)
     - rewrite <- IHp1; clear IHp1; simpl.
-      destruct (interp h c p1 bind d); try reflexivity.
+      destruct (interp h c p1 env d); try reflexivity.
       simpl.
       specialize (IHp2 res).
       unfold pat_context_data in IHp2.
       rewrite <- IHp2; clear IHp2.
-      destruct (interp h c p2 bind res); reflexivity.      
+      destruct (interp h c p2 env res); reflexivity.      
     (* pgetconstant *)
     - destruct (edot c s); simpl; trivial.
     (* penv *)
     - eauto. 
     (* pletEnv *)
     - rewrite <- IHp1; clear IHp1; simpl.
-      destruct (interp h c p1 bind d); try reflexivity; simpl.
+      destruct (interp h c p1 env d); try reflexivity; simpl.
       destruct res; try reflexivity; simpl.
-      destruct (merge_bindings bind l); try reflexivity; simpl.
+      destruct (merge_bindings env l); try reflexivity; simpl.
       specialize (IHp2 d l0).
       rewrite <- IHp2; clear IHp2; simpl.
       destruct (interp h c p2 l0 d); try reflexivity.
