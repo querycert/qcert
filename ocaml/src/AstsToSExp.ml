@@ -395,9 +395,9 @@ let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
 					 :: (SString (string_of_char_list v2))
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
   | NNRCGroupBy (g,sl,n1) -> STerm ("NNRCGroupBy",
-				    [(SString (string_of_char_list g))]
-				    @ (coq_string_list_to_sstring_list sl)
-				    @ [nnrc_to_sexp n1])
+				    (SString (string_of_char_list g))
+				    :: (STerm ("keys",coq_string_list_to_sstring_list sl))
+				    :: [nnrc_to_sexp n1])
 
 let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   match se with
@@ -410,6 +410,8 @@ let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   | STerm ("NNRCIf", [n1;n2;n3]) -> NNRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)
   | STerm ("NNRCEither", (SString v1) :: (SString v2) :: [n1;n2;n3]) ->
       NNRCEither (sexp_to_nnrc n1,char_list_of_string v1,sexp_to_nnrc n2,char_list_of_string v2,sexp_to_nnrc n3)
+  | STerm ("NNRCGroupBy", (SString v1) :: (STerm ("keys", v2)) :: [n1]) ->
+      NNRCGroupBy (char_list_of_string v1,sstring_list_to_coq_string_list v2,sexp_to_nnrc n1)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrc with name " ^ t))
   | _ ->
