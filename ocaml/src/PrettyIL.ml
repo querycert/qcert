@@ -775,30 +775,30 @@ let pretty_nraenv greek margin a =
     flush_str_formatter ()
   end
 
-(* NNRC PP *)
+(* NNNRC PP *)
 
 let rec pretty_nnrc_aux p sym ff n =
   match n with
-  | Hack.NRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
-  | Hack.NRCConst d -> fprintf ff "%a" pretty_data d
-  | Hack.NRCBinop (b,n1,n2) -> (pretty_binop p sym pretty_nnrc_aux) ff b n1 n2
-  | Hack.NRCUnop (u,n1) -> (pretty_unop p sym pretty_nnrc_aux) ff u n1
-  | Hack.NRCLet (v,n1,n2) ->
+  | Hack.NNRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
+  | Hack.NNRCConst d -> fprintf ff "%a" pretty_data d
+  | Hack.NNRCBinop (b,n1,n2) -> (pretty_binop p sym pretty_nnrc_aux) ff b n1 n2
+  | Hack.NNRCUnop (u,n1) -> (pretty_unop p sym pretty_nnrc_aux) ff u n1
+  | Hack.NNRCLet (v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
 	 (Util.string_of_char_list v)
 	(pretty_nnrc_aux p sym) n1
 	(pretty_nnrc_aux p sym) n2
-  | Hack.NRCFor (v,n1,n2) ->
+  | Hack.NNRCFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
 	(pretty_nnrc_aux 0 sym) n2
 	 (Util.string_of_char_list v) pretty_sym sym.sin
 	(pretty_nnrc_aux 0 sym) n1
-  | Hack.NRCIf (n1,n2,n3) ->
+  | Hack.NNRCIf (n1,n2,n3) ->
       fprintf ff "@[<hv 0>@[<hv 2>if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
 	(pretty_nnrc_aux p sym) n1
 	(pretty_nnrc_aux p sym) n2
 	(pretty_nnrc_aux p sym) n3
-  | Hack.NRCEither (n0,v1,n1,v2,n2) ->
+  | Hack.NNRCEither (n0,v1,n1,v2,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	(pretty_nnrc_aux p sym) n0
 	 (Util.string_of_char_list v1) (pretty_nnrc_aux p sym) n1
@@ -818,7 +818,7 @@ let pretty_nnrc greek margin n =
     flush_str_formatter ()
   end
 
-(* NRCMR PP *)
+(* NNRCMR PP *)
 let pretty_fun sym ff (x, n) =
   fprintf ff "@[fun ($v%s) ->@ %a@]"
     (Util.string_of_char_list x)
@@ -930,62 +930,62 @@ let pretty_nnrcmr greek margin mr_chain =
     flush_str_formatter ()
   end
 
-(* dnrc PP *)
+(* dnnrc PP *)
 
-let rec pretty_dnrc_aux ann plug p sym ff n =
+let rec pretty_dnnrc_aux ann plug p sym ff n =
   match n with
-  | Hack.DNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v)
-  | Hack.DNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
-  | Hack.DNRCBinop (a, b,n1,n2) ->
+  | Hack.DNNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v)
+  | Hack.DNNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
+  | Hack.DNNRCBinop (a, b,n1,n2) ->
       fprintf ff "%a(" ann a
-    ; ((pretty_binop 0 sym (pretty_dnrc_aux ann plug)) ff b n1 n2)
+    ; ((pretty_binop 0 sym (pretty_dnnrc_aux ann plug)) ff b n1 n2)
     ; fprintf ff ")"
-  | Hack.DNRCUnop (a,u,n1) ->
+  | Hack.DNNRCUnop (a,u,n1) ->
      fprintf ff "%a(" ann a
-    ; ((pretty_unop 0 sym (pretty_dnrc_aux ann plug)) ff u n1)
+    ; ((pretty_unop 0 sym (pretty_dnnrc_aux ann plug)) ff u n1)
     ; fprintf ff ")"
-  | Hack.DNRCLet (a,v,n1,n2) ->
+  | Hack.DNNRCLet (a,v,n1,n2) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
 	     ann a
 	 (Util.string_of_char_list v)
-	(pretty_dnrc_aux ann plug p sym) n1
-	(pretty_dnrc_aux ann plug p sym) n2
-  | Hack.DNRCFor (a,v,n1,n2) ->
+	(pretty_dnnrc_aux ann plug p sym) n1
+	(pretty_dnnrc_aux ann plug p sym) n2
+  | Hack.DNNRCFor (a,v,n1,n2) ->
      fprintf ff "@[<hv 0>%a{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
 	     ann a
-	(pretty_dnrc_aux ann plug 0 sym) n2
+	(pretty_dnnrc_aux ann plug 0 sym) n2
 	 (Util.string_of_char_list v) pretty_sym sym.sin
-	(pretty_dnrc_aux ann plug 0 sym) n1
-  | Hack.DNRCIf (a,n1,n2,n3) ->
+	(pretty_dnnrc_aux ann plug 0 sym) n1
+  | Hack.DNNRCIf (a,n1,n2,n3) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
 	     ann a
-	(pretty_dnrc_aux ann plug p sym) n1
-	(pretty_dnrc_aux ann plug p sym) n2
-	(pretty_dnrc_aux ann plug p sym) n3
-  | Hack.DNRCEither (a,n0,v1,n1,v2,n2) ->
+	(pretty_dnnrc_aux ann plug p sym) n1
+	(pretty_dnnrc_aux ann plug p sym) n2
+	(pretty_dnnrc_aux ann plug p sym) n3
+  | Hack.DNNRCEither (a,n0,v1,n1,v2,n2) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	     ann a
-	(pretty_dnrc_aux ann plug p sym) n0
-	 (Util.string_of_char_list v1) (pretty_dnrc_aux ann plug p sym) n1
-	 (Util.string_of_char_list v2) (pretty_dnrc_aux ann plug p sym) n2
-  | Hack.DNRCCollect (a,n1) ->
+	(pretty_dnnrc_aux ann plug p sym) n0
+	 (Util.string_of_char_list v1) (pretty_dnnrc_aux ann plug p sym) n1
+	 (Util.string_of_char_list v2) (pretty_dnnrc_aux ann plug p sym) n2
+  | Hack.DNNRCCollect (a,n1) ->
      fprintf ff "@[%a%s[@[%a@]]@]"
 	     ann a
 	     "COLLECT"
-	(pretty_dnrc_aux ann plug p sym) n1
-  | Hack.DNRCDispatch (a,n1) ->
+	(pretty_dnnrc_aux ann plug p sym) n1
+  | Hack.DNNRCDispatch (a,n1) ->
      fprintf ff "@[%a%s[@[%a@]]@]"
 	     ann a
 	     "DISPATCH"
-	     (pretty_dnrc_aux ann plug p sym) n1
-  | Hack.DNRCAlg (a,body,arglist) ->
+	     (pretty_dnnrc_aux ann plug p sym) n1
+  | Hack.DNNRCAlg (a,body,arglist) ->
      fprintf ff "@[%a(@[fun %a => @] %a)@[(%a)@]@]"
 	     ann a
              (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
              plug body
-	     (pretty_list (pretty_dnrc_aux ann plug p sym) ",") (List.map snd arglist)
+	     (pretty_list (pretty_dnnrc_aux ann plug p sym) ",") (List.map snd arglist)
 
-let pretty_dnrc ann plug greek margin n =
+let pretty_dnnrc ann plug greek margin n =
   let conf = make_pretty_config greek margin in
   let ff = str_formatter in
   begin
@@ -995,7 +995,7 @@ let pretty_dnrc ann plug greek margin n =
       | Greek -> greeksym
       | Ascii -> textsym
     in
-    fprintf ff "@[%a@]@." (pretty_dnrc_aux ann plug 0 sym) n;
+    fprintf ff "@[%a@]@." (pretty_dnnrc_aux ann plug 0 sym) n;
     flush_str_formatter ()
   end
 
@@ -1139,13 +1139,13 @@ let pretty_query pconf q =
   | Compiler.Q_dnnrc_dataset q ->
       let ann = pretty_annotate_ignore in
       let plug = pretty_plug_dataset greek in
-      pretty_dnrc ann plug greek margin q
+      pretty_dnnrc ann plug greek margin q
   | Compiler.Q_dnnrc_typed_dataset q ->
       let ann =
         pretty_annotate_annotated_rtype greek pretty_annotate_ignore
       in
       let plug = pretty_plug_dataset greek in
-      pretty_dnrc ann plug greek margin q
+      pretty_dnnrc ann plug greek margin q
   | Compiler.Q_javascript q -> Util.string_of_char_list q
   | Compiler.Q_java q -> Util.string_of_char_list q
   | Compiler.Q_spark q -> Util.string_of_char_list q

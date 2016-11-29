@@ -30,84 +30,103 @@ Section NNRC.
   
   Definition var := string.
   
-  Inductive nrc :=
-  | NRCVar : var -> nrc
-  | NRCConst : data -> nrc
-  | NRCBinop : binOp -> nrc -> nrc -> nrc
-  | NRCUnop : unaryOp -> nrc -> nrc
-  | NRCLet : var -> nrc -> nrc -> nrc
-  | NRCFor : var -> nrc -> nrc -> nrc
-  | NRCIf : nrc -> nrc -> nrc -> nrc
-  | NRCEither : nrc -> var -> nrc -> var -> nrc -> nrc.
+  Inductive nnrc :=
+  | NNRCVar : var -> nnrc
+  | NNRCConst : data -> nnrc
+  | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc
+  | NNRCUnop : unaryOp -> nnrc -> nnrc
+  | NNRCLet : var -> nnrc -> nnrc -> nnrc
+  | NNRCFor : var -> nnrc -> nnrc -> nnrc
+  | NNRCIf : nnrc -> nnrc -> nnrc -> nnrc
+  | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc
+  (* Extended *)
+  | NNRCGroupBy : string -> list string -> nnrc -> nnrc.
 
-  Tactic Notation "nrc_cases" tactic(first) ident(c) :=
+  Fixpoint nnrcIsCore (e:nnrc) : Prop :=
+    match e with
+    | NNRCVar _ => True
+    | NNRCConst _ => True
+    | NNRCBinop _ e1 e2 => (nnrcIsCore e1) /\ (nnrcIsCore e2)
+    | NNRCUnop _ e1 => (nnrcIsCore e1)
+    | NNRCLet _ e1 e2 => (nnrcIsCore e1) /\ (nnrcIsCore e2)
+    | NNRCFor _ e1 e2 => (nnrcIsCore e1) /\ (nnrcIsCore e2)
+    | NNRCIf e1 e2 e3 => (nnrcIsCore e1) /\ (nnrcIsCore e2) /\ (nnrcIsCore e3)
+    | NNRCEither e1 _ e2 _ e3 => (nnrcIsCore e1) /\ (nnrcIsCore e2) /\ (nnrcIsCore e3)
+    (* Extended *)
+    | NNRCGroupBy _ _ _ => False
+    end.
+
+  Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
     first;
-    [ Case_aux c "NRCVar"%string
-    | Case_aux c "NRCConst"%string
-    | Case_aux c "NRCBinop"%string
-    | Case_aux c "NRCUnop"%string
-    | Case_aux c "NRCLet"%string
-    | Case_aux c "NRCFor"%string
-    | Case_aux c "NRCIf"%string
-    | Case_aux c "NRCEither"%string].
+    [ Case_aux c "NNRCVar"%string
+    | Case_aux c "NNRCConst"%string
+    | Case_aux c "NNRCBinop"%string
+    | Case_aux c "NNRCUnop"%string
+    | Case_aux c "NNRCLet"%string
+    | Case_aux c "NNRCFor"%string
+    | Case_aux c "NNRCIf"%string
+    | Case_aux c "NNRCEither"%string
+    | Case_aux c "NNRCGroupBy"%string].
 
-  Global Instance nrc_eqdec : EqDec nrc eq.
+  Global Instance nnrc_eqdec : EqDec nnrc eq.
   Proof.
-    change (forall x y : nrc,  {x = y} + {x <> y}).
+    change (forall x y : nnrc,  {x = y} + {x <> y}).
     decide equality;
       try solve [apply binOp_eqdec | apply unaryOp_eqdec
                  | apply data_eqdec | apply string_eqdec].
+    - decide equality; apply string_dec.
   Defined.
 
-  (** Semantics of NNRC *)
+  (** Semantics of NNNRC *)
 
   Context (h:brand_relation_t).
 
-  Fixpoint nrc_eval (env:bindings) (e:nrc) : option data :=
+  Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
     match e with
-      | NRCVar x =>
+      | NNRCVar x =>
         lookup equiv_dec env x
-      | NRCConst d =>
+      | NNRCConst d =>
          Some (normalize_data h d)
-      | NRCBinop bop e1 e2 =>
-        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nrc_eval env e1) (nrc_eval env e2)
-      | NRCUnop uop e1 =>
-        olift (fun d1 => fun_of_unaryop h uop d1) (nrc_eval env e1)
-      | NRCLet x e1 e2 =>
-        match nrc_eval env e1 with
-        | Some d => nrc_eval ((x,d)::env) e2
+      | NNRCBinop bop e1 e2 =>
+        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nnrc_core_eval env e1) (nnrc_core_eval env e2)
+      | NNRCUnop uop e1 =>
+        olift (fun d1 => fun_of_unaryop h uop d1) (nnrc_core_eval env e1)
+      | NNRCLet x e1 e2 =>
+        match nnrc_core_eval env e1 with
+        | Some d => nnrc_core_eval ((x,d)::env) e2
         | _ => None
         end
-      | NRCFor x e1 e2 =>
-        match nrc_eval env e1 with
+      | NNRCFor x e1 e2 =>
+        match nnrc_core_eval env e1 with
         | Some (dcoll c1) =>
           let inner_eval d1 :=
-              let env' := (x,d1) :: env in nrc_eval env' e2
+              let env' := (x,d1) :: env in nnrc_core_eval env' e2
           in
           lift dcoll (rmap inner_eval c1)
         | _ => None
         end
-      | NRCIf e1 e2 e3 =>
+      | NNRCIf e1 e2 e3 =>
         let aux_if d :=
             match d with
             | dbool b =>
-              if b then nrc_eval env e2 else nrc_eval env e3
+              if b then nnrc_core_eval env e2 else nnrc_core_eval env e3
             | _ => None
             end
-        in olift aux_if (nrc_eval env e1)
-      | NRCEither ed xl el xr er =>
-        match nrc_eval env ed with
+        in olift aux_if (nnrc_core_eval env e1)
+      | NNRCEither ed xl el xr er =>
+        match nnrc_core_eval env ed with
         | Some (dleft dl) =>
-          nrc_eval ((xl,dl)::env) el
+          nnrc_core_eval ((xl,dl)::env) el
         | Some (dright dr) =>
-          nrc_eval ((xr,dr)::env) er
+          nnrc_core_eval ((xr,dr)::env) er
         | _ => None
         end
+      | NNRCGroupBy _ _ _ => None (* Fails for core eval *)
     end.
 
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nrc_eval_lookup_equiv_prop :
-    Proper (lookup_equiv ==> eq ==> eq) nrc_eval.
+  Global Instance nnrc_core_eval_lookup_equiv_prop :
+    Proper (lookup_equiv ==> eq ==> eq) nnrc_core_eval.
   Proof.
     unfold Proper, respectful, lookup_equiv; intros; subst.
     rename y0 into e.
@@ -139,47 +158,48 @@ Section NNRC.
 End NNRC.
 
 (* begin hide *)
-Notation "‵‵ c" := (NRCConst (dconst c))  (at level 0) : nrc_scope.                           (* ‵ = \backprime *)
-Notation "‵ c" := (NRCConst c)  (at level 0) : nrc_scope.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (NRCConst (dcoll nil))  (at level 0) : nrc_scope.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (NRCConst (drec nil)) (at level 50) : nrc_scope.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (NNRCConst (dconst c))  (at level 0) : nnrc_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (NNRCConst c)  (at level 0) : nnrc_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (NNRCConst (dcoll nil))  (at level 0) : nnrc_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (NNRCConst (drec nil)) (at level 50) : nnrc_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (NRCBinop AAnd r1 r2) (right associativity, at level 65): nrc_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (NRCBinop AOr r1 r2) (right associativity, at level 70): nrc_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (NRCBinop AEq r1 r2) (right associativity, at level 70): nrc_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (NRCBinop ALt r1 r2) (no associativity, at level 70): nrc_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (NRCBinop AUnion r1 r2) (right associativity, at level 70): nrc_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (NRCBinop AMinus r1 r2) (right associativity, at level 70): nrc_scope.  (* − = \minus *)
-Notation "r1 ⋂min r2" := (NRCBinop AMin r1 r2) (right associativity, at level 70): nrc_scope. (* ♯ = \sharp *)
-Notation "r1 ⋃max r2" := (NRCBinop AMax r1 r2) (right associativity, at level 70): nrc_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((NRCBinop AConcat) p r) (at level 70) : nrc_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((NRCBinop AMergeConcat) p r) (at level 70) : nrc_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (NNRCBinop AAnd r1 r2) (right associativity, at level 65): nnrc_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (NNRCBinop AOr r1 r2) (right associativity, at level 70): nnrc_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (NNRCBinop AEq r1 r2) (right associativity, at level 70): nnrc_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (NNRCBinop ALt r1 r2) (no associativity, at level 70): nnrc_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (NNRCBinop AUnion r1 r2) (right associativity, at level 70): nnrc_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (NNRCBinop AMinus r1 r2) (right associativity, at level 70): nnrc_scope.  (* − = \minus *)
+Notation "r1 ⋂min r2" := (NNRCBinop AMin r1 r2) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
+Notation "r1 ⋃max r2" := (NNRCBinop AMax r1 r2) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((NNRCBinop AConcat) p r) (at level 70) : nnrc_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((NNRCBinop AMergeConcat) p r) (at level 70) : nnrc_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (NRCUnop ANeg r1) (right associativity, at level 70): nrc_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (NRCUnop ADistinct r1) (right associativity, at level 70): nrc_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (NRCUnop ACount r1) (right associativity, at level 70): nrc_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (NRCUnop AFlatten d) (at level 50) : nrc_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((NRCUnop AColl) d)  (at level 50) : nrc_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((NRCUnop (ARec s)) r) (at level 50) : nrc_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((NRCUnop (ARecRemove s1)) r) (at level 50) : nrc_scope.          (* ¬ = \neg and π = \pi *)
-Notation "π[ s1 ]( r )" := ((NRCUnop (ARecProject s1)) r) (at level 50) : nrc_scope.          (* π = \pi *)
-Notation "p · r" := ((NRCUnop (ADot r)) p) (left associativity, at level 40): nrc_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (NNRCUnop ANeg r1) (right associativity, at level 70): nnrc_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (NNRCUnop ADistinct r1) (right associativity, at level 70): nnrc_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (NNRCUnop ACount r1) (right associativity, at level 70): nnrc_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (NNRCUnop AFlatten d) (at level 50) : nnrc_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((NNRCUnop AColl) d)  (at level 50) : nnrc_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((NNRCUnop (ARec s)) r) (at level 50) : nnrc_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((NNRCUnop (ARecRemove s1)) r) (at level 50) : nnrc_scope.          (* ¬ = \neg and π = \pi *)
+Notation "π[ s1 ]( r )" := ((NNRCUnop (ARecProject s1)) r) (at level 50) : nnrc_scope.          (* π = \pi *)
+Notation "p · r" := ((NNRCUnop (ADot r)) p) (left associativity, at level 40): nnrc_scope.      (* · = \cdot *)
 
-Notation "'$$' v" := (NRCVar v%string) (at level 50, format "'$$' v") : nrc_scope.
-Notation "{| e1 | '$$' x ∈ e2 |}" := (NRCFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$$' x  ∈  e2  |}") : nrc_scope.   (* ∈ = \in *)
-Notation "'LET' '$$' x ':=' e2 'IN' e1" := (NRCLet x%string e2 e1) (at level 50, format "'[hv' 'LET'  '$$' x  ':='  '[' e2 ']'  '/' 'IN'  '[' e1 ']' ']'") : nrc_scope.
-Notation "e1 ? e2 : e3" := (NRCIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nrc_scope.
+Notation "'$$' v" := (NNRCVar v%string) (at level 50, format "'$$' v") : nnrc_scope.
+Notation "{| e1 | '$$' x ∈ e2 |}" := (NNRCFor x%string e2 e1) (at level 50, format "{|  e1  '/ ' |  '$$' x  ∈  e2  |}") : nnrc_scope.   (* ∈ = \in *)
+Notation "'LET' '$$' x ':=' e2 'IN' e1" := (NNRCLet x%string e2 e1) (at level 50, format "'[hv' 'LET'  '$$' x  ':='  '[' e2 ']'  '/' 'IN'  '[' e1 ']' ']'") : nnrc_scope.
+Notation "e1 ? e2 : e3" := (NNRCIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  e2 '/' :  e3 ']'") : nnrc_scope.
 
-Tactic Notation "nrc_cases" tactic(first) ident(c) :=
+Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "NRCVar"%string
-  | Case_aux c "NRCConst"%string
-  | Case_aux c "NRCBinop"%string
-  | Case_aux c "NRCUnop"%string
-  | Case_aux c "NRCLet"%string
-  | Case_aux c "NRCFor"%string
-  | Case_aux c "NRCIf"%string
-  | Case_aux c "NRCEither"%string].
+  [ Case_aux c "NNRCVar"%string
+  | Case_aux c "NNRCConst"%string
+  | Case_aux c "NNRCBinop"%string
+  | Case_aux c "NNRCUnop"%string
+  | Case_aux c "NNRCLet"%string
+  | Case_aux c "NNRCFor"%string
+  | Case_aux c "NNRCIf"%string
+  | Case_aux c "NNRCEither"%string
+  | Case_aux c "NNRCGroupBy"%string].
 
 (* end hide *)
 

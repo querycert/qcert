@@ -33,83 +33,83 @@ Section NRAtoNNRC.
 
   (** Translation from NRA to Named Nested Relational Calculus *)
 
-  Fixpoint nra_to_nnrc (op:alg) (var:var) : nrc :=
+  Fixpoint nra_to_nnrc (op:alg) (var:var) : nnrc :=
     match op with
       (* [[ ID ]]_var = var *)
-      | AID => NRCVar var
+      | AID => NNRCVar var
       (* [[ Const ]]_var = Const *)
-      | AConst rd => NRCConst rd
+      | AConst rd => NNRCConst rd
       (* [[ op1 ⊕ op2 ]]_var == [[ op1 ]]
 _var ⊕ [[ op2 ]]_var *)
       | ABinop bop op1 op2 =>
-        NRCBinop bop (nra_to_nnrc op1 var) (nra_to_nnrc op2 var)
+        NNRCBinop bop (nra_to_nnrc op1 var) (nra_to_nnrc op2 var)
       (* [[ UOP op1 ]]_var = UOP [[ op1 ]]_var *)
       | AUnop uop op1 =>
-        NRCUnop uop (nra_to_nnrc op1 var)
+        NNRCUnop uop (nra_to_nnrc op1 var)
       (* [[ χ⟨ op1 ⟩( op2 ) ]]_var = { [[ op1 ]]_t | t ∈ [[ op2 ]]_var } *)
       | AMap op1 op2 =>
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let t := fresh_var "tmap$" (var::nil) in
-        NRCFor t nrc2 (nra_to_nnrc op1 t)
+        NNRCFor t nnrc2 (nra_to_nnrc op1 t)
       (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1 } | t1 ∈ [[ op2 ]]_var } *)
       | AMapConcat op1 op2 =>
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let (t1,t2) := fresh_var2 "tmc$" "tmc$" (var::nil) in
-        NRCUnop AFlatten
-                (NRCFor t1 nrc2
-                        (NRCFor t2 (nra_to_nnrc op1 t1)
-                                ((NRCBinop AConcat) (NRCVar t1) (NRCVar t2))))
+        NNRCUnop AFlatten
+                (NNRCFor t1 nnrc2
+                        (NNRCFor t2 (nra_to_nnrc op1 t1)
+                                ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
         (* [[ op1 × op2 ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_var } | t1 ∈ [[ op1 ]]_var } *)
       | AProduct op1 op2 =>
-        let nrc1 := (nra_to_nnrc op1 var) in
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc1 := (nra_to_nnrc op1 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let (t1,t2) := fresh_var2 "tprod$" "tprod$" (var::nil) in
-        NRCUnop AFlatten
-                (NRCFor t1 nrc1
-                        (NRCFor t2 nrc2
-                                ((NRCBinop AConcat) (NRCVar t1) (NRCVar t2))))
+        NNRCUnop AFlatten
+                (NNRCFor t1 nnrc1
+                        (NNRCFor t2 nnrc2
+                                ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ σ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ if [[ op1 ]]_t1 then { t1 } else {} | t1 ∈ [[ op2 ]]_var } *)
       | ASelect op1 op2 =>
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let t := fresh_var "tsel$" (var::nil) in
-        let nrc1 := (nra_to_nnrc op1 t) in
-        NRCUnop AFlatten
-                (NRCFor t nrc2
-                        (NRCIf nrc1 (NRCUnop AColl (NRCVar t)) (NRCConst (dcoll nil))))
+        let nnrc1 := (nra_to_nnrc op1 t) in
+        NNRCUnop AFlatten
+                (NNRCFor t nnrc2
+                        (NNRCIf nnrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
       (* [[ op1 ∥ op2 ]]_var == let t := [[ op1 ]]_var in
                                   if (t = {})
                                   then [[ op2 ]]_var
                                   else t *)
       | ADefault op1 op2 =>
-        let nrc1 := (nra_to_nnrc op1 var) in
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc1 := (nra_to_nnrc op1 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let t := fresh_var "tdef$" (var::nil) in
-        (NRCLet t nrc1
-                (NRCIf (NRCBinop AEq
-                                 (NRCVar t)
-                                 (NRCUnop AFlatten (NRCConst (dcoll nil))))
-                       nrc2 (NRCVar t)))
+        (NNRCLet t nnrc1
+                (NNRCIf (NNRCBinop AEq
+                                 (NNRCVar t)
+                                 (NNRCUnop AFlatten (NNRCConst (dcoll nil))))
+                       nnrc2 (NNRCVar t)))
       (* [[ op1 ◯ op2 ]]_var == let t := [[ op2 ]]_var
                                   in [[ op1 ]]_t *)
       | AEither opl opr =>
-        let nrcl := (nra_to_nnrc opl var) in
-        let nrcr := (nra_to_nnrc opr var) in
-        NRCEither (NRCVar var) var nrcl var nrcr
+        let nnrcl := (nra_to_nnrc opl var) in
+        let nnrcr := (nra_to_nnrc opr var) in
+        NNRCEither (NNRCVar var) var nnrcl var nnrcr
       | AEitherConcat op1 op2 =>
-        let nrc1 := (nra_to_nnrc op1 var) in
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc1 := (nra_to_nnrc op1 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let t := fresh_var "ec$" (var::nil) in 
-        NRCLet t nrc2
-        (NRCEither nrc1 var (NRCUnop ALeft (NRCBinop AConcat (NRCVar var) (NRCVar t)))
-                  var (NRCUnop ARight (NRCBinop AConcat (NRCVar var) (NRCVar t))))
+        NNRCLet t nnrc2
+        (NNRCEither nnrc1 var (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar var) (NNRCVar t)))
+                  var (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar var) (NNRCVar t))))
       | AApp op1 op2 =>
-        let nrc2 := (nra_to_nnrc op2 var) in
+        let nnrc2 := (nra_to_nnrc op2 var) in
         let t := fresh_var "tapp$" (var::nil) in
-        let nrc1 := (nra_to_nnrc op1 t) in
-        (NRCLet t nrc2 nrc1)
+        let nnrc1 := (nra_to_nnrc op1 t) in
+        (NNRCLet t nnrc2 nnrc1)
     end.
 
   (** Auxiliary lemmas used in the proof of correctness for the translation *)
@@ -117,10 +117,10 @@ _var ⊕ [[ op2 ]]_var *)
   Lemma map_sem_correct (h:list (string*string)) (op:alg) (l:list data) (env:bindings) (v:var):
     (forall (d : data) (env : bindings) (v : var),
           lookup equiv_dec env v = Some d ->
-          nrc_eval h env (nra_to_nnrc op v) = h ⊢ op @ₐ d) ->
+          nnrc_core_eval h env (nra_to_nnrc op v) = h ⊢ op @ₐ d) ->
     rmap
       (fun x : data =>
-         nrc_eval h ((v, x) :: env) (nra_to_nnrc op v)) l
+         nnrc_core_eval h ((v, x) :: env) (nra_to_nnrc op v)) l
     =
     rmap (fun_of_alg h op) l.
   Proof.
@@ -138,7 +138,7 @@ _var ⊕ [[ op2 ]]_var *)
 
   Theorem nra_sem_correct (h:list (string*string)) (op:alg) (env:bindings) (v:var) (d:data) :
     lookup equiv_dec env v = Some d ->
-    nrc_eval h env (nra_to_nnrc op v) = h ⊢ op @ₐ d.
+    nnrc_core_eval h env (nra_to_nnrc op v) = h ⊢ op @ₐ d.
   Proof.
     Opaque fresh_var.
     revert d env v.
@@ -290,7 +290,7 @@ _var ⊕ [[ op2 ]]_var *)
   Require Import Omega.
 
   Theorem nraToNNRC_size op v : 
-    nrc_size (nra_to_nnrc op v) <= 10 * alg_size op.
+    nnrc_size (nra_to_nnrc op v) <= 10 * alg_size op.
   Proof.
     revert v.
     induction op; simpl in *; intros; trivial.

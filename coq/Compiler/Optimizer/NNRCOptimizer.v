@@ -16,7 +16,7 @@
 
 (* This includes some rewrites/simplification rules for the Nested relational calculus *)
 
-Section NRewFunc.
+Section NNRCOptimizer.
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -29,48 +29,50 @@ Section NRewFunc.
   Context {fruntime:foreign_runtime}.
 
   (** Apply the function f to the direct child of p *)
-  Definition nnrc_map (f: nrc -> nrc) (e:nrc) :=
+  Definition nnrc_map (f: nnrc -> nnrc) (e:nnrc) :=
     match e with
-      | NRCVar v => NRCVar v
-      | NRCConst d => NRCConst d
-      | NRCBinop bop e1 e2 => NRCBinop bop (f e1) (f e2)
-      | NRCUnop uop e1 => NRCUnop uop (f e1)
-      | NRCLet v e1 e2 => NRCLet v (f e1) (f e2)
-      | NRCFor v e1 e2 => NRCFor v (f e1) (f e2)
-      | NRCIf e1 e2 e3 => NRCIf (f e1) (f e2) (f e3)
-      | NRCEither ed xl el xr er => NRCEither (f ed) xl (f el) xr (f er)
+      | NNRCVar v => NNRCVar v
+      | NNRCConst d => NNRCConst d
+      | NNRCBinop bop e1 e2 => NNRCBinop bop (f e1) (f e2)
+      | NNRCUnop uop e1 => NNRCUnop uop (f e1)
+      | NNRCLet v e1 e2 => NNRCLet v (f e1) (f e2)
+      | NNRCFor v e1 e2 => NNRCFor v (f e1) (f e2)
+      | NNRCIf e1 e2 e3 => NNRCIf (f e1) (f e2) (f e3)
+      | NNRCEither ed xl el xr er => NNRCEither (f ed) xl (f el) xr (f er)
+      | NNRCGroupBy g sl e1 => NNRCGroupBy g sl (f e1)
     end.
 
   Lemma nnrc_map_correctness:
-    forall f: nrc -> nrc,
-    forall e: nrc,
-      (forall e', nnrc_eq (f e') e') -> nnrc_eq (nnrc_map f e) e.
+    forall f: nnrc -> nnrc,
+    forall e: nnrc,
+      (forall e', nnrc_ext_eq (f e') e') -> nnrc_ext_eq (nnrc_map f e) e.
   Proof.
     intros f e Hf.
-    nrc_cases (induction e) Case;
+    nnrc_cases (induction e) Case;
       try solve [simpl; repeat rewrite Hf; reflexivity].
   Qed.
 
   (** Apply the function f to all subexpression of e. *)
-  Fixpoint nnrc_map_deep (f: nrc -> nrc) (e: nrc) :=
+  Fixpoint nnrc_map_deep (f: nnrc -> nnrc) (e: nnrc) :=
     match e with
-      | NRCVar v => f (NRCVar v)
-      | NRCConst d => f (NRCConst d)
-      | NRCBinop bop e1 e2 => f (NRCBinop bop (nnrc_map_deep f e1) (nnrc_map_deep f e2))
-      | NRCUnop uop e1 => f (NRCUnop uop (nnrc_map_deep f e1))
-      | NRCLet v e1 e2 => f (NRCLet v (nnrc_map_deep f e1) (nnrc_map_deep f e2))
-      | NRCFor v e1 e2 => f (NRCFor v (nnrc_map_deep f e1) (nnrc_map_deep f e2))
-      | NRCIf e1 e2 e3 => f (NRCIf (nnrc_map_deep f e1) (nnrc_map_deep f e2) (nnrc_map_deep f e3))
-      | NRCEither ed xl el xr er => f (NRCEither (nnrc_map_deep f ed) xl (nnrc_map_deep f  el) xr (nnrc_map_deep f er))
+      | NNRCVar v => f (NNRCVar v)
+      | NNRCConst d => f (NNRCConst d)
+      | NNRCBinop bop e1 e2 => f (NNRCBinop bop (nnrc_map_deep f e1) (nnrc_map_deep f e2))
+      | NNRCUnop uop e1 => f (NNRCUnop uop (nnrc_map_deep f e1))
+      | NNRCLet v e1 e2 => f (NNRCLet v (nnrc_map_deep f e1) (nnrc_map_deep f e2))
+      | NNRCFor v e1 e2 => f (NNRCFor v (nnrc_map_deep f e1) (nnrc_map_deep f e2))
+      | NNRCIf e1 e2 e3 => f (NNRCIf (nnrc_map_deep f e1) (nnrc_map_deep f e2) (nnrc_map_deep f e3))
+      | NNRCEither ed xl el xr er => f (NNRCEither (nnrc_map_deep f ed) xl (nnrc_map_deep f  el) xr (nnrc_map_deep f er))
+      | NNRCGroupBy g sl e1 => f (NNRCGroupBy g sl (nnrc_map_deep f e1))
     end.
 
   Lemma nnrc_map_deep_corretness:
-    forall f: nrc -> nrc,
-    forall e: nrc,
-      (forall e', nnrc_eq (f e') e') -> nnrc_eq (nnrc_map_deep f e) e.
+    forall f: nnrc -> nnrc,
+    forall e: nnrc,
+      (forall e', nnrc_ext_eq (f e') e') -> nnrc_ext_eq (nnrc_map_deep f e) e.
   Proof.
     intros f e Hf.
-    nrc_cases (induction e) Case; simpl;
+    nnrc_cases (induction e) Case; simpl;
       try solve [repeat rewrite Hf; reflexivity];
       try solve [repeat rewrite Hf; rewrite IHe; reflexivity ];
       try solve [repeat rewrite Hf; rewrite IHe1; rewrite IHe2; reflexivity ];
@@ -78,14 +80,14 @@ Section NRewFunc.
   Qed.
 
   (* Java equivalent: NnrcOptimizer.rew_iter *)
-  Fixpoint rew_iter (rew: nrc -> nrc) (fuel: nat) (p: nrc) :=
+  Fixpoint rew_iter (rew: nnrc -> nnrc) (fuel: nat) (p: nnrc) :=
     match fuel with
       | 0 => p
       | S n => rew_iter rew n (rew p)
     end.
 
   Lemma rew_iter_correctness rew n p:
-    (forall p', nnrc_eq (rew p') p') -> nnrc_eq (rew_iter rew n p) p.
+    (forall p', nnrc_ext_eq (rew p') p') -> nnrc_ext_eq (rew_iter rew n p) p.
   Proof.
     generalize p; clear p.
     induction n; try reflexivity.
@@ -99,7 +101,7 @@ Section NRewFunc.
   Require Import Compare_dec.
 
   (* Java equivalent: NnrcOptimizer.rew_size (inlined) *)
-  Function rew_cost (rew: nrc -> nrc) (cost: nrc -> nat) (p: nrc) { measure cost p } :=
+  Function rew_cost (rew: nnrc -> nnrc) (cost: nnrc -> nat) (p: nnrc) { measure cost p } :=
     let p' := rew p in
     match nat_compare (cost p') (cost p) with
       | Lt => rew_cost rew cost p'
@@ -112,7 +114,7 @@ Section NRewFunc.
   Defined.
 
   Lemma rew_cost_correctness rew cost p:
-    (forall p', nnrc_eq (rew p') p') -> nnrc_eq (rew_cost rew cost p) p.
+    (forall p', nnrc_ext_eq (rew p') p') -> nnrc_ext_eq (rew_cost rew cost p) p.
   Proof.
     intros Hrew.
     functional induction rew_cost rew cost p.
@@ -124,11 +126,11 @@ Section NRewFunc.
   Hint Rewrite rew_cost_correctness : rew_correct.
 
   (* Java equivalent: NnrcOptimizer.rew_size *)
-  Definition rew_size (rew: nrc -> nrc) (p: nrc) :=
-    rew_cost rew NNRCSize.nrc_size p.
+  Definition rew_size (rew: nnrc -> nnrc) (p: nnrc) :=
+    rew_cost rew NNRCSize.nnrc_size p.
 
   Lemma rew_size_correctness rew p:
-    (forall p', nnrc_eq (rew p') p') -> nnrc_eq (rew_size rew p) p.
+    (forall p', nnrc_ext_eq (rew p') p') -> nnrc_ext_eq (rew_size rew p) p.
   Proof.
     intros Hrew.
     unfold rew_size.
@@ -145,26 +147,26 @@ Section NRewFunc.
   Definition nunshadow := unshadow_simpl nil.
   
   (* *************************** *)
-  Definition head_rew (e: nrc) :=
+  Definition head_rew (e: nnrc) :=
     (nunshadow e).
 
   Lemma head_rew_correctness e:
-    nnrc_eq (head_rew e) e.
+    nnrc_ext_eq (head_rew e) e.
   Proof.
     unfold head_rew.
-    apply unshadow_preserves.
+    apply unshadow_ext_preserves.
   Qed.
 
   Lemma rewriter_simpl_rew_no_free_var :
-    forall (op : nrc) (x : var),
-      In x (nrc_free_vars (head_rew op)) -> In x (nrc_free_vars op).
+    forall (op : nnrc) (x : var),
+      In x (nnrc_free_vars (head_rew op)) -> In x (nnrc_free_vars op).
   Proof.
     intros.
     unfold head_rew in H.
     eapply unshadow_free_vars; eapply H.
   Qed.
 
-End NRewFunc.
+End NNRCOptimizer.
 
 (* 
 *** Local Variables: ***

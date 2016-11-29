@@ -30,8 +30,8 @@ Section ForeigntoSpark.
          foreign_to_spark_reduce_op
            (rop:foreign_reduce_op_type)
            (scala_endl quotel:string) : string
-         ; foreign_to_spark_prepare_nrcmr :
-             nrcmr -> nrcmr
+         ; foreign_to_spark_prepare_nnrcmr :
+             nnrcmr -> nnrcmr
        }.
 
 End ForeigntoSpark.

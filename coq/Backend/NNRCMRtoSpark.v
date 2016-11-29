@@ -87,23 +87,23 @@ Section NNRCMRtoSpark.
        "this"; "throw"; "trait"; "try"; "true"; "type"; "val"; "var"
        ; "while"; "with"; "yield"].
 
-  Definition nrcmr_rename_local_for_js (mrl:nrcmr)
-    := nrcmr_rename_local
+  Definition nnrcmr_rename_local_for_js (mrl:nnrcmr)
+    := nnrcmr_rename_local
          jsSafeSeparator
          jsIdentifierSanitize
          jsAvoidList
          mrl.
   
-  Definition nrcmr_rename_graph_for_scala (mrl:nrcmr)
-    := nrcmr_rename_graph
+  Definition nnrcmr_rename_graph_for_scala (mrl:nnrcmr)
+    := nnrcmr_rename_graph
          scalaSafeSeparator
          scalaIdentifierSanitize
          scalaAvoidList 
          mrl.
 
-  Definition nrcmr_rename_for_spark (mrl:nrcmr)
-    := nrcmr_rename_graph_for_scala
-         (nrcmr_rename_local_for_js mrl).
+  Definition nnrcmr_rename_for_spark (mrl:nnrcmr)
+    := nnrcmr_rename_graph_for_scala
+         (nnrcmr_rename_local_for_js mrl).
 
     End sanitize.
     
@@ -283,7 +283,7 @@ Section NNRCMRtoSpark.
       match mr_map with
       | MapDist (map_v, map_f) =>
         let map_v_js := "map_arg" in  (* Waring: we suppose that map_f does not capture "map_arg". *)
-        let '(j, v, t) := nrcToJSunshadow map_f 3 1 js_endl quotel (map_v::nil) ((map_v, map_v_js)::nil) in
+        let '(j, v, t) := nnrcToJSunshadow map_f 3 1 js_endl quotel (map_v::nil) ((map_v, map_v_js)::nil) in
           "val "++(rdd_map_id mr_id)++" = "++(rdd_env_id input)++".map(x => {" ++ scala_endl ++
         "  val e = get_engine()" ++ scala_endl ++
         "  val x_js = e.eval(""var tmp = ""+x.asInstanceOf[String]+""; tmp"")" ++ scala_endl ++
@@ -298,7 +298,7 @@ Section NNRCMRtoSpark.
         "})" ++ scala_endl
       | MapDistFlatten (map_v, map_f) =>
         let map_v_js := "map_arg" in  (* Waring: we suppose that map_f does not capture "map_arg". *)
-        let '(j, v, t) := nrcToJSunshadow map_f 3 1 js_endl quotel (map_v::nil) ((map_v, map_v_js)::nil) in
+        let '(j, v, t) := nnrcToJSunshadow map_f 3 1 js_endl quotel (map_v::nil) ((map_v, map_v_js)::nil) in
           "val "++(rdd_map_id mr_id)++" = "++(rdd_env_id input)++".flatMap(x => {" ++ scala_endl ++
         "  val e = get_engine()" ++ scala_endl ++
         "  val x_js = e.eval(""var tmp = ""+x.asInstanceOf[String]+""; tmp"")" ++ scala_endl ++
@@ -313,7 +313,7 @@ Section NNRCMRtoSpark.
         "})" ++ scala_endl
       | MapScalar (map_v, map_f) => (* XXX TODO: change when scalar values are going tobe implemented as scalar *)
         let map_v_js := "map_arg" in  (* Waring: we suppose that map_f does not capture "map_arg". *)
-        let '(j, v, t) := nrcToJSunshadow map_f 3 1 js_endl quotel (map_v::nil) ((map_v, map_v_js)::nil) in
+        let '(j, v, t) := nnrcToJSunshadow map_f 3 1 js_endl quotel (map_v::nil) ((map_v, map_v_js)::nil) in
           "val "++(rdd_map_id mr_id)++" = "++(rdd_env_id input)++".flatMap(x => {" ++ scala_endl ++
         "  val e = get_engine()" ++ scala_endl ++
         "  val x_js = e.eval(""var tmp = ""+x.asInstanceOf[String]+""; tmp"")" ++ scala_endl ++
@@ -403,7 +403,7 @@ Section NNRCMRtoSpark.
       | RedCollect reduce =>
         let (red_values_v, red_f) := reduce in
         let red_values_v_js := "values" in
-        let '(j, v, t) := nrcToJSunshadow red_f 1 1 js_endl quotel (red_values_v :: nil) ((red_values_v, red_values_v_js)::nil) in
+        let '(j, v, t) := nnrcToJSunshadow red_f 1 1 js_endl quotel (red_values_v :: nil) ((red_values_v, red_values_v_js)::nil) in
         "val "++(rdd_reduce_id mr_id)++" = (() => {" ++ scala_endl ++
         "  val e = get_engine()" ++ scala_endl ++
         "  val values = "++(rdd_map_id mr_id)++".collect()" ++ scala_endl ++
@@ -459,7 +459,7 @@ Section NNRCMRtoSpark.
       | s::l => s++sep++(string_of_list sep l)
       end.
 
-    Definition scala_of_mr_last (mr_last: ((list var * nrc) * list (var * dlocalization))) (scala_endl:string) (quotel:string) :=
+    Definition scala_of_mr_last (mr_last: ((list var * nnrc) * list (var * dlocalization))) (scala_endl:string) (quotel:string) :=
       (* We suppose that this code is put into a context where there is a JavaScript engine e *)
       let params_js :=
           List.map (fun x => "v"++x) (fst (fst mr_last))
@@ -474,7 +474,7 @@ Section NNRCMRtoSpark.
             (snd mr_last)
       in
       let result :=
-          let '(j, v, _) := nrcToJSunshadow (snd (fst mr_last)) 3 1 js_endl quotel nil nil in
+          let '(j, v, _) := nnrcToJSunshadow (snd (fst mr_last)) 3 1 js_endl quotel nil nil in
           "e.eval(""(function ("++(string_of_list ", " params_js)++"){"++js_endl++"""+"++ scala_endl ++
           "       """++j++js_endl++"""+" ++ scala_endl ++
           "       ""    return JSON.stringify("++v++");"++js_endl++"""+" ++ scala_endl ++
@@ -482,11 +482,11 @@ Section NNRCMRtoSpark.
       in
       result.
 
-    Definition scala_of_nrcmr (mrl:nrcmr) (scala_endl:string) (quotel:string) :=
+    Definition scala_of_nnrcmr (mrl:nnrcmr) (scala_endl:string) (quotel:string) :=
       scala_of_mr_chain mrl.(mr_chain) scala_endl quotel ++
       scala_of_mr_last mrl.(mr_last) scala_endl quotel.
 
-    Definition nrcmrToSparkTopDataFromFile (test_name: string) (init: var) (l:nrcmr) (scala_endl:string) (quotel: string) :=
+    Definition nnrcmrToSparkTopDataFromFile (test_name: string) (init: var) (l:nnrcmr) (scala_endl:string) (quotel: string) :=
       "import org.apache.spark.SparkContext" ++ scala_endl ++
       "import org.apache.spark.SparkContext._" ++ scala_endl ++
       "import org.apache.spark.SparkConf" ++ scala_endl ++
@@ -513,7 +513,7 @@ Section NNRCMRtoSpark.
       "def run(sc: SparkContext): String = {" ++ scala_endl ++
       get_engine_func scala_endl ++ scala_endl ++
       load_env l.(mr_inputs_loc) scala_endl quotel ++ scala_endl ++
-      scala_of_nrcmr l scala_endl quotel ++
+      scala_of_nnrcmr l scala_endl quotel ++
       "}" ++ scala_endl ++
       scala_endl ++
       "def main(args: Array[String]) {" ++ scala_endl ++
@@ -540,8 +540,8 @@ Section NNRCMRtoSpark.
 
   End MRSpark.
 
-  Definition nrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (l:nrcmr) : string :=
-    nrcmrToSparkTopDataFromFile test_name init l eol_newline "'".
+  Definition nnrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (l:nnrcmr) : string :=
+    nnrcmrToSparkTopDataFromFile test_name init l eol_newline "'".
 
 End NNRCMRtoSpark.
 

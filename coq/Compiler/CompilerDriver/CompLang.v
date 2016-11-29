@@ -52,11 +52,11 @@ Section CompLang.
   Definition nra := alg.
   Definition nraenv_core := algenv.
   Definition nraenv := nraenv.
-  Definition nnrc := nrc.
-  Definition nnrcmr := nrcmr.
+  Definition nnrc := nnrc.
+  Definition nnrcmr := nnrcmr.
   Definition cldmr := cld_mrl.
-  Definition dnnrc_dataset := dnrc _ unit dataset.
-  Definition dnnrc_typed_dataset {bm:brand_model} := dnrc _ (type_annotation unit) dataset.
+  Definition dnnrc_dataset := dnnrc _ unit dataset.
+  Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc _ (type_annotation unit) dataset.
   Definition javascript := string.
   Definition java := string.
   Definition spark := string.

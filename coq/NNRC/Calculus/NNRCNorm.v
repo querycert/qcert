@@ -32,50 +32,50 @@ Section NNRCProp.
   Context (h:brand_relation_t).
  
   (* evaluation preserves normalization *)
-  Lemma nrc_eval_normalized env e {o} :
-    nrc_eval h env e = Some o ->
+  Lemma nnrc_core_eval_normalized env e {o} :
+    nnrc_core_eval h env e = Some o ->
     Forall (data_normalized h) (map snd env) ->
     data_normalized h o.
   Proof.
-    revert env o. nrc_cases (induction e) Case.
-    - Case "NRCVar"%string.
+    revert env o. nnrc_cases (induction e) Case.
+    - Case "NNRCVar"%string.
       simpl; intros.
       rewrite Forall_forall in H0.
       apply lookup_in in H.
       apply (H0 o).
       rewrite in_map_iff.
       exists (v,o); eauto.
-    - Case "NRCConst"%string.
+    - Case "NNRCConst"%string.
       simpl; intros.
       inversion H; subst; intros.
       apply normalize_normalizes.
-    - Case "NRCBinop"%string.
+    - Case "NNRCBinop"%string.
       simpl; intros.
-      case_eq (nrc_eval h env e1); [intros ? eqq1 | intros eqq1];
+      case_eq (nnrc_core_eval h env e1); [intros ? eqq1 | intros eqq1];
       (rewrite eqq1 in *;
-      case_eq (nrc_eval h env e2); [intros ? eqq2 | intros eqq2];
+      case_eq (nnrc_core_eval h env e2); [intros ? eqq2 | intros eqq2];
       rewrite eqq2 in *); simpl in *; try discriminate.
       eapply fun_of_binop_normalized; eauto.
-    - Case "NRCUnop"%string.
+    - Case "NNRCUnop"%string.
       simpl; intros.
-      case_eq (nrc_eval h env e); [intros ? eqq1 | intros eqq1];
+      case_eq (nnrc_core_eval h env e); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;
         simpl in *; try discriminate.
       eapply fun_of_unaryop_normalized; eauto.
-    - Case "NRCLet"%string.
+    - Case "NNRCLet"%string.
       simpl; intros.
-      case_eq (nrc_eval h env e1); [intros ? eqq1 | intros eqq1];
+      case_eq (nnrc_core_eval h env e1); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;
         simpl in *; try discriminate.
-      case_eq (nrc_eval h ((v,d)::env) e2); [intros ? eqq2 | intros eqq2];
+      case_eq (nnrc_core_eval h ((v,d)::env) e2); [intros ? eqq2 | intros eqq2];
       rewrite eqq2 in *;
         simpl in *; try discriminate.
       inversion H; subst.
       eapply IHe2; eauto.
       constructor; eauto.
-    - Case "NRCFor"%string.
+    - Case "NNRCFor"%string.
       simpl; intros.
-      case_eq (nrc_eval h env e1); [intros ? eqq1 | intros eqq1];
+      case_eq (nnrc_core_eval h env e1); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;
       simpl in *; try discriminate.
       destruct d; try discriminate.
@@ -87,16 +87,16 @@ Section NNRCProp.
       apply (rmap_Forall e H2); intros.
       apply (IHe2 _ _ H).
       constructor; eauto.
-    - Case "NRCIf"%string.
+    - Case "NNRCIf"%string.
       simpl; intros.
-      case_eq (nrc_eval h env e1); [intros ? eqq1 | intros eqq1];
+      case_eq (nnrc_core_eval h env e1); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;
       simpl in *; try discriminate.
       destruct d; try discriminate.
       destruct b; eauto.
-    - Case "NRCEither"%string.
+    - Case "NNRCEither"%string.
       simpl; intros.
-      case_eq (nrc_eval h env e1); [intros ? eqq1 | intros eqq1];
+      case_eq (nnrc_core_eval h env e1); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;
       simpl in *; try discriminate.
       specialize (IHe1 _ _ eqq1 H0).
@@ -105,14 +105,16 @@ Section NNRCProp.
          constructor; eauto.
       + eapply IHe3; eauto.
         constructor; eauto.
+    - Case "NNRCGroupBy"%string.
+      simpl; intros; congruence.
   Qed.
 
 End NNRCProp.
 
-Hint Resolve nrc_eval_normalized.
+Hint Resolve nnrc_core_eval_normalized.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

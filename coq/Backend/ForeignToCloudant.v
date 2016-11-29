@@ -30,13 +30,13 @@ Section ForeigntoCloudant.
          foreign_to_cloudant_reduce_op
            (rop:foreign_reduce_op_type)
          : cld_reduce_op
-         ; foreign_to_cloudant_prepare_nrcmr :
-             nrcmr -> nrcmr
-         ; foreign_to_cloudant_nrcmr_prepared :
-             nrcmr -> Prop
-         ; foreign_to_cloudant_prepare_nrcmr_prepares (src:nrcmr) :
-             foreign_to_cloudant_nrcmr_prepared
-               (foreign_to_cloudant_prepare_nrcmr src)
+         ; foreign_to_cloudant_prepare_nnrcmr :
+             nnrcmr -> nnrcmr
+         ; foreign_to_cloudant_nnrcmr_prepared :
+             nnrcmr -> Prop
+         ; foreign_to_cloudant_prepare_nnrcmr_prepares (src:nnrcmr) :
+             foreign_to_cloudant_nnrcmr_prepared
+               (foreign_to_cloudant_prepare_nnrcmr src)
        }.
 
 End ForeigntoCloudant.

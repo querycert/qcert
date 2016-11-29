@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TNRCEq.
+Section TNNRCEq.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -26,7 +26,7 @@ Section TNRCEq.
   Require Import Arith.
 
   Require Import Utils BasicSystem.
-  Require Import NNRC TNRC.
+  Require Import NNRC NNRCEq TNNRC.
 
   (* Named Nested Relational Calculus *)
 
@@ -34,16 +34,16 @@ Section TNRCEq.
 
   Context {m:basic_model}.
 
-  Definition tnrc_rewrites_to (e1 e2:nrc) : Prop :=
+  Definition tnnrc_rewrites_to (e1 e2:nnrc) : Prop :=
     forall (τenv : tbindings) (τout:rtype),
-      nrc_type τenv e1 τout ->
-      (nrc_type τenv e2 τout) /\ (forall (env:bindings),
-                                     bindings_type env τenv -> nrc_eval brand_relation_brands env e1 = nrc_eval brand_relation_brands env e2).
+      nnrc_type τenv e1 τout ->
+      (nnrc_type τenv e2 τout) /\ (forall (env:bindings),
+                                     bindings_type env τenv -> nnrc_core_eval brand_relation_brands env e1 = nnrc_core_eval brand_relation_brands env e2).
 
-  Notation "e1 ⇒ᶜ e2" := (tnrc_rewrites_to e1 e2) (at level 80).
+  Notation "e1 ⇒ᶜᶜ e2" := (tnnrc_rewrites_to e1 e2) (at level 80).
 
   Require Import NNRCEq.
-  Open Scope nrc_scope.
+  Open Scope nnrc_scope.
 
   Lemma data_normalized_bindings_type_map env τenv :
     bindings_type env τenv ->
@@ -55,13 +55,13 @@ Section TNRCEq.
 
   Hint Resolve data_normalized_bindings_type_map.
   
-  Lemma nrc_rewrites_typed_with_untyped (e1 e2:nrc) :
-    e1 ≡ᶜ e2 ->
-    (forall  {τenv: tbindings} {τout:rtype}, nrc_type τenv e1 τout -> nrc_type τenv e2 τout)
-    -> e1 ⇒ᶜ e2.
+  Lemma nnrc_rewrites_typed_with_untyped (e1 e2:nnrc) :
+    e1 ≡ᶜᶜ e2 ->
+    (forall  {τenv: tbindings} {τout:rtype}, nnrc_type τenv e1 τout -> nnrc_type τenv e2 τout)
+    -> e1 ⇒ᶜᶜ e2.
   Proof.
     intros.
-    unfold tnrc_rewrites_to; simpl; intros.
+    unfold tnnrc_rewrites_to; simpl; intros.
     split; auto 2; intros.
     apply H; eauto.
   Qed.
@@ -72,19 +72,19 @@ Section TNRCEq.
 
   Require Import TOps.
   
-  Hint Constructors nrc_type.
+  Hint Constructors nnrc_type.
   Hint Constructors unaryOp_type.
   Hint Constructors binOp_type.
 
   Require Import ROpsEq NNRCEq.
   
-  Global Instance  tnrc_rewrites_to_pre : PreOrder tnrc_rewrites_to.
+  Global Instance  tnnrc_rewrites_to_pre : PreOrder tnnrc_rewrites_to.
   Proof.
     constructor; red; intros.
-    - unfold tnrc_rewrites_to; intros.
+    - unfold tnnrc_rewrites_to; intros.
       split; try assumption; intros.
       reflexivity.
-    - unfold tnrc_rewrites_to in *; intros.
+    - unfold tnnrc_rewrites_to in *; intros.
       specialize (H τenv τout H1).
       elim H; clear H; intros.
       specialize (H0 τenv τout H).
@@ -95,36 +95,36 @@ Section TNRCEq.
       reflexivity.
   Qed.
   
-  (* NRCVar *)
+  (* NNRCVar *)
 
-  Global Instance nrcvar_tproper:
-    Proper (eq ==> tnrc_rewrites_to) NRCVar.
+  Global Instance nnrcvar_tproper:
+    Proper (eq ==> tnnrc_rewrites_to) NNRCVar.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     rewrite <- H.
     split; try assumption.
     intros; reflexivity.
   Qed.
   
-  (* NRCConst *)
+  (* NNRCConst *)
 
-  Global Instance nrcconst_tproper:
-    Proper (eq ==> tnrc_rewrites_to) NRCConst.
+  Global Instance nnrcconst_tproper:
+    Proper (eq ==> tnnrc_rewrites_to) NNRCConst.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     rewrite <- H.
     split; try assumption.
     intros; reflexivity.
   Qed.
 
-  (* NRCBinop *)
+  (* NNRCBinop *)
 
-  Global Instance nrcbinop_tproper:
-    Proper (eq ==> tnrc_rewrites_to
-               ==> tnrc_rewrites_to
-               ==> tnrc_rewrites_to) NRCBinop.
+  Global Instance nnrcbinop_tproper:
+    Proper (eq ==> tnnrc_rewrites_to
+               ==> tnnrc_rewrites_to
+               ==> tnnrc_rewrites_to) NNRCBinop.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     rewrite H in *; clear H.
     inversion H2; clear H2; subst.
     econstructor; eauto.
@@ -138,12 +138,12 @@ Section TNRCEq.
     rewrite (H2 env H); rewrite (H3 env H); reflexivity.
   Qed.
   
-  (* NRCUnop *)
+  (* NNRCUnop *)
 
-  Global Instance nrcunop_tproper :
-    Proper (eq ==> tnrc_rewrites_to ==> tnrc_rewrites_to) NRCUnop.
+  Global Instance nnrcunop_tproper :
+    Proper (eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCUnop.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     rewrite H in *; clear H.
     inversion H1; clear H1; subst.
     econstructor; eauto.
@@ -154,42 +154,42 @@ Section TNRCEq.
     simpl. rewrite (H1 env H); reflexivity.
   Qed.
 
-  (* NRCLet *)
+  (* NNRCLet *)
 
-  Global Instance nrclet_tproper :
-    Proper (eq ==> tnrc_rewrites_to ==> tnrc_rewrites_to ==> tnrc_rewrites_to) NRCLet.
+  Global Instance nnrclet_tproper :
+    Proper (eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCLet.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     inversion H2; clear H2; subst.
     specialize (H0  τenv τ₁ H8); elim H0; clear H0 H8; intros.
     specialize (H1  ((y, τ₁) :: τenv) τout H9); elim H1; clear H1 H9; intros.
     econstructor; eauto.
     intros; simpl.
     rewrite (H0 env H3).
-    case_eq (nrc_eval brand_relation_brands env y0); intros; try reflexivity.
+    case_eq (nnrc_core_eval brand_relation_brands env y0); intros; try reflexivity.
     rewrite (H2 ((y, d) :: env)); try reflexivity.
     unfold bindings_type.
     apply Forall2_cons; try assumption.
     simpl; split; try reflexivity.
-    generalize (@typed_nrc_yields_typed_data _ τ₁ env τenv y0 H3 H); intros.
+    generalize (@typed_nnrc_yields_typed_data _ τ₁ env τenv y0 H3 H); intros.
     elim H5; intros.
     rewrite H4 in H6.
     elim H6; clear H6; intros.
     inversion H6; assumption.
   Qed.
     
-  (* NRCFor *)
+  (* NNRCFor *)
 
   Require Import TData.
   
-  Lemma dcoll_wt (l:list data) (τ:rtype) (τenv:tbindings) (env:bindings) (e:nrc):
+  Lemma dcoll_wt (l:list data) (τ:rtype) (τenv:tbindings) (env:bindings) (e:nnrc):
     bindings_type env τenv ->
-    nrc_type τenv e (Coll τ) ->
-    nrc_eval brand_relation_brands env e = Some (dcoll l) ->
+    nnrc_type τenv e (Coll τ) ->
+    nnrc_core_eval brand_relation_brands env e = Some (dcoll l) ->
     forall x:data, In x l -> (data_type x τ).
   Proof.
     intros.
-    generalize (@typed_nrc_yields_typed_data _ (Coll τ) env τenv e H H0); intros.
+    generalize (@typed_nnrc_yields_typed_data _ (Coll τ) env τenv e H H0); intros.
     elim H3; clear H3; intros.
     elim H3; clear H3; intros.
     rewrite H3 in H1.
@@ -202,17 +202,17 @@ Section TNRCEq.
     apply (H1 x0 H2).
   Qed.
 
-  Global Instance nrcfor_tproper :
-    Proper (eq ==> tnrc_rewrites_to ==> tnrc_rewrites_to ==> tnrc_rewrites_to) NRCFor.
+  Global Instance nnrcfor_tproper :
+    Proper (eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCFor.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     inversion H2; clear H2; subst.
     specialize (H0  τenv (Coll τ₁) H8); elim H0; clear H0 H8; intros.
     specialize (H1  ((y, τ₁) :: τenv) τ₂ H9); elim H1; clear H1 H9; intros.
     econstructor; eauto.
     intros; simpl.
     rewrite (H0 env H3).
-    case_eq (nrc_eval brand_relation_brands env y0); intros; try reflexivity.
+    case_eq (nnrc_core_eval brand_relation_brands env y0); intros; try reflexivity.
     destruct d; try reflexivity.
     assert (forall x, In x l -> (data_type x τ₁)) by
         (apply (dcoll_wt l τ₁ τenv env y0); assumption).
@@ -223,22 +223,22 @@ Section TNRCEq.
       by (intros; apply (H5 x); right; assumption).
     specialize (IHl H); clear H.
     rewrite (H2 ((y, a) :: env)).
-    destruct (nrc_eval brand_relation_brands ((y, a) :: env) y1); try reflexivity.
-    destruct ((rmap (fun d1 : data => nrc_eval brand_relation_brands ((y, d1) :: env) x1) l)); destruct ((rmap (fun d1 : data => nrc_eval brand_relation_brands ((y, d1) :: env) y1) l)); simpl in *; try congruence.
+    destruct (nnrc_core_eval brand_relation_brands ((y, a) :: env) y1); try reflexivity.
+    destruct ((rmap (fun d1 : data => nnrc_core_eval brand_relation_brands ((y, d1) :: env) x1) l)); destruct ((rmap (fun d1 : data => nnrc_core_eval brand_relation_brands ((y, d1) :: env) y1) l)); simpl in *; try congruence.
     unfold bindings_type.
     apply Forall2_cons; try assumption.
     simpl; split; try reflexivity.
     apply (H5 a); left; reflexivity.
   Qed.
     
-  (* NRCIf *)
+  (* NNRCIf *)
 
-  Global Instance nrcif_tproper :
-    Proper (tnrc_rewrites_to ==> tnrc_rewrites_to
-                             ==> tnrc_rewrites_to
-                             ==> tnrc_rewrites_to) NRCIf.
+  Global Instance nnrcif_tproper :
+    Proper (tnnrc_rewrites_to ==> tnnrc_rewrites_to
+                             ==> tnnrc_rewrites_to
+                             ==> tnnrc_rewrites_to) NNRCIf.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     inversion H2; clear H2; subst.
     specialize (H  τenv Bool H7); elim H; clear H H7; intros.
     specialize (H0  τenv τout H9); elim H0; clear H0 H9; intros.
@@ -249,10 +249,10 @@ Section TNRCEq.
     reflexivity.
   Qed.
 
-  Global Instance nrceither_tproper :
-    Proper (tnrc_rewrites_to ==> eq ==> tnrc_rewrites_to ==> eq ==> tnrc_rewrites_to ==> tnrc_rewrites_to) NRCEither.
+  Global Instance nnrceither_tproper :
+    Proper (tnnrc_rewrites_to ==> eq ==> tnnrc_rewrites_to ==> eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCEither.
   Proof.
-    unfold Proper, respectful, tnrc_rewrites_to; intros.
+    unfold Proper, respectful, tnnrc_rewrites_to; intros.
     subst.
     inversion H4; clear H4; subst.
     destruct (H _ _ H10).
@@ -262,7 +262,7 @@ Section TNRCEq.
     simpl.
     split; [eauto | ]; intros.
     rewrite H2; trivial.
-    destruct (@typed_nrc_yields_typed_data _ _ _ _ _  H H0) as [?[??]].
+    destruct (@typed_nnrc_yields_typed_data _ _ _ _ _  H H0) as [?[??]].
     rewrite H1.
     apply data_type_Either_inv in H3.
     destruct H3 as [[?[??]]|[?[??]]]; subst.
@@ -270,9 +270,9 @@ Section TNRCEq.
     - eapply H7. constructor; simpl; intuition; eauto.
   Qed.
 
-End TNRCEq.
+End TNNRCEq.
 
-Notation "e1 ⇒ᶜ e2" := (tnrc_rewrites_to e1 e2) (at level 80).
+Notation "e1 ⇒ᶜᶜ e2" := (tnnrc_rewrites_to e1 e2) (at level 80).
 
 (* 
 *** Local Variables: ***

@@ -76,10 +76,10 @@ Section sanitizer.
   Definition javaAvoidList :=
     ["abstract"; "assert"; "boolean"; "break"; "byte"; "case"; "catch"; "char"; "class"; "const"; "continue"; "default"; "do"; "double"; "else"; "enum"; "extends"; "false"; "final"; "finally"; "float"; "for"; "goto"; "if"; "implements"; "import"; "instanceof"; "int"; "interface"; "long"; "native"; "new"; "null"; "package"; "private"; "protected"; "public"; "return"; "short"; "static"; "strictfp"; "super"; "switch"; "synchronized"; "this"; "throw"; "throws"; "transient"; "true"; "try"; "void"; "volatile"; "while"].
 
-  Definition unshadow_java {fruntime:foreign_runtime} (avoid:list var) (e:nrc) : nrc
+  Definition unshadow_java {fruntime:foreign_runtime} (avoid:list var) (e:nnrc) : nnrc
     := unshadow javaSafeSeparator javaIdentifierSanitize (avoid++javaAvoidList) e.
 
-  Definition javaSanitizeNNRC {fruntime:foreign_runtime} (e:nrc) : nrc
+  Definition javaSanitizeNNRC {fruntime:foreign_runtime} (e:nnrc) : nnrc
     := unshadow_java nil e.
 
 End sanitizer.
@@ -172,7 +172,7 @@ Section NNRCtoJava.
     
   End test.
 
-  Section NRCJava.
+  Section NNRCJava.
     Context {ftojavajson:foreign_to_java}.
 
     Definition mk_java_string (s:string) : string
@@ -236,25 +236,25 @@ Section NNRCtoJava.
          | like_any_string => "new UnaryOperator.AnyStringLikeClause()"
          end.
     
-    Fixpoint nrcToJava
-             (n : nrc)                    (* NNRC expression to translate *)
+    Fixpoint nnrcToJava
+             (n : nnrc)                    (* NNRC expression to translate *)
              (t : nat)                    (* next available unused temporary *)
              (i : nat)                    (* indentation level *)
              (eol : string)               (* Choice of end of line character *)
              (quotel : string)            (* Choice of quote character *)
-             (ivs : list (string * string))  (* Input variables and their corresponding string representation -- should be free in the nrc expression *)
+             (ivs : list (string * string))  (* Input variables and their corresponding string representation -- should be free in the nnrc expression *)
       : string                            (* JavaScript statements for computing result *)
         * java_json                          (* JavaScript expression holding result *)
         * nat                             (* next available unused temporary *)
       := match n with
-         | NRCVar v =>
+         | NNRCVar v =>
            match assoc_lookupr equiv_dec ivs v with
            | Some v_string => ("", mk_java_json v_string, t)
            | None => ("", mk_java_json ("v" ++ v), t)
            end
-         | NRCConst d => ("", (mk_java_json_data quotel d), t)
-         | NRCUnop op n1 =>
-           let '(s1, e1, t0) := nrcToJava n1 t i eol quotel ivs in
+         | NNRCConst d => ("", (mk_java_json_data quotel d), t)
+         | NNRCUnop op n1 =>
+           let '(s1, e1, t0) := nnrcToJava n1 t i eol quotel ivs in
            let e0 := match op with
                      | AIdOp => e1
                      | AUArith u => mk_java_unary_op0 (uarithToJavaMethod u) e1
@@ -291,9 +291,9 @@ Section NNRCtoJava.
                        => foreign_to_java_unary_op i eol quotel fu e1
                      end in
            (s1, e0, t0)
-         | NRCBinop op n1 n2 =>
-           let '(s1, e1, t2) := nrcToJava n1 t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJava n2 t2 i eol quotel ivs in
+         | NNRCBinop op n1 n2 =>
+           let '(s1, e1, t2) := nnrcToJava n1 t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJava n2 t2 i eol quotel ivs in
            let e0 := match op with
                      | ABArith b => mk_java_binary_op0 (barithToJavaMethod b) e1 e2
                      | AEq => mk_java_binary_op0 "equals" e1 e2
@@ -313,9 +313,9 @@ Section NNRCtoJava.
                        => foreign_to_java_binary_op i eol quotel fb e1 e2
                      end in
            (s1 ++ s2, e0, t0)
-         | NRCLet v bind body =>
-           let '(s1, e1, t2) := nrcToJava bind t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJava body t2 i eol quotel ivs in
+         | NNRCLet v bind body =>
+           let '(s1, e1, t2) := nnrcToJava bind t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJava body t2 i eol quotel ivs in
            let v0 := "v" ++ v in
            let ret := "vletvar$" ++ v ++ "$" ++ (nat_to_string10 t0) in
            (s1
@@ -326,9 +326,9 @@ Section NNRCtoJava.
               ++ (indent (i+1)) ++ ret ++ " = " ++ (from_java_json e2) ++ ";" ++ eol
               ++ (indent i) ++ "}" ++ eol,
             mk_java_json ret, t0+1)
-         | NRCFor v iter body =>
-           let '(s1, e1, t2) := nrcToJava iter t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJava body t2 (i+1) eol quotel ivs in
+         | NNRCFor v iter body =>
+           let '(s1, e1, t2) := nnrcToJava iter t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJava body t2 (i+1) eol quotel ivs in
            let elm := "v" ++ v in
            let src := "src" ++ (nat_to_string10 t0) in
            let idx := "i" ++ (nat_to_string10 t0) in
@@ -341,10 +341,10 @@ Section NNRCtoJava.
                ++ (indent (i+1)) ++ dst ++ ".add(" ++ (from_java_json e2) ++ ");" ++ eol
                ++ (indent i) ++ "}" ++ eol,
             (mk_java_json dst), t0 + 1)
-         | NRCIf c n1 n2 =>
-           let '(s1, e1, t2) := nrcToJava c t i eol quotel ivs in
-           let '(s2, e2, t3) := nrcToJava n1 t2 (i+1) eol quotel ivs in
-           let '(s3, e3, t0) := nrcToJava n2 t3 (i+1) eol quotel ivs in
+         | NNRCIf c n1 n2 =>
+           let '(s1, e1, t2) := nnrcToJava c t i eol quotel ivs in
+           let '(s2, e2, t3) := nnrcToJava n1 t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t0) := nnrcToJava n2 t3 (i+1) eol quotel ivs in
            let v0 := "t" ++ (nat_to_string10 t0) in
            (s1 ++ (indent i) ++ "final JsonElement " ++ v0 ++ ";" ++ eol
                ++ (indent i) ++ "if (RuntimeUtils.asBoolean(" ++ (from_java_json e1) ++ ")) {" ++ eol
@@ -355,10 +355,10 @@ Section NNRCtoJava.
                ++ (indent (i+1)) ++ v0 ++ " = " ++ (from_java_json e3) ++ ";" ++ eol
                ++ (indent i) ++ "}" ++ eol,
             (mk_java_json v0), t0 + 1)
-         | NRCEither nd xl nl xr nr =>
-           let '(s1, e1, t2) := nrcToJava nd t i eol quotel ivs in
-           let '(s2, e2, t1) := nrcToJava nl t2 (i+1) eol quotel ivs in
-           let '(s3, e3, t0) := nrcToJava nr t1 (i+1) eol quotel ivs in
+         | NNRCEither nd xl nl xr nr =>
+           let '(s1, e1, t2) := nnrcToJava nd t i eol quotel ivs in
+           let '(s2, e2, t1) := nnrcToJava nl t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t0) := nnrcToJava nr t1 (i+1) eol quotel ivs in
            let vl := "v" ++ xl in
            let vr := "v" ++ xr in
            let res := "res" ++ (nat_to_string10 t0) in  (* Stores the result from either left or right evaluation so it can be returned *)
@@ -375,35 +375,39 @@ Section NNRCtoJava.
                ++ (indent (i+1)) ++ res ++ " = " ++ (from_java_json e3) ++ ";" ++ eol
                ++ (indent i) ++ "}" ++ eol,
             mk_java_json res, t0 + 1)
+         | NNRCGroupBy g sl n1 =>
+           let '(s1, e1, t0) := nnrcToJava n1 t i eol quotel ivs in
+           let e0 := mk_java_unary_opn "groupby" [(mk_java_string g);(mk_java_string_collection sl)] e1 in
+           (s1, e0, t0)
        end.
 
-    Definition nrcToJavaunshadow (n : nrc) (t : nat) (i : nat) (eol : string) (quotel : string) (avoid: list var) (ivs : list (string * string)) :=
+    Definition nnrcToJavaunshadow (n : nnrc) (t : nat) (i : nat) (eol : string) (quotel : string) (avoid: list var) (ivs : list (string * string)) :=
       let n := unshadow_java avoid n in
-      nrcToJava n t i eol quotel ivs.
+      nnrcToJava n t i eol quotel ivs.
 
     Definition makeJavaParams (ivs: list(string*string)) :=
       joinStrings ", " (map (fun elem => "JsonElement " ++ snd elem) ivs).
 
     (* Free variables are assumed to be constant lookups *)
-    Definition closeFreeVars (input:string) (e:nrc) (ivs:list(string*string)) : nrc :=
-      let all_free_vars := nrc_free_vars e in
-      let wrap_one_free_var (e':nrc) (fv:string) : nrc :=
+    Definition closeFreeVars (input:string) (e:nnrc) (ivs:list(string*string)) : nnrc :=
+      let all_free_vars := nnrc_free_vars e in
+      let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (assoc_lookupr equiv_dec ivs fv)
           then e'
-          else (NRCLet fv (NRCUnop (ADot fv) (NRCVar input)) e')
+          else (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
     
-    Definition nrcToJavaFun (i:nat) (input_v:string) (e:nrc) (eol:string) (quotel:string) (ivs : list (string * string)) (fname:string) :=
+    Definition nnrcToJavaFun (i:nat) (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list (string * string)) (fname:string) :=
       let e' := closeFreeVars input_v e ivs in
-      let '(j0, v0, t0) := nrcToJavaunshadow e' 1 (i + 1) eol quotel ("constants"::"hierarchy"::(List.map fst ivs)) ivs in
+      let '(j0, v0, t0) := nnrcToJavaunshadow e' 1 (i + 1) eol quotel ("constants"::"hierarchy"::(List.map fst ivs)) ivs in
       (indent i) ++ "public JsonElement " ++ fname ++ "(Hierarchy hierarchy, "++ (makeJavaParams ivs) ++ ") {" ++ eol
                  ++ j0
                  ++ (indent i) ++ "  return " ++ (from_java_json v0) ++ ";" ++ eol
                  ++ (indent i) ++ "}" ++ eol.
 
-    Definition nrcToJavaClass (class_name:string) (package_name:string) (imports:string) (input_v:string) (e:nrc) (eol:string) (quotel:string) (ivs : list (string * string)) (fname:string) :=
-      let f := nrcToJavaFun 1 input_v e eol quotel ivs fname in
+    Definition nnrcToJavaClass (class_name:string) (package_name:string) (imports:string) (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list (string * string)) (fname:string) :=
+      let f := nnrcToJavaFun 1 input_v e eol quotel ivs fname in
       (if(package_name == "")
       then ""
       else "package " ++ package_name ++ ";" ++ eol ++ eol)
@@ -420,12 +424,12 @@ Section NNRCtoJava.
       ++ "}" ++ eol
     .
 
-    Definition nrcToJavaTop (class_name:string) (imports:string) (e:nrc) : string :=
+    Definition nnrcToJavaTop (class_name:string) (imports:string) (e:nnrc) : string :=
       let input_f := "query" in
       let input_v := "constants" in
-      nrcToJavaClass class_name "" imports input_v e eol_newline quotel_double ((input_v, input_v)::nil) input_f.
+      nnrcToJavaClass class_name "" imports input_v e eol_newline quotel_double ((input_v, input_v)::nil) input_f.
 
-  End NRCJava.
+  End NNRCJava.
 
 End NNRCtoJava.
 

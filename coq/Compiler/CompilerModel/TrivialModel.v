@@ -342,8 +342,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_cloudant.
     Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
       := silent_optimizer_logger string nraenv.
-    Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
-      := silent_optimizer_logger string nrc.
+    Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
+      := silent_optimizer_logger string nnrc.
     Definition compiler_foreign_data_typing : foreign_data_typing
       := trivial_foreign_data_typing.
     
@@ -381,8 +381,8 @@ Existing Instance silent_optimizer_logger.
       := trivial_foreign_to_cloudant.
     Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
       := silent_optimizer_logger string nraenv.
-    Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc
-      := silent_optimizer_logger string nrc.
+    Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
+      := silent_optimizer_logger string nnrc.
     Definition compiler_model_foreign_data_typing : foreign_data_typing
       := trivial_foreign_data_typing.
   End TrivialModel.

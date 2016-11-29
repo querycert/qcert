@@ -28,22 +28,24 @@ Section NNRCtoDNNRC.
 
   Context {fruntime:foreign_runtime}.
   
-  Fixpoint nrc_to_dnrc {A:Set} {plug_type:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nrc) : dnrc A plug_type :=
+  Fixpoint nnrc_to_dnnrc {A:Set} {plug_type:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nnrc) : dnnrc A plug_type :=
     match n with
-    | NRCVar v =>
+    | NNRCVar v =>
       match lookup equiv_dec tenv v with
-      | None => DNRCVar annot v (* urghh... *)
-      | Some Vlocal => DNRCVar annot v
-      | Some Vdistr => DNRCCollect annot (DNRCVar annot v)
+      | None => DNNRCVar annot v (* urghh... *)
+      | Some Vlocal => DNNRCVar annot v
+      | Some Vdistr => DNNRCCollect annot (DNNRCVar annot v)
       end
-    | NRCConst d => DNRCConst annot d
-    | NRCBinop b n1 n2 => DNRCBinop annot b (nrc_to_dnrc annot tenv n1) (nrc_to_dnrc annot tenv n2)
-    | NRCUnop u n1 => DNRCUnop annot u (nrc_to_dnrc annot tenv n1)
-    | NRCLet v n1 n2 => DNRCLet annot v (nrc_to_dnrc annot tenv n1) (nrc_to_dnrc annot ((v,Vlocal)::tenv) n2)
-    | NRCFor v n1 n2 => DNRCFor annot v (nrc_to_dnrc annot tenv n1) (nrc_to_dnrc annot ((v,Vlocal)::tenv) n2)
-    | NRCIf n1 n2 n3 => DNRCIf annot (nrc_to_dnrc annot tenv n1) (nrc_to_dnrc annot tenv n2) (nrc_to_dnrc annot tenv n3)
-    | NRCEither n0 v1 n1 v2 n2 =>
-      DNRCEither annot (nrc_to_dnrc annot tenv n0) v1 (nrc_to_dnrc annot ((v1,Vlocal)::tenv) n1) v2 (nrc_to_dnrc annot ((v2,Vlocal)::tenv) n2)
+    | NNRCConst d => DNNRCConst annot d
+    | NNRCBinop b n1 n2 => DNNRCBinop annot b (nnrc_to_dnnrc annot tenv n1) (nnrc_to_dnnrc annot tenv n2)
+    | NNRCUnop u n1 => DNNRCUnop annot u (nnrc_to_dnnrc annot tenv n1)
+    | NNRCLet v n1 n2 => DNNRCLet annot v (nnrc_to_dnnrc annot tenv n1) (nnrc_to_dnnrc annot ((v,Vlocal)::tenv) n2)
+    | NNRCFor v n1 n2 => DNNRCFor annot v (nnrc_to_dnnrc annot tenv n1) (nnrc_to_dnnrc annot ((v,Vlocal)::tenv) n2)
+    | NNRCIf n1 n2 n3 => DNNRCIf annot (nnrc_to_dnnrc annot tenv n1) (nnrc_to_dnnrc annot tenv n2) (nnrc_to_dnnrc annot tenv n3)
+    | NNRCEither n0 v1 n1 v2 n2 =>
+      DNNRCEither annot (nnrc_to_dnnrc annot tenv n0) v1 (nnrc_to_dnnrc annot ((v1,Vlocal)::tenv) n1) v2 (nnrc_to_dnnrc annot ((v2,Vlocal)::tenv) n2)
+    | NNRCGroupBy g sl n1 =>
+      DNNRCGroupBy annot g sl (nnrc_to_dnnrc annot tenv n1)
     end.
 
   Definition wf_localization (tl:option dlocalization) (dl:option ddata) :=
@@ -98,18 +100,18 @@ Section NNRCtoDNNRC.
     - apply IHdenv. apply H.
   Qed.
 
-  Lemma rmap_nrc_to_dnrc_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) tenv denv v l n2 :
+  Lemma rmap_nnrc_to_dnnrc_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) tenv denv v l n2 :
     wf_denv tenv denv ->
     (forall (tenv : list (var * dlocalization))
             (denv : list (var * ddata)),
         wf_denv tenv denv ->
-        lift Dlocal (nrc_eval h (localize_denv denv) n2) =
-        dnrc_eval h denv (nrc_to_dnrc annot tenv n2)) ->
+        lift Dlocal (nnrc_core_eval h (localize_denv denv) n2) =
+        dnnrc_eval h denv (nnrc_to_dnnrc annot tenv n2)) ->
     rmap
       (fun d1 : data =>
          olift checkLocal
-               (dnrc_eval h ((v, Dlocal d1) :: denv)
-                          (nrc_to_dnrc annot ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nrc_eval h ((v, d1) :: localize_denv denv) n2) l.
+               (dnnrc_eval h ((v, Dlocal d1) :: denv)
+                          (nnrc_to_dnnrc annot ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nnrc_core_eval h ((v, d1) :: localize_denv denv) n2) l.
   Proof.
     intros Hwf; intros.
     induction l; [reflexivity| ]; simpl.
@@ -117,17 +119,17 @@ Section NNRCtoDNNRC.
     specialize (H ((v, Vlocal) :: tenv) ((v, Dlocal a) :: denv)).
     rewrite <- H; simpl.
     unfold lift.
-    assert (@nrc_eval fruntime h
+    assert (@nnrc_core_eval fruntime h
         (@cons (prod var (@data (@foreign_runtime_data fruntime)))
            (@pair var (@data (@foreign_runtime_data fruntime)) v a)
            (@localize_denv (@foreign_runtime_data fruntime) denv)) n2 =
-            @nrc_eval fruntime h
+            @nnrc_core_eval fruntime h
             (@cons (prod string (@data (@foreign_runtime_data fruntime)))
                (@pair string (@data (@foreign_runtime_data fruntime)) v a)
                (@localize_denv (@foreign_runtime_data fruntime) denv)) n2).
     reflexivity.
     rewrite <- H0; clear H0.
-    destruct (nrc_eval h ((v, a) :: localize_denv denv) n2); try reflexivity.
+    destruct (nnrc_core_eval h ((v, a) :: localize_denv denv) n2); try reflexivity.
     simpl.
     rewrite <- IHl.
     reflexivity.
@@ -135,16 +137,16 @@ Section NNRCtoDNNRC.
     assumption.
   Qed.
 
-  Global Arguments dnrc : clear implicits.
-  Lemma nrc_to_dnrc_correct {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (tenv:list (var*dlocalization)) (n:nrc) :
+  Global Arguments dnnrc : clear implicits.
+  Lemma nnrc_to_dnnrc_correct {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (tenv:list (var*dlocalization)) (n:nnrc) :
     forall denv:list (var*ddata),
       wf_denv tenv denv ->
-      lift Dlocal (nrc_eval h (localize_denv denv) n) = dnrc_eval h denv (nrc_to_dnrc annot tenv n).
+      lift Dlocal (nnrc_core_eval h (localize_denv denv) n) = dnnrc_eval h denv (nnrc_to_dnnrc annot tenv n).
   Proof.
-    revert tenv; nrc_cases (induction n) Case; intros; simpl; intros.
+    revert tenv; nnrc_cases (induction n) Case; intros; simpl; intros.
     unfold wf_denv in H;
       elim H; intros; clear H.
-    - Case "NRCVar"%string.
+    - Case "NNRCVar"%string.
       case_eq (lookup equiv_dec tenv v); simpl; intros.
       + case_eq d; simpl; intros; specialize (H1 v).
         * unfold wf_localization in H1. subst.
@@ -163,61 +165,61 @@ Section NNRCtoDNNRC.
         unfold wf_localization in H1.
         rewrite H in *.
         contradiction.
-    - Case "NRCConst"%string.
+    - Case "NNRCConst"%string.
       reflexivity.
-    - Case "NRCBinop"%string.
+    - Case "NNRCBinop"%string.
       unfold lift in *.
       specialize (IHn1 tenv denv H).
       specialize (IHn2 tenv denv H).
-      case_eq (nrc_eval h (localize_denv denv) n1);
-        case_eq (nrc_eval h (localize_denv denv) n2); intros;
+      case_eq (nnrc_core_eval h (localize_denv denv) n1);
+        case_eq (nnrc_core_eval h (localize_denv denv) n2); intros;
         rewrite H0 in *; rewrite H1 in *; simpl in *;
         rewrite <- IHn1; rewrite <- IHn2; simpl in *; reflexivity.
-    - Case "NRCUnop"%string.
+    - Case "NNRCUnop"%string.
       specialize (IHn tenv denv H).
-      case_eq (nrc_eval h (localize_denv denv) n); intros;
+      case_eq (nnrc_core_eval h (localize_denv denv) n); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn; simpl in *; reflexivity.
-    - Case "NRCLet"%string.
+    - Case "NNRCLet"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nrc_eval h (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (localize_denv denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       specialize (IHn2 ((v, Vlocal) :: tenv) ((v, Dlocal d) :: denv)).
       apply IHn2; apply wf_denv_cons; apply H.
-    - Case "NRCFor"%string.
+    - Case "NNRCFor"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nrc_eval h (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (localize_denv denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl in *; try reflexivity.
       unfold lift.
-      rewrite rmap_nrc_to_dnrc_correct; try assumption.
+      rewrite rmap_nnrc_to_dnnrc_correct; try assumption.
       assert (@rmap (@data (@foreign_runtime_data fruntime))
          (@data (@foreign_runtime_data fruntime))
          (fun d1 : @data (@foreign_runtime_data fruntime) =>
-          @nrc_eval fruntime h
+          @nnrc_core_eval fruntime h
             (@cons (prod var (@data (@foreign_runtime_data fruntime)))
                (@pair var (@data (@foreign_runtime_data fruntime)) v d1)
                (localize_denv denv)) n2) l = rmap
-         (fun d1 : data => nrc_eval h ((v, d1) :: localize_denv denv) n2)
+         (fun d1 : data => nnrc_core_eval h ((v, d1) :: localize_denv denv) n2)
          l) by reflexivity.
       rewrite H1. clear H1.
       destruct (rmap
-                  (fun d1 : data => nrc_eval h ((v, d1) :: localize_denv denv) n2)
+                  (fun d1 : data => nnrc_core_eval h ((v, d1) :: localize_denv denv) n2)
                   l); reflexivity.
-    - Case "NRCIf"%string.
+    - Case "NNRCIf"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nrc_eval h (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (localize_denv denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl; try reflexivity.
       destruct b; simpl.
       + specialize (IHn2 tenv denv); apply IHn2; apply H.
       + specialize (IHn3 tenv denv); apply IHn3; apply H.
-    - Case "NRCEither"%string.
+    - Case "NNRCEither"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nrc_eval h (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (localize_denv denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl; try reflexivity.
@@ -227,12 +229,14 @@ Section NNRCtoDNNRC.
       + specialize (IHn3 ((v0, Vlocal) :: tenv) ((v0, Dlocal d) :: denv)).
         rewrite <- localize_denv_cons.
         apply IHn3; apply wf_denv_cons; apply H.
+    - Case "NNRCGroupBy"%string.
+      reflexivity. (* XXX TODO: Currently both fail in core NNRC and in DNNRC XXX *)
   Qed.
 
   Require Import NRAEnvRuntime.
   Require Import Dataset.
   Context {ftype: ForeignType.foreign_type}.
-  Definition nrc_to_dnrc_dataset {A} := @nrc_to_dnrc A dataset.
+  Definition nnrc_to_dnnrc_dataset {A} := @nnrc_to_dnnrc A dataset.
 
 End NNRCtoDNNRC.
 

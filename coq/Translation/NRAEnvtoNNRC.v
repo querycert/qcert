@@ -32,99 +32,99 @@ Section NRAEnvtoNNRC.
 
   (** Translation from NRA+Env to Named Nested Relational Calculus *)
   (* Java equivalent: NraToNnrc.algenv_to_nnrc *)
-  Fixpoint algenv_to_nnrc (op:algenv) (varid varenv:var) : nrc :=
+  Fixpoint algenv_to_nnrc (op:algenv) (varid varenv:var) : nnrc :=
     match op with
       (* [[ ID ]]_vid,venv == vid *)
-      | ANID => NRCVar varid
+      | ANID => NNRCVar varid
       (* [[ Const ]]_vid,venv == Const *)
-      | ANConst rd => NRCConst rd
+      | ANConst rd => NNRCConst rd
       (* [[ op1 ⊕ op2 ]]_vid,venv == [[ op1 ]]_vid,venv ⊕ [[ op2 ]]_vid,venv *)
       | ANBinop bop op1 op2 =>
-        NRCBinop bop (algenv_to_nnrc op1 varid varenv) (algenv_to_nnrc op2 varid varenv)
+        NNRCBinop bop (algenv_to_nnrc op1 varid varenv) (algenv_to_nnrc op2 varid varenv)
       (* [[ UOP op1 ]]_vid,venv = UOP [[ op1 ]]_vid,venv *)
       | ANUnop uop op1 =>
-        NRCUnop uop (algenv_to_nnrc op1 varid varenv)
+        NNRCUnop uop (algenv_to_nnrc op1 varid varenv)
       (* [[ χ⟨ op1 ⟩( op2 ) ]]_vid,venv = { [[ op1 ]]_t,venv | t ∈ [[ op2 ]]_vid,venv } *)
       | ANMap op1 op2 =>
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let t := fresh_var "tmap$" (varid::varenv::nil) in
-        NRCFor t nrc2 (algenv_to_nnrc op1 t varenv)
+        NNRCFor t nnrc2 (algenv_to_nnrc op1 t varenv)
       (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1,venv } | t1 ∈ [[ op2 ]]_vid,venv } *)
       | ANMapConcat op1 op2 =>
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in
-        NRCUnop AFlatten
-                (NRCFor t1 nrc2
-                        (NRCFor t2 (algenv_to_nnrc op1 t1 varenv)
-                                ((NRCBinop AConcat) (NRCVar t1) (NRCVar t2))))
+        NNRCUnop AFlatten
+                (NNRCFor t1 nnrc2
+                        (NNRCFor t2 (algenv_to_nnrc op1 t1 varenv)
+                                ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ op1 × op2 ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_vid,venv } | t1 ∈ [[ op1 ]]_vid,venv } *)
       | ANProduct op1 op2 =>
-        let nrc1 := (algenv_to_nnrc op1 varid varenv) in
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc1 := (algenv_to_nnrc op1 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tprod$" "tprod$" (varid::varenv::nil) in
-        NRCUnop AFlatten
-                (NRCFor t1 nrc1
-                        (NRCFor t2 nrc2
-                                ((NRCBinop AConcat) (NRCVar t1) (NRCVar t2))))
+        NNRCUnop AFlatten
+                (NNRCFor t1 nnrc1
+                        (NNRCFor t2 nnrc2
+                                ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
       (* [[ σ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ if [[ op1 ]]_t1,venv then { t1 } else {} | t1 ∈ [[ op2 ]]_vid,venv } *)
       | ANSelect op1 op2 =>
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let t := fresh_var "tsel$" (varid::varenv::nil) in
-        let nrc1 := (algenv_to_nnrc op1 t varenv) in
-        NRCUnop AFlatten
-                (NRCFor t nrc2
-                        (NRCIf nrc1 (NRCUnop AColl (NRCVar t)) (NRCConst (dcoll nil))))
+        let nnrc1 := (algenv_to_nnrc op1 t varenv) in
+        NNRCUnop AFlatten
+                (NNRCFor t nnrc2
+                        (NNRCIf nnrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
       (* [[ op1 ∥ op2 ]]_vid,venv == let t := [[ op1 ]]_vid,venv in
                                        if (t = {})
                                        then [[ op2 ]]_vid,venv
                                        else t *)
       | ANDefault op1 op2 =>
-        let nrc1 := (algenv_to_nnrc op1 varid varenv) in
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc1 := (algenv_to_nnrc op1 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let t := fresh_var "tdef$" (varid::varenv::nil) in
-        (NRCLet t nrc1
-                (NRCIf (NRCBinop AEq
-                                 (NRCVar t)
-                                 (NRCUnop AFlatten (NRCConst (dcoll nil))))
-                       nrc2 (NRCVar t)))
+        (NNRCLet t nnrc1
+                (NNRCIf (NNRCBinop AEq
+                                 (NNRCVar t)
+                                 (NNRCUnop AFlatten (NNRCConst (dcoll nil))))
+                       nnrc2 (NNRCVar t)))
       (* [[ op1 ◯ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
                                      in [[ op1 ]]_t,venv *)
       | ANEither opl opr =>
         let (t1,t2) := fresh_var2 "teitherL$" "teitherR$" (varid::varenv::nil) in
-        let nrcl := (algenv_to_nnrc opl t1 varenv) in
-        let nrcr := (algenv_to_nnrc opr t2 varenv) in
-        NRCEither (NRCVar varid) t1 nrcl t2 nrcr
+        let nnrcl := (algenv_to_nnrc opl t1 varenv) in
+        let nnrcr := (algenv_to_nnrc opr t2 varenv) in
+        NNRCEither (NNRCVar varid) t1 nnrcl t2 nnrcr
       | ANEitherConcat op1 op2 =>
-        let nrc1 := (algenv_to_nnrc op1 varid varenv) in
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc1 := (algenv_to_nnrc op1 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let t := fresh_var "tec$" (varid::varenv::nil) in 
-        NRCLet t nrc2
-        (NRCEither nrc1 varid (NRCUnop ALeft (NRCBinop AConcat (NRCVar varid) (NRCVar t)))
-                  varid (NRCUnop ARight (NRCBinop AConcat (NRCVar varid) (NRCVar t))))
+        NNRCLet t nnrc2
+        (NNRCEither nnrc1 varid (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar varid) (NNRCVar t)))
+                  varid (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar varid) (NNRCVar t))))
       | ANApp op1 op2 =>
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let t := fresh_var "tapp$" (varid::varenv::nil) in
-        let nrc1 := (algenv_to_nnrc op1 t varenv) in
-        (NRCLet t nrc2 nrc1)
+        let nnrc1 := (algenv_to_nnrc op1 t varenv) in
+        (NNRCLet t nnrc2 nnrc1)
       (* [[ CENV v ]]_vid,venv = v *)
-      | ANGetConstant s => NRCVar (append CONST_PREFIX s)
+      | ANGetConstant s => NNRCVar (append CONST_PREFIX s)
       (* [[ ENV ]]_vid,venv = venv *)
-      | ANEnv => NRCVar varenv
+      | ANEnv => NNRCVar varenv
       (* [[ op1 ◯ₑ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
                                       in [[ op1 ]]_vid,t *)
       | ANAppEnv op1 op2 =>
-        let nrc2 := (algenv_to_nnrc op2 varid varenv) in
+        let nnrc2 := (algenv_to_nnrc op2 varid varenv) in
         let t := fresh_var "tappe$" (varid::varenv::nil) in
-        let nrc1 := (algenv_to_nnrc op1 varid t) in
-        (NRCLet t nrc2 nrc1)
+        let nnrc1 := (algenv_to_nnrc op1 varid t) in
+        (NNRCLet t nnrc2 nnrc1)
       (* [[ χᵉ⟨ op1 ⟩ ]]_vid,venv = { [[ op1 ]]_vid,t1 | t1 ∈ venv } *)
       | ANMapEnv op1 =>
         let t1 := fresh_var "tmape$" (varid::varenv::nil) in
-        let nrc1 := (algenv_to_nnrc op1 varid t1) in
-        (NRCFor t1 (NRCVar varenv) nrc1)
+        let nnrc1 := (algenv_to_nnrc op1 varid t1) in
+        (NNRCFor t1 (NNRCVar varenv) nnrc1)
     end.
 
   (** Auxiliary lemmas used in the proof of correctness for the translation *)
@@ -146,10 +146,10 @@ Section NRAEnvtoNNRC.
         = lookup equiv_dec (filterConstants env) x) ->
       lookup equiv_dec env vid = Some did ->
        lookup equiv_dec env venv = Some denv ->
-       nrc_eval h env (algenv_to_nnrc op vid venv) = (fun_of_algenv h cenv op denv did)) ->
+       nnrc_core_eval h env (algenv_to_nnrc op vid venv) = (fun_of_algenv h cenv op denv did)) ->
     rmap
       (fun x : data =>
-         nrc_eval h ((vid, x) :: env) (algenv_to_nnrc op vid venv)) l
+         nnrc_core_eval h ((vid, x) :: env) (algenv_to_nnrc op vid venv)) l
     =
     rmap (fun_of_algenv h dcenv op denv) l.
   Proof.
@@ -175,7 +175,7 @@ Section NRAEnvtoNNRC.
         = lookup equiv_dec (filterConstants env) x) ->
     lookup equiv_dec env vid = Some did ->
     lookup equiv_dec env venv = Some denv ->
-    nrc_eval h env (algenv_to_nnrc op vid venv) = h ⊢ₑ op @ₑ did ⊣ dcenv;denv.
+    nnrc_core_eval h env (algenv_to_nnrc op vid venv) = h ⊢ₑ op @ₑ did ⊣ dcenv;denv.
   Proof.
     Opaque fresh_var.
     Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
@@ -325,7 +325,7 @@ Section NRAEnvtoNNRC.
       match_destr; [| repeat (match_destr; trivial)].
       rewrite <- (IHop1 dcenv did denv ((fresh_var "tec$" (vid :: venv :: nil), d) :: env) vid venv); simpl; trivial.
       + unfold var in *.
-        destruct (nrc_eval h (_ :: env)); trivial.
+        destruct (nnrc_core_eval h (_ :: env)); trivial.
         dest_eqdec; [| congruence].
         dest_eqdec; [elim (fresh_var_fresh1 _ _ _ (symmetry e0)) | ].
         dest_eqdec; [| congruence].
@@ -379,7 +379,7 @@ Section NRAEnvtoNNRC.
   Lemma algenv_to_nnrc_no_free_vars (op: algenv):
     forall (vid venv: var),
     forall v,
-      In v (nrc_free_vars (algenv_to_nnrc op vid venv)) ->
+      In v (nnrc_free_vars (algenv_to_nnrc op vid venv)) ->
       (prefix CONST_PREFIX v = true
       (* It is also true that: *)
       (* /\ In v (mkConstants (nraenv_constants op)) *)
@@ -460,7 +460,7 @@ Section NRAEnvtoNNRC.
       + specialize (IHop1 ((fresh_var "tsel$" (vid :: venv :: nil))) venv v).
         clear IHop2.
         revert H IHop1.
-        generalize (nrc_free_vars
+        generalize (nnrc_free_vars
                       (algenv_to_nnrc op1 (fresh_var "tsel$" (vid :: venv :: nil)) venv)).
         intros.
         apply remove_inv in H.
@@ -562,9 +562,9 @@ Section NRAEnvtoNNRC.
   Qed.
 
   Section Top.
-    Definition algenv_to_nnrc_top (q:algenv) (init_vid init_venv:var) : nrc :=
-      NRCLet init_venv (NRCConst (drec nil))
-             (NRCLet init_vid (NRCConst dunit)
+    Definition algenv_to_nnrc_top (q:algenv) (init_vid init_venv:var) : nnrc :=
+      NNRCLet init_venv (NNRCConst (drec nil))
+             (NNRCLet init_vid (NNRCConst dunit)
                      (algenv_to_nnrc q init_vid init_venv)).
   End Top.
   
@@ -575,7 +575,7 @@ Section NRAEnvtoNNRC.
   Require Import Omega.
 
   Theorem algenvToNNRC_size op vid venv : 
-    nrc_size (algenv_to_nnrc op vid venv) <= 10 * algenv_size op.
+    nnrc_size (algenv_to_nnrc op vid venv) <= 10 * algenv_size op.
   Proof.
     Transparent fresh_var2.
     revert vid venv.

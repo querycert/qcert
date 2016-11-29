@@ -47,7 +47,7 @@ Section TNRAEnvtoNNRC.
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
     (op ▷ τin >=> τout ⊣ τcenv;τenv) ->
-    nrc_type tenv (algenv_to_nnrc op vid venv) τout.
+    nnrc_type tenv (algenv_to_nnrc op vid venv) τout.
   Proof.
     Opaque fresh_var.
     Opaque append.
@@ -55,9 +55,9 @@ Section TNRAEnvtoNNRC.
     revert vid venv tenv pre1 pre2 fpre H H0.
     dependent induction H1; simpl; intros.
     (* ATID *)
-    - apply TNRCVar; trivial.
+    - apply TNNRCVar; trivial.
     (* ATConst *)
-    - apply TNRCConst; trivial.
+    - apply TNNRCConst; trivial.
     (* ATBinop *)
     - econstructor; eauto.
     (* ATUnop *)
@@ -72,21 +72,21 @@ Section TNRAEnvtoNNRC.
         elim_fresh e.
     (* ATMapConcat *)
     - specialize (IHalgenv_type2 vid venv tenv).
-      apply (@TNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+      apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
-      apply (@TNRCFor m (RType.Rec Closed τ₁ pf1)); [eauto | ].
-      apply (@TNRCFor m (RType.Rec Closed τ₂ pf2)).
+      apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); [eauto | ].
+      apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
       + apply IHalgenv_type1; simpl; trivial;
         match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl; match_destr; try elim_fresh e.
         match_destr; elim_fresh e.
     (* ATProduct *)
-    - apply (@TNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+    - apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
-      apply (@TNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
+      apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
       apply (IHalgenv_type1 vid venv tenv); assumption.
       clear IHalgenv_type1 op1 H1_.
-      apply (@TNRCFor m (RType.Rec Closed τ₂ pf2)).
+      apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
       + apply IHalgenv_type2; simpl; trivial; match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl.
         * match_destr.
@@ -94,9 +94,9 @@ Section TNRAEnvtoNNRC.
           match_destr; congruence.
         * match_destr; try congruence.
     (* ATSelect *)
-    - apply (@TNRCUnop m (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
-      apply (@TNRCFor m τ); [apply (IHalgenv_type2 vid venv tenv )|idtac]; trivial.
-      apply TNRCIf.
+    - apply (@TNNRCUnop m (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
+      apply (@TNNRCFor m τ); [apply (IHalgenv_type2 vid venv tenv )|idtac]; trivial.
+      apply TNNRCIf.
       + apply IHalgenv_type1; simpl; trivial; match_destr; elim_fresh e.
       + econstructor; eauto.
         econstructor. simpl.
@@ -156,7 +156,7 @@ Section TNRAEnvtoNNRC.
       rewrite mkConstants_assoc_lookupr.
       trivial.
     (* ATEnv *)
-    - apply TNRCVar; assumption.
+    - apply TNNRCVar; assumption.
     (* ATAppEnv *)
     - repeat (econstructor; eauto 2).
       apply IHalgenv_type2; simpl; trivial; match_destr; elim_fresh e.
@@ -175,7 +175,7 @@ Section TNRAEnvtoNNRC.
         = lookup equiv_dec (filterConstants tenv) x) ->
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
-    nrc_type tenv (algenv_to_nnrc op vid venv) τout ->
+    nnrc_type tenv (algenv_to_nnrc op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τcenv;τenv).
   Proof.
     Hint Constructors algenv_type.
@@ -353,7 +353,7 @@ Section TNRAEnvtoNNRC.
         = lookup equiv_dec (filterConstants tenv) x) ->
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
-    nrc_type tenv (algenv_to_nnrc op vid venv) τout ->
+    nnrc_type tenv (algenv_to_nnrc op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τcenv;τenv).
   Proof.
     Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back.

@@ -37,7 +37,7 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_cloudant : foreign_cloudant.
   Axiom compiler_model_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
-  Axiom compiler_model_nrc_optimizer_logger : optimizer_logger string nrc.
+  Axiom compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
   Axiom compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
 
@@ -68,8 +68,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     := model.compiler_model_foreign_to_cloudant.
   Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
     :=  model.compiler_model_nraenv_optimizer_logger.
-  Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
-    :=  model.compiler_model_nrc_optimizer_logger.
+  Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
+    :=  model.compiler_model_nnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := model.compiler_model_foreign_data_typing.
 End CompilerModelRuntime.

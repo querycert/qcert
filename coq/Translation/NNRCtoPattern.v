@@ -70,43 +70,45 @@ Section NNRCtoPattern.
 
   (** Translation from NNRC to CAMP.
       This assumes that there is no shadowing *)
-  Fixpoint nrcToPat_ns (n:NNRC.nrc) : pat
+  Fixpoint nnrcToPat_ns (n:NNRC.nnrc) : pat
     := match n with
-         | NNRC.NRCVar v => lookup (loop_var v)
-         | NNRC.NRCConst d => pconst d
-         | NNRC.NRCBinop op n1 n2 => pbinop op (nrcToPat_ns n1) (nrcToPat_ns n2)
-         | NNRC.NRCUnop op n1 => punop op (nrcToPat_ns n1)
+         | NNRC.NNRCVar v => lookup (loop_var v)
+         | NNRC.NNRCConst d => pconst d
+         | NNRC.NNRCBinop op n1 n2 => pbinop op (nnrcToPat_ns n1) (nnrcToPat_ns n2)
+         | NNRC.NNRCUnop op n1 => punop op (nnrcToPat_ns n1)
 
-         | NNRC.NRCLet v bind body => 
-           pletIt (nrcToPat_ns bind)
+         | NNRC.NNRCLet v bind body => 
+           pletIt (nnrcToPat_ns bind)
                     (pletEnv (pvar (loop_var v))
-                             (nrcToPat_ns body))
-         | NNRC.NRCFor v iter body => 
-           pletIt (nrcToPat_ns iter)
+                             (nnrcToPat_ns body))
+         | NNRC.NNRCFor v iter body => 
+           pletIt (nnrcToPat_ns iter)
                  (mapall
                     (pletEnv (pvar (loop_var v))
-                             (nrcToPat_ns body)))
+                             (nnrcToPat_ns body)))
                  
-         | NNRC.NRCIf c n1 n2 =>
-           let ctrans := (nrcToPat_ns c) in
-           let n1trans := (nrcToPat_ns n1) in
-           let n2trans := (nrcToPat_ns n2) in
+         | NNRC.NNRCIf c n1 n2 =>
+           let ctrans := (nnrcToPat_ns c) in
+           let n1trans := (nnrcToPat_ns n1) in
+           let n2trans := (nnrcToPat_ns n2) in
            (porElse 
              (pand (pbinop AAnd ‵true ctrans) n1trans)
              (* it could have failed because of n1, but then this will also fail *)
              (pand (punop ANeg ctrans) n2trans))
-         | NNRC.NRCEither nd xl nl xr nr =>
-           pletIt (nrcToPat_ns nd)
-                  (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nrcToPat_ns nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nrcToPat_ns nr))))
+         | NNRC.NNRCEither nd xl nl xr nr =>
+           pletIt (nnrcToPat_ns nd)
+                  (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nnrcToPat_ns nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nnrcToPat_ns nr))))
+         | NNRC.NNRCGroupBy g sl n =>
+           pfail (* XXX How to do this best? XXX *)
        end.
 
   (** Definition with shadowing *)
 
-  Definition nrcToPat avoid (n:NNRC.nrc) : pat := nrcToPat_ns (unshadow_simpl avoid n).
+  Definition nnrcToPat avoid (n:NNRC.nnrc) : pat := nnrcToPat_ns (unshadow_simpl avoid n).
 
   (** Additional auxiliary lemmas to reason about domains and environments *)
 
-  Definition nrc_to_pat_env {A:Type} (env:list (string*A)) : list (string * A)
+  Definition nnrc_to_pat_env {A:Type} (env:list (string*A)) : list (string * A)
     := map (fun xy => (loop_var (fst xy), snd xy)) env.
 
   Require Import Eqdep_dec.
@@ -114,7 +116,7 @@ Section NNRCtoPattern.
   Lemma env_lookup_edot {A} (env:list (string*A)) (v:string) :
     NoDup (domain env) ->
      RAssoc.lookup equiv_dec env v =
-     edot (nrc_to_pat_env env) (loop_var v).
+     edot (nnrc_to_pat_env env) (loop_var v).
   Proof.
     intros nd.
     unfold edot; simpl.
@@ -137,7 +139,7 @@ Section NNRCtoPattern.
   Require Import RLift.
 
   Lemma compatible_nin v (env:list (string*data)) a :
-        ~ In v (domain env) -> RCompat.compatible (nrc_to_pat_env env) ((loop_var v, a) :: nil) = true.
+        ~ In v (domain env) -> RCompat.compatible (nnrc_to_pat_env env) ((loop_var v, a) :: nil) = true.
   Proof.
     revert v a. induction env; simpl; trivial.
     destruct a; simpl. intuition.
@@ -150,15 +152,15 @@ Section NNRCtoPattern.
     apply loop_var_inj in e. intuition.
   Qed.
 
-Lemma nrc_to_pat_nodup {A env} : 
-  NoDup (@domain _ A env) -> NoDup (domain (nrc_to_pat_env env)).
+Lemma nnrc_to_pat_nodup {A env} : 
+  NoDup (@domain _ A env) -> NoDup (domain (nnrc_to_pat_env env)).
 Proof.
   Hint Constructors NoDup.
   induction env; simpl; intuition.
   inversion H; subst.
   constructor; auto.
   destruct a; simpl in *.
-  unfold domain, nrc_to_pat_env.
+  unfold domain, nnrc_to_pat_env.
   rewrite map_map; simpl.
   rewrite in_map_iff.
   intros [x [lx ix]].
@@ -170,35 +172,35 @@ Qed.
 Lemma compatible_drec_sort_nin v (env: bindings) a :
   NoDup (domain env) ->
   ~ In v (domain env) ->
-  RCompat.compatible (rec_sort (nrc_to_pat_env env)) ((loop_var v, a) :: nil) = true.
+  RCompat.compatible (rec_sort (nnrc_to_pat_env env)) ((loop_var v, a) :: nil) = true.
 Proof.
   intros.
   eapply compatible_perm_proper_l; try eapply compatible_nin; eauto.
   - apply rec_sort_perm.
-    apply nrc_to_pat_nodup; trivial.
+    apply nnrc_to_pat_nodup; trivial.
   Qed.
 
 Require Import RSort.
 
 (* our translation does not look at the data *)
-Lemma nrcToPat_data_indep h cenv d d' b n:
-  interp h cenv (nrcToPat_ns n) b d = interp h cenv (nrcToPat_ns n) b d'.
+Lemma nnrcToPat_data_indep h cenv d d' b n:
+  interp h cenv (nnrcToPat_ns n) b d = interp h cenv (nnrcToPat_ns n) b d'.
 Proof.
   revert d d' b. 
   induction n; simpl in *; trivial; intros.
   - erewrite IHn1, IHn2; eauto; intuition.
   - erewrite IHn; eauto; intuition.
   - rewrite (IHn1 d d') by intuition.
-    destruct (interp h cenv (nrcToPat_ns n1) b d'); trivial.
+    destruct (interp h cenv (nnrcToPat_ns n1) b d'); trivial.
   - rewrite (IHn1 d d') by intuition.
-    destruct (interp h cenv (nrcToPat_ns n1) b d'); trivial.
+    destruct (interp h cenv (nnrcToPat_ns n1) b d'); trivial.
   - rewrite (IHn1 d d') by intuition.
-    destruct (interp h cenv (nrcToPat_ns n1) b d'); trivial.
+    destruct (interp h cenv (nnrcToPat_ns n1) b d'); trivial.
     destruct res; trivial.
     destruct b0; simpl;
     repeat rewrite merge_bindings_nil_r.
     + rewrite (IHn2 d d').
-       destruct (interp h cenv (nrcToPat_ns n2) (rec_sort b) d'); trivial.
+       destruct (interp h cenv (nnrcToPat_ns n2) (rec_sort b) d'); trivial.
     + apply IHn3.
   - rewrite (IHn1 d d').
     unfold bindpr. match_destr.
@@ -389,47 +391,56 @@ Require Import Permutation.
         any such variable is "free" with respect to the current environment (that is the point
         of the shadow_free predicate), so merge_bindings always succeeds.
 *)
-  Lemma nrcToPat_norecoverable_ns h cenv n env :
+Lemma nnrcToPat_norecoverable_ns h cenv n env :
+  nnrcIsCore n ->
     shadow_free n = true ->
     NoDup (domain env) ->
-    (forall x, In x (domain env) -> ~ In x (nrc_bound_vars n)) ->
-    isRecoverableError (interp h cenv (nrcToPat_ns n) (rec_sort (nrc_to_pat_env env)) dunit) = false.
+    (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
+    isRecoverableError (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env)) dunit) = false.
   Proof.
     Hint Resolve op2tpr_not_recoverable.
-
-    revert env. induction n; intros; trivial.
+    intros Hiscore.
+    revert Hiscore env. induction n; intros; trivial.
     - simpl in *.
       destruct ((edot
-                 (rec_sort (nrc_to_pat_env env))
+                 (rec_sort (nnrc_to_pat_env env))
               (loop_var v))); simpl; trivial.
-    - simpl in *; rewrite andb_true_iff in H; apply in_in_app_false in H1; intuition.
+    - simpl in *.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
+      rewrite andb_true_iff in H; apply in_in_app_false in H1; intuition.
       specialize (IHn1 _ H2 H0).
       specialize (IHn2 _ H3 H0).
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit);
-        destruct (interp h cenv (nrcToPat_ns n2) (rec_sort (nrc_to_pat_env env)) dunit); simpl; intuition.
-    - simpl in *; specialize (IHn _ H H0).
-      destruct (interp h cenv (nrcToPat_ns n) (rec_sort (nrc_to_pat_env env)) dunit); simpl; intuition.
-    -  simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
-       unfold nrcToPat_ns; fold nrcToPat_ns.
-      unfold NNRC.nrc_eval; fold NNRC.nrc_eval.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit);
+        destruct (interp h cenv (nnrcToPat_ns n2) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; intuition.
+    - simpl in *.
+      specialize (IHn Hiscore).
+      specialize (IHn _ H H0).
+      destruct (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; intuition.
+    - simpl in Hiscore.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
+      simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
+      unfold nnrcToPat_ns; fold nnrcToPat_ns.
+      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       match_destr_in H1.
       specialize (IHn1 _ H5 H0 H).
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit);
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit);
         unfold bindpr; [trivial|(elim IHn1; eauto)|idtac].
       simpl.
       unfold merge_bindings.
       rewrite (compatible_drec_sort_nin _ _ _ H0 H6).
       rewrite (drec_concat_sort_app_comm
-                 (rec_sort (nrc_to_pat_env env))
+                 (rec_sort (nnrc_to_pat_env env))
                    ((loop_var v, res) :: nil)).
       simpl.
       unfold rec_concat_sort.
       simpl. rewrite drec_sort_idempotent.
       replace (RSort.insertion_sort_insert rec_field_lt_dec 
-            (loop_var v, res) (rec_sort (nrc_to_pat_env env))) with
-      (rec_sort (nrc_to_pat_env ((v,res)::env))) by reflexivity.
-      rewrite (nrcToPat_data_indep _ _ _ dunit).
+            (loop_var v, res) (rec_sort (nnrc_to_pat_env env))) with
+      (rec_sort (nnrc_to_pat_env ((v,res)::env))) by reflexivity.
+      rewrite (nnrcToPat_data_indep _ _ _ dunit).
       apply IHn2; trivial.
       + constructor; eauto.
       + simpl; intuition; subst; eauto.
@@ -439,7 +450,7 @@ Require Import Permutation.
         * intros nin.
           unfold rec_sort in nin.
           apply drec_sort_domain in nin.
-          unfold domain, nrc_to_pat_env in nin.
+          unfold domain, nnrc_to_pat_env in nin.
           rewrite map_map in nin.
           rewrite in_map_iff in nin.
           destruct nin as [x [xeq xin]].
@@ -448,14 +459,17 @@ Require Import Permutation.
           destruct x.
           apply in_dom in xin.
           simpl in *; intuition.
-        * rewrite <- rec_sort_perm; apply nrc_to_pat_nodup; trivial.
-    -  simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
-       unfold nrcToPat_ns; fold nrcToPat_ns.
-      unfold NNRC.nrc_eval; fold NNRC.nrc_eval.
+        * rewrite <- rec_sort_perm; apply nnrc_to_pat_nodup; trivial.
+    - simpl in Hiscore.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
+      simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
+      unfold nnrcToPat_ns; fold nnrcToPat_ns.
+      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       match_destr_in H1.
       specialize (IHn1 _ H5 H0 H).
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit);
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit);
         unfold bindpr; [trivial|(elim IHn1; eauto)|idtac].
       destruct res; trivial. 
       rewrite interp_mapall; trivial.
@@ -465,17 +479,17 @@ Require Import Permutation.
       unfold merge_bindings at 1.
       rewrite (compatible_drec_sort_nin _ _ _ H0 H6).
       rewrite (drec_concat_sort_app_comm
-                 (rec_sort (nrc_to_pat_env env))
+                 (rec_sort (nnrc_to_pat_env env))
                    ((loop_var v, a) :: nil)).
       unfold rec_concat_sort.
       simpl.
       rewrite drec_sort_idempotent.
       replace (RSort.insertion_sort_insert rec_field_lt_dec 
-            (loop_var v, a) (rec_sort (nrc_to_pat_env env))) with
-      (rec_sort (nrc_to_pat_env ((v,a)::env))) by reflexivity.
+            (loop_var v, a) (rec_sort (nnrc_to_pat_env env))) with
+      (rec_sort (nnrc_to_pat_env ((v,a)::env))) by reflexivity.
       specialize (IHn2 ((v,a)::env)).
-      rewrite (nrcToPat_data_indep _ _ _ dunit).
-      destruct (interp h cenv (nrcToPat_ns n2) (rec_sort (nrc_to_pat_env ((v, a) :: env))) dunit); 
+      rewrite (nnrcToPat_data_indep _ _ _ dunit).
+      destruct (interp h cenv (nnrcToPat_ns n2) (rec_sort (nnrc_to_pat_env ((v, a) :: env))) dunit); 
         simpl in *; trivial.
       cut (true = false); [intuition|idtac].
       apply IHn2; eauto; intros ? [?|?] ?; subst; eauto.
@@ -485,7 +499,7 @@ Require Import Permutation.
       simpl. constructor.
         * intros nin. 
           apply drec_sort_domain in nin.
-          unfold domain, nrc_to_pat_env in nin.
+          unfold domain, nnrc_to_pat_env in nin.
           rewrite map_map in nin.
           rewrite in_map_iff in nin.
           destruct nin as [x [xeq xin]].
@@ -494,19 +508,27 @@ Require Import Permutation.
           destruct x.
           apply in_dom in xin.
           simpl in *; intuition.
-        * rewrite <- rec_sort_perm; apply nrc_to_pat_nodup; trivial.
-    - simpl in *; repeat rewrite andb_true_iff in *.
+        * rewrite <- rec_sort_perm; apply nnrc_to_pat_nodup; trivial.
+    - simpl in Hiscore.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
+      elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
+      simpl in *; repeat rewrite andb_true_iff in *.
       apply in_in_app_false in H1; intuition.
       apply in_in_app_false in H4; intuition.
       specialize (IHn1 _ H1 H0 H).
       specialize (IHn2 _ H5 H0 H2).
       specialize (IHn3 _ H3 H0 H6).
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit); simpl; trivial.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; trivial.
       destruct res; trivial.
       simpl in *.
       destruct b; simpl; rewrite merge_bindings_nil_r; rewrite drec_sort_idempotent; trivial.
-      destruct (interp h cenv (nrcToPat_ns n2) (rec_sort (nrc_to_pat_env env)) dunit); simpl; trivial.
-    - simpl in *. repeat rewrite andb_true_iff in *.
+      destruct (interp h cenv (nnrcToPat_ns n2) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; trivial.
+    - simpl in Hiscore.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
+      elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
+      simpl in *. repeat rewrite andb_true_iff in *.
       destruct H as [[[[nin1 nin2]sn1]sn2]sn3].
       match_destr_in nin1. match_destr_in nin2.
       apply in_in_cons_cons_app_app_false in H1; intuition.
@@ -517,20 +539,20 @@ Require Import Permutation.
         rewrite (compatible_drec_sort_nin _ _ _ H0 H3).
         specialize (IHn2 ((v, res)::env) sn2).
         rewrite (drec_concat_sort_app_comm
-                   (rec_sort (nrc_to_pat_env env))
+                   (rec_sort (nnrc_to_pat_env env))
                    ((loop_var v, res) :: nil)).
         * unfold rec_concat_sort.
           simpl in IHn2. simpl.
           rewrite drec_sort_idempotent.
-          rewrite (nrcToPat_data_indep _ _ _ dunit).
+          rewrite (nnrcToPat_data_indep _ _ _ dunit).
           match_destr.
           simpl in *. apply IHn2; auto.
           intros ? [?|?]; subst; eauto.
-        * rewrite <- rec_sort_perm by (apply nrc_to_pat_nodup; trivial).
+        * rewrite <- rec_sort_perm by (apply nnrc_to_pat_nodup; trivial).
           rewrite domain_app.
           rewrite Permutation_app_comm.
-          simpl; constructor; try apply nrc_to_pat_nodup; trivial.
-          unfold domain, nrc_to_pat_env.
+          simpl; constructor; try apply nnrc_to_pat_nodup; trivial.
+          unfold domain, nnrc_to_pat_env.
           rewrite map_map.
           rewrite in_map_iff.
           simpl.
@@ -542,21 +564,21 @@ Require Import Permutation.
         rewrite (compatible_drec_sort_nin _ _ _ H0 H5).
         specialize (IHn3 ((v0, res)::env) sn3).
         rewrite (drec_concat_sort_app_comm
-                   (rec_sort (nrc_to_pat_env env))
+                   (rec_sort (nnrc_to_pat_env env))
                    ((loop_var v0, res) :: nil)).
         * unfold rec_concat_sort.
           simpl in IHn3. simpl.
           rewrite drec_sort_idempotent.
-          rewrite (nrcToPat_data_indep _ _ _ dunit).
+          rewrite (nnrcToPat_data_indep _ _ _ dunit).
           unfold isRecoverableError.
           match_destr.
           simpl in *. apply IHn3; auto.
           intros ? [?|?]; subst; eauto.
-        * rewrite <- rec_sort_perm by (apply nrc_to_pat_nodup; trivial).
+        * rewrite <- rec_sort_perm by (apply nnrc_to_pat_nodup; trivial).
           rewrite domain_app.
           rewrite Permutation_app_comm.
-          simpl; constructor; try apply nrc_to_pat_nodup; trivial.
-          unfold domain, nrc_to_pat_env.
+          simpl; constructor; try apply nnrc_to_pat_nodup; trivial.
+          unfold domain, nnrc_to_pat_env.
           rewrite map_map.
           rewrite in_map_iff.
           simpl.
@@ -564,21 +586,26 @@ Require Import Permutation.
           apply loop_var_inj in eqq. subst.
           destruct x. apply H5.
           apply (in_dom H4).
+    - simpl in Hiscore; contradiction. (* GroupBy Case nnrcIsCore is False *)
   Qed.
 
-  Lemma nrcToPat_norecoverable_top_ns h cenv n :
+  Lemma nnrcToPat_norecoverable_top_ns h cenv n :
+    nnrcIsCore n ->
     shadow_free n = true ->
-    isRecoverableError (interp h cenv (nrcToPat_ns n) nil dunit) = false.
+    isRecoverableError (interp h cenv (nnrcToPat_ns n) nil dunit) = false.
   Proof.
     intros.
-    generalize (nrcToPat_norecoverable_ns h cenv n nil); simpl; auto.
+    generalize (nnrcToPat_norecoverable_ns h cenv n nil); simpl; auto.
   Qed.
 
-  Theorem nrcToPat_norecoverable_top h cenv avoid n :
-    isRecoverableError (interp h cenv (nrcToPat avoid n) nil dunit) = false.
+  Theorem nnrcToPat_norecoverable_top h cenv avoid n :
+    nnrcIsCore n ->
+    isRecoverableError (interp h cenv (nnrcToPat avoid n) nil dunit) = false.
   Proof.
-    generalize (nrcToPat_norecoverable_top_ns h cenv (unshadow_simpl avoid n)
-               (unshadow_shadow_free _ _ _ _)); intros H.
+    intros Hiscore.
+    generalize (unshadow_simpl_preserve_core avoid n Hiscore); intros.
+    generalize (nnrcToPat_norecoverable_top_ns h cenv (unshadow_simpl avoid n)
+               H (unshadow_shadow_free _ _ _ _)); intros.
     trivial.
   Qed.
 
@@ -588,10 +615,10 @@ Require Import Permutation.
     destruct pr; trivial.
   Qed.
 
-  Lemma in_loop_var_nrc_to_pat_env {B} v (env:list (string*B)) :
-   In (loop_var v) (domain (nrc_to_pat_env env)) <-> In v (domain env).
+  Lemma in_loop_var_nnrc_to_pat_env {B} v (env:list (string*B)) :
+   In (loop_var v) (domain (nnrc_to_pat_env env)) <-> In v (domain env).
   Proof.
-    unfold domain, nrc_to_pat_env.
+    unfold domain, nnrc_to_pat_env.
     rewrite map_map.
     repeat rewrite in_map_iff.
     split; intros inn; destruct inn as [x [xeq xin]]; simpl in *; subst.
@@ -601,71 +628,74 @@ Require Import Permutation.
 
   (** Note that since the translation never yields recoverable errors, 
       any errors are terminal, which nicely aligns with errors in NNRC (which are terminal) *)
-  Lemma nrcToPat_sem_correct_ns h cenv n env :
+  Lemma nnrcToPat_sem_correct_ns h cenv n env :
+    nnrcIsCore n ->
     shadow_free n = true ->
     NoDup (domain env) ->
-    (forall x, In x (domain env) -> ~ In x (nrc_bound_vars n)) ->
-    NNRC.nrc_eval h env n = pr2op (interp h cenv (nrcToPat_ns n) (rec_sort (nrc_to_pat_env env)) dunit).
+    (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
+    NNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env)) dunit).
   Proof.
-    revert env. induction n; intros; trivial.
+    intros HisCore.
+    revert HisCore env; induction n; intro Hiscore; intros; trivial.
     - simpl in *.
-
       simpl.
       rewrite env_lookup_edot; trivial.
-      generalize (nrc_to_pat_nodup H0); intros nd.
+      generalize (nnrc_to_pat_nodup H0); intros nd.
       generalize (rec_sort_perm _ nd); intros p.
       rewrite <- (edot_nodup_perm _ _ _ nd p).
-      destruct (edot (nrc_to_pat_env env) (loop_var v)); trivial.
+      destruct (edot (nnrc_to_pat_env env) (loop_var v)); trivial.
     - simpl in *.
-      rewrite andb_true_iff in H; apply in_in_app_false in H1; intuition.
-      rewrite IHn1, IHn2; trivial.
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit); simpl; trivial.
-      destruct (interp h cenv (nrcToPat_ns n2) (rec_sort (nrc_to_pat_env env)) dunit); simpl; trivial.
+      rewrite andb_true_iff in H; apply in_in_app_false in H1.
+      rewrite IHn1, IHn2; trivial; intuition.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; trivial.
+      destruct (interp h cenv (nnrcToPat_ns n2) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; trivial.
       rewrite pr2op_op2tpr; trivial.
     - simpl in *. 
       rewrite IHn; trivial.
-      destruct (interp h cenv (nrcToPat_ns n) (rec_sort (nrc_to_pat_env env))); simpl; trivial.
+      destruct (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env))); simpl; trivial.
       rewrite pr2op_op2tpr; trivial.
-    - unfold nrcToPat_ns; fold nrcToPat_ns.
-      unfold NNRC.nrc_eval; fold NNRC.nrc_eval.
+    - unfold nnrcToPat_ns; fold nnrcToPat_ns.
+      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       simpl in H, H1; repeat rewrite andb_true_iff in H; 
         apply in_in_cons_app_false in H1; intuition.
-      destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+      destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
        intuition.
       rewrite IHn1; trivial.
       simpl.
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env))  dunit);
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env))  dunit);
         [intuition|intuition|idtac]. simpl.
       rewrite IHn2; trivial. simpl.
       unfold merge_bindings.
       rewrite (compatible_drec_sort_nin _ _ _ H0 H6).
       simpl.
       rewrite (drec_concat_sort_app_comm 
-                 (rec_sort (nrc_to_pat_env env))
+                 (rec_sort (nnrc_to_pat_env env))
                  ((loop_var v, res) :: nil)).
       unfold rec_concat_sort.
       simpl.
       rewrite drec_sort_idempotent.
-      rewrite (nrcToPat_data_indep _ _ res dunit); trivial.
+      rewrite (nnrcToPat_data_indep _ _ res dunit); trivial.
       rewrite domain_app.
       rewrite Permutation_app_comm.
       simpl. constructor.
-      * rewrite in_dom_rec_sort, in_loop_var_nrc_to_pat_env; trivial.
-      * rewrite <- rec_sort_perm; apply nrc_to_pat_nodup; trivial.
+      * rewrite in_dom_rec_sort, in_loop_var_nnrc_to_pat_env; trivial.
+      * rewrite <- rec_sort_perm; apply nnrc_to_pat_nodup; trivial.
+      * simpl in Hiscore. intuition.
       * simpl; constructor; trivial.
       * simpl in *. eauto; intros ? [?|?] ?; subst; eauto.
+      * simpl in Hiscore. intuition.
     - (* need to be careful about simplifications, since we want to
           reason about mapall, which is a definition *)
-      unfold nrcToPat_ns; fold nrcToPat_ns.
-      unfold NNRC.nrc_eval; fold NNRC.nrc_eval.
+      unfold nnrcToPat_ns; fold nnrcToPat_ns.
+      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       simpl in H, H1; repeat rewrite andb_true_iff in H; 
         apply in_in_cons_app_false in H1; intuition.
-      destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+      destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
        intuition.
       rewrite IHn1; trivial.
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env))  dunit);
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env))  dunit);
         [intuition|intuition|idtac].
       unfold pr2op at 1.
       destruct res; trivial. unfold bindpr.
@@ -679,49 +709,57 @@ Require Import Permutation.
         rewrite (compatible_drec_sort_nin _ _ _ H0 H6).
         simpl.
         rewrite (drec_concat_sort_app_comm 
-                   (rec_sort (nrc_to_pat_env env))
+                   (rec_sort (nnrc_to_pat_env env))
                    ((loop_var v, a) :: nil)).
         unfold rec_concat_sort.
         simpl.
         rewrite drec_sort_idempotent.
-        rewrite (nrcToPat_data_indep h _ a dunit); trivial.
-        destruct ((interp h cenv (nrcToPat_ns n2)
+        rewrite (nnrcToPat_data_indep h _ a dunit); trivial.
+        destruct ((interp h cenv (nnrcToPat_ns n2)
           (RSort.insertion_sort_insert rec_field_lt_dec 
-             (loop_var v, a) (rec_sort (nrc_to_pat_env env))) dunit)); simpl; trivial;
+             (loop_var v, a) (rec_sort (nnrc_to_pat_env env))) dunit)); simpl; trivial;
           destruct (prmapM
                       (map
             (fun d : data =>
              match
-               merge_bindings (rec_sort (nrc_to_pat_env env))
+               merge_bindings (rec_sort (nnrc_to_pat_env env))
                               ((loop_var v, d) :: nil)
              with
-             | Some bind' => interp h cenv (nrcToPat_ns n2) bind' d
+             | Some bind' => interp h cenv (nnrcToPat_ns n2) bind' d
              | None => RecoverableError 
              end) l)); simpl; trivial.
         rewrite domain_app.
         rewrite Permutation_app_comm.
         simpl. constructor.
-        * rewrite in_dom_rec_sort, in_loop_var_nrc_to_pat_env; trivial.
-        * rewrite <- rec_sort_perm; apply nrc_to_pat_nodup; trivial.
+        * rewrite in_dom_rec_sort, in_loop_var_nnrc_to_pat_env; trivial.
+        * rewrite <- rec_sort_perm; apply nnrc_to_pat_nodup; trivial.
+      + simpl in Hiscore; intuition.
       + simpl; constructor; trivial.
       + simpl in *. eauto; intros ? [?|?] ?; subst; eauto.
+      + simpl in Hiscore; intuition.
     - simpl in *; repeat rewrite andb_true_iff in *.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
+      elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
       apply in_in_app_false in H1; intuition.
       apply in_in_app_false in H4; intuition.
       rewrite IHn1, IHn2, IHn3; trivial.
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit); simpl; trivial.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit); simpl; trivial.
       simpl. destruct res; trivial.
       destruct b; simpl;
       rewrite merge_bindings_nil_r; rewrite drec_sort_idempotent; trivial.
-      destruct (interp h cenv (nrcToPat_ns n2) (rec_sort (nrc_to_pat_env env)) dunit); trivial.
+      destruct (interp h cenv (nnrcToPat_ns n2) (rec_sort (nnrc_to_pat_env env)) dunit); trivial.
     - simpl in *.
+      elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
+      elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
+      specialize (IHn1 Hcore1); specialize (IHn2 Hcore2); specialize (IHn3 Hcore3).
       simpl in *. repeat rewrite andb_true_iff in *.
       destruct H as [[[[nin1 nin2]sn1]sn2]sn3].
       match_destr_in nin1. match_destr_in nin2.
       apply in_in_cons_cons_app_app_false in H1; [| intuition.. ].
       rewrite IHn1 by intuition.
       unfold pr2op, bindpr.
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort (nrc_to_pat_env env)) dunit); trivial.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort (nnrc_to_pat_env env)) dunit); trivial.
       destruct H1 as [?[?[?[??]]]].
       destruct res; trivial.
       + rewrite IHn2; trivial.
@@ -729,18 +767,18 @@ Require Import Permutation.
            unfold merge_bindings .
            rewrite (compatible_drec_sort_nin _ _ _ H0 H3).
            rewrite (drec_concat_sort_app_comm 
-                      (rec_sort (nrc_to_pat_env env))
+                      (rec_sort (nnrc_to_pat_env env))
                       ((loop_var v, res) :: nil)).
            unfold rec_concat_sort.
            simpl.
            rewrite drec_sort_idempotent.
-           rewrite (nrcToPat_data_indep h _ res dunit); trivial.
+           rewrite (nnrcToPat_data_indep h _ res dunit); trivial.
            match_destr.
            rewrite <- rec_sort_perm, domain_app, Permutation_app_comm.
            simpl. constructor; trivial.
-           rewrite in_loop_var_nrc_to_pat_env; trivial.
-           apply nrc_to_pat_nodup; trivial.
-           apply nrc_to_pat_nodup; trivial.
+           rewrite in_loop_var_nnrc_to_pat_env; trivial.
+           apply nnrc_to_pat_nodup; trivial.
+           apply nnrc_to_pat_nodup; trivial.
          * constructor; trivial.
          * simpl. intros ? [?|?] inn; subst; eauto.
       + rewrite IHn3; trivial.
@@ -748,44 +786,47 @@ Require Import Permutation.
            unfold merge_bindings .
            rewrite (compatible_drec_sort_nin _ _ _ H0 H4).
            rewrite (drec_concat_sort_app_comm 
-                      (rec_sort (nrc_to_pat_env env))
+                      (rec_sort (nnrc_to_pat_env env))
                       ((loop_var v0, res) :: nil)).
            unfold rec_concat_sort.
            simpl.
            rewrite drec_sort_idempotent.
-           rewrite (nrcToPat_data_indep h _ res dunit); trivial.
+           rewrite (nnrcToPat_data_indep h _ res dunit); trivial.
            rewrite <- rec_sort_perm, domain_app, Permutation_app_comm.
            simpl. constructor; trivial.
-           rewrite in_loop_var_nrc_to_pat_env; trivial.
-           apply nrc_to_pat_nodup; trivial.
-           apply nrc_to_pat_nodup; trivial.
+           rewrite in_loop_var_nnrc_to_pat_env; trivial.
+           apply nnrc_to_pat_nodup; trivial.
+           apply nnrc_to_pat_nodup; trivial.
          * constructor; trivial.
          * simpl. intros ? [?|?] inn; subst; eauto.
   Qed.
 
-  Lemma nrcToPat_sem_correct_top_ns h cenv n :
+  Lemma nnrcToPat_sem_correct_top_ns h cenv n :
+    nnrcIsCore n ->
     shadow_free n = true ->
-    NNRC.nrc_eval h nil n = pr2op (interp h cenv (nrcToPat_ns n) nil dunit).
+    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_ns n) nil dunit).
   Proof.
     intros.
-    apply nrcToPat_sem_correct_ns; simpl; auto.
+    apply nnrcToPat_sem_correct_ns; simpl; auto.
   Qed.
 
-  Theorem nrcToPat_sem_correct_top h cenv avoid n :
-    NNRC.nrc_eval h nil n = pr2op (interp h cenv (nrcToPat avoid n) nil dunit).
+  Theorem nnrcToPat_sem_correct_top h cenv avoid n :
+    nnrcIsCore n ->
+    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat avoid n) nil dunit).
   Proof.
-    generalize (nrcToPat_sem_correct_top_ns h cenv (unshadow_simpl avoid n)
-               (unshadow_shadow_free _ _ _ _)); intros H.
-    unfold nrcToPat.
-    unfold unshadow_simpl in H.
-    rewrite unshadow_eval in H. trivial.
+    intro Hiscore.
+    generalize (unshadow_simpl_preserve_core avoid n Hiscore); intros.
+    generalize (nnrcToPat_sem_correct_top_ns h cenv (unshadow_simpl avoid n)
+                                             H (unshadow_shadow_free _ _ _ _)); intros.
+    unfold nnrcToPat.
+    unfold unshadow_simpl in H0.
+    rewrite unshadow_eval in H0. trivial.
   Qed.
 
 Section trans_let.
 
   Section fresh.
     Require Import Datatypes List.
-
 
   Definition option_to_list {A:Type} (o:option A) 
     := match o with
@@ -983,145 +1024,146 @@ Hint Rewrite
     (pletEnv (punop ACount pit ≐ punop ACount (lookup freshVar))
     (lookup freshVar))))%rule.
 
-  Fixpoint nrcToPat_ns_let (n:NNRC.nrc) : pat
+  Fixpoint nnrcToPat_ns_let (n:NNRC.nnrc) : pat
     := match n with
-         | NNRC.NRCVar v => lookup (loop_var v)
-         | NNRC.NRCConst d => pconst d
-         | NNRC.NRCBinop op n1 n2 => pbinop op (nrcToPat_ns_let n1) (nrcToPat_ns_let n2)
-         | NNRC.NRCUnop op n1 => punop op (nrcToPat_ns_let n1)
+         | NNRC.NNRCVar v => lookup (loop_var v)
+         | NNRC.NNRCConst d => pconst d
+         | NNRC.NNRCBinop op n1 n2 => pbinop op (nnrcToPat_ns_let n1) (nnrcToPat_ns_let n2)
+         | NNRC.NNRCUnop op n1 => punop op (nnrcToPat_ns_let n1)
 
-         | NNRC.NRCLet v bind body => 
-           pletIt (nrcToPat_ns_let bind)
+         | NNRC.NNRCLet v bind body => 
+           pletIt (nnrcToPat_ns_let bind)
                      (pletEnv (pvar (loop_var v))
-                            (nrcToPat_ns_let body))
-         | NNRC.NRCFor v iter body => 
-           pletIt (nrcToPat_ns_let iter)
+                            (nnrcToPat_ns_let body))
+         | NNRC.NNRCFor v iter body => 
+           pletIt (nnrcToPat_ns_let iter)
                  (mapall_let
                     (pletEnv (pvar (loop_var v))
-                             (nrcToPat_ns_let body)))
+                             (nnrcToPat_ns_let body)))
                  
-         | NNRC.NRCIf c n1 n2 =>
-           let ctrans := (nrcToPat_ns_let c) in
-           let n1trans := (nrcToPat_ns_let n1) in
-           let n2trans := (nrcToPat_ns_let n2) in
+         | NNRC.NNRCIf c n1 n2 =>
+           let ctrans := (nnrcToPat_ns_let c) in
+           let n1trans := (nnrcToPat_ns_let n1) in
+           let n2trans := (nnrcToPat_ns_let n2) in
            let freshVar := fresh_let_var "if$" (let_vars ctrans ++ let_vars n1trans ++ let_vars n2trans) in
            pletEnv (punop (ARec freshVar) ctrans)
            (porElse 
              (pand (pbinop AAnd ‵true (lookup freshVar)) n1trans)
              (* it could have failed because of n1, but then this will also fail *)
              (pand (punop ANeg (lookup freshVar)) n2trans))
-         | NNRC.NRCEither nd xl nl xr nr =>
-           pletIt (nrcToPat_ns_let nd)
-                  (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nrcToPat_ns_let nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nrcToPat_ns_let nr))))
-
+         | NNRC.NNRCEither nd xl nl xr nr =>
+           pletIt (nnrcToPat_ns_let nd)
+                  (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nnrcToPat_ns_let nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nnrcToPat_ns_let nr))))
+         | NNRC.NNRCGroupBy g sl n =>
+           pfail
        end.
 
-  Definition nrcToPat_let avoid (n:NNRC.nrc) : pat 
-    := nrcToPat_ns_let (unshadow_simpl avoid n).
+  Definition nnrcToPat_let avoid (n:NNRC.nnrc) : pat 
+    := nnrcToPat_ns_let (unshadow_simpl avoid n).
 
-Lemma loop_let_var_distinct x y :
-  loop_var x <> let_var y.
-Proof.
-  inversion 1.
-Qed.
+  Lemma loop_let_var_distinct x y :
+    loop_var x <> let_var y.
+  Proof.
+    inversion 1.
+  Qed.
 
-Instance In_equivlist_proper {A}:
-  Proper (eq ==> equivlist ==> iff) (@In A).
-Proof.
-  unfold Proper, respectful, equivlist; intros; subst; trivial.
-Qed.
+  Instance In_equivlist_proper {A}:
+    Proper (eq ==> equivlist ==> iff) (@In A).
+  Proof.
+    unfold Proper, respectful, equivlist; intros; subst; trivial.
+  Qed.
 
-Lemma interp_nrcToPat_ns_ignored_let_binding h cenv b x xv d n :
+  Lemma interp_nnrcToPat_ns_ignored_let_binding h cenv b x xv d n :
     shadow_free n = true ->
     RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
-    fresh_bindings (domain b) (nrcToPat_ns n) ->
-    (forall x, In x (domain b) -> ~ In x (map loop_var (nrc_bound_vars n))) ->
+    fresh_bindings (domain b) (nnrcToPat_ns n) ->
+    (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     NoDup (domain b) ->
-    ~ In (let_var x) (let_vars (nrcToPat_ns n)) ->
+    ~ In (let_var x) (let_vars (nnrcToPat_ns n)) ->
     ~ In (let_var x) (domain b) ->
-    (interp h cenv (nrcToPat_ns n)
-           (rec_concat_sort b
-                            ((let_var x, xv)::nil)) d)
+    (interp h cenv (nnrcToPat_ns n)
+            (rec_concat_sort b
+                             ((let_var x, xv)::nil)) d)
     = 
-           (interp h cenv (nrcToPat_ns n)
-           (rec_sort b) d).
-Proof.
-  Hint Resolve loop_let_var_distinct.
-  revert b x xv d.
-  induction n; intros; trivial; simpl in H0;
-   autorewrite with fresh_bindings in H0.
-  - simpl in *; unfold rec_concat_sort.
-    unfold edot.
-    repeat rewrite drec_sort_idempotent.
-    rewrite (@assoc_lookupr_drec_sort_app_nin string ODT_string); simpl; intuition.
-    eapply loop_let_var_distinct; eauto.
-  - simpl in *;
-    rewrite andb_true_iff in *; intuition.
-    autorewrite with fresh_bindings in *. intuition.
-    rewrite IHn1; intuition.
-    rewrite IHn2; intuition.
-    apply (H2 x0); eauto.
-    rewrite map_app, in_app_iff; intuition.
-    apply (H2 x0); eauto.
-    rewrite map_app, in_app_iff; intuition.
-  - autorewrite with fresh_bindings in *. intuition.
-    simpl in *; rewrite IHn; intuition.
-    unfold fresh_bindings in *; simpl in *; intros.
-    intro nin; apply (H1 _ H6).
-    destruct u; intuition.
-  - unfold nrcToPat_ns; fold nrcToPat_ns.
-    repeat rewrite interp_pletIt_eq.
-    simpl in H, H1,H2,H4. repeat rewrite andb_true_iff in H.
-    rewrite map_app in H2.
-    apply in_in_cons_app_false in H2.
-    repeat rewrite nin_app_or in H4. simpl in H4. 
-    autorewrite with fresh_bindings in *.
-    intuition.
-    rewrite IHn1; trivial.
-    destruct (interp h cenv (nrcToPat_ns n1) (rec_sort b) d); simpl; trivial.
-    destruct (in_dec string_eqdec v (nrc_bound_vars n2)); try discriminate.
-    repeat rewrite merge_bindings_single_nin; trivial.
-    rewrite drec_concat_sort_pullout; auto.
-    rewrite IHn2; trivial.
-    simpl.
-    rewrite drec_sort_drec_sort_concat.
-    rewrite rec_sorted_id; eauto.
-    unfold rec_concat_sort in *.
-    * autorewrite with fresh_bindings; simpl; intuition.
-      unfold fresh_bindings; simpl; intuition.
-      eelim loop_let_var_distinct; eauto.
-    * intros.
+    (interp h cenv (nnrcToPat_ns n)
+            (rec_sort b) d).
+  Proof.
+    Hint Resolve loop_let_var_distinct.
+    revert b x xv d.
+    induction n; intros; trivial; simpl in H0;
+    autorewrite with fresh_bindings in H0.
+    - simpl in *; unfold rec_concat_sort.
+      unfold edot.
+      repeat rewrite drec_sort_idempotent.
+      rewrite (@assoc_lookupr_drec_sort_app_nin string ODT_string); simpl; intuition.
+      eapply loop_let_var_distinct; eauto.
+    - simpl in *;
+      rewrite andb_true_iff in *; intuition.
+      autorewrite with fresh_bindings in *. intuition.
+      rewrite IHn1; intuition.
+      rewrite IHn2; intuition.
+      apply (H2 x0); eauto.
+      rewrite map_app, in_app_iff; intuition.
+      apply (H2 x0); eauto.
+      rewrite map_app, in_app_iff; intuition.
+    - autorewrite with fresh_bindings in *. intuition.
+      simpl in *; rewrite IHn; intuition.
+      unfold fresh_bindings in *; simpl in *; intros.
+      intro nin; apply (H1 _ H6).
+      destruct u; intuition.
+    - unfold nnrcToPat_ns; fold nnrcToPat_ns.
+      repeat rewrite interp_pletIt_eq.
+      simpl in H, H1,H2,H4. repeat rewrite andb_true_iff in H.
+      rewrite map_app in H2.
+      apply in_in_cons_app_false in H2.
+      repeat rewrite nin_app_or in H4. simpl in H4. 
+      autorewrite with fresh_bindings in *.
+      intuition.
+      rewrite IHn1; trivial.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort b) d); simpl; trivial.
+      destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); try discriminate.
+      repeat rewrite merge_bindings_single_nin; trivial.
+      rewrite drec_concat_sort_pullout; auto.
+      rewrite IHn2; trivial.
+      simpl.
+      rewrite drec_sort_drec_sort_concat.
+      rewrite rec_sorted_id; eauto.
       unfold rec_concat_sort in *.
-      rewrite drec_sort_equiv_domain in H10.
-      rewrite domain_app in H10. simpl in H10.
-      rewrite in_app_iff in H10. simpl in H10.
-      destruct H10 as [?|[?|?]]; [eauto|idtac|trivial].
-      subst. apply n.
-      apply in_map_iff in H15.
-      destruct H15 as [vv [vveq vvin]].
-      apply loop_var_inj in vveq; subst. intuition.
-        * cut (NoDup (domain (b ++ (loop_var v, res) :: nil))); intros.
-          unfold rec_concat_sort; rewrite <- rec_sort_perm; trivial.
-          rewrite domain_app.
-          rewrite Permutation_app_comm.
-          simpl.
-          constructor; auto.
-        * unfold rec_concat_sort.
-          rewrite drec_sort_equiv_domain.
-          rewrite domain_app, in_app_iff.
-          simpl.
-          intuition.
-        * constructor; simpl. intuition.
-          constructor; simpl; intuition.
-        * intro nin. rewrite drec_sort_equiv_domain in nin. auto.
-        * intro nin. unfold rec_concat_sort in nin.
-          rewrite drec_sort_equiv_domain in nin.
-          rewrite domain_app, in_app_iff in nin.
-          simpl in nin.
-          intuition.
-  - (* need to be careful about simplifications, since we want to
+      * autorewrite with fresh_bindings; simpl; intuition.
+        unfold fresh_bindings; simpl; intuition.
+        eelim loop_let_var_distinct; eauto.
+      * intros.
+        unfold rec_concat_sort in *.
+        rewrite drec_sort_equiv_domain in H10.
+        rewrite domain_app in H10. simpl in H10.
+        rewrite in_app_iff in H10. simpl in H10.
+        destruct H10 as [?|[?|?]]; [eauto|idtac|trivial].
+        subst. apply n.
+        apply in_map_iff in H15.
+        destruct H15 as [vv [vveq vvin]].
+        apply loop_var_inj in vveq; subst. intuition.
+      * cut (NoDup (domain (b ++ (loop_var v, res) :: nil))); intros.
+        unfold rec_concat_sort; rewrite <- rec_sort_perm; trivial.
+        rewrite domain_app.
+        rewrite Permutation_app_comm.
+        simpl.
+        constructor; auto.
+      * unfold rec_concat_sort.
+        rewrite drec_sort_equiv_domain.
+        rewrite domain_app, in_app_iff.
+        simpl.
+        intuition.
+      * constructor; simpl. intuition.
+        constructor; simpl; intuition.
+      * intro nin. rewrite drec_sort_equiv_domain in nin. auto.
+      * intro nin. unfold rec_concat_sort in nin.
+        rewrite drec_sort_equiv_domain in nin.
+        rewrite domain_app, in_app_iff in nin.
+        simpl in nin.
+        intuition.
+    - (* need to be careful about simplifications, since we want to
           reason about mapall, which is a definition *)
-      unfold nrcToPat_ns; fold nrcToPat_ns.
+      unfold nnrcToPat_ns; fold nnrcToPat_ns.
       repeat rewrite interp_pletIt_eq.
       simpl in H, H1,H2,H4. repeat rewrite andb_true_iff in H.
       rewrite map_app in H2.
@@ -1138,7 +1180,7 @@ Proof.
                                   destruct H4 as [x H4]).
       destruct H2 as [?[??]].
       rewrite IHn1; trivial.
-      destruct (interp h cenv (nrcToPat_ns n1) (rec_sort b) d); try reflexivity.
+      destruct (interp h cenv (nnrcToPat_ns n1) (rec_sort b) d); try reflexivity.
       unfold bindpr.
       destruct res; try reflexivity.
       repeat rewrite interp_mapall by intuition.
@@ -1148,7 +1190,7 @@ Proof.
       apply RList.Forall2_refl.
       red; intros.
       simpl.
-      destruct (in_dec string_eqdec v (nrc_bound_vars n2)); try discriminate.
+      destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); try discriminate.
       repeat rewrite merge_bindings_single_nin; trivial.
       rewrite drec_concat_sort_pullout; auto.
       rewrite IHn2; trivial.
@@ -1187,244 +1229,244 @@ Proof.
         rewrite domain_app, in_app_iff in nin.
         simpl in nin.
         intuition.
-  - simpl in *.
-    repeat rewrite andb_true_iff in *.
-    repeat rewrite map_app in H2.
-    apply in_in_app_false in H2.
-    destruct H2 as [? HH].
-    repeat rewrite nin_app_or in H4.
-    autorewrite with fresh_bindings in *. 
-    apply in_in_app_false in HH.
-    destruct H4 as [[??][??]].
-    destruct H as [[??]?].
-    destruct H1 as [[[??]?][[??]?]].
-    specialize (IHn1 b x xv d).
-    rewrite IHn1 by intuition.
-    destruct ((interp h cenv (nrcToPat_ns n1) (rec_sort b) d));
-      simpl in *; intuition.
-    destruct res; simpl; trivial.
-    destruct b0; simpl; 
-    repeat rewrite merge_bindings_nil_r.
-    + rewrite drec_sort_drec_sort_concat, drec_sort_idempotent.
-      specialize (IHn2 b x xv d).
-      rewrite IHn2 by intuition.
-      destruct  (interp h cenv (nrcToPat_ns n2) (rec_sort b) d); simpl in *; intuition.
-    + rewrite drec_sort_drec_sort_concat, drec_sort_idempotent.
-      specialize (IHn3 b x xv d).
-      rewrite IHn3 by intuition.
-      trivial.
-  - simpl in *.
-    repeat rewrite andb_true_iff in *.
-    destruct H as [[[[inv inv0]sn1]sn2]sn3].
-    match_destr_in inv; match_destr_in inv0.
-    autorewrite with fresh_bindings in H1.
-    destruct H1 as [?[[?[??]][?[??]]]].
-    rewrite in_app_iff in H4.
-    rewrite IHn1; trivial.
-    + {unfold bindpr. match_destr; simpl; trivial. destruct res; simpl; trivial.
-       - repeat rewrite merge_bindings_single_nin; trivial.
-         cut ( (rec_concat_sort (rec_concat_sort b ((let_var x, xv) :: nil))
-                                   ((loop_var v, res) :: nil)) =
-         (rec_concat_sort (rec_concat_sort b ((loop_var v, res)::nil))
-                          ((let_var x, xv) :: nil))).
-         + intros re1; rewrite re1.
-           specialize (IHn2 (rec_concat_sort b ((loop_var v, res)::nil)) x xv res).
-           cut_to IHn2; trivial.
-           * rewrite drec_sort_drec_sort_concat in IHn2.
-             unfold rec_concat_sort in IHn2 |- *.
-             repeat rewrite rec_sort_rec_sort_app1 in IHn2.
-             repeat rewrite rec_sort_rec_sort_app1.
-             destruct  (interp h cenv (nrcToPat_ns n2)
-              (rec_sort
-                 ((b ++ (loop_var v, res) :: nil) ++ (let_var x, xv) :: nil))
-              res);
-               destruct (interp h cenv (nrcToPat_ns n2)
-                                (rec_sort (b ++ (loop_var v, res) :: nil)) res);
-               simpl in *; intuition.
-           * apply (drec_concat_sort_sorted (odt:=ODT_string)).
-           * unfold rec_concat_sort.
-             rewrite fresh_bindings_domain_drec_sort,
-                        domain_app, fresh_bindings_app.
-             split; trivial; simpl.
-             unfold fresh_bindings; intros.
-             simpl in H11.
-             destruct H11; [ | intuition ].
-             eelim loop_let_var_distinct.
-             eauto.
-           * intros ? inn.
-             unfold rec_concat_sort in inn.
-             rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
-             simpl in inn.
-             destruct inn as [?|[?|?]].
-             specialize (H2 _ H11).
-             repeat rewrite map_app, in_app_iff in H2.
-             repeat (apply not_or in H2; let x := fresh "GG" in
-                                  destruct H2 as [x H2]).
-             trivial.
-             subst.
-             rewrite in_map_iff.
-             intros [?[injj ?]].
-             apply loop_var_inj in injj; subst. eauto.
-             intuition.
-           * unfold rec_concat_sort.
-             rewrite <- rec_sort_perm; trivial;
-             rewrite domain_app;
-             rewrite Permutation_app_comm;
-             simpl; constructor; auto 1;
-             intro inn; specialize (H2 _ inn);
-             apply not_or in H2; intuition.
-           * simpl in H4.
-             repeat (apply not_or in H4; let x := fresh "GG" in
-                                         destruct H4 as [x H4]).
-             repeat rewrite in_app_iff in H4.
-             apply not_or in H4. destruct H4 as [? ?].
-             trivial.
-           * unfold rec_concat_sort.
-             rewrite in_dom_rec_sort, domain_app, in_app_iff.
-             repeat rewrite map_app in H2.
-             simpl. destruct 1 as [inn|[inn|?]]; trivial.
-             specialize (H2 _ inn);
-             repeat (apply not_or in H2; let x := fresh "GG" in
-                                         destruct H2 as [x H2];
-                     repeat rewrite in_app_iff in H2).
-             congruence.
-             eapply loop_let_var_distinct; eauto.
-         + unfold rec_concat_sort.
-           repeat rewrite rec_sort_rec_sort_app1.
-           apply drec_sort_perm_eq.
-           * repeat rewrite domain_app; simpl.
-             rewrite Permutation_app_comm.
-             constructor.
-             simpl; rewrite in_app_iff; simpl; intros [inn|[inn|?]]; trivial.
-             specialize (H2 _ inn).
-             repeat (apply not_or in H2; let x := fresh "GG" in
-                                         destruct H2 as [x H2];
-                                           repeat rewrite in_app_iff in H2).
-             congruence.
-             eapply loop_let_var_distinct; eauto.
-             rewrite Permutation_app_comm.
-             constructor; trivial.
-           * repeat rewrite app_ass. apply Permutation_app; trivial.
-              apply Permutation_app_comm.
-         + rewrite in_dom_rec_sort. intros inn; specialize (H2 _ inn).
+    - simpl in *.
+      repeat rewrite andb_true_iff in *.
+      repeat rewrite map_app in H2.
+      apply in_in_app_false in H2.
+      destruct H2 as [? HH].
+      repeat rewrite nin_app_or in H4.
+      autorewrite with fresh_bindings in *. 
+      apply in_in_app_false in HH.
+      destruct H4 as [[??][??]].
+      destruct H as [[??]?].
+      destruct H1 as [[[??]?][[??]?]].
+      specialize (IHn1 b x xv d).
+      rewrite IHn1 by intuition.
+      destruct ((interp h cenv (nnrcToPat_ns n1) (rec_sort b) d));
+        simpl in *; intuition.
+      destruct res; simpl; trivial.
+      destruct b0; simpl; 
+      repeat rewrite merge_bindings_nil_r.
+      + rewrite drec_sort_drec_sort_concat, drec_sort_idempotent.
+        specialize (IHn2 b x xv d).
+        rewrite IHn2 by intuition.
+        destruct  (interp h cenv (nnrcToPat_ns n2) (rec_sort b) d); simpl in *; intuition.
+      + rewrite drec_sort_drec_sort_concat, drec_sort_idempotent.
+        specialize (IHn3 b x xv d).
+        rewrite IHn3 by intuition.
+        trivial.
+    - simpl in *.
+      repeat rewrite andb_true_iff in *.
+      destruct H as [[[[inv inv0]sn1]sn2]sn3].
+      match_destr_in inv; match_destr_in inv0.
+      autorewrite with fresh_bindings in H1.
+      destruct H1 as [?[[?[??]][?[??]]]].
+      rewrite in_app_iff in H4.
+      rewrite IHn1; trivial.
+      + {unfold bindpr. match_destr; simpl; trivial. destruct res; simpl; trivial.
+         - repeat rewrite merge_bindings_single_nin; trivial.
+           cut ( (rec_concat_sort (rec_concat_sort b ((let_var x, xv) :: nil))
+                                  ((loop_var v, res) :: nil)) =
+                 (rec_concat_sort (rec_concat_sort b ((loop_var v, res)::nil))
+                                  ((let_var x, xv) :: nil))).
+           + intros re1; rewrite re1.
+             specialize (IHn2 (rec_concat_sort b ((loop_var v, res)::nil)) x xv res).
+             cut_to IHn2; trivial.
+             * rewrite drec_sort_drec_sort_concat in IHn2.
+               unfold rec_concat_sort in IHn2 |- *.
+               repeat rewrite rec_sort_rec_sort_app1 in IHn2.
+               repeat rewrite rec_sort_rec_sort_app1.
+               destruct  (interp h cenv (nnrcToPat_ns n2)
+                                 (rec_sort
+                                    ((b ++ (loop_var v, res) :: nil) ++ (let_var x, xv) :: nil))
+                                 res);
+                 destruct (interp h cenv (nnrcToPat_ns n2)
+                                  (rec_sort (b ++ (loop_var v, res) :: nil)) res);
+                 simpl in *; intuition.
+             * apply (drec_concat_sort_sorted (odt:=ODT_string)).
+             * unfold rec_concat_sort.
+               rewrite fresh_bindings_domain_drec_sort,
+               domain_app, fresh_bindings_app.
+               split; trivial; simpl.
+               unfold fresh_bindings; intros.
+               simpl in H11.
+               destruct H11; [ | intuition ].
+               eelim loop_let_var_distinct.
+               eauto.
+             * intros ? inn.
+               unfold rec_concat_sort in inn.
+               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
+               simpl in inn.
+               destruct inn as [?|[?|?]].
+               specialize (H2 _ H11).
+               repeat rewrite map_app, in_app_iff in H2.
                repeat (apply not_or in H2; let x := fresh "GG" in
-                                           destruct H2 as [x H2];
-                       repeat rewrite in_app_iff in H2).
-               congruence.
-         + unfold rec_concat_sort.
-           rewrite in_dom_rec_sort, domain_app, in_app_iff.
-           simpl.
-           intros [inn|[inn|?]]; trivial.
-           specialize (H2 _ inn).
-               repeat (apply not_or in H2; let x := fresh "GG" in
-                                           destruct H2 as [x H2];
-                       repeat rewrite in_app_iff in H2).
+                                           destruct H2 as [x H2]).
+               trivial.
+               subst.
+               rewrite in_map_iff.
+               intros [?[injj ?]].
+               apply loop_var_inj in injj; subst. eauto.
+               intuition.
+             * unfold rec_concat_sort.
+               rewrite <- rec_sort_perm; trivial;
+               rewrite domain_app;
+               rewrite Permutation_app_comm;
+               simpl; constructor; auto 1;
+               intro inn; specialize (H2 _ inn);
+               apply not_or in H2; intuition.
+             * simpl in H4.
+               repeat (apply not_or in H4; let x := fresh "GG" in
+                                           destruct H4 as [x H4]).
+               repeat rewrite in_app_iff in H4.
+               apply not_or in H4. destruct H4 as [? ?].
+               trivial.
+             * unfold rec_concat_sort.
+               rewrite in_dom_rec_sort, domain_app, in_app_iff.
+               repeat rewrite map_app in H2.
+               simpl. destruct 1 as [inn|[inn|?]]; trivial.
+               specialize (H2 _ inn);
+                 repeat (apply not_or in H2; let x := fresh "GG" in
+                                             destruct H2 as [x H2];
+                                               repeat rewrite in_app_iff in H2).
                congruence.
                eapply loop_let_var_distinct; eauto.
-       - repeat rewrite merge_bindings_single_nin; trivial.
-         cut ( (rec_concat_sort (rec_concat_sort b ((let_var x, xv) :: nil))
-                                   ((loop_var v0, res) :: nil)) =
-         (rec_concat_sort (rec_concat_sort b ((loop_var v0, res)::nil))
-                          ((let_var x, xv) :: nil))).
-         + intros re1; rewrite re1.
-           rewrite IHn3; trivial.
-           * rewrite drec_sort_drec_sort_concat.
-             unfold rec_concat_sort.
-             rewrite rec_sort_rec_sort_app1.
-             reflexivity.
-           * apply (drec_concat_sort_sorted (odt:=ODT_string)).
-           * unfold rec_concat_sort.
-             rewrite fresh_bindings_domain_drec_sort,
-                        domain_app, fresh_bindings_app.
-             split; trivial; simpl.
-             unfold fresh_bindings; intros.
-             simpl in H11.
-             destruct H11; [ | intuition ].
-             eelim loop_let_var_distinct.
-             eauto.
-           * intros ? inn.
-             unfold rec_concat_sort in inn.
-             rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
-             simpl in inn.
-             destruct inn as [?|[?|?]].
-             specialize (H2 _ H11).
-             repeat rewrite map_app, in_app_iff in H2.
-             repeat (apply not_or in H2; let x := fresh "GG" in
-                                  destruct H2 as [x H2]).
-             trivial.
-             subst.
-             rewrite in_map_iff.
-             intros [?[injj ?]].
-             apply loop_var_inj in injj; subst. eauto.
-             intuition.
-           * unfold rec_concat_sort.
-             rewrite <- rec_sort_perm; trivial;
-             rewrite domain_app;
-             rewrite Permutation_app_comm;
-             simpl; constructor; auto 1;
-             intro inn; specialize (H2 _ inn);
-             apply not_or in H2; intuition.
-           * simpl in H4.
-             repeat (apply not_or in H4; let x := fresh "GG" in
-                                         destruct H4 as [x H4]).
-             repeat rewrite in_app_iff in H4.
-             apply not_or in H4. simpl in H4. destruct H4 as [? ?].
-             apply not_or in H11. destruct H11.
-             trivial.
-           * unfold rec_concat_sort.
-             rewrite in_dom_rec_sort, domain_app, in_app_iff.
-             repeat rewrite map_app in H2.
-             simpl. destruct 1 as [inn|[inn|?]]; trivial.
-             specialize (H2 _ inn);
+           + unfold rec_concat_sort.
+             repeat rewrite rec_sort_rec_sort_app1.
+             apply drec_sort_perm_eq.
+             * repeat rewrite domain_app; simpl.
+               rewrite Permutation_app_comm.
+               constructor.
+               simpl; rewrite in_app_iff; simpl; intros [inn|[inn|?]]; trivial.
+               specialize (H2 _ inn).
+               repeat (apply not_or in H2; let x := fresh "GG" in
+                                           destruct H2 as [x H2];
+                                             repeat rewrite in_app_iff in H2).
+               congruence.
+               eapply loop_let_var_distinct; eauto.
+               rewrite Permutation_app_comm.
+               constructor; trivial.
+             * repeat rewrite app_ass. apply Permutation_app; trivial.
+               apply Permutation_app_comm.
+           + rewrite in_dom_rec_sort. intros inn; specialize (H2 _ inn).
              repeat (apply not_or in H2; let x := fresh "GG" in
                                          destruct H2 as [x H2];
-                     repeat rewrite in_app_iff in H2).
+                                           repeat rewrite in_app_iff in H2).
              congruence.
-             eapply loop_let_var_distinct; eauto.
-         + unfold rec_concat_sort.
-           repeat rewrite rec_sort_rec_sort_app1.
-           apply drec_sort_perm_eq.
-           * repeat rewrite domain_app; simpl.
-             rewrite Permutation_app_comm.
-             constructor.
-             simpl; rewrite in_app_iff; simpl; intros [inn|[inn|?]]; trivial.
+           + unfold rec_concat_sort.
+             rewrite in_dom_rec_sort, domain_app, in_app_iff.
+             simpl.
+             intros [inn|[inn|?]]; trivial.
              specialize (H2 _ inn).
              repeat (apply not_or in H2; let x := fresh "GG" in
                                          destruct H2 as [x H2];
                                            repeat rewrite in_app_iff in H2).
              congruence.
              eapply loop_let_var_distinct; eauto.
-             rewrite Permutation_app_comm.
-             constructor; trivial.
-           * repeat rewrite app_ass. apply Permutation_app; trivial.
-              apply Permutation_app_comm.
-         + rewrite in_dom_rec_sort. intros inn; specialize (H2 _ inn).
-           repeat (apply not_or in H2; let x := fresh "GG" in
-                                       destruct H2 as [x H2];
-                                         repeat rewrite in_app_iff in H2).
-           congruence.
-         + unfold rec_concat_sort.
-           rewrite in_dom_rec_sort, domain_app, in_app_iff.
-           simpl.
-           intros [inn|[inn|?]]; trivial.
-           specialize (H2 _ inn).
-           repeat (apply not_or in H2; let x := fresh "GG" in
-                                       destruct H2 as [x H2];
-                                         repeat rewrite in_app_iff in H2).
-           congruence.
-           eapply loop_let_var_distinct; eauto.
-      }
-    + intros ? inn inn2.
-       rewrite in_map_iff in inn2.
-       destruct inn2 as [? [? inn2]]; subst.
-           specialize (H2 _ inn).
+         - repeat rewrite merge_bindings_single_nin; trivial.
+           cut ( (rec_concat_sort (rec_concat_sort b ((let_var x, xv) :: nil))
+                                  ((loop_var v0, res) :: nil)) =
+                 (rec_concat_sort (rec_concat_sort b ((loop_var v0, res)::nil))
+                                  ((let_var x, xv) :: nil))).
+           + intros re1; rewrite re1.
+             rewrite IHn3; trivial.
+             * rewrite drec_sort_drec_sort_concat.
+               unfold rec_concat_sort.
+               rewrite rec_sort_rec_sort_app1.
+               reflexivity.
+             * apply (drec_concat_sort_sorted (odt:=ODT_string)).
+             * unfold rec_concat_sort.
+               rewrite fresh_bindings_domain_drec_sort,
+               domain_app, fresh_bindings_app.
+               split; trivial; simpl.
+               unfold fresh_bindings; intros.
+               simpl in H11.
+               destruct H11; [ | intuition ].
+               eelim loop_let_var_distinct.
+               eauto.
+             * intros ? inn.
+               unfold rec_concat_sort in inn.
+               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
+               simpl in inn.
+               destruct inn as [?|[?|?]].
+               specialize (H2 _ H11).
+               repeat rewrite map_app, in_app_iff in H2.
+               repeat (apply not_or in H2; let x := fresh "GG" in
+                                           destruct H2 as [x H2]).
+               trivial.
+               subst.
+               rewrite in_map_iff.
+               intros [?[injj ?]].
+               apply loop_var_inj in injj; subst. eauto.
+               intuition.
+             * unfold rec_concat_sort.
+               rewrite <- rec_sort_perm; trivial;
+               rewrite domain_app;
+               rewrite Permutation_app_comm;
+               simpl; constructor; auto 1;
+               intro inn; specialize (H2 _ inn);
+               apply not_or in H2; intuition.
+             * simpl in H4.
+               repeat (apply not_or in H4; let x := fresh "GG" in
+                                           destruct H4 as [x H4]).
+               repeat rewrite in_app_iff in H4.
+               apply not_or in H4. simpl in H4. destruct H4 as [? ?].
+               apply not_or in H11. destruct H11.
+               trivial.
+             * unfold rec_concat_sort.
+               rewrite in_dom_rec_sort, domain_app, in_app_iff.
+               repeat rewrite map_app in H2.
+               simpl. destruct 1 as [inn|[inn|?]]; trivial.
+               specialize (H2 _ inn);
+                 repeat (apply not_or in H2; let x := fresh "GG" in
+                                             destruct H2 as [x H2];
+                                               repeat rewrite in_app_iff in H2).
+               congruence.
+               eapply loop_let_var_distinct; eauto.
+           + unfold rec_concat_sort.
+             repeat rewrite rec_sort_rec_sort_app1.
+             apply drec_sort_perm_eq.
+             * repeat rewrite domain_app; simpl.
+               rewrite Permutation_app_comm.
+               constructor.
+               simpl; rewrite in_app_iff; simpl; intros [inn|[inn|?]]; trivial.
+               specialize (H2 _ inn).
                repeat (apply not_or in H2; let x := fresh "GG" in
                                            destruct H2 as [x H2];
-                       repeat rewrite map_app, in_app_iff in H2).
-               apply GG1. apply in_map_iff.
-               eauto. 
-    + unfold fresh_bindings in *. eauto.
-Qed.
+                                             repeat rewrite in_app_iff in H2).
+               congruence.
+               eapply loop_let_var_distinct; eauto.
+               rewrite Permutation_app_comm.
+               constructor; trivial.
+             * repeat rewrite app_ass. apply Permutation_app; trivial.
+               apply Permutation_app_comm.
+           + rewrite in_dom_rec_sort. intros inn; specialize (H2 _ inn).
+             repeat (apply not_or in H2; let x := fresh "GG" in
+                                         destruct H2 as [x H2];
+                                           repeat rewrite in_app_iff in H2).
+             congruence.
+           + unfold rec_concat_sort.
+             rewrite in_dom_rec_sort, domain_app, in_app_iff.
+             simpl.
+             intros [inn|[inn|?]]; trivial.
+             specialize (H2 _ inn).
+             repeat (apply not_or in H2; let x := fresh "GG" in
+                                         destruct H2 as [x H2];
+                                           repeat rewrite in_app_iff in H2).
+             congruence.
+             eapply loop_let_var_distinct; eauto.
+        }
+      + intros ? inn inn2.
+        rewrite in_map_iff in inn2.
+        destruct inn2 as [? [? inn2]]; subst.
+        specialize (H2 _ inn).
+        repeat (apply not_or in H2; let x := fresh "GG" in
+                                    destruct H2 as [x H2];
+                                      repeat rewrite map_app, in_app_iff in H2).
+        apply GG1. apply in_map_iff.
+        eauto. 
+      + unfold fresh_bindings in *. eauto.
+  Qed.
 
 Lemma interp_mapall_let_cons h cenv p bind a l :
     RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
@@ -1550,8 +1592,8 @@ Proof.
 Qed.
 
 Lemma let_vars_let_to_naive x n :
-  In (let_var x) (let_vars (nrcToPat_ns n)) ->
-  In (let_var x) (let_vars (nrcToPat_ns_let n)).
+  In (let_var x) (let_vars (nnrcToPat_ns n)) ->
+  In (let_var x) (let_vars (nnrcToPat_ns_let n)).
 Proof.
   revert x.
   induction n; simpl; trivial; intros;
@@ -1559,8 +1601,8 @@ Proof.
 Qed.
 
 Lemma fresh_bindings_let_to_naive l n :
-  fresh_bindings l (nrcToPat_ns_let n) ->
-  fresh_bindings l (nrcToPat_ns n).
+  fresh_bindings l (nnrcToPat_ns_let n) ->
+  fresh_bindings l (nnrcToPat_ns n).
 Proof.
   unfold fresh_bindings; intros.
   specialize (H _ H0).
@@ -1575,13 +1617,13 @@ Proof.
   induction x; destruct y; simpl; inversion 1; trivial; subst; eauto.
 Qed.
   
-Lemma nrcToPat_ns_let_equiv h cenv n b d :
+Lemma nnrcToPat_ns_let_equiv h cenv n b d :
     RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
-    fresh_bindings (domain b) (nrcToPat_ns_let n) ->
+    fresh_bindings (domain b) (nnrcToPat_ns_let n) ->
     NoDup (domain b) ->
     shadow_free n = true ->
-    (forall x, In x (domain b) -> ~ In x (map loop_var (nrc_bound_vars n))) ->
-    interp h cenv (nrcToPat_ns_let n) b d = interp h cenv (nrcToPat_ns n) b d.
+    (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
+    interp h cenv (nnrcToPat_ns_let n) b d = interp h cenv (nnrcToPat_ns n) b d.
 Proof.
   Hint Resolve drec_sort_sorted fresh_bindings_let_to_naive.
 
@@ -1602,7 +1644,7 @@ Proof.
   - simpl in *. repeat rewrite andb_true_iff in *. intuition.
     rewrite IHn1; intuition.
     assert (vnin:~ In (loop_var v) (domain b)) by eauto.
-    destruct (interp h cenv (nrcToPat_ns n1) b d); simpl; trivial.
+    destruct (interp h cenv (nnrcToPat_ns n1) b d); simpl; trivial.
     + repeat rewrite merge_bindings_single_nin by trivial.
       apply IHn2; trivial; intros.
       * apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -1612,7 +1654,7 @@ Proof.
         rewrite domain_app, in_app_iff in nin.
         simpl in *.
         intuition.
-        destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+        destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
           intuition.
         apply (H7 _ H9). simpl; intuition.
         eapply loop_let_var_distinct; eauto.
@@ -1622,12 +1664,12 @@ Proof.
         rewrite domain_app, in_app_iff in H0.
         simpl in *.
         intuition. 
-        destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+        destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
           intuition.
         apply (H3 _ H10). rewrite map_app, in_app_iff.
         intuition.
         subst.
-        destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+        destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
           intuition.
         apply in_map_iff in H9.
         destruct H9 as [vv [vveq vvin]].
@@ -1636,7 +1678,7 @@ Proof.
   - Opaque mapall_let mapall.
     simpl in *. repeat rewrite andb_true_iff in *. intuition.
     rewrite IHn1; intuition.
-    + destruct (interp h cenv (nrcToPat_ns n1) b d); simpl; trivial.
+    + destruct (interp h cenv (nnrcToPat_ns n1) b d); simpl; trivial.
       Transparent mapall_let mapall.
       destruct res;
         try solve [auto 2; simpl; trivial].
@@ -1655,7 +1697,7 @@ Proof.
         rewrite domain_app, in_app_iff in nin.
         simpl in *.
         intuition.
-        destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+        destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
           intuition.
         apply (H5 _ H8). simpl; intuition.
         eapply loop_let_var_distinct; eauto.
@@ -1665,12 +1707,12 @@ Proof.
         rewrite domain_app, in_app_iff in H0.
         simpl in *.
         intuition. 
-        destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+        destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
           intuition.
         apply (H3 _ H9). rewrite map_app, in_app_iff.
         intuition.
         subst.
-        destruct (in_dec string_eqdec v (nrc_bound_vars n2));
+        destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
           intuition.
         apply in_map_iff in H8.
         destruct H8 as [vv [vveq vvin]].
@@ -1680,15 +1722,15 @@ Proof.
     repeat rewrite andb_true_iff in *; intuition.
     assert(nin:~ In
               (fresh_let_var "if$" 
-                 (let_vars (nrcToPat_ns_let n1) ++
-                           let_vars (nrcToPat_ns_let n2) ++ let_vars (nrcToPat_ns_let n3)))
+                 (let_vars (nnrcToPat_ns_let n1) ++
+                           let_vars (nnrcToPat_ns_let n2) ++ let_vars (nnrcToPat_ns_let n3)))
               (domain b)).
     unfold mapall_let in *.
     autorewrite with fresh_bindings in *.
     intuition. eapply H2. reflexivity.
     trivial.
     rewrite IHn1; intuition.
-    destruct (interp h cenv (nrcToPat_ns n1) b d); trivial.
+    destruct (interp h cenv (nnrcToPat_ns n1) b d); trivial.
     simpl.
     rewrite merge_bindings_single_nin by trivial.
     rewrite edot_fresh_concat by trivial.
@@ -1696,30 +1738,30 @@ Proof.
     destruct b0; simpl.
     + repeat rewrite merge_bindings_nil_r.
        cut (
-           (interp h cenv (nrcToPat_ns_let n2)
+           (interp h cenv (nnrcToPat_ns_let n2)
               (rec_sort
                  (rec_concat_sort b
                     ((fresh_let_var "if$"
-                        (let_vars (nrcToPat_ns_let n1) ++
-                         let_vars (nrcToPat_ns_let n2) ++
-                         let_vars (nrcToPat_ns_let n3)), 
+                        (let_vars (nnrcToPat_ns_let n1) ++
+                         let_vars (nnrcToPat_ns_let n2) ++
+                         let_vars (nnrcToPat_ns_let n3)), 
                      dbool true) :: nil))) d) =
-           (interp h cenv (nrcToPat_ns n2)
+           (interp h cenv (nnrcToPat_ns n2)
               (rec_sort b) d)).
        intros HH; rewrite HH.
        match_destr.
       rewrite IHn2; auto.
       * rewrite drec_sort_drec_sort_concat.
         rewrite fresh_let_var_as_let.
-        rewrite interp_nrcToPat_ns_ignored_let_binding; unfold rec_sort; intuition.
+        rewrite interp_nnrcToPat_ns_ignored_let_binding; unfold rec_sort; intuition.
         apply (H3 _ H4). repeat rewrite map_app, in_app_iff; intuition.
         apply let_vars_let_to_naive in H4.
         unfold let_var in H4.
         rewrite <- append_ass in H4.
         apply (fresh_let_var_fresh
                       "if$"
-                      (let_vars (nrcToPat_ns_let n1) ++
-                                let_vars (nrcToPat_ns_let n2) ++ let_vars (nrcToPat_ns_let n3))); unfold fresh_let_var, fresh_var.
+                      (let_vars (nnrcToPat_ns_let n1) ++
+                                let_vars (nnrcToPat_ns_let n2) ++ let_vars (nnrcToPat_ns_let n3))); unfold fresh_let_var, fresh_var.
         repeat rewrite in_app_iff.
         intuition.
       * apply (drec_sort_sorted (odt:=ODT_string)).
@@ -1751,15 +1793,15 @@ Proof.
       rewrite IHn3; auto.
       * rewrite drec_sort_drec_sort_concat.
         rewrite fresh_let_var_as_let.
-        rewrite interp_nrcToPat_ns_ignored_let_binding; unfold rec_sort; intuition.
+        rewrite interp_nnrcToPat_ns_ignored_let_binding; unfold rec_sort; intuition.
         apply (H3 _ H4).   
         repeat rewrite map_app, in_app_iff.
         intuition.
         apply let_vars_let_to_naive in H4.
         unfold let_var in H4.
         rewrite <- append_ass in H4.
-        apply (fresh_let_var_fresh "if$" (let_vars (nrcToPat_ns_let n1) ++
-                   let_vars (nrcToPat_ns_let n2) ++ let_vars (nrcToPat_ns_let n3))).
+        apply (fresh_let_var_fresh "if$" (let_vars (nnrcToPat_ns_let n1) ++
+                   let_vars (nnrcToPat_ns_let n2) ++ let_vars (nnrcToPat_ns_let n3))).
         repeat rewrite in_app_iff.
         intuition.
       * apply (drec_sort_sorted (odt:=ODT_string)).
@@ -1806,9 +1848,9 @@ Proof.
         specialize (IHn2  (rec_concat_sort b ((loop_var v, res) :: nil)) res).
         {
           cut_to IHn2; trivial.
-          - destruct (  interp h cenv (nrcToPat_ns_let n2)
+          - destruct (  interp h cenv (nnrcToPat_ns_let n2)
                                (rec_concat_sort b ((loop_var v, res) :: nil)) res);
-            destruct (  interp h cenv (nrcToPat_ns n2)
+            destruct (  interp h cenv (nnrcToPat_ns n2)
                                (rec_concat_sort b ((loop_var v, res) :: nil)) res); simpl in *;
               trivial.
           - apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -1851,10 +1893,10 @@ Proof.
         }
 Qed.
 
-  Lemma fresh_bindings_from_nrc {A} e l :
-    fresh_bindings (domain (@nrc_to_pat_env A e)) l.
+  Lemma fresh_bindings_from_nnrc {A} e l :
+    fresh_bindings (domain (@nnrc_to_pat_env A e)) l.
   Proof.
-    unfold fresh_bindings, nrc_to_pat_env, domain.
+    unfold fresh_bindings, nnrc_to_pat_env, domain.
     rewrite map_map. simpl. intros.
     apply in_map_iff in H.
     destruct H as [? [??]].
@@ -1864,136 +1906,147 @@ Qed.
   
   (** Main lemmas for the correctness of the translation *)
 
-  Lemma nrcToPat_let_ns_correct h cenv n env d :
+  Lemma nnrcToPat_let_ns_correct h cenv n env d :
+    nnrcIsCore n ->
     shadow_free n = true ->
     NoDup (domain env) ->
-    (forall x, In x (domain env) -> ~ In x (nrc_bound_vars n)) ->
-    (forall x, In x (domain (nrc_to_pat_env env)) -> ~ In x (map loop_var (nrc_bound_vars n))) ->
-    NNRC.nrc_eval h env n = pr2op (interp h cenv (nrcToPat_ns_let n) (rec_sort (nrc_to_pat_env env)) d).
+    (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
+    (forall x, In x (domain (nnrc_to_pat_env env)) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
+    NNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_ns_let n) (rec_sort (nnrc_to_pat_env env)) d).
   Proof.
     intros.
-    rewrite (nrcToPat_sem_correct_ns _ cenv); auto.
+    rewrite (nnrcToPat_sem_correct_ns _ cenv); auto.
     f_equal.
-    rewrite nrcToPat_ns_let_equiv; eauto 2.
-    - erewrite nrcToPat_data_indep; reflexivity.
+    rewrite nnrcToPat_ns_let_equiv; eauto 2.
+    - erewrite nnrcToPat_data_indep; reflexivity.
     - rewrite fresh_bindings_domain_drec_sort.
-      apply fresh_bindings_from_nrc.
+      apply fresh_bindings_from_nnrc.
     - intros ? inn.
       apply -> (@in_dom_rec_sort string) in inn.
       eauto 2.
   Qed.
 
-  Lemma nrcToPat_let_correct_messy h cenv avoid n env d :
+  Lemma nnrcToPat_let_correct_messy h cenv avoid n env d :
+    nnrcIsCore n ->
     NoDup (domain env) ->
-    (forall x, In x (domain env) -> ~ In x (nrc_bound_vars (unshadow_simpl avoid n))) ->
-    (forall x, In x (domain (nrc_to_pat_env env)) -> ~ In x (map loop_var (nrc_bound_vars (unshadow_simpl avoid n)))) ->
-    NNRC.nrc_eval h env n = pr2op (interp h cenv (nrcToPat_let avoid n) (rec_sort (nrc_to_pat_env env)) d).
+    (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars (unshadow_simpl avoid n))) ->
+    (forall x, In x (domain (nnrc_to_pat_env env)) -> ~ In x (map loop_var (nnrc_bound_vars (unshadow_simpl avoid n)))) ->
+    NNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_let avoid n) (rec_sort (nnrc_to_pat_env env)) d).
   Proof.
+    intro Hiscore.
     intros.
-    generalize (nrcToPat_let_ns_correct h cenv (unshadow_simpl avoid n) env d
-                                        (unshadow_shadow_free _ _ _ _)); intros HH.
-    unfold nrcToPat_let.
+    generalize (unshadow_simpl_preserve_core avoid n Hiscore); intros.
+    generalize (nnrcToPat_let_ns_correct h cenv (unshadow_simpl avoid n) env d
+                                        H2 (unshadow_shadow_free _ _ _ _)); intros HH.
+    unfold nnrcToPat_let.
     unfold unshadow_simpl in HH.
     rewrite unshadow_eval in HH.
     auto.
   Qed.
 
   (** This corresponds to Theorem 6.1 *)
-  Theorem nrcToPat_let_correct h cenv n env d :
+  Theorem nnrcToPat_let_correct h cenv n env d :
+    nnrcIsCore n ->
     NoDup (domain env) ->
-    NNRC.nrc_eval h env n
-    = pr2op (interp h cenv (nrcToPat_let (domain env) n)
-                    (rec_sort (nrc_to_pat_env env)) d).
+    NNRC.nnrc_core_eval h env n
+    = pr2op (interp h cenv (nnrcToPat_let (domain env) n)
+                    (rec_sort (nnrc_to_pat_env env)) d).
   Proof.
     Hint Resolve unshadow_avoid.
-     intros.
-     apply nrcToPat_let_correct_messy; unfold unshadow_simpl; auto.
-     intros.
-     unfold nrc_to_pat_env, domain in H0.
-     rewrite map_map in H0.
-     apply in_map_iff in H0.
-     destruct H0 as [? [? inn]]; subst.
-     intro inn2.
-     apply in_map_iff in inn2.
-     destruct inn2 as [? [eq1 inn2]].
-     simpl in eq1.
-     apply loop_var_inj in eq1. subst.
-     destruct x0.
-     apply in_dom in inn.
-     apply (unshadow_avoid _ _ _ _ _ inn inn2).
-   Qed.
-     
-Lemma nrcToPat_let_sem_correct_top_ns h cenv n :
-    shadow_free n = true ->
-    NNRC.nrc_eval h nil n = pr2op (interp h cenv (nrcToPat_ns_let n) nil dunit).
-  Proof.
+    intro Hiscore.
     intros.
-    rewrite (nrcToPat_sem_correct_top_ns _ cenv); auto.
+    apply nnrcToPat_let_correct_messy; unfold unshadow_simpl; auto.
+    intros.
+    unfold nnrc_to_pat_env, domain in H0.
+    rewrite map_map in H0.
+    apply in_map_iff in H0.
+    destruct H0 as [? [? inn]]; subst.
+    intro inn2.
+    apply in_map_iff in inn2.
+    destruct inn2 as [? [eq1 inn2]].
+    simpl in eq1.
+    apply loop_var_inj in eq1. subst.
+    destruct x0.
+    apply in_dom in inn.
+    apply (unshadow_avoid _ _ _ _ _ inn inn2).
+  Qed.
+
+  Lemma nnrcToPat_let_sem_correct_top_ns h cenv n :
+    nnrcIsCore n ->
+    shadow_free n = true ->
+    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_ns_let n) nil dunit).
+  Proof.
+    intro Hiscore.
+    intros.
+    rewrite (nnrcToPat_sem_correct_top_ns _ cenv); auto.
     f_equal.
-    rewrite nrcToPat_ns_let_equiv; eauto 2.
+    rewrite nnrcToPat_ns_let_equiv; eauto 2.
     simpl; autorewrite with fresh_bindings; trivial.
   Qed.
 
-Theorem nrcToPat_let_sem_correct_top h cenv n :
-    NNRC.nrc_eval h nil n = pr2op (interp h cenv (nrcToPat_let nil n) nil dunit).
+  Theorem nnrcToPat_let_sem_correct_top h cenv n :
+    nnrcIsCore n ->
+    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_let nil n) nil dunit).
   Proof.
+    intros Hiscore.
     intros.
-    generalize (nrcToPat_let_sem_correct_top_ns h cenv (unshadow_simpl nil n)
-               (unshadow_shadow_free _ _ _ _)); intros H.
-    unfold nrcToPat_let.
-    unfold unshadow_simpl in H.
-    rewrite unshadow_eval in H. trivial.
+    generalize (unshadow_simpl_preserve_core nil n Hiscore); intros.
+    generalize (nnrcToPat_let_sem_correct_top_ns h cenv (unshadow_simpl nil n)
+                                                 H (unshadow_shadow_free _ _ _ _)); intros H0.
+    unfold nnrcToPat_let.
+    unfold unshadow_simpl in H0.
+    rewrite unshadow_eval in H0. trivial.
   Qed.
 
-Require Import NNRCSize.
-Require Import PatternSize.
+  Require Import NNRCSize.
+  Require Import PatternSize.
 
-(** Lemma and proof for the linear size of the translation *)
+  (** Lemma and proof for the linear size of the translation *)
 
-Lemma nrc_subst_var_size n v v' :
-  nrc_size (nrc_subst n v (NNRC.NRCVar v')) = nrc_size n.
-Proof.
-  induction n; simpl; auto;
-  repeat dest_eqdec; auto.
-Qed.
+  Lemma nnrc_subst_var_size n v v' :
+    nnrc_size (nnrc_subst n v (NNRC.NNRCVar v')) = nnrc_size n.
+  Proof.
+    induction n; simpl; auto;
+    repeat dest_eqdec; auto.
+  Qed.
 
-Lemma nrc_rename_lazy_size n v v' :
-  nrc_size (nrc_rename_lazy n v v') = nrc_size n.
-Proof.
-  unfold nrc_rename_lazy.
-  match_destr.
-  rewrite nrc_subst_var_size.
-  trivial.
-Qed.
+  Lemma nnrc_rename_lazy_size n v v' :
+    nnrc_size (nnrc_rename_lazy n v v') = nnrc_size n.
+  Proof.
+    unfold nnrc_rename_lazy.
+    match_destr.
+    rewrite nnrc_subst_var_size.
+    trivial.
+  Qed.
 
-Lemma unshadow_size sep renamer avoid n :
-  nrc_size (unshadow sep renamer avoid n) = nrc_size n.
-Proof.
-  induction n; simpl; auto;
-  (repeat match_destr; simpl;
-   repeat rewrite nrc_rename_lazy_size; auto).
-Qed.
+  Lemma unshadow_size sep renamer avoid n :
+    nnrc_size (unshadow sep renamer avoid n) = nnrc_size n.
+  Proof.
+    induction n; simpl; auto;
+    (repeat match_destr; simpl;
+     repeat rewrite nnrc_rename_lazy_size; auto).
+  Qed.
 
-Lemma unshadow_simpl_size avoid n :
-  nrc_size (unshadow_simpl avoid n) = nrc_size n.
-Proof.
-  apply unshadow_size.
-Qed.
+  Lemma unshadow_simpl_size avoid n :
+    nnrc_size (unshadow_simpl avoid n) = nnrc_size n.
+  Proof.
+    apply unshadow_size.
+  Qed.
 
-Lemma nrcToPat_ns_let_size n : 
-  pat_size (nrcToPat_ns_let n) <= 25 * nrc_size n.
-Proof.
-  induction n; simpl; try omega.
-Qed.
+  Lemma nnrcToPat_ns_let_size n : 
+    pat_size (nnrcToPat_ns_let n) <= 25 * nnrc_size n.
+  Proof.
+    induction n; simpl; try omega.
+  Qed.
 
-Theorem nrcToPat_let_size avoid n : 
-  pat_size (nrcToPat_let avoid n) <= 25 * nrc_size n.
-Proof.
-  unfold nrcToPat_let.
-  generalize (nrcToPat_ns_let_size (unshadow_simpl avoid n)).
-  rewrite unshadow_simpl_size.
-  trivial.
-Qed.
+  Theorem nnrcToPat_let_size avoid n : 
+    pat_size (nnrcToPat_let avoid n) <= 25 * nnrc_size n.
+  Proof.
+    unfold nnrcToPat_let.
+    generalize (nnrcToPat_ns_let_size (unshadow_simpl avoid n)).
+    rewrite unshadow_simpl_size.
+    trivial.
+  Qed.
 
 End trans_let.
 

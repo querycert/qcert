@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TNRCInfer.
+Section TNNRCInfer.
 
   Require Import String.
   Require Import List.
@@ -23,9 +23,9 @@ Section TNRCInfer.
   Require Import EquivDec Morphisms.
 
   Require Import Utils BasicSystem.
-  Require Import NNRC.
 
-  Require Import TNRC.
+  Require Import NNRC.
+  Require Import TNNRC.
 
   Context {m:basic_model}.
 
@@ -34,32 +34,32 @@ Section TNRCInfer.
   Require Import TDataInfer.
   Require Import TOpsInfer.
 
-  Fixpoint infer_nrc_type (tenv:tbindings) (n:nrc) {struct n} : option rtype :=
+  Fixpoint infer_nnrc_type (tenv:tbindings) (n:nnrc) {struct n} : option rtype :=
     match n with
-    | NRCVar v =>
+    | NNRCVar v =>
       lookup equiv_dec tenv v
-    | NRCConst d => infer_data_type (normalize_data brand_relation_brands d)
-    | NRCBinop b n1 n2 =>
+    | NNRCConst d => infer_data_type (normalize_data brand_relation_brands d)
+    | NNRCBinop b n1 n2 =>
       let binf (τ₁ τ₂:rtype) := infer_binop_type b τ₁ τ₂ in
-      olift2 binf (infer_nrc_type tenv n1) (infer_nrc_type tenv n2)
-    | NRCUnop u n1 =>
+      olift2 binf (infer_nnrc_type tenv n1) (infer_nnrc_type tenv n2)
+    | NNRCUnop u n1 =>
         let unf (τ₁:rtype) := infer_unop_type u τ₁ in
-        olift unf (infer_nrc_type tenv n1)
-    | NRCLet v n1 n2 =>
-      let τ₁ := infer_nrc_type tenv n1 in
-      let let_infer τ := infer_nrc_type ((v,τ)::tenv) n2 in
+        olift unf (infer_nnrc_type tenv n1)
+    | NNRCLet v n1 n2 =>
+      let τ₁ := infer_nnrc_type tenv n1 in
+      let let_infer τ := infer_nnrc_type ((v,τ)::tenv) n2 in
       olift let_infer τ₁
-    | NRCFor v n1 n2 =>
-      let τ₁ := infer_nrc_type tenv n1 in
-      let for_infer τ := lift Coll (infer_nrc_type ((v,τ)::tenv) n2) in
+    | NNRCFor v n1 n2 =>
+      let τ₁ := infer_nnrc_type tenv n1 in
+      let for_infer τ := lift Coll (infer_nnrc_type ((v,τ)::tenv) n2) in
       olift for_infer (olift tuncoll τ₁)
-    | NRCIf n0 n1 n2 =>
-      match infer_nrc_type tenv n0 with
+    | NNRCIf n0 n1 n2 =>
+      match infer_nnrc_type tenv n0 with
       | Some τ₀ =>
         match `τ₀ with
         | Bool₀ =>
-          let oτ₁ := infer_nrc_type tenv n1 in
-          let oτ₂ := infer_nrc_type tenv n2 in
+          let oτ₁ := infer_nnrc_type tenv n1 in
+          let oτ₂ := infer_nnrc_type tenv n2 in
           match (oτ₁, oτ₂) with
             | (Some τ₁, Some τ₂) =>
               if (rtype_eq_dec τ₁ τ₂) (* Probably should be generalized using join... *)
@@ -71,11 +71,11 @@ Section TNRCInfer.
         end
       | None => None
       end
-    | NRCEither n0 v1 n1 v2 n2 =>
-      match olift tuneither (infer_nrc_type tenv n0) with
+    | NNRCEither n0 v1 n1 v2 n2 =>
+      match olift tuneither (infer_nnrc_type tenv n0) with
       | Some (τl, τr) =>
-          let oτ₁ := infer_nrc_type ((v1,τl)::tenv) n1 in
-          let oτ₂ := infer_nrc_type ((v2,τr)::tenv) n2 in
+          let oτ₁ := infer_nnrc_type ((v1,τl)::tenv) n1 in
+          let oτ₂ := infer_nnrc_type ((v2,τr)::tenv) n2 in
           match (oτ₁, oτ₂) with
             | (Some τ₁, Some τ₂) =>
               if (rtype_eq_dec τ₁ τ₂) (* Probably should be generalized using join... *)
@@ -85,63 +85,65 @@ Section TNRCInfer.
           end
       | _ => None
       end
+    | NNRCGroupBy g sl n1 =>
+      None (* For core, always fails *)
     end.
   
-  Lemma infer_nrc_type_correct {τout} (tenv:tbindings) (n:nrc) :
-    infer_nrc_type tenv n = Some τout ->
-    nrc_type tenv n τout.
+  Lemma infer_nnrc_type_correct {τout} (tenv:tbindings) (n:nnrc) :
+    infer_nnrc_type tenv n = Some τout ->
+    nnrc_type tenv n τout.
   Proof.
     revert tenv τout.
-    nrc_cases (induction n) Case; intros; simpl in *.
-    - Case "NRCVar"%string.
-      apply TNRCVar; assumption.
-    - Case "NRCConst"%string.
-      apply TNRCConst.
+    nnrc_cases (induction n) Case; intros; simpl in *.
+    - Case "NNRCVar"%string.
+      apply TNNRCVar; assumption.
+    - Case "NNRCConst"%string.
+      apply TNNRCConst.
       apply infer_data_type_correct. assumption.
-    - Case "NRCBinop"%string.
+    - Case "NNRCBinop"%string.
       specialize (IHn1 tenv); specialize (IHn2 tenv).
-      destruct (infer_nrc_type tenv n1); destruct (infer_nrc_type tenv n2); simpl in *;
+      destruct (infer_nnrc_type tenv n1); destruct (infer_nnrc_type tenv n2); simpl in *;
       try discriminate.
       specialize (IHn1 r eq_refl); specialize (IHn2 r0 eq_refl).
-      apply (@TNRCBinop m r r0 τout tenv); try assumption.
+      apply (@TNNRCBinop m r r0 τout tenv); try assumption.
       apply infer_binop_type_correct; assumption.
-    - Case "NRCUnop"%string.
+    - Case "NNRCUnop"%string.
       specialize (IHn tenv).
-      destruct (infer_nrc_type tenv n); simpl in *;
+      destruct (infer_nnrc_type tenv n); simpl in *;
       try discriminate.
       specialize (IHn r eq_refl).
-      apply (@TNRCUnop m r τout tenv); try assumption.
+      apply (@TNNRCUnop m r τout tenv); try assumption.
       apply infer_unop_type_correct; assumption.
-    - Case "NRCLet"%string.
+    - Case "NNRCLet"%string.
       specialize (IHn1 tenv).
-      destruct (infer_nrc_type tenv n1); simpl in *; try discriminate.
+      destruct (infer_nnrc_type tenv n1); simpl in *; try discriminate.
       specialize (IHn2 ((v,r) :: tenv)).
-      destruct (infer_nrc_type ((v, r) :: tenv) n2); simpl in *; try discriminate.
+      destruct (infer_nnrc_type ((v, r) :: tenv) n2); simpl in *; try discriminate.
       inversion H; subst; clear H.
       specialize (IHn1 r eq_refl).
       specialize (IHn2 τout eq_refl).
-      apply (TNRCLet v tenv n1 n2 IHn1 IHn2).
-    - Case "NRCFor"%string.
+      apply (TNNRCLet v tenv n1 n2 IHn1 IHn2).
+    - Case "NNRCFor"%string.
       specialize (IHn1 tenv).
-      destruct (infer_nrc_type tenv n1); simpl in *; try discriminate.
+      destruct (infer_nnrc_type tenv n1); simpl in *; try discriminate.
       case_eq (tuncoll r); intros; rewrite H0 in *; simpl in H.
       + apply tuncoll_correct in H0.
         specialize (IHn2 ((v,r0) :: tenv)).
-        destruct (infer_nrc_type ((v, r0) :: tenv) n2); simpl in *; try discriminate.
+        destruct (infer_nnrc_type ((v, r0) :: tenv) n2); simpl in *; try discriminate.
         inversion H; subst; clear H.
         specialize (IHn1 (Coll r0) eq_refl).
         specialize (IHn2 r1 eq_refl).
-        apply (TNRCFor v tenv n1 n2 IHn1 IHn2).
+        apply (TNNRCFor v tenv n1 n2 IHn1 IHn2).
       + discriminate.
-    - Case "NRCIf"%string.
+    - Case "NNRCIf"%string.
       specialize (IHn1 tenv).
       specialize (IHn2 tenv).
       specialize (IHn3 tenv).
-      destruct (infer_nrc_type tenv n1); simpl in *; try discriminate.
+      destruct (infer_nnrc_type tenv n1); simpl in *; try discriminate.
       destruct r; try congruence; simpl in H.
       destruct x; try congruence; simpl in H.
-      destruct (infer_nrc_type tenv n2); simpl in *; try discriminate.
-      destruct (infer_nrc_type tenv n3); simpl in *; try discriminate.
+      destruct (infer_nnrc_type tenv n2); simpl in *; try discriminate.
+      destruct (infer_nnrc_type tenv n3); simpl in *; try discriminate.
       destruct (rtype_eq_dec r r0); simpl in *; try congruence.
       rewrite e0 in *; clear e0.
       inversion H; clear H; subst.
@@ -150,10 +152,10 @@ Section TNRCInfer.
       specialize (IHn1 Bool eq_refl).
       specialize (IHn2 τout eq_refl).
       specialize (IHn3 τout eq_refl).
-      apply TNRCIf; assumption.
-    - Case "NRCEither"%string.
+      apply TNNRCIf; assumption.
+    - Case "NNRCEither"%string.
       specialize (IHn1 tenv).
-      destruct (infer_nrc_type tenv n1); simpl in *; try discriminate.
+      destruct (infer_nnrc_type tenv n1); simpl in *; try discriminate.
       unfold tuneither in H.
       destruct r; simpl in H; try discriminate.
       destruct x; simpl in H; try discriminate.
@@ -166,11 +168,13 @@ Section TNRCInfer.
                               (Either₀ x1 x2) e) eq_refl).
       specialize (IHn2 _ _ H0).
       specialize (IHn3 _ _ H1).
-      eapply TNRCEither; eauto.
+      eapply TNNRCEither; eauto.
       erewrite <- Either_canon; eauto.
-  Qed.      
+    - Case "NNRCGroupBy"%string.
+      congruence. (* Type checking always fails for groupby in core NNRC *)
+  Qed.
 
-End TNRCInfer.
+End TNNRCInfer.
 
 (* 
 *** Local Variables: ***

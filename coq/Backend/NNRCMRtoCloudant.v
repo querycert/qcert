@@ -39,25 +39,25 @@ Section NNRCMRToCloudantMR.
       Require Import NNRCtoJavascript.
 
 	  (* Java equivalent: MROptimizer.nrc_mr_rename_local_for_cloudant *)
-      Definition nrcmr_rename_local_for_cloudant (mrl:nrcmr)
-        := nrcmr_rename_local
+      Definition nnrcmr_rename_local_for_cloudant (mrl:nnrcmr)
+        := nnrcmr_rename_local
              jsSafeSeparator
              jsIdentifierSanitize
              jsAvoidList
              mrl.
 
 	  (* Java equivalent: MROptimizer.nrc_mr_rename_graph_for_cloudant *)
-      Definition nrcmr_rename_graph_for_cloudant (mrl:nrcmr)
-        := nrcmr_rename_graph
+      Definition nnrcmr_rename_graph_for_cloudant (mrl:nnrcmr)
+        := nnrcmr_rename_graph
              cldSafeSeparator
              cldIdentifierSanitize
              cldAvoidList 
              mrl.
 
 	  (* Java equivalent: MROptimizer.nrc_mr_rename_for_cloudant *)
-      Definition nrcmr_rename_for_cloudant (mrl:nrcmr)
-        := nrcmr_rename_graph_for_cloudant
-             (nrcmr_rename_local_for_cloudant mrl).
+      Definition nnrcmr_rename_for_cloudant (mrl:nnrcmr)
+        := nnrcmr_rename_graph_for_cloudant
+             (nnrcmr_rename_local_for_cloudant mrl).
 
   End sanitize.
   
@@ -79,25 +79,25 @@ Section NNRCMRToCloudantMR.
     end.
 
   (* Java equivalent: NrcmrtoCldmr.pushReduce *)
-  Definition pushReduce (avoiddb: list var) (r:(var*nrc)) : cld_reduce * (var*cld_map) :=
+  Definition pushReduce (avoiddb: list var) (r:(var*nnrc)) : cld_reduce * (var*cld_map) :=
     let fresh_outputdb := fresh_var "output_" avoiddb in
     let pushed_reduce := collectReduce (Some fresh_outputdb) in
     let v_red := fst r in
     let f_red := snd r in
     (* Deals with Cloudant's implicit mapping of results into 'key'/'value' records *)
-    let pushed_map := MRtoMapCld (MapScalar (v_red,NRCUnop AColl f_red)) true 0 in
+    let pushed_map := MRtoMapCld (MapScalar (v_red,NNRCUnop AColl f_red)) true 0 in
     (pushed_reduce, (fresh_outputdb, pushed_map)).
 
   (* Java equivalent: NrcmrtoCldmr.pushMR *)
-  Definition pushMR (dbinput dboutput:var) (pushed_map: cld_map) (mrempty:option nrc) :=
+  Definition pushMR (dbinput dboutput:var) (pushed_map: cld_map) (mrempty:option nnrc) :=
     mkMRCld dbinput pushed_map (Some (idReduce (Some dboutput))) mrempty.
   
-  Definition pushMRNoRed (dbinput:var) (pushed_map: cld_map) (mrempty:option nrc) :=
+  Definition pushMRNoRed (dbinput:var) (pushed_map: cld_map) (mrempty:option nnrc) :=
     mkMRCld dbinput pushed_map None mrempty.
 
   Definition minMap :=
     let x := "x"%string in
-    let map_fun := (x, NRCUnop (ADot "min") (NRCVar x)) in
+    let map_fun := (x, NNRCUnop (ADot "min") (NNRCVar x)) in
     mkMapCld (CldMapId map_fun) (CldEmitCollect O).
 
   Definition minMR (stats_v out_v: var) :=
@@ -108,7 +108,7 @@ Section NNRCMRToCloudantMR.
 
   Definition maxMap :=
     let x := "x"%string in
-    let map_fun := (x, NRCUnop (ADot "max") (NRCVar x)) in
+    let map_fun := (x, NNRCUnop (ADot "max") (NNRCVar x)) in
     mkMapCld (CldMapId map_fun) (CldEmitCollect O).
 
   Definition maxMR (stats_v out_v: var) :=
@@ -118,7 +118,7 @@ Section NNRCMRToCloudantMR.
     mkMRCld stats_v maxMap None.
 
   (* Java equivalent: NrcmrToCldmr.MRtoReduceCld *)
-  Definition MRtoReduceCld (v_key:var) (out_v:var) (avoiddb: list var) (mrr: NNRCMR.reduce_fun) (mrempty:option nrc) :
+  Definition MRtoReduceCld (v_key:var) (out_v:var) (avoiddb: list var) (mrr: NNRCMR.reduce_fun) (mrempty:option nnrc) :
     bool * cld_reduce * (option cld_mr) * (list var) :=
     match mrr with
     | RedId => (false, idReduce (Some out_v), None, avoiddb)
@@ -152,7 +152,7 @@ Section NNRCMRToCloudantMR.
     let cld_map := MRtoMapCld mrmap collectflag 0 in
     match pushedmr with
     | None => (mkMRCld cld_input cld_map (Some first_reduce) mrempty :: nil, avoiddb')
-    | Some nextmr => ((mkMRCld cld_input cld_map (Some first_reduce) (Some (NRCConst (dcoll nil)))) :: nextmr :: nil, avoiddb')
+    | Some nextmr => ((mkMRCld cld_input cld_map (Some first_reduce) (Some (NNRCConst (dcoll nil)))) :: nextmr :: nil, avoiddb')
                        (* EMPTY REDUCE IS EMPTY COLL IF REDUCE IS PUSHED! *)
     end.
   
@@ -171,31 +171,31 @@ Section NNRCMRToCloudantMR.
     lift snd (cld_mrl_eval h env mrl).
    *)
 
-  Lemma rmap_with_key (prefix:list nat) (i:nat) (v:var) (n:nrc) (coll: list data) :
+  Lemma rmap_with_key (prefix:list nat) (i:nat) (v:var) (n:nnrc) (coll: list data) :
     (rmap
        (fun d : data * data =>
           let (k, v0) := d in
-          match nrc_eval h ((v, v0) :: nil) n with
+          match nnrc_core_eval h ((v, v0) :: nil) n with
           | Some res => Some (k, res)
           | None => None
           end) (init_keys_aux prefix i coll)) =
-    lift (init_keys_aux prefix i) (rmap (fun d : data => nrc_eval h ((v, d) :: nil) n) coll).
+    lift (init_keys_aux prefix i) (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) coll).
   Proof.
     revert i.
     induction coll; try reflexivity; simpl; intros.
-    destruct (nrc_eval h ((v, a) :: nil) n); try reflexivity; simpl.
+    destruct (nnrc_core_eval h ((v, a) :: nil) n); try reflexivity; simpl.
     rewrite (IHcoll (S i)); clear IHcoll.
-    destruct ((rmap (fun d0 : data => nrc_eval h ((v, d0) :: nil) n) coll)); reflexivity.
+    destruct ((rmap (fun d0 : data => nnrc_core_eval h ((v, d0) :: nil) n) coll)); reflexivity.
   Qed.
 
-  Lemma rmap_eval_through_init_keys (l:list data) (n:nrc) (v:var) :
+  Lemma rmap_eval_through_init_keys (l:list data) (n:nnrc) (v:var) :
     (rmap (fun d : data * data =>
              let (k, v0) := d in
-             match nrc_eval h ((v, v0) :: nil) n with
+             match nnrc_core_eval h ((v, v0) :: nil) n with
              | Some res0 => Some (k, res0)
              | None => None
              end) (init_keys l))
-    = lift init_keys (rmap (fun d : data => nrc_eval h ((v, d) :: nil) n) l).
+    = lift init_keys (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) l).
   Proof.
     unfold init_keys.
     apply rmap_with_key.
@@ -260,7 +260,7 @@ Section NNRCMRToCloudantMR.
         unfold cld_mr_map_eval; simpl.
         unfold apply_map_fun_with_keys; simpl.
         rewrite rmap_eval_through_init_keys.
-        revert H; generalize (rmap (fun d : data => nrc_eval h ((v, d) :: nil) n) l);
+        revert H; generalize (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) l);
         intros omap1res; intros.
         destruct omap1res; simpl in *; try congruence.
         inversion H.
@@ -290,7 +290,7 @@ Section NNRCMRToCloudantMR.
         unfold cld_mr_map_eval; simpl.
         unfold apply_map_fun_with_keys; simpl.
         rewrite rmap_eval_through_init_keys.
-        revert H; generalize (rmap (fun d : data => nrc_eval h ((v, d) :: nil) n) l);
+        revert H; generalize (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) l);
         intros omap1res; intros.
         destruct omap1res; simpl in *; try congruence.
         unfold mr_reduce_eval in *; simpl in *.
@@ -313,7 +313,7 @@ Section NNRCMRToCloudantMR.
         unfold cld_mr_eval; simpl.
         unfold cld_mr_map_eval; simpl.
         unfold apply_map_fun_with_keys; simpl.
-        destruct (nrc_eval h ((v, d) :: nil)); simpl in *; try congruence.
+        destruct (nnrc_core_eval h ((v, d) :: nil)); simpl in *; try congruence.
         destruct d0; simpl in *; try congruence.
         inversion H; subst; clear H.
         rename l into mapres; simpl in *.
@@ -345,8 +345,8 @@ Section NNRCMRToCloudantMR.
 
   (* Java equivalent: NrcmrToCldmr.mr_last_to_cld_mr_last *)
   Definition mr_last_to_cld_mr_last
-             (mr_last_closure:(list var * nrc) * list (var * dlocalization))
-    : (list var * nrc) * list var :=
+             (mr_last_closure:(list var * nnrc) * list (var * dlocalization))
+    : (list var * nnrc) * list var :=
     let (fvs, mr_last) := fst mr_last_closure in
     let vars_loc := snd mr_last_closure in
     let cld_mr_last :=
@@ -356,12 +356,12 @@ Section NNRCMRToCloudantMR.
              | None => k (* assert false: should not occur *)
              | Some Vdistr =>
                (* let kv : var := really_fresh_in "$"%string "kv"%string nil k in *)
-               NRCLet fv (NRCVar fv) k
+               NNRCLet fv (NNRCVar fv) k
              | Some Vlocal =>
-               NRCLet fv
-                      (NRCEither (NRCUnop ASingleton (NRCVar fv))
-                                 fv (NRCVar fv)
-                                 fv (NRCConst dunit)) (* must not be executed *)
+               NNRCLet fv
+                      (NNRCEither (NNRCUnop ASingleton (NNRCVar fv))
+                                 fv (NNRCVar fv)
+                                 fv (NNRCConst dunit)) (* must not be executed *)
                       k
              end)
           mr_last fvs
@@ -369,7 +369,7 @@ Section NNRCMRToCloudantMR.
     ((fvs, cld_mr_last), map fst vars_loc).
 
   (* Java equivalent: nrcmrToCldmr.NNRCMRtoNNRCMRCloudant *)
-  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (mrl: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (mrl: nnrcmr) : cld_mrl :=
     (* Used to compute a separate var_locs distinct from mr_last effective params -- removed now.
        This should be reviewed by Louis *)
     mkMRCldChain
@@ -573,7 +573,7 @@ Proof.
   Admitted.
 
 (*
-  Definition NNRCMRtoNNRCMRCloudantInit (avoiddb: list var) (l: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudantInit (avoiddb: list var) (l: nnrcmr) : cld_mrl :=
     match l with
     | nil => nil
     | mrtop :: nil =>
@@ -584,7 +584,7 @@ Proof.
     end.
 
     Lemma NNRCMRtoNNRCMRCloudantInit_causally_consistent avoiddb l :
-    nrcmr_causally_consistent l = true ->
+    nnrcmr_causally_consistent l = true ->
     forall x,
       cld_mr_chain_causally_consistent x = true ->
       forallb (fun a => forallb (fun y : cld_mr => cld_mr_input y <>b mr_output a) x) l = true ->
@@ -598,7 +598,7 @@ Proof.
       - destruct l.
         + rewrite app_nil_r.
            apply MRtoMRCldLast_causually_consistent; trivial.
-          * unfold nrcmr_causally_consistent in H.
+          * unfold nnrcmr_causally_consistent in H.
             simpl in H.
             repeat rewrite andb_true_iff in H.
             intuition.
@@ -614,7 +614,7 @@ Proof.
             rewrite eqq; simpl.
             { intros HH; apply HH; clear HH.
               - apply H2. simpl; intuition.
-              - unfold nrcmr_causally_consistent in H.
+              - unfold nnrcmr_causally_consistent in H.
                 simpl in H.
                 repeat rewrite andb_true_iff in H; intuition.
               - simpl in H1.
@@ -640,7 +640,7 @@ Proof.
                match_destr.
                rewrite e in inn1.
                destruct inn1 as [eqq3|inn3].
-               + unfold nrcmr_causally_consistent in H.
+               + unfold nnrcmr_causally_consistent in H.
                  simpl in H.
                  repeat rewrite andb_true_iff in H.
                  intuition.
@@ -665,7 +665,7 @@ Proof.
                specialize (inn1 _ inn3).
                rewrite e in inn1.
                destruct inn1 as [eqq4|inn4].
-               + unfold nrcmr_causally_consistent in H.
+               + unfold nnrcmr_causally_consistent in H.
                  simpl in H.
                  repeat rewrite andb_true_iff in H.
                  intuition.
@@ -699,12 +699,12 @@ Proof.
 *)
 
   (* Java equivalent: NrcmrToCldmr.convert *)
-  Definition NNRCMRtoNNRCMRCloudantTop (mrl: nrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudantTop (mrl: nnrcmr) : cld_mrl :=
     let avoiddb := List.map mr_input mrl.(mr_chain) ++ List.map mr_output mrl.(mr_chain) in
     NNRCMRtoNNRCMRCloudant avoiddb mrl.
 
   Lemma NNRCMRtoNNRCMRCloudantTop_causally_consistent mrl :
-    nrcmr_causally_consistent mrl = true ->
+    nnrcmr_causally_consistent mrl = true ->
     cld_mr_chain_causally_consistent (NNRCMRtoNNRCMRCloudantTop mrl).(cld_mr_chain) = true.
   Proof.
     intros cc.

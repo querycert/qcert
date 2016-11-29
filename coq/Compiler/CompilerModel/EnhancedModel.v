@@ -928,7 +928,7 @@ Definition enhanced_to_spark_reduce_op
         ".arithmean /* ArithMean must be removed before code generation */"
      end.
 
-(* NRCMR rewrites *)
+(* NNRCMR rewrites *)
 Require Import NNRCRuntime NNRCMRRuntime NRewMR.
 
   (* Java equivalent: MROptimizer.min_max_to_stats *)
@@ -957,7 +957,7 @@ Require Import NNRCRuntime NNRCMRRuntime NRewMR.
             mkMR
               tmp
               mr.(mr_output)
-              (MapScalar (x, NRCUnop AColl (NRCUnop (ADot stats_field) (NRCVar x))))
+              (MapScalar (x, NNRCUnop AColl (NNRCUnop (ADot stats_field) (NNRCVar x))))
               RedSingleton
         in
         Some (mr1::mr2::nil)
@@ -983,25 +983,25 @@ Require Import NNRCRuntime NNRCMRRuntime NRewMR.
         let map :=
             match typ with
             | enhanced_numeric_int =>
-              let zero := NRCConst (dnat 0) in
+              let zero := NNRCConst (dnat 0) in
               let x := "stats"%string in
-              MapScalar (x, NRCUnop AColl
-                                    (NRCIf (NRCBinop AEq (NRCUnop (ADot "count"%string) (NRCVar x)) zero)
+              MapScalar (x, NNRCUnop AColl
+                                    (NNRCIf (NNRCBinop AEq (NNRCUnop (ADot "count"%string) (NNRCVar x)) zero)
                                            zero
-                                           (NRCBinop (ABArith ArithDivide)
-                                                     (NRCUnop (ADot "sum"%string) (NRCVar x))
-                                                     (NRCUnop (ADot "count"%string) (NRCVar x)))))
+                                           (NNRCBinop (ABArith ArithDivide)
+                                                     (NNRCUnop (ADot "sum"%string) (NNRCVar x))
+                                                     (NNRCUnop (ADot "count"%string) (NNRCVar x)))))
             | enhanced_numeric_float =>
-              let zero := NRCConst (dnat 0) in
-              let zerof := NRCConst (denhancedfloat FLOAT_CONST0) in
+              let zero := NNRCConst (dnat 0) in
+              let zerof := NNRCConst (denhancedfloat FLOAT_CONST0) in
               let x := "stats"%string in
-              MapScalar (x, NRCUnop AColl
-                                    (NRCIf (NRCBinop AEq (NRCUnop (ADot "count"%string) (NRCVar x)) zero)
+              MapScalar (x, NNRCUnop AColl
+                                    (NNRCIf (NNRCBinop AEq (NNRCUnop (ADot "count"%string) (NNRCVar x)) zero)
                                            zerof
-                                           (NRCBinop (AForeignBinaryOp (enhanced_binary_float_op bop_float_div))
-                                                     (NRCUnop (ADot "sum"%string) (NRCVar x))
-                                                     (NRCUnop (AForeignUnaryOp (enhanced_unary_float_op uop_float_of_int))
-                                                       (NRCUnop (ADot "count"%string) (NRCVar x))))))
+                                           (NNRCBinop (AForeignBinaryOp (enhanced_binary_float_op bop_float_div))
+                                                     (NNRCUnop (ADot "sum"%string) (NNRCVar x))
+                                                     (NNRCUnop (AForeignUnaryOp (enhanced_unary_float_op uop_float_of_int))
+                                                       (NNRCUnop (ADot "count"%string) (NNRCVar x))))))
             end
         in
         let mr2 :=
@@ -1038,29 +1038,29 @@ Require Import NNRCRuntime NNRCMRRuntime NRewMR.
   Definition min_max_free_mr_chain (src:list mr)
     := Forall min_max_free_mr src.
 
-  Definition min_max_free_nrcmr (src:nrcmr)
+  Definition min_max_free_nnrcmr (src:nnrcmr)
     := min_max_free_mr_chain src.(mr_chain).
 
   Definition arithmean_free_mr_chain (src:list mr)
     := Forall arithmean_free_mr src.
 
-  Definition arithmean_free_nrcmr (src:nrcmr)
+  Definition arithmean_free_nnrcmr (src:nnrcmr)
     := arithmean_free_mr_chain src.(mr_chain).
 
-  Definition to_spark_nrcmr (l: nrcmr) :=
-    let avoid := get_nrcmr_vars l in
+  Definition to_spark_nnrcmr (l: nnrcmr) :=
+    let avoid := get_nnrcmr_vars l in
     let l := apply_rewrite (arithmean_to_stats avoid) l in
     l.
 
-  Definition to_spark_nrcmr_prepared (src:nrcmr)
-    := arithmean_free_nrcmr src.
+  Definition to_spark_nnrcmr_prepared (src:nnrcmr)
+    := arithmean_free_nnrcmr src.
 
 Program Instance enhanced_foreign_to_spark : foreign_to_spark
   := mk_foreign_to_spark
        enhanced_foreign_runtime
        enhanced_foreign_reduce_op
        enhanced_to_spark_reduce_op
-       to_spark_nrcmr.
+       to_spark_nnrcmr.
 
 Instance enhanced_foreign_cloudant : foreign_cloudant
   := mk_foreign_cloudant
@@ -1080,26 +1080,26 @@ Definition enhanced_to_cloudant_reduce_op
      | RedOpArithMean _ => CloudantMR.CldRedOpStats CloudantMR.Cld_int (* assert false *)
      end.
 
-  (* Java equivalent: MROptimizer.foreign_to_cloudant_prepare_nrcmr *)
-  Definition to_cloudant_nrcmr (l: nrcmr) :=
-    let avoid := get_nrcmr_vars l in
+  (* Java equivalent: MROptimizer.foreign_to_cloudant_prepare_nnrcmr *)
+  Definition to_cloudant_nnrcmr (l: nnrcmr) :=
+    let avoid := get_nnrcmr_vars l in
     let l := apply_rewrite (min_max_to_stats avoid) l in
     let l := apply_rewrite (arithmean_to_stats avoid) l in
     l.
 
-  Definition to_cloudant_nrcmr_prepared (src:nrcmr)
-    := min_max_free_nrcmr src /\ arithmean_free_nrcmr src.
+  Definition to_cloudant_nnrcmr_prepared (src:nnrcmr)
+    := min_max_free_nnrcmr src /\ arithmean_free_nnrcmr src.
 
   Program Instance enhanced_foreign_to_cloudant : foreign_to_cloudant
     :=
       { foreign_to_cloudant_reduce_op := enhanced_to_cloudant_reduce_op
-        ; foreign_to_cloudant_prepare_nrcmr := to_cloudant_nrcmr
-        ; foreign_to_cloudant_nrcmr_prepared := to_cloudant_nrcmr_prepared
+        ; foreign_to_cloudant_prepare_nnrcmr := to_cloudant_nnrcmr
+        ; foreign_to_cloudant_nnrcmr_prepared := to_cloudant_nnrcmr_prepared
       }.
   Next Obligation.
-    unfold to_cloudant_nrcmr.
-    unfold to_cloudant_nrcmr_prepared.
-    unfold min_max_free_nrcmr, min_max_free_mr_chain, min_max_free_mr, min_max_free_reduce.
+    unfold to_cloudant_nnrcmr.
+    unfold to_cloudant_nnrcmr_prepared.
+    unfold min_max_free_nnrcmr, min_max_free_mr_chain, min_max_free_mr, min_max_free_reduce.
     split.
     - unfold apply_rewrite, min_max_to_stats.
       unfold mr_chain_apply_rewrite.
@@ -1150,7 +1150,7 @@ Definition enhanced_to_cloudant_reduce_op
         invcs H0; trivial.
       + intuition.
         invcs H; trivial.
-    - unfold apply_rewrite, mr_chain_apply_rewrite, arithmean_free_nrcmr, arithmean_free_mr_chain.
+    - unfold apply_rewrite, mr_chain_apply_rewrite, arithmean_free_nnrcmr, arithmean_free_mr_chain.
       simpl in *.
       apply Forall_forall; intros ? inn.
       apply in_flat_map in inn.
@@ -1215,34 +1215,34 @@ Definition enhanced_to_cloudant_reduce_op
         ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
       } .
 
-  Axiom OPTIMIZER_LOGGER_nrc_startPass :
-    String.string -> nrc -> OPTIMIZER_LOGGER_token_type.
+  Axiom OPTIMIZER_LOGGER_nnrc_startPass :
+    String.string -> nnrc -> OPTIMIZER_LOGGER_token_type.
 
-  Extract Inlined Constant OPTIMIZER_LOGGER_nrc_startPass =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_startPass =>
   "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
 
-  Axiom OPTIMIZER_LOGGER_nrc_step :
+  Axiom OPTIMIZER_LOGGER_nnrc_step :
     OPTIMIZER_LOGGER_token_type -> String.string ->
-    nrc -> nrc ->
+    nnrc -> nnrc ->
     OPTIMIZER_LOGGER_token_type.
   
-  Extract Inlined Constant OPTIMIZER_LOGGER_nrc_step =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_step =>
   "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
 
-  Axiom OPTIMIZER_LOGGER_nrc_endPass :
-    OPTIMIZER_LOGGER_token_type -> nrc -> OPTIMIZER_LOGGER_token_type.
+  Axiom OPTIMIZER_LOGGER_nnrc_endPass :
+    OPTIMIZER_LOGGER_token_type -> nnrc -> OPTIMIZER_LOGGER_token_type.
   
-  Extract Inlined Constant OPTIMIZER_LOGGER_nrc_endPass =>
+  Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
   "(fun token output -> Logger.log_endPass token output)".
 
-  Instance foreign_nrc_optimizer_logger :
-    optimizer_logger string nrc
+  Instance foreign_nnrc_optimizer_logger :
+    optimizer_logger string nnrc
     :=
       {
         optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
-        ; logStartPass := OPTIMIZER_LOGGER_nrc_startPass
-        ; logStep :=  OPTIMIZER_LOGGER_nrc_step
-        ; logEndPass :=  OPTIMIZER_LOGGER_nrc_endPass
+        ; logStartPass := OPTIMIZER_LOGGER_nnrc_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_nnrc_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_nnrc_endPass
       } .
     
 
@@ -1448,8 +1448,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := enhanced_foreign_to_cloudant.
   Definition compiler_nraenv_optimizer_logger : optimizer_logger string nraenv
     := foreign_nraenv_optimizer_logger.
-  Definition compiler_nrc_optimizer_logger : optimizer_logger string nrc
-    := foreign_nrc_optimizer_logger.
+  Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
+    := foreign_nnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
 End EnhancedRuntime.
@@ -2122,7 +2122,7 @@ Proof.
         eexists; split; try reflexivity;
           repeat constructor.
 Qed.
-           
+         
 Definition time_binary_op_type_infer_sub {model : brand_model} (op:time_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
   match op with
   | bop_time_as =>
@@ -2202,7 +2202,7 @@ Proof.
         eexists; split; try reflexivity;
           repeat constructor.
 Qed.
-           
+         
 Definition sql_date_binary_op_type_infer_sub {model : brand_model} (op:sql_date_binary_op) (τ₁ τ₂:rtype) : option (rtype*rtype*rtype) :=
   match op with
   | bop_sql_date_plus =>
@@ -2444,8 +2444,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := enhanced_foreign_to_cloudant.
   Definition compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv
     := foreign_nraenv_optimizer_logger.
-  Definition compiler_model_nrc_optimizer_logger : optimizer_logger string nrc
-    := foreign_nrc_optimizer_logger.
+  Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
+    := foreign_nnrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
 End EnhancedModel.

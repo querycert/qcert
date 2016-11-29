@@ -88,8 +88,8 @@ Section CloudantMR.
   
   (* Java equivalent: CldMapFun *)
   Inductive cld_map_fun :=
-  | CldMapId : var * nrc -> cld_map_fun           (* A -> B *)
-  | CldMapFlatten : var * nrc -> cld_map_fun.     (* A -> coll B *)
+  | CldMapId : var * nnrc -> cld_map_fun           (* A -> B *)
+  | CldMapFlatten : var * nnrc -> cld_map_fun.     (* A -> coll B *)
 
   (* Java equivalent: CldMapEmit *)
   Inductive cld_map_emit :=
@@ -121,7 +121,7 @@ Section CloudantMR.
   (* Java equivalent: CldReduceFun *)
   Inductive cld_reduce_fun :=
   | CldRedId : cld_reduce_fun
-  | CldRedAggregate : ((var * var) * nrc) -> (var * nrc) -> cld_reduce_fun
+  | CldRedAggregate : ((var * var) * nnrc) -> (var * nnrc) -> cld_reduce_fun
   | CldRedOp : cld_reduce_op -> cld_reduce_fun.
       (* first function : ((K * list B) -> C) function that computes the first reduce pass
          second function : (list C) -> C) function that computes the subsequent reduceereduce passes *)
@@ -138,13 +138,13 @@ Section CloudantMR.
       { cld_mr_input: var;               (* Input Cloudant Database *)
         cld_mr_map: cld_map;             (* Cloudant Map *)
         cld_mr_reduce: option cld_reduce; (* Cloudant Reduce *)
-        cld_mr_reduce_default: option nrc }.
+        cld_mr_reduce_default: option nnrc }.
 
   (* Java equivalent: CldMrl *)
   Record cld_mrl :=
     mkMRCldChain
       { cld_mr_chain: list cld_mr;
-        cld_mr_last: ((list var) * nrc) * (list var) }.
+        cld_mr_last: ((list var) * nnrc) * (list var) }.
   (* Temporarily : localization should always be scalar *)
 
   (********************************
@@ -181,7 +181,7 @@ Section CloudantMR.
   Definition mr_chain_io_vars (l : list mr) : list var
     := map mr_input l ++ map mr_output l.
 
-  Definition nrcmr_io_vars (mrl : nrcmr) : list var
+  Definition nnrcmr_io_vars (mrl : nnrcmr) : list var
     := mr_chain_io_vars mrl.(mr_chain).
 
   Definition cld_mr_chain_io_vars : list cld_mr -> list var
@@ -192,11 +192,11 @@ Section CloudantMR.
 
   (* XXX Those have to be revised... *)
   
-  Definition function_with_no_free_vars (f: var * nrc) :=
-    (forall (x: var), In x (nrc_free_vars (snd f)) -> x = fst f).
-  Definition function2_with_no_free_vars (f: (var * var) * nrc) :=
+  Definition function_with_no_free_vars (f: var * nnrc) :=
+    (forall (x: var), In x (nnrc_free_vars (snd f)) -> x = fst f).
+  Definition function2_with_no_free_vars (f: (var * var) * nnrc) :=
     (fst (fst f)) <> (snd (fst f)) /\
-    (forall x, In x (nrc_free_vars (snd f)) -> x = (fst (fst f)) \/ x = (snd (fst f))).
+    (forall x, In x (nnrc_free_vars (snd f)) -> x = (fst (fst f)) \/ x = (snd (fst f))).
 
   Definition init_vkey := "vkey$"%string.
   Definition init_vval := "vval$"%string.
@@ -229,23 +229,23 @@ Section CloudantMR.
    * Semantics of map *
    ********************)
 
-  Definition apply_map_fun_with_keys (doc:var) (body:nrc) :
+  Definition apply_map_fun_with_keys (doc:var) (body:nnrc) :
     list (data * data) -> option (list (data * data)) :=
     fun coll =>
       let f_map (d:data*data) :=
           let '(k, v) := d in
-          match nrc_eval h ((doc,v)::nil) body with
+          match nnrc_core_eval h ((doc,v)::nil) body with
           | None => None
           | Some res => Some (k, res)
           end
       in rmap f_map coll.
   
-  Definition apply_map_fun_without_keys (doc:var) (body:nrc) :
+  Definition apply_map_fun_without_keys (doc:var) (body:nnrc) :
     list (data * data) -> option (list data) :=
     fun coll =>
       let f_map (d:data*data) :=
           let (_, v) := d in
-          match nrc_eval h ((doc,v)::nil) body with
+          match nnrc_core_eval h ((doc,v)::nil) body with
           | None => None
           | Some res => Some res
           end
@@ -281,7 +281,7 @@ Section CloudantMR.
       end
     end.
 
-  Lemma mapIdDist_is_map (map:var*nrc) (coll:list data) :
+  Lemma mapIdDist_is_map (map:var*nnrc) (coll:list data) :
     lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitDist)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
     unfold cld_mr_map_eval; simpl.
@@ -290,16 +290,16 @@ Section CloudantMR.
     - destruct map; reflexivity.
     - destruct map; simpl.
       unfold apply_map_fun_with_keys in *; simpl.
-      destruct (nrc_eval h ((v, a) :: nil) n0); try reflexivity; simpl.
+      destruct (nnrc_core_eval h ((v, a) :: nil) n0); try reflexivity; simpl.
       rewrite <- (IHcoll (S n)); simpl; clear IHcoll.
       destruct (init_keys_aux nil (S n) coll); try reflexivity; simpl.
       destruct p; simpl.
-      destruct (nrc_eval h ((v, d1) :: nil) n0); try reflexivity; simpl.
+      destruct (nnrc_core_eval h ((v, d1) :: nil) n0); try reflexivity; simpl.
       generalize ((lift (fun t' : list (data * data) => (d0, d2) :: t')
            (rmap
               (fun d3 : data * data =>
                let (k, v0) := d3 in
-               match nrc_eval h ((v, v0) :: nil) n0 with
+               match nnrc_core_eval h ((v, v0) :: nil) n0 with
                | Some res => Some (k, res)
                | None => None
                end) l))); intros.
@@ -316,7 +316,7 @@ Section CloudantMR.
     destruct coll; reflexivity.
   Qed.
 
-  Lemma mapIdCollect_is_map (map:var*nrc) (n:nat) (coll:list data) :
+  Lemma mapIdCollect_is_map (map:var*nnrc) (n:nat) (coll:list data) :
     lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitCollect n)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
     unfold cld_mr_map_eval; simpl.
@@ -325,16 +325,16 @@ Section CloudantMR.
     - destruct map; reflexivity.
     - destruct map; simpl.
       unfold apply_map_fun_without_keys in *; simpl.
-      destruct (nrc_eval h ((v, a) :: nil) n1); try reflexivity; simpl.
+      destruct (nnrc_core_eval h ((v, a) :: nil) n1); try reflexivity; simpl.
       rewrite <- (IHcoll (S n0)); simpl; clear IHcoll.
       destruct (init_keys_aux nil (S n0) coll); try reflexivity; simpl.
       destruct p; simpl.
-      destruct (nrc_eval h ((v, d1) :: nil) n1); try reflexivity; simpl.
+      destruct (nnrc_core_eval h ((v, d1) :: nil) n1); try reflexivity; simpl.
       generalize ((lift (fun t' : list data => d2 :: t')
            (rmap
               (fun d3 : data * data =>
                let (_, v0) := d3 in
-               match nrc_eval h ((v, v0) :: nil) n1 with
+               match nnrc_core_eval h ((v, v0) :: nil) n1 with
                | Some res => Some res
                | None => None
                end) l))); intros.
@@ -360,12 +360,12 @@ Section CloudantMR.
    * Semantics of reduce *
    ***********************)
 
-  Definition cld_mr_aggregate_eval (f_reduce: (var * var) * nrc) (f_rereduce: (var * nrc)) (groups: list (data * (list data)))  : option (list (data * data)) :=
+  Definition cld_mr_aggregate_eval (f_reduce: (var * var) * nnrc) (f_rereduce: (var * nnrc)) (groups: list (data * (list data)))  : option (list (data * data)) :=
     let (key_values_args, body) := f_reduce in
     let (key_arg, values_arg) := key_values_args in
     let f_reduce (key_values_v: data * list data) : option (data * data) :=
         let (key_v, values_v) := key_values_v in
-        match nrc_eval h ((values_arg, dcoll values_v) :: (key_arg, key_v) :: nil) body with
+        match nnrc_core_eval h ((values_arg, dcoll values_v) :: (key_arg, key_v) :: nil) body with
           None => None
         | Some res => Some (key_v, res)
         end
@@ -374,7 +374,7 @@ Section CloudantMR.
     let f_rereduce (key_value_v: (data * data)) : option (data * data) :=
         let '(key_v, value_v) := key_value_v in
         let '(values_arg, rebody) := f_rereduce in
-        match nrc_eval h ((values_arg, dcoll (value_v::nil)) :: nil) rebody with
+        match nnrc_core_eval h ((values_arg, dcoll (value_v::nil)) :: nil) rebody with
         | None => None
         | Some res => Some (key_v, res)
         end
@@ -474,7 +474,7 @@ Section CloudantMR.
       end
     end.
   
-  Definition nrc_env_of_cld_env (form:list var) (eff: option (list data)): option bindings :=
+  Definition nnrc_env_of_cld_env (form:list var) (eff: option (list data)): option bindings :=
     olift (zip form) eff. 
 
   Definition effective_params_from_bindings (eff:list var) (cld_env:bindings) : option (list data) :=
@@ -487,11 +487,11 @@ Section CloudantMR.
          end)
       eff.
   
-  Definition cld_mr_eval_last (cld_env:bindings) (mr_last: ((list var) * nrc) * (list var)) : option data :=
+  Definition cld_mr_eval_last (cld_env:bindings) (mr_last: ((list var) * nnrc) * (list var)) : option data :=
     let (formal_params, n) := fst mr_last in
     let effective_params := effective_params_from_bindings (snd mr_last) cld_env in
-    let onrc_env := nrc_env_of_cld_env formal_params effective_params in
-    olift (fun nrc_env => nrc_eval h nrc_env n) onrc_env.
+    let onrc_env := nnrc_env_of_cld_env formal_params effective_params in
+    olift (fun nnrc_env => nnrc_core_eval h nnrc_env n) onrc_env.
 
   Definition cld_mr_chain_eval_inner (env:bindings) (l:list cld_mr) : option (bindings * list (data * data)) :=
     List.fold_left
@@ -535,15 +535,15 @@ Section CloudantMR.
 
     (* Java equivalent: NrcmrToCldmr.collectReduce *)
     Definition collectReduce (v_out:option var) : cld_reduce :=
-      mkReduceCld (CldRedAggregate (init_vkey, init_vval, NRCVar init_vval)
-                                   (init_vval, NRCUnop AFlatten (NRCVar init_vval))) v_out.
+      mkReduceCld (CldRedAggregate (init_vkey, init_vval, NNRCVar init_vval)
+                                   (init_vval, NNRCUnop AFlatten (NNRCVar init_vval))) v_out.
 
     (* Java equivalent: NrcmrToCldmr.opReduce *)
     Definition opReduce (op: cld_reduce_op) (v_out:option var) : cld_reduce :=
       mkReduceCld (CldRedOp op) v_out.
 
     Definition defaultMR : cld_mr :=
-      mkMRCld init_vval (mkMapCld (CldMapId (init_vval, NRCConst dunit)) (CldEmitCollect (99%nat))) None None (*empty default*).
+      mkMRCld init_vval (mkMapCld (CldMapId (init_vval, NNRCConst dunit)) (CldEmitCollect (99%nat))) None None (*empty default*).
     
   End cld_mr_library.
 

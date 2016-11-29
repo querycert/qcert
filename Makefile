@@ -136,13 +136,18 @@ MODULES = \
 	NNRC/Calculus/NNRCEq \
 	NNRC/Calculus/NNRCSize \
 	NNRC/Extended/NNRCExt \
-	NNRC/Typing/TNRC \
-	NNRC/Typing/TNRCInfer \
-	NNRC/Typing/TNRCEq \
-	NNRC/Typing/TShadow \
-	NNRC/Rew/NRewUtil \
-	NNRC/Rew/NRew \
-	NNRC/Rew/TRew \
+	NNRC/Extended/NNRCExtShadow \
+	NNRC/Extended/NNRCExtEq \
+	NNRC/Typing/TNNRC \
+	NNRC/Typing/TNNRCExt \
+	NNRC/Typing/TNNRCInfer \
+	NNRC/Typing/TNNRCEq \
+	NNRC/Typing/TNNRCExtEq \
+	NNRC/Typing/TNNRCShadow \
+	NNRC/Typing/TNNRCExtShadow \
+	NNRC/Rew/NNRCRewriteUtil \
+	NNRC/Rew/NNRCRewrite \
+	NNRC/Rew/TNNRCRewrite \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \
@@ -220,8 +225,8 @@ MODULES = \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
 	Compiler/Optimizer/NRAEnvOptimFunc \
-	Compiler/Optimizer/NRewFunc \
-	Compiler/Optimizer/TRewFunc \
+	Compiler/Optimizer/NNRCOptimizer \
+	Compiler/Optimizer/TNNRCOptimizer \
 	Compiler/CompilerModel/CompilerRuntime \
 	Compiler/CompilerModel/CompilerModel \
 	Compiler/CompilerModel/FloatModelPart \

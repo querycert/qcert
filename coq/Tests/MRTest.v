@@ -50,12 +50,12 @@ Section MRTest.
           (x :: chain, last)
         end.
 
-  Definition nfirsts n (chain: nrcmr) :=
+  Definition nfirsts n (chain: nnrcmr) :=
     match nfirsts_aux n chain.(mr_chain) with
-    | (l, None) => mkMRChain chain.(mr_inputs_loc) l (("x"%string::nil, NRCVar "x"%string), nil)
+    | (l, None) => mkMRChain chain.(mr_inputs_loc) l (("x"%string::nil, NNRCVar "x"%string), nil)
     | (l, Some mr) =>
       let x_loc := mr_output_localized mr in
-      mkMRChain chain.(mr_inputs_loc) l (("x"%string::nil, NRCVar "x"%string), x_loc::nil)
+      mkMRChain chain.(mr_inputs_loc) l (("x"%string::nil, NNRCVar "x"%string), x_loc::nil)
     end.
 
 End MRTest.

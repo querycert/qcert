@@ -44,50 +44,53 @@ Section DNNRCDatasetRewrites.
    * Andy Gill. IFIP Working Conference on DSLs, 2009.
    * http://ku-fpg.github.io/files/Gill-09-KUREDSL.pdf *)
   Fixpoint tryBottomUp {A: Set} {P: Set}
-           (f: dnrc A P -> option (dnrc A P))
-           (e: dnrc A P)
-    : dnrc A P :=
+           (f: dnnrc A P -> option (dnnrc A P))
+           (e: dnnrc A P)
+    : dnnrc A P :=
     let try := fun e =>
                  match f e with
                  | Some e' => e'
                  | None => e
                  end in
     match e with
-    | DNRCVar _ _ => try e
-    | DNRCConst _ _ => try e
-    | DNRCBinop a b x y =>
+    | DNNRCVar _ _ => try e
+    | DNNRCConst _ _ => try e
+    | DNNRCBinop a b x y =>
       let x' := tryBottomUp f x in
       let y' := tryBottomUp f y in
-      try (DNRCBinop a b x' y')
-    | DNRCUnop a b x =>
+      try (DNNRCBinop a b x' y')
+    | DNNRCUnop a b x =>
       let x' := tryBottomUp f x in
-      try (DNRCUnop a b x')
-    | DNRCLet a b x y =>
-      let x' := tryBottomUp f x in
-      let y' := tryBottomUp f y in
-      try (DNRCLet a b x' y')
-    | DNRCFor a b x y =>
+      try (DNNRCUnop a b x')
+    | DNNRCLet a b x y =>
       let x' := tryBottomUp f x in
       let y' := tryBottomUp f y in
-      try (DNRCFor a b x' y')
-    | DNRCIf a x y z =>
+      try (DNNRCLet a b x' y')
+    | DNNRCFor a b x y =>
       let x' := tryBottomUp f x in
       let y' := tryBottomUp f y in
-      let z' := tryBottomUp f z in
-      try (DNRCIf a x' y' z')
-    | DNRCEither a x b y c z =>
+      try (DNNRCFor a b x' y')
+    | DNNRCIf a x y z =>
       let x' := tryBottomUp f x in
       let y' := tryBottomUp f y in
       let z' := tryBottomUp f z in
-      try (DNRCEither a x' b y' c z')
-    | DNRCCollect a x =>
+      try (DNNRCIf a x' y' z')
+    | DNNRCEither a x b y c z =>
       let x' := tryBottomUp f x in
-      try (DNRCCollect a x')
-    | DNRCDispatch a x =>
+      let y' := tryBottomUp f y in
+      let z' := tryBottomUp f z in
+      try (DNNRCEither a x' b y' c z')
+    | DNNRCGroupBy a g sl x =>
       let x' := tryBottomUp f x in
-      try (DNRCDispatch a x')
-    | DNRCAlg a b c =>
-      (* TODO Should I try to match on the dnrc environment? *)
+      try (DNNRCGroupBy a g sl x')
+    | DNNRCCollect a x =>
+      let x' := tryBottomUp f x in
+      try (DNNRCCollect a x')
+    | DNNRCDispatch a x =>
+      let x' := tryBottomUp f x in
+      try (DNNRCDispatch a x')
+    | DNNRCAlg a b c =>
+      (* TODO Should I try to match on the dnnrc environment? *)
       try e
     end.
 
@@ -97,35 +100,35 @@ Section DNNRCDatasetRewrites.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: dnrc (type_annotation A) dataset) :=
+             (e: dnnrc (type_annotation A) dataset) :=
     match e with
-    | DNRCUnop t1 AFlatten
-               (DNRCFor t2 x
-                        (DNRCCollect t3 xs)
-                        (DNRCEither _ (DNRCUnop t4 (ACast brands) (DNRCVar _ x'))
+    | DNNRCUnop t1 AFlatten
+               (DNNRCFor t2 x
+                        (DNNRCCollect t3 xs)
+                        (DNNRCEither _ (DNNRCUnop t4 (ACast brands) (DNNRCVar _ x'))
                                     leftVar
                                     leftE
                                     _
-                                    (DNNRC.DNRCConst _ (dcoll nil)))) =>
+                                    (DNNRC.DNNRCConst _ (dcoll nil)))) =>
       if (x == x')
       then
         match olift tuneither (lift_tlocal (ta_inferred t4)) with
         | Some (castSuccessType, _) =>
           let algTypeA := ta_mk (ta_base t4) (Tdistr castSuccessType) in
           let collectTypeA := ta_mk (ta_base t3) (Tlocal (Coll castSuccessType)) in
-          (* We need a fresh name for the DNRCAlg environment that binds DNNRC terms to
+          (* We need a fresh name for the DNNRCAlg environment that binds DNNRC terms to
            * be referred to by name in the algebra part.
            * I talked to Avi about it and this is what needs to happen:
            * - TODO write a function that finds free (and possibly bound) names in Dataset
            * - TODO use existing fresh_var-related functions in Basic.Util.RFresh
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
-          let ALG := (DNRCAlg algTypeA
+          let ALG := (DNNRCAlg algTypeA
                             (DSFilter (CUDFCast brands (CCol "$type"))
                                       (DSVar "map_cast"))
                             (("map_cast"%string, xs)::nil)) in
-          Some (DNRCUnop t1 AFlatten
-                         (DNRCFor t2 leftVar (DNRCCollect collectTypeA ALG)
+          Some (DNNRCUnop t1 AFlatten
+                         (DNNRCFor t2 leftVar (DNNRCCollect collectTypeA ALG)
                                   leftE))
         | _ => None
         end
@@ -141,49 +144,51 @@ Section DNNRCDatasetRewrites.
   Fixpoint rewrite_unbrand_or_fail
            {A: Set} {P: Set}
            (s: string)
-           (e: dnrc A P) :=
+           (e: dnnrc A P) :=
     match e with
-    | DNRCUnop t1 AUnbrand (DNRCVar t2 v) =>
+    | DNNRCUnop t1 AUnbrand (DNNRCVar t2 v) =>
       if (s == v)
-      then Some (DNRCVar t1 s)
+      then Some (DNNRCVar t1 s)
       else None
-    | DNRCVar _ v =>
+    | DNNRCVar _ v =>
       if (s == v)
       then None
       else Some e
-    | DNRCConst _ _ => Some e
-    | DNRCBinop a b x y =>
-      lift2 (DNRCBinop a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
-    | DNRCUnop a b x =>
-      lift (DNRCUnop a b) (rewrite_unbrand_or_fail s x)
-    | DNRCLet a b x y =>
-      lift2 (DNRCLet a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
-    | DNRCFor a b x y =>
-      lift2 (DNRCFor a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
-    | DNRCIf a x y z =>
+    | DNNRCConst _ _ => Some e
+    | DNNRCBinop a b x y =>
+      lift2 (DNNRCBinop a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
+    | DNNRCUnop a b x =>
+      lift (DNNRCUnop a b) (rewrite_unbrand_or_fail s x)
+    | DNNRCLet a b x y =>
+      lift2 (DNNRCLet a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
+    | DNNRCFor a b x y =>
+      lift2 (DNNRCFor a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
+    | DNNRCIf a x y z =>
       match rewrite_unbrand_or_fail s x, rewrite_unbrand_or_fail s y, rewrite_unbrand_or_fail s z with
-      | Some x', Some y', Some z' => Some (DNRCIf a x' y' z')
+      | Some x', Some y', Some z' => Some (DNNRCIf a x' y' z')
       | _, _, _ => None
       end
-    | DNRCEither a x b y c z =>
+    | DNNRCEither a x b y c z =>
       match rewrite_unbrand_or_fail s x, rewrite_unbrand_or_fail s y, rewrite_unbrand_or_fail s z with
-      | Some x', Some y', Some z' => Some (DNRCEither a x' b y' c z')
+      | Some x', Some y', Some z' => Some (DNNRCEither a x' b y' c z')
       | _, _, _ => None
       end
-    | DNRCCollect a x =>
-      lift (DNRCCollect a) (rewrite_unbrand_or_fail s x)
-    | DNRCDispatch a x =>
-      lift (DNRCDispatch a) (rewrite_unbrand_or_fail s x)
+    | DNNRCGroupBy a g sl x =>
+      lift (DNNRCGroupBy a g sl) (rewrite_unbrand_or_fail s x)
+    | DNNRCCollect a x =>
+      lift (DNNRCCollect a) (rewrite_unbrand_or_fail s x)
+    | DNNRCDispatch a x =>
+      lift (DNNRCDispatch a) (rewrite_unbrand_or_fail s x)
     (* TODO Can we discover uses of the variable s in an algebra expression? *)
-    | DNRCAlg _ _ _ => None
+    | DNNRCAlg _ _ _ => None
     end.
 
   Definition rec_lift_unbrand
              {A : Set}
-             (e: dnrc (type_annotation A) dataset):
-    option (dnrc (type_annotation _) dataset) :=
+             (e: dnnrc (type_annotation A) dataset):
+    option (dnnrc (type_annotation _) dataset) :=
     match e with
-    | DNRCFor t1 x (DNRCCollect t2 xs as c) e =>
+    | DNNRCFor t1 x (DNNRCCollect t2 xs as c) e =>
       match lift_tlocal (di_required_typeof c) with
       | Some (exist _ (Coll₀ (Brand₀ bs)) _) =>
         let t := proj1_sig (brands_type bs) in
@@ -191,14 +196,14 @@ Section DNNRCDatasetRewrites.
         | Some e' =>
           let ALG :=
               (* TODO fresh name for lift_unbrand! *)
-              DNRCAlg (dnrc_annotation_get xs)
+              DNNRCAlg (dnnrc_annotation_get xs)
                       (DSSelect (("$blob"%string, CCol "unbranded.$blob")
                                    :: ("$known"%string, CCol "unbranded.$known")::nil)
                                 (DSSelect (("unbranded"%string, CUDFUnbrand t (CCol "$data"))::nil)
                                           (DSVar "lift_unbrand")))
                       (("lift_unbrand"%string, xs)::nil)
           in
-          Some (DNRCFor t1 x (DNRCCollect t2 ALG) e')
+          Some (DNNRCFor t1 x (DNNRCCollect t2 ALG) e')
         | None => None
         end
       | _ => None
@@ -228,28 +233,28 @@ Section DNNRCDatasetRewrites.
     end.
 
   Fixpoint condition_to_column {A: Set}
-           (e: dnrc (type_annotation A) dataset)
+           (e: dnnrc (type_annotation A) dataset)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
-    | DNRCUnop _ (ADot fld) (DNRCVar _ n) =>
+    | DNNRCUnop _ (ADot fld) (DNNRCVar _ n) =>
       let (var, _) := binding in
       if (n == var)
       then Some (CCol ("$known."%string ++ fld))
       else None
-    (*    | DNRCVar _ n =>
+    (*    | DNNRCVar _ n =>
       (* TODO generalize to multiple bindings, for joins *)
       let (var, expr) := binding in
       if (n == var)
       then Some expr
       else None
-    | DNRCUnop _ (ADot fld) c =>
+    | DNNRCUnop _ (ADot fld) c =>
       lift (fun c =>
               (CDot cname fld c))
            (condition_to_column c "c" binding) *)
-    | DNRCConst _ d =>
+    | DNNRCConst _ d =>
       lift (fun t => CLit (d, (proj1_sig t))) (lift_tlocal (di_required_typeof e))
-    | DNRCBinop _ AEq l r =>
+    | DNNRCBinop _ AEq l r =>
       let types_are_okay :=
           lift2 (fun lt rt => andb (equiv_decb lt rt)
                                    (spark_equality_matches_qcert_equality_for_type (proj1_sig lt)))
@@ -259,16 +264,16 @@ Section DNNRCDatasetRewrites.
         Some (CEq l' r')
       | _, _, _ => None
       end
-    | DNRCBinop _ ASConcat l r =>
+    | DNNRCBinop _ ASConcat l r =>
       lift2 CSConcat
             (condition_to_column l binding)
             (condition_to_column r binding)
-    | DNRCBinop _ ALt l r =>
+    | DNNRCBinop _ ALt l r =>
       lift2 CLessThan
             (condition_to_column l binding)
             (condition_to_column r binding)
     (* TODO properly implement this *)
-    | DNRCUnop _ AToString x =>
+    | DNNRCUnop _ AToString x =>
       lift CToString
            (condition_to_column x binding)
 
@@ -276,23 +281,23 @@ Section DNNRCDatasetRewrites.
     end.
 
   Definition rec_if_else_empty_to_filter {A: Set}
-             (e: dnrc (type_annotation A) dataset):
-    option (dnrc (type_annotation A) dataset) :=
+             (e: dnnrc (type_annotation A) dataset):
+    option (dnnrc (type_annotation A) dataset) :=
     match e with
-    | DNRCUnop t1 AFlatten
-               (DNRCFor t2 x (DNRCCollect t3 xs)
-                        (DNRCIf _ condition
+    | DNNRCUnop t1 AFlatten
+               (DNNRCFor t2 x (DNNRCCollect t3 xs)
+                        (DNNRCIf _ condition
                                 thenE
-                                (DNNRC.DNRCConst _ (dcoll nil)))) =>
+                                (DNNRC.DNNRCConst _ (dcoll nil)))) =>
       match condition_to_column condition (x, CCol "abc") with
       | Some c' =>
         let ALG :=
-            DNRCAlg (dnrc_annotation_get xs)
+            DNNRCAlg (dnnrc_annotation_get xs)
                     (DSFilter c' (DSVar "if_else_empty_to_filter"))
                     (("if_else_empty_to_filter"%string, xs)::nil)
         in
-        Some (DNRCUnop t1 AFlatten
-                       (DNRCFor t2 x (DNRCCollect t3 ALG)
+        Some (DNNRCUnop t1 AFlatten
+                       (DNNRCFor t2 x (DNNRCCollect t3 ALG)
                                 thenE))
       | None => None
       end
@@ -300,21 +305,21 @@ Section DNNRCDatasetRewrites.
     end.
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
-             (e: dnrc (type_annotation A) dataset):
-    option (dnrc (type_annotation A) dataset) :=
+             (e: dnnrc (type_annotation A) dataset):
+    option (dnnrc (type_annotation A) dataset) :=
     match e with
-    | DNRCUnop t1 AFlatten
-               (DNRCFor t2 x xs
-                        (DNRCUnop t3 AColl e)) =>
-      Some (DNRCFor t1 x xs e)
+    | DNNRCUnop t1 AFlatten
+               (DNNRCFor t2 x xs
+                        (DNNRCUnop t3 AColl e)) =>
+      Some (DNNRCFor t1 x xs e)
     | _ => None
     end.
 
   Definition rec_for_to_select {A: Set}
-             (e: dnrc (type_annotation A) dataset):
-    option (dnrc (type_annotation A) dataset) :=
+             (e: dnnrc (type_annotation A) dataset):
+    option (dnnrc (type_annotation A) dataset) :=
     match e with
-    | DNRCFor t1 x (DNRCCollect t2 xs) body =>
+    | DNNRCFor t1 x (DNNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
       (* TODO generalize to other types than String ...
        * This involves returning more than one column ... *)
@@ -325,11 +330,11 @@ Section DNNRCDatasetRewrites.
           (* TODO generalize to other types than String ... *)
           let ALG_type := Tdistr String in
           let ALG :=
-              DNRCAlg (ta_mk (ta_base t1) ALG_type)
+              DNNRCAlg (ta_mk (ta_base t1) ALG_type)
                       (DSSelect (("value"%string, body')::nil) (DSVar "for_to_select"))
                       (("for_to_select"%string, xs)::nil)
           in
-          Some (DNRCCollect t1 ALG)
+          Some (DNNRCCollect t1 ALG)
         | None => None
         end
       | _ => None
@@ -338,7 +343,7 @@ Section DNNRCDatasetRewrites.
     end.
 
   Definition dnnrcToDatasetRewrite {A : Set}
-             (e: dnrc (type_annotation A) dataset) : dnrc (type_annotation A) dataset
+             (e: dnnrc (type_annotation A) dataset) : dnnrc (type_annotation A) dataset
     :=
       let e' := e in
       let e'' := tryBottomUp rec_cast_to_filter e' in

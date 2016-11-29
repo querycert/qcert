@@ -299,44 +299,47 @@ Section DNNRCtoScala.
     | Foreign₀ _ => false
     end.
 
-  Fixpoint scala_of_dnrc {A: Set} (d: dnrc (type_annotation A) dataset) : string :=
+  Fixpoint scala_of_dnnrc {A: Set} (d: dnnrc (type_annotation A) dataset) : string :=
     let code :=
         match d with
-        | DNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
-        | DNRCConst t c =>
+        | DNNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
+        | DNNRCConst t c =>
           match (lift_tlocal (di_required_typeof d)) with
           | Some r => scala_literal_data c (proj1_sig r)
           | None => "Don't know how to construct a distributed constant"
           end
-        | DNRCBinop t op x y =>
+        | DNNRCBinop t op x y =>
           match di_typeof x, di_typeof y with
-          | Tlocal _, Tlocal _ => scala_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
-          | Tdistr _, Tdistr _ => spark_of_binop op (scala_of_dnrc x) (scala_of_dnrc y)
+          | Tlocal _, Tlocal _ => scala_of_binop op (scala_of_dnnrc x) (scala_of_dnnrc y)
+          | Tdistr _, Tdistr _ => spark_of_binop op (scala_of_dnnrc x) (scala_of_dnnrc y)
           | _, _ => "DONT_SUPPORT_MIXED_LOCAL_DISTRIBUTED_BINARY_OPERATORS"
           end
-        | DNRCUnop t op x =>
+        | DNNRCUnop t op x =>
           match di_typeof x with
-          | Tlocal _ => scala_of_unop (di_required_typeof d) op (scala_of_dnrc x)
-          | Tdistr _ => spark_of_unop op (scala_of_dnrc x)
+          | Tlocal _ => scala_of_unop (di_required_typeof d) op (scala_of_dnnrc x)
+          | Tdistr _ => spark_of_unop op (scala_of_dnnrc x)
           end
-        | DNRCLet t n x y => (* Scala val is letrec, use anonymous function instead *)
-          "((( " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ ") => " ++ scala_of_dnrc y ++ ")(" ++ scala_of_dnrc x ++ "))"
-        | DNRCFor t n x y =>
+        | DNNRCLet t n x y => (* Scala val is letrec, use anonymous function instead *)
+          "((( " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ ") => " ++ scala_of_dnnrc y ++ ")(" ++ scala_of_dnnrc x ++ "))"
+        | DNNRCFor t n x y =>
           (* TODO for distributed map of non-record-like-things we have to unwrap *)
-          scala_of_dnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnrc y ++ " })"
-        | DNRCIf t x y z =>
-          "(if (" ++ scala_of_dnrc x ++ ") " ++ scala_of_dnrc y ++ " else " ++ scala_of_dnrc z ++ ")"
-        | DNRCEither t x vy y vz z =>
+          scala_of_dnnrc x ++ ".map((" ++ n ++ ") => { " ++ scala_of_dnnrc y ++ " })"
+        | DNNRCIf t x y z =>
+          "(if (" ++ scala_of_dnnrc x ++ ") " ++ scala_of_dnnrc y ++ " else " ++ scala_of_dnnrc z ++ ")"
+        | DNNRCEither t x vy y vz z =>
           match olift tuneither (lift_tlocal (di_required_typeof x)) with
           | Some (lt, rt) =>
-            "either(" ++ scala_of_dnrc x ++ ", (" ++
+            "either(" ++ scala_of_dnnrc x ++ ", (" ++
                       vy ++ ": " ++ rtype_to_scala_type (proj1_sig lt) ++
-                      ") => { " ++ scala_of_dnrc y ++ " }, (" ++
+                      ") => { " ++ scala_of_dnnrc y ++ " }, (" ++
                       vz ++ ": " ++ rtype_to_scala_type (proj1_sig rt) ++
-                      ") => { " ++ scala_of_dnrc z ++ " })"
-          | None => "DNRCEither's first argument is not of type Either"
+                      ") => { " ++ scala_of_dnnrc z ++ " })"
+          | None => "DNNRCEither's first argument is not of type Either"
           end
-        | DNRCCollect t x =>
+        (* XXX TODO! XXX *)
+        | DNNRCGroupBy t g sl x =>
+          "DNNRC_GROUPBY_CODEGEN_IS_NOT_CURRENTLY_IMPLEMENTED"
+        | DNNRCCollect t x =>
           (* Distributed collections of primitives are wrapped in a singleton record.
            * We need to unwrap them after the call to collect(). *)
           let postfix :=
@@ -349,20 +352,20 @@ Section DNNRCtoScala.
                   end
                 | None => "ARGUMENT_TO_COLLECT_SHOULD_BE_A_DISTRIBUTED_COLLECTION"
               end in
-          scala_of_dnrc x ++ ".collect()" ++ postfix
+          scala_of_dnnrc x ++ ".collect()" ++ postfix
         (* TODO handle bags of non-record types (ints, strings, bags, ...) *)
-        | DNRCDispatch t x =>
+        | DNNRCDispatch t x =>
           match olift tuncoll (lift_tlocal (di_typeof x)) with
           | Some et =>
-            "dispatch(" ++ rtype_to_spark_DataType (proj1_sig et) ++ ", " ++ scala_of_dnrc x ++ ")"
+            "dispatch(" ++ rtype_to_spark_DataType (proj1_sig et) ++ ", " ++ scala_of_dnnrc x ++ ")"
           | None => "Argument to dispatch is not a local collection."
           end
-        | DNRCAlg t a ((x, d)::nil) =>
+        | DNNRCAlg t a ((x, d)::nil) =>
           (* TODO does this also need the lambda encoding for let? *)
-          "{ val " ++ x ++ " = " ++ scala_of_dnrc d ++ "; " ++
+          "{ val " ++ x ++ " = " ++ scala_of_dnnrc d ++ "; " ++
                    code_of_dataset a
                    ++ " }"
-        | DNRCAlg _ _ _ =>
+        | DNNRCAlg _ _ _ =>
           "NON_UNARY_ALG_CODEGEN_IS_NOT_CURRENTLY_IMPLEMENTED"
         end in
     if di_typeof d == di_required_typeof d then code else
@@ -382,11 +385,11 @@ Section DNNRCtoScala.
       | None => "CANTCASTTODISTRIBUTEDTYPE"
       end.
 
-  Definition dnnrc_infer_type {A: Set} (e: dnrc A dataset) (inputType: rtype)
-    : option (dnrc (type_annotation A) dataset) :=
+  Definition dnnrc_infer_type {A: Set} (e: dnnrc A dataset) (inputType: rtype)
+    : option (dnnrc (type_annotation A) dataset) :=
     let tdb: tdbindings :=
         ("CONST$WORLD"%string, (Tdistr inputType))::nil in
-    infer_dnrc_type tdb e.
+    infer_dnnrc_type tdb e.
 
   Definition initBrandHierarchy : string :=
     let lines :=
@@ -396,8 +399,8 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
-             (e: dnrc (type_annotation A) dataset) : string :=
+  Definition dnnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
+             (e: dnnrc (type_annotation A) dataset) : string :=
     ""
       ++ "import org.apache.spark.sql.types._" ++ eol
       ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
@@ -410,7 +413,7 @@ Section DNNRCtoScala.
       (* sparkSession is a field in QcertRuntime. What it does in an import? I have no idea! *)
       ++ "  import sparkSession.implicits._" ++ eol
       ++ "println(toBlob(" ++ eol
-      ++ scala_of_dnrc e ++ eol
+      ++ scala_of_dnnrc e ++ eol
       ++ "))" ++ eol
       ++ "}" ++ eol
       ++ "}"

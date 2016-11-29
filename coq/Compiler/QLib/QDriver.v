@@ -80,7 +80,7 @@ Module QDriver(runtime:CompilerRuntime).
     Definition nraenv_core_optim_to_nnrc_optim_to_dnnrc :
       vdbindings -> nraenv_core -> dnnrc_dataset
       := nraenv_core_optim_to_nnrc_optim_to_dnnrc.
-    Definition nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim : nraenv_core -> nrcmr
+    Definition nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim : nraenv_core -> nnrcmr
       := nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim.
 
     (* Used in CloudantUtil *)

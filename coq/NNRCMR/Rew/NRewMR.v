@@ -38,49 +38,49 @@ Section NRewMR.
   (* Id Function *)
 
   (* Java equivalent: MROptimizer.is_id_function *)  
-  Definition is_id_function (f: var * nrc) :=
+  Definition is_id_function (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NRCVar y => equiv_decb x y
-    | NRCUnop AIdOp (NRCVar y) => equiv_decb x y
+    | NNRCVar y => equiv_decb x y
+    | NNRCUnop AIdOp (NNRCVar y) => equiv_decb x y
     | _ => false
     end.
 
   (* Coll Function *)
 
   (* Java equivalent: MROptimizer.is_coll_function *)  
-  Definition is_coll_function (f: var * nrc) :=
+  Definition is_coll_function (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NRCUnop AColl (NRCVar y) => equiv_decb x y
+    | NNRCUnop AColl (NNRCVar y) => equiv_decb x y
     | _ => false
     end.
 
   (* Constant Function *)
   
-  Definition is_constant_function (f: var * nrc) :=
+  Definition is_constant_function (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NRCConst _ => true
+    | NNRCConst _ => true
     | _ => false
     end.
 
   (* Flatten Function *)
 
   (* Java equivalent: MROptimizer.is_flatten_function *)
-  Definition is_flatten_function (f: var * nrc) :=
+  Definition is_flatten_function (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NRCUnop AFlatten (NRCVar y) => equiv_decb x y
-    | NRCLet a (NRCUnop AFlatten (NRCVar y)) (NRCVar b) => equiv_decb x y && equiv_decb a b
+    | NNRCUnop AFlatten (NNRCVar y) => equiv_decb x y
+    | NNRCLet a (NNRCUnop AFlatten (NNRCVar y)) (NNRCVar b) => equiv_decb x y && equiv_decb a b
     | _ => false
     end.
 
-  Lemma is_flatten_function_correct (x:var) (n:nrc) (env:bindings) :
+  Lemma is_flatten_function_correct (x:var) (n:nnrc) (env:bindings) :
     is_flatten_function (x,n) = true ->
     forall d,
       lookup equiv_dec env x = Some d ->
-      (nrc_eval h env n) = lift_oncoll (fun l => (lift dcoll (rflatten l))) d.
+      (nnrc_core_eval h env n) = lift_oncoll (fun l => (lift dcoll (rflatten l))) d.
   Proof.
     intros Hfun d Henv.
     simpl in *.
@@ -105,13 +105,13 @@ Section NRewMR.
 
   (* Coll/Uncoll functions *)
 
-  Definition is_uncoll_function_arg (f: var * nrc) :=
+  Definition is_uncoll_function_arg (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NRCLet a
-             (NRCEither (NRCUnop ASingleton (NRCVar y))
-                        b (NRCVar b')
-                        c (NRCConst dunit))
+    | NNRCLet a
+             (NNRCEither (NNRCUnop ASingleton (NNRCVar y))
+                        b (NNRCVar b')
+                        c (NNRCConst dunit))
              n' =>
       equiv_decb x y && equiv_decb b b' && equiv_decb a x
     | _ => false
@@ -352,7 +352,7 @@ Section NRewMR.
       if is_uncoll_function_arg f then
         let (x, n) := f in
         match n with
-        | NRCLet a _ n' => Some (RedCollect (a, n'))
+        | NNRCLet a _ n' => Some (RedCollect (a, n'))
         | _ => None
         end
       else
@@ -391,10 +391,10 @@ Section NRewMR.
     repeat dest_eqdec; try congruence.
     simpl.
     clear e0 e H H1 H2 Hred'.
-    assert (nrc_eval h ((v, dcoll coll) :: (v, dcoll (dcoll coll :: nil)) :: nil) n2 =
-            nrc_eval h ((v, dcoll coll) :: nil) n2) as Heq;
+    assert (nnrc_core_eval h ((v, dcoll coll) :: (v, dcoll (dcoll coll :: nil)) :: nil) n2 =
+            nnrc_core_eval h ((v, dcoll coll) :: nil) n2) as Heq;
       [ | rewrite <- Heq; reflexivity ].
-    apply nrc_eval_equiv_free_in_env.
+    apply nnrc_core_eval_equiv_free_in_env.
     intros x Hx.
     unfold lookup.
     repeat dest_eqdec; try congruence.
@@ -664,7 +664,7 @@ Section NRewMR.
       destruct
         (rmap
            (fun d0 : data =>
-              let (doc, body) := p in nrc_eval h ((doc, d0) :: nil) body) l);
+              let (doc, body) := p in nnrc_core_eval h ((doc, d0) :: nil) body) l);
         simpl; try reflexivity.
       destruct (rflatten l0);
         simpl; try reflexivity.
@@ -679,7 +679,7 @@ Section NRewMR.
       destruct
         (rmap
            (fun d : data =>
-              let (doc, body) := p in nrc_eval h ((doc, d) :: nil) body) l);
+              let (doc, body) := p in nnrc_core_eval h ((doc, d) :: nil) body) l);
         simpl; try reflexivity.
       destruct (@equiv_dec string (@eq string) (@eq_equivalence string) string_eqdec v1 v);
       [ | unfold equiv_decb in *;
@@ -1069,7 +1069,7 @@ Section NRewMR.
     dest_eqdec; try congruence; simpl.
     destruct (rmap
                  (fun d : data =>
-                  let (doc, body) := p in nrc_eval h ((doc, d) :: nil) body)
+                  let (doc, body) := p in nnrc_core_eval h ((doc, d) :: nil) body)
                  l);
       simpl in *; try congruence.
     rewrite (id_reduce_correct _ _ Hmr1_red_is_id).
@@ -1094,9 +1094,9 @@ Section NRewMR.
     if equiv_decb mr1.(mr_output) mr2.(mr_input)
        && is_singleton_reduce mr1.(mr_reduce) then
       match mr1.(mr_map), mr2.(mr_map) with
-      | MapScalar (x1, NRCUnop AColl n1), MapScalar (x2, n2) =>
+      | MapScalar (x1, NNRCUnop AColl n1), MapScalar (x2, n2) =>
         let map :=
-            MapScalar (x1, NRCLet x2 n1 n2)
+            MapScalar (x1, NNRCLet x2 n1 n2)
         in
         let mr :=
             mkMR
@@ -1141,13 +1141,13 @@ Section NRewMR.
     simpl in *.
     destruct loc_d; simpl in *; try contradiction.
     dest_eqdec; try congruence; simpl.
-    destruct (nrc_eval h ((v, d) :: nil) n); simpl; try congruence.
+    destruct (nnrc_core_eval h ((v, d) :: nil) n); simpl; try congruence.
     rewrite (singleton_reduce_correct _ _ Hmr1_red_is_singleton).
     simpl.
     repeat dest_eqdec; try congruence; simpl.
     unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl.
-    assert (@nrc_eval fruntime h
+    assert (@nnrc_core_eval fruntime h
                (@cons
                   (prod NNRC.var (@data (@foreign_runtime_data fruntime)))
                   (@pair NNRC.var (@data (@foreign_runtime_data fruntime))
@@ -1158,12 +1158,12 @@ Section NRewMR.
                         d)
                      (@nil
                         (prod var (@data (@foreign_runtime_data fruntime))))))
-               n0 = nrc_eval h ((v0, d0) :: (v, d) :: nil) n0) by reflexivity.
+               n0 = nnrc_core_eval h ((v0, d0) :: (v, d) :: nil) n0) by reflexivity.
     rewrite H in *; clear H.
-    assert (nrc_eval h ((v0, d0) :: nil) n0 =
-            nrc_eval h ((v0, d0) :: (v, d) :: nil) n0) as Heq;
+    assert (nnrc_core_eval h ((v0, d0) :: nil) n0 =
+            nnrc_core_eval h ((v0, d0) :: (v, d) :: nil) n0) as Heq;
       [ | rewrite Heq; clear Heq ].
-    - apply nrc_eval_equiv_free_in_env.
+    - apply nnrc_core_eval_equiv_free_in_env.
       intros x Hx.
       assert (x = v0) as Heq;
         [ | rewrite Heq; clear Heq;
@@ -1173,7 +1173,7 @@ Section NRewMR.
       simpl in *.
       apply Hmr2_map_wf.
       assumption.
-    - destruct (nrc_eval h ((v0, d0) :: (v, d) :: nil) n0); simpl; try congruence.
+    - destruct (nnrc_core_eval h ((v0, d0) :: (v, d) :: nil) n0); simpl; try congruence.
       destruct (olift (mr_reduce_eval h (mr_reduce mr2))); simpl; try congruence.
       unfold merge_env; simpl.
       repeat dest_eqdec; try congruence; simpl.
@@ -1262,8 +1262,8 @@ Section NRewMR.
   (*          && is_id_flat_map mr2.(mr_flat_map) then *)
   (*       let map := *)
   (*           match mr1.(mr_flat_map) with *)
-  (*           | (x, NRCUnop AColl n) => (x, n) *)
-  (*           | (x, n) => (x, NRCUnop AFlatten n) *)
+  (*           | (x, NNRCUnop AColl n) => (x, n) *)
+  (*           | (x, n) => (x, NNRCUnop AFlatten n) *)
   (*           end *)
   (*       in *)
   (*       let mr := *)
@@ -1301,7 +1301,7 @@ Section NRewMR.
   (*       let map := *)
   (*           let (x1, n1) := mr1.(mr_flat_map) in *)
   (*           let (x2, n2) := mr2.(mr_flat_map) in *)
-  (*           (x1, NRCUnop AFlatten (NRCFor x2 n1 n2)) *)
+  (*           (x1, NNRCUnop AFlatten (NNRCFor x2 n1 n2)) *)
   (*       in *)
   (*       let mr := *)
   (*           mkMR *)
@@ -1321,15 +1321,15 @@ Section NRewMR.
    * Last expression  *
    ********************)
 
-  Definition merge_mr_last mr (last: ((list var * nrc) * list (var * dlocalization)) ) :=
+  Definition merge_mr_last mr (last: ((list var * nnrc) * list (var * dlocalization)) ) :=
     let '((params, n), args) := last in
     match (params, args) with
     | (x::nil, (output, Vscalar)::nil) =>
       if equiv_decb output mr.(mr_output) && is_singleton_reduce mr.(mr_reduce) then
         match mr.(mr_map) with
-        | MapScalar (x1, NRCUnop AColl n1) =>
-          Some ((mr.(mr_input)::nil, NRCLet x
-                                            (NRCLet x1 (NRCVar mr.(mr_input)) n1)
+        | MapScalar (x1, NNRCUnop AColl n1) =>
+          Some ((mr.(mr_input)::nil, NNRCLet x
+                                            (NNRCLet x1 (NNRCVar mr.(mr_input)) n1)
                                             n),
                 (mr.(mr_input), Vscalar)::nil)
         | _ => None
@@ -1434,7 +1434,7 @@ Section NRewMR.
    *****************)
  
   (* Java equivalent: MROptimizer.mr_optimize_step *)
-  Definition mr_optimize_step (l: nrcmr): nrcmr :=
+  Definition mr_optimize_step (l: nnrcmr): nnrcmr :=
     let to_keep := List.map fst (snd l.(mr_last)) in
     let l := apply_rewrite map_collect_flatten_to_map_flatten_collect l in
     let l := apply_merge merge_id_reduce_id_dist_map l in
@@ -1466,7 +1466,7 @@ Section NRewMR.
     l.
 
   (* Java equivalent: MROptimizer.mr_optimize_loop *)
-  Fixpoint mr_optimize_loop n (l: nrcmr) :=
+  Fixpoint mr_optimize_loop n (l: nnrcmr) :=
     match n with
     | 0 => l
     | S n =>
@@ -1475,7 +1475,7 @@ Section NRewMR.
     end.
 
   (* Java equivalent: MROptimizer.mr_optimize *)
-  Definition mr_optimize (l: nrcmr) :=
+  Definition mr_optimize (l: nnrcmr) :=
     mr_optimize_loop 10 l.
 
   (* Java equivalent: MROptimizer.fresh_mr_var *)
@@ -1484,14 +1484,14 @@ Section NRewMR.
     (x, x::vars).
 
 
-  (* Java equivalent: MROptimizer.get_nrcmr_vars *)
+  (* Java equivalent: MROptimizer.get_nnrcmr_vars *)
   Definition get_mr_chain_vars mr_chain :=
     List.fold_left
       (fun acc mr => mr.(mr_input) :: mr.(mr_output) :: acc)
       mr_chain nil.
 
-  (* Java equivalent: MROptimizer.get_nrcmr_vars *)
-  Definition get_nrcmr_vars mrl :=
+  (* Java equivalent: MROptimizer.get_nnrcmr_vars *)
+  Definition get_nnrcmr_vars mrl :=
     get_mr_chain_vars mrl.(mr_chain).
 
 End NRewMR.

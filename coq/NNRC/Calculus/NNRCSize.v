@@ -20,20 +20,21 @@ Section size.
 
   Context {fruntime:foreign_runtime}.
 
-  (* Java equivalent: NnrcOptimizer.rew_size.nrc_size *)
-  Fixpoint nrc_size (n:nrc) : nat 
+  (* Java equivalent: NnnrcOptimizer.rew_size.nnrc_size *)
+  Fixpoint nnrc_size (n:nnrc) : nat 
     := match n with
-         | NRCVar v => 1
-         | NRCConst d => 1
-         | NRCBinop op n₁ n₂ => S (nrc_size n₁ + nrc_size n₂)
-         | NRCUnop op n₁ => S (nrc_size n₁)
-         | NRCLet v n₁ n₂ => S (nrc_size n₁ + nrc_size n₂)
-         | NRCFor v n₁ n₂ => S (nrc_size n₁ + nrc_size n₂)
-         | NRCIf n₁ n₂ n₃ => S (nrc_size n₁ + nrc_size n₂ + nrc_size n₃)
-         | NRCEither nd vl nl vr nr => S (nrc_size nd + nrc_size nl + nrc_size nr)
+         | NNRCVar v => 1
+         | NNRCConst d => 1
+         | NNRCBinop op n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
+         | NNRCUnop op n₁ => S (nnrc_size n₁)
+         | NNRCLet v n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
+         | NNRCFor v n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
+         | NNRCIf n₁ n₂ n₃ => S (nnrc_size n₁ + nnrc_size n₂ + nnrc_size n₃)
+         | NNRCEither nd vl nl vr nr => S (nnrc_size nd + nnrc_size nl + nnrc_size nr)
+         | NNRCGroupBy g sl n => S (nnrc_size n)
        end.
 
-  Lemma nrc_size_nzero (n:nrc) : nrc_size n <> 0.
+  Lemma nnrc_size_nzero (n:nnrc) : nnrc_size n <> 0.
   Proof.
     induction n; simpl; omega.
   Qed.

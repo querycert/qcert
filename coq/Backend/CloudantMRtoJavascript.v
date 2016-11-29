@@ -54,8 +54,8 @@ Section CloudantMRtoJavascript.
           ++ "  }" ++ eol.
 
     (* Java equivalent: CloudantBackend.createMapFunFirst *)
-    Definition createMapFunFirst (v_map:string) (e:nrc) (emitString:string) (harness:bool) (eol:string) (quotel:string) : string :=
-          let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel (v_map::nil) ((v_map,"doc")::nil) in
+    Definition createMapFunFirst (v_map:string) (e:nnrc) (emitString:string) (harness:bool) (eol:string) (quotel:string) : string :=
+          let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel (v_map::nil) ((v_map,"doc")::nil) in
           "function (doc) {" ++ eol
                              ++ "  var v0 = null;" ++ eol
                              ++ "  var key = doc._id;" ++ eol
@@ -69,8 +69,8 @@ Section CloudantMRtoJavascript.
                              ++ "}".
     
     (* Java equivalent: CloudantBackend.createMapFunRest *)    
-    Definition createMapFunRest (v_map:string) (e:nrc) (emitString:string) (harness:bool) (eol:string) (quotel:string) : string :=
-          let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel (v_map::nil) ((v_map,"doc")::nil) in
+    Definition createMapFunRest (v_map:string) (e:nnrc) (emitString:string) (harness:bool) (eol:string) (quotel:string) : string :=
+          let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel (v_map::nil) ((v_map,"doc")::nil) in
           "function (doc) {" ++ eol
                              ++ "  var v0 = null;" ++ eol
                              ++ "  var key = doc.key;" ++ eol
@@ -82,7 +82,7 @@ Section CloudantMRtoJavascript.
                              ++ "}".
 
     (* Java equivalent: CloudantBackend.nrcToJSMapFirst *)    
-    Definition nrcToJSMapFirst (cldmap:cld_map) (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) : string :=
+    Definition nnrcToJSMapFirst (cldmap:cld_map) (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) : string :=
       match map_fun cldmap with
       | CldMapId (v_map, e) =>
         match map_emit cldmap with
@@ -101,7 +101,7 @@ Section CloudantMRtoJavascript.
       end.
 
     (* Java equivalent: CloudantBackend.nrcToJSMapRest *)    
-    Definition nrcToJSMapRest (cldmap:cld_map) (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) : string :=
+    Definition nnrcToJSMapRest (cldmap:cld_map) (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) : string :=
       match map_fun cldmap with
       | CldMapId (v_map, e) =>
         match map_emit cldmap with
@@ -120,9 +120,9 @@ Section CloudantMRtoJavascript.
       end.
 
 	(* Java equivalent: CloudantBackend.nrcToJSReduce *)
-    Definition nrcToJSReduce (e1:nrc) (e2:nrc) (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (values_iv:string) : string :=
-      let '(j0, v0, t0) := nrcToJSunshadow e1 1 1 eol quotel (values_iv::nil) ((values_iv,"values")::nil) in
-      let '(j1, v1, t1) := nrcToJSunshadow e2 t0 1 eol quotel (values_iv::nil) ((values_iv,"values")::nil) in
+    Definition nnrcToJSReduce (e1:nnrc) (e2:nnrc) (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (values_iv:string) : string :=
+      let '(j0, v0, t0) := nnrcToJSunshadow e1 1 1 eol quotel (values_iv::nil) ((values_iv,"values")::nil) in
+      let '(j1, v1, t1) := nnrcToJSunshadow e2 t0 1 eol quotel (values_iv::nil) ((values_iv,"values")::nil) in
       "function (keys, values, rereduce) {" ++ eol
                                             ++ "  if (rereduce) {" ++ eol
                                             ++ j1
@@ -142,14 +142,14 @@ Section CloudantMRtoJavascript.
                                             ++ "}".
 
 	(* Java equivalent: CloudantBackend.nrcToJSDefault *)
-    Definition nrcToJSDefault (harness:bool) (e_def:nrc) (eol:string) (quotel:string) :=
-      let '(j0, v0, t0) := nrcToJSunshadow e_def 1 1 eol quotel nil nil in
-      nrcToJSFunStub harness e_def eol quotel nil "db_default".
+    Definition nnrcToJSDefault (harness:bool) (e_def:nnrc) (eol:string) (quotel:string) :=
+      let '(j0, v0, t0) := nnrcToJSunshadow e_def 1 1 eol quotel nil nil in
+      nnrcToJSFunStub harness e_def eol quotel nil "db_default".
     
 	(* Java equivalent: CloudantBackend.nrcToJSGen *)
-    Definition nrcToJSGen (harness:bool) (e_closure:(list var) * nrc) (eol:string) (quotel:string) :=
+    Definition nnrcToJSGen (harness:bool) (e_closure:(list var) * nnrc) (eol:string) (quotel:string) :=
       let (params, e) := e_closure in
-      nrcToJSFunStub harness e eol quotel params "db_post".
+      nnrcToJSFunStub harness e eol quotel params "db_post".
     
     Definition mapReduceStringstoJS_pair (eol:string) (index:nat) (mr:option string * option string * option string * option string * string) : string :=
       match mr with
@@ -203,14 +203,14 @@ Section CloudantMRtoJavascript.
       let clddefault := cld_mr_reduce_default mr in
       let map_string :=
           if ini
-          then nrcToJSMapFirst cldmap h harness eol quotel
-          else nrcToJSMapRest cldmap h harness eol quotel
+          then nnrcToJSMapFirst cldmap h harness eol quotel
+          else nnrcToJSMapRest cldmap h harness eol quotel
       in
       let default_string :=
           match clddefault with
           | None => None
           | Some clddef =>
-            Some (nrcToJSDefault harness clddef eol quotel)
+            Some (nnrcToJSDefault harness clddef eol quotel)
           end
       in
       match cld_mr_reduce mr with
@@ -230,7 +230,7 @@ Section CloudantMRtoJavascript.
           (vs_input, vs_output, default_string, Some reduce_string, map_string)
         | CldRedAggregate (vs_reduce, f_reduce) (v_rereduce, f_rereduce) =>
           let (v_key, v_reduce) := vs_reduce in
-          let reduce_string := nrcToJSReduce f_reduce f_rereduce h harness eol quotel v_reduce in
+          let reduce_string := nnrcToJSReduce f_reduce f_rereduce h harness eol quotel v_reduce in
           (vs_input, vs_output, default_string, Some reduce_string, map_string)
         | CldRedOp CldRedOpCount =>
           (vs_input, vs_output, default_string, Some "_count", map_string)
@@ -255,8 +255,8 @@ Section CloudantMRtoJavascript.
       cld_mr_chainToJS h harness eol quotel mrl.(cld_mr_chain).
 
     (* Java equivalent: CloudantBackend.cld_mrToLastJS *)
-    Definition cld_mrToLastJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (e_closure: (list var) * nrc) : string :=
-      nrcToJSGen harness e_closure eol quotel.
+    Definition cld_mrToLastJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (e_closure: (list var) * nnrc) : string :=
+      nnrcToJSGen harness e_closure eol quotel.
 
     (* Java equivalent: CloudantBackend.buildDesignDoc *)
     Definition buildDesignDoc (view_name:string) (s_map:string) (s_reduce:option string) (s_dboutput:option string) (s_dbdefault:option string) :=

@@ -33,11 +33,11 @@ Section NNRCEq.
   (** Equivalence between expressions in the Named Nested Relational Calculus *)
 
   (** Semantics of NNRC *)
-  Definition nnrc_eq (e1 e2:nrc) : Prop :=
+  Definition nnrc_eq (e1 e2:nnrc) : Prop :=
     forall (h:brand_relation_t),
     forall (env:bindings),
       Forall (data_normalized h) (map snd env) ->
-      nrc_eval h env e1 = nrc_eval h env e2.
+      nnrc_core_eval h env e1 = nnrc_core_eval h env e2.
 
   Global Instance nnrc_equiv : Equivalence nnrc_eq.
   Proof.
@@ -54,80 +54,80 @@ Section NNRCEq.
   (* all the nnrc constructors are proper wrt. equivalence *)
 
   (* NRCVar *)
-  Global Instance var_proper : Proper (eq ==> nnrc_eq) NRCVar.
+  Global Instance var_proper : Proper (eq ==> nnrc_eq) NNRCVar.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; rewrite H; reflexivity.
   Qed.
 
-  (* NRCConst *)
+  (* NNRCConst *)
   
-  Global Instance const_proper : Proper (eq ==> nnrc_eq) NRCConst.
+  Global Instance const_proper : Proper (eq ==> nnrc_eq) NNRCConst.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; rewrite H; reflexivity.
   Qed.
 
-  (* NRCBinop *)
+  (* NNRCBinop *)
   
-  Global Instance binop_proper : Proper (binop_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NRCBinop.
+  Global Instance binop_proper : Proper (binop_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCBinop.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl; rewrite H0 by trivial; rewrite H1 by trivial; clear H0 H1.
-    case_eq (nrc_eval h env y0); case_eq (nrc_eval h env y1); intros; simpl; trivial.
+    case_eq (nnrc_core_eval h env y0); case_eq (nnrc_core_eval h env y1); intros; simpl; trivial.
     rewrite (H h); eauto.
   Qed.
 
-  (* NRCUnnop *)
+  (* NNRCUnnop *)
   
-  Global Instance unop_proper : Proper (unaryop_eq ==> nnrc_eq ==> nnrc_eq) NRCUnop.
+  Global Instance unop_proper : Proper (unaryop_eq ==> nnrc_eq ==> nnrc_eq) NNRCUnop.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl; rewrite H0 by trivial; clear H0.
-    case_eq (nrc_eval h env y0); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h env y0); simpl; trivial; intros.
     rewrite (H h); eauto.
   Qed.
     
-  (* NRCLet *)
+  (* NNRCLet *)
   
-  Global Instance let_proper : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NRCLet.
+  Global Instance let_proper : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCLet.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. rewrite H0 by trivial; clear H0.
-    case_eq (nrc_eval h env y0); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h env y0); simpl; trivial; intros.
     rewrite H; clear H.
     rewrite H1; eauto.
     constructor; eauto.
   Qed.
     
-  (* NRCFor *)
+  (* NNRCFor *)
 
     Hint Resolve data_normalized_dcoll_in.
 
-  Global Instance for_proper : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NRCFor.
+  Global Instance for_proper : Proper (eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCFor.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. rewrite H0 by trivial; clear H0. subst.
-    case_eq (nrc_eval h env y0); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h env y0); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     f_equal.
     apply rmap_ext; intros.
     apply H1; simpl; eauto.
   Qed.
 
-  (* NRCIf *)
+  (* NNRCIf *)
   
-  Global Instance if_proper : Proper (nnrc_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NRCIf.
+  Global Instance if_proper : Proper (nnrc_eq ==> nnrc_eq ==> nnrc_eq ==> nnrc_eq) NNRCIf.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. rewrite H by trivial; clear H.
-    case_eq (nrc_eval h env y); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h env y); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     destruct b; eauto.
   Qed.
 
-  (* NRCEither *)
-  Global Instance either_proper : Proper (nnrc_eq ==> eq ==> nnrc_eq ==> eq ==> nnrc_eq ==> nnrc_eq) NRCEither.
+  (* NNRCEither *)
+  Global Instance either_proper : Proper (nnrc_eq ==> eq ==> nnrc_eq ==> eq ==> nnrc_eq ==> nnrc_eq) NNRCEither.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. subst.
@@ -141,9 +141,18 @@ Section NNRCEq.
       apply H3; simpl; eauto.
   Qed.
 
+  (* NNRCGroupBy *)
+  (* Fails for core *)
+  
+  Global Instance group_by_proper : Proper (eq ==> eq ==> nnrc_eq ==> nnrc_eq) NNRCGroupBy.
+  Proof.
+    unfold Proper, respectful, nnrc_eq.
+    intros; reflexivity.
+  Qed.
+
 End NNRCEq.
 
-Notation "X ≡ᶜ Y" := (nnrc_eq X Y) (at level 90) : nrc_scope.                             (* ≡ = \equiv *)
+Notation "X ≡ᶜᶜ Y" := (nnrc_eq X Y) (at level 90) : nnrc_scope.                             (* ≡ = \equiv *)
 
 (* 
 *** Local Variables: ***

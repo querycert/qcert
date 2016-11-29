@@ -36,10 +36,10 @@ Section DNNRCEq.
   (** Equivalence between expressions in the 
       Distributed Nested Relational Calculus *)
 
-  Definition dnnrc_eq (e1 e2:dnrc A plug_type) : Prop :=
+  Definition dnnrc_eq (e1 e2:dnnrc A plug_type) : Prop :=
     forall (h:brand_relation_t) (denv:dbindings),
       Forall (ddata_normalized h) (map snd denv) ->
-      dnrc_eval h denv e1 = dnrc_eval h denv e2.
+      dnnrc_eval h denv e1 = dnnrc_eval h denv e2.
 
   Global Instance dnnrc_equiv : Equivalence dnnrc_eq.
   Proof.
@@ -55,72 +55,72 @@ Section DNNRCEq.
 
   (* all the dnnrc constructors are proper wrt. equivalence *)
 
-  (* DNRCVar *)
-  Global Instance dvar_proper : Proper (eq ==> eq ==> dnnrc_eq) DNRCVar.
+  (* DNNRCVar *)
+  Global Instance dvar_proper : Proper (eq ==> eq ==> dnnrc_eq) DNNRCVar.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; subst; reflexivity.
   Qed.
 
-  (* DNRCConst *)
+  (* DNNRCConst *)
   
-  Global Instance dconst_proper : Proper (eq ==> eq ==> dnnrc_eq) DNRCConst.
+  Global Instance dconst_proper : Proper (eq ==> eq ==> dnnrc_eq) DNNRCConst.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; subst; reflexivity.
   Qed.
 
-  (* DNRCBinop *)
+  (* DNNRCBinop *)
   
-  Global Instance dbinop_proper : Proper (eq ==> binop_eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNRCBinop.
+  Global Instance dbinop_proper : Proper (eq ==> binop_eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCBinop.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst.
     rewrite H1 by trivial.
     rewrite H2 by trivial.
-    case_eq (dnrc_eval h denv y1);
-      case_eq (dnrc_eval h denv y2); intros; simpl; trivial.
+    case_eq (dnnrc_eval h denv y1);
+      case_eq (dnnrc_eval h denv y2); intros; simpl; trivial.
     destruct d0; destruct d; try reflexivity; simpl.
     rewrite H0; [reflexivity| | ].
-    apply (dnrc_eval_normalized_local h denv y1); try assumption.
-    apply (dnrc_eval_normalized_local h denv y1); try assumption.
+    apply (dnnrc_eval_normalized_local h denv y1); try assumption.
+    apply (dnnrc_eval_normalized_local h denv y1); try assumption.
   Qed.
 
-  (* DNRCUnnop *)
+  (* DNNRCUnnop *)
   
-  Global Instance dunop_proper : Proper (eq ==> unaryop_eq ==> dnnrc_eq ==> dnnrc_eq) DNRCUnop.
+  Global Instance dunop_proper : Proper (eq ==> unaryop_eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCUnop.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst.
     rewrite H1 by trivial.
-    case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
+    case_eq (dnnrc_eval h denv y1); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     rewrite H0; [reflexivity| ].
-    apply (dnrc_eval_normalized_local h denv y1); try assumption.
+    apply (dnnrc_eval_normalized_local h denv y1); try assumption.
   Qed.
     
-  (* DNRCLet *)
+  (* DNNRCLet *)
   
-  Global Instance dlet_proper : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNRCLet.
+  Global Instance dlet_proper : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCLet.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. rewrite H0; clear H0; rewrite H1 by trivial; clear H1.
-    case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
+    case_eq (dnnrc_eval h denv y1); simpl; trivial; intros.
     rewrite H2; eauto.
     constructor; eauto.
     simpl.
-    eapply dnrc_eval_normalized; eauto.
+    eapply dnnrc_eval_normalized; eauto.
   Qed.
 
-  (* DNRCFor *)
+  (* DNNRCFor *)
 
   Hint Resolve data_normalized_dcoll_in.
 
-  Global Instance dfor_proper : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNRCFor.
+  Global Instance dfor_proper : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCFor.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. rewrite H1 by trivial; clear H1. subst.
-    case_eq (dnrc_eval h denv y1); simpl; trivial; intros.
+    case_eq (dnnrc_eval h denv y1); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     { destruct d; try reflexivity; simpl.
       f_equal.
@@ -128,7 +128,7 @@ Section DNNRCEq.
       rewrite H2; simpl; eauto.
       constructor; [|assumption].
       assert (ddata_normalized h (Dlocal (dcoll l))).
-      - eapply dnrc_eval_normalized; eauto.
+      - eapply dnnrc_eval_normalized; eauto.
       - inversion H1; subst; clear H1.
         constructor.
         inversion H5; subst; clear H5.
@@ -139,27 +139,27 @@ Section DNNRCEq.
       rewrite H2; simpl; eauto.
       constructor; [|assumption].
       assert (ddata_normalized h (Ddistr l)).
-      - eapply dnrc_eval_normalized; eauto.
+      - eapply dnnrc_eval_normalized; eauto.
       - inversion H1; subst; clear H1.
         constructor.
         rewrite Forall_forall in H5.
         auto. }
   Qed.
 
-  (* DNRCIf *)
+  (* DNNRCIf *)
   
-  Global Instance dif_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNRCIf.
+  Global Instance dif_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCIf.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst. rewrite H0 by trivial; clear H0.
-    case_eq (dnrc_eval h denv y0); simpl; trivial; intros.
+    case_eq (dnnrc_eval h denv y0); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     destruct b; eauto.
   Qed.
 
-  (* DNRCEither *)
-  Global Instance deither_proper : Proper (eq ==> dnnrc_eq ==> eq ==> dnnrc_eq ==> eq ==> dnnrc_eq ==> dnnrc_eq) DNRCEither.
+  (* DNNRCEither *)
+  Global Instance deither_proper : Proper (eq ==> dnnrc_eq ==> eq ==> dnnrc_eq ==> eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCEither.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst.
@@ -169,10 +169,10 @@ Section DNNRCEq.
       rewrite Forall_forall; intros.
       inversion H; subst.
       unfold olift, checkLocal in eqq1.
-      case_eq (dnrc_eval h denv y0); intros; rewrite H1 in eqq1; try congruence;
+      case_eq (dnnrc_eval h denv y0); intros; rewrite H1 in eqq1; try congruence;
       destruct d0; try congruence; inversion eqq1; subst.
       assert (ddata_normalized h (Dlocal (dleft d))).
-      apply (@dnrc_eval_normalized _ _ _ _ plug denv y0); assumption.
+      apply (@dnnrc_eval_normalized _ _ _ _ plug denv y0); assumption.
       inversion H3; subst; clear H3.
       inversion H7; subst; clear H7.
       constructor; assumption.
@@ -181,18 +181,18 @@ Section DNNRCEq.
       rewrite Forall_forall; intros.
       inversion H; subst.
       unfold olift, checkLocal in eqq1.
-      case_eq (dnrc_eval h denv y0); intros; rewrite H1 in eqq1; try congruence;
+      case_eq (dnnrc_eval h denv y0); intros; rewrite H1 in eqq1; try congruence;
       destruct d0; try congruence; inversion eqq1; subst.
       assert (ddata_normalized h (Dlocal (dright d))).
-      apply (@dnrc_eval_normalized _ _ _ _ plug denv y0); assumption.
+      apply (@dnnrc_eval_normalized _ _ _ _ plug denv y0); assumption.
       inversion H3; subst; clear H3.
       inversion H7; subst; clear H7.
       constructor; assumption.
       rewrite Forall_forall in H5. auto.
   Qed.
 
-  (* DNRCCollect *)
-  Global Instance dcollect_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq) DNRCCollect.
+  (* DNNRCCollect *)
+  Global Instance dcollect_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCCollect.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst.
@@ -200,8 +200,8 @@ Section DNNRCEq.
     reflexivity.
   Qed.
     
-  (* DNRCDispatch *)
-  Global Instance ddispatch_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq) DNRCDispatch.
+  (* DNNRCDispatch *)
+  Global Instance ddispatch_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCDispatch.
   Proof.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl. subst.
@@ -209,13 +209,13 @@ Section DNNRCEq.
     reflexivity.
   Qed.
 
-  (* DNRCAlg *)
+  (* DNNRCAlg *)
   (* Here we would need a notion of equality on AlgPlug --
      something worth discussing with Stefan *)
   (*
-  Global Instance dalg : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq) DNRCDispatch.
+  Global Instance dalg : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCDispatch.
   Proof.
-    unfold Proper, respectful, dnnrc_eq.
+    unfold Proper, respectful, dnnnrc_eq.
     intros; simpl. subst.
     ...
   Qed.
@@ -223,7 +223,7 @@ Section DNNRCEq.
 
 End DNNRCEq.
 
-Notation "X ≡ᵈ Y" := (dnnrc_eq X Y) (at level 90) : dnrc_scope.                             (* ≡ = \equiv *)
+Notation "X ≡ᵈ Y" := (dnnrc_eq X Y) (at level 90) : dnnrc_scope.                             (* ≡ = \equiv *)
 
 (* 
 *** Local Variables: ***

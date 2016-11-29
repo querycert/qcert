@@ -54,7 +54,7 @@ Section CompDriver.
 
   (* Optimizations *)
   Require Import NRAEnvOptimFunc.
-  Require Import TRewFunc.
+  Require Import TNNRCOptimizer.
   Require Import DNNRCDatasetRewrites.
   Require Import OptimizerLogger.
 
@@ -82,7 +82,7 @@ Section CompDriver.
   Context {bm:brand_model}.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
-  Context {nnrc_logger:optimizer_logger string nrc}.
+  Context {nnrc_logger:optimizer_logger string nnrc}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
@@ -132,13 +132,13 @@ Section CompDriver.
 
   Definition nnrc_optim (q: nnrc) : nnrc := trew q.
 
-  Definition nnrc_to_camp (avoid: list var) (q: nnrc) : camp := nrcToPat_let avoid q. (* XXX avoid ? XXX *)
+  Definition nnrc_to_camp (avoid: list var) (q: nnrc) : camp := nnrcToPat_let avoid q. (* XXX avoid ? XXX *)
 
-  (* Java equivalent: NnrcToNrcmr.convert *)
+  (* Java equivalent: NnrcToNnrcmr.convert *)
   Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
-    let q : nnrc := nrc_subst q init_vid (NRCConst dunit) in
+    let q : nnrc := nnrc_subst q init_vid (NNRCConst dunit) in
     let q : nnrc := nnrc_optim q in
-    let q_free_vars := (* bdistinct !!! *) nrc_free_vars q in
+    let q_free_vars := (* bdistinct !!! *) nnrc_free_vars q in
     let inputs_loc :=
         (init_vid, Vlocal)
           ::(vinit, Vlocal)
@@ -150,7 +150,7 @@ Section CompDriver.
 
   Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
     (* XXX TODO: Handling of vid? XXX *)
-    (* let q : nnrc := nrc_subst q init_vid (NRCConst dunit) in *)
+    (* let q : nnrc := nnrc_subst q init_vid (NNRCConst dunit) in *)
     (* let q : nnrc := nnrc_optim q in *)
     let inputs_loc :=
         (init_vid, Vlocal) (* XXX suppr vid? XXX *)
@@ -163,15 +163,15 @@ Section CompDriver.
 
   Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := trew_nnrcmr (mr_optimize q).
 
-  Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nrcmr q.
+  Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
 
-  Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nrcmr tt q.
+  Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
 
   Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
-    let q := foreign_to_cloudant_prepare_nrcmr q in
+    let q := foreign_to_cloudant_prepare_nnrcmr q in
     let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
-    let q := foreign_to_cloudant_prepare_nrcmr q in
-    nrcmr_rename_for_cloudant q.
+    let q := foreign_to_cloudant_prepare_nnrcmr q in
+    nnrcmr_rename_for_cloudant q.
 
   Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
     NNRCMRtoNNRCMRCloudantTop h q.
@@ -180,13 +180,13 @@ Section CompDriver.
     nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
   Definition nnrcmr_to_nnrcmr_spark_prepare (q: nnrcmr) : nnrcmr :=
-    let q := foreign_to_spark_prepare_nrcmr q in
+    let q := foreign_to_spark_prepare_nnrcmr q in
     let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
-    let q := foreign_to_spark_prepare_nrcmr q in
-    nrcmr_rename_for_spark q.
+    let q := foreign_to_spark_prepare_nnrcmr q in
+    nnrcmr_rename_for_spark q.
 
   Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
-    nrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
+    nnrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
 
   Definition nnrcmr_to_spark (rulename: string) (q: nnrcmr) : spark :=
     nnrcmr_prepared_to_spark rulename (nnrcmr_to_nnrcmr_spark_prepare q).
@@ -195,15 +195,15 @@ Section CompDriver.
     mapReducePairstoCloudant h q rulename.
 
   Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
-    nrc_to_dnrc tt inputs_loc q.
+    nnrc_to_dnnrc tt inputs_loc q.
 
   Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Check XXX *)
-    nrcToJSTop q.
+    nnrcToJSTop q.
 
   Require Import ForeignToJava.
   Context {ftojava:foreign_to_java}.
   Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
-    nrcToJavaTop class_name imports q.
+    nnrcToJavaTop class_name imports q.
 
   Definition dnnrc_dataset_to_dnnrc_typed_dataset
              (e: dnnrc_dataset) (inputType: rtype)
@@ -212,7 +212,7 @@ Section CompDriver.
 
   Definition dnnrc_typed_dataset_to_spark2
              (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
-    @dnrcToSpark2Top _ _ bm _ unit inputType name q.
+    @dnnrcToSpark2Top _ _ bm _ unit inputType name q.
 
   Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
     dnnrcToDatasetRewrite q.
@@ -3249,7 +3249,7 @@ Section CompDriver.
     nnrc_optim (nraenv_core_to_nnrc (nraenv_core_optim q)).
   Definition nraenv_core_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv_core) : dnnrc_dataset :=
     nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_core_to_nnrc (nraenv_core_optim q))).
-  Definition nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim (q:nraenv_core) : nrcmr :=
+  Definition nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim (q:nraenv_core) : nnrcmr :=
     nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (nnrc_optim (nraenv_core_to_nnrc (nraenv_core_optim q)))).
 
   (* Used in queryTests: *)

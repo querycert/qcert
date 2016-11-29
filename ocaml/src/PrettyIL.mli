@@ -72,9 +72,9 @@ val pretty_nnrcmr : bool -> int -> QLang.nnrcmr -> string
 
 (* Pretty DNRC *)
 
-val pretty_dnrc : (Format.formatter -> 'a -> unit) ->
-		  (Format.formatter -> 'plug_type -> unit) ->
-		  bool -> int -> ('a, 'plug_type) Compiler.dnrc -> string
+val pretty_dnnrc : (Format.formatter -> 'a -> unit) ->
+  (Format.formatter -> 'plug_type -> unit) ->
+    bool -> int -> ('a, 'plug_type) Compiler.dnnrc -> string
 
 (* Pretty Spark IR *)
 

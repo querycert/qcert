@@ -116,10 +116,10 @@ Section sanitizer.
      ; "yield"].
 
   (* Java equivalent: JavaScriptBackend.unshadow_js *)
-  Definition unshadow_js {fruntime:foreign_runtime} (avoid:list var) (e:nrc) : nrc
+  Definition unshadow_js {fruntime:foreign_runtime} (avoid:list var) (e:nnrc) : nnrc
     := unshadow jsSafeSeparator jsIdentifierSanitize (avoid++jsAvoidList) e.
 
-  Definition jsSanitizeNNRC {fruntime:foreign_runtime} (e:nrc) : nrc
+  Definition jsSanitizeNNRC {fruntime:foreign_runtime} (e:nnrc) : nnrc
     := unshadow_js nil e.
 
 End sanitizer.
@@ -197,7 +197,7 @@ Section NNRCtoJavascript.
 
   End DataJS.
 
-  Section NRCJS.
+  Section NNRCJS.
 
     Require Import RDataSort.
     (* Sort criteria *)
@@ -241,25 +241,25 @@ Section NNRCtoJavascript.
          end.
 
     (* Java equivalent: JavaScript.Backend.nrcToJS *)
-    Fixpoint nrcToJS
-             (n : nrc)                    (* NNRC expression to translate *)
+    Fixpoint nnrcToJS
+             (n : nnrc)                    (* NNNRC expression to translate *)
              (t : nat)                    (* next available unused temporary *)
              (i : nat)                    (* indentation level *)
              (eol : string)               (* Choice of end of line character *)
              (quotel : string)            (* Choice of quote character *)
-             (ivs : list (string * string))  (* Input variables and their corresponding string representation -- should be free in the nrc expression *)
+             (ivs : list (string * string))  (* Input variables and their corresponding string representation -- should be free in the nnrc expression *)
       : string                            (* JavaScript statements for computing result *)
         * string                          (* JavaScript expression holding result *)
         * nat                             (* next available unused temporary *)
       := match n with
-         | NRCVar v =>
+         | NNRCVar v =>
            match assoc_lookupr equiv_dec ivs v with
            | Some v_string => ("", v_string, t)
            | None => ("", "v" ++ v, t)
            end
-         | NRCConst d => ("", (dataToJS quotel d), t)
-         | NRCUnop op n1 =>
-           let '(s1, e1, t0) := nrcToJS n1 t i eol quotel ivs in
+         | NNRCConst d => ("", (dataToJS quotel d), t)
+         | NNRCUnop op n1 =>
+           let '(s1, e1, t0) := nnrcToJS n1 t i eol quotel ivs in
            let e0 := match op with
                      | AIdOp => e1
                      | AUArith u => uarithToJs u e1
@@ -298,9 +298,9 @@ Section NNRCtoJavascript.
                        => foreign_to_javascript_unary_op i eol quotel fu e1
                      end in
            (s1, e0, t0)
-         | NRCBinop op n1 n2 =>
-           let '(s1, e1, t2) := nrcToJS n1 t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJS n2 t2 i eol quotel ivs in
+         | NNRCBinop op n1 n2 =>
+           let '(s1, e1, t2) := nnrcToJS n1 t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJS n2 t2 i eol quotel ivs in
            let e0 := match op with
                      | ABArith b => barithToJs b e1 e2
                      | AEq => "equal(" ++ e1 ++ ", " ++ e2 ++ ")"
@@ -320,16 +320,16 @@ Section NNRCtoJavascript.
                        => foreign_to_javascript_binary_op i eol quotel fb e1 e2
                      end in
            (s1 ++ s2, e0, t0)
-         | NRCLet v bind body =>
-           let '(s1, e1, t2) := nrcToJS bind t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJS body t2 i eol quotel ivs in
+         | NNRCLet v bind body =>
+           let '(s1, e1, t2) := nnrcToJS bind t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJS body t2 i eol quotel ivs in
            let v0 := "v" ++ v in
            (s1 ++ (indent i) ++ "var " ++ v0 ++ " = " ++ e1 ++ ";" ++ eol
                ++ s2,
             e2, t0)
-         | NRCFor v iter body =>
-           let '(s1, e1, t2) := nrcToJS iter t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJS body t2 (i+1) eol quotel ivs in
+         | NNRCFor v iter body =>
+           let '(s1, e1, t2) := nnrcToJS iter t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJS body t2 (i+1) eol quotel ivs in
            let elm := "v" ++ v in
            let src := "src" ++ (nat_to_string10 t0) in
            let idx := "i" ++ (nat_to_string10 t0) in
@@ -346,10 +346,10 @@ Section NNRCtoJavascript.
                ++ (indent (i+1)) ++ dst ++ ".push(" ++ e2 ++ ");" ++ eol
                ++ (indent i) ++ "}" ++ eol,
             dst, t0 + 1)
-         | NRCIf c n1 n2 =>
-           let '(s1, e1, t2) := nrcToJS c t i eol quotel ivs in
-           let '(s2, e2, t3) := nrcToJS n1 t2 (i+1) eol quotel ivs in
-           let '(s3, e3, t0) := nrcToJS n2 t3 (i+1) eol quotel ivs in
+         | NNRCIf c n1 n2 =>
+           let '(s1, e1, t2) := nnrcToJS c t i eol quotel ivs in
+           let '(s2, e2, t3) := nnrcToJS n1 t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t0) := nnrcToJS n2 t3 (i+1) eol quotel ivs in
            let v0 := "t" ++ (nat_to_string10 t0) in
            (s1 ++ (indent i) ++ "var " ++ v0 ++ ";" ++ eol
                ++ (indent i) ++ "if (" ++ e1 ++ ") {" ++ eol
@@ -360,10 +360,10 @@ Section NNRCtoJavascript.
                ++ (indent (i+1)) ++ v0 ++ " = " ++ e3 ++ ";" ++ eol
                ++ (indent i) ++ "}" ++ eol,
             v0, t0 + 1)
-         | NRCEither nd xl nl xr nr =>
-           let '(s1, e1, t2) := nrcToJS nd t i eol quotel ivs in
-           let '(s2, e2, t0) := nrcToJS nl t2 (i+1) eol quotel ivs in
-           let '(s3, e3, t1) := nrcToJS nr t0 (i+1) eol quotel ivs in
+         | NNRCEither nd xl nl xr nr =>
+           let '(s1, e1, t2) := nnrcToJS nd t i eol quotel ivs in
+           let '(s2, e2, t0) := nnrcToJS nl t2 (i+1) eol quotel ivs in
+           let '(s3, e3, t1) := nnrcToJS nr t0 (i+1) eol quotel ivs in
            let vl := "v" ++ xl in
            let vr := "v" ++ xr in
            let res := "res" ++ (nat_to_string10 t1) in  (* Stores the result from either left or right evaluation so it can be returned *)
@@ -380,12 +380,18 @@ Section NNRCtoJavascript.
                ++ (indent (i+1)) ++ res ++ " = " ++ e3 ++ ";" ++ eol
                ++ (indent i) ++ "}" ++ eol,
             res, t1 + 1)
+         | NNRCGroupBy g sl n1 =>
+           let '(s1, e1, t0) := nnrcToJS n1 t i eol quotel ivs in
+           let e0 := "groupby(" ++ e1 ++ ", "
+                                ++ quotel ++ g ++ quotel ++ ", "
+                                ++ (brandsToJs quotel sl) ++ ")" in
+           (s1, e0, t0)
        end.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSunshadow *)
-    Definition nrcToJSunshadow (n : nrc) (t : nat) (i : nat) (eol : string) (quotel : string) (avoid: list var) (ivs : list (string * string)) :=
+    Definition nnrcToJSunshadow (n : nnrc) (t : nat) (i : nat) (eol : string) (quotel : string) (avoid: list var) (ivs : list (string * string)) :=
       let n := unshadow_js avoid n in
-      nrcToJS n t i eol quotel ivs.
+      nnrcToJS n t i eol quotel ivs.
 
     (* Java equivalent: JavaScriptBackend.makeJSParams *)
     Definition makeJSParams (ivs: list string) :=
@@ -393,12 +399,12 @@ Section NNRCtoJavascript.
 
     (* Free variables are assumed to be constant lookups *)
     (* Java equivalent: JavaScriptBackend.closeFreeVars *)
-    Definition closeFreeVars (input:string) (e:nrc) (params:list string) : nrc :=
-      let all_free_vars := nrc_free_vars e in
-      let wrap_one_free_var (e':nrc) (fv:string) : nrc :=
+    Definition closeFreeVars (input:string) (e:nnrc) (params:list string) : nnrc :=
+      let all_free_vars := nnrc_free_vars e in
+      let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (in_dec string_dec fv params)
           then e'
-          else (NRCLet fv (NRCUnop (ADot fv) (NRCVar input)) e')
+          else (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
 
@@ -407,8 +413,8 @@ Section NNRCtoJavascript.
       map (fun x => (x,x)) params.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFunStub *)    
-    Definition nrcToJSFunStub (harness:bool) (e:nrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
-      let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
+    Definition nnrcToJSFunStub (harness:bool) (e:nnrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
+      let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
       "function " ++ fname
                   ++ "("++ (makeJSParams params) ++ ") {" ++ eol
                   ++ j0
@@ -417,8 +423,8 @@ Section NNRCtoJavascript.
                   ++ (if harness then "%HARNESS%" else "").
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFunStubConstants *)
-    Definition nrcToJSFunStubConstants (e:nrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
-      let '(j0, v0, t0) := nrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
+    Definition nnrcToJSFunStubConstants (e:nnrc) (eol:string) (quotel:string) (params : list string) (fname:string) :=
+      let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
       "function " ++ fname
                   ++ "("++ (makeJSParams params) ++ ") {" ++ eol
 (*                ++ "  var constants = mkWorld(constants);" ++ eol *) (* Moved to caller, i.e., TestUtil.java in queryTests *)
@@ -427,17 +433,17 @@ Section NNRCtoJavascript.
                   ++ "}".
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFun *)
-    Definition nrcToJSFun (input_v:string) (e:nrc) (eol:string) (quotel:string) (ivs : list string) (fname:string) :=
+    Definition nnrcToJSFun (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list string) (fname:string) :=
       let e' := closeFreeVars input_v e ivs in
-      nrcToJSFunStubConstants e' eol quotel ivs fname.
+      nnrcToJSFunStubConstants e' eol quotel ivs fname.
 
     (* Java equivalent: JavaScriptBackend.generateJavaScript *)
-    Definition nrcToJSTop (e:nrc) : string :=
+    Definition nnrcToJSTop (e:nnrc) : string :=
       let input_f := "query" in
       let input_v := "constants" in
-      nrcToJSFun input_v e eol_newline quotel_double (input_v::nil) input_f.
+      nnrcToJSFun input_v e eol_newline quotel_double (input_v::nil) input_f.
 
-  End NRCJS.
+  End NNRCJS.
 
 End NNRCtoJavascript.
 

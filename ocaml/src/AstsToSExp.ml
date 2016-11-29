@@ -383,29 +383,33 @@ let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
 
 let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
   match n with
-  | NRCVar v -> STerm ("NRCVar", [SString (string_of_char_list v)])
-  | NRCConst d -> STerm ("NRCConst", [data_to_sexp d])
-  | NRCBinop (b, n1, n2) -> STerm ("NRCBinop", (binop_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
-  | NRCUnop (u, n1) -> STerm ("NRCUnop", (unop_to_sexp u) :: [nnrc_to_sexp n1])
-  | NRCLet (v, n1, n2) -> STerm ("NRCLet", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
-  | NRCFor (v, n1, n2) -> STerm ("NRCFor", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
-  | NRCIf (n1, n2, n3) -> STerm ("NRCIf", [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
-  | NRCEither (n1,v1,n2,v2,n3) -> STerm ("NRCEither",
+  | NNRCVar v -> STerm ("NNRCVar", [SString (string_of_char_list v)])
+  | NNRCConst d -> STerm ("NNRCConst", [data_to_sexp d])
+  | NNRCBinop (b, n1, n2) -> STerm ("NNRCBinop", (binop_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NNRCUnop (u, n1) -> STerm ("NNRCUnop", (unop_to_sexp u) :: [nnrc_to_sexp n1])
+  | NNRCLet (v, n1, n2) -> STerm ("NNRCLet", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NNRCFor (v, n1, n2) -> STerm ("NNRCFor", (SString (string_of_char_list v)) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
+  | NNRCIf (n1, n2, n3) -> STerm ("NNRCIf", [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
+  | NNRCEither (n1,v1,n2,v2,n3) -> STerm ("NNRCEither",
 					 (SString (string_of_char_list v1))
 					 :: (SString (string_of_char_list v2))
 					 :: [nnrc_to_sexp n1;nnrc_to_sexp n2;nnrc_to_sexp n3])
+  | NNRCGroupBy (g,sl,n1) -> STerm ("NNRCGroupBy",
+				    [(SString (string_of_char_list g))]
+				    @ (coq_string_list_to_sstring_list sl)
+				    @ [nnrc_to_sexp n1])
 
 let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   match se with
-  | STerm ("NRCVar", [SString v]) -> NRCVar (char_list_of_string v)
-  | STerm ("NRCConst", [d]) -> NRCConst (sexp_to_data d)
-  | STerm ("NRCBinop", b :: [n1;n2]) -> NRCBinop (sexp_to_binop b, sexp_to_nnrc n1, sexp_to_nnrc n2)
-  | STerm ("NRCUnop", u :: [n1]) -> NRCUnop (sexp_to_unop u, sexp_to_nnrc n1)
-  | STerm ("NRCLet", (SString v) :: [n1;n2]) -> NRCLet (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
-  | STerm ("NRCFor", (SString v) :: [n1;n2]) -> NRCFor (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
-  | STerm ("NRCIf", [n1;n2;n3]) -> NRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)
-  | STerm ("NRCEither", (SString v1) :: (SString v2) :: [n1;n2;n3]) ->
-      NRCEither (sexp_to_nnrc n1,char_list_of_string v1,sexp_to_nnrc n2,char_list_of_string v2,sexp_to_nnrc n3)
+  | STerm ("NNRCVar", [SString v]) -> NNRCVar (char_list_of_string v)
+  | STerm ("NNRCConst", [d]) -> NNRCConst (sexp_to_data d)
+  | STerm ("NNRCBinop", b :: [n1;n2]) -> NNRCBinop (sexp_to_binop b, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NNRCUnop", u :: [n1]) -> NNRCUnop (sexp_to_unop u, sexp_to_nnrc n1)
+  | STerm ("NNRCLet", (SString v) :: [n1;n2]) -> NNRCLet (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NNRCFor", (SString v) :: [n1;n2]) -> NNRCFor (char_list_of_string v, sexp_to_nnrc n1, sexp_to_nnrc n2)
+  | STerm ("NNRCIf", [n1;n2;n3]) -> NNRCIf (sexp_to_nnrc n1, sexp_to_nnrc n2, sexp_to_nnrc n3)
+  | STerm ("NNRCEither", (SString v1) :: (SString v2) :: [n1;n2;n3]) ->
+      NNRCEither (sexp_to_nnrc n1,char_list_of_string v1,sexp_to_nnrc n2,char_list_of_string v2,sexp_to_nnrc n3)
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside nnrc with name " ^ t))
   | _ ->
@@ -449,29 +453,29 @@ let sexp_to_params (se:sexp) =
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside var list")
 
-let fun_to_sexp (f:(var list * nrc)) : sexp =
+let fun_to_sexp (f:(var list * QLang.nnrc)) : sexp =
   STerm ("lambda", (params_to_sexp (fst f)) :: (nnrc_to_sexp (snd f)) :: [])
 
-let sexp_to_fun (se:sexp) : (var list * nrc) =
+let sexp_to_fun (se:sexp) : (var list * QLang.nnrc) =
   match se with
   | STerm ("lambda", params :: sen :: []) ->
       (sexp_to_params params, sexp_to_nnrc sen)
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside lambda")
 
-let unary_fun_to_sexp (f:var * nrc) : sexp =
+let unary_fun_to_sexp (f:var * QLang.nnrc) : sexp =
   fun_to_sexp ([fst f], snd f)
 
-let sexp_to_unary_fun (se:sexp) : var * nrc =
+let sexp_to_unary_fun (se:sexp) : var * QLang.nnrc =
   match sexp_to_fun se with
   | ([var], n) -> (var, n)
   | _ ->
       raise (Qcert_Error "Map or Reduce lambda isn't unary")
   
-let binary_fun_to_sexp (f:(var * var) * nrc) : sexp =
+let binary_fun_to_sexp (f:(var * var) * QLang.nnrc) : sexp =
   fun_to_sexp ([fst (fst f); (snd (fst f))], snd f)
 
-let sexp_to_binary_fun (se:sexp) : (var * var) * nrc =
+let sexp_to_binary_fun (se:sexp) : (var * var) * QLang.nnrc =
   match sexp_to_fun se with
   | ([var1; var2], n) -> ((var1, var2), n)
   | _ ->
@@ -606,14 +610,14 @@ let sexp_to_var_locs (se:sexp list) =
   map sexp_to_var_loc se
 
 
-let mr_last_to_sexp (last: (var list * nrc) * (var * dlocalization) list) =
+let mr_last_to_sexp (last: (var list * QLang.nnrc) * (var * dlocalization) list) =
   match last with
   | (f, var_locs)
     ->
       (STerm ("mr_last",
 	      (fun_to_sexp f) :: (var_locs_to_sexp var_locs)))
 
-let sexp_to_mr_last (se:sexp) : (var list * nrc) * (var * dlocalization) list =
+let sexp_to_mr_last (se:sexp) : (var list * QLang.nnrc) * (var * dlocalization) list =
   match se with
   | STerm ("mr_last", f :: var_locs) ->
       (sexp_to_fun f, sexp_to_var_locs var_locs)
@@ -775,13 +779,13 @@ let sexp_to_cld_mr_chain (sel:sexp list) : cld_mr list =
   List.map sexp_to_cld_mr sel
 
 
-let cld_mr_last_to_sexp (last: (var list * nrc) * var list) : sexp list =
+let cld_mr_last_to_sexp (last: (var list * QLang.nnrc) * var list) : sexp list =
   match last with
   | (f, vars)
     ->
       (fun_to_sexp f) :: (var_list_to_sexp vars)
 
-let sexp_to_cld_mr_last (sel:sexp list) : (var list * nrc) * var list =
+let sexp_to_cld_mr_last (sel:sexp list) : (var list * QLang.nnrc) * var list =
   match sel with
   | f :: vars ->
       (sexp_to_fun f, sexp_to_var_list vars)

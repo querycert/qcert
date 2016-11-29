@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * COPYRight 2015-2016 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ Section CompEval.
     (* Language: nnrc *)
     (* Note: eval_nnrc assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_nnrc (q:nnrc) (cenv: list (string*data)) : option data
-      := nrc_eval h (mkConstants (rec_sort cenv)) q.
+      := @nnrc_ext_eval _ h (mkConstants (rec_sort cenv)) q.
 
     (* Language: nnrcmr *)
     (* Note: eval_nnrcmr assumes constant environment has been prefixed with 'CONST$' *)
@@ -138,7 +138,7 @@ Section CompEval.
          (* Note: localize_bindings turns all variables distributed! *)
          let loc_cenv := mkDistLocs cenv in
          match load_init_env init_vinit loc_cenv cenv with
-         | Some mr_env => nrcmr_eval h mr_env q
+         | Some mr_env => nnrcmr_eval h mr_env q
          | None => None
          end.
 
@@ -159,7 +159,7 @@ Section CompEval.
       let cenv := mkConstants (rec_sort cenv) in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (@dnrc_eval _ _ _ h SparkIRPlug cenv q)
+      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h SparkIRPlug cenv q)
       | None => None
       end.
 

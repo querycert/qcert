@@ -48,7 +48,7 @@ Section CompStat.
   Context {bm:brand_model}.
   Context {nraenv_core_logger:optimizer_logger string algenv}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
-  Context {nnrc_logger:optimizer_logger string nrc}.
+  Context {nnrc_logger:optimizer_logger string nnrc}.
   Context {fredop:foreign_reduce_op}.
 
   Require Import ZArith.
@@ -111,7 +111,7 @@ Section CompStat.
 
   Definition stat_nnrc (q: nnrc) : data :=
     drec
-      (("nnrc_size", dnat (Z_of_nat (nrc_size q)))
+      (("nnrc_size", dnat (Z_of_nat (nnrc_size q)))
          :: nil).
 
   Definition stat_nra (q:nra) : data :=
