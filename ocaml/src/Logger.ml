@@ -16,12 +16,13 @@
 
 (* This module contains the implementation for the optimization logger *)
 
-let trace = ref false
-let set_trace () = trace := true
-let unset_trace () = trace := false
+(* nra logger *)
+let nra_trace = ref false
+let nra_set_trace () = nra_trace := true
+let nra_unset_trace () = nra_trace := false
 
-let log_startPass name input =
-  if !trace
+let nra_log_startPass name input =
+  if !nra_trace
   then
     begin
       (* Probably too much noise ... *)
@@ -31,8 +32,8 @@ let log_startPass name input =
   else
     name
   
-let log_step tok name input output =
-  if !trace
+let nra_log_step tok name input output =
+  if !nra_trace
   then
     begin
       if (input == output)
@@ -43,8 +44,8 @@ let log_step tok name input output =
   else
     tok
 
-let log_endPass tok output =
-  if !trace
+let nra_log_endPass tok output =
+  if !nra_trace
   then
     begin
       (* Probably too much noise ... *)
@@ -54,4 +55,42 @@ let log_endPass tok output =
   else
     tok
 
+(* nrc logger *)
   
+let nrc_trace = ref false
+let nrc_set_trace () = nrc_trace := true
+let nrc_unset_trace () = nrc_trace := false
+
+let nrc_log_startPass name input =
+  if !nrc_trace
+  then
+    begin
+      (* Probably too much noise ... *)
+      (* print_string "starting pass: "; print_endline name; *)
+      name
+    end
+  else
+    name
+  
+let nrc_log_step tok name input output =
+  if !nrc_trace
+  then
+    begin
+      if (input == output)
+      then () (* (print_string "skipping optimization: "; print_endline name) *)
+      else (print_string "running optimization: "; print_endline name) ;
+      tok
+    end
+  else
+    tok
+
+let nrc_log_endPass tok output =
+  if !nrc_trace
+  then
+    begin
+      (* Probably too much noise ... *)
+      (* print_string "ending pass: "; print_endline tok; *)
+      tok
+    end
+  else
+    tok

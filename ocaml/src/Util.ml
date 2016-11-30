@@ -21,7 +21,8 @@
 exception Qcert_Error of string
 
 (* this can't go in Logger, since that creates a circular dependency *)
-type logger_token_type = string
+type nra_logger_token_type = string
+type nrc_logger_token_type = string
 
 (**************)
 (* Data types *)

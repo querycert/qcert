@@ -18,10 +18,16 @@
 
 open Util
 
-val log_startPass : string -> 'a -> logger_token_type
-val log_step : logger_token_type -> string -> 'a -> 'a -> logger_token_type
-val log_endPass : logger_token_type -> 'a -> logger_token_type
+val nra_log_startPass : string -> 'a -> nra_logger_token_type
+val nra_log_step : nra_logger_token_type -> string -> 'a -> 'a -> nra_logger_token_type
+val nra_log_endPass : nra_logger_token_type -> 'a -> nra_logger_token_type
 
-val set_trace : unit -> unit
-val unset_trace : unit -> unit
+val nra_set_trace : unit -> unit
+val nra_unset_trace : unit -> unit
 
+val nrc_log_startPass : string -> 'a -> nrc_logger_token_type
+val nrc_log_step : nrc_logger_token_type -> string -> 'a -> 'a -> nrc_logger_token_type
+val nrc_log_endPass : nrc_logger_token_type -> 'a -> nrc_logger_token_type
+
+val nrc_set_trace : unit -> unit
+val nrc_unset_trace : unit -> unit

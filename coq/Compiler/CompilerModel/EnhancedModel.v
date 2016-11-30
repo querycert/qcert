@@ -1181,65 +1181,69 @@ Definition enhanced_to_cloudant_reduce_op
         invcs H; trivial.
   Qed.
 
-  (* optimizer logger support *)
-  Axiom OPTIMIZER_LOGGER_token_type : Set.
-  Extract Constant OPTIMIZER_LOGGER_token_type => "Util.logger_token_type".
+  (* nra optimizer logger support *)
+  Axiom OPTIMIZER_LOGGER_nraenv_token_type : Set.
+  Extract Constant OPTIMIZER_LOGGER_nraenv_token_type => "Util.nra_logger_token_type".
 
   Axiom OPTIMIZER_LOGGER_nraenv_startPass :
-    String.string -> nraenv -> OPTIMIZER_LOGGER_token_type.
+    String.string -> nraenv -> OPTIMIZER_LOGGER_nraenv_token_type.
 
   Extract Constant OPTIMIZER_LOGGER_nraenv_startPass =>
-  "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> Logger.nra_log_startPass (Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nraenv_step :
-    OPTIMIZER_LOGGER_token_type -> String.string ->
+    OPTIMIZER_LOGGER_nraenv_token_type -> String.string ->
     nraenv -> nraenv ->
-    OPTIMIZER_LOGGER_token_type.
+    OPTIMIZER_LOGGER_nraenv_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_step =>
-  "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> Logger.nra_log_step token (Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nraenv_endPass :
-    OPTIMIZER_LOGGER_token_type -> nraenv -> OPTIMIZER_LOGGER_token_type.
+    OPTIMIZER_LOGGER_nraenv_token_type -> nraenv -> OPTIMIZER_LOGGER_nraenv_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nraenv_endPass =>
-  "(fun token output -> Logger.log_endPass token output)".
+  "(fun token output -> Logger.nra_log_endPass token output)".
 
   Instance foreign_nraenv_optimizer_logger :
     optimizer_logger string nraenv
     :=
       {
-        optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nraenv_token_type
         ; logStartPass := OPTIMIZER_LOGGER_nraenv_startPass
         ; logStep :=  OPTIMIZER_LOGGER_nraenv_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nraenv_endPass
       } .
 
+  (* nrc optimizer logger support *)
+  Axiom OPTIMIZER_LOGGER_nnrc_token_type : Set.
+  Extract Constant OPTIMIZER_LOGGER_nnrc_token_type => "Util.nrc_logger_token_type".
+
   Axiom OPTIMIZER_LOGGER_nnrc_startPass :
-    String.string -> nnrc -> OPTIMIZER_LOGGER_token_type.
+    String.string -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
 
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_startPass =>
-  "(fun name input -> Logger.log_startPass (Util.string_of_char_list name) input)".
+  "(fun name input -> Logger.nrc_log_startPass (Util.string_of_char_list name) input)".
 
   Axiom OPTIMIZER_LOGGER_nnrc_step :
-    OPTIMIZER_LOGGER_token_type -> String.string ->
+    OPTIMIZER_LOGGER_nnrc_token_type -> String.string ->
     nnrc -> nnrc ->
-    OPTIMIZER_LOGGER_token_type.
+    OPTIMIZER_LOGGER_nnrc_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_step =>
-  "(fun token name input output -> Logger.log_step token (Util.string_of_char_list name) input output)".
+  "(fun token name input output -> Logger.nrc_log_step token (Util.string_of_char_list name) input output)".
 
   Axiom OPTIMIZER_LOGGER_nnrc_endPass :
-    OPTIMIZER_LOGGER_token_type -> nnrc -> OPTIMIZER_LOGGER_token_type.
+    OPTIMIZER_LOGGER_nnrc_token_type -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
   
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
-  "(fun token output -> Logger.log_endPass token output)".
+  "(fun token output -> Logger.nrc_log_endPass token output)".
 
   Instance foreign_nnrc_optimizer_logger :
     optimizer_logger string nnrc
     :=
       {
-        optimizer_logger_token_type := OPTIMIZER_LOGGER_token_type
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_nnrc_token_type
         ; logStartPass := OPTIMIZER_LOGGER_nnrc_startPass
         ; logStep :=  OPTIMIZER_LOGGER_nnrc_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nnrc_endPass
