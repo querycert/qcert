@@ -61,7 +61,13 @@ let args_list gconf =
       ("-stat-all", Arg.Unit (QcertArg.set_stat_all gconf),
          " Produce statistics for all intermediate queries");
       ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
-         " Produce statistics for paths following starting from the source");
+       " Produce statistics for paths following starting from the source");
+      ("-log-optims", Arg.Unit (fun () -> Logger.nra_set_trace();Logger.nrc_set_trace()),
+       " Enable optimization logging");
+      ("-log-optims-nra", Arg.Unit (Logger.nra_set_trace),
+       " Enable optimization logging for nra");
+      ("-log-optims-nrc", Arg.Unit (Logger.nrc_set_trace),
+       " Enable optimization logging for nrc");
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
