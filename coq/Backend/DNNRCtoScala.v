@@ -156,11 +156,11 @@ Section DNNRCtoScala.
     | CSConcat c1 c2 =>
       "concat(" ++ code_of_column c1 ++ ", " ++ code_of_column c2 ++ ")"
     | CToString c =>
-      "QcertRuntime.toQcertStringUDF(" ++ code_of_column c ++ ")"
+      "toQcertStringUDF(" ++ code_of_column c ++ ")"
     | CUDFCast bs c =>
-      "QcertRuntime.castUDF(" ++ joinStrings ", " ("brandHierarchy"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
+      "castUDF(" ++ joinStrings ", " ("HIERARCHY"%string :: map quote_string bs) ++ ")(" ++ code_of_column c ++ ")"
     | CUDFUnbrand t c =>
-      "QcertRuntime.unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
+      "unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
 
   Fixpoint code_of_dataset (e: dataset) : string :=
@@ -194,7 +194,7 @@ Section DNNRCtoScala.
     | AArithMean => prefix "arithMean"
     | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
     | ACast bs =>
-      "cast(" ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
+      "cast(HIERARCHY, " ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
     | AColl => prefix "Array"
     | ACount => postfix "length"
     | ADot n =>
@@ -218,7 +218,7 @@ Section DNNRCtoScala.
     | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
     | ARight => prefix "right"
     | ASum => postfix "sum"
-    | AToString => prefix "QcertRuntime.toQcertString"
+    | AToString => prefix "toQcertString"
     | ASubstring start olen =>
       "(" ++ x ++ ").substring(" ++ toString start ++
           match olen with
@@ -393,28 +393,36 @@ Section DNNRCtoScala.
 
   Definition initBrandHierarchy : string :=
     let lines :=
-        map (fun p => "addToBrandHierarchy(""" ++ (fst p) ++ """, """ ++ snd p ++ """);")
+        map (fun p => "(""" ++ fst p ++ """ -> """ ++ snd p ++ """)")
             brand_relation_brands in
-    joinStrings " " lines.
+    joinStrings ", " lines.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
   Definition dnnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
              (e: dnnrc (type_annotation A) dataset) : string :=
     ""
-      ++ "import org.apache.spark.sql.types._" ++ eol
-      ++ "import org.apache.spark.sql.{Dataset, Row}" ++ eol
+      ++ "import org.apache.spark.SparkContext" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol
+      ++ "import org.apache.spark.sql.SparkSession" ++ eol
+      ++ "import org.apache.spark.sql.types._" ++ eol
       ++ "import org.qcert.QcertRuntime" ++ eol
-      ++ "object " ++ name ++ " extends QcertRuntime {" ++ eol
-      ++ initBrandHierarchy ++ eol
-      ++ "val worldType = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
-      ++ "def run(CONST$WORLD: Dataset[Row]) = {" ++ eol
-      (* sparkSession is a field in QcertRuntime. What it does in an import? I have no idea! *)
-      ++ "  import sparkSession.implicits._" ++ eol
-      ++ "println(toBlob(" ++ eol
+      ++ "import org.qcert.QcertRuntime._" ++ eol
+
+      ++ "object " ++ name ++ " {" ++ eol
+      ++ "def main(args: Array[String]): Unit = {" ++ eol
+      ++ "val WORLDTYPE = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
+      ++ "val HIERARCHY = QcertRuntime.makeHierarchy(" ++ initBrandHierarchy ++ ")" ++ eol
+      ++ "val sparkContext = new SparkContext()" ++ eol
+      ++ "val sparkSession = SparkSession.builder().getOrCreate()" ++ eol
+      ++ "val CONST$WORLD = sparkSession.read.schema(WORLDTYPE).json(args(0))" ++ eol
+      ++ "import sparkSession.implicits._" ++ eol
+      ++ "QcertRuntime.beforeQuery()" ++ eol
+      ++ "println(QcertRuntime.toBlob(" ++ eol
       ++ scala_of_dnnrc e ++ eol
       ++ "))" ++ eol
+      ++ "QcertRuntime.afterQuery()" ++ eol
+      ++ "sparkContext.stop()" ++ eol
       ++ "}" ++ eol
       ++ "}"
   .
