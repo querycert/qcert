@@ -37,6 +37,16 @@ Section NNRCExt.
   Context {h:brand_relation_t}.
   
   Section macros.
+    (** e groupby[g,keys] ==
+         LET $group0 := e
+         IN { [ g: ]
+                ⊕
+              ♯flatten({ IF ($group3 = π[keys])
+                         THEN {$group3}
+                         ELSE {}
+                       | $group3 ∈ $group0 })
+            | $group2 ∈ ♯distinct({ π[keys]($group1) | $group1 ∈ $group0 }) }
+    *)
     Definition nnrc_group_by (g:string) (sl:list string) (e:nnrc) : nnrc :=
       let t0 := "$group0"%string in
       let t1 := "$group1"%string in
@@ -50,11 +60,26 @@ Section NNRCExt.
                                (NNRCUnop (ARec g)
                                         (NNRCUnop AFlatten
                                                  (NNRCFor t3 (NNRCVar t0)
-                                                         (NNRCIf (NNRCBinop AEq (NNRCVar t2) (NNRCUnop (ARecProject sl) (NNRCVar t3))) (NNRCVar t3) (NNRCConst (dcoll nil))))))
+                                                          (NNRCIf (NNRCBinop AEq (NNRCUnop (ARecProject sl) (NNRCVar t3)) (NNRCVar t2))
+                                                                  (NNRCUnop AColl (NNRCVar t3))
+                                                                  (NNRCConst (dcoll nil))))))
                                (NNRCVar t2))).
-
+    
+    Lemma nnrc_group_by_correct env
+          (g:string) (sl:list string)
+          (e:nnrc)
+          (incoll outcoll:list data):
+      nnrc_core_eval h env e = Some (dcoll incoll) ->
+      group_by_nested_eval_table g sl incoll = Some outcoll -> 
+      nnrc_core_eval h env (nnrc_group_by g sl e) = Some (dcoll outcoll).
+    Proof.
+      intros.
+      unfold nnrc_group_by; simpl.
+      rewrite H; simpl; clear H.
+      apply (group_by_table_correct g sl incoll outcoll H0).
+    Qed.
   End macros.
-  
+
   Section translation.
     Fixpoint nnrc_ext_to_nnrc (e:nnrc) : nnrc :=
       match e with

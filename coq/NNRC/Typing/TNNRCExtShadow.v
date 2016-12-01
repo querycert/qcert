@@ -70,8 +70,20 @@ Section TNNRCExtShadow.
          * apply (nnrc_ext_type_remove_duplicate_env nil v1 τr l) in H10; eauto.
          * eapply (IHe3 ((v0, τr) :: l)); eauto.
            rewrite <- remove_in_neq in neq3; intuition.
-    - unfold NNRCExt.nnrc_group_by.
-      nnrc_inverter. (* Kudos to inversion tactic just collapses groupBy macro *)
+    - (* GroupBy case *)
+      unfold NNRCExt.nnrc_group_by in *.
+      nnrc_inverter.
+      inversion H11; clear H11; subst.
+      inversion H20; clear H20; subst.
+      inversion H33; clear H33; subst.
+      inversion H27; clear H27; subst.
+      destruct x1; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl.
+      f_equal.
+      apply rtype_fequal.
+      reflexivity.
     - constructor. erewrite lookup_remove_nin; eauto.
     - apply nin_app_or in H. intuition. eauto.
     - apply nin_app_or in H. intuition.
@@ -99,8 +111,25 @@ Section TNNRCExtShadow.
          * apply (nnrc_ext_type_remove_duplicate_env nil v1 τr l); simpl; trivial.
          * eapply (IHe3 ((v0, τr) :: l)); eauto.
            rewrite <- remove_in_neq in neq3; intuition.
-    - unfold NNRCExt.nnrc_group_by.
-      nnrc_inverter. (* Kudos to inversion tactic just collapses groupBy macro *)
+    - (* GroupBy case *)
+      unfold NNRCExt.nnrc_group_by in *.
+      nnrc_inverter.
+      inversion H11; clear H11; subst.
+      inversion H20; clear H20; subst.
+      inversion H33; clear H33; subst.
+      inversion H27; clear H27; subst.
+      destruct x1; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl.
+      f_equal.
+      apply rtype_fequal.
+      reflexivity.
+      Grab Existential Variables.
+      eauto.
+      eauto.
+      eauto.
+      eauto.
   Qed.
 
   Lemma nnrc_ext_type_swap_neq  l1 v1 x1 v2 x2 l2 e τ :
@@ -189,10 +218,19 @@ Section TNNRCExtShadow.
         * apply (nnrc_ext_type_swap_neq nil); eauto 2; simpl.
           apply (nnrc_ext_type_swap_neq nil) in H8; eauto 2; simpl in *.
           eapply IHe3; eauto 2; intuition.
-    - (* GroupBy Case. inversion tactic on group-by macro. *)
+    - (* GroupBy Case *)
       intros.
       unfold NNRCExt.nnrc_group_by in *.
       nnrc_inverter.
+      inversion H15; clear H15; subst.
+      inversion H8; clear H8; subst.
+      destruct x; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl.
+      f_equal.
+      apply rtype_fequal.
+      reflexivity.
     - intuition.
       destruct (string_dec v v₀); simpl; subst; intuition; 
         inversion H; subst; simpl in *; repeat dest_eqdec; intuition;
@@ -261,10 +299,24 @@ Section TNNRCExtShadow.
         * apply (nnrc_ext_type_swap_neq nil); eauto; simpl.
           apply IHe3; eauto 2; intuition.
           apply (nnrc_ext_type_swap_neq nil); eauto; simpl.
-    - (* GroupBy Case. inversion tactic on group-by macro. *)
+    - (* GroupBy Case *)
       intros.
       unfold NNRCExt.nnrc_group_by in *.
       nnrc_inverter.
+      inversion H15; clear H15; subst.
+      inversion H8; clear H8; subst.
+      destruct x; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl.
+      f_equal.
+      apply rtype_fequal.
+      reflexivity.
+      Grab Existential Variables.
+      eauto.
+      eauto.
+      eauto.
+      eauto.
   Qed.
 
   Lemma nnrc_ext_type_cons_subst_disjoint  e e' Γ v τ₀ τ :
@@ -361,6 +413,18 @@ Section TNNRCExtShadow.
         }
     - unfold NNRCExt.nnrc_group_by in *.
       nnrc_inverter.
+      inversion H15; clear H15; subst.
+      inversion H8; clear H8; subst.
+      destruct x; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl.
+      f_equal.
+      apply rtype_fequal.
+      reflexivity.
+      Grab Existential Variables.
+      eauto.
+      eauto.
   Qed.
 
   Lemma nnrc_ext_type_rename_pick_subst sep renamer avoid e Γ v τ₀ τ :
@@ -396,6 +460,14 @@ Section TNNRCExtShadow.
         unfold nnrc_ext_type; eauto.
     - unfold NNRCExt.nnrc_group_by in *.
       nnrc_inverter.
+      inversion H32; clear H32; subst.
+      inversion H26; clear H26; subst.
+      inversion H19; clear H19; subst.
+      inversion H10; clear H10; subst.
+      destruct x0; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl; f_equal; apply rtype_fequal; reflexivity.
     - econstructor; [eauto|..].
       apply nnrc_ext_type_rename_pick_subst in H6.
       unfold nnrc_ext_type; eauto.
@@ -409,12 +481,25 @@ Section TNNRCExtShadow.
         unfold nnrc_ext_type; eauto.
     - unfold NNRCExt.nnrc_group_by in *.
       nnrc_inverter.
+      inversion H32; clear H32; subst.
+      inversion H26; clear H26; subst.
+      inversion H19; clear H19; subst.
+      inversion H10; clear H10; subst.
+      destruct x0; simpl in *.
+      rtype_equalizer. subst.
+      repeat (econstructor; eauto).
+      simpl; f_equal; apply rtype_fequal; reflexivity.
+      Grab Existential Variables.
+      eauto.
+      eauto.
+      eauto.
+      eauto.
   Qed.
 
 End TNNRCExtShadow.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

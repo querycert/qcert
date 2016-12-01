@@ -76,6 +76,29 @@ Section RGroupBy.
            (eval_key d1)
            (Some d2).
 
+  Lemma key_is_eq_with_project_eq sl d l :
+    key_is_eq_r
+      (fun d0 : data =>
+         match d0 with
+         | dunit => None
+         | dnat _ => None
+         | dbool _ => None
+         | dstring _ => None
+         | dcoll _ => None
+         | drec r => Some (drec (rproject r sl))
+         | dleft _ => None
+         | dright _ => None
+         | dbrand _ _ => None
+         | dforeign _ => None
+         end) (drec l) d =
+    Some (if data_eq_dec (drec (rproject l sl)) d then true else false).
+  Proof.
+    unfold key_is_eq_r.
+    Opaque data_eq_dec.
+    simpl.
+    destruct (data_eq_dec (drec (rproject l sl)) d); reflexivity.
+  Qed.
+
   Require Import String.
   
   Definition group_of_key (eval_key: data -> option data) (k:data) (l: list data) :=
@@ -117,6 +140,442 @@ Section RGroupBy.
              (g:string) (eval_keys:data -> option data) (l: list data) : option (list data) :=
     olift (to_partitions g) (group_by_nested_eval eval_keys l).
 
+  Section tableform.
+    Definition group_by_nested_eval_table
+               (g:string) (sl:list string) (l:list data) : option (list data) :=
+      group_by_nested_eval_keys_partition
+        g
+        (fun d =>
+           match d with
+           | drec r => Some (drec (rproject r sl))
+           | _ => None
+           end) l.
+
+    Lemma test sl d incoll :
+      olift (fun group : list data => Some (dcoll group))
+            (group_of_key
+               (fun d : data =>
+                  match d with
+                  | dunit => None
+                  | dnat _ => None
+                  | dbool _ => None
+                  | dstring _ => None
+                  | dcoll _ => None
+                  | drec r => Some (drec (rproject r sl))
+                  | dleft _ => None
+                  | dright _ => None
+                  | dbrand _ _ => None
+                  | dforeign _ => None
+                  end) d incoll)
+      =
+(olift
+              (fun d1 : data =>
+               lift_oncoll
+                 (fun l2 : list data => lift dcoll (rflatten l2)) d1)
+              (lift dcoll
+                 (rmap
+                    (fun d1 : data =>
+                     olift
+                       (fun d0 : data =>
+                        match d0 with
+                        | dunit => None
+                        | dnat _ => None
+                        | dbool true => Some (dcoll (d1 :: nil))
+                        | dbool false => Some (dcoll nil)
+                        | dstring _ => None
+                        | dcoll _ => None
+                        | drec _ => None
+                        | dleft _ => None
+                        | dright _ => None
+                        | dbrand _ _ => None
+                        | dforeign _ => None
+                        end)
+                       (olift2
+                          (fun d0 d2 : data =>
+                           unbdata
+                             (fun x y : data =>
+                              if data_eq_dec x y then true else false) d0
+                             d2)
+                          match d1 with
+                          | dunit => None
+                          | dnat _ => None
+                          | dbool _ => None
+                          | dstring _ => None
+                          | dcoll _ => None
+                          | drec r => Some (drec (rproject r sl))
+                          | dleft _ => None
+                          | dright _ => None
+                          | dbrand _ _ => None
+                          | dforeign _ => None
+                          end (Some d))) incoll))).
+    Proof.
+      induction incoll; simpl in *; [reflexivity| ].
+      unfold group_of_key in *.
+      simpl in *.
+      destruct a; simpl in *; try congruence.
+      rewrite key_is_eq_with_project_eq.
+      destruct (data_eq_dec (drec (rproject l sl)) d); simpl.
+      - destruct (lift_filter
+                    (fun d0 : data =>
+                       key_is_eq_r
+                         (fun d1 : data =>
+                            match d1 with
+                            | dunit => None
+                            | dnat _ => None
+                            | dbool _ => None
+                            | dstring _ => None
+                            | dcoll _ => None
+                            | drec r => Some (drec (rproject r sl))
+                            | dleft _ => None
+                            | dright _ => None
+                            | dbrand _ _ => None
+                            | dforeign _ => None
+                            end) d0 d) incoll);
+        destruct ((rmap
+             (fun d1 : data =>
+              olift
+                (fun d0 : data =>
+                 match d0 with
+                 | dunit => None
+                 | dnat _ => None
+                 | dbool true => Some (dcoll (d1 :: nil))
+                 | dbool false => Some (dcoll nil)
+                 | dstring _ => None
+                 | dcoll _ => None
+                 | drec _ => None
+                 | dleft _ => None
+                 | dright _ => None
+                 | dbrand _ _ => None
+                 | dforeign _ => None
+                 end)
+                (olift2
+                   (fun d0 d2 : data =>
+                    unbdata
+                      (fun x y : data =>
+                       if data_eq_dec x y then true else false) d0 d2)
+                   match d1 with
+                   | dunit => None
+                   | dnat _ => None
+                   | dbool _ => None
+                   | dstring _ => None
+                   | dcoll _ => None
+                   | drec r => Some (drec (rproject r sl))
+                   | dleft _ => None
+                   | dright _ => None
+                   | dbrand _ _ => None
+                   | dforeign _ => None
+                   end (Some d))) incoll)); simpl in *; try congruence.
+        case_eq (rflatten l1); intros.
+        subst.
+        rewrite H in IHincoll; simpl in *.
+        inversion IHincoll; subst.
+        rewrite (rflatten_cons _ _ l2); try assumption. reflexivity.
+        rewrite H in IHincoll; simpl in *; congruence.
+        case_eq (rflatten l0); intros; subst; simpl in *; try congruence.
+        rewrite H in IHincoll; simpl in *; congruence.
+        rewrite H in IHincoll; simpl in *.
+        rewrite rflatten_cons_none; [reflexivity|assumption].
+      - destruct (lift_filter
+                    (fun d0 : data =>
+                       key_is_eq_r
+                         (fun d1 : data =>
+                            match d1 with
+                            | dunit => None
+                            | dnat _ => None
+                            | dbool _ => None
+                            | dstring _ => None
+                            | dcoll _ => None
+                            | drec r => Some (drec (rproject r sl))
+                            | dleft _ => None
+                            | dright _ => None
+                            | dbrand _ _ => None
+                            | dforeign _ => None
+                            end) d0 d) incoll);
+        destruct ((rmap
+             (fun d1 : data =>
+              olift
+                (fun d0 : data =>
+                 match d0 with
+                 | dunit => None
+                 | dnat _ => None
+                 | dbool true => Some (dcoll (d1 :: nil))
+                 | dbool false => Some (dcoll nil)
+                 | dstring _ => None
+                 | dcoll _ => None
+                 | drec _ => None
+                 | dleft _ => None
+                 | dright _ => None
+                 | dbrand _ _ => None
+                 | dforeign _ => None
+                 end)
+                (olift2
+                   (fun d0 d2 : data =>
+                    unbdata
+                      (fun x y : data =>
+                       if data_eq_dec x y then true else false) d0 d2)
+                   match d1 with
+                   | dunit => None
+                   | dnat _ => None
+                   | dbool _ => None
+                   | dstring _ => None
+                   | dcoll _ => None
+                   | drec r => Some (drec (rproject r sl))
+                   | dleft _ => None
+                   | dright _ => None
+                   | dbrand _ _ => None
+                   | dforeign _ => None
+                   end (Some d))) incoll)); simpl in *; try congruence.
+        case_eq (rflatten l1); intros.
+        subst.
+        rewrite H in IHincoll; simpl in *.
+        inversion IHincoll; subst.
+        rewrite (rflatten_cons _ _ l2); try assumption.
+        rewrite H in IHincoll; simpl in *; congruence.
+        case_eq (rflatten l0); intros; subst; simpl in *; try congruence.
+        rewrite H in IHincoll; simpl in *; congruence.
+        rewrite H in IHincoll; simpl in *.
+        rewrite rflatten_cons_none; [reflexivity|assumption].
+    Qed.
+
+    Lemma test2 g sl d l0 l1 incoll:
+      match d with
+      | dunit => None
+      | dnat _ => None
+      | dbool _ => None
+      | dstring _ => None
+      | dcoll _ => None
+      | drec r2 =>
+        Some
+          (drec
+             (insertion_sort_insert rec_field_lt_dec 
+                                    (g, dcoll l1) (rec_sort r2)))
+      | dleft _ => None
+      | dright _ => None
+      | dbrand _ _ => None
+      | dforeign _ => None
+      end = None ->
+      olift (to_partitions g)
+            (lift (fun t' : list (data * list data) => (d, l1) :: t')
+                  (rmap
+                     (fun k : data =>
+                        olift (fun group : list data => Some (k, group))
+                              (group_of_key
+                                 (fun d : data =>
+                                    match d with
+                                    | dunit => None
+                                    | dnat _ => None
+                      | dbool _ => None
+                      | dstring _ => None
+                      | dcoll _ => None
+                      | drec r => Some (drec (rproject r sl))
+                      | dleft _ => None
+                      | dright _ => None
+                      | dbrand _ _ => None
+                      | dforeign _ => None
+                                    end) k incoll)) l0)) = None.
+    Proof.
+      intros.
+      case_eq d; intros; subst; simpl in *; try congruence;
+      destruct (rmap
+          (fun k : data =>
+           olift (fun group : list data => Some (k, group))
+             (group_of_key
+                (fun d : data =>
+                 match d with
+                 | dunit => None
+                 | dnat _ => None
+                 | dbool _ => None
+                 | dstring _ => None
+                 | dcoll _ => None
+                 | drec r => Some (drec (rproject r sl))
+                 | dleft _ => None
+                 | dright _ => None
+                 | dbrand _ _ => None
+                 | dforeign _ => None
+                 end) k incoll)) l0); simpl;
+      unfold to_partitions; simpl; try reflexivity.
+    Qed.
+
+    Lemma rmap_map_merge {A} {B} {C} (f1:A -> B) (f2:B -> option C) (l: list A):
+      (rmap (fun d => f2 (f1 d)) l) =
+      rmap f2 (map f1 l).
+    Proof.
+      induction l; intros; simpl; [reflexivity| ].
+      destruct (f2 (f1 a)); [|reflexivity].
+      rewrite IHl.
+      reflexivity.
+    Qed.
+
+    Lemma group_by_table_correct
+          (g:string) (sl:list string)
+          (incoll outcoll:list data):
+      group_by_nested_eval_table g sl incoll = Some outcoll -> 
+      match
+        olift (fun d1 : data => rondcoll bdistinct d1)
+              (lift dcoll
+                    (rmap
+                       (fun d1 : data =>
+                          match d1 with
+                          | dunit => None
+                          | dnat _ => None
+                          | dbool _ => None
+                          | dstring _ => None
+                          | dcoll _ => None
+                          | drec r => Some (drec (rproject r sl))
+                          | dleft _ => None
+                          | dright _ => None
+                          | dbrand _ _ => None
+                          | dforeign _ => None
+                          end) incoll))
+      with
+      | Some dunit => None
+      | Some (dnat _) => None
+      | Some (dbool _) => None
+      | Some (dstring _) => None
+      | Some (dcoll c1) =>
+        lift dcoll
+             (rmap
+                (fun d1 : data =>
+                   olift2
+                     (fun d0 d2 : data =>
+                        match d0 with
+                        | dunit => None
+                        | dnat _ => None
+                        | dbool _ => None
+                        | dstring _ => None
+                        | dcoll _ => None
+                        | drec r1 =>
+                          match d2 with
+                          | dunit => None
+                          | dnat _ => None
+                          | dbool _ => None
+                          | dstring _ => None
+                          | dcoll _ => None
+                          | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+                          | dleft _ => None
+                          | dright _ => None
+                          | dbrand _ _ => None
+                          | dforeign _ => None
+                          end
+                        | dleft _ => None
+                        | dright _ => None
+                        | dbrand _ _ => None
+                        | dforeign _ => None
+                        end)
+                     (olift (fun d0 : data => Some (drec ((g, d0) :: nil)))
+                            (olift
+                               (fun d0 : data =>
+                                  lift_oncoll
+                                    (fun l : list data => lift dcoll (rflatten l)) d0)
+                               (lift dcoll
+                                     (rmap
+                                        (fun d0 : data =>
+                                           olift
+                                             (fun d2 : data =>
+                                                match d2 with
+                                                | dunit => None
+                                                | dnat _ => None
+                                                | dbool true => Some (dcoll (d0 :: nil))
+                                                | dbool false => Some (dcoll nil)
+                                                | dstring _ => None
+                                                | dcoll _ => None
+                                                | drec _ => None
+                                                | dleft _ => None
+                                                | dright _ => None
+                                                | dbrand _ _ => None
+                                                | dforeign _ => None
+                                                end)
+                                             (olift2
+                                                (fun d2 d3 : data =>
+                                                   unbdata
+                                                     (fun x y : data =>
+                                                        if data_eq_dec x y
+                                                        then true
+                                                        else false) d2 d3)
+                                                match d0 with
+                                                | dunit => None
+                                                | dnat _ => None
+                                                | dbool _ => None
+                                                | dstring _ => None
+                                                | dcoll _ => None
+                                                | drec r => Some (drec (rproject r sl))
+                                                | dleft _ => None
+                                                | dright _ => None
+                                                | dbrand _ _ => None
+                                                | dforeign _ => None
+                                                end (Some d1))) incoll)))) 
+                     (Some d1)) c1)
+      | Some (drec _) => None
+      | Some (dleft _) => None
+      | Some (dright _) => None
+      | Some (dbrand _ _) => None
+      | Some (dforeign _) => None
+      | None => None
+      end = Some (dcoll outcoll).
+    Proof.
+      intros.
+      unfold group_by_nested_eval_table in H.
+      unfold group_by_nested_eval_keys_partition in H.
+      unfold group_by_nested_eval in H.
+      destruct ((rmap
+                  (fun d : data =>
+                   match d with
+                   | dunit => None
+                   | dnat _ => None
+                   | dbool _ => None
+                   | dstring _ => None
+                   | dcoll _ => None
+                   | drec r => Some (drec (rproject r sl))
+                   | dleft _ => None
+                   | dright _ => None
+                   | dbrand _ _ => None
+                   | dforeign _ => None
+                   end) incoll)); simpl in *; try congruence.
+      destruct (bdistinct l); simpl in *;
+      [unfold to_partitions in H; simpl in H; inversion H; auto| ].
+      generalize (test sl d incoll); intros Htest.
+      case_eq (group_of_key
+                (fun d : data =>
+                 match d with
+                 | dunit => None
+                 | dnat _ => None
+                 | dbool _ => None
+                 | dstring _ => None
+                 | dcoll _ => None
+                 | drec r => Some (drec (rproject r sl))
+                 | dleft _ => None
+                 | dright _ => None
+                 | dbrand _ _ => None
+                 | dforeign _ => None
+                 end) d incoll); intros;
+      rewrite H0 in *; simpl in *; try congruence.
+      rewrite <- Htest. 
+      simpl.
+      case_eq (match d with
+      | dunit => None
+      | dnat _ => None
+      | dbool _ => None
+      | dstring _ => None
+      | dcoll _ => None
+      | drec r2 =>
+          Some
+            (drec
+               (insertion_sort_insert rec_field_lt_dec 
+                  (g, dcoll l1) (rec_sort r2)))
+      | dleft _ => None
+      | dright _ => None
+      | dbrand _ _ => None
+      | dforeign _ => None
+               end); intros.
+      - destruct d; simpl in *; try congruence.
+        inversion H1; clear H1; subst.
+        admit.
+      - generalize (test2 g sl d l0 l1 incoll H1); intros.
+        rewrite H2 in H; congruence.
+    Admitted.
+    
+  End tableform.
+  
   Section normalized.
     Require Import BrandRelation.
     Require Import RDataNorm.
