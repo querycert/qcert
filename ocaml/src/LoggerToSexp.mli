@@ -16,17 +16,7 @@
 
 (* This module contains the implementation for the optimization logger *)
 
-open Util
 open SExp
-
-val nra_log_startPass : string -> 'a -> nra_logger_token_type
-val nra_log_step : nra_logger_token_type -> string -> 'a -> 'a -> nra_logger_token_type
-val nra_log_endPass : nra_logger_token_type -> 'a -> nra_logger_token_type
-
-val nra_set_trace : (Obj.t->sexp) -> string -> unit
-
-val nrc_log_startPass : string -> 'a -> nrc_logger_token_type
-val nrc_log_step : nrc_logger_token_type -> string -> 'a -> 'a -> nrc_logger_token_type
-val nrc_log_endPass : nrc_logger_token_type -> 'a -> nrc_logger_token_type
-
-val nrc_set_trace : (Obj.t->sexp) -> string -> unit
+   
+val logger_nra_to_sexp : Obj.t -> sexp
+val logger_nrc_to_sexp : Obj.t -> sexp

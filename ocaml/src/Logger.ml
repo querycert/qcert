@@ -16,81 +16,137 @@
 
 (* This module contains the implementation for the optimization logger *)
 
+open SExp
+open Util
+
+type logger_verbosity =
+  | LOG_NONE
+  | LOG_NAMES
+  | LOG_PHASES_AND_NAMES
+  | LOG_VERBOSE_SEXP of (Obj.t -> sexp)
+
+let logger_verbosity_of_string conv s
+  = match s with
+  | "none" -> LOG_NONE
+  | "names" -> LOG_NAMES
+  | "phases_and_names" -> LOG_PHASES_AND_NAMES
+  | "sexp" -> LOG_VERBOSE_SEXP conv
+  | _ -> raise (Qcert_Error ("Unknown logging verbosity level: "^s^".  Supported levels: none, names, phases_and_names, sexp"))
+  
+	    
 (* nra logger *)
-let nra_trace = ref false
-let nra_set_trace () = nra_trace := true
-let nra_unset_trace () = nra_trace := false
+let nra_trace = ref LOG_NONE
+let nra_set_trace conv (s:string) = nra_trace := (logger_verbosity_of_string conv s)
 
 let nra_log_startPass name input =
-  if !nra_trace
+  if !nra_trace != LOG_NONE
   then
-    begin
-      (* Probably too much noise ... *)
-      (* print_string "starting pass: "; print_endline name; *)
-      name
-    end
+    (begin
+	match !nra_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_string "starting nra optimization pass: "; print_endline name
+	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nra\" \""^name^"\"")
+	| _ -> ()
+    end;
+  name)
   else
     name
   
 let nra_log_step tok name input output =
-  if !nra_trace
+  if !nra_trace != LOG_NONE
   then
     begin
       if (input == output)
       then () (* (print_string "skipping optimization: "; print_endline name) *)
-      else (print_string "running optimization: "; print_endline name) ;
+      else
+	begin
+	  match !nra_trace with
+	  | LOG_NAMES ->
+	     (print_string "running nra optimization: "; print_endline name) ;
+	  | LOG_PHASES_AND_NAMES ->
+	     (print_string "  running nra optimization: "; print_endline name) ;
+	  | LOG_VERBOSE_SEXP conv ->
+	       let sexp_input = conv (Obj.magic input) in
+	       let sexp_output = conv (Obj.magic output) in
+	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
+	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
+	  | _ -> ()
+	end;
       tok
     end
   else
     tok
 
 let nra_log_endPass tok output =
-  if !nra_trace
+  if !nra_trace != LOG_NONE
   then
-    begin
-      (* Probably too much noise ... *)
-      (* print_string "ending pass: "; print_endline tok; *)
-      tok
-    end
+    (begin
+	match !nra_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_endline "ending nra optimization pass: "
+	| LOG_VERBOSE_SEXP conv -> print_endline ")"
+	| _ -> ()
+    end;
+     tok)
   else
     tok
 
 (* nrc logger *)
   
-let nrc_trace = ref false
-let nrc_set_trace () = nrc_trace := true
-let nrc_unset_trace () = nrc_trace := false
+let nrc_trace = ref LOG_NONE
+let nrc_set_trace conv s = nrc_trace := (logger_verbosity_of_string conv s)
 
 let nrc_log_startPass name input =
-  if !nrc_trace
+  if !nrc_trace != LOG_NONE
   then
-    begin
-      (* Probably too much noise ... *)
-      (* print_string "starting pass: "; print_endline name; *)
-      name
-    end
+    (begin
+	match !nrc_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_string "starting nrc optimization pass: "; print_endline name
+	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"nrc\" \""^name^"\"")
+	| _ -> ()
+    end;
+     name)
   else
     name
   
 let nrc_log_step tok name input output =
-  if !nrc_trace
+  if !nrc_trace != LOG_NONE
   then
     begin
-      if (input == output)
+     if (input == output)
       then () (* (print_string "skipping optimization: "; print_endline name) *)
-      else (print_string "running optimization: "; print_endline name) ;
-      tok
+      else
+	begin
+	  match !nra_trace with
+	  | LOG_NAMES ->
+	     (print_string "running nrc optimization: "; print_endline name) ;
+	  | LOG_PHASES_AND_NAMES ->
+	     (print_string "  running nrc optimization: "; print_endline name) ;
+	  | LOG_VERBOSE_SEXP conv ->
+	     begin
+	       let sexp_input = conv (Obj.magic input) in
+	       let sexp_output = conv (Obj.magic output) in
+	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
+	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
+	     end
+	  | _ -> ()
+	end;
+     tok
     end
   else
     tok
 
 let nrc_log_endPass tok output =
-  if !nrc_trace
+  if !nrc_trace != LOG_NONE
   then
-    begin
-      (* Probably too much noise ... *)
-      (* print_string "ending pass: "; print_endline tok; *)
-      tok
-    end
+    (begin
+	match !nrc_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_endline "ending nrc optimization pass: "
+	| LOG_VERBOSE_SEXP conv -> print_endline ")"
+	| _ -> ()
+    end;
+     tok)
   else
     tok

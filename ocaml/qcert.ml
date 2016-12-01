@@ -17,6 +17,8 @@
 open Util
 open QcertConfig
 open Compiler.EnhancedCompiler
+open Logger
+open LoggerToSexp
 
 (* Command line args *)
 
@@ -62,11 +64,11 @@ let args_list gconf =
          " Produce statistics for all intermediate queries");
       ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
        " Produce statistics for paths following starting from the source");
-      ("-log-optims", Arg.Unit (fun () -> Logger.nra_set_trace();Logger.nrc_set_trace()),
+      ("-log-optims", Arg.String (fun s -> Logger.nra_set_trace logger_nra_to_sexp s;Logger.nrc_set_trace logger_nrc_to_sexp s),
        " Enable optimization logging");
-      ("-log-optims-nra", Arg.Unit (Logger.nra_set_trace),
+      ("-log-optims-nra", Arg.String (Logger.nra_set_trace logger_nra_to_sexp),
        " Enable optimization logging for nra");
-      ("-log-optims-nrc", Arg.Unit (Logger.nrc_set_trace),
+      ("-log-optims-nrc", Arg.String (Logger.nrc_set_trace logger_nrc_to_sexp),
        " Enable optimization logging for nrc");
       (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
       (*  " Logs the optimizations/rewrites during compilation"); *)
