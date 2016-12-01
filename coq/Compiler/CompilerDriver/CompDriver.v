@@ -212,7 +212,7 @@ Section CompDriver.
 
   Definition dnnrc_typed_dataset_to_spark2
              (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
-    @dnnrcToSpark2Top _ _ bm _ unit inputType name q.
+    @dnnrcToSpark2Top _ _ bm _ _ unit inputType name q.
 
   Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
     dnnrcToDatasetRewrite q.
