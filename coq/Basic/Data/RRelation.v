@@ -245,6 +245,16 @@ Section RRelation.
     rewrite IHl; reflexivity.
   Qed.
   
+  Lemma rmap_map_merge {A} {B} {C} (f1:A -> B) (f2:B -> option C) (l: list A):
+    (rmap (fun d => f2 (f1 d)) l) =
+    rmap f2 (map f1 l).
+  Proof.
+    induction l; intros; simpl; [reflexivity| ].
+    destruct (f2 (f1 a)); [|reflexivity].
+    rewrite IHl.
+    reflexivity.
+  Qed.
+
   Lemma lift_dcoll_cons_rmap d l1 l2 :
     lift dcoll l1 = lift dcoll l2 ->
     lift dcoll (lift (fun t => d :: t) l1) = lift dcoll (lift (fun t => d :: t) l2).
