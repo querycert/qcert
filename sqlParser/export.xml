@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project sqlParser with libraries in sub-folder">
+    <!--this file was originally created by the jar export wizard but subsequently modified to simplify properties and eliminate
+       environment dependences.  It assumes the layout of the qcert working directory as organized for git -->
+    <property name="dest" value="../bin"/>
+    <target name="create_run_jar">
+        <jar destfile="${dest}/sqlparser.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.qcert.sql.SQL2Sexp"/>
+                <attribute name="Class-Path" value=". sqlparser_lib/antlr4-runtime-4.5.3.jar sqlparser_lib/guava-19.0.jar sqlparser_lib/presto-parser-0.152.3.jar sqlparser_lib/slice-0.7.jar"/>
+            </manifest>
+            <fileset dir="bin"/>
+        </jar>
+        <delete dir="${dest}/sqlparser_lib"/>
+        <mkdir dir="${dest}/sqlparser_lib"/>
+        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="${dest}/sqlparser_lib"/>
+        <copy file="lib/guava-19.0.jar" todir="${dest}/sqlparser_lib"/>
+        <copy file="lib/presto-parser-0.152.3.jar" todir="${dest}/sqlparser_lib"/>
+        <copy file="lib/slice-0.7.jar" todir="${dest}/sqlparser_lib"/>
+    </target>
+</project>

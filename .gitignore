@@ -8,6 +8,8 @@ Makefile.coq
 bin/CADa
 bin/qcert
 bin/qcertJS.js
+bin/sqlparser.jar
+bin/sqlparser_lib/*.jar
 /.project
 /.README.md.html
 html
