@@ -50,8 +50,81 @@ public class SQL2Sexp {
 	/** Suffix completion for split output files */
 	private static final String splitOutputTemplate = "%s_%d.s-sql";
 	
+	/**
+	 * Convert occurances of NN [days|months|years] to interval NN [day|month|year]. 
+	 * @param query the original query
+	 * @return the altered query
+	 */
+	private static String convertDateIntervals(String query) {
+        CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
+		SqlBaseLexer lexer = new SqlBaseLexer(stream);
+		StringBuilder buffer = new StringBuilder();
+		Token savedInteger = null;
+		for (Token token : lexer.getAllTokens()) {
+			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
+				savedInteger = token;
+			else if (savedInteger != null) {
+				String unit = getUnit(token.getText());
+				if (unit != null) {
+					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
+					savedInteger = null;
+				} else if (token.getType() == SqlBaseLexer.WS)
+					buffer.append(token.getText());
+				else { 
+					buffer.append(savedInteger.getText()).append(" ").append(token.getText());
+					savedInteger = null;
+				}
+			} else
+				buffer.append(token.getText());
+		}
+		return buffer.toString();
+	}
+	
+	/** Generate a range of arguments from a stem, start index, and end index */
+	private static List<String> generateRange(List<String> sources) {
+		String stem = sources.get(0);
+		int start = Integer.parseInt(sources.get(1));
+		int end = Integer.parseInt(sources.get(2));
+		List<String> range = new ArrayList<>();
+		for (int i = start; i <= end; i++)
+			range.add(stem + i);
+		return range;
+	}
+
+	/**
+	 * Subroutine of convertDateIntervals to recognize interval names in the plural form and return the singular of same
+	 */
+	private static String getUnit(String text) {
+		if (text.trim().equalsIgnoreCase("days"))
+			return "day";
+		else if (text.trim().equalsIgnoreCase("months"))
+			return "month";
+		else if (text.trim().equalsIgnoreCase("years"))
+			return "year";
+		else
+			return null;
+	}
+
+	/** Determine if a "query" has multiple statements */
+	private static boolean hasMultipleStatements(String query) {
+		StatementSplitter splitter = new StatementSplitter(query);
+		return splitter.getCompleteStatements().size() > 1;
+	}
+
+	/** Determine if a string looks like an integer number */
+	private static boolean isNumber(String string) {
+		for (int i = 0; i < string.length(); i++)
+			if (!Character.isDigit(string.charAt(i)))
+				return false;
+		return true;
+	}
+
 	/** Main program */
 	public static void main(String[] args) throws Exception {
+		if (args.length == 2 && "-single".equals(args[0])) {
+			processSingle(args[1]);
+			return;
+		}
 		List<String> sources = new ArrayList<>();
 		int index = 0;
 		File data = dataDirectory;
@@ -93,75 +166,6 @@ public class SQL2Sexp {
 			}
 		}			
 	}
-	
-	/**
-	 * Convert occurances of NN [days|months|years] to interval NN [day|month|year]. 
-	 * @param query the original query
-	 * @return the altered query
-	 */
-	private static String convertDateIntervals(String query) {
-        CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
-		SqlBaseLexer lexer = new SqlBaseLexer(stream);
-		StringBuilder buffer = new StringBuilder();
-		Token savedInteger = null;
-		for (Token token : lexer.getAllTokens()) {
-			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
-				savedInteger = token;
-			else if (savedInteger != null) {
-				String unit = getUnit(token.getText());
-				if (unit != null) {
-					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
-					savedInteger = null;
-				} else if (token.getType() == SqlBaseLexer.WS)
-					buffer.append(token.getText());
-				else { 
-					buffer.append(savedInteger.getText()).append(" ").append(token.getText());
-					savedInteger = null;
-				}
-			} else
-				buffer.append(token.getText());
-		}
-		return buffer.toString();
-	}
-
-	/** Generate a range of arguments from a stem, start index, and end index */
-	private static List<String> generateRange(List<String> sources) {
-		String stem = sources.get(0);
-		int start = Integer.parseInt(sources.get(1));
-		int end = Integer.parseInt(sources.get(2));
-		List<String> range = new ArrayList<>();
-		for (int i = start; i <= end; i++)
-			range.add(stem + i);
-		return range;
-	}
-
-	/**
-	 * Subroutine of convertDateIntervals to recognize interval names in the plural form and return the singular of same
-	 */
-	private static String getUnit(String text) {
-		if (text.trim().equalsIgnoreCase("days"))
-			return "day";
-		else if (text.trim().equalsIgnoreCase("months"))
-			return "month";
-		else if (text.trim().equalsIgnoreCase("years"))
-			return "year";
-		else
-			return null;
-	}
-
-	/** Determine if a "query" has multiple statements */
-	private static boolean hasMultipleStatements(String query) {
-		StatementSplitter splitter = new StatementSplitter(query);
-		return splitter.getCompleteStatements().size() > 1;
-	}
-
-	/** Determine if a string looks like an integer number */
-	private static boolean isNumber(String string) {
-		for (int i = 0; i < string.length(); i++)
-			if (!Character.isDigit(string.charAt(i)))
-				return false;
-		return true;
-	}
 
 	/**
 	 * Process a single query by simple name.  On success, return null or the empty string
@@ -186,6 +190,23 @@ public class SQL2Sexp {
 			if (msg == null)
 				e.printStackTrace();
 			return msg == null ? e.toString() : msg;
+		}
+	}
+
+	/**
+	 * Special version of process to return the s-exp form of a single sql file (used as a subprocess of qcert)
+	 */
+	private static void processSingle(String file) {
+		try {
+			String query = FileUtil.readFile(new File(file));
+			query = convertDateIntervals(query);
+			String result = PrestoEncoder.parseAndEncode(query, false);
+			System.out.println(result);
+		} catch (Exception e) {
+			String msg = e.getMessage();
+			if (msg == null)
+				msg = e.toString();
+			System.out.println(msg);
 		}
 	}
 
