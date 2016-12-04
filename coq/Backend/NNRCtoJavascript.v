@@ -163,8 +163,8 @@ Section NNRCtoJavascript.
     Definition js_quote_string (s:string)
       := flat_map_string js_quote_char s.
 
-    Definition stringToJS (s:string)
-      := "" ++ quotel_double ++ "" ++ js_quote_string s ++ "" ++ quotel_double ++ "".
+    Definition stringToJS (quotel:string) (s:string)
+      := "" ++ quotel ++ "" ++ js_quote_string s ++ "" ++ quotel ++ "".
 
     
     (* Java equivalent: JavaScriptBackend.dataToJS *)
@@ -174,7 +174,7 @@ Section NNRCtoJavascript.
          | jnil => "null" (* to be discussed *)
          | jnumber n => Z_to_string10 n
          | jbool b => if b then "true" else "false"
-         | jstring s => stringToJS s
+         | jstring s => stringToJS quotel s
          | jarray ls =>
            let ss := map (jsonToJS quotel) ls in
            "[" ++ (joinStrings ", " ss) ++ "]"
