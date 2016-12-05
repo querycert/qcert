@@ -655,6 +655,15 @@ Section RBindings.
     trivial.
   Qed.
 
+  Lemma insertion_sort_insertion_sort_app {A} l1 l2 l3 :
+    insertion_sort rec_field_lt_dec (l1 ++ insertion_sort (@rec_field_lt_dec A) l2 ++ l3) =
+    insertion_sort rec_field_lt_dec (l1 ++ l2 ++ l3).
+  Proof.
+    induction l1; simpl.
+    - apply insertion_sort_insertion_sort_app1.
+    - rewrite IHl1; trivial.
+  Qed.
+
   Lemma insertion_sort_eq_app1 {A l1 l1'} l2 :
     insertion_sort (@rec_field_lt_dec A) l1 = insertion_sort rec_field_lt_dec l1' -> 
     insertion_sort rec_field_lt_dec (l1 ++ l2) =
@@ -672,6 +681,22 @@ Section RBindings.
    rec_sort (l1 ++ l2).
   Proof.
     apply insertion_sort_insertion_sort_app1.
+  Qed.
+
+  Lemma rec_sort_rec_sort_app {A} l1 l2 l3 :
+    rec_sort (l1 ++ (@rec_sort A) l2 ++ l3) =
+    rec_sort (l1 ++ l2 ++ l3).
+  Proof.
+    apply insertion_sort_insertion_sort_app.
+  Qed.
+
+  Lemma rec_sort_rec_sort_app2 {A} l1 l2 :
+    rec_sort (l1 ++ (@rec_sort A) l2) =
+    rec_sort (l1 ++ l2).
+  Proof.
+    generalize (rec_sort_rec_sort_app l1 l2 nil).
+    repeat rewrite app_nil_r.
+    trivial.
   Qed.
 
   Lemma rec_sort_eq_app1  {A l1 l1'} l2 :

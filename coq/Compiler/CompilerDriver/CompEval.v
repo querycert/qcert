@@ -99,7 +99,7 @@ Section CompEval.
 
     (* Language: oql *)
     Definition eval_oql (q:oql) (cenv: list (string*data)) : option data
-      := oql_interp h (rec_sort cenv) q nil.
+      := oql_interp h (rec_sort cenv) q.
 
     (* Language: sql *)
     (* Note: eval for sql relies on translation to nraenv_core *)

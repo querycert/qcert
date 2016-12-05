@@ -46,7 +46,7 @@ Section CompLang.
 
   Definition rule := rule.
   Definition camp := pat.
-  Definition oql := oql_expr.
+  Definition oql := oql.
   Definition sql := sql.
   Definition lambda_nra := lalg.
   Definition nra := alg.

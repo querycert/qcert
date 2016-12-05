@@ -31,36 +31,56 @@ Section TOQL.
   Section typ.
   
     Context {m:basic_model}.
+    Section constt.
+      Context (τconstants:tbindings).
+
+      Hint Resolve bindings_type_has_type.
+
+      Inductive oql_expr_type : tbindings -> oql_expr -> rtype -> Prop :=
+      | OTConst {τ} tenv c :
+          data_type (normalize_data brand_relation_brands c) τ ->
+          oql_expr_type tenv (OConst c) τ
+      | OTVar {τ} tenv v :
+          edot tenv v = Some τ -> oql_expr_type tenv (OVar v) τ
+      | OTTable {τ} tenv s :
+          tdot τconstants s = Some τ ->
+          oql_expr_type tenv (OTable s) τ
+      | OTBinop {τ₁ τ₂ τout} tenv b e₁ e₂ :
+          oql_expr_type tenv e₁ τ₁ ->
+          oql_expr_type tenv e₂ τ₂ ->
+          binOp_type b τ₁ τ₂ τout ->
+          oql_expr_type tenv (OBinop b e₁ e₂) τout
+      | OTUnop {τ₁ τout} tenv u e₁ :
+          oql_expr_type tenv e₁ τ₁ ->
+          unaryOp_type u τ₁ τout ->
+          oql_expr_type tenv (OUnop u e₁) τout.
+
+    End constt.
+    
     Context (τconstants:tbindings).
-    Hint Resolve bindings_type_has_type.
 
-    Inductive oql_expr_type : tbindings -> oql_expr -> rtype -> Prop :=
-    | OTConst {τ} tenv c :
-        data_type (normalize_data brand_relation_brands c) τ ->
-        oql_expr_type tenv (OConst c) τ
-    | OTVar {τ} tenv v :
-        edot tenv v = Some τ -> oql_expr_type tenv (OVar v) τ
-    | OTTable {τ} tenv s :
-        tdot τconstants s = Some τ ->
-        oql_expr_type tenv (OTable s) τ
-    | OTBinop {τ₁ τ₂ τout} tenv b e₁ e₂ :
-        oql_expr_type tenv e₁ τ₁ ->
-        oql_expr_type tenv e₂ τ₂ ->
-        binOp_type b τ₁ τ₂ τout ->
-        oql_expr_type tenv (OBinop b e₁ e₂) τout
-    | OTUnop {τ₁ τout} tenv u e₁ :
-        oql_expr_type tenv e₁ τ₁ ->
-        unaryOp_type u τ₁ τout ->
-        oql_expr_type tenv (OUnop u e₁) τout.
-  End typ.
+    Inductive oql_query_program_type : tbindings -> tbindings -> oql_query_program -> rtype -> Prop :=
+    | OTDefineQuery {tenv s e rest τ}  {tdefls τ₁} :
+        oql_expr_type (rec_concat_sort τconstants tdefls) tenv e τ₁ ->
+        oql_query_program_type (rec_concat_sort tdefls ((s,τ₁)::nil)) tenv rest τ ->
+        oql_query_program_type tdefls tenv (ODefineQuery s e rest) τ
+    | OTUndefineQuery {tenv s rest tdefls τ} :
+        oql_query_program_type (rremove tdefls s) tenv rest τ ->
+        oql_query_program_type tdefls tenv (OUndefineQuery s rest) τ
+    |OTQuery {tdefls tenv e τ}:
+     oql_expr_type (rec_concat_sort τconstants tdefls) tenv e τ ->
+     oql_query_program_type tdefls tenv (OQuery e) τ.
 
-  (** Main typing soundness theorem for OQL *)
+    Definition oql_type (o:oql_query_program) (τ:rtype) : Prop
+      := oql_query_program_type nil nil o τ.
+    
+    End typ.
 
-  Theorem typed_oql_yields_typed_data {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
+  Theorem typed_oql_expr_yields_typed_data {m:basic_model} {τc} {τenv τout} c (env:list (string*data)) (q:oql_expr):
     bindings_type c τc ->
     bindings_type env τenv ->
     (oql_expr_type τc τenv q τout) ->
-    (exists x, (oql_interp brand_relation_brands c q env = Some x /\ (x ▹ τout))).
+    (exists x, (oql_expr_interp brand_relation_brands c q env = Some x /\ (x ▹ τout))).
   Proof.
     intros.
     revert c env H H0.
@@ -87,6 +107,61 @@ Section TOQL.
       destruct (typed_unop_yields_typed_data _ _ H4 H) as [?[??]].
       rewrite H5.
       exists x0; auto.
+  Qed.
+
+  Lemma bindings_type_app {m:basic_model}  l1 l2 r1 r2 :
+    bindings_type l1 r1 -> bindings_type l2 r2 ->
+    bindings_type (l1 ++ l2) (r1 ++ r2) .
+  Proof.
+    unfold bindings_type.
+    apply Forall2_app; trivial; tauto.
+  Qed.
+
+  Lemma bindings_type_rec_concat_sort {m:basic_model}  l1 l2 r1 r2 :
+    bindings_type l1 r1 -> bindings_type l2 r2 ->
+    bindings_type (rec_concat_sort l1 l2) (rec_concat_sort r1 r2) .
+  Proof.
+    intros.
+    apply bindings_type_sort.
+    apply bindings_type_app; trivial.
+  Qed.
+  
+  Lemma typed_oql_query_program_yields_typed_data {m:basic_model} {τc τdefls} {τenv τout} c (defls env:list (string*data)) (q:oql_query_program):
+    bindings_type c τc ->
+    bindings_type defls τdefls ->
+    bindings_type env τenv ->
+    (oql_query_program_type τc τdefls τenv q τout) ->
+    (exists x, (oql_query_program_interp brand_relation_brands c defls q env = Some x /\ (x ▹ τout))).
+  Proof.
+    intros.
+    revert c defls env H H0 H1.
+    dependent induction H2; simpl; intros.
+    - assert (bt: bindings_type (rec_concat_sort c defls) (rec_concat_sort τc tdefls))
+        by (apply bindings_type_rec_concat_sort; trivial).
+      destruct (typed_oql_expr_yields_typed_data _ _ e bt H3 H)
+        as [d [de dt]].
+      rewrite de; simpl.
+      destruct (IHoql_query_program_type _ (rec_concat_sort defls ((s,d)::nil)) env H0);
+        eauto 2.
+      apply bindings_type_rec_concat_sort; trivial.
+      constructor; simpl; auto.
+    - destruct (IHoql_query_program_type c (rremove defls s) env); eauto 2.
+      apply rremove_well_typed.
+      trivial.
+    - eapply typed_oql_expr_yields_typed_data; eauto.
+      apply bindings_type_rec_concat_sort; trivial.
+  Qed.
+
+    (** Main typing soundness theorem for OQL *)
+
+  Theorem typed_oql_yields_typed_data {m:basic_model} {τc} {τout} c (q:oql_query_program):
+    bindings_type c τc ->
+    oql_type τc q τout ->
+    (exists x, (oql_interp brand_relation_brands c q = Some x /\ (x ▹ τout))).
+  Proof.
+    intros.
+    eapply typed_oql_query_program_yields_typed_data; eauto
+    ; constructor.
   Qed.
   
 End TOQL.

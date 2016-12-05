@@ -1237,6 +1237,30 @@ Section RList.
     apply set_inter_intro; intuition.
   Qed.
 
+  Lemma equivlist_cons l1 l2 (s:A) :
+    equivlist l1 l2 ->
+    equivlist (s::l1) (s::l2).
+  Proof.
+    unfold equivlist.
+    firstorder.
+  Qed.
+
+  Global Instance equivlist_filter :
+    Proper (eq ==> equivlist ==> equivlist) (@filter A).
+  Proof.
+    red; unfold equivlist; intros ? ? ? ? ? ? ?; subst.
+    repeat rewrite filter_In.
+    firstorder.
+  Qed.
+  
+  Global Instance equivlist_remove_all {dec:EqDec A eq} :
+    Proper (eq ==> equivlist ==> equivlist) (@remove_all A dec).
+  Proof.
+    red; intros ? ? ? ? ? ?; subst.
+    repeat rewrite remove_all_filter.
+    apply equivlist_filter; trivial.
+  Qed.
+
     Lemma incl_list_dec (dec:forall x y:A, {x = y} + {x <> y}) (l1 l2:list A) : {(forall x, In x l1 -> In x l2)} + {~(forall x, In x l1 -> In x l2)}.
     Proof.
       case_eq (forallb (fun x => if in_dec dec x l2 then true else false) (l1)); intros fb.

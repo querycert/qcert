@@ -26,13 +26,13 @@ Section OQLSize.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint oql_size (e:oql_expr) : nat 
+  Fixpoint oql_expr_size (e:oql_expr) : nat 
     := match e with
          | OConst d => 1
          | OVar v => 1
          | OTable v => 1
-         | OBinop op n₁ n₂ => S (oql_size n₁ + oql_size n₂)
-         | OUnop op n₁ => S (oql_size n₁)
+         | OBinop op n₁ n₂ => S (oql_expr_size n₁ + oql_expr_size n₂)
+         | OUnop op n₁ => S (oql_expr_size n₁)
          | OSFW se el we oe =>
            let from_size :=
                fold_left (fun x => fun e => x+oql_in_size e) el 0
@@ -41,24 +41,34 @@ Section OQLSize.
        end
   with oql_select_size (se:oql_select_expr) :=
     match se with
-    | OSelect e => oql_size e
-    | OSelectDistinct e => oql_size e
+    | OSelect e => oql_expr_size e
+    | OSelectDistinct e => oql_expr_size e
     end
   with oql_in_size (ie:oql_in_expr) :=
     match ie with
-    | OIn v e => oql_size e
-    | OInCast v brand_names e => oql_size e
+    | OIn v e => oql_expr_size e
+    | OInCast v brand_names e => oql_expr_size e
     end
   with oql_where_size (we:oql_where_expr) :=
     match we with
     | OTrue => 0
-    | OWhere e => oql_size e
+    | OWhere e => oql_expr_size e
     end
   with oql_order_size (oe:oql_order_by_expr) :=
     match oe with
     | ONoOrder => 0
-    | OOrderBy e _ => oql_size e
+    | OOrderBy e _ => oql_expr_size e
     end.
+
+  Fixpoint oql_query_program_size (oq:oql_query_program) : nat
+    := match oq with
+      | ODefineQuery s e rest => S (oql_expr_size e + oql_query_program_size rest)
+      | OUndefineQuery s rest => S (oql_query_program_size rest)
+      | OQuery e => S (oql_expr_size e)
+      end.
+
+  Definition oql_size (q:oql) : nat
+    := oql_query_program_size q.
   
 End OQLSize.
 

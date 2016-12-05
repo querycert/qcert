@@ -20,8 +20,10 @@ Section OQLtoNRAEnv.
   Require Import List.
   Require Import Arith Omega.
   Require Import EquivDec.
+  Require Import Morphisms.
 
-  Require Import Utils BasicSystem.
+
+  Require Import Utils BasicRuntime.
 
   Require Import OQL.
   Require Import NRAEnvRuntime.
@@ -31,22 +33,30 @@ Section OQLtoNRAEnv.
   Context (h:list(string*string)).
   Context (constant_env:list (string*data)).
 
+  Section query_var.
+    Context (deflist:list string).
+
   (*****************************
    * OQL to NRAEnv translation *
    *****************************)
-  
-  Fixpoint nraenv_of_oql (e:oql_expr) : nraenv :=
+
+  Definition lookup_table (table_name:string) : nraenv
+    := if in_dec string_eqdec table_name deflist
+       then NRAEnvUnop (ADot table_name) NRAEnvEnv
+       else NRAEnvGetConstant table_name.
+
+  Fixpoint nraenv_of_oql_expr (e:oql_expr) : nraenv :=
     match e with
     | OConst d => NRAEnvConst d
     | OVar v => NRAEnvUnop (ADot v) NRAEnvID
-    | OTable t => NRAEnvGetConstant t
-    | OBinop b e1 e2 => NRAEnvBinop b (nraenv_of_oql e1) (nraenv_of_oql e2)
-    | OUnop u e1 => NRAEnvUnop u (nraenv_of_oql e1)
+    | OTable t => lookup_table t
+    | OBinop b e1 e2 => NRAEnvBinop b (nraenv_of_oql_expr e1) (nraenv_of_oql_expr e2)
+    | OUnop u e1 => NRAEnvUnop u (nraenv_of_oql_expr e1)
     | OSFW select_clause from_clause where_clause order_clause =>
       let nraenv_of_from (opacc:nraenv) (from_in_expr : oql_in_expr) :=
           match from_in_expr with
             | OIn in_v from_expr =>
-              NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec in_v) NRAEnvID) (nraenv_of_oql from_expr)) opacc
+              NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec in_v) NRAEnvID) (nraenv_of_oql_expr from_expr)) opacc
             | OInCast in_v brand_name from_expr =>
               NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec in_v) NRAEnvID)
                                  (NRAEnvUnop AFlatten
@@ -54,7 +64,7 @@ Section OQLtoNRAEnv.
                                             (NRAEnvEither (NRAEnvUnop AColl NRAEnvID)
                                                       (NRAEnvConst (dcoll nil)))
                                             (NRAEnvMap (NRAEnvUnop (ACast (brand_name::nil)) NRAEnvID)
-                                                   (nraenv_of_oql from_expr))
+                                                   (nraenv_of_oql_expr from_expr))
                                          )))
                           opacc
           end
@@ -66,7 +76,7 @@ Section OQLtoNRAEnv.
           match where_clause with
           | OTrue => nraenv_of_from_clause
           | OWhere where_expr =>
-            NRAEnvSelect (nraenv_of_oql where_expr) nraenv_of_from_clause
+            NRAEnvSelect (nraenv_of_oql_expr where_expr) nraenv_of_from_clause
           end
       in
       let nraenv_of_order_clause :=
@@ -77,11 +87,41 @@ Section OQLtoNRAEnv.
       in
       match select_clause with
       | OSelect select_expr =>
-        NRAEnvMap (nraenv_of_oql select_expr) nraenv_of_order_clause
+        NRAEnvMap (nraenv_of_oql_expr select_expr) nraenv_of_order_clause
       | OSelectDistinct select_expr =>
-        NRAEnvUnop ADistinct (NRAEnvMap (nraenv_of_oql select_expr) nraenv_of_order_clause)
+        NRAEnvUnop ADistinct (NRAEnvMap (nraenv_of_oql_expr select_expr) nraenv_of_order_clause)
       end
     end.
+
+  End query_var.
+
+  Fixpoint nraenv_of_oql_query_program
+               (defllist:list string) (oq:oql_query_program) : nraenv
+    := match oq with
+       | ODefineQuery s e rest =>
+         NRAEnvAppEnv 
+              (nraenv_of_oql_query_program (s::defllist) rest)
+              (NRAEnvBinop AConcat
+                      NRAEnvEnv
+                      (NRAEnvUnop (ARec s)
+                                  (nraenv_of_oql_expr defllist e)))
+       | OUndefineQuery s rest =>
+         NRAEnvAppEnv
+           (nraenv_of_oql_query_program (remove_all s defllist) rest)
+           (NRAEnvUnop (ARecRemove s) NRAEnvEnv)
+       | OQuery q => 
+         nraenv_of_oql_expr defllist q
+       end.
+
+  Definition nraenv_of_oql (q:oql) : nraenv
+    := NRAEnvAppEnv 
+         (NRAEnvApp (nraenv_of_oql_query_program nil q)
+                    (NRAEnvConst (drec nil)))
+         (NRAEnvConst (drec nil)).
+
+  (* Top-level translation call *)
+  Definition translate_oql_to_nraenv (q:oql) : nraenv :=
+    nraenv_of_oql q.
 
 
   (***************************
@@ -291,8 +331,9 @@ Section OQLtoNRAEnv.
         (map (fun x : list (string * data) => rec_concat_sort a x)
              (map (fun x : data => (s, x) :: nil) l0) ++ l1).
   Proof.
-    induction l0; [reflexivity|idtac]; simpl.
-    rewrite IHl0. reflexivity.
+    rewrite map_app.
+    repeat rewrite map_map.
+    trivial.
   Qed.
 
 
@@ -300,29 +341,29 @@ Section OQLtoNRAEnv.
    * Select clause correctness *
    *****************************)
   
-  Lemma nraenv_of_select_expr_correct
-        (o:oql_expr) (xenv:data) (env0 : option (list oql_env)) :
-    (forall (xenv : data) (env : oql_env),
-        oql_interp h constant_env o env =
-        (h ⊢ nraenv_of_oql o @ₓ (drec env) ⊣ constant_env; xenv )%nraenv) ->
-    olift (fun x0 : list oql_env => lift dcoll (rmap (oql_interp h constant_env o) x0)) env0 =
+  Lemma nraenv_of_select_expr_correct defls
+        (o:oql_expr) xenv (env0 : option (list oql_env)) :
+    (forall xenv (env : oql_env),
+        oql_expr_interp h (rec_concat_sort constant_env defls) o env =
+        (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ (drec env) ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv) ->
+    olift (fun x0 : list oql_env => lift dcoll (rmap (oql_expr_interp h (rec_concat_sort constant_env defls) o) x0)) env0 =
     olift
       (fun d : data =>
          lift_oncoll
            (fun c1 : list data =>
               lift dcoll
                    (rmap
-                      (nraenv_eval h constant_env (nraenv_of_oql o) xenv)
+                      (nraenv_eval h constant_env (nraenv_of_oql_expr (domain defls) o) (drec (rec_concat_sort xenv defls)))
                       c1)) d) (lift (fun x => dcoll (map drec x)) env0).
   Proof.
     intros.
     destruct env0; [|reflexivity]; simpl.
     induction l; simpl; try reflexivity.
     rewrite (H xenv).
-    destruct (h ⊢ nraenv_of_oql o @ₓ (drec a) ⊣ constant_env; xenv)%nraenv; simpl;
+    destruct (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ (drec a) ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv; simpl;
     [|reflexivity].
-    destruct (rmap (oql_interp h constant_env o) l);
-      destruct (rmap (nraenv_eval h constant_env (nraenv_of_oql o) xenv)
+    destruct (rmap (oql_expr_interp h (rec_concat_sort constant_env defls) o) l);
+      destruct (rmap (nraenv_eval h constant_env (nraenv_of_oql_expr (domain defls) o) (drec (rec_concat_sort xenv defls)))
                      (map drec l)); simpl in *; congruence.
   Qed.
 
@@ -333,18 +374,17 @@ Section OQLtoNRAEnv.
 
   (* first off, prove the one-step used in the fold correctly adds one
      variable and does cartesian product (i.e., MapConcat) *)
-
-  Lemma one_from_fold_step_is_map_concat s o op xenv envs envs0:
-    (h ⊢ op @ₓ envs ⊣ constant_env; xenv)%nraenv =
+  Lemma one_from_fold_step_is_map_concat defls s o op xenv envs envs0:
+    (h ⊢ op @ₓ envs ⊣ constant_env ; (drec (rec_concat_sort xenv defls)))%nraenv =
     lift (fun x : list (list (string * data)) => dcoll (map drec x)) envs0 ->
-    (forall (xenv0 : data) (env : oql_env),
-       oql_interp h constant_env o env =
-       (h ⊢ nraenv_of_oql o @ₓ drec env ⊣ constant_env; xenv0)%nraenv) ->
-    ((h ⊢ (NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec s) NRAEnvID) (nraenv_of_oql o)) op) @ₓ envs ⊣ constant_env; xenv)%nraenv =
+    (forall xenv0 (env : oql_env),
+       oql_expr_interp h (rec_concat_sort constant_env defls) o env =
+       (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ drec env ⊣ constant_env; (drec (rec_concat_sort xenv0 defls)))%nraenv) ->
+    ((h ⊢ (NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec s) NRAEnvID) (nraenv_of_oql_expr (domain defls) o)) op) @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
      lift (fun x : list (list (string * data)) => dcoll (map drec x))
           (match envs0 with
            | Some envl' =>
-             env_map_concat s (oql_interp h constant_env o) envl'
+             env_map_concat s (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
            | None => None
            end)).
   Proof.
@@ -359,7 +399,8 @@ Section OQLtoNRAEnv.
     unfold oenv_map_concat_single in *; simpl.
     rewrite (H0 xenv).
     destruct (RAlgEnv.fun_of_algenv h constant_env
-          (algenv_of_nraenv (nraenv_of_oql o)) xenv 
+                                    (algenv_of_nraenv (nraenv_of_oql_expr (domain defls) o))
+                                    (drec (rec_concat_sort xenv defls))
           (drec a))%nraenv;
       try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -367,8 +408,8 @@ Section OQLtoNRAEnv.
     unfold omap_concat in *.
     rewrite rmap_orecconcat_rmap_drec.
     destruct ((oflat_map
-             (fun a0 : oql_env =>
-              match oql_interp h constant_env o a0 with
+                 (fun a0 : oql_env =>
+                    match oql_expr_interp h (rec_concat_sort constant_env defls) o a0 with
               | Some (dcoll y) =>
                   Some
                     (env_map_concat_single a0
@@ -387,7 +428,7 @@ Section OQLtoNRAEnv.
                            (fun x : data => Some (drec ((s, x) :: nil)))
                            c1)) d)
                   (RAlgEnv.fun_of_algenv h constant_env
-                  (algenv_of_nraenv (nraenv_of_oql o)) xenv a0)%nraenv
+                  (algenv_of_nraenv (nraenv_of_oql_expr (domain defls) o)) (drec (rec_concat_sort xenv defls)) a0)%nraenv
               with
               | Some (dcoll y) => rmap (fun x : data => orecconcat a0 x) y
               | Some _ => None
@@ -403,12 +444,12 @@ Section OQLtoNRAEnv.
      correctly adds one variable and does cartesian product (i.e.,
      MapConcat) as well *)
 
-  Lemma one_from_cast_fold_step_is_map_concat_cast s bn o op xenv envs envs0:
-    (h ⊢ op @ₓ envs ⊣ constant_env; xenv)%nraenv =
+  Lemma one_from_cast_fold_step_is_map_concat_cast defls s bn o op xenv envs envs0:
+    (h ⊢ op @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
     lift (fun x : list (list (string * data)) => dcoll (map drec x)) envs0 ->
-    (forall (xenv0 : data) (env : oql_env),
-       oql_interp h constant_env o env =
-       (h ⊢ nraenv_of_oql o @ₓ drec env ⊣ constant_env; xenv0)%nraenv) ->
+    (forall xenv0 (env : oql_env),
+       oql_expr_interp h (rec_concat_sort constant_env defls) o env =
+       (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ drec env ⊣ constant_env; (drec (rec_concat_sort xenv0 defls)))%nraenv) ->
     ((h ⊢ (NRAEnvMapConcat
              (NRAEnvMap
                 (NRAEnvUnop (ARec s) NRAEnvID)
@@ -416,13 +457,13 @@ Section OQLtoNRAEnv.
                               NRAEnvMap (NRAEnvEither (NRAEnvUnop AColl NRAEnvID)
                                                       (NRAEnvConst (dcoll nil)))
                                         (NRAEnvMap (NRAEnvUnop (ACast (bn :: nil)) NRAEnvID)
-                                                   (nraenv_of_oql o))))) op) @ₓ envs
-        ⊣ constant_env; xenv)%nraenv
+                                                   (nraenv_of_oql_expr (domain defls) o))))) op) @ₓ envs
+        ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv
      =
      lift (fun x : list (list (string * data)) => dcoll (map drec x))
           match envs0 with
           | Some envl' =>
-            env_map_concat_cast h s bn (oql_interp h constant_env o) envl'
+            env_map_concat_cast h s bn (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
           | None => None
           end).
   Proof.
@@ -437,7 +478,7 @@ Section OQLtoNRAEnv.
     unfold oenv_map_concat_single_with_cast in *; simpl.
     rewrite (H0 xenv).
     destruct (RAlgEnv.fun_of_algenv h constant_env
-          (algenv_of_nraenv (nraenv_of_oql o)) xenv 
+          (algenv_of_nraenv (nraenv_of_oql_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
           (drec a))%nraenv;
       try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -452,22 +493,6 @@ Section OQLtoNRAEnv.
                 return
                   (option (list (@data (@foreign_runtime_data fruntime))))
               with
-              | dunit =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | dnat _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | dbool _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | dstring _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | dcoll _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | drec _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | dleft _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
-              | dright _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
               | dbrand b' _ =>
                   match
                     sub_brands_dec h b' (@cons string bn (@nil string))
@@ -485,8 +510,8 @@ Section OQLtoNRAEnv.
                         (list (@data (@foreign_runtime_data fruntime)))
                         (@nil (@data (@foreign_runtime_data fruntime)))
                   end
-              | dforeign _ =>
-                  @None (list (@data (@foreign_runtime_data fruntime)))
+              | _ =>
+                  None
               end) l0 =                (@oflat_map (@data (@foreign_runtime_data fruntime))
                    (@data (@foreign_runtime_data fruntime))
                    (fun x : @data (@foreign_runtime_data fruntime) =>
@@ -496,30 +521,6 @@ Section OQLtoNRAEnv.
                         (option
                            (list (@data (@foreign_runtime_data fruntime))))
                     with
-                    | dunit =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | dnat _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | dbool _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | dstring _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | dcoll _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | drec _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | dleft _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
-                    | dright _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
                     | dbrand b' _ =>
                         match
                           sub_brands_dec h b'
@@ -546,364 +547,41 @@ Section OQLtoNRAEnv.
                               (@nil
                                  (@data (@foreign_runtime_data fruntime)))
                         end
-                    | dforeign _ =>
-                        @None
-                          (list (@data (@foreign_runtime_data fruntime)))
+                    | _ => None
                     end) l0)) by reflexivity.
     rewrite H; clear H.
     destruct (oflat_map
           (fun x : data =>
            match x with
-           | dunit => None
-           | dnat _ => None
-           | dbool _ => None
-           | dstring _ => None
-           | dcoll _ => None
-           | drec _ => None
-           | dleft _ => None
-           | dright _ => None
            | dbrand b' _ =>
                if sub_brands_dec h b' (bn :: nil)
                then Some (x :: nil)
                else Some nil
-           | dforeign _ => None
+           | _ => None
            end) l0); simpl; try reflexivity.
     autorewrite with alg; simpl.
     unfold env_map_concat_single in *.
     unfold omap_concat in *.
     autorewrite with alg; simpl.
     rewrite rmap_rec_concat_map_is_map_rec_concat_map; simpl.
-    destruct ((@oflat_map (@oql_env fruntime) (@oql_env fruntime)
-                (fun a : @oql_env fruntime =>
-                 match
-                   @oql_interp fruntime h constant_env o a
-                   return (option (list (@oql_env fruntime)))
-                 with
-                 | Some d =>
-                     match
-                       d return (option (list (@oql_env fruntime)))
-                     with
-                     | dunit => @None (list (@oql_env fruntime))
-                     | dnat _ => @None (list (@oql_env fruntime))
-                     | dbool _ => @None (list (@oql_env fruntime))
-                     | dstring _ => @None (list (@oql_env fruntime))
-                     | dcoll y =>
-                         match
-                           @oflat_map
-                             (@data (@foreign_runtime_data fruntime))
-                             (@data (@foreign_runtime_data fruntime))
-                             (fun
-                                x : @data (@foreign_runtime_data fruntime)
-                              =>
-                              match
-                                x
-                                return
-                                  (option
-                                     (list
-                                        (@data
-                                           (@foreign_runtime_data fruntime))))
-                              with
-                              | dunit =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dnat _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dbool _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dstring _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dcoll _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | drec _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dleft _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dright _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              | dbrand b' _ =>
-                                  match
-                                    sub_brands_dec h b'
-                                      (@cons string bn (@nil string))
-                                    return
-                                      (option
-                                         (list
-                                            (@data
-                                               (@foreign_runtime_data
-                                                fruntime))))
-                                  with
-                                  | left _ =>
-                                      @Some
-                                        (list
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime)))
-                                        (@cons
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime)) x
-                                           (@nil
-                                              (@data
-                                                (@foreign_runtime_data
-                                                fruntime))))
-                                  | right _ =>
-                                      @Some
-                                        (list
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime)))
-                                        (@nil
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime)))
-                                  end
-                              | dforeign _ =>
-                                  @None
-                                    (list
-                                       (@data
-                                          (@foreign_runtime_data fruntime)))
-                              end) y
-                           return (option (list (@oql_env fruntime)))
-                         with
-                         | Some y0 =>
-                             @Some (list (@oql_env fruntime))
-                               (@map
-                                  (list
-                                     (prod string
-                                        (@data
-                                           (@foreign_runtime_data fruntime))))
-                                  (list
-                                     (prod string
-                                        (@data
-                                           (@foreign_runtime_data fruntime))))
-                                  (fun
-                                     x : list
-                                           (prod string
-                                              (@data
-                                                (@foreign_runtime_data
-                                                fruntime))) =>
-                                   @rec_concat_sort string ODT_string
-                                     (@data
-                                        (@foreign_runtime_data fruntime))
-                                     a x)
-                                  (@map
-                                     (@data
-                                        (@foreign_runtime_data fruntime))
-                                     (list
-                                        (prod string
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime))))
-                                     (fun
-                                        x : @data
-                                              (@foreign_runtime_data
-                                                fruntime) =>
-                                      @cons
-                                        (prod string
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime)))
-                                        (@pair string
-                                           (@data
-                                              (@foreign_runtime_data
-                                                fruntime)) s x)
-                                        (@nil
-                                           (prod string
-                                              (@data
-                                                (@foreign_runtime_data
-                                                fruntime))))) y0))
-                         | None => @None (list (@oql_env fruntime))
-                         end
-                     | drec _ => @None (list (@oql_env fruntime))
-                     | dleft _ => @None (list (@oql_env fruntime))
-                     | dright _ => @None (list (@oql_env fruntime))
-                     | dbrand _ _ => @None (list (@oql_env fruntime))
-                     | dforeign _ => @None (list (@oql_env fruntime))
-                     end
-                 | None => @None (list (@oql_env fruntime))
-                 end) l)); simpl in *.
-    - destruct (          (oflat_map
-             (fun a : data =>
-              match
-                olift
-                  (fun d : data =>
-                   lift_oncoll
-                     (fun c1 : list data =>
-                      lift dcoll
-                        (rmap
-                           (fun x : data => Some (drec ((s, x) :: nil)))
-                           c1)) d)
-                  (olift
-                     (fun d1 : data =>
-                      lift_oncoll
-                        (fun l : list data => lift dcoll (rflatten l)) d1)
-                     (olift
-                        (fun d : data =>
-                         lift_oncoll
-                           (fun c1 : list data =>
-                            lift dcoll
-                              (rmap
-                                 (fun x : data =>
-                                  match x with
-                                  | dunit => None
-                                  | dnat _ => None
-                                  | dbool _ => None
-                                  | dstring _ => None
-                                  | dcoll _ => None
-                                  | drec _ => None
-                                  | dleft dl => Some (dcoll (dl :: nil))
-                                  | dright _ => Some (dcoll nil)
-                                  | dbrand _ _ => None
-                                  | dforeign _ => None
-                                  end) c1)) d)
-                        (olift
-                           (fun d : data =>
-                            lift_oncoll
-                              (fun c1 : list data =>
-                               lift dcoll
-                                 (rmap
-                                    (fun x : data =>
-                                     match x with
-                                     | dunit => None
-                                     | dnat _ => None
-                                     | dbool _ => None
-                                     | dstring _ => None
-                                     | dcoll _ => None
-                                     | drec _ => None
-                                     | dleft _ => None
-                                     | dright _ => None
-                                     | dbrand b' _ =>
-                                         if
-                                          sub_brands_dec h b' (bn :: nil)
-                                         then Some (dsome x)
-                                         else Some dnone
-                                     | dforeign _ => None
-                                     end) c1)) d)
-                           (RAlgEnv.fun_of_algenv h constant_env
-                              (algenv_of_nraenv (nraenv_of_oql o)) xenv a)%nraenv)))
-              with
-              | Some dunit => None
-              | Some (dnat _) => None
-              | Some (dbool _) => None
-              | Some (dstring _) => None
-              | Some (dcoll y) => rmap (fun x : data => orecconcat a x) y
-              | Some (drec _) => None
-              | Some (dleft _) => None
-              | Some (dright _) => None
-              | Some (dbrand _ _) => None
-              | Some (dforeign _) => None
-              | None => None
-              end) (map drec l))); simpl in *; try congruence.
-      inversion IHl; clear IHl.
-      subst; simpl.
+    match type of IHl with
+    | lift _ ?x = lift _ ?y  => destruct y; destruct x; simpl in *
+    end; simpl in *; try discriminate.
+    - invcs IHl.
       rewrite map_map_drec_works.
       reflexivity.
-    - destruct
-        ((oflat_map
-            (fun a : data =>
-               match
-                 olift
-                   (fun d : data =>
-                      lift_oncoll
-                        (fun c1 : list data =>
-                           lift dcoll
-                                (rmap
-                                   (fun x : data => Some (drec ((s, x) :: nil)))
-                                   c1)) d)
-                   (olift
-                      (fun d1 : data =>
-                         lift_oncoll
-                           (fun l : list data => lift dcoll (rflatten l)) d1)
-                      (olift
-                         (fun d : data =>
-                            lift_oncoll
-                              (fun c1 : list data =>
-                                 lift dcoll
-                                      (rmap
-                                         (fun x : data =>
-                                            match x with
-                                            | dunit => None
-                                            | dnat _ => None
-                                            | dbool _ => None
-                                            | dstring _ => None
-                                            | dcoll _ => None
-                                            | drec _ => None
-                                            | dleft dl => Some (dcoll (dl :: nil))
-                                            | dright _ => Some (dcoll nil)
-                                            | dbrand _ _ => None
-                                            | dforeign _ => None
-                                            end) c1)) d)
-                         (olift
-                            (fun d : data =>
-                               lift_oncoll
-                                 (fun c1 : list data =>
-                                    lift dcoll
-                                         (rmap
-                                            (fun x : data =>
-                                               match x with
-                                               | dunit => None
-                                               | dnat _ => None
-                                               | dbool _ => None
-                                               | dstring _ => None
-                                               | dcoll _ => None
-                                               | drec _ => None
-                                               | dleft _ => None
-                                               | dright _ => None
-                                               | dbrand b' _ =>
-                                                 if
-                                                   sub_brands_dec h b' (bn :: nil)
-                                                 then Some (dsome x)
-                                                 else Some dnone
-                                               | dforeign _ => None
-                                               end) c1)) d)
-                            (RAlgEnv.fun_of_algenv h constant_env
-                              (algenv_of_nraenv (nraenv_of_oql o)) xenv a))))
-               with
-               | Some dunit => None
-               | Some (dnat _) => None
-               | Some (dbool _) => None
-               | Some (dstring _) => None
-               | Some (dcoll y) => rmap (fun x : data => orecconcat a x) y
-               | Some (drec _) => None
-               | Some (dleft _) => None
-               | Some (dright _) => None
-               | Some (dbrand _ _) => None
-               | Some (dforeign _) => None
-               | None => None
-               end) (map drec l))); simpl in *; [congruence|reflexivity].
+    - congruence.
   Qed.
 
   (* Second, show that 'x in expr' translation is correct *)
   
-  Lemma nraenv_of_from_in_correct env o s xenv :
-    (forall (xenv0 : data) (env0 : oql_env),
-        oql_interp h constant_env o env0 =
-        (h ⊢ nraenv_of_oql o @ₓ drec env0 ⊣ constant_env; xenv0)%nraenv) ->
+  Lemma nraenv_of_from_in_correct defls env o s xenv :
+    (forall xenv0 (env0 : oql_env),
+        oql_expr_interp h (rec_concat_sort constant_env defls) o env0 =
+        (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ drec env0 ⊣ constant_env; (drec (rec_concat_sort xenv0 defls)))%nraenv) ->
     (lift (fun x : list (list (string * data)) => dcoll (map drec x))
-          (env_map_concat s (oql_interp h constant_env o) (env :: nil))) =
-    (nraenv_eval h constant_env (NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec s) NRAEnvID) (nraenv_of_oql o)) (NRAEnvUnop AColl NRAEnvID)) xenv (drec env)).
+          (env_map_concat s (oql_expr_interp h (rec_concat_sort constant_env defls) o) (env :: nil))) =
+    (nraenv_eval h constant_env (NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (ARec s) NRAEnvID) (nraenv_of_oql_expr (domain defls) o)) (NRAEnvUnop AColl NRAEnvID)) (drec (rec_concat_sort xenv defls)) (drec env)).
   Proof.
     intros; simpl.
     unfold nraenv_eval; simpl.
@@ -914,7 +592,7 @@ Section OQLtoNRAEnv.
     rewrite (H xenv); clear H.
     unfold nraenv_eval; simpl.
     destruct (RAlgEnv.fun_of_algenv h constant_env
-          (algenv_of_nraenv (nraenv_of_oql o)) xenv 
+          (algenv_of_nraenv (nraenv_of_oql_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
           (drec env))%nraenv;
       try reflexivity; simpl.
     destruct d; simpl; try reflexivity.
@@ -925,14 +603,14 @@ Section OQLtoNRAEnv.
 
   (* Finally, the main fold_left for a whole from clause is correct *)
   
-  Lemma nraenv_of_from_clause_correct op envs envs0 el xenv :
+  Lemma nraenv_of_from_clause_correct defls op envs envs0 el xenv :
     Forall
       (fun ab : oql_in_expr =>
-         forall (xenv : data) (env : oql_env),
-           oql_interp h constant_env (oin_expr ab) env =
-           (h ⊢ nraenv_of_oql (oin_expr ab) @ₓ drec env ⊣ constant_env;
-             xenv)%nraenv) el ->
-    (h ⊢ op @ₓ envs ⊣ constant_env; xenv)%nraenv =
+         forall xenv (env : oql_env),
+           oql_expr_interp h (rec_concat_sort constant_env defls) (oin_expr ab) env =
+           (h ⊢ nraenv_of_oql_expr (domain defls) (oin_expr ab) @ₓ drec env ⊣ constant_env;
+             (drec (rec_concat_sort xenv defls)))%nraenv) el ->
+    (h ⊢ op @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
     (lift (fun x : list (list (string * data)) => dcoll (map drec x)) envs0) ->
     (lift (fun x : list (list (string * data)) => dcoll (map drec x))
           (fold_left
@@ -943,13 +621,13 @@ Section OQLtoNRAEnv.
             match envl with
             | None => None
             | Some envl' =>
-              env_map_concat in_v (oql_interp h constant_env from_expr) envl'
+              env_map_concat in_v (oql_expr_interp h (rec_concat_sort constant_env defls) from_expr) envl'
             end
           | OInCast in_v brand_name from_expr =>
             match envl with
             | None => None
             | Some envl' =>
-              env_map_concat_cast h in_v brand_name (oql_interp h constant_env from_expr) envl'
+              env_map_concat_cast h in_v brand_name (oql_expr_interp h (rec_concat_sort constant_env defls) from_expr) envl'
             end
           end
              ) el envs0)) =
@@ -959,7 +637,7 @@ Section OQLtoNRAEnv.
           match from_in_expr with
           | OIn in_v from_expr =>
             NRAEnvMapConcat
-              (NRAEnvMap (NRAEnvUnop (ARec in_v) NRAEnvID) (nraenv_of_oql from_expr))
+              (NRAEnvMap (NRAEnvUnop (ARec in_v) NRAEnvID) (nraenv_of_oql_expr (domain defls) from_expr))
               opacc
           | OInCast in_v brand_name from_expr =>
             NRAEnvMapConcat
@@ -970,11 +648,11 @@ Section OQLtoNRAEnv.
                                                       (NRAEnvConst (dcoll nil)))
                                         (NRAEnvMap (NRAEnvUnop (ACast (brand_name::nil))
                                                                NRAEnvID)
-                                                   (nraenv_of_oql from_expr)))))
+                                                   (nraenv_of_oql_expr (domain defls) from_expr)))))
               opacc
           end
        )
-       el op @ₓ envs ⊣ constant_env; xenv)%nraenv.
+       el op @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv.
   Proof.
     intros.
     revert op xenv envs0 envs H0.
@@ -985,21 +663,21 @@ Section OQLtoNRAEnv.
       specialize (IHel H4); clear H H4.
       specialize (IHel (NRAEnvMapConcat
                           (NRAEnvMap (NRAEnvUnop (ARec s) NRAEnvID)
-                                     (nraenv_of_oql o)) op)%nraenv).
+                                     (nraenv_of_oql_expr (domain defls) o)) op)%nraenv).
       assert ((h ⊢ (NRAEnvMapConcat
                       (NRAEnvMap (NRAEnvUnop (ARec s) NRAEnvID)
-                                 (nraenv_of_oql o)) op)%nraenv
-                 @ₓ envs ⊣ constant_env; xenv)%nraenv =
+                                 (nraenv_of_oql_expr (domain defls) o)) op)%nraenv
+                 @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
               lift (fun x : list (list (string * data)) => dcoll (map drec x))
                    (match envs0 with
                     | Some envl' =>
-                      env_map_concat s (oql_interp h constant_env o) envl'
+                      env_map_concat s (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
                     | None => None
                     end))
         by (apply one_from_fold_step_is_map_concat; assumption).
       apply (IHel xenv (match envs0 with
                         | Some envl' =>
-                          env_map_concat s (oql_interp h constant_env o) envl'
+                          env_map_concat s (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
                         | None => None
                         end) envs H).
     (* OInCast case *)
@@ -1014,7 +692,7 @@ Section OQLtoNRAEnv.
                                    (NRAEnvEither (NRAEnvUnop AColl NRAEnvID)
                                                  (NRAEnvConst (dcoll nil)))
                                    (NRAEnvMap (NRAEnvUnop (ACast (s0 :: nil)) NRAEnvID)
-                                              (nraenv_of_oql o))))) (op))%nraenv).
+                                              (nraenv_of_oql_expr (domain defls) o))))) (op))%nraenv).
       assert ((h ⊢ (NRAEnvMapConcat
                  (NRAEnvMap
                     (NRAEnvUnop (ARec s) NRAEnvID)
@@ -1023,19 +701,19 @@ Section OQLtoNRAEnv.
                                    (NRAEnvEither (NRAEnvUnop AColl NRAEnvID)
                                                  (NRAEnvConst (dcoll nil)))
                                    (NRAEnvMap (NRAEnvUnop (ACast (s0 :: nil)) NRAEnvID)
-                                              (nraenv_of_oql o))))) (op)) @ₓ envs
-                 ⊣ constant_env; xenv)%nraenv
+                                              (nraenv_of_oql_expr (domain defls) o))))) (op)) @ₓ envs
+                 ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv
               =
               lift (fun x : list (list (string * data)) => dcoll (map drec x))
                    match envs0 with
                    | Some envl' =>
-                     env_map_concat_cast h s s0 (oql_interp h constant_env o) envl'
+                     env_map_concat_cast h s s0 (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
                    | None => None
                    end)
         by (apply one_from_cast_fold_step_is_map_concat_cast; assumption).
       apply (IHel xenv (match envs0 with
                         | Some envl' =>
-                          env_map_concat_cast h s s0 (oql_interp h constant_env o) envl'
+                          env_map_concat_cast h s s0 (oql_expr_interp h (rec_concat_sort constant_env defls) o) envl'
                         | None => None
                         end) envs H).
   Qed.
@@ -1044,16 +722,16 @@ Section OQLtoNRAEnv.
    * Where clause correctness *
    ****************************)
   
-  Lemma nraenv_of_where_clause_correct
-        (o:oql_expr) (xenv:data) (ol : option (list oql_env)):
-    (forall (xenv : data) (env : oql_env),
-        oql_interp h constant_env o env =
-        (h ⊢ nraenv_of_oql o @ₓ drec env ⊣ constant_env; xenv)%nraenv) ->
+  Lemma nraenv_of_where_clause_correct defls
+        (o:oql_expr) xenv (ol : option (list oql_env)):
+    (forall xenv (env : oql_env),
+        oql_expr_interp h (rec_concat_sort constant_env defls) o env =
+        (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ drec env ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv) ->
     lift (fun x : list (list (string * data)) => dcoll (map drec x))
          (olift
             (lift_filter
                (fun x' : oql_env =>
-                  match oql_interp h constant_env o x' with
+                  match oql_expr_interp h (rec_concat_sort constant_env defls) o x' with
                   | Some (dbool b) => Some b
                   | Some _ => None
                   | None => None
@@ -1066,7 +744,7 @@ Section OQLtoNRAEnv.
                    (lift_filter
                       (fun x' : data =>
                          match
-                           (h ⊢ nraenv_of_oql o @ₓ x' ⊣ constant_env; xenv)%nraenv
+                           (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ x' ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv
                          with
                          | Some (dbool b) => Some b
                          | Some _ => None
@@ -1078,19 +756,19 @@ Section OQLtoNRAEnv.
     destruct ol; [|reflexivity]; simpl.
     induction l; [reflexivity|idtac]; simpl.
     rewrite (H xenv a); simpl in *.
-    destruct (h ⊢ nraenv_of_oql o @ₓ drec a ⊣ constant_env; xenv)%nraenv; try reflexivity; simpl.
+    destruct (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ drec a ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     destruct (lift_filter
              (fun x' : data =>
               match
-                (h ⊢ nraenv_of_oql o @ₓ x' ⊣ constant_env; xenv)%nraenv
+                (h ⊢ nraenv_of_oql_expr (domain defls) o @ₓ x' ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv
               with
               | Some (dbool b0) => Some b0
               | Some _ => None
               | None => None
               end) (map drec l)); destruct ((lift_filter
              (fun x' : oql_env =>
-              match oql_interp h constant_env o x' with
+              match oql_expr_interp h (rec_concat_sort constant_env defls) o x' with
               | Some (dbool b) => Some b
               | Some _ => None
               | None => None
@@ -1099,12 +777,14 @@ Section OQLtoNRAEnv.
     destruct b; reflexivity.
   Qed.
 
-  (* Main theorem: OQL to NRAEnv translation is correct *)
-  
-  Theorem nraenv_of_oql_correct (e:oql_expr) :
-    forall xenv:data, forall env:oql_env,
-        oql_interp h constant_env e env =
-        nraenv_eval h constant_env (nraenv_of_oql e) xenv (drec env).
+  (* OQL expr to NRAEnv translation is correct *)
+
+  (* delete env section *)
+  Theorem nraenv_of_oql_expr_correct (e:oql_expr) :
+    forall xenv, forall defls, forall env,
+        oql_expr_interp h (rec_concat_sort constant_env defls) e env =
+        (nraenv_eval h constant_env (nraenv_of_oql_expr (domain defls) e)
+                     (drec (rec_concat_sort xenv defls)) (drec env))%nraenv.
   Proof.
     intros. revert xenv env.
     induction e; simpl; intros.
@@ -1113,7 +793,24 @@ Section OQLtoNRAEnv.
     (* OVar *)
     - reflexivity.
     (* OTable *)
-    - reflexivity.
+    - unfold lookup_table; unfold nraenv_eval.
+      match_destr; simpl.
+      + unfold edot.
+        unfold rec_concat_sort.
+        repeat rewrite assoc_lookupr_drec_sort.
+        rewrite (assoc_lookupr_app constant_env defls).
+        rewrite (assoc_lookupr_app xenv defls).
+        match_case; intros nin.
+        apply assoc_lookupr_none_nin in nin.
+        congruence.
+      + unfold edot.
+        unfold rec_concat_sort.
+        rewrite assoc_lookupr_drec_sort.
+        rewrite (assoc_lookupr_app constant_env defls).
+        match_case; intros ? inn.
+        apply assoc_lookupr_in in inn.
+        apply in_dom in inn.
+        congruence.
     (* OBinop *)
     - rewrite (IHe1 xenv env); rewrite (IHe2 xenv env).
       reflexivity.
@@ -1123,26 +820,27 @@ Section OQLtoNRAEnv.
     (* OSFW *)
     - destruct e1.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
+        unfold nraenv_eval in *; simpl.
+        rewrite <- (Hfrom _ _ (Some (env :: nil)))
+         ; [idtac|assumption|reflexivity].
+        generalize nraenv_of_select_expr_correct; intros Hselect.
+        unfold nraenv_eval in *; simpl.
+        rewrite <- Hselect; [|assumption].
+        reflexivity.
+      + simpl in *.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity].
         generalize nraenv_of_select_expr_correct; intros Hselect.
         unfold nraenv_eval in *; simpl.
         rewrite <- Hselect; [|assumption].
-        reflexivity.
-      + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
-        unfold nraenv_eval in *; simpl.
-        rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity].
-        generalize nraenv_of_select_expr_correct; intros Hselect.
-        unfold nraenv_eval in *; simpl.
-        rewrite <- Hselect; [|assumption].
         rewrite push_lift_coll_in_rmap; simpl.
         rewrite olift_rondcoll_over_dcoll.
         reflexivity.
     - destruct e1.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         generalize nraenv_of_where_clause_correct; intros Hwhere.
@@ -1153,7 +851,7 @@ Section OQLtoNRAEnv.
         rewrite <- Hselect; [|assumption].
         reflexivity.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         generalize nraenv_of_where_clause_correct; intros Hwhere.
@@ -1167,7 +865,7 @@ Section OQLtoNRAEnv.
         reflexivity.
     - destruct e1.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         generalize nraenv_of_select_expr_correct; intros Hselect.
@@ -1175,7 +873,7 @@ Section OQLtoNRAEnv.
         rewrite <- Hselect; [|assumption].
         reflexivity.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         generalize nraenv_of_select_expr_correct; intros Hselect.
@@ -1186,7 +884,7 @@ Section OQLtoNRAEnv.
         reflexivity.
     - destruct e1.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         generalize nraenv_of_where_clause_correct; intros Hwhere.
@@ -1197,7 +895,7 @@ Section OQLtoNRAEnv.
         rewrite <- Hselect; [|assumption].
         reflexivity.
       + simpl in *.
-        generalize nraenv_of_from_clause_correct; intros Hfrom.
+        generalize (nraenv_of_from_clause_correct defls); intros Hfrom.
         unfold nraenv_eval in *; simpl.
         rewrite <- (Hfrom _ _ (Some (env :: nil))) ; [idtac|assumption|reflexivity]. 
         generalize nraenv_of_where_clause_correct; intros Hwhere.
@@ -1211,69 +909,144 @@ Section OQLtoNRAEnv.
         reflexivity.
   Qed.
 
-  (* Top-level translation call *)
+  Global Instance lookup_table_proper :
+    Proper (equivlist ==> eq ==> eq) lookup_table.
+  Proof.
+    red; intros l1 l2 eql s1 s2 eqs; subst s2.
+    unfold lookup_table.
+    match_destr; match_destr.
+    - rewrite eql in i; congruence.
+    - rewrite <- eql in i; congruence.
+  Qed.    
 
-  Definition translate_oql_to_nraenv (e:oql_expr) : nraenv :=
-    (* Produces the initial plan *)
-    NRAEnvApp (nraenv_of_oql e) (NRAEnvConst (drec nil)).
-
-  (********************************************
-   * Additional properties of the translation *
-   ********************************************)
+  Global Instance nraenv_of_oql_expr_proper :
+    Proper (equivlist ==> eq ==> eq) nraenv_of_oql_expr.
+  Proof.
+    Ltac fold_left_local_solver 
+      := match goal with
+           [H:Forall _ ?el |- fold_left ?f1 ?e1 ?n1 = fold_left ?f2 ?e2 ?n2 ]
+           => cut (forall n, fold_left f1 e1 n = fold_left f2 e2 n); [solve[auto] | ]
+              ; intros n; revert H n
+              ; let IHel := (fresh "IHel") in
+                (induction el as [| ? ? IHel]; intros FH n; simpl in *; trivial
+                 ; invcs FH; rewrite IHel; trivial
+                 ; match_destr; simpl in *; congruence)
+         end.
+    red; intros l1 l2 eql q1 q2 eqq; subst q2.
+    induction q1; simpl in *; trivial.
+    - rewrite eql; trivial.
+    - rewrite IHq1_1, IHq1_2; trivial.
+    - rewrite IHq1; trivial.
+    - destruct e1; simpl in *; rewrite IHq1; clear IHq1.
+      + do 1 f_equal; fold_left_local_solver.
+      + do 2 f_equal; fold_left_local_solver.
+    - destruct e1; simpl in *; rewrite IHq0, IHq1; clear IHq0 IHq1.
+      + do 2 f_equal; fold_left_local_solver.
+      + do 3 f_equal; fold_left_local_solver.
+    - destruct e1; simpl in *; rewrite IHq1; clear IHq1.
+      + do 1 f_equal; fold_left_local_solver.
+      + do 2 f_equal; fold_left_local_solver.
+    - destruct e1; simpl in *; rewrite IHq1_1, IHq1_2; clear IHq1_1 IHq1_2 IHq1_3.
+      + do 2 f_equal; fold_left_local_solver.
+      + do 3 f_equal; fold_left_local_solver.
+  Qed.
   
-  (* OQL to NRAEnv translation is local env-free *)
-
-  (* For fold_left, make sure to do the induction on el for *any* accumulator *)
-  Lemma fold_left_ignore_env (el:list oql_in_expr) (a:nraenv) :
-    nraenv_ignores_env a ->
-    Forall (fun ab : oql_in_expr => nraenv_ignores_env (nraenv_of_oql (oin_expr ab))) el ->
-    nraenv_ignores_env
-      (fold_left
-         (fun (opacc : nraenv) (from_in_expr : oql_in_expr) =>
-            match from_in_expr with
-            | OIn in_v from_expr =>
-              (NRAEnvMapConcat
-                 (NRAEnvMap
-                    (NRAEnvUnop (ARec in_v) NRAEnvID)
-                    (nraenv_of_oql from_expr)) opacc)%nraenv
-            | OInCast in_v brand_name from_expr =>
-             (NRAEnvMapConcat
-                (NRAEnvMap (NRAEnvUnop (ARec in_v) NRAEnvID)
-                           (NRAEnvUnop AFlatten
-                                       (NRAEnvMap
-                                          (NRAEnvEither (NRAEnvUnop AColl NRAEnvID)
-                                                        (NRAEnvConst (dcoll nil)))
-                                          (NRAEnvMap
-                                             (NRAEnvUnop (ACast (brand_name::nil)) NRAEnvID)
-                                             (nraenv_of_oql from_expr))))) opacc)%nraenv
-            end)
-         el a).
+  Global Instance nraenv_of_oql_query_program_proper :
+    Proper (equivlist ==> eq ==> eq) nraenv_of_oql_query_program.
   Proof.
-    intros.
-    revert a H.
-    induction el; simpl; intros; try assumption.
-    inversion H0; clear H0; subst.
-    specialize (IHel H4); clear H4.
-    destruct a; simpl in *.
-    - apply IHel.
-      unfold nraenv_ignores_env.
-      simpl; auto.
-    - apply IHel.
-      unfold nraenv_ignores_env.
-      simpl; auto.
+    red; intros l1 l2 eql q1 q2 eqq; subst q2.
+    revert l1 l2 eql.
+    induction q1; intros l1 l2 eql; simpl.
+    - f_equal.
+      + apply IHq1.
+        apply equivlist_cons; trivial.
+      + do 2 f_equal. apply nraenv_of_oql_expr_proper; trivial.
+    - f_equal.
+      apply IHq1.
+      apply equivlist_remove_all; trivial.
+    - apply nraenv_of_oql_expr_proper; trivial.
   Qed.
 
-  Lemma oql_to_nraenv_ignores_env (e:oql_expr) :
-    nraenv_ignores_env (nraenv_of_oql e).
+  Lemma nraenv_of_oql_query_program_correct (defllist:list string) (oq:oql_query_program) :
+    forall (defls:oql_env) xenv env,
+      (forall x, In x ((domain defls)++(oql_query_program_defls oq)) -> ~In x (domain xenv)) ->
+      oql_query_program_interp h constant_env defls oq env =
+      nraenv_eval h constant_env (nraenv_of_oql_query_program (domain defls) oq) (drec (rec_concat_sort xenv defls)) (drec env).
   Proof.
-    induction e; simpl;
-    unfold nraenv_ignores_env; simpl;
-    auto;
-    destruct e1;
-    simpl in *;
-    repeat (split; auto);
-    apply fold_left_ignore_env; unfold nraenv_ignores_env;
-    simpl; auto.
+    intros. revert defls xenv env H.
+    induction oq; simpl; intros.
+    - rewrite (nraenv_of_oql_expr_correct _ xenv).
+      unfold nraenv_eval; simpl.
+      match goal with
+        [|- olift _ ?x = _ ] => destruct x
+      end; simpl; trivial.
+      rewrite (IHoq _ xenv).
+      + unfold nraenv_eval; simpl.
+        assert (equivlist (domain (rec_concat_sort defls ((s, d) :: nil))) (s::domain defls)).
+        {
+          unfold rec_concat_sort.
+          rewrite drec_sort_equiv_domain.
+          rewrite domain_app.
+          rewrite app_commutative_equivlist.
+          simpl.
+          reflexivity.
+        }
+        rewrite (nraenv_of_oql_query_program_proper _ _ H0 _ _ (eq_refl _ )).
+        unfold rec_concat_sort.
+        rewrite rec_sort_rec_sort_app1.
+        rewrite app_ass.
+        rewrite rec_sort_rec_sort_app2.
+        trivial.
+      + intros.
+        apply H.
+        rewrite in_app_iff in H0.
+        unfold rec_concat_sort in H0.
+        rewrite in_dom_rec_sort in H0.
+        rewrite domain_app in H0.
+        simpl in H0.
+        rewrite in_app_iff in H0.
+        rewrite in_app_iff; simpl in *.
+        tauto.
+    - unfold nraenv_eval; simpl.
+      rewrite (IHoq _ xenv).
+      + unfold nraenv_eval.
+        f_equal.
+        * rewrite domain_rremove; trivial.
+        * unfold rec_concat_sort.
+          rewrite rremove_rec_sort_commute.
+          rewrite rremove_app.
+          rewrite (nin_rremove xenv); trivial.
+          apply H.
+          rewrite in_app_iff; simpl.
+          tauto.
+      + intros.
+        apply H.
+        rewrite in_app_iff; simpl.
+        rewrite domain_rremove in H0.
+        rewrite in_app_iff in H0.
+        rewrite remove_all_filter in H0.
+        rewrite filter_In in H0.
+        tauto.
+    - apply nraenv_of_oql_expr_correct.
+  Qed.
+
+  Theorem nraenv_of_oql_correct (q:oql) :
+    forall xenv xdata,
+      oql_interp h constant_env q =
+      nraenv_eval h constant_env (nraenv_of_oql q) xenv xdata.
+  Proof.
+    intros xenv.
+    unfold nraenv_of_oql, oql_interp.
+    rewrite (nraenv_of_oql_query_program_correct nil q nil nil); simpl; [| tauto].
+    reflexivity.
+  Qed.
+
+  Theorem translate_oql_to_nraenv_correct (q:oql) : 
+    forall xenv xdata,
+      oql_interp h constant_env q =
+      nraenv_eval h constant_env (translate_oql_to_nraenv q) xenv xdata.
+  Proof.
+    apply nraenv_of_oql_correct.
   Qed.
 
 End OQLtoNRAEnv.

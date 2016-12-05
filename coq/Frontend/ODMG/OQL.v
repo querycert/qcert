@@ -21,7 +21,7 @@ Section OQL.
   Require Import Arith.
   Require Import EquivDec.
 
-  Require Import Utils BasicSystem.
+  Require Import Utils BasicRuntime.
   Require Import RDataSort.
 
   Context {fruntime:foreign_runtime}.
@@ -53,6 +53,14 @@ Section OQL.
 
   Set Elimination Schemes.
 
+  Inductive oql_query_program : Set :=
+  | ODefineQuery : string -> oql_expr -> oql_query_program -> oql_query_program
+  | OUndefineQuery : string -> oql_query_program -> oql_query_program
+  | OQuery : oql_expr -> oql_query_program
+  .
+
+  Definition oql : Set := oql_query_program.
+  
   Definition oselect_expr (ie:oql_select_expr) : oql_expr :=
     match ie with
     | OSelect e => e
@@ -413,9 +421,28 @@ Section OQL.
       destruct (s == s0); [left|right]; congruence.
   Defined.
 
+  Global Instance oql_query_program_eqdec : EqDec oql_query_program eq.
+  Proof.
+    red; induction x; destruct y; try solve [right; congruence].
+    - destruct (s == s0); [ | right; congruence].
+      destruct (o == o0); [ | right; congruence].
+      destruct (IHx y); [ | right; congruence].
+      left; congruence.
+    - destruct (s == s0); [ | right; congruence].
+      destruct (IHx y); [ | right; congruence].
+      left; congruence.
+    - destruct (o == o0); [left|right]; congruence.
+  Defined.
+
+  Global Instance oql_eqdec : EqDec oql eq.
+  Proof.
+    apply oql_query_program_eqdec.
+  Defined.
+
   (** Semantics of OQL *)
 
   Context (h:brand_relation_t).
+  Section sem.
   Context (constant_env:list (string*data)).
 
   Definition env_map_concat_single (a:oql_env) (xl:list oql_env) : list oql_env :=
@@ -470,13 +497,13 @@ Section OQL.
              (d:list oql_env) : option (list oql_env) :=
     oflat_map (oenv_map_concat_single_with_cast v brand_name f) d.
 
-  Fixpoint oql_interp (q:oql_expr) (env:oql_env) : option data :=
+  Fixpoint oql_expr_interp (q:oql_expr) (env:oql_env) : option data :=
     match q with
     | OConst d => Some (normalize_data h d)
     | OVar n => edot env n
     | OTable t => edot constant_env t
-    | OBinop bop q1 q2 => olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (oql_interp q1 env) (oql_interp q2 env)
-    | OUnop uop q1 => olift (fun d1 => fun_of_unaryop h uop d1) (oql_interp q1 env)
+    | OBinop bop q1 q2 => olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (oql_expr_interp q1 env) (oql_expr_interp q2 env)
+    | OUnop uop q1 => olift (fun d1 => fun_of_unaryop h uop d1) (oql_expr_interp q1 env)
     | OSFW select_clause from_clause where_clause order_by_clause =>
       let init_env := Some (env :: nil) in
       let from_interp (envl:option (list oql_env)) (from_in_expr : oql_in_expr) :=
@@ -485,19 +512,19 @@ Section OQL.
             match envl with
             | None => None
             | Some envl' =>
-              env_map_concat in_v (oql_interp from_expr) envl'
+              env_map_concat in_v (oql_expr_interp from_expr) envl'
             end
           | OInCast in_v brand_name from_expr =>
             match envl with
             | None => None
             | Some envl' =>
-              env_map_concat_cast in_v brand_name (oql_interp from_expr) envl'
+              env_map_concat_cast in_v brand_name (oql_expr_interp from_expr) envl'
             end
           end
       in
       let from_result := fold_left from_interp from_clause init_env in
       let pred (where_expr:oql_expr) (x':oql_env) :=
-          match oql_interp where_expr x' with
+          match oql_expr_interp where_expr x' with
           | Some (dbool b) => Some b
           | _ => None
           end
@@ -517,11 +544,11 @@ Section OQL.
       let select_result :=
           match select_clause with
           | OSelect select_expr =>
-            olift (fun x => lift dcoll (rmap (oql_interp select_expr) x))
+            olift (fun x => lift dcoll (rmap (oql_expr_interp select_expr) x))
                   order_by_result
           | OSelectDistinct select_expr =>
             let select_dup :=
-                olift (fun x => (rmap (oql_interp select_expr) x))
+                olift (fun x => (rmap (oql_expr_interp select_expr) x))
                       order_by_result
             in
             lift (fun x => dcoll ((@bdistinct data data_eq_dec) x)) select_dup
@@ -530,6 +557,26 @@ Section OQL.
       select_result
     end.
 
+  End sem.
+
+  Section sem2.
+    Context (constant_env:list (string*data)).
+    Fixpoint oql_query_program_interp (defls:list (string*data))
+             (oq:oql_query_program) (env:oql_env) : option data :=
+      match oq with
+      | ODefineQuery s e rest =>
+        olift
+          (fun d => oql_query_program_interp (rec_concat_sort defls ((s,d)::nil)) rest env)
+          (oql_expr_interp (rec_concat_sort constant_env defls) e env)
+      | OUndefineQuery s rest =>
+        oql_query_program_interp (rremove defls s) rest env
+    | OQuery e => oql_expr_interp (rec_concat_sort constant_env defls) e env
+      end.
+
+  Definition oql_interp (e:oql) : option data
+    := oql_query_program_interp nil e nil.
+
+  End sem2. 
   Section OQLScope.
 
     Fixpoint oql_free_vars (e:oql_expr) :=
@@ -567,7 +614,7 @@ Section OQL.
       | OOrderBy e _ => oql_free_vars e
       end.
 
-  (* capture avoiding substitution *)
+    (* capture avoiding substitution *)
     Fixpoint oql_subst (e:oql_expr) (x:string) (e':oql_expr) : oql_expr :=
       match e with
       | OConst d => OConst d
@@ -614,6 +661,14 @@ Section OQL.
       | ONoOrder => ONoOrder
       | OOrderBy e sc => OOrderBy (oql_subst e x e') sc
       end.
+    
+  Fixpoint oql_query_program_defls
+             (oq:oql_query_program)  : list string :=
+      match oq with
+      | ODefineQuery s e rest => s::(oql_query_program_defls rest)
+      | OUndefineQuery s rest => s::(oql_query_program_defls rest)
+      | OQuery e => nil
+      end.
 
   End OQLScope.
   
@@ -648,6 +703,7 @@ Notation "p · r" := ((OUnop (ADot r)) p) (left associativity, at level 40): oql
 
 Notation "'$' v" := (OVar v%string) (at level 50, format "'$' v") : oql_scope.
 Notation "'$$' v" := (OTable v%string) (at level 50, format "'$$' v") : oql_scope.
+
 Notation "'SELECT' e1 'FROM' e2 'WHERE' e3" := (OSFW (OSelect e1) e2 e3) (at level 50, format "'SELECT' e1 'FROM' e2 'WHERE' e3") : oql_scope.
 Notation "'SELECT' 'DISTINCT' e1 'FROM' e2 'WHERE' e3" := (OSFW (OSelectDistinct e1) e2 e3) (at level 50, format "'SELECT' 'DISTINCT' e1 'FROM' e2 'WHERE' e3") : oql_scope.
 Notation "e 'IN' x" := (OIn e x) (at level 50, format "e 'IN' x") : oql_scope.

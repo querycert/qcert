@@ -440,28 +440,19 @@ Section TOps.
     Forall2
       (fun (d : string * data) (r : string * rtype) =>
          fst d = fst r /\ data_type (snd d) (snd r)) dl τ ->
-    is_list_sorted ODT_lt_dec (domain τ) = true ->
     Forall2
       (fun (d : string * data) (r : string * rtype) =>
          fst d = fst r /\ data_type (snd d) (snd r)) (rremove dl s)
       (rremove τ s).
   Proof.
-    intros.
-    induction H.
-    apply Forall2_nil.
-    simpl.
-    assert (is_list_sorted ODT_lt_dec (domain l') = true)
-      by (apply (@rec_sorted_skip_first string ODT_string _ l' y); assumption).
-    specialize (IHForall2 H2); clear H2.
-    elim H; clear H; intros.
-    rewrite H in *.
-    elim (string_dec s (fst y)); intros.
-    assumption.
-    apply Forall2_cons.
-    split; assumption.
-    assumption.
+    intros F2.
+    induction F2; simpl; trivial.
+    destruct H; simpl in *.
+    rewrite H.
+    match_destr.
+    auto.
   Qed.
-    
+
   Lemma rproject_well_typed τ rl s dl:
     Forall2
       (fun (d : string * data) (r : string * rtype) =>
@@ -1050,11 +1041,10 @@ Section TOps.
     - Case "ATRecRemove"%string.
       dependent induction H; rtype_equalizer. subst.
       exists (drec (rremove dl s)); split; try reflexivity.
-      eapply dtrec; try (apply rremove_well_typed; [eassumption |]).
+      eapply dtrec; try (apply rremove_well_typed; try eassumption).
       + apply is_sorted_rremove; trivial.
       + apply sublist_filter; trivial.
       + intuition; congruence.
-      + trivial.
     - Case "ATRecProject"%string.
       dependent induction H.
       rtype_equalizer ; subst.

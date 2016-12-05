@@ -150,7 +150,7 @@ Section OQLTest.
   (* Simple count over a table *)
 
   Definition q0 : oql_expr := OUnop ACount (OTable "Companies").
-  Definition q0_eval : option data := oql_interp CPRModel tables q0 init_env.
+  Definition q0_eval : option data := oql_expr_interp CPRModel tables q0 init_env.
 
 (*  Eval vm_compute in q0_eval. *)
 
@@ -167,7 +167,7 @@ Section OQLTest.
       (OWhere (OBinop AEq (OUnop (ADot "name") (OUnop AUnbrand (OVar "e"))) (OConst (dstring "John"))))
       ONoOrder.
   
-  Definition q1_eval : option data := oql_interp CPRModel tables q1 init_env.
+  Definition q1_eval : option data := oql_expr_interp CPRModel tables q1 init_env.
 
 (*  Eval vm_compute in q1_eval. *)
   
@@ -189,7 +189,7 @@ Section OQLTest.
                       (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c")))))
       ONoOrder.
 
-  Definition q2_eval : option data := oql_interp CPRModel tables q2 init_env.
+  Definition q2_eval : option data := oql_expr_interp CPRModel tables q2 init_env.
 
 (*  Eval vm_compute in q2_eval. *)
 
@@ -206,7 +206,7 @@ Section OQLTest.
                       (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c")))))
       ONoOrder.
 
-  Definition q2'_eval : option data := oql_interp CPRModel tables q2' init_env.
+  Definition q2'_eval : option data := oql_expr_interp CPRModel tables q2' init_env.
 
 (*  Eval vm_compute in q2'_eval. *)
 (*  Eval vm_compute in q2'. *)
@@ -224,7 +224,7 @@ Section OQLTest.
       OTrue
       ONoOrder.
 
-  Definition q3_eval : option data := oql_interp CPRModel tables q3 init_env.
+  Definition q3_eval : option data := oql_expr_interp CPRModel tables q3 init_env.
 
 (*  Eval vm_compute in q3_eval. *)
   (* Note that AMD doesn't appear since it does not have departments *)
@@ -245,7 +245,7 @@ Section OQLTest.
       OTrue
       ONoOrder.
 
-  Definition q3wrong_eval : option data := oql_interp CPRModel tables q3wrong init_env.
+  Definition q3wrong_eval : option data := oql_expr_interp CPRModel tables q3wrong init_env.
 
 (*  Eval vm_compute in q3wrong_eval. *)
 

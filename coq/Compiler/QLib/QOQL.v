@@ -25,8 +25,10 @@ Module QOQL(runtime:CompilerRuntime).
 
   Definition expr : Set
     := OQL.oql_expr.
+  Definition program : Set
+    := OQL.oql.
   Definition t : Set
-    := expr.
+    := program.
   Definition var : Set
     := String.string.
   
@@ -78,6 +80,15 @@ Module QOQL(runtime:CompilerRuntime).
   Definition tableify : expr -> expr
     := OQLSugar.tableify.
 
+  Definition define : String.string -> expr -> program -> program
+    := OQL.ODefineQuery.
+
+  Definition undefine : String.string -> program -> program
+    := OQL.OUndefineQuery.
+
+  Definition query : expr -> program
+    := OQL.OQuery.
+  
 End QOQL.
 (* 
 *** Local Variables: ***

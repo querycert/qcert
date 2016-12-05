@@ -1044,6 +1044,44 @@ Section RRemove.
     apply (@sorted_over_filter string ODT_string); assumption.
   Qed.
 
+  Lemma domain_rremove {A} s (l:list (string*A)) :
+    domain (rremove l s) = remove_all s (domain l).
+  Proof.
+    induction l; simpl; trivial.
+    unfold equiv_dec, string_eqdec.
+    destruct (string_dec s (fst a)); simpl; trivial.
+    f_equal; trivial.
+  Qed.
+
+  Lemma rremove_rec_sort_commute {B} (l1:list (string*B)) s:
+    rremove (rec_sort l1) s = rec_sort (rremove l1 s).
+  Proof.
+    unfold rremove.
+    apply rec_sort_filter_fst_commute; intros.
+    simpl.
+    match_destr.
+  Qed.
+
+  Lemma rremove_app {B} (l1 l2:list (string*B)) s:
+    rremove (l1 ++ l2) s = rremove l1 s ++ rremove l2 s.
+  Proof.
+    unfold rremove.
+    apply filter_app.
+  Qed.
+
+  Lemma nin_rremove {B} (l:list (string*B)) s :
+    ~ In s (domain l) ->
+    rremove l s = l.
+  Proof.
+    intros nin.
+    apply true_filter; intros ? inn.
+    destruct x.
+    apply in_dom in inn.
+    simpl.
+    match_destr.
+    congruence.
+  Qed.
+
 End RRemove.
 
 Section RProject.
