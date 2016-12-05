@@ -1,0 +1,9 @@
+/* Example of simple select-from-where */
+
+define t as Persons
+; define s as select struct(name:p.name, worksfor: c.cname)
+from c in Companies,
+     p in t
+where p.company = c.cid
+; undefine t
+; s

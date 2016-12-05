@@ -20,10 +20,13 @@
   open OQLParser
 
   let keyword_table =
-    let tbl = Hashtbl.create 37 in
+    let tbl = Hashtbl.create 39 in
     begin
       List.iter (fun (key, data) -> Hashtbl.add tbl key data)
-	[ (* SFW *)
+	[  (* program *)
+	   "define", DEFINE;
+ 	   "undefine", UNDEFINE;
+ 	   (* SFW *)
 	  "select", SELECT;
 	  "distinct", DISTINCT;
 	  "from", FROM;
@@ -71,6 +74,7 @@ rule token sbuff = parse
 | "*" { STAR }
 | "-" { MINUS }
 | "," { COMMA }
+| ";" { SEMI }
 | "." { DOT }
 | "->" { ARROW }
 | "(" { LPAREN }

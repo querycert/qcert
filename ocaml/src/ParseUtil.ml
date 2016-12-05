@@ -55,7 +55,7 @@ let parse_json f : QData.json = parse DataParser.main (DataLexer.token (string_b
 let parse_rule f : string * QLang.query = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
 let parse_camp f : QLang.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
   
-let parse_oql f : QLang.oql = QOQL.query (QOQL.tableify (parse OQLParser.main (OQLLexer.token (string_buff ())) f))
+let parse_oql f : QLang.oql = parse OQLParser.main (OQLLexer.token (string_buff ())) f
 
 let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
 

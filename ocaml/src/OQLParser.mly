@@ -35,12 +35,14 @@
 %token EQUAL NEQUAL
 %token LT GT LTEQ GTEQ
 %token PLUS STAR MINUS
-%token DOT ARROW COMMA COLON
+%token DOT ARROW COMMA SEMI COLON
 %token LPAREN RPAREN
 %token EOF
 
+%token DEFINE UNDEFINE
+
 %right FROM IN WHERE
-%right COMMA
+%right COMMA SEMI
 %right EQUAL NEQUAL
 %right LT GT LTEQ GTEQ
 %right PLUS MINUS
@@ -48,17 +50,26 @@
 %right STAR
 %left DOT ARROW
 
-%start <Compiler.EnhancedCompiler.QOQL.expr> main
+%start <Compiler.EnhancedCompiler.QOQL.program> main
 
 %%
 
 main:
-| q = query EOF
+| q = program EOF
     { q }
+
+program:
+| DEFINE v = IDENT AS e = query SEMI p = program 
+  { QOQL.define (Util.char_list_of_string v) e p  }
+| UNDEFINE v = IDENT SEMI p = program 
+  { QOQL.undefine (Util.char_list_of_string v) p  }
+| e = query
+  { QOQL.query e }
+
 
 query:
 | e = expr
-    { e }
+    { QOQL.tableify e }
 
 expr:
 (* Parenthesized expression *)
