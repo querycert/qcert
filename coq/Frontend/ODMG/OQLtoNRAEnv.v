@@ -30,9 +30,6 @@ Section OQLtoNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
-  Context (h:list(string*string)).
-  Context (constant_env:list (string*data)).
-
   Section query_var.
     Context (deflist:list string).
 
@@ -153,7 +150,7 @@ Section OQLtoNRAEnv.
     reflexivity.
   Qed.
                                                         
-  Lemma flatten_either_is_rmap_either bn l0:
+  Lemma flatten_either_is_rmap_either h bn l0:
     (olift rflatten
            (olift
               (rmap
@@ -341,6 +338,9 @@ Section OQLtoNRAEnv.
    * Select clause correctness *
    *****************************)
   
+  Context (h:brand_relation_t).
+  Context (constant_env:list (string*data)).
+
   Lemma nraenv_of_select_expr_correct defls
         (o:oql_expr) xenv (env0 : option (list oql_env)) :
     (forall xenv (env : oql_env),
