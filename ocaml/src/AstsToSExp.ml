@@ -1157,8 +1157,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | Compiler.L_camp -> Compiler.Q_camp (sexp_to_camp se)
   | Compiler.L_oql ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | Compiler.L_sql ->
-      raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | Compiler.L_sql -> Compiler.Q_sql (sexp_to_sql se)
   | Compiler.L_lambda_nra ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_nra ->
