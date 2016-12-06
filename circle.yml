@@ -1,6 +1,6 @@
 machine:
   pre:
-    - export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
+    - export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server couchdb mongodb-org*
 dependencies:
   cache_directories:
     - "~/.opam"
