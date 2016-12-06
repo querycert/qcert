@@ -56,6 +56,7 @@ let parse_rule f : string * QLang.query = parse RuleParser.rulemain (RuleLexer.t
 let parse_camp f : QLang.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
   
 let parse_oql f : QLang.oql = parse OQLParser.main (OQLLexer.token (string_buff ())) f
+let parse_sql f : QLang.sql = AstsToSExp.sexp_to_sql (SQLParser.main f)
 
 let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse LambdaNRAParser.main (LambdaNRALexer.token (string_buff ())) f)
 
@@ -81,7 +82,7 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_rule -> parse_rule f
   | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
-  | Compiler.L_sql -> ("SQL", Compiler.Q_sql (parse_sql_sexp f))
+  | Compiler.L_sql -> ("SQL", Compiler.Q_sql (parse_sql f))
   | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
   | Compiler.L_nra -> raise (Qcert_Error "No parser for NRA available")
   | Compiler.L_nraenv_core -> ("NRAEnvCore", Compiler.Q_nraenv_core (parse_nraenv_sexp f))
