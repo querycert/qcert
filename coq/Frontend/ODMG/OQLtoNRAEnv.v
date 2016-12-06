@@ -967,6 +967,18 @@ Section OQLtoNRAEnv.
     - apply nraenv_of_oql_expr_proper; trivial.
   Qed.
 
+  Print rec_concat_sort.
+  Lemma rec_concat_sort_domain_app_commutatuve_equiv {K} {odt:ODT} {B} l1 l2 :
+    (equivlist (domain (rec_concat_sort l1 l2)) (domain l2 ++ @domain K B l1)).
+  Proof.
+    unfold rec_concat_sort.
+    rewrite drec_sort_equiv_domain.
+    rewrite domain_app.
+    rewrite app_commutative_equivlist.
+    simpl.
+    reflexivity.
+  Qed.
+
   Lemma nraenv_of_oql_query_program_correct (defllist:list string) (oq:oql_query_program) :
     forall (defls:oql_env) xenv env,
       (forall x, In x ((domain defls)++(oql_query_program_defls oq)) -> ~In x (domain xenv)) ->
@@ -982,15 +994,8 @@ Section OQLtoNRAEnv.
       end; simpl; trivial.
       rewrite (IHoq _ xenv).
       + unfold nraenv_eval; simpl.
-        assert (equivlist (domain (rec_concat_sort defls ((s, d) :: nil))) (s::domain defls)).
-        {
-          unfold rec_concat_sort.
-          rewrite drec_sort_equiv_domain.
-          rewrite domain_app.
-          rewrite app_commutative_equivlist.
-          simpl.
-          reflexivity.
-        }
+        assert (equivlist (domain (rec_concat_sort defls ((s, d) :: nil))) (s::domain defls))
+          by (rewrite rec_concat_sort_domain_app_commutatuve_equiv; simpl; reflexivity).
         rewrite (nraenv_of_oql_query_program_proper _ _ H0 _ _ (eq_refl _ )).
         unfold rec_concat_sort.
         rewrite rec_sort_rec_sort_app1.

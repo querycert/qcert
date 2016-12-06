@@ -201,6 +201,7 @@ MODULES = \
 	Frontend/ODMG/OQLSize \
 	Frontend/ODMG/OQLtoNRAEnv \
 	Frontend/ODMG/TOQL \
+	Frontend/ODMG/TOQLtoNRAEnv \
 	Frontend/ODMGRuntime \
 	Frontend/SQL/SQL \
 	Backend/JSON \
