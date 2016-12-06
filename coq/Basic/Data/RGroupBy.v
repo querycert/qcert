@@ -861,6 +861,139 @@ Section RGroupBy.
     Require Import RDataNorm.
     Context (h:brand_relation_t).
 
+    Lemma bdistinct_normalized l :
+      Forall (data_normalized h) l ->
+      Forall (data_normalized h) (bdistinct l).
+    Proof.
+      intros dn.
+      rewrite bdistinct_sublist; trivial.
+    Qed.
+
+    Lemma rmap_rproject_normalized l l0 o :
+      Forall (data_normalized h) l0 ->
+      (rmap
+         (fun d : data =>
+            match d with
+            | dunit => None
+            | dnat _ => None
+            | dbool _ => None
+            | dstring _ => None
+            | dcoll _ => None
+            | drec r => Some (drec (rproject r l))
+            | dleft _ => None
+            | dright _ => None
+            | dbrand _ _ => None
+            | dforeign _ => None
+            end) l0) = Some o ->
+      Forall (data_normalized h) o.
+    Proof.
+      intros.
+      eapply rmap_Forall; eauto; intros.
+      simpl in *.
+      match_destr_in H1.
+      invcs H1.
+      invcs H2.
+      constructor.
+      - rewrite sublist_rproject; trivial.
+      - eapply is_list_sorted_sublist; try apply H4.
+        apply sublist_domain.
+        apply sublist_rproject; trivial.
+    Qed.
+
+    Lemma group_of_key_normalized a l l1 l2 :
+      Forall (data_normalized h) l1 ->
+      group_of_key
+           (fun d : data =>
+            match d with
+            | dunit => None
+            | dnat _ => None
+            | dbool _ => None
+            | dstring _ => None
+            | dcoll _ => None
+            | drec r => Some (drec (rproject r l))
+            | dleft _ => None
+            | dright _ => None
+            | dbrand _ _ => None
+            | dforeign _ => None
+            end) a l1 = Some l2 ->
+      Forall (data_normalized h) l2.
+    Proof.
+      intros dn eqq.
+      unfold group_of_key.
+      eapply lift_filter_Forall; eauto.
+    Qed.      
+
+    Lemma group_by_nested_eval_normalized l0 l o :
+      Forall (data_normalized h) l0 ->
+      (group_by_nested_eval
+         (fun d : data =>
+            match d with
+            | dunit => None
+            | dnat _ => None
+            | dbool _ => None
+            | dstring _ => None
+            | dcoll _ => None
+            | drec r => Some (drec (rproject r l))
+            | dleft _ => None
+            | dright _ => None
+            | dbrand _ _ => None
+            | dforeign _ => None
+            end) l0) = Some o ->
+      Forall (fun dd => data_normalized h (fst dd)
+                        /\ Forall (data_normalized h) (snd dd)) o.
+    Proof.
+      unfold group_by_nested_eval.
+      intros dn eqq.
+      unfold olift in eqq.
+      match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      apply some_lift in eqq2
+      ; destruct eqq2 as [d1 eqq2 d2].
+      assert (dn1:Forall (data_normalized h) l1).
+      { subst.
+        apply bdistinct_Forall.
+        eapply rmap_rproject_normalized; eauto.
+      } 
+      clear d1 d2 eqq2.
+      revert dn1 o eqq.
+      induction l1; simpl; intros dn1 o eqq.
+      - invcs eqq; constructor.
+      - invcs dn1.
+        match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      apply some_lift in eqq
+      ; destruct eqq as [d1 eqq ?]; subst.
+      specialize(IHl1 H2 _ eqq); clear eqq.
+      constructor; trivial.
+      match_case_in eqq2; [intros ? eqq3 | intros eqq3]
+      ; rewrite eqq3 in eqq2; try discriminate.
+      invcs eqq2.
+      simpl.
+      split; trivial.
+      eapply group_of_key_normalized; try eapply eqq3.
+      trivial.
+    Qed.
+    
+    Lemma group_to_partitions_normalized s a d : 
+      data_normalized h (fst a) ->
+      Forall (data_normalized h) (snd a) ->
+      group_to_partitions s a = Some d ->
+      data_normalized h d.
+    Proof.
+      unfold group_to_partitions.
+      intros dn1 dn2 eqq.
+      destruct a as [d1 dl1]; unfold fst in *.
+      destruct d1; try discriminate.
+      assert (deq:d = drec (rec_sort ((s, dcoll (snd (drec l, dl1))) :: l)))
+        by (invcs eqq; trivial).
+      clear eqq.
+      subst d.
+      apply dnrec_sort.
+      invcs dn1.
+      constructor; simpl in *; trivial.
+      constructor; trivial.
+    Qed.
+
     Lemma group_by_nested_eval_keys_partition_normalized l0 s l o :
       data_normalized h (dcoll l0) ->
       lift dcoll
@@ -881,15 +1014,34 @@ Section RGroupBy.
                  end) l0) = Some o
       -> data_normalized h o.
     Proof.
-      intros.
-      induction l0; simpl in H0.
-      - inversion H0; subst.
-        constructor; constructor.
-      - inversion H; clear H; subst.
-        inversion H2; clear H2; subst.
-        destruct a; try discriminate; simpl in *.
-        admit.
-    Admitted.
+      unfold group_by_nested_eval_keys_partition, to_partitions.
+      intros dn eqq.
+      apply some_lift in eqq.
+      destruct eqq as [d eqq ?]; subst.
+      unfold olift in eqq.
+      match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      invcs dn.
+      generalize (group_by_nested_eval_normalized _ _ _ H0 eqq2); intros dn2.
+      clear l0 eqq2 H0.
+      revert dn2 d eqq.
+      induction l1; intros dn2 d eqq.
+      - invcs eqq.
+        repeat constructor.
+      - invcs dn2.
+        specialize (IHl1 H2).
+        simpl in eqq.
+      match_case_in eqq; [intros ? eqq2 | intros eqq2]
+      ; rewrite eqq2 in eqq; try discriminate.
+      match_case_in eqq; [intros ? eqq3 | intros eqq3]
+      ; rewrite eqq3 in eqq; try discriminate.
+      invcs eqq.
+      specialize (IHl1 _ eqq3).
+      apply data_normalized_dcoll; split; trivial.
+      destruct H1.
+      eapply group_to_partitions_normalized; eauto.
+    Qed.
+
   End normalized.
 
 End RGroupBy.
