@@ -154,45 +154,125 @@ Section NRAEnvtoNNRCExt.
 
   Open Scope nraenv_scope.
 
-  Lemma test op vid venv:
-    nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv)
-    = algenv_to_nnrc (algenv_of_nraenv op) vid venv.
+  (* This is clearly not true *)
+  Example nraenv_to_nnrc_codepaths_different vid venv:
+    exists op,
+      ~ (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv)
+      = algenv_to_nnrc (algenv_of_nraenv op) vid venv).
   Proof.
-    revert vid venv; induction op; simpl; intros;
-    try reflexivity;
-    try (rewrite IHop1; rewrite IHop2; auto);
-    try (rewrite IHop; auto);
-    try (rewrite IHop3; reflexivity). (* join *)
-    unfold nnrc_group_by.
-    admit.
-  Admitted.
+    exists (NRAEnvGroupBy "a"%string nil%string NRAEnvID).
+    simpl; inversion 1.
+  Qed.
+
+  Lemma nnrc_core_eval_binop_eq h env b op1 op2 op1' op2' :
+    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+    nnrc_core_eval h env op2 = nnrc_core_eval h env op2' ->
+    nnrc_core_eval h env (NNRCBinop b op1 op2) =
+    nnrc_core_eval h env (NNRCBinop b op1' op2').
+  Proof.
+    intros eqq1 eqq2.
+    simpl.
+    rewrite eqq1, eqq2; trivial.
+  Qed.
+
+  Lemma nnrc_core_eval_unop_eq h env u op1 op1' :
+    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+    nnrc_core_eval h env (NNRCUnop u op1) =
+    nnrc_core_eval h env (NNRCUnop u op1').
+  Proof.
+    intros eqq.
+    simpl.
+    rewrite eqq; trivial.
+  Qed.
+
+    Lemma nnrc_core_eval_for_eq h env x op1 op2 op1' op2' :
+      nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+      (forall l,
+          nnrc_core_eval h env op1 = Some (dcoll l) ->
+          forall d,
+            In d l ->
+            nnrc_core_eval h  ((x,d)::env) op2 = nnrc_core_eval h  ((x,d)::env) op2') ->
+      nnrc_core_eval h env (NNRCFor x op1 op2) =
+      nnrc_core_eval h env (NNRCFor x op1' op2').
+  Proof.
+    intros eqq1 eqq2.
+    simpl.
+    rewrite <- eqq1; trivial.
+    match_destr.
+    match_destr.
+    f_equal.
+    apply rmap_ext; intros.
+    eauto.
+  Qed.
+
+  Lemma nnrc_core_eval_if_eq h env bop bop' op1 op2 op1' op2' :
+    nnrc_core_eval h env bop = nnrc_core_eval h env bop' ->
+    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+    nnrc_core_eval h env op2 = nnrc_core_eval h env op2' ->
+    nnrc_core_eval h env (NNRCIf bop op1 op2) =
+    nnrc_core_eval h env (NNRCIf bop' op1' op2').
+  Proof.
+    intros eqq1 eqq2 eqq3.
+    simpl.
+    rewrite eqq1.
+    apply olift_ext; intros.
+    match_destr.
+    match_destr.
+  Qed.
   
-  Lemma test2 h env op vid venv:
+  Lemma nnrc_core_eval_let_eq h env x op1 op2 op1' op2' :
+      nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+      (forall d,
+          nnrc_core_eval h env op1 = Some d ->
+            nnrc_core_eval h  ((x,d)::env) op2 = nnrc_core_eval h  ((x,d)::env) op2') ->
+      nnrc_core_eval h env (NNRCLet x op1 op2) =
+      nnrc_core_eval h env (NNRCLet x op1' op2').
+  Proof.
+    intros eqq1 eqq2.
+    simpl.
+    rewrite <- eqq1; trivial.
+    match_destr.
+    auto.
+  Qed.
+
+  Lemma nnrc_core_eval_either_eq h env x y eop eop' op1 op2 op1' op2' :
+      nnrc_core_eval h env eop = nnrc_core_eval h env eop' ->
+      (forall d,
+          nnrc_core_eval h env eop = Some (dleft d) ->
+            nnrc_core_eval h  ((x,d)::env) op1 = nnrc_core_eval h  ((x,d)::env) op1') ->
+      (forall d,
+          nnrc_core_eval h env eop = Some (dright d) ->
+            nnrc_core_eval h  ((y,d)::env) op2 = nnrc_core_eval h  ((y,d)::env) op2') ->
+      nnrc_core_eval h env (NNRCEither eop x op1 y op2) =
+      nnrc_core_eval h env (NNRCEither eop' x op1' y op2').
+  Proof.
+    intros eqq1 eqq2 eqq3.
+    simpl.
+    rewrite <- eqq1; trivial.
+    match_destr.
+    match_destr; auto.
+  Qed.
+
+  Theorem nraenv_to_nnrc_codepaths_equivalent h env op vid venv:
     nnrc_core_eval h env (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv))
     = nnrc_core_eval h env (algenv_to_nnrc (algenv_of_nraenv op) vid venv).
   Proof.
-    revert vid venv env; induction op; intros;
-    try reflexivity.
-    - simpl; rewrite IHop1; rewrite IHop2; auto.
-    - simpl; rewrite IHop; auto.
-    - simpl. rewrite IHop2.
-      destruct (nnrc_core_eval h env (algenv_to_nnrc (algenv_of_nraenv op2) vid venv));
-        [|reflexivity].
-      destruct d; simpl in *; try reflexivity.
-      f_equal; apply rmap_ext; intros.
-      rewrite IHop1; reflexivity.
-    - simpl (nnrc_ext_to_nnrc
-               (nraenv_to_nnrc_ext (NRAEnvMapConcat op1 op2) vid venv)).
-      
-      rewrite IHop2.
-      destruct (nnrc_core_eval h env (algenv_to_nnrc (algenv_of_nraenv op2) vid venv));
-        [|reflexivity].
-      destruct d; simpl in *; try reflexivity.
-      f_equal; apply rmap_ext; intros.
-      rewrite IHop1; reflexivity.
-    - 
-      rewrite (map_sem_correct h op1 dcenv denv l); trivial.
-      
+    Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq.
+    Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq.
+    Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq.
+
+    revert vid venv env; induction op; intros
+    ; simpl algenv_of_nraenv
+    ; simpl algenv_to_nnrc
+    ; simpl nnrc_ext_to_nnrc
+    ; simpl nraenv_to_nnrc_ext
+    ; eauto 4.
+    - apply nnrc_core_eval_unop_eq; auto.
+    - unfold nnrc_group_by
+    ; simpl algenv_of_nraenv
+    ; simpl algenv_to_nnrc
+    ; simpl nnrc_ext_to_nnrc
+    ; simpl nraenv_to_nnrc_ext.
     admit.
   Admitted.
   
@@ -210,7 +290,7 @@ Section NRAEnvtoNNRCExt.
     intros.
     unfold nnrc_ext_eval.
     unfold nraenv_eval.
-    rewrite test2.
+    rewrite nraenv_to_nnrc_codepaths_equivalent.
     apply nraenv_sem_correct; assumption.
   Qed.
 
