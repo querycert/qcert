@@ -1,3 +1,6 @@
+machine:
+  pre:
+    - export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
 dependencies:
   cache_directories:
     - "~/.opam"
