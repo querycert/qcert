@@ -20,6 +20,8 @@
 
 open Util
 
-let main = begin
+let main (s : string) = begin
+	print_endline "SQL source:";
+	print_endline s;
 	raise (Qcert_Error "Cannot yet handle SQL source.  Use -source-sexp for now")
 	end
