@@ -30,8 +30,10 @@ Section TNNRCOptimizer.
   Require Import NNRCSystem.
   Require Import NNRCOptimizer.
   Require Import OptimizerLogger.
+  Require Import OptimizerStep.
 
   Local Open Scope nnrc_scope.
+  Local Open Scope string.
   (* *************************** *)
 
     Ltac tcorrectness_prover :=
@@ -131,7 +133,7 @@ Section TNNRCOptimizer.
   Hint Rewrite @rew_size_correctness : rew_correct.
 
   (****************)
-
+      
   (* Java equivalent: NnrcOptimizer.tunshadow_preserves_fun *)
   Definition tunshadow_preserves_fun {fruntime:foreign_runtime} (e:nnrc) :=
     unshadow_simpl nil e.
@@ -143,28 +145,49 @@ Section TNNRCOptimizer.
     apply tunshadow_preserves_arrow.
   Qed.
 
+  Definition tunshadow_preserves_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "unshadow" (* name *)
+         "Renames variables to avoid shadowing" (* description *)
+         "tunshadow_preserves_fun" (* lemma name *)
+         tunshadow_preserves_fun (* lemma *).
+
+  Definition tunshadow_preserves_step_correct {model:basic_model}
+    := mkOptimizerStepModel tunshadow_preserves_step tunshadow_preserves_fun_correctness.
+
+
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tfor_nil_fun  {fruntime:foreign_runtime}(e:nnrc) :=
     match e with
     | NNRCFor x ‵{||} e2 => ‵{||}
     | _ => e
     end.
-
+  
   Lemma tfor_nil_fun_correctness {model:basic_model} (e:nnrc) :
     tnnrc_ext_rewrites_to e (tfor_nil_fun e).
   Proof.
     tprove_correctness e.
     apply tfor_nil_arrow.
   Qed.
-    
+
+  Definition tfor_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "for/nil" (* name *)
+         "Remove loop comprehensions over empty bags" (* description *)
+         "tfor_nil_fun" (* lemma name *)
+         tfor_nil_fun (* lemma *).
+
+  Definition tfor_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tfor_nil_step tfor_nil_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tfor_singleton_to_let_fun  {fruntime:foreign_runtime}(e:nnrc) :=
+  Definition tfor_singleton_to_let_fun  {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
     | NNRCFor x (NNRCUnop AColl e1) e2
       => NNRCUnop AColl (NNRCLet x e1 e2)
     | _ => e
     end.
-  
+
   Lemma tfor_singleton_to_let_fun_correctness {model:basic_model} (e:nnrc) :
     tnnrc_ext_rewrites_to e (tfor_singleton_to_let_fun e).
   Proof.
@@ -172,33 +195,63 @@ Section TNNRCOptimizer.
     apply tfor_singleton_to_let_arrow.
   Qed.
 
+  Definition tfor_singleton_to_let_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "for/singleton" (* name *)
+         "Lower a loop comprehension over a singleton into a singleton of a let" (* description *)
+         "tfor_singleton_to_let_step" (* lemma name *)
+         tfor_singleton_to_let_fun (* lemma *).
+  
+  Definition tfor_singleton_to_let_step_correct {model:basic_model}
+    := mkOptimizerStepModel tfor_singleton_to_let_step tfor_singleton_to_let_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tflatten_singleton_nnrc_fun  {fruntime:foreign_runtime}e
+  Definition tflatten_singleton_fun  {fruntime:foreign_runtime} (e:nnrc)
     := match e with
        | ♯flatten(‵{| e1 |}) => e1
        | _ => e
        end.
 
-  Lemma tflatten_singleton_nnrc_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tflatten_singleton_nnrc_fun e).
+  Lemma tflatten_singleton_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_ext_rewrites_to e (tflatten_singleton_fun e).
   Proof.
     tprove_correctness e.
     apply tflatten_singleton_nnrc_arrow.
   Qed.
 
+  Definition tflatten_singleton_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/singleton" (* name *)
+         "Simplify a flatten of a singleton bag" (* description *)
+         "tflatten_singleton_fun" (* lemma name *)
+         tflatten_singleton_fun (* lemma *).
+  
+  Definition tflatten_singleton_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_singleton_step tflatten_singleton_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tflatten_nil_nnrc_fun  {fruntime:foreign_runtime}e
+  Definition tflatten_nil_fun  {fruntime:foreign_runtime} (e:nnrc)
     := match e with
        | ♯flatten(‵{||}) => ‵{||}
        | _ => e
        end.
 
-  Lemma tflatten_nil_nnrc_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tflatten_nil_nnrc_fun e).
+  Lemma tflatten_nil_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_ext_rewrites_to e (tflatten_nil_fun e).
   Proof.
     tprove_correctness e.
     apply tflatten_nil_nnrc_arrow.
   Qed.
+
+  Definition tflatten_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/nil" (* name *)
+         "Simplify flatten of an empty bag" (* description *)
+         "tflatten_nil_fun" (* lemma name *)
+         tflatten_nil_fun (* lemma *).
+  
+  Definition tflatten_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_nil_step tflatten_nil_fun_correctness.
 
   Definition tsigma_to_if_fun  {fruntime:foreign_runtime}(e:nnrc) :=
     match e with
@@ -221,6 +274,16 @@ Section TNNRCOptimizer.
     tprove_correctness e.
     apply tsigma_to_if_arrow.
   Qed.
+
+  Definition tsigma_to_if_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "sigma/if" (* name *)
+         "???" (* description *)
+         "tsigma_to_if_fun" (* lemma name *)
+         tsigma_to_if_fun (* lemma *).
+
+  Definition tsigma_to_if_step_correct {model:basic_model}
+    := mkOptimizerStepModel tsigma_to_if_step tsigma_to_if_fun_correctness.
   
   (* {| e3 | $t2 ∈ ♯flatten({| e2 ? ‵{|$t1|} : ‵{||} | $t1 ∈ e1 |}) |}
        ⇒ ♯flatten({| e2 ? ‵{| LET $t2 := $t1 IN e3 ]|} : ‵{||} | $t1 ∈ e1 |}) *)
@@ -254,6 +317,16 @@ Section TNNRCOptimizer.
     apply tmap_sigma_fusion_samevar_arrow.
   Qed.
 
+    Definition tmap_sigma_fusion_samevar_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "sigma/same var fusion" (* name *)
+         "???" (* description *)
+         "tmap_sigma_fusion_samevar_fun" (* lemma name *)
+         tmap_sigma_fusion_samevar_fun (* lemma *).
+
+  Definition tmap_sigma_fusion_samevar_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_sigma_fusion_samevar_step tmap_sigma_fusion_samevar_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tdot_of_rec_fun  {fruntime:foreign_runtime}(e:nnrc) :=
     match e with
@@ -272,8 +345,18 @@ Section TNNRCOptimizer.
     apply tdot_of_rec.
   Qed.
 
+    Definition tdot_of_rec_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/rec" (* name *)
+         "Simplify lookup of a new record constructor" (* description *)
+         "tdot_of_rec_fun" (* lemma name *)
+         tdot_of_rec_fun (* lemma *).
+
+  Definition tdot_of_rec_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_of_rec_step tdot_of_rec_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrc_merge_concat_to_concat_fun  {fruntime:foreign_runtime}(e:nnrc)
+  Definition tmerge_concat_to_concat_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
        | (‵[| (s1, p1)|] ⊗ ‵[| (s2, p2)|])
          => if (equiv_decb s1 s2)
@@ -282,8 +365,8 @@ Section TNNRCOptimizer.
        | _ => e
        end.
 
-  Lemma tnnrc_merge_concat_to_concat_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tnnrc_merge_concat_to_concat_fun e).
+  Lemma tmerge_concat_to_concat_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_ext_rewrites_to e (tmerge_concat_to_concat_fun e).
   Proof.
     destruct e; simpl; try reflexivity.
     destruct b; simpl; try reflexivity.
@@ -296,8 +379,18 @@ Section TNNRCOptimizer.
     apply tnnrc_merge_concat_to_concat_arrow; trivial.
   Qed.
 
+    Definition tmerge_concat_to_concat_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "merge-concat->merge" (* name *)
+         "Simplify a merge-concat of two singleton records with different fields using concat" (* description *)
+         "tmerge_concat_to_concat_fun" (* lemma name *)
+         tmerge_concat_to_concat_fun (* lemma *).
+
+  Definition tmerge_concat_to_concat_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmerge_concat_to_concat_step tmerge_concat_to_concat_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrc_dot_of_concat_rec_fun  {fruntime:foreign_runtime}(e:nnrc)
+  Definition tdot_of_concat_rec_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
        | (NNRCUnop (ADot s) (NNRCBinop AConcat e1 (NNRCUnop (ARec s2) e2)))
          => if equiv_decb s s2
@@ -306,8 +399,8 @@ Section TNNRCOptimizer.
        | _ => e
        end.
 
-  Lemma tnnrc_dot_of_concat_rec_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tnnrc_dot_of_concat_rec_fun e).
+  Lemma tdot_of_concat_rec_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_ext_rewrites_to e (tdot_of_concat_rec_fun e).
   Proof.
     destruct e; simpl; try reflexivity.
     destruct u; simpl; try reflexivity.
@@ -322,6 +415,16 @@ Section TNNRCOptimizer.
     - apply tnnrc_dot_of_concat_rec_neq_arrow.
       trivial.
   Qed.
+
+    Definition tdot_of_concat_rec_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/concat/rec 2" (* name *)
+         "Simplifies lookup of a concatenation with a record constructor" (* description *)
+         "tdot_of_concat_rec_fun" (* lemma name *)
+         tdot_of_concat_rec_fun (* lemma *).
+
+  Definition tdot_of_concat_rec_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_of_concat_rec_step tdot_of_concat_rec_fun_correctness.
 
   (** Inlining *)
 
@@ -381,6 +484,17 @@ Section TNNRCOptimizer.
     apply tlet_inline_arrow.
   Qed.
 
+    Definition tinline_let_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "let inline" (* name *)
+         "Inline let statements heuristically deemed suitable for inlining" (* description *)
+         "tinline_let_fun" (* lemma name *)
+         tinline_let_fun (* lemma *).
+
+  Definition tinline_let_step_correct {model:basic_model}
+    := mkOptimizerStepModel tinline_let_step tinline_let_fun_correctness.
+
+
   (* push map through either and if *)
   (* Java equivalent: NnrcOptimizer.[same] *)
     Definition tfor_over_if_nil_fun  {fruntime:foreign_runtime}(e:nnrc)
@@ -398,6 +512,17 @@ Section TNNRCOptimizer.
     rewrite tfor_nil_arrow.
     reflexivity.
   Qed.
+
+    Definition tfor_over_if_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "for/if/else nil" (* name *)
+         "Push loop comprehension over an if statement through the if statement when the else clause just constructs an empty bag" (* description *)
+         "tfor_over_if_nil_fun" (* lemma name *)
+         tfor_over_if_nil_fun (* lemma *).
+
+  Definition tfor_over_if_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tfor_over_if_nil_step tfor_over_if_nil_fun_correctness.
+
   
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tfor_over_either_nil_fun  {fruntime:foreign_runtime} (e:nnrc)
@@ -421,57 +546,97 @@ Section TNNRCOptimizer.
     reflexivity.
   Qed.
 
+    Definition tfor_over_either_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "for/either/right nil" (* name *)
+         "Push loop comprehension over an either statement through the either statement when the right clause just constructs an empty bag" (* description *)
+         "tfor_over_either_nil_fun" (* lemma name *)
+         tfor_over_either_nil_fun (* lemma *).
+
+  Definition tfor_over_either_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tfor_over_either_nil_step tfor_over_either_nil_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrcunop_over_either_nil_fun  {fruntime:foreign_runtime}(e:nnrc)
+  Definition tunop_over_either_const_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
        | NNRCUnop op (NNRCEither e1 xl el xr (NNRCConst d)) =>
          NNRCEither e1 xl (NNRCUnop op el) xr (NNRCUnop op (NNRCConst d))
        | _ => e
        end.
 
-  Lemma tnnrcunop_over_either_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tnnrcunop_over_either_nil_fun e).
+  Lemma tunop_over_either_const_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_ext_rewrites_to e (tunop_over_either_const_fun e).
   Proof.
     tprove_correctness e.
     apply tnnrcunop_over_either_arrow.
   Qed.
 
+    Definition tunop_over_either_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "unary/either/right const" (* name *)
+         "Push unary operators through either when the right branch is a constant" (* description *)
+         "tunop_over_either_const_fun" (* lemma name *)
+         tunop_over_either_const_fun (* lemma *).
+
+  Definition tunop_over_either_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tunop_over_either_const_step tunop_over_either_const_fun_correctness.
+
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrcunop_over_if_nil_fun  {fruntime:foreign_runtime}(e:nnrc)
+  Definition tunop_over_if_const_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
        | NNRCUnop op (NNRCIf e1 e2 (NNRCConst d)) =>
          NNRCIf e1 (NNRCUnop op e2) (NNRCUnop op (NNRCConst d))
        | _ => e
        end.
 
-  Lemma tnnrcunop_over_if_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tnnrcunop_over_if_nil_fun e).
+  Lemma tunop_over_if_const_fun_correctness {model:basic_model} (e:nnrc) :
+    tnnrc_ext_rewrites_to e (tunop_over_if_const_fun e).
   Proof.
     tprove_correctness e.
     apply tnnrcunop_over_if_arrow.
   Qed.
+  
+  Definition tunop_over_if_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "unary/if/else const" (* name *)
+         "Push unary operators through if when the else branch is a constant" (* description *)
+         "tunop_over_if_const_fun" (* lemma name *)
+         tunop_over_if_const_fun (* lemma *).
+
+  Definition tunop_over_if_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tunop_over_if_const_step tunop_over_if_const_fun_correctness.
 
     (* optimizations for rproject *)
 
   (* Java equivalent: NnrcOptimizer.[same] *)
-   Definition tnnrcproject_nil_fun {fruntime:foreign_runtime} (e:nnrc) :=
+   Definition tproject_nil_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject nil) e₁
         => NNRCConst (drec nil)
       | _ => e
     end.
 
-  Definition tnnrcproject_nil_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_nil_fun p.
+  Definition tproject_nil_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_nil_fun p.
   Proof.
     tprove_correctness p.
     apply tnnrcproject_nil.
   Qed.
 
-  Hint Rewrite @tnnrcproject_nil_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_nil_fun_correctness : toptim_correct.
+
+    Definition tproject_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/nil" (* name *)
+         "Simplify record projection over empty bags" (* description *)
+         "tproject_nil_fun" (* lemma name *)
+         tproject_nil_fun (* lemma *).
+
+  Definition tproject_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_nil_step tproject_nil_fun_correctness.
 
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrcproject_over_const_fun {fruntime:foreign_runtime} (e:nnrc) :=
+  Definition tproject_over_const_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject sl)
           (NNRCConst (drec l))
@@ -479,17 +644,27 @@ Section TNNRCOptimizer.
       | _ => e
     end.
 
-  Definition tnnrcproject_over_const_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_over_const_fun p.
+  Definition tproject_over_const_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_over_const_fun p.
   Proof.
     tprove_correctness p.
     apply tnnrcproject_over_const.
   Qed.
 
-  Hint Rewrite @tnnrcproject_over_const_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_over_const_fun_correctness : toptim_correct.
+  
+  Definition tproject_over_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/const rec" (* name *)
+         "Simplify record projection over constant records" (* description *)
+         "tproject_over_const_fun" (* lemma name *)
+         tproject_over_const_fun (* lemma *).
+
+  Definition tproject_over_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_over_const_step tproject_over_const_fun_correctness.
   
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrcproject_over_rec_fun {fruntime:foreign_runtime} (e:nnrc) :=
+  Definition tproject_over_rec_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject sl)
           (NNRCUnop (ARec s) p₁)
@@ -499,18 +674,28 @@ Section TNNRCOptimizer.
       | _ => e
     end.
 
-  Definition tnnrcproject_over_rec_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_over_rec_fun p.
+  Definition tproject_over_rec_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_over_rec_fun p.
   Proof.
     tprove_correctness p.
     - apply tnnrcproject_over_rec_in; trivial.
     - apply tnnrcproject_over_rec_nin; trivial. 
   Qed.
 
-  Hint Rewrite @tnnrcproject_over_rec_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_over_rec_fun_correctness : toptim_correct.
+
+  Definition tproject_over_rec_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/rec" (* name *)
+         "Simplify record projection over a record constructor" (* description *)
+         "tproject_over_rec_fun" (* lemma name *)
+         tproject_over_rec_fun (* lemma *).
+
+  Definition tproject_over_rec_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_over_rec_step tproject_over_rec_fun_correctness.
 
   (* Java equivalent: NnrcOptimizer.[same] *)
-   Definition tnnrcproject_over_concat_r_fun {fruntime:foreign_runtime} (e:nnrc) :=
+   Definition tproject_over_concat_r_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject sl)
                (NNRCBinop AConcat
@@ -523,18 +708,28 @@ Section TNNRCOptimizer.
       | _ => e
     end.
 
-  Definition tnnrcproject_over_concat_r_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_over_concat_r_fun p.
+  Definition tproject_over_concat_r_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_over_concat_r_fun p.
   Proof.
     tprove_correctness p.
     - apply tnnrcproject_over_concat_rec_r_in; trivial.
     - apply tnnrcproject_over_concat_rec_r_nin; trivial.
   Qed.
                   
-  Hint Rewrite @tnnrcproject_over_concat_r_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_over_concat_r_fun_correctness : toptim_correct.
 
+  Definition tproject_over_concat_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/concat/right rec" (* name *)
+         "Simplify record projection over concatenation with a record constructor" (* description *)
+         "tproject_over_concat_r_fun" (* lemma name *)
+         tproject_over_concat_r_fun (* lemma *).
+
+  Definition tproject_over_concat_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_over_concat_r_step tproject_over_concat_r_fun_correctness.
+  
   (* Java equivalent: NnrcOptimizer.[same] *)
-     Definition tnnrcproject_over_concat_l_fun {fruntime:foreign_runtime} (e:nnrc) :=
+     Definition tproject_over_concat_l_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject sl)
                (NNRCBinop AConcat
@@ -547,17 +742,27 @@ Section TNNRCOptimizer.
       | _ => e
     end.
 
-  Definition tnnrcproject_over_concat_l_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_over_concat_l_fun p.
+  Definition tproject_over_concat_l_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_over_concat_l_fun p.
   Proof.
     tprove_correctness p.
     apply tnnrcproject_over_concat_rec_l_nin; trivial.
   Qed.
                   
-  Hint Rewrite @tnnrcproject_over_concat_l_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_over_concat_l_fun_correctness : toptim_correct.
+
+  Definition tproject_over_concat_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/concat/left rec" (* name *)
+         "Simplify record projection over concatenation with a record constructor" (* description *)
+         "tproject_over_concat_l_fun" (* lemma name *)
+         tproject_over_concat_l_fun (* lemma *).
+
+  Definition tproject_over_concat_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_over_concat_l_step tproject_over_concat_l_fun_correctness.
 
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tnnrcproject_over_nnrcproject_fun {fruntime:foreign_runtime} (e:nnrc) :=
+  Definition tproject_over_project_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject sl1)
           (NNRCUnop (ARecProject sl2) p1)
@@ -565,17 +770,27 @@ Section TNNRCOptimizer.
       | _ => e
     end.
 
-  Definition tnnrcproject_over_nnrcproject_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_over_nnrcproject_fun p.
+  Definition tproject_over_project_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_over_project_fun p.
   Proof.
     tprove_correctness p.
     apply tnnrcproject_over_nnrcproject.
   Qed.
 
-  Hint Rewrite @tnnrcproject_over_nnrcproject_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_over_project_fun_correctness : toptim_correct.
+
+  Definition tproject_over_project_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/project" (* name *)
+         "Fuse nested record projections" (* description *)
+         "tproject_over_project_fun" (* lemma name *)
+         tproject_over_project_fun (* lemma *).
+
+  Definition tproject_over_project_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_over_project_step tproject_over_project_fun_correctness.
 
   (* Java equivalent: NnrcOptimizer.[same] *)
-   Definition tnnrcproject_over_either_fun {fruntime:foreign_runtime} (e:nnrc) :=
+   Definition tproject_over_either_fun {fruntime:foreign_runtime} (e:nnrc) :=
     match e with
       | NNRCUnop (ARecProject sl)
           (NNRCEither p xl p₁ xr p₂)
@@ -583,18 +798,28 @@ Section TNNRCOptimizer.
       | _ => e
     end.
 
-  Definition tnnrcproject_over_either_fun_correctness {model:basic_model} p :
-    p ⇒ᶜ tnnrcproject_over_either_fun p.
+  Definition tproject_over_either_fun_correctness {model:basic_model} p :
+    p ⇒ᶜ tproject_over_either_fun p.
   Proof.
     tprove_correctness p.
     apply tnnrcproject_over_either.
   Qed.
 
-  Hint Rewrite @tnnrcproject_over_either_fun_correctness : toptim_correct.
+  Hint Rewrite @tproject_over_either_fun_correctness : toptim_correct.
 
+  Definition tproject_over_either_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "project/either/" (* name *)
+         "Push record projection through either" (* description *)
+         "tproject_over_either_fun" (* lemma name *)
+         tproject_over_either_fun (* lemma *).
+
+  Definition tproject_over_either_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproject_over_either_step tproject_over_either_fun_correctness.
+  
   (* count optimizations *)
   (* Java equivalent: NnrcOptimizer.[same] *)
-  Definition tcount_over_flat_for_either_if_nil_fun  {fruntime:foreign_runtime}(e:nnrc)
+  Definition tcount_over_flat_for_either_if_nil_fun  {fruntime:foreign_runtime} (e:nnrc)
     := match e with
        | (♯count(♯flatten(NNRCFor v
                               ehead (NNRCEither e1 xl
@@ -613,6 +838,16 @@ Section TNNRCOptimizer.
     apply tcount_over_flat_for_either_if_nil_arrow.
   Qed.
 
+  Definition tcount_over_flat_for_either_if_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/flatten/for/either/right if/else nil" (* name *)
+         "Remove work that is not needed when only the bag count is needed" (* description *)
+         "tcount_over_flat_for_either_if_nil_fun" (* lemma name *)
+         tcount_over_flat_for_either_if_nil_fun (* lemma *).
+
+  Definition tcount_over_flat_for_either_if_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_flat_for_either_if_nil_step tcount_over_flat_for_either_if_nil_fun_correctness.
+  
   (* Java equivalent: NnrcOptimizer.[same] *)
   Definition tcount_over_flat_for_either_either_nil_fun  {fruntime:foreign_runtime}(e:nnrc)
     := match e with
@@ -634,43 +869,133 @@ Section TNNRCOptimizer.
     apply tcount_over_flat_for_either_either_nil_arrow.
   Qed.
 
+    Definition tcount_over_flat_for_either_either_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/flatten/for/either/right either/right nil" (* name *)
+         "Remove work that is not needed when only the bag count is needed" (* description *)
+         "tcount_over_flat_for_either_either_nil_fun" (* lemma name *)
+         tcount_over_flat_for_either_either_nil_fun (* lemma *).
+
+  Definition tcount_over_flat_for_either_either_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_flat_for_either_either_nil_step tcount_over_flat_for_either_either_nil_fun_correctness.  
+                                                            
+  (* list of all optimizations *)
+    Definition tnnrc_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nnrc)
+      := [
+          tfor_nil_step
+          ; tfor_singleton_to_let_step
+          ; tflatten_singleton_step
+          ; tflatten_nil_step
+          ; tsigma_to_if_step
+          ; tmap_sigma_fusion_samevar_step
+          ; tdot_of_rec_step
+          ; tmerge_concat_to_concat_step
+          ; tdot_of_concat_rec_step
+          ; tinline_let_step
+          ; tfor_over_if_nil_step
+          ; tfor_over_either_nil_step
+          ; tunop_over_either_const_step
+          ; tunop_over_if_const_step
+          ; tproject_nil_step
+          ; tproject_over_const_step
+          ; tproject_over_rec_step
+          ; tproject_over_concat_r_step
+          ; tproject_over_concat_l_step
+          ; tproject_over_project_step
+          ; tproject_over_either_step
+          ; tcount_over_flat_for_either_if_nil_step
+          ; tcount_over_flat_for_either_either_nil_step
+        ].
+
+    Definition tnnrc_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrc_ext_rewrites_to)
+      := [
+          tfor_nil_step_correct
+          ; tfor_singleton_to_let_step_correct
+          ; tflatten_singleton_step_correct
+          ; tflatten_nil_step_correct
+          ; tsigma_to_if_step_correct
+          ; tmap_sigma_fusion_samevar_step_correct
+          ; tdot_of_rec_step_correct
+          ; tmerge_concat_to_concat_step_correct
+          ; tdot_of_concat_rec_step_correct
+          ; tinline_let_step_correct
+          ; tfor_over_if_nil_step_correct
+          ; tfor_over_either_nil_step_correct
+          ; tunop_over_either_const_step_correct
+          ; tunop_over_if_const_step_correct
+          ; tproject_nil_step_correct
+          ; tproject_over_const_step_correct
+          ; tproject_over_rec_step_correct
+          ; tproject_over_concat_r_step_correct
+          ; tproject_over_concat_l_step_correct
+          ; tproject_over_project_step_correct
+          ; tproject_over_either_step_correct
+          ; tcount_over_flat_for_either_if_nil_step_correct
+          ; tcount_over_flat_for_either_either_nil_step_correct
+        ].
+
+  Lemma tnnrc_optim_model_list_complete {model:basic_model}
+    : optim_model_list_complete tnnrc_optim_list tnnrc_optim_model_list.
+  Proof.
+    optim_correct_list_complete_prover.
+  Qed.
+
+  Definition tnnrc_optim_list_correct {model:basic_model}
+    : optim_list_correct tnnrc_ext_rewrites_to tnnrc_optim_list
+    := optim_list_correct_from_model tnnrc_optim_model_list_complete.
+
+  Lemma tnnrc_optim_list_distinct {fruntime:foreign_runtime}:
+    optim_list_distinct tnnrc_optim_list.
+  Proof.
+    apply optim_list_distinct_prover.
+    vm_compute.
+    apply eq_refl.
+  Qed.
 
   (* *************************** *)
 
-  Local Open Scope string.
-  
   (* Java equivalent: NnrcOptimizer.head_rew_list *)
-  Definition head_rew_list {fruntime:foreign_runtime} : list (string*(nnrc -> nnrc)) :=
-    [   ("tinline_let_fun", tinline_let_fun)
-        ; ("tcount_over_flat_for_either_either_nil_fun", tcount_over_flat_for_either_either_nil_fun)
-        ; ("tcount_over_flat_for_either_if_nil_fun", tcount_over_flat_for_either_if_nil_fun)
-        ; ("tnnrc_merge_concat_to_concat_fun", tnnrc_merge_concat_to_concat_fun)
-        ; ("tnnrc_dot_of_concat_rec_fun", tnnrc_dot_of_concat_rec_fun)
-        ; ("tdot_of_rec_fun", tdot_of_rec_fun)
-        ; ("tflatten_singleton_nnrc_fun", tflatten_singleton_nnrc_fun)
-        ; ("tflatten_nil_nnrc_fun", tflatten_nil_nnrc_fun)
-        ; ("tfor_singleton_to_let_fun", tfor_singleton_to_let_fun)
-        ; ("tnnrcunop_over_either_nil_fun", tnnrcunop_over_either_nil_fun)
-        ; ("tnnrcunop_over_if_nil_fun", tnnrcunop_over_if_nil_fun)
-        ; ("tfor_over_either_nil_fun", tfor_over_either_nil_fun)
-        ; ("tfor_over_if_nil_fun", tfor_over_if_nil_fun)
-        ; ("tfor_nil_fun", tfor_nil_fun)
-        ; ("tmap_sigma_fusion_samevar_fun", tmap_sigma_fusion_samevar_fun)
-        ; ("tnnrcproject_nil_fun", tnnrcproject_nil_fun)
-        ; ("tnnrcproject_over_const_fun", tnnrcproject_over_const_fun)
-        ; ("tnnrcproject_over_rec_fun", tnnrcproject_over_rec_fun)
-        ; ("tnnrcproject_over_concat_r_fun", tnnrcproject_over_concat_r_fun)
-        ; ("tnnrcproject_over_concat_l_fun", tnnrcproject_over_concat_l_fun)
-        ; ("tnnrcproject_over_nnrcproject_fun", tnnrcproject_over_nnrcproject_fun)
-        ; ("tnnrcproject_over_either_fun", tnnrcproject_over_either_fun)
-    ].
+  Definition head_rew_list {fruntime:foreign_runtime} : list string
+    := [
+        optim_step_name tinline_let_step
+        ; optim_step_name tcount_over_flat_for_either_either_nil_step
+        ; optim_step_name tcount_over_flat_for_either_if_nil_step
+        ; optim_step_name tmerge_concat_to_concat_step
+        ; optim_step_name tdot_of_concat_rec_step
+        ; optim_step_name tdot_of_rec_step
+        ; optim_step_name tflatten_singleton_step
+        ; optim_step_name tflatten_nil_step
+        ; optim_step_name tfor_singleton_to_let_step
+        ; optim_step_name tunop_over_either_const_step
+        ; optim_step_name tunop_over_if_const_step
+        ; optim_step_name tfor_over_either_nil_step
+        ; optim_step_name tfor_over_if_nil_step
+        ; optim_step_name tfor_nil_step
+        ; optim_step_name tmap_sigma_fusion_samevar_step
+        ; optim_step_name tproject_nil_step
+        ; optim_step_name tproject_over_const_step
+        ; optim_step_name tproject_over_rec_step
+        ; optim_step_name tproject_over_concat_r_step
+        ; optim_step_name tproject_over_concat_l_step
+        ; optim_step_name tproject_over_project_step
+        ; optim_step_name tproject_over_either_step
+      ].
 
+  Remark head_rew_list_all_valid  {fruntime:foreign_runtime}
+    : valid_optims tnnrc_optim_list head_rew_list = (head_rew_list,nil).
+  Proof.
+    vm_compute; trivial.
+  Qed.
+
+  Definition head_rew_list_optim {fruntime:foreign_runtime}
+    := project_optims tnnrc_optim_list head_rew_list.
+  
   (* Java equivalent: NnrcOptimizer.head_rew *)
   Definition head_rew 
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nnrc} (name:string)
     : nnrc -> nnrc :=
-    apply_steps ("nnrc_head" ++ name) head_rew_list.
+    run_optimizer_steps ("nnrc_head" ++ name) head_rew_list_optim.
 
   Lemma head_rew_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc}
@@ -678,47 +1003,20 @@ Section TNNRCOptimizer.
     tnnrc_ext_rewrites_to p (head_rew name p).
   Proof.
     unfold head_rew.
-    rewrite tnnrcproject_over_either_fun_correctness at 1.
-    rewrite tnnrcproject_over_nnrcproject_fun_correctness at 1.
-    rewrite tnnrcproject_over_concat_l_fun_correctness at 1.
-    rewrite tnnrcproject_over_concat_r_fun_correctness at 1.
-    rewrite tnnrcproject_over_rec_fun_correctness at 1.
-    rewrite tnnrcproject_over_const_fun_correctness at 1.
-    rewrite tnnrcproject_nil_fun_correctness at 1.
-    rewrite tmap_sigma_fusion_samevar_fun_correctness at 1.
-    rewrite tfor_nil_fun_correctness at 1.
-    rewrite tfor_over_if_nil_fun_correctness at 1.
-    rewrite tfor_over_either_nil_fun_correctness at 1.
-    rewrite tnnrcunop_over_if_nil_fun_correctness at 1.
-    rewrite tnnrcunop_over_either_nil_fun_correctness at 1.
-    rewrite tfor_singleton_to_let_fun_correctness at 1.
-    rewrite tflatten_nil_nnrc_fun_correctness at 1.
-    rewrite tflatten_singleton_nnrc_fun_correctness at 1.
-    rewrite tdot_of_rec_fun_correctness at 1.
-    rewrite tnnrc_dot_of_concat_rec_fun_correctness at 1.
-    rewrite tnnrc_merge_concat_to_concat_fun_correctness at 1.
-    rewrite tcount_over_flat_for_either_if_nil_fun_correctness at 1.
-    rewrite tcount_over_flat_for_either_either_nil_fun_correctness at 1.
-    rewrite tinline_let_fun_correctness at 1.
-    red; intros; split; [apply H|idtac]; intros.
-    unfold head_rew_list.
-    unfold apply_steps.
-    rewrite hide_use_eq.
-    simpl fold_right.
-    repeat rewrite optimizer_step_result.
-    unfold snd.
-    reflexivity.
+    apply run_optimizer_steps_correct.
+    unfold head_rew_list_optim.
+    apply project_optims_list_correct.
+    apply tnnrc_optim_list_correct.
   Qed.
 
   (* Java equivalent: NnrcOptimizer.trew (inlined) *)
   Definition rew1 {fruntime:foreign_runtime} (p: nnrc) :=
-    tunshadow_preserves_fun p.
+    optim_step_step tunshadow_preserves_step p.
   
   Lemma rew1_correctness {model:basic_model} (p:nnrc) :
     tnnrc_ext_rewrites_to p (rew1 p).
   Proof.
-    unfold rew1.
-    apply tunshadow_preserves_fun_correctness.
+    apply (optim_step_model_step_correct _ tunshadow_preserves_step_correct).
   Qed.
     
   Definition rew2
@@ -729,13 +1027,8 @@ Section TNNRCOptimizer.
         {model:basic_model} {logger:optimizer_logger string nnrc} (p:nnrc) :
     tnnrc_ext_rewrites_to p (rew2 p).
   Proof.
-    unfold rew2.
-    assert (tnnrc_ext_rewrites_to p (tnnrc_map_deep (head_rew "2") p)).
-    apply tnnrc_map_deep_correctness.
-    intro p'.
-    rewrite head_rew_correctness at 1.
-    reflexivity.
-    assumption.
+    apply tnnrc_map_deep_correctness; intros.
+    apply head_rew_correctness.
   Qed.
 
   Definition rew3
@@ -752,15 +1045,11 @@ Section TNNRCOptimizer.
         {model:basic_model} {logger:optimizer_logger string nnrc} p:
     tnnrc_ext_rewrites_to p (trew p).
   Proof.
+      Hint Resolve rew_size_correctness rew_iter_correctness.
+      Hint Resolve rew1_correctness rew2_correctness.
     unfold trew.
-    rewrite rew1_correctness at 1.
-    rewrite rew_size_correctness at 1; try reflexivity.
-    intros p1.
-    rewrite rew_iter_correctness at 1; try reflexivity.
-    intros p2.
-    rewrite rew2_correctness at 1; try reflexivity.
+    transitivity (rew1 p); eauto.
   Qed.
-  
 
   Require Import NNRCMR.
   Require Import ForeignReduceOps.
