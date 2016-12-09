@@ -7,5 +7,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/presto-parser-0.152.3.jar" sourcepath="libsrc/presto-parser-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/slice-0.7.jar"/>
 	<classpathentry kind="lib" path="lib/nanohttpd-2.3.1.jar" sourcepath="libsrc/nanohttp-src.zip"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.4.5.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
