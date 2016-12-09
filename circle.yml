@@ -16,4 +16,4 @@ dependencies:
 
 test:
   override:
-    - eval `opam config env` && make -j3 && make jsapi
+    - eval `opam config env` && make -j1 && make jsapi
