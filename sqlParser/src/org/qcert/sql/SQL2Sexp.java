@@ -15,7 +15,12 @@
  */
 package org.qcert.sql;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +28,13 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
 
-import util.FileUtil;
-import util.SExpParser;
-import util.SExpression;
-
 import com.facebook.presto.sql.parser.CaseInsensitiveStream;
 import com.facebook.presto.sql.parser.SqlBaseLexer;
 import com.facebook.presto.sql.parser.StatementSplitter;
+
+import util.FileUtil;
+import util.SExpParser;
+import util.SExpression;
 
 /**
  * Main program for translating SQL into S-expression form for import into qcert.
@@ -121,8 +126,8 @@ public class SQL2Sexp {
 
 	/** Main program */
 	public static void main(String[] args) throws Exception {
-		if (args.length == 2 && "-single".equals(args[0])) {
-			processSingle(args[1]);
+		if (args.length == 1 && "-single".equals(args[0])) {
+			processSingle();
 			return;
 		}
 		List<String> sources = new ArrayList<>();
@@ -196,9 +201,9 @@ public class SQL2Sexp {
 	/**
 	 * Special version of process to return the s-exp form of a single sql file (used as a subprocess of qcert)
 	 */
-	private static void processSingle(String file) {
+	private static void processSingle() {
 		try {
-			String query = FileUtil.readFile(new File(file));
+			String query = readStdin();
 			query = convertDateIntervals(query);
 			String result = PrestoEncoder.parseAndEncode(query, false);
 			System.out.println(result);
@@ -208,6 +213,23 @@ public class SQL2Sexp {
 				msg = e.toString();
 			System.out.println(msg);
 		}
+	}
+
+	/** Read stdin into a String until eos (in a pipeline) 
+	 * @throws IOException */
+	private static String readStdin() throws IOException {
+		InputStreamReader srdr = new InputStreamReader(System.in);
+		StringWriter swtr = new StringWriter();
+		PrintWriter wtr = new PrintWriter(swtr);
+		BufferedReader rdr = new BufferedReader(srdr);
+		String line = rdr.readLine();
+		while (line != null) {
+			wtr.println(line);
+			line = rdr.readLine();
+		}
+		rdr.close();
+		wtr.close();
+		return swtr.toString();
 	}
 
 	/**
