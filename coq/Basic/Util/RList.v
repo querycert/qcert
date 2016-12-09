@@ -1411,6 +1411,17 @@ Section RList.
     eauto.
   Qed.
 
+  Lemma NoDup_dec {A:Type} {dec:EqDec A eq} (l:list A): {NoDup l} + {~NoDup l}.
+  Proof.
+    induction l.
+    - left; constructor.
+    - destruct (in_dec equiv_dec a l).
+      + right; inversion 1; congruence.
+      + destruct IHl.
+        * left; constructor; auto.
+        * right; inversion 1; congruence.
+  Defined.
+  
   Section disj.
     Definition disjoint {A:Type} (l1 l2:list A)
       := forall x, In x l1 -> In x l2 -> False.

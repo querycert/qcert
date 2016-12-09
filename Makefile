@@ -225,6 +225,7 @@ MODULES = \
 	Backend/DNNRCDatasetRewrites \
 	Backend/DNNRCtoScala \
 	Compiler/Optimizer/OptimizerLogger \
+	Compiler/Optimizer/OptimizerStep \
 	Compiler/Optimizer/NRAEnvOptimFunc \
 	Compiler/Optimizer/NNRCOptimizer \
 	Compiler/Optimizer/TNNRCOptimizer \

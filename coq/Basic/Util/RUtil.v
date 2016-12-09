@@ -311,6 +311,14 @@ Section RUtil.
       - apply H0; assumption.
     Qed.
 
+    Lemma Forall_app_inv {A : Type} {P : A -> Prop} (l1 l2 : list A) :
+      Forall P (l1 ++ l2) ->   Forall P l1 /\ Forall P l2.
+  Proof.
+    repeat rewrite Forall_forall.
+    intros Finn; split; intros ? inn
+    ; apply Finn; rewrite in_app_iff; tauto.
+  Qed.
+
     Lemma Forall_map {A B} P (f:A->B) l:
       Forall P (map f l) <->
       Forall (fun x => P (f x)) l.

@@ -17,7 +17,12 @@
 Section OptimizerLogger.
 
   Require Import String List.
+  Require Import Setoid.
+  Require Import Equivalence.
 
+  Require Import Utils.
+  Require Import OptimizerStep.
+  
   Class optimizer_logger (Name:Set) (D:Set) 
     := mk_optimizer_logger {
            optimizer_logger_token_type:Set
@@ -71,6 +76,78 @@ Section OptimizerLogger.
       ; logStep t name input output := t
       ; logEndPass t output := t
     } .
+
+      Definition run_optimizer_step {lang:Set} 
+               {logger:optimizer_logger string lang}
+               (step:OptimizerStep lang)
+               (input:optimizer_logger_token_type*lang)
+    : optimizer_logger_token_type*lang
+    := let res := (optim_step_step step) (snd input) in
+       let log := logStep (fst input) (optim_step_name step) (snd input) res in
+       (log, res).
+
+    Lemma run_optimizer_step_result
+          {lang:Set} 
+          {logger:optimizer_logger string lang}
+          (step:OptimizerStep lang)
+          (input:optimizer_logger_token_type*lang) :
+      snd (run_optimizer_step step input) = (optim_step_step step) (snd input).
+  Proof.
+    unfold run_optimizer_step.
+    simpl; reflexivity.
+  Qed.
+
+  Definition run_optimizer_steps
+             {lang:Set} 
+             {logger:optimizer_logger string lang}
+             (passName:string)
+             (steps:list (OptimizerStep lang))
+             (input:lang) : lang
+    := let tok := logStartPass passName input in
+       let '(tok2, res) := fold_right run_optimizer_step (tok,input) steps in
+       let tok := logEndPass tok2 res in
+       hide_use tok res.
+
+    Lemma run_optimizer_steps_fold_correct
+        {lang:Set}
+        {R:relation lang}
+        {pre:PreOrder R}
+        {logger:optimizer_logger string lang}
+        (steps:list (OptimizerStep lang))
+        (tok:optimizer_logger_token_type)
+        (input:lang) :
+      optim_list_correct R steps ->
+      R input (snd (fold_right run_optimizer_step (tok,input) steps)).
+    Proof.
+      revert input tok.
+      (* reverse induction *)
+      induction steps using rev_ind; simpl; intros input tok pf.
+      - reflexivity.
+      - rewrite fold_right_app.
+        simpl.
+        apply Forall_app_inv in pf.
+        destruct pf as [pf1 pf2].
+        invcs pf2.
+        etransitivity; eauto.
+    Qed.
+    
+  Lemma run_optimizer_steps_correct
+        {lang:Set}
+        {R:relation lang}
+        {pre:PreOrder R}
+        {logger:optimizer_logger string lang}
+        (passName:string)
+        (steps:list (OptimizerStep lang))
+        (input:lang) :
+    optim_list_correct R steps ->
+    R input (run_optimizer_steps passName steps input).
+  Proof.
+    unfold run_optimizer_steps.
+    simpl.
+    intros pf.
+    generalize (run_optimizer_steps_fold_correct steps (logStartPass passName input) input pf).
+    match_destr.
+Qed.    
        
 End OptimizerLogger.
 
