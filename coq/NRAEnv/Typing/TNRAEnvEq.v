@@ -459,9 +459,7 @@ Section TNRAEnvEq.
     rewrite lift_tnraenv_eq_to_talgenv_eq.
     rewrite lift_tnraenv_eq_to_talgenv_eq in H1.
     simpl.
-    unfold group_by.
-    unfold map_to_rec.
-    unfold project.
+    unfold group_by_with_env.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
 

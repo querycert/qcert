@@ -967,7 +967,6 @@ Section OQLtoNRAEnv.
     - apply nraenv_of_oql_expr_proper; trivial.
   Qed.
 
-  Print rec_concat_sort.
   Lemma rec_concat_sort_domain_app_commutatuve_equiv {K} {odt:ODT} {B} l1 l2 :
     (equivlist (domain (rec_concat_sort l1 l2)) (domain l2 ++ @domain K B l1)).
   Proof.

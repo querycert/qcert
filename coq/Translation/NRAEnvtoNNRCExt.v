@@ -185,7 +185,7 @@ Section NRAEnvtoNNRCExt.
     rewrite eqq; trivial.
   Qed.
 
-    Lemma nnrc_core_eval_for_eq h env x op1 op2 op1' op2' :
+  Lemma nnrc_core_eval_for_eq h env x op1 op2 op1' op2' :
       nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
       (forall l,
           nnrc_core_eval h env op1 = Some (dcoll l) ->
@@ -260,7 +260,6 @@ Section NRAEnvtoNNRCExt.
     Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq.
     Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq.
     Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq.
-
     revert vid venv env; induction op; intros
     ; simpl algenv_of_nraenv
     ; simpl algenv_to_nnrc
@@ -268,13 +267,8 @@ Section NRAEnvtoNNRCExt.
     ; simpl nraenv_to_nnrc_ext
     ; eauto 4.
     - apply nnrc_core_eval_unop_eq; auto.
-    - unfold nnrc_group_by
-    ; simpl algenv_of_nraenv
-    ; simpl algenv_to_nnrc
-    ; simpl nnrc_ext_to_nnrc
-    ; simpl nraenv_to_nnrc_ext.
-    admit.
-  Admitted.
+    - apply nnrc_core_eval_group_by_eq; auto.
+  Qed.
   
   Theorem nraenv_sem_correct (h:list (string*string)) (op:nraenv) (env:bindings) (vid venv:var) dcenv (did denv:data) :
     prefix CONST_PREFIX vid = false ->
@@ -294,10 +288,10 @@ Section NRAEnvtoNNRCExt.
     apply nraenv_sem_correct; assumption.
   Qed.
 
-  Lemma nraenv_to_nnrc_ext_no_free_vars (op: algenv):
+  Lemma nraenv_to_nnrc_ext_no_free_vars (op: nraenv):
     forall (vid venv: var),
     forall v,
-      In v (nrc_free_vars (nraenv_to_nnrc_ext op vid venv)) ->
+      In v (nnrc_free_vars (nraenv_to_nnrc_ext op vid venv)) ->
       (prefix CONST_PREFIX v = true
       (* It is also true that: *)
       (* /\ In v (mkConstants (nraenv_constants op)) *)
@@ -305,7 +299,7 @@ Section NRAEnvtoNNRCExt.
       )
       \/ v = vid \/ v = venv.
   Proof.
-    algenv_cases (induction op) Case.
+    nraenv_cases (induction op) Case.
     - Case "NRAEnvID"%string.
       intros;
       simpl in *; repeat rewrite in_app_iff in *;
@@ -378,7 +372,7 @@ Section NRAEnvtoNNRCExt.
       + specialize (IHop1 ((fresh_var "tsel$" (vid :: venv :: nil))) venv v).
         clear IHop2.
         revert H IHop1.
-        generalize (nrc_free_vars
+        generalize (nnrc_free_vars
                       (nraenv_to_nnrc_ext op1 (fresh_var "tsel$" (vid :: venv :: nil)) venv)).
         intros.
         apply remove_inv in H.
@@ -454,6 +448,7 @@ Section NRAEnvtoNNRCExt.
       rewrite prefix_nil.
       reflexivity.
     - Case "NRAEnvEnv"%string.
+      simpl.
       intros vid venv v.
       simpl.
       intros Hv.
@@ -477,10 +472,72 @@ Section NRAEnvtoNNRCExt.
       destruct H.
       specialize (IHop vid ((fresh_var "tmape$" (vid :: venv :: nil))) v H).
       intuition.
+    - Case "NRAEnvFlatMap"%string.
+      intros vid venv v Hv.
+      simpl in Hv.
+      rewrite in_app_iff in Hv.
+      destruct Hv.
+      + auto.
+      + apply remove_inv in H.
+        destruct (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv v); intuition.
+    - Case "NRAEnvJoin"%string.
+      intros vid venv v Hv.
+      simpl in Hv.
+      rewrite in_app_iff in Hv.
+      destruct Hv.
+      + case_eq (fresh_var2 "tprod$" "tprod$" (vid :: venv :: nil)); intros.
+        rewrite H0 in H. simpl in H.
+        rewrite in_app_iff in H.
+        destruct (string_eqdec s0 s0); try congruence.
+        destruct H.
+        * auto.
+        * destruct (string_eqdec s0 s); try congruence; subst; clear e.
+          apply remove_inv in H.
+          elim H; clear H; intros.
+          rewrite in_app_iff in H.
+          elim H; clear H; intros.
+          auto.
+          auto.
+          apply remove_inv in H.
+          elim H; clear H; intros.
+          rewrite in_app_iff in H.
+          elim H; clear H; intros.
+          auto.
+          simpl in H.
+          elim H; clear H; intros; auto.
+      + specialize (IHop1 ((fresh_var "tsel$" (vid :: venv :: nil))) venv v).
+        clear IHop2.
+        revert H IHop1.
+        generalize (nnrc_free_vars
+                      (nraenv_to_nnrc_ext op1 (fresh_var "tsel$" (vid :: venv :: nil)) venv)).
+        intros.
+        apply remove_inv in H.
+        elim H; clear H; intros.
+        rewrite In_app_iff in H; simpl in H.
+        intuition.
+    - Case "NRAEnvProject"%string.
+      intros vid venv v Hv.
+      Opaque fresh_var.
+      simpl in Hv.
+      rewrite in_app_iff in Hv.
+      destruct Hv.
+      + auto.
+      + intros;
+        simpl in *; repeat rewrite in_app_iff in *;
+        destruct (IHop (fresh_var "tmap$" (vid :: venv :: nil)) venv v); intuition;
+        destruct (string_eqdec (fresh_var "tmap$" (vid :: venv :: nil))
+                               (fresh_var "tmap$" (vid :: venv :: nil))); try congruence;
+        simpl in *; contradiction.
+    - Case "NRAEnvGroupBy"%string.
+      intros vid venv v Hv.
+      Opaque fresh_var.
+      simpl in Hv.
+      simpl in *; repeat rewrite in_app_iff in *;
+      intuition.
   Qed.
 
   Section Top.
-    Definition nraenv_to_nnrc_ext_top (q:algenv) (init_vid init_venv:var) : nrc :=
+    Definition nraenv_to_nnrc_ext_top (q:nraenv) (init_vid init_venv:var) : nnrc :=
       NNRCLet init_venv (NNRCConst (drec nil))
              (NNRCLet init_vid (NNRCConst dunit)
                      (nraenv_to_nnrc_ext q init_vid init_venv)).
@@ -492,8 +549,8 @@ Section NRAEnvtoNNRCExt.
 
   Require Import Omega.
 
-  Theorem algenvToNNNRC_size op vid venv : 
-    nrc_size (nraenv_to_nnrc_ext op vid venv) <= 10 * algenv_size op.
+  Theorem nraenvToNNNRC_size op vid venv : 
+    nnrc_size (nraenv_to_nnrc_ext op vid venv) <= 12 * nraenv_size op.
   Proof.
     Transparent fresh_var2.
     revert vid venv.
@@ -516,11 +573,17 @@ Section NRAEnvtoNNRCExt.
     - omega.
     - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
     - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
+    - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
+      specialize (IHop2 vid venv); omega.
+    - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv);
+      specialize (IHop2 vid venv); specialize (IHop3 vid venv); try omega.
+    - specialize (IHop vid venv); omega.
+    - specialize (IHop vid venv); omega.
   Qed.
 
   End size.
 
-End NRAEnvtoNNNRCExt.
+End NRAEnvtoNNRCExt.
 
 (* 
 *** Local Variables: ***

@@ -354,7 +354,6 @@ Section NRAEnvIgnore.
     induction e; simpl in *; auto;
     try (elim H; clear H; intros; auto).
     - try (elim H0; clear H0; intros; auto).
-    - intuition.
   Qed.
   
   Lemma nraenv_ignores_env_swap (e:nraenv) :

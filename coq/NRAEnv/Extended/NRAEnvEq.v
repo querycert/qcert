@@ -280,9 +280,7 @@ Section NRAEnvEq.
     unfold Proper, respectful.
     intros; subst.
     rewrite nraenv_eq_algenv_eq in *.
-    simpl. unfold group_by.
-    unfold project.
-    unfold map_to_rec.
+    simpl. unfold group_by_with_env.
     rewrite H1 by trivial.
     reflexivity.
   Qed.

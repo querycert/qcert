@@ -87,7 +87,7 @@ Section NRAEnv.
        ⟩
       ({ [ t4 : χ⟨[t3]⟩(op) ] } × (χ⟨[t2:ID]⟩(χ⟨[t1:ID]⟩(♯distinct(Π[sl](op)))))) *)
   
-  Definition group_by (g:string) (sl:list string) (op : algenv) : algenv :=
+  Definition group_by_no_env (g:string) (sl:list string) (op : algenv) : algenv :=
     ANMap
       (ANBinop AConcat
                (ANUnop (ADot "1") (ANUnop (ADot "2") ANID))
@@ -104,10 +104,33 @@ Section NRAEnv.
          (map_to_rec "2" (map_to_rec "1" (ANUnop ADistinct (project sl op))))).
 
   (* Uses the environment to store the result of [op] -- less crazy inefficient *)
+  (* g: partition name ; sl: list of grouping attributes *)
+  (* Γ[g][sl](op) ==
+      (χ⟨ ID ⊕ [ g : σ⟨ ENV.$key = π[sl](ID) ⟩(ENV.$pregroup) ◯ᵉ ([$key:ID] ⊕ ENV) ] ⟩
+        (♯distinct(Π[sl](ENV.$pregroup)))) ◯ᵉ [ $pregroup : op ]
+
+ *)
   Definition group_by_with_env (g:string) (sl:list string) (op : algenv) : algenv :=
-    let op_result := ANUnop (ADot "$pregroup") ANEnv in
-    let group_over_op_result := group_by g sl op_result in
-    ANAppEnv group_over_op_result (ANBinop AConcat ANEnv (ANUnop (ARec "$pregroup") op)).
+    let op_pregroup := ANUnop (ADot "$pregroup") ANEnv in
+    ANAppEnv
+      (ANMap
+         (ANBinop AConcat
+                  (ANUnop (ARec g)
+                          (ANAppEnv (ANSelect (ANBinop AEq
+                                                       (ANUnop (ARecProject sl) ANID)
+                                                       (ANUnop (ADot "$key") ANEnv))
+                                              op_pregroup
+                                    )
+                                    (ANBinop AConcat (ANUnop (ARec "$key") ANID) ANEnv)
+                          )
+                  )
+                  ANID
+         )
+         (ANUnop ADistinct (project sl op_pregroup))
+      )
+      (ANUnop (ARec "$pregroup") op).
+
+  Require Import RAlgEnvEq.
 
   (* Unnest *)
 
@@ -174,7 +197,7 @@ Section NRAEnv.
       | NRAEnvFlatMap e1 e2 => flat_map (algenv_of_nraenv e1) (algenv_of_nraenv e2)
       | NRAEnvJoin e1 e2 e3 => join (algenv_of_nraenv e1) (algenv_of_nraenv e2) (algenv_of_nraenv e3)
       | NRAEnvProject ls e1 => project ls (algenv_of_nraenv e1)
-      | NRAEnvGroupBy s ls e1 => group_by s ls (algenv_of_nraenv e1)
+      | NRAEnvGroupBy s ls e1 => group_by_with_env s ls (algenv_of_nraenv e1)
     end.
 
   Fixpoint nraenv_of_algenv (a:algenv) : nraenv :=
@@ -256,8 +279,8 @@ Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   | Case_aux c "NRAEnvEither"
   | Case_aux c "NRAEnvEitherConcat"
   | Case_aux c "NRAEnvApp"
+  | Case_aux c "NRAEnvGetConstant"
   | Case_aux c "NRAEnvEnv"
-  | Case_aux c "NRAEnvCEnv"
   | Case_aux c "NRAEnvAppEnv"
   | Case_aux c "NRAEnvMapEnv"
   | Case_aux c "NRAEnvFlatMap"

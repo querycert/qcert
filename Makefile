@@ -176,6 +176,7 @@ MODULES = \
 	Translation/ForeignToReduceOps \
 	Translation/NRAtoNNRC \
 	Translation/NRAEnvtoNNRC \
+	Translation/NRAEnvtoNNRCExt \
 	Translation/NNRCtoPattern \
 	Translation/NNRCtoNNRCMR \
 	Translation/NNRCtoDNNRC \
