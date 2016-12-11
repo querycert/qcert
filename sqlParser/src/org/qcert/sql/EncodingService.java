@@ -25,14 +25,20 @@ import fi.iki.elonen.NanoHTTPD;
  * A small nonohttpd-based server that does SQL parse-encode (to sexp) via http get requests.
  */
 public class EncodingService extends NanoHTTPD {
-	public EncodingService(int port) {
-		super(port);
-	}
-	
 	public static void main(String[] args) throws IOException {
 		int port = args.length == 0 ? 9879 : Integer.parseInt(args[0]);
 		EncodingService svc = new EncodingService(port);
 		svc.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+	}
+	
+	public EncodingService(int port) {
+		super(port);
+	}
+
+	private Response respond(Response.Status status, String content) {
+		Response response = newFixedLengthResponse(status, NanoHTTPD.MIME_PLAINTEXT, content);
+    	response.addHeader("Access-Control-Allow-Origin", "*");
+    	return response;
 	}
 
 	/* (non-Javadoc)
@@ -47,25 +53,30 @@ public class EncodingService extends NanoHTTPD {
                 session.parseBody(files);
             } catch (IOException ioe) {
             	System.out.println("I/O Exception parsing body");
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
+                return respond(Response.Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
             } catch (ResponseException re) {
             	System.out.println("Response Exception parsing body");
-                return newFixedLengthResponse(re.getStatus(), NanoHTTPD.MIME_PLAINTEXT, re.getMessage());
+                return respond(re.getStatus(), re.getMessage());
             }
             String query = files.get("postData");
             if (query == null) {
             	System.out.println("No postData in body");
-                return newFixedLengthResponse(Response.Status.BAD_REQUEST, NanoHTTPD.MIME_PLAINTEXT, "Invalid input");
+                return respond(Response.Status.BAD_REQUEST, "Invalid input");
             }
             try { 
-            	return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, PrestoEncoder.parseAndEncode(query, false));
+            	String encoded = PrestoEncoder.parseAndEncode(query, false);
+            	System.out.println("Started with:");
+            	System.out.println(query);
+            	System.out.println("Encoded to:");
+            	System.out.println(encoded);
+				return respond(Response.Status.OK, encoded);
             } catch (Throwable t) {
             	t.printStackTrace();
-            	return newFixedLengthResponse(Response.Status.BAD_REQUEST, NanoHTTPD.MIME_PLAINTEXT, "*ERROR*: " + t.getMessage());
+            	return respond(Response.Status.BAD_REQUEST, "*ERROR*: " + t.getMessage());
             }
         } else {
         	System.out.println("Rejecting non-post request");
-            return newFixedLengthResponse(Response.Status.BAD_REQUEST, NanoHTTPD.MIME_PLAINTEXT, "Only POST requests accepted");
+        	return respond(Response.Status.BAD_REQUEST, "Only POST requests accepted");
         }
 	}
 }
