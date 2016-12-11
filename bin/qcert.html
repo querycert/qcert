@@ -4,6 +4,7 @@
     <title>Q*cert online form</title>
     <meta charset = "UTF-8" />
     <script src="../lib/qcertJS.js"></script>
+    <script src="../sqlParser/js/preMain.js"></script>
     <script>
       var entityMap = {
       	"&": "&amp;",
@@ -24,7 +25,7 @@
                       'ascii' : document.getElementById("charset").value === "Ascii",
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
-        document.getElementById("result").innerHTML = escapeHtml(main(input).result);
+        document.getElementById("result").innerHTML = escapeHtml(preMain(input).result);
       }
       function clearButton() {
         document.getElementById("result").innerHTML = "";
