@@ -99,6 +99,7 @@ let global_config_of_json j =
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexpall (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
+  Js.Optdef.iter j##.sourcesexp (fun b -> gconf.gconf_source_sexp <- Js.to_bool b);
   Js.Optdef.iter j##.ascii
     (fun b -> if Js.to_bool b then
       PrettyIL.set_ascii gconf.gconf_pretty_config ()
