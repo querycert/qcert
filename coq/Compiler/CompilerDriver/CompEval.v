@@ -126,6 +126,11 @@ Section CompEval.
     Definition eval_nraenv (q:nraenv) (cenv: list (string*data)) : option data
       := NRAEnv.nraenv_eval h (rec_sort cenv) q (drec nil) dunit.
 
+    (* Language: nnrc_core *)
+    (* Note: eval_nnrc_core assumes constant environment has been prefixed with 'CONST$' *)
+    Definition eval_nnrc_core (q:nnrc_core) (cenv: list (string*data)) : option data
+      := lift_nnrc_core (@nnrc_core_eval _ h (mkConstants (rec_sort cenv))) q.
+
     (* Language: nnrc *)
     (* Note: eval_nnrc assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_nnrc (q:nnrc) (cenv: list (string*data)) : option data
@@ -196,6 +201,9 @@ Section CompEval.
       Definition eval_nraenv_world (q:nraenv) (world:list data) : option data :=
         eval_nraenv q (mkWorld world).
 
+      Definition eval_nnrc_core_world (q:nnrc_core) (world:list data) : option data :=
+        eval_nnrc_core q (mkWorld world).
+
       Definition eval_nnrc_world (q:nnrc) (world:list data) : option data :=
         eval_nnrc q (mkWorld world).
 
@@ -248,6 +256,7 @@ Section CompEval.
       | Q_nra q => lift_output (eval_nra q cenv)
       | Q_nraenv_core q => lift_output (eval_nraenv_core q cenv)
       | Q_nraenv q => lift_output (eval_nraenv q cenv)
+      | Q_nnrc_core q => lift_output (eval_nnrc_core q cenv)
       | Q_nnrc q => lift_output (eval_nnrc q cenv)
       | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
       | Q_cldmr q => lift_output (eval_cldmr q cenv)
@@ -272,6 +281,7 @@ Section CompEval.
       | Q_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nraenv_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nraenv _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_nnrc_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))

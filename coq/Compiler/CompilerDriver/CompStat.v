@@ -109,6 +109,11 @@ Section CompStat.
       (("nnrcmr_length", dnat (Z_of_nat (List.length q.(mr_chain))))
          :: nil).
 
+  Definition stat_nnrc_core (q: nnrc_core) : data :=
+    drec
+      (("nnrc_core_size", dnat (Z_of_nat (lift_nnrc_core nnrc_size q)))
+         :: nil).
+
   Definition stat_nnrc (q: nnrc) : data :=
     drec
       (("nnrc_size", dnat (Z_of_nat (nnrc_size q)))
@@ -213,6 +218,14 @@ Section CompStat.
          :: ("nnrcmr_optim_time", dstring t)
          :: nil).
 
+  Definition stat_tree_nnrc_core (q: nnrc_core) : data :=
+    let (t, q') := time nnrc_core_optim q in
+    drec
+      (("nnrc_core_no_optim", stat_nnrc_core q)
+         :: ("nnrc_core_optim", stat_nnrc_core q')
+         :: ("nnrc_core_optim_time", dstring t)
+         :: nil).
+
   Definition stat_tree_nnrc (q: nnrc) : data :=
     let (t, q') := time nnrc_optim q in
     drec
@@ -224,9 +237,9 @@ Section CompStat.
   Definition stat_tree_body_nra (q:nra) : data :=
     match stat_nra q with
     | drec l =>
-      let (t, q') := time nra_to_nnrc q in
-      drec (l ++ ("nra_to_nnrc", stat_tree_nnrc q')
-              :: ("nra_to_nnrc_time", dstring t)
+      let (t, q') := time nra_to_nnrc_core q in
+      drec (l ++ ("nra_to_nnrc_core", stat_tree_nnrc_core q')
+              :: ("nra_to_nnrc_core_time", dstring t)
               :: nil)
     | s => s
     end.
@@ -242,10 +255,10 @@ Section CompStat.
   Definition stat_tree_body_nraenv_core (q:nraenv_core) : data :=
     match stat_nraenv_core q with
     | drec l =>
-      let (t_nnrc, q_nnrc) := time nraenv_core_to_nnrc q in
+      let (t_nnrc, q_nnrc) := time nraenv_core_to_nnrc_core q in
       let (t_nra, q_nra) := time nraenv_core_to_nra q in
-      drec (l ++ ("nraenv_core_to_nnrc", stat_tree_nnrc q_nnrc)
-              :: ("nraenv_core_to_nnrc_time", dstring t_nnrc)
+      drec (l ++ ("nraenv_core_to_nnrc_core", stat_tree_nnrc_core q_nnrc)
+              :: ("nraenv_core_to_nnrc_core_time", dstring t_nnrc)
               :: ("nraenv_core_to_nra", stat_tree_nra q_nra)
               :: ("nraenv_core_to_nra_time", dstring t_nra)
               :: nil)
@@ -346,6 +359,7 @@ Section CompStat.
         | Q_nra q => stat_nra q
         | Q_nraenv_core q => stat_nraenv_core q
         | Q_nraenv q => stat_nraenv q
+        | Q_nnrc_core q => stat_nnrc_core q
         | Q_nnrc q => stat_nnrc q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_cldmr q => stat_cldmr q
@@ -372,6 +386,7 @@ Section CompStat.
         | Q_nra q => stat_tree_nra q
         | Q_nraenv_core q => stat_tree_nraenv_core q
         | Q_nraenv q => stat_tree_nraenv q
+        | Q_nnrc_core q => stat_tree_nnrc_core q
         | Q_nnrc q => stat_tree_nnrc q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_cldmr q => stat_tree_cldmr q

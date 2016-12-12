@@ -761,6 +761,22 @@ Section NNRCExt.
   Qed.
 
   End prop.
+
+  Section core.
+    Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
+    Program Definition nnrc_to_nnrc_core (e:nnrc) : nnrc_core :=
+      nnrc_ext_to_nnrc e.
+    Next Obligation.
+      apply nnrc_ext_to_nnrc_is_core.
+    Defined.
+
+    Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
+      proj1_sig e.
+
+    Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
+      f (proj1_sig e).
+    
+  End core.
   
 End NNRCExt.
 

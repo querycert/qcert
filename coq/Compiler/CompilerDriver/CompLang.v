@@ -52,6 +52,7 @@ Section CompLang.
   Definition nra := alg.
   Definition nraenv_core := algenv.
   Definition nraenv := nraenv.
+  Definition nnrc_core := nnrc_core.
   Definition nnrc := nnrc.
   Definition nnrcmr := nnrcmr.
   Definition cldmr := cld_mrl.
@@ -72,6 +73,7 @@ Section CompLang.
     | L_nra : language
     | L_nraenv_core : language
     | L_nraenv : language
+    | L_nnrc_core : language
     | L_nnrc : language
     | L_nnrcmr : language
     | L_cldmr : language
@@ -93,6 +95,7 @@ Section CompLang.
     | Q_nra : nra -> query
     | Q_nraenv_core : nraenv_core -> query
     | Q_nraenv : nraenv -> query
+    | Q_nnrc_core : nnrc_core -> query
     | Q_nnrc : nnrc -> query
     | Q_nnrcmr : nnrcmr -> query
     | Q_cldmr : cldmr -> query
@@ -115,6 +118,7 @@ Section CompLang.
     | Case_aux c "Q_nra"%string
     | Case_aux c "Q_nraenv_core"%string
     | Case_aux c "Q_nraenv"%string
+    | Case_aux c "Q_nnrc_core"%string
     | Case_aux c "Q_nnrc"%string
     | Case_aux c "Q_nnrcmr"%string
     | Case_aux c "Q_cldmr"%string
@@ -139,7 +143,8 @@ Section CompLang.
     | "lambda_nra"%string => L_lambda_nra
     | "nra"%string => L_nra
     | "nraenv_core"%string => L_nraenv_core
-    | "nraenv"%string => L_nraenv_core
+    | "nraenv"%string => L_nraenv
+    | "nnrc_core"%string => L_nnrc_core
     | "nnrc"%string => L_nnrc
     | "nnrcmr"%string => L_nnrcmr
     | "cldmr"%string => L_cldmr
@@ -164,6 +169,7 @@ Section CompLang.
     | L_nra => "nra"%string
     | L_nraenv_core => "nraenv_core"%string
     | L_nraenv => "nraenv"%string
+    | L_nnrc_core => "nnrc_core"%string
     | L_nnrc => "nnrc"%string
     | L_nnrcmr => "nnrcmr"%string
     | L_cldmr => "cldmr"%string
@@ -187,6 +193,7 @@ Section CompLang.
     | Q_nra _ => L_nra
     | Q_nraenv_core _ => L_nraenv_core
     | Q_nraenv _ => L_nraenv
+    | Q_nnrc_core _ => L_nnrc_core
     | Q_nnrc _ => L_nnrc
     | Q_nnrcmr _ => L_nnrcmr
     | Q_cldmr _ => L_cldmr
@@ -219,6 +226,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_nra"%string
   | Case_aux c "L_nraenv_core"%string
   | Case_aux c "L_nraenv"%string
+  | Case_aux c "L_nnrc_core"%string
   | Case_aux c "L_nnrc"%string
   | Case_aux c "L_nnrcmr"%string
   | Case_aux c "L_cldmr"%string

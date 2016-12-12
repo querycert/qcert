@@ -90,7 +90,7 @@ let fold_design (dds:(string * string) list) (last_expr:string) (last_inputs: ch
     last_inputs
 
 let cloudant_compile_from_nra harness nrule op h =
-  let mr = QDriver.nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+  let mr = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
   let (design_docs, (last_expr, last_inputs)) = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (QDriver.nnrcmr_to_cldmr [] mr) in
   let harnessed_design_docs = List.map (fun doc -> stringify_designdoc (add_harness_to_designdoc harness h doc)) design_docs in
   fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
@@ -102,7 +102,7 @@ let cloudant_compile_from_nnrcmr harness nrule nnrcmr h =
   fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
 
 let cloudant_compile_no_harness_from_nra nrule op =
-  let mr = QDriver.nraenv_core_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
+  let mr = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim op in
   let (design_docs, (last_expr, last_inputs)) = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (QDriver.nnrcmr_to_cldmr [] mr) in
   fold_design (List.map stringify_designdoc design_docs) (Util.string_of_char_list last_expr) last_inputs
 
