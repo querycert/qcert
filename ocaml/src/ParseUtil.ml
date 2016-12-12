@@ -86,6 +86,7 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_nra -> raise (Qcert_Error "No parser for NRA available")
   | Compiler.L_nraenv_core -> ("NRAEnvCore", Compiler.Q_nraenv_core (parse_nraenv_sexp f))
   | Compiler.L_nraenv -> raise (Qcert_Error "No parser for NRAEnv available")
+  | Compiler.L_nnrc_core -> ("NNRCCore", Compiler.Q_nnrc_core (parse_nnrc_sexp f))
   | Compiler.L_nnrc -> ("NNRC", Compiler.Q_nnrc (parse_nnrc_sexp f))
   | Compiler.L_nnrcmr -> ("NNRCMR", Compiler.Q_nnrcmr (parse_nnrcmr_sexp f))
   | Compiler.L_cldmr -> ("CldMR", Compiler.Q_cldmr (parse_cldmr_sexp f))

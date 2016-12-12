@@ -44,6 +44,7 @@ val get_cld_config : lang_config -> CloudantUtil.cld_config
 val suffix_nra : unit -> string
 val suffix_nraenv : unit -> string
 val suffix_nrasexp : unit -> string
+val suffix_nnrc_core : unit -> string
 val suffix_nnrc : unit -> string
 val suffix_nnrcsexp : unit -> string
 val suffix_dnnrc_dataset : unit -> string

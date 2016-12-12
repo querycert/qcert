@@ -802,7 +802,9 @@ let rec pretty_nnrc_aux p sym ff n =
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	(pretty_nnrc_aux p sym) n0
 	 (Util.string_of_char_list v1) (pretty_nnrc_aux p sym) n1
-	 (Util.string_of_char_list v2) (pretty_nnrc_aux p sym) n2
+	(Util.string_of_char_list v2) (pretty_nnrc_aux p sym) n2
+  | Hack.NNRCGroupBy (g,atts,n1) ->
+      fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_aux 0 sym) n1
 
 let pretty_nnrc greek margin n =
   let conf = make_pretty_config greek margin in
@@ -841,7 +843,6 @@ let pretty_reduce_op_to_string op =
   | Hack.RedOpMax typ -> "max"
   | Hack.RedOpArithMean typ -> "arithmean"
   | Hack.RedOpStats typ -> "stats"
-
 
 let pretty_nnrcmr_job_aux sym ff mr =
   let distributed = "distributed" in
@@ -984,6 +985,8 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
              (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
              plug body
 	     (pretty_list (pretty_dnnrc_aux ann plug p sym) ",") (List.map snd arglist)
+  | Hack.DNNRCGroupBy (a,g,atts,n1) ->
+      fprintf ff "@[<hv 2>%agroup by@ %a%a@[<hv 2>(%a)@]@]" ann a (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_dnnrc_aux ann plug 0 sym) n1
 
 let pretty_dnnrc ann plug greek margin n =
   let conf = make_pretty_config greek margin in
@@ -1133,6 +1136,7 @@ let pretty_query pconf q =
   | Compiler.Q_nra q -> pretty_nra greek margin q
   | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin (QDriver.nraenv_core_to_nraenv q)
   | Compiler.Q_nraenv q -> pretty_nraenv greek margin q
+  | Compiler.Q_nnrc_core q -> pretty_nnrc greek margin q
   | Compiler.Q_nnrc q -> pretty_nnrc greek margin q
   | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin q
   | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
