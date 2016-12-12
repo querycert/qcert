@@ -174,7 +174,7 @@ Section NRAEnv.
     change (forall x y : nraenv,  {x = y} + {x <> y}).
     decide equality;
       try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
-  Qed.
+  Defined.
 
   Fixpoint algenv_of_nraenv (e:nraenv) : algenv :=
     match e with
