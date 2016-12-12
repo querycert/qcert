@@ -3,4 +3,5 @@
 *.js
 *.s-sql
 *_stats.json
+*.error
 tpcds*
