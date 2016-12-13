@@ -25,7 +25,7 @@ Section NRAEnvOptimFunc.
 
   Require Import Utils BasicSystem.
   Require Import NRAEnvSystem.
-  Require Import OptimizerLogger.
+  Require Import OptimizerStep OptimizerLogger.
 
   Open Scope nraenv_scope.
   
@@ -139,7 +139,7 @@ Section NRAEnvOptimFunc.
   End rewriter.
 
   Section dup.
-    Fixpoint nodupA_checker {bm:basic_model} (p:nraenv) : bool
+    Fixpoint nodupA_checker {fruntime:foreign_runtime} (p:nraenv) : bool
     := match p with
        | NRAEnvUnop ADistinct _ => true
        | NRAEnvBinop AMinus p₁ p₂ => nodupA_checker p₂
@@ -189,7 +189,7 @@ Section NRAEnvOptimFunc.
         apply bdistinct_NoDup.
     Qed.
 
-    Definition dup_elim_fun {bm:basic_model} (p:nraenv) :=
+    Definition dup_elim_fun {fruntime:foreign_runtime} (p:nraenv) :=
       match p with
       | NRAEnvUnop ADistinct q  =>
         if nodupA_checker q then q else p
@@ -297,6 +297,15 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tand_comm_fun_correctness : optim_correct.
 
+  Definition tand_comm_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "and commute" (* name *)
+         "Swap the arguments to the boolean and operator" (* description *)
+         "tand_comm_fun" (* lemma name *)
+         tand_comm_fun (* lemma *).
+
+  Definition tand_comm_step_correct {model:basic_model}
+    := mkOptimizerStepModel tand_comm_step tand_comm_fun_correctness.
 
   (* σ{P1 ∧ P2}(P) ⇒ₓ σ{P2 ∧ P1}(P) *) (* XXX Why neessary ? *)
 
@@ -315,6 +324,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tselect_and_comm_fun_correctness : optim_correct.
 
+  Definition tselect_and_comm_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "select/and swap" (* name *)
+         "Swap the arguments to the boolean operator when it is used in a selection" (* description *)
+         "tselect_and_comm_fun" (* lemma name *)
+         tselect_and_comm_fun (* lemma *).
+
+  Definition tselect_and_comm_step_correct {model:basic_model}
+    := mkOptimizerStepModel tselect_and_comm_step tselect_and_comm_fun_correctness.
+
   (* σ{P1}(σ{P2}(P3)) ⇒ₓ σ{P2 ∧ P1}(P3)) *)
 
   Definition tselect_and_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -332,9 +351,19 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tselect_and_fun_correctness : optim_correct.
 
+  Definition tselect_and_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "select/select fusion" (* name *)
+         "Fuse nested selections into a single selection using a conjunction" (* description *)
+         "tselect_and_fun" (* lemma name *)
+         tselect_and_fun (* lemma *).
+
+  Definition tselect_and_step_correct {model:basic_model}
+    := mkOptimizerStepModel tselect_and_step tselect_and_fun_correctness.
+
   (* [ a1 : p1; a2 : p2 ].a2 ⇒ₓ p2 *)
 
-  Definition tenvdot_from_duplicate_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tdot_from_duplicate_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvUnop (ADot s2)
                (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1) op1) (NRAEnvUnop (ARec s2') op2)) =>
@@ -345,17 +374,27 @@ Section NRAEnvOptimFunc.
       | _ => p
     end.
 
-  Lemma tenvdot_from_duplicate_r_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvdot_from_duplicate_r_fun p.
+  Lemma tdot_from_duplicate_r_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdot_from_duplicate_r_fun p.
   Proof.
     tprove_correctness p. 
     apply tenvdot_from_duplicate_r_arrow.
   Qed.
-  Hint Rewrite @tenvdot_from_duplicate_r_fun_correctness : optim_correct.
+  Hint Rewrite @tdot_from_duplicate_r_fun_correctness : optim_correct.
+
+  Definition tdot_from_duplicate_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/concat/rec right dup" (* name *)
+         "Simplifies field lookup of a concatenation with a record creation of that field" (* description *)
+         "tdot_from_duplicate_r_fun" (* lemma name *)
+         tdot_from_duplicate_r_fun (* lemma *).
+
+  Definition tdot_from_duplicate_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_from_duplicate_r_step tdot_from_duplicate_r_fun_correctness.
 
   (* [ a1 : p1; a2 : p2 ].a1 ⇒ₓ p1 *)
 
-  Definition tenvdot_from_duplicate_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tdot_from_duplicate_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvUnop (ADot s1)
                (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1') op1) (NRAEnvUnop (ARec s2) op2)) =>
@@ -366,30 +405,49 @@ Section NRAEnvOptimFunc.
       | _ => p
     end.
 
-  Lemma tenvdot_from_duplicate_l_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvdot_from_duplicate_l_fun p.
+  Lemma tdot_from_duplicate_l_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tdot_from_duplicate_l_fun p.
   Proof.
     tprove_correctness p. 
     apply tenvdot_from_duplicate_l_arrow.
     assumption.
   Qed.
-  Hint Rewrite @tenvdot_from_duplicate_l_fun_correctness : optim_correct.
+  Hint Rewrite @tdot_from_duplicate_l_fun_correctness : optim_correct.
 
+  Definition tdot_from_duplicate_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/concat/rec left dup" (* name *)
+         "Simplifies field lookup of a concatenation with a record creation of that field" (* description *)
+         "tdot_from_duplicate_l_fun" (* lemma name *)
+         tdot_from_duplicate_l_fun (* lemma *).
+
+  Definition tdot_from_duplicate_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_from_duplicate_l_step tdot_from_duplicate_l_fun_correctness.
 
   (* ♯flatten({ p }) ⇒ₓ p when p's output type is a collection *)
-  Definition tenvflatten_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tflatten_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvUnop AFlatten (NRAEnvUnop AColl p) => p
       | _ => p
     end.
 
-  Lemma tenvflatten_coll_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvflatten_coll_fun p.
+  Lemma tflatten_coll_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_coll_fun p.
   Proof.
     tprove_correctness p.
     apply tenvflatten_coll_arrow.
   Qed.
-  Hint Rewrite @tenvflatten_coll_fun_correctness : optim_correct.
+  Hint Rewrite @tflatten_coll_fun_correctness : optim_correct.
+  
+  Definition tflatten_coll_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/coll" (* name *)
+         "Simplify flatten of a bag constructor" (* description *)
+         "tflatten_coll_fun" (* lemma name *)
+         tflatten_coll_fun (* lemma *).
+
+  Definition tflatten_coll_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_coll_step tflatten_coll_fun_correctness.
 
   (* p ⊕ [] ⇒ₓ p when p returns a record *)
   Definition tconcat_empty_record_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -407,6 +465,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tconcat_empty_record_r_fun_correctness : optim_correct.
 
+  Definition tconcat_empty_record_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "concat/nil right" (* name *)
+         "Remove concatenation with an empty record" (* description *)
+         "tconcat_empty_record_r_fun" (* lemma name *)
+         tconcat_empty_record_r_fun (* lemma *).
+
+  Definition tconcat_empty_record_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tconcat_empty_record_r_step tconcat_empty_record_r_fun_correctness.
+
   (* [] ⊕ p ⇒ₓ p when p returns a record *)
   Definition tconcat_empty_record_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -422,6 +490,16 @@ Section NRAEnvOptimFunc.
     apply tconcat_empty_record_l_arrow.
   Qed.
   Hint Rewrite @tconcat_empty_record_l_fun_correctness : optim_correct.
+
+    Definition tconcat_empty_record_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "concat/nil left" (* name *)
+         "Remove concatenation with an empty record" (* description *)
+         "tconcat_empty_record_l_fun" (* lemma name *)
+         tconcat_empty_record_l_fun (* lemma *).
+
+  Definition tconcat_empty_record_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tconcat_empty_record_l_step tconcat_empty_record_l_fun_correctness.
 
   Definition tdot_over_concat_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -442,6 +520,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tdot_over_concat_r_fun_correctness : optim_correct.
 
+  Definition tdot_over_concat_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/concat/rec right" (* name *)
+         "Simplify field lookup of a concatenation of a record construction" (* description *)
+         "tdot_over_concat_r_fun" (* lemma name *)
+         tdot_over_concat_r_fun (* lemma *).
+
+  Definition tdot_over_concat_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_over_concat_r_step tdot_over_concat_r_fun_correctness.
+
   Definition tdot_over_concat_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
     |  NRAEnvUnop (ADot a₂) (NRAEnvBinop AConcat (NRAEnvUnop (ARec a₁) q₁) q₂) =>
@@ -460,6 +548,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tdot_over_concat_l_fun_correctness : optim_correct.
 
+   Definition tdot_over_concat_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/concat/rec left" (* name *)
+         "Simplify field lookup of a concatenation of a record construction" (* description *)
+         "tdot_over_concat_l_fun" (* lemma name *)
+         tdot_over_concat_l_fun (* lemma *).
+
+  Definition tdot_over_concat_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_over_concat_l_step tdot_over_concat_l_fun_correctness.
+  
   (* p ⊗ [] ⇒ₓ { p } when p returns a record *)
   Definition tmerge_empty_record_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -475,6 +573,16 @@ Section NRAEnvOptimFunc.
     apply tmerge_empty_record_r_arrow.
   Qed.
   Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
+
+  Definition tmerge_empty_record_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "merge-concat/nil right" (* name *)
+         "Simplify merge concat of an empty record" (* description *)
+         "tmerge_empty_record_r_fun" (* lemma name *)
+         tmerge_empty_record_r_fun (* lemma *).
+
+  Definition tmerge_empty_record_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmerge_empty_record_r_step tmerge_empty_record_r_fun_correctness.
 
   (* [] ⊗ p ⇒ₓ { p } when p returns a record *)
   Definition tmerge_empty_record_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -492,37 +600,66 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tmerge_empty_record_l_fun_correctness : optim_correct.
 
+  Definition tmerge_empty_record_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "merge-concat/nil left" (* name *)
+         "Simplify merge concat of an empty record" (* description *)
+         "tmerge_empty_record_l_fun" (* lemma name *)
+         tmerge_empty_record_l_fun (* lemma *).
+
+  Definition tmerge_empty_lecord_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmerge_empty_record_l_step tmerge_empty_record_l_fun_correctness.
+
   (* χ⟨ ID ⟩( p ) ⇒ₓ p *)
-  Definition tenvmap_into_id_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tmap_into_id_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         NRAEnvMap NRAEnvID p => p
       | _ => p
     end.
 
-  Lemma tenvmap_into_id_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvmap_into_id_fun p.
+  Lemma tmap_into_id_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_into_id_fun p.
   Proof.
     tprove_correctness p.
     apply tenvmap_into_id_arrow.
   Qed.
-  Hint Rewrite @tenvmap_into_id_fun_correctness : optim_correct.
+  Hint Rewrite @tmap_into_id_fun_correctness : optim_correct.
 
+  Definition tmap_into_id_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/id" (* name *)
+         "Simplify map of ID" (* description *)
+         "tmap_into_id_fun" (* lemma name *)
+         tmap_into_id_fun (* lemma *).
+
+  Definition tmap_into_id_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_into_id_step tmap_into_id_fun_correctness.
 
   (* ♯flatten(χ⟨ { p1 } ⟩( p2 )) ⇒ₓ χ⟨ p1 ⟩( p2 ) *)
-  Definition tenvflatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tflatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvUnop AColl p1) p2) =>
         NRAEnvMap p1 p2
       | _ => p
     end.
 
-  Lemma tenvflatten_map_coll_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvflatten_map_coll_fun p.
+  Lemma tflatten_map_coll_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tflatten_map_coll_fun p.
   Proof.
     tprove_correctness p.
     apply tenvflatten_map_coll_arrow.
   Qed.
-  Hint Rewrite @tenvflatten_map_coll_fun_correctness : optim_correct.
+  Hint Rewrite @tflatten_map_coll_fun_correctness : optim_correct.
+
+  Definition tflatten_map_coll_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/map/coll" (* name *)
+         "Simplify flatten of the map of a bag constructor" (* description *)
+         "tflatten_map_coll_fun" (* lemma name *)
+         tflatten_map_coll_fun (* lemma *).
+
+  Definition tflatten_map_coll_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_map_coll_step tflatten_map_coll_fun_correctness.
 
   Definition tflatten_flatten_map_either_nil_fun {fruntime:foreign_runtime} (p: nraenv) :=
       match p with
@@ -543,36 +680,65 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tflatten_flatten_map_either_nil_fun_correctness : optim_correct.
 
+  Definition tflatten_flatten_map_either_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/flatten/map/app/either/nil right" (* name *)
+         "Simplify nested flatten of an either nil (under an application)" (* description *)
+         "tflatten_flatten_map_either_nil_fun" (* lemma name *)
+         tflatten_flatten_map_either_nil_fun (* lemma *).
+
+  Definition tflatten_flatten_map_either_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_flatten_map_either_nil_step tflatten_flatten_map_either_nil_fun_correctness.
+
   (* χ⟨ P1 ⟩( χ⟨ P2 ⟩( P3 ) ) ⇒ₓ χ⟨ P1 ◯ P2 ⟩( P3 ) *)
-  Definition tenvmap_map_compose_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tmap_map_compose_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         NRAEnvMap p1 (NRAEnvMap p2 p3) => NRAEnvMap (NRAEnvApp p1 p2) p3
       | _ => p
     end.
 
-  Lemma tenvmap_map_compose_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvmap_map_compose_fun p.
+  Lemma tmap_map_compose_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_map_compose_fun p.
   Proof.
     tprove_correctness p.
     apply tenvmap_map_compose_arrow.
   Qed.
-  Hint Rewrite @tenvmap_map_compose_fun_correctness : optim_correct.
+  Hint Rewrite @tmap_map_compose_fun_correctness : optim_correct.
 
+  Definition tmap_map_compose_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/map" (* name *)
+         "Fuses nested maps together" (* description *)
+         "tmap_map_compose_fun" (* lemma name *)
+         tmap_map_compose_fun (* lemma *).
+
+  Definition tmap_map_compose_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_map_compose_step tmap_map_compose_fun_correctness.
 
   (* χ⟨ P1 ⟩( { P2 } ) ⇒ₓ { P1 ◯ P2 } *)
-  Definition tenvmap_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
+  Definition tmap_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         NRAEnvMap p1 (NRAEnvUnop AColl p2) => NRAEnvUnop AColl (NRAEnvApp p1 p2)
       | _ => p
     end.
 
-  Lemma tenvmap_singleton_fun_correctness {model:basic_model} (p:nraenv) :
-    p ⇒ₓ tenvmap_singleton_fun p.
+  Lemma tmap_singleton_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tmap_singleton_fun p.
   Proof.
     tprove_correctness p.
     apply tenvmap_singleton_arrow.
   Qed.
-  Hint Rewrite @tenvmap_singleton_fun_correctness : optim_correct.
+  Hint Rewrite @tmap_singleton_fun_correctness : optim_correct.
+
+  Definition tmap_singleton_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/coll" (* name *)
+         "Lowers a map over a bag constructor" (* description *)
+         "tmap_singleton_fun" (* lemma name *)
+         tmap_singleton_fun (* lemma *).
+
+  Definition tmap_singleton_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_singleton_step tmap_singleton_fun_correctness.
 
   (* p ◯ ID ⇒ₓ p *)
   Definition tapp_over_id_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -589,6 +755,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_id_r_fun_correctness : optim_correct.
 
+  Definition tapp_over_id_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/id arg" (* name *)
+         "Simplifies application to ID" (* description *)
+         "tapp_over_id_r_fun" (* lemma name *)
+         tapp_over_id_r_fun (* lemma *).
+
+  Definition tapp_over_id_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_id_r_step tapp_over_id_r_fun_correctness.
+
   (* ENV ◯ p ⇒ₓ ENV *)
   Definition tapp_over_env_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -604,6 +780,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_env_fun_correctness : optim_correct.
 
+  Definition tapp_over_env_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/env body" (* name *)
+         "Simplify applications of ENV" (* description *)
+         "tapp_over_env_fun" (* lemma name *)
+         tapp_over_env_fun (* lemma *).
+
+  Definition tapp_over_env_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_env_step tapp_over_env_fun_correctness.
+  
   (* ID ◯ p ⇒ₓ p *)
   Definition tapp_over_id_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -618,6 +804,16 @@ Section NRAEnvOptimFunc.
     apply tapp_over_id_l_arrow.
   Qed.
   Hint Rewrite @tapp_over_id_l_fun_correctness : optim_correct.
+
+  Definition tapp_over_id_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/id body" (* name *)
+         "Simplify applications of ID" (* description *)
+         "tapp_over_id_l_fun" (* lemma name *)
+         tapp_over_id_l_fun (* lemma *).
+
+  Definition tapp_over_id_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_id_l_step tapp_over_id_l_fun_correctness.
 
   (* ignores_id p1 -> p1 ◯ p2 ⇒ₓ p1 *)
   Definition tapp_over_ignoreid_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -639,6 +835,16 @@ Section NRAEnvOptimFunc.
     apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
+  Definition tapp_over_ignoreid_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/ignore-id body" (* name *)
+         "Simplify application of expressions that ignore ID" (* description *)
+         "tapp_over_ignoreid_fun" (* lemma name *)
+         tapp_over_ignoreid_fun (* lemma *).
+
+  Definition tapp_over_ignoreid_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_ignoreid_step tapp_over_ignoreid_fun_correctness.
+
   (* ENV ◯ₑ p ⇒ₓ p *)
   Definition tappenv_over_env_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -655,6 +861,17 @@ Section NRAEnvOptimFunc.
     apply tappenv_over_env_l_arrow.
   Qed.
 
+  Definition tappenv_over_env_l_step {fruntime:foreign_runtime}
+      := mkOptimizerStep
+         "app-env/env body" (* name *)
+         "Simplify environment applications of the environment" (* description *)
+         "tappenv_over_env_l_fun" (* lemma name *)
+         tappenv_over_env_l_fun (* lemma *).
+
+  Definition tappenv_over_env_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_env_l_step tappenv_over_env_l_fun_correctness.
+
+
   (* p ◯ₑ ENV ⇒ₓ p *)
   Definition tappenv_over_env_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -668,6 +885,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tappenv_over_env_r_arrow.
   Qed.
+
+  Definition tappenv_over_env_r_step {fruntime:foreign_runtime}
+      := mkOptimizerStep
+         "app-env/env arg" (* name *)
+         "Simplify environment applications to the environment" (* description *)
+         "tappenv_over_env_r_fun" (* lemma name *)
+         tappenv_over_env_r_fun (* lemma *).
+
+  Definition tappenv_over_env_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_env_r_step tappenv_over_env_r_fun_correctness.
 
   (* ignores_env p1 -> p1 ◯ₑ p2 ⇒ₓ p1 *)
   Definition tappenv_over_ignoreenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -689,6 +916,16 @@ Section NRAEnvOptimFunc.
     apply nraenv_ignores_env_algenv_eq; assumption.
   Qed.
 
+  Definition tappenv_over_ignoreenv_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/ignore-env arg" (* name *)
+         "Simplify environment applications that ignore the environment" (* description *)
+         "tappenv_over_ignoreenv_fun" (* lemma name *)
+         tappenv_over_ignoreenv_fun (* lemma *).
+
+  Definition tappenv_over_ignoreenv_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_ignoreenv_step tappenv_over_ignoreenv_fun_correctness.
+
   (* (p1 ◯ p2) ◯ p3 ⇒ₓ p1 ◯ (p2 ◯ p3) *)
   Definition tapp_over_app_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -707,6 +944,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_app_fun_correctness : optim_correct.
 
+  Definition tapp_over_app_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/app" (* name *)
+         "Reorder nested applications" (* description *)
+         "tapp_over_app_fun" (* lemma name *)
+         tapp_over_app_fun (* lemma *).
+
+  Definition tapp_over_app_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_app_step tapp_over_app_fun_correctness.
+
   (* (p1 ◯ₑ p2) ◯ₑ p3 ⇒ₓ p1 ◯ₑ (p2 ◯ₑ p3) *)
   Definition tappenv_over_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -722,6 +969,16 @@ Section NRAEnvOptimFunc.
     apply tappenv_over_appenv_arrow.
   Qed.
   Hint Rewrite @tappenv_over_appenv_fun_correctness : optim_correct.
+
+   Definition tappenv_over_appenv_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/app-env" (* name *)
+         "Reorder nested environment applications" (* description *)
+         "tappenv_over_appenv_fun" (* lemma name *)
+         tappenv_over_appenv_fun (* lemma *).
+
+  Definition tappenv_over_appenv_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_appenv_step tappenv_over_appenv_fun_correctness.
 
   (* ignores_id p3 -> (p1 ◯ p2) ◯ₑ p3 ⇒ₓ (p1 ◯ₑ p3) ◯ (p2 ◯ₑ p3) *)
   Definition tappenv_over_app_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -758,6 +1015,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tappenv_over_app_fun_correctness : optim_correct.
 
+    Definition tappenv_over_app_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/app body" (* name *)
+         "Push environment application through application" (* description *)
+         "tappenv_over_app_fun" (* lemma name *)
+         tappenv_over_app_fun (* lemma *).
+
+  Definition tappenv_over_app_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_app_step tappenv_over_app_fun_correctness.
+
   (* ignores_id p1 -> (p1 ◯ₑ p2) ◯ p3 ⇒ₓ p1 ◯ₑ (p2 ◯ p3) *)
   Definition tapp_over_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -783,6 +1050,16 @@ Section NRAEnvOptimFunc.
     - reflexivity.
   Qed.
 
+  Definition tapp_over_appenv_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/app-env body" (* name *)
+         "Push application through environment application" (* description *)
+         "tapp_over_appenv_fun" (* lemma name *)
+         tapp_over_appenv_fun (* lemma *).
+
+  Definition tapp_over_appenv_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_appenv_step tapp_over_appenv_fun_correctness.
+
   (* (NRAEnvUnop u p1) ◯ p2 ⇒ₓ (NRAEnvUnop u (p1 ◯ p2)) *)
   Definition tapp_over_unop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -799,6 +1076,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_unop_fun_correctness : optim_correct.
 
+  Definition tapp_over_unop_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/unop" (* name *)
+         "Push application through unary operations" (* description *)
+         "tapp_over_unop_fun" (* lemma name *)
+         tapp_over_unop_fun (* lemma *).
+
+  Definition tapp_over_unop_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_unop_step tapp_over_unop_fun_correctness.
+
   (* (NRAEnvUnop u p1) ◯ₑ p2 ⇒ₓ (NRAEnvUnop u (p1 ◯ₑ p2)) *)
   Definition tappenv_over_unop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -814,6 +1101,16 @@ Section NRAEnvOptimFunc.
     apply tappenv_over_unop_arrow.
   Qed.
 
+  Definition tappenv_over_unop_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/unop" (* name *)
+         "Push environment application through unary operations" (* description *)
+         "tappenv_over_unop_fun" (* lemma name *)
+         tappenv_over_unop_fun (* lemma *).
+
+  Definition tappenv_over_unop_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_unop_step tappenv_over_unop_fun_correctness.
+
   Definition tunop_over_either_const_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvUnop u (NRAEnvEither p₁ (NRAEnvConst d)) => NRAEnvEither (NRAEnvUnop u p₁) (NRAEnvUnop u (NRAEnvConst d))
@@ -826,6 +1123,17 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tunop_over_either.
   Qed.
+
+  Definition tunop_over_either_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "unop/either/const right" (* name *)
+         "Push a unary operation through an either construct with a right branch that builds a constant" (* description *)
+         "tunop_over_either_const_fun" (* lemma name *)
+         tunop_over_either_const_fun (* lemma *).
+
+  Definition tunop_over_either_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tunop_over_either_const_step tunop_over_either_const_fun_correctness.
+
 
   Definition tunop_over_either_const_app_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -840,6 +1148,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tunop_over_either_app.
   Qed.
+
+  Definition tunop_over_either_const_app_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "unop/app/either/const right" (* name *)
+         "Push a unary operation through an application of an either construct with a right branch that builds a constant" (* description *)
+         "tunop_over_either_const_app_fun" (* lemma name *)
+         tunop_over_either_const_app_fun (* lemma *).
+
+  Definition tunop_over_either_const_app_step_correct {model:basic_model}
+    := mkOptimizerStepModel tunop_over_either_const_app_step tunop_over_either_const_app_fun_correctness.
   
   (* χ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ₓ χ⟨ p1 ⟩( p2 ◯ p0 ) *)
   Definition tapp_over_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -857,6 +1175,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_map_fun_correctness : optim_correct.
 
+  Definition tapp_over_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/map" (* name *)
+         "Push applications through map a body" (* description *)
+         "tapp_over_map_fun" (* lemma name *)
+         tapp_over_map_fun (* lemma *).
+
+  Definition tapp_over_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_map_step tapp_over_map_fun_correctness.
+
   (* ⋈ᵈ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ₓ ⋈ᵈ⟨ q₁ ⟩( q₂ ◯ q ) *)
 
   Definition tapp_over_mapconcat_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -873,6 +1201,16 @@ Section NRAEnvOptimFunc.
     apply tapp_over_mapconcat_arrow.
   Qed.
   Hint Rewrite @tapp_over_mapconcat_fun_correctness : optim_correct.
+
+  Definition tapp_over_mapconcat_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/map-concat" (* name *)
+         "Push application through a map-concat body" (* description *)
+         "tapp_over_mapconcat_fun" (* lemma name *)
+         tapp_over_mapconcat_fun (* lemma *).
+
+  Definition tapp_over_mapconcat_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_mapconcat_step tapp_over_mapconcat_fun_correctness.
 
   (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ₓ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
 
@@ -899,6 +1237,16 @@ Section NRAEnvOptimFunc.
     apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
+  Definition tappenv_over_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/map" (* name *)
+         "Push environment application through a map body" (* description *)
+         "tappenv_over_map_fun" (* lemma name *)
+         tappenv_over_map_fun (* lemma *).
+
+  Definition tappenv_over_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_map_step tappenv_over_map_fun_correctness.
+
   (* σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ₓ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
 
   Definition tappenv_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -924,6 +1272,16 @@ Section NRAEnvOptimFunc.
     apply nraenv_ignores_id_algenv_eq; assumption.
   Qed.
 
+  Definition tappenv_over_select_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/select" (* name *)
+         "Push environment application through a selection body" (* description *)
+         "tappenv_over_select_fun" (* lemma name *)
+         tappenv_over_select_fun (* lemma *).
+
+  Definition tappenv_over_select_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_select_step tappenv_over_select_fun_correctness.
+
   (* σ⟨ p1 ⟩( p2 ) ◯ p0 ⇒ₓ σ⟨ p1 ⟩( p2 ◯ p0 ) *)
 
   Definition tapp_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -941,6 +1299,15 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_select_fun_correctness : optim_correct.
 
+  Definition tapp_over_select_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/slect" (* name *)
+         "Push application through a selection body" (* description *)
+         "tapp_over_select_fun" (* lemma name *)
+         tapp_over_select_fun (* lemma *).
+
+  Definition tapp_over_select_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_select_step tapp_over_select_fun_correctness.
 
   (* (NRAEnvBinop b p2 p3 ◯ p1) ⇒ₓ (NRAEnvBinop b (p2 ◯ p1) (p3 ◯ p1)) *)
   Definition tapp_over_binop_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -958,6 +1325,15 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tapp_over_binop_fun_correctness : optim_correct.
 
+  Definition tapp_over_binop_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/binop" (* name *)
+         "Push application through binary operations" (* description *)
+         "tapp_over_binop_fun" (* lemma name *)
+         tapp_over_binop_fun (* lemma *).
+
+  Definition tapp_over_binop_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_binop_step tapp_over_binop_fun_correctness.
 
   (* { [ s1 : p1 ] } × { [ s2 : p2 ] } ⇒ₓ { [ s1 : p1; s2 : p2 ] } *)
   Definition tproduct_singletons_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -977,6 +1353,15 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tproduct_singletons_fun_correctness : optim_correct.
 
+  Definition tproduct_singletons_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "product/singleton singleton" (* name *)
+         "Simplify the product of two singRemove loop comprehensions over empty loops" (* description *)
+         "tproduct_singletons_fun" (* lemma name *)
+         tproduct_singletons_fun (* lemma *).
+
+  Definition tproduct_singletons_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproduct_singletons_step tproduct_singletons_fun_correctness.
 
   (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
   Definition tdouble_flatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -996,7 +1381,17 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tdouble_flatten_map_coll_fun_correctness : optim_correct.
 
-  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
+    Definition tdouble_flatten_map_coll_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/map/map/coll" (* name *)
+         "Simplify flattenging the map of the map of a bag constructor" (* description *)
+         "tdouble_flatten_map_coll_fun" (* lemma name *)
+         tdouble_flatten_map_coll_fun (* lemma *).
+
+  Definition tdouble_flatten_map_coll_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdouble_flatten_map_coll_step tdouble_flatten_map_coll_fun_correctness.
+
+  (* TODO: horribly named *)
   Definition tflatten_over_double_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | (NRAEnvUnop AFlatten
@@ -1013,7 +1408,17 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tflatten_over_double_map_fun_correctness : optim_correct.
 
-  (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
+  Definition tflatten_over_double_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/map/map/select" (* name *)
+         "Simplify flatten of a map over a map of a selection applied to a bag constructor of the input" (* description *)
+         "tflatten_over_double_map_fun" (* lemma name *)
+         tflatten_over_double_map_fun (* lemma *).
+
+  Definition tflatten_over_double_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_over_double_map_step tflatten_over_double_map_fun_correctness.
+
+  (* TODO: poorly named *)
   Definition tflatten_over_double_map_with_either_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
     | (NRAEnvUnop AFlatten
@@ -1041,6 +1446,16 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tflatten_over_double_map_with_either_fun_correctness : optim_correct.
 
+  Definition tflatten_over_double_map_with_either_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/map/map/select/app/either" (* name *)
+         "???" (* description *)
+         "tflatten_over_double_map_with_either_fun" (* lemma name *)
+         tflatten_over_double_map_with_either_fun (* lemma *).
+
+  Definition tflatten_over_double_map_with_either_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_over_double_map_with_either_step tflatten_over_double_map_with_either_fun_correctness.
+
   (* ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ⇒ₓ p2 ⊗ p1 *)
   Definition tappenv_over_env_merge_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1067,19 +1482,15 @@ Section NRAEnvOptimFunc.
     apply H0; assumption.
   Qed.
 
-  Definition tmerge_with_empty_rec_fun {fruntime:foreign_runtime} (p: nraenv) :=
-    match p with
-      | NRAEnvBinop AMergeConcat p1 (NRAEnvConst (drec nil)) =>
-        NRAEnvUnop AColl p1
-      | _ => p
-    end.
+  Definition tappenv_over_env_merge_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/merge-concat/env left" (* name *)
+         "Simplify environment application of a merge-concat where the left part is ENV and the right part ignores the environment" (* description *)
+         "tappenv_over_env_merge_l_fun" (* lemma name *)
+         tappenv_over_env_merge_l_fun (* lemma *).
 
-  Lemma tmerge_with_empty_rec_fun_correctness {model:basic_model} (p: nraenv) :
-    p ⇒ₓ tmerge_with_empty_rec_fun p.
-  Proof.
-    tprove_correctness p.
-    apply tmerge_empty_record_r_arrow.
-  Qed.
+  Definition tappenv_over_env_merge_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_env_merge_l_step tappenv_over_env_merge_l_fun_correctness.
 
   Definition ttostring_on_string_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1101,6 +1512,16 @@ Section NRAEnvOptimFunc.
     - apply ttostring_tostring_arrow.
   Qed.
 
+  Definition ttostring_on_string_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "to-string/string" (* name *)
+         "Remove ToString operations where the argument is statically known to already be a string" (* description *)
+         "ttostring_on_string_fun" (* lemma name *)
+         ttostring_on_string_fun (* lemma *).
+
+  Definition ttostring_on_string_step_correct {model:basic_model}
+    := mkOptimizerStepModel ttostring_on_string_step ttostring_on_string_fun_correctness.
+
   Definition tmap_full_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop AColl NRAEnvID)) => p
@@ -1117,6 +1538,16 @@ Section NRAEnvOptimFunc.
     destruct p2_2; simpl; try reflexivity;
     apply tmap_full_over_select_arrow.
   Qed.
+
+  Definition tmap_full_over_select_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/select/coll" (* name *)
+         "???" (* description *)
+         "tmap_full_over_select_fun" (* lemma name *)
+         tmap_full_over_select_fun (* lemma *).
+
+  Definition tmap_full_over_select_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_full_over_select_step tmap_full_over_select_fun_correctness.
 
   Definition tcompose_selects_in_mapenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1135,6 +1566,16 @@ Section NRAEnvOptimFunc.
     apply tcompose_selects_in_mapenv_arrow.
   Qed.
 
+  Definition tcompose_selects_in_mapenv_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/flatten/map-env/map/select/coll/id" (* name *)
+         "???" (* description *)
+         "tcompose_selects_in_mapenv_fun" (* lemma name *)
+         tcompose_selects_in_mapenv_fun (* lemma *).
+
+  Definition tcompose_selects_in_mapenv_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcompose_selects_in_mapenv_step tcompose_selects_in_mapenv_fun_correctness.
+
   Definition tmapenv_to_env_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | (NRAEnvApp (NRAEnvMapEnv NRAEnvEnv) p1) => NRAEnvEnv
@@ -1148,6 +1589,16 @@ Section NRAEnvOptimFunc.
     apply tmapenv_to_env_arrow.
   Qed.
 
+  Definition tmapenv_to_env_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/map-env/env" (* name *)
+         "Simplify applications with body that map-environments over the environment" (* description *)
+         "tmapenv_to_env_fun" (* lemma name *)
+         tmapenv_to_env_fun (* lemma *).
+
+  Definition tmapenv_to_env_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmapenv_to_env_step tmapenv_to_env_fun_correctness.
+
   Definition tenv_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvAppEnv NRAEnvEnv p1 => p1
@@ -1160,6 +1611,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tappenv_over_env_l_arrow.
   Qed.
+
+  Definition tenv_appenv_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/env" (* name *)
+         "Simplifies environment applications of the environment" (* description *)
+         "tenv_appenv_fun" (* lemma name *)
+         tenv_appenv_fun (* lemma *).
+
+  Definition tenv_appenv_step_correct {model:basic_model}
+    := mkOptimizerStepModel tenv_appenv_step tenv_appenv_fun_correctness.
 
   Definition tflatten_mapenv_coll_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1175,6 +1636,16 @@ Section NRAEnvOptimFunc.
     apply tflatten_mapenv_coll_arrow.
   Qed.
 
+  Definition tflatten_mapenv_coll_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/map-env/coll" (* name *)
+         "Simplify flattening a map environment of a bag constructor" (* description *)
+         "tflatten_mapenv_coll_fun" (* lemma name *)
+         tflatten_mapenv_coll_fun (* lemma *).
+
+  Definition tflatten_mapenv_coll_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_mapenv_coll_step tflatten_mapenv_coll_fun_correctness.
+
   Definition tflatten_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | NRAEnvUnop AFlatten (NRAEnvConst (dcoll nil)) =>
@@ -1189,6 +1660,16 @@ Section NRAEnvOptimFunc.
     apply tenvflatten_nil_arrow.
   Qed.
 
+  Definition tflatten_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/nil" (* name *)
+         "Remove flatten over empty records" (* description *)
+         "tflatten_nil_fun" (* lemma name *)
+         tflatten_nil_fun (* lemma *).
+
+  Definition tflatten_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_nil_step tflatten_nil_fun_correctness.
+
   Definition tflatten_through_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | NRAEnvUnop AFlatten (NRAEnvAppEnv p1 p2) =>
@@ -1202,6 +1683,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tflatten_through_appenv_arrow.
   Qed.
+
+  Definition tflatten_through_appenv_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/app-env" (* name *)
+         "Push flatten operations through environment applications" (* description *)
+         "tflatten_through_appenv_fun" (* lemma name *)
+         tflatten_through_appenv_fun (* lemma *).
+
+  Definition tflatten_through_appenv_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflatten_through_appenv_step tflatten_through_appenv_fun_correctness.
 
   Definition tappenv_flatten_mapenv_to_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1219,6 +1710,17 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tappenv_flatten_mapenv_to_map_arrow.
   Qed.
+
+  Definition tappenv_flatten_mapenv_to_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/(flatten/map-env)(merge-concat/(env)(rec/id))" (* name *)
+         "Simplify environment application of a flattened environment map to a merge-concat of the environment with a record constructor" (* description *)
+         "tappenv_flatten_mapenv_to_map_fun" (* lemma name *)
+         tappenv_flatten_mapenv_to_map_fun (* lemma *).
+
+  Definition tappenv_flatten_mapenv_to_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_flatten_mapenv_to_map_step tappenv_flatten_mapenv_to_map_fun_correctness.
+
 
   Definition tselect_over_either_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1239,6 +1741,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tselect_over_either_nil_fun_correctness : toptim_correct.
 
+  Definition tselect_over_either_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "select/either/nil right" (* name *)
+         "Push selection through an either whose right side returns an empty bag" (* description *)
+         "tselect_over_either_nil_fun" (* lemma name *)
+         tselect_over_either_nil_fun (* lemma *).
+
+  Definition tselect_over_either_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tselect_over_either_nil_step tselect_over_either_nil_fun_correctness.
+
   Definition tselect_over_either_nil_app_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvSelect p₁ (NRAEnvApp (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) p₄) =>
@@ -1257,6 +1769,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tselect_over_either_nil_app_fun_correctness : toptim_correct.
+
+  Definition tselect_over_either_nil_app_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "select/app/either/nil right" (* name *)
+         "Push selection through an application of an either whose right side returns an empty bag" (* description *)
+         "tselect_over_either_nil_app_fun" (* lemma name *)
+         tselect_over_either_nil_app_fun (* lemma *).
+
+  Definition tselect_over_either_nil_app_step_correct {model:basic_model}
+    := mkOptimizerStepModel tselect_over_either_nil_app_step tselect_over_either_nil_app_fun_correctness.
 
   Definition tmap_over_either_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1277,6 +1799,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tmap_over_either_nil_fun_correctness : toptim_correct.
 
+  Definition tmap_over_either_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/either/nil right" (* name *)
+         "Push map through an either whose right side returns an empty bag" (* description *)
+         "tmap_over_either_nil_fun" (* lemma name *)
+         tmap_over_either_nil_fun (* lemma *).
+
+  Definition tmap_over_either_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_over_either_nil_step tmap_over_either_nil_fun_correctness.
+
   Definition tmap_over_either_nil_app_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvMap p₁ (NRAEnvApp (NRAEnvEither p₂ (NRAEnvConst (dcoll nil))) p₄) =>
@@ -1295,6 +1827,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tmap_over_either_nil_app_fun_correctness : toptim_correct.
+
+  Definition tmap_over_either_nil_app_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/app/either/nil right" (* name *)
+         "Push map through an application of an either whose right side returns an empty bag" (* description *)
+         "tmap_over_either_nil_app_fun" (* lemma name *)
+         tmap_over_either_nil_app_fun (* lemma *).
+
+  Definition tmap_over_either_nil_app_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_over_either_nil_app_step tmap_over_either_nil_app_fun_correctness.
 
   Definition tappenv_over_either_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1324,6 +1866,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tappenv_over_either_nil_fun_correctness : toptim_correct.
 
+    Definition tappenv_over_either_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/either/nil right" (* name *)
+         "Pushes environment application through an either with a right branch that builds an empty bag" (* description *)
+         "tappenv_over_either_nil_fun" (* lemma name *)
+         tappenv_over_either_nil_fun (* lemma *).
+
+  Definition tappenv_over_either_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_either_nil_step tappenv_over_either_nil_fun_correctness.
+
   Definition tselect_over_flatten_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
     | NRAEnvSelect p₁ (NRAEnvUnop AFlatten p₂) =>
@@ -1339,6 +1891,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tselect_over_flatten_fun_correctness : toptim_correct.
+
+  Definition tselect_over_flatten_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "select/flatten" (* name *)
+         "Pushes selection through a flatten operation" (* description *)
+         "tselect_over_flatten_fun" (* lemma name *)
+         tselect_over_flatten_fun (* lemma *).
+
+  Definition tselect_over_flatten_step_correct {model:basic_model}
+    := mkOptimizerStepModel tselect_over_flatten_step tselect_over_flatten_fun_correctness.
 
   Definition tmap_over_flatten_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1356,6 +1918,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tmap_over_flatten_fun_correctness : toptim_correct.
 
+  Definition tmap_over_flatten_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/flatten" (* name *)
+         "Pushes map through a flatten operation" (* description *)
+         "tmap_over_flatten_fun" (* lemma name *)
+         tmap_over_flatten_fun (* lemma *).
+
+  Definition tmap_over_flatten_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_over_flatten_step tmap_over_flatten_fun_correctness.
+
   Definition tmap_over_flatten_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
     | NRAEnvMap p₁ (NRAEnvUnop AFlatten (NRAEnvMap p₂ p₃)) =>
@@ -1371,6 +1943,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tmap_over_flatten_map_fun_correctness : toptim_correct.
+
+  Definition tmap_over_flatten_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map/flatten/map" (* name *)
+         "Pushes map through a flatten of a map" (* description *)
+         "tmap_over_flatten_map_fun" (* lemma name *)
+         tmap_over_flatten_map_fun (* lemma *).
+
+  Definition tmap_over_flatten_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmap_over_flatten_map_step tmap_over_flatten_map_fun_correctness.
 
   Definition tconcat_over_rec_eq_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1393,6 +1975,16 @@ Section NRAEnvOptimFunc.
                   
   Hint Rewrite @tconcat_over_rec_eq_fun_correctness : toptim_correct.
 
+  Definition tconcat_over_rec_eq_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "concat/(rec)(rec)" (* name *)
+         "Simplifies a concatentation of two record constructors" (* description *)
+         "tconcat_over_rec_eq_fun" (* lemma name *)
+         tconcat_over_rec_eq_fun (* lemma *).
+
+  Definition tconcat_over_rec_eq_step_correct {model:basic_model}
+    := mkOptimizerStepModel tconcat_over_rec_eq_step tconcat_over_rec_eq_fun_correctness.
+
   Definition tapp_over_const_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         (NRAEnvApp (NRAEnvConst d) p1) => (NRAEnvConst d)
@@ -1406,6 +1998,16 @@ Section NRAEnvOptimFunc.
     apply tapp_over_const_arrow.
   Qed.
 
+  Definition tapp_over_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/const" (* name *)
+         "Simplifies application of a constant" (* description *)
+         "tapp_over_const_fun" (* lemma name *)
+         tapp_over_const_fun (* lemma *).
+
+  Definition tapp_over_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_const_step tapp_over_const_fun_correctness.
+
   Definition tappenv_over_const_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         (NRAEnvAppEnv (NRAEnvConst d) p1) => (NRAEnvConst d)
@@ -1418,6 +2020,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tappenv_over_const_arrow.
   Qed.
+
+  Definition tappenv_over_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/const" (* name *)
+         "Simplifies environment application of a constant" (* description *)
+         "tappenv_over_const_fun" (* lemma name *)
+         tappenv_over_const_fun (* lemma *).
+
+  Definition tappenv_over_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_const_step tappenv_over_const_fun_correctness.
 
   Definition tflip_env1_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1452,6 +2064,16 @@ Section NRAEnvOptimFunc.
     apply H0; assumption.
   Qed.
 
+  Definition tflip_env1_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "env flip1" (* name *)
+         "???" (* description *)
+         "tflip_env1_fun" (* lemma name *)
+         tflip_env1_fun (* lemma *).
+
+  Definition tflip_env1_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflip_env1_step tflip_env1_fun_correctness.
+
   Definition tflip_env2_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       (NRAEnvAppEnv (NRAEnvSelect p (NRAEnvUnop AColl NRAEnvID)) NRAEnvID) =>
@@ -1465,6 +2087,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tflip_env2_arrow.
   Qed.
+
+  Definition tflip_env2_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/select/coll/id" (* name *)
+         "Pushes environment application through selection of a bag constructor over the input" (* description *)
+         "tflip_env2_fun" (* lemma name *)
+         tflip_env2_fun (* lemma *).
+
+  Definition tflip_env2_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflip_env2_step tflip_env2_fun_correctness.
 
   Definition tmapenv_over_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1480,6 +2112,16 @@ Section NRAEnvOptimFunc.
     apply tmapenv_over_singleton_arrow.
   Qed.
 
+    Definition tmapenv_over_singleton_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/(map-env)(coll)" (* name *)
+         "Simplifies the environment application of a map environment over a bag constructor" (* description *)
+         "tmapenv_over_singleton_fun" (* lemma name *)
+         tmapenv_over_singleton_fun (* lemma *).
+
+  Definition tmapenv_over_singleton_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmapenv_over_singleton_step tmapenv_over_singleton_fun_correctness.
+  
   Definition tappenv_over_binop_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         (NRAEnvAppEnv (NRAEnvBinop b p1 p2) p0) =>
@@ -1493,6 +2135,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tappenv_over_binop.
   Qed.
+
+  Definition tappenv_over_binop_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/binop" (* name *)
+         "Pushes an environment application through a binary operation" (* description *)
+         "tappenv_over_binop_fun" (* lemma name *)
+         tappenv_over_binop_fun (* lemma *).
+
+  Definition tappenv_over_binop_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_over_binop_step tappenv_over_binop_fun_correctness.
 
   Definition tflip_env6_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1510,6 +2162,17 @@ Section NRAEnvOptimFunc.
     apply tflip_env6_arrow.
   Qed.
 
+  Definition tflip_env6_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "env flip6" (* name *)
+         "???" (* description *)
+         "tflip_env6_fun" (* lemma name *)
+         tflip_env6_fun (* lemma *).
+
+  Definition tflip_env6_step_correct {model:basic_model}
+    := mkOptimizerStepModel tflip_env6_step tflip_env6_fun_correctness.
+
+  (* TODO: horribly named *)
   Definition tmapenv_to_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | (NRAEnvAppEnv (NRAEnvMapEnv p1) p2) =>
@@ -1533,6 +2196,16 @@ Section NRAEnvOptimFunc.
     apply H0; assumption.
   Qed.
 
+  Definition tmapenv_to_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/map-env" (* name *)
+         "Push environment application through map environment" (* description *)
+         "tmapenv_to_map_fun" (* lemma name *)
+         tmapenv_to_map_fun (* lemma *).
+
+  Definition tmapenv_to_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmapenv_to_map_step tmapenv_to_map_fun_correctness.
+
   Definition tmerge_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
     | NRAEnvBinop AMergeConcat (NRAEnvUnop (ARec s1) p1) (NRAEnvUnop (ARec s2) p2) =>
@@ -1552,6 +2225,16 @@ Section NRAEnvOptimFunc.
     apply tmerge_concat_to_concat_arrow.
     trivial.
   Qed.
+
+  Definition tmerge_concat_to_concat_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "merge-concat/(rec)(rec)" (* name *)
+         "Simplifies a merge-concat of two record constructors into a simpler concatentation" (* description *)
+         "tmerge_concat_to_concat_fun" (* lemma name *)
+         tmerge_concat_to_concat_fun (* lemma *).
+
+  Definition tmerge_concat_to_concat_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmerge_concat_to_concat_step tmerge_concat_to_concat_fun_correctness.
 
   Definition tmerge_with_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
@@ -1580,6 +2263,16 @@ Section NRAEnvOptimFunc.
     trivial.
   Qed.
 
+  Definition tmerge_with_concat_to_concat_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "merge-concat/(rec)(concat(rec)(rec))" (* name *)
+         "Simplifies a merge concatenation of a record constructor and a concatenation of record constructors into a simpler concatenation" (* description *)
+         "tmerge_with_concat_to_concat_fun" (* lemma name *)
+         tmerge_with_concat_to_concat_fun (* lemma *).
+
+  Definition tmerge_with_concat_to_concat_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmerge_with_concat_to_concat_step tmerge_with_concat_to_concat_fun_correctness.
+
   Definition tdot_over_rec_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvUnop (ADot s2)
@@ -1596,6 +2289,16 @@ Section NRAEnvOptimFunc.
     apply tdot_over_rec_arrow.
   Qed.
 
+  Definition tdot_over_rec_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "dot/rec" (* name *)
+         "Simplifies field lookup of a record construction" (* description *)
+         "tdot_over_rec_fun" (* lemma name *)
+         tdot_over_rec_fun (* lemma *).
+
+  Definition tdot_over_rec_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdot_over_rec_step tdot_over_rec_fun_correctness.
+
   Definition tnested_map_over_singletons_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvUnop AFlatten
@@ -1610,6 +2313,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tnested_map_over_singletons_arrow.
   Qed.
+
+  Definition tnested_map_over_singletons_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "flatten/map/select/coll" (* name *)
+         "Simplifies a flatten of a map of a select over a bag constructor" (* description *)
+         "tnested_map_over_singletons_fun" (* lemma name *)
+         tnested_map_over_singletons_fun (* lemma *).
+
+  Definition tnested_map_over_singletons_step_correct {model:basic_model}
+    := mkOptimizerStepModel tnested_map_over_singletons_step tnested_map_over_singletons_fun_correctness.
 
   Definition tappenv_mapenv_to_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1626,6 +2339,16 @@ Section NRAEnvOptimFunc.
     tprove_correctness p.
     apply tappenv_mapenv_to_map_arrow.
   Qed.
+
+  Definition tappenv_mapenv_to_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app-env/(map-env)(merge-concat(env)(rec/id))" (* name *)
+         "???" (* description *)
+         "tappenv_mapenv_to_map_fun" (* lemma name *)
+         tappenv_mapenv_to_map_fun (* lemma *).
+
+  Definition tappenv_mapenv_to_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tappenv_mapenv_to_map_step tappenv_mapenv_to_map_fun_correctness.
 
   (* optimizations for rproject *)
 
@@ -1645,6 +2368,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_nil_fun_correctness : toptim_correct.
 
+  Definition trproject_nil_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/nil" (* name *)
+         "Remove record projection of an empty record" (* description *)
+         "trproject_nil_fun" (* lemma name *)
+         trproject_nil_fun (* lemma *).
+
+  Definition trproject_nil_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_nil_step trproject_nil_fun_correctness.
+
   Definition trproject_over_const_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | NRAEnvUnop (ARecProject sl)
@@ -1661,7 +2394,17 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @trproject_over_const_fun_correctness : toptim_correct.
-  
+
+  Definition trproject_over_const_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/const" (* name *)
+         "Simplify record projection of a constant record" (* description *)
+         "trproject_over_const_fun" (* lemma name *)
+         trproject_over_const_fun (* lemma *).
+
+  Definition trproject_over_const_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_over_const_step trproject_over_const_fun_correctness.
+
   Definition trproject_over_rec_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | NRAEnvUnop (ARecProject sl)
@@ -1681,6 +2424,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @trproject_over_rec_fun_correctness : toptim_correct.
+
+  Definition trproject_over_rec_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/rec" (* name *)
+         "Simplify record projection of a record construction" (* description *)
+         "trproject_over_rec_fun" (* lemma name *)
+         trproject_over_rec_fun (* lemma *).
+
+  Definition trproject_over_rec_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_over_rec_step trproject_over_rec_fun_correctness.
 
   Definition trproject_over_concat_r_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1705,6 +2458,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_concat_r_fun_correctness : toptim_correct.
 
+  Definition trproject_over_concat_r_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/concat/rec right" (* name *)
+         "Simplify record projection of a concatenation with a record constructor" (* description *)
+         "trproject_over_concat_r_fun" (* lemma name *)
+         trproject_over_concat_r_fun (* lemma *).
+
+  Definition trproject_over_concat_r_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_over_concat_r_step trproject_over_concat_r_fun_correctness.
+
   Definition trproject_over_concat_l_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | NRAEnvUnop (ARecProject sl)
@@ -1727,6 +2490,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_concat_l_fun_correctness : toptim_correct.
 
+  Definition trproject_over_concat_l_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/concat/rec left" (* name *)
+         "Simplify record projection of a concatenation with a record constructor" (* description *)
+         "trproject_over_concat_l_fun" (* lemma name *)
+         trproject_over_concat_l_fun (* lemma *).
+
+  Definition trproject_over_concat_l_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_over_concat_l_step trproject_over_concat_l_fun_correctness.
+
   Definition trproject_over_rproject_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | NRAEnvUnop (ARecProject sl1)
@@ -1743,6 +2516,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @trproject_over_rproject_fun_correctness : toptim_correct.
+
+  Definition trproject_over_rproject_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/rproject" (* name *)
+         "Fuse nested record projections" (* description *)
+         "trproject_over_rproject_fun" (* lemma name *)
+         trproject_over_rproject_fun (* lemma *).
+
+  Definition trproject_over_rproject_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_over_rproject_step trproject_over_rproject_fun_correctness.
 
   Definition trproject_over_either_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1761,6 +2544,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @trproject_over_either_fun_correctness : toptim_correct.
 
+  Definition trproject_over_either_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "rproject/either" (* name *)
+         "Push record projection through an either" (* description *)
+         "trproject_over_either_fun" (* lemma name *)
+         trproject_over_either_fun (* lemma *).
+
+  Definition trproject_over_either_step_correct {model:basic_model}
+    := mkOptimizerStepModel trproject_over_either_step trproject_over_either_fun_correctness.
+
   Definition tcount_over_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
       | NRAEnvUnop ACount (NRAEnvMap p₁ p₂) => NRAEnvUnop ACount p₂
@@ -1775,7 +2568,17 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tcount_over_map_fun_correctness : toptim_correct.
-  
+
+  Definition tcount_over_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/map" (* name *)
+         "Simplify count of a map (by removing the map)" (* description *)
+         "tcount_over_map_fun" (* lemma name *)
+         tcount_over_map_fun (* lemma *).
+
+  Definition tcount_over_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_map_step tcount_over_map_fun_correctness.
+
   Definition tcount_over_flat_map_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvUnop ACount
@@ -1793,6 +2596,17 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tcount_over_flat_map_map_fun_correctness : toptim_correct.
+
+  Definition tcount_over_flat_map_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/flatten/map/map" (* name *)
+         "Simplify the count of a flatten of a map'ed map" (* description *)
+         "tcount_over_flat_map_map_fun" (* lemma name *)
+         tcount_over_flat_map_map_fun (* lemma *).
+
+  Definition tcount_over_flat_map_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_flat_map_map_step tcount_over_flat_map_map_fun_correctness.
+
 
   Definition tcount_over_flat_map_either_nil_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1816,6 +2630,16 @@ Section NRAEnvOptimFunc.
   Qed.
 
   Hint Rewrite @tcount_over_flat_map_either_nil_map_fun_correctness : toptim_correct.
+
+  Definition tcount_over_flat_map_either_nil_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/flatten/map/either(map)(nil)" (* name *)
+         "Simplify count of a flatten of a map over an either where the right part builds an empty bag" (* description *)
+         "tcount_over_flat_map_either_nil_map_fun" (* lemma name *)
+         tcount_over_flat_map_either_nil_map_fun (* lemma *).
+
+  Definition tcount_over_flat_map_either_nil_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_flat_map_either_nil_map_step tcount_over_flat_map_either_nil_map_fun_correctness.
 
   Definition tcount_over_flat_map_either_nil_app_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
@@ -1842,6 +2666,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tcount_over_flat_map_either_nil_app_map_fun_correctness : toptim_correct.
 
+  Definition tcount_over_flat_map_either_nil_app_map_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/flatten/map/app/either(map)(nil)" (* name *)
+         "Simplify count of a flatten of a map over an application of an either where the right part builds an empty bag" (* description *)
+         "tcount_over_flat_map_either_nil_app_map_fun" (* lemma name *)
+         tcount_over_flat_map_either_nil_app_map_fun (* lemma *).
+
+  Definition tcount_over_flat_map_either_nil_app_map_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_flat_map_either_nil_app_map_step tcount_over_flat_map_either_nil_app_map_fun_correctness.
+
   Definition tcount_over_flat_map_either_nil_app_singleton_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvUnop ACount
@@ -1864,6 +2698,16 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tcount_over_flat_map_either_nil_app_singleton_fun_correctness : toptim_correct.
 
+  Definition tcount_over_flat_map_either_nil_app_singleton_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "count/flatten/map/app/either(coll)(nil)" (* name *)
+         "Simplify count of a flatten of a map over an application of an either where the left side builds a bag and the right part builds an empty bag" (* description *)
+         "tcount_over_flat_map_either_nil_app_singleton_fun" (* lemma name *)
+         tcount_over_flat_map_either_nil_app_singleton_fun (* lemma *).
+
+  Definition tcount_over_flat_map_either_nil_app_singleton_step_correct {model:basic_model}
+    := mkOptimizerStepModel tcount_over_flat_map_either_nil_app_singleton_step tcount_over_flat_map_either_nil_app_singleton_fun_correctness.
+
   (* optimizations for mapconcat *)
 
   (* ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ₓ p₁ ◯ (‵[||]) *)
@@ -1882,7 +2726,17 @@ Section NRAEnvOptimFunc.
   Qed.
   Hint Rewrite @tmerge_empty_record_r_fun_correctness : optim_correct.
 
-  Definition tdup_elim_fun {model:basic_model} (p:nraenv) :=
+  Definition tmapconcat_over_singleton_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "map-concat/coll right/nil" (* name *)
+         "Simplufy map concat with a bag with an empty record" (* description *)
+         "tmapconcat_over_singleton_fun" (* lemma name *)
+         tmapconcat_over_singleton_fun (* lemma *).
+
+  Definition tmapconcat_over_singleton_step_correct {model:basic_model}
+    := mkOptimizerStepModel tmapconcat_over_singleton_step tmapconcat_over_singleton_fun_correctness.
+
+  Definition tdup_elim_fun {fruntime:foreign_runtime} (p:nraenv) :=
     dup_elim_fun p.
 
   Lemma tdup_elim_fun_correctness {model:basic_model} (p:nraenv) :
@@ -1898,383 +2752,439 @@ Section NRAEnvOptimFunc.
 
   Hint Rewrite @tdup_elim_fun_correctness : optim_correct.
 
+  Definition tdup_elim_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "distinct/nodup" (* name *)
+         "Removes applications of the distinct operator to bags statically known to already be duplicate free" (* description *)
+         "tdup_elim_fun" (* lemma name *)
+         tdup_elim_fun (* lemma *).
+
+  Definition tdup_elim_step_correct {model:basic_model}
+    := mkOptimizerStepModel tdup_elim_step tdup_elim_fun_correctness.
   
   (* *************************** *)
   Local Open Scope string.
-  Definition head_optim_list {fruntime:foreign_runtime} : list (string*(nraenv -> nraenv)) :=
-    [("tapp_over_app_fun", tapp_over_app_fun);
-        ("tappenv_over_appenv_fun", tappenv_over_appenv_fun);
-        ("tappenv_over_app_fun", tappenv_over_app_fun);
-        ("tapp_over_appenv_fun", tapp_over_appenv_fun);
-        ("tenvmap_into_id_fun", tenvmap_into_id_fun);
-        ("tproduct_singletons_fun", tproduct_singletons_fun);
-        ("tenvmap_singleton_fun", tenvmap_singleton_fun);
-        ("tenvmap_map_compose_fun", tenvmap_map_compose_fun);
-        ("tenvflatten_coll_fun", tenvflatten_coll_fun);
-         (* only in tail *)
-        (*    tdouble_flatten_map_coll_fun; *)
-        ("tenvflatten_map_coll_fun", tenvflatten_map_coll_fun);
-        ("tapp_over_id_r_fun", tapp_over_id_r_fun);
-        ("tapp_over_id_l_fun", tapp_over_id_l_fun);
-        ("tapp_over_unop_fun", tapp_over_unop_fun);
-        ("tapp_over_binop_fun", tapp_over_binop_fun);
-        ("tapp_over_select_fun", tapp_over_select_fun);
-        ("tapp_over_map_fun", tapp_over_map_fun);
-        ("tapp_over_mapconcat_fun", tapp_over_mapconcat_fun);
-        ("tappenv_over_unop_fun", tappenv_over_unop_fun);
-        ("tcompose_selects_in_mapenv_fun", tcompose_selects_in_mapenv_fun);
-        ("tmap_full_over_select_fun", tmap_full_over_select_fun);
-        ("ttostring_on_string_fun", ttostring_on_string_fun);
-        ("tmerge_with_empty_rec_fun", tmerge_with_empty_rec_fun);
-        ("tselect_and_fun", tselect_and_fun);
-        ("tenvdot_from_duplicate_r_fun", tenvdot_from_duplicate_r_fun);
-        ("tenvdot_from_duplicate_l_fun", tenvdot_from_duplicate_l_fun);
-        ("tconcat_empty_record_r_fun", tconcat_empty_record_r_fun);
-        ("tconcat_empty_record_l_fun", tconcat_empty_record_l_fun);
-        ("tdot_over_concat_r_fun", tdot_over_concat_r_fun);
-        ("tdot_over_concat_l_fun", tdot_over_concat_l_fun);
-        ("tmerge_empty_record_r_fun", tmerge_empty_record_r_fun);
-        ("tmerge_empty_record_l_fun", tmerge_empty_record_l_fun);
-        ("tmapenv_to_env_fun", tmapenv_to_env_fun);
-        ("tenv_appenv_fun", tenv_appenv_fun);
-        ("tflatten_mapenv_coll_fun", tflatten_mapenv_coll_fun);
-        ("tflatten_nil_fun", tflatten_nil_fun);
-         (* only in head *)
-        ("tflatten_through_appenv_fun", tflatten_through_appenv_fun);
-         (* only in head *)
-        ("tappenv_flatten_mapenv_to_map_fun", tappenv_flatten_mapenv_to_map_fun);
-        ("tapp_over_const_fun", tapp_over_const_fun);
-        ("tappenv_over_const_fun", tappenv_over_const_fun);
-        ("tflip_env1_fun", tflip_env1_fun);
-        ("tflip_env2_fun", tflip_env2_fun);
-        ("tmapenv_over_singleton_fun", tmapenv_over_singleton_fun);
-        ("tappenv_over_binop_fun", tappenv_over_binop_fun);
-        ("tflip_env6_fun", tflip_env6_fun);
-        ("tmapenv_to_map_fun", tmapenv_to_map_fun);
-        ("tappenv_over_map_fun", tappenv_over_map_fun);
-        ("tapp_over_ignoreid_fun", tapp_over_ignoreid_fun);
-        ("tappenv_over_ignoreenv_fun", tappenv_over_ignoreenv_fun);
-        ("tappenv_over_env_r_fun", tappenv_over_env_r_fun);
-        ("tappenv_over_env_l_fun", tappenv_over_env_l_fun);
-        ("tappenv_over_env_merge_l_fun", tappenv_over_env_merge_l_fun);
-        ("tappenv_over_select_fun", tappenv_over_select_fun);
-        ("tmerge_concat_to_concat_fun", tmerge_concat_to_concat_fun);
-        ("tmerge_with_concat_to_concat_fun", tmerge_with_concat_to_concat_fun);
-        ("tdot_over_rec_fun", tdot_over_rec_fun);
-        ("tnested_map_over_singletons_fun", tnested_map_over_singletons_fun);
-        ("tapp_over_env_fun", tapp_over_env_fun);
-        ("tselect_over_either_nil_fun", tselect_over_either_nil_fun);
-        ("tselect_over_either_nil_app_fun", tselect_over_either_nil_app_fun);
-          ("tmap_over_either_nil_fun", tmap_over_either_nil_fun);
-        ("tmap_over_either_nil_app_fun", tmap_over_either_nil_app_fun);
-        ("tappenv_over_either_nil_fun", tappenv_over_either_nil_fun);
-        ("tselect_over_flatten_fun", tselect_over_flatten_fun);
-(*    tmap_over_flatten_fun; *)
-        ("tconcat_over_rec_eq_fun", tconcat_over_rec_eq_fun);
-        ("trproject_nil_fun", trproject_nil_fun);
-        ("trproject_over_const_fun", trproject_over_const_fun);
-        ("trproject_over_rec_fun", trproject_over_rec_fun);
-        ("trproject_over_concat_r_fun", trproject_over_concat_r_fun);
-        ("trproject_over_concat_l_fun", trproject_over_concat_l_fun);
-        ("trproject_over_rproject_fun", trproject_over_rproject_fun);
-        ("trproject_over_either_fun", trproject_over_either_fun);
-        ("tcount_over_map_fun", tcount_over_map_fun);
-        ("tcount_over_flat_map_map_fun", tcount_over_flat_map_map_fun);
-        ("tcount_over_flat_map_either_nil_map_fun", tcount_over_flat_map_either_nil_map_fun);
-        ("tcount_over_flat_map_either_nil_app_map_fun", tcount_over_flat_map_either_nil_app_map_fun);
-        ("tcount_over_flat_map_either_nil_app_singleton_fun", tcount_over_flat_map_either_nil_app_singleton_fun);
-        ("tunop_over_either_const_app_fun", tunop_over_either_const_app_fun);
-        ("tunop_over_either_const_fun", tunop_over_either_const_fun);
-        ("tmapconcat_over_singleton_fun", tmapconcat_over_singleton_fun)
+
+  (* list of all optimizations *)
+  Definition tnraenv_optim_list {fruntime:foreign_runtime} : list (@OptimizerStep nraenv)
+    := [
+        tand_comm_step
+        ; tselect_and_comm_step
+        ; tselect_and_step
+        ; tdot_from_duplicate_r_step
+        ; tdot_from_duplicate_l_step
+        ; tflatten_coll_step
+        ; tconcat_empty_record_r_step
+        ; tconcat_empty_record_l_step
+        ; tdot_over_concat_r_step
+        ; tdot_over_concat_l_step
+        ; tmerge_empty_record_r_step
+        ; tmerge_empty_record_l_step
+        ; tmap_into_id_step
+        ; tflatten_map_coll_step
+        ; tflatten_flatten_map_either_nil_step
+        ; tmap_map_compose_step
+        ; tmap_singleton_step
+        ; tapp_over_id_r_step
+        ; tapp_over_env_step
+        ; tapp_over_id_l_step
+        ; tapp_over_ignoreid_step
+        ; tappenv_over_env_l_step
+        ; tappenv_over_env_r_step
+        ; tappenv_over_ignoreenv_step
+        ; tapp_over_app_step
+        ; tappenv_over_appenv_step
+        ; tappenv_over_app_step
+        ; tapp_over_appenv_step
+        ; tapp_over_unop_step
+        ; tappenv_over_unop_step
+        ; tunop_over_either_const_step
+        ; tunop_over_either_const_app_step
+        ; tapp_over_map_step
+        ; tapp_over_mapconcat_step
+        ; tappenv_over_map_step
+        ; tappenv_over_select_step
+        ; tapp_over_select_step
+        ; tapp_over_binop_step
+        ; tproduct_singletons_step
+        ; tdouble_flatten_map_coll_step
+        ; tflatten_over_double_map_step
+        ; tflatten_over_double_map_with_either_step
+        ; tappenv_over_env_merge_l_step
+        ; ttostring_on_string_step
+        ; tmap_full_over_select_step
+        ; tcompose_selects_in_mapenv_step
+        ; tmapenv_to_env_step
+        ; tenv_appenv_step
+        ; tflatten_mapenv_coll_step
+        ; tflatten_nil_step
+        ; tflatten_through_appenv_step
+        ; tappenv_flatten_mapenv_to_map_step
+        ; tselect_over_either_nil_step
+        ; tselect_over_either_nil_app_step
+        ; tmap_over_either_nil_step
+        ; tmap_over_either_nil_app_step
+        ; tappenv_over_either_nil_step
+        ; tselect_over_flatten_step
+        ; tmap_over_flatten_step
+        ; tmap_over_flatten_map_step
+        ; tconcat_over_rec_eq_step
+        ; tapp_over_const_step
+        ; tappenv_over_const_step
+        ; tflip_env1_step
+        ; tflip_env2_step
+        ; tmapenv_over_singleton_step
+        ; tappenv_over_binop_step
+        ; tflip_env6_step
+        ; tmapenv_to_map_step
+        ; tmerge_concat_to_concat_step
+        ; tmerge_with_concat_to_concat_step
+        ; tdot_over_rec_step
+        ; tnested_map_over_singletons_step
+        ; tappenv_mapenv_to_map_step
+        ; trproject_nil_step
+        ; trproject_over_const_step
+        ; trproject_over_rec_step
+        ; trproject_over_concat_r_step
+        ; trproject_over_concat_l_step
+        ; trproject_over_rproject_step
+        ; trproject_over_either_step
+        ; tcount_over_map_step
+        ; tcount_over_flat_map_map_step
+        ; tcount_over_flat_map_either_nil_map_step
+        ; tcount_over_flat_map_either_nil_app_map_step
+        ; tcount_over_flat_map_either_nil_app_singleton_step
+        ; tmapconcat_over_singleton_step
+        ; tdup_elim_step
+      ].
+
+  Definition tnraenv_optim_model_list {model:basic_model} : list (OptimizerStepModel tnraenv_rewrites_to)
+    := [
+        tand_comm_step_correct
+        ; tselect_and_comm_step_correct
+        ; tselect_and_step_correct
+        ; tdot_from_duplicate_r_step_correct
+        ; tdot_from_duplicate_l_step_correct
+        ; tflatten_coll_step_correct
+        ; tconcat_empty_record_r_step_correct
+        ; tconcat_empty_record_l_step_correct
+        ; tdot_over_concat_r_step_correct
+        ; tdot_over_concat_l_step_correct
+        ; tmerge_empty_record_r_step_correct
+        ; tmerge_empty_lecord_l_step_correct
+        ; tmap_into_id_step_correct
+        ; tflatten_map_coll_step_correct
+        ; tflatten_flatten_map_either_nil_step_correct
+        ; tmap_map_compose_step_correct
+        ; tmap_singleton_step_correct
+        ; tapp_over_id_r_step_correct
+        ; tapp_over_env_step_correct
+        ; tapp_over_id_l_step_correct
+        ; tapp_over_ignoreid_step_correct
+        ; tappenv_over_env_l_step_correct
+        ; tappenv_over_env_r_step_correct
+        ; tappenv_over_ignoreenv_step_correct
+        ; tapp_over_app_step_correct
+        ; tappenv_over_appenv_step_correct
+        ; tappenv_over_app_step_correct
+        ; tapp_over_appenv_step_correct
+        ; tapp_over_unop_step_correct
+        ; tappenv_over_unop_step_correct
+        ; tunop_over_either_const_step_correct
+        ; tunop_over_either_const_app_step_correct
+        ; tapp_over_map_step_correct
+        ; tapp_over_mapconcat_step_correct
+        ; tappenv_over_map_step_correct
+        ; tappenv_over_select_step_correct
+        ; tapp_over_select_step_correct
+        ; tapp_over_binop_step_correct
+        ; tproduct_singletons_step_correct
+        ; tdouble_flatten_map_coll_step_correct
+        ; tflatten_over_double_map_step_correct
+        ; tflatten_over_double_map_with_either_step_correct
+        ; tappenv_over_env_merge_l_step_correct
+        ; ttostring_on_string_step_correct
+        ; tmap_full_over_select_step_correct
+        ; tcompose_selects_in_mapenv_step_correct
+        ; tmapenv_to_env_step_correct
+        ; tenv_appenv_step_correct
+        ; tflatten_mapenv_coll_step_correct
+        ; tflatten_nil_step_correct
+        ; tflatten_through_appenv_step_correct
+        ; tappenv_flatten_mapenv_to_map_step_correct
+        ; tselect_over_either_nil_step_correct
+        ; tselect_over_either_nil_app_step_correct
+        ; tmap_over_either_nil_step_correct
+        ; tmap_over_either_nil_app_step_correct
+        ; tappenv_over_either_nil_step_correct
+        ; tselect_over_flatten_step_correct
+        ; tmap_over_flatten_step_correct
+        ; tmap_over_flatten_map_step_correct
+        ; tconcat_over_rec_eq_step_correct
+        ; tapp_over_const_step_correct
+        ; tappenv_over_const_step_correct
+        ; tflip_env1_step_correct
+        ; tflip_env2_step_correct
+        ; tmapenv_over_singleton_step_correct
+        ; tappenv_over_binop_step_correct
+        ; tflip_env6_step_correct
+        ; tmapenv_to_map_step_correct
+        ; tmerge_concat_to_concat_step_correct
+        ; tmerge_with_concat_to_concat_step_correct
+        ; tdot_over_rec_step_correct
+        ; tnested_map_over_singletons_step_correct
+        ; tappenv_mapenv_to_map_step_correct
+        ; trproject_nil_step_correct
+        ; trproject_over_const_step_correct
+        ; trproject_over_rec_step_correct
+        ; trproject_over_concat_r_step_correct
+        ; trproject_over_concat_l_step_correct
+        ; trproject_over_rproject_step_correct
+        ; trproject_over_either_step_correct
+        ; tcount_over_map_step_correct
+        ; tcount_over_flat_map_map_step_correct
+        ; tcount_over_flat_map_either_nil_map_step_correct
+        ; tcount_over_flat_map_either_nil_app_map_step_correct
+        ; tcount_over_flat_map_either_nil_app_singleton_step_correct
+        ; tmapconcat_over_singleton_step_correct
+        ; tdup_elim_step_correct
+      ].
+
+  Lemma tnraenv_optim_model_list_complete {model:basic_model}
+    : optim_model_list_complete tnraenv_optim_list tnraenv_optim_model_list.
+  Proof.
+    optim_correct_list_complete_prover.
+  Qed.
+
+  Definition tnraenv_optim_list_correct {model:basic_model}
+    : optim_list_correct tnraenv_rewrites_to tnraenv_optim_list
+    := optim_list_correct_from_model tnraenv_optim_model_list_complete.
+
+  Lemma tnraenv_optim_list_distinct {fruntime:foreign_runtime}:
+    optim_list_distinct tnraenv_optim_list.
+  Proof.
+    apply optim_list_distinct_prover.
+    vm_compute.
+    apply eq_refl.
+  Qed.
+  
+  Definition head_optim_list {fruntime:foreign_runtime} : list string :=
+    [
+      optim_step_name tapp_over_app_step
+      ; optim_step_name tappenv_over_appenv_step
+      ; optim_step_name tappenv_over_app_step
+      ; optim_step_name tapp_over_appenv_step
+      ; optim_step_name tmap_into_id_step
+      ; optim_step_name tproduct_singletons_step
+      ; optim_step_name tmap_singleton_step
+      ; optim_step_name tmap_map_compose_step
+      ; optim_step_name tflatten_coll_step
+      (* only in tail *)
+      (* ; optim_step_name tdouble_flatten_map_coll_step *)
+      ; optim_step_name tflatten_map_coll_step
+      ; optim_step_name tapp_over_id_r_step
+      ; optim_step_name tapp_over_id_l_step
+      ; optim_step_name tapp_over_unop_step
+      ; optim_step_name tapp_over_binop_step
+      ; optim_step_name tapp_over_select_step
+      ; optim_step_name tapp_over_map_step
+      ; optim_step_name tapp_over_mapconcat_step
+      ; optim_step_name tappenv_over_unop_step
+      ; optim_step_name tcompose_selects_in_mapenv_step
+      ; optim_step_name tmap_full_over_select_step
+      ; optim_step_name ttostring_on_string_step
+      ; optim_step_name tmerge_empty_record_r_step
+      ; optim_step_name tselect_and_step
+      ; optim_step_name tdot_from_duplicate_r_step
+      ; optim_step_name tdot_from_duplicate_l_step
+      ; optim_step_name tconcat_empty_record_r_step
+      ; optim_step_name tconcat_empty_record_l_step
+      ; optim_step_name tdot_over_concat_r_step
+      ; optim_step_name tdot_over_concat_l_step
+      ; optim_step_name tmerge_empty_record_r_step
+      ; optim_step_name tmerge_empty_record_l_step
+      ; optim_step_name tmapenv_to_env_step
+      ; optim_step_name tenv_appenv_step
+      ; optim_step_name tflatten_mapenv_coll_step
+      ; optim_step_name tflatten_nil_step
+      (*optim_step_name  only in head *)
+      ; optim_step_name tflatten_through_appenv_step
+      (*optim_step_name  only in head *)
+      ; optim_step_name tappenv_flatten_mapenv_to_map_step
+      ; optim_step_name tapp_over_const_step
+      ; optim_step_name tappenv_over_const_step
+      ; optim_step_name tflip_env1_step
+      ; optim_step_name tflip_env2_step
+      ; optim_step_name tmapenv_over_singleton_step
+      ; optim_step_name tappenv_over_binop_step
+      ; optim_step_name tflip_env6_step
+      ; optim_step_name tmapenv_to_map_step
+      ; optim_step_name tappenv_over_map_step
+      ; optim_step_name tapp_over_ignoreid_step
+      ; optim_step_name tappenv_over_ignoreenv_step
+      ; optim_step_name tappenv_over_env_r_step
+      ; optim_step_name tappenv_over_env_l_step
+      ; optim_step_name tappenv_over_env_merge_l_step
+      ; optim_step_name tappenv_over_select_step
+      ; optim_step_name tmerge_concat_to_concat_step
+      ; optim_step_name tmerge_with_concat_to_concat_step
+      ; optim_step_name tdot_over_rec_step
+      ; optim_step_name tnested_map_over_singletons_step
+      ; optim_step_name tapp_over_env_step
+      ; optim_step_name tselect_over_either_nil_step
+      ; optim_step_name tselect_over_either_nil_app_step
+      ; optim_step_name tmap_over_either_nil_step
+      ; optim_step_name tmap_over_either_nil_app_step
+      ; optim_step_name tappenv_over_either_nil_step
+      ; optim_step_name tselect_over_flatten_step
+      (* ; optim_step_name tmap_over_flatten_step *)
+      ; optim_step_name tconcat_over_rec_eq_step
+      ; optim_step_name trproject_nil_step
+      ; optim_step_name trproject_over_const_step
+      ; optim_step_name trproject_over_rec_step
+      ; optim_step_name trproject_over_concat_r_step
+      ; optim_step_name trproject_over_concat_l_step
+      ; optim_step_name trproject_over_rproject_step
+      ; optim_step_name trproject_over_either_step
+      ; optim_step_name tcount_over_map_step
+      ; optim_step_name tcount_over_flat_map_map_step
+      ; optim_step_name tcount_over_flat_map_either_nil_map_step
+      ; optim_step_name tcount_over_flat_map_either_nil_app_map_step
+      ; optim_step_name tcount_over_flat_map_either_nil_app_singleton_step
+      ; optim_step_name tunop_over_either_const_app_step
+      ; optim_step_name tunop_over_either_const_step
+      ; optim_step_name tmapconcat_over_singleton_step
     ].
 
+  Remark head_optim_list_all_valid  {fruntime:foreign_runtime}
+    : valid_optims tnraenv_optim_list head_optim_list = (head_optim_list,nil).
+  Proof.
+    vm_compute; trivial.
+  Qed.
+
+  Definition head_optim_list_optim {fruntime:foreign_runtime}
+    := project_optims tnraenv_optim_list head_optim_list.
+  
   Definition head_optim
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nraenv} (name:string)
     : nraenv -> nraenv :=
-    apply_steps ("nra_head" ++ name) head_optim_list.
+     run_optimizer_steps ("nra_head" ++ name) head_optim_list_optim.
   
   Lemma head_optim_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (name:string) (p:nraenv) :
     p ⇒ₓ head_optim name p.
   Proof.
     unfold head_optim.
-    rewrite tmapconcat_over_singleton_fun_correctness at 1.
-    rewrite tunop_over_either_const_fun_correctness at 1.
-    rewrite tunop_over_either_const_app_fun_correctness at 1.
-    rewrite tcount_over_flat_map_either_nil_app_singleton_fun_correctness at 1.
-    rewrite tcount_over_flat_map_either_nil_app_map_fun_correctness at 1.
-    rewrite tcount_over_flat_map_either_nil_map_fun_correctness at 1.
-    rewrite tcount_over_flat_map_map_fun_correctness at 1.
-    rewrite tcount_over_map_fun_correctness at 1.
-    rewrite trproject_over_either_fun_correctness at 1.
-    rewrite trproject_over_rproject_fun_correctness at 1.
-    rewrite trproject_over_concat_l_fun_correctness at 1.
-    rewrite trproject_over_concat_r_fun_correctness at 1.
-    rewrite trproject_over_rec_fun_correctness at 1.
-    rewrite trproject_over_const_fun_correctness at 1.
-    rewrite trproject_nil_fun_correctness at 1.
-    rewrite tconcat_over_rec_eq_fun_correctness at 1.
-(*    rewrite tmap_over_flatten_fun_correctness at 1. *)
-    rewrite tselect_over_flatten_fun_correctness at 1.
-    rewrite tappenv_over_either_nil_fun_correctness at 1.
-    rewrite tmap_over_either_nil_app_fun_correctness at 1.
-    rewrite tmap_over_either_nil_fun_correctness at 1.
-    rewrite tselect_over_either_nil_app_fun_correctness at 1.
-    rewrite tselect_over_either_nil_fun_correctness at 1.
-    rewrite tapp_over_env_fun_correctness at 1.
-    rewrite tnested_map_over_singletons_fun_correctness at 1.
-    rewrite tdot_over_rec_fun_correctness at 1.
-    rewrite tmerge_with_concat_to_concat_fun_correctness at 1.
-    rewrite tmerge_concat_to_concat_fun_correctness at 1.
-    rewrite tappenv_over_select_fun_correctness at 1.
-    rewrite tappenv_over_env_merge_l_fun_correctness at 1.
-    rewrite tappenv_over_env_l_fun_correctness at 1.
-    rewrite tappenv_over_env_r_fun_correctness at 1.
-    rewrite tappenv_over_ignoreenv_fun_correctness at 1.
-    rewrite tapp_over_ignoreid_fun_correctness at 1.
-    rewrite tappenv_over_map_fun_correctness at 1.
-    rewrite tmapenv_to_map_fun_correctness at 1.
-    rewrite tflip_env6_fun_correctness at 1.
-    rewrite tappenv_over_binop_fun_correctness at 1.
-    rewrite tmapenv_over_singleton_fun_correctness at 1.
-    rewrite tflip_env2_fun_correctness at 1.
-    rewrite tflip_env1_fun_correctness at 1.
-    rewrite tappenv_over_const_fun_correctness at 1.
-    rewrite tapp_over_const_fun_correctness at 1.
-    rewrite tappenv_flatten_mapenv_to_map_fun_correctness at 1.
-    rewrite tflatten_through_appenv_fun_correctness at 1.
-    rewrite tflatten_nil_fun_correctness at 1.
-    rewrite tflatten_mapenv_coll_fun_correctness at 1.
-    rewrite tenv_appenv_fun_correctness at 1.
-    rewrite tmapenv_to_env_fun_correctness at 1.
-    rewrite tmerge_empty_record_l_fun_correctness at 1.
-    rewrite tmerge_empty_record_r_fun_correctness at 1.
-    rewrite tdot_over_concat_l_fun_correctness at 1.
-    rewrite tdot_over_concat_r_fun_correctness at 1.
-    rewrite tconcat_empty_record_l_fun_correctness at 1.
-    rewrite tconcat_empty_record_r_fun_correctness at 1.
-    rewrite tenvdot_from_duplicate_l_fun_correctness at 1.
-    rewrite tenvdot_from_duplicate_r_fun_correctness at 1.
-    rewrite tselect_and_fun_correctness at 1.
-    rewrite tmerge_with_empty_rec_fun_correctness at 1.
-    rewrite ttostring_on_string_fun_correctness at 1.
-    rewrite tmap_full_over_select_fun_correctness at 1; (* only in tail *)
-    rewrite tcompose_selects_in_mapenv_fun_correctness at 1.
-    rewrite tappenv_over_unop_fun_correctness at 1.
-    rewrite tapp_over_mapconcat_fun_correctness at 1.
-    rewrite tapp_over_map_fun_correctness at 1.
-    rewrite tapp_over_select_fun_correctness at 1.
-    rewrite tapp_over_binop_fun_correctness at 1.
-    rewrite tapp_over_unop_fun_correctness at 1.
-    rewrite tapp_over_id_l_fun_correctness at 1.
-    rewrite tapp_over_id_r_fun_correctness at 1.
-    rewrite tenvflatten_map_coll_fun_correctness at 1.
-    rewrite tenvflatten_coll_fun_correctness at 1.
-    rewrite tenvmap_map_compose_fun_correctness at 1.
-    rewrite tenvmap_singleton_fun_correctness at 1.
-    rewrite tproduct_singletons_fun_correctness at 1.
-    rewrite tenvmap_into_id_fun_correctness at 1.
-    rewrite tapp_over_appenv_fun_correctness at 1.
-    rewrite tappenv_over_app_fun_correctness at 1.
-    rewrite tappenv_over_appenv_fun_correctness at 1.
-    rewrite tapp_over_app_fun_correctness at 1.
-    unfold head_optim_list.
-    unfold apply_steps.
-    rewrite hide_use_eq.
-    simpl fold_right.
-    repeat rewrite optimizer_step_result.
-    unfold snd.
-    red; intros; split; [apply H|reflexivity].
+    apply run_optimizer_steps_correct.
+    unfold head_optim_list_optim.
+    apply project_optims_list_correct.
+    apply tnraenv_optim_list_correct.
   Qed.
 
   (* *************************** *)
 
-  Definition tail_optim_list {fruntime:foreign_runtime} : list (string * (nraenv -> nraenv)) :=
-    [ ("tflatten_flatten_map_either_nil_fun", tflatten_flatten_map_either_nil_fun);
-        ("tmap_over_flatten_map_fun", tmap_over_flatten_map_fun);
-        ("tapp_over_app_fun", tapp_over_app_fun);
-        ("tappenv_over_appenv_fun", tappenv_over_appenv_fun);
-        ("tappenv_over_app_fun", tappenv_over_app_fun);
-        ("tapp_over_appenv_fun", tapp_over_appenv_fun);
-        ("tenvmap_into_id_fun", tenvmap_into_id_fun);
-        ("tproduct_singletons_fun", tproduct_singletons_fun);
-        ("tenvmap_singleton_fun", tenvmap_singleton_fun);
-        ("tenvmap_map_compose_fun", tenvmap_map_compose_fun);
-        ("tenvflatten_coll_fun", tenvflatten_coll_fun);
-        (* only in tail *)
-        ("tdouble_flatten_map_coll_fun", tdouble_flatten_map_coll_fun);
-        ("tflatten_over_double_map_fun", tflatten_over_double_map_fun);
-        ("tflatten_over_double_map_with_either_fun", tflatten_over_double_map_with_either_fun);
-        ("tenvflatten_map_coll_fun", tenvflatten_map_coll_fun);
-        ("tapp_over_id_r_fun", tapp_over_id_r_fun);
-        ("tapp_over_id_l_fun", tapp_over_id_l_fun);
-        ("tapp_over_unop_fun", tapp_over_unop_fun);
-        ("tapp_over_binop_fun", tapp_over_binop_fun);
-        ("tapp_over_select_fun", tapp_over_select_fun);
-        ("tapp_over_map_fun", tapp_over_map_fun);
-        ("tapp_over_mapconcat_fun", tapp_over_mapconcat_fun);
-        ("tappenv_over_unop_fun", tappenv_over_unop_fun);
-        ("tcompose_selects_in_mapenv_fun", tcompose_selects_in_mapenv_fun);
-        ("tmap_full_over_select_fun", tmap_full_over_select_fun);
-        ("ttostring_on_string_fun", ttostring_on_string_fun);
-        ("tmerge_with_empty_rec_fun", tmerge_with_empty_rec_fun);
-        ("tselect_and_fun", tselect_and_fun);
-        ("tenvdot_from_duplicate_r_fun", tenvdot_from_duplicate_r_fun);
-        ("tenvdot_from_duplicate_l_fun", tenvdot_from_duplicate_l_fun);
-        ("tconcat_empty_record_r_fun", tconcat_empty_record_r_fun);
-        ("tconcat_empty_record_l_fun", tconcat_empty_record_l_fun);
-        ("tdot_over_concat_r_fun", tdot_over_concat_r_fun);
-        ("tdot_over_concat_l_fun", tdot_over_concat_l_fun);
-        ("tmerge_empty_record_r_fun", tmerge_empty_record_r_fun);
-        ("tmerge_empty_record_l_fun", tmerge_empty_record_l_fun);
-        ("tmapenv_to_env_fun", tmapenv_to_env_fun);
-        ("tenv_appenv_fun", tenv_appenv_fun);
-        ("tflatten_mapenv_coll_fun", tflatten_mapenv_coll_fun);
-        ("tflatten_nil_fun", tflatten_nil_fun);
-        ("tapp_over_const_fun", tapp_over_const_fun);
-        ("tappenv_over_const_fun", tappenv_over_const_fun);
-        ("tflip_env1_fun", tflip_env1_fun);
-        ("tflip_env2_fun", tflip_env2_fun);
-        ("tmapenv_over_singleton_fun", tmapenv_over_singleton_fun);
-        ("tappenv_over_binop_fun", tappenv_over_binop_fun);
-        ("tflip_env6_fun", tflip_env6_fun);
-        ("tmapenv_to_map_fun", tmapenv_to_map_fun);
-        ("tappenv_over_map_fun", tappenv_over_map_fun);
-        ("tapp_over_ignoreid_fun", tapp_over_ignoreid_fun);
-        ("tappenv_over_ignoreenv_fun", tappenv_over_ignoreenv_fun);
-        ("tappenv_over_env_r_fun", tappenv_over_env_r_fun);
-        ("tappenv_over_env_l_fun", tappenv_over_env_l_fun);
-        ("tappenv_over_env_merge_l_fun", tappenv_over_env_merge_l_fun);
-        ("tappenv_over_select_fun", tappenv_over_select_fun);
-        ("tmerge_concat_to_concat_fun", tmerge_concat_to_concat_fun);
-        ("tmerge_with_concat_to_concat_fun", tmerge_with_concat_to_concat_fun);
-        ("tdot_over_rec_fun", tdot_over_rec_fun);
-        ("tnested_map_over_singletons_fun", tnested_map_over_singletons_fun);
-        ("tapp_over_env_fun", tapp_over_env_fun);
-        ("tappenv_mapenv_to_map_fun", tappenv_mapenv_to_map_fun);
-        ("tselect_over_either_nil_fun", tselect_over_either_nil_fun);
-        ("tselect_over_either_nil_app_fun", tselect_over_either_nil_app_fun); 
-        ("tmap_over_either_nil_fun", tmap_over_either_nil_fun);
-        ("tmap_over_either_nil_app_fun", tmap_over_either_nil_app_fun); 
-        ("tappenv_over_either_nil_fun", tappenv_over_either_nil_fun);
-        ("tselect_over_flatten_fun", tselect_over_flatten_fun);
-        ("tmap_over_flatten_fun", tmap_over_flatten_fun); 
-        ("tconcat_over_rec_eq_fun", tconcat_over_rec_eq_fun);
-        ("trproject_nil_fun", trproject_nil_fun);
-        ("trproject_over_const_fun", trproject_over_const_fun);
-        ("trproject_over_rec_fun", trproject_over_rec_fun);
-        ("trproject_over_concat_r_fun", trproject_over_concat_r_fun);
-        ("trproject_over_concat_l_fun", trproject_over_concat_l_fun);
-        ("trproject_over_rproject_fun", trproject_over_rproject_fun);
-        ("trproject_over_either_fun", trproject_over_either_fun);
-        ("tcount_over_map_fun", tcount_over_map_fun);
-        ("tcount_over_flat_map_map_fun", tcount_over_flat_map_map_fun);
-        ("tcount_over_flat_map_either_nil_map_fun", tcount_over_flat_map_either_nil_map_fun);
-        ("tcount_over_flat_map_either_nil_app_map_fun", tcount_over_flat_map_either_nil_app_map_fun);
-        ("tcount_over_flat_map_either_nil_app_singleton_fun", tcount_over_flat_map_either_nil_app_singleton_fun);
-        ("tunop_over_either_const_app_fun", tunop_over_either_const_app_fun);
-        ("tunop_over_either_const_fun", tunop_over_either_const_fun);
-        ("tmapconcat_over_singleton_fun", tmapconcat_over_singleton_fun)
+  Definition tail_optim_list {fruntime:foreign_runtime} : list string :=
+    [ optim_step_name tflatten_flatten_map_either_nil_step
+      ; optim_step_name tmap_over_flatten_map_step
+      ; optim_step_name tapp_over_app_step
+      ; optim_step_name tappenv_over_appenv_step
+      ; optim_step_name tappenv_over_app_step
+      ; optim_step_name tapp_over_appenv_step
+      ; optim_step_name tmap_into_id_step
+      ; optim_step_name tproduct_singletons_step
+      ; optim_step_name tmap_singleton_step
+      ; optim_step_name tmap_map_compose_step
+      ; optim_step_name tflatten_coll_step
+      (* only in tail *)
+      ; optim_step_name tdouble_flatten_map_coll_step
+      ; optim_step_name tflatten_over_double_map_step
+      ; optim_step_name tflatten_over_double_map_with_either_step
+      ; optim_step_name tflatten_map_coll_step
+      ; optim_step_name tapp_over_id_r_step
+      ; optim_step_name tapp_over_id_l_step
+      ; optim_step_name tapp_over_unop_step
+      ; optim_step_name tapp_over_binop_step
+      ; optim_step_name tapp_over_select_step
+      ; optim_step_name tapp_over_map_step
+      ; optim_step_name tapp_over_mapconcat_step
+      ; optim_step_name tappenv_over_unop_step
+      ; optim_step_name tcompose_selects_in_mapenv_step
+      ; optim_step_name tmap_full_over_select_step
+      ; optim_step_name ttostring_on_string_step
+      ; optim_step_name tmerge_empty_record_r_step
+      ; optim_step_name tselect_and_step
+      ; optim_step_name tdot_from_duplicate_r_step
+      ; optim_step_name tdot_from_duplicate_l_step
+      ; optim_step_name tconcat_empty_record_r_step
+      ; optim_step_name tconcat_empty_record_l_step
+      ; optim_step_name tdot_over_concat_r_step
+      ; optim_step_name tdot_over_concat_l_step
+      ; optim_step_name tmerge_empty_record_r_step
+      ; optim_step_name tmerge_empty_record_l_step
+      ; optim_step_name tmapenv_to_env_step
+      ; optim_step_name tenv_appenv_step
+      ; optim_step_name tflatten_mapenv_coll_step
+      ; optim_step_name tflatten_nil_step
+      ; optim_step_name tapp_over_const_step
+      ; optim_step_name tappenv_over_const_step
+      ; optim_step_name tflip_env1_step
+      ; optim_step_name tflip_env2_step
+      ; optim_step_name tmapenv_over_singleton_step
+      ; optim_step_name tappenv_over_binop_step
+      ; optim_step_name tflip_env6_step
+      ; optim_step_name tmapenv_to_map_step
+      ; optim_step_name tappenv_over_map_step
+      ; optim_step_name tapp_over_ignoreid_step
+      ; optim_step_name tappenv_over_ignoreenv_step
+      ; optim_step_name tappenv_over_env_r_step
+      ; optim_step_name tappenv_over_env_l_step
+      ; optim_step_name tappenv_over_env_merge_l_step
+      ; optim_step_name tappenv_over_select_step
+      ; optim_step_name tmerge_concat_to_concat_step
+      ; optim_step_name tmerge_with_concat_to_concat_step
+      ; optim_step_name tdot_over_rec_step
+      ; optim_step_name tnested_map_over_singletons_step
+      ; optim_step_name tapp_over_env_step
+      ; optim_step_name tappenv_mapenv_to_map_step
+      ; optim_step_name tselect_over_either_nil_step
+      ; optim_step_name tselect_over_either_nil_app_step
+      ; optim_step_name tmap_over_either_nil_step
+      ; optim_step_name tmap_over_either_nil_app_step
+      ; optim_step_name tappenv_over_either_nil_step
+      ; optim_step_name tselect_over_flatten_step
+      ; optim_step_name tmap_over_flatten_step
+      ; optim_step_name tconcat_over_rec_eq_step
+      ; optim_step_name trproject_nil_step
+      ; optim_step_name trproject_over_const_step
+      ; optim_step_name trproject_over_rec_step
+      ; optim_step_name trproject_over_concat_r_step
+      ; optim_step_name trproject_over_concat_l_step
+      ; optim_step_name trproject_over_rproject_step
+      ; optim_step_name trproject_over_either_step
+      ; optim_step_name tcount_over_map_step
+      ; optim_step_name tcount_over_flat_map_map_step
+      ; optim_step_name tcount_over_flat_map_either_nil_map_step
+      ; optim_step_name tcount_over_flat_map_either_nil_app_map_step
+      ; optim_step_name tcount_over_flat_map_either_nil_app_singleton_step
+      ; optim_step_name tunop_over_either_const_app_step
+      ; optim_step_name tunop_over_either_const_step
+      ; optim_step_name tmapconcat_over_singleton_step
     ].
 
+    Definition tail_optim_list_optim {fruntime:foreign_runtime}
+    := project_optims tnraenv_optim_list tail_optim_list.
+
   Definition tail_optim {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (name:string) : nraenv -> nraenv :=
-    apply_steps ("tail" ++ name)  tail_optim_list.
+    run_optimizer_steps ("tail" ++ name) tail_optim_list_optim.
 
   Lemma tail_optim_correctness {model:basic_model}  {logger:optimizer_logger string nraenv} (name:string) (p:nraenv) :
     p ⇒ₓ tail_optim name p.
   Proof.
     unfold tail_optim.
-    rewrite tmapconcat_over_singleton_fun_correctness at 1.
-    rewrite tunop_over_either_const_fun_correctness at 1.
-    rewrite tunop_over_either_const_app_fun_correctness at 1.
-    rewrite tcount_over_flat_map_either_nil_app_singleton_fun_correctness at 1.
-    rewrite tcount_over_flat_map_either_nil_app_map_fun_correctness at 1.
-    rewrite tcount_over_flat_map_either_nil_map_fun_correctness at 1.
-    rewrite tcount_over_flat_map_map_fun_correctness at 1.
-    rewrite tcount_over_map_fun_correctness at 1.
-    rewrite trproject_over_either_fun_correctness at 1.
-    rewrite trproject_over_rproject_fun_correctness at 1.
-    rewrite trproject_over_concat_l_fun_correctness at 1.
-    rewrite trproject_over_concat_r_fun_correctness at 1.
-    rewrite trproject_over_rec_fun_correctness at 1.
-    rewrite trproject_over_const_fun_correctness at 1.
-    rewrite trproject_nil_fun_correctness at 1.
-    rewrite tconcat_over_rec_eq_fun_correctness at 1.
-    rewrite tmap_over_flatten_fun_correctness at 1. 
-    rewrite tselect_over_flatten_fun_correctness at 1.
-    rewrite tappenv_over_either_nil_fun_correctness at 1.
-    rewrite tmap_over_either_nil_app_fun_correctness at 1.
-    rewrite tmap_over_either_nil_fun_correctness at 1.
-    rewrite tselect_over_either_nil_app_fun_correctness at 1.
-    rewrite tselect_over_either_nil_fun_correctness at 1.
-    rewrite tappenv_mapenv_to_map_fun_correctness at 1.
-    rewrite tapp_over_env_fun_correctness at 1.
-    rewrite tnested_map_over_singletons_fun_correctness at 1.
-    rewrite tdot_over_rec_fun_correctness at 1.
-    rewrite tmerge_with_concat_to_concat_fun_correctness at 1.
-    rewrite tmerge_concat_to_concat_fun_correctness at 1.
-    rewrite tappenv_over_select_fun_correctness at 1.
-    rewrite tappenv_over_env_merge_l_fun_correctness at 1.
-    rewrite tappenv_over_env_l_fun_correctness at 1.
-    rewrite tappenv_over_env_r_fun_correctness at 1.
-    rewrite tappenv_over_ignoreenv_fun_correctness at 1.
-    rewrite tapp_over_ignoreid_fun_correctness at 1.
-    rewrite tappenv_over_map_fun_correctness at 1.
-    rewrite tmapenv_to_map_fun_correctness at 1.
-    rewrite tflip_env6_fun_correctness at 1.
-    rewrite tappenv_over_binop_fun_correctness at 1.
-    rewrite tmapenv_over_singleton_fun_correctness at 1.
-    rewrite tflip_env2_fun_correctness at 1.
-    rewrite tflip_env1_fun_correctness at 1.
-    rewrite tappenv_over_const_fun_correctness at 1.
-    rewrite tapp_over_const_fun_correctness at 1.
-    rewrite tflatten_nil_fun_correctness at 1.
-    rewrite tflatten_mapenv_coll_fun_correctness at 1.
-    rewrite tenv_appenv_fun_correctness at 1.
-    rewrite tmapenv_to_env_fun_correctness at 1.
-    rewrite tmerge_empty_record_l_fun_correctness at 1.
-    rewrite tmerge_empty_record_r_fun_correctness at 1.
-    rewrite tdot_over_concat_l_fun_correctness at 1.
-    rewrite tdot_over_concat_r_fun_correctness at 1.
-    rewrite tconcat_empty_record_l_fun_correctness at 1.
-    rewrite tconcat_empty_record_r_fun_correctness at 1.
-    rewrite tenvdot_from_duplicate_l_fun_correctness at 1.
-    rewrite tenvdot_from_duplicate_r_fun_correctness at 1.
-    rewrite tselect_and_fun_correctness at 1.
-    rewrite tmerge_with_empty_rec_fun_correctness at 1.
-    rewrite ttostring_on_string_fun_correctness at 1.
-    rewrite tmap_full_over_select_fun_correctness at 1.
-    rewrite tcompose_selects_in_mapenv_fun_correctness at 1;
-    rewrite tappenv_over_unop_fun_correctness at 1.
-    rewrite tapp_over_mapconcat_fun_correctness at 1.
-    rewrite tapp_over_map_fun_correctness at 1.
-    rewrite tapp_over_select_fun_correctness at 1.
-    rewrite tapp_over_binop_fun_correctness at 1.
-    rewrite tapp_over_unop_fun_correctness at 1.
-    rewrite tapp_over_id_l_fun_correctness at 1.
-    rewrite tapp_over_id_r_fun_correctness at 1.
-    rewrite tenvflatten_map_coll_fun_correctness at 1.
-    rewrite tflatten_over_double_map_with_either_fun_correctness at 1.
-    rewrite tflatten_over_double_map_fun_correctness at 1.
-    rewrite tdouble_flatten_map_coll_fun_correctness at 1.
-    rewrite tenvflatten_coll_fun_correctness at 1.
-    rewrite tenvmap_map_compose_fun_correctness at 1.
-    rewrite tenvmap_singleton_fun_correctness at 1.
-    rewrite tproduct_singletons_fun_correctness at 1.
-    rewrite tenvmap_into_id_fun_correctness at 1.
-    rewrite tapp_over_appenv_fun_correctness at 1.
-    rewrite tappenv_over_app_fun_correctness at 1.
-    rewrite tappenv_over_appenv_fun_correctness at 1.
-    rewrite tapp_over_app_fun_correctness at 1.
-    rewrite tmap_over_flatten_map_fun_correctness at 1.
-    rewrite tflatten_flatten_map_either_nil_fun_correctness at 1.
-    unfold tail_optim_list.
-    unfold apply_steps.
-    rewrite hide_use_eq.
-    simpl fold_right.
-    repeat rewrite optimizer_step_result.
-    unfold snd.
-    red; intros; split; [apply H|reflexivity].
+    apply run_optimizer_steps_correct.
+    unfold tail_optim_list_optim.
+    apply project_optims_list_correct.
+    apply tnraenv_optim_list_correct.
   Qed.
 
   Definition optim1 {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p: nraenv) :=
@@ -2284,12 +3194,8 @@ Section NRAEnvOptimFunc.
     p ⇒ₓ optim1 p.
   Proof.
     unfold optim1.
-    assert (p ⇒ₓ tnraenv_map_deep (head_optim "1") p).
-    apply nraenv_map_deep_correctness.
-    intro p'.
-    rewrite head_optim_correctness at 1.
-    reflexivity.
-    assumption.
+    apply nraenv_map_deep_correctness; intros.
+    apply head_optim_correctness.
   Qed.
 
   Definition optim2 {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p: nraenv) :=
@@ -2299,12 +3205,8 @@ Section NRAEnvOptimFunc.
     p ⇒ₓ optim2 p.
   Proof.
     unfold optim2.
-    assert (p ⇒ₓ tnraenv_map_deep (tail_optim "") p).
     apply nraenv_map_deep_correctness.
-    intro p'.
-    rewrite tail_optim_correctness at 1.
-    reflexivity.
-    assumption.
+    apply tail_optim_correctness.
   Qed.
 
   Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p:nraenv) :=
@@ -2314,17 +3216,13 @@ Section NRAEnvOptimFunc.
   Lemma toptim_nraenv_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
     p ⇒ₓ toptim_nraenv p.
   Proof.
-    unfold toptim_nraenv.
-    rewrite optim_size_correctness at 1; try reflexivity.
-    rewrite optim_size_correctness at 1; try reflexivity.
-    intros p1.
-    rewrite optim_iter_correctness at 1; try reflexivity.
-    intros p2.
-    rewrite optim2_correctness at 1; try reflexivity.
-    intros p1.
-    rewrite optim_iter_correctness at 1; try reflexivity.
-    intros p2.
-    rewrite optim1_correctness at 1; try reflexivity.
+      Hint Resolve optim_size_correctness optim_iter_correctness.
+      Hint Resolve optim1_correctness optim2_correctness.
+      unfold toptim_nraenv.
+      transitivity ((optim_size (optim_iter optim1 5) p)); [ | auto ].
+      apply optim_size_correctness; intros.
+      apply optim_iter_correctness; intros.
+      apply optim1_correctness.
   Qed.
 
 End NRAEnvOptimFunc.
