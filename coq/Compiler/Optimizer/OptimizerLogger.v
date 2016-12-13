@@ -33,23 +33,6 @@ Section OptimizerLogger.
                optimizer_logger_token_type
          }.
 
-  Definition optimizer_step
-             {Name D} {logger:optimizer_logger Name D}
-             (step:Name*(D->D)) (input:optimizer_logger_token_type*D)
-    : optimizer_logger_token_type*D
-    := let res := (snd step) (snd input) in
-       let log := logStep (fst input) (fst step) (snd input) res in
-       (log, res).
-
-  Lemma optimizer_step_result
-         {Name D} {logger:optimizer_logger Name D}
-         (step:Name*(D->D)) (input:optimizer_logger_token_type*D) :
-    snd (optimizer_step step input) = (snd step) (snd input).
-  Proof.
-    unfold optimizer_step.
-    simpl; reflexivity.
-  Qed.
-
   (* This it to try and ``trick'' the system so that 
      the evaluation is extracted and run for its effects
     *)
@@ -60,14 +43,6 @@ Section OptimizerLogger.
   Qed.
   Opaque hide_use.
   
-  Definition apply_steps {Name D} {logger:optimizer_logger Name D}
-             (name:Name)
-              (l:list (Name*(D->D))) (p:D)
-    := let tok := logStartPass name p in
-       let res := fold_right optimizer_step (tok,p) l in
-       let tok := logEndPass (fst res) (snd res) in
-       hide_use tok (snd res).
-
   Instance silent_optimizer_logger (Name:Set) (D:Set) : optimizer_logger Name D
     :=
     {
