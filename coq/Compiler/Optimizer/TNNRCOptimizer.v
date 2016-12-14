@@ -954,8 +954,39 @@ Section TNNRCOptimizer.
 
   (* *************************** *)
 
+  Definition run_nnrc_optims 
+             {fruntime:foreign_runtime}
+             {logger:optimizer_logger string nnrc}
+             (phaseName:string)
+             (optims:list string)
+             (iterationsBetweenCostCheck:nat)
+    : nnrc -> nnrc :=
+    rew_size
+      (rew_iter 
+         (tnnrc_map_deep 
+            (run_optimizer_steps ("[nnrc] " ++ phaseName)
+                                 (project_optims tnnrc_optim_list optims)))
+         iterationsBetweenCostCheck).
+
+  Lemma run_nnrc_optims_correctness
+        {model:basic_model} {logger:optimizer_logger string nnrc}
+        (phaseName:string)
+        (optims:list string)
+        (iterationsBetweenCostCheck:nat)
+        (p:nnrc) :
+    tnnrc_ext_rewrites_to p ( run_nnrc_optims phaseName optims iterationsBetweenCostCheck p).
+  Proof.
+    unfold run_nnrc_optims.
+    apply rew_size_correctness; intros.
+    apply rew_iter_correctness; intros.
+    apply tnnrc_map_deep_correctness; intros.
+    apply run_optimizer_steps_correct.
+    apply project_optims_list_correct.
+    apply tnnrc_optim_list_correct.
+  Qed.
+  
   (* Java equivalent: NnrcOptimizer.head_rew_list *)
-  Definition head_rew_list {fruntime:foreign_runtime} : list string
+  Definition nnrc_default_optim_list {fruntime:foreign_runtime} : list string
     := [
         optim_step_name tinline_let_step
         ; optim_step_name tcount_over_flat_for_either_either_nil_step
@@ -981,74 +1012,23 @@ Section TNNRCOptimizer.
         ; optim_step_name tproject_over_either_step
       ].
 
-  Remark head_rew_list_all_valid  {fruntime:foreign_runtime}
-    : valid_optims tnnrc_optim_list head_rew_list = (head_rew_list,nil).
+  Remark nnrc_default_optim_list_all_valid  {fruntime:foreign_runtime}
+    : valid_optims tnnrc_optim_list nnrc_default_optim_list = (nnrc_default_optim_list,nil).
   Proof.
     vm_compute; trivial.
   Qed.
-
-  Definition head_rew_list_optim {fruntime:foreign_runtime}
-    := project_optims tnnrc_optim_list head_rew_list.
   
-  (* Java equivalent: NnrcOptimizer.head_rew *)
-  Definition head_rew 
-             {fruntime:foreign_runtime}
-             {logger:optimizer_logger string nnrc} (name:string)
-    : nnrc -> nnrc :=
-    run_optimizer_steps ("nnrc_head" ++ name) head_rew_list_optim.
-
-  Lemma head_rew_correctness
-        {model:basic_model} {logger:optimizer_logger string nnrc}
-        (name:string) (p:nnrc) :
-    tnnrc_ext_rewrites_to p (head_rew name p).
-  Proof.
-    unfold head_rew.
-    apply run_optimizer_steps_correct.
-    unfold head_rew_list_optim.
-    apply project_optims_list_correct.
-    apply tnnrc_optim_list_correct.
-  Qed.
-
-  (* Java equivalent: NnrcOptimizer.trew (inlined) *)
-  Definition rew1 {fruntime:foreign_runtime} (p: nnrc) :=
-    optim_step_step tunshadow_preserves_step p.
-  
-  Lemma rew1_correctness {model:basic_model} (p:nnrc) :
-    tnnrc_ext_rewrites_to p (rew1 p).
-  Proof.
-    apply (optim_step_model_step_correct _ tunshadow_preserves_step_correct).
-  Qed.
-    
-  Definition rew2
-             {fruntime:foreign_runtime} {logger:optimizer_logger string nnrc} (p: nnrc) :=
-    tnnrc_map_deep (head_rew "2") p.
-
-  Lemma rew2_correctness
-        {model:basic_model} {logger:optimizer_logger string nnrc} (p:nnrc) :
-    tnnrc_ext_rewrites_to p (rew2 p).
-  Proof.
-    apply tnnrc_map_deep_correctness; intros.
-    apply head_rew_correctness.
-  Qed.
-
-  Definition rew3
-             {fruntime:foreign_runtime} {logger:optimizer_logger string nnrc} (p: nnrc) :=
-    tnnrc_map_deep (head_rew "3") p.
-
   (* Java equivalent: NnrcOptimizer.trew *)
   Definition trew
-             {fruntime:foreign_runtime} {logger:optimizer_logger string nnrc}  (p:nnrc) :=
-    let pass1p := rew1 p in
-    (rew_size (rew_iter rew2 10) pass1p).
+             {fruntime:foreign_runtime} {logger:optimizer_logger string nnrc}
+    := run_nnrc_optims "2" nnrc_default_optim_list 10.
 
   Lemma trew_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc} p:
     tnnrc_ext_rewrites_to p (trew p).
   Proof.
-      Hint Resolve rew_size_correctness rew_iter_correctness.
-      Hint Resolve rew1_correctness rew2_correctness.
     unfold trew.
-    transitivity (rew1 p); eauto.
+    apply run_nnrc_optims_correctness.
   Qed.
 
   Require Import NNRCMR.
