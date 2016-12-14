@@ -2967,8 +2967,39 @@ Section NRAEnvOptimFunc.
     vm_compute.
     apply eq_refl.
   Qed.
+
+  Definition run_nraenv_optims 
+             {fruntime:foreign_runtime}
+             {logger:optimizer_logger string nraenv}
+             (phaseName:string)
+             (optims:list string)
+             (iterationsBetweenCostCheck:nat)
+    : nraenv -> nraenv :=
+    optim_size
+      (optim_iter 
+         (tnraenv_map_deep 
+            (run_optimizer_steps ("[nraenv] " ++ phaseName)
+                                 (project_optims tnraenv_optim_list optims)))
+         iterationsBetweenCostCheck).
+
+  Lemma run_nraenv_optims_correctness
+        {model:basic_model} {logger:optimizer_logger string nraenv}
+        (phaseName:string)
+        (optims:list string)
+        (iterationsBetweenCostCheck:nat)
+        (p:nraenv) :
+    tnraenv_rewrites_to p ( run_nraenv_optims phaseName optims iterationsBetweenCostCheck p).
+  Proof.
+    unfold run_nraenv_optims.
+    apply optim_size_correctness; intros.
+    apply optim_iter_correctness; intros.
+    apply nraenv_map_deep_correctness; intros.
+    apply run_optimizer_steps_correct.
+    apply project_optims_list_correct.
+    apply tnraenv_optim_list_correct.
+  Qed.
   
-  Definition head_optim_list {fruntime:foreign_runtime} : list string :=
+  Definition nraenv_default_head_optim_list {fruntime:foreign_runtime} : list string :=
     [
       optim_step_name tapp_over_app_step
       ; optim_step_name tappenv_over_appenv_step
@@ -3056,34 +3087,14 @@ Section NRAEnvOptimFunc.
       ; optim_step_name tmapconcat_over_singleton_step
     ].
 
-  Remark head_optim_list_all_valid  {fruntime:foreign_runtime}
-    : valid_optims tnraenv_optim_list head_optim_list = (head_optim_list,nil).
+  Remark nraenv_default_head_optim_list_valid  {fruntime:foreign_runtime}
+    : valid_optims tnraenv_optim_list nraenv_default_head_optim_list = (nraenv_default_head_optim_list,nil).
   Proof.
     vm_compute; trivial.
   Qed.
 
-  Definition head_optim_list_optim {fruntime:foreign_runtime}
-    := project_optims tnraenv_optim_list head_optim_list.
-  
-  Definition head_optim
-             {fruntime:foreign_runtime}
-             {logger:optimizer_logger string nraenv} (name:string)
-    : nraenv -> nraenv :=
-     run_optimizer_steps ("nra_head" ++ name) head_optim_list_optim.
-  
-  Lemma head_optim_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (name:string) (p:nraenv) :
-    p ⇒ₓ head_optim name p.
-  Proof.
-    unfold head_optim.
-    apply run_optimizer_steps_correct.
-    unfold head_optim_list_optim.
-    apply project_optims_list_correct.
-    apply tnraenv_optim_list_correct.
-  Qed.
-
   (* *************************** *)
-
-  Definition tail_optim_list {fruntime:foreign_runtime} : list string :=
+  Definition nraenv_default_tail_optim_list {fruntime:foreign_runtime} : list string :=
     [ optim_step_name tflatten_flatten_map_either_nil_step
       ; optim_step_name tmap_over_flatten_map_step
       ; optim_step_name tapp_over_app_step
@@ -3171,58 +3182,52 @@ Section NRAEnvOptimFunc.
       ; optim_step_name tmapconcat_over_singleton_step
     ].
 
-    Definition tail_optim_list_optim {fruntime:foreign_runtime}
-    := project_optims tnraenv_optim_list tail_optim_list.
-
-  Definition tail_optim {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (name:string) : nraenv -> nraenv :=
-    run_optimizer_steps ("tail" ++ name) tail_optim_list_optim.
-
-  Lemma tail_optim_correctness {model:basic_model}  {logger:optimizer_logger string nraenv} (name:string) (p:nraenv) :
-    p ⇒ₓ tail_optim name p.
+    Remark nraenv_default_tail_optim_list_valid  {fruntime:foreign_runtime}
+    : valid_optims tnraenv_optim_list nraenv_default_tail_optim_list = (nraenv_default_tail_optim_list,nil).
   Proof.
-    unfold tail_optim.
-    apply run_optimizer_steps_correct.
-    unfold tail_optim_list_optim.
-    apply project_optims_list_correct.
-    apply tnraenv_optim_list_correct.
+    vm_compute; trivial.
   Qed.
 
-  Definition optim1 {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p: nraenv) :=
-    tnraenv_map_deep (head_optim "1") p.
+  Definition toptim_nraenv_head {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv}
+    := run_nraenv_optims "head" nraenv_default_head_optim_list 5.
 
-  Lemma optim1_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (p:nraenv) :
-    p ⇒ₓ optim1 p.
+  Lemma toptim_nraenv_head_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
+    p ⇒ₓ toptim_nraenv_head p.
   Proof.
-    unfold optim1.
-    apply nraenv_map_deep_correctness; intros.
-    apply head_optim_correctness.
+    unfold toptim_nraenv_head.
+    apply run_nraenv_optims_correctness.
+  Qed.
+  
+  Definition toptim_nraenv_tail {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} 
+    := run_nraenv_optims "tail" nraenv_default_head_optim_list 15.
+
+  Lemma toptim_nraenv_tail_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
+    p ⇒ₓ toptim_nraenv_tail p.
+  Proof.
+    unfold toptim_nraenv_tail.
+    apply run_nraenv_optims_correctness.
   Qed.
 
-  Definition optim2 {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p: nraenv) :=
-    tnraenv_map_deep (tail_optim "") p.
+  Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} :=
+    compose toptim_nraenv_tail toptim_nraenv_head.
 
-  Lemma optim2_correctness {model:basic_model} {logger:optimizer_logger string nraenv} (p:nraenv) :
-    p ⇒ₓ optim2 p.
+  Lemma compose_transitivity {A:Type} {R:relation A} {trans:Transitive R}
+        (x y:A) (f g :A->A):
+    R x (g y) ->
+    R (g y) (f (g y)) ->
+    R x ((compose f g) y).
   Proof.
-    unfold optim2.
-    apply nraenv_map_deep_correctness.
-    apply tail_optim_correctness.
+    intros.
+    etransitivity; eauto.
   Qed.
-
-  Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} (p:nraenv) :=
-    let pass1p := (optim_size (optim_iter optim1 5) p) in
-    (optim_size (optim_iter optim2 15) pass1p).
-
+    
   Lemma toptim_nraenv_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
     p ⇒ₓ toptim_nraenv p.
   Proof.
-      Hint Resolve optim_size_correctness optim_iter_correctness.
-      Hint Resolve optim1_correctness optim2_correctness.
-      unfold toptim_nraenv.
-      transitivity ((optim_size (optim_iter optim1 5) p)); [ | auto ].
-      apply optim_size_correctness; intros.
-      apply optim_iter_correctness; intros.
-      apply optim1_correctness.
+    unfold toptim_nraenv.
+    apply compose_transitivity.
+    - apply toptim_nraenv_head_correctness.
+    - apply toptim_nraenv_tail_correctness.
   Qed.
 
 End NRAEnvOptimFunc.
