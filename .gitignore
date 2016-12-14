@@ -10,6 +10,7 @@ bin/qcert
 bin/qcertJS.js
 bin/sqlparser.jar
 bin/sqlparser_lib/*.jar
+bin/encodingService.zip
 /.project
 /.README.md.html
 html
