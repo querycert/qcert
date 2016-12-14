@@ -29,12 +29,13 @@ public class EncodingService extends NanoHTTPD {
 		int port = args.length == 0 ? 9879 : Integer.parseInt(args[0]);
 		EncodingService svc = new EncodingService(port);
 		svc.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
+		System.out.println("Encoding service started on port " + port);
 	}
-	
+
 	public EncodingService(int port) {
 		super(port);
 	}
-
+	
 	private Response respond(Response.Status status, String content) {
 		Response response = newFixedLengthResponse(status, NanoHTTPD.MIME_PLAINTEXT, content);
     	response.addHeader("Access-Control-Allow-Origin", "*");
