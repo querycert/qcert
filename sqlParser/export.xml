@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project sqlParser with libraries in sub-folder">
+<project default="all" name="Export artifacts from sqlParser project to bin">
     <!--this file was originally created by the jar export wizard but subsequently modified to simplify properties and eliminate
        environment dependences.  It assumes the layout of the qcert working directory as organized for git -->
-    <property name="dest" value="../bin"/>
-    <target name="create_run_jar">
+
+	<property name="dest" value="../bin"/>
+	
+	<target name="all" depends="create_run_jar,create_server_jar"/>
+
+	<target name="create_run_jar">
         <jar destfile="${dest}/sqlparser.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.qcert.sql.SQL2Sexp"/>
@@ -17,5 +21,29 @@
         <copy file="lib/guava-19.0.jar" todir="${dest}/sqlparser_lib"/>
         <copy file="lib/presto-parser-0.152.3.jar" todir="${dest}/sqlparser_lib"/>
         <copy file="lib/slice-0.7.jar" todir="${dest}/sqlparser_lib"/>
+    </target>
+
+	<target name="create_server_jar">
+		<delete dir="staging"/>
+		<mkdir dir="staging"/>
+        <jar destfile="staging/encodeService.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.qcert.sql.EncodingService"/>
+                <attribute name="Class-Path" 
+                	value=". encoding_lib/antlr4-runtime-4.5.3.jar encoding_lib/guava-19.0.jar encoding_lib/presto-parser-0.152.3.jar encoding_lib/slice-0.7.jar encoding_lib/nanohttpd-2.3.1.jar"/>
+            </manifest>
+            <fileset dir="bin"/>
+        </jar>
+        <mkdir dir="staging/encoding_lib"/>
+        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="staging/encoding_lib"/>
+        <copy file="lib/guava-19.0.jar" todir="staging/encoding_lib"/>
+        <copy file="lib/presto-parser-0.152.3.jar" todir="staging/encoding_lib"/>
+        <copy file="lib/slice-0.7.jar" todir="staging/encoding_lib"/>
+        <copy file="lib/nanohttpd-2.3.1.jar" todir="staging/encoding_lib"/>
+		<delete file="${dest}/encodingService.zip"/>
+		<zip destfile="${dest}/encodingService.zip">
+			<fileset dir="staging"/>
+		</zip>
+		<delete dir="staging"/>
     </target>
 </project>
