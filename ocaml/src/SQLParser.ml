@@ -18,10 +18,18 @@
  * an s-expression form of SQL that can be consumed by the next phase. 
 *)
 
-open Util
+open Unix
 
 let main (s : string) = begin
-	print_endline "SQL source:";
-	print_endline s;
-	raise (Qcert_Error "Cannot yet handle SQL source.  Use -source-sexp for now")
+	let cmd = Printf.sprintf "java -jar %s/bin/sqlparser.jar -single" (getenv "QCERT_HOME")
+	in
+		let fromProcess, toProcess = open_process cmd
+		in
+			output_string toProcess s;
+			close_out toProcess;
+			print_endline "about to read result";
+			let result = input_line fromProcess
+			in
+				close_in fromProcess;
+				result
 	end
