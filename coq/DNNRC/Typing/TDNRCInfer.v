@@ -324,7 +324,27 @@ Section TDNNRCInfer.
                                          (ta_require (Tlocal τ₀l') n₀
               )))))
 
-       | DNNRCGroupBy _ _ _ _ => None (* XXX TODO XXX *)
+       | DNNRCGroupBy a g sl n1 =>
+         bind (infer_dnnrc_type tenv n1)
+              (fun n₁ =>
+                 bind (lift_tlocal (di_typeof n₁))
+                      (fun τ₁l =>
+                         let τ₁l' := τ₁l ⊔ (Coll ⊥) in
+                         bind (tuncoll τ₁l')
+                              (fun τ₁ =>
+                                 olift (fun τs =>
+                                         let '(τ, τ₁') := τs in
+                                         olift (fun τs₂ =>
+                                                 let '(τ₂, τ₂') := τs₂ in
+                                                 lift (fun τs₃ =>
+                                                         DNNRCGroupBy
+                                                           (ta_mk a (Tlocal (Coll τ)))
+                                                           g sl
+                                                           (ta_require (Tlocal (Coll τ₁l')) n₁))
+                                                      (infer_binop_type_sub AConcat τ₂ τ)
+                                               )
+                                               (infer_unop_type_sub (ARec g) τ₁l'))
+                                       (infer_unop_type_sub (ARecProject sl) τ₁))))
        | DNNRCAlg _ _ _ => None
        end.
 
