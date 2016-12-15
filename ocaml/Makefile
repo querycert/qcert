@@ -14,6 +14,9 @@
 # limitations under the License.
 #
 
+## CONFIGURATON
+QCERT_HOME=$(CURDIR)/..
+
 ## Configuratin for the separate ocamljava compiler
 OCAMLJAVA=/Users/js/.opam/ocamljava-2.0-alpha3
 
@@ -43,10 +46,19 @@ all: $(MAIN) $(MAIN3)
 jars: $(MAIN).$(JAR) $(MAIN3).$(JAR) $(LIB).jar
 js: qcertJS.js
 
+generated: generated/StaticConfig.ml generated/Compiler.ml generated/Compiler.mli
+
 # Extraction from Coq
-generated:
+generated/Compiler.ml generated/Compiler.mli:
 	mkdir -p generated
 	(cd generated; coqc -R ../../coq Qcert ../Extraction.v)
+
+# Configuration
+generated/StaticConfig.ml:
+	mkdir -p generated
+	echo "(* This file is generated *)" > generated/StaticConfig.ml
+	echo "let qcert_home = \"$(QCERT_HOME)\"" >> generated/StaticConfig.ml
+
 
 # OCaml build
 $(MAIN): generated $(MAIN).$(TARGET)

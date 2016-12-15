@@ -14,22 +14,29 @@
  * limitations under the License.
  *)
 
-(* This module contains process management to invoke a separate Java utility.  The utility converts SQL source to
- * an s-expression form of SQL that can be consumed by the next phase. 
+(* This module contains process management to invoke a separate Java
+   utility.  The utility converts SQL source to * an s-expression form of
+   SQL that can be consumed by the next phase.
 *)
 
-open Unix
+open Util
 
-let main (s : string) = begin
-	let cmd = Printf.sprintf "java -jar %s/bin/sqlparser.jar -single" (getenv "QCERT_HOME")
-	in
-		let fromProcess, toProcess = open_process cmd
-		in
-			output_string toProcess s;
-			close_out toProcess;
-			print_endline "about to read result";
-			let result = input_line fromProcess
-			in
-				close_in fromProcess;
-				result
-	end
+let get_qcert_home () =
+  try Sys.getenv "QCERT_HOME"
+  with Not_found -> StaticConfig.qcert_home
+
+let main (s : string) =
+  begin try
+    let cmd =
+      Format.sprintf "java -jar %s/bin/sqlparser.jar -single" (get_qcert_home ())
+    in
+    let fromProcess, toProcess = Unix.open_process cmd in
+    output_string toProcess s;
+    close_out toProcess;
+    print_endline "about to read result";
+    let result = input_line fromProcess in
+    close_in fromProcess;
+    result
+  with exn ->
+    raise (Qcert_Error ("SQL parser: "^(Printexc.to_string exn)))
+  end
