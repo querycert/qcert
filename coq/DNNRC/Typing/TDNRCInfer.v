@@ -118,6 +118,7 @@ Section TDNNRCInfer.
     | Tdistr τ => f2 τ
     end.
 
+  Locate lookup.
   Fixpoint infer_dnnrc_type {A} (tenv:tdbindings) (n:dnnrc A plug_type) :
     option (dnnrc (type_annotation A) plug_type)
     := match n with
@@ -337,8 +338,9 @@ Section TDNNRCInfer.
                                          olift (fun τs₂ =>
                                                  let '(τ₂, τ₂') := τs₂ in
                                                  lift (fun τs₃ =>
+                                                         let '(τ₃, τ₃', τ₃'') := τs₃ in
                                                          DNNRCGroupBy
-                                                           (ta_mk a (Tlocal (Coll τ)))
+                                                           (ta_mk a (Tlocal (Coll τ₃)))
                                                            g sl
                                                            (ta_require (Tlocal (Coll τ₁l')) n₁))
                                                       (infer_binop_type_sub AConcat τ₂ τ)
@@ -397,7 +399,7 @@ Section TDNNRCInfer.
     DNNRCUnop tt ADistinct (DNNRCVar tt "WORLD"%string).
 
   Example ex10 : dnnrc unit plug_type :=
-    DNNRCCollect tt (DNNRCUnop tt ADistinct (DNNRCVar tt "WORLD"%string)).
+    DNNRCVar tt "WORLD"%string.
 
   (*
     Eval simpl in infer_dnnrc_type
@@ -424,7 +426,51 @@ Section TDNNRCInfer.
     Eval simpl in infer_dnnrc_type
                          (("WORLD"%string, (Tdistr (Brand (("Any"%string)::nil))))::nil)
                          ex10.
+
    *)
+
+  (* Small utility function which gets the final type annotation,
+     removes the proof and evaluates it to get the final type result *)
+  Definition unwrap_pf_compute {A} n :=
+    Eval vm_compute in
+    match @di_typeof A n with
+    | Tlocal r => (proj1_sig r)
+    | Tdistr r => (proj1_sig r)
+    end.
+
+  (* A slightly more interesting type with records to test the group by inference *)
+  (* Note "partition" is there to check that the concat order in the type inference is right,
+     the new "partition" for the group in the example should shadow the one from the input *)
+  Definition t0_rec :=
+    ("age"%string,Nat)::("name"%string,String)::("partition"%string,Nat)::nil.
+
+  Lemma t0_rec_wf :
+    is_list_sorted ODT_lt_dec (domain t0_rec) = true.
+  Proof.
+    simpl.
+    reflexivity.
+  Defined.
+  
+  Definition t0 :=
+    Tlocal (Coll (Rec Closed t0_rec t0_rec_wf)).
+
+  Example ex11 : dnnrc unit plug_type :=
+    DNNRCGroupBy tt "partition"%string ("name"%string::nil)
+                 (DNNRCVar tt "WORLD"%string).
+
+  Eval vm_compute in (lift unwrap_pf_compute
+                        (infer_dnnrc_type
+                           (("WORLD"%string, t0)::nil)
+                           ex11)).
+
+  Example ex12 : dnnrc unit plug_type :=
+    DNNRCGroupBy tt "partition"%string ("age"%string::"name"%string::nil)
+                 (DNNRCVar tt "WORLD"%string).
+
+  Eval vm_compute in (lift unwrap_pf_compute
+                        (infer_dnnrc_type
+                           (("WORLD"%string, t0)::nil)
+                           ex12)).
 
 (*
   Eval vm_compute in infer_dnnrc_type nil ex1.
