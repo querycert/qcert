@@ -122,7 +122,46 @@ Section OptimizerLogger.
     intros pf.
     generalize (run_optimizer_steps_fold_correct steps (logStartPass passName input) input pf).
     match_destr.
-Qed.    
+  Qed.
+
+  Definition run_phase {lang:Set}
+             {logger:optimizer_logger string lang}
+             (mapdeep:(lang->lang)->lang->lang)
+             (cost:lang->nat)
+             (lang_optim_list:list (OptimizerStep lang))
+             (phaseName:string)
+             (optims:list string)
+             (iterationsBetweenCostCheck:nat)
+    : lang -> lang :=
+      iter_cost
+      (iter
+         (mapdeep
+            (run_optimizer_steps phaseName
+                                 (project_optims lang_optim_list optims)))
+         iterationsBetweenCostCheck) cost.
+
+  Lemma run_phase_correctness {lang:Set} {R:relation lang} {pre:PreOrder R}
+        {logger:optimizer_logger string lang}
+        {mapdeep:(lang->lang)->lang->lang}
+        (mapdeep_correct:
+           forall f, (forall a, R a (f a)) -> forall a, R a (mapdeep f a))
+        (cost:lang->nat)
+        {lang_optim_list:list (OptimizerStep lang)}
+        (lang_optim_list_correct:optim_list_correct R lang_optim_list)
+        (phaseName:string)
+        (optims:list string)
+        (iterationsBetweenCostCheck:nat) p :
+    R p (run_phase mapdeep cost lang_optim_list
+                   phaseName optims iterationsBetweenCostCheck p).
+  Proof.
+    unfold run_phase.
+    apply iter_cost_trans; trivial; intros.
+    apply iter_trans; trivial; intros.
+    apply mapdeep_correct; intros.
+    apply run_optimizer_steps_correct.
+    apply project_optims_list_correct.
+    apply lang_optim_list_correct.
+  Qed.
        
 End OptimizerLogger.
 

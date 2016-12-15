@@ -95,43 +95,6 @@ Section TNNRCOptimizer.
     rewrite IHp1 at 1; rewrite IHp2 at 1; rewrite IHp3 at 1; rewrite Hf at 1; reflexivity.
   Qed.
 
-  Lemma rew_iter_correctness {model:basic_model} rew n p:
-    (forall p', tnnrc_ext_rewrites_to p' (rew p')) -> tnnrc_ext_rewrites_to p (rew_iter rew n p).
-  Proof.
-    generalize p; clear p.
-    induction n; try reflexivity.
-    intros p Hrew.
-    simpl.
-    apply AUX.
-    - clear p; intros p.
-      apply IHn.
-      assumption.
-    - apply Hrew.
-  Qed.
-  Hint Rewrite @rew_iter_correctness : rew_correct.
-
-  Lemma rew_cost_correctness {model:basic_model} rew cost p:
-    (forall p', tnnrc_ext_rewrites_to p' (rew p')) -> tnnrc_ext_rewrites_to p (rew_cost rew cost p).
-  Proof.
-    intros Hrew.
-    functional induction rew_cost rew cost p.
-    - apply (tnnrc_ext_rewrites_to_trans p (rew p)).
-      + apply Hrew.
-      + apply IHn.
-    - reflexivity.
-  Qed.
-  Hint Rewrite @rew_cost_correctness : rew_correct.
-
-  Lemma rew_size_correctness {model:basic_model} rew p:
-    (forall p', tnnrc_ext_rewrites_to p' (rew p')) -> tnnrc_ext_rewrites_to p (rew_size rew p).
-  Proof.
-    intros Hrew.
-    unfold rew_size.
-    apply rew_cost_correctness.
-    assumption.
-  Qed.
-  Hint Rewrite @rew_size_correctness : rew_correct.
-
   (****************)
       
   (* Java equivalent: NnrcOptimizer.tunshadow_preserves_fun *)
@@ -953,7 +916,6 @@ Section TNNRCOptimizer.
   Qed.
 
   (* *************************** *)
-
   Definition run_nnrc_optims 
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nnrc}
@@ -961,12 +923,8 @@ Section TNNRCOptimizer.
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
     : nnrc -> nnrc :=
-    rew_size
-      (rew_iter 
-         (tnnrc_map_deep 
-            (run_optimizer_steps ("[nnrc] " ++ phaseName)
-                                 (project_optims tnnrc_optim_list optims)))
-         iterationsBetweenCostCheck).
+    run_phase tnnrc_map_deep NNRCSize.nnrc_size tnnrc_optim_list
+              ("[nnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
 
   Lemma run_nnrc_optims_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc}
@@ -977,12 +935,9 @@ Section TNNRCOptimizer.
     tnnrc_ext_rewrites_to p ( run_nnrc_optims phaseName optims iterationsBetweenCostCheck p).
   Proof.
     unfold run_nnrc_optims.
-    apply rew_size_correctness; intros.
-    apply rew_iter_correctness; intros.
-    apply tnnrc_map_deep_correctness; intros.
-    apply run_optimizer_steps_correct.
-    apply project_optims_list_correct.
-    apply tnnrc_optim_list_correct.
+    apply run_phase_correctness.
+    - intros. apply tnnrc_map_deep_correctness; auto.
+    - apply tnnrc_optim_list_correct.
   Qed.
   
   (* Java equivalent: NnrcOptimizer.head_rew_list *)

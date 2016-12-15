@@ -633,6 +633,89 @@ Section RUtil.
 
   End Zutil.
 
+  Section iter.
+    Lemma repeat_plus {A} (x:A) (n1 n2:nat) :
+      repeat x (n1+n2) = repeat x n1 ++ repeat x n2.
+    Proof.
+      induction n1; simpl; congruence.
+    Qed.
+
+    Fixpoint iter {A} (f:A->A) (iterations:nat) (a:A)
+      := match iterations with
+         | 0 => a
+         | S n => iter f n (f a)
+         end.
+
+    Lemma iter_fold_left_list {A B} (f:A->A) (l:list B) (a:A)
+      : iter f (length l) a = fold_left (fun x y => f x) l a.
+    Proof.
+      revert a.
+      induction l; simpl; trivial.
+    Qed.
+
+    Lemma iter_fold_left_repeat {A} (f:A->A) (iterations:nat) (a:A)
+      : iter f iterations a = fold_left (fun x y => f x) (repeat 0 iterations) a.
+    Proof.
+      rewrite <- iter_fold_left_list.
+      rewrite repeat_length.
+      trivial.
+    Qed.
+
+    Lemma iter_fold_right_list {A B} (f:A->A) (l:list B) (a:A)
+      : iter f (length l) a = fold_right (fun x y => f y) a l.
+    Proof.
+      rewrite <- (rev_involutive l).
+      rewrite fold_left_rev_right.
+      rewrite rev_length.
+      apply iter_fold_left_list.
+    Qed.
+
+    Lemma iter_plus {A} (f:A->A) (iterations1 iterations2:nat) (a:A) :
+      iter f (iterations1+iterations2) a = iter f iterations2 (iter f iterations1 a).
+    Proof.
+      repeat rewrite iter_fold_left_repeat.
+      rewrite repeat_plus.
+      rewrite fold_left_app.
+      trivial.
+    Qed.
+
+    Lemma iter_trans {A} (R:relation A) {pre:PreOrder R} f
+          (pf:forall x, R x (f x)) (iterations:nat) a :
+      R a (iter f iterations a).
+    Proof.
+      revert a.
+      induction iterations; simpl; intros.
+      - reflexivity.
+      - etransitivity; eauto.
+    Qed.
+
+  End iter.
+
+  Section cost.
+    Require Import Recdef.
+    Require Import Compare_dec.
+
+    Context {A:Type}.
+    Function iter_cost (optim: A -> A) (cost: A -> nat) (p: A) { measure cost p } :=
+      let p' := optim p in
+      if lt_dec (cost p') (cost p)
+      then iter_cost optim cost p'
+      else p.
+    Proof.
+      intros optim cost p Hcmp; trivial.
+    Defined.
+
+    Lemma iter_cost_trans (R:relation A) {pre:PreOrder R} f
+          (pf:forall x, R x (f x)) (cost:A->nat) a :
+      R a (iter_cost f cost a).
+    Proof.
+      apply iter_cost_ind; intros.
+      - etransitivity; eauto.
+      - reflexivity.
+    Qed.
+
+  End cost.
+
   Section vm.
     Definition is_true {A B} (x:{A}+{B}) : bool :=
       Eval vm_compute in (if x then true else false).

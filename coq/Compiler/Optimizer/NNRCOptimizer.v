@@ -80,66 +80,13 @@ Section NNRCOptimizer.
   Qed.
 
   (* Java equivalent: NnrcOptimizer.rew_iter *)
-  Fixpoint rew_iter (rew: nnrc -> nnrc) (fuel: nat) (p: nnrc) :=
-    match fuel with
-      | 0 => p
-      | S n => rew_iter rew n (rew p)
-    end.
-
-  Lemma rew_iter_correctness rew n p:
-    (forall p', nnrc_ext_eq (rew p') p') -> nnrc_ext_eq (rew_iter rew n p) p.
-  Proof.
-    generalize p; clear p.
-    induction n; try reflexivity.
-    intros p Hrew.
-    simpl.
-    rewrite IHn; try assumption.
-    apply Hrew.
-  Qed.
-
-  Require Import Recdef.
-  Require Import Compare_dec.
-
-  (* Java equivalent: NnrcOptimizer.rew_size (inlined) *)
-  Function rew_cost (rew: nnrc -> nnrc) (cost: nnrc -> nat) (p: nnrc) { measure cost p } :=
-    let p' := rew p in
-    match nat_compare (cost p') (cost p) with
-      | Lt => rew_cost rew cost p'
-      | _ => p
-    end.
-  Proof.
-    intros rew cost p Hcmp.
-    apply nat_compare_lt in Hcmp.
-    exact Hcmp.
-  Defined.
-
-  Lemma rew_cost_correctness rew cost p:
-    (forall p', nnrc_ext_eq (rew p') p') -> nnrc_ext_eq (rew_cost rew cost p) p.
-  Proof.
-    intros Hrew.
-    functional induction rew_cost rew cost p.
-    - rewrite IHn.
-      apply Hrew.
-    - reflexivity.
-  Qed.
-
-  Hint Rewrite rew_cost_correctness : rew_correct.
-
+(*  Definition rew_iter (rew: nnrc -> nnrc) (fuel: nat) (p: nnrc)
+    := iter rew fuel p.
+*)
   (* Java equivalent: NnrcOptimizer.rew_size *)
-  Definition rew_size (rew: nnrc -> nnrc) (p: nnrc) :=
-    rew_cost rew NNRCSize.nnrc_size p.
-
-  Lemma rew_size_correctness rew p:
-    (forall p', nnrc_ext_eq (rew p') p') -> nnrc_ext_eq (rew_size rew p) p.
-  Proof.
-    intros Hrew.
-    unfold rew_size.
-    apply rew_cost_correctness.
-    assumption.
-  Qed.
-
-  Hint Rewrite rew_size_correctness : rew_correct.
-
+  (* Definition rew_size (rew: nnrc -> nnrc) (p: nnrc) :=
+    iter_cost rew NNRCSize.nnrc_size p.
+   *)
   (* *************************** *)
 
   (* unshadowing *)

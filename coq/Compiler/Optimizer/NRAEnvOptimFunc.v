@@ -111,31 +111,6 @@ Section NRAEnvOptimFunc.
       | NRAEnvProject sl op1 => f (NRAEnvProject sl (nraenv_map_deep f op1))
       | NRAEnvGroupBy s sl op1 => f (NRAEnvGroupBy s sl (nraenv_map_deep f op1))
     end.
-
-    Fixpoint optim_iter (optim: nraenv -> nraenv) (fuel: nat) (p: nraenv) :=
-      match fuel with
-      | 0 => p
-      | S n => optim_iter optim n (optim p)
-      end.
-
-    Require Import Recdef.
-    Require Import Compare_dec.
-
-    Function optim_cost (optim: nraenv -> nraenv) (cost: nraenv -> nat) (p: nraenv) { measure cost p } :=
-      let p' := optim p in
-      match nat_compare (cost p') (cost p) with
-      | Lt => optim_cost optim cost p'
-      | _ => p
-      end.
-    Proof.
-      intros optim cost p Hcmp.
-      apply nat_compare_lt in Hcmp.
-      exact Hcmp.
-    Defined.
-
-    Definition optim_size (optim: nraenv -> nraenv) (p: nraenv) :=
-      optim_cost optim nraenv_size p.
-
   End rewriter.
 
   Section dup.
@@ -241,43 +216,6 @@ Section NRAEnvOptimFunc.
     try (rewrite IHp1 at 1; rewrite IHp2 at 1; rewrite Hf at 1; reflexivity);
     rewrite IHp at 1; rewrite Hf at 1; reflexivity.
   Qed.
-
-  Lemma optim_iter_correctness {model:basic_model} optim n p:
-    (forall p', p' ⇒ₓ optim p') -> p ⇒ₓ optim_iter optim n p.
-  Proof.
-    generalize p; clear p.
-    induction n; try reflexivity.
-    intros p Hoptim.
-    simpl.
-    apply AUX.
-    - clear p; intros p.
-      apply IHn.
-      assumption.
-    - apply Hoptim.
-  Qed.
-  Hint Rewrite @optim_iter_correctness : optim_correct.
-
-  Lemma optim_cost_correctness {model:basic_model} optim cost p:
-    (forall p', p' ⇒ₓ optim p') -> p ⇒ₓ optim_cost optim cost p.
-  Proof.
-    intros Hoptim.
-    functional induction optim_cost optim cost p.
-    - apply (tnraenv_rewrites_to_trans p (optim p)).
-      + apply Hoptim.
-      + apply IHn.
-    - reflexivity.
-  Qed.
-  Hint Rewrite @optim_cost_correctness : optim_correct.
-
-  Lemma optim_size_correctness {model:basic_model} optim p:
-    (forall p', p' ⇒ₓ optim p') -> p ⇒ₓ optim_size optim p.
-  Proof.
-    intros Hoptim.
-    unfold optim_size.
-    apply optim_cost_correctness.
-    assumption.
-  Qed.
-  Hint Rewrite @optim_size_correctness : optim_correct.
 
   (****************)
 
@@ -2975,12 +2913,8 @@ Section NRAEnvOptimFunc.
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
     : nraenv -> nraenv :=
-    optim_size
-      (optim_iter 
-         (tnraenv_map_deep 
-            (run_optimizer_steps ("[nraenv] " ++ phaseName)
-                                 (project_optims tnraenv_optim_list optims)))
-         iterationsBetweenCostCheck).
+    run_phase tnraenv_map_deep nraenv_size tnraenv_optim_list
+               ("[nraenv] " ++ phaseName) optims iterationsBetweenCostCheck.
 
   Lemma run_nraenv_optims_correctness
         {model:basic_model} {logger:optimizer_logger string nraenv}
@@ -2991,12 +2925,9 @@ Section NRAEnvOptimFunc.
     tnraenv_rewrites_to p ( run_nraenv_optims phaseName optims iterationsBetweenCostCheck p).
   Proof.
     unfold run_nraenv_optims.
-    apply optim_size_correctness; intros.
-    apply optim_iter_correctness; intros.
-    apply nraenv_map_deep_correctness; intros.
-    apply run_optimizer_steps_correct.
-    apply project_optims_list_correct.
-    apply tnraenv_optim_list_correct.
+    apply run_phase_correctness.
+    - intros. apply nraenv_map_deep_correctness; auto.
+    - apply tnraenv_optim_list_correct.
   Qed.
   
   Definition nraenv_default_head_optim_list {fruntime:foreign_runtime} : list string :=
