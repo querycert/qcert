@@ -156,8 +156,10 @@ MODULES = \
 	NNRCMR/Rew/NRewMR \
 	NNRCMR/NNRCMRRuntime \
 	DNNRC/Calculus/DNNRC \
+	DNNRC/Calculus/DNNRCSize \
 	DNNRC/Calculus/DNNRCEq \
 	DNNRC/Calculus/Dataset \
+	DNNRC/Calculus/DatasetSize \
 	DNNRC/Typing/TDNRC \
 	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
