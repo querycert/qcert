@@ -446,8 +446,8 @@ let pretty_unop p sym callb ff u a =
    nat         bags           bool   string  rec
 
    min, max    {min}, {max}	       	           20
-   *,/,%                      \/       	     [*]   19
-   +, -        U, \           /\     ^ 	     [+]   18
+   *,/,%                      \/       	     [+]   19
+   +, -        U, \           /\     ^ 	     [*]   18
    < <=                                	           17
                in                      	           16
    =                       	       	           15
@@ -641,8 +641,8 @@ let pretty_binop p sym callb ff b a1 a2 =
   match b with
   | Hack.AEq -> pretty_infix_exp p 15 sym callb ("=",1) ff a1 a2
   | Hack.AUnion -> pretty_infix_exp p 18 sym callb sym.cup ff a1 a2
-  | Hack.AConcat -> pretty_infix_exp p 19 sym callb ("[*]",3) ff a1 a2
-  | Hack.AMergeConcat -> pretty_infix_exp p 18 sym callb ("[+]",3) ff a1 a2
+  | Hack.AConcat -> pretty_infix_exp p 19 sym callb ("[+]",3) ff a1 a2
+  | Hack.AMergeConcat -> pretty_infix_exp p 18 sym callb ("[*]",3) ff a1 a2
   | Hack.AAnd -> pretty_infix_exp p 19 sym callb sym.wedge ff a1 a2
   | Hack.AOr -> pretty_infix_exp p 18 sym callb sym.vee ff a1 a2
   | Hack.ABArith ba -> (pretty_binarith p sym callb) ff ba a1 a2

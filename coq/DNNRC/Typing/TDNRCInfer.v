@@ -458,20 +458,33 @@ Section TDNNRCInfer.
     DNNRCGroupBy tt "partition"%string ("name"%string::nil)
                  (DNNRCVar tt "WORLD"%string).
 
+  (*
   Eval vm_compute in (lift unwrap_pf_compute
                         (infer_dnnrc_type
                            (("WORLD"%string, t0)::nil)
                            ex11)).
+   *)
 
   Example ex12 : dnnrc unit plug_type :=
     DNNRCGroupBy tt "partition"%string ("age"%string::"name"%string::nil)
                  (DNNRCVar tt "WORLD"%string).
 
+  (*
   Eval vm_compute in (lift unwrap_pf_compute
                         (infer_dnnrc_type
                            (("WORLD"%string, t0)::nil)
                            ex12)).
+   *)
 
+  Example ex13 : dnnrc unit plug_type :=
+    DNNRCConst tt (drec nil).
+
+  Eval vm_compute in (lift unwrap_pf_compute
+                        (infer_dnnrc_type
+                           (("WORLD"%string, t0)::nil)
+                           ex13)).
+
+  
 (*
   Eval vm_compute in infer_dnnrc_type nil ex1.
   Eval vm_compute in infer_dnnrc_type nil ex2.
