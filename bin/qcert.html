@@ -25,7 +25,8 @@
                       'ascii' : document.getElementById("charset").value === "Ascii",
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
-        document.getElementById("result").innerHTML = escapeHtml(preMain(input).result);
+				var useLocal = document.getElementById("localServer").checked;
+				document.getElementById("result").innerHTML = escapeHtml(preMain(input, useLocal).result);
       }
       function clearButton() {
         document.getElementById("result").innerHTML = "";
@@ -74,8 +75,8 @@
           <label>source</label>
           <select id = "source">
 	      <option>rule</option>
-	      <option>sql</option>
-	      <option selected="selected">camp</option>
+	      <option selected="selected">sql</option>
+	      <option>camp</option>
 	      <option>oql</option>
 	      <option>lambda_nra</option>
 	      <option>nra</option>
@@ -119,7 +120,15 @@
 	  <br/>
           <textarea id = "query"
                     rows = "10"
-                    cols = "80" />punop AFlatten (pletIt ((pgetconstant "WORLD")) (pmap (pletEnv (pletIt (pletIt (punop (ACast ["entities.Customer"]) (pit)) (pleft)) (pletEnv (punop (ARec "c") (pit)) (pletEnv (passert (pbinop AEq (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "age") (pit)) (pit))) (#` 32))) (pletIt (penv) (pit))))) (punop AColl (pbinop ASConcat (punop AToString (#` "Customer =")) (punop AToString (pletIt (pletIt (penv) (punop (ADot "c") (pit))) (pletIt (punop AUnbrand (pit)) (pletIt (punop (ADot "name") (pit)) (pit))))))))))</textarea>
+                    cols = "80" />select
+	sum(l_extendedprice * l_discount) as revenue
+from
+	lineitem
+where
+	date_ge(l_shipdate, date '1994-01-01')
+	and date_lt(l_shipdate, date_plus(date '1994-01-01', interval '1' year))
+	and l_discount between .06 - 0.01 and .06 + 0.01
+	and l_quantity < 24;</textarea>
         </p>
         <p>
           <label>io</label><br/>
@@ -209,6 +218,7 @@
                  id = "java_imports"
                  value = "" />
         </p>
+    <label><input type="checkbox" id="localServer" checked>Use Local Server for SQL Assist</label>
     </fieldset>
     </form>
   </body>
