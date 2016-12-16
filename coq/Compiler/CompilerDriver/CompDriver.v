@@ -122,7 +122,7 @@ Section CompDriver.
     nnrc_to_nnrc_core (algenv_to_nnrc q init_vid init_venv).
 
   Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
-    nraenv_to_nnrc_ext q init_vid init_venv.
+    nraenv_to_nnrc_ext_top q init_vid init_venv.
 
   Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_algenv q.
 
@@ -148,22 +148,17 @@ Section CompDriver.
 
   (* Java equivalent: NnrcToNnrcmr.convert *)
   Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
-    let q : nnrc := nnrc_subst q init_vid (NNRCConst dunit) in
-    let q : nnrc := nnrc_optim q in
     let q_free_vars := (* bdistinct !!! *) nnrc_free_vars q in
     let inputs_loc :=
-        (init_vid, Vlocal)
-          ::(vinit, Vlocal)
+        (vinit, Vlocal)
           ::(mkDistNames q_free_vars)
     in
     nnrc_to_nnrcmr_chain q
                          init_vinit
                          inputs_loc.
 
+  (* Free variables should eventually be passed from the application? *)
   Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
-    (* XXX TODO: Handling of vid? XXX *)
-    (* let q : nnrc := nnrc_subst q init_vid (NNRCConst dunit) in *)
-    (* let q : nnrc := nnrc_optim q in *)
     let inputs_loc :=
         (init_vid, Vlocal) (* XXX suppr vid? XXX *)
           ::(vinit, Vlocal)
