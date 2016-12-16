@@ -24,3 +24,6 @@ let logger_nra_to_sexp exp
   
 let logger_nrc_to_sexp exp
   = nnrc_to_sexp (Obj.magic exp)
+
+let logger_dnrc_to_sexp exp
+  = SString "DNRC->SEXP not yet implemented"

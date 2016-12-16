@@ -64,14 +64,18 @@ let args_list gconf =
          " Produce statistics for all intermediate queries");
       ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
        " Produce statistics for paths following starting from the source");
-      ("-log-optims", Arg.String (fun s -> Logger.nra_set_trace logger_nra_to_sexp s;Logger.nrc_set_trace logger_nrc_to_sexp s),
+      (*  " Logs the optimizations/rewrites during compilation"); *)
+      ("-log-optims", Arg.String
+			(fun s -> Logger.nra_set_trace logger_nra_to_sexp s;
+				  Logger.nrc_set_trace logger_nrc_to_sexp s;
+				  Logger.dnrc_set_trace logger_nrc_to_sexp s),
        " Enable optimization logging");
       ("-log-optims-nra", Arg.String (Logger.nra_set_trace logger_nra_to_sexp),
        " Enable optimization logging for nra");
       ("-log-optims-nrc", Arg.String (Logger.nrc_set_trace logger_nrc_to_sexp),
        " Enable optimization logging for nrc");
-      (* ("-log-optims", Arg.Unit (Logger.set_trace), *)
-      (*  " Logs the optimizations/rewrites during compilation"); *)
+      ("-log-optims-dnrc", Arg.String (Logger.dnrc_set_trace logger_dnrc_to_sexp),
+       " Enable optimization logging for dnrc");
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
        " Avoid unicode symbols in emited queries");
       ("-margin", Arg.Int (PrettyIL.set_margin gconf.gconf_pretty_config),

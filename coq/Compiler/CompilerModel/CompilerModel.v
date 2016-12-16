@@ -23,6 +23,8 @@ Require Import ForeignCloudant ForeignToCloudant.
 Require Import OptimizerLogger.
 Require Import ForeignType ForeignDataTyping.
 Require Import RAlgEnv NRAEnv NNRC.
+Require Import DNNRC Dataset.
+Require Import TDNRCInfer.
 
 Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
@@ -38,6 +40,7 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
+  Axiom compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc (type_annotation unit) dataset).
   Axiom compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
 
@@ -70,6 +73,8 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     :=  model.compiler_model_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     :=  model.compiler_model_nnrc_optimizer_logger.
+  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string  (dnnrc (type_annotation unit) dataset)
+    :=  model.compiler_model_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := model.compiler_model_foreign_data_typing.
 End CompilerModelRuntime.

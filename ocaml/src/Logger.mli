@@ -30,3 +30,9 @@ val nrc_log_step : nrc_logger_token_type -> string -> 'a -> 'a -> nrc_logger_tok
 val nrc_log_endPass : nrc_logger_token_type -> 'a -> nrc_logger_token_type
 
 val nrc_set_trace : (Obj.t->sexp) -> string -> unit
+
+val dnrc_log_startPass : string -> 'a -> dnrc_logger_token_type
+val dnrc_log_step : dnrc_logger_token_type -> string -> 'a -> 'a -> dnrc_logger_token_type
+val dnrc_log_endPass : dnrc_logger_token_type -> 'a -> dnrc_logger_token_type
+
+val dnrc_set_trace : (Obj.t->sexp) -> string -> unit

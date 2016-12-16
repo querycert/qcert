@@ -28,6 +28,8 @@ Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
 Require NNRCMR CloudantMR.
 Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
+Require Import DNNRC Dataset.
+Require Import TDNRCInfer.
 
 Import ListNotations.
 
@@ -1235,11 +1237,11 @@ Definition enhanced_to_cloudant_reduce_op
 
   Axiom OPTIMIZER_LOGGER_nnrc_endPass :
     OPTIMIZER_LOGGER_nnrc_token_type -> nnrc -> OPTIMIZER_LOGGER_nnrc_token_type.
-  
+
   Extract Inlined Constant OPTIMIZER_LOGGER_nnrc_endPass =>
   "(fun token output -> Logger.nrc_log_endPass token output)".
 
-  Instance foreign_nnrc_optimizer_logger :
+    Instance foreign_nnrc_optimizer_logger :
     optimizer_logger string nnrc
     :=
       {
@@ -1248,7 +1250,6 @@ Definition enhanced_to_cloudant_reduce_op
         ; logStep :=  OPTIMIZER_LOGGER_nnrc_step
         ; logEndPass :=  OPTIMIZER_LOGGER_nnrc_endPass
       } .
-    
 
 (** Foreign typing, used to build the basic_model *)
 
@@ -1425,6 +1426,44 @@ Next Obligation.
   ; invcs H; invcs H0; constructor.
 Defined.
 
+Definition dnnrc_for_log {br:brand_relation}
+  := (@dnnrc enhanced_foreign_runtime (type_annotation unit) dataset).
+
+  (* dnnrc optimizer logger support *)
+  Axiom OPTIMIZER_LOGGER_dnnrc_token_type : Set.
+  Extract Constant OPTIMIZER_LOGGER_dnnrc_token_type => "Util.dnrc_logger_token_type".
+
+  Axiom OPTIMIZER_LOGGER_dnnrc_startPass :
+    forall {br:brand_relation}, String.string -> dnnrc_for_log -> OPTIMIZER_LOGGER_dnnrc_token_type.
+
+  Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_startPass =>
+  "(fun br name input -> Logger.dnrc_log_startPass (Util.string_of_char_list name) input)".
+
+  Axiom OPTIMIZER_LOGGER_dnnrc_step :
+    forall  {br:brand_relation}, 
+    OPTIMIZER_LOGGER_dnnrc_token_type -> String.string ->
+    dnnrc_for_log -> dnnrc_for_log ->
+    OPTIMIZER_LOGGER_dnnrc_token_type.
+  
+  Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_step =>
+  "(fun br token name input output -> Logger.dnrc_log_step token (Util.string_of_char_list name) input output)".
+
+  Axiom OPTIMIZER_LOGGER_dnnrc_endPass :
+    forall {br:brand_relation}, OPTIMIZER_LOGGER_dnnrc_token_type -> dnnrc_for_log -> OPTIMIZER_LOGGER_dnnrc_token_type.
+  
+  Extract Inlined Constant OPTIMIZER_LOGGER_dnnrc_endPass =>
+  "(fun br token output -> Logger.dnrc_log_endPass token output)".
+
+  Instance foreign_dnnrc_optimizer_logger  {br:brand_relation} :
+    optimizer_logger string dnnrc_for_log
+    :=
+      {
+        optimizer_logger_token_type := OPTIMIZER_LOGGER_dnnrc_token_type
+        ; logStartPass := OPTIMIZER_LOGGER_dnnrc_startPass
+        ; logStep :=  OPTIMIZER_LOGGER_dnnrc_step
+        ; logEndPass :=  OPTIMIZER_LOGGER_dnnrc_endPass
+      } .
+
 Module EnhancedRuntime <: CompilerRuntime.
   Definition compiler_foreign_type : foreign_type
     := enhanced_foreign_type.
@@ -1454,6 +1493,8 @@ Module EnhancedRuntime <: CompilerRuntime.
     := foreign_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
+  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (dnnrc (type_annotation unit) dataset)
+    := foreign_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
 End EnhancedRuntime.
@@ -2450,6 +2491,8 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
+  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (dnnrc (type_annotation unit) dataset)
+    := foreign_dnnrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
 End EnhancedModel.

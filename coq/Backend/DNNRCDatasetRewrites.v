@@ -150,66 +150,6 @@ Section DNNRCDatasetRewrites.
     Context {ftype:foreign_type}.
     Context {h:brand_relation_t}.
     Context {m:brand_model}.
-    Context {fdtyping:foreign_data_typing}.
-    Context {fboptyping:foreign_binary_op_typing}.
-    Context {fuoptyping:foreign_unary_op_typing}.
-    Context {fttjs: foreign_to_javascript}.
-
-  (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego.
-   *
-   * A Haskell Hosted DSL for Writing Transformation Systems.
-   * Andy Gill. IFIP Working Conference on DSLs, 2009.
-   * http://ku-fpg.github.io/files/Gill-09-KUREDSL.pdf *)
-  Fixpoint tryBottomUp {A: Set} {P: Set}
-           (f: dnnrc A P -> option (dnnrc A P))
-           (e: dnnrc A P)
-    : dnnrc A P :=
-    let try := fun e =>
-                 match f e with
-                 | Some e' => e'
-                 | None => e
-                 end in
-    match e with
-    | DNNRCVar _ _ => try e
-    | DNNRCConst _ _ => try e
-    | DNNRCBinop a b x y =>
-      let x' := tryBottomUp f x in
-      let y' := tryBottomUp f y in
-      try (DNNRCBinop a b x' y')
-    | DNNRCUnop a b x =>
-      let x' := tryBottomUp f x in
-      try (DNNRCUnop a b x')
-    | DNNRCLet a b x y =>
-      let x' := tryBottomUp f x in
-      let y' := tryBottomUp f y in
-      try (DNNRCLet a b x' y')
-    | DNNRCFor a b x y =>
-      let x' := tryBottomUp f x in
-      let y' := tryBottomUp f y in
-      try (DNNRCFor a b x' y')
-    | DNNRCIf a x y z =>
-      let x' := tryBottomUp f x in
-      let y' := tryBottomUp f y in
-      let z' := tryBottomUp f z in
-      try (DNNRCIf a x' y' z')
-    | DNNRCEither a x b y c z =>
-      let x' := tryBottomUp f x in
-      let y' := tryBottomUp f y in
-      let z' := tryBottomUp f z in
-      try (DNNRCEither a x' b y' c z')
-    | DNNRCGroupBy a g sl x =>
-      let x' := tryBottomUp f x in
-      try (DNNRCGroupBy a g sl x')
-    | DNNRCCollect a x =>
-      let x' := tryBottomUp f x in
-      try (DNNRCCollect a x')
-    | DNNRCDispatch a x =>
-      let x' := tryBottomUp f x in
-      try (DNNRCDispatch a x')
-    | DNNRCAlg a b c =>
-      (* TODO Should I try to match on the dnnrc environment? *)
-      try e
-    end.
 
   (** Discover the traditional casting the world pattern:
    * Iterate over a collection (the world), cast the element and perform some action on success, return the empty collection otherwise, and flatten at the end.
@@ -217,8 +157,9 @@ Section DNNRCDatasetRewrites.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: dnnrc (type_annotation A) dataset) :=
-    match e with
+             (e: dnnrc (type_annotation A) dataset) :
+    dnnrc (type_annotation A) dataset
+    := match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x
                         (DNNRCCollect t3 xs)
@@ -244,15 +185,22 @@ Section DNNRCDatasetRewrites.
                             (DSFilter (CUDFCast brands (CCol "$type"))
                                       (DSVar "map_cast"))
                             (("map_cast"%string, xs)::nil)) in
-          Some (DNNRCUnop t1 AFlatten
+          (DNNRCUnop t1 AFlatten
                          (DNNRCFor t2 leftVar (DNNRCCollect collectTypeA ALG)
                                   leftE))
-        | _ => None
+        | _ => e
         end
-      else None
-    | _ => None
+      else e
+    | _ => e
     end.
 
+  Definition rec_cast_to_filter_step {A:Set}
+    := mkOptimizerStep
+         "rec cast filter" (* name *)
+         "???" (* description *)
+         "rec_cast_to_filter" (* lemma name *)
+         (@rec_cast_to_filter A) (* lemma *).
+  
   (* Replace (Unbrand (Var s)) expressions by just (Var s), for one specific s.
    * If there are uses of (Var s) outside Unbrand, fail. We use this to lift
    * unbranding into a map, but only if the value is not used unbranded. This is
@@ -261,8 +209,8 @@ Section DNNRCDatasetRewrites.
   Fixpoint rewrite_unbrand_or_fail
            {A: Set} {P: Set}
            (s: string)
-           (e: dnnrc A P) :=
-    match e with
+           (e: dnnrc A P) : option (dnnrc A P)
+    := match e with
     | DNNRCUnop t1 AUnbrand (DNNRCVar t2 v) =>
       if (s == v)
       then Some (DNNRCVar t1 s)
@@ -303,7 +251,7 @@ Section DNNRCDatasetRewrites.
   Definition rec_lift_unbrand
              {A : Set}
              (e: dnnrc (type_annotation A) dataset):
-    option (dnnrc (type_annotation _) dataset) :=
+    (dnnrc (type_annotation _) dataset) :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs as c) e =>
       match lift_tlocal (di_required_typeof c) with
@@ -320,14 +268,20 @@ Section DNNRCDatasetRewrites.
                                           (DSVar "lift_unbrand")))
                       (("lift_unbrand"%string, xs)::nil)
           in
-          Some (DNNRCFor t1 x (DNNRCCollect t2 ALG) e')
-        | None => None
+          DNNRCFor t1 x (DNNRCCollect t2 ALG) e'
+        | None => e
         end
-      | _ => None
+      | _ => e
       end
-    | _ => None
+    | _ => e
     end.
 
+    Definition rec_lift_unbrand_step {A:Set}
+    := mkOptimizerStep
+         "rec lift unbrand" (* name *)
+         "???" (* description *)
+         " rec_lift_unbrand" (* lemma name *)
+         (@rec_lift_unbrand A) (* lemma *).
 
   Fixpoint spark_equality_matches_qcert_equality_for_type (r: rtype₀) :=
     match r with
@@ -399,7 +353,7 @@ Section DNNRCDatasetRewrites.
 
   Definition rec_if_else_empty_to_filter {A: Set}
              (e: dnnrc (type_annotation A) dataset):
-    option (dnnrc (type_annotation A) dataset) :=
+    (dnnrc (type_annotation A) dataset) :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x (DNNRCCollect t3 xs)
@@ -413,28 +367,42 @@ Section DNNRCDatasetRewrites.
                     (DSFilter c' (DSVar "if_else_empty_to_filter"))
                     (("if_else_empty_to_filter"%string, xs)::nil)
         in
-        Some (DNNRCUnop t1 AFlatten
+        DNNRCUnop t1 AFlatten
                        (DNNRCFor t2 x (DNNRCCollect t3 ALG)
-                                thenE))
-      | None => None
+                                thenE)
+      | None => e
       end
-    | _ => None
+    | _ => e
     end.
+
+  Definition rec_if_else_empty_to_filter_step {A:Set}
+    := mkOptimizerStep
+         "rec/if/empty" (* name *)
+         "" (* description *)
+         "rec_if_else_empty_to_filter" (* lemma name *)
+         (@rec_if_else_empty_to_filter A) (* lemma *).
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
              (e: dnnrc (type_annotation A) dataset):
-    option (dnnrc (type_annotation A) dataset) :=
+    dnnrc (type_annotation A) dataset :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x xs
                         (DNNRCUnop t3 AColl e)) =>
-      Some (DNNRCFor t1 x xs e)
-    | _ => None
+      DNNRCFor t1 x xs e
+    | _ => e
     end.
+
+  Definition rec_remove_map_singletoncoll_flatten_step {A:Set}
+    := mkOptimizerStep
+         "flatten/for/coll" (* name *)
+         "Simplifes flatten of a for comprehension that creates singleton bags" (* description *)
+         "rec_remove_map_singletoncoll_flatten" (* lemma name *)
+         (@rec_remove_map_singletoncoll_flatten A) (* lemma *).
 
   Definition rec_for_to_select {A: Set}
              (e: dnnrc (type_annotation A) dataset):
-    option (dnnrc (type_annotation A) dataset) :=
+    dnnrc (type_annotation A) dataset :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
@@ -451,18 +419,41 @@ Section DNNRCDatasetRewrites.
                       (DSSelect (("value"%string, body')::nil) (DSVar "for_to_select"))
                       (("for_to_select"%string, xs)::nil)
           in
-          Some (DNNRCCollect t1 ALG)
-        | None => None
+          DNNRCCollect t1 ALG
+        | None => e
         end
-      | _ => None
+      | _ => e
       end
-    | _ => None
+    | _ => e
     end.
+
+  Definition rec_for_to_select_step {A:Set}
+    := mkOptimizerStep
+         "rec for to select" (* name *)
+         "???" (* description *)
+         "rec_for_to_select" (* lemma name *)
+         (@rec_for_to_select A) (* lemma *).
+
+  Import ListNotations.
 
   Definition dnnrc_optim_list {A} :
     list (OptimizerStep (dnnrc (type_annotation A) dataset))
-      := nil.
-    
+    := [
+        rec_cast_to_filter_step
+        ; rec_lift_unbrand_step
+        ; rec_if_else_empty_to_filter_step
+        ; rec_remove_map_singletoncoll_flatten_step
+        ; rec_for_to_select_step
+      ].
+
+  Lemma dnnrc_optim_list_distinct {A:Set}:
+    optim_list_distinct (@dnnrc_optim_list A).
+  Proof.
+    apply optim_list_distinct_prover.
+    vm_compute.
+    apply eq_refl.
+  Qed.
+  
   Definition run_dnnrc_optims {A}
              {logger:optimizer_logger string (dnnrc (type_annotation A) dataset)}
              (phaseName:string)
@@ -472,34 +463,24 @@ Section DNNRCDatasetRewrites.
     run_phase dnnrc_map_deep (dnnrc_size dataset_size) dnnrc_optim_list
               ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
 
-  Import ListNotations.
-
   Definition dnnrc_default_optim_list : list string
     := [
-        (*
-          optim_step_name rec_for_to_select
-          ; optim_step_name rec_remove_map_singletoncoll_flatten
-          ; optim_step_name rec_if_else_empty_to_filter
-          ; optim_step_name rec_lift_unbrand
-          ; optim_step_name rec_cast_to_filter_step
-         *)
+        optim_step_name (@rec_for_to_select_step unit)
+          ; optim_step_name (@rec_remove_map_singletoncoll_flatten_step unit)
+          ; optim_step_name (@rec_if_else_empty_to_filter_step unit)
+          ; optim_step_name (@rec_lift_unbrand_step unit)
+          ; optim_step_name (@rec_cast_to_filter_step unit)
         ].
 
-  Definition dnnrcToDatasetRewrite_new {A}
+  Remark dnnrc_default_optim_list_all_valid  {A:Set}
+    : valid_optims (@dnnrc_optim_list A) dnnrc_default_optim_list = (dnnrc_default_optim_list,nil).
+  Proof.
+    vm_compute; trivial.
+  Qed.
+
+  Definition dnnrcToDatasetRewrite {A:Set}
              {logger:optimizer_logger string (dnnrc (type_annotation A) dataset)}
     := run_dnnrc_optims "" dnnrc_default_optim_list 6.
-  
-  Definition dnnrcToDatasetRewrite {A : Set}
-             (e: dnnrc (type_annotation A) dataset) : dnnrc (type_annotation A) dataset
-    :=
-      let e' := e in
-      let e'' := tryBottomUp rec_cast_to_filter e' in
-      let e''' := tryBottomUp rec_lift_unbrand e'' in
-      let e'''' := tryBottomUp rec_if_else_empty_to_filter e''' in
-      let e''''' := tryBottomUp rec_remove_map_singletoncoll_flatten e'''' in
-      let e'''''' := tryBottomUp rec_for_to_select e''''' in
-      e''''''.
-
 
 End DNNRCDatasetRewrites.
 

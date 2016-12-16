@@ -32,7 +32,8 @@ let logger_verbosity_of_string conv s
   | "phases_and_names" -> LOG_PHASES_AND_NAMES
   | "sexp" -> LOG_VERBOSE_SEXP conv
   | _ -> raise (Qcert_Error ("Unknown logging verbosity level: "^s^".  Supported levels: none, names, phases_and_names, sexp"))
-  
+
+(* TODO: refactor this code *)
 	    
 (* nra logger *)
 let nra_trace = ref LOG_NONE
@@ -144,6 +145,66 @@ let nrc_log_endPass tok output =
 	match !nrc_trace with
 	| LOG_PHASES_AND_NAMES ->
 	   print_endline "ending nrc optimization pass: "
+	| LOG_VERBOSE_SEXP conv -> print_endline ")"
+	| _ -> ()
+    end;
+     tok)
+  else
+    tok
+
+(* dnrc logger *)
+  
+let dnrc_trace = ref LOG_NONE
+let dnrc_set_trace conv s = dnrc_trace := (logger_verbosity_of_string conv s)
+
+let dnrc_log_startPass name input =
+  if !dnrc_trace != LOG_NONE
+  then
+    (begin
+	match !dnrc_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_string "starting dnrc optimization pass: "; print_endline name
+	| LOG_VERBOSE_SEXP conv -> print_string ("(phase \"dnrc\" \""^name^"\"")
+	| _ -> ()
+    end;
+     name)
+  else
+    name
+  
+let dnrc_log_step tok name input output =
+  if !dnrc_trace != LOG_NONE
+  then
+    begin
+     if (input == output)
+      then () (* (print_string "skipping optimization: "; print_endline name) *)
+      else
+	begin
+	  match !nra_trace with
+	  | LOG_NAMES ->
+	     (print_string "running dnrc optimization: "; print_endline name) ;
+	  | LOG_PHASES_AND_NAMES ->
+	     (print_string "  running dnrc optimization: "; print_endline name) ;
+	  | LOG_VERBOSE_SEXP conv ->
+	     begin
+	       let sexp_input = conv (Obj.magic input) in
+	       let sexp_output = conv (Obj.magic output) in
+	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
+	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
+	     end
+	  | _ -> ()
+	end;
+     tok
+    end
+  else
+    tok
+
+let dnrc_log_endPass tok output =
+  if !dnrc_trace != LOG_NONE
+  then
+    (begin
+	match !dnrc_trace with
+	| LOG_PHASES_AND_NAMES ->
+	   print_endline "ending dnrc optimization pass: "
 	| LOG_VERBOSE_SEXP conv -> print_endline ")"
 	| _ -> ()
     end;
