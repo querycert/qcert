@@ -639,6 +639,14 @@ Section RList.
     + constructor; auto.
     + auto.
   Qed.
+
+  Lemma Forall2_map_Forall {A B:Type} (P:A->B->Prop) (f:A->B) l :
+    Forall2 P l (map f l) <-> Forall (fun x => P x (f x)) l.
+  Proof.
+    split
+    ; induction l; simpl; trivial
+    ; inversion 1; subst; auto.
+  Qed.
   
   End forall2.
 

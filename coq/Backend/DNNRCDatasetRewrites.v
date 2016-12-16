@@ -21,22 +21,139 @@ Require Import EquivDec.
 
 Require Import Utils BasicSystem.
 Require Import NNRCRuntime ForeignToJava ForeignToJavascript.
-Require Import DNNRC.
+Require Import DNNRC DNNRCSize DNNRCEq.
 Require Import RType.
 Require Import TDNRCInfer.
 Require Import TOpsInfer.
-Require Import Dataset.
+Require Import Dataset DatasetSize.
+Require Import OptimizerStep OptimizerLogger.
+
 
 Section DNNRCDatasetRewrites.
 
-  Context {f:foreign_runtime}.
-  Context {h:brand_relation_t}.
-  Context {ftype:foreign_type}.
-  Context {m:brand_model}.
-  Context {fdtyping:foreign_data_typing}.
-  Context {fboptyping:foreign_binary_op_typing}.
-  Context {fuoptyping:foreign_unary_op_typing}.
-  Context {fttjs: foreign_to_javascript}.
+  Context {fruntime:foreign_runtime}.
+  (* This can be used to lift any rewrite on P to dnnrc A P.
+     Practical note: the appropriate map_deep should probably 
+     be used on the provided rewrite *)
+  
+  Fixpoint dnnrc_map_plug {A: Set} {P: Set}
+           (f: P -> P)
+           (e: dnnrc A P) : dnnrc A P
+    := match e with
+       | DNNRCVar a e0 => DNNRCVar a e0
+       | DNNRCConst a e0 => DNNRCConst a e0
+       | DNNRCBinop a b e1 e2 =>
+         DNNRCBinop a b (dnnrc_map_plug f e1) (dnnrc_map_plug f e2)
+       | DNNRCUnop a u e0 =>
+         DNNRCUnop a u (dnnrc_map_plug f e0)
+       | DNNRCLet a x e1 e2 =>
+         DNNRCLet a x (dnnrc_map_plug f e1) (dnnrc_map_plug f e2)
+       | DNNRCFor a x e1 e2 =>
+         DNNRCFor a x (dnnrc_map_plug f e1) (dnnrc_map_plug f e2)
+       | DNNRCIf a e1 e2 e3 =>
+         DNNRCIf a
+                (dnnrc_map_plug f e1)
+                (dnnrc_map_plug f e2)
+                (dnnrc_map_plug f e3)
+       | DNNRCEither a e0 x1 e1 x2 e2 =>
+         DNNRCEither a (dnnrc_map_plug f e0) x1 (dnnrc_map_plug f e1) x2 (dnnrc_map_plug f e2)
+       | DNNRCGroupBy a g sl e0 =>
+         DNNRCGroupBy a g sl (dnnrc_map_plug f e0)
+       | DNNRCCollect a e0 =>
+         DNNRCCollect a (dnnrc_map_plug f e0)
+       | DNNRCDispatch a e0 =>
+         DNNRCDispatch a (dnnrc_map_plug f e0)
+       | DNNRCAlg a p sdl =>
+         DNNRCAlg a (f p) (map (fun sd => (fst sd, (dnnrc_map_plug f (snd sd)))) sdl)
+    end.
+
+  Lemma dnnrc_map_plug_correct {A: Set} {P: Set}  
+        {plug:AlgPlug P}
+        {f: P -> P}
+        (pf:forall (a:A) e env, dnnrc_eq (DNNRCAlg a e env) (DNNRCAlg a (f e) env))
+        (e: dnnrc A P) :
+    dnnrc_eq e (dnnrc_map_plug f e).
+  Proof.
+    induction e; simpl; 
+      try reflexivity.
+    - apply dbinop_proper; trivial; try reflexivity.
+    - apply dunop_proper; trivial; try reflexivity.
+    - apply dlet_proper; trivial; reflexivity.
+    - apply dfor_proper; trivial; reflexivity.
+    - apply dif_proper; trivial; reflexivity.
+    - apply deither_proper; trivial; reflexivity.
+    - apply dgroupby_proper; trivial; reflexivity.
+    - apply dcollect_proper; trivial; reflexivity.
+    - apply ddispatch_proper; trivial; reflexivity.
+    - rewrite pf.
+      apply dalg_proper; trivial.
+      apply Forall2_map_Forall.
+      revert H; apply Forall_impl; intros; simpl; tauto.
+  Qed.
+
+    Fixpoint dnnrc_map_deep {A: Set} {P: Set}
+           (f: dnnrc A P -> dnnrc A P)
+           (e: dnnrc A P) : dnnrc A P
+    := match e with
+       | DNNRCVar a e0 =>
+         f (DNNRCVar a e0)
+       | DNNRCConst a e0 =>
+         f (DNNRCConst a e0)
+       | DNNRCBinop a b e1 e2 =>
+         f (DNNRCBinop a b (dnnrc_map_deep f e1) (dnnrc_map_deep f e2))
+       | DNNRCUnop a u e0 =>
+         f (DNNRCUnop a u (dnnrc_map_deep f e0))
+       | DNNRCLet a x e1 e2 =>
+         f (DNNRCLet a x (dnnrc_map_deep f e1) (dnnrc_map_deep f e2))
+       | DNNRCFor a x e1 e2 =>
+         f (DNNRCFor a x (dnnrc_map_deep f e1) (dnnrc_map_deep f e2))
+       | DNNRCIf a e1 e2 e3 =>
+         f (DNNRCIf a
+                (dnnrc_map_deep f e1)
+                (dnnrc_map_deep f e2)
+                (dnnrc_map_deep f e3))
+       | DNNRCEither a e0 x1 e1 x2 e2 =>
+         f (DNNRCEither a (dnnrc_map_deep f e0) x1 (dnnrc_map_deep f e1) x2 (dnnrc_map_deep f e2))
+       | DNNRCGroupBy a g sl e0 =>
+         f (DNNRCGroupBy a g sl (dnnrc_map_deep f e0))
+       | DNNRCCollect a e0 =>
+         f (DNNRCCollect a (dnnrc_map_deep f e0))
+       | DNNRCDispatch a e0 =>
+         f (DNNRCDispatch a (dnnrc_map_deep f e0))
+       | DNNRCAlg a p sdl =>
+         f (DNNRCAlg a p (map (fun sd => (fst sd, (dnnrc_map_deep f (snd sd)))) sdl))
+    end.
+
+    Lemma dnnrc_map_deep_correctness {A: Set} {P: Set} 
+          {plug:AlgPlug P}
+          {f: dnnrc A P -> dnnrc A P}
+          (pf:forall e, dnnrc_eq e (f e))
+          (e: dnnrc A P) :
+      dnnrc_eq e (dnnrc_map_deep f e).
+    Proof.
+      induction e; simpl; try auto 2
+      ;  (etransitivity; [| apply pf]).
+      - apply dbinop_proper; trivial; try reflexivity.
+      - apply dunop_proper; trivial; try reflexivity.
+      - apply dlet_proper; trivial; reflexivity.
+      - apply dfor_proper; trivial; reflexivity.
+      - apply dif_proper; trivial; reflexivity.
+      - apply deither_proper; trivial; reflexivity.
+      - apply dgroupby_proper; trivial; reflexivity.
+      - apply dcollect_proper; trivial; reflexivity.
+      - apply ddispatch_proper; trivial; reflexivity.
+      - apply dalg_proper; trivial.
+        apply Forall2_map_Forall.
+        revert H; apply Forall_impl; intros; simpl; tauto.
+    Qed.
+
+    Context {ftype:foreign_type}.
+    Context {h:brand_relation_t}.
+    Context {m:brand_model}.
+    Context {fdtyping:foreign_data_typing}.
+    Context {fboptyping:foreign_binary_op_typing}.
+    Context {fuoptyping:foreign_unary_op_typing}.
+    Context {fttjs: foreign_to_javascript}.
 
   (* This should really be some clever monadic combinator thing to compose tree rewritings and strategies, think Stratego.
    *
@@ -342,6 +459,36 @@ Section DNNRCDatasetRewrites.
     | _ => None
     end.
 
+  Definition dnnrc_optim_list {A} :
+    list (OptimizerStep (dnnrc (type_annotation A) dataset))
+      := nil.
+    
+  Definition run_dnnrc_optims {A}
+             {logger:optimizer_logger string (dnnrc (type_annotation A) dataset)}
+             (phaseName:string)
+             (optims:list string)
+             (iterationsBetweenCostCheck:nat)
+    : dnnrc (type_annotation A) dataset -> dnnrc (type_annotation A) dataset :=
+    run_phase dnnrc_map_deep (dnnrc_size dataset_size) dnnrc_optim_list
+              ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
+
+  Import ListNotations.
+
+  Definition dnnrc_default_optim_list : list string
+    := [
+        (*
+          optim_step_name rec_for_to_select
+          ; optim_step_name rec_remove_map_singletoncoll_flatten
+          ; optim_step_name rec_if_else_empty_to_filter
+          ; optim_step_name rec_lift_unbrand
+          ; optim_step_name rec_cast_to_filter_step
+         *)
+        ].
+
+  Definition dnnrcToDatasetRewrite_new {A}
+             {logger:optimizer_logger string (dnnrc (type_annotation A) dataset)}
+    := run_dnnrc_optims "" dnnrc_default_optim_list 6.
+  
   Definition dnnrcToDatasetRewrite {A : Set}
              (e: dnnrc (type_annotation A) dataset) : dnnrc (type_annotation A) dataset
     :=

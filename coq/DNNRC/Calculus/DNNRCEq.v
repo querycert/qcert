@@ -191,6 +191,14 @@ Section DNNRCEq.
       rewrite Forall_forall in H5. auto.
   Qed.
 
+    (* DNNRCGroupBy *)
+  Global Instance dgroupby_proper : Proper (eq ==> eq ==> eq ==> dnnrc_eq ==>dnnrc_eq) DNNRCGroupBy.
+  Proof.
+    unfold Proper, respectful, dnnrc_eq.
+    intros; simpl; subst.
+    trivial.
+  Qed.
+
   (* DNNRCCollect *)
   Global Instance dcollect_proper : Proper (eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCCollect.
   Proof.
@@ -209,17 +217,29 @@ Section DNNRCEq.
     reflexivity.
   Qed.
 
-  (* DNNRCAlg *)
-  (* Here we would need a notion of equality on AlgPlug --
-     something worth discussing with Stefan *)
-  (*
-  Global Instance dalg : Proper (eq ==> eq ==> dnnrc_eq ==> dnnrc_eq) DNNRCDispatch.
+  Global Instance dalg_proper : Proper (eq ==> eq ==> Forall2 (fun n1 n2  => fst n1 = fst n2 /\ dnnrc_eq (snd n1) (snd n2)) ==> dnnrc_eq) DNNRCAlg.
   Proof.
-    unfold Proper, respectful, dnnnrc_eq.
-    intros; simpl. subst.
-    ...
+    unfold Proper, respectful, dnnrc_eq.
+    intros; simpl; subst.
+    cut ((map
+         (fun x : string * dnnrc A plug_type =>
+          match dnnrc_eval h denv (snd x) with
+          | Some (Dlocal _) => None
+          | Some (Ddistr coll) => Some (fst x, coll)
+          | None => None
+          end) x1) = (map
+         (fun x : string * dnnrc A plug_type =>
+          match dnnrc_eval h denv (snd x) with
+          | Some (Dlocal _) => None
+          | Some (Ddistr coll) => Some (fst x, coll)
+          | None => None
+          end) y1)); [intros eqq; rewrite eqq; trivial | ].
+    dependent induction H1; simpl; trivial.
+    rewrite IHForall2 by trivial.
+    destruct H as [eqq1 eqq2].
+    rewrite eqq1, eqq2 by trivial.
+    trivial.
   Qed.
-  *)
 
 End DNNRCEq.
 
