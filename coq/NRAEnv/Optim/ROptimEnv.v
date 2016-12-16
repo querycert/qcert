@@ -952,6 +952,16 @@ Section ROptimEnv.
     destruct o; reflexivity.
   Qed.    
   
+  (* (p1 × p2) ◯ p0 ≡ (p1  ◯ p0) × (p2 ◯ p0) *)
+  
+  Lemma app_over_product p0 p1 p2:
+    (p1 × p2) ◯ p0 ≡ₑ (p1  ◯ p0) × (p2 ◯ p0).
+  Proof.
+    unfold alg_eq, algenv_eq; intros; simpl.
+    generalize (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros.
+    destruct o; reflexivity.
+  Qed.    
+  
   (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
   
   Lemma appenv_over_map p0 p1 p2:

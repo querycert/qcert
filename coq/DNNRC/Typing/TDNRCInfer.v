@@ -118,7 +118,6 @@ Section TDNNRCInfer.
     | Tdistr τ => f2 τ
     end.
 
-  Locate lookup.
   Fixpoint infer_dnnrc_type {A} (tenv:tdbindings) (n:dnnrc A plug_type) :
     option (dnnrc (type_annotation A) plug_type)
     := match n with
@@ -452,38 +451,50 @@ Section TDNNRCInfer.
   Defined.
   
   Definition t0 :=
-    Tlocal (Coll (Rec Closed t0_rec t0_rec_wf)).
+    Tdistr (Rec Closed t0_rec t0_rec_wf).
 
   Example ex11 : dnnrc unit plug_type :=
     DNNRCGroupBy tt "partition"%string ("name"%string::nil)
-                 (DNNRCVar tt "WORLD"%string).
+                 (DNNRCCollect tt (DNNRCVar tt "$vConst$WORLD"%string)).
 
   (*
   Eval vm_compute in (lift unwrap_pf_compute
                         (infer_dnnrc_type
-                           (("WORLD"%string, t0)::nil)
+                           (("$vConst$WORLD"%string, t0)::nil)
                            ex11)).
    *)
 
   Example ex12 : dnnrc unit plug_type :=
     DNNRCGroupBy tt "partition"%string ("age"%string::"name"%string::nil)
-                 (DNNRCVar tt "WORLD"%string).
+                 (DNNRCCollect tt (DNNRCVar tt "$vConst$WORLD"%string)).
 
   (*
   Eval vm_compute in (lift unwrap_pf_compute
                         (infer_dnnrc_type
-                           (("WORLD"%string, t0)::nil)
+                           (("$vConst$WORLD"%string, t0)::nil)
                            ex12)).
    *)
 
   Example ex13 : dnnrc unit plug_type :=
-    DNNRCConst tt (drec nil).
+    DNNRCFor tt
+             "$vtmap$0"%string
+             (DNNRCUnop tt AFlatten
+                        (DNNRCFor tt
+                                  "$vtprod$0"%string
+                                  (DNNRCCollect tt (DNNRCVar tt "$vConst$WORLD"%string))
+                                  (DNNRCUnop tt AColl
+                                             (DNNRCBinop tt AConcat
+                                                         (DNNRCVar tt "$vtprod$0"%string)
+                                                         (DNNRCConst tt (drec nil))))))
+             (DNNRCUnop tt (ARec "name")
+                        (DNNRCUnop tt (ADot "name") (DNNRCVar tt "$vtmap$0"%string))).
 
+  (*
   Eval vm_compute in (lift unwrap_pf_compute
                         (infer_dnnrc_type
-                           (("WORLD"%string, t0)::nil)
+                           (("$vConst$WORLD"%string, t0)::nil)
                            ex13)).
-
+*)
   
 (*
   Eval vm_compute in infer_dnnrc_type nil ex1.

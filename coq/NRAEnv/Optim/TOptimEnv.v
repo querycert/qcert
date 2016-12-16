@@ -375,6 +375,183 @@ Section TOptimEnv.
     eauto. eauto.
   Qed.
 
+  (* q × { [] } ⇒ q *)
+
+  Lemma forall2_same_domain l1 l2 :
+    Forall2
+      (fun (d : string * data) (r : string * rtype) =>
+         fst d = fst r /\ snd d ▹ snd r) l2 l1 ->
+    domain l1 = domain l2.
+  Proof.
+    revert l2.
+    induction l1; simpl; inversion 1; subst; simpl; trivial.
+    inversion H3.
+    rewrite H0.
+    clear H0 H1.
+    rewrite (IHl1 l).
+    reflexivity.
+    assumption.
+  Qed.
+
+  Lemma rmap_concat_empty_right τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (rmap_concat (fun _ : data => Some (dcoll (drec nil :: nil))) l) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold rmap_concat in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      rewrite IHl.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort.
+      rewrite app_nil_r.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        apply (forall2_same_domain rl dl); assumption.
+        assumption.
+      + rewrite H.
+        reflexivity.
+  Qed.
+  
+  Lemma rmap_concat_empty_left τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (rmap_concat (fun _ : data => Some (dcoll l)) (drec nil::nil)) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold rmap_concat in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      unfold oflat_map in IHl.
+      unfold oomap_concat in *.
+      unfold omap_concat in *.
+      simpl in *.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort in *.
+      rewrite app_nil_l in *.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        apply (forall2_same_domain rl dl); assumption.
+        assumption.
+      + destruct (rmap
+         (fun x : data =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r1 => Some (drec (rec_sort ([] ++ r1)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end) l); simpl in *; congruence.
+  Qed.
+    
+  Lemma tproduct_empty_right_arrow q:
+    q × ‵{| ‵[||] |} ⇒ q.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    algenv_inferer.
+    split.
+    - dtype_inverter.
+      subst.
+      inversion H0; clear H0.
+      rtype_equalizer.
+      assert (rl_sub = rl) by auto; clear H5.
+      subst.
+      subst.
+      clear H4.
+      assert (rl = []) by (inversion H6; reflexivity).
+      subst.
+      simpl.
+      assert (rec_concat_sort τ₁ [] = τ₁).
+      unfold rec_concat_sort.
+      rewrite app_nil_r.
+      rewrite rec_sorted_id by trivial.
+      reflexivity.
+      assert (Coll (Rec Closed τ₁ pf1) = Coll (Rec Closed (rec_concat_sort τ₁ []) pf3)).
+      apply rtype_fequal.
+      simpl.
+      rewrite H.
+      reflexivity.
+      rewrite <- H0.
+      assumption.
+    - intros.
+      dtype_inverter.
+      subst.
+      inversion H0.
+      subst.
+      input_well_typed.
+      inversion τout.
+      simpl.
+      dtype_inverter.
+      subst.
+      rewrite (rmap_concat_empty_right τ₁ x1).
+      reflexivity.
+      assumption.
+  Qed.
+
+  Lemma tproduct_empty_left_arrow q:
+    ‵{| ‵[||] |} × q ⇒ q.
+  Proof.
+    unfold talgenv_rewrites_to; intros.
+    algenv_inferer.
+    split.
+    - dtype_inverter.
+      subst.
+      inversion H0; clear H0.
+      rtype_equalizer.
+      assert (rl_sub = rl) by auto; clear H5.
+      subst.
+      subst.
+      clear H4.
+      assert (rl = []) by (inversion H6; reflexivity).
+      subst.
+      simpl.
+      assert (rec_concat_sort [] τ₂ = τ₂).
+      unfold rec_concat_sort.
+      rewrite app_nil_l.
+      rewrite rec_sorted_id by trivial.
+      reflexivity.
+      assert (Coll (Rec Closed τ₂ pf2) = Coll (Rec Closed (rec_concat_sort [] τ₂) pf3)).
+      apply rtype_fequal.
+      simpl.
+      rewrite H.
+      reflexivity.
+      rewrite <- H0.
+      assumption.
+    - intros.
+      dtype_inverter.
+      subst.
+      inversion H0.
+      subst.
+      input_well_typed.
+      inversion τout.
+      simpl.
+      dtype_inverter.
+      subst.
+      rewrite (rmap_concat_empty_left τ₂ x1).
+      reflexivity.
+      assumption.
+  Qed.
+
+  (* ‵[| (s, p₁) |] ⊕ ‵[| (s, p₂) |] ⇒ ‵[| (s, p₂) |] *)
+  
   Lemma tconcat_over_rec_eq s p₁ p₂ :
      ‵[| (s, p₁) |] ⊕ ‵[| (s, p₂) |] ⇒ ‵[| (s, p₂) |].
    Proof.
@@ -1951,6 +2128,15 @@ Section TOptimEnv.
     ⋈ᵈ⟨ q₁ ⟩( q₂ ) ◯ q ⇒ ⋈ᵈ⟨ q₁ ⟩( q₂ ◯ q ).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (app_over_mapconcat q q₁ q₂)).
+    intros. algenv_inferer.
+  Qed.
+
+  (* (q₁ × q₂) ◯ q ⇒ (q₁  ◯ q) × (q₁ ◯ q) *)
+  
+  Lemma tapp_over_product_arrow q q₁ q₂:
+    (q₁ × q₂) ◯ q ⇒ (q₁ ◯ q) × (q₂ ◯ q).
+  Proof.
+    apply (rewrites_typed_with_untyped _ _ (app_over_product q q₁ q₂)).
     intros. algenv_inferer.
   Qed.
 

@@ -1150,6 +1150,33 @@ Section NRAEnvOptimFunc.
   Definition tapp_over_mapconcat_step_correct {model:basic_model}
     := mkOptimizerStepModel tapp_over_mapconcat_step tapp_over_mapconcat_fun_correctness.
 
+  (* ⋈(q₁ × q₂) ◯ q ⇒ (q₁  ◯ q) × (q₁ ◯ q) *)
+
+  Definition tapp_over_product_fun {fruntime:foreign_runtime} (p: nraenv) :=
+    match p with
+        NRAEnvApp (NRAEnvProduct p1 p2) p0 =>
+        NRAEnvProduct (NRAEnvApp p1 p0) (NRAEnvApp p2 p0)
+      | _ => p
+    end.
+
+  Lemma tapp_over_product_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tapp_over_product_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tapp_over_product_arrow.
+  Qed.
+  Hint Rewrite @tapp_over_product_fun_correctness : optim_correct.
+
+  Definition tapp_over_product_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "app/product" (* name *)
+         "Push application through a product body" (* description *)
+         "tapp_over_product_fun" (* lemma name *)
+         tapp_over_product_fun (* lemma *).
+
+  Definition tapp_over_product_step_correct {model:basic_model}
+    := mkOptimizerStepModel tapp_over_product_step tapp_over_product_fun_correctness.
+
   (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ⇒ₓ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
 
   Definition tappenv_over_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -1300,6 +1327,56 @@ Section NRAEnvOptimFunc.
 
   Definition tproduct_singletons_step_correct {model:basic_model}
     := mkOptimizerStepModel tproduct_singletons_step tproduct_singletons_fun_correctness.
+
+  (* { p1 × { [] } ⇒ₓ p1 *)
+  Definition tproduct_empty_right_fun {fruntime:foreign_runtime} (p: nraenv) :=
+    match p with
+    | NRAEnvProduct p1 (NRAEnvUnop AColl (NRAEnvConst (drec nil))) => p1
+    | _ => p
+    end.
+
+  Lemma tproduct_empty_right_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tproduct_empty_right_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tproduct_empty_right_arrow.
+  Qed.
+  Hint Rewrite @tproduct_empty_right_fun_correctness : optim_correct.
+
+  Definition tproduct_empty_right_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "product singleton right" (* name *)
+         "Eliminates empty table on the right of a Cartesian product" (* description *)
+         "tproduct_empty_right_fun" (* lemma name *)
+         tproduct_empty_right_fun (* lemma *).
+
+  Definition tproduct_empty_right_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproduct_empty_right_step tproduct_empty_right_fun_correctness.
+
+  (* { { [] } × p1 ⇒ₓ p1 *)
+  Definition tproduct_empty_left_fun {fruntime:foreign_runtime} (p: nraenv) :=
+    match p with
+    | NRAEnvProduct (NRAEnvUnop AColl (NRAEnvConst (drec nil))) p1 => p1
+    | _ => p
+    end.
+
+  Lemma tproduct_empty_left_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tproduct_empty_left_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tproduct_empty_left_arrow.
+  Qed.
+  Hint Rewrite @tproduct_empty_left_fun_correctness : optim_correct.
+
+  Definition tproduct_empty_left_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "product singleton left" (* name *)
+         "Eliminates empty table on the left of a Cartesian product" (* description *)
+         "tproduct_empty_left_fun" (* lemma name *)
+         tproduct_empty_left_fun (* lemma *).
+
+  Definition tproduct_empty_left_step_correct {model:basic_model}
+    := mkOptimizerStepModel tproduct_empty_left_step tproduct_empty_left_fun_correctness.
 
   (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
   Definition tdouble_flatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
@@ -2740,11 +2817,14 @@ Section NRAEnvOptimFunc.
         ; tunop_over_either_const_app_step
         ; tapp_over_map_step
         ; tapp_over_mapconcat_step
+        ; tapp_over_product_step
         ; tappenv_over_map_step
         ; tappenv_over_select_step
         ; tapp_over_select_step
         ; tapp_over_binop_step
         ; tproduct_singletons_step
+        ; tproduct_empty_right_step
+        ; tproduct_empty_left_step
         ; tdouble_flatten_map_coll_step
         ; tflatten_over_double_map_step
         ; tflatten_over_double_map_with_either_step
@@ -2832,11 +2912,14 @@ Section NRAEnvOptimFunc.
         ; tunop_over_either_const_app_step_correct
         ; tapp_over_map_step_correct
         ; tapp_over_mapconcat_step_correct
+        ; tapp_over_product_step_correct
         ; tappenv_over_map_step_correct
         ; tappenv_over_select_step_correct
         ; tapp_over_select_step_correct
         ; tapp_over_binop_step_correct
         ; tproduct_singletons_step_correct
+        ; tproduct_empty_right_step_correct
+        ; tproduct_empty_left_step_correct
         ; tdouble_flatten_map_coll_step_correct
         ; tflatten_over_double_map_step_correct
         ; tflatten_over_double_map_with_either_step_correct
@@ -2938,6 +3021,8 @@ Section NRAEnvOptimFunc.
       ; optim_step_name tapp_over_appenv_step
       ; optim_step_name tmap_into_id_step
       ; optim_step_name tproduct_singletons_step
+      ; optim_step_name tproduct_empty_right_step
+      ; optim_step_name tproduct_empty_left_step
       ; optim_step_name tmap_singleton_step
       ; optim_step_name tmap_map_compose_step
       ; optim_step_name tflatten_coll_step
@@ -2951,6 +3036,7 @@ Section NRAEnvOptimFunc.
       ; optim_step_name tapp_over_select_step
       ; optim_step_name tapp_over_map_step
       ; optim_step_name tapp_over_mapconcat_step
+      ; optim_step_name tapp_over_product_step
       ; optim_step_name tappenv_over_unop_step
       ; optim_step_name tcompose_selects_in_mapenv_step
       ; optim_step_name tmap_full_over_select_step
@@ -3034,6 +3120,8 @@ Section NRAEnvOptimFunc.
       ; optim_step_name tapp_over_appenv_step
       ; optim_step_name tmap_into_id_step
       ; optim_step_name tproduct_singletons_step
+      ; optim_step_name tproduct_empty_right_step
+      ; optim_step_name tproduct_empty_left_step
       ; optim_step_name tmap_singleton_step
       ; optim_step_name tmap_map_compose_step
       ; optim_step_name tflatten_coll_step
@@ -3049,6 +3137,7 @@ Section NRAEnvOptimFunc.
       ; optim_step_name tapp_over_select_step
       ; optim_step_name tapp_over_map_step
       ; optim_step_name tapp_over_mapconcat_step
+      ; optim_step_name tapp_over_product_step
       ; optim_step_name tappenv_over_unop_step
       ; optim_step_name tcompose_selects_in_mapenv_step
       ; optim_step_name tmap_full_over_select_step
