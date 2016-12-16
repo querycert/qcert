@@ -14,20 +14,26 @@
  * limitations under the License.
  */
 
-function preProcessSQL(sql) {
-		var url = "http://localhost:9879"; /* TODO: how to parameterize this */
+function preProcessSQL(sql, useLocal) {
+		var url = useLocal ? "http://localhost:9879" : "http://35.164.159.76:9879";
+//	console.log("URL: " + url);
+//	console.log("local flag: " + useLocal);
 		var request = new XMLHttpRequest();
 		request.open("POST", url, false);
 		request.setRequestHeader("Content-Type", "text/plain");
 		request.send(sql);
-//		console.log("Returning encoded form:");
-//		console.log(request.responseText);
+//	console.log("Returning encoded form:");
+//	console.log(request.responseText);
 		return request.responseText;
 }
 
-function preMain(input) {
+function preMain(input, useLocal) {
 		if (input.source == "sql") {
-			input.query = preProcessSQL(input.query);
+			try {
+				input.query = preProcessSQL(input.query, useLocal);
+			} catch (e) {
+				return { "result": e.message};
+			}
 			input.sourcesexp = true;
 		}
 //		console.log("Input to main:");
