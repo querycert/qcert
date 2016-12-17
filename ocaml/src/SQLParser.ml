@@ -33,7 +33,6 @@ let main (s : string) =
     let fromProcess, toProcess = Unix.open_process cmd in
     output_string toProcess s;
     close_out toProcess;
-    print_endline "about to read result";
     let result = input_line fromProcess in
     close_in fromProcess;
     result
