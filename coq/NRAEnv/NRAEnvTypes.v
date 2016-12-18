@@ -16,7 +16,6 @@
 
 Require Export BasicTypes.
 Require Export TAlgEnv TAlgEnvEq TAlgEnvIgnore.
-Require Export TOptimEnv.
 Require Export TNRAEnv TNRAEnvEq.
 
 (* 

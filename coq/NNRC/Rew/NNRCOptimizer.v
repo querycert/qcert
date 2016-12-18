@@ -22,7 +22,8 @@ Section NNRCOptimizer.
   Require Import Arith.
   
   Require Import Utils BasicRuntime.
-  Require Import NNRCRuntime.
+  Require Import NNRCSystem.
+  Require Import NNRCRewriteUtil NNRCRewrite.
 
   Require Import Program.
 

@@ -16,8 +16,6 @@
 
 Require Export BasicRuntime.
 Require Export RAlg RAlgSugar RAlgEq RAlgExt RAlgExtEq RAlgSize.
-Require Export RAlgContext.
-Require Export ROptim ROptimContext ROptimExt.
 
 (* 
 *** Local Variables: ***

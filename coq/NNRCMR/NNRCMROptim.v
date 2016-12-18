@@ -14,8 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export NNRCMR.
-Require Export ForeignReduceOps.
+Require Export NRewMR.
 
 (* 
 *** Local Variables: ***

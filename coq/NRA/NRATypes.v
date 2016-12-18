@@ -16,7 +16,6 @@
 
 Require Export BasicTypes.
 Require Export TAlg TAlgEq TAlgExt TDomain.
-Require Export TOptim.
 
 (* 
 *** Local Variables: ***

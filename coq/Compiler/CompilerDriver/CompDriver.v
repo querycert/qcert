@@ -29,10 +29,10 @@ Section CompDriver.
   Require Import SQL.
   Require Import LambdaAlg.
   Require Import CAMPRuntime.
-  Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCMRRuntime.
+  Require Import NRARuntime NRAOptim.
+  Require Import NRAEnvRuntime NRAEnvOptim.
+  Require Import NNRCRuntime NNRCOptim.
+  Require Import NNRCMRRuntime NNRCMROptim.
   Require Import CloudantMR.
   Require Import DNNRC Dataset.
 
@@ -147,6 +147,7 @@ Section CompDriver.
     lift_nnrc_core (nnrcToPat_let avoid) q. (* XXX avoid ? XXX *)
 
   (* Java equivalent: NnrcToNnrcmr.convert *)
+  (* XXX This call should be removed and replaced by nnrc_to_nnrcmr. see below XXX *)
   Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
     let q_free_vars := (* bdistinct !!! *) nnrc_free_vars q in
     let inputs_loc :=
@@ -160,8 +161,7 @@ Section CompDriver.
   (* Free variables should eventually be passed from the application? *)
   Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
     let inputs_loc :=
-        (init_vid, Vlocal) (* XXX suppr vid? XXX *)
-          ::(vinit, Vlocal)
+        (vinit, Vlocal)
           :: inputs_loc
     in
     nnrc_to_nnrcmr_chain q

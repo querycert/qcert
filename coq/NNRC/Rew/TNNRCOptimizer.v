@@ -28,6 +28,7 @@ Section TNNRCOptimizer.
 
   Require Import Utils BasicSystem.
   Require Import NNRCSystem.
+  Require Import NNRCRewriteUtil NNRCRewrite TNNRCRewrite.
   Require Import NNRCOptimizer.
   Require Import OptimizerLogger.
   Require Import OptimizerStep.

@@ -24,7 +24,10 @@ Section NRAEnvOptimFunc.
   Require Import String List ListSet.
 
   Require Import Utils BasicSystem.
-  Require Import NRAEnvSystem.
+  Require Import RAlgEnv RAlgEnvEq TAlgEnv TAlgEnvEq.
+  Require Import NRAEnv NRAEnvEq TNRAEnv TNRAEnvEq ROptimEnv TOptimEnv.
+  Require Import RAlgEnvIgnore TAlgEnvIgnore NRAEnvIgnore RAlgEnvSize NRAEnvSize.
+  
   Require Import OptimizerStep OptimizerLogger.
 
   Open Scope nraenv_scope.
@@ -114,6 +117,10 @@ Section NRAEnvOptimFunc.
   End rewriter.
 
   Section dup.
+    (* optimization for distinct *)
+    Definition nraenv_nodupA {fruntime:foreign_runtime} (q:nraenv) : Prop :=
+      nodupA (algenv_of_nraenv q).
+
     Fixpoint nodupA_checker {fruntime:foreign_runtime} (p:nraenv) : bool
     := match p with
        | NRAEnvUnop ADistinct _ => true

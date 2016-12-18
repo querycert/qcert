@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Require Export NNRCMR.
-Require Export ForeignReduceOps.
+Require Export NNRCRewriteUtil NNRCRewrite.
+Require Export TNNRCRewrite.
+Require Export NNRCOptimizer TNNRCOptimizer.
 
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
-

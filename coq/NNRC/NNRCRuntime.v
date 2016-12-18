@@ -16,7 +16,6 @@
 
 Require Export BasicRuntime.
 Require Export NNRC NNRCNorm NNRCSize NNRCEq NNRCShadow.
-Require Export NNRCRewriteUtil NNRCRewrite.
 Require Export NNRCExt NNRCExtShadow NNRCExtEq.
 
 (* 

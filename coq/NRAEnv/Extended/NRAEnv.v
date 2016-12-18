@@ -239,13 +239,6 @@ Section NRAEnv.
     reflexivity.
   Qed.
 
-  Section dup.
-    Require Import ROptimEnv.
-    (* optimization for distinct *)
-    Definition nraenv_nodupA (q:nraenv) : Prop :=
-      nodupA (algenv_of_nraenv q).
-  End dup.
-
 End NRAEnv.
 
 (* begin hide *)

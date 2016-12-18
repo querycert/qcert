@@ -32,7 +32,7 @@ Section RAlgEnvContext.
   Require Import Arith.
 
   Require Import Utils BasicRuntime.
-  Require Import NRARuntime.
+  Require Import NRARuntime NRAOptim.
   Require Import RAlgEnv RAlgEnvIgnore RAlgEnvEq RAlgEnvContext.
 
 (*

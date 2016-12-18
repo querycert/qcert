@@ -38,6 +38,8 @@ MODULES = \
 	Basic/Util/RBindings \
 	Basic/Util/RBindingsNat \
 	Basic/Util/Utils \
+	Basic/Logger/OptimizerLogger \
+	Basic/Logger/OptimizerStep \
 	Basic/Data/RBag \
 	Basic/Data/RDomain \
 	Basic/Data/BrandRelation \
@@ -101,13 +103,14 @@ MODULES = \
         NRA/Typing/TAlgExt \
         NRA/Typing/TDomain \
 	NRA/Context/RAlgContext \
+	NRA/NRARuntime \
+	NRA/NRATypes \
+	NRA/NRASystem \
 	NRA/Optim/ROptim \
 	NRA/Optim/ROptimContext \
 	NRA/Optim/ROptimExt \
 	NRA/Optim/TOptim \
-	NRA/NRARuntime \
-	NRA/NRATypes \
-	NRA/NRASystem \
+	NRA/NRAOptim \
 	NRAEnv/Algebra/RAlgEnv \
 	NRAEnv/Algebra/RAlgEnvSize \
 	NRAEnv/Algebra/RAlgEnvIgnore \
@@ -122,14 +125,16 @@ MODULES = \
         NRAEnv/Typing/TAlgEnvEq \
 	NRAEnv/Typing/TNRAEnv \
 	NRAEnv/Typing/TNRAEnvEq \
+	NRAEnv/NRAEnvRuntime \
+	NRAEnv/NRAEnvTypes \
+	NRAEnv/NRAEnvSystem \
 	NRAEnv/Context/RAlgEnvContext \
 	NRAEnv/Context/RAlgEnvContextLift \
 	NRAEnv/Optim/ROptimEnv \
 	NRAEnv/Optim/ROptimEnvContext \
 	NRAEnv/Optim/TOptimEnv \
-	NRAEnv/NRAEnvRuntime \
-	NRAEnv/NRAEnvTypes \
-	NRAEnv/NRAEnvSystem \
+	NRAEnv/Optim/NRAEnvOptimFunc \
+	NRAEnv/NRAEnvOptim \
 	NNRC/Calculus/NNRC \
 	NNRC/Calculus/NNRCShadow \
 	NNRC/Calculus/NNRCNorm \
@@ -145,16 +150,20 @@ MODULES = \
 	NNRC/Typing/TNNRCExtEq \
 	NNRC/Typing/TNNRCShadow \
 	NNRC/Typing/TNNRCExtShadow \
-	NNRC/Rew/NNRCRewriteUtil \
-	NNRC/Rew/NNRCRewrite \
-	NNRC/Rew/TNNRCRewrite \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \
+	NNRC/Rew/NNRCRewriteUtil \
+	NNRC/Rew/NNRCRewrite \
+	NNRC/Rew/TNNRCRewrite \
+	NNRC/Rew/NNRCOptimizer \
+	NNRC/Rew/TNNRCOptimizer \
+	NNRC/NNRCOptim \
 	NNRCMR/Calculus/ForeignReduceOps \
 	NNRCMR/Calculus/NNRCMR \
-	NNRCMR/Rew/NRewMR \
 	NNRCMR/NNRCMRRuntime \
+	NNRCMR/Rew/NRewMR \
+	NNRCMR/NNRCMROptim \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCSize \
 	DNNRC/Calculus/DNNRCEq \
@@ -164,6 +173,7 @@ MODULES = \
 	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
 	DNNRC/Typing/TOpsInferSub \
+	DNNRC/Optim/DNNRCDatasetRewrites \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
 	CAMP/Rules/PatternSugar \
@@ -225,13 +235,7 @@ MODULES = \
 	Backend/NNRCMRtoCloudant \
 	Backend/CloudantMRtoJavascript \
 	Backend/SparkData \
-	Backend/DNNRCDatasetRewrites \
 	Backend/DNNRCtoScala \
-	Compiler/Optimizer/OptimizerLogger \
-	Compiler/Optimizer/OptimizerStep \
-	Compiler/Optimizer/NRAEnvOptimFunc \
-	Compiler/Optimizer/NNRCOptimizer \
-	Compiler/Optimizer/TNNRCOptimizer \
 	Compiler/CompilerModel/CompilerRuntime \
 	Compiler/CompilerModel/CompilerModel \
 	Compiler/CompilerModel/FloatModelPart \

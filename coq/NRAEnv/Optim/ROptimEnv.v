@@ -1740,9 +1740,9 @@ Section ROptimEnv.
           | None => None
           end) d); trivial.
   Qed.
-
+  
   (* optimization for distinct *)
-    Definition nodupA : algenv -> Prop :=
+  Definition nodupA : algenv -> Prop :=
     algenv_always_ensures
       (fun d => match d with
                 | dcoll dl => NoDup dl
