@@ -25,7 +25,7 @@ Section CompEval.
   (* ASTs *)
   Require Import ODMGRuntime.
   Require Import LambdaNRA.
-  Require Import SQL.
+  Require Import SQL SQLtoNRAEnv.
   Require Import CAMPRuntime.
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.

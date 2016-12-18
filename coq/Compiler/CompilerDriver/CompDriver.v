@@ -40,6 +40,7 @@ Section CompDriver.
   Require Import PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC NRAEnvtoNNRCExt.
   Require Import LambdaNRAtoNRAEnv.
+  Require Import SQLtoNRAEnv.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
@@ -98,7 +99,7 @@ Section CompDriver.
 
   Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
 
-  Definition sql_to_nraenv (q:sql) : nraenv := SQL.sql_to_nraenv q.
+  Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
 
   Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lalg q.
 

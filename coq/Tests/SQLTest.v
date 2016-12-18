@@ -34,7 +34,7 @@ Section SQLTest.
   Require Import String ZArith.
   Open Scope Z_scope.
 
-  Require Import RDataSort SQL.
+  Require Import RDataSort SQL SQLtoNRAEnv.
   
   Local Open Scope string_scope.
   Local Open Scope data_scope.
@@ -44,6 +44,7 @@ Section SQLTest.
    *****************)
 
   Require Import EnhancedModel.
+  Require Import CompEval.
   
   (* Some useful functions *)
 
@@ -141,7 +142,7 @@ Section SQLTest.
     := sql_to_nraenv (SRunQuery q::nil).
 
     Definition sql_just_query_eval (q:sql_query)
-    := sql_eval (SRunQuery q::nil).
+    := @eval_sql _ nil (SRunQuery q::nil).
 
   (* sql1:
        select name
@@ -151,9 +152,8 @@ Section SQLTest.
   Definition nraenv1 :=
     sql_just_query_to_nraenv sql1.
 
-  (* Eval vm_compute in nraenv1. *)
-  (* Eval vm_compute in (nraenv_eval nraenv1 tables). *)
-  (* Eval vm_compute in (sql_just_query_eval  sql1 tables). *)
+   Eval vm_compute in nraenv1. 
+   (* Eval vm_compute in (sql_just_query_eval  sql1 tables). *)
 
   (* sql2:
        select name,

@@ -29,7 +29,7 @@ Section CompStat.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
   Require Import ODMGRuntime.
-  Require Import SQL.
+  Require Import SQLSize.
 
   Require Import CompilerRuntime.
   Require Import BasicSystem.
