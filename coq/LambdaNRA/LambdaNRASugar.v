@@ -19,10 +19,10 @@ Require Import List.
 Require Import Arith.
 Require Import EquivDec.
 
-Section LambdaAlgSugar.
+Section LambdaNRASugar.
 
   Require Import Utils BasicSystem.
-  Require Import LambdaAlg.
+  Require Import LambdaNRA.
 
   Context {fruntime:foreign_runtime}.
 
@@ -48,11 +48,11 @@ Section LambdaAlgSugar.
     let free_vars := lalg_free_vars e in
     fold_left la_tableify_one_var free_vars e.
   
-End LambdaAlgSugar.
+End LambdaNRASugar.
 
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

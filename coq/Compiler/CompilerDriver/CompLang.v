@@ -30,7 +30,7 @@ Section CompLang.
 
   Require Import NNRCMRtoDNNRC.
   Require Import TDNRCInfer.
-  Require Import LambdaAlg.
+  Require Import LambdaNRA.
   Require Import SQL.
   
   Require Rule.

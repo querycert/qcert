@@ -24,7 +24,7 @@ Require Import Utils BasicRuntime.
 
 Section LambdaNRAtoNRAEnv.
 
-  Require Import LambdaAlg NRAEnvRuntime.
+  Require Import LambdaNRA NRAEnvRuntime.
 
   Context {fruntime:foreign_runtime}.
 

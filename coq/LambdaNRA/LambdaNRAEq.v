@@ -22,7 +22,7 @@ Require Import Morphisms.
 
 Require Import Utils BasicRuntime.
 
-Require Import LambdaAlg.
+Require Import LambdaNRA.
 Section LambdaNRAEq.
 
   Context {fruntime:foreign_runtime}.
@@ -187,6 +187,6 @@ End LambdaNRAEq.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

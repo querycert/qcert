@@ -19,48 +19,48 @@ Require Import CompilerRuntime.
 Module QLambdaNRA(runtime:CompilerRuntime).
   Require String.
   Require QData QOperators.
-  Require LambdaAlg LambdaAlgSugar.
+  Require LambdaNRA LambdaNRASugar.
 
   Module Data := QData.QData runtime.
   Module Ops := QOperators.QOperators runtime.
 
   Definition expr : Set
-    := LambdaAlg.lalg.
+    := LambdaNRA.lalg.
   Definition lambda_expr : Set
-    := LambdaAlg.lalg_lambda.
+    := LambdaNRA.lalg_lambda.
   Definition t : Set
     := expr.
   Definition var : Set
     := String.string.
 
   Definition lalambda : var -> expr -> lambda_expr
-    := LambdaAlg.LALambda.
+    := LambdaNRA.LALambda.
   Definition lavar : var -> expr
-    := LambdaAlg.LAVar.
+    := LambdaNRA.LAVar.
   Definition laconst : Data.data -> expr
-    := LambdaAlg.LAConst.
+    := LambdaNRA.LAConst.
   Definition ltable  : String.string -> expr
-    := LambdaAlg.LATable.
+    := LambdaNRA.LATable.
   Definition labinop : Ops.Binary.op -> expr -> expr -> expr
-    := LambdaAlg.LABinop.
+    := LambdaNRA.LABinop.
   Definition launop : Ops.Unary.op -> expr -> expr
-    := LambdaAlg.LAUnop.
+    := LambdaNRA.LAUnop.
   Definition lamap : lambda_expr -> expr -> expr
-    := LambdaAlg.LAMap.
+    := LambdaNRA.LAMap.
   Definition laselect : lambda_expr -> expr -> expr
-    := LambdaAlg.LASelect.
+    := LambdaNRA.LASelect.
   Definition lamapconcat : lambda_expr -> expr -> expr
-    := LambdaAlg.LAMapConcat.
+    := LambdaNRA.LAMapConcat.
 
   Definition ladot : String.string -> expr -> expr 
-    := LambdaAlgSugar.LADot.
+    := LambdaNRASugar.LADot.
   Definition laarrow : String.string -> expr -> expr 
-    := LambdaAlgSugar.LAArrow.
+    := LambdaNRASugar.LAArrow.
   Definition lastruct : list (String.string * expr) -> expr 
-    := LambdaAlgSugar.LAStruct.
+    := LambdaNRASugar.LAStruct.
 
   Definition latableify : expr -> expr
-    := LambdaAlgSugar.la_tableify.
+    := LambdaNRASugar.la_tableify.
 
 End QLambdaNRA.
 (* 

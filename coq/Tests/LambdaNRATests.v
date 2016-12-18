@@ -22,7 +22,7 @@ Require Import Morphisms.
 
 Require Import Utils BasicRuntime.
 
-Require Import LambdaAlg LambdaAlgEq LambdaAlgtoNRAEnv.
+Require Import LambdaNRA LambdaNRAEq LambdaNRAtoNRAEnv.
 Require Import TrivialCompiler.
 Import TrivialCompiler.
 

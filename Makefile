@@ -187,6 +187,9 @@ MODULES = \
 	CAMP/CAMPSystem \
 	CldMR/CldMRUtil \
 	CldMR/CldMR \
+	LambdaNRA/LambdaNRA \
+	LambdaNRA/LambdaNRASugar \
+	LambdaNRA/LambdaNRAEq \
 	Translation/ForeignToReduceOps \
 	Translation/NRAtoNNRC \
 	Translation/NRAEnvtoNNRC \
@@ -207,10 +210,7 @@ MODULES = \
 	Translation/TNNRCtoPattern \
 	Translation/TPatterntoNRA \
 	Translation/TPatterntoNRAEnv \
-	Frontend/LambdaNRA/LambdaAlg \
-	Frontend/LambdaNRA/LambdaAlgSugar \
-	Frontend/LambdaNRA/LambdaAlgEq \
-	Frontend/LambdaNRA/LambdaAlgtoNRAEnv \
+	Translation/LambdaNRAtoNRAEnv \
 	Frontend/ODMG/OQL \
 	Frontend/ODMG/OQLSugar \
 	Frontend/ODMG/OQLSize \
@@ -274,7 +274,7 @@ MODULES = \
 	Tests/MRTest \
 	Tests/OQLTest \
 	Tests/SQLTest \
-	Tests/LambdaAlgTests
+	Tests/LambdaNRATests
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
 

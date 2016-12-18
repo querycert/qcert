@@ -27,7 +27,7 @@ Section CompDriver.
   (* ASTs *)
   Require Import ODMGRuntime.
   Require Import SQL.
-  Require Import LambdaAlg.
+  Require Import LambdaNRA.
   Require Import CAMPRuntime.
   Require Import NRARuntime NRAOptim.
   Require Import NRAEnvRuntime NRAEnvOptim.
@@ -39,7 +39,7 @@ Section CompDriver.
   (* Translations *)
   Require Import PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
   Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC NRAEnvtoNNRCExt.
-  Require Import LambdaAlgtoNRAEnv.
+  Require Import LambdaNRAtoNRAEnv.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
