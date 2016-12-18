@@ -22,14 +22,14 @@ Require Import CompilerTest.
 
 Section MRTest.
 
-  Require Import NNRCRuntime CloudantMR.
+  Require Import NNRCRuntime CldMR.
   Require Import TrivialModel.
 
   (* ...                     ...
      ... WORD COUNT WAS HERE ...
      ...                     ... *)
   
-  (* Small instrumentation for NNRCMR and CloudantMR *)
+  (* Small instrumentation for NNRCMR and CldMR *)
 
   Require Import Arith NNRCMR.
   

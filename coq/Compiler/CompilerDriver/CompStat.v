@@ -25,7 +25,7 @@ Section CompStat.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
-  Require Import CloudantMR.
+  Require Import CldMR.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
   Require Import ODMGRuntime.
@@ -42,7 +42,7 @@ Section CompStat.
 
   Local Open Scope list_scope.
 
-  Require Import  ForeignCloudant.
+  Require Import ForeignCloudant.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {bm:brand_model}.

@@ -26,7 +26,7 @@ Require Import CompilerRuntime CompilerModel.
 Require Import FloatModelPart StringModelPart. 
 Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
-Require NNRCMR CloudantMR.
+Require NNRCMR CldMR.
 Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 Require Import DNNRC Dataset.
 Require Import TDNRCInfer.
@@ -668,10 +668,10 @@ Defined.
   Defined.
 
   Definition enhanced_to_cld_numeric_type
-             (typ:enhanced_numeric_type) : CloudantMR.cld_numeric_type
+             (typ:enhanced_numeric_type) : CldMR.cld_numeric_type
     := match typ with
-       | enhanced_numeric_int => CloudantMR.Cld_int
-       | enhanced_numeric_float => CloudantMR.Cld_float
+       | enhanced_numeric_int => CldMR.Cld_int
+       | enhanced_numeric_float => CldMR.Cld_float
        end.
 
 Inductive enhanced_reduce_op
@@ -1072,14 +1072,14 @@ Instance enhanced_foreign_cloudant : foreign_cloudant
        (AForeignUnaryOp (enhanced_unary_float_op uop_float_listmax)).
 
 Definition enhanced_to_cloudant_reduce_op
-           (rop:enhanced_reduce_op) : CloudantMR.cld_reduce_op
+           (rop:enhanced_reduce_op) : CldMR.cld_reduce_op
   := match rop with
-     | RedOpCount => CloudantMR.CldRedOpCount
-     | RedOpSum typ => CloudantMR.CldRedOpSum (enhanced_to_cld_numeric_type typ)
-     | RedOpStats typ => CloudantMR.CldRedOpStats (enhanced_to_cld_numeric_type typ)
-     | RedOpMin _ => CloudantMR.CldRedOpStats CloudantMR.Cld_int (* assert false *)
-     | RedOpMax _ => CloudantMR.CldRedOpStats CloudantMR.Cld_int (* assert false *)
-     | RedOpArithMean _ => CloudantMR.CldRedOpStats CloudantMR.Cld_int (* assert false *)
+     | RedOpCount => CldMR.CldRedOpCount
+     | RedOpSum typ => CldMR.CldRedOpSum (enhanced_to_cld_numeric_type typ)
+     | RedOpStats typ => CldMR.CldRedOpStats (enhanced_to_cld_numeric_type typ)
+     | RedOpMin _ => CldMR.CldRedOpStats CldMR.Cld_int (* assert false *)
+     | RedOpMax _ => CldMR.CldRedOpStats CldMR.Cld_int (* assert false *)
+     | RedOpArithMean _ => CldMR.CldRedOpStats CldMR.Cld_int (* assert false *)
      end.
 
   (* Java equivalent: MROptimizer.foreign_to_cloudant_prepare_nnrcmr *)

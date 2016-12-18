@@ -33,7 +33,7 @@ Section CompDriver.
   Require Import NRAEnvRuntime NRAEnvOptim.
   Require Import NNRCRuntime NNRCOptim.
   Require Import NNRCMRRuntime NNRCMROptim.
-  Require Import CloudantMR.
+  Require Import CldMR.
   Require Import DNNRC Dataset.
 
   (* Translations *)
@@ -46,9 +46,9 @@ Section CompDriver.
   Require Import NNRCtoPattern.
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSpark.
-  Require Import NNRCMRtoCloudant.
+  Require Import NNRCMRtoCldMR.
   Require Import NNRCMRtoDNNRC.
-  Require Import CloudantMRtoJavascript.
+  Require Import CldMRtoJavaScript.
   Require Import NNRCtoDNNRC.
   Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
 

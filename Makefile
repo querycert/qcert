@@ -185,6 +185,8 @@ MODULES = \
 	CAMP/CAMPRuntime \
 	CAMP/CAMPTypes \
 	CAMP/CAMPSystem \
+	CldMR/CldMRUtil \
+	CldMR/CldMR \
 	Translation/ForeignToReduceOps \
 	Translation/NRAtoNNRC \
 	Translation/NRAEnvtoNNRC \
@@ -226,14 +228,12 @@ MODULES = \
 	Backend/ForeignToScala \
 	Backend/ForeignToCloudant \
 	Backend/ForeignToSpark \
-	Backend/CloudantKV \
-	Backend/CloudantMR \
 	Backend/JSONtoData \
 	Backend/NNRCtoJava \
 	Backend/NNRCtoJavascript \
 	Backend/NNRCMRtoSpark \
-	Backend/NNRCMRtoCloudant \
-	Backend/CloudantMRtoJavascript \
+	Backend/NNRCMRtoCldMR \
+	Backend/CldMRtoJavaScript \
 	Backend/SparkData \
 	Backend/DNNRCtoScala \
 	Compiler/CompilerModel/CompilerRuntime \

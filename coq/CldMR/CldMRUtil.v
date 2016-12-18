@@ -15,7 +15,7 @@
  *)
 
 (* Utils: key/value manipulation *)
-Section CloudantKV.
+Section CldMRUtil.
   Require Import String.
   Require Import List.
   Require Import Sorting.Mergesort.
@@ -262,7 +262,7 @@ Section CloudantKV.
     apply get_values_of_init_aux_same.
   Qed.
     
-End CloudantKV.
+End CldMRUtil.
 
 (*
 *** Local Variables: ***

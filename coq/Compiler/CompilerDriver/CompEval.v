@@ -31,7 +31,7 @@ Section CompEval.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
-  Require Import CloudantMR. (* XXX contains cld_load_init_env! XXX *)
+  Require Import CldMR. (* XXX contains cld_load_init_env! XXX *)
   Require Import DNNRC Dataset.
 
   (* Translations *)

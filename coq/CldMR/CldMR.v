@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section CloudantMR.
+Section CldMR.
   Require Import String.
   Require Import List.
   Require Import Sorting.Mergesort.
@@ -22,7 +22,7 @@ Section CloudantMR.
 
   Require Import Utils BasicRuntime.
   Require Import NNRCRuntime NNRCMRRuntime.
-  Require Import CloudantKV ForeignCloudant.
+  Require Import CldMRUtil ForeignCloudant.
   
   Local Open Scope list_scope.
 
@@ -601,7 +601,7 @@ Section CloudantMR.
   Definition cldAvoidList : list string := [].
 
   End sanitize.
-End CloudantMR.
+End CldMR.
 
 (*
 *** Local Variables: ***

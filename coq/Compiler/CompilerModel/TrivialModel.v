@@ -20,7 +20,7 @@ Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
 Require Import CompilerRuntime CompilerModel.
-Require NNRCMR CloudantMR.
+Require NNRCMR CldMR.
 Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 Require Import DNNRC Dataset.
 Require Import TDNRCInfer.

@@ -17,13 +17,13 @@
 Require Import List String.
 
 Require Import Utils BasicRuntime.
-Require Import NNRCRuntime CloudantMR.
+Require Import NNRCRuntime CldMR.
 Require Import NNRCtoJavascript.
 Require Import ForeignToJavascript ForeignCloudant.
 
 Local Open Scope string_scope.
 
-Section CloudantMRtoJavascript.
+Section CldMRtoJavaScript.
 
   Context {fruntime:foreign_runtime}.
   Context {ftojavascript:foreign_to_javascript}.
@@ -351,7 +351,7 @@ Section CloudantMRtoJavascript.
 
   End CloudantJS.
   
-End CloudantMRtoJavascript.
+End CldMRtoJavaScript.
 
 (* 
 *** Local Variables: ***

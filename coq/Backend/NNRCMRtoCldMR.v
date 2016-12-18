@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCMRToCloudantMR.
+Section NNRCMRToCldMR.
   Require Import String.
   Require Import List.
   Require Import Sorting.Mergesort.
@@ -22,9 +22,8 @@ Section NNRCMRToCloudantMR.
 
   Require Import Utils BasicRuntime.
   Require Import NNRCRuntime NNRCMRRuntime.
-  Require Import CloudantKV.
   Require Import ForeignCloudant ForeignToCloudant.
-  Require Import NNRCMR CloudantMR.
+  Require Import CldMRUtil CldMR.
   
   Local Open Scope list_scope.
 
@@ -719,7 +718,7 @@ Proof.
   (* Qed. *)
   Admitted.
 
-End NNRCMRToCloudantMR.
+End NNRCMRToCldMR.
 
 (*
 *** Local Variables: ***

@@ -20,7 +20,7 @@ Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRCMRRuntime.
-Require Import CloudantMR.
+Require Import CldMR.
 Require Import DNNRC Dataset.
 Require Import CAMPRuntime.
 Require Import ODMGRuntime.
