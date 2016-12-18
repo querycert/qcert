@@ -192,6 +192,13 @@ MODULES = \
 	LambdaNRA/LambdaNRAEq \
 	SQL/SQL \
 	SQL/SQLSize \
+	OQL/Lang/OQL \
+	OQL/Lang/OQLSugar \
+	OQL/Lang/OQLSize \
+	OQL/Typing/TOQL \
+	OQL/OQLRuntime \
+	OQL/OQLTypes \
+	OQL/OQLSystem \
 	Translation/ForeignToReduceOps \
 	Translation/NRAtoNNRC \
 	Translation/NRAEnvtoNNRC \
@@ -214,13 +221,8 @@ MODULES = \
 	Translation/TPatterntoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
-	Frontend/ODMG/OQL \
-	Frontend/ODMG/OQLSugar \
-	Frontend/ODMG/OQLSize \
-	Frontend/ODMG/OQLtoNRAEnv \
-	Frontend/ODMG/TOQL \
-	Frontend/ODMG/TOQLtoNRAEnv \
-	Frontend/ODMGRuntime \
+	Translation/OQLtoNRAEnv \
+	Translation/TOQLtoNRAEnv \
 	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignTypeToJSON \

@@ -28,7 +28,7 @@ Section CompStat.
   Require Import CldMR.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
-  Require Import ODMGRuntime.
+  Require Import OQLRuntime.
   Require Import SQLSize.
 
   Require Import CompilerRuntime.

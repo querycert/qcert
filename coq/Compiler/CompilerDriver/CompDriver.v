@@ -25,7 +25,7 @@ Section CompDriver.
   Require Import TypingRuntime.
 
   (* ASTs *)
-  Require Import ODMGRuntime.
+  Require Import OQLRuntime.
   Require Import SQL.
   Require Import LambdaNRA.
   Require Import CAMPRuntime.

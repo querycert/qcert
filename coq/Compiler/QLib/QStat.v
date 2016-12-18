@@ -23,7 +23,7 @@ Require Import NNRCMRRuntime.
 Require Import CldMR.
 Require Import DNNRC Dataset.
 Require Import CAMPRuntime.
-Require Import ODMGRuntime.
+Require Import OQLRuntime.
 
 Require Import CompilerRuntime.
 Module QStat(runtime:CompilerRuntime).

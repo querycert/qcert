@@ -24,7 +24,7 @@ Section CompLang.
   Require Import CldMR.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
-  Require Import ODMGRuntime.
+  Require Import OQLRuntime.
 
   Require Import BasicSystem.
 

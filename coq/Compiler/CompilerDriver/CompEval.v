@@ -23,7 +23,7 @@ Section CompEval.
   Require Import TypingRuntime.
 
   (* ASTs *)
-  Require Import ODMGRuntime.
+  Require Import OQLRuntime.
   Require Import LambdaNRA.
   Require Import SQL SQLtoNRAEnv.
   Require Import CAMPRuntime.

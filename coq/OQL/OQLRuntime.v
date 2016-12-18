@@ -16,7 +16,6 @@
 
 Require Export BasicRuntime.
 Require Export OQL OQLSugar OQLSize.
-Require Export OQLtoNRAEnv.
 
 (* 
 *** Local Variables: ***
