@@ -20,7 +20,7 @@ Require Import Peano_dec.
 Require Import EquivDec.
 
 Require Import Utils BasicSystem.
-Require Import NNRCRuntime ForeignToJava ForeignToJavascript.
+Require Import NNRCRuntime.
 Require Import DNNRC DNNRCSize DNNRCEq.
 Require Import RType.
 Require Import TDNRCInfer.
@@ -486,6 +486,6 @@ End DNNRCDatasetRewrites.
 
 (*
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

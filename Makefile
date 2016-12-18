@@ -224,10 +224,10 @@ MODULES = \
 	Backend/ForeignToJava \
 	Backend/ForeignToJavascript \
 	Backend/ForeignToScala \
-	Backend/CloudantKV \
-	Backend/CloudantMR \
 	Backend/ForeignToCloudant \
 	Backend/ForeignToSpark \
+	Backend/CloudantKV \
+	Backend/CloudantMR \
 	Backend/JSONtoData \
 	Backend/NNRCtoJava \
 	Backend/NNRCtoJavascript \
