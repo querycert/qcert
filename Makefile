@@ -202,6 +202,7 @@ MODULES = \
 	OQL/OQLTypes \
 	OQL/OQLSystem \
 	Translation/ForeignToReduceOps \
+	Translation/ForeignToCloudant \
 	Translation/NRAtoNNRC \
 	Translation/NRAEnvtoNNRC \
 	Translation/NRAEnvtoNNRCExt \
@@ -232,7 +233,6 @@ MODULES = \
 	Backend/ForeignToJava \
 	Backend/ForeignToJavascript \
 	Backend/ForeignToScala \
-	Backend/ForeignToCloudant \
 	Backend/ForeignToSpark \
 	Backend/JSONtoData \
 	Backend/NNRCtoJava \
