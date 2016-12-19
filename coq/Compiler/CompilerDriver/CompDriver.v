@@ -56,6 +56,7 @@ Section CompDriver.
   (* Optimizations *)
   Require Import NRAEnvOptimFunc.
   Require Import TNNRCOptimizer.
+  Require Import TNNRCMROptimizer.
   Require Import DNNRCDatasetRewrites.
   Require Import OptimizerLogger.
 

@@ -163,6 +163,7 @@ MODULES = \
 	NNRCMR/Calculus/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
 	NNRCMR/Rew/NRewMR \
+	NNRCMR/Rew/TNNRCMROptimizer \
 	NNRCMR/NNRCMROptim \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCSize \
