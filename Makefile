@@ -186,6 +186,7 @@ MODULES = \
 	CAMP/CAMPTypes \
 	CAMP/CAMPSystem \
 	CldMR/CldMRUtil \
+	CldMR/ForeignCloudant \
 	CldMR/CldMR \
 	LambdaNRA/LambdaNRA \
 	LambdaNRA/LambdaNRASugar \
@@ -208,6 +209,7 @@ MODULES = \
 	Translation/NNRCtoDNNRC \
 	Translation/NNRCMRtoNNRC \
 	Translation/NNRCMRtoDNNRC \
+	Translation/NNRCMRtoCldMR \
 	Translation/PatterntoNRA \
 	Translation/PatterntoNRAEnv \
 	Translation/PatternSugartoNRA \
@@ -226,7 +228,6 @@ MODULES = \
 	Backend/JSON \
 	Backend/ForeignToJSON \
 	Backend/ForeignTypeToJSON \
-	Backend/ForeignCloudant \
 	Backend/ForeignToJava \
 	Backend/ForeignToJavascript \
 	Backend/ForeignToScala \
@@ -236,7 +237,6 @@ MODULES = \
 	Backend/NNRCtoJava \
 	Backend/NNRCtoJavascript \
 	Backend/NNRCMRtoSpark \
-	Backend/NNRCMRtoCldMR \
 	Backend/CldMRtoJavaScript \
 	Backend/SparkData \
 	Backend/DNNRCtoScala \

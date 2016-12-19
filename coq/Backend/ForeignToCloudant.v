@@ -17,7 +17,7 @@
 Require Import List String.
 
 Require Import Utils ForeignRuntime.
-Require Import NNRCMRRuntime CldMR.
+Require Import NNRCMRRuntime CldMR ForeignCloudant.
 
 Local Open Scope string_scope.
 

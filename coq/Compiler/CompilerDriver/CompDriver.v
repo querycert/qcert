@@ -62,10 +62,10 @@ Section CompDriver.
   (* Foreign Support *)
   Require Import ForeignToReduceOps.
   Require Import ForeignToSpark.
-  Require Import ForeignCloudant ForeignToCloudant.
+  Require Import ForeignCloudant.
+  Require Import ForeignToCloudant.
   Require Import ForeignToJavascript.
   Require Import ForeignToScala.
-  Require Import ForeignCloudant.
 
   (* Compiler Driver *)
   Require Import CompLang CompEnv.
