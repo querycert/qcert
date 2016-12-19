@@ -65,6 +65,7 @@ Section CompDriver.
   Require Import ForeignToSpark.
   Require Import ForeignCloudant.
   Require Import ForeignToCloudant.
+  Require Import ForeignToJava.
   Require Import ForeignToJavascript.
   Require Import ForeignToScala.
 
@@ -87,144 +88,174 @@ Section CompDriver.
   Context {nnrc_logger:optimizer_logger string nnrc}.
   Context {dnnrc_logger:optimizer_logger string (dnnrc fr (type_annotation unit) dataset)}.
   Context {ftojs:foreign_to_javascript}.
+  Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
 
   (* Translation functions *)
+  Section translations_util.
+    (* Java equivalent: MROptimizer.nrc_mr_rename_local_for_cloudant *)
+    Definition nnrcmr_rename_local_for_cloudant (mrl:nnrcmr)
+      := nnrcmr_rename_local
+           jsSafeSeparator
+           jsIdentifierSanitize
+           jsAvoidList
+           mrl.
 
-  Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletoNRAEnv.translate_rule_to_algenv q.
+    (* Java equivalent: MROptimizer.nrc_mr_rename_graph_for_cloudant *)
+    Definition nnrcmr_rename_graph_for_cloudant (mrl:nnrcmr)
+      := nnrcmr_rename_graph
+           cldSafeSeparator
+           cldIdentifierSanitize
+           cldAvoidList 
+           mrl.
 
-  Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
+    (* Java equivalent: MROptimizer.nrc_mr_rename_for_cloudant *)
+    Definition nnrcmr_rename_for_cloudant (mrl:nnrcmr)
+      := nnrcmr_rename_graph_for_cloudant
+           (nnrcmr_rename_local_for_cloudant mrl).
+    
+  End translations_util.
 
-  Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
+  Section translations.
 
-  Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
+    Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletoNRAEnv.translate_rule_to_algenv q.
 
-  Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
+    Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
 
-  Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lalg q.
+    Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
 
-  Definition camp_to_nraenv_core (q:camp) : nraenv_core := PatterntoNRAEnv.translate_pat_to_algenv q.
+    Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
 
-  Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
+    Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
 
-  Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := algenv_of_nraenv q.
+    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lalg q.
 
-  Definition nraenv_core_to_nraenv (q: algenv) : nraenv := nraenv_of_algenv q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := PatterntoNRAEnv.translate_pat_to_algenv q.
 
-  Definition nraenv_optim (q: nraenv) : nraenv := NRAEnvOptimFunc.toptim_nraenv q.
+    Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
 
-  Definition nraenv_core_optim (q: nraenv_core) : nraenv_core :=
-    nraenv_to_nraenv_core (nraenv_optim (nraenv_core_to_nraenv q)).
+    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := algenv_of_nraenv q.
 
-  Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
-    nnrc_to_nnrc_core q.
+    Definition nraenv_core_to_nraenv (q: algenv) : nraenv := nraenv_of_algenv q.
+
+    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
+      nnrc_to_nnrc_core q.
   
-  Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
-    nnrc_to_nnrc_core (algenv_to_nnrc q init_vid init_venv).
+    Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
+      nnrc_to_nnrc_core (algenv_to_nnrc q init_vid init_venv).
 
-  Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
-    nraenv_to_nnrc_ext_top q init_vid init_venv.
+    Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
+      nraenv_to_nnrc_ext_top q init_vid init_venv.
 
-  Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_algenv q.
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_algenv q.
 
-  Definition nra_to_nraenv_core (q: nra) : nraenv_core := algenv_of_alg q.
+    Definition nra_to_nraenv_core (q: nra) : nraenv_core := algenv_of_alg q.
 
-  Definition nra_optim (q: nra) : nra :=
-    let nraenv_core_opt := (nraenv_core_optim (algenv_of_alg q)) in
-    if algenv_is_nra_fun nraenv_core_opt then
-      algenv_deenv_alg nraenv_core_opt
-    else
-      alg_of_algenv nraenv_core_opt.
+    Definition nra_to_nnrc_core (q: nra) : nnrc_core :=
+      nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
 
-  Definition nra_to_nnrc_core (q: nra) : nnrc_core :=
-    nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
+    Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
+      lift_nnrc_core (nnrcToPat_let avoid) q. (* XXX avoid ? XXX *)
 
-  Definition nnrc_optim (q: nnrc) : nnrc := trew q.
+    (* Java equivalent: NnrcToNnrcmr.convert *)
+    (* XXX This call should be removed and replaced by nnrc_to_nnrcmr. see below XXX *)
+    Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
+      let q_free_vars := (* bdistinct !!! *) nnrc_free_vars q in
+      let inputs_loc :=
+          (vinit, Vlocal)
+            ::(mkDistNames q_free_vars)
+      in
+      nnrc_to_nnrcmr_chain q
+                           init_vinit
+                           inputs_loc.
 
-  Definition nnrc_core_optim (q: nnrc_core) : nnrc_core :=
-    nnrc_to_nnrc_core (lift_nnrc_core trew q).
+    (* Free variables should eventually be passed from the application. *)
+    Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
+      let inputs_loc :=
+          (vinit, Vlocal)
+            :: inputs_loc
+      in
+      nnrc_to_nnrcmr_chain q
+                           init_vinit
+                           inputs_loc.
 
-  Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
-    lift_nnrc_core (nnrcToPat_let avoid) q. (* XXX avoid ? XXX *)
+    Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
 
-  (* Java equivalent: NnrcToNnrcmr.convert *)
-  (* XXX This call should be removed and replaced by nnrc_to_nnrcmr. see below XXX *)
-  Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
-    let q_free_vars := (* bdistinct !!! *) nnrc_free_vars q in
-    let inputs_loc :=
-        (vinit, Vlocal)
-          ::(mkDistNames q_free_vars)
-    in
-    nnrc_to_nnrcmr_chain q
-                         init_vinit
-                         inputs_loc.
+    Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
 
-  (* Free variables should eventually be passed from the application? *)
-  Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
-    let inputs_loc :=
-        (vinit, Vlocal)
-          :: inputs_loc
-    in
-    nnrc_to_nnrcmr_chain q
-                         init_vinit
-                         inputs_loc.
+    Definition nnrcmr_optim_aux (q: nnrcmr) : nnrcmr := trew_nnrcmr (mr_optimize q).
 
-  Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := trew_nnrcmr (mr_optimize q).
+    Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
+      let q := foreign_to_cloudant_prepare_nnrcmr q in
+      let q := nnrcmr_optim_aux q in                         (* XXXXXXXXXXX optim XXXXXXXX *)
+      let q := foreign_to_cloudant_prepare_nnrcmr q in
+      nnrcmr_rename_for_cloudant q.
 
-  Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
+    Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
+      NNRCMRtoNNRCMRCloudantTop h q.
 
-  Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
+    Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
+      nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
-  Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
-    let q := foreign_to_cloudant_prepare_nnrcmr q in
-    let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
-    let q := foreign_to_cloudant_prepare_nnrcmr q in
-    nnrcmr_rename_for_cloudant q.
+    Definition nnrcmr_to_nnrcmr_spark_prepare (q: nnrcmr) : nnrcmr :=
+      let q := foreign_to_spark_prepare_nnrcmr q in
+      let q := nnrcmr_optim_aux q in                         (* XXXXXXXXXXX optim XXXXXXXX *)
+      let q := foreign_to_spark_prepare_nnrcmr q in
+      nnrcmr_rename_for_spark q.
 
-  Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
-    NNRCMRtoNNRCMRCloudantTop h q.
+    Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
+      nnrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
 
-  Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
-    nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
+    Definition nnrcmr_to_spark (rulename: string) (q: nnrcmr) : spark :=
+      nnrcmr_prepared_to_spark rulename (nnrcmr_to_nnrcmr_spark_prepare q).
 
-  Definition nnrcmr_to_nnrcmr_spark_prepare (q: nnrcmr) : nnrcmr :=
-    let q := foreign_to_spark_prepare_nnrcmr q in
-    let q := nnrcmr_optim q in                              (* XXXXXXXXXXX optim XXXXXXXX *)
-    let q := foreign_to_spark_prepare_nnrcmr q in
-    nnrcmr_rename_for_spark q.
+    Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
+      mapReducePairstoCloudant h q rulename.
 
-  Definition nnrcmr_prepared_to_spark (rulename: string) (q: nnrcmr) : spark :=
-    nnrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
+    Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
+      nnrc_to_dnnrc tt inputs_loc q.
 
-  Definition nnrcmr_to_spark (rulename: string) (q: nnrcmr) : spark :=
-    nnrcmr_prepared_to_spark rulename (nnrcmr_to_nnrcmr_spark_prepare q).
+    Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Check XXX *)
+      nnrcToJSTop q.
 
-  Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
-    mapReducePairstoCloudant h q rulename.
+    Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
+      nnrcToJavaTop class_name imports q.
 
-  Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
-    nnrc_to_dnnrc tt inputs_loc q.
+    Definition dnnrc_dataset_to_dnnrc_typed_dataset
+               (e: dnnrc_dataset) (inputType: rtype)
+      : option dnnrc_typed_dataset :=
+      dnnrc_infer_type e inputType.
 
-  Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Check XXX *)
-    nnrcToJSTop q.
+    Definition dnnrc_typed_dataset_to_spark2
+               (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
+      @dnnrcToSpark2Top _ _ bm _ _ unit inputType name q.
 
-  Require Import ForeignToJava.
-  Context {ftojava:foreign_to_java}.
-  Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
-    nnrcToJavaTop class_name imports q.
+  End translations.
 
-  Definition dnnrc_dataset_to_dnnrc_typed_dataset
-             (e: dnnrc_dataset) (inputType: rtype)
-    : option dnnrc_typed_dataset :=
-    dnnrc_infer_type e inputType.
+  Section optimizations.
+    Definition nraenv_optim (q: nraenv) : nraenv := NRAEnvOptimFunc.toptim_nraenv q.
 
-  Definition dnnrc_typed_dataset_to_spark2
-             (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
-    @dnnrcToSpark2Top _ _ bm _ _ unit inputType name q.
+    Definition nraenv_core_optim (q: nraenv_core) : nraenv_core :=
+      nraenv_to_nraenv_core (nraenv_optim (nraenv_core_to_nraenv q)).
 
-  Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
-    dnnrcToDatasetRewrite q.
+    Definition nra_optim (q: nra) : nra :=
+      let nraenv_core_opt := (nraenv_core_optim (algenv_of_alg q)) in
+      if algenv_is_nra_fun nraenv_core_opt then
+        algenv_deenv_alg nraenv_core_opt
+      else
+        alg_of_algenv nraenv_core_opt.
+
+    Definition nnrc_optim (q: nnrc) : nnrc := trew q.
+
+    Definition nnrc_core_optim (q: nnrc_core) : nnrc_core :=
+      nnrc_to_nnrc_core (lift_nnrc_core trew q).
+
+    Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := nnrcmr_optim_aux q.
+
+    Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
+      dnnrcToDatasetRewrite q.
+  End optimizations.
 
   (* Drivers *)
 
@@ -258,7 +289,7 @@ Section CompDriver.
     | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : rtype -> dnnrc_typed_dataset_driver -> dnnrc_dataset_driver
   .
 
-(*  Unset Elimination Schemes. *)
+  (* Unset Elimination Schemes. *)
   Inductive camp_driver : Set :=
     | Dv_camp_stop : camp_driver
     | Dv_camp_to_nraenv_core : nraenv_core_driver -> camp_driver

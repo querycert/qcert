@@ -34,32 +34,6 @@ Section NNRCMRToCldMR.
 
   Context (h:list(string*string)).
 
-  Section sanitize.
-      Require Import NNRCtoJavascript.
-
-	  (* Java equivalent: MROptimizer.nrc_mr_rename_local_for_cloudant *)
-      Definition nnrcmr_rename_local_for_cloudant (mrl:nnrcmr)
-        := nnrcmr_rename_local
-             jsSafeSeparator
-             jsIdentifierSanitize
-             jsAvoidList
-             mrl.
-
-	  (* Java equivalent: MROptimizer.nrc_mr_rename_graph_for_cloudant *)
-      Definition nnrcmr_rename_graph_for_cloudant (mrl:nnrcmr)
-        := nnrcmr_rename_graph
-             cldSafeSeparator
-             cldIdentifierSanitize
-             cldAvoidList 
-             mrl.
-
-	  (* Java equivalent: MROptimizer.nrc_mr_rename_for_cloudant *)
-      Definition nnrcmr_rename_for_cloudant (mrl:nnrcmr)
-        := nnrcmr_rename_graph_for_cloudant
-             (nnrcmr_rename_local_for_cloudant mrl).
-
-  End sanitize.
-  
   (********************************
    * NNRCMR to ♥ NNRCMRCloudant ♥ *
    ********************************)
