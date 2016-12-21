@@ -141,11 +141,18 @@ interface PuzzleSides {
 	}
 
 interface IPuzzlePiece extends fabric.IObject {
-	// this should be the fabric ts file
+	// this should be in the fabric ts file
 	canvas:fabric.IStaticCanvas;
+
 	// new stuff
 	isSourcePiece?:boolean;
 	movePlace?:{left:number, top:number};
+
+	// these are to help avoid accidentally setting
+	// left or top without calling setCoords() after as required
+	mySetLeft:(x:number)=>void;
+	mySetTop:(y:number)=>void;
+	mySetLeftAndTop:(x:number, y:number)=>void;
 	readonly left:number;
 	readonly top:number;
 }
@@ -183,6 +190,21 @@ var PuzzlePiece:new(args:any)=>IPuzzlePiece = <any>fabric.util.createClass(fabri
 
   },
 
+  mySetLeft: function(x:number) {
+	  this.left = x;
+	  this.setCoords();
+  },
+  mySetTop: function(y:number) {
+	  this.top = y;
+	  this.setCoords();
+  },
+  mySetLeftAndTop: function(x:number, y:number) {
+	  this.left = x;
+	  this.top = y;
+	  this.setCoords();
+  },
+
+
   toObject: function() {
     return fabric.util.object.extend(this.callSuper('toObject'), {
       label: this.get('label')
@@ -200,9 +222,9 @@ var PuzzlePiece:new(args:any)=>IPuzzlePiece = <any>fabric.util.createClass(fabri
 });
 
 var sourcePieces = {};
-var placedPieces = [];
+var placedPieces:IPuzzlePiece[][] = [];
 
-function mkSourcePiece(options) {
+function mkSourcePiece(options):IPuzzlePiece {
 
 	let piece = new PuzzlePiece({
 		left : (options.col || 0)*(piecewidth + 30) + 20,
@@ -255,12 +277,7 @@ function mkSourcePiece(options) {
 		const leftentry = Math.round(piece.left / piecewidth);
 
 		// snap to grid
-		piece.set({
-			left: leftentry * piecewidth,
-			top: topentry * pieceheight
-		});
-		// TODO: try to use typescript to ensure that this is called when needed
-		piece.setCoords();
+		piece.mySetLeftAndTop(leftentry * piecewidth, topentry * pieceheight);
 	
 		if(!piece.isSourcePiece) {
 			if(piece.top >= canvasHeightInteractive) {
@@ -318,8 +335,7 @@ function mkSourcePiece(options) {
 					if(mp === undefined) {
 						break;
 					}
-					mp.left = oldleft*piecewidth;
-					mp.setCoords();
+					mp.mySetLeft(oldleft*piecewidth);
 					oldleft = oldleft + 1;
 				}
 			}
@@ -333,8 +349,7 @@ function mkSourcePiece(options) {
 				if(mp === undefined) {
 					break;
 				}
-				mp.left = (curleft+1)*piecewidth;
-				mp.setCoords();
+				mp.mySetLeft((curleft+1)*piecewidth);
 				curleft = curleft + 1;
 			}
 		}
