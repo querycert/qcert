@@ -30,24 +30,27 @@ import com.facebook.presto.sql.tree.SortItem.NullOrdering;
  */
 public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, StringBuilder> {
 	/** Set this to suppress the limit clause
-	 * TODO: this shouldn't ultimately be necessary
 	 */
 	private static final boolean SUPPRESS_LIMIT = true;
 
 	/** Set this to suppress window designations on function calls
-	 * TODO: this shouldn't ultimately be necessary
 	 */
 	private static final boolean SUPPRESS_WINDOWS = Boolean.getBoolean("SUPPRESS_WINDOWS");
 	
 	/** Set this to suppress all 'with ... as' clauses
-	 * TODO: this shouldn't ultimately be necessary
 	 */
 	private static final boolean SUPPRESS_WITH = Boolean.getBoolean("SUPPRESS_WITH");
 	
 	/** Set this to suppress all 'orderBy' directives
-	 * TODO: this shouldn't ultimately be necessary
 	 */
 	private static final boolean SUPPRESS_ORDERBY = Boolean.getBoolean("SUPPRESS_ORDERBY");
+
+	/** Indicates whether field names ending in "date" are assumed to be dates in the schema */
+	private boolean useDateNameHeuristic;
+	
+	public EncodingVisitor(boolean useDateNameHeuristic) {
+		this.useDateNameHeuristic = useDateNameHeuristic;
+	}
 	
 	/* (non-Javadoc)
 	 * @see com.facebook.presto.sql.tree.DefaultTraversalVisitor#visitFrameBound(com.facebook.presto.sql.tree.FrameBound, java.lang.Object)
@@ -131,6 +134,9 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitArithmeticBinary(ArithmeticBinaryExpression node, StringBuilder builder) {
+		Expression transformed = maybeTransform(node);
+		if (transformed != node)
+			return process(transformed, builder);
 		builder.append("(").append(node.getType().toString().toLowerCase()).append(" ");
 		process(node.getLeft(), builder);
 		process(node.getRight(), builder);
@@ -168,6 +174,9 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitBetweenPredicate(BetweenPredicate node, StringBuilder builder) {
+		Expression transformed = maybeTransform(node);
+		if (transformed != node)
+			return process(transformed, builder);
 		builder.append("(isBetween ");
 		process(node.getValue(), builder);
 		process(node.getMin(), builder);
@@ -250,6 +259,9 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitComparisonExpression(ComparisonExpression node, StringBuilder builder) {
+		Expression transformed = maybeTransform(node);
+		if (transformed != node)
+			return process(transformed, builder);
 		builder.append("(").append(node.getType().toString().toLowerCase()).append(" ");
 		process(node.getLeft(), builder);
 		process(node.getRight(), builder);
@@ -530,17 +542,6 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	@Override
 	protected StringBuilder visitIntersect(Intersect node, StringBuilder builder) {
 		return processSetOperation(node, builder, Intersect.class, "intersect");
-	}
-
-	/** Common subroutine for set operation visitor methods */
-	private StringBuilder processSetOperation(SetOperation node, StringBuilder builder, Class<? extends SetOperation> type,
-			String tag) {
-		boolean distinct = node.isDistinct();
-		List<Relation> canonical = makeBinary(node.getRelations(), type, distinct);
-		builder.append("(").append(tag).append(distinct ? " (distinct) " : " ");
-		for (Relation r : canonical)
-			processSetOpOperand(r, builder);
-		return builder.append(") ");
 	}
 
 	/* (non-Javadoc)
@@ -1237,6 +1238,42 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 		appendStrings(Arrays.asList(strings), builder);
 	}
 
+	/** Heuristic type inference: determine if an Expression has type 'date'.
+	 * This should not produce false positives.  It uses heuristics to find obvious cases only.
+	 */
+	private boolean isDate(Expression maybeDate) {
+		/* Look for date literals, since they are obviously dates */
+		if (maybeDate instanceof GenericLiteral)
+			return ((GenericLiteral) maybeDate).getType().equalsIgnoreCase("date");
+		/* Look for functions with method name date_plus or date_minus since these produce dates (and resulted from
+		 *  heuristic type inference on children).
+		 */
+		if (maybeDate instanceof FunctionCall)
+			switch(((FunctionCall) maybeDate).getName().toString()) {
+			case "date_plus":
+			case "date_minus":
+				return true;
+			}
+		/* if the date name heuristic is enabled and the expression is a ref or deref of a name, apply that heuristic */
+		if (useDateNameHeuristic) {
+			String name = maybeDate instanceof QualifiedNameReference ? ((QualifiedNameReference) maybeDate).getName().toString()
+					: maybeDate instanceof DereferenceExpression ? ((DereferenceExpression) maybeDate).getFieldName()
+							: null;
+			if (name != null)
+				return name.endsWith("date");
+		}
+		return false;
+	}
+
+	/** Heuristic type inference: determine if an Expression has type 'date interval'.
+	 * This should not produce false positives.  It uses heuristics to find obvious cases only.
+	 */
+	private boolean isDateInterval(Expression maybeInterval) {
+		/* Look for interval literals, since they are obviously intervals */
+		return maybeInterval instanceof IntervalLiteral;
+		/* That's all for now */
+	}
+
 	/** From a list of at least two relations and a SetOperation subclass, make a list of exactly two relations whose
 	 *   members may themselves be set operations with relation lists of exactly two members.
 	 *   Longer lists are canonicalized by inserting nodes of the specified type.
@@ -1261,6 +1298,87 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	}
 
 	/**
+	 * Convenience utility to construct a function call node
+	 */
+	private FunctionCall makeFunction(String name, Expression... args) {
+		return new FunctionCall(QualifiedName.of(name), Arrays.asList(args));
+	}
+
+	/** Selectively turn an ArithmeticBinaryExpression node into a function call if it operates on dates */
+	private Expression maybeTransform(ArithmeticBinaryExpression node) {
+		/* Bail if the operator isn't add or subtract; if it is, note the name to use. */
+		String name;
+		switch (node.getType()) {
+		case ADD:
+			name = "date_plus";
+			break;
+		case SUBTRACT:
+			name = "date_minus";
+			break;
+		default:
+			return node;
+		}
+		/* Transform children, then test heuristically for date type */
+		Expression left = maybeTransform(node.getLeft());
+		Expression right = maybeTransform(node.getRight());
+		if (isDate(left) || isDateInterval(right))
+			return makeFunction(name, left, right);
+		return node;
+	}
+
+	/** Selectively turn a BetweenPredicate node into a function call if it operates on dates */
+	private Expression maybeTransform(BetweenPredicate node) {
+		Expression value = maybeTransform(node.getValue());
+		Expression min = maybeTransform(node.getMin());
+		Expression max = maybeTransform(node.getMax());
+		if (isDate(value) || isDate(min) || isDate(max))
+			return makeFunction("date_between", value, min, max);
+		return node;
+	}
+
+	/** Selectively turn a ComparisonExpression node into a function call if it operates on dates */
+	private Expression maybeTransform(ComparisonExpression node) {
+		/* Bail if not a possible operator, else remember the name to use */
+		String name;
+		switch (node.getType()) {
+		case GREATER_THAN:
+			name = "date_gt";
+			break;
+		case GREATER_THAN_OR_EQUAL:
+			name = "date_ge";
+			break;
+		case LESS_THAN:
+			name = "date_lt";
+			break;
+		case LESS_THAN_OR_EQUAL:
+			name = "date_le";
+			break;
+		case NOT_EQUAL:
+			name = "date_ne";
+			break;
+		default:
+			return node;
+		}
+		Expression left = maybeTransform(node.getLeft());
+		Expression right = maybeTransform(node.getRight());
+		if (isDate(left) || isDate(right))
+			return makeFunction(name, left, right);
+		return node;
+	}
+
+	/* Selectively turn an expression to a Function call if it meets any of the date or date interval criteria for doing so */
+	private Expression maybeTransform(Expression node) {
+		if (node instanceof ArithmeticBinaryExpression)
+			return maybeTransform((ArithmeticBinaryExpression) node);
+		else if (node instanceof BetweenPredicate)
+			return maybeTransform((BetweenPredicate) node);
+		else if (node instanceof ComparisonExpression)
+			return maybeTransform((ComparisonExpression) node);
+		else
+			return node;
+	}
+
+	/**
 	 * Exception when something isn't implemented
 	 */
 	private StringBuilder notImplemented(Object o) {
@@ -1280,6 +1398,17 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 			}
 			builder.append(") ");
 		}
+	}
+
+	/** Common subroutine for set operation visitor methods */
+	private StringBuilder processSetOperation(SetOperation node, StringBuilder builder, Class<? extends SetOperation> type,
+			String tag) {
+		boolean distinct = node.isDistinct();
+		List<Relation> canonical = makeBinary(node.getRelations(), type, distinct);
+		builder.append("(").append(tag).append(distinct ? " (distinct) " : " ");
+		for (Relation r : canonical)
+			processSetOpOperand(r, builder);
+		return builder.append(") ");
 	}
 
 	/**
