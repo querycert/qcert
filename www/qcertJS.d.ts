@@ -1,6 +1,6 @@
 type SourceLanguageGroups = {
-		frontend:[{langid, label}], 
-		intermediate:[{langid, label}], 
-		backend:[{langid, label}]};
+		frontend:[{langid:string, label:string}], 
+		intermediate:[{langid:string, label:string}], 
+		backend:[{langid:string, label:string}]};
 
 declare function languages(): SourceLanguageGroups;

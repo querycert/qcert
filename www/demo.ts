@@ -147,6 +147,7 @@ interface IPuzzlePiece extends fabric.IObject {
 	// new stuff
 	isSourcePiece?:boolean;
 	movePlace?:{left:number, top:number};
+	langid:string;
 
 	// these are to help avoid accidentally setting
 	// left or top without calling setCoords() after as required
@@ -221,7 +222,11 @@ var PuzzlePiece:new(args:any)=>IPuzzlePiece = <any>fabric.util.createClass(fabri
   }
 });
 
-var sourcePieces = {};
+interface StringMap<V> {
+	[K: string]: V;
+}
+
+var sourcePieces:StringMap<IPuzzlePiece> = {};
 var placedPieces:IPuzzlePiece[][] = [];
 
 function mkSourcePiece(options):IPuzzlePiece {
@@ -237,14 +242,15 @@ function mkSourcePiece(options):IPuzzlePiece {
 	});
 	
 	piece.isSourcePiece = true;
+	piece.langid = options.langid;
+	// TODO: when me move something, shift things to the right back over it (to the left)
+	// be careful how that interacts with the shift right code!
 	// TODO: work on getting things to move out of the way
 	// track what we were over last / are over now
 	// and use that to track what is going on
 	// once that is working, change the code to move things over 
 	// to use animations to look smooth
 
-	// TODO: when things move, they sometimes become deselected ( / in the wrong place? check!)
-	
 	function mousedownfunc() {
 		piece.set({
 			opacity:.5
@@ -253,7 +259,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 			// create a new copy of this piece
 			var copyOfSelf = mkSourcePiece(options);
 			// and make it the new "canonical" source piece
-			sourcePieces[options.pieceID] = copyOfSelf;
+			sourcePieces[options.langid] = copyOfSelf;
 			piece.canvas.add(copyOfSelf);
 
 			// now make this piece into a non source piece
@@ -283,8 +289,6 @@ function mkSourcePiece(options):IPuzzlePiece {
 			if(piece.top >= canvasHeightInteractive) {
 				piece.canvas.remove(piece);
 			}
-
-		
 			
 			// update the placed grid
 			if('movePlace' in piece) {
@@ -409,10 +413,8 @@ function init() {
 
 			colelem.row = srcrow;
 			colelem.col = srccol;
-			const pieceID = srcrow*srccol;
-			colelem.pieceID = pieceID;
 			let piece = mkSourcePiece(colelem);
-			sourcePieces[pieceID] = piece;
+			sourcePieces[colelem.langid] = piece;
 			canvas.add(piece);
 		}
 	}
