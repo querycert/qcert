@@ -214,9 +214,9 @@ let main input =
   end
 
 let _ =
-  Js.Unsafe.global##.languages :=
+  Js.Unsafe.global##.qcertLanguages :=
     Js.wrap_callback language_specs;
-  Js.Unsafe.global##.path :=
+  Js.Unsafe.global##.qcertLanguagesPath :=
     Js.wrap_callback json_of_source_to_target_path;
   Js.Unsafe.global##.main :=
     Js.wrap_callback main

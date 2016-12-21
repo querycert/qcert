@@ -225,14 +225,14 @@ where
       <legend>Languages</legend>
       <p><pre id="languages"></pre></p>
       <script>
-	document.getElementById("languages").innerHTML = escapeHtml(languages().backend);
+	document.getElementById("languages").innerHTML = escapeHtml(qcertLanguages().backend);
       </script>
     </fieldset>
     <fieldset>
       <legend>Paths</legend>
       <p><pre id="paths"></pre></p>
       <script>
-	document.getElementById("paths").innerHTML = escapeHtml(path({ 'source': 'sql','target':'nnrc' }).path);
+	document.getElementById("paths").innerHTML = escapeHtml(qcertLanguagesPath({ 'source': 'sql','target':'nnrc' }).path);
       </script>
     </fieldset>
     -->
