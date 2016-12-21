@@ -150,7 +150,7 @@ var PuzzlePiece = fabric.util.createClass(fabric.Rect, {
   }
 });
 
-
+var sourcePieces = {};
 function mkSourcePiece(options) {
 
 	var piece = new PuzzlePiece({
@@ -161,23 +161,37 @@ function mkSourcePiece(options) {
 		sides : options.sides || {},
 		hasControls : false
 	});
-	piece.on('moving', function() { 
-		piece.set({
-		left: Math.round(piece.left / piecewidth) * piecewidth,
-		top: Math.round(piece.top / piecewidth) * piecewidth
-		});
-	});
-	piece.on('mousedown', function() {
+	piece.isSourcePiece = true;
+
+	// TODO: disable group selection on the bottom part.
+	
+	function mousedownfunc() {
 		piece.set({
 			opacity:.5
-		})
-	});
+		});
+		if(piece.isSourcePiece) {
+			// create a new copy of this piece
+			var copyOfSelf = mkSourcePiece(options);
+			// and make it the new "canonical" source piece
+			sourcePieces[options.pieceID] = copyOfSelf;
+			piece.canvas.add(copyOfSelf);
+
+			// now make this piece into a non source piece
+			piece.isSourcePiece = false;
+		}
+	};
+
+	piece.on('mousedown', mousedownfunc);
 	piece.on('mouseup', function() {
 		piece.set({
 			opacity:1
-		})
+		});
+		if(!piece.isSourcePiece) {
+			if(piece.top >= canvasHeightInteractive) {
+				piece.canvas.remove(piece);
+			}
+		}
 	});
-	//piece.off('moving');
 	return piece;
 }
 
@@ -185,6 +199,20 @@ function mkSourcePiece(options) {
 
 function init() {
     var canvas = new fabric.Canvas('main-canvas');
+	canvas.hoverCursor = 'pointer';
+	canvas.selection = false;
+
+	// canvas.on('selection:created', function (event) {
+	// 	canvas.getActiveGroup().set({hasControls : false});
+	// });
+
+	canvas.on('object:moving', function (event) {
+		const piece = event.target;
+		piece.set({
+		left: Math.round(piece.left / piecewidth) * piecewidth,
+		top: Math.round(piece.top / piecewidth) * piecewidth
+		});
+	});
 
 	// first, lets draw the boundary between the interactive and the selections
 	const separatorLine = new fabric.Line([ 0, canvasHeightInteractive, totalCanvasWidth, canvasHeightInteractive], { stroke: '#ccc', selectable: false });
@@ -208,7 +236,6 @@ function init() {
 	canvas.add(startPiece);
 
 	// create the list of languages that can be dragged onto the canvas
-	var sourceCollection = [];
 	for(var srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
 		let rowelem = srcLangDescripts[srcrow];
 		if(rowelem == null) {
@@ -222,8 +249,10 @@ function init() {
 
 			colelem.row = srcrow;
 			colelem.col = srccol;
+			const pieceID = srcrow*srccol;
+			colelem.pieceID = pieceID;
 			let piece = mkSourcePiece(colelem);
-			sourceCollection.push(piece);
+			sourcePieces[pieceID] = piece;
 			canvas.add(piece);
 		}
 	}
