@@ -251,6 +251,7 @@ MODULES = \
 	Compiler/CompilerModel/TrivialModel \
 	Compiler/CompilerDriver/CompLang \
 	Compiler/CompilerDriver/CompEnv \
+	Compiler/CompilerDriver/CompConfig \
 	Compiler/CompilerDriver/CompDriver \
 	Compiler/CompilerDriver/CompStat \
 	Compiler/CompilerDriver/CompEval \

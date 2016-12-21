@@ -920,29 +920,26 @@ Section TNNRCOptimizer.
   Definition run_nnrc_optims 
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nnrc}
-             (phaseName:string)
-             (optims:list string)
-             (iterationsBetweenCostCheck:nat)
+             (opc:optim_phases_config)
     : nnrc -> nnrc :=
-    run_phase tnnrc_map_deep NNRCSize.nnrc_size tnnrc_optim_list
-              ("[nnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
+    run_phases tnnrc_map_deep NNRCSize.nnrc_size tnnrc_optim_list opc.
 
   Lemma run_nnrc_optims_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc}
-        (phaseName:string)
-        (optims:list string)
-        (iterationsBetweenCostCheck:nat)
+        (opc:optim_phases_config)
         (p:nnrc) :
-    tnnrc_ext_rewrites_to p ( run_nnrc_optims phaseName optims iterationsBetweenCostCheck p).
+    tnnrc_ext_rewrites_to p (run_nnrc_optims opc p).
   Proof.
     unfold run_nnrc_optims.
-    apply run_phase_correctness.
+    apply run_phases_correctness.
     - intros. apply tnnrc_map_deep_correctness; auto.
     - apply tnnrc_optim_list_correct.
   Qed.
+
+  Section default.
   
-  (* Java equivalent: NnrcOptimizer.head_rew_list *)
-  Definition nnrc_default_optim_list {fruntime:foreign_runtime} : list string
+    (* Java equivalent: NnrcOptimizer.head_rew_list *)
+    Definition nnrc_default_optim_list {fruntime:foreign_runtime} : list string
     := [
         optim_step_name tinline_let_step
         ; optim_step_name tcount_over_flat_for_either_either_nil_step
@@ -967,23 +964,28 @@ Section TNNRCOptimizer.
         ; optim_step_name tproject_over_project_step
         ; optim_step_name tproject_over_either_step
       ].
+    
+    Remark nnrc_default_optim_list_all_valid {fruntime:foreign_runtime}
+      : valid_optims tnnrc_optim_list nnrc_default_optim_list = (nnrc_default_optim_list,nil).
+    Proof.
+      vm_compute; trivial.
+    Qed.
+  
+    Definition default_nnrc_optim_phases {fruntime:foreign_runtime} :=
+      ("[nnrc] default"%string,nnrc_default_optim_list,10)::nil.
 
-  Remark nnrc_default_optim_list_all_valid  {fruntime:foreign_runtime}
-    : valid_optims tnnrc_optim_list nnrc_default_optim_list = (nnrc_default_optim_list,nil).
-  Proof.
-    vm_compute; trivial.
-  Qed.
+  End default.
   
   (* Java equivalent: NnrcOptimizer.trew *)
-  Definition trew
+  Definition trew_old
              {fruntime:foreign_runtime} {logger:optimizer_logger string nnrc}
-    := run_nnrc_optims "2" nnrc_default_optim_list 10.
+    := run_nnrc_optims default_nnrc_optim_phases.
 
-  Lemma trew_correctness
+  Lemma trew_old_correctness
         {model:basic_model} {logger:optimizer_logger string nnrc} p:
-    tnnrc_ext_rewrites_to p (trew p).
+    tnnrc_ext_rewrites_to p (trew_old p).
   Proof.
-    unfold trew.
+    unfold trew_old.
     apply run_nnrc_optims_correctness.
   Qed.
 

@@ -19,7 +19,6 @@ Section CompDriver.
   Require Import String.
   Require Import Morphisms.
 
-
   (* Basic *)
   Require Import BasicSystem.
   Require Import TypingRuntime.
@@ -70,7 +69,8 @@ Section CompDriver.
   Require Import ForeignToScala.
 
   (* Compiler Driver *)
-  Require Import CompLang CompEnv.
+  
+  Require Import CompLang CompEnv CompConfig.
 
   (* Some useful notations *)
   Local Open Scope list_scope.
@@ -184,7 +184,7 @@ Section CompDriver.
 
     Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
 
-    Definition nnrcmr_optim_aux (q: nnrcmr) : nnrcmr := trew_nnrcmr (mr_optimize q).
+    Definition nnrcmr_optim_aux (q: nnrcmr) : nnrcmr := trew_old_nnrcmr (mr_optimize q).
 
     Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
       let q := foreign_to_cloudant_prepare_nnrcmr q in
@@ -234,22 +234,34 @@ Section CompDriver.
   End translations.
 
   Section optimizations.
-    Definition nraenv_optim (q: nraenv) : nraenv := NRAEnvOptimFunc.toptim_nraenv q.
+    Definition nraenv_optim (opc:optim_phases_config) (q: nraenv) : nraenv :=
+      NRAEnvOptimFunc.run_nraenv_optims opc q.
+    Definition nraenv_optim_default (q: nraenv) : nraenv :=
+      nraenv_optim default_nraenv_optim_phases q.
 
-    Definition nraenv_core_optim (q: nraenv_core) : nraenv_core :=
-      nraenv_to_nraenv_core (nraenv_optim (nraenv_core_to_nraenv q)).
+    Definition nraenv_core_optim (opc:optim_phases_config) (q: nraenv_core) : nraenv_core :=
+      nraenv_to_nraenv_core (nraenv_optim opc (nraenv_core_to_nraenv q)).
+    Definition nraenv_core_optim_default (q: nraenv_core) : nraenv_core :=
+      nraenv_core_optim default_nraenv_optim_phases q.
 
-    Definition nra_optim (q: nra) : nra :=
-      let nraenv_core_opt := (nraenv_core_optim (algenv_of_alg q)) in
+    Definition nra_optim (opc:optim_phases_config) (q: nra) : nra :=
+      let nraenv_core_opt := (nraenv_core_optim opc (algenv_of_alg q)) in
       if algenv_is_nra_fun nraenv_core_opt then
         algenv_deenv_alg nraenv_core_opt
       else
         alg_of_algenv nraenv_core_opt.
+    Definition nra_optim_default (q: nra) : nra :=
+      nra_optim default_nraenv_optim_phases q.
 
-    Definition nnrc_optim (q: nnrc) : nnrc := trew q.
+    Definition nnrc_optim (opc:optim_phases_config) (q: nnrc) : nnrc := run_nnrc_optims opc q.
+    Definition nnrc_optim_default (q:nnrc) : nnrc :=
+               nnrc_optim (get_default_optim_config L_nnrc) q.
 
-    Definition nnrc_core_optim (q: nnrc_core) : nnrc_core :=
-      nnrc_to_nnrc_core (lift_nnrc_core trew q).
+    Definition nnrc_core_optim (opc:optim_phases_config) (q: nnrc_core) : nnrc_core :=
+      nnrc_to_nnrc_core (lift_nnrc_core (run_nnrc_optims opc) q).
+
+    Definition nnrc_core_optim_default (q: nnrc_core) : nnrc_core :=
+      nnrc_to_nnrc_core (lift_nnrc_core nnrc_optim_default q).
 
     Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := nnrcmr_optim_aux q.
 
@@ -297,26 +309,26 @@ Section CompDriver.
 
   with nra_driver : Set :=
     | Dv_nra_stop : nra_driver
-    | Dv_nra_optim : nra_driver -> nra_driver
+    | Dv_nra_optim : optim_phases_config -> nra_driver -> nra_driver
     | Dv_nra_to_nnrc_core : nnrc_core_driver -> nra_driver
     | Dv_nra_to_nraenv_core : nraenv_core_driver -> nra_driver
 
   with nraenv_core_driver : Set :=
     | Dv_nraenv_core_stop : nraenv_core_driver
-    | Dv_nraenv_core_optim : nraenv_core_driver -> nraenv_core_driver
+    | Dv_nraenv_core_optim : optim_phases_config -> nraenv_core_driver -> nraenv_core_driver
     | Dv_nraenv_core_to_nraenv : nraenv_driver -> nraenv_core_driver
     | Dv_nraenv_core_to_nnrc_core : nnrc_core_driver -> nraenv_core_driver
     | Dv_nraenv_core_to_nra : nra_driver -> nraenv_core_driver
 
   with nraenv_driver : Set :=
     | Dv_nraenv_stop : nraenv_driver
-    | Dv_nraenv_optim : nraenv_driver -> nraenv_driver
+    | Dv_nraenv_optim : optim_phases_config -> nraenv_driver -> nraenv_driver
     | Dv_nraenv_to_nnrc : nnrc_driver -> nraenv_driver
     | Dv_nraenv_to_nraenv_core : nraenv_core_driver -> nraenv_driver
 
   with nnrc_driver : Set :=
     | Dv_nnrc_stop : nnrc_driver
-    | Dv_nnrc_optim : nnrc_driver -> nnrc_driver
+    | Dv_nnrc_optim : optim_phases_config -> nnrc_driver -> nnrc_driver
     | Dv_nnrc_to_nnrc_core : nnrc_core_driver -> nnrc_driver
     | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* (* inputs_loc *) vdbindings -> *) nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc_dataset : (* inputs_loc *) vdbindings -> dnnrc_dataset_driver -> nnrc_driver
@@ -325,7 +337,7 @@ Section CompDriver.
 
   with nnrc_core_driver : Set :=
     | Dv_nnrc_core_stop : nnrc_core_driver
-    | Dv_nnrc_core_optim : nnrc_core_driver -> nnrc_core_driver
+    | Dv_nnrc_core_optim : optim_phases_config -> nnrc_core_driver -> nnrc_core_driver
     | Dv_nnrc_core_to_nnrc : nnrc_driver -> nnrc_core_driver
     | Dv_nnrc_core_to_camp : (* avoid *) list var -> camp_driver -> nnrc_core_driver
 
@@ -511,7 +523,7 @@ Section CompDriver.
   with driver_length_nra (dv: nra_driver)  :=
     match dv with
     | Dv_nra_stop => 1
-    | Dv_nra_optim dv => 1 + driver_length_nra dv
+    | Dv_nra_optim opc dv => 1 + driver_length_nra dv
     | Dv_nra_to_nnrc_core dv => 1 + driver_length_nnrc_core dv
     | Dv_nra_to_nraenv_core dv => 1 + driver_length_nraenv_core dv
     end
@@ -519,7 +531,7 @@ Section CompDriver.
   with driver_length_nraenv_core (dv: nraenv_core_driver) :=
     match dv with
     | Dv_nraenv_core_stop => 1
-    | Dv_nraenv_core_optim dv => 1 + driver_length_nraenv_core dv
+    | Dv_nraenv_core_optim opc dv => 1 + driver_length_nraenv_core dv
     | Dv_nraenv_core_to_nraenv dv => 1 + driver_length_nraenv dv
     | Dv_nraenv_core_to_nnrc_core dv => 1 + driver_length_nnrc_core dv
     | Dv_nraenv_core_to_nra dv => 1 + driver_length_nra dv
@@ -528,7 +540,7 @@ Section CompDriver.
   with driver_length_nraenv (dv: nraenv_driver) :=
     match dv with
     | Dv_nraenv_stop => 1
-    | Dv_nraenv_optim dv => 1 + driver_length_nraenv dv
+    | Dv_nraenv_optim opc dv => 1 + driver_length_nraenv dv
     | Dv_nraenv_to_nnrc dv => 1 + driver_length_nnrc dv
     | Dv_nraenv_to_nraenv_core dv => 1 + driver_length_nraenv_core dv
     end
@@ -536,7 +548,7 @@ Section CompDriver.
   with driver_length_nnrc_core (dv: nnrc_core_driver) :=
     match dv with
     | Dv_nnrc_core_stop => 1
-    | Dv_nnrc_core_optim dv => 1 + driver_length_nnrc_core dv
+    | Dv_nnrc_core_optim opc dv => 1 + driver_length_nnrc_core dv
     | Dv_nnrc_core_to_nnrc dv => 1 + driver_length_nnrc dv
     | Dv_nnrc_core_to_camp avoid dv => 1 + driver_length_camp dv
     end
@@ -544,7 +556,7 @@ Section CompDriver.
   with driver_length_nnrc (dv: nnrc_driver) :=
     match dv with
     | Dv_nnrc_stop => 1
-    | Dv_nnrc_optim dv => 1 + driver_length_nnrc dv
+    | Dv_nnrc_optim opc dv => 1 + driver_length_nnrc dv
     | Dv_nnrc_to_nnrc_core dv => 1 + driver_length_nnrc_core dv
     | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv => 1 + driver_length_nnrcmr dv
     | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
@@ -713,8 +725,8 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_nra_stop => nil
-        | Dv_nra_optim dv =>
-          let q := nra_optim q in
+        | Dv_nra_optim opc dv =>
+          let q := nra_optim opc q in
           compile_nra dv q
         | Dv_nra_to_nnrc_core dv =>
           let q := nra_to_nnrc_core q in
@@ -730,8 +742,8 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_nraenv_stop => nil
-        | Dv_nraenv_optim dv =>
-          let q := nraenv_optim q in
+        | Dv_nraenv_optim opc dv =>
+          let q := nraenv_optim opc q in
           compile_nraenv dv q
         | Dv_nraenv_to_nnrc dv =>
           let q := nraenv_to_nnrc q in
@@ -747,8 +759,8 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_nraenv_core_stop => nil
-        | Dv_nraenv_core_optim dv =>
-          let q := nraenv_core_optim q in
+        | Dv_nraenv_core_optim opc dv =>
+          let q := nraenv_core_optim opc q in
           compile_nraenv_core dv q
         | Dv_nraenv_core_to_nraenv dv =>
           let q := nraenv_core_to_nraenv q in
@@ -767,8 +779,8 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_nnrc_core_stop => nil
-        | Dv_nnrc_core_optim dv =>
-          let q := nnrc_core_optim q in
+        | Dv_nnrc_core_optim opc dv =>
+          let q := nnrc_core_optim opc q in
           compile_nnrc_core dv q
         | Dv_nnrc_core_to_nnrc dv =>
           let q := nnrc_core_to_nnrc q in
@@ -784,8 +796,8 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_nnrc_stop => nil
-        | Dv_nnrc_optim dv =>
-          let q := nnrc_optim q in
+        | Dv_nnrc_optim opc dv =>
+          let q := nnrc_optim opc q in
           compile_nnrc dv q
         | Dv_nnrc_to_nnrc_core dv =>
           let q := nnrc_to_nnrc_core q in
@@ -915,16 +927,6 @@ Section CompDriver.
   (* Compilers config *)
 
   Section CompDriverConfig.
-  Record driver_config :=
-    mkDvConfig
-      { comp_qname : string;
-        comp_class_name : string; (* Class name different from rule name in Java case *)
-        comp_brand_rel : list (string * string) (* brand_relation *);
-        comp_input_type : rtype (* input type for inference *);
-        comp_mr_vinit : var;
-        comp_vdbindings : vdbindings;
-        comp_java_imports : string; }.
-
   Definition push_translation config lang dv :=
     match lang with
     | L_rule =>
@@ -1056,7 +1058,7 @@ Section CompDriver.
       match dv with
       | Dv_nnrc_core dv => Dv_nra (Dv_nra_to_nnrc_core dv)
       | Dv_nraenv_core dv => Dv_nra (Dv_nra_to_nraenv_core dv)
-      | Dv_nra dv => Dv_nra (Dv_nra_optim dv)
+      | Dv_nra dv => Dv_nra (Dv_nra_optim (get_optim_config L_nra config.(comp_optim_config)) dv)
       | Dv_nraenv _
       | Dv_rule _
       | Dv_camp _
@@ -1081,7 +1083,7 @@ Section CompDriver.
       match dv with
       | Dv_nnrc_core dv => Dv_nraenv_core (Dv_nraenv_core_to_nnrc_core dv)
       | Dv_nra dv => Dv_nraenv_core (Dv_nraenv_core_to_nra dv)
-      | Dv_nraenv_core dv => Dv_nraenv_core (Dv_nraenv_core_optim dv)
+      | Dv_nraenv_core dv => Dv_nraenv_core (Dv_nraenv_core_optim (get_optim_config L_nraenv_core config.(comp_optim_config)) dv)
       | Dv_nraenv dv => Dv_nraenv_core (Dv_nraenv_core_to_nraenv dv)
       | Dv_rule _
       | Dv_camp _
@@ -1105,7 +1107,7 @@ Section CompDriver.
     | L_nraenv =>
       match dv with
       | Dv_nraenv_core dv => Dv_nraenv (Dv_nraenv_to_nraenv_core dv)
-      | Dv_nraenv dv => Dv_nraenv (Dv_nraenv_optim dv)
+      | Dv_nraenv dv => Dv_nraenv (Dv_nraenv_optim (get_optim_config L_nraenv config.(comp_optim_config)) dv)
       | Dv_nnrc dv => Dv_nraenv (Dv_nraenv_to_nnrc dv)
       | Dv_nra _
       | Dv_nnrc_core _
@@ -1130,7 +1132,7 @@ Section CompDriver.
     | L_nnrc_core =>
       match dv with
       | Dv_camp dv => Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst config.(comp_vdbindings)) dv) (* XXX to check XXX *)
-      | Dv_nnrc_core dv => Dv_nnrc_core (Dv_nnrc_core_optim dv)
+      | Dv_nnrc_core dv => Dv_nnrc_core (Dv_nnrc_core_optim (get_optim_config L_nnrc_core config.(comp_optim_config)) dv)
       | Dv_nnrc dv => Dv_nnrc_core (Dv_nnrc_core_to_nnrc dv)
       | Dv_nraenv _
       | Dv_nnrcmr _
@@ -1158,7 +1160,7 @@ Section CompDriver.
       | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
-      | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim dv)
+      | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc config.(comp_optim_config)) dv)
       | Dv_nnrc_core dv => Dv_nnrc (Dv_nnrc_to_nnrc_core dv)
       | Dv_camp _
       | Dv_nraenv _
@@ -1386,8 +1388,18 @@ Section CompDriver.
           vdbindings = config.(comp_vdbindings)
         | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
           class_name = config.(comp_class_name) /\ imports = config.(comp_java_imports)
+        | Dv_nra (Dv_nra_optim opc _) =>
+          opc = (get_optim_config L_nra config.(comp_optim_config))
+        | Dv_nraenv_core (Dv_nraenv_core_optim opc _) =>
+          opc = (get_optim_config L_nraenv_core config.(comp_optim_config))
+        | Dv_nraenv (Dv_nraenv_optim opc _) =>
+          opc = (get_optim_config L_nraenv config.(comp_optim_config))
+        | Dv_nnrc (Dv_nnrc_optim opc _) =>
+          opc = (get_optim_config L_nnrc config.(comp_optim_config))
         | Dv_nnrc_core (Dv_nnrc_core_to_camp avoid _) =>
           avoid = (List.map fst config.(comp_vdbindings))
+        | Dv_nnrc_core (Dv_nnrc_core_optim opc _) =>
+          opc = (get_optim_config L_nnrc_core config.(comp_optim_config))
         | Dv_nnrcmr (Dv_nnrcmr_to_spark qname _) =>
           qname = config.(comp_qname)
         | Dv_nnrcmr (Dv_nnrcmr_to_cldmr brand_rel _) =>
@@ -1433,18 +1445,18 @@ Section CompDriver.
     | Dv_nra (Dv_nra_stop) => (L_nra, None)
     | Dv_nra (Dv_nra_to_nnrc_core dv) => (L_nra, Some (Dv_nnrc_core dv))
     | Dv_nra (Dv_nra_to_nraenv_core dv) => (L_nra, Some (Dv_nraenv_core dv))
-    | Dv_nra (Dv_nra_optim dv) => (L_nra, Some (Dv_nra dv))
+    | Dv_nra (Dv_nra_optim opc dv) => (L_nra, Some (Dv_nra dv))
     | Dv_nraenv_core (Dv_nraenv_core_stop) => (L_nraenv_core, None)
     | Dv_nraenv_core (Dv_nraenv_core_to_nnrc_core dv) => (L_nraenv_core, Some (Dv_nnrc_core dv))
     | Dv_nraenv_core (Dv_nraenv_core_to_nra dv) => (L_nraenv_core, Some (Dv_nra dv))
     | Dv_nraenv_core (Dv_nraenv_core_to_nraenv dv) => (L_nraenv_core, Some (Dv_nraenv dv))
-    | Dv_nraenv_core (Dv_nraenv_core_optim dv) => (L_nraenv_core, Some (Dv_nraenv_core dv))
+    | Dv_nraenv_core (Dv_nraenv_core_optim opc dv) => (L_nraenv_core, Some (Dv_nraenv_core dv))
     | Dv_nraenv (Dv_nraenv_stop) => (L_nraenv, None)
-    | Dv_nraenv (Dv_nraenv_optim dv) => (L_nraenv, Some (Dv_nraenv dv))
+    | Dv_nraenv (Dv_nraenv_optim opc dv) => (L_nraenv, Some (Dv_nraenv dv))
     | Dv_nraenv (Dv_nraenv_to_nnrc dv) => (L_nraenv, Some (Dv_nnrc dv))
     | Dv_nraenv (Dv_nraenv_to_nraenv_core dv) => (L_nraenv, Some (Dv_nraenv_core dv))
     | Dv_nnrc_core (Dv_nnrc_core_stop) => (L_nnrc_core, None)
-    | Dv_nnrc_core (Dv_nnrc_core_optim dv) => (L_nnrc_core, Some (Dv_nnrc_core dv))
+    | Dv_nnrc_core (Dv_nnrc_core_optim opc dv) => (L_nnrc_core, Some (Dv_nnrc_core dv))
     | Dv_nnrc_core (Dv_nnrc_core_to_nnrc dv) => (L_nnrc_core, Some (Dv_nnrc dv))
     | Dv_nnrc_core (Dv_nnrc_core_to_camp vdbindings dv) => (L_nnrc_core, Some (Dv_camp dv))
     | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
@@ -1453,7 +1465,7 @@ Section CompDriver.
     | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
     | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
-    | Dv_nnrc (Dv_nnrc_optim dv) => (L_nnrc, Some (Dv_nnrc dv))
+    | Dv_nnrc (Dv_nnrc_optim opc dv) => (L_nnrc, Some (Dv_nnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_spark name dv) => (L_nnrcmr, Some (Dv_spark dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
@@ -1492,16 +1504,6 @@ Section CompDriver.
     intros.
     eapply pop_transition_lt_len; eauto.
   Defined.
-
-  Definition trivial_driver_config : driver_config
-    := mkDvConfig
-         EmptyString
-         EmptyString
-         nil
-         ⊥
-         EmptyString
-         nil
-         EmptyString.
 
   Lemma target_language_of_driver_is_postfix_javascript:
       (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_javascript dv))) (Dv_javascript dv)).
@@ -1553,7 +1555,8 @@ Section CompDriver.
                  ⊥
                  EmptyString
                  nil
-                 EmptyString) (lang:=L_cldmr)
+                 EmptyString
+                 nil) (lang:=L_cldmr)
       ; [ eapply target_language_of_driver_is_postfix_cloudant | | ]
       ; simpl; trivial.
   Qed.
@@ -1576,7 +1579,8 @@ Section CompDriver.
                  r
                  EmptyString
                  nil
-                 EmptyString) (lang:=L_dnnrc_typed_dataset)
+                 EmptyString
+                 nil) (lang:=L_dnnrc_typed_dataset)
       ; [ eapply target_language_of_driver_is_postfix_spark2 | | ]
       ; simpl; trivial.
   Qed.
@@ -1596,7 +1600,8 @@ Section CompDriver.
                  r
                  EmptyString
                  nil
-                 EmptyString) (lang:=L_dnnrc_dataset)
+                 EmptyString
+                 nil) (lang:=L_dnnrc_dataset)
       ; [eapply target_language_of_driver_is_postfix_dnnrc_typed_dataset | | ]; simpl; trivial.
   Qed.
 
@@ -1650,8 +1655,53 @@ Section CompDriver.
                  nil
                  ⊥
                  EmptyString
+                 nil
+                 EmptyString
+                 ((L_nra,o)::nil)) (lang:=L_nra);
+        [eassumption | | ]; simpl; trivial.
+    - eapply is_postfix_plus_one with
+      (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 nil
+                 ⊥
+                 EmptyString
+                 nil
+                 EmptyString
+                 ((L_nraenv_core,o)::nil)) (lang:=L_nraenv_core);
+        [eassumption | | ]; simpl; trivial.
+    - eapply is_postfix_plus_one with
+      (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 nil
+                 ⊥
+                 EmptyString
+                 nil
+                 EmptyString
+                 ((L_nraenv,o)::nil)) (lang:=L_nraenv);
+        [eassumption | | ]; simpl; trivial.
+    - eapply is_postfix_plus_one with
+      (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 nil
+                 ⊥
+                 EmptyString
+                 nil
+                 EmptyString
+                 ((L_nnrc_core,o)::nil)) (lang:=L_nnrc_core);
+        [eassumption | | ]; simpl; trivial.
+    - eapply is_postfix_plus_one with
+      (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 nil
+                 ⊥
+                 EmptyString
                  (List.map (fun x => (x,Vlocal)) l)
-                 EmptyString) (lang:=L_nnrc_core);
+                 EmptyString
+                 nil) (lang:=L_nnrc_core);
         [eassumption | | ]; simpl; trivial.
       rewrite List.map_map.
       simpl.
@@ -1663,9 +1713,21 @@ Section CompDriver.
                  EmptyString
                  nil
                  ⊥
+                 EmptyString
+                 nil
+                 EmptyString
+                 ((L_nnrc,o)::nil)) (lang:=L_nnrc);
+        [eassumption | | ]; simpl; trivial.
+    - eapply is_postfix_plus_one with
+      (config:=mkDvConfig
+                 EmptyString
+                 EmptyString
+                 nil
+                 ⊥
                  v
                  nil
-                 EmptyString) (lang:=L_nnrc);
+                 EmptyString
+                 nil) (lang:=L_nnrc);
         [eassumption | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
@@ -1675,7 +1737,8 @@ Section CompDriver.
                  ⊥
                  EmptyString
                  v
-                 EmptyString) (lang:=L_nnrc);
+                 EmptyString
+                 nil) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=trivial_driver_config) (lang:=L_nnrc);
@@ -1688,7 +1751,8 @@ Section CompDriver.
                  ⊥
                  EmptyString
                  nil
-                 s0) (lang:=L_nnrc);
+                 s0
+                 nil) (lang:=L_nnrc);
       [eapply target_language_of_driver_is_postfix_java | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
@@ -1698,7 +1762,8 @@ Section CompDriver.
                  ⊥
                  EmptyString
                  nil
-                 EmptyString) (lang:=L_nnrcmr);
+                 EmptyString
+                 nil) (lang:=L_nnrcmr);
         [eapply target_language_of_driver_is_postfix_spark | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
@@ -1708,7 +1773,8 @@ Section CompDriver.
                  ⊥
                  EmptyString
                  nil
-                 EmptyString) (lang:=L_nnrcmr);
+                 EmptyString
+                 nil) (lang:=L_nnrcmr);
         [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
@@ -1718,7 +1784,8 @@ Section CompDriver.
                  ⊥
                  EmptyString
                  nil
-                 EmptyString) (lang:=L_nnrcmr);
+                 EmptyString
+                 nil) (lang:=L_nnrcmr);
       [eapply target_language_of_driver_is_postfix_cldmr | | ]; simpl; trivial.
   Qed.
 
@@ -1886,8 +1953,18 @@ Section CompDriver.
           simpl; try reflexivity;
             destruct dv; simpl; try reflexivity;
               simpl in H_config.
+        * destruct (H_config (Dv_nra (Dv_nra_optim (get_optim_config L_nra (comp_optim_config config0)) n)));
+          reflexivity.
+        * destruct (H_config (Dv_nraenv_core (Dv_nraenv_core_optim (get_optim_config L_nraenv_core (comp_optim_config config0)) n)));
+          reflexivity.
+        * destruct (H_config (Dv_nraenv (Dv_nraenv_optim (get_optim_config L_nraenv (comp_optim_config config0)) n)));
+          reflexivity.
         * destruct (H_config ((Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (comp_vdbindings config0)) c))));
             reflexivity.
+        * destruct (H_config (Dv_nnrc_core (Dv_nnrc_core_optim (get_optim_config L_nnrc_core (comp_optim_config config0)) n)));
+          reflexivity.
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc (comp_optim_config config0)) n)));
+          reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) n)));
             reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (comp_vdbindings config0) d)));
@@ -3369,15 +3446,15 @@ Section CompDriver.
     Qed.
 
     Definition no_L_error (lang: language) : Prop :=
-    match lang with
-    | L_error _ => False
-    | _ => True
-    end.
+      match lang with
+      | L_error _ => False
+      | _ => True
+      end.
 
     Definition exists_path_from_source_target source target
       := match get_path_from_source_target source target with
-        | L_error _ :: nil => False
-        | path => True
+         | L_error _ :: nil => False
+         | path => True
          end.
 
     Lemma exists_path_from_source_target_refl
@@ -3622,16 +3699,6 @@ Section CompDriver.
   
   (* Some macros, that aren't really just about source-target *)
 
-  Definition default_dv_config :=
-    mkDvConfig
-      (* comp_qname = *) "query"
-      (* class_name = *) "query"
-      (* comp_brand_rel = *) nil
-      (* comp_input_type = *) RType.Unit
-      (* comp_mr_vinit = *) init_vinit
-      (* comp_vdbindings = *) nil
-      (* comp_java_imports = *) "".
-
   Definition compile_from_source_target (conf: driver_config) (source:language) (target:language) (q: query) : query :=
     let path := get_path_from_source_target source target in
       let dv := driver_of_path conf path in
@@ -3643,26 +3710,26 @@ Section CompDriver.
 
   (* Used in CompTest: *)
   Definition rule_to_nraenv_optim (q: rule) : nraenv :=
-    nraenv_optim (nraenv_core_to_nraenv (rule_to_nraenv_core q)).
+    nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q)).
   Definition rule_to_nnrc_optim (q: rule) : nnrc :=
-    nnrc_optim (nraenv_to_nnrc (nraenv_optim (nraenv_core_to_nraenv (rule_to_nraenv_core q)))).
+    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q)))).
 
   (* Used in CALib: *)
   Definition nraenv_optim_to_nnrc_optim (q:nraenv) : nnrc :=
-    nnrc_optim (nraenv_to_nnrc (nraenv_optim q)).
+    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)).
   Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc_dataset :=
-    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (nraenv_optim q))).
+    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q))).
   Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim (q:nraenv) : nnrcmr :=
-    nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (nnrc_optim (nraenv_to_nnrc (nraenv_optim q)))).
+    nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)))).
 
   (* Used in queryTests: *)
   Definition rule_to_nraenv_to_nnrc_optim (q:rule) : nnrc :=
-    nnrc_optim (nraenv_to_nnrc (nraenv_optim (nraenv_core_to_nraenv (rule_to_nraenv_core q)))).
+    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q)))).
   Definition rule_to_nraenv_to_nnrc_optim_to_dnnrc
              (inputs_loc:vdbindings) (q:rule) : dnnrc_dataset :=
-    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim (nraenv_to_nnrc (nraenv_optim (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
+    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
   Definition rule_to_nraenv_to_nnrc_optim_to_javascript (q:rule) : string :=
-    nnrc_to_javascript (nnrc_optim (nraenv_to_nnrc (nraenv_optim (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
+    nnrc_to_javascript (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
   Definition rule_to_nnrcmr (q:rule) : nnrcmr :=
     nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q)).
   Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=

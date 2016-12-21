@@ -25,7 +25,7 @@ Require Import DNNRC Dataset.
 Require Import CAMPRuntime.
 Require Import OQLRuntime.
 
-Require Import CompLang CompDriver.
+Require Import CompLang CompConfig CompDriver.
 
 Require Import CompilerRuntime.
 Module QDriver(runtime:CompilerRuntime).

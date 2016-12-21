@@ -109,4 +109,5 @@ let driver_conf_of_global_conf gconf qname cname =
     comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
     comp_vdbindings = gconf.gconf_vdbindings;
-    comp_java_imports = char_list_of_string gconf.gconf_java_imports; }
+    comp_java_imports = char_list_of_string gconf.gconf_java_imports;
+    comp_optim_config = []; (* XXX To be populate from command line and JS for optimizer parameterization XXX *) }

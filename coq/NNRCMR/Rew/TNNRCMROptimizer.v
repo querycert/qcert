@@ -35,7 +35,7 @@ Section TNNRCMROptimizer.
 
   Require Import NNRCMR.
   Require Import ForeignReduceOps.
-  Definition trew_nnrcmr
+  Definition trew_old_nnrcmr
              {fruntime:foreign_runtime} {fredop:foreign_reduce_op} {logger:optimizer_logger string nnrc}
              (l: nnrcmr) :=
     let inputs_loc := l.(mr_inputs_loc) in
@@ -44,15 +44,15 @@ Section TNNRCMROptimizer.
           (fun mr =>
              let map :=
                  match mr.(mr_map) with
-                 | MapDist (x, n) => MapDist (x, trew n)
-                 | MapDistFlatten (x, n) => MapDistFlatten (x, trew n)
-                 | MapScalar (x, n) => MapScalar (x, trew n)
+                 | MapDist (x, n) => MapDist (x, trew_old n)
+                 | MapDistFlatten (x, n) => MapDistFlatten (x, trew_old n)
+                 | MapScalar (x, n) => MapScalar (x, trew_old n)
                  end
              in
              let reduce :=
                  match mr.(mr_reduce) with
                  | RedId => RedId
-                 | RedCollect (x, n) => RedCollect (x, trew n)
+                 | RedCollect (x, n) => RedCollect (x, trew_old n)
                  | RedOp op => RedOp op
                  | RedSingleton => RedSingleton
                  end
@@ -62,7 +62,7 @@ Section TNNRCMROptimizer.
     in
     let last :=
         let '((params, n), args) := l.(mr_last) in
-        ((params, trew n), args)
+        ((params, trew_old n), args)
     in
     mkMRChain
       inputs_loc

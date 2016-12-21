@@ -162,7 +162,50 @@ Section OptimizerLogger.
     apply project_optims_list_correct.
     apply lang_optim_list_correct.
   Qed.
-       
+
+  Section multiphase.
+    Definition optim_phases_config : Set :=
+      list (string * list string * nat).
+  
+    Fixpoint run_phases {lang:Set}
+               {logger:optimizer_logger string lang}
+               (mapdeep:(lang->lang)->lang->lang)
+               (cost:lang->nat)
+               (lang_optim_list:list (OptimizerStep lang))
+               (opc: optim_phases_config)
+               (q:lang)
+      : lang :=
+      match opc with
+      | nil => q
+      | (phaseName,optims,iterationsBetweenCostCheck) :: opc' =>
+        let q :=
+            run_phase mapdeep cost lang_optim_list phaseName optims iterationsBetweenCostCheck q
+        in
+        run_phases mapdeep cost lang_optim_list opc' q
+      end.
+    
+    Lemma run_phases_correctness {lang:Set} {R:relation lang} {pre:PreOrder R}
+          {logger:optimizer_logger string lang}
+          {mapdeep:(lang->lang)->lang->lang}
+          (mapdeep_correct:
+             forall f, (forall a, R a (f a)) -> forall a, R a (mapdeep f a))
+          (cost:lang->nat)
+          {lang_optim_list:list (OptimizerStep lang)}
+          (lang_optim_list_correct:optim_list_correct R lang_optim_list)
+          (opc: optim_phases_config) p :
+      R p (run_phases mapdeep cost lang_optim_list
+                      opc p).
+    Proof.
+      revert p.
+      induction opc; simpl; [reflexivity|]; intros.
+      destruct a; simpl.
+      destruct p0; simpl.
+      specialize (IHopc (run_phase mapdeep cost lang_optim_list s l n p)).
+      generalize (run_phase_correctness mapdeep_correct cost lang_optim_list_correct s l n p).
+      intros; destruct pre; eauto.
+    Qed.
+  End multiphase.
+
 End OptimizerLogger.
 
 (*

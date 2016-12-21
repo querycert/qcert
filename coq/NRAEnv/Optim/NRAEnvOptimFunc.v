@@ -2999,26 +2999,23 @@ Section NRAEnvOptimFunc.
   Definition run_nraenv_optims 
              {fruntime:foreign_runtime}
              {logger:optimizer_logger string nraenv}
-             (phaseName:string)
-             (optims:list string)
-             (iterationsBetweenCostCheck:nat)
+             (opc:optim_phases_config)
     : nraenv -> nraenv :=
-    run_phase tnraenv_map_deep nraenv_size tnraenv_optim_list
-               ("[nraenv] " ++ phaseName) optims iterationsBetweenCostCheck.
+    run_phases tnraenv_map_deep nraenv_size tnraenv_optim_list opc.
 
   Lemma run_nraenv_optims_correctness
         {model:basic_model} {logger:optimizer_logger string nraenv}
-        (phaseName:string)
-        (optims:list string)
-        (iterationsBetweenCostCheck:nat)
+        (opc:optim_phases_config)
         (p:nraenv) :
-    tnraenv_rewrites_to p ( run_nraenv_optims phaseName optims iterationsBetweenCostCheck p).
+    tnraenv_rewrites_to p ( run_nraenv_optims opc p).
   Proof.
     unfold run_nraenv_optims.
-    apply run_phase_correctness.
+    apply run_phases_correctness.
     - intros. apply nraenv_map_deep_correctness; auto.
     - apply tnraenv_optim_list_correct.
   Qed.
+
+  Section default.
   
   Definition nraenv_default_head_optim_list {fruntime:foreign_runtime} : list string :=
     [
@@ -3215,28 +3212,35 @@ Section NRAEnvOptimFunc.
     vm_compute; trivial.
   Qed.
 
-  Definition toptim_nraenv_head {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv}
-    := run_nraenv_optims "head" nraenv_default_head_optim_list 5.
+    Definition default_nraenv_optim_phases {fruntime:foreign_runtime} :=
+      ("[nraenv] head"%string,nraenv_default_head_optim_list,5)
+        :: ("[nraenv] tail"%string,nraenv_default_tail_optim_list,15)
+        :: nil.
 
-  Lemma toptim_nraenv_head_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
-    p ⇒ₓ toptim_nraenv_head p.
+  End default.
+
+  Definition toptim_old_nraenv_head {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv}
+    := run_nraenv_optims (("head",nraenv_default_head_optim_list,5)::nil).
+
+  Lemma toptim_old_nraenv_head_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
+    p ⇒ₓ toptim_old_nraenv_head p.
   Proof.
-    unfold toptim_nraenv_head.
+    unfold toptim_old_nraenv_head.
     apply run_nraenv_optims_correctness.
   Qed.
   
-  Definition toptim_nraenv_tail {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} 
-    := run_nraenv_optims "tail" nraenv_default_head_optim_list 15.
+  Definition toptim_old_nraenv_tail {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} 
+    := run_nraenv_optims (("tail",nraenv_default_head_optim_list,15)::nil).
 
-  Lemma toptim_nraenv_tail_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
-    p ⇒ₓ toptim_nraenv_tail p.
+  Lemma toptim_old_nraenv_tail_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
+    p ⇒ₓ toptim_old_nraenv_tail p.
   Proof.
-    unfold toptim_nraenv_tail.
+    unfold toptim_old_nraenv_tail.
     apply run_nraenv_optims_correctness.
   Qed.
 
-  Definition toptim_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} :=
-    compose toptim_nraenv_tail toptim_nraenv_head.
+  Definition toptim_old_nraenv {fruntime:foreign_runtime} {logger:optimizer_logger string nraenv} :=
+    compose toptim_old_nraenv_tail toptim_old_nraenv_head.
 
   Lemma compose_transitivity {A:Type} {R:relation A} {trans:Transitive R}
         (x y:A) (f g :A->A):
@@ -3248,13 +3252,13 @@ Section NRAEnvOptimFunc.
     etransitivity; eauto.
   Qed.
     
-  Lemma toptim_nraenv_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
-    p ⇒ₓ toptim_nraenv p.
+  Lemma toptim_old_nraenv_correctness {model:basic_model} {logger:optimizer_logger string nraenv} p:
+    p ⇒ₓ toptim_old_nraenv p.
   Proof.
-    unfold toptim_nraenv.
+    unfold toptim_old_nraenv.
     apply compose_transitivity.
-    - apply toptim_nraenv_head_correctness.
-    - apply toptim_nraenv_tail_correctness.
+    - apply toptim_old_nraenv_head_correctness.
+    - apply toptim_old_nraenv_tail_correctness.
   Qed.
 
 End NRAEnvOptimFunc.

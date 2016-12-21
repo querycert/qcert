@@ -86,6 +86,19 @@ Section CompLang.
     | L_cloudant : language
     | L_error : string -> language.
 
+  Require Import EquivDec.
+  Lemma language_eq_dec : EqDec language eq.
+  Proof.
+    repeat red.
+    destruct x; destruct y; try solve[right; inversion 1]; try (left; reflexivity).
+    - destruct (string_dec s s0).
+      + left; f_equal; subst; reflexivity.
+      + right; intro; apply n; inversion H; trivial.
+  Defined.
+  
+  Global Instance language_eqdec : EqDec language eq := language_eq_dec.
+  (* begin hide *)
+
   Inductive query : Set :=
     | Q_rule : rule -> query
     | Q_camp : camp -> query

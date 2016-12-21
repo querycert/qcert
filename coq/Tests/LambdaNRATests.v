@@ -222,11 +222,12 @@ End LambdaNRATests.
 Require Import NRAEnvOptimFunc.
 Require Import OptimizerLogger.
 Require Import NRAEnv.
+Require Import CompDriver.
 Context {l:optimizer_logger string nraenv}.
 
 Definition T1env : nraenv := (nraenv_of_lalg_lambda (q_to_lambda T1l)).
 (* Eval vm_compute in T1env. *)
-Definition T1env_opt := toptim_nraenv T1env.
+Definition T1env_opt := nraenv_optim_default T1env.
 (* Eval vm_compute in T1env_opt. *)
 Definition T1nnrc_opt :=
   TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T1env_opt.
@@ -234,7 +235,7 @@ Definition T1nnrc_opt :=
 
 Definition T2env := (nraenv_of_lalg_lambda (q_to_lambda T2l)).
 (* Eval vm_compute in T2env. *)
-Definition T2env_opt := toptim_nraenv T2env.
+Definition T2env_opt := nraenv_optim_default T2env.
 (* Eval vm_compute in T2env_opt. *)
 (* Note: this optimizes perfectly the access to environment, but does not yield T2r --- I believe
    this is the right plan in most cases since you would more often want to
