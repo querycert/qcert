@@ -7,7 +7,7 @@
 	const canvasHeightInteractive = 300;
 	const canvasHeightChooser = 300;
 	// we should set canvas width appropriately
-	const totalCanvasWidth = 1000;
+	let totalCanvasWidth = 1000;
 	const totalCanvasHeight = canvasHeightInteractive + canvasHeightChooser;
 
 	// The set of languages and their properties
@@ -18,6 +18,22 @@
 		{label:'OQL', fill:'#FFCC99', sides:acrossSides},
 		null,
 		{label:'SQL', fill:'#FFCC99', sides:acrossSides}]];
+
+	// first, lets draw the boundary between the interactive and the selections
+	let separatorLine = new fabric.Line([ 0, canvasHeightInteractive, totalCanvasWidth, canvasHeightInteractive], { stroke: '#ccc', selectable: false });
+
+	function updateCanvasWidth(canvas, newWidth) {
+		totalCanvasWidth = newWidth;
+		canvas.setWidth(newWidth);
+		separatorLine.set('x2', newWidth);
+	}
+
+	function ensureCanvasWidth(canvas, lastpiece) {
+		const newwidth = (lastpiece+1)*piecewidth;
+		if(newwidth > totalCanvasWidth) {
+			updateCanvasWidth(canvas, newwidth);
+		}
+	}
 
 // based on code from https://www.codeproject.com/articles/395453/html-jigsaw-puzzle
 	function getMask(tileRatio, topTab, rightTab, bottomTab, leftTab) {
@@ -165,8 +181,13 @@ function mkSourcePiece(options) {
 		hasBorders : false
 	});
 	piece.isSourcePiece = true;
+	// TODO: work on getting things to move out of the way
+	// track what we were over last / are over now
+	// and use that to track what is going on
+	// once that is working, change the code to move things over 
+	// to use animations to look smooth
 
-	// TODO: disable group selection on the bottom part.
+	// TODO: when things move, they sometimes become deselected ( / in the wrong place? check!)
 	
 	function mousedownfunc() {
 		piece.set({
@@ -195,21 +216,88 @@ function mkSourcePiece(options) {
 		piece.set({
 			opacity:1
 		});
+
+		const topentry = Math.round(piece.top / pieceheight);
+		const leftentry = Math.round(piece.left / piecewidth);
+
+		// snap to grid
+		piece.set({
+			left: leftentry * piecewidth,
+			top: topentry * pieceheight
+		});
+	
 		if(!piece.isSourcePiece) {
 			if(piece.top >= canvasHeightInteractive) {
 				piece.canvas.remove(piece);
 			}
 
-			// update the placed grid
-			const topentry = Math.round(piece.top / pieceheight);
-			const leftentry = Math.round(piece.left / piecewidth);
+		
 			
+			// update the placed grid
+			if('movePlace' in piece) {
+				// finalize the moved pieces in their new positions
+				const prow = placedPieces[topentry];
+				if(! (prow === undefined)) {
+					let curleft = leftentry;
+					let curleftval = prow[leftentry];
+					while(! (curleftval === undefined)) {
+						let nextleft = curleft+1;
+						let nextleftval = prow[nextleft];
+
+						prow[nextleft] = curleftval;
+						curleft = nextleft;
+						curleftval = nextleftval;
+					}
+					ensureCanvasWidth(piece.canvas, curleft);
+					prow[leftentry] = undefined;
+				}
+				delete piece['movePlace'];
+			}
 			if(topentry >= placedPieces.length || placedPieces[topentry] === undefined) {
 				placedPieces[topentry] = [];
 			}
 			const topplaces = placedPieces[topentry];
 			if(leftentry >= topplaces.length || topplaces[leftentry] === undefined) {
 				topplaces[leftentry] = piece;
+			}
+		}
+//		piece.canvas.renderAll();
+	});
+	piece.on('moving', function() {
+		const topentry = Math.round(piece.top / pieceheight);
+		const leftentry = Math.round(piece.left / piecewidth);
+
+		if('movePlace' in piece) {
+			if(piece.movePlace.left == leftentry && piece.movePlace.top == topentry) {
+				// still over the same grid spot
+				return;
+			}
+			// otherwise, we moved.  We need to put back anything we moved out of the way
+			const oldtop = piece.movePlace.top;
+			const prow = placedPieces[oldtop];
+			if(! (prow === undefined)) {
+				var oldleft = piece.movePlace.left;
+				while(true) {
+					let mp = prow[oldleft];
+					if(mp === undefined) {
+						break;
+					}
+					mp.left = oldleft*piecewidth;
+					oldleft = oldleft + 1;
+				}
+			}
+		}
+		piece.movePlace = {top:topentry, left:leftentry};
+		const prow = placedPieces[topentry];
+		if(! (prow === undefined)) {
+			var curleft = leftentry;
+			while(true) {
+				let mp = prow[curleft];
+				if(mp === undefined) {
+					break;
+				}
+				mp.left = (curleft+1)*piecewidth;
+				curleft = curleft + 1;
 			}
 		}
 	});
@@ -227,16 +315,13 @@ function init() {
 	// 	canvas.getActiveGroup().set({hasControls : false});
 	// });
 
-	canvas.on('object:moving', function (event) {
-		const piece = event.target;
-		piece.set({
-		left: Math.round(piece.left / piecewidth) * piecewidth,
-		top: Math.round(piece.top / pieceheight) * pieceheight
-		});
-	});
-
-	// first, lets draw the boundary between the interactive and the selections
-	const separatorLine = new fabric.Line([ 0, canvasHeightInteractive, totalCanvasWidth, canvasHeightInteractive], { stroke: '#ccc', selectable: false });
+	// canvas.on('object:moving', function (event) {
+	// 	const piece = event.target;
+	// 	piece.set({
+	// 	left: Math.round(piece.left / piecewidth) * piecewidth,
+	// 	top: Math.round(piece.top / pieceheight) * pieceheight
+	// 	});
+	// });
 	
 	canvas.add(separatorLine);
 	separatorLine.set('visible', true);
