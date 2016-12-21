@@ -4,7 +4,7 @@
 	const piecewidth = 100;
 	const pieceheight = 100;
 	const canvasHeightPipeline = 100
-	const canvasHeightInteractive = 400;
+	const canvasHeightInteractive = 300;
 	const canvasHeightChooser = 300;
 	// we should set canvas width appropriately
 	const totalCanvasWidth = 1000;
@@ -151,6 +151,8 @@ var PuzzlePiece = fabric.util.createClass(fabric.Rect, {
 });
 
 var sourcePieces = {};
+var placedPieces = [];
+
 function mkSourcePiece(options) {
 
 	var piece = new PuzzlePiece({
@@ -159,7 +161,8 @@ function mkSourcePiece(options) {
 		fill : options.fill || 'purple',
 		label : options.label,
 		sides : options.sides || {},
-		hasControls : false
+		hasControls : false,
+		hasBorders : false
 	});
 	piece.isSourcePiece = true;
 
@@ -178,6 +181,12 @@ function mkSourcePiece(options) {
 
 			// now make this piece into a non source piece
 			piece.isSourcePiece = false;
+		} else {
+			// update the placed grid
+			const topentry = Math.round(piece.top / pieceheight);
+			const leftentry = Math.round(piece.left / piecewidth);
+			
+			delete placedPieces[topentry][leftentry];
 		}
 	};
 
@@ -189,6 +198,18 @@ function mkSourcePiece(options) {
 		if(!piece.isSourcePiece) {
 			if(piece.top >= canvasHeightInteractive) {
 				piece.canvas.remove(piece);
+			}
+
+			// update the placed grid
+			const topentry = Math.round(piece.top / pieceheight);
+			const leftentry = Math.round(piece.left / piecewidth);
+			
+			if(topentry >= placedPieces.length || placedPieces[topentry] === undefined) {
+				placedPieces[topentry] = [];
+			}
+			const topplaces = placedPieces[topentry];
+			if(leftentry >= topplaces.length || topplaces[leftentry] === undefined) {
+				topplaces[leftentry] = piece;
 			}
 		}
 	});
@@ -210,7 +231,7 @@ function init() {
 		const piece = event.target;
 		piece.set({
 		left: Math.round(piece.left / piecewidth) * piecewidth,
-		top: Math.round(piece.top / piecewidth) * piecewidth
+		top: Math.round(piece.top / pieceheight) * pieceheight
 		});
 	});
 
