@@ -164,6 +164,7 @@ interface IPuzzlePiece extends fabric.IObject {
 	isSourcePiece?:boolean;
 	movePlace?:{left:number, top:number};
 	langid:string;
+	tooltipObj?:fabric.IObject;
 
 	// these are to help avoid accidentally setting
 	// left or top without calling setCoords() after as required
@@ -230,7 +231,7 @@ var PuzzlePiece:new(args:any)=>IPuzzlePiece = <any>fabric.util.createClass(fabri
 
   _render: function(ctx) {
     this.callSuper('_render', ctx);
-    ctx.font = '30px Helvetica';
+    ctx.font = '20px Helvetica';
     ctx.fillStyle = '#333';
 	ctx.textAlign='center';
 	ctx.textStyle='bold';
@@ -271,6 +272,12 @@ function mkSourcePiece(options):IPuzzlePiece {
 		piece.set({
 			opacity:.5
 		});
+		// clear any tooltip
+		if('tooltipObj' in piece) {
+			piece.canvas.remove(piece.tooltipObj);
+			delete piece.tooltipObj;
+		}
+
 		if(piece.isSourcePiece) {
 			// create a new copy of this piece
 			var copyOfSelf = mkSourcePiece(options);
@@ -374,6 +381,66 @@ function mkSourcePiece(options):IPuzzlePiece {
 			}
 		}
 	});
+	
+	piece.on('mouseover', function() {
+		if(piece.isSourcePiece) {
+			if(! ('tooltipObj' in piece)) {
+
+				// calculate where it should appear.
+				const text = new fabric.IText('Language description goes here', 
+				{ left: 0, 
+					top: 0,
+					fill:'black',
+					fontSize:40,
+					editable:false
+					});
+
+				const tooltipOffset:fabric.IPoint = new fabric.Point(10, 10);
+
+				let boundingBox = text.getBoundingRect();
+				const maxwidth = piece.canvas.getWidth()*3/4;
+
+				if(boundingBox.width > maxwidth) {
+					text.setWidth(maxwidth);
+					text.setCoords();
+					boundingBox = text.getBoundingRect();
+				}
+				let piecemid = piece.left + Math.round(piecewidth/2);
+				
+				let boxleft = piecemid - Math.round(boundingBox.width / 2);
+				if(boxleft < 0) {
+					boxleft = 0;
+				} else {
+					let tryright = piecemid + Math.round(boundingBox.width / 2);
+					tryright = Math.min(tryright, piece.canvas.getWidth());
+					boxleft = tryright - boundingBox.width;
+				}
+
+				let boxtop = piece.top - boundingBox.height - tooltipOffset.y;
+				if(boxtop < 0) {
+					boxtop = piece.top + piece.height + tooltipOffset.y;
+				}
+
+				text.originX = 'left';
+				text.left = boxleft;
+				text.originY = 'top';
+				text.top = boxtop;
+				text.setCoords();
+				const box = new fabric.Rect(text.getBoundingRect());
+				box.setFill('#EEEEEE');
+				const group = new fabric.Group([box, text]);
+				piece.tooltipObj = group;
+				piece.canvas.add(group);
+			}
+		}
+	});
+	piece.on('mouseout', function() {
+		if('tooltipObj' in piece) {
+			piece.canvas.remove(piece.tooltipObj);
+			delete piece.tooltipObj;
+		}
+	});
+
 	return piece;
 }
 
