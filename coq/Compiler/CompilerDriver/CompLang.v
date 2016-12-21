@@ -17,6 +17,10 @@
 Section CompLang.
 
   Require Import String.
+  Require Import List.
+  
+  Require Import EquivDec.
+
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
@@ -86,7 +90,6 @@ Section CompLang.
     | L_cloudant : language
     | L_error : string -> language.
 
-  Require Import EquivDec.
   Lemma language_eq_dec : EqDec language eq.
   Proof.
     repeat red.
@@ -97,7 +100,6 @@ Section CompLang.
   Defined.
   
   Global Instance language_eqdec : EqDec language eq := language_eq_dec.
-  (* begin hide *)
 
   Inductive query : Set :=
     | Q_rule : rule -> query
@@ -147,84 +149,158 @@ Section CompLang.
 
   Section CompLangUtil.
 
-  Definition language_of_name_case_sensitive name : language:=
-    match name with
-    | "rule"%string => L_rule
-    | "camp"%string => L_camp
-    | "oql"%string => L_oql
-    | "sql"%string => L_sql
-    | "lambda_nra"%string => L_lambda_nra
-    | "nra"%string => L_nra
-    | "nraenv_core"%string => L_nraenv_core
-    | "nraenv"%string => L_nraenv
-    | "nnrc_core"%string => L_nnrc_core
-    | "nnrc"%string => L_nnrc
-    | "nnrcmr"%string => L_nnrcmr
-    | "cldmr"%string => L_cldmr
-    | "dnnrc"%string => L_dnnrc_dataset
-    | "dnnrc_typed"%string => L_dnnrc_typed_dataset
-    | "js"%string | "rhino"%string | "javascript"%string => L_javascript
-    | "java"%string => L_java
-    | "spark"%string => L_spark
-    | "spark2"%string => L_spark2
-    | "cloudant"%string => L_cloudant
-    | "error"%string => L_error ""
-    | _ => L_error ("'"++name++"' is not a language name")
-    end.
+    Definition language_of_name_case_sensitive name : language:=
+      match name with
+      | "rule"%string => L_rule
+      | "camp"%string => L_camp
+      | "oql"%string => L_oql
+      | "sql"%string => L_sql
+      | "lambda_nra"%string => L_lambda_nra
+      | "nra"%string => L_nra
+      | "nraenv_core"%string => L_nraenv_core
+      | "nraenv"%string => L_nraenv
+      | "nnrc_core"%string => L_nnrc_core
+      | "nnrc"%string => L_nnrc
+      | "nnrcmr"%string => L_nnrcmr
+      | "cldmr"%string => L_cldmr
+      | "dnnrc"%string => L_dnnrc_dataset
+      | "dnnrc_typed"%string => L_dnnrc_typed_dataset
+      | "js"%string | "rhino"%string | "javascript"%string => L_javascript
+      | "java"%string => L_java
+      | "spark"%string => L_spark
+      | "spark2"%string => L_spark2
+      | "cloudant"%string => L_cloudant
+      | "error"%string => L_error ""
+      | _ => L_error ("'"++name++"' is not a language name")
+      end.
 
-  Definition name_of_language lang :=
-    match lang with
-    | L_rule => "rule"%string
-    | L_camp => "camp"%string
-    | L_oql => "oql"%string
-    | L_sql => "sql"%string
-    | L_lambda_nra => "lambda_nra"%string
-    | L_nra => "nra"%string
-    | L_nraenv_core => "nraenv_core"%string
-    | L_nraenv => "nraenv"%string
-    | L_nnrc_core => "nnrc_core"%string
-    | L_nnrc => "nnrc"%string
-    | L_nnrcmr => "nnrcmr"%string
-    | L_cldmr => "cldmr"%string
-    | L_dnnrc_dataset => "dnnrc"%string
-    | L_dnnrc_typed_dataset => "dnnrc_typed"%string
-    | L_javascript => "js"%string
-    | L_java => "java"%string
-    | L_spark => "spark"%string
-    | L_spark2 => "spark2"%string
-    | L_cloudant => "cloudant"%string
-    | L_error _ => "error"%string
-    end.
+    Definition name_of_language lang :=
+      match lang with
+      | L_rule => "rule"%string
+      | L_camp => "camp"%string
+      | L_oql => "oql"%string
+      | L_sql => "sql"%string
+      | L_lambda_nra => "lambda_nra"%string
+      | L_nra => "nra"%string
+      | L_nraenv_core => "nraenv_core"%string
+      | L_nraenv => "nraenv"%string
+      | L_nnrc_core => "nnrc_core"%string
+      | L_nnrc => "nnrc"%string
+      | L_nnrcmr => "nnrcmr"%string
+      | L_cldmr => "cldmr"%string
+      | L_dnnrc_dataset => "dnnrc"%string
+      | L_dnnrc_typed_dataset => "dnnrc_typed"%string
+      | L_javascript => "js"%string
+      | L_java => "java"%string
+      | L_spark => "spark"%string
+      | L_spark2 => "spark2"%string
+      | L_cloudant => "cloudant"%string
+      | L_error _ => "error"%string
+      end.
 
-  Definition language_of_query q :=
-    match q with
-    | Q_rule _ => L_rule
-    | Q_camp _ => L_camp
-    | Q_oql _ => L_oql
-    | Q_sql _ => L_sql
-    | Q_lambda_nra _ => L_lambda_nra
-    | Q_nra _ => L_nra
-    | Q_nraenv_core _ => L_nraenv_core
-    | Q_nraenv _ => L_nraenv
-    | Q_nnrc_core _ => L_nnrc_core
-    | Q_nnrc _ => L_nnrc
-    | Q_nnrcmr _ => L_nnrcmr
-    | Q_cldmr _ => L_cldmr
-    | Q_dnnrc_dataset _ => L_dnnrc_dataset
-    | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
-    | Q_javascript _ => L_javascript
-    | Q_java _ => L_java
-    | Q_spark _ => L_spark
-    | Q_spark2 _ => L_spark2
-    | Q_cloudant _ => L_cloudant
-    | Q_error err =>
-      L_error ("No language corresponding to error query '"++err++"'")
-    end.
+    Definition language_of_query q :=
+      match q with
+      | Q_rule _ => L_rule
+      | Q_camp _ => L_camp
+      | Q_oql _ => L_oql
+      | Q_sql _ => L_sql
+      | Q_lambda_nra _ => L_lambda_nra
+      | Q_nra _ => L_nra
+      | Q_nraenv_core _ => L_nraenv_core
+      | Q_nraenv _ => L_nraenv
+      | Q_nnrc_core _ => L_nnrc_core
+      | Q_nnrc _ => L_nnrc
+      | Q_nnrcmr _ => L_nnrcmr
+      | Q_cldmr _ => L_cldmr
+      | Q_dnnrc_dataset _ => L_dnnrc_dataset
+      | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
+      | Q_javascript _ => L_javascript
+      | Q_java _ => L_java
+      | Q_spark _ => L_spark
+      | Q_spark2 _ => L_spark2
+      | Q_cloudant _ => L_cloudant
+      | Q_error err =>
+        L_error ("No language corresponding to error query '"++err++"'")
+      end.
 
-  Definition name_of_query q :=
-    name_of_language (language_of_query q).
+    Definition name_of_query q :=
+      name_of_language (language_of_query q).
 
+    Definition lang_desc : Set := (language * string).
 
+    Inductive language_kind : Set :=
+    | FrontEnd : language_kind
+    | MiddleEnd : language_kind
+    | BackEnd : language_kind.
+
+    Lemma language_kind_eq_dec : EqDec language_kind eq.
+    Proof.
+      repeat red.
+      destruct x; destruct y; try solve[right; inversion 1]; left; reflexivity.
+    Defined.
+  
+    Global Instance language_kind_eqdec : EqDec language_kind eq := language_kind_eq_dec.
+
+    Open Scope string.
+    Definition language_descriptions :=
+      (L_rule,FrontEnd,"Rule","Rules for CAMP")
+      :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
+      :: (L_oql,FrontEnd,"OQL", "Object Query Language")
+      :: (L_sql,FrontEnd,"SQL", "Structured Query Language")
+      :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
+      :: (L_nra,MiddleEnd,"NRA","Nested Relational Algebra")
+(*    :: (L_nraenv_core,MiddleEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments") *)
+      :: (L_nraenv,MiddleEnd,"NRAᵉ","Nested Relational Algebra with Environments")
+(*    :: (L_nnrc_core,MiddleEnd,"cNNRC", "Core Named Nested Relational Calculus") *)
+      :: (L_nnrc,MiddleEnd,"NNRC", "Named Nested Relational Calculus")
+      :: (L_nnrcmr,MiddleEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
+      :: (L_cldmr,MiddleEnd,"CldMR", "Nested Relational Calculus with Cloudant Map/Reduce")
+      :: (L_dnnrc_dataset,MiddleEnd,"DNNRC","Distributed Named Nested Relational Calculus")
+      :: (L_dnnrc_typed_dataset,MiddleEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
+      :: (L_javascript,BackEnd,"JS","JavaScript")
+      :: (L_java,BackEnd,"Java","Java")
+      :: (L_spark,BackEnd,"Spark","Spark (RDDs)")
+      :: (L_spark2,BackEnd,"Spark2", "Spark (Datasets)")
+      :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
+(*    :: (L_error,MiddleEnd,"Error","Error") *)
+      :: nil.
+
+    Definition add_id_to_language_description (ld:language * language_kind * string * string) :=
+      match ld with
+      | (lang,kind,label,desc) =>
+        (lang,name_of_language lang,kind,label,desc)
+      end.
+
+    Definition language_descriptions_with_ids :=
+      map add_id_to_language_description language_descriptions.
+
+    (* Eval vm_compute in languages_descriptions_with_ids. *)
+
+    Definition check_kind (the_kind:language_kind)
+               (ld:language * string * language_kind * string * string)
+      :=
+      match ld with
+      | (lang,id,kind,label,desc) =>
+        if (language_kind_eq_dec kind the_kind) then true else false
+      end.
+    
+    Record export_desc :=
+      mkExportDesc
+      { frontend : list(language * string * language_kind * string * string);
+        middleend : list(language * string * language_kind * string * string);
+        backend : list(language * string * language_kind * string * string) }.
+    
+    Definition select_description_per_kind
+               (ldl: list(language * string * language_kind * string * string)) :=
+      mkExportDesc
+        (filter (check_kind FrontEnd) ldl)
+        (filter (check_kind MiddleEnd) ldl)
+        (filter (check_kind BackEnd) ldl).
+
+    (* Eval vm_compute in (select_description_per_kind language_descriptions_with_ids). *)
+
+    Definition export_language_descriptions : export_desc :=
+      select_description_per_kind language_descriptions_with_ids.
   End CompLangUtil.
 
 End CompLang.

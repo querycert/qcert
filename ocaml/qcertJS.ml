@@ -147,6 +147,27 @@ let json_of_error msg =
     val result = Js.string msg
   end
 
+let json_of_exported_languages exported_languages =
+  let wrap x =
+    let ((((_,id),_),lab),_) = x in
+    object%js
+      val langid = Js.string (Util.string_of_char_list id)
+      val label = Js.string (Util.string_of_char_list lab)
+    end
+  in
+  let wrap_all l =
+    let a = new%js Js.array_empty in
+    List.iter (fun x -> ignore (a##push (wrap x))) l;
+    a
+  in
+  object%js
+    val frontend = Js.def (wrap_all exported_languages.Compiler.frontend)
+    val intermediate = Js.def (wrap_all exported_languages.Compiler.middleend)
+    val backend =  Js.def (wrap_all exported_languages.Compiler.backend)
+  end
+let language_specs () =
+  let exported_languages = QLang.export_language_descriptions  in
+  json_of_exported_languages exported_languages
 
 let main input =
   begin try
@@ -178,5 +199,7 @@ let main input =
   end
 
 let _ =
+  Js.Unsafe.global##.languages :=
+    Js.wrap_callback language_specs;
   Js.Unsafe.global##.main :=
     Js.wrap_callback main

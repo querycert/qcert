@@ -62,6 +62,9 @@ Module QLang(runtime:CompilerRuntime).
     Definition language_of_query : query -> language := language_of_query.
     Definition name_of_query : query -> string := name_of_query.
 
+    Definition export_desc : Set := export_desc.
+    Definition export_language_descriptions : export_desc := export_language_descriptions.
+    
   End QL.
 End QLang.
 
