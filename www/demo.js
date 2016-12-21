@@ -238,6 +238,7 @@ function mkSourcePiece(options) {
 			left: leftentry * piecewidth,
 			top: topentry * pieceheight
 		});
+		piece.setCoords();
 	
 		if(!piece.isSourcePiece) {
 			if(piece.top >= canvasHeightInteractive) {
@@ -296,6 +297,7 @@ function mkSourcePiece(options) {
 						break;
 					}
 					mp.left = oldleft*piecewidth;
+					mp.setCoords();
 					oldleft = oldleft + 1;
 				}
 			}
@@ -310,6 +312,7 @@ function mkSourcePiece(options) {
 					break;
 				}
 				mp.left = (curleft+1)*piecewidth;
+				mp.setCoords();
 				curleft = curleft + 1;
 			}
 		}
