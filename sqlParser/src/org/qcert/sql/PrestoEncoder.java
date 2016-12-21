@@ -32,14 +32,15 @@ import com.facebook.presto.sql.tree.Statement;
 public class PrestoEncoder {
 	/**
 	 * Encode a list of presto tree nodes as an S-expression for importing into Coq code
-	 * @param toEncode the list of presto tree nodes to encode 
+	 * @param toEncode the list of presto tree nodes to encode
+	 * @param useDateNameHeuristic flag indicating that field names ending in "date" denote dates 
 	 * @return the S-expression string
 	 */
-	public static String encode(List<? extends Node> toEncode) {
+	public static String encode(List<? extends Node> toEncode, boolean useDateNameHeuristic) {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("(statements ");
 		for(Node node : toEncode) {
-			encode(buffer, node);
+			encode(buffer, node, useDateNameHeuristic);
 		}
 		buffer.append(")");
 		return buffer.toString();
@@ -51,8 +52,8 @@ public class PrestoEncoder {
 	 * @param toEncode the presto tree node
 	 * @return the buffer, for convenience
 	 */
-	public static StringBuilder encode(StringBuilder buffer, Node toEncode) {
-		return new EncodingVisitor().process(toEncode, buffer);
+	public static StringBuilder encode(StringBuilder buffer, Node toEncode, boolean useDateNameHeuristic) {
+		return new EncodingVisitor(useDateNameHeuristic).process(toEncode, buffer);
 	}
 
 	/**
@@ -60,23 +61,25 @@ public class PrestoEncoder {
 	 *   an S-expression string
 	 * @param sourceString the SQL source string to parse and then encode
 	 * @param interleaved if true, each statement is parsed then encoded with the outer loop iterating through statements;
-	 *   otherwise, all parsing is done, and then all encoding 
+	 *   otherwise, all parsing is done, and then all encoding
+	 * @param useDateNameHeuristic if true, all field names ending in "date" are assumed to contain dates 
 	 * @return the S-expression string
 	 */
-	public static String parseAndEncode(String sourceString, boolean interleaved) {
+	public static String parseAndEncode(String sourceString, boolean interleaved, boolean useDateNameHeuristic) {
 		if (interleaved)
-			return interleavedParseAndEncode(sourceString);
-		return encode(parse(sourceString));
+			return interleavedParseAndEncode(sourceString, useDateNameHeuristic);
+		return encode(parse(sourceString), useDateNameHeuristic);
 	}
 
 	/**
 	 * Alternative parse/encode loop useful when there are lots of statements.  Isolates what parses but does not encode from
 	 *   what doesn't parse at all
 	 * @param sourceString the source string
+	 * @param useDateNameHeuristic if true, all field names ending in "date" are assumed to denote dates
 	 * @return the parsed String, which might be vacuous, while rejecting all statements that don't parse (encoding errors still
 	 *   cause termination)
 	 */
-	private static String interleavedParseAndEncode(String sourceString) {
+	private static String interleavedParseAndEncode(String sourceString, boolean useDateNameHeuristic) {
 		StatementSplitter splitter = new StatementSplitter(sourceString);
 		SqlParser parser = new SqlParser();
 		StringBuilder buffer = new StringBuilder().append("(statements ");
@@ -95,7 +98,7 @@ public class PrestoEncoder {
 				continue;
 			}
 			try {
-				encode(buffer, result);
+				encode(buffer, result, useDateNameHeuristic);
 				successes++;
 			} catch (Exception e) {
 				System.out.println("Successes: " + successes);

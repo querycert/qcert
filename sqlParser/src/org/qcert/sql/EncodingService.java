@@ -65,7 +65,7 @@ public class EncodingService extends NanoHTTPD {
                 return respond(Response.Status.BAD_REQUEST, "Invalid input");
             }
             try { 
-            	String encoded = PrestoEncoder.parseAndEncode(query, false);
+            	String encoded = PrestoEncoder.parseAndEncode(query, false, true);
             	System.out.println("Started with:");
             	System.out.println(query);
             	System.out.println("Encoded to:");
