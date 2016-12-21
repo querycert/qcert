@@ -149,10 +149,11 @@ let json_of_error msg =
 
 let json_of_exported_languages exported_languages =
   let wrap x =
-    let ((((_,id),_),lab),_) = x in
+    let ((((_,id),_),lab),desc) = x in
     object%js
       val langid = Js.string (Util.string_of_char_list id)
       val label = Js.string (Util.string_of_char_list lab)
+      val description = Js.string (Util.string_of_char_list desc)
     end
   in
   let wrap_all l =
