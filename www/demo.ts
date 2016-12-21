@@ -414,7 +414,7 @@ function init() {
 	});
 	canvas.add(startPiece);
 
-	const srcLangDescripts = getSrcLangDescripts(languages());
+	const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
 	let maxCols:number = 0;
 	// create the list of languages that can be dragged onto the canvas
 	for(var srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
