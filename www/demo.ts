@@ -19,6 +19,14 @@ interface PuzzleSides {
 	let totalCanvasWidth = 1000;
 	const totalCanvasHeight = canvasHeightInteractive + canvasHeightChooser;
 
+	function getSourceLeft(left:number):number {
+		return left*(piecewidth + 30) + 20;
+	}
+
+	function getSourceTop(top:number):number {
+		return canvasHeightInteractive + top*(pieceheight+30) + 10;
+	}
+
 	// The set of languages and their properties
 	// const srcLanguageGroups:SourceLanguageGroups = {
 	// 	frontend:[{langid:'sql', label:'SQL'}, {langid:'oql', label:'OQL'}],
@@ -44,18 +52,26 @@ interface PuzzleSides {
 	// the boundary between the interactive and the selections
 	let separatorLine = new fabric.Line([ 0, canvasHeightInteractive, totalCanvasWidth, canvasHeightInteractive], { stroke: '#ccc', selectable: false });
 
-	function updateCanvasWidth(canvas, newWidth) {
+	function updateCanvasWidth(canvas:fabric.IStaticCanvas, newWidth:number) {
 		totalCanvasWidth = newWidth;
 		canvas.setWidth(newWidth);
 		separatorLine.set('x2', newWidth);
 	}
 
-	function ensureCanvasWidth(canvas, lastpiece) {
-		const newwidth = (lastpiece+1)*piecewidth;
-		if(newwidth > totalCanvasWidth) {
-			updateCanvasWidth(canvas, newwidth);
+	function ensureCanvasWidth(canvas:fabric.IStaticCanvas, newWidth:number) {
+		if(newWidth > totalCanvasWidth) {
+			updateCanvasWidth(canvas, newWidth);
 		}
 	}
+
+	function ensureCanvasInteractivePieceWidth(canvas:fabric.IStaticCanvas, lastpiece:number) {
+		ensureCanvasWidth(canvas, lastpiece*piecewidth);
+	}
+
+	function ensureCanvasSourcePieceWidth(canvas:fabric.IStaticCanvas, lastpiece:number) {
+		ensureCanvasWidth(canvas, getSourceLeft(lastpiece));
+	}
+
 
 // based on code from https://www.codeproject.com/articles/395453/html-jigsaw-puzzle
 	function getMask(tileRatio, topTab, rightTab, bottomTab, leftTab) {
@@ -232,8 +248,8 @@ var placedPieces:IPuzzlePiece[][] = [];
 function mkSourcePiece(options):IPuzzlePiece {
 
 	let piece = new PuzzlePiece({
-		left : (options.col || 0)*(piecewidth + 30) + 20,
-		top : canvasHeightInteractive + ((options.row || 0)*(pieceheight+30)) + 10,
+		left : getSourceLeft(options.col || 0),
+		top : getSourceTop(options.row || 0),
 		fill : options.fill || 'purple',
 		label : options.label,
 		sides : options.sides || {},
@@ -289,7 +305,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 			if(piece.top >= canvasHeightInteractive) {
 				piece.canvas.remove(piece);
 			}
-			
+
 			// update the placed grid
 			if('movePlace' in piece) {
 				// finalize the moved pieces in their new positions
@@ -305,7 +321,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 						curleft = nextleft;
 						curleftval = nextleftval;
 					}
-					ensureCanvasWidth(piece.canvas, curleft);
+					ensureCanvasInteractivePieceWidth(piece.canvas, curleft+1);
 					prow[leftentry] = undefined;
 				}
 				delete piece['movePlace'];
@@ -399,13 +415,15 @@ function init() {
 	canvas.add(startPiece);
 
 	const srcLangDescripts = getSrcLangDescripts(languages());
+	let maxCols:number = 0;
 	// create the list of languages that can be dragged onto the canvas
 	for(var srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
 		let rowelem = srcLangDescripts[srcrow];
 		if(rowelem == null) {
 			continue;
 		}
-		for(var srccol=0; srccol < rowelem.length; srccol++) {
+		let srccol=0;
+		for(srccol=0; srccol < rowelem.length; srccol++) {
 			let colelem = rowelem[srccol];
 			if(colelem == null) {
 				continue;
@@ -417,7 +435,10 @@ function init() {
 			sourcePieces[colelem.langid] = piece;
 			canvas.add(piece);
 		}
+		maxCols = Math.max(srccol, maxCols);
 	}
+	// make sure the canvas is wide enough
+	ensureCanvasSourcePieceWidth(canvas, maxCols);
 
     // // create grid
     // for (var i = 0; i < (600 / grid); i++) {
