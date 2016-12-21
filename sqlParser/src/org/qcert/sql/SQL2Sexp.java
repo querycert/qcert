@@ -40,10 +40,10 @@ import util.SExpression;
  * Main program for translating SQL into S-expression form for import into qcert.
  */
 public class SQL2Sexp {
-	/** The default data directory unless overridden by -source option */
+	/** The default data directory when not "single" unless overridden by -source option */
 	private static final File dataDirectory = new File("data");
 
-	/** The default output directory unless overridden by -output option */
+	/** The default output directory when not "-single" unless overridden by -output option */
 	private static final File outputDirectory = new File("sexp");
 
 	/** Suffix completion for input files */
@@ -55,17 +55,98 @@ public class SQL2Sexp {
 	/** Suffix completion for split output files */
 	private static final String splitOutputTemplate = "%s_%d.s-sql";
 	
+	/** Main program */
+	public static void main(String[] args) throws Exception {
+		if (args.length == 1 && "-single".equals(args[0])) {
+			processSingle();
+			return;
+		}
+		List<String> sources = new ArrayList<>();
+		int index = 0;
+		File data = dataDirectory;
+		File output = outputDirectory;
+		boolean interleaved = false;
+		boolean splitStatements = false; 
+		boolean useDateNameHeuristic = true;
+		while (index < args.length) {
+			String arg = args[index];
+			if (arg.equals("-source")) {
+				data = new File(args[index+1]);
+				index += 2;
+			} else if (arg.equals("-output")) {
+				output = new File(args[index+1]);
+				index += 2;
+			} else {
+				index++;
+				if (arg.equals("-interleaved"))
+					interleaved = true;
+				else if (arg.equals("-splitStatements"))
+					splitStatements = true;
+				else if (arg.equals("-noDateNameHeuristic"))
+					useDateNameHeuristic = false;
+				else if (arg.startsWith("-"))
+					throw new IllegalArgumentException(arg);
+				else
+					sources.add(arg);
+			}
+		}
+		if (sources.size() == 3 && isNumber(sources.get(1)) && isNumber(sources.get(2)))
+			sources = generateRange(sources);
+		for (String source : sources) {
+			String result = process(source, interleaved, splitStatements, useDateNameHeuristic, data, output);
+			if (result == null || result.length() == 0)
+				System.out.println("Query " + source + " parsed and converted");
+			else {
+				System.out.println("Query " + source + " failed to parse or convert");
+				System.out.println(" " + result);
+			}
+		}			
+	}
+	
 	/**
-	 * Convert occurances of NN [days|months|years] to interval NN [day|month|year]. 
+	 * Apply necessary fixups at the lexical level (needed to get the query to even be parsed by presto-parser).
+	 * 1.  Convert occurances of NN [days|months|years] to interval NN [day|month|year] (needed by many TPC-DS queries).
+	 * 2.  Remove parenthesized numeric field after an interval unit field (needed to run TPC-H query 1). 
 	 * @param query the original query
 	 * @return the altered query
 	 */
-	private static String convertDateIntervals(String query) {
+	private static String applyLexicalFixups(String query) {
         CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
 		SqlBaseLexer lexer = new SqlBaseLexer(stream);
 		StringBuilder buffer = new StringBuilder();
 		Token savedInteger = null;
+		FixupState state = FixupState.OPEN;
 		for (Token token : lexer.getAllTokens()) {
+			switch (state) {
+			case ELIDE1:
+				state = FixupState.ELIDE2;
+				continue;
+			case ELIDE2:
+				state = FixupState.OPEN;
+				continue;
+			case INTERVAL:
+				buffer.append(token.getText());
+				if (getUnit(token.getText()) != null)
+					state = FixupState.UNIT;
+				continue;
+			case UNIT:
+				if (token.getText().equals("(")) {
+					state = FixupState.ELIDE1;
+				} else {
+					buffer.append(token.getText());
+					if (token.getType() != SqlBaseLexer.WS)
+						state = FixupState.OPEN;
+				}
+				continue;
+			case OPEN:
+			default:
+				if (token.getType() == SqlBaseLexer.INTERVAL) {
+					state = FixupState.INTERVAL;
+					buffer.append(token.getText());
+					continue;
+				}
+				break;
+			}
 			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
 				savedInteger = token;
 			else if (savedInteger != null) {
@@ -84,7 +165,7 @@ public class SQL2Sexp {
 		}
 		return buffer.toString();
 	}
-	
+
 	/** Generate a range of arguments from a stem, start index, and end index */
 	private static List<String> generateRange(List<String> sources) {
 		String stem = sources.get(0);
@@ -97,17 +178,18 @@ public class SQL2Sexp {
 	}
 
 	/**
-	 * Subroutine of convertDateIntervals to recognize interval names in the plural form and return the singular of same
+	 * Utility to recognize interval unit names in either singular or plural form and return the singular of same
 	 */
 	private static String getUnit(String text) {
-		if (text.trim().equalsIgnoreCase("days"))
-			return "day";
-		else if (text.trim().equalsIgnoreCase("months"))
-			return "month";
-		else if (text.trim().equalsIgnoreCase("years"))
+		switch (text.trim().toLowerCase()) {
+		case "days": case "day":
+			return "day:";
+		case "months": case "month":
+			return "month:";
+		case "years": case "year":
 			return "year";
-		else
-			return null;
+		}
+		return null;
 	}
 
 	/** Determine if a "query" has multiple statements */
@@ -124,65 +206,16 @@ public class SQL2Sexp {
 		return true;
 	}
 
-	/** Main program */
-	public static void main(String[] args) throws Exception {
-		if (args.length == 1 && "-single".equals(args[0])) {
-			processSingle();
-			return;
-		}
-		List<String> sources = new ArrayList<>();
-		int index = 0;
-		File data = dataDirectory;
-		File output = outputDirectory;
-		boolean convertDateIntervals = false;
-		boolean interleaved = false;
-		boolean splitStatements = false; 
-		while (index < args.length) {
-			String arg = args[index];
-			if (arg.equals("-source")) {
-				data = new File(args[index+1]);
-				index += 2;
-			} else if (arg.equals("-output")) {
-				output = new File(args[index+1]);
-				index += 2;
-			} else {
-				index++;
-				if (arg.equals("-interleaved"))
-					interleaved = true;
-				else if (arg.equals("-splitStatements"))
-					splitStatements = true;
-				else if (arg.equals("-convertDateIntervals"))
-					convertDateIntervals = true;
-				else if (arg.startsWith("-"))
-					throw new IllegalArgumentException(arg);
-				else
-					sources.add(arg);
-			}
-		}
-		if (sources.size() == 3 && isNumber(sources.get(1)) && isNumber(sources.get(2)))
-			sources = generateRange(sources);
-		for (String source : sources) {
-			String result = process(source, convertDateIntervals, interleaved, splitStatements, data, output);
-			if (result == null || result.length() == 0)
-				System.out.println("Query " + source + " parsed and converted");
-			else {
-				System.out.println("Query " + source + " failed to parse or convert");
-				System.out.println(" " + result);
-			}
-		}			
-	}
-
 	/**
-	 * Process a single query by simple name.  On success, return null or the empty string
+	 * Process a single query by simple name (in file-to-file mode).  On success, return null or the empty string
 	 * On failure, return the exception message.
 	 */
-	private static String process(String qn, boolean useDaysHack, boolean interleaved, boolean splitStatements, 
+	private static String process(String qn, boolean interleaved, boolean splitStatements, boolean useDateNameHeuristic, 
 			File data, File output) {
 		try {
 			String query = FileUtil.readFile(new File(data, String.format(inputTemplate, qn)));
-			if (useDaysHack)
-				query = convertDateIntervals(query);
-			String result = PrestoEncoder.parseAndEncode(query, interleaved);
+			query = applyLexicalFixups(query);
+			String result = PrestoEncoder.parseAndEncode(query, interleaved, useDateNameHeuristic);
 			if (hasMultipleStatements(query) && splitStatements)
 				writeSplitOutput(result, qn, output); // subsumes sanity check
 			else {
@@ -199,13 +232,13 @@ public class SQL2Sexp {
 	}
 
 	/**
-	 * Special version of process to return the s-exp form of a single sql file (used as a subprocess of qcert)
+	 * Special version of process to implement "single" mode (runs as pipe segment).
 	 */
 	private static void processSingle() {
 		try {
 			String query = readStdin();
-			query = convertDateIntervals(query);
-			String result = PrestoEncoder.parseAndEncode(query, false);
+			query = applyLexicalFixups(query);
+			String result = PrestoEncoder.parseAndEncode(query, false, true);
 			System.out.println(result);
 		} catch (Exception e) {
 			String msg = e.getMessage();
@@ -257,5 +290,10 @@ public class SQL2Sexp {
 			reparse(toWrite); // sanity check
 			FileUtil.writeFile(new File(output, String.format(splitOutputTemplate, qn, index++)), toWrite);
 		}
+	}
+	
+	/** Enumeration used in lexical fixups of interval syntax */
+	private enum FixupState {
+		OPEN, INTERVAL, UNIT, ELIDE1, ELIDE2
 	}
 }
