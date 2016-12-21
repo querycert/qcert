@@ -15,6 +15,7 @@
 #
 
 CP=cp
+TSC?=tsc
 
 COQDOCFLAGS=-interpolate -utf8 --lib-subtitles --no-lib-name -l
 export COQDOCFLAGS
@@ -299,6 +300,12 @@ spark2-runtime:
 japi:
 	@$(MAKE) java-extraction
 	@$(MAKE) lib/QcertLibrary.jar
+
+demo: jsapi
+	@echo "[Qcert] "
+	@echo "[Qcert] Compiling typescript files to javascript"
+	@echo "[Qcert] "
+	cd www && $(TSC) -p "tsconfig.json"
 
 jsapi:
 	@$(MAKE) js-extraction
