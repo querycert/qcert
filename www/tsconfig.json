@@ -6,7 +6,8 @@
     },
     "files":[
         "demo.ts",
-        "typings.d.ts"
+        "typings.d.ts",
+        "qcertJS.d.ts"
     ]
 }
 

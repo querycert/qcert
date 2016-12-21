@@ -1,4 +1,12 @@
 
+// some types
+
+interface PuzzleSides {
+	left?:-1|0|1;
+	top?:-1|0|1;
+	right?:-1|0|1;
+	bottom?:-1|0|1;
+}
 
 // constants
 // these must remain 100 for the puzzle piece path stuff to work out
@@ -12,19 +20,19 @@
 	const totalCanvasHeight = canvasHeightInteractive + canvasHeightChooser;
 
 	// The set of languages and their properties
-	const srcLanguageGroups = {
-		frontend:[{langid:'sql', label:'SQL'}, {langid:'oql', label:'OQL'}],
-        intermediate:[{langid:'nrae', label:'NRAenv'}, {langid:'nrc', label:'NNRC'}],
-        backend:[{langid:'js', label:'javascript'}, {langid:'cloudant', label:'Cloudant'}]};
+	// const srcLanguageGroups:SourceLanguageGroups = {
+	// 	frontend:[{langid:'sql', label:'SQL'}, {langid:'oql', label:'OQL'}],
+    //     intermediate:[{langid:'nrae', label:'NRAenv'}, {langid:'nrc', label:'NNRC'}],
+    //     backend:[{langid:'js', label:'javascript'}, {langid:'cloudant', label:'Cloudant'}]};
 
 
-	function toSrcLangDescript(color, sides) {
-		return function(group) {
+	function toSrcLangDescript(color, sides:PuzzleSides) {
+		return function(group:{langid, label}) {
 			return {langid:group.langid, label:group.label, fill:color, sides:sides};
 		}
 	}
 	
-	function getSrcLangDescripts(langGroups) {
+	function getSrcLangDescripts(langGroups:SourceLanguageGroups) {
 		let ret = [];
 		ret.push(langGroups.frontend.map(toSrcLangDescript('#33cc33', {right:-1})));
 		ret.push(langGroups.intermediate.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
@@ -132,8 +140,18 @@
 		return mask;
 	}
 
+interface IPuzzlePiece extends fabric.IObject {
+	// this should be the fabric ts file
+	canvas:fabric.IStaticCanvas;
+	// new stuff
+	isSourcePiece?:boolean;
+	movePlace?:{left:number, top:number};
+	readonly left:number;
+	readonly top:number;
+}
+
 // The class for a puzzle piece object
-var PuzzlePiece:new(args:any)=>any = <any>fabric.util.createClass(fabric.Rect, {
+var PuzzlePiece:new(args:any)=>IPuzzlePiece = <any>fabric.util.createClass(fabric.Rect, {
 
   type: 'puzzlePiece',
 
@@ -144,7 +162,7 @@ var PuzzlePiece:new(args:any)=>any = <any>fabric.util.createClass(fabric.Rect, {
     this.callSuper('initialize', options);
     this.set('label', options.label || '');
 
-	const puzzleSides = options.sides || {};
+	const puzzleSides:PuzzleSides = options.sides || {};
 	const puzzleLeft = puzzleSides.left || 0;
 	const puzzleRight = puzzleSides.right || 0;
 	const puzzleTop = puzzleSides.top || 0;
@@ -186,7 +204,7 @@ var placedPieces = [];
 
 function mkSourcePiece(options) {
 
-	var piece = new PuzzlePiece({
+	let piece = new PuzzlePiece({
 		left : (options.col || 0)*(piecewidth + 30) + 20,
 		top : canvasHeightInteractive + ((options.row || 0)*(pieceheight+30)) + 10,
 		fill : options.fill || 'purple',
@@ -195,6 +213,7 @@ function mkSourcePiece(options) {
 		hasControls : false,
 		hasBorders : false
 	});
+	
 	piece.isSourcePiece = true;
 	// TODO: work on getting things to move out of the way
 	// track what we were over last / are over now
@@ -240,6 +259,7 @@ function mkSourcePiece(options) {
 			left: leftentry * piecewidth,
 			top: topentry * pieceheight
 		});
+		// TODO: try to use typescript to ensure that this is called when needed
 		piece.setCoords();
 	
 		if(!piece.isSourcePiece) {
@@ -359,7 +379,7 @@ function init() {
 	});
 	canvas.add(startPiece);
 
-	const srcLangDescripts = getSrcLangDescripts(srcLanguageGroups);
+	const srcLangDescripts = getSrcLangDescripts(languages());
 	// create the list of languages that can be dragged onto the canvas
 	for(var srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
 		let rowelem = srcLangDescripts[srcrow];
