@@ -11,15 +11,28 @@
 	const totalCanvasHeight = canvasHeightInteractive + canvasHeightChooser;
 
 	// The set of languages and their properties
-	const acrossSides = {left:1, right:-1};
-	const srcLangDescripts = [
-		null,
-		[null,
-		{label:'OQL', fill:'#FFCC99', sides:acrossSides},
-		null,
-		{label:'SQL', fill:'#FFCC99', sides:acrossSides}]];
+	const srcLanguageGroups = {
+		frontend:[{langid:'sql', label:'SQL'}, {langid:'oql', label:'OQL'}],
+        intermediate:[{langid:'nrae', label:'NRAenv'}, {langid:'nrc', label:'NNRC'}],
+        backend:[{langid:'js', label:'javascript'}, {langid:'cloudant', label:'Cloudant'}]};
 
-	// first, lets draw the boundary between the interactive and the selections
+
+	function toSrcLangDescript(color, sides) {
+		return function(group) {
+			return {langid:group.langid, label:group.label, fill:color, sides:sides};
+		}
+	}
+	
+	function getSrcLangDescripts(langGroups) {
+		let ret = [];
+		ret.push(langGroups.frontend.map(toSrcLangDescript('#33cc33', {right:-1})));
+		ret.push(langGroups.intermediate.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
+		ret.push(langGroups.backend.map(toSrcLangDescript('#ff3300', {left: 1})));
+
+		return ret;
+	}
+
+	// the boundary between the interactive and the selections
 	let separatorLine = new fabric.Line([ 0, canvasHeightInteractive, totalCanvasWidth, canvasHeightInteractive], { stroke: '#ccc', selectable: false });
 
 	function updateCanvasWidth(canvas, newWidth) {
@@ -172,8 +185,8 @@ var placedPieces = [];
 function mkSourcePiece(options) {
 
 	var piece = new PuzzlePiece({
-		left : (options.col || 0)*piecewidth,
-		top : canvasHeightInteractive + ((options.row || 0)*pieceheight),
+		left : (options.col || 0)*(piecewidth + 30) + 20,
+		top : canvasHeightInteractive + ((options.row || 0)*(pieceheight+30)) + 10,
 		fill : options.fill || 'purple',
 		label : options.label,
 		sides : options.sides || {},
@@ -341,6 +354,7 @@ function init() {
 	});
 	canvas.add(startPiece);
 
+	const srcLangDescripts = getSrcLangDescripts(srcLanguageGroups);
 	// create the list of languages that can be dragged onto the canvas
 	for(var srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
 		let rowelem = srcLangDescripts[srcrow];
