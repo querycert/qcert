@@ -35,8 +35,8 @@ interface PuzzleSides {
 
 
 	function toSrcLangDescript(color, sides:PuzzleSides) {
-		return function(group:{langid, label}) {
-			return {langid:group.langid, label:group.label, fill:color, sides:sides};
+		return function(group:QcertLanguageDescription) {
+			return {langid:group.langid, label:group.label, langdescription:group.description, fill:color, sides:sides};
 		}
 	}
 	
@@ -164,6 +164,7 @@ interface IPuzzlePiece extends fabric.IObject {
 	isSourcePiece?:boolean;
 	movePlace?:{left:number, top:number};
 	langid:string;
+	langdescription:string;
 	tooltipObj?:fabric.IObject;
 
 	// these are to help avoid accidentally setting
@@ -260,6 +261,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 	
 	piece.isSourcePiece = true;
 	piece.langid = options.langid;
+	piece.langdescription = options.langdescription;
 	// TODO: when me move something, shift things to the right back over it (to the left)
 	// be careful how that interacts with the shift right code!
 	// TODO: work on getting things to move out of the way
@@ -387,7 +389,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 			if(! ('tooltipObj' in piece)) {
 
 				// calculate where it should appear.
-				const text = new fabric.IText('Language description goes here', 
+				const text = new fabric.IText(piece.langdescription, 
 				{ left: 0, 
 					top: 0,
 					fill:'black',

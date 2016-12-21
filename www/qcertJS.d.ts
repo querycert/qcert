@@ -1,9 +1,10 @@
 type QcertLanguage = string;
 
+type QcertLanguageDescription = {langid:QcertLanguage, label:string, description:string};
 type SourceLanguageGroups = {
-		frontend:[{langid:QcertLanguage, label:string}], 
-		intermediate:[{langid:QcertLanguage, label:string}], 
-		backend:[{langid:QcertLanguage, label:string}]};
+		frontend:[QcertLanguageDescription], 
+		intermediate:[QcertLanguageDescription], 
+		backend:[QcertLanguageDescription]};
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;
