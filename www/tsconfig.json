@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": true
+    },
+    "files":[
+        "demo.ts",
+        "typings.d.ts"
+    ]
+}
+

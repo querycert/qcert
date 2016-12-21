@@ -1,4 +1,5 @@
 
+
 // constants
 // these must remain 100 for the puzzle piece path stuff to work out
 	const piecewidth = 100;
@@ -132,7 +133,7 @@
 	}
 
 // The class for a puzzle piece object
-var PuzzlePiece = fabric.util.createClass(fabric.Rect, {
+var PuzzlePiece:new(args:any)=>any = <any>fabric.util.createClass(fabric.Rect, {
 
   type: 'puzzlePiece',
 
@@ -158,7 +159,8 @@ var PuzzlePiece = fabric.util.createClass(fabric.Rect, {
     path.originY = 'center';
 	this.puzzlePath = path;
 	this.set('clipTo', function (ctxt) {
-	 		path._render(ctxt);
+		const p:any = path;
+	 	p._render(ctxt);
 	});
 
   },
