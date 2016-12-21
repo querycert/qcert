@@ -1148,7 +1148,7 @@ Section NNRCtoNNRCMR.
       ((output::nil, (NNRCVar output)), (output, Vlocal)::nil).
 
   (* Java equivalent: NnrcToNrcmr.nnrc_to_nnrcmr_chain *)
-  Definition nnrc_to_nnrcmr_chain (n: nnrc) (initunit: var) (inputs_loc: vdbindings) : nnrcmr :=
+  Definition nnrc_to_nnrcmr_chain (initunit: var) (inputs_loc: vdbindings) (n: nnrc) : nnrcmr :=
     let n_ns := (* unshadow_simpl (initunit::nil) *) n in
     let vars_loc := inputs_loc ++ List.map (fun x => (x, Vlocal)) (nnrc_bound_vars n_ns) in
     nnrc_to_nnrcmr_chain_ns n_ns initunit inputs_loc vars_loc.

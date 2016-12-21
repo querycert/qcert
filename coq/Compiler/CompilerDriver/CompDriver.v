@@ -166,9 +166,10 @@ Section CompDriver.
           (vinit, Vlocal)
             ::(mkDistNames q_free_vars)
       in
-      nnrc_to_nnrcmr_chain q
-                           init_vinit
-                           inputs_loc.
+      (* XXX Expands GroupBy For now XXX *)
+      let q := nnrc_to_nnrc_core q in
+      lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
+                                           inputs_loc) q.
 
     (* Free variables should eventually be passed from the application. *)
     Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
@@ -176,9 +177,10 @@ Section CompDriver.
           (vinit, Vlocal)
             :: inputs_loc
       in
-      nnrc_to_nnrcmr_chain q
-                           init_vinit
-                           inputs_loc.
+      (* XXX Expands GroupBy For now XXX *)
+      let q := nnrc_to_nnrc_core q in
+      lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
+                                           inputs_loc) q.
 
     Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
 
@@ -216,11 +218,11 @@ Section CompDriver.
     Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
       nnrc_to_dnnrc tt inputs_loc q.
 
-    Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Check XXX *)
-      nnrcToJSTop q.
+    Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
+      lift_nnrc_core nnrcToJSTop (nnrc_to_nnrc_core q).
 
-    Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Check XXX *)
-      nnrcToJavaTop class_name imports q.
+    Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Expands GroupBy For now XXX *)
+      lift_nnrc_core (nnrcToJavaTop class_name imports) (nnrc_to_nnrc_core q).
 
     Definition dnnrc_dataset_to_dnnrc_typed_dataset
                (e: dnnrc_dataset) (inputType: rtype)
