@@ -228,6 +228,13 @@ where
 	document.getElementById("languages").innerHTML = escapeHtml(languages().backend);
       </script>
     </fieldset>
+    <fieldset>
+      <legend>Paths</legend>
+      <p><pre id="paths"></pre></p>
+      <script>
+	document.getElementById("paths").innerHTML = escapeHtml(path({ 'source': 'sql','target':'nnrc' }).path);
+      </script>
+    </fieldset>
     -->
     </form>
   </body>

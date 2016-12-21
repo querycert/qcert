@@ -169,6 +169,21 @@ let language_specs () =
   let exported_languages = QLang.export_language_descriptions  in
   json_of_exported_languages exported_languages
 
+let json_of_source_to_target_path j =
+  let source_lang = language_of_name (Js.to_string j##.source) in
+  let target_lang = language_of_name (Js.to_string j##.target) in
+  let path_lang = QDriver.get_path_from_source_target source_lang target_lang in
+  let path = List.map name_of_language path_lang in
+  let wrap x = Js.string x in
+  let wrap_all l =
+    let a = new%js Js.array_empty in
+    List.iter (fun x -> ignore (a##push (wrap x))) l;
+    a
+  in
+  object%js
+    val path = Js.def (wrap_all path)
+  end
+
 let main input =
   begin try
     let gconf =
@@ -201,5 +216,7 @@ let main input =
 let _ =
   Js.Unsafe.global##.languages :=
     Js.wrap_callback language_specs;
+  Js.Unsafe.global##.path :=
+    Js.wrap_callback json_of_source_to_target_path;
   Js.Unsafe.global##.main :=
     Js.wrap_callback main
