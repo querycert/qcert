@@ -265,6 +265,58 @@ function makePuzzlePiece(options):any {
 	return group;
 }
 
+function makeToolTip(
+					tip:string,
+					canvas:fabric.IStaticCanvas,
+					srcRect:{left:number, top:number, width:number, height:number},
+					tooltipOffset:fabric.IPoint,
+					textOptions:fabric.ITextOptions, 
+					rectOptions:fabric.IRectOptions):fabric.IObject {
+	const topts = fabric.util.object.clone(textOptions);
+	topts.left = 0;
+	topts.top = 0;
+	topts.editable = false;
+	const text = new fabric.IText(tip, topts);
+	// calculate where it should appear.
+
+	// if needed, shrink the font so that the text
+	// is not too large
+	let boundingBox = text.getBoundingRect();
+	const maxwidth = canvas.getWidth()*3/4;
+	while(boundingBox.width > maxwidth) {
+		text.setFontSize(text.getFontSize()-2);
+		text.setCoords();
+		boundingBox = text.getBoundingRect();
+	}
+	let piecemid = srcRect.left + Math.round(srcRect.width/2);
+
+	let boxleft = piecemid - Math.round(boundingBox.width / 2);
+	if(boxleft < 0) {
+		boxleft = 0;
+	} else {
+		let tryright = piecemid + Math.round(boundingBox.width / 2);
+		tryright = Math.min(tryright, canvas.getWidth());
+		boxleft = tryright - boundingBox.width;
+	}
+
+	let boxtop = srcRect.top - boundingBox.height - tooltipOffset.y;
+	if(boxtop < 0) {
+		boxtop = srcRect.top + srcRect.height + tooltipOffset.y;
+	}
+
+	text.originX = 'left';
+	text.left = boxleft;
+	text.originY = 'top';
+	text.top = boxtop;
+	text.setCoords();
+	const ropts = fabric.util.object.clone(rectOptions);
+	fabric.util.object.extend(ropts, text.getBoundingRect());
+	const box = new fabric.Rect(ropts);
+	const group = new fabric.Group([box, text]);
+	return group;
+}
+
+
 function mkSourcePiece(options):IPuzzlePiece {
 	const group = makePuzzlePiece(options);
 	
@@ -424,53 +476,16 @@ function mkSourcePiece(options):IPuzzlePiece {
 		if(piece.isSourcePiece) {
 			if(! ('tooltipObj' in piece)) {
 
-				// calculate where it should appear.
-				const text = new fabric.IText(piece.langdescription, 
-				{ left: 0, 
-					top: 0,
-					fill:'black',
-					fontSize:40,
-					editable:false
-					});
-
-				const tooltipOffset:fabric.IPoint = new fabric.Point(10, 10);
-
-				let boundingBox = text.getBoundingRect();
-				const maxwidth = piece.canvas.getWidth()*3/4;
-
-				// if needed, shrink the font so that the text
-				// is not too large
-				while(boundingBox.width > maxwidth) {
-					text.setFontSize(text.getFontSize()-2);
-					text.setCoords();
-					boundingBox = text.getBoundingRect();
-				}
-				let piecemid = piece.left + Math.round(piecewidth/2);
+				const tip = makeToolTip(
+					piece.langdescription,
+					piece.canvas,
+					{left:piece.left, top:piece.top, width:piecewidth, height:pieceheight},
+					new fabric.Point(10, 10),
+				 	{fill:'black', fontSize:40}, 
+					{fill:'#EEEEEE'});
 				
-				let boxleft = piecemid - Math.round(boundingBox.width / 2);
-				if(boxleft < 0) {
-					boxleft = 0;
-				} else {
-					let tryright = piecemid + Math.round(boundingBox.width / 2);
-					tryright = Math.min(tryright, piece.canvas.getWidth());
-					boxleft = tryright - boundingBox.width;
-				}
-
-				let boxtop = piece.top - boundingBox.height - tooltipOffset.y;
-				if(boxtop < 0) {
-					boxtop = piece.top + piece.height + tooltipOffset.y;
-				}
-
-				text.originX = 'left';
-				text.left = boxleft;
-				text.originY = 'top';
-				text.top = boxtop;
-				text.setCoords();
-				const box = new fabric.Rect(text.getBoundingRect());
-				box.setFill('#EEEEEE');
-				const group = new fabric.Group([box, text]);
-				piece.tooltipObj = group;
-				piece.canvas.add(group);
+				piece.tooltipObj = tip;
+				piece.canvas.add(tip);
 			}
 		}
 	});
@@ -483,8 +498,6 @@ function mkSourcePiece(options):IPuzzlePiece {
 
 	return piece;
 }
-
-
 
 function init() {
     var canvas = new fabric.Canvas('main-canvas');
@@ -528,6 +541,7 @@ function init() {
 		selectable: false
 	});
 	startPiece.hoverCursor = 'auto';
+	
 
 	canvas.add(startPiece);
 
@@ -546,10 +560,32 @@ function init() {
 		top:pipelineRow * pieceheight + gridOffset.y,
 		width:20,
 		height:pieceheight});
-	const runGroup = new fabric.Group([runRect, runText]);
+	const runGroup:any = new fabric.Group([runRect, runText]);
 	runGroup.set({
 		hasControls:false,
 		selectable:false
+	});
+
+	runGroup.on('mouseover', function() {
+		if(! ('tooltipObj' in runGroup)) {
+			// TODO: add path information here (at least for now)
+			const tip = makeToolTip(
+				"Run the compiler!",
+				canvas,
+				{left:runGroup.left, top:runGroup.top, width:20, height:pieceheight},
+				new fabric.Point(10, 10),
+				{fill:'black', fontSize:40}, 
+				{fill:'#EEEEEE'});
+			
+				runGroup.tooltipObj = tip;
+				runGroup.canvas.add(tip);
+			}
+	});
+	runGroup.on('mouseout', function() {
+		if('tooltipObj' in runGroup) {
+			canvas.remove(runGroup.tooltipObj);
+			delete runGroup.tooltipObj;
+		}
 	});
 
 	canvas.add(runGroup);
