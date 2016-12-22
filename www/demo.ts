@@ -16,7 +16,7 @@ interface PuzzleSides {
 	const gridRows = 3;
 	const pipelineRow = 1;
 
-	const gridOffset:fabric.IPoint = new fabric.Point(20,20);
+	const gridOffset:fabric.IPoint = new fabric.Point(22,20);
 	const canvasHeightInteractive = gridRows*pieceheight+gridOffset.y*2;
 	// TODO: This number should be automatically calculated
 	const canvasHeightChooser = 400;
@@ -546,7 +546,7 @@ function init() {
 	canvas.add(startPiece);
 
 	const runText = new fabric.Text('R\nu\nn', {
-		left:0,
+		left:2,
 		fontSize:25,
 		top:pipelineRow * pieceheight + gridOffset.y + 1,
 		textAlign:'center',
@@ -559,7 +559,10 @@ function init() {
 		left:0,
 		top:pipelineRow * pieceheight + gridOffset.y,
 		width:20,
-		height:pieceheight});
+		height:pieceheight-2,
+		stroke:'red',
+		strokeWidth:2
+	});
 	const runGroup:any = new fabric.Group([runRect, runText]);
 	runGroup.set({
 		hasControls:false,
