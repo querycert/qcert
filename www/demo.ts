@@ -14,6 +14,7 @@ interface PuzzleSides {
 	const pieceheight = 100;
 
 	const gridRows = 3;
+	const pipelineRow = 1;
 
 	const gridOffset:fabric.IPoint = new fabric.Point(20,20);
 	const canvasHeightInteractive = gridRows*pieceheight+gridOffset.y*2;
@@ -291,6 +292,8 @@ function mkSourcePiece(options):IPuzzlePiece {
 
 
 	const piece:IPuzzlePiece = group;
+	piece.hoverCursor = 'grab';
+	(<any>piece).moveCursor = 'grabbing';
 
 	// TODO: when me move something, shift things to the right back over it (to the left)
 	// be careful how that interacts with the shift right code!
@@ -485,12 +488,12 @@ function mkSourcePiece(options):IPuzzlePiece {
 
 function init() {
     var canvas = new fabric.Canvas('main-canvas');
-	canvas.hoverCursor = 'pointer';
 	// TODO: at some point enable this
 	// but upon creation remove any inappropriate (source) elements
 	// and set up the mouse up/down/hover code
 	// taking care that the algorithm may now need to move things multiple spaces
 	canvas.selection = false;
+	canvas.hoverCursor = 'pointer';
 
 	// canvas.on('selection:created', function (event) {
 	// 	canvas.getActiveGroup().set({hasControls : false});
@@ -521,10 +524,35 @@ function init() {
 	});
 	startPiece.setGridCoords(0, 1);
 	startPiece.set({
-		selectable: false,
-		hoverCursor:'auto'
+		hasControls : false,
+		selectable: false
 	});
+	startPiece.hoverCursor = 'auto';
+
 	canvas.add(startPiece);
+
+	const runText = new fabric.Text('R\nu\nn', {
+		left:0,
+		fontSize:25,
+		top:pipelineRow * pieceheight + gridOffset.y + 1,
+		textAlign:'center',
+		width:20,
+		fill:'red',
+		height:pieceheight
+	});
+
+	const runRect = new fabric.Rect({
+		left:0,
+		top:pipelineRow * pieceheight + gridOffset.y,
+		width:20,
+		height:pieceheight});
+	const runGroup = new fabric.Group([runRect, runText]);
+	runGroup.set({
+		hasControls:false,
+		selectable:false
+	});
+
+	canvas.add(runGroup);
 
 	const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
 	let maxCols:number = 0;
