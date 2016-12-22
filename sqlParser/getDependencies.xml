@@ -5,6 +5,7 @@
 <property name="presto" value="com/facebook/presto/presto-parser/0.161/presto-parser-0.161.jar"/>
 <property name="presto-src" value="com/facebook/presto/presto-parser/0.161/presto-parser-0.161-sources.jar"/>
 <property name="guava" value="com/google/guava/guava/19.0/guava-19.0.jar"/>
+<property name="guava-src" value="com/google/guava/guava/19.0/guava-19.0-sources.jar"/>
 <property name="antlr" value="org/antlr/antlr4-runtime/4.5.3/antlr4-runtime-4.5.3.jar"/>
 <property name="slice" value="io/airlift/slice/0.7/slice-0.7.jar"/>
 <property name="nanohttpd" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1.jar"/>
@@ -20,6 +21,7 @@
 	<get src="${repo}${presto}" dest="lib"/>
 	<get src="${repo}${presto-src}" dest="lib"/>
 	<get src="${repo}${guava}" dest="lib"/>
+	<get src="${repo}${guava-src}" dest="lib"/>
 	<get src="${repo}${antlr}" dest="lib"/>
 	<get src="${repo}${slice}" dest="lib"/>
 	<get src="${repo}${nanohttpd}" dest="lib"/>
