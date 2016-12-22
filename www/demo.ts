@@ -237,14 +237,29 @@ function makePuzzlePiece(options):any {
 	});
 	// const bbox = text.getBoundingRect();
 
-	const group = new fabric.Group([path, text],
+	const group:any = new fabric.Group([path, text],
 	{
 		hasControls:false,
 		hasBorders:false
 	});
 
-	(<any>group).puzzleOffset = puzzleOffsetPoint;
+	group.puzzleOffset = puzzleOffsetPoint;
 	
+	group.getGridPoint = function():fabric.IPoint {
+		return new fabric.Point(
+			Math.round((this.left + this.puzzleOffset.x - gridOffset.x) / piecewidth),
+			Math.round((this.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
+	};
+
+	group.setGridPoint = function(point:fabric.IPoint):void {
+		this.setGridCoords(point.x, point.y);
+	};
+
+	group.setGridCoords = function(x:number, y:number):void {
+		this.left = x * piecewidth - this.puzzleOffset.x + gridOffset.x;
+		this.top = y * pieceheight - this.puzzleOffset.y + gridOffset.y;
+		this.setCoords();
+	};
 
 	return group;
 }
@@ -270,22 +285,6 @@ function mkSourcePiece(options):IPuzzlePiece {
 	  this.top = y;
 	  this.setCoords();
   	};
-
-	group.getGridPoint = function():fabric.IPoint {
-		return new fabric.Point(
-			Math.round((this.left + this.puzzleOffset.x - gridOffset.x) / piecewidth),
-			Math.round((this.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
-	};
-
-	group.setGridPoint = function(point:fabric.IPoint):void {
-		this.setGridCoords(point.x, point.y);
-	};
-
-	group.setGridCoords = function(x:number, y:number):void {
-		this.mySetLeftAndTop(x * piecewidth - this.puzzleOffset.x + gridOffset.x, 
-							y * pieceheight - this.puzzleOffset.y + gridOffset.y);
-		this.setCoords();
-	};
 
 	// snap to grid
 
@@ -487,6 +486,10 @@ function mkSourcePiece(options):IPuzzlePiece {
 function init() {
     var canvas = new fabric.Canvas('main-canvas');
 	canvas.hoverCursor = 'pointer';
+	// TODO: at some point enable this
+	// but upon creation remove any inappropriate (source) elements
+	// and set up the mouse up/down/hover code
+	// taking care that the algorithm may now need to move things multiple spaces
 	canvas.selection = false;
 
 	// canvas.on('selection:created', function (event) {
@@ -507,17 +510,21 @@ function init() {
 	//canvas.selection = false;
 
 	// create the start piece
-	// var startPiece = makePuzzlePiece({
-	// 	left : 10,
-	// 	top : canvasHeightPipeline,
-	// 	fill : 'green',
-	// 	label : 'start',
-	// 	sides : {right:-1},
-	// 	hasControls : false,
-	// 	selectable : false,
-	// 	evented : false
-	// });
-	// canvas.add(startPiece);
+	// note that the start piece is meant to have a "real" piece put on top of it by the user
+	var startPiece = makePuzzlePiece({
+		fill : '#c2f0c2',
+		label : 'start',
+		sides : {right:-1},
+		hasControls : false,
+		selectable : false,
+		evented : false
+	});
+	startPiece.setGridCoords(0, 1);
+	startPiece.set({
+		selectable: false,
+		hoverCursor:'auto'
+	});
+	canvas.add(startPiece);
 
 	const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
 	let maxCols:number = 0;
