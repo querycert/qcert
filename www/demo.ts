@@ -532,7 +532,7 @@ function init() {
 		selectable : false,
 		evented : false
 	});
-	startPiece.setGridCoords(0, 1);
+	startPiece.setGridCoords(0, pipelineRow);
 	startPiece.set({
 		hasControls : false,
 		selectable: false
