@@ -13,8 +13,8 @@ interface PuzzleSides {
 	const piecewidth = 100;
 	const pieceheight = 100;
 
-	const gridRows = 3;
-	const pipelineRow = 1;
+	const gridRows = 2;
+	const pipelineRow = 0;
 
 	const gridOffset:fabric.IPoint = new fabric.Point(22,20);
 	const canvasHeightInteractive = gridRows*pieceheight+gridOffset.y*2;
