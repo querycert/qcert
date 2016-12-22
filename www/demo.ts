@@ -190,9 +190,11 @@ interface StringMap<V> {
 	[K: string]: V;
 }
 
+// These are two critical arrays for the buider
+// This is the collection of source pieces
 var sourcePieces:StringMap<IPuzzlePiece> = {};
+// This is the matrix of pieces that are in the grid
 var placedPieces:IPuzzlePiece[][] = [];
-
 
 
 function makePuzzlePiece(options):any {
@@ -496,14 +498,31 @@ function mkSourcePiece(options):IPuzzlePiece {
 	return piece;
 }
 
-function init() {
-    var canvas = new fabric.Canvas('main-canvas');
+interface ICanvasTab {
+       label:string;
+       rectOptions?:fabric.IRectOptions;
+       textOptions?:fabric.ITextOptions;
+       show():void;
+       hide():void;
+	   canvasObj?:fabric.IObject;
+}
+
+const defaultTabTextOpts:fabric.ITextOptions = { 
+	fontFamily: 'Impact',
+  	stroke: '#c3bfbf',
+  	strokeWidth: 1
+};
+
+const defaultTabRectOpts:fabric.IRectOptions = {
+	cornerSize:2,
+	strokeLineCap:'round'
+}
+
+function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 	// TODO: at some point enable this
 	// but upon creation remove any inappropriate (source) elements
 	// and set up the mouse up/down/hover code
 	// taking care that the algorithm may now need to move things multiple spaces
-	canvas.selection = false;
-	canvas.hoverCursor = 'pointer';
 
 	// canvas.on('selection:created', function (event) {
 	// 	canvas.getActiveGroup().set({hasControls : false});
@@ -517,7 +536,6 @@ function init() {
 	// 	});
 	// });
 	
-	canvas.add(separatorLine);
 	separatorLine.set('visible', true);
 	// disable group selection
 	//canvas.selection = false;
@@ -539,8 +557,6 @@ function init() {
 	});
 	startPiece.hoverCursor = 'auto';
 	
-
-	canvas.add(startPiece);
 
 	const runText = new fabric.Text('R\nu\nn', {
 		left:2,
@@ -588,8 +604,6 @@ function init() {
 		}
 	});
 
-	canvas.add(runGroup);
-
 	const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
 	let maxCols:number = 0;
 	// create the list of languages that can be dragged onto the canvas
@@ -610,18 +624,174 @@ function init() {
 			colelem.col = srccol;
 			let piece = mkSourcePiece(colelem);
 			sourcePieces[colelem.langid] = piece;
-			canvas.add(piece);
 		}
 		maxCols = Math.max(srccol, maxCols);
 	}
-	// make sure the canvas is wide enough
-	ensureCanvasSourcePieceWidth(canvas, maxCols);
 
-	// TODO: This number should be automatically calculated
 	const canvasHeightChooser = srcrow;
 	const totalCanvasHeight = getSourceTop(srcrow)-15;
 
-	canvas.setHeight(totalCanvasHeight);
 
-	canvas.renderAll();
+	const canvasElement = document.getElementById('main-canvas');
+	const tab:ICanvasTab = {
+              label:"Builder",
+               rectOptions:{fill:'orange'},
+               show:function() {
+				   	canvas.selection = false;
+					canvas.hoverCursor = 'pointer';
+
+					canvas.add(startPiece);
+					//canvas.add(runGroup);
+					canvas.add(separatorLine);
+
+					// add the source pieces
+					for(let piece in sourcePieces) {
+						canvas.add(sourcePieces[piece]);
+					}
+
+					// add the grid pieces
+					const placedRows = placedPieces.length;
+					for(let row=0;row < placedRows; row++) {
+						const prow = placedPieces[row];
+						if(prow !== undefined) {
+							const placedCols = prow.length;
+							for(let col=0;col < placedCols; col++) {
+								const piece = prow[col];
+								if (piece !== undefined) {
+									canvas.add(piece);
+								}
+							}
+						}
+					}
+					// make sure the canvas is wide enough
+					ensureCanvasSourcePieceWidth(canvas, maxCols);
+					// TODO: also make sure that it is wide enough for the pieces in the grid
+					canvas.setHeight(totalCanvasHeight);
+					canvas.renderAll();
+				},
+        		hide:function() {
+                       canvas.clear();
+               }
+       };
+	return tab;
 }
+
+function init_input(canvas:fabric.ICanvas):ICanvasTab {
+		const rect = new fabric.Rect({
+		left: 10, top: 5, width:200, height:50, fill:'purple',
+		hasBorders:false, 
+		hasControls:false,
+		selectable:false
+       });
+       
+       const tab:ICanvasTab = {
+               label:"Input",
+               rectOptions:{fill:'orange'},
+               show:function() {
+				    canvas.selection = false;
+                    canvas.add(rect);
+               },
+               hide:function() {
+                       canvas.clear();                
+               }
+       };
+	   return tab;
+}
+
+function makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
+       const ropts = fabric.util.object.clone(defaultTabRectOpts);
+	   fabric.util.object.extend(ropts, tab.rectOptions || {});
+
+       ropts.left = left;
+       ropts.top = top;
+       ropts.editable = false;
+       ropts.height = ropts.height || 50;
+       ropts.width = ropts.width || 200;
+       const box = new fabric.Rect(ropts);
+
+
+	   const topts = fabric.util.object.clone(defaultTabTextOpts)
+	   fabric.util.object.extend(topts, tab.textOptions || {});
+       topts.left = 0;
+       topts.top = 0;
+       topts.editable = false;
+       const text = new fabric.IText(tab.label, topts);
+       // calculate where it should appear.
+
+       // if needed, shrink the font so that the text
+       // is not too large
+       let boundingBox = text.getBoundingRect();
+       const maxwidth = ropts.width - 4;
+       while(boundingBox.width > maxwidth) {
+               text.setFontSize(text.getFontSize()-2);
+
+               text.setCoords();
+               boundingBox = text.getBoundingRect();
+       }
+
+	   
+       text.originX = 'left';
+       text.left = ropts.left + (ropts.width -  boundingBox.width) / 2;
+       text.originY = 'top';
+       text.top = ropts.top;
+       text.height = ropts.height;
+       text.width = ropts.width;
+       text.setTextAlign('center');
+       text.setCoords();
+       const group = new fabric.Group([box, text]);
+	   group.hasControls = false;
+	   group.hasBorders = false;
+	   group.lockMovementX = true;
+	   group.lockMovementY = true;
+	   tab.canvasObj = group;
+	   group.setOpacity(0.3);
+       return group;
+}
+
+let currentTab:ICanvasTab = null;
+function switchTab(tab:ICanvasTab) {
+	if(currentTab != null) {
+		if('canvasObj' in currentTab) {
+			const tabobj = currentTab.canvasObj;
+			tabobj.setOpacity(0.3);
+		}
+		currentTab.hide();
+	}
+	currentTab = tab;
+	tab.show();
+	if('canvasObj' in tab) {
+		const tabobj = tab.canvasObj;
+		tabobj.setOpacity(1);
+	}
+}
+
+function init_tabs(canvas:fabric.ICanvas, tabs:ICanvasTab[]) {
+       canvas.selection = false;
+
+       const tabTop = 5;
+       let tabLeft = 10;
+
+       for(let i=0; i < tabs.length; i++) {
+               const itab = tabs[i];
+               const tabgroup = makeTab(canvas, itab, tabTop, tabLeft);
+               tabLeft += tabgroup.getBoundingRect().width;
+               tabgroup.hoverCursor = 'pointer';
+               tabgroup.on('selected', function() {
+				   switchTab(itab);
+               });
+
+               canvas.add(tabgroup);
+       }
+}
+
+function init():void {
+	const maincanvas = new fabric.Canvas('main-canvas');
+	const tabscanvas = new fabric.Canvas('tabs-canvas');
+
+	const builderTab = init_builder(maincanvas);
+	const inputTab = init_input(maincanvas);
+	init_tabs(tabscanvas, [builderTab, inputTab]);
+	switchTab(builderTab);
+	tabscanvas.renderAll();
+}
+
