@@ -167,6 +167,7 @@ interface IPuzzlePiece extends fabric.IObject {
 	isSourcePiece?:boolean;
 	movePlace?:{left:number, top:number};
 	langid:string;
+	label:string;
 	langdescription:string;
 	tooltipObj?:fabric.IObject;
 	puzzleOffset:fabric.IPoint;
@@ -322,6 +323,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 	
 	group.isSourcePiece = true;
 	group.langid = options.langid;
+	group.label = options.label;
 	group.langdescription = options.langdescription;
 
 	group.mySetLeft = function(x:number) {
@@ -784,14 +786,116 @@ function init_tabs(canvas:fabric.ICanvas, tabs:ICanvasTab[]) {
        }
 }
 
+function getPipelinePieces():IPuzzlePiece[] {
+	const prow = placedPieces[pipelineRow];
+	const path = [];
+	if(prow === undefined) {
+		return path;
+	}
+	const rowLen = prow.length;
+	for(let col = 0; col < rowLen; col++) {
+		const piece = prow[col];
+		if(piece === undefined) {
+			return path;
+		}
+		path.push(piece);
+	}
+	return path;
+}
+
+function getPipelineLangs():QcertLanguage[] {
+	return getPipelinePieces().map(function (piece) {
+				return piece.langid;
+	});
+}
+
+function expandLangsPath(path:QcertLanguage[]):{id:QcertLanguage,explicit:boolean}[] {
+	let expanded = [];
+	const pathLen = path.length;
+	if(path == null || pathLen == 0) {
+		return expanded;
+	}
+
+	let prev = path[0];
+	expanded.push({id:prev, explicit:true});
+	for(let i = 1; i < pathLen; i++) {
+		const cur = path[i];
+		const curPath = qcertLanguagesPath({
+			source: prev,
+			target:cur
+		}).path;
+		const curPathLen = curPath.length;
+
+		if(curPath == null 
+		|| curPathLen == 0
+		|| (curPathLen == 1 && curPath[0] == "error")) {
+			expanded.push("error");
+		} else {
+			for(let j = 1; j < curPathLen; j++) {
+				expanded.push({id:curPath[j], explicit:(j+1)==curPathLen});
+			}
+		}
+		prev = cur;
+	}
+
+	return expanded;
+}
+
+function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):string {
+	const lang = langpack.id;
+	let str:string = "";
+	if(lang in sourcePieces) {
+		str = sourcePieces[lang].label;
+	} else {
+		str = "error";
+	}
+
+	if(! langpack.explicit) {
+		str = "[" + str + "]";
+	}
+	return str;
+}
+
+function init_path(canvas:fabric.ICanvas):ICanvasTab {
+
+       const tab:ICanvasTab = {
+               label:"Path",
+               rectOptions:{fill:'orange'},
+               show:function() {
+				    canvas.selection = false;
+					const langs = getPipelineLangs();
+					const expanded = expandLangsPath(langs);
+					const path = expanded.map(getLanguageMarkedLabel).join(" -> ");
+
+					const txt = new fabric.Text(path, {
+						left: 10, top: 5, width:200, height:50, fill:'purple'
+					});
+					
+
+                    canvas.add(txt);
+               },
+               hide:function() {
+                       canvas.clear();                
+               }
+       };
+	   return tab;
+}
+
+const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
+	init_builder,
+	init_input,
+	init_path
+];
+
 function init():void {
 	const maincanvas = new fabric.Canvas('main-canvas');
 	const tabscanvas = new fabric.Canvas('tabs-canvas');
 
-	const builderTab = init_builder(maincanvas);
-	const inputTab = init_input(maincanvas);
-	init_tabs(tabscanvas, [builderTab, inputTab]);
-	switchTab(builderTab);
+	const tabs = tabinitlist.map(function (elem) {
+		return elem(maincanvas)
+	});
+	init_tabs(tabscanvas, tabs);
+	switchTab(tabs[0]);
 	tabscanvas.renderAll();
 }
 
