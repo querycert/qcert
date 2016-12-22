@@ -18,12 +18,9 @@ interface PuzzleSides {
 
 	const gridOffset:fabric.IPoint = new fabric.Point(22,20);
 	const canvasHeightInteractive = gridRows*pieceheight+gridOffset.y*2;
-	// TODO: This number should be automatically calculated
-	const canvasHeightChooser = 400;
 
 	// we should set canvas width appropriately
 	let totalCanvasWidth = 1000;
-	const totalCanvasHeight = canvasHeightInteractive + canvasHeightChooser;
 
 	function getSourceLeft(left:number):number {
 		return left*(piecewidth + 30) + 20;
@@ -596,7 +593,8 @@ function init() {
 	const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
 	let maxCols:number = 0;
 	// create the list of languages that can be dragged onto the canvas
-	for(var srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
+	let srcrow=0;
+	for(srcrow=0; srcrow < srcLangDescripts.length; srcrow++) {
 		let rowelem = srcLangDescripts[srcrow];
 		if(rowelem == null) {
 			continue;
@@ -618,6 +616,10 @@ function init() {
 	}
 	// make sure the canvas is wide enough
 	ensureCanvasSourcePieceWidth(canvas, maxCols);
+
+	// TODO: This number should be automatically calculated
+	const canvasHeightChooser = srcrow;
+	const totalCanvasHeight = getSourceTop(srcrow)-15;
 
 	canvas.setHeight(totalCanvasHeight);
 
