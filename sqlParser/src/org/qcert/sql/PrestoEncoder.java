@@ -16,6 +16,7 @@
 package org.qcert.sql;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -27,7 +28,14 @@ import com.facebook.presto.sql.parser.ParsingException;
 import com.facebook.presto.sql.parser.SqlBaseLexer;
 import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
+import com.facebook.presto.sql.tree.CreateView;
 import com.facebook.presto.sql.tree.Node;
+import com.facebook.presto.sql.tree.Query;
+import com.facebook.presto.sql.tree.QueryBody;
+import com.facebook.presto.sql.tree.QuerySpecification;
+import com.facebook.presto.sql.tree.Select;
+import com.facebook.presto.sql.tree.SelectItem;
+import com.facebook.presto.sql.tree.SingleColumn;
 import com.facebook.presto.sql.tree.Statement;
 
 /**
@@ -70,7 +78,6 @@ public class PrestoEncoder {
 	 * @return the S-expression string
 	 */
 	public static String parseAndEncode(String sourceString, boolean interleaved, boolean useDateNameHeuristic) {
-		sourceString = applyLexicalFixups(sourceString);
 		if (interleaved)
 			return interleavedParseAndEncode(sourceString, useDateNameHeuristic);
 		return encode(parse(sourceString), useDateNameHeuristic);
@@ -78,52 +85,84 @@ public class PrestoEncoder {
 	
 	/**
 	 * Apply necessary fixups at the lexical level (needed to get the query to even be parsed by presto-parser).
-	 * 1.  Convert occurances of NN [days|months|years] to interval NN [day|month|year] (needed by many TPC-DS queries).
-	 * 2.  Remove parenthesized numeric field after an interval unit field (needed to run TPC-H query 1). 
+	 * 1.  Convert occurances of 'NN [days|months|years]' to 'interval NN [day|month|year]' (needed by many TPC-DS queries).
+	 * 2.  Remove parenthesized numeric field after an interval unit field (needed to run TPC-H query 1).
+	 * 3.  Remove parenthesized name list in 'create view NAME (...) as' and relocate the names into the body of the statement (needed to run TPC-H query 15).
+	 * Fixup 3 is only partially lexical; the lexical phase remembers the names and a visitor updates the body after parsing.  
 	 * @param query the original query
+	 * @param foundNames an initially empty list to which names found in fixup 3 may be added for later processing
 	 * @return the altered query
 	 */
-	private static String applyLexicalFixups(String query) {
+	private static String applyLexicalFixups(String query, List<String> foundNames) {
 	    CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
 		SqlBaseLexer lexer = new SqlBaseLexer(stream);
 		StringBuilder buffer = new StringBuilder();
 		Token savedInteger = null;
-		PrestoEncoder.FixupState state = PrestoEncoder.FixupState.OPEN;
+		FixupState state = FixupState.OPEN;
 		for (Token token : lexer.getAllTokens()) {
+			/* The 'state' is used for fixups 2 and 3 */
 			switch (state) {
 			case ELIDE1:
-				state = PrestoEncoder.FixupState.ELIDE2;
+				state = FixupState.ELIDE2;
 				continue;
 			case ELIDE2:
-				state = PrestoEncoder.FixupState.OPEN;
+				state = FixupState.OPEN;
+				continue;
+			case ELIDELIST:
+				if (token.getType() == SqlBaseLexer.AS) {
+					buffer.append(token.getText());
+					state = FixupState.OPEN;
+				} else if (token.getType() != SqlBaseLexer.WS && !token.getText().equals(",") && !token.getText().equals(")")) {
+					foundNames.add(token.getText());
+				}
+				continue;
+			case CREATE:
+				buffer.append(token.getText());
+				if (token.getType() == SqlBaseLexer.VIEW)
+					state = FixupState.VIEW;
+				else if (token.getType() != SqlBaseLexer.WS)
+					state = FixupState.OPEN;
+				continue;
+			case VIEW:
+				if (token.getText().equals("(")) {
+					state = FixupState.ELIDELIST;
+				} else {
+					buffer.append(token.getText());
+					if (token.getType() == SqlBaseLexer.AS)
+						state = FixupState.OPEN;
+				}
 				continue;
 			case INTERVAL:
 				buffer.append(token.getText());
-				if (PrestoEncoder.getUnit(token.getText()) != null)
-					state = PrestoEncoder.FixupState.UNIT;
+				if (getUnit(token.getText()) != null)
+					state = FixupState.UNIT;
 				continue;
 			case UNIT:
 				if (token.getText().equals("(")) {
-					state = PrestoEncoder.FixupState.ELIDE1;
+					state = FixupState.ELIDE1;
 				} else {
 					buffer.append(token.getText());
 					if (token.getType() != SqlBaseLexer.WS)
-						state = PrestoEncoder.FixupState.OPEN;
+						state = FixupState.OPEN;
 				}
 				continue;
 			case OPEN:
-			default:
 				if (token.getType() == SqlBaseLexer.INTERVAL) {
-					state = PrestoEncoder.FixupState.INTERVAL;
+					state = FixupState.INTERVAL;
 					buffer.append(token.getText());
 					continue;
-				}
+				} else if (token.getType() == SqlBaseLexer.CREATE) {
+					state = FixupState.CREATE;
+					buffer.append(token.getText());
+					continue;
+				} // If 'open' and there is not a transition to another state, break the switch and try fixup 1.  This should be the only break in the switch.
 				break;
 			}
+			/* The 'savedInteger' is used for fixup 1 */
 			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
 				savedInteger = token;
 			else if (savedInteger != null) {
-				String unit = PrestoEncoder.getUnit(token.getText());
+				String unit = getUnit(token.getText());
 				if (unit != null) {
 					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
 					savedInteger = null;
@@ -137,6 +176,31 @@ public class PrestoEncoder {
 				buffer.append(token.getText());
 		}
 		return buffer.toString();
+	}
+
+	/**
+	 * Distribute names found during lexical fixup of a 'create view' statement
+	 * @param view the statement
+	 * @param names the names
+	 * @return a new create view statement with the names distributed into the body
+	 */
+	private static CreateView distributeNames(CreateView view, List<String> names) {
+		if (view.getQuery().getQueryBody() instanceof QuerySpecification) {
+			QuerySpecification body = (QuerySpecification) view.getQuery().getQueryBody();
+			Select select = body.getSelect();
+			if (select.getSelectItems().size() != names.size())
+				throw new IllegalStateException("Don't know how to distribute names for 'create view' statement when the number of select items doesn't match the number of names");
+			List<SelectItem> newItems = new ArrayList<>();
+			Iterator<String> namesIter = names.iterator();
+			for (SelectItem oldItem : select.getSelectItems()) {
+				newItems.add(new SingleColumn(((SingleColumn) oldItem).getExpression(), namesIter.next()));
+			}
+			body = new QuerySpecification(new Select(select.isDistinct(), newItems), body.getFrom(), body.getWhere(), body.getGroupBy(), 
+					body.getHaving(), body.getOrderBy(), body.getLimit());
+			return new CreateView(view.getName(), new Query(view.getQuery().getWith(), body, view.getQuery().getOrderBy(), 
+					view.getQuery().getLimit()), view.isReplace());
+		}
+		throw new IllegalStateException("Don't know how to distribute names for 'create view' statement when body is not a QuerySpecification");
 	}
 
 	/**
@@ -172,7 +236,7 @@ public class PrestoEncoder {
 			String body = statement.statement();
 			Statement result;
 			try {
-				result = parser.createStatement(body);
+				result = parseStatement(parser, body);
 			} catch (Exception e) {
 				String msg = e.getMessage();
 				if (msg == null)
@@ -204,7 +268,7 @@ public class PrestoEncoder {
 
 		for(com.facebook.presto.sql.parser.StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
 			String body = statement.statement();
-			Statement result = parser.createStatement(body);
+			Statement result = parseStatement(parser, body);
 			results.add(result);
 		}
 
@@ -215,8 +279,24 @@ public class PrestoEncoder {
 		return results;
 	}
 
-	/** Enumeration used in lexical fixups of interval syntax */
+	/** Parse an individual statement, applying lexical fixups first */
+	private static Statement parseStatement(SqlParser parser, String body) {
+		List<String> names = new ArrayList<>();
+		Statement result = parser.createStatement(applyLexicalFixups(body, names));
+		if (!names.isEmpty())
+			result = distributeNames((CreateView) result, names); // No CCE possible since result must be a CreateView in this case
+		return result;
+	}
+
+	/** Enumeration used in lexical fixups */
 	private enum FixupState {
-		OPEN, INTERVAL, UNIT, ELIDE1, ELIDE2
+		OPEN, /* no interval or create view observed */ 
+		INTERVAL, /* observed 'interval' but not yet any unit */ 
+		UNIT, /* observed a unit, not yet eliding */ 
+		ELIDE1, /* started eliding paren'd number */ 
+		ELIDE2, /* still eliding paren'd number */
+		CREATE, /* observed 'create', not yet 'view' */
+		VIEW, /* observed 'view' after 'create' */
+		ELIDELIST, /* observed parenthesized list after 'view', before 'as' and names are being elided and saved */
 	}
 }
