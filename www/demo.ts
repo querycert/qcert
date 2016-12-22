@@ -12,9 +12,14 @@ interface PuzzleSides {
 // these must remain 100 for the puzzle piece path stuff to work out
 	const piecewidth = 100;
 	const pieceheight = 100;
-	const canvasHeightPipeline = 100
-	const canvasHeightInteractive = 300;
-	const canvasHeightChooser = 300;
+
+	const gridRows = 3;
+
+	const gridOffset:fabric.IPoint = new fabric.Point(20,20);
+	const canvasHeightInteractive = gridRows*pieceheight+gridOffset.y*2;
+	// TODO: This number should be automatically calculated
+	const canvasHeightChooser = 400;
+
 	// we should set canvas width appropriately
 	let totalCanvasWidth = 1000;
 	const totalCanvasHeight = canvasHeightInteractive + canvasHeightChooser;
@@ -24,7 +29,7 @@ interface PuzzleSides {
 	}
 
 	function getSourceTop(top:number):number {
-		return canvasHeightInteractive + top*(pieceheight+30) + 10;
+		return canvasHeightInteractive + top*(pieceheight+30) + 20;
 	}
 
 	// The set of languages and their properties
@@ -166,6 +171,10 @@ interface IPuzzlePiece extends fabric.IObject {
 	langid:string;
 	langdescription:string;
 	tooltipObj?:fabric.IObject;
+	puzzleOffset:fabric.IPoint;
+	getGridPoint:()=>fabric.IPoint;
+	setGridPoint:(point:fabric.IPoint)=>void;
+	setGridCoords:(x:number, y:number)=>void;
 
 	// these are to help avoid accidentally setting
 	// left or top without calling setCoords() after as required
@@ -177,68 +186,7 @@ interface IPuzzlePiece extends fabric.IObject {
 }
 
 // The class for a puzzle piece object
-var PuzzlePiece:new(args:any)=>IPuzzlePiece = <any>fabric.util.createClass(fabric.Rect, {
 
-  type: 'puzzlePiece',
-
-  initialize: function(options) {
-    options || (options = { });
-	options.width = piecewidth;
-	options.height = pieceheight;
-    this.callSuper('initialize', options);
-    this.set('label', options.label || '');
-
-	const puzzleSides:PuzzleSides = options.sides || {};
-	const puzzleLeft = puzzleSides.left || 0;
-	const puzzleRight = puzzleSides.right || 0;
-	const puzzleTop = puzzleSides.top || 0;
-	const puzzleBottom = puzzleSides.bottom || 0;
-
-	var path = new fabric.Path(getMask(1, puzzleTop, puzzleRight, puzzleBottom, puzzleLeft));
-	path.centeredScaling = true;
-    path.scale(1);
-
-    //path.selectable = true;
-    path.originX = 'center';
-    path.originY = 'center';
-	this.puzzlePath = path;
-	this.set('clipTo', function (ctxt) {
-		const p:any = path;
-	 	p._render(ctxt);
-	});
-
-  },
-
-  mySetLeft: function(x:number) {
-	  this.left = x;
-	  this.setCoords();
-  },
-  mySetTop: function(y:number) {
-	  this.top = y;
-	  this.setCoords();
-  },
-  mySetLeftAndTop: function(x:number, y:number) {
-	  this.left = x;
-	  this.top = y;
-	  this.setCoords();
-  },
-
-
-  toObject: function() {
-    return fabric.util.object.extend(this.callSuper('toObject'), {
-      label: this.get('label')
-    });
-  },
-
-  _render: function(ctx) {
-    this.callSuper('_render', ctx);
-    ctx.font = '20px Helvetica';
-    ctx.fillStyle = '#333';
-	ctx.textAlign='center';
-	ctx.textStyle='bold';
-    ctx.fillText(this.label, -this.width/2+50, -this.height/2 + 30);
-  }
-});
 
 interface StringMap<V> {
 	[K: string]: V;
@@ -247,21 +195,104 @@ interface StringMap<V> {
 var sourcePieces:StringMap<IPuzzlePiece> = {};
 var placedPieces:IPuzzlePiece[][] = [];
 
-function mkSourcePiece(options):IPuzzlePiece {
 
-	let piece = new PuzzlePiece({
-		left : getSourceLeft(options.col || 0),
-		top : getSourceTop(options.row || 0),
-		fill : options.fill || 'purple',
-		label : options.label,
-		sides : options.sides || {},
-		hasControls : false,
-		hasBorders : false
+
+function makePuzzlePiece(options):any {
+	    options || (options = { });
+	options.width = piecewidth;
+	options.height = pieceheight;
+
+	const puzzleSides:PuzzleSides = options.sides || {};
+	const puzzleLeft = puzzleSides.left || 0;
+	const puzzleRight = puzzleSides.right || 0;
+	const puzzleTop = puzzleSides.top || 0;
+	const puzzleBottom = puzzleSides.bottom || 0;
+
+	function calcPuzzleEdgeOffset(side:number):number {
+		if(side < 0) {
+			return 9;
+		} else if(side > 0) {
+			return 20;
+		} else {
+			return 0;
+		}
+	}
+	const puzzleOffsetPoint = new fabric.Point(	calcPuzzleEdgeOffset(puzzleLeft),
+						calcPuzzleEdgeOffset(puzzleTop));
+
+
+	options.left = getSourceLeft(options.col || 0) - puzzleOffsetPoint.x;
+	options.top = getSourceTop(options.row || 0) - puzzleOffsetPoint.y;
+	options.hasControls = false;
+	options.hasBorders = false;
+	const path = new fabric.Path(getMask(1, puzzleTop, puzzleRight, puzzleBottom, puzzleLeft), options);
+
+// fix where the text appears
+	const text = new fabric.Text(options.label, {
+		fill: '#333',
+		fontWeight: 'bold',
+		fontSize: 20,
+		left: options.left + 10 + (puzzleLeft > 0 ? 23 : 0),
+		top: options.top + 10
 	});
+	// const bbox = text.getBoundingRect();
+
+	const group = new fabric.Group([path, text],
+	{
+		hasControls:false,
+		hasBorders:false
+	});
+
+	(<any>group).puzzleOffset = puzzleOffsetPoint;
 	
-	piece.isSourcePiece = true;
-	piece.langid = options.langid;
-	piece.langdescription = options.langdescription;
+
+	return group;
+}
+
+function mkSourcePiece(options):IPuzzlePiece {
+	const group = makePuzzlePiece(options);
+	
+	
+	group.isSourcePiece = true;
+	group.langid = options.langid;
+	group.langdescription = options.langdescription;
+
+	group.mySetLeft = function(x:number) {
+	  group.left = x;
+	  this.setCoords();
+  	};
+  	group.mySetTop = function(y:number) {
+	  this.top = y;
+	  this.setCoords();
+  	};
+  	group.mySetLeftAndTop = function(x:number, y:number) {
+	  this.left = x;
+	  this.top = y;
+	  this.setCoords();
+  	};
+
+	group.getGridPoint = function():fabric.IPoint {
+		return new fabric.Point(
+			Math.round((this.left + this.puzzleOffset.x - gridOffset.x) / piecewidth),
+			Math.round((this.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
+	};
+
+	group.setGridPoint = function(point:fabric.IPoint):void {
+		this.setGridCoords(point.x, point.y);
+	};
+
+	group.setGridCoords = function(x:number, y:number):void {
+		this.mySetLeftAndTop(x * piecewidth - this.puzzleOffset.x + gridOffset.x, 
+							y * pieceheight - this.puzzleOffset.y + gridOffset.y);
+		this.setCoords();
+	};
+
+	// snap to grid
+
+
+
+	const piece:IPuzzlePiece = group;
+
 	// TODO: when me move something, shift things to the right back over it (to the left)
 	// be careful how that interacts with the shift right code!
 	// TODO: work on getting things to move out of the way
@@ -299,18 +330,19 @@ function mkSourcePiece(options):IPuzzlePiece {
 	};
 
 	piece.on('mousedown', mousedownfunc);
+
 	piece.on('mouseup', function() {
 		piece.set({
 			opacity:1
 		});
+		const gridp = piece.getGridPoint();
+		const leftentry = gridp.x;
+		const topentry = gridp.y;
 
-		const topentry = Math.round(piece.top / pieceheight);
-		const leftentry = Math.round(piece.left / piecewidth);
-
-		// snap to grid
-		piece.mySetLeftAndTop(leftentry * piecewidth, topentry * pieceheight);
+		piece.setGridPoint(gridp);
 	
 		if(!piece.isSourcePiece) {
+			// fix this to use grid coordinates
 			if(piece.top >= canvasHeightInteractive) {
 				piece.canvas.remove(piece);
 			}
@@ -346,8 +378,10 @@ function mkSourcePiece(options):IPuzzlePiece {
 //		piece.canvas.renderAll();
 	});
 	piece.on('moving', function() {
-		const topentry = Math.round(piece.top / pieceheight);
-		const leftentry = Math.round(piece.left / piecewidth);
+		const gridp = piece.getGridPoint();
+		const leftentry = gridp.x;
+		const topentry = gridp.y;
+
 
 		if('movePlace' in piece) {
 			if(piece.movePlace.left == leftentry && piece.movePlace.top == topentry) {
@@ -364,7 +398,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 					if(mp === undefined) {
 						break;
 					}
-					mp.mySetLeft(oldleft*piecewidth);
+					mp.setGridCoords(oldleft, oldtop);
 					oldleft = oldleft + 1;
 				}
 			}
@@ -378,7 +412,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 				if(mp === undefined) {
 					break;
 				}
-				mp.mySetLeft((curleft+1)*piecewidth);
+				mp.setGridCoords(curleft+1, topentry);
 				curleft = curleft + 1;
 			}
 		}
@@ -402,8 +436,10 @@ function mkSourcePiece(options):IPuzzlePiece {
 				let boundingBox = text.getBoundingRect();
 				const maxwidth = piece.canvas.getWidth()*3/4;
 
-				if(boundingBox.width > maxwidth) {
-					text.setWidth(maxwidth);
+				// if needed, shrink the font so that the text
+				// is not too large
+				while(boundingBox.width > maxwidth) {
+					text.setFontSize(text.getFontSize()-2);
 					text.setCoords();
 					boundingBox = text.getBoundingRect();
 				}
@@ -471,17 +507,17 @@ function init() {
 	//canvas.selection = false;
 
 	// create the start piece
-	var startPiece = new PuzzlePiece({
-		left : 10,
-		top : canvasHeightPipeline,
-		fill : 'green',
-		label : 'start',
-		sides : {right:-1},
-		hasControls : false,
-		selectable : false,
-		evented : false
-	});
-	canvas.add(startPiece);
+	// var startPiece = makePuzzlePiece({
+	// 	left : 10,
+	// 	top : canvasHeightPipeline,
+	// 	fill : 'green',
+	// 	label : 'start',
+	// 	sides : {right:-1},
+	// 	hasControls : false,
+	// 	selectable : false,
+	// 	evented : false
+	// });
+	// canvas.add(startPiece);
 
 	const srcLangDescripts = getSrcLangDescripts(qcertLanguages());
 	let maxCols:number = 0;
@@ -509,16 +545,7 @@ function init() {
 	// make sure the canvas is wide enough
 	ensureCanvasSourcePieceWidth(canvas, maxCols);
 
-    // // create grid
-    // for (var i = 0; i < (600 / grid); i++) {
-    //   canvas.add(new fabric.Line([ i * grid, 0, i * grid, 600], { stroke: '#ccc', selectable: false }));
-    //   canvas.add(new fabric.Line([ 0, i * grid, 600, i * grid], { stroke: '#ccc', selectable: false }))
-    // }
+	canvas.setHeight(totalCanvasHeight);
 
-	// sourceCollection[1].set({
-	// 	clipTo: function (ctxt) {
-	// 		path._render(ctxt);
-	// 	}
-	// });
 	canvas.renderAll();
 }
