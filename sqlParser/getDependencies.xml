@@ -2,11 +2,13 @@
 
 <property name="repo" value="http://central.maven.org/maven2/"/>
 
-<property name="presto" value="com/facebook/presto/presto-parser/0.152.3/presto-parser-0.152.3.jar"/>
+<property name="presto" value="com/facebook/presto/presto-parser/0.161/presto-parser-0.161.jar"/>
+<property name="presto-src" value="com/facebook/presto/presto-parser/0.161/presto-parser-0.161-sources.jar"/>
 <property name="guava" value="com/google/guava/guava/19.0/guava-19.0.jar"/>
 <property name="antlr" value="org/antlr/antlr4-runtime/4.5.3/antlr4-runtime-4.5.3.jar"/>
 <property name="slice" value="io/airlift/slice/0.7/slice-0.7.jar"/>
 <property name="nanohttpd" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1.jar"/>
+<property name="nanohttpd-src" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1-sources.jar"/>
 <property name="httpclient" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
 <property name="httpcore" value="org/apache/httpcomponents/httpcore/4.4.5/httpcore-4.4.5.jar"/>
 <property name="logging" value="commons-logging/commons-logging/1.2/commons-logging-1.2.jar"/>
@@ -16,10 +18,12 @@
 	<delete dir="lib"/>
 	<mkdir dir="lib"/>
 	<get src="${repo}${presto}" dest="lib"/>
+	<get src="${repo}${presto-src}" dest="lib"/>
 	<get src="${repo}${guava}" dest="lib"/>
 	<get src="${repo}${antlr}" dest="lib"/>
 	<get src="${repo}${slice}" dest="lib"/>
 	<get src="${repo}${nanohttpd}" dest="lib"/>
+	<get src="${repo}${nanohttpd-src}" dest="lib"/>
 	<get src="${repo}${httpclient}" dest="lib"/>
 	<get src="${repo}${httpcore}" dest="lib"/>
 	<get src="${repo}${logging}" dest="lib"/>

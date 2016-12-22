@@ -122,14 +122,6 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	}
 
 	/* (non-Javadoc)
-	 * @see com.facebook.presto.sql.tree.AstVisitor#visitApproximate(com.facebook.presto.sql.tree.Approximate, java.lang.Object)
-	 */
-	@Override
-	protected StringBuilder visitApproximate(Approximate node, StringBuilder builder) {
-		return notImplemented(new Object(){});
-	}
-
-	/* (non-Javadoc)
 	 * @see com.facebook.presto.sql.tree.DefaultTraversalVisitor#visitArithmeticBinary(com.facebook.presto.sql.tree.ArithmeticBinaryExpression, java.lang.Object)
 	 */
 	@Override
@@ -732,9 +724,6 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 			process(node.getWith().get(), builder);
 
 		process(node.getQueryBody(), builder);
-
-		if (node.getApproximate().isPresent())
-			process(node.getApproximate().get(), builder);
 
 		if (node.getLimit().isPresent() && !SUPPRESS_LIMIT)
 			appendStringNode("limit", node.getLimit().get(), builder);
