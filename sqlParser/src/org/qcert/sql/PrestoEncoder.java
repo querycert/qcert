@@ -16,11 +16,15 @@
 package org.qcert.sql;
 
 import java.util.ArrayList;
-
-import com.facebook.presto.sql.parser.ParsingException;
-
 import java.util.List;
 
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.Token;
+
+import com.facebook.presto.sql.parser.CaseInsensitiveStream;
+import com.facebook.presto.sql.parser.ParsingException;
+import com.facebook.presto.sql.parser.SqlBaseLexer;
 import com.facebook.presto.sql.parser.SqlParser;
 import com.facebook.presto.sql.parser.StatementSplitter;
 import com.facebook.presto.sql.tree.Node;
@@ -45,7 +49,7 @@ public class PrestoEncoder {
 		buffer.append(")");
 		return buffer.toString();
 	}
-	
+
 	/**
 	 * Encode an individual presto tree node as an S-expression using an existing buffer
 	 * @param buffer the existing buffer
@@ -66,9 +70,88 @@ public class PrestoEncoder {
 	 * @return the S-expression string
 	 */
 	public static String parseAndEncode(String sourceString, boolean interleaved, boolean useDateNameHeuristic) {
+		sourceString = applyLexicalFixups(sourceString);
 		if (interleaved)
 			return interleavedParseAndEncode(sourceString, useDateNameHeuristic);
 		return encode(parse(sourceString), useDateNameHeuristic);
+	}
+	
+	/**
+	 * Apply necessary fixups at the lexical level (needed to get the query to even be parsed by presto-parser).
+	 * 1.  Convert occurances of NN [days|months|years] to interval NN [day|month|year] (needed by many TPC-DS queries).
+	 * 2.  Remove parenthesized numeric field after an interval unit field (needed to run TPC-H query 1). 
+	 * @param query the original query
+	 * @return the altered query
+	 */
+	private static String applyLexicalFixups(String query) {
+	    CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
+		SqlBaseLexer lexer = new SqlBaseLexer(stream);
+		StringBuilder buffer = new StringBuilder();
+		Token savedInteger = null;
+		PrestoEncoder.FixupState state = PrestoEncoder.FixupState.OPEN;
+		for (Token token : lexer.getAllTokens()) {
+			switch (state) {
+			case ELIDE1:
+				state = PrestoEncoder.FixupState.ELIDE2;
+				continue;
+			case ELIDE2:
+				state = PrestoEncoder.FixupState.OPEN;
+				continue;
+			case INTERVAL:
+				buffer.append(token.getText());
+				if (PrestoEncoder.getUnit(token.getText()) != null)
+					state = PrestoEncoder.FixupState.UNIT;
+				continue;
+			case UNIT:
+				if (token.getText().equals("(")) {
+					state = PrestoEncoder.FixupState.ELIDE1;
+				} else {
+					buffer.append(token.getText());
+					if (token.getType() != SqlBaseLexer.WS)
+						state = PrestoEncoder.FixupState.OPEN;
+				}
+				continue;
+			case OPEN:
+			default:
+				if (token.getType() == SqlBaseLexer.INTERVAL) {
+					state = PrestoEncoder.FixupState.INTERVAL;
+					buffer.append(token.getText());
+					continue;
+				}
+				break;
+			}
+			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
+				savedInteger = token;
+			else if (savedInteger != null) {
+				String unit = PrestoEncoder.getUnit(token.getText());
+				if (unit != null) {
+					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
+					savedInteger = null;
+				} else if (token.getType() == SqlBaseLexer.WS)
+					buffer.append(token.getText());
+				else { 
+					buffer.append(savedInteger.getText()).append(" ").append(token.getText());
+					savedInteger = null;
+				}
+			} else
+				buffer.append(token.getText());
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * Utility to recognize interval unit names in either singular or plural form and return the singular of same
+	 */
+	private static String getUnit(String text) {
+		switch (text.trim().toLowerCase()) {
+		case "days": case "day":
+			return "day:";
+		case "months": case "month":
+			return "month:";
+		case "years": case "year":
+			return "year";
+		}
+		return null;
 	}
 
 	/**
@@ -130,5 +213,10 @@ public class PrestoEncoder {
 		}
 
 		return results;
+	}
+
+	/** Enumeration used in lexical fixups of interval syntax */
+	private enum FixupState {
+		OPEN, INTERVAL, UNIT, ELIDE1, ELIDE2
 	}
 }

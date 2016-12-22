@@ -24,12 +24,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.Token;
-
-import com.facebook.presto.sql.parser.CaseInsensitiveStream;
-import com.facebook.presto.sql.parser.SqlBaseLexer;
 import com.facebook.presto.sql.parser.StatementSplitter;
 
 import util.FileUtil;
@@ -103,69 +97,6 @@ public class SQL2Sexp {
 		}			
 	}
 	
-	/**
-	 * Apply necessary fixups at the lexical level (needed to get the query to even be parsed by presto-parser).
-	 * 1.  Convert occurances of NN [days|months|years] to interval NN [day|month|year] (needed by many TPC-DS queries).
-	 * 2.  Remove parenthesized numeric field after an interval unit field (needed to run TPC-H query 1). 
-	 * @param query the original query
-	 * @return the altered query
-	 */
-	private static String applyLexicalFixups(String query) {
-        CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
-		SqlBaseLexer lexer = new SqlBaseLexer(stream);
-		StringBuilder buffer = new StringBuilder();
-		Token savedInteger = null;
-		FixupState state = FixupState.OPEN;
-		for (Token token : lexer.getAllTokens()) {
-			switch (state) {
-			case ELIDE1:
-				state = FixupState.ELIDE2;
-				continue;
-			case ELIDE2:
-				state = FixupState.OPEN;
-				continue;
-			case INTERVAL:
-				buffer.append(token.getText());
-				if (getUnit(token.getText()) != null)
-					state = FixupState.UNIT;
-				continue;
-			case UNIT:
-				if (token.getText().equals("(")) {
-					state = FixupState.ELIDE1;
-				} else {
-					buffer.append(token.getText());
-					if (token.getType() != SqlBaseLexer.WS)
-						state = FixupState.OPEN;
-				}
-				continue;
-			case OPEN:
-			default:
-				if (token.getType() == SqlBaseLexer.INTERVAL) {
-					state = FixupState.INTERVAL;
-					buffer.append(token.getText());
-					continue;
-				}
-				break;
-			}
-			if (token.getType() == SqlBaseLexer.INTEGER_VALUE)
-				savedInteger = token;
-			else if (savedInteger != null) {
-				String unit = getUnit(token.getText());
-				if (unit != null) {
-					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
-					savedInteger = null;
-				} else if (token.getType() == SqlBaseLexer.WS)
-					buffer.append(token.getText());
-				else { 
-					buffer.append(savedInteger.getText()).append(" ").append(token.getText());
-					savedInteger = null;
-				}
-			} else
-				buffer.append(token.getText());
-		}
-		return buffer.toString();
-	}
-
 	/** Generate a range of arguments from a stem, start index, and end index */
 	private static List<String> generateRange(List<String> sources) {
 		String stem = sources.get(0);
@@ -175,21 +106,6 @@ public class SQL2Sexp {
 		for (int i = start; i <= end; i++)
 			range.add(stem + i);
 		return range;
-	}
-
-	/**
-	 * Utility to recognize interval unit names in either singular or plural form and return the singular of same
-	 */
-	private static String getUnit(String text) {
-		switch (text.trim().toLowerCase()) {
-		case "days": case "day":
-			return "day:";
-		case "months": case "month":
-			return "month:";
-		case "years": case "year":
-			return "year";
-		}
-		return null;
 	}
 
 	/** Determine if a "query" has multiple statements */
@@ -214,7 +130,6 @@ public class SQL2Sexp {
 			File data, File output) {
 		try {
 			String query = FileUtil.readFile(new File(data, String.format(inputTemplate, qn)));
-			query = applyLexicalFixups(query);
 			String result = PrestoEncoder.parseAndEncode(query, interleaved, useDateNameHeuristic);
 			if (hasMultipleStatements(query) && splitStatements)
 				writeSplitOutput(result, qn, output); // subsumes sanity check
@@ -237,7 +152,6 @@ public class SQL2Sexp {
 	private static void processSingle() {
 		try {
 			String query = readStdin();
-			query = applyLexicalFixups(query);
 			String result = PrestoEncoder.parseAndEncode(query, false, true);
 			System.out.println(result);
 		} catch (Exception e) {
@@ -290,10 +204,5 @@ public class SQL2Sexp {
 			reparse(toWrite); // sanity check
 			FileUtil.writeFile(new File(output, String.format(splitOutputTemplate, qn, index++)), toWrite);
 		}
-	}
-	
-	/** Enumeration used in lexical fixups of interval syntax */
-	private enum FixupState {
-		OPEN, INTERVAL, UNIT, ELIDE1, ELIDE2
 	}
 }
