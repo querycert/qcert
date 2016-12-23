@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function preProcessSQL(sql, useLocal) {
+function preProcessSQL(sql:string, useLocal:boolean) {
 		var url = useLocal ? "http://localhost:9879" : "http://35.164.159.76:9879";
 //	console.log("URL: " + url);
 //	console.log("local flag: " + useLocal);
@@ -27,7 +27,7 @@ function preProcessSQL(sql, useLocal) {
 		return request.responseText;
 }
 
-function preMain(input, useLocal) {
+function qcertPreCompile(input:QcertCompilerConfig, useLocal:boolean) : string | { result: string } {
 		if (input.source == "sql") {
 			try {
 				input.query = preProcessSQL(input.query, useLocal);

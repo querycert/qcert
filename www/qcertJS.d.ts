@@ -8,6 +8,7 @@ type SourceLanguageGroups = {
 
 type QcertOptimPhase = {name: string; optims: string[]; iter: number};
 type QcertOptimConfig = {language: string; phases: QcertOptimPhase[]};
+type QcertCompilerConfig = {source:QcertLanguage, target:QcertLanguage, sourcesexp: boolean, ascii: boolean, javaimports: string, query: string};
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;
@@ -22,4 +23,10 @@ declare function qcertLanguagesPath(args:{source:QcertLanguage, target:QcertLang
 
 /** Returns the set of default optimization phases and rewrites for each language */
 declare function qcertOptimDefaults(): {optims: QcertOptimConfig[]};
+
+/** Main compilation call
+ * @config specifies the compilation parameters, including source,target,ascii/greek,additional java imports, and the query in source form
+ * @returns Includes the intermediate representation for the target language
+ */
+declare function qcertCompile(config:QcertCompilerConfig): string;
 

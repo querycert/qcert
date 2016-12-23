@@ -4,7 +4,7 @@
     <title>Q*cert online form</title>
     <meta charset = "UTF-8" />
     <script src="../lib/qcertJS.js"></script>
-    <script src="../sqlParser/js/preMain.js"></script>
+    <script src="../www/qcertPreCompiler.js"></script>
     <script>
       var entityMap = {
       	"&": "&amp;",
@@ -26,7 +26,7 @@
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
 				var useLocal = document.getElementById("localServer").checked;
-				document.getElementById("result").innerHTML = escapeHtml(preMain(input, useLocal).result);
+				document.getElementById("result").innerHTML = escapeHtml(qcertPreCompile(input, useLocal).result);
       }
       function clearButton() {
         document.getElementById("result").innerHTML = "";
