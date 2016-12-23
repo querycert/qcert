@@ -19,6 +19,8 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import com.facebook.presto.sql.tree.*;
@@ -100,7 +102,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitAliasedRelation(AliasedRelation node, StringBuilder builder) {
-		builder.append("(aliasAs \"").append(node.getAlias()).append("\" ");
+		nodeWithString("aliasAs", node.getAlias(), builder);
 		process(node.getRelation(), builder);
 		if (node.getColumnNames() != null && !node.getColumnNames().isEmpty()) {
 			builder.append("(columns ");
@@ -238,6 +240,12 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 		return builder.append(") ");
 	}
 
+	@Override
+	protected StringBuilder visitColumnDefinition(ColumnDefinition node, StringBuilder builder) {
+		nodeWithString("column", node.getName(), builder);
+		return appendString(node.getType(), builder).append(")");
+	}
+
 	/* (non-Javadoc)
 	 * @see com.facebook.presto.sql.tree.AstVisitor#visitCommit(com.facebook.presto.sql.tree.Commit, java.lang.Object)
 	 */
@@ -265,7 +273,15 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitCreateTable(CreateTable node, StringBuilder builder) {
-		return notImplemented(new Object(){});
+		nodeWithString("createTable", node.getName().toString(), builder);
+		if (node.isNotExists())
+			builder.append("(notExists) ");
+		if (!node.getElements().isEmpty())
+			for (TableElement element : node.getElements()) {
+				process(element, builder);
+			}
+		addProperties(node.getProperties(), builder);
+		return builder.append(") ");
 	}
 
 	/* (non-Javadoc)
@@ -273,7 +289,14 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitCreateTableAsSelect(CreateTableAsSelect node, StringBuilder builder) {
-		return notImplemented(new Object(){});
+		nodeWithString("createTableAsSelect", node.getName().toString(), builder);
+		if (node.isNotExists())
+			builder.append("(notExists) ");
+		if (node.isWithData())
+			builder.append("(withData) ");
+		process(node.getQuery(), builder);
+		addProperties(node.getProperties(), builder);
+		return builder.append(") ");
 	}
 
 	/* (non-Javadoc)
@@ -281,9 +304,8 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitCreateView(CreateView node, StringBuilder builder) {
-		builder.append("(createView \"").append(node.getName()).append("\" ");
-		process(node.getQuery(), builder);
-		return builder.append(") ");
+		nodeWithString("createView", node.getName().toString(), builder);
+		return process(node.getQuery(), builder).append(") ");
 	}
 
 	/* (non-Javadoc)
@@ -331,9 +353,8 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitDereferenceExpression(DereferenceExpression node, StringBuilder builder) {
-		builder.append("(deref \"").append(node.getFieldName()).append("\" ");
-		process(node.getBase(), builder);
-		return builder.append(") ");
+		nodeWithString("deref", node.getFieldName(), builder);
+		return process(node.getBase(), builder).append(") ");
 	}
 
 	/* (non-Javadoc)
@@ -357,7 +378,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitDropView(DropView node, StringBuilder builder) {
-		return builder.append("(dropView \"").append(node.getName()).append("\") ");
+		return appendStringNode("dropView", node.getName().toString(), builder);
 	}
 
 	/* (non-Javadoc)
@@ -441,7 +462,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 		builder.append("(function ");
 		if (node.getWindow().isPresent())
 			processWindow(node.getWindow().get(), builder);
-		builder.append("\"").append(node.getName().toString()).append("\" ");
+		appendString(node.getName().toString(), builder);
 		for (Expression arg : node.getArguments())
 			process(arg, builder);
 		return builder.append(") ");
@@ -541,7 +562,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitIntervalLiteral(IntervalLiteral node, StringBuilder builder) {
-		builder.append("(interval \"").append(node.getValue()).append("\" ");
+		nodeWithString("interval", node.getValue(), builder);
 		if (node.getSign() == Sign.NEGATIVE) {
 			builder.append("(negative) ");
 		}
@@ -775,7 +796,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
                 else if (groupingElement instanceof Rollup) {
                 	builder.append("(rollup ");
                 	for (QualifiedName colName : ((Rollup) groupingElement).getColumns()) {
-                		builder.append("\"").append(colName.toString()).append("\" ");
+                		appendString(colName.toString(), builder);
                 	}
                 	builder.append(")");
                 } else
@@ -994,7 +1015,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	@Override
 	protected StringBuilder visitSingleColumn(SingleColumn node, StringBuilder builder) {
 		if (node.getAlias().isPresent())
-			builder.append("(as \"").append(node.getAlias().get()).append("\") ");
+			appendStringNode("as", node.getAlias().get(), builder);
 		return process(node.getExpression(), builder);
 	}
 
@@ -1032,7 +1053,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	@Override
 	protected StringBuilder visitStringLiteral(StringLiteral node, StringBuilder builder) {
-		return builder.append("\"").append(node.getValue()).append("\" ");
+		return appendString(node.getValue(), builder);
 	}
 
 	/* (non-Javadoc)
@@ -1197,6 +1218,23 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 		return builder.append(") ");
 	}
 
+	/** Add a properties subnode (createTable and createTableAsSelect use this) */
+	private void addProperties(Map<String, Expression> properties, StringBuilder builder) {
+		if (!properties.isEmpty()) {
+			builder.append("(properties ");
+			for (Entry<String, Expression> property : properties.entrySet()) {
+				nodeWithString("property", property.getKey(), builder);
+				process(property.getValue(), builder).append(") ");
+			}
+			builder.append(")");
+		}
+	}
+
+	/** Append a string with a trailing blank */
+	private StringBuilder appendString(String s, StringBuilder builder) {
+		return builder.append("\"").append(s).append("\" ");
+	}
+
 	/**
 	 * Given a node name and a string argument, append a String-style S-expression node
 	 * @param node the node name
@@ -1214,7 +1252,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 	 */
 	private void appendStrings(List<String> list, StringBuilder builder) {
 		for (String s : list) {
-			builder.append("\"").append(s).append("\" ");
+			appendString(s, builder);
 		}
 	}
 
@@ -1365,6 +1403,11 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 			return maybeTransform((ComparisonExpression) node);
 		else
 			return node;
+	}
+
+	/** Like appendStringNode but leaves the node open for more things to be added (see appendStringNode) */
+	private StringBuilder nodeWithString(String node, String arg, StringBuilder builder) {
+		return builder.append(String.format("(%s \"%s\" ", node, arg));
 	}
 
 	/**
