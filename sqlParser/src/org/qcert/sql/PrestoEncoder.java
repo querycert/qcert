@@ -87,6 +87,7 @@ public class PrestoEncoder {
 	 * 1.  Convert occurances of 'NN [days|months|years]' to 'interval NN [day|month|year]' (needed by many TPC-DS queries).
 	 * 2.  Remove parenthesized numeric field after an interval unit field (needed to run TPC-H query 1).
 	 * 3.  Remove parenthesized name list in 'create view NAME (...) as' and relocate the names into the body of the statement (needed to run TPC-H query 15).
+	 * 4.  On a 'create table' (schema), remove occurances of NOT NULL, which presto does not handle.
 	 * Fixup 3 is only partially lexical; the lexical phase remembers the names and a visitor updates the body after parsing.  
 	 * @param query the original query
 	 * @param foundNames an initially empty list to which names found in fixup 3 may be added for later processing
@@ -119,6 +120,8 @@ public class PrestoEncoder {
 				buffer.append(token.getText());
 				if (token.getType() == SqlBaseLexer.VIEW)
 					state = FixupState.VIEW;
+				else if (token.getType() == SqlBaseLexer.TABLE)
+					state = FixupState.TABLE;
 				else if (token.getType() != SqlBaseLexer.WS)
 					state = FixupState.OPEN;
 				continue;
@@ -130,6 +133,9 @@ public class PrestoEncoder {
 					if (token.getType() == SqlBaseLexer.AS)
 						state = FixupState.OPEN;
 				}
+			case TABLE:
+				if (token.getType() != SqlBaseLexer.NOT && token.getType() != SqlBaseLexer.NULL)
+					buffer.append(token.getText());
 				continue;
 			case INTERVAL:
 				buffer.append(token.getText());
@@ -297,8 +303,9 @@ public class PrestoEncoder {
 		UNIT, /* observed a unit, not yet eliding */ 
 		ELIDE1, /* started eliding paren'd number */ 
 		ELIDE2, /* still eliding paren'd number */
-		CREATE, /* observed 'create', not yet 'view' */
+		CREATE, /* observed 'create', not yet 'view' or 'table' */
 		VIEW, /* observed 'view' after 'create' */
 		ELIDELIST, /* observed parenthesized list after 'view', before 'as' and names are being elided and saved */
+		TABLE, /* observed 'table' after 'create' */
 	}
 }
