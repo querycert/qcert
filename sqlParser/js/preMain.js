@@ -36,7 +36,7 @@ function preMain(input, useLocal) {
 			}
 			input.sourcesexp = true;
 		}
-//		console.log("Input to main:");
+//		console.log("Input to qcertCompile:");
 //		console.log(input);
-		return main(input);
+		return qcertCompile(input);
 }

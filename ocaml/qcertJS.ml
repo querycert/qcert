@@ -117,6 +117,10 @@ let global_config_of_json j =
   iter_array QcertArg.add_vlocal j##.vlocal;
   complet_configuration gconf
 
+let wrap_all wrap_f l =
+  let a = new%js Js.array_empty in
+  List.iter (fun x -> ignore (a##push (wrap_f x))) l;
+  a
 
 let json_of_result res =
   let wrap x =
@@ -125,16 +129,11 @@ let json_of_result res =
         val value = Js.string x.QcertCore.res_content
       end
   in
-  let wrap_all l =
-    let a = new%js Js.array_empty in
-    List.iter (fun x -> ignore (a##push (wrap x))) l;
-    a
-  in
   object%js
     val emit = Js.def (wrap res.QcertCore.res_emit)
-    val emitall = Js.def (wrap_all res.QcertCore.res_emit_all)
+    val emitall = Js.def (wrap_all wrap res.QcertCore.res_emit_all)
     val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
-    val emitsexpall = Js.def (wrap_all res.QcertCore.res_emit_sexp_all)
+    val emitsexpall = Js.def (wrap_all wrap res.QcertCore.res_emit_sexp_all)
     val result = Js.string res.QcertCore.res_emit.QcertCore.res_content
   end
 
@@ -156,15 +155,10 @@ let json_of_exported_languages exported_languages =
       val description = Js.string (Util.string_of_char_list desc)
     end
   in
-  let wrap_all l =
-    let a = new%js Js.array_empty in
-    List.iter (fun x -> ignore (a##push (wrap x))) l;
-    a
-  in
   object%js
-    val frontend = Js.def (wrap_all exported_languages.Compiler.frontend)
-    val intermediate = Js.def (wrap_all exported_languages.Compiler.middleend)
-    val backend =  Js.def (wrap_all exported_languages.Compiler.backend)
+    val frontend = Js.def (wrap_all wrap exported_languages.Compiler.frontend)
+    val intermediate = Js.def (wrap_all wrap exported_languages.Compiler.middleend)
+    val backend =  Js.def (wrap_all wrap exported_languages.Compiler.backend)
   end
 let language_specs () =
   let exported_languages = QLang.export_language_descriptions  in
@@ -176,15 +170,33 @@ let json_of_source_to_target_path j =
   let path_lang = QDriver.get_path_from_source_target source_lang target_lang in
   let path = List.map name_of_language path_lang in
   let wrap x = Js.string x in
-  let wrap_all l =
-    let a = new%js Js.array_empty in
-    List.iter (fun x -> ignore (a##push (wrap x))) l;
-    a
-  in
   object%js
-    val path = Js.def (wrap_all path)
+    val path = Js.def (wrap_all wrap path)
   end
 
+let json_of_optim x =
+  Js.string (Util.string_of_char_list x)
+
+let js_of_optim_phase x =
+  let ((name,optim_list), iter) = x in
+  object%js
+    val name = Js.string (Util.string_of_char_list name)
+    val optims = Js.def (wrap_all json_of_optim optim_list)
+    val iter = Js.number_of_float (float_of_int iter)
+  end
+  
+let json_of_optim_default () =
+  let ocd = QDriver.optim_config_default in
+  let wrap (x,y) =
+    object%js
+      val language = Js.string (name_of_language x)
+      val phases = Js.def (wrap_all js_of_optim_phase y)
+    end
+  in
+  object%js
+    val optims = Js.def (wrap_all wrap ocd)
+  end
+  
 let main input =
   begin try
     let gconf =
@@ -219,5 +231,7 @@ let _ =
     Js.wrap_callback language_specs;
   Js.Unsafe.global##.qcertLanguagesPath :=
     Js.wrap_callback json_of_source_to_target_path;
-  Js.Unsafe.global##.main :=
+  Js.Unsafe.global##.qcertOptimDefaults :=
+    Js.wrap_callback json_of_optim_default;
+  Js.Unsafe.global##.qcertCompile :=
     Js.wrap_callback main

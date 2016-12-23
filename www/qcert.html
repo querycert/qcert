@@ -235,6 +235,43 @@ where
 	document.getElementById("paths").innerHTML = escapeHtml(qcertLanguagesPath({ 'source': 'sql','target':'nnrc' }).path);
       </script>
     </fieldset>
+    <fieldset>
+      <legend>Optim Defaults</legend>
+      <p><pre id="optims"></pre></p>
+      <script>
+	var optims = [];
+	var optims_names = [];
+	var defaults = qcertOptimDefaults().optims;
+	for (var i=0; i<defaults.length; i++) {
+	  optims_names.push(defaults[i].language);
+	  optims.push(defaults[i]);
+	}
+	document.getElementById("optims").innerHTML = escapeHtml(optims_names);
+      </script>
+    </fieldset>
+    <fieldset>
+      <legend>NRAEnv Optim Defaults</legend>
+      <p><pre id="nraenv"></pre></p>
+      <p><pre id="nraenvphase"></pre></p>
+      <p><pre id="nraenvoptims"></pre></p>
+      <script>
+	var nraenvoptims = [];
+	for (var i=0; i<optims.length; i++) {
+	  var optimlang = optims[i];
+	  if (optimlang.language === "nraenv") {
+	    document.getElementById("nraenv").innerHTML = escapeHtml(optimlang.language);
+	      for (var j=0; j<optimlang.phases.length; j++) {
+  	      var optimphase = optimlang.phases[j];
+	      document.getElementById("nraenvphase").innerHTML = escapeHtml(optimphase.name);
+	      for (var k=0; k<optimphase.optims.length; k++) {
+	        nraenvoptims.push(optimphase.optims[k]);
+  	      }
+	    }
+	  }
+	}
+	document.getElementById("nraenvoptims").innerHTML = escapeHtml(nraenvoptims);
+      </script>
+    </fieldset>
     -->
     </form>
   </body>

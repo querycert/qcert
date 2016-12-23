@@ -56,6 +56,10 @@ Module QDriver(runtime:CompilerRuntime).
     Definition get_path_from_source_target : language -> language -> list language :=
       get_path_from_source_target.
 
+    (* Optimizers config *)
+
+    Definition optim_config_default := optim_config_default.
+    
     (* Comp *)
     (* XXX TODO : use driver *)
     Definition get_driver_from_source_target : driver_config -> language -> language -> driver := get_driver_from_source_target.
