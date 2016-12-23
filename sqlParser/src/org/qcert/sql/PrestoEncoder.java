@@ -31,7 +31,6 @@ import com.facebook.presto.sql.parser.StatementSplitter;
 import com.facebook.presto.sql.tree.CreateView;
 import com.facebook.presto.sql.tree.Node;
 import com.facebook.presto.sql.tree.Query;
-import com.facebook.presto.sql.tree.QueryBody;
 import com.facebook.presto.sql.tree.QuerySpecification;
 import com.facebook.presto.sql.tree.Select;
 import com.facebook.presto.sql.tree.SelectItem;
@@ -175,6 +174,8 @@ public class PrestoEncoder {
 			} else
 				buffer.append(token.getText());
 		}
+		if (savedInteger != null)
+			buffer.append(savedInteger.getText());
 		return buffer.toString();
 	}
 
@@ -282,7 +283,8 @@ public class PrestoEncoder {
 	/** Parse an individual statement, applying lexical fixups first */
 	private static Statement parseStatement(SqlParser parser, String body) {
 		List<String> names = new ArrayList<>();
-		Statement result = parser.createStatement(applyLexicalFixups(body, names));
+		body = applyLexicalFixups(body, names);
+		Statement result = parser.createStatement(body);
 		if (!names.isEmpty())
 			result = distributeNames((CreateView) result, names); // No CCE possible since result must be a CreateView in this case
 		return result;
