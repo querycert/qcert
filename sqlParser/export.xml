@@ -4,6 +4,8 @@
        environment dependences.  It assumes the layout of the qcert working directory as organized for git -->
 
 	<property name="dest" value="../bin"/>
+	<!-- The following property is also defined in getDependencies.xml.  Should be the same. -->	
+	<property name="presto-version" value="0.161"/>
 	
 	<target name="all" depends="create_run_jar,create_server_jar"/>
 
@@ -11,7 +13,7 @@
         <jar destfile="${dest}/sqlparser.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.qcert.sql.SQL2Sexp"/>
-                <attribute name="Class-Path" value=". sqlparser_lib/antlr4-runtime-4.5.3.jar sqlparser_lib/guava-19.0.jar sqlparser_lib/presto-parser-0.161.jar sqlparser_lib/slice-0.7.jar"/>
+                <attribute name="Class-Path" value=". sqlparser_lib/antlr4-runtime-4.5.3.jar sqlparser_lib/guava-19.0.jar sqlparser_lib/presto-parser-${presto-version}.jar sqlparser_lib/slice-0.7.jar"/>
             </manifest>
             <fileset dir="bin"/>
         </jar>
@@ -19,7 +21,7 @@
         <mkdir dir="${dest}/sqlparser_lib"/>
         <copy file="lib/antlr4-runtime-4.5.3.jar" todir="${dest}/sqlparser_lib"/>
         <copy file="lib/guava-19.0.jar" todir="${dest}/sqlparser_lib"/>
-        <copy file="lib/presto-parser-0.161.jar" todir="${dest}/sqlparser_lib"/>
+        <copy file="lib/presto-parser-${presto-version}.jar" todir="${dest}/sqlparser_lib"/>
         <copy file="lib/slice-0.7.jar" todir="${dest}/sqlparser_lib"/>
     </target>
 
@@ -30,14 +32,14 @@
             <manifest>
                 <attribute name="Main-Class" value="org.qcert.sql.EncodingService"/>
                 <attribute name="Class-Path" 
-                	value=". encoding_lib/antlr4-runtime-4.5.3.jar encoding_lib/guava-19.0.jar encoding_lib/presto-parser-0.152.3.jar encoding_lib/slice-0.7.jar encoding_lib/nanohttpd-2.3.1.jar"/>
+                	value=". encoding_lib/antlr4-runtime-4.5.3.jar encoding_lib/guava-19.0.jar encoding_lib/presto-parser-${presto-version}.jar encoding_lib/slice-0.7.jar encoding_lib/nanohttpd-2.3.1.jar"/>
             </manifest>
             <fileset dir="bin"/>
         </jar>
         <mkdir dir="server/encoding_lib"/>
         <copy file="lib/antlr4-runtime-4.5.3.jar" todir="server/encoding_lib"/>
         <copy file="lib/guava-19.0.jar" todir="server/encoding_lib"/>
-        <copy file="lib/presto-parser-0.161.jar" todir="server/encoding_lib"/>
+        <copy file="lib/presto-parser-${presto-version}.jar" todir="server/encoding_lib"/>
         <copy file="lib/slice-0.7.jar" todir="server/encoding_lib"/>
         <copy file="lib/nanohttpd-2.3.1.jar" todir="server/encoding_lib"/>
 		<delete file="${dest}/encodingService.zip"/>
