@@ -24,9 +24,9 @@
     </target>
 
 	<target name="create_server_jar">
-		<delete dir="staging"/>
-		<mkdir dir="staging"/>
-        <jar destfile="staging/encodeService.jar">
+		<delete dir="server"/>
+		<mkdir dir="server"/>
+        <jar destfile="server/encodeService.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.qcert.sql.EncodingService"/>
                 <attribute name="Class-Path" 
@@ -34,16 +34,15 @@
             </manifest>
             <fileset dir="bin"/>
         </jar>
-        <mkdir dir="staging/encoding_lib"/>
-        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="staging/encoding_lib"/>
-        <copy file="lib/guava-19.0.jar" todir="staging/encoding_lib"/>
-        <copy file="lib/presto-parser-0.161.jar" todir="staging/encoding_lib"/>
-        <copy file="lib/slice-0.7.jar" todir="staging/encoding_lib"/>
-        <copy file="lib/nanohttpd-2.3.1.jar" todir="staging/encoding_lib"/>
+        <mkdir dir="server/encoding_lib"/>
+        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="server/encoding_lib"/>
+        <copy file="lib/guava-19.0.jar" todir="server/encoding_lib"/>
+        <copy file="lib/presto-parser-0.161.jar" todir="server/encoding_lib"/>
+        <copy file="lib/slice-0.7.jar" todir="server/encoding_lib"/>
+        <copy file="lib/nanohttpd-2.3.1.jar" todir="server/encoding_lib"/>
 		<delete file="${dest}/encodingService.zip"/>
 		<zip destfile="${dest}/encodingService.zip">
-			<fileset dir="staging"/>
+			<fileset dir="server"/>
 		</zip>
-		<delete dir="staging"/>
     </target>
 </project>
