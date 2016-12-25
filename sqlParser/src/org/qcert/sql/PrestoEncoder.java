@@ -41,6 +41,9 @@ import com.facebook.presto.sql.tree.Statement;
  * Utilities that work with presto-parser to produce other useful forms 
  */
 public class PrestoEncoder {
+	/** Causes printing of SQL before and after lexical fixup */
+	private static final boolean VERBOSE_LEXICAL = Boolean.getBoolean("VERBOSE_LEXICAL");
+	
 	/**
 	 * Encode a list of presto tree nodes as an S-expression for importing into Coq code
 	 * @param toEncode the list of presto tree nodes to encode
@@ -94,10 +97,15 @@ public class PrestoEncoder {
 	 * @return the altered query
 	 */
 	private static String applyLexicalFixups(String query, List<String> foundNames) {
+		if (VERBOSE_LEXICAL) {
+			System.out.println("Before:");
+			System.out.println(query);
+		}
 	    CharStream stream = new CaseInsensitiveStream(new ANTLRInputStream(query));
 		SqlBaseLexer lexer = new SqlBaseLexer(stream);
 		StringBuilder buffer = new StringBuilder();
 		Token savedInteger = null;
+		List<Token> savedWS = new ArrayList<>();
 		FixupState state = FixupState.OPEN;
 		for (Token token : lexer.getAllTokens()) {
 			/* The 'state' is used for fixups 2 and 3 */
@@ -133,6 +141,7 @@ public class PrestoEncoder {
 					if (token.getType() == SqlBaseLexer.AS)
 						state = FixupState.OPEN;
 				}
+				continue;
 			case TABLE:
 				if (token.getType() != SqlBaseLexer.NOT && token.getType() != SqlBaseLexer.NULL)
 					buffer.append(token.getText());
@@ -171,18 +180,28 @@ public class PrestoEncoder {
 				if (unit != null) {
 					buffer.append("interval '").append(savedInteger.getText()).append("' ").append(unit);
 					savedInteger = null;
+					savedWS.clear();
 				} else if (token.getType() == SqlBaseLexer.WS)
-					buffer.append(token.getText());
+					savedWS.add(token);
 				else { 
-					buffer.append(savedInteger.getText()).append(" ").append(token.getText());
+					buffer.append(savedInteger.getText());
+					for (Token ws : savedWS)
+						buffer.append(ws.getText());
+					buffer.append(token.getText());
 					savedInteger = null;
+					savedWS.clear();
 				}
 			} else
 				buffer.append(token.getText());
 		}
 		if (savedInteger != null)
 			buffer.append(savedInteger.getText());
-		return buffer.toString();
+		query = buffer.toString();
+		if (VERBOSE_LEXICAL) {
+			System.out.println("After:");
+			System.out.println(query);
+		}
+		return query;
 	}
 
 	/**
@@ -205,7 +224,7 @@ public class PrestoEncoder {
 			body = new QuerySpecification(new Select(select.isDistinct(), newItems), body.getFrom(), body.getWhere(), body.getGroupBy(), 
 					body.getHaving(), body.getOrderBy(), body.getLimit());
 			return new CreateView(view.getName(), new Query(view.getQuery().getWith(), body, view.getQuery().getOrderBy(), 
-					view.getQuery().getLimit()), view.isReplace());
+					view.getQuery().getLimit(), view.getQuery().getApproximate()), view.isReplace());
 		}
 		throw new IllegalStateException("Don't know how to distribute names for 'create view' statement when body is not a QuerySpecification");
 	}
@@ -216,9 +235,9 @@ public class PrestoEncoder {
 	private static String getUnit(String text) {
 		switch (text.trim().toLowerCase()) {
 		case "days": case "day":
-			return "day:";
+			return "day";
 		case "months": case "month":
-			return "month:";
+			return "month";
 		case "years": case "year":
 			return "year";
 		}
