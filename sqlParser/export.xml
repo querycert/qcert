@@ -5,7 +5,7 @@
 
 	<property name="dest" value="../bin"/>
 	<!-- The following property is also defined in getDependencies.xml.  Should be the same. -->	
-	<property name="presto-version" value="0.161"/>
+	<property name="presto-version" value="0.154"/>
 	
 	<target name="all" depends="create_run_jar,create_server_jar"/>
 

@@ -2,7 +2,7 @@
 
 <property name="repo" value="http://central.maven.org/maven2/"/>
 <!-- The following property is also defined in export.xml.  Should be the same. -->	
-<property name="presto-version" value="0.161"/>
+<property name="presto-version" value="0.154"/>
 	
 <property name="presto" value="com/facebook/presto/presto-parser/${presto-version}/presto-parser-${presto-version}.jar"/>
 <property name="presto-src" value="com/facebook/presto/presto-parser/${presto-version}/presto-parser-${presto-version}-sources.jar"/>
