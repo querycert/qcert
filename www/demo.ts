@@ -75,6 +75,38 @@ interface PuzzleSides {
 		ensureCanvasWidth(canvas, getSourceLeft(lastpiece));
 	}
 
+	// Add support for hit testig individual objects in a group
+ 	// from http://stackoverflow.com/questions/15196603/using-containspoint-to-select-object-in-group#15210884
+ 	fabric.util.object.extend(fabric.Object.prototype, {
+		getAbsoluteCenterPoint: function() {
+		var point = this.getCenterPoint();
+		if (!this.group)
+			return point;
+		var groupPoint = this.group.getAbsoluteCenterPoint();
+		return {
+			x: point.x + groupPoint.x,
+			y: point.y + groupPoint.y
+		};
+		},
+		containsInGroupPoint: function(point) {
+		if (!this.group)
+			return this.containsPoint(point);
+
+		var center = this.getAbsoluteCenterPoint();
+		var thisPos = {
+			xStart: center.x - this.width/2,
+			xEnd: center.x + this.width/2,
+			yStart: center.y - this.height/2,
+			yEnd: center.y + this.height/2
+		}
+
+		if (point.x >= thisPos.xStart && point.x <= (thisPos.xEnd)) {
+			if (point.y >= thisPos.yStart && point.y <= thisPos.yEnd) {
+				return true;
+			}
+		}
+		return false;
+	}});
 
 // based on code from https://www.codeproject.com/articles/395453/html-jigsaw-puzzle
 	function getMask(tileRatio, topTab, rightTab, bottomTab, leftTab) {
@@ -165,6 +197,8 @@ interface IPuzzlePiece extends fabric.IObject {
 
 	// new stuff
 	isSourcePiece?:boolean;
+	isImplicit?:boolean;
+
 	movePlace?:{left:number, top:number};
 	langid:string;
 	label:string;
@@ -262,6 +296,18 @@ function makePuzzlePiece(options):any {
 		this.setCoords();
 	};
 
+
+	group.makeSelected = function() {
+		console.log('selecting: ' + group.langid);
+		path.set('fill', 'purple');
+		console.log(group);
+	}
+
+	group.makeUnselected = function() {
+		console.log('deselecting: ' + group.langid);
+	}
+
+
 	return group;
 }
 
@@ -355,6 +401,12 @@ function mkSourcePiece(options):IPuzzlePiece {
 	// and use that to track what is going on
 	// once that is working, change the code to move things over 
 	// to use animations to look smooth
+
+	(<any>piece).mkDerivative = function () {
+		var copyOfSelf = mkSourcePiece(options);
+		copyOfSelf.isSourcePiece = false;
+		return copyOfSelf;
+	}
 
 	function mousedownfunc() {
 		piece.set({
@@ -520,6 +572,214 @@ const defaultTabRectOpts:fabric.IRectOptions = {
 	strokeLineCap:'round'
 }
 
+// hm.  it would be really nice if we could make shorter pieces...
+// a makeCompositePiece which takes in a list of puzzle pieces
+// (which it can, of course, display as the hovertip.  Ideally it would take color from them too...)
+// yay! the new getLRMask can do this!
+
+// TODO: first get the implicit logic to work:
+// when we need a new piece, create one piece (with first part of the chain?) and mark it implicit
+// make sure all the logic works.
+// after implicit pieces work, add support for composite pieces (which may also be implicit)
+
+// TODO: create a makeCompositePiece that takes in a bunch of IPuzzlePieces
+// and creates a single composite piece that can show the originals in a tooltip
+// depending on which piece part you are actually hovering over, the tooltip will
+// show that piece "bright"/selected and the others with a lower opacity
+
+// separately, mark pieces as implicit if they are implicit
+// If there is a single piece in a chain, it can be directly added (marked as implicit)
+// if more, they are created, and then a composite (and implicit) chain will represent them.
+// double clicking (if we can support that) on an implicit (either normal or composite)
+// turns it into an explicit chain
+
+// dropping on an implicit is allowed.  It does not make the implicit move out of the way,
+// although it may generate a (possibly temporary) new implicit
+
+// the logic will be a bit hairy :-)
+
+// Of course, that piece will be marked as "generated"
+// which means that 
+
+// the sources that are passed in are owned (and manipulated directly) by the resulting composite object
+function makeCompositePiece(canvas:fabric.ICanvas, gridx:number, gridy:number, sources:IPuzzlePiece[]):fabric.IObject {
+		function getLRMask(tileRatio, rightTab:number, leftTab:number, width:number) {
+
+		var curvyCoords = [ 0, 0, 35, 15, 37, 5, 37, 5, 40, 0, 38, -5, 38, -5,
+				20, -20, 50, -20, 50, -20, 80, -20, 62, -5, 62, -5, 60, 0, 63,
+				5, 63, 5, 65, 15, 100, 0 ];
+		const tileHeight = 100;
+		var mask = "";
+		var leftx = -4;
+		var topy = 0;
+		var rightx = leftx + width;
+		var bottomy = topy + tileHeight;
+
+		mask += "M" + leftx + "," + topy;
+		mask += "L" + (leftx + width) + "," + topy;
+		//Right
+		for (var i = 0; i < curvyCoords.length / 6; i++) {
+			mask += "C";
+			mask += rightx - rightTab * curvyCoords[i * 6 + 1] * tileRatio;
+			mask += ",";
+			mask += topy + curvyCoords[i * 6 + 0] * tileRatio;
+			mask += ",";
+			mask += rightx - rightTab * curvyCoords[i * 6 + 3] * tileRatio;
+			mask += ",";
+			mask += topy + curvyCoords[i * 6 + 2] * tileRatio;
+			mask += ",";
+			mask += rightx - rightTab * curvyCoords[i * 6 + 5] * tileRatio;
+			mask += ",";
+			mask += topy + curvyCoords[i * 6 + 4] * tileRatio;
+		}
+
+		mask += "L" + leftx + "," + bottomy;
+		
+		//Left
+		for (var i = 0; i < curvyCoords.length / 6; i++) {
+			mask += "C";
+			mask += leftx + leftTab * curvyCoords[i * 6 + 1] * tileRatio;
+			mask += ",";
+			mask += bottomy - curvyCoords[i * 6 + 0] * tileRatio;
+			mask += ",";
+			mask += leftx + leftTab * curvyCoords[i * 6 + 3] * tileRatio;
+			mask += ",";
+			mask += bottomy - curvyCoords[i * 6 + 2] * tileRatio;
+			mask += ",";
+			mask += leftx + leftTab * curvyCoords[i * 6 + 5] * tileRatio;
+			mask += ",";
+			mask += bottomy - curvyCoords[i * 6 + 4] * tileRatio;
+		}
+
+		return mask;
+	}
+	const sourceLen = sources.length;
+	const pwidth = piecewidth / sourceLen;
+	let parts:fabric.IObject[] = [];
+
+	for(let i=0; i < sourceLen; i++) {
+		const p = sources[i];
+		const shortPiece = new fabric.Path(getLRMask(1, 1, -1, pwidth), {
+			fill:p.fill,
+			opacity: 0.5,
+			left:i*pwidth,
+			top:0,
+		});
+		
+		shortPiece.set({
+			fill : '#6699ff',
+			hasControls : false,
+			selectable : false,
+			evented : false,
+
+		});
+		p.setOpacity(p.opacity/2);
+		p.setGridCoords(i, 0);
+
+		(<any>shortPiece).fullPiece = p;
+		parts.push(shortPiece);
+	}
+	const fullGroup = new fabric.Group(sources);
+
+	const partgroup = new fabric.Group(parts);
+
+	let lastSelectedPart:number = -1;
+
+	function updateTooltip() {
+
+		// abstract the logic from makeToolTip?
+		// fix where it appears!
+		const tipbound = fullGroup.getBoundingRect();
+		const compositebound = partgroup.getBoundingRect();
+
+		
+		fullGroup.setLeft(compositebound.left + (compositebound.width - tipbound.width) / 2);
+		fullGroup.setTop(compositebound.top + compositebound.height + 10);
+		const tip = fullGroup;
+
+		if(! ('tooltipObj' in partgroup)) {
+			const canvas = (<any>partgroup).canvas;
+			(<any>partgroup).tooltipObj = tip;
+			canvas.add(tip);
+		}
+	};
+
+	function findSubTarget(e:Event, lastIndex:number):number {
+		const mousePos = canvas.getPointer(e);
+		const mousePoint = new fabric.Point(mousePos.x, mousePos.y);
+
+		if(lastIndex >= 0) {
+			const part:any = parts[lastIndex];
+			if(part.containsInGroupPoint(mousePoint)) {
+				return lastIndex;
+			}
+		}
+		for(let i=0; i < parts.length; i++) {
+			if(i == lastIndex) {
+				continue;
+			}
+
+			const part:any = parts[i];
+			if(part.containsInGroupPoint(mousePoint)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	
+	function updateTooltipFocus(e:Event) {
+		const newSelectedPart = findSubTarget(e, lastSelectedPart);
+		if(lastSelectedPart == newSelectedPart) {
+			return;
+		}
+		if(lastSelectedPart >= 0) {
+			const lastpartpiece:any = parts[lastSelectedPart];
+			//lastpart.makeUnselected();
+		}
+		if(newSelectedPart >= 0) {
+			const newpart:any = sources[newSelectedPart];
+			//newpart.makeSelected();
+		}
+		lastSelectedPart = newSelectedPart;
+		canvas.renderAll();
+	}
+
+	function deleteTooltip() {
+		if('tooltipObj' in partgroup) {
+			(<any>partgroup).canvas.remove(((<any>partgroup).tooltipObj));
+			delete (<any>partgroup).tooltipObj;
+		}
+	}
+
+	function mousemovehandler(e:fabric.IEvent) {
+		if(e.target == partgroup) {
+			if(! ('tooltipObj' in partgroup)) {
+				updateTooltip();
+			} 
+			updateTooltipFocus(e.e);
+		}
+	}
+
+	partgroup.on('mouseover', function() {
+		canvas.on('mouse:move', mousemovehandler);
+	});
+
+	partgroup.on('moving', function () {
+		updateTooltip();
+	});
+
+	partgroup.on('mouseout', function() {
+		canvas.off('mouse:move', mousemovehandler);
+		deleteTooltip();
+	});
+	// group.on('mouseup', function() {
+	// 	deleteTooltip();
+	// });
+
+	return partgroup;
+}
+
 function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 	// TODO: at some point enable this
 	// but upon creation remove any inappropriate (source) elements
@@ -544,7 +804,7 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 
 	// create the start piece
 	// note that the start piece is meant to have a "real" piece put on top of it by the user
-	var startPiece = makePuzzlePiece({
+	const startPiece = makePuzzlePiece({
 		fill : '#c2f0c2',
 		label : 'start',
 		sides : {right:-1},
@@ -558,7 +818,6 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 		selectable: false
 	});
 	startPiece.hoverCursor = 'auto';
-	
 
 	const runText = new fabric.Text('R\nu\nn', {
 		left:2,
@@ -643,6 +902,7 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 					canvas.hoverCursor = 'pointer';
 
 					canvas.add(startPiece);
+
 					//canvas.add(runGroup);
 					canvas.add(separatorLine);
 
@@ -669,6 +929,18 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 					ensureCanvasSourcePieceWidth(canvas, maxCols);
 					// TODO: also make sure that it is wide enough for the pieces in the grid
 					canvas.setHeight(totalCanvasHeight);
+
+	function getLangPiece(langid:string) {
+		return (<any>sourcePieces[langid]).mkDerivative();
+	}
+		// TODO experimental
+		// const g = makeCompositePiece(canvas, 3, 1, 
+		// 	[getLangPiece("nraenv"),
+		// 	getLangPiece("nra"), 
+		// 	getLangPiece("camp")]);
+		// canvas.add(g);
+	// TODO end:experimental
+	
 					canvas.renderAll();
 				},
         		hide:function() {
