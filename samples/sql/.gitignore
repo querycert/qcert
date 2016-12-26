@@ -4,4 +4,4 @@
 *.s-sql
 *_stats.json
 *.error
-tpcds*
+/tpc/*.sql

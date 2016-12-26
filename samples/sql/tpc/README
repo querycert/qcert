@@ -1,0 +1,38 @@
+For legal reasons we do not reproduce the TPC benchmark data here.  However, we provide instructions for obtaining the
+queries that we used to produce our results for TPC-H and TPC-DS in our paper in SIGMOD 2017.
+
+TPC-H:
+
+1. Obtain the TPC-H tools zip from http://www.tpc.org/tpch/.  You will need to agree to terms which are
+explained during the process.
+
+2. Unzip the provided archive in a convenient place.  We are only able to explain how to build on a Linux
+system.  Building on other systems is a bit of an art but can often be done (see the provided porting guide).
+
+3. In the subdirectory 'dbgen', copy 'makefile.suite' to 'makefile' and edit the latter file to specify
+ 	CC      = gcc
+  DATABASE= DB2
+  MACHINE = LINUX
+  WORKLOAD = TPCH
+
+4.  Type 'make'.  It should build the needed software.
+
+5.  Switch to the peer directory called 'queries' and make a subdirectory called 'data'.
+
+6.  Source the file tpch_gens provided here.  It should populate the 'data' directory with sql files based on
+the TPC-H templates.  Copy the sql files back to this folder.
+
+TPC-DS:
+
+1. Obtain the TPC-DS tools zip from http://www.tpc.org/tpcds/.  You will need to agree to terms which are
+explained during the process.
+
+2. Unzip the provided archive in a convenient place.  The supported systems are even more restricted than for
+TPC-H.  We've only been able to build on Linux, which is how the makefile is set up initially.
+
+3. In the subdirectory called 'tools' type 'make'.  It should build the needed software.
+
+4. Move to the parent directory and make a subdirectory called data.
+
+5.  Source file tpcds_gens provided here.  It should populate the 'data' directory with sql files based on the
+TPC-DS templates.  Copy the sql files back to this folder.
