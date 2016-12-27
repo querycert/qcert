@@ -33,9 +33,20 @@ import org.apache.http.impl.client.HttpClients;
  */
 public class TestEncodingService {
 	public static void main(String[] args) throws Exception {
-		FileEntity entity = new FileEntity(new File(args[0]));
+		String file, url;
+		if (args.length == 2 && args[0].equals("remote")) {
+			file = args[1];
+			url = "http://35.164.159.76:9879";
+		} else if (args.length == 1) {
+			file = args[0];
+			url = "http://localhost:9879";
+		} else {
+			System.out.println("Wrong number of arguments");
+			return;
+		}
+		FileEntity entity = new FileEntity(new File(file));
 		HttpClient client = HttpClients.createDefault();
-		HttpPost post = new HttpPost("http://localhost:9879");
+		HttpPost post = new HttpPost(url);
 		entity.setContentType("text/plain");
 		post.setEntity(entity);
 		HttpResponse resp = client.execute(post);
