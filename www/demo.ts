@@ -191,125 +191,6 @@ interface PuzzleSides {
 		return mask;
 	}
 
-interface IPuzzlePiece extends fabric.IObject {
-	// this should be in the fabric ts file
-	canvas:fabric.IStaticCanvas;
-
-	// new stuff
-	isSourcePiece?:boolean;
-	isImplicit?:boolean;
-
-	movePlace?:{left:number, top:number};
-	langid:string;
-	label:string;
-	langdescription:string;
-	tooltipObj?:fabric.IObject;
-	puzzleOffset:fabric.IPoint;
-	getGridPoint:()=>fabric.IPoint;
-	setGridPoint:(point:fabric.IPoint)=>void;
-	setGridCoords:(x:number, y:number)=>void;
-
-	// these are to help avoid accidentally setting
-	// left or top without calling setCoords() after as required
-	mySetLeft:(x:number)=>void;
-	mySetTop:(y:number)=>void;
-	mySetLeftAndTop:(x:number, y:number)=>void;
-	readonly left:number;
-	readonly top:number;
-}
-
-// The class for a puzzle piece object
-
-
-interface StringMap<V> {
-	[K: string]: V;
-}
-
-// These are two critical arrays for the buider
-// This is the collection of source pieces
-var sourcePieces:StringMap<IPuzzlePiece> = {};
-// This is the matrix of pieces that are in the grid
-var placedPieces:IPuzzlePiece[][] = [];
-
-
-function makePuzzlePiece(options):any {
-	    options || (options = { });
-	options.width = piecewidth;
-	options.height = pieceheight;
-
-	const puzzleSides:PuzzleSides = options.sides || {};
-	const puzzleLeft = puzzleSides.left || 0;
-	const puzzleRight = puzzleSides.right || 0;
-	const puzzleTop = puzzleSides.top || 0;
-	const puzzleBottom = puzzleSides.bottom || 0;
-
-	function calcPuzzleEdgeOffset(side:number):number {
-		if(side < 0) {
-			return 9;
-		} else if(side > 0) {
-			return 20;
-		} else {
-			return 0;
-		}
-	}
-	const puzzleOffsetPoint = new fabric.Point(	calcPuzzleEdgeOffset(puzzleLeft),
-						calcPuzzleEdgeOffset(puzzleTop));
-
-
-	options.left = getSourceLeft(options.col || 0) - puzzleOffsetPoint.x;
-	options.top = getSourceTop(options.row || 0) - puzzleOffsetPoint.y;
-	options.hasControls = false;
-	options.hasBorders = false;
-	const path = new fabric.Path(getMask(1, puzzleTop, puzzleRight, puzzleBottom, puzzleLeft), options);
-
-// fix where the text appears
-	const text = new fabric.Text(options.label, {
-		fill: '#333',
-		fontWeight: 'bold',
-		fontSize: 20,
-		left: options.left + 10 + (puzzleLeft > 0 ? 23 : 0),
-		top: options.top + 10
-	});
-	// const bbox = text.getBoundingRect();
-
-	const group:any = new fabric.Group([path, text],
-	{
-		hasControls:false,
-		hasBorders:false
-	});
-
-	group.puzzleOffset = puzzleOffsetPoint;
-	
-	group.getGridPoint = function():fabric.IPoint {
-		return new fabric.Point(
-			Math.round((this.left + this.puzzleOffset.x - gridOffset.x) / piecewidth),
-			Math.round((this.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
-	};
-
-	group.setGridPoint = function(point:fabric.IPoint):void {
-		this.setGridCoords(point.x, point.y);
-	};
-
-	group.setGridCoords = function(x:number, y:number):void {
-		this.left = x * piecewidth - this.puzzleOffset.x + gridOffset.x;
-		this.top = y * pieceheight - this.puzzleOffset.y + gridOffset.y;
-		this.setCoords();
-	};
-
-
-	group.makeSelected = function() {
-		console.log('selecting: ' + group.langid);
-		path.set('fill', 'purple');
-		console.log(group);
-	}
-
-	group.makeUnselected = function() {
-		console.log('deselecting: ' + group.langid);
-	}
-
-
-	return group;
-}
 
 function makeToolTip(
 					tip:string,
@@ -362,144 +243,299 @@ function makeToolTip(
 	return group;
 }
 
+interface IPuzzlePiece extends fabric.IObject {
+	// this should be in the fabric ts file
+	canvas:fabric.IStaticCanvas;
 
-function mkSourcePiece(options):IPuzzlePiece {
-	const group = makePuzzlePiece(options);
-	
-	
-	group.isSourcePiece = true;
-	group.langid = options.langid;
-	group.label = options.label;
-	group.langdescription = options.langdescription;
+	// new stuff
+	isSourcePiece?:boolean;
+	isImplicit?:boolean;
 
-	group.mySetLeft = function(x:number) {
-	  group.left = x;
-	  this.setCoords();
-  	};
-  	group.mySetTop = function(y:number) {
-	  this.top = y;
-	  this.setCoords();
-  	};
-  	group.mySetLeftAndTop = function(x:number, y:number) {
-	  this.left = x;
-	  this.top = y;
-	  this.setCoords();
-  	};
+	movePlace?:{left:number, top:number};
+	langid:string;
+	label:string;
+	langdescription:string;
+	tooltipObj?:fabric.IObject;
+	puzzleOffset:fabric.IPoint;
+	getGridPoint:()=>fabric.IPoint;
+	setGridPoint:(point:fabric.IPoint)=>void;
+	setGridCoords:(x:number, y:number)=>void;
 
-	// snap to grid
+	// these are to help avoid accidentally setting
+	// left or top without calling setCoords() after as required
+	mySetLeft:(x:number)=>void;
+	mySetTop:(y:number)=>void;
+	mySetLeftAndTop:(x:number, y:number)=>void;
+	readonly left:number;
+	readonly top:number;
+}
+
+// The class for a puzzle piece object
 
 
+interface StringMap<V> {
+	[K: string]: V;
+}
 
-	const piece:IPuzzlePiece = group;
-	piece.hoverCursor = 'grab';
-	(<any>piece).moveCursor = 'grabbing';
+// These are two critical arrays for the buider
+// This is the collection of source pieces
+var sourcePieces:StringMap<SourcePuzzlePiece> = {};
+// This is the matrix of pieces that are in the grid
+var placedPieces:InteractivePuzzlePiece[][] = [];
 
-	// TODO: when me move something, shift things to the right back over it (to the left)
-	// be careful how that interacts with the shift right code!
-	// TODO: work on getting things to move out of the way
-	// track what we were over last / are over now
-	// and use that to track what is going on
-	// once that is working, change the code to move things over 
-	// to use animations to look smooth
+// things that can be get/set via the grid
+interface Griddable {
+	getGridPoint():fabric.IPoint;
+	setGridPoint(point:fabric.IPoint):void;
+	setGridCoords(x:number, y:number):void;
+}
 
-	(<any>piece).mkDerivative = function () {
-		var copyOfSelf = mkSourcePiece(options);
-		copyOfSelf.isSourcePiece = false;
-		return copyOfSelf;
+// objects that are wrapped by customization
+interface BackingObject extends fabric.IObject {
+	frontingObject:FrontingObject;
+	canvas:fabric.ICanvas;
+}
+
+function isBackingObject(object: any): object is BackingObject {
+    return 'frontingObject' in object;
+}
+
+// objects that wrap a fabric object
+interface FrontingObject {
+	backingObject:BackingObject;
+	associate();
+	deassociate();
+}
+
+// function assignBackingObject(frontingObject:FrontingObject, backingObject:fabric.IObject) {
+// 	// disassociate the backingObject from any previous owner
+// 	if(isBackingObject(backingObject)) {
+// 		const oldObject = backingObject.frontingObject;
+// 		oldObject.deassociate();
+// 		delete oldObject.backingObject;
+// 	}
+// 	(<any>backingObject).frontingObject = frontingObject;
+// 	frontingObject.backingObject = <BackingObject>(backingObject);
+// 	frontingObject.associate();
+// }
+
+class BasicPuzzlePiece implements Griddable, FrontingObject {
+
+	options:any;
+	backingObject:fabric.IObject & {canvas:fabric.ICanvas} & {frontingObject:any};
+	puzzleOffset:fabric.IPoint;
+
+	static make(options):BasicPuzzlePiece {
+		const p = new BasicPuzzlePiece({options:options});
+		p.backingObject.frontingObject = p;
+		p.associate();
+		return p;
 	}
 
-	function mousedownfunc() {
-		piece.set({
-			opacity:.5
-		});
-		// clear any tooltip
-		if('tooltipObj' in piece) {
-			piece.canvas.remove(piece.tooltipObj);
-			delete piece.tooltipObj;
-		}
+	protected constructor(args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+		function calcPuzzleEdgeOffset(side:number):number {
+				if(side < 0) {
+					return 9;
+				} else if(side > 0) {
+					return 20;
+				} else {
+					return 0;
+				}
+			}
 
-		if(piece.isSourcePiece) {
-			// create a new copy of this piece
-			var copyOfSelf = mkSourcePiece(options);
-			// and make it the new "canonical" source piece
-			sourcePieces[options.langid] = copyOfSelf;
-			piece.canvas.add(copyOfSelf);
+		if('options' in args) {
+			let options = (<any>args).options;
+			this.options = options;
+			options || (options = { });
+			options.width = piecewidth;
+			options.height = pieceheight;
+			const puzzleSides:PuzzleSides = options.sides || {};
+			const puzzleLeft = puzzleSides.left || 0;
+			const puzzleRight = puzzleSides.right || 0;
+			const puzzleTop = puzzleSides.top || 0;
+			const puzzleBottom = puzzleSides.bottom || 0;
 
-			// now make this piece into a non source piece
-			piece.isSourcePiece = false;
+			const puzzleOffsetPoint = new fabric.Point(	calcPuzzleEdgeOffset(puzzleLeft),
+								calcPuzzleEdgeOffset(puzzleTop));
+
+
+			options.left = getSourceLeft(options.col || 0) - puzzleOffsetPoint.x;
+			options.top = getSourceTop(options.row || 0) - puzzleOffsetPoint.y;
+			options.hasControls = false;
+			options.hasBorders = false;
+
+			const path = new fabric.Path(getMask(1, puzzleTop, puzzleRight, puzzleBottom, puzzleLeft), options);
+
+			// fix where the text appears
+			const text = new fabric.Text(options.label, {
+				fill: '#333',
+				fontWeight: 'bold',
+				fontSize: 20,
+				left: options.left + 10 + (puzzleLeft > 0 ? 23 : 0),
+				top: options.top + 10
+			});
+			// const bbox = text.getBoundingRect();
+
+			const group = new fabric.Group([path, text],
+			{
+				hasControls:false,
+				hasBorders:false
+			});
+			this.backingObject = <any>group;
+			(<any>group).frontingObject = this;
+
+			this.puzzleOffset = puzzleOffsetPoint;
+			this.backingObject.frontingObject = this;
 		} else {
-			// update the placed grid
-			const topentry = Math.round(piece.top / pieceheight);
-			const leftentry = Math.round(piece.left / piecewidth);
-			
-			delete placedPieces[topentry][leftentry];
+			// steal from another puzzle
+			const src = (<any>args).srcpuzzle;
+			this.options = src.options;
+			this.backingObject = src.backingObject;
+			this.puzzleOffset = src.puzzleOffset;
 		}
+	}
+
+	getGridPoint():fabric.IPoint {
+		return new fabric.Point(
+			Math.round((this.backingObject.left + this.puzzleOffset.x - gridOffset.x) / piecewidth),
+			Math.round((this.backingObject.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
 	};
 
-	piece.on('mousedown', mousedownfunc);
+	setGridPoint(point:fabric.IPoint):void {
+		this.setGridCoords(point.x, point.y);
+	};
 
-	piece.on('mouseup', function() {
-		piece.set({
+	setGridCoords(x:number, y:number):void {
+		this.backingObject.left = x * piecewidth - this.puzzleOffset.x + gridOffset.x;
+		this.backingObject.top = y * pieceheight - this.puzzleOffset.y + gridOffset.y;
+		this.backingObject.setCoords();
+	};
+
+	deassociate() {
+		
+	};
+	associate() {
+
+	};
+
+	// markSelected() {
+	// 	console.log('selecting: ' + this.langid);
+	// }
+
+	// group.makeUnselected = function() {
+	// 	console.log('deselecting: ' + this.langid);
+	// }
+}
+
+class InteractivePuzzlePiece extends BasicPuzzlePiece {
+	langid:QcertLanguage;
+	label:string;
+	langdescription:string;
+	movePlace?:{left:number, top:number};
+
+	static make(src:BasicPuzzlePiece):InteractivePuzzlePiece {
+		const p = new InteractivePuzzlePiece({srcpuzzle:src});
+		p.backingObject.frontingObject = p;
+		p.associate();
+		return p;
+	}
+
+	public constructor(args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+		super(args);
+		if('srcpuzzle' in args) {
+			const options = (<any>args).srcpuzzle;
+			this.langid = options.langid;
+			this.label = options.label;
+			this.langdescription = options.langdescription;
+		} else {
+			const options = (<any>args).options;
+			this.langid = options.langid;
+			this.label = options.label;
+			this.langdescription = options.langdescription;
+
+		}
+	}
+
+	associate() {
+		this.backingObject.hoverCursor = 'grab';
+		(<any>this.backingObject).moveCursor = 'grabbing';
+		this.backingObject.on('mousedown', this.mousedown);
+		this.backingObject.on('moving', this.moving); 
+		this.backingObject.on('mouseup', this.mouseup); 
+	}
+
+	disassociate() {
+		this.backingObject.off('mousedown', this.mousedown);
+		this.backingObject.off('moving', this.moving); 
+		this.backingObject.off('mouseup', this.mouseup); 
+	}
+
+	protected mousedown = () => {
+		const gp = this.getGridPoint();
+			
+		delete placedPieces[gp.y][gp.x];
+	}
+
+	protected mouseup = () => {
+		this.backingObject.set({
 			opacity:1
 		});
-		const gridp = piece.getGridPoint();
+		const gridp = this.getGridPoint();
 		const leftentry = gridp.x;
 		const topentry = gridp.y;
 
-		piece.setGridPoint(gridp);
+		this.setGridPoint(gridp);
 	
-		if(!piece.isSourcePiece) {
-			// fix this to use grid coordinates
-			if(piece.top >= canvasHeightInteractive) {
-				piece.canvas.remove(piece);
-			}
-
-			// update the placed grid
-			if('movePlace' in piece) {
-				// finalize the moved pieces in their new positions
-				const prow = placedPieces[topentry];
-				if(! (prow === undefined)) {
-					let curleft = leftentry;
-					let curleftval = prow[leftentry];
-					while(! (curleftval === undefined)) {
-						let nextleft = curleft+1;
-						let nextleftval = prow[nextleft];
-
-						prow[nextleft] = curleftval;
-						curleft = nextleft;
-						curleftval = nextleftval;
-					}
-					ensureCanvasInteractivePieceWidth(piece.canvas, curleft+1);
-					prow[leftentry] = undefined;
-				}
-				delete piece['movePlace'];
-			}
-			if(topentry >= placedPieces.length || placedPieces[topentry] === undefined) {
-				placedPieces[topentry] = [];
-			}
-			const topplaces = placedPieces[topentry];
-			if(leftentry >= topplaces.length || topplaces[leftentry] === undefined) {
-				topplaces[leftentry] = piece;
-			}
+		// fix this to use grid coordinates
+		if(this.backingObject.top >= canvasHeightInteractive) {
+			this.backingObject.canvas.remove(this.backingObject);
 		}
-//		piece.canvas.renderAll();
-	});
-	piece.on('moving', function() {
-		const gridp = piece.getGridPoint();
+
+		// update the placed grid
+		if('movePlace' in this) {
+			// finalize the moved pieces in their new positions
+			const prow = placedPieces[topentry];
+			if(! (prow === undefined)) {
+				let curleft = leftentry;
+				let curleftval = prow[leftentry];
+				while(! (curleftval === undefined)) {
+					let nextleft = curleft+1;
+					let nextleftval = prow[nextleft];
+
+					prow[nextleft] = curleftval;
+					curleft = nextleft;
+					curleftval = nextleftval;
+				}
+				ensureCanvasInteractivePieceWidth(this.backingObject.canvas, curleft+1);
+				prow[leftentry] = undefined;
+			}
+			delete this['movePlace'];
+		}
+		if(topentry >= placedPieces.length || placedPieces[topentry] === undefined) {
+			placedPieces[topentry] = [];
+		}
+		const topplaces = placedPieces[topentry];
+		if(leftentry >= topplaces.length || topplaces[leftentry] === undefined) {
+			topplaces[leftentry] = this;
+		}
+	}
+
+	protected moving = ():any => {
+		const gridp = this.getGridPoint();
 		const leftentry = gridp.x;
 		const topentry = gridp.y;
 
-
-		if('movePlace' in piece) {
-			if(piece.movePlace.left == leftentry && piece.movePlace.top == topentry) {
+		console.log('hello');
+		if('movePlace' in this) {
+			if(this.movePlace.left == leftentry && this.movePlace.top == topentry) {
 				// still over the same grid spot
 				return;
 			}
 			// otherwise, we moved.  We need to put back anything we moved out of the way
-			const oldtop = piece.movePlace.top;
+			const oldtop = this.movePlace.top;
 			const prow = placedPieces[oldtop];
 			if(! (prow === undefined)) {
-				var oldleft = piece.movePlace.left;
+				var oldleft = this.movePlace.left;
 				while(true) {
 					let mp = prow[oldleft];
 					if(mp === undefined) {
@@ -510,7 +546,7 @@ function mkSourcePiece(options):IPuzzlePiece {
 				}
 			}
 		}
-		piece.movePlace = {top:topentry, left:leftentry};
+		this.movePlace = {top:topentry, left:leftentry};
 		const prow = placedPieces[topentry];
 		if(! (prow === undefined)) {
 			var curleft = leftentry;
@@ -523,34 +559,113 @@ function mkSourcePiece(options):IPuzzlePiece {
 				curleft = curleft + 1;
 			}
 		}
-	});
-	
-	piece.on('mouseover', function() {
-		if(piece.isSourcePiece) {
-			if(! ('tooltipObj' in piece)) {
-
-				const tip = makeToolTip(
-					piece.langdescription,
-					piece.canvas,
-					{left:piece.left, top:piece.top, width:piecewidth, height:pieceheight},
-					new fabric.Point(10, 10),
-				 	{fill:'black', fontSize:40}, 
-					{fill:'#EEEEEE'});
-				
-				piece.tooltipObj = tip;
-				piece.canvas.add(tip);
-			}
-		}
-	});
-	piece.on('mouseout', function() {
-		if('tooltipObj' in piece) {
-			piece.canvas.remove(piece.tooltipObj);
-			delete piece.tooltipObj;
-		}
-	});
-
-	return piece;
+	}
 }
+
+class SourcePuzzlePiece extends BasicPuzzlePiece {
+
+	static make(options):SourcePuzzlePiece {
+		const p = new SourcePuzzlePiece(options);
+		p.associate();
+		return p;
+	}
+
+	langid:QcertLanguage;
+	label:string;
+	langdescription:string;
+
+	protected constructor(options) {
+		super({options:options});	
+	
+		this.langid = options.langid;
+		this.label = options.label;
+		this.langdescription = options.langdescription;
+	};
+
+	associate() {
+		this.backingObject.hoverCursor = 'grab';
+		(<any>this.backingObject).moveCursor = 'grabbing';
+		this.backingObject.on('mousedown', this.mousedown);
+		this.backingObject.on('mouseover', this.mouseover); 
+		this.backingObject.on('mouseout', this.mouseout); 
+	};
+
+	disassociate() {
+		this.backingObject.off();
+		// this.backingObject.off('mousdown', this.mousedown);
+		// this.backingObject.off('mouseover', this.mouseover); 
+		// this.backingObject.off('mouseout', this.mouseout); 
+	}
+
+	// TODO: when me move something, shift things to the right back over it (to the left)
+	// be careful how that interacts with the shift right code!
+	// TODO: work on getting things to move out of the way
+	// track what we were over last / are over now
+	// and use that to track what is going on
+	// once that is working, change the code to move things over 
+	// to use animations to look smooth
+
+	// mkDerivative() {
+	// 	// change to keep the same fronting object, with a new backingobject.
+	// 	// which actually, can be automatically re-created upon disassociate
+	// 	// instead, when dragging, we will create a new (BasicPuzzlePiece for now)
+	// 	// and reassociate the backend with it
+
+	// 	// new SourcePuzzlePiece(this.options);
+	// // (<any>piece).mkDerivative = function () {
+	// // 	var copyOfSelf = mkSourcePiece(options);
+	// // 	copyOfSelf.isSourcePiece = false;
+	// // 	return copyOfSelf;
+	// }
+
+	tooltipObj?:fabric.IObject;
+
+	protected mousedown = () => {
+		this.backingObject.set({
+			opacity:.5
+		});
+		// clear any tooltip
+		if('tooltipObj' in this) {
+			this.backingObject.canvas.remove(this.tooltipObj);
+			delete this.tooltipObj;
+		}
+
+		this.disassociate();
+		InteractivePuzzlePiece.make(this);
+		// This could be optimized a bit
+		// in particular, we can factor out the underlying puzzle piece,
+		// and just create it and give it to the existing source piece
+		// instead of creating a new source piece
+		const newSourcePiece = SourcePuzzlePiece.make(this.options);
+		this.backingObject.canvas.add(newSourcePiece.backingObject);
+		sourcePieces[this.langid] = newSourcePiece;
+		this.backingObject.canvas.renderAll();
+	}
+	
+	protected mouseover = () => {
+		console.log('mouseover');
+		if(! ('tooltipObj' in this)) {
+			const tip = makeToolTip(
+				this.langdescription,
+				this.backingObject.canvas,
+				{left:this.backingObject.left, top:this.backingObject.top, width:piecewidth, height:pieceheight},
+				new fabric.Point(10, 10),
+				{fill:'black', fontSize:40}, 
+				{fill:'#EEEEEE'});
+			
+			this.tooltipObj = tip;
+			this.backingObject.canvas.add(tip);
+		}
+	};
+	
+	protected mouseout = () => {
+		if('tooltipObj' in this) {
+			this.backingObject.canvas.remove(this.tooltipObj);
+			delete this.tooltipObj;
+		}
+	};
+}
+
 
 interface ICanvasTab {
        label:string;
@@ -804,7 +919,7 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 
 	// create the start piece
 	// note that the start piece is meant to have a "real" piece put on top of it by the user
-	const startPiece = makePuzzlePiece({
+	const startPiece = BasicPuzzlePiece.make({
 		fill : '#c2f0c2',
 		label : 'start',
 		sides : {right:-1},
@@ -813,11 +928,11 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 		evented : false
 	});
 	startPiece.setGridCoords(0, pipelineRow);
-	startPiece.set({
+	startPiece.backingObject.set({
 		hasControls : false,
 		selectable: false
 	});
-	startPiece.hoverCursor = 'auto';
+	startPiece.backingObject.hoverCursor = 'auto';
 
 	const runText = new fabric.Text('R\nu\nn', {
 		left:2,
@@ -883,7 +998,7 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 
 			colelem.row = srcrow;
 			colelem.col = srccol;
-			let piece = mkSourcePiece(colelem);
+			let piece = SourcePuzzlePiece.make(colelem);
 			sourcePieces[colelem.langid] = piece;
 		}
 		maxCols = Math.max(srccol, maxCols);
@@ -901,14 +1016,14 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 				   	canvas.selection = false;
 					canvas.hoverCursor = 'pointer';
 
-					canvas.add(startPiece);
+					canvas.add(startPiece.backingObject);
 
 					//canvas.add(runGroup);
 					canvas.add(separatorLine);
 
 					// add the source pieces
 					for(let piece in sourcePieces) {
-						canvas.add(sourcePieces[piece]);
+						canvas.add(sourcePieces[piece].backingObject);
 					}
 
 					// add the grid pieces
@@ -920,7 +1035,7 @@ function init_builder(canvas:fabric.ICanvas):ICanvasTab {
 							for(let col=0;col < placedCols; col++) {
 								const piece = prow[col];
 								if (piece !== undefined) {
-									canvas.add(piece);
+									canvas.add(piece.backingObject);
 								}
 							}
 						}
