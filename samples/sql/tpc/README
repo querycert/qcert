@@ -1,5 +1,7 @@
 For legal reasons we do not reproduce the TPC benchmark data here.  However, we provide instructions for obtaining the
-queries that we used to produce our results for TPC-H and TPC-DS in our paper in SIGMOD 2017.
+queries that we used to produce our results using queries from TPC-H and TPC-DS (in our paper in SIGMOD 2017).
+
+Coming soon: instructions for getting data also, and a Makefile for generating statistics and running the queries.
 
 TPC-H:
 
