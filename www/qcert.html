@@ -5,6 +5,7 @@
     <meta charset = "UTF-8" />
     <script src="../lib/qcertJS.js"></script>
     <script src="../www/qcertPreCompiler.js"></script>
+    <script src="../runtime/javascript/qcert-merged-runtime.js"></script>
     <script>
       var entityMap = {
       	"&": "&amp;",
@@ -26,10 +27,26 @@
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
 				var useLocal = document.getElementById("localServer").checked;
-				document.getElementById("result").innerHTML = escapeHtml(qcertPreCompile(input, useLocal).result);
+				compiledQuery = qcertPreCompile(input, useLocal).result;	
+				document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
+			}
+			function performEvaluation() {
+					var io = document.getElementById("io").value;
+					eval(compiledQuery);
+					var result = JSON.stringify(query(JSON.parse(io)));
+					document.getElementById("execresult").innerHTML = escapeHtml(result);
       }
+			function executeButton() {
+				var target = document.getElementById("target").value;
+				if (target != "js")
+				  document.getElementById("execresult").innerHTML = "Only JavaScript execution is supported at this time";
+				else {
+				  performEvaluation();
+				}
+			}		
       function clearButton() {
         document.getElementById("result").innerHTML = "";
+        document.getElementById("execresult").innerHTML = "";
       }
     </script>
     <script>
@@ -64,7 +81,18 @@
         return false;
       }
     </script>
-
+		<script>
+			function handleFile(files, output) {
+   			if (files.length > 0) {
+	  		  var file = files[0];
+		  	  var reader = new FileReader();
+		  	  reader.onload = function(event) {
+			      document.getElementById(output).innerHTML = escapeHtml(event.target.result);
+			    }
+			    var text = reader.readAsText(file);
+			  }
+			}
+		</script>
   </head>
   <body>
     <h1>Q*cert online form</h1>
@@ -103,12 +131,12 @@
 	      <option>lambda_nra</option>
 	      <option>nra</option>
 	      <option>nraenv</option>
-	      <option selected="selected">nnrc</option>
+	      <option>nnrc</option>
 	      <option>nnrcmr</option>
 	      <option>cldmr</option>
 	      <option>dnnrc</option>
 	      <option>dnnrc_typed</option>
-	      <option>js</option>
+	      <option selected="selected">js</option>
 	      <option>java</option>
 	      <option>spark</option>
 	      <option>spark2</option>
@@ -116,92 +144,32 @@
 	  </select>
         </p>
         <p>
-          <label>source query</label>
+          <label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="sourceFile" onchange='handleFile(this.files, "query")'/>
 	  <br/>
           <textarea id = "query"
                     rows = "10"
-                    cols = "80" />select
-	sum(l_extendedprice * l_discount) as revenue
-from
-	lineitem
-where
-	date_ge(l_shipdate, date '1994-01-01')
-	and date_lt(l_shipdate, date_plus(date '1994-01-01', interval '1' year))
-	and l_discount between .06 - 0.01 and .06 + 0.01
-	and l_quantity < 24;</textarea>
+                    cols = "80" /></textarea>
         </p>
         <p>
-          <label>io</label><br/>
+          <label>io (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="ioFile" onchange='handleFile(this.files, "io")'/><br/>
           <textarea id = "io"
                     rows = "10"
-                    cols = "80" />{"inheritance": [
-{"sub":"entities.MainEntity", "sup":"org.qcert.TopEntity"},
-   {"sub":"entities.Purchase", "sup":"org.qcert.TopEntity"},
-   {"sub":"entities.Customer", "sup":"org.qcert.TopEntity"}
-]
-,"model":
-{"modelName": "test01",
- "brandTypes" :[{ "brand":"org.qcert.TopEntity", "typeName":"org_qcert_TopEntity"},
-   { "brand":"entities.Customer", "typeName":"entities_Customer"},
-   { "brand":"entities.Purchase", "typeName":"entities_Purchase"},
-   { "brand":"entities.MainEntity", "typeName":"entities_MainEntity"}],
-   "typeDefs" :[{ "typeName": "org_qcert_TopEntity", "typeDef": { }},
-   { "typeName": "entities_Customer", "typeDef": { "cid": "Nat", "age": "Nat", "name": "String"}},
-   { "typeName": "entities_Purchase", "typeDef": { "cid": "Nat", "pid": "Nat", "name": "String", "quantity": "Nat"}},
-   { "typeName": "entities_MainEntity", "typeDef": { "id": "Nat", "doubleAttribute": "Nat", "stringId": "String"}}]
-}
-, "WMType" : { "$coll" : { "$brand" : ["entities.MainEntity"] } },
-"input": [
-  {"type":["entities.Customer"],"data":{"name":"John Doe", "cid":123, "age":32}},
-  {"type":["entities.Customer"],"data":{"name":"Jane Doe", "cid":124, "age":32}},
-  {"type":["entities.Customer"],"data":{"name":"Jim Does", "cid":125, "age":34}},
-  {"type":["entities.Customer"],"data":{"name":"Jill Does", "cid":126, "age":32}},
-  {"type":["entities.Customer"],"data":{"name":"Joan Doe", "cid":127, "age":34}},
-  {"type":["entities.Customer"],"data":{"name":"James Do", "cid":128, "age":35}},
-  {"type":["entities.Purchase"],"data":{"name":"Tomatoe", "cid":123, "pid":1, "quantity":3}},
-  {"type":["entities.Purchase"],"data":{"name":"Potatoe", "cid":123, "pid":2, "quantity":1}},
-  {"type":["entities.Purchase"],"data":{"name":"Stiletto", "cid":125, "pid":3, "quantity":64}},
-  {"type":["entities.Purchase"],"data":{"name":"Libretto", "cid":126, "pid":4, "quantity":62}},
-  {"type":["entities.Purchase"],"data":{"name":"Dough", "cid":128, "pid":5, "quantity":4}},
-  {"type":["entities.Purchase"],"data":{"name":"Croissant", "cid":128, "pid":6, "quantity":2}},
-  {"type":["entities.MainEntity"],"data":{"id":201, "doubleAttribute":4, "stringId":"201"}},
-  {"type":["entities.MainEntity"],"data":{"id":202, "doubleAttribute":100, "stringId":"202"}}
-],
-
-"partitionedInput": {"entities.Purchase":[
-    {"type":["entities.Purchase"],"data":{"name":"Stiletto", "cid":125, "pid":3, "quantity":64}},
-    {"type":["entities.Purchase"],"data":{"name":"Dough", "cid":128, "pid":5, "quantity":4}},
-    {"type":["entities.Purchase"],"data":{"name":"Tomatoe", "cid":123, "pid":1, "quantity":3}},
-    {"type":["entities.Purchase"],"data":{"name":"Libretto", "cid":126, "pid":4, "quantity":62}},
-    {"type":["entities.Purchase"],"data":{"name":"Croissant", "cid":128, "pid":6, "quantity":2}},
-    {"type":["entities.Purchase"],"data":{"name":"Potatoe", "cid":123, "pid":2, "quantity":1}}],
-  "entities.MainEntity":[
-    {"type":["entities.MainEntity"],"data":{"id":201, "doubleAttribute":4, "stringId":"201"}},
-    {"type":["entities.MainEntity"],"data":{"id":202, "doubleAttribute":100, "stringId":"202"}}],
-  "entities.Customer":[
-    {"type":["entities.Customer"],"data":{"name":"Jane Doe", "cid":124, "age":32}},
-    {"type":["entities.Customer"],"data":{"name":"Joan Doe", "cid":127, "age":34}},
-    {"type":["entities.Customer"],"data":{"name":"Jill Does", "cid":126, "age":32}},
-    {"type":["entities.Customer"],"data":{"name":"John Doe", "cid":123, "age":32}},
-    {"type":["entities.Customer"],"data":{"name":"Jim Does", "cid":125, "age":34}},
-    {"type":["entities.Customer"],"data":{"name":"James Do", "cid":128, "age":35}}]
-},
-
-"output": [
-  "Customer =John Doe",
-  "Customer =Jane Doe",
-  "Customer =Jill Does"
-]}
-</textarea>
+                    cols = "80" /></textarea>
 </fieldset>
 <p/>
     <button type="button"
 	    onclick="compileButton()"><b>compile</b></button>
     <button type="button"
+	    onclick="executeButton()"><b>execute</b></button>
+    <button type="button"
 	    onclick="clearButton()"><b>clear</b></button>
     <fieldset>
-      <legend>Result</legend>
+      <legend>Compilation Result</legend>
       <p><pre id="result"></pre></p>
+    </fieldset>
+    <fieldset>
+      <legend>Execution Result</legend>
+      <p><pre id="execresult"></pre></p>
     </fieldset>
     <fieldset>
       <legend>Options</legend>
@@ -218,7 +186,7 @@ where
                  id = "java_imports"
                  value = "" />
         </p>
-    <label><input type="checkbox" id="localServer" checked>Use Local Server for SQL Assist</label>
+    <label><input type="checkbox" id="localServer">Use Local Server for SQL Assist</label>
     </fieldset>
     <!-- Testing area
     <fieldset>
