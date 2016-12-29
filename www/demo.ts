@@ -455,6 +455,7 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	label:string;
 	langdescription:string;
 	movePlace?:{left:number, top:number};
+	movedPieces?:number;
 
 	isTransient() {
 		return false;
@@ -498,8 +499,13 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 
 	protected mousedown = () => {
 		const gp = this.getGridPoint();
-		//this.movePlace = {left:gp.x, top:gp.y};
-		delete placedPieces[gp.y][gp.x];
+		this.backingObject.set({
+			opacity:0.5
+		});
+
+		this.movePlace = {left:gp.x, top:gp.y};
+		this.movedPieces = 0;
+		//delete placedPieces[gp.y][gp.x];
 	}
 
 	protected mouseup = () => {
@@ -516,34 +522,49 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		if(gridp.y < 0 || gridp.y >= gridRows) {
 			this.hide();
 		}
+		delete this.movePlace;
+		delete this.movedPieces;
 
-		// update the placed grid
-		if('movePlace' in this) {
-			// finalize the moved pieces in their new positions
-			const prow = placedPieces[topentry];
-			if(! (prow === undefined)) {
-				let curleft = leftentry;
-				let curleftval = prow[leftentry];
-				while(! (curleftval === undefined)) {
-					let nextleft = curleft+1;
-					let nextleftval = prow[nextleft];
-
-					prow[nextleft] = curleftval;
-					curleft = nextleft;
-					curleftval = nextleftval;
+		// find the rightmost entry in the row
+		const prow = placedPieces[topentry];
+		if(prow !== undefined) {
+			let maxcol:number;
+			for(maxcol = prow.length-1; maxcol >= 0; maxcol--) {
+				if(prow[maxcol] !== undefined) {
+					break;
 				}
-				ensureCanvasInteractivePieceWidth(this.canvas, curleft+1);
-				prow[leftentry] = undefined;
 			}
-			delete this['movePlace'];
+			ensureCanvasInteractivePieceWidth(this.canvas, maxcol+1);
 		}
-		if(topentry >= placedPieces.length || placedPieces[topentry] === undefined) {
-			placedPieces[topentry] = [];
-		}
-		const topplaces = placedPieces[topentry];
-		if(leftentry >= topplaces.length || topplaces[leftentry] === undefined) {
-			topplaces[leftentry] = this;
-		}
+
+
+		// // update the placed grid
+		// if('movePlace' in this) {
+		// 	// finalize the moved pieces in their new positions
+		// 	const prow = placedPieces[topentry];
+		// 	if(! (prow === undefined)) {
+		// 		let curleft = leftentry;
+		// 		let curleftval = prow[leftentry];
+		// 		while(! (curleftval === undefined)) {
+		// 			let nextleft = curleft+1;
+		// 			let nextleftval = prow[nextleft];
+
+		// 			prow[nextleft] = curleftval;
+		// 			curleft = nextleft;
+		// 			curleftval = nextleftval;
+		// 		}
+		// 		ensureCanvasInteractivePieceWidth(this.canvas, curleft+1);
+		// 		prow[leftentry] = undefined;
+		// 	}
+		// 	delete this['movePlace'];
+		// }
+		// if(topentry >= placedPieces.length || placedPieces[topentry] === undefined) {
+		// 	placedPieces[topentry] = [];
+		// }
+		// const topplaces = placedPieces[topentry];
+		// if(leftentry >= topplaces.length || topplaces[leftentry] === undefined) {
+		// 	topplaces[leftentry] = this;
+		// }
 
 		// // finalize any left objects in their new positions
 		// // remove any transient path objects
@@ -556,7 +577,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		// }
 
 	}
-
 	
 	//leftTransients?:CompositeHalfPiece;
 	//rightTransients?:CompositeHalfPiece;
@@ -570,20 +590,21 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 				// still over the same grid spot
 				return;
 			}
-			// otherwise, we moved.  We need to put back anything we moved out of the way
+			// otherwise, we moved.  We need to move back the pieces that we moved
 			const oldtop = this.movePlace.top;
+			const oldleft = this.movePlace.left;
 			const prow = placedPieces[oldtop];
-			if(! (prow === undefined)) {
-				var oldleft = this.movePlace.left;
-				while(true) {
-					let mp = prow[oldleft];
-					if(mp === undefined) {
-						break;
-					}
-					mp.setGridCoords(oldleft, oldtop);
-					oldleft = oldleft + 1;
+
+			for(let i:number=0; i<this.movedPieces; i++) {
+				const curleft=oldleft+i;
+				const p = prow[curleft+1];
+				prow[curleft] = p;
+				if(p !== undefined) {
+					p.setGridCoords(curleft, oldtop);
 				}
 			}
+			prow[oldleft+this.movedPieces] = undefined;
+		}
 			// // destroy any associated objects
 			// if('pathObjects' in this) {
 			// 	for(let i =0; i < this.pathObjects.length; i++) {
@@ -592,20 +613,33 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			// 	}
 			// 	delete this.pathObjects;			
 			// }
-		}
 		this.backingObject.moveCursor = 'grabbing';
 		this.movePlace = {top:topentry, left:leftentry};
 		const prow = placedPieces[topentry];
-		if(! (prow === undefined)) {
-			var curleft = leftentry;
-			while(true) {
-				let mp = prow[curleft];
-				if(mp === undefined) {
-					break;
+		let numMoved:number = -1;
+		if(prow !== undefined) {
+			var curleft = leftentry-1;
+			let curleftval:InteractivePuzzlePiece = this;
+			// if needed, move things to the right
+			while(curleftval !== undefined) {
+				numMoved++;
+				let nextleft = curleft+1;
+				let nextleftval = prow[nextleft];
+
+				prow[nextleft] = curleftval;
+				if(nextleft!=leftentry) {
+					curleftval.setGridCoords(nextleft, topentry);
 				}
-				mp.setGridCoords(curleft+1, topentry);
-				curleft = curleft + 1;
+				curleft = nextleft;
+				curleftval = nextleftval;
 			}
+
+			this.movedPieces = numMoved;
+		} else {
+			placedPieces[topentry] = [];
+			placedPieces[topentry][leftentry] = this;
+			this.movedPieces = 0;
+		}
 			// now calculate any path-induced transients for hovering
 			// this.pathObjects = [];
 			// if(leftentry > 0) {
@@ -643,7 +677,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			// if(nextentry !== undefined) {
 			// 	// ...
 			// }
-		}
 	}
 }
 
