@@ -31,10 +31,10 @@ Section LambdaNRATests.
 
   (* Prep *)
   Definition h : brand_relation_t := nil.
-  
+
   Definition db1 :=
     (dcoll ((drec (("addr",(drec (("city", dstring "NYC")::nil)))::nil))::nil))%string.
-
+  
   Definition child1 :=
     (dcoll ((drec (("name",dstring "Jane")::("age",dnat 2)::nil))
               :: (drec (("name",dstring "Joan")::("age",dnat 99)::nil))
@@ -50,30 +50,29 @@ Section LambdaNRATests.
               :: (drec (("name",dstring "Jack")::("age",dnat 40)::("child",child2)::nil))
               :: nil))%string.
 
-  (* T1 : map(λ(a) a.city)(map(λ(p) p.addr)(P)) == map(λ(p) p.addr.city)(P) *)
+  (* T1 : P.map{p => p.addr}.map{a => a.city} == P.map{p => p.addr.city} *)
   (** The original version of T1 *)
   Definition T1l P :=
-    LAMap (LALambda "a" (LAUnop (ADot "city") (LAVar "a")))
-          (LAMap (LALambda "p" (LAUnop (ADot "addr") (LAVar "p"))) P).
+    LNRAMap (LNRALambda "a" (LNRAUnop (ADot "city") (LNRAVar "a")))
+            (LNRAMap (LNRALambda "p" (LNRAUnop (ADot "addr") (LNRAVar "p"))) P).
 
   (** The simplified version of T1 *)
   Definition T1r P :=
-    LAMap (LALambda "p" (LAUnop (ADot "city") (LAUnop (ADot "addr") (LAVar "p")))) P.
+    LNRAMap (LNRALambda "p" (LNRAUnop (ADot "city") (LNRAUnop (ADot "addr") (LNRAVar "p")))) P.
 
-
-  Lemma T1lr_equiv P : lalg_eq (T1l P) (T1r P).
+  Lemma T1lr_equiv P : lnra_eq (T1l P) (T1r P).
   Proof.
-    unfold lalg_eq, T1l, T1r.
+    unfold lnra_eq, T1l, T1r.
     intros.
-    autorewrite with lalg.
+    autorewrite with lnra.
     simpl.
     unfold olift.
-    destruct (fun_of_lalg h0 cenv env P); trivial.
+    destruct (fun_of_lnra h0 cenv env P); trivial.
     unfold lift_oncoll.
     destruct d; trivial.
     induction l; simpl; trivial.
-    autorewrite with lalg.
-    case_eq (@fun_of_lalg TrivialModel.trivial_foreign_runtime h0 cenv
+    autorewrite with lnra.
+    case_eq (@fun_of_lnra TrivialModel.trivial_foreign_runtime h0 cenv
              (@app
                 (prod string
                    (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))) env
@@ -87,7 +86,7 @@ Section LambdaNRATests.
                    (@nil
                       (prod string
                          (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))))))
-             (@LAUnop TrivialModel.trivial_foreign_runtime
+             (@LNRAUnop TrivialModel.trivial_foreign_runtime
                 (@ADot TrivialModel.trivial_foreign_data
                    (@TrivialModel.trivial_foreign_unary_op TrivialModel.trivial_foreign_data)
                    (String (Ascii.Ascii true false false false false true true false)
@@ -96,10 +95,10 @@ Section LambdaNRATests.
                             (String
                                (Ascii.Ascii false true false false true true true false)
                                EmptyString)))))
-                (@LAVar TrivialModel.trivial_foreign_runtime
+                (@LNRAVar TrivialModel.trivial_foreign_runtime
                    (String (Ascii.Ascii false false false false true true true false)
                            EmptyString)))); simpl; intros.
-    - unfold fun_of_lalg in H |- *.
+    - unfold fun_of_lnra in H |- *.
       rewrite H; clear H.
       rewrite olift_some.
       match_case_in IHl; intros; rewrite H in IHl.
@@ -111,11 +110,11 @@ Section LambdaNRATests.
         simpl.
         destruct ((@rmap (@data TrivialModel.trivial_foreign_data)
                  (@data TrivialModel.trivial_foreign_data)
-                 (@fun_of_lalg_lambda TrivialModel.trivial_foreign_runtime h0 cenv env
-                    (@LALambda TrivialModel.trivial_foreign_runtime
+                 (@fun_of_lnra_lambda TrivialModel.trivial_foreign_runtime h0 cenv env
+                    (@LNRALambda TrivialModel.trivial_foreign_runtime
                        (String (Ascii.Ascii true false false false false true true false)
                           EmptyString)
-                       (@LAUnop TrivialModel.trivial_foreign_runtime
+                       (@LNRAUnop TrivialModel.trivial_foreign_runtime
                           (@ADot TrivialModel.trivial_foreign_data
                              (@TrivialModel.trivial_foreign_unary_op
                                 TrivialModel.trivial_foreign_data)
@@ -129,12 +128,12 @@ Section LambdaNRATests.
                                       (String
                                          (Ascii.Ascii true false false true true true true
                                             false) EmptyString)))))
-                          (@LAVar TrivialModel.trivial_foreign_runtime
+                          (@LNRAVar TrivialModel.trivial_foreign_runtime
                              (String
                                 (Ascii.Ascii true false false false false true true false)
                                 EmptyString))))) x)); simpl.
-        * autorewrite with lalg.
-          unfold fun_of_lalg.
+        * autorewrite with lnra.
+          unfold fun_of_lnra.
           simpl.
           unfold edot.
           rewrite @assoc_lookupr_app.
@@ -149,7 +148,7 @@ Section LambdaNRATests.
         destruct d; simpl; trivial.
         match_destr.
     - match_case; intros.
-      unfold fun_of_lalg in H, H0.
+      unfold fun_of_lnra in H, H0.
       rewrite H in H0.
       simpl in H0.
       discriminate.
@@ -158,61 +157,61 @@ Section LambdaNRATests.
   
 (*  Eval vm_compute in (eval_q h T1l db1). *)
 (*  Eval vm_compute in (eval_q h T1r db1). *)
-(*  Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda T1l)) db1). *)
-(*  Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda T1r)) db1). *)
+(*  Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T1l)) db1). *)
+(*  Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T1r)) db1). *)
 
-  (* T2 : map(λ(x) x.age)(sel(λ(p) p.age > 25)(P)) == sel(λ(a) a > 25)(map(λ(p) p.age)(P)) *)
+  (* T2 : P.filter{p => p.age > 25}.map{x => x.age} == P.map{p => p.age}.filter{a => a > 25} *)
   Definition T2l P :=
-    LAMap (LALambda "x" (LAUnop (ADot "age") (LAVar "x")))
-          (LASelect (LALambda "p" (LABinop ALt
-                                           (LAConst (dnat 25))
-                                           (LAUnop (ADot "age") (LAVar "p")))) P).
-
+    LNRAMap (LNRALambda "x" (LNRAUnop (ADot "age") (LNRAVar "x")))
+            (LNRAFilter (LNRALambda "p" (LNRABinop ALt
+                                                   (LNRAConst (dnat 25))
+                                                   (LNRAUnop (ADot "age") (LNRAVar "p")))) P).
+  
   Definition T2r P :=
-    LASelect (LALambda "a" (LABinop ALt
-                                    (LAConst (dnat 25))
-                                    (LAVar "a")))
-             (LAMap (LALambda "p" (LAUnop (ADot "age") (LAVar "p"))) P).
+    LNRAFilter (LNRALambda "a" (LNRABinop ALt
+                                          (LNRAConst (dnat 25))
+                                          (LNRAVar "a")))
+               (LNRAMap (LNRALambda "p" (LNRAUnop (ADot "age") (LNRAVar "p"))) P).
 
   
 (*  Eval vm_compute in (eval_q h T2l db2). *)
   (* Eval vm_compute in (eval_q h T2r db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda T2l)) db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda T2r)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T2l)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T2r)) db2). *)
 
-  (* A3 : map(λ(p) [ person: p, kids: sel(λ(c) c.age > 25)(p.child) ])(P) *)
+  (* A3 : P.map{p => [ person: p, kids: p.child.filter{c => c.age > 25} ]} *)
 
   Definition A3 P :=
-    LAMap
-      (LALambda "p"
-                (LABinop AConcat (LAUnop (ARec "person") (LAVar "p"))
-                         (LAUnop (ARec "kids")
-                                 (LASelect
-                                    (LALambda "c"
-                                              (LABinop ALt
-                                                       (LAConst (dnat 25))
-                                                       (LAUnop (ADot "age") (LAVar "c"))))
-                                    (LAUnop (ADot "child") (LAVar "p")))))) P.
+    LNRAMap
+      (LNRALambda "p"
+                  (LNRABinop AConcat (LNRAUnop (ARec "person") (LNRAVar "p"))
+                             (LNRAUnop (ARec "kids")
+                                       (LNRAFilter
+                                          (LNRALambda "c"
+                                                      (LNRABinop ALt
+                                                                 (LNRAConst (dnat 25))
+                                                                 (LNRAUnop (ADot "age") (LNRAVar "c"))))
+                                          (LNRAUnop (ADot "child") (LNRAVar "p")))))) P.
 
   (* Eval vm_compute in (eval_q h A3 db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda A3)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda A3)) db2). *)
   
-  (* A4 : map(λ(p) [ person: p, kids: sel(λ(c) p.age > 25)(p.child) ])(P) *)
+  (* A4 : P.map{p => [ person: p, kids: p.child.filter{c => p.age > 25} ]} *)
 
   Definition A4 P :=
-    LAMap
-      (LALambda "p"
-                (LABinop AConcat (LAUnop (ARec "person") (LAVar "p"))
-                         (LAUnop (ARec "kids")
-                                 (LASelect
-                                    (LALambda "c"
-                                              (LABinop ALt
-                                                       (LAConst (dnat 25))
-                                                       (LAUnop (ADot "age") (LAVar "p"))))
-                                    (LAUnop (ADot "child") (LAVar "p")))))) P.
+    LNRAMap
+      (LNRALambda "p"
+                  (LNRABinop AConcat (LNRAUnop (ARec "person") (LNRAVar "p"))
+                             (LNRAUnop (ARec "kids")
+                                       (LNRAFilter
+                                          (LNRALambda "c"
+                                                      (LNRABinop ALt
+                                                                 (LNRAConst (dnat 25))
+                                                                 (LNRAUnop (ADot "age") (LNRAVar "p"))))
+                                          (LNRAUnop (ADot "child") (LNRAVar "p")))))) P.
 
   (* Eval vm_compute in (eval_q h A4 db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lalg_lambda (q_to_lambda A4)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda A4)) db2). *)
 
 End LambdaNRATests.
 
@@ -225,7 +224,7 @@ Require Import NRAEnv.
 Require Import CompDriver.
 Context {l:optimizer_logger string nraenv}.
 
-Definition T1env : nraenv := (nraenv_of_lalg_lambda (q_to_lambda T1l)).
+Definition T1env : nraenv := (nraenv_of_lnra_lambda (q_to_lambda T1l)).
 (* Eval vm_compute in T1env. *)
 Definition T1env_opt := nraenv_optim_default T1env.
 (* Eval vm_compute in T1env_opt. *)
@@ -233,13 +232,13 @@ Definition T1nnrc_opt :=
   TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T1env_opt.
 (* Eval vm_compute in T1nnrc_opt. *)
 
-Definition T2env := (nraenv_of_lalg_lambda (q_to_lambda T2l)).
+Definition T2env := (nraenv_of_lnra_lambda (q_to_lambda T2l)).
 (* Eval vm_compute in T2env. *)
 Definition T2env_opt := nraenv_optim_default T2env.
 (* Eval vm_compute in T2env_opt. *)
 (* Note: this optimizes perfectly the access to environment, but does not yield T2r --- I believe
    this is the right plan in most cases since you would more often want to
-   push the select inside the map, rather than the other way around. *)
+   push the map inside the filter, rather than the other way around. *)
 Definition T2nnrc_opt := TrivialCompiler.QDriver.nraenv_optim_to_nnrc_optim T2env_opt.
 (* Eval vm_compute in T2nnrc_opt. *)
 

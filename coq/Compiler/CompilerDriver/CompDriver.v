@@ -129,7 +129,7 @@ Section CompDriver.
 
     Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
 
-    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lalg q.
+    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lnra q.
 
     Definition camp_to_nraenv_core (q:camp) : nraenv_core := PatterntoNRAEnv.translate_pat_to_algenv q.
 

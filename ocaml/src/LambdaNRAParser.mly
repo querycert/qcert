@@ -19,11 +19,28 @@
   open Util
   open Compiler.EnhancedCompiler
 
-  let resolve_nra_operator a le e =
+  type lambda_or_expression =
+  | ParsedLambda of QLambdaNRA.lambda_expr
+  | ParsedExpr of QLambdaNRA.expr
+
+  let resolve_one_lambda a el =
+    begin match el with
+    | [ParsedLambda le] -> le
+    | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " expecting one lambda"))
+    end
+
+  let resolve_one_expr a el =
+    begin match el with
+    | [ParsedExpr e] -> e
+    | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " expecting one expression"))
+    end
+
+  let resolve_nra_operator a el e0 =
     begin match a with
-    | "map" -> QLambdaNRA.lamap le e
-    | "mapconcat" -> QLambdaNRA.lamapconcat le e
-    | "select" -> QLambdaNRA.laselect le e
+    | "map" -> QLambdaNRA.lamap (resolve_one_lambda a el) e0
+    | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
+    | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
+    | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
@@ -83,13 +100,15 @@ expr:
 | v = IDENT
     { QLambdaNRA.lavar (Util.char_list_of_string v) }
 | e = expr DOT a = IDENT LCURLY le = lambda_expr RCURLY
-    { resolve_nra_operator a le e }
+    { resolve_nra_operator a [ParsedLambda le] e }
 | e = expr DOT a = IDENT
     { QLambdaNRA.ladot (Util.char_list_of_string a) e }
 | e = expr ARROW a = IDENT
     { QLambdaNRA.laarrow (Util.char_list_of_string a) e }
 | STRUCT LPAREN r = reclist RPAREN
     { QLambdaNRA.lastruct r }
+| e = expr DOT a = IDENT LPAREN el=params RPAREN
+    { resolve_nra_operator a el e }
 (* Unary operators *)
 | NOT e1 = expr
     { QLambdaNRA.launop QOps.Unary.aneg e1 }
@@ -121,3 +140,12 @@ recatt:
 | a = IDENT COLON e = expr
     { (Util.char_list_of_string a, e) }
     
+params:
+| e = expr
+  { [ParsedExpr e] }
+|  LCURLY le = lambda_expr RCURLY
+  { [ParsedLambda le] }
+| e = expr COMMA el = params
+  { (ParsedExpr e)::el }
+|  LCURLY le = lambda_expr RCURLY COMMA el = params
+  { (ParsedLambda le)::el }

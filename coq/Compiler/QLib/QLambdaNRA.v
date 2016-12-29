@@ -25,44 +25,47 @@ Module QLambdaNRA(runtime:CompilerRuntime).
   Module Ops := QOperators.QOperators runtime.
 
   Definition expr : Set
-    := LambdaNRA.lalg.
+    := LambdaNRA.lnra.
   Definition lambda_expr : Set
-    := LambdaNRA.lalg_lambda.
+    := LambdaNRA.lnra_lambda.
   Definition t : Set
     := expr.
   Definition var : Set
     := String.string.
 
   Definition lalambda : var -> expr -> lambda_expr
-    := LambdaNRA.LALambda.
+    := LambdaNRA.LNRALambda.
   Definition lavar : var -> expr
-    := LambdaNRA.LAVar.
+    := LambdaNRA.LNRAVar.
   Definition laconst : Data.data -> expr
-    := LambdaNRA.LAConst.
+    := LambdaNRA.LNRAConst.
   Definition ltable  : String.string -> expr
-    := LambdaNRA.LATable.
+    := LambdaNRA.LNRATable.
   Definition labinop : Ops.Binary.op -> expr -> expr -> expr
-    := LambdaNRA.LABinop.
+    := LambdaNRA.LNRABinop.
   Definition launop : Ops.Unary.op -> expr -> expr
-    := LambdaNRA.LAUnop.
+    := LambdaNRA.LNRAUnop.
   Definition lamap : lambda_expr -> expr -> expr
-    := LambdaNRA.LAMap.
-  Definition laselect : lambda_expr -> expr -> expr
-    := LambdaNRA.LASelect.
+    := LambdaNRA.LNRAMap.
+  Definition lafilter : lambda_expr -> expr -> expr
+    := LambdaNRA.LNRAFilter.
   Definition lamapconcat : lambda_expr -> expr -> expr
-    := LambdaNRA.LAMapConcat.
+    := LambdaNRA.LNRAMapConcat.
+  Definition laproduct : expr -> expr -> expr
+    := LambdaNRA.LNRAProduct.
 
   Definition ladot : String.string -> expr -> expr 
-    := LambdaNRASugar.LADot.
+    := LambdaNRASugar.LNRADot.
   Definition laarrow : String.string -> expr -> expr 
-    := LambdaNRASugar.LAArrow.
+    := LambdaNRASugar.LNRAArrow.
   Definition lastruct : list (String.string * expr) -> expr 
-    := LambdaNRASugar.LAStruct.
+    := LambdaNRASugar.LNRAStruct.
 
   Definition latableify : expr -> expr
     := LambdaNRASugar.la_tableify.
 
 End QLambdaNRA.
+
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***
