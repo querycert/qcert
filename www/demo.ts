@@ -504,8 +504,19 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		});
 
 		this.movePlace = {left:gp.x, top:gp.y};
-		this.movedPieces = 0;
-		//delete placedPieces[gp.y][gp.x];
+
+		// this.movedPieces = 0;
+		// implement move-to-left behavior
+		let numToShift = 0;
+		const prow = placedPieces[gp.y];
+		if(prow !== undefined) {
+			let curleft = gp.x+1;
+			while(prow[curleft] !== undefined) {
+				numToShift++;
+				curleft++;
+			}
+		}
+		this.movedPieces = numToShift;
 	}
 
 	protected mouseup = () => {
