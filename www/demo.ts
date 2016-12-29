@@ -513,8 +513,8 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 		this.setGridPoint(gridp);
 	
 		// fix this to use grid coordinates
-		if(this.backingObject.top >= canvasHeightInteractive) {
-			this.backingObject.canvas.remove(this.backingObject);
+		if(gridp.y < 0 || gridp.y >= gridRows) {
+			this.hide();
 		}
 
 		// update the placed grid
@@ -532,7 +532,7 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 					curleft = nextleft;
 					curleftval = nextleftval;
 				}
-				ensureCanvasInteractivePieceWidth(this.backingObject.canvas, curleft+1);
+				ensureCanvasInteractivePieceWidth(this.canvas, curleft+1);
 				prow[leftentry] = undefined;
 			}
 			delete this['movePlace'];
