@@ -67,12 +67,12 @@ Section LambdaNRATests.
     autorewrite with lnra.
     simpl.
     unfold olift.
-    destruct (fun_of_lnra h0 cenv env P); trivial.
+    destruct (lnra_eval h0 cenv env P); trivial.
     unfold lift_oncoll.
     destruct d; trivial.
     induction l; simpl; trivial.
     autorewrite with lnra.
-    case_eq (@fun_of_lnra TrivialModel.trivial_foreign_runtime h0 cenv
+    case_eq (@lnra_eval TrivialModel.trivial_foreign_runtime h0 cenv
              (@app
                 (prod string
                    (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))) env
@@ -98,7 +98,7 @@ Section LambdaNRATests.
                 (@LNRAVar TrivialModel.trivial_foreign_runtime
                    (String (Ascii.Ascii false false false false true true true false)
                            EmptyString)))); simpl; intros.
-    - unfold fun_of_lnra in H |- *.
+    - unfold lnra_eval in H |- *.
       rewrite H; clear H.
       rewrite olift_some.
       match_case_in IHl; intros; rewrite H in IHl.
@@ -110,7 +110,7 @@ Section LambdaNRATests.
         simpl.
         destruct ((@rmap (@data TrivialModel.trivial_foreign_data)
                  (@data TrivialModel.trivial_foreign_data)
-                 (@fun_of_lnra_lambda TrivialModel.trivial_foreign_runtime h0 cenv env
+                 (@lnra_eval_lambda TrivialModel.trivial_foreign_runtime h0 cenv env
                     (@LNRALambda TrivialModel.trivial_foreign_runtime
                        (String (Ascii.Ascii true false false false false true true false)
                           EmptyString)
@@ -133,7 +133,7 @@ Section LambdaNRATests.
                                 (Ascii.Ascii true false false false false true true false)
                                 EmptyString))))) x)); simpl.
         * autorewrite with lnra.
-          unfold fun_of_lnra.
+          unfold lnra_eval.
           simpl.
           unfold edot.
           rewrite @assoc_lookupr_app.
@@ -148,7 +148,7 @@ Section LambdaNRATests.
         destruct d; simpl; trivial.
         match_destr.
     - match_case; intros.
-      unfold fun_of_lnra in H, H0.
+      unfold lnra_eval in H, H0.
       rewrite H in H0.
       simpl in H0.
       discriminate.

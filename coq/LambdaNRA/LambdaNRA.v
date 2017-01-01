@@ -93,30 +93,30 @@ Section LambdaNRA.
   Context (h:brand_relation_t).
   Context (constant_env:list (string*data)).
 
-  Fixpoint fun_of_lnra (env: bindings) (op:lnra) : option data :=
+  Fixpoint lnra_eval (env: bindings) (op:lnra) : option data :=
     match op with
     | LNRAVar x => edot env x
     | LNRATable t => edot constant_env t
     | LNRAConst d => Some (normalize_data h d)
-    | LNRABinop b op1 op2 => olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (fun_of_lnra env op1) (fun_of_lnra env op2)
+    | LNRABinop b op1 op2 => olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lnra_eval env op1) (lnra_eval env op2)
     | LNRAUnop u op1 =>
-      olift (fun d1 => fun_of_unaryop h u d1) (fun_of_lnra env op1)
+      olift (fun d1 => fun_of_unaryop h u d1) (lnra_eval env op1)
     | LNRAMap lop1 op2 =>
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (fun_of_lnra_lambda env lop1) c1)) d
-        in olift aux_map (fun_of_lnra env op2)
+            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_eval_lambda env lop1) c1)) d
+        in olift aux_map (lnra_eval env op2)
     | LNRAMapConcat lop1 op2 =>
       let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun_of_lnra_lambda env lop1) c1)) d
-      in olift aux_mapconcat (fun_of_lnra env op2)
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_eval_lambda env lop1) c1)) d
+      in olift aux_mapconcat (lnra_eval env op2)
     | LNRAProduct op1 op2 =>
       (* Note: it's even clearer from this formulation that both branches take the same environment *)
       let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => fun_of_lnra env op2) c1)) d
-      in olift aux_product (fun_of_lnra env op1)
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lnra_eval env op2) c1)) d
+      in olift aux_product (lnra_eval env op1)
     | LNRAFilter lop1 op2 =>
       let pred x' :=
-          match fun_of_lnra_lambda env lop1 x' with
+          match lnra_eval_lambda env lop1 x' with
           | Some (dbool b) => Some b
           | _ => None
           end
@@ -124,12 +124,12 @@ Section LambdaNRA.
       let aux_map d :=
           lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
       in
-      olift aux_map (fun_of_lnra env op2)
+      olift aux_map (lnra_eval env op2)
     end
-  with fun_of_lnra_lambda (env:bindings) (lop:lnra_lambda) (d:data) : option data :=
+  with lnra_eval_lambda (env:bindings) (lop:lnra_lambda) (d:data) : option data :=
     match lop with
     | LNRALambda x op =>
-      (fun_of_lnra (env++((x,d)::nil)) op)
+      (lnra_eval (env++((x,d)::nil)) op)
     end.
 
   (* For top-level: Parametric query *)
@@ -137,47 +137,47 @@ Section LambdaNRA.
     (LNRALambda "input" (Q (LNRAVar "input"))).
 
   Definition eval_q (Q:lnra -> lnra) (input:data) : option data :=
-    fun_of_lnra_lambda nil (q_to_lambda Q) input.
+    lnra_eval_lambda nil (q_to_lambda Q) input.
 
 
-  Lemma fun_of_lnra_lambda_lambda_eq env x lop d:
-    fun_of_lnra_lambda env (LNRALambda x lop) d =
-    (fun_of_lnra (env++((x,d)::nil)) lop).
+  Lemma lnra_eval_lambda_lambda_eq env x lop d:
+    lnra_eval_lambda env (LNRALambda x lop) d =
+    (lnra_eval (env++((x,d)::nil)) lop).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma fun_of_lnra_map_eq env lop1 op2 :
-    fun_of_lnra env (LNRAMap lop1 op2) = 
+  Lemma lnra_eval_map_eq env lop1 op2 :
+    lnra_eval env (LNRAMap lop1 op2) = 
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (fun_of_lnra_lambda env lop1) c1)) d
-        in olift aux_map (fun_of_lnra env op2).
+            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_eval_lambda env lop1) c1)) d
+        in olift aux_map (lnra_eval env op2).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma fun_of_lnra_map_concat_eq env lop1 op2 :
-    fun_of_lnra env (LNRAMapConcat lop1 op2) = 
+  Lemma lnra_eval_map_concat_eq env lop1 op2 :
+    lnra_eval env (LNRAMapConcat lop1 op2) = 
       let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun_of_lnra_lambda env lop1) c1)) d
-      in olift aux_mapconcat (fun_of_lnra env op2).
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_eval_lambda env lop1) c1)) d
+      in olift aux_mapconcat (lnra_eval env op2).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma fun_of_lnra_product_eq env op1 op2 :
-    fun_of_lnra env (LNRAProduct op1 op2) = 
+  Lemma lnra_eval_product_eq env op1 op2 :
+    lnra_eval env (LNRAProduct op1 op2) = 
         let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => fun_of_lnra env op2) c1)) d
-        in olift aux_product (fun_of_lnra env op1).
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lnra_eval env op2) c1)) d
+        in olift aux_product (lnra_eval env op1).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma fun_of_lnra_filter_eq env lop1 op2 :
-    fun_of_lnra env (LNRAFilter lop1 op2) = 
+  Lemma lnra_eval_filter_eq env lop1 op2 :
+    lnra_eval env (LNRAFilter lop1 op2) = 
       let pred x' :=
-          match fun_of_lnra_lambda env lop1 x' with
+          match lnra_eval_lambda env lop1 x' with
           | Some (dbool b) => Some b
           | _ => None
           end
@@ -185,13 +185,13 @@ Section LambdaNRA.
       let aux_map d :=
           lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
       in
-      olift aux_map (fun_of_lnra env op2).
+      olift aux_map (lnra_eval env op2).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma fun_of_lnra_normalized {op:lnra} {env:bindings} {o} :
-    fun_of_lnra env op= Some o ->
+  Lemma lnra_eval_normalized {op:lnra} {env:bindings} {o} :
+    lnra_eval env op= Some o ->
     Forall (fun x => data_normalized h (snd x)) env ->
     Forall (fun x => data_normalized h (snd x)) constant_env ->
     data_normalized h o.
@@ -379,11 +379,11 @@ Section LambdaNRA.
   End LambdaNRAScope.
 End LambdaNRA.
 
-Hint Rewrite @fun_of_lnra_lambda_lambda_eq : lnra.
-Hint Rewrite @fun_of_lnra_map_eq : lnra.
-Hint Rewrite @fun_of_lnra_map_concat_eq : lnra.
-Hint Rewrite @fun_of_lnra_product_eq : lnra.
-Hint Rewrite @fun_of_lnra_filter_eq : lnra.
+Hint Rewrite @lnra_eval_lambda_lambda_eq : lnra.
+Hint Rewrite @lnra_eval_map_eq : lnra.
+Hint Rewrite @lnra_eval_map_concat_eq : lnra.
+Hint Rewrite @lnra_eval_product_eq : lnra.
+Hint Rewrite @lnra_eval_filter_eq : lnra.
 
 Tactic Notation "lnra_cases" tactic(first) ident(c) :=
   first;

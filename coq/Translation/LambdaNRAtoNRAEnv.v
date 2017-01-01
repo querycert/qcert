@@ -50,7 +50,7 @@ Section LambdaNRAtoNRAEnv.
   Context (constant_env:list (string*data)).
     
   Theorem nraenv_of_lnra_lambda_correct (env:bindings) (lop:lnra_lambda) (d:data) :
-    fun_of_lnra_lambda h constant_env env lop d = nraenv_eval h constant_env (nraenv_of_lnra_lambda lop) (drec env) d.
+    lnra_eval_lambda h constant_env env lop d = nraenv_eval h constant_env (nraenv_of_lnra_lambda lop) (drec env) d.
   Proof.
     destruct lop.
     revert env s d.

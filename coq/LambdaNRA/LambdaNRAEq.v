@@ -34,7 +34,7 @@ Section LambdaNRAEq.
       (env:bindings)
       (dn_cenv:Forall (fun d => data_normalized h (snd d)) cenv)
       (dn_env:Forall (fun d => data_normalized h (snd d)) env),
-       fun_of_lnra h cenv env op1 = fun_of_lnra h cenv env op2.
+       lnra_eval h cenv env op1 = lnra_eval h cenv env op2.
 
     Definition lnra_lambda_eq (op1 op2:lnra_lambda) : Prop :=
     forall
@@ -45,7 +45,7 @@ Section LambdaNRAEq.
       (dn_env:Forall (fun d => data_normalized h (snd d)) env)
       (d:data)
       (dn_d:data_normalized h d),
-      fun_of_lnra_lambda h cenv env op1 d = fun_of_lnra_lambda h cenv env op2 d.
+      lnra_eval_lambda h cenv env op1 d = lnra_eval_lambda h cenv env op2 d.
 
   Global Instance lnra_equiv : Equivalence lnra_eq.
   Proof.
@@ -121,7 +121,7 @@ Section LambdaNRAEq.
     f_equal.
     apply rmap_ext; intros.
     apply H; trivial.
-    eapply fun_of_lnra_normalized in H1; trivial.
+    eapply lnra_eval_normalized in H1; trivial.
     invcs H1.
     rewrite Forall_forall in H4.
     eauto.
@@ -138,7 +138,7 @@ Section LambdaNRAEq.
     f_equal.
     apply rmap_concat_ext; intros.
     apply H; trivial.
-    eapply fun_of_lnra_normalized in H1; trivial.
+    eapply lnra_eval_normalized in H1; trivial.
     invcs H1.
     rewrite Forall_forall in H4.
     eauto.
@@ -165,7 +165,7 @@ Section LambdaNRAEq.
     f_equal.
     apply lift_filter_ext; intros.
     rewrite H; trivial.
-    eapply fun_of_lnra_normalized in H1; trivial.
+    eapply lnra_eval_normalized in H1; trivial.
     invcs H1.
     rewrite Forall_forall in H4.
     eauto.
