@@ -281,7 +281,9 @@ interface StringMap<V> {
 // This is the collection of source pieces
 var sourcePieces:StringMap<SourcePuzzlePiece> = {};
 // This is the matrix of pieces that are in the grid
-var placedPieces:InteractivePuzzlePiece[][] = [];
+var placedPieces:BasicPuzzlePiece[][] = [];
+
+let errorPiece:SourcePuzzlePiece;
 
 // things that can be get/set via the grid
 interface Griddable {
@@ -331,7 +333,7 @@ abstract class GriddablePuzzlePiece implements Griddable {
 			Math.round((this.backingObject.top + this.puzzleOffset.y - gridOffset.y) / pieceheight));
 	};
 
-	setGridPoint(point:fabric.IPoint):void {
+	setGridPoint(point:{x:number, y:number}):void {
 		this.setGridCoords(point.x, point.y);
 	};
 
@@ -356,6 +358,68 @@ abstract class GriddablePuzzlePiece implements Griddable {
 	puzzleOffset:fabric.IPoint;
 }
 
+class Grid {
+
+/**
+ * @param location The location where the first piece will be inserted
+ * @param piece The piece(s) to be inserted.  The piece
+ *        location is not set to the specified grid point (this is useful when it is being dragged,
+ * 		  and should not snap to the grid point right now).  If this is desired, call {@link addToGrid} 
+ * 		  with a singleton array
+ * @param Allow the element added to be immediately followed by another element (without creating a buffer)
+ *        Note that if the first piece is put "on top" of another piece, then a buffer will always be created
+ * @returns the number of pieces that were moved out of the way
+ */
+	static addOneToGrid(location:{x:number, y:number}, piece:BasicPuzzlePiece, allowFirstAdjacent:Boolean):number {
+		const prow = placedPieces[location.y];
+		if(prow === undefined) {
+			placedPieces[location.y] = [];
+			placedPieces[location.y][location.x] = piece;
+			return 0;
+		} else {
+			let numMoved = -1;
+			var curleft = location.x-1;
+			let curleftval:BasicPuzzlePiece = piece;
+			let foundSpace = false;
+			// if needed, move things to the right
+			while(curleftval !== undefined || (! foundSpace && ! (numMoved <= 0 && allowFirstAdjacent))) {
+				if(curleftval === undefined) {
+					foundSpace = true;
+				}
+				numMoved++;
+				let nextleft = curleft+1;
+				let nextleftval = prow[nextleft];
+
+				prow[nextleft] = curleftval;
+				if(nextleft!=location.x && curleftval !== undefined) {
+					curleftval.setGridCoords(nextleft, location.y);
+				}
+				curleft = nextleft;
+				curleftval = nextleftval;
+			}
+			return numMoved;
+		}
+	}
+
+/**
+ * @param location The location where the first piece will be inserted
+ * @param The pieces to insert. They will all have their locations set appropriately.
+ * @param Allow the element added to be immediately followed by another element (without creating a buffer)
+ *        Note that if the first piece is put "on top" of another piece, then a buffer will always be created
+
+ * @returns the number of pieces that were moved out of the way for each piece
+ */
+	static addToGrid(location:{x:number, y:number}, piece:BasicPuzzlePiece[], allowFirstAdjacent:boolean):number[] {
+		const numMoved = [];
+		const piecelen = piece.length;
+		for(let i = 0; i < piecelen; i++) {
+			const newlocation = {x:location.x+i, y:location.y};
+			numMoved.push(Grid.addOneToGrid(newlocation, piece[i], allowFirstAdjacent));
+			piece[i].setGridPoint(newlocation);
+		}
+		return numMoved;
+	}
+}
 class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, Displayable {
 
 	isTransient() {
@@ -484,6 +548,7 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	}
 
 	associate() {
+		this.backingObject.selectable  = true;
 		this.backingObject.hoverCursor = 'grab';
 		this.backingObject.moveCursor = 'grabbing';
 		this.backingObject.on('mousedown', this.mousedown);
@@ -589,8 +654,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 
 	}
 	
-	//leftTransients?:CompositeHalfPiece;
-	//rightTransients?:CompositeHalfPiece;
 	protected moving = ():any => {
 		const gridp = this.getGridPoint();
 		const leftentry = gridp.x;
@@ -601,7 +664,15 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 				// still over the same grid spot
 				return;
 			}
+			// abstract this (like for addOneToGrid, so I can reuse it for removing transients)
+			// note that we need to pass in the old place, since the current place of the hovering
+			// piece is not correct
 			// otherwise, we moved.  We need to move back the pieces that we moved
+			//InteractivePuzzlePiece.removeTransients(this);
+
+			// also, to test, turn off transients first,
+			// since that will mess up the locations.
+
 			const oldtop = this.movePlace.top;
 			const oldleft = this.movePlace.left;
 			const prow = placedPieces[oldtop];
@@ -615,6 +686,7 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 				}
 			}
 			prow[oldleft+this.movedPieces] = undefined;
+
 		}
 			// // destroy any associated objects
 			// if('pathObjects' in this) {
@@ -626,61 +698,100 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			// }
 		this.backingObject.moveCursor = 'grabbing';
 		this.movePlace = {top:topentry, left:leftentry};
-		const prow = placedPieces[topentry];
-		let numMoved:number = -1;
-		if(prow !== undefined) {
-			var curleft = leftentry-1;
-			let curleftval:InteractivePuzzlePiece = this;
-			// if needed, move things to the right
-			while(curleftval !== undefined) {
-				numMoved++;
-				let nextleft = curleft+1;
-				let nextleftval = prow[nextleft];
+		this.movedPieces = Grid.addOneToGrid({x:leftentry, y:topentry}, this, true);
+		// InteractivePuzzlePiece.addTransients(this);
+	}
 
-				prow[nextleft] = curleftval;
-				if(nextleft!=leftentry) {
-					curleftval.setGridCoords(nextleft, topentry);
-				}
-				curleft = nextleft;
-				curleftval = nextleftval;
-			}
+	// TODO: would probably help to have a grid abstraction
+	// which you add/move stuff with (instead of just setting/getting prow and stuff)
+	// 
 
-			this.movedPieces = numMoved;
-		} else {
-			placedPieces[topentry] = [];
-			placedPieces[topentry][leftentry] = this;
-			this.movedPieces = 0;
+	/**
+	 * Remove any transients at or (transient-transitively) next to point
+	 */
+	static removeTransients(point:{x:number, y:number}) {
+		const cury = point.y;
+		const prow = placedPieces[cury];
+		if(prow === undefined) {
+			return;
 		}
-			// now calculate any path-induced transients for hovering
-			// this.pathObjects = [];
-			// if(leftentry > 0) {
-			// 	const preventry = prow[leftentry-1];
-			// 	if(preventry !== undefined) {
-			// 		// write this then abstract it so I can call it again
-			// 		const curPath = qcertLanguagesPath({
-			// 			source: preventry.langid,
-			// 			target:this.langid
-			// 		}).path;
 
-			// 		const curPathLen = curPath.length;
 
-			// 		if(curPath == null 
-			// 			|| curPathLen == 0
-			// 			|| (curPathLen == 1 && curPath[0] == "error")) {
-			// 			(<any>this.backingObject).moveCursor = 'no-drop';
- 			// 			} else {
-			// 				for(let j = 1; j < curPathLen-1; j++) {
-			// 					const langid = curPath[j];
-			// 					const p = SourcePuzzlePiece.makeBasic(langid);
-			// 					p.setGridCoords(leftentry+(j-1), topentry);
-			// 					p.backingObject.top = p.backingObject.top + pieceheight/2;
-			// 					p.backingObject.setCoords();
-			// 					this.pathObjects.push(p);
-			// 					this.backingObject.canvas.add(p.backingObject);
-			// 				}
-			// 			}
-			// 		}
-			// }
+		let curx = curpoint.x;
+
+	}
+
+	// add transients around a piece
+	static addTransients(piece:InteractivePuzzlePiece) {
+		const curpoint = piece.getGridPoint();
+		const cury = curpoint.y;
+		const curx = curpoint.x;
+		const prow = placedPieces[cury];
+		if(prow === undefined) {
+			return;
+		}
+		const rightx = curx + 1;
+		const rightp = prow[rightx];
+		if(rightp !== undefined) {
+			if(rightp.isTransient()) {
+					console.log("addTransient called next to a transient (right).  This should not happen.");
+					return;
+				}
+			const rightpieces = InteractivePuzzlePiece.getPathTransients(piece, <InteractivePuzzlePiece>rightp);
+			if(rightpieces.length > 0) {
+				Grid.addToGrid({y:cury, x:rightx}, rightpieces, false);
+				rightpieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
+			}
+		}
+
+		if(curx > 0) {
+			const leftx = curx-1;
+			const leftp = prow[leftx];
+			if(leftp !== undefined) {
+				if(leftp.isTransient()) {
+					console.log("addTransient called next to a transient (left).  This should not happen.");
+					return;
+				}
+				const leftpieces = InteractivePuzzlePiece.getPathTransients(<InteractivePuzzlePiece>leftp, piece);
+				if(leftpieces.length > 0) {
+					Grid.addToGrid(curpoint, leftpieces, false);
+					leftpieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
+					piece.lefttransientMovedPieces
+					const newx = curx + leftpieces.length;
+					// do something cool here to show off that the piece moved.
+				}
+			}
+		}
+	}
+
+	// I need to figure out this whole interactive v transient thing better
+	static getPathTransients(piece1:InteractivePuzzlePiece, piece2:InteractivePuzzlePiece):BasicPuzzlePiece[] {
+		const curPath = qcertLanguagesPath({
+			 			source: piece1.langid,
+			 			target:piece2.langid
+			 		}).path;
+		const curPathLen = curPath.length;
+		const transients:BasicPuzzlePiece[] = [];
+		if(curPath == null 
+				|| curPathLen == 0
+				|| (curPathLen == 1 && curPath[0] == "error")) {
+				// (<any>this.backingObject).moveCursor = 'no-drop';
+				// add an error piece
+
+			transients.push(errorPiece.mkTransientDerivative());
+		} else {
+			for(let j = 1; j < curPathLen-1; j++) {
+				const langid = curPath[j];
+				const p = SourcePuzzlePiece.makeTransient(langid);
+				// p.setGridCoords(leftentry+(j-1), topentry);
+				// p.backingObject.top = p.backingObject.top + pieceheight/2;
+				// p.backingObject.setCoords();
+				transients.push(p);
+				//this.backingObject.canvas.add(p.backingObject);
+			}
+		}
+		return transients;
+	}
 			// let nextentry = prow[leftentry];
 			// if(nextentry === undefined) {
 			// 	nextentry = prow[leftentry+1];
@@ -688,13 +799,16 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			// if(nextentry !== undefined) {
 			// 	// ...
 			// }
-	}
 }
 
 class SourcePuzzlePiece extends BasicPuzzlePiece {
 
 	static makeBasic(langid:QcertLanguage):BasicPuzzlePiece {
 		return sourcePieces[langid].mkBasicDerivative();
+	}
+
+	static makeTransient(langid:QcertLanguage):TransientPuzzlePiece {
+		return sourcePieces[langid].mkTransientDerivative();
 	}
 
 	isTransient() {
@@ -782,6 +896,10 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	mkBasicDerivative():BasicPuzzlePiece {
 		return BasicPuzzlePiece.make(this.canvas, this.options);
 	}
+
+	mkTransientDerivative():TransientPuzzlePiece {
+		return TransientPuzzlePiece.make(this.canvas, {options:this.options});
+	}
 	
 	protected mouseover = () => {
 		if(! ('tooltipObj' in this)) {
@@ -804,6 +922,66 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 			delete this.tooltipObj;
 		}
 	};
+}
+
+class TransientPuzzlePiece extends BasicPuzzlePiece {
+	langid:QcertLanguage;
+	label:string;
+	langdescription:string;
+	movePlace?:{left:number, top:number};
+	movedPieces?:number;
+
+	isTransient() {
+		return true;
+	}
+
+	static make(canvas:fabric.ICanvas, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
+		const p = new TransientPuzzlePiece(canvas, args);
+		p.associate();
+		return p;
+	}
+
+	public constructor(canvas:fabric.ICanvas, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+		super(canvas, args);
+		if('srcpuzzle' in args) {
+			const options = (<any>args).srcpuzzle;
+			this.langid = options.langid;
+			this.label = options.label;
+			this.langdescription = options.langdescription;
+		} else {
+			const options = (<any>args).options;
+			this.langid = options.langid;
+			this.label = options.label;
+			this.langdescription = options.langdescription;
+
+		}
+	}
+
+	oldoptions?:{selectable:boolean, opacity:number};
+
+	associate() {
+		this.oldoptions = {
+			selectable:this.backingObject.selectable,
+			opacity:this.backingObject.getOpacity()
+		};
+		this.backingObject.selectable  = false;
+		this.backingObject.setOpacity(0.25);
+		this.backingObject.hoverCursor = 'pointer';
+		this.backingObject.moveCursor = 'pointer';
+		//this.backingObject.on('mousedown', this.mousedown);
+		//this.backingObject.on('moving', this.moving); 
+		//this.backingObject.on('mouseup', this.mouseup); 
+	}
+
+	disassociate() {
+		if('oldoptions' in this) {
+			this.backingObject.set(this.oldoptions);
+			delete this.oldoptions;
+		}
+		//this.backingObject.off('mousedown', this.mousedown);
+		//this.backingObject.off('moving', this.moving); 
+		//this.backingObject.off('mouseup', this.mouseup); 
+	}
 }
 
 // hm.  it would be really nice if we could make shorter pieces...
@@ -1188,6 +1366,15 @@ class BuilderTab extends ICanvasTab {
 			maxCols = Math.max(srccol, maxCols);
 		}
 
+		const errorOptions = {
+			langid:'error', 
+			label:'Error', 
+			langdescription:'This represents an error, probably an unsupported path',
+			fill:'#ff3300', sides:{}
+		};
+
+		errorPiece = SourcePuzzlePiece.make(canvas, errorOptions);
+
 		const canvasHeightChooser = srcrow;
 		this.maxCols = maxCols;
 		this.totalCanvasHeight = getSourceTop(srcrow)-15;
@@ -1383,9 +1570,9 @@ function init_tabs(canvas:fabric.ICanvas, tabs:ICanvasTab[]) {
        }
 }
 
-function getPipelinePieces():InteractivePuzzlePiece[] {
+function getPipelinePieces():BasicPuzzlePiece[] {
 	const prow = placedPieces[pipelineRow];
-	const path:InteractivePuzzlePiece[] = [];
+	const path:BasicPuzzlePiece[] = [];
 	if(prow === undefined) {
 		return path;
 	}
@@ -1402,7 +1589,11 @@ function getPipelinePieces():InteractivePuzzlePiece[] {
 
 function getPipelineLangs():QcertLanguage[] {
 	return getPipelinePieces().map(function (piece) {
-				return piece.langid;
+				if('langid' in piece) {
+					return (<any>piece).langid;
+				} else {
+					return undefined;
+				}
 	});
 }
 
