@@ -71,6 +71,29 @@ public class PrestoEncoder {
 	}
 
 	/**
+	 * Parse a SQL source string.  First separates it into statements, then parses the Statements.
+	 * @param sourceString the SQL source string
+	 * @return the parsed statement(s) as an List<Statement>
+	 */
+	public static List<Statement> parse(String query) {
+		StatementSplitter splitter = new StatementSplitter(query);
+		SqlParser parser = new SqlParser();
+		ArrayList<Statement> results = new ArrayList<Statement>(1);
+
+		for(com.facebook.presto.sql.parser.StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
+			String body = statement.statement();
+			Statement result = parseStatement(parser, body);
+			results.add(result);
+		}
+
+		if(results.isEmpty()) {
+			throw new ParsingException("input query does not contain any statements");
+		}
+
+		return results;
+	}
+	
+	/**
 	 * Parse a SQL source in string form into one or more presto nodes and then encode the result as
 	 *   an S-expression string
 	 * @param sourceString the SQL source string to parse and then encode
@@ -84,7 +107,7 @@ public class PrestoEncoder {
 			return interleavedParseAndEncode(sourceString, useDateNameHeuristic);
 		return encode(parse(sourceString), useDateNameHeuristic);
 	}
-	
+
 	/**
 	 * Apply necessary fixups at the lexical level (needed to get the query to even be parsed by presto-parser).
 	 * 1.  Convert occurances of 'NN [days|months|years]' to 'interval NN [day|month|year]' (needed by many TPC-DS queries).
@@ -280,29 +303,6 @@ public class PrestoEncoder {
 		}
 		System.out.println("Successes: " + successes);
 		return buffer.append(")").toString();
-	}
-
-	/**
-	 * Parse a SQL source string.  First separates it into statements, then parses the Statements.
-	 * @param sourceString the SQL source string
-	 * @return the parsed statement(s) as an List<Statement>
-	 */
-	private static List<Statement> parse(String query) {
-		StatementSplitter splitter = new StatementSplitter(query);
-		SqlParser parser = new SqlParser();
-		ArrayList<Statement> results = new ArrayList<Statement>(1);
-
-		for(com.facebook.presto.sql.parser.StatementSplitter.Statement statement : splitter.getCompleteStatements()) {
-			String body = statement.statement();
-			Statement result = parseStatement(parser, body);
-			results.add(result);
-		}
-
-		if(results.isEmpty()) {
-			throw new ParsingException("input query does not contain any statements");
-		}
-
-		return results;
 	}
 
 	/** Parse an individual statement, applying lexical fixups first */
