@@ -207,23 +207,23 @@ MODULES = \
 	Translation/NRAtoNNRC \
 	Translation/NRAEnvtoNNRC \
 	Translation/NRAEnvtoNNRCExt \
-	Translation/NNRCtoPattern \
+	Translation/NNRCtoCAMP \
 	Translation/NNRCtoNNRCMR \
 	Translation/NNRCtoDNNRC \
 	Translation/NNRCMRtoNNRC \
 	Translation/NNRCMRtoDNNRC \
 	Translation/NNRCMRtoCldMR \
-	Translation/PatterntoNRA \
-	Translation/PatterntoNRAEnv \
-	Translation/PatternSugartoNRA \
-	Translation/PatternSugartoNRAEnv \
+	Translation/CAMPtoNRA \
+	Translation/CAMPtoNRAEnv \
+	Translation/CAMPSugartoNRA \
+	Translation/CAMPSugartoNRAEnv \
 	Translation/RuletoNRA \
 	Translation/RuletoNRAEnv \
 	Translation/TNRAtoNNRC \
 	Translation/TNRAEnvtoNNRC \
-	Translation/TNNRCtoPattern \
-	Translation/TPatterntoNRA \
-	Translation/TPatterntoNRAEnv \
+	Translation/TNNRCtoCAMP \
+	Translation/TCAMPtoNRA \
+	Translation/TCAMPtoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
 	Translation/OQLtoNRAEnv \
@@ -258,7 +258,7 @@ MODULES = \
 	Compiler/CompilerDriver/CompEval \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
-	Compiler/QLib/QPattern \
+	Compiler/QLib/QCAMP \
 	Compiler/QLib/QRule \
 	Compiler/QLib/QOQL \
 	Compiler/QLib/QSQL \

@@ -27,7 +27,7 @@ Require Import NNRCRuntime.
 
 (* end hide *)
 
-Section NNRCtoPattern.
+Section NNRCtoCAMP.
 
   Context {fruntime:foreign_runtime}.
 
@@ -2050,7 +2050,7 @@ Qed.
 
 End trans_let.
 
-End NNRCtoPattern.
+End NNRCtoCAMP.
 
 (* 
 *** Local Variables: ***

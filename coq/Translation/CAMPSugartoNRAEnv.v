@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section PatternSugartoNRAEnv.
+Section CAMPSugartoNRAEnv.
 
   Require Import String.
   Require Import List.
@@ -22,7 +22,7 @@ Section PatternSugartoNRAEnv.
   Require Import Utils BasicRuntime.
   Require Import NRAEnvRuntime.
   Require Import Pattern PatternSugar Rule.
-  Require Import PatterntoNRAEnv.
+  Require Import CAMPtoNRAEnv.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -51,7 +51,7 @@ Section PatternSugartoNRAEnv.
   Definition algenv_of_WW (p:pat) :=
     algenv_of_pat (WW p).
 
-End PatternSugartoNRAEnv.
+End CAMPSugartoNRAEnv.
 
 (* 
 *** Local Variables: ***

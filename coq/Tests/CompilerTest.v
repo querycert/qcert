@@ -252,14 +252,14 @@ Section CompilerUntypedTest.
   Eval compute in (proj1_sig tout1).
   *)
     
-  Require Import TAlgEnv TPatterntoNRAEnv.
+  Require Import TAlgEnv TCAMPtoNRAEnv.
   
   Lemma alg5_wt τ :
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
     unfold algopt5, camp_to_nraenv_core.
-    unfold PatterntoNRAEnv.translate_pat_to_algenv.
-    unfold PatterntoNRAEnv.algenv_of_pat.
+    unfold CAMPtoNRAEnv.translate_pat_to_algenv.
+    unfold CAMPtoNRAEnv.algenv_of_pat.
     econstructor; eauto.
     econstructor; eauto.
     Focus 2.

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section PatterntoNRA.
+Section CAMPtoNRA.
 
   Require Import String.
   Require Import List.
@@ -405,7 +405,7 @@ Section size.
 
 End size.
 
-End PatterntoNRA.
+End CAMPtoNRA.
 
 (* 
 *** Local Variables: ***

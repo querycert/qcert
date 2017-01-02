@@ -23,9 +23,9 @@ Require Import Utils BasicSystem.
 Require Import NNRCSystem.
 Require Import CAMPSystem.
 
-Require Import NNRCtoPattern.
+Require Import NNRCtoCAMP.
   
-Section TNNRCtoPattern.
+Section TNNRCtoCAMP.
 
   (** Auxiliary definitions and lemmas *)
   Context {m:basic_model}.
@@ -2063,7 +2063,7 @@ Section TNNRCtoPattern.
      intuition; eauto.
    Qed.
 
-End TNNRCtoPattern.
+End TNNRCtoCAMP.
 
 (* 
 *** Local Variables: ***

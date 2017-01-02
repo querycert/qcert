@@ -22,7 +22,7 @@ Section RuletoNRA.
   Require Import Utils BasicRuntime.
   Require Import NRARuntime.
   Require Import Rule.
-  Require Import PatterntoNRA.
+  Require Import CAMPtoNRA.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.

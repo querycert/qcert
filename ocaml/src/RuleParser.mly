@@ -144,77 +144,77 @@ pat:
     { p }
 (* CAMP pattern *)
 | PCONST DUNIT
-    { QPattern.pconst QData.dunit }
+    { QCAMP.pconst QData.dunit }
 | PCONST LPAREN d = data RPAREN
-    { QPattern.pconst d }
+    { QCAMP.pconst d }
 | PUNOP u = uop p = pat
-    { QPattern.punop u p }
+    { QCAMP.punop u p }
 | PBINOP b = bop p1 = pat p2 = pat
-    { QPattern.pbinop b p1 p2 }
+    { QCAMP.pbinop b p1 p2 }
 | PMAP p = pat
-    { QPattern.pmap p }
+    { QCAMP.pmap p }
 | PASSERT p = pat
-    { QPattern.passert p }
+    { QCAMP.passert p }
 | PORELSE p1 = pat p2 = pat
-    { QPattern.porelse p1 p2 }
+    { QCAMP.porelse p1 p2 }
 | PIT
-    { QPattern.pit }
+    { QCAMP.pit }
 | PLETIT p1 = pat p2 = pat
-    { QPattern.pletit p1 p2 }
+    { QCAMP.pletit p1 p2 }
 | PENV
-    { QPattern.penv }
+    { QCAMP.penv }
 | PLETENV p1 = pat p2 = pat
-    { QPattern.pletenv  p1 p2 }
+    { QCAMP.pletenv  p1 p2 }
 | PLEFT
-    { QPattern.pleft }
+    { QCAMP.pleft }
 | PRIGHT
-    { QPattern.pright }
+    { QCAMP.pright }
 | PGETCONSTANT s = STRING
-    { QPattern.pgetconstant (Util.char_list_of_string s) }
+    { QCAMP.pgetconstant (Util.char_list_of_string s) }
 (* Macros pattern *)
 | PNOW
-    { QPattern.pnow }
+    { QCAMP.pnow }
 | PACCEPT
-    { QPattern.pconst (QData.drec []) }
+    { QCAMP.pconst (QData.drec []) }
 | LOOKUP s = STRING
-    { QPattern.lookup (Util.char_list_of_string s) }
+    { QCAMP.lookup (Util.char_list_of_string s) }
  | v = STRING IS p = pat %prec UIS
-    { QPattern.pIS (Util.char_list_of_string v) p }
+    { QCAMP.pIS (Util.char_list_of_string v) p }
 | WITHVAR s = STRING p = pat %prec UWITHVAR
-    { QPattern.withVar (Util.char_list_of_string s) p }
+    { QCAMP.withVar (Util.char_list_of_string s) p }
 | PVARWITH s = STRING p = pat %prec UWITHVAR
-    { QPattern.pvarwith (Util.char_list_of_string s) p }
+    { QCAMP.pvarwith (Util.char_list_of_string s) p }
 | TOSTRING p = pat
-    { QPattern.toString p }
+    { QCAMP.toString p }
 | PBINOPRED b = bop LBRACKET pl = patlist RBRACKET
-    { QPattern.pat_binop_reduce b pl }
+    { QCAMP.pat_binop_reduce b pl }
 | p1 = pat PLUSSPLUS p2 = pat
-    { QPattern.stringConcat p1 p2 }
+    { QCAMP.stringConcat p1 p2 }
 | DASHUNDER
-    { QPattern.pit }
+    { QCAMP.pit }
 | DASHTICK c = const
-    { (QPattern.pconst c) }
+    { (QCAMP.pconst c) }
 | s = STRING BANGDASHARROW p = pat
-    { QPattern.pbdot (Util.char_list_of_string s) p }
+    { QCAMP.pbdot (Util.char_list_of_string s) p }
 | PBDOT s = STRING p = pat %prec PBDOT
-    { QPattern.pbdot (Util.char_list_of_string s) p }
+    { QCAMP.pbdot (Util.char_list_of_string s) p }
 | PBSOMEDOT s = STRING p = pat %prec PBSOMEDOT
-    { QPattern.pbsomedot (Util.char_list_of_string s) p }
+    { QCAMP.pbsomedot (Util.char_list_of_string s) p }
 | PSOME
-    { QPattern.pleft }
+    { QCAMP.pleft }
 | PNULL
-    { QPattern.pnull }
+    { QCAMP.pnull }
 (* INSTANCEOF, FETCH, and MATCHES temporarily have hacks because of signature changes in RuleSugar.v.  TODO fix this *)
 | n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
-    { QPattern.instanceOf (Util.char_list_of_string n) t p }
+    { QCAMP.instanceOf (Util.char_list_of_string n) t p }
 | p = pat TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = pat %prec UFETCH
-    { QPattern.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
+    { QCAMP.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
 | MATCHES LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
-    { QPattern.matches t p }
+    { QCAMP.matches t p }
 | AGGREGATE r = rule_rule DO u = uop OVER p = pat FLATTEN f = INT
     { QRule.aggregate r u p (Util.coq_Z_of_int f) }
 | VARIABLES LBRACKET v = stringlist RBRACKET
-    { QPattern.returnVariables v }
+    { QCAMP.returnVariables v }
 data:
 | DUNIT
     { QData.dunit }

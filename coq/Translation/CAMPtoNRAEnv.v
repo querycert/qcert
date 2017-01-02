@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section PatterntoNRAEnv.
+Section CAMPtoNRAEnv.
   Require Import String.
   Require Import List.
 
   Require Import Utils BasicRuntime.
   Require Import NRARuntime NRAEnvRuntime.
   Require Import Pattern.
-  Require Import PatterntoNRA.
+  Require Import CAMPtoNRA.
 
   Context {fruntime:foreign_runtime}.
 
@@ -224,7 +224,7 @@ Section PatterntoNRAEnv.
 
   End size.
 
-End PatterntoNRAEnv.
+End CAMPtoNRAEnv.
 
 (* 
 *** Local Variables: ***

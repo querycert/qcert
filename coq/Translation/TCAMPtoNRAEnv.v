@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section TPatterntoNRAEnv.
+Section TCAMPtoNRAEnv.
 
   Require Import String List.
 
   Require Import Utils BasicSystem.
   Require Import NRASystem NRAEnvSystem.
-  Require Import Pattern PatterntoNRAEnv.
+  Require Import Pattern CAMPtoNRAEnv.
 
-  Require Import TPattern TPatterntoNRA.
+  Require Import TPattern TCAMPtoNRA.
 
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -115,7 +115,7 @@ Section TPatterntoNRAEnv.
       apply algenv_of_pat_type_preserve; trivial.
     Qed.
 
-End TPatterntoNRAEnv.
+End TCAMPtoNRAEnv.
 
 (* 
 *** Local Variables: ***

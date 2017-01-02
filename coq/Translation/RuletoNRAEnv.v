@@ -21,7 +21,7 @@ Section RuletoNRAEnv.
 
   Require Import Utils BasicRuntime.
   Require Import NRAEnvRuntime.
-  Require Import PatterntoNRA PatterntoNRAEnv.
+  Require Import CAMPtoNRA CAMPtoNRAEnv.
   Require Import Rule RuletoNRA.
 
   Local Open Scope string_scope.

@@ -17,12 +17,12 @@
 Require Import CompilerRuntime.
 Module QRule(runtime:CompilerRuntime).
   Require String.
-  Require QOperators QData QPattern.
+  Require QOperators QData QCAMP.
   Require Rule RuleSugar.
 
   Module Data := QData.QData runtime.
   Module Ops := QOperators.QOperators runtime.
-  Module Pattern := QPattern.QPattern runtime.
+  Module Pattern := QCAMP.QCAMP runtime.
 
   Definition rule : Set 
     := Rule.rule.

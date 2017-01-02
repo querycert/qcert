@@ -15,7 +15,7 @@
  *)
 
 Require Import CompilerRuntime.
-Module QPattern(runtime:CompilerRuntime).
+Module QCAMP(runtime:CompilerRuntime).
   Require String BrandRelation.
   Require Pattern PatternSugar RuleSugar.
 
@@ -103,7 +103,7 @@ Module QPattern(runtime:CompilerRuntime).
   Definition lookup : String.string -> expr 
     := PatternSugar.lookup.
   
-End QPattern.
+End QCAMP.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***

@@ -36,14 +36,14 @@ Section CompDriver.
   Require Import DNNRC Dataset.
 
   (* Translations *)
-  Require Import PatterntoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
-  Require Import RuletoNRA PatterntoNRA NRAtoNNRC NRAEnvtoNNRC NRAEnvtoNNRCExt.
+  Require Import CAMPtoNRAEnv RuletoNRAEnv OQLtoNRAEnv.
+  Require Import RuletoNRA CAMPtoNRA NRAtoNNRC NRAEnvtoNNRC NRAEnvtoNNRCExt.
   Require Import LambdaNRAtoNRAEnv.
   Require Import SQLtoNRAEnv.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
-  Require Import NNRCtoPattern.
+  Require Import NNRCtoCAMP.
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSpark.
   Require Import NNRCMRtoCldMR.
@@ -131,7 +131,7 @@ Section CompDriver.
 
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lnra q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := PatterntoNRAEnv.translate_pat_to_algenv q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtoNRAEnv.translate_pat_to_algenv q.
 
     Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
 

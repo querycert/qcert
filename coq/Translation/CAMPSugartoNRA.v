@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section PatternSugartoNRA.
+Section CAMPSugartoNRA.
 
   Require Import String.
   Require Import List.
@@ -22,7 +22,7 @@ Section PatternSugartoNRA.
   Require Import Utils BasicRuntime.
   Require Import NRARuntime.
   Require Import Pattern PatternSugar Rule.
-  Require Import PatterntoNRA.
+  Require Import CAMPtoNRA.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -60,7 +60,7 @@ Section PatternSugartoNRA.
   Definition alg_of_WW (p:pat) :=
     alg_of_pat (WW p).
 
-End PatternSugartoNRA.
+End CAMPSugartoNRA.
 
 (* 
 *** Local Variables: ***

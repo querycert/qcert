@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TPatterntoNRA.
+Section TCAMPtoNRA.
 
   Require Import String.
   Require Import List.
@@ -22,7 +22,7 @@ Section TPatterntoNRA.
   Require Import Utils BasicSystem.
   Require Import NRASystem.
   Require Import Pattern TPattern.
-  Require Import PatterntoNRA.
+  Require Import CAMPtoNRA.
 
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -548,7 +548,7 @@ Section TPatterntoNRA.
     intuition.
   Qed.
 *)
-End TPatterntoNRA.
+End TCAMPtoNRA.
 
 (* 
 *** Local Variables: ***
