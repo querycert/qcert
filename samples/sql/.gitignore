@@ -5,4 +5,6 @@
 *_stats.json
 *.error
 /tpc/*.sql
-/tpc/*.io
+/tpc/*.data
+/tpc/dss.ddl
+

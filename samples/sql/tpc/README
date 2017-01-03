@@ -1,9 +1,21 @@
-For legal reasons we do not reproduce the TPC benchmark data here.  However, we provide instructions for obtaining the
-queries that we used to produce our results using queries from TPC-H and TPC-DS (in our paper in SIGMOD 2017).
+For legal reasons we do not reproduce any downloaded TPC tools or templates here.  You will need to
+obtain these from tpc.org and agree to the terms there.
 
-Coming soon: instructions for getting data also, and a Makefile for generating statistics and running the queries.
+For generating queries from the TPC-H abd TPC-DS benchmarks, we provide instructions here.  The queries
+generated according to these instructions are the ones used for our paper in SIGMOD 2017.
 
-TPC-H:
+For TPC-H, we provide a heavily stripped down version of the output of the TPC data generator suitable for
+running most queries in reasonable time.  The TableTransformer program provided as part of the sqlParser
+section of this repository is used to convert a SQL schema and tabular data files into a JSON format that is
+readily consumed by our compiled queries.  You are free to use the TPC data generator yourself to produce
+larger datasets but they may not necessarily execute in reasonable time with the present technology.  The data
+provided here was used to evaluate correctness of the TPC-H queries.  Note that our paper does not report any
+runtime performace results.
+
+For TPC-DS, we have not yet explored runtime behavior.  The queries can be compiled and statistics gathered
+but no data (or instructions for generating data) are provided. 
+
+TPC-H queries and schema:
 
 1. Obtain the TPC-H tools zip from http://www.tpc.org/tpch/.  You will need to agree to terms which are
 explained during the process.
@@ -17,14 +29,17 @@ system.  Building on other systems is a bit of an art but can often be done (see
   MACHINE = LINUX
   WORKLOAD = TPCH
 
-4.  Type 'make'.  It should build the needed software.
+4.  Type 'make' in the dbgen subdirectory.  It should build the needed software.
 
-5.  Switch to the peer directory called 'queries' and make a subdirectory called 'data'.
+5.  Switch to the directory 'queries' (a subdirectory of dbgen) and make a subdirectory there called 'data'.
 
 6.  Source the file tpch_gens provided here.  It should populate the 'data' directory with sql files based on
-the TPC-H templates.  Copy the sql files back to this folder.
+the TPC-H templates.
 
-TPC-DS:
+7. Copy the sql files produced in step 6 back to this folder.  Also copy the 'dss.ddl' file from the dbgen
+directory.
+
+TPC-DS queries:
 
 1. Obtain the TPC-DS tools zip from http://www.tpc.org/tpcds/.  You will need to agree to terms which are
 explained during the process.
@@ -36,5 +51,29 @@ TPC-H.  We've only been able to build on Linux, which is how the makefile is set
 
 4. Move to the parent directory and make a subdirectory called data.
 
-5.  Source file tpcds_gens provided here.  It should populate the 'data' directory with sql files based on the
-TPC-DS templates.  Copy the sql files back to this folder.
+5.  Source the file tpcds_gens provided here (it is set up with bash syntax; you might need to tweak it for a
+different shell).  It should populate the 'data' directory with sql files based on the TPC-DS templates.  Copy
+the sql files back to this folder.
+
+TPC-H data:
+
+Execute 'make tpch.data' in this folder.  This target will also execute as a dependency when you run queries
+as described below.
+
+To understand our data staging approach, you can study that make target and also its supporting Java program
+TableTransformer.java (source is in sqlParser.src).
+
+Compiling and running:
+
+You can compile any query by making its .js file.  That is,
+
+make q1.js
+
+will compile q1.sql and produce q1.js.  A file called (e.g.) q1_stats.json will also be produced showing some
+internal statistics (the paper reports these for the TPC-H queries).
+
+You can run any query using an artificial target.  To run (e.g.) q1.js do
+
+make run_q1
+
+If q1.js does not exist, it will be compiled first.
