@@ -253,20 +253,20 @@ Section DNNRCDatasetRewrites.
              (e: dnnrc (type_annotation A) dataset):
     (dnnrc (type_annotation _) dataset) :=
     match e with
-    | DNNRCFor t1 x (DNNRCCollect t2 xs as c) e =>
+    | DNNRCFor t1 x (DNNRCCollect t2 xs as c) body =>
       match lift_tlocal (di_required_typeof c) with
       | Some (exist _ (Coll₀ (Brand₀ bs)) _) =>
         let t := proj1_sig (brands_type bs) in
-        match rewrite_unbrand_or_fail x e with
+        match rewrite_unbrand_or_fail x body with
         | Some e' =>
           let ALG :=
               (* TODO fresh name for lift_unbrand! *)
               DNNRCAlg (dnnrc_annotation_get xs)
-                      (DSSelect (("$blob"%string, CCol "unbranded.$blob")
-                                   :: ("$known"%string, CCol "unbranded.$known")::nil)
-                                (DSSelect (("unbranded"%string, CUDFUnbrand t (CCol "$data"))::nil)
-                                          (DSVar "lift_unbrand")))
-                      (("lift_unbrand"%string, xs)::nil)
+                       (DSSelect (("$blob"%string, CCol "unbranded.$blob")
+                                    :: ("$known"%string, CCol "unbranded.$known")::nil)
+                                 (DSSelect (("unbranded"%string, CUDFUnbrand t (CCol "$data"))::nil)
+                                           (DSVar "lift_unbrand")))
+                       (("lift_unbrand"%string, xs)::nil)
           in
           DNNRCFor t1 x (DNNRCCollect t2 ALG) e'
         | None => e
