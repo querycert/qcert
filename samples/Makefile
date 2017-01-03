@@ -1,17 +1,10 @@
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-OSTYPE=$(shell uname -o)
-
 JAVA_SRCS=$(wildcard src/testing/runners/*.java)
 CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
 
-ifeq ($(OSTYPE),Cygwin)
+ifeq ($(OS),Windows_NT)
   PATH_SEP=';'
 else
-  ifeq ($(OSTYPE),Msys)
-    PATH_SEP=';'
-  else
-    PATH_SEP=':'
-  endif
+  PATH_SEP=':'
 endif
 
 EMPTY=

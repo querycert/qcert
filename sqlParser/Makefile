@@ -1,18 +1,11 @@
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-OSTYPE=$(shell uname -o)
+ifeq ($(OS),Windows_NT)
+  PATH_SEP=';'
+else
+  PATH_SEP=':'
+endif
 
 JAVA_SRCS=$(wildcard src/org/qcert/sql/*.java)
 CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
-
-ifeq ($(OSTYPE),Cygwin)
-  PATH_SEP=';'
-else
-  ifeq ($(OSTYPE),Msys)
-    PATH_SEP=';'
-  else
-    PATH_SEP=':'
-  endif
-endif
 
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
