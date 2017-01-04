@@ -360,66 +360,86 @@ abstract class GriddablePuzzlePiece implements Griddable {
 
 class Grid {
 
+	static remove(location:{x:number, y:number}) {
+		let prow = placedPieces[location.y];
+		if(prow === undefined) {
+			return;
+		}
+		for(let i=location.x; i < prow.length; i++) {
+			const p = i+1 < prow.length ? prow[i+1] : undefined;
+			prow[i] = p;
+			if(p !== undefined) {
+				p.setGridCoords(i, location.y);
+			}
+		}
+	}
+
+	static removeAndHide(location:{x:number, y:number}) {
+		let prow = placedPieces[location.y];
+		if(prow === undefined) {
+			return;
+		}
+		const p = prow[location.x];
+		Grid.remove(location);
+		if(p !== undefined) {
+			p.hide();
+		}
+	}
+
+	static addAndShow(location:{x:number, y:number}, pieces:BasicPuzzlePiece|BasicPuzzlePiece[]) {
+		Grid.add(location, pieces);
+		if(pieces instanceof Array) {
+			pieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
+		} else {
+			pieces.show();
+		}
+	}
 /**
  * @param location The location where the first piece will be inserted
  * @param piece The piece(s) to be inserted.  The piece
- *        location is not set to the specified grid point (this is useful when it is being dragged,
- * 		  and should not snap to the grid point right now).  If this is desired, call {@link addToGrid} 
- * 		  with a singleton array
- * @param Allow the element added to be immediately followed by another element (without creating a buffer)
- *        Note that if the first piece is put "on top" of another piece, then a buffer will always be created
+ *        locations are not set. If this is desired, call {@link fixup locations} 
  * @returns the number of pieces that were moved out of the way
  */
-	static addOneToGrid(location:{x:number, y:number}, piece:BasicPuzzlePiece, allowFirstAdjacent:Boolean):number {
+	static add(location:{x:number, y:number}, pieces:BasicPuzzlePiece|BasicPuzzlePiece[]) {
+		let prow = placedPieces[location.y];
+		if(! (pieces instanceof Array)) {
+			pieces = [pieces];
+		}
+		const numPieces = pieces.length;
+		if(prow === undefined) {
+			prow = [];
+			placedPieces[location.y] = prow;
+		} else {
+			for(let i=prow.length-1; i >= location.x; i--) {
+				const p = prow[i];
+				const dest = i+numPieces;
+				if(p !== undefined) {
+					p.setGridCoords(dest, location.y);
+				}
+				prow[dest] = p;
+			}
+		}
+		for(let i=0; i < numPieces; i++) {
+			prow[location.x+i] = pieces[i];
+		}
+	}
+
+	static fixupLocations(location:{x:number, y:number}, pieces:number) {
 		const prow = placedPieces[location.y];
 		if(prow === undefined) {
-			placedPieces[location.y] = [];
-			placedPieces[location.y][location.x] = piece;
-			return 0;
-		} else {
-			let numMoved = -1;
-			var curleft = location.x-1;
-			let curleftval:BasicPuzzlePiece = piece;
-			let foundSpace = false;
-			// if needed, move things to the right
-			while(curleftval !== undefined || (! foundSpace && ! (numMoved <= 0 && allowFirstAdjacent))) {
-				if(curleftval === undefined) {
-					foundSpace = true;
-				}
-				numMoved++;
-				let nextleft = curleft+1;
-				let nextleftval = prow[nextleft];
-
-				prow[nextleft] = curleftval;
-				if(nextleft!=location.x && curleftval !== undefined) {
-					curleftval.setGridCoords(nextleft, location.y);
-				}
-				curleft = nextleft;
-				curleftval = nextleftval;
+			return;
+		}
+		for(let i=0; i < pieces; i++) {
+			const x = location.x+i;
+			const p = prow[x];
+			if(p !== undefined) {
+				p.setGridCoords(x, location.y);
 			}
-			return numMoved;
 		}
-	}
-
-/**
- * @param location The location where the first piece will be inserted
- * @param The pieces to insert. They will all have their locations set appropriately.
- * @param Allow the element added to be immediately followed by another element (without creating a buffer)
- *        Note that if the first piece is put "on top" of another piece, then a buffer will always be created
-
- * @returns the number of pieces that were moved out of the way for each piece
- */
-	static addToGrid(location:{x:number, y:number}, piece:BasicPuzzlePiece[], allowFirstAdjacent:boolean):number[] {
-		const numMoved = [];
-		const piecelen = piece.length;
-		for(let i = 0; i < piecelen; i++) {
-			const newlocation = {x:location.x+i, y:location.y};
-			numMoved.push(Grid.addOneToGrid(newlocation, piece[i], allowFirstAdjacent));
-			piece[i].setGridPoint(newlocation);
-		}
-		return numMoved;
 	}
 }
+	
+
 class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, Displayable {
 
 	isTransient() {
@@ -519,7 +539,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	label:string;
 	langdescription:string;
 	movePlace?:{left:number, top:number};
-	movedPieces?:number;
 
 	isTransient() {
 		return false;
@@ -570,18 +589,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 
 		this.movePlace = {left:gp.x, top:gp.y};
 
-		// this.movedPieces = 0;
-		// implement move-to-left behavior
-		let numToShift = 0;
-		const prow = placedPieces[gp.y];
-		if(prow !== undefined) {
-			let curleft = gp.x+1;
-			while(prow[curleft] !== undefined) {
-				numToShift++;
-				curleft++;
-			}
-		}
-		this.movedPieces = numToShift;
 	}
 
 	protected mouseup = () => {
@@ -596,10 +603,10 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	
 		// fix this to use grid coordinates
 		if(gridp.y < 0 || gridp.y >= gridRows) {
+			Grid.remove(gridp);
 			this.hide();
 		}
 		delete this.movePlace;
-		delete this.movedPieces;
 
 		// find the rightmost entry in the row
 		const prow = placedPieces[topentry];
@@ -655,8 +662,11 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	}
 	
 	protected moving = ():any => {
+		const oldactualleft = this.backingObject.getLeft();
+		const oldactualtop = this.backingObject.getTop();
 		const gridp = this.getGridPoint();
-		const leftentry = gridp.x;
+		const originalleftentry = gridp.x;
+		let leftentry = originalleftentry;
 		const topentry = gridp.y;
 
 		if('movePlace' in this) {
@@ -664,29 +674,14 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 				// still over the same grid spot
 				return;
 			}
-			// abstract this (like for addOneToGrid, so I can reuse it for removing transients)
-			// note that we need to pass in the old place, since the current place of the hovering
-			// piece is not correct
-			// otherwise, we moved.  We need to move back the pieces that we moved
-			//InteractivePuzzlePiece.removeTransients(this);
-
-			// also, to test, turn off transients first,
-			// since that will mess up the locations.
 
 			const oldtop = this.movePlace.top;
 			const oldleft = this.movePlace.left;
 			const prow = placedPieces[oldtop];
-
-			for(let i:number=0; i<this.movedPieces; i++) {
-				const curleft=oldleft+i;
-				const p = prow[curleft+1];
-				prow[curleft] = p;
-				if(p !== undefined) {
-					p.setGridCoords(curleft, oldtop);
-				}
-			}
-			prow[oldleft+this.movedPieces] = undefined;
-
+			const shifted = InteractivePuzzlePiece.removeadjacentTransients({x:oldleft, y:oldtop});
+			const newleft = oldleft - shifted;
+			Grid.remove({x:newleft, y:oldtop});
+			InteractivePuzzlePiece.addTransientsBefore({x:newleft, y:oldtop});
 		}
 			// // destroy any associated objects
 			// if('pathObjects' in this) {
@@ -696,51 +691,144 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			// 	}
 			// 	delete this.pathObjects;			
 			// }
+		// update, since it may have moved when we removed/added transients 
+		leftentry = this.getGridPoint().x;
 		this.backingObject.moveCursor = 'grabbing';
+		const prow = placedPieces[topentry];
+		let shifted:number = 0;
+
+		if(prow !== undefined) {
+			const existingPiece = prow[leftentry];
+			if(existingPiece !== undefined) {
+				if(existingPiece.isTransient()) {
+					shifted = InteractivePuzzlePiece.removeadjacentTransients({x:leftentry, y:topentry});
+					leftentry = leftentry - shifted;
+					// also remove the current (transient) entry
+					Grid.removeAndHide({x:leftentry, y:topentry});
+					//leftentry = leftentry+1;
+					Grid.add({x:leftentry, y:topentry}, this);
+				} else {
+					Grid.add({x:leftentry, y:topentry}, this);					
+					shifted = InteractivePuzzlePiece.removeadjacentTransients({x:leftentry, y:topentry});
+					leftentry = leftentry - shifted;
+				}
+			} else {
+				Grid.add({x:leftentry, y:topentry}, this);									
+			}
+		} else {
+			Grid.add({x:leftentry, y:topentry}, this);												
+		}
+		const movedBack:number = InteractivePuzzlePiece.addTransients({x:leftentry, y:topentry}, this);
+		leftentry = leftentry + movedBack;
+		if(leftentry == originalleftentry) {
+			// if this is where we started, restore the (unsnapped) coordinates
+			this.backingObject.setLeft(oldactualleft);
+			this.backingObject.setTop(oldactualtop);
+		} else {
+			this.setGridCoords(leftentry, topentry);
+		}
+		this.canvas.renderAll();
 		this.movePlace = {top:topentry, left:leftentry};
-		this.movedPieces = Grid.addOneToGrid({x:leftentry, y:topentry}, this, true);
-		// InteractivePuzzlePiece.addTransients(this);
 	}
 
 	// TODO: would probably help to have a grid abstraction
 	// which you add/move stuff with (instead of just setting/getting prow and stuff)
 	// 
 
-	/**
-	 * Remove any transients at or (transient-transitively) next to point
-	 */
-	static removeTransients(point:{x:number, y:number}) {
+/**
+ * Remove any transients (transient-transitively) next to point
+ */
+	static removeadjacentTransients(point:{x:number, y:number}):number {
 		const cury = point.y;
 		const prow = placedPieces[cury];
 		if(prow === undefined) {
 			return;
 		}
+		let curx = point.x+1;
+		// delete stuff to the right
+		while(true) {
+			const p = prow[curx];
+			if(p !== undefined && p.isTransient()) {
+				Grid.removeAndHide({x:curx, y:cury});
+			} else {
+				break;
+			}
+		}
+		// delete stuff to the left
+		curx = point.x-1;
+		while(curx >= 0) {
+			const p = prow[curx];
+			if(p !== undefined && p.isTransient()) {
+				Grid.removeAndHide({x:curx, y:point.y});
+				curx--;
+			} else {
+				break;
+			}
+		}
+		return point.x-(curx+1);
+	}
 
 
-		let curx = curpoint.x;
+	static addTransientsBefore(afterpoint:{x:number, y:number}):number {
+		const cury = afterpoint.y;
+		const curx = afterpoint.x;
+		const prow = placedPieces[cury];
+		if(prow === undefined) {
+			return 0;
+		}
 
+		const piece = prow[curx];
+		if(piece === undefined) {
+			return 0;
+		}
+
+		if(piece.isTransient()) {
+			console.log("addTransientsBefore called next to a transient (right).  This should not happen.");
+			return 0;
+		}
+
+		if(curx > 0) {
+			const leftx = curx-1;
+			const leftp = prow[leftx];
+			if(leftp !== undefined) {
+				if(leftp.isTransient()) {
+					console.log("addTransientsBefore called next to a transient (left).  This should not happen.");
+					return 0;
+				}
+				const leftpieces = InteractivePuzzlePiece.getPathTransients(<InteractivePuzzlePiece>leftp, <InteractivePuzzlePiece>piece);
+				if(leftpieces.length > 0) {
+					Grid.addAndShow(afterpoint, leftpieces);
+					Grid.fixupLocations(afterpoint, leftpieces.length);
+				}
+				return leftpieces.length;
+			} else {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
 	}
 
 	// add transients around a piece
-	static addTransients(piece:InteractivePuzzlePiece) {
-		const curpoint = piece.getGridPoint();
+	static addTransients(curpoint:{x:number, y:number}, piece:InteractivePuzzlePiece):number {
 		const cury = curpoint.y;
 		const curx = curpoint.x;
 		const prow = placedPieces[cury];
 		if(prow === undefined) {
-			return;
+			return 0;
 		}
 		const rightx = curx + 1;
 		const rightp = prow[rightx];
 		if(rightp !== undefined) {
 			if(rightp.isTransient()) {
 					console.log("addTransient called next to a transient (right).  This should not happen.");
-					return;
+					return 0;
 				}
 			const rightpieces = InteractivePuzzlePiece.getPathTransients(piece, <InteractivePuzzlePiece>rightp);
 			if(rightpieces.length > 0) {
-				Grid.addToGrid({y:cury, x:rightx}, rightpieces, false);
-				rightpieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
+				Grid.addAndShow({y:cury, x:rightx}, rightpieces);
+				// call fixup on them
+				Grid.fixupLocations({y:cury, x:rightx}, rightpieces.length);
 			}
 		}
 
@@ -750,17 +838,19 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			if(leftp !== undefined) {
 				if(leftp.isTransient()) {
 					console.log("addTransient called next to a transient (left).  This should not happen.");
-					return;
+					return 0;
 				}
 				const leftpieces = InteractivePuzzlePiece.getPathTransients(<InteractivePuzzlePiece>leftp, piece);
 				if(leftpieces.length > 0) {
-					Grid.addToGrid(curpoint, leftpieces, false);
-					leftpieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
-					piece.lefttransientMovedPieces
-					const newx = curx + leftpieces.length;
-					// do something cool here to show off that the piece moved.
+					Grid.addAndShow(curpoint, leftpieces);
+					Grid.fixupLocations(curpoint, leftpieces.length);
 				}
+				return leftpieces.length;
+			} else {
+				return 0;
 			}
+		} else {
+			return 0;
 		}
 	}
 
