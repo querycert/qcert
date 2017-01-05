@@ -1360,8 +1360,8 @@ abstract class ICanvasTab {
 	canvasObj?:fabric.IObject;
 }
 
-
-function makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
+class TabManager extends ICanvasTab {
+	static makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
        const ropts = fabric.util.object.clone(defaultTabRectOpts);
 	   fabric.util.object.extend(ropts, tab.getRectOptions() || {});
 
@@ -1409,42 +1409,87 @@ function makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:n
 	   tab.canvasObj = group;
 	   group.setOpacity(0.3);
        return group;
-}
+	}
 
-let currentTab:ICanvasTab = null;
-function switchTab(tab:ICanvasTab) {
-	if(currentTab != null) {
-		if('canvasObj' in currentTab) {
-			const tabobj = currentTab.canvasObj;
-			tabobj.setOpacity(0.3);
+	static make(canvas:fabric.ICanvas, label:string, tabs:ICanvasTab[], startTab:number=-1):TabManager {
+		const tm = new TabManager(canvas, label, tabs);
+		if(startTab >= 0 && startTab < tabs.length) {
+			const t = tabs[startTab];
+			if(t !== undefined && t !== null) {
+				tm.currentTab = t;
+				if('canvasObj' in t) {
+					const tabobj = t.canvasObj;
+					tabobj.setOpacity(1);
+				}
+			}
 		}
-		currentTab.hide();
+		return tm;
 	}
-	currentTab = tab;
-	tab.show();
-	if('canvasObj' in tab) {
-		const tabobj = tab.canvasObj;
-		tabobj.setOpacity(1);
-	}
-}
 
-function init_tabs(canvas:fabric.ICanvas, tabs:ICanvasTab[]) {
-       canvas.selection = false;
-
-       const tabTop = 5;
-       let tabLeft = 10;
+	private constructor(canvas:fabric.ICanvas, label:string, tabs:ICanvasTab[]) {
+		super(canvas);
+		this.label = label;
+		this.tabObjects = [];
+       	const tabTop = 5;
+       	let tabLeft = 10;
+		
 
        for(let i=0; i < tabs.length; i++) {
-               const itab = tabs[i];
-               const tabgroup = makeTab(canvas, itab, tabTop, tabLeft);
-               tabLeft += tabgroup.getBoundingRect().width;
-               tabgroup.hoverCursor = 'pointer';
-               tabgroup.on('selected', function() {
-				   switchTab(itab);
-               });
+			const itab = tabs[i];
+			const tabgroup = TabManager.makeTab(canvas, itab, tabTop, tabLeft);
+			tabLeft += tabgroup.getBoundingRect().width;
+			tabgroup.hoverCursor = 'pointer';
+			tabgroup.on('selected', () => {
+				this.switchTab(itab);
+			});
 
-               canvas.add(tabgroup);
+			this.tabObjects.push(tabgroup);
        }
+	}
+
+	readonly label:string;
+	tabObjects:fabric.IObject[];
+
+	getLabel():string {
+		return this.label;
+	}
+
+	getRectOptions():fabric.IRectOptions {
+		return defaultTabRectOpts;
+	}
+	getTextOptions():fabric.ITextOptions {
+		return defaultTabTextOpts;
+	}
+	show():void {
+		if(this.currentTab != null) {
+			this.currentTab.show();
+		}
+		this.tabObjects.forEach((obj) => this.canvas.add(obj));
+	}
+	hide() {
+		if(this.currentTab != null) {
+			this.currentTab.hide();
+		}
+		this.tabObjects.forEach((obj) => this.canvas.remove(obj));
+	}
+
+	currentTab:ICanvasTab = null;
+
+	switchTab(tab:ICanvasTab) {
+		if(this.currentTab != null) {
+			if('canvasObj' in this.currentTab) {
+				const tabobj = this.currentTab.canvasObj;
+				tabobj.setOpacity(0.3);
+			}
+			this.currentTab.hide();
+		}
+		this.currentTab = tab;
+		tab.show();
+		if('canvasObj' in tab) {
+			const tabobj = tab.canvasObj;
+			tabobj.setOpacity(1);
+		}
+	}
 }
 
 
@@ -1804,7 +1849,7 @@ function init():void {
 	const tabs = tabinitlist.map(function (elem) {
 		return new elem(maincanvas)
 	});
-	init_tabs(tabscanvas, tabs);
-	switchTab(tabs[0]);
+	const tm = TabManager.make(tabscanvas, "Q*cert", tabs, 0);
+	tm.show();
 	tabscanvas.renderAll();
 }
