@@ -1360,6 +1360,16 @@ abstract class ICanvasTab {
 	canvasObj?:fabric.IObject;
 }
 
+abstract class ICanvasDynamicTab extends ICanvasTab {
+		constructor(canvas:fabric.ICanvas) {
+			super(canvas);
+	}
+	/**
+	 * returns true if the name change is successfull
+	 */
+	abstract setLabel(newlabel:string):boolean;
+}
+
 class TabManager extends ICanvasTab {
 	static makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
        const ropts = fabric.util.object.clone(defaultTabRectOpts);
@@ -1411,8 +1421,10 @@ class TabManager extends ICanvasTab {
        return group;
 	}
 
-	static make(canvas:fabric.ICanvas, label:string, tabs:ICanvasTab[], startTab:number=-1):TabManager {
-		const tm = new TabManager(canvas, label, tabs);
+	static make(canvas:fabric.ICanvas, 
+				options:{label:string, rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
+				tabs:ICanvasTab[], startTab:number=-1):TabManager {
+		const tm = new TabManager(canvas, options, tabs);
 		if(startTab >= 0 && startTab < tabs.length) {
 			const t = tabs[startTab];
 			if(t !== undefined && t !== null) {
@@ -1426,12 +1438,20 @@ class TabManager extends ICanvasTab {
 		return tm;
 	}
 
-	private constructor(canvas:fabric.ICanvas, label:string, tabs:ICanvasTab[]) {
+	private constructor(canvas:fabric.ICanvas, 
+					options:{label:string, rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
+					tabs:ICanvasTab[]) {
 		super(canvas);
-		this.label = label;
+		this.label = options.label;
+		this.rectOpts = options.rectOptions || defaultTabRectOpts;
+		this.textOpts = options.textOptions || defaultTabTextOpts;
 		this.tabObjects = [];
-       	const tabTop = 5;
-       	let tabLeft = 10;
+
+		const defaultTabOrigin = {left:10, top:5};
+
+		const tabOrigin = options.tabOrigin || defaultTabOrigin;
+		const tabTop = tabOrigin.top || defaultTabOrigin.top;
+       	let tabLeft = tabOrigin.left || defaultTabOrigin.left;
 		
 
        for(let i=0; i < tabs.length; i++) {
@@ -1448,6 +1468,8 @@ class TabManager extends ICanvasTab {
 	}
 
 	readonly label:string;
+	readonly rectOpts:fabric.IRectOptions;
+	readonly textOpts:fabric.IITextOptions;
 	tabObjects:fabric.IObject[];
 
 	getLabel():string {
@@ -1455,10 +1477,10 @@ class TabManager extends ICanvasTab {
 	}
 
 	getRectOptions():fabric.IRectOptions {
-		return defaultTabRectOpts;
+		return this.rectOpts;
 	}
 	getTextOptions():fabric.ITextOptions {
-		return defaultTabTextOpts;
+		return this.textOpts;
 	}
 	show():void {
 		if(this.currentTab != null) {
@@ -1494,6 +1516,11 @@ class TabManager extends ICanvasTab {
 
 
 class BuilderTab extends ICanvasTab {
+
+	static make(canvas:fabric.ICanvas) {
+		return new BuilderTab(canvas);
+	}
+
 	startPiece:BasicPuzzlePiece;
 	totalCanvasHeight:number;
 	maxCols:number;
@@ -1683,6 +1710,10 @@ class BuilderTab extends ICanvasTab {
 class InputTab extends ICanvasTab {
 	rect:fabric.IObject;
 
+	static make(canvas:fabric.ICanvas) {
+		return new InputTab(canvas);
+	}
+
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
 		this.rect = new fabric.Rect({
@@ -1783,6 +1814,10 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 
 class PathTab extends ICanvasTab {
 
+	static make(canvas:fabric.ICanvas) {
+		return new PathTab(canvas);
+	}
+
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
 	}
@@ -1808,38 +1843,158 @@ class PathTab extends ICanvasTab {
 	}
 }
 
-class OptimizationsTab extends ICanvasTab {
-	rect:fabric.IObject;
 
-	constructor(canvas:fabric.ICanvas) {
-		super(canvas);
-		this.rect = new fabric.Rect({
-			left: 10, top: 5, width:200, height:50, fill:'purple',
-			hasBorders:false, 
-			hasControls:false,
-			selectable:false
-       });
+class OptimPhaseTab extends ICanvasDynamicTab {
+	static make(canvas:fabric.ICanvas, 
+		phase:QcertOptimPhase, 
+		options:{color:string, top?:number}):OptimPhaseTab {
+		return new OptimPhaseTab(canvas, phase, options);
 	}
 
-	getLabel() {
-		return "Optimizations";
+	constructor(canvas:fabric.ICanvas, 
+		phase:QcertOptimPhase,
+		options:{color:string, top?:number}) {
+		
+		super(canvas);
+		this.phase = phase;
+		this.top = options.top || 0;
+		this.color = options.color || 'orange';
+
+		//this.body = document.getElementsByTagName("body")[0];
+		this.body = document.getElementById("container");
+		const newdiv = document.createElement('div');
+		newdiv.style.position='absolute';
+		newdiv.style.left='10px';
+		newdiv.style.top=String(this.top) + 'px';
+		this.optimDiv = newdiv;
+		const list = document.createElement('ul');
+		for(let i =0 ; i < phase.optims.length; i++) {
+			const entry = document.createElement('li');
+			entry.appendChild(document.createTextNode(phase.optims[i]));
+			list.appendChild(entry);
+		}
+		newdiv.appendChild(list);
+	}
+	
+	readonly top:number;
+	readonly color:string;
+	phase:QcertOptimPhase;
+
+	getLabel():string {
+		return this.phase.name;
+	}
+
+	setLabel(newlabel:string):boolean {
+		this.phase.name = newlabel;
+		return true;
 	}
 	
 	getRectOptions() {
-		return {fill:'orange'};
+		return {fill:this.color};
 	}
 
+	body:HTMLElement;
+	optimDiv:HTMLElement;
 	show() {
-		this.canvas.selection = false;
-		this.canvas.add(this.rect);
+		this.body.appendChild(this.optimDiv);		
+
+		//this.canvas.add(this.rect);
+	}
+
+	hide() {
+		this.body.removeChild(this.optimDiv);
+		//this.canvas.remove(this.rect);
 	}
 }
 
-const tabinitlist:(new (canvas:fabric.ICanvas)=>ICanvasTab)[] = [
-	BuilderTab,
-	InputTab,
-	OptimizationsTab,
-	PathTab
+// class LangOptimizations extends ICanvasTab {
+	
+// 	static make(canvas:fabric.ICanvas, options:{label:string, color:string, top?:number}):LangOptimizations {
+// 		return new LangOptimizations(canvas, options);
+// 	}
+
+// 	// [
+// 	// 	LangOptimizations.make(canvas, {label:'NNRC', color:'purple', top:yoffset}),
+// 	// 	LangOptimizations.make(canvas, {label:'NRA', color:'green', top:yoffset})
+// 	// ];
+
+// 	static makeConfig(cfg:QcertOptimConfig):LangOptimizations {
+		
+// 		// LangOptimizations.make(cfg.language
+// 	}
+
+// 	constructor(canvas:fabric.ICanvas, options:{label:string, color:string, top?:number}) {
+// 		super(canvas);
+// 		this.label = options.label;
+// 		this.color = options.color;
+// 		this.top = options.top || 0;
+
+// 		this.rect = new fabric.Rect({
+// 			left: 10, top: this.top, width:400, height:50, fill:this.color,
+// 			hasBorders:false, 
+// 			hasControls:false,
+// 			selectable:false
+//        });
+// 	}
+
+// 	readonly top:number;
+// 	rect:fabric.IObject;
+// 	readonly label:string;
+// 	readonly color:string;
+
+// 	getLabel():string {
+// 		return this.label;
+// 	}
+	
+// 	getRectOptions() {
+// 		return {fill:this.color};
+// 	}
+
+// 	show() {
+// 		this.canvas.add(this.rect);
+// 	}
+
+// 	hide() {
+// 		this.canvas.remove(this.rect);
+// 	}
+
+// }
+
+function optimPhaseMake(canvas:fabric.ICanvas, 
+options:{color:string, top?:number}) {
+	return function(phase:QcertOptimPhase) {
+		return OptimPhaseTab.make(canvas, phase, options);
+	}
+
+}
+
+function langOptimizationsMake(canvas:fabric.ICanvas, yoffset:number) {
+	return function (cfg:QcertOptimConfig):ICanvasTab {
+		const yoffset2 = yoffset+60;
+		
+		const optimTabs = cfg.phases.map(optimPhaseMake(canvas, {color:'yellow', top:yoffset2}));
+		
+		return TabManager.make(canvas, {label:cfg.language, rectOptions:{fill:'green'}, tabOrigin:{top:yoffset}}, optimTabs, 0);
+	};
+}
+
+function OptimizationsTabMake(canvas:fabric.ICanvas) {
+	const yoffset = 60;
+	// TODO: this is the wrong call!
+	// we actually need to get the list of languages that admit Optimizations
+	// and for each one, create the appropriate 
+	const defaults = qcertOptimDefaults();
+	
+	const optimTabs = defaults.optims.map(langOptimizationsMake(canvas, yoffset));
+	
+	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'orange'}}, optimTabs, 0);
+}
+
+const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
+	BuilderTab.make,
+	InputTab.make,
+	OptimizationsTabMake,
+	PathTab.make
 ];
 
 function init():void {
@@ -1847,9 +2002,9 @@ function init():void {
 	const tabscanvas = new fabric.Canvas('tabs-canvas');
 
 	const tabs = tabinitlist.map(function (elem) {
-		return new elem(maincanvas)
+		return elem(maincanvas)
 	});
-	const tm = TabManager.make(tabscanvas, "Q*cert", tabs, 0);
+	const tm = TabManager.make(tabscanvas, {label:"Q*cert"}, tabs, 0);
 	tm.show();
 	tabscanvas.renderAll();
 }
