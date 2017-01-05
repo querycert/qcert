@@ -1360,6 +1360,94 @@ abstract class ICanvasTab {
 	canvasObj?:fabric.IObject;
 }
 
+
+function makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
+       const ropts = fabric.util.object.clone(defaultTabRectOpts);
+	   fabric.util.object.extend(ropts, tab.getRectOptions() || {});
+
+       ropts.left = left;
+       ropts.top = top;
+       ropts.editable = false;
+       ropts.height = ropts.height || 50;
+       ropts.width = ropts.width || 200;
+       const box = new fabric.Rect(ropts);
+
+
+	   const topts = fabric.util.object.clone(defaultTabTextOpts)
+	   fabric.util.object.extend(topts, tab.getTextOptions() || {});
+       topts.left = 0;
+       topts.top = 0;
+       topts.editable = false;
+	   const text = new fabric.IText(tab.getLabel(), topts);
+       // calculate where it should appear.
+
+       // if needed, shrink the font so that the text
+       // is not too large
+       let boundingBox = text.getBoundingRect();
+       const maxwidth = ropts.width - 4;
+       while(boundingBox.width > maxwidth) {
+               text.setFontSize(text.getFontSize()-2);
+
+               text.setCoords();
+               boundingBox = text.getBoundingRect();
+       }
+
+	   
+       text.originX = 'left';
+       text.left = ropts.left + (ropts.width -  boundingBox.width) / 2;
+       text.originY = 'top';
+       text.top = ropts.top;
+       text.height = ropts.height;
+       text.width = ropts.width;
+       text.setTextAlign('center');
+       text.setCoords();
+       const group = new fabric.Group([box, text]);
+	   group.hasControls = false;
+	   group.hasBorders = false;
+	   group.lockMovementX = true;
+	   group.lockMovementY = true;
+	   tab.canvasObj = group;
+	   group.setOpacity(0.3);
+       return group;
+}
+
+let currentTab:ICanvasTab = null;
+function switchTab(tab:ICanvasTab) {
+	if(currentTab != null) {
+		if('canvasObj' in currentTab) {
+			const tabobj = currentTab.canvasObj;
+			tabobj.setOpacity(0.3);
+		}
+		currentTab.hide();
+	}
+	currentTab = tab;
+	tab.show();
+	if('canvasObj' in tab) {
+		const tabobj = tab.canvasObj;
+		tabobj.setOpacity(1);
+	}
+}
+
+function init_tabs(canvas:fabric.ICanvas, tabs:ICanvasTab[]) {
+       canvas.selection = false;
+
+       const tabTop = 5;
+       let tabLeft = 10;
+
+       for(let i=0; i < tabs.length; i++) {
+               const itab = tabs[i];
+               const tabgroup = makeTab(canvas, itab, tabTop, tabLeft);
+               tabLeft += tabgroup.getBoundingRect().width;
+               tabgroup.hoverCursor = 'pointer';
+               tabgroup.on('selected', function() {
+				   switchTab(itab);
+               });
+
+               canvas.add(tabgroup);
+       }
+}
+
+
 class BuilderTab extends ICanvasTab {
 	startPiece:BasicPuzzlePiece;
 	totalCanvasHeight:number;
@@ -1574,92 +1662,6 @@ class InputTab extends ICanvasTab {
 	}
 }
 
-function makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
-       const ropts = fabric.util.object.clone(defaultTabRectOpts);
-	   fabric.util.object.extend(ropts, tab.getRectOptions() || {});
-
-       ropts.left = left;
-       ropts.top = top;
-       ropts.editable = false;
-       ropts.height = ropts.height || 50;
-       ropts.width = ropts.width || 200;
-       const box = new fabric.Rect(ropts);
-
-
-	   const topts = fabric.util.object.clone(defaultTabTextOpts)
-	   fabric.util.object.extend(topts, tab.getTextOptions() || {});
-       topts.left = 0;
-       topts.top = 0;
-       topts.editable = false;
-	   const text = new fabric.IText(tab.getLabel(), topts);
-       // calculate where it should appear.
-
-       // if needed, shrink the font so that the text
-       // is not too large
-       let boundingBox = text.getBoundingRect();
-       const maxwidth = ropts.width - 4;
-       while(boundingBox.width > maxwidth) {
-               text.setFontSize(text.getFontSize()-2);
-
-               text.setCoords();
-               boundingBox = text.getBoundingRect();
-       }
-
-	   
-       text.originX = 'left';
-       text.left = ropts.left + (ropts.width -  boundingBox.width) / 2;
-       text.originY = 'top';
-       text.top = ropts.top;
-       text.height = ropts.height;
-       text.width = ropts.width;
-       text.setTextAlign('center');
-       text.setCoords();
-       const group = new fabric.Group([box, text]);
-	   group.hasControls = false;
-	   group.hasBorders = false;
-	   group.lockMovementX = true;
-	   group.lockMovementY = true;
-	   tab.canvasObj = group;
-	   group.setOpacity(0.3);
-       return group;
-}
-
-let currentTab:ICanvasTab = null;
-function switchTab(tab:ICanvasTab) {
-	if(currentTab != null) {
-		if('canvasObj' in currentTab) {
-			const tabobj = currentTab.canvasObj;
-			tabobj.setOpacity(0.3);
-		}
-		currentTab.hide();
-	}
-	currentTab = tab;
-	tab.show();
-	if('canvasObj' in tab) {
-		const tabobj = tab.canvasObj;
-		tabobj.setOpacity(1);
-	}
-}
-
-function init_tabs(canvas:fabric.ICanvas, tabs:ICanvasTab[]) {
-       canvas.selection = false;
-
-       const tabTop = 5;
-       let tabLeft = 10;
-
-       for(let i=0; i < tabs.length; i++) {
-               const itab = tabs[i];
-               const tabgroup = makeTab(canvas, itab, tabTop, tabLeft);
-               tabLeft += tabgroup.getBoundingRect().width;
-               tabgroup.hoverCursor = 'pointer';
-               tabgroup.on('selected', function() {
-				   switchTab(itab);
-               });
-
-               canvas.add(tabgroup);
-       }
-}
-
 function getPipelinePieces():BasicPuzzlePiece[] {
 	const prow = placedPieces[pipelineRow];
 	const path:BasicPuzzlePiece[] = [];
@@ -1677,47 +1679,47 @@ function getPipelinePieces():BasicPuzzlePiece[] {
 	return path;
 }
 
-function getPipelineLangs():QcertLanguage[] {
+function getPipelineLangs():{id:QcertLanguage,explicit:boolean}[] {
 	return getPipelinePieces().map(function (piece) {
-				if('langid' in piece) {
-					return (<any>piece).langid;
-				} else {
-					return undefined;
-				}
+		if('langid' in piece) {
+			return {id:(<any>piece).langid, explicit:! piece.isTransient()};
+		} else {
+			return undefined;
+		}
 	});
 }
 
-function expandLangsPath(path:QcertLanguage[]):{id:QcertLanguage,explicit:boolean}[] {
-	let expanded = [];
-	const pathLen = path.length;
-	if(path == null || pathLen == 0) {
-		return expanded;
-	}
+// function expandLangsPath(path:QcertLanguage[]):{id:QcertLanguage,explicit:boolean}[] {
+// 	let expanded = [];
+// 	const pathLen = path.length;
+// 	if(path == null || pathLen == 0) {
+// 		return expanded;
+// 	}
 
-	let prev = path[0];
-	expanded.push({id:prev, explicit:true});
-	for(let i = 1; i < pathLen; i++) {
-		const cur = path[i];
-		const curPath = qcertLanguagesPath({
-			source: prev,
-			target:cur
-		}).path;
-		const curPathLen = curPath.length;
+// 	let prev = path[0];
+// 	expanded.push({id:prev, explicit:true});
+// 	for(let i = 1; i < pathLen; i++) {
+// 		const cur = path[i];
+// 		const curPath = qcertLanguagesPath({
+// 			source: prev,
+// 			target:cur
+// 		}).path;
+// 		const curPathLen = curPath.length;
 
-		if(curPath == null 
-		|| curPathLen == 0
-		|| (curPathLen == 1 && curPath[0] == "error")) {
-			expanded.push("error");
-		} else {
-			for(let j = 1; j < curPathLen; j++) {
-				expanded.push({id:curPath[j], explicit:(j+1)==curPathLen});
-			}
-		}
-		prev = cur;
-	}
+// 		if(curPath == null 
+// 		|| curPathLen == 0
+// 		|| (curPathLen == 1 && curPath[0] == "error")) {
+// 			expanded.push("error");
+// 		} else {
+// 			for(let j = 1; j < curPathLen; j++) {
+// 				expanded.push({id:curPath[j], explicit:(j+1)==curPathLen});
+// 			}
+// 		}
+// 		prev = cur;
+// 	}
 
-	return expanded;
-}
+// 	return expanded;
+// }
 
 function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):string {
 	const lang = langpack.id;
@@ -1750,8 +1752,8 @@ class PathTab extends ICanvasTab {
     show() {
 		this.canvas.selection = false;
 		const langs = getPipelineLangs();
-		const expanded = expandLangsPath(langs);
-		const path = expanded.map(getLanguageMarkedLabel).join(" -> ");
+		//const expanded = expandLangsPath(langs);
+		const path = langs.map(getLanguageMarkedLabel).join(" -> ");
 
 		const txt = new fabric.Text(path, {
 			left: 10, top: 5, width:200, height:50, fill:'purple'
@@ -1761,9 +1763,37 @@ class PathTab extends ICanvasTab {
 	}
 }
 
+class OptimizationsTab extends ICanvasTab {
+	rect:fabric.IObject;
+
+	constructor(canvas:fabric.ICanvas) {
+		super(canvas);
+		this.rect = new fabric.Rect({
+			left: 10, top: 5, width:200, height:50, fill:'purple',
+			hasBorders:false, 
+			hasControls:false,
+			selectable:false
+       });
+	}
+
+	getLabel() {
+		return "Optimizations";
+	}
+	
+	getRectOptions() {
+		return {fill:'orange'};
+	}
+
+	show() {
+		this.canvas.selection = false;
+		this.canvas.add(this.rect);
+	}
+}
+
 const tabinitlist:(new (canvas:fabric.ICanvas)=>ICanvasTab)[] = [
 	BuilderTab,
 	InputTab,
+	OptimizationsTab,
 	PathTab
 ];
 
