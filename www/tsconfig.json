@@ -2,7 +2,10 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "sourceMap": true
+        "sourceMap": true,
+        "types": [
+            "Sortablejs"
+        ]
     },
     "files":[
         "demo.ts",
