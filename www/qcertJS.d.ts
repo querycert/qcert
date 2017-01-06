@@ -6,12 +6,16 @@ type SourceLanguageGroups = {
 		intermediate:[QcertLanguageDescription], 
 		backend:[QcertLanguageDescription]};
 
+type QcertOptimStepDescription = {name: string, description:string, lemma:string};
+
 type QcertOptimPhase = {name: string; optims: string[]; iter: number};
 type QcertOptimConfig = {language: string; phases: QcertOptimPhase[]};
 type QcertCompilerConfig = {source:QcertLanguage, target:QcertLanguage, sourcesexp: boolean, ascii: boolean, javaimports: string, query: string};
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;
+
+declare function qcertOptimList():{optims:{language:QcertLanguage; optims:QcertOptimStepDescription[]}[]};
 
 /**
  * Derives a default path between the arguments

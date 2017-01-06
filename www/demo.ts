@@ -277,6 +277,9 @@ interface StringMap<V> {
 	[K: string]: V;
 }
 
+// Either move sourcePieces inside the builder or move its initialization
+// out to avoid maintenance/ordering problems
+
 // These are two critical arrays for the buider
 // This is the collection of source pieces
 var sourcePieces:StringMap<SourcePuzzlePiece> = {};
@@ -1425,20 +1428,24 @@ class TabManager extends ICanvasTab {
 				options:{label:string, rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
 				tabs:ICanvasTab[], startTab:number=-1):TabManager {
 		const tm = new TabManager(canvas, options, tabs);
+		tm.setInitTab(tabs, startTab);
+		return tm;
+	}
+
+	protected setInitTab(tabs:ICanvasTab[], startTab:number) {
 		if(startTab >= 0 && startTab < tabs.length) {
 			const t = tabs[startTab];
 			if(t !== undefined && t !== null) {
-				tm.currentTab = t;
+				this.currentTab = t;
 				if('canvasObj' in t) {
 					const tabobj = t.canvasObj;
 					tabobj.setOpacity(1);
 				}
 			}
 		}
-		return tm;
-	}
 
-	private constructor(canvas:fabric.ICanvas, 
+	}
+	protected constructor(canvas:fabric.ICanvas, 
 					options:{label:string, rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
 					tabs:ICanvasTab[]) {
 		super(canvas);
@@ -1845,13 +1852,15 @@ class PathTab extends ICanvasTab {
 
 
 class OptimPhaseTab extends ICanvasDynamicTab {
-	static make(canvas:fabric.ICanvas, 
+	static make(canvas:fabric.ICanvas,
+		parentDiv:HTMLElement, 
 		phase:QcertOptimPhase, 
 		options:{color:string, top?:number}):OptimPhaseTab {
-		return new OptimPhaseTab(canvas, phase, options);
+		return new OptimPhaseTab(canvas, parentDiv, phase, options);
 	}
 
-	constructor(canvas:fabric.ICanvas, 
+	constructor(canvas:fabric.ICanvas,
+		div:HTMLElement,  
 		phase:QcertOptimPhase,
 		options:{color:string, top?:number}) {
 		
@@ -1861,11 +1870,8 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		this.color = options.color || 'orange';
 
 		//this.body = document.getElementsByTagName("body")[0];
-		this.body = document.getElementById("container");
+		this.parentDiv = div;
 		const newdiv = document.createElement('div');
-		newdiv.style.position='absolute';
-		newdiv.style.left='10px';
-		newdiv.style.top=String(this.top) + 'px';
 		this.optimDiv = newdiv;
 		const list = document.createElement('ul');
 		for(let i =0 ; i < phase.optims.length; i++) {
@@ -1893,16 +1899,16 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		return {fill:this.color};
 	}
 
-	body:HTMLElement;
+	parentDiv:HTMLElement;
 	optimDiv:HTMLElement;
 	show() {
-		this.body.appendChild(this.optimDiv);		
+		this.parentDiv.appendChild(this.optimDiv);		
 
 		//this.canvas.add(this.rect);
 	}
 
 	hide() {
-		this.body.removeChild(this.optimDiv);
+		this.parentDiv.removeChild(this.optimDiv);
 		//this.canvas.remove(this.rect);
 	}
 }
@@ -1960,22 +1966,127 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 
 // }
 
-function optimPhaseMake(canvas:fabric.ICanvas, 
+function optimPhaseMake(canvas:fabric.ICanvas, div:HTMLElement,
 options:{color:string, top?:number}) {
 	return function(phase:QcertOptimPhase) {
-		return OptimPhaseTab.make(canvas, phase, options);
+		return OptimPhaseTab.make(canvas, div, phase, options);
 	}
 
 }
 
-function langOptimizationsMake(canvas:fabric.ICanvas, yoffset:number) {
-	return function (cfg:QcertOptimConfig):ICanvasTab {
-		const yoffset2 = yoffset+60;
+class OptimizationManager extends ICanvasTab {
+	
+	static make(canvas:fabric.ICanvas, 
+				options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
+				language:QcertLanguage,
+				optims:QcertOptimStepDescription[],
+				cfg_phases:QcertOptimPhase[],
+				startTab:number=-1):OptimizationManager {
+					
+		const tm = new OptimizationManager(canvas, options, language, optims, cfg_phases);
+		return tm;
+	}
+
+	language:QcertLanguage;
+	tabManager:TabManager;
+	parentDiv:HTMLElement;
+	topDiv:HTMLElement;
+	phasesDiv:HTMLElement;
+
+	rectOptions?:fabric.IRectOptions;
+	textOptions?:fabric.IITextOptions;
+
+	protected constructor(
+		canvas:fabric.ICanvas, 
+		options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
+		language:QcertLanguage,
+		optims:QcertOptimStepDescription[],
+		cfg_phases:QcertOptimPhase[]) {
+
+		super(canvas);
+		this.language = language;
+		this.rectOptions = options.rectOptions;
+		this.textOptions = options.textOptions;
+		const defaultTabOrigin = {left:10, top:5};
+
+		const tabOrigin = options.tabOrigin || defaultTabOrigin;
+		const tabTop = tabOrigin.top || defaultTabOrigin.top;
+       	const tabLeft = tabOrigin.left || defaultTabOrigin.left;
 		
-		const optimTabs = cfg.phases.map(optimPhaseMake(canvas, {color:'yellow', top:yoffset2}));
+		this.parentDiv = document.getElementById("container");
+		const newdiv = document.createElement('div');
+		newdiv.style.position='absolute';
+		newdiv.style.left='10px';
+		newdiv.style.top=String(tabTop+60) + 'px';
+		this.topDiv = newdiv;
+		const list = document.createElement('ul');
+		for(let i =0 ; i < optims.length; i++) {
+			const o = optims[i];
+			const entry = document.createElement('li');
+			entry.appendChild(document.createTextNode(o.name));
+			entry.title = o.description;
+			list.appendChild(entry);
+		}
+
+		const leftdiv = document.createElement('div');
+		leftdiv.classList.add('phase-optims');
+		leftdiv.style.position = 'static';
+		leftdiv.style.cssFloat = 'left';
+		const rightdiv = document.createElement('div');
+		rightdiv.classList.add('all-optims');
+		rightdiv.style.position = 'static';
+		rightdiv.style.cssFloat = 'right';
+		rightdiv.appendChild(list);
+
+		newdiv.appendChild(leftdiv);
+		newdiv.appendChild(rightdiv);		
+		this.phasesDiv = leftdiv;
+
+		const yoffset2 = tabTop+60;
+	
+		const optimTabs = cfg_phases.map(optimPhaseMake(canvas, leftdiv, {color:'yellow', top:yoffset2}));
+
+		this.tabManager = TabManager.make(canvas, 
+				{
+					label:language,
+					rectOptions:options.rectOptions,
+			 		textOptions:options.textOptions, 
+				 	tabOrigin:options.tabOrigin
+				}, optimTabs, 0);
 		
-		return TabManager.make(canvas, {label:cfg.language, rectOptions:{fill:'green'}, tabOrigin:{top:yoffset}}, optimTabs, 0);
-	};
+
+	}
+	
+	getLabel():string {
+		return this.language;
+	}
+
+	getRectOptions():fabric.IRectOptions {
+		return this.rectOptions;
+	}
+
+	getTextOptions():fabric.ITextOptions {
+		return this.textOptions;
+	}
+
+	show() {
+		this.tabManager.show();
+		this.parentDiv.appendChild(this.topDiv);		
+	}
+
+	hide() {
+		this.tabManager.hide();
+		this.parentDiv.removeChild(this.topDiv);		
+	}
+}
+
+function findFirstWithField<T, K extends keyof T>(l:T[], field:K, lang:T[K]):T {
+	const f = l.filter((x) => x[field] == lang);
+	if(f.length == 0) {
+		return undefined;
+	} else {
+		return f[0];
+	}
 }
 
 function OptimizationsTabMake(canvas:fabric.ICanvas) {
@@ -1983,9 +2094,18 @@ function OptimizationsTabMake(canvas:fabric.ICanvas) {
 	// TODO: this is the wrong call!
 	// we actually need to get the list of languages that admit Optimizations
 	// and for each one, create the appropriate 
-	const defaults = qcertOptimDefaults();
-	
-	const optimTabs = defaults.optims.map(langOptimizationsMake(canvas, yoffset));
+	const optims = qcertOptimList().optims;
+	const defaults = qcertOptimDefaults().optims;
+
+	const opts = {rectOptions:{fill:'green'}, tabOrigin:{top:yoffset}};	
+	let optimTabs:ICanvasTab[] = [];
+	for(let i=0; i < optims.length; i++) {
+		const opt = optims[i];
+		const cfg = findFirstWithField(defaults, 'language', opt.language);
+		const cfg_phases = cfg === undefined ? [] : cfg.phases;
+
+		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language, opt.optims, cfg_phases));
+	}
 	
 	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'orange'}}, optimTabs, 0);
 }

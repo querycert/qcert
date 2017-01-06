@@ -301,6 +301,31 @@ Section CompLang.
 
     Definition export_language_descriptions : export_desc :=
       select_description_per_kind language_descriptions_with_ids.
+
+    (* given a language, returns the type of that language *)
+    Definition type_of_language (l:language) : Set :=
+      match l with
+      | L_rule => rule
+      | L_camp => camp
+      | L_oql => oql
+      | L_sql => sql
+      | L_lambda_nra => lnra
+      | L_nra => nra
+      | L_nraenv_core => nraenv_core
+      | L_nraenv => nraenv
+      | L_nnrc_core => nnrc_core
+      | L_nnrc => nnrc
+      | L_nnrcmr => nnrcmr
+      | L_cldmr => cldmr
+      | L_dnnrc_dataset => dnnrc_dataset
+      | L_dnnrc_typed_dataset => dnnrc_typed_dataset
+      | L_javascript => javascript
+      | L_java => java
+      | L_spark => spark
+      | L_spark2 => spark2
+      | L_cloudant => cloudant
+      | L_error _ => string
+      end.
   End CompLangUtil.
 
 End CompLang.

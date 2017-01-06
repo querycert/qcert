@@ -58,6 +58,7 @@ Module QDriver(runtime:CompilerRuntime).
 
     (* Optimizers config *)
 
+    Definition optim_config_list := optim_config_list.
     Definition optim_config_default := optim_config_default.
     
     (* Comp *)

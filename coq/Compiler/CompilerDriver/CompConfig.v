@@ -21,17 +21,44 @@ Section CompConfig.
   (* Basic *)
   Require Import BasicSystem.
   Require Import TypingRuntime.
+  Require Import ForeignReduceOps.
 
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {bm:brand_model}.
-
+  
   Require Import OptimizerLogger.
   Require Import CompLang CompEnv.
   
   Section optim.
     Require Import TNNRCOptimizer.
     Require Import NRAEnvOptimFunc.
+    Require Import OptimizerStep.
+
+    (* CompLang.type_of_language does not suffice, since some language 
+       (the core ones) have optimizations specified in a different language 
+       (via conversion) *)
+
+    Definition optim_type_of_language (l:language) : Set :=
+      match l with
+      | L_nra => nraenv
+      | L_nraenv_core => nraenv
+      | L_nraenv => nraenv
+      | L_nnrc_core => nnrc
+      | L_nnrc => nnrc
+      | _ => Empty_set
+      end.
+
+    Definition optim_config_list_type := list {l:language & list (OptimizerStep (optim_type_of_language l))}.
+
+    Definition optim_config_list : optim_config_list_type
+      := existT _ L_nra tnraenv_optim_list
+        :: existT _ L_nraenv_core tnraenv_optim_list
+        :: existT _ L_nraenv tnraenv_optim_list
+        :: existT _ L_nnrc_core tnnrc_optim_list
+        :: existT _ L_nnrc tnnrc_optim_list
+        :: nil.
+      
     Definition optim_config : Set :=
       list (language * optim_phases_config).
 
@@ -56,7 +83,19 @@ Section CompConfig.
       | Some opc => opc
       | None => get_default_optim_config l
       end.
-    
+
+    Require Import Permutation.
+
+    Remark optim_config_list_default_in_sync :
+      Permutation
+        (map (@projT1 _ _) optim_config_list)
+        (map fst optim_config_default).
+    Proof.
+      apply permutation_prover.
+      vm_compute.
+      trivial.
+    Qed.
+      
   End optim.
 
   Record driver_config :=

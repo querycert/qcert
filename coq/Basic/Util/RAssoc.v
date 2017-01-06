@@ -543,6 +543,16 @@ Section RAssoc.
       + right. intro P. apply n. eapply (Permutation_in _ P). simpl; intuition.
   Defined.
 
+  Lemma permutation_prover {A:Set} {dec:EqDec A eq}
+           (l1 l2:list A)
+           (pf:holds (permutation_dec l1 l2)) :
+              Permutation l1 l2.
+  Proof.
+    generalize (permutation_dec l1 l2).
+    unfold holds, is_true in *.
+    match_destr_in pf.
+  Qed.
+
   Lemma NoDup_app_inv {A:Type} {a b:list A} : NoDup (a++b) -> NoDup a.
   Proof.
     induction b; intuition.

@@ -17,7 +17,9 @@
 open Util
 open QcertUtil
 open QcertConfig
+module Hack = Compiler
 open Compiler.EnhancedCompiler
+   
 
 (**********************************)
 (* Library functions              *)
@@ -177,6 +179,25 @@ let json_of_source_to_target_path j =
 let json_of_optim x =
   Js.string (Util.string_of_char_list x)
 
+let js_of_optim_step_list {Hack.optim_step_name; Hack.optim_step_description; Hack.optim_step_lemma} =
+  object%js
+    val name = Js.string (Util.string_of_char_list optim_step_name)
+    val description = Js.string (Util.string_of_char_list optim_step_description)
+    val lemma = Js.string (Util.string_of_char_list optim_step_lemma)
+  end
+  
+let json_of_optim_list () =
+  let ocl = QDriver.optim_config_list in
+  let wrap (Hack.ExistT (x, y)) =
+    object%js
+      val language = Js.string (name_of_language x)
+      val optims = Js.def (wrap_all js_of_optim_step_list y)
+    end
+  in
+  object%js
+    val optims = Js.def (wrap_all wrap ocl)
+  end
+  
 let js_of_optim_phase x =
   let ((name,optim_list), iter) = x in
   object%js
@@ -231,6 +252,8 @@ let _ =
     Js.wrap_callback language_specs;
   Js.Unsafe.global##.qcertLanguagesPath :=
     Js.wrap_callback json_of_source_to_target_path;
+  Js.Unsafe.global##.qcertOptimList :=
+    Js.wrap_callback json_of_optim_list;
   Js.Unsafe.global##.qcertOptimDefaults :=
     Js.wrap_callback json_of_optim_default;
   Js.Unsafe.global##.qcertCompile :=
