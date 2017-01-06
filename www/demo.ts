@@ -1873,6 +1873,16 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		this.parentDiv = div;
 		const newdiv = document.createElement('div');
 		this.optimDiv = newdiv;
+
+
+		const divTitle = document.createElement('h3');
+		divTitle.style.cssFloat = 'center';
+		divTitle.appendChild(document.createTextNode("Currently selected optimizations"));
+		newdiv.appendChild(divTitle);
+		const divIterations = document.createElement('h4');
+		divIterations.appendChild(document.createTextNode("These optimizations will be batched in " + phase.iter + " iterations "));
+		newdiv.appendChild(divIterations);
+
 		const list = document.createElement('ul');
 		for(let i =0 ; i < phase.optims.length; i++) {
 			const entry = document.createElement('li');
@@ -1912,59 +1922,6 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		//this.canvas.remove(this.rect);
 	}
 }
-
-// class LangOptimizations extends ICanvasTab {
-	
-// 	static make(canvas:fabric.ICanvas, options:{label:string, color:string, top?:number}):LangOptimizations {
-// 		return new LangOptimizations(canvas, options);
-// 	}
-
-// 	// [
-// 	// 	LangOptimizations.make(canvas, {label:'NNRC', color:'purple', top:yoffset}),
-// 	// 	LangOptimizations.make(canvas, {label:'NRA', color:'green', top:yoffset})
-// 	// ];
-
-// 	static makeConfig(cfg:QcertOptimConfig):LangOptimizations {
-		
-// 		// LangOptimizations.make(cfg.language
-// 	}
-
-// 	constructor(canvas:fabric.ICanvas, options:{label:string, color:string, top?:number}) {
-// 		super(canvas);
-// 		this.label = options.label;
-// 		this.color = options.color;
-// 		this.top = options.top || 0;
-
-// 		this.rect = new fabric.Rect({
-// 			left: 10, top: this.top, width:400, height:50, fill:this.color,
-// 			hasBorders:false, 
-// 			hasControls:false,
-// 			selectable:false
-//        });
-// 	}
-
-// 	readonly top:number;
-// 	rect:fabric.IObject;
-// 	readonly label:string;
-// 	readonly color:string;
-
-// 	getLabel():string {
-// 		return this.label;
-// 	}
-	
-// 	getRectOptions() {
-// 		return {fill:this.color};
-// 	}
-
-// 	show() {
-// 		this.canvas.add(this.rect);
-// 	}
-
-// 	hide() {
-// 		this.canvas.remove(this.rect);
-// 	}
-
-// }
 
 function optimPhaseMake(canvas:fabric.ICanvas, div:HTMLElement,
 options:{color:string, top?:number}) {
@@ -2036,10 +1993,15 @@ class OptimizationManager extends ICanvasTab {
 		rightdiv.classList.add('all-optims');
 		rightdiv.style.position = 'static';
 		rightdiv.style.cssFloat = 'right';
+		const rightDivTitle = document.createElement('h3');
+		rightDivTitle.style.cssFloat = 'center';
+		rightDivTitle.appendChild(document.createTextNode("Available optimizations"));
+		rightdiv.appendChild(rightDivTitle);
 		rightdiv.appendChild(list);
 
 		newdiv.appendChild(leftdiv);
 		newdiv.appendChild(rightdiv);		
+
 		this.phasesDiv = leftdiv;
 
 		const yoffset2 = tabTop+60;
