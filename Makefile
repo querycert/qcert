@@ -301,7 +301,7 @@ japi:
 	@$(MAKE) java-extraction
 	@$(MAKE) lib/QcertLibrary.jar
 
-demo: jsapi
+demo: qcert jsapi
 	@echo "[Qcert] "
 	@echo "[Qcert] Compiling typescript files to javascript"
 	@echo "[Qcert] "
