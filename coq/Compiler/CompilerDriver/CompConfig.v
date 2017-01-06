@@ -49,14 +49,14 @@ Section CompConfig.
       | _ => Empty_set
       end.
 
-    Definition optim_config_list_type := list {l:language & list (OptimizerStep (optim_type_of_language l))}.
+    Definition optim_config_list_type := list {l:language & (string * list (OptimizerStep (optim_type_of_language l)))}%type.
 
     Definition optim_config_list : optim_config_list_type
-      := existT _ L_nra tnraenv_optim_list
-        :: existT _ L_nraenv_core tnraenv_optim_list
-        :: existT _ L_nraenv tnraenv_optim_list
-        :: existT _ L_nnrc_core tnnrc_optim_list
-        :: existT _ L_nnrc tnnrc_optim_list
+      := existT _ L_nra ("NRAEnv.Optim.NRAEnvOptimFunc"%string, tnraenv_optim_list)
+        :: existT _ L_nraenv_core ("NRAEnv.Optim.NRAEnvOptimFunc"%string, tnraenv_optim_list)
+        :: existT _ L_nraenv ("NRAEnv.Optim.NRAEnvOptimFunc"%string, tnraenv_optim_list)
+        :: existT _ L_nnrc_core ("NNRC.Rew.TNNRCOptimizer"%string,tnnrc_optim_list)
+        :: existT _ L_nnrc ("NNRC.Rew.TNNRCOptimizer"%string,tnnrc_optim_list)
         :: nil.
       
     Definition optim_config : Set :=

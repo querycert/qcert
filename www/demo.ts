@@ -1883,13 +1883,50 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		divIterations.appendChild(document.createTextNode("These optimizations will be batched in " + phase.iter + " iterations "));
 		newdiv.appendChild(divIterations);
 
-		const list = document.createElement('ul');
-		for(let i =0 ; i < phase.optims.length; i++) {
+		const listnode = document.createElement('ul');
+		listnode.classList.add('optim-list');
+
+		function makePhaseOptimElement(optim:string):HTMLLIElement {
 			const entry = document.createElement('li');
-			entry.appendChild(document.createTextNode(phase.optims[i]));
-			list.appendChild(entry);
+			entry.classList.add('optim-list');
+			// const dhandle = document.createElement('span');
+			// dhandle.classList.add('optim-handle');
+			// dhandle.innerHTML = '&#9776;';
+			// entry.appendChild(dhandle);
+
+
+			entry.appendChild(document.createTextNode(optim));
+
+			const removenode = document.createElement('i');
+			removenode.classList.add('js-remove');
+			removenode.appendChild(document.createTextNode('✖'));
+			entry.appendChild(removenode);
+			return entry;
 		}
-		newdiv.appendChild(list);
+
+		for(let i =0 ; i < phase.optims.length; i++) {
+			listnode.appendChild(makePhaseOptimElement(phase.optims[i]));
+		}
+
+		const sort = Sortable.create(listnode, 
+		{
+			group: {
+				name: 'optims',
+				pull: true,
+				put: true
+			},
+			sort: true,
+			animation: 150,
+			filter: '.js-remove',
+			//handle: '.optim-handle',
+  			onFilter: function (evt) {
+    			var el = sort.closest(evt.item); // get dragged item
+    			el && el.parentNode.removeChild(el);
+  			}
+		}
+		);
+
+		newdiv.appendChild(listnode);
 	}
 	
 	readonly top:number;
@@ -1936,11 +1973,12 @@ class OptimizationManager extends ICanvasTab {
 	static make(canvas:fabric.ICanvas, 
 				options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
 				language:QcertLanguage,
+				modulebase:string,
 				optims:QcertOptimStepDescription[],
 				cfg_phases:QcertOptimPhase[],
 				startTab:number=-1):OptimizationManager {
 					
-		const tm = new OptimizationManager(canvas, options, language, optims, cfg_phases);
+		const tm = new OptimizationManager(canvas, options, language, modulebase, optims, cfg_phases);
 		return tm;
 	}
 
@@ -1957,6 +1995,7 @@ class OptimizationManager extends ICanvasTab {
 		canvas:fabric.ICanvas, 
 		options:{rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
 		language:QcertLanguage,
+		module_base:string,
 		optims:QcertOptimStepDescription[],
 		cfg_phases:QcertOptimPhase[]) {
 
@@ -1976,31 +2015,70 @@ class OptimizationManager extends ICanvasTab {
 		newdiv.style.left='10px';
 		newdiv.style.top=String(tabTop+60) + 'px';
 		this.topDiv = newdiv;
-		const list = document.createElement('ul');
+		const listnode = document.createElement('ul');
+
+		const coqdocBaseURL = 'https://querycert.github.io/sigmod17/';
+		function makeLemmaURL(base:string, lemma:string) {
+			let url = coqdocBaseURL + "Qcert." + base + ".html";
+			if(lemma != undefined) {
+			 	url = url + "#" + lemma;
+			}
+			return url;
+		}
+
+		function makeAvailableOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
+			const entry = document.createElement('li');
+			entry.classList.add("optim-list");
+			entry.appendChild(document.createTextNode(o.name));
+			const lemmaLink = document.createElement('a');
+			lemmaLink.href = makeLemmaURL(modulebase, o.lemma);
+			lemmaLink.appendChild(document.createTextNode('❤'));
+			lemmaLink.classList.add('lemma-link');
+			entry.appendChild(lemmaLink);
+			entry.title = o.description;
+			return entry;
+		}
+
+		listnode.classList.add('optim-list');
 		for(let i =0 ; i < optims.length; i++) {
 			const o = optims[i];
-			const entry = document.createElement('li');
-			entry.appendChild(document.createTextNode(o.name));
-			entry.title = o.description;
-			list.appendChild(entry);
+			const entry = makeAvailableOptimElement(module_base, o);
+
+			listnode.appendChild(entry);
 		}
 
 		const leftdiv = document.createElement('div');
 		leftdiv.classList.add('phase-optims');
 		leftdiv.style.position = 'static';
 		leftdiv.style.cssFloat = 'left';
+
 		const rightdiv = document.createElement('div');
 		rightdiv.classList.add('all-optims');
 		rightdiv.style.position = 'static';
 		rightdiv.style.cssFloat = 'right';
+		rightdiv.style.paddingLeft='40px';
 		const rightDivTitle = document.createElement('h3');
 		rightDivTitle.style.cssFloat = 'center';
 		rightDivTitle.appendChild(document.createTextNode("Available optimizations"));
 		rightdiv.appendChild(rightDivTitle);
-		rightdiv.appendChild(list);
+		rightdiv.appendChild(listnode);
+
+		const sort = Sortable.create(listnode, 
+		{
+			group: {
+				name: 'optims',
+				pull: 'clone',
+				put: false
+			},
+			sort: false,
+			animation: 150
+		}
+		);
+
 
 		newdiv.appendChild(leftdiv);
 		newdiv.appendChild(rightdiv);		
+
 
 		this.phasesDiv = leftdiv;
 
@@ -2063,10 +2141,10 @@ function OptimizationsTabMake(canvas:fabric.ICanvas) {
 	let optimTabs:ICanvasTab[] = [];
 	for(let i=0; i < optims.length; i++) {
 		const opt = optims[i];
-		const cfg = findFirstWithField(defaults, 'language', opt.language);
+		const cfg = findFirstWithField(defaults, 'language', opt.language.name);
 		const cfg_phases = cfg === undefined ? [] : cfg.phases;
 
-		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language, opt.optims, cfg_phases));
+		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language.name, opt.language.modulebase, opt.optims, cfg_phases));
 	}
 	
 	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'orange'}}, optimTabs, 0);

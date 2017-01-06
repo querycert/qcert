@@ -15,7 +15,7 @@ type QcertCompilerConfig = {source:QcertLanguage, target:QcertLanguage, sourcese
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;
 
-declare function qcertOptimList():{optims:{language:QcertLanguage; optims:QcertOptimStepDescription[]}[]};
+declare function qcertOptimList():{optims:{language:{name:QcertLanguage, modulebase:string}, optims:QcertOptimStepDescription[]}[]};
 
 /**
  * Derives a default path between the arguments

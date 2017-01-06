@@ -188,9 +188,13 @@ let js_of_optim_step_list {Hack.optim_step_name; Hack.optim_step_description; Ha
   
 let json_of_optim_list () =
   let ocl = QDriver.optim_config_list in
-  let wrap (Hack.ExistT (x, y)) =
+  let wrap (Hack.ExistT (x, (optim_module_name, y))) =
     object%js
-      val language = Js.string (name_of_language x)
+      val language =
+	object%js
+	  val name = Js.string (name_of_language x)
+	  val modulebase = Js.string (Util.string_of_char_list optim_module_name)
+	end
       val optims = Js.def (wrap_all js_of_optim_step_list y)
     end
   in
