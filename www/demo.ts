@@ -1829,7 +1829,7 @@ class PathTab extends ICanvasTab {
 		super(canvas);
 	}
 	getLabel() {
-		return "Path";
+		return "Path[temp]";
 	}
 
 	getRectOptions() {
@@ -1850,22 +1850,81 @@ class PathTab extends ICanvasTab {
 	}
 }
 
+const coqdocBaseURL = 'https://querycert.github.io/sigmod17/';
+function makeLemmaURL(base:string, lemma:string) {
+	let url = coqdocBaseURL + "Qcert." + base + ".html";
+	if(lemma != undefined) {
+		url = url + "#" + lemma;
+	}
+	return url;
+}
+
+function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
+	const entry = document.createElement('li');
+	entry.classList.add("optim-list");
+	entry.appendChild(document.createTextNode(o.name));
+	const lemmaLink = document.createElement('a');
+	lemmaLink.href = makeLemmaURL(modulebase, o.lemma);
+	lemmaLink.appendChild(document.createTextNode('❤'));
+	lemmaLink.classList.add('lemma-link');
+	entry.appendChild(lemmaLink);
+	entry.title = o.description;
+	entry.setAttribute('data-id', o.name);
+	return entry;
+}
+
+function makeAvailableOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
+	return makeOptimElement(modulebase, o);
+}
+
+function addRemoveButton(elem:HTMLElement) {
+	const removenode = document.createElement('i');
+	removenode.classList.add('js-remove');
+	removenode.appendChild(document.createTextNode('✖'));
+	elem.appendChild(removenode);
+}
+
+function makeSimpleOptimElement(optim:string) {
+	const entry = document.createElement('li');
+	entry.classList.add('optim-list');
+
+	entry.appendChild(document.createTextNode(optim));
+	return entry;
+}
+
+function makePhaseOptimElement(
+	modulebase:string,
+	optims:QcertOptimStepDescription[],
+	optim:string):HTMLLIElement {
+
+	const fulloptim = findFirstWithField(optims, 'name', optim);
+	const entry = fulloptim ? makeOptimElement(modulebase, fulloptim) : makeSimpleOptimElement(optim);
+	addRemoveButton(entry);
+	return entry;
+}
 
 class OptimPhaseTab extends ICanvasDynamicTab {
 	static make(canvas:fabric.ICanvas,
 		parentDiv:HTMLElement, 
+		modulebase:string,
+		optims:QcertOptimStepDescription[],
+
 		phase:QcertOptimPhase, 
 		options:{color:string, top?:number}):OptimPhaseTab {
-		return new OptimPhaseTab(canvas, parentDiv, phase, options);
+		return new OptimPhaseTab(canvas, parentDiv, modulebase, optims, phase, options);
 	}
 
 	constructor(canvas:fabric.ICanvas,
 		div:HTMLElement,  
+		modulebase:string,
+		optims:QcertOptimStepDescription[],
+
 		phase:QcertOptimPhase,
 		options:{color:string, top?:number}) {
 		
 		super(canvas);
-		this.phase = phase;
+		this.name = phase.name;
+		this.iter = phase.iter;
 		this.top = options.top || 0;
 		this.color = options.color || 'orange';
 
@@ -1886,26 +1945,8 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		const listnode = document.createElement('ul');
 		listnode.classList.add('optim-list');
 
-		function makePhaseOptimElement(optim:string):HTMLLIElement {
-			const entry = document.createElement('li');
-			entry.classList.add('optim-list');
-			// const dhandle = document.createElement('span');
-			// dhandle.classList.add('optim-handle');
-			// dhandle.innerHTML = '&#9776;';
-			// entry.appendChild(dhandle);
-
-
-			entry.appendChild(document.createTextNode(optim));
-
-			const removenode = document.createElement('i');
-			removenode.classList.add('js-remove');
-			removenode.appendChild(document.createTextNode('✖'));
-			entry.appendChild(removenode);
-			return entry;
-		}
-
 		for(let i =0 ; i < phase.optims.length; i++) {
-			listnode.appendChild(makePhaseOptimElement(phase.optims[i]));
+			listnode.appendChild(makePhaseOptimElement(modulebase, optims, phase.optims[i]));
 		}
 
 		const sort = Sortable.create(listnode, 
@@ -1917,28 +1958,44 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 			},
 			sort: true,
 			animation: 150,
-			filter: '.js-remove',
 			//handle: '.optim-handle',
+			filter: '.js-remove',
   			onFilter: function (evt) {
     			var el = sort.closest(evt.item); // get dragged item
     			el && el.parentNode.removeChild(el);
-  			}
+  			},
+			onAdd: function (evt) {
+				const item = evt.item;
+				addRemoveButton(item);
+			},
+			dataIdAttr: 'data-id'
 		}
 		);
+		this.sortable = sort;
 
 		newdiv.appendChild(listnode);
 	}
 	
+	readonly sortable:Sortable;
 	readonly top:number;
 	readonly color:string;
-	phase:QcertOptimPhase;
+	name:string;
+	iter:number;
+
+	getPhase():QcertOptimPhase {
+		return {
+			name:this.name,
+			optims:this.sortable.toArray(),
+			iter: this.iter
+		}
+	}
 
 	getLabel():string {
-		return this.phase.name;
+		return this.name;
 	}
 
 	setLabel(newlabel:string):boolean {
-		this.phase.name = newlabel;
+		this.name = newlabel;
 		return true;
 	}
 	
@@ -1960,10 +2017,13 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 	}
 }
 
-function optimPhaseMake(canvas:fabric.ICanvas, div:HTMLElement,
+function optimPhaseMake(canvas:fabric.ICanvas, 	
+	div:HTMLElement,
+	module_base:string,
+	optims:QcertOptimStepDescription[],
 options:{color:string, top?:number}) {
 	return function(phase:QcertOptimPhase) {
-		return OptimPhaseTab.make(canvas, div, phase, options);
+		return OptimPhaseTab.make(canvas, div, module_base, optims, phase, options);
 	}
 
 }
@@ -1983,6 +2043,7 @@ class OptimizationManager extends ICanvasTab {
 	}
 
 	language:QcertLanguage;
+	optimTabs:OptimPhaseTab[];
 	tabManager:TabManager;
 	parentDiv:HTMLElement;
 	topDiv:HTMLElement;
@@ -2016,28 +2077,6 @@ class OptimizationManager extends ICanvasTab {
 		newdiv.style.top=String(tabTop+60) + 'px';
 		this.topDiv = newdiv;
 		const listnode = document.createElement('ul');
-
-		const coqdocBaseURL = 'https://querycert.github.io/sigmod17/';
-		function makeLemmaURL(base:string, lemma:string) {
-			let url = coqdocBaseURL + "Qcert." + base + ".html";
-			if(lemma != undefined) {
-			 	url = url + "#" + lemma;
-			}
-			return url;
-		}
-
-		function makeAvailableOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
-			const entry = document.createElement('li');
-			entry.classList.add("optim-list");
-			entry.appendChild(document.createTextNode(o.name));
-			const lemmaLink = document.createElement('a');
-			lemmaLink.href = makeLemmaURL(modulebase, o.lemma);
-			lemmaLink.appendChild(document.createTextNode('❤'));
-			lemmaLink.classList.add('lemma-link');
-			entry.appendChild(lemmaLink);
-			entry.title = o.description;
-			return entry;
-		}
 
 		listnode.classList.add('optim-list');
 		for(let i =0 ; i < optims.length; i++) {
@@ -2084,7 +2123,7 @@ class OptimizationManager extends ICanvasTab {
 
 		const yoffset2 = tabTop+60;
 	
-		const optimTabs = cfg_phases.map(optimPhaseMake(canvas, leftdiv, {color:'yellow', top:yoffset2}));
+		this.optimTabs = cfg_phases.map(optimPhaseMake(canvas, leftdiv, module_base, optims, {color:'yellow', top:yoffset2}));
 
 		this.tabManager = TabManager.make(canvas, 
 				{
@@ -2092,11 +2131,22 @@ class OptimizationManager extends ICanvasTab {
 					rectOptions:options.rectOptions,
 			 		textOptions:options.textOptions, 
 				 	tabOrigin:options.tabOrigin
-				}, optimTabs, 0);
+				}, this.optimTabs, 0);
 		
 
 	}
+
+	getOptimConfig():QcertOptimConfig {
+		return {
+			language:this.language,
+			phases:this.getConfigPhases()
+		}
+	}
 	
+	getConfigPhases():QcertOptimPhase[] {
+		return this.optimTabs.map((x) => x.getPhase());
+	}
+
 	getLabel():string {
 		return this.language;
 	}
@@ -2129,16 +2179,18 @@ function findFirstWithField<T, K extends keyof T>(l:T[], field:K, lang:T[K]):T {
 	}
 }
 
+// TODO: turn this into a wrapper class so that 
+// globalOptimTabs, OptimizationsTabMake, and getOptimConfig
+// are encapsulated
+let globalOptimTabs:OptimizationManager[];
+
 function OptimizationsTabMake(canvas:fabric.ICanvas) {
 	const yoffset = 60;
-	// TODO: this is the wrong call!
-	// we actually need to get the list of languages that admit Optimizations
-	// and for each one, create the appropriate 
 	const optims = qcertOptimList().optims;
 	const defaults = qcertOptimDefaults().optims;
 
 	const opts = {rectOptions:{fill:'green'}, tabOrigin:{top:yoffset}};	
-	let optimTabs:ICanvasTab[] = [];
+	let optimTabs:OptimizationManager[] = [];
 	for(let i=0; i < optims.length; i++) {
 		const opt = optims[i];
 		const cfg = findFirstWithField(defaults, 'language', opt.language.name);
@@ -2146,8 +2198,16 @@ function OptimizationsTabMake(canvas:fabric.ICanvas) {
 
 		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language.name, opt.language.modulebase, opt.optims, cfg_phases));
 	}
-	
+	globalOptimTabs = optimTabs;
 	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'orange'}}, optimTabs, 0);
+}
+
+function getOptimConfig():QcertOptimConfig[] {
+	if(globalOptimTabs) {
+		return globalOptimTabs.map((x) => x.getOptimConfig());
+	} else {
+		return [];
+	}
 }
 
 const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
