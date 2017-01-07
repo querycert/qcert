@@ -273,12 +273,11 @@ MODULES = \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \
-	Tests/RAlgTest \
-	Tests/TAlgTest \
-	Tests/BrandTest \
-	Tests/TBrandTest \
+	Tests/NRATest \
+	Tests/TNRATest \
+	Tests/CAMPTest \
+	Tests/TCAMPTest \
 	Tests/CompilerTest \
-	Tests/MRTest \
 	Tests/OQLTest \
 	Tests/SQLTest \
 	Tests/LambdaNRATests

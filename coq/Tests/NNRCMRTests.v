@@ -14,12 +14,22 @@
  * limitations under the License.
  *)
 
-Require Import PatternTest.
-Require Import EvalTop CompTop.
-Require Import NNRCMR NNRCtoNNRCMR NRewMR.
-Module SampleRules.
-Open Scope nrc_scope.
+Require Import BrandRelation.
 
+Require Import ZArith.
+Local Open Scope Z_scope.
+Require Import String.
+Local Open Scope string.
+Require Import List.
+Import ListNotations.
+
+(* This module encodes the examples in sample-rules.txt *)
+Section MRCompilerTest.
+
+  Require Import BasicSystem CAMPRuntime.
+  Local Open Scope rule_scope.
+  Require Import TrivialModel.
+  
 Example R01 :=
   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop AEq (pbdot "age" (pit)) (#` 32))));;
   rule_return (pbinop ASConcat (toString (#` "Customer =")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))
@@ -59,6 +69,7 @@ Definition test01Types :=
 
 Definition test01BrandContext := mkBrand_context test01Types (eq_refl _).
 
+Require Import CompEnv.
 Local Obligation Tactic := fast_refl.
 Program Instance test01BrandModel : brand_model 
  := mkBrand_model test01BrandRelation test01BrandContext (eq_refl _) (eq_refl _).
@@ -87,29 +98,33 @@ Example Result_R01_JRules := List.map dconst [
   "Customer =Jane Doe";
   "Customer =Jill Does"
 ].
-
-Example R01_nrcmr := tcompile_rule_to_nnrcmr_chain R01.
-Example Result_R01_Coq := lift_rule_failure (get_result (nrcmr_chain_eval_top test01BrandRelationList R01_nrcmr exampleWM)).
+Require Import CompDriver.
+Example R01_nrcmr := rule_to_nnrcmr R01.
+Require Import CompEval.
+Require Import RuletoNRA.
+Example Result_R01_Coq := lift_rule_failure (@eval_nnrcmr_world _ _ test01BrandRelationList R01_nrcmr exampleWM).
 Eval vm_compute in Result_R01_Coq.
 Example R01_verify : validate_success Result_R01_Coq Result_R01_JRules = true.
 Proof. fast_refl. Qed.
+
+(*
 Set Printing Depth 1000.
 Eval vm_compute in R01_nrcmr.
-
+*)
 
 (* MR chain compiler *)
-Require Import NShadow.
+Require Import NNRCShadow.
 
-Example nrc_R01 := (tcompile_rule_to_nnrc_topt R01).
-Eval vm_compute in nrc_R01.
+Example nrc_R01 := (rule_to_nraenv_to_nnrc_optim R01).
+(* Eval vm_compute in nrc_R01. *)
 
-Example free_vars_R01 :=  List.map (fun x => (x, Vdistributed)) (nrc_free_vars nrc_R01).
-Example nrcmr_R01 := nnrc_to_nnrcmr_chain nrc_R01 "unit" free_vars_R01 "output".
-Eval vm_compute in nrcmr_R01.
+Example free_vars_R01 :=  List.map (fun x => (x, Vdistr)) (nnrc_free_vars nrc_R01).
+Example nrcmr_R01 := nnrc_to_nnrcmr "unit" free_vars_R01 nrc_R01.
+(* Eval vm_compute in nrcmr_R01. *)
 
 Example nrcmr_R01_optimized :=
-  mr_optimize nrcmr_R01 ("output"::nil).
-Eval vm_compute in nrcmr_R01_optimized.
+  nnrcmr_optim nrcmr_R01.
+(* Eval vm_compute in nrcmr_R01_optimized. *)
 
 
 
@@ -123,14 +138,14 @@ Eval vm_compute in nrcmr_R01_optimized.
 Require Import NNRC.
 Require Import NNRCtoNNRCMR.
 Example ex06 :=
-  NRCLet "x1" (NRCUnop AColl (NRCConst (dnat 1)))
-         (NRCLet "x2" (NRCFor "x3" (NRCVar "x0")
-                               (NRCBinop AEq (NRCVar "x3") (NRCVar "x1")))
-                 (NRCFor "x4" (NRCVar "x2")
-                         (NRCUnop ANeg (NRCVar "x4")))).
-Example ex06nnrcmr_chain := nnrc_to_nnrcmr_chain ex06 "x0" nil "x100".
+  NNRCLet "x1" (NNRCUnop AColl (NNRCConst (dnat 1)))
+          (NNRCLet "x2" (NNRCFor "x3" (NNRCVar "x0")
+                               (NNRCBinop AEq (NNRCVar "x3") (NNRCVar "x1")))
+                  (NNRCFor "x4" (NNRCVar "x2")
+                          (NNRCUnop ANeg (NNRCVar "x4")))).
+Example ex06nnrcmr_chain := nnrc_to_nnrcmr_chain "x0" nil ex06.
 
-Eval compute in ex06nnrcmr_chain.
+(* Eval compute in ex06nnrcmr_chain. *)
 
 (* ---------------- *)
 
@@ -139,16 +154,15 @@ Eval compute in ex06nnrcmr_chain.
 Example loop_nest :=
   let i := "x1" in
   let j := "x2" in
-  NRCFor i (NRCConst (dcoll (dnat 1 :: dnat 2 :: nil)))
-         (NRCFor j (NRCConst (dcoll (dstring "a" :: dstring "b" :: nil)))
-         (NRCVar j)).
+  NNRCFor i (NNRCConst (dcoll (dnat 1 :: dnat 2 :: nil)))
+         (NNRCFor j (NNRCConst (dcoll (dstring "a" :: dstring "b" :: nil)))
+         (NNRCVar j)).
 
+Eval vm_compute in @eval_nnrc _ nil loop_nest nil.
 
-Eval vm_compute in nrc_eval nil nil loop_nest.
-
-Example loop_nest_mr := nnrc_to_nnrcmr_chain loop_nest "x0" nil "x100".
+Example loop_nest_mr := nnrc_to_nnrcmr "x0" nil loop_nest.
 Eval vm_compute in loop_nest_mr.
-Eval vm_compute in nrcmr_eval nil (("x0", Dscalar dunit)::nil) loop_nest_mr.
+Eval vm_compute in @eval_nnrcmr _ _ nil loop_nest_mr (("x0", dunit)::nil).
 
 
 (* ---------------- *)
@@ -157,8 +171,8 @@ Eval vm_compute in nrcmr_eval nil (("x0", Dscalar dunit)::nil) loop_nest_mr.
 
 (* 1 *)
 
-Example nrc_const := NRCConst (dnat 1).
-Example free_vars_const : list (var * localization) := nil.
+Example nrc_const := NNRCConst (dnat 1).
+Example free_vars_const : list (var * dlocalization) := nil.
 Example nrcmr_const := nnrc_to_nnrcmr_chain nrc_const "unit" nil "output".
 Eval vm_compute in nrcmr_const.
 Example env_const : bindings := nil.

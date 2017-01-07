@@ -26,7 +26,7 @@ Require Import List.
 Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
-Section BrandTest.
+Section CAMPTest.
 
   Require Import BasicSystem CAMPRuntime.
   Local Open Scope rule_scope.
@@ -464,7 +464,7 @@ all customers. *)
   Proof. fast_refl. Qed.
 *)
 
-End BrandTest.
+End CAMPTest.
 
 (* 
 *** Local Variables: ***

@@ -20,7 +20,7 @@ Section TAlgTest.
   Require Import Utils BasicSystem.
   Require Import NRASystem.
   
-  Require Import RAlgTest.
+  Require Import NRATest.
 
   Local Open Scope string_scope.
   Local Open Scope algext_scope.

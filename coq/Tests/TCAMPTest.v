@@ -24,9 +24,9 @@ Require Import List.
 Import ListNotations.
 
 (* This module encodes the examples in sample-rules.txt *)
-Section TBrandTest.
+Section TCAMPTest.
 
-  Require Import BrandTest.
+  Require Import CAMPTest.
   Require Import BasicSystem.
   Require Import TrivialModel.
 
@@ -132,7 +132,7 @@ Section TBrandTest.
     eauto. eauto. eauto. eauto.
   Qed.
 
-End TBrandTest.
+End TCAMPTest.
 
 
 (* 
