@@ -15,8 +15,8 @@
  *)
 
 Require Export RAlgContext.
-Require Export ROptim ROptimContext ROptimExt.
-Require Export TOptim.
+Require Export NRARewrite NRARewriteContext NRAExtRewrite.
+Require Export TNRARewrite.
 
 (* 
 *** Local Variables: ***

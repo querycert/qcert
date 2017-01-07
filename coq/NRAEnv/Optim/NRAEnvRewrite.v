@@ -21,7 +21,8 @@ Section ROptimEnv.
 
   Require Import Utils BasicRuntime.
 
-  Require Import RAlg RAlgEq RAlgEnv RAlgEnvIgnore RAlgEnvEq ROptim.
+  Require Import NRARuntime NRAOptim.
+  Require Import RAlgEnv RAlgEnvIgnore RAlgEnvEq.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
@@ -1647,8 +1648,8 @@ Section ROptimEnv.
     - destruct x; simpl; trivial.
   Qed.
 
-   Lemma rproject_over_const sl l :
-    π[sl](ANConst (drec l)) ≡ₑ ANConst (drec (rproject l sl)).
+  Lemma rproject_over_const sl l :
+    π[sl](ANConst (drec l)) ≡ₑ ANConst (drec (RRelation.rproject l sl)).
   Proof.
     red; simpl; intros.
     rewrite rproject_rec_sort_commute.

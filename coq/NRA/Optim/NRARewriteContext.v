@@ -18,21 +18,20 @@
  * Algebra contexts *
  *******************************)
 
-Section ROptimEnvContext.
+Section ROptimContext.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
 
-  Require Import Arith List.
+  Require Import Arith NPeano Omega List.
   
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEnv RAlgEnvEq.
-  
-  Require Import RAlgContext ROptimEnv ROptimContext.
-  Require Import RAlgEnvContext RAlgEnvContextLift.
-  Local Open Scope algenv_ctxt.
+  Require Import RAlg RAlgEq.
+  Require Import RAlgContext NRARewrite.
+
+  Local Open Scope alg_ctxt.
 
   Context {fruntime:foreign_runtime}.
 
@@ -47,6 +46,17 @@ Section ROptimEnvContext.
            destruct x as [|[n a]]; simpl in H; inversion H; clear H;
            try subst n
          end.
+  
+  Lemma lt_nat_compat (x y:nat) : ~ x < y -> ~ y < x -> x = y.
+  Proof.
+    omega.
+  Qed.
+
+  Lemma insertion_sort_equivlist_nat l l':
+    equivlist l l' -> insertion_sort lt_dec l = insertion_sort lt_dec l'.
+  Proof.
+    apply (@insertion_sort_equivlist nat lt lt_dec eq_equivalence nat_eq_eqdec Nat.lt_strorder lt_nat_compat).
+  Qed.
 
   Ltac simpl_plugins
     := match goal with
@@ -58,42 +68,37 @@ Section ROptimEnvContext.
        end.
 
   Ltac simpl_ctxt_equiv :=
-    try apply <- algenv_ctxt_equiv_strict_equiv;
+    try apply <- alg_ctxt_equiv_strict_equiv;
     red; simpl; intros; simpl_plugins; simpl.
 
-  Local Open Scope algenv_ctxt_scope.
-  Lemma envctxt_and_comm_ctxt :
-    $2 ∧ $1 ≡ₑ $1 ∧ $2.
-  Proof.
-    generalize ctxt_and_comm_ctxt; intros pf.
-    apply lift_alg_context_proper in pf.
-    simpl in pf; trivial.
-  Qed.
-  
-  Lemma ctxt_envunion_assoc :
-    ($1 ⋃ $2) ⋃ $3 ≡ₑ $1 ⋃ ($2 ⋃ $3).
+  Lemma ctxt_and_comm_ctxt :
+    $2 ∧ $1 ≡ₐ $1 ∧ $2.
   Proof.
     simpl_ctxt_equiv.
-    apply envunion_assoc.
+    apply and_comm.
   Qed.
 
-  Lemma ctxt_app_over_merge :
-    (ENV ⊗ $1) ◯ $2 ≡ₑ ENV ⊗ ($1 ◯ $2).
+  Lemma ctxt_unnest_singleton_ctxt s1 s2 s3  :
+    s1 <> s2 /\ s2 <> s3 /\ s3 <> s1 ->
+    χ⟨¬π[s1 ]( ID)
+     ⟩( ⋈ᵈ⟨χ⟨‵[| (s2, ID)|] ⟩( (ID) · s1)
+          ⟩( ‵{|‵[| (s3, $1)|] ⊕ ‵[| (s1, ‵{| $2|})|]|}))
+     ≡ₐ ‵{|‵[| (s3, $1)|] ⊕ ‵[| (s2, $2)|]|}.
   Proof.
+    intros.
     simpl_ctxt_equiv.
-    apply app_over_merge.
+    apply unnest_singleton; trivial.
   Qed.
 
-  Lemma envctxt_select_union_distr :
-    σ⟨ $0 ⟩($1 ⋃ $2) ≡ₑ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).
+  Lemma ctxt_select_union_distr :
+    σ⟨ $0 ⟩($1 ⋃ $2) ≡ₐ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).
   Proof.
-    generalize ctxt_select_union_distr; intros pf.
-    apply lift_alg_context_proper in pf.
-    simpl in pf; trivial.
+    intros.
+    simpl_ctxt_equiv.
+    apply union_select_distr.
   Qed.
 
-
-End ROptimEnvContext.
+End ROptimContext.
   
 (* 
 *** Local Variables: ***

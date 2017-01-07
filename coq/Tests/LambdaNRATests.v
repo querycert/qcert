@@ -218,10 +218,11 @@ End LambdaNRATests.
 
 (* Now let's see if we can optimize *)
 
-Require Import NRAEnvOptimFunc.
 Require Import OptimizerLogger.
 Require Import NRAEnv.
+Require Import NRAEnvOptimizer.
 Require Import CompDriver.
+
 Context {l:optimizer_logger string nraenv}.
 
 Definition T1env : nraenv := (nraenv_of_lnra_lambda (q_to_lambda T1l)).

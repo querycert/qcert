@@ -32,7 +32,7 @@ Section CompConfig.
   
   Section optim.
     Require Import TNNRCOptimizer.
-    Require Import NRAEnvOptimFunc.
+    Require Import NRAEnvOptimizer.
     Require Import OptimizerStep.
 
     (* CompLang.type_of_language does not suffice, since some language 
@@ -52,11 +52,11 @@ Section CompConfig.
     Definition optim_config_list_type := list {l:language & (string * list (OptimizerStep (optim_type_of_language l)))}%type.
 
     Definition optim_config_list : optim_config_list_type
-      := existT _ L_nra ("NRAEnv.Optim.NRAEnvOptimFunc"%string, tnraenv_optim_list)
-        :: existT _ L_nraenv_core ("NRAEnv.Optim.NRAEnvOptimFunc"%string, tnraenv_optim_list)
-        :: existT _ L_nraenv ("NRAEnv.Optim.NRAEnvOptimFunc"%string, tnraenv_optim_list)
-        :: existT _ L_nnrc_core ("NNRC.Rew.TNNRCOptimizer"%string,tnnrc_optim_list)
-        :: existT _ L_nnrc ("NNRC.Rew.TNNRCOptimizer"%string,tnnrc_optim_list)
+      := existT _ L_nra ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
+        :: existT _ L_nraenv_core ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
+        :: existT _ L_nraenv ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
+        :: existT _ L_nnrc_core ("NNRC.Optim.TNNRCOptimizer"%string,tnnrc_optim_list)
+        :: existT _ L_nnrc ("NNRC.Optim.TNNRCOptimizer"%string,tnnrc_optim_list)
         :: nil.
       
     Definition optim_config : Set :=

@@ -34,7 +34,7 @@ Section TOptimEnv.
   Require Import RAlgEnv RAlgEnvIgnore RAlgEnvEq.
   Require Import TAlgEnv TAlgEnvIgnore TAlgEnvEq.
 
-  Require Import ROptimEnv.
+  Require Import NRAEnvRewrite.
 
   Local Open Scope algenv_scope.
 

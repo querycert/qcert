@@ -25,7 +25,7 @@ Section NRAEnvOptimFunc.
 
   Require Import Utils BasicSystem.
   Require Import RAlgEnv RAlgEnvEq TAlgEnv TAlgEnvEq.
-  Require Import NRAEnv NRAEnvEq TNRAEnv TNRAEnvEq ROptimEnv TOptimEnv.
+  Require Import NRAEnv NRAEnvEq TNRAEnv TNRAEnvEq NRAEnvRewrite TNRAEnvRewrite.
   Require Import RAlgEnvIgnore TAlgEnvIgnore NRAEnvIgnore RAlgEnvSize NRAEnvSize.
   
   Require Import OptimizerStep OptimizerLogger.

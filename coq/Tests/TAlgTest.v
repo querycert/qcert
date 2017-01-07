@@ -18,8 +18,7 @@ Section TAlgTest.
   Require Import List String.
 
   Require Import Utils BasicSystem.
-  Require Import RAlgExt RAlgEq ROptim.
-  Require Import TAlg TAlgExt TDomain.
+  Require Import NRASystem.
   
   Require Import RAlgTest.
 

@@ -26,7 +26,7 @@ Section TOptim.
   Require Import Utils BasicSystem.
 
   Require Import RAlg RAlgExt RAlgEq.
-  Require Import ROptim.
+  Require Import NRARewrite.
 
   Require Import TAlg TAlgEq.
 

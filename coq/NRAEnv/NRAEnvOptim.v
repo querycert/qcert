@@ -15,8 +15,8 @@
  *)
 
 Require Export RAlgEnvContext RAlgEnvContextLift.
-Require Export ROptimEnv ROptimEnvContext TOptimEnv.
-Require Export NRAEnvOptimFunc.
+Require Export NRAEnvRewrite NRAEnvRewriteContext TNRAEnvRewrite.
+Require Export NRAEnvOptimizer.
 
 (* 
 *** Local Variables: ***

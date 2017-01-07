@@ -107,10 +107,10 @@ MODULES = \
 	NRA/NRARuntime \
 	NRA/NRATypes \
 	NRA/NRASystem \
-	NRA/Optim/ROptim \
-	NRA/Optim/ROptimContext \
-	NRA/Optim/ROptimExt \
-	NRA/Optim/TOptim \
+	NRA/Optim/NRARewrite \
+	NRA/Optim/NRARewriteContext \
+	NRA/Optim/NRAExtRewrite \
+	NRA/Optim/TNRARewrite \
 	NRA/NRAOptim \
 	NRAEnv/Algebra/RAlgEnv \
 	NRAEnv/Algebra/RAlgEnvSize \
@@ -131,10 +131,10 @@ MODULES = \
 	NRAEnv/NRAEnvSystem \
 	NRAEnv/Context/RAlgEnvContext \
 	NRAEnv/Context/RAlgEnvContextLift \
-	NRAEnv/Optim/ROptimEnv \
-	NRAEnv/Optim/ROptimEnvContext \
-	NRAEnv/Optim/TOptimEnv \
-	NRAEnv/Optim/NRAEnvOptimFunc \
+	NRAEnv/Optim/NRAEnvRewrite \
+	NRAEnv/Optim/NRAEnvRewriteContext \
+	NRAEnv/Optim/TNRAEnvRewrite \
+	NRAEnv/Optim/NRAEnvOptimizer \
 	NRAEnv/NRAEnvOptim \
 	NNRC/Calculus/NNRC \
 	NNRC/Calculus/NNRCShadow \
@@ -154,17 +154,17 @@ MODULES = \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \
-	NNRC/Rew/NNRCRewriteUtil \
-	NNRC/Rew/NNRCRewrite \
-	NNRC/Rew/TNNRCRewrite \
-	NNRC/Rew/NNRCOptimizer \
-	NNRC/Rew/TNNRCOptimizer \
+	NNRC/Optim/NNRCRewriteUtil \
+	NNRC/Optim/NNRCRewrite \
+	NNRC/Optim/TNNRCRewrite \
+	NNRC/Optim/NNRCOptimizer \
+	NNRC/Optim/TNNRCOptimizer \
 	NNRC/NNRCOptim \
 	NNRCMR/Calculus/ForeignReduceOps \
 	NNRCMR/Calculus/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
-	NNRCMR/Rew/NRewMR \
-	NNRCMR/Rew/TNNRCMROptimizer \
+	NNRCMR/Optim/NNRCMRRewrite \
+	NNRCMR/Optim/TNNRCMROptimizer \
 	NNRCMR/NNRCMROptim \
 	DNNRC/Calculus/DNNRC \
 	DNNRC/Calculus/DNNRCSize \
@@ -175,7 +175,7 @@ MODULES = \
 	DNNRC/Typing/TDNRCsub \
 	DNNRC/Typing/TDNRCInfer \
 	DNNRC/Typing/TOpsInferSub \
-	DNNRC/Optim/DNNRCDatasetRewrites \
+	DNNRC/Optim/DNNRCOptimizer \
 	CAMP/Rules/Pattern \
 	CAMP/Rules/PatternSize \
 	CAMP/Rules/PatternSugar \

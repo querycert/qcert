@@ -931,7 +931,7 @@ Definition enhanced_to_spark_reduce_op
      end.
 
 (* NNRCMR rewrites *)
-Require Import NNRCRuntime NNRCMRRuntime NRewMR.
+Require Import NNRCRuntime NNRCMRRuntime NNRCMRRewrite.
 
   (* Java equivalent: MROptimizer.min_max_to_stats *)
   Definition min_max_to_stats avoid (mr: mr) :=

@@ -91,7 +91,7 @@ Section DNNRCDatasetRewrites.
       revert H; apply Forall_impl; intros; simpl; tauto.
   Qed.
 
-    Fixpoint dnnrc_map_deep {A: Set} {P: Set}
+  Fixpoint dnnrc_map_deep {A: Set} {P: Set}
            (f: dnnrc A P -> dnnrc A P)
            (e: dnnrc A P) : dnnrc A P
     := match e with

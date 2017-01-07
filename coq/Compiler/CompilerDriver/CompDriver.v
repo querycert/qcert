@@ -50,13 +50,13 @@ Section CompDriver.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoJavaScript.
   Require Import NNRCtoDNNRC.
-  Require Import TDNRCInfer DNNRCtoScala DNNRCDatasetRewrites.
+  Require Import TDNRCInfer DNNRCtoScala DNNRCOptimizer.
 
   (* Optimizations *)
-  Require Import NRAEnvOptimFunc.
+  Require Import NRAEnvOptimizer.
   Require Import TNNRCOptimizer.
   Require Import TNNRCMROptimizer.
-  Require Import DNNRCDatasetRewrites.
+  Require Import DNNRCOptimizer.
   Require Import OptimizerLogger.
 
   (* Foreign Support *)
@@ -237,7 +237,7 @@ Section CompDriver.
 
   Section optimizations.
     Definition nraenv_optim (opc:optim_phases_config) (q: nraenv) : nraenv :=
-      NRAEnvOptimFunc.run_nraenv_optims opc q.
+      NRAEnvOptimizer.run_nraenv_optims opc q.
     Definition nraenv_optim_default (q: nraenv) : nraenv :=
       nraenv_optim default_nraenv_optim_phases q.
 

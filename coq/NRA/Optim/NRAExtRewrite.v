@@ -19,7 +19,8 @@ Section ROptimExt.
   Require Import List.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEq ROptim RAlgExt RAlgExtEq.
+  Require Import RAlg RAlgEq RAlgExt RAlgExtEq.
+  Require Import NRARewrite.
 
   Local Open Scope alg_scope.
   Local Open Scope algext_scope.

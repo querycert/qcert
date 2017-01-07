@@ -33,9 +33,7 @@ Section RAlgTest.
   Require Import String ZArith.
   Open Scope Z_scope.
 
-  Require Import RAlgExt.
-  Require Import RAlgEq.
-  Require Import ROptim.
+  Require Import NRARuntime.
 
   Local Open Scope string_scope.
   Local Open Scope algext_scope.
