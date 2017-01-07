@@ -24,7 +24,7 @@ Section TRule.
 
   Require Import BasicSystem.
   Require Export Rule.
-  Require Import TPattern.
+  Require Import TCAMP.
 
   Local Open Scope rule.
   Local Open Scope string.

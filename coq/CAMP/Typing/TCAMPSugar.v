@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TPatternSugar.
+Section TCAMPSugar.
  
   Require Import String.
   Require Import List.
@@ -22,8 +22,8 @@ Section TPatternSugar.
   Require Import Program.
 
   Require Import BasicSystem.
-  Require Import PatternSugar Rule.
-  Require Export TPattern.
+  Require Import CAMPSugar.
+  Require Export TCAMP.
 
   Local Open Scope rule.
 
@@ -78,7 +78,7 @@ Section TPatternSugar.
     rewrite sort_sorted_is_id in H6; eauto.
   Qed.
 
-End TPatternSugar.
+End TCAMPSugar.
 
 (* 
 *** Local Variables: ***

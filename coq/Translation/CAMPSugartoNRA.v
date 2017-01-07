@@ -21,7 +21,7 @@ Section CAMPSugartoNRA.
 
   Require Import Utils BasicRuntime.
   Require Import NRARuntime.
-  Require Import Pattern PatternSugar Rule.
+  Require Import CAMPRuntime RuleRuntime.
   Require Import CAMPtoNRA.
   
   Local Open Scope string_scope.

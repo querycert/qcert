@@ -21,7 +21,7 @@ Local Open Scope string.
 Require Import List.
 Import ListNotations.
 
-Require Import BasicSystem CAMPRuntime.
+Require Import BasicSystem CAMPRuntime RuleRuntime.
 Require Import TrivialModel.
 
 Require CompilerRuntime.
@@ -191,7 +191,7 @@ Section CompilerUntypedTest.
   
   Definition tinp1 := (("WORLD", Coll (Brand (singleton "MainEntity")))::nil).
 
-  Require Import TPattern TOps.
+  Require Import TCAMP TOps.
 
   (* This is collapsed using econstructor, but not sure how systematic that would be... -JS *)
   Lemma Example1'_wt τ :

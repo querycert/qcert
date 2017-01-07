@@ -19,7 +19,6 @@ Section QEnv.
   Require Import String List String EquivDec.
   
   Require Import BasicRuntime.
-  Require Import Pattern Rule.
 
   (*********
    * Utils *

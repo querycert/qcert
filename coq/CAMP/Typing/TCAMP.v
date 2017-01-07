@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TPattern.
+Section TCAMP.
  
   Require Import String.
   Require Import List.
@@ -22,7 +22,7 @@ Section TPattern.
   Require Import Program.
 
   Require Import BasicSystem.
-  Require Import Pattern.
+  Require Import CAMP.
 
   (** Auxiliary lemmas *)
 
@@ -349,7 +349,7 @@ Section TPattern.
     - apply pat_type_const_sort_b; trivial.
   Qed.
 
-End TPattern.
+End TCAMP.
 
 Notation "[ c & g ] |= p ; a ~> b" := (pat_type c g p a b) (at level 90) : rule_scope.
 

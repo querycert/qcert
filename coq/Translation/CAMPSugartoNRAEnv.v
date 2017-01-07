@@ -21,7 +21,7 @@ Section CAMPSugartoNRAEnv.
 
   Require Import Utils BasicRuntime.
   Require Import NRAEnvRuntime.
-  Require Import Pattern PatternSugar Rule.
+  Require Import CAMPRuntime RuleRuntime.
   Require Import CAMPtoNRAEnv.
   
   Local Open Scope string_scope.

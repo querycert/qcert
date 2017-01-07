@@ -21,7 +21,7 @@ Section RuletoNRA.
 
   Require Import Utils BasicRuntime.
   Require Import NRARuntime.
-  Require Import Rule.
+  Require Import RuleSystem.
   Require Import CAMPtoNRA.
   
   Local Open Scope string_scope.

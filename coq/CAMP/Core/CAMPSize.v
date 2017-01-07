@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Section size.
+Section CAMPSize.
   Require Import Omega.
-  Require Import BasicRuntime Pattern.
+  Require Import BasicRuntime CAMP.
 
   Context {fruntime:foreign_runtime}.
 
@@ -43,7 +43,7 @@ Section size.
     induction a; simpl; omega.
   Qed.
 
-End size.
+End CAMPSize.
 
 (* 
 *** Local Variables: ***

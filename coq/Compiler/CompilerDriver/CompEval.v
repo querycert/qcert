@@ -25,7 +25,8 @@ Section CompEval.
   (* ASTs *)
   Require Import OQLRuntime.
   Require Import LambdaNRA.
-  Require Import SQL SQLtoNRAEnv.
+  Require Import SQL.
+  Require Import RuleRuntime.
   Require Import CAMPRuntime.
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
@@ -35,6 +36,7 @@ Section CompEval.
   Require Import DNNRC Dataset.
 
   (* Translations *)
+  Require Import SQLtoNRAEnv.
   Require Import LambdaNRAtoNRAEnv. (* Used for lambda_nra evaluation *)
   Require Import NNRCtoNNRCMR.      (* XXX contains load_init_env! XXX *)
 

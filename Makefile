@@ -176,17 +176,20 @@ MODULES = \
 	DNNRC/Typing/TDNRCInfer \
 	DNNRC/Typing/TOpsInferSub \
 	DNNRC/Optim/DNNRCOptimizer \
-	CAMP/Rules/Pattern \
-	CAMP/Rules/PatternSize \
-	CAMP/Rules/PatternSugar \
-	CAMP/Rules/Rule \
-	CAMP/Rules/RuleSugar \
-	CAMP/Typing/TPattern \
-	CAMP/Typing/TPatternSugar \
-	CAMP/Typing/TRule \
+	CAMP/Core/CAMP \
+	CAMP/Core/CAMPSize \
+	CAMP/Core/CAMPSugar \
+	CAMP/Typing/TCAMP \
+	CAMP/Typing/TCAMPSugar \
 	CAMP/CAMPRuntime \
 	CAMP/CAMPTypes \
 	CAMP/CAMPSystem \
+	Rule/Core/Rule \
+	Rule/Core/RuleSugar \
+	Rule/Typing/TRule \
+	Rule/RuleRuntime \
+	Rule/RuleTypes \
+	Rule/RuleSystem \
 	CldMR/CldMRUtil \
 	CldMR/ForeignCloudant \
 	CldMR/CldMR \

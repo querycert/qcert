@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section Pattern.
+Section CAMP.
 
   Require Import String.
   Require Import List.
@@ -685,7 +685,7 @@ Section Pattern.
        | TerminalError _ => None
        end.
 
-End Pattern.
+End CAMP.
 
 
 (* begin hide *)

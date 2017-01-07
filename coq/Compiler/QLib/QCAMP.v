@@ -17,7 +17,7 @@
 Require Import CompilerRuntime.
 Module QCAMP(runtime:CompilerRuntime).
   Require String BrandRelation.
-  Require Pattern PatternSugar RuleSugar.
+  Require CAMPRuntime.
 
   Require QOperators QData.
 
@@ -25,83 +25,74 @@ Module QCAMP(runtime:CompilerRuntime).
   Module Ops := QOperators.QOperators(runtime).
 
   Definition expr : Set 
-    := Pattern.pat.
+    := CAMP.pat.
   Definition pat : Set 
     := expr.
   Definition t : Set 
     := expr.
   
   Definition pconst : Data.t -> expr 
-    := Pattern.pconst.
+    := CAMP.pconst.
   Definition punop : Ops.Unary.op -> expr -> expr 
-    := Pattern.punop.
+    := CAMP.punop.
   Definition pbinop : Ops.Binary.op -> expr -> expr -> expr 
-    := Pattern.pbinop.
+    := CAMP.pbinop.
   Definition pmap : expr -> expr 
-    := Pattern.pmap.
+    := CAMP.pmap.
   Definition passert : expr -> expr 
-    := Pattern.passert.
+    := CAMP.passert.
   Definition porelse : expr -> expr -> expr 
-    := Pattern.porElse.
+    := CAMP.porElse.
   Definition pit : expr 
-    := Pattern.pit.
+    := CAMP.pit.
   Definition pletit : expr -> expr -> expr 
-    := Pattern.pletIt.
+    := CAMP.pletIt.
   Definition pgetconstant : String.string -> expr 
-    := Pattern.pgetconstant.
+    := CAMP.pgetconstant.
   Definition penv : expr 
-    := Pattern.penv.
+    := CAMP.penv.
   Definition pletenv : expr -> expr -> expr 
-    := Pattern.pletEnv.
+    := CAMP.pletEnv.
   Definition pleft : expr 
-    := Pattern.pleft.
+    := CAMP.pleft.
   Definition pright : expr 
-    := Pattern.pright.
+    := CAMP.pright.
 
   Definition pnow : expr
-    := PatternSugar.pnow.
+    := CAMPSugar.pnow.
 
   Definition pnull : expr
-    := PatternSugar.pnull.
+    := CAMPSugar.pnull.
 
   Definition pbdot : String.string -> expr -> expr
-    := PatternSugar.pbdot.
+    := CAMPSugar.pbdot.
 
   Definition pbsomedot : String.string -> expr -> expr
-    := PatternSugar.pbsomedot.
+    := CAMPSugar.pbsomedot.
 
   Definition returnVariables : list String.string -> expr
-    := PatternSugar.returnVariables.
-
-  Definition instanceOf : String.string -> BrandRelation.brands -> expr -> expr
-    := RuleSugar.instanceOf.
-
-  Definition matches : BrandRelation.brands -> expr -> expr
-    := RuleSugar.matches.
-
-  Definition fetchRef : BrandRelation.brands -> String.string -> String.string -> expr -> expr -> expr
-    := RuleSugar.fetchRef.
+    := CAMPSugar.returnVariables.
 
   Definition stringConcat : expr -> expr -> expr
-    := PatternSugar.stringConcat.
+    := CAMPSugar.stringConcat.
 
   Definition toString : expr -> expr 
-    := PatternSugar.toString.
+    := CAMPSugar.toString.
 
   Definition pat_binop_reduce : Ops.Binary.op -> list expr -> expr
-    := PatternSugar.pat_binop_reduce.
+    := CAMPSugar.pat_binop_reduce.
 
   Definition pvarwith : String.string -> expr -> expr
-    := PatternSugar.pvarwith.
+    := CAMPSugar.pvarwith.
 
   Definition withVar : String.string -> expr -> expr
-    := PatternSugar.withVar.
+    := CAMPSugar.withVar.
 
   Definition pIS : String.string -> expr -> expr
-    := PatternSugar.pIS.
+    := CAMPSugar.pIS.
 
   Definition lookup : String.string -> expr 
-    := PatternSugar.lookup.
+    := CAMPSugar.lookup.
   
 End QCAMP.
 (* 

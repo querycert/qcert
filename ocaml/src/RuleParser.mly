@@ -206,11 +206,11 @@ pat:
     { QCAMP.pnull }
 (* INSTANCEOF, FETCH, and MATCHES temporarily have hacks because of signature changes in RuleSugar.v.  TODO fix this *)
 | n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
-    { QCAMP.instanceOf (Util.char_list_of_string n) t p }
+    { QRule.instanceOf (Util.char_list_of_string n) t p }
 | p = pat TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = pat %prec UFETCH
-    { QCAMP.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
+    { QRule.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
 | MATCHES LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
-    { QCAMP.matches t p }
+    { QRule.matches t p }
 | AGGREGATE r = rule_rule DO u = uop OVER p = pat FLATTEN f = INT
     { QRule.aggregate r u p (Util.coq_Z_of_int f) }
 | VARIABLES LBRACKET v = stringlist RBRACKET

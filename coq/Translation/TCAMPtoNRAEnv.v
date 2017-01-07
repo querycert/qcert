@@ -20,9 +20,8 @@ Section TCAMPtoNRAEnv.
 
   Require Import Utils BasicSystem.
   Require Import NRASystem NRAEnvSystem.
-  Require Import Pattern CAMPtoNRAEnv.
-
-  Require Import TPattern TCAMPtoNRA.
+  Require Import CAMPSystem.
+  Require Import CAMPtoNRAEnv TCAMPtoNRA.
 
   Local Open Scope string_scope.
   Local Open Scope list_scope.

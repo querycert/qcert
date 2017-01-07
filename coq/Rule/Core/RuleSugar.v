@@ -22,7 +22,7 @@ Section RuleSugar.
   Require Import List.
 
   Require Import BasicRuntime.
-  Require Export PatternSugar Rule.
+  Require Export CAMPSugar Rule.
   
   Local Open Scope rule.
   Local Open Scope string.

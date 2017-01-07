@@ -23,7 +23,7 @@ Section Rule.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Export PatternSugar.
+  Require Export CAMPSugar.
   
   Local Open Scope rule.
   Local Open Scope string.

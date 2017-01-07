@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicTypes.
-Require Export TPattern TPatternSugar TRule.
+Require Export TCAMP TCAMPSugar.
 
 (* 
 *** Local Variables: ***

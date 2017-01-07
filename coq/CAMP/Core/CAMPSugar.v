@@ -15,14 +15,14 @@
  *)
 
 (* This file defines derived patterns, notations, and concepts *)
-Section PatternSugar.
+Section CAMPSugar.
 
   Require Import String.
   Require Import List.
   Require Import EquivDec.
 
   Require Import BasicRuntime.  
-  Require Export Pattern.
+  Require Export CAMP.
 
   Context {fruntime:foreign_runtime}.
 
@@ -193,7 +193,7 @@ Section PatternSugar.
   (* Java equivalent: CampBasicFunctionRule.notholds *)
   Definition notholds p := WW (mapsnone p).
 
-End PatternSugar.
+End CAMPSugar.
   
 Delimit Scope rule_scope with rule.
 

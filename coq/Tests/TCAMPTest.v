@@ -61,7 +61,7 @@ Section TCAMPTest.
   Instance CPModel : brand_model
     := mkBrand_model CPRModel_relation CPTContext (eq_refl _) (eq_refl _).
 
-  Require Import TPattern TPatternSugar TRule.
+  Require Import CAMPSystem RuleSystem.
   
   (* Typing for R1 *)
 

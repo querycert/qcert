@@ -14,8 +14,8 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export CAMP CAMPSize CAMPSugar.
+Require Export RuleRuntime.
+Require Export RuleTypes.
 
 (* 
 *** Local Variables: ***

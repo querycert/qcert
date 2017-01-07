@@ -20,7 +20,7 @@ Section CAMPtoNRAEnv.
 
   Require Import Utils BasicRuntime.
   Require Import NRARuntime NRAEnvRuntime.
-  Require Import Pattern.
+  Require Import CAMPRuntime.
   Require Import CAMPtoNRA.
 
   Context {fruntime:foreign_runtime}.
@@ -211,7 +211,7 @@ Section CAMPtoNRAEnv.
   End Top.
 
   Section size.
-    Require Import PatternSize.
+    Require Import CAMPSize.
     Require Import RAlgEnvSize.
     Require Import Omega.
     

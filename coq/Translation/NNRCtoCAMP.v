@@ -1999,7 +1999,7 @@ Qed.
   Qed.
 
   Require Import NNRCSize.
-  Require Import PatternSize.
+  Require Import CAMPSize.
 
   (** Lemma and proof for the linear size of the translation *)
 

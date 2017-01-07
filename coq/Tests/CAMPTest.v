@@ -28,7 +28,7 @@ Import ListNotations.
 (* This module encodes the examples in sample-rules.txt *)
 Section CAMPTest.
 
-  Require Import BasicSystem CAMPRuntime.
+  Require Import BasicSystem CAMPRuntime RuleRuntime.
   Local Open Scope rule_scope.
   Require Import TrivialModel.
   

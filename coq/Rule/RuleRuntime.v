@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicRuntime.
-Require Export CAMP CAMPSize CAMPSugar.
+Require Export Rule RuleSugar.
 
 (* 
 *** Local Variables: ***

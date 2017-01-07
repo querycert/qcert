@@ -21,7 +21,7 @@ Section TCAMPtoNRA.
 
   Require Import Utils BasicSystem.
   Require Import NRASystem.
-  Require Import Pattern TPattern.
+  Require Import CAMPSystem.
   Require Import CAMPtoNRA.
 
   Local Open Scope string_scope.

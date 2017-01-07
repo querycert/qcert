@@ -21,7 +21,7 @@ Section CAMPtoNRA.
 
   Require Import Utils BasicRuntime.
   Require Import NRARuntime.
-  Require Import Pattern.
+  Require Import CAMPRuntime.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -392,7 +392,7 @@ Section CAMPtoNRA.
   Qed.
 
 Section size.
-  Require Import PatternSize.
+  Require Import CAMPSize.
   Require Import RAlgSize.
   Require Import Omega.
 
