@@ -39,8 +39,8 @@ MODULES = \
 	Basic/Util/RBindings \
 	Basic/Util/RBindingsNat \
 	Basic/Util/Utils \
-	Basic/Logger/OptimizerLogger \
 	Basic/Logger/OptimizerStep \
+	Basic/Logger/OptimizerLogger \
 	Basic/Data/RBag \
 	Basic/Data/RDomain \
 	Basic/Data/BrandRelation \
