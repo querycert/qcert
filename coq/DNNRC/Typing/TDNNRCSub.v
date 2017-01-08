@@ -5,9 +5,9 @@
   Require Import EquivDec Morphisms.
 
   Require Import Utils BasicSystem.
-  Require Import DNNRC TDNRC.
+  Require Import DNNRC TDNNRC.
 
-  Section TDNNRCsub.
+  Section TDNNRCSub.
 
     Context {m:basic_model}.
 
@@ -299,7 +299,7 @@
       eauto.
   Admitted.
 
-  End TDNNRCsub.
+  End TDNNRCSub.
 
 (* 
 *** Local Variables: ***

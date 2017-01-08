@@ -18,21 +18,21 @@ Require Import CompilerRuntime.
 Module QUtil(runtime:CompilerRuntime).
 
   Require Import BasicRuntime NNRCMRRuntime.
-  Require Import TDNRCInfer.
+  Require Import TDNNRCInfer.
   
   (* mr_reduce_empty isn't a field of mr so it needs to be exposed *)
   Definition mr_reduce_empty := mr_reduce_empty.
 
   (* Access to type annotations *)
   Definition type_annotation {br:brand_relation} (A:Set): Set
-    := TDNRCInfer.type_annotation A.
+    := TDNNRCInfer.type_annotation A.
 
   Definition ta_base {br:brand_relation} (A:Set) (ta:type_annotation A)
-    := TDNRCInfer.ta_base ta.
+    := TDNNRCInfer.ta_base ta.
   Definition ta_inferred {br:brand_relation} (A:Set) (ta:type_annotation A)
-    := TDNRCInfer.ta_inferred ta .
+    := TDNNRCInfer.ta_inferred ta .
   Definition ta_required {br:brand_relation} (A:Set) (ta:type_annotation A)
-    := TDNRCInfer.ta_required ta.
+    := TDNNRCInfer.ta_required ta.
 
   (* Processing for input or output of queries *)
   Require Import CompEnv.

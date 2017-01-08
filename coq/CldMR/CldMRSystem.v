@@ -14,13 +14,10 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export ForeignReduceOps.
-Require Export NNRCMR.
+Require Export CldMRRuntime.
 
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
-

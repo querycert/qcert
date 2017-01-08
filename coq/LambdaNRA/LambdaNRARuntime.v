@@ -14,24 +14,8 @@
  * limitations under the License.
  *)
 
-Require Import List String.
-
-Require Import Utils BasicRuntime.
-
-
-Local Open Scope string_scope.
-
-Section ForeignCloudant.
-
-  Class foreign_cloudant
-        {fruntime:foreign_runtime} : Type
-    := mk_foreign_cloudant {
-           cloudant_float_sum_op : unaryOp
-           ; cloudant_float_min_op : unaryOp
-           ; cloudant_float_max_op : unaryOp
-       }.
-
-End ForeignCloudant.
+Require Export BasicRuntime.
+Require Export LambdaNRA LambdaNRAEq LambdaNRASugar.
 
 (* 
 *** Local Variables: ***

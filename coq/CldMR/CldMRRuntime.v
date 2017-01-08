@@ -15,12 +15,11 @@
  *)
 
 Require Export BasicRuntime.
-Require Export ForeignReduceOps.
-Require Export NNRCMR.
+Require Export ForeignCloudant.
+Require Export CldMRUtil CldMR.
 
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
-

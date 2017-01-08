@@ -92,12 +92,12 @@ MODULES = \
 	Basic/BasicTypes \
 	Basic/BasicSystem \
 	Basic/TypingRuntime \
-	NRA/Algebra/RAlg \
-	NRA/Algebra/RAlgSugar \
-	NRA/Algebra/RAlgSize \
-	NRA/Algebra/RAlgEq \
-	NRA/Algebra/RAlgExt \
-	NRA/Algebra/RAlgExtEq \
+	NRA/Lang/RAlg \
+	NRA/Lang/RAlgSugar \
+	NRA/Lang/RAlgSize \
+	NRA/Lang/RAlgEq \
+	NRA/Lang/RAlgExt \
+	NRA/Lang/RAlgExtEq \
 	NRA/Typing/TAlg \
 	NRA/Typing/TAlgInfer \
         NRA/Typing/TAlgEq \
@@ -112,14 +112,14 @@ MODULES = \
 	NRA/Optim/NRAExtRewrite \
 	NRA/Optim/TNRARewrite \
 	NRA/NRAOptim \
-	NRAEnv/Algebra/RAlgEnv \
-	NRAEnv/Algebra/RAlgEnvSize \
-	NRAEnv/Algebra/RAlgEnvIgnore \
-	NRAEnv/Algebra/RAlgEnvEq \
-        NRAEnv/Extended/NRAEnv \
-        NRAEnv/Extended/NRAEnvSize \
-        NRAEnv/Extended/NRAEnvEq \
-        NRAEnv/Extended/NRAEnvIgnore \
+	NRAEnv/Core/RAlgEnv \
+	NRAEnv/Core/RAlgEnvSize \
+	NRAEnv/Core/RAlgEnvIgnore \
+	NRAEnv/Core/RAlgEnvEq \
+        NRAEnv/Lang/NRAEnv \
+        NRAEnv/Lang/NRAEnvSize \
+        NRAEnv/Lang/NRAEnvEq \
+        NRAEnv/Lang/NRAEnvIgnore \
 	NRAEnv/Typing/TAlgEnv \
 	NRAEnv/Typing/TAlgEnvInfer \
 	NRAEnv/Typing/TAlgEnvIgnore \
@@ -136,14 +136,14 @@ MODULES = \
 	NRAEnv/Optim/TNRAEnvRewrite \
 	NRAEnv/Optim/NRAEnvOptimizer \
 	NRAEnv/NRAEnvOptim \
-	NNRC/Calculus/NNRC \
-	NNRC/Calculus/NNRCShadow \
-	NNRC/Calculus/NNRCNorm \
-	NNRC/Calculus/NNRCEq \
-	NNRC/Calculus/NNRCSize \
-	NNRC/Extended/NNRCExt \
-	NNRC/Extended/NNRCExtShadow \
-	NNRC/Extended/NNRCExtEq \
+	NNRC/Core/NNRC \
+	NNRC/Core/NNRCShadow \
+	NNRC/Core/NNRCNorm \
+	NNRC/Core/NNRCEq \
+	NNRC/Core/NNRCSize \
+	NNRC/Lang/NNRCExt \
+	NNRC/Lang/NNRCExtShadow \
+	NNRC/Lang/NNRCExtEq \
 	NNRC/Typing/TNNRC \
 	NNRC/Typing/TNNRCExt \
 	NNRC/Typing/TNNRCInfer \
@@ -160,44 +160,55 @@ MODULES = \
 	NNRC/Optim/NNRCOptimizer \
 	NNRC/Optim/TNNRCOptimizer \
 	NNRC/NNRCOptim \
-	NNRCMR/Calculus/ForeignReduceOps \
-	NNRCMR/Calculus/NNRCMR \
+	NNRCMR/Lang/ForeignReduceOps \
+	NNRCMR/Lang/NNRCMR \
 	NNRCMR/NNRCMRRuntime \
+	NNRCMR/NNRCMRSystem \
 	NNRCMR/Optim/NNRCMRRewrite \
 	NNRCMR/Optim/TNNRCMROptimizer \
 	NNRCMR/NNRCMROptim \
-	DNNRC/Calculus/DNNRC \
-	DNNRC/Calculus/DNNRCSize \
-	DNNRC/Calculus/DNNRCEq \
-	DNNRC/Calculus/Dataset \
-	DNNRC/Calculus/DatasetSize \
-	DNNRC/Typing/TDNRC \
-	DNNRC/Typing/TDNRCsub \
-	DNNRC/Typing/TDNRCInfer \
+	DNNRC/Lang/DNNRC \
+	DNNRC/Lang/DNNRCSize \
+	DNNRC/Lang/DNNRCEq \
+	DNNRC/Lang/Dataset \
+	DNNRC/Lang/DatasetSize \
+	DNNRC/Typing/TDNNRC \
+	DNNRC/Typing/TDNNRCSub \
+	DNNRC/Typing/TDNNRCInfer \
 	DNNRC/Typing/TOpsInferSub \
+	DNNRC/DNNRCRuntime \
+	DNNRC/DNNRCTypes \
+	DNNRC/DNNRCSystem \
 	DNNRC/Optim/DNNRCOptimizer \
-	CAMP/Core/CAMP \
-	CAMP/Core/CAMPSize \
-	CAMP/Core/CAMPSugar \
+	DNNRC/DNNRCOptim \
+	CAMP/Lang/CAMP \
+	CAMP/Lang/CAMPSize \
+	CAMP/Lang/CAMPSugar \
 	CAMP/Typing/TCAMP \
 	CAMP/Typing/TCAMPSugar \
 	CAMP/CAMPRuntime \
 	CAMP/CAMPTypes \
 	CAMP/CAMPSystem \
-	Rule/Core/Rule \
-	Rule/Core/RuleSugar \
+	Rule/Lang/Rule \
+	Rule/Lang/RuleSugar \
 	Rule/Typing/TRule \
 	Rule/RuleRuntime \
 	Rule/RuleTypes \
 	Rule/RuleSystem \
-	CldMR/CldMRUtil \
-	CldMR/ForeignCloudant \
-	CldMR/CldMR \
-	LambdaNRA/LambdaNRA \
-	LambdaNRA/LambdaNRASugar \
-	LambdaNRA/LambdaNRAEq \
-	SQL/SQL \
-	SQL/SQLSize \
+	CldMR/Lang/CldMRUtil \
+	CldMR/Lang/ForeignCloudant \
+	CldMR/Lang/CldMR \
+	CldMR/CldMRRuntime \
+	CldMR/CldMRSystem \
+	LambdaNRA/Lang/LambdaNRA \
+	LambdaNRA/Lang/LambdaNRASugar \
+	LambdaNRA/Lang/LambdaNRAEq \
+	LambdaNRA/LambdaNRARuntime \
+	LambdaNRA/LambdaNRASystem \
+	SQL/Lang/SQL \
+	SQL/Lang/SQLSize \
+	SQL/SQLRuntime \
+	SQL/SQLSystem \
 	OQL/Lang/OQL \
 	OQL/Lang/OQLSugar \
 	OQL/Lang/OQLSize \

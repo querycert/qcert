@@ -26,7 +26,7 @@ Section TDNNRCInfer.
   Require Import Utils BasicSystem.
   Require Import DNNRC.
 
-  Require Import TDNRC.
+  Require Import TDNNRC.
 
   (** Type inference for NNNRC when given the type of the environment *)
 

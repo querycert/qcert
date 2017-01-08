@@ -400,6 +400,6 @@ Tactic Notation "lnra_cases" tactic(first) ident(c) :=
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

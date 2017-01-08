@@ -50,7 +50,7 @@ Section CompDriver.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoJavaScript.
   Require Import NNRCtoDNNRC.
-  Require Import TDNRCInfer DNNRCtoScala DNNRCOptimizer.
+  Require Import TDNNRCInfer DNNRCtoScala DNNRCOptimizer.
 
   (* Optimizations *)
   Require Import NRAEnvOptimizer.

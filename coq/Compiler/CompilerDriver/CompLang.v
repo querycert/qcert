@@ -34,7 +34,7 @@ Section CompLang.
   Require Import BasicSystem.
 
   Require Import NNRCMRtoDNNRC.
-  Require Import TDNRCInfer.
+  Require Import TDNNRCInfer.
   Require Import LambdaNRA.
   Require Import SQL.
   

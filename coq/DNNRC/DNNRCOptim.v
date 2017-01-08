@@ -14,9 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export ForeignReduceOps.
-Require Export NNRCMR.
+Require Export DNNRCOptimizer.
 
 (* 
 *** Local Variables: ***

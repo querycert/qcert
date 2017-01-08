@@ -29,7 +29,7 @@ Require Import NNRCRuntime ForeignToScala.
 Require Import DNNRC.
 Require Import RType.
 Require Import TDataInfer.
-Require Import TDNRCInfer.
+Require Import TDNNRCInfer.
 Require Import TOpsInfer.
 Require Import Dataset.
 Require Import SparkData.

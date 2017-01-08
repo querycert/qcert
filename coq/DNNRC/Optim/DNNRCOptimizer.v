@@ -23,7 +23,7 @@ Require Import Utils BasicSystem.
 Require Import NNRCRuntime.
 Require Import DNNRC DNNRCSize DNNRCEq.
 Require Import RType.
-Require Import TDNRCInfer.
+Require Import TDNNRCInfer.
 Require Import TOpsInfer.
 Require Import Dataset DatasetSize.
 Require Import OptimizerStep OptimizerLogger.

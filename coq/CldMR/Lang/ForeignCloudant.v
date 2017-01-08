@@ -14,13 +14,27 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export ForeignReduceOps.
-Require Export NNRCMR.
+Require Import List String.
+
+Require Import Utils BasicRuntime.
+
+
+Local Open Scope string_scope.
+
+Section ForeignCloudant.
+
+  Class foreign_cloudant
+        {fruntime:foreign_runtime} : Type
+    := mk_foreign_cloudant {
+           cloudant_float_sum_op : unaryOp
+           ; cloudant_float_min_op : unaryOp
+           ; cloudant_float_max_op : unaryOp
+       }.
+
+End ForeignCloudant.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
-

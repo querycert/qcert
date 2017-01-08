@@ -24,7 +24,7 @@ Require Import OptimizerLogger.
 Require Import ForeignType ForeignDataTyping.
 Require Import RAlgEnv NNRC NRAEnv.
 Require Import DNNRC Dataset.
-Require Import TDNRCInfer.
+Require Import TDNNRCInfer.
 
 Module Type CompilerRuntime.
   Axiom compiler_foreign_type : foreign_type.

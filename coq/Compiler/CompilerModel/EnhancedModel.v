@@ -29,7 +29,7 @@ Require Import SqlDateModelPart.
 Require NNRCMR CldMR.
 Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 Require Import DNNRC Dataset.
-Require Import TDNRCInfer.
+Require Import TDNNRCInfer.
 
 Import ListNotations.
 

@@ -23,7 +23,7 @@ Require Import CompilerRuntime CompilerModel.
 Require NNRCMR CldMR.
 Require Import OptimizerLogger String RAlgEnv NRAEnv NNRC.
 Require Import DNNRC Dataset.
-Require Import TDNRCInfer.
+Require Import TDNNRCInfer.
 
 Program Instance trivial_foreign_data : foreign_data
   := mk_foreign_data Empty_set _ _ _ _ _ _.

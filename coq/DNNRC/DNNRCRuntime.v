@@ -15,8 +15,9 @@
  *)
 
 Require Export BasicRuntime.
-Require Export ForeignReduceOps.
-Require Export NNRCMR.
+
+Require Export DNNRC DNNRCEq DNNRCSize.
+Require Export Dataset DatasetSize.
 
 (* 
 *** Local Variables: ***
