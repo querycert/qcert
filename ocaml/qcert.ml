@@ -106,6 +106,7 @@ let languages =
     Compiler.L_nraenv_core;
     Compiler.L_nraenv;
     Compiler.L_nnrc;
+    Compiler.L_nnrc_core;
     Compiler.L_nnrcmr;
     Compiler.L_cldmr;
     Compiler.L_dnnrc_dataset;
