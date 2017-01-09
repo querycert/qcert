@@ -1373,6 +1373,12 @@ abstract class ICanvasDynamicTab extends ICanvasTab {
 	abstract setLabel(newlabel:string):boolean;
 }
 
+type TabManagerOptions = {label:string, 
+					rectOptions?:fabric.IRectOptions, 
+					textOptions?:fabric.IITextOptions, 
+					tabOrigin?:{left?:number, top?:number},
+					};
+
 class TabManager extends ICanvasTab {
 	static makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
        const ropts = fabric.util.object.clone(defaultTabRectOpts);
@@ -1423,9 +1429,9 @@ class TabManager extends ICanvasTab {
 	   group.setOpacity(0.3);
        return group;
 	}
-
+					
 	static make(canvas:fabric.ICanvas, 
-				options:{label:string, rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
+				options:TabManagerOptions, 
 				tabs:ICanvasTab[], startTab:number=-1):TabManager {
 		const tm = new TabManager(canvas, options, tabs);
 		tm.setInitTab(tabs, startTab);
@@ -1446,7 +1452,7 @@ class TabManager extends ICanvasTab {
 
 	}
 	protected constructor(canvas:fabric.ICanvas, 
-					options:{label:string, rectOptions?:fabric.IRectOptions, textOptions?:fabric.IITextOptions, tabOrigin?:{left?:number, top?:number}}, 
+					options:TabManagerOptions, 
 					tabs:ICanvasTab[]) {
 		super(canvas);
 		this.label = options.label;
@@ -1865,7 +1871,7 @@ function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLI
 	entry.appendChild(document.createTextNode(o.name));
 	const lemmaLink = document.createElement('a');
 	lemmaLink.href = makeLemmaURL(modulebase, o.lemma);
-	lemmaLink.appendChild(document.createTextNode('❤'));
+	lemmaLink.appendChild(document.createTextNode('✿'));
 	lemmaLink.classList.add('lemma-link');
 	entry.appendChild(lemmaLink);
 	entry.title = o.description;
