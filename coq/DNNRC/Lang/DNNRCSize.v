@@ -38,7 +38,7 @@ Section size.
        | DNNRCGroupBy _ _ _ d0 => S (dnnrc_size d0)
        | DNNRCCollect _ d0 => S (dnnrc_size d0)
        | DNNRCDispatch _ d0 => S (dnnrc_size d0)
-       | DNNRCAlg _ pt sdl => S (plug_size pt + (fold_left (fun acc sc => dnnrc_size (snd sc) + acc) sdl 0))
+       | DNNRCAlg _ pt sdl => S (plug_size pt + 0) (* (fold_left (fun acc sc => dnnrc_size (snd sc) + acc) sdl 0)) *)
        end.
 
   Lemma dnnrc_size_nzero (d:dnnrc A plug_type) : dnnrc_size d <> 0.
