@@ -466,7 +466,7 @@ Section RAlgEnvIgnore.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
+      generalize (nra_eval h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -477,19 +477,19 @@ Section RAlgEnvIgnore.
       unfold pat_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl.
-      destruct (fun_of_alg h (algenv_deenv_alg e1) a); try reflexivity.
+      destruct (nra_eval h (algenv_deenv_alg e1) a); try reflexivity.
       unfold lift; simpl.
       revert IHl.
-      generalize (rmap (fun_of_alg h (alg_of_algenv e1))
+      generalize (rmap (nra_eval h (alg_of_algenv e1))
                        (map (fun x : data => drec (("PBIND"%string, d1) :: ("PCONST"%string, c):: ("PDATA"%string, x) :: nil)) l));
-        generalize (rmap (fun_of_alg h (algenv_deenv_alg e1)) l); intros.
+        generalize (rmap (nra_eval h (algenv_deenv_alg e1)) l); intros.
       destruct o; destruct o0; try congruence.
     - inversion H; clear H.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
+      generalize (nra_eval h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -500,7 +500,7 @@ Section RAlgEnvIgnore.
       unfold pat_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
-      generalize (fun_of_alg h (algenv_deenv_alg e1) a); intros.
+      generalize (nra_eval h (algenv_deenv_alg e1) a); intros.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
@@ -512,7 +512,7 @@ Section RAlgEnvIgnore.
                  oflat_map
          (fun a0 : data =>
           match
-            match fun_of_alg h (alg_of_algenv e1) a0 with
+            match nra_eval h (alg_of_algenv e1) a0 with
             | Some (dcoll l1) =>
                 match
                   rmap (fun x : data => Some (drec (("PDATA2"%string, x) :: nil))) l1
@@ -530,7 +530,7 @@ Section RAlgEnvIgnore.
         ); generalize (
      oflat_map
        (fun a0 : data =>
-        match fun_of_alg h (algenv_deenv_alg e1) a0 with
+        match nra_eval h (algenv_deenv_alg e1) a0 with
         | Some (dcoll y) => omap_concat a0 y
         | _ => None
         end) l
@@ -617,7 +617,7 @@ Section RAlgEnvIgnore.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
+      generalize (nra_eval h (algenv_deenv_alg e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -628,14 +628,14 @@ Section RAlgEnvIgnore.
       unfold pat_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
-      generalize (fun_of_alg h (algenv_deenv_alg e1) a); intros.
+      generalize (nra_eval h (algenv_deenv_alg e1) a); intros.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
       revert IHl.
       generalize (lift_filter
          (fun x' : data =>
-          match fun_of_alg h (alg_of_algenv e1) x' with
+          match nra_eval h (alg_of_algenv e1) x' with
           | Some (dbool b0) => Some b0
           | _ => None
           end) (map (fun x : data => drec (("PBIND"%string, d1) :: ("PCONST"%string, c):: ("PDATA"%string, x) :: nil)) l)
@@ -652,7 +652,7 @@ Section RAlgEnvIgnore.
           end) l0);
         generalize (lift_filter
        (fun x' : data =>
-        match fun_of_alg h (algenv_deenv_alg e1) x' with
+        match nra_eval h (algenv_deenv_alg e1) x' with
         | Some (dbool b) => Some b
         | _ => None
         end) l
@@ -667,7 +667,7 @@ Section RAlgEnvIgnore.
           end) l0);
         generalize (lift_filter
        (fun x' : data =>
-        match fun_of_alg h (algenv_deenv_alg e1) x' with
+        match nra_eval h (algenv_deenv_alg e1) x' with
         | Some (dbool b) => Some b
         | _ => None
         end) l
@@ -676,7 +676,7 @@ Section RAlgEnvIgnore.
       * revert IHl.
         generalize (lift_filter
        (fun x' : data =>
-        match fun_of_alg h (algenv_deenv_alg e1) x' with
+        match nra_eval h (algenv_deenv_alg e1) x' with
         | Some (dbool b0) => Some b0
         | _ => None
         end) l); intros.
@@ -693,7 +693,7 @@ Section RAlgEnvIgnore.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; simpl; clear IHe2.
-      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl.
+      generalize (nra_eval h (algenv_deenv_alg e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl;
       unfold pat_context_data in *;
       rewrite IHe1; reflexivity.
@@ -701,7 +701,7 @@ Section RAlgEnvIgnore.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; simpl; clear IHe2.
-      generalize (fun_of_alg h (algenv_deenv_alg e2) d2); intros; simpl.
+      generalize (nra_eval h (algenv_deenv_alg e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl.
       unfold pat_context_data in *;
       rewrite IHe1; reflexivity.
@@ -726,7 +726,7 @@ Section RAlgEnvIgnore.
     end.
 
   Lemma fun_of_algenv_of_alg h c e d env :
-    fun_of_alg h e d = fun_of_algenv h c (algenv_of_alg e) env d.
+    nra_eval h e d = fun_of_algenv h c (algenv_of_alg e) env d.
   Proof.
     revert d env.
     induction e; simpl; trivial; intros;

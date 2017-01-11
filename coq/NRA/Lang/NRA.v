@@ -54,33 +54,33 @@ Section NRA.
 
   Context (h:list(string*string)).
   
-  Fixpoint fun_of_alg (op:alg) (x:data) : option data :=
+  Fixpoint nra_eval (op:alg) (x:data) : option data :=
     match op with
       | AID => Some x
       | AConst rd => Some (normalize_data h rd)
       | ABinop bop op1 op2 =>
-        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (fun_of_alg op1 x) (fun_of_alg op2 x)
+        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nra_eval op1 x) (nra_eval op2 x)
       | AUnop uop op1 =>
-        olift (fun d1 => fun_of_unaryop h uop d1) (fun_of_alg op1 x)
+        olift (fun d1 => fun_of_unaryop h uop d1) (nra_eval op1 x)
       | AMap op1 op2 =>
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (fun_of_alg op1) c1)) d
-        in olift aux_map (fun_of_alg op2 x)
+            lift_oncoll (fun c1 => lift dcoll (rmap (nra_eval op1) c1)) d
+        in olift aux_map (nra_eval op2 x)
       | AMapConcat op1 op2 =>
         let aux_mapconcat d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun_of_alg op1) c1)) d
-        in olift aux_mapconcat (fun_of_alg op2 x)
+            lift_oncoll (fun c1 => lift dcoll (rmap_concat (nra_eval op1) c1)) d
+        in olift aux_mapconcat (nra_eval op2 x)
       | AProduct op1 op2 =>
-        (* Note: (fun y => fun_of_alg op2 x) does not depend on input,
+        (* Note: (fun y => nra_eval op2 x) does not depend on input,
            but we still use a nested loop and delay op2 evaluation so it does not
            fail in case the op1 operand is an empty collection -- this makes sure
            to align the semantics with the NNRC version. - Jerome *)
         let aux_product d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => fun_of_alg op2 x) c1)) d
-        in olift aux_product (fun_of_alg op1 x)
+            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => nra_eval op2 x) c1)) d
+        in olift aux_product (nra_eval op1 x)
       | ASelect op1 op2 =>
         let pred x' :=
-            match fun_of_alg op1 x' with
+            match nra_eval op1 x' with
               | Some (dbool b) => Some b
               | _ => None
             end
@@ -88,20 +88,20 @@ Section NRA.
         let aux_select d :=
             lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
         in
-        olift aux_select (fun_of_alg op2 x)
+        olift aux_select (nra_eval op2 x)
       | ADefault op1 op2 =>
         olift (fun d1 => match d1 with
-                           | dcoll nil => fun_of_alg op2 x
+                           | dcoll nil => nra_eval op2 x
                            | _ => Some d1
-                         end) (fun_of_alg op1 x)
+                         end) (nra_eval op1 x)
       | AEither opl opr =>
         match x with
-          | dleft dl => fun_of_alg opl dl
-          | dright dr => fun_of_alg opr dr
+          | dleft dl => nra_eval opl dl
+          | dright dr => nra_eval opr dr
           | _ => None
         end
       | AEitherConcat op1 op2 =>
-        match fun_of_alg op1 x, fun_of_alg op2 x with
+        match nra_eval op1 x, nra_eval op2 x with
           | Some (dleft (drec l)), Some (drec t)  =>
             Some (dleft (drec (rec_concat_sort l t)))
           | Some (dright (drec r)), Some (drec t)  =>
@@ -109,7 +109,7 @@ Section NRA.
           | _, _ => None
         end
       | AApp op1 op2 =>
-        olift (fun d => (fun_of_alg op1 d)) (fun_of_alg op2 x)
+        olift (fun d => (nra_eval op1 d)) (nra_eval op2 x)
     end.
 
 
@@ -126,7 +126,7 @@ Section NRA.
 
   (* evaluation preserves normalization *)
   Lemma fun_of_alg_normalized {op:alg} {d:data} {o} :
-    fun_of_alg op d = Some o ->
+    nra_eval op d = Some o ->
     data_normalized h d ->
     data_normalized h o.
   Proof.
@@ -138,16 +138,16 @@ Section NRA.
     - intros.
       specialize (IHop1 d).
       specialize (IHop2 d).
-      destruct (fun_of_alg op1 d); simpl in *; try discriminate.
-      destruct (fun_of_alg op2 d); simpl in *; try discriminate.
+      destruct (nra_eval op1 d); simpl in *; try discriminate.
+      destruct (nra_eval op2 d); simpl in *; try discriminate.
       apply (fun_of_binop_normalized h) in H; eauto.
     - intros.
       specialize (IHop d).
-      destruct (fun_of_alg op d); simpl in *; try discriminate.
+      destruct (nra_eval op d); simpl in *; try discriminate.
       apply fun_of_unaryop_normalized in H; eauto.
     - intros;
       specialize (IHop2 d);
-      destruct (fun_of_alg op2 d); simpl in *; try discriminate;
+      destruct (nra_eval op2 d); simpl in *; try discriminate;
       specialize (IHop2 _ (eq_refl _) H0).
       destruct d0; simpl in *; try discriminate.
       apply some_lift in H; destruct H; subst.
@@ -156,7 +156,7 @@ Section NRA.
       apply (rmap_Forall e H1); eauto.
     - intros;
       specialize (IHop2 d);
-      destruct (fun_of_alg op2 d); simpl in *; try discriminate;
+      destruct (nra_eval op2 d); simpl in *; try discriminate;
       specialize (IHop2 _ (eq_refl _) H0).
       destruct d0; simpl in *; try discriminate.
       apply some_lift in H; destruct H; subst.
@@ -175,7 +175,7 @@ Section NRA.
       eapply (data_normalized_orecconcat H3); trivial.
     -  intros;
       specialize (IHop1 d);
-      destruct (fun_of_alg op1 d); simpl in *; try discriminate.
+      destruct (nra_eval op1 d); simpl in *; try discriminate.
       specialize (IHop1 _ (eq_refl _) H0).
       destruct d0; simpl in *; try discriminate.
       apply some_lift in H; destruct H; subst.
@@ -194,7 +194,7 @@ Section NRA.
       eapply (data_normalized_orecconcat H3); trivial.
     - intros;
       specialize (IHop2 d);
-      destruct (fun_of_alg op2 d); simpl in *; try discriminate;
+      destruct (nra_eval op2 d); simpl in *; try discriminate;
       specialize (IHop2 _ (eq_refl _) H0).
       destruct d0; simpl in *; try discriminate.
       apply some_lift in H; destruct H; subst.      
@@ -204,7 +204,7 @@ Section NRA.
       apply (lift_filter_Forall e H1).
     - intros;
       specialize (IHop1 d);
-      destruct (fun_of_alg op1 d); simpl in *; try discriminate.
+      destruct (nra_eval op1 d); simpl in *; try discriminate.
       specialize (IHop1 _ (eq_refl _) H0).
       destruct d0; simpl in *; try solve [inversion H; subst; trivial].
       destruct l; simpl; eauto 3.
@@ -214,8 +214,8 @@ Section NRA.
     - intros.
       specialize (IHop1 d).
       specialize (IHop2 d).
-      destruct (fun_of_alg op1 d); simpl in *; try discriminate.
-      destruct (fun_of_alg op2 d); simpl in *; try discriminate.
+      destruct (nra_eval op1 d); simpl in *; try discriminate.
+      destruct (nra_eval op2 d); simpl in *; try discriminate.
       specialize (IHop1 _ (eq_refl _) H0).
       specialize (IHop2 _ (eq_refl _) H0).
       destruct d0; try discriminate.
@@ -233,7 +233,7 @@ Section NRA.
         apply data_normalized_rec_concat_sort; trivial.
       + repeat (destruct d0; try discriminate).
     - intros. specialize (IHop2 d).
-      destruct (fun_of_alg op2 d); simpl in *; try discriminate.
+      destruct (nra_eval op2 d); simpl in *; try discriminate.
       eauto. 
   Qed.
     
@@ -243,7 +243,7 @@ End NRA.
 
 (** Algebraic plan application *)
 
-Notation "h ⊢ Op @ₐ x" := (fun_of_alg h Op x) (at level 10). (* \vdash *)
+Notation "h ⊢ Op @ₐ x" := (nra_eval h Op x) (at level 10). (* \vdash *)
 
 (* As much as possible, notations are aligned with those of [CM93]
    S. Cluet and G. Moerkotte. Nested queries in object bases. In

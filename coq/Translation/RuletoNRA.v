@@ -36,7 +36,7 @@ Section RuletoNRA.
 
   Lemma rule_trans_correct {h:list(string*string)} c rps bind d :
     lift_failure (interp h c (rule_to_pattern rps) bind d) =
-    fun_of_alg h (alg_of_rule rps) (pat_context_data (drec (rec_sort c)) (drec bind) d).
+    nra_eval h (alg_of_rule rps) (pat_context_data (drec (rec_sort c)) (drec bind) d).
   Proof.
     unfold alg_of_rule.
     generalize (rule_to_pattern rps); intros.
@@ -45,7 +45,7 @@ Section RuletoNRA.
 
   Lemma rule_parts_trans_correct_r {h:list(string*string)} c rps bind d :
       interp h c (rule_to_pattern rps) bind d =
-      lift_pat_failure (fun_of_alg h
+      lift_pat_failure (nra_eval h
                             (alg_of_rule rps)
                             (pat_context_data (drec (rec_sort c)) (drec bind) d)).
   Proof.
@@ -71,7 +71,7 @@ Section RuletoNRA.
   
   Lemma rule_trans_correct_r {h:list(string*string)} (r:rule) (world:list data) :
     eval_rule h r world =
-    lift_rule_failure (fun_of_alg h (rule_trans r) (drec (mkWorld world))).
+    lift_rule_failure (nra_eval h (rule_trans r) (drec (mkWorld world))).
   Proof.
     simpl; unfold eval_rule.
     generalize (@rule_trans_correct h (mkWorld world)); intros.
@@ -91,7 +91,7 @@ Section RuletoNRA.
 
   Lemma aggregate_trans_correct {h:list(string*string)} c rules op secondMap bind d nflat :
     lift_failure (interp h c (aggregate rules op secondMap nflat) bind d) =
-    fun_of_alg h (alg_of_aggregate rules op secondMap nflat) (pat_context_data (drec (rec_sort c)) (drec bind) d).
+    nra_eval h (alg_of_aggregate rules op secondMap nflat) (pat_context_data (drec (rec_sort c)) (drec bind) d).
   Proof.
     unfold alg_of_aggregate.
     apply pat_trans_correct.
@@ -99,7 +99,7 @@ Section RuletoNRA.
 
   Lemma aggregate_trans_correct_r {h:list(string*string)} c rules op secondMap bind d nflat:
     interp h c (aggregate rules op secondMap nflat) bind d =
-    lift_pat_failure (fun_of_alg h (alg_of_aggregate rules op secondMap nflat) (pat_context_data (drec (rec_sort c)) (drec bind) d)).
+    lift_pat_failure (nra_eval h (alg_of_aggregate rules op secondMap nflat) (pat_context_data (drec (rec_sort c)) (drec bind) d)).
   Proof.
     rewrite <- aggregate_trans_correct.
     generalize (AGGREGATE rules DO op OVER secondMap FLATTEN nflat)%rule; intros.

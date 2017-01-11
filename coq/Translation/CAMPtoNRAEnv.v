@@ -168,7 +168,7 @@ Section CAMPtoNRAEnv.
   Qed.
   
   Lemma pat_envtrans_equiv_to_alg h c p bind d:
-    fun_of_alg h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
+    nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
     fun_of_algenv h c (algenv_of_pat p) (drec bind) d.
   Proof.
     rewrite <- pat_envtrans_correct.
@@ -177,7 +177,7 @@ Section CAMPtoNRAEnv.
 
   Lemma algenv_of_pat_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
-    fun_of_alg h (alg_of_pat_top c p) d =
+    nra_eval h (alg_of_pat_top c p) d =
     fun_of_algenv h c (algenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.

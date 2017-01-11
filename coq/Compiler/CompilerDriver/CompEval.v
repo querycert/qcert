@@ -115,7 +115,7 @@ Section CompEval.
 
     (* Language: nra *)
     Definition eval_nra (q:nra) (cenv: list (string*data)) : option data
-      := fun_of_alg h q (drec (rec_sort cenv)).
+      := nra_eval h q (drec (rec_sort cenv)).
       (* XXX Passing just cenv as ID value is more natural, but not
              consistent with nraenv_core to nra translation which encodes
              ID and ENV in a records using the pat_context_data macro XXX *)

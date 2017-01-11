@@ -122,7 +122,7 @@ _var ⊕ [[ op2 ]]_var *)
       (fun x : data =>
          nnrc_core_eval h ((v, x) :: env) (nra_to_nnrc op v)) l
     =
-    rmap (fun_of_alg h op) l.
+    rmap (nra_eval h op) l.
   Proof.
     intros.
     induction l.

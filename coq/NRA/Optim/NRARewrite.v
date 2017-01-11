@@ -149,7 +149,7 @@ Section ROptim.
               match h ⊢ p1 @ₐ x with
               | Some x' => Some (dcoll (x' :: nil))
               | None => None
-              end) l); generalize (rmap (fun_of_alg h p1) l); intros.
+              end) l); generalize (rmap (nra_eval h p1) l); intros.
     unfold lift in *; simpl.
     destruct o; destruct o0; simpl; try reflexivity; try congruence.
     - simpl in *.

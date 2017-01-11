@@ -511,7 +511,7 @@ Section RAlgEnv.
       destruct o; try reflexivity; simpl.
       unfold lift, lift_oncoll in *.
       revert IHl.
-      destruct (rmap (fun_of_alg h (alg_of_algenv ae1))
+      destruct (rmap (nra_eval h (alg_of_algenv ae1))
          (map (fun x : data =>
            drec
              (("PBIND", env)
@@ -733,7 +733,7 @@ Section RAlgEnv.
       destruct o; try reflexivity; simpl.
       unfold lift, lift_oncoll in *.
       revert IHl.
-      destruct (rmap (fun_of_alg h (alg_of_algenv ae))
+      destruct (rmap (nra_eval h (alg_of_algenv ae))
          (map (fun x0 : data => drec (("PBIND", x0) :: ("PCONST", drec constant_env) :: ("PDATA", x) :: nil))
               l)); try reflexivity; try congruence; simpl; destruct (rmap (fun env' => (fun_of_algenv ae env' x)) l); try reflexivity; try congruence.
   Qed.

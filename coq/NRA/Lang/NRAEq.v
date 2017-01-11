@@ -116,7 +116,7 @@ Section NRAEq.
 
   Lemma oomap_concat_eq {h:list(string*string)} op1 op2 l:
     (forall x : data, h ⊢ op1 @ₐ x = h ⊢ op2 @ₐ x) ->
-    oomap_concat (fun_of_alg h op1) l = oomap_concat (fun_of_alg h op2) l.
+    oomap_concat (nra_eval h op1) l = oomap_concat (nra_eval h op2) l.
   Proof.
     intros.
     unfold oomap_concat; rewrite H; reflexivity.

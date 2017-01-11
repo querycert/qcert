@@ -94,7 +94,7 @@ Section TNRA.
     (op1 ▷ τ₁ >=> τ₂) ->
     (forall d : data,
        data_type d τ₁ -> exists x : data, brand_relation_brands ⊢ op1 @ₐ d = Some x /\ data_type x τ₂) ->
-    exists x : list data, (rmap (fun_of_alg brand_relation_brands op1) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (rmap (nra_eval brand_relation_brands op1) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros.
     induction dl; simpl; intros.
@@ -267,7 +267,7 @@ Section TNRA.
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
                    brand_relation_brands ⊢ op1 @ₐ d = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_concat (fun_of_alg  brand_relation_brands op1) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+    exists x : list data, (rmap_concat (nra_eval  brand_relation_brands op1) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
     intros; rewrite Forall_forall in *.
     induction dl; simpl in *; unfold rmap_concat in *; simpl.
@@ -378,7 +378,7 @@ Section TNRA.
       rewrite H; clear H.
       invcs H1; rtype_equalizer.
       subst.
-      assert (exists x : list data, (rmap (fun_of_alg brand_relation_brands op1) dl = Some x)
+      assert (exists x : list data, (rmap (nra_eval brand_relation_brands op1) dl = Some x)
                                     /\ data_type (dcoll x) (Coll τ₂)).
       apply (rmap_typed op1 dl H2); assumption.
       destruct H as [? [eqq dt]].
@@ -393,7 +393,7 @@ Section TNRA.
 
       rewrite H0; clear H0. simpl.
       
-      assert (exists x : list data, (rmap_concat (fun_of_alg  brand_relation_brands op1) x0 = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      assert (exists x : list data, (rmap_concat (nra_eval brand_relation_brands op1) x0 = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
       apply (rmap_concat_typed op1 x0 pf1 pf2 pf3); try assumption; try reflexivity.
       elim H0; intros; clear H0.
       elim H4; intros; clear H4.

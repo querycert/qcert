@@ -188,7 +188,7 @@ Section RAlgEnvEq.
     unfold Proper, respectful, algenv_eq; simpl; intros.
     rewrite H0 by trivial.
     rewrite unfold_env_alg_sort by trivial; simpl.
-    case_eq (fun_of_alg h (alg_of_algenv y0) (pat_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
+    case_eq (nra_eval h (alg_of_algenv y0) (pat_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
     destruct d; try reflexivity; simpl; intros.
     f_equal. apply rmap_ext; intros.
     apply H; eauto.

@@ -194,7 +194,7 @@ Section NRAExt.
   Context (h:list(string*string)).
   
   Definition fun_of_algext (e:algext) (x:data) : option data :=
-    fun_of_alg h (alg_of_algext e) x.
+    nra_eval h (alg_of_algext e) x.
 
   (** Algebraic plan application *)
 

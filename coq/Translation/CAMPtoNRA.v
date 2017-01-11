@@ -200,7 +200,7 @@ Section CAMPtoNRA.
   (** Theorem 4.2: lemma of translation correctness for patterns *)
 
   Theorem pat_trans_correct {h:brand_relation_t} c p bind d:
-    lift_failure (interp h c p bind d) = fun_of_alg h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d).
+    lift_failure (interp h c p bind d) = nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d).
   Proof.
     revert d bind;
     pat_cases (induction p) Case; simpl; intros.
@@ -237,7 +237,7 @@ Section CAMPtoNRA.
       rewrite rflatten_lift1.
       reflexivity.
       revert IHl.
-      destruct ((rmap (fun_of_alg h (alg_of_pat p))
+      destruct ((rmap (nra_eval h (alg_of_pat p))
               (map
                  (fun x : data =>
                   drec
@@ -304,7 +304,7 @@ Section CAMPtoNRA.
   Qed.
 
   Lemma pat_trans_yields_coll {h:brand_relation_t} p d d0:
-    fun_of_alg h (alg_of_pat p) d = Some d0 ->
+    nra_eval h (alg_of_pat p) d = Some d0 ->
     {x | d0 = dcoll x}.
   Proof.
     Ltac findcol := 
@@ -339,8 +339,8 @@ Section CAMPtoNRA.
 
   Lemma pat_trans_top_pat_context {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    fun_of_alg h (alg_of_pat_top c p) d 
-    = fun_of_alg h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec nil) d).
+    nra_eval h (alg_of_pat_top c p) d 
+    = nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec nil) d).
   Proof.
     simpl.
     unfold olift, pat_context_data; intros.
@@ -356,7 +356,7 @@ Section CAMPtoNRA.
 
   Lemma pat_trans_top_correct {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    lift_failure (interp h c p nil d) = fun_of_alg h (alg_of_pat_top c p) d.
+    lift_failure (interp h c p nil d) = nra_eval h (alg_of_pat_top c p) d.
   Proof.
     intros.
     rewrite pat_trans_top_pat_context by trivial.
@@ -375,7 +375,7 @@ Section CAMPtoNRA.
 
   Lemma pat_trans_correct_r {h:brand_relation_t} c p bind d:
       interp h c p bind d =
-      lift_pat_failure (fun_of_alg h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d)).
+      lift_pat_failure (nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d)).
   Proof.
     rewrite <- pat_trans_correct.
     destruct (interp h c p bind d); intros; simpl; reflexivity.
@@ -384,7 +384,7 @@ Section CAMPtoNRA.
   Lemma pat_trans_top_correct_r {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
       interp h c p nil d =
-      lift_pat_failure (fun_of_alg h (alg_of_pat_top c p) d).
+      lift_pat_failure (nra_eval h (alg_of_pat_top c p) d).
   Proof.
     intros.
     rewrite <- pat_trans_top_correct by trivial.
