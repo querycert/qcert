@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section RAlgExt.
+Section NRAExt.
   Require Import String List Compare_dec.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlg.
+  Require Import NRA.
 
   (* Algebra *)
 
@@ -198,7 +198,7 @@ Section RAlgExt.
 
   (** Algebraic plan application *)
 
-End RAlgExt.
+End NRAExt.
 
 (* As much as possible, notations are aligned with those of [CM93]
    S. Cluet and G. Moerkotte. Nested queries in object bases. In

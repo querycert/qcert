@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section RAlg.
+Section NRA.
   Require Import String List Compare_dec.
   Require Import EquivDec.
   
@@ -237,7 +237,7 @@ Section RAlg.
       eauto. 
   Qed.
     
-End RAlg.
+End NRA.
 
 (* Some notations for the paper and readability *)
 

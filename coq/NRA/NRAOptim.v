@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export RAlgContext.
+Require Export NRAContext.
 Require Export NRARewrite NRARewriteContext NRAExtRewrite.
 Require Export TNRARewrite.
 

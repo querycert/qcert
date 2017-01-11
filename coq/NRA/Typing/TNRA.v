@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section TAlg.
+Section TNRA.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
   Require Import Program.
   
   Require Import Utils BasicSystem.
-  Require Import RAlg.
+  Require Import NRA.
 
   (** Typing for NRA *)
   Section typ.
@@ -532,7 +532,7 @@ Section TAlg.
     exact x.
   Defined.
 
-End TAlg.
+End TNRA.
 
 (* Typed algebraic plan *)
 Notation "Op ▷ A >=> B" := (alg_type Op A B) (at level 70).

@@ -18,7 +18,7 @@
  * Algebra constructors proper *
  *******************************)
 
-Section RAlgEq.
+Section NRAEq.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -30,7 +30,7 @@ Section RAlgEq.
   Require Import String.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlg.
+  Require Import NRA.
 
   Local Open Scope alg_scope.
 
@@ -190,7 +190,7 @@ Section RAlgEq.
     rewrite (H h d); eauto.
   Qed.
 
-End RAlgEq.
+End NRAEq.
 
 Notation "X ≡ₐ Y" := (alg_eq X Y) (at level 90) : alg_scope.                             (* ≡ = \equiv *)
 

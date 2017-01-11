@@ -392,8 +392,6 @@ Section CAMPtoNRA.
   Qed.
 
 Section size.
-  Require Import CAMPSize.
-  Require Import RAlgSize.
   Require Import Omega.
 
   (** Proof showing linear size translation *)

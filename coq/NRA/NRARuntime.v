@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicRuntime.
-Require Export RAlg RAlgSugar RAlgEq RAlgExt RAlgExtEq RAlgSize.
+Require Export NRA NRASugar NRAEq NRAExt NRAExtEq NRASize.
 
 (* 
 *** Local Variables: ***

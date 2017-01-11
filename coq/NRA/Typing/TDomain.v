@@ -22,8 +22,8 @@ Section TDomain.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlg.
-  Require Import TAlg.
+  Require Import NRA.
+  Require Import TNRA.
 
   Context {ftype:foreign_type}.
 

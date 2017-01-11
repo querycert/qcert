@@ -14,11 +14,11 @@
  * limitations under the License.
  *)
 
-Section RAlgExt.
+Section NRAExt.
   Require Import String List Compare_dec.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEq RAlgExt.
+  Require Import NRA NRAEq NRAExt.
 
   (* Equivalence for extended algebra *)
 
@@ -284,7 +284,7 @@ Section RAlgExt.
     reflexivity.
   Qed.
 
-End RAlgExt.
+End NRAExt.
 
 Notation "X ≡ₓ Y" := (algext_eq X Y) (at level 90) : algext_scope. (* ≡ = \equiv *)
 

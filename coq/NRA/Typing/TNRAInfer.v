@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TAlgInfer.
+Section TNRAInfer.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
@@ -24,8 +24,8 @@ Section TAlgInfer.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlg.
-  Require Import TAlg.
+  Require Import NRA.
+  Require Import TNRA.
 
   Require Import Program.
 
@@ -503,7 +503,7 @@ Section TAlgInfer.
 
   (* Still should try and prove most specific and completeness theorems ... *)
   
-End TAlgInfer.
+End TNRAInfer.
 
 (* 
 *** Local Variables: ***

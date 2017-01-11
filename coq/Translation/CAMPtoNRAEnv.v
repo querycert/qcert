@@ -82,7 +82,6 @@ Section CAMPtoNRAEnv.
   
   (** Theorem 4.2: lemma of translation correctness for patterns *)
 
-  Require Import RAlgEq.
   Local Open Scope alg_scope.
 
   Lemma pat_envtrans_correct h c q env d:
@@ -211,8 +210,6 @@ Section CAMPtoNRAEnv.
   End Top.
 
   Section size.
-    Require Import CAMPSize.
-    Require Import RAlgEnvSize.
     Require Import Omega.
     
     (** Proof showing linear size translation *)

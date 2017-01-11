@@ -685,11 +685,11 @@ Section TAlgEnv.
             op).
  *)
   
-  Lemma ATunnest_two (s1 s2:string) (op:RAlg.alg) τin τ₁ pf1 τs τrem pf2 :
+  Lemma ATunnest_two (s1 s2:string) (op:NRA.alg) τin τ₁ pf1 τs τrem pf2 :
     op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ->
     tdot τ₁ s1 = Some (Coll τs) ->
     τrem = (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1) ->
-    RAlgExt.unnest_two s1 s2 op ▷ 
+    NRAExt.unnest_two s1 s2 op ▷ 
                τin >=> Coll (Rec Closed τrem pf2).
   Proof.
     intros; subst.
@@ -755,7 +755,7 @@ Section TAlgEnv.
     | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
   end; try rtype_equalizer; try assumption; try subst; simpl in *; try alg_inverter.
 
-  Lemma ATunnest_two_inv (s1 s2:string) (op:RAlg.alg) τin rec  :
+  Lemma ATunnest_two_inv (s1 s2:string) (op:NRA.alg) τin rec  :
     unnest_two s1 s2 op ▷ 
                        τin >=> Coll rec ->
     exists τ₁ pf1 τs τrem pf2,

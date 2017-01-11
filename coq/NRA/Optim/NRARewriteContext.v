@@ -28,8 +28,8 @@ Section ROptimContext.
   Require Import Arith NPeano Omega List.
   
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEq.
-  Require Import RAlgContext NRARewrite.
+  Require Import NRA NRAEq.
+  Require Import NRAContext NRARewrite.
 
   Local Open Scope alg_ctxt.
 

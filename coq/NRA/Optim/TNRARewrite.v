@@ -25,10 +25,10 @@ Section TOptim.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlg RAlgExt RAlgEq.
+  Require Import NRA NRAExt NRAEq.
   Require Import NRARewrite.
 
-  Require Import TAlg TAlgEq.
+  Require Import TNRA TNRAEq.
 
   Require Import Program.
   

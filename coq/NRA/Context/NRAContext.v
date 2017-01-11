@@ -18,7 +18,7 @@
  * Algebra contexts *
  *******************************)
 
-Section RAlgContext.
+Section NRAContext.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -33,7 +33,7 @@ Section RAlgContext.
   Require Import Bool.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEq.
+  Require Import NRA NRAEq.
   Require Import RBindingsNat.
 
   Local Open Scope alg_scope.
@@ -1055,7 +1055,7 @@ Section RAlgContext.
     simpl; trivial.
   Qed.
   End equivs.
-End RAlgContext.
+End NRAContext.
 
 (* TODO: show that the constructors of context are all proper with respect to context equivalence *)
 

@@ -20,7 +20,7 @@ Section TAlgEnvIgnore.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlg RAlgEq RAlgEnv RAlgEnvEq.
+  Require Import NRA NRAEq RAlgEnv RAlgEnvEq.
 
   Require Import RAlgEnvIgnore.
   Require Import TAlgEnv.

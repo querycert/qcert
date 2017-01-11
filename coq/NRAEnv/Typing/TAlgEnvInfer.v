@@ -33,7 +33,7 @@ Section TAlgEnvInfer.
 
   Require Import TDataInfer.
   Require Import TOpsInfer.
-  Require Import TAlgInfer. (* Only for a few auxiliary Lemmas that should probably be moved *)
+  Require Import TNRAInfer. (* Only for a few auxiliary Lemmas that should probably be moved *)
 
   (* Type inference for algebraic expressions *)
 

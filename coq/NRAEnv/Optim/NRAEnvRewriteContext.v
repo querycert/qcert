@@ -28,9 +28,9 @@ Section ROptimEnvContext.
   Require Import Arith List.
   
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEnv RAlgEnvEq.
+  Require Import NRA RAlgEnv RAlgEnvEq.
   
-  Require Import RAlgContext NRAEnvRewrite NRARewriteContext.
+  Require Import NRAContext NRAEnvRewrite NRARewriteContext.
   Require Import RAlgEnvContext RAlgEnvContextLift.
   Local Open Scope algenv_ctxt.
 

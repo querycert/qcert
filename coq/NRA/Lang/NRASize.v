@@ -14,9 +14,9 @@
  * limitations under the License.
  *)
 
-Section RAlgSize.
+Section NRASize.
   Require Import Omega.
-  Require Import BasicRuntime RAlg.
+  Require Import BasicRuntime NRA.
 
   Context {fruntime:foreign_runtime}.
 
@@ -58,7 +58,7 @@ Section RAlgSize.
     | AApp a₁ a₂ => max (alg_depth a₁) (alg_depth a₂)
     end.
 
-End RAlgSize.
+End NRASize.
 
 (* 
 *** Local Variables: ***

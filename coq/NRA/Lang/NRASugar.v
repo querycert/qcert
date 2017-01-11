@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section RAlgSugar.
+Section NRASugar.
   Require Import String List Compare_dec.
   Require Import EquivDec.
   
   Require Import Utils BasicRuntime.
-  Require Import RAlg.
+  Require Import NRA.
 
   (* Some macros used by extended algebras and patterns *)
 
@@ -102,7 +102,7 @@ Section RAlgSugar.
     tauto.
   Qed.
 
-End RAlgSugar.
+End NRASugar.
 
 Hint Resolve data_normalized_pat_context_data.  
 (* 

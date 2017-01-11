@@ -18,7 +18,7 @@ Section RAlgEnvIgnore.
 
   Require Import Bool List String.
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEq RAlgEnv.
+  Require Import NRA NRAEq RAlgEnv.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
@@ -447,7 +447,7 @@ Section RAlgEnvIgnore.
       rewrite (IHe H h x x1 x2); reflexivity.
   Qed.
 
-  Require Import RAlgSugar.
+  Require Import NRASugar.
   Lemma algenv_is_nra_deenv (h:list (string*string)) c (e:algenv) (d1 d2:data) :
     algenv_is_nra e ->
         h ⊢ (alg_of_algenv e) @ₐ (pat_context_data c d1 d2) =

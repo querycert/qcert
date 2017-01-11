@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TAlgEq.
+Section TNRAEq.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -27,8 +27,8 @@ Section TAlgEq.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlg RAlgEq.
-  Require Import TAlg.
+  Require Import NRA NRAEq.
+  Require Import TNRA.
 
   Local Open Scope alg_scope.
 
@@ -107,7 +107,7 @@ Section TAlgEq.
     assumption.
   Qed.
 
-End TAlgEq.
+End TNRAEq.
 
 Notation "m ⊢ₐ A ↦ B ⊧ op1 ⇒ op2" := (@talg_rewrites_to m A B op1 op2) (at level 80).
 

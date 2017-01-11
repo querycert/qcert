@@ -92,18 +92,18 @@ MODULES = \
 	Basic/BasicTypes \
 	Basic/BasicSystem \
 	Basic/TypingRuntime \
-	NRA/Lang/RAlg \
-	NRA/Lang/RAlgSugar \
-	NRA/Lang/RAlgSize \
-	NRA/Lang/RAlgEq \
-	NRA/Lang/RAlgExt \
-	NRA/Lang/RAlgExtEq \
-	NRA/Typing/TAlg \
-	NRA/Typing/TAlgInfer \
-        NRA/Typing/TAlgEq \
-        NRA/Typing/TAlgExt \
+	NRA/Lang/NRA \
+	NRA/Lang/NRASugar \
+	NRA/Lang/NRASize \
+	NRA/Lang/NRAEq \
+	NRA/Lang/NRAExt \
+	NRA/Lang/NRAExtEq \
+	NRA/Typing/TNRA \
+	NRA/Typing/TNRAInfer \
+        NRA/Typing/TNRAEq \
+        NRA/Typing/TNRAExt \
         NRA/Typing/TDomain \
-	NRA/Context/RAlgContext \
+	NRA/Context/NRAContext \
 	NRA/NRARuntime \
 	NRA/NRATypes \
 	NRA/NRASystem \

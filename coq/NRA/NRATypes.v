@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicTypes.
-Require Export TAlg TAlgEq TAlgExt TDomain.
+Require Export TNRA TNRAEq TNRAExt TDomain.
 
 (* 
 *** Local Variables: ***

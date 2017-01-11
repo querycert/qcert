@@ -14,15 +14,15 @@
  * limitations under the License.
  *)
 
-Section TAlgExt.
+Section TNRAExt.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlgExt.
-  Require Import TAlg.
+  Require Import NRAExt.
+  Require Import TNRA.
 
   Local Open Scope algext_scope.
   
@@ -59,7 +59,7 @@ Section TAlgExt.
     unfold fun_of_algext, algext_type; intros.
     apply (@talg_eval m τin τout (alg_of_algext op) H0 d); assumption.
   Defined.
-End TAlgExt.
+End TNRAExt.
 
 (* Typed algebraic plan *)
 

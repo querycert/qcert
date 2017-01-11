@@ -19,7 +19,7 @@ Section ROptim.
   Require Import List String.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlg RAlgEq.
+  Require Import NRA NRAEq.
   
   Local Open Scope alg_scope.
 
