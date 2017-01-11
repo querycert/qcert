@@ -12,6 +12,9 @@ There are four source languages: LambdaNRA, SQL, OQL, and JRules.
 For SQL and JRules, the parser is in Java and is called as an external
 process.
 
+Warning: Support for JRules isn't part of the open-source release, but
+is documented here for completeness purposes.
+
 Intermediate Languages
 ----------------------
 
@@ -98,8 +101,8 @@ Target Languages:
    Rule        rule
    CAMP	       camp
    NRA	       nra
-   NRAEnv      nraenv_core
-   	       nraenv
+   NRAEnv      nraenv
+   	       nraenv_core
    NNRC	       nnrc
    	       nnrc_core
    NNRCMR      nnrcmr
