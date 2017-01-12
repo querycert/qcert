@@ -14,10 +14,10 @@
  * limitations under the License.
  *)
 
-Section RAlgEnvSize.
+Section cNRAEnvSize.
   Require Import Omega.
   Require Import BasicRuntime.
-  Require Import RAlgEnv.
+  Require Import cNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
@@ -68,7 +68,7 @@ Section RAlgEnvSize.
     | ANMapEnv a₁ => (S (cnraenv_depth a₁))
     end.
 
-End RAlgEnvSize.
+End cNRAEnvSize.
 
 (* 
 *** Local Variables: ***

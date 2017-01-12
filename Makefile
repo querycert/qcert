@@ -112,25 +112,25 @@ MODULES = \
 	NRA/Optim/NRAExtRewrite \
 	NRA/Optim/TNRARewrite \
 	NRA/NRAOptim \
-	NRAEnv/Core/RAlgEnv \
-	NRAEnv/Core/RAlgEnvSize \
-	NRAEnv/Core/RAlgEnvIgnore \
-	NRAEnv/Core/RAlgEnvEq \
+	NRAEnv/Core/cNRAEnv \
+	NRAEnv/Core/cNRAEnvSize \
+	NRAEnv/Core/cNRAEnvIgnore \
+	NRAEnv/Core/cNRAEnvEq \
         NRAEnv/Lang/NRAEnv \
         NRAEnv/Lang/NRAEnvSize \
         NRAEnv/Lang/NRAEnvEq \
         NRAEnv/Lang/NRAEnvIgnore \
-	NRAEnv/Typing/TAlgEnv \
-	NRAEnv/Typing/TAlgEnvInfer \
-	NRAEnv/Typing/TAlgEnvIgnore \
-        NRAEnv/Typing/TAlgEnvEq \
+	NRAEnv/Typing/TcNRAEnv \
+	NRAEnv/Typing/TcNRAEnvInfer \
+	NRAEnv/Typing/TcNRAEnvIgnore \
+        NRAEnv/Typing/TcNRAEnvEq \
 	NRAEnv/Typing/TNRAEnv \
 	NRAEnv/Typing/TNRAEnvEq \
 	NRAEnv/NRAEnvRuntime \
 	NRAEnv/NRAEnvTypes \
 	NRAEnv/NRAEnvSystem \
-	NRAEnv/Context/RAlgEnvContext \
-	NRAEnv/Context/RAlgEnvContextLift \
+	NRAEnv/Context/cNRAEnvContext \
+	NRAEnv/Context/cNRAEnvContextLift \
 	NRAEnv/Optim/NRAEnvRewrite \
 	NRAEnv/Optim/NRAEnvRewriteContext \
 	NRAEnv/Optim/TNRAEnvRewrite \
@@ -219,7 +219,7 @@ MODULES = \
 	Translation/ForeignToReduceOps \
 	Translation/ForeignToCloudant \
 	Translation/NRAtoNNRC \
-	Translation/NRAEnvtoNNRC \
+	Translation/cNRAEnvtoNNRC \
 	Translation/NRAEnvtoNNRCExt \
 	Translation/NNRCtoCAMP \
 	Translation/NNRCtoNNRCMR \
@@ -228,16 +228,16 @@ MODULES = \
 	Translation/NNRCMRtoDNNRC \
 	Translation/NNRCMRtoCldMR \
 	Translation/CAMPtoNRA \
-	Translation/CAMPtoNRAEnv \
+	Translation/CAMPtocNRAEnv \
 	Translation/CAMPSugartoNRA \
-	Translation/CAMPSugartoNRAEnv \
+	Translation/CAMPSugartocNRAEnv \
 	Translation/RuletoNRA \
-	Translation/RuletoNRAEnv \
+	Translation/RuletocNRAEnv \
 	Translation/TNRAtoNNRC \
-	Translation/TNRAEnvtoNNRC \
+	Translation/TcNRAEnvtoNNRC \
 	Translation/TNNRCtoCAMP \
 	Translation/TCAMPtoNRA \
-	Translation/TCAMPtoNRAEnv \
+	Translation/TCAMPtocNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
 	Translation/OQLtoNRAEnv \

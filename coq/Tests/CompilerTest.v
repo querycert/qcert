@@ -238,7 +238,7 @@ Section CompilerUntypedTest.
   Qed.
 
   (*
-  Require Import TAlgEnvInfer.
+  Require Import TcNRAEnvInfer.
 
   Definition tout1infer : option rtype₀ :=
     match infer_cnraenv_type alg5 (Rec tinp1 eq_refl) Unit with
@@ -252,14 +252,14 @@ Section CompilerUntypedTest.
   Eval compute in (proj1_sig tout1).
   *)
     
-  Require Import TAlgEnv TCAMPtoNRAEnv.
+  Require Import TcNRAEnv TCAMPtocNRAEnv.
   
   Lemma alg5_wt τ :
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
     unfold algopt5, camp_to_nraenv_core.
-    unfold CAMPtoNRAEnv.translate_pat_to_cnraenv.
-    unfold CAMPtoNRAEnv.cnraenv_of_pat.
+    unfold CAMPtocNRAEnv.translate_pat_to_cnraenv.
+    unfold CAMPtocNRAEnv.cnraenv_of_pat.
     econstructor; eauto.
     econstructor; eauto.
     Focus 2.

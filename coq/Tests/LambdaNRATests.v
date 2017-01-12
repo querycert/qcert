@@ -157,8 +157,8 @@ Section LambdaNRATests.
   
 (*  Eval vm_compute in (eval_q h T1l db1). *)
 (*  Eval vm_compute in (eval_q h T1r db1). *)
-(*  Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T1l)) db1). *)
-(*  Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T1r)) db1). *)
+(*  Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda T1l)) db1). *)
+(*  Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda T1r)) db1). *)
 
   (* T2 : P.filter{p => p.age > 25}.map{x => x.age} == P.map{p => p.age}.filter{a => a > 25} *)
   Definition T2l P :=
@@ -176,8 +176,8 @@ Section LambdaNRATests.
   
 (*  Eval vm_compute in (eval_q h T2l db2). *)
   (* Eval vm_compute in (eval_q h T2r db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T2l)) db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda T2r)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda T2l)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda T2r)) db2). *)
 
   (* A3 : P.map{p => [ person: p, kids: p.child.filter{c => c.age > 25} ]} *)
 
@@ -194,7 +194,7 @@ Section LambdaNRATests.
                                           (LNRAUnop (ADot "child") (LNRAVar "p")))))) P.
 
   (* Eval vm_compute in (eval_q h A3 db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda A3)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda A3)) db2). *)
   
   (* A4 : P.map{p => [ person: p, kids: p.child.filter{c => p.age > 25} ]} *)
 
@@ -211,7 +211,7 @@ Section LambdaNRATests.
                                           (LNRAUnop (ADot "child") (LNRAVar "p")))))) P.
 
   (* Eval vm_compute in (eval_q h A4 db2). *)
-  (* Eval vm_compute in (eval_nraenv_q h (algenv_of_lnra_lambda (q_to_lambda A4)) db2). *)
+  (* Eval vm_compute in (eval_nraenv_q h (cnraenv_of_lnra_lambda (q_to_lambda A4)) db2). *)
 
 End LambdaNRATests.
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NRAEnvtoNNRC.
+Section cNRAEnvtoNNRC.
 
   (* begin hide *)
   Require Import String.
@@ -146,12 +146,12 @@ Section NRAEnvtoNNRC.
         = lookup equiv_dec (filterConstants env) x) ->
       lookup equiv_dec env vid = Some did ->
        lookup equiv_dec env venv = Some denv ->
-       nnrc_core_eval h env (cnraenv_to_nnrc op vid venv) = (fun_of_cnraenv h cenv op denv did)) ->
+       nnrc_core_eval h env (cnraenv_to_nnrc op vid venv) = (cnraenv_eval h cenv op denv did)) ->
     rmap
       (fun x : data =>
          nnrc_core_eval h ((vid, x) :: env) (cnraenv_to_nnrc op vid venv)) l
     =
-    rmap (fun_of_cnraenv h dcenv op denv) l.
+    rmap (cnraenv_eval h dcenv op denv) l.
   Proof.
     intros Hdiff1 Hdiff2 Hcenv Henv.
     intros; induction l.
@@ -602,7 +602,7 @@ Section NRAEnvtoNNRC.
 
   End size.
 
-End NRAEnvtoNNRC.
+End cNRAEnvtoNNRC.
 
 (* 
 *** Local Variables: ***

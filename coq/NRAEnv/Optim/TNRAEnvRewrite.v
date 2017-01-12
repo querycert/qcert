@@ -31,8 +31,8 @@ Section TOptimEnv.
   
   Require Import BasicSystem.
 
-  Require Import RAlgEnv RAlgEnvIgnore RAlgEnvEq.
-  Require Import TAlgEnv TAlgEnvIgnore TAlgEnvEq.
+  Require Import cNRAEnv cNRAEnvIgnore cNRAEnvEq.
+  Require Import TcNRAEnv TcNRAEnvIgnore TcNRAEnvEq.
 
   Require Import NRAEnvRewrite.
 
@@ -906,7 +906,7 @@ Section TOptimEnv.
                                   (brand_relation_brands ⊢ₑ q₃ @ₑ x1 ⊣ c;env))
                                c1)) d)
                       (brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;env)) dout);
-      destruct ((rmap (fun_of_cnraenv brand_relation_brands c q₁ env) dout)); simpl in *; try congruence.
+      destruct ((rmap (cnraenv_eval brand_relation_brands c q₁ env) dout)); simpl in *; try congruence.
     - unfold olift in *.
       case_eq (rflatten l0); intros; rewrite H in *.
       + rewrite (rflatten_cons dout0 l0 l1 H).
@@ -1006,7 +1006,7 @@ Section TOptimEnv.
     dtype_inverter.
     destruct x0; simpl.
     - autorewrite with alg.
-      destruct (rmap (fun_of_cnraenv brand_relation_brands c q₂ env) dout);
+      destruct (rmap (cnraenv_eval brand_relation_brands c q₂ env) dout);
         destruct (rmap
               (fun x0 : data =>
                olift
@@ -1078,7 +1078,7 @@ Section TOptimEnv.
                                 end) c1)) d)
                       (olift (fun d1 : data => Some (dcoll [d1]))
                              (brand_relation_brands ⊢ₑ q₂ @ₑ x0 ⊣ c;env))) dout);
-      destruct (rmap (fun_of_cnraenv brand_relation_brands c q₂ env) dout); simpl in *; try congruence; try rewrite eout0.
+      destruct (rmap (cnraenv_eval brand_relation_brands c q₂ env) dout); simpl in *; try congruence; try rewrite eout0.
       + destruct (lift_filter
                 (fun x' : data =>
                  match brand_relation_brands ⊢ₑ q₁ @ₑ x' ⊣ c;env with
@@ -1153,7 +1153,7 @@ Section TOptimEnv.
           destruct (lift_oncoll
            (fun c1 : list data =>
             match
-              rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+              rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
             with
             | Some a' => Some (dcoll a')
             | None => None
@@ -1193,18 +1193,18 @@ Section TOptimEnv.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+                     rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
                    end) x'
             | None => None
             end) dout); try congruence.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try reflexivity.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try reflexivity.
           clear H1 H2; case_eq (rflatten l1); intros; rewrite H1 in *; try congruence.
           rewrite rflatten_cons_none; assumption.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try reflexivity.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try reflexivity.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try reflexivity.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try reflexivity.
           destruct (rmap
                  (fun x0 : data =>
                   match
@@ -1241,7 +1241,7 @@ Section TOptimEnv.
                         (fun c1 : list data =>
                          match
                            rmap
-                             (fun_of_cnraenv brand_relation_brands c q₁ env)
+                             (cnraenv_eval brand_relation_brands c q₁ env)
                              c1
                          with
                          | Some a' => Some (dcoll a')
@@ -1299,7 +1299,7 @@ Section TOptimEnv.
                         (fun c1 : list data =>
                          match
                            rmap
-                             (fun_of_cnraenv brand_relation_brands c q₁ env)
+                             (cnraenv_eval brand_relation_brands c q₁ env)
                              c1
                          with
                          | Some a' => Some (dcoll a')
@@ -1310,12 +1310,12 @@ Section TOptimEnv.
           case_eq (rflatten l2); intros;
           rewrite H10 in *; simpl in *.
           rewrite (rflatten_cons [d] l2 l3 H10); simpl in *.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l1); try congruence; simpl.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
           inversion IHdout; reflexivity.
           rewrite rflatten_cons_none; simpl.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l1); try congruence; simpl.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
           reflexivity. assumption.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l1); try congruence; simpl.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l1); try congruence; simpl.
           reflexivity.
           destruct (brand_relation_brands ⊢ₑ q₁ @ₑ dout0 ⊣ c;env); try reflexivity; simpl.
           destruct (rmap
@@ -1353,7 +1353,7 @@ Section TOptimEnv.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+                     rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
@@ -1397,7 +1397,7 @@ Section TOptimEnv.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+                     rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
@@ -1413,7 +1413,7 @@ Section TOptimEnv.
           case_eq (rflatten l1); intros; rewrite H9 in *; simpl in *.
           rewrite (rflatten_cons [] l1 l3 H9); simpl. assumption.
           rewrite rflatten_cons_none; simpl.
-          destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l2); congruence.
+          destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l2); congruence.
           assumption.
           case_eq (rflatten l1); intros; rewrite H9 in *; simpl in *. congruence.
           rewrite rflatten_cons_none; simpl. reflexivity.
@@ -1427,7 +1427,7 @@ Section TOptimEnv.
           destruct (lift_oncoll
            (fun c1 : list data =>
             match
-              rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+              rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
             with
             | Some a' => Some (dcoll a')
             | None => None
@@ -1467,7 +1467,7 @@ Section TOptimEnv.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+                     rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
@@ -1526,7 +1526,7 @@ Section TOptimEnv.
                 lift_oncoll
                   (fun c1 : list data =>
                    match
-                     rmap (fun_of_cnraenv brand_relation_brands c q₁ env) c1
+                     rmap (cnraenv_eval brand_relation_brands c q₁ env) c1
                    with
                    | Some a' => Some (dcoll a')
                    | None => None
@@ -1571,7 +1571,7 @@ Section TOptimEnv.
                         (fun c1 : list data =>
                          match
                            rmap
-                             (fun_of_cnraenv brand_relation_brands c q₁ env)
+                             (cnraenv_eval brand_relation_brands c q₁ env)
                              c1
                          with
                          | Some a' => Some (dcoll a')
@@ -1636,7 +1636,7 @@ Section TOptimEnv.
                         (fun c1 : list data =>
                          match
                            rmap
-                             (fun_of_cnraenv brand_relation_brands c q₁ env)
+                             (cnraenv_eval brand_relation_brands c q₁ env)
                              c1
                          with
                          | Some a' => Some (dcoll a')
@@ -1673,7 +1673,7 @@ Section TOptimEnv.
                             (fun c1 : list data =>
                                lift dcoll
                                     (rmap
-                                       (fun_of_cnraenv brand_relation_brands c q₁ env)
+                                       (cnraenv_eval brand_relation_brands c q₁ env)
                                        c1)) d)
                        (lift dcoll
                              match
@@ -1699,18 +1699,18 @@ Section TOptimEnv.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
         unfold lift in *.
         case_eq (rflatten l); intros; rewrite H in *.
-        destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try congruence.
+        destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try congruence.
         rewrite (rflatten_cons [d] l l1 H).
         inversion IHdout; subst.
         reflexivity.
-        destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try congruence.
+        destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try congruence.
         rewrite rflatten_cons_none; try assumption; reflexivity.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
         unfold lift in *.
         case_eq (rflatten l); intros; rewrite H in *. congruence.
         rewrite rflatten_cons_none; try assumption.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
-        destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l); try congruence.
+        destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l); try congruence.
         simpl in *; congruence.
         reflexivity.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); reflexivity.
@@ -1722,7 +1722,7 @@ Section TOptimEnv.
                             (fun c1 : list data =>
                                lift dcoll
                                     (rmap
-                                       (fun_of_cnraenv brand_relation_brands c q₁ env)
+                                       (cnraenv_eval brand_relation_brands c q₁ env)
                                        c1)) d)
                        (lift dcoll
                              match
@@ -1748,13 +1748,13 @@ Section TOptimEnv.
       + destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;env); try reflexivity; simpl.
         unfold lift in *.
         case_eq (rflatten l); intros; rewrite H in *.
-        destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try congruence.
+        destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try congruence.
         rewrite (rflatten_cons [] l l1 H).
         inversion IHdout; subst.
         reflexivity.
-        destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try congruence.
+        destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try congruence.
         rewrite rflatten_cons_none; try assumption; reflexivity.
-        destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ env) l0); try congruence.
+        destruct (rmap (cnraenv_eval brand_relation_brands c q₁ env) l0); try congruence.
         unfold lift in *.
         case_eq (rflatten l); intros; rewrite H in *.
         rewrite (rflatten_cons [] l l2 H).
@@ -2220,7 +2220,7 @@ Section TOptimEnv.
       rewrite (cnraenv_ignores_env_swap q₁ H _ c x a a).
       destruct (brand_relation_brands ⊢ₑ q₁ @ₑ a ⊣ c;a); try reflexivity; simpl.
       unfold lift in *.
-      destruct (rmap (fun_of_cnraenv brand_relation_brands c q₁ x) l);
+      destruct (rmap (cnraenv_eval brand_relation_brands c q₁ x) l);
         destruct (rmap (fun x0 : data => brand_relation_brands ⊢ₑ q₁ @ₑ x0 ⊣ c;x0) l);
         simpl in *; congruence.
   Qed.

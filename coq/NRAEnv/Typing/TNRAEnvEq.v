@@ -117,7 +117,7 @@ Section TNRAEnvEq.
 
   (** Thanks to shallow semantics, lifting between cnraenv and nraenv is easy *)
   Section eq_lift.
-    Require Import RAlgEnv TAlgEnvEq.
+    Require Import cNRAEnv TcNRAEnvEq.
     Open Scope cnraenv_scope.
 
     Lemma lift_tcnraenv_eq_to_tnraenv_eq_r (q1 q2:cnraenv) :

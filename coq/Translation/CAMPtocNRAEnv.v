@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section CAMPtoNRAEnv.
+Section CAMPtocNRAEnv.
   Require Import String.
   Require Import List.
 
@@ -85,7 +85,7 @@ Section CAMPtoNRAEnv.
   Local Open Scope alg_scope.
 
   Lemma pat_envtrans_correct h c q env d:
-    lift_failure (interp h c q env d) = fun_of_cnraenv h c (cnraenv_of_pat q) (drec env) d.
+    lift_failure (interp h c q env d) = cnraenv_eval h c (cnraenv_of_pat q) (drec env) d.
   Proof.
     revert d env; induction q; simpl; intros.
     (* pconst *)
@@ -109,7 +109,7 @@ Section CAMPtoNRAEnv.
       destruct (interp h c q env a); try reflexivity; simpl.
       * rewrite IHl; clear IHl; simpl.
         unfold lift; simpl.
-        destruct (rmap (fun_of_cnraenv h c (cnraenv_of_pat q) (drec env)) l); try reflexivity; simpl.
+        destruct (rmap (cnraenv_eval h c (cnraenv_of_pat q) (drec env)) l); try reflexivity; simpl.
         unfold rflatten, lift; simpl.
         destruct (oflat_map
             (fun x : data =>
@@ -118,7 +118,7 @@ Section CAMPtoNRAEnv.
              | _ => None
              end) l0); reflexivity.
       * unfold lift, liftpr in *; simpl in *.
-        revert IHl; generalize (rmap (fun_of_cnraenv h c (cnraenv_of_pat q) (drec env)) l); intros.
+        revert IHl; generalize (rmap (cnraenv_eval h c (cnraenv_of_pat q) (drec env)) l); intros.
         destruct o; simpl in *.
         revert IHl; generalize (gather_successes (map (interp h c q env) l)); intros.
         destruct p; unfold rflatten in *; simpl in *; try congruence;
@@ -169,7 +169,7 @@ Section CAMPtoNRAEnv.
   
   Lemma pat_envtrans_equiv_to_alg h c p bind d:
     nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
-    fun_of_cnraenv h c (cnraenv_of_pat p) (drec bind) d.
+    cnraenv_eval h c (cnraenv_of_pat p) (drec bind) d.
   Proof.
     rewrite <- pat_envtrans_correct.
     rewrite pat_trans_correct; reflexivity.
@@ -178,7 +178,7 @@ Section CAMPtoNRAEnv.
   Lemma cnraenv_of_pat_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
     nra_eval h (alg_of_pat_top c p) d =
-    fun_of_cnraenv h c (cnraenv_of_pat_top p) (drec nil) d.
+    cnraenv_eval h c (cnraenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.
     simpl.
@@ -191,10 +191,10 @@ Section CAMPtoNRAEnv.
   Lemma epat_trans_top_correct h c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
     (* XXX Why nil for local-env there?! Probably should have a interp_top with fixed nil local-env XXX *)
-    lift_failure (interp h c p nil d) = fun_of_cnraenv h c (cnraenv_of_pat_top p) (drec nil) d.
+    lift_failure (interp h c p nil d) = cnraenv_eval h c (cnraenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.
-    unfold fun_of_cnraenv.
+    unfold cnraenv_eval.
     rewrite <- (cnraenv_of_pat_top_id h c); trivial.
     rewrite pat_trans_correct.
     rewrite pat_trans_top_pat_context; trivial; reflexivity.
@@ -221,7 +221,7 @@ Section CAMPtoNRAEnv.
 
   End size.
 
-End CAMPtoNRAEnv.
+End CAMPtocNRAEnv.
 
 (* 
 *** Local Variables: ***

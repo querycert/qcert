@@ -21,7 +21,7 @@ Section RConstants.
   Require Import List.
   Require Import RUtil RList RSublist RFresh RBindings RAssoc. 
   
-  (* Java equivalent: NraToNnrc inline in algenv_to_nnrc *)
+  (* Java equivalent: NraToNnrc inline in cnraenv_to_nnrc *)
   Definition CONST_PREFIX:string := "CONST$"%string.
 
   Definition mkConstants {A} (l:list (string*A))

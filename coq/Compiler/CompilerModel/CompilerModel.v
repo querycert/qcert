@@ -22,7 +22,7 @@ Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.
 Require Import OptimizerLogger.
 Require Import ForeignType ForeignDataTyping.
-Require Import RAlgEnv NRAEnv NNRC.
+Require Import NNRC cNRAEnv NRAEnv.
 Require Import DNNRC Dataset.
 Require Import TDNNRCInfer.
 

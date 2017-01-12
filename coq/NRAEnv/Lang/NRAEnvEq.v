@@ -18,7 +18,7 @@ Section NRAEnvEq.
   Require Import String List Compare_dec.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlgEnv RAlgEnvEq.
+  Require Import cNRAEnv cNRAEnvEq.
   Require Import NRAEnv.
 
   (* Equivalence for extended algebra *)
@@ -63,7 +63,7 @@ Section NRAEnvEq.
   Notation "X ≡ₓ Y" := (nraenv_eq X Y) (at level 90) : nraenv_scope. (* ≡ = \equiv *)
   (** Thanks to shallow semantics, lifting between cnraenv and nraenv is easy *)
   Section eq_lift.
-    Require Import RAlgEnv RAlgEnvEq.
+    Require Import cNRAEnv cNRAEnvEq.
     Open Scope cnraenv_scope.
 
     Lemma lift_cnraenv_eq_to_nraenv_eq_r (q1 q2:cnraenv) :

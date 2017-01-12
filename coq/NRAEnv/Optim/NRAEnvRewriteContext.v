@@ -28,10 +28,10 @@ Section ROptimEnvContext.
   Require Import Arith List.
   
   Require Import Utils BasicRuntime.
-  Require Import NRA RAlgEnv RAlgEnvEq.
+  Require Import NRA cNRAEnv cNRAEnvEq.
   
   Require Import NRAContext NRAEnvRewrite NRARewriteContext.
-  Require Import RAlgEnvContext RAlgEnvContextLift.
+  Require Import cNRAEnvContext cNRAEnvContextLift.
   Local Open Scope cnraenv_ctxt.
 
   Context {fruntime:foreign_runtime}.

@@ -24,9 +24,9 @@ Section NRAEnvOptimFunc.
   Require Import String List ListSet.
 
   Require Import Utils BasicSystem.
-  Require Import RAlgEnv RAlgEnvEq TAlgEnv TAlgEnvEq.
+  Require Import cNRAEnv cNRAEnvEq TcNRAEnv TcNRAEnvEq.
   Require Import NRAEnv NRAEnvEq TNRAEnv TNRAEnvEq NRAEnvRewrite TNRAEnvRewrite.
-  Require Import RAlgEnvIgnore TAlgEnvIgnore NRAEnvIgnore RAlgEnvSize NRAEnvSize.
+  Require Import cNRAEnvIgnore TcNRAEnvIgnore NRAEnvIgnore cNRAEnvSize NRAEnvSize.
   
   Require Import OptimizerStep OptimizerLogger.
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section CAMPSugartoNRAEnv.
+Section CAMPSugartocNRAEnv.
 
   Require Import String.
   Require Import List.
@@ -22,7 +22,7 @@ Section CAMPSugartoNRAEnv.
   Require Import Utils BasicRuntime.
   Require Import NRAEnvRuntime.
   Require Import CAMPRuntime RuleRuntime.
-  Require Import CAMPtoNRAEnv.
+  Require Import CAMPtocNRAEnv.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -51,7 +51,7 @@ Section CAMPSugartoNRAEnv.
   Definition cnraenv_of_WW (p:pat) :=
     cnraenv_of_pat (WW p).
 
-End CAMPSugartoNRAEnv.
+End CAMPSugartocNRAEnv.
 
 (* 
 *** Local Variables: ***

@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicRuntime.
-Require Export RAlgEnv RAlgEnvEq RAlgEnvSize RAlgEnvIgnore.
+Require Export cNRAEnv cNRAEnvEq cNRAEnvSize cNRAEnvIgnore.
 Require Export NRAEnv NRAEnvSize NRAEnvIgnore NRAEnvEq.
 
 (* 

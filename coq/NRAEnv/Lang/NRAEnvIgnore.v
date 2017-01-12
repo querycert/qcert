@@ -344,7 +344,7 @@ Section NRAEnvIgnore.
       auto.
   Qed.
 
-  Require Import RAlgEnvIgnore.
+  Require Import cNRAEnvIgnore.
 
   Lemma nraenv_ignores_env_cnraenv_eq (e:nraenv) :
     nraenv_ignores_env e ->

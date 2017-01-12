@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TAlgEnvInfer.
+Section TcNRAEnvInfer.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
@@ -24,8 +24,8 @@ Section TAlgEnvInfer.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlgEnv.
-  Require Import TAlgEnv.
+  Require Import cNRAEnv.
+  Require Import TcNRAEnv.
 
   Require Import Program.
 
@@ -471,7 +471,7 @@ Section TAlgEnvInfer.
 
   (* Still should try and prove most specific and completeness theorems ... *)
   
-End TAlgEnvInfer.
+End TcNRAEnvInfer.
 
 (* 
 *** Local Variables: ***

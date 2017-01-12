@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section RAlgEnvEq.
+Section cNRAEnvEq.
   Require Import String List Compare_dec.
   
   Require Import Utils BasicRuntime.
   Require Import NRARuntime.
-  Require Import RAlgEnv RAlgEnvIgnore.
+  Require Import cNRAEnv cNRAEnvIgnore.
 
   Local Open Scope string.
   Local Open Scope cnraenv_scope.
@@ -408,7 +408,7 @@ Section RAlgEnvEq.
   Proof.
     unfold Proper, respectful, alg_eq, cnraenv_eq.
     intros.
-    repeat rewrite <- fun_of_cnraenv_of_alg.
+    repeat rewrite <- cnraenv_eval_of_alg.
     auto.
   Qed.
   
@@ -471,7 +471,7 @@ Section RAlgEnvEq.
       (d:data),
       h ⊢ₑ q @ₑ x ⊣ c;env = Some d -> P d.
 
-End RAlgEnvEq.
+End cNRAEnvEq.
 
 Notation "X ≡ₑ Y" := (cnraenv_eq X Y) (at level 90) : cnraenv_scope.                             (* ≡ = \equiv *)
 

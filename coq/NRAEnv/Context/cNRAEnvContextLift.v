@@ -18,7 +18,7 @@
  * Algebra contexts *
  *******************************)
 
-Section RAlgEnvContext.
+Section cNRAEnvContext.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -33,7 +33,7 @@ Section RAlgEnvContext.
 
   Require Import Utils BasicRuntime.
   Require Import NRARuntime NRAOptim.
-  Require Import RAlgEnv RAlgEnvIgnore RAlgEnvEq RAlgEnvContext.
+  Require Import cNRAEnv cNRAEnvIgnore cNRAEnvEq cNRAEnvContext.
 
 (*
     Lemma aec_substs_prop_part2 c ps1 ps2 :
@@ -159,7 +159,7 @@ Section RAlgEnvContext.
   Proof.
     red; intros.
     simpl.
-    rewrite <- fun_of_cnraenv_of_alg.
+    rewrite <- cnraenv_eval_of_alg.
     rewrite unfold_env_alg_sort.
     rewrite (map_normalize_normalized_eq h (rec_sort c)).
     - rewrite drec_sort_idempotent.
@@ -193,7 +193,7 @@ Section RAlgEnvContext.
               | [H: data_normalized _ (dright _) |- _ ] => inversion H; clear H; try subst
               end.
 
-  Hint Resolve fun_of_cnraenv_normalized.
+  Hint Resolve cnraenv_eval_normalized.
   Hint Resolve data_normalized_dcoll_in.
 
   Instance aeu_Binop_proper h c env :
@@ -604,7 +604,7 @@ Section RAlgEnvContext.
     apply lift_alg_context_proper.
   Qed.
 
-End RAlgEnvContext.
+End cNRAEnvContext.
 
 (* 
 *** Local Variables: ***

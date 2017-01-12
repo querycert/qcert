@@ -18,7 +18,7 @@
  * Algebra contexts *
  *******************************)
 
-Section RAlgEnvContext.
+Section cNRAEnvContext.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -32,7 +32,7 @@ Section RAlgEnvContext.
   Require Import Arith Bool.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlgEnv RAlgEnvEq.
+  Require Import cNRAEnv cNRAEnvEq.
   Require Import RBindingsNat.
 
   Local Open Scope cnraenv_scope.
@@ -1137,7 +1137,7 @@ Section RAlgEnvContext.
 
   End equivs.
   
-   End RAlgEnvContext.
+End cNRAEnvContext.
 
 (* TODO: show that the constructors of context are all proper with respect to context equivalence *)
 

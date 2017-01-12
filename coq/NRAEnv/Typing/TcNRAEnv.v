@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TAlgEnv.
+Section TcNRAEnv.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
@@ -22,7 +22,7 @@ Section TAlgEnv.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlgEnv RAlgEnvEq.
+  Require Import cNRAEnv cNRAEnvEq.
   Require Import NRAEnv.
 
   Local Open Scope cnraenv_scope.
@@ -109,7 +109,7 @@ Section TAlgEnv.
     (op1 ▷ τ₁ >=> τ₂ ⊣ τc; τenv) ->
     (forall d : data,
        data_type d τ₁ -> exists x : data, brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c; env = Some x /\ x ▹ τ₂) ->
-    exists x : list data, (rmap (fun_of_cnraenv brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (rmap (cnraenv_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros dt_c; intros.
     induction dl; simpl; intros.
@@ -141,7 +141,7 @@ Section TAlgEnv.
        forall d : data,
          data_type d τ₁ ->
          exists x : data, brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c;env = Some x /\ data_type x τ₂) ->
-    exists x : list data, (rmap (fun env' => (fun_of_cnraenv brand_relation_brands c op1 env' x0)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (rmap (fun env' => (cnraenv_eval brand_relation_brands c op1 env' x0)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros dt_c.
     induction dl; simpl; intros.
@@ -321,7 +321,7 @@ Section TAlgEnv.
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
                    brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c;env = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_concat (fun_of_cnraenv brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+    exists x : list data, (rmap_concat (cnraenv_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
     intros dt_c Henv.
     intros; rewrite Forall_forall in *.
@@ -436,7 +436,7 @@ Section TAlgEnv.
       invcs H1.
       rtype_equalizer.
       subst.
-      assert (EE : exists x : list data, (rmap (fun_of_cnraenv brand_relation_brands c op1 env) dl = Some x)
+      assert (EE : exists x : list data, (rmap (cnraenv_eval brand_relation_brands c op1 env) dl = Some x)
                                     /\ data_type (dcoll x) (Coll τ₂)).
       + apply (@rmap_typed τc τenv τ₁ τ₂ c op1 env dl dt_c Henv); trivial.
         apply IHcnraenv_type1; trivial.
@@ -450,7 +450,7 @@ Section TAlgEnv.
       elim H1; intros; clear H1.
       rewrite H0; clear H0.
       invcs H2.
-      assert (EE : exists x : list data, (rmap_concat (fun_of_cnraenv brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      assert (EE : exists x : list data, (rmap_concat (cnraenv_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
       + apply (rmap_concat_typed_env op1 c env dl pf1 pf2 pf3 dt_c Henv); try assumption; try reflexivity.
         apply recover_rec_forall with (r:= r); assumption.
         apply IHcnraenv_type1; assumption.
@@ -561,7 +561,7 @@ Section TAlgEnv.
     - intros.
       invcs Henv; rtype_equalizer.
       subst; simpl.
-      assert (exists x : list data, (rmap (fun env' : data => (fun_of_cnraenv brand_relation_brands c op1 env' d)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂)).
+      assert (exists x : list data, (rmap (fun env' : data => (cnraenv_eval brand_relation_brands c op1 env' d)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂)).
       * apply (@rmap_env_typed τc τenv τin τ₂); try assumption.
       * destruct H1 as [? [eqq dt]].
         rewrite eqq; simpl.
@@ -1104,7 +1104,7 @@ Section TAlgEnv.
     - apply typed_cnraenv_const_sort_b; trivial.
   Qed.
 
-End TAlgEnv.
+End TcNRAEnv.
 
 (* Typed algebraic plan *)
 
@@ -1186,7 +1186,7 @@ Ltac input_well_typed :=
               HI:?x ▹ ?τin,
               HC:bindings_type ?c ?τc,
               HE:?env ▹ ?τenv
-              |- context [(fun_of_cnraenv ?h ?c ?op ?env ?x)]] =>
+              |- context [(cnraenv_eval ?h ?c ?op ?env ?x)]] =>
              let xout := fresh "dout" in
              let xtype := fresh "τout" in
              let xeval := fresh "eout" in

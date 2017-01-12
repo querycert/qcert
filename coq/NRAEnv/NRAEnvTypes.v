@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicTypes.
-Require Export TAlgEnv TAlgEnvEq TAlgEnvIgnore.
+Require Export TcNRAEnv TcNRAEnvEq TcNRAEnvIgnore.
 Require Export TNRAEnv TNRAEnvEq.
 
 (* 

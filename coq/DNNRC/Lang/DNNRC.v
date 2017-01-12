@@ -531,12 +531,12 @@ Section DNNRC.
   End GenDNNRC.
 
   Section NraEnvPlug.
-    Require Import RAlgEnv.
+    Require Import cNRAEnv.
     
     Definition nraenv_eval h aconstant_env op :=
       let aenv := drec nil in (* empty local environment to start, which is an empty record *)
       let aid := dcoll ((drec nil)::nil) in (* to be checked *)
-      fun_of_cnraenv h (bindings_of_coll_bindings aconstant_env) op aenv aid.
+      cnraenv_eval h (bindings_of_coll_bindings aconstant_env) op aenv aid.
 
     Lemma nraenv_eval_normalized h :
       forall op:cnraenv, forall (constant_env:coll_bindings) (o:data),
@@ -545,14 +545,14 @@ Section DNNRC.
       data_normalized h o.
     Proof.
       intros.
-      specialize (@fun_of_cnraenv_normalized _ h (bindings_of_coll_bindings constant_env) op (drec nil) (dcoll ((drec nil)::nil))); intros.
+      specialize (@cnraenv_eval_normalized _ h (bindings_of_coll_bindings constant_env) op (drec nil) (dcoll ((drec nil)::nil))); intros.
       unfold bindings_of_coll_bindings.
       apply H1; try assumption.
       repeat constructor.
       repeat constructor.
     Qed.
 
-    Global Program Instance AlgEnvPlug : (@AlgPlug cnraenv) :=
+    Global Program Instance NRAEnvPlug : (@AlgPlug cnraenv) :=
       mkAlgPlug nraenv_eval nraenv_eval_normalized.
 
     Definition dnnrc_cnraenv {A} := @dnnrc A cnraenv.

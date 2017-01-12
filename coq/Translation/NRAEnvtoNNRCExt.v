@@ -25,7 +25,6 @@ Section NRAEnvtoNNRCExt.
   Require Import Utils BasicRuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
-  Require Import NRAEnvtoNNRC.
 
   (* end hide *)
 
@@ -155,14 +154,17 @@ Section NRAEnvtoNNRCExt.
   Open Scope nraenv_scope.
 
   (* This is clearly not true *)
-  Example nraenv_to_nnrc_codepaths_different vid venv:
-    exists op,
-      ~ (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv)
-      = cnraenv_to_nnrc (cnraenv_of_nraenv op) vid venv).
-  Proof.
-    exists (NRAEnvGroupBy "a"%string nil%string NRAEnvID).
-    simpl; inversion 1.
-  Qed.
+  Section negResult.
+    Require Import cNRAEnvtoNNRC.
+    Example nraenv_to_nnrc_codepaths_different vid venv:
+      exists op,
+        ~ (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv)
+           = cnraenv_to_nnrc (cnraenv_of_nraenv op) vid venv).
+    Proof.
+      exists (NRAEnvGroupBy "a"%string nil%string NRAEnvID).
+      simpl; inversion 1.
+    Qed.
+  End negResult.
 
   Lemma nnrc_core_eval_binop_eq h env b op1 op2 op1' op2' :
     nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->

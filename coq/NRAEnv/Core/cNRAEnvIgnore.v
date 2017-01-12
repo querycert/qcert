@@ -14,11 +14,11 @@
  * limitations under the License.
  *)
 
-Section RAlgEnvIgnore.
+Section cNRAEnvIgnore.
 
   Require Import Bool List String.
   Require Import Utils BasicRuntime.
-  Require Import NRA NRAEq RAlgEnv.
+  Require Import NRA NRAEq cNRAEnv.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
@@ -328,16 +328,16 @@ Section RAlgEnvIgnore.
     - rewrite (IHe H h env1 env2); reflexivity.
     - inversion H; clear H.
       rewrite (IHe2 H1 h env1 env2); clear IHe2 H1.
-      generalize ((fun_of_cnraenv h c e2 env2)); intros.
+      generalize ((cnraenv_eval h c e2 env2)); intros.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl.
       rewrite (IHe1 H0 h env1 env2); clear IHe1 H0.
-      destruct (fun_of_cnraenv h c e1 env2 a); intros; trivial.
+      destruct (cnraenv_eval h c e1 env2 a); intros; trivial.
       unfold lift in *; simpl in *.
       revert IHl.
-      generalize (rmap (fun_of_cnraenv h c e1 env1) l); 
-        generalize (rmap (fun_of_cnraenv h c e1 env2) l); intros.
+      generalize (rmap (cnraenv_eval h c e1 env1) l); 
+        generalize (rmap (cnraenv_eval h c e1 env2) l); intros.
       destruct o1; destruct o0; simpl; congruence.
     - inversion H; clear H.
       rewrite (IHe2 H1 h env1 env2); clear IHe2 H1.
@@ -725,8 +725,8 @@ Section RAlgEnvIgnore.
       | AApp e1 e2 => ANApp (cnraenv_of_alg e1) (cnraenv_of_alg e2)
     end.
 
-  Lemma fun_of_cnraenv_of_alg h c e d env :
-    nra_eval h e d = fun_of_cnraenv h c (cnraenv_of_alg e) env d.
+  Lemma cnraenv_eval_of_alg h c e d env :
+    nra_eval h e d = cnraenv_eval h c (cnraenv_of_alg e) env d.
   Proof.
     revert d env.
     induction e; simpl; trivial; intros;
@@ -753,7 +753,7 @@ Section RAlgEnvIgnore.
     induction x; simpl; try congruence.
   Qed.
     
-End RAlgEnvIgnore.
+End cNRAEnvIgnore.
 
 (* 
 *** Local Variables: ***

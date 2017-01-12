@@ -22,7 +22,7 @@ Section ROptimEnv.
   Require Import Utils BasicRuntime.
 
   Require Import NRARuntime NRAOptim.
-  Require Import RAlgEnv RAlgEnvIgnore RAlgEnvEq.
+  Require Import cNRAEnv cNRAEnvIgnore cNRAEnvEq.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
@@ -148,7 +148,7 @@ Section ROptimEnv.
     induction l; try reflexivity; simpl.
     generalize (h ⊢ₑ p2 @ₑ a ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
-    revert IHl; generalize (rmap (fun_of_cnraenv h c p2 env) l); intros.
+    revert IHl; generalize (rmap (cnraenv_eval h c p2 env) l); intros.
     destruct o; try reflexivity; simpl.
     destruct (h ⊢ₑ p1 @ₑ d ⊣ c;env); try reflexivity; simpl.
     revert IHl; generalize (rmap
@@ -158,10 +158,10 @@ Section ROptimEnv.
                | None => None
                end) l); intros.
     destruct o; try reflexivity; simpl in *.
-    destruct (rmap (fun_of_cnraenv h c p1 env) l0).
+    destruct (rmap (cnraenv_eval h c p1 env) l0).
     inversion IHl; reflexivity.
     congruence.
-    destruct (rmap (fun_of_cnraenv h c p1 env) l0).
+    destruct (rmap (cnraenv_eval h c p1 env) l0).
     congruence.
     reflexivity.
     revert IHl; generalize (rmap
@@ -239,7 +239,7 @@ Section ROptimEnv.
     generalize (h ⊢ₑ p1 @ₑ a ⊣ c;env); clear a; intros.
     destruct o; try reflexivity; simpl.
     unfold lift in *; simpl in *.
-    revert IHl; generalize (rmap (fun_of_cnraenv h c p1 env) l); intros.
+    revert IHl; generalize (rmap (cnraenv_eval h c p1 env) l); intros.
     destruct o; try reflexivity; try congruence.
     unfold lift_oncoll in *; simpl in *.
     rewrite app_nil_r.
@@ -550,7 +550,7 @@ Section ROptimEnv.
               match h ⊢ₑ p1 @ₑ x ⊣ c;env with
               | Some x' => Some (dcoll (x' :: nil))
               | None => None
-              end) l); generalize (rmap (fun_of_cnraenv h c p1 env) l); intros.
+              end) l); generalize (rmap (cnraenv_eval h c p1 env) l); intros.
     unfold lift in *; simpl.
     destruct o; destruct o0; simpl; try reflexivity; try congruence.
     - simpl in *.
@@ -607,16 +607,16 @@ Section ROptimEnv.
                  (fun x : data =>
                   lift_oncoll
                     (fun c1 : list data =>
-                     lift dcoll (rmap (fun_of_cnraenv br c p₁ env) c1)) x) l);  [intros ? eqq2 | intros eqq2];
+                     lift dcoll (rmap (cnraenv_eval br c p₁ env) c1)) x) l);  [intros ? eqq2 | intros eqq2];
      rewrite eqq2 in IHl; simpl in * ).
     - apply lift_injective in IHl; [ | inversion 1; trivial].
       rewrite rmap_over_app.
       rewrite IHl.
-      destruct (rmap (fun_of_cnraenv br c p₁ env) l0); simpl; trivial.
+      destruct (rmap (cnraenv_eval br c p₁ env) l0); simpl; trivial.
     - apply none_lift in IHl.
       rewrite rmap_over_app.
       rewrite IHl; simpl.
-      destruct (rmap (fun_of_cnraenv br c p₁ env) l0); simpl; trivial.
+      destruct (rmap (cnraenv_eval br c p₁ env) l0); simpl; trivial.
     - clear IHl.
       cut False; [intuition | ].
       revert eqq1 l1 eqq2.
@@ -978,7 +978,7 @@ Section ROptimEnv.
     rewrite H0; simpl.
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;d); try reflexivity; simpl.
     f_equal; unfold lift in *; simpl in *.
-    destruct (rmap (fun_of_cnraenv h c p1 d) l);
+    destruct (rmap (cnraenv_eval h c p1 d) l);
       destruct (rmap
             (fun x0 : data =>
              olift (fun env' : data => h ⊢ₑ p1 @ₑ x0 ⊣ c;env') (h ⊢ₑ p0 @ₑ x0 ⊣ c;env)) l); congruence.
@@ -1706,19 +1706,19 @@ Section ROptimEnv.
                | Some x'0 =>
                    lift_oncoll
                      (fun c1 : list data =>
-                      match rmap (fun_of_cnraenv h c p₁ env) c1 with
+                      match rmap (cnraenv_eval h c p₁ env) c1 with
                       | Some a' => Some (dcoll a')
                       | None => None
                       end) x'0
                | None => None
                end) l);
-      destruct (rmap (fun_of_cnraenv h c p₂ env) l);
+      destruct (rmap (cnraenv_eval h c p₂ env) l);
       simpl in * .
     - destruct (rmap
             (fun x0 : data =>
              lift_oncoll
                (fun c1 : list data =>
-                match rmap (fun_of_cnraenv h c p₁ env) c1 with
+                match rmap (cnraenv_eval h c p₁ env) c1 with
                 | Some a' => Some (dcoll a')
                 | None => None
                 end) x0) l1); try discriminate.
@@ -1729,14 +1729,14 @@ Section ROptimEnv.
             (fun x0 : data =>
              lift_oncoll
                (fun c1 : list data =>
-                match rmap (fun_of_cnraenv h c p₁ env) c1 with
+                match rmap (cnraenv_eval h c p₁ env) c1 with
                 | Some a' => Some (dcoll a')
                 | None => None
                 end) x0) l0); try discriminate.
       trivial.
     - destruct ( lift_oncoll
          (fun c1 : list data =>
-          match rmap (fun_of_cnraenv h c p₁ env) c1 with
+          match rmap (cnraenv_eval h c p₁ env) c1 with
           | Some a' => Some (dcoll a')
           | None => None
           end) d); trivial.

@@ -14,16 +14,16 @@
  * limitations under the License.
  *)
 
-Section TAlgEnvIgnore.
+Section TcNRAEnvIgnore.
 
   Require Import List String.
 
   Require Import Utils BasicSystem.
 
-  Require Import NRA NRAEq RAlgEnv RAlgEnvEq.
+  Require Import NRA NRAEq cNRAEnv cNRAEnvEq.
 
-  Require Import RAlgEnvIgnore.
-  Require Import TAlgEnv.
+  Require Import cNRAEnvIgnore.
+  Require Import TcNRAEnv.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
@@ -116,7 +116,7 @@ Section TAlgEnvIgnore.
       econstructor; eauto.
   Qed.
 
-End TAlgEnvIgnore.
+End TcNRAEnvIgnore.
 
 (* 
 *** Local Variables: ***

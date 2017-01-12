@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export RAlgEnvContext RAlgEnvContextLift.
+Require Export cNRAEnvContext cNRAEnvContextLift.
 Require Export NRAEnvRewrite NRAEnvRewriteContext TNRAEnvRewrite.
 Require Export NRAEnvOptimizer.
 

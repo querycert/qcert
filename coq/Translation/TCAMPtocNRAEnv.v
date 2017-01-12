@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section TCAMPtoNRAEnv.
+Section TCAMPtocNRAEnv.
 
   Require Import String List.
 
   Require Import Utils BasicSystem.
   Require Import NRASystem NRAEnvSystem.
   Require Import CAMPSystem.
-  Require Import CAMPtoNRAEnv TCAMPtoNRA.
+  Require Import CAMPtocNRAEnv TCAMPtoNRA.
 
   Local Open Scope string_scope.
   Local Open Scope list_scope.
@@ -104,7 +104,7 @@ Section TCAMPtoNRAEnv.
     apply cnraenv_of_pat_type_preserve; eauto.
   Qed.
 
-  Require Import TRule RuletoNRAEnv.
+  Require Import TRule RuletocNRAEnv.
 
   Theorem cnraenv_of_rule_type_preserve τworld τout r :
     @rule_type m τworld τout r ->
@@ -114,7 +114,7 @@ Section TCAMPtoNRAEnv.
       apply cnraenv_of_pat_type_preserve; trivial.
     Qed.
 
-End TCAMPtoNRAEnv.
+End TCAMPtocNRAEnv.
 
 (* 
 *** Local Variables: ***

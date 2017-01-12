@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section RAlgEnv.
+Section cNRAEnv.
   Require Import String List Compare_dec.
   Require Import EquivDec.
 
@@ -77,33 +77,33 @@ Section RAlgEnv.
 
   Context (h:list(string*string)).
   Context (constant_env:list (string*data)).
-  Fixpoint fun_of_cnraenv (op:cnraenv) (env: data) (x:data) : option data :=
+  Fixpoint cnraenv_eval (op:cnraenv) (env: data) (x:data) : option data :=
     match op with
       | ANID => Some x
       | ANConst rd => Some (normalize_data h rd)
       | ANBinop bop op1 op2 =>
-        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (fun_of_cnraenv op1 env x) (fun_of_cnraenv op2 env x)
+        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (cnraenv_eval op1 env x) (cnraenv_eval op2 env x)
       | ANUnop uop op1 =>
-        olift (fun d1 => fun_of_unaryop h uop d1) (fun_of_cnraenv op1 env x)
+        olift (fun d1 => fun_of_unaryop h uop d1) (cnraenv_eval op1 env x)
       | ANMap op1 op2 =>
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (fun_of_cnraenv op1 env) c1)) d
-        in olift aux_map (fun_of_cnraenv op2 env x)
+            lift_oncoll (fun c1 => lift dcoll (rmap (cnraenv_eval op1 env) c1)) d
+        in olift aux_map (cnraenv_eval op2 env x)
       | ANMapConcat op1 op2 =>
         let aux_mapconcat d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun_of_cnraenv op1 env) c1)) d
-        in olift aux_mapconcat (fun_of_cnraenv op2 env x)
+            lift_oncoll (fun c1 => lift dcoll (rmap_concat (cnraenv_eval op1 env) c1)) d
+        in olift aux_mapconcat (cnraenv_eval op2 env x)
       | ANProduct op1 op2 =>
-        (* Note: (fun y => fun_of_cnraenv op2 x) does not depend on input,
+        (* Note: (fun y => cnraenv_eval op2 x) does not depend on input,
            but we still use a nested look and delay op2 evaluation so it does not
            fail in case the op1 operand is an empty collection -- this makes sure
            to align the semantics with the NNRC version. - Jerome *)
         let aux_product d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => fun_of_cnraenv op2 env x) c1)) d
-        in olift aux_product (fun_of_cnraenv op1 env x)
+            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => cnraenv_eval op2 env x) c1)) d
+        in olift aux_product (cnraenv_eval op1 env x)
       | ANSelect op1 op2 =>
         let pred x' :=
-            match fun_of_cnraenv op1 env x' with
+            match cnraenv_eval op1 env x' with
               | Some (dbool b) => Some b
               | _ => None
             end
@@ -111,15 +111,15 @@ Section RAlgEnv.
         let aux_select d :=
             lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
         in
-        olift aux_select (fun_of_cnraenv op2 env x)
+        olift aux_select (cnraenv_eval op2 env x)
       | ANEither opl opr =>
         match x with
-          | dleft dl => fun_of_cnraenv opl env dl
-          | dright dr => fun_of_cnraenv opr env dr
+          | dleft dl => cnraenv_eval opl env dl
+          | dright dr => cnraenv_eval opr env dr
           | _ => None
         end
       | ANEitherConcat op1 op2 =>
-        match fun_of_cnraenv op1 env x, fun_of_cnraenv op2 env x with
+        match cnraenv_eval op1 env x, cnraenv_eval op2 env x with
           | Some (dleft (drec l)), Some (drec t)  =>
             Some (dleft (drec (rec_concat_sort l t)))
           | Some (dright (drec r)), Some (drec t)  =>
@@ -128,20 +128,20 @@ Section RAlgEnv.
         end
       | ANDefault op1 op2 =>
         olift (fun d1 => match d1 with
-                               | dcoll nil => fun_of_cnraenv op2 env x
+                               | dcoll nil => cnraenv_eval op2 env x
                                | _ => Some d1
-                         end) (fun_of_cnraenv op1 env x)
+                         end) (cnraenv_eval op1 env x)
       | ANApp op2 op1 =>
-        olift (fun x' => fun_of_cnraenv op2 env x') (fun_of_cnraenv op1 env x)
+        olift (fun x' => cnraenv_eval op2 env x') (cnraenv_eval op1 env x)
       | ANGetConstant s => edot constant_env s
       | ANEnv => (Some env)
       | ANAppEnv op2 op1 =>
         (* Note: evaluate op1 to create a new environment;
                  evaluate op2 in that new environment *)
         (* This is the parallel to AApp, but for the environment *)
-        olift (fun env' => fun_of_cnraenv op2 env' x) (fun_of_cnraenv op1 env x)
+        olift (fun env' => cnraenv_eval op2 env' x) (cnraenv_eval op1 env x)
       | ANMapEnv op1 =>
-        lift_oncoll (fun c1 => lift dcoll (rmap ((fun env' => fun_of_cnraenv op1 env' x)) c1)) env
+        lift_oncoll (fun c1 => lift dcoll (rmap ((fun env' => cnraenv_eval op1 env' x)) c1)) env
     end.
 
   (** Functions used to map dual input env/data into single input *)
@@ -478,7 +478,7 @@ Section RAlgEnv.
   Qed.
 
   Lemma unfold_env_alg (ae:cnraenv) (env:data) (x:data) :
-    (fun_of_cnraenv ae env x) = (h ⊢ (alg_of_cnraenv ae) @ₐ (pat_context_data (drec constant_env) env x)).
+    (cnraenv_eval ae env x) = (h ⊢ (alg_of_cnraenv ae) @ₐ (pat_context_data (drec constant_env) env x)).
   Proof.
     revert env x; cnraenv_cases (induction ae) Case; simpl; intros.
     - Case "ANID"%string.
@@ -515,7 +515,7 @@ Section RAlgEnv.
          (map (fun x : data =>
            drec
              (("PBIND", env)
-              :: ("PCONST", drec constant_env) :: ("PDATA", x) :: nil)) l)); try reflexivity; try congruence; simpl; destruct (rmap (fun_of_cnraenv ae1 env) l); try reflexivity; try congruence.
+              :: ("PCONST", drec constant_env) :: ("PDATA", x) :: nil)) l)); try reflexivity; try congruence; simpl; destruct (rmap (cnraenv_eval ae1 env) l); try reflexivity; try congruence.
     - Case "ANMapConcat"%string.
       rewrite IHae2; clear IHae2.
       generalize (h ⊢ (alg_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x)); intros; clear ae2 x.
@@ -593,7 +593,7 @@ Section RAlgEnv.
              end) l1)
                       ); generalize (oflat_map
             (fun a0 : data =>
-             match fun_of_cnraenv ae1 env a0 with
+             match cnraenv_eval ae1 env a0 with
              | Some (dcoll y) => omap_concat a0 y
              | _ => None
              end) l) ; intros.
@@ -618,7 +618,7 @@ Section RAlgEnv.
         destruct (omap_concat a l0); simpl; try reflexivity.
         revert IHl; generalize (oflat_map
          (fun a0 : data =>
-          match fun_of_cnraenv ae1 env a0 with
+          match cnraenv_eval ae1 env a0 with
           | Some (dcoll y) => omap_concat a0 y
           | _ => None
           end) l); intros.
@@ -650,7 +650,7 @@ Section RAlgEnv.
       * revert IHl.
         generalize (lift_filter
                       (fun x' : data =>
-                         match fun_of_cnraenv ae1 env x' with
+                         match cnraenv_eval ae1 env x' with
                            | Some (dbool b) => Some b
                            | _ => None
                          end) l);
@@ -679,7 +679,7 @@ Section RAlgEnv.
       * revert IHl.
         generalize (lift_filter
                       (fun x' : data =>
-                         match fun_of_cnraenv ae1 env x' with
+                         match cnraenv_eval ae1 env x' with
                            | Some (dbool b) => Some b
                            | _ => None
                          end) l);
@@ -735,22 +735,22 @@ Section RAlgEnv.
       revert IHl.
       destruct (rmap (nra_eval h (alg_of_cnraenv ae))
          (map (fun x0 : data => drec (("PBIND", x0) :: ("PCONST", drec constant_env) :: ("PDATA", x) :: nil))
-              l)); try reflexivity; try congruence; simpl; destruct (rmap (fun env' => (fun_of_cnraenv ae env' x)) l); try reflexivity; try congruence.
+              l)); try reflexivity; try congruence; simpl; destruct (rmap (fun env' => (cnraenv_eval ae env' x)) l); try reflexivity; try congruence.
   Qed.
   
-End RAlgEnv.
+End cNRAEnv.
 
 (* Delimit Scope cnraenv_scope with cnraenv. *)
 Delimit Scope cnraenv_scope with cnraenv.
 
-Notation "h ⊢ₑ op @ₑ x ⊣ c ; env " := (fun_of_cnraenv h c op env x) (at level 10) : cnraenv_scope.
+Notation "h ⊢ₑ op @ₑ x ⊣ c ; env " := (cnraenv_eval h c op env x) (at level 10) : cnraenv_scope.
 
 Section RCnraenv2.
   Local Open Scope cnraenv.
 
   Context {fruntime:foreign_runtime}.
 
-  Lemma fun_of_cnraenv_const_sort h p x c env :
+  Lemma cnraenv_eval_const_sort h p x c env :
     h ⊢ₑ p @ₑ x ⊣ (rec_sort c); env = h ⊢ₑ p @ₑ x ⊣ c; env.
   Proof.
     revert x c env.
@@ -784,16 +784,16 @@ Section RCnraenv2.
   Qed.
 
   Lemma unfold_env_alg_sort h c (ae:cnraenv) (env:data) (x:data) :
-    (fun_of_cnraenv h c ae env x) = (h ⊢ (alg_of_cnraenv ae) @ₐ (pat_context_data (drec (rec_sort c)) env x)).
+    (cnraenv_eval h c ae env x) = (h ⊢ (alg_of_cnraenv ae) @ₐ (pat_context_data (drec (rec_sort c)) env x)).
   Proof.
-    rewrite <- (fun_of_cnraenv_const_sort h _ x c env).
+    rewrite <- (cnraenv_eval_const_sort h _ x c env).
     rewrite unfold_env_alg by trivial.
     trivial.
   Qed.
 
    (* evaluation preserves normalization *)
-  Lemma fun_of_cnraenv_normalized h constant_env {op:cnraenv} {env d:data} {o} :
-    fun_of_cnraenv h constant_env op env d = Some o ->
+  Lemma cnraenv_eval_normalized h constant_env {op:cnraenv} {env d:data} {o} :
+    cnraenv_eval h constant_env op env d = Some o ->
     Forall (fun x => data_normalized h (snd x)) constant_env ->
     data_normalized h env ->
     data_normalized h d ->
@@ -847,7 +847,7 @@ Notation "r1 ◯ r2" := (ANApp r1 r2) (right associativity, at level 60): cnraen
 Notation "r1 ◯ₑ r2" := (ANAppEnv r1 r2) (right associativity, at level 60): cnraenv_scope.           (* ◯ = \bigcirc *)
 Notation "χᵉ⟨ p ⟩()" := (ANMapEnv p) (at level 70) : cnraenv_scope.                              (* χ = \chi *)
 
-Hint Resolve fun_of_cnraenv_normalized.
+Hint Resolve cnraenv_eval_normalized.
 
 Tactic Notation "cnraenv_cases" tactic(first) ident(c) :=
   first;

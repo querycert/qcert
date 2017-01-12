@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TAlgEnvEq.
+Section TcNRAEnvEq.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -26,8 +26,8 @@ Section TAlgEnvEq.
   Require Import String.
 
   Require Import Utils BasicSystem.
-  Require Import RAlgEnv RAlgEnvEq.
-  Require Import TAlgEnv.
+  Require Import cNRAEnv cNRAEnvEq.
+  Require Import TcNRAEnv.
 
   Local Open Scope cnraenv_scope.
   
@@ -119,7 +119,7 @@ Section TAlgEnvEq.
    * Proper stuff *
    ****************)
 
-  Require Import ROpsEq RAlgEnvEq.
+  Require Import ROpsEq.
   
   Global Instance  tcnraenv_rewrites_to_pre : PreOrder tcnraenv_rewrites_to.
   Proof.
@@ -208,7 +208,7 @@ Section TAlgEnvEq.
     input_well_typed.
     unfold lift in *.
     specialize (IHdout H7).
-    destruct (rmap (fun_of_cnraenv brand_relation_brands c x env) dout); destruct (rmap (fun_of_cnraenv brand_relation_brands c y env) dout); congruence.
+    destruct (rmap (cnraenv_eval brand_relation_brands c x env) dout); destruct (rmap (cnraenv_eval brand_relation_brands c y env) dout); congruence.
   Qed.
 
   (* ANMapConcat *)
@@ -391,7 +391,7 @@ Section TAlgEnvEq.
     rewrite Forall_forall in *; auto.
   Qed.
 
-End TAlgEnvEq.
+End TcNRAEnvEq.
 
 Notation "op1 ⇒ op2" := (tcnraenv_rewrites_to op1 op2) (at level 80) : cnraenv_scope.
 Notation "h ⊧ t1 ⇝ t2 ⊣ c ; tenv" := (@typed_cnraenv h c tenv t1 t2) (at level 80) : cnraenv_scope.

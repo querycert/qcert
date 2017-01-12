@@ -398,7 +398,7 @@ Section OQLtoNRAEnv.
     unfold oomap_concat in *; simpl.
     unfold oenv_map_concat_single in *; simpl.
     rewrite (H0 xenv).
-    destruct (RAlgEnv.fun_of_cnraenv h constant_env
+    destruct (cNRAEnv.cnraenv_eval h constant_env
                                     (cnraenv_of_nraenv (nraenv_of_oql_expr (domain defls) o))
                                     (drec (rec_concat_sort xenv defls))
           (drec a))%nraenv;
@@ -427,7 +427,7 @@ Section OQLtoNRAEnv.
                         (rmap
                            (fun x : data => Some (drec ((s, x) :: nil)))
                            c1)) d)
-                  (RAlgEnv.fun_of_cnraenv h constant_env
+                  (cNRAEnv.cnraenv_eval h constant_env
                   (cnraenv_of_nraenv (nraenv_of_oql_expr (domain defls) o)) (drec (rec_concat_sort xenv defls)) a0)%nraenv
               with
               | Some (dcoll y) => rmap (fun x : data => orecconcat a0 x) y
@@ -477,7 +477,7 @@ Section OQLtoNRAEnv.
     unfold oomap_concat in *; simpl.
     unfold oenv_map_concat_single_with_cast in *; simpl.
     rewrite (H0 xenv).
-    destruct (RAlgEnv.fun_of_cnraenv h constant_env
+    destruct (cNRAEnv.cnraenv_eval h constant_env
           (cnraenv_of_nraenv (nraenv_of_oql_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
           (drec a))%nraenv;
       try reflexivity; simpl.
@@ -591,7 +591,7 @@ Section OQLtoNRAEnv.
     unfold oenv_map_concat_single; simpl.
     rewrite (H xenv); clear H.
     unfold nraenv_eval; simpl.
-    destruct (RAlgEnv.fun_of_cnraenv h constant_env
+    destruct (cNRAEnv.cnraenv_eval h constant_env
           (cnraenv_of_nraenv (nraenv_of_oql_expr (domain defls) o)) (drec (rec_concat_sort xenv defls))
           (drec env))%nraenv;
       try reflexivity; simpl.

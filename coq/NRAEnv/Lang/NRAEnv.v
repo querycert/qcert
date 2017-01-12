@@ -19,7 +19,7 @@ Section NRAEnv.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import RAlgEnv.
+  Require Import cNRAEnv.
 
   (* Algebra *)
 
@@ -130,7 +130,7 @@ Section NRAEnv.
       )
       (ANUnop (ARec "$pregroup") op).
 
-  Require Import RAlgEnvEq.
+  Require Import cNRAEnvEq.
 
   (* Unnest *)
 
@@ -229,10 +229,10 @@ Section NRAEnv.
   Context (h:list(string*string)).
   
   Definition nraenv_eval c (e:nraenv) (env:data) (x:data) : option data :=
-    fun_of_cnraenv h c (cnraenv_of_nraenv e) env x.
+    cnraenv_eval h c (cnraenv_of_nraenv e) env x.
 
   Lemma initial_nraenv_ident c (e:cnraenv) (env:data) (x:data) :
-    nraenv_eval c (nraenv_of_cnraenv e) env x = fun_of_cnraenv h c e env x.
+    nraenv_eval c (nraenv_of_cnraenv e) env x = cnraenv_eval h c e env x.
   Proof.
     unfold nraenv_eval.
     rewrite nraenv_roundtrip.

@@ -22,7 +22,7 @@ Section TNRAEnv.
 
   Require Import Utils BasicSystem.
 
-  Require Import RAlgEnv TAlgEnv.
+  Require Import cNRAEnv TcNRAEnv.
   Require Import NRAEnv NRAEnvEq.
 
   Local Open Scope nraenv_scope.
