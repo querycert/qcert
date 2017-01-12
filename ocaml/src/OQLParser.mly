@@ -42,7 +42,7 @@
 %token DEFINE UNDEFINE
 
 %right FROM IN WHERE
-%right COMMA SEMI
+%right COMMA
 %right EQUAL NEQUAL
 %right LT GT LTEQ GTEQ
 %right PLUS MINUS
