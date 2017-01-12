@@ -193,7 +193,7 @@ Section NRAExt.
     
   Context (h:list(string*string)).
   
-  Definition fun_of_nraext (e:nraext) (x:data) : option data :=
+  Definition nraext_eval (e:nraext) (x:data) : option data :=
     nra_eval h (nra_of_nraext e) x.
 
   (** Nraebraic plan application *)
@@ -212,7 +212,7 @@ End NRAExt.
 (* begin hide *)
 Delimit Scope nraext_scope with nraext.
 
-Notation "h ⊢ EOp @ₓ x" := (fun_of_nraext h EOp x) (at level 10): nraext_scope.
+Notation "h ⊢ EOp @ₓ x" := (nraext_eval h EOp x) (at level 10): nraext_scope.
 
 Notation "'ID'" := (AXID)  (at level 50) : nraext_scope.                                           (* ◇ = \Diamond *)
 

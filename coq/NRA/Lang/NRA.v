@@ -125,7 +125,7 @@ Section NRA.
   Qed.
 
   (* evaluation preserves normalization *)
-  Lemma fun_of_nra_normalized {op:nra} {d:data} {o} :
+  Lemma nra_eval_normalized {op:nra} {d:data} {o} :
     nra_eval op d = Some o ->
     data_normalized h d ->
     data_normalized h o.
@@ -292,7 +292,7 @@ Notation "σ⟨ p ⟩( r )" := (ASelect p r) (at level 70) : nra_scope.         
 Notation "r1 ∥ r2" := (ADefault r1 r2) (right associativity, at level 70): nra_scope.       (* ∥ = \parallel *)
 Notation "r1 ◯ r2" := (AApp r1 r2) (right associativity, at level 60): nra_scope.           (* ◯ = \bigcirc *)
 
-Hint Resolve fun_of_nra_normalized.
+Hint Resolve nra_eval_normalized.
 
 Local Open Scope string_scope.
 Tactic Notation "nra_cases" tactic(first) ident(c) :=
