@@ -29,10 +29,10 @@ Section CAMPSugartoNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition algenv_of_pand (p1 p2:pat) : algenv :=
-    algenv_of_pat (pand p1 p2).
+  Definition cnraenv_of_pand (p1 p2:pat) : cnraenv :=
+    cnraenv_of_pat (pand p1 p2).
 
-  Definition algenv_for_pand (q1 q2: algenv) : algenv :=
+  Definition cnraenv_for_pand (q1 q2: cnraenv) : cnraenv :=
     ANUnop AFlatten
          (ANAppEnv (ANMapEnv q2)
             (ANUnop AFlatten
@@ -40,16 +40,16 @@ Section CAMPSugartoNRAEnv.
                   (ANMap (ANConst (drec nil))
                      (ANSelect ANID q1))))).
   
-  Lemma algenv_of_pand_works (p1 p2:pat) :
-    algenv_of_pat (pand p1 p2) = algenv_for_pand (algenv_of_pat p1) (algenv_of_pat p2).
+  Lemma cnraenv_of_pand_works (p1 p2:pat) :
+    cnraenv_of_pat (pand p1 p2) = cnraenv_for_pand (cnraenv_of_pat p1) (cnraenv_of_pat p2).
   Proof.
     reflexivity.
   Qed.
 
   (* WW *)
 
-  Definition algenv_of_WW (p:pat) :=
-    algenv_of_pat (WW p).
+  Definition cnraenv_of_WW (p:pat) :=
+    cnraenv_of_pat (WW p).
 
 End CAMPSugartoNRAEnv.
 

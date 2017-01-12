@@ -35,40 +35,40 @@ Section RAlgEnvContext.
   Require Import RAlgEnv RAlgEnvEq.
   Require Import RBindingsNat.
 
-  Local Open Scope algenv_scope.
+  Local Open Scope cnraenv_scope.
 
   Context {fruntime:foreign_runtime}.
 
-  Inductive algenv_ctxt : Set :=
-  | CNHole : nat -> algenv_ctxt
-  | CNPlug : algenv -> algenv_ctxt
-  | CANBinop : binOp -> algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANUnop : unaryOp -> algenv_ctxt -> algenv_ctxt
-  | CANMap : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANMapConcat : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANProduct : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANSelect : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANDefault : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANEither : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANEitherConcat : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANApp : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANAppEnv : algenv_ctxt -> algenv_ctxt -> algenv_ctxt
-  | CANMapEnv : algenv_ctxt -> algenv_ctxt
+  Inductive cnraenv_ctxt : Set :=
+  | CNHole : nat -> cnraenv_ctxt
+  | CNPlug : cnraenv -> cnraenv_ctxt
+  | CANBinop : binOp -> cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANUnop : unaryOp -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANMap : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANMapConcat : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANProduct : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANSelect : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANDefault : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANEither : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANEitherConcat : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANApp : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANAppEnv : cnraenv_ctxt -> cnraenv_ctxt -> cnraenv_ctxt
+  | CANMapEnv : cnraenv_ctxt -> cnraenv_ctxt
   .
 
-  Definition CANID : algenv_ctxt
+  Definition CANID : cnraenv_ctxt
     := CNPlug ANID.
 
-    Definition CANEnv : algenv_ctxt
+    Definition CANEnv : cnraenv_ctxt
     := CNPlug ANEnv.
 
-    Definition CANGetConstant s : algenv_ctxt
+    Definition CANGetConstant s : cnraenv_ctxt
     := CNPlug (ANGetConstant s).
 
-  Definition CANConst : data -> algenv_ctxt
+  Definition CANConst : data -> cnraenv_ctxt
     := fun d => CNPlug (ANConst d).
 
-  Fixpoint aec_holes (c:algenv_ctxt) : list nat :=
+  Fixpoint aec_holes (c:cnraenv_ctxt) : list nat :=
     match c with
       | CNHole x => x::nil
       | CNPlug a => nil
@@ -86,7 +86,7 @@ Section RAlgEnvContext.
       | CANMapEnv c1 => aec_holes c1
     end.
 
-  Fixpoint aec_simplify (c:algenv_ctxt) : algenv_ctxt :=
+  Fixpoint aec_simplify (c:cnraenv_ctxt) : cnraenv_ctxt :=
     match c with
       | CNHole x => CNHole x
       | CNPlug a => CNPlug a
@@ -164,7 +164,7 @@ Section RAlgEnvContext.
       repeat rewrite <- IHc; simpl; trivial].
   Qed.
 
-  Definition aec_algenv_of_ctxt c
+  Definition aec_cnraenv_of_ctxt c
     := match (aec_simplify c) with
          | CNPlug a => Some a
          | _ => None
@@ -183,12 +183,12 @@ Section RAlgEnvContext.
     rewrite e; eauto 2].
   Defined.
 
-  Lemma aec_algenv_of_ctxt_nholes c :
-    aec_holes c = nil -> {a | aec_algenv_of_ctxt c = Some a}.
+  Lemma aec_cnraenv_of_ctxt_nholes c :
+    aec_holes c = nil -> {a | aec_cnraenv_of_ctxt c = Some a}.
   Proof.
     intros ac0.
     destruct (aec_simplify_nholes _ ac0).
-    unfold aec_algenv_of_ctxt.
+    unfold aec_cnraenv_of_ctxt.
     rewrite e.
     eauto.
   Qed.
@@ -205,7 +205,7 @@ Section RAlgEnvContext.
                  match_destr; try congruence].
   Qed.
 
-  Fixpoint aec_subst (c:algenv_ctxt) (x:nat) (p:algenv) : algenv_ctxt :=
+  Fixpoint aec_subst (c:cnraenv_ctxt) (x:nat) (p:cnraenv) : cnraenv_ctxt :=
     match c with
       | CNHole x'
         => if x == x' then CNPlug p else CNHole x'
@@ -237,7 +237,7 @@ Section RAlgEnvContext.
         => CANMapEnv (aec_subst c1 x p)
     end.
 
-  Definition aec_substp (c:algenv_ctxt) xp
+  Definition aec_substp (c:cnraenv_ctxt) xp
     := let '(x, p) := xp in aec_subst c x p.
     
   Definition aec_substs c ps :=
@@ -659,10 +659,10 @@ Section RAlgEnvContext.
   Qed.
 
     Section equivs.
-    Context (base_equiv:algenv->algenv->Prop).
+    Context (base_equiv:cnraenv->cnraenv->Prop).
 
-    Definition algenv_ctxt_equiv (c1 c2 : algenv_ctxt)
-      := forall (ps:list (nat * algenv)),
+    Definition cnraenv_ctxt_equiv (c1 c2 : cnraenv_ctxt)
+      := forall (ps:list (nat * cnraenv)),
            match aec_simplify (aec_substs c1 ps),
                  aec_simplify (aec_substs c2 ps)
            with
@@ -670,8 +670,8 @@ Section RAlgEnvContext.
              | _, _ => True
            end.
 
-   Definition algenv_ctxt_equiv_strict (c1 c2 : algenv_ctxt)
-     := forall (ps:list (nat * algenv)),
+   Definition cnraenv_ctxt_equiv_strict (c1 c2 : cnraenv_ctxt)
+     := forall (ps:list (nat * cnraenv)),
           is_list_sorted lt_dec (domain ps) = true ->
           equivlist (domain ps) (aec_holes c1 ++ aec_holes c2) ->
           match aec_simplify (aec_substs c1 ps),
@@ -682,10 +682,10 @@ Section RAlgEnvContext.
           end.
 
    Global Instance aec_simplify_proper :
-     Proper (algenv_ctxt_equiv ==> algenv_ctxt_equiv) aec_simplify.
+     Proper (cnraenv_ctxt_equiv ==> cnraenv_ctxt_equiv) aec_simplify.
   Proof.
     unfold Proper, respectful.
-    unfold algenv_ctxt_equiv.
+    unfold cnraenv_ctxt_equiv.
     intros.
     repeat rewrite aec_simplify_substs_simplify1.
     specialize (H ps).
@@ -693,10 +693,10 @@ Section RAlgEnvContext.
   Qed.
   
   Lemma aec_simplify_proper_inv x y:
-    algenv_ctxt_equiv (aec_simplify x) (aec_simplify y) -> algenv_ctxt_equiv x y.
+    cnraenv_ctxt_equiv (aec_simplify x) (aec_simplify y) -> cnraenv_ctxt_equiv x y.
  Proof.
     unfold Proper, respectful.
-    unfold algenv_ctxt_equiv.
+    unfold cnraenv_ctxt_equiv.
     intros.
     specialize (H ps).
     repeat rewrite aec_simplify_substs_simplify1 in H.
@@ -704,25 +704,25 @@ Section RAlgEnvContext.
  Qed.
 
  Instance aec_subst_proper_part1 :
-   Proper (algenv_ctxt_equiv ==> eq ==> eq ==> algenv_ctxt_equiv) aec_subst.
+   Proper (cnraenv_ctxt_equiv ==> eq ==> eq ==> cnraenv_ctxt_equiv) aec_subst.
   Proof.
-    unfold Proper, respectful, algenv_ctxt_equiv.
+    unfold Proper, respectful, cnraenv_ctxt_equiv.
     intros. subst.
     specialize (H ((y0,y1)::ps)).
     simpl in H.
     match_destr; match_destr.
   Qed.
 
-  Global Instance aec_substs_proper_part1: Proper (algenv_ctxt_equiv ==> eq ==> algenv_ctxt_equiv) aec_substs.
+  Global Instance aec_substs_proper_part1: Proper (cnraenv_ctxt_equiv ==> eq ==> cnraenv_ctxt_equiv) aec_substs.
   Proof.
-    unfold Proper, respectful, algenv_ctxt_equiv.
+    unfold Proper, respectful, cnraenv_ctxt_equiv.
     intros. subst.
     repeat rewrite <- aec_substs_app.
     apply H.
   Qed.
 
-  Definition algenv_ctxt_equiv_strict1 (c1 c2 : algenv_ctxt)
-     := forall (ps:list (nat * algenv)),
+  Definition cnraenv_ctxt_equiv_strict1 (c1 c2 : cnraenv_ctxt)
+     := forall (ps:list (nat * cnraenv)),
           NoDup (domain ps) ->
           equivlist (domain ps) (aec_holes c1 ++ aec_holes c2) ->
           match aec_simplify (aec_substs c1 ps),
@@ -778,7 +778,7 @@ Section RAlgEnvContext.
      apply (Permutation_ind_bis
               (fun ps1 ps2 =>
                  NoDup (domain ps1) ->
-                 forall c : algenv_ctxt,
+                 forall c : cnraenv_ctxt,
                    aec_substs c ps1 =
                    aec_substs c ps2 )); intros; simpl.
      - trivial.
@@ -794,10 +794,10 @@ Section RAlgEnvContext.
    Qed. 
        
    (* They don't need to be sorted, as long as there are no duplicates *)
-   Lemma algenv_ctxt_equiv_strict_equiv1 (c1 c2 : algenv_ctxt) :
-     algenv_ctxt_equiv_strict1 c1 c2 <-> algenv_ctxt_equiv_strict c1 c2.
+   Lemma cnraenv_ctxt_equiv_strict_equiv1 (c1 c2 : cnraenv_ctxt) :
+     cnraenv_ctxt_equiv_strict1 c1 c2 <-> cnraenv_ctxt_equiv_strict c1 c2.
    Proof.
-     unfold algenv_ctxt_equiv_strict, algenv_ctxt_equiv_strict1.
+     unfold cnraenv_ctxt_equiv_strict, cnraenv_ctxt_equiv_strict1.
      split; intros.
      - apply H; trivial.
        apply is_list_sorted_NoDup in H0; trivial.
@@ -812,8 +812,8 @@ Section RAlgEnvContext.
    Qed.
 
    (* we don't really need to worry about duplicates either *)
-   Definition algenv_ctxt_equiv_strict2 (c1 c2 : algenv_ctxt)
-     := forall (ps:list (nat * algenv)),
+   Definition cnraenv_ctxt_equiv_strict2 (c1 c2 : cnraenv_ctxt)
+     := forall (ps:list (nat * cnraenv)),
           equivlist (domain ps) (aec_holes c1 ++ aec_holes c2) ->
           match aec_simplify (aec_substs c1 ps),
                 aec_simplify (aec_substs c2 ps)
@@ -871,10 +871,10 @@ Section RAlgEnvContext.
       simpl in *. intuition.
   Qed.
   
-   Lemma algenv_ctxt_equiv_strict1_equiv2 (c1 c2 : algenv_ctxt) :
-     algenv_ctxt_equiv_strict2 c1 c2 <-> algenv_ctxt_equiv_strict1 c1 c2.
+   Lemma cnraenv_ctxt_equiv_strict1_equiv2 (c1 c2 : cnraenv_ctxt) :
+     cnraenv_ctxt_equiv_strict2 c1 c2 <-> cnraenv_ctxt_equiv_strict1 c1 c2.
    Proof.
-     unfold algenv_ctxt_equiv_strict1, algenv_ctxt_equiv_strict2.
+     unfold cnraenv_ctxt_equiv_strict1, cnraenv_ctxt_equiv_strict2.
      split; intros H.
      - intros. apply H; trivial.
      - intros.
@@ -889,8 +889,8 @@ Section RAlgEnvContext.
    Qed.
 
    (* we don't really need to worry about having extra stuff either *)
-   Definition algenv_ctxt_equiv_strict3 (c1 c2 : algenv_ctxt)
-     := forall (ps:list (nat * algenv)),
+   Definition cnraenv_ctxt_equiv_strict3 (c1 c2 : cnraenv_ctxt)
+     := forall (ps:list (nat * cnraenv)),
           incl (aec_holes c1 ++ aec_holes c2) (domain ps)  ->
           match aec_simplify (aec_substs c1 ps),
                 aec_simplify (aec_substs c2 ps)
@@ -921,10 +921,10 @@ Section RAlgEnvContext.
        congruence.
    Qed.
          
-   Lemma algenv_ctxt_equiv_strict2_equiv3 (c1 c2 : algenv_ctxt) :
-     algenv_ctxt_equiv_strict3 c1 c2 <-> algenv_ctxt_equiv_strict2 c1 c2.
+   Lemma cnraenv_ctxt_equiv_strict2_equiv3 (c1 c2 : cnraenv_ctxt) :
+     cnraenv_ctxt_equiv_strict3 c1 c2 <-> cnraenv_ctxt_equiv_strict2 c1 c2.
    Proof.
-     unfold algenv_ctxt_equiv_strict2, algenv_ctxt_equiv_strict3.
+     unfold cnraenv_ctxt_equiv_strict2, cnraenv_ctxt_equiv_strict3.
      split; intros H.
      - intros. apply H; trivial. unfold equivlist, incl in *.
        intros; apply H0; trivial.
@@ -942,10 +942,10 @@ Section RAlgEnvContext.
          * apply incl_domain_cut_down_incl; trivial.
    Qed.
 
-   Lemma algenv_ctxt_equiv_strict3_equiv (c1 c2 : algenv_ctxt) :
-     algenv_ctxt_equiv c1 c2 <-> algenv_ctxt_equiv_strict3 c1 c2.
+   Lemma cnraenv_ctxt_equiv_strict3_equiv (c1 c2 : cnraenv_ctxt) :
+     cnraenv_ctxt_equiv c1 c2 <-> cnraenv_ctxt_equiv_strict3 c1 c2.
    Proof.
-     unfold algenv_ctxt_equiv_strict3, algenv_ctxt_equiv.
+     unfold cnraenv_ctxt_equiv_strict3, cnraenv_ctxt_equiv.
      intros.
       split; intros H.
      - intros. apply H; trivial.
@@ -968,13 +968,13 @@ Section RAlgEnvContext.
            inversion inn.
    Qed.
 
-   Theorem algenv_ctxt_equiv_strict_equiv (c1 c2 : algenv_ctxt) :
-     algenv_ctxt_equiv c1 c2 <-> algenv_ctxt_equiv_strict c1 c2.
+   Theorem cnraenv_ctxt_equiv_strict_equiv (c1 c2 : cnraenv_ctxt) :
+     cnraenv_ctxt_equiv c1 c2 <-> cnraenv_ctxt_equiv_strict c1 c2.
    Proof.
-     rewrite algenv_ctxt_equiv_strict3_equiv,
-     algenv_ctxt_equiv_strict2_equiv3,
-     algenv_ctxt_equiv_strict1_equiv2,
-     algenv_ctxt_equiv_strict_equiv1.
+     rewrite cnraenv_ctxt_equiv_strict3_equiv,
+     cnraenv_ctxt_equiv_strict2_equiv3,
+     cnraenv_ctxt_equiv_strict1_equiv2,
+     cnraenv_ctxt_equiv_strict_equiv1.
      reflexivity.
    Qed.
 
@@ -1008,23 +1008,23 @@ Section RAlgEnvContext.
       rewrite remove_all_filter. trivial.
   Qed.
 
-  Global Instance algenv_ctxt_equiv_refl {refl:Reflexive base_equiv}: Reflexive algenv_ctxt_equiv.
+  Global Instance cnraenv_ctxt_equiv_refl {refl:Reflexive base_equiv}: Reflexive cnraenv_ctxt_equiv.
   Proof.
-    unfold algenv_ctxt_equiv.
+    unfold cnraenv_ctxt_equiv.
     red; intros.
     - match_destr; reflexivity.
   Qed.   
 
-  Global Instance algenv_ctxt_equiv_sym {sym:Symmetric base_equiv}: Symmetric algenv_ctxt_equiv.
+  Global Instance cnraenv_ctxt_equiv_sym {sym:Symmetric base_equiv}: Symmetric cnraenv_ctxt_equiv.
   Proof.
-    unfold algenv_ctxt_equiv.
+    unfold cnraenv_ctxt_equiv.
     red; intros.
     - specialize (H ps). match_destr; match_destr. symmetry. trivial.
   Qed.
 
-  Global Instance algenv_ctxt_equiv_trans {trans:Transitive base_equiv}: Transitive algenv_ctxt_equiv.
+  Global Instance cnraenv_ctxt_equiv_trans {trans:Transitive base_equiv}: Transitive cnraenv_ctxt_equiv.
   Proof.
-    unfold algenv_ctxt_equiv.
+    unfold cnraenv_ctxt_equiv.
     red; intros.
     - specialize (H (ps ++ (map (fun x => (x, ANID)) (aec_holes y)))).
       specialize (H0 (ps ++ (map (fun x => (x, ANID)) (aec_holes y)))).
@@ -1052,7 +1052,7 @@ Section RAlgEnvContext.
         case_eq (fold_left (fun (a1 : list nat) (b : nat) => remove_all b a1)
      (aec_holes y)
      (fold_left
-        (fun (a1 : list nat) (b : nat * algenv) =>
+        (fun (a1 : list nat) (b : nat * cnraenv) =>
            remove_all (fst b) a1) ps (aec_holes y))); trivial.
         intros n rl fle.
         assert (inn:In n (n::rl)) by (simpl; intuition).
@@ -1066,7 +1066,7 @@ Section RAlgEnvContext.
         transitivity x0; trivial.
   Qed.
 
-  Global Instance algenv_ctxt_equiv_equivalence {equiv:Equivalence base_equiv}: Equivalence algenv_ctxt_equiv.
+  Global Instance cnraenv_ctxt_equiv_equivalence {equiv:Equivalence base_equiv}: Equivalence cnraenv_ctxt_equiv.
   Proof.
     constructor; red; intros.
     - reflexivity.
@@ -1074,35 +1074,35 @@ Section RAlgEnvContext.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance algenv_ctxt_equiv_preorder {pre:PreOrder base_equiv} : PreOrder algenv_ctxt_equiv.
+  Global Instance cnraenv_ctxt_equiv_preorder {pre:PreOrder base_equiv} : PreOrder cnraenv_ctxt_equiv.
   Proof.
     constructor; red; intros.
     - reflexivity.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance algenv_ctxt_equiv_strict_refl {refl:Reflexive base_equiv}: Reflexive algenv_ctxt_equiv_strict.
+  Global Instance cnraenv_ctxt_equiv_strict_refl {refl:Reflexive base_equiv}: Reflexive cnraenv_ctxt_equiv_strict.
   Proof.
     red; intros.
-    repeat rewrite <- algenv_ctxt_equiv_strict_equiv in *.
+    repeat rewrite <- cnraenv_ctxt_equiv_strict_equiv in *.
     reflexivity.
   Qed.   
 
-  Global Instance algenv_ctxt_equiv_strict_sym {sym:Symmetric base_equiv}: Symmetric algenv_ctxt_equiv_strict.
+  Global Instance cnraenv_ctxt_equiv_strict_sym {sym:Symmetric base_equiv}: Symmetric cnraenv_ctxt_equiv_strict.
   Proof.
     red; intros.
-    repeat rewrite <- algenv_ctxt_equiv_strict_equiv in *.
+    repeat rewrite <- cnraenv_ctxt_equiv_strict_equiv in *.
     symmetry; trivial.
   Qed.   
 
-  Global Instance algenv_ctxt_equiv_strict_trans {trans:Transitive base_equiv}: Transitive algenv_ctxt_equiv_strict.
+  Global Instance cnraenv_ctxt_equiv_strict_trans {trans:Transitive base_equiv}: Transitive cnraenv_ctxt_equiv_strict.
   Proof.
     red; intros.
-    repeat rewrite <- algenv_ctxt_equiv_strict_equiv in *.
+    repeat rewrite <- cnraenv_ctxt_equiv_strict_equiv in *.
     etransitivity; eauto.
   Qed.
   
-  Global Instance algenv_ctxt_equiv_strict_equivalence {equiv:Equivalence base_equiv}: Equivalence algenv_ctxt_equiv_strict.
+  Global Instance cnraenv_ctxt_equiv_strict_equivalence {equiv:Equivalence base_equiv}: Equivalence cnraenv_ctxt_equiv_strict.
   Proof.
     constructor; red; intros.
     - reflexivity.
@@ -1110,7 +1110,7 @@ Section RAlgEnvContext.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance algenv_ctxt_equiv_strict_preorder {pre:PreOrder base_equiv} : PreOrder algenv_ctxt_equiv_strict.
+  Global Instance cnraenv_ctxt_equiv_strict_preorder {pre:PreOrder base_equiv} : PreOrder cnraenv_ctxt_equiv_strict.
   Proof.
     constructor; red; intros.
     - reflexivity.
@@ -1118,19 +1118,19 @@ Section RAlgEnvContext.
   Qed.
 
   Global Instance CNPlug_proper :
-    Proper (base_equiv ==> algenv_ctxt_equiv) CNPlug.
+    Proper (base_equiv ==> cnraenv_ctxt_equiv) CNPlug.
   Proof.
     unfold Proper, respectful.
-    unfold algenv_ctxt_equiv.
+    unfold cnraenv_ctxt_equiv.
     intros. autorewrite with aec_substs.
     simpl; trivial.
   Qed.
 
   Global Instance CNPlug_proper_strict :
-    Proper (base_equiv ==> algenv_ctxt_equiv_strict) CNPlug.
+    Proper (base_equiv ==> cnraenv_ctxt_equiv_strict) CNPlug.
   Proof.
     unfold Proper, respectful.
-    unfold algenv_ctxt_equiv_strict.
+    unfold cnraenv_ctxt_equiv_strict.
     intros. autorewrite with aec_substs.
     simpl; trivial.
   Qed.
@@ -1141,50 +1141,50 @@ Section RAlgEnvContext.
 
 (* TODO: show that the constructors of context are all proper with respect to context equivalence *)
 
-Delimit Scope algenv_ctxt_scope with algenv_ctxt.
+Delimit Scope cnraenv_ctxt_scope with cnraenv_ctxt.
 
-Notation "'ID'" := (CANID)  (at level 50) : algenv_ctxt_scope.
-Notation "'ENV'" := (CANEnv)  (at level 50) : algenv_ctxt_scope.
+Notation "'ID'" := (CANID)  (at level 50) : cnraenv_ctxt_scope.
+Notation "'ENV'" := (CANEnv)  (at level 50) : cnraenv_ctxt_scope.
 
-Notation "‵‵ c" := (CANConst (dconst c))  (at level 0) : algenv_ctxt_scope.                           (* ‵ = \baeckprime *)
-Notation "‵ c" := (CANConst c)  (at level 0) : algenv_ctxt_scope.                                     (* ‵ = \baeckprime *)
-Notation "‵{||}" := (CANConst (dcoll nil))  (at level 0) : algenv_ctxt_scope.                         (* ‵ = \baeckprime *)
-Notation "‵[||]" := (CANConst (drec nil)) (at level 50) : algenv_ctxt_scope.                          (* ‵ = \baeckprime *)
+Notation "‵‵ c" := (CANConst (dconst c))  (at level 0) : cnraenv_ctxt_scope.                           (* ‵ = \baeckprime *)
+Notation "‵ c" := (CANConst c)  (at level 0) : cnraenv_ctxt_scope.                                     (* ‵ = \baeckprime *)
+Notation "‵{||}" := (CANConst (dcoll nil))  (at level 0) : cnraenv_ctxt_scope.                         (* ‵ = \baeckprime *)
+Notation "‵[||]" := (CANConst (drec nil)) (at level 50) : cnraenv_ctxt_scope.                          (* ‵ = \baeckprime *)
 
-Notation "r1 ∧ r2" := (CANBinop AAnd r1 r2) (right associativity, at level 65): algenv_ctxt_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (CANBinop AOr r1 r2) (right associativity, at level 70): algenv_ctxt_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (CANBinop AEq r1 r2) (right associativity, at level 70): algenv_ctxt_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (CANBinop ALt r1 r2) (no associativity, at level 70): algenv_ctxt_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (CANBinop AUnion r1 r2) (right associativity, at level 70): algenv_ctxt_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (CANBinop AMinus r1 r2) (right associativity, at level 70): algenv_ctxt_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (CANBinop AMin r1 r2) (right associativity, at level 70): algenv_ctxt_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (CANBinop AMax r1 r2) (right associativity, at level 70): algenv_ctxt_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((CANBinop AConcat) p r) (at level 70) : algenv_ctxt_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((CANBinop AMergeConcat) p r) (at level 70) : algenv_ctxt_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (CANBinop AAnd r1 r2) (right associativity, at level 65): cnraenv_ctxt_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (CANBinop AOr r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (CANBinop AEq r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (CANBinop ALt r1 r2) (no associativity, at level 70): cnraenv_ctxt_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (CANBinop AUnion r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (CANBinop AMinus r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (CANBinop AMin r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (CANBinop AMax r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((CANBinop AConcat) p r) (at level 70) : cnraenv_ctxt_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((CANBinop AMergeConcat) p r) (at level 70) : cnraenv_ctxt_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (CANUnop ANeg r1) (right associativity, at level 70): algenv_ctxt_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (CANUnop ADistinct r1) (right associativity, at level 70): algenv_ctxt_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (CANUnop ACount r1) (right associativity, at level 70): algenv_ctxt_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (CANUnop AFlatten d) (at level 50) : algenv_ctxt_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((CANUnop AColl) d)  (at level 50) : algenv_ctxt_scope.                        (* ‵ = \baeckprime *)
-Notation "‵[| ( s , r ) |]" := ((CANUnop (ARec s)) r) (at level 50) : algenv_ctxt_scope.              (* ‵ = \baeckprime *)
-Notation "¬π[ s1 ]( r )" := ((CANUnop (ARecRemove s1)) r) (at level 50) : algenv_ctxt_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((CANUnop (ADot r)) p) (left associativity, at level 40): algenv_ctxt_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (CANUnop ANeg r1) (right associativity, at level 70): cnraenv_ctxt_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (CANUnop ADistinct r1) (right associativity, at level 70): cnraenv_ctxt_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (CANUnop ACount r1) (right associativity, at level 70): cnraenv_ctxt_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (CANUnop AFlatten d) (at level 50) : cnraenv_ctxt_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((CANUnop AColl) d)  (at level 50) : cnraenv_ctxt_scope.                        (* ‵ = \baeckprime *)
+Notation "‵[| ( s , r ) |]" := ((CANUnop (ARec s)) r) (at level 50) : cnraenv_ctxt_scope.              (* ‵ = \baeckprime *)
+Notation "¬π[ s1 ]( r )" := ((CANUnop (ARecRemove s1)) r) (at level 50) : cnraenv_ctxt_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((CANUnop (ADot r)) p) (left associativity, at level 40): cnraenv_ctxt_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (CANMap p r) (at level 70) : algenv_ctxt_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CANMapConcat e2 e1) (at level 70) : algenv_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (CANProduct r1 r2) (right associativity, at level 70): algenv_ctxt_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (CANSelect p r) (at level 70) : algenv_ctxt_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (CANDefault r1 r2) (right associativity, at level 70): algenv_ctxt_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (CANApp r1 r2) (right associativity, at level 60): algenv_ctxt_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (CANMap p r) (at level 70) : cnraenv_ctxt_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CANMapConcat e2 e1) (at level 70) : cnraenv_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (CANProduct r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (CANSelect p r) (at level 70) : cnraenv_ctxt_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (CANDefault r1 r2) (right associativity, at level 70): cnraenv_ctxt_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (CANApp r1 r2) (right associativity, at level 60): cnraenv_ctxt_scope.           (* ◯ = \bigcirc *)
 
-Notation "r1 ◯ₑ r2" := (CANAppEnv r1 r2) (right associativity, at level 60): algenv_ctxt_scope.           (* ◯ = \bigcirc *)
+Notation "r1 ◯ₑ r2" := (CANAppEnv r1 r2) (right associativity, at level 60): cnraenv_ctxt_scope.           (* ◯ = \bigcirc *)
 
-Notation "χᵉ⟨ p ⟩( r )" := (CANMapEnv p r) (at level 70) : algenv_ctxt_scope.                              (* χ = \chi *)
+Notation "χᵉ⟨ p ⟩( r )" := (CANMapEnv p r) (at level 70) : cnraenv_ctxt_scope.                              (* χ = \chi *)
 
-Notation "$ n" := (CNHole n) (at level 50)  : algenv_ctxt_scope.
+Notation "$ n" := (CNHole n) (at level 50)  : cnraenv_ctxt_scope.
 
-Notation "X ≡ₑ Y" := (algenv_ctxt_equiv algenv_eq X Y) (at level 90) : algenv_ctxt_scope.
+Notation "X ≡ₑ Y" := (cnraenv_ctxt_equiv cnraenv_eq X Y) (at level 90) : cnraenv_ctxt_scope.
 
   Hint Rewrite
        @aec_substs_Plug

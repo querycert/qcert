@@ -32,7 +32,7 @@ Section ROptimEnvContext.
   
   Require Import NRAContext NRAEnvRewrite NRARewriteContext.
   Require Import RAlgEnvContext RAlgEnvContextLift.
-  Local Open Scope algenv_ctxt.
+  Local Open Scope cnraenv_ctxt.
 
   Context {fruntime:foreign_runtime}.
 
@@ -58,10 +58,10 @@ Section ROptimEnvContext.
        end.
 
   Ltac simpl_ctxt_equiv :=
-    try apply <- algenv_ctxt_equiv_strict_equiv;
+    try apply <- cnraenv_ctxt_equiv_strict_equiv;
     red; simpl; intros; simpl_plugins; simpl.
 
-  Local Open Scope algenv_ctxt_scope.
+  Local Open Scope cnraenv_ctxt_scope.
   Lemma envctxt_and_comm_ctxt :
     $2 ∧ $1 ≡ₑ $1 ∧ $2.
   Proof.

@@ -31,23 +31,23 @@ Section RuletoNRAEnv.
 
   (* Rule parts *)
 
-  Definition algenv_of_rule (r:rule) : algenv :=
-    algenv_of_pat (rule_to_pattern r).
+  Definition cnraenv_of_rule (r:rule) : cnraenv :=
+    cnraenv_of_pat (rule_to_pattern r).
 
   Lemma rule_envtrans_correct h c rps bind d :
     lift_failure (interp h c (rule_to_pattern rps) bind d) =
-    fun_of_algenv h c (algenv_of_rule rps) (drec bind) d.
+    fun_of_cnraenv h c (cnraenv_of_rule rps) (drec bind) d.
   Proof.
-    unfold algenv_of_rule.
+    unfold cnraenv_of_rule.
     generalize (rule_to_pattern rps); intros.
     apply pat_envtrans_correct.
   Qed.
 
   Lemma rule_parts_envtrans_correct_r h c rps bind d :
       interp h c (rule_to_pattern rps) bind d =
-      lift_pat_failure (fun_of_algenv h
+      lift_pat_failure (fun_of_cnraenv h
                                       c 
-                            (algenv_of_rule rps)
+                            (cnraenv_of_rule rps)
                             (drec bind) d).
   Proof.
     rewrite <- (rule_envtrans_correct _ ).
@@ -58,7 +58,7 @@ Section RuletoNRAEnv.
   (* Rules *)
   Lemma rule_trans_correct_r (h:list (string*string)) (r:rule) (world:list data) :
     eval_rule h r world =
-    lift_rule_failure (fun_of_algenv h (mkWorld world) (algenv_of_rule r) (drec nil) dunit).
+    lift_rule_failure (fun_of_cnraenv h (mkWorld world) (cnraenv_of_rule r) (drec nil) dunit).
   Proof.
     simpl; unfold eval_rule.
     generalize rule_envtrans_correct; intros.
@@ -71,20 +71,20 @@ Section RuletoNRAEnv.
 
   Require Import RuleSugar.
   
-  Definition algenv_of_aggregate (rules:rule->rule) (op:unaryOp) (secondMap:pat) (flatn:nat) : algenv :=
-    algenv_of_pat (aggregate rules op secondMap flatn).
+  Definition cnraenv_of_aggregate (rules:rule->rule) (op:unaryOp) (secondMap:pat) (flatn:nat) : cnraenv :=
+    cnraenv_of_pat (aggregate rules op secondMap flatn).
 
   Lemma aggregate_envtrans_correct h c rules op secondMap bind d (flatn:nat) :
     lift_failure (interp h c (aggregate rules op secondMap flatn) bind d) =
-    fun_of_algenv h c (algenv_of_aggregate rules op secondMap flatn) (drec bind) d.
+    fun_of_cnraenv h c (cnraenv_of_aggregate rules op secondMap flatn) (drec bind) d.
   Proof.
-    unfold algenv_of_aggregate.
+    unfold cnraenv_of_aggregate.
     apply pat_envtrans_correct.
   Qed.
 
   Lemma aggregate_envtrans_correct_r h c rules op secondMap bind d  (flatn:nat) :
     interp h c (aggregate rules op secondMap flatn) bind d =
-    lift_pat_failure (fun_of_algenv h c (algenv_of_aggregate rules op secondMap flatn) (drec bind) d).
+    lift_pat_failure (fun_of_cnraenv h c (cnraenv_of_aggregate rules op secondMap flatn) (drec bind) d).
   Proof.
     rewrite <- (aggregate_envtrans_correct _).
     generalize (AGGREGATE rules DO op OVER secondMap FLATTEN flatn)%rule; intros.
@@ -93,9 +93,9 @@ Section RuletoNRAEnv.
 
   (* Top-level translation call *)
 
-  Definition translate_rule_to_algenv (r:rule) : algenv :=
+  Definition translate_rule_to_cnraenv (r:rule) : cnraenv :=
     (* Produces the initial plan *)
-    ANAppEnv (algenv_of_rule r) (ANConst (drec nil)).
+    ANAppEnv (cnraenv_of_rule r) (ANConst (drec nil)).
 
 End RuletoNRAEnv.
 

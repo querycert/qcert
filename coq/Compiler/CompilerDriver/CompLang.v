@@ -55,7 +55,7 @@ Section CompLang.
   Definition sql := sql.
   Definition lambda_nra := lnra.
   Definition nra := alg.
-  Definition nraenv_core := algenv.
+  Definition nraenv_core := cnraenv.
   Definition nraenv := nraenv.
   Definition nnrc_core := nnrc_core.
   Definition nnrc := nnrc.

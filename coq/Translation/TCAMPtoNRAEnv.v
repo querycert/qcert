@@ -27,13 +27,13 @@ Section TCAMPtoNRAEnv.
   Local Open Scope list_scope.
   Local Open Scope rule_scope.
 
-  Hint Constructors algenv_type unaryOp_type binOp_type.
+  Hint Constructors cnraenv_type unaryOp_type binOp_type.
 
   Context {m:basic_model}.
 
-  Lemma algenv_of_pat_type_preserve τc Γ pf p τin τout :
+  Lemma cnraenv_of_pat_type_preserve τc Γ pf p τin τout :
     [τc&Γ] |= p ; τin ~> τout ->
-    algenv_of_pat p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
+    cnraenv_of_pat p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
   Proof.
     Hint Resolve data_type_drec_nil.
     revert Γ pf τin τout.
@@ -87,9 +87,9 @@ Section TCAMPtoNRAEnv.
 
   (** Some corollaries of the main Lemma *)
 
-  Lemma algenv_of_pat_algenv_of_pat_top p τc τin τout :
-    algenv_of_pat p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl) ->
-    algenv_of_pat_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
+  Lemma cnraenv_of_pat_cnraenv_of_pat_top p τc τin τout :
+    cnraenv_of_pat p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl) ->
+    cnraenv_of_pat_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
     repeat (econstructor; eauto).
@@ -97,21 +97,21 @@ Section TCAMPtoNRAEnv.
     
   Theorem alg_of_pat_top_type_preserve p τc τin τout :
     [τc&nil] |= p ; τin ~> τout ->
-    algenv_of_pat_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
+    cnraenv_of_pat_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
-    apply algenv_of_pat_algenv_of_pat_top.
-    apply algenv_of_pat_type_preserve; eauto.
+    apply cnraenv_of_pat_cnraenv_of_pat_top.
+    apply cnraenv_of_pat_type_preserve; eauto.
   Qed.
 
   Require Import TRule RuletoNRAEnv.
 
-  Theorem algenv_of_rule_type_preserve τworld τout r :
+  Theorem cnraenv_of_rule_type_preserve τworld τout r :
     @rule_type m τworld τout r ->
-    algenv_of_rule r ▷ Unit >=> Coll τout ⊣  (mkTWorld τworld);(Rec Closed nil eq_refl).
+    cnraenv_of_rule r ▷ Unit >=> Coll τout ⊣  (mkTWorld τworld);(Rec Closed nil eq_refl).
     Proof.
       unfold rule_type; intros.
-      apply algenv_of_pat_type_preserve; trivial.
+      apply cnraenv_of_pat_type_preserve; trivial.
     Qed.
 
 End TCAMPtoNRAEnv.

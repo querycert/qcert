@@ -119,7 +119,7 @@ Section CompDriver.
 
   Section translations.
 
-    Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletoNRAEnv.translate_rule_to_algenv q.
+    Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletoNRAEnv.translate_rule_to_cnraenv q.
 
     Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
 
@@ -131,26 +131,26 @@ Section CompDriver.
 
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lnra q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtoNRAEnv.translate_pat_to_algenv q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtoNRAEnv.translate_pat_to_cnraenv q.
 
     Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
 
-    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := algenv_of_nraenv q.
+    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := cnraenv_of_nraenv q.
 
-    Definition nraenv_core_to_nraenv (q: algenv) : nraenv := nraenv_of_algenv q.
+    Definition nraenv_core_to_nraenv (q: cnraenv) : nraenv := nraenv_of_cnraenv q.
 
     Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
       nnrc_to_nnrc_core q.
   
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
-      nnrc_to_nnrc_core (algenv_to_nnrc q init_vid init_venv).
+      nnrc_to_nnrc_core (cnraenv_to_nnrc q init_vid init_venv).
 
     Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
       nraenv_to_nnrc_ext_top q init_vid init_venv.
 
-    Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_algenv q.
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_cnraenv q.
 
-    Definition nra_to_nraenv_core (q: nra) : nraenv_core := algenv_of_alg q.
+    Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_alg q.
 
     Definition nra_to_nnrc_core (q: nra) : nnrc_core :=
       nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
@@ -247,11 +247,11 @@ Section CompDriver.
       nraenv_core_optim default_nraenv_optim_phases q.
 
     Definition nra_optim (opc:optim_phases_config) (q: nra) : nra :=
-      let nraenv_core_opt := (nraenv_core_optim opc (algenv_of_alg q)) in
-      if algenv_is_nra_fun nraenv_core_opt then
-        algenv_deenv_alg nraenv_core_opt
+      let nraenv_core_opt := (nraenv_core_optim opc (cnraenv_of_alg q)) in
+      if cnraenv_is_nra_fun nraenv_core_opt then
+        cnraenv_deenv_alg nraenv_core_opt
       else
-        alg_of_algenv nraenv_core_opt.
+        alg_of_cnraenv nraenv_core_opt.
     Definition nra_optim_default (q: nra) : nra :=
       nra_optim default_nraenv_optim_phases q.
 

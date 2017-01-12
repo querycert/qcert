@@ -31,35 +31,35 @@ Section NRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition join (op1 op2 op3 : algenv) : algenv :=
+  Definition join (op1 op2 op3 : cnraenv) : cnraenv :=
     (ANSelect op1 (ANProduct op2 op3)).
 
-  Definition semi_join (op1 op2 op3 : algenv) : algenv :=
+  Definition semi_join (op1 op2 op3 : cnraenv) : cnraenv :=
     ANSelect (ANUnop ANeg (ANBinop AEq (ANSelect op1 (ANProduct ((ANUnop AColl) ANID) op3)) (ANConst (dcoll nil)))) op2.
 
-  Definition anti_join (op1 op2 op3 : algenv) : algenv :=
+  Definition anti_join (op1 op2 op3 : cnraenv) : cnraenv :=
     ANSelect (ANBinop AEq (ANSelect op1 (ANProduct ((ANUnop AColl) ANID) op3)) (ANConst (dcoll nil))) op2.
 
   (* Maps *)
 
-  Definition map_add_rec (s:string) (op1 op2 : algenv) : algenv :=
+  Definition map_add_rec (s:string) (op1 op2 : cnraenv) : cnraenv :=
     ANMap ((ANBinop AConcat) ANID ((ANUnop (ARec s)) op1)) op2.
-  Definition map_to_rec (s:string) (op : algenv) : algenv :=
+  Definition map_to_rec (s:string) (op : cnraenv) : cnraenv :=
     ANMap (ANUnop (ARec s) ANID) op.
 
-  Definition flat_map (op1 op2 : algenv) : algenv :=
+  Definition flat_map (op1 op2 : cnraenv) : cnraenv :=
     ANUnop AFlatten (ANMap op1 op2).
   
   (* Projects *)
-  Definition project (fields:list string) (op:algenv) : algenv
+  Definition project (fields:list string) (op:cnraenv) : cnraenv
     := ANMap (ANUnop (ARecProject fields) ANID) op.
 
-  Definition project_remove (s:string) (op:algenv) : algenv :=
+  Definition project_remove (s:string) (op:cnraenv) : cnraenv :=
     ANMap ((ANUnop (ARecRemove s)) ANID) op.
 
   (* Renaming *)
   (* renames field s1 to s2 *)
-  Definition map_rename_rec (s1 s2:string) (op:algenv) : algenv :=
+  Definition map_rename_rec (s1 s2:string) (op:cnraenv) : cnraenv :=
     ANMap ((ANBinop AConcat) ((ANUnop (ARec s2)) ((ANUnop (ADot s1)) ANID))
                   ((ANUnop (ARecRemove s1)) ANID)) op.
 
@@ -87,7 +87,7 @@ Section NRAEnv.
        ⟩
       ({ [ t4 : χ⟨[t3]⟩(op) ] } × (χ⟨[t2:ID]⟩(χ⟨[t1:ID]⟩(♯distinct(Π[sl](op)))))) *)
   
-  Definition group_by_no_env (g:string) (sl:list string) (op : algenv) : algenv :=
+  Definition group_by_no_env (g:string) (sl:list string) (op : cnraenv) : cnraenv :=
     ANMap
       (ANBinop AConcat
                (ANUnop (ADot "1") (ANUnop (ADot "2") ANID))
@@ -110,7 +110,7 @@ Section NRAEnv.
         (♯distinct(Π[sl](ENV.$pregroup)))) ◯ᵉ [ $pregroup : op ]
 
  *)
-  Definition group_by_with_env (g:string) (sl:list string) (op : algenv) : algenv :=
+  Definition group_by_with_env (g:string) (sl:list string) (op : cnraenv) : cnraenv :=
     let op_pregroup := ANUnop (ADot "$pregroup") ANEnv in
     ANAppEnv
       (ANMap
@@ -134,10 +134,10 @@ Section NRAEnv.
 
   (* Unnest *)
 
-  Definition unnest_one (s:string) (op:algenv) : algenv :=
+  Definition unnest_one (s:string) (op:cnraenv) : cnraenv :=
     ANMap ((ANUnop (ARecRemove s)) ANID) (ANMapConcat ((ANUnop (ADot s)) ANID) op).
 
-  Definition unnest_two (s1 s2:string) (op:algenv) : algenv :=
+  Definition unnest_two (s1 s2:string) (op:cnraenv) : cnraenv :=
     ANMap ((ANUnop (ARecRemove s1)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec s2)) ANID) ((ANUnop (ADot s1)) ANID)) op).
 
   (* NRAEnv for Optim *)
@@ -176,52 +176,52 @@ Section NRAEnv.
       try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
   Defined.
 
-  Fixpoint algenv_of_nraenv (e:nraenv) : algenv :=
+  Fixpoint cnraenv_of_nraenv (e:nraenv) : cnraenv :=
     match e with
       | NRAEnvID => ANID
       | NRAEnvConst d => ANConst d
-      | NRAEnvBinop b e1 e2 => ANBinop b (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvUnop u e1 => ANUnop u (algenv_of_nraenv e1)
-      | NRAEnvMap e1 e2 => ANMap (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvMapConcat e1 e2 => ANMapConcat (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvProduct e1 e2 => ANProduct (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvSelect e1 e2 => ANSelect (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvDefault e1 e2 => ANDefault (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvEither opl opr => ANEither (algenv_of_nraenv opl) (algenv_of_nraenv opr)
-      | NRAEnvEitherConcat op1 op2 => ANEitherConcat (algenv_of_nraenv op1) (algenv_of_nraenv op2)
-      | NRAEnvApp e1 e2 => ANApp (algenv_of_nraenv e1) (algenv_of_nraenv e2)
+      | NRAEnvBinop b e1 e2 => ANBinop b (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvUnop u e1 => ANUnop u (cnraenv_of_nraenv e1)
+      | NRAEnvMap e1 e2 => ANMap (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvMapConcat e1 e2 => ANMapConcat (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvProduct e1 e2 => ANProduct (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvSelect e1 e2 => ANSelect (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvDefault e1 e2 => ANDefault (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvEither opl opr => ANEither (cnraenv_of_nraenv opl) (cnraenv_of_nraenv opr)
+      | NRAEnvEitherConcat op1 op2 => ANEitherConcat (cnraenv_of_nraenv op1) (cnraenv_of_nraenv op2)
+      | NRAEnvApp e1 e2 => ANApp (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
       | NRAEnvGetConstant s => ANGetConstant s
       | NRAEnvEnv => ANEnv
-      | NRAEnvAppEnv e1 e2 => ANAppEnv (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvMapEnv e1 => ANMapEnv (algenv_of_nraenv e1)
-      | NRAEnvFlatMap e1 e2 => flat_map (algenv_of_nraenv e1) (algenv_of_nraenv e2)
-      | NRAEnvJoin e1 e2 e3 => join (algenv_of_nraenv e1) (algenv_of_nraenv e2) (algenv_of_nraenv e3)
-      | NRAEnvProject ls e1 => project ls (algenv_of_nraenv e1)
-      | NRAEnvGroupBy s ls e1 => group_by_with_env s ls (algenv_of_nraenv e1)
+      | NRAEnvAppEnv e1 e2 => ANAppEnv (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvMapEnv e1 => ANMapEnv (cnraenv_of_nraenv e1)
+      | NRAEnvFlatMap e1 e2 => flat_map (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2)
+      | NRAEnvJoin e1 e2 e3 => join (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2) (cnraenv_of_nraenv e3)
+      | NRAEnvProject ls e1 => project ls (cnraenv_of_nraenv e1)
+      | NRAEnvGroupBy s ls e1 => group_by_with_env s ls (cnraenv_of_nraenv e1)
     end.
 
-  Fixpoint nraenv_of_algenv (a:algenv) : nraenv :=
+  Fixpoint nraenv_of_cnraenv (a:cnraenv) : nraenv :=
     match a with
       | ANID => NRAEnvID
       | ANConst d => NRAEnvConst d
-      | ANBinop b e1 e2 => NRAEnvBinop b (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANUnop u e1 => NRAEnvUnop u (nraenv_of_algenv e1)
-      | ANMap e1 e2 => NRAEnvMap (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANMapConcat e1 e2 => NRAEnvMapConcat (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANProduct e1 e2 => NRAEnvProduct (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANSelect e1 e2 => NRAEnvSelect (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANDefault e1 e2 => NRAEnvDefault (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANEither opl opr => NRAEnvEither (nraenv_of_algenv opl) (nraenv_of_algenv opr)
-      | ANEitherConcat op1 op2 => NRAEnvEitherConcat (nraenv_of_algenv op1) (nraenv_of_algenv op2)
-      | ANApp e1 e2 => NRAEnvApp (nraenv_of_algenv e1) (nraenv_of_algenv e2)
+      | ANBinop b e1 e2 => NRAEnvBinop b (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANUnop u e1 => NRAEnvUnop u (nraenv_of_cnraenv e1)
+      | ANMap e1 e2 => NRAEnvMap (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANMapConcat e1 e2 => NRAEnvMapConcat (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANProduct e1 e2 => NRAEnvProduct (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANSelect e1 e2 => NRAEnvSelect (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANDefault e1 e2 => NRAEnvDefault (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANEither opl opr => NRAEnvEither (nraenv_of_cnraenv opl) (nraenv_of_cnraenv opr)
+      | ANEitherConcat op1 op2 => NRAEnvEitherConcat (nraenv_of_cnraenv op1) (nraenv_of_cnraenv op2)
+      | ANApp e1 e2 => NRAEnvApp (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
       | ANGetConstant s => NRAEnvGetConstant s
       | ANEnv => NRAEnvEnv
-      | ANAppEnv e1 e2 => NRAEnvAppEnv (nraenv_of_algenv e1) (nraenv_of_algenv e2)
-      | ANMapEnv e1 => NRAEnvMapEnv (nraenv_of_algenv e1)
+      | ANAppEnv e1 e2 => NRAEnvAppEnv (nraenv_of_cnraenv e1) (nraenv_of_cnraenv e2)
+      | ANMapEnv e1 => NRAEnvMapEnv (nraenv_of_cnraenv e1)
     end.
 
-  Lemma nraenv_roundtrip (a:algenv) :
-    (algenv_of_nraenv (nraenv_of_algenv a)) = a.
+  Lemma nraenv_roundtrip (a:cnraenv) :
+    (cnraenv_of_nraenv (nraenv_of_cnraenv a)) = a.
   Proof.
     induction a; simpl; try reflexivity; try (rewrite IHa1; rewrite IHa2; try rewrite IHa3; reflexivity); rewrite IHa; reflexivity.
   Qed.
@@ -229,10 +229,10 @@ Section NRAEnv.
   Context (h:list(string*string)).
   
   Definition nraenv_eval c (e:nraenv) (env:data) (x:data) : option data :=
-    fun_of_algenv h c (algenv_of_nraenv e) env x.
+    fun_of_cnraenv h c (cnraenv_of_nraenv e) env x.
 
-  Lemma initial_nraenv_ident c (e:algenv) (env:data) (x:data) :
-    nraenv_eval c (nraenv_of_algenv e) env x = fun_of_algenv h c e env x.
+  Lemma initial_nraenv_ident c (e:cnraenv) (env:data) (x:data) :
+    nraenv_eval c (nraenv_of_cnraenv e) env x = fun_of_cnraenv h c e env x.
   Proof.
     unfold nraenv_eval.
     rewrite nraenv_roundtrip.

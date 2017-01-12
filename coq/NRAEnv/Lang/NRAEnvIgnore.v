@@ -346,9 +346,9 @@ Section NRAEnvIgnore.
 
   Require Import RAlgEnvIgnore.
 
-  Lemma nraenv_ignores_env_algenv_eq (e:nraenv) :
+  Lemma nraenv_ignores_env_cnraenv_eq (e:nraenv) :
     nraenv_ignores_env e ->
-    algenv_ignores_env (algenv_of_nraenv e).
+    cnraenv_ignores_env (cnraenv_of_nraenv e).
   Proof.
     intros.
     induction e; simpl in *; auto;
@@ -363,14 +363,14 @@ Section NRAEnvIgnore.
   Proof.
     intros.
     unfold nraenv_eval.
-    apply algenv_ignores_env_swap.
-    apply nraenv_ignores_env_algenv_eq.
+    apply cnraenv_ignores_env_swap.
+    apply nraenv_ignores_env_cnraenv_eq.
     apply H.
   Qed.
   
-  Lemma nraenv_ignores_id_algenv_eq (e:nraenv) :
+  Lemma nraenv_ignores_id_cnraenv_eq (e:nraenv) :
     nraenv_ignores_id e ->
-    algenv_ignores_id (algenv_of_nraenv e).
+    cnraenv_ignores_id (cnraenv_of_nraenv e).
   Proof.
     intros.
     induction e; simpl in *; auto;
@@ -385,8 +385,8 @@ Section NRAEnvIgnore.
   Proof.
     intros.
     unfold nraenv_eval.
-    apply algenv_ignores_id_swap.
-    apply nraenv_ignores_id_algenv_eq.
+    apply cnraenv_ignores_id_swap.
+    apply nraenv_ignores_id_cnraenv_eq.
     apply H.
   Qed.
 

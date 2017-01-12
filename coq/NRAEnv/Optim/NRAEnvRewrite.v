@@ -28,48 +28,48 @@ Section ROptimEnv.
   (* Those are valid without type *)
 
   Local Open Scope alg_scope.
-  Local Open Scope algenv_scope.
+  Local Open Scope cnraenv_scope.
 
   Context {fruntime:foreign_runtime}.
 
   (* Pulls equivalences from core algebra *)
 
   Hint Resolve dnrec_sort.
-  Lemma pull_alg_opt (p1 p2:algenv) :
-    (alg_of_algenv p1) ≡ₐ (alg_of_algenv p2) ->
+  Lemma pull_alg_opt (p1 p2:cnraenv) :
+    (alg_of_cnraenv p1) ≡ₐ (alg_of_cnraenv p2) ->
     p1 ≡ₑ p2.
   Proof.
-    unfold alg_eq, algenv_eq; intros.
+    unfold alg_eq, cnraenv_eq; intros.
     repeat rewrite unfold_env_alg_sort.
     rewrite H; eauto.
   Qed.
 
   (* P1 ∧ P2 ≡ P2 ∧ P1 *)
 
-  Lemma envand_comm (p1 p2: algenv) :
+  Lemma envand_comm (p1 p2: cnraenv) :
     p2 ∧ p1 ≡ₑ p1 ∧ p2.
   Proof.
     apply pull_alg_opt.
-    unfold alg_of_algenv.
+    unfold alg_of_cnraenv.
     rewrite and_comm; reflexivity.
   Qed.
 
   (* (P1 ⋃ P2) ⋃ P3 ≡ P1 ⋃ (P2 ⋃ P3) *)
 
-  Lemma envunion_assoc (p1 p2 p3: algenv):
+  Lemma envunion_assoc (p1 p2 p3: cnraenv):
     (p1 ⋃ p2) ⋃ p3 ≡ₑ p1 ⋃ (p2 ⋃ p3).
   Proof.
     apply pull_alg_opt.
-    unfold alg_of_algenv.
+    unfold alg_of_cnraenv.
     rewrite union_assoc; reflexivity.
   Qed.
   
   (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
 
-  Lemma envunion_select_distr (p p1 p2: algenv) :
+  Lemma envunion_select_distr (p p1 p2: cnraenv) :
     σ⟨ p ⟩(p1 ⋃ p2) ≡ₑ σ⟨ p ⟩(p1) ⋃ σ⟨ p ⟩(p2).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _.
     simpl.
     generalize (h ⊢ₑ p1 @ₑ x  ⊣ c;env) as d1.
     generalize (h ⊢ₑ p2 @ₑ x  ⊣ c;env) as d2.
@@ -117,7 +117,7 @@ Section ROptimEnv.
 
   (* this is the name we give it in the paper *)
     (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
-  Lemma select_union_distr (q q₁ q₂: algenv) :
+  Lemma select_union_distr (q q₁ q₂: cnraenv) :
     σ⟨ q ⟩(q₁ ⋃ q₂) ≡ₑ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
   Proof.
     apply envunion_select_distr.
@@ -125,10 +125,10 @@ Section ROptimEnv.
 
   (* χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 } *)
 
-  Lemma envmap_singleton (p1 p2:algenv) :
+  Lemma envmap_singleton (p1 p2:cnraenv) :
     χ⟨ p1 ⟩( ‵{| p2 |} ) ≡ₑ ‵{| p1 ◯ p2 |}.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
     generalize (h ⊢ₑ p1 @ₑ d ⊣ c;env); intros; simpl.
@@ -137,10 +137,10 @@ Section ROptimEnv.
 
   (* χ⟨ P1 ⟩( χ⟨ P2 ⟩( P3 ) ) ≡ χ⟨ P1 ◯ P2 ⟩( P3 ) *)
 
-  Lemma envmap_map_compose (p1 p2 p3:algenv) :
+  Lemma envmap_map_compose (p1 p2 p3:cnraenv) :
     χ⟨ p1 ⟩( χ⟨ p2 ⟩( p3 ) ) ≡ₑ χ⟨ p1 ◯ p2 ⟩( p3 ).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p3 @ₑ x ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -148,7 +148,7 @@ Section ROptimEnv.
     induction l; try reflexivity; simpl.
     generalize (h ⊢ₑ p2 @ₑ a ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
-    revert IHl; generalize (rmap (fun_of_algenv h c p2 env) l); intros.
+    revert IHl; generalize (rmap (fun_of_cnraenv h c p2 env) l); intros.
     destruct o; try reflexivity; simpl.
     destruct (h ⊢ₑ p1 @ₑ d ⊣ c;env); try reflexivity; simpl.
     revert IHl; generalize (rmap
@@ -158,10 +158,10 @@ Section ROptimEnv.
                | None => None
                end) l); intros.
     destruct o; try reflexivity; simpl in *.
-    destruct (rmap (fun_of_algenv h c p1 env) l0).
+    destruct (rmap (fun_of_cnraenv h c p1 env) l0).
     inversion IHl; reflexivity.
     congruence.
-    destruct (rmap (fun_of_algenv h c p1 env) l0).
+    destruct (rmap (fun_of_cnraenv h c p1 env) l0).
     congruence.
     reflexivity.
     revert IHl; generalize (rmap
@@ -179,7 +179,7 @@ Section ROptimEnv.
   Lemma app_over_rec s p1 p2:
     ‵[| (s, p1) |] ◯ p2 ≡ₑ ‵[| (s, p1 ◯ p2) |].
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -189,7 +189,7 @@ Section ROptimEnv.
   Lemma envflatten_coll_flatten p:
     ♯flatten(‵{| ♯flatten( p ) |}) ≡ₑ ♯flatten( p ).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); clear x p; intros.
     destruct o; try reflexivity; simpl.
     unfold olift; simpl.
@@ -213,7 +213,7 @@ Section ROptimEnv.
   Lemma envflatten_coll_coll p:
     ♯flatten(‵{| ‵{| p |} |}) ≡ₑ ‵{| p |}.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); clear x p; intros.
     destruct o; reflexivity.
   Qed.
@@ -221,7 +221,7 @@ Section ROptimEnv.
   Lemma envflatten_nil :
     ♯flatten(‵{||}) ≡ₑ ‵{||}.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     trivial.
   Qed.
 
@@ -230,7 +230,7 @@ Section ROptimEnv.
   Lemma envflatten_coll_map p1 p2 :
     ♯flatten(‵{| χ⟨ p1 ⟩( p2 ) |}) ≡ₑ χ⟨ p1 ⟩( p2 ).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); clear x p2; intros.
     destruct o; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -239,7 +239,7 @@ Section ROptimEnv.
     generalize (h ⊢ₑ p1 @ₑ a ⊣ c;env); clear a; intros.
     destruct o; try reflexivity; simpl.
     unfold lift in *; simpl in *.
-    revert IHl; generalize (rmap (fun_of_algenv h c p1 env) l); intros.
+    revert IHl; generalize (rmap (fun_of_cnraenv h c p1 env) l); intros.
     destruct o; try reflexivity; try congruence.
     unfold lift_oncoll in *; simpl in *.
     rewrite app_nil_r.
@@ -251,7 +251,7 @@ Section ROptimEnv.
     ♯flatten( ♯flatten(χ⟨ANEither p₁ ‵{||} ◯ p₂⟩(p₃))) ≡ₑ 
      ♯flatten( χ⟨ANEither( ♯flatten(p₁)) ‵{||} ◯ p₂⟩(p₃)).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p₃ @ₑ x ⊣ c; env); simpl; trivial.
     unfold olift.
     destruct d; simpl; trivial.
@@ -384,7 +384,7 @@ Section ROptimEnv.
   Lemma envflatten_coll_mergeconcat p1 p2:
     ♯flatten( ‵{| p1 ⊗ p2 |} ) ≡ₑ p1 ⊗ p2.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); clear p1; intros.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); clear x p2; intros.
     destruct o; destruct o0; try reflexivity; simpl.
@@ -406,7 +406,7 @@ Section ROptimEnv.
     ♯flatten(χ⟨ χ⟨ ‵{| ID |} ⟩( ♯flatten( p1 ) ) ⟩( p2 ))
             ≡ₑ χ⟨ ‵{| ID |} ⟩(♯flatten(χ⟨ ♯flatten( p1 ) ⟩( p2 ))).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); clear x p2; intros.
     destruct o; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -536,7 +536,7 @@ Section ROptimEnv.
   Lemma envflatten_map_coll p1 p2 :
     ♯flatten(χ⟨ ‵{| p1 |} ⟩( p2 )) ≡ₑ χ⟨ p1 ⟩( p2 ).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); clear x p2; intros.
     destruct o; try reflexivity.
     destruct d; try reflexivity; simpl.
@@ -550,7 +550,7 @@ Section ROptimEnv.
               match h ⊢ₑ p1 @ₑ x ⊣ c;env with
               | Some x' => Some (dcoll (x' :: nil))
               | None => None
-              end) l); generalize (rmap (fun_of_algenv h c p1 env) l); intros.
+              end) l); generalize (rmap (fun_of_cnraenv h c p1 env) l); intros.
     unfold lift in *; simpl.
     destruct o; destruct o0; simpl; try reflexivity; try congruence.
     - simpl in *.
@@ -607,16 +607,16 @@ Section ROptimEnv.
                  (fun x : data =>
                   lift_oncoll
                     (fun c1 : list data =>
-                     lift dcoll (rmap (fun_of_algenv br c p₁ env) c1)) x) l);  [intros ? eqq2 | intros eqq2];
+                     lift dcoll (rmap (fun_of_cnraenv br c p₁ env) c1)) x) l);  [intros ? eqq2 | intros eqq2];
      rewrite eqq2 in IHl; simpl in * ).
     - apply lift_injective in IHl; [ | inversion 1; trivial].
       rewrite rmap_over_app.
       rewrite IHl.
-      destruct (rmap (fun_of_algenv br c p₁ env) l0); simpl; trivial.
+      destruct (rmap (fun_of_cnraenv br c p₁ env) l0); simpl; trivial.
     - apply none_lift in IHl.
       rewrite rmap_over_app.
       rewrite IHl; simpl.
-      destruct (rmap (fun_of_algenv br c p₁ env) l0); simpl; trivial.
+      destruct (rmap (fun_of_cnraenv br c p₁ env) l0); simpl; trivial.
     - clear IHl.
       cut False; [intuition | ].
       revert eqq1 l1 eqq2.
@@ -701,7 +701,7 @@ Section ROptimEnv.
   Lemma select_over_either p₁ p₂ p₃ :
     σ⟨p₁⟩( ANEither p₂ p₃) ≡ₑ ANEither (σ⟨p₁⟩(p₂)) (σ⟨p₁⟩(p₃)).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     match_destr.
   Qed.
 
@@ -711,7 +711,7 @@ Section ROptimEnv.
   Lemma envdot_from_duplicate_r s1 s2 p1 :
     (‵[| (s1, p1) |] ⊕ ‵[| (s2, p1) |])·s2 ≡ₑ p1.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); clear p1 x; intros.
     destruct o; try reflexivity.
     unfold olift; simpl.
@@ -732,7 +732,7 @@ Section ROptimEnv.
   Lemma envdot_from_duplicate_l s1 s2 p1 :
     (‵[| (s1, p1) |] ⊕ ‵[| (s2, p1) |])·s1 ≡ₑ p1.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); clear p1 x; intros.
     destruct o; try reflexivity.
     unfold olift; simpl.
@@ -752,14 +752,14 @@ Section ROptimEnv.
   Lemma envmap_over_either p₁ p₂ p₃ :
     χ⟨p₁⟩( ANEither p₂ p₃) ≡ₑ ANEither (χ⟨p₁⟩(p₂)) (χ⟨p₁⟩(p₃)).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     match_destr.
   Qed.
 
   Lemma envmap_over_either_app p₁ p₂ p₃ p₄:
     χ⟨p₁⟩( ANEither p₂ p₃ ◯ p₄) ≡ₑ ANEither (χ⟨p₁⟩(p₂)) (χ⟨p₁⟩(p₃)) ◯ p₄.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     unfold olift.
     destruct (h ⊢ₑ p₄ @ₑ x ⊣ c; env); simpl; trivial.
     destruct d; simpl; trivial.
@@ -770,7 +770,7 @@ Section ROptimEnv.
   Lemma envmap_into_id p :
     χ⟨ ID ⟩(‵{| p |}) ≡ₑ ‵{| p |}.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); clear x p; intros.
     destruct o; reflexivity.
   Qed.
@@ -782,7 +782,7 @@ Section ROptimEnv.
   Lemma envmap_into_id_flatten p :
     χ⟨ ID ⟩( ♯flatten(p) ) ≡ₑ ♯flatten(p).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); clear x p; intros.
     destruct o; try reflexivity; simpl.
     unfold lift_oncoll; simpl.
@@ -800,7 +800,7 @@ Section ROptimEnv.
     ‵{|‵[| (s1, p1) |] |} × ‵{| ‵[| (s2, p2) |] |} ≡ₑ
      ‵{|‵[| (s1, p1) |] ⊕ ‵[| (s2, p2) |] |}.
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; destruct o0; reflexivity.
   Qed.
@@ -810,7 +810,7 @@ Section ROptimEnv.
   Lemma app_over_id p:
     p ◯ ID ≡ₑ p.
   Proof.
-    unfold alg_eq, algenv_eq; intros; reflexivity.
+    unfold alg_eq, cnraenv_eq; intros; reflexivity.
   Qed.    
 
   (* ENV ◯ₑ p ≡ p *)
@@ -818,7 +818,7 @@ Section ROptimEnv.
   Lemma appenv_over_env p:
     ENV ◯ₑ p ≡ₑ p.
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
@@ -827,7 +827,7 @@ Section ROptimEnv.
   Lemma app_over_id_l p:
     ID ◯ p ≡ₑ p.
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -837,7 +837,7 @@ Section ROptimEnv.
   Lemma app_over_app p1 p2 p3:
     (p1 ◯ p2) ◯ p3  ≡ₑ p1 ◯ (p2 ◯ p3).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p3 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -847,7 +847,7 @@ Section ROptimEnv.
   Lemma app_over_unop u p1 p2:
     (ANUnop u p1) ◯ p2 ≡ₑ (ANUnop u (p1 ◯ p2)).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -857,7 +857,7 @@ Section ROptimEnv.
   Lemma appenv_over_unop u p1 p2:
     (ANUnop u p1) ◯ₑ p2 ≡ₑ (ANUnop u (p1 ◯ₑ p2)).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -865,14 +865,14 @@ Section ROptimEnv.
   Lemma unop_over_either u p₁ p₂ :
     ANUnop u (ANEither p₁ p₂) ≡ₑ ANEither (ANUnop u p₁)(ANUnop u p₂).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     match_destr.
   Qed.
 
   Lemma unop_over_either_app u p₁ p₂ p₃ :
     ANUnop u (ANEither p₁ p₂ ◯ p₃)  ≡ₑ ANEither (ANUnop u p₁)(ANUnop u p₂) ◯ p₃.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     unfold olift.
     destruct (h ⊢ₑ p₃ @ₑ x ⊣ c; env); simpl; trivial.
     destruct d; simpl; trivial.
@@ -883,7 +883,7 @@ Section ROptimEnv.
   Lemma app_over_merge p1 p2:
     (ANEnv ⊗ p1) ◯ p2 ≡ₑ ANEnv ⊗ (p1 ◯ p2).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -894,7 +894,7 @@ Section ROptimEnv.
     (ANBinop b p2 (ANConst d) ◯ p1)
       ≡ₑ (ANBinop b (p2 ◯ p1) (ANConst d)).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -905,7 +905,7 @@ Section ROptimEnv.
     (ANBinop b p1 p2 ◯ (p3 ⊕ p4) )
       ≡ₑ (ANBinop b (p1 ◯ (p3 ⊕ p4)) (p2 ◯ (p3 ⊕ p4))).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct (h ⊢ₑ p3 @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct (h ⊢ₑ p4 @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -918,7 +918,7 @@ Section ROptimEnv.
     (ANBinop b p1 p2 ◯ (ANUnop (ADot s) ANEnv))
       ≡ₑ (ANBinop b (p1 ◯ (ANUnop (ADot s) ANEnv)) (p2 ◯ (ANUnop (ADot s) ANEnv))).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct env; try reflexivity; simpl.
     destruct (edot l s); reflexivity.
   Qed.
@@ -928,7 +928,7 @@ Section ROptimEnv.
   Lemma app_over_select p0 p1 p2:
     σ⟨ p1 ⟩( p2 ) ◯ p0 ≡ₑ σ⟨ p1 ⟩( p2 ◯ p0 ).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.    
@@ -938,7 +938,7 @@ Section ROptimEnv.
   Lemma app_over_map p0 p1 p2:
     χ⟨ p1 ⟩( p2 ) ◯ p0 ≡ₑ χ⟨ p1 ⟩( p2 ◯ p0 ).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.    
@@ -948,7 +948,7 @@ Section ROptimEnv.
   Lemma app_over_mapconcat p0 p1 p2:
     ⋈ᵈ⟨ p1 ⟩( p2 ) ◯ p0 ≡ₑ ⋈ᵈ⟨ p1 ⟩( p2 ◯ p0 ).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.    
@@ -958,7 +958,7 @@ Section ROptimEnv.
   Lemma app_over_product p0 p1 p2:
     (p1 × p2) ◯ p0 ≡ₑ (p1  ◯ p0) × (p2 ◯ p0).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.    
@@ -966,19 +966,19 @@ Section ROptimEnv.
   (* χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
   
   Lemma appenv_over_map p0 p1 p2:
-    algenv_ignores_id p0 ->
+    cnraenv_ignores_id p0 ->
     χ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ₑ χ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ).
   Proof.
-    unfold alg_eq, algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
+    unfold alg_eq, cnraenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     case_eq (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros; try reflexivity; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;d); try reflexivity; simpl.
     destruct d0; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    rewrite (algenv_ignores_id_swap p0 H h c env a x).
+    rewrite (cnraenv_ignores_id_swap p0 H h c env a x).
     rewrite H0; simpl.
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;d); try reflexivity; simpl.
     f_equal; unfold lift in *; simpl in *.
-    destruct (rmap (fun_of_algenv h c p1 d) l);
+    destruct (rmap (fun_of_cnraenv h c p1 d) l);
       destruct (rmap
             (fun x0 : data =>
              olift (fun env' : data => h ⊢ₑ p1 @ₑ x0 ⊣ c;env') (h ⊢ₑ p0 @ₑ x0 ⊣ c;env)) l); congruence.
@@ -987,15 +987,15 @@ Section ROptimEnv.
   (* σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ) *)
   
   Lemma appenv_over_select p0 p1 p2:
-    algenv_ignores_id p0 ->
+    cnraenv_ignores_id p0 ->
     σ⟨ p1 ⟩( p2 ) ◯ₑ p0 ≡ₑ σ⟨ p1 ◯ₑ p0 ⟩( p2 ◯ₑ p0 ).
   Proof.
-    unfold alg_eq, algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
+    unfold alg_eq, cnraenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     case_eq (h ⊢ₑ p0 @ₑ x ⊣ c;env); intros; try reflexivity; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;d); try reflexivity; simpl.
     destruct d0; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    rewrite (algenv_ignores_id_swap p0 H h c env a x).
+    rewrite (cnraenv_ignores_id_swap p0 H h c env a x).
     rewrite H0; simpl.
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;d); try reflexivity; simpl.
     destruct d0; try reflexivity.
@@ -1035,7 +1035,7 @@ Section ROptimEnv.
   Lemma appenv_over_mapenv p:
     ANAppEnv (ANMapEnv (ANUnop AColl ANEnv)) (ANUnop AFlatten p) ≡ₑ (ANMap (ANUnop AColl ANID) (ANUnop AFlatten p)).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -1045,7 +1045,7 @@ Section ROptimEnv.
   Lemma appenv_over_mapenv_coll p:
     ANAppEnv (ANMapEnv (ANUnop AColl (ANUnop AColl ANEnv))) (ANUnop AFlatten p) ≡ₑ (ANMap (ANUnop AColl (ANUnop AColl ANID)) (ANUnop AFlatten p)).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.    
@@ -1056,19 +1056,19 @@ Section ROptimEnv.
     ANAppEnv (ANMapEnv (ANUnop AColl ((ENV) · s))) (ENV ⊗ ID)
              ≡ₑ ANMap (ANUnop AColl ((ID) · s)) (ENV ⊗ ID).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct x; reflexivity.
   Qed.
 
-  (* algenv_ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ≡ p2 ⊗ p1 *)
+  (* cnraenv_ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ≡ p2 ⊗ p1 *)
   
   Lemma appenv_over_env_merge_l p1 p2:
-    algenv_ignores_env p1 ->
+    cnraenv_ignores_env p1 ->
     ANAppEnv (ENV ⊗ p1) p2 ≡ₑ p2 ⊗ p1.
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity; simpl.
-    rewrite (algenv_ignores_env_swap p1 H h c d env x).
+    rewrite (cnraenv_ignores_env_swap p1 H h c d env x).
     destruct (h ⊢ₑ p1 @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
@@ -1078,7 +1078,7 @@ Section ROptimEnv.
     ANAppEnv (ANMapEnv ((ENV) · s)) (ENV ⊗ ID)
              ≡ₑ ANMap ((ID) · s) (ENV ⊗ ID).
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct x; reflexivity.
   Qed.    
 
@@ -1087,7 +1087,7 @@ Section ROptimEnv.
   Lemma env_appenv p:
     (ENV) ◯ₑ p ≡ₑ p.
   Proof.
-    unfold alg_eq, algenv_eq; intros; simpl.
+    unfold alg_eq, cnraenv_eq; intros; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
@@ -1127,7 +1127,7 @@ Section ROptimEnv.
     intros.
     elim H; clear H; intros.
     elim H0; clear H0; intros.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); generalize(h ⊢ₑ p2 @ₑ x ⊣ c;env); clear p1 p2 x; intros.
     destruct o; try reflexivity; simpl.
     - unfold olift, olift2; simpl.
@@ -1272,7 +1272,7 @@ Section ROptimEnv.
       ◯ (‵[| (a1, p1) |] ⊕ ‵[| (a2, p2) |])
       ≡ₑ (ANBinop b p1 p2).
   Proof.
-    unfold alg_eq, algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
+    unfold alg_eq, cnraenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); intros.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; destruct o0; try reflexivity; simpl.
@@ -1301,7 +1301,7 @@ Section ROptimEnv.
       ◯ p2
      ≡ₑ (‵[| (s1, p1 ◯ p2) |] ⊕ ‵[| (s2, ANConst d) |]).
   Proof.
-    unfold alg_eq, algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold alg_eq, cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -1311,7 +1311,7 @@ Section ROptimEnv.
   Lemma tostring_dstring s:
     (ANUnop AToString (ANConst (dstring s))) ≡ₑ (ANConst (dstring s)).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; reflexivity.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; reflexivity.
   Qed.
 
   (* #toString(#toString(p)) ≡ #toString(p) *)
@@ -1319,7 +1319,7 @@ Section ROptimEnv.
   Lemma tostring_tostring p:
     (ANUnop AToString (ANUnop AToString p)) ≡ₑ (ANUnop AToString p).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
@@ -1330,39 +1330,39 @@ Section ROptimEnv.
   Lemma app_over_env_dot s:
     (ENV ◯ (ENV) · s) · s ≡ₑ (ENV) · s.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct env; try reflexivity; simpl.
     case_eq (RRelation.edot l s); intros; try reflexivity; assumption.
   Qed.
 
   Lemma app_over_appenv p1 p2 p3:
-    algenv_ignores_id p3 ->
+    cnraenv_ignores_id p3 ->
     ((p3 ◯ₑ p2) ◯ p1) ≡ₑ p3 ◯ₑ (p2 ◯ p1).
   Proof.
-    unfold algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
     generalize (h ⊢ₑ p2 @ₑ d ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
-    apply algenv_ignores_id_swap; assumption.
+    apply cnraenv_ignores_id_swap; assumption.
   Qed.
 
   Lemma appenv_over_app_ie p1 p2 p3:
-    algenv_ignores_env p3 ->
+    cnraenv_ignores_env p3 ->
     ((p3 ◯ p2) ◯ₑ p1) ≡ₑ p3 ◯ (p2 ◯ₑ p1).
   Proof.
-    unfold algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p1 @ₑ x ⊣ c;env); intros.
     destruct o; try reflexivity; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;d); simpl; trivial.
-    apply algenv_ignores_env_swap; assumption.
+    apply cnraenv_ignores_env_swap; assumption.
   Qed.
 
   Lemma app_over_appenv_over_mapenv p1 p2:
     (((ANMapEnv (‵{|ENV|})) ◯ₑ p1) ◯ p2) ≡ₑ
     (((ANMapEnv (‵{|ENV|})) ◯ₑ (p1 ◯ p2) )).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     generalize (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros.
     destruct o; reflexivity.
   Qed.
@@ -1370,7 +1370,7 @@ Section ROptimEnv.
   Lemma map_full_over_select_id p0 p1 p2:
     χ⟨ p0 ⟩(σ⟨ p1 ⟩(‵{| p2 |})) ≡ₑ χ⟨ p0 ◯ p2 ⟩(σ⟨ p1 ◯ p2 ⟩(‵{| ID |})).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     case_eq (h ⊢ₑ p2 @ₑ x ⊣ c;env); intros; try reflexivity; simpl.
     destruct (h ⊢ₑ p1 @ₑ d ⊣ c;env); try reflexivity; simpl.
     destruct d0; try reflexivity; simpl.
@@ -1382,7 +1382,7 @@ Section ROptimEnv.
     (♯flatten(ANMapEnv (χ⟨ENV⟩(σ⟨p1⟩( ‵{| ID |}))))) ◯ₑ (χ⟨ENV⟩(σ⟨p2⟩( ‵{| ID |})))
             ≡ₑ (χ⟨ENV⟩(σ⟨p1⟩(σ⟨p2⟩( ‵{| ID |})))).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     autorewrite with alg.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity.
     destruct d; try reflexivity.
@@ -1398,18 +1398,18 @@ Section ROptimEnv.
   Lemma flatten_through_appenv p1 p2 :
     ♯flatten(p1 ◯ₑ p2) ≡ₑ ♯flatten(p1) ◯ₑ p2.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
   Lemma appenv_through_either q₁ q₂ q₃:
-    algenv_ignores_id q₃ ->
+    cnraenv_ignores_id q₃ ->
     ANEither q₁ q₂ ◯ₑ q₃ ≡ₑ ANEither (q₁ ◯ₑ q₃) (q₂ ◯ₑ q₃).
   Proof.
     intros.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     unfold olift.
-    generalize (algenv_ignores_id_swap q₃ H h c env x); intros eqq.
+    generalize (cnraenv_ignores_id_swap q₃ H h c env x); intros eqq.
     destruct (h ⊢ₑ q₃ @ₑ x ⊣ c;env); simpl in * ;
     destruct x; simpl; trivial;
     specialize (eqq x); rewrite <- eqq; trivial.
@@ -1421,7 +1421,7 @@ Section ROptimEnv.
   Lemma flatten_mapenv_coll p1:
     ♯flatten(ANMapEnv (‵{| p1 |})) ≡ₑ ANMapEnv p1.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct env; try reflexivity; simpl.
     autorewrite with alg.
     induction l; try reflexivity; simpl in *.
@@ -1446,7 +1446,7 @@ Section ROptimEnv.
   Lemma flip_env1 p :
     χ⟨ENV⟩(σ⟨ p ⟩(‵{|ID|})) ◯ₑ ID ≡ₑ (σ⟨ p ⟩(‵{|ID|})) ◯ₑ ID.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;x); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     destruct b; reflexivity.
@@ -1455,27 +1455,27 @@ Section ROptimEnv.
   Lemma flip_env2 p :
     (σ⟨ p ⟩(‵{|ID|}) ◯ₑ ID) ≡ₑ σ⟨ p ◯ₑ ID ⟩(‵{|ID|}).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;x); reflexivity.
   Qed.
 
   Lemma flip_env3 b p1 p2 :
      (ANBinop b p1 p2) ◯ₑ ID ≡ₑ (ANBinop b (p1 ◯ₑ ID) (p2 ◯ₑ ID)).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; reflexivity.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; reflexivity.
   Qed.
 
   Lemma flip_env4 p1 p2 s :
      (ANUnop (ADot s) p1) ◯ₑ p2 ≡ₑ (ANUnop (ADot s) (p1 ◯ₑ p2)).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); reflexivity.
   Qed.
 
   Lemma flip_env5 p1 p2:
     ♯flatten(χ⟨σ⟨p1⟩(‵{|ID|})⟩(p2)) ≡ₑ σ⟨p1⟩(p2).
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     autorewrite with alg.
@@ -1555,14 +1555,14 @@ Section ROptimEnv.
   Qed.
 
   Lemma flip_env7 p1 p2:
-    algenv_ignores_id p1 ->
+    cnraenv_ignores_id p1 ->
     (ANMapEnv (‵{| p1 |})) ◯ₑ p2 ≡ₑ χ⟨‵{| p1 ◯ₑ ID |}⟩(p2).
   Proof.
-    unfold algenv_eq; intros ? ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    rewrite (algenv_ignores_id_swap p1 H h c a x a).
+    rewrite (cnraenv_ignores_id_swap p1 H h c a x a).
     destruct (h ⊢ₑ p1 @ₑ a ⊣ c;a); try reflexivity; simpl.
     destruct ((rmap
              (fun env' : data =>
@@ -1581,7 +1581,7 @@ Section ROptimEnv.
     ‵[| (s1, p1)|] ⊗ ‵[| (s2, p2)|] ≡ₑ ‵{|‵[| (s1, p1)|] ⊕ ‵[| (s2, p2)|]|}.
   Proof.
     intros.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p1 @ₑ x ⊣ c;env); try reflexivity; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); try reflexivity; simpl.
     unfold merge_bindings.
@@ -1597,7 +1597,7 @@ Section ROptimEnv.
   Lemma dot_over_rec s p :
     (‵[| (s, p)|]) · s ≡ₑ p.
   Proof.
-    unfold algenv_eq; intros ? ? _ ? _ ? _; simpl.
+    unfold cnraenv_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;env); try reflexivity; simpl.
     unfold edot; simpl.
     destruct (string_eqdec s s); congruence.
@@ -1706,19 +1706,19 @@ Section ROptimEnv.
                | Some x'0 =>
                    lift_oncoll
                      (fun c1 : list data =>
-                      match rmap (fun_of_algenv h c p₁ env) c1 with
+                      match rmap (fun_of_cnraenv h c p₁ env) c1 with
                       | Some a' => Some (dcoll a')
                       | None => None
                       end) x'0
                | None => None
                end) l);
-      destruct (rmap (fun_of_algenv h c p₂ env) l);
+      destruct (rmap (fun_of_cnraenv h c p₂ env) l);
       simpl in * .
     - destruct (rmap
             (fun x0 : data =>
              lift_oncoll
                (fun c1 : list data =>
-                match rmap (fun_of_algenv h c p₁ env) c1 with
+                match rmap (fun_of_cnraenv h c p₁ env) c1 with
                 | Some a' => Some (dcoll a')
                 | None => None
                 end) x0) l1); try discriminate.
@@ -1729,28 +1729,28 @@ Section ROptimEnv.
             (fun x0 : data =>
              lift_oncoll
                (fun c1 : list data =>
-                match rmap (fun_of_algenv h c p₁ env) c1 with
+                match rmap (fun_of_cnraenv h c p₁ env) c1 with
                 | Some a' => Some (dcoll a')
                 | None => None
                 end) x0) l0); try discriminate.
       trivial.
     - destruct ( lift_oncoll
          (fun c1 : list data =>
-          match rmap (fun_of_algenv h c p₁ env) c1 with
+          match rmap (fun_of_cnraenv h c p₁ env) c1 with
           | Some a' => Some (dcoll a')
           | None => None
           end) d); trivial.
   Qed.
   
   (* optimization for distinct *)
-  Definition nodupA : algenv -> Prop :=
-    algenv_always_ensures
+  Definition nodupA : cnraenv -> Prop :=
+    cnraenv_always_ensures
       (fun d => match d with
                 | dcoll dl => NoDup dl
                 | _ => False
                 end).
   
-  Lemma dup_elim (q:algenv) :
+  Lemma dup_elim (q:cnraenv) :
     nodupA q -> ANUnop ADistinct q  ≡ₑ  q.
   Proof.
     intros nd.
@@ -1775,29 +1775,29 @@ This is the first operation that
     continuation of binops or ANEIther
     since that would be done separately anyway *)
   (** returns: (last part of the computation, rest of it) *)
-  Fixpoint algenv_split_last (e:algenv) : (algenv*algenv)
+  Fixpoint cnraenv_split_last (e:cnraenv) : (cnraenv*cnraenv)
     := match e with
          | ANID => (ANID,ANID)
          | ANConst c =>  (ANID,ANConst c)
          | ANBinop b e1 e2 => (ANBinop b e1 e2,ANID)
          | ANUnop u e1 =>
-           match algenv_split_last e1 with
+           match cnraenv_split_last e1 with
              | (ANID, r) => (ANUnop u r, ANID)
              | (e1last, e1rest) => (e1last, ANUnop u e1rest)
            end
          | ANMap e1 e2 =>
-           match algenv_split_last e2 with
+           match cnraenv_split_last e2 with
              | (ANID, r) => (ANMap e1 e2, ANID)
              | (e2last, e2rest) => (e2last, ANMap e1 e2rest)
            end
          | ANMapConcat e1 e2 =>
-           match algenv_split_last e2 with
+           match cnraenv_split_last e2 with
              | (ANID, r) => (ANMapConcat e1 e2, ANID)
              | (e2last, e2rest) => (e2last, ANMapConcat e1 e2rest)
            end
          | ANProduct e1 e2 => (ANProduct e1 e2,ANID)
          | ANSelect e1 e2 =>
-           match algenv_split_last e2 with
+           match cnraenv_split_last e2 with
              | (ANID, r) => (ANSelect e1 e2, ANID)
              | (e2last, e2rest) => (e2last, ANSelect e1 e2rest)
            end         
@@ -1806,7 +1806,7 @@ This is the first operation that
          | ANEitherConcat l r =>
            (ANEitherConcat l r, ANID)
          | ANApp e1 e2 =>
-           match algenv_split_last e2 with
+           match cnraenv_split_last e2 with
              | (ANID, r) => (e1, r)
              | (e2last, e2rest) => (e2last, ANApp e1 e2rest)
            end         
@@ -1835,9 +1835,9 @@ End ROptimEnv.
     Generalized into: tenvmap_into_id
 *)
 
-Hint Rewrite @envflatten_map_coll : algenv_optim.
-Hint Rewrite @envmap_into_id : algenv_optim.
-Hint Rewrite @envmap_into_id_flatten : algenv_optim.
+Hint Rewrite @envflatten_map_coll : cnraenv_optim.
+Hint Rewrite @envmap_into_id : cnraenv_optim.
+Hint Rewrite @envmap_into_id_flatten : cnraenv_optim.
 
 (*
        -- Those introduce a ◯ , but remove a χ
@@ -1845,8 +1845,8 @@ Hint Rewrite @envmap_into_id_flatten : algenv_optim.
        envmap_singleton : χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 }
 *)
 
-Hint Rewrite @envmap_map_compose : algenv_optim.
-Hint Rewrite @envmap_singleton : algenv_optim.
+Hint Rewrite @envmap_map_compose : cnraenv_optim.
+Hint Rewrite @envmap_singleton : cnraenv_optim.
 
 (*
        -- Those remove over flatten
@@ -1857,10 +1857,10 @@ Hint Rewrite @envmap_singleton : algenv_optim.
     Generalized into: tenvflatten_coll
 *)
 
-Hint Rewrite @envflatten_coll_mergeconcat : algenv_optim.
-Hint Rewrite @envflatten_coll_map : algenv_optim.
-Hint Rewrite @envflatten_coll_flatten : algenv_optim.
-Hint Rewrite @envflatten_coll_coll : algenv_optim.
+Hint Rewrite @envflatten_coll_mergeconcat : cnraenv_optim.
+Hint Rewrite @envflatten_coll_map : cnraenv_optim.
+Hint Rewrite @envflatten_coll_flatten : cnraenv_optim.
+Hint Rewrite @envflatten_coll_coll : cnraenv_optim.
 
 (*
        -- Those push-down or remove ◯
@@ -1881,19 +1881,19 @@ Hint Rewrite @envflatten_coll_coll : algenv_optim.
           ≡ₑ (χᵉ⟨‵{|ENV|} ⟩( ID)) ◯ₑ (χ⟨ENV ⟩( σ⟨p1 ⟩( ‵{|ID|}))) ◯ p2
 *)
 
-Hint Rewrite @app_over_id : algenv_optim.
-Hint Rewrite @app_over_id_l : algenv_optim.
-Hint Rewrite @app_over_app : algenv_optim.           (* Not in ROptimEnvFunc *)
-Hint Rewrite @app_over_map : algenv_optim.
-Hint Rewrite @app_over_select : algenv_optim.
-Hint Rewrite @app_over_unop : algenv_optim.
-Hint Rewrite @app_over_binop_l : algenv_optim.
-Hint Rewrite @app_over_merge : algenv_optim.
-Hint Rewrite @app_over_rec : algenv_optim.
-Hint Rewrite @binop_over_rec_pair : algenv_optim.
-Hint Rewrite @concat_id_left : algenv_optim.
-Hint Rewrite @app_over_env_dot : algenv_optim.
-Hint Rewrite @app_over_appenv_over_mapenv : algenv_optim.
+Hint Rewrite @app_over_id : cnraenv_optim.
+Hint Rewrite @app_over_id_l : cnraenv_optim.
+Hint Rewrite @app_over_app : cnraenv_optim.           (* Not in ROptimEnvFunc *)
+Hint Rewrite @app_over_map : cnraenv_optim.
+Hint Rewrite @app_over_select : cnraenv_optim.
+Hint Rewrite @app_over_unop : cnraenv_optim.
+Hint Rewrite @app_over_binop_l : cnraenv_optim.
+Hint Rewrite @app_over_merge : cnraenv_optim.
+Hint Rewrite @app_over_rec : cnraenv_optim.
+Hint Rewrite @binop_over_rec_pair : cnraenv_optim.
+Hint Rewrite @concat_id_left : cnraenv_optim.
+Hint Rewrite @app_over_env_dot : cnraenv_optim.
+Hint Rewrite @app_over_appenv_over_mapenv : cnraenv_optim.
 
 (*
        -- Other misc rewrites
@@ -1902,10 +1902,10 @@ Hint Rewrite @app_over_appenv_over_mapenv : algenv_optim.
                                  ≡ χ⟨ { ID } ⟩(♯flatten(χ⟨ ♯flatten( p1 ) ⟩( p2 )))
 *)
 
-Hint Rewrite @product_singletons : algenv_optim.
-Hint Rewrite @double_flatten_map_coll : algenv_optim.
-Hint Rewrite @tostring_dstring : algenv_optim.
-Hint Rewrite @tostring_tostring : algenv_optim.
+Hint Rewrite @product_singletons : cnraenv_optim.
+Hint Rewrite @double_flatten_map_coll : cnraenv_optim.
+Hint Rewrite @tostring_dstring : cnraenv_optim.
+Hint Rewrite @tostring_tostring : cnraenv_optim.
 
 (*
        -- Those handle operators on the environment
@@ -1915,27 +1915,27 @@ Hint Rewrite @tostring_tostring : algenv_optim.
                                    ≡ₑ χ⟨ { ID.e } ⟩(ANBinop AMergeConcat ENV ID)
 *)
 
-Hint Rewrite @env_appenv : algenv_optim.
-Hint Rewrite @appenv_over_mapenv : algenv_optim.
-Hint Rewrite @appenv_over_mapenv_coll : algenv_optim.
-Hint Rewrite @appenv_over_mapenv_merge : algenv_optim.
-Hint Rewrite @appenv_over_mapenv_merge2 : algenv_optim.
-Hint Rewrite @compose_selects_in_mapenv : algenv_optim.
-Hint Rewrite @flatten_through_appenv : algenv_optim.
-Hint Rewrite @flatten_mapenv_coll : algenv_optim.
+Hint Rewrite @env_appenv : cnraenv_optim.
+Hint Rewrite @appenv_over_mapenv : cnraenv_optim.
+Hint Rewrite @appenv_over_mapenv_coll : cnraenv_optim.
+Hint Rewrite @appenv_over_mapenv_merge : cnraenv_optim.
+Hint Rewrite @appenv_over_mapenv_merge2 : cnraenv_optim.
+Hint Rewrite @compose_selects_in_mapenv : cnraenv_optim.
+Hint Rewrite @flatten_through_appenv : cnraenv_optim.
+Hint Rewrite @flatten_mapenv_coll : cnraenv_optim.
 
 (* Simple optimizations for either *)
-Hint Rewrite @either_app_over_dleft : algenv_optim.
-Hint Rewrite @either_app_over_dright : algenv_optim.
-Hint Rewrite @either_app_over_aleft : algenv_optim.
-Hint Rewrite @either_app_over_aright : algenv_optim.
+Hint Rewrite @either_app_over_dleft : cnraenv_optim.
+Hint Rewrite @either_app_over_dright : cnraenv_optim.
+Hint Rewrite @either_app_over_aleft : cnraenv_optim.
+Hint Rewrite @either_app_over_aright : cnraenv_optim.
 
 (* Optimizations for rproject *)
-Hint Rewrite @rproject_over_concat : algenv_optim.
-Hint Rewrite @rproject_over_rec_in : algenv_optim. 
-Hint Rewrite @rproject_over_rec_nin : algenv_optim. 
-Hint Rewrite @rproject_over_rproject : algenv_optim. 
-Hint Rewrite @rproject_over_either  : algenv_optim.
+Hint Rewrite @rproject_over_concat : cnraenv_optim.
+Hint Rewrite @rproject_over_rec_in : cnraenv_optim. 
+Hint Rewrite @rproject_over_rec_nin : cnraenv_optim. 
+Hint Rewrite @rproject_over_rproject : cnraenv_optim. 
+Hint Rewrite @rproject_over_either  : cnraenv_optim.
   
 (* end hide *)
 

@@ -40,50 +40,50 @@ Section TAlgEnvInfer.
   Context {m:basic_model}.
   Context (τconstants:list (string*rtype)).
 
-  Fixpoint infer_algenv_type (e:algenv) (τenv τin:rtype) : option rtype :=
+  Fixpoint infer_cnraenv_type (e:cnraenv) (τenv τin:rtype) : option rtype :=
     match e with
       | ANID => Some τin
       | ANConst d => infer_data_type (normalize_data brand_relation_brands d)
       | ANBinop b op1 op2 =>
         let binf (τ₁ τ₂:rtype) := infer_binop_type b τ₁ τ₂ in
-        olift2 binf (infer_algenv_type op1 τenv τin) (infer_algenv_type op2 τenv τin)
+        olift2 binf (infer_cnraenv_type op1 τenv τin) (infer_cnraenv_type op2 τenv τin)
       | ANUnop u op1 =>
         let unf (τ₁:rtype) := infer_unop_type u τ₁ in
-        olift unf (infer_algenv_type op1 τenv τin)
+        olift unf (infer_cnraenv_type op1 τenv τin)
       | ANMap op1 op2 =>
         let mapf (τ₁:rtype) :=
-            olift (fun x => lift (fun y => Coll y) (infer_algenv_type op1 τenv x)) (tuncoll τ₁)
+            olift (fun x => lift (fun y => Coll y) (infer_cnraenv_type op1 τenv x)) (tuncoll τ₁)
         in
-        olift mapf (infer_algenv_type op2 τenv τin)
+        olift mapf (infer_cnraenv_type op2 τenv τin)
       | ANMapConcat op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
               | Some τr₁ =>
-                match olift (tmapConcatOutput τ₁) (infer_algenv_type op1 τenv τr₁) with
+                match olift (tmapConcatOutput τ₁) (infer_cnraenv_type op1 τenv τr₁) with
                   | None => None
                   | Some τ₂ => Some (Coll τ₂)
                 end
             end
         in
-        olift mapconcatf (olift tmapConcatInput (infer_algenv_type op2 τenv τin))
+        olift mapconcatf (olift tmapConcatInput (infer_cnraenv_type op2 τenv τin))
       | ANProduct op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
               | Some τr₁ =>
-                match olift (tmapConcatOutput τ₁) (infer_algenv_type op2 τenv τin) with
+                match olift (tmapConcatOutput τ₁) (infer_cnraenv_type op2 τenv τin) with
                   | None => None
                   | Some τ₂ => Some (Coll τ₂)
                 end
             end
         in
-        olift mapconcatf (olift tmapConcatInput (infer_algenv_type op1 τenv τin))
+        olift mapconcatf (olift tmapConcatInput (infer_cnraenv_type op1 τenv τin))
       | ANSelect op1 op2 =>
         let selectf (τ₁:rtype) :=
             match tuncoll τ₁ with
               | Some τ₁' =>
-                match infer_algenv_type op1 τenv τ₁' with
+                match infer_cnraenv_type op1 τenv τ₁' with
                   | Some τ₂ =>
                     match `τ₂ with
                       | Bool₀ => Some (Coll τ₁')
@@ -94,9 +94,9 @@ Section TAlgEnvInfer.
               | None => None
             end
         in
-        olift selectf (infer_algenv_type op2 τenv τin)
+        olift selectf (infer_cnraenv_type op2 τenv τin)
       | ANDefault op1 op2 =>
-        match ((infer_algenv_type op1 τenv τin), (infer_algenv_type op2 τenv τin)) with
+        match ((infer_cnraenv_type op1 τenv τin), (infer_cnraenv_type op2 τenv τin)) with
             | (Some τ₁', Some τ₂') =>
               match (tuncoll τ₁', tuncoll τ₂') with
                 | (Some τ₁₀, Some τ₂₀) =>
@@ -108,7 +108,7 @@ Section TAlgEnvInfer.
       | ANEither op1 op2 =>
         match tuneither τin with
         | Some (τl, τr) =>
-          match ((infer_algenv_type op1 τenv τl), (infer_algenv_type op2 τenv τr)) with
+          match ((infer_cnraenv_type op1 τenv τl), (infer_cnraenv_type op2 τenv τr)) with
           | (Some τ₁', Some τ₂') =>
             if (rtype_eq_dec τ₁' τ₂') (* Probably should be generalized using join... *)
             then Some τ₁'
@@ -118,7 +118,7 @@ Section TAlgEnvInfer.
         | _ => None
         end
       | ANEitherConcat op1 op2 =>
-        match (infer_algenv_type op1 τenv τin, infer_algenv_type op2 τenv τin) with
+        match (infer_cnraenv_type op1 τenv τin, infer_cnraenv_type op2 τenv τin) with
         | (Some τeither, Some τrecplus) =>          
           match tuneither τeither with
           | Some (τl, τr) =>
@@ -132,29 +132,29 @@ Section TAlgEnvInfer.
         | (_, _) => None
         end
       | ANApp op1 op2 =>
-        let appf (τ₁:rtype) := infer_algenv_type op1 τenv τ₁ in
-        olift appf (infer_algenv_type op2 τenv τin)
+        let appf (τ₁:rtype) := infer_cnraenv_type op1 τenv τ₁ in
+        olift appf (infer_cnraenv_type op2 τenv τin)
       | ANGetConstant s =>
         tdot τconstants s
       | ANEnv =>
         Some τenv
       | ANAppEnv op1 op2 =>
-        let appf (τ₁:rtype) := infer_algenv_type op1 τ₁ τin in
-        olift appf (infer_algenv_type op2 τenv τin)
+        let appf (τ₁:rtype) := infer_cnraenv_type op1 τ₁ τin in
+        olift appf (infer_cnraenv_type op2 τenv τin)
       | ANMapEnv op1 =>
         let mapf (τenv':rtype) :=
-            lift Coll (infer_algenv_type op1 τenv' τin)
+            lift Coll (infer_cnraenv_type op1 τenv' τin)
         in
         olift mapf (tuncoll τenv)
     end.
 
-  Lemma infer_algenv_type_correct (τenv τin τout:rtype) (e:algenv) :
-    infer_algenv_type e τenv τin = Some τout ->
-    algenv_type τconstants e τenv τin τout.
+  Lemma infer_cnraenv_type_correct (τenv τin τout:rtype) (e:cnraenv) :
+    infer_cnraenv_type e τenv τin = Some τout ->
+    cnraenv_type τconstants e τenv τin τout.
   Proof.
     intros.
     revert τenv τin τout H.
-    algenv_cases (induction e) Case; intros; simpl in H.
+    cnraenv_cases (induction e) Case; intros; simpl in H.
     - Case "ANID"%string.
       inversion H; clear H.
       apply ANTID.
@@ -163,26 +163,26 @@ Section TAlgEnvInfer.
       apply infer_data_type_correct. assumption.
     - Case "ANBinop"%string.
       specialize (IHe1 τenv τin); specialize (IHe2 τenv τin).
-      destruct (infer_algenv_type e1 τenv τin);
-        destruct (infer_algenv_type e2 τenv τin); simpl in *;
+      destruct (infer_cnraenv_type e1 τenv τin);
+        destruct (infer_cnraenv_type e2 τenv τin); simpl in *;
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
       apply (@ANTBinop m τconstants τenv τin r r0 τout); try assumption.
       apply infer_binop_type_correct; assumption.
     - Case "ANUnop"%string.
       specialize (IHe τenv τin).
-      destruct (infer_algenv_type e τenv τin); simpl in *;
+      destruct (infer_cnraenv_type e τenv τin); simpl in *;
       try discriminate.
       specialize (IHe r eq_refl).
       apply (@ANTUnop m τconstants τenv τin r τout); try assumption.
       apply infer_unop_type_correct; assumption.
     - Case "ANMap"%string.
-      case_eq (infer_algenv_type e2 τenv τin); intros; simpl in *.
+      case_eq (infer_cnraenv_type e2 τenv τin); intros; simpl in *.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H. simpl in *.
         unfold lift in H.
         case_eq (tuncoll r); intros. rewrite H1 in *.
         inversion H. subst. clear H H0.
-        case_eq (infer_algenv_type e1 τenv r0); intros.
+        case_eq (infer_cnraenv_type e1 τenv r0); intros.
         specialize (IHe1 τenv r0 r1 H).
         rewrite H in H3.
         inversion H3.
@@ -193,7 +193,7 @@ Section TAlgEnvInfer.
         rewrite H1 in H; simpl in H; congruence.
       + rewrite H0 in H. simpl in H; congruence.
     - Case "ANMapConcat"%string.
-      case_eq (infer_algenv_type e2 τenv τin); intros.
+      case_eq (infer_cnraenv_type e2 τenv τin); intros.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
         destruct r; try congruence.
@@ -208,7 +208,7 @@ Section TAlgEnvInfer.
         simpl in H; clear eq12 eq11 e.
         assert (RecMaybe Closed l1' = Some (Rec Closed l1' pf1')) by apply RecMaybe_pf_some.
         rewrite H0 in H; clear H0.
-        case_eq (infer_algenv_type e1 τenv (Rec Closed l1' pf1')); intros.
+        case_eq (infer_cnraenv_type e1 τenv (Rec Closed l1' pf1')); intros.
         * rewrite H0 in H; simpl in H.
           destruct r; try congruence.
           destruct x; simpl in H; try congruence.
@@ -262,8 +262,8 @@ Section TAlgEnvInfer.
         * rewrite H0 in H; simpl in H; congruence.
       + rewrite H0 in H; simpl in H; congruence.
     - Case "ANProduct"%string.
-      case_eq (infer_algenv_type e1 τenv τin); intros.
-      case_eq (infer_algenv_type e2 τenv τin); intros.
+      case_eq (infer_cnraenv_type e1 τenv τin); intros.
+      case_eq (infer_cnraenv_type e2 τenv τin); intros.
       + specialize (IHe1 τenv τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
         destruct r; try congruence.
@@ -330,18 +330,18 @@ Section TAlgEnvInfer.
         rewrite H1.
         auto.
       + rewrite H1 in H. simpl in H.
-        destruct ((olift tmapConcatInput (infer_algenv_type e1 τenv τin))); simpl in H.
+        destruct ((olift tmapConcatInput (infer_cnraenv_type e1 τenv τin))); simpl in H.
         destruct (RecMaybe Closed l); congruence.
         congruence.
       + rewrite H0 in H; simpl in H; congruence.
     - Case "ANSelect"%string.
       simpl.
-      case_eq (infer_algenv_type e2 τenv τin); intros; simpl in *.
+      case_eq (infer_cnraenv_type e2 τenv τin); intros; simpl in *.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H. simpl in *.
         unfold lift in H.
         case_eq (tuncoll r); intros. rewrite H1 in *.
         inversion H. subst. clear H H0.
-        case_eq (infer_algenv_type e1 τenv r0); intros.
+        case_eq (infer_cnraenv_type e1 τenv r0); intros.
         specialize (IHe1 τenv r0 r1 H).
         rewrite H in H3.
         destruct r1; try congruence; simpl in *.
@@ -358,7 +358,7 @@ Section TAlgEnvInfer.
       + rewrite H0 in H. simpl in H; congruence.
     - Case "ANDefault"%string.
       specialize (IHe1 τenv τin); specialize (IHe2 τenv τin).
-      destruct (infer_algenv_type e1 τenv τin); destruct (infer_algenv_type e2 τenv τin); simpl in *;
+      destruct (infer_cnraenv_type e1 τenv τin); destruct (infer_cnraenv_type e2 τenv τin); simpl in *;
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
       case_eq r; case_eq r0;intros; subst; simpl in *.
@@ -389,7 +389,7 @@ Section TAlgEnvInfer.
       ; eapply ANTEither
       ; eauto.
     - Case "ANEitherConcat"%string.
-      case_eq (infer_algenv_type e1 τenv τin); case_eq (infer_algenv_type e2 τenv τin); simpl in *; intros;
+      case_eq (infer_cnraenv_type e1 τenv τin); case_eq (infer_cnraenv_type e2 τenv τin); simpl in *; intros;
       rewrite H0 in *; rewrite H1 in *; try discriminate.
       unfold tuneither in H.
       destruct r0; simpl in H.
@@ -434,7 +434,7 @@ Section TAlgEnvInfer.
       eapply ANTEitherConcat; eauto.
     - Case "ANApp"%string.
       specialize (IHe2 τenv τin).
-      destruct (infer_algenv_type e2 τenv τin).
+      destruct (infer_cnraenv_type e2 τenv τin).
       specialize (IHe2 r eq_refl).
       econstructor; eauto.
       simpl in *; congruence.
@@ -444,7 +444,7 @@ Section TAlgEnvInfer.
       inversion H; apply ANTEnv.
     - Case "ANAppEnv"%string.
       specialize (IHe2 τenv τin).
-      destruct (infer_algenv_type e2 τenv τin).
+      destruct (infer_cnraenv_type e2 τenv τin).
       simpl in H.
       specialize (IHe2 r eq_refl).
       specialize (IHe1 r τin τout).
@@ -459,7 +459,7 @@ Section TAlgEnvInfer.
         assert (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) 
                       (` r) (proj2_sig r) = r) by (apply rtype_fequal; reflexivity).
         rewrite H0 in H; clear H0.
-        case_eq (infer_algenv_type e r τin); intros; simpl in *.
+        case_eq (infer_cnraenv_type e r τin); intros; simpl in *.
         * unfold lift in H.
           rewrite H0 in H; simpl in H.
           inversion H. subst; clear H.

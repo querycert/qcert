@@ -46,7 +46,7 @@ Section CompStat.
   Context {ft:foreign_type}.
   Context {fr:foreign_runtime}.
   Context {bm:brand_model}.
-  Context {nraenv_core_logger:optimizer_logger string algenv}.
+  Context {nraenv_core_logger:optimizer_logger string cnraenv}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nnrc}.
   Context {fredop:foreign_reduce_op}.
@@ -127,8 +127,8 @@ Section CompStat.
 
   Definition stat_nraenv_core (q:nraenv_core) : data :=
     drec
-      (("nraenv_core_size", dnat (Z_of_nat (algenv_size q)))
-         :: ("nraenv_core_depth", dnat (Z_of_nat (algenv_depth q)))
+      (("nraenv_core_size", dnat (Z_of_nat (cnraenv_size q)))
+         :: ("nraenv_core_depth", dnat (Z_of_nat (cnraenv_depth q)))
          :: nil).
 
   Definition stat_nraenv (q:nraenv) : data :=

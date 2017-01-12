@@ -36,36 +36,36 @@ Section CAMPtoNRAEnv.
 
   (** Translation from CAMP to EnvNRA *)
 
-  (* Java equivalent: CampToNra.algenv_of_pat *)
-  Fixpoint algenv_of_pat (p:pat) : algenv :=
+  (* Java equivalent: CampToNra.cnraenv_of_pat *)
+  Fixpoint cnraenv_of_pat (p:pat) : cnraenv :=
     match p with
       | pconst d' => envpat_match (ANConst d')
-      | punop uop p₁ => ANMap (ANUnop uop ANID) (algenv_of_pat p₁)
+      | punop uop p₁ => ANMap (ANUnop uop ANID) (cnraenv_of_pat p₁)
       | pbinop bop p₁ p₂ =>
         ANMap (ANBinop bop (ANUnop (ADot "a1") ANID) (ANUnop (ADot "a2") ANID))
-              (ANProduct (ANMap (ANUnop (ARec "a1") ANID) (algenv_of_pat p₁))
-                         (ANMap (ANUnop (ARec "a2") ANID) (algenv_of_pat p₂)))
+              (ANProduct (ANMap (ANUnop (ARec "a1") ANID) (cnraenv_of_pat p₁))
+                         (ANMap (ANUnop (ARec "a2") ANID) (cnraenv_of_pat p₂)))
       | pmap p₁ =>
         envpat_match
           (ANUnop AFlatten
                   (ANMap
-                     (algenv_of_pat p₁) ANID))
+                     (cnraenv_of_pat p₁) ANID))
       | passert p₁ =>
-        ANMap (ANConst (drec nil)) (ANSelect ANID (algenv_of_pat p₁))
-      | porElse p₁ p₂ => ANDefault (algenv_of_pat p₁) (algenv_of_pat p₂)
+        ANMap (ANConst (drec nil)) (ANSelect ANID (cnraenv_of_pat p₁))
+      | porElse p₁ p₂ => ANDefault (cnraenv_of_pat p₁) (cnraenv_of_pat p₂)
       | pit => envpat_match ANID
       | pletIt p₁ p₂ =>
         ANUnop AFlatten
-               (ANMap (algenv_of_pat p₂)
-                      (algenv_of_pat p₁))
+               (ANMap (cnraenv_of_pat p₂)
+                      (cnraenv_of_pat p₁))
       | pgetconstant s => envpat_match (ANGetConstant s)
       | penv => envpat_match ANEnv
       | pletEnv p₁ p₂ =>
         ANUnop AFlatten
                (ANAppEnv
-                  (ANMapEnv (algenv_of_pat p₂))
+                  (ANMapEnv (cnraenv_of_pat p₂))
                   (ANUnop AFlatten
-                          (ANMap (ANBinop AMergeConcat ANEnv ANID) (algenv_of_pat p₁))))
+                          (ANMap (ANBinop AMergeConcat ANEnv ANID) (cnraenv_of_pat p₁))))
       | pleft =>
         ANEither (envpat_match ANID) (envpat_fail)
       | pright =>
@@ -76,16 +76,16 @@ Section CAMPtoNRAEnv.
       (with an empty context) 
   *)
 
-  Definition algenv_of_pat_top p :=
+  Definition cnraenv_of_pat_top p :=
     ANUnop AFlatten
-           (ANMap (algenv_of_pat p) (ANUnop AColl ANID)).
+           (ANMap (cnraenv_of_pat p) (ANUnop AColl ANID)).
   
   (** Theorem 4.2: lemma of translation correctness for patterns *)
 
   Local Open Scope alg_scope.
 
   Lemma pat_envtrans_correct h c q env d:
-    lift_failure (interp h c q env d) = fun_of_algenv h c (algenv_of_pat q) (drec env) d.
+    lift_failure (interp h c q env d) = fun_of_cnraenv h c (cnraenv_of_pat q) (drec env) d.
   Proof.
     revert d env; induction q; simpl; intros.
     (* pconst *)
@@ -109,7 +109,7 @@ Section CAMPtoNRAEnv.
       destruct (interp h c q env a); try reflexivity; simpl.
       * rewrite IHl; clear IHl; simpl.
         unfold lift; simpl.
-        destruct (rmap (fun_of_algenv h c (algenv_of_pat q) (drec env)) l); try reflexivity; simpl.
+        destruct (rmap (fun_of_cnraenv h c (cnraenv_of_pat q) (drec env)) l); try reflexivity; simpl.
         unfold rflatten, lift; simpl.
         destruct (oflat_map
             (fun x : data =>
@@ -118,7 +118,7 @@ Section CAMPtoNRAEnv.
              | _ => None
              end) l0); reflexivity.
       * unfold lift, liftpr in *; simpl in *.
-        revert IHl; generalize (rmap (fun_of_algenv h c (algenv_of_pat q) (drec env)) l); intros.
+        revert IHl; generalize (rmap (fun_of_cnraenv h c (cnraenv_of_pat q) (drec env)) l); intros.
         destruct o; simpl in *.
         revert IHl; generalize (gather_successes (map (interp h c q env) l)); intros.
         destruct p; unfold rflatten in *; simpl in *; try congruence;
@@ -169,16 +169,16 @@ Section CAMPtoNRAEnv.
   
   Lemma pat_envtrans_equiv_to_alg h c p bind d:
     nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
-    fun_of_algenv h c (algenv_of_pat p) (drec bind) d.
+    fun_of_cnraenv h c (cnraenv_of_pat p) (drec bind) d.
   Proof.
     rewrite <- pat_envtrans_correct.
     rewrite pat_trans_correct; reflexivity.
   Qed.
 
-  Lemma algenv_of_pat_top_id h c p d :
+  Lemma cnraenv_of_pat_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
     nra_eval h (alg_of_pat_top c p) d =
-    fun_of_algenv h c (algenv_of_pat_top p) (drec nil) d.
+    fun_of_cnraenv h c (cnraenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.
     simpl.
@@ -191,11 +191,11 @@ Section CAMPtoNRAEnv.
   Lemma epat_trans_top_correct h c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
     (* XXX Why nil for local-env there?! Probably should have a interp_top with fixed nil local-env XXX *)
-    lift_failure (interp h c p nil d) = fun_of_algenv h c (algenv_of_pat_top p) (drec nil) d.
+    lift_failure (interp h c p nil d) = fun_of_cnraenv h c (cnraenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.
-    unfold fun_of_algenv.
-    rewrite <- (algenv_of_pat_top_id h c); trivial.
+    unfold fun_of_cnraenv.
+    rewrite <- (cnraenv_of_pat_top_id h c); trivial.
     rewrite pat_trans_correct.
     rewrite pat_trans_top_pat_context; trivial; reflexivity.
   Qed.
@@ -203,9 +203,9 @@ Section CAMPtoNRAEnv.
   Section Top.
     (* Java equivalent: CampToNra.convert *)
     (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
-    Definition translate_pat_to_algenv (p:pat) : algenv :=
+    Definition translate_pat_to_cnraenv (p:pat) : cnraenv :=
       (* Produces the initial plan *)
-      ANAppEnv (algenv_of_pat p) (ANConst (drec nil)).
+      ANAppEnv (cnraenv_of_pat p) (ANConst (drec nil)).
 
   End Top.
 
@@ -214,7 +214,7 @@ Section CAMPtoNRAEnv.
     
     (** Proof showing linear size translation *)
     Lemma pat_trans_size p :
-      algenv_size (algenv_of_pat p) <= 13 * pat_size p.
+      cnraenv_size (cnraenv_of_pat p) <= 13 * pat_size p.
     Proof.
       induction p; simpl; omega.
     Qed.
