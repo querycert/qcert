@@ -40,7 +40,7 @@ Section ROptimExt.
     p1 ≡ₓ p2.
   Proof.
     unfold nra_eq, nraext_eq; intros.
-    unfold fun_of_nraext.
+    unfold nraext_eval.
     rewrite H; trivial.
   Qed.
 

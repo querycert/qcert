@@ -74,56 +74,56 @@ Section NRAExt.
 
   Global Instance eabinop_proper : Proper (binop_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXBinop.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply abinop_proper; assumption.
   Qed.
 
   (* AXUnop *)
   Global Instance eaunop_proper : Proper (unaryop_eq ==> nraext_eq ==> nraext_eq) AXUnop.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aunop_proper; assumption.
   Qed.
 
   (* AXMap *)
   Global Instance eamap_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXMap.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply amap_proper; assumption.
   Qed.
 
   (* AXMapConcat *)
   Global Instance eamapconcat_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXMapConcat.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply amapconcat_proper; assumption.
   Qed.
 
   (* AXProduct *)
   Global Instance eaproduct_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXProduct.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aproduct_proper; assumption.
   Qed.
 
   (* AXSelect *)
   Global Instance easelect_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXSelect.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aselect_proper; assumption.
   Qed.
 
   (* AXEither *)
   Global Instance eaeither_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXEither.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros; simpl.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros; simpl.
     destruct x1; simpl; trivial; inversion H1; subst; eauto.
   Qed.
 
   (* AXEitherConcat *)
   Global Instance eaeitherconcat_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXEitherConcat.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros; simpl.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros; simpl.
     rewrite (H0 h x1) by trivial; rewrite (H h x1) by trivial.
     case_eq (h ⊢ nra_of_nraext y0 @ₐ x1); case_eq (h ⊢ nra_of_nraext y @ₐ x1); intros; simpl; trivial.
   Qed.
@@ -131,21 +131,21 @@ Section NRAExt.
   (* AXDefault *)
   Global Instance eadefault_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXDefault.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply adefault_proper; assumption.
   Qed.
 
   (* AXApp *)
   Global Instance eaapp_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXApp.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aapp_proper; assumption.
   Qed.
 
   (* AXJoin *)
   Global Instance eajoin_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXJoin.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aselect_proper; try assumption.
     apply aproduct_proper; assumption.
   Qed.
@@ -153,7 +153,7 @@ Section NRAExt.
   (* AXSemiJoin *)
   Global Instance easemi_join_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXSemiJoin.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aselect_proper; try assumption.
     apply aunop_proper; try assumption; try reflexivity.
     apply abinop_proper; try assumption; try reflexivity.
@@ -164,7 +164,7 @@ Section NRAExt.
   (* AXAntiJoin *)
   Global Instance eaanti_join_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXAntiJoin.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aselect_proper; try assumption.
     apply abinop_proper; try assumption; try reflexivity.
     apply aselect_proper; try assumption; try reflexivity.
@@ -174,7 +174,7 @@ Section NRAExt.
   (* AXMapToRec *)
   Global Instance eamap_to_rec_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXMapToRec.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply amap_proper; try assumption.
     rewrite H; reflexivity.
   Qed.    
@@ -182,7 +182,7 @@ Section NRAExt.
   (* AXMapAddRec *)
   Global Instance eamap_add_rec_proper : Proper (eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXMapAddRec.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply amap_proper; try assumption.
     apply abinop_proper; try assumption; try reflexivity.
     apply aunop_proper; try assumption; try reflexivity.
@@ -192,7 +192,7 @@ Section NRAExt.
   (* rproject *)
   Global Instance rproject_proper : Proper (eq ==> nra_eq ==> nra_eq) rproject.
   Proof.
-    unfold Proper, respectful, nra_eq, fun_of_nraext; intros ls ls' ?; subst ls'. intros.
+    unfold Proper, respectful, nra_eq, nraext_eval; intros ls ls' ?; subst ls'. intros.
     induction ls; trivial.
     simpl.
     rewrite H, IHls by trivial.
@@ -231,7 +231,7 @@ Section NRAExt.
   (* AXProjectRemove *)
   Global Instance eaproject_remove_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXProjectRemove.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     rewrite H by trivial; clear H.
     apply amap_proper; try assumption; reflexivity.
   Qed.    
@@ -239,7 +239,7 @@ Section NRAExt.
   (* AXMapRename *)
   Global Instance eamap_rename_rec_proper : Proper (eq ==> eq ==> nraext_eq ==> nraext_eq) AXMapRename.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     rewrite H by trivial; rewrite H0 by trivial; clear H H0.
     apply amap_proper; try assumption; reflexivity.
   Qed.    
@@ -247,7 +247,7 @@ Section NRAExt.
   (* AXUnnestOne *)
   Global Instance eaunnest_one_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXUnnestOne.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     rewrite H by trivial; clear H.
     apply amap_proper; try assumption; try reflexivity.
     apply amapconcat_proper; try assumption; reflexivity.
@@ -256,7 +256,7 @@ Section NRAExt.
   (* AXUnnestTwo *)
   Global Instance eaunnest_two_proper : Proper (eq ==> eq ==> nraext_eq ==> nraext_eq) AXUnnestTwo.
   Proof.
-    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
+    unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     rewrite H by trivial; rewrite H0 by trivial; clear H H0.
     apply amap_proper; try assumption; try reflexivity.
     apply amapconcat_proper; try assumption; reflexivity.

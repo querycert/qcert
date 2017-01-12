@@ -39,7 +39,7 @@ Section TNRAExt.
     (d ▹ τin) -> (op ▷ τin >=> τout) ->
     (exists x, (brand_relation_brands ⊢ op @ₓ d = Some x /\ (x ▹ τout))).
   Proof.
-    unfold fun_of_nraext, nraext_type; intros.
+    unfold nraext_eval, nraext_type; intros.
     apply (@typed_nra_yields_typed_data m τin τout); assumption.
   Qed.
 
@@ -49,14 +49,14 @@ Section TNRAExt.
     (d ▹ τin) -> (op ▷ τin >=> τout) ->             
     { x:data | x ▹ τout }.
   Proof.
-    unfold fun_of_nraext, nraext_type; intros.
+    unfold nraext_eval, nraext_type; intros.
     apply (@typed_nra_total m τin τout (nra_of_nraext op) H0 d); assumption.
   Defined.
 
   Definition tnraext_eval {τin τout} (op:nraext) (d:data):
     (d ▹ τin) -> (op ▷ τin >=> τout) -> data.
   Proof.
-    unfold fun_of_nraext, nraext_type; intros.
+    unfold nraext_eval, nraext_type; intros.
     apply (@tnra_eval m τin τout (nra_of_nraext op) H0 d); assumption.
   Defined.
 End TNRAExt.
