@@ -29,14 +29,14 @@ Notation "[| x1 ; .. ; xn |]" := (RData.drec (cons x1 .. (cons xn nil) ..)) : da
 Notation "{||}" := (dcoll nil) : data_scope. (* collections *)
 Notation "{| x1 ; .. ; xn |}" := (dcoll (cons x1 .. (cons xn nil) ..)) : data_scope.
 
-Section RAlgTest.
+Section NRATest.
   Require Import String ZArith.
   Open Scope Z_scope.
 
   Require Import NRARuntime.
 
   Local Open Scope string_scope.
-  Local Open Scope algext_scope.
+  Local Open Scope nraext_scope.
   Local Open Scope data_scope.
 
   (*****************
@@ -287,7 +287,7 @@ Section RAlgTest.
 
   (* Eval compute in (h ⊢ qpersons @ₓ dunit). *)
 
-End RAlgTest.
+End NRATest.
 
 (* 
 *** Local Variables: ***

@@ -35,14 +35,14 @@ Section NRASugar.
   (* Match failure returns the empty sequence, success returns a singleton sequence *)
   Definition pat_fail := AConst (dcoll nil).
   Definition pat_match op := AUnop AColl op.
-  Definition pat_triple s1 s2 s3 (aconst:alg) (abind:alg) (adata:alg) :=
+  Definition pat_triple s1 s2 s3 (aconst:nra) (abind:nra) (adata:nra) :=
     ABinop AConcat
            (AUnop (ARec s1) aconst)
            (ABinop AConcat
                    (AUnop (ARec s2) abind)
                    (AUnop (ARec s3) adata)).
   
-  Definition pat_context (aconst:alg) (abind:alg) (adata:alg) :=
+  Definition pat_context (aconst:nra) (abind:nra) (adata:nra) :=
     pat_triple "PCONST" "PBIND" "PDATA"  aconst abind adata.
   
   Definition pat_withbinding :=
@@ -55,7 +55,7 @@ Section NRASugar.
             :: nil).
 
   (* Variant used in context *)
-  Definition make_fixed_pat_context_data (const:data) (env:data) : alg
+  Definition make_fixed_pat_context_data (const:data) (env:data) : nra
     := ABinop AConcat
               (AUnop (ARec "PBIND"%string) (AConst env))
               (ABinop AConcat

@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TAlgTest.
+Section TNRATest.
   Require Import List String.
 
   Require Import Utils BasicSystem.
@@ -23,7 +23,7 @@ Section TAlgTest.
   Require Import NRATest.
 
   Local Open Scope string_scope.
-  Local Open Scope algext_scope.
+  Local Open Scope nraext_scope.
 
   (**************
    * Input data *
@@ -215,7 +215,7 @@ Section TAlgTest.
 
   (* Eval compute in (q4_wt ⊨ 𝓐(q4)). (* computes the 'record domain' of q4 *) *)
 
-End TAlgTest.
+End TNRATest.
 
 (* 
 *** Local Variables: ***

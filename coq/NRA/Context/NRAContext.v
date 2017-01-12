@@ -36,32 +36,32 @@ Section NRAContext.
   Require Import NRA NRAEq.
   Require Import RBindingsNat.
 
-  Local Open Scope alg_scope.
+  Local Open Scope nra_scope.
 
   Context {fruntime:foreign_runtime}.
 
-  Inductive alg_ctxt : Set :=
-  | CHole : nat -> alg_ctxt
-  | CPlug : alg -> alg_ctxt
-  | CABinop : binOp -> alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CAUnop : unaryOp -> alg_ctxt -> alg_ctxt
-  | CAMap : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CAMapConcat : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CAProduct : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CASelect : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CADefault : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CAEither : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CAEitherConcat : alg_ctxt -> alg_ctxt -> alg_ctxt
-  | CAApp : alg_ctxt -> alg_ctxt -> alg_ctxt
+  Inductive nra_ctxt : Set :=
+  | CHole : nat -> nra_ctxt
+  | CPlug : nra -> nra_ctxt
+  | CABinop : binOp -> nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAUnop : unaryOp -> nra_ctxt -> nra_ctxt
+  | CAMap : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAMapConcat : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAProduct : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CASelect : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CADefault : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAEither : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAEitherConcat : nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAApp : nra_ctxt -> nra_ctxt -> nra_ctxt
   .
 
-  Definition CAID : alg_ctxt
+  Definition CAID : nra_ctxt
     := CPlug AID.
 
-  Definition CAConst : data -> alg_ctxt
+  Definition CAConst : data -> nra_ctxt
     := fun d => CPlug (AConst d).
 
-  Fixpoint ac_holes (c:alg_ctxt) : list nat :=
+  Fixpoint ac_holes (c:nra_ctxt) : list nat :=
     match c with
       | CHole x => x::nil
       | CPlug a => nil
@@ -77,7 +77,7 @@ Section NRAContext.
       | CAApp c1 c2 => ac_holes c1 ++ ac_holes c2
     end.
 
-  Fixpoint ac_simplify (c:alg_ctxt) : alg_ctxt :=
+  Fixpoint ac_simplify (c:nra_ctxt) : nra_ctxt :=
     match c with
       | CHole x => CHole x
       | CPlug a => CPlug a
@@ -145,7 +145,7 @@ Section NRAContext.
       repeat rewrite <- IHc; simpl; trivial].
   Qed.
 
-  Definition ac_alg_of_ctxt c
+  Definition ac_nra_of_ctxt c
     := match (ac_simplify c) with
          | CPlug a => Some a
          | _ => None
@@ -165,12 +165,12 @@ Section NRAContext.
     rewrite e; eauto 2.
   Defined.
 
-  Lemma ac_alg_of_ctxt_nholes c :
-    ac_holes c = nil -> {a | ac_alg_of_ctxt c = Some a}.
+  Lemma ac_nra_of_ctxt_nholes c :
+    ac_holes c = nil -> {a | ac_nra_of_ctxt c = Some a}.
   Proof.
     intros ac0.
     destruct (ac_simplify_nholes _ ac0).
-    unfold ac_alg_of_ctxt.
+    unfold ac_nra_of_ctxt.
     rewrite e.
     eauto.
   Qed.
@@ -187,7 +187,7 @@ Section NRAContext.
                  match_destr; try congruence].
   Qed.
 
-  Fixpoint ac_subst (c:alg_ctxt) (x:nat) (p:alg) : alg_ctxt :=
+  Fixpoint ac_subst (c:nra_ctxt) (x:nat) (p:nra) : nra_ctxt :=
     match c with
       | CHole x'
         => if x == x' then CPlug p else CHole x'
@@ -215,7 +215,7 @@ Section NRAContext.
         => CAApp (ac_subst c1 x p) (ac_subst c2 x p)
     end.
 
-  Definition ac_substp (c:alg_ctxt) xp
+  Definition ac_substp (c:nra_ctxt) xp
     := let '(x, p) := xp in ac_subst c x p.
     
   Definition ac_substs c ps :=
@@ -579,10 +579,10 @@ Section NRAContext.
   Qed.
 
   Section equivs.
-    Context (base_equiv:alg->alg->Prop).
+    Context (base_equiv:nra->nra->Prop).
     
-   Definition alg_ctxt_equiv (c1 c2 : alg_ctxt)
-     := forall (ps:list (nat * alg)),
+   Definition nra_ctxt_equiv (c1 c2 : nra_ctxt)
+     := forall (ps:list (nat * nra)),
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
           with
@@ -590,8 +590,8 @@ Section NRAContext.
             | _, _ => True
           end.
 
-   Definition alg_ctxt_equiv_strict (c1 c2 : alg_ctxt)
-     := forall (ps:list (nat * alg)),
+   Definition nra_ctxt_equiv_strict (c1 c2 : nra_ctxt)
+     := forall (ps:list (nat * nra)),
           is_list_sorted lt_dec (domain ps) = true ->
           equivlist (domain ps) (ac_holes c1 ++ ac_holes c2) ->
           match ac_simplify (ac_substs c1 ps),
@@ -602,10 +602,10 @@ Section NRAContext.
           end.
 
    Global Instance ac_simplify_proper :
-     Proper (alg_ctxt_equiv ==> alg_ctxt_equiv) ac_simplify.
+     Proper (nra_ctxt_equiv ==> nra_ctxt_equiv) ac_simplify.
   Proof.
     unfold Proper, respectful.
-    unfold alg_ctxt_equiv.
+    unfold nra_ctxt_equiv.
     intros.
     repeat rewrite ac_simplify_substs_simplify1.
     specialize (H ps).
@@ -613,10 +613,10 @@ Section NRAContext.
   Qed.
   
   Lemma ac_simplify_proper_inv x y:
-    alg_ctxt_equiv (ac_simplify x) (ac_simplify y) -> alg_ctxt_equiv x y.
+    nra_ctxt_equiv (ac_simplify x) (ac_simplify y) -> nra_ctxt_equiv x y.
  Proof.
     unfold Proper, respectful.
-    unfold alg_ctxt_equiv.
+    unfold nra_ctxt_equiv.
     intros.
     specialize (H ps).
     repeat rewrite ac_simplify_substs_simplify1 in H.
@@ -624,25 +624,25 @@ Section NRAContext.
  Qed.
 
  Instance ac_subst_proper_part1 :
-   Proper (alg_ctxt_equiv ==> eq ==> eq ==> alg_ctxt_equiv) ac_subst.
+   Proper (nra_ctxt_equiv ==> eq ==> eq ==> nra_ctxt_equiv) ac_subst.
   Proof.
-    unfold Proper, respectful, alg_ctxt_equiv.
+    unfold Proper, respectful, nra_ctxt_equiv.
     intros. subst.
     specialize (H ((y0,y1)::ps)).
     simpl in H.
     match_destr; match_destr.
   Qed.
 
-  Global Instance ac_substs_proper_part1: Proper (alg_ctxt_equiv ==> eq ==> alg_ctxt_equiv) ac_substs.
+  Global Instance ac_substs_proper_part1: Proper (nra_ctxt_equiv ==> eq ==> nra_ctxt_equiv) ac_substs.
   Proof.
-    unfold Proper, respectful, alg_ctxt_equiv.
+    unfold Proper, respectful, nra_ctxt_equiv.
     intros. subst.
     repeat rewrite <- ac_substs_app.
     apply H.
   Qed.
 
-  Definition alg_ctxt_equiv_strict1 (c1 c2 : alg_ctxt)
-     := forall (ps:list (nat * alg)),
+  Definition nra_ctxt_equiv_strict1 (c1 c2 : nra_ctxt)
+     := forall (ps:list (nat * nra)),
           NoDup (domain ps) ->
           equivlist (domain ps) (ac_holes c1 ++ ac_holes c2) ->
           match ac_simplify (ac_substs c1 ps),
@@ -697,7 +697,7 @@ Section NRAContext.
      apply (Permutation_ind_bis
               (fun ps1 ps2 =>
                  NoDup (domain ps1) ->
-                 forall c : alg_ctxt,
+                 forall c : nra_ctxt,
                    ac_substs c ps1 =
                    ac_substs c ps2 )); intros; simpl.
      - trivial.
@@ -713,10 +713,10 @@ Section NRAContext.
    Qed. 
        
    (* They don't need to be sorted, as long as there are no duplicates *)
-   Lemma alg_ctxt_equiv_strict_equiv1 (c1 c2 : alg_ctxt) :
-     alg_ctxt_equiv_strict1 c1 c2 <-> alg_ctxt_equiv_strict c1 c2.
+   Lemma nra_ctxt_equiv_strict_equiv1 (c1 c2 : nra_ctxt) :
+     nra_ctxt_equiv_strict1 c1 c2 <-> nra_ctxt_equiv_strict c1 c2.
    Proof.
-     unfold alg_ctxt_equiv_strict, alg_ctxt_equiv_strict1.
+     unfold nra_ctxt_equiv_strict, nra_ctxt_equiv_strict1.
      split; intros.
      - apply H; trivial.
        apply is_list_sorted_NoDup in H0; trivial.
@@ -731,8 +731,8 @@ Section NRAContext.
    Qed.
 
    (* we don't really need to worry about duplicates either *)
-   Definition alg_ctxt_equiv_strict2 (c1 c2 : alg_ctxt)
-     := forall (ps:list (nat * alg)),
+   Definition nra_ctxt_equiv_strict2 (c1 c2 : nra_ctxt)
+     := forall (ps:list (nat * nra)),
           equivlist (domain ps) (ac_holes c1 ++ ac_holes c2) ->
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
@@ -790,10 +790,10 @@ Section NRAContext.
       simpl in *. intuition.
   Qed.
   
-   Lemma alg_ctxt_equiv_strict1_equiv2 (c1 c2 : alg_ctxt) :
-     alg_ctxt_equiv_strict2 c1 c2 <-> alg_ctxt_equiv_strict1 c1 c2.
+   Lemma nra_ctxt_equiv_strict1_equiv2 (c1 c2 : nra_ctxt) :
+     nra_ctxt_equiv_strict2 c1 c2 <-> nra_ctxt_equiv_strict1 c1 c2.
    Proof.
-     unfold alg_ctxt_equiv_strict1, alg_ctxt_equiv_strict2.
+     unfold nra_ctxt_equiv_strict1, nra_ctxt_equiv_strict2.
      split; intros H.
      - intros. apply H; trivial.
      - intros.
@@ -808,8 +808,8 @@ Section NRAContext.
    Qed.
 
    (* we don't really need to worry about having extra stuff either *)
-   Definition alg_ctxt_equiv_strict3 (c1 c2 : alg_ctxt)
-     := forall (ps:list (nat * alg)),
+   Definition nra_ctxt_equiv_strict3 (c1 c2 : nra_ctxt)
+     := forall (ps:list (nat * nra)),
           incl (ac_holes c1 ++ ac_holes c2) (domain ps)  ->
           match ac_simplify (ac_substs c1 ps),
                 ac_simplify (ac_substs c2 ps)
@@ -840,10 +840,10 @@ Section NRAContext.
        congruence.
    Qed.
          
-   Lemma alg_ctxt_equiv_strict2_equiv3 (c1 c2 : alg_ctxt) :
-     alg_ctxt_equiv_strict3 c1 c2 <-> alg_ctxt_equiv_strict2 c1 c2.
+   Lemma nra_ctxt_equiv_strict2_equiv3 (c1 c2 : nra_ctxt) :
+     nra_ctxt_equiv_strict3 c1 c2 <-> nra_ctxt_equiv_strict2 c1 c2.
    Proof.
-     unfold alg_ctxt_equiv_strict2, alg_ctxt_equiv_strict3.
+     unfold nra_ctxt_equiv_strict2, nra_ctxt_equiv_strict3.
      split; intros H.
      - intros. apply H; trivial. unfold equivlist, incl in *.
        intros; apply H0; trivial.
@@ -861,10 +861,10 @@ Section NRAContext.
          * apply incl_domain_cut_down_incl; trivial.
    Qed.
 
-   Lemma alg_ctxt_equiv_strict3_equiv (c1 c2 : alg_ctxt) :
-     alg_ctxt_equiv c1 c2 <-> alg_ctxt_equiv_strict3 c1 c2.
+   Lemma nra_ctxt_equiv_strict3_equiv (c1 c2 : nra_ctxt) :
+     nra_ctxt_equiv c1 c2 <-> nra_ctxt_equiv_strict3 c1 c2.
    Proof.
-     unfold alg_ctxt_equiv_strict3, alg_ctxt_equiv.
+     unfold nra_ctxt_equiv_strict3, nra_ctxt_equiv.
      intros.
       split; intros H.
      - intros. apply H; trivial.
@@ -887,13 +887,13 @@ Section NRAContext.
            inversion inn.
    Qed.
 
-   Theorem alg_ctxt_equiv_strict_equiv (c1 c2 : alg_ctxt) :
-     alg_ctxt_equiv c1 c2 <-> alg_ctxt_equiv_strict c1 c2.
+   Theorem nra_ctxt_equiv_strict_equiv (c1 c2 : nra_ctxt) :
+     nra_ctxt_equiv c1 c2 <-> nra_ctxt_equiv_strict c1 c2.
    Proof.
-     rewrite alg_ctxt_equiv_strict3_equiv,
-     alg_ctxt_equiv_strict2_equiv3,
-     alg_ctxt_equiv_strict1_equiv2,
-     alg_ctxt_equiv_strict_equiv1.
+     rewrite nra_ctxt_equiv_strict3_equiv,
+     nra_ctxt_equiv_strict2_equiv3,
+     nra_ctxt_equiv_strict1_equiv2,
+     nra_ctxt_equiv_strict_equiv1.
      reflexivity.
    Qed.
 
@@ -927,23 +927,23 @@ Section NRAContext.
       rewrite remove_all_filter. trivial.
   Qed.
 
-  Global Instance alg_ctxt_equiv_refl {refl:Reflexive base_equiv}: Reflexive alg_ctxt_equiv.
+  Global Instance nra_ctxt_equiv_refl {refl:Reflexive base_equiv}: Reflexive nra_ctxt_equiv.
   Proof.
-    unfold alg_ctxt_equiv.
+    unfold nra_ctxt_equiv.
     red; intros.
     - match_destr; reflexivity.
   Qed.   
 
-  Global Instance alg_ctxt_equiv_sym {sym:Symmetric base_equiv}: Symmetric alg_ctxt_equiv.
+  Global Instance nra_ctxt_equiv_sym {sym:Symmetric base_equiv}: Symmetric nra_ctxt_equiv.
   Proof.
-    unfold alg_ctxt_equiv.
+    unfold nra_ctxt_equiv.
     red; intros.
     - specialize (H ps). match_destr; match_destr. symmetry. trivial.
   Qed.
 
-  Global Instance alg_ctxt_equiv_trans {trans:Transitive base_equiv}: Transitive alg_ctxt_equiv.
+  Global Instance nra_ctxt_equiv_trans {trans:Transitive base_equiv}: Transitive nra_ctxt_equiv.
   Proof.
-    unfold alg_ctxt_equiv.
+    unfold nra_ctxt_equiv.
     red; intros.
     - specialize (H (ps ++ (map (fun x => (x, AID)) (ac_holes y)))).
       specialize (H0 (ps ++ (map (fun x => (x, AID)) (ac_holes y)))).
@@ -971,10 +971,10 @@ Section NRAContext.
         case_eq (fold_left (fun (a1 : list nat) (b : nat) => remove_all b a1)
      (ac_holes y)
      (fold_left
-        (fun (a1 : list nat) (b : nat * alg) =>
+        (fun (a1 : list nat) (b : nat * nra) =>
            remove_all (fst b) a1) ps (ac_holes y))); trivial.
-        intros n rl fle.
-        assert (inn:In n (n::rl)) by (simpl; intuition).
+        intros num rl fle.
+        assert (inn:In num (num::rl)) by (simpl; intuition).
         rewrite <- fle in inn.
         generalize (fold_left_remove_all_nil_in_inv' inn); intros inn2.
         generalize (fold_left_remove_all_nil_in_not_inv' inn); intros nin2.
@@ -985,7 +985,7 @@ Section NRAContext.
         transitivity x0; trivial.
   Qed.
 
-  Global Instance alg_ctxt_equiv_equivalence {equiv:Equivalence base_equiv}: Equivalence alg_ctxt_equiv.
+  Global Instance nra_ctxt_equiv_equivalence {equiv:Equivalence base_equiv}: Equivalence nra_ctxt_equiv.
   Proof.
     constructor; red; intros.
     - reflexivity.
@@ -993,35 +993,35 @@ Section NRAContext.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance alg_ctxt_equiv_preorder {pre:PreOrder base_equiv} : PreOrder alg_ctxt_equiv.
+  Global Instance nra_ctxt_equiv_preorder {pre:PreOrder base_equiv} : PreOrder nra_ctxt_equiv.
   Proof.
     constructor; red; intros.
     - reflexivity.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance alg_ctxt_equiv_strict_refl {refl:Reflexive base_equiv}: Reflexive alg_ctxt_equiv_strict.
+  Global Instance nra_ctxt_equiv_strict_refl {refl:Reflexive base_equiv}: Reflexive nra_ctxt_equiv_strict.
   Proof.
     red; intros.
-    repeat rewrite <- alg_ctxt_equiv_strict_equiv in *.
+    repeat rewrite <- nra_ctxt_equiv_strict_equiv in *.
     reflexivity.
   Qed.   
 
-  Global Instance alg_ctxt_equiv_strict_sym {sym:Symmetric base_equiv}: Symmetric alg_ctxt_equiv_strict.
+  Global Instance nra_ctxt_equiv_strict_sym {sym:Symmetric base_equiv}: Symmetric nra_ctxt_equiv_strict.
   Proof.
     red; intros.
-    repeat rewrite <- alg_ctxt_equiv_strict_equiv in *.
+    repeat rewrite <- nra_ctxt_equiv_strict_equiv in *.
     symmetry; trivial.
   Qed.   
 
-  Global Instance alg_ctxt_equiv_strict_trans {trans:Transitive base_equiv}: Transitive alg_ctxt_equiv_strict.
+  Global Instance nra_ctxt_equiv_strict_trans {trans:Transitive base_equiv}: Transitive nra_ctxt_equiv_strict.
   Proof.
     red; intros.
-    repeat rewrite <- alg_ctxt_equiv_strict_equiv in *.
+    repeat rewrite <- nra_ctxt_equiv_strict_equiv in *.
     etransitivity; eauto.
   Qed.
   
-  Global Instance alg_ctxt_equiv_strict_equivalence {equiv:Equivalence base_equiv}: Equivalence alg_ctxt_equiv_strict.
+  Global Instance nra_ctxt_equiv_strict_equivalence {equiv:Equivalence base_equiv}: Equivalence nra_ctxt_equiv_strict.
   Proof.
     constructor; red; intros.
     - reflexivity.
@@ -1029,7 +1029,7 @@ Section NRAContext.
     - etransitivity; eauto.
   Qed.
 
-  Global Instance alg_ctxt_equiv_strict_preorder {pre:PreOrder base_equiv} : PreOrder alg_ctxt_equiv_strict.
+  Global Instance nra_ctxt_equiv_strict_preorder {pre:PreOrder base_equiv} : PreOrder nra_ctxt_equiv_strict.
   Proof.
     constructor; red; intros.
     - reflexivity.
@@ -1038,19 +1038,19 @@ Section NRAContext.
 
 
   Global Instance CPlug_proper :
-    Proper (base_equiv ==> alg_ctxt_equiv) CPlug.
+    Proper (base_equiv ==> nra_ctxt_equiv) CPlug.
   Proof.
     unfold Proper, respectful.
-    unfold alg_ctxt_equiv.
+    unfold nra_ctxt_equiv.
     intros. autorewrite with ac_substs.
     simpl; trivial.
   Qed.
 
   Global Instance CPlug_proper_strict :
-    Proper (base_equiv ==> alg_ctxt_equiv_strict) CPlug.
+    Proper (base_equiv ==> nra_ctxt_equiv_strict) CPlug.
   Proof.
     unfold Proper, respectful.
-    unfold alg_ctxt_equiv_strict.
+    unfold nra_ctxt_equiv_strict.
     intros. autorewrite with ac_substs.
     simpl; trivial.
   Qed.
@@ -1059,45 +1059,45 @@ End NRAContext.
 
 (* TODO: show that the constructors of context are all proper with respect to context equivalence *)
 
-Delimit Scope alg_ctxt_scope with alg_ctxt.
+Delimit Scope nra_ctxt_scope with nra_ctxt.
 
-Notation "'ID'" := (CAID)  (at level 50) : alg_ctxt_scope.
+Notation "'ID'" := (CAID)  (at level 50) : nra_ctxt_scope.
 
-Notation "‵‵ c" := (CAConst (dconst c))  (at level 0) : alg_ctxt_scope.                           (* ‵ = \backprime *)
-Notation "‵ c" := (CAConst c)  (at level 0) : alg_ctxt_scope.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (CAConst (dcoll nil))  (at level 0) : alg_ctxt_scope.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (CAConst (drec nil)) (at level 50) : alg_ctxt_scope.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (CAConst (dconst c))  (at level 0) : nra_ctxt_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (CAConst c)  (at level 0) : nra_ctxt_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (CAConst (dcoll nil))  (at level 0) : nra_ctxt_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (CAConst (drec nil)) (at level 50) : nra_ctxt_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (CABinop AAnd r1 r2) (right associativity, at level 65): alg_ctxt_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (CABinop AOr r1 r2) (right associativity, at level 70): alg_ctxt_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (CABinop AEq r1 r2) (right associativity, at level 70): alg_ctxt_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (CABinop ALt r1 r2) (no associativity, at level 70): alg_ctxt_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (CABinop AUnion r1 r2) (right associativity, at level 70): alg_ctxt_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (CABinop AMinus r1 r2) (right associativity, at level 70): alg_ctxt_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (CABinop AMin r1 r2) (right associativity, at level 70): alg_ctxt_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (CABinop AMax r1 r2) (right associativity, at level 70): alg_ctxt_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((CABinop AConcat) p r) (at level 70) : alg_ctxt_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((CABinop AMergeConcat) p r) (at level 70) : alg_ctxt_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (CABinop AAnd r1 r2) (right associativity, at level 65): nra_ctxt_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (CABinop AOr r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (CABinop AEq r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (CABinop ALt r1 r2) (no associativity, at level 70): nra_ctxt_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (CABinop AUnion r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (CABinop AMinus r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (CABinop AMin r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (CABinop AMax r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((CABinop AConcat) p r) (at level 70) : nra_ctxt_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((CABinop AMergeConcat) p r) (at level 70) : nra_ctxt_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (CAUnop ANeg r1) (right associativity, at level 70): alg_ctxt_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (CAUnop ADistinct r1) (right associativity, at level 70): alg_ctxt_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (CAUnop ACount r1) (right associativity, at level 70): alg_ctxt_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (CAUnop AFlatten d) (at level 50) : alg_ctxt_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((CAUnop AColl) d)  (at level 50) : alg_ctxt_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((CAUnop (ARec s)) r) (at level 50) : alg_ctxt_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((CAUnop (ARecRemove s1)) r) (at level 50) : alg_ctxt_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((CAUnop (ADot r)) p) (left associativity, at level 40): alg_ctxt_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (CAUnop ANeg r1) (right associativity, at level 70): nra_ctxt_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (CAUnop ADistinct r1) (right associativity, at level 70): nra_ctxt_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (CAUnop ACount r1) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (CAUnop AFlatten d) (at level 50) : nra_ctxt_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((CAUnop AColl) d)  (at level 50) : nra_ctxt_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((CAUnop (ARec s)) r) (at level 50) : nra_ctxt_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((CAUnop (ARecRemove s1)) r) (at level 50) : nra_ctxt_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((CAUnop (ADot r)) p) (left associativity, at level 40): nra_ctxt_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (CAMap p r) (at level 70) : alg_ctxt_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CAMapConcat e2 e1) (at level 70) : alg_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (CAProduct r1 r2) (right associativity, at level 70): alg_ctxt_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (CASelect p r) (at level 70) : alg_ctxt_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (CADefault r1 r2) (right associativity, at level 70): alg_ctxt_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (CAApp r1 r2) (right associativity, at level 60): alg_ctxt_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (CAMap p r) (at level 70) : nra_ctxt_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CAMapConcat e2 e1) (at level 70) : nra_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (CAProduct r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (CASelect p r) (at level 70) : nra_ctxt_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (CADefault r1 r2) (right associativity, at level 70): nra_ctxt_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (CAApp r1 r2) (right associativity, at level 60): nra_ctxt_scope.           (* ◯ = \bigcirc *)
 
-Notation "$ n" := (CHole n) (at level 50)  : alg_ctxt_scope.
+Notation "$ n" := (CHole n) (at level 50)  : nra_ctxt_scope.
 
-Notation "X ≡ₐ Y" := (alg_ctxt_equiv alg_eq X Y) (at level 90) : alg_ctxt_scope.
+Notation "X ≡ₐ Y" := (nra_ctxt_equiv nra_eq X Y) (at level 90) : nra_ctxt_scope.
 
   Hint Rewrite
        @ac_substs_Plug

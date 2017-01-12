@@ -33,10 +33,10 @@ Section CAMPSugartoNRA.
 
   (* and *)
   
-  Definition alg_of_pand (p1 p2:pat) : alg :=
-    alg_of_pat (pand p1 p2).
+  Definition nra_of_pand (p1 p2:pat) : nra :=
+    nra_of_pat (pand p1 p2).
 
-  Definition alg_for_pand (q1 q2:alg) : alg :=
+  Definition nra_for_pand (q1 q2:nra) : nra :=
     (♯flatten(χ⟨q2
              ⟩( unnest_two "PBIND1" "PBIND"
                   (χ⟨‵[| ("PDATA", (ID) · "PDATA")|]
@@ -45,11 +45,11 @@ Section CAMPSugartoNRA.
                    ⟩( unnest_two "a1" "PBIND1"
                         (‵{|ID
                             ⊕ ‵[| ("a1",
-                              χ⟨‵[||] ⟩( σ⟨ID ⟩( q1)))|]|}))))))%alg.
+                              χ⟨‵[||] ⟩( σ⟨ID ⟩( q1)))|]|}))))))%nra.
 
 
-  Lemma alg_of_pand_works (p1 p2:pat) :
-    alg_of_pat (pand p1 p2) = alg_for_pand (alg_of_pat p1) (alg_of_pat p2).
+  Lemma nra_of_pand_works (p1 p2:pat) :
+    nra_of_pat (pand p1 p2) = nra_for_pand (nra_of_pat p1) (nra_of_pat p2).
   Proof.
     simpl.
     reflexivity.
@@ -57,8 +57,8 @@ Section CAMPSugartoNRA.
   
   (* WW *)
 
-  Definition alg_of_WW (p:pat) :=
-    alg_of_pat (WW p).
+  Definition nra_of_WW (p:pat) :=
+    nra_of_pat (WW p).
 
 End CAMPSugartoNRA.
 

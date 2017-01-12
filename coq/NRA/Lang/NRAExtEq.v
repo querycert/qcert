@@ -22,11 +22,11 @@ Section NRAExt.
 
   (* Equivalence for extended algebra *)
 
-  Local Open Scope algext_scope.
+  Local Open Scope nraext_scope.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition algext_eq (op1 op2:algext) : Prop :=
+  Definition nraext_eq (op1 op2:nraext) : Prop :=
     forall h:list(string*string),
     forall x:data,
       data_normalized h x ->
@@ -38,122 +38,122 @@ Section NRAExt.
   Require Import EquivDec.
   Require Import Program.
 
-  Global Instance algext_equiv : Equivalence algext_eq.
+  Global Instance nraext_equiv : Equivalence nraext_eq.
   Proof.
     constructor.
-    - unfold Reflexive, algext_eq.
+    - unfold Reflexive, nraext_eq.
       intros; reflexivity.
-    - unfold Symmetric, algext_eq.
+    - unfold Symmetric, nraext_eq.
       intros; rewrite (H h x0) by trivial; reflexivity.
-    - unfold Transitive, algext_eq.
+    - unfold Transitive, nraext_eq.
       intros; rewrite (H h x0) by trivial; rewrite (H0 h x0) by trivial; reflexivity.
   Qed.
 
-  Definition algext_eq_alg_eq (op1 op2:algext) : algext_eq op1 op2 <-> alg_eq (alg_of_algext op1) (alg_of_algext op2).
+  Definition nraext_eq_nra_eq (op1 op2:nraext) : nraext_eq op1 op2 <-> nra_eq (nra_of_nraext op1) (nra_of_nraext op2).
   Proof.
     split; intro; assumption.
    Qed.
     
-  (* all the extended algebraic constructors are proper wrt. equivalence *)
+  (* all the extended nraebraic constructors are proper wrt. equivalence *)
 
   (* AXID *)
-  Global Instance eaid_proper : Proper algext_eq AXID.
+  Global Instance eaid_proper : Proper nraext_eq AXID.
   Proof.
-    unfold Proper, respectful, algext_eq.
+    unfold Proper, respectful, nraext_eq.
     apply aid_proper; assumption.
   Qed.
 
   (* AXConst *)
-  Global Instance eaconst_proper : Proper (eq ==> algext_eq) AXConst.
+  Global Instance eaconst_proper : Proper (eq ==> nraext_eq) AXConst.
   Proof.
-    unfold Proper, respectful, algext_eq; intros.
+    unfold Proper, respectful, nraext_eq; intros.
     apply aconst_proper; assumption.
   Qed.
 
   (* AXBinOp *)
 
-  Global Instance eabinop_proper : Proper (binop_eq ==> algext_eq ==> algext_eq ==> algext_eq) AXBinop.
+  Global Instance eabinop_proper : Proper (binop_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXBinop.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply abinop_proper; assumption.
   Qed.
 
   (* AXUnop *)
-  Global Instance eaunop_proper : Proper (unaryop_eq ==> algext_eq ==> algext_eq) AXUnop.
+  Global Instance eaunop_proper : Proper (unaryop_eq ==> nraext_eq ==> nraext_eq) AXUnop.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aunop_proper; assumption.
   Qed.
 
   (* AXMap *)
-  Global Instance eamap_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXMap.
+  Global Instance eamap_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXMap.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply amap_proper; assumption.
   Qed.
 
   (* AXMapConcat *)
-  Global Instance eamapconcat_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXMapConcat.
+  Global Instance eamapconcat_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXMapConcat.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply amapconcat_proper; assumption.
   Qed.
 
   (* AXProduct *)
-  Global Instance eaproduct_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXProduct.
+  Global Instance eaproduct_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXProduct.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aproduct_proper; assumption.
   Qed.
 
   (* AXSelect *)
-  Global Instance easelect_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXSelect.
+  Global Instance easelect_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXSelect.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aselect_proper; assumption.
   Qed.
 
   (* AXEither *)
-  Global Instance eaeither_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXEither.
+  Global Instance eaeither_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXEither.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros; simpl.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros; simpl.
     destruct x1; simpl; trivial; inversion H1; subst; eauto.
   Qed.
 
   (* AXEitherConcat *)
-  Global Instance eaeitherconcat_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXEitherConcat.
+  Global Instance eaeitherconcat_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXEitherConcat.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros; simpl.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros; simpl.
     rewrite (H0 h x1) by trivial; rewrite (H h x1) by trivial.
-    case_eq (h ⊢ alg_of_algext y0 @ₐ x1); case_eq (h ⊢ alg_of_algext y @ₐ x1); intros; simpl; trivial.
+    case_eq (h ⊢ nra_of_nraext y0 @ₐ x1); case_eq (h ⊢ nra_of_nraext y @ₐ x1); intros; simpl; trivial.
   Qed.
   
   (* AXDefault *)
-  Global Instance eadefault_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXDefault.
+  Global Instance eadefault_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXDefault.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply adefault_proper; assumption.
   Qed.
 
   (* AXApp *)
-  Global Instance eaapp_proper : Proper (algext_eq ==> algext_eq ==> algext_eq) AXApp.
+  Global Instance eaapp_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXApp.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aapp_proper; assumption.
   Qed.
 
   (* AXJoin *)
-  Global Instance eajoin_proper : Proper (algext_eq ==> algext_eq ==> algext_eq ==> algext_eq) AXJoin.
+  Global Instance eajoin_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXJoin.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aselect_proper; try assumption.
     apply aproduct_proper; assumption.
   Qed.
 
   (* AXSemiJoin *)
-  Global Instance easemi_join_proper : Proper (algext_eq ==> algext_eq ==> algext_eq ==> algext_eq) AXSemiJoin.
+  Global Instance easemi_join_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXSemiJoin.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aselect_proper; try assumption.
     apply aunop_proper; try assumption; try reflexivity.
     apply abinop_proper; try assumption; try reflexivity.
@@ -162,9 +162,9 @@ Section NRAExt.
   Qed.
 
   (* AXAntiJoin *)
-  Global Instance eaanti_join_proper : Proper (algext_eq ==> algext_eq ==> algext_eq ==> algext_eq) AXAntiJoin.
+  Global Instance eaanti_join_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXAntiJoin.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply aselect_proper; try assumption.
     apply abinop_proper; try assumption; try reflexivity.
     apply aselect_proper; try assumption; try reflexivity.
@@ -172,17 +172,17 @@ Section NRAExt.
   Qed.
 
   (* AXMapToRec *)
-  Global Instance eamap_to_rec_proper : Proper (eq ==> algext_eq ==> algext_eq) AXMapToRec.
+  Global Instance eamap_to_rec_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXMapToRec.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply amap_proper; try assumption.
     rewrite H; reflexivity.
   Qed.    
 
   (* AXMapAddRec *)
-  Global Instance eamap_add_rec_proper : Proper (eq ==> algext_eq ==> algext_eq ==> algext_eq) AXMapAddRec.
+  Global Instance eamap_add_rec_proper : Proper (eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXMapAddRec.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     apply amap_proper; try assumption.
     apply abinop_proper; try assumption; try reflexivity.
     apply aunop_proper; try assumption; try reflexivity.
@@ -190,9 +190,9 @@ Section NRAExt.
   Qed.    
 
   (* rproject *)
-  Global Instance rproject_proper : Proper (eq ==> alg_eq ==> alg_eq) rproject.
+  Global Instance rproject_proper : Proper (eq ==> nra_eq ==> nra_eq) rproject.
   Proof.
-    unfold Proper, respectful, alg_eq, fun_of_algext; intros ls ls' ?; subst ls'. intros.
+    unfold Proper, respectful, nra_eq, fun_of_nraext; intros ls ls' ?; subst ls'. intros.
     induction ls; trivial.
     simpl.
     rewrite H, IHls by trivial.
@@ -200,17 +200,17 @@ Section NRAExt.
   Qed.
 
   (* AXRProject *)
-  Global Instance earproject_proper : Proper (eq ==> algext_eq ==> algext_eq) AXRProject.
+  Global Instance earproject_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXRProject.
   Proof.
     unfold Proper, respectful.
     intros; subst.
-    rewrite algext_eq_alg_eq in *.
+    rewrite nraext_eq_nra_eq in *.
     simpl. rewrite H0 by trivial.
     reflexivity.
   Qed.
 
   (* project *)
-  Global Instance project_proper : Proper (eq ==> alg_eq ==> alg_eq) project.
+  Global Instance project_proper : Proper (eq ==> nra_eq ==> nra_eq) project.
   Proof.
     unfold Proper, respectful; intros; subst.
     unfold project.
@@ -219,51 +219,51 @@ Section NRAExt.
   Qed.
 
   (* AXProject *)
-  Global Instance eaproject_proper : Proper (eq ==> algext_eq ==> algext_eq) AXProject.
+  Global Instance eaproject_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXProject.
   Proof.
     unfold Proper, respectful.
     intros; subst.
-    rewrite algext_eq_alg_eq in *.
+    rewrite nraext_eq_nra_eq in *.
     simpl. rewrite H0 by trivial.
     reflexivity.
   Qed.
 
   (* AXProjectRemove *)
-  Global Instance eaproject_remove_proper : Proper (eq ==> algext_eq ==> algext_eq) AXProjectRemove.
+  Global Instance eaproject_remove_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXProjectRemove.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     rewrite H by trivial; clear H.
     apply amap_proper; try assumption; reflexivity.
   Qed.    
 
   (* AXMapRename *)
-  Global Instance eamap_rename_rec_proper : Proper (eq ==> eq ==> algext_eq ==> algext_eq) AXMapRename.
+  Global Instance eamap_rename_rec_proper : Proper (eq ==> eq ==> nraext_eq ==> nraext_eq) AXMapRename.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     rewrite H by trivial; rewrite H0 by trivial; clear H H0.
     apply amap_proper; try assumption; reflexivity.
   Qed.    
 
   (* AXUnnestOne *)
-  Global Instance eaunnest_one_proper : Proper (eq ==> algext_eq ==> algext_eq) AXUnnestOne.
+  Global Instance eaunnest_one_proper : Proper (eq ==> nraext_eq ==> nraext_eq) AXUnnestOne.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     rewrite H by trivial; clear H.
     apply amap_proper; try assumption; try reflexivity.
     apply amapconcat_proper; try assumption; reflexivity.
   Qed.    
 
   (* AXUnnestTwo *)
-  Global Instance eaunnest_two_proper : Proper (eq ==> eq ==> algext_eq ==> algext_eq) AXUnnestTwo.
+  Global Instance eaunnest_two_proper : Proper (eq ==> eq ==> nraext_eq ==> nraext_eq) AXUnnestTwo.
   Proof.
-    unfold Proper, respectful, algext_eq, fun_of_algext; intros.
+    unfold Proper, respectful, nraext_eq, fun_of_nraext; intros.
     rewrite H by trivial; rewrite H0 by trivial; clear H H0.
     apply amap_proper; try assumption; try reflexivity.
     apply amapconcat_proper; try assumption; reflexivity.
   Qed.    
 
   (* group1 *)
-  Global Instance group1_proper : Proper (eq ==> eq ==> alg_eq ==> alg_eq) group1.
+  Global Instance group1_proper : Proper (eq ==> eq ==> nra_eq ==> nra_eq) group1.
   Proof.
     unfold Proper, respectful, group1; intros; subst; simpl.
     repeat (apply amap_proper
@@ -275,18 +275,18 @@ Section NRAExt.
   Qed.
 
   (* AXGroupBy *)
-  Global Instance eagroupby_proper : Proper (eq ==> eq ==> algext_eq ==> algext_eq) AXGroupBy.
+  Global Instance eagroupby_proper : Proper (eq ==> eq ==> nraext_eq ==> nraext_eq) AXGroupBy.
   Proof.
     unfold Proper, respectful.
     intros; subst.
-    rewrite algext_eq_alg_eq in *.
+    rewrite nraext_eq_nra_eq in *.
     simpl. rewrite H1.
     reflexivity.
   Qed.
 
 End NRAExt.
 
-Notation "X ≡ₓ Y" := (algext_eq X Y) (at level 90) : algext_scope. (* ≡ = \equiv *)
+Notation "X ≡ₓ Y" := (nraext_eq X Y) (at level 90) : nraext_scope. (* ≡ = \equiv *)
 
 (* 
 *** Local Variables: ***

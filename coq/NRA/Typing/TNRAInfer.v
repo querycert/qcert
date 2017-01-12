@@ -115,50 +115,50 @@ Section TNRAInfer.
 
   Context {m:basic_model}.
 
-  Fixpoint infer_alg_type (e:alg) (τin:rtype) : option rtype :=
+  Fixpoint infer_nra_type (e:nra) (τin:rtype) : option rtype :=
     match e with
       | AID => Some τin
       | AConst d => infer_data_type (normalize_data brand_relation_brands d)
       | ABinop b op1 op2 =>
         let binf (τ₁ τ₂:rtype) := infer_binop_type b τ₁ τ₂ in
-        olift2 binf (infer_alg_type op1 τin) (infer_alg_type op2 τin)
+        olift2 binf (infer_nra_type op1 τin) (infer_nra_type op2 τin)
       | AUnop u op1 =>
         let unf (τ₁:rtype) := infer_unop_type u τ₁ in
-        olift unf (infer_alg_type op1 τin)
+        olift unf (infer_nra_type op1 τin)
       | AMap op1 op2 =>
         let mapf (τ₁:rtype) :=
-            olift (fun x => lift (fun y => Coll y) (infer_alg_type op1 x)) (tuncoll τ₁)
+            olift (fun x => lift (fun y => Coll y) (infer_nra_type op1 x)) (tuncoll τ₁)
         in
-        olift mapf (infer_alg_type op2 τin)
+        olift mapf (infer_nra_type op2 τin)
       | AMapConcat op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
               | Some τr₁ =>
-                match olift (tmapConcatOutput τ₁) (infer_alg_type op1 τr₁) with
+                match olift (tmapConcatOutput τ₁) (infer_nra_type op1 τr₁) with
                   | None => None
                   | Some τ₂ => Some (Coll τ₂)
                 end
             end
         in
-        olift mapconcatf (olift tmapConcatInput (infer_alg_type op2 τin))
+        olift mapconcatf (olift tmapConcatInput (infer_nra_type op2 τin))
       | AProduct op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
               | Some τr₁ =>
-                match olift (tmapConcatOutput τ₁) (infer_alg_type op2 τin) with
+                match olift (tmapConcatOutput τ₁) (infer_nra_type op2 τin) with
                   | None => None
                   | Some τ₂ => Some (Coll τ₂)
                 end
             end
         in
-        olift mapconcatf (olift tmapConcatInput (infer_alg_type op1 τin))
+        olift mapconcatf (olift tmapConcatInput (infer_nra_type op1 τin))
       | ASelect op1 op2 =>
         let selectf (τ₁:rtype) :=
             match tuncoll τ₁ with
               | Some τ₁' =>
-                match infer_alg_type op1 τ₁' with
+                match infer_nra_type op1 τ₁' with
                   | Some τ₂ =>
                     match `τ₂ with
                       | Bool₀ => Some (Coll τ₁')
@@ -169,9 +169,9 @@ Section TNRAInfer.
               | None => None
             end
         in
-        olift selectf (infer_alg_type op2 τin)
+        olift selectf (infer_nra_type op2 τin)
       | ADefault op1 op2 =>
-        match ((infer_alg_type op1 τin), (infer_alg_type op2 τin)) with
+        match ((infer_nra_type op1 τin), (infer_nra_type op2 τin)) with
             | (Some τ₁', Some τ₂') =>
               match (tuncoll τ₁', tuncoll τ₂') with
                 | (Some τ₁₀, Some τ₂₀) =>
@@ -183,7 +183,7 @@ Section TNRAInfer.
       | AEither op1 op2 =>
         match tuneither τin with
         | Some (τl, τr) =>
-          match ((infer_alg_type op1 τl), (infer_alg_type op2 τr)) with
+          match ((infer_nra_type op1 τl), (infer_nra_type op2 τr)) with
           | (Some τ₁', Some τ₂') =>
             if (rtype_eq_dec τ₁' τ₂') (* Probably should be generalized using join... *)
             then Some τ₁'
@@ -193,7 +193,7 @@ Section TNRAInfer.
         | _ => None
         end
       | AEitherConcat op1 op2 =>
-        match (infer_alg_type op1 τin, infer_alg_type op2 τin) with
+        match (infer_nra_type op1 τin, infer_nra_type op2 τin) with
         | (Some τeither, Some τrecplus) =>          
           match tuneither τeither with
           | Some (τl, τr) =>
@@ -207,17 +207,17 @@ Section TNRAInfer.
         | (_, _) => None
         end
       | AApp op1 op2 =>
-        let appf (τ₁:rtype) := infer_alg_type op1 τ₁ in
-        olift appf (infer_alg_type op2 τin)
+        let appf (τ₁:rtype) := infer_nra_type op1 τ₁ in
+        olift appf (infer_nra_type op2 τin)
     end.
 
-  Lemma infer_alg_type_correct (τin τout:rtype) (e:alg) :
-    infer_alg_type e τin = Some τout ->
-    alg_type e τin τout.
+  Lemma infer_nra_type_correct (τin τout:rtype) (e:nra) :
+    infer_nra_type e τin = Some τout ->
+    nra_type e τin τout.
   Proof.
     intros.
     revert τin τout H.
-    alg_cases (induction e) Case; intros; simpl in H.
+    nra_cases (induction e) Case; intros; simpl in H.
     - Case "AID"%string.
       inversion H; clear H.
       apply ATID.
@@ -226,25 +226,25 @@ Section TNRAInfer.
       apply infer_data_type_correct. assumption.
     - Case "ABinop"%string.
       specialize (IHe1 τin); specialize (IHe2 τin).
-      destruct (infer_alg_type e1 τin); destruct (infer_alg_type e2 τin); simpl in *;
+      destruct (infer_nra_type e1 τin); destruct (infer_nra_type e2 τin); simpl in *;
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
       apply (@ATBinop m τin r r0 τout); try assumption.
       apply infer_binop_type_correct; assumption.
     - Case "AUnop"%string.
       specialize (IHe τin).
-      destruct (infer_alg_type e τin); simpl in *;
+      destruct (infer_nra_type e τin); simpl in *;
       try discriminate.
       specialize (IHe r eq_refl).
       apply (@ATUnop m τin r τout); try assumption.
       apply infer_unop_type_correct; assumption.
     - Case "AMap"%string.
-      case_eq (infer_alg_type e2 τin); intros; simpl in *.
+      case_eq (infer_nra_type e2 τin); intros; simpl in *.
       + specialize (IHe2 τin r H0). rewrite H0 in H. simpl in *.
         unfold lift in H.
         case_eq (tuncoll r); intros. rewrite H1 in *.
         inversion H. subst. clear H H0.
-        case_eq (infer_alg_type e1 r0); intros.
+        case_eq (infer_nra_type e1 r0); intros.
         specialize (IHe1 r0 r1 H).
         rewrite H in H3.
         inversion H3.
@@ -255,7 +255,7 @@ Section TNRAInfer.
         rewrite H1 in H; simpl in H; congruence.
       + rewrite H0 in H. simpl in H; congruence.
     - Case "AMapConcat"%string.
-      case_eq (infer_alg_type e2 τin); intros.
+      case_eq (infer_nra_type e2 τin); intros.
       + specialize (IHe2 τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
         destruct r; try congruence.
@@ -271,7 +271,7 @@ Section TNRAInfer.
         simpl in H; clear eq12 eq11.
         assert (RecMaybe Closed l1' = Some (Rec Closed l1' pf1')) by apply RecMaybe_pf_some.
         rewrite H0 in H; clear H0.
-        case_eq (infer_alg_type e1 (Rec Closed l1' pf1')); intros.
+        case_eq (infer_nra_type e1 (Rec Closed l1' pf1')); intros.
         * rewrite H0 in H; simpl in H.
           destruct r; try congruence.
           destruct x; simpl in H; try congruence.
@@ -325,8 +325,8 @@ Section TNRAInfer.
         * rewrite H0 in H; simpl in H; congruence.
       + rewrite H0 in H; simpl in H; congruence.
     - Case "AProduct"%string.
-      case_eq (infer_alg_type e1 τin); intros.
-      case_eq (infer_alg_type e2 τin); intros.
+      case_eq (infer_nra_type e1 τin); intros.
+      case_eq (infer_nra_type e2 τin); intros.
       + specialize (IHe1 τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
         destruct r; try congruence.
@@ -391,18 +391,18 @@ Section TNRAInfer.
         rewrite H1.
         assumption.
       + rewrite H1 in H. simpl in H.
-        destruct ((olift tmapConcatInput (infer_alg_type e1 τin))); simpl in H.
+        destruct ((olift tmapConcatInput (infer_nra_type e1 τin))); simpl in H.
         destruct (RecMaybe Closed l); congruence.
         congruence.
       + rewrite H0 in H; simpl in H; congruence.
     - Case "ASelect"%string.
       simpl.
-      case_eq (infer_alg_type e2 τin); intros; simpl in *.
+      case_eq (infer_nra_type e2 τin); intros; simpl in *.
       + specialize (IHe2 τin r H0). rewrite H0 in H. simpl in *.
         unfold lift in H.
         case_eq (tuncoll r); intros. rewrite H1 in *.
         inversion H. subst. clear H H0.
-        case_eq (infer_alg_type e1 r0); intros.
+        case_eq (infer_nra_type e1 r0); intros.
         specialize (IHe1 r0 r1 H).
         rewrite H in H3.
         destruct r1; try congruence; simpl in *.
@@ -419,7 +419,7 @@ Section TNRAInfer.
       + rewrite H0 in H. simpl in H; congruence.
     - Case "ADefault"%string.
       specialize (IHe1 τin); specialize (IHe2 τin).
-      destruct (infer_alg_type e1 τin); destruct (infer_alg_type e2 τin); simpl in *;
+      destruct (infer_nra_type e1 τin); destruct (infer_nra_type e2 τin); simpl in *;
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
       case_eq r; case_eq r0;intros; subst; simpl in *.
@@ -450,7 +450,7 @@ Section TNRAInfer.
       ; eapply ATEither
       ; eauto.
     - Case "AEitherConcat"%string.
-      case_eq (infer_alg_type e1 τin); case_eq (infer_alg_type e2 τin); simpl in *; intros;
+      case_eq (infer_nra_type e1 τin); case_eq (infer_nra_type e2 τin); simpl in *; intros;
       rewrite H0 in *; rewrite H1 in *; try discriminate.
       unfold tuneither in H.
       destruct r0; simpl in H.
@@ -495,7 +495,7 @@ Section TNRAInfer.
       eapply ATEitherConcat; eauto.
     - Case "AApp"%string.
       specialize (IHe2 τin).
-      destruct (infer_alg_type e2 τin).
+      destruct (infer_nra_type e2 τin).
       specialize (IHe2 r eq_refl).
       econstructor; eauto.
       simpl in *; congruence.

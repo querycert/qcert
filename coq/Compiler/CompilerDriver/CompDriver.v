@@ -123,7 +123,7 @@ Section CompDriver.
 
     Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
 
-    Definition rule_to_nra (q:rule) : nra := alg_of_rule q.
+    Definition rule_to_nra (q:rule) : nra := nra_of_rule q.
 
     Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
 
@@ -133,7 +133,7 @@ Section CompDriver.
 
     Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_pat_to_cnraenv q.
 
-    Definition camp_to_nra (q:camp) : nra := alg_of_pat q.
+    Definition camp_to_nra (q:camp) : nra := nra_of_pat q.
 
     Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := cnraenv_of_nraenv q.
 
@@ -148,9 +148,9 @@ Section CompDriver.
     Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
       nraenv_to_nnrc_ext_top q init_vid init_venv.
 
-    Definition nraenv_core_to_nra (q: nraenv_core) : nra := alg_of_cnraenv q.
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_cnraenv q.
 
-    Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_alg q.
+    Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_nra q.
 
     Definition nra_to_nnrc_core (q: nra) : nnrc_core :=
       nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
@@ -247,11 +247,11 @@ Section CompDriver.
       nraenv_core_optim default_nraenv_optim_phases q.
 
     Definition nra_optim (opc:optim_phases_config) (q: nra) : nra :=
-      let nraenv_core_opt := (nraenv_core_optim opc (cnraenv_of_alg q)) in
+      let nraenv_core_opt := (nraenv_core_optim opc (cnraenv_of_nra q)) in
       if cnraenv_is_nra_fun nraenv_core_opt then
-        cnraenv_deenv_alg nraenv_core_opt
+        cnraenv_deenv_nra nraenv_core_opt
       else
-        alg_of_cnraenv nraenv_core_opt.
+        nra_of_cnraenv nraenv_core_opt.
     Definition nra_optim_default (q: nra) : nra :=
       nra_optim default_nraenv_optim_phases q.
 

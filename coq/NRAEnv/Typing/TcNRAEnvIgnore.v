@@ -28,7 +28,6 @@ Section TcNRAEnvIgnore.
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
 
-  Local Open Scope alg_scope.
   Local Open Scope cnraenv_scope.
   
   Lemma tcnraenv_ignores_env_swap {m:basic_model} (e:cnraenv) :

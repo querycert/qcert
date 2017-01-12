@@ -31,7 +31,7 @@ Section TNRAtoNNRC.
   (** Type preservation for the translation from NRA to NNRC *)
 
   Context {m:basic_model}.
-  Theorem tnra_sem_correct {τin τout} (op:alg) (tenv:tbindings) (v:var) :
+  Theorem tnra_sem_correct {τin τout} (op:nra) (tenv:tbindings) (v:var) :
     (op ▷ τin >=> τout) ->
     lookup equiv_dec tenv v = Some τin ->
     nnrc_type tenv (nra_to_nnrc op v) τout.
@@ -47,31 +47,31 @@ Section TNRAtoNNRC.
     - apply TNNRCConst.
       assumption.
     (* ATBinop *)
-    - specialize (IHalg_type1 v tenv H2); specialize (IHalg_type2 v tenv H2).
+    - specialize (IHnra_type1 v tenv H2); specialize (IHnra_type2 v tenv H2).
       apply (@TNNRCBinop m τ₁ τ₂); assumption.
     (* ATUnop *)
-    - specialize (IHalg_type v tenv H1).
+    - specialize (IHnra_type v tenv H1).
       apply (@TNNRCUnop m τ); assumption.
     (* ATMap *)
-    - specialize (IHalg_type2 v tenv H1).
+    - specialize (IHnra_type2 v tenv H1).
       apply (@TNNRCFor m τ₁); try assumption.
-      specialize (IHalg_type1 (fresh_var "tmap$" [v]) ((fresh_var "tmap$" [v],τ₁)::tenv)).
+      specialize (IHnra_type1 (fresh_var "tmap$" [v]) ((fresh_var "tmap$" [v],τ₁)::tenv)).
       simpl in *.
-      revert IHalg_type1.
+      revert IHnra_type1.
       dest_eqdec; try congruence.
       intros.
-      apply IHalg_type1; trivial.
+      apply IHnra_type1; trivial.
     (* ATMapConcat *)
-    - specialize (IHalg_type2 v tenv H2).
+    - specialize (IHnra_type2 v tenv H2).
       apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
       apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
       apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
-      specialize (IHalg_type1 (fresh_var "tmc$" [v]) (((fresh_var "tmc$" [v]), RType.Rec Closed τ₁ pf1) :: tenv)).
+      specialize (IHnra_type1 (fresh_var "tmc$" [v]) (((fresh_var "tmc$" [v]), RType.Rec Closed τ₁ pf1) :: tenv)).
       assert (lookup equiv_dec (((fresh_var "tmc$" [v]), RType.Rec Closed τ₁ pf1) :: tenv) (fresh_var "tmc$" [v]) =
               Some (RType.Rec Closed τ₁ pf1)).
       simpl; match_destr; try congruence.
-      specialize (IHalg_type1 H3); clear H3.
+      specialize (IHnra_type1 H3); clear H3.
       assumption.
       apply (@TNNRCBinop m (RType.Rec Closed τ₁ pf1) (RType.Rec Closed τ₂ pf2)).
       apply ATConcat; assumption.
@@ -82,7 +82,7 @@ Section TNRAtoNNRC.
       + apply TNNRCVar; simpl.
         dest_eqdec; try congruence.
     (* ATProduct *)
-    - specialize (IHalg_type1 v tenv H2).
+    - specialize (IHnra_type1 v tenv H2).
       apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
       apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
@@ -91,7 +91,7 @@ Section TNRAtoNNRC.
               Some τin).
       simpl. match_destr; try congruence.
       elim (fresh_var_fresh1 _ _ _ e).
-      specialize (IHalg_type2 v ((_, RType.Rec Closed τ₁ pf1) :: tenv) H3).
+      specialize (IHnra_type2 v ((_, RType.Rec Closed τ₁ pf1) :: tenv) H3).
       assumption.
       apply (@TNNRCBinop m (RType.Rec Closed τ₁ pf1) (RType.Rec Closed τ₂ pf2)).
       apply ATConcat; assumption.
@@ -103,9 +103,9 @@ Section TNRAtoNNRC.
         dest_eqdec; try congruence.
     (* ATSelect *)
     - apply (@TNNRCUnop m (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
-      apply (@TNNRCFor m τ); [apply (IHalg_type2 v tenv H1)|idtac].
+      apply (@TNNRCFor m τ); [apply (IHnra_type2 v tenv H1)|idtac].
       apply TNNRCIf.
-      apply (IHalg_type1 _ ((_, τ) :: tenv)).
+      apply (IHnra_type1 _ ((_, τ) :: tenv)).
       simpl; match_destr; try congruence.
       apply (@TNNRCUnop m τ); [apply ATColl|apply TNNRCVar].
       simpl; match_destr; try congruence.
@@ -125,18 +125,18 @@ Section TNRAtoNNRC.
       econstructor; eauto.
       econstructor; eauto.
       apply Forall_nil.
-      apply IHalg_type2.
+      apply IHnra_type2.
       simpl. match_destr; try congruence.
       elim (fresh_var_fresh1 _ _ _ e).
       econstructor; eauto.
       simpl; match_destr; try congruence.
     (* ATEither *)
     - repeat (econstructor; eauto);
-      [apply IHalg_type1 | apply IHalg_type2]; simpl;
+      [apply IHnra_type1 | apply IHnra_type2]; simpl;
       match_destr; congruence.
     (* ATEitherConcat *)
     - repeat (econstructor; eauto).
-      + apply IHalg_type1; simpl. match_destr.
+      + apply IHnra_type1; simpl. match_destr.
         elim (fresh_var_fresh1 _ _ _ e).
       + simpl; match_destr; try congruence. 
       + simpl; match_destr.
@@ -148,18 +148,18 @@ Section TNRAtoNNRC.
         * match_destr; try congruence.
     (* ATApp *)
     - repeat (econstructor; eauto).
-      apply IHalg_type2.
+      apply IHnra_type2.
       simpl; match_destr; try congruence.
   Qed.
 
   (** Reverse direction, main theorem *)
 
-  Theorem tnra_sem_correct_back {τin τout} (op:alg) (tenv:tbindings) (v:var) :
+  Theorem tnra_sem_correct_back {τin τout} (op:nra) (tenv:tbindings) (v:var) :
     nnrc_type tenv (nra_to_nnrc op v) τout ->
     lookup equiv_dec tenv v = Some τin ->
     (op ▷ τin >=> τout).
   Proof.
-    Hint Constructors alg_type.
+    Hint Constructors nra_type.
     intros.
     revert v tenv τin τout H H0.
     induction op; simpl; intros; inversion H; subst.
@@ -307,7 +307,7 @@ Section TNRAtoNNRC.
   (** Theorem 7.4: NRA<->NNRC.
        Final iff Theorem of type preservation for the translation from NRA to NNRC *)
 
-  Theorem tnra_sem_correct_iff {τin τout} (op:alg) (tenv:tbindings) (v:var) :
+  Theorem tnra_sem_correct_iff {τin τout} (op:nra) (tenv:tbindings) (v:var) :
     lookup equiv_dec tenv v = Some τin ->
     (nnrc_type tenv (nra_to_nnrc op v) τout <->
     (op ▷ τin >=> τout)).

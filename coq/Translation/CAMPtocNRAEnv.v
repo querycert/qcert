@@ -82,7 +82,7 @@ Section CAMPtocNRAEnv.
   
   (** Theorem 4.2: lemma of translation correctness for patterns *)
 
-  Local Open Scope alg_scope.
+  Local Open Scope nra_scope.
 
   Lemma pat_envtrans_correct h c q env d:
     lift_failure (interp h c q env d) = cnraenv_eval h c (cnraenv_of_pat q) (drec env) d.
@@ -167,8 +167,8 @@ Section CAMPtocNRAEnv.
     - destruct d; simpl; trivial.
   Qed.
   
-  Lemma pat_envtrans_equiv_to_alg h c p bind d:
-    nra_eval h (alg_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
+  Lemma pat_envtrans_equiv_to_nra h c p bind d:
+    nra_eval h (nra_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
     cnraenv_eval h c (cnraenv_of_pat p) (drec bind) d.
   Proof.
     rewrite <- pat_envtrans_correct.
@@ -177,12 +177,12 @@ Section CAMPtocNRAEnv.
 
   Lemma cnraenv_of_pat_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
-    nra_eval h (alg_of_pat_top c p) d =
+    nra_eval h (nra_of_pat_top c p) d =
     cnraenv_eval h c (cnraenv_of_pat_top p) (drec nil) d.
   Proof.
     intros.
     simpl.
-    rewrite <- pat_envtrans_equiv_to_alg.
+    rewrite <- pat_envtrans_equiv_to_nra.
     unfold pat_context_data.
     rewrite map_normalize_normalized_eq by trivial.
     reflexivity.

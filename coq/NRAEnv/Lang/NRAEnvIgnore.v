@@ -23,7 +23,6 @@ Section NRAEnvIgnore.
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
 
-  Local Open Scope alg_scope.
   Local Open Scope nraenv_scope.
   
   (** Some infrastructure for rewrites *)

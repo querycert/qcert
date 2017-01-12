@@ -53,36 +53,36 @@ Section cNRAEnvContext.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint lift_alg_context (c:alg_ctxt) : cnraenv_ctxt :=
+  Fixpoint lift_nra_context (c:nra_ctxt) : cnraenv_ctxt :=
     match c with
       | CHole x'
         => CNHole x'
       | CPlug a
-        => CNPlug (cnraenv_of_alg a)
+        => CNPlug (cnraenv_of_nra a)
       | CABinop b c1 c2
-        => CANBinop b (lift_alg_context c1) (lift_alg_context c2)
+        => CANBinop b (lift_nra_context c1) (lift_nra_context c2)
       | CAUnop u c
-        => CANUnop u (lift_alg_context c)
+        => CANUnop u (lift_nra_context c)
       | CAMap c1 c2
-        => CANMap (lift_alg_context c1) (lift_alg_context c2)
+        => CANMap (lift_nra_context c1) (lift_nra_context c2)
       | CAMapConcat c1 c2
-        => CANMapConcat (lift_alg_context c1) (lift_alg_context c2)
+        => CANMapConcat (lift_nra_context c1) (lift_nra_context c2)
       | CAProduct c1 c2
-        => CANProduct (lift_alg_context c1) (lift_alg_context c2)
+        => CANProduct (lift_nra_context c1) (lift_nra_context c2)
       | CASelect c1 c2
-        => CANSelect (lift_alg_context c1) (lift_alg_context c2)
+        => CANSelect (lift_nra_context c1) (lift_nra_context c2)
       | CADefault c1 c2
-        => CANDefault (lift_alg_context c1) (lift_alg_context c2)
+        => CANDefault (lift_nra_context c1) (lift_nra_context c2)
       | CAEither c1 c2
-        => CANEither (lift_alg_context c1) (lift_alg_context c2)
+        => CANEither (lift_nra_context c1) (lift_nra_context c2)
       | CAEitherConcat c1 c2
-        => CANEitherConcat (lift_alg_context c1) (lift_alg_context c2)
+        => CANEitherConcat (lift_nra_context c1) (lift_nra_context c2)
       | CAApp c1 c2
-        => CANApp (lift_alg_context c1) (lift_alg_context c2)
+        => CANApp (lift_nra_context c1) (lift_nra_context c2)
     end.
 
   Lemma aec_simplify_lift_commute c :
-    aec_simplify (lift_alg_context c) = lift_alg_context (ac_simplify c).
+    aec_simplify (lift_nra_context c) = lift_nra_context (ac_simplify c).
   Proof.
     induction c; simpl; trivial
     ; try rewrite IHc; try rewrite IHc1; try rewrite IHc2
@@ -91,28 +91,28 @@ Section cNRAEnvContext.
   Qed.
   
   Lemma  aec_holes_lift c:
-    aec_holes (lift_alg_context c) = ac_holes c.
+    aec_holes (lift_nra_context c) = ac_holes c.
   Proof.
     induction c; simpl; try congruence.
   Qed.
 
-  Lemma lift_alg_context_subst c n a :
-    lift_alg_context (ac_subst c n a) =
-    aec_subst (lift_alg_context c) n (cnraenv_of_alg a).
+  Lemma lift_nra_context_subst c n a :
+    lift_nra_context (ac_subst c n a) =
+    aec_subst (lift_nra_context c) n (cnraenv_of_nra a).
   Proof.
     induction c; simpl; try congruence.
     match_destr.
   Qed.
 
-  Lemma lift_alg_context_substs c ps :
-    lift_alg_context (ac_substs c ps) =
-    aec_substs (lift_alg_context c)
-               (map (fun xy => (fst xy, cnraenv_of_alg (snd xy))) ps).
+  Lemma lift_nra_context_substs c ps :
+    lift_nra_context (ac_substs c ps) =
+    aec_substs (lift_nra_context c)
+               (map (fun xy => (fst xy, cnraenv_of_nra (snd xy))) ps).
   Proof.
     revert c.
     induction ps; simpl; trivial.
     destruct a; simpl; intros.
-    rewrite IHps, lift_alg_context_subst.
+    rewrite IHps, lift_nra_context_subst.
     trivial.
   Qed.
 
@@ -153,14 +153,14 @@ Section cNRAEnvContext.
     Forall (fun x => data_normalized h (snd x)) c ->
     data_normalized h env ->
     cnraenv_eq_under h c env 
-                    ((cnraenv_of_alg (alg_of_cnraenv e )
+                    ((cnraenv_of_nra (nra_of_cnraenv e )
                                     ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[|("PCONST", ‵(drec (rec_sort c)))|] ⊕‵[| ("PDATA", ID)|])))%cnraenv)
                     e.
   Proof.
     red; intros.
     simpl.
-    rewrite <- cnraenv_eval_of_alg.
-    rewrite unfold_env_alg_sort.
+    rewrite <- cnraenv_eval_of_nra.
+    rewrite unfold_env_nra_sort.
     rewrite (map_normalize_normalized_eq h (rec_sort c)).
     - rewrite drec_sort_idempotent.
       rewrite (normalize_normalized_eq h H0).
@@ -468,8 +468,8 @@ Section cNRAEnvContext.
             /\ cnraenv_eq_under h c env (snd xy1) (snd xy2)) ps1 ps2
      -> cnraenv_ctxt_equiv_under
           h c env
-          (aec_substs (lift_alg_context e) ps1)
-          (aec_substs (lift_alg_context e) ps2).
+          (aec_substs (lift_nra_context e) ps1)
+          (aec_substs (lift_nra_context e) ps2).
    Proof.
      induction e; simpl; intros f2; autorewrite with aec_substs.
      - induction f2; simpl.
@@ -500,7 +500,7 @@ Section cNRAEnvContext.
            (map
               (fun x : nat * cnraenv =>
                (fst x,
-               (cnraenv_of_alg (alg_of_cnraenv (snd x))
+               (cnraenv_of_nra (nra_of_cnraenv (snd x))
                 ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵(drec (rec_sort c)))|] ⊕ ‵[| ("PDATA", ID)|])))%cnraenv))
               ps) ps.
    Proof.
@@ -510,7 +510,7 @@ Section cNRAEnvContext.
        apply roundtrip_env; trivial.
    Qed.
 
-   Global Instance lift_alg_context_proper : Proper (alg_ctxt_equiv alg_eq ==> cnraenv_ctxt_equiv cnraenv_eq) lift_alg_context.
+   Global Instance lift_nra_context_proper : Proper (nra_ctxt_equiv nra_eq ==> cnraenv_ctxt_equiv cnraenv_eq) lift_nra_context.
   Proof.
     unfold Proper, respectful.
     intros c1 c2 H.
@@ -520,7 +520,7 @@ Section cNRAEnvContext.
     match_case; match_case; intros.
     red; intros h dl dnc env dnenv d dnd.
     specialize (H (map (fun xy => (fst xy,
-                                   (AApp (alg_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env)))) ps)).
+                                   (AApp (nra_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env)))) ps)).
     
       symmetry in Hequiv.
        generalize (equivlist_in Hequiv); intros Hin.
@@ -532,36 +532,36 @@ Section cNRAEnvContext.
          repeat rewrite aec_holes_lift; intuition. }
        repeat rewrite map_map in H.
        simpl in H.
-       generalize (ac_holes_saturated_subst (fun x => (alg_of_cnraenv x ◯ make_fixed_pat_context_data (drec (rec_sort dl)) env)%alg) c1 ps c1incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_pat_context_data (drec (rec_sort dl)) env)%nra) c1 ps c1incl);
          intros c1nholes.
-       generalize (ac_holes_saturated_subst (fun x => (alg_of_cnraenv x ◯ make_fixed_pat_context_data (drec (rec_sort dl)) env)%alg) c2 ps c2incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_pat_context_data (drec (rec_sort dl)) env)%nra) c2 ps c2incl);
          intros c2nholes.
        destruct (ac_simplify_nholes _ c1nholes) as [c1s c1seq].
        destruct (ac_simplify_nholes _ c2nholes) as [c2s c2seq].
        generalize (aec_simplify_lift_commute (ac_substs c1
              (map
                 (fun xy : nat * cnraenv =>
-                   (fst xy, AApp (alg_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env))) ps)));
+                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env))) ps)));
         intros leq1.
       generalize (aec_simplify_lift_commute (ac_substs c2
              (map
                 (fun xy : nat * cnraenv =>
-                   (fst xy, AApp (alg_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env))) ps)));
+                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env))) ps)));
         intros leq2.
-      rewrite lift_alg_context_substs in leq1, leq2.
+      rewrite lift_nra_context_substs in leq1, leq2.
       rewrite map_map in leq1, leq2. simpl in leq1, leq2.
       rewrite c1seq, c2seq in *.
       intros.
       generalize
         (aec_substs_under_prop_part2 h dl env dnc dnenv c1
                                      (map (fun x => (fst x, 
-                                     ((cnraenv_of_alg (alg_of_cnraenv (snd x)))
+                                     ((cnraenv_of_nra (nra_of_cnraenv (snd x)))
                                         ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|] ⊕ ‵[| ("PDATA", ID)|])))%cnraenv)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s1eq.
 
       generalize
         (aec_substs_under_prop_part2 h dl env dnc dnenv c2
                                      (map (fun x => (fst x, 
-                                     ((cnraenv_of_alg (alg_of_cnraenv (snd x)))
+                                     ((cnraenv_of_nra (nra_of_cnraenv (snd x)))
                                         ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|]⊕ ‵[| ("PDATA", ID)|])))%cnraenv)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s2eq.
       simpl in s1eq, s2eq.
       simpl in *.
@@ -569,8 +569,8 @@ Section cNRAEnvContext.
       simpl in s1eq, s2eq.
       rewrite leq1, H1 in s1eq.
       rewrite leq2, H0 in s2eq.
-      assert (cseq: ((cnraenv_of_alg c1s) ≡ₑ (cnraenv_of_alg c2s))%cnraenv).
-      { apply cnraenv_of_alg_proper. trivial. }
+      assert (cseq: ((cnraenv_of_nra c1s) ≡ₑ (cnraenv_of_nra c2s))%cnraenv).
+      { apply cnraenv_of_nra_proper. trivial. }
       rewrite <- cnraenv_eq_under_equiv in cseq.
       specialize (cseq h dl env).
       rewrite s1eq, s2eq in cseq.
@@ -578,30 +578,30 @@ Section cNRAEnvContext.
       apply cseq; auto.
   Qed.
 
-  Global Instance lift_alg_context_strict_proper : Proper (alg_ctxt_equiv_strict alg_eq ==> cnraenv_ctxt_equiv_strict cnraenv_eq) lift_alg_context.
+  Global Instance lift_nra_context_strict_proper : Proper (nra_ctxt_equiv_strict nra_eq ==> cnraenv_ctxt_equiv_strict cnraenv_eq) lift_nra_context.
   Proof.
     unfold Proper, respectful.
     intros c1 c2 H.
     apply cnraenv_ctxt_equiv_strict_equiv.
-    apply alg_ctxt_equiv_strict_equiv in H.
-    apply lift_alg_context_proper; trivial.
+    apply nra_ctxt_equiv_strict_equiv in H.
+    apply lift_nra_context_proper; trivial.
   Qed.
 
-  Local Open Scope alg_ctxt.
+  Local Open Scope nra_ctxt.
   Local Open Scope cnraenv_ctxt.
 
-  (** This is just a restatement of lift_alg_context_proper
+  (** This is just a restatement of lift_nra_context_proper
         which visually looks more like the paper version.
-        For the mechanization, lift_alg_context_proper 
-        is nicer, since it explicitly states that lift_alg_context
+        For the mechanization, lift_nra_context_proper 
+        is nicer, since it explicitly states that lift_nra_context
         is a morphism between the two equivalences
         and registers that relationship with the rewriting infrastructure
         of Coq.
    *)
-  Theorem contextual_equivalence_lifting (c₁ c₂:alg_ctxt) :
-    c₁ ≡ₐ c₂ -> lift_alg_context c₁ ≡ₑ lift_alg_context c₂.
+  Theorem contextual_equivalence_lifting (c₁ c₂:nra_ctxt) :
+    c₁ ≡ₐ c₂ -> lift_nra_context c₁ ≡ₑ lift_nra_context c₂.
   Proof.
-    apply lift_alg_context_proper.
+    apply lift_nra_context_proper.
   Qed.
 
 End cNRAEnvContext.

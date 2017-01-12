@@ -662,7 +662,7 @@ Section TcNRAEnv.
     apply ATpat_data_inv'.
   Qed.
 
-  Hint Constructors alg_type unaryOp_type binOp_type.
+  Hint Constructors nra_type unaryOp_type binOp_type.
   Hint Resolve ATdot ATpat_data.
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
@@ -685,7 +685,7 @@ Section TcNRAEnv.
             op).
  *)
   
-  Lemma ATunnest_two (s1 s2:string) (op:NRA.alg) τin τ₁ pf1 τs τrem pf2 :
+  Lemma ATunnest_two (s1 s2:string) (op:NRA.nra) τin τ₁ pf1 τs τrem pf2 :
     op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ->
     tdot τ₁ s1 = Some (Coll τs) ->
     τrem = (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1) ->
@@ -699,27 +699,27 @@ Section TcNRAEnv.
     unfold rec_concat_sort. eauto.
   Qed.
 
-  Ltac alg_inverter := 
+  Ltac nra_inverter := 
   match goal with
     | [H:Coll _ = Coll _ |- _] => inversion H; clear H
     | [H: `?τ₁ = Coll₀ (`?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
     | [H:  Coll₀ (`?τ₂) = `?τ₁ |- _] => symmetry in H
     (* Note: do not generalize too hastily on unaryOp/binOp constructors *)
-    | [H:@alg_type _  AID _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AMap _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AMapConcat _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AEither _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AEitherConcat _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (ARecEither _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (ADefault _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AApp _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AProduct _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (ASelect _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AUnop _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (ABinop _ _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _  (AConst _) _ _ |- _ ] => inversion H; clear H
-    | [H:@alg_type _ (pat_data) _ _ |- _ ] => apply ATpat_data_inv' in H
-    | [H:@alg_type _ (pat_data) (pat_context_type _ _) _ |- _ ] => apply ATpat_data_inv in H
+    | [H:@nra_type _  AID _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AMap _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AMapConcat _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AEither _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AEitherConcat _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (ARecEither _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (ADefault _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AApp _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AProduct _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (ASelect _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AUnop _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (ABinop _ _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _  (AConst _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ (pat_data) _ _ |- _ ] => apply ATpat_data_inv' in H
+    | [H:@nra_type _ (pat_data) (pat_context_type _ _) _ |- _ ] => apply ATpat_data_inv in H
     | [H: (_,_)  = (_,_) |- _ ] => inversion H; clear H
     | [H: map (fun x2 : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                  (fst x2, ` (snd x2))) ?x0 = [] |- _] => apply (map_rtype_nil x0) in H; simpl in H; subst
@@ -753,9 +753,9 @@ Section TcNRAEnv.
     | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
     | [H:binOp_type AAnd _ _ _ |- _ ] => inversion H; clear H
     | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
-  end; try rtype_equalizer; try assumption; try subst; simpl in *; try alg_inverter.
+  end; try rtype_equalizer; try assumption; try subst; simpl in *; try nra_inverter.
 
-  Lemma ATunnest_two_inv (s1 s2:string) (op:NRA.alg) τin rec  :
+  Lemma ATunnest_two_inv (s1 s2:string) (op:NRA.nra) τin rec  :
     unnest_two s1 s2 op ▷ 
                        τin >=> Coll rec ->
     exists τ₁ pf1 τs τrem pf2,
@@ -766,13 +766,13 @@ Section TcNRAEnv.
   Proof.
     unfold unnest_two.
     intros H.
-    alg_inverter.
+    nra_inverter.
     destruct x; simpl in *.
     repeat eexists; intuition; eauto.
   Qed.
     
     Lemma ATRecEither s τl τr pf1 pf2:
-      alg_type (ARecEither s) (Either τl τr)
+      nra_type (ARecEither s) (Either τl τr)
                (Either
                   (Rec Closed ((s,τl)::nil) pf1)
                   (Rec Closed ((s,τr)::nil) pf2)).
@@ -780,8 +780,8 @@ Section TcNRAEnv.
       econstructor; eauto.
     Qed.
 
-    Theorem typed_cnraenv_to_typed_alg {τc} pf {τenv τin τout} (op:cnraenv):
-    (cnraenv_type τc op τenv τin τout) -> (alg_type (alg_of_cnraenv op) (pat_context_type (Rec Closed τc pf) τenv τin) τout).
+    Theorem typed_cnraenv_to_typed_nra {τc} pf {τenv τin τout} (op:cnraenv):
+    (cnraenv_type τc op τenv τin τout) -> (nra_type (nra_of_cnraenv op) (pat_context_type (Rec Closed τc pf) τenv τin) τout).
   Proof.
     intros.
     dependent induction H; simpl; intros.
@@ -823,13 +823,13 @@ Section TcNRAEnv.
                           [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, Rec Closed τ₁ pf1)]
                           [("PDATA2"%string, (Rec Closed τ₂ pf2))]
                           [("PBIND"%string, τenv);  ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, Rec Closed τ₁ pf1); ("PDATA2"%string, Rec Closed τ₂ pf2)]
-                          (AMap (AUnop (ARec "PDATA2") AID) (alg_of_cnraenv op1))
-                          (unnest_two "a1" "PDATA" (AUnop AColl (pat_wrap_a1 (alg_of_cnraenv op2))))
+                          (AMap (AUnop (ARec "PDATA2") AID) (nra_of_cnraenv op1))
+                          (unnest_two "a1" "PDATA" (AUnop AColl (pat_wrap_a1 (nra_of_cnraenv op2))))
                           eq_refl eq_refl
             ); try reflexivity.
       eauto.
       unfold pat_wrap_a1.
-      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (pat_triple "PCONST" "PBIND" "a1" pat_const_env pat_bind (alg_of_cnraenv op2))) (pat_context_type  (Rec Closed τc pf) τenv τin) [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
+      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (pat_triple "PCONST" "PBIND" "a1" pat_const_env pat_bind (nra_of_cnraenv op2))) (pat_context_type  (Rec Closed τc pf) τenv τin) [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
       apply (@ATUnop m (pat_context_type  (Rec Closed τc pf) τenv τin) (Rec Closed [("PBIND"%string, τenv);  ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)).
       econstructor; eauto.
       unfold pat_triple, pat_bind.
@@ -980,10 +980,10 @@ Section TcNRAEnv.
         apply UIP_dec. apply bool_dec.
       Qed.
 
-  Ltac alg_inverter_ext
+  Ltac nra_inverter_ext
     :=
       simpl in *; match goal with
-         | [H:@alg_type _ (unnest_two _ _ _) _ (Coll _) |- _ ] => apply ATunnest_two_inv in H;
+         | [H:@nra_type _ (unnest_two _ _ _) _ (Coll _) |- _ ] => apply ATunnest_two_inv in H;
              destruct H as [? [? [? [? [? [? [?[??]]]]]]]]
          | [H: prod _ _ |- _ ] => destruct H; simpl in *; try subst
          | [H: context [Rec Closed [("PBIND"%string, ?env); ("PCONST"%string, ?c); ("PDATA"%string, ?d)] ?pf ] |- _ ] => unfold rtype in H; rewrite (fold_pat_context_type c env d pf) in H
@@ -1005,8 +1005,8 @@ Section TcNRAEnv.
                H2:@eq bool ?a ?b |- _] => destruct (UIP_bool H1 H2)
        end.
 
-  Ltac alg_inverter2 :=
-    repeat (try unfold pat_wrap, pat_wrap_a1, pat_wrap_bind_a1, pat_context, pat_triple, pat_const_env, pat_bind, pat_wrap in *; (alg_inverter_ext || alg_inverter); try subst).
+  Ltac nra_inverter2 :=
+    repeat (try unfold pat_wrap, pat_wrap_a1, pat_wrap_bind_a1, pat_context, pat_triple, pat_const_env, pat_bind, pat_wrap in *; (nra_inverter_ext || nra_inverter); try subst).
 
   Ltac tdot_inverter :=
     repeat
@@ -1020,25 +1020,25 @@ Section TcNRAEnv.
             end
       end.
 
-  Lemma typed_cnraenv_to_typed_alg_inv' {k τc pf0 τenv τin τout pf} (op:cnraenv):
-    alg_type (alg_of_cnraenv op) (Rec k [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf0)); ("PDATA"%string, τin)] pf) τout ->
+  Lemma typed_cnraenv_to_typed_nra_inv' {k τc pf0 τenv τin τout pf} (op:cnraenv):
+    nra_type (nra_of_cnraenv op) (Rec k [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf0)); ("PDATA"%string, τin)] pf) τout ->
     cnraenv_type τc op τenv τin τout.
   Proof.
     Hint Constructors cnraenv_type.
     revert k τenv τin τout pf.
     induction op; simpl; intros.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
     - inversion H; clear H; subst.
       unfold pat_const_env in H5.
       inversion H5;  clear H5; subst.
@@ -1050,7 +1050,7 @@ Section TcNRAEnv.
       destruct τ'; simpl in H9; inversion H9; clear H9.
       destruct p; destruct p0; destruct p1; simpl in *.
       rtype_equalizer.
-      alg_inverter_ext.
+      nra_inverter_ext.
       subst.
       unfold tdot,edot in H5.
       simpl in H5.
@@ -1059,17 +1059,17 @@ Section TcNRAEnv.
       rtype_equalizer.
       subst.
       econstructor; trivial.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
-    - alg_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
+    - nra_inverter2; try tdot_inverter; eauto.
   Qed.
   
-  Theorem typed_cnraenv_to_typed_alg_inv {τc} pf {τenv τin τout} (op:cnraenv):
-    alg_type (alg_of_cnraenv op) (pat_context_type  (Rec Closed τc pf) τenv τin) τout ->
+  Theorem typed_cnraenv_to_typed_nra_inv {τc} pf {τenv τin τout} (op:cnraenv):
+    nra_type (nra_of_cnraenv op) (pat_context_type  (Rec Closed τc pf) τenv τin) τout ->
     cnraenv_type τc op τenv τin τout.
   Proof.
     unfold pat_context_type.
-    apply typed_cnraenv_to_typed_alg_inv'.
+    apply typed_cnraenv_to_typed_nra_inv'.
   Qed.
 
   Lemma typed_cnraenv_const_sort_f {τc op τenv τin τout} :

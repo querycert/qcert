@@ -33,7 +33,7 @@ Section NRAtoNNRC.
 
   (** Translation from NRA to Named Nested Relational Calculus *)
 
-  Fixpoint nra_to_nnrc (op:alg) (var:var) : nnrc :=
+  Fixpoint nra_to_nnrc (op:nra) (var:var) : nnrc :=
     match op with
       (* [[ ID ]]_var = var *)
       | AID => NNRCVar var
@@ -114,7 +114,7 @@ _var ⊕ [[ op2 ]]_var *)
 
   (** Auxiliary lemmas used in the proof of correctness for the translation *)
 
-  Lemma map_sem_correct (h:list (string*string)) (op:alg) (l:list data) (env:bindings) (v:var):
+  Lemma map_sem_correct (h:list (string*string)) (op:nra) (l:list data) (env:bindings) (v:var):
     (forall (d : data) (env : bindings) (v : var),
           lookup equiv_dec env v = Some d ->
           nnrc_core_eval h env (nra_to_nnrc op v) = h ⊢ op @ₐ d) ->
@@ -136,13 +136,13 @@ _var ⊕ [[ op2 ]]_var *)
 
   (** Theorem 5.2: proof of correctness for the translation *)
 
-  Theorem nra_sem_correct (h:list (string*string)) (op:alg) (env:bindings) (v:var) (d:data) :
+  Theorem nra_sem_correct (h:list (string*string)) (op:nra) (env:bindings) (v:var) (d:data) :
     lookup equiv_dec env v = Some d ->
     nnrc_core_eval h env (nra_to_nnrc op v) = h ⊢ op @ₐ d.
   Proof.
     Opaque fresh_var.
     revert d env v.
-    alg_cases (induction op) Case; intros.
+    nra_cases (induction op) Case; intros.
     - Case "AID"%string.
       simpl. assumption.
     - Case "AConst"%string.
@@ -290,7 +290,7 @@ _var ⊕ [[ op2 ]]_var *)
   Require Import Omega.
 
   Theorem nraToNNRC_size op v : 
-    nnrc_size (nra_to_nnrc op v) <= 10 * alg_size op.
+    nnrc_size (nra_to_nnrc op v) <= 10 * nra_size op.
   Proof.
     revert v.
     induction op; simpl in *; intros; trivial.

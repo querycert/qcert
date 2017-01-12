@@ -32,7 +32,7 @@ Section TOptim.
 
   Require Import Program.
   
-  Local Open Scope alg_scope.
+  Local Open Scope nra_scope.
 
   (* An attempt at proving some of the relational algebra's
      TYPE-DEPENDENT algebraic equivalences. *)
@@ -47,13 +47,13 @@ Section TOptim.
     opl ≡τ opr.
   Proof.
     intros.
-    apply alg_eq_impl_talg_eq.
+    apply nra_eq_impl_tnra_eq.
     rewrite H; rewrite H0.
     rewrite and_comm.
     reflexivity.
   Qed.
 
-  Lemma tand_comm_arrow {τin} (op1 op2:alg) :
+  Lemma tand_comm_arrow {τin} (op1 op2:nra) :
     m ⊢ₐ τin ↦ Bool ⊧ (op1 ∧ op2) ⇒ (op2 ∧ op1).
   Proof.
     intros.
@@ -67,7 +67,7 @@ Section TOptim.
 
   (* σ{P1}(σ{P2}(P3)) == σ{P2 ∧ P1}(P3)) *)
 
-  Lemma tselect_and_aux (x: data) τin τ (op op1 op2:alg) :
+  Lemma tselect_and_aux (x: data) τin τ (op op1 op2:nra) :
     op ▷ τin >=> (Coll τ) ->
     op1 ▷ τ >=> Bool ->
     op2 ▷ τ >=> Bool ->
@@ -77,7 +77,7 @@ Section TOptim.
   Proof.
     intros; simpl.
     assert (exists d, (brand_relation_brands ⊢ op@ₐx = Some d /\ (d ▹ (Coll τ))))
-      by (apply (@typed_alg_yields_typed_data m τin); assumption).
+      by (apply (@typed_nra_yields_typed_data m τin); assumption).
     elim H3; clear H3; intros.
     elim H3; clear H3; intros.
     rewrite H3; clear H3; simpl.
@@ -97,7 +97,7 @@ Section TOptim.
     assert (data_type a τ)
       by intuition.
     assert (exists d, (brand_relation_brands ⊢ op2@ₐa = Some d /\ (d ▹ Bool)))
-      by (apply (@typed_alg_yields_typed_data m τ); assumption).
+      by (apply (@typed_nra_yields_typed_data m τ); assumption).
     destruct H4 as [? [eqq dt]].
     rewrite eqq; clear eqq.
     dtype_inverter.
@@ -111,13 +111,13 @@ Section TOptim.
     - destruct x1.
       + simpl.
         assert (exists d, (brand_relation_brands ⊢ op1@ₐa = Some d /\ (d ▹ Bool)))
-          by (apply (@typed_alg_yields_typed_data m τ); assumption).
+          by (apply (@typed_nra_yields_typed_data m τ); assumption).
         destruct H4 as [? [eqq dt]].
         rewrite eqq; clear eqq.
         dtype_inverter.
         reflexivity.
       + assert (exists d, (brand_relation_brands ⊢ op1@ₐa = Some d /\ (d ▹ Bool)))
-          by (apply (@typed_alg_yields_typed_data m τ); assumption).
+          by (apply (@typed_nra_yields_typed_data m τ); assumption).
         destruct H4 as [? [eqq dt]].
         rewrite eqq; clear eqq.
         dtype_inverter.
@@ -136,7 +136,7 @@ Section TOptim.
     (`opr = σ⟨ `op2 ∧ `op1 ⟩(`op)) ->
     (opl ≡τ opr).
   Proof.
-    unfold talg_eq; intros.
+    unfold tnra_eq; intros.
     rewrite H; rewrite H0.
     rewrite (tselect_and_aux x τin τ).
     reflexivity.
@@ -148,14 +148,14 @@ Section TOptim.
 
   (* σ⟨ P1 ⟩(σ⟨ P2 ⟩(P3)) == σ⟨ P2 ⟩(σ⟨ P1 ⟩(P3)) *)
 
-  (* This is the first rewrite done at algebra level, using alg_eq. *)
-  Lemma tselect_comm_alg {τin τ} (op1 op2:τ ⇝ Bool) (op opl opr: τin ⇝ (Coll τ)) :
+  (* This is the first rewrite done at algebra level, using nra_eq. *)
+  Lemma tselect_comm_nra {τin τ} (op1 op2:τ ⇝ Bool) (op opl opr: τin ⇝ (Coll τ)) :
     (`opl = σ⟨ `op1 ⟩(σ⟨ `op2 ⟩(`op))) ->
     (`opr = σ⟨ `op2 ⟩(σ⟨ `op1 ⟩(`op))) ->
     opl ≡τ opr.
   Proof.
     intros.
-    unfold talg_eq; intros.
+    unfold tnra_eq; intros.
     rewrite H; rewrite H0.
     rewrite (tselect_and_aux x τin τ); try assumption.
     rewrite (tselect_and_aux x τin τ); try assumption.
@@ -177,8 +177,8 @@ Section TOptim.
     x ▹ τin ->
     (brand_relation_brands ⊢ σ⟨ `op1 ⟩(σ⟨ `op2 ⟩(`op)) @ₐ x ) = (brand_relation_brands ⊢ σ⟨ `op2 ⟩(σ⟨ `op1 ⟩(`op)) @ₐ x).
   Proof.
-    generalize (@tselect_comm_alg τin); intros.
-    unfold talg_eq in H.
+    generalize (@tselect_comm_nra τin); intros.
+    unfold tnra_eq in H.
     specialize (H τ op1 op2 op).
     assert (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( ` op)) ▷ τin >=> Coll τ).
     apply ATSelect.
@@ -195,12 +195,12 @@ Section TOptim.
     assert (exists opl:τin ⇝ Coll τ, `opl = σ⟨ `op1 ⟩( σ⟨ `op2 ⟩(`op))).
     revert H1.
     generalize (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( `op))); intros.
-    exists (exist (fun op => alg_type op τin (Coll τ)) a H1).
+    exists (exist (fun op => nra_type op τin (Coll τ)) n H1).
     reflexivity.
     assert (exists opr:τin ⇝ Coll τ, `opr = σ⟨ `op2 ⟩( σ⟨ `op1 ⟩(`op))).
     revert H2.
     generalize (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩(`op))); intros.
-    exists (exist (fun op => alg_type op τin (Coll τ)) a H2).
+    exists (exist (fun op => nra_type op τin (Coll τ)) n H2).
     reflexivity.
     elim H3; elim H4; intros.
     rewrite <- H5.
@@ -221,25 +221,25 @@ Section TOptim.
     exact b.
   Defined.
 
-  Definition typed_alg_total_bool {τ} (op:τ ⇝ Bool):
+  Definition typed_nra_total_bool {τ} (op:τ ⇝ Bool):
     {x:data|(x ▹ τ)} -> bool.
   Proof.
     intros.
     apply tunbox_bool.
-    apply (@typed_alg_total m τ Bool (`op) (proj2_sig op) (`H)).
+    apply (@typed_nra_total m τ Bool (`op) (proj2_sig op) (`H)).
     elim H; intros.
     exact p.
   Defined.
 
-  Lemma typed_alg_total_bool_consistent {τ} (op:τ ⇝ Bool) (d: {x:data|(x ▹ τ)}) :
+  Lemma typed_nra_total_bool_consistent {τ} (op:τ ⇝ Bool) (d: {x:data|(x ▹ τ)}) :
     match (brand_relation_brands ⊢ `op@ₐ`d) with
       | Some (dbool b) => Some b
       | _ => None
-    end = Some (typed_alg_total_bool op d).
+    end = Some (typed_nra_total_bool op d).
   Proof.
-    unfold typed_alg_total_bool.
-    unfold typed_alg_total.
-    generalize (typed_alg_yields_typed_data (`d) (`op) (sig_ind (fun H : {x : data | x ▹ τ} => ` H ▹ τ)
+    unfold typed_nra_total_bool.
+    unfold typed_nra_total.
+    generalize (typed_nra_yields_typed_data (`d) (`op) (sig_ind (fun H : {x : data | x ▹ τ} => ` H ▹ τ)
                  (fun (x : data) (p : x ▹ τ) => p) d) 
                                             (proj2_sig op)); intros.
     destruct e; simpl.
@@ -249,13 +249,13 @@ Section TOptim.
     reflexivity.
   Qed.
 
-  Lemma typed_alg_total_bool_consistent2 {τ} (op:τ ⇝ Bool) (x:data) (pf:(x ▹ τ)) :
+  Lemma typed_nra_total_bool_consistent2 {τ} (op:τ ⇝ Bool) (x:data) (pf:(x ▹ τ)) :
     match (brand_relation_brands ⊢ `op@ₐx) with
       | Some (dbool b) => Some b
       | _ => None
-    end = Some (typed_alg_total_bool op (exist _ x pf)).
+    end = Some (typed_nra_total_bool op (exist _ x pf)).
   Proof.
-    apply (typed_alg_total_bool_consistent op (exist _ x pf)).
+    apply (typed_nra_total_bool_consistent op (exist _ x pf)).
   Qed.
   
   Lemma typed_lifted_predicate {τ} (op:τ ⇝ Bool) (d:data):
@@ -268,8 +268,8 @@ Section TOptim.
          end) d = Some b'.
   Proof.
     intros.
-    exists (typed_alg_total_bool op (exist _ d H)).
-    apply typed_alg_total_bool_consistent2.
+    exists (typed_nra_total_bool op (exist _ d H)).
+    apply typed_nra_total_bool_consistent2.
   Qed.
 
   Lemma lift_filter_remove_one_false (l:list data) (f:data -> option bool) (a:data) :
@@ -378,12 +378,12 @@ Section TOptim.
     (`opr = σ⟨`op⟩(`op1) − σ⟨`op⟩(`op2)) ->
     opl ≡τ opr.
   Proof.
-    unfold talg_eq; intros.
+    unfold tnra_eq; intros.
     rewrite H; rewrite H0; clear H H0 opl opr; simpl.
     assert (exists d1, (brand_relation_brands ⊢ `op1@ₐx = Some d1 /\ (d1 ▹ (Coll τ))))
-      by (apply (@typed_alg_yields_typed_data m τin); [assumption|apply (proj2_sig op1)]).
+      by (apply (@typed_nra_yields_typed_data m τin); [assumption|apply (proj2_sig op1)]).
     assert (exists d2, (brand_relation_brands ⊢ `op2@ₐx = Some d2 /\ (d2 ▹ (Coll τ))))
-      by (apply (@typed_alg_yields_typed_data m τin); [assumption|apply (proj2_sig op2)]).
+      by (apply (@typed_nra_yields_typed_data m τin); [assumption|apply (proj2_sig op2)]).
     elim H; elim H0; clear H H0; intros.
     elim H; elim H0; clear H H0; intros.
     rewrite H; rewrite H2; clear H H2.

@@ -97,14 +97,14 @@ Section TCAMPtoNRA.
     - reflexivity.
   Qed.
 
-  Hint Constructors alg_type unaryOp_type binOp_type.
+  Hint Constructors nra_type unaryOp_type binOp_type.
   Hint Resolve ATdot ATpat_match ATpat_data.
   
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
    *)
 
-  Lemma ATunnest_two (s1 s2:string) (op:alg) τin τ₁ pf1 τs τrem pf2 :
+  Lemma ATunnest_two (s1 s2:string) (op:nra) τin τ₁ pf1 τs τrem pf2 :
     op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ->
     tdot τ₁ s1 = Some (Coll τs) ->
     τrem = (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1) ->
@@ -124,7 +124,7 @@ Section TCAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma ATunnest_two_inv {s1 s2:string} {op:alg} {τin τout} :
+  Lemma ATunnest_two_inv {s1 s2:string} {op:nra} {τin τout} :
     unnest_two s1 s2 op ▷ τin >=> Coll τout ->
     exists τ₁ pf1 τs pf2,
     op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) /\
@@ -149,9 +149,9 @@ Section TCAMPtoNRA.
   Qed.
 
   (** Main lemma for the type preservation of the translation. *)
-  Lemma alg_of_pat_type_preserve' τc Γ pf p τin τout :
+  Lemma nra_of_pat_type_preserve' τc Γ pf p τin τout :
     pat_type (rec_sort τc) Γ p τin τout ->
-    alg_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
+    nra_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
   Proof.
     Hint Resolve data_type_drec_nil.
     revert τc Γ pf τin τout.
@@ -252,22 +252,22 @@ Section TCAMPtoNRA.
       eauto. 
   Qed.
 
-  Lemma alg_of_pat_type_preserve τc Γ pf p τin τout :
+  Lemma nra_of_pat_type_preserve τc Γ pf p τin τout :
     pat_type τc Γ p τin τout ->
-    alg_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
+    nra_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
   Proof.
     intros H.
-    apply alg_of_pat_type_preserve'.
+    apply nra_of_pat_type_preserve'.
     apply pat_type_const_sort.
     trivial.
   Qed.
 
   (** Some corollaries of the main Lemma *)
 
-  Lemma alg_of_pat_alg_of_pat_top p c τc τin τout :
+  Lemma nra_of_pat_nra_of_pat_top p c τc τin τout :
     bindings_type c τc ->
-    alg_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed nil eq_refl) τin) >=> Coll τout ->
-    alg_of_pat_top c p ▷ τin >=> Coll τout.
+    nra_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed nil eq_refl) τin) >=> Coll τout ->
+    nra_of_pat_top c p ▷ τin >=> Coll τout.
   Proof.
     Hint Resolve normalize_normalizes.
     Hint Resolve normalize_preserves_type.
@@ -297,14 +297,14 @@ Section TCAMPtoNRA.
     eauto. eauto. eauto. eauto. 
   Qed.
     
-  Theorem alg_of_pat_top_type_preserve p c τc τin τout :
+  Theorem nra_of_pat_top_type_preserve p c τc τin τout :
     bindings_type c τc ->
     pat_type τc nil p τin τout ->
-    alg_of_pat_top c p ▷ τin >=> Coll τout.
+    nra_of_pat_top c p ▷ τin >=> Coll τout.
   Proof.
     intros.
-    eapply alg_of_pat_alg_of_pat_top; eauto.
-    eapply alg_of_pat_type_preserve; eauto.
+    eapply nra_of_pat_nra_of_pat_top; eauto.
+    eapply nra_of_pat_type_preserve; eauto.
   Qed.
 
   Hint Constructors pat_type.
@@ -434,20 +434,20 @@ Section TCAMPtoNRA.
         => apply Rec₀_eq_proj1_Rec in H; destruct H as [??]
     end; try rtype_equalizer; try subst; simpl in *; try inverter.
   
-  Lemma alg_of_pat_type_form_output_weak p τin τout :
-    alg_of_pat p ▷ τin >=> τout ->
+  Lemma nra_of_pat_type_form_output_weak p τin τout :
+    nra_of_pat p ▷ τin >=> τout ->
     exists τout',τout = Coll τout'.
   Proof.
     revert τin τout.
     induction p; simpl; intros; try inverter; eauto.
   Qed.
 
-  Theorem alg_of_pat_type_form_output p τin τout :
-    alg_of_pat p ▷ τin >=> τout ->
+  Theorem nra_of_pat_type_form_output p τin τout :
+    nra_of_pat p ▷ τin >=> τout ->
     {τout' | τout = Coll τout'}.
   Proof.
     intros H.
-    apply alg_of_pat_type_form_output_weak in H.
+    apply nra_of_pat_type_form_output_weak in H.
     destruct τout.
     destruct x;
       try solve [cut False; [intuition|destruct H; inversion H]].
@@ -455,20 +455,20 @@ Section TCAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma alg_of_pat_top_type_form_output_weak p c τin τout :
-    alg_of_pat_top c p ▷ τin >=> τout ->
+  Lemma nra_of_pat_top_type_form_output_weak p c τin τout :
+    nra_of_pat_top c p ▷ τin >=> τout ->
     exists τout', τout = Coll τout'.
   Proof.
-    unfold alg_of_pat_top; intros; inverter.
+    unfold nra_of_pat_top; intros; inverter.
     eauto.
   Qed.
 
-  Theorem alg_of_pat_top_type_form_output p c τin τout :
-    alg_of_pat_top c p ▷ τin >=> τout ->
+  Theorem nra_of_pat_top_type_form_output p c τin τout :
+    nra_of_pat_top c p ▷ τin >=> τout ->
     {τout' | τout = Coll τout'}.
   Proof.
     intros H.
-    apply alg_of_pat_top_type_form_output_weak in H.
+    apply nra_of_pat_top_type_form_output_weak in H.
     destruct τout.
     destruct x;
       try solve [cut False; [intuition|destruct H; inversion H]].
@@ -489,15 +489,15 @@ Section TCAMPtoNRA.
            end.
 
   (* Leave for later -- JS
-  Lemma alg_of_pat_type_preserve_back Γ pf p τin τout :
-    alg_of_pat p ▷ (pat_context_type (Rec Closed Γ pf) τin) >=> (Coll τout) ->
+  Lemma nra_of_pat_type_preserve_back Γ pf p τin τout :
+    nra_of_pat p ▷ (pat_context_type (Rec Closed Γ pf) τin) >=> (Coll τout) ->
     pat_type m Γ p τin τout.
   Proof.
     Hint Resolve data_type_drec_nil. 
     Ltac inst :=
       repeat match goal with
-                 [H1:forall _ _ _ _ , alg_of_pat ?p ▷ _ >=> _ -> _,
-                    H2:alg_of_pat ?p ▷ ?i >=> _
+                 [H1:forall _ _ _ _ , nra_of_pat ?p ▷ _ >=> _ -> _,
+                    H2:nra_of_pat ?p ▷ ?i >=> _
                     |- _] => apply H1 in H2
              end.
 
@@ -505,46 +505,46 @@ Section TCAMPtoNRA.
     induction p; simpl; intros; try inverter; tdi; try inverter; subst; try inst; eauto.
   Qed.
 
-  Lemma alg_of_pat_top_alg_of_pat p τin τout :
-    alg_of_pat_top p ▷ τin >=> Coll τout ->
-    alg_of_pat p ▷ (pat_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout.
+  Lemma nra_of_pat_top_nra_of_pat p τin τout :
+    nra_of_pat_top p ▷ τin >=> Coll τout ->
+    nra_of_pat p ▷ (pat_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout.
   Proof.
-    unfold alg_of_pat_top.
+    unfold nra_of_pat_top.
     intros; inverter; subst; trivial.
     inversion H1; clear H1.
     subst.
     inversion H3; clear H3; subst.
   Qed.
     
-  Theorem alg_of_pat_top_type_preserve_back p τin τout :
-    alg_of_pat_top p ▷ τin >=> Coll τout ->
+  Theorem nra_of_pat_top_type_preserve_back p τin τout :
+    nra_of_pat_top p ▷ τin >=> Coll τout ->
     nil |= p ; τin ~> τout.
   Proof.
     intros.
-    eapply alg_of_pat_type_preserve_back.
-    eapply alg_of_pat_top_alg_of_pat; eauto.
+    eapply nra_of_pat_type_preserve_back.
+    eapply nra_of_pat_top_nra_of_pat; eauto.
   Qed.
  *)
   (** Theorem 7.4: Pattern<->NRA.
        Final iff Theorem of type preservation for the translation from Patterns to NRA *)
   (*
-  Theorem alg_of_pat_type_preserve_iff Γ pf p τin τout :
+  Theorem nra_of_pat_type_preserve_iff Γ pf p τin τout :
     Γ |= p ; τin ~> τout <->
-    alg_of_pat p ▷ (pat_context_type (Rec Γ pf) τin) >=> (Coll τout).
+    nra_of_pat p ▷ (pat_context_type (Rec Γ pf) τin) >=> (Coll τout).
   Proof.
  Hint Resolve 
-         alg_of_pat_type_preserve
-         alg_of_pat_type_preserve_back.
+         nra_of_pat_type_preserve
+         nra_of_pat_type_preserve_back.
     intuition eauto.
   Qed.
     
-  Lemma alg_of_pat_top_type_preserve_iff p τin τout :
+  Lemma nra_of_pat_top_type_preserve_iff p τin τout :
     nil |= p ; τin ~> τout <->
-    alg_of_pat_top p ▷ τin >=> Coll τout.
+    nra_of_pat_top p ▷ τin >=> Coll τout.
   Proof.
     Hint Resolve 
-         alg_of_pat_top_type_preserve
-         alg_of_pat_top_type_preserve_back.
+         nra_of_pat_top_type_preserve
+         nra_of_pat_top_type_preserve_back.
     intuition.
   Qed.
 *)

@@ -108,7 +108,7 @@ End TDomain.
 
 Section dom.
   Require Import TBrandModel.
-  Lemma alg_domain {m:basic_model} {τin τout} (op:alg) :
+  Lemma nra_domain {m:basic_model} {τin τout} (op:nra) :
     op ▷ τin >=> τout -> list string.
   Proof.
     intros.
@@ -142,12 +142,12 @@ Section dom.
 
 End dom.
 
-Notation "d1 # d2" := (domains_disjoint d1 d2) (at level 70) : alg_scope.
-Notation "x ∈ d"   := (in_domain d x)  (at level 70) : alg_scope.          (* ∈ = \in *)
-Notation "x ∉ d"   := (not_in_domain d x)  (at level 70) : alg_scope.      (* ∉ = \notin *)
-Notation "d1 ⊆ d2" := (domains_included d1 d2) (at level 70) : alg_scope.  (* ⊆ = \subseteq *)
+Notation "d1 # d2" := (domains_disjoint d1 d2) (at level 70) : nra_scope.
+Notation "x ∈ d"   := (in_domain d x)  (at level 70) : nra_scope.          (* ∈ = \in *)
+Notation "x ∉ d"   := (not_in_domain d x)  (at level 70) : nra_scope.      (* ∉ = \notin *)
+Notation "d1 ⊆ d2" := (domains_included d1 d2) (at level 70) : nra_scope.  (* ⊆ = \subseteq *)
 
-Notation "pf ⊨ 𝓐( op )" := (alg_domain op pf) (at level 70) : alg_scope.  (* ⊨ = \vDash and 𝓐 = Unicode 1D4D0 *)
+Notation "pf ⊨ 𝓐( op )" := (nra_domain op pf) (at level 70) : nra_scope.  (* ⊨ = \vDash and 𝓐 = Unicode 1D4D0 *)
 
 (* 
 *** Local Variables: ***

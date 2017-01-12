@@ -121,8 +121,8 @@ Section CompStat.
 
   Definition stat_nra (q:nra) : data :=
     drec
-      (("nra_size", dnat (Z_of_nat (alg_size q)))
-         :: ("nra_depth", dnat (Z_of_nat (alg_depth q)))
+      (("nra_size", dnat (Z_of_nat (nra_size q)))
+         :: ("nra_depth", dnat (Z_of_nat (nra_depth q)))
          :: nil).
 
   Definition stat_nraenv_core (q:nraenv_core) : data :=

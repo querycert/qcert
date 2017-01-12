@@ -66,7 +66,7 @@ Section ROptimEnvContext.
     $2 ∧ $1 ≡ₑ $1 ∧ $2.
   Proof.
     generalize ctxt_and_comm_ctxt; intros pf.
-    apply lift_alg_context_proper in pf.
+    apply lift_nra_context_proper in pf.
     simpl in pf; trivial.
   Qed.
   
@@ -88,7 +88,7 @@ Section ROptimEnvContext.
     σ⟨ $0 ⟩($1 ⋃ $2) ≡ₑ σ⟨ $0 ⟩($1) ⋃ σ⟨ $0 ⟩($2).
   Proof.
     generalize ctxt_select_union_distr; intros pf.
-    apply lift_alg_context_proper in pf.
+    apply lift_nra_context_proper in pf.
     simpl in pf; trivial.
   Qed.
 

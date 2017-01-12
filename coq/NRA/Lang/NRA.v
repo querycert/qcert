@@ -28,24 +28,24 @@ Section NRA.
 
   Context {fruntime:foreign_runtime}.
   
-  Inductive alg : Set :=
-  | AID : alg
-  | AConst : data -> alg
-  | ABinop : binOp -> alg -> alg -> alg
-  | AUnop : unaryOp -> alg -> alg
-  | AMap : alg -> alg -> alg
-  | AMapConcat : alg -> alg -> alg
-  | AProduct : alg -> alg -> alg
-  | ASelect : alg -> alg -> alg
-  | ADefault : alg -> alg -> alg
-  | AEither : alg -> alg -> alg
-  | AEitherConcat : alg -> alg -> alg
-  | AApp : alg -> alg -> alg
+  Inductive nra : Set :=
+  | AID : nra
+  | AConst : data -> nra
+  | ABinop : binOp -> nra -> nra -> nra
+  | AUnop : unaryOp -> nra -> nra
+  | AMap : nra -> nra -> nra
+  | AMapConcat : nra -> nra -> nra
+  | AProduct : nra -> nra -> nra
+  | ASelect : nra -> nra -> nra
+  | ADefault : nra -> nra -> nra
+  | AEither : nra -> nra -> nra
+  | AEitherConcat : nra -> nra -> nra
+  | AApp : nra -> nra -> nra
   .
 
-  Global Instance alg_eqdec : EqDec alg eq.
+  Global Instance nra_eqdec : EqDec nra eq.
   Proof.
-    change (forall x y : alg,  {x = y} + {x <> y}).
+    change (forall x y : nra,  {x = y} + {x <> y}).
     decide equality;
     try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec].
   Qed.
@@ -54,7 +54,7 @@ Section NRA.
 
   Context (h:list(string*string)).
   
-  Fixpoint nra_eval (op:alg) (x:data) : option data :=
+  Fixpoint nra_eval (op:nra) (x:data) : option data :=
     match op with
       | AID => Some x
       | AConst rd => Some (normalize_data h rd)
@@ -125,7 +125,7 @@ Section NRA.
   Qed.
 
   (* evaluation preserves normalization *)
-  Lemma fun_of_alg_normalized {op:alg} {d:data} {o} :
+  Lemma fun_of_nra_normalized {op:nra} {d:data} {o} :
     nra_eval op d = Some o ->
     data_normalized h d ->
     data_normalized h o.
@@ -241,7 +241,7 @@ End NRA.
 
 (* Some notations for the paper and readability *)
 
-(** Algebraic plan application *)
+(** Nraebraic plan application *)
 
 Notation "h ⊢ Op @ₐ x" := (nra_eval h Op x) (at level 10). (* \vdash *)
 
@@ -255,47 +255,47 @@ Notation "h ⊢ Op @ₐ x" := (nra_eval h Op x) (at level 10). (* \vdash *)
  *)
 
 (* begin hide *)
-Delimit Scope alg_scope with alg.
+Delimit Scope nra_scope with nra.
 
-Notation "'ID'" := (AID)  (at level 50) : alg_scope.
+Notation "'ID'" := (AID)  (at level 50) : nra_scope.
 
-Notation "‵‵ c" := (AConst (dconst c))  (at level 0) : alg_scope.                           (* ‵ = \backprime *)
-Notation "‵ c" := (AConst c)  (at level 0) : alg_scope.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (AConst (dcoll nil))  (at level 0) : alg_scope.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (AConst (drec nil)) (at level 50) : alg_scope.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (AConst (dconst c))  (at level 0) : nra_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (AConst c)  (at level 0) : nra_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (AConst (dcoll nil))  (at level 0) : nra_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (AConst (drec nil)) (at level 50) : nra_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (ABinop AAnd r1 r2) (right associativity, at level 65): alg_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (ABinop AOr r1 r2) (right associativity, at level 70): alg_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (ABinop AEq r1 r2) (right associativity, at level 70): alg_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (ABinop ALt r1 r2) (no associativity, at level 70): alg_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (ABinop AUnion r1 r2) (right associativity, at level 70): alg_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (ABinop AMinus r1 r2) (right associativity, at level 70): alg_scope.  (* − = \minus *)
-Notation "r1 ⋂min r2" := (ABinop AMin r1 r2) (right associativity, at level 70): alg_scope. (* ♯ = \sharp *)
-Notation "r1 ⋃max r2" := (ABinop AMax r1 r2) (right associativity, at level 70): alg_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((ABinop AConcat) p r) (at level 70) : alg_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((ABinop AMergeConcat) p r) (at level 70) : alg_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (ABinop AAnd r1 r2) (right associativity, at level 65): nra_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (ABinop AOr r1 r2) (right associativity, at level 70): nra_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (ABinop AEq r1 r2) (right associativity, at level 70): nra_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (ABinop ALt r1 r2) (no associativity, at level 70): nra_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (ABinop AUnion r1 r2) (right associativity, at level 70): nra_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (ABinop AMinus r1 r2) (right associativity, at level 70): nra_scope.  (* − = \minus *)
+Notation "r1 ⋂min r2" := (ABinop AMin r1 r2) (right associativity, at level 70): nra_scope. (* ♯ = \sharp *)
+Notation "r1 ⋃max r2" := (ABinop AMax r1 r2) (right associativity, at level 70): nra_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((ABinop AConcat) p r) (at level 70) : nra_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((ABinop AMergeConcat) p r) (at level 70) : nra_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (AUnop ANeg r1) (right associativity, at level 70): alg_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (AUnop ADistinct r1) (right associativity, at level 70): alg_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (AUnop ACount r1) (right associativity, at level 70): alg_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (AUnop AFlatten d) (at level 50) : alg_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((AUnop AColl) d)  (at level 50) : alg_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((AUnop (ARec s)) r) (at level 50) : alg_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((AUnop (ARecRemove s1)) r) (at level 50) : alg_scope.          (* ¬ = \neg and π = \pi *)
-Notation "π[ s1 ]( r )" := ((AUnop (ARecProject s1)) r) (at level 50) : alg_scope.          (* π = \pi *)
-Notation "p · r" := ((AUnop (ADot r)) p) (left associativity, at level 40): alg_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (AUnop ANeg r1) (right associativity, at level 70): nra_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (AUnop ADistinct r1) (right associativity, at level 70): nra_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (AUnop ACount r1) (right associativity, at level 70): nra_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (AUnop AFlatten d) (at level 50) : nra_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((AUnop AColl) d)  (at level 50) : nra_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((AUnop (ARec s)) r) (at level 50) : nra_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((AUnop (ARecRemove s1)) r) (at level 50) : nra_scope.          (* ¬ = \neg and π = \pi *)
+Notation "π[ s1 ]( r )" := ((AUnop (ARecProject s1)) r) (at level 50) : nra_scope.          (* π = \pi *)
+Notation "p · r" := ((AUnop (ADot r)) p) (left associativity, at level 40): nra_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (AMap p r) (at level 70) : alg_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (AMapConcat e2 e1) (at level 70) : alg_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (AProduct r1 r2) (right associativity, at level 70): alg_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (ASelect p r) (at level 70) : alg_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (ADefault r1 r2) (right associativity, at level 70): alg_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (AApp r1 r2) (right associativity, at level 60): alg_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (AMap p r) (at level 70) : nra_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (AMapConcat e2 e1) (at level 70) : nra_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (AProduct r1 r2) (right associativity, at level 70): nra_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (ASelect p r) (at level 70) : nra_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (ADefault r1 r2) (right associativity, at level 70): nra_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (AApp r1 r2) (right associativity, at level 60): nra_scope.           (* ◯ = \bigcirc *)
 
-Hint Resolve fun_of_alg_normalized.
+Hint Resolve fun_of_nra_normalized.
 
 Local Open Scope string_scope.
-Tactic Notation "alg_cases" tactic(first) ident(c) :=
+Tactic Notation "nra_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "AID"
   | Case_aux c "AConst"

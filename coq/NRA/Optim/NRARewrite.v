@@ -21,7 +21,7 @@ Section ROptim.
   Require Import Utils BasicRuntime.
   Require Import NRA NRAEq.
   
-  Local Open Scope alg_scope.
+  Local Open Scope nra_scope.
 
   Context {fruntime:foreign_runtime}.
 
@@ -30,10 +30,10 @@ Section ROptim.
 
   (* P1 ∧ P2 ≡ P2 ∧ P1 *)
 
-  Lemma and_comm (p1 p2: alg) :
+  Lemma and_comm (p1 p2: nra) :
     p2 ∧ p1 ≡ₐ p1 ∧ p2.
   Proof.
-    unfold alg_eq; intros; simpl.
+    unfold nra_eq; intros; simpl.
     generalize (h ⊢ p1 @ₐ x); generalize (h ⊢ p2 @ₐ x); intros.
     destruct o; destruct o0; try reflexivity.
     unfold unbdbool.
@@ -43,10 +43,10 @@ Section ROptim.
 
   (* (P1 ⋃ P2) ⋃ P3 ≡ P1 ⋃ (P2 ⋃ P3) *)
 
-  Lemma union_assoc (p1 p2 p3: alg):
+  Lemma union_assoc (p1 p2 p3: nra):
     (p1 ⋃ p2) ⋃ p3 ≡ₐ p1 ⋃ (p2 ⋃ p3).
   Proof.
-    unfold alg_eq; intros; simpl.
+    unfold nra_eq; intros; simpl.
     generalize (h ⊢ p1 @ₐ x) as d1.
     generalize (h ⊢ p2 @ₐ x) as d2.
     generalize (h ⊢ p3 @ₐ x) as d3.
@@ -62,10 +62,10 @@ Section ROptim.
   
   (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
 
-  Lemma union_select_distr (p p1 p2: alg) :
+  Lemma union_select_distr (p p1 p2: nra) :
     σ⟨ p ⟩(p1 ⋃ p2) ≡ₐ σ⟨ p ⟩(p1) ⋃ σ⟨ p ⟩(p2).
   Proof.
-    unfold alg_eq; intros.
+    unfold nra_eq; intros.
     simpl.
     generalize (h ⊢ p1 @ₐ x) as d1.
     generalize (h ⊢ p2 @ₐ x) as d2.
@@ -112,10 +112,10 @@ Section ROptim.
 
   (* χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 } *)
 
-  Lemma map_singleton (p1 p2:alg) :
+  Lemma map_singleton (p1 p2:nra) :
     χ⟨ p1 ⟩( ‵{| p2 |} ) ≡ₐ ‵{| p1 ◯ p2 |}.
   Proof.
-    unfold alg_eq; intros; simpl.
+    unfold nra_eq; intros; simpl.
     generalize (h ⊢ p2 @ₐ x); intros.
     destruct o; try reflexivity; simpl.
     generalize (h ⊢ p1 @ₐ d); intros; simpl.
@@ -127,7 +127,7 @@ Section ROptim.
   Lemma compose_rec_id s p:
     ‵[| (s, ID) |] ◯ p ≡ₐ ‵[| (s, p) |].
   Proof.
-    unfold alg_eq; intros; simpl.
+    unfold nra_eq; intros; simpl.
     generalize (h ⊢ p @ₐ x); intros.
     destruct o; reflexivity.
   Qed.
@@ -135,7 +135,7 @@ Section ROptim.
   Lemma flatten_map_coll p1 p2 :
     ♯flatten(χ⟨ ‵{| p1 |} ⟩( p2 )) ≡ₐ χ⟨ p1 ⟩( p2 ).
   Proof.
-    unfold alg_eq; intros h x _; simpl.
+    unfold nra_eq; intros h x _; simpl.
     generalize (h ⊢ p2 @ₐ x); clear x p2; intros.
     destruct o; try reflexivity.
     destruct d; try reflexivity; simpl.
@@ -180,7 +180,7 @@ Section ROptim.
   Lemma dot_from_duplicate_r s1 s2 p1 :
     (‵[| (s1, p1) |] ⊕ ‵[| (s2, p1) |])·s2 ≡ₐ p1.
   Proof.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     generalize (h ⊢ p1 @ₐ x); clear p1 x; intros.
     destruct o; try reflexivity.
     unfold olift; simpl.
@@ -201,7 +201,7 @@ Section ROptim.
   Lemma dot_from_duplicate_l s1 s2 p1 :
     (‵[| (s1, p1) |] ⊕ ‵[| (s2, p1) |])·s1 ≡ₐ p1.
   Proof.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     generalize (h ⊢ p1 @ₐ x); clear p1 x; intros.
     destruct o; try reflexivity.
     unfold olift; simpl.
@@ -223,7 +223,7 @@ Section ROptim.
   Lemma map_into_singleton p :
     χ⟨ ‵{| ID |} ⟩(‵{| p |}) ≡ₐ ‵{|‵{| p |}|}.
   Proof.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     generalize (h ⊢ p @ₐ x); clear x p; intros.
     destruct o; reflexivity.
   Qed.
@@ -233,7 +233,7 @@ Section ROptim.
   Lemma flatten_over_map_into_singleton p1 p2:
     ♯flatten( χ⟨ ‵{|‵{| p1 |}|} ⟩( p2 ) ) ≡ₐ χ⟨ ‵{| p1 |} ⟩( p2 ).
   Proof.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     generalize (h ⊢ p2 @ₐ x); clear p2 x; intros.
     destruct o; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
@@ -317,7 +317,7 @@ Section ROptim.
     intros.
     elim H; clear H; intros.
     elim H0; clear H0; intros.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     generalize (h ⊢ p1 @ₐ x); generalize(h ⊢ p2 @ₐ x); clear p1 p2 x; intros.
     destruct o; try reflexivity; simpl.
     - unfold olift, olift2; simpl.
@@ -456,11 +456,11 @@ Section ROptim.
   (* χ⟨ [ PBIND : ID.PBIND; PDATA : ID.PDATA.WORLD ].PDATA ⟩({ p })
      ≡ { [ PBIND : p.PBIND; PDATA: p.PDATA.WORLD ].PDATA } *)
   
-  Lemma substitute_in_bindings (p:alg) :
+  Lemma substitute_in_bindings (p:nra) :
     χ⟨ (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PDATA"·"WORLD") |])·"PDATA" ⟩( ‵{| p |} )
      ≡ₐ ‵{|(‵[| ("PBIND", p·"PBIND") |] ⊕ ‵[| ("PDATA", p·"PDATA"·"WORLD") |])·"PDATA" |}.
   Proof.
-    unfold alg_eq, olift; intros ? ? _; simpl.
+    unfold nra_eq, olift; intros ? ? _; simpl.
     generalize (h ⊢ p @ₐ x); simpl; intros; clear p x.
     destruct o; try reflexivity.
     destruct d; try reflexivity.
@@ -516,7 +516,7 @@ Section ROptim.
     (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PBIND"·"WORLD") |])·"PDATA"
      ≡ₐ ID·"PBIND"·"WORLD".
   Proof.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     destruct x; try reflexivity; simpl.
     generalize (edot l "PBIND"); clear l; intros.
     destruct o; try reflexivity; simpl.
@@ -539,7 +539,7 @@ Section ROptim.
              ⟩( ‵{|‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID· "PBIND") |] |}))|]
      ≡ₐ ‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("a1", ‵{| ID·"PBIND"·"e" |}) |].
   Proof.
-    unfold alg_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _; simpl.
     destruct x; try reflexivity; simpl.
     generalize (edot l "PBIND"); intros.
     destruct o; try reflexivity; simpl.

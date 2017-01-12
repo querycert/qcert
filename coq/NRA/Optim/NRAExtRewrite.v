@@ -22,8 +22,8 @@ Section ROptimExt.
   Require Import NRA NRAEq NRAExt NRAExtEq.
   Require Import NRARewrite.
 
-  Local Open Scope alg_scope.
-  Local Open Scope algext_scope.
+  Local Open Scope nra_scope.
+  Local Open Scope nraext_scope.
 
   Context {fruntime:foreign_runtime}.
 
@@ -35,48 +35,48 @@ Section ROptimExt.
 
   (* Pulls equivalences from core algebra *)
 
-  Lemma pull_alg_opt (p1 p2:algext) :
-    (alg_of_algext p1) ≡ₐ (alg_of_algext p2) ->
+  Lemma pull_nra_opt (p1 p2:nraext) :
+    (nra_of_nraext p1) ≡ₐ (nra_of_nraext p2) ->
     p1 ≡ₓ p2.
   Proof.
-    unfold alg_eq, algext_eq; intros.
-    unfold fun_of_algext.
+    unfold nra_eq, nraext_eq; intros.
+    unfold fun_of_nraext.
     rewrite H; trivial.
   Qed.
 
   (* P1 ∧ P2 == P2 ∧ P1 *)
 
-  Lemma eand_comm (p1 p2: algext) :
+  Lemma eand_comm (p1 p2: nraext) :
     p2 ∧ p1 ≡ₓ p1 ∧ p2.
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply and_comm.
   Qed.
 
   (* (P1 ⋃ P2) ⋃ P3 == P1 ⋃ (P2 ⋃ P3) *)
 
-  Lemma eunion_assoc (p1 p2 p3: algext):
+  Lemma eunion_assoc (p1 p2 p3: nraext):
     (p1 ⋃ p2) ⋃ p3 ≡ₓ p1 ⋃ (p2 ⋃ p3).
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply union_assoc.
   Qed.
   
   (* σ⟨ P ⟩(P1 ⋃ P2) == σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
 
-  Lemma eunion_select_distr (p p1 p2: algext) :
+  Lemma eunion_select_distr (p p1 p2: nraext) :
     σ⟨ p ⟩(p1 ⋃ p2) ≡ₓ σ⟨ p ⟩(p1) ⋃ σ⟨ p ⟩(p2).
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply union_select_distr.
   Qed.
 
   (* χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 } *)
 
-  Lemma emap_singleton (p1 p2:algext) :
+  Lemma emap_singleton (p1 p2:nraext) :
     χ⟨ p1 ⟩( ‵{| p2 |} ) ≡ₓ ‵{| p1 ◯ p2 |}.
   Proof.  
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply map_singleton.
   Qed.
 
@@ -85,18 +85,18 @@ Section ROptimExt.
   Lemma ecompose_rec_id s p:
     ‵[| (s, ID) |] ◯ p ≡ₓ ‵[| (s, p) |].
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply compose_rec_id.
   Qed.
 
   Lemma eflatten_map_coll p1 p2 :
     ♯flatten(χ⟨ ‵{| p1 |} ⟩( p2 )) ≡ₓ χ⟨ p1 ⟩( p2 ).
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply flatten_map_coll.
   Qed.
 
-  (* Specific to extended algebra *)
+  (* Specific to extended nraebra *)
   
   (*
      a1, a2, a3 are distinct field names
@@ -110,7 +110,7 @@ Section ROptimExt.
      ≡ₓ ‵{|‵[| (s3, p1)|] ⊕ ‵[| (s2, p2)|]|}.
   Proof.
     intros.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply unnest_singleton; assumption.
   Qed.
 
@@ -119,7 +119,7 @@ Section ROptimExt.
   Lemma emap_into_singleton p :
     χ⟨ ‵{| ID |} ⟩(‵{| p |}) ≡ₓ ‵{|‵{| p |}|}.
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply map_into_singleton.
   Qed.    
 
@@ -128,7 +128,7 @@ Section ROptimExt.
   Lemma eflatten_over_map_into_singleton p1 p2 :
     ♯flatten( χ⟨ ‵{|‵{| p1 |}|} ⟩( p2 ) ) ≡ₓ χ⟨ ‵{| p1 |} ⟩( p2 ).
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply flatten_over_map_into_singleton.
   Qed.
 
@@ -137,9 +137,9 @@ Section ROptimExt.
   Lemma join_intro p1 p2 p3 :
     σ⟨ p1 ⟩( p2 × p3 ) ≡ₓ ⋈⟨ p1 ⟩(p2, p3).
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     simpl; unfold join.
-    unfold alg_eq; intros ? ? _.
+    unfold nra_eq; intros ? ? _.
     reflexivity.
   Qed.
     
@@ -152,7 +152,7 @@ Section ROptimExt.
   Lemma emap_singleton_rec s1 s2 :
     χ⟨‵[| (s1, ID) |] ⟩( ‵{|(ID) · s2 |}) ≡ₓ ‵{|‵[| (s1, (ID) · s2) |] |}.
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply map_singleton_rec.
   Qed.    
 
@@ -161,7 +161,7 @@ Section ROptimExt.
   Lemma emap_dot_singleton s p :
     χ⟨ (ID)·s ⟩( ‵{| p |} ) ≡ₓ ‵{| p·s |}.
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply map_dot_singleton.
   Qed.
 
@@ -181,11 +181,11 @@ Section ROptimExt.
   (* χ⟨ [ PBIND : ID.PBIND; PDATA : ID.PDATA.WORLD ].PDATA ⟩({ p })
      ≡ { [ PBIND : p.PBIND; PDATA: p.PDATA.WORLD ].PDATA } *)
   
-  Lemma esubstitute_in_bindings (p:algext) :
+  Lemma esubstitute_in_bindings (p:nraext) :
     χ⟨ (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PDATA"·"WORLD") |])·"PDATA" ⟩( ‵{| p |} )
      ≡ₓ ‵{|(‵[| ("PBIND", p·"PBIND") |] ⊕ ‵[| ("PDATA", p·"PDATA"·"WORLD") |])·"PDATA" |}.
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply substitute_in_bindings.
   Qed.
 
@@ -194,7 +194,7 @@ Section ROptimExt.
   Lemma edot_from_duplicate_bind_r :
     (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PBIND") |])·"PDATA" ≡ₓ ID·"PBIND".
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply dot_from_duplicate_bind_r.
   Qed.
     
@@ -203,7 +203,7 @@ Section ROptimExt.
   Lemma edot_from_duplicate_bind_l :
     (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PBIND") |])·"PBIND" ≡ₓ ID·"PBIND".
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply dot_from_duplicate_bind_l.
   Qed.
 
@@ -213,7 +213,7 @@ Section ROptimExt.
     (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PBIND"·"WORLD") |])·"PDATA"
      ≡ₓ ID·"PBIND"·"WORLD".
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply dot_dot_from_duplicate_bind.
   Qed.
 
@@ -231,7 +231,7 @@ Section ROptimExt.
              ⟩( ‵{|‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID· "PBIND") |] |}))|]
      ≡ₓ ‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("a1", ‵{| ID·"PBIND"·"e" |}) |].
   Proof.
-    apply pull_alg_opt.
+    apply pull_nra_opt.
     apply big_nested_bind_simplify_one.
   Qed.
 

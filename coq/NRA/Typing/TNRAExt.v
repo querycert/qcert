@@ -24,47 +24,47 @@ Section TNRAExt.
   Require Import NRAExt.
   Require Import TNRA.
 
-  Local Open Scope algext_scope.
+  Local Open Scope nraext_scope.
   
   (** Typing for NRA *)
 
   Context {m:basic_model}.
-  Definition algext_type Op A B := alg_type (alg_of_algext Op) A B.
+  Definition nraext_type Op A B := nra_type (nra_of_nraext Op) A B.
   
-  Notation "Op ▷ A >=> B" := (algext_type Op A B) (at level 70).
+  Notation "Op ▷ A >=> B" := (nraext_type Op A B) (at level 70).
 
   (** Main typing soundness theorem for the Extended NRA *)
 
-  Theorem typed_algext_yields_typed_data {τin τout} (d:data) (op:algext):
+  Theorem typed_nraext_yields_typed_data {τin τout} (d:data) (op:nraext):
     (d ▹ τin) -> (op ▷ τin >=> τout) ->
     (exists x, (brand_relation_brands ⊢ op @ₓ d = Some x /\ (x ▹ τout))).
   Proof.
-    unfold fun_of_algext, algext_type; intros.
-    apply (@typed_alg_yields_typed_data m τin τout); assumption.
+    unfold fun_of_nraext, nraext_type; intros.
+    apply (@typed_nra_yields_typed_data m τin τout); assumption.
   Qed.
 
   (** Corrolaries of the main type soudness theorem *)
 
-  Definition typed_algext_total {τin τout} (op:algext) (d:data):
+  Definition typed_nraext_total {τin τout} (op:nraext) (d:data):
     (d ▹ τin) -> (op ▷ τin >=> τout) ->             
     { x:data | x ▹ τout }.
   Proof.
-    unfold fun_of_algext, algext_type; intros.
-    apply (@typed_alg_total m τin τout (alg_of_algext op) H0 d); assumption.
+    unfold fun_of_nraext, nraext_type; intros.
+    apply (@typed_nra_total m τin τout (nra_of_nraext op) H0 d); assumption.
   Defined.
 
-  Definition talgext_eval {τin τout} (op:algext) (d:data):
+  Definition tnraext_eval {τin τout} (op:nraext) (d:data):
     (d ▹ τin) -> (op ▷ τin >=> τout) -> data.
   Proof.
-    unfold fun_of_algext, algext_type; intros.
-    apply (@talg_eval m τin τout (alg_of_algext op) H0 d); assumption.
+    unfold fun_of_nraext, nraext_type; intros.
+    apply (@tnra_eval m τin τout (nra_of_nraext op) H0 d); assumption.
   Defined.
 End TNRAExt.
 
 (* Typed algebraic plan *)
 
-Notation "Op ▷ A >=> B" := (algext_type Op A B) (at level 70) : algext_scope.
-Notation "Op @▷ d" := (talgext_eval Op d) (at level 70) : algext_scope.
+Notation "Op ▷ A >=> B" := (nraext_type Op A B) (at level 70) : nraext_scope.
+Notation "Op @▷ d" := (tnraext_eval Op d) (at level 70) : nraext_scope.
 
 (* 
 *** Local Variables: ***

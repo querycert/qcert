@@ -39,7 +39,7 @@ Section cNRAEnvEq.
       (dn_x:data_normalized h x),
       h ⊢ₑ op1 @ₑ x ⊣ c;env = h ⊢ₑ op2 @ₑ x ⊣ c;env.
 
-  Definition alg_eqenv (op1 op2:cnraenv) : Prop :=
+  Definition nra_eqenv (op1 op2:cnraenv) : Prop :=
     forall
       (h:list(string*string))
       (c:list (string*data))
@@ -48,7 +48,7 @@ Section cNRAEnvEq.
       (dn_env:data_normalized h env)
       (x:data)
       (dn_x:data_normalized h x),
-      h ⊢ (alg_of_cnraenv op1) @ₐ (pat_context_data (drec (rec_sort c)) env x) = h ⊢ (alg_of_cnraenv op2) @ₐ (pat_context_data (drec (rec_sort c)) env x).
+      h ⊢ (nra_of_cnraenv op1) @ₐ (pat_context_data (drec (rec_sort c)) env x) = h ⊢ (nra_of_cnraenv op2) @ₐ (pat_context_data (drec (rec_sort c)) env x).
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -67,32 +67,32 @@ Section cNRAEnvEq.
       intros. rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
   Qed.
 
-  Global Instance alg_eqenv_equiv : Equivalence alg_eqenv.
+  Global Instance nra_eqenv_equiv : Equivalence nra_eqenv.
   Proof.
     constructor.
-    - unfold Reflexive, alg_eqenv.
+    - unfold Reflexive, nra_eqenv.
       intros; reflexivity.
-    - unfold Symmetric, alg_eqenv.
+    - unfold Symmetric, nra_eqenv.
       intros; rewrite (H h c dn_c env dn_env x0) by trivial; reflexivity.
-    - unfold Transitive, alg_eqenv.
+    - unfold Transitive, nra_eqenv.
       intros; rewrite (H h c dn_c env dn_env x0) by trivial; rewrite (H0 h c dn_c env dn_env x0) by trivial; reflexivity.
   Qed.
 
   Hint Resolve dnrec_sort.
     
-  Lemma alg_eqenv_same (op1 op2:cnraenv) :
-    cnraenv_eq op1 op2 <-> alg_eqenv op1 op2.
+  Lemma nra_eqenv_same (op1 op2:cnraenv) :
+    cnraenv_eq op1 op2 <-> nra_eqenv op1 op2.
   Proof.
-    split; unfold cnraenv_eq, alg_eqenv; intros.
-    - repeat rewrite <- unfold_env_alg by trivial.
+    split; unfold cnraenv_eq, nra_eqenv; intros.
+    - repeat rewrite <- unfold_env_nra by trivial.
       rewrite H; trivial.
       apply Forall_sorted.
       trivial.
-    - repeat rewrite unfold_env_alg_sort by trivial.
+    - repeat rewrite unfold_env_nra_sort by trivial.
       rewrite H; trivial.
   Qed.
     
-  (* all the extended algebraic constructors are proper wrt. equivalence *)
+  (* all the extended nraebraic constructors are proper wrt. equivalence *)
 
   (* ANID *)
   Global Instance anid_proper : Proper cnraenv_eq ANID.
@@ -101,10 +101,10 @@ Section cNRAEnvEq.
     reflexivity.
   Qed.
 
-  Global Instance anideq_proper : Proper alg_eqenv ANID.
+  Global Instance anideq_proper : Proper nra_eqenv ANID.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anid_proper.
+    rewrite <- nra_eqenv_same; apply anid_proper.
   Qed.
 
   (* ANConst *)
@@ -114,10 +114,10 @@ Section cNRAEnvEq.
     rewrite H; reflexivity.
   Qed.
 
-  Global Instance anconsteq_proper : Proper (eq ==> alg_eqenv) ANConst.
+  Global Instance anconsteq_proper : Proper (eq ==> nra_eqenv) ANConst.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anconst_proper; assumption.
+    rewrite <- nra_eqenv_same; apply anconst_proper; assumption.
   Qed.
 
   (* ANBinOp *)
@@ -126,32 +126,32 @@ Section cNRAEnvEq.
   Proof.
     unfold Proper, respectful, cnraenv_eq; intros; simpl.
     generalize abinop_proper.
-    unfold Proper, respectful, cnraenv_eq, alg_eq; intros; simpl.
+    unfold Proper, respectful, cnraenv_eq, nra_eq; intros; simpl.
     specialize (H2 x y H).
     rewrite H0 by trivial; rewrite H1 by trivial.
-    rewrite unfold_env_alg_sort by trivial; simpl.
-    rewrite unfold_env_alg_sort by trivial; simpl.
-    specialize (H2 (alg_of_cnraenv y0) (alg_of_cnraenv y0)).
+    rewrite unfold_env_nra_sort by trivial; simpl.
+    rewrite unfold_env_nra_sort by trivial; simpl.
+    specialize (H2 (nra_of_cnraenv y0) (nra_of_cnraenv y0)).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y0 @ₐ x3 = h0 ⊢ alg_of_cnraenv y0 @ₐ x3)).
+               h0 ⊢ nra_of_cnraenv y0 @ₐ x3 = h0 ⊢ nra_of_cnraenv y0 @ₐ x3)).
     intros; reflexivity.
     specialize (H2 H3).
-    specialize (H2 (alg_of_cnraenv y1) (alg_of_cnraenv y1)).
+    specialize (H2 (nra_of_cnraenv y1) (nra_of_cnraenv y1)).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y1 @ₐ x3 = h0 ⊢ alg_of_cnraenv y1 @ₐ x3)).
+               h0 ⊢ nra_of_cnraenv y1 @ₐ x3 = h0 ⊢ nra_of_cnraenv y1 @ₐ x3)).
     intros; reflexivity.
     specialize (H2 H4).
     apply (H2 h).
     eauto.
   Qed.
 
-  Global Instance anbinopeq_proper : Proper (binop_eq ==> alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANBinop.
+  Global Instance anbinopeq_proper : Proper (binop_eq ==> nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANBinop.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anbinop_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anbinop_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANUnop *)
@@ -159,14 +159,14 @@ Section cNRAEnvEq.
   Proof.
     unfold Proper, respectful, cnraenv_eq; simpl; intros.
     rewrite H0 by trivial.
-    rewrite unfold_env_alg_sort by trivial; simpl.
+    rewrite unfold_env_nra_sort by trivial; simpl.
     generalize (aunop_proper).
-    unfold Proper, respectful, cnraenv_eq, alg_eq; simpl; intros.
+    unfold Proper, respectful, cnraenv_eq, nra_eq; simpl; intros.
     specialize (H1 x y H).
-    specialize (H1 (alg_of_cnraenv y0) (alg_of_cnraenv y0)).
+    specialize (H1 (nra_of_cnraenv y0) (nra_of_cnraenv y0)).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                    data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y0 @ₐ x3 = h0 ⊢ alg_of_cnraenv y0 @ₐ x3)).
+               h0 ⊢ nra_of_cnraenv y0 @ₐ x3 = h0 ⊢ nra_of_cnraenv y0 @ₐ x3)).
     intros; reflexivity.
     specialize (H1 H2).
     apply (H1 h).
@@ -175,11 +175,11 @@ Section cNRAEnvEq.
 
   Hint Resolve data_normalized_dcoll_in.
 
-  Global Instance anunopeq_proper : Proper (unaryop_eq ==> alg_eqenv ==> alg_eqenv) ANUnop.
+  Global Instance anunopeq_proper : Proper (unaryop_eq ==> nra_eqenv ==> nra_eqenv) ANUnop.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anunop_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anunop_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANMap *)
@@ -187,18 +187,18 @@ Section cNRAEnvEq.
   Proof.
     unfold Proper, respectful, cnraenv_eq; simpl; intros.
     rewrite H0 by trivial.
-    rewrite unfold_env_alg_sort by trivial; simpl.
-    case_eq (nra_eval h (alg_of_cnraenv y0) (pat_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
+    rewrite unfold_env_nra_sort by trivial; simpl.
+    case_eq (nra_eval h (nra_of_cnraenv y0) (pat_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
     destruct d; try reflexivity; simpl; intros.
     f_equal. apply rmap_ext; intros.
     apply H; eauto.
   Qed.
 
-  Global Instance anmapeq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANMap.
+  Global Instance anmapeq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMap.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anmap_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anmap_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANMapConcat *)
@@ -214,11 +214,11 @@ Section cNRAEnvEq.
     
   Qed.
 
-  Global Instance anmapconcateq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANMapConcat.
+  Global Instance anmapconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMapConcat.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anmapconcat_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anmapconcat_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
   
   (* ANProduct *)
@@ -226,29 +226,29 @@ Section cNRAEnvEq.
   Proof.
     unfold Proper, respectful, cnraenv_eq; simpl; intros.
     rewrite H by trivial; rewrite H0 by trivial.
-    rewrite unfold_env_alg_sort by trivial; simpl.
-    rewrite unfold_env_alg_sort by trivial; simpl.
+    rewrite unfold_env_nra_sort by trivial; simpl.
+    rewrite unfold_env_nra_sort by trivial; simpl.
     generalize aproduct_proper.
-    unfold Proper, respectful, alg_eq; simpl; intros.
-    specialize (H1 (alg_of_cnraenv y) (alg_of_cnraenv y)).
+    unfold Proper, respectful, nra_eq; simpl; intros.
+    specialize (H1 (nra_of_cnraenv y) (nra_of_cnraenv y)).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y @ₐ x3 = h0 ⊢ alg_of_cnraenv y @ₐ x3))
+               h0 ⊢ nra_of_cnraenv y @ₐ x3 = h0 ⊢ nra_of_cnraenv y @ₐ x3))
       by (intros; reflexivity).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y0 @ₐ x3 = h0 ⊢ alg_of_cnraenv y0 @ₐ x3))
+               h0 ⊢ nra_of_cnraenv y0 @ₐ x3 = h0 ⊢ nra_of_cnraenv y0 @ₐ x3))
       by (intros; reflexivity).
-    specialize (H1 H2 (alg_of_cnraenv y0) (alg_of_cnraenv y0) H3).
+    specialize (H1 H2 (nra_of_cnraenv y0) (nra_of_cnraenv y0) H3).
     apply (H1 h).
     eauto.      
   Qed.
 
-  Global Instance anmapproducteq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANProduct.
+  Global Instance anmapproducteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANProduct.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anproduct_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anproduct_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
   
   (* ANSelect *)
@@ -263,11 +263,11 @@ Section cNRAEnvEq.
     rewrite H; eauto.
   Qed.
 
-  Global Instance anselecteq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANSelect.
+  Global Instance anselecteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANSelect.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anselect_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anselect_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANDefault *)
@@ -275,30 +275,30 @@ Section cNRAEnvEq.
   Proof.
     unfold Proper, respectful, cnraenv_eq; simpl; intros.
     rewrite H by trivial; rewrite H0 by trivial.
-    rewrite unfold_env_alg_sort by trivial; simpl.
-    rewrite unfold_env_alg_sort by trivial; simpl.
+    rewrite unfold_env_nra_sort by trivial; simpl.
+    rewrite unfold_env_nra_sort by trivial; simpl.
     generalize adefault_proper.
-    unfold Proper, respectful, cnraenv_eq, alg_eq; simpl; intros.
-    specialize (H1 (alg_of_cnraenv y) (alg_of_cnraenv y)).
+    unfold Proper, respectful, cnraenv_eq, nra_eq; simpl; intros.
+    specialize (H1 (nra_of_cnraenv y) (nra_of_cnraenv y)).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y @ₐ x3 = h0 ⊢ alg_of_cnraenv y @ₐ x3)).
+               h0 ⊢ nra_of_cnraenv y @ₐ x3 = h0 ⊢ nra_of_cnraenv y @ₐ x3)).
     intros; reflexivity.
     specialize (H1 H2).
-    specialize (H1 (alg_of_cnraenv y0) (alg_of_cnraenv y0)).
+    specialize (H1 (nra_of_cnraenv y0) (nra_of_cnraenv y0)).
     assert ((forall (h0 : list (string * string)) (x3 : data),
                data_normalized h0 x3 ->
-               h0 ⊢ alg_of_cnraenv y0 @ₐ x3 = h0 ⊢ alg_of_cnraenv y0 @ₐ x3)).
+               h0 ⊢ nra_of_cnraenv y0 @ₐ x3 = h0 ⊢ nra_of_cnraenv y0 @ₐ x3)).
     intros; reflexivity.
     specialize (H1 H3).
     apply (H1 h); eauto.
   Qed.
 
-  Global Instance andefaulteq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANDefault.
+  Global Instance andefaulteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANDefault.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply andefault_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply andefault_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
     (* ANEither *)
@@ -308,9 +308,9 @@ Section cNRAEnvEq.
     destruct x1; trivial; inversion dn_x; subst; eauto.
   Qed.
 
-    Global Instance aneithereq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANEither.
+    Global Instance aneithereq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANEither.
   Proof.
-    unfold Proper, respectful, alg_eqenv; intros; simpl.
+    unfold Proper, respectful, nra_eqenv; intros; simpl.
     destruct x1; simpl; trivial; inversion dn_x; subst.
     + apply H; trivial.
     + apply H0; trivial.
@@ -323,9 +323,9 @@ Section cNRAEnvEq.
     rewrite H,H0 by trivial. repeat match_destr.
   Qed.
 
-    Global Instance aneitherconcateq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANEitherConcat.
+    Global Instance aneitherconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANEitherConcat.
   Proof.
-    unfold Proper, respectful, alg_eqenv; intros; simpl.
+    unfold Proper, respectful, nra_eqenv; intros; simpl.
     rewrite H,H0 by trivial. repeat match_destr.
   Qed.
 
@@ -338,11 +338,11 @@ Section cNRAEnvEq.
     eauto.
   Qed.
 
-  Global Instance anappeq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANApp.
+  Global Instance anappeq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANApp.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anapp_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anapp_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANGetConstant *)
@@ -352,7 +352,7 @@ Section cNRAEnvEq.
     reflexivity.
   Qed.
 
-  Global Instance angetconstanteq_proper s : Proper (alg_eqenv) (ANGetConstant s).
+  Global Instance angetconstanteq_proper s : Proper (nra_eqenv) (ANGetConstant s).
   Proof.
     unfold Proper, respectful; intros.
     reflexivity.
@@ -365,7 +365,7 @@ Section cNRAEnvEq.
     reflexivity.
   Qed.
 
-  Global Instance anenveq_proper : Proper (alg_eqenv) ANEnv.
+  Global Instance anenveq_proper : Proper (nra_eqenv) ANEnv.
   Proof.
     unfold Proper, respectful; intros.
     reflexivity.
@@ -380,11 +380,11 @@ Section cNRAEnvEq.
     apply H; eauto.
   Qed.
 
-  Global Instance anappenveq_proper : Proper (alg_eqenv ==> alg_eqenv ==> alg_eqenv) ANAppEnv.
+  Global Instance anappenveq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANAppEnv.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anappenv_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anappenv_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
   (* ANMapEnv *)
@@ -397,18 +397,18 @@ Section cNRAEnvEq.
     eauto.
   Qed.
 
-  Global Instance anmapenveq_proper : Proper (alg_eqenv ==> alg_eqenv) ANMapEnv.
+  Global Instance anmapenveq_proper : Proper (nra_eqenv ==> nra_eqenv) ANMapEnv.
   Proof.
     unfold Proper, respectful; intros.
-    rewrite <- alg_eqenv_same; apply anmapenv_proper;
-    try assumption; rewrite alg_eqenv_same; assumption.
+    rewrite <- nra_eqenv_same; apply anmapenv_proper;
+    try assumption; rewrite nra_eqenv_same; assumption.
   Qed.
 
-  Lemma cnraenv_of_alg_proper : Proper (alg_eq ==> cnraenv_eq) cnraenv_of_alg.
+  Lemma cnraenv_of_nra_proper : Proper (nra_eq ==> cnraenv_eq) cnraenv_of_nra.
   Proof.
-    unfold Proper, respectful, alg_eq, cnraenv_eq.
+    unfold Proper, respectful, nra_eq, cnraenv_eq.
     intros.
-    repeat rewrite <- cnraenv_eval_of_alg.
+    repeat rewrite <- cnraenv_eval_of_nra.
     auto.
   Qed.
   
@@ -416,11 +416,11 @@ Section cNRAEnvEq.
 
   
   
-  Lemma cnraenv_of_alg_proper_inv x y :
-    (cnraenv_of_alg x ≡ₑ cnraenv_of_alg y)%cnraenv ->
-    (x ≡ₐ y)%alg.
+  Lemma cnraenv_of_nra_proper_inv x y :
+    (cnraenv_of_nra x ≡ₑ cnraenv_of_nra y)%cnraenv ->
+    (x ≡ₐ y)%nra.
   Proof.
-    unfold alg_eq, cnraenv_eq.
+    unfold nra_eq, cnraenv_eq.
     intros.
     assert (eq1:forall (h : list (string * string))
                        (c:list (string *data)),
@@ -429,33 +429,33 @@ Section cNRAEnvEq.
                   data_normalized h env ->
                   forall (x0 : data),
                   data_normalized h x0 ->
-                  (h ⊢ (alg_of_cnraenv (cnraenv_of_alg x)) @ₐ (pat_context_data (drec (rec_sort c)) env x0))%alg =
-                  (h ⊢ (alg_of_cnraenv (cnraenv_of_alg y)) @ₐ (pat_context_data (drec (rec_sort c)) env x0))%alg ).
-    { intros. repeat rewrite <- unfold_env_alg_sort; trivial. auto. }
+                  (h ⊢ (nra_of_cnraenv (cnraenv_of_nra x)) @ₐ (pat_context_data (drec (rec_sort c)) env x0))%nra =
+                  (h ⊢ (nra_of_cnraenv (cnraenv_of_nra y)) @ₐ (pat_context_data (drec (rec_sort c)) env x0))%nra ).
+    { intros. repeat rewrite <- unfold_env_nra_sort; trivial. auto. }
     assert (eq2:forall (h : list (string * string))
                        (x0 : data),
                   data_normalized h x0 ->
-                  h ⊢ cnraenv_deenv_alg (cnraenv_of_alg x) @ₐ x0 =
-                  h ⊢ cnraenv_deenv_alg (cnraenv_of_alg y) @ₐ x0).
+                  h ⊢ cnraenv_deenv_nra (cnraenv_of_nra x) @ₐ x0 =
+                  h ⊢ cnraenv_deenv_nra (cnraenv_of_nra y) @ₐ x0).
     { intros. specialize (eq1 h0 nil (Forall_nil _) dunit (dnunit _) x1 H1 ).
       do 2 rewrite cnraenv_is_nra_deenv in eq1 by
-          apply cnraenv_of_alg_is_nra; trivial.
+          apply cnraenv_of_nra_is_nra; trivial.
     }
     specialize (eq2 h x0).
-    repeat rewrite cnraenv_deenv_alg_of_alg in eq2.
+    repeat rewrite cnraenv_deenv_nra_of_nra in eq2.
     auto.
   Qed.
 
-  Lemma alg_of_cnraenv_proper_inv x y :
-    (alg_of_cnraenv x ≡ₐ alg_of_cnraenv y)%alg ->
+  Lemma nra_of_cnraenv_proper_inv x y :
+    (nra_of_cnraenv x ≡ₐ nra_of_cnraenv y)%nra ->
     (x ≡ₑ y)%cnraenv.
   Proof.
     unfold Proper, respectful; intros.
-    (* apply cnraenv_of_alg_proper in H. *)
-    unfold alg_eq, cnraenv_eq in *.
+    (* apply cnraenv_of_nra_proper in H. *)
+    unfold nra_eq, cnraenv_eq in *.
     intros.
     specialize (H h (pat_context_data (drec (rec_sort c)) env x0)).
-    repeat rewrite <- unfold_env_alg_sort in H by trivial.
+    repeat rewrite <- unfold_env_nra_sort in H by trivial.
     auto.
   Qed.
 

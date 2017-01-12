@@ -31,7 +31,7 @@ Section ROptimContext.
   Require Import NRA NRAEq.
   Require Import NRAContext NRARewrite.
 
-  Local Open Scope alg_ctxt.
+  Local Open Scope nra_ctxt.
 
   Context {fruntime:foreign_runtime}.
 
@@ -68,7 +68,7 @@ Section ROptimContext.
        end.
 
   Ltac simpl_ctxt_equiv :=
-    try apply <- alg_ctxt_equiv_strict_equiv;
+    try apply <- nra_ctxt_equiv_strict_equiv;
     red; simpl; intros; simpl_plugins; simpl.
 
   Lemma ctxt_and_comm_ctxt :
