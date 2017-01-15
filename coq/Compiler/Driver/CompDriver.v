@@ -3773,6 +3773,57 @@ Section CompDriver.
   Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=
     nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q))).
 
+
+  (* *)
+
+  Definition get_source_from_path path :=
+    match path with
+    | lang :: _ => lang
+    | nil => L_error "empty path"
+    end.
+
+  Definition get_target_from_path path :=
+    match List.rev path with
+    | lang :: _ => lang
+    | nil => L_error "empty path"
+    end.
+
+  Definition remove_source_optim path :=
+    match path with
+    | L_rule :: L_rule :: path => L_rule :: path
+    | L_camp :: L_camp :: path => L_camp :: path
+    | L_oql :: L_oql :: path => L_oql :: path
+    | L_sql :: L_sql :: path => L_sql :: path
+    | L_lambda_nra :: L_lambda_nra :: path => L_lambda_nra :: path
+    | L_nra :: L_nra :: path => L_nra :: path
+    | L_nraenv_core :: L_nraenv_core :: path => L_nraenv_core :: path
+    | L_nraenv :: L_nraenv :: path => L_nraenv :: path
+    | L_nnrc_core :: L_nnrc_core :: path => L_nnrc_core :: path
+    | L_nnrc :: L_nnrc :: path => L_nnrc :: path
+    | L_nnrcmr :: L_nnrcmr :: path => L_nnrcmr :: path
+    | L_cldmr :: L_cldmr :: path => L_cldmr :: path
+    | L_dnnrc_dataset :: L_dnnrc_dataset :: path => L_dnnrc_dataset :: path
+    | L_dnnrc_typed_dataset :: L_dnnrc_typed_dataset :: path => L_dnnrc_typed_dataset :: path
+    | L_javascript :: L_javascript :: path => L_javascript :: path
+    | L_java :: L_java :: path => L_java :: path
+    | L_spark :: L_spark :: path => L_spark :: path
+    | L_spark2 :: L_spark2 :: path => L_spark2 :: path
+    | L_cloudant :: L_cloudant :: path => L_cloudant :: path
+    | _ => path
+    end.
+
+  Lemma remove_source_optim_correrct path :
+    let path' := remove_source_optim path in
+    get_source_from_path path = get_source_from_path path'.
+  Proof.
+    simpl.
+    destruct path; simpl; try reflexivity.
+    destruct l; simpl; try reflexivity;
+      try solve [
+            destruct path; try reflexivity;
+            destruct l; simpl; try reflexivity ].
+  Qed.
+
   End CompPaths.
 
 End CompDriver.
