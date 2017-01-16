@@ -110,7 +110,7 @@ Section LambdaNRATests.
         simpl.
         destruct ((@rmap (@data TrivialModel.trivial_foreign_data)
                  (@data TrivialModel.trivial_foreign_data)
-                 (@lnra_eval_lambda TrivialModel.trivial_foreign_runtime h0 cenv env
+                 (@lnra_lambda_eval TrivialModel.trivial_foreign_runtime h0 cenv env
                     (@LNRALambda TrivialModel.trivial_foreign_runtime
                        (String (Ascii.Ascii true false false false false true true false)
                           EmptyString)

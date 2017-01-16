@@ -47,13 +47,16 @@ Section LambdaNRAtoNRAEnv.
     end.
 
   Context (h:brand_relation_t).
-  Context (constant_env:list (string*data)).
+  Context (global_env:list (string*data)).
     
-  Theorem nraenv_of_lnra_lambda_correct (env:bindings) (lop:lnra_lambda) (d:data) :
-    lnra_eval_lambda h constant_env env lop d = nraenv_eval h constant_env (nraenv_of_lnra_lambda lop) (drec env) d.
+  Theorem nraenv_of_lnra_lambda_correct :
+    forall env:bindings, forall lop:lnra_lambda, forall d:data,
+      lnra_lambda_eval h global_env env lop d =
+      nraenv_eval h global_env
+                  (nraenv_of_lnra_lambda lop) (drec env) d.
   Proof.
     destruct lop.
-    revert env s d.
+    revert env s.
     lnra_cases (induction l) Case
     ; intros; unfold nraenv_eval in *; simpl in *
     ; autorewrite with lnra.
@@ -108,10 +111,10 @@ Section LambdaNRAtoNRAEnv.
   Qed.
 
   Definition eval_nraenv_q (Qe:nraenv) (input:data) : option data :=
-    nraenv_eval h constant_env Qe (drec nil) input.
+    nraenv_eval h global_env Qe (drec nil) input.
 
   Theorem eval_nraenv_q_correct (Q:lnra -> lnra) (input:data) :
-    eval_q h constant_env Q input = eval_nraenv_q (nraenv_of_lnra_lambda (q_to_lambda Q)) input.
+    eval_q h global_env Q input = eval_nraenv_q (nraenv_of_lnra_lambda (q_to_lambda Q)) input.
   Proof.
     unfold eval_q, eval_nraenv_q.
     rewrite nraenv_of_lnra_lambda_correct.

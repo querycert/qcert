@@ -45,7 +45,7 @@ Section LambdaNRAEq.
       (dn_env:Forall (fun d => data_normalized h (snd d)) env)
       (d:data)
       (dn_d:data_normalized h d),
-      lnra_eval_lambda h cenv env op1 d = lnra_eval_lambda h cenv env op2 d.
+      lnra_lambda_eval h cenv env op1 d = lnra_lambda_eval h cenv env op2 d.
 
   Global Instance lnra_equiv : Equivalence lnra_eq.
   Proof.

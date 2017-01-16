@@ -27,19 +27,19 @@ Section LambdaNRA.
 
   Unset Elimination Schemes.
 
-  (* Lambda NRA *)
+  (** Lambda NRA AST *)
   Inductive lnra : Set :=
-  | LNRAVar : string -> lnra (* Variable access *)
+  | LNRAVar : string -> lnra (** Variable access *)
   | LNRATable : string -> lnra
   | LNRAConst : data -> lnra
   | LNRABinop : binOp -> lnra -> lnra -> lnra
   | LNRAUnop : unaryOp -> lnra -> lnra
-  | LNRAMap : lnra_lambda -> lnra -> lnra (* 'dependent operators' use lambdas *)
+  | LNRAMap : lnra_lambda -> lnra -> lnra (** 'dependent operators' use lambdas *)
   | LNRAMapConcat : lnra_lambda -> lnra -> lnra
   | LNRAProduct : lnra -> lnra -> lnra
   | LNRAFilter : lnra_lambda -> lnra -> lnra
   with lnra_lambda : Set :=
-  | LNRALambda : string -> lnra -> lnra_lambda (* Lambda is (\var.alg) *)
+  | LNRALambda : string -> lnra -> lnra_lambda (** Lambda is (\var.alg) *)
   .
 
   Tactic Notation "lnra_cases" tactic(first) ident(c) :=
@@ -91,23 +91,23 @@ Section LambdaNRA.
   (** Semantics of Lambda NRA *)
 
   Context (h:brand_relation_t).
-  Context (constant_env:list (string*data)).
+  Context (global_env:list (string*data)).
 
   Fixpoint lnra_eval (env: bindings) (op:lnra) : option data :=
     match op with
     | LNRAVar x => edot env x
-    | LNRATable t => edot constant_env t
+    | LNRATable t => edot global_env t
     | LNRAConst d => Some (normalize_data h d)
     | LNRABinop b op1 op2 => olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lnra_eval env op1) (lnra_eval env op2)
     | LNRAUnop u op1 =>
       olift (fun d1 => fun_of_unaryop h u d1) (lnra_eval env op1)
     | LNRAMap lop1 op2 =>
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_eval_lambda env lop1) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
         in olift aux_map (lnra_eval env op2)
     | LNRAMapConcat lop1 op2 =>
       let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_eval_lambda env lop1) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
       in olift aux_mapconcat (lnra_eval env op2)
     | LNRAProduct op1 op2 =>
       (* Note: it's even clearer from this formulation that both branches take the same environment *)
@@ -116,7 +116,7 @@ Section LambdaNRA.
       in olift aux_product (lnra_eval env op1)
     | LNRAFilter lop1 op2 =>
       let pred x' :=
-          match lnra_eval_lambda env lop1 x' with
+          match lnra_lambda_eval env lop1 x' with
           | Some (dbool b) => Some b
           | _ => None
           end
@@ -126,7 +126,9 @@ Section LambdaNRA.
       in
       olift aux_map (lnra_eval env op2)
     end
-  with lnra_eval_lambda (env:bindings) (lop:lnra_lambda) (d:data) : option data :=
+  with lnra_lambda_eval (env:bindings)
+                        (lop:lnra_lambda) (d:data)
+       : option data :=
     match lop with
     | LNRALambda x op =>
       (lnra_eval (env++((x,d)::nil)) op)
@@ -137,11 +139,11 @@ Section LambdaNRA.
     (LNRALambda "input" (Q (LNRAVar "input"))).
 
   Definition eval_q (Q:lnra -> lnra) (input:data) : option data :=
-    lnra_eval_lambda nil (q_to_lambda Q) input.
+    lnra_lambda_eval nil (q_to_lambda Q) input.
 
 
-  Lemma lnra_eval_lambda_lambda_eq env x lop d:
-    lnra_eval_lambda env (LNRALambda x lop) d =
+  Lemma lnra_lambda_eval_lambda_eq env x lop d:
+    lnra_lambda_eval env (LNRALambda x lop) d =
     (lnra_eval (env++((x,d)::nil)) lop).
   Proof.
     reflexivity.
@@ -150,7 +152,7 @@ Section LambdaNRA.
   Lemma lnra_eval_map_eq env lop1 op2 :
     lnra_eval env (LNRAMap lop1 op2) = 
         let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_eval_lambda env lop1) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
         in olift aux_map (lnra_eval env op2).
   Proof.
     reflexivity.
@@ -159,7 +161,7 @@ Section LambdaNRA.
   Lemma lnra_eval_map_concat_eq env lop1 op2 :
     lnra_eval env (LNRAMapConcat lop1 op2) = 
       let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_eval_lambda env lop1) c1)) d
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
       in olift aux_mapconcat (lnra_eval env op2).
   Proof.
     reflexivity.
@@ -177,7 +179,7 @@ Section LambdaNRA.
   Lemma lnra_eval_filter_eq env lop1 op2 :
     lnra_eval env (LNRAFilter lop1 op2) = 
       let pred x' :=
-          match lnra_eval_lambda env lop1 x' with
+          match lnra_lambda_eval env lop1 x' with
           | Some (dbool b) => Some b
           | _ => None
           end
@@ -193,7 +195,7 @@ Section LambdaNRA.
   Lemma lnra_eval_normalized {op:lnra} {env:bindings} {o} :
     lnra_eval env op= Some o ->
     Forall (fun x => data_normalized h (snd x)) env ->
-    Forall (fun x => data_normalized h (snd x)) constant_env ->
+    Forall (fun x => data_normalized h (snd x)) global_env ->
     data_normalized h o.
   Proof.
     revert env o.
@@ -379,7 +381,7 @@ Section LambdaNRA.
   End LambdaNRAScope.
 End LambdaNRA.
 
-Hint Rewrite @lnra_eval_lambda_lambda_eq : lnra.
+Hint Rewrite @lnra_lambda_eval_lambda_eq : lnra.
 Hint Rewrite @lnra_eval_map_eq : lnra.
 Hint Rewrite @lnra_eval_map_concat_eq : lnra.
 Hint Rewrite @lnra_eval_product_eq : lnra.
