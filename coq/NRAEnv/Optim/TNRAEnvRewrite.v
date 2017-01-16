@@ -3201,6 +3201,21 @@ Section TOptimEnv.
       trivial.
   Qed.
 
+  (* σ⟨ q ⟩(q₁ ⋃ q₂) ⇒ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂) *)
+
+  Lemma tenvunion_select_distr_arrow (q q₁ q₂: cnraenv) :
+    σ⟨ q ⟩(q₁ ⋃ q₂) ⇒ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
+  Proof.
+    apply rewrites_typed_with_untyped.
+    - apply envunion_select_distr.
+    - intros.
+      cnraenv_inferer.
+      invcs H3.
+      rtype_equalizer. subst.
+      repeat econstructor;
+      trivial.
+  Qed.
+    
 End TOptimEnv.
 
 (* begin hide *)

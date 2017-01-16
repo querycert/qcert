@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NRAEnvOptimFunc.
+Section NRAEnvOptimizer.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -278,6 +278,33 @@ Section NRAEnvOptimFunc.
 
   Definition tselect_and_comm_step_correct {model:basic_model}
     := mkOptimizerStepModel tselect_and_comm_step tselect_and_comm_fun_correctness.
+
+  (** σ⟨ q ⟩(q₁ ⋃ q₂) ⇒ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂) *)
+
+  Definition tenvunion_select_distr_fun {fruntime:foreign_runtime} (p: nraenv) :=
+    match p with
+      | NRAEnvSelect op (NRAEnvBinop AUnion op1 op2) =>
+        NRAEnvBinop AUnion (NRAEnvSelect op op1) (NRAEnvSelect op op2)
+      | _ => p
+    end.
+
+  Lemma tenvunion_select_distr_fun_correctness {model:basic_model} (p:nraenv) :
+    p ⇒ₓ tenvunion_select_distr_fun p.
+  Proof.
+    tprove_correctness p.
+    apply tenvunion_select_distr_arrow.
+  Qed.
+  Hint Rewrite @tenvunion_select_distr_fun_correctness : optim_correct.
+
+  Definition tenvunion_select_distr_step {fruntime:foreign_runtime}
+    := mkOptimizerStep
+         "select/union distr" (* name *)
+         "Pushes selection through union" (* description *)
+         "tenvunion_select_distr_fun" (* lemma name *)
+         tenvunion_select_distr_fun (* lemma *).
+
+  Definition tenvunion_select_distr_step_correct {model:basic_model}
+    := mkOptimizerStepModel tenvunion_select_distr_step tenvunion_select_distr_fun_correctness.
 
   (* σ{P1}(σ{P2}(P3)) ⇒ₓ σ{P2 ∧ P1}(P3)) *)
 
@@ -2793,6 +2820,7 @@ Section NRAEnvOptimFunc.
         tand_comm_step
         ; tselect_and_comm_step
         ; tselect_and_step
+        ; tenvunion_select_distr_step
         ; tdot_from_duplicate_r_step
         ; tdot_from_duplicate_l_step
         ; tflatten_coll_step
@@ -2888,6 +2916,7 @@ Section NRAEnvOptimFunc.
         tand_comm_step_correct
         ; tselect_and_comm_step_correct
         ; tselect_and_step_correct
+        ; tenvunion_select_distr_step_correct
         ; tdot_from_duplicate_r_step_correct
         ; tdot_from_duplicate_l_step_correct
         ; tflatten_coll_step_correct
@@ -3047,6 +3076,7 @@ Section NRAEnvOptimFunc.
       ; optim_step_name ttostring_on_string_step
       ; optim_step_name tmerge_empty_record_r_step
       ; optim_step_name tselect_and_step
+      ; optim_step_name tenvunion_select_distr_step
       ; optim_step_name tdot_from_duplicate_r_step
       ; optim_step_name tdot_from_duplicate_l_step
       ; optim_step_name tconcat_empty_record_r_step
@@ -3148,6 +3178,7 @@ Section NRAEnvOptimFunc.
       ; optim_step_name ttostring_on_string_step
       ; optim_step_name tmerge_empty_record_r_step
       ; optim_step_name tselect_and_step
+      ; optim_step_name tenvunion_select_distr_step
       ; optim_step_name tdot_from_duplicate_r_step
       ; optim_step_name tdot_from_duplicate_l_step
       ; optim_step_name tconcat_empty_record_r_step
@@ -3261,7 +3292,7 @@ Section NRAEnvOptimFunc.
     - apply toptim_old_nraenv_tail_correctness.
   Qed.
 
-End NRAEnvOptimFunc.
+End NRAEnvOptimizer.
 
 (*
 *** Local Variables: ***
