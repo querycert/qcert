@@ -93,9 +93,9 @@ Source languages:
 Target Languages:
    JavaScript  js
    Java	       java
+   Spark       spark_rdd
+   	       spark_dataset
    Cloudant    cloudant
-   Spark       spark
-   	       spark2
 
 'IL's:
    Rule        rule

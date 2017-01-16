@@ -103,8 +103,8 @@ let languages =
     Compiler.L_sql;
     Compiler.L_lambda_nra;
     Compiler.L_nra;
-    Compiler.L_nraenv_core;
     Compiler.L_nraenv;
+    Compiler.L_nraenv_core;
     Compiler.L_nnrc;
     Compiler.L_nnrc_core;
     Compiler.L_nnrcmr;
@@ -113,8 +113,8 @@ let languages =
     Compiler.L_dnnrc_typed_dataset;
     Compiler.L_javascript;
     Compiler.L_java;
-    Compiler.L_spark;
-    Compiler.L_spark2;
+    Compiler.L_spark_rdd;
+    Compiler.L_spark_dataset;
     Compiler.L_cloudant; ]
 
 

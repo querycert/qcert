@@ -69,14 +69,14 @@ Section CompStat.
       (("cloudant_stat", dstring "no stat available")
          :: nil).
 
-  Definition stat_spark2 (q: spark2) : data :=
+  Definition stat_spark_dataset (q: spark_dataset) : data :=
     drec
-      (("spark2_stat", dstring "no stat available")
+      (("spark_dataset_stat", dstring "no stat available")
          :: nil).
 
-  Definition stat_spark (q: spark) : data :=
+  Definition stat_spark_rdd (q: spark_rdd) : data :=
     drec
-      (("spark_stat", dstring "no stat available")
+      (("spark_rdd_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_java (q: java) : data :=
@@ -175,14 +175,14 @@ Section CompStat.
       (("cloudant", stat_cloudant q)
          :: nil).
 
-  Definition stat_tree_spark2 (q: spark2) : data :=
+  Definition stat_tree_spark_dataset (q: spark_dataset) : data :=
     drec
-      (("spark2", stat_spark2 q)
+      (("spark_dataset", stat_spark_dataset q)
          :: nil).
 
-  Definition stat_tree_spark (q: spark) : data :=
+  Definition stat_tree_spark_rdd (q: spark_rdd) : data :=
     drec
-      (("spark", stat_spark q)
+      (("spark_rdd", stat_spark_rdd q)
          :: nil).
 
   Definition stat_tree_java (q: java) : data :=
@@ -367,8 +367,8 @@ Section CompStat.
         | Q_dnnrc_typed_dataset q => stat_dnnrc_typed_dataset q
         | Q_javascript q => stat_javascript q
         | Q_java q => stat_java q
-        | Q_spark q => stat_spark q
-        | Q_spark2 q => stat_spark2 q
+        | Q_spark_rdd q => stat_spark_rdd q
+        | Q_spark_dataset q => stat_spark_dataset q
         | Q_cloudant q => stat_cloudant q
         | Q_error q => stat_error q
         end
@@ -394,8 +394,8 @@ Section CompStat.
         | Q_dnnrc_typed_dataset q => stat_tree_dnnrc_typed_dataset q
         | Q_javascript q => stat_tree_javascript q
         | Q_java q => stat_tree_java q
-        | Q_spark q => stat_tree_spark q
-        | Q_spark2 q => stat_tree_spark2 q
+        | Q_spark_rdd q => stat_tree_spark_rdd q
+        | Q_spark_dataset q => stat_tree_spark_dataset q
         | Q_cloudant q => stat_tree_cloudant q
         | Q_error q => stat_tree_error q
         end

@@ -47,8 +47,8 @@ Module QLang(runtime:CompilerRuntime).
     Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc_typed_dataset.
     Definition javascript := javascript.
     Definition java := java.
-    Definition spark := spark.
-    Definition spark2 := spark2.
+    Definition spark_rdd := spark_rdd.
+    Definition spark_dataset := spark_dataset.
     Definition cloudant := cloudant.
 
     Definition language : Set := language.

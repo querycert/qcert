@@ -1175,8 +1175,8 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_javascript
   | Compiler.L_java
-  | Compiler.L_spark
-  | Compiler.L_spark2
+  | Compiler.L_spark_rdd
+  | Compiler.L_spark_dataset
   | Compiler.L_cloudant ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | Compiler.L_error err ->
@@ -1211,9 +1211,9 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Compiler.Q_java _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Q_spark _ ->
+  | Compiler.Q_spark_rdd _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Compiler.Q_spark2 _ ->
+  | Compiler.Q_spark_dataset _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Compiler.Q_cloudant _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)

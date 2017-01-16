@@ -65,8 +65,8 @@ Section CompLang.
   Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc _ (type_annotation unit) dataset.
   Definition javascript := string.
   Definition java := string.
-  Definition spark := string.
-  Definition spark2 := string.
+  Definition spark_rdd := string.
+  Definition spark_dataset := string.
   Definition cloudant := (list (string * string) * (string * list string))%type.
 
   Inductive language : Set :=
@@ -86,8 +86,8 @@ Section CompLang.
     | L_dnnrc_typed_dataset : language
     | L_javascript : language
     | L_java : language
-    | L_spark : language
-    | L_spark2 : language
+    | L_spark_rdd : language
+    | L_spark_dataset : language
     | L_cloudant : language
     | L_error : string -> language.
 
@@ -119,8 +119,8 @@ Section CompLang.
     | Q_dnnrc_typed_dataset : dnnrc_typed_dataset -> query
     | Q_javascript : javascript -> query
     | Q_java : java -> query
-    | Q_spark : spark -> query
-    | Q_spark2 : spark2 -> query
+    | Q_spark_rdd : spark_rdd -> query
+    | Q_spark_dataset : spark_dataset -> query
     | Q_cloudant : cloudant -> query
     | Q_error : string -> query.
 
@@ -142,8 +142,8 @@ Section CompLang.
     | Case_aux c "Q_dnnrc_typed_dataset"%string
     | Case_aux c "Q_javascript"%string
     | Case_aux c "Q_java"%string
-    | Case_aux c "Q_spark"%string
-    | Case_aux c "Q_spark2"%string
+    | Case_aux c "Q_spark_rdd"%string
+    | Case_aux c "Q_spark_dataset"%string
     | Case_aux c "Q_cloudant"%string
     | Case_aux c "Q_error"%string].
 
@@ -168,8 +168,8 @@ Section CompLang.
       | "dnnrc_typed"%string => L_dnnrc_typed_dataset
       | "js"%string | "rhino"%string | "javascript"%string => L_javascript
       | "java"%string => L_java
-      | "spark"%string => L_spark
-      | "spark2"%string => L_spark2
+      | "spark_rdd"%string => L_spark_rdd
+      | "spark_dataset"%string => L_spark_dataset
       | "cloudant"%string => L_cloudant
       | "error"%string => L_error ""
       | _ => L_error ("'"++name++"' is not a language name")
@@ -193,8 +193,8 @@ Section CompLang.
       | L_dnnrc_typed_dataset => "dnnrc_typed"%string
       | L_javascript => "js"%string
       | L_java => "java"%string
-      | L_spark => "spark"%string
-      | L_spark2 => "spark2"%string
+      | L_spark_rdd => "spark_rdd"%string
+      | L_spark_dataset => "spark_dataset"%string
       | L_cloudant => "cloudant"%string
       | L_error _ => "error"%string
       end.
@@ -217,8 +217,8 @@ Section CompLang.
       | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
       | Q_javascript _ => L_javascript
       | Q_java _ => L_java
-      | Q_spark _ => L_spark
-      | Q_spark2 _ => L_spark2
+      | Q_spark_rdd _ => L_spark_rdd
+      | Q_spark_dataset _ => L_spark_dataset
       | Q_cloudant _ => L_cloudant
       | Q_error err =>
         L_error ("No language corresponding to error query '"++err++"'")
@@ -260,8 +260,8 @@ Section CompLang.
       :: (L_dnnrc_typed_dataset,MiddleEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
       :: (L_javascript,BackEnd,"JS","JavaScript")
       :: (L_java,BackEnd,"Java","Java")
-      :: (L_spark,BackEnd,"Spark","Spark (RDDs)")
-      :: (L_spark2,BackEnd,"Spark2", "Spark (Datasets)")
+      :: (L_spark_rdd,BackEnd,"Spark","Spark (RDDs)")
+      :: (L_spark_dataset,BackEnd,"Spark2", "Spark (Datasets)")
       :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
 (*    :: (L_error,MiddleEnd,"Error","Error") *)
       :: nil.
@@ -322,8 +322,8 @@ Section CompLang.
       | L_dnnrc_typed_dataset => dnnrc_typed_dataset
       | L_javascript => javascript
       | L_java => java
-      | L_spark => spark
-      | L_spark2 => spark2
+      | L_spark_rdd => spark_rdd
+      | L_spark_dataset => spark_dataset
       | L_cloudant => cloudant
       | L_error _ => string
       end.
@@ -349,8 +349,8 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_dnnrc_typed_dataset"%string
   | Case_aux c "L_javascript"%string
   | Case_aux c "L_java"%string
-  | Case_aux c "L_spark"%string
-  | Case_aux c "L_spark2"%string
+  | Case_aux c "L_spark_rdd"%string
+  | Case_aux c "L_spark_dataset"%string
   | Case_aux c "L_cloudant"%string
   | Case_aux c "L_error"%string].
 

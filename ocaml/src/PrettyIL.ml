@@ -1152,8 +1152,8 @@ let pretty_query pconf q =
       pretty_dnnrc ann plug greek margin q
   | Compiler.Q_javascript q -> Util.string_of_char_list q
   | Compiler.Q_java q -> Util.string_of_char_list q
-  | Compiler.Q_spark q -> Util.string_of_char_list q
-  | Compiler.Q_spark2 q -> Util.string_of_char_list q
+  | Compiler.Q_spark_rdd q -> Util.string_of_char_list q
+  | Compiler.Q_spark_dataset q -> Util.string_of_char_list q
   | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant q
   | Compiler.Q_error q -> "Error: "^(Util.string_of_char_list q)
   end

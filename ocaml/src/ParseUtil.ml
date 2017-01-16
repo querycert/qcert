@@ -94,8 +94,8 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_dnnrc_typed_dataset -> raise (Qcert_Error "No parser for typed DNNRC available")
   | Compiler.L_javascript -> raise (Qcert_Error "No parser for Javascript available")
   | Compiler.L_java -> raise (Qcert_Error "No parser for Java available")
-  | Compiler.L_spark -> raise (Qcert_Error "No parser for Spark available")
-  | Compiler.L_spark2 -> raise (Qcert_Error "No parser for Spark 2.0 available")
+  | Compiler.L_spark_rdd -> raise (Qcert_Error "No parser for Spark (RDD) available")
+  | Compiler.L_spark_dataset -> raise (Qcert_Error "No parser for Spark (Dataset) available")
   | Compiler.L_cloudant -> raise (Qcert_Error "No parser for Cloudant available")
   | Compiler.L_error err ->
       let err = string_of_char_list err in
