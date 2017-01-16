@@ -92,7 +92,7 @@ let global_config_of_json j =
   apply QcertArg.set_source j##.source;
   apply QcertArg.set_target j##.target;
   iter_array QcertArg.add_path j##.path;
-  Js.Optdef.iter j##.exact_path (fun b -> gconf.gconf_exact_path <- Js.to_bool b);
+  Js.Optdef.iter j##.exactpath (fun b -> gconf.gconf_exact_path <- Js.to_bool b);
   apply QcertArg.set_dir j##.dir;
   apply QcertArg.set_dir j##.dirtarget;
   Js.Optdef.iter j##.jsruntime
@@ -222,7 +222,7 @@ let json_of_optim_default () =
     val optims = Js.def (wrap_all wrap ocd)
   end
   
-let main input =
+let qcert_compile input =
   begin try
     let gconf =
       begin try
@@ -261,4 +261,6 @@ let _ =
   Js.Unsafe.global##.qcertOptimDefaults :=
     Js.wrap_callback json_of_optim_default;
   Js.Unsafe.global##.qcertCompile :=
-    Js.wrap_callback main
+    Js.wrap_callback qcert_compile
+
+

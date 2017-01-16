@@ -23,6 +23,7 @@
       function compileButton() {
         var input = { 'source' : document.getElementById("source").value,
                       'target' : document.getElementById("target").value,
+                      'exactpath' : document.getElementById("exactpath").value === "ExactPath",
                       'ascii' : document.getElementById("charset").value === "Ascii",
                       'javaimports' : document.getElementById("java_imports").value,
                       'query' : document.getElementById("query").value };
@@ -178,6 +179,13 @@
 	  <select id = "charset">
 	      <option>Ascii</option>
 	      <option selected="selected">Greek</option>
+	  </select>
+        </p>
+        <p>
+          <label>compilation path</label>
+	  <select id = "exactpath">
+	      <option>ExactPath</option>
+	      <option selected="selected">FillPath</option>
 	  </select>
         </p>
         <p>

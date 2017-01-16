@@ -10,7 +10,15 @@ type QcertOptimStepDescription = {name: string, description:string, lemma:string
 
 type QcertOptimPhase = {name: string; optims: string[]; iter: number};
 type QcertOptimConfig = {language: string; phases: QcertOptimPhase[]};
-type QcertCompilerConfig = {source:QcertLanguage, target:QcertLanguage, sourcesexp: boolean, ascii: boolean, javaimports: string, query: string};
+type QcertCompilerConfig = {
+    source:QcertLanguage,  /* Source language */
+    target:QcertLanguage,  /* Target language */
+    path:string[],         /* Intermediate compilation steps (excluding source/target) */
+    exactpath: boolean,    /* true if forcing exact compilation path */
+    sourcesexp: boolean,   /* true if input language uses s-expression syntax */
+    ascii: boolean,        /* true for ascii pp instead of greek pp */
+    javaimports: string,   /* optional java imports for Java back-end */
+    query: string};        /* Input query */
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;
