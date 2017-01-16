@@ -14,14 +14,14 @@
  * limitations under the License.
  *)
 
-Section RuletocNRAEnv.
+Section RuletoNRAEnv.
 
   Require Import String.
   Require Import List.
 
   Require Import Utils BasicRuntime.
   Require Import NRAEnvRuntime.
-  Require Import CAMPtoNRA CAMPtocNRAEnv.
+  Require Import CAMPtoNRA CAMPtoNRAEnv.
   Require Import RuleSystem RuletoNRA.
 
   Local Open Scope string_scope.
@@ -31,26 +31,26 @@ Section RuletocNRAEnv.
 
   (* Rule parts *)
 
-  Definition cnraenv_of_rule (r:rule) : cnraenv :=
-    cnraenv_of_pat (rule_to_pattern r).
+  Definition nraenv_of_rule (r:rule) : nraenv :=
+    nraenv_of_pat (rule_to_pattern r).
 
-  Lemma cnraenv_of_rule_correct h c rps bind d :
+  Lemma nraenv_of_rule_correct h c rps bind d :
     lift_failure (interp h c (rule_to_pattern rps) bind d) =
-    cnraenv_eval h c (cnraenv_of_rule rps) (drec bind) d.
+    nraenv_eval h c (nraenv_of_rule rps) (drec bind) d.
   Proof.
-    unfold cnraenv_of_rule.
+    unfold nraenv_of_rule.
     generalize (rule_to_pattern rps); intros.
-    apply cnraenv_of_pat_correct.
+    apply nraenv_of_pat_correct.
   Qed.
 
   Lemma rule_parts_envtrans_correct_r h c rps bind d :
       interp h c (rule_to_pattern rps) bind d =
-      lift_pat_failure (cnraenv_eval h
+      lift_pat_failure (nraenv_eval h
                                       c 
-                            (cnraenv_of_rule rps)
+                            (nraenv_of_rule rps)
                             (drec bind) d).
   Proof.
-    rewrite <- (cnraenv_of_rule_correct _ ).
+    rewrite <- (nraenv_of_rule_correct _ ).
     generalize (rule_to_pattern rps); intros; simpl.
     destruct (interp h c p bind d); simpl; eauto.
   Qed.
@@ -58,10 +58,10 @@ Section RuletocNRAEnv.
   (* Rules *)
   Lemma rule_trans_correct_r (h:list (string*string)) (r:rule) (world:list data) :
     eval_rule h r world =
-    lift_rule_failure (cnraenv_eval h (mkWorld world) (cnraenv_of_rule r) (drec nil) dunit).
+    lift_rule_failure (nraenv_eval h (mkWorld world) (nraenv_of_rule r) (drec nil) dunit).
   Proof.
     simpl; unfold eval_rule.
-    generalize cnraenv_of_rule_correct; intros.
+    generalize nraenv_of_rule_correct; intros.
     rewrite <- (H _); clear H.
     unfold eval_rule_res.
     match_destr.
@@ -71,20 +71,20 @@ Section RuletocNRAEnv.
 
   Require Import RuleSugar.
   
-  Definition cnraenv_of_aggregate (rules:rule->rule) (op:unaryOp) (secondMap:pat) (flatn:nat) : cnraenv :=
-    cnraenv_of_pat (aggregate rules op secondMap flatn).
+  Definition nraenv_of_aggregate (rules:rule->rule) (op:unaryOp) (secondMap:pat) (flatn:nat) : nraenv :=
+    nraenv_of_pat (aggregate rules op secondMap flatn).
 
   Lemma aggregate_envtrans_correct h c rules op secondMap bind d (flatn:nat) :
     lift_failure (interp h c (aggregate rules op secondMap flatn) bind d) =
-    cnraenv_eval h c (cnraenv_of_aggregate rules op secondMap flatn) (drec bind) d.
+    nraenv_eval h c (nraenv_of_aggregate rules op secondMap flatn) (drec bind) d.
   Proof.
-    unfold cnraenv_of_aggregate.
-    apply cnraenv_of_pat_correct.
+    unfold nraenv_of_aggregate.
+    apply nraenv_of_pat_correct.
   Qed.
 
   Lemma aggregate_envtrans_correct_r h c rules op secondMap bind d  (flatn:nat) :
     interp h c (aggregate rules op secondMap flatn) bind d =
-    lift_pat_failure (cnraenv_eval h c (cnraenv_of_aggregate rules op secondMap flatn) (drec bind) d).
+    lift_pat_failure (nraenv_eval h c (nraenv_of_aggregate rules op secondMap flatn) (drec bind) d).
   Proof.
     rewrite <- (aggregate_envtrans_correct _).
     generalize (AGGREGATE rules DO op OVER secondMap FLATTEN flatn)%rule; intros.
@@ -93,11 +93,11 @@ Section RuletocNRAEnv.
 
   (* Top-level translation call *)
 
-  Definition translate_rule_to_cnraenv (r:rule) : cnraenv :=
+  Definition translate_rule_to_nraenv (r:rule) : nraenv :=
     (* Produces the initial plan *)
-    ANAppEnv (cnraenv_of_rule r) (ANConst (drec nil)).
+    NRAEnvAppEnv (nraenv_of_rule r) (NRAEnvConst (drec nil)).
 
-End RuletocNRAEnv.
+End RuletoNRAEnv.
 
 (* 
 *** Local Variables: ***

@@ -84,7 +84,7 @@ Section CAMPtocNRAEnv.
 
   Local Open Scope nra_scope.
 
-  Lemma pat_envtrans_correct h c q env d:
+  Lemma cnraenv_of_pat_correct h c q env d:
     lift_failure (interp h c q env d) = cnraenv_eval h c (cnraenv_of_pat q) (drec env) d.
   Proof.
     revert d env; induction q; simpl; intros.
@@ -167,11 +167,11 @@ Section CAMPtocNRAEnv.
     - destruct d; simpl; trivial.
   Qed.
   
-  Lemma pat_envtrans_equiv_to_nra h c p bind d:
+  Lemma cnraenv_of_pat_equiv_to_nra h c p bind d:
     nra_eval h (nra_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d) =
     cnraenv_eval h c (cnraenv_of_pat p) (drec bind) d.
   Proof.
-    rewrite <- pat_envtrans_correct.
+    rewrite <- cnraenv_of_pat_correct.
     rewrite pat_trans_correct; reflexivity.
   Qed.
 
@@ -182,7 +182,7 @@ Section CAMPtocNRAEnv.
   Proof.
     intros.
     simpl.
-    rewrite <- pat_envtrans_equiv_to_nra.
+    rewrite <- cnraenv_of_pat_equiv_to_nra.
     unfold pat_context_data.
     rewrite map_normalize_normalized_eq by trivial.
     reflexivity.

@@ -36,10 +36,13 @@ Section CompDriver.
   Require Import DNNRC Dataset.
 
   (* Translations *)
-  Require Import CAMPtocNRAEnv RuletocNRAEnv OQLtoNRAEnv.
-  Require Import RuletoNRA CAMPtoNRA NRAtoNNRC cNRAEnvtoNNRC NRAEnvtoNNRCExt.
-  Require Import LambdaNRAtoNRAEnv.
+  Require Import OQLtoNRAEnv.
   Require Import SQLtoNRAEnv.
+  Require Import LambdaNRAtoNRAEnv.
+  Require Import RuletoNRA CAMPtoNRA.
+  Require Import CAMPtocNRAEnv RuletocNRAEnv.
+  Require Import CAMPtoNRAEnv RuletoNRAEnv.
+  Require Import NRAtoNNRC cNRAEnvtoNNRC NRAEnvtoNNRCExt.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
@@ -118,43 +121,50 @@ Section CompDriver.
   End translations_util.
 
   Section translations.
-
-    Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletocNRAEnv.translate_rule_to_cnraenv q.
-
-    Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
-
-    Definition rule_to_nra (q:rule) : nra := nra_of_rule q.
-
+    (** Source languages translations *)
     Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
 
     Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
 
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lnra q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_pat_to_cnraenv q.
+    (** Rule/CAMP translations *)
+    Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
+
+    Definition rule_to_nra (q:rule) : nra := nra_of_rule q.
+
+    Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletocNRAEnv.translate_rule_to_cnraenv q.
+
+    Definition rule_to_nraenv (q:rule) : nraenv := RuletoNRAEnv.nraenv_of_rule q.
 
     Definition camp_to_nra (q:camp) : nra := nra_of_pat q.
 
-    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := cnraenv_of_nraenv q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_pat_to_cnraenv q.
 
-    Definition nraenv_core_to_nraenv (q: cnraenv) : nraenv := nraenv_of_cnraenv q.
+    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.nraenv_of_pat q.
 
-    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
-      nnrc_to_nnrc_core q.
-  
-    Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
-      nnrc_to_nnrc_core (cnraenv_to_nnrc q init_vid init_venv).
-
-    Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
-      nraenv_to_nnrc_ext_top q init_vid init_venv.
-
-    Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_cnraenv q.
-
+    (** NRA/NRAEnv translations *)
     Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_nra q.
 
     Definition nra_to_nnrc_core (q: nra) : nnrc_core :=
       nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
 
+    Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
+      nnrc_to_nnrc_core (cnraenv_to_nnrc q init_vid init_venv).
+
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_cnraenv q.
+
+    Definition nraenv_core_to_nraenv (q: cnraenv) : nraenv := nraenv_of_cnraenv q.
+
+    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := cnraenv_of_nraenv q.
+
+    Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
+      nraenv_to_nnrc_ext_top q init_vid init_venv.
+
+    (** NNRC translations *)
+    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
+      nnrc_to_nnrc_core q.
+  
     Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
       lift_nnrc_core (nnrcToPat_let avoid) q. (* XXX avoid ? XXX *)
 
@@ -182,6 +192,18 @@ Section CompDriver.
       lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
                                            inputs_loc) q.
 
+    Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
+      nnrc_to_dnnrc tt inputs_loc q.
+
+    Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
+      lift_nnrc_core nnrcToJSTop (nnrc_to_nnrc_core q).
+
+    Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Expands GroupBy For now XXX *)
+      lift_nnrc_core (nnrcToJavaTop class_name imports) (nnrc_to_nnrc_core q).
+
+    (** DNNRC translations *)
+    
+    (** NNRCMR translations *)
     Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
 
     Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
@@ -212,18 +234,6 @@ Section CompDriver.
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
       nnrcmr_prepared_to_spark_rdd rulename (nnrcmr_to_nnrcmr_spark_rdd_prepare q).
 
-    Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
-      mapReducePairstoCloudant h q rulename.
-
-    Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
-      nnrc_to_dnnrc tt inputs_loc q.
-
-    Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
-      lift_nnrc_core nnrcToJSTop (nnrc_to_nnrc_core q).
-
-    Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Expands GroupBy For now XXX *)
-      lift_nnrc_core (nnrcToJavaTop class_name imports) (nnrc_to_nnrc_core q).
-
     Definition dnnrc_dataset_to_dnnrc_typed_dataset
                (e: dnnrc_dataset) (inputType: rtype)
       : option dnnrc_typed_dataset :=
@@ -232,6 +242,10 @@ Section CompDriver.
     Definition dnnrc_typed_dataset_to_spark_dataset
                (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
       @dnnrcToSpark2Top _ _ bm _ _ unit inputType name q.
+
+    (* Backend *)
+    Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
+      mapReducePairstoCloudant h q rulename.
 
   End translations.
 
@@ -307,6 +321,7 @@ Section CompDriver.
   Inductive camp_driver : Set :=
     | Dv_camp_stop : camp_driver
     | Dv_camp_to_nraenv_core : nraenv_core_driver -> camp_driver
+    | Dv_camp_to_nraenv : nraenv_driver -> camp_driver
     | Dv_camp_to_nra : nra_driver -> camp_driver
 
   with nra_driver : Set :=
@@ -380,6 +395,7 @@ Section CompDriver.
     | Dv_rule_stop : rule_driver
     | Dv_rule_to_camp : camp_driver -> rule_driver
     | Dv_rule_to_nraenv_core : nraenv_core_driver -> rule_driver
+    | Dv_rule_to_nraenv : nraenv_driver -> rule_driver
     | Dv_rule_to_nra : nra_driver -> rule_driver.
 
   Inductive oql_driver : Set :=
@@ -519,6 +535,7 @@ Section CompDriver.
     match dv with
     | Dv_camp_stop => 1
     | Dv_camp_to_nraenv_core dv => 1 + driver_length_nraenv_core dv
+    | Dv_camp_to_nraenv dv => 1 + driver_length_nraenv dv
     | Dv_camp_to_nra dv => 1 + driver_length_nra dv
     end
 
@@ -581,6 +598,7 @@ Section CompDriver.
     | Dv_rule_stop => 1
     | Dv_rule_to_camp dv => 1 + driver_length_camp dv
     | Dv_rule_to_nraenv_core dv => 1 + driver_length_nraenv_core dv
+    | Dv_rule_to_nraenv dv => 1 + driver_length_nraenv dv
     | Dv_rule_to_nra dv => 1 + driver_length_nra dv
     end.
 
@@ -716,6 +734,9 @@ Section CompDriver.
         | Dv_camp_to_nraenv_core dv =>
           let q := camp_to_nraenv_core q in
           compile_nraenv_core dv q
+        | Dv_camp_to_nraenv dv =>
+          let q := camp_to_nraenv q in
+          compile_nraenv dv q
         | Dv_camp_to_nra dv =>
           let q := camp_to_nra q in
           compile_nra dv q
@@ -859,6 +880,9 @@ Section CompDriver.
         | Dv_rule_to_nraenv_core dv =>
           let q := rule_to_nraenv_core q in
           compile_nraenv_core dv q
+        | Dv_rule_to_nraenv dv =>
+          let q := rule_to_nraenv q in
+          compile_nraenv dv q
         | Dv_rule_to_nra dv =>
           let q := rule_to_nra q in
           compile_nra dv q
@@ -935,8 +959,8 @@ Section CompDriver.
       match dv with
       | Dv_camp dv => Dv_rule (Dv_rule_to_camp dv)
       | Dv_nraenv_core dv => Dv_rule (Dv_rule_to_nraenv_core dv)
+      | Dv_nraenv dv => Dv_rule (Dv_rule_to_nraenv dv)
       | Dv_nra dv => Dv_rule (Dv_rule_to_nra dv)
-      | Dv_nraenv _
       | Dv_rule _
       | Dv_oql _
       | Dv_sql _
@@ -959,8 +983,8 @@ Section CompDriver.
     | L_camp =>
       match dv with
       | Dv_nraenv_core dv => Dv_camp (Dv_camp_to_nraenv_core dv)
+      | Dv_nraenv dv => Dv_camp (Dv_camp_to_nraenv dv)
       | Dv_nra dv => Dv_camp (Dv_camp_to_nra dv)
-      | Dv_nraenv _
       | Dv_rule _
       | Dv_camp _
       | Dv_oql _
@@ -1336,8 +1360,10 @@ Section CompDriver.
     match (dv, q) with
     | (Dv_rule (Dv_rule_to_camp dv), Q_camp q) => Dv_camp dv
     | (Dv_rule (Dv_rule_to_nraenv_core dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv_core dv)
+    | (Dv_rule (Dv_rule_to_nraenv dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv dv)
     | (Dv_rule (Dv_rule_to_nra dv), Q_camp q) => Dv_camp (Dv_camp_to_nra dv)
     | (Dv_camp (Dv_camp_to_nraenv_core dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv_core dv)
+    | (Dv_camp (Dv_camp_to_nraenv dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv dv)
     | (Dv_camp (Dv_camp_to_nra dv), Q_rule q) => Dv_rule (Dv_rule_to_nra dv)
     | (_, _) => dv
     end.
@@ -1434,9 +1460,11 @@ Section CompDriver.
     | Dv_rule (Dv_rule_stop) => (L_rule, None)
     | Dv_rule (Dv_rule_to_camp dv) => (L_rule, Some (Dv_camp dv))
     | Dv_rule (Dv_rule_to_nraenv_core dv) => (L_rule, Some (Dv_nraenv_core dv))
+    | Dv_rule (Dv_rule_to_nraenv dv) => (L_rule, Some (Dv_nraenv dv))
     | Dv_rule (Dv_rule_to_nra dv) => (L_rule, Some (Dv_nra dv))
     | Dv_camp (Dv_camp_stop) => (L_camp, None)
     | Dv_camp (Dv_camp_to_nraenv_core dv) => (L_camp, Some (Dv_nraenv_core dv))
+    | Dv_camp (Dv_camp_to_nraenv dv) => (L_camp, Some (Dv_nraenv dv))
     | Dv_camp (Dv_camp_to_nra dv) => (L_camp, Some (Dv_nra dv))
     | Dv_oql (Dv_oql_stop) => (L_oql, None)
     | Dv_oql (Dv_oql_to_nraenv dv) => (L_oql, Some (Dv_nraenv dv))
@@ -2038,13 +2066,11 @@ Section CompDriver.
           :: nil
       | L_rule, L_nraenv =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: nil
       | L_rule, L_nnrc_core =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2053,7 +2079,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_nnrc =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2061,7 +2086,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_javascript =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2070,7 +2094,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_java =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2079,7 +2102,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_nnrcmr =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2089,7 +2111,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_spark_rdd =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2100,7 +2121,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_cldmr =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2111,7 +2131,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_cloudant =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2123,7 +2142,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_dnnrc_dataset =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2132,7 +2150,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_dnnrc_typed_dataset =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2143,7 +2160,6 @@ Section CompDriver.
           :: nil
       | L_rule, L_spark_dataset =>
         L_rule
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2169,13 +2185,11 @@ Section CompDriver.
           :: nil
       | L_camp, L_nraenv =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: nil
       | L_camp, L_nnrc_core =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2184,7 +2198,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_nnrc =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2192,7 +2205,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_javascript =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2201,7 +2213,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_java =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2210,7 +2221,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_nnrcmr =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2220,7 +2230,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_spark_rdd =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2231,7 +2240,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_cldmr =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2242,7 +2250,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_cloudant =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2254,7 +2261,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_dnnrc_dataset =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2263,7 +2269,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_dnnrc_typed_dataset =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2274,7 +2279,6 @@ Section CompDriver.
           :: nil
       | L_camp, L_spark_dataset =>
         L_camp
-          :: L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2684,7 +2688,7 @@ Section CompDriver.
       | L_nra, L_nraenv_core =>
         L_nra
           :: L_nra
-          :: L_nra
+          :: L_nraenv_core
           :: L_nraenv_core
           :: nil
       | L_nra, L_nraenv =>

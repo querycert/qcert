@@ -229,15 +229,19 @@ MODULES = \
 	Translation/NNRCMRtoCldMR \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
+	Translation/CAMPtoNRAEnv \
 	Translation/CAMPSugartoNRA \
 	Translation/CAMPSugartocNRAEnv \
+	Translation/CAMPSugartoNRAEnv \
 	Translation/RuletoNRA \
 	Translation/RuletocNRAEnv \
+	Translation/RuletoNRAEnv \
 	Translation/TNRAtoNNRC \
 	Translation/TcNRAEnvtoNNRC \
 	Translation/TNNRCtoCAMP \
 	Translation/TCAMPtoNRA \
 	Translation/TCAMPtocNRAEnv \
+	Translation/TCAMPtoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
 	Translation/OQLtoNRAEnv \
