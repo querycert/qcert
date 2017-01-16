@@ -41,7 +41,7 @@
     | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
-    | "union" -> QLambdaNRA.labinop Compiler.AUnion (resolve_one_expr a el) e0
+    | "union" -> QLambdaNRA.labinop Compiler.AUnion e0 (resolve_one_expr a el)
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
@@ -56,6 +56,7 @@
 %token OR AND NOT
 %token STRUCT
 %token EQUAL NEQUAL EQUALGT
+%token GT LT
 %token PLUS STAR MINUS
 %token DOT ARROW COMMA COLON
 %token LPAREN RPAREN
@@ -63,6 +64,7 @@
 %token EOF
 
 %right EQUAL NEQUAL
+%right GT LT
 %right PLUS MINUS
 %right AND OR
 %right STAR
@@ -118,6 +120,10 @@ expr:
     { QLambdaNRA.labinop QOps.Binary.aeq e1 e2 }
 | e1 = expr NEQUAL e2 = expr
     { QLambdaNRA.launop QOps.Unary.aneg (QLambdaNRA.labinop QOps.Binary.aeq e1 e2) }
+| e1 = expr GT e2 = expr
+    { QLambdaNRA.launop QOps.Unary.aneg (QLambdaNRA.labinop QOps.Binary.ale e1 e2) }
+| e1 = expr LT e2 = expr
+    { QLambdaNRA.labinop QOps.Binary.alt e1 e2 }
 | e1 = expr MINUS e2 = expr
     { QLambdaNRA.labinop QOps.Binary.ZArith.aminus e1 e2 }
 | e1 = expr PLUS e2 = expr

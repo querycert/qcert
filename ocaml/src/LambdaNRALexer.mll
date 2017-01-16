@@ -53,6 +53,8 @@ rule token sbuff = parse
 | "&&" { AND }
 | "->" { ARROW }
 | "=>" { EQUALGT }
+| "<" { LT }
+| ">" { GT }
 | "(" { LPAREN }
 | ")" { RPAREN }
 | "{" { LCURLY }
