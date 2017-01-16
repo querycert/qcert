@@ -21,7 +21,7 @@ Section NNRCMRtoDNNRC.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC NNRCMR.
+  Require Import NNRCSystem NNRCMRSystem.
   Require Import ForeignReduceOps ForeignToReduceOps.
   Require Import DNNRC NNRCtoDNNRC.
   Local Open Scope string_scope.

@@ -22,7 +22,7 @@ Section NNRCRewriteUtil.
 
   Require Import Utils BasicRuntime.
 
-  Require Import NNRC NNRCEq NNRCShadow.
+  Require Import cNNRC cNNRCEq cNNRCShadow.
 
   Context {fruntime:foreign_runtime}.
 

@@ -23,7 +23,7 @@ Require Import Utils BasicSystem.
 Require Import NNRCSystem.
 Require Import CAMPSystem.
 
-Require Import NNRCtoCAMP.
+Require Import cNNRCtoCAMP.
   
 Section TNNRCtoCAMP.
 

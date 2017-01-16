@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCExt.
+Section NNRC.
 
   Require Import String.
   Require Import List.
@@ -29,7 +29,7 @@ Section NNRCExt.
   Require Import EquivDec Decidable.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC.
+  Require Import cNNRC.
 
   (** Named Nested Relational Calculus - Extended *)
 
@@ -486,7 +486,7 @@ Section NNRCExt.
   End semantics.
 
   Section prop.
-    Require Import NNRCShadow.
+    Require Import cNNRCShadow.
 
     Lemma nnrc_ext_to_nnrc_free_vars_same e:
       nnrc_free_vars e = nnrc_free_vars (nnrc_ext_to_nnrc e).
@@ -763,22 +763,15 @@ Section NNRCExt.
   End prop.
 
   Section core.
-    Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
     Program Definition nnrc_to_nnrc_core (e:nnrc) : nnrc_core :=
       nnrc_ext_to_nnrc e.
     Next Obligation.
       apply nnrc_ext_to_nnrc_is_core.
     Defined.
 
-    Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
-      proj1_sig e.
-
-    Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
-      f (proj1_sig e).
-    
   End core.
   
-End NNRCExt.
+End NNRC.
 
 (* 
 *** Local Variables: ***

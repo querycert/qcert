@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvtoNNRC.
+Section cNRAEnvtocNNRC.
 
   (* begin hide *)
   Require Import String.
@@ -602,7 +602,7 @@ Section cNRAEnvtoNNRC.
 
   End size.
 
-End cNRAEnvtoNNRC.
+End cNRAEnvtocNNRC.
 
 (* 
 *** Local Variables: ***

@@ -136,21 +136,21 @@ MODULES = \
 	NRAEnv/Optim/TNRAEnvRewrite \
 	NRAEnv/Optim/NRAEnvOptimizer \
 	NRAEnv/NRAEnvOptim \
-	NNRC/Core/NNRC \
-	NNRC/Core/NNRCShadow \
-	NNRC/Core/NNRCNorm \
-	NNRC/Core/NNRCEq \
-	NNRC/Core/NNRCSize \
-	NNRC/Lang/NNRCExt \
-	NNRC/Lang/NNRCExtShadow \
-	NNRC/Lang/NNRCExtEq \
+	NNRC/Core/cNNRC \
+	NNRC/Core/cNNRCShadow \
+	NNRC/Core/cNNRCNorm \
+	NNRC/Core/cNNRCEq \
+	NNRC/Lang/NNRC \
+	NNRC/Lang/NNRCShadow \
+	NNRC/Lang/NNRCEq \
+	NNRC/Lang/NNRCSize \
+	NNRC/Typing/TcNNRC \
 	NNRC/Typing/TNNRC \
-	NNRC/Typing/TNNRCExt \
-	NNRC/Typing/TNNRCInfer \
+	NNRC/Typing/TcNNRCInfer \
+	NNRC/Typing/TcNNRCEq \
 	NNRC/Typing/TNNRCEq \
-	NNRC/Typing/TNNRCExtEq \
+	NNRC/Typing/TcNNRCShadow \
 	NNRC/Typing/TNNRCShadow \
-	NNRC/Typing/TNNRCExtShadow \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \
 	NNRC/NNRCSystem \
@@ -218,10 +218,10 @@ MODULES = \
 	OQL/OQLSystem \
 	Translation/ForeignToReduceOps \
 	Translation/ForeignToCloudant \
-	Translation/NRAtoNNRC \
-	Translation/cNRAEnvtoNNRC \
-	Translation/NRAEnvtoNNRCExt \
-	Translation/NNRCtoCAMP \
+	Translation/NRAtocNNRC \
+	Translation/cNRAEnvtocNNRC \
+	Translation/NRAEnvtoNNRC \
+	Translation/cNNRCtoCAMP \
 	Translation/NNRCtoNNRCMR \
 	Translation/NNRCtoDNNRC \
 	Translation/NNRCMRtoNNRC \
@@ -236,9 +236,9 @@ MODULES = \
 	Translation/RuletoNRA \
 	Translation/RuletocNRAEnv \
 	Translation/RuletoNRAEnv \
-	Translation/TNRAtoNNRC \
-	Translation/TcNRAEnvtoNNRC \
-	Translation/TNNRCtoCAMP \
+	Translation/TNRAtocNNRC \
+	Translation/TcNRAEnvtocNNRC \
+	Translation/TcNNRCtoCAMP \
 	Translation/TCAMPtoNRA \
 	Translation/TCAMPtocNRAEnv \
 	Translation/TCAMPtoNRAEnv \

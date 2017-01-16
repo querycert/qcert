@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRC.
+Section cNNRC.
 
   Require Import String.
   Require Import List.
@@ -155,7 +155,18 @@ Section NNRC.
         simpl; match_destr.
   Qed.
 
-End NNRC.
+  Section core.
+    Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
+
+    Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
+      proj1_sig e.
+
+    Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
+      f (proj1_sig e).
+    
+  End core.
+  
+End cNNRC.
 
 (* begin hide *)
 Notation "‵‵ c" := (NNRCConst (dconst c))  (at level 0) : nnrc_scope.                           (* ‵ = \backprime *)

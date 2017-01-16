@@ -23,7 +23,7 @@ Section NNRCtoDNNRC.
   Require Import Morphisms.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC.
+  Require Import NNRCSystem.
   Require Import DData DNNRC.
 
   Context {fruntime:foreign_runtime}.

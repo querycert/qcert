@@ -15,8 +15,8 @@
  *)
 
 Require Export BasicTypes.
+Require Export TcNNRC TcNNRCEq TcNNRCShadow.
 Require Export TNNRC TNNRCEq TNNRCShadow.
-Require Export TNNRCExt TNNRCExtEq TNNRCExtShadow.
 
 (* 
 *** Local Variables: ***

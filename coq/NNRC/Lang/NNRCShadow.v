@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCExtShadow.
+Section NNRCShadow.
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -23,8 +23,8 @@ Section NNRCExtShadow.
 
   Require Import Utils BasicRuntime.
 
-  Require Import NNRC NNRCExt.
-  Require Import NNRCSize NNRCShadow.
+  Require Import cNNRC cNNRCShadow.
+  Require Import NNRC NNRCSize.
 
   Close Scope nnrc_scope.
   
@@ -889,7 +889,7 @@ Section NNRCExtShadow.
          nnrc_subst e x (NNRCVar x'))
       substlist e.
 
-End NNRCExtShadow.
+End NNRCShadow.
 
 (* 
 *** Local Variables: ***

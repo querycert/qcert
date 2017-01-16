@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NRAEnvtoNNRCExt.
+Section NRAEnvtoNNRC.
 
   (* begin hide *)
   Require Import String.
@@ -155,7 +155,7 @@ Section NRAEnvtoNNRCExt.
 
   (* This is clearly not true *)
   Section negResult.
-    Require Import cNRAEnvtoNNRC.
+    Require Import cNRAEnvtocNNRC.
     Example nraenv_to_nnrc_codepaths_different vid venv:
       exists op,
         ~ (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv)
@@ -585,7 +585,7 @@ Section NRAEnvtoNNRCExt.
 
   End size.
 
-End NRAEnvtoNNRCExt.
+End NRAEnvtoNNRC.
 
 (* 
 *** Local Variables: ***

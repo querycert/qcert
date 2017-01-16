@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NRAtoNNRC.
+Section NRAtocNNRC.
 
   (* begin hide *)
   Require Import String.
@@ -315,7 +315,12 @@ _var ⊕ [[ op2 ]]_var *)
 
   End size.
 
-End NRAtoNNRC.
+  Section core.
+    Definition nra_to_nnrc_core q init_vid :=
+      nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
+  End core.
+  
+End NRAtocNNRC.
 
 (* 
 *** Local Variables: ***

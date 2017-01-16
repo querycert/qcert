@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TNNRCInfer.
+Section TcNNRCInfer.
 
   Require Import String.
   Require Import List.
@@ -24,8 +24,8 @@ Section TNNRCInfer.
 
   Require Import Utils BasicSystem.
 
-  Require Import NNRC.
-  Require Import TNNRC.
+  Require Import cNNRC.
+  Require Import TcNNRC.
 
   Context {m:basic_model}.
 
@@ -174,7 +174,7 @@ Section TNNRCInfer.
       congruence. (* Type checking always fails for groupby in core NNRC *)
   Qed.
 
-End TNNRCInfer.
+End TcNNRCInfer.
 
 (* 
 *** Local Variables: ***

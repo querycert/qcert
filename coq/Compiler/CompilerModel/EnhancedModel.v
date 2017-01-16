@@ -27,7 +27,7 @@ Require Import FloatModelPart StringModelPart.
 Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
 Require NNRCMR CldMR.
-Require Import OptimizerLogger String cNRAEnv NRAEnv NNRC.
+Require Import OptimizerLogger String cNRAEnv NRAEnv cNNRC.
 Require Import DNNRC Dataset.
 Require Import TDNNRCInfer.
 

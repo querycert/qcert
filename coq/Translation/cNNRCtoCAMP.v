@@ -70,24 +70,24 @@ Section NNRCtoCAMP.
 
   (** Translation from NNRC to CAMP.
       This assumes that there is no shadowing *)
-  Fixpoint nnrcToPat_ns (n:NNRC.nnrc) : pat
+  Fixpoint nnrcToPat_ns (n:cNNRC.nnrc) : pat
     := match n with
-         | NNRC.NNRCVar v => lookup (loop_var v)
-         | NNRC.NNRCConst d => pconst d
-         | NNRC.NNRCBinop op n1 n2 => pbinop op (nnrcToPat_ns n1) (nnrcToPat_ns n2)
-         | NNRC.NNRCUnop op n1 => punop op (nnrcToPat_ns n1)
+         | cNNRC.NNRCVar v => lookup (loop_var v)
+         | cNNRC.NNRCConst d => pconst d
+         | cNNRC.NNRCBinop op n1 n2 => pbinop op (nnrcToPat_ns n1) (nnrcToPat_ns n2)
+         | cNNRC.NNRCUnop op n1 => punop op (nnrcToPat_ns n1)
 
-         | NNRC.NNRCLet v bind body => 
+         | cNNRC.NNRCLet v bind body => 
            pletIt (nnrcToPat_ns bind)
                     (pletEnv (pvar (loop_var v))
                              (nnrcToPat_ns body))
-         | NNRC.NNRCFor v iter body => 
+         | cNNRC.NNRCFor v iter body => 
            pletIt (nnrcToPat_ns iter)
                  (mapall
                     (pletEnv (pvar (loop_var v))
                              (nnrcToPat_ns body)))
                  
-         | NNRC.NNRCIf c n1 n2 =>
+         | cNNRC.NNRCIf c n1 n2 =>
            let ctrans := (nnrcToPat_ns c) in
            let n1trans := (nnrcToPat_ns n1) in
            let n2trans := (nnrcToPat_ns n2) in
@@ -95,16 +95,16 @@ Section NNRCtoCAMP.
              (pand (pbinop AAnd ‵true ctrans) n1trans)
              (* it could have failed because of n1, but then this will also fail *)
              (pand (punop ANeg ctrans) n2trans))
-         | NNRC.NNRCEither nd xl nl xr nr =>
+         | cNNRC.NNRCEither nd xl nl xr nr =>
            pletIt (nnrcToPat_ns nd)
                   (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nnrcToPat_ns nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nnrcToPat_ns nr))))
-         | NNRC.NNRCGroupBy g sl n =>
+         | cNNRC.NNRCGroupBy g sl n =>
            pfail (* XXX How to do this best? XXX *)
        end.
 
   (** Definition with shadowing *)
 
-  Definition nnrcToPat avoid (n:NNRC.nnrc) : pat := nnrcToPat_ns (unshadow_simpl avoid n).
+  Definition nnrcToPat avoid (n:cNNRC.nnrc) : pat := nnrcToPat_ns (unshadow_simpl avoid n).
 
   (** Additional auxiliary lemmas to reason about domains and environments *)
 
@@ -422,7 +422,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
       unfold nnrcToPat_ns; fold nnrcToPat_ns.
-      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
+      unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       match_destr_in H1.
       specialize (IHn1 _ H5 H0 H).
@@ -465,7 +465,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
       unfold nnrcToPat_ns; fold nnrcToPat_ns.
-      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
+      unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       match_destr_in H1.
       specialize (IHn1 _ H5 H0 H).
@@ -633,7 +633,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
     shadow_free n = true ->
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
-    NNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env)) dunit).
+    cNNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env)) dunit).
   Proof.
     intros HisCore.
     revert HisCore env; induction n; intro Hiscore; intros; trivial.
@@ -655,7 +655,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
       destruct (interp h cenv (nnrcToPat_ns n) (rec_sort (nnrc_to_pat_env env))); simpl; trivial.
       rewrite pr2op_op2tpr; trivial.
     - unfold nnrcToPat_ns; fold nnrcToPat_ns.
-      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
+      unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       simpl in H, H1; repeat rewrite andb_true_iff in H; 
         apply in_in_cons_app_false in H1; intuition.
@@ -688,7 +688,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
     - (* need to be careful about simplifications, since we want to
           reason about mapall, which is a definition *)
       unfold nnrcToPat_ns; fold nnrcToPat_ns.
-      unfold NNRC.nnrc_core_eval; fold NNRC.nnrc_core_eval.
+      unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
       rewrite interp_pletIt_eq.
       simpl in H, H1; repeat rewrite andb_true_iff in H; 
         apply in_in_cons_app_false in H1; intuition.
@@ -804,7 +804,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
   Lemma nnrcToPat_sem_correct_top_ns h cenv n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_ns n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_ns n) nil dunit).
   Proof.
     intros.
     apply nnrcToPat_sem_correct_ns; simpl; auto.
@@ -812,7 +812,7 @@ Lemma nnrcToPat_norecoverable_ns h cenv n env :
 
   Theorem nnrcToPat_sem_correct_top h cenv avoid n :
     nnrcIsCore n ->
-    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat avoid n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat avoid n) nil dunit).
   Proof.
     intro Hiscore.
     generalize (unshadow_simpl_preserve_core avoid n Hiscore); intros.
@@ -1024,24 +1024,24 @@ Hint Rewrite
     (pletEnv (punop ACount pit ≐ punop ACount (lookup freshVar))
     (lookup freshVar))))%rule.
 
-  Fixpoint nnrcToPat_ns_let (n:NNRC.nnrc) : pat
+  Fixpoint nnrcToPat_ns_let (n:cNNRC.nnrc) : pat
     := match n with
-         | NNRC.NNRCVar v => lookup (loop_var v)
-         | NNRC.NNRCConst d => pconst d
-         | NNRC.NNRCBinop op n1 n2 => pbinop op (nnrcToPat_ns_let n1) (nnrcToPat_ns_let n2)
-         | NNRC.NNRCUnop op n1 => punop op (nnrcToPat_ns_let n1)
+         | cNNRC.NNRCVar v => lookup (loop_var v)
+         | cNNRC.NNRCConst d => pconst d
+         | cNNRC.NNRCBinop op n1 n2 => pbinop op (nnrcToPat_ns_let n1) (nnrcToPat_ns_let n2)
+         | cNNRC.NNRCUnop op n1 => punop op (nnrcToPat_ns_let n1)
 
-         | NNRC.NNRCLet v bind body => 
+         | cNNRC.NNRCLet v bind body => 
            pletIt (nnrcToPat_ns_let bind)
                      (pletEnv (pvar (loop_var v))
                             (nnrcToPat_ns_let body))
-         | NNRC.NNRCFor v iter body => 
+         | cNNRC.NNRCFor v iter body => 
            pletIt (nnrcToPat_ns_let iter)
                  (mapall_let
                     (pletEnv (pvar (loop_var v))
                              (nnrcToPat_ns_let body)))
                  
-         | NNRC.NNRCIf c n1 n2 =>
+         | cNNRC.NNRCIf c n1 n2 =>
            let ctrans := (nnrcToPat_ns_let c) in
            let n1trans := (nnrcToPat_ns_let n1) in
            let n2trans := (nnrcToPat_ns_let n2) in
@@ -1051,14 +1051,14 @@ Hint Rewrite
              (pand (pbinop AAnd ‵true (lookup freshVar)) n1trans)
              (* it could have failed because of n1, but then this will also fail *)
              (pand (punop ANeg (lookup freshVar)) n2trans))
-         | NNRC.NNRCEither nd xl nl xr nr =>
+         | cNNRC.NNRCEither nd xl nl xr nr =>
            pletIt (nnrcToPat_ns_let nd)
                   (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nnrcToPat_ns_let nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nnrcToPat_ns_let nr))))
-         | NNRC.NNRCGroupBy g sl n =>
+         | cNNRC.NNRCGroupBy g sl n =>
            pfail
        end.
 
-  Definition nnrcToPat_let avoid (n:NNRC.nnrc) : pat 
+  Definition nnrcToPat_let avoid (n:cNNRC.nnrc) : pat 
     := nnrcToPat_ns_let (unshadow_simpl avoid n).
 
   Lemma loop_let_var_distinct x y :
@@ -1912,7 +1912,7 @@ Qed.
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
     (forall x, In x (domain (nnrc_to_pat_env env)) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
-    NNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_ns_let n) (rec_sort (nnrc_to_pat_env env)) d).
+    cNNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_ns_let n) (rec_sort (nnrc_to_pat_env env)) d).
   Proof.
     intros.
     rewrite (nnrcToPat_sem_correct_ns _ cenv); auto.
@@ -1931,7 +1931,7 @@ Qed.
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars (unshadow_simpl avoid n))) ->
     (forall x, In x (domain (nnrc_to_pat_env env)) -> ~ In x (map loop_var (nnrc_bound_vars (unshadow_simpl avoid n)))) ->
-    NNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_let avoid n) (rec_sort (nnrc_to_pat_env env)) d).
+    cNNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToPat_let avoid n) (rec_sort (nnrc_to_pat_env env)) d).
   Proof.
     intro Hiscore.
     intros.
@@ -1948,7 +1948,7 @@ Qed.
   Theorem nnrcToPat_let_correct h cenv n env d :
     nnrcIsCore n ->
     NoDup (domain env) ->
-    NNRC.nnrc_core_eval h env n
+    cNNRC.nnrc_core_eval h env n
     = pr2op (interp h cenv (nnrcToPat_let (domain env) n)
                     (rec_sort (nnrc_to_pat_env env)) d).
   Proof.
@@ -1974,7 +1974,7 @@ Qed.
   Lemma nnrcToPat_let_sem_correct_top_ns h cenv n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_ns_let n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_ns_let n) nil dunit).
   Proof.
     intro Hiscore.
     intros.
@@ -1986,7 +1986,7 @@ Qed.
 
   Theorem nnrcToPat_let_sem_correct_top h cenv n :
     nnrcIsCore n ->
-    NNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_let nil n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToPat_let nil n) nil dunit).
   Proof.
     intros Hiscore.
     intros.
@@ -2004,7 +2004,7 @@ Qed.
   (** Lemma and proof for the linear size of the translation *)
 
   Lemma nnrc_subst_var_size n v v' :
-    nnrc_size (nnrc_subst n v (NNRC.NNRCVar v')) = nnrc_size n.
+    nnrc_size (nnrc_subst n v (cNNRC.NNRCVar v')) = nnrc_size n.
   Proof.
     induction n; simpl; auto;
     repeat dest_eqdec; auto.

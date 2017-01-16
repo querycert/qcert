@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCExtEq.
+Section NNRCEq.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -26,8 +26,8 @@ Section NNRCExtEq.
   Require Import Arith.
   
   Require Import Utils BasicRuntime.
-  Require Import NNRC NNRCNorm NNRCEq.
-  Require Import NNRCExt.
+  Require Import cNNRC cNNRCNorm cNNRCEq.
+  Require Import NNRC.
 
   Context {fruntime:foreign_runtime}.
 
@@ -141,7 +141,7 @@ Section NNRCExtEq.
     assumption.
   Qed.
 
-End NNRCExtEq.
+End NNRCEq.
 
 Notation "X ≡ᶜ Y" := (nnrc_ext_eq X Y) (at level 90) : nnrc_scope.                             (* ≡ = \equiv *)
 

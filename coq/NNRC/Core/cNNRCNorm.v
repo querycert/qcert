@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCProp.
+Section cNNRCProp.
 
   Require Import String.
   Require Import List.
@@ -24,7 +24,7 @@ Section NNRCProp.
 
   Require Import Utils BasicRuntime.
 
-  Require Import NNRC.
+  Require Import cNNRC.
 
   (** Named Nested Relational Calculus *)
 
@@ -109,7 +109,7 @@ Section NNRCProp.
       simpl; intros; congruence.
   Qed.
 
-End NNRCProp.
+End cNNRCProp.
 
 Hint Resolve nnrc_core_eval_normalized.
 

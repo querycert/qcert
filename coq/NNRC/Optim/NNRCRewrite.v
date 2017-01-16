@@ -23,8 +23,8 @@ Section NNRCRewrite.
   Require Import EquivDec.
 
   Require Import Utils BasicRuntime.
-  Require Import NNRC NNRCShadow.
-  Require Import NNRCExt NNRCExtShadow NNRCExtEq.
+  Require Import cNNRC cNNRCShadow.
+  Require Import NNRC NNRCShadow NNRCEq.
   Require Import NNRCRewriteUtil.
 
   Local Open Scope nnrc_scope.

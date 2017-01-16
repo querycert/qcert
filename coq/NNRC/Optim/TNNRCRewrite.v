@@ -24,9 +24,9 @@ Section TNNRCRewrite.
       
   Require Import Utils BasicSystem.
     
-  Require Import NNRC NNRCExt NNRCExtEq NNRCShadow NNRCExtShadow.
+  Require Import cNNRC NNRC NNRCEq cNNRCShadow NNRCShadow.
   Require Import NNRCRewriteUtil NNRCRewrite.
-  Require Import TNNRC TNNRCExt TNNRCExtShadow TNNRCExtEq.
+  Require Import TcNNRC TNNRC TNNRCShadow TNNRCEq.
 
   Local Open Scope nnrc_scope.
   (* e ⇒ unshadow(e) *)

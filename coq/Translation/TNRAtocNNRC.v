@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TNRAtoNNRC.
+Section TNRAtocNNRC.
 
   Require Import String.
   Require Import List.
@@ -26,7 +26,7 @@ Section TNRAtoNNRC.
   Require Import NRASystem.
   Require Import NNRCSystem.
 
-  Require Import NRAtoNNRC.
+  Require Import NRAtocNNRC.
 
   (** Type preservation for the translation from NRA to NNRC *)
 
@@ -316,7 +316,7 @@ Section TNRAtoNNRC.
     intuition; eauto.
   Qed.
 
-End TNRAtoNNRC.
+End TNRAtocNNRC.
 
 (* 
 *** Local Variables: ***

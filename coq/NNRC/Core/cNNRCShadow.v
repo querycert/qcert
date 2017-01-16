@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NNRCShadow.
+Section cNNRCShadow.
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -23,8 +23,7 @@ Section NNRCShadow.
 
   Require Import Utils BasicRuntime.
 
-  Require Import NNRC.
-  Require Import NNRCSize.
+  Require Import cNNRC.
 
   Close Scope nnrc_scope.
   
@@ -557,46 +556,6 @@ Section NNRCShadow.
       := if oldvar == newvar
          then e
          else (nnrc_subst e oldvar (NNRCVar newvar)).
-
-    Lemma nnrc_rename_lazy_size n x1 x2:
-      nnrc_size (nnrc_rename_lazy n x1 x2) = nnrc_size n.
-    Proof.
-      nnrc_cases (induction n) Case;
-        unfold nnrc_rename_lazy in *;
-        simpl;
-        destruct (equiv_dec x1 x2);
-        simpl;
-        try reflexivity;
-        try solve [ rewrite IHn1;
-                    rewrite IHn2;
-                    rewrite IHn3;
-                    reflexivity ];
-        try solve [ rewrite IHn1;
-                    rewrite IHn2;
-                    reflexivity ];
-        try solve [ rewrite IHn;
-                    reflexivity ];
-        try solve [ rewrite IHn1;
-                    destruct (equiv_dec v x1);
-                      simpl; try reflexivity;
-                    rewrite IHn2;
-                    reflexivity ].
-      - Case "NNRCVar"%string.
-        destruct (equiv_dec v x1);
-            simpl; reflexivity.
-      - Case "NNRCEither"%string.
-        rewrite IHn1.
-        destruct (equiv_dec v x1);
-          destruct (equiv_dec v0 x1);
-          simpl; try reflexivity.
-        + rewrite IHn3.
-          reflexivity.
-        + rewrite IHn2.
-          reflexivity.
-        + rewrite IHn2.
-          rewrite IHn3.
-          reflexivity.
-    Qed.
 
     Context (sep:string).
     (* as part of unshadowing, we also support a user defined renaming function *)
@@ -1792,7 +1751,7 @@ Section NNRCShadow.
     Qed.
     
   End core.
-End NNRCShadow.
+End cNNRCShadow.
 
 (* 
 *** Local Variables: ***

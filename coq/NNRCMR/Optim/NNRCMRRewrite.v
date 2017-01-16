@@ -1149,8 +1149,8 @@ Section NRewMR.
       repeat dest_eqdec; try congruence; simpl.
     assert (@nnrc_core_eval fruntime h
                (@cons
-                  (prod NNRC.var (@data (@foreign_runtime_data fruntime)))
-                  (@pair NNRC.var (@data (@foreign_runtime_data fruntime))
+                  (prod cNNRC.var (@data (@foreign_runtime_data fruntime)))
+                  (@pair cNNRC.var (@data (@foreign_runtime_data fruntime))
                      v0 d0)
                   (@cons
                      (prod var (@data (@foreign_runtime_data fruntime)))
