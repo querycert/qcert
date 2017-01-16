@@ -29,17 +29,17 @@ Section LambdaNRA.
 
   (** Lambda NRA AST *)
   Inductive lnra : Set :=
-  | LNRAVar : string -> lnra (** Variable access *)
+  | LNRAVar : string -> lnra (* Variable access *)
   | LNRATable : string -> lnra
   | LNRAConst : data -> lnra
   | LNRABinop : binOp -> lnra -> lnra -> lnra
   | LNRAUnop : unaryOp -> lnra -> lnra
-  | LNRAMap : lnra_lambda -> lnra -> lnra (** 'dependent operators' use lambdas *)
+  | LNRAMap : lnra_lambda -> lnra -> lnra (* 'dependent operators' use lambdas *)
   | LNRAMapConcat : lnra_lambda -> lnra -> lnra
   | LNRAProduct : lnra -> lnra -> lnra
   | LNRAFilter : lnra_lambda -> lnra -> lnra
   with lnra_lambda : Set :=
-  | LNRALambda : string -> lnra -> lnra_lambda (** Lambda is (\var.alg) *)
+  | LNRALambda : string -> lnra -> lnra_lambda (* Lambda is (\var.alg) *)
   .
 
   Tactic Notation "lnra_cases" tactic(first) ident(c) :=
