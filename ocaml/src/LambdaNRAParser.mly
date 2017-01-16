@@ -41,6 +41,7 @@
     | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
+    | "union" -> QLambdaNRA.labinop Compiler.AUnion (resolve_one_expr a el) e0
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
