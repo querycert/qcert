@@ -257,20 +257,20 @@ MODULES = \
 	Backend/CldMRtoJavaScript \
 	Backend/SparkData \
 	Backend/DNNRCtoScala \
-	Compiler/CompilerModel/CompilerRuntime \
-	Compiler/CompilerModel/CompilerModel \
-	Compiler/CompilerModel/FloatModelPart \
-	Compiler/CompilerModel/StringModelPart \
-	Compiler/CompilerModel/DateTimeModelPart \
-	Compiler/CompilerModel/SqlDateModelPart \
-	Compiler/CompilerModel/EnhancedModel \
-	Compiler/CompilerModel/TrivialModel \
-	Compiler/CompilerDriver/CompLang \
-	Compiler/CompilerDriver/CompEnv \
-	Compiler/CompilerDriver/CompConfig \
-	Compiler/CompilerDriver/CompDriver \
-	Compiler/CompilerDriver/CompStat \
-	Compiler/CompilerDriver/CompEval \
+	Compiler/Model/CompilerRuntime \
+	Compiler/Model/CompilerModel \
+	Compiler/Model/FloatModelPart \
+	Compiler/Model/StringModelPart \
+	Compiler/Model/DateTimeModelPart \
+	Compiler/Model/SqlDateModelPart \
+	Compiler/Model/EnhancedModel \
+	Compiler/Model/TrivialModel \
+	Compiler/Driver/CompLang \
+	Compiler/Driver/CompEnv \
+	Compiler/Driver/CompConfig \
+	Compiler/Driver/CompDriver \
+	Compiler/Driver/CompStat \
+	Compiler/Driver/CompEval \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QCAMP \
