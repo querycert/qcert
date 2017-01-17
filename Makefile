@@ -230,9 +230,6 @@ MODULES = \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \
-	Translation/CAMPSugartoNRA \
-	Translation/CAMPSugartocNRAEnv \
-	Translation/CAMPSugartoNRAEnv \
 	Translation/RuletoNRA \
 	Translation/RuletocNRAEnv \
 	Translation/RuletoNRAEnv \

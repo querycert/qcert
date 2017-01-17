@@ -391,17 +391,50 @@ Section CAMPtoNRA.
     destruct (interp h c p nil d); intros; simpl; eauto.
   Qed.
 
-Section size.
-  Require Import Omega.
+  Section size.
+    Require Import Omega.
 
-  (** Proof showing linear size translation *)
-  Lemma pat_trans_size p :
-    nra_size (nra_of_pat p) <= 41 * pat_size p.
-  Proof.
-    induction p; simpl; omega.
-  Qed.
+    (** Proof showing linear size translation *)
+    Lemma pat_trans_size p :
+      nra_size (nra_of_pat p) <= 41 * pat_size p.
+    Proof.
+      induction p; simpl; omega.
+    Qed.
 
-End size.
+  End size.
+
+  Section sugar.
+    (* Mapping to NRA for the built-in operators *)
+    (* and *)
+  
+    Definition nra_of_pand (p1 p2:pat) : nra :=
+      nra_of_pat (pand p1 p2).
+
+    Definition nra_for_pand (q1 q2:nra) : nra :=
+      (♯flatten(χ⟨q2
+                 ⟩( unnest_two "PBIND1" "PBIND"
+                               (χ⟨‵[| ("PDATA", (ID) · "PDATA")|]
+                                   ⊕ (‵[| ("PCONST", (ID) · "PCONST")|]
+                                       ⊕ ‵[| ("PBIND1", (ID) · "PBIND" ⊗ (ID) · "PBIND1")|])
+                                 ⟩( unnest_two "a1" "PBIND1"
+                                               (‵{|ID
+                                                     ⊕ ‵[| ("a1",
+                                                            χ⟨‵[||] ⟩( σ⟨ID ⟩( q1)))|]|}))))))%nra.
+
+
+    Lemma nra_of_pand_works (p1 p2:pat) :
+      nra_of_pat (pand p1 p2) = nra_for_pand (nra_of_pat p1) (nra_of_pat p2).
+    Proof.
+      simpl.
+      reflexivity.
+    Qed.
+  
+    (* WW *)
+    
+    Definition nra_of_WW (p:pat) :=
+      nra_of_pat (WW p).
+
+  End sugar.
 
 End CAMPtoNRA.
 

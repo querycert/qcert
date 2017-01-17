@@ -156,6 +156,31 @@ Section CAMPtoNRAEnv.
 
   End size.
 
+  Section sugar.
+    Definition nraenv_of_pand (p1 p2:pat) : nraenv :=
+      nraenv_of_pat (pand p1 p2).
+
+    Definition nraenv_for_pand (q1 q2: nraenv) : nraenv :=
+      NRAEnvUnop AFlatten
+                 (NRAEnvAppEnv (NRAEnvMapEnv q2)
+                               (NRAEnvUnop AFlatten
+                                           (NRAEnvMap (NRAEnvBinop AMergeConcat NRAEnvEnv NRAEnvID)
+                                                      (NRAEnvMap (NRAEnvConst (drec nil))
+                                                                 (NRAEnvSelect NRAEnvID q1))))).
+  
+    Lemma nraenv_of_pand_works (p1 p2:pat) :
+      nraenv_of_pat (pand p1 p2) = nraenv_for_pand (nraenv_of_pat p1) (nraenv_of_pat p2).
+    Proof.
+      reflexivity.
+    Qed.
+
+    (* WW *)
+
+    Definition nraenv_of_WW (p:pat) :=
+      nraenv_of_pat (WW p).
+
+  End sugar.
+
 End CAMPtoNRAEnv.
 
 (* 
