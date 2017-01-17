@@ -387,6 +387,7 @@ Section DNNRCtoScala.
       | None => "CANTCASTTODISTRIBUTEDTYPE"
       end.
 
+  (* XXX This should be moved and generalized for arbitrary tdbindings XXX *)
   Definition dnnrc_infer_type {A: Set} (e: dnnrc A dataset) (inputType: rtype)
     : option (dnnrc (type_annotation A) dataset) :=
     let tdb: tdbindings :=
