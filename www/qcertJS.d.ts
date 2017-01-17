@@ -15,10 +15,21 @@ type QcertCompilerConfig = {
     target:QcertLanguage,  /* Target language */
     path:string[],         /* Intermediate compilation steps (excluding source/target) */
     exactpath: boolean,    /* true if forcing exact compilation path */
+    emitall: boolean       /* true if emitting for all intermediate languages */
     sourcesexp: boolean,   /* true if input language uses s-expression syntax */
     ascii: boolean,        /* true for ascii pp instead of greek pp */
     javaimports: string,   /* optional java imports for Java back-end */
     query: string};        /* Input query */
+
+type QcertResultFile = {
+    file: string;         /* File name */
+    lang: string;         /* Language name */
+    value: string};       /* Emitted code */
+
+type QcertResult = {
+    emit: QcertResultFile;
+    emitall: QcertResultFile[];
+    result: string};
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;
@@ -40,5 +51,5 @@ declare function qcertOptimDefaults(): {optims: QcertOptimConfig[]};
  * @config specifies the compilation parameters, including source,target,ascii/greek,additional java imports, and the query in source form
  * @returns Includes the intermediate representation for the target language
  */
-declare function qcertCompile(config:QcertCompilerConfig): string;
+declare function qcertCompile(config:QcertCompilerConfig): QcertResult;
 

@@ -127,7 +127,8 @@ let wrap_all wrap_f l =
 let json_of_result res =
   let wrap x =
       object%js
-        val name = Js.string x.QcertCore.res_file
+        val file = Js.string x.QcertCore.res_file
+        val lang = Js.string x.QcertCore.res_lang
         val value = Js.string x.QcertCore.res_content
       end
   in

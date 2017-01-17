@@ -32,11 +32,12 @@ type result = {
   }
 and result_file = {
     res_file : string;
+    res_lang : string;
     res_content : string;
   }
 
 let no_result_file =
-  { res_file = ""; res_content = ""; }
+  { res_file = ""; res_lang = ""; res_content = ""; }
 
 (******************)
 (* Core functions *)
@@ -86,9 +87,10 @@ let emit_string (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) prett
   let s = PrettyIL.pretty_query pretty_conf q in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
-  let ext = ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q) in
+  let lang = QLang.language_of_query brand_model q in
+  let ext = ConfigUtil.suffix_of_language lang in
   let fout = outname (target_f dir fpref) ext in
-  { res_file = fout; res_content = s; }
+  { res_file = fout; res_lang = QcertUtil.name_of_language lang; res_content = s; }
 
 (* Emit s-expr *)
 
@@ -97,9 +99,10 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let s = SExp.sexp_to_string sexp in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let fpref = Filename.chop_extension file_name in
-  let fpost = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
+  let lang = QLang.language_of_query brand_model q in
+  let fpost = QcertUtil.name_of_language lang in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
-  { res_file = fout; res_content = s; }
+  { res_file = fout; res_lang = QcertUtil.name_of_language lang; res_content = s; }
 
 (* Eval *)
 
@@ -135,7 +138,7 @@ let eval_string (validate:bool) (debug:bool) (data:QEval.eval_input) (expected_o
   let fpref = Filename.chop_extension file_name in
   let fpost = language_name in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in
-  { res_file = fout; res_content = s; }
+  { res_file = fout; res_lang = language_name; res_content = s; }
 
 (* Stats *)
 
@@ -148,10 +151,11 @@ let stat_query (schema: TypeUtil.schema) q =
 let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   let name = char_list_of_string (Filename.chop_extension file_name) in
   let brand_model = schema.TypeUtil.sch_brand_model in
+  let language_name = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
   let stats = QStat.json_stat_tree_of_query brand_model name q in
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_stats.json" in
-  { res_file = fout; res_content = string stats; }
+  { res_file = fout; res_lang = language_name; res_content = string stats; }
 
 (* Main *)
 

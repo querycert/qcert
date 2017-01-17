@@ -66,18 +66,18 @@
       }
       function displayAllResults(allresults) {
 	for (var i=0; i<allresults.length; i++) {
-	  addResult(allresults[i].name,allresults[i].value);
+	  addResult(allresults[i].file,allresults[i].lang,allresults[i].value);
 	}
       }
-      function addResult(name,value) {
+      function addResult(file,lang,value) {
         var allres = document.getElementById("allresults");
-        var lang = document.createElement("b");
-        var t1 = document.createTextNode(name);
-        lang.appendChild(t1);
+        var l = document.createElement("b");
+        var t1 = document.createTextNode(lang);
+        l.appendChild(t1);
         var query = document.createElement("pre");
         var t2 = document.createTextNode(value);
         query.appendChild(t2);
-        allres.appendChild(lang);
+        allres.appendChild(l);
         allres.appendChild(query);
       }
       function addPath() {
