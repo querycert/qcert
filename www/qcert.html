@@ -34,9 +34,6 @@
 				document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
 				displayAllResults(compilationResult.emitall);
 			}
-			function displayAllResults() {
-					document.getElementById("execresult").innerHTML = escapeHtml(result);
-	                }
 			function performEvaluation() {
 					var io = document.getElementById("io").value;
 					eval(compiledQuery);
@@ -54,6 +51,7 @@
       function clearButton() {
         document.getElementById("result").innerHTML = "";
         document.getElementById("execresult").innerHTML = "";
+        document.getElementById("allresults").innerHTML = "";
       }
     </script>
     <script>
@@ -65,6 +63,7 @@
         sel.appendChild(opt);
       }
       function displayAllResults(allresults) {
+        document.getElementById("allresults").innerHTML = "";
 	for (var i=0; i<allresults.length; i++) {
 	  addResult(allresults[i].file,allresults[i].lang,allresults[i].value);
 	}
