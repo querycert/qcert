@@ -233,16 +233,22 @@ Section CompDriver.
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
       nnrcmr_prepared_to_spark_rdd rulename (nnrcmr_to_nnrcmr_spark_rdd_prepare q).
 
+  (* XXX This should be generalized for arbitrary tdbindings XXX *)
+    Definition dnnrc_infer_world {A: Set} (e: dnnrc _ A dataset) (inputType: rtype)
+      : option (dnnrc _ (type_annotation A) dataset) :=
+      let tdb: tdbindings := ("CONST$WORLD"%string, (Tdistr inputType))::nil in
+      infer_dnnrc_type tdb e.
+
     Definition dnnrc_dataset_to_dnnrc_typed_dataset
                (e: dnnrc_dataset) (inputType: rtype)
       : option dnnrc_typed_dataset :=
-      dnnrc_infer_type e inputType.
+      dnnrc_infer_world e inputType.
 
+    (* Backend *)
     Definition dnnrc_typed_dataset_to_spark_dataset
                (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
       @dnnrcToSpark2Top _ _ bm _ _ unit inputType name q.
 
-    (* Backend *)
     Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
       mapReducePairstoCloudant h q rulename.
 
