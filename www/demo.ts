@@ -445,6 +445,9 @@ class Grid {
 
 class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, Displayable {
 
+	langid:QcertLanguage;
+	langdescription:string;
+
 	isTransient() {
 		return true;
 	}
@@ -1527,7 +1530,6 @@ class TabManager extends ICanvasTab {
 	}
 }
 
-
 class BuilderTab extends ICanvasTab {
 
 	static make(canvas:fabric.ICanvas) {
@@ -1721,7 +1723,10 @@ class BuilderTab extends ICanvasTab {
 }
 
 class InputTab extends ICanvasTab {
-	rect:fabric.IObject;
+	titleTextElement:Node;
+	inputTabElement:HTMLElement;
+	queryInput:HTMLElement;
+	defaultTitleTextElement:Node;
 
 	static make(canvas:fabric.ICanvas) {
 		return new InputTab(canvas);
@@ -1729,12 +1734,10 @@ class InputTab extends ICanvasTab {
 
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
-		this.rect = new fabric.Rect({
-			left: 10, top: 5, width:200, height:50, fill:'purple',
-			hasBorders:false, 
-			hasControls:false,
-			selectable:false
-       });
+		this.inputTabElement = document.getElementById("input-tab");
+		this.titleTextElement = document.getElementById("input-tab-lang-title");
+		this.defaultTitleTextElement = <HTMLElement>this.titleTextElement.cloneNode(true);
+		this.queryInput = document.getElementById("input-tab-query-input");
 	}
 
 	getLabel() {
@@ -1745,9 +1748,58 @@ class InputTab extends ICanvasTab {
 		return {fill:'orange'};
 	}
 
+	static getSrcLanguagePiece() {
+		const pipeline = getPipelinePieces();
+		if(pipeline === undefined || pipeline.length == 0) {
+			return errorPiece;
+		} else {
+			return pipeline[0];
+		}
+	}
+
+	clearTitle() {
+		while(this.titleTextElement.hasChildNodes()) {
+			this.titleTextElement.removeChild(this.titleTextElement.firstChild);
+		}
+	}
+
+	setErrorTitleText() {
+		const newNode = this.defaultTitleTextElement.cloneNode(true)
+		this.titleTextElement.parentNode.replaceChild(newNode, this.titleTextElement);
+		this.titleTextElement = newNode;
+	}
+
+	setSrcLanguage(piece:BasicPuzzlePiece) {
+		this.clearTitle();
+		const titleElem = document.createElement('h1');
+		titleElem.style.textAlign = 'center';
+		titleElem.appendChild(document.createTextNode("Input Language: " + piece.langid + " [" + piece.langdescription + "]"));
+		this.titleTextElement.appendChild(titleElem);
+	}
+
+	update() {
+		const srcpiece = InputTab.getSrcLanguagePiece();
+		if(srcpiece.langid == 'error') {
+			this.setErrorTitleText();
+			this.queryInput.style.display="none";
+		} else {
+			this.setSrcLanguage(srcpiece);
+			this.queryInput.style.display="block";
+		}
+	}
+
 	show() {
-		this.canvas.selection = false;
-		this.canvas.add(this.rect);
+		this.clearTitle();
+		this.update();
+
+		this.inputTabElement.style.display="block";
+		this.canvas.getElement().style.display="none";
+
+	}
+
+	hide() {
+		this.canvas.getElement().style.display="block";
+		this.inputTabElement.style.display="none";
 	}
 }
 
@@ -2233,4 +2285,26 @@ function init():void {
 	const tm = TabManager.make(tabscanvas, {label:"Q*cert"}, tabs, 0);
 	tm.show();
 	tabscanvas.renderAll();
+}
+
+function handleFile(output:string, files:FileList) {
+	if (files.length > 0) {
+		const file = files[0];
+		const reader = new FileReader();
+		const outputElem:HTMLTextAreaElement = <HTMLTextAreaElement>document.getElementById(output);
+		reader.onload = function(event) {
+			const txt:string = (<any>event.target).result;
+			outputElem.value = txt;
+		}
+		reader.readAsText(file);
+	}
+}
+
+
+function handleFileDrop(output:string, event:DragEvent) {
+	event.stopPropagation();
+  	event.preventDefault();
+	var dt = event.dataTransfer;
+  	var files = dt.files;
+	handleFile(output, files);
 }

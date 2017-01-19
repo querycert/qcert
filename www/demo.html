@@ -16,6 +16,37 @@
 	<canvas id="tabs-canvas" width="1000" height="50"></canvas>
 	<div id="container" style="position:relative">
 		<canvas id="main-canvas" width="1000" height="700"></canvas>
+		<div id="input-tab" style="display:none; position:absolute; left:10px; top:10px">
+			<div id="input-tab-lang-title">
+				<h1 style="text-align: center">No Input language specified</h1>
+				<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
+			</div>
+			<div id="input-tab-query-input">
+			<div id="input-tab-query-input-src">
+			<label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-src-file" onchange='handleFile("input-tab-query-src-text", this.files)'/>
+	  		<br/>
+          <textarea id = "input-tab-query-src-text"
+                    rows = "10"
+                    cols = "80" 
+					spellcheck="false"						
+					autocapitalize="none"
+					ondrop='handleFileDrop("input-tab-query-src-text", event)'
+					></textarea>
+          	</div>
+			  <p></p>
+			  <div id="input-tab-query-input-io">
+			<label>io (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-io-text", this.files)'/>
+	  		<br/>
+          <textarea id = "input-tab-query-io-text"
+                    rows = "10"
+                    cols = "80" 
+					spellcheck="false"
+					autocapitalize="none"
+					ondrop='handleFileDrop("input-tab-query-io-text", event)'
+					></textarea>
+          	</div>
+		 </div>
+		</div>
 	</div>
 </body>
 
