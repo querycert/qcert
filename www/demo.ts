@@ -1877,31 +1877,67 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 	return str;
 }
 
-class PathTab extends ICanvasTab {
+class RunTab extends ICanvasTab {
 
 	static make(canvas:fabric.ICanvas) {
-		return new PathTab(canvas);
+		return new RunTab(canvas);
 	}
 
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
 	}
 	getLabel() {
-		return "Path[temp]";
+		return "Run";
 	}
 
 	getRectOptions() {
 		return {fill:'orange'};
 	}
 
+	/* We should save and compare against the old workspace state
+	 * so that we don't recompile everything everytime we come back to this tab
+	 * Maybe create a state manager,
+	 * and allow each tab to register with it and save/restore state as needed
+	 *
+	 * 
+	 */
+
+	setError(msg:string) {
+		console.log(msg);
+	}
+
     show() {
 		this.canvas.selection = false;
 		const langs = getPipelineLangs();
-		//const expanded = expandLangsPath(langs);
-		const path = langs.map(getLanguageMarkedLabel).join(" -> ");
+		const optims = getOptimConfig();
+		const srcInput = getSrcInput();
+		const ioInput = getIOInput();
 
-		const txt = new fabric.Text(path, {
-			left: 10, top: 5, width:200, height:50, fill:'purple'
+		const path = langs.map(x => x.id);
+		if(path.length <= 2) {
+			this.setError("There needs to be a start and end language.");
+			return;
+		}
+
+		const middlePath = path.slice(1,-1);
+		
+		const resultPack = qcertCompile({
+			source:path[0],
+			target:path[path.length-1],
+			path:middlePath,
+			exactpath:true,
+			emitall:true,
+			sourcesexp:false,
+			ascii:false,
+			javaimports:undefined,
+			query:srcInput
+		});
+		const resultStr = resultPack.result;
+		const emissions = resultPack.emitall;
+
+
+		const txt = new fabric.Text(resultStr, {
+			left: 10, top: 5, width:200, height:500, fill:'purple'
 		});
 		
 		this.canvas.add(txt);
@@ -2272,7 +2308,7 @@ const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
 	BuilderTab.make,
 	InputTab.make,
 	OptimizationsTabMake,
-	PathTab.make
+	RunTab.make
 ];
 
 function init():void {
@@ -2307,4 +2343,14 @@ function handleFileDrop(output:string, event:DragEvent) {
 	var dt = event.dataTransfer;
   	var files = dt.files;
 	handleFile(output, files);
+}
+
+function getSrcInput():string {
+	const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-src-text');
+	return elem.value;
+}
+
+function getIOInput():string {
+	const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-io-text');
+	return elem.value;
 }
