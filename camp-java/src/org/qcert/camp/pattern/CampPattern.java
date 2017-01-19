@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,29 @@ import org.qcert.camp.CampAST;
  * Represents all Patterns (expressions in CAMP rather than Rules or Data)
  */
 public abstract class CampPattern extends CampAST {
-	public enum Kind {
-		  pconst, punop, pbinop, pmap, passert, 
-		  porElse, pit, pletIt, pgetconstant, penv, 
-		  pletEnv, pleft, pright; 
-	}
-
 	/** Single instance of the env pattern */
 	public static final EnvPattern ENV = new EnvPattern();
+
 	/** Single instance of the it pattern */
 	public static final ItPattern IT = new ItPattern();
 	/** Single instance of the left pattern */
 	public static final CampPattern LEFT = new LeftPattern();
 	/** Single instance of the right pattern */
 	public static final RightPattern RIGHT = new RightPattern();
-	
 	private final CampPattern[] operands;
 	
 	CampPattern(CampPattern ... operands) {
 		this.operands = operands;
+	}
+	
+	/**
+	 * A few subclasses can exist in partially applied form and complete themselves using this call.
+	 * The default implementation throws an exception
+	 * @param operand the operand to which the partially applied pattern is to be applied in order to complete itself
+	 * @return the completed pattern
+	 */
+	public CampPattern applyTo(CampPattern operand) {
+		throw new UnsupportedOperationException("This pattern does not support 'applyTo'");
 	}
 	
 	public abstract Kind getKind();
@@ -64,5 +68,20 @@ public abstract class CampPattern extends CampAST {
 	@Override
 	protected Object[] getOperands() {
 		return operands;
+	}
+	
+	/**
+	 * Those subclasses that can be partially applied and have not been applied (have a current signature of pat->pat) should
+	 *   return true.  Default returns false.
+	 * @return whether this pattern is a function
+	 */
+	public boolean isFunction() {
+		return false;
+	}
+	
+	public enum Kind {
+		  pconst, punop, pbinop, pmap, passert, 
+		  porElse, pit, pletIt, pgetconstant, penv, 
+		  pletEnv, pleft, pright; 
 	}
 }

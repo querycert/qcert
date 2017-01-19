@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.qcert.camp.pattern;
 
 import org.qcert.camp.data.CampData;
+import org.qcert.camp.data.FloatData;
 import org.qcert.camp.data.NatData;
 import org.qcert.camp.data.StringData;
 
@@ -33,29 +34,42 @@ public final class ConstPattern extends CampPattern {
 		this.data = data;
 	}
 
-	/** Convenience constructor for String constants */
-	public ConstPattern(String value) {
-		this(new StringData(value));
-	}
-	
 	/** Convenience constructor for integral constants */
 	public ConstPattern(long value) {
 		this(new NatData(value));
 	}
 	
+	/** Convenience constructor for the family of "simple" types (Java wrapper types plus String and null) */
+	public ConstPattern(Object value) {
+		this(convertToCampData(value));
+	}
+	
+	/** Convenience constructor for String constants */
+	public ConstPattern(String value) {
+		this(new StringData(value));
+	}
+
 	/**
 	 * @return the data
 	 */
 	public CampData getData() {
 		return data;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.qcert.camp.pattern.CampPattern#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.pconst;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return data.toString();
 	}
 
 	/* (non-Javadoc)
@@ -74,11 +88,25 @@ public final class ConstPattern extends CampPattern {
 		return "Pconst";
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return data.toString();
+	private static CampData convertToCampData(Object value) {
+		if (value == null)
+			return CampData.NULL;
+		switch (value.getClass().getName()) {
+		case "java.lang.Byte":
+		case "java.lang.Short":
+		case "java.lang.Integer":
+		case "java.lang.Long":
+			return new NatData(((Number) value).longValue());
+		case "java.lang.Float":
+		case "java.lang.Double":
+			return new FloatData(((Number) value).doubleValue());
+		case "java.lang.Boolean":
+			return ((Boolean) value).booleanValue() ? CampData.TRUE : CampData.FALSE;
+		case "java.lang.Character":
+		case "java.lang.String":
+			return new StringData(value.toString());
+		default:
+			throw new IllegalArgumentException("Can't construct CampData representation for type " + value.getClass().getName());
+		}
 	}
 }

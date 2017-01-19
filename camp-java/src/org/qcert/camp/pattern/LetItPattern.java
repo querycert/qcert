@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,23 @@ package org.qcert.camp.pattern;
 
 
 /**
- * Represents the CAMP letIt pattern
+ * Represents the CAMP letIt pattern.  This pattern can exist in a partially applied form (with only one operand bound, making
+ *   the resulting signature pat->pat instead of pat.
  */
 public class LetItPattern extends CampPattern {
+	/** Make a partially applied LetItPattern to be completed using applyTo */
+	public LetItPattern(CampPattern operand1) {
+		this(operand1, null);
+	}
+
+	/** Make a complete LetItPattern of type 'pat' */
 	public LetItPattern(CampPattern operand1, CampPattern operand2) {
 		super(operand1, operand2);
+	}
+	
+	@Override
+	public CampPattern applyTo(CampPattern operand2) {
+		return new LetItPattern(getOperand1(), operand2);
 	}
 
 	/* (non-Javadoc)
@@ -32,12 +44,9 @@ public class LetItPattern extends CampPattern {
 		return Kind.pletIt;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
 	@Override
-	protected String getTag() {
-		return "PletIt";
+	public boolean isFunction() {
+		return getOperand2() == null;
 	}
 
 	/* (non-Javadoc)
@@ -45,6 +54,15 @@ public class LetItPattern extends CampPattern {
 	 */
 	@Override
 	public String toString() {
-		return "let IT = " + getOperand1() + "in " + getOperand2();
+		CampPattern op2 = getOperand2();
+		return "let IT = " + getOperand1() + "in " + (op2 == null ? "??" : op2);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		return "PletIt";
 	}
 }

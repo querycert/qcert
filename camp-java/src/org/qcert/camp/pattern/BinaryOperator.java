@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,5 +59,51 @@ public enum BinaryOperator {
     ATimeGt,
     ATimeGe,
     ATimeDurationFromScale, 
-    ATimeDurationBetween 
+    ATimeDurationBetween;
+	
+	public boolean isBoolean() {
+		switch (this) {
+		case AEq:
+		case AAnd:
+		case AContains:
+		case AFloatGe:
+		case AFloatGt:
+		case AFloatLe:
+		case AFloatLt:
+		case AFloatNe:
+		case ALe:
+		case ALt:
+		case AOr:
+		case ATimeGe:
+		case ATimeGt:
+		case ATimeLe:
+		case ATimeLt:
+		case ATimeNe:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	public boolean isArithmetic() {
+		switch (this) {
+		case AFloatDiv:
+		case AFloatMax:
+		case AFloatMin:
+		case AFloatMinus:
+		case AFloatMult:
+		case AFloatPlus:
+		case AFloatPow:
+		case ArithDivide:
+		case ArithMax:
+		case ArithMin:
+		case ArithMinus:
+		case ArithMult:
+		case ArithPlus:
+		case ArithRem:
+			return true;
+		default:
+			return false;
+		}
+	}
 }

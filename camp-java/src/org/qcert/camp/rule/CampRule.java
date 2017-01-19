@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.qcert.camp.pattern.CampPattern;
  * Represents Rules (macros defined on CAMP patterns)
  */
 public abstract class CampRule extends CampAST {
-	public abstract CampRule apply(CampRule operand);
+	public abstract CampRule applyTo(CampRule operand);
 
 	public abstract CampPattern convertToPattern();
 

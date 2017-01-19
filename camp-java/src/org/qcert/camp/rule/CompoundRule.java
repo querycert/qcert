@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.util.List;
 import org.qcert.camp.pattern.CampPattern;
 
 /**
- * Represents a compound rule formed from other FunctionRules 
+ * Represents a compound rule formed from other parially applied rules (for which isFunction() is true)
  */
 public final class CompoundRule extends CampRule {
 	private final List<CampRule> members;
@@ -35,13 +35,13 @@ public final class CompoundRule extends CampRule {
 		else if (left.isFunction())
 			members.add(left);
 		else
-			throw new IllegalArgumentException("First rule argment is not a function");
+			throw new IllegalArgumentException("First rule argument is not a function");
 		if (right instanceof CompoundRule)
 			members.addAll(((CompoundRule) right).members);
 		else if (right.isFunction())
 			members.add(right);
 		else
-			throw new IllegalArgumentException("Second rule argment is not a function");
+			throw new IllegalArgumentException("Second rule argument is not a function");
 		this.members = Collections.unmodifiableList(members);
 	}
 
@@ -49,18 +49,18 @@ public final class CompoundRule extends CampRule {
 	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
 	 */
 	@Override
-	public CampRule apply(CampRule rule) {
+	public CampRule applyTo(CampRule rule) {
 		List<CampRule> toApply = new ArrayList<>(members);
 		Collections.reverse(toApply);
 		for (CampRule next : toApply) {
-			rule = next.apply(rule);
+			rule = next.applyTo(rule);
 		}
 		return rule;
 	}
 
 	/** See comment in "convertToPattern" */
 	public CampPattern convertForAggregate() {
-		return apply(new ReturnRule(CampPattern.ENV)).convertToPattern();
+		return applyTo(new ReturnRule(CampPattern.ENV)).convertToPattern();
 	}
 
 	/**

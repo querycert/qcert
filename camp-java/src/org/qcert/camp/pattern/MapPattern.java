@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,18 @@ package org.qcert.camp.pattern;
 
 
 /**
- * Represents a CAMP Map pattern 
+ * Represents a CAMP Map pattern.  This pattern can exist in a partially applied form (with only one operand bound, making
+ *   the resulting signature pat->pat instead of pat.
  */
 public class MapPattern extends CampPattern {
+	/** Make a complete Map pattern */
 	public MapPattern(CampPattern operand) {
 		super(operand);
+	}
+	
+	/** Make a partially applied map pattern */
+	public MapPattern() {
+		super((CampPattern) null);
 	}
 
 	/* (non-Javadoc)
@@ -40,11 +47,17 @@ public class MapPattern extends CampPattern {
 		return "Pmap";
 	}
 
+	@Override
+	public boolean isFunction() {
+		return getOperand() == null;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return "map " + getOperand();
+		CampPattern op = getOperand();
+		return "map " + (op == null ? "??" : op);
 	}
 }

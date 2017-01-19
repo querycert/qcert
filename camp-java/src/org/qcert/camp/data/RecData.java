@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class RecData extends CampData {
 	 */
 	@Override
 	protected String getTag() {
-		return "Drec";
+		return "drec";
 	}
 
 	/* (non-Javadoc)

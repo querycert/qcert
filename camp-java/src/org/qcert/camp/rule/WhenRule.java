@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach 
+ * Copyright (C) 2016-2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public final class WhenRule extends PatternRule {
 	 * @see org.qcert.camp.rule.CampRule#apply(org.qcert.camp.rule.CampRule)
 	 */
 	@Override
-	public CampRule apply(CampRule operand) {
+	public CampRule applyTo(CampRule operand) {
 		return new WhenRule(this, operand);
 	}
 
