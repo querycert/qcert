@@ -24,9 +24,10 @@ type global_config = {
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
-    mutable gconf_io : string option;
-    mutable gconf_io_use_world : bool;
+    mutable gconf_schema_file : string option;
     mutable gconf_schema : TypeUtil.schema;
+    mutable gconf_io_file : string option;
+    mutable gconf_io_use_world : bool;
     mutable gconf_data : QEval.eval_input;
     mutable gconf_expected_output_data : DataUtil.io_output;
     gconf_cld_conf : CloudantUtil.cld_config;
@@ -41,7 +42,7 @@ type global_config = {
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_vdbindings : QLang.vdbindings;
+    mutable gconf_tdbindings : QLang.tdbindings;
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
@@ -49,7 +50,7 @@ type global_config = {
 
 let complet_configuration gconf =
   let _schema =
-    begin match gconf.gconf_io with
+    begin match gconf.gconf_io_file with
     | Some io ->
         gconf.gconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
     | None ->
@@ -57,7 +58,7 @@ let complet_configuration gconf =
     end
   in
   let _data =
-    begin match gconf.gconf_io with
+    begin match gconf.gconf_io_file with
     | Some io ->
 	if gconf.gconf_io_use_world
 	then
@@ -73,7 +74,7 @@ let complet_configuration gconf =
     end
   in
   let _expected_output_data =
-    begin match gconf.gconf_io with
+    begin match gconf.gconf_io_file with
     | Some io ->
         gconf.gconf_expected_output_data <- DataUtil.get_output (Some (ParseString.parse_io_from_string io))
     | None ->
@@ -108,6 +109,6 @@ let driver_conf_of_global_conf gconf qname cname =
     comp_brand_rel = brand_rel;
     comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
-    comp_vdbindings = gconf.gconf_vdbindings;
+    comp_tdbindings = gconf.gconf_tdbindings;
     comp_java_imports = char_list_of_string gconf.gconf_java_imports;
     comp_optim_config = []; (* XXX To be populate from command line and JS for optimizer parameterization XXX *) }

@@ -38,8 +38,10 @@ let args_list gconf =
        "<dir> Directory for the emitied code of target (if not specified use the one given by -dir)");
       ("-js-runtime", Arg.String (CloudantUtil.set_harness gconf.gconf_cld_conf),
        "<harness.js> JavaScript runtime");
-      ("-io", Arg.String (QcertArg.set_io gconf),
-       "<file.io> Schema and inputs data for evaluation");
+      ("-schema", Arg.String (QcertArg.set_schema_file gconf),
+       "<file.schema> Schema");
+      ("-io", Arg.String (QcertArg.set_io_file gconf),
+       "<file.io> I/O file (Schema and inputs data) for evaluation");
       ("-io-use-world", Arg.Unit (QcertArg.set_io_use_world gconf),
        "Declare 'CONST$WORLD' as a distributed variable");
       ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
@@ -138,9 +140,10 @@ let parse_args () =
       gconf_exact_path = false;
       gconf_dir = None;
       gconf_dir_target = None;
-      gconf_io = None;
-      gconf_io_use_world = false;
+      gconf_schema_file = None;
       gconf_schema = TypeUtil.empty_schema;
+      gconf_io_file = None;
+      gconf_io_use_world = false;
       gconf_data = Compiler.Ev_in_world [];
       gconf_expected_output_data = [];
       gconf_cld_conf = CloudantUtil.default_cld_config ();
@@ -155,7 +158,7 @@ let parse_args () =
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_vdbindings = [];
+      gconf_tdbindings = [];
       gconf_stat = false;
       gconf_stat_all = false;
       gconf_stat_tree = false; }

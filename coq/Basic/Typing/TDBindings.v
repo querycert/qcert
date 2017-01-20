@@ -103,7 +103,18 @@ Section TDBindings.
     rewrite H3 in H2.
     trivial.
   Qed.
-    
+
+  Section vdbindings.
+    Definition t_to_v (bind:string * drtype) : string * dlocalization :=
+      match snd bind with
+      | Tlocal _ => (fst bind, Vlocal)
+      | Tdistr _ => (fst bind, Vdistr)
+      end.
+
+    Definition vdbindings_of_tdbindings (binds:tdbindings) : vdbindings :=
+      map t_to_v binds.
+  End vdbindings.
+  
 End TDBindings.
 
 Hint Resolve dbindings_type_Forall_normalized.

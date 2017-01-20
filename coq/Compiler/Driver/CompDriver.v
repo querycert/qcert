@@ -1162,7 +1162,7 @@ Section CompDriver.
       end
     | L_nnrc_core =>
       match dv with
-      | Dv_camp dv => Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst config.(comp_vdbindings)) dv) (* XXX to check XXX *)
+      | Dv_camp dv => Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (vdbindings_of_tdbindings config.(comp_tdbindings))) dv) (* XXX to check XXX *)
       | Dv_nnrc_core dv => Dv_nnrc_core (Dv_nnrc_core_optim (get_optim_config L_nnrc_core config.(comp_optim_config)) dv)
       | Dv_nnrc dv => Dv_nnrc_core (Dv_nnrc_core_to_nnrc dv)
       | Dv_nraenv _
@@ -1188,7 +1188,7 @@ Section CompDriver.
     | L_nnrc =>
       match dv with
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (* config.(comp_vdbindings) *) dv)
-      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset config.(comp_vdbindings) dv)
+      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_tdbindings config.(comp_tdbindings)) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc config.(comp_optim_config)) dv)
@@ -1418,7 +1418,7 @@ Section CompDriver.
         | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit (* vdbindings *) _) =>
           vinit = config.(comp_mr_vinit) (* /\ vdbindings = config.(comp_vdbindings) *)
         | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset vdbindings _) =>
-          vdbindings = config.(comp_vdbindings)
+          vdbindings = vdbindings_of_tdbindings config.(comp_tdbindings)
         | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
           class_name = config.(comp_class_name) /\ imports = config.(comp_java_imports)
         | Dv_nra (Dv_nra_optim opc _) =>
@@ -1430,7 +1430,7 @@ Section CompDriver.
         | Dv_nnrc (Dv_nnrc_optim opc _) =>
           opc = (get_optim_config L_nnrc config.(comp_optim_config))
         | Dv_nnrc_core (Dv_nnrc_core_to_camp avoid _) =>
-          avoid = (List.map fst config.(comp_vdbindings))
+          avoid = (List.map fst (vdbindings_of_tdbindings config.(comp_tdbindings)))
         | Dv_nnrc_core (Dv_nnrc_core_optim opc _) =>
           opc = (get_optim_config L_nnrc_core config.(comp_optim_config))
         | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd qname _) =>
@@ -1640,6 +1640,29 @@ Section CompDriver.
       ; [eapply target_language_of_driver_is_postfix_dnnrc_typed_dataset | | ]; simpl; trivial.
   Qed.
 
+  Lemma pick_tdbindings_from_vdbindings (v:vdbindings):
+    exists tdb:tdbindings,
+      (vdbindings_of_tdbindings tdb = v).
+  Proof.
+    revert v.
+    induction v.
+    - exists nil; reflexivity.
+    - destruct a.
+      destruct d.
+      + elim IHv; intros.
+        exists ((s,Tlocal Unit) :: x).
+        simpl.
+        unfold t_to_v.
+        simpl.
+        rewrite H; reflexivity.
+      + elim IHv; intros.
+        exists ((s,Tdistr Unit) :: x).
+        simpl.
+        unfold t_to_v.
+        simpl.
+        rewrite H; reflexivity.
+  Qed.
+  
   Lemma target_language_of_driver_is_postfix_cnd:
     (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp dv)))
                                   (Dv_camp dv))
@@ -1734,10 +1757,11 @@ Section CompDriver.
                  nil
                  ⊥
                  EmptyString
-                 (List.map (fun x => (x,Vlocal)) l)
+                 (List.map (fun x => (x,Tlocal Unit)) l)
                  EmptyString
                  nil) (lang:=L_nnrc_core);
         [eassumption | | ]; simpl; trivial.
+      unfold vdbindings_of_tdbindings. rewrite List.map_map.
       rewrite List.map_map.
       simpl.
       rewrite List.map_id.
@@ -1764,17 +1788,20 @@ Section CompDriver.
                  EmptyString
                  nil) (lang:=L_nnrc);
         [eassumption | | ]; simpl; trivial.
-    - eapply is_postfix_plus_one with
+    - generalize (pick_tdbindings_from_vdbindings v); intros.
+      elim H; intros.
+      eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
                  nil
                  ⊥
                  EmptyString
-                 v
+                 x
                  EmptyString
                  nil) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
+      rewrite H0; reflexivity.
     - eapply is_postfix_plus_one with
       (config:=trivial_driver_config) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_javascript | | ]; simpl; trivial.
@@ -1994,7 +2021,7 @@ Section CompDriver.
           reflexivity.
         * destruct (H_config (Dv_nraenv (Dv_nraenv_optim (get_optim_config L_nraenv (comp_optim_config config0)) n)));
           reflexivity.
-        * destruct (H_config ((Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (comp_vdbindings config0)) c))));
+        * destruct (H_config ((Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (vdbindings_of_tdbindings (comp_tdbindings config0))) c))));
             reflexivity.
         * destruct (H_config (Dv_nnrc_core (Dv_nnrc_core_optim (get_optim_config L_nnrc_core (comp_optim_config config0)) n)));
           reflexivity.
@@ -2002,7 +2029,7 @@ Section CompDriver.
           reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) n)));
             reflexivity.
-        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (comp_vdbindings config0) d)));
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_tdbindings (comp_tdbindings config0)) d)));
             reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
             try reflexivity.

@@ -58,9 +58,10 @@ let global_config_of_json j =
       gconf_exact_path = false;
       gconf_dir = None;
       gconf_dir_target = None;
-      gconf_io = None;
-      gconf_io_use_world = false;
+      gconf_schema_file = None;
       gconf_schema = TypeUtil.empty_schema;
+      gconf_io_file = None;
+      gconf_io_use_world = false;
       gconf_data = Compiler.Ev_in_world [];
       gconf_expected_output_data = [];
       gconf_cld_conf = CloudantUtil.default_cld_config ();
@@ -75,7 +76,7 @@ let global_config_of_json j =
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_vdbindings = [];
+      gconf_tdbindings = [];
       gconf_stat = false;
       gconf_stat_all = false;
       gconf_stat_tree = false; }
@@ -97,7 +98,7 @@ let global_config_of_json j =
   apply QcertArg.set_dir j##.dirtarget;
   Js.Optdef.iter j##.jsruntime
     (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
-  apply QcertArg.set_io j##.io;
+  apply QcertArg.set_io_file j##.io;
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexpall (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);

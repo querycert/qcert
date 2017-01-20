@@ -105,7 +105,7 @@ Section CompConfig.
         comp_brand_rel : list (string * string) (* brand_relation *);
         comp_input_type : rtype (* input type for inference *);
         comp_mr_vinit : string;
-        comp_vdbindings : vdbindings;
+        comp_tdbindings : tdbindings;
         comp_java_imports : string;
         comp_optim_config : optim_config; }.
 
@@ -131,7 +131,7 @@ Section CompConfig.
       (* comp_brand_rel = *) nil
       (* comp_input_type = *) RType.Unit
       (* comp_mr_vinit = *) init_vinit
-      (* comp_vdbindings = *) nil
+      (* comp_tdbindings = *) nil
       (* comp_java_imports = *) ""
       (* comp_optim_config = *) nil.
 

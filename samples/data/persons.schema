@@ -1,9 +1,16 @@
-{ "CONST$Persons" :
-  { "$coll" : { "pid" : "Nat",
-		"name" : "String",
-		"age" : "Nat",
-		"company" : "Nat" } },
-  "CONST$Companies" :
-  { "$coll" : { "cid" : "Nat",
-		"cname" : "String",
-		"departments" : { "$coll" : "String" } } } }
+{ "inheritance": [],
+  "model":
+  { "modelName": "test01",
+    "brandTypes" :[],
+    "typeDefs" :[] },
+  "global" :
+  { "CONST$Persons" :
+    { "$coll" : { "pid" : "Nat",
+		  "name" : "String",
+		  "age" : "Nat",
+		  "company" : "Nat" } },
+    "CONST$Companies" :
+    { "$coll" : { "cid" : "Nat",
+		  "cname" : "String",
+		  "departments" : { "$coll" : "String" } } } }
+}

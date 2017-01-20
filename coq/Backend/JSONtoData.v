@@ -267,7 +267,29 @@ Section JSONtoData.
 
   End toRType.
 
-  (* Prototype stuff *)
+  (* JSON to DType *)
+  Section toDType.
+    (* Prototype stuff *)
+    Require Import Types.
+    Require Import RTypeNorm.
+    Require Import ForeignTypeToJSON.
+    Context {ftype:foreign_type}.
+    Context {ftypeToJSON:foreign_type_to_JSON}.
+
+    Definition json_to_drtype {br:brand_relation} (j:json) : drtype :=
+      match j with
+      | jobject (("$dist"%string,j')::nil) => Tdistr (json_to_rtype j')
+      | _ => Tlocal (json_to_rtype j)
+      end.
+
+    Definition json_to_drtype_with_fail {br:brand_relation} (j:json) : option drtype :=
+      match j with
+      | jobject (("$dist"%string,j')::nil) => lift Tdistr (json_to_rtype_with_fail j')
+      | _ => lift Tlocal (json_to_rtype_with_fail j)
+      end.
+
+  End toDType.
+
   Section RoundTripping.
     Inductive json_data : data -> Prop :=
     | json_null : json_data dunit

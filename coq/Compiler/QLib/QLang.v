@@ -24,8 +24,6 @@ Module QLang(runtime:CompilerRuntime).
 
   Local Open Scope list_scope.
 
-  Definition vdbindings := vdbindings.
-
   (* Languages *)
 
   Section QL.
@@ -65,6 +63,8 @@ Module QLang(runtime:CompilerRuntime).
     Definition export_desc : Set := export_desc.
     Definition export_language_descriptions : export_desc := export_language_descriptions.
     
+    Definition vdbindings := vdbindings.
+    Definition tdbindings := tdbindings.
   End QL.
 End QLang.
 

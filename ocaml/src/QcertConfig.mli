@@ -23,9 +23,10 @@ type global_config = {
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
-    mutable gconf_io : string option;
-    mutable gconf_io_use_world : bool;
+    mutable gconf_schema_file : string option;
     mutable gconf_schema : TypeUtil.schema;
+    mutable gconf_io_file : string option;
+    mutable gconf_io_use_world : bool;
     mutable gconf_data : QEval.eval_input;
     mutable gconf_expected_output_data : DataUtil.io_output;
     gconf_cld_conf : CloudantUtil.cld_config;
@@ -40,7 +41,7 @@ type global_config = {
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_vdbindings : QLang.vdbindings;
+    mutable gconf_tdbindings : QLang.tdbindings;
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;

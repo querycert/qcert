@@ -75,6 +75,20 @@ Module QType(runtime:CompilerRuntime).
 
   Definition json_to_rtype_with_fail {m:brand_relation} := json_to_rtype_with_fail.
 
+  (* Additional support for distributed types *)
+  
+  Definition camp_dtype {m:brand_relation} : Set
+    := DType.drtype.
+  Definition dt {m:brand_relation} : Set
+    := camp_dtype.
+
+  Definition json_to_drtype {m:brand_relation} : JSON.json -> camp_dtype := json_to_drtype.
+
+  Definition json_to_drtype_with_fail {m:brand_relation} : JSON.json -> option camp_dtype := json_to_drtype_with_fail.
+
+  Definition tlocal {m:brand_relation}  : camp_type -> camp_dtype := DType.Tlocal.
+  Definition tdistr {m:brand_relation}  : camp_type -> camp_dtype := DType.Tdistr.
+
   (* JSON -> sdata string *)
   Require SparkData.
   Require RData.
