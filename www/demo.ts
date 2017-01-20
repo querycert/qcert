@@ -1877,17 +1877,17 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 	return str;
 }
 
-class RunTab extends ICanvasTab {
+class CompileTab extends ICanvasTab {
 
 	static make(canvas:fabric.ICanvas) {
-		return new RunTab(canvas);
+		return new CompileTab(canvas);
 	}
 
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
 	}
 	getLabel() {
-		return "Run";
+		return "Compile";
 	}
 
 	getRectOptions() {
@@ -2306,9 +2306,9 @@ function getOptimConfig():QcertOptimConfig[] {
 
 const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
 	BuilderTab.make,
-	InputTab.make,
 	OptimizationsTabMake,
-	RunTab.make
+	InputTab.make,
+	CompileTab.make
 ];
 
 function init():void {
