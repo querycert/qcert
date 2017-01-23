@@ -74,8 +74,8 @@ Section NRAEnvSize.
     (* Those are additional operators *)
     | NRAEnvFlatMap a₁ a₂ => max (S (nraenv_depth a₁)) (nraenv_depth a₂)
     | NRAEnvJoin a₁ a₂ a₃ => max (S (nraenv_depth a₁)) (max (nraenv_depth a₂) (nraenv_depth a₃))
-    | NRAEnvProject _ a₁ => (nraenv_size a₁)
-    | NRAEnvGroupBy _ _ a₁ => (nraenv_size a₁)
+    | NRAEnvProject _ a₁ => (nraenv_depth a₁)
+    | NRAEnvGroupBy _ _ a₁ => (nraenv_depth a₁)
     end.
 
 End NRAEnvSize.
