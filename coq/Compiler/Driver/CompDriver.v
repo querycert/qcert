@@ -3806,23 +3806,38 @@ Section CompDriver.
     | L_dnnrc_typed_dataset :: L_dnnrc_typed_dataset :: path => L_dnnrc_typed_dataset :: path
     | L_javascript :: L_javascript :: path => L_javascript :: path
     | L_java :: L_java :: path => L_java :: path
-    | L_spark :: L_spark :: path => L_spark :: path
-    | L_spark2 :: L_spark2 :: path => L_spark2 :: path
+    | L_spark_rdd :: L_spark_rdd :: path => L_spark_rdd :: path
+    | L_spark_dataset :: L_spark_dataset :: path => L_spark_dataset :: path
     | L_cloudant :: L_cloudant :: path => L_cloudant :: path
     | _ => path
     end.
 
   Lemma remove_source_optim_correrct path :
     let path' := remove_source_optim path in
-    get_source_from_path path = get_source_from_path path'.
+    get_source_from_path path = get_source_from_path path' /\
+    get_target_from_path path = get_target_from_path path'.
   Proof.
     simpl.
-    destruct path; simpl; try reflexivity.
-    destruct l; simpl; try reflexivity;
+    split;
+      unfold get_target_from_path;
+      destruct path; simpl; try reflexivity;
+      destruct l; simpl; try reflexivity;
       try solve [
-            destruct path; try reflexivity;
-            destruct l; simpl; try reflexivity ].
+        destruct path; try reflexivity;
+        destruct l; simpl; try reflexivity;
+        destruct (List.rev path); simpl; try reflexivity ].
   Qed.
+
+  Definition remove_target_optim path :=
+    List.rev (remove_source_optim (List.rev path)).
+
+  Lemma remove_target_optim_correrct path :
+    let path' := remove_target_optim path in
+    get_source_from_path path = get_source_from_path path' /\
+    get_target_from_path path = get_target_from_path path'.
+  Proof.
+  Admitted. (* XXX TOO XXX *)
+
 
   End CompPaths.
 
