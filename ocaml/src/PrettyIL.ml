@@ -78,6 +78,7 @@ type nra_sym =
       pi: (string*int);
       bpi: (string*int);
       gamma: (string*int);
+      rho: (string*int);
       cup: (string*int);
       vee: (string*int);
       wedge: (string*int);
@@ -111,7 +112,8 @@ let textsym =
     sharp = ("#", 1);
     pi = ("project", 7);
     bpi = ("Project", 7);
-    gamma = ("Group", 7);
+    gamma = ("Group", 5);
+    rho = ("Unnest", 6);
     cup = ("U",1);
     vee = ("\\/",2);
     wedge = ("/\\",2);
@@ -145,6 +147,7 @@ let greeksym =
     pi = ("π", 1);
     bpi = ("Π", 1);
     gamma = ("Γ", 1);
+    rho = ("ρ", 1);
     cup = ("∪",1);
     vee = ("∨",1);
     wedge = ("∧",1);
@@ -736,6 +739,8 @@ let rec pretty_nraenv_aux p sym ff a =
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.bpi (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
   | Hack.NRAEnvGroupBy (g,atts,a1) ->
       fprintf ff "@[<hv 0>%a%a%a(%a)@]" pretty_sym sym.gamma (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
+  | Hack.NRAEnvUnnest (a,b,a1) ->
+      fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.rho (pretty_squared_names sym) [a;b] (pretty_nraenv_aux 0 sym) a1
 
 (* resets precedence back to 0 *)
 and pretty_nraenv_exp p sym thissym ff a1 oa2 =

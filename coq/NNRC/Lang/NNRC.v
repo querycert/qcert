@@ -487,7 +487,7 @@ Section NNRC.
 
   Section prop.
     Require Import cNNRCShadow.
-
+    
     Lemma nnrc_ext_to_nnrc_free_vars_same e:
       nnrc_free_vars e = nnrc_free_vars (nnrc_ext_to_nnrc e).
     Proof.
@@ -677,7 +677,7 @@ Section NNRC.
     Proof.
       revert env v x v'.
       nnrc_cases (induction e) Case; simpl; unfold equiv_dec;
-      unfold nnrc_ext_eval in *; unfold var in *; trivial; intros; simpl.
+        unfold nnrc_ext_eval in *; unfold var in *; trivial; intros; simpl.
       - Case "NNRCVar"%string.
         intuition. destruct (string_eqdec v0 v); simpl; subst; intuition.
         + match_destr; intuition. simpl. dest_eqdec; intuition.
@@ -692,17 +692,17 @@ Section NNRC.
         case_eq (nnrc_core_eval h ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
         destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
         + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 d nil); 
-          simpl; intros rr1; rewrite rr1.
+            simpl; intros rr1; rewrite rr1.
           destruct (string_eqdec v0 v'); unfold Equivalence.equiv in *; subst.
           * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v' d nil); 
-            simpl; auto.
+              simpl; auto.
           * generalize (@nnrc_core_eval_remove_free_env _ h ((v0,d)::nil)); 
-            simpl; intros rr2; apply rr2. intuition.
+              simpl; intros rr2; apply rr2. intuition.
             elim H3. apply remove_in_neq; auto.
             rewrite nnrc_ext_to_nnrc_free_vars_same; auto.
         + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
           generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl; intros rr2; 
-          repeat rewrite rr2 by trivial.
+            repeat rewrite rr2 by trivial.
           apply IHe2.
           * intros nin; intuition. elim H2; apply remove_in_neq; auto.
           * intuition.
@@ -713,53 +713,126 @@ Section NNRC.
         apply rmap_ext; intros.
         destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
         + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 x0 nil); 
-          simpl; intros rr1; rewrite rr1.
+            simpl; intros rr1; rewrite rr1.
           destruct (string_eqdec v0 v'); unfold Equivalence.equiv in *; subst.
           * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v' x0 nil); 
-            simpl; auto.
+              simpl; auto.
           * generalize (@nnrc_core_eval_remove_free_env _ h ((v0,x0)::nil)); 
-            simpl; intros rr2; apply rr2. intuition.
+              simpl; intros rr2; apply rr2. intuition.
             elim H4. apply remove_in_neq; auto.
             rewrite nnrc_ext_to_nnrc_free_vars_same; auto.
         + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
           generalize (@nnrc_core_eval_swap_neq _ h nil v x0); simpl; intros rr2; 
-        repeat rewrite rr2 by trivial.
-        apply IHe2.
-        * intros nin; intuition. elim H3; apply remove_in_neq; auto.
-        * intuition.
-    - rewrite nin_app_or in H; destruct H as [? HH]; 
-      rewrite nin_app_or in HH, H0.
-      rewrite nin_app_or in H0.
-      rewrite IHe1, IHe2, IHe3; intuition.
-    - apply not_or in H0; destruct H0 as [neq1 neq2].
-      apply not_or in neq2; destruct neq2 as [neq2 neq3].
-      repeat rewrite nin_app_or in neq3.
-      repeat rewrite nin_app_or in H.
-      rewrite IHe1 by intuition.
-      repeat rewrite <- remove_in_neq in H by congruence.
-      match_destr. destruct d; trivial.
-      + match_destr; unfold Equivalence.equiv in *; subst.
-        * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
-          intros re2; rewrite re2 by trivial.
-          generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
-            simpl; intros re3. rewrite re3. intuition.
+            repeat rewrite rr2 by trivial.
+          apply IHe2.
+          * intros nin; intuition. elim H3; apply remove_in_neq; auto.
+          * intuition.
+      - rewrite nin_app_or in H; destruct H as [? HH]; 
+          rewrite nin_app_or in HH, H0.
+        rewrite nin_app_or in H0.
+        rewrite IHe1, IHe2, IHe3; intuition.
+      - apply not_or in H0; destruct H0 as [neq1 neq2].
+        apply not_or in neq2; destruct neq2 as [neq2 neq3].
+        repeat rewrite nin_app_or in neq3.
+        repeat rewrite nin_app_or in H.
+        rewrite IHe1 by intuition.
+        repeat rewrite <- remove_in_neq in H by congruence.
+        match_destr. destruct d; trivial.
+        + match_destr; unfold Equivalence.equiv in *; subst.
+          * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
+              intros re2; rewrite re2 by trivial.
+            generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
+              simpl; intros re3. rewrite re3. intuition.
             rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
-        * generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl;
-          intros re1; repeat rewrite re1 by trivial.
-          rewrite IHe2; intuition.
-      + match_destr; unfold Equivalence.equiv in *; subst.
-        * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
-          intros re2; rewrite re2 by trivial.
-          generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
-          simpl; intros re3. rewrite re3. intuition.
-          rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
-        * generalize (@nnrc_core_eval_swap_neq _ h nil v0 d); simpl;
-          intros re1; repeat rewrite re1 by trivial.
-          rewrite IHe3; intuition.
-    - rewrite IHe; try assumption.
-      reflexivity.
-  Qed.
+          * generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl;
+              intros re1; repeat rewrite re1 by trivial.
+            rewrite IHe2; intuition.
+        + match_destr; unfold Equivalence.equiv in *; subst.
+          * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
+              intros re2; rewrite re2 by trivial.
+            generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
+              simpl; intros re3. rewrite re3. intuition.
+            rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
+          * generalize (@nnrc_core_eval_swap_neq _ h nil v0 d); simpl;
+              intros re1; repeat rewrite re1 by trivial.
+            rewrite IHe3; intuition.
+      - rewrite IHe; try assumption.
+        reflexivity.
+    Qed.
 
+    Definition unnest_from_nraenv vid venv a b n1 := 
+      (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
+               (NNRCUnop AFlatten
+                         (NNRCFor (fresh_var "tmc$" (vid :: venv :: nil))
+                                  n1
+                                  (NNRCFor
+                                     (fresh_var "tmc$" (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                                     (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
+                                              (NNRCUnop (ADot a) (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil))))
+                                              (NNRCUnop (ARec b) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil)))))
+                                     (NNRCBinop AConcat (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil)))
+                                                (NNRCVar
+                                                   (fresh_var "tmc$"
+                                                              (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))
+               (NNRCUnop (ARecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
+
+    Definition unnest_from_nraenv_core vid venv a b n1 :=
+      (NNRCFor (fresh_var "tmap$" (vid :: venv :: nil))
+               (NNRCUnop AFlatten
+                         (NNRCFor (fresh_var "tmc$" (vid :: venv :: nil))
+                                  n1
+                                  (NNRCFor
+                                     (fresh_var "tmc$" (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                                     (NNRCFor
+                                        (fresh_var "tmap$" (fresh_var "tmc$" (vid :: venv :: nil) :: venv :: nil))
+                                        (NNRCUnop (ADot a) (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil))))
+                                        (NNRCUnop (ARec b)
+                                                  (NNRCVar
+                                                     (fresh_var "tmap$"
+                                                                (fresh_var "tmc$" (vid :: venv :: nil) :: venv :: nil)))))
+                                     (NNRCBinop AConcat (NNRCVar (fresh_var "tmc$" (vid :: venv :: nil)))
+                                                (NNRCVar
+                                                   (fresh_var "tmc$"
+                                                              (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))
+               (NNRCUnop (ARecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
+
+    Lemma unnest_from_nraenv_and_nraenv_core_eq vid venv env a b op1 op1' :
+      nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+      nnrc_core_eval h env (unnest_from_nraenv vid venv a b op1) =
+      nnrc_core_eval h env (unnest_from_nraenv_core vid venv a b op1').
+    Proof.
+      intros Hind.
+      Opaque fresh_var.
+      simpl.
+      rewrite Hind; clear Hind.
+      destruct (nnrc_core_eval h env op1'); try reflexivity; simpl.
+      destruct d; try reflexivity; simpl.
+      destruct (equiv_dec (fresh_var "tmap$" (vid :: venv :: nil))
+                          (fresh_var "tmap$" (vid :: venv :: nil))); try congruence.
+      destruct (equiv_dec (fresh_var "tmc$" (vid :: venv :: nil))
+                          (fresh_var "tmc$" (vid :: venv :: nil))); try congruence.
+      simpl in *.
+      destruct (equiv_dec
+                  (fresh_var "tmc$"
+                             (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil))
+                  (fresh_var "tmc$"
+                             (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil)));
+        try congruence; simpl.
+      destruct (equiv_dec
+                  (fresh_var "tmap$"
+                             (fresh_var "tmc$" (vid :: venv :: nil) :: venv :: nil))
+                  (fresh_var "tmap$"
+                             (fresh_var "tmc$" (vid :: venv :: nil) :: venv :: nil))); try congruence; simpl in *.
+      destruct (equiv_dec (fresh_var "tmc$" (vid :: venv :: nil))
+                          (fresh_var "tmc$"
+                                     (fresh_var "tmc$" (vid :: venv :: nil)
+                                                :: vid :: venv :: nil))). auto.
+      clear e e0 e1 e2 c.
+      f_equal.
+      induction l; [reflexivity| ]; simpl.
+      destruct a0; try reflexivity.
+    Qed.
+  
   End prop.
 
   Section core.

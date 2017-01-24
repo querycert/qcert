@@ -86,6 +86,7 @@ Section NRAEnvOptimizer.
       | NRAEnvJoin op1 op2 op3 => NRAEnvJoin (f op1) (f op2) (f op3)
       | NRAEnvProject sl op1 => NRAEnvProject sl (f op1)
       | NRAEnvGroupBy s sl op1 => NRAEnvGroupBy s sl (f op1)
+      | NRAEnvUnnest a b op1 => NRAEnvUnnest a b (f op1)
       end.
     
     (** Apply the function f to all subexpression fo p. *)
@@ -113,6 +114,7 @@ Section NRAEnvOptimizer.
       | NRAEnvJoin op1 op2 op3 => f (NRAEnvJoin (nraenv_map_deep f op1) (nraenv_map_deep f op2) (nraenv_map_deep f op3))
       | NRAEnvProject sl op1 => f (NRAEnvProject sl (nraenv_map_deep f op1))
       | NRAEnvGroupBy s sl op1 => f (NRAEnvGroupBy s sl (nraenv_map_deep f op1))
+      | NRAEnvUnnest a b op1 => f (NRAEnvUnnest a b (nraenv_map_deep f op1))
     end.
   End rewriter.
 

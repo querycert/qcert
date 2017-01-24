@@ -149,6 +149,24 @@ Section NRAEnvtoNNRC.
       NNRCFor t (nraenv_to_nnrc_ext op1 varid varenv) (NNRCUnop (ARecProject sl) (NNRCVar t))
     | NRAEnvGroupBy g sl op1 =>
       NNRCGroupBy g sl (nraenv_to_nnrc_ext op1 varid varenv)
+    | NRAEnvUnnest a b op1 =>
+      let nrc1 := (nraenv_to_nnrc_ext op1 varid varenv) in (* op1 *)
+      let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in (* new vars for op3 *)
+      let nrc2 := (* op2 = (ANMap ((ANUnop (ARec b)) ANID) ((ANUnop (ADot a)) ANID)) *)
+          let t := fresh_var "tmap$" (varid::varenv::nil) in
+          NNRCFor t (NNRCUnop (ADot a) (NNRCVar t1)) (NNRCUnop (ARec b) (NNRCVar t))
+      in
+      let nrc3 := (* op3 = (ANMapConcat op2 op1) *)
+          NNRCUnop AFlatten
+                   (NNRCFor t1 nrc1
+                            (NNRCFor t2 nrc2
+                                     ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+      in
+      let nrc4 := (* op4 = (ANMap ((ANUnop (ARecRemove a)) ANID) op3) *)
+          let t := fresh_var "tmap$" (varid::varenv::nil) in
+          NNRCFor t nrc3 (NNRCUnop (ARecRemove a) (NNRCVar t))
+      in
+      nrc4
     end.
 
   Open Scope nraenv_scope.
@@ -270,6 +288,7 @@ Section NRAEnvtoNNRC.
     ; eauto 4.
     - apply nnrc_core_eval_unop_eq; auto.
     - apply nnrc_core_eval_group_by_eq; auto.
+    - apply unnest_from_nraenv_and_nraenv_core_eq; auto.
   Qed.
   
   Theorem nraenv_sem_correct (h:list (string*string)) (op:nraenv) (env:bindings) (vid venv:var) dcenv (did denv:data) :
@@ -533,9 +552,33 @@ Section NRAEnvtoNNRC.
     - Case "NRAEnvGroupBy"%string.
       intros vid venv v Hv.
       Opaque fresh_var.
-      simpl in Hv.
       simpl in *; repeat rewrite in_app_iff in *;
       intuition.
+    - Case "NRAEnvUnnest"%string.
+      intros vid venv v Hv.
+      Opaque fresh_var2.
+      simpl.
+      case_eq (fresh_var2 "tmc$" "tmc$" (vid :: venv :: nil)); intros.
+      simpl in *.
+      rewrite H in Hv.
+      simpl in Hv.
+      repeat rewrite in_app_iff in *.
+      destruct (string_eqdec s2 s2); try congruence.
+      elim Hv; intros; clear Hv.
+      + elim H0; clear H0; intros.
+        apply IHop; assumption.
+        destruct (string_eqdec (fresh_var "tmap$" (vid :: venv :: nil))
+                               (fresh_var "tmap$" (vid :: venv :: nil))); try congruence.
+        destruct (string_eqdec s1 s1); try congruence.
+        simpl in H0.
+        destruct (string_eqdec s2 s1); simpl in *.
+        contradiction.
+        destruct (string_eqdec s1 s1); try congruence.
+        contradiction.
+      + destruct (string_eqdec (fresh_var "tmap$" (vid :: venv :: nil))
+                               (fresh_var "tmap$" (vid :: venv :: nil))); try congruence.
+        simpl in H0.
+        contradiction.
   Qed.
 
   Section Top.
@@ -549,39 +592,40 @@ Section NRAEnvtoNNRC.
 
   Section size.
 
-  Require Import Omega.
+    Require Import Omega.
 
-  Theorem nraenvToNNNRC_size op vid venv : 
-    nnrc_size (nraenv_to_nnrc_ext op vid venv) <= 12 * nraenv_size op.
-  Proof.
-    Transparent fresh_var2.
-    revert vid venv.
-    induction op; simpl in *; intros; trivial.
-    - omega.
-    - omega.
-    - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop vid venv); omega.
-    - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-      specialize (IHop2 vid venv); omega.
-    - repeat match_destr.
-      specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
-    - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
-    - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-    - omega.
-    - omega.
-    - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
-    - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
-    - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-      specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv);
-      specialize (IHop2 vid venv); specialize (IHop3 vid venv); try omega.
-    - specialize (IHop vid venv); omega.
-    - specialize (IHop vid venv); omega.
-  Qed.
+    Theorem nraenvToNNNRC_size op vid venv : 
+      nnrc_size (nraenv_to_nnrc_ext op vid venv) <= 14 * nraenv_size op.
+    Proof.
+      Transparent fresh_var2.
+      revert vid venv.
+      induction op; simpl in *; intros; trivial.
+      - omega.
+      - omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop vid venv); omega.
+      - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
+          specialize (IHop2 vid venv); omega.
+      - repeat match_destr.
+        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
+      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
+      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
+      - omega.
+      - omega.
+      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
+      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
+      - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
+          specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv);
+          specialize (IHop2 vid venv); specialize (IHop3 vid venv); try omega.
+      - specialize (IHop vid venv); omega.
+      - specialize (IHop vid venv); omega.
+      - specialize (IHop vid venv); omega.
+    Qed.
 
   End size.
 

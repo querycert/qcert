@@ -285,6 +285,17 @@ Section NRAEnvEq.
     reflexivity.
   Qed.
 
+  (* NRAEnvUnnest *)
+  Global Instance nraenv_unnest_proper : Proper (eq ==> eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnnest.
+  Proof.
+    unfold Proper, respectful.
+    intros; subst.
+    rewrite nraenv_eq_cnraenv_eq in *.
+    simpl. unfold unnest.
+    rewrite H1 by trivial.
+    reflexivity.
+  Qed.
+
 End NRAEnvEq.
 
 Notation "X ≡ₓ Y" := (nraenv_eq X Y) (at level 90) : nraenv_scope. (* ≡ = \equiv *)

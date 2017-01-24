@@ -463,6 +463,19 @@ Section TNRAEnvEq.
     rewrite H; rewrite H0; rewrite H1; reflexivity.
   Qed.
 
+  (* NRAEnvUnnest *)
+
+  Global Instance nraenv_unnest_tproper :
+    Proper (eq ==> eq ==> tnraenv_rewrites_to ==> tnraenv_rewrites_to) NRAEnvUnnest.
+  Proof.
+    unfold Proper, respectful; intros.
+    rewrite lift_tnraenv_eq_to_tcnraenv_eq.
+    rewrite lift_tnraenv_eq_to_tcnraenv_eq in H1.
+    simpl.
+    unfold unnest.
+    rewrite H; rewrite H0; rewrite H1; reflexivity.
+  Qed.
+
 End TNRAEnvEq.
 
 Notation "op1 ⇒ₓ op2" := (tnraenv_rewrites_to op1 op2) (at level 80) : nraenv_scope.

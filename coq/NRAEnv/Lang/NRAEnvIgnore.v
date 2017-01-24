@@ -52,6 +52,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  (is_nra e1) /\ (is_nra e2) /\ (is_nra e3)
       | NRAEnvProject _ e1 => (is_nra e1)
       | NRAEnvGroupBy _ _ e1 => (is_nra e1)
+      | NRAEnvUnnest _ _ e1 => (is_nra e1)
     end.
 
   Fixpoint is_nra_fun (e:nraenv) : bool :=
@@ -77,6 +78,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  andb (is_nra_fun e1) (andb (is_nra_fun e2) (is_nra_fun e3))
       | NRAEnvProject _ e1 => (is_nra_fun e1)
       | NRAEnvGroupBy _ _ e1 => (is_nra_fun e1)
+      | NRAEnvUnnest _ _ e1 => (is_nra_fun e1)
     end.
 
   Lemma is_nra_eq (e:nraenv):
@@ -128,6 +130,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2) /\ (nraenv_ignores_env e3)
       | NRAEnvProject _ e1 => (nraenv_ignores_env e1)
       | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_env e1)
+      | NRAEnvUnnest _ _ e1 => (nraenv_ignores_env e1)
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_ignores_env_fun *)
@@ -154,6 +157,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  andb (nraenv_ignores_env_fun e1) (andb (nraenv_ignores_env_fun e2) (nraenv_ignores_env_fun e3))
       | NRAEnvProject _ e1 => (nraenv_ignores_env_fun e1)
       | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_env_fun e1)
+      | NRAEnvUnnest _ _ e1 => (nraenv_ignores_env_fun e1)
     end.
 
   Lemma nraenv_ignores_env_eq (e:nraenv):
@@ -209,6 +213,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  (fixed_env e1) /\ (fixed_env e2) /\ (fixed_env e3)
       | NRAEnvProject _ e1 => (fixed_env e1)
       | NRAEnvGroupBy _ _ e1 => (fixed_env e1)
+      | NRAEnvUnnest _ _ e1 => (fixed_env e1)
     end.
 
   Fixpoint fixed_env_fun (e:nraenv) : bool :=
@@ -234,6 +239,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  andb (fixed_env_fun e1) (andb (fixed_env_fun e2) (fixed_env_fun e3))
       | NRAEnvProject _ e1 => (fixed_env_fun e1)
       | NRAEnvGroupBy _ _ e1 => (fixed_env_fun e1)
+      | NRAEnvUnnest _ _ e1 => (fixed_env_fun e1)
     end.
 
   Lemma fixed_env_eq (e:nraenv):
@@ -287,6 +293,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  (nraenv_ignores_id e1) /\ (nraenv_ignores_id e2) /\ (nraenv_ignores_id e3)
       | NRAEnvProject _ e1 => (nraenv_ignores_id e1)
       | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_id e1)
+      | NRAEnvUnnest _ _ e1 => (nraenv_ignores_id e1)
     end.
 
   (* Java equivalent: NraOptimizer.nraenv_ignores_id_fun *)
@@ -313,6 +320,7 @@ Section NRAEnvIgnore.
       | NRAEnvJoin e1 e2 e3 =>  andb (nraenv_ignores_id_fun e1) (andb (nraenv_ignores_id_fun e2) (nraenv_ignores_id_fun e3))
       | NRAEnvProject _ e1 => (nraenv_ignores_id_fun e1)
       | NRAEnvGroupBy _ _ e1 => (nraenv_ignores_id_fun e1)
+      | NRAEnvUnnest _ _ e1 => (nraenv_ignores_id_fun e1)
     end.
 
   Lemma nraenv_ignores_id_eq (e:nraenv):

@@ -137,8 +137,8 @@ Section NRAEnv.
   Definition unnest_one (s:string) (op:cnraenv) : cnraenv :=
     ANMap ((ANUnop (ARecRemove s)) ANID) (ANMapConcat ((ANUnop (ADot s)) ANID) op).
 
-  Definition unnest_two (s1 s2:string) (op:cnraenv) : cnraenv :=
-    ANMap ((ANUnop (ARecRemove s1)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec s2)) ANID) ((ANUnop (ADot s1)) ANID)) op).
+  Definition unnest (a b:string) (op:cnraenv) : cnraenv :=
+    ANMap ((ANUnop (ARecRemove a)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec b)) ANID) ((ANUnop (ADot a)) ANID)) op).
 
   (* NRAEnv for Optim *)
   (* A representation for the NRA with additional operators, usually
@@ -167,6 +167,7 @@ Section NRAEnv.
   | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv
   | NRAEnvProject : list string -> nraenv -> nraenv
   | NRAEnvGroupBy : string -> list string -> nraenv -> nraenv
+  | NRAEnvUnnest : string -> string -> nraenv -> nraenv
   .
 
   Global Instance nraenv_eqdec : EqDec nraenv eq.
@@ -198,6 +199,7 @@ Section NRAEnv.
       | NRAEnvJoin e1 e2 e3 => join (cnraenv_of_nraenv e1) (cnraenv_of_nraenv e2) (cnraenv_of_nraenv e3)
       | NRAEnvProject ls e1 => project ls (cnraenv_of_nraenv e1)
       | NRAEnvGroupBy s ls e1 => group_by_with_env s ls (cnraenv_of_nraenv e1)
+      | NRAEnvUnnest a b e1 => unnest a b (cnraenv_of_nraenv e1)
     end.
 
   Fixpoint nraenv_of_cnraenv (a:cnraenv) : nraenv :=
@@ -279,7 +281,8 @@ Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   | Case_aux c "NRAEnvFlatMap"
   | Case_aux c "NRAEnvJoin"
   | Case_aux c "NRAEnvProject"
-  | Case_aux c "NRAEnvGroupBy"].
+  | Case_aux c "NRAEnvGroupBy"
+  | Case_aux c "NRAEnvUnnest"].
 
 (* 
 *** Local Variables: ***

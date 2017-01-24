@@ -45,6 +45,7 @@ Section NRAEnvSize.
          | NRAEnvJoin a₁ a₂ a₃ => S (nraenv_size a₁ + nraenv_size a₂ + nraenv_size a₃)
          | NRAEnvProject _ a₁ => S (nraenv_size a₁)
          | NRAEnvGroupBy _ _ a₁ => S (nraenv_size a₁)
+         | NRAEnvUnnest _ _ a₁ => S (nraenv_size a₁)
        end.
 
   Lemma nraenv_size_nzero (a:nraenv) : nraenv_size a <> 0.
@@ -76,6 +77,7 @@ Section NRAEnvSize.
     | NRAEnvJoin a₁ a₂ a₃ => max (S (nraenv_depth a₁)) (max (nraenv_depth a₂) (nraenv_depth a₃))
     | NRAEnvProject _ a₁ => (nraenv_depth a₁)
     | NRAEnvGroupBy _ _ a₁ => (nraenv_depth a₁)
+    | NRAEnvUnnest _ _ a₁ => (nraenv_depth a₁)
     end.
 
 End NRAEnvSize.
