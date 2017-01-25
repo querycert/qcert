@@ -828,7 +828,7 @@ Notation "p ⊕ r"   := ((ANBinop AConcat) p r) (at level 70) : cnraenv_scope.  
 Notation "p ⊗ r"   := ((ANBinop AMergeConcat) p r) (at level 70) : cnraenv_scope.                (* ⊗ = \otimes *)
 
 Notation "¬( r1 )" := (ANUnop ANeg r1) (right associativity, at level 70): cnraenv_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (ANUnop ADistinct r1) (right associativity, at level 70): cnraenv_scope.   (* ε = \epsilon *)
+Notation "♯distinct( r1 )" := (ANUnop ADistinct r1) (right associativity, at level 70): cnraenv_scope.   (* ε = \epsilon *)
 Notation "♯count( r1 )" := (ANUnop ACount r1) (right associativity, at level 70): cnraenv_scope. (* ♯ = \sharp *)
 Notation "♯flatten( d )" := (ANUnop AFlatten d) (at level 50) : cnraenv_scope.                   (* ♯ = \sharp *)
 Notation "‵{| d |}" := ((ANUnop AColl) d)  (at level 50) : cnraenv_scope.                        (* ‵ = \backprime *)

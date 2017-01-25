@@ -65,32 +65,31 @@ Section ROptimEnv.
   Qed.
   
   (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
-
-  Lemma envunion_select_distr (p p1 p2: cnraenv) :
-    σ⟨ p ⟩(p1 ⋃ p2) ≡ₑ σ⟨ p ⟩(p1) ⋃ σ⟨ p ⟩(p2).
+  Lemma select_union_distr (q q₁ q₂: cnraenv) :
+    σ⟨ q ⟩(q₁ ⋃ q₂) ≡ₑ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
   Proof.
     unfold cnraenv_eq; intros ? ? _ ? _ ? _.
     simpl.
-    generalize (h ⊢ₑ p1 @ₑ x  ⊣ c;env) as d1.
-    generalize (h ⊢ₑ p2 @ₑ x  ⊣ c;env) as d2.
+    generalize (h ⊢ₑ q₁ @ₑ x  ⊣ c;env) as d1.
+    generalize (h ⊢ₑ q₂ @ₑ x  ⊣ c;env) as d2.
     intros.
     destruct d1; destruct d2; try (autorewrite with alg; reflexivity); simpl.
     destruct d; try reflexivity.
     destruct d0; simpl;
     try (destruct (lift_filter
                      (fun x' : data =>
-                        match h ⊢ₑ p @ₑ x' ⊣ c;env with
+                        match h ⊢ₑ q @ₑ x' ⊣ c;env with
                           | Some (dbool b) => Some b
                           | _ => None
                         end) l); simpl; reflexivity).
     induction l; simpl.
       destruct (lift_filter
          (fun x' : data =>
-          match h ⊢ₑ p @ₑ x' ⊣ c;env with
+          match h ⊢ₑ q @ₑ x' ⊣ c;env with
           | Some (dbool b) => Some b
           | _ => None
           end) l0); reflexivity.
-      generalize(h ⊢ₑ p @ₑ a ⊣ c;env); intros.
+      generalize(h ⊢ₑ q @ₑ a ⊣ c;env); intros.
       unfold bunion.
       rewrite lift_app_filter.
       destruct o; try reflexivity.
@@ -98,13 +97,13 @@ Section ROptimEnv.
       revert IHl.
       generalize ((lift_filter
             (fun x' : data =>
-             match h ⊢ₑ p @ₑ x' ⊣ c;env with
+             match h ⊢ₑ q @ₑ x' ⊣ c;env with
              | Some (dbool b0) => Some b0
              | _ => None
              end) l)).
       generalize (lift_filter
              (fun x' : data =>
-              match h ⊢ₑ p @ₑ x' ⊣ c;env with
+              match h ⊢ₑ q @ₑ x' ⊣ c;env with
               | Some (dbool b0) => Some b0
               | _ => None
               end) l0).
@@ -113,14 +112,6 @@ Section ROptimEnv.
       destruct o; try reflexivity.
       + destruct b; autorewrite with alg; reflexivity.
       + autorewrite with alg. reflexivity. 
-  Qed.
-
-  (* this is the name we give it in the paper *)
-    (* σ⟨ P ⟩(P1 ⋃ P2) ≡ σ⟨ P ⟩(P1) ⋃ σ⟨ P ⟩(P2) *)
-  Lemma select_union_distr (q q₁ q₂: cnraenv) :
-    σ⟨ q ⟩(q₁ ⋃ q₂) ≡ₑ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
-  Proof.
-    apply envunion_select_distr.
   Qed.
 
   (* χ⟨ P1 ⟩( { P2 } ) ≡ { P1 ◯ P2 } *)

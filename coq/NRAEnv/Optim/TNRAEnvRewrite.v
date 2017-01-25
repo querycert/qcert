@@ -3189,7 +3189,7 @@ Section TOptimEnv.
   Qed.
   
   Lemma tdup_elim (q:cnraenv) :
-    nodupA q -> ANUnop ADistinct q  ⇒  q.
+    nodupA q -> ♯distinct(q) ⇒ q.
   Proof.
     intros nd.
     apply rewrites_typed_with_untyped.
@@ -3203,11 +3203,11 @@ Section TOptimEnv.
 
   (* σ⟨ q ⟩(q₁ ⋃ q₂) ⇒ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂) *)
 
-  Lemma tenvunion_select_distr_arrow (q q₁ q₂: cnraenv) :
-    σ⟨ q ⟩(q₁ ⋃ q₂) ⇒ σ⟨ q ⟩(q₁) ⋃ σ⟨ q ⟩(q₂).
+  Lemma tselect_union_distr (q₀ q₁ q₂: cnraenv) :
+    σ⟨ q₀ ⟩(q₁ ⋃ q₂) ⇒ σ⟨ q₀ ⟩(q₁) ⋃ σ⟨ q₀ ⟩(q₂).
   Proof.
     apply rewrites_typed_with_untyped.
-    - apply envunion_select_distr.
+    - apply select_union_distr.
     - intros.
       cnraenv_inferer.
       invcs H3.
