@@ -831,6 +831,13 @@ Notation "¬( r1 )" := (ANUnop ANeg r1) (right associativity, at level 70): cnra
 Notation "♯distinct( r1 )" := (ANUnop ADistinct r1) (right associativity, at level 70): cnraenv_scope.   (* ε = \epsilon *)
 Notation "♯count( r1 )" := (ANUnop ACount r1) (right associativity, at level 70): cnraenv_scope. (* ♯ = \sharp *)
 Notation "♯flatten( d )" := (ANUnop AFlatten d) (at level 50) : cnraenv_scope.                   (* ♯ = \sharp *)
+
+Notation "a1 ♯+ a2" := (ANBinop (ABArith ArithPlus) a1 a2) (right associativity, at level 70): cnraenv_scope.
+   (* ♯ = \sharp *)
+
+Notation "a1 ♯- a2" := (ANBinop (ABArith ArithMinus) a1 a2) (right associativity, at level 70): cnraenv_scope.
+   (* ♯ = \sharp *)
+
 Notation "‵{| d |}" := ((ANUnop AColl) d)  (at level 50) : cnraenv_scope.                        (* ‵ = \backprime *)
 Notation "‵[| ( s , r ) |]" := ((ANUnop (ARec s)) r) (at level 50) : cnraenv_scope.              (* ‵ = \backprime *)
 Notation "¬π[ s1 ]( r )" := ((ANUnop (ARecRemove s1)) r) (at level 50) : cnraenv_scope.          (* ¬ = \neg and π = \pi *)
@@ -845,7 +852,7 @@ Notation "r1 ∥ r2" := (ANDefault r1 r2) (right associativity, at level 70): cn
 Notation "r1 ◯ r2" := (ANApp r1 r2) (right associativity, at level 60): cnraenv_scope.           (* ◯ = \bigcirc *)
 
 Notation "r1 ◯ₑ r2" := (ANAppEnv r1 r2) (right associativity, at level 60): cnraenv_scope.           (* ◯ = \bigcirc *)
-Notation "χᵉ⟨ p ⟩()" := (ANMapEnv p) (at level 70) : cnraenv_scope.                              (* χ = \chi *)
+Notation "χᵉ⟨ p ⟩" := (ANMapEnv p) (at level 70) : cnraenv_scope.                              (* χ = \chi *)
 
 Hint Resolve cnraenv_eval_normalized.
 
