@@ -289,6 +289,7 @@ MODULES = \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \
 	Tests/NRATest \
+	Tests/NRAEnvTest \
 	Tests/TNRATest \
 	Tests/CAMPTest \
 	Tests/TCAMPTest \
