@@ -215,6 +215,20 @@ Section LambdaNRATests.
 
 End LambdaNRATests.
 
+Section LambdaNRALinq.
+
+  Definition linq_example Persons
+    := LNRAMap
+         (LNRALambda "p"
+                     (LNRAUnop (ADot "name") (LNRAVar "p")))
+         (LNRAFilter 
+            (LNRALambda "p"
+                        (LNRABinop ALt
+                                   (LNRAUnop (ADot "name") (LNRAVar "p"))
+                                   (LNRAConst (dnat 30))))
+            Persons).
+               
+End LambdaNRALinq.
 
 (* Now let's see if we can optimize *)
 
