@@ -28,7 +28,7 @@ let get_qcert_home () =
 let main (s : string) =
   begin try
     let cmd =
-      Format.sprintf "java -jar %s/bin/sqlparser.jar -single" (get_qcert_home ())
+      Format.sprintf "java -jar %s/bin/javaService.jar parseSQL" (get_qcert_home ())
     in
     let fromProcess, toProcess = Unix.open_process cmd in
     output_string toProcess s;

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Joshua Auerbach
+ * Copyright (C) 2016-2017 Joshua Auerbach
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 function preProcessSQL(sql, useLocal) {
-    var url = useLocal ? "http://localhost:9879" : "http://35.164.159.76:9879";
+    var url = useLocal ? "http://localhost:9879?verb=parseSQL" : "http://35.164.159.76:9879?verb=parseSQL";
     //	console.log("URL: " + url);
     //	console.log("local flag: " + useLocal);
     var request = new XMLHttpRequest();

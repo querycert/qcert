@@ -1,50 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="all" name="Export artifacts from sqlParser project to bin">
-    <!--this file was originally created by the jar export wizard but subsequently modified to simplify properties and eliminate
-       environment dependences.  It assumes the layout of the qcert working directory as organized for git -->
+<project default="create_run_jar" name="Export artifacts from sqlParser project to bin">
 
-	<property name="dest" value="../bin"/>
+	<property name="dest" value="../javaService/services"/>
 	<!-- The following property is also defined in getDependencies.xml.  Should be the same. -->	
 	<property name="presto-version" value="0.154"/>
-	
-	<target name="all" depends="create_run_jar,create_server_jar"/>
 
 	<target name="create_run_jar">
+		<delete file="${dest}/sqlparser.jar"/>
         <jar destfile="${dest}/sqlparser.jar">
-            <manifest>
-                <attribute name="Main-Class" value="org.qcert.sql.SQL2Sexp"/>
-                <attribute name="Class-Path" value=". sqlparser_lib/antlr4-runtime-4.5.3.jar sqlparser_lib/guava-19.0.jar sqlparser_lib/presto-parser-${presto-version}.jar sqlparser_lib/slice-0.7.jar"/>
-            </manifest>
             <fileset dir="bin"/>
         </jar>
-        <delete dir="${dest}/sqlparser_lib"/>
-        <mkdir dir="${dest}/sqlparser_lib"/>
-        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="${dest}/sqlparser_lib"/>
-        <copy file="lib/guava-19.0.jar" todir="${dest}/sqlparser_lib"/>
-        <copy file="lib/presto-parser-${presto-version}.jar" todir="${dest}/sqlparser_lib"/>
-        <copy file="lib/slice-0.7.jar" todir="${dest}/sqlparser_lib"/>
-    </target>
-
-	<target name="create_server_jar">
-		<delete dir="server"/>
-		<mkdir dir="server"/>
-        <jar destfile="server/encodeService.jar">
-            <manifest>
-                <attribute name="Main-Class" value="org.qcert.sql.EncodingService"/>
-                <attribute name="Class-Path" 
-                	value=". encoding_lib/antlr4-runtime-4.5.3.jar encoding_lib/guava-19.0.jar encoding_lib/presto-parser-${presto-version}.jar encoding_lib/slice-0.7.jar encoding_lib/nanohttpd-2.3.1.jar"/>
-            </manifest>
-            <fileset dir="bin"/>
-        </jar>
-        <mkdir dir="server/encoding_lib"/>
-        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="server/encoding_lib"/>
-        <copy file="lib/guava-19.0.jar" todir="server/encoding_lib"/>
-        <copy file="lib/presto-parser-${presto-version}.jar" todir="server/encoding_lib"/>
-        <copy file="lib/slice-0.7.jar" todir="server/encoding_lib"/>
-        <copy file="lib/nanohttpd-2.3.1.jar" todir="server/encoding_lib"/>
-		<delete file="${dest}/encodingService.zip"/>
-		<zip destfile="${dest}/encodingService.zip">
-			<fileset dir="server"/>
-		</zip>
+        <copy file="lib/antlr4-runtime-4.5.3.jar" todir="${dest}"/>
+        <copy file="lib/guava-19.0.jar" todir="${dest}"/>
+        <copy file="lib/presto-parser-${presto-version}.jar" todir="${dest}"/>
+        <copy file="lib/slice-0.7.jar" todir="${dest}"/>
     </target>
 </project>

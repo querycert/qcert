@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016-2017 Joshua Auerbach 
+ * Copyright (C) 2017 Joshua Auerbach 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.qcert.sql;
-
-import org.qcert.javasvc.Command;
+package org.qcert.javasvc;
 
 /**
- * Link the SQL Parser to the javaService so it can be invoked from qcert binary and via http server
+ * A command that can be dispatched via the Java service
  */
-public class EncodingService implements Command {
-	@Override
-	public String invoke(String arg) {
-		return PrestoEncoder.parseAndEncode(arg, false, true);
-	}
+public interface Command {
+	public String invoke(String arg);
 }

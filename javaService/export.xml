@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_server_jar" name="Export artifacts from sqlParser project to bin">
+
+	<property name="dest" value="../bin"/>
+
+	<target name="create_server_jar">
+        <delete dir="${dest}/services"/>
+		<copy todir="${dest}/services">
+			<fileset file="lib/nanohttpd-2.3.1.jar"/>
+			<fileset dir="services"/>
+		</copy>
+		<pathconvert property="depends" pathsep=" ">
+			<fileset dir="${dest}/services"/>
+			<chainedmapper>
+				<flattenmapper/>
+				<globmapper from="*" to="services/*"/>
+			</chainedmapper>
+		</pathconvert>
+		<delete file="${dest}/javaService.jar"/>
+        <jar destfile="${dest}/javaService.jar">
+            <manifest>
+                <attribute name="Main-Class" value="org.qcert.javasvc.Main"/>
+                <attribute name="Class-Path" 
+                	value=". ${depends}"/>
+            </manifest>
+            <fileset dir="bin" excludes="test/**"/>
+        </jar>
+		<delete file="javaService.zip"/>
+		<zip destfile="javaService.zip">
+			<fileset dir="${dest}" includes="**/*.jar"/>
+		</zip>
+    </target>
+</project>
