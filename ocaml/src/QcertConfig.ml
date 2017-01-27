@@ -24,12 +24,15 @@ type global_config = {
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
+    (* Schema, data, expected output *)
     mutable gconf_schema_file : string option;
     mutable gconf_schema : TypeUtil.schema;
+    mutable gconf_data_file : string option;
+    mutable gconf_data : DataUtil.content_input;
+    mutable gconf_expected_output_file : string option;
+    mutable gconf_expected_output_data : DataUtil.content_output;
+    (* I/O File includes all of schema, data, expected output - for testing *)
     mutable gconf_io_file : string option;
-    mutable gconf_io_use_world : bool;
-    mutable gconf_data : QEval.eval_input;
-    mutable gconf_expected_output_data : DataUtil.io_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
@@ -42,7 +45,6 @@ type global_config = {
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_tdbindings : QLang.tdbindings;
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
@@ -60,15 +62,8 @@ let complet_configuration gconf =
   let _data =
     begin match gconf.gconf_io_file with
     | Some io ->
-	if gconf.gconf_io_use_world
-	then
-          gconf.gconf_data <-
-	    Compiler.Ev_in_world
-	      (DataUtil.get_input DataUtil.META (Some (ParseString.parse_io_from_string io)))
-	else
-          gconf.gconf_data <-
-	    Compiler.Ev_in_constant_env
-	      (DataUtil.get_partitioned_input DataUtil.META (Some (ParseString.parse_io_from_string io)))
+        gconf.gconf_data <-
+	  (DataUtil.build_input DataUtil.META (Some (ParseString.parse_io_from_string io)))
     | None ->
         ()
     end
@@ -76,7 +71,7 @@ let complet_configuration gconf =
   let _expected_output_data =
     begin match gconf.gconf_io_file with
     | Some io ->
-        gconf.gconf_expected_output_data <- DataUtil.get_output (Some (ParseString.parse_io_from_string io))
+        gconf.gconf_expected_output_data <- DataUtil.build_output (Some (ParseString.parse_io_from_string io))
     | None ->
         ()
     end
@@ -101,14 +96,12 @@ let complet_configuration gconf =
 (* Driver config *)
 
 let driver_conf_of_global_conf gconf qname cname =
-  let brand_rel =
-    TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model
-  in
+  let brand_rel = TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model in
+  let constants_config = gconf.gconf_schema.TypeUtil.sch_globals in
   { Compiler.comp_qname = char_list_of_string qname;
-    Compiler.comp_class_name = char_list_of_string cname;
+    comp_class_name = char_list_of_string cname;
     comp_brand_rel = brand_rel;
-    comp_input_type = gconf.gconf_schema.TypeUtil.sch_camp_type;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
-    comp_tdbindings = gconf.gconf_tdbindings;
+    comp_constants = constants_config;
     comp_java_imports = char_list_of_string gconf.gconf_java_imports;
     comp_optim_config = []; (* XXX To be populate from command line and JS for optimizer parameterization XXX *) }

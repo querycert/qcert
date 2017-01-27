@@ -61,6 +61,11 @@ Module QDriver(runtime:CompilerRuntime).
     Definition optim_config_list := optim_config_list.
     Definition optim_config_default := optim_config_default.
     
+    (* Constants config *)
+
+    Definition constants_config := constants_config.
+    Definition mk_constant_config := mkConstantConfig.
+    
     (* Comp *)
     (* XXX TODO : use driver *)
     Definition get_driver_from_source_target : driver_config -> language -> language -> driver := get_driver_from_source_target.

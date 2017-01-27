@@ -40,10 +40,12 @@ let args_list gconf =
        "<harness.js> JavaScript runtime");
       ("-schema", Arg.String (QcertArg.set_schema_file gconf),
        "<file.schema> Schema");
+      ("-data", Arg.String (QcertArg.set_data_file gconf),
+       "<file.data> Input data");
+      ("-expected-output", Arg.String (QcertArg.set_expected_output_file gconf),
+       "<file.output> Expected output");
       ("-io", Arg.String (QcertArg.set_io_file gconf),
-       "<file.io> I/O file (Schema and inputs data) for evaluation");
-      ("-io-use-world", Arg.Unit (QcertArg.set_io_use_world gconf),
-       "Declare 'CONST$WORLD' as a distributed variable");
+       "<file.io> I/O file (Schema,input data,expected output) for evaluation");
       ("-emit-all", Arg.Unit (QcertArg.set_emit_all gconf),
        " Emit generated code of all intermediate queries");
       ("-emit-sexp", Arg.Unit (QcertArg.set_emit_sexp gconf),
@@ -90,10 +92,6 @@ let args_list gconf =
       (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
       ("-vinit", Arg.String (QcertArg.set_vinit gconf),
        "<init> Set the name init variable for the map-reduce backends");
-      ("-vdistr", Arg.String (QcertArg.add_vdirst gconf),
-       "<x> Declare x as a distributed variable");
-      ("-vlocal", Arg.String (QcertArg.add_vlocal gconf),
-       "<x> Declare x as a local variable");
     ]
 
 let anon_args input_files f = input_files := f :: !input_files
@@ -142,10 +140,11 @@ let parse_args () =
       gconf_dir_target = None;
       gconf_schema_file = None;
       gconf_schema = TypeUtil.empty_schema;
-      gconf_io_file = None;
-      gconf_io_use_world = false;
-      gconf_data = Compiler.Ev_in_world [];
+      gconf_data_file = None;
+      gconf_data = [];
+      gconf_expected_output_file = None;
       gconf_expected_output_data = [];
+      gconf_io_file = None;
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;
@@ -158,15 +157,12 @@ let parse_args () =
       gconf_pretty_config = PrettyIL.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
-      gconf_tdbindings = [];
       gconf_stat = false;
       gconf_stat_all = false;
       gconf_stat_tree = false; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complet_configuration gconf, List.rev !input_files)
-
-
 
 let () =
   let gconf, input_files = parse_args () in

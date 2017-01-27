@@ -19,13 +19,9 @@ Section TOps.
   Require Import Compare_dec.
   
   Require Import Utils Types BasicRuntime.
-  Require Import ForeignDataTyping ForeignOpsTyping TData TDataSort.
+  Require Import ForeignDataTyping ForeignOpsTyping TUtil TData TDataSort.
 
   Require Import Program.
-
-  (* Useful *)
-
-  Definition tdot {A} (l:list (string * A)) (a:string) : option A := edot l a.
 
   (** Typing rules for unary operators *)
 

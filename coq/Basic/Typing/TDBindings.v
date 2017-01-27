@@ -104,17 +104,39 @@ Section TDBindings.
     trivial.
   Qed.
 
+  Section unlocalize.
+    Require Import TBindings.
+    Definition unlocalize_tdbindings (binds:tdbindings) : tbindings :=
+      map (fun xy => ((fst xy), unlocalize_drtype (snd xy))) binds.
+  End unlocalize.
+  
   Section vdbindings.
-    Definition t_to_v (bind:string * drtype) : string * dlocalization :=
+    Require Import TUtil TOpsInfer.
+    Require Import EquivDec.
+
+    Definition dt_to_v (bind:string * drtype) : string * dlocalization :=
       match snd bind with
       | Tlocal _ => (fst bind, Vlocal)
       | Tdistr _ => (fst bind, Vdistr)
       end.
 
     Definition vdbindings_of_tdbindings (binds:tdbindings) : vdbindings :=
-      map t_to_v binds.
+      map dt_to_v binds.
+
+    Definition v_and_t_to_dt_opt (v:dlocalization) (t:rtype) : option drtype :=
+      match v with
+      | Vlocal => Some (Tlocal t)
+      | Vdistr => lift Tdistr (tuncoll t)
+      end.
+
+    Definition v_and_t_to_dt (v:dlocalization) (t:rtype) : drtype :=
+      match v with
+      | Vlocal => Tlocal t
+      | Vdistr => Tdistr t
+      end.
+
   End vdbindings.
-  
+
 End TDBindings.
 
 Hint Resolve dbindings_type_Forall_normalized.

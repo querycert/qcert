@@ -19,7 +19,7 @@ Section DConstants.
   Require Import String.
   Require Import List.
   Require Import EquivDec.
-  Require Import RList RAssoc.
+  Require Import RList RLift RAssoc.
   Require Import RData DData RRelation.
 
   Require Import RConstants.
@@ -37,23 +37,23 @@ Section DConstants.
   Definition mkDistLocs {A} (cenv: list (string * A)) : list (string * dlocalization) :=
     mkDistNames (map fst cenv).
 
+  Definition mkDistConstant (loc:dlocalization) (d:data) :=
+    match loc with
+    | Vlocal => Some (Dlocal d)
+    | Vdistributed =>
+      match d with
+      | dcoll coll => Some (Ddistr coll)
+      | _ => None
+      end
+    end.
+  
   Definition mkDistConstants
              (vars_loc: list (string * dlocalization)) (env: list (string*data))
     : option (list (string*ddata)) :=
     let one (x_loc: string * dlocalization) :=
         let (x, loc) := x_loc in
-        match lookup equiv_dec env x with
-        | Some d =>
-          match loc with
-          | Vlocal => Some (x, Dlocal d)
-          | Vdistributed =>
-            match d with
-            | dcoll coll => Some (x, Ddistr coll)
-            | _ => None
-            end
-          end
-        | None => None
-        end
+        olift (fun d => lift (fun dd => (x, dd)) (mkDistConstant loc d))
+              (lookup equiv_dec env x)
     in
     rmap one vars_loc.
 
@@ -67,6 +67,9 @@ Section DConstants.
       := (WORLD, Vdistr)::nil.
   End World.
 
+  Definition unlocalize_constants (env:list (string*ddata)) : list (string*data) :=
+    map (fun xy => (fst xy, unlocalize_data (snd xy))) env.
+  
 End DConstants.
 
 (* 

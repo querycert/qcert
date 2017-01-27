@@ -62,7 +62,9 @@ Module QLang(runtime:CompilerRuntime).
 
     Definition export_desc : Set := export_desc.
     Definition export_language_descriptions : export_desc := export_language_descriptions.
-    
+
+    Definition vdistr := Vdistr.
+    Definition vlocal := Vlocal.
     Definition vdbindings := vdbindings.
     Definition tdbindings := tdbindings.
   End QL.

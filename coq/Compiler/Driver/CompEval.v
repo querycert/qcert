@@ -223,17 +223,11 @@ Section CompEval.
   End EvalFunctions.
 
   Section EvalDriver.
-    Inductive eval_input : Set :=
-    | Ev_in_world : list data -> eval_input
-    | Ev_in_constant_env : list (string*data) -> eval_input
-    .
+    Definition eval_input : Set := list (string*ddata).
 
     Definition lift_input (ev_in:eval_input) : list (string*data) :=
-      match ev_in with
-      | Ev_in_world world => mkWorld world
-      | Ev_in_constant_env cenv => cenv
-      end.
-    
+      unlocalize_constants ev_in.
+
     Inductive eval_output : Set :=
     | Ev_out_unsupported : string -> eval_output
     | Ev_out_failed : eval_output

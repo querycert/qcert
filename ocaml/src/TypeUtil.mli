@@ -20,22 +20,15 @@ open Compiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
-type io_schema = {
-    io_brand_model : (string * string) list;
-    io_name : string;
-    io_brand_type : (string * string) list;
-    io_type_definitions : (string * rtype_content) list;
-  }
-
 type schema = {
     sch_brand_model : QType.brand_model;
-    sch_camp_type : QType.camp_type;
     sch_foreign_typing : Compiler.foreign_typing;
-    sch_io_schema : io_schema option;
+    sch_io_schema : content_schema option;
+    sch_globals : QDriver.constants_config;
   }
 
 val empty_schema : schema
-
 val schema_of_io_json : QData.json -> schema
 
 val brand_relation_of_brand_model : QType.brand_model -> Compiler.brand_relation
+

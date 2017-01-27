@@ -58,7 +58,7 @@ Section CompConfig.
         :: existT _ L_nnrc_core ("NNRC.Optim.TNNRCOptimizer"%string,tnnrc_optim_list)
         :: existT _ L_nnrc ("NNRC.Optim.TNNRCOptimizer"%string,tnnrc_optim_list)
         :: nil.
-      
+
     Definition optim_config : Set :=
       list (language * optim_phases_config).
 
@@ -98,14 +98,91 @@ Section CompConfig.
       
   End optim.
 
+  Section constants.
+    (* Each global variable has a localization and a local type *)
+    Record constant_config :=
+      mkConstantConfig { constant_localization : dlocalization;
+                         constant_type : rtype; }.
+
+    Definition constants_config := list (string * constant_config).
+
+    Definition vdbindings_of_constants_config (cconf:constants_config) :=
+      map (fun xy => (fst xy, (snd xy).(constant_localization))) cconf.
+
+    Definition tbindings_of_constants_config (cconf:constants_config) :=
+      map (fun xy => (fst xy, (snd xy).(constant_type))) cconf.
+
+    Definition tdbinding_of_constant_config (gc:string * constant_config) :=
+      let (s,cc) := gc in
+      (s,v_and_t_to_dt cc.(constant_localization) cc.(constant_type)).
+    
+    Definition tdbindings_of_constants_config (gc:constants_config) :=
+      map tdbinding_of_constant_config gc.
+    
+    (* Used to show a constant_config exists for a given tdbindings *)
+    Definition constant_config_of_tdbinding_opt (td:string * drtype) : string * constant_config :=
+      match td with
+      | (s,Tlocal t) => (s,mkConstantConfig Vlocal t)
+      | (s,Tdistr t) => (s,mkConstantConfig Vdistr (Coll t))
+      end.
+    Definition constant_config_of_tdbinding (td:string * drtype) : string * constant_config :=
+      match td with
+      | (s,Tlocal t) => (s,mkConstantConfig Vlocal t)
+      | (s,Tdistr t) => (s,mkConstantConfig Vdistr t)
+      end.
+    Definition constants_config_of_tdbindings (tds:tdbindings) : constants_config :=
+      map constant_config_of_tdbinding tds.
+
+    (* And it has the right merge property *)
+    Lemma constants_config_of_tdbindings_merges (tds:tdbindings) :
+        tdbindings_of_constants_config (constants_config_of_tdbindings tds)
+        = tds.
+    Proof.
+      induction tds; simpl.
+      - reflexivity.
+      - unfold tdbindings_of_constants_config in *; simpl.
+        rewrite IHtds; clear IHtds.
+        destruct a; simpl in *.
+        destruct d; simpl in *; reflexivity.
+    Qed.
+
+    (* One more property for vdbindings access to constant_config. *)
+    Lemma vdbindings_of_constants_config_commutes x:
+      vdbindings_of_constants_config (constants_config_of_tdbindings x)
+      = vdbindings_of_tdbindings x.
+    Proof.
+      induction x; simpl.
+      - reflexivity.
+      - rewrite IHx.
+        destruct a; simpl.
+        destruct d; simpl; reflexivity.
+    Qed.
+    
+    (* Used to show a constant_config exists for a given avoid list *)
+    Definition one_tdbindings_of_avoid_list (avoid:list string) : tdbindings :=
+      map (fun x => (x,Tlocal Unit)) avoid.
+
+    Definition one_constant_config_of_avoid_list (avoid:list string) : constants_config :=
+      constants_config_of_tdbindings (one_tdbindings_of_avoid_list avoid).
+
+    Lemma one_constant_config_of_avoid_list_extracts (avoid:list string) :
+      map fst (vdbindings_of_constants_config (one_constant_config_of_avoid_list avoid)) = avoid.
+    Proof.
+      unfold one_constant_config_of_avoid_list.
+      induction avoid; simpl.
+      - reflexivity.
+      - rewrite IHavoid; reflexivity.
+    Qed.
+      
+  End constants.
+  
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
         comp_class_name : string; (* Class name different from rule name in Java case *)
         comp_brand_rel : list (string * string) (* brand_relation *);
-        comp_input_type : rtype (* input type for inference *);
         comp_mr_vinit : string;
-        comp_tdbindings : tdbindings;
+        comp_constants : constants_config;
         comp_java_imports : string;
         comp_optim_config : optim_config; }.
 
@@ -116,7 +193,6 @@ Section CompConfig.
          EmptyString
          EmptyString
          nil
-         ⊥
          EmptyString
          nil
          EmptyString
@@ -129,7 +205,6 @@ Section CompConfig.
       (* comp_qname = *) "query"
       (* class_name = *) "query"
       (* comp_brand_rel = *) nil
-      (* comp_input_type = *) RType.Unit
       (* comp_mr_vinit = *) init_vinit
       (* comp_tdbindings = *) nil
       (* comp_java_imports = *) ""

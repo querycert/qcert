@@ -107,165 +107,29 @@ Section NNRCtoNNRCMR.
     unfold load_init_env_success in Hmr_env.
     destruct Hmr_env.
     destruct H0.
-    unfold load_init_env, mkDistConstants in H.
-    assert (@rmap (prod string dlocalization)
-              (prod string (@ddata (@foreign_runtime_data fruntime)))
-              (fun x_loc : prod string dlocalization =>
-               match
-                 x_loc
-                 return
-                   (option
-                      (prod string
-                         (@ddata (@foreign_runtime_data fruntime))))
-               with
-               | pair x loc =>
-                   match
-                     @lookup string
-                       (@data (@foreign_runtime_data fruntime))
-                       (@equiv_dec string (@eq string)
-                          (@eq_equivalence string) string_eqdec) nnrc_env x
-                     return
-                       (option
-                          (prod string
-                             (@ddata (@foreign_runtime_data fruntime))))
-                   with
-                   | Some d =>
-                       match
-                         loc
-                         return
-                           (option
-                              (prod string
-                                 (@ddata (@foreign_runtime_data fruntime))))
-                       with
-                       | Vlocal =>
-                           @Some
-                             (prod string
-                                (@ddata (@foreign_runtime_data fruntime)))
-                             (@pair string
-                                (@ddata (@foreign_runtime_data fruntime))
-                                x
-                                (@Dlocal (@foreign_runtime_data fruntime)
-                                   d))
-                       | Vdistr =>
-                           match
-                             d
-                             return
-                               (option
-                                  (prod string
-                                     (@ddata
-                                        (@foreign_runtime_data fruntime))))
-                           with
-                           | dunit =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dnat _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dbool _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dstring _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dcoll coll =>
-                               @Some
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                                 (@pair string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)) x
-                                    (@Ddistr
-                                       (@foreign_runtime_data fruntime)
-                                       coll))
-                           | drec _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dleft _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dright _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dbrand _ _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           | dforeign _ =>
-                               @None
-                                 (prod string
-                                    (@ddata
-                                       (@foreign_runtime_data fruntime)))
-                           end
-                       end
-                   | None =>
-                       @None
-                         (prod string
-                            (@ddata (@foreign_runtime_data fruntime)))
-                   end
-               end) vars_loc
-              = (rmap
-          (fun x_loc : var * dlocalization =>
-           let (x, loc) := x_loc in
-           match lookup equiv_dec nnrc_env x with
-           | Some d =>
-               match loc with
-               | Vlocal => Some (x, Dlocal d)
-               | Vdistr =>
-                   match d with
-                   | dunit => None
-                   | dnat _ => None
-                   | dbool _ => None
-                   | dstring _ => None
-                   | dcoll coll => Some (x, Ddistr coll)
-                   | drec _ => None
-                   | dleft _ => None
-                   | dright _ => None
-                   | dbrand _ _ => None
-                   | dforeign _ => None
-                   end
-               end
-           | None => None
-           end) vars_loc)) by reflexivity.
-    rewrite H2 in *; clear H2.
+    unfold load_init_env, mkDistConstants, mkDistConstant in H.
     destruct (rmap
-          (fun x_loc : var * dlocalization =>
-           let (x, loc) := x_loc in
-           match lookup equiv_dec nnrc_env x with
-           | Some d =>
-               match loc with
-               | Vlocal => Some (x, Dlocal d)
-               | Vdistr =>
-                   match d with
-                   | dunit => None
-                   | dnat _ => None
-                   | dbool _ => None
-                   | dstring _ => None
-                   | dcoll coll => Some (x, Ddistr coll)
-                   | drec _ => None
-                   | dleft _ => None
-                   | dright _ => None
-                   | dbrand _ _ => None
-                   | dforeign _ => None
-                   end
-               end
-           | None => None
-           end) vars_loc); simpl in *; try congruence.
+           (fun x_loc : string * dlocalization =>
+            let (x, loc) := x_loc in
+            olift
+              (fun d : data =>
+               lift (fun dd : ddata => (x, dd))
+                 match loc with
+                 | Vlocal => Some (Dlocal d)
+                 | Vdistr =>
+                     match d with
+                     | dunit => None
+                     | dnat _ => None
+                     | dbool _ => None
+                     | dstring _ => None
+                     | dcoll coll => Some (Ddistr coll)
+                     | drec _ => None
+                     | dleft _ => None
+                     | dright _ => None
+                     | dbrand _ _ => None
+                     | dforeign _ => None
+                     end
+                 end) (lookup equiv_dec nnrc_env x)) vars_loc); simpl in *; try congruence.
     inversion H.
     simpl.
     dest_eqdec; try congruence.

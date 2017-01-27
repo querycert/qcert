@@ -15,9 +15,9 @@
  *)
 
 Require Export Utils Types.
-Require Export TData TDData.
+Require Export TUtil TData TDData.
 Require Export TBindings TDBindings.
-Require Export TOps TOpsEq.
+Require Export TOps TOpsEq TOpsInfer.
 Require Export ForeignTyping.
 
 (* 

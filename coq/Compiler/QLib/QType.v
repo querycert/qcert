@@ -84,7 +84,7 @@ Module QType(runtime:CompilerRuntime).
 
   Definition json_to_drtype {m:brand_relation} : JSON.json -> camp_dtype := json_to_drtype.
 
-  Definition json_to_drtype_with_fail {m:brand_relation} : JSON.json -> option camp_dtype := json_to_drtype_with_fail.
+  Definition json_to_vrtype_with_fail {m:brand_relation} : JSON.json -> option (String.string * camp_type) := json_to_vrtype_with_fail.
 
   Definition tlocal {m:brand_relation}  : camp_type -> camp_dtype := DType.Tlocal.
   Definition tdistr {m:brand_relation}  : camp_type -> camp_dtype := DType.Tdistr.
@@ -92,10 +92,10 @@ Module QType(runtime:CompilerRuntime).
   (* JSON -> sdata string *)
   Require SparkData.
   Require RData.
-  Require TOpsInfer.
+  Require TUtil.
 
   Definition camp_type_uncoll (m:brand_model) : camp_type -> option camp_type
-    := @TOpsInfer.tuncoll _ m.
+    := @TUtil.tuncoll _ m.
   
   Definition data_to_sjson (m:brand_model) : data -> camp_type -> option String.string
     := @SparkData.data_to_sjson _ _ _ m.

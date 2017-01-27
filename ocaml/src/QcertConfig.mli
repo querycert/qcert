@@ -23,12 +23,15 @@ type global_config = {
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
+    (* Schema, data, expected output *)
     mutable gconf_schema_file : string option;
     mutable gconf_schema : TypeUtil.schema;
+    mutable gconf_data_file : string option;
+    mutable gconf_data : DataUtil.content_input;
+    mutable gconf_expected_output_file : string option;
+    mutable gconf_expected_output_data : DataUtil.content_output;
+    (* I/O File includes all of schema, data, expected output - for testing *)
     mutable gconf_io_file : string option;
-    mutable gconf_io_use_world : bool;
-    mutable gconf_data : QEval.eval_input;
-    mutable gconf_expected_output_data : DataUtil.io_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
@@ -41,7 +44,6 @@ type global_config = {
     mutable gconf_source_sexp : bool;
     mutable gconf_java_imports : string;
     mutable gconf_mr_vinit : string;
-    mutable gconf_tdbindings : QLang.tdbindings;
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;

@@ -78,6 +78,7 @@ MODULES = \
 	Basic/TypeSystem/TBrandModelProp \
 	Basic/TypeSystem/Types \
 	Basic/Typing/ForeignDataTyping \
+	Basic/Typing/TUtil \
 	Basic/Typing/TData \
 	Basic/Typing/TDData \
 	Basic/Typing/TBindings \

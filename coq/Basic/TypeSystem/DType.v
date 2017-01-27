@@ -51,6 +51,15 @@ Section DType.
       * right; congruence.
   Qed.
 
+  Section unlocalize.
+    Definition unlocalize_drtype (dt:drtype) : rtype :=
+      match dt with
+      | Tlocal t => t
+      | Tdistr t => Coll t
+      end.
+
+  End unlocalize.
+
 End DType.
 
     

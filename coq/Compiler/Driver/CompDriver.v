@@ -233,21 +233,16 @@ Section CompDriver.
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
       nnrcmr_prepared_to_spark_rdd rulename (nnrcmr_to_nnrcmr_spark_rdd_prepare q).
 
-  (* XXX This should be generalized for arbitrary tdbindings XXX *)
-    Definition dnnrc_infer_world {A: Set} (e: dnnrc _ A dataset) (inputType: rtype)
-      : option (dnnrc _ (type_annotation A) dataset) :=
-      let tdb: tdbindings := ("CONST$WORLD"%string, (Tdistr inputType))::nil in
-      infer_dnnrc_type tdb e.
-
     Definition dnnrc_dataset_to_dnnrc_typed_dataset
-               (e: dnnrc_dataset) (inputType: rtype)
+               (e: dnnrc_dataset) (tdenv: tdbindings)
       : option dnnrc_typed_dataset :=
-      dnnrc_infer_world e inputType.
+      infer_dnnrc_type tdenv e.
 
     (* Backend *)
+
     Definition dnnrc_typed_dataset_to_spark_dataset
-               (inputType:rtype) (name:string) (q:dnnrc_typed_dataset) : string :=
-      @dnnrcToSpark2Top _ _ bm _ _ unit inputType name q.
+               (tenv:tdbindings) (name:string) (q:dnnrc_typed_dataset) : string :=
+      @dnnrcToSpark2Top _ _ bm _ _ unit tenv name q.
 
     Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
       mapReducePairstoCloudant h q rulename.
@@ -314,12 +309,12 @@ Section CompDriver.
   Inductive dnnrc_typed_dataset_driver : Set :=
     | Dv_dnnrc_typed_dataset_stop : dnnrc_typed_dataset_driver
     | Dv_dnnrc_typed_dataset_optim : dnnrc_typed_dataset_driver -> dnnrc_typed_dataset_driver
-    | Dv_dnnrc_typed_dataset_to_spark_dataset : rtype -> string -> spark_dataset_driver -> dnnrc_typed_dataset_driver
+    | Dv_dnnrc_typed_dataset_to_spark_dataset : tdbindings -> string -> spark_dataset_driver -> dnnrc_typed_dataset_driver
   .
 
   Inductive dnnrc_dataset_driver : Set :=
     | Dv_dnnrc_dataset_stop : dnnrc_dataset_driver
-    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : rtype -> dnnrc_typed_dataset_driver -> dnnrc_dataset_driver
+    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : tdbindings -> dnnrc_typed_dataset_driver -> dnnrc_dataset_driver
   .
 
   (* Unset Elimination Schemes. *)
@@ -722,8 +717,8 @@ Section CompDriver.
     let queries :=
         match dv with
         | Dv_dnnrc_dataset_stop => nil
-        | Dv_dnnrc_dataset_to_dnnrc_typed_dataset rt dv =>
-          let q := dnnrc_dataset_to_dnnrc_typed_dataset q rt in
+        | Dv_dnnrc_dataset_to_dnnrc_typed_dataset tdenv dv =>
+          let q := dnnrc_dataset_to_dnnrc_typed_dataset q tdenv in
           match q with
           | Some q => compile_dnnrc_typed_dataset dv q
           | None => (Q_error "Type checking failed for dnnrc query") :: nil
@@ -1162,7 +1157,7 @@ Section CompDriver.
       end
     | L_nnrc_core =>
       match dv with
-      | Dv_camp dv => Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (vdbindings_of_tdbindings config.(comp_tdbindings))) dv) (* XXX to check XXX *)
+      | Dv_camp dv => Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (vdbindings_of_constants_config config.(comp_constants))) dv) (* XXX to check XXX *)
       | Dv_nnrc_core dv => Dv_nnrc_core (Dv_nnrc_core_optim (get_optim_config L_nnrc_core config.(comp_optim_config)) dv)
       | Dv_nnrc dv => Dv_nnrc_core (Dv_nnrc_core_to_nnrc dv)
       | Dv_nraenv _
@@ -1188,7 +1183,7 @@ Section CompDriver.
     | L_nnrc =>
       match dv with
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (* config.(comp_vdbindings) *) dv)
-      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_tdbindings config.(comp_tdbindings)) dv)
+      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc config.(comp_optim_config)) dv)
@@ -1263,7 +1258,7 @@ Section CompDriver.
     | L_dnnrc_dataset =>
       match dv with
       | Dv_dnnrc_typed_dataset dv =>
-        Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset config.(comp_input_type) dv)
+          Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (tdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_dnnrc_dataset _
       | Dv_nraenv _
       | Dv_rule _
@@ -1289,7 +1284,7 @@ Section CompDriver.
     | L_dnnrc_typed_dataset =>
       match dv with
       | Dv_spark_dataset dv =>
-        Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset config.(comp_input_type) config.(comp_qname) dv)
+          Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset (tdbindings_of_constants_config config.(comp_constants)) config.(comp_qname) dv)
       | Dv_dnnrc_typed_dataset dv =>
         Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv)
       | Dv_nraenv _
@@ -1418,7 +1413,7 @@ Section CompDriver.
         | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit (* vdbindings *) _) =>
           vinit = config.(comp_mr_vinit) (* /\ vdbindings = config.(comp_vdbindings) *)
         | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset vdbindings _) =>
-          vdbindings = vdbindings_of_tdbindings config.(comp_tdbindings)
+          vdbindings = (vdbindings_of_constants_config config.(comp_constants))
         | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
           class_name = config.(comp_class_name) /\ imports = config.(comp_java_imports)
         | Dv_nra (Dv_nra_optim opc _) =>
@@ -1430,7 +1425,7 @@ Section CompDriver.
         | Dv_nnrc (Dv_nnrc_optim opc _) =>
           opc = (get_optim_config L_nnrc config.(comp_optim_config))
         | Dv_nnrc_core (Dv_nnrc_core_to_camp avoid _) =>
-          avoid = (List.map fst (vdbindings_of_tdbindings config.(comp_tdbindings)))
+          avoid = (List.map fst (vdbindings_of_constants_config config.(comp_constants)))
         | Dv_nnrc_core (Dv_nnrc_core_optim opc _) =>
           opc = (get_optim_config L_nnrc_core config.(comp_optim_config))
         | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd qname _) =>
@@ -1439,10 +1434,10 @@ Section CompDriver.
           brand_rel = config.(comp_brand_rel)
         | Dv_cldmr (Dv_cldmr_to_cloudant qname brand_rel _) =>
           qname = config.(comp_qname) /\ brand_rel = config.(comp_brand_rel)
-        | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset input_type _) =>
-          input_type = config.(comp_input_type)
-        | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset input_type qname _) =>
-          input_type = config.(comp_input_type) /\ qname = config.(comp_qname)
+        | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset tdbindings _) =>
+          tdbindings = tdbindings_of_constants_config config.(comp_constants)
+        | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset tdbindings qname _) =>
+          (tdbindings = tdbindings_of_constants_config config.(comp_constants)) /\ qname = config.(comp_qname)
         | _ => True
         end.
 
@@ -1587,7 +1582,6 @@ Section CompDriver.
                  s
                  EmptyString
                  l
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1611,13 +1605,13 @@ Section CompDriver.
                  s
                  EmptyString
                  nil
-                 r
                  EmptyString
-                 nil
+                 (constants_config_of_tdbindings t)
                  EmptyString
                  nil) (lang:=L_dnnrc_typed_dataset)
       ; [ eapply target_language_of_driver_is_postfix_spark_dataset | | ]
       ; simpl; trivial.
+      rewrite (constants_config_of_tdbindings_merges t); reflexivity.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_dnnrc_dataset:
@@ -1632,12 +1626,12 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 r
                  EmptyString
-                 nil
+                 (constants_config_of_tdbindings t)
                  EmptyString
                  nil) (lang:=L_dnnrc_dataset)
       ; [eapply target_language_of_driver_is_postfix_dnnrc_typed_dataset | | ]; simpl; trivial.
+      rewrite (constants_config_of_tdbindings_merges t); reflexivity.
   Qed.
 
   Lemma pick_tdbindings_from_vdbindings (v:vdbindings):
@@ -1652,13 +1646,9 @@ Section CompDriver.
       + elim IHv; intros.
         exists ((s,Tlocal Unit) :: x).
         simpl.
-        unfold t_to_v.
-        simpl.
         rewrite H; reflexivity.
       + elim IHv; intros.
         exists ((s,Tdistr Unit) :: x).
-        simpl.
-        unfold t_to_v.
         simpl.
         rewrite H; reflexivity.
   Qed.
@@ -1711,7 +1701,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1722,7 +1711,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1733,7 +1721,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1744,7 +1731,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1755,23 +1741,17 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
-                 (List.map (fun x => (x,Tlocal Unit)) l)
+                 (one_constant_config_of_avoid_list l)
                  EmptyString
                  nil) (lang:=L_nnrc_core);
         [eassumption | | ]; simpl; trivial.
-      unfold vdbindings_of_tdbindings. rewrite List.map_map.
-      rewrite List.map_map.
-      simpl.
-      rewrite List.map_id.
-      trivial.
+      rewrite one_constant_config_of_avoid_list_extracts; reflexivity.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1782,7 +1762,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  v
                  nil
                  EmptyString
@@ -1795,13 +1774,13 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
-                 x
+                 (constants_config_of_tdbindings x)
                  EmptyString
                  nil) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
-      rewrite H0; reflexivity.
+      subst.
+      rewrite vdbindings_of_constants_config_commutes; reflexivity.
     - eapply is_postfix_plus_one with
       (config:=trivial_driver_config) (lang:=L_nnrc);
         [eapply target_language_of_driver_is_postfix_javascript | | ]; simpl; trivial.
@@ -1810,7 +1789,6 @@ Section CompDriver.
                  EmptyString
                  s
                  nil
-                 ⊥
                  EmptyString
                  nil
                  s0
@@ -1821,7 +1799,6 @@ Section CompDriver.
                  s
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1832,7 +1809,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  nil
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -1843,7 +1819,6 @@ Section CompDriver.
                  EmptyString
                  EmptyString
                  l
-                 ⊥
                  EmptyString
                  nil
                  EmptyString
@@ -2021,7 +1996,7 @@ Section CompDriver.
           reflexivity.
         * destruct (H_config (Dv_nraenv (Dv_nraenv_optim (get_optim_config L_nraenv (comp_optim_config config0)) n)));
           reflexivity.
-        * destruct (H_config ((Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (vdbindings_of_tdbindings (comp_tdbindings config0))) c))));
+        * destruct (H_config ((Dv_nnrc_core (Dv_nnrc_core_to_camp (List.map fst (vdbindings_of_constants_config (comp_constants config0))) c))));
             reflexivity.
         * destruct (H_config (Dv_nnrc_core (Dv_nnrc_core_optim (get_optim_config L_nnrc_core (comp_optim_config config0)) n)));
           reflexivity.
@@ -2029,7 +2004,7 @@ Section CompDriver.
           reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) n)));
             reflexivity.
-        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_tdbindings (comp_tdbindings config0)) d)));
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
             try reflexivity.
@@ -2041,10 +2016,10 @@ Section CompDriver.
         * destruct (H_config (Dv_cldmr (Dv_cldmr_to_cloudant (comp_qname config0) (comp_brand_rel config0) c)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
-        * destruct (H_config (Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (comp_input_type config0) d)));
+        * destruct (H_config (Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (tdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
         * destruct (H_config (Dv_dnnrc_typed_dataset
-                                (Dv_dnnrc_typed_dataset_to_spark_dataset (comp_input_type config0) (comp_qname config0) s)));
+                                (Dv_dnnrc_typed_dataset_to_spark_dataset (tdbindings_of_constants_config (comp_constants config0)) (comp_qname config0) s)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
   Qed.
@@ -3480,7 +3455,7 @@ Section CompDriver.
           end.
     Proof.
       destruct source; destruct target;
-      intros; try solve [ simpl; split; reflexivity ].
+        intros; try solve [ simpl; split; reflexivity ].
     Qed.
 
     Definition no_L_error (lang: language) : Prop :=

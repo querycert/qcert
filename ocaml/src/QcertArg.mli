@@ -23,8 +23,9 @@ val add_path : QcertConfig.global_config -> string -> unit
 val set_dir : QcertConfig.global_config -> string -> unit
 val set_dir_target : QcertConfig.global_config -> string -> unit
 val set_schema_file : QcertConfig.global_config -> string -> unit
+val set_data_file : QcertConfig.global_config -> string -> unit
+val set_expected_output_file : QcertConfig.global_config -> string -> unit
 val set_io_file : QcertConfig.global_config -> string -> unit
-val set_io_use_world : QcertConfig.global_config -> unit -> unit
 val set_emit_all : QcertConfig.global_config -> unit -> unit
 val set_emit_sexp : QcertConfig.global_config -> unit -> unit
 val set_emit_sexp_all : QcertConfig.global_config -> unit -> unit
@@ -35,8 +36,6 @@ val set_eval_validate : QcertConfig.global_config -> unit -> unit
 val set_source_sexp : QcertConfig.global_config -> unit -> unit
 val set_java_imports : QcertConfig.global_config -> string -> unit
 val set_vinit : QcertConfig.global_config -> string -> unit
-val add_vdirst : QcertConfig.global_config -> string -> unit
-val add_vlocal : QcertConfig.global_config -> string -> unit
 val set_stat : QcertConfig.global_config -> unit -> unit
 val set_stat_all : QcertConfig.global_config -> unit -> unit
 val set_stat_tree : QcertConfig.global_config -> unit -> unit

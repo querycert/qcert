@@ -395,8 +395,24 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  Definition dnnrcToSpark2Top {A : Set} (inputType:rtype) (name: string)
+  (* XXX NEW CODE: handles a collection of distributed variables instead of a single built-in 'WORLD' one. Stefan should review. XXX *)
+  (* XXX WARNING: Won't work unless there is a way to pass multiple input JSON collections? *)
+  (* XXX WARNING: Seems to assume the type is local, but not sure why? *)
+  
+  Definition type_name_of_var (var:string) : string :=
+    var ++ "$TYPE".
+  
+  Definition scala_type_of_tbinding (bind:string * rtype) :=
+    "val " ++ (type_name_of_var (fst bind)) ++ " = " ++ rtype_to_spark_DataType (proj1_sig (snd bind)) ++ eol.
+
+  (* XXX WARNING: Won't work unless there is a way to pass multiple input JSON collections? see the .json(args(0)) part to be fixed? *)
+  Definition scala_var_of_tbinding (bind:string * rtype) :=
+    "val " ++ (fst bind) ++ " = sparkSession.read.schema(" ++ (type_name_of_var (fst bind)) ++ ").json(args(0))" ++ eol.
+
+  Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
              (e: dnnrc (type_annotation A) dataset) : string :=
+    (* XXX This has to be generalized for multiple distributed collections! XXX *)
+    let inputType := lookup equiv_dec tenv "CONST$WORLD"%string in
     ""
       ++ "import org.apache.spark.SparkContext" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol
@@ -407,11 +423,15 @@ Section DNNRCtoScala.
 
       ++ "object " ++ name ++ " {" ++ eol
       ++ "def main(args: Array[String]): Unit = {" ++ eol
-      ++ "val WORLDTYPE = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol
+      (* XXX This has to be generalized for multiple distributed collections! XXX *)
+      (* ++ "val WORLDTYPE = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol *)
+      ++ (joinStrings "" (map scala_type_of_tbinding (unlocalize_tdbindings tenv)))
       ++ "val HIERARCHY = QcertRuntime.makeHierarchy(" ++ initBrandHierarchy ++ ")" ++ eol
       ++ "val sparkContext = new SparkContext()" ++ eol
       ++ "val sparkSession = SparkSession.builder().getOrCreate()" ++ eol
-      ++ "val CONST$WORLD = sparkSession.read.schema(WORLDTYPE).json(args(0))" ++ eol
+      (* XXX This has to be generalized for multiple distributed collections! XXX *)
+      (* ++ "val CONST$WORLD = sparkSession.read.schema(WORLDTYPE).json(args(0))" ++ eol *)
+      ++ (joinStrings "" (map scala_var_of_tbinding (unlocalize_tdbindings tenv)))
       ++ "import sparkSession.implicits._" ++ eol
       ++ "QcertRuntime.beforeQuery()" ++ eol
       ++ "println(QcertRuntime.toBlob(" ++ eol

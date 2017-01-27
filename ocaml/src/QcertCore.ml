@@ -106,10 +106,52 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
 
 (* Eval *)
 
-let eval_string (validate:bool) (debug:bool) (data:QEval.eval_input) (expected_output_data:DataUtil.io_output) (schema: TypeUtil.schema) dir file_name q =
-  let ev_input = data in
+let lift_data_to_ddata globals (var:char list * QData.data) =
+  let vname = fst var in
+  let data = snd var in
+  let loc =
+    begin try (List.assoc vname globals).Compiler.constant_localization with
+    | Not_found -> Compiler.Vlocal
+    end
+  in
+  begin match loc with
+  | Compiler.Vlocal -> (vname,QData.dlocal data)
+  | Compiler.Vdistr ->
+      begin match QData.ddistr data with
+      | Some dd -> (vname,dd)
+      | None -> raise  (Qcert_Error ("Distributed variable " ^ (Util.string_of_char_list vname) ^ " should be initialized with an input collection"))
+      end
+  end
+
+(* Debug *)
+
+let get_dist (dd:QData.ddata) =
+  begin match dd with
+  | Compiler.Ddistr _ -> "distributed"
+  | Compiler.Dlocal _ -> "local"
+  end
+
+let get_value (dd:QData.ddata) =
+  begin match dd with
+  | Compiler.Ddistr d ->
+      Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") (QData.dcoll d))
+  | Compiler.Dlocal d ->
+      Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") d)
+  end
+    
+let print_input_var (v:char list * QData.ddata) =
+  Printf.printf "Var: %s is %s and has value:\n" (Util.string_of_char_list (fst v)) (get_dist (snd v));
+  Printf.printf "%s\n" (get_value (snd v))
+    
+let print_input ev_input =
+  List.iter print_input_var ev_input
+
+let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (expected_output_data:DataUtil.content_output) (schema: TypeUtil.schema) dir file_name q =
   let brand_model = schema.TypeUtil.sch_brand_model in
   let brand_relation = TypeUtil.brand_relation_of_brand_model brand_model in
+  let globals = schema.TypeUtil.sch_globals in
+  let ev_input = List.map (lift_data_to_ddata globals) ev_input in
+  (* print_input ev_input; *)
   let language_name = QcertUtil.name_of_language (QLang.language_of_query brand_model q) in
   let ev_output =
     begin match debug with

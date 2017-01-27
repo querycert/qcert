@@ -18,24 +18,14 @@ open Util
 open DataUtil
 open Compiler.EnhancedCompiler
 
-type io_schema = {
-    io_brand_model : (string * string) list;
-    io_name : string;
-    io_brand_type : (string * string) list;
-    io_type_definitions : (string * rtype_content) list;
-  }
-
 type schema = {
     sch_brand_model : QType.brand_model;
-    sch_camp_type : QType.camp_type;
     sch_foreign_typing : Compiler.foreign_typing;
-    sch_io_schema : io_schema option;
+    sch_io_schema : content_schema option;
+    sch_globals : QDriver.constants_config;
   }
 
 (* Data utils for the Camp evaluator and compiler *)
-
-let make_brand_relation (br:  (string * string) list) =
-  List.map (fun xy -> (Util.char_list_of_string (fst xy), Util.char_list_of_string (snd xy))) br
 
 let lookup_brand_type (brand_type:string) type_defs =
   try
@@ -43,47 +33,45 @@ let lookup_brand_type (brand_type:string) type_defs =
   with
   | Not_found -> raise (Failure ("Type: " ^ brand_type ^ " not found in type defs list"))
 
-let rtype_content_to_rtype (br: (string * string) list) (j:rtype_content) =
-  match QType.json_to_rtype_with_fail (make_brand_relation br) j with
+let rtype_content_to_rtype (br: (char list * char list) list) (j:rtype_content) =
+  match QType.json_to_rtype_with_fail br j with
   | None -> raise (Failure ("type parsing failed for JSON:" ^ (Util.string_of_char_list (QData.jsonToJS ['"'] j))))
   | Some t -> t
 
-let make_brand_context (br: (string * string) list) brand_types (type_defs : (string * rtype_content) list) =
+let rtype_content_to_vrtype (br: (char list * char list) list) (j:vrtype_content) =
+  begin match QType.json_to_vrtype_with_fail br j with
+  | None -> raise (Failure ("global type parsing failed for JSON:" ^ (Util.string_of_char_list (QData.jsonToJS ['"'] j))))
+  | Some t -> t
+  end
+
+let make_brand_context (br: (char list * char list) list) brand_types (type_defs : (string * rtype_content) list) =
   List.map (fun (x,y) -> (Util.char_list_of_string x, rtype_content_to_rtype br (lookup_brand_type y type_defs))) brand_types
 
-let model_content_to_model (br: (string * string) list) (mc: model_content) : QType.brand_model option =
-  let (model_name, brand_types, type_defs) = mc in
-  let brand_relation = make_brand_relation br in
+let content_schema_to_model (mc: content_schema) : QType.brand_model option =
+  let (br, brand_types, type_defs, _) = mc in
   let brand_context = make_brand_context br brand_types type_defs in
-  QType.make_brand_model brand_relation brand_context
+  QType.make_brand_model br brand_context
 
-let extract_schema io =
-  let (_, hierarchy, _, model, wmType, _) = DataUtil.get_io_content (Some io) in
-  let (modelName, brandTypes, typeDefs) = DataUtil.get_model_content model in
-  let sch =
-    { io_brand_model = DataUtil.build_hierarchy hierarchy;
-      io_name = modelName;
-      io_brand_type = brandTypes;
-      io_type_definitions = typeDefs; }
-  in
-  (sch, wmType)
+let localization_of_string (x:char list) =
+  begin match Util.string_of_char_list x with
+  | "local" -> QLang.vlocal
+  | "distr" -> QLang.vdistr
+  | _ -> raise (Failure ("global localization parsing failed for: " ^ (Util.string_of_char_list x)))
+  end
+    
+let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDriver.constants_config =
+  let (br, _, _, globals) = mc in
+  List.map (fun (x,y) -> let (z,k) = rtype_content_to_vrtype br y in (Util.char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals
 
-let process_schema io_sch wmType =
-  let hierarchy, modelName, brandTypes, typeDefs =
-    (io_sch.io_brand_model, io_sch.io_name, io_sch.io_brand_type, io_sch.io_type_definitions)
-  in
-  let bm =
-    match model_content_to_model hierarchy (modelName,brandTypes,typeDefs) with
+let process_schema mc =
+  let bm = 
+    begin match content_schema_to_model mc with
     | Some bm -> bm
     | None -> raise (Failure "...Brand model creation failed")
+    end
   in
-  let wmTypeC =
-    match QType.camp_type_uncoll bm (rtype_content_to_rtype hierarchy wmType) with
-    | Some wmTypeC -> wmTypeC
-    | None -> raise (Failure "WMType isn't a collection")
-  in
-  (bm,wmTypeC)
-
+  let globs = content_schema_to_globals bm mc in
+  (bm,globs)
 
 (* The functions that should be exported *)
 
@@ -92,17 +80,17 @@ let brand_relation_of_brand_model brand_model =
 
 let empty_schema =
   let brand_model = QType.empty_brand_model () in
-  let camp_type = QType.bottom (brand_relation_of_brand_model brand_model) in (* XXX TODO: ask Jerome XXX *)
   let foreign_typing = Enhanced.Model.foreign_typing brand_model in
   { sch_brand_model = brand_model;
-    sch_camp_type = camp_type;
     sch_foreign_typing = foreign_typing;
-    sch_io_schema = None; }
+    sch_io_schema = None;
+    sch_globals = [] }
 
 let schema_of_io_json (io:QData.json) =
-  let (io_schema, wmType) = extract_schema io in
-  let bm, ct = process_schema io_schema wmType in
+  let content_schema = build_schema (Some io) in
+  let (bm,globs) = process_schema content_schema in
   { sch_brand_model = bm;
-    sch_camp_type = ct;
     sch_foreign_typing = Enhanced.Model.foreign_typing bm;
-    sch_io_schema = Some io_schema; }
+    sch_io_schema = Some content_schema;
+    sch_globals = globs }
+

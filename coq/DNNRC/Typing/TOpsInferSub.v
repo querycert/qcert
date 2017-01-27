@@ -23,8 +23,7 @@ Section TOpsInferSub.
   Require Import Bool.
   Require Import EquivDec.
   
-  Require Import Utils Types BasicRuntime.
-  Require Import ForeignDataTyping ForeignOpsTyping TData TOps TOpsInfer.
+  Require Import Utils BasicSystem.
 
   (* Lemma/definitions over types involved in the inference *)
   

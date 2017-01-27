@@ -27,6 +27,8 @@ let set_exact_path gconf () = gconf.gconf_exact_path <- true
 let set_dir gconf s = gconf.gconf_dir <- Some s
 let set_dir_target gconf s = gconf.gconf_dir_target <- Some s
 let set_schema_file gconf file_name = gconf.gconf_schema_file <- Some (Util.string_of_file file_name)
+let set_data_file gconf file_name = gconf.gconf_data_file <- Some (Util.string_of_file file_name)
+let set_expected_output_file gconf file_name = gconf.gconf_expected_output_file <- Some (Util.string_of_file file_name)
 let set_io_file gconf file_name = gconf.gconf_io_file <- Some (Util.string_of_file file_name)
 let set_emit_all gconf () = gconf.gconf_emit_all <- true
 let set_emit_sexp gconf () = gconf.gconf_emit_sexp <- true
@@ -38,13 +40,6 @@ let set_eval_validate gconf () = gconf.gconf_eval_validate <- true
 let set_source_sexp gconf () = gconf.gconf_source_sexp <- true
 let set_java_imports gconf s = gconf.gconf_java_imports <- s
 let set_vinit gconf x = gconf.gconf_mr_vinit <- x
-let add_vdirst gconf x =
-  let x = char_list_of_string x in
-  gconf.gconf_tdbindings <- (x, QType.tdistr [] (QType.top [])) :: gconf.gconf_tdbindings
-let set_io_use_world gconf () = gconf.gconf_io_use_world <- true; add_vdirst gconf "CONST$WORLD" (* XXX HACK TO BE REVIEWED XXX *)
-let add_vlocal gconf x =
-  let x = char_list_of_string x in
-  gconf.gconf_tdbindings <- (x, QType.tlocal [] (QType.top [])) :: gconf.gconf_tdbindings
 let set_stat gconf () = gconf.gconf_stat <- true
 let set_stat_all gconf () = gconf.gconf_stat_all <- true
 let set_stat_tree gconf () = gconf.gconf_stat_tree <- true

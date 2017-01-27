@@ -73,7 +73,16 @@ Module QData(runtime:CompilerRuntime).
   Definition jsonToJS s : JSON.json -> String.string 
     := NNRCtoJavascript.jsonToJS s.
 
-
+  Section dist.
+    Import DData.
+    Definition ddata : Set := DData.ddata.
+    Definition dlocal : data -> ddata := DData.Dlocal.
+    Definition ddistr (x:data) : option ddata :=
+      match x with
+      | RData.dcoll c => Some (DData.Ddistr c)
+      | _ => None
+      end.
+  End dist.
 End QData.
 
 (* 
