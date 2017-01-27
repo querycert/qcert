@@ -3786,7 +3786,21 @@ Section CompDriver.
     match List.rev path with
     | lang :: _ => lang
     | nil => L_error "empty path"
-    end.
+    end.    
+
+  Lemma get_source_target_from_path_rev path :
+    get_source_from_path path = get_target_from_path (List.rev path).
+  Proof.
+    unfold get_target_from_path.
+    rewrite List.rev_involutive.
+    reflexivity.
+  Qed.
+
+  Lemma get_target_source_from_path_rev path :
+    get_target_from_path path = get_source_from_path (List.rev path).
+  Proof.
+    reflexivity.
+  Qed.
 
   Definition remove_source_optim path :=
     match path with
@@ -3812,7 +3826,7 @@ Section CompDriver.
     | _ => path
     end.
 
-  Lemma remove_source_optim_correrct path :
+  Lemma remove_source_optim_correct path :
     let path' := remove_source_optim path in
     get_source_from_path path = get_source_from_path path' /\
     get_target_from_path path = get_target_from_path path'.
@@ -3831,13 +3845,20 @@ Section CompDriver.
   Definition remove_target_optim path :=
     List.rev (remove_source_optim (List.rev path)).
 
-  Lemma remove_target_optim_correrct path :
+  Lemma remove_target_optim_correct path :
     let path' := remove_target_optim path in
     get_source_from_path path = get_source_from_path path' /\
     get_target_from_path path = get_target_from_path path'.
   Proof.
-  Admitted. (* XXX TOO XXX *)
-
+    simpl.
+    rewrite (get_source_target_from_path_rev path).
+    rewrite (get_source_target_from_path_rev (remove_target_optim path)).
+    rewrite (get_target_source_from_path_rev path).
+    rewrite (get_target_source_from_path_rev (remove_target_optim path)).
+    unfold remove_target_optim.
+    repeat rewrite List.rev_involutive.
+    generalize (remove_source_optim_correct (List.rev path)); simpl; tauto.
+  Qed.
 
   End CompPaths.
 
