@@ -35,8 +35,8 @@ public class JavaTestRunner {
 	}
 
 	public static Object runQuery(JavaQuery query, JsonObject combinedInput) {
-		JsonArray hierarchy = combinedInput.getAsJsonArray("inheritance");
-		JsonElement input = combinedInput.get("input");
+	        JsonArray hierarchy = combinedInput.get("schema").getAsJsonObject().getAsJsonArray("hierarchy");
+		JsonElement input = combinedInput.get("input").getAsJsonObject().get("WORLD");
 		final ZonedDateTime now;
 		JsonPrimitive primnow = combinedInput.getAsJsonPrimitive("now");
 		if(primnow == null) {
@@ -60,8 +60,8 @@ public class JavaTestRunner {
 
 	private static JsonObject mkConstants(JsonElement input, ZonedDateTime now) {
 	    JsonObject jsonObject = new JsonObject();
-	    jsonObject.add("CONST$WORLD", input);
-	    jsonObject.addProperty("CONST$NOW", now.toString());
+	    jsonObject.add("WORLD", input);
+	    jsonObject.addProperty("NOW", now.toString());
 	    return jsonObject;
 	}
 

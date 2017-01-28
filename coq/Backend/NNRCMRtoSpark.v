@@ -241,6 +241,7 @@ Section NNRCMRtoSpark.
       List.fold_left
         (fun acc (x_loc: var * dlocalization) =>
            let (x, loc) := x_loc in
+           let unconsted_x := unConstVar x in (* Removes CONST$ prefix added during compilation for consistency with external specification *)
            let load_func :=
                match loc with
                | Vlocal => "loadScalar"
@@ -248,7 +249,7 @@ Section NNRCMRtoSpark.
                end
            in
            acc ++
-           "val "++(rdd_env_id x)++" = "++load_func++"(e, sc, world, """++(attr_id x)++""")" ++ scala_endl)
+           "val "++(rdd_env_id x)++" = "++load_func++"(e, sc, world, """++(attr_id unconsted_x)++""")" ++ scala_endl)
         env_vars "".
 
     Definition check_result_from_file_func (scala_endl:string) (quotel:string) :=

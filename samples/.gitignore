@@ -4,3 +4,6 @@
 *.s-sql
 *_stats.json
 *.error
+*.txt
+oql/*.json
+sql/*.json

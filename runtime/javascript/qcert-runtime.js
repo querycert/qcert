@@ -426,7 +426,7 @@ function looksLikeRelationship(v) {
 	return hasKey && hasType;
 }
 function mkWorld(v) {
-  return { "CONST$WORLD" : v };
+  return { "WORLD" : v };
 }
 
 // from: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FRegular_Expressions
