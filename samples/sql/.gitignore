@@ -1,9 +1,3 @@
-*.java
-*.class
-*.js
-*.s-sql
-*_stats.json
-*.error
 /tpc/*.sql
 /tpc/*.data
 /tpc/dss.ddl

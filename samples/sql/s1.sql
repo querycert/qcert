@@ -1,3 +1,3 @@
 select *
-from WORLD
+from persons
 ;

@@ -1,4 +1,4 @@
 select name
-from Persons
+from persons
 where age > 32
 ;
