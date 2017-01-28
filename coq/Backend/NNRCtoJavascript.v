@@ -397,17 +397,6 @@ Section NNRCtoJavascript.
     Definition makeJSParams (ivs: list string) :=
       joinStrings ", " ivs.
 
-    (* Free variables are assumed to be constant lookups *)
-    (* Java equivalent: JavaScriptBackend.closeFreeVars *)
-    Definition closeFreeVars (input:string) (e:nnrc) (params:list string) : nnrc :=
-      let all_free_vars := nnrc_free_vars e in
-      let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
-          if (in_dec string_dec fv params)
-          then e'
-          else (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
-      in
-      fold_left wrap_one_free_var all_free_vars e.
-
     (* Java equivalent: JavaScriptBackend.paramsToStringedParams *)
     Definition paramsToStringedParams (params : list string) :=
       map (fun x => (x,x)) params.
@@ -427,10 +416,22 @@ Section NNRCtoJavascript.
       let '(j0, v0, t0) := nnrcToJSunshadow e 1 1 eol quotel params (paramsToStringedParams params) in
       "function " ++ fname
                   ++ "("++ (makeJSParams params) ++ ") {" ++ eol
-(*                ++ "  var constants = mkWorld(constants);" ++ eol *) (* Moved to caller, i.e., TestUtil.java in queryTests *)
                   ++ j0
                   ++ "  return " ++ v0 ++ ";" ++ eol
                   ++ "}".
+
+    (* Free variables are assumed to be constant lookups *)
+    (* Java equivalent: JavaScriptBackend.closeFreeVars *)
+    Definition closeFreeVars (input:string) (e:nnrc) (params:list string) : nnrc :=
+      let all_free_vars := nnrc_free_vars e in
+      let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
+          if (in_dec string_dec fv params)
+          then e'
+          else
+            let unconsted_fv := unConstVar fv in (* Removes CONST$ prefix added during compilation for consistency with external specification *)
+            (NNRCLet fv (NNRCUnop (ADot unconsted_fv) (NNRCVar input)) e')
+      in
+      fold_left wrap_one_free_var all_free_vars e.
 
     (* Java equivalent: JavaScriptBackend.nrcToJSFun *)
     Definition nnrcToJSFun (input_v:string) (e:nnrc) (eol:string) (quotel:string) (ivs : list string) (fname:string) :=

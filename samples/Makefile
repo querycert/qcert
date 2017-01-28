@@ -17,7 +17,6 @@ JAVA=java
 JAVAC=javac
 QCERTCOMP=../bin/qcert
 QCERTEVAL=../bin/qcert -eval
-QCERTDATA=../bin/CADa
 
 all:
 	$(MAKE) classes
@@ -42,20 +41,6 @@ oql/%.class: oql/%.java
 	@echo
 	@echo "Compiling test with javac: '"$<"' to '"$@"'"
 	$(JAVAC) -cp $(CPATH) $<
-
-oql/%_spark2:
-	-mkdir -p $@
-	-mkdir -p $@/src/main/scala
-
-oql/%_spark2/persons.sjson: oql/%_spark2
-	$(QCERTDATA) -dir oql/$*_spark2 data/persons.json
-
-camp/%_spark2:
-	-mkdir -p $@
-	-mkdir -p $@/src/main/scala
-
-run_spark2_%: oql/%_spark2 oql/%_spark2/persons.sjson
-	$(QCERTCOMP)
 
 run_js_%: oql/%.js
 	@echo

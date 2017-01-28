@@ -197,6 +197,15 @@ Section RConstants.
 
   End World.
 
+  Section unConst.
+    Require Import String.
+    Definition unConstVar (fv:string) : string :=
+      if (prefix "CONST$" fv)
+      then
+        substring 6 ((length fv) - 6) fv
+      else fv.
+  End unConst.
+  
 End RConstants.
 
 (* 

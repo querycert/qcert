@@ -394,7 +394,9 @@ Section NNRCtoJava.
       let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (assoc_lookupr equiv_dec ivs fv)
           then e'
-          else (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
+          else
+            let unconsted_fv := unConstVar fv in (* Removes CONST$ prefix added during compilation for consistency with external specification *)
+            (NNRCLet fv (NNRCUnop (ADot unconsted_fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
     
