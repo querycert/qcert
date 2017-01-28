@@ -11,5 +11,7 @@
 	<classpathentry kind="lib" path="services/presto-parser-0.154.jar"/>
 	<classpathentry kind="lib" path="services/slice-0.7.jar"/>
 	<classpathentry kind="lib" path="services/sqlparser.jar"/>
+	<classpathentry kind="lib" path="services/jrules-engine.jar"/>
+	<classpathentry kind="lib" path="services/jrules2CAMP.jar" sourcepath="/jrules2CAMP"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
