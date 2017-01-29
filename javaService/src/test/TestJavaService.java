@@ -16,6 +16,8 @@
 package test;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -30,6 +32,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
 /**
  * Just a test that we are able to communicate with the Java service at localhost or AWS instance, port 9879.
  */
@@ -40,13 +46,15 @@ public class TestJavaService {
 	 * Main.  The cmdline arguments either do or don't contain the flag -remote: that's the only supported flag.  If it is specified,
 	 *   we test code on the AWS instance.  If it is not, we test code running locally.
 	 * The first non-flag argument is the "verb", which (currently) should be one of the verbs set at the top of source file
-	 *   org.qcert.javasrc.Main.  The second non-flag argument is a file containing material to send to the server.
+	 *   org.qcert.javasrc.Main.  The second non-flag argument is a file containing source to send to the server.
+	 *   The third non-flag argument, if present, is a file containing the schema to send to the server.  The third argument
+	 *   is ignored unless the verb is one that requires it, in which case it is required.
 	 * All other arguments and argument forms are illegal.
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		/* Parse command line */
-		String file = null, loc = "localhost", verb = null;
+		String file = null, loc = "localhost", verb = null, schema = null;
 		for (String arg : args) {
 			if (arg.equals("-remote"))
 				loc = REMOTE_LOC;
@@ -56,11 +64,18 @@ public class TestJavaService {
 				verb = arg;
 			else if (file == null)
 				file = arg;
+			else if (schema == null)
+				schema = arg;
 			else
 				illegal();
 		}
 		/* Simple consistency checks */
 		if (verb == null || file == null)
+			illegal();
+		if (needsSchema(verb)) {
+			if (schema == null)
+				illegal();
+		} else if (schema != null)
 			illegal();
 		/* Assemble information from arguments */
 		String url = String.format("http://%s:9879?verb=%s", loc, verb);
@@ -70,6 +85,8 @@ public class TestJavaService {
 			toSend = Base64.getEncoder().encodeToString(contents);
 		else
 			toSend = new String(contents);
+		if (needsSchema(verb))
+			toSend = makeSpecialJson(toSend, schema);
 		HttpClient client = HttpClients.createDefault();
 		HttpPost post = new HttpPost(url);
 		StringEntity entity = new StringEntity(toSend);
@@ -98,8 +115,29 @@ public class TestJavaService {
 		System.exit(-1);
 	}
 
+	/**
+	 * Make the special JSON encoding when both source and schema must be provided
+	 * @param source the source string
+	 * @param schemaFile the file containing the schema
+	 * @return the string containing both as a JSON object
+	 * @throws IOException 
+	 */
+	private static String makeSpecialJson(String source, String schemaFile) throws IOException {
+		/* This is done using GSON rather than naive string operations to avoid issues with embedded quotes */
+		JsonObject result = new JsonObject();
+		result.add("source", new JsonPrimitive(source));
+		JsonObject schema = new JsonParser().parse(new FileReader(schemaFile)).getAsJsonObject();
+		result.add("schema", schema);
+		return result.toString();
+	}
+
 	/** Determines if a given verb needs base64 encoding of its file contents (currently true only of serialRule2CAMP) */
 	private static boolean needsEncoding(String verb) {
 		return "serialRule2CAMP".equals(verb);
+	}
+
+	/** Determines if a given verb needs a schema (currently true only of techRule2CAMP) */
+	private static boolean needsSchema(String verb) {
+		return "techRule2CAMP".equals(verb);
 	}
 }
