@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="services/sqlparser.jar"/>
 	<classpathentry kind="lib" path="services/jrules-engine.jar"/>
 	<classpathentry kind="lib" path="services/jrules2CAMP.jar" sourcepath="/jrules2CAMP"/>
+	<classpathentry kind="lib" path="services/gson-2.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
