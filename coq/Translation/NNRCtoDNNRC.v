@@ -236,7 +236,7 @@ Section NNRCtoDNNRC.
   Require Import NRAEnvRuntime.
   Require Import Dataset.
   Context {ftype: ForeignType.foreign_type}.
-  Definition nnrc_to_dnnrc_dataset {A} := @nnrc_to_dnnrc A dataset.
+  Definition nnrc_to_dnnrc_dataset {A:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nnrc) := @nnrc_to_dnnrc A dataset annot (mkConstants tenv) n.
 
 End NNRCtoDNNRC.
 

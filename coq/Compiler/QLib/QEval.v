@@ -27,7 +27,6 @@ Module QEval(runtime:CompilerRuntime).
 
   (* Inputs to eval *)
   Definition constant_env : Set := list (string*data).
-  Definition world_env : Set := list data.
 
   (* Eval for arbitrary (local) constant environments *)
   Definition eval_rule : rule -> constant_env -> option data := @eval_rule _ h.
@@ -49,27 +48,6 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_nnrcmr : nnrcmr -> constant_env -> option data := @eval_nnrcmr _ _ h.
   Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
   Definition eval_dnnrc_dataset {bm:brand_model} : dnnrc_dataset -> constant_env -> option data := @eval_dnnrc_dataset _ _ h.
-
-  (* Eval for single 'world' collection *)
-  Definition eval_rule_world : rule -> world_env -> option data := @eval_rule_world _ h.
-  Definition eval_rule_world_debug : bool -> rule -> world_env -> string := @eval_rule_world_debug _ h.
-  
-  Definition eval_camp_world : camp -> world_env -> option data := @eval_camp_world _ h.
-  Definition eval_camp_world_debug : bool -> camp -> world_env -> string := @eval_camp_world_debug _ h.
-
-  Definition eval_oql_world : oql -> world_env -> option data := @eval_oql_world _ h.
-  Definition eval_sql_world : sql -> world_env -> option data := @eval_sql_world _ h.
-  Definition eval_lambda_nra_world : lambda_nra -> world_env -> option data := @eval_lambda_nra_world _ h.
-
-  Definition eval_nra_world : nra -> world_env -> option data := @eval_nra_world _ h.
-  Definition eval_nraenv_core_world : nraenv_core -> world_env -> option data := @eval_nraenv_core_world _ h.
-  Definition eval_nraenv_world : nraenv -> world_env -> option data := @eval_nraenv_world _ h.
-
-  Definition eval_nnrc_world : nnrc -> world_env -> option data := @eval_nnrc_world _ h.
-
-  Definition eval_nnrcmr_world : nnrcmr -> world_env -> option data := @eval_nnrcmr_world _ _ h.
-  Definition eval_cldmr_world : cldmr -> world_env -> option data := @eval_cldmr_world _ _ h.
-  Definition eval_dnnrc_dataset_world {bm:brand_model} : dnnrc_dataset -> world_env -> option data := @eval_dnnrc_dataset_world _ _ h.
 
   (* Eval driver *)
 

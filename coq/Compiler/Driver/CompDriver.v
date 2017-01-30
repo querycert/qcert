@@ -192,7 +192,7 @@ Section CompDriver.
                                            inputs_loc) q.
 
     Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
-      nnrc_to_dnnrc tt inputs_loc q.
+      nnrc_to_dnnrc_dataset tt inputs_loc q.
 
     Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
       lift_nnrc_core nnrcToJSTop (nnrc_to_nnrc_core q).

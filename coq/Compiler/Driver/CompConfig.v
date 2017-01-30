@@ -109,6 +109,9 @@ Section CompConfig.
     Definition vdbindings_of_constants_config (cconf:constants_config) :=
       map (fun xy => (fst xy, (snd xy).(constant_localization))) cconf.
 
+    Definition vdbindings_of_constants_config_prefixed (cconf:constants_config) :=
+      mkConstants (map (fun xy => (fst xy, (snd xy).(constant_localization))) cconf).
+
     Definition tbindings_of_constants_config (cconf:constants_config) :=
       map (fun xy => (fst xy, (snd xy).(constant_type))) cconf.
 
@@ -156,6 +159,20 @@ Section CompConfig.
       - rewrite IHx.
         destruct a; simpl.
         destruct d; simpl; reflexivity.
+    Qed.
+    
+    (* One more property for vdbindings access to constant_config. *)
+    Lemma vdbindings_of_constants_config_prefixed_commutes x:
+      vdbindings_of_constants_config_prefixed (constants_config_of_tdbindings x)
+      = mkConstants (vdbindings_of_tdbindings x).
+    Proof.
+      induction x; simpl.
+      - reflexivity.
+      - unfold constant_config_of_tdbinding in *.
+        unfold vdbindings_of_constants_config_prefixed in *; simpl in *.
+        rewrite IHx.
+        destruct a; simpl in *.
+        destruct d; simpl in *; reflexivity.
     Qed.
     
     (* Used to show a constant_config exists for a given avoid list *)
