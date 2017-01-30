@@ -3,7 +3,7 @@
 	      "typeDefs" :[],
 	      "globals" :
 	      { "persons" :
-		{ "dist" : "local",
+		{ "dist" : "distr",
 		  "type" : { "$coll" : { "pid" : "Nat" ,
 					 "name" : "String",
 					 "age" : "Nat",

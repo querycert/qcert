@@ -86,8 +86,8 @@ Module QDriver(runtime:CompilerRuntime).
     Definition nraenv_optim_to_nnrc_optim_to_dnnrc :
       vdbindings -> nraenv -> dnnrc_dataset
       := nraenv_optim_to_nnrc_optim_to_dnnrc.
-    Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim : nraenv -> nnrcmr
-      := nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim.
+    Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_optim : vdbindings -> nraenv -> nnrcmr
+      := nraenv_optim_to_nnrc_optim_to_nnrcmr_optim.
 
     (* Used in CloudantUtil *)
     Definition cldmr_to_cloudant : string -> list (string*string) -> cldmr -> cloudant := cldmr_to_cloudant.
@@ -103,8 +103,8 @@ Module QDriver(runtime:CompilerRuntime).
       vdbindings -> rule -> dnnrc_dataset := rule_to_nraenv_to_nnrc_optim_to_dnnrc.
     Definition rule_to_nraenv_to_nnrc_optim_to_javascript :
       rule -> string := rule_to_nraenv_to_nnrc_optim_to_javascript.
-    Definition rule_to_nnrcmr : rule -> nnrcmr := rule_to_nnrcmr.
-    Definition rule_to_cldmr : list (string*string) -> rule -> cldmr := rule_to_cldmr.
+    Definition rule_to_nnrcmr : vdbindings -> rule -> nnrcmr := rule_to_nnrcmr.
+    Definition rule_to_cldmr : list (string*string) -> vdbindings -> rule -> cldmr := rule_to_cldmr.
 
   End QD.
 End QDriver.

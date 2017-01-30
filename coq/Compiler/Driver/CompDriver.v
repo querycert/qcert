@@ -168,24 +168,9 @@ Section CompDriver.
       lift_nnrc_core (nnrcToPat_let avoid) q. (* XXX avoid ? XXX *)
 
     (* Java equivalent: NnrcToNnrcmr.convert *)
-    (* XXX This call should be removed and replaced by nnrc_to_nnrcmr. see below XXX *)
-    Definition nnrc_to_nnrcmr_comptop (vinit: var) (q: nnrc) : nnrcmr :=
-      let q_free_vars := (* bdistinct !!! *) nnrc_free_vars q in
-      let inputs_loc :=
-          (vinit, Vlocal)
-            ::(mkDistNames q_free_vars)
-      in
-      (* XXX Expands GroupBy For now XXX *)
-      let q := nnrc_to_nnrc_core q in
-      lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
-                                           inputs_loc) q.
-
     (* Free variables should eventually be passed from the application. *)
     Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
-      let inputs_loc :=
-          (vinit, Vlocal)
-            :: inputs_loc
-      in
+      let inputs_loc := mkConstants ((vinit, Vlocal) :: inputs_loc) in
       (* XXX Expands GroupBy For now XXX *)
       let q := nnrc_to_nnrc_core q in
       lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
@@ -347,7 +332,7 @@ Section CompDriver.
     | Dv_nnrc_stop : nnrc_driver
     | Dv_nnrc_optim : optim_phases_config -> nnrc_driver -> nnrc_driver
     | Dv_nnrc_to_nnrc_core : nnrc_core_driver -> nnrc_driver
-    | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* (* inputs_loc *) vdbindings -> *) nnrcmr_driver -> nnrc_driver
+    | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
     | Dv_nnrc_to_dnnrc_dataset : (* inputs_loc *) vdbindings -> dnnrc_dataset_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
@@ -577,7 +562,7 @@ Section CompDriver.
     | Dv_nnrc_stop => 1
     | Dv_nnrc_optim opc dv => 1 + driver_length_nnrc dv
     | Dv_nnrc_to_nnrc_core dv => 1 + driver_length_nnrc_core dv
-    | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv => 1 + driver_length_nnrcmr dv
+    | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => 1 + driver_length_nnrcmr dv
     | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
     | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
     | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
@@ -825,8 +810,8 @@ Section CompDriver.
         | Dv_nnrc_to_nnrc_core dv =>
           let q := nnrc_to_nnrc_core q in
           compile_nnrc_core dv q
-        | Dv_nnrc_to_nnrcmr vinit (* inputs_loc *) dv =>
-          let q := nnrc_to_nnrcmr_comptop vinit (* inputs_loc *) q in
+        | Dv_nnrc_to_nnrcmr vinit inputs_loc dv =>
+          let q := nnrc_to_nnrcmr vinit inputs_loc q in
           compile_nnrcmr dv q
         | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
           let q := nnrc_to_dnnrc_dataset inputs_loc q in
@@ -1182,7 +1167,7 @@ Section CompDriver.
       end
     | L_nnrc =>
       match dv with
-      | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (* config.(comp_vdbindings) *) dv)
+      | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (vdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
@@ -1410,8 +1395,8 @@ Section CompDriver.
       forall dv',
         is_postfix_driver dv' dv ->
         match dv' with
-        | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit (* vdbindings *) _) =>
-          vinit = config.(comp_mr_vinit) (* /\ vdbindings = config.(comp_vdbindings) *)
+        | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings _) =>
+          vinit = config.(comp_mr_vinit) /\ vdbindings = (vdbindings_of_constants_config config.(comp_constants))
         | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset vdbindings _) =>
           vdbindings = (vdbindings_of_constants_config config.(comp_constants))
         | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
@@ -1491,7 +1476,7 @@ Section CompDriver.
     | Dv_nnrc_core (Dv_nnrc_core_to_camp vdbindings dv) => (L_nnrc_core, Some (Dv_camp dv))
     | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
     | Dv_nnrc (Dv_nnrc_to_nnrc_core dv) => (L_nnrc, Some (Dv_nnrc_core dv))
-    | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit (* vdbindings *) dv) => (L_nnrc, Some (Dv_nnrcmr dv))
+    | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
     | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
     | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
@@ -1757,16 +1742,20 @@ Section CompDriver.
                  EmptyString
                  ((L_nnrc,o)::nil)) (lang:=L_nnrc);
         [eassumption | | ]; simpl; trivial.
-    - eapply is_postfix_plus_one with
+    - generalize (pick_tdbindings_from_vdbindings v0); intros.
+      elim H0; intros.
+      eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
                  nil
                  v
-                 nil
+                 (constants_config_of_tdbindings x)
                  EmptyString
                  nil) (lang:=L_nnrc);
         [eassumption | | ]; simpl; trivial.
+      subst.
+      rewrite vdbindings_of_constants_config_commutes; reflexivity.
     - generalize (pick_tdbindings_from_vdbindings v); intros.
       elim H; intros.
       eapply is_postfix_plus_one with
@@ -2002,8 +1991,9 @@ Section CompDriver.
           reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc (comp_optim_config config0)) n)));
           reflexivity.
-        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) n)));
-            reflexivity.
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) (vdbindings_of_constants_config (comp_constants config0)) n)));
+            try reflexivity.
+          rewrite H0; rewrite H3; reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
@@ -3732,8 +3722,8 @@ Section CompDriver.
     nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)).
   Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc_dataset :=
     nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q))).
-  Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_comptop_optim (q:nraenv) : nnrcmr :=
-    nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)))).
+  Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_optim (inputs_loc:vdbindings) (q:nraenv) : nnrcmr :=
+    nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)))).
 
   (* Used in queryTests: *)
   Definition rule_to_nraenv_to_nnrc_optim (q:rule) : nnrc :=
@@ -3743,10 +3733,10 @@ Section CompDriver.
     nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
   Definition rule_to_nraenv_to_nnrc_optim_to_javascript (q:rule) : string :=
     nnrc_to_javascript (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
-  Definition rule_to_nnrcmr (q:rule) : nnrcmr :=
-    nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q)).
-  Definition rule_to_cldmr (h:list (string*string)) (q:rule) : cldmr :=
-    nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr_comptop init_vinit (rule_to_nraenv_to_nnrc_optim q))).
+  Definition rule_to_nnrcmr (inputs_loc:vdbindings) (q:rule) : nnrcmr :=
+    nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (rule_to_nraenv_to_nnrc_optim q)).
+  Definition rule_to_cldmr (h:list (string*string)) (inputs_loc:vdbindings) (q:rule) : cldmr :=
+    nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (rule_to_nraenv_to_nnrc_optim q))).
 
 
   (* *)
