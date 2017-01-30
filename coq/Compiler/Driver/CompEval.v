@@ -242,6 +242,56 @@ Section CompEval.
       end.
   End EvalDriver.
 
+  (* Evaluation functions: variant with a single world collection as input *)
+  (* Note: those simply build a single WORLD constant environment by calling mkWorld *)
+  (* XXX probably should be made obsolete with the eval driver, but
+       used in ocaml and queryTests XXX *)
+  Section EvalWorld.
+    Definition eval_rule_world (r:rule) (world:list data) : option data :=
+      eval_rule r (mkWorld world).
+    Definition eval_rule_world_debug (debug:bool) (r:rule) (world:list data) : string :=
+      eval_rule_debug debug r (mkWorld world).
+    
+    Definition eval_camp_world (q:camp) (world:list data) : option data :=
+      eval_camp q (mkWorld world).
+    Definition eval_camp_world_debug (debug:bool) (q:camp) (world:list data) : string :=
+      eval_camp_debug debug q (mkWorld world).
+    
+    Definition eval_oql_world (q:oql) (world:list data) : option data :=
+      eval_oql q (mkWorld world).
+    
+    Definition eval_sql_world (q:sql) (world:list data) : option data :=
+      eval_sql q (mkWorld world).
+    
+    Definition eval_lambda_nra_world (q:lambda_nra) (world:list data) : option data :=
+      eval_lambda_nra q (mkWorld world).
+    
+    Definition eval_nra_world (q:nra) (world:list data) : option data :=
+      eval_nra q (mkWorld world).
+    
+    Definition eval_nraenv_core_world (q:nraenv_core) (world:list data) : option data :=
+      eval_nraenv_core q (mkWorld world).
+    
+    Definition eval_nraenv_world (q:nraenv) (world:list data) : option data :=
+      eval_nraenv q (mkWorld world).
+    
+    Definition eval_nnrc_core_world (q:nnrc_core) (world:list data) : option data :=
+      eval_nnrc_core q (mkWorld world).
+    
+    Definition eval_nnrc_world (q:nnrc) (world:list data) : option data :=
+      eval_nnrc q (mkWorld world).
+    
+    Definition eval_nnrcmr_world (q:nnrcmr) (world:list data) : option data :=
+      eval_nnrcmr q (mkWorld world).
+    
+    Definition eval_cldmr_world (q:cldmr) (world:list data) : option data :=
+      eval_cldmr q (mkWorld world).
+    
+    Definition eval_dnnrc_dataset_world (q:dnnrc_dataset) (world:list data) : option data :=
+      eval_dnnrc_dataset q (mkWorld world).
+    
+  End EvalWorld.
+
 End CompEval.
 
 
