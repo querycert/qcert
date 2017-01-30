@@ -48,28 +48,47 @@ type content_schema = content_hierarchy * content_brandTypes * content_typeDefs 
 
 let get_field name r =
   List.assoc (Util.char_list_of_string name) r
-      
+
+let get_field_opt name r =
+  begin try
+    Some (List.assoc (Util.char_list_of_string name) r)
+  with
+  | Not_found -> None
+  end
+
+let get_field_defaults name r d =
+  begin try
+    List.assoc (Util.char_list_of_string name) r
+  with
+  | Not_found -> d
+  end
+
+let missing_input_default = QData.jobject []  (* Empty object i.e., no input variables *)
+let missing_output_default = QData.jarray []  (* Empty array i.e., empty result *)
+let missing_schema_default = QData.jobject [] (* Empty object i.e., no schema *)
+    
 let get_io_components (od:QData.json option) : QData.json * QData.json * QData.json =
-    match od with
-    | Some d ->
-	begin
-	  try
-	    match d with
-	    | Compiler.Jobject r ->
-		let input = get_field "input" r in
-		let output = get_field "output" r in
-		let schema = get_field "schema" r in
-		(input,
-		 output,
-		 schema)
-	    | _ ->
-		raise Not_found
-	  with
+  begin match od with
+  | Some d ->
+      begin
+	try
+	  match d with
+	  | Compiler.Jobject r ->
+	      let input = get_field_defaults "input" r missing_input_default in
+	      let output = get_field_defaults "output" r missing_output_default in
+	      let schema = get_field_defaults "schema" r missing_schema_default in
+	      (input,
+	       output,
+	       schema)
 	  | _ ->
-	      raise (Qcert_Error "Ill-formed IO")
-	end
-    | None ->
-	raise (Qcert_Error "No IO file provided")
+	      raise Not_found
+	with
+	| _ ->
+	    raise (Qcert_Error "Ill-formed IO")
+      end
+  | None ->
+      raise (Qcert_Error "No IO file provided")
+  end
 
 (* Schema processing first *)
 
@@ -121,14 +140,19 @@ let build_globals globals =
       List.map (function (varname, typeDef) -> (Util.string_of_char_list varname, typeDef)) l
   | _ ->
       raise (Qcert_Error "Ill-formed globals")
-	
+
+let missing_hierarchy_default = QData.jarray []  (* Empty array i.e., empty hierarchy *)
+let missing_brandTypes_default = QData.jarray []  (* Empty array i.e., no brand types *)
+let missing_typeDefs_default = QData.jarray []  (* Empty array i.e., no type definitions *)
+let missing_globals_default = QData.jobject []  (* Empty object i.e., no global variables *)
+
 let build_schema_from_json (j:QData.json) =
   begin match j with
   | Compiler.Jobject r ->
-      let hierarchy = get_field "hierarchy" r in
-      let brandTypes = get_field "brandTypes" r in
-      let typeDefs = get_field "typeDefs" r in
-      let globals = get_field "globals" r in
+      let hierarchy = get_field_defaults "hierarchy" r missing_hierarchy_default in
+      let brandTypes = get_field_defaults "brandTypes" r missing_brandTypes_default in
+      let typeDefs = get_field_defaults "typeDefs" r missing_typeDefs_default in
+      let globals = get_field_defaults "globals" r missing_globals_default in
       (build_hierarchy hierarchy,
        build_brandTypes brandTypes,
        build_typeDefs typeDefs,
