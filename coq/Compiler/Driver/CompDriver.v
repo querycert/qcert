@@ -135,7 +135,7 @@ Section CompDriver.
 
     Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletocNRAEnv.translate_rule_to_cnraenv q.
 
-    Definition rule_to_nraenv (q:rule) : nraenv := RuletoNRAEnv.nraenv_of_rule q.
+    Definition rule_to_nraenv (q:rule) : nraenv := RuletoNRAEnv.translate_rule_to_nraenv q.
 
     Definition camp_to_nra (q:camp) : nra := nra_of_pat q.
 

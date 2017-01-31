@@ -293,10 +293,10 @@ Section CompStat.
   Definition stat_tree_camp (q:camp) : data :=
     match stat_camp q with
     | drec l =>
-      let (t_nraenv_core, q_nraenv_core) := time camp_to_nraenv_core q in
+      let (t_nraenv, q_nraenv) := time camp_to_nraenv q in
       let (t_nra, q_nra) := time camp_to_nra q in
-      drec (l ++ ("camp_to_nraenv_core", stat_tree_nraenv_core q_nraenv_core)
-              :: ("camp_to_nraenv_core_time", dstring t_nraenv_core)
+      drec (l ++ ("camp_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("camp_to_nraenv_time", dstring t_nraenv)
               :: ("camp_to_nra", stat_tree_nra q_nra)
               :: ("camp_to_nra_time", dstring t_nra)
               :: nil)
@@ -306,10 +306,10 @@ Section CompStat.
   Definition stat_tree_rule (q:rule) : data :=
     match stat_rule q with
     | drec l =>
-      let (t_nraenv_core, q_nraenv_core) := time rule_to_nraenv_core q in
+      let (t_nraenv, q_nraenv) := time rule_to_nraenv q in
       let (t_nra, q_nra) := time rule_to_nra q in
-      drec (l ++ ("rule_to_nraenv_core", stat_tree_nraenv_core q_nraenv_core)
-              :: ("rule_to_nraenv_core_time", dstring t_nraenv_core)
+      drec (l ++ ("rule_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("rule_to_nraenv_time", dstring t_nraenv)
               :: ("rule_to_nra", stat_tree_nra q_nra)
               :: ("rule_to_nra_time", dstring t_nra)
               :: nil)
