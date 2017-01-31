@@ -170,7 +170,7 @@ Section CompDriver.
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
     Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
-      let inputs_loc := mkConstants ((vinit, Vlocal) :: inputs_loc) in
+      let inputs_loc := (vinit, Vlocal) :: mkConstants (inputs_loc) in
       (* XXX Expands GroupBy For now XXX *)
       let q := nnrc_to_nnrc_core q in
       lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
@@ -3710,6 +3710,22 @@ Section CompDriver.
       | target :: _ => target
       end.
 
+  Lemma errorstuff s:
+    (forall m : string, L_error s <> L_error m) -> False.
+  Proof.
+    intros.
+    unfold not in H.
+    apply (H s); reflexivity.
+  Qed.
+
+  Lemma stuff (conf:driver_config) (source:language) (target:language) (q q':query) (dv:driver) :
+    (forall m, language_of_query q' <> L_error m) ->
+    language_of_query q = source ->
+    compile_from_source_target conf source target q = q' ->
+    language_of_query q' = target.
+  Proof.
+    admit.
+  Admitted.
 
   (* Used in CompTest: *)
   Definition rule_to_nraenv_optim (q: rule) : nraenv :=
