@@ -27,9 +27,10 @@
                       'emitall' : document.getElementById("emitall").value === "EmitAll",
                       'ascii' : document.getElementById("charset").value === "Ascii",
                       'javaimports' : document.getElementById("java_imports").value,
-                      'query' : document.getElementById("query").value };
-				var useLocal = document.getElementById("localServer").checked;
-				compilationResult = qcertPreCompile(input, useLocal);	
+											'query' : document.getElementById("query").value,
+					};
+				var schema = document.getElementById("schema").value;
+				compilationResult = qcertPreCompile(input, schema);	
 				compiledQuery = compilationResult.result;
 				document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
 				displayAllResults(compilationResult.emitall);
@@ -104,16 +105,25 @@
       }
     </script>
 		<script>
-			function handleFile(files, output) {
+		function handleFile(files, output) {
    			if (files.length > 0) {
-	  		  var file = files[0];
-		  	  var reader = new FileReader();
-		  	  reader.onload = function(event) {
-			      document.getElementById(output).innerHTML = escapeHtml(event.target.result);
-			    }
-			    var text = reader.readAsText(file);
+		  			var reader = new FileReader();
+	  				var file = files[0];
+						if (file.name.endsWith(".sem")) {
+	  						reader.onload = function(event) {
+										var contents = btoa(String.fromCharCode.apply(null, new Uint8Array(event.target.result)))
+  									document.getElementById(output).innerHTML = contents;
+								}
+								reader.readAsArrayBuffer(file);
+						} else {
+								reader.onload = function(event) {
+										var contents = escapeHtml(event.target.result);
+  									document.getElementById(output).innerHTML = contents;
+								}																		
+								reader.readAsText(file);
+						}
 			  }
-			}
+		}
 		</script>
   </head>
   <body>
@@ -125,6 +135,8 @@
           <label>source</label>
           <select id = "source">
 	      <option>rule</option>
+	      <option>techrule</option>
+	      <option>designerrule</option>
 	      <option>sql</option>
 	      <option>camp</option>
 	      <option>oql</option>
@@ -166,19 +178,24 @@
 	  </select>
         </p>
         <p>
-          <label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="sourceFile" onchange='handleFile(this.files, "query")'/>
-	  <br/>
+          <label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="sourceFile" onchange='handleFile(this.files, "query")'/><br/>
           <textarea id = "query"
                     rows = "10"
                     cols = "80" />WORLD.filter{p => p.age = 32}</textarea>
         </p>
         <p>
-          <label>io (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="ioFile" onchange='handleFile(this.files, "io")'/><br/>
+          <label>schema (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="schemaFile" onchange='handleFile(this.files, "schema")'/><br/>
+          <textarea id = "schema"
+                    rows = "10"
+                    cols = "80" /></textarea>
+    		<p/>
+        <p>
+          <label>execution input (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="ioFile" onchange='handleFile(this.files, "io")'/><br/>
           <textarea id = "io"
                     rows = "10"
                     cols = "80" /></textarea>
+    		<p/>
 </fieldset>
-<p/>
     <button type="button"
 	    onclick="compileButton()"><b>compile</b></button>
     <button type="button"
@@ -226,7 +243,6 @@
                  id = "java_imports"
                  value = "" />
         </p>
-    <label><input type="checkbox" id="localServer">Use Local Server for SQL Assist</label>
     </fieldset>
     <!-- Testing area
     <fieldset>

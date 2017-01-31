@@ -13,30 +13,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function preProcessSQL(sql, useLocal) {
-    var url = useLocal ? "http://localhost:9879?verb=parseSQL" : "http://35.164.159.76:9879?verb=parseSQL";
-    //	console.log("URL: " + url);
-    //	console.log("local flag: " + useLocal);
+function preProcess(text, verb) {
+    var request = preProcessOnce(text, verb, "localhost");
+    if (request.status == 0)
+        request = preProcessOnce(text, verb, "35.164.159.76");
+    if (request.status == 0)
+        throw Error("No server found to perform the " + verb + " function");
+    if (request.status == 200)
+        return request.responseText;
+    return "ERROR " + request.status + ": " + request.responseText;
+}
+function preProcessOnce(text, verb, host) {
+    var url = "http://" + host + ":9879?verb=" + verb;
     var request = new XMLHttpRequest();
     request.open("POST", url, false);
     request.setRequestHeader("Content-Type", "text/plain");
-    request.send(sql);
-    //	console.log("Returning encoded form:");
-    //	console.log(request.responseText);
-    return request.responseText;
-}
-function qcertPreCompile(input, useLocal) {
-    if (input.source == "sql") {
-        try {
-            input.query = preProcessSQL(input.query, useLocal);
-        }
-        catch (e) {
-            return { "result": e.message };
-        }
-        input.sourcesexp = true;
+    try {
+        request.send(text);
     }
-    //		console.log("Input to qcertCompile:");
-    //		console.log(input);
+    catch (e) { }
+    return request;
+}
+function combineInputAndSchema(input, schema) {
+    var parsed = JSON.parse(schema);
+    var combined = { source: input, schema: parsed };
+    return JSON.stringify(combined);
+}
+function qcertPreCompile(input, schema) {
+    try {
+        if (input.source == "sql") {
+            input.query = preProcess(input.query, "parseSQL");
+            input.sourcesexp = true;
+        }
+        else if (input.source == "techrule") {
+            var combined = combineInputAndSchema(input.query, schema);
+            input.query = preProcess(combined, "techRule2CAMP");
+            input.sourcesexp = true;
+            input.source = "camp";
+        }
+        else if (input.source == "designerrule") {
+            input.query = preProcess(input.query, "serialRule2CAMP");
+            input.sourcesexp = true;
+            input.source = "camp";
+        }
+    }
+    catch (e) {
+        return { result: "ERROR: " + e.message };
+    }
     return qcertCompile(input);
 }
 //# sourceMappingURL=qcertPreCompiler.js.map
