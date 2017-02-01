@@ -35,12 +35,14 @@
 				document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
 				displayAllResults(compilationResult.emitall);
 			}
-			function performEvaluation() {
-					var io = document.getElementById("io").value;
-					eval(compiledQuery);
-					var result = JSON.stringify(query(JSON.parse(io)));
-					document.getElementById("execresult").innerHTML = escapeHtml(result);
-	                }
+      function performEvaluation() {
+		    var io = document.getElementById("io").value;
+  	    var schema = document.getElementById("schema").value;
+		    inheritance = JSON.parse(schema).inheritance;
+		    eval(compiledQuery);
+		    var result = JSON.stringify(query(JSON.parse(io)));
+		    document.getElementById("execresult").innerHTML = escapeHtml(result);
+      }
 			function executeButton() {
 				var target = document.getElementById("target").value;
 				if (target != "js")
