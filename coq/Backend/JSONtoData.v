@@ -301,8 +301,10 @@ Section JSONtoData.
 
     Definition json_to_vrtype_with_fail {br:brand_relation} (j:json) : option (string * rtype) :=
       match j with
-      | jobject (("dist"%string,jstring s)::("type"%string,j')::nil) => Some (s,json_to_rtype j')
-      | jobject (("type"%string,j')::("dist"%string,jstring s)::nil) => Some (s,json_to_rtype j')
+      | jobject (("dist"%string,jstring s)::("type"%string,j')::nil) =>
+        lift (fun x => (s,x)) (json_to_rtype_with_fail j')
+      | jobject (("type"%string,j')::("dist"%string,jstring s)::nil) =>
+        lift (fun x => (s,x)) (json_to_rtype_with_fail j')
       | _ => None
       end.
 
