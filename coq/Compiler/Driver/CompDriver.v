@@ -221,7 +221,7 @@ Section CompDriver.
     Definition dnnrc_dataset_to_dnnrc_typed_dataset
                (e: dnnrc_dataset) (tdenv: tdbindings)
       : option dnnrc_typed_dataset :=
-      infer_dnnrc_type tdenv e.
+      infer_dnnrc_type (mkConstants tdenv) e.
 
     (* Backend *)
 

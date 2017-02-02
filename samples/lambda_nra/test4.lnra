@@ -1,0 +1,4 @@
+/* Example of simple select-from-where */
+
+Persons.filter{ p => 32 = 32 }
+
