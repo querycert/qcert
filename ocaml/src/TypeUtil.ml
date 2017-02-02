@@ -68,8 +68,25 @@ let localization_of_string (x:char list) =
   begin match Util.string_of_char_list x with
   | "local" -> QLang.vlocal
   | "distr" -> QLang.vdistr
-  | _ -> raise (Failure ("global localization parsing failed for: " ^ (Util.string_of_char_list x)))
+  | _ -> raise (Qcert_Error ("global localization parsing failed for: " ^ (Util.string_of_char_list x)))
   end
+
+let lift_constant_types (bm:QType.brand_model) br glb =
+  let (vname,gbj) = glb in
+  let (locs,gbt) = rtype_content_to_vrtype br gbj in
+  let loc = localization_of_string locs in
+  let t =
+    begin match loc with
+    | Compiler.Vlocal -> gbt
+    | Compiler.Vdistr ->
+	(* XXX We to 'uncoll' here to check that the type is a collection type and extract its content -- This is an assumption of the Compiler Driver XXX *)
+	begin match QType.camp_type_uncoll bm gbt with
+	| None -> raise (Qcert_Error ("Type for distributed constant " ^ vname ^ " must be a collection type"))
+	| Some dt -> dt
+	end
+    end
+  in
+  (Util.char_list_of_string vname, QDriver.mk_constant_config bm loc t)
     
 let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDriver.constants_config =
   let (br, _, _, globals) = mc in
@@ -79,7 +96,8 @@ let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDri
     | None -> []
     end
   in
-  List.map (fun (x,y) -> let (z,k) = rtype_content_to_vrtype br y in (Util.char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals
+  List.map (lift_constant_types bm br) globals
+(*  List.map (fun (x,y) -> let (z,k) =  in (Util.char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals *)
 
 let process_schema mc =
   let bm = 

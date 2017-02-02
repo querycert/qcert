@@ -297,7 +297,8 @@ MODULES = \
 	Tests/CompilerTest \
 	Tests/OQLTest \
 	Tests/SQLTest \
-	Tests/LambdaNRATests
+	Tests/LambdaNRATest \
+	Tests/TDataTest
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
 
