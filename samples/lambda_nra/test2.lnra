@@ -1,4 +1,4 @@
-/* Example of returning a record (struct in OQL terminology) */
+/* Example returning a newly created record */
 
-Companies.mapconcat{ c => c.departments.map{ d => struct(company: c.cname, dept: d) } }
+Companies.flatmap{ c => c.departments.map{ d => struct(company: c.cname, dept: d) } }
 

@@ -1,4 +1,4 @@
-/* Example of simple select-from-where */
+/* Example of filter followed by map */
 
-Persons.filter{ p => p.age = 32 }.map{p => p.name }
+Persons.filter{ p => p.age = 32 }.map{ p => p.name }
 

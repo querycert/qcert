@@ -39,6 +39,8 @@ Section LambdaNRASugar.
 
   Definition LNRADot (s:string) (e:lnra) := LNRAUnop (ADot s) e.
   Definition LNRAArrow (s:string) (e:lnra) := LNRAUnop (ADot s) (LNRAUnop AUnbrand e).
+  Definition LNRAFlatMap (l:lnra_lambda) (e:lnra) :=
+    LNRAUnop AFlatten (LNRAMap l e).
   
   (* replaces free variables by table lookups -- used in parser *)
   Definition la_tableify_one_var (e:lnra) (v:string) : lnra :=

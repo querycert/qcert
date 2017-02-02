@@ -38,6 +38,7 @@
   let resolve_nra_operator a el e0 =
     begin match a with
     | "map" -> QLambdaNRA.lamap (resolve_one_lambda a el) e0
+    | "flatmap" -> QLambdaNRA.laflatmap (resolve_one_lambda a el) e0
     | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0

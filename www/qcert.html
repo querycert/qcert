@@ -63,7 +63,7 @@
           <label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="sourceFile" onchange='handleFile(this.files, "query")'/><br/>
           <textarea id = "query"
                     rows = "10"
-                    cols = "80" />Persons.filter{p => p.age = 32}</textarea>
+                    cols = "80" />Persons.filter{p => p.age = 32}.map{p => p.name}</textarea>
         </p>
         <p>
           <label>schema (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="schemaFile" onchange='handleFile(this.files, "schema")'/><br/>

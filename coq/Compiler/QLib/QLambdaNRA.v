@@ -60,6 +60,8 @@ Module QLambdaNRA(runtime:CompilerRuntime).
     := LambdaNRASugar.LNRAArrow.
   Definition lastruct : list (String.string * expr) -> expr 
     := LambdaNRASugar.LNRAStruct.
+  Definition laflatmap : lambda_expr -> expr -> expr
+    := LambdaNRASugar.LNRAFlatMap.
 
   Definition latableify : expr -> expr
     := LambdaNRASugar.la_tableify.
