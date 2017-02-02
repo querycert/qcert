@@ -17,6 +17,10 @@
 open Util
 open Compiler.EnhancedCompiler
 
+type io_kind =
+  | IO_file of string option
+  | IO_components of string option * string option * string option
+  
 type global_config = {
     mutable gconf_source : QLang.language;
     mutable gconf_target : QLang.language;
@@ -24,15 +28,11 @@ type global_config = {
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
-    (* Schema, data, expected output *)
-    mutable gconf_schema_file : string option;
+    (* Schema, input, output *)
+    mutable gconf_io : io_kind option;
     mutable gconf_schema : TypeUtil.schema;
-    mutable gconf_data_file : string option;
-    mutable gconf_data : DataUtil.content_input;
-    mutable gconf_expected_output_file : string option;
-    mutable gconf_expected_output_data : DataUtil.content_output;
-    (* I/O File includes all of schema, data, expected output - for testing *)
-    mutable gconf_io_file : string option;
+    mutable gconf_input : DataUtil.content_input;
+    mutable gconf_output : DataUtil.content_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
@@ -50,30 +50,49 @@ type global_config = {
     mutable gconf_stat_tree : bool;
   }
 
+let hierarchy_of_conf gconf =
+  TypeUtil.hierarchy_of_schema (gconf.gconf_schema)
+
+let parse_io f =
+  begin match f with
+  | None -> (None,None,None)
+  | Some f -> DataUtil.get_io_components (Some (ParseString.parse_io_from_string f))
+  end
+
+let parse_io_component f =
+  begin match f with
+  | None -> None
+  | Some f -> Some (ParseString.parse_io_from_string f)
+  end
+
 let complet_configuration gconf =
+  let (io_input,io_output,io_schema) =
+    begin match gconf.gconf_io with
+    | None -> (None,None,None)
+    | Some (IO_file f) -> parse_io f
+    | Some (IO_components (fin,fout,fschema)) ->
+	(parse_io_component fin,
+	 parse_io_component fout,
+	 parse_io_component fschema)
+    end
+  in
   let _schema =
-    begin match gconf.gconf_io_file with
-    | Some io ->
-        gconf.gconf_schema <- TypeUtil.schema_of_io_json (ParseString.parse_io_from_string io)
-    | None ->
-        ()
+    begin match io_schema with
+    | Some io -> gconf.gconf_schema <- TypeUtil.schema_of_io_json io
+    | None -> ()
     end
   in
-  let _data =
-    begin match gconf.gconf_io_file with
-    | Some io ->
-        gconf.gconf_data <-
-	  (DataUtil.build_input DataUtil.META (Some (ParseString.parse_io_from_string io)))
-    | None ->
-        ()
+  let h = hierarchy_of_conf gconf in
+  let _input =
+    begin match io_input with
+    | Some io -> gconf.gconf_input <- (DataUtil.build_input DataUtil.META h io)
+    | None -> ()
     end
   in
-  let _expected_output_data =
-    begin match gconf.gconf_io_file with
-    | Some io ->
-        gconf.gconf_expected_output_data <- DataUtil.build_output (Some (ParseString.parse_io_from_string io))
-    | None ->
-        ()
+  let _output =
+    begin match io_output with
+    | Some io -> gconf.gconf_output <- DataUtil.build_output h io
+    | None -> ()
     end
   in
   begin match gconf.gconf_exact_path with

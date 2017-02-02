@@ -16,6 +16,10 @@
 
 open Compiler.EnhancedCompiler
 
+type io_kind =
+  | IO_file of string option
+  | IO_components of string option * string option * string option
+  
 type global_config = {
     mutable gconf_source : QLang.language;
     mutable gconf_target : QLang.language;
@@ -23,15 +27,11 @@ type global_config = {
     mutable gconf_exact_path : bool;
     mutable gconf_dir : string option;
     mutable gconf_dir_target : string option;
-    (* Schema, data, expected output *)
-    mutable gconf_schema_file : string option;
+    (* Schema, input, output *)
+    mutable gconf_io : io_kind option;
     mutable gconf_schema : TypeUtil.schema;
-    mutable gconf_data_file : string option;
-    mutable gconf_data : DataUtil.content_input;
-    mutable gconf_expected_output_file : string option;
-    mutable gconf_expected_output_data : DataUtil.content_output;
-    (* I/O File includes all of schema, data, expected output - for testing *)
-    mutable gconf_io_file : string option;
+    mutable gconf_input : DataUtil.content_input;
+    mutable gconf_output : DataUtil.content_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;

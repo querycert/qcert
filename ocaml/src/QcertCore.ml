@@ -203,8 +203,8 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
 
 let main gconf (file_name, query_s) =
   let schema = gconf.gconf_schema in
-  let data = gconf.gconf_data in
-  let expected_output_data = gconf.gconf_expected_output_data in
+  let data = gconf.gconf_input in
+  let expected_output_data = gconf.gconf_output in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let (qname, q_source) = parse_string gconf query_s in
   let class_name =

@@ -30,8 +30,10 @@ type io_json = QData.json
 type io_input = QData.json
 type io_output = QData.json
 type io_schema = QData.json
+
 type io_hierarchy = QData.json
-type io_model = QData.json
+type io_brandTypes = QData.json
+type io_typeDefs = QData.json
 type io_globals = QData.json
 
 type rtype_content = QData.json
@@ -44,12 +46,13 @@ type content_hierarchy = (char list * char list) list
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
-type content_schema = content_hierarchy * content_brandTypes * content_typeDefs * content_globals
+type content_schema = content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
 
-val get_io_components : io_json option -> io_input * io_output * io_schema
+val get_io_components : io_json option -> io_input option * io_output option * io_schema option
 
-val build_input : serialization_format -> io_json option -> content_input
-val build_output : io_json option -> content_output
-val build_schema : io_json option -> content_schema
-
-val display_sdata : string option -> string -> string list -> string -> unit
+val build_input : serialization_format -> content_hierarchy -> io_input -> content_input
+val build_output : content_hierarchy -> io_output -> content_output
+val build_schema : io_schema -> content_schema
+val build_brandTypes : io_brandTypes -> content_brandTypes
+val build_typeDefs : io_typeDefs -> content_typeDefs
+val build_globals : io_globals -> content_globals

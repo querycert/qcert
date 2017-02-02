@@ -60,10 +60,10 @@ let global_config_of_json j =
       gconf_dir_target = None;
       gconf_schema_file = None;
       gconf_schema = TypeUtil.empty_schema;
-      gconf_data_file = None;
-      gconf_data = [];
-      gconf_expected_output_file = None;
-      gconf_expected_output_data = [];
+      gconf_input_file = None;
+      gconf_input = [];
+      gconf_output_file = None;
+      gconf_output = [];
       gconf_io_file = None;
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
@@ -99,8 +99,8 @@ let global_config_of_json j =
   Js.Optdef.iter j##.jsruntime
     (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
   apply QcertArg.set_schema_file j##.schema;
-  apply QcertArg.set_data_file j##.data;
-  apply QcertArg.set_expected_output_file j##.expectedoutput;
+  apply QcertArg.set_input_file j##.data;
+  apply QcertArg.set_output_file j##.expectedoutput;
   apply QcertArg.set_io_file j##.io;
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);

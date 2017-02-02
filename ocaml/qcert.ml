@@ -40,9 +40,9 @@ let args_list gconf =
        "<harness.js> JavaScript runtime");
       ("-schema", Arg.String (QcertArg.set_schema_file gconf),
        "<file.schema> Schema");
-      ("-data", Arg.String (QcertArg.set_data_file gconf),
-       "<file.data> Input data");
-      ("-expected-output", Arg.String (QcertArg.set_expected_output_file gconf),
+      ("-input", Arg.String (QcertArg.set_input_file gconf),
+       "<file.input> Input");
+      ("-output", Arg.String (QcertArg.set_output_file gconf),
        "<file.output> Expected output");
       ("-io", Arg.String (QcertArg.set_io_file gconf),
        "<file.io> I/O file (Schema,input data,expected output) for evaluation");
@@ -138,13 +138,10 @@ let parse_args () =
       gconf_exact_path = false;
       gconf_dir = None;
       gconf_dir_target = None;
-      gconf_schema_file = None;
+      gconf_io = None;
       gconf_schema = TypeUtil.empty_schema;
-      gconf_data_file = None;
-      gconf_data = [];
-      gconf_expected_output_file = None;
-      gconf_expected_output_data = [];
-      gconf_io_file = None;
+      gconf_input = [];
+      gconf_output = [];
       gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;

@@ -29,6 +29,7 @@ type schema = {
 
 val empty_schema : schema
 val schema_of_io_json : QData.json -> schema
+val hierarchy_of_schema : schema -> (char list * char list) list
 
 val brand_relation_of_brand_model : QType.brand_model -> Compiler.brand_relation
 

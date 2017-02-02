@@ -23,8 +23,8 @@ val add_path : QcertConfig.global_config -> string -> unit
 val set_dir : QcertConfig.global_config -> string -> unit
 val set_dir_target : QcertConfig.global_config -> string -> unit
 val set_schema_file : QcertConfig.global_config -> string -> unit
-val set_data_file : QcertConfig.global_config -> string -> unit
-val set_expected_output_file : QcertConfig.global_config -> string -> unit
+val set_input_file : QcertConfig.global_config -> string -> unit
+val set_output_file : QcertConfig.global_config -> string -> unit
 val set_io_file : QcertConfig.global_config -> string -> unit
 val set_emit_all : QcertConfig.global_config -> unit -> unit
 val set_emit_sexp : QcertConfig.global_config -> unit -> unit

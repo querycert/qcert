@@ -48,9 +48,21 @@ let make_brand_context (br: (char list * char list) list) brand_types (type_defs
   List.map (fun (x,y) -> (Util.char_list_of_string x, rtype_content_to_rtype br (lookup_brand_type y type_defs))) brand_types
 
 let content_schema_to_model (mc: content_schema) : QType.brand_model option =
-  let (br, brand_types, type_defs, _) = mc in
-  let brand_context = make_brand_context br brand_types type_defs in
-  QType.make_brand_model br brand_context
+  let (h, brand_types, type_defs, _) = mc in
+  let brand_types =
+    begin match brand_types with
+    | Some bt -> build_brandTypes bt
+    | None -> []
+    end
+  in
+  let type_defs =
+    begin match type_defs with
+    | Some td -> build_typeDefs td
+    | None -> []
+    end
+  in
+  let brand_context = make_brand_context h brand_types type_defs in
+  QType.make_brand_model h brand_context
 
 let localization_of_string (x:char list) =
   begin match Util.string_of_char_list x with
@@ -61,6 +73,12 @@ let localization_of_string (x:char list) =
     
 let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDriver.constants_config =
   let (br, _, _, globals) = mc in
+  let globals =
+    begin match globals with
+    | Some gb -> build_globals gb
+    | None -> []
+    end
+  in
   List.map (fun (x,y) -> let (z,k) = rtype_content_to_vrtype br y in (Util.char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals
 
 let process_schema mc =
@@ -87,10 +105,15 @@ let empty_schema =
     sch_globals = [] }
 
 let schema_of_io_json (io:QData.json) =
-  let content_schema = build_schema (Some io) in
+  let content_schema = build_schema io in
   let (bm,globs) = process_schema content_schema in
   { sch_brand_model = bm;
     sch_foreign_typing = Enhanced.Model.foreign_typing bm;
     sch_io_schema = Some content_schema;
     sch_globals = globs }
 
+let hierarchy_of_schema sc =
+  begin match sc.sch_io_schema with
+  | None -> []
+  | Some (h,_,_,_) -> h
+  end
