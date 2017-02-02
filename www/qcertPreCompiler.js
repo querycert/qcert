@@ -60,6 +60,8 @@ function qcertPreCompile(input, schema) {
     catch (e) {
         return { result: "ERROR: " + e.message };
     }
+    if (input.query.substring(0, 6) == "ERROR:")
+        return { result: input.query };
     return qcertCompile(input);
 }
 //# sourceMappingURL=qcertPreCompiler.js.map

@@ -60,5 +60,7 @@ function qcertPreCompile(input:QcertCompilerConfig, schema:string) : string | { 
 		} catch (e) {
 				return { result: "ERROR: " + e.message }
 		}
+		if (input.query.substring(0, 6) == "ERROR:")
+			 return { result: input.query };
 		return qcertCompile(input);
 }
