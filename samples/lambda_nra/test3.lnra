@@ -1,4 +1,4 @@
 /* Example of simple select-from-where */
 
-Persons1.union(Persons2).filter{ p => p.age = 32 }
+Persons.union(Persons).filter{ p => p.age = 32 }
 

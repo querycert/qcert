@@ -26,24 +26,30 @@ let add_path gconf s = gconf.gconf_path <- gconf.gconf_path @ [ language_of_name
 let set_exact_path gconf () = gconf.gconf_exact_path <- true
 let set_dir gconf s = gconf.gconf_dir <- Some s
 let set_dir_target gconf s = gconf.gconf_dir_target <- Some s
+let set_schema_content gconf file_content =
+  begin match gconf.gconf_io with
+  | None -> gconf.gconf_io <- Some (IO_components (None,None,Some file_content))
+  | Some (IO_components (c1,c2,c3)) -> gconf.gconf_io <- Some (IO_components (c1,c2,Some file_content))
+  | Some (IO_file _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
+  end
+let set_input_content gconf file_content =
+  begin match gconf.gconf_io with
+  | None -> gconf.gconf_io <- Some (IO_components (Some file_content,None,None))
+  | Some (IO_components (c1,c2,c3)) -> gconf.gconf_io <- Some (IO_components (Some file_content,c2,c3))
+  | Some (IO_file _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
+  end
+let set_output_content gconf file_content =
+  begin match gconf.gconf_io with
+  | None -> gconf.gconf_io <- Some (IO_components (None,Some file_content,None))
+  | Some (IO_components (c1,c2,c3)) -> gconf.gconf_io <- Some (IO_components (c1,Some file_content,c3))
+  | Some (IO_file _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
+  end
 let set_schema_file gconf file_name =
-  begin match gconf.gconf_io with
-  | None -> gconf.gconf_io <- Some (IO_components (None,None,Some (Util.string_of_file file_name)))
-  | Some (IO_components (c1,c2,c3)) -> gconf.gconf_io <- Some (IO_components (c1,c2,Some (Util.string_of_file file_name)))
-  | Some (IO_file _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
-  end
+  set_schema_content gconf (Util.string_of_file file_name)
 let set_input_file gconf file_name =
-  begin match gconf.gconf_io with
-  | None -> gconf.gconf_io <- Some (IO_components (Some (Util.string_of_file file_name),None,None))
-  | Some (IO_components (c1,c2,c3)) -> gconf.gconf_io <- Some (IO_components (Some (Util.string_of_file file_name),c2,c3))
-  | Some (IO_file _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
-  end
+  set_input_content gconf (Util.string_of_file file_name)
 let set_output_file gconf file_name =
-  begin match gconf.gconf_io with
-  | None -> gconf.gconf_io <- Some (IO_components (None,Some (Util.string_of_file file_name),None))
-  | Some (IO_components (c1,c2,c3)) -> gconf.gconf_io <- Some (IO_components (c1,Some (Util.string_of_file file_name),c3))
-  | Some (IO_file _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
-  end
+  set_output_content gconf (Util.string_of_file file_name)
 let set_io_file gconf file_name =
   begin match gconf.gconf_io with
   | None -> gconf.gconf_io <- Some (IO_file (Some (Util.string_of_file file_name)))

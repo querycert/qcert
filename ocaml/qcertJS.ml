@@ -95,9 +95,10 @@ let global_config_of_json j =
   apply QcertArg.set_dir j##.dirtarget;
   Js.Optdef.iter j##.jsruntime
     (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
-  Js.Optdef.iter j##.schema (fun f -> try QcertArg.set_schema_file gconf f with _ -> ());
-  Js.Optdef.iter j##.input (fun f -> try QcertArg.set_input_file gconf f with _ -> ());
+  apply QcertArg.set_schema_content j##.schema;
+  apply QcertArg.set_input_content j##.input;
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
+  Js.Optdef.iter j##.eval (fun b -> gconf.gconf_eval <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexpall (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
   Js.Optdef.iter j##.sourcesexp (fun b -> gconf.gconf_source_sexp <- Js.to_bool b);
@@ -135,6 +136,7 @@ let json_of_result res =
     val emitsexp = Js.def (wrap res.QcertCore.res_emit_sexp)
     val emitsexpall = Js.def (wrap_all wrap res.QcertCore.res_emit_sexp_all)
     val result = Js.string res.QcertCore.res_emit.QcertCore.res_content
+    val eval = Js.string res.QcertCore.res_eval.QcertCore.res_content
   end
 
 let json_of_error msg =
@@ -144,6 +146,7 @@ let json_of_error msg =
     val emitsexp = Js.undefined
     val emitsexpall = Js.undefined
     val result = Js.string msg
+    val eval = Js.string msg
   end
 
 let json_of_exported_languages exported_languages =
