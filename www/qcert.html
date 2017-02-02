@@ -25,9 +25,11 @@
                       'target' : document.getElementById("target").value,
                       'exactpath' : document.getElementById("exactpath").value === "ExactPath",
                       'emitall' : document.getElementById("emitall").value === "EmitAll",
+                      'schema' : document.getElementById("schema").value,
+                      'input' : document.getElementById("input").value,
                       'ascii' : document.getElementById("charset").value === "Ascii",
                       'javaimports' : document.getElementById("java_imports").value,
-											'query' : document.getElementById("query").value,
+	              'query' : document.getElementById("query").value,
 					};
 				var schema = document.getElementById("schema").value;
 				compilationResult = qcertPreCompile(input, schema);	
@@ -36,11 +38,11 @@
 				displayAllResults(compilationResult.emitall);
 			}
       function performEvaluation() {
-		    var io = document.getElementById("io").value;
-  	    var schema = document.getElementById("schema").value;
+		    var input = document.getElementById("input").value;
+  	            var schema = document.getElementById("schema").value;
 		    inheritance = JSON.parse(schema).inheritance;
 		    eval(compiledQuery);
-		    var result = JSON.stringify(query(JSON.parse(io)));
+		    var result = JSON.stringify(query(JSON.parse(input)));
 		    document.getElementById("execresult").innerHTML = escapeHtml(result);
       }
 			function executeButton() {
@@ -192,8 +194,8 @@
                     cols = "80" /></textarea>
     		<p/>
         <p>
-          <label>execution input (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="ioFile" onchange='handleFile(this.files, "io")'/><br/>
-          <textarea id = "io"
+          <label>execution input (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="inputFile" onchange='handleFile(this.files, "input")'/><br/>
+          <textarea id = "input"
                     rows = "10"
                     cols = "80" /></textarea>
     		<p/>

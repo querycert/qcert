@@ -95,10 +95,8 @@ let global_config_of_json j =
   apply QcertArg.set_dir j##.dirtarget;
   Js.Optdef.iter j##.jsruntime
     (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
-  apply QcertArg.set_schema_file j##.schema;
-  apply QcertArg.set_input_file j##.data;
-  apply QcertArg.set_output_file j##.expectedoutput;
-  apply QcertArg.set_io_file j##.io;
+  Js.Optdef.iter j##.schema (fun f -> try QcertArg.set_schema_file gconf f with _ -> ());
+  Js.Optdef.iter j##.input (fun f -> try QcertArg.set_input_file gconf f with _ -> ());
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexpall (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
