@@ -28,7 +28,7 @@ BLANK=$(EMPTY) $(EMPTY)
 # Keep this list accurate as dependencies evolve or versions change
 DEPENDENCIES=lib/antlr4-runtime-4.5.3.jar lib/presto-parser-0.154.jar \
     lib/slice-0.7.jar lib/guava-19.0.jar
-CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin $(DEPENDENCIES))
+CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.7.jar $(DEPENDENCIES))
 
 JAVAC=javac
 

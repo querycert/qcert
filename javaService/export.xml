@@ -7,6 +7,7 @@
         <delete dir="${dest}/services"/>
 		<copy todir="${dest}/services">
 			<fileset file="lib/nanohttpd-2.3.1.jar"/>
+			<fileset file="lib/gson-2.7.jar"/>
 			<fileset dir="services"/>
 		</copy>
 		<pathconvert property="depends" pathsep=" ">

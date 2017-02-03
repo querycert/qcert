@@ -5,6 +5,9 @@
 <!-- Supports main functionality: -->
 <property name="nanohttpd" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1.jar"/>
 <property name="nanohttpd-src" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1-sources.jar"/>
+<!-- This project will build without GSON but GSON is needed in practice by every service so keep it here -->	
+<property name="gson" value="com/google/code/gson/gson/2.7/gson-2.7.jar"/>
+<property name="gson-src" value="com/google/code/gson/gson/2.7/gson-2.7-sources.jar"/>
 <!-- Supports testing: -->	
 <property name="httpclient" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
 <property name="httpclient-src" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2-sources.jar"/>
@@ -17,6 +20,8 @@
 	<mkdir dir="lib"/>
 	<get src="${repo}${nanohttpd}" dest="lib"/>
 	<get src="${repo}${nanohttpd-src}" dest="lib"/>
+	<get src="${repo}${gson}" dest="lib"/>
+	<get src="${repo}${gson-src}" dest="lib"/>
 	<get src="${repo}${httpclient}" dest="lib"/>
 	<get src="${repo}${httpclient-src}" dest="lib"/>
 	<get src="${repo}${httpcore}" dest="lib"/>
