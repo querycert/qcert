@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="services/jrules-engine.jar"/>
 	<classpathentry kind="lib" path="services/jrules2CAMP.jar" sourcepath="/jrules2CAMP"/>
 	<classpathentry exported="true" kind="lib" path="lib/gson-2.7.jar" sourcepath="lib/gson-2.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-csv-1.1.jar" sourcepath="lib/commons-csv-1.1-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

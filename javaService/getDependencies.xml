@@ -2,18 +2,19 @@
 
 <property name="repo" value="http://central.maven.org/maven2/"/>
 	
-<!-- Supports main functionality: -->
+<!-- Supports main functionality (binaries should be exported to bin/services) -->
 <property name="nanohttpd" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1.jar"/>
 <property name="nanohttpd-src" value="org/nanohttpd/nanohttpd/2.3.1/nanohttpd-2.3.1-sources.jar"/>
-<!-- This project will build without GSON but GSON is needed in practice by every service so keep it here -->	
 <property name="gson" value="com/google/code/gson/gson/2.7/gson-2.7.jar"/>
 <property name="gson-src" value="com/google/code/gson/gson/2.7/gson-2.7-sources.jar"/>
-<!-- Supports testing: -->	
+<!-- Supports testing and batch utilities (binaries need not be exported): -->	
 <property name="httpclient" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
 <property name="httpclient-src" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2-sources.jar"/>
 <property name="httpcore" value="org/apache/httpcomponents/httpcore/4.4.5/httpcore-4.4.5.jar"/>
 <property name="httpcore-src" value="org/apache/httpcomponents/httpcore/4.4.5/httpcore-4.4.5-sources.jar"/>
 <property name="logging" value="commons-logging/commons-logging/1.2/commons-logging-1.2.jar"/>
+<property name="commonscsv" value="org/apache/commons/commons-csv/1.1/commons-csv-1.1.jar"/>
+<property name="commonscsv-src" value="org/apache/commons/commons-csv/1.1/commons-csv-1.1-sources.jar"/>
 
 <target name="get">
 	<delete dir="lib"/>
@@ -27,5 +28,7 @@
 	<get src="${repo}${httpcore}" dest="lib"/>
 	<get src="${repo}${httpcore-src}" dest="lib"/>
 	<get src="${repo}${logging}" dest="lib"/>
+	<get src="${repo}${commonscsv}" dest="lib"/>
+	<get src="${repo}${commonscsv-src}" dest="lib"/>
 </target>
 </project>

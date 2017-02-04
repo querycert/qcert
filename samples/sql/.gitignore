@@ -1,4 +1,4 @@
 /tpc/*.sql
 /tpc/*.data
 /tpc/dss.ddl
-
+/tpc/*.json

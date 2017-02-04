@@ -85,7 +85,7 @@ public class SchemaTransformer {
 			 *  is just used to encode tables into input structures it will work fine.
 			 */
 			String type = isDate(def) ? "Date" : isString(def) ? "String" : "Nat";
-			ans.add(def.getName(), new JsonPrimitive(type));
+			ans.add(def.getName().toLowerCase(), new JsonPrimitive(type));
 		}
 		return ans;
 	}
@@ -107,7 +107,7 @@ public class SchemaTransformer {
 			CreateTable ct = (CreateTable) s;
 			/* Conversion to array in the following is to check that every TableElement is a ColumnDefinition */
 			ColumnDefinition[] defs = ct.getElements().toArray(new ColumnDefinition[ct.getElements().size()]);
-			String tableName = ct.getName().toString();
+			String tableName = ct.getName().toString().toLowerCase();
 			JsonObject tableType = new JsonObject();
 			tableType.add("dist", new JsonPrimitive("distr"));
 			JsonObject collection = new JsonObject();
