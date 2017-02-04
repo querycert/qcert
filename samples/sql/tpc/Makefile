@@ -1,6 +1,7 @@
 SAMPLES=../..
 QCERT=$(SAMPLES)/..
 SQLPARSER=$(QCERT)/sqlParser
+JAVASERVICE=$(QCERT)/javaService
 JAVASCRIPT=$(QCERT)/runtime/javascript
 QCERTCOMP=$(QCERT)/bin/qcert
 # Default assume Java 8 in path
@@ -14,7 +15,7 @@ else
 endif
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
-RAWCPATH=$(SQLPARSER)/bin $(SAMPLES)/bin $(wildcard $(SQLPARSER)/lib/*.jar)
+RAWCPATH=$(SQLPARSER)/bin $(SAMPLES)/bin $(JAVASERVICE)/bin $(wildcard $(SQLPARSER)/lib/*.jar $(JAVASERVICE)/lib/*.jar)
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
 
 # Define merged Javascript runtime
@@ -32,7 +33,7 @@ TPCDS_QUERIES = $(foreach N,$(SQLTPCDSNUM),tpcds_$(N))
 ALL_QUERIES = $(FAST_TPCH_QUERIES) $(SLOW_TPCH_QUERIES) $(TPCDS_QUERIES)
 COMPILE_LIST = $(foreach N,$(ALL_QUERIES),$(N).js)
 
-# By default, we compile all the TPC-H queries and all but 5 TPC-DS queries (those don't even parse).  We the subset of TPC-H queries that run in reasonable time
+# By default, we compile all the TPC-H queries and all but 5 TPC-DS queries (those don't even parse).  We run only the subset of TPC-H queries that run in reasonable time
 all:	prereq $(COMPILE_LIST) $(RUN_LIST)
 
 # The prereq target simply ensures that other required builds are done
@@ -56,8 +57,11 @@ run_%:	%.js tpch.data $(MERGED_RT)
 	-time $(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input tpch.data -runtime $(MERGED_RT) $<
 
 # Produce the TPC-H dataset from tables and schema
-tpch.data:	dss.ddl customer.tbl lineitem.tbl nation.tbl orders.tbl part.tbl partsupp.tbl region.tbl supplier.tbl
-	$(JAVA) -cp $(CPATH) org.qcert.sql.TableTransformer -schema dss.ddl -output tpch.data customer lineitem nation orders part partsupp region supplier
+tpch.data:	tpch-schema.json customer.csv lineitem.csv nation.csv orders.csv part.csv partsupp.csv region.csv supplier.csv
+	$(JAVA) -cp $(CPATH) org.qcert.util.DataLoader -schema tpch-schema.json -delimiter '|' -output $@ customer lineitem nation orders part partsupp region supplier
+
+tpch-schema.json:	dss.ddl 
+	$(JAVA) -cp $(CPATH) org.qcert.sql.SchemaTransformer dss.ddl -output $@
 
 clean:
 	-rm *.js *_stats.json tpch.data
