@@ -5,7 +5,7 @@
 *.glob
 *.aux
 Makefile.coq
-bin/CADa
+bin/qdata
 bin/qcert
 bin/qcertJS.js
 bin/*.jar
