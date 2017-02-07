@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.qcert.util.SchemaUtil.ListType;
 import org.qcert.util.SchemaUtil.ObjectType;
 import org.qcert.util.SchemaUtil.PrimitiveType;
 import org.qcert.util.SchemaUtil.Type;
@@ -115,7 +116,9 @@ public class DataLoader {
 			else {
 				for (JsonElement elem : thisType) {
 					JsonObject toAdd = new JsonObject();
-					toAdd.add("type", new JsonPrimitive(table));
+					JsonArray brands = new JsonArray();
+					brands.add(new JsonPrimitive(table));
+					toAdd.add("type", brands);
 					toAdd.add("data", elem);
 					world.add(toAdd);
 				}
@@ -226,6 +229,34 @@ public class DataLoader {
 	}
 
 	/**
+	 * Convert a primitive value of designated type to a JsonElement
+	 * @param value the value to convert
+	 * @param fieldType the type of the field
+	 * @return a JsonElement (either a primitive or a date object)
+	 */
+	private static JsonElement convertPrimitiveValue(String value, Type fieldType) {
+		String typeName = ((PrimitiveType) fieldType).typeName;
+		switch(typeName) {
+		case "String":
+			return new JsonPrimitive(value);
+		case "Nat":
+		case "EFloat":
+			/* We are a little loosy-goosy with numbers since the sources of information are often inexact */
+			try {
+				return new JsonPrimitive(Integer.parseInt(value));
+			} catch (NumberFormatException ig) {
+				return new JsonPrimitive(Double.parseDouble(value));
+			}
+		case "Date":
+			return formatDate(value);
+		case "Bool":
+			return new JsonPrimitive(value.equalsIgnoreCase("true"));
+		default:
+			throw new UnsupportedOperationException("Don't known how to convert primitive schema type " + typeName);
+		}
+	}
+
+	/**
 	 * Format a SQL-style String date into a JSON date object
 	 * TODO consider that this is perhaps too SQL-specific and we may need to support other date formats (and distinguish them)
 	 * @param stringDate the date to format
@@ -277,26 +308,18 @@ public class DataLoader {
 		if (fieldType == null)
 			throw new IllegalArgumentException("Field " + fieldName + " is not among the attributes of type " + def.brand);
 		if (fieldType instanceof PrimitiveType) {
-			String typeName = ((PrimitiveType) fieldType).typeName;
-			switch(typeName) {
-			case "String":
-				return new JsonPrimitive(value);
-			case "Nat":
-			case "EFloat":
-				/* We are a little loosy-goosy with numbers since the sources of information are often inexact */
-				try {
-					return new JsonPrimitive(Integer.parseInt(value));
-				} catch (NumberFormatException ig) {
-					return new JsonPrimitive(Double.parseDouble(value));
-				}
-			case "Date":
-				return formatDate(value);
-			case "Bool":
-				return new JsonPrimitive(value.equalsIgnoreCase("true"));
-			default:
-				throw new UnsupportedOperationException("Don't known how to convert primitive schema type " + typeName);
+			return convertPrimitiveValue(value, fieldType);
+		}
+		if (fieldType instanceof ListType) {
+			Type elementType = ((ListType) fieldType).elementType;
+			if (elementType instanceof PrimitiveType) {
+				JsonArray ans = new JsonArray();
+				String[] values = value.split(",");
+				for (String val : values)
+					ans.add(convertPrimitiveValue(val, elementType));
+				return ans;
 			}
 		}
-		throw new UnsupportedOperationException("Can't handle embedded lists or object types when loading data");
+		throw new UnsupportedOperationException("Can't handle embedded object types, lists thereof, or lists of lists, when loading data");
 	}
 }
