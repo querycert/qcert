@@ -227,7 +227,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_dataset_to_spark_dataset
                (tenv:tdbindings) (name:string) (q:dnnrc_typed_dataset) : string :=
-      @dnnrcToSpark2Top _ _ bm _ _ unit tenv name q.
+      @dnnrcToSpark2Top _ _ bm _ _ unit (mkConstants tenv) name q.
 
     Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
       mapReducePairstoCloudant h q rulename.
