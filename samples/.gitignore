@@ -7,3 +7,4 @@
 *.txt
 oql/*.json
 sql/*.json
+/bin/
