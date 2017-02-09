@@ -1,0 +1,18 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.branding.*;
+import org.qcert.camp.translator.RuntimeUtils;
+import com.ibm.ia.model.*;
+
+ruleset test18 {
+  rule FindMarketers {
+    when {
+      C:  Client();
+      Ms: aggregate { M: Marketer(clients.contains(C.id)); }
+      do { ArrayList<String> {M.name}; }
+    } then { 
+      System.out.println("Client " + C.name + " has marketers " + RuntimeUtils.stringListToString(Ms)); 
+    }
+  }
+}

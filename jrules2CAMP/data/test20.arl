@@ -1,0 +1,16 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.entities.*;
+
+ruleset test20 {
+  rule R20 {
+    when {
+      cs: aggregate {
+        c:Customer();
+      } groupby {g: c.age;} do { count {c.name}; }
+    } then {
+      System.out.println("Nb of customers with age " + g + " is " + cs);
+    }
+  }
+}

@@ -1,0 +1,31 @@
+<project name="dependencies" default="getoss">
+	<property name="repo" value="http://central.maven.org/maven2/"/>
+	<property name="asm" value="asm/asm/3.1/asm-3.1.jar"/>
+	<property name="asm-commons" value="asm/asm-commons/3.1/asm-commons-3.1.jar"/>
+	<property name="asm-tree" value="asm/asm-tree/3.1/asm-tree-3.1.jar"/>
+
+	<target name="clean">
+		<delete dir="lib" excludes="jrules-engine.jar"/>
+		<mkdir dir="lib"/>
+	</target>
+	
+	<target name="getoss" depends="clean">
+		<get src="${repo}${asm}" dest="lib"/>
+		<get src="${repo}${asm-commons}" dest="lib"/>
+		<get src="${repo}${asm-tree}" dest="lib"/>
+	</target>
+		
+	<!-- This target is not the default nor is it a dependency of the default target.  It may or may not be useful and is merely
+		intended to illustrate one possible way of obtaining jrules-engine.jar.  
+		Note also that if you are in a free trial of ODM on the Cloud and have downloaded or installed the RuleDesigner locally, a 
+		copy of this jar can also be found in the studio/lib folder of that installation -->
+	<target name="getodm">
+		<fail unless="odm.plugins.loc" message="odm.plugins.loc property is required for this target"/>
+		<unzip dest=".">
+			<patternset>
+				<include name="lib/*.jar"/>
+			</patternset>
+			<fileset dir="${odm.plugins.loc}" includes="com.ibm.rules.engine_*.jar"/>
+		</unzip>
+	</target>
+</project>

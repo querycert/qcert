@@ -1,0 +1,87 @@
+This folder contains the support for "JRules" input to the Q*Cert
+
+The support is not yet fully integrated into the qcert command but can be demonstrated using the Makefile in
+this directory.  A fuller integration is underway.
+
+What do we mean by "JRules"?
+
+The name "JRules" does not denote a single language but rather a rule management system, sold by ILog and then
+by IBM.  IBM has since renamed this system "Operational Decision Manager" (ODM).  The support in this
+directory covers some but not all of the rule languages available with ODM.
+
+ODM comes in two server configurations called "ODM Rules" and "ODM Insights".  Each comes with an
+eclipse-based IDE (called a "Designer") and supports a characteristic set of languages.  There are two license
+arrangements: "ODM Classic" has only the Rules configuration and "ODM Advanced" comes with both Rules and
+Insights.  There is also ODM in the cloud, based on the Rules configuration.  We hope that our support will
+work with either the Insights Designer or the Rules Designer but what we provide here was tested only with the
+Rules Designer.
+
+ODM is not available for free, although some 30 day free trial programs will allow you to try out certain
+versions.  In order to use the support in this directory you do need to obtain a legal copy of one of the recent
+versions of ODM.
+
+One possible route is to sign up for the 30 day free trial of ODM in the Cloud
+(https://www.bpm.ibmcloud.com/odm/index.html).  Once you are authorized for the trial, you can log in to the
+cloud service and obtain a copy of the ODM Rules Designer (this eclipse-based tool is installed on your own
+machine).  At that point you, can enable the support.
+
+We support "technical rules" (written with a Java-like syntax).  ODM uses the terms "ILog Rule Language"
+(IRL), "Advanced Rule Language" (ARL), and "Technical Rule Language" (TRL) variously to denote these kinds of
+rules, with small variations.  We provide examples (with suffix .arl) in the data subdirectory.
+
+We also support "business rules" (written in a natural-language like syntax), but you have to author these in
+an ODM Designer and successfully build the projects that contain them.  Once you have them, you can find a
+compiled form of them inside the designer workspace.  These can be consumed by Q*cert under the right
+circumstances.
+
+Note that our ability to consume JRules languages is an experimental facility developed by researchers and not
+the ODM product team.  You cannot expect support from IBM in using this experimental facility, which is
+provided as is.  Artifacts and jars in the ODM Designer products that we depend upon here may change at any
+time, causing the experimental facility to stop working either temporarily or permanently.
+
+Installing / Enabling
+
+1.  If there is no lib subdirectory of this directory, make one.
+
+2.  Obtain a legal copy of jrules-engine.jar and place it in lib.  If you have a legal copy of the Rule
+Designer for ODM in the cloud, there is a copy of this in the studio/lib directory of the directory where the
+Rule Designer is installed (if you installed via the eclipse update mechanism, this may be the directory where
+eclipse is installed).  Simply copy that file into the lib subdirectory here.
+
+Remaining steps are not as automated as they should be.  This will be corrected soon.
+
+3.  If the camp-java/bin directory in qcert is not populated, issue 'make' in the camp-java directory.
+
+4.  If the javaService/bin directory in qcert is not populated, issue 'make' in the javaService directory.  Then,
+issue 'make' in the sqlParser directory (this ensures that sqlParser is in the services set; jrules2CAMP stuff is
+added in subsequent steps).
+
+5.  Type 'make' in this directory.  In theory, this should first fetch additional (OSS) dependencies, then build
+the code and export it to the Java services.
+
+6.  In the javaServices directory type 'make install' to move things to their final location in qcert/bin.
+
+7.  To build all the arl samples to js, type 'make all_js' (here).
+
+8.  To observe integrated execution in the www/qcert.html web form:
+
+a.  Start the JavaService locally.
+
+cd qcert/bin
+java -jar javaService.jar -server 9879
+
+b.  Open qcert.html in a web browser.
+
+c.  For ARL, select the "techrule" source type and file-choose an ARL file from the 'data' subdirectory of this
+directory.  For the schema, file-choose testSchema.json from the 'data' subdirectory of this directory.  Select an
+output language and compile.
+
+d.  For ODM business rules authored in designer, locate your designer workspace.  For each successfully built
+rule there should be a file of extension .sem in the output directory of the containing project.  Select the
+"designerrule" source type and file-choose one of these .sem files.  It will appear as gibberish (sorry, it's
+binary and is base64 encoded at read-in).  No schema is needed.  Select an output language and compile.
+
+e.  To execute the ARL rules, choose the .io file corresponding to the rule you selected in step c and put it
+in the input section of the form, then use the execute button on the form.  We do not provide any data for
+executing business rules authored in designer.  We may do so in the future, if there are business rule samples
+that are either widely available or that we are allowed to redistribute.

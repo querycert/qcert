@@ -1,0 +1,8 @@
+/lib/*
+/data/*.js
+/data/*.camp
+/data/*.io
+/data/*_output.json
+/data/*_test.json
+/data/testInput
+/bin
