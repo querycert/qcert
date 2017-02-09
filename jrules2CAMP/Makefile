@@ -14,22 +14,18 @@
 #  limitations under the License.
 # 
 
-# The following should change once this code is in qcert instead of SummerCAMP.  Meanwhile, adjust it according to
-# the relative location of the qcert repository in your environment
-QCERTROOT=../../qcert
-
 # Might need to set these if Java is not in the path
 JAVA=java
 JAVAC=javac
 
-# The following MUST be set on the cmdline or in the environment if designer target is used (otherwise ignore)
+# The following MUST be set on the cmdline or in the environment if the 'designer' target is used (otherwise ignore)
 #WORKSPACE = location of folder that is the parent of all designer projects (usually the ODM Designer workspace)
 
 # Remaining entries can be left as is
 
-QCERTCOMP=$(QCERTROOT)/bin/qcert
-RUNTIME=$(QCERTROOT)/runtime/javascript/qcert-runtime.js
-RAWCPATH=bin $(QCERTROOT)/camp-java/bin $(QCERTROOT)/samples/bin $(QCERTROOT)/javaService/bin $(QCERTROOT)/javaService/lib/gson-2.7.jar $(QCERTROOT)/javaService/lib/commons-csv-1.1.jar $(wildcard lib/*.jar)
+QCERTCOMP=../bin/qcert
+RUNTIME=../runtime/javascript/qcert-runtime.js
+RAWCPATH=bin ../camp-java/bin ../samples/bin ../javaService/bin ../javaService/lib/gson-2.7.jar ../javaService/lib/commons-csv-1.1.jar $(wildcard lib/*.jar)
 
 JAVA_SRCS=$(shell find src/ -name '*.java')
 CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
@@ -62,6 +58,9 @@ DATAFILES = $(foreach F,$(ALL_TYPES),data/$(F).csv)
 DESIGNER_RULES = MiniLoanService::eligibility.'minimum credit score' MiniLoanService::eligibility.'minimum income' MiniLoanService::validation.'maximum amount'
 
 all:
+	$(MAKE) -C ../camp-java all
+	$(MAKE) -C ../samples all
+	$(MAKE) -C ../javaService all
 	$(MAKE) classes
 	ant -f export.xml
 
