@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-echo $PATH
-
 mkdir -p test01_nnrc/src/main/scala/
 qcert -schema test01.schema -target spark_dataset -dir-target test01_nnrc/src/main/scala test01.camp
 pushd test01_nnrc
