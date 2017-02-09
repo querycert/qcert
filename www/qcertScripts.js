@@ -11,24 +11,32 @@ function escapeHtml(string) {
 		return entityMap[s];
 	});
 }
-function compileButton() {
-	var input = { 'source' : document.getElementById("source").value,
-			'target' : document.getElementById("target").value,
-			'exactpath' : document.getElementById("exactpath").value === "ExactPath",
-			'emitall' : document.getElementById("emitall").value === "EmitAll",
+	  function getParameter(paramName,defaultValue) {
+	      elem = document.getElementById(paramName);
+	      if (elem != null) {
+		  return elem.value;
+	      } else {
+		  return defaultValue;
+	      }
+	  }
+      function compileButton() {
+	  var input = { 'source' : getParameter("source",""),
+			'target' : getParameter("target",""),
+			'exactpath' : getParameter("exactpath","FillPath") === "ExactPath",
+			'emitall' : getParameter("emitall","EmitTarget") === "EmitAll",
 			'eval' : false,
-			'schema' : document.getElementById("schema").value,
-			'input' : document.getElementById("input").value,
-			'ascii' : document.getElementById("charset").value === "Ascii",
-			'javaimports' : document.getElementById("java_imports").value,
-			'query' : document.getElementById("query").value,
-	};
-	var schema = document.getElementById("schema").value;
-	compilationResult = qcertPreCompile(input, schema);	
-	compiledQuery = compilationResult.result;
-	document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
-	displayAllResults(compilationResult.emitall);
-}
+			'schema' : getParameter("schema","{}"),
+			'input' : getParameter("input","{}"),
+			'ascii' : getParameter("charset","Greek") === "Ascii",
+			'javaimports' : getParameter("java_imports",""),
+			'query' : document.getElementById("query").value
+		      };
+	  var schema = getParameter("schema","{}");
+	  compilationResult = qcertPreCompile(input, schema);	
+	  compiledQuery = compilationResult.result;
+	  document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
+	  displayAllResults(compilationResult.emitall);
+      }
 function verify(result, expected) {
 	if (result.length != expected.length)
 		return false;
@@ -80,7 +88,7 @@ function executeButton() {
 	else {
 		performJsEvaluation();
 	}
-}		
+}
 function clearButton() {
 	document.getElementById("result").innerHTML = "";
 	document.getElementById("execresult").innerHTML = "";
