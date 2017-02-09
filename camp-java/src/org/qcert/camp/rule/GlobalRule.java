@@ -80,7 +80,7 @@ public final class GlobalRule extends PatternRule {
 	 */
 	@Override
 	public String toString() {
-		return "rule_global (" + getPattern() + ")";
+		return "rule_global (" + getPattern() + ") ;; " + getOperand();
 	}
 
 	/* (non-Javadoc)

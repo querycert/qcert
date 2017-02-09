@@ -55,7 +55,7 @@ public class LetItPattern extends CampPattern {
 	@Override
 	public String toString() {
 		CampPattern op2 = getOperand2();
-		return "let IT = " + getOperand1() + "in " + (op2 == null ? "??" : op2);
+		return "let IT = " + getOperand1() + " in " + (op2 == null ? "??" : op2);
 	}
 
 	/* (non-Javadoc)

@@ -81,7 +81,7 @@ public final class WhenRule extends PatternRule {
 	 */
 	@Override
 	public String toString() {
-		return "rule_when (" + getPattern() + ")";
+		return "rule_when (" + getPattern() + ") ;; " + getOperand();
 	}
 
 	/* (non-Javadoc)
