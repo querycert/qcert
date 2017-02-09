@@ -402,8 +402,13 @@ Section DNNRCtoScala.
   Definition type_name_of_var (var:string) : string :=
     var ++ "$TYPE".
   
-  Definition scala_type_of_tbinding (bind:string * rtype) :=
-    "val " ++ (type_name_of_var (fst bind)) ++ " = " ++ rtype_to_spark_DataType (proj1_sig (snd bind)) ++ eol.
+  Definition scala_type_of_tbinding (bind:string * drtype) :=
+    match snd bind with
+    | Tdistr elementType =>
+      "val " ++ (type_name_of_var (fst bind)) ++ " = " ++ rtype_to_spark_DataType (proj1_sig elementType) ++ eol
+    | Tlocal localType =>
+      "val " ++ (type_name_of_var (fst bind)) ++ " = " ++ rtype_to_spark_DataType (proj1_sig localType) ++ eol
+    end.
 
   (* XXX WARNING: Won't work unless there is a way to pass multiple input JSON collections? see the .json(args(0)) part to be fixed? *)
   Definition scala_var_of_tbinding (bind:string * rtype) :=
@@ -412,7 +417,6 @@ Section DNNRCtoScala.
   Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
              (e: dnnrc (type_annotation A) dataset) : string :=
     (* XXX This has to be generalized for multiple distributed collections! XXX *)
-    let inputType := lookup equiv_dec tenv "CONST$WORLD"%string in
     ""
       ++ "import org.apache.spark.SparkContext" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol
@@ -425,7 +429,7 @@ Section DNNRCtoScala.
       ++ "def main(args: Array[String]): Unit = {" ++ eol
       (* XXX This has to be generalized for multiple distributed collections! XXX *)
       (* ++ "val WORLDTYPE = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol *)
-      ++ (joinStrings "" (map scala_type_of_tbinding (unlocalize_tdbindings tenv)))
+      ++ (joinStrings "" (map scala_type_of_tbinding tenv))
       ++ "val HIERARCHY = QcertRuntime.makeHierarchy(" ++ initBrandHierarchy ++ ")" ++ eol
       ++ "val sparkContext = new SparkContext()" ++ eol
       ++ "val sparkSession = SparkSession.builder().getOrCreate()" ++ eol
