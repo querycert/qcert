@@ -2,7 +2,7 @@ machine:
   pre:
     - export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
   environment:
-    PATH: "bin/:spark-2.1-bin-hadoop2.7/bin/:$PATH"
+    PATH: "~/qcert/bin/:~/qcert/spark-2.1-bin-hadoop2.7/bin/:$PATH"
 dependencies:
   cache_directories:
     - "~/.opam"
