@@ -1,9 +1,12 @@
 machine:
   pre:
     - export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
+  environment:
+    PATH: "bin/:spark-2.1-bin-hadoop2.7/bin/:$PATH"
 dependencies:
   cache_directories:
     - "~/.opam"
+    - "~/spark-2.1-bin-hadoop2.7"
   pre:
     - sudo add-apt-repository -y ppa:avsm/ppa
     - sudo apt-get -qq update
@@ -11,9 +14,11 @@ dependencies:
     - opam init -a
     - opam install -y menhir ocamlbuild camlp5 coq.8.5.3 js_of_ocaml:
         timeout: 1200
+    - if [[ ! -e spark-2.1-bin-hadoop2.7 ]]; then wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz && tar xf spark-2.1.0-bin-hadoop2.7.tgz ; fi
   override:
     - make spark2-runtime
 
 test:
   override:
     - eval `opam config env` && make -j1 && make jsapi
+    - ./tests/spark2/run.sh

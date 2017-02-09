@@ -1,3 +1,0 @@
-scalaVersion := "2.11.8"
-
-libraryDependencies += "org.qcert" %% "qcert-spark2-runtime" % "0.1.0-SNAPSHOT"

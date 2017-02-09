@@ -1,2 +1,0 @@
-select struct(pageRank : r->pageRank, pageURL : r->pageURL) from r 
-as entities.Ranking in WORLD where r->pageRank > 10

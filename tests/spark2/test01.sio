@@ -1,0 +1,14 @@
+{"$data": "{\"age\": 32, \"cid\": 123, \"name\": \"John Doe\"}", "$type": ["entities.Customer"]}
+{"$data": "{\"age\": 32, \"cid\": 124, \"name\": \"Jane Doe\"}", "$type": ["entities.Customer"]}
+{"$data": "{\"age\": 34, \"cid\": 125, \"name\": \"Jim Does\"}", "$type": ["entities.Customer"]}
+{"$data": "{\"age\": 32, \"cid\": 126, \"name\": \"Jill Does\"}", "$type": ["entities.Customer"]}
+{"$data": "{\"age\": 34, \"cid\": 127, \"name\": \"Joan Doe\"}", "$type": ["entities.Customer"]}
+{"$data": "{\"age\": 35, \"cid\": 128, \"name\": \"James Do\"}", "$type": ["entities.Customer"]}
+{"$data": "{\"cid\": 123, \"name\": \"Tomatoe\", \"pid\": 1, \"quantity\": 3}", "$type": ["entities.Purchase"]}
+{"$data": "{\"cid\": 123, \"name\": \"Potatoe\", \"pid\": 2, \"quantity\": 1}", "$type": ["entities.Purchase"]}
+{"$data": "{\"cid\": 125, \"name\": \"Stiletto\", \"pid\": 3, \"quantity\": 64}", "$type": ["entities.Purchase"]}
+{"$data": "{\"cid\": 126, \"name\": \"Libretto\", \"pid\": 4, \"quantity\": 62}", "$type": ["entities.Purchase"]}
+{"$data": "{\"cid\": 128, \"name\": \"Dough\", \"pid\": 5, \"quantity\": 4}", "$type": ["entities.Purchase"]}
+{"$data": "{\"cid\": 128, \"name\": \"Croissant\", \"pid\": 6, \"quantity\": 2}", "$type": ["entities.Purchase"]}
+{"$data": "{\"doubleAttribute\": 4, \"id\": 201, \"stringId\": \"201\"}", "$type": ["entities.MainEntity"]}
+{"$data": "{\"doubleAttribute\": 100, \"id\": 202, \"stringId\": \"202\"}", "$type": ["entities.MainEntity"]}
