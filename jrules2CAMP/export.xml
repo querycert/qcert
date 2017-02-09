@@ -2,8 +2,8 @@
 <project default="create_run_jar" name="Export artifacts from jrules2CAMP project to bin">
 
 	<!-- The following properties should change when this code is moved to qcert -->
-	<property name="dest" value="../../qcert/javaService/services"/>
-	<property name="camp-java" value="../../qcert/camp-java"/>
+	<property name="dest" value="../javaService/services"/>
+	<property name="camp-java" value="../camp-java"/>
 
 	<target name="create_run_jar">
 		<delete file="${dest}/jrules2CAMP.jar"/>
