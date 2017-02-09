@@ -2,11 +2,11 @@ machine:
   pre:
     - export DEBIAN_FRONTEND=noninteractive && sudo apt-get remove -y --purge mysql-server mysql-community-server
   environment:
-    PATH: "~/qcert/bin/:~/spark-2.1-bin-hadoop2.7/bin/:$PATH"
+    PATH: "~/qcert/bin/:~/spark-2.1.0-bin-hadoop2.7/bin/:$PATH"
 dependencies:
   cache_directories:
     - "~/.opam"
-    - "~/spark-2.1-bin-hadoop2.7"
+    - "~/spark-2.1.0-bin-hadoop2.7"
   pre:
     - sudo add-apt-repository -y ppa:avsm/ppa
     - sudo apt-get -qq update
@@ -21,4 +21,4 @@ dependencies:
 test:
   override:
     - eval `opam config env` && make -j1 && make jsapi
-    - ./tests/spark2/run.sh
+    - cd tests/spark2 && ./run.sh
