@@ -21,8 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +32,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.qcert.camp.pattern.CampPattern;
-import org.qcert.camp.util.FileUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -321,7 +322,7 @@ public class Rule2CAMP {
 				e.printStackTrace();
 			}
 			if (translated != null)
-				FileUtil.writeFile(new File(dir, ruleName + ".camp"), translated.emit());
+				Rule2CAMP.writeFile(new File(dir, ruleName + ".camp"), translated.emit());
 		}
 		
 		/* If input is provided, execute with ODM engine */
@@ -367,5 +368,16 @@ public class Rule2CAMP {
 		if (primitive.isBoolean())
 			return primitive.getAsBoolean();
 		throw new IllegalStateException();
+	}
+
+	/**
+	 * Write text to a file
+	 * @param file the file
+	 * @param text the text to write
+	 */
+	private static void writeFile(File file, String text) throws IOException {
+		PrintWriter wtr = new PrintWriter(new FileWriter(file));
+		wtr.println(text);
+		wtr.close();
 	}
 }
