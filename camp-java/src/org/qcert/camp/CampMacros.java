@@ -234,11 +234,11 @@ public class CampMacros {
 	}
 
 	/** A macro equivalent to the mapsnone macro on coq
-      Definition mapsnone p := (punop ACount (pmap p) == 0).
+      Definition mapsnone p := (passert (pbinop AEq (punop ACount (pmap p)) 0)).
 	 **/
 	private static CampPattern mapsnone(CampPattern p) {
 		CampPattern count = new UnaryPattern(UnaryOperator.ACount, new MapPattern(p));
-		return eq(count, new ConstPattern(0));
+		return new AssertPattern(eq(count, new ConstPattern(0)));
 	}
 
 	/**  A macro equivalent to the namedObject sugar in Coq:
