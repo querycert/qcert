@@ -196,6 +196,23 @@ can compile and run a given test for you:
 make run_java_test1
 ```
 
+## Spark Dataset backend
+
+To compile the Spark runtime and run queries on Spark you need `sbt`
+and `spark-submit` on your path.
+
+- [sbt](http://www.scala-sbt.org/)
+- [Spark](https://spark.apache.org/)
+
+Currently there is only one Spark example. You can compile and run it like this:
+
+```
+make spark2-runtime
+cd tests/spark2/
+./run.sh
+```
+
+
 ## Caveats
 
 - There is no official support for Windows, although some success has been reported (See [Issue #1](https://github.com/querycert/qcert/issues/1))
