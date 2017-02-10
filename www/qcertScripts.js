@@ -1,49 +1,53 @@
 var entityMap = {
-		"&": "&amp;",
-		"<": "&lt;",
-		">": "&gt;",
-		'"': '&quot;',
-		"'": '&#39;',
-		"/": '&#x2F;'
+	"&" : "&amp;",
+	"<" : "&lt;",
+	">" : "&gt;",
+	'"' : '&quot;',
+	"'" : '&#39;',
+	"/" : '&#x2F;'
 };
 function escapeHtml(string) {
-	return String(string).replace(/[&<>"'\/]/g, function (s) {
+	return String(string).replace(/[&<>"'\/]/g, function(s) {
 		return entityMap[s];
 	});
 }
-	  function getParameter(paramName,defaultValue) {
-	      elem = document.getElementById(paramName);
-	      if (elem != null) {
-		  return elem.value;
-	      } else {
-		  return defaultValue;
-	      }
-	  }
-      function compileButton() {
-	  var input = { 'source' : getParameter("source",""),
-			'target' : getParameter("target",""),
-			'exactpath' : getParameter("exactpath","FillPath") === "ExactPath",
-			'emitall' : getParameter("emitall","EmitTarget") === "EmitAll",
-			'eval' : false,
-			'schema' : getParameter("schema","{}"),
-			'input' : getParameter("input","{}"),
-			'ascii' : getParameter("charset","Greek") === "Ascii",
-			'javaimports' : getParameter("java_imports",""),
-			'query' : document.getElementById("query").value
-		      };
-	  var schema = getParameter("schema","{}");
-	  compilationResult = qcertPreCompile(input, schema);	
-	  compiledQuery = compilationResult.result;
-	  document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
-	  displayAllResults(compilationResult.emitall);
-      }
+function getParameter(paramName, defaultValue) {
+	elem = document.getElementById(paramName);
+	if (elem != null) {
+		return elem.value;
+	} else {
+		return defaultValue;
+	}
+}
+function compileButton() {
+	var input = {
+		'source' : getParameter("source", ""),
+		'target' : getParameter("target", ""),
+		'exactpath' : getParameter("exactpath", "FillPath") === "ExactPath",
+		'emitall' : getParameter("emitall", "EmitTarget") === "EmitAll",
+		'eval' : false,
+		'schema' : getParameter("schema", "{}"),
+		'input' : getParameter("input", "{}"),
+		'ascii' : getParameter("charset", "Greek") === "Ascii",
+		'javaimports' : getParameter("java_imports", ""),
+		'query' : document.getElementById("query").value
+	};
+	var schema = getParameter("schema", "{}");
+	var handler = function(compilationResult) {
+		compiledQuery = compilationResult.result;
+		document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
+		displayAllResults(compilationResult.emitall);
+	}
+	qcertPreCompile(input, schema, handler);
+}
 function verify(result, expected) {
 	if (result.length != expected.length)
 		return false;
 	for (var i = 0; i < result.length; i++) {
 		var resultMember = result[i];
 		var expectedMember = expected[i];
-		if (resultMember.constructor == Array && expectedMember.constructor == Array) {
+		if (resultMember.constructor == Array
+				&& expectedMember.constructor == Array) {
 			if (!verify(resultMember, expectedMember))
 				return false;
 		} else if (resultMember != expectedMember)
@@ -52,34 +56,40 @@ function verify(result, expected) {
 	return true;
 }
 function compileForEval() {
-	var input = { 'source' : document.getElementById("source").value,
-			'target' : document.getElementById("target").value,
-			'exactpath' : document.getElementById("exactpath").value === "ExactPath",
-			'emitall' : document.getElementById("emitall").value === "EmitAll",
-			'eval' : true,
-			'schema' : document.getElementById("schema").value,
-			'input' : document.getElementById("input").value,
-			'ascii' : document.getElementById("charset").value === "Ascii",
-			'javaimports' : document.getElementById("java_imports").value,
-			'query' : document.getElementById("query").value,
+	var input = {
+		'source' : document.getElementById("source").value,
+		'target' : document.getElementById("target").value,
+		'exactpath' : document.getElementById("exactpath").value === "ExactPath",
+		'emitall' : document.getElementById("emitall").value === "EmitAll",
+		'eval' : true,
+		'schema' : document.getElementById("schema").value,
+		'input' : document.getElementById("input").value,
+		'ascii' : document.getElementById("charset").value === "Ascii",
+		'javaimports' : document.getElementById("java_imports").value,
+		'query' : document.getElementById("query").value,
 	};
 	var schema = document.getElementById("schema").value;
-	compilationResult = qcertPreCompile(input, schema);	
-	evalQuery = compilationResult.eval;
-	document.getElementById("execresult").innerHTML = escapeHtml(evalQuery);
+	var handler = function(compilationResult) {
+		evalQuery = compilationResult.eval;
+		document.getElementById("execresult").innerHTML = escapeHtml(evalQuery);
+	}
+	qcertPreCompile(input, schema, handler);
 }
 function performJsEvaluation() {
 	var io = JSON.parse(document.getElementById("input").value);
 	var input = ("input" in io) ? io.input : io;
 	var schemaText = document.getElementById("schema").value;
 	var schema = JSON.parse(schemaText);
-	inheritance = ("hierarchy" in schema) ? schema.hierarchy : ("inheritance" in schema) ? schema.inheritance : [];
+	inheritance = ("hierarchy" in schema) ? schema.hierarchy
+			: ("inheritance" in schema) ? schema.inheritance : [];
 	eval(compiledQuery);
 	var result = query(input)[0];
 	var prefix = "";
 	if ("output" in io)
-		prefix = verify(result, io.output) ? "Equal to the expected result:\n" : "Differs from expected result:\n";
-	document.getElementById("execresult").innerHTML = escapeHtml(prefix + JSON.stringify(result));
+		prefix = verify(result, io.output) ? "Equal to the expected result:\n"
+				: "Differs from expected result:\n";
+	document.getElementById("execresult").innerHTML = escapeHtml(prefix
+			+ JSON.stringify(result));
 }
 function executeButton() {
 	var target = document.getElementById("target").value;
@@ -103,11 +113,11 @@ function addOption(sel, lang) {
 }
 function displayAllResults(allresults) {
 	document.getElementById("allresults").innerHTML = "";
-	for (var i=0; i<allresults.length; i++) {
-		addResult(allresults[i].file,allresults[i].lang,allresults[i].value);
+	for (var i = 0; i < allresults.length; i++) {
+		addResult(allresults[i].file, allresults[i].lang, allresults[i].value);
 	}
 }
-function addResult(file,lang,value) {
+function addResult(file, lang, value) {
 	var allres = document.getElementById("allresults");
 	var l = document.createElement("b");
 	var t1 = document.createTextNode(lang);
@@ -147,7 +157,8 @@ function handleFile(files, output) {
 		var file = files[0];
 		if (file.name.endsWith(".sem")) {
 			reader.onload = function(event) {
-				var contents = btoa(String.fromCharCode.apply(null, new Uint8Array(event.target.result)))
+				var contents = btoa(String.fromCharCode.apply(null,
+						new Uint8Array(event.target.result)))
 				document.getElementById(output).innerHTML = contents;
 			}
 			reader.readAsArrayBuffer(file);
@@ -155,7 +166,7 @@ function handleFile(files, output) {
 			reader.onload = function(event) {
 				var contents = escapeHtml(event.target.result);
 				document.getElementById(output).innerHTML = contents;
-			}																		
+			}
 			reader.readAsText(file);
 		}
 	}

@@ -14,53 +14,82 @@
  * limitations under the License.
  */
 
-function preProcess(text:string, verb:string) {
-    var request = preProcessOnce(text, verb, "localhost");
-		if (request.status == 0)
-				request = preProcessOnce(text, verb, "35.164.159.76");
-		if (request.status == 0)
-				throw Error("No server found to perform the " + verb + " function");
-		if (request.status == 200)
- 				return request.responseText;
-		return "ERROR " + request.status + ": " + request.responseText;
+// List server hosts in the order they should be attempted.  It is a good idea (but not required) to put localhost first so that
+// new functionality can be tested without updating remote server hosts.
+var serverHosts = [ "localhost", "35.164.159.76" ];
+
+function preProcess(text: string, verb: string, callback: (result: string) => any) {
+    var next = function() {
+        callback("ERROR: no server found to process " + verb + " request");
+    }
+    for (var i = serverHosts.length - 1; i >=0; i--)
+        next = makeHandler(text, verb, serverHosts[i], callback, next); 
+    next();
 }
 
-function preProcessOnce(text:string, verb:string, host:string) {
-		var url =  "http://" + host + ":9879?verb=" + verb;
-		var request = new XMLHttpRequest();
-		request.open("POST", url, false);
-		request.setRequestHeader("Content-Type", "text/plain");
-		try {
-				request.send(text);
-		} catch (e) {}
-		return request;
+function makeHandler(text: string, verb: string, host: string, success: (result: string) => any, failure: () => any) {
+    return function() {
+        console.log("Handler invoked for host " + host);
+        var url = "http://" + host + ":9879?verb=" + verb;
+        var request = new XMLHttpRequest();
+        request.open("POST", url, true);
+        request.setRequestHeader("Content-Type", "text/plain");
+        request.onloadend = function() {
+            if (request.status == 200) {
+                console.log("Success with verb " + verb + " at host " + host);
+                success(request.responseText);
+            } else {
+                console.log("Failure with verb " + verb + " at host " + host);
+                failure();
+            }
+        }
+        try {
+            console.log("Sending request to host " + host);
+            request.send(text);
+        } catch (e) {
+        }
+    }
 }
 
-function combineInputAndSchema(input:string, schema:string) {
-		 var parsed = JSON.parse(schema);
-		 var combined = { source: input, schema: parsed };
-		 return JSON.stringify(combined);
+function combineInputAndSchema(input: string, schema: string) {
+    var parsed = JSON.parse(schema);
+    var combined = { source: input, schema: parsed };
+    return JSON.stringify(combined);
 }
 
-function qcertPreCompile(input:QcertCompilerConfig, schema:string) : string | { result: string } {
-		try {
-				if (input.source == "sql") {
-						input.query = preProcess(input.query, "parseSQL");
-						input.sourcesexp = true;
-				} else if (input.source == "techrule") {
-						var combined = combineInputAndSchema(input.query, schema);
-						input.query = preProcess(combined, "techRule2CAMP");
-						input.sourcesexp = true;
-						input.source = "camp";
-				} else if (input.source == "designerrule") {
-						input.query = preProcess(input.query, "serialRule2CAMP");
-						input.sourcesexp = true;
-						input.source = "camp";
-				}
-		} catch (e) {
-				return { result: "ERROR: " + e.message }
-		}
-		if (input.query.substring(0, 6) == "ERROR:")
-			 return { result: input.query };
-		return qcertCompile(input);
+function qcertPreCompile(input: QcertCompilerConfig, schema: string, callback: (result: { result: string }) => any) {
+    var verb = null, sourceCAMP = false, query = null;
+    console.log("Starting pre-compile for source language " + input.source);
+    if (input.source == "sql") {
+        verb = "parseSQL";
+        sourceCAMP = false;
+        query = input.query;
+    } else if (input.source == "techrule") {
+        verb = "techRule2CAMP";
+        sourceCAMP = true;
+        query = combineInputAndSchema(input.query, schema);
+    } else if (input.source == "designerrule") {
+        verb = "designerRule2CAMP";
+        sourceCAMP = true;
+        query = input.query;
+    } else {
+        console.log("No precompile, synchronous callback");
+        callback(qcertCompile(input));
+        return;
+    }
+    var handler = function(result: string) {
+        if (result.substring(0, 6) == "ERROR:") {
+            console.log("Calling back with error: " + result);
+            callback({ result: result });
+        } else {
+            input.query = result;
+            input.sourcesexp = true;
+            if (sourceCAMP)
+                input.source = "CAMP";
+            console.log("Doing qcertCompile after successful preProcess");
+            callback(qcertCompile(input));
+        }
+    }
+    console.log("Dispatching preprocess");
+    preProcess(query, verb, handler);
 }
