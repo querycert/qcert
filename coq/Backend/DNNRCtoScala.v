@@ -432,6 +432,7 @@ Section DNNRCtoScala.
       ++ (joinStrings "" (map scala_type_of_tbinding tenv))
       ++ "val HIERARCHY = QcertRuntime.makeHierarchy(" ++ initBrandHierarchy ++ ")" ++ eol
       ++ "val sparkContext = new SparkContext()" ++ eol
+      ++ "org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.WARN)" ++ eol
       ++ "val sparkSession = SparkSession.builder().getOrCreate()" ++ eol
       (* XXX This has to be generalized for multiple distributed collections! XXX *)
       (* ++ "val CONST$WORLD = sparkSession.read.schema(WORLDTYPE).json(args(0))" ++ eol *)
