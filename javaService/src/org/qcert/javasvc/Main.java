@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.qcert.util.CSV2JSON;
+
 import fi.iki.elonen.NanoHTTPD;
 
 /**
@@ -38,6 +40,8 @@ public class Main extends NanoHTTPD {
 		verbToClass.put("parseSQL", "org.qcert.sql.EncodingService");
 		verbToClass.put("techRule2CAMP", "org.qcert.camp.translator.TechRule2CAMP");
 		verbToClass.put("serialRule2CAMP", "org.qcert.camp.translator.SerialRule2CAMP");
+		verbToClass.put("csv2JSON", CSV2JSON.class.getName());
+		verbToClass.put("sqlSchema2JSON", "org.qcert.sql.SQLSchema2JSON");
 	}
 	
 	/** Mapping from class names to Command instances (conserves instantiations) */

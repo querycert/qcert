@@ -18,7 +18,8 @@ package org.qcert.util;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,16 +80,16 @@ import com.google.gson.stream.JsonWriter;
 public class DataLoader {
 	private DataLoader() {}
 	
-	/** Primary entry point to this service.  The 'main' method is also useful but can be bypassed when files are named in
-	 *   non-standard ways or use a CSV format understood by Apache commons-csv but other than strict RFC 4180
-	 * @param fileNameMap a map from "table names" (type names matching CSV files) to the corresponding CSV files
+	/** Primary entry point to this service.  The 'main' method is also useful but can be bypassed to call this instead
+	 *   when files are named in non-standard ways or to use a CSV format understood by Apache commons-csv but other than strict RFC 4180.
+	 * @param tableMap a map from "table names" (type names matching CSV files) to the corresponding CSV file contents (as Strings)
 	 * @param jsonSchema the JSON format schema in one of several possible variations, as a JsonElement (array or object)
 	 * @param format the CSV format to use (if the format does not include a header we assume that the first line of 
 	 *   each file constitutes a header
 	 * @return a JsonObject representing the loaded data
 	 * @throws Exception
 	 */
-	public static JsonObject loadData(Map<String, File> fileNameMap, JsonElement jsonSchema, CSVFormat format) throws Exception {
+	public static JsonObject loadData(Map<String, String> tableMap, JsonElement jsonSchema, CSVFormat format) throws Exception {
 		if (format.getHeader() == null)
 			format = format.withHeader();
 		Map<String, ObjectType> types = SchemaUtil.getSchema(jsonSchema);
@@ -105,7 +106,7 @@ public class DataLoader {
 		JsonArray world = partitioned ? null : new JsonArray();
 		if (!partitioned)
 			ans.add("WORLD", world);
-		for (Entry<String, File> filePair : fileNameMap.entrySet()) {
+		for (Entry<String, String> filePair : tableMap.entrySet()) {
 			String table = filePair.getKey();
 			ObjectType def = types.get(table);
 			if (def == null)
@@ -205,10 +206,13 @@ public class DataLoader {
 				schemaFile = new File(directory, schema);
 		}
 		
-		/* Canonicalize the file names and associate them with their table names */
-		Map<String, File> fileNameMap = new HashMap<>();
-		for (String table : tables)
-			fileNameMap.put(table, directory == null ? new File(table + ".csv") : new File(directory, table + ".csv"));
+		/* Canonicalize the file names, read the contents, and associate each with its corresponding table name */
+		Map<String, String> tableMap = new HashMap<>();
+		for (String table : tables) {
+			File toRead = directory == null ? new File(table + ".csv") : new File(directory, table + ".csv");
+			String contents = new String(Files.readAllBytes(Paths.get(toRead.getAbsolutePath())));
+			tableMap.put(table, contents);
+		}
 		
 		/* Parse the schema */
 		JsonElement jsonSchema = new JsonParser().parse(new FileReader(schemaFile));
@@ -217,7 +221,7 @@ public class DataLoader {
 		CSVFormat format = CSVFormat.RFC4180;
 		if (delimiter != 0)
 			format = format.withDelimiter(delimiter);
-		JsonObject ans = loadData(fileNameMap, jsonSchema, format);
+		JsonObject ans = loadData(tableMap, jsonSchema, format);
 		
 		/* Write the result */
 		FileWriter wtr = new FileWriter(outputFile);
@@ -274,15 +278,15 @@ public class DataLoader {
 	}
 
 	/** Process an individual table, producing its rows in JSON form 
-	 * @param dataFile the file containing the csv material to load
+	 * @param data the CSV file contents as a String
 	 * @param def the type definition as an ObjectType
 	 * @param format the CSVFormat to use
 	 * @return a JsonArray of the translation of the rows
 	 * @throws Exception
 	 */
-	private static JsonArray process(File dataFile, ObjectType def, CSVFormat format) throws Exception {
+	private static JsonArray process(String data, ObjectType def, CSVFormat format) throws Exception {
 		JsonArray ans = new JsonArray();
-		List<CSVRecord> records = CSVParser.parse(dataFile, Charset.defaultCharset(), format).getRecords();
+		List<CSVRecord> records = CSVParser.parse(data, format).getRecords();
 		for (CSVRecord record : records) {
 			Map<String, String> recmap = record.toMap();
 			JsonObject datum = new JsonObject();

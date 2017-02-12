@@ -37,6 +37,35 @@ import util.FileUtil;
 public class SchemaTransformer {
 
 	/**
+	 * Convert a list of Statements representating 'create table' statements in SQL into a JsonObject representation of the schema
+	 * @param statements the statements
+	 * @return the JsonObject
+	 */
+	public static JsonObject convertSchemas(List<Statement> statements) {
+		JsonObject ans = new JsonObject();
+		ans.add("hierarchy", new JsonArray());
+		ans.add("brandTypes", new JsonArray());
+		ans.add("typeDefs", new JsonArray());
+		JsonObject globals = new JsonObject();
+		ans.add("globals", globals);
+		for (Statement s : statements) {
+			assert s instanceof CreateTable;
+			CreateTable ct = (CreateTable) s;
+			/* Conversion to array in the following is to check that every TableElement is a ColumnDefinition */
+			ColumnDefinition[] defs = ct.getElements().toArray(new ColumnDefinition[ct.getElements().size()]);
+			String tableName = ct.getName().toString().toLowerCase();
+			JsonObject tableType = new JsonObject();
+			tableType.add("dist", new JsonPrimitive("distr"));
+			JsonObject collection = new JsonObject();
+			tableType.add("type", collection);
+			collection.add("$coll", convertColumns(defs));
+			globals.add(tableName, tableType);
+		}
+		JsonObject converted = ans;
+		return converted;
+	}
+
+	/**
 	 * Main program.  
 	 * <p>Command line arguments are
 	 * <ul><li><b>-output &lt;filename&gt;</b> (required) the name of the output file (absolute or relative to current directory)
@@ -88,35 +117,6 @@ public class SchemaTransformer {
 			ans.add(def.getName().toLowerCase(), new JsonPrimitive(type));
 		}
 		return ans;
-	}
-
-	/**
-	 * Convert a list of Statements representating 'create table' statements in SQL into a JsonObject representation of the schema
-	 * @param statements the statements
-	 * @return the JsonObject
-	 */
-	private static JsonObject convertSchemas(List<Statement> statements) {
-		JsonObject ans = new JsonObject();
-		ans.add("hierarchy", new JsonArray());
-		ans.add("brandTypes", new JsonArray());
-		ans.add("typeDefs", new JsonArray());
-		JsonObject globals = new JsonObject();
-		ans.add("globals", globals);
-		for (Statement s : statements) {
-			assert s instanceof CreateTable;
-			CreateTable ct = (CreateTable) s;
-			/* Conversion to array in the following is to check that every TableElement is a ColumnDefinition */
-			ColumnDefinition[] defs = ct.getElements().toArray(new ColumnDefinition[ct.getElements().size()]);
-			String tableName = ct.getName().toString().toLowerCase();
-			JsonObject tableType = new JsonObject();
-			tableType.add("dist", new JsonPrimitive("distr"));
-			JsonObject collection = new JsonObject();
-			tableType.add("type", collection);
-			collection.add("$coll", convertColumns(defs));
-			globals.add(tableName, tableType);
-		}
-		JsonObject converted = ans;
-		return converted;
 	}
 
 	/** From a ColumnDefinition, determine whether it may be assumed to be of date type */

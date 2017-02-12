@@ -21,8 +21,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -46,15 +49,14 @@ public class TestJavaService {
 	 * Main.  The cmdline arguments either do or don't contain the flag -remote: that's the only supported flag.  If it is specified,
 	 *   we test code on the AWS instance.  If it is not, we test code running locally.
 	 * The first non-flag argument is the "verb", which (currently) should be one of the verbs set at the top of source file
-	 *   org.qcert.javasrc.Main.  The second non-flag argument is a file containing source to send to the server.
-	 *   The third non-flag argument, if present, is a file containing the schema to send to the server.  The third argument
-	 *   is ignored unless the verb is one that requires it, in which case it is required.
-	 * All other arguments and argument forms are illegal.
+	 *   org.qcert.javasrc.Main.  Remaining non-flag arguments are file names.  There must be at least one.  The number of such 
+	 *   arguments and what they should contain depends on the verb.
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		/* Parse command line */
-		String file = null, loc = "localhost", verb = null, schema = null;
+		List<String> files = new ArrayList<>();
+		String loc = "localhost", verb = null;
 		for (String arg : args) {
 			if (arg.equals("-remote"))
 				loc = REMOTE_LOC;
@@ -62,31 +64,46 @@ public class TestJavaService {
 				illegal();
 			else if (verb == null)
 				verb = arg;
-			else if (file == null)
-				file = arg;
-			else if (schema == null)
-				schema = arg;
-			else
-				illegal();
+			else 
+				files.add(arg);
 		}
-		/* Simple consistency checks */
-		if (verb == null || file == null)
+		/* Simple consistency checks and verb-specific parsing */
+		if (files.size() == 0)
 			illegal();
-		if (needsSchema(verb)) {
-			if (schema == null)
+		String file = files.remove(0);
+		String schema = null;
+		switch (verb) {
+		case "parseSQL":
+		case "serialRule2CAMP":
+		case "sqlSchema2JSON":
+			if (files.size() != 0)
 				illegal();
-		} else if (schema != null)
+			break;
+		case "techRule2CAMP":
+			if (files.size() != 1)
+				illegal();
+			schema = files.get(0);
+			break;
+		case "csv2JSON":
+			if (files.size() < 1)
+				illegal();
+			break;
+		default:
 			illegal();
+		}
+
 		/* Assemble information from arguments */
 		String url = String.format("http://%s:9879?verb=%s", loc, verb);
 		byte[] contents = Files.readAllBytes(Paths.get(file));
 		String toSend;
-		if (needsEncoding(verb))
+		if ("serialRule2CAMP".equals(verb))
 			toSend = Base64.getEncoder().encodeToString(contents);
 		else
 			toSend = new String(contents);
-		if (needsSchema(verb))
+		if ("techRule2CAMP".equals(verb))
 			toSend = makeSpecialJson(toSend, schema);
+		else if ("csv2JSON".equals(verb))
+			toSend = makeSpecialJson(toSend, files);
 		HttpClient client = HttpClients.createDefault();
 		HttpPost post = new HttpPost(url);
 		StringEntity entity = new StringEntity(toSend);
@@ -116,6 +133,32 @@ public class TestJavaService {
 	}
 
 	/**
+	 * Make the special JSON encoding with both a schema and some number of CSV files must be provided
+	 * TODO at present there is no way to send "format" or "delimiter" members
+	 * @param schemaString a String containing the JSON schema
+	 * @param files the list of file names which are to be read to obtain CSV and whose names are to be decomposed to
+	 *   form type (table) names
+	 * @return the JSON encoding to send
+	 * @throws IOException 
+	 */
+	private static String makeSpecialJson(String schemaString, List<String> files) throws IOException {
+		JsonObject result = new JsonObject();
+		JsonObject schema = new JsonParser().parse(schemaString).getAsJsonObject();
+		result.add("schema", schema);
+		JsonObject data = new JsonObject();
+		result.add("data", data);
+		for (String file : files) {
+			Path path = Paths.get(file);
+			String csv = new String(Files.readAllBytes(path));
+			String table = path.getFileName().toString();
+			if (table.endsWith(".csv"))
+				table = table.substring(0, table.length() - 4);
+			data.add(table, new JsonPrimitive(csv));
+		}
+		return result.toString();
+	}
+
+	/**
 	 * Make the special JSON encoding when both source and schema must be provided
 	 * @param source the source string
 	 * @param schemaFile the file containing the schema
@@ -129,15 +172,5 @@ public class TestJavaService {
 		JsonObject schema = new JsonParser().parse(new FileReader(schemaFile)).getAsJsonObject();
 		result.add("schema", schema);
 		return result.toString();
-	}
-
-	/** Determines if a given verb needs base64 encoding of its file contents (currently true only of serialRule2CAMP) */
-	private static boolean needsEncoding(String verb) {
-		return "serialRule2CAMP".equals(verb);
-	}
-
-	/** Determines if a given verb needs a schema (currently true only of techRule2CAMP) */
-	private static boolean needsSchema(String verb) {
-		return "techRule2CAMP".equals(verb);
 	}
 }
