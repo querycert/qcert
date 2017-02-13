@@ -393,14 +393,11 @@ Section DNNRCtoScala.
             brand_relation_brands in
     joinStrings ", " lines.
 
-  (** Toplevel entry to Spark2/Scala codegen *)
-
   (* Walk through toplevel constant bindings and emit local scala bindings `val
     NAME = ...`. We read distributed collections as files in Spark's JSON format
     (one JSON record per line, .sio). The file paths are just arguments to the
     main function. TODO Local input is currently not supported. We should
-    probably read them in the JSON BLOB format we use for open records and
-    stuff. *)
+    probably read them in the JSON BLOB format we use for open records. *)
   Fixpoint emitGlobals (tenv: tdbindings) (fileArgCounter: nat) :=
     match tenv with
     | nil => ""
@@ -410,6 +407,7 @@ Section DNNRCtoScala.
       emitGlobals rest (fileArgCounter + 1)
     end.
 
+  (** Toplevel entry to Spark2/Scala codegen *)
   Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
              (e: dnnrc (type_annotation A) dataset) : string :=
     ""
