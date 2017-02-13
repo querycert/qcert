@@ -159,10 +159,21 @@ Section CompEval.
          end.
 
     (* Language: dnnrc_dataset *)
-    (* WARNING: This doesn't work if using the Dataset part of the langauge *)
+    (* WARNING: This doesn't work if using the Dataset part of the language *)
 
     Definition eval_dnnrc_dataset
                (q:dnnrc_dataset) (cenv: list (string*data)) : option data :=
+      let cenv := mkConstants (rec_sort cenv) in
+      let loc_cenv := mkDistLocs (rec_sort cenv) in
+      match mkDistConstants loc_cenv cenv with
+      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h SparkIRPlug cenv q)
+      | None => None
+      end.
+
+    (* Language: dnnrc_typed_dataset *)
+
+    Definition eval_dnnrc_typed_dataset
+               (q:dnnrc_typed_dataset) (cenv: list (string*data)) : option data :=
       let cenv := mkConstants (rec_sort cenv) in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
@@ -207,7 +218,7 @@ Section CompEval.
       | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
       | Q_cldmr q => lift_output (eval_cldmr q cenv)
       | Q_dnnrc_dataset q => lift_output (eval_dnnrc_dataset q cenv)
-      | Q_dnnrc_typed_dataset _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_dnnrc_typed_dataset q => lift_output (eval_dnnrc_typed_dataset q cenv)
       | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_rdd _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
@@ -288,6 +299,9 @@ Section CompEval.
       eval_cldmr q (mkWorld world).
     
     Definition eval_dnnrc_dataset_world (q:dnnrc_dataset) (world:list data) : option data :=
+      eval_dnnrc_dataset q (mkWorld world).
+    
+    Definition eval_dnnrc_typed_dataset_world (q:dnnrc_dataset) (world:list data) : option data :=
       eval_dnnrc_dataset q (mkWorld world).
     
   End EvalWorld.
