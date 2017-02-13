@@ -135,3 +135,35 @@ let hierarchy_of_schema sc =
   | None -> []
   | Some (h,_,_,_) -> h
   end
+
+type content_sdata = (char list * char list) list
+
+let get_type bm (glob_constant:Compiler.constant_config) =
+  let br = brand_relation_of_brand_model bm in
+  begin match glob_constant.Compiler.constant_localization with
+  | Compiler.Vlocal -> glob_constant.Compiler.constant_type
+  | Compiler.Vdistr -> QType.bag br glob_constant.Compiler.constant_type
+  end
+
+let get_constant_name (glob_name:char list) (globs:QDriver.constants_config) : Compiler.constant_config =
+  begin try
+    List.assoc glob_name globs
+  with
+  | _ ->
+      raise (Failure ("No type declared for constant: " ^ (Util.string_of_char_list glob_name)))
+  end
+
+let proc_glob bm (globs:QDriver.constants_config) globd =
+  let (glob_name, glob_data) = globd in
+  let glob = get_constant_name glob_name globs in
+  let glob_type = get_type bm glob in
+  begin match QType.data_to_sjson bm glob_data glob_type with
+  | Some sdata -> (glob_name,sdata)
+  | None -> raise (Failure ("Could not process sdata for constant: " ^ (Util.string_of_char_list glob_name)))
+  end
+  
+let content_sdata_of_data (sc:schema) (data:DataUtil.content_input) =
+  let bm = sc.sch_brand_model in
+  let globs = sc.sch_globals in
+  List.map (proc_glob bm globs) data
+

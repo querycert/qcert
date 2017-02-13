@@ -35,14 +35,15 @@ MENHIRFLAG=-use-menhir
 #MENHIRFLAG=
 
 MAIN=qcert
+MAIN2=qdata
 TARGET=native
 JAR=jar
 
 LIB=CALib
 LIBJS=CALibJS
 
-all: $(MAIN)
-jars: $(MAIN).$(JAR) $(LIB).jar
+all: $(MAIN) #$(MAIN2)
+jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(LIB).jar
 js: qcertJS.js
 
 generated: generated/StaticConfig.ml generated/Compiler.ml generated/Compiler.mli
@@ -69,6 +70,16 @@ $(MAIN).$(TARGET): generated
 $(MAIN).$(JAR): generated
 	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(JAR)
 	cp _build/$(MAIN).$(JAR) $(MAIN).$(JAR)
+
+$(MAIN2): generated $(MAIN2).$(TARGET)
+	cp _build/$(MAIN2).$(TARGET) ../bin/$(MAIN2)
+
+$(MAIN2).$(TARGET): generated
+	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(TARGET)
+
+$(MAIN2).$(JAR): generated
+	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(JAR)
+	cp _build/$(MAIN2).$(JAR) $(MAIN2).$(JAR)
 
 $(LIBJS).cma: generated
 	$(OCAMLBUILD) -libs js_of_ocaml -pp "camlp4o -I /Users/simeon/.opam/4.02.1/lib/js_of_ocaml pa_js.cmo" \
@@ -115,6 +126,7 @@ clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build
 	rm -f $(MAIN).$(JAR)
+	rm -f $(MAIN2).$(JAR)
 	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi
 	rm -f japi/lib/CALib.jar
 	rm -f japi/src/org/qcert/calib/CALibWrapper.java
@@ -129,8 +141,8 @@ realclean:
 	rm -f DataLexer.ml DataParser.ml DataParser.mli
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
-	rm -rf *~ generated $(MAIN)
-	rm -f ../bin/$(MAIN)
+	rm -rf *~ generated $(MAIN) $(MAIN2)
+	rm -f ../bin/$(MAIN) ../bin/$(MAIN2)
 	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi ../lib/qcertJS.js
 
 cleanall: realclean

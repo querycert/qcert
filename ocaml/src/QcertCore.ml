@@ -164,7 +164,7 @@ let print_input_var (v:char list * QData.ddata) =
 let print_input ev_input =
   List.iter print_input_var ev_input
 
-let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (expected_output_data:DataUtil.content_output) (schema: TypeUtil.schema) dir file_name q =
+let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (expected_output:DataUtil.content_output) (schema: TypeUtil.schema) dir file_name q =
   let brand_model = schema.TypeUtil.sch_brand_model in
   let brand_relation = TypeUtil.brand_relation_of_brand_model brand_model in
   let globals = schema.TypeUtil.sch_globals in
@@ -191,7 +191,7 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
   in
   let _ =
     if validate
-    then CheckUtil.validate_result expected_output_data (Some ev_data)
+    then CheckUtil.validate_result expected_output (Some ev_data)
     else ()
   in
   let s = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") ev_data) in
@@ -221,8 +221,8 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
 
 let main gconf (file_name, query_s) =
   let schema = gconf.gconf_schema in
-  let data = gconf.gconf_input in
-  let expected_output_data = gconf.gconf_output in
+  let input = gconf.gconf_input in
+  let expected_output = gconf.gconf_output in
   let brand_model = schema.TypeUtil.sch_brand_model in
   let (qname, q_source) = parse_string gconf query_s in
   let class_name =
@@ -296,7 +296,7 @@ let main gconf (file_name, query_s) =
   let res_eval =
     (* eval compiled query *)
     if gconf.gconf_eval then
-      eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug data expected_output_data schema gconf.gconf_dir file_name q_target
+      eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug input expected_output schema gconf.gconf_dir file_name q_target
     else
       no_result_file
   in
@@ -306,7 +306,7 @@ let main gconf (file_name, query_s) =
       let _, l =
         List.fold_left
           (fun (fname, acc) q ->
-            let res = eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug data expected_output_data schema gconf.gconf_dir fname q in
+            let res = eval_string gconf.gconf_eval_validate gconf.gconf_eval_debug input expected_output schema gconf.gconf_dir fname q in
             let suff =
               ConfigUtil.suffix_of_language (QLang.language_of_query brand_model q)
             in

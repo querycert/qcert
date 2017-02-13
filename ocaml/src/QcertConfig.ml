@@ -56,26 +56,27 @@ let hierarchy_of_conf gconf =
 let parse_io f =
   begin match f with
   | None -> (None,None,None)
-  | Some f -> DataUtil.get_io_components (Some (ParseString.parse_io_from_string f))
+  | Some f -> DataUtil.get_io_components (Some (ParseFile.parse_io_from_file f))
   end
 
 let parse_io_component f =
   begin match f with
   | None -> None
-  | Some f -> Some (ParseString.parse_io_from_string f)
+  | Some f -> Some (ParseFile.parse_io_from_file f)
   end
 
+let parse_io_kind gconf =
+  begin match gconf.gconf_io with
+  | None -> (None,None,None)
+  | Some (IO_file f) -> parse_io f
+  | Some (IO_components (fin,fout,fschema)) ->
+      (parse_io_component fin,
+       parse_io_component fout,
+       parse_io_component fschema)
+  end
+    
 let complet_configuration gconf =
-  let (io_input,io_output,io_schema) =
-    begin match gconf.gconf_io with
-    | None -> (None,None,None)
-    | Some (IO_file f) -> parse_io f
-    | Some (IO_components (fin,fout,fschema)) ->
-	(parse_io_component fin,
-	 parse_io_component fout,
-	 parse_io_component fschema)
-    end
-  in
+  let (io_input,io_output,io_schema) = parse_io_kind gconf in
   let _schema =
     begin match io_schema with
     | Some io -> gconf.gconf_schema <- TypeUtil.schema_of_io_json io
