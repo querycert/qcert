@@ -67,6 +67,6 @@ let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp
 
 let parse_query_from_string l s : string * QLang.query =
 	begin match l with
-	| Compiler.L_sql -> ("SQL", Compiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (SQLParser.main s))))
+	| Compiler.L_sql -> ("SQL", Compiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (JavaService.main "parseSQL" s))))
 	| _ ->  parse_string (parse_query l) s
   end

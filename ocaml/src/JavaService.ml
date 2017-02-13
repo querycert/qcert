@@ -15,8 +15,9 @@
  *)
 
 (* This module contains process management to invoke a separate Java
-   utility.  The utility converts SQL source to * an s-expression form of
-   SQL that can be consumed by the next phase.
+   utility.  The utility has an expandable set of functions, such as
+	 converting SQL source to an s-expression form of SQL that can be consumed by the next phase.
+	 Also, parsing JRules, converting SQL schemas to JSON, and data loading using Apache commons-csv.
 *)
 
 open Util
@@ -25,10 +26,10 @@ let get_qcert_home () =
   try Sys.getenv "QCERT_HOME"
   with Not_found -> StaticConfig.qcert_home
 
-let main (s : string) =
+let main (verb: string) (s: string) =
   begin try
     let cmd =
-      Format.sprintf "java -jar %s/bin/javaService.jar parseSQL" (get_qcert_home ())
+      Format.sprintf "java -jar %s/bin/javaService.jar %s" (get_qcert_home ()) verb
     in
     let fromProcess, toProcess = Unix.open_process cmd in
     output_string toProcess s;
@@ -37,5 +38,5 @@ let main (s : string) =
     close_in fromProcess;
     result
   with exn ->
-    raise (Qcert_Error ("SQL parser: "^(Printexc.to_string exn)))
+    raise (Qcert_Error ("Java Service: "^(Printexc.to_string exn)))
   end
