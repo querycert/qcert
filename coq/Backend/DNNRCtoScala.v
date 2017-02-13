@@ -395,28 +395,23 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
 
-  (* XXX NEW CODE: handles a collection of distributed variables instead of a single built-in 'WORLD' one. Stefan should review. XXX *)
-  (* XXX WARNING: Won't work unless there is a way to pass multiple input JSON collections? *)
-  (* XXX WARNING: Seems to assume the type is local, but not sure why? *)
-  
-  Definition type_name_of_var (var:string) : string :=
-    var ++ "$TYPE".
-  
-  Definition scala_type_of_tbinding (bind:string * drtype) :=
-    match snd bind with
-    | Tdistr elementType =>
-      "val " ++ (type_name_of_var (fst bind)) ++ " = " ++ rtype_to_spark_DataType (proj1_sig elementType) ++ eol
-    | Tlocal localType =>
-      "val " ++ (type_name_of_var (fst bind)) ++ " = " ++ rtype_to_spark_DataType (proj1_sig localType) ++ eol
+  (* Walk through toplevel constant bindings and emit local scala bindings `val
+    NAME = ...`. We read distributed collections as files in Spark's JSON format
+    (one JSON record per line, .sio). The file paths are just arguments to the
+    main function. TODO Local input is currently not supported. We should
+    probably read them in the JSON BLOB format we use for open records and
+    stuff. *)
+  Fixpoint emitGlobals (tenv: tdbindings) (fileArgCounter: nat) :=
+    match tenv with
+    | nil => ""
+    | (name, Tlocal lt) :: rest => "LOCAL INPUT UNIMPLEMENTED"
+    | (name, Tdistr elt) :: rest =>
+      "val " ++ name ++ " = sparkSession.read.schema(" ++ rtype_to_spark_DataType (proj1_sig elt) ++ ").json(args(" ++ nat_to_string10 fileArgCounter ++ "))" ++ eol ++
+      emitGlobals rest (fileArgCounter + 1)
     end.
-
-  (* XXX WARNING: Won't work unless there is a way to pass multiple input JSON collections? see the .json(args(0)) part to be fixed? *)
-  Definition scala_var_of_tbinding (bind:string * rtype) :=
-    "val " ++ (fst bind) ++ " = sparkSession.read.schema(" ++ (type_name_of_var (fst bind)) ++ ").json(args(0))" ++ eol.
 
   Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
              (e: dnnrc (type_annotation A) dataset) : string :=
-    (* XXX This has to be generalized for multiple distributed collections! XXX *)
     ""
       ++ "import org.apache.spark.SparkContext" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol
@@ -427,16 +422,11 @@ Section DNNRCtoScala.
 
       ++ "object " ++ name ++ " {" ++ eol
       ++ "def main(args: Array[String]): Unit = {" ++ eol
-      (* XXX This has to be generalized for multiple distributed collections! XXX *)
-      (* ++ "val WORLDTYPE = " ++ rtype_to_spark_DataType (proj1_sig inputType) ++ eol *)
-      ++ (joinStrings "" (map scala_type_of_tbinding tenv))
       ++ "val HIERARCHY = QcertRuntime.makeHierarchy(" ++ initBrandHierarchy ++ ")" ++ eol
       ++ "val sparkContext = new SparkContext()" ++ eol
       ++ "org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.WARN)" ++ eol
       ++ "val sparkSession = SparkSession.builder().getOrCreate()" ++ eol
-      (* XXX This has to be generalized for multiple distributed collections! XXX *)
-      (* ++ "val CONST$WORLD = sparkSession.read.schema(WORLDTYPE).json(args(0))" ++ eol *)
-      ++ (joinStrings "" (map scala_var_of_tbinding (unlocalize_tdbindings tenv)))
+      ++ emitGlobals tenv 0
       ++ "import sparkSession.implicits._" ++ eol
       ++ "QcertRuntime.beforeQuery()" ++ eol
       ++ "println(QcertRuntime.toBlob(" ++ eol
@@ -445,7 +435,7 @@ Section DNNRCtoScala.
       ++ "QcertRuntime.afterQuery()" ++ eol
       ++ "sparkContext.stop()" ++ eol
       ++ "}" ++ eol
-      ++ "}"
+      ++ "}" ++ eol
   .
 
 End DNNRCtoScala.
