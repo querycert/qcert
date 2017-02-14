@@ -27,6 +27,10 @@ let get_qcert_home () =
   with Not_found -> StaticConfig.qcert_home
 
 let main (verb: string) (s: string) =
+	(*
+	Format.printf "Input for verb %s: %s" verb s;
+	Format.print_newline ();
+	*)
   begin try
     let cmd =
       Format.sprintf "java -jar %s/bin/javaService.jar %s" (get_qcert_home ()) verb
@@ -36,6 +40,10 @@ let main (verb: string) (s: string) =
     close_out toProcess;
     let result = input_line fromProcess in
     close_in fromProcess;
+  	(*
+		Format.printf "Output for verb %s: %s" verb result;
+		Format.print_newline ();
+		*)
     result
   with exn ->
     raise (Qcert_Error ("Java Service: "^(Printexc.to_string exn)))
