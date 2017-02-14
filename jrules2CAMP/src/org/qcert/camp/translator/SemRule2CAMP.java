@@ -1554,8 +1554,9 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	}
 
 	/**
-	 * Translate a block consisting of a single statement that is a SemValue.  Otherwise, issue a warning and substitute a minimal
-	 *   action.
+	 * Translate a block consisting of a single statement that is a SemValue.  Otherwise, seubstitute a minimal
+	 *   action.  TODO make this minimal action be something that really works to interpret the condition part of the
+	 *   rule as a query.
 	 * @param block the block to examine
 	 * @param condition the condition from the original action rule, in case a substitute action is needed
 	 * @return a translation (never returns null)
@@ -1568,16 +1569,15 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 				try {
 					return ((SemValue) stmt).accept(this);
 				} catch (UnsupportedOperationException e) {
-					System.out.println("Warning: substituting action because " + e.getMessage());
 				}
-			} else
-				System.out.println("Warning: substituting action because statement is not a SemValue");
-		} else
-			System.out.println("Warning: substituting action because there is more than one statement");
-		// Substitution:
+			}
+		}
+		// Substitution when there is more than one statement or the statement is not a SemValue.
+		// First try to find bindings in the condition and return the first one (dubious).
 		if (condition.getBindings().size() > 0)
 			return condition.getBindings().get(0).asValue().accept(this);
 		else
+			// Placeholder
 			return new ConstPattern("Rule completed (substituted action)");
 	}
 
