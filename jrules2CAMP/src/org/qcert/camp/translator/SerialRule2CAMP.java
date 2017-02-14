@@ -31,7 +31,7 @@ public class SerialRule2CAMP implements Command {
 
 	@Override
 	public String invoke(String arg) {
-		Decoder decoder = Base64.getDecoder();
+		Decoder decoder = Base64.getMimeDecoder();
 		InputStream stream = new ByteArrayInputStream(decoder.decode(arg));
 		try {
 			ODMFrontEnd frontEnd = new ODMFrontEnd(stream, null);
