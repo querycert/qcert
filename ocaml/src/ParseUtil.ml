@@ -82,6 +82,8 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
   | Compiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
+  | Compiler.L_techrule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
+  | Compiler.L_designerrule -> raise (Qcert_Error "Designer rule should be parsed from binary file contents, not lexer")
   | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
   | Compiler.L_nra -> raise (Qcert_Error "No parser for NRA available")
   | Compiler.L_nraenv_core -> ("NRAEnvCore", Compiler.Q_nraenv_core (parse_nraenv_sexp f))
