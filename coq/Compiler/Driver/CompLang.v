@@ -71,6 +71,9 @@ Section CompLang.
 
   Inductive language : Set :=
     | L_rule : language
+    (* Note: techrule and designerrule are not yet fully integrated *)
+    | L_techrule : language
+    | L_designerrule : language
     | L_camp : language
     | L_oql : language
     | L_sql : language
@@ -154,6 +157,9 @@ Section CompLang.
       match name with
       | "rule"%string => L_rule
       | "camp"%string => L_camp
+    (* Note: techrule and designerrule are not yet fully integrated *)
+      | "techrule"%string => L_techrule
+      | "designerrule"%string => L_designerrule
       | "oql"%string => L_oql
       | "sql"%string => L_sql
       | "lambda_nra"%string => L_lambda_nra
@@ -178,6 +184,9 @@ Section CompLang.
     Definition name_of_language lang :=
       match lang with
       | L_rule => "rule"%string
+    (* Note: techrule and designerrule are not yet fully integrated *)
+      | L_techrule => "techrule"%string
+      | L_designerrule => "designerrule"%string
       | L_camp => "camp"%string
       | L_oql => "oql"%string
       | L_sql => "sql"%string
@@ -307,6 +316,10 @@ Section CompLang.
     Definition type_of_language (l:language) : Set :=
       match l with
       | L_rule => rule
+    (* Note: letting techrule and designerrule piggy-back on camp is a temporary hack.  They are actually distinct source languages
+    that translate to camp; however, this translation is currently special-cased *)
+      | L_techrule => camp
+      | L_designerrule => camp
       | L_camp => camp
       | L_oql => oql
       | L_sql => sql
