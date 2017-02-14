@@ -68,5 +68,8 @@ let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp
 let parse_query_from_string l s : string * QLang.query =
 	begin match l with
 	| Compiler.L_sql -> ("SQL", Compiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (JavaService.main "parseSQL" s))))
+	| Compiler.L_techrule -> ("CAMP", Compiler.Q_camp (parse_camp_sexp_from_string (JavaService.main "techRule2CAMP" s)))
+	| Compiler.L_designerrule -> ("CAMP", Compiler.Q_camp (parse_camp_sexp_from_string 
+			(JavaService.main "serialRule2CAMP" (B64.encode s))))
 	| _ ->  parse_string (parse_query l) s
   end
