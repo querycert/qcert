@@ -23,7 +23,7 @@ OCAMLJAVA=/Users/js/.opam/ocamljava-2.0-alpha3
 ###### Shouldn't have to be changed after this
 OCAMLBUILD= ocamlbuild \
 		-no-links -classic-display \
-		-tags annot -use-ocamlfind -package str -package unix
+		-tags annot -use-ocamlfind -package str -package unix -package base64
 
 OCAMLBUILDJAR= $(OCAMLJAVA)/bin/ocamlbuild \
 		-no-links -classic-display \
