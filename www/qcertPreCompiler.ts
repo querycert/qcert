@@ -69,7 +69,7 @@ function qcertPreCompile(input: QcertCompilerConfig, schema: string, callback: (
         sourceCAMP = true;
         query = combineInputAndSchema(input.query, schema);
     } else if (input.source == "designerrule") {
-        verb = "designerRule2CAMP";
+        verb = "serialRule2CAMP";
         sourceCAMP = true;
         query = input.query;
     } else {
