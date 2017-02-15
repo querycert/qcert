@@ -322,7 +322,7 @@ public class Rule2CAMP {
 				e.printStackTrace();
 			}
 			if (translated != null)
-				Rule2CAMP.writeFile(new File(dir, ruleName + ".camp"), translated.emit());
+				Rule2CAMP.writeFile(new File(dir, ruleName.replace(' ', '_') + ".camp"), translated.emit());
 		}
 		
 		/* If input is provided, execute with ODM engine */
@@ -335,7 +335,7 @@ public class Rule2CAMP {
 			combined.add("input", input);
 			combined.add("output",  jsonizeOutput(result));
 			combined.add("schema", schema);
-			FileWriter wtr = new FileWriter(new File(dir, ruleName + ".io"));
+			FileWriter wtr = new FileWriter(new File(dir, ruleName.replace(' ',  '_') + ".io"));
 			JsonWriter json = new JsonWriter(wtr);
 			json.setLenient(true);
 			json.setIndent("  ");
