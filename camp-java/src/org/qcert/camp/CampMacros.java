@@ -15,8 +15,8 @@
  */
 package org.qcert.camp;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import org.qcert.camp.data.CampData;
@@ -191,8 +191,8 @@ public class CampMacros {
 	 *   Definition returnVariables (sl:list string) : pat
      *      := punop (ARecProject sl) penv.
 	 */
-	public static CampPattern variables(String[] variableNames) {
-		return new UnaryPattern(UnaryOperator.ARecProject, Arrays.asList(variableNames), CampPattern.ENV);
+	public static CampPattern variables(List<String> variableNames) {
+		return new UnaryPattern(UnaryOperator.ARecProject, variableNames, CampPattern.ENV);
 	}
 
 	/** A macro equivalent to the varWith function in Coq:
