@@ -990,7 +990,7 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
 	     "DISPATCH"
 	     (pretty_dnnrc_aux ann plug p sym) n1
   | Hack.DNNRCAlg (a,body,arglist) ->
-     fprintf ff "@[%a(@[fun %a => @] %a)@[(%a)@]@]"
+     fprintf ff "@[%adataset(@[fun $%a => @] %a)@[(%a)@]@]"
 	     ann a
              (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
              plug body
