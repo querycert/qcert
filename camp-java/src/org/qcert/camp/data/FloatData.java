@@ -15,6 +15,7 @@
  */
 package org.qcert.camp.data;
 
+import java.io.PrintWriter;
 
 /**
  * Represents the dfloat data constructor
@@ -27,27 +28,19 @@ public class FloatData extends CampData {
 	}
 
 	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#emit(java.io.PrintWriter)
+	 */
+	@Override
+	public void emit(PrintWriter pw) {
+		pw.append(String.valueOf(value));
+	}
+
+	/* (non-Javadoc)
 	 * @see org.qcert.camp.data.CampData#getKind()
 	 */
 	@Override
 	public Kind getKind() {
 		return Kind.dfloat;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getOperands()
-	 */
-	@Override
-	protected Object[] getOperands() {
-		return new Object[] {value};
-	}
-
-	/* (non-Javadoc)
-	 * @see org.qcert.camp.CampAST#getTag()
-	 */
-	@Override
-	protected String getTag() {
-		return "Dfloat";
 	}
 
 	/**
@@ -63,5 +56,21 @@ public class FloatData extends CampData {
 	@Override
 	public String toString() {
 		return String.valueOf(value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getOperands()
+	 */
+	@Override
+	protected Object[] getOperands() {
+		throw new IllegalStateException();  // emit is overridden, this should not be called
+	}
+
+	/* (non-Javadoc)
+	 * @see org.qcert.camp.CampAST#getTag()
+	 */
+	@Override
+	protected String getTag() {
+		throw new IllegalStateException();  // emit is overridden, this should not be called
 	}
 }
