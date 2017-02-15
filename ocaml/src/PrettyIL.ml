@@ -29,15 +29,18 @@ type charkind =
 
 type pretty_config =
     { mutable margin : int;
-      mutable charset : charkind }
+      mutable charset : charkind;
+      mutable type_annotations : bool; }
 
-let make_pretty_config greek margin =
+let make_pretty_config greek margin annot =
   { margin = margin;
-    charset = if greek then Greek else Ascii }
+    charset = if greek then Greek else Ascii;
+    type_annotations = annot; }
 
 let default_pretty_config () =
   { margin = 120;
-    charset = Greek }
+    charset = Greek;
+    type_annotations = false; }
 
 let set_ascii conf () = conf.charset <- Ascii
 let set_greek conf () = conf.charset <- Greek
@@ -46,6 +49,8 @@ let get_charset_bool conf =
   match conf.charset with
   | Greek -> true
   | Ascii -> false
+let set_type_annotations conf () = conf.type_annotations <- true
+let set_no_type_annotations conf () = conf.type_annotations <- false
 
 let set_margin conf i = conf.margin <- i
 let get_margin conf = conf.margin
@@ -696,8 +701,8 @@ and pretty_nra_exp p sym thissym ff a1 oa2 =
 	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nra_aux 0 sym) a2
 
 
-let pretty_nra greek margin a =
-  let conf = make_pretty_config greek margin in
+let pretty_nra greek margin annot a =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -766,8 +771,8 @@ and pretty_infix_dependent pouter pinner sym callb thissym ff a1 a2 a3 =
     fprintf ff "@[<hov 0>%a@ %a%a%a%a@ %a@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
 
 
-let pretty_nraenv greek margin a =
-  let conf = make_pretty_config greek margin in
+let pretty_nraenv greek margin annot a =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -811,8 +816,8 @@ let rec pretty_nnrc_aux p sym ff n =
   | Hack.NNRCGroupBy (g,atts,n1) ->
       fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_aux 0 sym) n1
 
-let pretty_nnrc greek margin n =
-  let conf = make_pretty_config greek margin in
+let pretty_nnrc greek margin annot n =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -922,8 +927,8 @@ let pretty_nnrcmr_aux sym ff mrl =
   pretty_mr_chain sym ff mrl.Hack.mr_chain;
   fprintf ff "@[%a@]@\n" (pretty_mr_last sym) mrl.Hack.mr_last
 
-let pretty_nnrcmr greek margin mr_chain =
-  let conf = make_pretty_config greek margin in
+let pretty_nnrcmr greek margin annot mr_chain =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -993,8 +998,8 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
   | Hack.DNNRCGroupBy (a,g,atts,n1) ->
       fprintf ff "@[<hv 2>%agroup by@ %a%a@[<hv 2>(%a)@]@]" ann a (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_dnnrc_aux ann plug 0 sym) n1
 
-let pretty_dnnrc ann plug greek margin n =
-  let conf = make_pretty_config greek margin in
+let pretty_dnnrc ann plug greek margin annot n =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -1038,8 +1043,8 @@ and pretty_rec_type sym ff rl =
   | (ra,rd) :: [] -> fprintf ff "%s : %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd
   | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd (pretty_rec_type sym) rl'
 
-let pretty_rtype greek margin rt =
-  let conf = make_pretty_config greek margin in
+let pretty_rtype greek margin annot rt =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -1108,8 +1113,8 @@ let rec pretty_dataset_aux p sym ff ds =
   | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataset_aux ff Hack.AConcat ds1 ds2
   | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataset_aux p sym) ds
 
-let pretty_dataset greek margin ds =
-  let conf = make_pretty_config greek margin in
+let pretty_dataset greek margin annot ds =
+  let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
     pp_set_margin ff (get_margin conf);
@@ -1132,29 +1137,32 @@ let pretty_plug_dataset greek ff a =
 let pretty_query pconf q =
   let greek = get_charset_bool pconf in
   let margin = pconf.margin in
+  let annot = pconf.type_annotations in
   begin match q with
   | Compiler.Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_nra q -> pretty_nra greek margin q
-  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin (QDriver.nraenv_core_to_nraenv q)
-  | Compiler.Q_nraenv q -> pretty_nraenv greek margin q
-  | Compiler.Q_nnrc_core q -> pretty_nnrc greek margin q
-  | Compiler.Q_nnrc q -> pretty_nnrc greek margin q
-  | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin q
+  | Compiler.Q_nra q -> pretty_nra greek margin annot q
+  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin annot (QDriver.nraenv_core_to_nraenv q)
+  | Compiler.Q_nraenv q -> pretty_nraenv greek margin annot q
+  | Compiler.Q_nnrc_core q -> pretty_nnrc greek margin annot q
+  | Compiler.Q_nnrc q -> pretty_nnrc greek margin annot q
+  | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin annot q
   | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_dnnrc_dataset q ->
       let ann = pretty_annotate_ignore in
       let plug = pretty_plug_dataset greek in
-      pretty_dnnrc ann plug greek margin q
+      pretty_dnnrc ann plug greek margin annot q
   | Compiler.Q_dnnrc_typed_dataset q ->
       let ann =
-        pretty_annotate_annotated_rtype greek pretty_annotate_ignore
+	if annot
+	then pretty_annotate_annotated_rtype greek pretty_annotate_ignore
+	else pretty_annotate_ignore
       in
       let plug = pretty_plug_dataset greek in
-      pretty_dnnrc ann plug greek margin q
+      pretty_dnnrc ann plug greek margin annot q
   | Compiler.Q_javascript q -> Util.string_of_char_list q
   | Compiler.Q_java q -> Util.string_of_char_list q
   | Compiler.Q_spark_rdd q -> Util.string_of_char_list q

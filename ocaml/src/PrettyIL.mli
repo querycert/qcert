@@ -32,6 +32,8 @@ val set_ascii : pretty_config -> unit -> unit
 val set_greek : pretty_config -> unit -> unit
 val get_charset : pretty_config -> charkind
 val get_charset_bool : pretty_config -> bool
+val set_type_annotations : pretty_config -> unit -> unit
+val set_no_type_annotations : pretty_config -> unit -> unit
 
 val set_margin : pretty_config -> int -> unit
 val get_margin : pretty_config -> int
@@ -60,25 +62,25 @@ val string_of_binop : Compiler.binOp -> string
 
 (* Pretty NRA^e *)
 
-val pretty_nraenv : bool -> int -> QLang.nraenv -> string
+val pretty_nraenv : bool -> int -> bool -> QLang.nraenv -> string
 
 (* Pretty NNRC *)
 
-val pretty_nnrc : bool -> int -> QLang.nnrc -> string
+val pretty_nnrc : bool -> int -> bool -> QLang.nnrc -> string
 
 (* Pretty NNRCMR *)
 
-val pretty_nnrcmr : bool -> int -> QLang.nnrcmr -> string
+val pretty_nnrcmr : bool -> int -> bool -> QLang.nnrcmr -> string
 
 (* Pretty DNRC *)
 
 val pretty_dnnrc : (Format.formatter -> 'a -> unit) ->
   (Format.formatter -> 'plug_type -> unit) ->
-    bool -> int -> ('a, 'plug_type) Compiler.dnnrc -> string
+    bool -> int -> bool -> ('a, 'plug_type) Compiler.dnnrc -> string
 
 (* Pretty Spark IR *)
 
-val pretty_dataset : bool -> int -> Compiler.dataset -> string
+val pretty_dataset : bool -> int -> bool -> Compiler.dataset -> string
 
 
 (* Pretty printers for various annotation types *)
@@ -97,7 +99,7 @@ val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
 
 (* Pretty types *)
 
-val pretty_rtype : bool -> int -> QType.camp_type -> string
+val pretty_rtype : bool -> int -> bool -> QType.camp_type -> string
 
 (* Pretty query *)
 

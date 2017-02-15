@@ -82,6 +82,8 @@ let args_list gconf =
        " Enable optimization logging for dnrc");
       ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
        " Avoid unicode symbols in emited queries");
+      ("-type-annotations", Arg.Unit (PrettyIL.set_type_annotations gconf.gconf_pretty_config),
+       " Print type annotations on ILs");
       ("-margin", Arg.Int (PrettyIL.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
       ("-cld-prefix", Arg.String (CloudantUtil.set_prefix gconf.gconf_cld_conf),
