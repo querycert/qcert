@@ -26,6 +26,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -84,6 +85,7 @@ import com.ibm.rules.engine.lang.semantics.SemMetadata;
 import com.ibm.rules.engine.lang.semantics.SemMethod;
 import com.ibm.rules.engine.lang.semantics.SemMethodInvocation;
 import com.ibm.rules.engine.lang.semantics.SemMethodReference;
+import com.ibm.rules.engine.lang.semantics.SemNamedVariableDeclaration;
 import com.ibm.rules.engine.lang.semantics.SemNewObject;
 import com.ibm.rules.engine.lang.semantics.SemStatement;
 import com.ibm.rules.engine.lang.semantics.SemThis;
@@ -967,19 +969,18 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	}
 
 	/** Gets an array of names from the argument list of a formatEntities call.  The list is in the middle argument */
-	private String[] getVariableNames(List<SemValue> vals) {
+	private List<String> getVariableNames(List<SemValue> vals) {
 		if (vals.size() > 3) {
 			SemValue listArg = vals.get(2);
 			if (listArg instanceof SemExtension) {
 				List<SemValue> args = ((SemExtension) listArg).getValues();
-				String[] ans = new String[args.size()];
+				List<String> ans = new ArrayList<>();
 				boolean allStrings = true;
-				for (int i = 0; i < ans.length; i++) {
-					SemValue arg = args.get(i);
+				for (SemValue arg : args) {
 					if (arg instanceof SemConstant) {
 						Object val = ((SemConstant) arg).getValue();
 						if (val instanceof String) {
-							ans[i] = (String) val;
+							ans.add((String) val);
 							continue;
 						}
 					}
@@ -990,6 +991,41 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 			}
 		}
 		throw new IllegalStateException("formatEntities arguments did not have the expected form");
+	}
+
+	/**
+	 * Get the variable names of objects used to match a SemCondition.
+	 * @param condition the condition
+	 * @return the list of variable names
+	 */
+	private List<String> getVariableNames(SemCondition condition) {
+		if (condition instanceof SemProductCondition) {
+			List<SemCondition> subconditions = ((SemProductCondition) condition).getConditions();
+			List<String> ans = new ArrayList<>();
+			for (SemCondition cond : subconditions) {
+				ans.addAll(getVariableNames(cond));
+			}
+			return ans; // May be empty if no subcondition produced anything
+		} else if (condition instanceof SemVariableCondition) {
+			SemVariableDeclaration decl = ((SemVariableCondition) condition).asValue().getVariableDeclaration();
+			if (decl instanceof SemNamedVariableDeclaration)
+				return Collections.singletonList(((SemNamedVariableDeclaration) decl).getVariableName());
+			if (condition instanceof SemAggregateCondition)
+				condition = ((SemAggregateCondition) condition).getGeneratorCondition();
+			if (condition instanceof SemClassCondition) {
+				// either originally or after chasing through an aggregate condition
+				SemValue generatorValue = ((SemClassCondition) condition).getValueConditionGenerator().getValue();
+				if (generatorValue instanceof SemAttributeValue)
+					return Collections.singletonList(((SemAttributeValue) generatorValue).getAttribute().getName());
+			}
+		}
+		// If we arrive here we did not produce a compound answer from a product condition nor a simple answer from a variable condition
+		// Look at the bindings.
+		List<SemLocalVariableDeclaration> bindings = condition.getBindings();
+		List<String> ans = new ArrayList<>();
+		for (SemLocalVariableDeclaration binding : bindings)
+			ans.add(binding.getVariableName());
+		return ans; // May be empty if there are no bindings
 	}
 
 	/**
@@ -1295,6 +1331,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		return null != receiver && "toString".equals(method) && 0 == args.size();
 	}
 
+
 	/** Tests whether a method invocation is for an equals between compatible types that we know how to translate */
 	private boolean isTranslatableEquals(SemMethodInvocation ast) {
 		SemMethod method = ast.getMethod();
@@ -1309,7 +1346,6 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		}
 		return false;
 	}
-
 
 	/** Tests whether a method invocation is the valueOf method of a primitive type */
 	private boolean isValueOf(SemMethodInvocation ast) {
@@ -1371,6 +1407,7 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		throw new UnsupportedOperationException(at + "not implemented: " + what);
 	}
 
+
 	/**
 	 * Replace an integer op with its floating point counterpart if the types are floating point.
 	 * This method is only called when the op is arithmetic and also floating point is enabled.
@@ -1413,7 +1450,6 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 		notImplemented(String.format("Operator %s between %s and %s", op, type1.getDisplayName(), type2.getDisplayName()));
 		return null; // not reached
 	}
-
 
 	/**
 	 * Process the accumulated chain of SemAttributeValue representing an access path
@@ -1554,11 +1590,14 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 	}
 
 	/**
-	 * Translate a block consisting of a single statement that is a SemValue.  Otherwise, seubstitute a minimal
-	 *   action.  TODO make this minimal action be something that really works to interpret the condition part of the
-	 *   rule as a query.
+	 * Translate a block containing the statements of the action clause of a production rule.
+	 * If the block contains a single statement which is a SemValue (e.g. a method call), it is simply
+	 * translated according to the usual rules.  This allows for production rules that take charge of their
+	 * own results display.  In all other cases (multiple statements in the block, statement that is not a SemValue)
+	 * we gather up the variables that name objects in the condition and turn them into a VARIABLES macro.
 	 * @param block the block to examine
-	 * @param condition the condition from the original action rule, in case a substitute action is needed
+	 * @param condition the condition from the original action rule, in case a search for variables that name objects is
+	 *   required
 	 * @return a translation (never returns null)
 	 */
 	private CampPattern translateBlock(SemBlock block, SemCondition condition) {
@@ -1572,13 +1611,10 @@ public class SemRule2CAMP implements SemValueVisitor<CampPattern>, SemConditionV
 				}
 			}
 		}
-		// Substitution when there is more than one statement or the statement is not a SemValue.
-		// First try to find bindings in the condition and return the first one (dubious).
-		if (condition.getBindings().size() > 0)
-			return condition.getBindings().get(0).asValue().accept(this);
-		else
-			// Placeholder
-			return new ConstPattern("Rule completed (substituted action)");
+		List<String> variableNames = getVariableNames(condition);
+		if (variableNames.isEmpty())
+			return notImplemented("Action clause too difficult to analyze");
+		return CampMacros.variables(variableNames);
 	}
 
 	/**
