@@ -119,7 +119,7 @@ let nrc_log_step tok name input output =
       then () (* (print_string "skipping optimization: "; print_endline name) *)
       else
 	begin
-	  match !nra_trace with
+	  match !nrc_trace with
 	  | LOG_NAMES ->
 	     (print_string "running nrc optimization: "; print_endline name) ;
 	  | LOG_PHASES_AND_NAMES ->
@@ -179,19 +179,14 @@ let dnrc_log_step tok name input output =
       then () (* (print_string "skipping optimization: "; print_endline name) *)
       else
 	begin
-	  match !nra_trace with
+	  match !dnrc_trace with
+          | LOG_NONE -> ()
 	  | LOG_NAMES ->
 	     (print_string "running dnrc optimization: "; print_endline name) ;
 	  | LOG_PHASES_AND_NAMES ->
 	     (print_string "  running dnrc optimization: "; print_endline name) ;
 	  | LOG_VERBOSE_SEXP conv ->
-	     begin
-	       let sexp_input = conv (Obj.magic input) in
-	       let sexp_output = conv (Obj.magic output) in
-	       let sexp_opt = STerm ("opt", [SString name; sexp_input; sexp_output]) in
-	       print_endline ""; print_string ("  " ^ (sexp_to_string sexp_opt))
-	     end
-	  | _ -> ()
+             failwith "sexp logging not supported for dnrc"
 	end;
      tok
     end
