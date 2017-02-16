@@ -72,7 +72,7 @@ let args_list gconf =
       ("-log-optims", Arg.String
 			(fun s -> Logger.nra_set_trace logger_nra_to_sexp s;
 				  Logger.nrc_set_trace logger_nrc_to_sexp s;
-				  Logger.dnrc_set_trace logger_nrc_to_sexp s),
+				  Logger.dnrc_set_trace logger_dnrc_to_sexp s),
        " Enable optimization logging");
       ("-log-optims-nra", Arg.String (Logger.nra_set_trace logger_nra_to_sexp),
        " Enable optimization logging for nra");
