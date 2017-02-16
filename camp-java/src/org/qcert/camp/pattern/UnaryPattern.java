@@ -140,7 +140,7 @@ public final class UnaryPattern extends CampPattern {
 		String delim = "";
 		for (String s : (List<String>) parameter) {
 			bldr.append(delim).append("\"").append(s).append("\"");
-			delim = ", ";
+			delim = sexp ? " " : ", ";
 		}
 		return bldr.append(sexp ? " " : "] ").toString();
 	}
