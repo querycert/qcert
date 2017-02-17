@@ -460,7 +460,7 @@ Section DNNRCDatasetRewrites.
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
     : dnnrc (type_annotation A) dataset -> dnnrc (type_annotation A) dataset :=
-    run_phase dnnrc_map_deep (dnnrc_size dataset_size) dnnrc_optim_list
+    run_phase dnnrc_map_deep (dnnrc_size (* dataset_size *)) dnnrc_optim_list
               ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
 
   Definition dnnrc_default_optim_list : list string
