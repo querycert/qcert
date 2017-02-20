@@ -49,6 +49,6 @@ type global_config = {
     mutable gconf_stat_tree : bool;
   }
 
-val complet_configuration : global_config -> global_config
+val complete_configuration : global_config -> global_config
 
 val driver_conf_of_global_conf : global_config -> string -> string -> QDriver.driver_config

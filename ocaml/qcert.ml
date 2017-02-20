@@ -163,7 +163,7 @@ let parse_args () =
       gconf_stat_tree = false; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
-  (complet_configuration gconf, List.rev !input_files)
+  (complete_configuration gconf, List.rev !input_files)
 
 let () =
   let gconf, input_files = parse_args () in

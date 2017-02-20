@@ -75,7 +75,7 @@ let parse_io_kind gconf =
        parse_io_component fschema)
   end
     
-let complet_configuration gconf =
+let complete_configuration gconf =
   let (io_input,io_output,io_schema) = parse_io_kind gconf in
   let _schema =
     begin match io_schema with

@@ -42,7 +42,7 @@ JAR=jar
 LIB=CALib
 LIBJS=CALibJS
 
-all: $(MAIN) #$(MAIN2)
+all: $(MAIN) $(MAIN2)
 jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(LIB).jar
 js: qcertJS.js
 

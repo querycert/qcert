@@ -33,3 +33,6 @@ val hierarchy_of_schema : schema -> (char list * char list) list
 
 val brand_relation_of_brand_model : QType.brand_model -> Compiler.brand_relation
 
+type content_sdata = (char list * char list) list
+val content_sdata_of_data : schema -> DataUtil.content_input -> content_sdata
+

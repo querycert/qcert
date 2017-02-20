@@ -122,6 +122,19 @@ let emit_sexpr_string (schema: TypeUtil.schema) dir file_name q =
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".sexp" in
   { res_file = fout; res_lang = QcertUtil.name_of_language lang; res_content = s; }
 
+(* Emit sio file *)
+
+let emit_one_sio file_name dir one_sdata =
+  let (const_name,const_sio) = one_sdata in
+  let fpref = Filename.chop_extension file_name in
+  let fout = outname (target_f dir (fpref^"."^(Util.string_of_char_list const_name))) ".sio" in
+  { res_file = fout; res_lang = "sio"; res_content = Util.string_of_char_list const_sio; }
+
+    
+let emit_sio (ev_input:DataUtil.content_input) (schema: TypeUtil.schema) (file_name:string) dir =
+  let sdata = TypeUtil.content_sdata_of_data schema ev_input in
+  List.map (emit_one_sio file_name dir) sdata
+
 (* Eval *)
 
 let lift_data_to_ddata globals (var:char list * QData.data) =
@@ -218,6 +231,20 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   { res_file = fout; res_lang = language_name; res_content = string stats; }
 
 (* Main *)
+
+let main_data gconf file_name =
+  let schema = gconf.gconf_schema in
+  let input = gconf.gconf_input in
+  let sinput = (* emit sio *)
+    let dir =
+      begin match gconf.gconf_dir_target with
+      | Some dir -> Some dir
+      | None -> gconf.gconf_dir
+      end
+    in
+    emit_sio input schema file_name dir
+  in
+  sinput
 
 let main gconf (file_name, query_s) =
   let schema = gconf.gconf_schema in
