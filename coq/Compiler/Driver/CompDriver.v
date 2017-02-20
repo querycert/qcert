@@ -141,7 +141,7 @@ Section CompDriver.
 
     Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_pat_to_cnraenv q.
 
-    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.nraenv_of_pat q.
+    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.translate_pat_to_nraenv q.
 
     (** NRA/NRAEnv translations *)
     Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_nra q.
