@@ -8,3 +8,11 @@ pushd test01_nnrc
 sbt assembly
 spark-submit --class R01 target/scala-2.11/test01_nnrc-assembly-0.1-SNAPSHOT.jar ../test01.sio
 popd
+
+mkdir -p test01_nnrcmr/src/main/scala/
+mkdir -p test01_nnrcmr/irs/
+qcert -emit-all -dir test01_nnrcmr/irs -log-optims-dnrc names -schema test01.schema -path nnrcmr -target spark_dataset -dir-target test01_nnrcmr/src/main/scala test01.camp
+pushd test01_nnrcmr
+sbt assembly
+spark-submit --class R01 target/scala-2.11/test01_nnrcmr-assembly-0.1-SNAPSHOT.jar ../test01.sio
+popd

@@ -7,6 +7,7 @@ machine:
 general:
   artifacts:
     - "tests/spark2/test01_nnrc/irs"
+    - "tests/spark2/test01_nnrcmr/irs"
 
 dependencies:
   cache_directories:
