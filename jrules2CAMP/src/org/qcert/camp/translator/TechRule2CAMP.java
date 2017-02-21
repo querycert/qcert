@@ -30,17 +30,17 @@ import com.google.gson.JsonParser;
 public class TechRule2CAMP implements Command {
 	@Override
 	public String invoke(String arg) {
-		StringReader rdr = new StringReader(arg);
-		JsonObject input = new JsonParser().parse(rdr).getAsJsonObject();
-		JsonElement schema = input.get("schema");
-		rdr = new StringReader(input.get("source").getAsString());
 		try {
+			StringReader rdr = new StringReader(arg);
+			JsonObject input = new JsonParser().parse(rdr).getAsJsonObject();
+			JsonElement schema = input.get("schema");
+			rdr = new StringReader(input.get("source").getAsString());
 			ODMFrontEnd frontEnd = new ODMFrontEnd(rdr, null, schema);
 			SemRule2CAMP semRule2Camp = new SemRule2CAMP(frontEnd.getFactory());
 			CampPattern translated = semRule2Camp.translate(frontEnd.getRule()).convertToPattern();
 			return translated.emit();
 		} catch (Exception e) {
-			return "ERROR: " + e.getMessage();
+			return "ERROR: " + e.getMessage() + ", while parsing " + arg;
 		}
 	}
 }
