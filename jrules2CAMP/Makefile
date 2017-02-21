@@ -82,14 +82,14 @@ $(OSS_DEPENDENCIES):
 designer:
 	$(JAVA) -cp $(CPATH) org.qcert.camp.translator.Rule2CAMP -workspace $(WORKSPACE) -output data $(DESIGNER_RULES)
 
-data/%.camp data/%.io:	data/%.arl classes data/testInput data/testSchema.json
-	$(JAVA) -cp $(CPATH) org.qcert.camp.translator.Rule2CAMP -schema data/testSchema.json -input data/testInput $<
+data/%.io:	data/%.arl classes data/testInput data/testSchema.json
+	$(JAVA) -cp $(CPATH) org.qcert.camp.translator.Rule2CAMP -schema data/testSchema.json -input data/testInput -nocamp $<
 
 data/testInput:	data/testSchema.json $(DATAFILES)
 	$(JAVA) -cp $(CPATH) org.qcert.util.DataLoader -dir data -output testInput -schema testSchema.json $(ALL_TYPES)
 
-data/%.js:	data/%.camp
-	$(QCERTCOMP) -source-sexp -source camp -target js $<
+data/%.js:	data/%.arl
+	$(QCERTCOMP) -source techrule -target js -schema data/testSchema.json -dir data $<
 
 run_%:	data/%.js data/%.io
 	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -runtime $(RUNTIME) -input data/$*.io $<
