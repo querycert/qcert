@@ -61,11 +61,11 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
 	let schema = begin match gconf.gconf_io with
 	  | None -> "{}"
     | Some (IO_file f) -> begin match f with
-				| Some s -> s
+				| Some s -> string_of_file s
 				| None -> "{}"
 				end 
     | Some (IO_components (fin,fout,fschema)) -> begin match fschema with
-				| Some s -> s
+				| Some s -> string_of_file s
 				| None -> "{}"
 				end
 	end in

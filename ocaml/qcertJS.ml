@@ -95,8 +95,6 @@ let global_config_of_json j =
   apply QcertArg.set_dir j##.dirtarget;
   Js.Optdef.iter j##.jsruntime
     (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
-  apply QcertArg.set_schema_content j##.schema;
-  apply QcertArg.set_input_content j##.input;
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.eval (fun b -> gconf.gconf_eval <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
@@ -115,7 +113,7 @@ let global_config_of_json j =
     (fun s -> CloudantUtil.set_prefix gconf.gconf_cld_conf (Js.to_string s));
   apply QcertArg.set_java_imports j##.javaimports;
   apply QcertArg.set_vinit j##.vinit;
-  complet_configuration gconf
+  complete_configuration gconf
 
 let wrap_all wrap_f l =
   let a = new%js Js.array_empty in
