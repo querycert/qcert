@@ -66,7 +66,7 @@
                     cols = "80" />Persons.filter{p => p.age = 32}.map{p => p.name}</textarea>
         </p>
         <p>
-          <label>schema (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="schemaFile" onchange='handleFile(this.files, "schema")'/><br/>
+          <label>schema (enter text or choose file)&nbsp;&nbsp;&nbsp;</label><input type="file" id="schemaFile" onchange='handleFile(this.files, "schema")'/><br/>
           <textarea id = "schema"
                     rows = "10"
                     cols = "80" />{ "hierarchy": [],
@@ -88,8 +88,10 @@
 </textarea>
     		<p/>
         <p>
-          <label>execution input (enter text or choose file)&nbsp;&nbsp;&nbsp;</label></label><input type="file" id="inputFile" onchange='handleFile(this.files, "input")'/><br/>
-          <textarea id = "input"
+          <label>either: execution input as JSON (enter text or choose file)&nbsp;&nbsp;&nbsp;</label><input type="file" id="inputFile" onchange='handleFile(this.files, "input")'/><br/>
+          <label>or: execution input as CSV files (choose files)&nbsp;&nbsp;&nbsp;</label><input type="file" multiple="true" id="inputCSVs" onchange='handleCSVs(this.files)'/>
+					<label>delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea><br/>
+          <textarea id = "input" 
                     rows = "10"
                     cols = "80" />{ "Persons" :
   [{"pid": 1, "name": "John Doe", "age":32, "company":101},

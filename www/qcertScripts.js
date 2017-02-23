@@ -171,3 +171,30 @@ function handleFile(files, output) {
 		}
 	}
 }
+function handleCSVs(files) {
+	var readFiles = {};
+	function readFile(index) {
+		if (index >= files.length) {
+			completeCSVs(readFiles);
+			return;
+		}
+		var file = files[index];
+		var reader = new FileReader();  
+		reader.onload = function(event) {
+			var typeName = file.name.endsWith(".csv") ? file.name.substring(0, file.name.length - 4) : file.name;
+			readFiles[typeName] = event.target.result;
+			readFile(index+1);
+		}
+		reader.readAsText(file);
+	}
+	readFile(0);
+}
+function completeCSVs(readFiles) {
+	var delimiter = document.getElementById("delimiter").value; 
+	var schema = JSON.parse(document.getElementById("schema").value);
+	var toSend = JSON.stringify({schema: schema, delimiter: delimiter, data: readFiles});
+	var process = function(result) {
+		document.getElementById("input").innerHTML = result;
+	}
+	var result = preProcess(toSend, "csv2JSON", process);
+}
