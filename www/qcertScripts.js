@@ -165,11 +165,37 @@ function handleFile(files, output) {
 		} else {
 			reader.onload = function(event) {
 				var contents = escapeHtml(event.target.result);
-				document.getElementById(output).innerHTML = contents;
+				if (output == "schema" && isSQLSchema(contents))
+					convertSQLSchema(contents);
+				else
+					document.getElementById(output).innerHTML = contents;
 			}
 			reader.readAsText(file);
 		}
 	}
+}
+// Determine if a String contains a SQL schema.  Not intended to be foolproof but just to discriminate the two supported schema
+// notations (SQL and JSON) when the input is at least mostly valid.
+function isSQLSchema(schemaText) {
+	/* A SQL schema should have the word "create" in it but SQL is case insensitive  */
+	var create = schemaText.search(/create/i);
+	if (create < 0)
+		return false;
+	var brace = schemaText.indexOf('{');
+	if (brace >= 0 && brace < create)
+		/* Word create is coincidentally appearing inside what is probably a JSON schema */
+		return false;
+	/* Looking more like SQL.  Drop any blanks that follow 'create' */
+	var balance = schemaText.substring(create + 6).trim();
+	/* The next word must be 'table' (case insensitive) */
+	var table = balance.search(/table/i);
+	return table == 0;
+}
+function convertSQLSchema(toConvert) {
+	var process = function(result) {
+		document.getElementById("schema").innerHTML = result;
+	}
+	var result = preProcess(toConvert, "sqlSchema2JSON", process);
 }
 function handleCSVs(files) {
 	var readFiles = {};

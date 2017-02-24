@@ -87,10 +87,11 @@
   } }
 </textarea>
     		<p/>
-        <p>
-          <label>either: execution input as JSON (enter text or choose file)&nbsp;&nbsp;&nbsp;</label><input type="file" id="inputFile" onchange='handleFile(this.files, "input")'/><br/>
-          <label>or: execution input as CSV files (choose files)&nbsp;&nbsp;&nbsp;</label><input type="file" multiple="true" id="inputCSVs" onchange='handleCSVs(this.files)'/>
-					<label>delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea><br/>
+         <p>
+					<label>use one of the following</label><br/>
+          <label>execution input as CSV files (choose delimiter and files)&nbsp;&nbsp;&nbsp;delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea>
+					<input type="file" multiple="true" id="inputCSVs" onchange='handleCSVs(this.files)'/><br/>
+          <label>execution input as JSON (enter text or choose file)&nbsp;&nbsp;&nbsp;</label><input type="file" id="inputFile" onchange='handleFile(this.files, "input")'/><br/>
           <textarea id = "input" 
                     rows = "10"
                     cols = "80" />{ "Persons" :
