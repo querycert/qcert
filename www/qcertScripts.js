@@ -41,6 +41,7 @@ function compileButton() {
 	qcertPreCompile(input, schema, handler);
 }
 function verify(result, expected) {
+	result = result[0]; // TODO is this always right?  
 	if (result.length != expected.length)
 		return false;
 	for (var i = 0; i < result.length; i++) {
@@ -78,12 +79,14 @@ function compileForEval() {
 function performJsEvaluation() {
 	var io = JSON.parse(document.getElementById("input").value);
 	var input = ("input" in io) ? io.input : io;
+//	console.log(input);
 	var schemaText = document.getElementById("schema").value;
 	var schema = JSON.parse(schemaText);
 	inheritance = ("hierarchy" in schema) ? schema.hierarchy
 			: ("inheritance" in schema) ? schema.inheritance : [];
+//	console.log(inheritance);
 	eval(compiledQuery);
-	var result = query(input)[0];
+	var result = query(input);
 	var prefix = "";
 	if ("output" in io)
 		prefix = verify(result, io.output) ? "Equal to the expected result:\n"
