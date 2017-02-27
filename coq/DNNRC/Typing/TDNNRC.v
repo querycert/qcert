@@ -35,7 +35,7 @@
 
     End tplug.
 
-    Global Arguments TAlgPlug plug_type {plug} : clear implicits. 
+    (* Global Arguments TAlgPlug plug_type {plug} : clear implicits.  *)
 
     (** Typing rules for NNRC *)
     Section typ.
@@ -57,7 +57,7 @@
         end
       end.
 
-      Inductive dnnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> dnnrc A plug_type -> drtype -> Prop :=
+      Inductive dnnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> @dnnrc _ A plug_type -> drtype -> Prop :=
       | TDNNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnnrc_type tenv (DNNRCVar a v) τ
       | TDNNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnnrc_type tenv (DNNRCConst a c) (Tlocal τ)
       | TDNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
@@ -122,7 +122,7 @@
   End typ.
 
   (** Main lemma for the type correctness of DNNRC *)
-    Theorem typed_dnnrc_yields_typed_data {A:Set} {plug_type:Set} {τ} `{tplug:TAlgPlug plug_type} (env:dbindings) (tenv:tdbindings) (e:dnnrc A plug_type) :
+    Theorem typed_dnnrc_yields_typed_data {A:Set} {plug_type:Set} {τ} `{tplug:TAlgPlug plug_type} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
     dbindings_type env tenv ->
     dnnrc_type tenv e τ ->
     (exists x, (dnnrc_eval brand_relation_brands env e) = Some x /\ (ddata_type x τ)).
@@ -358,7 +358,7 @@
 
 End TDNNRC.
 
-Global Arguments TAlgPlug {m} plug_type {plug} : clear implicits. 
+(* Global Arguments TAlgPlug {m} plug_type {plug} : clear implicits.  *)
 
 (* 
 *** Local Variables: ***
