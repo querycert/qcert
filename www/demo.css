@@ -10,6 +10,19 @@ li.optim-list {
     background: #eee;
     margin: 1px;
     padding: 5px 10px;
+    font-size: 200%;
+}
+
+div.phase-optims div h3 {
+    font-size: 200%;    
+}
+
+div.all-optims h3 {
+    font-size: 200%;    
+}
+
+div.phase-optims div h4 {
+    font-size: 150%;    
 }
 
 .sortable-ghost {
