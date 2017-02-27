@@ -41,7 +41,7 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_nnrc_optimizer_logger : optimizer_logger string nnrc.
-  Axiom compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc (type_annotation unit) dataset).
+  Axiom compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
   Axiom compiler_foreign_data_typing : foreign_data_typing.
 End CompilerRuntime.
 

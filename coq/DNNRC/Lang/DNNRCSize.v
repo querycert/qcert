@@ -25,7 +25,7 @@ Section size.
 
   Context (plug_size:plug_type->nat).
   
-  Fixpoint dnnrc_size (d:dnnrc A plug_type)
+  Fixpoint dnnrc_size (d:@dnnrc _ A plug_type)
     := match d with
        | DNNRCVar _ _ => 1
        | DNNRCConst _ _ => 1
@@ -41,7 +41,7 @@ Section size.
        | DNNRCAlg _ pt sdl => S ((* plug_size pt + *) 0) (* (fold_left (fun acc sc => dnnrc_size (snd sc) + acc) sdl 0)) *)
        end.
 
-  Lemma dnnrc_size_nzero (d:dnnrc A plug_type) : dnnrc_size d <> 0.
+  Lemma dnnrc_size_nzero (d:@dnnrc _ A plug_type) : dnnrc_size d <> 0.
   Proof.
     induction d; simpl; omega.
   Qed.

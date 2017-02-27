@@ -902,7 +902,7 @@ Section TNNRCtoCAMP.
       + eapply IHn2; eauto.
          * intros ? inn1 inn2.
            repeat defresh.
-           assert (inn1': In (let_var x) (domain (Γ ++ [(loop_var v, s2)])))
+           assert (inn1': In (let_var x) (domain (Γ ++ [(loop_var v, s0)])))
                   by (apply  drec_sort_equiv_domain; trivial).
            rewrite domain_app, in_app_iff in inn1'.
            simpl in inn1'; intuition; eauto.
@@ -910,7 +910,7 @@ Section TNNRCtoCAMP.
            eelim loop_let_var_distinct; eauto.
          * intros ? inn1 inn2.
             repeat defresh.
-            assert (inn1': In x (domain (Γ ++ [(loop_var v, s2)])))
+            assert (inn1': In x (domain (Γ ++ [(loop_var v, s0)])))
                   by (apply  drec_sort_equiv_domain; trivial).
             rewrite domain_app, in_app_iff in inn1'.
             simpl in inn1'; intuition; eauto.
@@ -946,7 +946,7 @@ Section TNNRCtoCAMP.
             eapply loop_let_var_distinct; eauto.
          * intros ? inn1 inn2.
            repeat defresh.
-           assert (inn1': In x (domain (Γ ++ [(loop_var v, s2)])))
+           assert (inn1': In x (domain (Γ ++ [(loop_var v, s0)])))
              by (apply  drec_sort_equiv_domain; trivial).
            rewrite domain_app, in_app_iff in inn1'.
            simpl in inn1'; intuition; eauto.
@@ -1057,6 +1057,7 @@ Section TNNRCtoCAMP.
           reflexivity.
         * econstructor; [eauto|..].
           repeat (econstructor; eauto).
+          inversion H41.
           apply tdot_rec_concat_sort_eq.
           intro inn.
           eapply H8; eauto.
@@ -1271,7 +1272,7 @@ Section TNNRCtoCAMP.
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt. t. 
-      destruct x; destruct x0; simpl in *; subst.
+      destruct x0; destruct x; simpl in *; subst.
       eapply TNNRCLet; eauto.
       destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; simpl; [econstructor; eauto|idtac].
@@ -1300,7 +1301,7 @@ Section TNNRCtoCAMP.
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt. t. 
-      destruct x; destruct x0; simpl in *; subst.
+      destruct x0; destruct x; simpl in *; subst.
       eapply TNNRCFor; eauto.
       destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
@@ -1312,7 +1313,7 @@ Section TNNRCtoCAMP.
       apply (nnrc_type_context_perm _ _ gperm); try rewrite gperm; trivial.
       + simpl; econstructor; eauto.
       + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
-        unfold merge_bindings in H15.
+        unfold merge_bindings in H14.
         destruct (compatible (nnrc_to_pat_env Γ) [(loop_var v, s2)]);
             [idtac|discriminate].
             t.
@@ -1351,7 +1352,7 @@ Section TNNRCtoCAMP.
       inversion H23; clear H23; subst.
       inversion H25; clear H25; subst.
       econstructor; [eauto | .. ].
-      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s6) :: Γ)) 
+      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s4) :: Γ)) 
           as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
@@ -1363,15 +1364,15 @@ Section TNNRCtoCAMP.
         eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H32.
           assert (perm: Permutation 
-                          ((loop_var v, s6) :: nnrc_to_pat_env Γ) 
-                          (nnrc_to_pat_env Γ ++ [(loop_var v, s6)]))
+                          ((loop_var v, s4) :: nnrc_to_pat_env Γ) 
+                          (nnrc_to_pat_env Γ ++ [(loop_var v, s4)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
             simpl. econstructor; eauto.
             intros inn1.
             apply nnrc_to_pat_in in inn1.
             intuition.
-      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v0, s4) :: Γ)) 
+      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v0, s6) :: Γ)) 
           as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n3) -> False) 
@@ -1383,8 +1384,8 @@ Section TNNRCtoCAMP.
         eapply IHn3; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H29.
           assert (perm: Permutation 
-                          ((loop_var v0, s4) :: nnrc_to_pat_env Γ) 
-                          (nnrc_to_pat_env Γ ++ [(loop_var v0, s4)]))
+                          ((loop_var v0, s6) :: nnrc_to_pat_env Γ) 
+                          (nnrc_to_pat_env Γ ++ [(loop_var v0, s6)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
             simpl. econstructor; eauto.
@@ -1656,15 +1657,16 @@ Section TNNRCtoCAMP.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
               simpl in inn.
               destruct inn as [?|[?|?]]; subst; eauto 2.
-            - unfold rec_concat_sort in H34 |- *.
-              rewrite rec_sort_rec_sort_app1 in H34 |- *.
+            - unfold rec_concat_sort in H29 |- *.
+              rewrite rec_sort_rec_sort_app1 in H29 |- *.
               assert (perm:Permutation
-                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v, s2)])
-                             ((b ++ [(loop_var v, s2)]) ++ [(let_var x, xv)])).
-              repeat rewrite app_ass.
-              apply Permutation_app; try reflexivity.
-              apply Permutation_app_comm.
-              erewrite <- drec_sort_perm_eq; try eapply perm; trivial.
+                             ((b ++ [(loop_var v, s0)]) ++ [(let_var x, xv)])
+                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v, s0)])).
+              { repeat rewrite app_ass.
+                apply Permutation_app; try reflexivity.
+                apply Permutation_app_comm.
+              }
+              erewrite drec_sort_perm_eq; try eapply perm; trivial.
               repeat rewrite domain_app.
               rewrite Permutation_app_comm; simpl.
               { constructor.
@@ -1695,11 +1697,11 @@ Section TNNRCtoCAMP.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
               simpl in inn.
               destruct inn as [?|[?|?]]; subst; eauto 2.
-            - unfold rec_concat_sort in H29 |- *.
-              rewrite rec_sort_rec_sort_app1 in H29 |- *.
+            - unfold rec_concat_sort in H34 |- *.
+              rewrite rec_sort_rec_sort_app1 in H34 |- *.
               assert (perm:Permutation
-                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v0, s0)])
-                             ((b ++ [(loop_var v0, s0)]) ++ [(let_var x, xv)])).
+                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v0, s2)])
+                             ((b ++ [(loop_var v0, s2)]) ++ [(let_var x, xv)])).
               repeat rewrite app_ass.
               apply Permutation_app; try reflexivity.
               apply Permutation_app_comm.
@@ -1960,8 +1962,8 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * eauto.
         * unfold merge_bindings in *.
-          match_case_in H31; intros compat1; rewrite compat1 in H31; try discriminate.
-          inversion H31; clear H31; subst.
+          match_case_in H29; intros compat1; rewrite compat1 in H29; try discriminate.
+          inversion H29; clear H29; subst.
           { eapply IHn2; eauto 2.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
             - unfold rec_concat_sort.
@@ -1978,8 +1980,8 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * eauto.
         * unfold merge_bindings in *.
-          match_case_in H29; intros compat2; rewrite compat2 in H29; try discriminate.
-          inversion H29; clear H29; subst.
+          match_case_in H31; intros compat2; rewrite compat2 in H31; try discriminate.
+          inversion H31; clear H31; subst.
           { eapply IHn3; eauto 2.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
             - unfold rec_concat_sort.

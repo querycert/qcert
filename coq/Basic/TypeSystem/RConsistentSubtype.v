@@ -148,7 +148,7 @@ Proof.
        simpl in H3.
        f_equal.
        f_equal.
-       apply  (H3 H2 _ H9).
+       apply  (H3 H9 _ H2).
        apply Rec_subtype_cons_eq in H0.
        destruct r; destruct r0; simpl.
        eapply subtype_ext; eauto.
