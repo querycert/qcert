@@ -681,8 +681,7 @@ Section NNRC.
       - Case "NNRCVar"%string.
         intuition. destruct (string_eqdec v0 v); simpl; subst; intuition.
         + match_destr; intuition. simpl. dest_eqdec; intuition.
-          rewrite e0.
-          destruct (equiv_dec v0 v0); try congruence.
+          destruct (equiv_dec v v); try congruence.
         + match_destr; subst; simpl; dest_eqdec; intuition.
           destruct (equiv_dec v v0); try congruence.
       - Case "NNRCBinop"%string.
