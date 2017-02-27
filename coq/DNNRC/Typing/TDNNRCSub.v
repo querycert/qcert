@@ -14,8 +14,8 @@
     Section typ.
       
       Inductive dnnrc_type_sub {A plug_type:Set}
-                {plug:AlgPlug plug_type} {tplug: TAlgPlug plug_type} :
-        tdbindings -> dnnrc A plug_type -> drtype -> Prop :=
+                {plug:AlgPlug plug_type} {tplug: TAlgPlug} :
+        tdbindings -> @dnnrc _ A plug_type -> drtype -> Prop :=
       | TDNNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnnrc_type_sub tenv (DNNRCVar a v) τ
       | TDNNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnnrc_type_sub tenv (DNNRCConst a c) (Tlocal τ)
       | TDNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
@@ -80,7 +80,7 @@
          dnnrc_type_sub τenv' e τout'
       .
 
-      Global Instance dnnrc_type_sub_proper {A plug_type:Set} {plug:AlgPlug plug_type} {tplug: TAlgPlug plug_type} :
+      Global Instance dnnrc_type_sub_proper {A plug_type:Set} {plug:AlgPlug plug_type} {tplug: TAlgPlug} :
         Proper (tdbindings_sub --> eq ==> drtype_sub ==> impl) (dnnrc_type_sub (A:=A)).
       Proof.
         unfold Proper, respectful, flip, impl; intros.
@@ -105,7 +105,7 @@
 
     Section lift.
 
-      Lemma dnnrc_type_to_dnnrc_type_sub {A} (plug_type:Set) (plug:AlgPlug plug_type) {tplug:TAlgPlug plug_type} {τ} (env:dbindings) (tenv:tdbindings) (e:dnnrc A plug_type) :
+      Lemma dnnrc_type_to_dnnrc_type_sub {A} (plug_type:Set) (plug:AlgPlug plug_type) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
         dnnrc_type tenv e τ ->
         dnnrc_type_sub tenv e τ.
       Proof.
@@ -123,7 +123,7 @@
     End lift.
 
     (** Main lemma for the type correctness of DNNNRC *)
-    Theorem typed_dnnrc_yields_typed_data {A} {plug_type:Set} (plug:AlgPlug plug_type) {tplug:TAlgPlug plug_type} {τ} (env:dbindings) (tenv:tdbindings) (e:dnnrc A plug_type) :
+    Theorem typed_dnnrc_yields_typed_data {A} {plug_type:Set} (plug:AlgPlug plug_type) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
     dbindings_type env tenv ->
     dnnrc_type_sub tenv e τ ->
     (exists x, (dnnrc_eval brand_relation_brands env e) = Some x /\ (ddata_type x τ)).

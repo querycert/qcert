@@ -38,7 +38,7 @@ Section DNNRCDatasetRewrites.
   
   Fixpoint dnnrc_map_plug {A: Set} {P: Set}
            (f: P -> P)
-           (e: dnnrc A P) : dnnrc A P
+           (e: @dnnrc _ A P) : @dnnrc _ A P
     := match e with
        | DNNRCVar a e0 => DNNRCVar a e0
        | DNNRCConst a e0 => DNNRCConst a e0
@@ -71,7 +71,7 @@ Section DNNRCDatasetRewrites.
         {plug:AlgPlug P}
         {f: P -> P}
         (pf:forall (a:A) e env, dnnrc_eq (DNNRCAlg a e env) (DNNRCAlg a (f e) env))
-        (e: dnnrc A P) :
+        (e: @dnnrc _ A P) :
     dnnrc_eq e (dnnrc_map_plug f e).
   Proof.
     induction e; simpl; 
@@ -92,8 +92,8 @@ Section DNNRCDatasetRewrites.
   Qed.
 
   Fixpoint dnnrc_map_deep {A: Set} {P: Set}
-           (f: dnnrc A P -> dnnrc A P)
-           (e: dnnrc A P) : dnnrc A P
+           (f: @dnnrc _ A P -> @dnnrc _ A P)
+           (e: @dnnrc _ A P) : @dnnrc _ A P
     := match e with
        | DNNRCVar a e0 =>
          f (DNNRCVar a e0)
@@ -126,9 +126,9 @@ Section DNNRCDatasetRewrites.
 
     Lemma dnnrc_map_deep_correctness {A: Set} {P: Set} 
           {plug:AlgPlug P}
-          {f: dnnrc A P -> dnnrc A P}
+          {f: @dnnrc _ A P -> @dnnrc _ A P}
           (pf:forall e, dnnrc_eq e (f e))
-          (e: dnnrc A P) :
+          (e: @dnnrc _ A P) :
       dnnrc_eq e (dnnrc_map_deep f e).
     Proof.
       induction e; simpl; try auto 2
@@ -157,8 +157,8 @@ Section DNNRCDatasetRewrites.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: dnnrc (type_annotation A) dataset) :
-    dnnrc (type_annotation A) dataset
+             (e: @dnnrc _ (type_annotation A) dataset) :
+    @dnnrc _ (type_annotation A) dataset
     := match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x
@@ -209,7 +209,7 @@ Section DNNRCDatasetRewrites.
   Fixpoint rewrite_unbrand_or_fail
            {A: Set} {P: Set}
            (s: string)
-           (e: dnnrc A P) : option (dnnrc A P)
+           (e: @dnnrc _ A P) : option (@dnnrc _ A P)
     := match e with
     | DNNRCUnop t1 AUnbrand (DNNRCVar t2 v) =>
       if (s == v)
@@ -250,8 +250,8 @@ Section DNNRCDatasetRewrites.
 
   Definition rec_lift_unbrand
              {A : Set}
-             (e: dnnrc (type_annotation A) dataset):
-    (dnnrc (type_annotation _) dataset) :=
+             (e: @dnnrc _ (type_annotation A) dataset):
+    (@dnnrc _ (type_annotation _) dataset) :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs as c) body =>
       match lift_tlocal (di_required_typeof c) with
@@ -304,7 +304,7 @@ Section DNNRCDatasetRewrites.
     end.
 
   Fixpoint condition_to_column {A: Set}
-           (e: dnnrc (type_annotation A) dataset)
+           (e: @dnnrc _ (type_annotation A) dataset)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
@@ -352,8 +352,8 @@ Section DNNRCDatasetRewrites.
     end.
 
   Definition rec_if_else_empty_to_filter {A: Set}
-             (e: dnnrc (type_annotation A) dataset):
-    (dnnrc (type_annotation A) dataset) :=
+             (e: @dnnrc _ (type_annotation A) dataset):
+    (@dnnrc _ (type_annotation A) dataset) :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x (DNNRCCollect t3 xs)
@@ -383,8 +383,8 @@ Section DNNRCDatasetRewrites.
          (@rec_if_else_empty_to_filter A) (* lemma *).
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
-             (e: dnnrc (type_annotation A) dataset):
-    dnnrc (type_annotation A) dataset :=
+             (e: @dnnrc _ (type_annotation A) dataset):
+    @dnnrc _ (type_annotation A) dataset :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x xs
@@ -401,8 +401,8 @@ Section DNNRCDatasetRewrites.
          (@rec_remove_map_singletoncoll_flatten A) (* lemma *).
 
   Definition rec_for_to_select {A: Set}
-             (e: dnnrc (type_annotation A) dataset):
-    dnnrc (type_annotation A) dataset :=
+             (e: @dnnrc _ (type_annotation A) dataset):
+    @dnnrc _ (type_annotation A) dataset :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
@@ -437,7 +437,7 @@ Section DNNRCDatasetRewrites.
   Import ListNotations.
 
   Definition dnnrc_optim_list {A} :
-    list (OptimizerStep (dnnrc (type_annotation A) dataset))
+    list (OptimizerStep (@dnnrc _ (type_annotation A) dataset))
     := [
         rec_cast_to_filter_step
         ; rec_lift_unbrand_step
@@ -455,11 +455,11 @@ Section DNNRCDatasetRewrites.
   Qed.
   
   Definition run_dnnrc_optims {A}
-             {logger:optimizer_logger string (dnnrc (type_annotation A) dataset)}
+             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataset)}
              (phaseName:string)
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
-    : dnnrc (type_annotation A) dataset -> dnnrc (type_annotation A) dataset :=
+    : @dnnrc _ (type_annotation A) dataset -> @dnnrc _ (type_annotation A) dataset :=
     run_phase dnnrc_map_deep (dnnrc_size (* dataset_size *)) dnnrc_optim_list
               ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
 
@@ -479,7 +479,7 @@ Section DNNRCDatasetRewrites.
   Qed.
 
   Definition dnnrcToDatasetRewrite {A:Set}
-             {logger:optimizer_logger string (dnnrc (type_annotation A) dataset)}
+             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataset)}
     := run_dnnrc_optims "" dnnrc_default_optim_list 6.
 
 End DNNRCDatasetRewrites.

@@ -97,16 +97,16 @@ Section TDNNRCInfer.
   Context {plug:AlgPlug plug_type}.
   (*  Context {tplug:TAlgPlug plug_type}. *)
 
-  Definition di_typeof {A} (d:dnnrc (type_annotation A) plug_type)
+  Definition di_typeof {A} (d:@dnnrc _ (type_annotation A) plug_type)
     := ta_inferred (dnnrc_annotation_get d).
 
-  Definition di_required_typeof {A} (d:dnnrc (type_annotation A) plug_type)
+  Definition di_required_typeof {A} (d:@dnnrc _ (type_annotation A) plug_type)
     := ta_required (dnnrc_annotation_get d).
 
   Definition ta_mk {A:Set} (base:A) (dτ:drtype) : type_annotation A
     := mkType_annotation base dτ dτ.
 
-  Definition ta_require {A} (dτ:drtype) (d:dnnrc (type_annotation A) plug_type)
+  Definition ta_require {A} (dτ:drtype) (d:@dnnrc _ (type_annotation A) plug_type)
     := dnnrc_annotation_update
          (fun a:type_annotation A =>
             mkType_annotation (ta_base a) (ta_inferred a) dτ) d.
@@ -118,8 +118,8 @@ Section TDNNRCInfer.
     | Tdistr τ => f2 τ
     end.
 
-  Fixpoint infer_dnnrc_type {A} (tenv:tdbindings) (n:dnnrc A plug_type) :
-    option (dnnrc (type_annotation A) plug_type)
+  Fixpoint infer_dnnrc_type {A} (tenv:tdbindings) (n:@dnnrc _ A plug_type) :
+    option (@dnnrc _ (type_annotation A) plug_type)
     := match n with
        | DNNRCVar a v =>
          lift (fun τ => DNNRCVar (ta_mk a τ) v)
@@ -130,7 +130,7 @@ Section TDNNRCInfer.
               (infer_data_type (normalize_data brand_relation_brands d))
               
        | DNNRCBinop a b n1 n2 =>
-         let binf (n₁ n₂:dnnrc (type_annotation A) plug_type) : option (dnnrc (type_annotation A) plug_type)
+         let binf (n₁ n₂:@dnnrc _ (type_annotation A) plug_type) : option (@dnnrc _ (type_annotation A) plug_type)
              := let dτ₁ := (di_typeof n₁) in
                 let dτ₂ := (di_typeof n₂) in
                 olift2 (fun τ₁ τ₂ =>
@@ -147,7 +147,7 @@ Section TDNNRCInfer.
          olift2 binf (infer_dnnrc_type tenv n1) (infer_dnnrc_type tenv n2)
 
        | DNNRCUnop a u n1 =>
-         let unf (n₁:dnnrc (type_annotation A) plug_type) : option (dnnrc (type_annotation A) plug_type)
+         let unf (n₁:@dnnrc _ (type_annotation A) plug_type) : option (@dnnrc _ (type_annotation A) plug_type)
              := let dτ₁ := (di_typeof n₁) in
                 bind_local_distr dτ₁
                                  (* Infer for local values *)
@@ -349,11 +349,11 @@ Section TDNNRCInfer.
        | DNNRCAlg _ _ _ => None
        end.
 
-  Example ex1 : dnnrc unit plug_type
+  Example ex1 : @dnnrc _ unit plug_type
     := DNNRCLet tt "x"%string (DNNRCConst tt (dnat 3)) (DNNRCBinop tt ALt (DNNRCVar tt "x"%string)
                  (DNNRCConst tt (dnat 5))).
 
-  Example ex2 : dnnrc unit plug_type
+  Example ex2 : @dnnrc _ unit plug_type
     := DNNRCFor tt
                "x"%string
                (DNNRCConst tt (dcoll nil))
@@ -362,7 +362,7 @@ Section TDNNRCInfer.
                        (DNNRCConst tt (dcoll ((dbool true)::nil)))
                        (DNNRCConst tt (dcoll ((dnat 3)::nil)))).
 
-  Example ex3 : dnnrc unit plug_type
+  Example ex3 : @dnnrc _ unit plug_type
     := DNNRCFor tt
                "x"%string
                (DNNRCConst tt (dcoll nil))
@@ -373,31 +373,31 @@ Section TDNNRCInfer.
                            "x2"%string
                            (DNNRCConst tt (dcoll ((dbool true)::nil)))).
 
-  Example ex4 : dnnrc unit plug_type :=
+  Example ex4 : @dnnrc _ unit plug_type :=
     DNNRCFor tt "el"%string
             (DNNRCCollect tt (DNNRCVar tt "WORLD"%string))
             (DNNRCUnop tt AToString (DNNRCVar tt "el"%string)).
 
-  Example ex5 : dnnrc unit plug_type :=
+  Example ex5 : @dnnrc _ unit plug_type :=
     DNNRCFor tt "el"%string
             (DNNRCVar tt "WORLD"%string)
             (DNNRCUnop tt AToString (DNNRCVar tt "el"%string)).
 
-  Example ex6 : dnnrc unit plug_type :=
+  Example ex6 : @dnnrc _ unit plug_type :=
     DNNRCUnop tt ACount
              (DNNRCCollect tt (DNNRCVar tt "WORLD"%string)).
 
-  Example ex7 : dnnrc unit plug_type :=
+  Example ex7 : @dnnrc _ unit plug_type :=
     DNNRCUnop tt ACount (DNNRCVar tt "WORLD"%string).
 
-  Example ex8 : dnnrc unit plug_type :=
+  Example ex8 : @dnnrc _ unit plug_type :=
     DNNRCUnop tt ADistinct
              (DNNRCCollect tt (DNNRCVar tt "WORLD"%string)).
 
-  Example ex9 : dnnrc unit plug_type :=
+  Example ex9 : @dnnrc _ unit plug_type :=
     DNNRCUnop tt ADistinct (DNNRCVar tt "WORLD"%string).
 
-  Example ex10 : dnnrc unit plug_type :=
+  Example ex10 : @dnnrc _ unit plug_type :=
     DNNRCVar tt "WORLD"%string.
 
   (*
@@ -453,7 +453,7 @@ Section TDNNRCInfer.
   Definition t0 :=
     Tdistr (Rec Closed t0_rec t0_rec_wf).
 
-  Example ex11 : dnnrc unit plug_type :=
+  Example ex11 : @dnnrc _ unit plug_type :=
     DNNRCGroupBy tt "partition"%string ("name"%string::nil)
                  (DNNRCCollect tt (DNNRCVar tt "$vConst$WORLD"%string)).
 
@@ -464,7 +464,7 @@ Section TDNNRCInfer.
                            ex11)).
    *)
 
-  Example ex12 : dnnrc unit plug_type :=
+  Example ex12 : @dnnrc _ unit plug_type :=
     DNNRCGroupBy tt "partition"%string ("age"%string::"name"%string::nil)
                  (DNNRCCollect tt (DNNRCVar tt "$vConst$WORLD"%string)).
 
@@ -475,7 +475,7 @@ Section TDNNRCInfer.
                            ex12)).
    *)
 
-  Example ex13 : dnnrc unit plug_type :=
+  Example ex13 : @dnnrc _ unit plug_type :=
     DNNRCFor tt
              "$vtmap$0"%string
              (DNNRCUnop tt AFlatten
@@ -507,7 +507,7 @@ Section TDNNRCInfer.
 
 End TDNNRCInfer.
 
-Global Arguments type_annotation {ftype br} A: clear implicits. 
+(* Global Arguments type_annotation {ftype br} A: clear implicits.  *)
 
 (* 
 *** Local Variables: ***
