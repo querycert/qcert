@@ -142,7 +142,7 @@ Next Obligation.
   rewrite digits_to_nat_aux_app.
   simpl.
   destruct (nat_to_digits_backwards (n / base)
-                                    (nat_to_digits_backwards_obligation_3 n nat_to_digits_backwards H)).
+                                    (nat_to_digits_backwards_obligation_3 n H)).
   simpl.
   destruct a as [e1 e2].
   split. 
