@@ -1352,7 +1352,7 @@ Section TNNRCtoCAMP.
       inversion H23; clear H23; subst.
       inversion H25; clear H25; subst.
       econstructor; [eauto | .. ].
-      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s6) :: Γ)) 
+      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s4) :: Γ)) 
           as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
@@ -1364,15 +1364,15 @@ Section TNNRCtoCAMP.
         eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H32.
           assert (perm: Permutation 
-                          ((loop_var v, s6) :: nnrc_to_pat_env Γ) 
-                          (nnrc_to_pat_env Γ ++ [(loop_var v, s6)]))
+                          ((loop_var v, s4) :: nnrc_to_pat_env Γ) 
+                          (nnrc_to_pat_env Γ ++ [(loop_var v, s4)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
             simpl. econstructor; eauto.
             intros inn1.
             apply nnrc_to_pat_in in inn1.
             intuition.
-      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v0, s4) :: Γ)) 
+      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v0, s6) :: Γ)) 
           as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n3) -> False) 
@@ -1384,8 +1384,8 @@ Section TNNRCtoCAMP.
         eapply IHn3; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H29.
           assert (perm: Permutation 
-                          ((loop_var v0, s4) :: nnrc_to_pat_env Γ) 
-                          (nnrc_to_pat_env Γ ++ [(loop_var v0, s4)]))
+                          ((loop_var v0, s6) :: nnrc_to_pat_env Γ) 
+                          (nnrc_to_pat_env Γ ++ [(loop_var v0, s6)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
             simpl. econstructor; eauto.
