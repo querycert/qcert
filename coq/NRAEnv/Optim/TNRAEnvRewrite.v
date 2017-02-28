@@ -1887,17 +1887,17 @@ Section TOptimEnv.
     unfold tcnraenv_rewrites_to; intros.
     cnraenv_inferer.
     econstructor; eauto.
-    - assert (merge_bindings τ₁ τ₂0 = Some τ₂0).
-      apply (merge_idem τ₁ τ₂2 τ₂0 pf1 pf2); assumption.
-      rewrite H2 in H; inversion H.
+    - assert (merge_bindings τ₁ τ₂2 = Some τ₂2).
+      apply (merge_idem _ τ₂ _ pf1 pf4); assumption.
+      rewrite H0 in H; inversion H.
       cnraenv_inferer.
       econstructor; eauto.
       econstructor; eauto.
-      assert (Rec Closed τ₂0 pf3 = Rec Closed τ₂0 pf4).
+      assert (Rec Closed τ₃ pf2 = Rec Closed τ₃ pf3).
       apply rtype_fequal; reflexivity.
       rewrite <- H1; assumption.
     - intros.
-      input_well_typed; simpl.
+      input_well_typed; simpl.      
       dependent induction τout.
       rtype_equalizer.
       subst; simpl.
@@ -1914,13 +1914,13 @@ Section TOptimEnv.
         apply (sorted_forall_sorted l rl0); assumption.
       + apply (sorted_forall_sorted dl rl); assumption.
     - econstructor; eauto.
-      + assert (merge_bindings τ₁ τ₂0 = Some τ₂0).
-        apply (merge_idem τ₁ τ₂2 τ₂0 pf1 pf2); assumption.
-        rewrite H2 in H; inversion H.
+      + assert (merge_bindings τ₁ τ₂2 = Some τ₂2).
+        apply (merge_idem _ τ₂ _ pf1 pf4); assumption.
+        rewrite H0 in H; inversion H.
         cnraenv_inferer.
         econstructor; eauto.
         econstructor; eauto.
-        assert (Rec Open τ₂0 pf3 = Rec Open τ₂0 pf4).
+        assert (Rec Open τ₃ pf2 = Rec Open τ₃ pf3).
         apply rtype_fequal; reflexivity.
         rewrite <- H1; assumption.
       + intros.
