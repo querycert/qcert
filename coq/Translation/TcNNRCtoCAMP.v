@@ -1272,7 +1272,7 @@ Section TNNRCtoCAMP.
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt. t. 
-      destruct x; destruct x0; simpl in *; subst.
+      destruct x0; destruct x; simpl in *; subst.
       eapply TNNRCLet; eauto.
       destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; simpl; [econstructor; eauto|idtac].
