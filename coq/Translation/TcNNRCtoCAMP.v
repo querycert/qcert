@@ -1301,7 +1301,7 @@ Section TNNRCtoCAMP.
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt. t. 
-      destruct x; destruct x0; simpl in *; subst.
+      destruct x0; destruct x; simpl in *; subst.
       eapply TNNRCFor; eauto.
       destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
@@ -1313,7 +1313,7 @@ Section TNNRCtoCAMP.
       apply (nnrc_type_context_perm _ _ gperm); try rewrite gperm; trivial.
       + simpl; econstructor; eauto.
       + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
-        unfold merge_bindings in H15.
+        unfold merge_bindings in H14.
         destruct (compatible (nnrc_to_pat_env Γ) [(loop_var v, s2)]);
             [idtac|discriminate].
             t.
