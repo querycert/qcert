@@ -902,7 +902,7 @@ Section TNNRCtoCAMP.
       + eapply IHn2; eauto.
          * intros ? inn1 inn2.
            repeat defresh.
-           assert (inn1': In (let_var x) (domain (Γ ++ [(loop_var v, s2)])))
+           assert (inn1': In (let_var x) (domain (Γ ++ [(loop_var v, s0)])))
                   by (apply  drec_sort_equiv_domain; trivial).
            rewrite domain_app, in_app_iff in inn1'.
            simpl in inn1'; intuition; eauto.
@@ -910,7 +910,7 @@ Section TNNRCtoCAMP.
            eelim loop_let_var_distinct; eauto.
          * intros ? inn1 inn2.
             repeat defresh.
-            assert (inn1': In x (domain (Γ ++ [(loop_var v, s2)])))
+            assert (inn1': In x (domain (Γ ++ [(loop_var v, s0)])))
                   by (apply  drec_sort_equiv_domain; trivial).
             rewrite domain_app, in_app_iff in inn1'.
             simpl in inn1'; intuition; eauto.
@@ -946,7 +946,7 @@ Section TNNRCtoCAMP.
             eapply loop_let_var_distinct; eauto.
          * intros ? inn1 inn2.
            repeat defresh.
-           assert (inn1': In x (domain (Γ ++ [(loop_var v, s2)])))
+           assert (inn1': In x (domain (Γ ++ [(loop_var v, s0)])))
              by (apply  drec_sort_equiv_domain; trivial).
            rewrite domain_app, in_app_iff in inn1'.
            simpl in inn1'; intuition; eauto.
@@ -1057,6 +1057,7 @@ Section TNNRCtoCAMP.
           reflexivity.
         * econstructor; [eauto|..].
           repeat (econstructor; eauto).
+          inversion H41.
           apply tdot_rec_concat_sort_eq.
           intro inn.
           eapply H8; eauto.
