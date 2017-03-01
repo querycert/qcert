@@ -237,7 +237,8 @@ Require Import NRAEnv.
 Require Import NRAEnvOptimizer.
 Require Import CompDriver.
 
-Context {l:optimizer_logger string nraenv}.
+Definition silent_optim := silent_optimizer_logger string nraenv.
+Existing Instance silent_optim.
 
 Definition T1env : nraenv := (nraenv_of_lnra_lambda (q_to_lambda T1l)).
 (* Eval vm_compute in T1env. *)
