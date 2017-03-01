@@ -1657,15 +1657,16 @@ Section TNNRCtoCAMP.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
               simpl in inn.
               destruct inn as [?|[?|?]]; subst; eauto 2.
-            - unfold rec_concat_sort in H34 |- *.
-              rewrite rec_sort_rec_sort_app1 in H34 |- *.
+            - unfold rec_concat_sort in H29 |- *.
+              rewrite rec_sort_rec_sort_app1 in H29 |- *.
               assert (perm:Permutation
-                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v, s2)])
-                             ((b ++ [(loop_var v, s2)]) ++ [(let_var x, xv)])).
-              repeat rewrite app_ass.
-              apply Permutation_app; try reflexivity.
-              apply Permutation_app_comm.
-              erewrite <- drec_sort_perm_eq; try eapply perm; trivial.
+                             ((b ++ [(loop_var v, s0)]) ++ [(let_var x, xv)])
+                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v, s0)])).
+              { repeat rewrite app_ass.
+                apply Permutation_app; try reflexivity.
+                apply Permutation_app_comm.
+              }
+              erewrite drec_sort_perm_eq; try eapply perm; trivial.
               repeat rewrite domain_app.
               rewrite Permutation_app_comm; simpl.
               { constructor.
@@ -1696,11 +1697,11 @@ Section TNNRCtoCAMP.
               rewrite in_dom_rec_sort, domain_app, in_app_iff in inn.
               simpl in inn.
               destruct inn as [?|[?|?]]; subst; eauto 2.
-            - unfold rec_concat_sort in H29 |- *.
-              rewrite rec_sort_rec_sort_app1 in H29 |- *.
+            - unfold rec_concat_sort in H34 |- *.
+              rewrite rec_sort_rec_sort_app1 in H34 |- *.
               assert (perm:Permutation
-                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v0, s0)])
-                             ((b ++ [(loop_var v0, s0)]) ++ [(let_var x, xv)])).
+                             ((b ++ [(let_var x, xv)]) ++ [(loop_var v0, s2)])
+                             ((b ++ [(loop_var v0, s2)]) ++ [(let_var x, xv)])).
               repeat rewrite app_ass.
               apply Permutation_app; try reflexivity.
               apply Permutation_app_comm.
@@ -1961,8 +1962,8 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * eauto.
         * unfold merge_bindings in *.
-          match_case_in H31; intros compat1; rewrite compat1 in H31; try discriminate.
-          inversion H31; clear H31; subst.
+          match_case_in H29; intros compat1; rewrite compat1 in H29; try discriminate.
+          inversion H29; clear H29; subst.
           { eapply IHn2; eauto 2.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
             - unfold rec_concat_sort.
@@ -1979,8 +1980,8 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * eauto.
         * unfold merge_bindings in *.
-          match_case_in H29; intros compat2; rewrite compat2 in H29; try discriminate.
-          inversion H29; clear H29; subst.
+          match_case_in H31; intros compat2; rewrite compat2 in H31; try discriminate.
+          inversion H31; clear H31; subst.
           { eapply IHn3; eauto 2.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
             - unfold rec_concat_sort.
