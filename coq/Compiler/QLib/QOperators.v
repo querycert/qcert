@@ -15,11 +15,12 @@
  *)
 
 Require Import CompilerRuntime.
+Require String Ascii.
+Require BrandRelation.
+Require Import ZArith.
+Require RBinaryOps.
 
 Module QOperators(runtime:CompilerRuntime).
-  Require String Ascii.
-  Require BrandRelation.
-  Require Import ZArith.
   
   Module Unary.
 
@@ -90,7 +91,6 @@ Module QOperators(runtime:CompilerRuntime).
   End Unary.
 
   Module Binary.
-    Require RBinaryOps.
 
     Definition op : Set 
       := RBinaryOps.binOp.

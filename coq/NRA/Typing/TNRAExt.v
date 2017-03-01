@@ -31,7 +31,7 @@ Section TNRAExt.
   Context {m:basic_model}.
   Definition nraext_type Op A B := nra_type (nra_of_nraext Op) A B.
   
-  Notation "Op ▷ A >=> B" := (nraext_type Op A B) (at level 70).
+  Notation "Op ▷ A >=> B" := (nraext_type Op A B) (at level 70) : nraext_scope.
 
   (** Main typing soundness theorem for the Extended NRA *)
 

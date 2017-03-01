@@ -15,12 +15,12 @@
  *)
 
 Require Import CompilerRuntime.
-Module QEval(runtime:CompilerRuntime).
-
-  Require Import String List String EquivDec.
+Require Import String List String EquivDec.
   
-  Require Import BasicSystem.
-  Require Import CompLang CompEval.
+Require Import BasicSystem.
+Require Import CompLang CompEval.
+
+Module QEval(runtime:CompilerRuntime).
 
   Section QE.
   Context {h:list(string*string)}.

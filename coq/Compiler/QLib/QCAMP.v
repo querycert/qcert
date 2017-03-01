@@ -15,11 +15,12 @@
  *)
 
 Require Import CompilerRuntime.
-Module QCAMP(runtime:CompilerRuntime).
-  Require String BrandRelation.
-  Require CAMPRuntime.
+Require String BrandRelation.
+Require CAMPRuntime.
 
-  Require QOperators QData.
+Require QOperators QData.
+
+Module QCAMP(runtime:CompilerRuntime).
 
   Module Data := QData.QData(runtime).
   Module Ops := QOperators.QOperators(runtime).

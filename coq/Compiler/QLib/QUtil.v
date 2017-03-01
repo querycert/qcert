@@ -15,11 +15,13 @@
  *)
 
 Require Import CompilerRuntime.
+
+Require Import BasicRuntime NNRCMRRuntime.
+Require Import TDNNRCInfer.
+Require Import CompEnv.
+
 Module QUtil(runtime:CompilerRuntime).
 
-  Require Import BasicRuntime NNRCMRRuntime.
-  Require Import TDNNRCInfer.
-  
   (* mr_reduce_empty isn't a field of mr so it needs to be exposed *)
   Definition mr_reduce_empty := mr_reduce_empty.
 
@@ -35,7 +37,6 @@ Module QUtil(runtime:CompilerRuntime).
     := TDNNRCInfer.ta_required ta.
 
   (* Processing for input or output of queries *)
-  Require Import CompEnv.
   Definition validate_lifted_success := validate_lifted_success.
 
   Definition mkDistLoc := mkConstants mkDistLoc. (* XXX Where should mkConstants be? *)
