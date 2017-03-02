@@ -228,6 +228,15 @@ Section LambdaNRALinq.
                                    (LNRAConst (dnat 30))))
             Persons).
                
+  Definition demo_example :=
+    LNRAFilter
+         (LNRALambda "p"
+                     (LNRABinop ALt
+                                (LNRAUnop (ADot "age") (LNRAVar "p"))
+                                (LNRAConst (dnat 30))))
+         (LNRABinop AUnion (LNRATable "Persons1")
+                    (LNRATable "Persons2")).
+
 End LambdaNRALinq.
 
 (* Now let's see if we can optimize *)
