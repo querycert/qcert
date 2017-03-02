@@ -346,8 +346,8 @@ Existing Instance silent_optimizer_logger.
       := silent_optimizer_logger string nraenv.
     Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
       := silent_optimizer_logger string nnrc.
-    Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (dnnrc (type_annotation unit) dataset)
-      := silent_optimizer_logger string (dnnrc (type_annotation unit) dataset).
+    Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)
+      := silent_optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
     Definition compiler_foreign_data_typing : foreign_data_typing
       := trivial_foreign_data_typing.
     
@@ -387,8 +387,8 @@ Existing Instance silent_optimizer_logger.
       := silent_optimizer_logger string nraenv.
     Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
       := silent_optimizer_logger string nnrc.
-    Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (dnnrc (type_annotation unit) dataset)   
-      := silent_optimizer_logger string (dnnrc (type_annotation unit) dataset).
+    Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)   
+      := silent_optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
  Definition compiler_model_foreign_data_typing : foreign_data_typing
       := trivial_foreign_data_typing.
   End TrivialModel.

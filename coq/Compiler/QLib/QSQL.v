@@ -15,10 +15,11 @@
  *)
 
 Require Import CompilerRuntime.
+Require String.
+Require QData QOperators.
+Require SQL.
+
 Module QSQL(runtime:CompilerRuntime).
-  Require String.
-  Require QData QOperators.
-  Require SQL.
 
   Module QData := QData.QData runtime.
   Module QOps := QOperators.QOperators runtime.

@@ -1493,7 +1493,7 @@ Module EnhancedRuntime <: CompilerRuntime.
     := foreign_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
-  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (dnnrc (type_annotation unit) dataset)
+  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)
     := foreign_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
@@ -2491,7 +2491,7 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
-  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (dnnrc (type_annotation unit) dataset)
+  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)
     := foreign_dnnrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.

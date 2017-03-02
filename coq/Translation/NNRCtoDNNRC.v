@@ -28,7 +28,7 @@ Section NNRCtoDNNRC.
 
   Context {fruntime:foreign_runtime}.
   
-  Fixpoint nnrc_to_dnnrc {A:Set} {plug_type:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nnrc) : dnnrc A plug_type :=
+  Fixpoint nnrc_to_dnnrc {A:Set} {plug_type:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nnrc) : @dnnrc _ A plug_type :=
     match n with
     | NNRCVar v =>
       match lookup equiv_dec tenv v with

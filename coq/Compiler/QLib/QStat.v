@@ -26,11 +26,11 @@ Require Import CAMPRuntime.
 Require Import OQLRuntime.
 
 Require Import CompilerRuntime.
-Module QStat(runtime:CompilerRuntime).
+Require Import BasicSystem.
+Require Import TypingRuntime.
+Require Import CompLang CompStat.
 
-  Require Import BasicSystem.
-  Require Import TypingRuntime.
-  Require Import CompLang CompStat.
+Module QStat(runtime:CompilerRuntime).
 
   Section QS.
     Context {bm:brand_model}.

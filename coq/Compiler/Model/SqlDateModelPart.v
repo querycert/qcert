@@ -39,7 +39,7 @@ Extract Constant SQL_DATE_INTERVAL => "string".
 Axiom SQL_DATE_INTERVAL_eq : SQL_DATE_INTERVAL -> SQL_DATE_INTERVAL -> bool.
 Extract Inlined Constant SQL_DATE_INTERVAL_eq => "(fun x y -> x = y)".
 
-Hypothesis SQL_DATE_INTERVAL_eq_correct :
+Conjecture SQL_DATE_INTERVAL_eq_correct :
   forall f1 f2, (SQL_DATE_INTERVAL_eq f1 f2 = true <-> f1 = f2).
 
 Axiom SQL_DATE_INTERVAL_tostring : SQL_DATE_INTERVAL -> String.string.
@@ -79,7 +79,7 @@ Extract Constant SQL_DATE => "string".
 Axiom SQL_DATE_eq : SQL_DATE -> SQL_DATE -> bool.
 Extract Inlined Constant SQL_DATE_eq => "(fun x y -> x = y)".
 
-Hypothesis SQL_DATE_eq_correct :
+Conjecture SQL_DATE_eq_correct :
   forall f1 f2, (SQL_DATE_eq f1 f2 = true <-> f1 = f2).
 
 Axiom SQL_DATE_tostring : SQL_DATE -> String.string.

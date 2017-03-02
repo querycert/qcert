@@ -228,8 +228,8 @@ Ltac nnrc_inverter :=
                 (fst x, proj1_sig (snd x))) _)
           = 
           (map
-             (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
-                (fst x, proj1_sig (snd x))) _) |- _ ] =>
+             (fun x' : string * {τ₀' : rtype₀ | wf_rtype₀ τ₀' = true} =>
+                (fst x', proj1_sig (snd x'))) _) |- _ ] =>
       apply map_rtype_fequal in H; trivial
     | [H:Rec _ _ _ = Rec _ _ _ |- _ ] => generalize (Rec_inv H); clear H; intro H; try subst
     | [H: context [(_::nil) = map 

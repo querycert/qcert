@@ -300,7 +300,7 @@ Section DNNRCtoScala.
     | Foreign₀ _ => false
     end.
 
-  Fixpoint scala_of_dnnrc {A: Set} (d: dnnrc (type_annotation A) dataset) : string :=
+  Fixpoint scala_of_dnnrc {A: Set} (d: @dnnrc _ (type_annotation A) dataset) : string :=
     let code :=
         match d with
         | DNNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
@@ -409,7 +409,7 @@ Section DNNRCtoScala.
 
   (** Toplevel entry to Spark2/Scala codegen *)
   Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
-             (e: dnnrc (type_annotation A) dataset) : string :=
+             (e: @dnnrc _ (type_annotation A) dataset) : string :=
     ""
       ++ "import org.apache.spark.SparkContext" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol

@@ -28,11 +28,11 @@ Require Import OQLRuntime.
 Require Import CompLang CompConfig CompDriver.
 
 Require Import CompilerRuntime.
-Module QDriver(runtime:CompilerRuntime).
+Require Import BasicSystem.
+Require Import TypingRuntime.
+Require Import CompEnv.
 
-  Require Import BasicSystem.
-  Require Import TypingRuntime.
-  Require Import CompEnv.
+Module QDriver(runtime:CompilerRuntime).
 
   Local Open Scope list_scope.
 

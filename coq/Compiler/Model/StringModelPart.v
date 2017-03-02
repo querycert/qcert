@@ -25,7 +25,7 @@ Require String.
 Axiom STRING : Set.
 
 Axiom STRING_eq : STRING -> STRING -> bool.
-Hypothesis STRING_eq_correct :
+Conjecture STRING_eq_correct :
   forall f1 f2, (STRING_eq f1 f2 = true <-> f1 = f2).
 
 Axiom STRING_tostring : STRING -> String.string.

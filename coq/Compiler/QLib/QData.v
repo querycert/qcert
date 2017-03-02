@@ -15,10 +15,10 @@
  *)
 
 Require Import CompilerRuntime.
-Module QData(runtime:CompilerRuntime).
+Require String RData JSON JSONtoData.
+Require NNRCtoJavascript.
 
-  Require String RData JSON JSONtoData.
-  Require NNRCtoJavascript.
+Module QData(runtime:CompilerRuntime).
   
   Definition json : Set 
     := JSON.json.

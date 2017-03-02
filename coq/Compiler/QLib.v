@@ -15,12 +15,12 @@
  *)
 
 Require Import CompilerRuntime.
-Module QLib(runtime:CompilerRuntime).
+Require QData QOperators.
+Require QOQL QSQL QLambdaNRA QCAMP QRule.
+Require QUtil QType QEval.
+Require QLang QDriver QStat. 
 
-  Require QData QOperators.
-  Require QOQL QSQL QLambdaNRA QCAMP QRule.
-  Require QUtil QType QEval.
-  Require QLang QDriver QStat. 
+Module QLib(runtime:CompilerRuntime).
 
   Module QType := QType.QType runtime.
   Module QData := QData.QData runtime.

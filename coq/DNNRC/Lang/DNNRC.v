@@ -561,8 +561,9 @@ Section DNNRC.
 
 End DNNRC.
 
-Global Arguments AlgPlug {fruntime} plug_type : clear implicits. 
-Global Arguments dnnrc {fruntime} A plug_type: clear implicits. 
+(* XXX Coq 8.6 Error: The "clear implicits" flag is incompatible with implicit annotations *)
+(* Global Arguments AlgPlug {fruntime} plug_type : clear implicits.  *)
+(* Global Arguments dnnrc {fruntime} A plug_type: clear implicits.  *)
 
 Tactic Notation "dnnrc_cases" tactic(first) ident(c) :=
   first;

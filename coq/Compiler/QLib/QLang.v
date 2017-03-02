@@ -18,9 +18,9 @@ Require Import String.
 Require Import CompLang.
 
 Require Import CompilerRuntime.
-Module QLang(runtime:CompilerRuntime).
+Require Import BasicSystem.
 
-  Require Import BasicSystem.
+Module QLang(runtime:CompilerRuntime).
 
   Local Open Scope list_scope.
 

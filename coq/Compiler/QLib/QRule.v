@@ -15,10 +15,11 @@
  *)
 
 Require Import CompilerRuntime.
+Require String.
+Require QOperators QData QCAMP.
+Require RuleRuntime.
+
 Module QRule(runtime:CompilerRuntime).
-  Require String.
-  Require QOperators QData QCAMP.
-  Require RuleRuntime.
 
   Module Data := QData.QData runtime.
   Module Ops := QOperators.QOperators runtime.

@@ -573,8 +573,8 @@ Section RType.
                      (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                         (fst x, proj1_sig (snd x))) _ =
                    map
-                     (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
-                        (fst x, proj1_sig (snd x))) _ |- _] => apply map_rtype_fequal in H
+                     (fun x' : string * {τ₀' : rtype₀ | wf_rtype₀ τ₀' = true} =>
+                        (fst x', proj1_sig (snd x'))) _ |- _] => apply map_rtype_fequal in H
            end.
 
   Lemma to_Rec {ftype:foreign_type} {br:brand_relation} k l pf :
@@ -1041,8 +1041,8 @@ Ltac rtype_equalizer :=
                    (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                       (fst x, proj1_sig (snd x))) _ =
                  map
-                   (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
-                      (fst x, proj1_sig (snd x))) _ |- _] => apply map_rtype_fequal in H
+                   (fun x' : string * {τ₀' : rtype₀ | wf_rtype₀ τ₀' = true} =>
+                      (fst x', proj1_sig (snd x'))) _ |- _] => apply map_rtype_fequal in H
          end.
 
 Ltac r_ext := solve [erewrite (rtype_ext); eauto].

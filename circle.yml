@@ -18,7 +18,7 @@ dependencies:
     - sudo apt-get -qq update
     - sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
     - opam init -a
-    - opam install -y menhir ocamlbuild camlp5 coq.8.5.3 js_of_ocaml:
+    - opam install -y menhir ocamlbuild camlp5 coq.8.6 js_of_ocaml:
         timeout: 1200
     - if [[ ! -d ~/spark-2.1.0-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.0/spark-2.1.0-bin-hadoop2.7.tgz && tar xf spark-2.1.0-bin-hadoop2.7.tgz ; fi
   override:

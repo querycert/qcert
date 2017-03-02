@@ -80,10 +80,6 @@ Section TNNRCShadow.
       destruct x1; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl.
-      f_equal.
-      apply rtype_fequal.
-      reflexivity.
     - constructor. erewrite lookup_remove_nin; eauto.
     - apply nin_app_or in H. intuition. eauto.
     - apply nin_app_or in H. intuition.
@@ -121,10 +117,6 @@ Section TNNRCShadow.
       destruct x1; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl.
-      f_equal.
-      apply rtype_fequal.
-      reflexivity.
       Grab Existential Variables.
       eauto.
       eauto.
@@ -227,10 +219,6 @@ Section TNNRCShadow.
       destruct x; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl.
-      f_equal.
-      apply rtype_fequal.
-      reflexivity.
     - intuition.
       destruct (string_dec v v₀); simpl; subst; intuition; 
         inversion H; subst; simpl in *; repeat dest_eqdec; intuition;
@@ -308,10 +296,6 @@ Section TNNRCShadow.
       destruct x; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl.
-      f_equal.
-      apply rtype_fequal.
-      reflexivity.
       Grab Existential Variables.
       eauto.
       eauto.
@@ -418,10 +402,6 @@ Section TNNRCShadow.
       destruct x; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl.
-      f_equal.
-      apply rtype_fequal.
-      reflexivity.
       Grab Existential Variables.
       eauto.
       eauto.
@@ -467,7 +447,6 @@ Section TNNRCShadow.
       destruct x0; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl; f_equal; apply rtype_fequal; reflexivity.
     - econstructor; [eauto|..].
       apply nnrc_ext_type_rename_pick_subst in H6.
       unfold nnrc_ext_type; eauto.
@@ -488,7 +467,6 @@ Section TNNRCShadow.
       destruct x0; simpl in *.
       rtype_equalizer. subst.
       repeat (econstructor; eauto).
-      simpl; f_equal; apply rtype_fequal; reflexivity.
       Grab Existential Variables.
       eauto.
       eauto.

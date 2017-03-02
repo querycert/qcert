@@ -84,7 +84,7 @@ Extract Constant TIME_DURATION => "string".
 Axiom TIME_DURATION_eq : TIME_DURATION -> TIME_DURATION -> bool.
 Extract Inlined Constant TIME_DURATION_eq => "(fun x y -> x = y)".
 
-Hypothesis TIME_DURATION_eq_correct :
+Conjecture TIME_DURATION_eq_correct :
   forall f1 f2, (TIME_DURATION_eq f1 f2 = true <-> f1 = f2).
 
 Axiom TIME_DURATION_tostring : TIME_DURATION -> String.string.
@@ -124,7 +124,7 @@ Extract Constant TIME_POINT => "string".
 Axiom TIME_POINT_eq : TIME_POINT -> TIME_POINT -> bool.
 Extract Inlined Constant TIME_POINT_eq => "(fun x y -> x = y)".
 
-Hypothesis TIME_POINT_eq_correct :
+Conjecture TIME_POINT_eq_correct :
   forall f1 f2, (TIME_POINT_eq f1 f2 = true <-> f1 = f2).
 
 Axiom TIME_POINT_tostring : TIME_POINT -> String.string.

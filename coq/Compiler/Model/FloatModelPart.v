@@ -32,7 +32,7 @@ Extract Constant FLOAT => "float".
 Axiom FLOAT_eq : FLOAT -> FLOAT -> bool.
 Extract Inlined Constant FLOAT_eq => "(fun x y -> x = y)".
 
-Hypothesis FLOAT_eq_correct :
+Conjecture FLOAT_eq_correct :
   forall f1 f2, (FLOAT_eq f1 f2 = true <-> f1 = f2).
 
 Axiom FLOAT_tostring : FLOAT -> String.string.

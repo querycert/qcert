@@ -36,7 +36,7 @@ Section DNNRCEq.
   (** Equivalence between expressions in the 
       Distributed Nested Relational Calculus *)
 
-  Definition dnnrc_eq (e1 e2:dnnrc A plug_type) : Prop :=
+  Definition dnnrc_eq (e1 e2:@dnnrc _ A plug_type) : Prop :=
     forall (h:brand_relation_t) (denv:dbindings),
       Forall (ddata_normalized h) (map snd denv) ->
       dnnrc_eval h denv e1 = dnnrc_eval h denv e2.
@@ -222,13 +222,13 @@ Section DNNRCEq.
     unfold Proper, respectful, dnnrc_eq.
     intros; simpl; subst.
     cut ((map
-         (fun x : string * dnnrc A plug_type =>
+         (fun x : string * @dnnrc _ A plug_type =>
           match dnnrc_eval h denv (snd x) with
           | Some (Dlocal _) => None
           | Some (Ddistr coll) => Some (fst x, coll)
           | None => None
           end) x1) = (map
-         (fun x : string * dnnrc A plug_type =>
+         (fun x : string * @dnnrc _ A plug_type =>
           match dnnrc_eval h denv (snd x) with
           | Some (Dlocal _) => None
           | Some (Ddistr coll) => Some (fst x, coll)

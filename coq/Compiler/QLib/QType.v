@@ -15,9 +15,14 @@
  *)
 
 Require Import CompilerRuntime Types.
+Require RType String.
+Require Import TypingRuntime.
+Require Import JSONtoData.
+Require SparkData.
+Require RData.
+Require TUtil.
 
 Module QType(runtime:CompilerRuntime).
-  Require RType String.
 
   Definition empty_brand_model (x:unit) := TBrandModel.empty_brand_model.
 
@@ -62,14 +67,12 @@ Module QType(runtime:CompilerRuntime).
     := RType.Brand.
 
   (* Additional support for brand models extraction -- will have to be tested/consolidated *)
-  Require Import TypingRuntime.
 
   Definition brand_model : Set := brand_model.
   Definition make_brand_model := make_brand_model_fails.
   Definition typing_runtime : Set := typing_runtime.
 
   (* Additional support for json to rtype conversion *)
-  Require Import JSONtoData.
   
   Definition json_to_rtype {m:brand_relation} := json_to_rtype.  
 
@@ -90,9 +93,6 @@ Module QType(runtime:CompilerRuntime).
   Definition tdistr {m:brand_relation}  : camp_type -> camp_dtype := DType.Tdistr.
 
   (* JSON -> sdata string *)
-  Require SparkData.
-  Require RData.
-  Require TUtil.
 
   Definition camp_type_uncoll (m:brand_model) : camp_type -> option camp_type
     := @TUtil.tuncoll _ m.
