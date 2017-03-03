@@ -1,15 +1,14 @@
 For legal reasons we do not reproduce any downloaded TPC tools or templates here.  You will need to
 obtain these from tpc.org and agree to the terms there.
 
-For generating queries from the TPC-H abd TPC-DS benchmarks, we provide instructions here.  The queries
+For generating queries from the TPC-H and TPC-DS benchmarks, we provide instructions here.  The queries
 generated according to these instructions are the ones used for our paper in SIGMOD 2017.
 
 For TPC-H, we provide a heavily stripped down version of the output of the TPC data generator suitable for
-running most queries in reasonable time.  We provide programs that will convert a SQL schema into qcert's JSON
-schema format and then convert tabular data files into qcert's JSON input format.  You are free to use the TPC
-data generator yourself to produce larger datasets but they may not necessarily execute in reasonable time
-with the present technology.  The data provided here was used to evaluate correctness of the TPC-H queries.
-Note that our paper does not report any runtime performace results.
+running most queries in reasonable time.  You are free to use the TPC data generator yourself to produce
+larger datasets but they may not necessarily execute in reasonable time with the present technology.  The data
+provided here was used to evaluate correctness of the TPC-H queries.  Note that our paper does not report any
+runtime performace results.
 
 For TPC-DS, we have not yet explored runtime behavior.  The queries can be compiled and statistics gathered
 but no data (or instructions for generating data) are provided. 
