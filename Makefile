@@ -355,7 +355,7 @@ js-extraction:
 	@$(MAKE) -C ocaml js
 
 Makefile.coq: Makefile $(VS) $(FILES)
-	@coq_makefile -R coq Qcert $(FILES) -o Makefile.coq
+	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
 
 html: Makefile.coq
 	@$(MAKE) -f Makefile.coq html
