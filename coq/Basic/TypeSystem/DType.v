@@ -49,7 +49,7 @@ Section DType.
     - destruct (r == r0); unfold equiv, complement in *; subst.
       * left; reflexivity.
       * right; congruence.
-  Qed.
+  Defined.
 
   Section unlocalize.
     Definition unlocalize_drtype (dt:drtype) : rtype :=

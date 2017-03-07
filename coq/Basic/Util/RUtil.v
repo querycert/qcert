@@ -629,7 +629,7 @@ Section RUtil.
     Proof.
       red.
       apply Z.eq_dec.
-    Qed.
+    Defined.
 
   End Zutil.
 

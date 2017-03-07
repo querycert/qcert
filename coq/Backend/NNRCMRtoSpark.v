@@ -232,7 +232,7 @@ Section NNRCMRtoSpark.
       apply pair_eq_dec.
       - apply string_dec.
       - apply dlocalization_eq_dec.
-    Qed.
+    Defined.
 
     Definition load_env (env_vars: list (var * dlocalization)) (scala_endl:string) (quotel:string) :=
       let env_vars := List.nodup var_loc_eq_dec env_vars in
