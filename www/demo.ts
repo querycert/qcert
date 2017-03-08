@@ -1390,8 +1390,8 @@ class TabManager extends ICanvasTab {
        ropts.left = left;
        ropts.top = top;
        ropts.editable = false;
-       ropts.height = ropts.height || 50;
-       ropts.width = ropts.width || 200;
+       ropts.height = ropts.height || 30;
+       ropts.width = ropts.width || 150;
        const box = new fabric.Rect(ropts);
 
 
