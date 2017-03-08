@@ -2030,7 +2030,9 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 
 		const divTitle = document.createElement('h3');
 		divTitle.style.cssFloat = 'center';
-		divTitle.appendChild(document.createTextNode("Currently selected optimizations"));
+		const titlenodetext = (num:number) => "Currently selected optimizations (" + num + ")";
+		const titlenode = document.createTextNode(titlenodetext(phase.optims.length));
+		divTitle.appendChild(titlenode);
 		newdiv.appendChild(divTitle);
 		const divIterations = document.createElement('h4');
 		divIterations.appendChild(document.createTextNode("These optimizations will be batched in " + phase.iter + " iterations "));
@@ -2041,6 +2043,10 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 
 		for(let i =0 ; i < phase.optims.length; i++) {
 			listnode.appendChild(makePhaseOptimElement(modulebase, optims, phase.optims[i]));
+		}
+
+		function updateTitleContent() {
+			titlenode.textContent = titlenodetext(listnode.childElementCount);
 		}
 
 		const sort = Sortable.create(listnode, 
@@ -2057,10 +2063,14 @@ class OptimPhaseTab extends ICanvasDynamicTab {
   			onFilter: function (evt) {
     			var el = sort.closest(evt.item); // get dragged item
     			el && el.parentNode.removeChild(el);
+				updateTitleContent();
   			},
 			onAdd: function (evt) {
 				const item = evt.item;
 				addRemoveButton(item);
+			},
+			onSort: function(evt) {
+				updateTitleContent();
 			},
 			dataIdAttr: 'data-id'
 		}
@@ -2192,7 +2202,7 @@ class OptimizationManager extends ICanvasTab {
 		rightdiv.style.paddingLeft='40px';
 		const rightDivTitle = document.createElement('h3');
 		rightDivTitle.style.cssFloat = 'center';
-		rightDivTitle.appendChild(document.createTextNode("Available optimizations"));
+		rightDivTitle.appendChild(document.createTextNode("Available optimizations (" + optims.length + ")"));
 		rightdiv.appendChild(rightDivTitle);
 		rightdiv.appendChild(listnode);
 
