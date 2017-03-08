@@ -54,7 +54,7 @@ Section TDataSort.
              (satts: list string) : {order_by_has_sortable_type τr satts} + {~order_by_has_sortable_type τr satts}.
   Proof.
     unfold order_by_has_sortable_type.
-    apply Forall_dec.
+    apply Forall_dec_defined.
     intros.
     case_eq (edot τr x); intros.
     - destruct (sortable_type_dec r).

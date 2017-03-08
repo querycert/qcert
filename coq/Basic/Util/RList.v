@@ -160,6 +160,25 @@ Section RList.
 
   End folds.
 
+  Section Forall.
+    Context {A:Type}.
+
+    (* XXX Alternative to List.Forall but defined so it can be used for computation XXX *)
+    Lemma Forall_dec_defined {P} :
+      (forall x:A, {P x} + { ~ P x }) ->
+      forall l:list A, {Forall P l} + {~ Forall P l}.
+    Proof.
+      intro Pdec. induction l as [|a l' Hrec].
+      - left. apply Forall_nil.
+      - destruct Hrec as [Hl'|Hl'].
+        + destruct (Pdec a) as [Ha|Ha].
+          * left. now apply Forall_cons.
+          * right. now inversion_clear 1.
+        + right. now inversion_clear 1.
+    Defined.
+
+  End Forall.
+  
   Section filter.
     Context {A:Type}.
 
