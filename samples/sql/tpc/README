@@ -8,7 +8,7 @@ For TPC-H, we provide a heavily stripped down version of the output of the TPC d
 running most queries in reasonable time.  You are free to use the TPC data generator yourself to produce
 larger datasets but they may not necessarily execute in reasonable time with the present technology.  The data
 provided here was used to evaluate correctness of the TPC-H queries.  Note that our paper does not report any
-runtime performace results.
+runtime performance results.
 
 For TPC-DS, we have not yet explored runtime behavior.  The queries can be compiled and statistics gathered
 but no data (or instructions for generating data) are provided. 
