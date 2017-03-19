@@ -101,8 +101,8 @@ let anon_args input_files f = input_files := f :: !input_files
 let languages =
   [ Compiler.L_rule;
     Compiler.L_camp;
-    Compiler.L_techrule;
-    Compiler.L_designerrule;
+    Compiler.L_tech_rule;
+    Compiler.L_designer_rule;
     Compiler.L_oql;
     Compiler.L_sql;
     Compiler.L_lambda_nra;

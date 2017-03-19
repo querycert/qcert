@@ -147,6 +147,16 @@ Section CompStat.
       (("rule_size", dnat (Z_of_nat (pat_size (rule_to_camp q))))
          :: nil).
 
+  Definition stat_tech_rule (q:tech_rule) : data :=
+    drec
+      (("tech_rule_stat", dstring "no stat available")
+         :: nil).
+
+  Definition stat_designer_rule (q:designer_rule) : data :=
+    drec
+      (("tech_designer_stat", dstring "no stat available")
+         :: nil).
+
   Definition stat_oql (q:oql) : data :=
     drec
       (("oql_size", dnat (Z_of_nat (oql_size q)))
@@ -325,6 +335,26 @@ Section CompStat.
     | s => s
     end.
 
+  Definition stat_tree_tech_rule (q:tech_rule) : data :=
+    match stat_tech_rule q with
+    | drec l =>
+      let (t_camp, q_camp) := time tech_rule_to_camp q in
+      drec (l ++ ("tech_rule_to_camp", stat_tree_camp q_camp)
+              :: ("tech_rule_to_camp", dstring t_camp)
+              :: nil)
+    | s => s
+    end.
+
+  Definition stat_tree_designer_rule (q:designer_rule) : data :=
+    match stat_designer_rule q with
+    | drec l =>
+      let (t_camp, q_camp) := time designer_rule_to_camp q in
+      drec (l ++ ("designer_rule_to_camp", stat_tree_camp q_camp)
+              :: ("designer_rule_to_camp", dstring t_camp)
+              :: nil)
+    | s => s
+    end.
+
   Definition stat_tree_oql (q:oql) : data :=
     match stat_oql q with
     | drec l =>
@@ -361,6 +391,8 @@ Section CompStat.
     let stat :=
         match q with
         | Q_rule q => stat_rule q
+        | Q_tech_rule q => stat_tech_rule q
+        | Q_designer_rule q => stat_designer_rule q
         | Q_camp q => stat_camp q
         | Q_oql q => stat_oql q
         | Q_sql q => stat_sql q
@@ -388,6 +420,8 @@ Section CompStat.
     let stat :=
         match q with
         | Q_rule q => stat_tree_rule q
+        | Q_tech_rule q => stat_tree_tech_rule q
+        | Q_designer_rule q => stat_tree_designer_rule q
         | Q_camp q => stat_tree_camp q
         | Q_oql q => stat_tree_oql q
         | Q_sql q => stat_tree_sql q

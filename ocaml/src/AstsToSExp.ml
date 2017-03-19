@@ -1163,9 +1163,9 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with
   | L_rule ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | L_techrule ->
+  | L_tech_rule ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | L_designerrule ->
+  | L_designer_rule ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_camp -> Q_camp (sexp_to_camp se)
   | L_oql ->

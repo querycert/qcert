@@ -29,6 +29,8 @@ Section CompLang.
   Require Import DNNRC Dataset.
   Require Import CAMPRuntime.
   Require Import RuleRuntime.
+  Require Import TechRuleRuntime.
+  Require Import DesignerRuleRuntime.
   Require Import OQLRuntime.
 
   Require Import BasicSystem.
@@ -50,6 +52,8 @@ Section CompLang.
   Context {fredop:foreign_reduce_op}.
 
   Definition rule := rule.
+  Definition tech_rule := tech_rule.
+  Definition designer_rule := designer_rule.
   Definition camp := pat.
   Definition oql := oql.
   Definition sql := sql.
@@ -71,9 +75,8 @@ Section CompLang.
 
   Inductive language : Set :=
     | L_rule : language
-    (* Note: techrule and designerrule are not yet fully integrated *)
-    | L_techrule : language
-    | L_designerrule : language
+    | L_tech_rule : language
+    | L_designer_rule : language
     | L_camp : language
     | L_oql : language
     | L_sql : language
@@ -106,30 +109,34 @@ Section CompLang.
   Global Instance language_eqdec : EqDec language eq := language_eq_dec.
 
   Inductive query : Set :=
-    | Q_rule : rule -> query
-    | Q_camp : camp -> query
-    | Q_oql : oql -> query
-    | Q_sql : sql -> query
-    | Q_lambda_nra : lambda_nra -> query
-    | Q_nra : nra -> query
-    | Q_nraenv_core : nraenv_core -> query
-    | Q_nraenv : nraenv -> query
-    | Q_nnrc_core : nnrc_core -> query
-    | Q_nnrc : nnrc -> query
-    | Q_nnrcmr : nnrcmr -> query
-    | Q_cldmr : cldmr -> query
-    | Q_dnnrc_dataset : dnnrc_dataset -> query
-    | Q_dnnrc_typed_dataset : dnnrc_typed_dataset -> query
-    | Q_javascript : javascript -> query
-    | Q_java : java -> query
-    | Q_spark_rdd : spark_rdd -> query
-    | Q_spark_dataset : spark_dataset -> query
-    | Q_cloudant : cloudant -> query
-    | Q_error : string -> query.
+  | Q_rule : rule -> query
+  | Q_tech_rule : tech_rule -> query
+  | Q_designer_rule : designer_rule -> query
+  | Q_camp : camp -> query
+  | Q_oql : oql -> query
+  | Q_sql : sql -> query
+  | Q_lambda_nra : lambda_nra -> query
+  | Q_nra : nra -> query
+  | Q_nraenv_core : nraenv_core -> query
+  | Q_nraenv : nraenv -> query
+  | Q_nnrc_core : nnrc_core -> query
+  | Q_nnrc : nnrc -> query
+  | Q_nnrcmr : nnrcmr -> query
+  | Q_cldmr : cldmr -> query
+  | Q_dnnrc_dataset : dnnrc_dataset -> query
+  | Q_dnnrc_typed_dataset : dnnrc_typed_dataset -> query
+  | Q_javascript : javascript -> query
+  | Q_java : java -> query
+  | Q_spark_rdd : spark_rdd -> query
+  | Q_spark_dataset : spark_dataset -> query
+  | Q_cloudant : cloudant -> query
+  | Q_error : string -> query.
 
   Tactic Notation "query_cases" tactic(first) ident(c) :=
     first;
     [ Case_aux c "Q_rule"%string
+    | Case_aux c "Q_tech_rule"%string
+    | Case_aux c "Q_designer_rule"%string
     | Case_aux c "Q_camp"%string
     | Case_aux c "Q_oql"%string
     | Case_aux c "Q_sql"%string
@@ -156,10 +163,9 @@ Section CompLang.
     Definition language_of_name_case_sensitive name : language:=
       match name with
       | "rule"%string => L_rule
+      | "tech_rule"%string => L_tech_rule
+      | "designer_rule"%string => L_designer_rule
       | "camp"%string => L_camp
-    (* Note: techrule and designerrule are not yet fully integrated *)
-      | "techrule"%string => L_techrule
-      | "designerrule"%string => L_designerrule
       | "oql"%string => L_oql
       | "sql"%string => L_sql
       | "lambda_nra"%string => L_lambda_nra
@@ -185,8 +191,8 @@ Section CompLang.
       match lang with
       | L_rule => "rule"%string
     (* Note: techrule and designerrule are not yet fully integrated *)
-      | L_techrule => "techrule"%string
-      | L_designerrule => "designerrule"%string
+      | L_tech_rule => "tech_rule"%string
+      | L_designer_rule => "designer_rule"%string
       | L_camp => "camp"%string
       | L_oql => "oql"%string
       | L_sql => "sql"%string
@@ -211,6 +217,8 @@ Section CompLang.
     Definition language_of_query q :=
       match q with
       | Q_rule _ => L_rule
+      | Q_tech_rule _ => L_tech_rule
+      | Q_designer_rule _ => L_designer_rule
       | Q_camp _ => L_camp
       | Q_oql _ => L_oql
       | Q_sql _ => L_sql
@@ -254,26 +262,28 @@ Section CompLang.
     Open Scope string.
     Definition language_descriptions :=
       (L_rule,FrontEnd,"Rule","Rules for CAMP")
-      :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
-      :: (L_oql,FrontEnd,"OQL", "Object Query Language")
-      :: (L_sql,FrontEnd,"SQL", "Structured Query Language")
-      :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
-      :: (L_nra,MiddleEnd,"NRA","Nested Relational Algebra")
-      :: (L_nraenv_core,MiddleEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments")
-      :: (L_nraenv,MiddleEnd,"NRAᵉ","Nested Relational Algebra with Environments")
-      :: (L_nnrc_core,MiddleEnd,"cNNRC", "Core Named Nested Relational Calculus")
-      :: (L_nnrc,MiddleEnd,"NNRC", "Named Nested Relational Calculus")
-      :: (L_nnrcmr,MiddleEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
-      :: (L_cldmr,MiddleEnd,"CldMR", "Nested Relational Calculus with Cloudant Map/Reduce")
-      :: (L_dnnrc_dataset,MiddleEnd,"DNNRC","Distributed Named Nested Relational Calculus")
-      :: (L_dnnrc_typed_dataset,MiddleEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
-      :: (L_javascript,BackEnd,"JS","JavaScript")
-      :: (L_java,BackEnd,"Java","Java")
-      :: (L_spark_rdd,BackEnd,"Spark","Spark (RDDs)")
-      :: (L_spark_dataset,BackEnd,"Spark2", "Spark (Datasets)")
-      :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
-(*    :: (L_error,MiddleEnd,"Error","Error") *)
-      :: nil.
+        :: (L_tech_rule,FrontEnd,"TechRule","Technical Rules")
+        :: (L_designer_rule,FrontEnd,"DesignerRule","Desginer Rules")
+        :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
+        :: (L_oql,FrontEnd,"OQL", "Object Query Language")
+        :: (L_sql,FrontEnd,"SQL", "Structured Query Language")
+        :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
+        :: (L_nra,MiddleEnd,"NRA","Nested Relational Algebra")
+        :: (L_nraenv_core,MiddleEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments")
+        :: (L_nraenv,MiddleEnd,"NRAᵉ","Nested Relational Algebra with Environments")
+        :: (L_nnrc_core,MiddleEnd,"cNNRC", "Core Named Nested Relational Calculus")
+        :: (L_nnrc,MiddleEnd,"NNRC", "Named Nested Relational Calculus")
+        :: (L_nnrcmr,MiddleEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
+        :: (L_cldmr,MiddleEnd,"CldMR", "Nested Relational Calculus with Cloudant Map/Reduce")
+        :: (L_dnnrc_dataset,MiddleEnd,"DNNRC","Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc_typed_dataset,MiddleEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
+        :: (L_javascript,BackEnd,"JS","JavaScript")
+        :: (L_java,BackEnd,"Java","Java")
+        :: (L_spark_rdd,BackEnd,"Spark","Spark (RDDs)")
+        :: (L_spark_dataset,BackEnd,"Spark2", "Spark (Datasets)")
+        :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
+        (*    :: (L_error,MiddleEnd,"Error","Error") *)
+        :: nil.
 
     Definition add_id_to_language_description (ld:language * language_kind * string * string) :=
       match ld with
@@ -316,10 +326,8 @@ Section CompLang.
     Definition type_of_language (l:language) : Set :=
       match l with
       | L_rule => rule
-    (* Note: letting techrule and designerrule piggy-back on camp is a temporary hack.  They are actually distinct source languages
-    that translate to camp; however, this translation is currently special-cased *)
-      | L_techrule => camp
-      | L_designerrule => camp
+      | L_tech_rule => tech_rule
+      | L_designer_rule => designer_rule
       | L_camp => camp
       | L_oql => oql
       | L_sql => sql
@@ -347,6 +355,8 @@ End CompLang.
 Tactic Notation "language_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "L_rule"%string
+  | Case_aux c "L_tech_rule"%string
+  | Case_aux c "L_designer_rule"%string
   | Case_aux c "L_camp"%string
   | Case_aux c "L_oql"%string
   | Case_aux c "L_sql"%string

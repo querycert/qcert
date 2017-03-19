@@ -31,6 +31,8 @@ Module QLang(runtime:CompilerRuntime).
     Context {ftyping: foreign_typing}.
 
     Definition rule := rule.
+    Definition tech_rule := tech_rule.
+    Definition designer_rule := designer_rule.
     Definition camp := camp.
     Definition oql := oql.
     Definition sql := sql.

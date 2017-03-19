@@ -89,7 +89,7 @@ data/testInput:	data/testSchema.json $(DATAFILES)
 	$(JAVA) -cp $(CPATH) org.qcert.util.DataLoader -dir data -output testInput -schema testSchema.json $(ALL_TYPES)
 
 data/%.js:	data/%.arl
-	$(QCERTCOMP) -source techrule -target js -schema data/testSchema.json -dir data $<
+	$(QCERTCOMP) -source tech_rule -target js -schema data/testSchema.json -dir data $<
 
 run_%:	data/%.js data/%.io
 	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -runtime $(RUNTIME) -input data/$*.io $<

@@ -206,6 +206,8 @@ Section CompEval.
       let cenv := lift_input ev_in in
       match q with
       | Q_rule q => lift_output (eval_rule q cenv)
+      | Q_tech_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_designer_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_camp q => lift_output (eval_camp q cenv)
       | Q_oql q => lift_output (eval_oql q cenv)
       | Q_sql q => lift_output (eval_sql q cenv)
@@ -231,6 +233,8 @@ Section CompEval.
       let cenv := lift_input ev_in in
       match q with
       | Q_rule q => Ev_out_returned_debug (eval_rule_debug true q cenv)
+      | Q_tech_rule _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_designer_rule _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_camp q => Ev_out_returned_debug (eval_camp_debug true q cenv)
       | Q_oql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_sql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))

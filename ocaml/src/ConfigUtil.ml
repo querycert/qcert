@@ -77,8 +77,8 @@ let get_cld_config conf = conf.cld_conf
 
 (* Target language *)
 let suffix_rule () = "_rule.camp"
-let suffix_techrule () = "_arl.txt"
-let suffix_designerrule () = "_sem.txt"
+let suffix_tech_rule () = "_arl.txt"
+let suffix_designer_rule () = "_sem.txt"
 let suffix_camp () = "_camp.camp"
 let suffix_oql () = "_oql.txt"
 let suffix_sql () = "_sql.txt"
@@ -115,8 +115,8 @@ let suffix_of_language lang =
   match lang with
   | Compiler.L_rule -> suffix_rule ()
   | Compiler.L_camp -> suffix_camp ()
-  | Compiler.L_techrule -> suffix_techrule ()
-  | Compiler.L_designerrule -> suffix_designerrule ()
+  | Compiler.L_tech_rule -> suffix_tech_rule ()
+  | Compiler.L_designer_rule -> suffix_designer_rule ()
   | Compiler.L_oql -> suffix_oql ()
   | Compiler.L_sql -> suffix_sql ()
   | Compiler.L_lambda_nra -> suffix_lambda_nra ()

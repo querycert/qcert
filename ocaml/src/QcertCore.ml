@@ -71,7 +71,7 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
 	end in
   let slang = gconf.gconf_source in
 	let the_query = begin match slang with
-	| Compiler.L_techrule -> src_and_schema query_s schema
+	| Compiler.L_tech_rule -> src_and_schema query_s schema
 	| _ -> query_s
 	end in
   let qname, q =
