@@ -43,6 +43,8 @@ val get_margin : pretty_config -> int
 val pretty_data : Format.formatter -> QData.data -> unit
 
 (* Useful for SExp support *)
+val timescale_as_string : Compiler.time_scale -> string
+
 val string_of_foreign_data : Compiler.enhanced_data -> string
 val foreign_data_of_string : string -> Compiler.enhanced_data
 
