@@ -13,11 +13,10 @@ tpch_2_17_0/dbgen/qgen:	tpch_2_17_0/dbgen/makefile
 
 # Must run on LINUX.  The following attempts to detect that while making minimal assumptions.
 test_system:
-	ifeq ($(OS),Windows_NT)
-		$(error "Must run TPC tools on a Linux machine")
-	else
-		SYSTEM := $(shell uname -s)
-		ifneq ($(SYSTEM),Linux)
-			$(error "Must run TPC tools on a Linux machine")
-		endif
-	endif
+ifeq ($(OS),Windows_NT)
+		$(error "No support for building TPC tools on windows: must use a Linux system")
+else ifneq(Linux,$(shell uname -s))
+		$(error "Must build TPC tools on a Linux system")
+else
+		echo Running on a Linux system.  Proceeding with TPC tools build.
+endif
