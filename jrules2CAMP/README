@@ -85,20 +85,21 @@ how we intend JRules to be used in practice.
 
 2.  To use the qcert command line tool directly on ODM technical or business rules, specify
 
--source techrule
+-source tech_rule
 
 or
 
--source designerrule
+-source designer_rule
 
-as part of the command line.  We use 'designerrule' rather than "business rule" to emphasize that ODM business
-rules must be built by an ODM Designer product.  It is the output artifact of that build that is consumed by
-qcert.
+as part of the command line.  We use 'designer_rule' rather than "business rule" to emphasize that ODM
+business rules must be built by an ODM Designer product.  It is the output artifact of that build that is
+consumed by qcert.
 
-Various sample ARL files (technical rules) are provided in the data subdirectory.  For these rules, you must
-specify a schema using the -schema directive.  Use the provided file testSchema.json.
+Various sample ARL files (technical rules) are provided in the data subdirectory (with file extension .arl).
+For these rules, you must specify a schema using the -schema directive.  Use the provided file testSchema.json
+in the data subdirectory.
 
-A schema is not needed for the 'designerrule' case, but you need to locate the output artifact in a designer
+A schema is not needed for the 'designer_rule' case, but you need to locate the output artifact in a designer
 workspace and specify it's path.  Locate your designer workspace.  For each successfully built rule there
 should be a file of extension .sem in the output directory of the containing project.
 
@@ -113,7 +114,7 @@ b.  Open www/qcert.html in a web browser.
 
 c.  For technical rules,
 
-i. Select the "techrule" source type
+i. Select the "tech_rule" source type
 
 ii. File-choose an ARL file from the 'data' subdirectory of this directory.
 
@@ -140,7 +141,7 @@ d.  For ODM business rules authored in designer
 i. Locate your designer workspace.  For each successfully built rule there should be a file of extension .sem
 in the output directory of the containing project.
 
-ii.  Select the "designerrule" source type
+ii.  Select the "designer_rule" source type
 
 iii. File-choose a .sem file that you located in step i.  It will appear as gibberish (sorry, it's
 binary and is base64 encoded at read-in).

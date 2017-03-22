@@ -62,12 +62,12 @@ function qcertPreCompile(input, schema, callback) {
         sourceCAMP = false;
         query = input.query;
     }
-    else if (input.source == "techrule") {
+    else if (input.source == "tech_rule") {
         verb = "techRule2CAMP";
         sourceCAMP = true;
         query = combineInputAndSchema(input.query, schema);
     }
-    else if (input.source == "designerrule") {
+    else if (input.source == "designer_rule") {
         verb = "serialRule2CAMP";
         sourceCAMP = true;
         query = input.query;
