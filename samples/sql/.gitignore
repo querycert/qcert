@@ -2,5 +2,5 @@
 /tpc/*.data
 /tpc/dss.ddl
 /tpc/*.json
-/tpc/tpc*.zip
-/tpc/tpch_2_17_0
+/tpc/linuxOnly/tpc*.zip
+/tpc/linuxOnly/tpch_2_17_0
