@@ -1,27 +1,16 @@
-The following must be done on a Linux system.  If you are not otherwise going to do the work on a Linux
-system, you can reproduce this folder and its parent folder (which may be empty).  It is not necessary check
-out the full repository or to build qcert in order to do the following steps.
+The following must be done on a Linux system.  See ../README for what you might do if you aren't otherwise
+developing on Linux.
 
 1.  Follow the procedures given on www.tpc.org to download the TPC-H tools zip and TPC-DS tools zip.  You will
 have to agree to TPC's terms in order to do this.  You will receive a personal link and your downloaded copies
 will begin with a unique prefix.
 
-2.  Place both zips in this folder, naming them
-
-tpc-h-tool.zip
-tpc-ds-tool.zip
-
-(that is, strip off the unique prefix).
+2.  Place both zips in this folder.
 
 3.  Issue
 
 make
 
-4.  If you will do the remaining work on the same Linux system, you are done.   Otherwise,
-issue
-
-make zip
-
-which will produce a tpc.zip in the parent of this folder.  Copy that to the parent of this folder on your
-target system and unzip it there.
-
+4.  If you will do the remaining work on the same Linux system, you are done.  Otherwise, copy the file
+tpc.zip in from the parent of this folder to the qcert/samples/sql/tpc folder on the system you will use for
+the remaining work and unzip it there.

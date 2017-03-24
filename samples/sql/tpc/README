@@ -1,57 +1,15 @@
-For legal reasons we do not reproduce any downloaded TPC tools or templates here.  You will need to
-obtain these from tpc.org and agree to the terms there.
+For legal reasons we do not reproduce any downloaded TPC tools or templates here.  These are readily obtained
+from www.tpc.org, but you will need to agree to the license terms stated there.  Furthermore, the TPC tools
+only build and run on Linux (actually, they can be ported to other systems but that is beyond the scope of
+what we are supporting here).
 
-For generating queries from the TPC-H and TPC-DS benchmarks, we provide instructions here.  The queries
-generated according to these instructions are the ones used for our paper in SIGMOD 2017.
+If you are already developing on Linux, just switch to the subfolder 'linuxOnly' and follow the README
+instructions there.  If you are not developing on Linux but have access to a Linux system image, duplicate the
+'linuxOnly' folder on that system with an empty parent directory and follow the README instructions there.
+These instructions include how to copy the results back to the main development system.
 
-For TPC-H, we provide a heavily stripped down version of the output of the TPC data generator suitable for
-running most queries in reasonable time.  You are free to use the TPC data generator yourself to produce
-larger datasets but they may not necessarily execute in reasonable time with the present technology.  The data
-provided here was used to evaluate correctness of the TPC-H queries.  Note that our paper does not report any
-runtime performance results.
-
-For TPC-DS, we have not yet explored runtime behavior.  The queries can be compiled and statistics gathered
-but no data (or instructions for generating data) are provided. 
-
-TPC-H queries and schema:
-
-1. Obtain the TPC-H tools zip from http://www.tpc.org/tpch/.  You will need to agree to terms which are
-explained during the process.
-
-2. Unzip the provided archive in a convenient place.  We are only able to explain how to build on a Linux
-system.  Building on other systems is a bit of an art but can often be done (see the provided porting guide).
-
-3. In the subdirectory 'dbgen', copy 'makefile.suite' to 'makefile' and edit the latter file to specify
- 	CC      = gcc
-  DATABASE= DB2
-  MACHINE = LINUX
-  WORKLOAD = TPCH
-
-4.  Type 'make' in the dbgen subdirectory.  It should build the needed software.
-
-5.  Switch to the directory 'queries' (a subdirectory of dbgen) and make a subdirectory there called 'data'.
-
-6.  Source the file tpch_gens provided here.  It should populate the 'data' directory with sql files based on
-the TPC-H templates.
-
-7. Copy the sql files produced in step 6 back to this folder.  Also copy the 'dss.ddl' file from the dbgen
-directory.
-
-TPC-DS queries:
-
-1. Obtain the TPC-DS tools zip from http://www.tpc.org/tpcds/.  You will need to agree to terms which are
-explained during the process.
-
-2. Unzip the provided archive in a convenient place.  The supported systems are even more restricted than for
-TPC-H.  We've only been able to build on Linux, which is how the makefile is set up initially.
-
-3. In the subdirectory called 'tools' type 'make'.  It should build the needed software.
-
-4. Move to the parent directory and make a subdirectory called data.
-
-5.  Source the file tpcds_gens provided here (it is set up with bash syntax; you might need to tweak it for a
-different shell).  It should populate the 'data' directory with sql files based on the TPC-DS templates.  Copy
-the sql files back to this folder.
+Once you have done this, you should have many files of the form tpch_*.sql and tpcds_*.sql, also some
+supporting files.
 
 TPC-H data:
 
@@ -65,13 +23,23 @@ Compiling and running:
 
 You can compile any query by making its .js file.  That is,
 
-make q1.js
+make tpch_1.js
 
-will compile q1.sql and produce q1.js.  A file called (e.g.) q1_stats.json will also be produced showing some
-internal statistics (the paper reports these for the TPC-H queries).
+will compile tpch_1.sql and produce tpch_1.js.  A file called (e.g.) tpch_1_stats.json will also be produced
+showing some internal statistics (the paper reports these for the TPC-H queries).
 
-You can run any query using an artificial target.  To run (e.g.) q1.js do
+You can run any query using an artificial target.  To run (e.g.) tpch_1.js do
 
-make run_q1
+make run_tpch_1
 
-If q1.js does not exist, it will be compiled first.
+If tpch_1.js does not exist, it will be compiled first.
+
+Note that:
+
+- not every query works.  All but one in TPC-H does, however.
+
+- for TPC-H we provide execution for the purpose of evaluating correctness.  We do not claim any performance
+  numbers in our papers.
+
+- for TPC-DS, we only attempt compilation, not execution.  Currently, 37 out of 99 TPC-DS queries compile
+  successfully.
