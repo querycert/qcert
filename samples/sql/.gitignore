@@ -4,3 +4,5 @@
 /tpc/*.json
 /tpc/linuxOnly/tpc*.zip
 /tpc/linuxOnly/tpch_2_17_0
+/tpc/linuzOnly/v2.3.0
+/tpc/tpc.zip
