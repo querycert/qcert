@@ -38,10 +38,10 @@ $(TPCH_QGEN):	$(TPC_H)
 	$(MAKE) -C $(TPC_H)
 
 $(TPC_H):
-	unzip tpc-h-tool.zip $(TPC_H)/*
+	unzip *tpc-h-tool.zip $(TPC_H)/*
 
 $(TPC_DS):
-	unzip tpc-ds-tool.zip
+	unzip *tpc-ds-tool.zip
 
 ../tpcds_%.sql:	$(TPC_DS)/tpcds.idx $(NETEZZA_PLUS) $(TPCDS_DSQGEN)
 	cd $(TPC_DS) && tools/dsqgen -template query$*.tpl -directory query_templates -scale 1 -filter -dialect netezzaPlus -quiet  > ../../tpcds_$*.sql
