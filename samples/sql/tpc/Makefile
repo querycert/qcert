@@ -52,7 +52,7 @@ $(MERGED_RT): $(BASE_RT) $(DATES_RT)
 # Compile a query to Javascript and also produce a stats report (as QUERYNAME_stats.json)
 %.js:	%.sql
 	@echo Compiling $<
-	-$(QCERTCOMP) -stat-tree -source sql -target js $<
+	-time $(QCERTCOMP) -stat-tree -source sql -target js $<
 
 # Run a Javascript result against the standard dataset (only valid for TPC-H and not all queries complete in reasonable time)
 run_%:	%.js tpch.data $(MERGED_RT)
