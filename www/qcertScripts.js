@@ -33,6 +33,7 @@ function compileButton() {
 		'query' : document.getElementById("query").value
 	};
 	var schema = getParameter("schema", "{}");
+	document.getElementById("result").innerHTML = "[ Query is compiling ]";
 	var handler = function(compilationResult) {
 		compiledQuery = compilationResult.result;
 		document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
@@ -77,25 +78,30 @@ function compileForEval() {
 	qcertPreCompile(input, schema, handler);
 }
 function performJsEvaluation() {
-	var io = JSON.parse(document.getElementById("input").value);
-	var input = ("input" in io) ? io.input : io;
-//	console.log(input);
-	var schemaText = document.getElementById("schema").value;
-	var schema = JSON.parse(schemaText);
-	inheritance = ("hierarchy" in schema) ? schema.hierarchy
-			: ("inheritance" in schema) ? schema.inheritance : [];
-//	console.log(inheritance);
-	eval(compiledQuery);
-	var result = query(input);
-	var prefix = "";
-	if ("output" in io)
-		prefix = verify(result, io.output) ? "Equal to the expected result:\n"
-				: "Differs from expected result:\n";
-	document.getElementById("execresult").innerHTML = escapeHtml(prefix
-			+ JSON.stringify(result));
+	// Processing is delegated to a web-worker
+	try {
+		var inputString = document.getElementById("input").value;
+		var schemaText = document.getElementById("schema").value;
+		// Worker is at global scope, making it accessible to the kill button
+		worker = new Worker("evalWorker.js");
+		worker.onmessage = function(e) {
+			document.getElementById("execresult").innerHTML = escapeHtml(e.data);
+		}
+		worker.onerror = function(e) {
+			document.getElementById("execresult").innerHTML = escapeHtml(e.message);
+		}
+		worker.postMessage([inputString, schemaText, compiledQuery]);
+	} catch (err) {
+		document.getElementById("execresult").innerHTML = escapeHtml(err.message);
+	}
+}
+function killButton() {
+	worker.terminate();
+	document.getElementById("execresult").innerHTML = "[ Execution terminated ]";
 }
 function executeButton() {
 	var target = document.getElementById("target").value;
+	document.getElementById("execresult").innerHTML = "[ Evaluating ]";
 	if (target != "js")
 		compileForEval()
 	else {
@@ -155,9 +161,11 @@ function addPath() {
 	return false;
 }
 function handleFile(files, output) {
+	console.log("File handler called");
 	if (files.length > 0) {
 		var reader = new FileReader();
 		var file = files[0];
+		document.getElementById(output).innerHTML = "[ Reading ]";
 		if (file.name.endsWith(".sem")) {
 			reader.onload = function(event) {
 				var contents = btoa(String.fromCharCode.apply(null,
@@ -201,6 +209,7 @@ function convertSQLSchema(toConvert) {
 	var result = preProcess(toConvert, "sqlSchema2JSON", process);
 }
 function handleCSVs(files) {
+	console.log("CSV file handler called");
 	var readFiles = {};
 	function readFile(index) {
 		if (index >= files.length) {
