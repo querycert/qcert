@@ -2340,18 +2340,33 @@ function init():void {
 }
 
 function handleFile(output:string, files:FileList) {
-	if (files.length > 0) {
-		const file = files[0];
-		const reader = new FileReader();
-		const outputElem:HTMLTextAreaElement = <HTMLTextAreaElement>document.getElementById(output);
-		reader.onload = function(event) {
-			const txt:string = (<any>event.target).result;
-			outputElem.value = txt;
-		}
-		reader.readAsText(file);
-	}
+    console.log("File handler called");
+    if (files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        const outputElem:HTMLTextAreaElement = <HTMLTextAreaElement>document.getElementById(output);
+        outputElem.value = "[ Reading ]";
+        if ((<any>file.name).endsWith(".sem")) {
+            reader.onload = function(event) {
+                const contents:string = btoa(String.fromCharCode.apply(null,
+                        new Uint8Array((<any>event.target).result)))
+                outputElem.value = contents;
+            }
+            reader.readAsArrayBuffer(file);
+        } else {
+            reader.onload = function(event) {
+                const contents:string = (<any>event.target).result;
+                // TODO: incorporate the following from the qcertScripts.js version
+//                if (output == "schema" && isSQLSchema(contents))
+//                    convertSQLSchema(contents);
+//                else
+                outputElem.value = contents;
+                
+            }
+            reader.readAsText(file);
+        }
+    }
 }
-
 
 function handleFileDrop(output:string, event:DragEvent) {
 	event.stopPropagation();
