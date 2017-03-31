@@ -32,14 +32,13 @@ function compileButton() {
 		'javaimports' : getParameter("java_imports", ""),
 		'query' : document.getElementById("query").value
 	};
-	var schema = getParameter("schema", "{}");
 	document.getElementById("result").innerHTML = "[ Query is compiling ]";
 	var handler = function(compilationResult) {
 		compiledQuery = compilationResult.result;
 		document.getElementById("result").innerHTML = escapeHtml(compiledQuery);
 		displayAllResults(compilationResult.emitall);
 	}
-	qcertPreCompile(input, schema, handler);
+	qcertPreCompile(input, handler);
 }
 function verify(result, expected) {
 	result = result[0]; // TODO is this always right?  
@@ -70,12 +69,11 @@ function compileForEval() {
 		'javaimports' : document.getElementById("java_imports").value,
 		'query' : document.getElementById("query").value,
 	};
-	var schema = document.getElementById("schema").value;
 	var handler = function(compilationResult) {
 		evalQuery = compilationResult.eval;
 		document.getElementById("execresult").innerHTML = escapeHtml(evalQuery);
 	}
-	qcertPreCompile(input, schema, handler);
+	qcertPreCompile(input, handler);
 }
 function performJsEvaluation() {
 	// Processing is delegated to a web-worker
