@@ -23,6 +23,10 @@ import org.qcert.javasvc.Command;
 public class EncodingService implements Command {
 	@Override
 	public String invoke(String arg) {
-		return PrestoEncoder.parseAndEncode(arg, false, true);
+		try {
+			return PrestoEncoder.parseAndEncode(arg, false, true);
+		} catch (Throwable t) {
+			return "ERROR: SQL Parser said \"" + t.getMessage() + "\"";
+		}
 	}
 }

@@ -129,7 +129,11 @@ public class Main extends NanoHTTPD {
 		Command cmd = instantiate(implClass);
 		if (cmd == null)
 			return "ERROR: implementation of " + verb + " is not available";
-		return cmd.invoke(arg);
+		try {
+			return cmd.invoke(arg);
+		} catch (Throwable t) {
+			return "ERROR: implementation of " + verb + " failed with the error -- " + t.getMessage();
+		}
 	}
 
 	/**
