@@ -44,7 +44,7 @@ LIBJS=CALibJS
 
 all: $(MAIN) $(MAIN2)
 jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(LIB).jar
-js: qcertJS.js
+js: ../lib/qcertJS.js
 
 generated: generated/StaticConfig.ml generated/Compiler.ml generated/Compiler.mli
 
@@ -105,11 +105,11 @@ japi/lib/$(LIB).jar: $(LIB).jar
 
 # JavaScript
 
-qcertJS.js: qcertJS.byte
+../lib/qcertJS.js: _build/qcertJS.byte
 	js_of_ocaml _build/qcertJS.byte
 	cp _build/qcertJS.js ../lib/qcertJS.js
 
-qcertJS.byte: generated qcertJS.ml
+_build/qcertJS.byte: generated qcertJS.ml
 	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
 
 wsk-update:
