@@ -1911,6 +1911,7 @@ class CompileTab extends ICanvasTab {
 		const langs = getPipelineLangs();
 		const optims = getOptimConfig();
 		const srcInput = getSrcInput();
+        const schemaInput = getSchemaInput();
 		const ioInput = getIOInput();
 
 		const path = langs.map(x => x.id);
@@ -1921,7 +1922,20 @@ class CompileTab extends ICanvasTab {
 
 		const middlePath = path.slice(1,-1);
 		
-		const resultPack = qcertCompile({
+        const compiling = new fabric.Text("[ Compiling query ]", {
+                left: 10, top: 5, width:200, height:500, fill:'purple'
+            });
+        const theCanvas = this.canvas; // make visible in handler
+        theCanvas.add(compiling);
+        
+        const handler = function(resultPack: QcertResult) {
+            const resultStr = resultPack.result;
+            const emissions = resultPack.emitall; // TODO: is this ever used?
+            compiling.setText(resultStr);
+            theCanvas.renderAll(); // required for the text modification to become visible
+        }
+        
+		qcertPreCompile({
 			source:path[0],
 			target:path[path.length-1],
 			path:middlePath,
@@ -1930,17 +1944,9 @@ class CompileTab extends ICanvasTab {
 			sourcesexp:false,
 			ascii:false,
 			javaimports:undefined,
-			query:srcInput
-		});
-		const resultStr = resultPack.result;
-		const emissions = resultPack.emitall;
-
-
-		const txt = new fabric.Text(resultStr, {
-			left: 10, top: 5, width:200, height:500, fill:'purple'
-		});
-		
-		this.canvas.add(txt);
+			query:srcInput,
+            schema: schemaInput,
+		  }, handler); 
 	}
 }
 
@@ -2358,6 +2364,11 @@ function handleFileDrop(output:string, event:DragEvent) {
 function getSrcInput():string {
 	const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-src-text');
 	return elem.value;
+}
+
+function getSchemaInput():string {
+    const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-schema-text');
+    return elem.value;
 }
 
 function getIOInput():string {

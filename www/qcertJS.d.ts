@@ -19,7 +19,8 @@ type QcertCompilerConfig = {
     sourcesexp: boolean,   /* true if input language uses s-expression syntax */
     ascii: boolean,        /* true for ascii pp instead of greek pp */
     javaimports: string,   /* optional java imports for Java back-end */
-    query: string};        /* Input query */
+    query: string,         /* Input query */
+    schema: string};       /* the schema */
 
 type QcertResultFile = {
     file: string;         /* File name */

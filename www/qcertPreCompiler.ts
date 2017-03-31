@@ -57,7 +57,8 @@ function combineInputAndSchema(input: string, schema: string) {
     return JSON.stringify(combined);
 }
 
-function qcertPreCompile(input: QcertCompilerConfig, schema: string, callback: (result: { result: string }) => any) {
+function qcertPreCompile(input: QcertCompilerConfig, callback: (result: QcertResult) => any) {
+    console.log(input);
     var verb = null, sourceCAMP = false, query = null;
     console.log("Starting pre-compile for source language " + input.source);
     if (input.source == "sql") {
@@ -67,7 +68,7 @@ function qcertPreCompile(input: QcertCompilerConfig, schema: string, callback: (
     } else if (input.source == "tech_rule") {
         verb = "techRule2CAMP";
         sourceCAMP = true;
-        query = combineInputAndSchema(input.query, schema);
+        query = combineInputAndSchema(input.query, input.schema);
     } else if (input.source == "designer_rule") {
         verb = "serialRule2CAMP";
         sourceCAMP = true;
@@ -80,13 +81,17 @@ function qcertPreCompile(input: QcertCompilerConfig, schema: string, callback: (
     var handler = function(result: string) {
         if (result.substring(0, 6) == "ERROR:") {
             console.log("Calling back with error: " + result);
-            callback({ result: result });
+            callback({ result: result, emit: null, emitall: []});
         } else {
             input.query = result;
             input.sourcesexp = true;
-            if (sourceCAMP)
+            if (sourceCAMP) {
                 input.source = "CAMP";
+                if (input.path[0].toLowerCase() == "camp")
+                    input.path.shift();
+            }
             console.log("Doing qcertCompile after successful preProcess");
+            console.log("Path: " + input.path);
             callback(qcertCompile(input));
         }
     }
