@@ -2339,7 +2339,7 @@ function init():void {
 	tabscanvas.renderAll();
 }
 
-function handleFile(output:string, files:FileList) {
+function handleFile(output:string, isSchema:boolean, files:FileList) {
     console.log("File handler called");
     if (files.length > 0) {
         const file = files[0];
@@ -2356,16 +2356,39 @@ function handleFile(output:string, files:FileList) {
         } else {
             reader.onload = function(event) {
                 const contents:string = (<any>event.target).result;
-                // TODO: incorporate the following from the qcertScripts.js version
-//                if (output == "schema" && isSQLSchema(contents))
-//                    convertSQLSchema(contents);
-//                else
-                outputElem.value = contents;
-                
+                if (isSchema && isSQLSchema(contents))
+                    convertSQLSchema(contents, outputElem);
+                else
+                    outputElem.value = contents;
             }
             reader.readAsText(file);
         }
     }
+}
+
+// Determine if a String contains a SQL schema.  Not intended to be foolproof but just to discriminate the two supported schema
+// notations (SQL and JSON) when the input is at least mostly valid.
+function isSQLSchema(schemaText:string) : boolean {
+    /* A SQL schema should have the word "create" in it but SQL is case insensitive  */
+    var create = schemaText.search(/create/i);
+    if (create < 0)
+        return false;
+    var brace = schemaText.indexOf('{');
+    if (brace >= 0 && brace < create)
+        /* Word create is coincidentally appearing inside what is probably a JSON schema */
+        return false;
+    /* Looking more like SQL.  Drop any blanks that follow 'create' */
+    var balance = schemaText.substring(create + 6).trim();
+    /* The next word must be 'table' (case insensitive) */
+    var table = balance.search(/table/i);
+    return table == 0;
+}
+
+function convertSQLSchema(toConvert:string, outputElem:HTMLTextAreaElement) {
+    var process = function(result:string) {
+        outputElem.value = result;
+    }
+    var result = preProcess(toConvert, "sqlSchema2JSON", process);
 }
 
 function handleFileDrop(output:string, event:DragEvent) {
@@ -2373,7 +2396,7 @@ function handleFileDrop(output:string, event:DragEvent) {
   	event.preventDefault();
 	var dt = event.dataTransfer;
   	var files = dt.files;
-	handleFile(output, files);
+	handleFile(output, false, files);
 }
 
 function getSrcInput():string {

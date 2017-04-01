@@ -23,7 +23,7 @@
 			</div>
 			<div id="input-tab-query-input">
 			<div id="input-tab-query-input-src">
-			<label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-src-file" onchange='handleFile("input-tab-query-src-text", this.files)'/>
+			<label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-src-file" onchange='handleFile("input-tab-query-src-text", false, this.files)'/>
 	  		<br/>
           <textarea id = "input-tab-query-src-text"
                     rows = "10"
@@ -36,7 +36,7 @@
           	</div>
 			  <p></p>
 			  <div id="input-tab-query-schema">
-			<label>schema (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-schema-text", this.files)'/>
+			<label>schema (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-schema-text", true, this.files)'/>
 	  		<br/>
           <textarea id = "input-tab-query-schema-text"
                     rows = "10"
@@ -49,7 +49,7 @@
           	</div>
 			  <p></p>
 			  <div id="input-tab-query-input-io">
-			<label>data (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-io-text", this.files)'/>
+			<label>data (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-io-text", false, this.files)'/>
 	  		<br/>
           <textarea id = "input-tab-query-io-text"
                     rows = "10"
