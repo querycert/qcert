@@ -69,6 +69,7 @@ function compileForEval() {
 		'javaimports' : document.getElementById("java_imports").value,
 		'query' : document.getElementById("query").value,
 	};
+	console.log(input);
 	var handler = function(compilationResult) {
 		evalQuery = compilationResult.eval;
 		document.getElementById("execresult").innerHTML = escapeHtml(evalQuery);
