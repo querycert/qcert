@@ -78,10 +78,14 @@ function qcertPreCompile(input: QcertCompilerConfig, callback: (result: QcertRes
         callback(qcertCompile(input));
         return;
     }
+    if (query.length == 0) {
+        callback({ result: "ERROR: No source query provided", eval: undefined, emit: null, emitall: []});
+        return
+    }
     var handler = function(result: string) {
         if (result.substring(0, 6) == "ERROR:") {
             console.log("Calling back with error: " + result);
-            callback({ result: result, emit: null, emitall: []});
+            callback({ result: result, eval: undefined, emit: null, emitall: []});
         } else {
             input.query = result;
             input.sourcesexp = true;

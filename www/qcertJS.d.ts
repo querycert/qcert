@@ -20,7 +20,9 @@ type QcertCompilerConfig = {
     ascii: boolean,        /* true for ascii pp instead of greek pp */
     javaimports: string,   /* optional java imports for Java back-end */
     query: string,         /* Input query */
-    schema: string};       /* the schema */
+    schema: string,        /* the schema */
+    input: string,         /* the (JSON format) input data) */
+    eval: boolean};        /* True if evaluation is to be conducted on the target language */
 
 type QcertResultFile = {
     file: string;         /* File name */
@@ -30,7 +32,8 @@ type QcertResultFile = {
 type QcertResult = {
     emit: QcertResultFile;
     emitall: QcertResultFile[];
-    result: string};
+    result: string,
+    eval: string};
 
 /**  Returns the set of languages known by the compiler, grouped into phases */
 declare function qcertLanguages(): SourceLanguageGroups;

@@ -22,7 +22,10 @@ interface PuzzleSides {
 	// we should set canvas width appropriately
 	let totalCanvasWidth = 1000;
 
-	function getSourceLeft(left:number):number {
+// global variables
+    var compiledQuery:string = null;
+
+    function getSourceLeft(left:number):number {
 		return left*(piecewidth + 30) + 20;
 	}
 
@@ -1912,7 +1915,6 @@ class CompileTab extends ICanvasTab {
 		const optims = getOptimConfig();
 		const srcInput = getSrcInput();
         const schemaInput = getSchemaInput();
-		const ioInput = getIOInput();
 
 		const path = langs.map(x => x.id);
 		if(path.length <= 2) {
@@ -1929,9 +1931,8 @@ class CompileTab extends ICanvasTab {
         theCanvas.add(compiling);
         
         const handler = function(resultPack: QcertResult) {
-            const resultStr = resultPack.result;
-            const emissions = resultPack.emitall; // TODO: is this ever used?
-            compiling.setText(resultStr);
+            compiledQuery = resultPack.result;
+            compiling.setText(compiledQuery);
             theCanvas.renderAll(); // required for the text modification to become visible
         }
         
@@ -1946,8 +1947,101 @@ class CompileTab extends ICanvasTab {
 			javaimports:undefined,
 			query:srcInput,
             schema: schemaInput,
+            eval:false,
+            input:undefined
 		  }, handler); 
 	}
+}
+
+class ExecTab extends ICanvasTab {
+
+    static make(canvas:fabric.ICanvas) {
+        return new ExecTab(canvas);
+    }
+
+    constructor(canvas:fabric.ICanvas) {
+        super(canvas);
+    }
+
+    getLabel() {
+        return "Execute";
+    }
+
+    getRectOptions() {
+        return {fill:'orange'};
+    }
+
+    setError(msg:string) {
+        console.log(msg);
+    }
+
+    show() {
+        this.canvas.selection = false;
+        const langs = getPipelineLangs();
+        const path = langs.map(x => x.id);
+        const target = langs[langs.length-1].id;
+        const srcInput = getSrcInput();
+        const schemaInput = getSchemaInput();
+        const dataInput = getIOInput();
+        
+        const executing = new fabric.Text("[ Executing query ]", {
+                left: 10, top: 5, width:200, height:500, fill:'purple'
+            });
+        this.canvas.add(executing);
+        if (target != "js")
+            this.compileForEval(path, executing, srcInput, schemaInput, dataInput);
+        else
+            this.performJsEvaluation(executing, dataInput, schemaInput);
+    }
+    
+    performJsEvaluation(executing:any, inputString:string, schemaText:string) {
+        if (compiledQuery == null) {
+            executing.setText("ERROR: Query has not been compiled");
+            this.canvas.renderAll();
+            return;
+        }
+        
+        // Processing is delegated to a web-worker
+        try {
+            // TODO figure out how to make Worker accessable to a 'kill' button
+            const worker = new Worker("evalWorker.js");
+            const theCanvas = this.canvas;
+            worker.onmessage = function(e) {
+                executing.setText(e.data);
+                theCanvas.renderAll();
+            }
+            worker.onerror = function(e) {
+                executing.setText(e.message);
+                theCanvas.renderAll();
+            }
+            worker.postMessage([inputString, schemaText, compiledQuery]);
+        } catch (err) {
+            executing.setText(err.message);
+            this.canvas.renderAll();
+        }
+    }
+
+    compileForEval(path:string[], executing:any, srcInput:string, schemaInput:string, dataInput:string) {
+        var handler = function(compilationResult: QcertResult) {
+            executing.setText(compilationResult.eval);
+            this.canvas.renderAll();
+        }
+        const middlePath = path.slice(1,-1);
+        qcertPreCompile({
+            source:path[0],
+            target:path[path.length-1],
+            path:middlePath,
+            exactpath:true,
+            emitall:true,
+            sourcesexp:false,
+            ascii:false,
+            javaimports:undefined,
+            query:srcInput,
+            schema: schemaInput,
+            eval: true,
+            input: dataInput
+          }, handler); 
+    }
 }
 
 const coqdocBaseURL = 'https://querycert.github.io/sigmod17/';
@@ -2324,7 +2418,8 @@ const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
 	BuilderTab.make,
 	OptimizationsTabMake,
 	InputTab.make,
-	CompileTab.make
+	CompileTab.make,
+    ExecTab.make
 ];
 
 function init():void {
@@ -2340,7 +2435,6 @@ function init():void {
 }
 
 function handleFile(output:string, isSchema:boolean, files:FileList) {
-    console.log("File handler called");
     if (files.length > 0) {
         const file = files[0];
         const reader = new FileReader();
