@@ -2022,9 +2022,10 @@ class ExecTab extends ICanvasTab {
     }
 
     compileForEval(path:string[], executing:any, srcInput:string, schemaInput:string, dataInput:string) {
+        const theCanvas = this.canvas;
         var handler = function(compilationResult: QcertResult) {
             executing.setText(compilationResult.eval);
-            this.canvas.renderAll();
+            theCanvas.renderAll();
         }
         const middlePath = path.slice(1,-1);
         qcertPreCompile({
