@@ -58,7 +58,6 @@ function combineInputAndSchema(input: string, schema: string) {
 }
 
 function qcertPreCompile(input: QcertCompilerConfig, callback: (result: QcertResult) => any) {
-    console.log(input);
     var verb = null, sourceCAMP = false, query = null;
     console.log("Starting pre-compile for source language " + input.source);
     if (input.source == "sql") {
