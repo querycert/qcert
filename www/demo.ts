@@ -24,6 +24,21 @@ interface PuzzleSides {
 
 // global variables
     var compiledQuery:string = null;
+    var worker:Worker = null;
+    var executing:any = null;
+    var executingCanvas:any = null;
+
+// Functions
+    function killButton() {
+        if (worker != null) {
+            worker.terminate();
+            worker = null;
+            if (executing != null && executingCanvas != null) {
+                executing.setText("[ Execution terminated ]");
+                executingCanvas.renderAll();
+            }
+        }
+    }
 
     function getSourceLeft(left:number):number {
 		return left*(piecewidth + 30) + 20;
@@ -1916,24 +1931,31 @@ class CompileTab extends ICanvasTab {
 		const srcInput = getSrcInput();
         const schemaInput = getSchemaInput();
 
-		const path = langs.map(x => x.id);
-		if(path.length <= 2) {
-			this.setError("There needs to be a start and end language.");
-			return;
-		}
-
-		const middlePath = path.slice(1,-1);
-		
         const compiling = new fabric.Text("[ Compiling query ]", {
                 left: 10, top: 5, width:200, height:500, fill:'purple'
             });
         const theCanvas = this.canvas; // make visible in handler
         theCanvas.add(compiling);
+
+        if (srcInput.length == 0) {
+            compiling.setText("ERROR: Query source has not been specified");
+            this.canvas.renderAll();
+            return;
+        }
+
+        const path = langs.map(x => x.id);
+		if(path.length <= 2) {
+            compiling.setText("[ No source and target language specified ]");
+            theCanvas.renderAll();
+			return;
+		}
+
+		const middlePath = path.slice(1,-1);
         
         const handler = function(resultPack: QcertResult) {
             compiledQuery = resultPack.result;
             compiling.setText(compiledQuery);
-            theCanvas.renderAll(); // required for the text modification to become visible
+            theCanvas.renderAll();
         }
         
 		qcertPreCompile({
@@ -1979,22 +2001,30 @@ class ExecTab extends ICanvasTab {
         this.canvas.selection = false;
         const langs = getPipelineLangs();
         const path = langs.map(x => x.id);
+
+        executing = new fabric.Text("[ Executing query ]", {
+                left: 10, top: 35, width:200, height:500, fill:'purple'
+            });
+        this.canvas.add(executing);
+        if (path.length <= 2) {
+            executing.setText("ERROR: no source and target languages were specified");  
+            this.canvas.renderAll();
+            return;
+        }
+        document.getElementById("execute-tab-button-area").style.display = "block";            
+
         const target = langs[langs.length-1].id;
         const srcInput = getSrcInput();
         const schemaInput = getSchemaInput();
         const dataInput = getIOInput();
         
-        const executing = new fabric.Text("[ Executing query ]", {
-                left: 10, top: 5, width:200, height:500, fill:'purple'
-            });
-        this.canvas.add(executing);
         if (target != "js")
             this.compileForEval(path, executing, srcInput, schemaInput, dataInput);
         else
-            this.performJsEvaluation(executing, dataInput, schemaInput);
+            this.performJsEvaluation(dataInput, schemaInput);
     }
     
-    performJsEvaluation(executing:any, inputString:string, schemaText:string) {
+    performJsEvaluation(inputString:string, schemaText:string) {
         if (compiledQuery == null) {
             executing.setText("ERROR: Query has not been compiled");
             this.canvas.renderAll();
@@ -2003,16 +2033,16 @@ class ExecTab extends ICanvasTab {
         
         // Processing is delegated to a web-worker
         try {
-            // TODO figure out how to make Worker accessable to a 'kill' button
-            const worker = new Worker("evalWorker.js");
-            const theCanvas = this.canvas;
+            // Worker variable is global (also executing and executingCanvas), making it (them) accessible to the killButton() function
+            worker = new Worker("evalWorker.js");
+            executingCanvas = this.canvas;
             worker.onmessage = function(e) {
                 executing.setText(e.data);
-                theCanvas.renderAll();
+                executingCanvas.renderAll();
             }
             worker.onerror = function(e) {
                 executing.setText(e.message);
-                theCanvas.renderAll();
+                executingCanvas.renderAll();
             }
             worker.postMessage([inputString, schemaText, compiledQuery]);
         } catch (err) {
@@ -2022,13 +2052,19 @@ class ExecTab extends ICanvasTab {
     }
 
     compileForEval(path:string[], executing:any, srcInput:string, schemaInput:string, dataInput:string) {
+        if (srcInput.length == 0) {
+            executing.setText("ERROR: Query source has not been specified");
+            this.canvas.renderAll();
+            return;
+        }
+        
         const theCanvas = this.canvas;
         var handler = function(compilationResult: QcertResult) {
             executing.setText(compilationResult.eval);
             theCanvas.renderAll();
         }
         const middlePath = path.slice(1,-1);
-        qcertPreCompile({
+        qcertPreCompile({   
             source:path[0],
             target:path[path.length-1],
             path:middlePath,
