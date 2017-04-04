@@ -49,7 +49,9 @@
           	</div>
 			  <p></p>
 			  <div id="input-tab-query-input-io">
-			<label>data (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-io-text", false, this.files)'/>
+	        <label>execution input as CSV files (choose delimiter and files)&nbsp;&nbsp;&nbsp;delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea>
+					<input type="file" multiple="true" id="inputCSVs" onchange='handleCSVs(this.files)'/><br/>
+			<label>execution input as JSON (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-io-text", false, this.files)'/>
 	  		<br/>
           <textarea id = "input-tab-query-io-text"
                     rows = "10"

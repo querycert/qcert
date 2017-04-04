@@ -2471,6 +2471,36 @@ function init():void {
 	tabscanvas.renderAll();
 }
 
+function handleCSVs(files:FileList) {
+    console.log("CSV file handler called");
+    var readFiles = {};
+    function readFile(index) {
+        if (index >= files.length) {
+            completeCSVs(readFiles);
+            return;
+        }
+        var file = files[index];
+        var reader = new FileReader();  
+        reader.onload = function(event) {
+            var typeName = (<any>file.name).endsWith(".csv") ? file.name.substring(0, file.name.length - 4) : file.name;
+            readFiles[typeName] = (<any>event.target).result;
+            readFile(index+1);
+        }
+        reader.readAsText(file);
+    }
+    readFile(0);
+}
+
+function completeCSVs(readFiles) {
+    var delimiter = (<HTMLTextAreaElement>document.getElementById("delimiter")).value; 
+    var schema = JSON.parse((<HTMLTextAreaElement>document.getElementById("input-tab-query-schema-text")).value);
+    var toSend = JSON.stringify({schema: schema, delimiter: delimiter, data: readFiles});
+    var process = function(result) {
+        document.getElementById("input-tab-query-io-text").innerHTML = result;
+    }
+    var result = preProcess(toSend, "csv2JSON", process);
+}
+
 function handleFile(output:string, isSchema:boolean, files:FileList) {
     if (files.length > 0) {
         const file = files[0];
