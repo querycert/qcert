@@ -36,7 +36,7 @@ onmessage = function(e) {
 	var input = ("input" in io) ? io.input : io;
 	
 	// Convert the schema
-	var schema = JSON.parse(schemaText);
+	var schema = schemaText.length > 0 ? JSON.parse(schemaText) : {};
 	
 	// Put inhertance at global scope so the evaluated query can see it
 	inheritance = ("hierarchy" in schema) ? schema.hierarchy

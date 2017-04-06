@@ -14,6 +14,8 @@
 
 <body onload="init();" id='body'>
 	<canvas id="tabs-canvas" width="1000" height="50"></canvas>
+    <button id="kill-button" type="button" style="font-size:large; display:none"
+        onclick="killButton()"><b>kill execution</b></button>
 	<div id="container" style="position:relative">
 		<canvas id="main-canvas" width="1000" height="700"></canvas>
 		<div id="input-tab" style="display:none; position:absolute; left:10px; top:10px">
@@ -64,10 +66,6 @@
           	</div>
 		 </div>
 		</div>
-		<div id="execute-tab-button-area" style="display:none; position:absolute; left:10px; top:10px">
-        <button type="button" style="font-size:large"
-	      onclick="killButton()"><b>kill execution</b></button>
-	    </div>
 	</div>
 </body>
 
