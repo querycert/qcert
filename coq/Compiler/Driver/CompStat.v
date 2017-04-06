@@ -142,9 +142,9 @@ Section CompStat.
       (("camp_size", dnat (Z_of_nat (pat_size q)))
          :: nil).
 
-  Definition stat_rule (q:rule) : data :=
+  Definition stat_camp_rule (q:camp_rule) : data :=
     drec
-      (("rule_size", dnat (Z_of_nat (pat_size (rule_to_camp q))))
+      (("rule_size", dnat (Z_of_nat (pat_size (camp_rule_to_camp q))))
          :: nil).
 
   Definition stat_tech_rule (q:tech_rule) : data :=
@@ -319,18 +319,12 @@ Section CompStat.
     | s => s
     end.
 
-  Definition stat_tree_rule (q:rule) : data :=
-    match stat_rule q with
+  Definition stat_tree_camp_rule (q:camp_rule) : data :=
+    match stat_camp_rule q with
     | drec l =>
-      let (t_nraenv, q_nraenv) := time rule_to_nraenv q in
-      let (t_nraenv_core, q_nraenv_core) := time rule_to_nraenv_core q in
-      let (t_nra, q_nra) := time rule_to_nra q in
-      drec (l ++ ("rule_to_nraenv", stat_tree_nraenv q_nraenv)
-              :: ("rule_to_nraenv_time", dstring t_nraenv)
-              :: ("rule_to_nraenv_core", stat_tree_nraenv_core q_nraenv_core)
-              :: ("rule_to_nraenv_core_time", dstring t_nraenv_core)
-              :: ("rule_to_nra", stat_tree_nra q_nra)
-              :: ("rule_to_nra_time", dstring t_nra)
+      let (t_camp, q_camp) := time camp_rule_to_camp q in
+      drec (l ++ ("camp_rule_to_camp", stat_tree_camp q_camp)
+              :: ("camp_rule_to_camp", dstring t_camp)
               :: nil)
     | s => s
     end.
@@ -390,7 +384,7 @@ Section CompStat.
   Definition json_stat_of_query (q:query) : string :=
     let stat :=
         match q with
-        | Q_rule q => stat_rule q
+        | Q_camp_rule q => stat_camp_rule q
         | Q_tech_rule q => stat_tech_rule q
         | Q_designer_rule q => stat_designer_rule q
         | Q_camp q => stat_camp q
@@ -419,7 +413,7 @@ Section CompStat.
   Definition json_stat_tree_of_query (qname:string) (q:query) : string :=
     let stat :=
         match q with
-        | Q_rule q => stat_tree_rule q
+        | Q_camp_rule q => stat_tree_camp_rule q
         | Q_tech_rule q => stat_tree_tech_rule q
         | Q_designer_rule q => stat_tree_designer_rule q
         | Q_camp q => stat_tree_camp q

@@ -51,7 +51,6 @@ Module QDriver(runtime:CompilerRuntime).
     Definition driver_config := driver_config.
     Definition driver_of_path : driver_config -> list language -> driver :=
       driver_of_path.
-    Definition fix_driver : driver -> query -> driver := fix_driver.
 
     Definition get_path_from_source_target : language -> language -> list language :=
       get_path_from_source_target.
@@ -78,8 +77,8 @@ Module QDriver(runtime:CompilerRuntime).
       := compile_from_source_target.
 
     (* Used in CompTest: *)
-    Definition rule_to_nraenv_optim : rule -> nraenv := rule_to_nraenv_optim.
-    Definition rule_to_nnrc_optim : rule -> nnrc := rule_to_nnrc_optim.
+    Definition camp_rule_to_nraenv_optim : camp_rule -> nraenv := camp_rule_to_nraenv_optim.
+    Definition camp_rule_to_nnrc_optim : camp_rule -> nnrc := camp_rule_to_nnrc_optim.
 
     (* Used in CALib: *)
     Definition nraenv_optim_to_nnrc_optim : nraenv -> nnrc := nraenv_optim_to_nnrc_optim.
@@ -98,13 +97,13 @@ Module QDriver(runtime:CompilerRuntime).
     Definition nraenv_core_to_nraenv : nraenv_core -> nraenv := nraenv_core_to_nraenv.
     
     (* Used in queryTests: *)
-    Definition rule_to_nraenv_to_nnrc_optim : rule -> nnrc := rule_to_nraenv_to_nnrc_optim.
-    Definition rule_to_nraenv_to_nnrc_optim_to_dnnrc :
-      vdbindings -> rule -> dnnrc_dataset := rule_to_nraenv_to_nnrc_optim_to_dnnrc.
+    Definition camp_rule_to_nraenv_to_nnrc_optim : camp_rule -> nnrc := camp_rule_to_nraenv_to_nnrc_optim.
+    Definition camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc :
+      vdbindings -> camp_rule -> dnnrc_dataset := camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc.
     Definition rule_to_nraenv_to_nnrc_optim_to_javascript :
-      rule -> string := rule_to_nraenv_to_nnrc_optim_to_javascript.
-    Definition rule_to_nnrcmr : vdbindings -> rule -> nnrcmr := rule_to_nnrcmr.
-    Definition rule_to_cldmr : list (string*string) -> vdbindings -> rule -> cldmr := rule_to_cldmr.
+      camp_rule -> string := camp_rule_to_nraenv_to_nnrc_optim_to_javascript.
+    Definition camp_rule_to_nnrcmr : vdbindings -> camp_rule -> nnrcmr := camp_rule_to_nnrcmr.
+    Definition camp_rule_to_cldmr : list (string*string) -> vdbindings -> camp_rule -> cldmr := camp_rule_to_cldmr.
 
   End QD.
 End QDriver.

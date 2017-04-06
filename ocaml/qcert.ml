@@ -99,7 +99,7 @@ let args_list gconf =
 let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
-  [ Compiler.L_rule;
+  [ Compiler.L_camp_rule;
     Compiler.L_camp;
     Compiler.L_tech_rule;
     Compiler.L_designer_rule;
@@ -136,7 +136,7 @@ let usage =
 let parse_args () =
   let input_files = ref [] in
   let gconf =
-    { gconf_source = Compiler.L_rule;
+    { gconf_source = Compiler.L_camp_rule;
       gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;

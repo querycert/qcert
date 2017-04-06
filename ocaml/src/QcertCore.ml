@@ -94,7 +94,6 @@ let compile_query (dv_conf: QDriver.driver_config) (schema: TypeUtil.schema) (pa
   let foreign_typing = schema.TypeUtil.sch_foreign_typing in
   let dv = QDriver.driver_of_path brand_model dv_conf path in
   let () = QcertUtil.driver_no_error dv in
-  let dv = QDriver.fix_driver brand_model dv q in
   let queries = QDriver.compile brand_model foreign_typing dv q in
   let () = List.iter QcertUtil.query_no_error queries in
   queries

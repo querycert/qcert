@@ -140,7 +140,7 @@ function addPath() {
 	var li = document.createElement("LI");
 	var sel = document.createElement("SELECT");
 	li.appendChild(sel);
-	addOption(sel, "rule");
+	addOption(sel, "camp_rule");
 	addOption(sel, "camp");
 	addOption(sel, "oql");
 	addOption(sel, "lambda_nra");

@@ -69,16 +69,16 @@ Section CompEval.
 
     (* Note: this is top-level so cenv is always first 'normalized' by calling rec_sort *)
     
-    (* Language: rule *)
-    (* Note: eval for rule relies on translation to camp *)
-    Definition eval_rule (q:rule) (cenv: list (string*data)) : option data :=
+    (* Language: camp_rule *)
+    (* Note: eval for camp_rule relies on translation to camp *)
+    Definition eval_camp_rule (q:rule) (cenv: list (string*data)) : option data :=
       match interp h (rec_sort cenv) (rule_to_pattern q) nil dunit with
       | Success l => Some (dcoll (l::nil))
       | RecoverableError => Some (dcoll nil)
       | TerminalError => None
       end.
 
-    Definition eval_rule_debug (debug:bool) (q:rule) (cenv: list (string*data)) : string
+    Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: list (string*data)) : string
       := let pp := rule_to_pattern q in
          print_presult_debug pp
                              (interp_debug h
@@ -205,7 +205,7 @@ Section CompEval.
     Definition eval_query (q:query) (ev_in:eval_input) : eval_output :=
       let cenv := lift_input ev_in in
       match q with
-      | Q_rule q => lift_output (eval_rule q cenv)
+      | Q_camp_rule q => lift_output (eval_camp_rule q cenv)
       | Q_tech_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_designer_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_camp q => lift_output (eval_camp q cenv)
@@ -232,7 +232,7 @@ Section CompEval.
     Definition eval_query_debug (q:query) (ev_in:eval_input) : eval_output :=
       let cenv := lift_input ev_in in
       match q with
-      | Q_rule q => Ev_out_returned_debug (eval_rule_debug true q cenv)
+      | Q_camp_rule q => Ev_out_returned_debug (eval_camp_rule_debug true q cenv)
       | Q_tech_rule _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_designer_rule _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_camp q => Ev_out_returned_debug (eval_camp_debug true q cenv)
@@ -262,10 +262,10 @@ Section CompEval.
   (* XXX probably should be made obsolete with the eval driver, but
        used in ocaml and queryTests XXX *)
   Section EvalWorld.
-    Definition eval_rule_world (r:rule) (world:list data) : option data :=
-      eval_rule r (mkWorld world).
-    Definition eval_rule_world_debug (debug:bool) (r:rule) (world:list data) : string :=
-      eval_rule_debug debug r (mkWorld world).
+    Definition eval_camp_rule_world (r:camp_rule) (world:list data) : option data :=
+      eval_camp_rule r (mkWorld world).
+    Definition eval_camp_rule_world_debug (debug:bool) (r:camp_rule) (world:list data) : string :=
+      eval_camp_rule_debug debug r (mkWorld world).
     
     Definition eval_camp_world (q:camp) (world:list data) : option data :=
       eval_camp q (mkWorld world).

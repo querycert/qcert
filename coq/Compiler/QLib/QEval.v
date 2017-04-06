@@ -30,8 +30,8 @@ Module QEval(runtime:CompilerRuntime).
   Definition world_env : Set := list data.
   
   (* Eval for arbitrary (local) constant environments *)
-  Definition eval_rule : rule -> constant_env -> option data := @eval_rule _ h.
-  Definition eval_rule_debug : bool -> rule -> constant_env -> string := @eval_rule_debug _ h.
+  Definition eval_camp_rule : camp_rule -> constant_env -> option data := @eval_camp_rule _ h.
+  Definition eval_camp_rule_debug : bool -> camp_rule -> constant_env -> string := @eval_camp_rule_debug _ h.
   
   Definition eval_camp : camp -> constant_env -> option data := @eval_camp _ h.
   Definition eval_camp_debug : bool -> camp -> constant_env -> string := @eval_camp_debug _ h.
@@ -60,8 +60,8 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_query_debug {bm:brand_model} : query -> eval_input -> eval_output := @eval_query_debug _ _ _ _ h.
 
   (* Eval for single 'world' collection *)
-  Definition eval_rule_world : rule -> world_env -> option data := @eval_rule_world _ h.
-  Definition eval_rule_world_debug : bool -> rule -> world_env -> string := @eval_rule_world_debug _ h.
+  Definition eval_camp_rule_world : camp_rule -> world_env -> option data := @eval_camp_rule_world _ h.
+  Definition eval_camp_rule_world_debug : bool -> camp_rule -> world_env -> string := @eval_camp_rule_world_debug _ h.
   
   Definition eval_camp_world : camp -> world_env -> option data := @eval_camp_world _ h.
   Definition eval_camp_world_debug : bool -> camp -> world_env -> string := @eval_camp_world_debug _ h.

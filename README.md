@@ -28,8 +28,8 @@ To build Q\*cert from the source, you will need:
  - Coq 8.6 (https://coq.inria.fr/)
 
 An easy way to get set up on most platforms is to use the OCaml
-package manager (https://opam.ocaml.org). Once opam is installed, you
-can just add the corresponding libraries:
+package manager (https://opam.ocaml.org). Once opam is installed, add
+the following libraries:
 
 ```
 opam install menhir

@@ -78,7 +78,7 @@ let parse_cldmr_sexp f : QLang.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
 let parse_query l f : (string * QLang.query) =
   begin match l with
-  | Compiler.L_rule -> parse_rule f
+  | Compiler.L_camp_rule -> parse_rule f
   | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
   | Compiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")

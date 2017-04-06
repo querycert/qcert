@@ -100,13 +100,13 @@
 
 %start <(string * Compiler.EnhancedCompiler.QLang.query)> rulemain
 %start <Compiler.EnhancedCompiler.QLang.camp> patmain
-%type <Compiler.EnhancedCompiler.QLang.rule -> Compiler.EnhancedCompiler.QLang.rule> rule_rule
+%type <Compiler.EnhancedCompiler.QLang.camp_rule -> Compiler.EnhancedCompiler.QLang.camp_rule> rule_rule
 
 %%
 
 rulemain:
 | EXAMPLE i=IDENT COLONEQUAL r = rule DOT EOF
-    { (i, Compiler.Q_rule r) }
+    { (i, Compiler.Q_camp_rule r) }
 | EXAMPLE i=IDENT COLONEQUAL p = pat DOT EOF
     { (i, Compiler.Q_camp p) }
 

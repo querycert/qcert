@@ -51,7 +51,7 @@ Section CompLang.
   Context {fr:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
 
-  Definition rule := rule.
+  Definition camp_rule := rule.
   Definition tech_rule := tech_rule.
   Definition designer_rule := designer_rule.
   Definition camp := pat.
@@ -74,7 +74,7 @@ Section CompLang.
   Definition cloudant := (list (string * string) * (string * list string))%type.
 
   Inductive language : Set :=
-    | L_rule : language
+    | L_camp_rule : language
     | L_tech_rule : language
     | L_designer_rule : language
     | L_camp : language
@@ -109,7 +109,7 @@ Section CompLang.
   Global Instance language_eqdec : EqDec language eq := language_eq_dec.
 
   Inductive query : Set :=
-  | Q_rule : rule -> query
+  | Q_camp_rule : camp_rule -> query
   | Q_tech_rule : tech_rule -> query
   | Q_designer_rule : designer_rule -> query
   | Q_camp : camp -> query
@@ -134,7 +134,7 @@ Section CompLang.
 
   Tactic Notation "query_cases" tactic(first) ident(c) :=
     first;
-    [ Case_aux c "Q_rule"%string
+    [ Case_aux c "Q_camp_rule"%string
     | Case_aux c "Q_tech_rule"%string
     | Case_aux c "Q_designer_rule"%string
     | Case_aux c "Q_camp"%string
@@ -162,7 +162,7 @@ Section CompLang.
 
     Definition language_of_name_case_sensitive name : language:=
       match name with
-      | "rule"%string => L_rule
+      | "camp_rule"%string => L_camp_rule
       | "tech_rule"%string => L_tech_rule
       | "designer_rule"%string => L_designer_rule
       | "camp"%string => L_camp
@@ -189,8 +189,7 @@ Section CompLang.
 
     Definition name_of_language lang :=
       match lang with
-      | L_rule => "rule"%string
-    (* Note: techrule and designerrule are not yet fully integrated *)
+      | L_camp_rule => "camp_rule"%string
       | L_tech_rule => "tech_rule"%string
       | L_designer_rule => "designer_rule"%string
       | L_camp => "camp"%string
@@ -216,7 +215,7 @@ Section CompLang.
 
     Definition language_of_query q :=
       match q with
-      | Q_rule _ => L_rule
+      | Q_camp_rule _ => L_camp_rule
       | Q_tech_rule _ => L_tech_rule
       | Q_designer_rule _ => L_designer_rule
       | Q_camp _ => L_camp
@@ -261,7 +260,7 @@ Section CompLang.
 
     Open Scope string.
     Definition language_descriptions :=
-      (L_rule,FrontEnd,"Rule","Rules for CAMP")
+      (L_camp_rule,FrontEnd,"CAMPRule","Rules for CAMP")
         :: (L_tech_rule,FrontEnd,"TechRule","Technical Rules")
         :: (L_designer_rule,FrontEnd,"DesignerRule","Desginer Rules")
         :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
@@ -325,7 +324,7 @@ Section CompLang.
     (* given a language, returns the type of that language *)
     Definition type_of_language (l:language) : Set :=
       match l with
-      | L_rule => rule
+      | L_camp_rule => camp_rule
       | L_tech_rule => tech_rule
       | L_designer_rule => designer_rule
       | L_camp => camp
@@ -354,7 +353,7 @@ End CompLang.
 
 Tactic Notation "language_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "L_rule"%string
+  [ Case_aux c "L_camp_rule"%string
   | Case_aux c "L_tech_rule"%string
   | Case_aux c "L_designer_rule"%string
   | Case_aux c "L_camp"%string

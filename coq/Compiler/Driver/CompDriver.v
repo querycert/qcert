@@ -40,9 +40,9 @@ Section CompDriver.
   Require Import OQLtoNRAEnv.
   Require Import SQLtoNRAEnv.
   Require Import LambdaNRAtoNRAEnv.
-  Require Import RuletoNRA CAMPtoNRA.
-  Require Import CAMPtocNRAEnv RuletocNRAEnv.
-  Require Import CAMPtoNRAEnv RuletoNRAEnv.
+  Require Import CAMPtoNRA.
+  Require Import CAMPtocNRAEnv.
+  Require Import CAMPtoNRAEnv.
   Require Import NRAtocNNRC cNRAEnvtocNNRC NRAEnvtoNNRC.
   Require Import NNRCtoJavascript.
   Require Import NNRCtoJava.
@@ -129,18 +129,12 @@ Section CompDriver.
 
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lnra q.
 
-    (** Rule/CAMP translations *)
-    Definition rule_to_camp (q:rule) : camp := Rule.rule_to_pattern q.
+    (** Rules and CAMP translations *)
+    Definition camp_rule_to_camp (q:camp_rule) : camp := Rule.rule_to_pattern q. (* Note: This is really macro-expansion *)
 
     Definition tech_rule_to_camp (q:tech_rule) : camp := TechRule.tech_rule_to_camp q.
 
     Definition designer_rule_to_camp (q:designer_rule) : camp := DesignerRule.designer_rule_to_camp q.
-
-    Definition rule_to_nra (q:rule) : nra := nra_of_rule q.
-
-    Definition rule_to_nraenv_core (q:rule) : nraenv_core := RuletocNRAEnv.translate_rule_to_cnraenv q.
-
-    Definition rule_to_nraenv (q:rule) : nraenv := RuletoNRAEnv.translate_rule_to_nraenv q.
 
     Definition camp_to_nra (q:camp) : nra := nra_of_pat q.
 
@@ -381,12 +375,9 @@ Section CompDriver.
   nnrc_driver_ind',
   nnrcmr_driver_ind'.
 
-  Inductive rule_driver : Set :=
-    | Dv_rule_stop : rule_driver
-    | Dv_rule_to_camp : camp_driver -> rule_driver
-    | Dv_rule_to_nraenv_core : nraenv_core_driver -> rule_driver
-    | Dv_rule_to_nraenv : nraenv_driver -> rule_driver
-    | Dv_rule_to_nra : nra_driver -> rule_driver.
+  Inductive camp_rule_driver : Set :=
+    | Dv_camp_rule_stop : camp_rule_driver
+    | Dv_camp_rule_to_camp : camp_driver -> camp_rule_driver.
 
   Inductive tech_rule_driver : Set :=
     | Dv_tech_rule_stop : tech_rule_driver
@@ -409,7 +400,7 @@ Section CompDriver.
     | Dv_lambda_nra_to_nraenv : nraenv_driver -> lambda_nra_driver.
 
   Inductive driver : Set :=
-  | Dv_rule : rule_driver -> driver
+  | Dv_camp_rule : camp_rule_driver -> driver
   | Dv_tech_rule : tech_rule_driver -> driver
   | Dv_designer_rule : designer_rule_driver -> driver
   | Dv_camp : camp_driver -> driver
@@ -435,7 +426,7 @@ Section CompDriver.
 
   Tactic Notation "driver_cases" tactic(first) ident(c) :=
     first;
-    [ Case_aux c "Dv_rule"%string
+    [ Case_aux c "Dv_camp_rule"%string
     | Case_aux c "Dv_tech_rule"%string
     | Case_aux c "Dv_designer_rule"%string
     | Case_aux c "Dv_camp"%string
@@ -470,7 +461,7 @@ Section CompDriver.
     | Dv_nnrc_core _ => L_nnrc_core
     | Dv_nnrc _ => L_nnrc
     | Dv_nnrcmr _ => L_nnrcmr
-    | Dv_rule _ => L_rule
+    | Dv_camp_rule _ => L_camp_rule
     | Dv_tech_rule _ => L_tech_rule
     | Dv_designer_rule _ => L_designer_rule
     | Dv_camp _ => L_camp
@@ -597,13 +588,10 @@ Section CompDriver.
     | Dv_nnrcmr_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
     end.
 
-  Definition driver_length_rule (dv: rule_driver) :=
+  Definition driver_length_camp_rule (dv: camp_rule_driver) :=
     match dv with
-    | Dv_rule_stop => 1
-    | Dv_rule_to_camp dv => 1 + driver_length_camp dv
-    | Dv_rule_to_nraenv_core dv => 1 + driver_length_nraenv_core dv
-    | Dv_rule_to_nraenv dv => 1 + driver_length_nraenv dv
-    | Dv_rule_to_nra dv => 1 + driver_length_nra dv
+    | Dv_camp_rule_stop => 1
+    | Dv_camp_rule_to_camp dv => 1 + driver_length_camp dv
     end.
 
   Definition driver_length_tech_rule (dv: tech_rule_driver) :=
@@ -638,7 +626,7 @@ Section CompDriver.
 
   Definition driver_length (dv: driver)  :=
     match dv with
-    | Dv_rule dv => driver_length_rule dv
+    | Dv_camp_rule dv => driver_length_camp_rule dv
     | Dv_tech_rule dv => driver_length_tech_rule dv
     | Dv_designer_rule dv => driver_length_designer_rule dv
     | Dv_camp dv => driver_length_camp dv
@@ -888,25 +876,16 @@ Section CompDriver.
     in
     (Q_nnrcmr q) :: queries.
 
-  Definition compile_rule (dv: rule_driver) (q: rule) : list query :=
+  Definition compile_camp_rule (dv: camp_rule_driver) (q: camp_rule) : list query :=
     let queries :=
         match dv with
-        | Dv_rule_stop => nil
-        | Dv_rule_to_camp dv =>
-          let q := rule_to_camp q in
+        | Dv_camp_rule_stop => nil
+        | Dv_camp_rule_to_camp dv =>
+          let q := camp_rule_to_camp q in
           compile_camp dv q
-        | Dv_rule_to_nraenv_core dv =>
-          let q := rule_to_nraenv_core q in
-          compile_nraenv_core dv q
-        | Dv_rule_to_nraenv dv =>
-          let q := rule_to_nraenv q in
-          compile_nraenv dv q
-        | Dv_rule_to_nra dv =>
-          let q := rule_to_nra q in
-          compile_nra dv q
         end
     in
-    (Q_rule q) :: queries.
+    (Q_camp_rule q) :: queries.
 
   Definition compile_tech_rule (dv: tech_rule_driver) (q: tech_rule) : list query :=
     let queries :=
@@ -965,7 +944,7 @@ Section CompDriver.
 
   Definition compile (dv: driver) (q: query) : list query :=
     match (dv, q) with
-    | (Dv_rule dv, Q_rule q) => compile_rule dv q
+    | (Dv_camp_rule dv, Q_camp_rule q) => compile_camp_rule dv q
     | (Dv_tech_rule dv, Q_tech_rule q) => compile_tech_rule dv q
     | (Dv_designer_rule dv, Q_designer_rule q) => compile_designer_rule dv q
     | (Dv_camp dv, Q_camp q) => compile_camp dv q
@@ -997,13 +976,13 @@ Section CompDriver.
   Section CompDriverConfig.
   Definition push_translation config lang dv :=
     match lang with
-    | L_rule =>
+    | L_camp_rule =>
       match dv with
-      | Dv_camp dv => Dv_rule (Dv_rule_to_camp dv)
-      | Dv_nraenv_core dv => Dv_rule (Dv_rule_to_nraenv_core dv)
-      | Dv_nraenv dv => Dv_rule (Dv_rule_to_nraenv dv)
-      | Dv_nra dv => Dv_rule (Dv_rule_to_nra dv)
-      | Dv_rule _
+      | Dv_camp dv => Dv_camp_rule (Dv_camp_rule_to_camp dv)
+      | Dv_nraenv_core _
+      | Dv_nraenv _
+      | Dv_nra _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_oql _
@@ -1030,7 +1009,7 @@ Section CompDriver.
       | Dv_nraenv_core _
       | Dv_nraenv _
       | Dv_nra _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_oql _
@@ -1057,7 +1036,7 @@ Section CompDriver.
       | Dv_nraenv_core _
       | Dv_nraenv _
       | Dv_nra _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_oql _
@@ -1083,7 +1062,7 @@ Section CompDriver.
       | Dv_nraenv_core dv => Dv_camp (Dv_camp_to_nraenv_core dv)
       | Dv_nraenv dv => Dv_camp (Dv_camp_to_nraenv dv)
       | Dv_nra dv => Dv_camp (Dv_camp_to_nra dv)
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1108,7 +1087,7 @@ Section CompDriver.
     | L_oql =>
       match dv with
       | Dv_nraenv dv => Dv_oql (Dv_oql_to_nraenv dv)
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1135,7 +1114,7 @@ Section CompDriver.
   | L_sql =>
       match dv with
       | Dv_nraenv dv => Dv_sql (Dv_sql_to_nraenv dv)
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1162,7 +1141,7 @@ Section CompDriver.
     | L_lambda_nra =>
       match dv with
       | Dv_nraenv dv => Dv_lambda_nra (Dv_lambda_nra_to_nraenv dv)
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1192,7 +1171,7 @@ Section CompDriver.
       | Dv_nraenv_core dv => Dv_nra (Dv_nra_to_nraenv_core dv)
       | Dv_nra dv => Dv_nra (Dv_nra_optim (get_optim_config L_nra config.(comp_optim_config)) dv)
       | Dv_nraenv _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1219,7 +1198,7 @@ Section CompDriver.
       | Dv_nra dv => Dv_nraenv_core (Dv_nraenv_core_to_nra dv)
       | Dv_nraenv_core dv => Dv_nraenv_core (Dv_nraenv_core_optim (get_optim_config L_nraenv_core config.(comp_optim_config)) dv)
       | Dv_nraenv dv => Dv_nraenv_core (Dv_nraenv_core_to_nraenv dv)
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1247,7 +1226,7 @@ Section CompDriver.
       | Dv_nnrc dv => Dv_nraenv (Dv_nraenv_to_nnrc dv)
       | Dv_nra _
       | Dv_nnrc_core _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1277,7 +1256,7 @@ Section CompDriver.
       | Dv_dnnrc_dataset _
       | Dv_javascript _
       | Dv_java _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_oql _
@@ -1304,7 +1283,7 @@ Section CompDriver.
       | Dv_nnrc_core dv => Dv_nnrc (Dv_nnrc_to_nnrc_core dv)
       | Dv_camp _
       | Dv_nraenv _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_oql _
@@ -1330,7 +1309,7 @@ Section CompDriver.
       | Dv_nnrcmr dv => Dv_nnrcmr (Dv_nnrcmr_optim dv)
       | Dv_nraenv _
       | Dv_nnrc_core _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1352,7 +1331,7 @@ Section CompDriver.
       match dv with
       | Dv_cloudant dv => Dv_cldmr (Dv_cldmr_to_cloudant config.(comp_qname) config.(comp_brand_rel) dv)
       | Dv_nraenv _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1381,7 +1360,7 @@ Section CompDriver.
           Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (tdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_dnnrc_dataset _
       | Dv_nraenv _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1410,7 +1389,7 @@ Section CompDriver.
       | Dv_dnnrc_typed_dataset dv =>
         Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv)
       | Dv_nraenv _
-      | Dv_rule _
+      | Dv_camp_rule _
       | Dv_tech_rule _
       | Dv_designer_rule _
       | Dv_camp _
@@ -1444,7 +1423,7 @@ Section CompDriver.
 
   Definition driver_of_language lang :=
     match lang with
-    | L_rule => Dv_rule Dv_rule_stop
+    | L_camp_rule => Dv_camp_rule Dv_camp_rule_stop
     | L_tech_rule => Dv_tech_rule Dv_tech_rule_stop
     | L_designer_rule => Dv_designer_rule Dv_designer_rule_stop
     | L_camp => Dv_camp Dv_camp_stop
@@ -1480,18 +1459,6 @@ Section CompDriver.
     | nil => Dv_error "Empty compilation path"
     | target :: rev_path =>
         driver_of_rev_path config (driver_of_language target) rev_path
-    end.
-
-  Definition fix_driver dv q :=
-    match (dv, q) with
-    | (Dv_rule (Dv_rule_to_camp dv), Q_camp q) => Dv_camp dv
-    | (Dv_rule (Dv_rule_to_nraenv_core dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv_core dv)
-    | (Dv_rule (Dv_rule_to_nraenv dv), Q_camp q) => Dv_camp (Dv_camp_to_nraenv dv)
-    | (Dv_rule (Dv_rule_to_nra dv), Q_camp q) => Dv_camp (Dv_camp_to_nra dv)
-    | (Dv_camp (Dv_camp_to_nraenv_core dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv_core dv)
-    | (Dv_camp (Dv_camp_to_nraenv dv), Q_rule q) => Dv_rule (Dv_rule_to_nraenv dv)
-    | (Dv_camp (Dv_camp_to_nra dv), Q_rule q) => Dv_rule (Dv_rule_to_nra dv)
-    | (_, _) => dv
     end.
 
 
@@ -1583,11 +1550,8 @@ Section CompDriver.
 
   Definition pop_transition dv : language * option driver :=
     match dv with
-    | Dv_rule (Dv_rule_stop) => (L_rule, None)
-    | Dv_rule (Dv_rule_to_camp dv) => (L_rule, Some (Dv_camp dv))
-    | Dv_rule (Dv_rule_to_nraenv_core dv) => (L_rule, Some (Dv_nraenv_core dv))
-    | Dv_rule (Dv_rule_to_nraenv dv) => (L_rule, Some (Dv_nraenv dv))
-    | Dv_rule (Dv_rule_to_nra dv) => (L_rule, Some (Dv_nra dv))
+    | Dv_camp_rule (Dv_camp_rule_stop) => (L_camp_rule, None)
+    | Dv_camp_rule (Dv_camp_rule_to_camp dv) => (L_camp_rule, Some (Dv_camp dv))
     | Dv_tech_rule (Dv_tech_rule_stop) => (L_tech_rule, None)
     | Dv_tech_rule (Dv_tech_rule_to_camp dv) => (L_tech_rule, Some (Dv_camp dv))
     | Dv_designer_rule (Dv_designer_rule_stop) => (L_designer_rule, None)
@@ -2002,14 +1966,14 @@ Section CompDriver.
     apply target_language_of_driver_is_postfix_cnd.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_rule:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_rule dv))) (Dv_rule dv)).
+  Lemma target_language_of_driver_is_postfix_camp_rule:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp_rule dv))) (Dv_camp_rule dv)).
   Proof.
     destruct dv; simpl; try reflexivity
     ; rewrite target_language_of_driver_equation
     ; simpl
     ;  try solve [eapply is_postfix_plus_one with
-                  (config:=trivial_driver_config) (lang:=L_rule);
+                  (config:=trivial_driver_config) (lang:=L_camp_rule);
                   [apply target_language_of_driver_is_postfix_cnd | | ]; simpl; trivial].
   Qed.
 
@@ -2090,7 +2054,7 @@ Section CompDriver.
          target_language_of_driver_is_postfix_nnrc_core
          target_language_of_driver_is_postfix_nnrc
          target_language_of_driver_is_postfix_nnrcmr
-         target_language_of_driver_is_postfix_rule
+         target_language_of_driver_is_postfix_camp_rule
          target_language_of_driver_is_postfix_tech_rule
          target_language_of_driver_is_postfix_designer_rule
          target_language_of_driver_is_postfix_oql
@@ -2212,62 +2176,70 @@ Section CompDriver.
 
     Definition get_path_from_source_target (source:language) (target:language) : list language :=
       match source, target with
-      (* From rule: *)
-      | L_rule, L_rule =>
-        L_rule
+      (* From camp_rule: *)
+      | L_camp_rule, L_camp_rule =>
+        L_camp_rule
           :: nil
-      | L_rule, L_camp =>
-        L_rule
+      | L_camp_rule, L_camp =>
+        L_camp_rule
           :: L_camp
           :: nil
-      | L_rule, L_nra =>
-        L_rule
+      | L_camp_rule, L_nra =>
+        L_camp_rule
+          :: L_camp
           :: L_nra
           :: L_nra
           :: nil
-      | L_rule, L_nraenv_core =>
-        L_rule
+      | L_camp_rule, L_nraenv_core =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv_core
           :: L_nraenv_core
           :: nil
-      | L_rule, L_nraenv =>
-        L_rule
+      | L_camp_rule, L_nraenv =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: nil
-      | L_rule, L_nnrc_core =>
-        L_rule
+      | L_camp_rule, L_nnrc_core =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_nnrc_core
           :: nil
-      | L_rule, L_nnrc =>
-        L_rule
+      | L_camp_rule, L_nnrc =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: nil
-      | L_rule, L_javascript =>
-        L_rule
+      | L_camp_rule, L_javascript =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_javascript
           :: nil
-      | L_rule, L_java =>
-        L_rule
+      | L_camp_rule, L_java =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_java
           :: nil
-      | L_rule, L_nnrcmr =>
-        L_rule
+      | L_camp_rule, L_nnrcmr =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2275,8 +2247,9 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_nnrcmr
           :: nil
-      | L_rule, L_spark_rdd =>
-        L_rule
+      | L_camp_rule, L_spark_rdd =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2285,8 +2258,9 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_spark_rdd
           :: nil
-      | L_rule, L_cldmr =>
-        L_rule
+      | L_camp_rule, L_cldmr =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2295,8 +2269,9 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: nil
-      | L_rule, L_cloudant =>
-        L_rule
+      | L_camp_rule, L_cloudant =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2306,16 +2281,18 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_rule, L_dnnrc_dataset =>
-        L_rule
+      | L_camp_rule, L_dnnrc_dataset =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
           :: L_dnnrc_dataset
           :: nil
-      | L_rule, L_dnnrc_typed_dataset =>
-        L_rule
+      | L_camp_rule, L_dnnrc_typed_dataset =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -2324,8 +2301,9 @@ Section CompDriver.
           :: L_dnnrc_typed_dataset
           :: L_dnnrc_typed_dataset
           :: nil
-      | L_rule, L_spark_dataset =>
-        L_rule
+      | L_camp_rule, L_spark_dataset =>
+        L_camp_rule
+          :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -4087,14 +4065,14 @@ Section CompDriver.
   Hint Resolve exists_path_from_source_target_completeness_nnrc : exists_path_hints.
   Hint Resolve exists_path_from_source_target_completeness_nnrcmr : exists_path_hints.
 
-  Lemma exists_path_from_source_target_completeness_rule :
+  Lemma exists_path_from_source_target_completeness_camp_rule :
     (forall dv,
-        exists_path_from_source_target L_rule (target_language_of_driver (Dv_rule dv))).
+        exists_path_from_source_target L_camp_rule (target_language_of_driver (Dv_camp_rule dv))).
   Proof.
     destruct dv; prove_exists_path_complete.
   Qed.
 
-  Hint Resolve exists_path_from_source_target_completeness_rule : exists_path_hints.
+  Hint Resolve exists_path_from_source_target_completeness_camp_rule : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_tech_rule :
     (forall dv,
@@ -4169,10 +4147,10 @@ Section CompDriver.
       end.
 
   (* Used in CompTest: *)
-  Definition rule_to_nraenv_optim (q: rule) : nraenv :=
-    nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q)).
-  Definition rule_to_nnrc_optim (q: rule) : nnrc :=
-    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q)))).
+  Definition camp_rule_to_nraenv_optim (q: camp_rule) : nraenv :=
+    nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q))).
+  Definition camp_rule_to_nnrc_optim (q: camp_rule) : nnrc :=
+    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q))))).
 
   (* Used in CALib: *)
   Definition nraenv_optim_to_nnrc_optim (q:nraenv) : nnrc :=
@@ -4183,17 +4161,17 @@ Section CompDriver.
     nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)))).
 
   (* Used in queryTests: *)
-  Definition rule_to_nraenv_to_nnrc_optim (q:rule) : nnrc :=
-    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q)))).
-  Definition rule_to_nraenv_to_nnrc_optim_to_dnnrc
-             (inputs_loc:vdbindings) (q:rule) : dnnrc_dataset :=
-    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
-  Definition rule_to_nraenv_to_nnrc_optim_to_javascript (q:rule) : string :=
-    nnrc_to_javascript (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (rule_to_nraenv_core q))))).
-  Definition rule_to_nnrcmr (inputs_loc:vdbindings) (q:rule) : nnrcmr :=
-    nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (rule_to_nraenv_to_nnrc_optim q)).
-  Definition rule_to_cldmr (h:list (string*string)) (inputs_loc:vdbindings) (q:rule) : cldmr :=
-    nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (rule_to_nraenv_to_nnrc_optim q))).
+  Definition camp_rule_to_nraenv_to_nnrc_optim (q:camp_rule) : nnrc :=
+    nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q))))).
+  Definition camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc
+             (inputs_loc:vdbindings) (q:camp_rule) : dnnrc_dataset :=
+    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
+  Definition camp_rule_to_nraenv_to_nnrc_optim_to_javascript (q:camp_rule) : string :=
+    nnrc_to_javascript (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
+  Definition camp_rule_to_nnrcmr (inputs_loc:vdbindings) (q:camp_rule) : nnrcmr :=
+    nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (camp_rule_to_nraenv_to_nnrc_optim q)).
+  Definition camp_rule_to_cldmr (h:list (string*string)) (inputs_loc:vdbindings) (q:camp_rule) : cldmr :=
+    nnrcmr_to_cldmr h (nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (camp_rule_to_nraenv_to_nnrc_optim q))).
 
 
   (* *)
@@ -4226,7 +4204,7 @@ Section CompDriver.
 
   Definition remove_source_optim path :=
     match path with
-    | L_rule :: L_rule :: path => L_rule :: path
+    | L_camp_rule :: L_camp_rule :: path => L_camp_rule :: path
     | L_camp :: L_camp :: path => L_camp :: path
     | L_oql :: L_oql :: path => L_oql :: path
     | L_sql :: L_sql :: path => L_sql :: path

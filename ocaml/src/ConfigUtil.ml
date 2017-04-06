@@ -49,12 +49,12 @@ let change_target conf s = conf.tlang <- Some s
 let get_source_lang_caco conf =
   begin match get_source_lang conf with
   | Some s -> s
-  | None -> "rule"
+  | None -> "camp_rule"
   end
 let get_source_lang_caev conf =
   begin match get_source_lang conf with
   | Some s -> s
-  | None -> "rule"
+  | None -> "camp_rule"
   end
 
 let get_target_lang_caco conf =
@@ -65,7 +65,7 @@ let get_target_lang_caco conf =
 let get_target_lang_caev conf =
   begin match get_target_lang conf with
   | Some s -> s
-  | None -> "rule"
+  | None -> "camp_rule"
   end
 
 
@@ -76,7 +76,7 @@ let get_path conf = conf.path
 let get_cld_config conf = conf.cld_conf
 
 (* Target language *)
-let suffix_rule () = "_rule.camp"
+let suffix_camp_rule () = "_rule.camp"
 let suffix_tech_rule () = "_arl.txt"
 let suffix_designer_rule () = "_sem.txt"
 let suffix_camp () = "_camp.camp"
@@ -113,7 +113,7 @@ let suffix_sdata () = ".sio"
 
 let suffix_of_language lang =
   match lang with
-  | Compiler.L_rule -> suffix_rule ()
+  | Compiler.L_camp_rule -> suffix_camp_rule ()
   | Compiler.L_camp -> suffix_camp ()
   | Compiler.L_tech_rule -> suffix_tech_rule ()
   | Compiler.L_designer_rule -> suffix_designer_rule ()

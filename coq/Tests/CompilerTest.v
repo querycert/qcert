@@ -111,8 +111,8 @@ Section CompilerUntypedTest.
   Definition algopt5 : nraenv_core := camp_to_nraenv_core Example1'.
   
   Definition rpat5 : rule := Eval compute in Example1.
-  Definition ralgopt5 : nraenv := rule_to_nraenv_optim Example1.
-  Definition rnnrc5 : nnrc := rule_to_nnrc_optim Example1.
+  Definition ralgopt5 : nraenv := camp_rule_to_nraenv_optim Example1.
+  Definition rnnrc5 : nnrc := camp_rule_to_nnrc_optim Example1.
   
   Definition inp1 : (list (string*data)) := (("WORLD", dcoll exampleWM)::nil).
   Definition inp2 : data := dunit.

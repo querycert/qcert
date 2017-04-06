@@ -52,7 +52,7 @@ let compile source_lang_s target_lang_s q_s =
 
 let global_config_of_json j =
   let gconf =
-    { gconf_source = Compiler.L_rule;
+    { gconf_source = Compiler.L_camp_rule;
       gconf_target = Compiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;

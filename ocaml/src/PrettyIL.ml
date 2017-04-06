@@ -1139,7 +1139,7 @@ let pretty_query pconf q =
   let margin = pconf.margin in
   let annot = pconf.type_annotations in
   begin match q with
-  | Compiler.Q_rule q -> "(* There is no rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_camp_rule q -> "(* There is no camp rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_tech_rule q -> "(* There is no tech rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_designer_rule q -> "(* There is no designer pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)

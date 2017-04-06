@@ -30,7 +30,7 @@ Module QLang(runtime:CompilerRuntime).
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 
-    Definition rule := rule.
+    Definition camp_rule := camp_rule.
     Definition tech_rule := tech_rule.
     Definition designer_rule := designer_rule.
     Definition camp := camp.

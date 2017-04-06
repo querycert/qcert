@@ -104,16 +104,6 @@ Section TCAMPtocNRAEnv.
     apply cnraenv_of_pat_type_preserve; eauto.
   Qed.
 
-  Require Import TRule RuletocNRAEnv.
-
-  Theorem cnraenv_of_rule_type_preserve τworld τout r :
-    @rule_type m τworld τout r ->
-    cnraenv_of_rule r ▷ Unit >=> Coll τout ⊣  (mkTWorld τworld);(Rec Closed nil eq_refl).
-    Proof.
-      unfold rule_type; intros.
-      apply cnraenv_of_pat_type_preserve; trivial.
-    Qed.
-
 End TCAMPtocNRAEnv.
 
 (* 

@@ -235,9 +235,6 @@ MODULES = \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \
-	Translation/RuletoNRA \
-	Translation/RuletocNRAEnv \
-	Translation/RuletoNRAEnv \
 	Translation/TNRAtocNNRC \
 	Translation/TcNRAEnvtocNNRC \
 	Translation/TcNNRCtoCAMP \
