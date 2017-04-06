@@ -34,10 +34,16 @@ interface PuzzleSides {
             worker.terminate();
             worker = null;
             if (executing != null && executingCanvas != null) {
-                executing.setText("[ Execution terminated ]");
-                executingCanvas.renderAll();
+                ensureFit(executingCanvas, executing, "[ Execution terminated ]");
             }
         }
+    }
+
+    function ensureFit(canvas:fabric.ICanvas, text:fabric.IText, newText:string) {
+        text.setText(newText);
+        canvas.setHeight(text.getHeight());
+        canvas.setWidth(text.getWidth());
+        canvas.renderAll();
     }
 
     function getSourceLeft(left:number):number {
@@ -1931,22 +1937,19 @@ class CompileTab extends ICanvasTab {
 		const srcInput = getSrcInput();
         const schemaInput = getSchemaInput();
 
-        const compiling = new fabric.Text("[ Compiling query ]", {
-                left: 10, top: 5, width:200, height:500, fill:'purple'
-            });
-        const theCanvas = this.canvas; // make visible in handler
+        const compiling = new fabric.Text("[ Compiling query ]");
+        const theCanvas = this.canvas;
         theCanvas.add(compiling);
+        theCanvas.renderAll();
 
         if (srcInput.length == 0) {
-            compiling.setText("ERROR: Query source has not been specified");
-            this.canvas.renderAll();
+            ensureFit(theCanvas, compiling, "[ Query contents have not been specified ]");
             return;
         }
 
         const path = langs.map(x => x.id);
-		if(path.length <= 2) {
-            compiling.setText("[ No source and target language specified ]");
-            theCanvas.renderAll();
+		if (path.length <= 2) {
+            ensureFit(theCanvas, compiling, "[ No source and/or target language specified ]");
 			return;
 		}
 
@@ -1954,8 +1957,7 @@ class CompileTab extends ICanvasTab {
         
         const handler = function(resultPack: QcertResult) {
             compiledQuery = resultPack.result;
-            compiling.setText(compiledQuery);
-            theCanvas.renderAll();
+            ensureFit(theCanvas, compiling, compiledQuery);
         }
         
 		qcertPreCompile({
@@ -2002,66 +2004,69 @@ class ExecTab extends ICanvasTab {
         const langs = getPipelineLangs();
         const path = langs.map(x => x.id);
 
-        executing = new fabric.Text("[ Executing query ]", {
-                left: 10, top: 35, width:200, height:500, fill:'purple'
-            });
+        executing = new fabric.Text("[ Executing query ]");
         this.canvas.add(executing);
         if (path.length <= 2) {
-            executing.setText("ERROR: no source and target languages were specified");  
-            this.canvas.renderAll();
+            ensureFit(this.canvas, executing, "[ No source and/or target language specified ]");
             return;
         }
-        document.getElementById("execute-tab-button-area").style.display = "block";            
 
-        const target = langs[langs.length-1].id;
-        const srcInput = getSrcInput();
-        const schemaInput = getSchemaInput();
         const dataInput = getIOInput();
+        if (dataInput.length == 0) {
+            ensureFit(this.canvas, executing, "[ No input data specified ]");
+            return;
+        }
         
+        // expose the kill button
+        document.getElementById("kill-button").style.display = "block";
+        
+        // Additional inputs
+        const target = langs[langs.length-1].id;
+        const schemaInput = getSchemaInput();
+        
+        // Handle according to target language            
         if (target != "js")
-            this.compileForEval(path, executing, srcInput, schemaInput, dataInput);
+            // TODO the kill button is ineffective for this case
+            this.compileForEval(path, executing, getSrcInput(), schemaInput, dataInput);
         else
             this.performJsEvaluation(dataInput, schemaInput);
+
+        // hide the kill button
+        document.getElementById("kill-button").style.display = "none";
     }
     
     performJsEvaluation(inputString:string, schemaText:string) {
         if (compiledQuery == null) {
-            executing.setText("ERROR: Query has not been compiled");
-            this.canvas.renderAll();
+            ensureFit(this.canvas, executing, "[ The query has not been compiled ]");
             return;
         }
-        
+    
         // Processing is delegated to a web-worker
         try {
             // Worker variable is global (also executing and executingCanvas), making it (them) accessible to the killButton() function
             worker = new Worker("evalWorker.js");
             executingCanvas = this.canvas;
             worker.onmessage = function(e) {
-                executing.setText(e.data);
-                executingCanvas.renderAll();
+                ensureFit(executingCanvas, executing, e.data);
             }
             worker.onerror = function(e) {
-                executing.setText(e.message);
-                executingCanvas.renderAll();
+                ensureFit(executingCanvas, executing, e.message);
             }
             worker.postMessage([inputString, schemaText, compiledQuery]);
         } catch (err) {
-            executing.setText(err.message);
-            this.canvas.renderAll();
+            ensureFit(this.canvas, executing, err.message);
         }
     }
 
     compileForEval(path:string[], executing:any, srcInput:string, schemaInput:string, dataInput:string) {
         if (srcInput.length == 0) {
-            executing.setText("ERROR: Query source has not been specified");
-            this.canvas.renderAll();
+            ensureFit(this.canvas, executing, "[ Query contents have not been specified ]");
             return;
         }
         
         const theCanvas = this.canvas;
         var handler = function(compilationResult: QcertResult) {
-            executing.setText(compilationResult.eval);
-            theCanvas.renderAll();
+            ensureFit(theCanvas, executing, compilationResult.eval);
         }
         const middlePath = path.slice(1,-1);
         qcertPreCompile({   
