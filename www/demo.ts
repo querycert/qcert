@@ -23,26 +23,38 @@ interface PuzzleSides {
 	let totalCanvasWidth = 1000;
 
 // global variables
+    // The compiled query ... passes from compile tab to execution tab
     var compiledQuery:string = null;
+    // The web-worker that is actively running a query or null.  The kill button should only be visible when this is non-null.
     var worker:Worker = null;
-    var executing:any = null;
-    var executingCanvas:any = null;
+    // The textarea of the execution tab.  This persists even when the execution tab is showing.
+    var executing:fabric.IText = null;
+    // The (main) canvas when the execution tab is showing, null when it is not showing
+    var executingCanvas:fabric.ICanvas = null;
 
 // Functions
     function killButton() {
         if (worker != null) {
             worker.terminate();
             worker = null;
-            if (executing != null && executingCanvas != null) {
-                ensureFit(executingCanvas, executing, "[ Execution terminated ]");
-            }
+            // We only display a termination message when the execution tab is showing
+            if (executingCanvas != null && executing != null)
+                ensureTextFit(executingCanvas, executing, "[ Execution terminated ]");
+            // But we clear the kill button in any case
+            document.getElementById("kill-button").style.display = "none";
         }
     }
 
-    function ensureFit(canvas:fabric.ICanvas, text:fabric.IText, newText:string) {
+    function ensureTextFit(canvas:fabric.ICanvas, text:fabric.IText, newText:string) {
         text.setText(newText);
-        canvas.setHeight(text.getHeight());
-        canvas.setWidth(text.getWidth());
+        const textHeight = text.getHeight();
+        const textWidth = text.getWidth();
+        const canvasHeight = canvas.getHeight();
+        const canvasWidth = canvas.getWidth();
+        if (textHeight > canvasHeight)
+            canvas.setHeight(textHeight);
+        if (textWidth > canvasWidth)
+        canvas.setWidth(textWidth);
         canvas.renderAll();
     }
 
@@ -1902,6 +1914,9 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 }
 
 class CompileTab extends ICanvasTab {
+    widthAtEntry:number;
+    heightAtEntry:number;
+    textArea:fabric.IText;
 
 	static make(canvas:fabric.ICanvas) {
 		return new CompileTab(canvas);
@@ -1909,7 +1924,10 @@ class CompileTab extends ICanvasTab {
 
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
+        this.textArea = new fabric.Text("");
+        console.log("A new CompileTab was made");
 	}
+    
 	getLabel() {
 		return "Compile";
 	}
@@ -1937,27 +1955,27 @@ class CompileTab extends ICanvasTab {
 		const srcInput = getSrcInput();
         const schemaInput = getSchemaInput();
 
-        const compiling = new fabric.Text("[ Compiling query ]");
-        const theCanvas = this.canvas;
-        theCanvas.add(compiling);
-        theCanvas.renderAll();
-
-        if (srcInput.length == 0) {
-            ensureFit(theCanvas, compiling, "[ Query contents have not been specified ]");
-            return;
-        }
+        const theCanvas = this.canvas; // put in context for handlers
+        const theTextArea = this.textArea;
+        this.widthAtEntry = theCanvas.getWidth();
+        this.heightAtEntry = theCanvas.getHeight();
+        theCanvas.add(theTextArea);
 
         const path = langs.map(x => x.id);
-		if (path.length <= 2) {
-            ensureFit(theCanvas, compiling, "[ No source and/or target language specified ]");
-			return;
-		}
+        if (path.length <= 2) {
+            ensureTextFit(theCanvas, theTextArea, "[ No source and/or target language specified ]");
+            return;
+        } else if (srcInput.length == 0) {
+            ensureTextFit(theCanvas, theTextArea, "[ Query contents have not been specified ]");
+            return;
+        } else
+            ensureTextFit(theCanvas, theTextArea, "[ Compiling query ]");
 
 		const middlePath = path.slice(1,-1);
         
         const handler = function(resultPack: QcertResult) {
             compiledQuery = resultPack.result;
-            ensureFit(theCanvas, compiling, compiledQuery);
+            ensureTextFit(theCanvas, theTextArea, compiledQuery);
         }
         
 		qcertPreCompile({
@@ -1975,9 +1993,17 @@ class CompileTab extends ICanvasTab {
             input:undefined
 		  }, handler); 
 	}
+    
+    hide() {
+        this.canvas.setWidth(this.widthAtEntry);
+        this.canvas.setHeight(this.heightAtEntry);
+        this.canvas.remove(this.textArea);
+    }
 }
 
 class ExecTab extends ICanvasTab {
+    widthAtEntry:number;
+    heightAtEntry:number;
 
     static make(canvas:fabric.ICanvas) {
         return new ExecTab(canvas);
@@ -1985,6 +2011,10 @@ class ExecTab extends ICanvasTab {
 
     constructor(canvas:fabric.ICanvas) {
         super(canvas);
+        // The 'executing' TextArea is kept global to make it accessible to the kill button.  We make it here just to keep the related
+        // initialization together.
+        if (executing == null)
+            executing = new fabric.Text("");
     }
 
     getLabel() {
@@ -2004,21 +2034,32 @@ class ExecTab extends ICanvasTab {
         const langs = getPipelineLangs();
         const path = langs.map(x => x.id);
 
-        executing = new fabric.Text("[ Executing query ]");
+        this.widthAtEntry = this.canvas.getWidth();
+        this.heightAtEntry = this.canvas.getHeight();
         this.canvas.add(executing);
+        
+        if (worker != null) {
+            ensureTextFit(this.canvas, executing, " [ A previous query is still executing and must be killed in order to execute a new one ]");
+            return;
+        }
+
         if (path.length <= 2) {
-            ensureFit(this.canvas, executing, "[ No source and/or target language specified ]");
+            ensureTextFit(this.canvas, executing, "[ No source and/or target language specified ]");
             return;
         }
 
         const dataInput = getIOInput();
         if (dataInput.length == 0) {
-            ensureFit(this.canvas, executing, "[ No input data specified ]");
+            ensureTextFit(this.canvas, executing, "[ No input data specified ]");
             return;
         }
         
+        ensureTextFit(this.canvas, executing, "[ Executing query ]");
+        
         // expose the kill button
         document.getElementById("kill-button").style.display = "block";
+        // Indicate that this tab is active in case the button is pressed (the button can outlive the tab)
+        executingCanvas = this.canvas;
         
         // Additional inputs
         const target = langs[langs.length-1].id;
@@ -2027,17 +2068,21 @@ class ExecTab extends ICanvasTab {
         // Handle according to target language            
         if (target != "js")
             // TODO the kill button is ineffective for this case
-            this.compileForEval(path, executing, getSrcInput(), schemaInput, dataInput);
+            this.compileForEval(path, getSrcInput(), schemaInput, dataInput);
         else
             this.performJsEvaluation(dataInput, schemaInput);
-
-        // hide the kill button
-        document.getElementById("kill-button").style.display = "none";
+    }
+    
+    hide() {
+        this.canvas.setWidth(this.widthAtEntry);
+        this.canvas.setHeight(this.heightAtEntry);
+        this.canvas.remove(executing);
+        executingCanvas = null;
     }
     
     performJsEvaluation(inputString:string, schemaText:string) {
         if (compiledQuery == null) {
-            ensureFit(this.canvas, executing, "[ The query has not been compiled ]");
+            ensureTextFit(this.canvas, executing, "[ The query has not been compiled ]");
             return;
         }
     
@@ -2045,28 +2090,35 @@ class ExecTab extends ICanvasTab {
         try {
             // Worker variable is global (also executing and executingCanvas), making it (them) accessible to the killButton() function
             worker = new Worker("evalWorker.js");
-            executingCanvas = this.canvas;
+            const workerComplete = this.workerComplete;
+            const theCanvas = this.canvas;
             worker.onmessage = function(e) {
-                ensureFit(executingCanvas, executing, e.data);
+                workerComplete(e.data, theCanvas);
             }
             worker.onerror = function(e) {
-                ensureFit(executingCanvas, executing, e.message);
+                workerComplete(e.message, theCanvas);
             }
             worker.postMessage([inputString, schemaText, compiledQuery]);
         } catch (err) {
-            ensureFit(this.canvas, executing, err.message);
+            this.workerComplete(err.message, this.canvas);
         }
     }
+    
+    workerComplete(text:string, canvas:fabric.ICanvas) {
+        ensureTextFit(canvas, executing, text);
+        document.getElementById("kill-button").style.display = "none";
+        worker = null;
+    }    
 
-    compileForEval(path:string[], executing:any, srcInput:string, schemaInput:string, dataInput:string) {
+    compileForEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) {
         if (srcInput.length == 0) {
-            ensureFit(this.canvas, executing, "[ Query contents have not been specified ]");
+            ensureTextFit(this.canvas, executing, "[ Query contents have not been specified ]");
             return;
         }
         
         const theCanvas = this.canvas;
         var handler = function(compilationResult: QcertResult) {
-            ensureFit(theCanvas, executing, compilationResult.eval);
+            ensureTextFit(theCanvas, executing, compilationResult.eval);
         }
         const middlePath = path.slice(1,-1);
         qcertPreCompile({   
