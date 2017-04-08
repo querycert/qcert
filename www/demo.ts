@@ -2065,27 +2065,12 @@ class ExecTab extends ICanvasTab {
         const target = langs[langs.length-1].id;
         const schemaInput = getSchemaInput();
         
-        // Handle according to target language            
-        if (target != "js")
-            // TODO the kill button is ineffective for this case
-            this.compileForEval(path, getSrcInput(), schemaInput, dataInput);
-        else
-            this.performJsEvaluation(dataInput, schemaInput);
-    }
-    
-    hide() {
-        this.canvas.setWidth(this.widthAtEntry);
-        this.canvas.setHeight(this.heightAtEntry);
-        this.canvas.remove(executing);
-        executingCanvas = null;
-    }
-    
-    performJsEvaluation(inputString:string, schemaText:string) {
-        if (compiledQuery == null) {
-            ensureTextFit(this.canvas, executing, "[ The query has not been compiled ]");
+        // Setup to handle according to target language
+        const arg:any = target == "js" ? this.setupJsEval(dataInput, schemaInput) : 
+            this.setupQcertEval(path, getSrcInput(), schemaInput, dataInput);
+        if (arg == null) // error already detected and indicated
             return;
-        }
-    
+
         // Processing is delegated to a web-worker
         try {
             // Worker variable is global (also executing and executingCanvas), making it (them) accessible to the killButton() function
@@ -2098,10 +2083,27 @@ class ExecTab extends ICanvasTab {
             worker.onerror = function(e) {
                 workerComplete(e.message, theCanvas);
             }
-            worker.postMessage([inputString, schemaText, compiledQuery]);
+            console.log("About to post");
+            console.log(arg);
+            worker.postMessage(arg);
         } catch (err) {
             this.workerComplete(err.message, this.canvas);
         }
+    }
+    
+    hide() {
+        this.canvas.setWidth(this.widthAtEntry);
+        this.canvas.setHeight(this.heightAtEntry);
+        this.canvas.remove(executing);
+        executingCanvas = null;
+    }
+    
+    setupJsEval(inputString:string, schemaText:string) : [string,string,string] {
+        if (compiledQuery == null) {
+            ensureTextFit(this.canvas, executing, "[ The query has not been compiled ]");
+            return null;
+        }
+        return [inputString, schemaText, compiledQuery ];
     }
     
     workerComplete(text:string, canvas:fabric.ICanvas) {
@@ -2110,19 +2112,13 @@ class ExecTab extends ICanvasTab {
         worker = null;
     }    
 
-    compileForEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) {
+    setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) : QcertCompilerConfig {
         if (srcInput.length == 0) {
             ensureTextFit(this.canvas, executing, "[ Query contents have not been specified ]");
-            return;
+            return null;
         }
-        
-        const theCanvas = this.canvas;
-        var handler = function(compilationResult: QcertResult) {
-            ensureTextFit(theCanvas, executing, compilationResult.eval);
-        }
-        const middlePath = path.slice(1,-1);
-        qcertPreCompile({   
-            source:path[0],
+       const middlePath = path.slice(1,-1);
+       return {source:path[0],
             target:path[path.length-1],
             path:middlePath,
             exactpath:true,
@@ -2134,7 +2130,7 @@ class ExecTab extends ICanvasTab {
             schema: schemaInput,
             eval: true,
             input: dataInput
-          }, handler); 
+          };
     }
 }
 

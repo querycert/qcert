@@ -19,15 +19,45 @@
 // even whether it will terminate.  The master thread containing the UI should have a kill button in case evaluation 
 // is going on too long.
 
-// Put all the harness functions at global scope so they are available to the query
-importScripts("../runtime/javascript/qcert-merged-runtime.js");
+// Get dependencies.  We put our merged runtime functions at global scope so they are available to the query
+importScripts("../runtime/javascript/qcert-merged-runtime.js", "qcertPreCompiler.js", "../lib/qcertJS.js");
 
-// Here upon receiving the input text, schema text, compiled query (in string form) from the main thread
+// Here upon receiving the activation message from the main thread.  This has two possible forms.
+// 1.  An array of Strings containing inputText, schemaText, and compiledQuery (requesting Javascript execution).
+// 2.  A QcertCompilerConfig containing invocation arguments for qcert (requesting evaluation of an intermediate language).
 onmessage = function(e) {
+	console.log("Web worker entered") ;
+	console.log(e);
+	// Execute according to what is requested
+	if (Array.isArray(e.data))
+		jsEval(e.data);
+	else
+		qcertEval(e.data);
+}
+
+// qcert intermediate language evaluation
+function qcertEval(inputConfig) {
+	console.log("qcertEval chosen");
+	var handler = function(result) {
+		console.log("Compiler returned");
+		console.log(result);
+		postMessage(result.eval);
+		console.log("reply message posted");
+
+		// Each spawned worker is designed to be used once
+		close();
+	}
+	qcertPreCompile(inputConfig, handler);
+}
+
+// Javascript evaluation
+function jsEval(args) {
+	console.log("jsEval chosen");
+
 	// Unpack the arguments
-	var inputText = e.data[0];
-	var schemaText = e.data[1];
-	var compiledQuery = e.data[2];
+	var inputText = args[0];
+	var schemaText = args[1];
+	var compiledQuery = args[2];
 
 	// Convert input text to an object
 	var io = JSON.parse(inputText);
@@ -57,7 +87,7 @@ onmessage = function(e) {
 
 	// Send the result back
 	postMessage(result);
-	
+
 	// Each spawned worker is designed to be used once
 	close();
 }
