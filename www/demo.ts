@@ -22,22 +22,56 @@ interface PuzzleSides {
 	// we should set canvas width appropriately
 	let totalCanvasWidth = 1000;
 
+    // Value for the 'accept' attribute for schema input (hardwired for now)
+    const schemaAccept = ".json,.schema,.io,.ddl";
+
+    // Value for the 'accept' attribute for non-csv data input (hardwired for now)
+    const dataAccept = ".json,.input,.io,.data";
+
+    // Error message for compile and execute tab when the source and target languages are not specified
+    const sourceAndTargetRequired = "[ Both source and target languages must specified ]";
+
+    // Error message for compile and execute (non-javascript) tab when the source and target languages are specified but the query src is not
+    const noQuerySrc = "[ Query contents have not been specified ]";
+
 // global variables
-    // The compiled query ... passes from compile tab to execution tab
+    // The compiled query ... passes from compile tab to execution tab when target language is javascript
     var compiledQuery:string = null;
     // The web-worker that is actively running a query or null.  The kill button should only be visible when this is non-null.
     var worker:Worker = null;
-    // The textarea of the execution tab.  This persists even when the execution tab is showing.
+    // The textarea of the execution tab.  Once created, this persists even when the execution tab is not showing.
     var executing:fabric.IText = null;
-    // The (main) canvas when the execution tab is showing, null when it is not showing
+    // The (main) canvas when the execution tab is showing, null when it is not showing.  Allows kill button to update the visible status.
     var executingCanvas:fabric.ICanvas = null;
 
 // Functions
+    // A placeholder to fetch ancillary information not currently in QcertLanguageDescription
+    // TODO integrate this
+    function getSourceLanguageExtraInfo(source:QcertLanguage) : {accept: string, schemaForCompile: boolean} {
+        switch (source) {
+        case "sql":
+            return {accept: ".sql", schemaForCompile: false};
+        case "oql":
+            return {accept: ".oql", schemaForCompile: false};
+        case "lambda_nra":
+            return {accept: ".lnra", schemaForCompile: false};
+        case "tech_rule":
+            return {accept: ".arl", schemaForCompile: true};
+        case "designer_rule":
+            return {accept: ".sem", schemaForCompile: false};
+        case "rule":
+            return {accept: ".rule,.camp", schemaForCompile: false};
+        default:
+            return undefined;
+        }
+    }
+
+    // Executes when the kill button is pressed.  The kill button should only be visible when an execution is running, whether or not the execution tab is showing
     function killButton() {
         if (worker != null) {
             worker.terminate();
             worker = null;
-            // We only display a termination message when the execution tab is showing
+            // We only display a termination message when the execution tab is showing (the message will be updated on the next 'show' otherwise)
             if (executingCanvas != null && executing != null)
                 ensureTextFit(executingCanvas, executing, "[ Execution terminated ]");
             // But we clear the kill button in any case
@@ -45,6 +79,7 @@ interface PuzzleSides {
         }
     }
 
+    // A specialized size ensure function for the compile and execution tabs.  Displays new text and makes sure it 'fits' (might cause scroll bars to appear)
     function ensureTextFit(canvas:fabric.ICanvas, text:fabric.IText, newText:string) {
         text.setText(newText);
         const textHeight = text.getHeight();
@@ -54,7 +89,7 @@ interface PuzzleSides {
         if (textHeight > canvasHeight)
             canvas.setHeight(textHeight);
         if (textWidth > canvasWidth)
-        canvas.setWidth(textWidth);
+            canvas.setWidth(textWidth);
         canvas.renderAll();
     }
 
@@ -1763,6 +1798,9 @@ class InputTab extends ICanvasTab {
 	inputTabElement:HTMLElement;
 	queryInput:HTMLElement;
 	defaultTitleTextElement:Node;
+    queryChooser:HTMLInputElement;
+    schemaChooser:HTMLInputElement;
+    dataChooser:HTMLInputElement;
 
 	static make(canvas:fabric.ICanvas) {
 		return new InputTab(canvas);
@@ -1774,6 +1812,9 @@ class InputTab extends ICanvasTab {
 		this.titleTextElement = document.getElementById("input-tab-lang-title");
 		this.defaultTitleTextElement = <HTMLElement>this.titleTextElement.cloneNode(true);
 		this.queryInput = document.getElementById("input-tab-query-input");
+        this.queryChooser = <HTMLInputElement>document.getElementById("input-tab-query-src-file");
+        this.schemaChooser = <HTMLInputElement>document.getElementById("input-tab-query-schema-file"); 
+        this.dataChooser = <HTMLInputElement>document.getElementById("input-tab-query-io-file");
 	}
 
 	getLabel() {
@@ -1811,6 +1852,11 @@ class InputTab extends ICanvasTab {
 		titleElem.style.textAlign = 'center';
 		titleElem.appendChild(document.createTextNode("Input Language: " + piece.langid + " [" + piece.langdescription + "]"));
 		this.titleTextElement.appendChild(titleElem);
+        const langInfo = getSourceLanguageExtraInfo(piece.langid);
+        this.queryChooser.accept = langInfo.accept;
+        // the following is static for now but set here since it may become dynamic in the future
+        this.schemaChooser.accept = schemaAccept;
+        this.dataChooser.accept = dataAccept;
 	}
 
 	update() {
@@ -1925,7 +1971,6 @@ class CompileTab extends ICanvasTab {
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
         this.textArea = new fabric.Text("");
-        console.log("A new CompileTab was made");
 	}
     
 	getLabel() {
@@ -1963,10 +2008,10 @@ class CompileTab extends ICanvasTab {
 
         const path = langs.map(x => x.id);
         if (path.length <= 2) {
-            ensureTextFit(theCanvas, theTextArea, "[ No source and/or target language specified ]");
+            ensureTextFit(theCanvas, theTextArea, sourceAndTargetRequired);
             return;
         } else if (srcInput.length == 0) {
-            ensureTextFit(theCanvas, theTextArea, "[ Query contents have not been specified ]");
+            ensureTextFit(theCanvas, theTextArea, noQuerySrc);
             return;
         } else
             ensureTextFit(theCanvas, theTextArea, "[ Compiling query ]");
@@ -2044,7 +2089,7 @@ class ExecTab extends ICanvasTab {
         }
 
         if (path.length <= 2) {
-            ensureTextFit(this.canvas, executing, "[ No source and/or target language specified ]");
+            ensureTextFit(this.canvas, executing, sourceAndTargetRequired);
             return;
         }
 
@@ -2114,7 +2159,7 @@ class ExecTab extends ICanvasTab {
 
     setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) : QcertCompilerConfig {
         if (srcInput.length == 0) {
-            ensureTextFit(this.canvas, executing, "[ Query contents have not been specified ]");
+            ensureTextFit(this.canvas, executing, noQuerySrc);
             return null;
         }
        const middlePath = path.slice(1,-1);
