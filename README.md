@@ -6,20 +6,23 @@ http://github.com/querycert/qcert
 
 ## About
 
-This is the source code for the Q\*cert verified query compiler. The
-goal of the project is to develop a state of the art query compiler
-for languages over a rich data model (nested, hierarchical, etc), with
-an implementation which provides strong correctness guarantees.
+This is the source code for the Q\*cert query compiler. The goal of
+the project is to develop a state of the art query compiler for
+languages over a rich data model (nested, hierarchical, etc), with an
+implementation which provides strong correctness guarantees.
 
-Q\*cert is built and verified using the Coq proof assistant. A working
-compiler can be obtained by 'extracting' OCaml code from the source
-in Coq.
+Q\*cert is built and verified using the Coq proof assistant. S
+significant subset of the compiler has been mechanically checked for
+correctness. The core compiler can be obtained by 'extracting' OCaml
+code from the source in Coq.
 
-## Building Q\*cert
+![Q*cert](docs/qcert.jpg)
 
-### Prerequisites
+## Prerequisites
 
-To build Q\*cert from the source, you will need:
+### OCaml and the Coq Proof Assistant
+
+To build Q\*cert from the source, you will need at :
 
  - OCaml 4.02 or later (http://ocaml.org/) along with the following libraries:
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
@@ -28,8 +31,8 @@ To build Q\*cert from the source, you will need:
  - Coq 8.6 (https://coq.inria.fr/)
 
 An easy way to get set up on most platforms is to use the OCaml
-package manager (https://opam.ocaml.org). Once opam is installed, add
-the following libraries:
+package manager (https://opam.ocaml.org). Once opam is installed, you
+can just add the corresponding libraries:
 
 ```
 opam install menhir
@@ -38,9 +41,34 @@ opam install camlp5
 opam install coq.8.6
 ```
 
-One platform that isn't directly supported by the OCaml package
-manager is Windows. We do not currently have detailed instructions for
-how to build on Windows.
+### Java (Recommended)
+
+SQL and ODM rules support, as well as part of the Q*cert runtime are
+written in Java and require a Java compiler (Java 7 or later).
+
+Build for the Java part of the code requires a recent version of ant.
+
+### TypeScript (Optional)
+
+Finally, a Web demo for the compiler is included with the distribution
+and is built using js_of_ocaml and TypeScript.
+
+js_of_ocaml can be installed using opam:
+
+```
+opam install js_of_ocaml
+```
+
+TypeScript can be obtained from (https://www.typescriptlang.org).
+
+### Portability
+
+Q*cert should build on most Linux systems and on MacOS.
+
+Windows isn't directly supported by the OCaml package manager. We do
+not currently have detailed instructions for how to build on Windows.
+
+## Building Q\*cert core
 
 ### Compile Q*cert
 
@@ -91,6 +119,8 @@ $ ./bin/qcert -source oql -target java samples/oql/test1.oql
 ```
 
 This will produce a java file called `samples/oql/test1.java`.
+
+## SQL and JRules support
 
 ## Run compiled queries
 
