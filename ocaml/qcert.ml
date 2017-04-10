@@ -90,8 +90,6 @@ let args_list gconf =
        "<pref> Cloudant DB prefix");
       ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
        "<imports> Additional imports for the Java runtime");
-      (* ("-eval", Arg.Unit XXX, "Evaluate the target query"); *)
-      (* ("-eval-all", Arg.Unit XXX, "Evaluate all the intermediate queries"); *)
       ("-vinit", Arg.String (QcertArg.set_vinit gconf),
        "<init> Set the name init variable for the map-reduce backends");
     ]

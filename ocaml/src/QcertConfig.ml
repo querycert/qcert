@@ -62,7 +62,7 @@ let parse_io f =
 let parse_io_component f =
   begin match f with
   | None -> None
-  | Some f -> Some (ParseFile.parse_io_from_file f)
+  | Some f -> Some (ParseString.parse_io_from_string f)
   end
 
 let parse_io_kind gconf =

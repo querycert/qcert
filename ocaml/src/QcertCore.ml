@@ -55,35 +55,39 @@ let fprint_compilation_path ff gconf =
 (* Parsing *)
 
 let src_and_schema (src: string) (schema: string) = 
-	Format.sprintf "{\"source\":\"%s\", \"schema\":%s}" (String.escaped src) schema
+  Format.sprintf "{\"source\":\"%s\", \"schema\":%s}" (String.escaped src) schema
 
 let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
-	let schema = begin match gconf.gconf_io with
-	  | None -> "{}"
-    | Some (IO_file f) -> begin match f with
-				| Some s -> string_of_file s
-				| None -> "{}"
-				end 
-    | Some (IO_components (fin,fout,fschema)) -> begin match fschema with
-				| Some s -> string_of_file s
-				| None -> "{}"
-				end
-	end in
-  let slang = gconf.gconf_source in
-	let the_query = begin match slang with
-	| Compiler.L_tech_rule -> src_and_schema query_s schema
-	| _ -> query_s
-	end in
-  let qname, q =
-    begin match gconf.gconf_source_sexp with
-    | false ->
-        ParseString.parse_query_from_string slang the_query
-    | true ->
-        let sexp = ParseString.parse_sexp_from_string query_s in
-        let name = QcertUtil.name_of_language slang in (* XXX Is it a good name? XXX *)
-        let q = AstsToSExp.sexp_to_query slang sexp in
-        (name, q)
+  let schema =
+    begin match gconf.gconf_io with
+    | None -> "{}"
+    | Some (IO_file f) ->
+	begin match f with
+	| Some s -> string_of_file s
+	| None -> "{}"
+	end 
+    | Some (IO_components (fin,fout,fschema)) ->
+	begin match fschema with
+	| Some s -> s
+	| None -> "{}"
+	end
     end
+  in
+  let slang = gconf.gconf_source in
+  let the_query =
+    begin match slang with
+    | Compiler.L_tech_rule -> src_and_schema query_s schema
+    | _ -> query_s
+    end in
+  let qname, q =
+    if gconf.gconf_source_sexp
+    then
+      let sexp = ParseString.parse_sexp_from_string query_s in
+      let lname = QcertUtil.name_of_language slang in
+      let q = AstsToSExp.sexp_to_query slang sexp in
+      (lname, q)
+    else
+      ParseString.parse_query_from_string slang the_query
   in
   (qname, q)
 
