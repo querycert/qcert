@@ -59,7 +59,7 @@ interface PuzzleSides {
             return {accept: ".arl", schemaForCompile: true};
         case "designer_rule":
             return {accept: ".sem", schemaForCompile: false};
-        case "rule":
+        case "camp_rule":
             return {accept: ".rule,.camp", schemaForCompile: false};
         default:
             return undefined;
@@ -2665,7 +2665,7 @@ function getSrcInput():string {
 
 function getSchemaInput():string {
     const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-schema-text');
-    return elem.value;
+    return elem.value.length > 0 ? elem.value : "{}";
 }
 
 function getIOInput():string {
