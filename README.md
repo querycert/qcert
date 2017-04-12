@@ -44,7 +44,7 @@ opam install coq.8.6
 ### Java (Recommended)
 
 SQL and ODM rules support, as well as part of the Q*cert runtime are
-written in Java and require a Java compiler (Java 7 or later).
+written in Java and require a Java compiler (Java 8 required).
 
 Build for the Java part of the code requires a recent version of ant.
 
@@ -83,6 +83,10 @@ not currently have detailed instructions for how to build on Windows.
 
 This should produce the `./bin/qcert` executable.
 
+## Building SQL and JRules support (Optional)
+
+
+
 ## Compile Queries
 
 Once the compiler is built, it can be used to compile queries. The
@@ -119,8 +123,6 @@ $ ./bin/qcert -source oql -target java samples/oql/test1.oql
 ```
 
 This will produce a java file called `samples/oql/test1.java`.
-
-## SQL and JRules support
 
 ## Run compiled queries
 
