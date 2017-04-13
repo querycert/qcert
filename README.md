@@ -83,7 +83,11 @@ not currently have detailed instructions for how to build on Windows.
 
 This should produce the `./bin/qcert` executable.
 
-## Building SQL and JRules support (Optional)
+## Building SQL support (Optional)
+
+
+
+## Building JRules support (Optional)
 
 
 

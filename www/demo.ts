@@ -1970,7 +1970,7 @@ class CompileTab extends ICanvasTab {
 
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
-        this.textArea = new fabric.Text("");
+        this.textArea = new fabric.Text("",{fontSize:20});
 	}
     
 	getLabel() {
@@ -2059,7 +2059,7 @@ class ExecTab extends ICanvasTab {
         // The 'executing' TextArea is kept global to make it accessible to the kill button.  We make it here just to keep the related
         // initialization together.
         if (executing == null)
-            executing = new fabric.Text("");
+            executing = new fabric.Text("",{fontSize:20});
     }
 
     getLabel() {
