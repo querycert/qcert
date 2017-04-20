@@ -18,50 +18,82 @@
         onclick="killButton()"><b>kill execution</b></button>
 	<div id="container" style="position:relative">
 		<canvas id="main-canvas" width="1000" height="700"></canvas>
-		<div id="input-tab" style="display:none; position:absolute; left:10px; top:10px">
-			<div id="input-tab-lang-title">
+		<div id="compile-tab" style="display:none; position:absolute; left:10px; top:10px">
+			<div id="compile-tab-lang-title">
 				<h1 style="text-align: center">No Input language specified</h1>
 				<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
 			</div>
-			<div id="input-tab-query-input">
-			<div id="input-tab-query-input-src">
-			<label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-src-file" onchange='handleFile("input-tab-query-src-text", false, this.files)'/>
+			<div id="compile-tab-query-input">
+			<div id="compile-tab-query-input-src">
+			<label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="compile-tab-query-src-file" onchange='handleFile("compile-tab-query-src-text", false, this.files)'/>
 	  		<br/>
-          <textarea id = "input-tab-query-src-text"
+          <textarea id = "compile-tab-query-src-text"
                     rows = "10"
-                    cols = "80" 
+                    cols = "120" 
 					spellcheck="false"						
 					autocapitalize="none"
-					ondrop='handleFileDrop("input-tab-query-src-text", event)'
+					ondrop='handleFileDrop("compile-tab-query-src-text", event)'
 					wrap="off"
 					></textarea>
           	</div>
 			  <p></p>
-			  <div id="input-tab-query-schema">
-			<label>schema (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-schema-file" onchange='handleFile("input-tab-query-schema-text", true, this.files)'/>
+			  <div id="compile-tab-query-schema">
+			<label>schema (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="compile-tab-query-schema-file" onchange='handleFile("compile-tab-query-schema-text", true, this.files)'/>
 	  		<br/>
-          <textarea id = "input-tab-query-schema-text"
+          <textarea id = "compile-tab-query-schema-text"
                     rows = "10"
-                    cols = "80" 
+                    cols = "120" 
 					spellcheck="false"
 					autocapitalize="none"
-					ondrop='handleFileDrop("input-tab-query-schema-text", event)'
+					ondrop='handleFileDrop("compile-tab-query-schema-text", event)'
 					wrap="off"
 					></textarea>
           	</div>
 			  <p></p>
-			  <div id="input-tab-query-input-io">
+		      <button type="button" style="font-size:large" onclick="compileButton()"><b>Run Compilation</b></button><br/>
+			  <div id="compile-tab-query-output">
+              <textarea id = "compile-tab-query-output-text"
+                    rows = "10"
+                    cols = "120" 
+					spellcheck="false"
+					autocapitalize="none"
+					wrap="on"
+					readonly="true"
+					></textarea>
+          	</div>
+		 </div>
+		</div>
+
+		<div id="execute-tab" style="display:none; position:absolute; left:10px; top:10px">
+			<div id="execute-tab-lang-title">
+				<h1 style="text-align: center">No Input language specified</h1>
+				<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
+			</div>
+			<div id="execute-tab-query-input">
+			<div id="execute-tab-query-input-io">
 	        <label>execution input as CSV files (choose delimiter and files)&nbsp;&nbsp;&nbsp;delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea>
 					<input type="file" multiple="true" id="inputCSVs" accept=".csv" onchange='handleCSVs(this.files)'/><br/>
-			<label>execution input as JSON (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="input-tab-query-io-file" onchange='handleFile("input-tab-query-io-text", false, this.files)'/>
+			<label>execution input as JSON (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="execute-tab-query-io-file" onchange='handleFile("execute-tab-query-io-text", false, this.files)'/>
 	  		<br/>
-          <textarea id = "input-tab-query-io-text"
+          <textarea id = "execute-tab-query-io-text"
+                    rows = "20"
+                    cols = "120" 
+					spellcheck="false"						
+					autocapitalize="none"
+					ondrop='handleFileDrop("execute-tab-query-io-text", event)'
+					wrap="off"
+					></textarea>
+          	</div>
+			  <p></p>
+		      <button type="button" style="font-size:large" onclick="executeButton()"><b>Run Query on Data</b></button><br/>
+			  <div id="execute-tab-query-output">
+              <textarea id = "execute-tab-query-output-text"
                     rows = "10"
-                    cols = "80" 
+                    cols = "120" 
 					spellcheck="false"
 					autocapitalize="none"
-					ondrop='handleFileDrop("input-tab-query-io-text", event)'
-					wrap="off"
+					wrap="on"
+					readonly="true"
 					></textarea>
           	</div>
 		 </div>

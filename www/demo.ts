@@ -35,14 +35,8 @@ interface PuzzleSides {
     const noQuerySrc = "[ Query contents have not been specified ]";
 
 // global variables
-    // The compiled query ... passes from compile tab to execution tab when target language is javascript
-    var compiledQuery:string = null;
     // The web-worker that is actively running a query or null.  The kill button should only be visible when this is non-null.
     var worker:Worker = null;
-    // The textarea of the execution tab.  Once created, this persists even when the execution tab is not showing.
-    var executing:fabric.IText = null;
-    // The (main) canvas when the execution tab is showing, null when it is not showing.  Allows kill button to update the visible status.
-    var executingCanvas:fabric.ICanvas = null;
 
 // Functions
     // A placeholder to fetch ancillary information not currently in QcertLanguageDescription
@@ -71,26 +65,146 @@ interface PuzzleSides {
         if (worker != null) {
             worker.terminate();
             worker = null;
-            // We only display a termination message when the execution tab is showing (the message will be updated on the next 'show' otherwise)
-            if (executingCanvas != null && executing != null)
-                ensureTextFit(executingCanvas, executing, "[ Execution terminated ]");
-            // But we clear the kill button in any case
+            const executing = getExecOutputArea();
+            if (executing != null)
+                executing.value = "[ Execution interrupted ]";
             document.getElementById("kill-button").style.display = "none";
         }
     }
 
-    // A specialized size ensure function for the compile and execution tabs.  Displays new text and makes sure it 'fits' (might cause scroll bars to appear)
-    function ensureTextFit(canvas:fabric.ICanvas, text:fabric.IText, newText:string) {
-        text.setText(newText);
-        const textHeight = text.getHeight();
-        const textWidth = text.getWidth();
-        const canvasHeight = canvas.getHeight();
-        const canvasWidth = canvas.getWidth();
-        if (textHeight > canvasHeight)
-            canvas.setHeight(textHeight);
-        if (textWidth > canvasWidth)
-            canvas.setWidth(textWidth);
-        canvas.renderAll();
+    // Executes when compile button is pressed.  This button shows when the compile tab shows.
+    function compileButton() {
+        const langs = getPipelineLangs();
+        const optims = getOptimConfig();
+        const srcInput = getSrcInput();
+        const schemaInput = getSchemaInput();
+
+        const theTextArea = <HTMLTextAreaElement>document.getElementById("compile-tab-query-output-text");
+
+        const path = langs.map(x => x.id);
+        if (path.length <= 2) {
+            theTextArea.value = sourceAndTargetRequired;
+            return;
+        } else if (srcInput.length == 0) {
+            theTextArea.value =  noQuerySrc;
+            return;
+        } else
+            theTextArea.value = "[ Compiling query ]";
+
+        const middlePath = path.slice(1,-1);
+        
+        const handler = function(resultPack: QcertResult) {
+            theTextArea.value = resultPack.result;
+        }
+        
+        qcertPreCompile({
+            source:path[0],
+            target:path[path.length-1],
+            path:middlePath,
+            exactpath:true,
+            emitall:true,
+            sourcesexp:false,
+            ascii:false,
+            javaimports:undefined,
+            query:srcInput,
+            schema: schemaInput,
+            eval:false,
+            input:undefined
+          }, handler); 
+    }
+
+    // Executes when execute button is pressed.  This button shows when the execute tab shows.
+    function executeButton() {
+        const langs = getPipelineLangs();
+        const path = langs.map(x => x.id);
+        const executing = getExecOutputArea();
+
+        if (worker != null) {
+            executing.value = " [ A previous query is still executing and must be killed in order to execute a new one ]";
+            return;
+        }
+
+        if (path.length <= 2) {
+            executing.value = sourceAndTargetRequired;
+            return;
+        }
+
+        const dataInput = getIOInput();
+        if (dataInput.length == 0) {
+            executing.value = "[ No input data specified ]";
+            return;
+        }
+        
+        executing.value = "[ Executing query ]";
+        
+        // expose the kill button
+        document.getElementById("kill-button").style.display = "block";
+        
+        // Additional inputs
+        const target = langs[langs.length-1].id;
+        const schemaInput = getSchemaInput();
+        
+        // Setup to handle according to target language
+        const arg:any = target == "js" ? setupJsEval(dataInput, schemaInput) : 
+            setupQcertEval(path, getSrcInput(), schemaInput, dataInput);
+        if (arg == null) // error already detected and indicated
+            return;
+
+        // Processing is delegated to a web-worker
+        try {
+            // Worker variable is global (also executing and executingCanvas), making it (them) accessible to the killButton() function
+            worker = new Worker("evalWorker.js");
+            worker.onmessage = function(e) {
+                workerComplete(e.data);
+            }
+            worker.onerror = function(e) {
+                workerComplete(e.message);
+            }
+            console.log("About to post");
+            console.log(arg);
+            worker.postMessage(arg);
+        } catch (err) {
+            workerComplete(err.message);
+        }
+    }
+
+    function setupJsEval(inputString:string, schemaText:string) : [string,string,string] {
+        const compiledQuery = getCompiledQuery();
+        if (compiledQuery == null) {
+            const executing = getExecOutputArea();
+            executing.value = "[ The query has not been compiled ]";
+            return null;
+        }
+        return [inputString, schemaText, compiledQuery ];
+    }
+    
+    function workerComplete(text:string) {
+        const executing = getExecOutputArea();
+        executing.value = text;
+        document.getElementById("kill-button").style.display = "none";
+        worker = null;
+    }    
+
+    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) : QcertCompilerConfig {
+        if (srcInput.length == 0) {
+            const executing = getExecOutputArea();
+            executing.value = noQuerySrc;
+            return null;
+        }
+       const middlePath = path.slice(1,-1);
+       return {source:path[0],
+            target:path[path.length-1],
+            path:middlePath,
+            exactpath:true,
+            emitall:true,
+            sourcesexp:false,
+            ascii:false,
+            javaimports:undefined,
+            query:srcInput,
+            schema: schemaInput,
+            eval: true,
+            input: dataInput
+          };
     }
 
     function getSourceLeft(left:number):number {
@@ -1793,32 +1907,30 @@ class BuilderTab extends ICanvasTab {
 	}
 }
 
-class InputTab extends ICanvasTab {
+class CompileTab extends ICanvasTab {
 	titleTextElement:Node;
 	inputTabElement:HTMLElement;
 	queryInput:HTMLElement;
 	defaultTitleTextElement:Node;
     queryChooser:HTMLInputElement;
     schemaChooser:HTMLInputElement;
-    dataChooser:HTMLInputElement;
 
 	static make(canvas:fabric.ICanvas) {
-		return new InputTab(canvas);
+		return new CompileTab(canvas);
 	}
 
 	constructor(canvas:fabric.ICanvas) {
 		super(canvas);
-		this.inputTabElement = document.getElementById("input-tab");
-		this.titleTextElement = document.getElementById("input-tab-lang-title");
+		this.inputTabElement = document.getElementById("compile-tab");
+		this.titleTextElement = document.getElementById("compile-tab-lang-title");
 		this.defaultTitleTextElement = <HTMLElement>this.titleTextElement.cloneNode(true);
-		this.queryInput = document.getElementById("input-tab-query-input");
-        this.queryChooser = <HTMLInputElement>document.getElementById("input-tab-query-src-file");
-        this.schemaChooser = <HTMLInputElement>document.getElementById("input-tab-query-schema-file"); 
-        this.dataChooser = <HTMLInputElement>document.getElementById("input-tab-query-io-file");
+		this.queryInput = document.getElementById("compile-tab-query-input");
+        this.queryChooser = <HTMLInputElement>document.getElementById("compile-tab-query-src-file");
+        this.schemaChooser = <HTMLInputElement>document.getElementById("compile-tab-query-schema-file"); 
 	}
 
 	getLabel() {
-		return "Input";
+		return "Compile";
 	}
 	
 	getRectOptions() {
@@ -1856,11 +1968,10 @@ class InputTab extends ICanvasTab {
         this.queryChooser.accept = langInfo.accept;
         // the following is static for now but set here since it may become dynamic in the future
         this.schemaChooser.accept = schemaAccept;
-        this.dataChooser.accept = dataAccept;
 	}
 
 	update() {
-		const srcpiece = InputTab.getSrcLanguagePiece();
+		const srcpiece = CompileTab.getSrcLanguagePiece();
 		if(srcpiece.langid == 'error') {
 			this.setErrorTitleText();
 			this.queryInput.style.display="none";
@@ -1883,6 +1994,91 @@ class InputTab extends ICanvasTab {
 		this.canvas.getElement().style.display="block";
 		this.inputTabElement.style.display="none";
 	}
+}
+
+class ExecTab extends ICanvasTab {
+    titleTextElement:Node;
+    inputTabElement:HTMLElement;
+    dataInput:HTMLElement;
+    defaultTitleTextElement:Node;
+    dataChooser:HTMLInputElement;
+
+    static make(canvas:fabric.ICanvas) {
+        return new ExecTab(canvas);
+    }
+
+    constructor(canvas:fabric.ICanvas) {
+        super(canvas);
+        this.inputTabElement = document.getElementById("execute-tab");
+        this.titleTextElement = document.getElementById("execute-tab-lang-title");
+        this.defaultTitleTextElement = <HTMLElement>this.titleTextElement.cloneNode(true);
+        this.dataInput = document.getElementById("execute-tab-query-input");
+        this.dataChooser = <HTMLInputElement>document.getElementById("execute-tab-query-io-file");
+    }
+
+    getLabel() {
+        return "Execute";
+    }
+    
+    getRectOptions() {
+        return {fill:'orange'};
+    }
+
+    static getSrcLanguagePiece() {
+        const pipeline = getPipelinePieces();
+        if(pipeline === undefined || pipeline.length == 0) {
+            return errorPiece;
+        } else {
+            return pipeline[0];
+        }
+    }
+
+    clearTitle() {
+        while(this.titleTextElement.hasChildNodes()) {
+            this.titleTextElement.removeChild(this.titleTextElement.firstChild);
+        }
+    }
+
+    setErrorTitleText() {
+        const newNode = this.defaultTitleTextElement.cloneNode(true)
+        this.titleTextElement.parentNode.replaceChild(newNode, this.titleTextElement);
+        this.titleTextElement = newNode;
+    }
+
+    setSrcLanguage(piece:BasicPuzzlePiece) {
+        this.clearTitle();
+        const titleElem = document.createElement('h1');
+        titleElem.style.textAlign = 'center';
+        titleElem.appendChild(document.createTextNode("Input Language: " + piece.langid + " [" + piece.langdescription + "]"));
+        this.titleTextElement.appendChild(titleElem);
+        // the following is static for now but set here since it may become dynamic in the future
+        this.dataChooser.accept = dataAccept;
+    }
+
+    update() {
+        const srcpiece = CompileTab.getSrcLanguagePiece();
+        if(srcpiece.langid == 'error') {
+            this.setErrorTitleText();
+            this.dataInput.style.display="none";
+        } else {
+            this.setSrcLanguage(srcpiece);
+            this.dataInput.style.display="block";
+        }
+    }
+
+    show() {
+        this.clearTitle();
+        this.update();
+
+        this.inputTabElement.style.display="block";
+        this.canvas.getElement().style.display="none";
+
+    }
+
+    hide() {
+        this.canvas.getElement().style.display="block";
+        this.inputTabElement.style.display="none";
+    }
 }
 
 function getPipelinePieces():BasicPuzzlePiece[] {
@@ -1957,226 +2153,6 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 		str = "[" + str + "]";
 	}
 	return str;
-}
-
-class CompileTab extends ICanvasTab {
-    widthAtEntry:number;
-    heightAtEntry:number;
-    textArea:fabric.IText;
-
-	static make(canvas:fabric.ICanvas) {
-		return new CompileTab(canvas);
-	}
-
-	constructor(canvas:fabric.ICanvas) {
-		super(canvas);
-        this.textArea = new fabric.Text("",{fontSize:20});
-	}
-    
-	getLabel() {
-		return "Compile";
-	}
-
-	getRectOptions() {
-		return {fill:'orange'};
-	}
-
-	/* We should save and compare against the old workspace state
-	 * so that we don't recompile everything everytime we come back to this tab
-	 * Maybe create a state manager,
-	 * and allow each tab to register with it and save/restore state as needed
-	 *
-	 * 
-	 */
-
-	setError(msg:string) {
-		console.log(msg);
-	}
-
-    show() {
-		this.canvas.selection = false;
-		const langs = getPipelineLangs();
-		const optims = getOptimConfig();
-		const srcInput = getSrcInput();
-        const schemaInput = getSchemaInput();
-
-        const theCanvas = this.canvas; // put in context for handlers
-        const theTextArea = this.textArea;
-        this.widthAtEntry = theCanvas.getWidth();
-        this.heightAtEntry = theCanvas.getHeight();
-        theCanvas.add(theTextArea);
-
-        const path = langs.map(x => x.id);
-        if (path.length <= 2) {
-            ensureTextFit(theCanvas, theTextArea, sourceAndTargetRequired);
-            return;
-        } else if (srcInput.length == 0) {
-            ensureTextFit(theCanvas, theTextArea, noQuerySrc);
-            return;
-        } else
-            ensureTextFit(theCanvas, theTextArea, "[ Compiling query ]");
-
-		const middlePath = path.slice(1,-1);
-        
-        const handler = function(resultPack: QcertResult) {
-            compiledQuery = resultPack.result;
-            ensureTextFit(theCanvas, theTextArea, compiledQuery);
-        }
-        
-		qcertPreCompile({
-			source:path[0],
-			target:path[path.length-1],
-			path:middlePath,
-			exactpath:true,
-			emitall:true,
-			sourcesexp:false,
-			ascii:false,
-			javaimports:undefined,
-			query:srcInput,
-            schema: schemaInput,
-            eval:false,
-            input:undefined
-		  }, handler); 
-	}
-    
-    hide() {
-        this.canvas.setWidth(this.widthAtEntry);
-        this.canvas.setHeight(this.heightAtEntry);
-        this.canvas.remove(this.textArea);
-    }
-}
-
-class ExecTab extends ICanvasTab {
-    widthAtEntry:number;
-    heightAtEntry:number;
-
-    static make(canvas:fabric.ICanvas) {
-        return new ExecTab(canvas);
-    }
-
-    constructor(canvas:fabric.ICanvas) {
-        super(canvas);
-        // The 'executing' TextArea is kept global to make it accessible to the kill button.  We make it here just to keep the related
-        // initialization together.
-        if (executing == null)
-            executing = new fabric.Text("",{fontSize:20});
-    }
-
-    getLabel() {
-        return "Execute";
-    }
-
-    getRectOptions() {
-        return {fill:'orange'};
-    }
-
-    setError(msg:string) {
-        console.log(msg);
-    }
-
-    show() {
-        this.canvas.selection = false;
-        const langs = getPipelineLangs();
-        const path = langs.map(x => x.id);
-
-        this.widthAtEntry = this.canvas.getWidth();
-        this.heightAtEntry = this.canvas.getHeight();
-        this.canvas.add(executing);
-        
-        if (worker != null) {
-            ensureTextFit(this.canvas, executing, " [ A previous query is still executing and must be killed in order to execute a new one ]");
-            return;
-        }
-
-        if (path.length <= 2) {
-            ensureTextFit(this.canvas, executing, sourceAndTargetRequired);
-            return;
-        }
-
-        const dataInput = getIOInput();
-        if (dataInput.length == 0) {
-            ensureTextFit(this.canvas, executing, "[ No input data specified ]");
-            return;
-        }
-        
-        ensureTextFit(this.canvas, executing, "[ Executing query ]");
-        
-        // expose the kill button
-        document.getElementById("kill-button").style.display = "block";
-        // Indicate that this tab is active in case the button is pressed (the button can outlive the tab)
-        executingCanvas = this.canvas;
-        
-        // Additional inputs
-        const target = langs[langs.length-1].id;
-        const schemaInput = getSchemaInput();
-        
-        // Setup to handle according to target language
-        const arg:any = target == "js" ? this.setupJsEval(dataInput, schemaInput) : 
-            this.setupQcertEval(path, getSrcInput(), schemaInput, dataInput);
-        if (arg == null) // error already detected and indicated
-            return;
-
-        // Processing is delegated to a web-worker
-        try {
-            // Worker variable is global (also executing and executingCanvas), making it (them) accessible to the killButton() function
-            worker = new Worker("evalWorker.js");
-            const workerComplete = this.workerComplete;
-            const theCanvas = this.canvas;
-            worker.onmessage = function(e) {
-                workerComplete(e.data, theCanvas);
-            }
-            worker.onerror = function(e) {
-                workerComplete(e.message, theCanvas);
-            }
-            console.log("About to post");
-            console.log(arg);
-            worker.postMessage(arg);
-        } catch (err) {
-            this.workerComplete(err.message, this.canvas);
-        }
-    }
-    
-    hide() {
-        this.canvas.setWidth(this.widthAtEntry);
-        this.canvas.setHeight(this.heightAtEntry);
-        this.canvas.remove(executing);
-        executingCanvas = null;
-    }
-    
-    setupJsEval(inputString:string, schemaText:string) : [string,string,string] {
-        if (compiledQuery == null) {
-            ensureTextFit(this.canvas, executing, "[ The query has not been compiled ]");
-            return null;
-        }
-        return [inputString, schemaText, compiledQuery ];
-    }
-    
-    workerComplete(text:string, canvas:fabric.ICanvas) {
-        ensureTextFit(canvas, executing, text);
-        document.getElementById("kill-button").style.display = "none";
-        worker = null;
-    }    
-
-    setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) : QcertCompilerConfig {
-        if (srcInput.length == 0) {
-            ensureTextFit(this.canvas, executing, noQuerySrc);
-            return null;
-        }
-       const middlePath = path.slice(1,-1);
-       return {source:path[0],
-            target:path[path.length-1],
-            path:middlePath,
-            exactpath:true,
-            emitall:true,
-            sourcesexp:false,
-            ascii:false,
-            javaimports:undefined,
-            query:srcInput,
-            schema: schemaInput,
-            eval: true,
-            input: dataInput
-          };
-    }
 }
 
 const coqdocBaseURL = 'https://querycert.github.io/sigmod17/';
@@ -2552,7 +2528,6 @@ function getOptimConfig():QcertOptimConfig[] {
 const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
 	BuilderTab.make,
 	OptimizationsTabMake,
-	InputTab.make,
 	CompileTab.make,
     ExecTab.make
 ];
@@ -2591,10 +2566,10 @@ function handleCSVs(files:FileList) {
 
 function completeCSVs(readFiles) {
     var delimiter = (<HTMLTextAreaElement>document.getElementById("delimiter")).value; 
-    var schema = JSON.parse((<HTMLTextAreaElement>document.getElementById("input-tab-query-schema-text")).value);
+    var schema = JSON.parse((<HTMLTextAreaElement>document.getElementById("compile-tab-query-schema-text")).value);
     var toSend = JSON.stringify({schema: schema, delimiter: delimiter, data: readFiles});
     var process = function(result) {
-        document.getElementById("input-tab-query-io-text").innerHTML = result;
+        getExecInputArea().value = result;
     }
     var result = preProcess(toSend, "csv2JSON", process);
 }
@@ -2659,16 +2634,28 @@ function handleFileDrop(output:string, event:DragEvent) {
 }
 
 function getSrcInput():string {
-	const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-src-text');
+	const elem = <HTMLTextAreaElement>document.getElementById('compile-tab-query-src-text');
 	return elem.value;
 }
 
 function getSchemaInput():string {
-    const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-schema-text');
+    const elem = <HTMLTextAreaElement>document.getElementById('compile-tab-query-schema-text');
     return elem.value.length > 0 ? elem.value : "{}";
 }
 
 function getIOInput():string {
-	const elem = <HTMLTextAreaElement>document.getElementById('input-tab-query-io-text');
-	return elem.value;
+	return getExecInputArea().value;
+}
+
+function getExecOutputArea():HTMLTextAreaElement {
+    return <HTMLTextAreaElement>document.getElementById('execute-tab-query-output-text');
+}
+
+function getExecInputArea():HTMLTextAreaElement {
+    return <HTMLTextAreaElement>document.getElementById('execute-tab-query-io-text');
+}
+
+function getCompiledQuery():string {
+    const elem = <HTMLTextAreaElement>document.getElementById('compile-tab-query-output-text');
+    return elem.value;
 }
