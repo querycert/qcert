@@ -37,6 +37,8 @@ Module QDriver(runtime:CompilerRuntime).
   Local Open Scope list_scope.
 
   Section QD.
+    Definition optim_config_default : optim_config := optim_config_default.
+
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 
@@ -58,8 +60,7 @@ Module QDriver(runtime:CompilerRuntime).
     (* Optimizers config *)
 
     Definition optim_config_list := optim_config_list.
-    Definition optim_config_default := optim_config_default.
-    
+
     (* Constants config *)
 
     Definition constants_config := constants_config.

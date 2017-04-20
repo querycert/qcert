@@ -21,59 +21,8 @@ Section CompLang.
   
   Require Import EquivDec.
 
-  Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
-  Require Import NNRCRuntime.
-  Require Import NNRCMRRuntime.
-  Require Import CldMR.
-  Require Import DNNRC Dataset.
-  Require Import CAMPRuntime.
-  Require Import RuleRuntime.
-  Require Import TechRuleRuntime.
-  Require Import DesignerRuleRuntime.
-  Require Import OQLRuntime.
-
-  Require Import BasicSystem.
-
-  Require Import NNRCMRtoDNNRC.
-  Require Import TDNNRCInfer.
-  Require Import LambdaNRA.
-  Require Import SQL.
-  
-  Require Rule.
-
-  Definition vdbindings := vdbindings.
-
-  (* Languages *)
-  Context {ft:foreign_type}.
-  Context {bm:brand_model}.
-
-  Context {fr:foreign_runtime}.
-  Context {fredop:foreign_reduce_op}.
-
-  Definition camp_rule := rule.
-  Definition tech_rule := tech_rule.
-  Definition designer_rule := designer_rule.
-  Definition camp := pat.
-  Definition oql := oql.
-  Definition sql := sql.
-  Definition lambda_nra := lnra.
-  Definition nra := nra.
-  Definition nraenv_core := cnraenv.
-  Definition nraenv := nraenv.
-  Definition nnrc_core := nnrc_core.
-  Definition nnrc := nnrc.
-  Definition nnrcmr := nnrcmr.
-  Definition cldmr := cld_mrl.
-  Definition dnnrc_dataset := dnnrc _ unit dataset.
-  Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc _ (type_annotation unit) dataset.
-  Definition javascript := string.
-  Definition java := string.
-  Definition spark_rdd := string.
-  Definition spark_dataset := string.
-  Definition cloudant := (list (string * string) * (string * list string))%type.
-
-  Inductive language : Set :=
+  Section Lang.
+    Inductive language : Set :=
     | L_camp_rule : language
     | L_tech_rule : language
     | L_designer_rule : language
@@ -97,68 +46,16 @@ Section CompLang.
     | L_cloudant : language
     | L_error : string -> language.
 
-  Lemma language_eq_dec : EqDec language eq.
-  Proof.
-    repeat red.
-    destruct x; destruct y; try solve[right; inversion 1]; try (left; reflexivity).
-    - destruct (string_dec s s0).
-      + left; f_equal; subst; reflexivity.
-      + right; intro; apply n; inversion H; trivial.
-  Defined.
+    Lemma language_eq_dec : EqDec language eq.
+    Proof.
+      repeat red.
+      destruct x; destruct y; try solve[right; inversion 1]; try (left; reflexivity).
+      - destruct (string_dec s s0).
+        + left; f_equal; subst; reflexivity.
+        + right; intro; apply n; inversion H; trivial.
+    Defined.
   
-  Global Instance language_eqdec : EqDec language eq := language_eq_dec.
-
-  Inductive query : Set :=
-  | Q_camp_rule : camp_rule -> query
-  | Q_tech_rule : tech_rule -> query
-  | Q_designer_rule : designer_rule -> query
-  | Q_camp : camp -> query
-  | Q_oql : oql -> query
-  | Q_sql : sql -> query
-  | Q_lambda_nra : lambda_nra -> query
-  | Q_nra : nra -> query
-  | Q_nraenv_core : nraenv_core -> query
-  | Q_nraenv : nraenv -> query
-  | Q_nnrc_core : nnrc_core -> query
-  | Q_nnrc : nnrc -> query
-  | Q_nnrcmr : nnrcmr -> query
-  | Q_cldmr : cldmr -> query
-  | Q_dnnrc_dataset : dnnrc_dataset -> query
-  | Q_dnnrc_typed_dataset : dnnrc_typed_dataset -> query
-  | Q_javascript : javascript -> query
-  | Q_java : java -> query
-  | Q_spark_rdd : spark_rdd -> query
-  | Q_spark_dataset : spark_dataset -> query
-  | Q_cloudant : cloudant -> query
-  | Q_error : string -> query.
-
-  Tactic Notation "query_cases" tactic(first) ident(c) :=
-    first;
-    [ Case_aux c "Q_camp_rule"%string
-    | Case_aux c "Q_tech_rule"%string
-    | Case_aux c "Q_designer_rule"%string
-    | Case_aux c "Q_camp"%string
-    | Case_aux c "Q_oql"%string
-    | Case_aux c "Q_sql"%string
-    | Case_aux c "Q_lambda_nra"%string
-    | Case_aux c "Q_nra"%string
-    | Case_aux c "Q_nraenv_core"%string
-    | Case_aux c "Q_nraenv"%string
-    | Case_aux c "Q_nnrc_core"%string
-    | Case_aux c "Q_nnrc"%string
-    | Case_aux c "Q_nnrcmr"%string
-    | Case_aux c "Q_cldmr"%string
-    | Case_aux c "Q_dnnrc_dataset"%string
-    | Case_aux c "Q_dnnrc_typed_dataset"%string
-    | Case_aux c "Q_javascript"%string
-    | Case_aux c "Q_java"%string
-    | Case_aux c "Q_spark_rdd"%string
-    | Case_aux c "Q_spark_dataset"%string
-    | Case_aux c "Q_cloudant"%string
-    | Case_aux c "Q_error"%string].
-
-
-  Section CompLangUtil.
+    Global Instance language_eqdec : EqDec language eq := language_eq_dec.
 
     Definition language_of_name_case_sensitive name : language:=
       match name with
@@ -212,36 +109,6 @@ Section CompLang.
       | L_cloudant => "cloudant"%string
       | L_error _ => "error"%string
       end.
-
-    Definition language_of_query q :=
-      match q with
-      | Q_camp_rule _ => L_camp_rule
-      | Q_tech_rule _ => L_tech_rule
-      | Q_designer_rule _ => L_designer_rule
-      | Q_camp _ => L_camp
-      | Q_oql _ => L_oql
-      | Q_sql _ => L_sql
-      | Q_lambda_nra _ => L_lambda_nra
-      | Q_nra _ => L_nra
-      | Q_nraenv_core _ => L_nraenv_core
-      | Q_nraenv _ => L_nraenv
-      | Q_nnrc_core _ => L_nnrc_core
-      | Q_nnrc _ => L_nnrc
-      | Q_nnrcmr _ => L_nnrcmr
-      | Q_cldmr _ => L_cldmr
-      | Q_dnnrc_dataset _ => L_dnnrc_dataset
-      | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
-      | Q_javascript _ => L_javascript
-      | Q_java _ => L_java
-      | Q_spark_rdd _ => L_spark_rdd
-      | Q_spark_dataset _ => L_spark_dataset
-      | Q_cloudant _ => L_cloudant
-      | Q_error err =>
-        L_error ("No language corresponding to error query '"++err++"'")
-      end.
-
-    Definition name_of_query q :=
-      name_of_language (language_of_query q).
 
     Definition lang_desc : Set := (language * string).
 
@@ -321,6 +188,140 @@ Section CompLang.
     Definition export_language_descriptions : export_desc :=
       select_description_per_kind language_descriptions_with_ids.
 
+  End Lang.
+
+  Section Query.
+    Require Import BasicSystem.
+
+    Require Import NRARuntime.
+    Require Import NRAEnvRuntime.
+    Require Import NNRCRuntime.
+    Require Import NNRCMRRuntime.
+    Require Import CldMR.
+    Require Import DNNRC Dataset.
+    Require Import CAMPRuntime.
+    Require Import RuleRuntime.
+    Require Import TechRuleRuntime.
+    Require Import DesignerRuleRuntime.
+    Require Import OQLRuntime.
+
+    Require Import NNRCMRtoDNNRC.
+    Require Import TDNNRCInfer.
+    Require Import LambdaNRA.
+    Require Import SQL.
+  
+    Require Rule.
+
+    Definition vdbindings := vdbindings.
+
+    (* Languages *)
+    Context {ft:foreign_type}.
+    Context {bm:brand_model}.
+
+    Context {fr:foreign_runtime}.
+    Context {fredop:foreign_reduce_op}.
+
+    Definition camp_rule := rule.
+    Definition tech_rule := tech_rule.
+    Definition designer_rule := designer_rule.
+    Definition camp := pat.
+    Definition oql := oql.
+    Definition sql := sql.
+    Definition lambda_nra := lnra.
+    Definition nra := nra.
+    Definition nraenv_core := cnraenv.
+    Definition nraenv := nraenv.
+    Definition nnrc_core := nnrc_core.
+    Definition nnrc := nnrc.
+    Definition nnrcmr := nnrcmr.
+    Definition cldmr := cld_mrl.
+    Definition dnnrc_dataset := dnnrc _ unit dataset.
+    Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc _ (type_annotation unit) dataset.
+    Definition javascript := string.
+    Definition java := string.
+    Definition spark_rdd := string.
+    Definition spark_dataset := string.
+    Definition cloudant := (list (string * string) * (string * list string))%type.
+
+    Inductive query : Set :=
+    | Q_camp_rule : camp_rule -> query
+    | Q_tech_rule : tech_rule -> query
+    | Q_designer_rule : designer_rule -> query
+    | Q_camp : camp -> query
+    | Q_oql : oql -> query
+    | Q_sql : sql -> query
+    | Q_lambda_nra : lambda_nra -> query
+    | Q_nra : nra -> query
+    | Q_nraenv_core : nraenv_core -> query
+    | Q_nraenv : nraenv -> query
+    | Q_nnrc_core : nnrc_core -> query
+    | Q_nnrc : nnrc -> query
+    | Q_nnrcmr : nnrcmr -> query
+    | Q_cldmr : cldmr -> query
+    | Q_dnnrc_dataset : dnnrc_dataset -> query
+    | Q_dnnrc_typed_dataset : dnnrc_typed_dataset -> query
+    | Q_javascript : javascript -> query
+    | Q_java : java -> query
+    | Q_spark_rdd : spark_rdd -> query
+    | Q_spark_dataset : spark_dataset -> query
+    | Q_cloudant : cloudant -> query
+    | Q_error : string -> query.
+
+    Tactic Notation "query_cases" tactic(first) ident(c) :=
+      first;
+      [ Case_aux c "Q_camp_rule"%string
+      | Case_aux c "Q_tech_rule"%string
+      | Case_aux c "Q_designer_rule"%string
+      | Case_aux c "Q_camp"%string
+      | Case_aux c "Q_oql"%string
+      | Case_aux c "Q_sql"%string
+      | Case_aux c "Q_lambda_nra"%string
+      | Case_aux c "Q_nra"%string
+      | Case_aux c "Q_nraenv_core"%string
+      | Case_aux c "Q_nraenv"%string
+      | Case_aux c "Q_nnrc_core"%string
+      | Case_aux c "Q_nnrc"%string
+      | Case_aux c "Q_nnrcmr"%string
+      | Case_aux c "Q_cldmr"%string
+      | Case_aux c "Q_dnnrc_dataset"%string
+      | Case_aux c "Q_dnnrc_typed_dataset"%string
+      | Case_aux c "Q_javascript"%string
+      | Case_aux c "Q_java"%string
+      | Case_aux c "Q_spark_rdd"%string
+      | Case_aux c "Q_spark_dataset"%string
+      | Case_aux c "Q_cloudant"%string
+      | Case_aux c "Q_error"%string].
+
+    Definition language_of_query q :=
+      match q with
+      | Q_camp_rule _ => L_camp_rule
+      | Q_tech_rule _ => L_tech_rule
+      | Q_designer_rule _ => L_designer_rule
+      | Q_camp _ => L_camp
+      | Q_oql _ => L_oql
+      | Q_sql _ => L_sql
+      | Q_lambda_nra _ => L_lambda_nra
+      | Q_nra _ => L_nra
+      | Q_nraenv_core _ => L_nraenv_core
+      | Q_nraenv _ => L_nraenv
+      | Q_nnrc_core _ => L_nnrc_core
+      | Q_nnrc _ => L_nnrc
+      | Q_nnrcmr _ => L_nnrcmr
+      | Q_cldmr _ => L_cldmr
+      | Q_dnnrc_dataset _ => L_dnnrc_dataset
+      | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
+      | Q_javascript _ => L_javascript
+      | Q_java _ => L_java
+      | Q_spark_rdd _ => L_spark_rdd
+      | Q_spark_dataset _ => L_spark_dataset
+      | Q_cloudant _ => L_cloudant
+      | Q_error err =>
+        L_error ("No language corresponding to error query '"++err++"'")
+      end.
+
+    Definition name_of_query q :=
+      name_of_language (language_of_query q).
+
     (* given a language, returns the type of that language *)
     Definition type_of_language (l:language) : Set :=
       match l with
@@ -347,7 +348,7 @@ Section CompLang.
       | L_cloudant => cloudant
       | L_error _ => string
       end.
-  End CompLangUtil.
+  End Query.
 
 End CompLang.
 

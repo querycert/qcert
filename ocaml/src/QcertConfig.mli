@@ -47,6 +47,7 @@ type global_config = {
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
+    mutable gconf_optim_config : Compiler.optim_config;
   }
 
 val complete_configuration : global_config -> global_config

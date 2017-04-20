@@ -50,6 +50,18 @@ let compile source_lang_s target_lang_s q_s =
 (* Equivalent to qcert cmd        *)
 (**********************************)
 
+let optim_phase_from_json_conf (gp: (string * string list) * int) : (char list * char list list) * int =
+  let phase_name = Util.char_list_of_string (fst (fst gp)) in
+  let phase_list = List.map Util.char_list_of_string (snd (fst gp)) in
+  ((phase_name, phase_list),snd gp)
+    
+let optim_phases_config_from_json_conf (gpc: string * ((string * string list) * int) list) : Compiler.language * Compiler.optim_phases_config =
+  let language = Compiler.language_of_name_case_sensitive (Util.char_list_of_string (fst gpc)) in
+  (language,List.map optim_phase_from_json_conf (snd gpc))
+    
+let optim_conf_from_json_conf (gc:(string * ((string * string list) * int) list) list) : Compiler.optim_config =
+  List.map optim_phases_config_from_json_conf gc
+    
 let global_config_of_json j =
   let gconf =
     { gconf_source = Compiler.L_camp_rule;
@@ -76,7 +88,8 @@ let global_config_of_json j =
       gconf_mr_vinit = "init";
       gconf_stat = false;
       gconf_stat_all = false;
-      gconf_stat_tree = false; }
+      gconf_stat_tree = false;
+      gconf_optim_config = []; }
   in
   let apply f o =
     Js.Optdef.iter o (fun s -> f gconf (Js.to_string s));

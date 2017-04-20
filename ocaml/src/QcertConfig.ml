@@ -48,6 +48,7 @@ type global_config = {
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
+    mutable gconf_optim_config : Compiler.optim_config;
   }
 
 let hierarchy_of_conf gconf =
@@ -124,4 +125,4 @@ let driver_conf_of_global_conf gconf qname cname =
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;
     comp_constants = constants_config;
     comp_java_imports = char_list_of_string gconf.gconf_java_imports;
-    comp_optim_config = []; (* XXX To be populate from command line and JS for optimizer parameterization XXX *) }
+    comp_optim_config = gconf.gconf_optim_config; }

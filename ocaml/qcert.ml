@@ -158,7 +158,8 @@ let parse_args () =
       gconf_mr_vinit = "init";
       gconf_stat = false;
       gconf_stat_all = false;
-      gconf_stat_tree = false; }
+      gconf_stat_tree = false;
+      gconf_optim_config = []; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complete_configuration gconf, List.rev !input_files)
