@@ -6,17 +6,14 @@ http://github.com/querycert/qcert
 
 ## About
 
-This is the source code for the Q\*cert query compiler. The goal of
-the project is to develop a state of the art query compiler for
-languages over a rich data model (nested, hierarchical, etc), with an
-implementation which provides strong correctness guarantees.
+This is the source code for Q\*cert, a framework for the development
+and verification of query compilers. It supports a rich data model
+(nested, hierarchical, etc) and a fairly extensive compilation
+pipeline to start from.
 
-Q\*cert is built and verified using the Coq proof assistant. S
-significant subset of the compiler has been mechanically checked for
-correctness. The core compiler can be obtained by 'extracting' OCaml
-code from the source in Coq.
-
-![Q*cert](docs/qcert.jpg)
+Q\*cert is built using the Coq proof assistant. A significant subset
+of the initial compilation pipeline has been mechanically checked for
+correctness.
 
 ## Prerequisites
 
