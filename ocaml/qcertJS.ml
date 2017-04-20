@@ -47,21 +47,40 @@ let compile source_lang_s target_lang_s q_s =
   Js.string result
 
 (**********************************)
-(* Equivalent to qcert cmd        *)
+(* Configuration support          *)
 (**********************************)
 
-let optim_phase_from_json_conf (gp: (string * string list) * int) : (char list * char list list) * int =
-  let phase_name = Util.char_list_of_string (fst (fst gp)) in
-  let phase_list = List.map Util.char_list_of_string (snd (fst gp)) in
-  ((phase_name, phase_list),snd gp)
-    
-let optim_phases_config_from_json_conf (gpc: string * ((string * string list) * int) list) : Compiler.language * Compiler.optim_phases_config =
-  let language = Compiler.language_of_name_case_sensitive (Util.char_list_of_string (fst gpc)) in
-  (language,List.map optim_phase_from_json_conf (snd gpc))
-    
-let optim_conf_from_json_conf (gc:(string * ((string * string list) * int) list) list) : Compiler.optim_config =
-  List.map optim_phases_config_from_json_conf gc
-    
+(* XXX g is applied to json value if it exists, f is the configuration setter, taking the result of g XXX *)
+let apply_gen gconf f g o = Js.Optdef.iter o (fun j -> f gconf (g j))
+let apply gconf f o = apply_gen gconf f Js.to_string o
+let iter_array gconf f o =
+  Js.Optdef.iter o
+    (fun a ->
+      let a = Js.str_array a in
+      ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
+
+(**********************************)
+(* Optim. configuration support   *)
+(**********************************)
+
+(* Two levels of conversions for optimization configuration:
+     json -> ocaml (in QcertArgs.mli) -> Coq (in Compiler.mli).
+
+   Here is the corresponding TypeScript type for the JSON side.
+     type QcertOptimStepDescription = {name: string, description:string, lemma:string};
+
+    type QcertOptimPhase = {name: string; optims: string[]; iter: number};
+    type QcertOptimConfig = {language: string; phases: QcertOptimPhase[]};
+
+ *)
+
+let optim_conf_ocaml_from_json_conf j : QcertArg.optim_config_ocaml =
+  [] (* XXX to be filled XXX *)
+
+(**********************************)
+(* Equivalent to qcert cmd        *)
+(**********************************)
+  
 let global_config_of_json j =
   let gconf =
     { gconf_source = Compiler.L_camp_rule;
@@ -91,30 +110,37 @@ let global_config_of_json j =
       gconf_stat_tree = false;
       gconf_optim_config = []; }
   in
-  let apply f o =
-    Js.Optdef.iter o (fun s -> f gconf (Js.to_string s));
-  in
-  let iter_array f o =
-    Js.Optdef.iter o
-      (fun a ->
-        let a = Js.str_array a in
-        ignore (Js.array_map (fun s -> f gconf (Js.to_string s)) a))
-  in
+  (* Specialize apply/iter for this given gconf *)
+  let apply_gen = apply_gen gconf in
+  let apply = apply gconf in
+  let iter_array = iter_array gconf in
+  (* Source/Target *)
   apply QcertArg.set_source j##.source;
   apply QcertArg.set_target j##.target;
+  (* Compilation path *)
   iter_array QcertArg.add_path j##.path;
   Js.Optdef.iter j##.exactpath (fun b -> gconf.gconf_exact_path <- Js.to_bool b);
+  (* Target directory -- XXX is that used? XXX *)
   apply QcertArg.set_dir j##.dir;
   apply QcertArg.set_dir j##.dirtarget;
-  Js.Optdef.iter j##.jsruntime
-    (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
+  (* I/O *)
   apply QcertArg.set_schema_content j##.schema;
   apply QcertArg.set_input_content j##.input;
+  (* Cloudant options *)
+  Js.Optdef.iter j##.jsruntime
+    (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
+  Js.Optdef.iter j##.cld_prefix
+    (fun s -> CloudantUtil.set_prefix gconf.gconf_cld_conf (Js.to_string s));
+  (* Emit options *)
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
-  Js.Optdef.iter j##.eval (fun b -> gconf.gconf_eval <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexpall (fun b -> gconf.gconf_emit_sexp_all <- Js.to_bool b);
+  (* Eval options *)
+  Js.Optdef.iter j##.eval (fun b -> gconf.gconf_eval <- Js.to_bool b);
+  Js.Optdef.iter j##.evalall (fun b -> gconf.gconf_eval_all <- Js.to_bool b);
+  (* Source options *)
   Js.Optdef.iter j##.sourcesexp (fun b -> gconf.gconf_source_sexp <- Js.to_bool b);
+  (* Pretty-printing options *)
   Js.Optdef.iter j##.ascii
     (fun b -> if Js.to_bool b then
       PrettyIL.set_ascii gconf.gconf_pretty_config ()
@@ -124,10 +150,13 @@ let global_config_of_json j =
     (fun num ->
       let n = int_of_float (Js.float_of_number num) in
       PrettyIL.set_margin gconf.gconf_pretty_config n);
-  Js.Optdef.iter j##.cld_prefix
-    (fun s -> CloudantUtil.set_prefix gconf.gconf_cld_conf (Js.to_string s));
+  (* Java options *)
   apply QcertArg.set_java_imports j##.javaimports;
+  (* NNRCMR options *)
   apply QcertArg.set_vinit j##.vinit;
+  (* Optimization configuration *)
+  apply_gen QcertArg.set_optims optim_conf_ocaml_from_json_conf j##.optims;
+  (* Return configuration after applying self-consistency constraints *)
   complete_configuration gconf
 
 let wrap_all wrap_f l =

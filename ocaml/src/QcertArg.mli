@@ -42,3 +42,14 @@ val set_vinit : QcertConfig.global_config -> string -> unit
 val set_stat : QcertConfig.global_config -> unit -> unit
 val set_stat_all : QcertConfig.global_config -> unit -> unit
 val set_stat_tree : QcertConfig.global_config -> unit -> unit
+
+(* Optimization support *)
+type optim_language_name = string
+type optim_phase_name = string
+type optim_name = string
+type optim_iter = int
+type optim_config_ocaml =
+    (optim_language_name * ((optim_phase_name * optim_name list) * optim_iter) list) list
+
+val set_optims : QcertConfig.global_config -> optim_config_ocaml -> unit
+

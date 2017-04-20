@@ -69,3 +69,30 @@ let set_vinit gconf x = gconf.gconf_mr_vinit <- x
 let set_stat gconf () = gconf.gconf_stat <- true
 let set_stat_all gconf () = gconf.gconf_stat_all <- true
 let set_stat_tree gconf () = gconf.gconf_stat_tree <- true
+
+(* Optimization support *)
+type optim_language_name = string
+type optim_phase_name = string
+type optim_name = string
+type optim_iter = int
+type optim_config_ocaml =
+    (optim_language_name * ((optim_phase_name * optim_name list) * optim_iter) list) list
+
+let optim_phase_from_ocaml_conf
+    (gp: (optim_phase_name * optim_name list) * optim_iter)
+    : (char list * char list list) * int =
+  let phase_name = Util.char_list_of_string (fst (fst gp)) in
+  let phase_list = List.map Util.char_list_of_string (snd (fst gp)) in
+  ((phase_name, phase_list),snd gp)
+    
+let optim_phases_config_from_ocaml_conf
+    (gpc: optim_language_name * ((optim_phase_name * optim_name list) * optim_iter) list)
+    : Compiler.language * Compiler.optim_phases_config =
+  let language = Compiler.language_of_name_case_sensitive (Util.char_list_of_string (fst gpc)) in
+  (language,List.map optim_phase_from_ocaml_conf (snd gpc))
+    
+let optim_conf_from_ocaml_conf (gc:optim_config_ocaml) : Compiler.optim_config =
+  List.map optim_phases_config_from_ocaml_conf gc
+
+let set_optims gconf optims = gconf.gconf_optim_config <- (optim_conf_from_ocaml_conf optims)
+

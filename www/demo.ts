@@ -109,7 +109,8 @@ interface PuzzleSides {
             query:srcInput,
             schema: schemaInput,
             eval:false,
-            input:undefined
+            input:undefined,
+	    optims:optims /* XXX Add optimizations here XXX */
           }, handler); 
     }
 
@@ -203,7 +204,8 @@ interface PuzzleSides {
             query:srcInput,
             schema: schemaInput,
             eval: true,
-            input: dataInput
+            input: dataInput,
+	    optims:[] /* XXX Add optimizations here XXX */
           };
     }
 
