@@ -75,7 +75,7 @@ interface PuzzleSides {
     // Executes when compile button is pressed.  This button shows when the compile tab shows.
     function compileButton() {
         const langs = getPipelineLangs();
-        const optims = getOptimConfig();
+        const optimconf = getOptimConfig();
         const srcInput = getSrcInput();
         const schemaInput = getSchemaInput();
 
@@ -110,7 +110,7 @@ interface PuzzleSides {
             schema: schemaInput,
             eval:false,
             input:undefined,
-	    optims:optims /* XXX Add optimizations here XXX */
+	    optims:optimconf /* XXX Add optimizations here XXX */
           }, handler); 
     }
 

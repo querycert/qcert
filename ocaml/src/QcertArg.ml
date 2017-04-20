@@ -71,28 +71,34 @@ let set_stat_all gconf () = gconf.gconf_stat_all <- true
 let set_stat_tree gconf () = gconf.gconf_stat_tree <- true
 
 (* Optimization support *)
-type optim_language_name = string
-type optim_phase_name = string
-type optim_name = string
-type optim_iter = int
-type optim_config_ocaml =
-    (optim_language_name * ((optim_phase_name * optim_name list) * optim_iter) list) list
+type optim_phase =
+    { mutable optim_phase_name : string;
+      mutable optim_phase_iter : int;
+      mutable optim_phase_optims : string list; }
+type optim_language =
+    { mutable optim_language_name : string;
+      mutable optim_phases : optim_phase list; }
+type optim_config = optim_language list
 
-let optim_phase_from_ocaml_conf
-    (gp: (optim_phase_name * optim_name list) * optim_iter)
+let optim_phase_from_ocaml_conf (gp: optim_phase)
     : (char list * char list list) * int =
-  let phase_name = Util.char_list_of_string (fst (fst gp)) in
-  let phase_list = List.map Util.char_list_of_string (snd (fst gp)) in
-  ((phase_name, phase_list),snd gp)
+  let phase_name = Util.char_list_of_string gp.optim_phase_name in
+  let phase_iter = gp.optim_phase_iter in
+  let phase_list = List.map Util.char_list_of_string gp.optim_phase_optims in
+  ((phase_name, phase_list),phase_iter)
     
-let optim_phases_config_from_ocaml_conf
-    (gpc: optim_language_name * ((optim_phase_name * optim_name list) * optim_iter) list)
+let optim_phases_config_from_ocaml_conf (gpc: optim_language)
     : Compiler.language * Compiler.optim_phases_config =
-  let language = Compiler.language_of_name_case_sensitive (Util.char_list_of_string (fst gpc)) in
-  (language,List.map optim_phase_from_ocaml_conf (snd gpc))
-    
-let optim_conf_from_ocaml_conf (gc:optim_config_ocaml) : Compiler.optim_config =
+  let language_name =
+    Compiler.language_of_name_case_sensitive
+      (Util.char_list_of_string gpc.optim_language_name)
+  in
+  let optim_phases = List.map optim_phase_from_ocaml_conf gpc.optim_phases in
+  (language_name,optim_phases)
+
+let optim_conf_from_ocaml_conf (gc:optim_config) : Compiler.optim_config =
   List.map optim_phases_config_from_ocaml_conf gc
 
 let set_optims gconf optims = gconf.gconf_optim_config <- (optim_conf_from_ocaml_conf optims)
+let set_optim gconf optim = gconf.gconf_optim_config <- gconf.gconf_optim_config@[optim_phases_config_from_ocaml_conf optim]
 

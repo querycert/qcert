@@ -30,7 +30,8 @@ function compileButton() {
 		'input' : getParameter("input", "{}"),
 		'ascii' : getParameter("charset", "Greek") === "Ascii",
 		'javaimports' : getParameter("java_imports", ""),
-		'query' : document.getElementById("query").value
+  	        'query' : document.getElementById("query").value,
+  	        'optims' : []
 	};
 	document.getElementById("result").innerHTML = "[ Query is compiling ]";
 	var handler = function(compilationResult) {
@@ -68,6 +69,7 @@ function compileForEval() {
 		'ascii' : document.getElementById("charset").value === "Ascii",
 		'javaimports' : document.getElementById("java_imports").value,
 		'query' : document.getElementById("query").value,
+	        'optims' : [],
 	};
 	console.log(input);
 	var handler = function(compilationResult) {
