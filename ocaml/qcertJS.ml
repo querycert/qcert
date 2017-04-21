@@ -15,6 +15,7 @@
  *)
 
 open Util
+open DataUtil
 open QcertUtil
 open QcertConfig
 module Hack = Compiler
@@ -79,40 +80,40 @@ let map_array_gen gconf f o =
 
  *)
 
-let phase_config_from_json j : QcertArg.optim_phase =
+let phase_config_from_json j : optim_phase =
   let pconf =
-    { QcertArg.optim_phase_name = "";
-      QcertArg.optim_phase_iter = 0;
-      QcertArg.optim_phase_optims = []; }
+    { optim_phase_name = "";
+      optim_phase_iter = 0;
+      optim_phase_optims = []; }
   in
   (* Specialize apply/iter for this given gconf *)
   let apply = apply pconf in
   let apply_int = apply_int pconf in
   let iter_array = iter_array pconf in
   (* Phase name *)
-  apply (fun pconf name -> pconf.QcertArg.optim_phase_name <- name) j##.name;
+  apply (fun pconf name -> pconf.optim_phase_name <- name) j##.name;
   (* Phase iter *)
-  apply_int (fun pconf i -> pconf.QcertArg.optim_phase_iter <- i) j##.iter;
+  apply_int (fun pconf i -> pconf.optim_phase_iter <- i) j##.iter;
   (* Optimizations *)
-  iter_array (fun pconf o -> pconf.QcertArg.optim_phase_optims <- pconf.QcertArg.optim_phase_optims@[o]) j##.optims;
+  iter_array (fun pconf o -> pconf.optim_phase_optims <- pconf.optim_phase_optims@[o]) j##.optims;
   (* Optimization phases *)
   pconf
   
     
-let optim_config_from_json j : QcertArg.optim_language =
+let optim_config_from_json j : optim_language =
   let oconf =
-    { QcertArg.optim_language_name = "";
-      QcertArg.optim_phases = []; }
+    { optim_language_name = "";
+      optim_phases = []; }
   in
   (* Specialize apply/iter for this given gconf *)
   let apply = apply oconf in
   (* Language name *)
-  apply (fun oconf name -> oconf.QcertArg.optim_language_name <- name) j##.language;
+  apply (fun oconf name -> oconf.optim_language_name <- name) j##.language;
   (* Optimization phases *)
   let poptims =
     List.map phase_config_from_json (Js.Optdef.get j##.phases (fun x -> []))
   in
-  oconf.QcertArg.optim_phases <- poptims;
+  oconf.optim_phases <- poptims;
   (* return optim configuration *)
   oconf
 
@@ -147,6 +148,7 @@ let global_config_of_json j =
       gconf_stat = false;
       gconf_stat_all = false;
       gconf_stat_tree = false;
+      gconf_optim_config_file = None;
       gconf_optim_config = []; }
   in
   (* Specialize apply/iter for this given gconf *)
