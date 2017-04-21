@@ -68,7 +68,8 @@ let args_list gconf =
          " Produce statistics for all intermediate queries");
       ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
        " Produce statistics for paths following starting from the source");
-      (*  " Logs the optimizations/rewrites during compilation"); *)
+      ("-optim-config", Arg.String (QcertArg.set_optim_config_file gconf),
+       " Configuration for the optimizer (JSON format)");
       ("-log-optims", Arg.String
 			(fun s -> Logger.nra_set_trace logger_nra_to_sexp s;
 				  Logger.nrc_set_trace logger_nrc_to_sexp s;
@@ -159,6 +160,7 @@ let parse_args () =
       gconf_stat = false;
       gconf_stat_all = false;
       gconf_stat_tree = false;
+      gconf_optim_config_file = None;
       gconf_optim_config = []; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;

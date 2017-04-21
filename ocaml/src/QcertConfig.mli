@@ -47,8 +47,12 @@ type global_config = {
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
+    mutable gconf_optim_config_file : string option;
     mutable gconf_optim_config : Compiler.optim_config;
   }
+
+val optim_phases_config_from_ocaml_conf : DataUtil.optim_language -> Compiler.language * Compiler.optim_phases_config
+val optim_conf_from_ocaml_conf : DataUtil.optim_config -> Compiler.optim_config
 
 val complete_configuration : global_config -> global_config
 

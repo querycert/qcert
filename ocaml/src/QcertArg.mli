@@ -43,16 +43,7 @@ val set_stat : QcertConfig.global_config -> unit -> unit
 val set_stat_all : QcertConfig.global_config -> unit -> unit
 val set_stat_tree : QcertConfig.global_config -> unit -> unit
 
-(* Optimization support *)
-type optim_phase =
-    { mutable optim_phase_name : string;
-      mutable optim_phase_iter : int;
-      mutable optim_phase_optims : string list; }
-type optim_language =
-    { mutable optim_language_name : string;
-      mutable optim_phases : optim_phase list; }
-type optim_config = optim_language list
-
-val set_optim : QcertConfig.global_config -> optim_language -> unit
-val set_optims : QcertConfig.global_config -> optim_config -> unit
+val set_optim_config_file : QcertConfig.global_config -> string -> unit
+val set_optim : QcertConfig.global_config -> DataUtil.optim_language -> unit
+val set_optims : QcertConfig.global_config -> DataUtil.optim_config -> unit
 

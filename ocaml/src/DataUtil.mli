@@ -48,6 +48,16 @@ type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
 type content_schema = content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
 
+(* Optimization support *)
+type optim_phase =
+    { mutable optim_phase_name : string;
+      mutable optim_phase_iter : int;
+      mutable optim_phase_optims : string list; }
+type optim_language =
+    { mutable optim_language_name : string;
+      mutable optim_phases : optim_phase list; }
+type optim_config = optim_language list
+
 val get_io_components : io_json option -> io_input option * io_output option * io_schema option
 
 val build_input : serialization_format -> content_hierarchy -> io_input -> content_input
@@ -56,4 +66,6 @@ val build_schema : io_schema -> content_schema
 val build_brandTypes : io_brandTypes -> content_brandTypes
 val build_typeDefs : io_typeDefs -> content_typeDefs
 val build_globals : io_globals -> content_globals
+
+val build_optim_config : QData.json -> optim_config
 

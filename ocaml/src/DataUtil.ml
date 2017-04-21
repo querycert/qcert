@@ -47,9 +47,57 @@ type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
 type content_schema = content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
 
+(* Optimization support *)
+type optim_phase =
+    { mutable optim_phase_name : string;
+      mutable optim_phase_iter : int;
+      mutable optim_phase_optims : string list; }
+type optim_language =
+    { mutable optim_language_name : string;
+      mutable optim_phases : optim_phase list; }
+type optim_config = optim_language list
+
+let optim_phase_from_ocaml_conf (gp: optim_phase)
+    : (char list * char list list) * int =
+  let phase_name = Util.char_list_of_string gp.optim_phase_name in
+  let phase_iter = gp.optim_phase_iter in
+  let phase_list = List.map Util.char_list_of_string gp.optim_phase_optims in
+  ((phase_name, phase_list),phase_iter)
+    
 
 let get_field name r =
-  List.assoc (Util.char_list_of_string name) r
+  begin try
+    List.assoc (Util.char_list_of_string name) r
+  with
+  | Not_found ->
+      raise (Qcert_Error ("Field " ^ name ^ " not found"))
+  end
+let get_string j =
+  begin match j with
+  | Compiler.Jstring s -> Util.string_of_char_list s
+  | _ ->
+      raise (Qcert_Error ("JSON value not a string"))
+  end
+let get_field_string name r =
+  begin match get_field name r with
+  | Compiler.Jstring s -> Util.string_of_char_list s
+  | _ ->
+      raise (Qcert_Error ("Field " ^ name ^ " not a string"))
+  end
+
+let get_field_string_array name r =
+  begin match get_field name r with
+  | Compiler.Jarray l -> List.map get_string l
+  | _ ->
+      raise (Qcert_Error ("Field " ^ name ^ " not a string"))
+  end
+   
+let get_field_int name r =
+  begin match get_field name r with
+  | Compiler.Jnumber i -> i
+  | _ ->
+      raise (Qcert_Error ("Field " ^ name ^ " not an integer"))
+  end
 
 let get_field_opt name r =
   begin try
@@ -179,3 +227,40 @@ let build_output h output =
   | _ -> raise (Qcert_Error "Ill-formed output")
   end
 
+let build_phase_config j =
+  begin match j with
+  | Compiler.Jobject r ->
+      let phase_name = get_field_string "name" r in
+      let phase_iter = get_field_int "iter" r in
+      let phase_optims = get_field_string_array "optims" r in
+      { optim_phase_name = phase_name;
+	optim_phase_iter = phase_iter;
+	optim_phase_optims = phase_optims; }
+  | _ ->
+      raise (Qcert_Error "Ill-formed language optim config")
+  end
+let build_phases_config j =
+  begin match j with
+  | Compiler.Jarray l ->
+      List.map build_phase_config l
+  | _ ->
+      raise (Qcert_Error "Illed formed phase optim configuration")
+  end
+
+let build_language_config j =
+  begin match j with
+  | Compiler.Jobject r ->
+      let language_name = get_field_string "language" r in
+      let phases = build_phases_config (get_field "phases" r) in
+      { optim_language_name = language_name;
+	optim_phases = phases; }
+  | _ ->
+      raise (Qcert_Error "Ill-formed language optim config")
+  end
+let build_optim_config j =
+  begin match j with
+  | Compiler.Jarray l ->
+      List.map build_language_config l
+  | _ ->
+      raise (Qcert_Error "Illed formed optim configuration")
+  end

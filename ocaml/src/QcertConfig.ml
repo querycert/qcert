@@ -15,6 +15,7 @@
  *)
 
 open Util
+open DataUtil
 open Compiler.EnhancedCompiler
 
 type io_kind =
@@ -31,8 +32,8 @@ type global_config = {
     (* Schema, input, output *)
     mutable gconf_io : io_kind option;
     mutable gconf_schema : TypeUtil.schema;
-    mutable gconf_input : DataUtil.content_input;
-    mutable gconf_output : DataUtil.content_output;
+    mutable gconf_input : content_input;
+    mutable gconf_output : content_output;
     gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
@@ -48,6 +49,7 @@ type global_config = {
     mutable gconf_stat : bool;
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
+    mutable gconf_optim_config_file : string option;
     mutable gconf_optim_config : Compiler.optim_config;
   }
 
@@ -57,13 +59,13 @@ let hierarchy_of_conf gconf =
 let parse_io f =
   begin match f with
   | None -> (None,None,None)
-  | Some f -> DataUtil.get_io_components (Some (ParseFile.parse_io_from_file f))
+  | Some f -> get_io_components (Some (ParseFile.parse_io_from_file f))
   end
 
-let parse_io_component f =
+let parse_json_component f =
   begin match f with
   | None -> None
-  | Some f -> Some (ParseString.parse_io_from_string f)
+  | Some f -> Some (ParseString.parse_json_from_string f)
   end
 
 let parse_io_kind gconf =
@@ -71,12 +73,42 @@ let parse_io_kind gconf =
   | None -> (None,None,None)
   | Some (IO_file f) -> parse_io f
   | Some (IO_components (fin,fout,fschema)) ->
-      (parse_io_component fin,
-       parse_io_component fout,
-       parse_io_component fschema)
+      (parse_json_component fin,
+       parse_json_component fout,
+       parse_json_component fschema)
   end
     
+(* Optimization support *)
+let optim_phase_from_ocaml_conf (gp: optim_phase)
+    : (char list * char list list) * int =
+  let phase_name = Util.char_list_of_string gp.optim_phase_name in
+  let phase_iter = gp.optim_phase_iter in
+  let phase_list = List.map Util.char_list_of_string gp.optim_phase_optims in
+  ((phase_name, phase_list),phase_iter)
+    
+let optim_phases_config_from_ocaml_conf (gpc: optim_language)
+    : Compiler.language * Compiler.optim_phases_config =
+  let language_name =
+    Compiler.language_of_name_case_sensitive
+      (Util.char_list_of_string gpc.optim_language_name)
+  in
+  let optim_phases = List.map optim_phase_from_ocaml_conf gpc.optim_phases in
+  (language_name,optim_phases)
+
+let optim_conf_from_ocaml_conf (gc:optim_config) : Compiler.optim_config =
+  List.map optim_phases_config_from_ocaml_conf gc
+
 let complete_configuration gconf =
+  let _optim_config =
+    begin match gconf.gconf_optim_config_file with
+    | Some f ->
+	let optim_json = ParseFile.parse_json_from_file f in
+	let caml_optim_conf = build_optim_config optim_json in
+	let coq_optim_conf = optim_conf_from_ocaml_conf caml_optim_conf in
+	gconf.gconf_optim_config <- coq_optim_conf
+    | None -> ()
+    end
+  in
   let (io_input,io_output,io_schema) = parse_io_kind gconf in
   let _schema =
     begin match io_schema with
@@ -87,13 +119,13 @@ let complete_configuration gconf =
   let h = hierarchy_of_conf gconf in
   let _input =
     begin match io_input with
-    | Some io -> gconf.gconf_input <- (DataUtil.build_input DataUtil.META h io)
+    | Some io -> gconf.gconf_input <- (build_input META h io)
     | None -> ()
     end
   in
   let _output =
     begin match io_output with
-    | Some io -> gconf.gconf_output <- DataUtil.build_output h io
+    | Some io -> gconf.gconf_output <- build_output h io
     | None -> ()
     end
   in
