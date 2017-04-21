@@ -69,7 +69,9 @@ let args_list gconf =
       ("-stat-tree", Arg.Unit (QcertArg.set_stat_tree gconf),
        " Produce statistics for paths following starting from the source");
       ("-optim-config", Arg.String (QcertArg.set_optim_config_file gconf),
-       " Configuration for the optimizer (JSON format)");
+       " Optimizer configuration (JSON format)");
+      ("-emit-optim-config", Arg.Unit (QcertArg.set_emit_optim_config gconf),
+       " Emit the optimizer configuration (JSON format)");
       ("-log-optims", Arg.String
 			(fun s -> Logger.nra_set_trace logger_nra_to_sexp s;
 				  Logger.nrc_set_trace logger_nrc_to_sexp s;
@@ -161,6 +163,7 @@ let parse_args () =
       gconf_stat_all = false;
       gconf_stat_tree = false;
       gconf_optim_config_file = None;
+      gconf_emit_optim_config = false;
       gconf_optim_config = []; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
@@ -198,5 +201,6 @@ let () =
       List.iter output_res res.QcertCore.res_eval_all;
       output_res res.QcertCore.res_emit_sexp;
       List.iter output_res res.QcertCore.res_emit_sexp_all;
-      output_stats res)
+      output_stats res;
+      output_res res.QcertCore.res_optim_config;)
     results

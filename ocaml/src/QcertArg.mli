@@ -44,6 +44,7 @@ val set_stat_all : QcertConfig.global_config -> unit -> unit
 val set_stat_tree : QcertConfig.global_config -> unit -> unit
 
 val set_optim_config_file : QcertConfig.global_config -> string -> unit
+val set_emit_optim_config : QcertConfig.global_config -> unit -> unit
 val set_optim : QcertConfig.global_config -> DataUtil.optim_language -> unit
 val set_optims : QcertConfig.global_config -> DataUtil.optim_config -> unit
 

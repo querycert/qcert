@@ -149,6 +149,7 @@ let global_config_of_json j =
       gconf_stat_all = false;
       gconf_stat_tree = false;
       gconf_optim_config_file = None;
+      gconf_emit_optim_config = false;
       gconf_optim_config = []; }
   in
   (* Specialize apply/iter for this given gconf *)

@@ -50,6 +50,7 @@ type global_config = {
     mutable gconf_stat_all : bool;
     mutable gconf_stat_tree : bool;
     mutable gconf_optim_config_file : string option;
+    mutable gconf_emit_optim_config : bool;
     mutable gconf_optim_config : Compiler.optim_config;
   }
 

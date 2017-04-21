@@ -29,6 +29,7 @@ type result = {
     res_stat : string;
     res_stat_all : string list;
     res_stat_tree : result_file;
+    res_optim_config : result_file;
   }
 and result_file = {
     res_file : string;
@@ -133,7 +134,6 @@ let emit_one_sio file_name dir one_sdata =
   let fout = outname (target_f dir (fpref^"."^(Util.string_of_char_list const_name))) ".sio" in
   { res_file = fout; res_lang = "sio"; res_content = Util.string_of_char_list const_sio; }
 
-    
 let emit_sio (ev_input:DataUtil.content_input) (schema: TypeUtil.schema) (file_name:string) dir =
   let sdata = TypeUtil.content_sdata_of_data schema ev_input in
   List.map (emit_one_sio file_name dir) sdata
@@ -233,6 +233,37 @@ let stat_tree_query (schema: TypeUtil.schema) dir file_name q =
   let fout = outname (target_f dir fpref) "_stats.json" in
   { res_file = fout; res_lang = language_name; res_content = string stats; }
 
+(* Optim config *)
+let data_of_optim_phase optim_phase =
+  let phase_name = fst (fst optim_phase) in
+  let phase_optims = List.map QData.dstring (snd (fst optim_phase)) in
+  let phase_iter = snd optim_phase in
+  QData.drec [(Util.char_list_of_string "name", QData.dstring phase_name);
+	      (Util.char_list_of_string "optims", QData.dcoll phase_optims);
+	      (Util.char_list_of_string "iter", QData.dnat phase_iter);]
+  
+let data_of_optim_language optim_lang =
+  let language_name = Compiler.name_of_language (fst optim_lang) in
+  let optim_phases = List.map data_of_optim_phase (snd optim_lang) in
+  QData.drec [(Util.char_list_of_string "language", QData.dstring language_name);
+	      (Util.char_list_of_string "phases", QData.dcoll optim_phases);]
+let data_of_optim_config (optim_config:Compiler.optim_config) =
+  let optim_config =
+    if optim_config = []
+    then
+      QDriver.optim_config_default
+    else
+      optim_config
+  in
+  let optim_languages = List.map data_of_optim_language optim_config in
+  QData.dcoll optim_languages
+let emit_optim_config optim_config dir file_name =
+  let fpref = Filename.chop_extension file_name in
+  let fout = outname (target_f dir fpref) "_optim.json" in
+  let optims_data = data_of_optim_config optim_config in
+  let optims = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") optims_data) in
+  { res_file = fout; res_lang = "json"; res_content = optims; }
+    
 (* Main *)
 
 let main_data gconf file_name =
@@ -354,6 +385,12 @@ let main gconf (file_name, query_s) =
     else
       ""
   in
+  let res_optim_config =
+    if gconf.gconf_emit_optim_config then
+      emit_optim_config gconf.gconf_optim_config gconf.gconf_dir file_name
+    else
+      no_result_file
+  in
   let res_stat_all =
     if gconf.gconf_stat_all then
       List.map (fun q -> stat_query schema q) queries
@@ -374,5 +411,6 @@ let main gconf (file_name, query_s) =
     res_eval_all = res_eval_all;
     res_stat = res_stat;
     res_stat_all = res_stat_all;
-    res_stat_tree = res_stat_tree; }
+    res_stat_tree = res_stat_tree;
+    res_optim_config = res_optim_config; }
 

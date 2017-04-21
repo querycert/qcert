@@ -68,6 +68,7 @@ let parse_args () =
       gconf_stat_all = false;
       gconf_stat_tree = false;
       gconf_optim_config_file = None;
+      gconf_emit_optim_config = false;
       gconf_optim_config = []; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
