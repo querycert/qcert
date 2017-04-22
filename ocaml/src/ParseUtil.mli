@@ -26,8 +26,8 @@ open Compiler.EnhancedCompiler
 val parse_io : Lexing.lexbuf -> QData.json
 val parse_json : Lexing.lexbuf -> QData.json
 
-val parse_rule : Lexing.lexbuf -> string * QLang.query
-val parse_camp : Lexing.lexbuf -> QLang.camp
+val parse_rule : Lexing.lexbuf -> string * QLang.camp_rule
+val parse_camp : Lexing.lexbuf -> string * QLang.camp
 
 val parse_oql : Lexing.lexbuf -> QLang.oql
 

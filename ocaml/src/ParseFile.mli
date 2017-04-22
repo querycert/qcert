@@ -26,8 +26,8 @@ open ParseUtil
 val parse_io_from_file : string -> QData.json
 val parse_json_from_file : string -> QData.json
 
-val parse_rule_from_file : string -> string * QLang.query
-val parse_camp_from_file : string -> QLang.camp
+val parse_rule_from_file : string -> string * QLang.camp_rule
+val parse_camp_from_file : string -> string * QLang.camp
 
 val parse_oql_from_file : string -> QLang.oql
 

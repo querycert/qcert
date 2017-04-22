@@ -26,16 +26,16 @@ open Compiler.EnhancedCompiler
 (*****************)
 
 let parse_string p_fun s =
-    let buf = Lexing.from_string s in
-    try
-      p_fun buf
-    with
-    | Qcert_Error msg -> raise (Qcert_Error msg)
-    | LexError msg ->
-	Printf.fprintf stderr "[%s] in string%!\n" msg; raise (Qcert_Error ("Parse error ["^ msg ^"] in string [" ^ s ^ "]"))
-    | _ ->
-	Printf.fprintf stderr "Error in string%!\n"; raise (Qcert_Error ("Parse error [???] in string"))
-  
+  let buf = Lexing.from_string s in
+  begin try
+    p_fun buf
+  with
+  | Qcert_Error msg -> raise (Qcert_Error msg)
+  | LexError msg ->
+      Printf.fprintf stderr "[%s] in string%!\n" msg; raise (Qcert_Error ("Parse error ["^ msg ^"] in string [" ^ s ^ "]"))
+  | _ ->
+      Printf.fprintf stderr "Error in string%!\n"; raise (Qcert_Error ("Parse error [???] in string"))
+  end
 
 (******************)
 (* Specific Parse *)
@@ -44,8 +44,8 @@ let parse_string p_fun s =
 let parse_io_from_string s : QData.json = parse_string parse_io s
 let parse_json_from_string s : QData.json = parse_string parse_json s
 
-let parse_rule_from_string s : string * QLang.query = parse_string parse_rule s
-let parse_camp_from_string s : QLang.camp = parse_string parse_camp s
+let parse_rule_from_string s : string * QLang.camp_rule = parse_string parse_rule s
+let parse_camp_from_string s : string * QLang.camp = parse_string parse_camp s
   
 let parse_oql_from_string s : QLang.oql = parse_string parse_oql s
 

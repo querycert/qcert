@@ -26,20 +26,20 @@ open Compiler.EnhancedCompiler
 (*****************)
 
 let parse_file p_fun f =
-    let ic = open_in f in
-    let buf = Lexing.from_channel ic in
-    try
-      let res = p_fun buf in
-      close_in ic; res
-    with
-    | Qcert_Error msg -> raise (Qcert_Error msg)
-    | LexError msg ->
-	close_in ic;
-	Printf.fprintf stderr "[%s] in file %s%!\n" msg f; raise (Qcert_Error ("Parse error in file " ^ f))
-    | _ ->
-	close_in ic;
-	Printf.fprintf stderr "Error in file %s%!\n" f; raise (Qcert_Error ("Parse error in file " ^ f))
-  
+  let ic = open_in f in
+  let buf = Lexing.from_channel ic in
+  begin try
+    let res = p_fun buf in
+    close_in ic; res
+  with
+  | Qcert_Error msg -> raise (Qcert_Error msg)
+  | LexError msg ->
+      close_in ic;
+      Printf.fprintf stderr "[%s] in file %s%!\n" msg f; raise (Qcert_Error ("Parse error in file " ^ f))
+  | _ ->
+      close_in ic;
+      Printf.fprintf stderr "Error in file %s%!\n" f; raise (Qcert_Error ("Parse error in file " ^ f))
+  end
 
 (******************)
 (* Specific Parse *)
@@ -48,8 +48,8 @@ let parse_file p_fun f =
 let parse_io_from_file f : QData.json = parse_file parse_io f
 let parse_json_from_file f : QData.json = parse_file parse_json f
 
-let parse_rule_from_file f : string * QLang.query = parse_file parse_rule f
-let parse_camp_from_file f : QLang.camp = parse_file parse_camp f
+let parse_rule_from_file f : string * QLang.camp_rule = parse_file parse_rule f
+let parse_camp_from_file f : string * QLang.camp = parse_file parse_camp f
   
 let parse_oql_from_file f : QLang.oql = parse_file parse_oql f
 

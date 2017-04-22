@@ -52,8 +52,8 @@ let parse parser lexer buf =
 let parse_io f : QData.json = parse DataParser.main (DataLexer.token (string_buff ())) f
 let parse_json f : QData.json = parse DataParser.main (DataLexer.token (string_buff ())) f
 
-let parse_rule f : string * QLang.query = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
-let parse_camp f : QLang.camp = parse RuleParser.patmain (RuleLexer.token (string_buff ())) f
+let parse_rule f : string * QLang.camp_rule = parse RuleParser.rulemain (RuleLexer.token (string_buff ())) f
+let parse_camp f : string * QLang.camp = parse RuleParser.campmain (RuleLexer.token (string_buff ())) f
   
 let parse_oql f : QLang.oql = parse OQLParser.main (OQLLexer.token (string_buff ())) f
 
@@ -78,8 +78,8 @@ let parse_cldmr_sexp f : QLang.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
 let parse_query l f : (string * QLang.query) =
   begin match l with
-  | Compiler.L_camp_rule -> parse_rule f
-  | Compiler.L_camp -> ("CAMP", Compiler.Q_camp (parse_camp f))
+  | Compiler.L_camp_rule -> let (n,r) = parse_rule f in (n, Compiler.Q_camp_rule r)
+  | Compiler.L_camp -> let (n,c) = parse_camp f in (n, Compiler.Q_camp c)
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
   | Compiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
   | Compiler.L_tech_rule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
