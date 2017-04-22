@@ -31,7 +31,7 @@ function compileButton() {
 		'ascii' : getParameter("charset", "Greek") === "Ascii",
 		'javaimports' : getParameter("java_imports", ""),
   	        'query' : document.getElementById("query").value,
-  	        'optims' : []
+    	        'optims' : document.getElementById("optim").value
 	};
 	document.getElementById("result").innerHTML = "[ Query is compiling ]";
 	var handler = function(compilationResult) {

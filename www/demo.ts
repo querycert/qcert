@@ -110,7 +110,7 @@ interface PuzzleSides {
             schema: schemaInput,
             eval:false,
             input:undefined,
-	    optims:optimconf /* XXX Add optimizations here XXX */
+	    optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
           }, handler); 
     }
 
@@ -205,7 +205,7 @@ interface PuzzleSides {
             schema: schemaInput,
             eval: true,
             input: dataInput,
-	    optims:[] /* XXX Add optimizations here XXX */
+	    optims:"[]" /* XXX Add optimizations here XXX */
           };
     }
 

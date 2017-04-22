@@ -69,54 +69,10 @@ let map_array_gen gconf f o =
 (* Optim. configuration support   *)
 (**********************************)
 
-(* Two levels of conversions for optimization configuration:
-     json -> ocaml (in QcertArgs.mli) -> Coq (in Compiler.mli).
-
-   Here is the corresponding TypeScript type for the JSON side.
-     type QcertOptimStepDescription = {name: string, description:string, lemma:string};
-
-    type QcertOptimPhase = {name: string; optims: string[]; iter: number};
-    type QcertOptimConfig = {language: string; phases: QcertOptimPhase[]};
-
- *)
-
-let phase_config_from_json j : optim_phase =
-  let pconf =
-    { optim_phase_name = "";
-      optim_phase_iter = 0;
-      optim_phase_optims = []; }
-  in
-  (* Specialize apply/iter for this given gconf *)
-  let apply = apply pconf in
-  let apply_int = apply_int pconf in
-  let iter_array = iter_array pconf in
-  (* Phase name *)
-  apply (fun pconf name -> pconf.optim_phase_name <- name) j##.name;
-  (* Phase iter *)
-  apply_int (fun pconf i -> pconf.optim_phase_iter <- i) j##.iter;
-  (* Optimizations *)
-  iter_array (fun pconf o -> pconf.optim_phase_optims <- pconf.optim_phase_optims@[o]) j##.optims;
-  (* Optimization phases *)
-  pconf
+let optim_config_from_json s : optim_config =
+  let optim_json = ParseString.parse_json_from_string s in
+  DataUtil.build_optim_config optim_json
   
-    
-let optim_config_from_json j : optim_language =
-  let oconf =
-    { optim_language_name = "";
-      optim_phases = []; }
-  in
-  (* Specialize apply/iter for this given gconf *)
-  let apply = apply oconf in
-  (* Language name *)
-  apply (fun oconf name -> oconf.optim_language_name <- name) j##.language;
-  (* Optimization phases *)
-  let poptims =
-    List.map phase_config_from_json (Js.Optdef.get j##.phases (fun x -> []))
-  in
-  oconf.optim_phases <- poptims;
-  (* return optim configuration *)
-  oconf
-
 (**********************************)
 (* Equivalent to qcert cmd        *)
 (**********************************)
@@ -154,7 +110,6 @@ let global_config_of_json j =
   in
   (* Specialize apply/iter for this given gconf *)
   let apply = apply gconf in
-  let iter_array_gen = iter_array_gen gconf in
   let iter_array = iter_array gconf in
   (* Source/Target *)
   apply QcertArg.set_source j##.source;
@@ -197,7 +152,7 @@ let global_config_of_json j =
   (* NNRCMR options *)
   apply QcertArg.set_vinit j##.vinit;
   (* Optimization configuration *)
-  iter_array_gen (fun gconf x -> QcertArg.set_optim gconf (optim_config_from_json x)) j##.optims;
+  apply (fun gconf o -> QcertArg.set_optims gconf (optim_config_from_json o)) j##.optims;
   (* Return configuration after applying self-consistency constraints *)
   complete_configuration gconf
 
