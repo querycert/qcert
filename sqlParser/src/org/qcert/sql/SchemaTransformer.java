@@ -110,10 +110,7 @@ public class SchemaTransformer {
 	private static JsonObject convertColumns(ColumnDefinition[] defs) {
 		JsonObject ans = new JsonObject();
 		for (ColumnDefinition def : defs) {
-			/* TODO research dates ... I don't think the name "Date" is going to be recognized by any Coq code, but if the schema
-			 *  is just used to encode tables into input structures it will work fine.
-			 */
-			String type = isDate(def) ? "Date" : isString(def) ? "String" : "Nat";
+			String type = isDate(def) ? "ESqlDate" : isString(def) ? "String" : "Nat";
 			ans.add(def.getName().toLowerCase(), new JsonPrimitive(type));
 		}
 		return ans;

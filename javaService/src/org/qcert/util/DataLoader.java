@@ -251,7 +251,7 @@ public class DataLoader {
 			} catch (NumberFormatException ig) {
 				return new JsonPrimitive(Double.parseDouble(value));
 			}
-		case "Date":
+		case "ESqlDate":
 			return formatDate(value);
 		case "Bool":
 			return new JsonPrimitive(value.equalsIgnoreCase("true"));
@@ -261,8 +261,8 @@ public class DataLoader {
 	}
 
 	/**
-	 * Format a SQL-style String date into a JSON date object
-	 * TODO consider that this is perhaps too SQL-specific and we may need to support other date formats (and distinguish them)
+	 * Format a SQL-style String date into a JSON date object, which, by convention, we use for this type
+	 * TODO support other kinds of dates
 	 * @param stringDate the date to format
 	 * @return the JSON result
 	 */
