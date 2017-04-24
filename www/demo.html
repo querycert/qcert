@@ -4,123 +4,125 @@
 <meta charset="utf-8"/>
 <title>Q*cert Playground</title>
     
-    <!-- Bootstrap core CSS -->
-    <link href="./dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap theme -->
-    <link href="./dist/css/bootstrap-theme.min.css" rel="stylesheet">
+<!-- Bootstrap core CSS -->
+<link href="./dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap theme -->
+<link href="./dist/css/bootstrap-theme.min.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="navbar.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="navbar.css" rel="stylesheet">
 
-    <!-- Q*cert demo -->
-    <link rel="stylesheet" type="text/css" href="demo.css" ></link>
+<!-- Q*cert demo -->
+<link rel="stylesheet" type="text/css" href="demo.css" ></link>
 </head>
 
 <body onload="init();" id='body'>
-	<canvas id="tabs-canvas" width="1000" height="50"></canvas>
-    <button id="kill-button" type="button" style="font-size:large; display:none"
-        onclick="killButton()"><b>kill execution</b></button>
-	<div id="container" style="position:relative">
-		<canvas id="main-canvas" width="1000" height="700"></canvas>
-		<div id="compile-tab" style="display:none; position:absolute; left:10px; top:10px">
-			<div id="compile-tab-lang-title">
-				<h1 style="text-align: center">No Input language specified</h1>
-				<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
-			</div>
-			<div id="compile-tab-query-input">
-			<div id="compile-tab-query-input-src">
-			<label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="compile-tab-query-src-file" onchange='handleFile("compile-tab-query-src-text", false, this.files)'/>
-	  		<br/>
+  <a href="http://querycert.github.io/index.html" width="120">
+    <img class="img-responsive pull-right" src="qcert-logo.png" hspace="20" width="120"/></a>
+  <canvas id="tabs-canvas" width="1000" height="50"></canvas>
+  <button id="kill-button" type="button" style="font-size:large; display:none"
+          onclick="killButton()"><b>kill execution</b></button>
+  <div id="container" style="position:relative">
+    <canvas id="main-canvas" width="1000" height="700"></canvas>
+    <div id="compile-tab" style="display:none; position:absolute; left:10px; top:10px">
+      <div id="compile-tab-lang-title">
+	<h1 style="text-align: center">No Input language specified</h1>
+	<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
+      </div>
+      <div id="compile-tab-query-input">
+	<div id="compile-tab-query-input-src">
+	  <label>source query (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="compile-tab-query-src-file" onchange='handleFile("compile-tab-query-src-text", false, this.files)'/>
+	  <br/>
           <textarea id = "compile-tab-query-src-text"
                     rows = "10"
                     cols = "120" 
-					spellcheck="false"						
-					autocapitalize="none"
-					ondrop='handleFileDrop("compile-tab-query-src-text", event)'
-					wrap="off"
-					></textarea>
-          	</div>
-			  <p></p>
-			  <div id="compile-tab-query-schema">
-			<label>schema (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="compile-tab-query-schema-file" onchange='handleFile("compile-tab-query-schema-text", true, this.files)'/>
-	  		<br/>
+		    spellcheck="false"						
+		    autocapitalize="none"
+		    ondrop='handleFileDrop("compile-tab-query-src-text", event)'
+		    wrap="off"
+		    ></textarea>
+        </div>
+	<p></p>
+	<div id="compile-tab-query-schema">
+	  <label>schema (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="compile-tab-query-schema-file" onchange='handleFile("compile-tab-query-schema-text", true, this.files)'/>
+	  <br/>
           <textarea id = "compile-tab-query-schema-text"
                     rows = "10"
                     cols = "120" 
-					spellcheck="false"
-					autocapitalize="none"
-					ondrop='handleFileDrop("compile-tab-query-schema-text", event)'
-					wrap="off"
-					></textarea>
-          	</div>
-			  <p></p>
-		      <button type="button" style="font-size:large" onclick="compileButton()"><b>Run Compilation</b></button><br/>
-			  <div id="compile-tab-query-output">
-              <textarea id = "compile-tab-query-output-text"
+		    spellcheck="false"
+		    autocapitalize="none"
+		    ondrop='handleFileDrop("compile-tab-query-schema-text", event)'
+		    wrap="off"
+		    ></textarea>
+        </div>
+	<p></p>
+	<button type="button" style="font-size:large" onclick="compileButton()"><b>Run Compilation</b></button><br/>
+	<div id="compile-tab-query-output">
+          <textarea id = "compile-tab-query-output-text"
                     rows = "10"
                     cols = "120" 
-					spellcheck="false"
-					autocapitalize="none"
-					wrap="on"
-					readonly="true"
-					></textarea>
-          	</div>
-		 </div>
-		</div>
-
-		<div id="execute-tab" style="display:none; position:absolute; left:10px; top:10px">
-			<div id="execute-tab-lang-title">
-				<h1 style="text-align: center">No Input language specified</h1>
-				<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
-			</div>
-			<div id="execute-tab-query-input">
-			<div id="execute-tab-query-input-io">
-	        <label>execution input as CSV files (choose delimiter and files)&nbsp;&nbsp;&nbsp;delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea>
-					<input type="file" multiple="true" id="inputCSVs" accept=".csv" onchange='handleCSVs(this.files)'/><br/>
-			<label>execution input as JSON (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="execute-tab-query-io-file" onchange='handleFile("execute-tab-query-io-text", false, this.files)'/>
-	  		<br/>
+		    spellcheck="false"
+		    autocapitalize="none"
+		    wrap="on"
+		    readonly="true"
+		    ></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <div id="execute-tab" style="display:none; position:absolute; left:10px; top:10px">
+      <div id="execute-tab-lang-title">
+	<h1 style="text-align: center">No Input language specified</h1>
+	<h2>Please select an input language by placing a language block on top of the start piece (on the Builder tab)</h2>
+      </div>
+      <div id="execute-tab-query-input">
+	<div id="execute-tab-query-input-io">
+	  <label>execution input as CSV files (choose delimiter and files)&nbsp;&nbsp;&nbsp;delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea>
+	  <input type="file" multiple="true" id="inputCSVs" accept=".csv" onchange='handleCSVs(this.files)'/><br/>
+	  <label>execution input as JSON (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="execute-tab-query-io-file" onchange='handleFile("execute-tab-query-io-text", false, this.files)'/>
+	  <br/>
           <textarea id = "execute-tab-query-io-text"
                     rows = "20"
                     cols = "120" 
-					spellcheck="false"						
-					autocapitalize="none"
-					ondrop='handleFileDrop("execute-tab-query-io-text", event)'
-					wrap="off"
-					></textarea>
-          	</div>
-			  <p></p>
-		      <button type="button" style="font-size:large" onclick="executeButton()"><b>Run Query on Data</b></button><br/>
-			  <div id="execute-tab-query-output">
-              <textarea id = "execute-tab-query-output-text"
+		    spellcheck="false"						
+		    autocapitalize="none"
+		    ondrop='handleFileDrop("execute-tab-query-io-text", event)'
+		    wrap="off"
+		    ></textarea>
+        </div>
+	<p></p>
+	<button type="button" style="font-size:large" onclick="executeButton()"><b>Run Query on Data</b></button><br/>
+	<div id="execute-tab-query-output">
+          <textarea id = "execute-tab-query-output-text"
                     rows = "10"
                     cols = "120" 
-					spellcheck="false"
-					autocapitalize="none"
-					wrap="on"
-					readonly="true"
-					></textarea>
-          	</div>
-		 </div>
-		</div>
-	</div>
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <!-- Fabric -->
-    <script src="lib/fabric.min.js"></script>
-    <script src="lib/Sortable.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="./assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="./dist/js/bootstrap.min.js"></script>
-    <script src="./assets/js/docs.min.js"></script>
-    <!-- Q*cert -->
-    <script src="../lib/qcertJS.js"></script>
-    <script src="qcertPreCompiler.js"></script>
-    <script src="demo.js"></script>
-
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="./assets/js/ie10-viewport-bug-workaround.js"></script>
+		    spellcheck="false"
+		    autocapitalize="none"
+		    wrap="on"
+		    readonly="true"
+		    ></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript
+       ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!-- Fabric -->
+  <script src="lib/fabric.min.js"></script>
+  <script src="lib/Sortable.min.js"></script>
+  <!-- Bootstrap -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="./assets/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="./dist/js/bootstrap.min.js"></script>
+  <script src="./assets/js/docs.min.js"></script>
+  <!-- Q*cert -->
+  <script src="../lib/qcertJS.js"></script>
+  <script src="qcertPreCompiler.js"></script>
+  <script src="demo.js"></script>
+  
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="./assets/js/ie10-viewport-bug-workaround.js"></script>
 </body>
 
 </html>

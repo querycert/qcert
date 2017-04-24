@@ -687,8 +687,9 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 			// fix where the text appears
 			const text = new fabric.Text(options.label, {
 				fill: '#333',
+				fontFamily: 'sans-serif',
 				fontWeight: 'bold',
-				fontSize: 20,
+				fontSize: 15,
 				left: options.left + 10 + (puzzleLeft > 0 ? 23 : 0),
 				top: options.top + 10
 			});
@@ -1191,7 +1192,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 				this.backingObject.canvas,
 				{left:this.backingObject.left, top:this.backingObject.top, width:piecewidth, height:pieceheight},
 				new fabric.Point(10, 10),
-				{fill:'black', fontSize:40}, 
+				{fill:'black', fontSize:20}, 
 				{fill:'#EEEEEE'});
 			
 			this.tooltipObj = tip;
@@ -1524,9 +1525,7 @@ function getLangPiece(langid:string):BasicPuzzlePiece {
 }
 
 const defaultTabTextOpts:fabric.ITextOptions = { 
-	fontFamily: 'Impact',
-  	stroke: '#c3bfbf',
-  	strokeWidth: 1
+	fontFamily: 'sans-serif',
 };
 
 const defaultTabRectOpts:fabric.IRectOptions = {
@@ -2528,9 +2527,9 @@ function getOptimConfig():QcertOptimConfig[] {
 }
 
 const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
-	BuilderTab.make,
-	OptimizationsTabMake,
-	CompileTab.make,
+    BuilderTab.make,
+    OptimizationsTabMake,
+    CompileTab.make,
     ExecTab.make
 ];
 

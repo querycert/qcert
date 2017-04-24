@@ -127,13 +127,13 @@ Section CompLang.
 
     Open Scope string.
     Definition language_descriptions :=
-      (L_camp_rule,FrontEnd,"CAMPRule","Rules for CAMP")
-        :: (L_tech_rule,FrontEnd,"TechRule","Technical Rules")
-        :: (L_designer_rule,FrontEnd,"DesignerRule","Desginer Rules")
-        :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
+      (L_sql,FrontEnd,"SQL", "Structured Query Language")
         :: (L_oql,FrontEnd,"OQL", "Object Query Language")
-        :: (L_sql,FrontEnd,"SQL", "Structured Query Language")
         :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
+        :: (L_tech_rule,FrontEnd,"TechRule","Technical Rules")
+        :: (L_designer_rule,FrontEnd,"DesignRule","Designer Rules")
+        :: (L_camp_rule,FrontEnd,"CAMPRule","Rules for CAMP")
+        :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
         :: (L_nra,MiddleEnd,"NRA","Nested Relational Algebra")
         :: (L_nraenv_core,MiddleEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments")
         :: (L_nraenv,MiddleEnd,"NRAᵉ","Nested Relational Algebra with Environments")
@@ -145,8 +145,8 @@ Section CompLang.
         :: (L_dnnrc_typed_dataset,MiddleEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
         :: (L_javascript,BackEnd,"JS","JavaScript")
         :: (L_java,BackEnd,"Java","Java")
-        :: (L_spark_rdd,BackEnd,"Spark","Spark (RDDs)")
-        :: (L_spark_dataset,BackEnd,"Spark2", "Spark (Datasets)")
+        :: (L_spark_rdd,BackEnd,"SparkRDD","Spark (RDD API)")
+        :: (L_spark_dataset,BackEnd,"SparkDF", "Spark (Dataframe API)")
         :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
         (*    :: (L_error,MiddleEnd,"Error","Error") *)
         :: nil.
