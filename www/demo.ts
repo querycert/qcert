@@ -698,7 +698,7 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 			});
 			// const bbox = text.getBoundingRect();
 
-			const group = new fabric.Group([path, text],
+		        const group = new fabric.Group([path, text],
 			{
 				hasControls:false,
 				hasBorders:false
@@ -1837,7 +1837,7 @@ class BuilderTab extends ICanvasTab {
 	}
 
 	getLabel():string {
-		return "Builder";
+		return "Path Builder ";
 	}
 
 	getRectOptions() {
@@ -1934,7 +1934,7 @@ class CompileTab extends ICanvasTab {
 	}
 
 	getLabel() {
-		return "Compile";
+		return "Compilation ";
 	}
 	
 	getRectOptions() {
@@ -2021,7 +2021,7 @@ class ExecTab extends ICanvasTab {
     }
 
     getLabel() {
-        return "Execute";
+        return " Evaluation ";
     }
     
     getRectOptions() {
@@ -2519,7 +2519,7 @@ function OptimizationsTabMake(canvas:fabric.ICanvas) {
 		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language.name, opt.language.modulebase, opt.optims, cfg_phases));
 	}
 	globalOptimTabs = optimTabs;
-	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'#FEBF01'}}, optimTabs, 0);
+	return TabManager.make(canvas, {label:"Optim Config", rectOptions:{fill:'#FEBF01'}}, optimTabs, 0);
 }
 
 function getOptimConfig():QcertOptimConfig[] {
