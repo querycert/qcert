@@ -3,13 +3,17 @@
 <head>
 <meta charset="utf-8"/>
 <title>Q*cert Playground</title>
-<!-- <script --> <!-- src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.2/fabric.min.js"></script> -->
-<script src="lib/fabric.min.js"></script>
-<script src="lib/Sortable.min.js"></script>
-<script src="../lib/qcertJS.js"></script>
-<script src="qcertPreCompiler.js"></script>
-<script src="demo.js"></script>
-<link rel="stylesheet" type="text/css" href="demo.css" ></link>
+    
+    <!-- Bootstrap core CSS -->
+    <link href="./dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="./dist/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="navbar.css" rel="stylesheet">
+
+    <!-- Q*cert demo -->
+    <link rel="stylesheet" type="text/css" href="demo.css" ></link>
 </head>
 
 <body onload="init();" id='body'>
@@ -99,6 +103,24 @@
 		 </div>
 		</div>
 	</div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- Fabric -->
+    <script src="lib/fabric.min.js"></script>
+    <script src="lib/Sortable.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="./assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="./dist/js/bootstrap.min.js"></script>
+    <script src="./assets/js/docs.min.js"></script>
+    <!-- Q*cert -->
+    <script src="../lib/qcertJS.js"></script>
+    <script src="qcertPreCompiler.js"></script>
+    <script src="demo.js"></script>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="./assets/js/ie10-viewport-bug-workaround.js"></script>
 </body>
 
 </html>
