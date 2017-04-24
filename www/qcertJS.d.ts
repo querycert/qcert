@@ -3,7 +3,8 @@ type QcertLanguage = string;
 type QcertLanguageDescription = {langid:QcertLanguage, label:string, description:string};
 type SourceLanguageGroups = {
 		frontend:[QcertLanguageDescription], 
-		intermediate:[QcertLanguageDescription], 
+		core:[QcertLanguageDescription], 
+		distributed:[QcertLanguageDescription], 
 		backend:[QcertLanguageDescription]};
 
 type QcertOptimStepDescription = {name: string, description:string, lemma:string};

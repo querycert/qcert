@@ -13,7 +13,8 @@ interface PuzzleSides {
 	const piecewidth = 100;
 	const pieceheight = 100;
 
-	const gridRows = 2;
+        // const gridRows = 2;
+	const gridRows = 1; // Only one interactive row for now -JS
 	const pipelineRow = 0;
 
 	const gridOffset:fabric.IPoint = new fabric.Point(22,20);
@@ -117,8 +118,9 @@ interface PuzzleSides {
     // Executes when execute button is pressed.  This button shows when the execute tab shows.
     function executeButton() {
         const langs = getPipelineLangs();
+        const optimconf = getOptimConfig();
         const path = langs.map(x => x.id);
-        const executing = getExecOutputArea();
+	const executing = getExecOutputArea();
 
         if (worker != null) {
             executing.value = " [ A previous query is still executing and must be killed in order to execute a new one ]";
@@ -147,7 +149,7 @@ interface PuzzleSides {
         
         // Setup to handle according to target language
         const arg:any = target == "js" ? setupJsEval(dataInput, schemaInput) : 
-            setupQcertEval(path, getSrcInput(), schemaInput, dataInput);
+              setupQcertEval(path, getSrcInput(), schemaInput, dataInput, optimconf);
         if (arg == null) // error already detected and indicated
             return;
 
@@ -186,7 +188,7 @@ interface PuzzleSides {
         worker = null;
     }    
 
-    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string) : QcertCompilerConfig {
+    function setupQcertEval(path:string[], srcInput:string, schemaInput:string, dataInput:string,optimconf:QcertOptimConfig[]) : QcertCompilerConfig {
         if (srcInput.length == 0) {
             const executing = getExecOutputArea();
             executing.value = noQuerySrc;
@@ -205,7 +207,7 @@ interface PuzzleSides {
             schema: schemaInput,
             eval: true,
             input: dataInput,
-	    optims:"[]" /* XXX Add optimizations here XXX */
+            optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
           };
     }
 
@@ -219,9 +221,9 @@ interface PuzzleSides {
 
 	// The set of languages and their properties
 	// const srcLanguageGroups:SourceLanguageGroups = {
-	// 	frontend:[{langid:'sql', label:'SQL'}, {langid:'oql', label:'OQL'}],
-    //     intermediate:[{langid:'nrae', label:'NRAenv'}, {langid:'nrc', label:'NNRC'}],
-    //     backend:[{langid:'js', label:'javascript'}, {langid:'cloudant', label:'Cloudant'}]};
+	//     frontend:[{langid:'sql', label:'SQL'}, {langid:'oql', label:'OQL'}],
+        //     intermediate:[{langid:'nrae', label:'NRAenv'}, {langid:'nrc', label:'NNRC'}],
+        //     backend:[{langid:'js', label:'javascript'}, {langid:'cloudant', label:'Cloudant'}]};
 
 
 	function toSrcLangDescript(color, sides:PuzzleSides) {
@@ -233,7 +235,8 @@ interface PuzzleSides {
 	function getSrcLangDescripts(langGroups:SourceLanguageGroups) {
 		let ret = [];
 		ret.push(langGroups.frontend.map(toSrcLangDescript('#33cc33', {right:-1})));
-		ret.push(langGroups.intermediate.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
+		ret.push(langGroups.core.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
+		ret.push(langGroups.distributed.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
 		ret.push(langGroups.backend.map(toSrcLangDescript('#ff3300', {left: 1})));
 
 		return ret;
@@ -2173,6 +2176,7 @@ function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLI
 	lemmaLink.href = makeLemmaURL(modulebase, o.lemma);
 	lemmaLink.appendChild(document.createTextNode('✿'));
 	lemmaLink.classList.add('lemma-link');
+        lemmaLink.setAttribute('target','codebrowser');
 	entry.appendChild(lemmaLink);
 	entry.title = o.description;
 	entry.setAttribute('data-id', o.name);

@@ -114,7 +114,8 @@ Section CompLang.
 
     Inductive language_kind : Set :=
     | FrontEnd : language_kind
-    | MiddleEnd : language_kind
+    | CoreEnd : language_kind
+    | DistrEnd : language_kind
     | BackEnd : language_kind.
 
     Lemma language_kind_eq_dec : EqDec language_kind eq.
@@ -133,22 +134,21 @@ Section CompLang.
         :: (L_tech_rule,FrontEnd,"TechRule","Technical Rules")
         :: (L_designer_rule,FrontEnd,"DesignRule","Designer Rules")
         :: (L_camp_rule,FrontEnd,"CAMPRule","Rules for CAMP")
-        :: (L_camp,MiddleEnd,"CAMP","Calculus of Aggregating Matching Patterns")
-        :: (L_nra,MiddleEnd,"NRA","Nested Relational Algebra")
-        :: (L_nraenv_core,MiddleEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments")
-        :: (L_nraenv,MiddleEnd,"NRAᵉ","Nested Relational Algebra with Environments")
-        :: (L_nnrc_core,MiddleEnd,"cNNRC", "Core Named Nested Relational Calculus")
-        :: (L_nnrc,MiddleEnd,"NNRC", "Named Nested Relational Calculus")
-        :: (L_nnrcmr,MiddleEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
-        :: (L_cldmr,MiddleEnd,"CldMR", "Nested Relational Calculus with Cloudant Map/Reduce")
-        :: (L_dnnrc_dataset,MiddleEnd,"DNNRC","Distributed Named Nested Relational Calculus")
-        :: (L_dnnrc_typed_dataset,MiddleEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
+        :: (L_camp,CoreEnd,"CAMP","Calculus of Aggregating Matching Patterns")
+        :: (L_nra,CoreEnd,"NRA","Nested Relational Algebra")
+        :: (L_nraenv_core,CoreEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments")
+        :: (L_nraenv,CoreEnd,"NRAᵉ","Nested Relational Algebra with Environments")
+        :: (L_nnrc_core,CoreEnd,"cNNRC", "Core Named Nested Relational Calculus")
+        :: (L_nnrc,CoreEnd,"NNRC", "Named Nested Relational Calculus")
+        :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
+        :: (L_cldmr,DistrEnd,"CldMR", "Nested Relational Calculus with Cloudant Map/Reduce")
+        :: (L_dnnrc_dataset,DistrEnd,"DNNRC","Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
         :: (L_javascript,BackEnd,"JS","JavaScript")
         :: (L_java,BackEnd,"Java","Java")
         :: (L_spark_rdd,BackEnd,"SparkRDD","Spark (RDD API)")
         :: (L_spark_dataset,BackEnd,"SparkDF", "Spark (Dataframe API)")
         :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
-        (*    :: (L_error,MiddleEnd,"Error","Error") *)
         :: nil.
 
     Definition add_id_to_language_description (ld:language * language_kind * string * string) :=
@@ -173,14 +173,16 @@ Section CompLang.
     Record export_desc :=
       mkExportDesc
       { frontend : list(language * string * language_kind * string * string);
-        middleend : list(language * string * language_kind * string * string);
+        coreend : list(language * string * language_kind * string * string);
+        distrend : list(language * string * language_kind * string * string);
         backend : list(language * string * language_kind * string * string) }.
     
     Definition select_description_per_kind
                (ldl: list(language * string * language_kind * string * string)) :=
       mkExportDesc
         (filter (check_kind FrontEnd) ldl)
-        (filter (check_kind MiddleEnd) ldl)
+        (filter (check_kind CoreEnd) ldl)
+        (filter (check_kind DistrEnd) ldl)
         (filter (check_kind BackEnd) ldl).
 
     (* Eval vm_compute in (select_description_per_kind language_descriptions_with_ids). *)

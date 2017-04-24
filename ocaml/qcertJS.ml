@@ -199,7 +199,8 @@ let json_of_exported_languages exported_languages =
   in
   object%js
     val frontend = Js.def (wrap_all wrap exported_languages.Compiler.frontend)
-    val intermediate = Js.def (wrap_all wrap exported_languages.Compiler.middleend)
+    val core = Js.def (wrap_all wrap exported_languages.Compiler.coreend)
+    val distributed = Js.def (wrap_all wrap exported_languages.Compiler.distrend)
     val backend =  Js.def (wrap_all wrap exported_languages.Compiler.backend)
   end
 let language_specs () =
