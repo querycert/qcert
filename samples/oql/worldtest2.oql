@@ -1,5 +1,0 @@
-/* Example of simple select-from-where */
-
-select p.name
-from p in WORLD
-where p.age =32

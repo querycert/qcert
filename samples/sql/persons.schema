@@ -1,0 +1,11 @@
+{ "hierarchy": [],
+  "brandTypes" :[],
+  "typeDefs" :[],
+  "globals" :
+  { "persons" :
+    { "dist" : "distr",
+      "type" : { "$coll" : { "pid" : "Nat" ,
+			     "name" : "String",
+			     "age" : "Nat",
+			     "company" : "Nat" } } } }
+}

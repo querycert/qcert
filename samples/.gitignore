@@ -7,4 +7,6 @@
 *.txt
 oql/*.json
 sql/*.json
+camp/*.json
+lambda_nra/*.json
 /bin/
