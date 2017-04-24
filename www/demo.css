@@ -1,8 +1,6 @@
 ul.optim-list {
     list-style: none;
     padding: 0;
-    font-size: 120%;
-    font-family: Arial;
 }
 
 li.optim-list {
@@ -11,20 +9,7 @@ li.optim-list {
 
     background: #eee;
     margin: 1px;
-    padding: 5px 10px;
-    font-size: 120%;
-}
-
-div.phase-optims div h3 {
-    font-size: 150%;    
-}
-
-div.all-optims h3 {
-    font-size: 150%;
-}
-
-div.phase-optims div h4 {
-    font-size: 120%;    
+    padding: 1px 5px;
 }
 
 .sortable-ghost {
@@ -32,18 +17,18 @@ div.phase-optims div h4 {
 }
 
 .optim-handle {
-    padding-right: 10px;
+    padding-right: 5px;
     cursor: move;
     cursor: -webkit-grabbing;
 }
 
 .js-remove {
     cursor: pointer;
-    padding-left: 10px;
+    padding-left: 5px;
     float: right;
 }
 
 .lemma-link {
-    padding-left: 10px;
+    padding-left: 5px;
     float: right;    
 }
