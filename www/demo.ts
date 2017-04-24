@@ -234,10 +234,10 @@ interface PuzzleSides {
 	
 	function getSrcLangDescripts(langGroups:SourceLanguageGroups) {
 		let ret = [];
-		ret.push(langGroups.frontend.map(toSrcLangDescript('#33cc33', {right:-1})));
-		ret.push(langGroups.core.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
-		ret.push(langGroups.distributed.map(toSrcLangDescript('#6699ff', {left: 1, right:-1})))
-		ret.push(langGroups.backend.map(toSrcLangDescript('#ff3300', {left: 1})));
+		ret.push(langGroups.frontend.map(toSrcLangDescript('#91D050', {right:-1})));
+		ret.push(langGroups.core.map(toSrcLangDescript('#7AB0DD', {left: 1, right:-1})))
+		ret.push(langGroups.distributed.map(toSrcLangDescript('#7AB0DD', {left: 1, right:-1})))
+		ret.push(langGroups.backend.map(toSrcLangDescript('#ED7D32', {left: 1})));
 
 		return ret;
 	}
@@ -1734,7 +1734,7 @@ class BuilderTab extends ICanvasTab {
 		separatorLine.set('visible', true);
 
 		const startPiece = BasicPuzzlePiece.make(canvas, {
-			fill : '#c2f0c2',
+			fill : '#bfe49a',
 			label : 'start',
 			sides : {right:-1},
 			hasControls : false,
@@ -1841,7 +1841,7 @@ class BuilderTab extends ICanvasTab {
 	}
 
 	getRectOptions() {
-		return {fill:'orange'};
+		return {fill:'#FEBF01'};
 	}
 
 	show():void {
@@ -1938,7 +1938,7 @@ class CompileTab extends ICanvasTab {
 	}
 	
 	getRectOptions() {
-		return {fill:'orange'};
+		return {fill:'#FEBF01'};
 	}
 
 	static getSrcLanguagePiece() {
@@ -2025,7 +2025,7 @@ class ExecTab extends ICanvasTab {
     }
     
     getRectOptions() {
-        return {fill:'orange'};
+        return {fill:'#FEBF01'};
     }
 
     static getSrcLanguagePiece() {
@@ -2236,7 +2236,7 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		this.name = phase.name;
 		this.iter = phase.iter;
 		this.top = options.top || 0;
-		this.color = options.color || 'orange';
+		this.color = options.color || '#FEBF01';
 
 		//this.body = document.getElementsByTagName("body")[0];
 		this.parentDiv = div;
@@ -2443,7 +2443,7 @@ class OptimizationManager extends ICanvasTab {
 
 		const yoffset2 = tabTop+60;
 	
-		this.optimTabs = cfg_phases.map(optimPhaseMake(canvas, leftdiv, module_base, optims, {color:'yellow', top:yoffset2}));
+		this.optimTabs = cfg_phases.map(optimPhaseMake(canvas, leftdiv, module_base, optims, {color:'#ED7D32', top:yoffset2}));
 
 		this.tabManager = TabManager.make(canvas, 
 				{
@@ -2509,7 +2509,7 @@ function OptimizationsTabMake(canvas:fabric.ICanvas) {
 	const optims = qcertOptimList().optims;
 	const defaults = qcertOptimDefaults().optims;
 
-	const opts = {rectOptions:{fill:'green'}, tabOrigin:{top:yoffset}};	
+	const opts = {rectOptions:{fill:'#548235'}, tabOrigin:{top:yoffset}};	
 	let optimTabs:OptimizationManager[] = [];
 	for(let i=0; i < optims.length; i++) {
 		const opt = optims[i];
@@ -2519,7 +2519,7 @@ function OptimizationsTabMake(canvas:fabric.ICanvas) {
 		optimTabs.push(OptimizationManager.make(canvas, opts, opt.language.name, opt.language.modulebase, opt.optims, cfg_phases));
 	}
 	globalOptimTabs = optimTabs;
-	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'orange'}}, optimTabs, 0);
+	return TabManager.make(canvas, {label:"Optimizations", rectOptions:{fill:'#FEBF01'}}, optimTabs, 0);
 }
 
 function getOptimConfig():QcertOptimConfig[] {
