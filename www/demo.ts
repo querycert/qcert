@@ -1,4 +1,3 @@
-
 // some types
 
 interface PuzzleSides {
@@ -1158,7 +1157,12 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 
 	tooltipObj?:fabric.IObject;
 
-	protected mousedown = () => {
+    protected mousedown = () => {
+		// Update source browser to point to the IL definition -JS
+		// Dealing with window focus is annoying, so disabled for now - JS
+   	        //var win = window.open("https://querycert.github.io/sigmod17/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv", 'codebrowser');
+   	
+		// Rest of logic for moving puzzle pieces
 		this.backingObject.set({
 			opacity:.5
 		});
@@ -1924,13 +1928,13 @@ class CompileTab extends ICanvasTab {
 	}
 
 	constructor(canvas:fabric.ICanvas) {
-		super(canvas);
-		this.inputTabElement = document.getElementById("compile-tab");
-		this.titleTextElement = document.getElementById("compile-tab-lang-title");
-		this.defaultTitleTextElement = <HTMLElement>this.titleTextElement.cloneNode(true);
-		this.queryInput = document.getElementById("compile-tab-query-input");
-        this.queryChooser = <HTMLInputElement>document.getElementById("compile-tab-query-src-file");
-        this.schemaChooser = <HTMLInputElement>document.getElementById("compile-tab-query-schema-file"); 
+	    super(canvas);
+	    this.inputTabElement = document.getElementById("compile-tab");
+	    this.titleTextElement = document.getElementById("compile-tab-lang-title");
+	    this.defaultTitleTextElement = <HTMLElement>this.titleTextElement.cloneNode(true);
+	    this.queryInput = document.getElementById("compile-tab-query-input");
+            this.queryChooser = <HTMLInputElement>document.getElementById("compile-tab-query-src-file");
+            this.schemaChooser = <HTMLInputElement>document.getElementById("compile-tab-query-schema-file"); 
 	}
 
 	getLabel() {
@@ -1963,26 +1967,25 @@ class CompileTab extends ICanvasTab {
 	}
 
 	setSrcLanguage(piece:BasicPuzzlePiece) {
-		this.clearTitle();
-		const titleElem = document.createElement('h1');
-		titleElem.style.textAlign = 'center';
-		titleElem.appendChild(document.createTextNode("Input Language: " + piece.langid + " [" + piece.langdescription + "]"));
-		this.titleTextElement.appendChild(titleElem);
-        const langInfo = getSourceLanguageExtraInfo(piece.langid);
-        this.queryChooser.accept = langInfo.accept;
-        // the following is static for now but set here since it may become dynamic in the future
-        this.schemaChooser.accept = schemaAccept;
+	    this.clearTitle();
+	    const titleElem = document.createElement('label');
+	    titleElem.appendChild(document.createTextNode("Input Language: " + piece.langid + " [" + piece.langdescription + "]"));
+	    this.titleTextElement.appendChild(titleElem);
+            const langInfo = getSourceLanguageExtraInfo(piece.langid);
+            this.queryChooser.accept = langInfo.accept;
+            // the following is static for now but set here since it may become dynamic in the future
+            this.schemaChooser.accept = schemaAccept;
 	}
 
 	update() {
-		const srcpiece = CompileTab.getSrcLanguagePiece();
-		if(srcpiece.langid == 'error') {
-			this.setErrorTitleText();
-			this.queryInput.style.display="none";
-		} else {
-			this.setSrcLanguage(srcpiece);
-			this.queryInput.style.display="block";
-		}
+	    const srcpiece = CompileTab.getSrcLanguagePiece();
+	    if(srcpiece.langid == 'error') {
+		this.setErrorTitleText();
+		this.queryInput.style.display="none";
+	    } else {
+		this.setSrcLanguage(srcpiece);
+		this.queryInput.style.display="block";
+	    }
 	}
 
 	show() {
@@ -2051,8 +2054,7 @@ class ExecTab extends ICanvasTab {
 
     setSrcLanguage(piece:BasicPuzzlePiece) {
         this.clearTitle();
-        const titleElem = document.createElement('h1');
-        titleElem.style.textAlign = 'center';
+        const titleElem = document.createElement('label');
         titleElem.appendChild(document.createTextNode("Input Language: " + piece.langid + " [" + piece.langdescription + "]"));
         this.titleTextElement.appendChild(titleElem);
         // the following is static for now but set here since it may become dynamic in the future
