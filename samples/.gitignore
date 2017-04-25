@@ -3,6 +3,7 @@
 *.js
 *.s-sql
 *_stats.json
+*_rdd.scala
 *.error
 *.txt
 oql/*.json
