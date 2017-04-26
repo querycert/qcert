@@ -25,7 +25,7 @@ Module QLambdaNRA(runtime:CompilerRuntime).
   Module Ops := QOperators.QOperators runtime.
 
   Definition expr : Set
-    := LambdaNRA.lnra.
+    := LambdaNRA.lambda_nra.
   Definition lambda_expr : Set
     := LambdaNRA.lnra_lambda.
   Definition t : Set

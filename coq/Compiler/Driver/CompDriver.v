@@ -127,7 +127,7 @@ Section CompDriver.
 
     Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
 
-    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lnra q.
+    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lambda_nra q.
 
     (** Rules and CAMP translations *)
     Definition camp_rule_to_camp (q:camp_rule) : camp := Rule.rule_to_pattern q. (* Note: This is really macro-expansion *)

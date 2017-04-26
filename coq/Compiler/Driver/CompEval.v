@@ -111,7 +111,10 @@ Section CompEval.
     (* Language: lambda_nra *)
     (* Note: eval for lambda_nra relies on translation to nraenv_core *)
     Definition eval_lambda_nra (q:lambda_nra) (cenv: list (string*data)) : option data
-      := NRAEnv.nraenv_eval h (rec_sort cenv) (nraenv_of_lnra q) (drec nil) dunit.
+      := NRAEnv.nraenv_eval h (rec_sort cenv) (nraenv_of_lambda_nra q) (drec nil) dunit.
+
+    Definition eval_lambda_nra' (q:lambda_nra) (cenv: list (string*data)) : option data
+      := LambdaNRA.eval_lambda_nra_top h (rec_sort cenv) q.
 
     (* Language: nra *)
     Definition eval_nra (q:nra) (cenv: list (string*data)) : option data

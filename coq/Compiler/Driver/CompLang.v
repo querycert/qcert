@@ -229,7 +229,7 @@ Section CompLang.
     Definition camp := pat.
     Definition oql := oql.
     Definition sql := sql.
-    Definition lambda_nra := lnra.
+    Definition lambda_nra := lambda_nra.
     Definition nra := nra.
     Definition nraenv_core := cnraenv.
     Definition nraenv := nraenv.
@@ -333,7 +333,7 @@ Section CompLang.
       | L_camp => camp
       | L_oql => oql
       | L_sql => sql
-      | L_lambda_nra => lnra
+      | L_lambda_nra => lambda_nra
       | L_nra => nra
       | L_nraenv_core => nraenv_core
       | L_nraenv => nraenv

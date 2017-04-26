@@ -26,28 +26,28 @@ Section LambdaNRASugar.
 
   Context {fruntime:foreign_runtime}.
 
-  Definition LNRAStruct (el:list (string * lnra)) :=
+  Definition LNRAStruct (el:list (string * lambda_nra)) :=
     match el with
     | nil => LNRAConst (drec nil)
     | (s0,x) :: rest =>
       let init_rec := LNRAUnop (ARec s0) x in
-      let proc_one (e:string * lnra) acc :=
+      let proc_one (e:string * lambda_nra) acc :=
           LNRABinop AConcat (LNRAUnop (ARec (fst e)) (snd e)) acc
       in
       fold_right proc_one init_rec rest
     end.
 
-  Definition LNRADot (s:string) (e:lnra) := LNRAUnop (ADot s) e.
-  Definition LNRAArrow (s:string) (e:lnra) := LNRAUnop (ADot s) (LNRAUnop AUnbrand e).
-  Definition LNRAFlatMap (l:lnra_lambda) (e:lnra) :=
+  Definition LNRADot (s:string) (e:lambda_nra) := LNRAUnop (ADot s) e.
+  Definition LNRAArrow (s:string) (e:lambda_nra) := LNRAUnop (ADot s) (LNRAUnop AUnbrand e).
+  Definition LNRAFlatMap (l:lnra_lambda) (e:lambda_nra) :=
     LNRAUnop AFlatten (LNRAMap l e).
   
   (* replaces free variables by table lookups -- used in parser *)
-  Definition la_tableify_one_var (e:lnra) (v:string) : lnra :=
-    lnra_subst e v (LNRATable v).
+  Definition la_tableify_one_var (e:lambda_nra) (v:string) : lambda_nra :=
+    lambda_nra_subst e v (LNRATable v).
 
-  Definition la_tableify (e:lnra) : lnra :=
-    let free_vars := lnra_free_vars e in
+  Definition la_tableify (e:lambda_nra) : lambda_nra :=
+    let free_vars := lambda_nra_free_vars e in
     fold_left la_tableify_one_var free_vars e.
   
 End LambdaNRASugar.

@@ -60,19 +60,26 @@ Section LambdaNRATests.
   Definition T1r P :=
     LNRAMap (LNRALambda "p" (LNRAUnop (ADot "city") (LNRAUnop (ADot "addr") (LNRAVar "p")))) P.
 
-  Lemma T1lr_equiv P : lnra_eq (T1l P) (T1r P).
+
+Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra'.
+Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra'.
+Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra'.
+Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra'.
+Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
+
+  Lemma T1lr_equiv P : lambda_nra_eq (T1l P) (T1r P).
   Proof.
-    unfold lnra_eq, T1l, T1r.
+    unfold lambda_nra_eq, T1l, T1r.
     intros.
-    autorewrite with lnra.
+    autorewrite with lambda_nra'.
     simpl.
     unfold olift.
-    destruct (lnra_eval h0 cenv env P); trivial.
+    destruct (lambda_nra_eval h0 cenv env P); trivial.
     unfold lift_oncoll.
     destruct d; trivial.
     induction l; simpl; trivial.
-    autorewrite with lnra.
-    case_eq (@lnra_eval TrivialModel.trivial_foreign_runtime h0 cenv
+    autorewrite with lambda_nra'.
+    case_eq (@lambda_nra_eval TrivialModel.trivial_foreign_runtime h0 cenv
              (@app
                 (prod string
                    (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))) env
@@ -98,7 +105,7 @@ Section LambdaNRATests.
                 (@LNRAVar TrivialModel.trivial_foreign_runtime
                    (String (Ascii.Ascii false false false false true true true false)
                            EmptyString)))); simpl; intros.
-    - unfold lnra_eval in H |- *.
+    - unfold lambda_nra_eval in H |- *.
       rewrite H; clear H.
       rewrite olift_some.
       match_case_in IHl; intros; rewrite H in IHl.
@@ -132,8 +139,8 @@ Section LambdaNRATests.
                              (String
                                 (Ascii.Ascii true false false false false true true false)
                                 EmptyString))))) x)); simpl.
-        * autorewrite with lnra.
-          unfold lnra_eval.
+        * autorewrite with lambda_nra'.
+          unfold lambda_nra_eval.
           simpl.
           unfold edot.
           rewrite @assoc_lookupr_app.
@@ -148,7 +155,7 @@ Section LambdaNRATests.
         destruct d; simpl; trivial.
         match_destr.
     - match_case; intros.
-      unfold lnra_eval in H, H0.
+      unfold lambda_nra_eval in H, H0.
       rewrite H in H0.
       simpl in H0.
       discriminate.

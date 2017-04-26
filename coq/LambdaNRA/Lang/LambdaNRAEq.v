@@ -27,14 +27,14 @@ Section LambdaNRAEq.
 
   Context {fruntime:foreign_runtime}.
 
-    Definition lnra_eq (op1 op2:lnra) : Prop :=
+    Definition lambda_nra_eq (op1 op2:lambda_nra) : Prop :=
     forall
       (h:list(string*string))
       (cenv:bindings)
       (env:bindings)
       (dn_cenv:Forall (fun d => data_normalized h (snd d)) cenv)
       (dn_env:Forall (fun d => data_normalized h (snd d)) env),
-       lnra_eval h cenv env op1 = lnra_eval h cenv env op2.
+       lambda_nra_eval h cenv env op1 = lambda_nra_eval h cenv env op2.
 
     Definition lnra_lambda_eq (op1 op2:lnra_lambda) : Prop :=
     forall
@@ -47,14 +47,14 @@ Section LambdaNRAEq.
       (dn_d:data_normalized h d),
       lnra_lambda_eval h cenv env op1 d = lnra_lambda_eval h cenv env op2 d.
 
-  Global Instance lnra_equiv : Equivalence lnra_eq.
+  Global Instance lambda_nra_equiv : Equivalence lambda_nra_eq.
   Proof.
     constructor.
-    - unfold Reflexive, lnra_eq.
+    - unfold Reflexive, lambda_nra_eq.
       intros; reflexivity.
-    - unfold Symmetric, lnra_eq.
+    - unfold Symmetric, lambda_nra_eq.
       intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; reflexivity.
-    - unfold Transitive, lnra_eq.
+    - unfold Transitive, lambda_nra_eq.
       intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; rewrite (H0 h cenv env dn_cenv dn_env) by trivial; reflexivity.
   Qed.
 
@@ -69,31 +69,31 @@ Section LambdaNRAEq.
       intros. rewrite (H h cenv env dn_cenv dn_env) by trivial; rewrite (H0 h cenv env dn_cenv dn_env) by trivial; reflexivity.
   Qed.
 
-  Global Instance lavar_proper : Proper (eq ==> lnra_eq) LNRAVar.
+  Global Instance lavar_proper : Proper (eq ==> lambda_nra_eq) LNRAVar.
   Proof.
-    unfold Proper, respectful, lnra_eq; intros.
+    unfold Proper, respectful, lambda_nra_eq; intros.
     subst.
     reflexivity.
   Qed.
 
-  Global Instance latable_proper : Proper (eq ==> lnra_eq) LNRATable.
+  Global Instance latable_proper : Proper (eq ==> lambda_nra_eq) LNRATable.
   Proof.
-    unfold Proper, respectful, lnra_eq; intros.
+    unfold Proper, respectful, lambda_nra_eq; intros.
     subst.
     reflexivity.
   Qed.
 
-  Global Instance laconst_proper : Proper (eq ==> lnra_eq) LNRAConst.
+  Global Instance laconst_proper : Proper (eq ==> lambda_nra_eq) LNRAConst.
   Proof.
-    unfold Proper, respectful, lnra_eq; intros.
+    unfold Proper, respectful, lambda_nra_eq; intros.
     subst.
     reflexivity.
   Qed.
 
   Global Instance labinop_proper :
-    Proper (eq ==> lnra_eq ==> lnra_eq ==> lnra_eq) LNRABinop.
+    Proper (eq ==> lambda_nra_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRABinop.
   Proof.
-    unfold Proper, respectful, lnra_eq; intros.
+    unfold Proper, respectful, lambda_nra_eq; intros.
     subst.
     cbn.
     rewrite <- H0, H1 by trivial.
@@ -101,9 +101,9 @@ Section LambdaNRAEq.
   Qed.
 
   Global Instance launop_proper :
-    Proper (eq ==> lnra_eq ==> lnra_eq) LNRAUnop.
+    Proper (eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAUnop.
   Proof.
-    unfold Proper, respectful, lnra_eq; intros.
+    unfold Proper, respectful, lambda_nra_eq; intros.
     subst.
     cbn.
     rewrite <- H0 by trivial.
@@ -111,72 +111,72 @@ Section LambdaNRAEq.
   Qed.
 
   Global Instance lamap_proper :
-    Proper (lnra_lambda_eq ==> lnra_eq ==> lnra_eq) LNRAMap.
+    Proper (lnra_lambda_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAMap.
   Proof.
-    unfold Proper, respectful, lnra_eq, lnra_lambda_eq; intros.
-    autorewrite with lnra.
+    unfold Proper, respectful, lambda_nra_eq, lnra_lambda_eq; intros.
+    autorewrite with lambda_nra.
     rewrite <- H0 by trivial.
     apply olift_ext; intros.
     apply lift_oncoll_ext; intros; subst.
     f_equal.
     apply rmap_ext; intros.
     apply H; trivial.
-    eapply lnra_eval_normalized in H1; trivial.
+    eapply lambda_nra_eval_normalized in H1; trivial.
     invcs H1.
     rewrite Forall_forall in H4.
     eauto.
   Qed.
 
   Global Instance lamapconcat_proper :
-    Proper (lnra_lambda_eq ==> lnra_eq ==> lnra_eq) LNRAMapConcat.
+    Proper (lnra_lambda_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAMapConcat.
   Proof.
-    unfold Proper, respectful, lnra_eq, lnra_lambda_eq; intros.
-    autorewrite with lnra.
+    unfold Proper, respectful, lambda_nra_eq, lnra_lambda_eq; intros.
+    autorewrite with lambda_nra.
     rewrite <- H0 by trivial.
     apply olift_ext; intros.
     apply lift_oncoll_ext; intros; subst.
     f_equal.
     apply rmap_concat_ext; intros.
     apply H; trivial.
-    eapply lnra_eval_normalized in H1; trivial.
+    eapply lambda_nra_eval_normalized in H1; trivial.
     invcs H1.
     rewrite Forall_forall in H4.
     eauto.
   Qed.
   
   Global Instance laproduct_proper :
-    Proper (lnra_eq ==> lnra_eq ==> lnra_eq) LNRAProduct.
+    Proper (lambda_nra_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAProduct.
   Proof.
-    unfold Proper, respectful, lnra_eq, lnra_lambda_eq; intros.
-    autorewrite with lnra.
+    unfold Proper, respectful, lambda_nra_eq, lnra_lambda_eq; intros.
+    autorewrite with lambda_nra.
     simpl.
     rewrite <- H, H0 by trivial.
     trivial.
   Qed.
 
   Global Instance lafilter_proper :
-    Proper (lnra_lambda_eq ==> lnra_eq ==> lnra_eq) LNRAFilter.
+    Proper (lnra_lambda_eq ==> lambda_nra_eq ==> lambda_nra_eq) LNRAFilter.
   Proof.
-    unfold Proper, respectful, lnra_eq, lnra_lambda_eq; intros.
-    autorewrite with lnra.
+    unfold Proper, respectful, lambda_nra_eq, lnra_lambda_eq; intros.
+    autorewrite with lambda_nra.
     rewrite <- H0 by trivial.
     apply olift_ext; intros.
     apply lift_oncoll_ext; intros; subst.
     f_equal.
     apply lift_filter_ext; intros.
     rewrite H; trivial.
-    eapply lnra_eval_normalized in H1; trivial.
+    eapply lambda_nra_eval_normalized in H1; trivial.
     invcs H1.
     rewrite Forall_forall in H4.
     eauto.
   Qed.
 
   Global Instance lalambda_proper :
-    Proper (eq ==> lnra_eq ==> lnra_lambda_eq) LNRALambda.
+    Proper (eq ==> lambda_nra_eq ==> lnra_lambda_eq) LNRALambda.
   Proof.
-    unfold Proper, respectful, lnra_eq, lnra_lambda_eq; intros.
+    unfold Proper, respectful, lambda_nra_eq, lnra_lambda_eq; intros.
     subst.
-    autorewrite with lnra.
+    autorewrite with lambda_nra.
     rewrite H0.
     - reflexivity.
     - trivial.

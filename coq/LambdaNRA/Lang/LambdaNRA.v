@@ -28,21 +28,21 @@ Section LambdaNRA.
   Unset Elimination Schemes.
 
   (** Lambda NRA AST *)
-  Inductive lnra : Set :=
-  | LNRAVar : string -> lnra (* Variable access *)
-  | LNRATable : string -> lnra
-  | LNRAConst : data -> lnra
-  | LNRABinop : binOp -> lnra -> lnra -> lnra
-  | LNRAUnop : unaryOp -> lnra -> lnra
-  | LNRAMap : lnra_lambda -> lnra -> lnra (* 'dependent operators' use lambdas *)
-  | LNRAMapConcat : lnra_lambda -> lnra -> lnra
-  | LNRAProduct : lnra -> lnra -> lnra
-  | LNRAFilter : lnra_lambda -> lnra -> lnra
+  Inductive lambda_nra : Set :=
+  | LNRAVar : string -> lambda_nra (* Variable access *)
+  | LNRATable : string -> lambda_nra
+  | LNRAConst : data -> lambda_nra
+  | LNRABinop : binOp -> lambda_nra -> lambda_nra -> lambda_nra
+  | LNRAUnop : unaryOp -> lambda_nra -> lambda_nra
+  | LNRAMap : lnra_lambda -> lambda_nra -> lambda_nra (* 'dependent operators' use lambdas *)
+  | LNRAMapConcat : lnra_lambda -> lambda_nra -> lambda_nra
+  | LNRAProduct : lambda_nra -> lambda_nra -> lambda_nra
+  | LNRAFilter : lnra_lambda -> lambda_nra -> lambda_nra
   with lnra_lambda : Set :=
-  | LNRALambda : string -> lnra -> lnra_lambda (* Lambda is (\var.alg) *)
+  | LNRALambda : string -> lambda_nra -> lnra_lambda (* Lambda is (\var.alg) *)
   .
 
-  Tactic Notation "lnra_cases" tactic(first) ident(c) :=
+  Tactic Notation "lambda_nra_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "LNRAVar"%string
   | Case_aux c "LNRATable"%string
@@ -59,25 +59,25 @@ Section LambdaNRA.
 
   (* The language is defined via mutual recursion, but it is easier to 
      unfold it for reasoning. *)
-  Definition  lnra_rect
-              (P : lnra -> Type)
+  Definition  lambda_nra_rect
+              (P : lambda_nra -> Type)
               (fvar : forall s : string, P (LNRAVar s))
               (ftable : forall t : string, P (LNRATable t))
               (fconst : forall d : data, P (LNRAConst d))
-              (fbinop : forall (b : binOp) (l : lnra), P l -> forall l0 : lnra, P l0 -> P (LNRABinop b l l0))
-              (funop : forall (u : unaryOp) (l : lnra), P l -> P (LNRAUnop u l))
-              (fmap : forall (s:string) (l0 l1 : lnra), P l0 -> P l1 -> P (LNRAMap (LNRALambda s l0) l1))
-              (fmapconcat : forall (s:string) (l0 l1 : lnra), P l0 -> P l1 -> P (LNRAMapConcat (LNRALambda s l0) l1))
-              (fproduct : forall l : lnra, P l -> forall l0 : lnra, P l0 -> P (LNRAProduct l l0))
-              (ffilter : forall (s:string) (l0 l1 : lnra), P l0 -> P l1 -> P (LNRAFilter (LNRALambda s l0) l1)) :
+              (fbinop : forall (b : binOp) (l0 l1: lambda_nra), P l0 -> P l1 -> P (LNRABinop b l0 l1))
+              (funop : forall (u : unaryOp) (l : lambda_nra), P l -> P (LNRAUnop u l))
+              (fmap : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMap (LNRALambda s l0) l1))
+              (fmapconcat : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMapConcat (LNRALambda s l0) l1))
+              (fproduct : forall l : lambda_nra, P l -> forall l0 : lambda_nra, P l0 -> P (LNRAProduct l l0))
+              (ffilter : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAFilter (LNRALambda s l0) l1)) :
     forall l, P l
     := 
-      fix F (l : lnra) : P l :=
+      fix F (l : lambda_nra) : P l :=
         match l as l0 return (P l0) with
         | LNRAVar s => fvar s
         | LNRATable t => ftable t
         | LNRAConst d => fconst d
-        | LNRABinop b l0 l1 => fbinop b l0 (F l0) l1 (F l1)
+        | LNRABinop b l0 l1 => fbinop b l0 l1 (F l0) (F l1)
         | LNRAUnop u l0 => funop u l0 (F l0)
         | LNRAMap (LNRALambda s l0) l1 => fmap s l0 l1 (F l0) (F l1)
         | LNRAMapConcat (LNRALambda s l0) l1 => fmapconcat s l0 l1 (F l0) (F l1)
@@ -85,35 +85,35 @@ Section LambdaNRA.
         | LNRAFilter (LNRALambda s l0) l1 => ffilter s l0 l1 (F l0) (F l1)
         end.
 
-  Definition lnra_ind (P : lnra -> Prop) := lnra_rect P.
-  Definition lnra_rec (P:lnra->Set) := lnra_rect P.
+  Definition lambda_nra_ind (P : lambda_nra -> Prop) := lambda_nra_rect P.
+  Definition lambda_nra_rec (P:lambda_nra->Set) := lambda_nra_rect P.
 
   (** Semantics of Lambda NRA *)
 
   Context (h:brand_relation_t).
   Context (global_env:list (string*data)).
 
-  Fixpoint lnra_eval (env: bindings) (op:lnra) : option data :=
+  Fixpoint lambda_nra_eval (env: bindings) (op:lambda_nra) : option data :=
     match op with
     | LNRAVar x => edot env x
     | LNRATable t => edot global_env t
     | LNRAConst d => Some (normalize_data h d)
-    | LNRABinop b op1 op2 => olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lnra_eval env op1) (lnra_eval env op2)
+    | LNRABinop b op1 op2 => olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
     | LNRAUnop u op1 =>
-      olift (fun d1 => fun_of_unaryop h u d1) (lnra_eval env op1)
+      olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1)
     | LNRAMap lop1 op2 =>
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
-        in olift aux_map (lnra_eval env op2)
+        in olift aux_map (lambda_nra_eval env op2)
     | LNRAMapConcat lop1 op2 =>
       let aux_mapconcat d :=
           lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
-      in olift aux_mapconcat (lnra_eval env op2)
+      in olift aux_mapconcat (lambda_nra_eval env op2)
     | LNRAProduct op1 op2 =>
       (* Note: it's even clearer from this formulation that both branches take the same environment *)
       let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lnra_eval env op2) c1)) d
-      in olift aux_product (lnra_eval env op1)
+          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
+      in olift aux_product (lambda_nra_eval env op1)
     | LNRAFilter lop1 op2 =>
       let pred x' :=
           match lnra_lambda_eval env lop1 x' with
@@ -124,82 +124,95 @@ Section LambdaNRA.
       let aux_map d :=
           lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
       in
-      olift aux_map (lnra_eval env op2)
+      olift aux_map (lambda_nra_eval env op2)
     end
   with lnra_lambda_eval (env:bindings)
                         (lop:lnra_lambda) (d:data)
        : option data :=
     match lop with
     | LNRALambda x op =>
-      (lnra_eval (env++((x,d)::nil)) op)
+      (lambda_nra_eval (env++((x,d)::nil)) op)
     end.
-
-  (* For top-level: Parametric query *)
-  Definition q_to_lambda (Q:lnra -> lnra) :=
-    (LNRALambda "input" (Q (LNRAVar "input"))).
-
-  Definition eval_q (Q:lnra -> lnra) (input:data) : option data :=
-    lnra_lambda_eval nil (q_to_lambda Q) input.
-
 
   Lemma lnra_lambda_eval_lambda_eq env x lop d:
     lnra_lambda_eval env (LNRALambda x lop) d =
-    (lnra_eval (env++((x,d)::nil)) lop).
+    (lambda_nra_eval (env++((x,d)::nil)) lop).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma lnra_eval_map_eq env lop1 op2 :
-    lnra_eval env (LNRAMap lop1 op2) = 
-        let aux_map d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
-        in olift aux_map (lnra_eval env op2).
+  Lemma lambda_nra_eval_var_eq env s :
+    lambda_nra_eval env (LNRAVar s) = 
+    edot env s.
   Proof.
     reflexivity.
   Qed.
 
-  Lemma lnra_eval_map_concat_eq env lop1 op2 :
-    lnra_eval env (LNRAMapConcat lop1 op2) = 
-      let aux_mapconcat d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
-      in olift aux_mapconcat (lnra_eval env op2).
+  Lemma lambda_nra_eval_binop_eq env b op1 op2 :
+    lambda_nra_eval env (LNRABinop b op1 op2) = 
+    olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma lnra_eval_product_eq env op1 op2 :
-    lnra_eval env (LNRAProduct op1 op2) = 
-        let aux_product d :=
-          lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lnra_eval env op2) c1)) d
-        in olift aux_product (lnra_eval env op1).
+  Lemma lambda_nra_eval_unop_eq env u op1 :
+    lambda_nra_eval env (LNRAUnop u op1) = 
+    olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma lnra_eval_filter_eq env lop1 op2 :
-    lnra_eval env (LNRAFilter lop1 op2) = 
-      let pred x' :=
-          match lnra_lambda_eval env lop1 x' with
-          | Some (dbool b) => Some b
-          | _ => None
-          end
-      in
-      let aux_map d :=
-          lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
-      in
-      olift aux_map (lnra_eval env op2).
+  Lemma lambda_nra_eval_map_eq env lop1 op2 :
+    lambda_nra_eval env (LNRAMap lop1 op2) = 
+    let aux_map d :=
+        lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
+    in olift aux_map (lambda_nra_eval env op2).
   Proof.
     reflexivity.
   Qed.
 
-  Lemma lnra_eval_normalized {op:lnra} {env:bindings} {o} :
-    lnra_eval env op= Some o ->
+  Lemma lambda_nra_eval_map_concat_eq env lop1 op2 :
+    lambda_nra_eval env (LNRAMapConcat lop1 op2) = 
+    let aux_mapconcat d :=
+        lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
+    in olift aux_mapconcat (lambda_nra_eval env op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma lambda_nra_eval_product_eq env op1 op2 :
+    lambda_nra_eval env (LNRAProduct op1 op2) = 
+    let aux_product d :=
+        lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
+    in olift aux_product (lambda_nra_eval env op1).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma lambda_nra_eval_filter_eq env lop1 op2 :
+    lambda_nra_eval env (LNRAFilter lop1 op2) = 
+    let pred x' :=
+        match lnra_lambda_eval env lop1 x' with
+        | Some (dbool b) => Some b
+        | _ => None
+        end
+    in
+    let aux_map d :=
+        lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
+    in
+    olift aux_map (lambda_nra_eval env op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma lambda_nra_eval_normalized {op:lambda_nra} {env:bindings} {o} :
+    lambda_nra_eval env op= Some o ->
     Forall (fun x => data_normalized h (snd x)) env ->
     Forall (fun x => data_normalized h (snd x)) global_env ->
     data_normalized h o.
   Proof.
     revert env o.
-    lnra_cases (induction op) Case
+    lambda_nra_cases (induction op) Case
     ; intros; simpl in *.
     - Case "LNRAVar"%string.
       unfold edot in H.
@@ -332,62 +345,78 @@ Section LambdaNRA.
       eapply (lift_filter_Forall e).
       trivial.
   Qed.
-  
+
   Section LambdaNRAScope.
 
-    Fixpoint lnra_free_vars (e:lnra) :=
+    Fixpoint lambda_nra_free_vars (e:lambda_nra) :=
       match e with
       | LNRAConst d => nil
       | LNRAVar v => v :: nil
       | LNRATable t => nil
-      | LNRABinop bop e1 e2 => lnra_free_vars e1 ++ lnra_free_vars e2
-      | LNRAUnop uop e1 => lnra_free_vars e1
+      | LNRABinop bop e1 e2 => lambda_nra_free_vars e1 ++ lambda_nra_free_vars e2
+      | LNRAUnop uop e1 => lambda_nra_free_vars e1
       | LNRAMap (LNRALambda x e1) e2 =>
-        (remove string_eqdec x (lnra_free_vars e1)) ++ (lnra_free_vars e2)
+        (remove string_eqdec x (lambda_nra_free_vars e1)) ++ (lambda_nra_free_vars e2)
       | LNRAMapConcat (LNRALambda x e1) e2 =>
-        (remove string_eqdec x (lnra_free_vars e1)) ++ (lnra_free_vars e2)
+        (remove string_eqdec x (lambda_nra_free_vars e1)) ++ (lambda_nra_free_vars e2)
       | LNRAProduct e1 e2 =>
-        (lnra_free_vars e1) ++ (lnra_free_vars e2)
+        (lambda_nra_free_vars e1) ++ (lambda_nra_free_vars e2)
       | LNRAFilter (LNRALambda x e1) e2 =>
-        (remove string_eqdec x (lnra_free_vars e1)) ++ (lnra_free_vars e2)
+        (remove string_eqdec x (lambda_nra_free_vars e1)) ++ (lambda_nra_free_vars e2)
       end.
 
   (* capture avoiding substitution *)
-    Fixpoint lnra_subst (e:lnra) (x:string) (e':lnra) : lnra :=
+    Fixpoint lambda_nra_subst (e:lambda_nra) (x:string) (e':lambda_nra) : lambda_nra :=
       match e with
       | LNRAConst d => LNRAConst d
       | LNRAVar y => if y == x then e' else LNRAVar y
       | LNRATable t => LNRATable t
       | LNRABinop bop e1 e2 => LNRABinop bop
-                                   (lnra_subst e1 x e') 
-                                   (lnra_subst e2 x e')
-      | LNRAUnop uop e1 => LNRAUnop uop (lnra_subst e1 x e')
+                                   (lambda_nra_subst e1 x e') 
+                                   (lambda_nra_subst e2 x e')
+      | LNRAUnop uop e1 => LNRAUnop uop (lambda_nra_subst e1 x e')
       | LNRAMap (LNRALambda y e1) e2 =>
         if (y == x)
-        then LNRAMap (LNRALambda y e1) (lnra_subst e2 x e')
-        else LNRAMap (LNRALambda y (lnra_subst e1 x e')) (lnra_subst e2 x e')
+        then LNRAMap (LNRALambda y e1) (lambda_nra_subst e2 x e')
+        else LNRAMap (LNRALambda y (lambda_nra_subst e1 x e')) (lambda_nra_subst e2 x e')
       | LNRAMapConcat (LNRALambda y e1) e2 =>
         if (y == x)
-        then LNRAMapConcat (LNRALambda y e1) (lnra_subst e2 x e')
-        else LNRAMapConcat (LNRALambda y (lnra_subst e1 x e')) (lnra_subst e2 x e')
+        then LNRAMapConcat (LNRALambda y e1) (lambda_nra_subst e2 x e')
+        else LNRAMapConcat (LNRALambda y (lambda_nra_subst e1 x e')) (lambda_nra_subst e2 x e')
       | LNRAProduct e1 e2 =>
-        LNRAProduct (lnra_subst e1 x e') (lnra_subst e2 x e')
+        LNRAProduct (lambda_nra_subst e1 x e') (lambda_nra_subst e2 x e')
       | LNRAFilter (LNRALambda y e1) e2 =>
         if (y == x)
-        then LNRAFilter (LNRALambda y e1) (lnra_subst e2 x e')
-        else LNRAFilter (LNRALambda y (lnra_subst e1 x e')) (lnra_subst e2 x e')
+        then LNRAFilter (LNRALambda y e1) (lambda_nra_subst e2 x e')
+        else LNRAFilter (LNRALambda y (lambda_nra_subst e1 x e')) (lambda_nra_subst e2 x e')
       end.
 
   End LambdaNRAScope.
+  
+  Section Top.
+    (* For top-level: Parametric query *)
+    Definition q_to_lambda (Q:lambda_nra -> lambda_nra) : lnra_lambda :=
+      (LNRALambda "input" (Q (LNRAVar "input"))).
+
+    Definition eval_lnra_lambda (Q:lambda_nra -> lambda_nra) (input:data) : option data :=
+      lnra_lambda_eval nil (q_to_lambda Q) input.
+
+    Definition eval_lambda_nra_top (q:lambda_nra) : option data :=
+      lambda_nra_eval nil q.
+  End Top.
+
 End LambdaNRA.
 
-Hint Rewrite @lnra_lambda_eval_lambda_eq : lnra.
-Hint Rewrite @lnra_eval_map_eq : lnra.
-Hint Rewrite @lnra_eval_map_concat_eq : lnra.
-Hint Rewrite @lnra_eval_product_eq : lnra.
-Hint Rewrite @lnra_eval_filter_eq : lnra.
+Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra.
 
-Tactic Notation "lnra_cases" tactic(first) ident(c) :=
+Tactic Notation "lambda_nra_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "LNRAVar"%string
   | Case_aux c "LNRATable"%string
