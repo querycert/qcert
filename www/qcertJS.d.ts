@@ -1,6 +1,6 @@
 type QcertLanguage = string;
 
-type QcertLanguageDescription = {langid:QcertLanguage, label:string, description:string};
+type QcertLanguageDescription = {langid:QcertLanguage, label:string, illoc:string, description:string};
 type SourceLanguageGroups = {
 		frontend:[QcertLanguageDescription], 
 		core:[QcertLanguageDescription], 

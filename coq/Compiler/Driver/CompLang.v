@@ -128,33 +128,33 @@ Section CompLang.
 
     Open Scope string.
     Definition language_descriptions :=
-      (L_sql,FrontEnd,"SQL", "Structured Query Language")
-        :: (L_oql,FrontEnd,"OQL", "Object Query Language")
-        :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
-        :: (L_tech_rule,FrontEnd,"TechRule","Technical Rules")
-        :: (L_designer_rule,FrontEnd,"DesignRule","Designer Rules")
-        :: (L_camp_rule,FrontEnd,"CAMPRule","Rules for CAMP")
-        :: (L_camp,CoreEnd,"CAMP","Calculus of Aggregating Matching Patterns")
-        :: (L_nra,CoreEnd,"NRA","Nested Relational Algebra")
-        :: (L_nraenv_core,CoreEnd,"cNRAᵉ","Core Nested Relational Algebra with Environments")
-        :: (L_nraenv,CoreEnd,"NRAᵉ","Nested Relational Algebra with Environments")
-        :: (L_nnrc_core,CoreEnd,"cNNRC", "Core Named Nested Relational Calculus")
-        :: (L_nnrc,CoreEnd,"NNRC", "Named Nested Relational Calculus")
-        :: (L_nnrcmr,DistrEnd,"NNRCMR", "Named Nested Relational Calculus with Map/Reduce")
-        :: (L_cldmr,DistrEnd,"CldMR", "Nested Relational Calculus with Cloudant Map/Reduce")
-        :: (L_dnnrc_dataset,DistrEnd,"DNNRC","Distributed Named Nested Relational Calculus")
-        :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","Typed Distributed Named Nested Relational Calculus")
-        :: (L_javascript,BackEnd,"JS","JavaScript")
-        :: (L_java,BackEnd,"Java","Java")
-        :: (L_spark_rdd,BackEnd,"SparkRDD","Spark (RDD API)")
-        :: (L_spark_dataset,BackEnd,"SparkDF", "Spark (Dataframe API)")
-        :: (L_cloudant,BackEnd,"Cloudant","Cloudant Map/Reduce Views")
+      (L_sql,FrontEnd,"SQL", "SQL.Lang.SQL", "Structured Query Language")
+        :: (L_oql,FrontEnd,"OQL", "OQL.Lang.OQL", "Object Query Language")
+        :: (L_lambda_nra,FrontEnd,"λNRA", "LambdaNRA.Lang.LambdaNRA", "Lambda Nested Relational Algebra")
+        :: (L_tech_rule,FrontEnd,"TechRule", "TechRule.Lang.TechRule", "Technical Rules")
+        :: (L_designer_rule,FrontEnd,"DesignRule","DesignerRule.Lang.DesignerRule","Designer Rules")
+        :: (L_camp_rule,FrontEnd,"CAMPRule","CAMPRule.Lang.CAMPRule","Rules for CAMP")
+        :: (L_camp,CoreEnd,"CAMP","CAMP.Lang.CAMP","Calculus of Aggregating Matching Patterns")
+        :: (L_nra,CoreEnd,"NRA","NRA.Lang.NRA","Nested Relational Algebra")
+        :: (L_nraenv_core,CoreEnd,"cNRAᵉ","NRAEnv.Core.cNRAEnv","Core Nested Relational Algebra with Environments")
+        :: (L_nraenv,CoreEnd,"NRAᵉ","NRAEnv.Lang.NRAEnv","Nested Relational Algebra with Environments")
+        :: (L_nnrc_core,CoreEnd,"cNNRC","NNRC.Core.cNNRC","Core Named Nested Relational Calculus")
+        :: (L_nnrc,CoreEnd,"NNRC","NNRC.Lang.NNRC","Named Nested Relational Calculus")
+        :: (L_nnrcmr,DistrEnd,"NNRCMR","NNRCMR.Lang.NNRCMR","Named Nested Relational Calculus with Map/Reduce")
+        :: (L_cldmr,DistrEnd,"CldMR","CldMR.Lang.CldMR","Named Nested Relational Calculus with Cloudant Map/Reduce")
+        :: (L_dnnrc_dataset,DistrEnd,"DNNRC","DNNRC.Lang.DNNRC","Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","DNNRC.Lang.DNNRC","Typed Distributed Named Nested Relational Calculus")
+        :: (L_javascript,BackEnd,"JS","JS.Lang.JS","JavaScript")
+        :: (L_java,BackEnd,"Java","Java.Lang.Java","Java")
+        :: (L_spark_rdd,BackEnd,"SparkRDD","SparkRDD.Lang.SparkRDD","Spark (RDD API)")
+        :: (L_spark_dataset,BackEnd,"SparkDF","SparkDF.Lang.SparkDF","Spark (Dataframe API)")
+        :: (L_cloudant,BackEnd,"Cloudant","Cloudant.Lang.Cloudant","Cloudant Map/Reduce Views")
         :: nil.
 
-    Definition add_id_to_language_description (ld:language * language_kind * string * string) :=
+    Definition add_id_to_language_description (ld:language * language_kind * string * string * string) :=
       match ld with
-      | (lang,kind,label,desc) =>
-        (lang,name_of_language lang,kind,label,desc)
+      | (lang,kind,label,illoc,desc) =>
+        (lang,name_of_language lang,kind,label,illoc,desc)
       end.
 
     Definition language_descriptions_with_ids :=
@@ -163,22 +163,22 @@ Section CompLang.
     (* Eval vm_compute in languages_descriptions_with_ids. *)
 
     Definition check_kind (the_kind:language_kind)
-               (ld:language * string * language_kind * string * string)
+               (ld:language * string * language_kind * string * string * string)
       :=
       match ld with
-      | (lang,id,kind,label,desc) =>
+      | (lang,id,kind,label,illoc,desc) =>
         if (language_kind_eq_dec kind the_kind) then true else false
       end.
     
     Record export_desc :=
       mkExportDesc
-      { frontend : list(language * string * language_kind * string * string);
-        coreend : list(language * string * language_kind * string * string);
-        distrend : list(language * string * language_kind * string * string);
-        backend : list(language * string * language_kind * string * string) }.
+      { frontend : list(language * string * language_kind * string * string * string);
+        coreend : list(language * string * language_kind * string * string * string);
+        distrend : list(language * string * language_kind * string * string * string);
+        backend : list(language * string * language_kind * string * string * string) }.
     
     Definition select_description_per_kind
-               (ldl: list(language * string * language_kind * string * string)) :=
+               (ldl: list(language * string * language_kind * string * string * string)) :=
       mkExportDesc
         (filter (check_kind FrontEnd) ldl)
         (filter (check_kind CoreEnd) ldl)

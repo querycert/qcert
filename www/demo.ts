@@ -227,7 +227,7 @@ interface PuzzleSides {
 
 	function toSrcLangDescript(color, sides:PuzzleSides) {
 		return function(group:QcertLanguageDescription) {
-			return {langid:group.langid, label:group.label, langdescription:group.description, fill:color, sides:sides};
+		    return {langid:group.langid, label:group.label, illocation:group.illoc, langdescription:group.description, fill:color, sides:sides};
 		}
 	}
 	
@@ -636,6 +636,7 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 
 	langid:QcertLanguage;
 	langdescription:string;
+	illocation:string;
 
 	isTransient() {
 		return true;
@@ -734,6 +735,7 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	langid:QcertLanguage;
 	label:string;
 	langdescription:string;
+	illocation:string;
 	movePlace?:{left:number, top:number};
 
 	isTransient() {
@@ -753,12 +755,13 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
+			this.illocation = options.illocation;
 		} else {
 			const options = (<any>args).options;
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
-
+			this.illocation = options.illocation;
 		}
 	}
 
@@ -1110,6 +1113,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	langid:QcertLanguage;
 	label:string;
 	langdescription:string;
+	illocation:string;
 
 	protected constructor(canvas:fabric.ICanvas, options) {
 		super(canvas, {options:options});	
@@ -1117,6 +1121,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 		this.langid = options.langid;
 		this.label = options.label;
 		this.langdescription = options.langdescription;
+	        this.illocation = options.illocation;
 	};
 
 	associate() {
@@ -1160,8 +1165,9 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
     protected mousedown = () => {
 		// Update source browser to point to the IL definition -JS
 		// Dealing with window focus is annoying, so disabled for now - JS
-   	        //var win = window.open("https://querycert.github.io/sigmod17/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv", 'codebrowser');
-   	
+   	        var illoc = makeLemmaURL(this.illocation,this.langid);
+   	        var win = window.open(illoc, 'codebrowser');
+   		window.focus();
 		// Rest of logic for moving puzzle pieces
 		this.backingObject.set({
 			opacity:.5
