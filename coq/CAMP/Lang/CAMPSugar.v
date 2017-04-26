@@ -32,12 +32,12 @@ Section CAMPSugar.
   (* Java equivalent: CampAcceptMacro *)
   Definition paccept := pconst (drec nil).
 
-  Definition pfail : pat := passert (pconst (dconst false)).
-  Definition makeSingleton (p:pat) : pat := punop AColl p.
+  Definition pfail : camp := passert (pconst (dconst false)).
+  Definition makeSingleton (p:camp) : camp := punop AColl p.
 
   (* Some operators macros *)
     
-  Definition pand (p1 p2:pat):= pletEnv (passert p1) p2.
+  Definition pand (p1 p2:camp):= pletEnv (passert p1) p2.
     
   (* Java equivalent: CampToStringMacro *)
   Definition toString p := punop AToString p.
@@ -61,22 +61,22 @@ Section CAMPSugar.
   (* Some var/env macros *)
     
   (* Java equivalent: CampBindingsMacro *)
-  Definition pWithBindings : pat -> pat := pletIt penv.
+  Definition pWithBindings : camp -> camp := pletIt penv.
   (* Java equivalent: CampVarwithMacro *)
-  Definition pvarwith f : pat -> pat := punop (ARec f).
+  Definition pvarwith f : camp -> camp := punop (ARec f).
   (* Inlined in several Java macro definitions *)
-  Definition pvar f : pat := pvarwith f pit.
+  Definition pvar f : camp := pvarwith f pit.
   (* Used in the expansion of Java macro CampUnbrandDotMacro *)
-  Definition pdot f : pat -> pat := pletIt (punop (ADot f) pit).
+  Definition pdot f : camp -> camp := pletIt (punop (ADot f) pit).
   (* Java equivalent: CampUnbrandDotMacro *)
-  Definition pbdot s p : pat := (pletIt punbrand (pdot s p)).
-  Definition pbsomedot s p : pat := (pletIt (pbdot s p) psome).
-  Definition varOf (varName:string) (p:pat) := pletEnv (pvar varName) p.
+  Definition pbdot s p : camp := (pletIt punbrand (pdot s p)).
+  Definition pbsomedot s p : camp := (pletIt (pbdot s p) psome).
+  Definition varOf (varName:string) (p:camp) := pletEnv (pvar varName) p.
   (* Java equivalent: CampLookupMacro *)
   Definition lookup c := (pWithBindings (pdot c pit)).
 
-  Definition withVar (name:string) (p:pat) : pat := pletIt (lookup name) p.
-  Definition withBrandedVar (name:string) (p:pat) : pat :=
+  Definition withVar (name:string) (p:camp) : camp := pletIt (lookup name) p.
+  Definition withBrandedVar (name:string) (p:camp) : camp :=
     pletIt (punbrand' (lookup name)) p.
 
   (* Java equivalent: CampIsMacro *)
@@ -88,8 +88,8 @@ Section CAMPSugar.
     
   (* Some notations *)
 
-  Fixpoint pFoldRec (pats:list (string*pat)) (init:data) : pat
-    := match pats with
+  Fixpoint pFoldRec (camps:list (string*camp)) (init:data) : camp
+    := match camps with
        | nil => pconst init
        | (s,p)::ls => pletIt (pletEnv
                                 (pdot s (pvar "current"))
@@ -97,49 +97,49 @@ Section CAMPSugar.
                              p
        end.
 
-  Fixpoint pMapRec (pats:list (string*pat)) : pat 
-    := match pats with
+  Fixpoint pMapRec (camps:list (string*camp)) : camp 
+    := match camps with
        | nil => pconst (drec nil)
        | (s,p)::ls => pletEnv (pdot s p) (pMapRec ls)
        end.
 
-  Definition pMapRecFromFold (pats:list (string*pat)) : pat 
+  Definition pMapRecFromFold (camps:list (string*camp)) : camp 
     := pFoldRec 
-         (map (fun xy => ((fst xy), pdot "current" (snd xy))) pats)
+         (map (fun xy => ((fst xy), pdot "current" (snd xy))) camps)
          (drec nil).
 
   (** A reduction operator for patterns.
         This is particularly useful with binary operators and sequencing constructs.
         For example, 
-           pat_reduce (pbinop AAnd) [p1; p2; p3]
+           camp_reduce (pbinop AAnd) [p1; p2; p3]
         and 
-           pat_reduce pletIt [p1; p2; p3]
+           camp_reduce pletIt [p1; p2; p3]
    *)
 
-  Fixpoint pat_reduce (f:pat->pat->pat) (l:list pat) : pat
+  Fixpoint camp_reduce (f:camp->camp->camp) (l:list camp) : camp
     := match l with
        | nil => passert (pconst (dconst false))
        | p1::l' => match l' with
                    | nil => p1
-                   | p2::l'' => f p1 (pat_reduce f l')
+                   | p2::l'' => f p1 (camp_reduce f l')
                    end
        end.
 
-  Definition pat_binop_reduce (b:binOp) (l:list pat) : pat :=
-    pat_reduce (fun p1 p2 => (pbinop b p1 p2)) l.
+  Definition camp_binop_reduce (b:binOp) (l:list camp) : camp :=
+    camp_reduce (fun p1 p2 => (pbinop b p1 p2)) l.
 
   (* Defines what it means for two patterns to be equivalent *)
-  Definition pat_equiv p₁ p₂ := forall h c b d, interp h c p₁ b d = interp h c p₂ b d.
+  Definition camp_equiv p₁ p₂ := forall h c b d, interp h c p₁ b d = interp h c p₂ b d.
 
-  Theorem withAccept_id p : pat_equiv (pletIt pit p) p.
+  Theorem withAccept_id p : camp_equiv (pletIt pit p) p.
   Proof.
-    unfold pat_equiv; reflexivity.
+    unfold camp_equiv; reflexivity.
   Qed.
 
-  Lemma preduce_id b (l:list pat):
-    pat_equiv (pat_reduce (pbinop b) l) (pat_binop_reduce b l).
+  Lemma preduce_id b (l:list camp):
+    camp_equiv (camp_reduce (pbinop b) l) (camp_binop_reduce b l).
   Proof.
-    unfold pat_equiv.
+    unfold camp_equiv.
     intros.
     reflexivity.
   Qed.
@@ -148,11 +148,11 @@ Section CAMPSugar.
   
   (* objects are branded records: brand ClassName (rec [ attributes... ])  *)
   (* Java equivalent: CampTypedObjectMacro *)
-  Definition typedObject (type:brands) (p:pat) :=
+  Definition typedObject (type:brands) (p:camp) :=
     pletIt (pcast type) p.
 
   (* Java equivalent: CampNamedObjectMacro *)
-  Definition namedObject (varName:string) (type:brands) (p:pat) :=
+  Definition namedObject (varName:string) (type:brands) (p:camp) :=
     pletIt (pcast type)
            (pletEnv (pvar varName)
                     p).
@@ -161,7 +161,7 @@ Section CAMPSugar.
     := dbrand type contents.
 
   (* Java equivalent: CampVariablesMacro *)
-  Definition returnVariables (sl:list string) : pat
+  Definition returnVariables (sl:list string) : camp
     := punop (ARecProject (insertion_sort ODT_lt_dec sl)) penv.
 
   (** Useful definitions *)
@@ -171,7 +171,7 @@ Section CAMPSugar.
   Definition WW p := pletIt (pgetconstant ("WORLD")) p.
 
   (* NB: This version does not use "fresh" as in the paper.  
-   * See mapall_let in Translation/NNRCtoPattern.v for a version
+   * See mapall_let in Translation/NNRCtoCAMP.v for a version
    * that uses a fresh variable to avoid recomputing (pmap p) 
    *)
   Notation "p1 ≐ p2" := (passert (pbinop AEq p1 p2)) (right associativity, at level 70, only parsing).     (* ≐ = \doteq *)

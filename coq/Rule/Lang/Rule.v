@@ -34,17 +34,17 @@ Section Rule.
   (** rules and their semantics *)
   Inductive rule :=
   (** a normal rule, matched against each working memory element in turn *)
-  | rule_when : pat -> rule -> rule
+  | rule_when : camp -> rule -> rule
   (** a rule that should run against the entire working memory (as a collection of elements) *)
-  | rule_global : pat -> rule -> rule
+  | rule_global : camp -> rule -> rule
   (** A rule that must not match any working memory element *)
-  | rule_not : pat -> rule -> rule
+  | rule_not : camp -> rule -> rule
   (** This is the last part of a rule, and it allow the 
         rule to return a value for each successful match-set. pit can be used as the identity *)
-  | rule_return : pat -> rule.  
+  | rule_return : camp -> rule.  
 
   (* Java equivalent: CampRule.convertToPattern *)
-  Fixpoint rule_to_pattern (rule:rule) : pat
+  Fixpoint rule_to_camp (rule:rule) : camp
     := match rule with
          | rule_when p ps =>
            punop AFlatten
@@ -52,31 +52,31 @@ Section Rule.
                     (pmap
                        (pletEnv
                           p
-                          (rule_to_pattern ps))))
+                          (rule_to_camp ps))))
          | rule_global p ps =>
            punop AFlatten
                  (makeSingleton
                     (pletEnv
                        (WW p)
-                       (rule_to_pattern ps)))
+                       (rule_to_camp ps)))
          | rule_not p ps =>
            punop AFlatten
                  (makeSingleton
                     (pletEnv
                        (notholds p RETURN BINDINGS)
-                       (rule_to_pattern ps)))
+                       (rule_to_camp ps)))
          | rule_return p =>
            makeSingleton p
        end.
 
   Definition eval_rule_debug (h:list(string*string)) (print_env:bool) (r:rule) (world:list data)
     : presult_debug data
-    := interp_debug h (mkWorld world) print_env nil (rule_to_pattern r) nil dunit.
+    := interp_debug h (mkWorld world) print_env nil (rule_to_camp r) nil dunit.
 
   Definition eval_rule_res_to_string
              (h:list(string*string)) (print_env:bool) (r:rule) (world:list data)
     : string
-    := let pp := (rule_to_pattern r) in
+    := let pp := (rule_to_camp r) in
        print_presult_debug pp
                            (interp_debug h
                                          (mkWorld world)
@@ -85,7 +85,7 @@ Section Rule.
   (** Semantics of CAMP rules, returning a presult *)
   Definition eval_rule_res (h:list(string*string)) (r:rule) (world:list data)
     : presult data
-    := interp h (mkWorld world) (rule_to_pattern r) nil dunit.
+    := interp h (mkWorld world) (rule_to_camp r) nil dunit.
 
   Definition eval_rule (h:list(string*string)) (r:rule) (world:list data)
     : option (list data)

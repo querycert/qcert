@@ -27,7 +27,7 @@ Section TCAMPSugar.
 
   Local Open Scope rule.
 
-  Hint Constructors pat_type.
+  Hint Constructors camp_type.
 
   Context {m:basic_model}.
 
@@ -43,7 +43,7 @@ Section TCAMPSugar.
     repeat econstructor.
   Qed.
 
-  Lemma PTmapall τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : pat} :
+  Lemma PTmapall τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
     NoDup (domain Γ) ->
     ([τc&Γ] |= p; τ₁ ~> τ₂) -> [τc&Γ] |= mapall p; Coll τ₁ ~> Coll τ₂.
   Proof.
@@ -51,14 +51,14 @@ Section TCAMPSugar.
     econstructor.
     + repeat econstructor; eauto.
     + rewrite merge_bindings_nil_r; eauto.
-    + simpl. apply pat_type_tenv_rec; eauto.
+    + simpl. apply camp_type_tenv_rec; eauto.
       Grab Existential Variables.
       eauto.
   Qed.
 
   Require Import RString.
 
-  Lemma PTmapall_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : pat} :
+  Lemma PTmapall_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
     RSort.is_list_sorted ODT_lt_dec (domain Γ) = true ->
     [τc&Γ] |= mapall p; τ₁ ~> τ₂ ->
                        exists τ₁' τ₂',

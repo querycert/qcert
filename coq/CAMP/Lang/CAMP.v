@@ -30,24 +30,24 @@ Section CAMP.
   (* end hide *)
 
   (** Patterns in CAMP *)
-  Inductive pat : Set :=
-  | pconst : data -> pat   (* This allows the empty list and empty record to be created *)
-  | punop : unaryOp -> pat -> pat (* this does need the first pattern argument, but providing it is more uniform with respect to pbinop *)
-  | pbinop : binOp -> pat -> pat -> pat
-  | pmap : pat -> pat
-(*| pgroupBy : pat -> pat *)
-  | passert : pat -> pat (* converts (dbool true) to [], and everything else to match failure *)
-  | porElse : pat -> pat -> pat (* if the first pattern fails, try the second pattern *)
-  | pit : pat
-  | pletIt : pat -> pat -> pat
-  | pgetconstant : string -> pat
-  | penv : pat
+  Inductive camp : Set :=
+  | pconst : data -> camp   (* This allows the empty list and empty record to be created *)
+  | punop : unaryOp -> camp -> camp (* this does need the first pattern argument, but providing it is more uniform with respect to pbinop *)
+  | pbinop : binOp -> camp -> camp -> camp
+  | pmap : camp -> camp
+(*| pgroupBy : camp -> camp *)
+  | passert : camp -> camp (* converts (dbool true) to [], and everything else to match failure *)
+  | porElse : camp -> camp -> camp (* if the first pattern fails, try the second pattern *)
+  | pit : camp
+  | pletIt : camp -> camp -> camp
+  | pgetconstant : string -> camp
+  | penv : camp
     (* Run the first pattern, which must return a record of new bindings. This is merged with the current bindings, and used to run the second pattern *)
-  | pletEnv : pat -> pat -> pat
-  | pleft : pat
-  | pright : pat.
+  | pletEnv : camp -> camp -> camp
+  | pleft : camp
+  | pright : camp.
 
-  Tactic Notation "pat_cases" tactic(first) ident(c) :=
+  Tactic Notation "camp_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "pconst"%string
   | Case_aux c "punop"%string
@@ -64,9 +64,9 @@ Section CAMP.
   | Case_aux c "pleft"%string
   | Case_aux c "pright"%string].
   
-  Global Instance pat_eqdec : EqDec pat eq.
+  Global Instance camp_eqdec : EqDec camp eq.
   Proof.
-    change (forall x y : pat, {x = y} + {x <> y}).
+    change (forall x y : camp, {x = y} + {x <> y}).
     decide equality.
     apply data_eqdec.
     apply unaryOp_eqdec.
@@ -76,9 +76,9 @@ Section CAMP.
 
   Local Open Scope string.
 
-  Global Instance ToString_pat : ToString pat
+  Global Instance ToString_camp : ToString camp
     := { toString :=
-           fix toStringp (p:pat) : string :=
+           fix toStringp (p:camp) : string :=
              match p with
                | pconst d => "(pconst " ++ toString d ++ ")"
                | punop u p1 => "(punop " ++ toString u ++ " " ++ toStringp p1 ++ ")"
@@ -98,55 +98,55 @@ Section CAMP.
 
   (* If we were reasoning about this formally, we would want to use a proper
      one-hole context.  Since we are not, a trail of choices suffices *)
-  Definition pat_src_path
+  Definition camp_src_path
     := list nat.
 
-  Fixpoint toString_pat_with_path (p:pat) (loc:pat_src_path) :=
+  Fixpoint toString_camp_with_path (p:camp) (loc:camp_src_path) :=
     match loc with
       | nil => bracketString "<<<"  (toString p) ">>>"
       | pos::loc' =>
         match p with
       | pconst d => "(pconst " ++ toString d ++ ")"
       | punop u p1 => "(punop " ++ toString u ++ " " ++
-                                toString_pat_with_path p1 loc' ++ ")"
+                                toString_camp_with_path p1 loc' ++ ")"
       | pbinop b p1 p2 => "(pbinop "
                             ++ toString b ++ " " ++
                             (if pos == 0
-                             then toString_pat_with_path p1 loc'
+                             then toString_camp_with_path p1 loc'
                              else toString p1)
                             ++ " " ++
                             (if pos == 1
-                             then toString_pat_with_path p2 loc'
+                             then toString_camp_with_path p2 loc'
                              else toString p2) ++ ")"
-      | pmap p1 => "(pmap " ++ toString_pat_with_path p1 loc' ++ ")"
-      | passert p1 => "(passert " ++ toString_pat_with_path p1 loc' ++ ")"
+      | pmap p1 => "(pmap " ++ toString_camp_with_path p1 loc' ++ ")"
+      | passert p1 => "(passert " ++ toString_camp_with_path p1 loc' ++ ")"
       | porElse p1 p2 => "(porElse " ++
                             (if pos == 0
-                             then toString_pat_with_path p1 loc'
+                             then toString_camp_with_path p1 loc'
                              else toString p1)
                             ++ " " ++
                             (if pos == 1
-                             then toString_pat_with_path p2 loc'
+                             then toString_camp_with_path p2 loc'
                              else toString p2) ++ ")"
 
       | pit  => "pit"
       | pletIt p1 p2 => "(pletIt " ++
                             (if pos == 0
-                             then toString_pat_with_path p1 loc'
+                             then toString_camp_with_path p1 loc'
                              else toString p1)
                             ++ " " ++
                             (if pos == 1
-                             then toString_pat_with_path p2 loc'
+                             then toString_camp_with_path p2 loc'
                              else toString p2) ++ ")"
       | pgetconstant s => "(pgetconstant " ++ s ++ ")"
       | penv => "penv"
       | pletEnv p1 p2 => "(pletEnv " ++ 
                             (if pos == 0
-                             then toString_pat_with_path p1 loc'
+                             then toString_camp_with_path p1 loc'
                              else toString p1)
                             ++ " " ++
                             (if pos == 1
-                             then toString_pat_with_path p2 loc'
+                             then toString_camp_with_path p2 loc'
                              else toString p2) ++ ")"
 
       | pleft => "pleft"
@@ -252,7 +252,7 @@ Section CAMP.
   Context (h:brand_relation_t).
   Context (constant_env:bindings).
         
-  Fixpoint interp (p:pat) (bind:bindings) (d:data) : presult data
+  Fixpoint interp (p:camp) (bind:bindings) (d:data) : presult data
     := match p with
        | pconst d' => Success (normalize_data h d')
        | punop op p₁ => bindpr (interp p₁ bind d)
@@ -328,7 +328,7 @@ Section CAMP.
   Section eval_debug.
 
   Inductive presult_debug A :=
-  | TerminalError_debug (s:string) (loc:pat_src_path) : presult_debug A
+  | TerminalError_debug (s:string) (loc:camp_src_path) : presult_debug A
   | RecoverableError_debug (s:string) : presult_debug A
   | Success_debug (res:A) : presult_debug A.
 
@@ -339,9 +339,9 @@ Section CAMP.
   (* end hide *)
 
   (* Not a ToString instance since it requires the top level pattern *)  
-  Definition print_presult_debug {A} {tos:ToString A} (p:pat) (pr:presult_debug A)
+  Definition print_presult_debug {A} {tos:ToString A} (p:camp) (pr:presult_debug A)
     := match pr with
-         | TerminalError_debug s loc => "TerminalError: " ++ s ++ ". This error occurred in the bracketed code: \n" ++ (toString_pat_with_path p (rev loc))
+         | TerminalError_debug s loc => "TerminalError: " ++ s ++ ". This error occurred in the bracketed code: \n" ++ (toString_camp_with_path p (rev loc))
          | RecoverableError_debug s => "RecoverableError: " ++ s
          | Success_debug res => "Success: " ++ toString res
        end.
@@ -383,7 +383,7 @@ Section CAMP.
        | (Success_debug a)::xs => liftpr_debug (cons a) (gather_successes_debug xs)
        end.
   
-  Definition op2tpr_debug {A:Type} (err:string) (loc:pat_src_path) (o:option A) : presult_debug A
+  Definition op2tpr_debug {A:Type} (err:string) (loc:camp_src_path) (o:option A) : presult_debug A
     := match o with
        | None => TerminalError_debug err loc
        | Some x => Success_debug x
@@ -411,7 +411,7 @@ Section CAMP.
 
   Context (print_env:bool).
   
-  Definition mk_err (desc:string) (p:pat) (bind:bindings) (it:data)
+  Definition mk_err (desc:string) (p:camp) (bind:bindings) (it:data)
     := toString p ++ " failed" ++ desc ++ "." ++
                 (if print_env
                  then "\n Current environment (env): "
@@ -423,23 +423,23 @@ Section CAMP.
   
   (* It is important to separate out the debug messages.
      Otherwise, they get reduced by proofs, which is painful *)
-  Definition punop_err (p:pat) (bind:bindings) (it:data) (d:data) : string
+  Definition punop_err (p:camp) (bind:bindings) (it:data) (d:data) : string
     := (mk_err "" p bind it ++ " The operator's argument was: " ++ toString d ++ "\n").
 
-  Definition binop_err (p:pat) (bind:bindings) (it:data) (d'₁ d'₂:data) : string
+  Definition binop_err (p:camp) (bind:bindings) (it:data) (d'₁ d'₂:data) : string
     := (mk_err "" p bind it ++ " The operator's first argument was: " ++ toString d'₁
                ++ "\n The operator's second argument was: " ++ toString d'₂
        ++ "\n").
 
-  Definition pmap_err (p:pat) (bind:bindings) (it:data) : string
+  Definition pmap_err (p:camp) (bind:bindings) (it:data) : string
     := mk_err " because the scrutinee was not a collection" p bind it.
 
-  Definition passert_err (p:pat) (bind:bindings) (it d:data) : string
+  Definition passert_err (p:camp) (bind:bindings) (it d:data) : string
     := mk_err " because the argument was not a boolean" p bind it
               ++ " The argument to passert was: " ++ toString d
                ++ "\n".
 
-  Definition pletEnv_err (p:pat) (bind:bindings) (it d:data) : string
+  Definition pletEnv_err (p:camp) (bind:bindings) (it d:data) : string
     := mk_err " because its first argument was not a record" p bind it
               ++ " The first argument to pletEnv was: " ++ toString d.
 
@@ -456,7 +456,7 @@ Section CAMP.
                 (bracketString "{" (joinStrings "; " (domain constant_env)) "}")
                 ++ "\n".
 
-  Fixpoint interp_debug (loc:pat_src_path) (p:pat) (bind:bindings) (d:data) : presult_debug data
+  Fixpoint interp_debug (loc:camp_src_path) (p:camp) (bind:bindings) (d:data) : presult_debug data
     := match p with
        | pconst d' => Success_debug (normalize_data h d')
        | punop op p₁ =>
@@ -601,13 +601,13 @@ Section CAMP.
     intros; subst; auto.
   Qed.
 
-  Theorem interp_debug_correct (loc:pat_src_path) (p:pat) (bind:bindings) (d:data) :
+  Theorem interp_debug_correct (loc:camp_src_path) (p:camp) (bind:bindings) (d:data) :
     presult_same
       (interp h constant_env p bind d)
       (interp_debug loc p bind d).
   Proof.
     revert loc bind d.
-    pat_cases (induction p) Case; simpl; intros.
+    camp_cases (induction p) Case; simpl; intros.
     - trivial.
     - apply bindpr_presult_same; [eauto | ]; intros.
       destruct (fun_of_unaryop h u x); simpl; trivial. 
@@ -661,23 +661,23 @@ Section CAMP.
   Qed.
 
   (** Semantics of CAMP patterns, returning a presult *)
-  Definition eval_pattern_debug (h:list(string*string)) (print_env:bool) (p:pat) (world:list data)
+  Definition eval_pattern_debug (h:list(string*string)) (print_env:bool) (p:camp) (world:list data)
     : presult_debug data
     := interp_debug h (mkWorld world) print_env nil p nil dunit.
 
   Definition eval_pattern_res_to_string
-             (h:list(string*string)) (print_env:bool) (p:pat) (world:list data)
+             (h:list(string*string)) (print_env:bool) (p:camp) (world:list data)
     : string
     := print_presult_debug p
                            (interp_debug h
                                          (mkWorld world)
                                          print_env nil p nil dunit).
 
-  Definition eval_pattern_res (h:list(string*string)) (p:pat) (world:list data)
+  Definition eval_pattern_res (h:list(string*string)) (p:camp) (world:list data)
     : presult data
     := interp h (mkWorld world) p nil dunit.
 
-  Definition eval_pattern (h:list(string*string)) (p:pat) (world:list data)
+  Definition eval_pattern (h:list(string*string)) (p:camp) (world:list data)
     : option (list data)
     := match eval_pattern_res h p world with
        | Success _ l => Some (l::nil)
@@ -693,7 +693,7 @@ Arguments TerminalError {A}.
 Arguments RecoverableError {A}.
 Arguments Success {A} res.
 
-Tactic Notation "pat_cases" tactic(first) ident(c) :=
+Tactic Notation "camp_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "pconst"%string
   | Case_aux c "punop"%string

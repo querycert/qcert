@@ -27,73 +27,73 @@ Section NRASugar.
 
   Open Scope string_scope.
 
-  Definition pat_bind := AUnop (ADot "PBIND") AID.
-  Definition pat_const_env := AUnop (ADot "PCONST") AID.
-  Definition pat_data := AUnop (ADot "PDATA") AID.
-  Definition pat_data_op op := AUnop (ADot "PDATA") op.
+  Definition nra_bind := AUnop (ADot "PBIND") AID.
+  Definition nra_const_env := AUnop (ADot "PCONST") AID.
+  Definition nra_data := AUnop (ADot "PDATA") AID.
+  Definition nra_data_op op := AUnop (ADot "PDATA") op.
 
   (* Match failure returns the empty sequence, success returns a singleton sequence *)
-  Definition pat_fail := AConst (dcoll nil).
-  Definition pat_match op := AUnop AColl op.
-  Definition pat_triple s1 s2 s3 (aconst:nra) (abind:nra) (adata:nra) :=
+  Definition nra_fail := AConst (dcoll nil).
+  Definition nra_match op := AUnop AColl op.
+  Definition nra_triple s1 s2 s3 (aconst:nra) (abind:nra) (adata:nra) :=
     ABinop AConcat
            (AUnop (ARec s1) aconst)
            (ABinop AConcat
                    (AUnop (ARec s2) abind)
                    (AUnop (ARec s3) adata)).
   
-  Definition pat_context (aconst:nra) (abind:nra) (adata:nra) :=
-    pat_triple "PCONST" "PBIND" "PDATA"  aconst abind adata.
+  Definition nra_context (aconst:nra) (abind:nra) (adata:nra) :=
+    nra_triple "PCONST" "PBIND" "PDATA"  aconst abind adata.
   
-  Definition pat_withbinding :=
-    pat_context pat_const_env pat_bind pat_bind.
+  Definition nra_withbinding :=
+    nra_context nra_const_env nra_bind nra_bind.
   
-  Definition pat_context_data dconst dbind dpid : data :=
+  Definition nra_context_data dconst dbind dpid : data :=
     drec (("PBIND",dbind)
             ::("PCONST",dconst)
             ::("PDATA",dpid)
             :: nil).
 
   (* Variant used in context *)
-  Definition make_fixed_pat_context_data (const:data) (env:data) : nra
+  Definition make_fixed_nra_context_data (const:data) (env:data) : nra
     := ABinop AConcat
               (AUnop (ARec "PBIND"%string) (AConst env))
               (ABinop AConcat
                       (AUnop (ARec "PCONST"%string) (AConst const))
                       (AUnop (ARec "PDATA"%string) AID)).
 
-  Definition pat_wrap op  :=
-    pat_triple "PCONST" "PBIND" "PDATA" pat_const_env pat_bind op.
+  Definition nra_wrap op  :=
+    nra_triple "PCONST" "PBIND" "PDATA" nra_const_env nra_bind op.
   
-  Definition pat_wrap_a1 op :=
-    pat_triple "PCONST" "PBIND" "a1" pat_const_env pat_bind op.
+  Definition nra_wrap_a1 op :=
+    nra_triple "PCONST" "PBIND" "a1" nra_const_env nra_bind op.
 
-  Definition pat_wrap_bind_a1 op :=
-    pat_triple "PCONST" "a1" "PDATA" pat_const_env  pat_bind op.
+  Definition nra_wrap_bind_a1 op :=
+    nra_triple "PCONST" "a1" "PDATA" nra_const_env  nra_bind op.
 
-  Definition pat_wrap_with_bind op1 :=
-    pat_context pat_const_env op1 AID.
+  Definition nra_wrap_with_bind op1 :=
+    nra_context nra_const_env op1 AID.
   
-  Definition pat_project_wrap :=
-    pat_wrap_with_bind pat_fail.
+  Definition nra_project_wrap :=
+    nra_wrap_with_bind nra_fail.
 
-  Lemma data_normalized_pat_context_data h constants env d:
+  Lemma data_normalized_nra_context_data h constants env d:
     data_normalized h constants ->
     data_normalized h env ->
     data_normalized h d ->
-    data_normalized h (pat_context_data constants env d).
+    data_normalized h (nra_context_data constants env d).
   Proof.
-    unfold pat_context_data.
+    unfold nra_context_data.
     repeat (constructor; simpl; eauto).
   Qed.
 
-  Lemma data_normalized_pat_context_data_inv h constants env d:
-    data_normalized h (pat_context_data constants env d) ->
+  Lemma data_normalized_nra_context_data_inv h constants env d:
+    data_normalized h (nra_context_data constants env d) ->
      data_normalized h constants /\
     data_normalized h env /\
     data_normalized h d.
   Proof.
-    unfold pat_context_data.
+    unfold nra_context_data.
     intros H.
     inversion H; clear H; subst.
     inversion H1; clear H1; subst.
@@ -104,7 +104,7 @@ Section NRASugar.
 
 End NRASugar.
 
-Hint Resolve data_normalized_pat_context_data.  
+Hint Resolve data_normalized_nra_context_data.  
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***

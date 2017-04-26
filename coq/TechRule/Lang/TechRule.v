@@ -25,7 +25,7 @@ Section TechRule.
   Context {fruntime:foreign_runtime}.
 
   Axiom tech_rule : Set.
-  Axiom tech_rule_to_camp : tech_rule -> pat.
+  Axiom tech_rule_to_camp : tech_rule -> camp.
   
 End TechRule.
 

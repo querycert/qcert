@@ -48,7 +48,7 @@ Section cNRAEnvEq.
       (dn_env:data_normalized h env)
       (x:data)
       (dn_x:data_normalized h x),
-      h ⊢ (nra_of_cnraenv op1) @ₐ (pat_context_data (drec (rec_sort c)) env x) = h ⊢ (nra_of_cnraenv op2) @ₐ (pat_context_data (drec (rec_sort c)) env x).
+      h ⊢ (nra_of_cnraenv op1) @ₐ (nra_context_data (drec (rec_sort c)) env x) = h ⊢ (nra_of_cnraenv op2) @ₐ (nra_context_data (drec (rec_sort c)) env x).
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -188,7 +188,7 @@ Section cNRAEnvEq.
     unfold Proper, respectful, cnraenv_eq; simpl; intros.
     rewrite H0 by trivial.
     rewrite unfold_env_nra_sort by trivial; simpl.
-    case_eq (nra_eval h (nra_of_cnraenv y0) (pat_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
+    case_eq (nra_eval h (nra_of_cnraenv y0) (nra_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
     destruct d; try reflexivity; simpl; intros.
     f_equal. apply rmap_ext; intros.
     apply H; eauto.
@@ -429,8 +429,8 @@ Section cNRAEnvEq.
                   data_normalized h env ->
                   forall (x0 : data),
                   data_normalized h x0 ->
-                  (h ⊢ (nra_of_cnraenv (cnraenv_of_nra x)) @ₐ (pat_context_data (drec (rec_sort c)) env x0))%nra =
-                  (h ⊢ (nra_of_cnraenv (cnraenv_of_nra y)) @ₐ (pat_context_data (drec (rec_sort c)) env x0))%nra ).
+                  (h ⊢ (nra_of_cnraenv (cnraenv_of_nra x)) @ₐ (nra_context_data (drec (rec_sort c)) env x0))%nra =
+                  (h ⊢ (nra_of_cnraenv (cnraenv_of_nra y)) @ₐ (nra_context_data (drec (rec_sort c)) env x0))%nra ).
     { intros. repeat rewrite <- unfold_env_nra_sort; trivial. auto. }
     assert (eq2:forall (h : list (string * string))
                        (x0 : data),
@@ -454,7 +454,7 @@ Section cNRAEnvEq.
     (* apply cnraenv_of_nra_proper in H. *)
     unfold nra_eq, cnraenv_eq in *.
     intros.
-    specialize (H h (pat_context_data (drec (rec_sort c)) env x0)).
+    specialize (H h (nra_context_data (drec (rec_sort c)) env x0)).
     repeat rewrite <- unfold_env_nra_sort in H by trivial.
     auto.
   Qed.

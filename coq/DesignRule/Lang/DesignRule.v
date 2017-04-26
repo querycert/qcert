@@ -14,11 +14,23 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export DesignerRule.
+(* This file defines  *)
+Section DesignRule.
+
+  (* begin hide *)
+  Require Import Utils BasicRuntime.
+  Require Export CAMP.
+  (* end hide *)
+
+  Context {fruntime:foreign_runtime}.
+
+  Axiom designer_rule : Set.
+  Axiom designer_rule_to_camp : designer_rule -> camp.
+  
+End DesignRule.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

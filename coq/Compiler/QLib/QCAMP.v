@@ -26,8 +26,8 @@ Module QCAMP(runtime:CompilerRuntime).
   Module Ops := QOperators.QOperators(runtime).
 
   Definition expr : Set 
-    := CAMP.pat.
-  Definition pat : Set 
+    := CAMP.camp.
+  Definition camp : Set 
     := expr.
   Definition t : Set 
     := expr.
@@ -80,8 +80,8 @@ Module QCAMP(runtime:CompilerRuntime).
   Definition toString : expr -> expr 
     := CAMPSugar.toString.
 
-  Definition pat_binop_reduce : Ops.Binary.op -> list expr -> expr
-    := CAMPSugar.pat_binop_reduce.
+  Definition camp_binop_reduce : Ops.Binary.op -> list expr -> expr
+    := CAMPSugar.camp_binop_reduce.
 
   Definition pvarwith : String.string -> expr -> expr
     := CAMPSugar.pvarwith.

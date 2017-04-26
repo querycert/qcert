@@ -38,7 +38,7 @@ Section TRule.
     := ("WORLD",Coll τworld)::nil.
   
   Definition rule_type (τworld τout:rtype) (r:rule) : Prop :=
-    pat_type (mkTWorld τworld) nil (rule_to_pattern r) Unit τout.
+    camp_type (mkTWorld τworld) nil (rule_to_camp r) Unit τout.
 
   Lemma typed_rule_correct {τworld τout} (r:rule):
     rule_type τworld τout r ->
@@ -50,12 +50,12 @@ Section TRule.
     intros.
     unfold eval_rule.
     unfold rule_type in H.
-    generalize (@typed_pat_success_or_recoverable
+    generalize (@typed_camp_success_or_recoverable
                   m (mkWorld world)
                   (mkTWorld τworld) nil
                   Unit
                   τout
-                  (rule_to_pattern r)
+                  (rule_to_camp r)
                   nil
                   dunit); intros.
     cut_to H1.

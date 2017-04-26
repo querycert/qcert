@@ -132,7 +132,7 @@ Section CompLang.
         :: (L_oql,FrontEnd,"OQL", "OQL.Lang.OQL", "Object Query Language")
         :: (L_lambda_nra,FrontEnd,"λNRA", "LambdaNRA.Lang.LambdaNRA", "Lambda Nested Relational Algebra")
         :: (L_tech_rule,FrontEnd,"TechRule", "TechRule.Lang.TechRule", "Technical Rules")
-        :: (L_designer_rule,FrontEnd,"DesignRule","DesignerRule.Lang.DesignerRule","Designer Rules")
+        :: (L_designer_rule,FrontEnd,"DesignRule","DesignRule.Lang.DesignRule","Designer Rules")
         :: (L_camp_rule,FrontEnd,"CAMPRule","CAMPRule.Lang.CAMPRule","Rules for CAMP")
         :: (L_camp,CoreEnd,"CAMP","CAMP.Lang.CAMP","Calculus of Aggregating Matching Patterns")
         :: (L_nra,CoreEnd,"NRA","NRA.Lang.NRA","Nested Relational Algebra")
@@ -204,7 +204,7 @@ Section CompLang.
     Require Import CAMPRuntime.
     Require Import RuleRuntime.
     Require Import TechRuleRuntime.
-    Require Import DesignerRuleRuntime.
+    Require Import DesignRuleRuntime.
     Require Import OQLRuntime.
 
     Require Import NNRCMRtoDNNRC.
@@ -226,7 +226,7 @@ Section CompLang.
     Definition camp_rule := rule.
     Definition tech_rule := tech_rule.
     Definition designer_rule := designer_rule.
-    Definition camp := pat.
+    Definition camp := camp.
     Definition oql := oql.
     Definition sql := sql.
     Definition lambda_nra := lambda_nra.

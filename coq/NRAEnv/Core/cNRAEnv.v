@@ -158,7 +158,7 @@ Section cNRAEnv.
   
   Fixpoint nra_of_cnraenv (ae:cnraenv) : nra :=
     match ae with
-      | ANID => pat_data
+      | ANID => nra_data
       | ANConst d => (AConst d)
       | ANBinop b ae1 ae2 => ABinop b (nra_of_cnraenv ae1) (nra_of_cnraenv ae2)
       | ANUnop u ae1 => AUnop u (nra_of_cnraenv ae1)
@@ -167,7 +167,7 @@ Section cNRAEnv.
              (unnest_two
                 "a1"
                 "PDATA"
-                (AUnop AColl (pat_wrap_a1 (nra_of_cnraenv ea2))))
+                (AUnop AColl (nra_wrap_a1 (nra_of_cnraenv ea2))))
       | ANMapConcat ea1 ea2 =>
         (AMap (ABinop AConcat
                       (AUnop (ADot "PDATA") AID)
@@ -177,7 +177,7 @@ Section cNRAEnv.
                  (unnest_two
                     "a1"
                     "PDATA"
-                    (AUnop AColl (pat_wrap_a1 (nra_of_cnraenv ea2))))))
+                    (AUnop AColl (nra_wrap_a1 (nra_of_cnraenv ea2))))))
       | ANProduct ea1 ea2 => AProduct (nra_of_cnraenv ea1) (nra_of_cnraenv ea2)
       | ANSelect ea1 ea2 =>
         (AMap (AUnop (ADot "PDATA") AID)
@@ -185,29 +185,29 @@ Section cNRAEnv.
                        (unnest_two
                           "a1"
                           "PDATA"
-                          (AUnop AColl (pat_wrap_a1 (nra_of_cnraenv ea2))))))
+                          (AUnop AColl (nra_wrap_a1 (nra_of_cnraenv ea2))))))
       | ANDefault ea1 ea2 => ADefault (nra_of_cnraenv ea1) (nra_of_cnraenv ea2)
       | ANEither eal ear => AApp
                                   (AEither (nra_of_cnraenv eal) (nra_of_cnraenv ear))
                                   (AEitherConcat
-                                     (AApp (ARecEither "PDATA") pat_data)
+                                     (AApp (ARecEither "PDATA") nra_data)
                                      (ABinop AConcat 
-                                             (AUnop (ARec "PBIND") pat_bind)
-                                             (AUnop (ARec "PCONST") pat_const_env)))
+                                             (AUnop (ARec "PBIND") nra_bind)
+                                             (AUnop (ARec "PCONST") nra_const_env)))
       | ANEitherConcat ea1 ea2 => AEitherConcat (nra_of_cnraenv ea1) (nra_of_cnraenv ea2)
-      | ANApp ea1 ea2 => AApp (nra_of_cnraenv ea1) (pat_wrap (nra_of_cnraenv ea2))
-      | ANGetConstant s => AUnop (ADot s) pat_const_env 
-      | ANEnv => pat_bind
+      | ANApp ea1 ea2 => AApp (nra_of_cnraenv ea1) (nra_wrap (nra_of_cnraenv ea2))
+      | ANGetConstant s => AUnop (ADot s) nra_const_env 
+      | ANEnv => nra_bind
       | ANAppEnv ea1 ea2 =>
         AApp (nra_of_cnraenv ea1)
-             (pat_context pat_const_env (nra_of_cnraenv ea2) pat_data)
+             (nra_context nra_const_env (nra_of_cnraenv ea2) nra_data)
       | ANMapEnv ea1 =>
-        (* fix this: the pat_data should change to a pat_pair *)
+        (* fix this: the nra_data should change to a nra_pair *)
         AMap (nra_of_cnraenv ea1)
              (unnest_two
                 "a1"
                 "PBIND"
-                (AUnop AColl (pat_wrap_bind_a1 pat_data)))
+                (AUnop AColl (nra_wrap_bind_a1 nra_data)))
     end.
 
   Lemma rmap_map_rec1 l s:
@@ -478,7 +478,7 @@ Section cNRAEnv.
   Qed.
 
   Lemma unfold_env_nra (ae:cnraenv) (env:data) (x:data) :
-    (cnraenv_eval ae env x) = (h ⊢ (nra_of_cnraenv ae) @ₐ (pat_context_data (drec constant_env) env x)).
+    (cnraenv_eval ae env x) = (h ⊢ (nra_of_cnraenv ae) @ₐ (nra_context_data (drec constant_env) env x)).
   Proof.
     revert env x; cnraenv_cases (induction ae) Case; simpl; intros.
     - Case "ANID"%string.
@@ -491,7 +491,7 @@ Section cNRAEnv.
       rewrite IHae; reflexivity.
     - Case "ANMap"%string.
       rewrite IHae2; clear IHae2.
-      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x));
+      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (nra_context_data (drec constant_env) env x));
         intros; clear ae2 x.
       unfold olift.
       destruct o; try reflexivity; simpl.
@@ -504,7 +504,7 @@ Section cNRAEnv.
       rewrite omap_concat_map_rec in IHl; simpl in *.
       rewrite app_nil_r in *.
       rewrite rmap_remove1 in *; simpl.
-      rewrite (IHae1 env a); unfold pat_context_data; simpl.
+      rewrite (IHae1 env a); unfold nra_context_data; simpl.
       generalize (h ⊢ (nra_of_cnraenv ae1) @ₐ (drec
                    (("PBIND", env)
                     :: ("PCONST", drec constant_env) :: ("PDATA", a) :: nil))); intros.
@@ -518,7 +518,7 @@ Section cNRAEnv.
               :: ("PCONST", drec constant_env) :: ("PDATA", x) :: nil)) l)); try reflexivity; try congruence; simpl; destruct (rmap (cnraenv_eval ae1 env) l); try reflexivity; try congruence.
     - Case "ANMapConcat"%string.
       rewrite IHae2; clear IHae2.
-      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x)); intros; clear ae2 x.
+      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (nra_context_data (drec constant_env) env x)); intros; clear ae2 x.
       unfold olift.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
@@ -530,7 +530,7 @@ Section cNRAEnv.
       rewrite omap_concat_map_rec in IHl; simpl in *.
       rewrite app_nil_r in *.
       rewrite rmap_remove1 in *; simpl.
-      rewrite (IHae1 env a); unfold pat_context_data; simpl.
+      rewrite (IHae1 env a); unfold nra_context_data; simpl.
       generalize (h ⊢ (nra_of_cnraenv ae1) @ₐ(drec
             (("PBIND", env)
              :: ("PCONST", drec constant_env) :: ("PDATA", a) :: nil))); intros.
@@ -627,7 +627,7 @@ Section cNRAEnv.
       rewrite IHae1; rewrite IHae2; reflexivity.
     - Case "ANSelect"%string.
       rewrite IHae2; clear IHae2.
-      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x)); intros; clear ae2 x.
+      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (nra_context_data (drec constant_env) env x)); intros; clear ae2 x.
       unfold olift.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
@@ -639,7 +639,7 @@ Section cNRAEnv.
       rewrite omap_concat_map_rec in IHl; simpl in *.
       rewrite app_nil_r in *.
       rewrite rmap_remove1 in *; simpl.
-      rewrite (IHae1 env a); unfold pat_context_data; simpl.
+      rewrite (IHae1 env a); unfold nra_context_data; simpl.
       generalize (h ⊢ (nra_of_cnraenv ae1) @ₐ(drec
             (("PBIND", env)
              :: ("PCONST", drec constant_env) :: ("PDATA", a) :: nil))); intros.
@@ -701,11 +701,11 @@ Section cNRAEnv.
     - Case "ANEither"%string.
       destruct x; simpl; trivial; [rewrite IHae1|rewrite IHae2]; reflexivity.
     - Case "ANEitherConcat"%string.
-      rewrite IHae2. generalize ((h ⊢ (nra_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x))); intros.
+      rewrite IHae2. generalize ((h ⊢ (nra_of_cnraenv ae2) @ₐ (nra_context_data (drec constant_env) env x))); intros.
       destruct o; try reflexivity; simpl;
       rewrite IHae1; reflexivity.
     - Case "ANApp"%string.
-      rewrite IHae2. generalize ((h ⊢ (nra_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x))); intros.
+      rewrite IHae2. generalize ((h ⊢ (nra_of_cnraenv ae2) @ₐ (nra_context_data (drec constant_env) env x))); intros.
       destruct o; try reflexivity; simpl.
       rewrite IHae1; reflexivity.
     - Case "ANGetConstant"%string.
@@ -714,7 +714,7 @@ Section cNRAEnv.
       reflexivity.
     - Case "ANAppEnv"%string.
       rewrite IHae2; clear IHae2.
-      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (pat_context_data (drec constant_env) env x)); intros.
+      generalize (h ⊢ (nra_of_cnraenv ae2) @ₐ (nra_context_data (drec constant_env) env x)); intros.
       destruct o; try reflexivity; simpl.
       apply IHae1.
     - Case "ANMapEnv"%string.
@@ -728,7 +728,7 @@ Section cNRAEnv.
       rewrite omap_concat_map_rec3 in IHl; simpl in *.
       rewrite app_nil_r in *.
       rewrite rmap_remove2 in *; simpl.
-      rewrite (IHae a x); unfold pat_context_data; simpl.
+      rewrite (IHae a x); unfold nra_context_data; simpl.
       generalize (h ⊢ (nra_of_cnraenv ae) @ₐ (drec (("PBIND", a) :: ("PCONST", drec constant_env) :: ("PDATA", x) :: nil))); intros.
       destruct o; try reflexivity; simpl.
       unfold lift, lift_oncoll in *.
@@ -784,7 +784,7 @@ Section RCnraenv2.
   Qed.
 
   Lemma unfold_env_nra_sort h c (ae:cnraenv) (env:data) (x:data) :
-    (cnraenv_eval h c ae env x) = (h ⊢ (nra_of_cnraenv ae) @ₐ (pat_context_data (drec (rec_sort c)) env x)).
+    (cnraenv_eval h c ae env x) = (h ⊢ (nra_of_cnraenv ae) @ₐ (nra_context_data (drec (rec_sort c)) env x)).
   Proof.
     rewrite <- (cnraenv_eval_const_sort h _ x c env).
     rewrite unfold_env_nra by trivial.

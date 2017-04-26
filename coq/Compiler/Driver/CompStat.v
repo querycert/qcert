@@ -139,12 +139,12 @@ Section CompStat.
 
   Definition stat_camp (q:camp) : data :=
     drec
-      (("camp_size", dnat (Z_of_nat (pat_size q)))
+      (("camp_size", dnat (Z_of_nat (camp_size q)))
          :: nil).
 
   Definition stat_camp_rule (q:camp_rule) : data :=
     drec
-      (("rule_size", dnat (Z_of_nat (pat_size (camp_rule_to_camp q))))
+      (("rule_size", dnat (Z_of_nat (camp_size (camp_rule_to_camp q))))
          :: nil).
 
   Definition stat_tech_rule (q:tech_rule) : data :=

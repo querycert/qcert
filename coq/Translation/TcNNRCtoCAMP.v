@@ -36,9 +36,9 @@ Section TNNRCtoCAMP.
     NoDup (domain Γ₁) ->
     RAssoc.lookup equiv_dec Γ₁ s = Some τ₁ ->
     [τc&Γ] |= p ; τ₁ ~> τ₂ ->
-    [τc&Γ] |= pdot (loop_var s) p ; (Rec k (nnrc_to_pat_env Γ₁) pf) ~> τ₂.
+    [τc&Γ] |= pdot (loop_var s) p ; (Rec k (nnrc_to_camp_env Γ₁) pf) ~> τ₂.
   Proof.
-    Hint Constructors pat_type.
+    Hint Constructors camp_type.
     unfold pdot; intros.
     eapply PTletIt; eauto.
     eapply PTunop; eauto.
@@ -52,7 +52,7 @@ Section TNNRCtoCAMP.
   Hint Resolve PTdot.
 
   Hint Resolve sorted_rec_nil.
-  Hint Constructors pat_type.
+  Hint Constructors camp_type.
 
   Lemma wf_env_same_domain {env tenv} v :
     bindings_type env tenv -> (In v (domain env) <-> In v (domain tenv)).
@@ -64,11 +64,11 @@ Section TNNRCtoCAMP.
     - destruct (IHenv _ v H4); intuition.
   Qed.
 
-  Lemma loop_var_in_nnrc_to_pat_env {B} {tenv v} :
+  Lemma loop_var_in_nnrc_to_camp_env {B} {tenv v} :
          In v (@domain _ B tenv) <->
-         In (loop_var v) (domain (nnrc_to_pat_env tenv)).
+         In (loop_var v) (domain (nnrc_to_camp_env tenv)).
   Proof.
-    unfold nnrc_to_pat_env. unfold domain. 
+    unfold nnrc_to_camp_env. unfold domain. 
     rewrite map_map; simpl.
     repeat rewrite in_map_iff.
     intuition.
@@ -79,19 +79,19 @@ Section TNNRCtoCAMP.
   Qed.
 
   (* TODO: redundant *)
-  Lemma nnrc_to_pat_in {B} Γ v :
+  Lemma nnrc_to_camp_in {B} Γ v :
     In v (@domain _ B Γ) <->
-    In (loop_var v) (domain (nnrc_to_pat_env Γ)).
+    In (loop_var v) (domain (nnrc_to_camp_env Γ)).
   Proof.
-    apply loop_var_in_nnrc_to_pat_env.
+    apply loop_var_in_nnrc_to_camp_env.
  Qed.
 
-  Lemma nnrc_to_pat_nodup {B} Γ : 
+  Lemma nnrc_to_camp_nodup {B} Γ : 
     NoDup (@domain _ B Γ) <-> 
-    NoDup (domain (nnrc_to_pat_env Γ)).
+    NoDup (domain (nnrc_to_camp_env Γ)).
   Proof.
     Hint Constructors NoDup.
-    unfold nnrc_to_pat_env, domain.
+    unfold nnrc_to_camp_env, domain.
     rewrite map_map; simpl.
     induction Γ; simpl; intuition.
     - inversion H1; subst.
@@ -109,17 +109,17 @@ Section TNNRCtoCAMP.
 
   Hint Constructors TOps.unaryOp_type TOps.binOp_type data_type.
 
-  Lemma is_list_sorted_nnrc_to_pat_env_nodup {B} {tenv} :
-    is_list_sorted ODT_lt_dec (@domain _ B (nnrc_to_pat_env tenv)) = true ->
+  Lemma is_list_sorted_nnrc_to_camp_env_nodup {B} {tenv} :
+    is_list_sorted ODT_lt_dec (@domain _ B (nnrc_to_camp_env tenv)) = true ->
     NoDup (domain tenv).
   Proof.
     intros.
-    rewrite nnrc_to_pat_nodup.
+    rewrite nnrc_to_camp_nodup.
     eapply is_list_sorted_NoDup; eauto.
     eapply StringOrder.lt_strorder.
   Qed.
 
-  Hint Resolve is_list_sorted_nnrc_to_pat_env_nodup.
+  Hint Resolve is_list_sorted_nnrc_to_camp_env_nodup.
 
   (* TODO: move to RAssoc *)
   Lemma lookup_incl_perm_nodup {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
@@ -194,11 +194,11 @@ Section TNNRCtoCAMP.
           eauto.
   Qed.
 
-  Lemma rec_cons_sort_nnrc_to_pat_env_pullback {A} a b Γ :
+  Lemma rec_cons_sort_nnrc_to_camp_env_pullback {A} a b Γ :
     NoDup (a :: domain Γ) ->
       exists Γ' : list (string*A),
      insertion_sort_insert rec_field_lt_dec (loop_var a, b)
-       (nnrc_to_pat_env Γ) = nnrc_to_pat_env Γ' /\
+       (nnrc_to_camp_env Γ) = nnrc_to_camp_env Γ' /\
      Permutation ((a, b) :: Γ) Γ'.
   Proof.
     revert a b. induction Γ; simpl; intros.
@@ -220,17 +220,17 @@ Section TNNRCtoCAMP.
            inversion H; subst; simpl in *; intuition.
   Qed.
 
-  Lemma rec_sort_nnrc_to_pat_env_pullback {A} (Γ:list (string*A)) :
+  Lemma rec_sort_nnrc_to_camp_env_pullback {A} (Γ:list (string*A)) :
     NoDup (domain Γ) ->
     exists Γ',
-      rec_sort (nnrc_to_pat_env Γ) = nnrc_to_pat_env Γ'
+      rec_sort (nnrc_to_camp_env Γ) = nnrc_to_camp_env Γ'
       /\ Permutation Γ Γ'.
   Proof.
     induction Γ; simpl.
     - exists (@nil (string*A)); intuition.
     - inversion 1; subst; destruct IHΓ; intuition.
       rewrite H1.
-      destruct (rec_cons_sort_nnrc_to_pat_env_pullback ((fst a)) (snd a) x); intuition.
+      destruct (rec_cons_sort_nnrc_to_camp_env_pullback ((fst a)) (snd a) x); intuition.
       rewrite <- H4; trivial.
       rewrite <- H4 in H6.
       exists x0. destruct a; simpl in *; intuition.
@@ -305,7 +305,7 @@ Section TNNRCtoCAMP.
 (*           | [H:TOps.binOp_type _ _ _ _ |- _] => 
              inversion H; subst; clear H
 *)
-           | [H: pat_type ?c ?g pit ?t1 ?t2 |- _] => 
+           | [H: camp_type ?c ?g pit ?t1 ?t2 |- _] => 
            match t1 with
              |  t2 => clear H
              | _ => inversion H; try subst
@@ -354,13 +354,13 @@ Section TNNRCtoCAMP.
 
    (** Proving ``forwards'' type preservation: if the compiled pattern is 
         well-typed, then the source nnrc is well-typed (with the same type) *)
-  Lemma nnrc_to_pat_ns_type_preserve n τc Γ τout :
-    is_list_sorted ODT_lt_dec (domain (nnrc_to_pat_env Γ)) = true ->
+  Lemma nnrc_to_camp_ns_type_preserve n τc Γ τout :
+    is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
     nnrc_type Γ n τout ->
     forall τ₀,
-      [τc&(nnrc_to_pat_env Γ)] |= (nnrcToPat_ns n) ; τ₀ ~> τout.
+      [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
     revert Γ τout; induction n; intros;
     inversion H2; subst; try solve [econstructor; eauto 3].
@@ -371,34 +371,34 @@ Section TNNRCtoCAMP.
       eapply PTletEnv.
       + econstructor; eauto. 
       + rewrite merge_bindings_single_nin; eauto.
-        rewrite <- loop_var_in_nnrc_to_pat_env; intuition.
+        rewrite <- loop_var_in_nnrc_to_camp_env; intuition.
       + rewrite rec_concat_sort_concats.
         assert (perm:Permutation 
-                       ((loop_var v, τ₁) :: nnrc_to_pat_env Γ)
-                       (nnrc_to_pat_env Γ ++ [(loop_var v, τ₁)]))
+                       ((loop_var v, τ₁) :: nnrc_to_camp_env Γ)
+                       (nnrc_to_camp_env Γ ++ [(loop_var v, τ₁)]))
           by (rewrite Permutation_cons_append; trivial).
-        assert (nd:NoDup (domain ((loop_var v, τ₁) :: nnrc_to_pat_env Γ))).
+        assert (nd:NoDup (domain ((loop_var v, τ₁) :: nnrc_to_camp_env Γ))).
         * simpl. constructor.
-          rewrite <- nnrc_to_pat_in; trivial.
-          apply -> (@nnrc_to_pat_nodup rtype); auto.
+          rewrite <- nnrc_to_camp_in; trivial.
+          apply -> (@nnrc_to_camp_nodup rtype); auto.
         * rewrite <- (drec_sort_perm_eq _ _ nd perm).
-          replace ((loop_var v, τ₁) :: nnrc_to_pat_env Γ) 
-          with (nnrc_to_pat_env ((v, τ₁) :: Γ)) by reflexivity.
-          destruct (rec_sort_nnrc_to_pat_env_pullback ((v, τ₁) :: Γ)) 
+          replace ((loop_var v, τ₁) :: nnrc_to_camp_env Γ) 
+          with (nnrc_to_camp_env ((v, τ₁) :: Γ)) by reflexivity.
+          destruct (rec_sort_nnrc_to_camp_env_pullback ((v, τ₁) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_pat_nodup; auto.
+          apply nnrc_to_camp_nodup; auto.
           rewrite eq'.
           destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); intuition.
           eapply IHn2; eauto.
           rewrite <- eq'. eauto.
           intros.
-          apply nnrc_to_pat_in in H5.
+          apply nnrc_to_camp_in in H5.
           rewrite <- eq' in H5.
           apply drec_sort_domain in H5.
-          apply loop_var_in_nnrc_to_pat_env in H5.
+          apply loop_var_in_nnrc_to_camp_env in H5.
           simpl in H5; intuition; subst; [intuition|eauto].
           apply (nnrc_type_context_perm _ _ perm'); auto.
-          apply nnrc_to_pat_nodup; auto.
+          apply nnrc_to_camp_nodup; auto.
           simpl; intuition; [idtac|eauto].
           subst;
             destruct (in_dec string_eqdec x (nnrc_bound_vars n2)); 
@@ -410,35 +410,35 @@ Section TNNRCtoCAMP.
       eapply PTletEnv.
       + econstructor; eauto. 
       + rewrite merge_bindings_single_nin; eauto.
-         rewrite <- loop_var_in_nnrc_to_pat_env; intuition.
+         rewrite <- loop_var_in_nnrc_to_camp_env; intuition.
       + rewrite rec_concat_sort_concats.
         assert (perm:Permutation 
-                       ((loop_var v, τ₁) :: nnrc_to_pat_env Γ)
-                       (nnrc_to_pat_env Γ ++ [(loop_var v, τ₁)]))
+                       ((loop_var v, τ₁) :: nnrc_to_camp_env Γ)
+                       (nnrc_to_camp_env Γ ++ [(loop_var v, τ₁)]))
           by (rewrite Permutation_cons_append; trivial).
-        assert (nd:NoDup (domain ((loop_var v, τ₁) :: nnrc_to_pat_env Γ))).
+        assert (nd:NoDup (domain ((loop_var v, τ₁) :: nnrc_to_camp_env Γ))).
         * simpl. constructor.
-          rewrite <- nnrc_to_pat_in; trivial.
-          apply -> (@nnrc_to_pat_nodup rtype); auto.
+          rewrite <- nnrc_to_camp_in; trivial.
+          apply -> (@nnrc_to_camp_nodup rtype); auto.
         * rewrite <- (drec_sort_perm_eq _ _ nd perm).
-          replace ((loop_var v, τ₁) :: nnrc_to_pat_env Γ) 
-          with (nnrc_to_pat_env ((v, τ₁) :: Γ)) by reflexivity.
-          destruct (rec_sort_nnrc_to_pat_env_pullback ((v, τ₁) :: Γ)) 
+          replace ((loop_var v, τ₁) :: nnrc_to_camp_env Γ) 
+          with (nnrc_to_camp_env ((v, τ₁) :: Γ)) by reflexivity.
+          destruct (rec_sort_nnrc_to_camp_env_pullback ((v, τ₁) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_pat_nodup; auto.
+          apply nnrc_to_camp_nodup; auto.
           rewrite eq'.
           destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); intuition.
           eapply IHn2; eauto.
           rewrite <- eq'.
           eauto.
           intros.
-          apply nnrc_to_pat_in in H5.
+          apply nnrc_to_camp_in in H5.
           rewrite <- eq' in H5.
           apply drec_sort_domain in H5.
-          apply loop_var_in_nnrc_to_pat_env in H5.
+          apply loop_var_in_nnrc_to_camp_env in H5.
           simpl in H5; intuition; subst; [intuition|eauto].
           apply (nnrc_type_context_perm _ _ perm'); auto.
-          apply nnrc_to_pat_nodup; auto.
+          apply nnrc_to_camp_nodup; auto.
           simpl; intuition; [idtac|eauto].
           subst;
             destruct (in_dec string_eqdec x (nnrc_bound_vars n2)); 
@@ -450,12 +450,12 @@ Section TNNRCtoCAMP.
           eapply PTbinop; eauto.
           econstructor; simpl; eauto.
         * rewrite merge_bindings_nil_r. reflexivity.
-        * eapply pat_type_tenv_rec; eauto.
+        * eapply camp_type_tenv_rec; eauto.
       + eapply PTletEnv.
         * eapply PTassert.
           eapply PTunop; eauto.
         * rewrite merge_bindings_nil_r. reflexivity.
-        * eapply pat_type_tenv_rec; eauto.
+        * eapply camp_type_tenv_rec; eauto.
     - simpl in *.
       apply in_in_cons_cons_app_app_false in H1.
       destruct H1 as [?[?[?[??]]]].
@@ -467,22 +467,22 @@ Section TNNRCtoCAMP.
         eapply PTletEnv.
         * repeat econstructor.
         * rewrite merge_bindings_single_nin. reflexivity.
-          rewrite <- loop_var_in_nnrc_to_pat_env.
+          rewrite <- loop_var_in_nnrc_to_camp_env.
           trivial.
-        * assert (nd:NoDup (domain ((loop_var v, τl) :: nnrc_to_pat_env Γ))).
+        * assert (nd:NoDup (domain ((loop_var v, τl) :: nnrc_to_camp_env Γ))).
           simpl; constructor.
-          rewrite <- loop_var_in_nnrc_to_pat_env; trivial.
-          apply -> (@nnrc_to_pat_nodup rtype); auto.
+          rewrite <- loop_var_in_nnrc_to_camp_env; trivial.
+          apply -> (@nnrc_to_camp_nodup rtype); auto.
           assert (perm:Permutation 
-                         ((loop_var v, τl) :: nnrc_to_pat_env Γ)
-                         (nnrc_to_pat_env Γ ++ [(loop_var v, τl)]))
+                         ((loop_var v, τl) :: nnrc_to_camp_env Γ)
+                         (nnrc_to_camp_env Γ ++ [(loop_var v, τl)]))
             by (rewrite Permutation_cons_append; trivial).
           unfold rec_concat_sort; rewrite <- (drec_sort_perm_eq _ _ nd perm).
-          replace ((loop_var v, τl) :: nnrc_to_pat_env Γ) 
-          with (nnrc_to_pat_env ((v, τl) :: Γ)) by reflexivity.
-          destruct (rec_sort_nnrc_to_pat_env_pullback ((v, τl) :: Γ)) 
+          replace ((loop_var v, τl) :: nnrc_to_camp_env Γ) 
+          with (nnrc_to_camp_env ((v, τl) :: Γ)) by reflexivity.
+          destruct (rec_sort_nnrc_to_camp_env_pullback ((v, τl) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_pat_nodup. auto.
+          apply nnrc_to_camp_nodup. auto.
           rewrite eq'.
           apply IHn2; trivial.
           rewrite <- eq'; eauto; reflexivity.
@@ -498,23 +498,23 @@ Section TNNRCtoCAMP.
         eapply PTletEnv.
         * repeat econstructor.
         * rewrite merge_bindings_single_nin. reflexivity.
-          rewrite <- loop_var_in_nnrc_to_pat_env.
+          rewrite <- loop_var_in_nnrc_to_camp_env.
           trivial.
         * unfold rec_concat_sort.
-          assert (nd:NoDup (domain ((loop_var v0, τr) :: nnrc_to_pat_env Γ))).
+          assert (nd:NoDup (domain ((loop_var v0, τr) :: nnrc_to_camp_env Γ))).
           simpl; constructor.
-          rewrite <- loop_var_in_nnrc_to_pat_env; trivial.
-          apply -> (@nnrc_to_pat_nodup rtype); auto.
+          rewrite <- loop_var_in_nnrc_to_camp_env; trivial.
+          apply -> (@nnrc_to_camp_nodup rtype); auto.
           assert (perm:Permutation 
-                         ((loop_var v0, τr) :: nnrc_to_pat_env Γ)
-                         (nnrc_to_pat_env Γ ++ [(loop_var v0, τr)]))
+                         ((loop_var v0, τr) :: nnrc_to_camp_env Γ)
+                         (nnrc_to_camp_env Γ ++ [(loop_var v0, τr)]))
             by (rewrite Permutation_cons_append; trivial).
           rewrite <- (drec_sort_perm_eq _ _ nd perm).
-          replace ((loop_var v0, τr) :: nnrc_to_pat_env Γ) 
-          with (nnrc_to_pat_env ((v0, τr) :: Γ)) by reflexivity.
-          destruct (rec_sort_nnrc_to_pat_env_pullback ((v0, τr) :: Γ)) 
+          replace ((loop_var v0, τr) :: nnrc_to_camp_env Γ) 
+          with (nnrc_to_camp_env ((v0, τr) :: Γ)) by reflexivity.
+          destruct (rec_sort_nnrc_to_camp_env_pullback ((v0, τr) :: Γ)) 
             as [Γ' [eq' perm']].
-          apply nnrc_to_pat_nodup; auto.
+          apply nnrc_to_camp_nodup; auto.
           rewrite eq'.
           apply IHn3; trivial.
           rewrite <- eq'; eauto; reflexivity.
@@ -530,24 +530,24 @@ Section TNNRCtoCAMP.
           eauto. eauto. eauto.
   Qed.
 
-  Lemma nnrc_to_pat_ns_top_type_preserve n τc τout :
+  Lemma nnrc_to_camp_ns_top_type_preserve n τc τout :
     shadow_free n = true ->
     nnrc_type nil n τout ->
     forall τ₀,
-      [τc&nil] |= (nnrcToPat_ns n) ; τ₀ ~> τout.
+      [τc&nil] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
     intros.
-    apply (nnrc_to_pat_ns_type_preserve n  τc nil); eauto.
+    apply (nnrc_to_camp_ns_type_preserve n  τc nil); eauto.
   Qed.
 
-  Lemma nnrc_to_pat_type_preserve n τc Γ τout :
-    is_list_sorted ODT_lt_dec (domain (nnrc_to_pat_env Γ)) = true ->
+  Lemma nnrc_to_camp_type_preserve n τc Γ τout :
+    is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     nnrc_type Γ n τout ->
     forall τ₀,
-      [τc&(nnrc_to_pat_env Γ)] |= (nnrcToPat (domain Γ) n) ; τ₀ ~> τout.
+      [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp (domain Γ) n) ; τ₀ ~> τout.
   Proof.
     intros.
-    apply nnrc_to_pat_ns_type_preserve; eauto.
+    apply nnrc_to_camp_ns_type_preserve; eauto.
     - apply unshadow_shadow_free.
     - apply unshadow_avoid.
     - apply unshadow_type; trivial.
@@ -591,17 +591,17 @@ Section TNNRCtoCAMP.
 
   Hint Rewrite fresh_bindings_cons_loop_var : fresh_bindings.
 
-  Lemma nnrcToPat_ns_type_ignored_let_binding τc b x xv τ₁ τ₂ n :
+  Lemma nnrcToCamp_ns_type_ignored_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
     shadow_free n = true ->
     RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
-    fresh_bindings (domain b) (nnrcToPat_ns n) ->
+    fresh_bindings (domain b) (nnrcToCamp_ns n) ->
     (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     NoDup (domain b) ->
-    ~ In (let_var x) (let_vars (nnrcToPat_ns n)) ->
+    ~ In (let_var x) (let_vars (nnrcToCamp_ns n)) ->
     ~ In (let_var x) (domain b) ->
-    ([τc&b] |= (nnrcToPat_ns n) ; τ₁ ~> τ₂) ->
-    [τc&(rec_concat_sort b ((let_var x, xv)::nil))] |= (nnrcToPat_ns n) ; τ₁ ~> τ₂.
+    ([τc&b] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂) ->
+    [τc&(rec_concat_sort b ((let_var x, xv)::nil))] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂.
   Proof.
     Hint Resolve loop_let_var_distinct.
     Hint Resolve rec_concat_sort_sorted.
@@ -868,15 +868,15 @@ Section TNNRCtoCAMP.
      eauto.
   Qed.
 
-  Lemma nnrc_to_pat_ns_let_type_equiv n τc Γ τout :
+  Lemma nnrc_to_camp_ns_let_type_equiv n τc Γ τout :
     nnrcIsCore n ->
     is_list_sorted ODT_lt_dec (domain Γ) = true ->
-    fresh_bindings (domain Γ) (nnrcToPat_ns_let n) ->
+    fresh_bindings (domain Γ) (nnrcToCamp_ns_let n) ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     forall τ₀,
-      [τc&Γ] |= (nnrcToPat_ns n) ; τ₀ ~> τout ->
-                                   [τc&Γ] |= (nnrcToPat_ns_let n) ; τ₀ ~> τout.
+      [τc&Γ] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
+                                   [τc&Γ] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout.
   Proof.
     intro Hiscore.
     revert Hiscore Γ τout.
@@ -1028,9 +1028,9 @@ Section TNNRCtoCAMP.
           rewrite <- inn.
           intros inn2.
           apply (fresh_let_var_fresh "if$"
-                                     (let_vars (nnrcToPat_ns_let n1) ++
-                                               let_vars (nnrcToPat_ns_let n2) ++
-                                               let_vars (nnrcToPat_ns_let n3))).
+                                     (let_vars (nnrcToCamp_ns_let n1) ++
+                                               let_vars (nnrcToCamp_ns_let n2) ++
+                                               let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff. intuition.
           
           unfold rec_concat_sort.
@@ -1043,14 +1043,14 @@ Section TNNRCtoCAMP.
           rewrite fresh_let_var_as_let in eqq.
           eapply loop_let_var_distinct; eauto.
           
-          eapply nnrcToPat_ns_type_ignored_let_binding; eauto.
+          eapply nnrcToCamp_ns_type_ignored_let_binding; eauto.
           apply fresh_bindings_let_to_naive; trivial.
           
           intros inn. apply let_vars_let_to_naive in inn.
           apply (fresh_let_var_fresh "if$"
-                                     (let_vars (nnrcToPat_ns_let n1) ++
-                                               let_vars (nnrcToPat_ns_let n2) ++
-                                               let_vars (nnrcToPat_ns_let n3))).
+                                     (let_vars (nnrcToCamp_ns_let n1) ++
+                                               let_vars (nnrcToCamp_ns_let n2) ++
+                                               let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff. intuition.
           
           intros inn; eapply H8; eauto.
@@ -1079,9 +1079,9 @@ Section TNNRCtoCAMP.
           rewrite <- inn.
           intros inn2.
           apply (fresh_let_var_fresh "if$"
-                                     (let_vars (nnrcToPat_ns_let n1) ++
-                                               let_vars (nnrcToPat_ns_let n2) ++
-                                               let_vars (nnrcToPat_ns_let n3))).
+                                     (let_vars (nnrcToCamp_ns_let n1) ++
+                                               let_vars (nnrcToCamp_ns_let n2) ++
+                                               let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff. intuition.
           
           unfold rec_concat_sort.
@@ -1094,14 +1094,14 @@ Section TNNRCtoCAMP.
           rewrite fresh_let_var_as_let in eqq.
           eapply loop_let_var_distinct; eauto.
           
-          eapply nnrcToPat_ns_type_ignored_let_binding; eauto.
+          eapply nnrcToCamp_ns_type_ignored_let_binding; eauto.
           apply fresh_bindings_let_to_naive; trivial.
           
           intros inn. apply let_vars_let_to_naive in inn.
           apply (fresh_let_var_fresh "if$"
-                                     (let_vars (nnrcToPat_ns_let n1) ++
-                                               let_vars (nnrcToPat_ns_let n2) ++
-                                               let_vars (nnrcToPat_ns_let n3))).
+                                     (let_vars (nnrcToCamp_ns_let n1) ++
+                                               let_vars (nnrcToCamp_ns_let n2) ++
+                                               let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff. intuition.
           
           intros inn; eapply H8; eauto.
@@ -1142,8 +1142,8 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * rewrite <- H22. reflexivity.
         * unfold merge_bindings in H22.
-          match_case_in H22; intros compat;
-          rewrite compat in H22; try discriminate.
+          match_case_in H22; intros comcamp;
+          rewrite comcamp in H22; try discriminate.
           inversion H22; clear H22; subst.
           { apply IHn2; trivial.
             - unfold rec_concat_sort.
@@ -1161,8 +1161,8 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * rewrite <- H24. reflexivity.
         * unfold merge_bindings in H24.
-          match_case_in H24; intros compat;
-          rewrite compat in H24; try discriminate.
+          match_case_in H24; intros comcamp;
+          rewrite comcamp in H24; try discriminate.
           inversion H24; clear H24; subst.
           { apply IHn3; trivial.
             - unfold rec_concat_sort.
@@ -1193,9 +1193,9 @@ Section TNNRCtoCAMP.
   Qed.
 
   Lemma fresh_bindings_from_tnnrc {A} e l :
-    fresh_bindings (@domain _ A (nnrc_to_pat_env e)) l.
+    fresh_bindings (@domain _ A (nnrc_to_camp_env e)) l.
   Proof.
-    unfold fresh_bindings, nnrc_to_pat_env, domain.
+    unfold fresh_bindings, nnrc_to_camp_env, domain.
     rewrite map_map. simpl. intros.
     apply in_map_iff in H.
     destruct H as [? [??]].
@@ -1203,21 +1203,21 @@ Section TNNRCtoCAMP.
     intuition.
   Qed.  
 
-  Lemma nnrc_to_pat_let_type_preserve n τc Γ τout :
+  Lemma nnrc_to_camp_let_type_preserve n τc Γ τout :
     nnrcIsCore n ->
-    is_list_sorted ODT_lt_dec (domain (nnrc_to_pat_env Γ)) = true ->
+    is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     nnrc_type Γ n τout ->
     forall τ₀,
-      [τc&(nnrc_to_pat_env Γ)] |= (nnrcToPat_let (domain Γ) n) ; τ₀ ~> τout.
+      [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout.
   Proof.
     intros.
-    apply nnrc_to_pat_ns_let_type_equiv; eauto.
+    apply nnrc_to_camp_ns_let_type_equiv; eauto.
     - apply unshadow_simpl_preserve_core.
       apply H.
     - apply fresh_bindings_from_tnnrc.
     - apply unshadow_shadow_free.
     - intros ? inn1 inn2.
-      unfold nnrc_to_pat_env, domain in inn1.
+      unfold nnrc_to_camp_env, domain in inn1.
       rewrite map_map, in_map_iff in inn1.
       destruct inn1 as [? [? inn1]]; subst.
       rewrite in_map_iff in inn2.
@@ -1227,35 +1227,35 @@ Section TNNRCtoCAMP.
       revert inn2.
       apply unshadow_avoid.
       eapply in_dom; eauto.
-    - apply nnrc_to_pat_ns_type_preserve; eauto.
+    - apply nnrc_to_camp_ns_type_preserve; eauto.
     + apply unshadow_shadow_free.
     + apply unshadow_avoid.
     + apply unshadow_type; trivial.
   Qed.
 
-  Lemma nnrc_to_pat_ns_let_top_type_preserve n τc τout :
+  Lemma nnrc_to_camp_ns_let_top_type_preserve n τc τout :
     nnrcIsCore n ->
     shadow_free n = true ->
     nnrc_type nil n τout ->
     forall τ₀,
-    [τc&nil] |= (nnrcToPat_ns_let n) ; τ₀ ~> τout.
+    [τc&nil] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout.
   Proof.
     intros.
-    apply nnrc_to_pat_ns_let_type_equiv; eauto.
+    apply nnrc_to_camp_ns_let_type_equiv; eauto.
     unfold fresh_bindings; simpl; intuition.
-    apply nnrc_to_pat_ns_top_type_preserve; eauto.
+    apply nnrc_to_camp_ns_top_type_preserve; eauto.
   Qed.
 
   (** Proving ``backwards'' type preservation: if the compiled pattern is 
         well-typed, then the source nnrc is well-typed (with the same type) *)
   
-  Lemma nnrc_to_pat_ns_type_preserve_back n τc Γ τout :
+  Lemma nnrc_to_camp_ns_type_preserve_back n τc Γ τout :
     nnrcIsCore n ->
-    is_list_sorted ODT_lt_dec (domain (nnrc_to_pat_env Γ)) = true ->
+    is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
     forall τ₀,
-      [τc&(nnrc_to_pat_env Γ)] |= (nnrcToPat_ns n) ; τ₀ ~> τout ->
+      [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
                                                      nnrc_type Γ n τout.
   Proof.
     intro Hiscore.
@@ -1274,7 +1274,7 @@ Section TNNRCtoCAMP.
       simpl in *. simpt. t. 
       destruct x0; destruct x; simpl in *; subst.
       eapply TNNRCLet; eauto.
-      destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s2) :: Γ)) 
+      destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; simpl; [econstructor; eauto|idtac].
       symmetry in gperm.
       assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
@@ -1287,15 +1287,15 @@ Section TNNRCtoCAMP.
           unfold rtype; rewrite <- grec; eauto.
          * repeat defresh. 
             unfold rec_concat_sort in H20.
-            simpl nnrc_to_pat_env.
+            simpl nnrc_to_camp_env.
             assert (perm: Permutation 
-                            ((loop_var v, s2) :: nnrc_to_pat_env Γ) 
-                            (nnrc_to_pat_env Γ ++ [(loop_var v, s2)]))
+                            ((loop_var v, s2) :: nnrc_to_camp_env Γ) 
+                            (nnrc_to_camp_env Γ ++ [(loop_var v, s2)]))
               by (rewrite Permutation_app_comm; simpl; reflexivity).
               erewrite drec_sort_perm_eq; try eapply perm; eauto.
               simpl. econstructor; eauto.
               intros inn1.
-              apply nnrc_to_pat_in in inn1.
+              apply nnrc_to_camp_in in inn1.
               intuition.
     - simpl in Hiscore;
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
@@ -1303,7 +1303,7 @@ Section TNNRCtoCAMP.
       simpl in *. simpt. t. 
       destruct x0; destruct x; simpl in *; subst.
       eapply TNNRCFor; eauto.
-      destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s2) :: Γ)) 
+      destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
       symmetry in gperm.
       assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
@@ -1314,19 +1314,19 @@ Section TNNRCtoCAMP.
       + simpl; econstructor; eauto.
       + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         unfold merge_bindings in H14.
-        destruct (compatible (nnrc_to_pat_env Γ) [(loop_var v, s2)]);
+        destruct (compatible (nnrc_to_camp_env Γ) [(loop_var v, s2)]);
             [idtac|discriminate].
             t.
             unfold rec_concat_sort in H20.
-            simpl nnrc_to_pat_env.
+            simpl nnrc_to_camp_env.
             assert (perm: Permutation 
-                            ((loop_var v, s2) :: nnrc_to_pat_env Γ) 
-                            (nnrc_to_pat_env Γ ++ [(loop_var v, s2)]))
+                            ((loop_var v, s2) :: nnrc_to_camp_env Γ) 
+                            (nnrc_to_camp_env Γ ++ [(loop_var v, s2)]))
                    by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto 2.
             simpl. econstructor; eauto.
             intros inn1.
-            apply nnrc_to_pat_in in inn1.
+            apply nnrc_to_camp_in in inn1.
             intuition.
     - simpl in Hiscore;
       elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
@@ -1343,16 +1343,16 @@ Section TNNRCtoCAMP.
       simpl in *; simpt; t.
       destruct x; destruct x0; destruct x1; destruct x2; simpl in *; subst.
       unfold merge_bindings in *.
-      match_case_in H15; intros compat1; rewrite compat1 in H15; try discriminate.
-      match_case_in H18; intros compat2; rewrite compat2 in H18; try discriminate.
-      match_case_in H23; intros compat3; rewrite compat3 in H23; try discriminate.
-      match_case_in H25; intros compat4; rewrite compat4 in H25; try discriminate.
+      match_case_in H15; intros comcamp1; rewrite comcamp1 in H15; try discriminate.
+      match_case_in H18; intros comcamp2; rewrite comcamp2 in H18; try discriminate.
+      match_case_in H23; intros comcamp3; rewrite comcamp3 in H23; try discriminate.
+      match_case_in H25; intros comcamp4; rewrite comcamp4 in H25; try discriminate.
       inversion H15; clear H15; subst.
       inversion H18; clear H18; subst.
       inversion H23; clear H23; subst.
       inversion H25; clear H25; subst.
       econstructor; [eauto | .. ].
-      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v, s4) :: Γ)) 
+      + destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s4) :: Γ)) 
           as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n2) -> False) 
@@ -1364,15 +1364,15 @@ Section TNNRCtoCAMP.
         eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H32.
           assert (perm: Permutation 
-                          ((loop_var v, s4) :: nnrc_to_pat_env Γ) 
-                          (nnrc_to_pat_env Γ ++ [(loop_var v, s4)]))
+                          ((loop_var v, s4) :: nnrc_to_camp_env Γ) 
+                          (nnrc_to_camp_env Γ ++ [(loop_var v, s4)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
             simpl. econstructor; eauto.
             intros inn1.
-            apply nnrc_to_pat_in in inn1.
+            apply nnrc_to_camp_in in inn1.
             intuition.
-      + destruct (rec_sort_nnrc_to_pat_env_pullback ((v0, s6) :: Γ)) 
+      + destruct (rec_sort_nnrc_to_camp_env_pullback ((v0, s6) :: Γ)) 
           as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
         symmetry in gperm.
         assert(nin:forall x : string, In x (domain g') -> In x (nnrc_bound_vars n3) -> False) 
@@ -1384,30 +1384,30 @@ Section TNNRCtoCAMP.
         eapply IHn3; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H29.
           assert (perm: Permutation 
-                          ((loop_var v0, s6) :: nnrc_to_pat_env Γ) 
-                          (nnrc_to_pat_env Γ ++ [(loop_var v0, s6)]))
+                          ((loop_var v0, s6) :: nnrc_to_camp_env Γ) 
+                          (nnrc_to_camp_env Γ ++ [(loop_var v0, s6)]))
             by (rewrite Permutation_app_comm; simpl; reflexivity).
             erewrite drec_sort_perm_eq; try eapply perm; eauto.
             simpl. econstructor; eauto.
             intros inn1.
-            apply nnrc_to_pat_in in inn1.
+            apply nnrc_to_camp_in in inn1.
             intuition.
     - simpl in Hiscore; contradiction.  (* GroupBy Case -- nnrcIsCore is False *)
    Qed.
 
-  Lemma nnrc_to_pat_ns_top_type_preserve_back n τc τout :
+  Lemma nnrc_to_camp_ns_top_type_preserve_back n τc τout :
     nnrcIsCore n ->
     shadow_free n = true ->
     forall τ₀,
-      [τc&nil] |= (nnrcToPat_ns n) ; τ₀ ~> τout ->
+      [τc&nil] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
                                      nnrc_type nil n τout.
   Proof.
     intro Hiscore.
     intros.
-    apply (nnrc_to_pat_ns_type_preserve_back n τc nil) in H0; eauto.
+    apply (nnrc_to_camp_ns_type_preserve_back n τc nil) in H0; eauto.
   Qed.
 
-  Lemma PTmapall_let τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : pat} :
+  Lemma PTmapall_let τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
     NoDup (domain Γ) ->
     fresh_bindings (domain Γ) (mapall_let p) ->
     ([τc&Γ] |= p; τ₁ ~> τ₂) -> [τc&Γ] |= mapall_let p; Coll τ₁ ~> Coll τ₂.
@@ -1427,7 +1427,7 @@ Section TNNRCtoCAMP.
       eauto.
   Qed.
 
-  Lemma PTmapall_let_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : pat} :
+  Lemma PTmapall_let_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
     RSort.is_list_sorted ODT_lt_dec (domain Γ) = true ->
     fresh_bindings (domain Γ) (mapall_let p) ->
     [τc&Γ] |= mapall_let p; τ₁ ~> τ₂ ->
@@ -1469,18 +1469,18 @@ Section TNNRCtoCAMP.
 
   Hint Resolve merge_bindings_sorted.
 
-  Lemma nnrcToPat_ns_type_weaken_let_binding τc b x xv τ₁ τ₂ n :
+  Lemma nnrcToCamp_ns_type_weaken_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
     shadow_free n = true ->
     RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
-    fresh_bindings (domain b) (nnrcToPat_ns n) ->
+    fresh_bindings (domain b) (nnrcToCamp_ns n) ->
     (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     NoDup (domain b) ->
-    ~ In (let_var x) (let_vars (nnrcToPat_ns n)) ->
+    ~ In (let_var x) (let_vars (nnrcToCamp_ns n)) ->
     ~ In (let_var x) (domain b) ->
     [τc&(rec_concat_sort b
-                         ((let_var x, xv)::nil))] |= (nnrcToPat_ns n) ; τ₁ ~> τ₂ ->
-                                                                        [τc&b] |= (nnrcToPat_ns n) ; τ₁ ~> τ₂.
+                         ((let_var x, xv)::nil))] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂ ->
+                                                                        [τc&b] |= (nnrcToCamp_ns n) ; τ₁ ~> τ₂.
   Proof.
     Hint Resolve loop_let_var_distinct.
     Hint Resolve rec_concat_sort_sorted.
@@ -1623,9 +1623,9 @@ Section TNNRCtoCAMP.
       simpl in *; simpt; t.
       destruct x0; destruct x1; simpl in *; subst.
       unfold merge_bindings in *.
-      match_case_in H26; intros compat1; rewrite compat1 in H26; try discriminate.
+      match_case_in H26; intros comcamp1; rewrite comcamp1 in H26; try discriminate.
       inversion H26; clear H26; subst.
-      match_case_in H28; intros compat2; rewrite compat2 in H28; try discriminate.
+      match_case_in H28; intros comcamp2; rewrite comcamp2 in H28; try discriminate.
       inversion H28; clear H28; subst.
       econstructor; [eauto|idtac].
       apply not_or in H16.
@@ -1725,15 +1725,15 @@ Section TNNRCtoCAMP.
           eauto.
   Qed.
 
-  Lemma nnrc_to_pat_ns_let_type_equiv_back n τc Γ τout :
+  Lemma nnrc_to_camp_ns_let_type_equiv_back n τc Γ τout :
     nnrcIsCore n ->
       is_list_sorted ODT_lt_dec (domain Γ) = true ->
-    fresh_bindings (domain Γ) (nnrcToPat_ns_let n) ->
+    fresh_bindings (domain Γ) (nnrcToCamp_ns_let n) ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     forall τ₀,
-      [τc&Γ] |= (nnrcToPat_ns_let n) ; τ₀ ~> τout ->
-                                       [τc&Γ] |= (nnrcToPat_ns n) ; τ₀ ~> τout.
+      [τc&Γ] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout ->
+                                       [τc&Γ] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
     intro Hiscore.
     revert Hiscore Γ τout.
@@ -1876,12 +1876,12 @@ Section TNNRCtoCAMP.
       econstructor.
       + econstructor; [eauto|..].
         rewrite merge_bindings_nil_r. rewrite sort_sorted_is_id by eauto. reflexivity.
-        eapply nnrcToPat_ns_type_weaken_let_binding; eauto.
+        eapply nnrcToCamp_ns_type_weaken_let_binding; eauto.
         * apply fresh_bindings_let_to_naive; auto.
         * intro inn.
-          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToPat_ns_let n1) ++
-                                                     let_vars (nnrcToPat_ns_let n2) ++
-                                                     let_vars (nnrcToPat_ns_let n3))).
+          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToCamp_ns_let n1) ++
+                                                     let_vars (nnrcToCamp_ns_let n2) ++
+                                                     let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff.
           apply let_vars_let_to_naive in inn.
           rewrite fresh_let_var_as_let.
@@ -1894,9 +1894,9 @@ Section TNNRCtoCAMP.
           autorewrite with fresh_bindings.
           simpl. intuition.
           autorewrite with fresh_bindings; intuition.
-          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToPat_ns_let n1) ++
-                                                     let_vars (nnrcToPat_ns_let n2) ++
-                                                     let_vars (nnrcToPat_ns_let n3))).
+          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToCamp_ns_let n1) ++
+                                                     let_vars (nnrcToCamp_ns_let n2) ++
+                                                     let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff.
           rewrite fresh_let_var_as_let.
           intuition.
@@ -1913,12 +1913,12 @@ Section TNNRCtoCAMP.
       + econstructor; [eauto|..].
         rewrite merge_bindings_nil_r.
         rewrite sort_sorted_is_id by eauto. reflexivity.
-        eapply nnrcToPat_ns_type_weaken_let_binding; eauto 3.
+        eapply nnrcToCamp_ns_type_weaken_let_binding; eauto 3.
         * apply fresh_bindings_let_to_naive; auto.
         * intro inn.
-          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToPat_ns_let n1) ++
-                                                     let_vars (nnrcToPat_ns_let n2) ++
-                                                     let_vars (nnrcToPat_ns_let n3))).
+          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToCamp_ns_let n1) ++
+                                                     let_vars (nnrcToCamp_ns_let n2) ++
+                                                     let_vars (nnrcToCamp_ns_let n3))).
           rewrite fresh_let_var_as_let.
           unfold let_var in inn.
           apply let_vars_let_to_naive in inn.
@@ -1932,9 +1932,9 @@ Section TNNRCtoCAMP.
           autorewrite with fresh_bindings.
           simpl. intuition.
           autorewrite with fresh_bindings; intuition.
-          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToPat_ns_let n1) ++
-                                                     let_vars (nnrcToPat_ns_let n2) ++
-                                                     let_vars (nnrcToPat_ns_let n3))).
+          apply (fresh_let_var_fresh "if$" (let_vars (nnrcToCamp_ns_let n1) ++
+                                                     let_vars (nnrcToCamp_ns_let n2) ++
+                                                     let_vars (nnrcToCamp_ns_let n3))).
           repeat rewrite in_app_iff.
           intuition.
           unfold rec_concat_sort; intros ? inn1 inn2.
@@ -1962,7 +1962,7 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * eauto.
         * unfold merge_bindings in *.
-          match_case_in H29; intros compat1; rewrite compat1 in H29; try discriminate.
+          match_case_in H29; intros comcamp1; rewrite comcamp1 in H29; try discriminate.
           inversion H29; clear H29; subst.
           { eapply IHn2; eauto 2.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -1980,7 +1980,7 @@ Section TNNRCtoCAMP.
         * repeat econstructor.
         * eauto.
         * unfold merge_bindings in *.
-          match_case_in H31; intros compat2; rewrite compat2 in H31; try discriminate.
+          match_case_in H31; intros comcamp2; rewrite comcamp2 in H31; try discriminate.
           inversion H31; clear H31; subst.
           { eapply IHn3; eauto 2.
             - apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -2005,27 +2005,27 @@ Section TNNRCtoCAMP.
       eauto.
   Qed.
 
-  Lemma nnrc_to_pat_let_type_preserve_back n τc Γ τout :
+  Lemma nnrc_to_camp_let_type_preserve_back n τc Γ τout :
     nnrcIsCore n ->
-    is_list_sorted ODT_lt_dec (domain (nnrc_to_pat_env Γ)) = true ->
+    is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     forall τ₀,
-      [τc&(nnrc_to_pat_env Γ)] |= (nnrcToPat_let (domain Γ) n) ; τ₀ ~> τout ->
+      [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout ->
       nnrc_type Γ n τout.
   Proof.
-    intro Hiscore. intros. unfold nnrcToPat_let in *.
+    intro Hiscore. intros. unfold nnrcToCamp_let in *.
     generalize (unshadow_simpl_preserve_core (domain Γ) n Hiscore); intros.
     unfold unshadow_simpl in *.
     eapply unshadow_type.
-    eapply (nnrc_to_pat_ns_type_preserve_back); trivial.
+    eapply (nnrc_to_camp_ns_type_preserve_back); trivial.
     - apply unshadow_preserve_core; assumption.
     - apply unshadow_shadow_free.
     - apply unshadow_avoid.
-    - apply nnrc_to_pat_ns_let_type_equiv_back; eauto.
+    - apply nnrc_to_camp_ns_let_type_equiv_back; eauto.
       + apply unshadow_preserve_core; assumption.
       + apply fresh_bindings_from_tnnrc.
       + apply unshadow_shadow_free.
       + intros ? inn1 inn2.
-        unfold nnrc_to_pat_env, domain in inn1.
+        unfold nnrc_to_camp_env, domain in inn1.
         rewrite map_map, in_map_iff in inn1.
         destruct inn1 as [? [? inn1]]; subst.
         rewrite in_map_iff in inn2.
@@ -2037,31 +2037,31 @@ Section TNNRCtoCAMP.
         eapply in_dom; eauto.
    Qed.
 
-  Lemma nnrc_to_pat_ns_let_top_type_preserve_back n τc τout :
+  Lemma nnrc_to_camp_ns_let_top_type_preserve_back n τc τout :
     nnrcIsCore n ->
     shadow_free n = true ->
     forall τ₀,
-      [τc&nil] |= (nnrcToPat_ns_let n) ; τ₀ ~> τout ->
+      [τc&nil] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout ->
                                          nnrc_type nil n τout.
   Proof.
     intro Hiscore. intros.
-    apply nnrc_to_pat_ns_let_type_equiv_back in H0; eauto.
-    apply nnrc_to_pat_ns_top_type_preserve_back in H0; eauto.
+    apply nnrc_to_camp_ns_let_type_equiv_back in H0; eauto.
+    apply nnrc_to_camp_ns_top_type_preserve_back in H0; eauto.
     unfold fresh_bindings; simpl; intuition.
   Qed.
 
   (** Theorem 7.4, NNRC<->CAMP.
        Final iff Theorem of type preservation for the translation
-       from NNRC back to Patterns *)
+       from NNRC back to Campterns *)
 
-  Theorem nnrc_to_pat_let_top_type_preserve_iff τc Γ n τout τ₀:
+  Theorem nnrc_to_camp_let_top_type_preserve_iff τc Γ n τout τ₀:
     nnrcIsCore n ->
-    is_list_sorted ODT_lt_dec (domain (nnrc_to_pat_env Γ)) = true ->
+    is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     (nnrc_type Γ n τout <->
-    [τc&(nnrc_to_pat_env Γ)]  |= (nnrcToPat_let (domain Γ) n) ; τ₀ ~> τout).
+    [τc&(nnrc_to_camp_env Γ)]  |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout).
    Proof.
-     Hint Resolve nnrc_to_pat_let_type_preserve.
-     Hint Resolve nnrc_to_pat_let_type_preserve_back.
+     Hint Resolve nnrc_to_camp_let_type_preserve.
+     Hint Resolve nnrc_to_camp_let_type_preserve_back.
      intuition; eauto.
    Qed.
 

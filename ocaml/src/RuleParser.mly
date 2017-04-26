@@ -109,59 +109,59 @@ rulemain:
     { (i, r) }
 
 campmain:
-| EXAMPLE i=IDENT COLONEQUAL p = pat DOT EOF
+| EXAMPLE i=IDENT COLONEQUAL p = camp DOT EOF
     { (i, p) }
 
 rule:
-| RULERETURN p = pat
+| RULERETURN p = camp
     { QRule.rule_return p }
-| RULEWHEN p = pat SEMISEMI r = rule
+| RULEWHEN p = camp SEMISEMI r = rule
     { QRule.rule_when p r }
-| RULENOT p = pat SEMISEMI r = rule
+| RULENOT p = camp SEMISEMI r = rule
     { QRule.rule_not p r }
-| RULEGLOBAL p = pat SEMISEMI r = rule
+| RULEGLOBAL p = camp SEMISEMI r = rule
     { QRule.rule_global p r }
 
 rule_rule:
-| RULEWHEN p = pat
+| RULEWHEN p = camp
     { (fun r -> QRule.rule_when p r) }
-| RULENOT p = pat
+| RULENOT p = camp
     { (fun r -> QRule.rule_not p r) }
-| RULEGLOBAL p = pat
+| RULEGLOBAL p = camp
     { (fun r -> QRule.rule_global p r) }
-| RULEWHEN p = pat SEMISEMISEMI r = rule_rule 
+| RULEWHEN p = camp SEMISEMISEMI r = rule_rule 
     { (fun r1 -> (QRule.rule_when p (r r1))) }
-| RULENOT p = pat SEMISEMISEMI r = rule_rule
+| RULENOT p = camp SEMISEMISEMI r = rule_rule
     { (fun r1 -> (QRule.rule_not p (r r1))) }
-| RULEGLOBAL p = pat SEMISEMISEMI r = rule_rule
+| RULEGLOBAL p = camp SEMISEMISEMI r = rule_rule
     { (fun r1 -> (QRule.rule_global p (r r1))) }
 
-pat:
+camp:
 (* Parenthesized pattern *)
-| LPAREN p = pat RPAREN
+| LPAREN p = camp RPAREN
     { p }
 (* CAMP pattern *)
 | PCONST DUNIT
     { QCAMP.pconst QData.dunit }
 | PCONST LPAREN d = data RPAREN
     { QCAMP.pconst d }
-| PUNOP u = uop p = pat
+| PUNOP u = uop p = camp
     { QCAMP.punop u p }
-| PBINOP b = bop p1 = pat p2 = pat
+| PBINOP b = bop p1 = camp p2 = camp
     { QCAMP.pbinop b p1 p2 }
-| PMAP p = pat
+| PMAP p = camp
     { QCAMP.pmap p }
-| PASSERT p = pat
+| PASSERT p = camp
     { QCAMP.passert p }
-| PORELSE p1 = pat p2 = pat
+| PORELSE p1 = camp p2 = camp
     { QCAMP.porelse p1 p2 }
 | PIT
     { QCAMP.pit }
-| PLETIT p1 = pat p2 = pat
+| PLETIT p1 = camp p2 = camp
     { QCAMP.pletit p1 p2 }
 | PENV
     { QCAMP.penv }
-| PLETENV p1 = pat p2 = pat
+| PLETENV p1 = camp p2 = camp
     { QCAMP.pletenv  p1 p2 }
 | PLEFT
     { QCAMP.pleft }
@@ -176,40 +176,40 @@ pat:
     { QCAMP.pconst (QData.drec []) }
 | LOOKUP s = STRING
     { QCAMP.lookup (Util.char_list_of_string s) }
- | v = STRING IS p = pat %prec UIS
+ | v = STRING IS p = camp %prec UIS
     { QCAMP.pIS (Util.char_list_of_string v) p }
-| WITHVAR s = STRING p = pat %prec UWITHVAR
+| WITHVAR s = STRING p = camp %prec UWITHVAR
     { QCAMP.withVar (Util.char_list_of_string s) p }
-| PVARWITH s = STRING p = pat %prec UWITHVAR
+| PVARWITH s = STRING p = camp %prec UWITHVAR
     { QCAMP.pvarwith (Util.char_list_of_string s) p }
-| TOSTRING p = pat
+| TOSTRING p = camp
     { QCAMP.toString p }
-| PBINOPRED b = bop LBRACKET pl = patlist RBRACKET
-    { QCAMP.pat_binop_reduce b pl }
-| p1 = pat PLUSSPLUS p2 = pat
+| PBINOPRED b = bop LBRACKET pl = camplist RBRACKET
+    { QCAMP.camp_binop_reduce b pl }
+| p1 = camp PLUSSPLUS p2 = camp
     { QCAMP.stringConcat p1 p2 }
 | DASHUNDER
     { QCAMP.pit }
 | DASHTICK c = const
     { (QCAMP.pconst c) }
-| s = STRING BANGDASHARROW p = pat
+| s = STRING BANGDASHARROW p = camp
     { QCAMP.pbdot (Util.char_list_of_string s) p }
-| PBDOT s = STRING p = pat %prec PBDOT
+| PBDOT s = STRING p = camp %prec PBDOT
     { QCAMP.pbdot (Util.char_list_of_string s) p }
-| PBSOMEDOT s = STRING p = pat %prec PBSOMEDOT
+| PBSOMEDOT s = STRING p = camp %prec PBSOMEDOT
     { QCAMP.pbsomedot (Util.char_list_of_string s) p }
 | PSOME
     { QCAMP.pleft }
 | PNULL
     { QCAMP.pnull }
 (* INSTANCEOF, FETCH, and MATCHES temporarily have hacks because of signature changes in RuleSugar.v.  TODO fix this *)
-| n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
+| n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = camp %prec UINSTANCE
     { QRule.instanceOf (Util.char_list_of_string n) t p }
-| p = pat TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = pat %prec UFETCH
+| p = camp TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = camp %prec UFETCH
     { QRule.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
-| MATCHES LBRACKET t = stringlist RBRACKET WHERE p = pat %prec UINSTANCE
+| MATCHES LBRACKET t = stringlist RBRACKET WHERE p = camp %prec UINSTANCE
     { QRule.matches t p }
-| AGGREGATE r = rule_rule DO u = uop OVER p = pat FLATTEN f = INT
+| AGGREGATE r = rule_rule DO u = uop OVER p = camp FLATTEN f = INT
     { QRule.aggregate r u p (Util.coq_Z_of_int f) }
 | VARIABLES LBRACKET v = stringlist RBRACKET
     { QCAMP.returnVariables v }
@@ -275,10 +275,10 @@ recatt:
 | LPAREN a = STRING COMMA d = data RPAREN
     { (Util.char_list_of_string a, d) }
     
-patlist:
-| p = pat
+camplist:
+| p = camp
     { p :: [] }
-| p = pat SEMI pl = patlist
+| p = camp SEMI pl = camplist
     { p :: pl }
 
 stringlist:

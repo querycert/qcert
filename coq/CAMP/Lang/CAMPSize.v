@@ -20,25 +20,25 @@ Section CAMPSize.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint pat_size (p:pat) : nat
+  Fixpoint camp_size (p:camp) : nat
     := match p with
          | pconst d' => 1
-         | punop op p₁ => S (pat_size p₁)
-         | pbinop op p₁ p₂ => S (pat_size p₁ + pat_size p₂)
-         | pmap p₁ => S (pat_size p₁)
-(*       | pgroupBy p₁ => S (pat_size p₁) *)
-         | passert p₁ => S (pat_size p₁)
-         | porElse p₁ p₂ => S (pat_size p₁ + pat_size p₂)
+         | punop op p₁ => S (camp_size p₁)
+         | pbinop op p₁ p₂ => S (camp_size p₁ + camp_size p₂)
+         | pmap p₁ => S (camp_size p₁)
+(*       | pgroupBy p₁ => S (camp_size p₁) *)
+         | passert p₁ => S (camp_size p₁)
+         | porElse p₁ p₂ => S (camp_size p₁ + camp_size p₂)
          | pit => 1
-         | pletIt p₁ p₂ => S (pat_size p₁ + pat_size p₂)
+         | pletIt p₁ p₂ => S (camp_size p₁ + camp_size p₂)
          | pgetconstant _ => 1
          | penv => 1
-         | pletEnv p₁ p₂ => S (pat_size p₁ + pat_size p₂)
+         | pletEnv p₁ p₂ => S (camp_size p₁ + camp_size p₂)
          | pleft => 1
          | pright => 1
        end.
 
-  Lemma pat_size_nzero (a:pat) : pat_size a <> 0.
+  Lemma camp_size_nzero (a:camp) : camp_size a <> 0.
   Proof.
     induction a; simpl; omega.
   Qed.

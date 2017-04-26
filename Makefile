@@ -198,8 +198,8 @@ MODULES = \
 	Rule/RuleSystem \
 	TechRule/Lang/TechRule \
 	TechRule/TechRuleRuntime \
-	DesignerRule/Lang/DesignerRule \
-	DesignerRule/DesignerRuleRuntime \
+	DesignRule/Lang/DesignRule \
+	DesignRule/DesignRuleRuntime \
 	CldMR/Lang/CldMRUtil \
 	CldMR/Lang/ForeignCloudant \
 	CldMR/Lang/CldMR \

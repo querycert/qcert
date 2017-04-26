@@ -34,7 +34,7 @@ Section CompDriver.
   Require Import NNRCMRRuntime NNRCMROptim.
   Require Import CldMR.
   Require Import DNNRC Dataset.
-  Require Import TechRule DesignerRule.
+  Require Import TechRule DesignRule.
 
   (* Translations *)
   Require Import OQLtoNRAEnv.
@@ -130,17 +130,17 @@ Section CompDriver.
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lambda_nra q.
 
     (** Rules and CAMP translations *)
-    Definition camp_rule_to_camp (q:camp_rule) : camp := Rule.rule_to_pattern q. (* Note: This is really macro-expansion *)
+    Definition camp_rule_to_camp (q:camp_rule) : camp := Rule.rule_to_camp q. (* Note: This is really macro-expansion *)
 
     Definition tech_rule_to_camp (q:tech_rule) : camp := TechRule.tech_rule_to_camp q.
 
-    Definition designer_rule_to_camp (q:designer_rule) : camp := DesignerRule.designer_rule_to_camp q.
+    Definition designer_rule_to_camp (q:designer_rule) : camp := DesignRule.designer_rule_to_camp q.
 
-    Definition camp_to_nra (q:camp) : nra := nra_of_pat q.
+    Definition camp_to_nra (q:camp) : nra := nra_of_camp q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_pat_to_cnraenv q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_camp_to_cnraenv q.
 
-    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.translate_pat_to_nraenv q.
+    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.translate_camp_to_nraenv q.
 
     (** NRA/NRAEnv translations *)
     Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_nra q.
@@ -164,7 +164,7 @@ Section CompDriver.
       nnrc_to_nnrc_core q.
   
     Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
-      lift_nnrc_core (nnrcToPat_let avoid) q. (* XXX avoid ? XXX *)
+      lift_nnrc_core (nnrcToCamp_let avoid) q. (* XXX avoid ? XXX *)
 
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)

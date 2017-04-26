@@ -47,8 +47,8 @@ Section TCAMP.
 
   Section t.
     Context (constants:tbindings).
-  Inductive pat_type :
-    tbindings -> pat -> rtype -> rtype -> Prop :=
+  Inductive camp_type :
+    tbindings -> camp -> rtype -> rtype -> Prop :=
     | PTconst Γ τ₁ {τ₂} d :
         data_type (normalize_data brand_relation_brands d) τ₂ ->
         Γ  |= pconst d ; τ₁ ~> τ₂
@@ -93,7 +93,7 @@ Section TCAMP.
         Γ |= pleft; (Either τl τr) ~> τl
     | PTRight Γ τl τr :
         Γ |= pright; (Either τl τr) ~> τr
-       where "g |= p ; a ~> b" := (pat_type g p a b).
+       where "g |= p ; a ~> b" := (camp_type g p a b).
 
   End t.
 
@@ -184,10 +184,10 @@ Section TCAMP.
 
   (** Main type soudness lemma *)
 
-  Notation "[ c & g ] |= p ; a ~> b" := (pat_type c g p a b) (at level 90).
+  Notation "[ c & g ] |= p ; a ~> b" := (camp_type c g p a b) (at level 90).
 
-  Theorem typed_pat_success_or_recoverable {c} {τc}
-          {Γ τin τout} {p:pat} {env} {d} :
+  Theorem typed_camp_success_or_recoverable {c} {τc}
+          {Γ τin τout} {p:camp} {env} {d} :
     bindings_type c τc ->
      bindings_type env Γ ->
      ([τc & Γ] |= p ; τin ~> τout) ->
@@ -196,10 +196,10 @@ Section TCAMP.
         \/ (interp brand_relation_brands c p env d = RecoverableError).
   Proof.
     simpl.
-    intros tconst tenv tpat tdat.
-    revert d env Γ τin τout tenv tpat tdat.
-    induction p; simpl; intros din env Γ τin τout tenv tpat tdat;
-    inversion tpat; subst.
+    intros tconst tenv tcamp tdat.
+    revert d env Γ τin τout tenv tcamp tdat.
+    induction p; simpl; intros din env Γ τin τout tenv tcamp tdat;
+    inversion tcamp; subst.
     (* pconst *)
     - eauto. 
     (* unaryOp *)
@@ -290,10 +290,10 @@ Section TCAMP.
   Qed.
 
   Require Import Permutation.
-  Hint Constructors pat_type.
+  Hint Constructors camp_type.
 
   (** Additional lemma used in the correctness for typed translation from NNRC to CAMP *)
-  Lemma pat_type_tenv_rec {τc Γ p τ₁ τ₂} :
+  Lemma camp_type_tenv_rec {τc Γ p τ₁ τ₂} :
     NoDup (domain Γ) ->
     [τc & Γ] |= p; τ₁ ~> τ₂ ->
     [τc & rec_sort Γ] |= p; τ₁ ~> τ₂.
@@ -317,7 +317,7 @@ Section TCAMP.
       rewrite rec_sort_rec_sort_app1; trivial.
   Qed.
 
-  Lemma pat_type_const_sort_f {τc Γ p τ₁ τ₂} :
+  Lemma camp_type_const_sort_f {τc Γ p τ₁ τ₂} :
     [rec_sort τc & Γ] |= p; τ₁ ~> τ₂ ->
     [τc & Γ] |= p; τ₁ ~> τ₂.
   Proof.
@@ -328,7 +328,7 @@ Section TCAMP.
     econstructor. apply H2.
   Qed.
 
-  Lemma pat_type_const_sort_b {τc Γ p τ₁ τ₂} :
+  Lemma camp_type_const_sort_b {τc Γ p τ₁ τ₂} :
     [τc & Γ] |= p; τ₁ ~> τ₂ ->
     [rec_sort τc & Γ] |= p; τ₁ ~> τ₂.
   Proof.
@@ -340,18 +340,18 @@ Section TCAMP.
     apply H2.
   Qed.
 
-  Lemma pat_type_const_sort {τc Γ p τ₁ τ₂} :
+  Lemma camp_type_const_sort {τc Γ p τ₁ τ₂} :
     [rec_sort τc & Γ] |= p; τ₁ ~> τ₂ <->
     [τc & Γ] |= p; τ₁ ~> τ₂.
   Proof.
     split; intros.
-    - apply pat_type_const_sort_f; trivial.
-    - apply pat_type_const_sort_b; trivial.
+    - apply camp_type_const_sort_f; trivial.
+    - apply camp_type_const_sort_b; trivial.
   Qed.
 
 End TCAMP.
 
-Notation "[ c & g ] |= p ; a ~> b" := (pat_type c g p a b) (at level 90) : rule_scope.
+Notation "[ c & g ] |= p ; a ~> b" := (camp_type c g p a b) (at level 90) : rule_scope.
 
 (* 
 *** Local Variables: ***

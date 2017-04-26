@@ -520,7 +520,7 @@ Section cNRAEnvContext.
     match_case; match_case; intros.
     red; intros h dl dnc env dnenv d dnd.
     specialize (H (map (fun xy => (fst xy,
-                                   (AApp (nra_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env)))) ps)).
+                                   (AApp (nra_of_cnraenv (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env)))) ps)).
     
       symmetry in Hequiv.
        generalize (equivlist_in Hequiv); intros Hin.
@@ -532,21 +532,21 @@ Section cNRAEnvContext.
          repeat rewrite aec_holes_lift; intuition. }
        repeat rewrite map_map in H.
        simpl in H.
-       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_pat_context_data (drec (rec_sort dl)) env)%nra) c1 ps c1incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c1 ps c1incl);
          intros c1nholes.
-       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_pat_context_data (drec (rec_sort dl)) env)%nra) c2 ps c2incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c2 ps c2incl);
          intros c2nholes.
        destruct (ac_simplify_nholes _ c1nholes) as [c1s c1seq].
        destruct (ac_simplify_nholes _ c2nholes) as [c2s c2seq].
        generalize (aec_simplify_lift_commute (ac_substs c1
              (map
                 (fun xy : nat * cnraenv =>
-                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env))) ps)));
+                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
         intros leq1.
       generalize (aec_simplify_lift_commute (ac_substs c2
              (map
                 (fun xy : nat * cnraenv =>
-                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_pat_context_data (drec (rec_sort dl)) env))) ps)));
+                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
         intros leq2.
       rewrite lift_nra_context_substs in leq1, leq2.
       rewrite map_map in leq1, leq2. simpl in leq1, leq2.

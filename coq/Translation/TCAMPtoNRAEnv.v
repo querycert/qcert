@@ -31,33 +31,33 @@ Section TCAMPtoNRAEnv.
 
   Context {m:basic_model}.
 
-  Lemma nraenv_of_pat_type_preserve τc Γ pf p τin τout :
+  Lemma nraenv_of_camp_type_preserve τc Γ pf p τin τout :
     [τc&Γ] |= p ; τin ~> τout ->
-    nraenv_of_pat p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
+    nraenv_of_camp p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
   Proof.
     Hint Resolve data_type_drec_nil.
     unfold nraenv_type.
-    rewrite nraenv_of_pat_cnraenv_of_pat_ident.
-    apply cnraenv_of_pat_type_preserve.
+    rewrite nraenv_of_camp_cnraenv_of_camp_ident.
+    apply cnraenv_of_camp_type_preserve.
   Qed.
 
   (** Some corollaries of the main Lemma *)
 
-  Lemma nraenv_of_pat_nraenv_of_pat_top p τc τin τout :
-    nraenv_of_pat p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl) ->
-    nraenv_of_pat_top p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
+  Lemma nraenv_of_camp_nraenv_of_camp_top p τc τin τout :
+    nraenv_of_camp p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl) ->
+    nraenv_of_camp_top p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
     repeat (econstructor; eauto).
   Qed.
     
-  Theorem alg_of_pat_top_type_preserve p τc τin τout :
+  Theorem alg_of_camp_top_type_preserve p τc τin τout :
     [τc&nil] |= p ; τin ~> τout ->
-    nraenv_of_pat_top p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
+    nraenv_of_camp_top p ▷ₓ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
-    apply nraenv_of_pat_nraenv_of_pat_top.
-    apply nraenv_of_pat_type_preserve; eauto.
+    apply nraenv_of_camp_nraenv_of_camp_top.
+    apply nraenv_of_camp_type_preserve; eauto.
   Qed.
 
 End TCAMPtoNRAEnv.

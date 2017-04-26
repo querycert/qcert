@@ -72,14 +72,14 @@ Section CompEval.
     (* Language: camp_rule *)
     (* Note: eval for camp_rule relies on translation to camp *)
     Definition eval_camp_rule (q:rule) (cenv: list (string*data)) : option data :=
-      match interp h (rec_sort cenv) (rule_to_pattern q) nil dunit with
+      match interp h (rec_sort cenv) (rule_to_camp q) nil dunit with
       | Success l => Some (dcoll (l::nil))
       | RecoverableError => Some (dcoll nil)
       | TerminalError => None
       end.
 
     Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: list (string*data)) : string
-      := let pp := rule_to_pattern q in
+      := let pp := rule_to_camp q in
          print_presult_debug pp
                              (interp_debug h
                                            (rec_sort cenv)
@@ -121,7 +121,7 @@ Section CompEval.
       := nra_eval h q (drec (rec_sort cenv)).
       (* XXX Passing just cenv as ID value is more natural, but not
              consistent with nraenv_core to nra translation which encodes
-             ID and ENV in a records using the pat_context_data macro XXX *)
+             ID and ENV in a records using the nra_context_data macro XXX *)
 
     (* Language: nraenv_core *)
     Definition eval_nraenv_core (q:nraenv_core) (cenv: list (string*data)) : option data

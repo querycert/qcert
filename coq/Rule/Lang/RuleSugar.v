@@ -30,25 +30,25 @@ Section RuleSugar.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint flattenn (n:nat) (p:pat)
+  Fixpoint flattenn (n:nat) (p:camp)
     := match n with
        | 0 => p
        | S m =>flattenn m (punop AFlatten p)
        end.
   
   (* Java equivalent: CampAggregateMacro *)
-  Definition aggregate (rules:rule->rule) (op:unaryOp) (secondMap:pat) (nflat:nat): pat
+  Definition aggregate (rules:rule->rule) (op:unaryOp) (secondMap:camp) (nflat:nat): camp
     :=  pletIt
-          (rule_to_pattern (rules (rule_return penv)))
+          (rule_to_camp (rules (rule_return penv)))
           (punop op (flattenn nflat (pmap (pletEnv pit secondMap)))).
 
-  Definition aggregate_group_by (rules:rule->rule) (opg:pat) (op:unaryOp) (secondMap:pat) : pat
+  Definition aggregate_group_by (rules:rule->rule) (opg:camp) (op:unaryOp) (secondMap:camp) : camp
     :=  pletIt
-          (rule_to_pattern (rules (rule_return penv)))
+          (rule_to_camp (rules (rule_return penv)))
           (punop op (pmap (pletEnv pit secondMap))).
 
   (* Java equivalent: CampFetchRefMacro *)
-  Definition fetchRef (entity:brands) (keyatt:string) (tempvar:string) (keyval:pat) : pat -> pat
+  Definition fetchRef (entity:brands) (keyatt:string) (tempvar:string) (keyval:camp) : camp -> camp
     := pletIt
          (pletEnv (pvarwith tempvar keyval)
                   (WW

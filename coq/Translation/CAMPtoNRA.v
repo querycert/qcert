@@ -39,40 +39,40 @@ Section CAMPtoNRA.
 
   (** Translation from CAMP to NRA *)
 
-  Fixpoint nra_of_pat (p:pat) : nra :=
+  Fixpoint nra_of_camp (p:camp) : nra :=
     match p with
-      | pconst d' => pat_match (AConst d')
-      | punop uop p₁ => AMap (AUnop uop AID) (nra_of_pat p₁)
+      | pconst d' => nra_match (AConst d')
+      | punop uop p₁ => AMap (AUnop uop AID) (nra_of_camp p₁)
       | pbinop bop p₁ p₂ =>
         AMap (ABinop bop (AUnop (ADot "a1") AID) (AUnop (ADot "a2") AID))
-             (AProduct (AMap (AUnop (ARec "a1") AID) (nra_of_pat p₁))
-                       (AMap (AUnop (ARec "a2") AID) (nra_of_pat p₂)))
+             (AProduct (AMap (AUnop (ARec "a1") AID) (nra_of_camp p₁))
+                       (AMap (AUnop (ARec "a2") AID) (nra_of_camp p₂)))
       | pmap p₁ =>
-        pat_match
+        nra_match
           (AUnop AFlatten
                  (AMap
-                    (nra_of_pat p₁)
+                    (nra_of_camp p₁)
                     (unnest_two
                        "a1"
                        "PDATA"
-                       (AUnop AColl (pat_wrap_a1 (AUnop (ADot "PDATA") AID))))))
-      | passert p₁ => AMap (AConst (drec nil)) (ASelect AID (nra_of_pat p₁))
-      | porElse p₁ p₂ => ADefault (nra_of_pat p₁) (nra_of_pat p₂)
-      | pit => pat_match pat_data
+                       (AUnop AColl (nra_wrap_a1 (AUnop (ADot "PDATA") AID))))))
+      | passert p₁ => AMap (AConst (drec nil)) (ASelect AID (nra_of_camp p₁))
+      | porElse p₁ p₂ => ADefault (nra_of_camp p₁) (nra_of_camp p₂)
+      | pit => nra_match nra_data
       | pletIt p₁ p₂ =>
         AUnop AFlatten
-              (AMap (nra_of_pat p₂)
+              (AMap (nra_of_camp p₂)
                     (unnest_two
                        "a1"
                        "PDATA"
                        (AUnop AColl
-                              (pat_wrap_a1 (nra_of_pat p₁)))))
-      | pgetconstant s => pat_match (AUnop (ADot s) pat_const_env)
-      | penv => pat_match pat_bind
+                              (nra_wrap_a1 (nra_of_camp p₁)))))
+      | pgetconstant s => nra_match (AUnop (ADot s) nra_const_env)
+      | penv => nra_match nra_bind
       | pletEnv p₁ p₂ =>
         AUnop AFlatten
               (AMap
-                 (nra_of_pat p₂)
+                 (nra_of_camp p₂)
                  (unnest_two (* Needed because MergeConcat may fail so is a
                                 collection which must be unnested *)
                     "PBIND1"
@@ -90,22 +90,22 @@ Section CAMPtoNRA.
                              (AUnop AColl
                                     (ABinop AConcat
                                             AID
-                                            (AUnop (ARec "a1") (nra_of_pat p₁))))))))
+                                            (AUnop (ARec "a1") (nra_of_camp p₁))))))))
       | pleft =>
-        AApp (AEither (pat_match AID) (pat_fail)) pat_data
+        AApp (AEither (nra_match AID) (nra_fail)) nra_data
       | pright =>
-        AApp (AEither (pat_fail) (pat_match AID)) pat_data
+        AApp (AEither (nra_fail) (nra_match AID)) nra_data
     end.
 
   (** top level version sets up the appropriate input 
       (with an empty context) 
   *)
 
-  Definition nra_of_pat_top c p :=
+  Definition nra_of_camp_top c p :=
     AUnop AFlatten
-          (AMap (nra_of_pat p)
+          (AMap (nra_of_camp p)
                 (AUnop AColl
-                       (pat_context (AConst (drec c)) (AConst (drec nil)) AID))).
+                       (nra_context (AConst (drec c)) (AConst (drec nil)) AID))).
 
   (** Auxiliary lemmas -- all used inside pmap proof *)
 
@@ -197,13 +197,13 @@ Section CAMPtoNRA.
     reflexivity.
   Qed.
 
-  (** Theorem 4.2: lemma of translation correctness for patterns *)
+  (** Theorem 4.2: lemma of translation correctness for campterns *)
 
-  Theorem pat_trans_correct {h:brand_relation_t} c p bind d:
-    lift_failure (interp h c p bind d) = nra_eval h (nra_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d).
+  Theorem camp_trans_correct {h:brand_relation_t} c p bind d:
+    lift_failure (interp h c p bind d) = nra_eval h (nra_of_camp p) (nra_context_data (drec (rec_sort c)) (drec bind) d).
   Proof.
     revert d bind;
-    pat_cases (induction p) Case; simpl; intros.
+    camp_cases (induction p) Case; simpl; intros.
     - Case "pconst"%string.
       reflexivity.
     - Case "punop"%string.
@@ -224,7 +224,7 @@ Section CAMPtoNRA.
       rewrite rmap_lift2; simpl.
       rewrite rmap_lift3; simpl.
       induction l; simpl; try reflexivity.
-      unfold pat_context_data in IHp.
+      unfold nra_context_data in IHp.
       assert ((rec_concat_sort (("PBIND", drec bind) :: ("PCONST", (drec (rec_sort c))) :: nil)
                    (("PDATA", a) :: nil)) =
               ("PBIND", drec bind) :: ("PCONST", (drec (rec_sort c))) :: ("PDATA", a) :: nil).
@@ -237,7 +237,7 @@ Section CAMPtoNRA.
       rewrite rflatten_lift1.
       reflexivity.
       revert IHl.
-      destruct ((rmap (nra_eval h (nra_of_pat p))
+      destruct ((rmap (nra_eval h (nra_of_camp p))
               (map
                  (fun x : data =>
                   drec
@@ -275,7 +275,7 @@ Section CAMPtoNRA.
       destruct (interp h c p1 bind d); try reflexivity.
       simpl.
       specialize (IHp2 res).
-      unfold pat_context_data in IHp2.
+      unfold nra_context_data in IHp2.
       rewrite <- IHp2; clear IHp2.
       destruct (interp h c p2 bind res); reflexivity.      
     - Case "pgetconstant"%string.
@@ -293,7 +293,7 @@ Section CAMPtoNRA.
       simpl.
       destruct (merge_bindings bind l); try reflexivity.
       specialize (IHp2 d l0).
-      unfold pat_context_data in *.
+      unfold nra_context_data in *.
       simpl.
       rewrite <- IHp2; clear IHp2; simpl.
       destruct (interp h c p2 l0 d); try reflexivity.
@@ -303,8 +303,8 @@ Section CAMPtoNRA.
       unfold lift_failure. destruct d; simpl; trivial.
   Qed.
 
-  Lemma pat_trans_yields_coll {h:brand_relation_t} p d d0:
-    nra_eval h (nra_of_pat p) d = Some d0 ->
+  Lemma camp_trans_yields_coll {h:brand_relation_t} p d d0:
+    nra_eval h (nra_of_camp p) d = Some d0 ->
     {x | d0 = dcoll x}.
   Proof.
     Ltac findcol := 
@@ -337,57 +337,57 @@ Section CAMPtoNRA.
     [ exists nil; congruence | exists (d1::nil); congruence].
   Qed.
 
-  Lemma pat_trans_top_pat_context {h:brand_relation_t} c p d:
+  Lemma camp_trans_top_nra_context {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    nra_eval h (nra_of_pat_top c p) d 
-    = nra_eval h (nra_of_pat p) (pat_context_data (drec (rec_sort c)) (drec nil) d).
+    nra_eval h (nra_of_camp_top c p) d 
+    = nra_eval h (nra_of_camp p) (nra_context_data (drec (rec_sort c)) (drec nil) d).
   Proof.
     simpl.
-    unfold olift, pat_context_data; intros.
+    unfold olift, nra_context_data; intros.
     rewrite map_normalize_normalized_eq; trivial.
-    - case_eq (h ⊢ (nra_of_pat p) @ₐ (drec (("PBIND", drec nil) :: ("PCONST", (drec (rec_sort c))) :: ("PDATA", d) :: nil))); simpl; trivial.
+    - case_eq (h ⊢ (nra_of_camp p) @ₐ (drec (("PBIND", drec nil) :: ("PCONST", (drec (rec_sort c))) :: ("PDATA", d) :: nil))); simpl; trivial.
     intros.
     unfold rflatten.
     simpl.
-    apply pat_trans_yields_coll in H0.
+    apply camp_trans_yields_coll in H0.
     destruct H0; subst; simpl.
     rewrite app_nil_r. trivial.
   Qed.
 
-  Lemma pat_trans_top_correct {h:brand_relation_t} c p d:
+  Lemma camp_trans_top_correct {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    lift_failure (interp h c p nil d) = nra_eval h (nra_of_pat_top c p) d.
+    lift_failure (interp h c p nil d) = nra_eval h (nra_of_camp_top c p) d.
   Proof.
     intros.
-    rewrite pat_trans_top_pat_context by trivial.
-    apply pat_trans_correct.
+    rewrite camp_trans_top_nra_context by trivial.
+    apply camp_trans_correct.
   Qed.
 
   (* Wrapping the error on the NRA side might be a little nicer, notably for later
      top-level proofs *)
 
-  Definition lift_pat_failure (d : option data) :=
+  Definition lift_camp_failure (d : option data) :=
     match d with
       | Some (dcoll nil) => RecoverableError
       | Some (dcoll (l::nil)) => Success l
       | _ => TerminalError
     end.
 
-  Lemma pat_trans_correct_r {h:brand_relation_t} c p bind d:
+  Lemma camp_trans_correct_r {h:brand_relation_t} c p bind d:
       interp h c p bind d =
-      lift_pat_failure (nra_eval h (nra_of_pat p) (pat_context_data (drec (rec_sort c)) (drec bind) d)).
+      lift_camp_failure (nra_eval h (nra_of_camp p) (nra_context_data (drec (rec_sort c)) (drec bind) d)).
   Proof.
-    rewrite <- pat_trans_correct.
+    rewrite <- camp_trans_correct.
     destruct (interp h c p bind d); intros; simpl; reflexivity.
   Qed.
 
-  Lemma pat_trans_top_correct_r {h:brand_relation_t} c p d:
+  Lemma camp_trans_top_correct_r {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
       interp h c p nil d =
-      lift_pat_failure (nra_eval h (nra_of_pat_top c p) d).
+      lift_camp_failure (nra_eval h (nra_of_camp_top c p) d).
   Proof.
     intros.
-    rewrite <- pat_trans_top_correct by trivial.
+    rewrite <- camp_trans_top_correct by trivial.
     destruct (interp h c p nil d); intros; simpl; eauto.
   Qed.
 
@@ -395,8 +395,8 @@ Section CAMPtoNRA.
     Require Import Omega.
 
     (** Proof showing linear size translation *)
-    Lemma pat_trans_size p :
-      nra_size (nra_of_pat p) <= 41 * pat_size p.
+    Lemma camp_trans_size p :
+      nra_size (nra_of_camp p) <= 41 * camp_size p.
     Proof.
       induction p; simpl; omega.
     Qed.
@@ -407,8 +407,8 @@ Section CAMPtoNRA.
     (* Mapping to NRA for the built-in operators *)
     (* and *)
   
-    Definition nra_of_pand (p1 p2:pat) : nra :=
-      nra_of_pat (pand p1 p2).
+    Definition nra_of_pand (p1 p2:camp) : nra :=
+      nra_of_camp (pand p1 p2).
 
     Definition nra_for_pand (q1 q2:nra) : nra :=
       (♯flatten(χ⟨q2
@@ -422,8 +422,8 @@ Section CAMPtoNRA.
                                                             χ⟨‵[||] ⟩( σ⟨ID ⟩( q1)))|]|}))))))%nra.
 
 
-    Lemma nra_of_pand_works (p1 p2:pat) :
-      nra_of_pat (pand p1 p2) = nra_for_pand (nra_of_pat p1) (nra_of_pat p2).
+    Lemma nra_of_pand_works (p1 p2:camp) :
+      nra_of_camp (pand p1 p2) = nra_for_pand (nra_of_camp p1) (nra_of_camp p2).
     Proof.
       simpl.
       reflexivity.
@@ -431,8 +431,8 @@ Section CAMPtoNRA.
   
     (* WW *)
     
-    Definition nra_of_WW (p:pat) :=
-      nra_of_pat (WW p).
+    Definition nra_of_WW (p:camp) :=
+      nra_of_camp (WW p).
 
   End sugar.
 

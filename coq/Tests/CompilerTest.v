@@ -107,10 +107,10 @@ Section CompilerUntypedTest.
   Example Example1_expected := map dconst
                                    ["MainEntitys with doubleAttribute 50: 2"].
 
-  Definition pat5 : camp := Eval compute in Example1'.
+  Definition camp5 : camp := Eval compute in Example1'.
   Definition algopt5 : nraenv_core := camp_to_nraenv_core Example1'.
   
-  Definition rpat5 : rule := Eval compute in Example1.
+  Definition rcamp5 : rule := Eval compute in Example1.
   Definition ralgopt5 : nraenv := camp_rule_to_nraenv_optim Example1.
   Definition rnnrc5 : nnrc := camp_rule_to_nnrc_optim Example1.
   
@@ -195,7 +195,7 @@ Section CompilerUntypedTest.
 
   (* This is collapsed using econstructor, but not sure how systematic that would be... -JS *)
   Lemma Example1'_wt τ :
-    pat_type tinp1 nil Example1' τ tout1.
+    camp_type tinp1 nil Example1' τ tout1.
   Proof.
     econstructor; eauto.
     econstructor; eauto.
@@ -258,12 +258,12 @@ Section CompilerUntypedTest.
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
     unfold algopt5, camp_to_nraenv_core.
-    unfold CAMPtocNRAEnv.translate_pat_to_cnraenv.
-    unfold CAMPtocNRAEnv.cnraenv_of_pat.
+    unfold CAMPtocNRAEnv.translate_camp_to_cnraenv.
+    unfold CAMPtocNRAEnv.cnraenv_of_camp.
     econstructor; eauto.
     econstructor; eauto.
     Focus 2.
-    apply (@cnraenv_of_pat_type_preserve).
+    apply (@cnraenv_of_camp_type_preserve).
     apply Example1'_wt.
     repeat econstructor; eauto.
     Grab Existential Variables.

@@ -450,7 +450,7 @@ Section cNRAEnvIgnore.
   Require Import NRASugar.
   Lemma cnraenv_is_nra_deenv (h:list (string*string)) c (e:cnraenv) (d1 d2:data) :
     cnraenv_is_nra e ->
-        h ⊢ (nra_of_cnraenv e) @ₐ (pat_context_data c d1 d2) =
+        h ⊢ (nra_of_cnraenv e) @ₐ (nra_context_data c d1 d2) =
         h ⊢ (cnraenv_deenv_nra e) @ₐ d2.
   Proof.
     intros.
@@ -474,7 +474,7 @@ Section cNRAEnvIgnore.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r.
       rewrite rmap_remove1; simpl.
-      unfold pat_context_data in *.
+      unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl.
       destruct (nra_eval h (cnraenv_deenv_nra e1) a); try reflexivity.
@@ -497,7 +497,7 @@ Section cNRAEnvIgnore.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r in *.
       rewrite rmap_remove1 in *; simpl.
-      unfold pat_context_data in *.
+      unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
       generalize (nra_eval h (cnraenv_deenv_nra e1) a); intros.
@@ -625,7 +625,7 @@ Section cNRAEnvIgnore.
       rewrite omap_concat_map_rec in *; simpl.
       rewrite app_nil_r in *.
       rewrite rmap_remove1 in *; simpl.
-      unfold pat_context_data in *.
+      unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
       generalize (nra_eval h (cnraenv_deenv_nra e1) a); intros.
@@ -695,7 +695,7 @@ Section cNRAEnvIgnore.
       rewrite IHe2; simpl; clear IHe2.
       generalize (nra_eval h (cnraenv_deenv_nra e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl;
-      unfold pat_context_data in *;
+      unfold nra_context_data in *;
       rewrite IHe1; reflexivity.
     - inversion H; clear H.
       specialize (IHe1 H0); clear H0.
@@ -703,7 +703,7 @@ Section cNRAEnvIgnore.
       rewrite IHe2; simpl; clear IHe2.
       generalize (nra_eval h (cnraenv_deenv_nra e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl.
-      unfold pat_context_data in *;
+      unfold nra_context_data in *;
       rewrite IHe1; reflexivity.
   Qed.
 

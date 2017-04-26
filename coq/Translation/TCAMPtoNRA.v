@@ -31,23 +31,23 @@ Section TCAMPtoNRA.
 
   Context {m:basic_model}.
 
-  Definition pat_context_type tconst tbind tpid : rtype := 
+  Definition nra_context_type tconst tbind tpid : rtype := 
     Rec Closed (("PBIND",tbind) :: ("PCONST",tconst) :: ("PDATA",tpid) :: nil) (eq_refl _).
 
-  Definition pat_wrap_a1_type tconst tbind tpid : rtype := 
+  Definition nra_wrap_a1_type tconst tbind tpid : rtype := 
     Rec Closed (("PBIND",tbind) :: ("PCONST",tconst) :: ("a1",tpid) :: nil) (eq_refl _).
   Local Open Scope rule_scope.
 
-  Lemma ATpat_match {n τin τout} :
+  Lemma ATnra_match {n τin τout} :
     n ▷ τin >=> τout ->
-    pat_match n ▷ τin >=> Coll τout.
+    nra_match n ▷ τin >=> Coll τout.
   Proof.
     intros; econstructor; eauto.
     econstructor.
   Qed.
 
-  Lemma ATpat_match_inv {n τin τout} :
-    pat_match n ▷ τin >=> τout ->
+  Lemma ATnra_match_inv {n τin τout} :
+    nra_match n ▷ τin >=> τout ->
     exists τout', τout = Coll τout' /\ n ▷ τin >=> τout'.
   Proof.
     inversion 1; subst.
@@ -55,11 +55,11 @@ Section TCAMPtoNRA.
     eauto.
   Qed.
 
-  Lemma ATpat_match_invcoll {n τin τout} :
-    pat_match n ▷ τin >=> Coll τout ->
+  Lemma ATnra_match_invcoll {n τin τout} :
+    nra_match n ▷ τin >=> Coll τout ->
     n ▷ τin >=> τout .
   Proof.
-    intros. apply ATpat_match_inv in H; destruct H as [?[??]].
+    intros. apply ATnra_match_inv in H; destruct H as [?[??]].
     inversion H; rtype_equalizer.
     subst. trivial.
   Qed.
@@ -89,8 +89,8 @@ Section TCAMPtoNRA.
     repeat econstructor; eauto.
   Qed.
 
-  Lemma ATpat_data τc τ τin :
-    pat_data ▷ pat_context_type τc τ τin >=> τin.
+  Lemma ATnra_data τc τ τin :
+    nra_data ▷ nra_context_type τc τ τin >=> τin.
   Proof.
     eapply ATdot.
     - econstructor.
@@ -98,7 +98,7 @@ Section TCAMPtoNRA.
   Qed.
 
   Hint Constructors nra_type unaryOp_type binOp_type.
-  Hint Resolve ATdot ATpat_match ATpat_data.
+  Hint Resolve ATdot ATnra_match ATnra_data.
   
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
@@ -149,9 +149,9 @@ Section TCAMPtoNRA.
   Qed.
 
   (** Main lemma for the type preservation of the translation. *)
-  Lemma nra_of_pat_type_preserve' τc Γ pf p τin τout :
-    pat_type (rec_sort τc) Γ p τin τout ->
-    nra_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
+  Lemma nra_of_camp_type_preserve' τc Γ pf p τin τout :
+    camp_type (rec_sort τc) Γ p τin τout ->
+    nra_of_camp p ▷ (nra_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
   Proof.
     Hint Resolve data_type_drec_nil.
     revert τc Γ pf τin τout.
@@ -252,22 +252,22 @@ Section TCAMPtoNRA.
       eauto. 
   Qed.
 
-  Lemma nra_of_pat_type_preserve τc Γ pf p τin τout :
-    pat_type τc Γ p τin τout ->
-    nra_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
+  Lemma nra_of_camp_type_preserve τc Γ pf p τin τout :
+    camp_type τc Γ p τin τout ->
+    nra_of_camp p ▷ (nra_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
   Proof.
     intros H.
-    apply nra_of_pat_type_preserve'.
-    apply pat_type_const_sort.
+    apply nra_of_camp_type_preserve'.
+    apply camp_type_const_sort.
     trivial.
   Qed.
 
   (** Some corollaries of the main Lemma *)
 
-  Lemma nra_of_pat_nra_of_pat_top p c τc τin τout :
+  Lemma nra_of_camp_nra_of_camp_top p c τc τin τout :
     bindings_type c τc ->
-    nra_of_pat p ▷ (pat_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed nil eq_refl) τin) >=> Coll τout ->
-    nra_of_pat_top c p ▷ τin >=> Coll τout.
+    nra_of_camp p ▷ (nra_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed nil eq_refl) τin) >=> Coll τout ->
+    nra_of_camp_top c p ▷ τin >=> Coll τout.
   Proof.
     Hint Resolve normalize_normalizes.
     Hint Resolve normalize_preserves_type.
@@ -297,17 +297,17 @@ Section TCAMPtoNRA.
     eauto. eauto. eauto. eauto. 
   Qed.
     
-  Theorem nra_of_pat_top_type_preserve p c τc τin τout :
+  Theorem nra_of_camp_top_type_preserve p c τc τin τout :
     bindings_type c τc ->
-    pat_type τc nil p τin τout ->
-    nra_of_pat_top c p ▷ τin >=> Coll τout.
+    camp_type τc nil p τin τout ->
+    nra_of_camp_top c p ▷ τin >=> Coll τout.
   Proof.
     intros.
-    eapply nra_of_pat_nra_of_pat_top; eauto.
-    eapply nra_of_pat_type_preserve; eauto.
+    eapply nra_of_camp_nra_of_camp_top; eauto.
+    eapply nra_of_camp_type_preserve; eauto.
   Qed.
 
-  Hint Constructors pat_type.
+  Hint Constructors camp_type.
 
   (** Section dedicated to the reverse direction for type preservation *)
 
@@ -355,13 +355,13 @@ Section TCAMPtoNRA.
       | [H:Coll _ = Coll _ |- _] => inversion H; clear H
       | [H:unaryOp_type AColl _ _ |- _ ] => 
         inversion H; clear H; subst
-      | [H:pat_context _ _ ▷ _ >=> _ |- _ ] => unfold pat_context in H
-      | [H:pat_triple _ _ _ _ _ _ ▷ _ >=> _ |- _ ] => unfold pat_triple in H
-      | [H:pat_wrap_a1 _ ▷ _ >=> _ |- _ ] => unfold pat_wrap_a1 in H
-      | [H:pat_match _ ▷ _ >=> Coll _ |- _] =>
-        apply ATpat_match_invcoll in H
-      | [H:pat_match _ ▷ _ >=> _ |- _] =>
-        apply ATpat_match_inv in H;
+      | [H:nra_context _ _ ▷ _ >=> _ |- _ ] => unfold nra_context in H
+      | [H:nra_triple _ _ _ _ _ _ ▷ _ >=> _ |- _ ] => unfold nra_triple in H
+      | [H:nra_wrap_a1 _ ▷ _ >=> _ |- _ ] => unfold nra_wrap_a1 in H
+      | [H:nra_match _ ▷ _ >=> Coll _ |- _] =>
+        apply ATnra_match_invcoll in H
+      | [H:nra_match _ ▷ _ >=> _ |- _] =>
+        apply ATnra_match_inv in H;
           destruct H as [? [??]]
       | [H:AUnop _ (ADot _) _ ▷ _ >=> _ |- _] =>
         apply ATdot_inv in H;
@@ -375,8 +375,8 @@ Section TCAMPtoNRA.
       | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
       | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
       | [H:AID ▷ _ >=> _ |- _ ] => apply ATaid_inv in H
-      | [H:pat_data ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:pat_fail ▷ _ >=> _ |- _ ] => inversion H; clear H
+      | [H:nra_data ▷ _ >=> _ |- _ ] => inversion H; clear H
+      | [H:nra_fail ▷ _ >=> _ |- _ ] => inversion H; clear H
       | [H:AMap _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
       | [H:AEither _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
       | [H:AEitherConcat _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
@@ -387,7 +387,7 @@ Section TCAMPtoNRA.
       | [H:ABinop _ _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
       | [H:AUnop _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
       | [H:AConst _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:pat_bind ▷ _ >=> _ |- _ ] => inversion H; clear H
+      | [H:nra_bind ▷ _ >=> _ |- _ ] => inversion H; clear H
       | [H:data_type _ (dcoll _) _ |- _ ] => inversion H; clear H
       | [H:Rec₀ _ _  = Rec₀ _ _ |- _ ] => inversion H; clear H
       | [H:(_,_)  = (_,_) |- _ ] => inversion H; clear H
@@ -424,7 +424,7 @@ Section TCAMPtoNRA.
       | [H:proj1_sig _ = Coll₀ (proj1_sig _) |- _ ] =>
         rewrite <- Coll_proj1 in H; rtype_equalizer
       | [H:(@eq bool ?x ?x) |- _ ] => generalize (UIP_refl_dec bool_dec H); intro; subst H
-      | [H:pat_context_type _ _ = Rec _ _ _ |- _ ] => unfold pat_context_type in H
+      | [H:nra_context_type _ _ = Rec _ _ _ |- _ ] => unfold nra_context_type in H
       | [H:Coll₀ _ = Coll₀ _ |- _ ] => inversion H; clear H
       | [H:proj1_sig _ =
            Rec₀
@@ -434,20 +434,20 @@ Section TCAMPtoNRA.
         => apply Rec₀_eq_proj1_Rec in H; destruct H as [??]
     end; try rtype_equalizer; try subst; simpl in *; try inverter.
   
-  Lemma nra_of_pat_type_form_output_weak p τin τout :
-    nra_of_pat p ▷ τin >=> τout ->
+  Lemma nra_of_camp_type_form_output_weak p τin τout :
+    nra_of_camp p ▷ τin >=> τout ->
     exists τout',τout = Coll τout'.
   Proof.
     revert τin τout.
     induction p; simpl; intros; try inverter; eauto.
   Qed.
 
-  Theorem nra_of_pat_type_form_output p τin τout :
-    nra_of_pat p ▷ τin >=> τout ->
+  Theorem nra_of_camp_type_form_output p τin τout :
+    nra_of_camp p ▷ τin >=> τout ->
     {τout' | τout = Coll τout'}.
   Proof.
     intros H.
-    apply nra_of_pat_type_form_output_weak in H.
+    apply nra_of_camp_type_form_output_weak in H.
     destruct τout.
     destruct x;
       try solve [cut False; [intuition|destruct H; inversion H]].
@@ -455,20 +455,20 @@ Section TCAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma nra_of_pat_top_type_form_output_weak p c τin τout :
-    nra_of_pat_top c p ▷ τin >=> τout ->
+  Lemma nra_of_camp_top_type_form_output_weak p c τin τout :
+    nra_of_camp_top c p ▷ τin >=> τout ->
     exists τout', τout = Coll τout'.
   Proof.
-    unfold nra_of_pat_top; intros; inverter.
+    unfold nra_of_camp_top; intros; inverter.
     eauto.
   Qed.
 
-  Theorem nra_of_pat_top_type_form_output p c τin τout :
-    nra_of_pat_top c p ▷ τin >=> τout ->
+  Theorem nra_of_camp_top_type_form_output p c τin τout :
+    nra_of_camp_top c p ▷ τin >=> τout ->
     {τout' | τout = Coll τout'}.
   Proof.
     intros H.
-    apply nra_of_pat_top_type_form_output_weak in H.
+    apply nra_of_camp_top_type_form_output_weak in H.
     destruct τout.
     destruct x;
       try solve [cut False; [intuition|destruct H; inversion H]].
@@ -489,15 +489,15 @@ Section TCAMPtoNRA.
            end.
 
   (* Leave for later -- JS
-  Lemma nra_of_pat_type_preserve_back Γ pf p τin τout :
-    nra_of_pat p ▷ (pat_context_type (Rec Closed Γ pf) τin) >=> (Coll τout) ->
-    pat_type m Γ p τin τout.
+  Lemma nra_of_camp_type_preserve_back Γ pf p τin τout :
+    nra_of_camp p ▷ (nra_context_type (Rec Closed Γ pf) τin) >=> (Coll τout) ->
+    camp_type m Γ p τin τout.
   Proof.
     Hint Resolve data_type_drec_nil. 
     Ltac inst :=
       repeat match goal with
-                 [H1:forall _ _ _ _ , nra_of_pat ?p ▷ _ >=> _ -> _,
-                    H2:nra_of_pat ?p ▷ ?i >=> _
+                 [H1:forall _ _ _ _ , nra_of_camp ?p ▷ _ >=> _ -> _,
+                    H2:nra_of_camp ?p ▷ ?i >=> _
                     |- _] => apply H1 in H2
              end.
 
@@ -505,46 +505,46 @@ Section TCAMPtoNRA.
     induction p; simpl; intros; try inverter; tdi; try inverter; subst; try inst; eauto.
   Qed.
 
-  Lemma nra_of_pat_top_nra_of_pat p τin τout :
-    nra_of_pat_top p ▷ τin >=> Coll τout ->
-    nra_of_pat p ▷ (pat_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout.
+  Lemma nra_of_camp_top_nra_of_camp p τin τout :
+    nra_of_camp_top p ▷ τin >=> Coll τout ->
+    nra_of_camp p ▷ (nra_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout.
   Proof.
-    unfold nra_of_pat_top.
+    unfold nra_of_camp_top.
     intros; inverter; subst; trivial.
     inversion H1; clear H1.
     subst.
     inversion H3; clear H3; subst.
   Qed.
     
-  Theorem nra_of_pat_top_type_preserve_back p τin τout :
-    nra_of_pat_top p ▷ τin >=> Coll τout ->
+  Theorem nra_of_camp_top_type_preserve_back p τin τout :
+    nra_of_camp_top p ▷ τin >=> Coll τout ->
     nil |= p ; τin ~> τout.
   Proof.
     intros.
-    eapply nra_of_pat_type_preserve_back.
-    eapply nra_of_pat_top_nra_of_pat; eauto.
+    eapply nra_of_camp_type_preserve_back.
+    eapply nra_of_camp_top_nra_of_camp; eauto.
   Qed.
  *)
   (** Theorem 7.4: Pattern<->NRA.
-       Final iff Theorem of type preservation for the translation from Patterns to NRA *)
+       Final iff Theorem of type preservation for the translation from Campterns to NRA *)
   (*
-  Theorem nra_of_pat_type_preserve_iff Γ pf p τin τout :
+  Theorem nra_of_camp_type_preserve_iff Γ pf p τin τout :
     Γ |= p ; τin ~> τout <->
-    nra_of_pat p ▷ (pat_context_type (Rec Γ pf) τin) >=> (Coll τout).
+    nra_of_camp p ▷ (nra_context_type (Rec Γ pf) τin) >=> (Coll τout).
   Proof.
  Hint Resolve 
-         nra_of_pat_type_preserve
-         nra_of_pat_type_preserve_back.
+         nra_of_camp_type_preserve
+         nra_of_camp_type_preserve_back.
     intuition eauto.
   Qed.
     
-  Lemma nra_of_pat_top_type_preserve_iff p τin τout :
+  Lemma nra_of_camp_top_type_preserve_iff p τin τout :
     nil |= p ; τin ~> τout <->
-    nra_of_pat_top p ▷ τin >=> Coll τout.
+    nra_of_camp_top p ▷ τin >=> Coll τout.
   Proof.
     Hint Resolve 
-         nra_of_pat_top_type_preserve
-         nra_of_pat_top_type_preserve_back.
+         nra_of_camp_top_type_preserve
+         nra_of_camp_top_type_preserve_back.
     intuition.
   Qed.
 *)
