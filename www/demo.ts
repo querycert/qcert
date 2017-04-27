@@ -222,19 +222,24 @@ interface PuzzleSides {
     // Executes when defaults button is pushed on the optim config tab
     function defaultConfig() {
         setConfig(qcertOptimDefaults().optims);
-        setConfigStatus("Default configuration was loaded.");
+        setConfigStatus("Default configuration was loaded.", false);
     }
 
     // Executes when clear all button is pushed on the optim config tab
     function clearConfig() {
         const optims = clearOptimsInTopList(qcertOptimDefaults().optims);
         setConfig(optims);
-        setConfigStatus("Configuration starting from scratch");
+        setConfigStatus("Configuration starting from scratch", false);
     }
 
-    function setConfigStatus(text:string) {
+    function setConfigStatus(text:string, usedFileChooser:boolean) {
         const msgarea = document.getElementById('config-message');
         msgarea.innerHTML = text;
+        if (usedFileChooser)
+            return;
+        // Buttons that alter the config without going through the file chooser should clear file chooser state, which is no longer valid
+        const chooser = document.getElementById('load-optims') as HTMLInputElement;
+        chooser.value = "";
     }
 
     function clearOptimsInTopList(array:QcertOptimConfig[]) {
@@ -2692,7 +2697,7 @@ function handleOptimFile(files:FileList) {
             const contents:string = (<any>event.target).result;
             const optims = JSON.parse(contents) as QcertOptimConfig[];
             setConfig(optims);
-            setConfigStatus("Configuration loaded from " + file.name);
+            setConfigStatus("Configuration loaded from " + file.name, true);
         } 
         reader.readAsText(file);
     }
