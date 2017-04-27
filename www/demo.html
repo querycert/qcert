@@ -92,7 +92,7 @@
       <div id="execute-tab-query-input">
 	<div id="execute-tab-query-input-io">
 	  <label>execution input as CSV files (choose delimiter and files)&nbsp;&nbsp;&nbsp;delimiter:</label><textarea id="delimiter" rows="1" cols="1">,</textarea>
-	  <input type="file" multiple="true" id="inputCSVs" accept=".csv" onchange='handleCSVs(this.files)'/><br/>
+	  <form id="csvs-form"><input type="file" multiple="true" id="inputCSVs" accept=".csv" onchange='handleCSVs(this.files)'/></form><br/>
 	  <label>execution input as JSON (enter text or choose file)&nbsp;&nbsp&nbsp;</label><input type="file" id="execute-tab-query-io-file" onchange='handleFile("execute-tab-query-io-text", false, this.files)'/>
 	  <br/>
           <textarea id = "execute-tab-query-io-text"

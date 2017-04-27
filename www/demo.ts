@@ -2683,13 +2683,20 @@ function handleCSVs(files:FileList) {
 }
 
 function completeCSVs(readFiles) {
-    var delimiter = (<HTMLTextAreaElement>document.getElementById("delimiter")).value; 
-    var schema = JSON.parse((<HTMLTextAreaElement>document.getElementById("compile-tab-query-schema-text")).value);
-    var toSend = JSON.stringify({schema: schema, delimiter: delimiter, data: readFiles});
-    var process = function(result) {
+    let schemaText = (<HTMLTextAreaElement>document.getElementById("compile-tab-query-schema-text")).value;
+    if (schemaText.length == 0) {
+        getExecInputArea().value = "[ Error: A schema must be specified (on the compile tab) to parse CSV files ]";
+        let form = <HTMLFormElement>document.getElementById('csvs-form');
+        form.reset();
+        return;
+    }
+    let delimiter = (<HTMLTextAreaElement>document.getElementById("delimiter")).value;
+    let schema = JSON.parse(schemaText);
+    let toSend = JSON.stringify({schema: schema, delimiter: delimiter, data: readFiles});
+    let process = function(result) {
         getExecInputArea().value = result;
     }
-    var result = preProcess(toSend, "csv2JSON", process);
+    preProcess(toSend, "csv2JSON", process);
 }
 
 function handleOptimFile(files:FileList) {
