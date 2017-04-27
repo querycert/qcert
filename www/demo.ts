@@ -227,9 +227,19 @@ interface PuzzleSides {
 
     // Executes when clear all button is pushed on the optim config tab
     function clearConfig() {
-        const optims = clearOptimsInTopList(qcertOptimDefaults().optims);
-        setConfig(optims);
+        setConfig(getClearConfig());
         setConfigStatus("Configuration starting from scratch", false);
+    }
+
+    function getClearConfig() {
+        function clearOptimsInPhaseList(array:QcertOptimPhase[]) {
+            array.forEach((elem) => elem.optims = [ optPlaceholder ])
+        }
+        function clearOptimsInTopList(array:QcertOptimConfig[]) {
+            array.forEach((elem) => clearOptimsInPhaseList(elem.phases));
+            return array;
+        }
+        return clearOptimsInTopList(qcertOptimDefaults().optims);
     }
 
     function setConfigStatus(text:string, usedFileChooser:boolean) {
@@ -240,15 +250,6 @@ interface PuzzleSides {
         // Buttons that alter the config without going through the file chooser should clear file chooser state, which is no longer valid
         const chooser = document.getElementById('load-optims') as HTMLInputElement;
         chooser.value = "";
-    }
-
-    function clearOptimsInTopList(array:QcertOptimConfig[]) {
-        array.forEach((elem) => clearOptimsInPhaseList(elem.phases));
-        return array;
-    }
-
-    function clearOptimsInPhaseList(array:QcertOptimPhase[]) {
-        array.forEach((elem) => elem.optims = [ optPlaceholder ])
     }
 
     function setConfig(optims) {
@@ -2344,10 +2345,12 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		const divTitle = document.createElement('h3');
 		divTitle.style.cssFloat = 'center';
 		const titlenodetext = (num:number) => "Currently selected optimizations (" + num + ")";
-        let initialLength = phase.optims.length;
-        if (initialLength == 1 && phase.optims[0] == optPlaceholder)
-            initialLength = 0;
-		const titlenode = document.createTextNode(titlenodetext(initialLength));
+        let displayedCount = phase.optims.length;
+        if (displayedCount == 0)
+            phase.optims = [ optPlaceholder ];
+        else if (displayedCount == 1 && phase.optims[0] == optPlaceholder)
+            displayedCount = 0;
+		const titlenode = document.createTextNode(titlenodetext(displayedCount));
 		divTitle.appendChild(titlenode);
 		newdiv.appendChild(divTitle);
 		const divIterations = document.createElement('h4');
@@ -2696,12 +2699,34 @@ function handleOptimFile(files:FileList) {
         reader.onload = function(event) {
             const contents:string = (<any>event.target).result;
             const optims = JSON.parse(contents) as QcertOptimConfig[];
+            addEmptyPhases(optims);
             setConfig(optims);
             setConfigStatus("Configuration loaded from " + file.name, true);
         } 
         reader.readAsText(file);
     }
-}    
+}
+
+function addEmptyPhases(optims:QcertOptimConfig[]) {
+    const empty = getClearConfig();
+    for (let i = 0; i < empty.length; i++) {
+        const conf = empty[i];
+        const match = findFirstWithField(optims, 'language', conf.language);
+        if (match) {
+            const emptyPhases = conf.phases;
+            const matchPhases = match.phases;
+            for (let j = 0; j < emptyPhases.length; j++) {
+                const phase = emptyPhases[j];
+                const phaseMatch = findFirstWithField(matchPhases, 'name', phase.name);
+                if (!phaseMatch)
+                    // Add the empty phase
+                    matchPhases.push(phase);
+            }
+        } else
+            // Add the entire empty language with all its phases
+            optims.push(conf);
+    }
+}
 
 function handleFile(output:string, isSchema:boolean, files:FileList) {
     if (files.length > 0) {
