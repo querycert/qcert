@@ -34,9 +34,18 @@ interface PuzzleSides {
     // Error message for compile and execute (non-javascript) tab when the source and target languages are specified but the query src is not
     const noQuerySrc = "[ Query contents have not been specified ]";
 
+    // Placeholder optimization when there are no optimizations chosen in a phase tab
+    const optPlaceholder = "Add optimizations here";
+
 // global variables
     // The web-worker that is actively running a query or null.  The kill button should only be visible when this is non-null.
     var worker:Worker = null;
+
+    // The top-level tab manager (providing access to it from global functions)
+    var tabManager:TabManager;
+
+    // The main canvas (for late (re)-construction of tabs to be replaced in the top-level tab manager
+    var mainCanvas:fabric.ICanvas;
 
 // Functions
     // A placeholder to fetch ancillary information not currently in QcertLanguageDescription
@@ -209,6 +218,39 @@ interface PuzzleSides {
             optims:JSON.stringify(optimconf) /* XXX Add optimizations here XXX */
           };
     }
+
+    // Executes when defaults button is pushed on the optim config tab
+    function defaultConfig() {
+        setConfig(qcertOptimDefaults().optims);
+        setConfigStatus("Default configuration was loaded.");
+    }
+
+    // Executes when clear all button is pushed on the optim config tab
+    function clearConfig() {
+        const optims = clearOptimsInTopList(qcertOptimDefaults().optims);
+        setConfig(optims);
+        setConfigStatus("Configuration starting from scratch");
+    }
+
+    function setConfigStatus(text:string) {
+        const msgarea = document.getElementById('config-message');
+        msgarea.innerHTML = text;
+    }
+
+    function clearOptimsInTopList(array:QcertOptimConfig[]) {
+        array.forEach((elem) => clearOptimsInPhaseList(elem.phases));
+        return array;
+    }
+
+    function clearOptimsInPhaseList(array:QcertOptimPhase[]) {
+        array.forEach((elem) => elem.optims = [ optPlaceholder ])
+    }
+
+    function setConfig(optims) {
+        const newOptimsTab = OptimizationsTabMakeFromConfig(mainCanvas, optims);
+        tabManager.replaceTab(newOptimsTab, 1);
+        mainCanvas.renderAll();         
+    }        
 
     function getSourceLeft(left:number):number {
 		return left*(piecewidth + 30) + 20;
@@ -1425,7 +1467,7 @@ class CompositePuzzlePiece extends GriddablePuzzlePiece implements Displayable, 
 	}
 
 	readonly canvas:fabric.ICanvas;
-	readonly fullGroup:fabric.IGroup;
+	readonly fullGroup:fabric.IObject;
 	readonly parts:fabric.IObject[];
 	readonly sources:BasicPuzzlePiece[];
 
@@ -1582,7 +1624,7 @@ type TabManagerOptions = {label:string,
 					};
 
 class TabManager extends ICanvasTab {
-	static makeTab(canvas:fabric.IStaticCanvas, tab:ICanvasTab, top:number, left:number):fabric.IObject {
+	static makeTab(tab:ICanvasTab, top:number, left:number):fabric.IObject {
        const ropts = fabric.util.object.clone(defaultTabRectOpts);
 	   fabric.util.object.extend(ropts, tab.getRectOptions() || {});
 
@@ -1635,6 +1677,7 @@ class TabManager extends ICanvasTab {
 	static make(canvas:fabric.ICanvas, 
 				options:TabManagerOptions, 
 				tabs:ICanvasTab[], startTab:number=-1):TabManager {
+        console.log("Making tab manager with label " + options.label + " and initial tab " + startTab + " and " + tabs.length + " tabs");
 		const tm = new TabManager(canvas, options, tabs);
 		tm.setInitTab(tabs, startTab);
 		return tm;
@@ -1671,7 +1714,7 @@ class TabManager extends ICanvasTab {
 
        for(let i=0; i < tabs.length; i++) {
 			const itab = tabs[i];
-			const tabgroup = TabManager.makeTab(canvas, itab, tabTop, tabLeft);
+			const tabgroup = TabManager.makeTab(itab, tabTop, tabLeft);
 			tabLeft += tabgroup.getBoundingRect().width;
 			tabgroup.hoverCursor = 'pointer';
 			tabgroup.on('selected', () => {
@@ -1681,6 +1724,27 @@ class TabManager extends ICanvasTab {
 			this.tabObjects.push(tabgroup);
        }
 	}
+    
+    replaceTab(newTab:ICanvasTab, position:number) {
+        const oldGroup = this.tabObjects[position];
+        const rect = oldGroup.getBoundingRect();
+        console.log("Old tab:");
+        console.log(this.currentTab);
+        const newGroup = TabManager.makeTab(newTab, rect.top, rect.left);
+        newGroup.hoverCursor = 'pointer';
+        newGroup.on('selected', () => {
+            this.switchTab(newTab);
+        });
+        this.tabObjects.forEach((obj) => this.canvas.remove(obj));
+        this.tabObjects[position] = newGroup;
+        this.tabObjects.forEach((obj) => this.canvas.add(obj));
+        if (oldGroup === this.currentTab.canvasObj) {
+            this.switchTab(newTab);
+        }
+        console.log("New tab:");
+        console.log(newTab);
+        this.canvas.renderAll();
+    }    
 
 	readonly label:string;
 	readonly rectOpts:fabric.IRectOptions;
@@ -2196,6 +2260,8 @@ function makeAvailableOptimElement(modulebase:string, o:QcertOptimStepDescriptio
 }
 
 function addRemoveButton(elem:HTMLElement) {
+    if (elem.innerText === optPlaceholder)
+        return;
 	const removenode = document.createElement('i');
 	removenode.classList.add('js-remove');
 	removenode.appendChild(document.createTextNode('✖'));
@@ -2219,6 +2285,24 @@ function makePhaseOptimElement(
 	const entry = fulloptim ? makeOptimElement(modulebase, fulloptim) : makeSimpleOptimElement(optim);
 	addRemoveButton(entry);
 	return entry;
+}
+
+function getCountWithUpdate(listnode:HTMLElement) {
+    const count = listnode.childElementCount;
+    if (count == 1 && listnode.children.item(0).innerHTML == optPlaceholder)
+        return 0;
+    if (count == 0) {
+        listnode.appendChild(makeSimpleOptimElement(optPlaceholder));
+        return 0;
+    }
+    if (count > 1)
+        for (let i = 0; i < count; i++) {
+            if (listnode.children.item(i).innerHTML == optPlaceholder) {
+                listnode.removeChild(listnode.children.item(i));
+                return count - 1;
+            }
+    }
+    return count;
 }
 
 class OptimPhaseTab extends ICanvasDynamicTab {
@@ -2255,7 +2339,10 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 		const divTitle = document.createElement('h3');
 		divTitle.style.cssFloat = 'center';
 		const titlenodetext = (num:number) => "Currently selected optimizations (" + num + ")";
-		const titlenode = document.createTextNode(titlenodetext(phase.optims.length));
+        let initialLength = phase.optims.length;
+        if (initialLength == 1 && phase.optims[0] == optPlaceholder)
+            initialLength = 0;
+		const titlenode = document.createTextNode(titlenodetext(initialLength));
 		divTitle.appendChild(titlenode);
 		newdiv.appendChild(divTitle);
 		const divIterations = document.createElement('h4');
@@ -2269,8 +2356,9 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 			listnode.appendChild(makePhaseOptimElement(modulebase, optims, phase.optims[i]));
 		}
 
-		function updateTitleContent() {
-			titlenode.textContent = titlenodetext(listnode.childElementCount);
+		function updateListAndTitleContent() {
+            const elemCount = getCountWithUpdate(listnode);
+			titlenode.textContent = titlenodetext(elemCount);
 		}
 
 		const sort = Sortable.create(listnode, 
@@ -2287,14 +2375,14 @@ class OptimPhaseTab extends ICanvasDynamicTab {
   			onFilter: function (evt) {
     			var el = sort.closest(evt.item); // get dragged item
     			el && el.parentNode.removeChild(el);
-				updateTitleContent();
+				updateListAndTitleContent();
   			},
 			onAdd: function (evt) {
 				const item = evt.item;
 				addRemoveButton(item);
 			},
 			onSort: function(evt) {
-				updateTitleContent();
+				updateListAndTitleContent();
 			},
 			dataIdAttr: 'data-id'
 		}
@@ -2489,12 +2577,14 @@ class OptimizationManager extends ICanvasTab {
 
 	show() {
 		this.tabManager.show();
-		this.parentDiv.appendChild(this.topDiv);		
+		this.parentDiv.appendChild(this.topDiv);
+        document.getElementById('optim-config-buttons').style.display = "block";		
 	}
 
 	hide() {
 		this.tabManager.hide();
 		this.parentDiv.removeChild(this.topDiv);		
+        document.getElementById('optim-config-buttons').style.display = "none";      
 	}
 }
 
@@ -2513,10 +2603,16 @@ function findFirstWithField<T, K extends keyof T>(l:T[], field:K, lang:T[K]):T {
 let globalOptimTabs:OptimizationManager[];
 
 function OptimizationsTabMake(canvas:fabric.ICanvas) {
-	const yoffset = 60;
-	const optims = qcertOptimList().optims;
-	const defaults = qcertOptimDefaults().optims;
+    return OptimizationsTabMakeFromConfig(canvas, qcertOptimDefaults().optims);
+}
 
+function OptimizationsTabMakeFromConfig(canvas:fabric.ICanvas, defaults:QcertOptimConfig[]) {
+	const yoffset = 60;
+    const optims = qcertOptimList().optims;
+
+    console.log("Setting optimization config");
+    console.log(optims);
+    
 	const opts = {rectOptions:{fill:'#548235'}, tabOrigin:{top:yoffset}};	
 	let optimTabs:OptimizationManager[] = [];
 	for(let i=0; i < optims.length; i++) {
@@ -2546,15 +2642,16 @@ const tabinitlist:((canvas:fabric.ICanvas)=>ICanvasTab)[] = [
 ];
 
 function init():void {
-	const maincanvas = new fabric.Canvas('main-canvas');
+	mainCanvas = new fabric.Canvas('main-canvas');
 	const tabscanvas = new fabric.Canvas('tabs-canvas');
 
 	const tabs = tabinitlist.map(function (elem) {
-		return elem(maincanvas)
+		return elem(mainCanvas)
 	});
 	const tm = TabManager.make(tabscanvas, {label:"Q*cert"}, tabs, 0);
 	tm.show();
 	tabscanvas.renderAll();
+    tabManager = tm;
 }
 
 function handleCSVs(files:FileList) {
@@ -2586,6 +2683,20 @@ function completeCSVs(readFiles) {
     }
     var result = preProcess(toSend, "csv2JSON", process);
 }
+
+function handleOptimFile(files:FileList) {
+    if (files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const contents:string = (<any>event.target).result;
+            const optims = JSON.parse(contents) as QcertOptimConfig[];
+            setConfig(optims);
+            setConfigStatus("Configuration loaded from " + file.name);
+        } 
+        reader.readAsText(file);
+    }
+}    
 
 function handleFile(output:string, isSchema:boolean, files:FileList) {
     if (files.length > 0) {

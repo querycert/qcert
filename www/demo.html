@@ -20,8 +20,18 @@
   <a href="http://querycert.github.io/index.html">
     <img class="img-responsive pull-right" src="qcert-logo.png" hspace="20" width="130"/></a>
   <canvas id="tabs-canvas" width="1000" height="50"></canvas>
-  <button id="kill-button" type="button" class="btn btn-primary" style="display:none"
+  <button id="kill-button" type="button" class="btn btn-primary" style="display:none; margin-left:10px"
           onclick="killButton()"><b>kill execution</b></button>
+  <div id="optim-config-buttons" style="display:none; margin-left:10px">
+    <button id="clear-button" type="button" class="btn btn-primary"
+          onclick="clearConfig()"><b>clear all</b></button>
+    <button id="defaults-button" type="button" class="btn btn-primary"
+          onclick="defaultConfig()"><b>defaults</b></button>
+    <label class="btn btn-primary" for="load-optims">load config</label>
+    <input type="file" id="load-optims" accept=".json" 
+          onchange='handleOptimFile(this.files)' style="display:none"/>
+    <label id="config-message">Default configuration was loaded.</label>          
+  </div>
   <div id="container" style="position:relative">
     <canvas id="main-canvas" width="1000" height="700"></canvas>
     <div id="compile-tab" style="display:none; position:absolute; left:10px; top:10px">
