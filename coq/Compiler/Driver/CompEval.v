@@ -22,21 +22,25 @@ Section CompEval.
   Require Import BasicSystem.
   Require Import TypingRuntime.
 
-  (* ASTs *)
+  (** Query languages *)
+  Require Import SQLRuntime.
   Require Import OQLRuntime.
-  Require Import LambdaNRA.
-  Require Import SQL.
-  Require Import RuleRuntime.
-  Require Import CAMPRuntime.
+  Require Import LambdaNRARuntime.
+  (** Rule languages *)
+  Require Import CAMPRuleRuntime.
+  Require Import TechRuleRuntime.
+  Require Import DesignRuleRuntime.
+  (** Intermediate languages *)
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
-  Require Import CldMR. (* XXX contains cld_load_init_env! XXX *)
-  Require Import DNNRC Dataset.
+  Require Import CldMRRuntime. (* XXX contains cld_load_init_env! XXX *)
+  Require Import DNNRCRuntime.
+  Require Import CAMPRuntime.
 
   (* Translations *)
-  Require Import SQLtoNRAEnv.
+  Require Import SQLtoNRAEnv.       (* Used for SQL evaluation *)
   Require Import LambdaNRAtoNRAEnv. (* Used for lambda_nra evaluation *)
   Require Import NNRCtoNNRCMR.      (* XXX contains load_init_env! XXX *)
 
@@ -71,15 +75,15 @@ Section CompEval.
     
     (* Language: camp_rule *)
     (* Note: eval for camp_rule relies on translation to camp *)
-    Definition eval_camp_rule (q:rule) (cenv: list (string*data)) : option data :=
-      match interp h (rec_sort cenv) (rule_to_camp q) nil dunit with
+    Definition eval_camp_rule (q:camp_rule) (cenv: list (string*data)) : option data :=
+      match interp h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
       | Success l => Some (dcoll (l::nil))
       | RecoverableError => Some (dcoll nil)
       | TerminalError => None
       end.
 
     Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: list (string*data)) : string
-      := let pp := rule_to_camp q in
+      := let pp := camp_rule_to_camp q in
          print_presult_debug pp
                              (interp_debug h
                                            (rec_sort cenv)

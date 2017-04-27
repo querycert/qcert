@@ -351,7 +351,7 @@ Section TCAMP.
 
 End TCAMP.
 
-Notation "[ c & g ] |= p ; a ~> b" := (camp_type c g p a b) (at level 90) : rule_scope.
+Notation "[ c & g ] |= p ; a ~> b" := (camp_type c g p a b) (at level 90) : camp_scope.
 
 (* 
 *** Local Variables: ***

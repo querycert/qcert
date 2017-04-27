@@ -195,47 +195,47 @@ Section CAMPSugar.
 
 End CAMPSugar.
   
-Delimit Scope rule_scope with rule.
+Delimit Scope camp_scope with camp.
 
-Notation "p1 |p-eq| p2" := (pbinop AEq p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-union| p2" := (pbinop AUnion p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-concat| p2" := (pbinop AConcat p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-mergeconcat| p2" := (pbinop AMergeConcat p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-and| p2" := (pbinop AAnd p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-or| p2" := (pbinop AOr p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-lt| p2" := (pbinop ALt p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-le| p2" := (pbinop ALe p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-minus| p2" := (pbinop AMinus p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-min| p2" := (pbinop AMin p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-max| p2" := (pbinop AMax p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-contains| p2" := (pbinop AContains p1 p2) (right associativity, at level 70): rule_scope.
-Notation "p1 |p-sconcat| p2" := (pbinop ASConcat p1 p2) (right associativity, at level 70): rule_scope.
-Notation "a '+s+' b" := (stringConcat a b) (right associativity, at level 60) : rule_scope.
+Notation "p1 |p-eq| p2" := (pbinop AEq p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-union| p2" := (pbinop AUnion p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-concat| p2" := (pbinop AConcat p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-mergeconcat| p2" := (pbinop AMergeConcat p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-and| p2" := (pbinop AAnd p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-or| p2" := (pbinop AOr p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-lt| p2" := (pbinop ALt p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-le| p2" := (pbinop ALe p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-minus| p2" := (pbinop AMinus p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-min| p2" := (pbinop AMin p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-max| p2" := (pbinop AMax p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-contains| p2" := (pbinop AContains p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-sconcat| p2" := (pbinop ASConcat p1 p2) (right associativity, at level 70): camp_scope.
+Notation "a '+s+' b" := (stringConcat a b) (right associativity, at level 60) : camp_scope.
 
-Notation "|p-min-num|( p )" := (punop ANumMin p) (right associativity, at level 70): rule_scope.
-Notation "|p-max-num|( p )" := (punop ANumMin p) (right associativity, at level 70): rule_scope.
+Notation "|p-min-num|( p )" := (punop ANumMin p) (right associativity, at level 70): camp_scope.
+Notation "|p-max-num|( p )" := (punop ANumMin p) (right associativity, at level 70): camp_scope.
 
-Notation "p1 ≐ p2" := (passert (pbinop AEq p1 p2)) (right associativity, at level 70, only parsing): rule_scope.     (* ≐ = \doteq *)
-Notation "p1 ∧ p2" := (pand p1 p2) (right associativity, at level 65): rule_scope. (* ∧ = \wedge *)
+Notation "p1 ≐ p2" := (passert (pbinop AEq p1 p2)) (right associativity, at level 70, only parsing): camp_scope.     (* ≐ = \doteq *)
+Notation "p1 ∧ p2" := (pand p1 p2) (right associativity, at level 65): camp_scope. (* ∧ = \wedge *)
 Notation "…" := pit.
-Notation "s ↓ p" := (pdot s p) (right associativity, at level 30): rule_scope. (* ↓ = \downarrow *)
+Notation "s ↓ p" := (pdot s p) (right associativity, at level 30): camp_scope. (* ↓ = \downarrow *)
 (* Java equivalent: CampBindingsMacro *)
-Notation "'BINDINGS'" := (pWithBindings pit) : rule_scope.
+Notation "'BINDINGS'" := (pWithBindings pit) : camp_scope.
 (* Java equivalent: CampReturnMacro *)
-Notation "a 'RETURN' b" := (pletEnv a b) (right associativity, at level 30, only parsing) : rule_scope.
+Notation "a 'RETURN' b" := (pletEnv a b) (right associativity, at level 30, only parsing) : camp_scope.
 
-Notation "! x" := (punbrand' x) (at level 0) : rule_scope.
-Notation "t 'COLON' p" := (varOf t p) (at level 70) : rule_scope.
+Notation "! x" := (punbrand' x) (at level 0) : camp_scope.
+Notation "t 'COLON' p" := (varOf t p) (at level 70) : camp_scope.
 (* Java equivalent: CampIsMacro *)
-Notation "var 'IS' p" := (pIS var p) (at level 71, only parsing) : rule_scope.
+Notation "var 'IS' p" := (pIS var p) (at level 71, only parsing) : camp_scope.
 
 (* non-unicode alternative notations *)
 Notation "‵ c" := (pconst (dconst c)) (at level 0). (* ‵ = \backprime *)
-Notation "#` c" := (pconst (dconst c)) (only parsing, at level 0) : rule_scope.
-Notation "s #-> p" := (pdot s p) (only parsing, right associativity, at level 30): rule_scope.
-Notation "s !#-> p" := (pbdot s p) (only parsing, right associativity, at level 30): rule_scope.
-Notation "#_" := pit (only parsing): rule_scope.
-Notation "p1 #= p2" := (passert (pbinop AEq p1 p2)) (only parsing, right associativity, at level 70): rule_scope.
+Notation "#` c" := (pconst (dconst c)) (only parsing, at level 0) : camp_scope.
+Notation "s #-> p" := (pdot s p) (only parsing, right associativity, at level 30): camp_scope.
+Notation "s !#-> p" := (pbdot s p) (only parsing, right associativity, at level 30): camp_scope.
+Notation "#_" := pit (only parsing): camp_scope.
+Notation "p1 #= p2" := (passert (pbinop AEq p1 p2)) (only parsing, right associativity, at level 70): camp_scope.
 
 (* 
 *** Local Variables: ***

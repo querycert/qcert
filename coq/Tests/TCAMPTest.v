@@ -61,7 +61,7 @@ Section TCAMPTest.
   Instance CPModel : brand_model
     := mkBrand_model CPRModel_relation CPTContext (eq_refl _) (eq_refl _).
 
-  Require Import CAMPSystem RuleSystem.
+  Require Import CAMPSystem CAMPRuleSystem.
   
   (* Typing for R1 *)
 
@@ -72,12 +72,12 @@ Section TCAMPTest.
     end.
 
   Lemma R1typed :
-    rule_type (Brand (singleton "Entity")) (Coll String) R1.
+    camp_rule_type (Brand (singleton "Entity")) (Coll String) R1.
   Proof.
     Hint Resolve PTCast.
     
     unfold R1.
-    unfold rule_type; simpl.
+    unfold camp_rule_type; simpl.
     econstructor; eauto.
     econstructor.
     repeat econstructor; eauto.

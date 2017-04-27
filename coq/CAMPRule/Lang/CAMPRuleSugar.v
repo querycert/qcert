@@ -15,16 +15,16 @@
  *)
 
 (* This file defines derived patterns, notations, and concepts *)
-Section RuleSugar.
+Section CAMPRuleSugar.
 
   (* begin hide *)
   Require Import String.
   Require Import List.
 
   Require Import BasicRuntime.
-  Require Export CAMPSugar Rule.
+  Require Export CAMPSugar CAMPRule.
   
-  Local Open Scope rule.
+  Local Open Scope camp_scope.
   Local Open Scope string.
   (* end hide *)
 
@@ -37,14 +37,14 @@ Section RuleSugar.
        end.
   
   (* Java equivalent: CampAggregateMacro *)
-  Definition aggregate (rules:rule->rule) (op:unaryOp) (secondMap:camp) (nflat:nat): camp
+  Definition aggregate (rules:camp_rule->camp_rule) (op:unaryOp) (secondMap:camp) (nflat:nat): camp
     :=  pletIt
-          (rule_to_camp (rules (rule_return penv)))
+          (camp_rule_to_camp (rules (rule_return penv)))
           (punop op (flattenn nflat (pmap (pletEnv pit secondMap)))).
 
-  Definition aggregate_group_by (rules:rule->rule) (opg:camp) (op:unaryOp) (secondMap:camp) : camp
+  Definition aggregate_group_by (rules:camp_rule->camp_rule) (opg:camp) (op:unaryOp) (secondMap:camp) : camp
     :=  pletIt
-          (rule_to_camp (rules (rule_return penv)))
+          (camp_rule_to_camp (rules (rule_return penv)))
           (punop op (pmap (pletEnv pit secondMap))).
 
   (* Java equivalent: CampFetchRefMacro *)
@@ -61,25 +61,25 @@ Section RuleSugar.
   Definition instanceOf n t p := namedObject n t (p RETURN BINDINGS).
   (* Java equivalent: CampMatchesMacro *)
   Definition matches t p := typedObject t (p RETURN BINDINGS).
-End RuleSugar.
+End CAMPRuleSugar.
 
-Delimit Scope rule_scope with rule.
+Delimit Scope camp_scope with camp_rule.
 
 (* Java equivalent: CampInstanceOfMacro *)
-Notation "n 'INSTANCEOF' t 'WHERE' p" := ((instanceOf n t p)%rule) (at level 70) : rule_scope.
-Notation "p 'TEMPVAR' t 'FETCH' e 'KEY' a 'DO' pcont" := ((fetchRef e a t p pcont)%rule) (at level 70) : rule_scope.
+Notation "n 'INSTANCEOF' t 'WHERE' p" := ((instanceOf n t p)%camp_rule) (at level 70) : camp_scope.
+Notation "p 'TEMPVAR' t 'FETCH' e 'KEY' a 'DO' pcont" := ((fetchRef e a t p pcont)%camp_rule) (at level 70) : camp_scope.
 (* Java equivalent: CampMatchesMacro *)
-Notation "'MATCHES' t 'WHERE' p" := ((matches t p)%rule) (at level 70) : rule_scope.
-Notation "'VARIABLES' sl" := (returnVariables sl) (at level 70) : rule_scope.
+Notation "'MATCHES' t 'WHERE' p" := ((matches t p)%camp_rule) (at level 70) : camp_scope.
+Notation "'VARIABLES' sl" := (returnVariables sl) (at level 70) : camp_scope.
 
-Notation " 'AGGREGATE' m1 'DO' op 'OVER' m2 'FLATTEN' f" := (aggregate m1 op m2 f) (at level 70) : rule_scope.
-Notation " 'AGGREGATEG' m1 'GROUPBY' opg 'DO' op 'OVER' m2" := (aggregate_group_by m1 opg op m2) (at level 70) : rule_scope.
-Notation "p1 'ANDMAPSNONES' p2" :=  ((p1 ∧ notholds p2 RETURN BINDINGS)%rule) (left associativity, at level 83) : rule_scope.
+Notation " 'AGGREGATE' m1 'DO' op 'OVER' m2 'FLATTEN' f" := (aggregate m1 op m2 f) (at level 70) : camp_scope.
+Notation " 'AGGREGATEG' m1 'GROUPBY' opg 'DO' op 'OVER' m2" := (aggregate_group_by m1 opg op m2) (at level 70) : camp_scope.
+Notation "p1 'ANDMAPSNONES' p2" :=  ((p1 ∧ notholds p2 RETURN BINDINGS)%camp_rule) (left associativity, at level 83) : camp_scope.
 
-Notation "a ;; b" := (a b) (at level 99, right associativity, only parsing) : rule_scope.
+Notation "a ;; b" := (a b) (at level 99, right associativity, only parsing) : camp_scope.
 
 (* Can be use inside an aggregate (function composition instead of application *)
-Notation "a ;;; b" := (fun x => a (b x)) (at level 99, right associativity, only parsing) : rule_scope.  
+Notation "a ;;; b" := (fun x => a (b x)) (at level 99, right associativity, only parsing) : camp_scope.  
 
 (* 
 *** Local Variables: ***

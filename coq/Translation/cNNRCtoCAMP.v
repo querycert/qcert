@@ -22,7 +22,7 @@ Require Import EquivDec Decidable Morphisms.
 Require Import Omega.
 
 Require Import Utils BasicRuntime.
-Require Import Rule.
+Require Import CAMPRuntime.
 Require Import NNRCRuntime.
 
 (* end hide *)
@@ -1022,7 +1022,7 @@ Hint Rewrite
     (* calculate the map and store it in a "temporary variable" *)
       ((pletEnv (punop (ARec freshVar) (pmap p))
     (pletEnv (punop ACount pit ≐ punop ACount (lookup freshVar))
-    (lookup freshVar))))%rule.
+    (lookup freshVar))))%camp.
 
   Fixpoint nnrcToCamp_ns_let (n:cNNRC.nnrc) : camp
     := match n with

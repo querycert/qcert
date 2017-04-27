@@ -15,7 +15,7 @@
  *)
 
 Require Export BasicTypes.
-Require Export TRule.
+Require Export TCAMPRule.
 
 (* 
 *** Local Variables: ***

@@ -36,7 +36,7 @@ Section TCAMPtoNRA.
 
   Definition nra_wrap_a1_type tconst tbind tpid : rtype := 
     Rec Closed (("PBIND",tbind) :: ("PCONST",tconst) :: ("a1",tpid) :: nil) (eq_refl _).
-  Local Open Scope rule_scope.
+  Local Open Scope camp_scope.
 
   Lemma ATnra_match {n τin τout} :
     n ▷ τin >=> τout ->

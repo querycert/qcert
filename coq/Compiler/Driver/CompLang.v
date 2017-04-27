@@ -195,25 +195,26 @@ Section CompLang.
   Section Query.
     Require Import BasicSystem.
 
+    (** Query languages *)
+    Require Import SQLRuntime.
+    Require Import OQLRuntime.
+    Require Import LambdaNRARuntime.
+    (** Rule languages *)
+    Require Import CAMPRuleRuntime.
+    Require Import TechRuleRuntime.
+    Require Import DesignRuleRuntime.
+    (** Intermediate languages *)
     Require Import NRARuntime.
     Require Import NRAEnvRuntime.
     Require Import NNRCRuntime.
     Require Import NNRCMRRuntime.
-    Require Import CldMR.
-    Require Import DNNRC Dataset.
+    Require Import CldMRRuntime.
+    Require Import DNNRCRuntime.
     Require Import CAMPRuntime.
-    Require Import RuleRuntime.
-    Require Import TechRuleRuntime.
-    Require Import DesignRuleRuntime.
-    Require Import OQLRuntime.
 
     Require Import NNRCMRtoDNNRC.
     Require Import TDNNRCInfer.
-    Require Import LambdaNRA.
-    Require Import SQL.
   
-    Require Rule.
-
     Definition vdbindings := vdbindings.
 
     (* Languages *)
@@ -223,7 +224,7 @@ Section CompLang.
     Context {fr:foreign_runtime}.
     Context {fredop:foreign_reduce_op}.
 
-    Definition camp_rule := rule.
+    Definition camp_rule := camp_rule.
     Definition tech_rule := tech_rule.
     Definition designer_rule := designer_rule.
     Definition camp := camp.

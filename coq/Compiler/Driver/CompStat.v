@@ -25,11 +25,11 @@ Section CompStat.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
-  Require Import CldMR.
-  Require Import DNNRC Dataset.
+  Require Import CldMRRuntime.
+  Require Import DNNRCRuntime.
   Require Import CAMPRuntime.
   Require Import OQLRuntime.
-  Require Import SQLSize.
+  Require Import SQLRuntime.
 
   Require Import CompilerRuntime.
   Require Import BasicSystem.

@@ -15,7 +15,7 @@
  *)
 
 (* This file defines derived patterns, notations, and concepts *)
-Section TRule.
+Section TCAMPRule.
 
   (* begin hide *)
   Require Import String.
@@ -23,10 +23,10 @@ Section TRule.
   Require Import EquivDec.
 
   Require Import BasicSystem.
-  Require Export Rule.
+  Require Export CAMPRule.
   Require Import TCAMP.
 
-  Local Open Scope rule.
+  Local Open Scope camp_scope.
   Local Open Scope string.
   (* end hide *)
 
@@ -37,29 +37,29 @@ Section TRule.
   Definition mkTWorld (τworld:rtype) : tbindings
     := ("WORLD",Coll τworld)::nil.
   
-  Definition rule_type (τworld τout:rtype) (r:rule) : Prop :=
-    camp_type (mkTWorld τworld) nil (rule_to_camp r) Unit τout.
+  Definition camp_rule_type (τworld τout:rtype) (r:camp_rule) : Prop :=
+    camp_type (mkTWorld τworld) nil (camp_rule_to_camp r) Unit τout.
 
-  Lemma typed_rule_correct {τworld τout} (r:rule):
-    rule_type τworld τout r ->
+  Lemma typed_rule_correct {τworld τout} (r:camp_rule):
+    camp_rule_type τworld τout r ->
     forall (world:list data),
       bindings_type (mkWorld world) (mkTWorld τworld) ->
-      (exists d, eval_rule brand_relation_brands  r world = Some (d::nil) /\ (data_type d τout))
-      \/ (eval_rule brand_relation_brands r world = Some nil).
+      (exists d, eval_camp_rule brand_relation_brands  r world = Some (d::nil) /\ (data_type d τout))
+      \/ (eval_camp_rule brand_relation_brands r world = Some nil).
   Proof.
     intros.
-    unfold eval_rule.
-    unfold rule_type in H.
+    unfold eval_camp_rule.
+    unfold camp_rule_type in H.
     generalize (@typed_camp_success_or_recoverable
                   m (mkWorld world)
                   (mkTWorld τworld) nil
                   Unit
                   τout
-                  (rule_to_camp r)
+                  (camp_rule_to_camp r)
                   nil
                   dunit); intros.
     cut_to H1.
-    - unfold eval_rule_res.
+    - unfold eval_camp_rule_res.
       destruct H1.
       + destruct H1 as [x [eqq1 ?]].
         rewrite eqq1.
@@ -71,7 +71,7 @@ Section TRule.
     - econstructor.
   Qed.
 
-End TRule.
+End TCAMPRule.
 
 (* 
 *** Local Variables: ***

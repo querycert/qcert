@@ -25,7 +25,7 @@ Section TCAMPtocNRAEnv.
 
   Local Open Scope string_scope.
   Local Open Scope list_scope.
-  Local Open Scope rule_scope.
+  Local Open Scope camp_scope.
 
   Hint Constructors cnraenv_type unaryOp_type binOp_type.
 

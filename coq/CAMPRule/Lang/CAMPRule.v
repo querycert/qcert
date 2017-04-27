@@ -15,7 +15,7 @@
  *)
 
 (* This file defines derived patterns, notations, and concepts *)
-Section Rule.
+Section CAMPRule.
 
   (* begin hide *)
   Require Import String.
@@ -25,26 +25,26 @@ Section Rule.
   Require Import Utils BasicRuntime.
   Require Export CAMPSugar.
   
-  Local Open Scope rule.
+  Local Open Scope camp_scope.
   Local Open Scope string.
   (* end hide *)
 
   Context {fruntime:foreign_runtime}.
 
   (** rules and their semantics *)
-  Inductive rule :=
+  Inductive camp_rule :=
   (** a normal rule, matched against each working memory element in turn *)
-  | rule_when : camp -> rule -> rule
+  | rule_when : camp -> camp_rule -> camp_rule
   (** a rule that should run against the entire working memory (as a collection of elements) *)
-  | rule_global : camp -> rule -> rule
+  | rule_global : camp -> camp_rule -> camp_rule
   (** A rule that must not match any working memory element *)
-  | rule_not : camp -> rule -> rule
+  | rule_not : camp -> camp_rule -> camp_rule
   (** This is the last part of a rule, and it allow the 
         rule to return a value for each successful match-set. pit can be used as the identity *)
-  | rule_return : camp -> rule.  
+  | rule_return : camp -> camp_rule.  
 
   (* Java equivalent: CampRule.convertToPattern *)
-  Fixpoint rule_to_camp (rule:rule) : camp
+  Fixpoint camp_rule_to_camp (rule:camp_rule) : camp
     := match rule with
          | rule_when p ps =>
            punop AFlatten
@@ -52,50 +52,50 @@ Section Rule.
                     (pmap
                        (pletEnv
                           p
-                          (rule_to_camp ps))))
+                          (camp_rule_to_camp ps))))
          | rule_global p ps =>
            punop AFlatten
                  (makeSingleton
                     (pletEnv
                        (WW p)
-                       (rule_to_camp ps)))
+                       (camp_rule_to_camp ps)))
          | rule_not p ps =>
            punop AFlatten
                  (makeSingleton
                     (pletEnv
                        (notholds p RETURN BINDINGS)
-                       (rule_to_camp ps)))
+                       (camp_rule_to_camp ps)))
          | rule_return p =>
            makeSingleton p
        end.
 
-  Definition eval_rule_debug (h:list(string*string)) (print_env:bool) (r:rule) (world:list data)
+  Definition eval_camp_rule_debug (h:list(string*string)) (print_env:bool) (r:camp_rule) (world:list data)
     : presult_debug data
-    := interp_debug h (mkWorld world) print_env nil (rule_to_camp r) nil dunit.
+    := interp_debug h (mkWorld world) print_env nil (camp_rule_to_camp r) nil dunit.
 
-  Definition eval_rule_res_to_string
-             (h:list(string*string)) (print_env:bool) (r:rule) (world:list data)
+  Definition eval_camp_rule_res_to_string
+             (h:list(string*string)) (print_env:bool) (r:camp_rule) (world:list data)
     : string
-    := let pp := (rule_to_camp r) in
+    := let pp := (camp_rule_to_camp r) in
        print_presult_debug pp
                            (interp_debug h
                                          (mkWorld world)
                                          print_env nil pp nil dunit).
 
   (** Semantics of CAMP rules, returning a presult *)
-  Definition eval_rule_res (h:list(string*string)) (r:rule) (world:list data)
+  Definition eval_camp_rule_res (h:list(string*string)) (r:camp_rule) (world:list data)
     : presult data
-    := interp h (mkWorld world) (rule_to_camp r) nil dunit.
+    := interp h (mkWorld world) (camp_rule_to_camp r) nil dunit.
 
-  Definition eval_rule (h:list(string*string)) (r:rule) (world:list data)
+  Definition eval_camp_rule (h:list(string*string)) (r:camp_rule) (world:list data)
     : option (list data)
-    := match eval_rule_res h r world with
+    := match eval_camp_rule_res h r world with
        | Success l => Some (l::nil)
        | RecoverableError => Some nil
        | TerminalError => None
        end.
 
-End Rule.
+End CAMPRule.
 
 (* 
 *** Local Variables: ***

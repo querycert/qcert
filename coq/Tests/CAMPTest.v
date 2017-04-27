@@ -28,8 +28,8 @@ Import ListNotations.
 (* This module encodes the examples in sample-rules.txt *)
 Section CAMPTest.
 
-  Require Import BasicSystem CAMPRuntime RuleRuntime.
-  Local Open Scope rule_scope.
+  Require Import BasicSystem CAMPRuntime CAMPRuleRuntime.
+  Local Open Scope camp_scope.
   Require Import TrivialModel.
   
   (* This was copy/pastes from sample-rules (with [] added in at the top level *)
@@ -69,7 +69,7 @@ Section CAMPTest.
         rule_when ("c" INSTANCEOF (singleton "Customer") WHERE ("age" !#-> #_ ≐ ‵32))
      ;; rule_return (‵"Customer =" +s+ withVar "c" ("name" !#-> #_)).
 
-  Example R1_result := eval_rule CPRModel R1 exampleWM.
+  Example R1_result := eval_camp_rule CPRModel R1 exampleWM.
 
   Example R1_expected :=
     map dconst
@@ -108,7 +108,7 @@ Section CAMPTest.
                  +s+ withVar "c1" (toString ("age" !#-> …))
        ).
 
-  Example R2_result := eval_rule CPRModel R2 exampleWM.
+  Example R2_result := eval_camp_rule CPRModel R2 exampleWM.
   Example R2_expected := map dconst 
     ["Customer: James Do and: James Do have the same age: 35";
      "Customer: Jim Does and: Joan Doe have the same age: 34";
@@ -150,7 +150,7 @@ Section CAMPTest.
                  +s+ ‵" made purchase:"
                  +s+ withBrandedVar "p" ("name"↓…)).
 
-  Example R3_result := eval_rule CPRModel R3 exampleWM.
+  Example R3_result := eval_camp_rule CPRModel R3 exampleWM.
 
   Example R3_expected := map dconst
     ["Customer: James Do made purchase:Croissant";
@@ -185,7 +185,7 @@ Section CAMPTest.
     ;; rule_return (‵"Customer: " +s+ withBrandedVar "c" ("name"↓…)
                  +s+ ‵" didn't make a purchase").
       
-  Example R4_result := eval_rule CPRModel R4 exampleWM.
+  Example R4_result := eval_camp_rule CPRModel R4 exampleWM.
 
   Example R4_expected := map dconst
     ["Customer: Joan Doe didn't make a purchase";
@@ -221,7 +221,7 @@ Section CAMPTest.
       ;; rule_return (‵"Customers with age 32: "
                  +s+ toString (lookup "cs")).
 
-  Example R5_result := eval_rule CPRModel R5 exampleWM.
+  Example R5_result := eval_camp_rule CPRModel R5 exampleWM.
   Example R5_expected := map dconst
                              ["Customers with age 32: 3"].
 
@@ -260,7 +260,7 @@ Section CAMPTest.
                  (toString (lookup "ps"))).
 
 
-  Example R6_result := eval_rule CPRModel R6 exampleWM.
+  Example R6_result := eval_camp_rule CPRModel R6 exampleWM.
 
   Example R6_expected := map dconst
     ["Nb of John Doe's purchases: 2"].
@@ -283,7 +283,7 @@ Section CAMPTest.
                  +s+ toString (lookup "cs")
                  +s+ ‵" other Customers").
 
-  Example R7_result := eval_rule CPRModel R7 exampleWM.
+  Example R7_result := eval_camp_rule CPRModel R7 exampleWM.
 
   Example R7_expected := map dconst
     ["Customer: James Do has the same age (35) as 1 other Customers";
@@ -312,7 +312,7 @@ Section CAMPTest.
                  +s+ toString (lookup "cs")
                  +s+ ‵" other Customers").
 
-  Example R8_result := eval_rule CPRModel R8 exampleWM.
+  Example R8_result := eval_camp_rule CPRModel R8 exampleWM.
 
   Example R8_expected := map dconst
     ["Customer: Jim Does has the same age (34) as 2 other Customers";
@@ -354,7 +354,7 @@ Section CAMPTest.
                  +s+ ‵" purchased: "
                  +s+ toString (lookup "pu")).
 
-  Example R9_result := eval_rule CPRModel R9 exampleWM.
+  Example R9_result := eval_camp_rule CPRModel R9 exampleWM.
 
   Example R9_expected := map dconst
     ["Customer : James Do purchased: [Croissant, Dough]";
@@ -404,7 +404,7 @@ all customers. *)
       ;; rule_return (‵"Total purchases are : " 
                  +s+ toString (lookup "total")).
 
-  Example R10_result := eval_rule CPRModel R10 exampleWM.
+  Example R10_result := eval_camp_rule CPRModel R10 exampleWM.
 
   Example R10_expected := map dconst
     [ "Total purchases are : 6"].
@@ -454,7 +454,7 @@ all customers. *)
                 .
 
 
-  Example R11_result := eval_rule CPRModel R11 exampleWM.
+  Example R11_result := eval_camp_rule CPRModel R11 exampleWM.
 (*  Eval vm_compute in R11_result. *)
 
   Example R11_expected := map dconst

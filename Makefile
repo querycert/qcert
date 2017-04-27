@@ -190,12 +190,12 @@ MODULES = \
 	CAMP/CAMPRuntime \
 	CAMP/CAMPTypes \
 	CAMP/CAMPSystem \
-	Rule/Lang/Rule \
-	Rule/Lang/RuleSugar \
-	Rule/Typing/TRule \
-	Rule/RuleRuntime \
-	Rule/RuleTypes \
-	Rule/RuleSystem \
+	CAMPRule/Lang/CAMPRule \
+	CAMPRule/Lang/CAMPRuleSugar \
+	CAMPRule/Typing/TCAMPRule \
+	CAMPRule/CAMPRuleRuntime \
+	CAMPRule/CAMPRuleTypes \
+	CAMPRule/CAMPRuleSystem \
 	TechRule/Lang/TechRule \
 	TechRule/TechRuleRuntime \
 	DesignRule/Lang/DesignRule \

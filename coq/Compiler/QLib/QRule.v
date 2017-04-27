@@ -17,7 +17,7 @@
 Require Import CompilerRuntime.
 Require String.
 Require QOperators QData QCAMP.
-Require RuleRuntime.
+Require CAMPRuleRuntime.
 
 Module QRule(runtime:CompilerRuntime).
 
@@ -26,30 +26,30 @@ Module QRule(runtime:CompilerRuntime).
   Module CAMP := QCAMP.QCAMP runtime.
 
   Definition rule : Set 
-    := Rule.rule.
+    := CAMPRule.camp_rule.
   Definition t : Set 
     := rule.
   
   Definition rule_when : CAMP.expr -> rule -> rule 
-    := Rule.rule_when.
+    := CAMPRule.rule_when.
   Definition rule_global : CAMP.expr -> rule -> rule 
-    := Rule.rule_global.
+    := CAMPRule.rule_global.
   Definition rule_not : CAMP.expr -> rule -> rule 
-    := Rule.rule_not.
+    := CAMPRule.rule_not.
   Definition rule_return : CAMP.expr -> rule 
-    := Rule.rule_return.
+    := CAMPRule.rule_return.
 
   Definition aggregate : (rule -> rule) -> Ops.Unary.op -> CAMP.expr -> nat -> CAMP.expr
-    := RuleSugar.aggregate.
+    := CAMPRuleSugar.aggregate.
 
   Definition instanceOf : String.string -> BrandRelation.brands -> CAMP.expr -> CAMP.expr
-    := RuleSugar.instanceOf.
+    := CAMPRuleSugar.instanceOf.
 
   Definition matches : BrandRelation.brands -> CAMP.expr -> CAMP.expr
-    := RuleSugar.matches.
+    := CAMPRuleSugar.matches.
 
   Definition fetchRef : BrandRelation.brands -> String.string -> String.string -> CAMP.expr -> CAMP.expr -> CAMP.expr
-    := RuleSugar.fetchRef.
+    := CAMPRuleSugar.fetchRef.
 
 End QRule.
 (* 

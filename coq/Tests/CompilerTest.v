@@ -21,7 +21,7 @@ Local Open Scope string.
 Require Import List.
 Import ListNotations.
 
-Require Import BasicSystem CAMPRuntime RuleRuntime.
+Require Import BasicSystem CAMPRuntime CAMPRuleRuntime.
 Require Import TrivialModel.
 
 Require CompilerRuntime.
@@ -36,7 +36,7 @@ Require Import CompLang CompDriver.
 (* This module encodes the examples in sample-rules.txt *)
 Section CompilerUntypedTest.
 
-  Local Open Scope rule_scope.
+  Local Open Scope camp_scope.
   Local Open Scope string.
 
   
@@ -103,14 +103,14 @@ Section CompilerUntypedTest.
                           +s+ toString (lookup "total-attribute")).
 
 
-  Example Example1_result := eval_rule nil Example1 exampleWM.
+  Example Example1_result := eval_camp_rule nil Example1 exampleWM.
   Example Example1_expected := map dconst
                                    ["MainEntitys with doubleAttribute 50: 2"].
 
   Definition camp5 : camp := Eval compute in Example1'.
   Definition algopt5 : nraenv_core := camp_to_nraenv_core Example1'.
   
-  Definition rcamp5 : rule := Eval compute in Example1.
+  Definition rcamp5 : camp_rule := Eval compute in Example1.
   Definition ralgopt5 : nraenv := camp_rule_to_nraenv_optim Example1.
   Definition rnnrc5 : nnrc := camp_rule_to_nnrc_optim Example1.
   

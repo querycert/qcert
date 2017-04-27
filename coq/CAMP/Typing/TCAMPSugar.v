@@ -25,7 +25,7 @@ Section TCAMPSugar.
   Require Import CAMPSugar.
   Require Export TCAMP.
 
-  Local Open Scope rule.
+  Local Open Scope camp_scope.
 
   Hint Constructors camp_type.
 

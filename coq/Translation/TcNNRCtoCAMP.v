@@ -30,7 +30,7 @@ Section TNNRCtoCAMP.
   (** Auxiliary definitions and lemmas *)
   Context {m:basic_model}.
 
-  Local Open Scope rule.
+  Local Open Scope camp_scope.
 
   Lemma  PTdot {τc} {Γ Γ₁:tbindings} {τ₁ τ₂ p k} (s:string) pf :
     NoDup (domain Γ₁) ->

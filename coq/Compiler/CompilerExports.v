@@ -17,8 +17,8 @@ Export ListNotations.
 
 (* Some additional modules, notably rules and notations *)
 Require Export Utils BasicSystem.
-Require Export Rule RuleSugar CompEnv.
-Open Scope rule_scope.
+Require Export CAMPRule CAMPRuleSugar CompEnv.
+Open Scope camp_scope.
 
 (* 
 *** Local Variables: ***

@@ -19,24 +19,28 @@ Section CompDriver.
   Require Import String.
   Require Import Morphisms.
 
-  (* Basic *)
+  (** Core libraries *)
   Require Import BasicSystem.
   Require Import TypingRuntime.
 
-  (* ASTs *)
+  (** Query languages *)
+  Require Import SQLRuntime.
   Require Import OQLRuntime.
-  Require Import SQL.
-  Require Import LambdaNRA.
+  Require Import LambdaNRARuntime.
+  (** Rule languages *)
+  Require Import CAMPRuleRuntime.
+  Require Import TechRuleRuntime.
+  Require Import DesignRuleRuntime.
+  (** Intermediate languages *)
+  Require Import NRARuntime.
+  Require Import NRAEnvRuntime.
+  Require Import NNRCRuntime.
+  Require Import NNRCMRRuntime.
+  Require Import CldMRRuntime.
+  Require Import DNNRCRuntime.
   Require Import CAMPRuntime.
-  Require Import NRARuntime NRAOptim.
-  Require Import NRAEnvRuntime NRAEnvOptim.
-  Require Import NNRCRuntime NNRCOptim.
-  Require Import NNRCMRRuntime NNRCMROptim.
-  Require Import CldMR.
-  Require Import DNNRC Dataset.
-  Require Import TechRule DesignRule.
 
-  (* Translations *)
+  (** Translations *)
   Require Import OQLtoNRAEnv.
   Require Import SQLtoNRAEnv.
   Require Import LambdaNRAtoNRAEnv.
@@ -54,16 +58,16 @@ Section CompDriver.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoJavaScript.
   Require Import NNRCtoDNNRC.
-  Require Import TDNNRCInfer DNNRCtoScala DNNRCOptimizer.
+  Require Import TDNNRCInfer DNNRCtoScala.
 
-  (* Optimizations *)
-  Require Import NRAEnvOptimizer.
-  Require Import TNNRCOptimizer.
-  Require Import TNNRCMROptimizer.
-  Require Import DNNRCOptimizer.
+  (** Optimizers *)
+  Require Import NRAEnvOptim.
+  Require Import NNRCOptim.
+  Require Import NNRCMROptim.
+  Require Import DNNRCOptim.
   Require Import OptimizerLogger.
 
-  (* Foreign Support *)
+  (** Foreign Datatypes Support *)
   Require Import ForeignToReduceOps.
   Require Import ForeignToSpark.
   Require Import ForeignCloudant.
@@ -72,7 +76,7 @@ Section CompDriver.
   Require Import ForeignToJavascript.
   Require Import ForeignToScala.
 
-  (* Compiler Driver *)
+  (** Compiler Driver *)
   
   Require Import CompLang CompEnv CompConfig.
 
@@ -130,7 +134,7 @@ Section CompDriver.
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lambda_nra q.
 
     (** Rules and CAMP translations *)
-    Definition camp_rule_to_camp (q:camp_rule) : camp := Rule.rule_to_camp q. (* Note: This is really macro-expansion *)
+    Definition camp_rule_to_camp (q:camp_rule) : camp := CAMPRule.camp_rule_to_camp q. (* Note: This is really macro-expansion *)
 
     Definition tech_rule_to_camp (q:tech_rule) : camp := TechRule.tech_rule_to_camp q.
 
