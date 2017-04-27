@@ -2167,7 +2167,7 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 	return str;
 }
 
-const coqdocBaseURL = 'https://querycert.github.io/sigmod17/';
+const coqdocBaseURL = 'https://querycert.github.io/doc/';
 function makeLemmaURL(base:string, lemma:string) {
 	let url = coqdocBaseURL + "Qcert." + base + ".html";
 	if(lemma != undefined) {
