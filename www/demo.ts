@@ -97,8 +97,13 @@ interface PuzzleSides {
         } else if (srcInput.length == 0) {
             theTextArea.value =  noQuerySrc;
             return;
-        } else
-            theTextArea.value = "[ Compiling query ]";
+        } else if (schemaInput.length == 0 || schemaInput == "{}") {
+            if (getSourceLanguageExtraInfo(path[0]).schemaForCompile) {
+                theTextArea.value = "[ The " + path[0] + " language requires a schema for compilation ]";
+                return;
+            }
+        }
+        theTextArea.value = "[ Compiling query ]";
 
         const middlePath = path.slice(1,-1);
         
