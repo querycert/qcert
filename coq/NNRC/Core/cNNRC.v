@@ -29,7 +29,9 @@ Section cNNRC.
   Context {fruntime:foreign_runtime}.
   
   Definition var := string.
-  
+
+  (** Note that the AST is shared between core NNRC and NNRC.
+      However, semantics for extended operators are not defined for core NNRC. *)
   Inductive nnrc :=
   | NNRCVar : var -> nnrc
   | NNRCConst : data -> nnrc
@@ -42,6 +44,8 @@ Section cNNRC.
   (* Extended *)
   | NNRCGroupBy : string -> list string -> nnrc -> nnrc.
 
+  (** The nnrcIsCore predicate defines what fragment is part of the core NNRC
+      and which part is not. *)
   Fixpoint nnrcIsCore (e:nnrc) : Prop :=
     match e with
     | NNRCVar _ => True
@@ -52,7 +56,6 @@ Section cNNRC.
     | NNRCFor _ e1 e2 => (nnrcIsCore e1) /\ (nnrcIsCore e2)
     | NNRCIf e1 e2 e3 => (nnrcIsCore e1) /\ (nnrcIsCore e2) /\ (nnrcIsCore e3)
     | NNRCEither e1 _ e2 _ e3 => (nnrcIsCore e1) /\ (nnrcIsCore e2) /\ (nnrcIsCore e3)
-    (* Extended *)
     | NNRCGroupBy _ _ _ => False
     end.
 
@@ -77,7 +80,18 @@ Section cNNRC.
     - decide equality; apply string_dec.
   Defined.
 
-  (** Semantics of NNNRC *)
+  Section core.
+    Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
+
+    Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
+      proj1_sig e.
+
+    Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
+      f (proj1_sig e).
+    
+  End core.
+  
+  (** Semantics of NNRC Core *)
 
   Context (h:brand_relation_t).
 
@@ -155,17 +169,6 @@ Section cNNRC.
         simpl; match_destr.
   Qed.
 
-  Section core.
-    Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
-
-    Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
-      proj1_sig e.
-
-    Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
-      f (proj1_sig e).
-    
-  End core.
-  
 End cNNRC.
 
 (* begin hide *)

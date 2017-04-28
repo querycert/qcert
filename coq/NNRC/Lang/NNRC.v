@@ -35,6 +35,11 @@ Section NNRC.
 
   Context {fruntime:foreign_runtime}.
   Context {h:brand_relation_t}.
+
+  Section lang.
+    (** The AST for NNRC is fully defined in the core NNRC module *)
+    Definition nnrc := nnrc.
+  End lang.
   
   Section macros.
     (** e groupby[g,keys] ==
