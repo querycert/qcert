@@ -52,7 +52,7 @@ let set_output_file gconf file_name =
   set_output_content gconf (Util.string_of_file file_name)
 let set_io_file gconf file_name =
   begin match gconf.gconf_io with
-  | None -> gconf.gconf_io <- Some (IO_file (Some (Util.string_of_file file_name)))
+  | None -> gconf.gconf_io <- Some (IO_file (Some file_name))
   | Some (IO_file f) -> gconf.gconf_io <- Some (IO_file (Some (Util.string_of_file file_name)))
   | Some (IO_components _) -> raise (Qcert_Error "Should not use -io with -schema/-input/-output")
   end
