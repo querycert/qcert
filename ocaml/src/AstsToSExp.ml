@@ -756,16 +756,16 @@ let sexp_to_cld_reduce_default se =
       raise (Qcert_Error "Not well-formed S-expr inside cld_reduce_default")
 
 
-let cld_mr_to_sexp (mr:cld_mr) : sexp =
+let cldmr_step_to_sexp (mr:cldmr_step) : sexp =
   STerm ("cld_mr",
-	 (STerm ("cld_mr_input", (SString (string_of_char_list mr.cld_mr_input))::[]))
-	 :: (STerm ("cld_mr_map", (cld_map_fun_to_sexp mr.cld_mr_map.map_fun0)
-		    :: (cld_map_emit_to_sexp mr.cld_mr_map.map_emit) :: []))
-	 :: (STerm ("cld_mr_reduce", cld_red_opt_to_sexp mr.cld_mr_reduce))
-	 :: (STerm ("cld_mr_reduce_default", cld_reduce_default_to_sexp mr.cld_mr_reduce_default))
+	 (STerm ("cld_mr_input", (SString (string_of_char_list mr.cldmr_step_input))::[]))
+	 :: (STerm ("cld_mr_map", (cld_map_fun_to_sexp mr.cldmr_step_map.map_fun0)
+		    :: (cld_map_emit_to_sexp mr.cldmr_step_map.map_emit) :: []))
+	 :: (STerm ("cld_mr_reduce", cld_red_opt_to_sexp mr.cldmr_step_reduce))
+	 :: (STerm ("cld_mr_reduce_default", cld_reduce_default_to_sexp mr.cldmr_step_reduce_default))
 	 :: [])
 
-let sexp_to_cld_mr (se:sexp) : cld_mr =
+let sexp_to_cldmr_step (se:sexp) : cldmr_step =
   match se with
   | STerm ("cld_mr",
 	   (STerm ("cld_mr_input", (SString input)::[]))
@@ -774,40 +774,40 @@ let sexp_to_cld_mr (se:sexp) : cld_mr =
 	   :: (STerm ("cld_mr_reduce_default", default))
 	   :: [])
     ->
-      { cld_mr_input = char_list_of_string input;
-	cld_mr_map = { map_fun0 = sexp_to_cld_map_fun mapf;
+      { cldmr_step_input = char_list_of_string input;
+	cldmr_step_map = { map_fun0 = sexp_to_cld_map_fun mapf;
 		       map_emit = sexp_to_cld_map_emit mape };
-	cld_mr_reduce = sexp_to_cld_red_opt reduce_opt;
-        cld_mr_reduce_default = sexp_to_cld_reduce_default default }
+	cldmr_step_reduce = sexp_to_cld_red_opt reduce_opt;
+        cldmr_step_reduce_default = sexp_to_cld_reduce_default default }
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside cld_mr")
 
 
-let cld_mr_chain_to_sexp (mrl:cld_mr list) : sexp list =
-  List.map cld_mr_to_sexp mrl
+let cldmr_chain_to_sexp (mrl:cldmr_step list) : sexp list =
+  List.map cldmr_step_to_sexp mrl
 
-let sexp_to_cld_mr_chain (sel:sexp list) : cld_mr list =
-  List.map sexp_to_cld_mr sel
+let sexp_to_cldmr_chain (sel:sexp list) : cldmr_step list =
+  List.map sexp_to_cldmr_step sel
 
 
-let cld_mr_last_to_sexp (last: (var list * QLang.nnrc) * var list) : sexp list =
+let cldmr_last_to_sexp (last: (var list * QLang.nnrc) * var list) : sexp list =
   match last with
   | (f, vars)
     ->
       (fun_to_sexp f) :: (var_list_to_sexp vars)
 
-let sexp_to_cld_mr_last (sel:sexp list) : (var list * QLang.nnrc) * var list =
+let sexp_to_cldmr_last (sel:sexp list) : (var list * QLang.nnrc) * var list =
   match sel with
   | f :: vars ->
       (sexp_to_fun f, sexp_to_var_list vars)
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside cld_mr_last")
+      raise (Qcert_Error "Not well-formed S-expr inside cldmr_last")
 
 
 let cldmr_to_sexp (c:QLang.cldmr) : sexp =
-  STerm ("cld_mrl",
-	  (STerm ("cld_mr_chain", cld_mr_chain_to_sexp c.cld_mr_chain))
-	  :: (STerm ("cld_mr_last", cld_mr_last_to_sexp c.cld_mr_last))
+  STerm ("cldmr",
+	  (STerm ("cld_mr_chain", cldmr_chain_to_sexp c.cldmr_chain))
+	  :: (STerm ("cld_mr_last", cldmr_last_to_sexp c.cldmr_last))
 	  :: [])
 
 let sexp_to_cldmr (se:sexp) : QLang.cldmr =
@@ -817,9 +817,8 @@ let sexp_to_cldmr (se:sexp) : QLang.cldmr =
 	   :: (STerm ("cld_mr_last", last))
 	   :: [])
     ->
-      { cld_mr_chain = 
-sexp_to_cld_mr_chain chain;
-	cld_mr_last = sexp_to_cld_mr_last last }
+      { cldmr_chain = sexp_to_cldmr_chain chain;
+	cldmr_last = sexp_to_cldmr_last last }
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside cldmr")
 

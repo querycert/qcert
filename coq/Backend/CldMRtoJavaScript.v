@@ -196,11 +196,11 @@ Section CldMRtoJavaScript.
   Section CloudantJS.
     
     (* Java equivalent: CloudantBackend.cldmrToJS *)
-    Definition cldmrToJS (h:list (string*string)) (ini:bool) (harness:bool) (eol:string) (quotel:string) (mr:cld_mr) : option string * option string * option string * option string * string :=
-      let v_input := cld_mr_input mr in
+    Definition cldmrToJS (h:list (string*string)) (ini:bool) (harness:bool) (eol:string) (quotel:string) (mr:cldmr_step) : option string * option string * option string * option string * string :=
+      let v_input := cldmr_step_input mr in
       let vs_input := Some v_input in
-      let cldmap := cld_mr_map mr in
-      let clddefault := cld_mr_reduce_default mr in
+      let cldmap := cldmr_step_map mr in
+      let clddefault := cldmr_step_reduce_default mr in
       let map_string :=
           if ini
           then nnrcToJSMapFirst cldmap h harness eol quotel
@@ -213,7 +213,7 @@ Section CldMRtoJavaScript.
             Some (nnrcToJSDefault harness clddef eol quotel)
           end
       in
-      match cld_mr_reduce mr with
+      match cldmr_step_reduce mr with
       | None =>
         (vs_input, None, default_string, None, map_string)
       | Some mred =>
@@ -242,7 +242,7 @@ Section CldMRtoJavaScript.
       end.
 
     (* Java equivalent: CloudantBackend.cld_mr_chainToJS *)
-    Definition cld_mr_chainToJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (mrl:list cld_mr) : list (option string * option string * option string * option string * string) :=
+    Definition cld_mr_chainToJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (mrl:list cldmr_step) : list (option string * option string * option string * option string * string) :=
       match mrl with
       | nil => nil
       | mr1 :: mrl' =>
@@ -251,8 +251,8 @@ Section CldMRtoJavaScript.
       end.
 
     (* Java equivalent: CloudantBackend.cld_mrToJS *)
-    Definition cld_mrToJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (mrl:cld_mrl) : list (option string * option string * option string * option string * string) :=
-      cld_mr_chainToJS h harness eol quotel mrl.(cld_mr_chain).
+    Definition cld_mrToJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (mrl:cldmr) : list (option string * option string * option string * option string * string) :=
+      cld_mr_chainToJS h harness eol quotel mrl.(cldmr_chain).
 
     (* Java equivalent: CloudantBackend.cld_mrToLastJS *)
     Definition cld_mrToLastJS (h:list (string*string)) (harness:bool) (eol:string) (quotel:string) (e_closure: (list var) * nnrc) : string :=
@@ -339,13 +339,13 @@ Section CldMRtoJavaScript.
       map (db_of_var rulename) params.
 
     (* Java equivalent: CloudantBackend.mapReducePairstoCloudant *)    
-    Definition mapReducePairstoCloudant (h:list (string*string)) (mrl : cld_mrl) (rulename:string) : (list (string*string) * (string * list string)) :=
+    Definition mapReducePairstoCloudant (h:list (string*string)) (mrl : cldmr) (rulename:string) : (list (string*string) * (string * list string)) :=
       let mrpl := cld_mrToJS h true eol_backn quotel_backdouble mrl in
-      let last_fun := cld_mrToLastJS h true eol_backn quotel_backdouble (fst (mrl.(cld_mr_last))) in
-      let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cld_mr_last))) in
+      let last_fun := cld_mrToLastJS h true eol_backn quotel_backdouble (fst (mrl.(cldmr_last))) in
+      let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cldmr_last))) in
       mapReduceStringstoDesignDocs mrpl last_fun cld_eff_params rulename.
 
-    Definition mapReducePairstoJSMRCloudant (h:list (string*string)) (mrl : cld_mrl) : string :=
+    Definition mapReducePairstoJSMRCloudant (h:list (string*string)) (mrl : cldmr) : string :=
       let mrpl := cld_mrToJS h false eol_newline quotel_double mrl in
       mapReduceStringstoJS eol_newline mrpl.
 

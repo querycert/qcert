@@ -92,7 +92,7 @@ Section NNRCMRToCldMR.
 
   (* Java equivalent: NrcmrToCldmr.MRtoReduceCld *)
   Definition MRtoReduceCld (v_key:var) (out_v:var) (avoiddb: list var) (mrr: NNRCMR.reduce_fun) (mrempty:option nnrc) :
-    bool * cld_reduce * (option cld_mr) * (list var) :=
+    bool * cld_reduce * (option cldmr_step) * (list var) :=
     match mrr with
     | RedId => (false, idReduce (Some out_v), None, avoiddb)
     | RedCollect redf =>
@@ -108,7 +108,7 @@ Section NNRCMRToCldMR.
     end.
 
   (* Java equivalent: NrcmrToCldmr.MRtoMRCld *)
-  Definition MRtoMRCld (avoiddb: list var) (mr: mr) : (list cld_mr) * (list var) :=
+  Definition MRtoMRCld (avoiddb: list var) (mr: mr) : (list cldmr_step) * (list var) :=
     let cld_input := mr_input mr in
     let cld_output := mr_output mr in
     let mrmap := mr_map mr in
@@ -137,11 +137,11 @@ Section NNRCMRToCldMR.
 
   (* For now keep that based on single inputdb ... *)
   (*
-  Definition cld_mrl_eval_pair (initdb initunit:var) (mrl:cld_mrl) (coll:list data) :
+  Definition cldmr_eval_pair (initdb initunit:var) (mrl:cldmr) (coll:list data) :
     option (list data) :=
     let cenv := (initdb, coll) :: nil in
     let env := cld_load_init_env initunit cenv in
-    lift snd (cld_mrl_eval h env mrl).
+    lift snd (cldmr_eval h env mrl).
    *)
 
   Lemma rmap_with_key (prefix:list nat) (i:nat) (v:var) (n:nnrc) (coll: list data) :
@@ -178,7 +178,7 @@ Section NNRCMRToCldMR.
     mr.(mr_input) <> mr.(mr_output) ->
     mr.(mr_output) <> init_unit ->
     init_unit <> mr.(mr_input) ->
-    cld_mr_chain_causally_consistent (fst (MRtoMRCld (mr.(mr_input) :: mr.(mr_output) :: init_unit :: nil) mr)) = true.
+    cldmr_chain_causally_consistent (fst (MRtoMRCld (mr.(mr_input) :: mr.(mr_output) :: init_unit :: nil) mr)) = true.
   Proof.
     intros.
     unfold MRtoMRCld.
@@ -186,8 +186,8 @@ Section NNRCMRToCldMR.
     destruct mr; simpl in *.
     destruct mr_reduce;
       unfold
-        cld_mr_chain_causally_consistent,
-      cld_mr_causally_consistent,
+        cldmr_chain_causally_consistent,
+      cldmr_step_causally_consistent,
       nequiv_decb, equiv_decb; simpl.
     - match_destr.
       congruence.
@@ -209,14 +209,14 @@ Section NNRCMRToCldMR.
     forall (locd:localized_data),
     forall (res: localized_data),
       mr_eval h mr locd = Some res ->
-      cld_mrl_eval_pair (mr.(mr_input)) init_unit
+      cldmr_eval_pair (mr.(mr_input)) init_unit
                         (fst (MRtoMRCld nil mr)) (cld_data_of_localized_data locd) =
       Some (cld_data_of_localized_data res).
   Proof.
     intros Hio Hou Hui.
     intros.
     destruct mr; simpl in *.
-    unfold mr_eval, cld_mrl_eval_pair, cld_mrl_eval; simpl.
+    unfold mr_eval, cldmr_eval_pair, cldmr_eval; simpl.
     unfold MRtoMRCld; simpl.
     destruct mr_map; simpl.
     (* MapDist *)
@@ -224,13 +224,13 @@ Section NNRCMRToCldMR.
       destruct locd; simpl in *; unfold mr_eval in *; simpl in *; try congruence.
       destruct mr_reduce; simpl in *.
       (* RedId *)
-      + unfold cld_mrl_eval_inner; simpl.
+      + unfold cldmr_eval_inner; simpl.
         unfold equiv_dec; destruct (string_eqdec mr_input init_unit); try congruence; clear c.
         unfold equiv_dec; destruct (string_eqdec mr_input mr_input); try congruence; clear e.
         simpl.
         rewrite pre_pack_pack_unpack_kvl_id; simpl.
-        unfold cld_mr_eval; simpl.
-        unfold cld_mr_map_eval; simpl.
+        unfold cldmr_step_eval; simpl.
+        unfold cldmr_step_map_eval; simpl.
         unfold apply_map_fun_with_keys; simpl.
         rewrite rmap_eval_through_init_keys.
         revert H; generalize (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) l);
@@ -254,13 +254,13 @@ Section NNRCMRToCldMR.
       destruct locd; simpl in *; unfold mr_eval in *; simpl in *; try congruence.
       destruct mr_reduce; simpl in *.
       (* RedId *)
-      + unfold cld_mrl_eval_inner; simpl.
+      + unfold cldmr_eval_inner; simpl.
         unfold equiv_dec; destruct (string_eqdec mr_input init_unit); try congruence; clear c.
         unfold equiv_dec; destruct (string_eqdec mr_input mr_input); try congruence; clear e.
         simpl.
         rewrite pre_pack_pack_unpack_kvl_id; simpl.
-        unfold cld_mr_eval; simpl.
-        unfold cld_mr_map_eval; simpl.
+        unfold cldmr_step_eval; simpl.
+        unfold cldmr_step_map_eval; simpl.
         unfold apply_map_fun_with_keys; simpl.
         rewrite rmap_eval_through_init_keys.
         revert H; generalize (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) l);
@@ -279,18 +279,18 @@ Section NNRCMRToCldMR.
       destruct locd; simpl in *; unfold mr_eval in *; simpl in *; try congruence.
       destruct mr_reduce; simpl in *.
       (* RedId *)
-      + unfold cld_mrl_eval_inner; simpl.
+      + unfold cldmr_eval_inner; simpl.
         unfold equiv_dec; destruct (string_eqdec mr_input init_unit); try congruence; clear c.
         unfold equiv_dec; destruct (string_eqdec mr_input mr_input); try congruence; clear e.
         simpl.
-        unfold cld_mr_eval; simpl.
-        unfold cld_mr_map_eval; simpl.
+        unfold cldmr_step_eval; simpl.
+        unfold cldmr_step_map_eval; simpl.
         unfold apply_map_fun_with_keys; simpl.
         destruct (nnrc_core_eval h ((v, d) :: nil)); simpl in *; try congruence.
         destruct d0; simpl in *; try congruence.
         inversion H; subst; clear H.
         rename l into mapres; simpl in *.
-        unfold cld_mr_reduce_eval; simpl.
+        unfold cldmr_step_reduce_eval; simpl.
         rewrite (init_like_first_map_index 0); simpl.
         unfold cld_merge_env; simpl.
         unfold equiv_dec; destruct (string_eqdec mr_output mr_input); try congruence; clear c.
@@ -307,22 +307,22 @@ Section NNRCMRToCldMR.
   Admitted.
 *)
 
-  (* Java equivalent: NrcmrToCldmr.mr_chain_to_cld_mr_chain *)
-  Fixpoint mr_chain_to_cld_mr_chain (avoiddb: list var) (l: list mr) : list cld_mr :=
+  (* Java equivalent: NrcmrToCldmr.mr_chain_to_cldmr_chain *)
+  Fixpoint mr_chain_to_cldmr_chain (avoiddb: list var) (l: list mr) : list cldmr_step :=
     match l with
     | nil => nil
     | mr :: l' =>
-      let (cld_mr,avoiddb') := (MRtoMRCld avoiddb mr) in
-      cld_mr ++ (mr_chain_to_cld_mr_chain avoiddb' l')
+      let (cldmr_step,avoiddb') := (MRtoMRCld avoiddb mr) in
+      cldmr_step ++ (mr_chain_to_cldmr_chain avoiddb' l')
     end.
 
-  (* Java equivalent: NrcmrToCldmr.mr_last_to_cld_mr_last *)
-  Definition mr_last_to_cld_mr_last
+  (* Java equivalent: NrcmrToCldmr.mr_last_to_cldmr_last *)
+  Definition mr_last_to_cldmr_last
              (mr_last_closure:(list var * nnrc) * list (var * dlocalization))
     : (list var * nnrc) * list var :=
     let (fvs, mr_last) := fst mr_last_closure in
     let vars_loc := snd mr_last_closure in
-    let cld_mr_last :=
+    let cldmr_last :=
         List.fold_right
           (fun fv k =>
              match lookup equiv_dec vars_loc fv with
@@ -339,15 +339,15 @@ Section NNRCMRToCldMR.
              end)
           mr_last fvs
     in
-    ((fvs, cld_mr_last), map fst vars_loc).
+    ((fvs, cldmr_last), map fst vars_loc).
 
   (* Java equivalent: nrcmrToCldmr.NNRCMRtoNNRCMRCloudant *)
-  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (mrl: nnrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudant (avoiddb: list var) (mrl: nnrcmr) : cldmr :=
     (* Used to compute a separate var_locs distinct from mr_last effective params -- removed now.
        This should be reviewed by Louis *)
     mkMRCldChain
-      (mr_chain_to_cld_mr_chain avoiddb mrl.(mr_chain))
-      (mr_last_to_cld_mr_last mrl.(mr_last)).
+      (mr_chain_to_cldmr_chain avoiddb mrl.(mr_chain))
+      (mr_last_to_cldmr_last mrl.(mr_last)).
 
   Require Import Bool.
 
@@ -356,10 +356,10 @@ Section NNRCMRToCldMR.
     In mr.(mr_input) avoiddb ->
     mr_causally_consistent mr mr = true ->
     forall x,
-    forallb (fun y => cld_mr_input y <>b mr.(mr_output)) x = true ->
-    cld_mr_chain_causally_consistent x = true ->
-    incl (mr.(mr_output) :: map cld_mr_input x) avoiddb ->
-         cld_mr_chain_causally_consistent (x ++ fst (MRtoMRCld avoiddb mr)) = true.
+    forallb (fun y => cldmr_step_input y <>b mr.(mr_output)) x = true ->
+    cldmr_chain_causally_consistent x = true ->
+    incl (mr.(mr_output) :: map cldmr_step_input x) avoiddb ->
+         cldmr_chain_causally_consistent (x ++ fst (MRtoMRCld avoiddb mr)) = true.
 Proof.
     intros.
     unfold MRtoMRCld.
@@ -367,8 +367,8 @@ Proof.
     destruct mr; simpl in *.
     destruct mr_reduce;
       unfold
-        cld_mr_chain_causally_consistent,
-      cld_mr_causally_consistent,
+        cldmr_chain_causally_consistent,
+      cldmr_step_causally_consistent,
       mr_causally_consistent,
       nequiv_decb, equiv_decb in *; simpl.
     - apply forallb_ordpairs_refl_app_cons; trivial.
@@ -383,7 +383,7 @@ Proof.
           intros aa inn.
           match_destr.
           unfold incl in H3.
-          specialize (H3 (cld_mr_input aa)).
+          specialize (H3 (cldmr_step_input aa)).
           rewrite e in H3.
           eelim fresh_var_fresh.
           apply H3.
@@ -410,7 +410,7 @@ Proof.
   Lemma MRtoMRCid_avoids avoiddb a :
     let '(l0, l1) := MRtoMRCld avoiddb a in
     incl (mr_input a :: nil) avoiddb ->
-    incl (avoiddb ++ map cld_mr_input l0) l1.
+    incl (avoiddb ++ map cldmr_step_input l0) l1.
   Proof.
     unfold MRtoMRCld, MRtoReduceCld.
     destruct a; simpl.
@@ -432,7 +432,7 @@ Proof.
 
   Lemma MRtoMRCid_input_avoids avoiddb a :
     let '(l0, l1) := MRtoMRCld avoiddb a in
-    Forall (fun x => cld_mr_input x = mr_input a \/ ~ In (cld_mr_input x) avoiddb) l0.
+    Forall (fun x => cldmr_step_input x = mr_input a \/ ~ In (cldmr_step_input x) avoiddb) l0.
   Proof.
     Hint Resolve fresh_var_fresh.
     unfold MRtoMRCld, MRtoReduceCld.
@@ -450,12 +450,12 @@ Proof.
   Lemma NNRCMRtoNNRCMRCloudant_causally_consistent avoiddb l :
     mr_chain_causally_consistent l = true ->
     forall x,
-      cld_mr_chain_causally_consistent x = true ->
-      forallb (fun a => forallb (fun y : cld_mr => cld_mr_input y <>b mr_output a) x) l = true ->
-      incl (map mr_input l ++ map mr_output l ++ map cld_mr_input x) avoiddb ->
-      cld_mr_chain_causally_consistent (x ++ mr_chain_to_cld_mr_chain avoiddb l) = true.
+      cldmr_chain_causally_consistent x = true ->
+      forallb (fun a => forallb (fun y : cldmr_step => cldmr_step_input y <>b mr_output a) x) l = true ->
+      incl (map mr_input l ++ map mr_output l ++ map cldmr_step_input x) avoiddb ->
+      cldmr_chain_causally_consistent (x ++ mr_chain_to_cldmr_chain avoiddb l) = true.
   Proof.
-    unfold mr_chain_causally_consistent, cld_mr_chain_causally_consistent.
+    unfold mr_chain_causally_consistent, cldmr_chain_causally_consistent.
     revert avoiddb.
     induction l; intros avoiddb lcc x xcc avoided.
     { rewrite app_nil_r; trivial. }
@@ -546,7 +546,7 @@ Proof.
   Admitted.
 
 (*
-  Definition NNRCMRtoNNRCMRCloudantInit (avoiddb: list var) (l: nnrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudantInit (avoiddb: list var) (l: nnrcmr) : cldmr :=
     match l with
     | nil => nil
     | mrtop :: nil =>
@@ -672,13 +672,13 @@ Proof.
 *)
 
   (* Java equivalent: NrcmrToCldmr.convert *)
-  Definition NNRCMRtoNNRCMRCloudantTop (mrl: nnrcmr) : cld_mrl :=
+  Definition NNRCMRtoNNRCMRCloudantTop (mrl: nnrcmr) : cldmr :=
     let avoiddb := List.map mr_input mrl.(mr_chain) ++ List.map mr_output mrl.(mr_chain) in
     NNRCMRtoNNRCMRCloudant avoiddb mrl.
 
   Lemma NNRCMRtoNNRCMRCloudantTop_causally_consistent mrl :
     nnrcmr_causally_consistent mrl = true ->
-    cld_mr_chain_causally_consistent (NNRCMRtoNNRCMRCloudantTop mrl).(cld_mr_chain) = true.
+    cldmr_chain_causally_consistent (NNRCMRtoNNRCMRCloudantTop mrl).(cldmr_chain) = true.
   Proof.
     intros cc.
     unfold NNRCMRtoNNRCMRCloudantTop.

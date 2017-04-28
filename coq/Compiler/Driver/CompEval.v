@@ -161,7 +161,7 @@ Section CompEval.
     Definition eval_cldmr (q:cldmr) (cenv: list (string*data)) : option data
       := let cenv := mkConstants (rec_sort cenv) in
          match cld_load_init_env init_vinit cenv with
-         | Some cenv => cld_mrl_eval h cenv q
+         | Some cenv => cldmr_eval h cenv q
          | None => None
          end.
 

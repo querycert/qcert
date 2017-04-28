@@ -133,43 +133,43 @@ Section CldMR.
         reduce_output : option var (* where to put the result -- corresponds to dbcopy *) }.
 
   (* Java equivalent: CldMr *)
-  Record cld_mr :=
+  Record cldmr_step :=
     mkMRCld
-      { cld_mr_input: var;               (* Input Cloudant Database *)
-        cld_mr_map: cld_map;             (* Cloudant Map *)
-        cld_mr_reduce: option cld_reduce; (* Cloudant Reduce *)
-        cld_mr_reduce_default: option nnrc }.
+      { cldmr_step_input: var;               (* Input Cloudant Database *)
+        cldmr_step_map: cld_map;             (* Cloudant Map *)
+        cldmr_step_reduce: option cld_reduce; (* Cloudant Reduce *)
+        cldmr_step_reduce_default: option nnrc }.
 
   (* Java equivalent: CldMrl *)
-  Record cld_mrl :=
+  Record cldmr :=
     mkMRCldChain
-      { cld_mr_chain: list cld_mr;
-        cld_mr_last: ((list var) * nnrc) * (list var) }.
+      { cldmr_chain: list cldmr_step;
+        cldmr_last: ((list var) * nnrc) * (list var) }.
   (* Temporarily : localization should always be scalar *)
 
   (********************************
    ** Well formation constraints **
    ********************************)
 
-  Definition cld_mr_causally_consistent (mr1 mr2:cld_mr) : bool
-    := match mr2.(cld_mr_reduce) with
+  Definition cldmr_step_causally_consistent (mr1 mr2:cldmr_step) : bool
+    := match mr2.(cldmr_step_reduce) with
        | Some r =>
          match r.(reduce_output) with
-         | Some o => mr1.(cld_mr_input) <>b o
+         | Some o => mr1.(cldmr_step_input) <>b o
          | None => true
          end
        | None => true
        end.
 
-  Definition cld_mr_chain_causally_consistent : list cld_mr -> bool
-    := forallb_ordpairs_refl cld_mr_causally_consistent.
+  Definition cldmr_chain_causally_consistent : list cldmr_step -> bool
+    := forallb_ordpairs_refl cldmr_step_causally_consistent.
 
-  Definition cld_mrl_causally_consistent (cld_mrl: cld_mrl) : bool
-    := cld_mr_chain_causally_consistent cld_mrl.(cld_mr_chain).
+  Definition cldmr_causally_consistent (cldmr: cldmr) : bool
+    := cldmr_chain_causally_consistent cldmr.(cldmr_chain).
 
-  Definition cld_mr_io_vars mr0 : list var
-    := mr0.(cld_mr_input)::
-      match mr0.(cld_mr_reduce) with
+  Definition cldmr_step_io_vars mr0 : list var
+    := mr0.(cldmr_step_input)::
+      match mr0.(cldmr_step_reduce) with
        | Some r =>
          match r.(reduce_output) with
          | Some o => o::nil
@@ -184,11 +184,11 @@ Section CldMR.
   Definition nnrcmr_io_vars (mrl : nnrcmr) : list var
     := mr_chain_io_vars mrl.(mr_chain).
 
-  Definition cld_mr_chain_io_vars : list cld_mr -> list var
-    := flat_map cld_mr_io_vars.
+  Definition cldmr_chain_io_vars : list cldmr_step -> list var
+    := flat_map cldmr_step_io_vars.
 
-  Definition cld_mrl_io_vars (cld_mrl:cld_mrl): list var
-    := cld_mr_chain_io_vars cld_mrl.(cld_mr_chain).
+  Definition cldmr_io_vars (cldmr:cldmr): list var
+    := cldmr_chain_io_vars cldmr.(cldmr_chain).
 
   (* XXX Those have to be revised... *)
   
@@ -252,7 +252,7 @@ Section CldMR.
       in rmap f_map coll.
 
   (* Note: CldMapFlatten allows multiple emits ... *)
-  Definition cld_mr_map_eval (map: cld_map) (coll: list (data * data)) : option (list (data * data)) :=
+  Definition cldmr_step_map_eval (map: cld_map) (coll: list (data * data)) : option (list (data * data)) :=
     let map_f := map.(map_fun) in
     let emit_f := map.(map_emit) in
     match map_f with
@@ -282,9 +282,9 @@ Section CldMR.
     end.
 
   Lemma mapIdDist_is_map (map:var*nnrc) (coll:list data) :
-    lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitDist)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
+    lift cld_get_values (cldmr_step_map_eval (mkMapCld (CldMapId map) (CldEmitDist)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
-    unfold cld_mr_map_eval; simpl.
+    unfold cldmr_step_map_eval; simpl.
     unfold init_keys; generalize 0.
     induction coll; intros; simpl in *.
     - destruct map; reflexivity.
@@ -317,9 +317,9 @@ Section CldMR.
   Qed.
 
   Lemma mapIdCollect_is_map (map:var*nnrc) (n:nat) (coll:list data) :
-    lift cld_get_values (cld_mr_map_eval (mkMapCld (CldMapId map) (CldEmitCollect n)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
+    lift cld_get_values (cldmr_step_map_eval (mkMapCld (CldMapId map) (CldEmitCollect n)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
-    unfold cld_mr_map_eval; simpl.
+    unfold cldmr_step_map_eval; simpl.
     unfold init_keys; generalize 0.
     induction coll; intros; simpl in *.
     - destruct map; reflexivity.
@@ -352,7 +352,7 @@ Section CldMR.
    * Semantics of group_by *
    *************************)
 
-  Definition cld_mr_group_by_eval (l: list (data * data)) : list (data * (list data)) :=
+  Definition cldmr_step_group_by_eval (l: list (data * data)) : list (data * (list data)) :=
     group_by_iter_eval_alt l.
 
 
@@ -360,7 +360,7 @@ Section CldMR.
    * Semantics of reduce *
    ***********************)
 
-  Definition cld_mr_aggregate_eval (f_reduce: (var * var) * nnrc) (f_rereduce: (var * nnrc)) (groups: list (data * (list data)))  : option (list (data * data)) :=
+  Definition cldmr_step_aggregate_eval (f_reduce: (var * var) * nnrc) (f_rereduce: (var * nnrc)) (groups: list (data * (list data)))  : option (list (data * data)) :=
     let (key_values_args, body) := f_reduce in
     let (key_arg, values_arg) := key_values_args in
     let f_reduce (key_values_v: data * list data) : option (data * data) :=
@@ -399,12 +399,12 @@ Section CldMR.
        | Cld_float => cloudant_float_max_op
        end.
   
-  Definition cld_mr_reduce_eval (red_fun: cld_reduce_fun) (coll: list (data * data))  : option (list (data * data)) :=
+  Definition cldmr_step_reduce_eval (red_fun: cld_reduce_fun) (coll: list (data * data))  : option (list (data * data)) :=
     match red_fun with
     | CldRedId => Some coll
     | CldRedAggregate f_reduce f_rereduce =>
-      let groups := cld_mr_group_by_eval coll in
-      cld_mr_aggregate_eval f_reduce f_rereduce groups
+      let groups := cldmr_step_group_by_eval coll in
+      cldmr_step_aggregate_eval f_reduce f_rereduce groups
     | CldRedOp CldRedOpCount =>
       let uop := ACount in
       let v := fun_of_unaryop h uop (dcoll (List.map snd coll)) in
@@ -436,8 +436,8 @@ Section CldMR.
       lift (fun res => (key, res)::nil) v
     end.
 
-  Lemma cld_mr_reduce_flatten_id (l:list (data * data)) :
-    (cld_mr_reduce_eval CldRedId l) = Some l.
+  Lemma cldmr_step_reduce_flatten_id (l:list (data * data)) :
+    (cldmr_step_reduce_eval CldRedId l) = Some l.
   Proof.
     reflexivity.
   Qed.
@@ -447,14 +447,14 @@ Section CldMR.
    * Semantics of one map-reduce *
    *******************************)
 
-  Definition cld_mr_eval (mr:cld_mr) (coll: list (data * data)) : option ((list (data*data)) * option var) :=
+  Definition cldmr_step_eval (mr:cldmr_step) (coll: list (data * data)) : option ((list (data*data)) * option var) :=
     let map_result :=
-        cld_mr_map_eval mr.(cld_mr_map) coll
+        cldmr_step_map_eval mr.(cldmr_step_map) coll
     in
-    match mr.(cld_mr_reduce) with
+    match mr.(cldmr_step_reduce) with
     | None => lift (fun x => (x,None)) map_result
     | Some reduce =>
-      let reduce_result := olift (cld_mr_reduce_eval reduce.(reduce_fun)) map_result in
+      let reduce_result := olift (cldmr_step_reduce_eval reduce.(reduce_fun)) map_result in
       lift (fun x => (x, reduce.(reduce_output))) reduce_result
     end.
 
@@ -487,24 +487,24 @@ Section CldMR.
          end)
       eff.
   
-  Definition cld_mr_eval_last (cld_env:bindings) (mr_last: ((list var) * nnrc) * (list var)) : option data :=
+  Definition cldmr_step_eval_last (cld_env:bindings) (mr_last: ((list var) * nnrc) * (list var)) : option data :=
     let (formal_params, n) := fst mr_last in
     let effective_params := effective_params_from_bindings (snd mr_last) cld_env in
     let onrc_env := nnrc_env_of_cld_env formal_params effective_params in
     olift (fun nnrc_env => nnrc_core_eval h nnrc_env n) onrc_env.
 
-  Definition cld_mr_chain_eval_inner (env:bindings) (l:list cld_mr) : option (bindings * list (data * data)) :=
+  Definition cldmr_chain_eval_inner (env:bindings) (l:list cldmr_step) : option (bindings * list (data * data)) :=
     List.fold_left
       (fun (acc: option (bindings * list (data * data))) mr =>
          match acc with
          | None => None
          | Some (env', _) =>
-           let cld_input := mr.(cld_mr_input) in
+           let cld_input := mr.(cldmr_step_input) in
            match lookup equiv_dec env' cld_input with
            | None => None
            | Some kvl =>
              let coll := unpack_kvl kvl in
-             match olift (cld_mr_eval mr) coll with
+             match olift (cldmr_step_eval mr) coll with
              | None => None
              | Some (res,None) => Some (env, res)
              | Some (res,Some x) =>
@@ -515,11 +515,11 @@ Section CldMR.
          end)
       l (Some (env,nil)).
 
-  Definition cld_mrl_eval (env:bindings) (cld_mrl:cld_mrl) : option data :=
-    match cld_mr_chain_eval_inner env cld_mrl.(cld_mr_chain) with
+  Definition cldmr_eval (env:bindings) (cldmr:cldmr) : option data :=
+    match cldmr_chain_eval_inner env cldmr.(cldmr_chain) with
     | None => None
     | Some (env_res, coll) =>
-      cld_mr_eval_last env_res cld_mrl.(cld_mr_last)
+      cldmr_step_eval_last env_res cldmr.(cldmr_last)
     end.
 
 
@@ -527,7 +527,7 @@ Section CldMR.
    ** CLDMR library **
    *******************)
 
-  Section cld_mr_library.
+  Section cldmr_step_library.
     
     (* Java equivalent: NrcmrToCldmr.idReduce *)
     Definition idReduce (v_out:option var) : cld_reduce := 
@@ -542,10 +542,10 @@ Section CldMR.
     Definition opReduce (op: cld_reduce_op) (v_out:option var) : cld_reduce :=
       mkReduceCld (CldRedOp op) v_out.
 
-    Definition defaultMR : cld_mr :=
+    Definition defaultMR : cldmr_step :=
       mkMRCld init_vval (mkMapCld (CldMapId (init_vval, NNRCConst dunit)) (CldEmitCollect (99%nat))) None None (*empty default*).
     
-  End cld_mr_library.
+  End cldmr_step_library.
 
   
   Section sanitize.

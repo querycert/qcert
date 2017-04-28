@@ -237,7 +237,7 @@ Section CompLang.
     Definition nnrc_core := nnrc_core.
     Definition nnrc := nnrc.
     Definition nnrcmr := nnrcmr.
-    Definition cldmr := cld_mrl.
+    Definition cldmr := cldmr.
     Definition dnnrc_dataset := dnnrc _ unit dataset.
     Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc _ (type_annotation unit) dataset.
     Definition javascript := string.
