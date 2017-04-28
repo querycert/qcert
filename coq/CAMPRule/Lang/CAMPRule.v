@@ -41,7 +41,9 @@ Section CAMPRule.
   | rule_not : camp -> camp_rule -> camp_rule
   (** This is the last part of a rule, and it allow the 
         rule to return a value for each successful match-set. pit can be used as the identity *)
-  | rule_return : camp -> camp_rule.  
+  | rule_return : camp -> camp_rule
+  (** This allows a rule to simply match a camp pattern *)
+  | rule_match : camp -> camp_rule.  
 
   (* Java equivalent: CampRule.convertToPattern *)
   Fixpoint camp_rule_to_camp (rule:camp_rule) : camp
@@ -67,6 +69,8 @@ Section CAMPRule.
                        (camp_rule_to_camp ps)))
          | rule_return p =>
            makeSingleton p
+         | rule_match p =>
+           p
        end.
 
   Definition eval_camp_rule_debug (h:list(string*string)) (print_env:bool) (r:camp_rule) (world:list data)

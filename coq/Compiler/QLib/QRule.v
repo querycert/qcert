@@ -30,25 +30,27 @@ Module QRule(runtime:CompilerRuntime).
   Definition t : Set 
     := rule.
   
-  Definition rule_when : CAMP.expr -> rule -> rule 
+  Definition rule_when : CAMP.camp -> rule -> rule 
     := CAMPRule.rule_when.
-  Definition rule_global : CAMP.expr -> rule -> rule 
+  Definition rule_global : CAMP.camp -> rule -> rule 
     := CAMPRule.rule_global.
-  Definition rule_not : CAMP.expr -> rule -> rule 
+  Definition rule_not : CAMP.camp -> rule -> rule 
     := CAMPRule.rule_not.
-  Definition rule_return : CAMP.expr -> rule 
+  Definition rule_return : CAMP.camp -> rule 
     := CAMPRule.rule_return.
+  Definition rule_match : CAMP.camp -> rule 
+    := CAMPRule.rule_match.
 
-  Definition aggregate : (rule -> rule) -> Ops.Unary.op -> CAMP.expr -> nat -> CAMP.expr
+  Definition aggregate : (rule -> rule) -> Ops.Unary.op -> CAMP.camp -> nat -> CAMP.camp
     := CAMPRuleSugar.aggregate.
 
-  Definition instanceOf : String.string -> BrandRelation.brands -> CAMP.expr -> CAMP.expr
+  Definition instanceOf : String.string -> BrandRelation.brands -> CAMP.camp -> CAMP.camp
     := CAMPRuleSugar.instanceOf.
 
-  Definition matches : BrandRelation.brands -> CAMP.expr -> CAMP.expr
+  Definition matches : BrandRelation.brands -> CAMP.camp -> CAMP.camp
     := CAMPRuleSugar.matches.
 
-  Definition fetchRef : BrandRelation.brands -> String.string -> String.string -> CAMP.expr -> CAMP.expr -> CAMP.expr
+  Definition fetchRef : BrandRelation.brands -> String.string -> String.string -> CAMP.camp -> CAMP.camp -> CAMP.camp
     := CAMPRuleSugar.fetchRef.
 
 End QRule.

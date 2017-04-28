@@ -25,74 +25,72 @@ Module QCAMP(runtime:CompilerRuntime).
   Module Data := QData.QData(runtime).
   Module Ops := QOperators.QOperators(runtime).
 
-  Definition expr : Set 
-    := CAMP.camp.
   Definition camp : Set 
-    := expr.
+    := CAMP.camp.
   Definition t : Set 
-    := expr.
+    := camp.
   
-  Definition pconst : Data.t -> expr 
+  Definition pconst : Data.t -> camp 
     := CAMP.pconst.
-  Definition punop : Ops.Unary.op -> expr -> expr 
+  Definition punop : Ops.Unary.op -> camp -> camp 
     := CAMP.punop.
-  Definition pbinop : Ops.Binary.op -> expr -> expr -> expr 
+  Definition pbinop : Ops.Binary.op -> camp -> camp -> camp 
     := CAMP.pbinop.
-  Definition pmap : expr -> expr 
+  Definition pmap : camp -> camp 
     := CAMP.pmap.
-  Definition passert : expr -> expr 
+  Definition passert : camp -> camp 
     := CAMP.passert.
-  Definition porelse : expr -> expr -> expr 
+  Definition porelse : camp -> camp -> camp 
     := CAMP.porElse.
-  Definition pit : expr 
+  Definition pit : camp 
     := CAMP.pit.
-  Definition pletit : expr -> expr -> expr 
+  Definition pletit : camp -> camp -> camp 
     := CAMP.pletIt.
-  Definition pgetconstant : String.string -> expr 
+  Definition pgetconstant : String.string -> camp 
     := CAMP.pgetconstant.
-  Definition penv : expr 
+  Definition penv : camp 
     := CAMP.penv.
-  Definition pletenv : expr -> expr -> expr 
+  Definition pletenv : camp -> camp -> camp 
     := CAMP.pletEnv.
-  Definition pleft : expr 
+  Definition pleft : camp 
     := CAMP.pleft.
-  Definition pright : expr 
+  Definition pright : camp 
     := CAMP.pright.
 
-  Definition pnow : expr
+  Definition pnow : camp
     := CAMPSugar.pnow.
 
-  Definition pnull : expr
+  Definition pnull : camp
     := CAMPSugar.pnull.
 
-  Definition pbdot : String.string -> expr -> expr
+  Definition pbdot : String.string -> camp -> camp
     := CAMPSugar.pbdot.
 
-  Definition pbsomedot : String.string -> expr -> expr
+  Definition pbsomedot : String.string -> camp -> camp
     := CAMPSugar.pbsomedot.
 
-  Definition returnVariables : list String.string -> expr
+  Definition returnVariables : list String.string -> camp
     := CAMPSugar.returnVariables.
 
-  Definition stringConcat : expr -> expr -> expr
+  Definition stringConcat : camp -> camp -> camp
     := CAMPSugar.stringConcat.
 
-  Definition toString : expr -> expr 
+  Definition toString : camp -> camp 
     := CAMPSugar.toString.
 
-  Definition camp_binop_reduce : Ops.Binary.op -> list expr -> expr
+  Definition camp_binop_reduce : Ops.Binary.op -> list camp -> camp
     := CAMPSugar.camp_binop_reduce.
 
-  Definition pvarwith : String.string -> expr -> expr
+  Definition pvarwith : String.string -> camp -> camp
     := CAMPSugar.pvarwith.
 
-  Definition withVar : String.string -> expr -> expr
+  Definition withVar : String.string -> camp -> camp
     := CAMPSugar.withVar.
 
-  Definition pIS : String.string -> expr -> expr
+  Definition pIS : String.string -> camp -> camp
     := CAMPSugar.pIS.
 
-  Definition lookup : String.string -> expr 
+  Definition lookup : String.string -> camp 
     := CAMPSugar.lookup.
   
 End QCAMP.

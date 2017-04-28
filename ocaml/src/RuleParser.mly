@@ -113,6 +113,8 @@ campmain:
     { (i, p) }
 
 rule:
+| p = camp (* This allows pure CAMP tests to be compiled as rules *)
+    { QRule.rule_match p }
 | RULERETURN p = camp
     { QRule.rule_return p }
 | RULEWHEN p = camp SEMISEMI r = rule
