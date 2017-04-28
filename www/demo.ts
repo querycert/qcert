@@ -2412,9 +2412,12 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 	iter:number;
 
 	getPhase():QcertOptimPhase {
+        let optims:string[] = this.sortable.toArray();
+        if (optims.length == 1 && optims[0] == optPlaceholder)
+            optims = [];
 		return {
 			name:this.name,
-			optims:this.sortable.toArray(),
+			optims:optims,
 			iter: this.iter
 		}
 	}
