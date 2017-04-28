@@ -91,3 +91,20 @@ function jsEval(args) {
 	// Each spawned worker is designed to be used once
 	close();
 }
+
+function verify(result, expected) {
+	result = result[0]; // TODO is this always right?  
+	if (result.length != expected.length)
+		return false;
+	for (var i = 0; i < result.length; i++) {
+		var resultMember = result[i];
+		var expectedMember = expected[i];
+		if (resultMember.constructor == Array
+				&& expectedMember.constructor == Array) {
+			if (!verify(resultMember, expectedMember))
+				return false;
+		} else if (resultMember != expectedMember)
+			return false;
+	}
+	return true;
+}
