@@ -37,8 +37,8 @@ Section TCAMPtoNRAEnv.
   Proof.
     Hint Resolve data_type_drec_nil.
     unfold nraenv_type.
-    rewrite nraenv_of_camp_cnraenv_of_camp_ident.
-    apply cnraenv_of_camp_type_preserve.
+    rewrite nraenv_of_camp_nraenv_core_of_camp_ident.
+    apply nraenv_core_of_camp_type_preserve.
   Qed.
 
   (** Some corollaries of the main Lemma *)

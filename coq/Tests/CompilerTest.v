@@ -241,7 +241,7 @@ Section CompilerUntypedTest.
   Require Import TcNRAEnvInfer.
 
   Definition tout1infer : option rtype₀ :=
-    match infer_cnraenv_type alg5 (Rec tinp1 eq_refl) Unit with
+    match infer_nraenv_core_type alg5 (Rec tinp1 eq_refl) Unit with
       | None => None
       | Some x => Some (proj1_sig x)
     end.
@@ -258,12 +258,12 @@ Section CompilerUntypedTest.
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
     unfold algopt5, camp_to_nraenv_core.
-    unfold CAMPtocNRAEnv.translate_camp_to_cnraenv.
-    unfold CAMPtocNRAEnv.cnraenv_of_camp.
+    unfold CAMPtocNRAEnv.translate_camp_to_nraenv_core.
+    unfold CAMPtocNRAEnv.nraenv_core_of_camp.
     econstructor; eauto.
     econstructor; eauto.
     Focus 2.
-    apply (@cnraenv_of_camp_type_preserve).
+    apply (@nraenv_core_of_camp_type_preserve).
     apply Example1'_wt.
     repeat econstructor; eauto.
     Grab Existential Variables.

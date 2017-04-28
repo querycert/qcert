@@ -84,8 +84,8 @@ Section CAMPtoNRAEnv.
 
   Require Import CAMPtocNRAEnv.
 
-  Lemma nraenv_of_camp_cnraenv_of_camp_ident q :
-    cnraenv_of_nraenv (nraenv_of_camp q) = cnraenv_of_camp q.
+  Lemma nraenv_of_camp_nraenv_core_of_camp_ident q :
+    nraenv_core_of_nraenv (nraenv_of_camp q) = nraenv_core_of_camp q.
   Proof.
     induction q; intros; try reflexivity; simpl;
     try (rewrite IHq; try reflexivity);
@@ -95,9 +95,9 @@ Section CAMPtoNRAEnv.
   Lemma nraenv_of_camp_correct h c q env d:
     lift_failure (interp h c q env d) = nraenv_eval h c (nraenv_of_camp q) (drec env) d.
   Proof.
-    rewrite cnraenv_of_camp_correct.
+    rewrite nraenv_core_of_camp_correct.
     unfold nraenv_eval.
-    rewrite nraenv_of_camp_cnraenv_of_camp_ident.
+    rewrite nraenv_of_camp_nraenv_core_of_camp_ident.
     reflexivity.
   Qed.
   

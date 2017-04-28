@@ -25,91 +25,91 @@ Section TcNRAEnv.
   Require Import cNRAEnv cNRAEnvEq.
   Require Import NRAEnv.
 
-  Local Open Scope cnraenv_scope.
+  Local Open Scope nraenv_core_scope.
   
   (** Typing for NRA *)
   Section typ.
     Context {m:basic_model}.
     Context (τconstants:tbindings).
   
-  Inductive cnraenv_type : cnraenv -> rtype -> rtype -> rtype -> Prop :=
+  Inductive nraenv_core_type : nraenv_core -> rtype -> rtype -> rtype -> Prop :=
   | ANTID {τenv τ} :
-      cnraenv_type ANID τenv τ τ
+      nraenv_core_type ANID τenv τ τ
   | ANTConst {τenv τin τout} c :
-      data_type (normalize_data brand_relation_brands c) τout -> cnraenv_type (ANConst c) τenv τin τout
+      data_type (normalize_data brand_relation_brands c) τout -> nraenv_core_type (ANConst c) τenv τin τout
   | ANTBinop {τenv τin τ₁ τ₂ τout} b op1 op2 :
       binOp_type b τ₁ τ₂ τout ->
-      cnraenv_type op1 τenv τin τ₁ ->
-      cnraenv_type op2 τenv τin τ₂ ->
-      cnraenv_type (ANBinop b op1 op2) τenv τin τout
+      nraenv_core_type op1 τenv τin τ₁ ->
+      nraenv_core_type op2 τenv τin τ₂ ->
+      nraenv_core_type (ANBinop b op1 op2) τenv τin τout
   | ANTUnop {τenv τin τ τout} u op :
       unaryOp_type u τ τout ->
-      cnraenv_type op τenv τin τ ->
-      cnraenv_type (ANUnop u op) τenv τin τout
+      nraenv_core_type op τenv τin τ ->
+      nraenv_core_type (ANUnop u op) τenv τin τout
   | ANTMap {τenv τin τ₁ τ₂} op1 op2 :
-      cnraenv_type op1 τenv τ₁ τ₂ ->
-      cnraenv_type op2 τenv τin (Coll τ₁) ->
-      cnraenv_type (ANMap op1 op2) τenv τin (Coll τ₂)
+      nraenv_core_type op1 τenv τ₁ τ₂ ->
+      nraenv_core_type op2 τenv τin (Coll τ₁) ->
+      nraenv_core_type (ANMap op1 op2) τenv τin (Coll τ₂)
   | ANTMapConcat {τenv τin τ₁ τ₂ τ₃} op1 op2 pf1 pf2 pf3 :
-      cnraenv_type op1 τenv (Rec Closed τ₁ pf1) (Coll (Rec Closed τ₂ pf2)) ->
-      cnraenv_type op2 τenv τin (Coll (Rec Closed τ₁ pf1)) ->
+      nraenv_core_type op1 τenv (Rec Closed τ₁ pf1) (Coll (Rec Closed τ₂ pf2)) ->
+      nraenv_core_type op2 τenv τin (Coll (Rec Closed τ₁ pf1)) ->
       rec_concat_sort τ₁ τ₂ = τ₃ ->
-      cnraenv_type (ANMapConcat op1 op2) τenv τin (Coll (Rec Closed τ₃ pf3))
+      nraenv_core_type (ANMapConcat op1 op2) τenv τin (Coll (Rec Closed τ₃ pf3))
   | ANTProduct {τenv τin τ₁ τ₂ τ₃} op1 op2 pf1 pf2 pf3 :
-      cnraenv_type op1 τenv τin (Coll (Rec Closed τ₁ pf1)) ->
-      cnraenv_type op2 τenv τin (Coll (Rec Closed τ₂ pf2)) ->
+      nraenv_core_type op1 τenv τin (Coll (Rec Closed τ₁ pf1)) ->
+      nraenv_core_type op2 τenv τin (Coll (Rec Closed τ₂ pf2)) ->
       rec_concat_sort τ₁ τ₂ = τ₃ ->
-      cnraenv_type (ANProduct op1 op2) τenv τin (Coll (Rec Closed τ₃ pf3))
+      nraenv_core_type (ANProduct op1 op2) τenv τin (Coll (Rec Closed τ₃ pf3))
   | ANTSelect {τenv τin τ} op1 op2 :
-      cnraenv_type op1 τenv τ Bool ->
-      cnraenv_type op2 τenv τin (Coll τ) ->
-      cnraenv_type (ANSelect op1 op2) τenv τin (Coll τ)
+      nraenv_core_type op1 τenv τ Bool ->
+      nraenv_core_type op2 τenv τin (Coll τ) ->
+      nraenv_core_type (ANSelect op1 op2) τenv τin (Coll τ)
   | ANTDefault {τenv τin τ} op1 op2 :
-      cnraenv_type op1 τenv τin (Coll τ) ->
-      cnraenv_type op2 τenv τin (Coll τ) ->
-      cnraenv_type (ANDefault op1 op2) τenv τin (Coll τ)
+      nraenv_core_type op1 τenv τin (Coll τ) ->
+      nraenv_core_type op2 τenv τin (Coll τ) ->
+      nraenv_core_type (ANDefault op1 op2) τenv τin (Coll τ)
   | ANTEither {τenv τl τr τout} opl opr :
-      cnraenv_type opl τenv τl τout ->
-      cnraenv_type opr τenv τr τout ->
-      cnraenv_type (ANEither opl opr) τenv (Either τl τr) τout
+      nraenv_core_type opl τenv τl τout ->
+      nraenv_core_type opr τenv τr τout ->
+      nraenv_core_type (ANEither opl opr) τenv (Either τl τr) τout
   | ANTEitherConcat {τenv τin rll pfl rlr pfr rlo pfo lo ro} op1 op2 pflo pfro :
-      cnraenv_type op1 τenv τin (Either (Rec Closed rll pfl) (Rec Closed rlr pfr)) ->
-      cnraenv_type op2 τenv τin (Rec Closed rlo pfo) ->
+      nraenv_core_type op1 τenv τin (Either (Rec Closed rll pfl) (Rec Closed rlr pfr)) ->
+      nraenv_core_type op2 τenv τin (Rec Closed rlo pfo) ->
       rec_concat_sort rll rlo = lo ->
       rec_concat_sort rlr rlo = ro ->
-      cnraenv_type (ANEitherConcat op1 op2) τenv  τin (Either (Rec Closed lo pflo) (Rec Closed ro pfro))                  
+      nraenv_core_type (ANEitherConcat op1 op2) τenv  τin (Either (Rec Closed lo pflo) (Rec Closed ro pfro))                  
   | ANTApp {τenv τin τ1 τ2} op2 op1 :
-      cnraenv_type op1 τenv τin τ1 ->
-      cnraenv_type op2 τenv τ1 τ2 ->
-      cnraenv_type (ANApp op2 op1) τenv τin τ2
+      nraenv_core_type op1 τenv τin τ1 ->
+      nraenv_core_type op2 τenv τ1 τ2 ->
+      nraenv_core_type (ANApp op2 op1) τenv τin τ2
   | ANTGetConstant {τenv τin τout} s :
       tdot τconstants s = Some τout ->
-      cnraenv_type (ANGetConstant s) τenv τin τout
+      nraenv_core_type (ANGetConstant s) τenv τin τout
   | ANTEnv {τenv τin} :
-      cnraenv_type ANEnv τenv τin τenv
+      nraenv_core_type ANEnv τenv τin τenv
   | ANTAppEnv {τenv τenv' τin τ2} op2 op1 :
-      cnraenv_type op1 τenv τin τenv' ->
-      cnraenv_type op2 τenv' τin τ2 ->
-      cnraenv_type (ANAppEnv op2 op1) τenv τin τ2
+      nraenv_core_type op1 τenv τin τenv' ->
+      nraenv_core_type op2 τenv' τin τ2 ->
+      nraenv_core_type (ANAppEnv op2 op1) τenv τin τ2
   | ANTMapEnv {τenv τin τ₂} op1 :
-      cnraenv_type op1 τenv τin τ₂ ->
-      cnraenv_type (ANMapEnv op1) (Coll τenv) τin (Coll τ₂).
+      nraenv_core_type op1 τenv τin τ₂ ->
+      nraenv_core_type (ANMapEnv op1) (Coll τenv) τin (Coll τ₂).
   End typ.
 
-  Notation "Op ▷ A >=> B ⊣ C ; E" := (cnraenv_type C Op E A B) (at level 70).
+  Notation "Op ▷ A >=> B ⊣ C ; E" := (nraenv_core_type C Op E A B) (at level 70).
 
-  (** Type lemmas for individual cnraenvebraic expressions *)
+  (** Type lemmas for individual algebraic expressions *)
 
   Context {m:basic_model}.
   
-  Lemma rmap_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : cnraenv) (env:data) (dl : list data) :
+  Lemma rmap_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : nraenv_core) (env:data) (dl : list data) :
     (bindings_type c τc) ->
     (env ▹ τenv) ->
     (Forall (fun d : data => data_type d τ₁) dl) ->
     (op1 ▷ τ₁ >=> τ₂ ⊣ τc; τenv) ->
     (forall d : data,
        data_type d τ₁ -> exists x : data, brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c; env = Some x /\ x ▹ τ₂) ->
-    exists x : list data, (rmap (cnraenv_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (rmap (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros dt_c; intros.
     induction dl; simpl; intros.
@@ -131,7 +131,7 @@ Section TcNRAEnv.
       rewrite <- H3; assumption.
   Qed.
 
-  Lemma rmap_env_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : cnraenv) (x0:data) (dl : list data) :
+  Lemma rmap_env_typed {τc} {τenv τ₁ τ₂ : rtype} c (op1 : nraenv_core) (x0:data) (dl : list data) :
     bindings_type c τc ->
     (x0 ▹ τ₁) ->
     (Forall (fun d : data => data_type d τenv) dl) ->
@@ -141,7 +141,7 @@ Section TcNRAEnv.
        forall d : data,
          data_type d τ₁ ->
          exists x : data, brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c;env = Some x /\ data_type x τ₂) ->
-    exists x : list data, (rmap (fun env' => (cnraenv_eval brand_relation_brands c op1 env' x0)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+    exists x : list data, (rmap (fun env' => (nraenv_core_eval brand_relation_brands c op1 env' x0)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
     intros dt_c.
     induction dl; simpl; intros.
@@ -311,7 +311,7 @@ Section TcNRAEnv.
     rewrite H1 in H; rewrite H2 in H0; assumption.
   Qed.
 
-  Lemma rmap_concat_typed_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} (op1 : cnraenv) c (env:data) (dl: list data) pf1 pf2 pf3:
+  Lemma rmap_concat_typed_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} (op1 : nraenv_core) c (env:data) (dl: list data) pf1 pf2 pf3:
     bindings_type c τc ->
     env ▹ τenv ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
@@ -321,7 +321,7 @@ Section TcNRAEnv.
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
                    brand_relation_brands ⊢ₑ op1 @ₑ d ⊣ c;env = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_concat (cnraenv_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+    exists x : list data, (rmap_concat (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
     intros dt_c Henv.
     intros; rewrite Forall_forall in *.
@@ -356,7 +356,7 @@ Section TcNRAEnv.
     apply data_type_concat; assumption.
   Qed.
 
-  Lemma rmap_concat_typed2_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} τin c (op1 : cnraenv) (env:data) y (dl: list data) pf1 pf2 pf3:
+  Lemma rmap_concat_typed2_env {τc} {τenv:rtype} {τ₁ τ₂ τ₃ : list (string * rtype)} τin c (op1 : nraenv_core) (env:data) y (dl: list data) pf1 pf2 pf3:
     bindings_type c τc ->
     env▹ τenv ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
@@ -404,7 +404,7 @@ Section TcNRAEnv.
 
   (** Main typing soundness theorem for NRAEnv *)
 
-  Theorem typed_cnraenv_yields_typed_data {τc} {τenv τin τout} c (env:data) (d:data) (op:cnraenv):
+  Theorem typed_nraenv_core_yields_typed_data {τc} {τenv τin τout} c (env:data) (d:data) (op:nraenv_core):
     bindings_type c τc ->
     (env ▹ τenv) -> (d ▹ τin) -> (op ▷ τin >=> τout ⊣ τc;τenv) ->
     (exists x, (brand_relation_brands ⊢ₑ op @ₑ d ⊣ c;env = Some x /\ (x ▹ τout))).
@@ -419,53 +419,53 @@ Section TcNRAEnv.
     - exists (RDataNorm.normalize_data brand_relation_brands c0); split; try reflexivity.
       assumption.
     (* ANTBinop *)
-    - elim (IHcnraenv_type1 env Henv d H0); elim (IHcnraenv_type2 env Henv d H0); intros.
+    - elim (IHnraenv_core_type1 env Henv d H0); elim (IHnraenv_core_type2 env Henv d H0); intros.
       elim H1; elim H2; intros; clear H1 H2.
       rewrite H3; simpl.
       rewrite H5; simpl.
       apply (typed_binop_yields_typed_data x0 x b H4 H6); assumption.
     (* ANTUnop *)
-    - elim (IHcnraenv_type env Henv d H1); intros.
+    - elim (IHnraenv_core_type env Henv d H1); intros.
       elim H2; intros; clear H2.
       rewrite H3.
       apply (typed_unop_yields_typed_data x u H4); assumption.
     (* ANTMap *)
-    - elim (IHcnraenv_type2 env Henv d H); intros; clear H IHcnraenv_type2.
+    - elim (IHnraenv_core_type2 env Henv d H); intros; clear H IHnraenv_core_type2.
       elim H0; intros; clear H0.
       rewrite H; clear H.
       invcs H1.
       rtype_equalizer.
       subst.
-      assert (EE : exists x : list data, (rmap (cnraenv_eval brand_relation_brands c op1 env) dl = Some x)
+      assert (EE : exists x : list data, (rmap (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x)
                                     /\ data_type (dcoll x) (Coll τ₂)).
       + apply (@rmap_typed τc τenv τ₁ τ₂ c op1 env dl dt_c Henv); trivial.
-        apply IHcnraenv_type1; trivial.
+        apply IHnraenv_core_type1; trivial.
       + destruct EE as [? [eqq dt]].
         simpl.
         rewrite eqq; simpl.
         eexists; split; try reflexivity.
         trivial.
     (* ANTMapConcat *)
-    - elim (IHcnraenv_type2 env Henv d H0); intros; clear IHcnraenv_type2 H0.
+    - elim (IHnraenv_core_type2 env Henv d H0); intros; clear IHnraenv_core_type2 H0.
       elim H1; intros; clear H1.
       rewrite H0; clear H0.
       invcs H2.
-      assert (EE : exists x : list data, (rmap_concat (cnraenv_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      assert (EE : exists x : list data, (rmap_concat (nraenv_core_eval brand_relation_brands c op1 env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
       + apply (rmap_concat_typed_env op1 c env dl pf1 pf2 pf3 dt_c Henv); try assumption; try reflexivity.
         apply recover_rec_forall with (r:= r); assumption.
-        apply IHcnraenv_type1; assumption.
+        apply IHnraenv_core_type1; assumption.
       + destruct EE as [? [eqq typ]].
         simpl; rewrite eqq; simpl.
         eexists; split; try reflexivity.
         trivial.
     (* ANTProduct *)
-    - elim (IHcnraenv_type1 env Henv d H0); intros; clear IHcnraenv_type1.
+    - elim (IHnraenv_core_type1 env Henv d H0); intros; clear IHnraenv_core_type1.
       elim H1; intros; clear H1.
       rewrite H2; clear H2; invcs H3.
       assert (EE : exists x : list data, (rmap_concat (fun _ : data => brand_relation_brands ⊢ₑ op2 @ₑ d ⊣ c;env) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
       + apply (@rmap_concat_typed2_env τc τenv τ₁ τ₂ (rec_concat_sort τ₁ τ₂) τin c op2 env d dl pf1 pf2 pf3); try assumption; try reflexivity.
         apply recover_rec_forall with (r:= r); assumption.
-        destruct (IHcnraenv_type2 env Henv d H0) as [? [eqq dt]].
+        destruct (IHnraenv_core_type2 env Henv d H0) as [? [eqq dt]].
         rewrite eqq.
         intros.
         eexists; split; try reflexivity.
@@ -475,7 +475,7 @@ Section TcNRAEnv.
         eexists; split; try reflexivity.
         trivial.
     (* ANTSelect *)
-    - elim (IHcnraenv_type2 env Henv d H); intros; clear IHcnraenv_type2.
+    - elim (IHnraenv_core_type2 env Henv d H); intros; clear IHnraenv_core_type2.
       elim H0; intros; clear H0.
       rewrite H1; clear H1 H0_0.
       invcs H2.
@@ -495,7 +495,7 @@ Section TcNRAEnv.
                  by intuition.
           assert (data_type a τ)
             by (simpl in *; intuition).
-          destruct (IHcnraenv_type1 env Henv a H1) as [? [eqq dt]].
+          destruct (IHnraenv_core_type1 env Henv a H1) as [? [eqq dt]].
           simpl; rewrite eqq; simpl.
           dtype_inverter.
           destruct (IHdl H0) as [? [eqq1 dt1]].
@@ -509,7 +509,7 @@ Section TcNRAEnv.
         eexists; split; try reflexivity; trivial.
         constructor; trivial.
     (* ANTDefault *)
-    - elim (IHcnraenv_type1 env Henv d H); elim (IHcnraenv_type2 env Henv d H); intros.
+    - elim (IHnraenv_core_type1 env Henv d H); elim (IHnraenv_core_type2 env Henv d H); intros.
       elim H0; elim H1; intros; clear H0 H1 H.
       rewrite H2. rewrite H4. clear H2 H4.
       simpl.
@@ -523,9 +523,9 @@ Section TcNRAEnv.
     (* ANTEither *)
     - destruct (data_type_Either_inv H) as [[dd[? ddtyp]]|[dd[? ddtyp]]]; subst; eauto.
     (* ANTEitherConcat *)
-    - destruct (IHcnraenv_type2 env Henv d H1) as [? [??]].
+    - destruct (IHnraenv_core_type2 env Henv d H1) as [? [??]].
       rewrite H2.
-      destruct (IHcnraenv_type1 env Henv d H1) as [? [??]].
+      destruct (IHnraenv_core_type1 env Henv d H1) as [? [??]].
       rewrite H4.
       destruct (data_type_Rec_inv H3); subst.
       destruct (data_type_Either_inv H5) as [[dd[? ddtyp]]|[dd[? ddtyp]]]; subst; eauto;
@@ -534,10 +534,10 @@ Section TcNRAEnv.
       econstructor;
       eapply dtrec_rec_concat_sort; eauto).
     (* ANTApp *)
-    - elim (IHcnraenv_type1 env Henv d H); intros.
+    - elim (IHnraenv_core_type1 env Henv d H); intros.
       elim H0; intros; clear H0 H.
       rewrite H1; simpl.
-      elim (IHcnraenv_type2 env Henv x H2); intros.
+      elim (IHnraenv_core_type2 env Henv x H2); intros.
       elim H; intros; clear H.
       rewrite H0; simpl.
       exists x0;split;[reflexivity|assumption].
@@ -550,10 +550,10 @@ Section TcNRAEnv.
     (* ANTEnv *)
     - exists env; split; [reflexivity|assumption].
     (* ANTAppEnv *)
-    - elim (IHcnraenv_type1 env Henv d H); intros.
+    - elim (IHnraenv_core_type1 env Henv d H); intros.
       elim H0; intros; clear H0.
       rewrite H1; simpl.
-      elim (IHcnraenv_type2 x H2 d H); intros.
+      elim (IHnraenv_core_type2 x H2 d H); intros.
       elim H0; intros; clear H0.
       rewrite H3; simpl.
       exists x0;split;[reflexivity|assumption].
@@ -561,7 +561,7 @@ Section TcNRAEnv.
     - intros.
       invcs Henv; rtype_equalizer.
       subst; simpl.
-      assert (exists x : list data, (rmap (fun env' : data => (cnraenv_eval brand_relation_brands c op1 env' d)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂)).
+      assert (exists x : list data, (rmap (fun env' : data => (nraenv_core_eval brand_relation_brands c op1 env' d)) dl = Some x) /\ data_type (dcoll x) (Coll τ₂)).
       * apply (@rmap_env_typed τc τenv τin τ₂); try assumption.
       * destruct H1 as [? [eqq dt]].
         rewrite eqq; simpl.
@@ -572,7 +572,7 @@ Section TcNRAEnv.
 
   (** Corrolaries of the main type soudness theorem *)
 
-  Definition typed_cnraenv_total {τc} {τenv τin τout} (op:cnraenv) (HOpT: op ▷ τin >=> τout ⊣ τc;τenv) c (env:data) (d:data)
+  Definition typed_nraenv_core_total {τc} {τenv τin τout} (op:nraenv_core) (HOpT: op ▷ τin >=> τout ⊣ τc;τenv) c (env:data) (d:data)
     (dt_c: bindings_type c τc) :
     (env ▹ τenv) ->
     (d ▹ τin) ->
@@ -580,7 +580,7 @@ Section TcNRAEnv.
   Proof.
     intro Henv.
     intros HdT.
-    generalize (typed_cnraenv_yields_typed_data c env d op dt_c Henv HdT HOpT).
+    generalize (typed_nraenv_core_yields_typed_data c env d op dt_c Henv HdT HOpT).
     intros.
     destruct (brand_relation_brands ⊢ₑ op @ₑ d ⊣ c;env).
     assert (data_type d0 τout).
@@ -590,13 +590,13 @@ Section TcNRAEnv.
       destruct H0. inversion H0.
   Defined.
 
-  Definition tcnraenv_eval {τc} {τenv τin τout} (op:cnraenv) (HOpT: op ▷ τin >=> τout ⊣ τc;τenv) c (env:data) (d:data)
+  Definition tnraenv_core_eval {τc} {τenv τin τout} (op:nraenv_core) (HOpT: op ▷ τin >=> τout ⊣ τc;τenv) c (env:data) (d:data)
              (dt_c: bindings_type c τc) : 
     (env ▹ τenv) -> (d ▹ τin) -> data.
   Proof.
     intros Henv.
     intros HdT.
-    destruct (typed_cnraenv_total op HOpT c env d dt_c Henv HdT).
+    destruct (typed_nraenv_core_total op HOpT c env d dt_c Henv HdT).
     exact x.
   Defined.
 
@@ -742,7 +742,7 @@ Section TcNRAEnv.
         destruct H as [? [? [? [??]]]]
     | [H: Coll₀ _ = Coll₀ _ |- _ ] => inversion H; clear H
     | [H: Rec₀ _ _ = Rec₀ _ _ |- _ ] => inversion H; clear H
-    | [H: cnraenv_type _ _ (snd ?x) _ |- _] => destruct x; simpl in *; subst
+    | [H: nraenv_core_type _ _ (snd ?x) _ |- _] => destruct x; simpl in *; subst
     | [H:unaryOp_type AColl _ _ |- _ ] => inversion H; clear H; subst
     | [H:unaryOp_type AFlatten _ _ |- _ ] => inversion H; clear H; subst
     | [H:unaryOp_type (ARec _) _ _ |- _ ] => inversion H; clear H; subst
@@ -780,8 +780,8 @@ Section TcNRAEnv.
       econstructor; eauto.
     Qed.
 
-    Theorem typed_cnraenv_to_typed_nra {τc} pf {τenv τin τout} (op:cnraenv):
-    (cnraenv_type τc op τenv τin τout) -> (nra_type (nra_of_cnraenv op) (nra_context_type (Rec Closed τc pf) τenv τin) τout).
+    Theorem typed_nraenv_core_to_typed_nra {τc} pf {τenv τin τout} (op:nraenv_core):
+    (nraenv_core_type τc op τenv τin τout) -> (nra_type (nra_of_nraenv_core op) (nra_context_type (Rec Closed τc pf) τenv τin) τout).
   Proof.
     intros.
     dependent induction H; simpl; intros.
@@ -823,13 +823,13 @@ Section TcNRAEnv.
                           [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, Rec Closed τ₁ pf1)]
                           [("PDATA2"%string, (Rec Closed τ₂ pf2))]
                           [("PBIND"%string, τenv);  ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, Rec Closed τ₁ pf1); ("PDATA2"%string, Rec Closed τ₂ pf2)]
-                          (AMap (AUnop (ARec "PDATA2") AID) (nra_of_cnraenv op1))
-                          (unnest_two "a1" "PDATA" (AUnop AColl (nra_wrap_a1 (nra_of_cnraenv op2))))
+                          (AMap (AUnop (ARec "PDATA2") AID) (nra_of_nraenv_core op1))
+                          (unnest_two "a1" "PDATA" (AUnop AColl (nra_wrap_a1 (nra_of_nraenv_core op2))))
                           eq_refl eq_refl
             ); try reflexivity.
       eauto.
       unfold nra_wrap_a1.
-      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (nra_triple "PCONST" "PBIND" "a1" nra_const_env nra_bind (nra_of_cnraenv op2))) (nra_context_type  (Rec Closed τc pf) τenv τin) [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
+      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (nra_triple "PCONST" "PBIND" "a1" nra_const_env nra_bind (nra_of_nraenv_core op2))) (nra_context_type  (Rec Closed τc pf) τenv τin) [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
       apply (@ATUnop m (nra_context_type  (Rec Closed τc pf) τenv τin) (Rec Closed [("PBIND"%string, τenv);  ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)).
       econstructor; eauto.
       unfold nra_triple, nra_bind.
@@ -1020,11 +1020,11 @@ Section TcNRAEnv.
             end
       end.
 
-  Lemma typed_cnraenv_to_typed_nra_inv' {k τc pf0 τenv τin τout pf} (op:cnraenv):
-    nra_type (nra_of_cnraenv op) (Rec k [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf0)); ("PDATA"%string, τin)] pf) τout ->
-    cnraenv_type τc op τenv τin τout.
+  Lemma typed_nraenv_core_to_typed_nra_inv' {k τc pf0 τenv τin τout pf} (op:nraenv_core):
+    nra_type (nra_of_nraenv_core op) (Rec k [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf0)); ("PDATA"%string, τin)] pf) τout ->
+    nraenv_core_type τc op τenv τin τout.
   Proof.
-    Hint Constructors cnraenv_type.
+    Hint Constructors nraenv_core_type.
     revert k τenv τin τout pf.
     induction op; simpl; intros.
     - nra_inverter2; try tdot_inverter; eauto.
@@ -1064,17 +1064,17 @@ Section TcNRAEnv.
     - nra_inverter2; try tdot_inverter; eauto.
   Qed.
   
-  Theorem typed_cnraenv_to_typed_nra_inv {τc} pf {τenv τin τout} (op:cnraenv):
-    nra_type (nra_of_cnraenv op) (nra_context_type  (Rec Closed τc pf) τenv τin) τout ->
-    cnraenv_type τc op τenv τin τout.
+  Theorem typed_nraenv_core_to_typed_nra_inv {τc} pf {τenv τin τout} (op:nraenv_core):
+    nra_type (nra_of_nraenv_core op) (nra_context_type  (Rec Closed τc pf) τenv τin) τout ->
+    nraenv_core_type τc op τenv τin τout.
   Proof.
     unfold nra_context_type.
-    apply typed_cnraenv_to_typed_nra_inv'.
+    apply typed_nraenv_core_to_typed_nra_inv'.
   Qed.
 
-  Lemma typed_cnraenv_const_sort_f {τc op τenv τin τout} :
-    cnraenv_type (rec_sort τc) op τenv τin τout ->
-    cnraenv_type τc op τenv τin τout.
+  Lemma typed_nraenv_core_const_sort_f {τc op τenv τin τout} :
+    nraenv_core_type (rec_sort τc) op τenv τin τout ->
+    nraenv_core_type τc op τenv τin τout.
   Proof.
     revert τc op τenv τin τout.
     induction op; simpl; inversion 1; rtype_equalizer; subst; eauto.
@@ -1083,9 +1083,9 @@ Section TcNRAEnv.
     econstructor. apply H1.
   Qed.
 
-  Lemma typed_cnraenv_const_sort_b {τc op τenv τin τout} :
-      cnraenv_type τc op τenv τin τout ->
-      cnraenv_type (rec_sort τc) op τenv τin τout.
+  Lemma typed_nraenv_core_const_sort_b {τc op τenv τin τout} :
+      nraenv_core_type τc op τenv τin τout ->
+      nraenv_core_type (rec_sort τc) op τenv τin τout.
   Proof.
     revert τc op τenv τin τout.
     induction op; simpl; inversion 1; rtype_equalizer; subst; eauto.
@@ -1095,29 +1095,29 @@ Section TcNRAEnv.
     apply H1.
   Qed.
 
-  Lemma typed_cnraenv_const_sort τc op τenv τin τout :
-    cnraenv_type (rec_sort τc) op τenv τin τout <->
-    cnraenv_type τc op τenv τin τout.
+  Lemma typed_nraenv_core_const_sort τc op τenv τin τout :
+    nraenv_core_type (rec_sort τc) op τenv τin τout <->
+    nraenv_core_type τc op τenv τin τout.
   Proof.
     split; intros.
-    - apply typed_cnraenv_const_sort_f; trivial.
-    - apply typed_cnraenv_const_sort_b; trivial.
+    - apply typed_nraenv_core_const_sort_f; trivial.
+    - apply typed_nraenv_core_const_sort_b; trivial.
   Qed.
 
 End TcNRAEnv.
 
 (* Typed algebraic plan *)
 
-Notation "Op ▷ A >=> B ⊣ C ; E" := (cnraenv_type C Op E A B) (at level 70).
-Notation "Op @▷ d ⊣ C ; e" := (tcnraenv_eval C Op e d) (at level 70).
+Notation "Op ▷ A >=> B ⊣ C ; E" := (nraenv_core_type C Op E A B) (at level 70).
+Notation "Op @▷ d ⊣ C ; e" := (tnraenv_core_eval C Op e d) (at level 70).
 
 (* Used to prove type portion of typed directed rewrites *)
   
-Hint Constructors cnraenv_type.
+Hint Constructors nraenv_core_type.
 Hint Constructors unaryOp_type.
 Hint Constructors binOp_type.
 
-Ltac cnraenv_inverter := 
+Ltac nraenv_core_inverter := 
   match goal with
     | [H:Coll _ = Coll _ |- _] => inversion H; clear H
     | [H: `?τ₁ = Coll₀ (`?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
@@ -1172,10 +1172,10 @@ Ltac cnraenv_inverter :=
     | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
     | [H:binOp_type AAnd _ _ _ |- _ ] => inversion H; clear H
     | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
-  end; try rtype_equalizer; try assumption; try subst; simpl in *; try cnraenv_inverter.
+  end; try rtype_equalizer; try assumption; try subst; simpl in *; try nraenv_core_inverter.
 
 (* inverts, then tries and solve *)
-Ltac cnraenv_inferer := try cnraenv_inverter; subst; try eauto.
+Ltac nraenv_core_inferer := try nraenv_core_inverter; subst; try eauto.
 
 (* simplifies when a goal evaluates an expression over well-typed data *)
 
@@ -1186,11 +1186,11 @@ Ltac input_well_typed :=
               HI:?x ▹ ?τin,
               HC:bindings_type ?c ?τc,
               HE:?env ▹ ?τenv
-              |- context [(cnraenv_eval ?h ?c ?op ?env ?x)]] =>
+              |- context [(nraenv_core_eval ?h ?c ?op ?env ?x)]] =>
              let xout := fresh "dout" in
              let xtype := fresh "τout" in
              let xeval := fresh "eout" in
-             destruct (typed_cnraenv_yields_typed_data c _ _ op HC HE HI HO)
+             destruct (typed_nraenv_core_yields_typed_data c _ _ op HC HE HI HO)
                as [xout [xeval xtype]]; rewrite xeval in *; simpl
          end.
 

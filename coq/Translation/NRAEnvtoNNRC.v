@@ -177,7 +177,7 @@ Section NRAEnvtoNNRC.
     Example nraenv_to_nnrc_codepaths_different vid venv:
       exists op,
         ~ (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv)
-           = cnraenv_to_nnrc (cnraenv_of_nraenv op) vid venv).
+           = nraenv_core_to_nnrc (nraenv_core_of_nraenv op) vid venv).
     Proof.
       exists (NRAEnvGroupBy "a"%string nil%string NRAEnvID).
       simpl; inversion 1.
@@ -275,14 +275,14 @@ Section NRAEnvtoNNRC.
 
   Theorem nraenv_to_nnrc_codepaths_equivalent h env op vid venv:
     nnrc_core_eval h env (nnrc_ext_to_nnrc (nraenv_to_nnrc_ext op vid venv))
-    = nnrc_core_eval h env (cnraenv_to_nnrc (cnraenv_of_nraenv op) vid venv).
+    = nnrc_core_eval h env (nraenv_core_to_nnrc (nraenv_core_of_nraenv op) vid venv).
   Proof.
     Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq.
     Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq.
     Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq.
     revert vid venv env; induction op; intros
-    ; simpl cnraenv_of_nraenv
-    ; simpl cnraenv_to_nnrc
+    ; simpl nraenv_core_of_nraenv
+    ; simpl nraenv_core_to_nnrc
     ; simpl nnrc_ext_to_nnrc
     ; simpl nraenv_to_nnrc_ext
     ; eauto 4.

@@ -37,7 +37,7 @@ Section NRAEnvTest.
   Require Import cNRAEnv.
 
   Local Open Scope string_scope.
-  Local Open Scope cnraenv_scope.
+  Local Open Scope nraenv_core_scope.
   Local Open Scope data_scope.
   Require Import TrivialModel.
 
@@ -45,7 +45,7 @@ Section NRAEnvTest.
   Example merge_env_example
     := [| ("A", dconst 1); ("B", dconst 3) |].
   
-  Example merge_succeeds : cnraenv
+  Example merge_succeeds : nraenv_core
     := χᵉ⟨ (ENV·"A") ♯+ (ENV·"C") ⟩ ◯ₑ (ENV ⊗ ‵ [| ("B", dconst 3) ; ("C", dconst 4) |]).
 
   Remark merge_succeeds_result :
@@ -53,7 +53,7 @@ Section NRAEnvTest.
                                            Some {| dconst 5 |}.
   Proof. reflexivity. Qed.
 
-  Example merge_fails : cnraenv
+  Example merge_fails : nraenv_core
     := χᵉ⟨ (ENV·"A") ♯+ (ENV·"C") ⟩ ◯ₑ (ENV ⊗ ‵ [| ("B", dconst 2) ; ("C", dconst 4) |]).
 
   Remark merge_fails_result :

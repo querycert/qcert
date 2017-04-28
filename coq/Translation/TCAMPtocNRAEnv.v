@@ -27,13 +27,13 @@ Section TCAMPtocNRAEnv.
   Local Open Scope list_scope.
   Local Open Scope camp_scope.
 
-  Hint Constructors cnraenv_type unaryOp_type binOp_type.
+  Hint Constructors nraenv_core_type unaryOp_type binOp_type.
 
   Context {m:basic_model}.
 
-  Lemma cnraenv_of_camp_type_preserve τc Γ pf p τin τout :
+  Lemma nraenv_core_of_camp_type_preserve τc Γ pf p τin τout :
     [τc&Γ] |= p ; τin ~> τout ->
-    cnraenv_of_camp p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
+    nraenv_core_of_camp p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed Γ pf).
   Proof.
     Hint Resolve data_type_drec_nil.
     revert Γ pf τin τout.
@@ -87,9 +87,9 @@ Section TCAMPtocNRAEnv.
 
   (** Some corollaries of the main Lemma *)
 
-  Lemma cnraenv_of_camp_cnraenv_of_camp_top p τc τin τout :
-    cnraenv_of_camp p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl) ->
-    cnraenv_of_camp_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
+  Lemma nraenv_core_of_camp_nraenv_core_of_camp_top p τc τin τout :
+    nraenv_core_of_camp p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl) ->
+    nraenv_core_of_camp_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
     repeat (econstructor; eauto).
@@ -97,11 +97,11 @@ Section TCAMPtocNRAEnv.
     
   Theorem alg_of_camp_top_type_preserve p τc τin τout :
     [τc&nil] |= p ; τin ~> τout ->
-    cnraenv_of_camp_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
+    nraenv_core_of_camp_top p ▷ τin >=> Coll τout ⊣ τc;(Rec Closed nil eq_refl).
   Proof.
     intros.
-    apply cnraenv_of_camp_cnraenv_of_camp_top.
-    apply cnraenv_of_camp_type_preserve; eauto.
+    apply nraenv_core_of_camp_nraenv_core_of_camp_top.
+    apply nraenv_core_of_camp_type_preserve; eauto.
   Qed.
 
 End TCAMPtocNRAEnv.

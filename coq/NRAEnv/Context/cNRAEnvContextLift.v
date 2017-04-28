@@ -38,8 +38,8 @@ Section cNRAEnvContext.
 (*
     Lemma aec_substs_prop_part2 c ps1 ps2 :
     Forall2 (fun xy1 xy2 => (fst xy1) = (fst xy2)
-                            /\ cnraenv_eq (snd xy1) (snd xy2)) ps1 ps2
-    -> cnraenv_ctxt_equiv_strict (aec_substs c ps1) (aec_substs c ps2).
+                            /\ nraenv_core_eq (snd xy1) (snd xy2)) ps1 ps2
+    -> nraenv_core_ctxt_equiv_strict (aec_substs c ps1) (aec_substs c ps2).
     Proof.
     intros F; revert c.
     induction F; simpl.
@@ -53,12 +53,12 @@ Section cNRAEnvContext.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint lift_nra_context (c:nra_ctxt) : cnraenv_ctxt :=
+  Fixpoint lift_nra_context (c:nra_ctxt) : nraenv_core_ctxt :=
     match c with
       | CHole x'
         => CNHole x'
       | CPlug a
-        => CNPlug (cnraenv_of_nra a)
+        => CNPlug (nraenv_core_of_nra a)
       | CABinop b c1 c2
         => CANBinop b (lift_nra_context c1) (lift_nra_context c2)
       | CAUnop u c
@@ -98,7 +98,7 @@ Section cNRAEnvContext.
 
   Lemma lift_nra_context_subst c n a :
     lift_nra_context (ac_subst c n a) =
-    aec_subst (lift_nra_context c) n (cnraenv_of_nra a).
+    aec_subst (lift_nra_context c) n (nraenv_core_of_nra a).
   Proof.
     induction c; simpl; try congruence.
     match_destr.
@@ -107,7 +107,7 @@ Section cNRAEnvContext.
   Lemma lift_nra_context_substs c ps :
     lift_nra_context (ac_substs c ps) =
     aec_substs (lift_nra_context c)
-               (map (fun xy => (fst xy, cnraenv_of_nra (snd xy))) ps).
+               (map (fun xy => (fst xy, nraenv_core_of_nra (snd xy))) ps).
   Proof.
     revert c.
     induction ps; simpl; trivial.
@@ -116,50 +116,50 @@ Section cNRAEnvContext.
     trivial.
   Qed.
 
-  Definition cnraenv_eq_under h c env (op1 op2:cnraenv) : Prop :=
+  Definition nraenv_core_eq_under h c env (op1 op2:nraenv_core) : Prop :=
         (forall (x:data)
                 (dn_x:data_normalized h x),
-          h ⊢ₑ op1 @ₑ x ⊣ c;env = h ⊢ₑ op2 @ₑ x ⊣ c;env)%cnraenv.
+          h ⊢ₑ op1 @ₑ x ⊣ c;env = h ⊢ₑ op2 @ₑ x ⊣ c;env)%nraenv_core.
 
-  Definition cnraenv_ctxt_equiv_under h c env (c1 c2 : cnraenv_ctxt)
-    := forall (ps:list (nat * cnraenv)),
+  Definition nraenv_core_ctxt_equiv_under h c env (c1 c2 : nraenv_core_ctxt)
+    := forall (ps:list (nat * nraenv_core)),
       match aec_simplify (aec_substs c1 ps),
             aec_simplify (aec_substs c2 ps)
       with
-      | CNPlug a1, CNPlug a2 => cnraenv_eq_under h c env a1 a2
+      | CNPlug a1, CNPlug a2 => nraenv_core_eq_under h c env a1 a2
       | _, _ => True
       end.
 
-  Lemma cnraenv_eq_under_equiv (op1 op2:cnraenv) : 
-    (forall h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env), cnraenv_eq_under h c env op1 op2) <->
-    cnraenv_eq op1 op2.
+  Lemma nraenv_core_eq_under_equiv (op1 op2:nraenv_core) : 
+    (forall h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env), nraenv_core_eq_under h c env op1 op2) <->
+    nraenv_core_eq op1 op2.
   Proof.
-    unfold cnraenv_eq, cnraenv_eq_under; intuition.
+    unfold nraenv_core_eq, nraenv_core_eq_under; intuition.
   Qed.
 
-  Lemma cnraenv_ctxt_equiv_under_equiv (op1 op2:cnraenv_ctxt) : 
-    (forall h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env), cnraenv_ctxt_equiv_under h c env op1 op2) <->
-    cnraenv_ctxt_equiv cnraenv_eq op1 op2.
+  Lemma nraenv_core_ctxt_equiv_under_equiv (op1 op2:nraenv_core_ctxt) : 
+    (forall h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env), nraenv_core_ctxt_equiv_under h c env op1 op2) <->
+    nraenv_core_ctxt_equiv nraenv_core_eq op1 op2.
   Proof.
-    unfold cnraenv_ctxt_equiv, cnraenv_ctxt_equiv_under; split; intros.
+    unfold nraenv_core_ctxt_equiv, nraenv_core_ctxt_equiv_under; split; intros.
     -match_case; match_case; intros.
-     apply cnraenv_eq_under_equiv; intros h dl env dn_c dn_env.
+     apply nraenv_core_eq_under_equiv; intros h dl env dn_c dn_env.
      specialize (H h dl env dn_c dn_env ps). rewrite H0, H1 in H. trivial.
     - specialize (H ps). match_destr; match_destr.
-      apply cnraenv_eq_under_equiv; auto.
+      apply nraenv_core_eq_under_equiv; auto.
   Qed.
 
   Lemma roundtrip_env e h c env :
     Forall (fun x => data_normalized h (snd x)) c ->
     data_normalized h env ->
-    cnraenv_eq_under h c env 
-                    ((cnraenv_of_nra (nra_of_cnraenv e )
-                                    ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[|("PCONST", ‵(drec (rec_sort c)))|] ⊕‵[| ("PDATA", ID)|])))%cnraenv)
+    nraenv_core_eq_under h c env 
+                    ((nraenv_core_of_nra (nra_of_nraenv_core e )
+                                    ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[|("PCONST", ‵(drec (rec_sort c)))|] ⊕‵[| ("PDATA", ID)|])))%nraenv_core)
                     e.
   Proof.
     red; intros.
     simpl.
-    rewrite <- cnraenv_eval_of_nra.
+    rewrite <- nraenv_core_eval_of_nra.
     rewrite unfold_env_nra_sort.
     rewrite (map_normalize_normalized_eq h (rec_sort c)).
     - rewrite drec_sort_idempotent.
@@ -168,13 +168,13 @@ Section cNRAEnvContext.
     - apply Forall_sorted; eauto.
   Qed.
 
-  Instance ae_under_equiv h c env : Equivalence (cnraenv_eq_under h c env).
+  Instance ae_under_equiv h c env : Equivalence (nraenv_core_eq_under h c env).
   Proof.
-    unfold cnraenv_eq_under.
+    unfold nraenv_core_eq_under.
     constructor; red; intros.
     - reflexivity.
     - symmetry; auto.
-    - transitivity ((h ⊢ₑ y @ₑ x0 ⊣ c;env)%cnraenv); eauto.
+    - transitivity ((h ⊢ₑ y @ₑ x0 ⊣ c;env)%nraenv_core); eauto.
   Qed.
 
   Ltac goal_eq_simpler
@@ -193,71 +193,71 @@ Section cNRAEnvContext.
               | [H: data_normalized _ (dright _) |- _ ] => inversion H; clear H; try subst
               end.
 
-  Hint Resolve cnraenv_eval_normalized.
+  Hint Resolve nraenv_core_eval_normalized.
   Hint Resolve data_normalized_dcoll_in.
 
   Instance aeu_Binop_proper h c env :
     Proper
       (eq ==>
-          cnraenv_eq_under h c env ==>
-          cnraenv_eq_under h c env ==>
-          cnraenv_eq_under h c env) ANBinop.
+          nraenv_core_eq_under h c env ==>
+          nraenv_core_eq_under h c env ==>
+          nraenv_core_eq_under h c env) ANBinop.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0, H1 by trivial; trivial.
   Qed.
 
   Instance aeu_Unop_proper h c env :
     Proper
       (eq ==>
-          cnraenv_eq_under h c env ==>
-          cnraenv_eq_under h c env) ANUnop.
+          nraenv_core_eq_under h c env ==>
+          nraenv_core_eq_under h c env) ANUnop.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0 by trivial.
     trivial.
   Qed.
 
   Instance aeu_Map_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env):
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANMap.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANMap.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
     goal_eq_simpler; eauto.
   Qed.
 
   Instance aeu_MapConcat_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANMapConcat.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANMapConcat.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
     goal_eq_simpler; eauto.
   Qed.
 
   Instance aeu_Product_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANProduct.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANProduct.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H by trivial.
     goal_eq_simpler; eauto.
   Qed.
 
   Instance aeu_Select_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env):
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANSelect.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANSelect.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
     goal_eq_simpler; eauto.
     rewrite H; eauto.
@@ -265,32 +265,32 @@ Section cNRAEnvContext.
 
   Instance aeu_Default_proper h c env :
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANDefault.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANDefault.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H, H0 by trivial.
     trivial.
   Qed.
    
   Instance aeu_Either_proper h c env :
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANEither.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANEither.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     match_destr; dn_inverter; eauto.
   Qed.
 
   Instance aeu_EitherConcat_proper h c env :
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANEitherConcat.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANEitherConcat.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
     goal_eq_simpler; eauto.
     rewrite H; eauto.
@@ -298,25 +298,25 @@ Section cNRAEnvContext.
 
   Instance aeu_App_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
     Proper
-      (cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env ==>
-                       cnraenv_eq_under h c env) ANApp.
+      (nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env ==>
+                       nraenv_core_eq_under h c env) ANApp.
   Proof.
-    unfold Proper, respectful, cnraenv_eq_under; simpl; intros.
+    unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
     goal_eq_simpler; eauto.
   Qed.
   
-  Instance aec_under_refl h c env : Reflexive (cnraenv_ctxt_equiv_under h c env).
+  Instance aec_under_refl h c env : Reflexive (nraenv_core_ctxt_equiv_under h c env).
   Proof.
-    red; unfold cnraenv_ctxt_equiv_under; intros.
+    red; unfold nraenv_core_ctxt_equiv_under; intros.
     match_destr.
     reflexivity.
   Qed.
 
-  Instance aecu_Plug_proper h c env : Proper (cnraenv_eq_under h c env ==> cnraenv_ctxt_equiv_under h c env) CNPlug.
+  Instance aecu_Plug_proper h c env : Proper (nraenv_core_eq_under h c env ==> nraenv_core_ctxt_equiv_under h c env) CNPlug.
   Proof.
-    unfold Proper, respectful, cnraenv_ctxt_equiv_under, cnraenv_eq_under; intros.
+    unfold Proper, respectful, nraenv_core_ctxt_equiv_under, nraenv_core_eq_under; intros.
     autorewrite with aec_substs.
     simpl.
     trivial.
@@ -325,11 +325,11 @@ Section cNRAEnvContext.
   Instance aecu_Binop_proper h c env :
     Proper
       (eq ==>
-          cnraenv_ctxt_equiv_under h c env ==>
-          cnraenv_ctxt_equiv_under h c env ==>
-          cnraenv_ctxt_equiv_under h c env) CANBinop.
+          nraenv_core_ctxt_equiv_under h c env ==>
+          nraenv_core_ctxt_equiv_under h c env ==>
+          nraenv_core_ctxt_equiv_under h c env) CANBinop.
   Proof.
-    unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+    unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
     intros; subst.
     autorewrite with aec_substs; simpl.
     specialize (H0 ps); specialize (H1 ps).
@@ -340,10 +340,10 @@ Section cNRAEnvContext.
   Instance aecu_Unop_proper h c env :
     Proper
       (eq ==>
-          cnraenv_ctxt_equiv_under h c env ==>
-          cnraenv_ctxt_equiv_under h c env) CANUnop.
+          nraenv_core_ctxt_equiv_under h c env ==>
+          nraenv_core_ctxt_equiv_under h c env) CANUnop.
   Proof.
-    unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+    unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
     intros; subst.
     autorewrite with aec_substs; simpl.
     specialize (H0 ps).
@@ -353,11 +353,11 @@ Section cNRAEnvContext.
 
    Instance aecu_Map_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env):
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANMap.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANMap.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -367,11 +367,11 @@ Section cNRAEnvContext.
 
    Instance aecu_MapConcat_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANMapConcat.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANMapConcat.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -381,11 +381,11 @@ Section cNRAEnvContext.
 
    Instance aecu_Product_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANProduct.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANProduct.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -395,11 +395,11 @@ Section cNRAEnvContext.
 
    Instance aecu_Select_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) : 
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANSelect.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANSelect.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -409,11 +409,11 @@ Section cNRAEnvContext.
 
    Instance aecu_Default_proper h c env :
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANDefault.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANDefault.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -423,11 +423,11 @@ Section cNRAEnvContext.
    
    Instance aecu_Either_proper h c env :
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANEither.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANEither.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -437,11 +437,11 @@ Section cNRAEnvContext.
 
    Instance aecu_EitherConcat_proper h c env :
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANEitherConcat.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANEitherConcat.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -451,11 +451,11 @@ Section cNRAEnvContext.
 
    Instance aecu_App_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
      Proper
-       (cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env ==>
-                        cnraenv_ctxt_equiv_under h c env) CANApp.
+       (nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env ==>
+                        nraenv_core_ctxt_equiv_under h c env) CANApp.
    Proof.
-     unfold Proper, respectful, cnraenv_ctxt_equiv_under.
+     unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
@@ -465,8 +465,8 @@ Section cNRAEnvContext.
 
  Lemma aec_substs_under_prop_part2 h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) e ps1 ps2 :
      Forall2 (fun xy1 xy2 => (fst xy1) = (fst xy2)
-            /\ cnraenv_eq_under h c env (snd xy1) (snd xy2)) ps1 ps2
-     -> cnraenv_ctxt_equiv_under
+            /\ nraenv_core_eq_under h c env (snd xy1) (snd xy2)) ps1 ps2
+     -> nraenv_core_ctxt_equiv_under
           h c env
           (aec_substs (lift_nra_context e) ps1)
           (aec_substs (lift_nra_context e) ps2).
@@ -495,13 +495,13 @@ Section cNRAEnvContext.
      (dn_c:Forall (fun x => data_normalized h (snd x)) c)
        (dn_env:data_normalized h env) :
    Forall2
-           (fun xy1 xy2 : nat * cnraenv =>
-            fst xy1 = fst xy2 /\ cnraenv_eq_under h c env (snd xy1) (snd xy2))
+           (fun xy1 xy2 : nat * nraenv_core =>
+            fst xy1 = fst xy2 /\ nraenv_core_eq_under h c env (snd xy1) (snd xy2))
            (map
-              (fun x : nat * cnraenv =>
+              (fun x : nat * nraenv_core =>
                (fst x,
-               (cnraenv_of_nra (nra_of_cnraenv (snd x))
-                ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵(drec (rec_sort c)))|] ⊕ ‵[| ("PDATA", ID)|])))%cnraenv))
+               (nraenv_core_of_nra (nra_of_nraenv_core (snd x))
+                ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵(drec (rec_sort c)))|] ⊕ ‵[| ("PDATA", ID)|])))%nraenv_core))
               ps) ps.
    Proof.
      induction ps; simpl; trivial.
@@ -510,17 +510,17 @@ Section cNRAEnvContext.
        apply roundtrip_env; trivial.
    Qed.
 
-   Global Instance lift_nra_context_proper : Proper (nra_ctxt_equiv nra_eq ==> cnraenv_ctxt_equiv cnraenv_eq) lift_nra_context.
+   Global Instance lift_nra_context_proper : Proper (nra_ctxt_equiv nra_eq ==> nraenv_core_ctxt_equiv nraenv_core_eq) lift_nra_context.
   Proof.
     unfold Proper, respectful.
     intros c1 c2 H.
-    apply <- cnraenv_ctxt_equiv_strict_equiv.
+    apply <- nraenv_core_ctxt_equiv_strict_equiv.
 
     red; intros ps Hsort Hequiv.
     match_case; match_case; intros.
     red; intros h dl dnc env dnenv d dnd.
     specialize (H (map (fun xy => (fst xy,
-                                   (AApp (nra_of_cnraenv (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env)))) ps)).
+                                   (AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env)))) ps)).
     
       symmetry in Hequiv.
        generalize (equivlist_in Hequiv); intros Hin.
@@ -532,21 +532,21 @@ Section cNRAEnvContext.
          repeat rewrite aec_holes_lift; intuition. }
        repeat rewrite map_map in H.
        simpl in H.
-       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c1 ps c1incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_nraenv_core x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c1 ps c1incl);
          intros c1nholes.
-       generalize (ac_holes_saturated_subst (fun x => (nra_of_cnraenv x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c2 ps c2incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_nraenv_core x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c2 ps c2incl);
          intros c2nholes.
        destruct (ac_simplify_nholes _ c1nholes) as [c1s c1seq].
        destruct (ac_simplify_nholes _ c2nholes) as [c2s c2seq].
        generalize (aec_simplify_lift_commute (ac_substs c1
              (map
-                (fun xy : nat * cnraenv =>
-                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
+                (fun xy : nat * nraenv_core =>
+                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
         intros leq1.
       generalize (aec_simplify_lift_commute (ac_substs c2
              (map
-                (fun xy : nat * cnraenv =>
-                   (fst xy, AApp (nra_of_cnraenv (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
+                (fun xy : nat * nraenv_core =>
+                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
         intros leq2.
       rewrite lift_nra_context_substs in leq1, leq2.
       rewrite map_map in leq1, leq2. simpl in leq1, leq2.
@@ -555,40 +555,40 @@ Section cNRAEnvContext.
       generalize
         (aec_substs_under_prop_part2 h dl env dnc dnenv c1
                                      (map (fun x => (fst x, 
-                                     ((cnraenv_of_nra (nra_of_cnraenv (snd x)))
-                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|] ⊕ ‵[| ("PDATA", ID)|])))%cnraenv)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s1eq.
+                                     ((nraenv_core_of_nra (nra_of_nraenv_core (snd x)))
+                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|] ⊕ ‵[| ("PDATA", ID)|])))%nraenv_core)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s1eq.
 
       generalize
         (aec_substs_under_prop_part2 h dl env dnc dnenv c2
                                      (map (fun x => (fst x, 
-                                     ((cnraenv_of_nra (nra_of_cnraenv (snd x)))
-                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|]⊕ ‵[| ("PDATA", ID)|])))%cnraenv)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s2eq.
+                                     ((nraenv_core_of_nra (nra_of_nraenv_core (snd x)))
+                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|]⊕ ‵[| ("PDATA", ID)|])))%nraenv_core)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s2eq.
       simpl in s1eq, s2eq.
       simpl in *.
       specialize (s1eq nil); specialize (s2eq nil).
       simpl in s1eq, s2eq.
       rewrite leq1, H1 in s1eq.
       rewrite leq2, H0 in s2eq.
-      assert (cseq: ((cnraenv_of_nra c1s) ≡ₑ (cnraenv_of_nra c2s))%cnraenv).
-      { apply cnraenv_of_nra_proper. trivial. }
-      rewrite <- cnraenv_eq_under_equiv in cseq.
+      assert (cseq: ((nraenv_core_of_nra c1s) ≡ₑ (nraenv_core_of_nra c2s))%nraenv_core).
+      { apply nraenv_core_of_nra_proper. trivial. }
+      rewrite <- nraenv_core_eq_under_equiv in cseq.
       specialize (cseq h dl env).
       rewrite s1eq, s2eq in cseq.
       red in cseq.
       apply cseq; auto.
   Qed.
 
-  Global Instance lift_nra_context_strict_proper : Proper (nra_ctxt_equiv_strict nra_eq ==> cnraenv_ctxt_equiv_strict cnraenv_eq) lift_nra_context.
+  Global Instance lift_nra_context_strict_proper : Proper (nra_ctxt_equiv_strict nra_eq ==> nraenv_core_ctxt_equiv_strict nraenv_core_eq) lift_nra_context.
   Proof.
     unfold Proper, respectful.
     intros c1 c2 H.
-    apply cnraenv_ctxt_equiv_strict_equiv.
+    apply nraenv_core_ctxt_equiv_strict_equiv.
     apply nra_ctxt_equiv_strict_equiv in H.
     apply lift_nra_context_proper; trivial.
   Qed.
 
   Local Open Scope nra_ctxt.
-  Local Open Scope cnraenv_ctxt.
+  Local Open Scope nraenv_core_ctxt.
 
   (** This is just a restatement of lift_nra_context_proper
         which visually looks more like the paper version.

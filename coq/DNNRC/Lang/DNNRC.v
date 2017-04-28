@@ -536,26 +536,26 @@ Section DNNRC.
     Definition nraenv_eval h aconstant_env op :=
       let aenv := drec nil in (* empty local environment to start, which is an empty record *)
       let aid := dcoll ((drec nil)::nil) in (* to be checked *)
-      cnraenv_eval h (bindings_of_coll_bindings aconstant_env) op aenv aid.
+      nraenv_core_eval h (bindings_of_coll_bindings aconstant_env) op aenv aid.
 
     Lemma nraenv_eval_normalized h :
-      forall op:cnraenv, forall (constant_env:coll_bindings) (o:data),
+      forall op:nraenv_core, forall (constant_env:coll_bindings) (o:data),
       Forall (fun x => data_normalized h (snd x)) (bindings_of_coll_bindings constant_env) ->
       nraenv_eval h constant_env op = Some o ->
       data_normalized h o.
     Proof.
       intros.
-      specialize (@cnraenv_eval_normalized _ h (bindings_of_coll_bindings constant_env) op (drec nil) (dcoll ((drec nil)::nil))); intros.
+      specialize (@nraenv_core_eval_normalized _ h (bindings_of_coll_bindings constant_env) op (drec nil) (dcoll ((drec nil)::nil))); intros.
       unfold bindings_of_coll_bindings.
       apply H1; try assumption.
       repeat constructor.
       repeat constructor.
     Qed.
 
-    Global Program Instance NRAEnvPlug : (@AlgPlug cnraenv) :=
+    Global Program Instance NRAEnvPlug : (@AlgPlug nraenv_core) :=
       mkAlgPlug nraenv_eval nraenv_eval_normalized.
 
-    Definition dnnrc_cnraenv {A} := @dnnrc A cnraenv.
+    Definition dnnrc_nraenv_core {A} := @dnnrc A nraenv_core.
 
   End NraEnvPlug.
 

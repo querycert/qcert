@@ -232,7 +232,7 @@ Section CompLang.
     Definition sql := sql.
     Definition lambda_nra := lambda_nra.
     Definition nra := nra.
-    Definition nraenv_core := cnraenv.
+    Definition nraenv_core := nraenv_core.
     Definition nraenv := nraenv.
     Definition nnrc_core := nnrc_core.
     Definition nnrc := nnrc.

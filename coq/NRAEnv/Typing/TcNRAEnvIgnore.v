@@ -28,10 +28,10 @@ Section TcNRAEnvIgnore.
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)
 
-  Local Open Scope cnraenv_scope.
+  Local Open Scope nraenv_core_scope.
   
-  Lemma tcnraenv_ignores_env_swap {m:basic_model} (e:cnraenv) :
-    cnraenv_ignores_env e ->
+  Lemma tnraenv_core_ignores_env_swap {m:basic_model} (e:nraenv_core) :
+    nraenv_core_ignores_env e ->
     forall τc (τin τout τenv₁ τenv₂:rtype),
     e ▷ τin >=> τout ⊣ τc;τenv₁ -> e ▷ τin >=> τout ⊣ τc;τenv₂.
   Proof.
@@ -76,8 +76,8 @@ Section TcNRAEnvIgnore.
       econstructor; eauto.
   Qed.
 
-  Lemma tcnraenv_ignores_id_swap {m:basic_model} (e:cnraenv) :
-    cnraenv_ignores_id e ->
+  Lemma tnraenv_core_ignores_id_swap {m:basic_model} (e:nraenv_core) :
+    nraenv_core_ignores_id e ->
     forall τc (τin₁ τin₂ τout τenv:rtype),
     e ▷ τin₁ >=> τout ⊣ τc;τenv -> e ▷ τin₂ >=> τout ⊣ τc;τenv.
   Proof.

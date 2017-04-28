@@ -32,7 +32,7 @@ Section TNRAEnv.
     Context {m:basic_model}.
     Context (τconstants:list (string*rtype)).
     Definition nraenv_type (q:nraenv) : rtype -> rtype -> rtype -> Prop :=
-      @cnraenv_type m τconstants (cnraenv_of_nraenv q).
+      @nraenv_core_type m τconstants (nraenv_core_of_nraenv q).
 
   End typ.
 
@@ -45,14 +45,14 @@ Section TNRAEnv.
   
     (** Main typing soundness theorem for the NRA *)
 
-    Lemma typed_nraenv_yields_typed_cnraenv {τc τenv τin τout} (op:nraenv):
-      (op ▷ₓ τin >=> τout ⊣ τc;τenv) -> cnraenv_type τc (cnraenv_of_nraenv op) τenv τin τout.
+    Lemma typed_nraenv_yields_typed_nraenv_core {τc τenv τin τout} (op:nraenv):
+      (op ▷ₓ τin >=> τout ⊣ τc;τenv) -> nraenv_core_type τc (nraenv_core_of_nraenv op) τenv τin τout.
     Proof.
       unfold nraenv_type; intro; assumption.
     Qed.
 
-    Lemma typed_cnraenv_yields_typed_nraenv {τc τenv τin τout} (op:nraenv):
-      cnraenv_type τc (cnraenv_of_nraenv op) τenv τin τout -> (op ▷ₓ τin >=> τout ⊣ τc;τenv).
+    Lemma typed_nraenv_core_yields_typed_nraenv {τc τenv τin τout} (op:nraenv):
+      nraenv_core_type τc (nraenv_core_of_nraenv op) τenv τin τout -> (op ▷ₓ τin >=> τout ⊣ τc;τenv).
     Proof.
       revert τin τout τenv.
       induction op; intros;
@@ -61,12 +61,12 @@ Section TNRAEnv.
       try (solve[inversion H; clear H; subst; repeat econstructor; eauto]).
     Qed.
     
-    Theorem typed_cnraenv_iff_typed_nraenv {τc τenv τin τout} (op:nraenv):
-      (op ▷ₓ τin >=> τout ⊣ τc;τenv) <-> cnraenv_type τc (cnraenv_of_nraenv op) τenv τin τout.
+    Theorem typed_nraenv_core_iff_typed_nraenv {τc τenv τin τout} (op:nraenv):
+      (op ▷ₓ τin >=> τout ⊣ τc;τenv) <-> nraenv_core_type τc (nraenv_core_of_nraenv op) τenv τin τout.
     Proof.
       split.
-      apply typed_nraenv_yields_typed_cnraenv.
-      apply typed_cnraenv_yields_typed_nraenv.
+      apply typed_nraenv_yields_typed_nraenv_core.
+      apply typed_nraenv_core_yields_typed_nraenv.
     Qed.
     
     Theorem typed_nraenv_yields_typed_data {τc τenv τin τout} c (env:data) (d:data) (op:nraenv):
@@ -76,7 +76,7 @@ Section TNRAEnv.
     Proof.
       intros.
       unfold nraenv_eval.
-      apply (@typed_cnraenv_yields_typed_data m τc τenv τin τout); try assumption.
+      apply (@typed_nraenv_core_yields_typed_data m τc τenv τin τout); try assumption.
     Qed.
 
     (** Corrolaries of the main type soudness theorem *)
@@ -127,7 +127,7 @@ Hint Constructors binOp_type.
 Ltac nraenv_inferer :=
   unfold nraenv_type in *;
   unfold nraenv_eval; simpl in *;
-  try cnraenv_inverter; subst; try eauto.
+  try nraenv_core_inverter; subst; try eauto.
 
 (* simplifies when a goal evaluates an expression over well-typed data *)
 Ltac nraenv_input_well_typed :=

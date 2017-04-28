@@ -22,50 +22,50 @@ Section cNRAEnvSize.
   Context {fruntime:foreign_runtime}.
 
   (* Java equivalent: NraOptimizer.optim_size.cnraenv_size *)
-  Fixpoint cnraenv_size (a:cnraenv) : nat
+  Fixpoint nraenv_core_size (a:nraenv_core) : nat
     := match a with
          | ANID => 1
          | ANConst d => 1
-         | ANBinop op a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANUnop op a₁ => S (cnraenv_size a₁)
-         | ANMap a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANMapConcat a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANProduct a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANSelect a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANDefault a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANEither a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANEitherConcat a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANApp a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
+         | ANBinop op a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANUnop op a₁ => S (nraenv_core_size a₁)
+         | ANMap a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANMapConcat a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANProduct a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANSelect a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANDefault a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANEither a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANEitherConcat a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANApp a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
          | ANGetConstant _ => 1
          | ANEnv => 1
-         | ANAppEnv a₁ a₂ => S (cnraenv_size a₁ + cnraenv_size a₂)
-         | ANMapEnv a₁ => S (cnraenv_size a₁)
+         | ANAppEnv a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANMapEnv a₁ => S (nraenv_core_size a₁)
        end.
 
-  Lemma cnraenv_size_nzero (a:cnraenv) : cnraenv_size a <> 0.
+  Lemma nraenv_core_size_nzero (a:nraenv_core) : nraenv_core_size a <> 0.
   Proof.
     induction a; simpl; omega.
   Qed.
   
-  Fixpoint cnraenv_depth (a:cnraenv) : nat :=
+  Fixpoint nraenv_core_depth (a:nraenv_core) : nat :=
     (* Better to start at zero, level one is at least one nested plan *)
     match a with
     | ANID => 0
     | ANConst d => 0
-    | ANBinop op a₁ a₂ => max (cnraenv_depth a₁) (cnraenv_depth a₂)
-    | ANUnop op a₁ => cnraenv_depth a₁
-    | ANMap a₁ a₂ => max (S (cnraenv_depth a₁)) (cnraenv_depth a₂)
-    | ANMapConcat a₁ a₂ => max (S (cnraenv_depth a₁)) (cnraenv_depth a₂)
-    | ANProduct a₁ a₂ => max (cnraenv_depth a₁) (cnraenv_depth a₂)
-    | ANSelect a₁ a₂ => max (S (cnraenv_depth a₁)) (cnraenv_depth a₂)
-    | ANDefault a₁ a₂ => max (cnraenv_depth a₁) (cnraenv_depth a₂)
-    | ANEither a₁ a₂=> max (cnraenv_depth a₁) (cnraenv_depth a₂)
-    | ANEitherConcat a₁ a₂=> max (cnraenv_depth a₁) (cnraenv_depth a₂)
-    | ANApp a₁ a₂ => max (cnraenv_depth a₁) (cnraenv_depth a₂)
+    | ANBinop op a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
+    | ANUnop op a₁ => nraenv_core_depth a₁
+    | ANMap a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
+    | ANMapConcat a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
+    | ANProduct a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
+    | ANSelect a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
+    | ANDefault a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
+    | ANEither a₁ a₂=> max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
+    | ANEitherConcat a₁ a₂=> max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
+    | ANApp a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
     | ANGetConstant _ => 0
     | ANEnv => 0
-    | ANAppEnv a₁ a₂ => max (cnraenv_depth a₁) (cnraenv_depth a₂)
-    | ANMapEnv a₁ => (S (cnraenv_depth a₁))
+    | ANAppEnv a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
+    | ANMapEnv a₁ => (S (nraenv_core_depth a₁))
     end.
 
 End cNRAEnvSize.

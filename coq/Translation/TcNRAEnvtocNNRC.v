@@ -38,7 +38,7 @@ Section TcNRAEnvtocNNRC.
             || apply fresh_var_fresh4 in e); intuition].
   
   Context {m:basic_model}.
-  Theorem tnraenv_sem_correct {τcenv} {τin τenv τout} (op:cnraenv) (tenv:tbindings) (vid venv:var) :
+  Theorem tnraenv_sem_correct {τcenv} {τin τenv τout} (op:nraenv_core) (tenv:tbindings) (vid venv:var) :
     prefix CONST_PREFIX vid = false ->
     prefix CONST_PREFIX venv = false ->
     (forall x,
@@ -47,7 +47,7 @@ Section TcNRAEnvtocNNRC.
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
     (op ▷ τin >=> τout ⊣ τcenv;τenv) ->
-    nnrc_type tenv (cnraenv_to_nnrc op vid venv) τout.
+    nnrc_type tenv (nraenv_core_to_nnrc op vid venv) τout.
   Proof.
     Opaque fresh_var.
     Opaque append.
@@ -64,19 +64,19 @@ Section TcNRAEnvtocNNRC.
     - econstructor; eauto. 
     (* ATMap *)
     - econstructor; [eauto | ].
-      apply (IHcnraenv_type1 
+      apply (IHnraenv_core_type1 
                     (fresh_var "tmap$" [vid; venv]) venv
                     ((fresh_var "tmap$" [vid; venv],τ₁)::tenv)); simpl; trivial.
       + dest_eqdec; congruence.
       + dest_eqdec; trivial.
         elim_fresh e.
     (* ATMapConcat *)
-    - specialize (IHcnraenv_type2 vid venv tenv).
+    - specialize (IHnraenv_core_type2 vid venv tenv).
       apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
       apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); [eauto | ].
       apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
-      + apply IHcnraenv_type1; simpl; trivial;
+      + apply IHnraenv_core_type1; simpl; trivial;
         match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl; match_destr; try elim_fresh e.
         match_destr; elim_fresh e.
@@ -84,10 +84,10 @@ Section TcNRAEnvtocNNRC.
     - apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
       apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
-      apply (IHcnraenv_type1 vid venv tenv); assumption.
-      clear IHcnraenv_type1 op1 H1_.
+      apply (IHnraenv_core_type1 vid venv tenv); assumption.
+      clear IHnraenv_core_type1 op1 H1_.
       apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
-      + apply IHcnraenv_type2; simpl; trivial; match_destr; try elim_fresh e.
+      + apply IHnraenv_core_type2; simpl; trivial; match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl.
         * match_destr.
           elim_fresh e.
@@ -95,9 +95,9 @@ Section TcNRAEnvtocNNRC.
         * match_destr; try congruence.
     (* ATSelect *)
     - apply (@TNNRCUnop m (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
-      apply (@TNNRCFor m τ); [apply (IHcnraenv_type2 vid venv tenv )|idtac]; trivial.
+      apply (@TNNRCFor m τ); [apply (IHnraenv_core_type2 vid venv tenv )|idtac]; trivial.
       apply TNNRCIf.
-      + apply IHcnraenv_type1; simpl; trivial; match_destr; elim_fresh e.
+      + apply IHnraenv_core_type1; simpl; trivial; match_destr; elim_fresh e.
       + econstructor; eauto.
         econstructor. simpl.
         match_destr; intuition.
@@ -112,18 +112,18 @@ Section TcNRAEnvtocNNRC.
         econstructor; eauto.
         econstructor; eauto.
         eapply Forall_nil.
-      + apply IHcnraenv_type2; simpl; trivial; match_destr; elim_fresh e.
+      + apply IHnraenv_core_type2; simpl; trivial; match_destr; elim_fresh e.
       + econstructor; eauto.
         simpl; match_destr; elim_fresh e.
     (* ATEither *)
     - econstructor.
       + econstructor; eauto.
-      + eapply IHcnraenv_type1; simpl; trivial; match_destr; try elim_fresh e.
-      + eapply IHcnraenv_type2; simpl; trivial; match_destr; try elim_fresh e.
+      + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
+      + eapply IHnraenv_core_type2; simpl; trivial; match_destr; try elim_fresh e.
     (* ATEitherConcat *)
     -  econstructor; [eauto | ].
        econstructor.
-       + eapply IHcnraenv_type1; simpl; trivial; match_destr; try elim_fresh e.
+       + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
        + econstructor; [eauto | ].
          econstructor; eauto.
          econstructor; eauto.
@@ -144,7 +144,7 @@ Section TcNRAEnvtocNNRC.
            }
     (* ATApp *)
     - repeat (econstructor; eauto 2).
-      apply IHcnraenv_type2; simpl; trivial.
+      apply IHnraenv_core_type2; simpl; trivial.
       + simpl; match_destr; intuition.
       + simpl; match_destr.
         elim_fresh e.
@@ -159,15 +159,15 @@ Section TcNRAEnvtocNNRC.
     - apply TNNRCVar; assumption.
     (* ATAppEnv *)
     - repeat (econstructor; eauto 2).
-      apply IHcnraenv_type2; simpl; trivial; match_destr; elim_fresh e.
+      apply IHnraenv_core_type2; simpl; trivial; match_destr; elim_fresh e.
     (* ATMapEnv *)
     - repeat econstructor; eauto 2.
-      apply IHcnraenv_type; simpl; trivial; match_destr; elim_fresh e.
+      apply IHnraenv_core_type; simpl; trivial; match_destr; elim_fresh e.
   Qed.
 
   (** Reverse direction, main theorem *)
 
-  Theorem tnraenv_sem_correct_back {τcenv} {τin τenv τout} (op:cnraenv) (tenv:tbindings) (vid venv:var) :
+  Theorem tnraenv_sem_correct_back {τcenv} {τin τenv τout} (op:nraenv_core) (tenv:tbindings) (vid venv:var) :
     prefix CONST_PREFIX vid = false ->
     prefix CONST_PREFIX venv = false ->
     (forall x,
@@ -175,13 +175,13 @@ Section TcNRAEnvtocNNRC.
         = lookup equiv_dec (filterConstants tenv) x) ->
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
-    nnrc_type tenv (cnraenv_to_nnrc op vid venv) τout ->
+    nnrc_type tenv (nraenv_core_to_nnrc op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τcenv;τenv).
   Proof.
-    Hint Constructors cnraenv_type.
+    Hint Constructors nraenv_core_type.
     intros pre1 pre2 fpre; intros.
     revert τin τenv τout vid venv tenv pre1 pre2 fpre H H0 H1.
-    cnraenv_cases (induction op) Case; simpl; intros; inversion H1; subst.
+    nraenv_core_cases (induction op) Case; simpl; intros; inversion H1; subst.
     - Case "ANID"%string.
       rewrite H in H4; inversion H4; subst. eauto.
     - Case "ANConst"%string.
@@ -345,7 +345,7 @@ Section TcNRAEnvtocNNRC.
   (** Theorem 7.4: NRA<->NNRC.
        Final iff Theorem of type preservation for the translation from NRA to NNRC *)
 
-  Theorem tnraenv_sem_correct_iff {τcenv} {τin τenv τout} (op:cnraenv) (tenv:tbindings) (vid venv:var) :
+  Theorem tnraenv_sem_correct_iff {τcenv} {τin τenv τout} (op:nraenv_core) (tenv:tbindings) (vid venv:var) :
     prefix CONST_PREFIX vid = false ->
     prefix CONST_PREFIX venv = false ->
     (forall x,
@@ -353,7 +353,7 @@ Section TcNRAEnvtocNNRC.
         = lookup equiv_dec (filterConstants tenv) x) ->
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
-    nnrc_type tenv (cnraenv_to_nnrc op vid venv) τout ->
+    nnrc_type tenv (nraenv_core_to_nnrc op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τcenv;τenv).
   Proof.
     Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back.

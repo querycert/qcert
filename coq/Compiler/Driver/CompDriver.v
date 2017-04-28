@@ -142,23 +142,23 @@ Section CompDriver.
 
     Definition camp_to_nra (q:camp) : nra := nra_of_camp q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_camp_to_cnraenv q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_camp_to_nraenv_core q.
 
     Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.translate_camp_to_nraenv q.
 
     (** NRA/NRAEnv translations *)
-    Definition nra_to_nraenv_core (q: nra) : nraenv_core := cnraenv_of_nra q.
+    Definition nra_to_nraenv_core (q: nra) : nraenv_core := nraenv_core_of_nra q.
 
     Definition nra_to_nnrc_core (q: nra) : nnrc_core := nra_to_nnrc_core q init_vid.
 
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
-      nnrc_to_nnrc_core (cnraenv_to_nnrc q init_vid init_venv).
+      nnrc_to_nnrc_core (nraenv_core_to_nnrc q init_vid init_venv).
 
-    Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_cnraenv q.
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_nraenv_core q.
 
-    Definition nraenv_core_to_nraenv (q: cnraenv) : nraenv := nraenv_of_cnraenv q.
+    Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv := nraenv_of_nraenv_core q.
 
-    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := cnraenv_of_nraenv q.
+    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := nraenv_core_of_nraenv q.
 
     Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
       nraenv_to_nnrc_ext_top q init_vid init_venv.
@@ -249,11 +249,11 @@ Section CompDriver.
       nraenv_core_optim default_nraenv_optim_phases q.
 
     Definition nra_optim (opc:optim_phases_config) (q: nra) : nra :=
-      let nraenv_core_opt := (nraenv_core_optim opc (cnraenv_of_nra q)) in
-      if cnraenv_is_nra_fun nraenv_core_opt then
-        cnraenv_deenv_nra nraenv_core_opt
+      let nraenv_core_opt := (nraenv_core_optim opc (nraenv_core_of_nra q)) in
+      if nraenv_core_is_nra_fun nraenv_core_opt then
+        nraenv_core_deenv_nra nraenv_core_opt
       else
-        nra_of_cnraenv nraenv_core_opt.
+        nra_of_nraenv_core nraenv_core_opt.
     Definition nra_optim_default (q: nra) : nra :=
       nra_optim default_nraenv_optim_phases q.
 

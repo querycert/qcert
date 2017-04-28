@@ -129,7 +129,7 @@ Section CompEval.
 
     (* Language: nraenv_core *)
     Definition eval_nraenv_core (q:nraenv_core) (cenv: list (string*data)) : option data
-      := cnraenv_eval h (rec_sort cenv) q (drec nil) dunit.
+      := nraenv_core_eval h (rec_sort cenv) q (drec nil) dunit.
 
     (* Language: nraenv *)
     Definition eval_nraenv (q:nraenv) (cenv: list (string*data)) : option data

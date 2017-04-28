@@ -121,7 +121,7 @@ Section NRAEnvOptimizer.
   Section dup.
     (* optimization for distinct *)
     Definition nraenv_nodupA {fruntime:foreign_runtime} (q:nraenv) : Prop :=
-      nodupA (cnraenv_of_nraenv q).
+      nodupA (nraenv_core_of_nraenv q).
 
     Fixpoint nodupA_checker {fruntime:foreign_runtime} (p:nraenv) : bool
     := match p with
@@ -188,7 +188,7 @@ Section NRAEnvOptimizer.
       match_case; try reflexivity.
       intros nd.
       symmetry.
-      rewrite lift_nraenv_eq_to_cnraenv_eq. simpl.
+      rewrite lift_nraenv_eq_to_nraenv_core_eq. simpl.
       rewrite dup_elim.
       reflexivity.
       apply nodupA_checker_correct; trivial.
@@ -806,7 +806,7 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_id_fun p1); intros; try reflexivity.
     apply tapp_over_ignoreid_arrow.
     rewrite <- nraenv_ignores_id_eq in H.
-    apply nraenv_ignores_id_cnraenv_eq; assumption.
+    apply nraenv_ignores_id_nraenv_core_eq; assumption.
   Qed.
 
   Definition tapp_over_ignoreid_step {fruntime:foreign_runtime}
@@ -887,7 +887,7 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_env_fun p1); intros; try reflexivity.
     apply tappenv_over_ignoreenv_arrow.
     rewrite <- nraenv_ignores_env_eq in H.
-    apply nraenv_ignores_env_cnraenv_eq; assumption.
+    apply nraenv_ignores_env_nraenv_core_eq; assumption.
   Qed.
 
   Definition tappenv_over_ignoreenv_step {fruntime:foreign_runtime}
@@ -975,14 +975,14 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_env_fun p1_1); intros.
     - apply tappenv_over_app_ie_arrow.
       rewrite <- nraenv_ignores_env_eq in H.
-      generalize nraenv_ignores_env_cnraenv_eq; intros.
-      unfold cnraenv_of_nraenv in *.
+      generalize nraenv_ignores_env_nraenv_core_eq; intros.
+      unfold nraenv_core_of_nraenv in *.
       apply H0; assumption.
     - case_eq (nraenv_ignores_id_fun p2); intros.
       + apply tappenv_over_app_arrow.
         rewrite <- nraenv_ignores_id_eq in H0.
-        generalize nraenv_ignores_id_cnraenv_eq; intros.
-        unfold cnraenv_of_nraenv in *.
+        generalize nraenv_ignores_id_nraenv_core_eq; intros.
+        unfold nraenv_core_of_nraenv in *.
         apply H1; assumption.
       + reflexivity.
   Qed.
@@ -1018,8 +1018,8 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_id_fun p1_1); intros.
     - apply tapp_over_appenv_arrow.
       rewrite <- nraenv_ignores_id_eq in H.
-      generalize nraenv_ignores_id_cnraenv_eq; intros.
-      unfold cnraenv_of_nraenv in *.
+      generalize nraenv_ignores_id_nraenv_core_eq; intros.
+      unfold nraenv_core_of_nraenv in *.
       apply H0; assumption.
     - reflexivity.
   Qed.
@@ -1231,11 +1231,11 @@ Section NRAEnvOptimizer.
     destruct p1; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
     case_eq (nraenv_ignores_id_fun p2); intros; try reflexivity.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tappenv_over_map_arrow.
     reflexivity.
     rewrite <- nraenv_ignores_id_eq in H.
-    apply nraenv_ignores_id_cnraenv_eq; assumption.
+    apply nraenv_ignores_id_nraenv_core_eq; assumption.
   Qed.
 
   Definition tappenv_over_map_step {fruntime:foreign_runtime}
@@ -1266,11 +1266,11 @@ Section NRAEnvOptimizer.
     destruct p1; try solve [unfold tnraenv_rewrites_to; simpl; auto].
     simpl.
     case_eq (nraenv_ignores_id_fun p2); intros; try reflexivity.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tappenv_over_select_arrow.
     reflexivity.
     rewrite <- nraenv_ignores_id_eq in H.
-    apply nraenv_ignores_id_cnraenv_eq; assumption.
+    apply nraenv_ignores_id_nraenv_core_eq; assumption.
   Qed.
 
   Definition tappenv_over_select_step {fruntime:foreign_runtime}
@@ -1528,8 +1528,8 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_env_fun p1_2); intros; try reflexivity.
     apply tappenv_over_env_merge_l_arrow.
     rewrite <- nraenv_ignores_env_eq in H.
-    generalize nraenv_ignores_env_cnraenv_eq; intros.
-    unfold cnraenv_of_nraenv in *.
+    generalize nraenv_ignores_env_nraenv_core_eq; intros.
+    unfold nraenv_core_of_nraenv in *.
     apply H0; assumption.
   Qed.
 
@@ -1784,7 +1784,7 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tselect_over_either_nil_fun p.
   Proof.
     tprove_correctness p.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tselect_over_either.
     rewrite tselect_over_nil.
     reflexivity.
@@ -1813,7 +1813,7 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tselect_over_either_nil_app_fun p.
   Proof.
     tprove_correctness p.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tselect_over_app_either.
     rewrite tselect_over_nil.
     reflexivity.
@@ -1842,7 +1842,7 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tmap_over_either_nil_fun p.
   Proof.
     tprove_correctness p.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tmap_over_either.
     rewrite tmap_over_nil.
     reflexivity.
@@ -1871,7 +1871,7 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tmap_over_either_nil_app_fun p.
   Proof.
     tprove_correctness p.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tmap_over_either_app.
     rewrite tmap_over_nil.
     reflexivity.
@@ -1909,10 +1909,10 @@ Section NRAEnvOptimizer.
     match_case; simpl; try reflexivity.
     intros ig.
     rewrite <- nraenv_ignores_id_eq in ig.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
-    autorewrite with tcnraenv_optim.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
+    autorewrite with tnraenv_core_optim.
     - reflexivity.
-    - apply nraenv_ignores_id_cnraenv_eq; assumption.
+    - apply nraenv_ignores_id_nraenv_core_eq; assumption.
   Qed.
 
   Hint Rewrite @tappenv_over_either_nil_fun_correctness : toptim_correct.
@@ -2019,7 +2019,7 @@ Section NRAEnvOptimizer.
     p ⇒ₓ tconcat_over_rec_eq_fun p.
   Proof.
     tprove_correctness p.
-    rewrite lift_tnraenv_eq_to_tcnraenv_eq. simpl.
+    rewrite lift_tnraenv_eq_to_tnraenv_core_eq. simpl.
     rewrite tconcat_over_rec_eq.
     reflexivity.
   Qed.
@@ -2110,8 +2110,8 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_env_fun p1_2_1);
       try reflexivity; intros; rewrite <- nraenv_ignores_env_eq in H;
     apply tflip_env4_arrow;
-    generalize nraenv_ignores_env_cnraenv_eq; intros;
-    unfold cnraenv_of_nraenv in *;
+    generalize nraenv_ignores_env_nraenv_core_eq; intros;
+    unfold nraenv_core_of_nraenv in *;
     apply H0; assumption.
   Qed.
 
@@ -2242,8 +2242,8 @@ Section NRAEnvOptimizer.
     case_eq (nraenv_ignores_id_fun p1); try reflexivity; intros.
     apply tmapenv_to_map_arrow.
     rewrite <- nraenv_ignores_id_eq in H.
-    generalize nraenv_ignores_id_cnraenv_eq; intros.
-    unfold cnraenv_of_nraenv in *.
+    generalize nraenv_ignores_id_nraenv_core_eq; intros.
+    unfold nraenv_core_of_nraenv in *.
     apply H0; assumption.
   Qed.
 

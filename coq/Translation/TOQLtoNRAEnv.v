@@ -34,7 +34,7 @@ Section TOQLtoNRAEnv.
       nraenv_type τconstant (nraenv_of_oql_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
     Proof.
       unfold nraenv_type; simpl.
-      Hint Constructors cnraenv_type.
+      Hint Constructors nraenv_core_type.
       revert τconstant τdefls pfd τenv pfe τout.
       induction e; simpl; intros τconstant τdefls pfd τenv pfe τout ot; invcs ot; eauto 4.
       - unfold lookup_table.
@@ -59,7 +59,7 @@ Section TOQLtoNRAEnv.
       nraenv_type τconstant (nraenv_of_oql_query_program (domain τdefls) oq) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
     Proof.
       unfold nraenv_type; simpl.
-      Hint Constructors cnraenv_type.
+      Hint Constructors nraenv_core_type.
       revert τdefls pfd τenv pfe τout.
       induction oq; simpl; intros τdefls pfd τenv pfe τout ot; invcs ot.
       - econstructor.
@@ -103,7 +103,7 @@ Section TOQLtoNRAEnv.
       Hint Constructors oql_expr_type.
       unfold nraenv_type; simpl.
       revert τconstant τdefls pfd τenv pfe τout.
-      induction e; simpl; intros τconstant τdefls pfd τenv pfe τout ot; try cnraenv_inverter; eauto 4.
+      induction e; simpl; intros τconstant τdefls pfd τenv pfe τout ot; try nraenv_core_inverter; eauto 4.
       - unfold lookup_table in *.
         constructor.
         unfold tdot, edot, rec_concat_sort.
