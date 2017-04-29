@@ -21,6 +21,15 @@ Extract Inlined Constant time => "(fun f x -> Util.time f x)".
 
 Section CompStat.
 
+  (** Query languages *)
+  Require Import SQLRuntime.
+  Require Import OQLRuntime.
+  Require Import LambdaNRARuntime.
+  (** Rule languages *)
+  Require Import CAMPRuleRuntime.
+  Require Import TechRuleRuntime.
+  Require Import DesignRuleRuntime.
+  (** Intermediate languages *)
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
@@ -28,8 +37,12 @@ Section CompStat.
   Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
   Require Import CAMPRuntime.
-  Require Import OQLRuntime.
-  Require Import SQLRuntime.
+  (** Target languages *)
+  Require Import JavaScriptRuntime.
+  Require Import JavaRuntime.
+  Require Import SparkRDDRuntime.
+  Require Import SparkDFRuntime.
+  Require Import CloudantRuntime.
 
   Require Import CompilerRuntime.
   Require Import BasicSystem.

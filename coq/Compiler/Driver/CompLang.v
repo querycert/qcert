@@ -144,7 +144,7 @@ Section CompLang.
         :: (L_cldmr,DistrEnd,"CldMR","CldMR.Lang.CldMR","Named Nested Relational Calculus with Cloudant Map/Reduce")
         :: (L_dnnrc_dataset,DistrEnd,"DNNRC","DNNRC.Lang.DNNRCDataset","Distributed Named Nested Relational Calculus")
         :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","DNNRC.Typing.TDNNRCDataset","Typed Distributed Named Nested Relational Calculus")
-        :: (L_javascript,BackEnd,"JS","JS.Lang.JS","JavaScript")
+        :: (L_javascript,BackEnd,"JavaScript","JavaScript.Lang.JavaScript","JavaScript")
         :: (L_java,BackEnd,"Java","Java.Lang.Java","Java")
         :: (L_spark_rdd,BackEnd,"SparkRDD","SparkRDD.Lang.SparkRDD","Spark (RDD API)")
         :: (L_spark_dataset,BackEnd,"SparkDF","SparkDF.Lang.SparkDF","Spark (Dataframe API)")
@@ -211,6 +211,12 @@ Section CompLang.
     Require Import CldMRRuntime.
     Require Import DNNRCRuntime.
     Require Import CAMPRuntime.
+    (** Target languages *)
+    Require Import JavaScriptRuntime.
+    Require Import JavaRuntime.
+    Require Import SparkRDDRuntime.
+    Require Import SparkDFRuntime.
+    Require Import CloudantRuntime.
 
     Require Import NNRCMRtoDNNRC.
     Require Import DNNRCTypes.
@@ -240,11 +246,11 @@ Section CompLang.
     Definition cldmr := cldmr.
     Definition dnnrc_dataset := dnnrc.
     Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc_typed.
-    Definition javascript := string.
-    Definition java := string.
-    Definition spark_rdd := string.
-    Definition spark_dataset := string.
-    Definition cloudant := (list (string * string) * (string * list string))%type.
+    Definition javascript := js.
+    Definition java := java.
+    Definition spark_rdd := spark_rdd.
+    Definition spark_dataset := spark_dataset.
+    Definition cloudant := cloudant.
 
     Inductive query : Set :=
     | Q_camp_rule : camp_rule -> query

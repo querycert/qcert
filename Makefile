@@ -223,6 +223,16 @@ MODULES = \
 	OQL/OQLRuntime \
 	OQL/OQLTypes \
 	OQL/OQLSystem \
+	JavaScript/Lang/JavaScript \
+	JavaScript/JavaScriptRuntime \
+	Java/Lang/Java \
+	Java/JavaRuntime \
+	SparkRDD/Lang/SparkRDD \
+	SparkRDD/SparkRDDRuntime \
+	SparkDF/Lang/SparkDF \
+	SparkDF/SparkDFRuntime \
+	Cloudant/Lang/Cloudant \
+	Cloudant/CloudantRuntime \
 	Translation/ForeignToReduceOps \
 	Translation/ForeignToCloudant \
 	Translation/NRAtocNNRC \

@@ -38,6 +38,12 @@ Section CompEval.
   Require Import CldMRRuntime. (* XXX contains cld_load_init_env! XXX *)
   Require Import DNNRCRuntime.
   Require Import CAMPRuntime.
+  (** Target languages *)
+  Require Import JavaScriptRuntime.
+  Require Import JavaRuntime.
+  Require Import SparkRDDRuntime.
+  Require Import SparkDFRuntime.
+  Require Import CloudantRuntime.
 
   (* Translations *)
   Require Import SQLtoNRAEnv.       (* Used for SQL evaluation *)

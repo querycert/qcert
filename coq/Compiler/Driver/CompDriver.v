@@ -39,6 +39,12 @@ Section CompDriver.
   Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
   Require Import CAMPRuntime.
+  (** Target languages *)
+  Require Import JavaScriptRuntime.
+  Require Import JavaRuntime.
+  Require Import SparkRDDRuntime.
+  Require Import SparkDFRuntime.
+  Require Import CloudantRuntime.
 
   (** Translations *)
   Require Import OQLtoNRAEnv.
@@ -221,15 +227,14 @@ Section CompDriver.
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
       nnrcmr_prepared_to_spark_rdd rulename (nnrcmr_to_nnrcmr_spark_rdd_prepare q).
 
-    Definition dnnrc_dataset_to_dnnrc_typed_dataset
-               (e: dnnrc_dataset) (tdenv: tdbindings)
+    Definition dnnrc_dataset_to_dnnrc_typed_dataset (e: dnnrc_dataset) (tdenv: tdbindings)
       : option dnnrc_typed_dataset :=
       infer_dnnrc_type (mkConstants tdenv) e.
 
     (* Backend *)
 
     Definition dnnrc_typed_dataset_to_spark_dataset
-               (tenv:tdbindings) (name:string) (q:dnnrc_typed_dataset) : string :=
+               (tenv:tdbindings) (name:string) (q:dnnrc_typed_dataset) : spark_dataset :=
       @dnnrcToSpark2Top _ _ bm _ _ unit (mkConstants tenv) name q.
 
     Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
