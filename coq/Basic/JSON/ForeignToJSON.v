@@ -17,27 +17,26 @@
 Require Import List String.
 
 Require Import Utils ForeignRuntime.
-Require Import NNRCMRRuntime.
+Require Import JSON.
 
 Local Open Scope string_scope.
 
-Section ForeigntoSpark.
+Section ForeignToJSON.
 
-  Class foreign_to_spark
-        {fruntime:foreign_runtime}
-        {fredop:foreign_reduce_op} : Type
-  := mk_foreign_to_spark {
-         foreign_to_spark_reduce_op
-           (rop:foreign_reduce_op_type)
-           (scala_endl quotel:string) : string
-         ; foreign_to_spark_prepare_nnrcmr :
-             nnrcmr -> nnrcmr
+(* TODO: properties required to ensure round-tripping *)
+
+Class foreign_to_JSON {fdata:foreign_data}: Type
+  := mk_foreign_to_JSON {
+         foreign_to_JSON_to_data
+           (j:json) : option foreign_data_type
+         ; foreign_to_JSON_from_data
+             (fd:foreign_data_type) : json
        }.
 
-End ForeigntoSpark.
+End ForeignToJSON.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

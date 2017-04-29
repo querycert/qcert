@@ -17,7 +17,7 @@
 Require Import List String.
 
 Require Import Utils ForeignRuntime.
-Require Import NNRCRuntime.
+Require Import RUtilOps.
 
 Local Open Scope string_scope.
 
@@ -68,6 +68,6 @@ End ForeigntoJava.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

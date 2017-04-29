@@ -16,27 +16,26 @@
 
 Require Import List String.
 
-Require Import Utils ForeignRuntime.
-Require Import JSON.
+Require Import Utils ForeignType.
 
 Local Open Scope string_scope.
 
-Section ForeignToJSON.
+Section ForeignTypeToJSON.
 
 (* TODO: properties required to ensure round-tripping *)
 
-Class foreign_to_JSON {fdata:foreign_data}: Type
-  := mk_foreign_to_JSON {
-         foreign_to_JSON_to_data
-           (j:json) : option foreign_data_type
-         ; foreign_to_JSON_from_data
-             (fd:foreign_data_type) : json
+Class foreign_type_to_JSON {ftype:foreign_type}: Type
+  := mk_foreign_type_to_JSON {
+         foreign_to_string_to_type
+           (s:string) : option foreign_type_type
+         ; foreign_to_string_from_type
+             (fd:foreign_type_type) : string
        }.
 
-End ForeignToJSON.
+End ForeignTypeToJSON.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

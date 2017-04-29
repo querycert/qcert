@@ -19,7 +19,7 @@ Require Export BrandRelation RBag RData RDataNorm RDomain.
 Require Export RRelation RGroupBy.
 Require Export DData DDataNorm.
 Require Export RConstants DConstants.
-Require Export ROps.
+Require Export RUtilOps ROps.
 Require Export ForeignRuntime.
 
 (* 

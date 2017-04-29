@@ -17,7 +17,7 @@
 Section SparkRDD.
   Require Import String.
 
-  (* Spark (RDD API) programs are in serialized form *)
+  (** Spark (RDD API) programs are in serialized form *)
   Definition spark_rdd := string.
   
 End SparkRDD.

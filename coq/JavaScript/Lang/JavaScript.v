@@ -17,7 +17,7 @@
 Section JavaScript.
   Require Import String.
 
-  (* Javascript programs are in serialized form *)
+  (** Javascript programs are in serialized form *)
   Definition javascript := string.
   Definition js := javascript. (* Just an alias *)
   

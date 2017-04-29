@@ -17,7 +17,7 @@
 Section Cloudant.
   Require Import String.
 
-  (* Cloudant programs are in serialized form *)
+  (** Cloudant programs are in serialized form *)
   Definition cloudant := (list (string * string) * (string * list string))%type.
   
 End Cloudant.

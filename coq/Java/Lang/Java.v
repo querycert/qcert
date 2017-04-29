@@ -17,7 +17,7 @@
 Section Java.
   Require Import String.
 
-  (* Java programs are in serialized form *)
+  (** Java programs are in serialized form *)
   Definition java := string.
   
 End Java.

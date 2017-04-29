@@ -90,6 +90,11 @@ MODULES = \
 	Basic/Typing/TOpsEq \
 	Basic/Typing/TOpsInfer \
 	Basic/ForeignTyping \
+	Basic/JSON/JSON \
+	Basic/JSON/ForeignToJSON \
+	Basic/JSON/ForeignTypeToJSON \
+	Basic/JSON/ForeignToJavascript \
+	Basic/JSON/JSONtoData \
 	Basic/BasicTypes \
 	Basic/BasicSystem \
 	Basic/TypingRuntime \
@@ -257,20 +262,15 @@ MODULES = \
 	Translation/SQLtoNRAEnv \
 	Translation/OQLtoNRAEnv \
 	Translation/TOQLtoNRAEnv \
-	Backend/JSON \
-	Backend/ForeignToJSON \
-	Backend/ForeignTypeToJSON \
-	Backend/ForeignToJava \
-	Backend/ForeignToJavascript \
-	Backend/ForeignToScala \
-	Backend/ForeignToSpark \
-	Backend/JSONtoData \
-	Backend/NNRCtoJava \
-	Backend/NNRCtoJavascript \
-	Backend/NNRCMRtoSpark \
-	Backend/CldMRtoJavaScript \
-	Backend/SparkData \
-	Backend/DNNRCtoScala \
+	Translation/ForeignToJava \
+	Translation/ForeignToScala \
+	Translation/ForeignToSpark \
+	Translation/CldMRtoCloudant \
+	Translation/NNRCtoJava \
+	Translation/NNRCtoJavascript \
+	Translation/NNRCMRtoSpark \
+	Translation/SparkData \
+	Translation/DNNRCtoScala \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
 	Compiler/Model/FloatModelPart \

@@ -62,7 +62,7 @@ Section CompDriver.
   Require Import NNRCMRtoSpark.
   Require Import NNRCMRtoCldMR.
   Require Import NNRCMRtoDNNRC.
-  Require Import CldMRtoJavaScript.
+  Require Import CldMRtoCloudant.
   Require Import NNRCtoDNNRC.
   Require Import TDNNRCInfer DNNRCtoScala.
 

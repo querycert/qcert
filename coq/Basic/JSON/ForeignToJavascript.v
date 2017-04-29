@@ -17,7 +17,6 @@
 Require Import List String.
 
 Require Import Utils ForeignRuntime.
-Require Import NNRCRuntime.
 
 Local Open Scope string_scope.
 
@@ -41,6 +40,6 @@ End ForeigntoJavascript.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

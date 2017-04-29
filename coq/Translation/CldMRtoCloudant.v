@@ -23,7 +23,7 @@ Require Import ForeignToJavascript ForeignCloudant.
 
 Local Open Scope string_scope.
 
-Section CldMRtoJavaScript.
+Section CldMRtoCloudant.
 
   Context {fruntime:foreign_runtime}.
   Context {ftojavascript:foreign_to_javascript}.
@@ -351,7 +351,7 @@ Section CldMRtoJavaScript.
 
   End CloudantJS.
   
-End CldMRtoJavaScript.
+End CldMRtoCloudant.
 
 (* 
 *** Local Variables: ***
