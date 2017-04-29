@@ -142,8 +142,8 @@ Section CompLang.
         :: (L_nnrc,CoreEnd,"NNRC","NNRC.Lang.NNRC","Named Nested Relational Calculus")
         :: (L_nnrcmr,DistrEnd,"NNRCMR","NNRCMR.Lang.NNRCMR","Named Nested Relational Calculus with Map/Reduce")
         :: (L_cldmr,DistrEnd,"CldMR","CldMR.Lang.CldMR","Named Nested Relational Calculus with Cloudant Map/Reduce")
-        :: (L_dnnrc_dataset,DistrEnd,"DNNRC","DNNRC.Lang.DNNRC","Distributed Named Nested Relational Calculus")
-        :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","DNNRC.Lang.DNNRC","Typed Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc_dataset,DistrEnd,"DNNRC","DNNRC.Lang.DNNRCDataset","Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","DNNRC.Typing.TDNNRCDataset","Typed Distributed Named Nested Relational Calculus")
         :: (L_javascript,BackEnd,"JS","JS.Lang.JS","JavaScript")
         :: (L_java,BackEnd,"Java","Java.Lang.Java","Java")
         :: (L_spark_rdd,BackEnd,"SparkRDD","SparkRDD.Lang.SparkRDD","Spark (RDD API)")
@@ -213,7 +213,7 @@ Section CompLang.
     Require Import CAMPRuntime.
 
     Require Import NNRCMRtoDNNRC.
-    Require Import TDNNRCInfer.
+    Require Import DNNRCTypes.
   
     Definition vdbindings := vdbindings.
 
@@ -238,8 +238,8 @@ Section CompLang.
     Definition nnrc := nnrc.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
-    Definition dnnrc_dataset := dnnrc _ unit dataset.
-    Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc _ (type_annotation unit) dataset.
+    Definition dnnrc_dataset := dnnrc.
+    Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc_typed.
     Definition javascript := string.
     Definition java := string.
     Definition spark_rdd := string.

@@ -94,7 +94,7 @@ Section CompDriver.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nnrc}.
-  Context {dnnrc_logger:optimizer_logger string (dnnrc fr (type_annotation unit) dataset)}.
+  Context {dnnrc_logger:optimizer_logger string (DNNRC.dnnrc fr (type_annotation unit) dataset)}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.

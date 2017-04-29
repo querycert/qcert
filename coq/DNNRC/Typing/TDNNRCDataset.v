@@ -14,12 +14,24 @@
  * limitations under the License.
  *)
 
-Require Export BasicTypes.
-Require Export TDNNRC TDNNRCInfer TDNNRCSub TOpsInferSub.
-Require Export TDNNRCDataset.
+Section TDNNRCDataset.
+
+  Require Import Utils BasicSystem.
+
+  Require Import DNNRC.
+  Require Import Dataset.
+  Require Import TDNNRC TDNNRCInfer.
+
+  Context {fruntime:foreign_runtime}.
+  Context {ftype: ForeignType.foreign_type}.
+  Context {br:brand_relation}.
+
+  Definition dnnrc_typed := @dnnrc _ (type_annotation unit) dataset.
+
+End TDNNRCDataset.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../coq" "Qcert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

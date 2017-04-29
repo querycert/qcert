@@ -173,10 +173,12 @@ MODULES = \
 	DNNRC/Lang/DNNRCEq \
 	DNNRC/Lang/Dataset \
 	DNNRC/Lang/DatasetSize \
+	DNNRC/Lang/DNNRCDataset \
 	DNNRC/Typing/TDNNRC \
 	DNNRC/Typing/TDNNRCSub \
-	DNNRC/Typing/TDNNRCInfer \
 	DNNRC/Typing/TOpsInferSub \
+	DNNRC/Typing/TDNNRCInfer \
+	DNNRC/Typing/TDNNRCDataset \
 	DNNRC/DNNRCRuntime \
 	DNNRC/DNNRCTypes \
 	DNNRC/DNNRCSystem \

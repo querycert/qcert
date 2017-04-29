@@ -18,6 +18,7 @@ Require Export BasicRuntime.
 
 Require Export DNNRC DNNRCEq DNNRCSize.
 Require Export Dataset DatasetSize.
+Require Export DNNRCDataset.
 
 (* 
 *** Local Variables: ***
