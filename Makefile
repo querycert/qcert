@@ -93,7 +93,6 @@ MODULES = \
 	Basic/JSON/JSON \
 	Basic/JSON/ForeignToJSON \
 	Basic/JSON/ForeignTypeToJSON \
-	Basic/JSON/ForeignToJavaScript \
 	Basic/JSON/JSONtoData \
 	Basic/BasicTypes \
 	Basic/BasicSystem \
@@ -262,6 +261,7 @@ MODULES = \
 	Translation/SQLtoNRAEnv \
 	Translation/OQLtoNRAEnv \
 	Translation/TOQLtoNRAEnv \
+	Translation/ForeignToJavaScript \
 	Translation/ForeignToJava \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
