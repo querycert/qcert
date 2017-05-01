@@ -54,17 +54,17 @@ Section CompDriver.
   Require Import CAMPtocNRAEnv.
   Require Import CAMPtoNRAEnv.
   Require Import NRAtocNNRC cNRAEnvtocNNRC NRAEnvtoNNRC.
-  Require Import NNRCtoJavascript.
+  Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
   Require Import cNNRCtoCAMP.
   Require Import NNRCMRtoNNRC.
-  Require Import NNRCMRtoSpark.
+  Require Import NNRCMRtoSparkRDD.
   Require Import NNRCMRtoCldMR.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoCloudant.
   Require Import NNRCtoDNNRC.
-  Require Import TDNNRCInfer DNNRCtoScala.
+  Require Import TDNNRCInfer tDNNRCtoSparkDF.
 
   (** Optimizers *)
   Require Import NRAEnvOptim.
@@ -79,7 +79,7 @@ Section CompDriver.
   Require Import ForeignCloudant.
   Require Import ForeignToCloudant.
   Require Import ForeignToJava.
-  Require Import ForeignToJavascript.
+  Require Import ForeignToJavaScript.
   Require Import ForeignToScala.
 
   (** Compiler Driver *)

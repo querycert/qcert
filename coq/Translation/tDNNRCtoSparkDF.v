@@ -32,11 +32,11 @@ Require Import TDataInfer.
 Require Import TDNNRCInfer.
 Require Import TOpsInfer.
 Require Import Dataset.
-Require Import SparkData.
+Require Import DatatoSparkDF.
 
 Local Open Scope string_scope.
 
-Section DNNRCtoScala.
+Section tDNNRCtoSparkDF.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
@@ -45,7 +45,7 @@ Section DNNRCtoScala.
   Context {fdtyping:foreign_data_typing}.
   Context {fboptyping:foreign_binary_op_typing}.
   Context {fuoptyping:foreign_unary_op_typing}.
-  Context {fttjs: ForeignToJavascript.foreign_to_javascript}.
+  Context {fttjs: ForeignToJavaScript.foreign_to_javascript}.
   Context {fts: ForeignToScala.foreign_to_scala}.
 
   Definition quote_string (s: string) : string :=
@@ -436,7 +436,7 @@ Section DNNRCtoScala.
       ++ "}" ++ eol
   .
 
-End DNNRCtoScala.
+End tDNNRCtoSparkDF.
 
 (*
 *** Local Variables: ***

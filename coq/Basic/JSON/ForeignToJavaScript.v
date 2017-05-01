@@ -20,7 +20,7 @@ Require Import Utils ForeignRuntime.
 
 Local Open Scope string_scope.
 
-Section ForeigntoJavascript.
+Section ForeigntoJavaScript.
 
 Class foreign_to_javascript {fruntime:foreign_runtime}: Type
   := mk_foreign_to_javascript {
@@ -36,7 +36,7 @@ Class foreign_to_javascript {fruntime:foreign_runtime}: Type
              (d1 d2:string) : string
        }.
   
-End ForeigntoJavascript.
+End ForeigntoJavaScript.
 
 (* 
 *** Local Variables: ***

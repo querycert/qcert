@@ -16,7 +16,7 @@
 
 Require Import String.
 Require Import CompilerRuntime Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavascript ForeignToScala ForeignToJSON ForeignTypeToJSON.
+Require Import ForeignToJava ForeignToJavaScript ForeignToScala ForeignToJSON ForeignTypeToJSON.
 Require Import ForeignReduceOps ForeignToReduceOps.
 Require Import ForeignToSpark.
 Require Import ForeignCloudant ForeignToCloudant.

@@ -19,13 +19,13 @@ Require Import EquivDec.
 
 Require Import Utils BasicRuntime.
 Require Import NNRCRuntime NNRCMRRuntime.
-Require Import NNRCtoJavascript.
-Require Import ForeignToJavascript ForeignToSpark.
+Require Import NNRCtoJavaScript.
+Require Import ForeignToJavaScript ForeignToSpark.
 Require Import NNRCMR.
 
 Local Open Scope string_scope.
 
-Section NNRCMRtoSpark.
+Section NNRCMRtoSparkRDD.
 
   Context {fruntime:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
@@ -35,7 +35,6 @@ Section NNRCMRtoSpark.
   Definition js_endl := eol_backn.
 
     Section sanitize.
-      Require Import NNRCtoJavascript.
       Import ListNotations.
       Require Import Ascii String.
       
@@ -544,7 +543,7 @@ Section NNRCMRtoSpark.
   Definition nnrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (l:nnrcmr) : string :=
     nnrcmrToSparkTopDataFromFile test_name init l eol_newline "'".
 
-End NNRCMRtoSpark.
+End NNRCMRtoSparkRDD.
 
 (*
 *** Local Variables: ***

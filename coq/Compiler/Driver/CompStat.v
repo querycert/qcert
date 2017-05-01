@@ -47,7 +47,7 @@ Section CompStat.
   Require Import CompilerRuntime.
   Require Import BasicSystem.
 
-  Require Import NNRCtoJavascript.
+  Require Import NNRCtoJavaScript.
 
   Require Import OptimizerLogger.
 
@@ -69,7 +69,7 @@ Section CompStat.
 
   (* Stat for an individual query *)
 
-  Require Import ForeignToJavascript.
+  Require Import ForeignToJavaScript.
   Context {ftojs:foreign_to_javascript}.
 
   Definition stat_error (q: string) : data :=

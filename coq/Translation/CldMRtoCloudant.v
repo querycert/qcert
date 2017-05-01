@@ -18,8 +18,8 @@ Require Import List String.
 
 Require Import Utils BasicRuntime.
 Require Import NNRCRuntime CldMR.
-Require Import NNRCtoJavascript.
-Require Import ForeignToJavascript ForeignCloudant.
+Require Import NNRCtoJavaScript.
+Require Import ForeignToJavaScript ForeignCloudant.
 
 Local Open Scope string_scope.
 

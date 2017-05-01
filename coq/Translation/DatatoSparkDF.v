@@ -20,14 +20,14 @@ Require Import EquivDec.
 
 Require Import Types BasicRuntime.
 Require Import ForeignDataTyping.
-Require Import NNRCtoJavascript.
+Require Import NNRCtoJavaScript.
 Require Import JSON.
 
-Section SparkData.
+Section DatatoSparkDF.
 
   Context {f:foreign_runtime}.
   Context {h:brand_relation_t}.
-  Context {fttojs: ForeignToJavascript.foreign_to_javascript}.
+  Context {fttojs: ForeignToJavaScript.foreign_to_javascript}.
   Context {ftype:foreign_type}.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
@@ -165,7 +165,7 @@ Section SparkData.
     (* Some (typed_data_to_json_string d r) *)
     lift (jsonToJS """") (typed_data_to_json d (proj1_sig r)).
 
-End SparkData.
+End DatatoSparkDF.
 
 (*
 *** Local Variables: ***

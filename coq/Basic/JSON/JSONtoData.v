@@ -160,7 +160,7 @@ Section JSONtoData.
   End toJSON.
 
   Section toJavascript.
-    Require Import ForeignToJavascript.
+    Require Import ForeignToJavaScript.
 
     Fixpoint data_enhanced_to_js (quotel:string) (d:data) : json :=
       match d with

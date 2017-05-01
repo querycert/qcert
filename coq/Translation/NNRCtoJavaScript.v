@@ -20,7 +20,7 @@ Require Import EquivDec.
 
 Require Import Utils BasicRuntime.
 Require Import NNRCRuntime.
-Require Import ForeignToJavascript.
+Require Import ForeignToJavaScript.
 Local Open Scope string_scope.
 
 
@@ -124,7 +124,7 @@ Section sanitizer.
 
 End sanitizer.
 
-Section NNRCtoJavascript.
+Section NNRCtoJavaScript.
 
   Context {fruntime:foreign_runtime}.
   Context {ftojavascript:foreign_to_javascript}.
@@ -446,7 +446,7 @@ Section NNRCtoJavascript.
 
   End NNRCJS.
 
-End NNRCtoJavascript.
+End NNRCtoJavaScript.
 
 (* 
 *** Local Variables: ***

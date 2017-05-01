@@ -93,7 +93,7 @@ MODULES = \
 	Basic/JSON/JSON \
 	Basic/JSON/ForeignToJSON \
 	Basic/JSON/ForeignTypeToJSON \
-	Basic/JSON/ForeignToJavascript \
+	Basic/JSON/ForeignToJavaScript \
 	Basic/JSON/JSONtoData \
 	Basic/BasicTypes \
 	Basic/BasicSystem \
@@ -267,10 +267,10 @@ MODULES = \
 	Translation/ForeignToSpark \
 	Translation/CldMRtoCloudant \
 	Translation/NNRCtoJava \
-	Translation/NNRCtoJavascript \
-	Translation/NNRCMRtoSpark \
-	Translation/SparkData \
-	Translation/DNNRCtoScala \
+	Translation/NNRCtoJavaScript \
+	Translation/NNRCMRtoSparkRDD \
+	Translation/DatatoSparkDF \
+	Translation/tDNNRCtoSparkDF \
 	Compiler/Model/CompilerRuntime \
 	Compiler/Model/CompilerModel \
 	Compiler/Model/FloatModelPart \
