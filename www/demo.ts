@@ -230,10 +230,21 @@ interface PuzzleSides {
         setConfigStatus("Default configuration was loaded.", false);
     }
 
-    // Executes when clear all button is pushed on the optim config tab
+    // Executes when clear button is pushed on the optim config tab
     function clearConfig() {
         setConfig(getClearConfig());
         setConfigStatus("Configuration starting from scratch", false);
+    }
+
+    // Executes when save button is pushed on the optim config tab
+    function saveConfig() {
+        const config = JSON.stringify(getOptimConfig());
+        const blob = new Blob([config], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = "optimizations";
+        link.click();
     }
 
     function getClearConfig() {
@@ -2341,6 +2352,7 @@ function makeSimpleOptimElement(optim:string) {
 	entry.classList.add('optim-list');
 
 	entry.appendChild(document.createTextNode(optim));
+    entry.setAttribute('data-id', optim);
 	return entry;
 }
 
@@ -2470,6 +2482,7 @@ class OptimPhaseTab extends ICanvasDynamicTab {
 
 	getPhase():QcertOptimPhase {
         let optims:string[] = this.sortable.toArray();
+        console.log(optims);
         if (optims.length == 1 && optims[0] == optPlaceholder)
             optims = [];
 		return {

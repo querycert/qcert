@@ -31,6 +31,8 @@
     <input type="file" id="load-optims" accept=".json" 
           onchange='handleOptimFile(this.files)' style="display:none"/>
     <label id="config-message">Default configuration was loaded.</label>          
+    <button id="save-button" type="button" class="btn btn-sm btn-primary"
+          onclick="saveConfig()"><b>save config</b></button>
   </div>
   <div id="container" style="position:relative">
     <canvas id="main-canvas" width="1000" height="700"></canvas>
