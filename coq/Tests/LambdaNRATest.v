@@ -80,31 +80,32 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
     induction l; simpl; trivial.
     autorewrite with lambda_nra'.
     case_eq (@lambda_nra_eval TrivialModel.trivial_foreign_runtime h0 cenv
-             (@app
-                (prod string
-                   (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))) env
-                (@cons
-                   (prod string
-                      (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime)))
-                   (@pair string
-                      (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))
-                      (String (Ascii.Ascii false false false false true true true false)
-                         EmptyString) a)
-                   (@nil
-                      (prod string
-                         (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))))))
-             (@LNRAUnop TrivialModel.trivial_foreign_runtime
-                (@ADot TrivialModel.trivial_foreign_data
-                   (@TrivialModel.trivial_foreign_unary_op TrivialModel.trivial_foreign_data)
-                   (String (Ascii.Ascii true false false false false true true false)
-                      (String (Ascii.Ascii false false true false false true true false)
-                         (String (Ascii.Ascii false false true false false true true false)
-                            (String
-                               (Ascii.Ascii false true false false true true true false)
-                               EmptyString)))))
-                (@LNRAVar TrivialModel.trivial_foreign_runtime
-                   (String (Ascii.Ascii false false false false true true true false)
-                           EmptyString)))); simpl; intros.
+            (@rec_sort string ODT_string
+               (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))
+               (@app
+                  (prod string
+                     (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))) env
+                  (@cons
+                     (prod string
+                        (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime)))
+                     (@pair string
+                        (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime))
+                        (String (Ascii.Ascii false false false false true true true false)
+                           EmptyString) a)
+                     (@nil
+                        (prod string
+                           (@data (@foreign_runtime_data TrivialModel.trivial_foreign_runtime)))))))
+            (@LNRAUnop TrivialModel.trivial_foreign_runtime
+               (@ADot TrivialModel.trivial_foreign_data
+                  (@TrivialModel.trivial_foreign_unary_op TrivialModel.trivial_foreign_data)
+                  (String (Ascii.Ascii true false false false false true true false)
+                     (String (Ascii.Ascii false false true false false true true false)
+                        (String (Ascii.Ascii false false true false false true true false)
+                           (String (Ascii.Ascii false true false false true true true false)
+                              EmptyString)))))
+               (@LNRAVar TrivialModel.trivial_foreign_runtime
+                  (String (Ascii.Ascii false false false false true true true false)
+                     EmptyString)))); simpl; intros.
     - unfold lambda_nra_eval in H |- *.
       rewrite H; clear H.
       rewrite olift_some.
@@ -143,6 +144,8 @@ Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra'.
           unfold lambda_nra_eval.
           simpl.
           unfold edot.
+          simpl.
+          rewrite (@assoc_lookupr_drec_sort string ODT_string).
           rewrite @assoc_lookupr_app.
           simpl.
           trivial.

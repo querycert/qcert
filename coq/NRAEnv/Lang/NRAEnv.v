@@ -241,6 +241,12 @@ Section NRAEnv.
     reflexivity.
   Qed.
 
+  Section Top.
+    Definition nraenv_eval_top (q:nraenv) (env:bindings) :=
+      nraenv_eval (rec_sort env) q (drec nil) dunit.
+      
+  End Top.
+
 End NRAEnv.
 
 (* begin hide *)

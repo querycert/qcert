@@ -27,16 +27,16 @@ Section LambdaNRAEq.
 
   Context {fruntime:foreign_runtime}.
 
-    Definition lambda_nra_eq (op1 op2:lambda_nra) : Prop :=
+  Definition lambda_nra_eq (op1 op2:lambda_nra) : Prop :=
     forall
       (h:list(string*string))
       (cenv:bindings)
       (env:bindings)
       (dn_cenv:Forall (fun d => data_normalized h (snd d)) cenv)
       (dn_env:Forall (fun d => data_normalized h (snd d)) env),
-       lambda_nra_eval h cenv env op1 = lambda_nra_eval h cenv env op2.
+      lambda_nra_eval h cenv env op1 = lambda_nra_eval h cenv env op2.
 
-    Definition lnra_lambda_eq (op1 op2:lnra_lambda) : Prop :=
+  Definition lnra_lambda_eq (op1 op2:lnra_lambda) : Prop :=
     forall
       (h:list(string*string))
       (cenv:bindings)
@@ -180,7 +180,7 @@ Section LambdaNRAEq.
     rewrite H0.
     - reflexivity.
     - trivial.
-    - apply Forall_app; auto.
+    - apply Forall_sorted; apply Forall_app; auto.
   Qed.
 
 End LambdaNRAEq.

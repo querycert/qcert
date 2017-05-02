@@ -116,15 +116,12 @@ Section CompEval.
     (* Language: sql *)
     (* Note: eval for sql relies on translation to nraenv_core *)
     Definition eval_sql (q:sql) (cenv: list (string*data)) : option data
-      := NRAEnv.nraenv_eval h (rec_sort cenv) (sql_to_nraenv_top q) (drec nil) dunit.
+      := NRAEnv.nraenv_eval_top h (sql_to_nraenv_top q) cenv.
 
     (* Language: lambda_nra *)
     (* Note: eval for lambda_nra relies on translation to nraenv_core *)
     Definition eval_lambda_nra (q:lambda_nra) (cenv: list (string*data)) : option data
-      := NRAEnv.nraenv_eval h (rec_sort cenv) (lambda_nra_to_nraenv q) (drec nil) dunit.
-
-    Definition eval_lambda_nra' (q:lambda_nra) (cenv: list (string*data)) : option data
-      := LambdaNRA.eval_lambda_nra_top h (rec_sort cenv) q.
+      := LambdaNRA.lambda_nra_eval_top h q cenv.
 
     (* Language: nra *)
     Definition eval_nra (q:nra) (cenv: list (string*data)) : option data
@@ -139,7 +136,7 @@ Section CompEval.
 
     (* Language: nraenv *)
     Definition eval_nraenv (q:nraenv) (cenv: list (string*data)) : option data
-      := NRAEnv.nraenv_eval h (rec_sort cenv) q (drec nil) dunit.
+      := NRAEnv.nraenv_eval_top h q cenv.
 
     (* Language: nnrc_core *)
     (* Note: eval_nnrc_core assumes constant environment has been prefixed with 'CONST$' *)

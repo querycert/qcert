@@ -91,30 +91,108 @@ Section LambdaNRA.
   (** Semantics of Lambda NRA *)
 
   Context (h:brand_relation_t).
-  Context (global_env:list (string*data)).
+  Section Semantics.
+    Context (global_env:list (string*data)).
 
-  Fixpoint lambda_nra_eval (env: bindings) (op:lambda_nra) : option data :=
-    match op with
-    | LNRAVar x => edot env x
-    | LNRATable t => edot global_env t
-    | LNRAConst d => Some (normalize_data h d)
-    | LNRABinop b op1 op2 => olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
-    | LNRAUnop u op1 =>
-      olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1)
-    | LNRAMap lop1 op2 =>
+    Fixpoint lambda_nra_eval (env: bindings) (op:lambda_nra) : option data :=
+      match op with
+      | LNRAVar x => edot env x
+      | LNRATable t => edot global_env t
+      | LNRAConst d => Some (normalize_data h d)
+      | LNRABinop b op1 op2 =>
+        olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
+      | LNRAUnop u op1 =>
+        olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1)
+      | LNRAMap lop1 op2 =>
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
         in olift aux_map (lambda_nra_eval env op2)
-    | LNRAMapConcat lop1 op2 =>
+      | LNRAMapConcat lop1 op2 =>
+        let aux_mapconcat d :=
+            lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
+        in olift aux_mapconcat (lambda_nra_eval env op2)
+      | LNRAProduct op1 op2 =>
+        (* Note: it's even clearer from this formulation that both branches take the same environment *)
+        let aux_product d :=
+            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
+        in olift aux_product (lambda_nra_eval env op1)
+      | LNRAFilter lop1 op2 =>
+        let pred x' :=
+            match lnra_lambda_eval env lop1 x' with
+            | Some (dbool b) => Some b
+            | _ => None
+            end
+        in
+        let aux_map d :=
+            lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
+        in
+        olift aux_map (lambda_nra_eval env op2)
+      end
+    with lnra_lambda_eval (env:bindings)
+                          (lop:lnra_lambda) (d:data)
+         : option data :=
+           match lop with
+           | LNRALambda x op =>
+             (lambda_nra_eval (rec_sort (env++((x,d)::nil))) op)
+           end.
+
+    Lemma lnra_lambda_eval_lambda_eq env x lop d:
+      lnra_lambda_eval env (LNRALambda x lop) d =
+      (lambda_nra_eval (rec_sort (env++((x,d)::nil))) lop).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_var_eq env s :
+      lambda_nra_eval env (LNRAVar s) = 
+      edot env s.
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_binop_eq env b op1 op2 :
+      lambda_nra_eval env (LNRABinop b op1 op2) = 
+      olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_unop_eq env u op1 :
+      lambda_nra_eval env (LNRAUnop u op1) = 
+      olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_map_eq env lop1 op2 :
+      lambda_nra_eval env (LNRAMap lop1 op2) = 
+      let aux_map d :=
+          lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
+      in olift aux_map (lambda_nra_eval env op2).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_map_concat_eq env lop1 op2 :
+      lambda_nra_eval env (LNRAMapConcat lop1 op2) = 
       let aux_mapconcat d :=
           lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
-      in olift aux_mapconcat (lambda_nra_eval env op2)
-    | LNRAProduct op1 op2 =>
-      (* Note: it's even clearer from this formulation that both branches take the same environment *)
+      in olift aux_mapconcat (lambda_nra_eval env op2).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_product_eq env op1 op2 :
+      lambda_nra_eval env (LNRAProduct op1 op2) = 
       let aux_product d :=
           lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
-      in olift aux_product (lambda_nra_eval env op1)
-    | LNRAFilter lop1 op2 =>
+      in olift aux_product (lambda_nra_eval env op1).
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_filter_eq env lop1 op2 :
+      lambda_nra_eval env (LNRAFilter lop1 op2) = 
       let pred x' :=
           match lnra_lambda_eval env lop1 x' with
           | Some (dbool b) => Some b
@@ -124,227 +202,153 @@ Section LambdaNRA.
       let aux_map d :=
           lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
       in
-      olift aux_map (lambda_nra_eval env op2)
-    end
-  with lnra_lambda_eval (env:bindings)
-                        (lop:lnra_lambda) (d:data)
-       : option data :=
-    match lop with
-    | LNRALambda x op =>
-      (lambda_nra_eval (env++((x,d)::nil)) op)
-    end.
+      olift aux_map (lambda_nra_eval env op2).
+    Proof.
+      reflexivity.
+    Qed.
 
-  Lemma lnra_lambda_eval_lambda_eq env x lop d:
-    lnra_lambda_eval env (LNRALambda x lop) d =
-    (lambda_nra_eval (env++((x,d)::nil)) lop).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_var_eq env s :
-    lambda_nra_eval env (LNRAVar s) = 
-    edot env s.
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_binop_eq env b op1 op2 :
-    lambda_nra_eval env (LNRABinop b op1 op2) = 
-    olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_unop_eq env u op1 :
-    lambda_nra_eval env (LNRAUnop u op1) = 
-    olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_map_eq env lop1 op2 :
-    lambda_nra_eval env (LNRAMap lop1 op2) = 
-    let aux_map d :=
-        lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
-    in olift aux_map (lambda_nra_eval env op2).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_map_concat_eq env lop1 op2 :
-    lambda_nra_eval env (LNRAMapConcat lop1 op2) = 
-    let aux_mapconcat d :=
-        lift_oncoll (fun c1 => lift dcoll (rmap_concat (lnra_lambda_eval env lop1) c1)) d
-    in olift aux_mapconcat (lambda_nra_eval env op2).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_product_eq env op1 op2 :
-    lambda_nra_eval env (LNRAProduct op1 op2) = 
-    let aux_product d :=
-        lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => lambda_nra_eval env op2) c1)) d
-    in olift aux_product (lambda_nra_eval env op1).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_filter_eq env lop1 op2 :
-    lambda_nra_eval env (LNRAFilter lop1 op2) = 
-    let pred x' :=
-        match lnra_lambda_eval env lop1 x' with
-        | Some (dbool b) => Some b
-        | _ => None
-        end
-    in
-    let aux_map d :=
-        lift_oncoll (fun c1 => lift dcoll (lift_filter pred c1)) d
-    in
-    olift aux_map (lambda_nra_eval env op2).
-  Proof.
-    reflexivity.
-  Qed.
-
-  Lemma lambda_nra_eval_normalized {op:lambda_nra} {env:bindings} {o} :
-    lambda_nra_eval env op= Some o ->
-    Forall (fun x => data_normalized h (snd x)) env ->
-    Forall (fun x => data_normalized h (snd x)) global_env ->
-    data_normalized h o.
-  Proof.
-    revert env o.
-    lambda_nra_cases (induction op) Case
-    ; intros; simpl in *.
-    - Case "LNRAVar"%string.
-      unfold edot in H.
-      apply assoc_lookupr_in in H.
-      rewrite Forall_forall in H0.
-      specialize (H0 _ H).
-      simpl in H0.
-      trivial.
-    - Case "LNRATable"%string.
-      unfold edot in H.
-      apply assoc_lookupr_in in H.
-      rewrite Forall_forall in H1.
-      specialize (H1 _ H).
-      simpl in H1.
-      trivial.
-    - Case "LNRAConst"%string.
-      invcs H.
-      apply normalize_normalizes.
-    - Case "LNRABinop"%string.
-      unfold olift2 in H.
-      match_case_in H; intros; rewrite H2 in H; try discriminate.
-      match_case_in H; intros; rewrite H3 in H; try discriminate.
-      eapply fun_of_binop_normalized; eauto.
-    - Case "LNRAUnop"%string.
-      unfold olift in H.
-      match_case_in H; intros; rewrite H2 in H; try discriminate.
-      eapply fun_of_unaryop_normalized; eauto.
-    - Case "LNRAMap"%string.
-      unfold olift in H.
-      match_case_in H; intros; rewrite H2 in H; try discriminate.
-      specialize (IHop2 _ _ H2 H0 H1).
-      unfold lift_oncoll in H.
-      match_destr_in H.
-      apply some_lift in H.
-      destruct H as [? ? ?]; subst.
-      constructor.
-      invcs IHop2.
-      eapply (rmap_Forall e).
-      + apply H3.
-      + intros. eapply IHop1; eauto.
-        apply Forall_app; auto.
-    - Case "LNRAMapConcat"%string.
-      unfold olift in H.
-      match_case_in H; intros; rewrite H2 in H; try discriminate.
-      specialize (IHop2 _ _ H2 H0 H1).
-      unfold lift_oncoll in H.
-      match_destr_in H.
-      apply some_lift in H.
-      destruct H as [? ? ?]; subst.
-      constructor.
-      invcs IHop2.
-      unfold rmap_concat in e.
-      eapply (oflat_map_Forall e).
-      + apply H3.
-      + intros.
-        unfold oomap_concat in H.
-        match_case_in H; intros; rewrite H5 in H; try discriminate.
+    Lemma lambda_nra_eval_normalized {op:lambda_nra} {env:bindings} {o} :
+      lambda_nra_eval env op= Some o ->
+      Forall (fun x => data_normalized h (snd x)) env ->
+      Forall (fun x => data_normalized h (snd x)) global_env ->
+      data_normalized h o.
+    Proof.
+      revert env o.
+      lambda_nra_cases (induction op) Case
+      ; intros; simpl in *.
+      - Case "LNRAVar"%string.
+        unfold edot in H.
+        apply assoc_lookupr_in in H.
+        rewrite Forall_forall in H0.
+        specialize (H0 _ H).
+        simpl in H0.
+        trivial.
+      - Case "LNRATable"%string.
+        unfold edot in H.
+        apply assoc_lookupr_in in H.
+        rewrite Forall_forall in H1.
+        specialize (H1 _ H).
+        simpl in H1.
+        trivial.
+      - Case "LNRAConst"%string.
+        invcs H.
+        apply normalize_normalizes.
+      - Case "LNRABinop"%string.
+        unfold olift2 in H.
+        match_case_in H; intros; rewrite H2 in H; try discriminate.
+        match_case_in H; intros; rewrite H3 in H; try discriminate.
+        eapply fun_of_binop_normalized; eauto.
+      - Case "LNRAUnop"%string.
+        unfold olift in H.
+        match_case_in H; intros; rewrite H2 in H; try discriminate.
+        eapply fun_of_unaryop_normalized; eauto.
+      - Case "LNRAMap"%string.
+        unfold olift in H.
+        match_case_in H; intros; rewrite H2 in H; try discriminate.
+        specialize (IHop2 _ _ H2 H0 H1).
+        unfold lift_oncoll in H.
         match_destr_in H.
-        unfold omap_concat in H.
-        specialize (IHop1 _ _ H5).
-        cut_to IHop1.
-        { invcs IHop1.
-          eapply (rmap_Forall H).
-          - eapply H7.
-          - intros.
-            simpl in *.
-            unfold orecconcat in H6.
-            match_destr_in H6.
-            match_destr_in H6.
-            invcs H6.
-            constructor.
-            + apply Forall_sorted.
-              apply Forall_app.
-              * invcs H4; trivial.
-              * invcs H8; trivial.
-            + eauto.
-        }
-        apply Forall_app; trivial.
-        constructor; trivial.
-        trivial.
-    - Case "LNRAProduct"%string.
-      unfold olift in H.
-      match_case_in H; intros; rewrite H2 in H; try discriminate.
-      specialize (IHop1 _ _ H2 H0 H1).
-      unfold lift_oncoll in H.
-      match_destr_in H.
-      apply some_lift in H.
-      destruct H as [? ? ?]; subst.
-      constructor.
-      invcs IHop1.
-      unfold rmap_concat in e.
-      eapply (oflat_map_Forall e).
-      + apply H3.
-      + intros.
-        unfold oomap_concat in H.
-        match_case_in H; intros; rewrite H5 in H; try discriminate.
+        apply some_lift in H.
+        destruct H as [? ? ?]; subst.
+        constructor.
+        invcs IHop2.
+        eapply (rmap_Forall e).
+        + apply H3.
+        + intros. eapply IHop1; eauto.
+          apply Forall_sorted.
+          apply Forall_app; auto.
+      - Case "LNRAMapConcat"%string.
+        unfold olift in H.
+        match_case_in H; intros; rewrite H2 in H; try discriminate.
+        specialize (IHop2 _ _ H2 H0 H1).
+        unfold lift_oncoll in H.
         match_destr_in H.
-        unfold omap_concat in H.
-        specialize (IHop2 _ _ H5).
-        cut_to IHop2.
-        { invcs IHop2.
-          eapply (rmap_Forall H).
-          - eapply H7.
-          - intros.
-            simpl in *.
-            unfold orecconcat in H6.
-            match_destr_in H6.
-            match_destr_in H6.
-            invcs H6.
-            constructor.
-            + apply Forall_sorted.
-              apply Forall_app.
-              * invcs H4; trivial.
-              * invcs H8; trivial.
-            + eauto.
-        }
+        apply some_lift in H.
+        destruct H as [? ? ?]; subst.
+        constructor.
+        invcs IHop2.
+        unfold rmap_concat in e.
+        eapply (oflat_map_Forall e).
+        + apply H3.
+        + intros.
+          unfold oomap_concat in H.
+          match_case_in H; intros; rewrite H5 in H; try discriminate.
+          match_destr_in H.
+          unfold omap_concat in H.
+          specialize (IHop1 _ _ H5).
+          cut_to IHop1.
+          { invcs IHop1.
+            eapply (rmap_Forall H).
+            - eapply H7.
+            - intros.
+              simpl in *.
+              unfold orecconcat in H6.
+              match_destr_in H6.
+              match_destr_in H6.
+              invcs H6.
+              constructor.
+              + apply Forall_sorted.
+                apply Forall_app.
+                * invcs H4; trivial.
+                * invcs H8; trivial.
+              + eauto.
+          }
+          apply Forall_sorted.
+          apply Forall_app; trivial.
+          constructor; trivial.
+          trivial.
+      - Case "LNRAProduct"%string.
+        unfold olift in H.
+        match_case_in H; intros; rewrite H2 in H; try discriminate.
+        specialize (IHop1 _ _ H2 H0 H1).
+        unfold lift_oncoll in H.
+        match_destr_in H.
+        apply some_lift in H.
+        destruct H as [? ? ?]; subst.
+        constructor.
+        invcs IHop1.
+        unfold rmap_concat in e.
+        eapply (oflat_map_Forall e).
+        + apply H3.
+        + intros.
+          unfold oomap_concat in H.
+          match_case_in H; intros; rewrite H5 in H; try discriminate.
+          match_destr_in H.
+          unfold omap_concat in H.
+          specialize (IHop2 _ _ H5).
+          cut_to IHop2.
+          { invcs IHop2.
+            eapply (rmap_Forall H).
+            - eapply H7.
+            - intros.
+              simpl in *.
+              unfold orecconcat in H6.
+              match_destr_in H6.
+              match_destr_in H6.
+              invcs H6.
+              constructor.
+              + apply Forall_sorted.
+                apply Forall_app.
+                * invcs H4; trivial.
+                * invcs H8; trivial.
+              + eauto.
+          }
+          trivial.
+          trivial.
+      - Case "LNRAFilter"%string.
+        unfold olift in H.
+        match_case_in H; intros; rewrite H2 in H; try discriminate.
+        specialize (IHop2 _ _ H2 H0 H1).
+        unfold lift_oncoll in H.
+        match_destr_in H.
+        apply some_lift in H.
+        destruct H as [? ? ?]; subst.
+        constructor.
+        invcs IHop2.
+        eapply (lift_filter_Forall e).
         trivial.
-        trivial.
-    - Case "LNRAFilter"%string.
-      unfold olift in H.
-      match_case_in H; intros; rewrite H2 in H; try discriminate.
-      specialize (IHop2 _ _ H2 H0 H1).
-      unfold lift_oncoll in H.
-      match_destr_in H.
-      apply some_lift in H.
-      destruct H as [? ? ?]; subst.
-      constructor.
-      invcs IHop2.
-      unfold rmap_concat in e.
-      eapply (lift_filter_Forall e).
-      trivial.
-  Qed.
+    Qed.
+  End Semantics.
 
   Section LambdaNRAScope.
 
@@ -365,7 +369,7 @@ Section LambdaNRA.
         (remove string_eqdec x (lambda_nra_free_vars e1)) ++ (lambda_nra_free_vars e2)
       end.
 
-  (* capture avoiding substitution *)
+    (* capture avoiding substitution *)
     Fixpoint lambda_nra_subst (e:lambda_nra) (x:string) (e':lambda_nra) : lambda_nra :=
       match e with
       | LNRAConst d => LNRAConst d
@@ -398,11 +402,12 @@ Section LambdaNRA.
     Definition q_to_lambda (Q:lambda_nra -> lambda_nra) : lnra_lambda :=
       (LNRALambda "input" (Q (LNRAVar "input"))).
 
-    Definition eval_lnra_lambda (Q:lambda_nra -> lambda_nra) (input:data) : option data :=
-      lnra_lambda_eval nil (q_to_lambda Q) input.
+    Definition lnra_lambda_eval_top (Q:lambda_nra -> lambda_nra)
+               (global_env:bindings) (input:data) : option data :=
+      lnra_lambda_eval global_env nil (q_to_lambda Q) input.
 
-    Definition eval_lambda_nra_top (q:lambda_nra) : option data :=
-      lambda_nra_eval nil q.
+    Definition lambda_nra_eval_top (q:lambda_nra) (env:bindings) : option data :=
+      lambda_nra_eval (rec_sort env) nil q.
   End Top.
 
 End LambdaNRA.
