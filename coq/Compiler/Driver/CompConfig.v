@@ -31,7 +31,7 @@ Section CompConfig.
   Require Import CompLang CompEnv.
   
   Section optim.
-    Require Import TNNRCOptimizer.
+    Require Import NNRCOptimizer.
     Require Import NRAEnvOptimizer.
     Require Import OptimizerStep.
 

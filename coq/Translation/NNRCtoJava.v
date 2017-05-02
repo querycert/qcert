@@ -426,7 +426,7 @@ Section NNRCtoJava.
       ++ "}" ++ eol
     .
 
-    Definition nnrcToJavaTop (class_name:string) (imports:string) (e:nnrc) : string :=
+    Definition nnrc_to_java_top (class_name:string) (imports:string) (e:nnrc) : string :=
       let input_f := "query" in
       let input_v := "constants" in
       nnrcToJavaClass class_name "" imports input_v e eol_newline quotel_double ((input_v, input_v)::nil) input_f.

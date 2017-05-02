@@ -29,7 +29,7 @@ Section NNRCMROptimizer.
   Require Import Utils BasicSystem.
   Require Import NNRCSystem.
   Require Import NNRCRewriteUtil NNRCRewrite TNNRCRewrite.
-  Require Import NNRCOptimizer TNNRCOptimizer.
+  Require Import NNRCOptimizer.
   Require Import OptimizerLogger.
   Require Import OptimizerStep.
 
@@ -44,15 +44,15 @@ Section NNRCMROptimizer.
           (fun mr =>
              let map :=
                  match mr.(mr_map) with
-                 | MapDist (x, n) => MapDist (x, trew_old n)
-                 | MapDistFlatten (x, n) => MapDistFlatten (x, trew_old n)
-                 | MapScalar (x, n) => MapScalar (x, trew_old n)
+                 | MapDist (x, n) => MapDist (x, run_nnrc_optims_default n)
+                 | MapDistFlatten (x, n) => MapDistFlatten (x, run_nnrc_optims_default n)
+                 | MapScalar (x, n) => MapScalar (x, run_nnrc_optims_default n)
                  end
              in
              let reduce :=
                  match mr.(mr_reduce) with
                  | RedId => RedId
-                 | RedCollect (x, n) => RedCollect (x, trew_old n)
+                 | RedCollect (x, n) => RedCollect (x, run_nnrc_optims_default n)
                  | RedOp op => RedOp op
                  | RedSingleton => RedSingleton
                  end
@@ -62,7 +62,7 @@ Section NNRCMROptimizer.
     in
     let last :=
         let '((params, n), args) := l.(mr_last) in
-        ((params, trew_old n), args)
+        ((params, run_nnrc_optims_default n), args)
     in
     mkMRChain
       inputs_loc

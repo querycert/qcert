@@ -163,7 +163,6 @@ MODULES = \
 	NNRC/Optim/NNRCRewrite \
 	NNRC/Optim/TNNRCRewrite \
 	NNRC/Optim/NNRCOptimizer \
-	NNRC/Optim/TNNRCOptimizer \
 	NNRC/NNRCOptim \
 	NNRCMR/Lang/ForeignReduceOps \
 	NNRCMR/Lang/NNRCMR \

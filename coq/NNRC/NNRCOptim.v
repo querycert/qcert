@@ -16,7 +16,7 @@
 
 Require Export NNRCRewriteUtil NNRCRewrite.
 Require Export TNNRCRewrite.
-Require Export NNRCOptimizer TNNRCOptimizer.
+Require Export NNRCOptimizer.
 
 (* 
 *** Local Variables: ***

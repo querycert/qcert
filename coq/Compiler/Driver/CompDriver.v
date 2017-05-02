@@ -189,10 +189,10 @@ Section CompDriver.
       nnrc_to_dnnrc_dataset tt inputs_loc q.
 
     Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
-      lift_nnrc_core nnrcToJSTop (nnrc_to_nnrc_core q).
+      lift_nnrc_core nnrc_to_js_top (nnrc_to_nnrc_core q).
 
     Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Expands GroupBy For now XXX *)
-      lift_nnrc_core (nnrcToJavaTop class_name imports) (nnrc_to_nnrc_core q).
+      lift_nnrc_core (nnrc_to_java_top class_name imports) (nnrc_to_nnrc_core q).
 
     (** DNNRC translations *)
     

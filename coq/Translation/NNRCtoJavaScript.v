@@ -439,7 +439,7 @@ Section NNRCtoJavaScript.
       nnrcToJSFunStubConstants e' eol quotel ivs fname.
 
     (* Java equivalent: JavaScriptBackend.generateJavaScript *)
-    Definition nnrcToJSTop (e:nnrc) : string :=
+    Definition nnrc_to_js_top (e:nnrc) : string :=
       let input_f := "query" in
       let input_v := "constants" in
       nnrcToJSFun input_v e eol_newline quotel_double (input_v::nil) input_f.
