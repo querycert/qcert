@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export NNRCMRRewrite TNNRCMROptimizer.
+Require Export NNRCMRRewrite NNRCMROptimizer.
 
 (* 
 *** Local Variables: ***

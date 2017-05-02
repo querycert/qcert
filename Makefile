@@ -170,7 +170,7 @@ MODULES = \
 	NNRCMR/NNRCMRRuntime \
 	NNRCMR/NNRCMRSystem \
 	NNRCMR/Optim/NNRCMRRewrite \
-	NNRCMR/Optim/TNNRCMROptimizer \
+	NNRCMR/Optim/NNRCMROptimizer \
 	NNRCMR/NNRCMROptim \
 	DNNRC/Lang/DNNRC \
 	DNNRC/Lang/DNNRCSize \

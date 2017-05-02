@@ -367,7 +367,7 @@ Section SQLtoNRAEnv.
        end.
 
   (* If there is no select statement, we default to dunit *)
-  Definition sql_to_nraenv (q:sql) : nraenv
+  Definition sql_to_nraenv_top (q:sql) : nraenv
     :=
       NRAEnvAppEnv
         (NRAEnvApp (sql_statements_to_nraenv nil q) (NRAEnvConst dunit))

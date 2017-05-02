@@ -133,11 +133,11 @@ Section CompDriver.
 
   Section translations.
     (** Source languages translations *)
-    Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.translate_oql_to_nraenv q.
+    Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.oql_to_nraenv_top q.
 
-    Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv q.
+    Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv_top q.
 
-    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := nraenv_of_lambda_nra q.
+    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := lambda_nra_to_nraenv q.
 
     (** Rules and CAMP translations *)
     Definition camp_rule_to_camp (q:camp_rule) : camp := CAMPRule.camp_rule_to_camp q. (* Note: This is really macro-expansion *)
@@ -167,7 +167,7 @@ Section CompDriver.
     Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := nraenv_core_of_nraenv q.
 
     Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
-      nraenv_to_nnrc_ext_top q init_vid init_venv.
+      nraenv_to_nnrc_top q init_vid init_venv.
 
     (** NNRC translations *)
     Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
@@ -201,7 +201,7 @@ Section CompDriver.
 
     Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
 
-    Definition nnrcmr_optim_aux (q: nnrcmr) : nnrcmr := trew_old_nnrcmr (mr_optimize q).
+    Definition nnrcmr_optim_aux (q: nnrcmr) : nnrcmr := run_nnrcmr_optims q.
 
     Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
       let q := foreign_to_cloudant_prepare_nnrcmr q in

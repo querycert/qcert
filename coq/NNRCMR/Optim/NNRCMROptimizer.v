@@ -16,7 +16,7 @@
 
 (* This includes some rewrites/simplification rules for the Nested relational calculus *)
 
-Section TNNRCMROptimizer.
+Section NNRCMROptimizer.
   Require Import String.
   Require Import List ListSet.
   Require Import Arith.
@@ -33,9 +33,9 @@ Section TNNRCMROptimizer.
   Require Import OptimizerLogger.
   Require Import OptimizerStep.
 
-  Require Import NNRCMR.
+  Require Import NNRCMR NNRCMRRewrite.
   Require Import ForeignReduceOps.
-  Definition trew_old_nnrcmr
+  Definition trew_nnrcmr
              {fruntime:foreign_runtime} {fredop:foreign_reduce_op} {logger:optimizer_logger string nnrc}
              (l: nnrcmr) :=
     let inputs_loc := l.(mr_inputs_loc) in
@@ -69,7 +69,11 @@ Section TNNRCMROptimizer.
       chain
       last.
 
-End TNNRCMROptimizer.
+  Definition run_nnrcmr_optims
+             {fruntime:foreign_runtime} {fredop:foreign_reduce_op} {logger:optimizer_logger string nnrc}
+             q := trew_nnrcmr (mr_optimize q).
+  
+End NNRCMROptimizer.
 
 (* 
 *** Local Variables: ***

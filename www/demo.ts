@@ -527,7 +527,6 @@ interface StringMap<V> {
 var sourcePieces:StringMap<SourcePuzzlePiece> = {};
 // This is the matrix of pieces that are in the grid
 var placedPieces:BasicPuzzlePiece[][] = [];
-
 let errorPiece:SourcePuzzlePiece;
 
 // things that can be get/set via the grid
@@ -618,8 +617,7 @@ class Grid {
 			}
 		}
 	}
-
-	static removeAndHide(location:{x:number, y:number}) {
+        static removeAndHide(location:{x:number, y:number}) {
 		let prow = placedPieces[location.y];
 		if(prow === undefined) {
 			return;
@@ -634,9 +632,9 @@ class Grid {
 	static addAndShow(location:{x:number, y:number}, pieces:BasicPuzzlePiece|BasicPuzzlePiece[]) {
 		Grid.add(location, pieces);
 		if(pieces instanceof Array) {
-			pieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
+		    pieces.forEach(function(p:BasicPuzzlePiece) {p.show();});
 		} else {
-			pieces.show();
+		    pieces.show();
 		}
 	}
 /**
@@ -690,6 +688,8 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 	langid:QcertLanguage;
 	langdescription:string;
 	illocation:string;
+	previouslangid:QcertLanguage|null;
+	previouslabel:string|null;
 
 	isTransient() {
 		return true;
@@ -707,13 +707,13 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 		this.canvas.remove(this.backingObject);
 	}
 
-	static make(canvas:fabric.ICanvas, options):BasicPuzzlePiece {
-		const p = new BasicPuzzlePiece(canvas, {options:options});
-		p.associate();
-		return p;
+        static make(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, options):BasicPuzzlePiece {
+	    const p = new BasicPuzzlePiece(canvas, previouslangid, previouslabel, {options:options});
+	    p.associate();
+	    return p;
 	}
 
-	protected constructor(canvas:fabric.ICanvas, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+        protected constructor(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
 		super();
 		this.canvas = canvas;
 
@@ -789,32 +789,38 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	label:string;
 	langdescription:string;
 	illocation:string;
+	previouslangid:QcertLanguage|null;
+	previouslabel:string|null;
 	movePlace?:{left:number, top:number};
 
 	isTransient() {
 		return false;
 	}
 
-	static make(canvas:fabric.ICanvas, src:BasicPuzzlePiece):InteractivePuzzlePiece {
-		const p = new InteractivePuzzlePiece(canvas, {srcpuzzle:src});
+        static make(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, src:BasicPuzzlePiece):InteractivePuzzlePiece {
+	    const p = new InteractivePuzzlePiece(canvas, previouslangid, previouslabel, {srcpuzzle:src});
 		p.associate();
 		return p;
 	}
 
-	public constructor(canvas:fabric.ICanvas, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
-		super(canvas, args);
+        public constructor(canvas:fabric.ICanvas, previouslangid:QcertLanguage, previouslabel:string, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+	    super(canvas, previouslangid, previouslabel, args);
 		if('srcpuzzle' in args) {
 			const options = (<any>args).srcpuzzle;
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
 			this.illocation = options.illocation;
+			this.previouslangid = previouslangid;
+			this.previouslabel = previouslabel;
 		} else {
 			const options = (<any>args).options;
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
 			this.illocation = options.illocation;
+			this.previouslangid = previouslangid;
+			this.previouslabel = previouslabel;
 		}
 	}
 
@@ -834,6 +840,13 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	}
 
 	protected mousedown = () => {
+		// Update source browser to point to the IL definition -JS
+	        // Dealing with window focus is annoying, so disabled for now - JS
+     	        if (this.previouslangid != null) {
+   	            var illoc = makeTransitionURL(this.previouslangid,this.previouslabel,this.langid,this.label);
+   	            var win = window.open(illoc, 'codebrowser');
+   		    window.focus();
+		}
 		const gp = this.getGridPoint();
 		this.backingObject.set({
 			opacity:0.5
@@ -1120,11 +1133,12 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 				// (<any>this.backingObject).moveCursor = 'no-drop';
 				// add an error piece
 
-			transients.push(errorPiece.mkTransientDerivative());
+		    transients.push(errorPiece.mkTransientDerivative(null,null));
 		} else {
 			for(let j = 1; j < curPathLen-1; j++) {
+				const previouslangid = curPath[j-1];
 				const langid = curPath[j];
-				const p = SourcePuzzlePiece.makeTransient(langid);
+			        const p = SourcePuzzlePiece.makeTransient(previouslangid,langid);
 				// p.setGridCoords(leftentry+(j-1), topentry);
 				// p.backingObject.top = p.backingObject.top + pieceheight/2;
 				// p.backingObject.setCoords();
@@ -1132,6 +1146,8 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 				//this.backingObject.canvas.add(p.backingObject);
 			}
 		}
+	        piece2.previouslangid = transients[transients.length-1].langid;
+	        piece2.previouslabel = sourcePieces[transients[transients.length-1].langid].label;
 		return transients;
 	}
 			// let nextentry = prow[leftentry];
@@ -1149,8 +1165,12 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 		return sourcePieces[langid].mkBasicDerivative();
 	}
 
-	static makeTransient(langid:QcertLanguage):TransientPuzzlePiece {
-		return sourcePieces[langid].mkTransientDerivative();
+        static makeTransient(prevlangid:QcertLanguage,langid:QcertLanguage):TransientPuzzlePiece {
+	    var prevlabel = null;
+	    if (prevlangid != null) {
+		prevlabel = sourcePieces[prevlangid].label;
+	    }
+	    return sourcePieces[langid].mkTransientDerivative(prevlangid,prevlabel);
 	}
 
 	isTransient() {
@@ -1169,7 +1189,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	illocation:string;
 
 	protected constructor(canvas:fabric.ICanvas, options) {
-		super(canvas, {options:options});	
+	    super(canvas, null, null, {options:options});	
 	
 		this.langid = options.langid;
 		this.label = options.label;
@@ -1187,7 +1207,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 
 	disassociate() {
 		this.backingObject.off();
-		// this.backingObject.off('mousdown', this.mousedown);
+		// this.backingObject.off('mousedown', this.mousedown);
 		// this.backingObject.off('mouseover', this.mouseover); 
 		// this.backingObject.off('mouseout', this.mouseout); 
 	}
@@ -1232,7 +1252,7 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 		}
 
 		this.disassociate();
-		InteractivePuzzlePiece.make(this.canvas, this);
+	        InteractivePuzzlePiece.make(this.canvas, null, null, this);
 		// This could be optimized a bit
 		// in particular, we can factor out the underlying puzzle piece,
 		// and just create it and give it to the existing source piece
@@ -1244,11 +1264,11 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	}
 
 	mkBasicDerivative():BasicPuzzlePiece {
-		return BasicPuzzlePiece.make(this.canvas, this.options);
+	    return BasicPuzzlePiece.make(this.canvas, null, null, this.options);
 	}
 
-	mkTransientDerivative():TransientPuzzlePiece {
-		return TransientPuzzlePiece.make(this.canvas, {options:this.options});
+        mkTransientDerivative(previouslangid:QcertLanguage, previouslabel:string):TransientPuzzlePiece {
+	    return TransientPuzzlePiece.make(this.canvas, previouslangid, previouslabel, {options:this.options});
 	}
 	
 	protected mouseover = () => {
@@ -1278,6 +1298,9 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 	langid:QcertLanguage;
 	label:string;
 	langdescription:string;
+	illocation:string;
+	previouslangid:QcertLanguage|null;
+	previouslabel:string|null;
 	movePlace?:{left:number, top:number};
 	movedPieces?:number;
 
@@ -1285,26 +1308,44 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 		return true;
 	}
 
-	static make(canvas:fabric.ICanvas, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
-		const p = new TransientPuzzlePiece(canvas, args);
+        static make(canvas:fabric.ICanvas, previouslangid:QcertLanguage,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}):TransientPuzzlePiece {
+	        const p = new TransientPuzzlePiece(canvas, previouslangid, previouslabel, args);
 		p.associate();
 		return p;
 	}
 
-	public constructor(canvas:fabric.ICanvas, args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
-		super(canvas, args);
+	public constructor(canvas:fabric.ICanvas, previouslangid:QcertLanguage,previouslabel:string,args:{options:any} | {srcpuzzle:BasicPuzzlePiece}) {
+	        super(canvas, previouslangid, previouslabel, args);
 		if('srcpuzzle' in args) {
 			const options = (<any>args).srcpuzzle;
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
+	                this.illocation = options.illocation;
+	                this.previouslangid = previouslangid;
+	                this.previouslabel = previouslabel;
 		} else {
 			const options = (<any>args).options;
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
-
+	                this.illocation = options.illocation;
+	                this.previouslangid = previouslangid;
+	                this.previouslabel = previouslabel;
 		}
+	}
+
+	protected mousedown = () => {
+		// Update source browser to point to the IL definition -JS
+		// Dealing with window focus is annoying, so disabled for now - JS
+     	        if (this.previouslangid != null) {
+   	            var illoc = makeTransitionURL(this.previouslangid,this.previouslabel,this.langid,this.label);
+   	            var win = window.open(illoc, 'codebrowser');
+   		    window.focus();
+		}
+	}
+
+	protected mouseup = () => {
 	}
 
 	oldoptions?:{selectable:boolean, opacity:number};
@@ -1318,9 +1359,9 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 		this.backingObject.setOpacity(0.25);
 		this.backingObject.hoverCursor = 'pointer';
 		this.backingObject.moveCursor = 'pointer';
-		//this.backingObject.on('mousedown', this.mousedown);
+		this.backingObject.on('mousedown', this.mousedown);
 		//this.backingObject.on('moving', this.moving); 
-		//this.backingObject.on('mouseup', this.mouseup); 
+		this.backingObject.on('mouseup', this.mouseup); 
 	}
 
 	disassociate() {
@@ -1328,9 +1369,9 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 			this.backingObject.set(this.oldoptions);
 			delete this.oldoptions;
 		}
-		//this.backingObject.off('mousedown', this.mousedown);
+		this.backingObject.off('mousedown', this.mousedown);
 		//this.backingObject.off('moving', this.moving); 
-		//this.backingObject.off('mouseup', this.mouseup); 
+		this.backingObject.off('mouseup', this.mouseup); 
 	}
 }
 
@@ -1818,7 +1859,7 @@ class BuilderTab extends ICanvasTab {
 		super(canvas);
 		separatorLine.set('visible', true);
 
-		const startPiece = BasicPuzzlePiece.make(canvas, {
+	        const startPiece = BasicPuzzlePiece.make(canvas, null, null, {
 			fill : '#bfe49a',
 			label : 'start',
 			sides : {right:-1},
@@ -2242,7 +2283,8 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 	return str;
 }
 
-const coqdocBaseURL = 'https://querycert.github.io/doc/';
+//const coqdocBaseURL = 'https://querycert.github.io/doc/';
+const coqdocBaseURL = 'file:///Users/js/git/querycert.github.io/doc/';
 function makeLemmaURL(base:string, lemma:string) {
 	let url = coqdocBaseURL + "Qcert." + base + ".html";
 	if(lemma != undefined) {
@@ -2250,7 +2292,22 @@ function makeLemmaURL(base:string, lemma:string) {
 	}
 	return url;
 }
-
+function fixLabel(label) {
+    if (label == "NRAᵉ") return "NRAEnv";
+    if (label == "cNRAᵉ") return "cNRAEnv";
+    if (label == "λNRA") return "LambdaNRA";
+    return label;
+}
+function makeTransitionURL(previouslangid, previouslabel, langid, label) {
+    var label = fixLabel(label);
+    var previouslabel = fixLabel(previouslabel);
+    if (previouslangid == langid) {
+	return makeLemmaURL(label+".Optim."+label+"Optimizer","run_"+langid + "_optims");
+    }
+    else {
+	return makeLemmaURL("Translation."+previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
+    }
+}
 function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
 	const entry = document.createElement('li');
 	entry.classList.add("optim-list");

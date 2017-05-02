@@ -29,9 +29,9 @@ Section TOQLtoNRAEnv.
 
   Context {m:basic_model}.
 
-    Lemma nraenv_of_oql_expr_type_preserve_f τconstant τdefls pfd τenv pfe e τout:
+    Lemma oql_to_nraenv_expr_type_preserve_f τconstant τdefls pfd τenv pfe e τout:
       oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout ->
-      nraenv_type τconstant (nraenv_of_oql_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
+      nraenv_type τconstant (oql_to_nraenv_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
     Proof.
       unfold nraenv_type; simpl.
       Hint Constructors nraenv_core_type.
@@ -54,9 +54,9 @@ Section TOQLtoNRAEnv.
           rewrite n in H1; trivial.
     Qed.
 
-    Lemma nraenv_of_oql_query_program_type_preserve_f τconstant τdefls pfd τenv pfe oq τout:
+    Lemma oql_to_nraenv_query_program_type_preserve_f τconstant τdefls pfd τenv pfe oq τout:
       oql_query_program_type τconstant τdefls τenv oq τout ->
-      nraenv_type τconstant (nraenv_of_oql_query_program (domain τdefls) oq) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
+      nraenv_type τconstant (oql_to_nraenv_query_program (domain τdefls) oq) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout.
     Proof.
       unfold nraenv_type; simpl.
       Hint Constructors nraenv_core_type.
@@ -65,7 +65,7 @@ Section TOQLtoNRAEnv.
       - econstructor.
         + econstructor; eauto.
           econstructor; eauto.
-          apply nraenv_of_oql_expr_type_preserve_f; eauto.
+          apply oql_to_nraenv_expr_type_preserve_f; eauto.
         + specialize (IHoq (rec_concat_sort τdefls ((s, τ₁) :: nil))).
           assert (eqls:equivlist (s :: domain τdefls) (domain (rec_concat_sort τdefls ((s, τ₁) :: nil))))
             by (rewrite rec_concat_sort_domain_app_commutatuve_equiv; simpl; reflexivity).
@@ -74,21 +74,21 @@ Section TOQLtoNRAEnv.
       - econstructor; eauto.
         rewrite <- domain_rremove; trivial.
         auto.
-      - apply nraenv_of_oql_expr_type_preserve_f; trivial.
+      - apply oql_to_nraenv_expr_type_preserve_f; trivial.
         Grab Existential Variables.
         solve[apply is_sorted_rremove; trivial].
         solve[eauto].
         solve[simpl; trivial].
     Qed.
 
-    Theorem nraenv_of_oql_type_preserve_f τconstant oq τout :
+    Theorem oql_to_nraenv_type_preserve_f τconstant oq τout :
       oql_type τconstant oq τout ->
       forall τenv τdata,
-      nraenv_type τconstant (nraenv_of_oql oq) τenv τdata τout.
+      nraenv_type τconstant (oql_to_nraenv oq) τenv τdata τout.
     Proof.
       intros ot τenv τdata.
-      unfold nraenv_of_oql, nraenv_type; simpl.
-      generalize (nraenv_of_oql_query_program_type_preserve_f τconstant nil sorted_rec_nil nil sorted_rec_nil oq τout ot); intros et.
+      unfold oql_to_nraenv, nraenv_type; simpl.
+      generalize (oql_to_nraenv_query_program_type_preserve_f τconstant nil sorted_rec_nil nil sorted_rec_nil oq τout ot); intros et.
       simpl in et.
       unfold nraenv_type in et.
       econstructor; econstructor; try eassumption; repeat econstructor;
@@ -96,8 +96,8 @@ Section TOQLtoNRAEnv.
     Qed.
 
     (* TODO (backwards preservation)
-    Lemma nraenv_of_oql_expr_type_preserve_b τconstant τdefls pfd τenv pfe e τout:
-      nraenv_type τconstant (nraenv_of_oql_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout ->
+    Lemma oql_to_nraenv_expr_type_preserve_b τconstant τdefls pfd τenv pfe e τout:
+      nraenv_type τconstant (oql_to_nraenv_expr (domain τdefls) e) (Rec Closed τdefls pfd) (Rec Closed τenv pfe) τout ->
       oql_expr_type (rec_concat_sort τconstant τdefls) τenv e τout.
     Proof.
       Hint Constructors oql_expr_type.

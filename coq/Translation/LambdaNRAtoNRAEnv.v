@@ -28,33 +28,33 @@ Section LambdaNRAtoNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint nraenv_of_lambda_nra (op:lambda_nra) : nraenv :=
+  Fixpoint lambda_nra_to_nraenv (op:lambda_nra) : nraenv :=
     match op with
     | LNRAVar x => NRAEnvUnop (ADot x) NRAEnvEnv
     | LNRATable x => NRAEnvGetConstant x
     | LNRAConst d => NRAEnvConst d
-    | LNRABinop b op1 op2 => NRAEnvBinop b (nraenv_of_lambda_nra op1) (nraenv_of_lambda_nra op2)
-    | LNRAUnop u op1 => NRAEnvUnop u (nraenv_of_lambda_nra op1)
-    | LNRAMap lop1 op2 => NRAEnvMap (nraenv_of_lnra_lambda lop1) (nraenv_of_lambda_nra op2)
-    | LNRAMapConcat lop1 op2 => NRAEnvMapConcat (nraenv_of_lnra_lambda lop1) (nraenv_of_lambda_nra op2)
-    | LNRAProduct op1 op2 => NRAEnvProduct (nraenv_of_lambda_nra op1) (nraenv_of_lambda_nra op2)
-    | LNRAFilter lop1 op2 => NRAEnvSelect (nraenv_of_lnra_lambda lop1) (nraenv_of_lambda_nra op2)
+    | LNRABinop b op1 op2 => NRAEnvBinop b (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2)
+    | LNRAUnop u op1 => NRAEnvUnop u (lambda_nra_to_nraenv op1)
+    | LNRAMap lop1 op2 => NRAEnvMap (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
+    | LNRAMapConcat lop1 op2 => NRAEnvMapConcat (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
+    | LNRAProduct op1 op2 => NRAEnvProduct (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2)
+    | LNRAFilter lop1 op2 => NRAEnvSelect (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2)
     end
   with nraenv_of_lnra_lambda (lop:lnra_lambda) : nraenv :=
     match lop with
     | LNRALambda x op =>
-      NRAEnvAppEnv (nraenv_of_lambda_nra op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID))
+      NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID))
     end.
 
   Context (h:brand_relation_t).
   Context (global_env:bindings).
 
-  Lemma nraenv_of_lambda_nra_never_uses_id :
+  Lemma lambda_nra_to_nraenv_never_uses_id :
     forall env:bindings, forall q:lambda_nra, forall d1 d2:data,
           nraenv_eval h global_env
-                      (nraenv_of_lambda_nra q) (drec env) d1 =
+                      (lambda_nra_to_nraenv q) (drec env) d1 =
           nraenv_eval h global_env
-                      (nraenv_of_lambda_nra q) (drec env) d2.
+                      (lambda_nra_to_nraenv q) (drec env) d2.
   Proof.
     lambda_nra_cases (induction q) Case
     ; intros; unfold nraenv_eval in *; simpl in *
@@ -81,11 +81,11 @@ Section LambdaNRAtoNRAEnv.
       reflexivity.
   Qed.
 
-  Theorem nraenv_of_lambda_nra_correct :
+  Theorem lambda_nra_to_nraenv_correct :
     forall q:lambda_nra, forall env:bindings, forall d:data,
       lambda_nra_eval h global_env env q =
       nraenv_eval h global_env
-                  (nraenv_of_lambda_nra q) (drec env) d.
+                  (lambda_nra_to_nraenv q) (drec env) d.
   Proof.
     lambda_nra_cases (induction q) Case
     ; intros; unfold nraenv_eval in *; simpl in *
