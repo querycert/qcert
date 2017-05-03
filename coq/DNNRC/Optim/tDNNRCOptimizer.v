@@ -29,7 +29,7 @@ Require Import Dataset DatasetSize.
 Require Import OptimizerStep OptimizerLogger.
 
 
-Section DNNRCDatasetRewrites.
+Section tDNNRCOptimizer.
 
   Context {fruntime:foreign_runtime}.
   (* This can be used to lift any rewrite on P to dnnrc A P.
@@ -482,7 +482,7 @@ Section DNNRCDatasetRewrites.
              {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataset)}
     := run_dnnrc_optims "" dnnrc_default_optim_list 6.
 
-End DNNRCDatasetRewrites.
+End tDNNRCOptimizer.
 
 (*
 *** Local Variables: ***

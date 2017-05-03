@@ -64,7 +64,8 @@ Section CompDriver.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoCloudant.
   Require Import NNRCtoDNNRC.
-  Require Import TDNNRCInfer tDNNRCtoSparkDF.
+  Require Import TDNNRCInfer DNNRCtotDNNRC.
+  Require Import tDNNRCtoSparkDF.
 
   (** Optimizers *)
   Require Import NRAEnvOptim.
@@ -212,9 +213,9 @@ Section CompDriver.
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
       nnrcmr_to_spark_rdd_top init_vinit rulename q. (* XXX init_vinit should be a parameter? *)
 
-    Definition dnnrc_dataset_to_dnnrc_typed_dataset (e: dnnrc_dataset) (tdenv: tdbindings)
+    Definition dnnrc_dataset_to_dnnrc_typed_dataset (q: dnnrc_dataset) (tdenv: tdbindings)
       : option dnnrc_typed_dataset :=
-      infer_dnnrc_type (mkConstants tdenv) e.
+      dnnrc_to_dnnrc_typed_top tdenv q.
 
     (* Backend *)
 

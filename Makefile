@@ -185,7 +185,7 @@ MODULES = \
 	DNNRC/DNNRCRuntime \
 	DNNRC/DNNRCTypes \
 	DNNRC/DNNRCSystem \
-	DNNRC/Optim/DNNRCOptimizer \
+	DNNRC/Optim/tDNNRCOptimizer \
 	DNNRC/DNNRCOptim \
 	CAMP/Lang/CAMP \
 	CAMP/Lang/CAMPSize \
@@ -247,6 +247,7 @@ MODULES = \
 	Translation/NNRCMRtoNNRC \
 	Translation/NNRCMRtoDNNRC \
 	Translation/NNRCMRtoCldMR \
+	Translation/DNNRCtotDNNRC \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \

@@ -14,11 +14,25 @@
  * limitations under the License.
  *)
 
-Require Export tDNNRCOptimizer.
+Section DNNRCtotDNNRC.
+
+  Section Top.
+    Require Import DNNRCSystem.
+    
+    Context {ftype: ForeignType.foreign_type}.
+    Context {fr:foreign_runtime}.
+    Context {bm:brand_model}.
+    Context {ftyping: foreign_typing}.
+
+    Definition dnnrc_to_dnnrc_typed_top (tdenv: tdbindings) (q:dnnrc) : option dnnrc_typed :=
+      infer_dnnrc_type (mkConstants tdenv) q.
+
+  End Top.
+  
+End DNNRCtotDNNRC.
 
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
-

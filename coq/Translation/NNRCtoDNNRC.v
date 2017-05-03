@@ -233,11 +233,30 @@ Section NNRCtoDNNRC.
       reflexivity. (* XXX TODO: Currently both fail in core NNRC and in DNNRC XXX *)
   Qed.
 
-  Require Import NRAEnvRuntime.
-  Require Import Dataset.
-  Context {ftype: ForeignType.foreign_type}.
-  Definition nnrc_to_dnnrc_dataset {A:Set} (annot:A) (tenv:list (var*dlocalization)) (n:nnrc) := @nnrc_to_dnnrc A dataset annot (mkConstants tenv) n.
+  Section Top.
+    Require Import NRAEnvRuntime.
+    Require Import Dataset.
+    Context {ftype: ForeignType.foreign_type}.
 
+    Definition nnrc_to_dnnrc_dataset {A:Set} (annot:A) (tenv:vdbindings) (n:nnrc) :=
+      @nnrc_to_dnnrc A dataset annot (mkConstants tenv) n.
+
+    Require Import DNNRCDataset.
+
+    Definition nnrc_to_dnnrc_top (tenv:vdbindings) (n:nnrc) : dnnrc :=
+      nnrc_to_dnnrc_dataset tt tenv n.
+
+    Theorem nnrc_to_dnnrc_top_correct h (tenv:vdbindings) (n:nnrc) :
+      forall denv:dbindings,
+        wf_denv (mkConstants tenv) denv ->
+        lift Dlocal (nnrc_core_eval h (localize_denv denv) n) =
+        dnnrc_eval h denv (nnrc_to_dnnrc_top tenv n).
+    Proof.
+      unfold nnrc_to_dnnrc_top.
+      apply nnrc_to_dnnrc_correct.
+    Qed.
+  End Top.
+  
 End NNRCtoDNNRC.
 
 (* 
