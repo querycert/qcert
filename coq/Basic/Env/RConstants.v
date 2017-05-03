@@ -24,8 +24,12 @@ Section RConstants.
   (* Java equivalent: NraToNnrc inline in cnraenv_to_nnrc *)
   Definition CONST_PREFIX:string := "CONST$"%string.
 
+  Definition mkConstantName (n:string) :=
+    append CONST_PREFIX n.
+  Definition mkConstant {A} (b:string*A)
+    := (mkConstantName (fst b),(snd b)).
   Definition mkConstants {A} (l:list (string*A))
-    := map (fun xy => (append CONST_PREFIX (fst xy), snd xy)) l.
+    := map mkConstant l.
 
   Section ConstantsProp.
     Definition filterConstants {A} (l:list (string*A))
@@ -162,6 +166,7 @@ Section RConstants.
     Proof.
       Opaque append.
       induction l; simpl; trivial.
+      unfold mkConstantName.
       destruct a; simpl.
       repeat match_destr; unfold Equivalence.equiv in * .
       - apply append_eq_inv1 in e.

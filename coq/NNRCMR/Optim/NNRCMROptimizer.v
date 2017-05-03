@@ -71,7 +71,9 @@ Section NNRCMROptimizer.
 
   Definition run_nnrcmr_optims
              {fruntime:foreign_runtime} {fredop:foreign_reduce_op} {logger:optimizer_logger string nnrc}
-             q := trew_nnrcmr (mr_optimize q).
+             q :=
+    let q := trew_nnrcmr (mr_optimize q) in (* MR-level optimization *)
+    trew_nnrcmr q. (* Optimize NNRC expressions within resulting NNRCMR *)
   
 End NNRCMROptimizer.
 

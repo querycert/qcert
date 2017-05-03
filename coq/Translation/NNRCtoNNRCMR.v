@@ -1062,6 +1062,14 @@ Section NNRCtoNNRCMR.
     admit.
     assumption.
   Admitted.
+
+  Section Top.
+    Definition nnrc_to_nnrcmr_top (vinit: var) (inputs_loc:vdbindings) (q:nnrc) : nnrcmr :=
+      let inputs_loc := (vinit, Vlocal) :: mkConstants (inputs_loc) in
+      (* XXX Expands GroupBy For now XXX *)
+      let q := nnrc_to_nnrc_core q in
+      lift_nnrc_core (nnrc_to_nnrcmr_chain vinit inputs_loc) q.
+  End Top.
   
 End NNRCtoNNRCMR.
 

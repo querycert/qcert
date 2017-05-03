@@ -98,9 +98,9 @@ run_%:	data/%.js data/%.io
 
 clean:
 	-rm -rf bin/*
-	-rm data/*.js
-	-rm data/*.camp
-	-rm data/*.io
-	-rm data/*_output.json
-	-rm data/*_test.json
+	-rm -f data/*.js
+	-rm -f data/*.camp
+	-rm -f data/*.io
+	-rm -f data/*_output.json
+	-rm -f data/*_test.json
 

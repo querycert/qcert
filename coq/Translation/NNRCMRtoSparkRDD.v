@@ -21,7 +21,7 @@ Require Import Utils BasicRuntime.
 Require Import NNRCRuntime NNRCMRRuntime.
 Require Import NNRCtoJavaScript.
 Require Import ForeignToJavaScript ForeignToSpark.
-Require Import NNRCMR.
+Require Import SparkRDDRuntime.
 
 Local Open Scope string_scope.
 
@@ -34,77 +34,77 @@ Section NNRCMRtoSparkRDD.
 
   Definition js_endl := eol_backn.
 
-    Section sanitize.
-      Import ListNotations.
-      Require Import Ascii String.
+  Section sanitize.
+    Import ListNotations.
+    Require Import Ascii String.
       
-      Definition scalaAllowedIdentifierInitialCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z"]%char.
+    Definition scalaAllowedIdentifierInitialCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z"]%char.
 
-  (* javascript identifiers can have (after the first character), a unicode letter, digit, underscore, or dollar sign.
+    (* javascript identifiers can have (after the first character), a unicode letter, digit, underscore, or dollar sign.
          Since Coq does not seem to have a unicode library, we just
          allow ascii characters,
-   *)
-      Definition scalaAllowedIdentifierCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z";"0";"1";"2";"3";"4";"5";"6";"7";"8";"9";"_"]%char.
+     *)
+    Definition scalaAllowedIdentifierCharacters := ["A";"B";"C";"D";"E";"F";"G";"H";"I";"J";"K";"L";"M";"N";"O";"P";"Q";"R";"S";"T";"U";"V";"W";"X";"Y";"Z";"a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z";"0";"1";"2";"3";"4";"5";"6";"7";"8";"9";"_"]%char.
 
-      Definition scalaIdentifierInitialCharacterToAdd := "X"%char.
-      Definition scalaIdenitiferCharacterForReplacement := "X"%char.
+    Definition scalaIdentifierInitialCharacterToAdd := "X"%char.
+    Definition scalaIdenitiferCharacterForReplacement := "X"%char.
 
-      Definition scalaIdentifierFixInitial (ident:string) : string
-        := match ident with
-           (* We also don't want empty identifier names *)
-           | EmptyString =>
-             String scalaIdentifierInitialCharacterToAdd EmptyString
-           | String a _ =>
-             if in_dec ascii_dec a scalaAllowedIdentifierInitialCharacters
-             then ident
-             else String scalaIdentifierInitialCharacterToAdd ident
-           end.
+    Definition scalaIdentifierFixInitial (ident:string) : string
+      := match ident with
+         (* We also don't want empty identifier names *)
+         | EmptyString =>
+           String scalaIdentifierInitialCharacterToAdd EmptyString
+         | String a _ =>
+           if in_dec ascii_dec a scalaAllowedIdentifierInitialCharacters
+           then ident
+           else String scalaIdentifierInitialCharacterToAdd ident
+         end.
 
-      Definition scalaIdentifierSanitizeChar (a:ascii)
-        := if a == "$"%char (* special case for readability *)
-           then "_"%char
-           else if in_dec ascii_dec a scalaAllowedIdentifierCharacters
-                then a
-                else scalaIdenitiferCharacterForReplacement.
+    Definition scalaIdentifierSanitizeChar (a:ascii)
+      := if a == "$"%char (* special case for readability *)
+         then "_"%char
+         else if in_dec ascii_dec a scalaAllowedIdentifierCharacters
+              then a
+              else scalaIdenitiferCharacterForReplacement.
 
-  Definition scalaIdentifierSanitizeBody (ident:string)
-    := map_string scalaIdentifierSanitizeChar ident.
+    Definition scalaIdentifierSanitizeBody (ident:string)
+      := map_string scalaIdentifierSanitizeChar ident.
   
-  Definition scalaIdentifierSanitize (ident:string)
-    := scalaIdentifierFixInitial (scalaIdentifierSanitizeBody ident).
-
-  Definition scalaSafeSeparator := "_".
-
-  (* pulled of off various lists of javascript reserved keywords 
+    Definition scalaIdentifierSanitize (ident:string)
+      := scalaIdentifierFixInitial (scalaIdentifierSanitizeBody ident).
+    
+    Definition scalaSafeSeparator := "_".
+    
+    (* pulled of off various lists of javascript reserved keywords 
          as well some common html/java words that should be avoided
           in case of shared context/interop *)
-  Definition scalaAvoidList :=
-    ["abstract"; "case"; "catch"; "class"; "def"; "do" ; "else"; "extends"
-     ; "false"; "final"; "finally"; "for"; "forSome"; "if" ; "implicit"; "import"
-     ; "lazy"; "match"; "new"; "null"; "object"; "override"
-     ; "package"; "private"; "protected"; "return"; "sealed"; "super";
-       "this"; "throw"; "trait"; "try"; "true"; "type"; "val"; "var"
-       ; "while"; "with"; "yield"].
-
-  Definition nnrcmr_rename_local_for_js (mrl:nnrcmr)
-    := nnrcmr_rename_local
-         jsSafeSeparator
-         jsIdentifierSanitize
-         jsAvoidList
-         mrl.
+    Definition scalaAvoidList :=
+      ["abstract"; "case"; "catch"; "class"; "def"; "do" ; "else"; "extends"
+       ; "false"; "final"; "finally"; "for"; "forSome"; "if" ; "implicit"; "import"
+       ; "lazy"; "match"; "new"; "null"; "object"; "override"
+       ; "package"; "private"; "protected"; "return"; "sealed"; "super";
+         "this"; "throw"; "trait"; "try"; "true"; "type"; "val"; "var"
+         ; "while"; "with"; "yield"].
+    
+    Definition nnrcmr_rename_local_for_js (mrl:nnrcmr)
+      := nnrcmr_rename_local
+           jsSafeSeparator
+           jsIdentifierSanitize
+           jsAvoidList
+           mrl.
   
-  Definition nnrcmr_rename_graph_for_scala (mrl:nnrcmr)
-    := nnrcmr_rename_graph
-         scalaSafeSeparator
-         scalaIdentifierSanitize
-         scalaAvoidList 
-         mrl.
+    Definition nnrcmr_rename_graph_for_scala (mrl:nnrcmr)
+      := nnrcmr_rename_graph
+           scalaSafeSeparator
+           scalaIdentifierSanitize
+           scalaAvoidList 
+           mrl.
 
-  Definition nnrcmr_rename_for_spark (mrl:nnrcmr)
-    := nnrcmr_rename_graph_for_scala
-         (nnrcmr_rename_local_for_js mrl).
-
-    End sanitize.
+    Definition nnrcmr_rename_for_spark (mrl:nnrcmr)
+      := nnrcmr_rename_graph_for_scala
+           (nnrcmr_rename_local_for_js mrl).
+    
+  End sanitize.
     
   Section MRSpark.
 
@@ -542,6 +542,26 @@ Section NNRCMRtoSparkRDD.
 
   Definition nnrcmrToSparkTopDataFromFileTop (test_name: string) (init: var) (l:nnrcmr) : string :=
     nnrcmrToSparkTopDataFromFile test_name init l eol_newline "'".
+
+  Section Top.
+    Require Import NNRCMROptim.
+    Require Import OptimizerLogger.
+    Context {nnrc_logger:optimizer_logger string nnrc}.
+
+    Definition nnrcmr_to_nnrcmr_spark_rdd_prepare (q: nnrcmr) : nnrcmr :=
+      let q := foreign_to_spark_prepare_nnrcmr q in
+      let q := run_nnrcmr_optims q in                         (* XXXXXXXXXXX optim XXXXXXXX *)
+      let q := foreign_to_spark_prepare_nnrcmr q in
+      nnrcmr_rename_for_spark q.
+
+    Definition nnrcmr_prepared_to_spark_rdd (vinit:var)
+               (rulename: string) (q: nnrcmr) : spark_rdd :=
+      nnrcmrToSparkTopDataFromFileTop rulename vinit q.
+
+    Definition nnrcmr_to_spark_rdd_top (vinit:var) (rulename: string) (q: nnrcmr) : spark_rdd :=
+      nnrcmr_prepared_to_spark_rdd vinit rulename (nnrcmr_to_nnrcmr_spark_rdd_prepare q).
+
+  End Top.
 
 End NNRCMRtoSparkRDD.
 

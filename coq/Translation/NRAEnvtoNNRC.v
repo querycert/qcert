@@ -582,6 +582,11 @@ Section NRAEnvtoNNRC.
   Qed.
 
   Section Top.
+    Definition bind_constants (einit:nnrc) (init_venv:var) (constants:list var) :=
+      fold_right (fun x acc =>
+                    NNRCLet (mkConstantName x) (NNRCUnop (ADot x) (NNRCVar init_venv))
+                            acc) einit constants.
+    
     Definition nraenv_to_nnrc_top (q:nraenv) (init_vid init_venv:var) : nnrc :=
       NNRCLet init_venv (NNRCConst (drec nil))
              (NNRCLet init_vid (NNRCConst dunit)

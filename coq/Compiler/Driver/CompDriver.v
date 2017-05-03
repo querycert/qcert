@@ -179,11 +179,7 @@ Section CompDriver.
     (* Java equivalent: NnrcToNnrcmr.convert *)
     (* Free variables should eventually be passed from the application. *)
     Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
-      let inputs_loc := (vinit, Vlocal) :: mkConstants (inputs_loc) in
-      (* XXX Expands GroupBy For now XXX *)
-      let q := nnrc_to_nnrc_core q in
-      lift_nnrc_core (nnrc_to_nnrcmr_chain init_vinit
-                                           inputs_loc) q.
+      nnrc_to_nnrcmr_top vinit inputs_loc q.
 
     Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
       nnrc_to_dnnrc_dataset tt inputs_loc q.
@@ -201,11 +197,9 @@ Section CompDriver.
 
     Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
 
-    Definition nnrcmr_optim_aux (q: nnrcmr) : nnrcmr := run_nnrcmr_optims q.
-
     Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
       let q := foreign_to_cloudant_prepare_nnrcmr q in
-      let q := nnrcmr_optim_aux q in                         (* XXXXXXXXXXX optim XXXXXXXX *)
+      let q := run_nnrcmr_optims q in                         (* XXXXXXXXXXX optim XXXXXXXX *)
       let q := foreign_to_cloudant_prepare_nnrcmr q in
       nnrcmr_rename_for_cloudant q.
 
@@ -215,17 +209,8 @@ Section CompDriver.
     Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
       nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
 
-    Definition nnrcmr_to_nnrcmr_spark_rdd_prepare (q: nnrcmr) : nnrcmr :=
-      let q := foreign_to_spark_prepare_nnrcmr q in
-      let q := nnrcmr_optim_aux q in                         (* XXXXXXXXXXX optim XXXXXXXX *)
-      let q := foreign_to_spark_prepare_nnrcmr q in
-      nnrcmr_rename_for_spark q.
-
-    Definition nnrcmr_prepared_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
-      nnrcmrToSparkTopDataFromFileTop rulename init_vinit q. (* XXX init_vinit should be a parameter? *)
-
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
-      nnrcmr_prepared_to_spark_rdd rulename (nnrcmr_to_nnrcmr_spark_rdd_prepare q).
+      nnrcmr_to_spark_rdd_top init_vinit rulename q. (* XXX init_vinit should be a parameter? *)
 
     Definition dnnrc_dataset_to_dnnrc_typed_dataset (e: dnnrc_dataset) (tdenv: tdbindings)
       : option dnnrc_typed_dataset :=
@@ -272,7 +257,7 @@ Section CompDriver.
     Definition nnrc_core_optim_default (q: nnrc_core) : nnrc_core :=
       nnrc_to_nnrc_core (lift_nnrc_core nnrc_optim_default q).
 
-    Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := nnrcmr_optim_aux q.
+    Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := run_nnrcmr_optims q.
 
     Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
       dnnrcToDatasetRewrite q.
