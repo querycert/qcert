@@ -7,9 +7,8 @@ http://github.com/querycert/qcert
 ## About
 
 This is the source code for Q\*cert, a framework for the development
-and verification of query compilers. It supports a rich data model
-(nested, hierarchical, etc) and a fairly extensive compilation
-pipeline to start from.
+and verification of query compilers. It supports a rich data model and
+a includes a fairly extensive compilation pipeline 'out of the box'.
 
 Q\*cert is built using the Coq proof assistant. A significant subset
 of the initial compilation pipeline has been mechanically checked for
@@ -19,7 +18,7 @@ correctness.
 
 ### OCaml and the Coq Proof Assistant
 
-To build Q\*cert from the source, you will need at :
+To build Q\*cert from the source, you will need:
 
  - OCaml 4.02 or later (http://ocaml.org/) along with the following libraries:
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
@@ -36,6 +35,7 @@ opam install menhir
 opam install ocamlbuild
 opam install camlp5
 opam install coq.8.6
+opam install js_of_ocaml
 ```
 
 ### Java (Recommended)
