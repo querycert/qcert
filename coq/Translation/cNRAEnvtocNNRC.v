@@ -562,12 +562,48 @@ Section cNRAEnvtocNNRC.
   Qed.
 
   Section Top.
-    Definition nraenv_core_to_nnrc_top (q:nraenv_core) (init_vid init_venv:var) : nnrc :=
+    Context (h:brand_relation_t).
+
+    (** One more top-level part of the translation *)
+    Definition nraenv_core_to_nnrc_top (init_vid init_venv:var) (q:nraenv_core) : nnrc :=
       NNRCLet init_venv (NNRCConst (drec nil))
-             (NNRCLet init_vid (NNRCConst dunit)
-                     (nraenv_core_to_nnrc q init_vid init_venv)).
+              (NNRCLet init_vid (NNRCConst dunit)
+                       (nraenv_core_to_nnrc q init_vid init_venv)).
+
+    (** Show that translation does not 'bleed out' beyond core NNRC *)
+    Lemma nraenv_core_to_nnrc_is_core (vid venv:var) (q:nraenv_core) :
+      nnrcIsCore (nraenv_core_to_nnrc q vid venv).
+    Proof.
+      revert vid venv.
+      nraenv_core_cases (induction q) Case; intros; simpl; auto.
+      - Case "ANMapConcat"%string.
+        destruct (fresh_var2 "tmc$" "tmc$" (vid :: venv :: nil));simpl.
+        auto.
+      - Case "ANProduct"%string.
+        destruct (fresh_var2 "tprod$" "tprod$" (vid :: venv :: nil)); simpl.
+        auto.
+      - Case "ANEither"%string.
+        destruct (fresh_var2 "teitherL$" "teitherR$" (vid :: venv :: nil)); simpl.
+        auto.
+    Qed.
+
+    Hint Resolve nraenv_core_to_nnrc_is_core.
+
+    Lemma nraenv_core_to_nnrc_top_is_core (vid venv:var) (q:nraenv_core) :
+      nnrcIsCore (nraenv_core_to_nnrc_top vid venv q).
+    Proof.
+      simpl.
+      auto.
+    Qed.
+
+    Hint Resolve nraenv_core_to_nnrc_top_is_core.
+
+    Program Definition nraenv_core_to_nnrc_core_top
+               (init_vid init_venv:var) (q:nraenv_core) : nnrc_core :=
+      exist _ (nraenv_core_to_nnrc_top init_vid init_venv q) _.
+    
   End Top.
-  
+
   (** Lemma and proof of linear size translation *)
 
   Section size.

@@ -169,6 +169,11 @@ Section cNNRC.
         simpl; match_destr.
   Qed.
 
+  Section Top.
+    Definition nnrc_core_eval_top (q:nnrc_core) (cenv:bindings) : option data :=
+      lift_nnrc_core (nnrc_core_eval (rec_sort cenv)) q.
+  End Top.
+  
 End cNNRC.
 
 (* begin hide *)

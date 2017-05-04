@@ -33,13 +33,12 @@ Section NNRC.
 
   (** Named Nested Relational Calculus - Extended *)
 
-  Context {fruntime:foreign_runtime}.
-  Context {h:brand_relation_t}.
+  Section Language.
+    Context {fruntime:foreign_runtime}.
+    Context {h:brand_relation_t}.
 
-  Section lang.
     (** The AST for NNRC is fully defined in the core NNRC module *)
     Definition nnrc := nnrc.
-  End lang.
   
   Section macros.
     (** e groupby[g,keys] ==
@@ -847,6 +846,14 @@ Section NNRC.
     Defined.
 
   End core.
+  
+  End Language.
+  Section Top.
+    Context {fruntime:foreign_runtime}.
+    Context (h:brand_relation_t).
+    Definition nnrc_eval_top (q:nnrc) (cenv:bindings) : option data :=
+      @nnrc_ext_eval _ h (rec_sort cenv) q.
+  End Top.
   
 End NNRC.
 

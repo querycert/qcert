@@ -81,14 +81,14 @@ Section CompEval.
     
     (* Language: camp_rule *)
     (* Note: eval for camp_rule relies on translation to camp *)
-    Definition eval_camp_rule (q:camp_rule) (cenv: list (string*data)) : option data :=
+    Definition eval_camp_rule (q:camp_rule) (cenv: bindings) : option data :=
       match interp h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
       | Success l => Some (dcoll (l::nil))
       | RecoverableError => Some (dcoll nil)
       | TerminalError => None
       end.
 
-    Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: list (string*data)) : string
+    Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: bindings) : string
       := let pp := camp_rule_to_camp q in
          print_presult_debug pp
                              (interp_debug h
@@ -96,61 +96,60 @@ Section CompEval.
                                            debug nil pp nil dunit).
 
     (* Language: camp *)
-    Definition eval_camp (q:camp) (cenv: list (string*data)) : option data
+    Definition eval_camp (q:camp) (cenv: bindings) : option data
       := match interp h (rec_sort cenv) q nil dunit with
          | Success l => Some (dcoll (l::nil))
          | RecoverableError => Some (dcoll nil)
          | TerminalError => None
          end.
 
-    Definition eval_camp_debug (debug:bool) (q:camp) (cenv: list (string*data)) : string
+    Definition eval_camp_debug (debug:bool) (q:camp) (cenv: bindings) : string
       := print_presult_debug q
                              (interp_debug h
                                            (rec_sort cenv)
                                            debug nil q nil dunit).
 
     (* Language: oql *)
-    Definition eval_oql (q:oql) (cenv: list (string*data)) : option data
+    Definition eval_oql (q:oql) (cenv: bindings) : option data
       := oql_interp h (rec_sort cenv) q.
 
     (* Language: sql *)
     (* Note: eval for sql relies on translation to nraenv_core *)
-    Definition eval_sql (q:sql) (cenv: list (string*data)) : option data
-      := NRAEnv.nraenv_eval_top h (sql_to_nraenv_top q) cenv.
+    Definition eval_sql (q:sql) (cenv: bindings) : option data
+      := nraenv_eval_top h (sql_to_nraenv_top q) cenv.
 
     (* Language: lambda_nra *)
-    (* Note: eval for lambda_nra relies on translation to nraenv_core *)
-    Definition eval_lambda_nra (q:lambda_nra) (cenv: list (string*data)) : option data
-      := LambdaNRA.lambda_nra_eval_top h q cenv.
+    Definition eval_lambda_nra (q:lambda_nra) (cenv: bindings) : option data
+      := lambda_nra_eval_top h q cenv.
 
     (* Language: nra *)
-    Definition eval_nra (q:nra) (cenv: list (string*data)) : option data
-      := nra_eval h q (drec (rec_sort cenv)).
+    Definition eval_nra (q:nra) (cenv: bindings) : option data
+      := nra_eval_top h q cenv.
       (* XXX Passing just cenv as ID value is more natural, but not
              consistent with nraenv_core to nra translation which encodes
              ID and ENV in a records using the nra_context_data macro XXX *)
 
     (* Language: nraenv_core *)
-    Definition eval_nraenv_core (q:nraenv_core) (cenv: list (string*data)) : option data
+    Definition eval_nraenv_core (q:nraenv_core) (cenv: bindings) : option data
       := nraenv_core_eval h (rec_sort cenv) q (drec nil) dunit.
 
     (* Language: nraenv *)
-    Definition eval_nraenv (q:nraenv) (cenv: list (string*data)) : option data
-      := NRAEnv.nraenv_eval_top h q cenv.
+    Definition eval_nraenv (q:nraenv) (cenv: bindings) : option data
+      := nraenv_eval_top h q cenv.
 
     (* Language: nnrc_core *)
     (* Note: eval_nnrc_core assumes constant environment has been prefixed with 'CONST$' *)
-    Definition eval_nnrc_core (q:nnrc_core) (cenv: list (string*data)) : option data
-      := lift_nnrc_core (@nnrc_core_eval _ h (mkConstants (rec_sort cenv))) q.
+    Definition eval_nnrc_core (q:nnrc_core) (cenv: bindings) : option data
+      := nnrc_core_eval_top h q cenv.
 
     (* Language: nnrc *)
     (* Note: eval_nnrc assumes constant environment has been prefixed with 'CONST$' *)
-    Definition eval_nnrc (q:nnrc) (cenv: list (string*data)) : option data
-      := @nnrc_ext_eval _ h (mkConstants (rec_sort cenv)) q.
+    Definition eval_nnrc (q:nnrc) (cenv: bindings) : option data
+      := nnrc_eval_top h q cenv.
 
     (* Language: nnrcmr *)
     (* Note: eval_nnrcmr assumes constant environment has been prefixed with 'CONST$' *)
-    Definition eval_nnrcmr (q:nnrcmr) (cenv: list (string*data)) : option data
+    Definition eval_nnrcmr (q:nnrcmr) (cenv: bindings) : option data
       := let cenv := mkConstants (rec_sort cenv) in
          (* Note: localize_bindings turns all variables distributed! *)
          let loc_cenv := mkDistLocs cenv in
@@ -161,7 +160,7 @@ Section CompEval.
 
     (* Language: cldmr *)
     (* Note: eval_cldmr assumes constant environment has been prefixed with 'CONST$' *)
-    Definition eval_cldmr (q:cldmr) (cenv: list (string*data)) : option data
+    Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data
       := let cenv := mkConstants (rec_sort cenv) in
          match cld_load_init_env init_vinit cenv with
          | Some cenv => cldmr_eval h cenv q
@@ -172,7 +171,7 @@ Section CompEval.
     (* WARNING: This doesn't work if using the Dataset part of the language *)
 
     Definition eval_dnnrc_dataset
-               (q:dnnrc_dataset) (cenv: list (string*data)) : option data :=
+               (q:dnnrc_dataset) (cenv: bindings) : option data :=
       let cenv := mkConstants (rec_sort cenv) in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
@@ -183,7 +182,7 @@ Section CompEval.
     (* Language: dnnrc_typed_dataset *)
 
     Definition eval_dnnrc_typed_dataset
-               (q:dnnrc_typed_dataset) (cenv: list (string*data)) : option data :=
+               (q:dnnrc_typed_dataset) (cenv: bindings) : option data :=
       let cenv := mkConstants (rec_sort cenv) in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
@@ -196,7 +195,7 @@ Section CompEval.
   Section EvalDriver.
     Definition eval_input : Set := list (string*ddata).
 
-    Definition lift_input (ev_in:eval_input) : list (string*data) :=
+    Definition lift_input (ev_in:eval_input) : bindings :=
       unlocalize_constants ev_in.
 
     Inductive eval_output : Set :=

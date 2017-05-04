@@ -236,7 +236,11 @@ Section NRA.
       destruct (nra_eval op2 d); simpl in *; try discriminate.
       eauto. 
   Qed.
-    
+
+  Section Top.
+    Definition nra_eval_top (q:nra) (cenv:bindings) : option data :=
+      nra_eval q (drec (rec_sort cenv)).
+  End Top.
 End NRA.
 
 (* Some notations for the paper and readability *)

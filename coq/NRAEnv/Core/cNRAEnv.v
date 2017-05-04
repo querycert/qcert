@@ -804,6 +804,13 @@ Section RcNRAEnv2.
     eauto.
   Qed.
 
+  Section Top.
+    Context (h:list(string*string)).
+
+    Definition nraenv_core_eval_top (q:nraenv_core) (env:bindings) :=
+      nraenv_core_eval h (rec_sort env) q (drec nil) dunit.
+  End Top.
+
 End RcNRAEnv2.
 
   

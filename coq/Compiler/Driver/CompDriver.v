@@ -158,8 +158,8 @@ Section CompDriver.
     Definition nra_to_nnrc_core (q: nra) : nnrc_core := nra_to_nnrc_core q init_vid.
 
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
-      nnrc_to_nnrc_core (nraenv_core_to_nnrc q init_vid init_venv).
-
+      nraenv_core_to_nnrc_core_top init_vid init_venv q.
+    
     Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_nraenv_core q.
 
     Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv := nraenv_of_nraenv_core q.
