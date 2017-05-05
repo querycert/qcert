@@ -16,9 +16,14 @@
 package org.qcert.experimental.sql;
 
 import java.lang.reflect.Method;
+import java.util.EnumMap;
+import java.util.List;
 
 import org.apache.asterix.common.exceptions.CompilationException;
+import org.apache.asterix.lang.common.base.Expression;
+import org.apache.asterix.lang.common.base.Expression.Kind;
 import org.apache.asterix.lang.common.base.ILangExpression;
+import org.apache.asterix.lang.common.base.Literal;
 import org.apache.asterix.lang.common.clause.GroupbyClause;
 import org.apache.asterix.lang.common.clause.LetClause;
 import org.apache.asterix.lang.common.clause.LimitClause;
@@ -70,6 +75,8 @@ import org.apache.asterix.lang.common.statement.TypeDecl;
 import org.apache.asterix.lang.common.statement.TypeDropStatement;
 import org.apache.asterix.lang.common.statement.UpdateStatement;
 import org.apache.asterix.lang.common.statement.WriteStatement;
+import org.apache.asterix.lang.common.struct.OperatorType;
+import org.apache.asterix.lang.common.struct.VarIdentifier;
 import org.apache.asterix.lang.sqlpp.clause.FromClause;
 import org.apache.asterix.lang.sqlpp.clause.FromTerm;
 import org.apache.asterix.lang.sqlpp.clause.HavingClause;
@@ -88,11 +95,14 @@ import org.apache.asterix.lang.sqlpp.expression.SelectExpression;
 import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
 
 public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
-	private boolean useDateNameHeuristic;
-	
+	private static final EnumMap<OperatorType, String> opNameMap = new EnumMap<>(OperatorType.class);
+	static {
+		opNameMap.put(OperatorType.GT, "greater_than");
+		// TODO the rest of these
+	}
 	
 	public SqlppEncodingVisitor(boolean useDateNameHeuristic) {
-		this.useDateNameHeuristic = useDateNameHeuristic;
+		// TODO save argument
 	}
 
 	@Override
@@ -186,13 +196,27 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(FromClause fromClause, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(FromClause node, StringBuilder builder) throws CompilationException {
+		builder.append("(from ");
+		for (FromTerm term : node.getFromTerms())
+			builder = term.accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
-	public StringBuilder visit(FromTerm fromTerm, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(FromTerm node, StringBuilder builder) throws CompilationException {
+		if (node.hasCorrelateClauses())
+			throw new UnsupportedOperationException("Cannot handle correlate clauses in FromTerm");
+		if (node.hasPositionalVariable())
+			throw new UnsupportedOperationException("Cannot handle positional variables in FromTerm");
+		VariableExpr var = node.getLeftVariable();
+		Expression expr = node.getLeftExpression();
+		if (isDistinctName(var, expr))
+			appendStringNode("as", decodeVariableRef(var.toString()), builder);
+		if (expr.getKind() == Kind.VARIABLE_EXPRESSION)
+			// Normal visit would use 'ref' but we want 'table' here
+			return appendStringNode("table", decodeVariableRef(expr.toString()), builder);
+		return expr.accept(this, builder);
 	}
 
 	@Override
@@ -261,8 +285,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(LiteralExpr l, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(LiteralExpr node, StringBuilder builder) throws CompilationException {
+		Literal lit = node.getValue();
+		switch (lit.getLiteralType()) {
+		case INTEGER:
+		case LONG:
+		case STRING:
+		case FALSE:
+		case TRUE:
+			return builder.append(lit.getStringValue()).append(" ");
+		default:
+			break;
+		}
+		throw new UnsupportedOperationException("Not supporting literals of type " + lit.getLiteralType());
 	}
 
 	@Override
@@ -286,8 +321,24 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(OperatorExpr ifbo, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(OperatorExpr node, StringBuilder builder) throws CompilationException {
+		List<Expression> exprs = node.getExprList();
+		List<OperatorType> ops = node.getOpList();
+		if (exprs.size() == 2 && ops.size() == 1)
+			return processBinaryOperator(ops.get(0), exprs.get(0), exprs.get(1), builder);
+		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary");
+	}
+
+	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
+			throws CompilationException {
+		String verb = opNameMap.get(operator);
+		if (verb == null)
+			throw new UnsupportedOperationException("No support for binary operator " + operator);
+		// TODO date expression substitution needed here
+		builder.append("(").append(verb).append(" ");
+		builder = operand1.accept(this, builder);
+		builder = operand2.accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -301,8 +352,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(Projection projection, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(Projection node, StringBuilder builder) throws CompilationException {
+		Expression expr = node.getExpression();
+		String name = node.getName();
+		if (name != null && !isDistinctName(name, expr)) {
+			name = null;
+		}
+		if (name != null) 
+			appendStringNode("as", name, builder);
+		if (expr != null)
+			return expr.accept(this, builder);
+		if (node.star())
+			return builder.append("(all ) ");
+		throw new UnsupportedOperationException("Cannot deal with a projection without an expression or a star");
 	}
 
 	@Override
@@ -331,7 +393,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	public StringBuilder visit(SelectBlock node, StringBuilder builder) throws CompilationException {
 		builder = node.getSelectClause().accept(this, builder);
 		builder = node.getFromClause().accept(this, builder);
-		builder = node.getWhereClause().accept(this, builder);
+		builder = acceptIfPresent(node.getWhereClause(), builder);
 		builder = acceptIfPresent(node.getGroupbyClause(), builder);
 		return acceptIfPresent(node.getHavingClause(), builder);
 	}
@@ -344,7 +406,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			builder = node.getSelectElement().accept(this, builder);
 		if (node.selectRegular())
 			builder = node.getSelectRegular().accept(this, builder);
-		return builder;
+		return builder.append(") "); // looks asymmetric but needed to align asterixDB's division of nodes with Presto's
 	}
 
 	@Override
@@ -357,8 +419,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder.append("(select ");
 		builder = acceptIfPresent(node.getLimitClause(), builder);
 		builder = acceptIfPresent(node.getOrderbyClause(), builder);
-		builder = node.getSelectSetOperation().accept(this, builder);
-		return builder.append(") ");
+		return node.getSelectSetOperation().accept(this, builder);
+		// absence of close paren here looks asymmetric but needed to align asterixDB's division of nodes with Presto's
+		// TODO the current approach to alignment of the two parsers might not be foolproof
 	}
 
 	@Override
@@ -372,7 +435,6 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	@Override
 	public StringBuilder visit(SelectSetOperation node, StringBuilder builder) throws CompilationException {
 		if (node.hasRightInputs())
-			// TODO ? Is this a SQL++ superset feature?
 			throw new UnsupportedOperationException("No support yet for SelectSetOperation with RightInputs");
 		return node.getLeftInput().accept(this, builder);
 	}
@@ -433,13 +495,16 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(VariableExpr v, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(VariableExpr node, StringBuilder builder) throws CompilationException {
+		String name = node.getVar().toString();
+		return appendStringNode("ref", decodeVariableRef(name), builder);
 	}
 
 	@Override
-	public StringBuilder visit(WhereClause wc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(WhereClause node, StringBuilder builder) throws CompilationException {
+    	builder.append("(where ");
+    	builder = node.getWhereExpr().accept(this, builder);
+    	return builder.append(") ");
 	}
 
 	@Override
@@ -451,6 +516,66 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		if (node != null)
 			builder = node.accept(this, builder);
 		return builder;
+	}
+
+	/**
+	 * Given a node name and a string argument, append a String-style S-expression node
+	 * @param node the node name
+	 * @param arg the String argument
+	 * @param builder the StringBuilder to receive the append
+	 */
+	private StringBuilder appendStringNode(String node, String arg, StringBuilder builder) {
+		return builder.append(String.format("(%s \"%s\" ) ", node, arg));
+	}
+
+	/**
+	 * Reverse the asterixDB practice of prefixing variable references with '$'
+	 * @param name the name to decode
+	 * @return the decoded name
+	 */
+	private String decodeVariableRef(String name) {
+		return (name.charAt(0) == '$') ? name.substring(1) : name;
+	}
+
+	/**
+	 * Work around the asterixDB convention of including an explicit name for every selected column, even when that is the
+	 *   same as the name of column. 
+	 * @param name the name assigned to the column
+	 * @param expr the Expression for the column, which might be a variable reference and possible to the same name, though
+	 *   prefixed with a $ as per their convention
+	 * @return true iff the name is distinct (that is, requires explicit handling in an "as" clause, otherwise such handling can be
+	 *   omitted to match presto conventions)
+	 */
+	private boolean isDistinctName(String name, Expression expr) {
+		if (expr.getKind() == Kind.VARIABLE_EXPRESSION) {
+			VariableExpr var = (VariableExpr) expr;
+			if (var.getIsNewVar())
+				return true;
+			VarIdentifier id = var.getVar();
+			if (id.namedValueAccess())
+				return true;
+			String exprName = id.getValue();
+			if (exprName.length() == name.length() + 1 && decodeVariableRef(exprName).equals(name))
+				return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Work around the asterixDB convention of including an explicit name for every selected-from table, even when that is the
+	 *   same as the name of table (dual of similar method for columns) 
+	 * @param var the name for the table as a VariableExpr
+	 * @param expr the Expression for the table, which might be a variable reference and possible to the same name, though
+	 *   prefixed with a $ as per their convention
+	 * @return true iff the name is distinct (that is, requires explicit handling in an "as" clause, otherwise such handling can be
+	 *   omitted to match presto conventions)
+	 */
+	private boolean isDistinctName(VariableExpr name, Expression expr) {
+		VarIdentifier id = name.getVar();
+		if (id.namedValueAccess())
+			return true;
+		String varName = decodeVariableRef(id.getValue());
+		return isDistinctName(varName, expr);
 	}
 
 	private StringBuilder notImplemented(Object o) {
