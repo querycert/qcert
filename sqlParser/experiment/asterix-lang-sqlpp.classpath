@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/test/java"/>
+	<classpathentry kind="src" path="target/generated-sources/javacc"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/CommonLang"/>
+	<classpathentry exported="true" kind="var" path="ASTERIXDB/asterixdb/asterix-yarn/target/asterix-yarn-0.9.2-SNAPSHOT-binary-assembly/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
