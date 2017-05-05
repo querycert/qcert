@@ -15,8 +15,6 @@
  */
 package org.qcert.experimental.sql;
 
-import java.io.FileReader;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -75,12 +73,16 @@ public class SqlppEncoder {
 			} catch (CompilationException e) {
 				System.out.println(e.getMessage());
 				continue;
+			} catch (Throwable e) {
+				e.printStackTrace();
+				continue;
 			}
 			try { 
 				System.out.println(encode(stmts, true));
-			} catch (UnsupportedOperationException e) {
+			} catch (Throwable e) {
 				System.out.println(e.toString());
 			}
+			
 		}
 	}
 
