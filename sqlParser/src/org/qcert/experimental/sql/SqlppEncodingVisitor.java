@@ -92,17 +92,20 @@ import org.apache.asterix.lang.sqlpp.clause.UnnestClause;
 import org.apache.asterix.lang.sqlpp.expression.CaseExpression;
 import org.apache.asterix.lang.sqlpp.expression.IndependentSubquery;
 import org.apache.asterix.lang.sqlpp.expression.SelectExpression;
+import org.apache.asterix.lang.sqlpp.struct.SetOperationInput;
+import org.apache.asterix.lang.sqlpp.struct.SetOperationRight;
 import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
 
 public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
 	private static final EnumMap<OperatorType, String> opNameMap = new EnumMap<>(OperatorType.class);
 	static {
 		opNameMap.put(OperatorType.GT, "greater_than");
+		opNameMap.put(OperatorType.EQ, "equal");
 		// TODO the rest of these
 	}
 	
 	public SqlppEncodingVisitor(boolean useDateNameHeuristic) {
-		// TODO save argument
+		// TODO save argument for date processing later
 	}
 
 	@Override
@@ -211,12 +214,18 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			throw new UnsupportedOperationException("Cannot handle positional variables in FromTerm");
 		VariableExpr var = node.getLeftVariable();
 		Expression expr = node.getLeftExpression();
-		if (isDistinctName(var, expr))
-			appendStringNode("as", decodeVariableRef(var.toString()), builder);
+		boolean aliased = isDistinctName(var, expr);
+		if (aliased)
+			// Use 'aliasAs' for tables or subquery-like things, instead of 'as', which is used for columns.
+			// This maintains the convention we had for Presto
+			// TODO the distinction may or may not be useful ... check what happens on qcert side
+			nodeWithString("aliasAs", decodeVariableRef(var.toString()), builder);
 		if (expr.getKind() == Kind.VARIABLE_EXPRESSION)
-			// Normal visit would use 'ref' but we want 'table' here
-			return appendStringNode("table", decodeVariableRef(expr.toString()), builder);
-		return expr.accept(this, builder);
+			// Normal visit would use 'ref' but we want 'table' here to conform to our Presto encoding convention
+			builder = appendStringNode("table", decodeVariableRef(expr.toString()), builder);
+		else 
+			builder = expr.accept(this, builder);
+		return aliased ? builder.append(") ") : builder;
 	}
 
 	@Override
@@ -329,18 +338,6 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary");
 	}
 
-	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
-			throws CompilationException {
-		String verb = opNameMap.get(operator);
-		if (verb == null)
-			throw new UnsupportedOperationException("No support for binary operator " + operator);
-		// TODO date expression substitution needed here
-		builder.append("(").append(verb).append(" ");
-		builder = operand1.accept(this, builder);
-		builder = operand2.accept(this, builder);
-		return builder.append(") ");
-	}
-
 	@Override
 	public StringBuilder visit(OrderbyClause oc, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -374,9 +371,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(Query node, StringBuilder builder) throws CompilationException {
-		builder.append("(query ");
-		builder = node.getBody().accept(this, builder);
-		return builder.append(") ");
+		if (node.getBody().getKind() != Kind.SELECT_EXPRESSION)
+			throw new UnsupportedOperationException("Can't handle query whose body isn't a select expression");
+		return node.getBody().accept(this, builder);
 	}
 
 	@Override
@@ -391,11 +388,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SelectBlock node, StringBuilder builder) throws CompilationException {
+		builder.append("(query (select ");
 		builder = node.getSelectClause().accept(this, builder);
+		builder = builder.append(") "); // for parity with what Presto encoder does.
 		builder = node.getFromClause().accept(this, builder);
 		builder = acceptIfPresent(node.getWhereClause(), builder);
 		builder = acceptIfPresent(node.getGroupbyClause(), builder);
-		return acceptIfPresent(node.getHavingClause(), builder);
+		builder = acceptIfPresent(node.getHavingClause(), builder);
+		return builder.append(") "); // only one since one was inserted above
 	}
 
 	@Override
@@ -406,7 +406,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			builder = node.getSelectElement().accept(this, builder);
 		if (node.selectRegular())
 			builder = node.getSelectRegular().accept(this, builder);
-		return builder.append(") "); // looks asymmetric but needed to align asterixDB's division of nodes with Presto's
+		return builder;
 	}
 
 	@Override
@@ -416,12 +416,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SelectExpression node, StringBuilder builder) throws CompilationException {
-		builder.append("(select ");
-		builder = acceptIfPresent(node.getLimitClause(), builder);
+		builder = node.getSelectSetOperation().accept(this, builder);
 		builder = acceptIfPresent(node.getOrderbyClause(), builder);
-		return node.getSelectSetOperation().accept(this, builder);
-		// absence of close paren here looks asymmetric but needed to align asterixDB's division of nodes with Presto's
-		// TODO the current approach to alignment of the two parsers might not be foolproof
+		return acceptIfPresent(node.getLimitClause(), builder);
 	}
 
 	@Override
@@ -434,9 +431,30 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SelectSetOperation node, StringBuilder builder) throws CompilationException {
-		if (node.hasRightInputs())
-			throw new UnsupportedOperationException("No support yet for SelectSetOperation with RightInputs");
-		return node.getLeftInput().accept(this, builder);
+		SetOperationInput first = node.getLeftInput();
+		if (node.hasRightInputs()) {
+			List<SetOperationRight> rights = node.getRightInputs();
+			if (rights.size() > 1)
+				throw new UnsupportedOperationException("No support for multiple right inputs in a SelectSetOperation");
+			SetOperationRight rightInput = rights.get(0);
+			SetOperationInput second = rightInput.getSetOperationRightInput();
+			boolean distinct = rightInput.isSetSemantics();
+			String tag;
+			switch (rightInput.getSetOpType()) {
+			case INTERSECT:
+				tag = "intersect";
+				break;
+			case UNION:
+				tag = "union";
+				break;
+			default:
+				throw new UnsupportedOperationException("No support for operator: " + rightInput.getSetOpType());
+			}
+			builder = builder.append("(query (").append(tag).append(distinct ? " (distinct) " : " ");
+			builder = first.accept(this, builder);
+			return second.accept(this, builder).append(") ) ");
+		} else
+			return node.getLeftInput().accept(this, builder);
 	}
 
 	@Override
@@ -560,7 +578,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Work around the asterixDB convention of including an explicit name for every selected-from table, even when that is the
 	 *   same as the name of table (dual of similar method for columns) 
@@ -578,9 +596,26 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return isDistinctName(varName, expr);
 	}
 
+	/** Like appendStringNode but leaves the node open for more things to be added (see appendStringNode) */
+	private StringBuilder nodeWithString(String node, String arg, StringBuilder builder) {
+		return builder.append(String.format("(%s \"%s\" ", node, arg));
+	}
+	
 	private StringBuilder notImplemented(Object o) {
 		Method method = o.getClass().getEnclosingMethod();
 		Class<?> type = method.getParameterTypes()[0];
 		throw new UnsupportedOperationException("Visitor not implemented for " + type.getSimpleName());
+	}
+
+	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
+			throws CompilationException {
+		String verb = opNameMap.get(operator);
+		if (verb == null)
+			throw new UnsupportedOperationException("No support for binary operator " + operator);
+		// TODO date expression substitution needed here
+		builder.append("(").append(verb).append(" ");
+		builder = operand1.accept(this, builder);
+		builder = operand2.accept(this, builder);
+		return builder.append(") ");
 	}
 }

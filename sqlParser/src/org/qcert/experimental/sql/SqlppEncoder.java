@@ -62,9 +62,11 @@ public class SqlppEncoder {
 	 * TODO move this to its own source file when it becomes elaborate enough
 	 */
 	public static void main(String[] args) throws Exception {
-		Reader input = new FileReader(args[0]);
-		List<Statement> stmts = parse(input);
-		System.out.println(encode(stmts, true));
+		for (String arg : args) {
+			Reader input = new FileReader(arg);
+			List<Statement> stmts = parse(input);
+			System.out.println(encode(stmts, true));
+		}
 	}
 
 	/**
