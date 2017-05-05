@@ -852,7 +852,7 @@ Section NNRC.
     Context {fruntime:foreign_runtime}.
     Context (h:brand_relation_t).
     Definition nnrc_eval_top (q:nnrc) (cenv:bindings) : option data :=
-      @nnrc_ext_eval _ h (rec_sort cenv) q.
+      @nnrc_ext_eval _ h (rec_sort (mkConstants cenv)) q.
   End Top.
   
 End NNRC.

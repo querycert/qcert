@@ -171,7 +171,7 @@ Section cNNRC.
 
   Section Top.
     Definition nnrc_core_eval_top (q:nnrc_core) (cenv:bindings) : option data :=
-      lift_nnrc_core (nnrc_core_eval (rec_sort cenv)) q.
+      lift_nnrc_core (nnrc_core_eval (rec_sort (mkConstants cenv))) q.
   End Top.
   
 End cNNRC.
