@@ -1453,7 +1453,7 @@ public class EncodingVisitor extends DefaultTraversalVisitor<StringBuilder, Stri
 		else if (r instanceof QuerySpecification) {
 			builder.append("(query ");
 			process(r, builder);
-			builder.append(")");
+			builder.append(") ");
 		} else
 			throw new UnsupportedOperationException("Can't deal with set op operand type " + r.getClass().getSimpleName());
 	}
