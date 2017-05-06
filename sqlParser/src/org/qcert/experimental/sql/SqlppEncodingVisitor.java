@@ -106,9 +106,12 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	private static final EnumMap<OperatorType, String> opNameMap = new EnumMap<>(OperatorType.class);
 	static {
 		opNameMap.put(OperatorType.GT, "greater_than");
+		opNameMap.put(OperatorType.LT, "less_than");
 		opNameMap.put(OperatorType.EQ, "equal");
 		opNameMap.put(OperatorType.AND, "and");
 		opNameMap.put(OperatorType.LIKE, "like");
+		opNameMap.put(OperatorType.DIV, "divide");
+		opNameMap.put(OperatorType.MUL, "multiply");
 		// TODO the rest of these
 	}
 	
@@ -319,6 +322,8 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			return builder.append(lit.getStringValue()).append(" ");
 		case STRING:
 			return appendString(lit.getStringValue(), builder);
+		case DOUBLE:
+			return builder.append(String.format("%f", lit.getValue())).append(" ");
 		default:
 			break;
 		}
