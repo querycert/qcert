@@ -228,23 +228,23 @@ Section NRAEnv.
     induction a; simpl; try reflexivity; try (rewrite IHa1; rewrite IHa2; try rewrite IHa3; reflexivity); rewrite IHa; reflexivity.
   Qed.
     
-  Context (h:list(string*string)).
-  
-  Definition nraenv_eval c (e:nraenv) (env:data) (x:data) : option data :=
-    nraenv_core_eval h c (nraenv_core_of_nraenv e) env x.
-
-  Lemma initial_nraenv_ident c (e:nraenv_core) (env:data) (x:data) :
-    nraenv_eval c (nraenv_of_nraenv_core e) env x = nraenv_core_eval h c e env x.
-  Proof.
-    unfold nraenv_eval.
-    rewrite nraenv_roundtrip.
-    reflexivity.
-  Qed.
-
   Section Top.
+    Context (h:list(string*string)).
+  
+    Definition nraenv_eval c (e:nraenv) (env:data) (x:data) : option data :=
+      nraenv_core_eval h c (nraenv_core_of_nraenv e) env x.
+
+    Lemma initial_nraenv_ident c (e:nraenv_core) (env:data) (x:data) :
+      nraenv_eval c (nraenv_of_nraenv_core e) env x = nraenv_core_eval h c e env x.
+    Proof.
+      unfold nraenv_eval.
+      rewrite nraenv_roundtrip.
+      reflexivity.
+    Qed.
+
     Definition nraenv_eval_top (q:nraenv) (env:bindings) :=
       nraenv_eval (rec_sort env) q (drec nil) dunit.
-      
+
   End Top.
 
 End NRAEnv.

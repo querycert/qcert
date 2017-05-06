@@ -671,7 +671,11 @@ Section OQL.
       end.
 
   End OQLScope.
-  
+
+  Section Top.
+    Definition oql_eval_top (q:oql) (cenv:bindings) : option data :=
+      oql_interp (rec_sort cenv) q.
+  End Top.
 End OQL.
 
 

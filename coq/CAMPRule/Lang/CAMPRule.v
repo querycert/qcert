@@ -99,6 +99,17 @@ Section CAMPRule.
        | TerminalError => None
        end.
 
+  Section Top.
+    Context (h:brand_relation_t).
+
+    Definition camp_rule_eval_top (q:camp_rule) (cenv:bindings) :=
+      match interp h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
+      | Success l => Some (dcoll (l::nil))
+      | RecoverableError => Some (dcoll nil)
+      | TerminalError => None
+      end.
+  End Top.
+
 End CAMPRule.
 
 (* 

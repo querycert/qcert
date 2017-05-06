@@ -50,6 +50,9 @@ Section CompDriver.
   Require Import OQLtoNRAEnv.
   Require Import SQLtoNRAEnv.
   Require Import LambdaNRAtoNRAEnv.
+  Require Import CAMPRuletoCAMP.
+  Require Import TechRuletoCAMP.
+  Require Import DesignRuletoCAMP.
   Require Import CAMPtoNRA.
   Require Import CAMPtocNRAEnv.
   Require Import CAMPtoNRAEnv.
@@ -138,14 +141,14 @@ Section CompDriver.
 
     Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv_top q.
 
-    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := lambda_nra_to_nraenv q.
+    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := LambdaNRAtoNRAEnv.lambda_nra_to_nraenv_top q.
 
     (** Rules and CAMP translations *)
-    Definition camp_rule_to_camp (q:camp_rule) : camp := CAMPRule.camp_rule_to_camp q. (* Note: This is really macro-expansion *)
+    Definition camp_rule_to_camp (q:camp_rule) : camp := CAMPRuletoCAMP.camp_rule_to_camp_top q.
 
-    Definition tech_rule_to_camp (q:tech_rule) : camp := TechRule.tech_rule_to_camp q.
+    Definition tech_rule_to_camp (q:tech_rule) : camp := TechRuletoCAMP.tech_rule_to_camp_top q.
 
-    Definition designer_rule_to_camp (q:designer_rule) : camp := DesignRule.designer_rule_to_camp q.
+    Definition designer_rule_to_camp (q:designer_rule) : camp := DesignRuletoCAMP.designer_rule_to_camp_top q.
 
     Definition camp_to_nra (q:camp) : nra := nra_of_camp q.
 

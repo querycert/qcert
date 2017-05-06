@@ -248,6 +248,9 @@ MODULES = \
 	Translation/NNRCMRtoDNNRC \
 	Translation/NNRCMRtoCldMR \
 	Translation/DNNRCtotDNNRC \
+	Translation/CAMPRuletoCAMP \
+	Translation/TechRuletoCAMP \
+	Translation/DesignRuletoCAMP \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \

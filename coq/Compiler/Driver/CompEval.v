@@ -82,11 +82,7 @@ Section CompEval.
     (* Language: camp_rule *)
     (* Note: eval for camp_rule relies on translation to camp *)
     Definition eval_camp_rule (q:camp_rule) (cenv: bindings) : option data :=
-      match interp h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
-      | Success l => Some (dcoll (l::nil))
-      | RecoverableError => Some (dcoll nil)
-      | TerminalError => None
-      end.
+      camp_rule_eval_top h q cenv.
 
     Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: bindings) : string
       := let pp := camp_rule_to_camp q in
@@ -96,12 +92,8 @@ Section CompEval.
                                            debug nil pp nil dunit).
 
     (* Language: camp *)
-    Definition eval_camp (q:camp) (cenv: bindings) : option data
-      := match interp h (rec_sort cenv) q nil dunit with
-         | Success l => Some (dcoll (l::nil))
-         | RecoverableError => Some (dcoll nil)
-         | TerminalError => None
-         end.
+    Definition eval_camp (q:camp) (cenv: bindings) : option data :=
+      camp_eval_top h q cenv.
 
     Definition eval_camp_debug (debug:bool) (q:camp) (cenv: bindings) : string
       := print_presult_debug q
@@ -111,7 +103,7 @@ Section CompEval.
 
     (* Language: oql *)
     Definition eval_oql (q:oql) (cenv: bindings) : option data
-      := oql_interp h (rec_sort cenv) q.
+      := oql_eval_top h q cenv.
 
     (* Language: sql *)
     (* Note: eval for sql relies on translation to nraenv_core *)
@@ -131,7 +123,7 @@ Section CompEval.
 
     (* Language: nraenv_core *)
     Definition eval_nraenv_core (q:nraenv_core) (cenv: bindings) : option data
-      := nraenv_core_eval h (rec_sort cenv) q (drec nil) dunit.
+      := nraenv_core_eval_top h q cenv.
 
     (* Language: nraenv *)
     Definition eval_nraenv (q:nraenv) (cenv: bindings) : option data

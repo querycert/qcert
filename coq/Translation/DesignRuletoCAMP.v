@@ -14,23 +14,25 @@
  * limitations under the License.
  *)
 
-(* This file defines  *)
-Section TechRule.
+Section DesignRuletoCAMP.
 
-  (* begin hide *)
+  Require Import String.
+  Require Import List.
+
   Require Import Utils BasicRuntime.
-  Require Export CAMP.
-  (* end hide *)
-
-  Context {fruntime:foreign_runtime}.
-
-  Axiom tech_rule : Set.
-  Axiom tech_rule_to_camp : tech_rule -> camp.
-
-End TechRule.
+  Require Import DesignRuleRuntime.
+  Require Import CAMPRuntime.
+  
+  Section Top.
+    Context {fr:foreign_runtime}.
+    (** Note: Translation from CAMP Rules to CAMP is really macro-expansion *)
+    Definition designer_rule_to_camp_top (q:designer_rule) : camp := designer_rule_to_camp q.
+  End Top.
+    
+End DesignRuletoCAMP.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)

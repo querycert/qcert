@@ -685,8 +685,17 @@ Section CAMP.
        | TerminalError _ => None
        end.
 
-End CAMP.
+  Section Top.
+    Context (h:brand_relation_t).
 
+    Definition camp_eval_top (q:camp) (cenv:bindings) :=
+      match interp h (rec_sort cenv) q nil dunit with
+      | Success _ l => Some (dcoll (l::nil))
+      | RecoverableError _ => Some (dcoll nil)
+      | TerminalError _ => None
+      end.
+  End Top.
+End CAMP.
 
 (* begin hide *)
 Arguments TerminalError {A}.
