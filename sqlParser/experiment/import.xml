@@ -1,0 +1,13 @@
+<project name="import" default="import">
+	<!-- This is just a convenience for JSA at this time, and so is set that way, but you can override or edit the following property -->
+	<property name="ASTERIX" value="/Users/joshuaauerbach/git/asterixdb/asterixdb"/>
+	<target name="import">
+		<copy verbose="true" file="${ASTERIX}/asterix-common/.classpath" tofile="asterix-common.classpath"/>
+		<copy verbose="true" file="${ASTERIX}/asterix-common/.project" tofile="asterix-common.project"/>
+		<copy verbose="true" file="${ASTERIX}/asterix-lang-common/.classpath" tofile="asterix-lang-common.classpath"/>
+		<copy verbose="true" file="${ASTERIX}/asterix-lang-common/.project" tofile="asterix-lang-common.project"/>
+		<copy verbose="true" file="${ASTERIX}/asterix-lang-sqlpp/.classpath" tofile="asterix-lang-sqlpp.classpath"/>
+		<copy verbose="true" file="${ASTERIX}/asterix-lang-sqlpp/.project" tofile="asterix-lang-sqlpp.project"/>
+		<copy verbose="true" file="../.classpath" tofile=".classpath"/>
+	</target>
+</project>

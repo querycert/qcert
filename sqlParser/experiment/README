@@ -5,17 +5,33 @@ Note: nothing is automated yet.  Only an eclipse-based approach is currently sup
 
 1.  Clone the asterixDB repository from https://github.com/apache/asterixdb.git.  It is not necessary to do
 this under eclipse nor do you initially import any projects into eclipse (this is done later with special
-metadata).  Currently I am using branch release-0.9.1 (may switch to master if it becomes necessary to more
-closely track updates or participate in the project).
+metadata). 
+
+Currently I am using branch release-0.9.1.  I may switch to master if it becomes necessary to more
+closely track updates or participate in the project.
 
 2.  Do a full build as instructed in the "Build from Source" item in the README.md of that project.  This
-requires Maven as listed there.
+requires Maven as listed there.  It's not necessary to start a server instance, unless you're curious.
 
 3.  Edit your Preferences->Java->Build Path->Classpath Variables to include an entry for ASTERIXDB set to the
 full path of where the top-level working directory of your asterixDB clone resides
 (e.g. /Users/joshuaauerbach/git/asterixdb).
 
 4.  From this directory copy files
+
+asterix-common.classpath
+asterix-common.project
+
+to the new paths
+
+$A/asterixdb/asterix-common/.classpath
+$A/asterixdb/asterix-common/.project
+
+(where $A denotes the full path to your asterixdb working directory).  
+
+Yes, there are two 'asterixdb' folders in the final path after $A is expanded.  This is correct.
+
+Then copy the files
 
 asterix-lang-common.classpath
 asterix-lang-common.project
@@ -25,10 +41,7 @@ to the new paths
 $A/asterixdb/asterix-lang-common/.classpath
 $A/asterixdb/asterix-lang-common/.project
 
-(where $A denotes the full path to your asterixdb working directory.  Note that there are two 'asterxdb'
-subfolders in the final path when $A is expanded).
-
-Then copy the files
+and also copy the files
 
 asterix-lang-sqlpp.classpath
 asterix-lang-sqlpp.project
@@ -42,14 +55,18 @@ The asterixDB project is maven-based but supports Eclilpse development, therefor
 be git-ignored and will not dirty your asterixDB clone (in case you care).
 
 5.  Use Import->Existing Projects into Workspace under Eclipse, to import (now) existing eclipse projects at
-the two locations you updated in the previous step.  You should now have projects SqlPPLang and CommonLang
-which should build under eclipse with no errors (plenty of warnings though).
+the three locations you updated in the previous step.  I recommend that you not request to copy the projects
+into the workspace.  By importing them in place you permit further updates via get.
+
+ You should now have projects asterix-common, asterix-lang-common, and asterix-lang-sqlpp, which should build 
+ under eclipse with no errors (plenty of warnings though).
 
 6.  Copy the file .classpath from this directory into its parent directory, replacing the .classpath that is
 there.  This WILL dirty your qcert working directory, so you should take care to revert .classpath in the
 parent directory before doing commits.
 
-Note: I will create a branch soon which should obviate the need for this step and the problems it might cause.
+Note: I will create a better config eventually, perhaps using a branch or perhaps isolating new code in a
+separate build and using a reflection barrier to choose dynamically between Presto and asterixDB.
 
 7.  If you don't already have the parent directory (sqlParser) as an Eclipse projet, import it.  You may need
 to import additional projects from qcert to allow it to build.  I am assuming you already ran the ant scripts
