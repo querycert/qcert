@@ -56,10 +56,11 @@ be git-ignored and will not dirty your asterixDB clone (in case you care).
 
 5.  Use Import->Existing Projects into Workspace under Eclipse, to import (now) existing eclipse projects at
 the three locations you updated in the previous step.  I recommend that you not request to copy the projects
-into the workspace.  By importing them in place you permit further updates via get.
+into the workspace.  By importing them in place you permit further updates via git in the event that we are 
+tracking asterixdb changes.
 
- You should now have projects asterix-common, asterix-lang-common, and asterix-lang-sqlpp, which should build 
- under eclipse with no errors (plenty of warnings though).
+You should now have projects asterix-common, asterix-lang-common, and asterix-lang-sqlpp, which should build 
+under eclipse with no errors (plenty of warnings though).
 
 6.  Copy the file .classpath from this directory into its parent directory, replacing the .classpath that is
 there.  This WILL dirty your qcert working directory, so you should take care to revert .classpath in the
