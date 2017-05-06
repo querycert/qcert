@@ -16,10 +16,15 @@
 package org.qcert.experimental.sql;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.asterix.common.exceptions.CompilationException;
+import org.apache.asterix.common.functions.FunctionSignature;
 import org.apache.asterix.lang.common.base.Expression;
 import org.apache.asterix.lang.common.base.Expression.Kind;
 import org.apache.asterix.lang.common.base.ILangExpression;
@@ -28,6 +33,7 @@ import org.apache.asterix.lang.common.clause.GroupbyClause;
 import org.apache.asterix.lang.common.clause.LetClause;
 import org.apache.asterix.lang.common.clause.LimitClause;
 import org.apache.asterix.lang.common.clause.OrderbyClause;
+import org.apache.asterix.lang.common.clause.OrderbyClause.OrderModifier;
 import org.apache.asterix.lang.common.clause.UpdateClause;
 import org.apache.asterix.lang.common.clause.WhereClause;
 import org.apache.asterix.lang.common.expression.CallExpr;
@@ -101,6 +107,8 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	static {
 		opNameMap.put(OperatorType.GT, "greater_than");
 		opNameMap.put(OperatorType.EQ, "equal");
+		opNameMap.put(OperatorType.AND, "and");
+		opNameMap.put(OperatorType.LIKE, "like");
 		// TODO the rest of these
 	}
 	
@@ -109,8 +117,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(CallExpr pf, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(CallExpr node, StringBuilder builder) throws CompilationException {
+		FunctionSignature signature = node.getFunctionSignature();
+		String namespace = signature.getNamespace();
+		String name = namespace != null && namespace.length() > 0 ? namespace + "." + signature.getName() : signature.getName();
+		builder = builder.append("(function ");
+		builder = appendString(name, builder);
+		for (Expression arg : node.getExprList())
+			arg.accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -201,11 +216,11 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	@Override
 	public StringBuilder visit(FromClause node, StringBuilder builder) throws CompilationException {
 		builder.append("(from ");
-		for (FromTerm term : node.getFromTerms())
-			builder = term.accept(this, builder);
+		// In keeping with how the Presto parser works, we process more than on 'from' term as an implicit Join.
+		builder = makeImplicitJoin(node.getFromTerms(), builder);
 		return builder.append(") ");
 	}
-
+	
 	@Override
 	public StringBuilder visit(FromTerm node, StringBuilder builder) throws CompilationException {
 		if (node.hasCorrelateClauses())
@@ -299,10 +314,11 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		switch (lit.getLiteralType()) {
 		case INTEGER:
 		case LONG:
-		case STRING:
 		case FALSE:
 		case TRUE:
 			return builder.append(lit.getStringValue()).append(" ");
+		case STRING:
+			return appendString(lit.getStringValue(), builder);
 		default:
 			break;
 		}
@@ -335,12 +351,39 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		List<OperatorType> ops = node.getOpList();
 		if (exprs.size() == 2 && ops.size() == 1)
 			return processBinaryOperator(ops.get(0), exprs.get(0), exprs.get(1), builder);
+		else if (exprs.size() - ops.size() == 1) {
+			assert ops.size() > 0;
+			return visit(makeBinary(exprs, ops), builder);
+		}
 		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary");
 	}
 
 	@Override
-	public StringBuilder visit(OrderbyClause oc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(OrderbyClause node, StringBuilder builder) throws CompilationException {
+		if (node.getNumFrames() > -1 || node.getNumTuples() > -1 || node.getRangeMap() != null)
+			throw new UnsupportedOperationException("Not yet supporting more complex OrderBy clauses");
+		List<Expression> orderExprs = node.getOrderbyList();
+		List<OrderModifier> orderMods = node.getModifierList();
+		assert orderExprs.size() == orderMods.size();
+		builder.append("(orderBy ");
+		Iterator<OrderModifier> kinds = orderMods.iterator();
+		for(Expression expr : orderExprs) {
+			String ordering;
+			switch (kinds.next()) {
+			case ASC:
+				ordering = "ascending";
+				break;
+			case DESC:
+				ordering = "descending";
+				break;
+			default:
+				throw new IllegalStateException("Unexpected ordering");
+			}
+			builder.append("(").append(ordering).append(" ");
+			expr.accept(this, builder);
+			builder.append(") ");
+		}
+		return builder.append(") ");
 	}
 
 	@Override
@@ -417,8 +460,13 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	@Override
 	public StringBuilder visit(SelectExpression node, StringBuilder builder) throws CompilationException {
 		builder = node.getSelectSetOperation().accept(this, builder);
+		// Because this is a top-level query, but visit(SelectBlock) assumes it might be nested, we have to strip the last paren
+		// before processing order by and limit.  We assume without checking that only whitespace follows the last paren.
+		int lastParen = builder.lastIndexOf(")");
+		builder.delete(lastParen, builder.length());
 		builder = acceptIfPresent(node.getOrderbyClause(), builder);
-		return acceptIfPresent(node.getLimitClause(), builder);
+		builder = acceptIfPresent(node.getLimitClause(), builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -536,6 +584,11 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return builder;
 	}
 
+	/** Append a string with a trailing blank */
+	private StringBuilder appendString(String s, StringBuilder builder) {
+		return builder.append("\"").append(s).append("\" ");
+	}
+
 	/**
 	 * Given a node name and a string argument, append a String-style S-expression node
 	 * @param node the node name
@@ -596,17 +649,67 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return isDistinctName(varName, expr);
 	}
 
+	/**
+	 * Subroutine of the visitor for OperatorExpr to handle chains longer than one operator and two operands.
+	 * In keeping with how things work in Presto, the result is left associative
+	 * @param exprs the expressions
+	 * @param ops the ops
+	 * @return
+	 */
+	private OperatorExpr makeBinary(List<Expression> exprs, List<OperatorType> ops) {
+		assert exprs.size() > 2;
+		exprs = new ArrayList<>(exprs);
+		ops = new ArrayList<>(ops);
+		Expression lastExpr = exprs.remove(exprs.size() - 1);
+		OperatorType lastOp = ops.remove(ops.size() - 1);
+		OperatorExpr remainder = new OperatorExpr(exprs, Collections.emptyList(), ops, false);
+		exprs = Arrays.asList(remainder, lastExpr);
+		return new OperatorExpr(exprs, Collections.emptyList(), Collections.singletonList(lastOp), false);
+	}
+
+	/**
+	 * Subroutine of the FromClause visitor to build a left-associative recursive nest of implicit joins from the
+	 *   list of FromTerms
+	 * @param terms the FromTerms
+	 * @param builder the StringBuilder
+	 * @return a StringBuilder appropriately augmented
+	 */
+	private StringBuilder makeImplicitJoin(List<FromTerm> terms, StringBuilder builder) throws CompilationException {
+		if (terms.size() == 1)
+			return terms.get(0).accept(this, builder);
+		terms = new ArrayList<>(terms);
+		FromTerm last = terms.remove(terms.size() - 1);
+		builder = builder.append("(join ");
+		builder = makeImplicitJoin(terms, builder);
+		builder = last.accept(this, builder);
+		return builder.append(") ");
+	}
+
 	/** Like appendStringNode but leaves the node open for more things to be added (see appendStringNode) */
 	private StringBuilder nodeWithString(String node, String arg, StringBuilder builder) {
 		return builder.append(String.format("(%s \"%s\" ", node, arg));
 	}
 	
+	/**
+	 * Convenient error thrower for identifying unimplemented things
+	 * @param o an object anonymously subclassed by the throwing method, allowing the method to be identified
+	 * @return a StringBuilder nominally, for composition, but never actually returns
+	 */
 	private StringBuilder notImplemented(Object o) {
 		Method method = o.getClass().getEnclosingMethod();
 		Class<?> type = method.getParameterTypes()[0];
 		throw new UnsupportedOperationException("Visitor not implemented for " + type.getSimpleName());
 	}
 
+	/**
+	 * Process a binary operation whose verb has been identified.  Localizes any per-operator special handling required
+	 * @param operator the operator
+	 * @param operand1 the first operand		
+	 * @param operand2 the second operand	
+	 * @param builder the StringBuilder
+	 * @return the StringBuilder (or a behaviorally equivalent one) augmented with this expression
+	 * @throws CompilationException
+	 */
 	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
 			throws CompilationException {
 		String verb = opNameMap.get(operator);
