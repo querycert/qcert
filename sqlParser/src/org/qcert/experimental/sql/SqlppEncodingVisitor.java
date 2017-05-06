@@ -38,6 +38,7 @@ import org.apache.asterix.lang.common.clause.UpdateClause;
 import org.apache.asterix.lang.common.clause.WhereClause;
 import org.apache.asterix.lang.common.expression.CallExpr;
 import org.apache.asterix.lang.common.expression.FieldAccessor;
+import org.apache.asterix.lang.common.expression.GbyVariableExpressionPair;
 import org.apache.asterix.lang.common.expression.IfExpr;
 import org.apache.asterix.lang.common.expression.IndexAccessor;
 import org.apache.asterix.lang.common.expression.ListConstructor;
@@ -112,6 +113,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		opNameMap.put(OperatorType.LIKE, "like");
 		opNameMap.put(OperatorType.DIV, "divide");
 		opNameMap.put(OperatorType.MUL, "multiply");
+		opNameMap.put(OperatorType.IN, "isIn");
 		// TODO the rest of these
 	}
 	
@@ -257,13 +259,32 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(GroupbyClause gc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(GroupbyClause node, StringBuilder builder) throws CompilationException {
+		if (node.hasDecorList())
+			throw new UnsupportedOperationException("Not supporting DecorList in group by");
+		if (node.hasGroupVar())
+			throw new UnsupportedOperationException("Not supporting GroupVar in group by");
+		if (node.hasHashGroupByHint())
+			throw new UnsupportedOperationException("Not supporting HashGroupByHint in group by");
+		if (node.hasWithMap())
+			throw new UnsupportedOperationException("Not supporting WithMap in group by");
+		builder = builder.append("(groupBy ");
+    	for (GbyVariableExpressionPair pair : node.getGbyPairList()) {
+    		Expression expr = pair.getExpr();
+    		VariableExpr var = pair.getVar();
+    		if (isDistinctName(var, expr)) {
+    			builder = appendStringNode("as", decodeVariableRef(var.toString()), builder);
+    		}
+    		builder = expr.accept(this, builder);
+    	}
+		return builder.append(") ");
 	}
 
 	@Override
-	public StringBuilder visit(HavingClause havingClause, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(HavingClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(having ");
+		builder = node.getFilterExpression().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
