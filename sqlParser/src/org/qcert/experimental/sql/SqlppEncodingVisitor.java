@@ -83,6 +83,7 @@ import org.apache.asterix.lang.common.statement.TypeDropStatement;
 import org.apache.asterix.lang.common.statement.UpdateStatement;
 import org.apache.asterix.lang.common.statement.WriteStatement;
 import org.apache.asterix.lang.common.struct.OperatorType;
+import org.apache.asterix.lang.common.struct.UnaryExprType;
 import org.apache.asterix.lang.common.struct.VarIdentifier;
 import org.apache.asterix.lang.sqlpp.clause.FromClause;
 import org.apache.asterix.lang.sqlpp.clause.FromTerm;
@@ -105,20 +106,26 @@ import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
 
 public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
 	private static final EnumMap<OperatorType, String> opNameMap = new EnumMap<>(OperatorType.class);
+	private static final EnumMap<UnaryExprType, String> unaryExprMap = new EnumMap<>(UnaryExprType.class);
 	static {
 		opNameMap.put(OperatorType.GT, "greater_than");
 		opNameMap.put(OperatorType.LT, "less_than");
 		opNameMap.put(OperatorType.EQ, "equal");
+		opNameMap.put(OperatorType.NEQ, "not_equal");
 		opNameMap.put(OperatorType.AND, "and");
 		opNameMap.put(OperatorType.LIKE, "like");
 		opNameMap.put(OperatorType.DIV, "divide");
 		opNameMap.put(OperatorType.MUL, "multiply");
 		opNameMap.put(OperatorType.IN, "isIn");
 		// TODO the rest of these
+		unaryExprMap.put(UnaryExprType.EXISTS, "exists");
+		// TODO the rest of these
 	}
 	
+	private boolean useDateNameHeuristic;
+	
 	public SqlppEncodingVisitor(boolean useDateNameHeuristic) {
-		// TODO save argument for date processing later
+		this.useDateNameHeuristic = useDateNameHeuristic;
 	}
 
 	@Override
@@ -126,9 +133,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		FunctionSignature signature = node.getFunctionSignature();
 		String namespace = signature.getNamespace();
 		String name = namespace != null && namespace.length() > 0 ? namespace + "." + signature.getName() : signature.getName();
+		List<Expression> args = node.getExprList();
+		// The following kluge is pretty arbitrary but seems needed since AsterixDB parses count(*) as count(1)
+		if (name.equals("count") && args.size() == 1 && args.get(0).getKind() == Kind.LITERAL_EXPRESSION) {
+			LiteralExpr lit = (LiteralExpr) args.get(0);
+			if (lit.getValue().toString().equals("1"))
+				args = Collections.emptyList();
+		}
+		// The following is needed because AsterixDB treats "not" as a function
+		if (name.equals("not") && args.size() == 1)
+			return handleNot(args.get(0), builder);
 		builder = builder.append("(function ");
 		builder = appendString(name, builder);
-		for (Expression arg : node.getExprList())
+		for (Expression arg : args)
 			arg.accept(this, builder);
 		return builder.append(") ");
 	}
@@ -214,8 +231,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(FieldAccessor fa, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(FieldAccessor node, StringBuilder builder) throws CompilationException {
+		builder = nodeWithString("deref", node.getIdent().toString(), builder);
+		return node.getExpr().accept(this, builder).append(") ");
 	}
 
 	@Override
@@ -225,7 +243,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder = makeImplicitJoin(node.getFromTerms(), builder);
 		return builder.append(") ");
 	}
-	
+
 	@Override
 	public StringBuilder visit(FromTerm node, StringBuilder builder) throws CompilationException {
 		if (node.hasCorrelateClauses())
@@ -247,7 +265,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			builder = expr.accept(this, builder);
 		return aliased ? builder.append(") ") : builder;
 	}
-
+	
 	@Override
 	public StringBuilder visit(FunctionDecl fd, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -562,8 +580,11 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(UnaryExpr u, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(UnaryExpr node, StringBuilder builder) throws CompilationException {
+		String verb = unaryExprMap.get(node.getExprType());
+		builder = builder.append("(").append(verb).append(" ");
+		builder = node.getExpr().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -635,6 +656,66 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	/**
+	 * Handle the case of a "not" appearing as a function call
+	 * @param expression the expression that is the argument to the apparent function call
+	 * @param builder the builder
+	 * @return the builder
+	 * @throws CompilationException 
+	 */
+	private StringBuilder handleNot(Expression expression, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(not ");
+		builder = expression.accept(this, builder);
+		return builder.append(") ");
+	}
+
+	/** Heuristic type inference: determine if an Expression has type 'date'.
+	 * This should not produce false positives.  It uses heuristics to find obvious cases only.
+	 */
+	private boolean isDate(Expression maybeDate) {
+		/* Look for date literals, since they are obviously dates */
+		// TODO it appears AsterixDB doesn't support date literals
+//		if (maybeDate instanceof GenericLiteral)
+//			return ((GenericLiteral) maybeDate).getType().equalsIgnoreCase("date");
+		/* Look for functions with method name date_plus or date_minus since these produce dates (and resulted from
+		 *  heuristic type inference on children).
+		 */
+		if (maybeDate.getKind() == Kind.CALL_EXPRESSION)
+			switch(((CallExpr) maybeDate).getFunctionSignature().getName()) {
+			case "date_plus":
+			case "date_minus":
+				return true;
+			}
+		/* if the date name heuristic is enabled and the expression is a ref or deref of a name, apply that heuristic */
+		if (useDateNameHeuristic) {
+			String name = null;
+			switch (maybeDate.getKind()) {
+			case FIELD_ACCESSOR_EXPRESSION:
+				name = ((FieldAccessor) maybeDate).getIdent().getValue();
+				break;
+			case VARIABLE_EXPRESSION:
+				name = decodeVariableRef(((VariableExpr) maybeDate).getVar().getValue());
+				break;
+			default:
+				break;
+			}
+			if (name != null)
+				return name.endsWith("date");
+		}
+		return false;
+	}
+
+	/** Heuristic type inference: determine if an Expression has type 'date interval'.
+	 * This should not produce false positives.  It uses heuristics to find obvious cases only.
+	 */
+	private boolean isDateInterval(Expression maybeInterval) {
+		/* Look for interval literals, since they are obviously intervals */
+		// TODO AsterixDB doesn't seem to support date intervals
+		return false;
+//		return maybeInterval instanceof IntervalLiteral;
+		/* That's all for now */
+	}
+
+	/**
 	 * Work around the asterixDB convention of including an explicit name for every selected column, even when that is the
 	 *   same as the name of column. 
 	 * @param name the name assigned to the column
@@ -692,7 +773,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		exprs = Arrays.asList(remainder, lastExpr);
 		return new OperatorExpr(exprs, Collections.emptyList(), Collections.singletonList(lastOp), false);
 	}
-
+	
 	/**
 	 * Subroutine of the FromClause visitor to build a left-associative recursive nest of implicit joins from the
 	 *   list of FromTerms
@@ -711,11 +792,69 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return builder.append(") ");
 	}
 
+	/** Test whether a node is an operator node and call the main date transformation analysis if it is */
+	private Expression maybeTransform(Expression expr) {
+		if (expr.getKind() == Kind.OP_EXPRESSION) {
+			OperatorExpr opExpr = (OperatorExpr) expr;
+			List<Expression> exprs = opExpr.getExprList();
+			List<OperatorType> ops = opExpr.getOpList();
+			if (exprs.size() == 2 && ops.size() == 1) {
+				// TODO we need to reorganize the code a bit to make sure we catch other cases
+				Expression maybe = maybeTransform(ops.get(0), exprs.get(0), exprs.get(1));
+				if (maybe != null)
+					return maybe;
+			}
+		}
+		return expr;
+	}
+
+	/** Selectively turn an operator node into a function call if it operates on dates.  Returns a new node or null if
+	 *  no safe transformation is available. */
+	private Expression maybeTransform(OperatorType operator, Expression operand1, Expression operand2) {
+		String name;
+		boolean arithmetic = false;
+		switch (operator) {
+		case BETWEEN:
+		case NOT_BETWEEN:
+			throw new UnsupportedOperationException("A between predicate may need date transformation but it is not yet implemented");
+		case GE:
+			name = "date_ge";
+			break;
+		case GT:
+			name = "date_gt";
+			break;
+		case LE:
+			name = "date_le";
+			break;
+		case LT:
+			name = "date_lt";
+			break;
+		case MINUS:
+			name = "date_minus";
+			arithmetic = true;
+			break;
+		case NEQ:
+			name = "date_ne";
+			break;
+		case PLUS:
+			name = "date_plus";
+			arithmetic = true;
+			break;
+		default:
+			return null;
+		}
+		Expression left = maybeTransform(operand1);
+		Expression right = maybeTransform(operand2);
+		if (isDate(left) || arithmetic && isDateInterval(right) || !arithmetic && isDate(right))
+			return new CallExpr(new FunctionSignature(null, name, 2), Arrays.asList(left, right));
+		return null;
+	}
+
 	/** Like appendStringNode but leaves the node open for more things to be added (see appendStringNode) */
 	private StringBuilder nodeWithString(String node, String arg, StringBuilder builder) {
 		return builder.append(String.format("(%s \"%s\" ", node, arg));
 	}
-	
+
 	/**
 	 * Convenient error thrower for identifying unimplemented things
 	 * @param o an object anonymously subclassed by the throwing method, allowing the method to be identified
@@ -738,10 +877,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	 */
 	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
 			throws CompilationException {
+		// Consider substitutions based on inferring that the operation involves dates
+		Expression alternative = maybeTransform(operator, operand1, operand2);
+		if (alternative != null)
+			return alternative.accept(this, builder);
+		// Otherwise proceed with the normal case
 		String verb = opNameMap.get(operator);
 		if (verb == null)
 			throw new UnsupportedOperationException("No support for binary operator " + operator);
-		// TODO date expression substitution needed here
 		builder.append("(").append(verb).append(" ");
 		builder = operand1.accept(this, builder);
 		builder = operand2.accept(this, builder);
