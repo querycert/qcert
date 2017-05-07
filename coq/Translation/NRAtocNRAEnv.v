@@ -14,23 +14,44 @@
  * limitations under the License.
  *)
 
-Section TechRuletoCAMP.
+Section NRAtocNRAEnv.
 
   Require Import String.
   Require Import List.
 
   Require Import Utils BasicRuntime.
-  Require Import TechRuleRuntime.
-  Require Import CAMPRuntime.
-  
-  Section Top.
-    Context {fr:foreign_runtime}.
+  Require Import NRARuntime.
+  Require Import NRAEnvRuntime.
 
-    (** Note: Translation from Tech Rules to CAMP is done in Java *)
-    Definition tech_rule_to_camp_top (q:tech_rule) : camp := tech_rule_to_camp q.
+  Context {fr:foreign_runtime}.
+
+  Section Top.
+    Context (h:brand_relation_t).
+
+    Definition nra_to_nraenv_core_top (q:nra) : nraenv_core :=
+      nraenv_core_of_nra q.
+
+    Theorem nra_to_nraenv_core_top_correct :
+      forall q:nra, forall global_env:bindings,
+          nra_eval_top h q global_env =
+          nraenv_core_eval_top h (nra_to_nraenv_core_top q) global_env.
+    Proof.
+      intros.
+      unfold nra_eval_top.
+      unfold nraenv_core_eval_top.
+      unfold nra_to_nraenv_core_top.
+      simpl.
+      rewrite <- nraenv_core_eval_of_nra.
+      simpl.
+      rewrite unfold_env_nra_sort.
+      simpl.
+      unfold nra_context_data.
+      rewrite drec_sort_idempotent.
+      reflexivity.
+    Qed.
   End Top.
     
-End TechRuletoCAMP.
+End NRAtocNRAEnv.
 
 (* 
 *** Local Variables: ***

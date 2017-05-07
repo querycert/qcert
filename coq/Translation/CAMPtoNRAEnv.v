@@ -136,12 +136,22 @@ Section CAMPtoNRAEnv.
   Qed.
 
   Section Top.
-    (* Java equivalent: CampToNra.convert *)
-    (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
-    Definition translate_camp_to_nraenv (p:camp) : nraenv :=
-      (* Produces the initial plan *)
-      NRAEnvAppEnv (nraenv_of_camp p) (NRAEnvConst (drec nil)).
+    Context (h:brand_relation_t).
 
+    (* Java equivalent: CampToNra.convert *)
+    Definition camp_to_nraenv_top (q:camp) : nraenv :=
+      (* Produces the initial plan *)
+      NRAEnvAppEnv (nraenv_of_camp q) (NRAEnvConst (drec nil)).
+
+    Theorem camp_to_nraenv_top_correct :
+      forall q:camp, forall global_env:bindings,
+          camp_eval_top h q global_env =
+          nraenv_eval_top h (camp_to_nraenv_top q) global_env.
+    Proof.
+      intros.
+      apply nraenv_of_camp_correct.
+    Qed.
+      
   End Top.
 
   Section size.

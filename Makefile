@@ -240,6 +240,7 @@ MODULES = \
 	Translation/ForeignToCloudant \
 	Translation/NRAtocNNRC \
 	Translation/cNRAEnvtocNNRC \
+	Translation/cNRAEnvtoNRA \
 	Translation/NRAEnvtoNNRC \
 	Translation/cNNRCtoCAMP \
 	Translation/NNRCtoNNRCMR \

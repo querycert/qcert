@@ -72,14 +72,6 @@ Section CAMPtocNRAEnv.
         ANEither (nraenv_fail) (nraenv_match ANID)
     end.
 
-  (** top level version sets up the appropriate input 
-      (with an empty context) 
-  *)
-
-  Definition nraenv_core_of_camp_top p :=
-    ANUnop AFlatten
-           (ANMap (nraenv_core_of_camp p) (ANUnop AColl ANID)).
-  
   (** Theorem 4.2: lemma of translation correctness for patterns *)
 
   Local Open Scope nra_scope.
@@ -175,6 +167,14 @@ Section CAMPtocNRAEnv.
     rewrite camp_trans_correct; reflexivity.
   Qed.
 
+  (** top level version sets up the appropriate input 
+      (with an empty context) 
+  *)
+
+  Definition nraenv_core_of_camp_top p :=
+    ANUnop AFlatten
+           (ANMap (nraenv_core_of_camp p) (ANUnop AColl ANID)).
+  
   Lemma nraenv_core_of_camp_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
     nra_eval h (nra_of_camp_top c p) d =
@@ -201,12 +201,23 @@ Section CAMPtocNRAEnv.
   Qed.
 
   Section Top.
+    Context (h:brand_relation_t).
+
     (* Java equivalent: CampToNra.convert *)
     (* Toplevel translation call XXX TODO: Why are there two??? XXX *)
-    Definition translate_camp_to_nraenv_core (p:camp) : nraenv_core :=
+    Definition camp_to_nraenv_core_top (p:camp) : nraenv_core :=
       (* Produces the initial plan *)
       ANAppEnv (nraenv_core_of_camp p) (ANConst (drec nil)).
 
+    Theorem camp_to_nraenv_core_top_correct :
+      forall q:camp, forall global_env:bindings,
+          camp_eval_top h q global_env =
+          nraenv_core_eval_top h (camp_to_nraenv_core_top q) global_env.
+    Proof.
+      intros.
+      apply nraenv_core_of_camp_correct.
+    Qed.
+      
   End Top.
 
   Section size.

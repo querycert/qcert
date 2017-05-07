@@ -57,6 +57,7 @@ Section CompDriver.
   Require Import CAMPtocNRAEnv.
   Require Import CAMPtoNRAEnv.
   Require Import NRAtocNNRC cNRAEnvtocNNRC NRAEnvtoNNRC.
+  Require Import cNRAEnvtoNRA.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
@@ -150,11 +151,11 @@ Section CompDriver.
 
     Definition designer_rule_to_camp (q:designer_rule) : camp := DesignRuletoCAMP.designer_rule_to_camp_top q.
 
-    Definition camp_to_nra (q:camp) : nra := nra_of_camp q.
+    Definition camp_to_nra (q:camp) : nra := CAMPtoNRA.camp_to_nra_top q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.translate_camp_to_nraenv_core q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.camp_to_nraenv_core_top q.
 
-    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.translate_camp_to_nraenv q.
+    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.camp_to_nraenv_top q.
 
     (** NRA/NRAEnv translations *)
     Definition nra_to_nraenv_core (q: nra) : nraenv_core := nraenv_core_of_nra q.
@@ -164,18 +165,16 @@ Section CompDriver.
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
       nraenv_core_to_nnrc_core_top init_vid init_venv q.
     
-    Definition nraenv_core_to_nra (q: nraenv_core) : nra := nra_of_nraenv_core q.
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra := cNRAEnvtoNRA.nraenv_core_to_nra_top q.
 
     Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv := nraenv_of_nraenv_core q.
 
     Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := nraenv_core_of_nraenv q.
 
-    Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
-      nraenv_to_nnrc_top q init_vid init_venv.
+    Definition nraenv_to_nnrc (q: nraenv) : nnrc := nraenv_to_nnrc_top q init_vid init_venv.
 
     (** NNRC translations *)
-    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
-      nnrc_to_nnrc_core q.
+    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core := nnrc_to_nnrc_core q.
   
     Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
       lift_nnrc_core (nnrcToCamp_let avoid) q. (* XXX avoid ? XXX *)

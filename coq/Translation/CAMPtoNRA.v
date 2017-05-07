@@ -436,6 +436,32 @@ Section CAMPtoNRA.
 
   End sugar.
 
+  Section Top.
+    Context (h:brand_relation_t).
+
+    Definition camp_to_nra_top (q:camp) : nra :=
+      AApp (nra_of_camp q) (nra_context AID (AConst (drec nil)) (AConst dunit)).
+
+    Theorem camp_to_nraenv_top_correct :
+      forall q:camp, forall global_env:bindings,
+          camp_eval_top h q global_env =
+          nra_eval_top h (camp_to_nra_top q) global_env.
+    Proof.
+      intros.
+      unfold camp_eval_top.
+      unfold nra_eval_top.
+      unfold camp_to_nra_top.
+      generalize (@camp_trans_correct h (rec_sort global_env) q nil dunit); intros.
+      unfold lift_failure in H.
+      rewrite H.
+      simpl.
+      rewrite drec_sort_idempotent.
+      unfold nra_context_data.
+      reflexivity.
+    Qed.
+      
+  End Top.
+  
 End CAMPtoNRA.
 
 (* 

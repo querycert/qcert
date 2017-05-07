@@ -53,6 +53,7 @@ Section NRA.
   (** NRA Semantics *)
 
   Context (h:list(string*string)).
+  Context (constant_env:list (string*data)).
   
   Fixpoint nra_eval (op:nra) (x:data) : option data :=
     match op with
@@ -126,10 +127,12 @@ Section NRA.
 
   (* evaluation preserves normalization *)
   Lemma nra_eval_normalized {op:nra} {d:data} {o} :
+    Forall (fun x => data_normalized h (snd x)) constant_env ->
     nra_eval op d = Some o ->
     data_normalized h d ->
     data_normalized h o.
   Proof.
+    intro HconstNorm.
     revert d o.
     induction op; simpl.
     - inversion 1; subst; trivial.
@@ -234,7 +237,7 @@ Section NRA.
       + repeat (destruct d0; try discriminate).
     - intros. specialize (IHop2 d).
       destruct (nra_eval op2 d); simpl in *; try discriminate.
-      eauto. 
+      eauto.
   Qed.
 
   Section Top.

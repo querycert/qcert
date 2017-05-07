@@ -25,7 +25,8 @@ Section DesignRuletoCAMP.
   
   Section Top.
     Context {fr:foreign_runtime}.
-    (** Note: Translation from CAMP Rules to CAMP is really macro-expansion *)
+
+    (** Note: Translation from Design Rules to CAMP is done in Java *)
     Definition designer_rule_to_camp_top (q:designer_rule) : camp := designer_rule_to_camp q.
   End Top.
     

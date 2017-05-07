@@ -258,7 +258,7 @@ Section CompilerUntypedTest.
     algopt5 ▷ τ >=> Coll tout1 ⊣ tinp1;(Rec Closed nil eq_refl).
   Proof.
     unfold algopt5, camp_to_nraenv_core.
-    unfold CAMPtocNRAEnv.translate_camp_to_nraenv_core.
+    unfold CAMPtocNRAEnv.camp_to_nraenv_core_top.
     unfold CAMPtocNRAEnv.nraenv_core_of_camp.
     econstructor; eauto.
     econstructor; eauto.
