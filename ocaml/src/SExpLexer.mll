@@ -59,6 +59,8 @@ rule token sbuff = parse
     { let s = Lexing.lexeme lexbuf in
       try Hashtbl.find keyword_table s
       with Not_found -> IDENT s }
+| ";;"
+    { comment 1 lexbuf; token sbuff lexbuf }
 | _
     { raise (LexError (Printf.sprintf "At offset %d: unexpected character.\n" (Lexing.lexeme_start lexbuf))) }
 
@@ -69,3 +71,12 @@ and string sbuff = parse
   | '"'    { let s = get_string sbuff in STRING s }  (* End of string *)
   | eof    { raise (LexError "String not terminated.\n") }
   | _      { add_char_to_string sbuff (Lexing.lexeme_char lexbuf 0); string sbuff lexbuf }
+
+and comment cpt = parse
+  | eof
+      { raise (LexError "Unterminated comment\n") }
+  | newline
+      { }
+  | _
+      { comment cpt lexbuf }
+
