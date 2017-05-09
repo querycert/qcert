@@ -41,7 +41,7 @@ Section TOptim.
 
   Context {m:basic_model}.
   
-  Lemma tand_comm {τin} (op1 op2 opl opr: τin ⇝ Bool) :
+  Lemma tand_comm {τc} {τin} (op1 op2 opl opr: τin ⇝ Bool ⊣ τc) :
     (`opl = `op2 ∧ `op1) ->
     (`opr = `op2 ∧ `op1) ->
     opl ≡τ opr.
@@ -53,8 +53,8 @@ Section TOptim.
     reflexivity.
   Qed.
 
-  Lemma tand_comm_arrow {τin} (op1 op2:nra) :
-    m ⊢ₐ τin ↦ Bool ⊧ (op1 ∧ op2) ⇒ (op2 ∧ op1).
+  Lemma tand_comm_arrow {τc} {τin} (op1 op2:nra) :
+    m ⊢ₐ τin ↦ Bool ⊣ τc ⊧ (op1 ∧ op2) ⇒ (op2 ∧ op1).
   Proof.
     intros.
     split.
@@ -67,17 +67,18 @@ Section TOptim.
 
   (* σ{P1}(σ{P2}(P3)) == σ{P2 ∧ P1}(P3)) *)
 
-  Lemma tselect_and_aux (x: data) τin τ (op op1 op2:nra) :
-    op ▷ τin >=> (Coll τ) ->
-    op1 ▷ τ >=> Bool ->
-    op2 ▷ τ >=> Bool ->
+  Lemma tselect_and_aux (x: data) c τc τin τ (op op1 op2:nra) :
+    op ▷ τin >=> (Coll τ) ⊣ τc ->
+    op1 ▷ τ >=> Bool ⊣ τc ->
+    op2 ▷ τ >=> Bool ⊣ τc ->
+    bindings_type c τc ->
     x ▹ τin ->
-    brand_relation_brands ⊢ (σ⟨ op1 ⟩(σ⟨ op2 ⟩(op))) @ₐ x =
-    brand_relation_brands ⊢ (σ⟨ op2 ∧ op1 ⟩(op)) @ₐ x.
+    brand_relation_brands ⊢ (σ⟨ op1 ⟩(σ⟨ op2 ⟩(op))) @ₐ x  ⊣ c =
+    brand_relation_brands ⊢ (σ⟨ op2 ∧ op1 ⟩(op)) @ₐ x ⊣ c.
   Proof.
-    intros; simpl.
-    assert (exists d, (brand_relation_brands ⊢ op@ₐx = Some d /\ (d ▹ (Coll τ))))
-      by (apply (@typed_nra_yields_typed_data m τin); assumption).
+    intros ? ? ? Hcenv; intros; simpl.
+    assert (exists d, (brand_relation_brands ⊢ op@ₐx ⊣ c = Some d /\ (d ▹ (Coll τ))))
+      by (apply (@typed_nra_yields_typed_data m τc τin); assumption).
     elim H3; clear H3; intros.
     elim H3; clear H3; intros.
     rewrite H3; clear H3; simpl.
@@ -96,60 +97,61 @@ Section TOptim.
     rewrite Forall_forall in H6; simpl in H6.
     assert (data_type a τ)
       by intuition.
-    assert (exists d, (brand_relation_brands ⊢ op2@ₐa = Some d /\ (d ▹ Bool)))
-      by (apply (@typed_nra_yields_typed_data m τ); assumption).
+    assert (exists d, (brand_relation_brands ⊢ op2@ₐa ⊣ c = Some d /\ (d ▹ Bool)))
+      by (apply (@typed_nra_yields_typed_data m τc τ); assumption).
     destruct H4 as [? [eqq dt]].
     rewrite eqq; clear eqq.
     dtype_inverter.
     unfold olift.
     destruct (       lift_filter
          (fun x' : data =>
-          match brand_relation_brands ⊢ op2 @ₐ x' with
+          match brand_relation_brands ⊢ op2 @ₐ x' ⊣ c with
           | Some (dbool b0) => Some b0
           | _ => None
           end) dl).
     - destruct x1.
       + simpl.
-        assert (exists d, (brand_relation_brands ⊢ op1@ₐa = Some d /\ (d ▹ Bool)))
-          by (apply (@typed_nra_yields_typed_data m τ); assumption).
+        assert (exists d, (brand_relation_brands ⊢ op1@ₐa ⊣ c = Some d /\ (d ▹ Bool)))
+          by (apply (@typed_nra_yields_typed_data m τc τ); assumption).
         destruct H4 as [? [eqq dt]].
         rewrite eqq; clear eqq.
         dtype_inverter.
         reflexivity.
-      + assert (exists d, (brand_relation_brands ⊢ op1@ₐa = Some d /\ (d ▹ Bool)))
-          by (apply (@typed_nra_yields_typed_data m τ); assumption).
+      + assert (exists d, (brand_relation_brands ⊢ op1@ₐa ⊣ c = Some d /\ (d ▹ Bool)))
+          by (apply (@typed_nra_yields_typed_data m τc τ); assumption).
         destruct H4 as [? [eqq dt]].
         rewrite eqq; clear eqq.
         dtype_inverter.
         destruct (lift_filter
      (fun x' : data =>
-      match brand_relation_brands ⊢ op1 @ₐ x' with
+      match brand_relation_brands ⊢ op1 @ₐ x' ⊣ c with
       | Some (dbool b0) => Some b0
       | _ => None
       end) l); reflexivity.
-    - destruct (brand_relation_brands ⊢ op1@ₐa); try reflexivity.
+    - destruct (brand_relation_brands ⊢ op1@ₐa ⊣ c); try reflexivity.
       destruct d; reflexivity.
   Qed.      
 
-  Lemma tselect_and {τin τ} (op opl opr: τin ⇝ (Coll τ)) (op1 op2:τ ⇝ Bool) :
+  Lemma tselect_and {τc} {τin τ} (op opl opr: τin ⇝ (Coll τ) ⊣ τc) (op1 op2:τ ⇝ Bool ⊣ τc) :
     (`opl = σ⟨ `op1 ⟩(σ⟨ `op2 ⟩(`op))) ->
     (`opr = σ⟨ `op2 ∧ `op1 ⟩(`op)) ->
     (opl ≡τ opr).
   Proof.
     unfold tnra_eq; intros.
     rewrite H; rewrite H0.
-    rewrite (tselect_and_aux x τin τ).
+    rewrite (tselect_and_aux x c τc τin τ).
     reflexivity.
     apply (proj2_sig op).
     apply (proj2_sig op1).
     apply (proj2_sig op2).
+    assumption.
     assumption.
   Qed.
 
   (* σ⟨ P1 ⟩(σ⟨ P2 ⟩(P3)) == σ⟨ P2 ⟩(σ⟨ P1 ⟩(P3)) *)
 
   (* This is the first rewrite done at algebra level, using nra_eq. *)
-  Lemma tselect_comm_nra {τin τ} (op1 op2:τ ⇝ Bool) (op opl opr: τin ⇝ (Coll τ)) :
+  Lemma tselect_comm_nra {τc} {τin τ} (op1 op2:τ ⇝ Bool ⊣ τc) (op opl opr: τin ⇝ (Coll τ) ⊣ τc) :
     (`opl = σ⟨ `op1 ⟩(σ⟨ `op2 ⟩(`op))) ->
     (`opr = σ⟨ `op2 ⟩(σ⟨ `op1 ⟩(`op))) ->
     opl ≡τ opr.
@@ -157,13 +159,13 @@ Section TOptim.
     intros.
     unfold tnra_eq; intros.
     rewrite H; rewrite H0.
-    rewrite (tselect_and_aux x τin τ); try assumption.
-    rewrite (tselect_and_aux x τin τ); try assumption.
+    rewrite (tselect_and_aux x c τc τin τ); try assumption.
+    rewrite (tselect_and_aux x c τc τin τ); try assumption.
     generalize and_comm; intros.
     assert ((σ⟨ ` op2 ∧ ` op1 ⟩( ` op)) ≡ₐ (σ⟨ ` op1 ∧ ` op2 ⟩( ` op))).
-    rewrite (H2 (`op1) (`op2)).
+    rewrite (H1 (`op1) (`op2)).
     reflexivity.
-    rewrite H3 by eauto.
+    rewrite H2 by eauto.
     reflexivity.
     apply (proj2_sig op).
     apply (proj2_sig op2).
@@ -173,39 +175,41 @@ Section TOptim.
     apply (proj2_sig op2).
   Qed.
 
-  Lemma tselect_comm {τin τ} x (op: τin ⇝ (Coll τ)) (op1 op2:τ ⇝ Bool) :
+  Lemma tselect_comm {τc} {τin τ} c x (op: τin ⇝ (Coll τ) ⊣ τc) (op1 op2:τ ⇝ Bool ⊣ τc) :
+    bindings_type c τc ->
     x ▹ τin ->
-    (brand_relation_brands ⊢ σ⟨ `op1 ⟩(σ⟨ `op2 ⟩(`op)) @ₐ x ) = (brand_relation_brands ⊢ σ⟨ `op2 ⟩(σ⟨ `op1 ⟩(`op)) @ₐ x).
+    (brand_relation_brands ⊢ σ⟨ `op1 ⟩(σ⟨ `op2 ⟩(`op)) @ₐ x ⊣ c) = (brand_relation_brands ⊢ σ⟨ `op2 ⟩(σ⟨ `op1 ⟩(`op)) @ₐ x ⊣ c).
   Proof.
-    generalize (@tselect_comm_nra τin); intros.
+    generalize (@tselect_comm_nra τc τin); intros.
     unfold tnra_eq in H.
     specialize (H τ op1 op2 op).
-    assert (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( ` op)) ▷ τin >=> Coll τ).
+    assert (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( ` op)) ▷ τin >=> Coll τ ⊣ τc).
     apply ATSelect.
     apply (proj2_sig op1).
     apply ATSelect.
     apply (proj2_sig op2).
     apply (proj2_sig op).
-    assert (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩( ` op)) ▷ τin >=> Coll τ).
+    assert (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩( ` op)) ▷ τin >=> Coll τ ⊣ τc).
     apply ATSelect.
     apply (proj2_sig op2).
     apply ATSelect.
     apply (proj2_sig op1).
     apply (proj2_sig op).
-    assert (exists opl:τin ⇝ Coll τ, `opl = σ⟨ `op1 ⟩( σ⟨ `op2 ⟩(`op))).
-    revert H1.
-    generalize (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( `op))); intros.
-    exists (exist (fun op => nra_type op τin (Coll τ)) n H1).
-    reflexivity.
-    assert (exists opr:τin ⇝ Coll τ, `opr = σ⟨ `op2 ⟩( σ⟨ `op1 ⟩(`op))).
+    assert (exists opl:τin ⇝ Coll τ ⊣ τc, `opl = σ⟨ `op1 ⟩( σ⟨ `op2 ⟩(`op))).
     revert H2.
-    generalize (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩(`op))); intros.
-    exists (exist (fun op => nra_type op τin (Coll τ)) n H2).
+    generalize (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( `op))); intros.
+    exists (exist (fun op => nra_type τc op τin (Coll τ)) n H2).
     reflexivity.
-    elim H3; elim H4; intros.
-    rewrite <- H5.
+    assert (exists opr:τin ⇝ Coll τ ⊣ τc, `opr = σ⟨ `op2 ⟩( σ⟨ `op1 ⟩(`op))).
+    revert H3.
+    generalize (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩(`op))); intros.
+    exists (exist (fun op => nra_type τc op τin (Coll τ)) n H3).
+    reflexivity.
+    elim H4; elim H5; intros.
     rewrite <- H6.
+    rewrite <- H7.
     apply (H x1 x0).
+    assumption.
     assumption.
     assumption.
     assumption.
@@ -221,25 +225,26 @@ Section TOptim.
     exact b.
   Defined.
 
-  Definition typed_nra_total_bool {τ} (op:τ ⇝ Bool):
+  Definition typed_nra_total_bool {τc} {τ} c (op:τ ⇝ Bool ⊣ τc):
+    bindings_type c τc ->
     {x:data|(x ▹ τ)} -> bool.
   Proof.
     intros.
     apply tunbox_bool.
-    apply (@typed_nra_total m τ Bool (`op) (proj2_sig op) (`H)).
-    elim H; intros.
+    apply (@typed_nra_total m τc τ Bool (`op) (proj2_sig op) c (`H0) H).
+    elim H0; intros.
     exact p.
   Defined.
 
-  Lemma typed_nra_total_bool_consistent {τ} (op:τ ⇝ Bool) (d: {x:data|(x ▹ τ)}) :
-    match (brand_relation_brands ⊢ `op@ₐ`d) with
+  Lemma typed_nra_total_bool_consistent {τc} {τ} c (op:τ ⇝ Bool ⊣ τc) (d: {x:data|(x ▹ τ)}) (Hcenv:bindings_type c τc) :
+    match (brand_relation_brands ⊢ `op@ₐ`d ⊣ c) with
       | Some (dbool b) => Some b
       | _ => None
-    end = Some (typed_nra_total_bool op d).
+    end = Some (typed_nra_total_bool c op Hcenv d).
   Proof.
     unfold typed_nra_total_bool.
     unfold typed_nra_total.
-    generalize (typed_nra_yields_typed_data (`d) (`op) (sig_ind (fun H : {x : data | x ▹ τ} => ` H ▹ τ)
+    generalize (typed_nra_yields_typed_data c (`d) (`op) Hcenv (sig_ind (fun H : {x : data | x ▹ τ} => ` H ▹ τ)
                  (fun (x : data) (p : x ▹ τ) => p) d) 
                                             (proj2_sig op)); intros.
     destruct e; simpl.
@@ -249,26 +254,27 @@ Section TOptim.
     reflexivity.
   Qed.
 
-  Lemma typed_nra_total_bool_consistent2 {τ} (op:τ ⇝ Bool) (x:data) (pf:(x ▹ τ)) :
-    match (brand_relation_brands ⊢ `op@ₐx) with
+  Lemma typed_nra_total_bool_consistent2 {τc} {τ} c (op:τ ⇝ Bool ⊣ τc) (x:data) (pf:(x ▹ τ)) (Hcenv:bindings_type c τc) :
+    match (brand_relation_brands ⊢ `op@ₐx ⊣ c) with
       | Some (dbool b) => Some b
       | _ => None
-    end = Some (typed_nra_total_bool op (exist _ x pf)).
+    end = Some (typed_nra_total_bool c op Hcenv (exist _ x pf)).
   Proof.
-    apply (typed_nra_total_bool_consistent op (exist _ x pf)).
+    apply (typed_nra_total_bool_consistent c op (exist _ x pf)).
   Qed.
   
-  Lemma typed_lifted_predicate {τ} (op:τ ⇝ Bool) (d:data):
+  Lemma typed_lifted_predicate {τc} {τ} (op:τ ⇝ Bool ⊣ τc) c (d:data):
+    bindings_type c τc ->
     data_type d τ ->
     exists b' : bool,
       (fun x' : data =>
-         match brand_relation_brands ⊢ (`op)@ₐ x' with
+         match brand_relation_brands ⊢ (`op)@ₐ x' ⊣ c with
            | Some (dbool b) => Some b
            | _ => None
          end) d = Some b'.
   Proof.
     intros.
-    exists (typed_nra_total_bool op (exist _ d H)).
+    exists (typed_nra_total_bool c op H (exist _ d H0)).
     apply typed_nra_total_bool_consistent2.
   Qed.
 
@@ -373,22 +379,23 @@ Section TOptim.
         congruence.
   Qed.
 
-  Lemma minus_select_distr {τin τ} (op:τ ⇝ Bool) (op1 op2 opl opr: τin ⇝ (Coll τ)) :
+  Lemma minus_select_distr {τc} {τin τ} (op:τ ⇝ Bool ⊣ τc) (op1 op2 opl opr: τin ⇝ (Coll τ) ⊣ τc) :
     (`opl = σ⟨`op⟩(`op1 − `op2)) ->
     (`opr = σ⟨`op⟩(`op1) − σ⟨`op⟩(`op2)) ->
     opl ≡τ opr.
   Proof.
-    unfold tnra_eq; intros.
+    unfold tnra_eq.
+    intros ? ? x c ? Hcenv.
     rewrite H; rewrite H0; clear H H0 opl opr; simpl.
-    assert (exists d1, (brand_relation_brands ⊢ `op1@ₐx = Some d1 /\ (d1 ▹ (Coll τ))))
-      by (apply (@typed_nra_yields_typed_data m τin); [assumption|apply (proj2_sig op1)]).
-    assert (exists d2, (brand_relation_brands ⊢ `op2@ₐx = Some d2 /\ (d2 ▹ (Coll τ))))
-      by (apply (@typed_nra_yields_typed_data m τin); [assumption|apply (proj2_sig op2)]).
+    assert (exists d1, (brand_relation_brands ⊢ `op1@ₐx ⊣ c = Some d1 /\ (d1 ▹ (Coll τ))))
+      by (apply (@typed_nra_yields_typed_data m τc τin); [assumption|assumption|apply (proj2_sig op1)]).
+    assert (exists d2, (brand_relation_brands ⊢ `op2@ₐx ⊣ c = Some d2 /\ (d2 ▹ (Coll τ))))
+      by (apply (@typed_nra_yields_typed_data m τc τin); [assumption|assumption|apply (proj2_sig op2)]).
     elim H; elim H0; clear H H0; intros.
     elim H; elim H0; clear H H0; intros.
-    rewrite H; rewrite H2; clear H H2.
+    rewrite H; rewrite H1; clear H H1.
     simpl.
-    invcs H0; invcs H3.
+    invcs H0; invcs H2.
     rtype_equalizer.
     subst.
     simpl.
@@ -398,20 +405,20 @@ Section TOptim.
                          data_type d τ ->
                          exists b' : bool,
                            f d = Some b') /\ f = ((fun x' : data =>
-         match brand_relation_brands ⊢ (` op) @ₐ x' with
+         match brand_relation_brands ⊢ (` op) @ₐ x' ⊣ c with
          | Some (dbool b) => Some b
          | _ => None
          end))).
     exists  ((fun x' : data =>
-         match brand_relation_brands ⊢ (` op) @ₐ x' with
+         match brand_relation_brands ⊢ (` op) @ₐ x' ⊣ c with
          | Some (dbool b) => Some b
          | _ => None
          end));
-      split; [apply typed_lifted_predicate|reflexivity].
+      split. intros. apply typed_lifted_predicate; try assumption. reflexivity.
     destruct H0 as [? [eqq dt]].
     revert dt.
     generalize ((fun x' : data =>
-       match brand_relation_brands ⊢ (` op) @ₐ x' with
+       match brand_relation_brands ⊢ (` op) @ₐ x' ⊣ c with
        | Some (dbool b) => Some b
        | _ => None
        end)); intros.

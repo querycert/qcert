@@ -27,10 +27,13 @@ Section NRAExt.
   Context {fruntime:foreign_runtime}.
 
   Definition nraext_eq (op1 op2:nraext) : Prop :=
-    forall h:list(string*string),
-    forall x:data,
-      data_normalized h x ->
-      h ⊢ op1 @ₓ x = h ⊢ op2 @ₓ x.
+    forall
+      (h:list(string*string))
+      (c:list (string*data))
+      (dn_c:Forall (fun d => data_normalized h (snd d)) c)
+      (x:data)
+      (dn_x:data_normalized h x),
+      h ⊢ op1 @ₓ x ⊣ c = h ⊢ op2 @ₓ x ⊣ c.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -44,9 +47,9 @@ Section NRAExt.
     - unfold Reflexive, nraext_eq.
       intros; reflexivity.
     - unfold Symmetric, nraext_eq.
-      intros; rewrite (H h x0) by trivial; reflexivity.
+      intros; rewrite (H h c dn_c x0) by trivial; reflexivity.
     - unfold Transitive, nraext_eq.
-      intros; rewrite (H h x0) by trivial; rewrite (H0 h x0) by trivial; reflexivity.
+      intros; rewrite (H h c dn_c x0) by trivial; rewrite (H0 h c dn_c x0) by trivial; reflexivity.
   Qed.
 
   Definition nraext_eq_nra_eq (op1 op2:nraext) : nraext_eq op1 op2 <-> nra_eq (nra_of_nraext op1) (nra_of_nraext op2).
@@ -117,15 +120,15 @@ Section NRAExt.
   Global Instance eaeither_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXEither.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros; simpl.
-    destruct x1; simpl; trivial; inversion H1; subst; eauto.
+    destruct x1; simpl; trivial; inversion dn_x; subst; eauto.
   Qed.
 
   (* AXEitherConcat *)
   Global Instance eaeitherconcat_proper : Proper (nraext_eq ==> nraext_eq ==> nraext_eq) AXEitherConcat.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros; simpl.
-    rewrite (H0 h x1) by trivial; rewrite (H h x1) by trivial.
-    case_eq (h ⊢ nra_of_nraext y0 @ₐ x1); case_eq (h ⊢ nra_of_nraext y @ₐ x1); intros; simpl; trivial.
+    rewrite (H0 h c dn_c x1) by trivial; rewrite (H h c dn_c x1) by trivial.
+    case_eq (h ⊢ nra_of_nraext y0 @ₐ x1 ⊣ c); case_eq (h ⊢ nra_of_nraext y @ₐ x1 ⊣ c); intros; simpl; trivial.
   Qed.
   
   (* AXDefault *)
@@ -140,6 +143,13 @@ Section NRAExt.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aapp_proper; assumption.
+  Qed.
+
+  (* AXGetConstant *)
+  Global Instance eagetconstant_proper s : Proper (nraext_eq) (AXGetConstant s).
+  Proof.
+    unfold Proper, respectful, nraext_eq; intros; simpl.
+    reflexivity.
   Qed.
 
   (* AXJoin *)

@@ -605,22 +605,22 @@ Section TcNRAEnv.
   (** Auxiliary lemmas specific to some of the NRA expressions used in
   the translation *)
 
-  Definition nra_context_type tconst tbind tpid : rtype := 
-    Rec Closed (("PBIND"%string,tbind) :: ("PCONST"%string,tconst) :: ("PDATA"%string,tpid) :: nil) (eq_refl _).
+  Definition nra_context_type tbind tpid : rtype := 
+    Rec Closed (("PBIND"%string,tbind) :: ("PDATA"%string,tpid) :: nil) (eq_refl _).
 
-  Lemma ATdot {p s τin τ pf τout}:
-      p  ▷ τin >=> Rec Closed τ pf ->
+  Lemma ATdot {p s τc τin τ pf τout}:
+      p  ▷ τin >=> Rec Closed τ pf ⊣ τc ->
       tdot τ s = Some τout ->
-      AUnop (ADot s) p ▷ τin >=> τout.
+      AUnop (ADot s) p ▷ τin >=> τout ⊣ τc.
   Proof.
     intros.
     repeat econstructor; eauto.
   Qed.
 
-  Lemma ATdot_inv {p s τin τout}:
-      AUnop (ADot s) p ▷ τin >=> τout ->
+  Lemma ATdot_inv {p s τc τin τout}:
+      AUnop (ADot s) p ▷ τin >=> τout ⊣ τc ->
       exists τ pf k,
-      p  ▷ τin >=> Rec k τ pf /\
+      p  ▷ τin >=> Rec k τ pf ⊣ τc /\
       tdot τ s = Some τout.
   Proof.
     inversion 1; subst.
@@ -629,7 +629,7 @@ Section TcNRAEnv.
   Qed.
 
   Lemma ATnra_data τc τ τin :
-    nra_data ▷ nra_context_type τc τ τin >=> τin.
+    nra_data ▷ nra_context_type τ τin >=> τin ⊣ τc.
   Proof.
     eapply ATdot.
     - econstructor.
@@ -637,7 +637,7 @@ Section TcNRAEnv.
   Qed.
 
   Lemma ATnra_data_inv' k τc τ τin pf τout:
-      nra_data ▷ Rec k [("PBIND"%string, τ); ("PCONST"%string, τc); ("PDATA"%string, τin)] pf >=> τout ->
+      nra_data ▷ Rec k [("PBIND"%string, τ); ("PDATA"%string, τin)] pf >=> τout ⊣ τc ->
       τin = τout.
   Proof.
     unfold nra_data.
@@ -648,14 +648,13 @@ Section TcNRAEnv.
     destruct τ'; inversion H3; clear H3; subst.
     destruct τ'; inversion H4; clear H4; subst.
     destruct τ'; inversion H6; clear H6; subst.
-    destruct τ'; inversion H8; clear H8; subst.
     rtype_equalizer. subst.
-    destruct p; destruct p0; destruct p1; simpl in *; subst.
+    destruct p; destruct p0; simpl in *; subst.
     inversion H0; trivial.
   Qed.
     
   Lemma ATnra_data_inv τc τ τin τout:
-    nra_data ▷ nra_context_type τc τ τin >=> τout ->
+    nra_data ▷ nra_context_type τ τin >=> τout ⊣ τc ->
     τin = τout.
   Proof.
     unfold nra_context_type.
@@ -685,12 +684,12 @@ Section TcNRAEnv.
             op).
  *)
   
-  Lemma ATunnest_two (s1 s2:string) (op:NRA.nra) τin τ₁ pf1 τs τrem pf2 :
-    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ->
+  Lemma ATunnest_two (s1 s2:string) (op:NRA.nra) τc τin τ₁ pf1 τs τrem pf2 :
+    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ⊣ τc ->
     tdot τ₁ s1 = Some (Coll τs) ->
     τrem = (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1) ->
     NRAExt.unnest_two s1 s2 op ▷ 
-               τin >=> Coll (Rec Closed τrem pf2).
+               τin >=> Coll (Rec Closed τrem pf2) ⊣ τc.
   Proof.
     intros; subst.
     econstructor; eauto.
@@ -705,21 +704,21 @@ Section TcNRAEnv.
     | [H: `?τ₁ = Coll₀ (`?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
     | [H:  Coll₀ (`?τ₂) = `?τ₁ |- _] => symmetry in H
     (* Note: do not generalize too hastily on unaryOp/binOp constructors *)
-    | [H:@nra_type _  AID _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AMap _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AMapConcat _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AEither _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AEitherConcat _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (ARecEither _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (ADefault _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AApp _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AProduct _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (ASelect _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AUnop _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (ABinop _ _ _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _  (AConst _) _ _ |- _ ] => inversion H; clear H
-    | [H:@nra_type _ (nra_data) _ _ |- _ ] => apply ATnra_data_inv' in H
-    | [H:@nra_type _ (nra_data) (nra_context_type _ _) _ |- _ ] => apply ATnra_data_inv in H
+    | [H:@nra_type _ _ AID _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AMap _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AMapConcat _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AEither _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AEitherConcat _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (ARecEither _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (ADefault _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AApp _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AProduct _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (ASelect _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AUnop _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (ABinop _ _ _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (AConst _) _ _ |- _ ] => inversion H; clear H
+    | [H:@nra_type _ _ (nra_data) _ _ |- _ ] => apply ATnra_data_inv' in H
+    | [H:@nra_type _ _ (nra_data) (nra_context_type _ _) _ |- _ ] => apply ATnra_data_inv in H
     | [H: (_,_)  = (_,_) |- _ ] => inversion H; clear H
     | [H: map (fun x2 : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                  (fst x2, ` (snd x2))) ?x0 = [] |- _] => apply (map_rtype_nil x0) in H; simpl in H; subst
@@ -755,11 +754,11 @@ Section TcNRAEnv.
     | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
   end; try rtype_equalizer; try assumption; try subst; simpl in *; try nra_inverter.
 
-  Lemma ATunnest_two_inv (s1 s2:string) (op:NRA.nra) τin rec  :
+  Lemma ATunnest_two_inv (s1 s2:string) (op:NRA.nra) τc τin rec  :
     unnest_two s1 s2 op ▷ 
-                       τin >=> Coll rec ->
+                       τin >=> Coll rec ⊣ τc ->
     exists τ₁ pf1 τs τrem pf2,
-    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) /\
+    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ⊣ τc /\
     tdot τ₁ s1 = Some (Coll τs) /\
     rec = (Rec Closed τrem pf2) /\
     τrem = (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1).
@@ -771,17 +770,17 @@ Section TcNRAEnv.
     repeat eexists; intuition; eauto.
   Qed.
     
-    Lemma ATRecEither s τl τr pf1 pf2:
-      nra_type (ARecEither s) (Either τl τr)
-               (Either
-                  (Rec Closed ((s,τl)::nil) pf1)
-                  (Rec Closed ((s,τr)::nil) pf2)).
-    Proof.
-      econstructor; eauto.
-    Qed.
-
-    Theorem typed_nraenv_core_to_typed_nra {τc} pf {τenv τin τout} (op:nraenv_core):
-    (nraenv_core_type τc op τenv τin τout) -> (nra_type (nra_of_nraenv_core op) (nra_context_type (Rec Closed τc pf) τenv τin) τout).
+  Lemma ATRecEither s τc τl τr pf1 pf2:
+    nra_type τc (ARecEither s) (Either τl τr)
+             (Either
+                (Rec Closed ((s,τl)::nil) pf1)
+                (Rec Closed ((s,τr)::nil) pf2)).
+  Proof.
+    econstructor; eauto.
+  Qed.
+  
+  Theorem typed_nraenv_core_to_typed_nra {τc} {τenv τin τout} (op:nraenv_core):
+    (nraenv_core_type τc op τenv τin τout) -> (nra_type τc (nra_of_nraenv_core op) (nra_context_type τenv τin) τout).
   Proof.
     intros.
     dependent induction H; simpl; intros.
@@ -794,24 +793,21 @@ Section TcNRAEnv.
     (* ANUnop *)
     - eauto.
     (* ANMap *)
-    - apply (@ATMap m (nra_context_type (Rec Closed τc pf) τenv τin) (nra_context_type (Rec Closed τc pf) τenv τ₁) τ₂); try assumption.
+    - apply (@ATMap m τc (nra_context_type τenv τin) (nra_context_type τenv τ₁) τ₂); try assumption.
       eapply ATunnest_two.
       eapply (ATUnop). eauto.
-      unfold nra_wrap_a1, nra_triple.
+      unfold nra_wrap_a1, nra_double.
       eapply ATBinop. eauto.
       eapply (ATUnop). eauto.
       eapply ATUnop; eauto.
       eapply ATDot. unfold tdot, edot; simpl. auto.
-      eapply ATBinop. eauto.
       eapply (ATUnop). eauto.
-      eapply ATUnop; eauto.
-      eapply ATDot. unfold tdot, edot; simpl. auto.
-      eapply ATUnop; eauto.
+      eauto.
       unfold tdot, edot; auto.
       reflexivity.
       reflexivity.
     (* ANMapConcat *)
-    - apply (@ATMap m (nra_context_type (Rec Closed τc pf) τenv τin) (Rec Closed (("PBIND"%string, τenv) :: ("PCONST"%string,  (Rec Closed τc pf)) :: ("PDATA"%string, (Rec Closed τ₁ pf1)) :: ("PDATA2"%string, (Rec Closed τ₂ pf2)) :: nil) (eq_refl _))).
+    - apply (@ATMap m τc (nra_context_type τenv τin) (Rec Closed (("PBIND"%string, τenv) :: ("PDATA"%string, (Rec Closed τ₁ pf1)) :: ("PDATA2"%string, (Rec Closed τ₂ pf2)) :: nil) (eq_refl _))).
       econstructor; eauto.
       econstructor; eauto.
       econstructor; eauto.
@@ -819,25 +815,21 @@ Section TcNRAEnv.
       econstructor; eauto.
       econstructor; eauto.
       reflexivity.
-      apply (@ATMapConcat m (nra_context_type  (Rec Closed τc pf) τenv τin)
-                          [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, Rec Closed τ₁ pf1)]
+      apply (@ATMapConcat m τc (nra_context_type τenv τin)
+                          [("PBIND"%string, τenv); ("PDATA"%string, Rec Closed τ₁ pf1)]
                           [("PDATA2"%string, (Rec Closed τ₂ pf2))]
-                          [("PBIND"%string, τenv);  ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, Rec Closed τ₁ pf1); ("PDATA2"%string, Rec Closed τ₂ pf2)]
+                          [("PBIND"%string, τenv); ("PDATA"%string, Rec Closed τ₁ pf1); ("PDATA2"%string, Rec Closed τ₂ pf2)]
                           (AMap (AUnop (ARec "PDATA2") AID) (nra_of_nraenv_core op1))
                           (unnest_two "a1" "PDATA" (AUnop AColl (nra_wrap_a1 (nra_of_nraenv_core op2))))
                           eq_refl eq_refl
             ); try reflexivity.
       eauto.
       unfold nra_wrap_a1.
-      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (nra_triple "PCONST" "PBIND" "a1" nra_const_env nra_bind (nra_of_nraenv_core op2))) (nra_context_type  (Rec Closed τc pf) τenv τin) [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
-      apply (@ATUnop m (nra_context_type  (Rec Closed τc pf) τenv τin) (Rec Closed [("PBIND"%string, τenv);  ("PCONST"%string,  (Rec Closed τc pf)); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)).
+      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (nra_double "PBIND" "a1" nra_bind (nra_of_nraenv_core op2))) τc (nra_context_type τenv τin) [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
+      apply (@ATUnop m τc (nra_context_type τenv τin) (Rec Closed [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)).
       econstructor; eauto.
-      unfold nra_triple, nra_bind.
-      apply (@ATBinop m (nra_context_type  (Rec Closed τc pf) τenv τin) (Rec Closed [("PCONST"%string,  (Rec Closed τc pf))] eq_refl) (Rec Closed [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)); try eauto.
-      + econstructor; eauto.
-        econstructor; eauto.
-        econstructor; eauto.
-      + apply (@ATBinop m (nra_context_type  (Rec Closed τc pf) τenv τin) (Rec Closed [("PBIND"%string, τenv)] eq_refl) (Rec Closed [("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)); try eauto.
+      unfold nra_double, nra_bind.
+      apply (@ATBinop m τc (nra_context_type  τenv τin) (Rec Closed [("PBIND"%string, τenv)] eq_refl) (Rec Closed [("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)); try eauto.
         econstructor; eauto.
 
         econstructor; eauto.
@@ -849,7 +841,7 @@ Section TcNRAEnv.
       econstructor; eauto.
       eapply ATunnest_two.
       + econstructor; eauto.
-        unfold nra_wrap_a1, nra_triple.
+        unfold nra_wrap_a1, nra_double.
         eapply ATBinop.
         * econstructor; reflexivity.
         * econstructor; eauto.
@@ -857,10 +849,6 @@ Section TcNRAEnv.
           econstructor; eauto.
           reflexivity.
         * econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
-          reflexivity.
       + reflexivity.
       + unfold rremove; reflexivity.
     (* ANDefault *)
@@ -878,135 +866,114 @@ Section TcNRAEnv.
             - econstructor; eauto.
               econstructor; eauto.
               econstructor; eauto.
-              reflexivity.
-            - econstructor; eauto.
-              econstructor; eauto.
-              econstructor; eauto.
-              reflexivity.
+            
           } 
       + econstructor; eauto.
     (* ANEitherConcat *)
     - eauto.
     (* ANApp *)
-    - apply (@ATApp m (nra_context_type  (Rec Closed τc pf) τenv τin) (nra_context_type  (Rec Closed τc pf) τenv τ1) τ2).
-      + unfold nra_context, nra_bind, nra_context_type, nra_triple; simpl.
+    - apply (@ATApp m τc (nra_context_type τenv τin) (nra_context_type τenv τ1) τ2).
+      + unfold nra_context, nra_bind, nra_context_type, nra_double; simpl.
         unfold nra_wrap.
-        apply (@ATBinop m (Rec Closed [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PCONST"%string,  (Rec Closed τc pf))::nil) (eq_refl _)) (Rec Closed (("PBIND"%string, τenv)::("PDATA"%string, τ1)::nil) (eq_refl _))).
-        * econstructor; eauto.
-        * econstructor; eauto.
-          econstructor; eauto.
-          econstructor; eauto.
-        * { apply (@ATBinop m (Rec Closed [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv)::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τ1)::nil) (eq_refl _))).
-            - econstructor; eauto.
-            - econstructor; eauto.
-              econstructor; eauto.
-              econstructor; eauto.
-            - econstructor; eauto.
-          }
+        apply (@ATBinop m τc (Rec Closed [("PBIND"%string, τenv); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv)::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τ1)::nil) (eq_refl _))).
+        econstructor; eauto.
+        econstructor; eauto.
+        econstructor; eauto.
+        econstructor; eauto.
+        econstructor; eauto.
       + trivial.
     (* ANGetConstant *)
     - unfold nra_bind, nra_context_type.
       econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      reflexivity.
     (* ANEnv *)
     - unfold nra_bind, nra_context_type. eauto.
     (* ANAppEnv *)
-    - apply (@ATApp m (nra_context_type  (Rec Closed τc pf) τenv τin) (nra_context_type  (Rec Closed τc pf) τenv' τin) τ2).
-      + unfold nra_context, nra_bind, nra_context_type, nra_triple; simpl.
-        apply (@ATBinop m (Rec Closed [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PCONST"%string, (Rec Closed τc pf))::nil) (eq_refl _)) (Rec Closed (("PBIND"%string, τenv')::("PDATA"%string, τin)::nil) (eq_refl _))).
-        * econstructor; eauto.
-        * do 3 ( econstructor; eauto).
-        * { apply (@ATBinop m (Rec Closed [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf)); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv')::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τin)::nil) (eq_refl _))).
-            - econstructor; eauto.
-            - do 3 (econstructor; eauto).
-            - do 3 (econstructor; eauto).
-          }
+    - apply (@ATApp m τc (nra_context_type τenv τin) (nra_context_type τenv' τin) τ2).
+      + unfold nra_context, nra_bind, nra_context_type, nra_double; simpl.
+        apply (@ATBinop m τc (Rec Closed [("PBIND"%string, τenv); ("PDATA"%string, τin)] eq_refl) (Rec Closed (("PBIND"%string, τenv')::nil) (eq_refl _)) (Rec Closed (("PDATA"%string, τin)::nil) (eq_refl _))).
+        econstructor; eauto.
+        do 3 (econstructor; eauto).
+        do 3 (econstructor; eauto).
       + trivial.
     (* ANMapEnv *)
     - econstructor; eauto.
       eapply ATunnest_two.
       + econstructor; eauto.
-        unfold nra_wrap_bind_a1, nra_triple.
+        unfold nra_wrap_bind_a1, nra_double.
         eapply ATBinop; eauto.
         * do 3 (econstructor; eauto).
-          reflexivity.
-        * eapply ATBinop; eauto.
-          do 3 (econstructor; eauto).
           reflexivity.
       + reflexivity.
       + simpl; trivial.
       Grab Existential Variables.
       eauto. eauto. eauto. eauto. eauto. 
       eauto. eauto. eauto. eauto. eauto.
-      eauto. eauto. eauto. eauto. eauto.
-      eauto. eauto. eauto. eauto. eauto.
+      eauto. eauto.
   Qed.
 
-  Lemma fold_nra_context_type (c env d: {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true}) pf :
-    Rec Closed [("PBIND"%string, env); ("PCONST"%string, c); ("PDATA"%string, d)] pf
-    = nra_context_type c env d.
+  Lemma fold_nra_context_type (env d: {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true}) pf :
+    Rec Closed [("PBIND"%string, env); ("PDATA"%string, d)] pf
+    = nra_context_type env d.
   Proof.
     unfold nra_context_type.
     erewrite Rec_pr_irrel; eauto.
   Qed.
 
-      Ltac defst l
-        := match l with
-             | @nil (string*rtype₀) => constr:(@nil (string*rtype))
-             | cons (?x,proj1_sig ?y) ?l' =>
-               let l'' := defst l' in
-               constr:(cons (x,y) l'')
-           end.
-
-      Ltac rec_proj_simpler
-        := repeat
-             match goal with
-               | [H: Rec₀ ?k ?l = proj1_sig ?τ |- _ ] => symmetry in H
-               | [H: proj1_sig ?τ = Rec₀ ?k ?l |- _ ] =>
-                 let ll := defst l in
-                 let HH:=fresh "eqq" in
-                 generalize (@Rec₀_eq_proj1_Rec _ _ τ k ll); intros HH;
-                 simpl in HH; specialize (HH H); clear H; destruct HH;
-                 try subst τ
-             end.
-
-      Require Import Eqdep_dec.
-      Require Import Bool.
-      
-      Lemma UIP_bool {a b:bool} (pf1 pf2:a = b) : pf1 = pf2.
-      Proof.
-        apply UIP_dec. apply bool_dec.
-      Qed.
+  Ltac defst l
+    := match l with
+       | @nil (string*rtype₀) => constr:(@nil (string*rtype))
+       | cons (?x,proj1_sig ?y) ?l' =>
+         let l'' := defst l' in
+         constr:(cons (x,y) l'')
+       end.
+  
+  Ltac rec_proj_simpler
+    := repeat
+         match goal with
+         | [H: Rec₀ ?k ?l = proj1_sig ?τ |- _ ] => symmetry in H
+         | [H: proj1_sig ?τ = Rec₀ ?k ?l |- _ ] =>
+           let ll := defst l in
+           let HH:=fresh "eqq" in
+           generalize (@Rec₀_eq_proj1_Rec _ _ τ k ll); intros HH;
+           simpl in HH; specialize (HH H); clear H; destruct HH;
+           try subst τ
+         end.
+  
+  Require Import Eqdep_dec.
+  Require Import Bool.
+  
+  Lemma UIP_bool {a b:bool} (pf1 pf2:a = b) : pf1 = pf2.
+  Proof.
+    apply UIP_dec. apply bool_dec.
+  Qed.
 
   Ltac nra_inverter_ext
     :=
       simpl in *; match goal with
-         | [H:@nra_type _ (unnest_two _ _ _) _ (Coll _) |- _ ] => apply ATunnest_two_inv in H;
-             destruct H as [? [? [? [? [? [? [?[??]]]]]]]]
-         | [H: prod _ _ |- _ ] => destruct H; simpl in *; try subst
-         | [H: context [Rec Closed [("PBIND"%string, ?env); ("PCONST"%string, ?c); ("PDATA"%string, ?d)] ?pf ] |- _ ] => unfold rtype in H; rewrite (fold_nra_context_type c env d pf) in H
-         | [H: Rec₀ ?k ?l = proj1_sig ?τ |- _ ] => symmetry in H
-         | [H: proj1_sig ?τ = Rec₀ ?k ?l |- _ ] =>
-            let ll := defst l in
-                 let HH:=fresh "eqq" in
-                 generalize (@Rec₀_eq_proj1_Rec _ _ τ k ll); intros HH;
-                 simpl in HH; specialize (HH H); clear H; destruct HH;
-                 try subst τ
-         | [H:proj1_sig _ =
-              Rec₀ Closed
-                   (map
-                      (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
-                         (fst x, ` (snd x))) _) |- _ ]
-           => let Hpf := fresh "spf" in
-              apply Rec₀_eq_proj1_Rec in H; destruct H as [? Hpf]
-         | [H1:@eq bool ?a ?b,
-               H2:@eq bool ?a ?b |- _] => destruct (UIP_bool H1 H2)
-       end.
+                  | [H:@nra_type _ _ (unnest_two _ _ _) _ (Coll _) |- _ ] => apply ATunnest_two_inv in H;
+                                                                           destruct H as [? [? [? [? [? [? [?[??]]]]]]]]
+                  | [H: prod _ _ |- _ ] => destruct H; simpl in *; try subst
+                  | [H: context [Rec Closed [("PBIND"%string, ?env); ("PDATA"%string, ?d)] ?pf ] |- _ ] => unfold rtype in H; rewrite (fold_nra_context_type env d pf) in H
+                  | [H: Rec₀ ?k ?l = proj1_sig ?τ |- _ ] => symmetry in H
+                  | [H: proj1_sig ?τ = Rec₀ ?k ?l |- _ ] =>
+                    let ll := defst l in
+                    let HH:=fresh "eqq" in
+                    generalize (@Rec₀_eq_proj1_Rec _ _ τ k ll); intros HH;
+                    simpl in HH; specialize (HH H); clear H; destruct HH;
+                    try subst τ
+                  | [H:proj1_sig _ =
+                       Rec₀ Closed
+                            (map
+                               (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
+                                  (fst x, ` (snd x))) _) |- _ ]
+                    => let Hpf := fresh "spf" in
+                       apply Rec₀_eq_proj1_Rec in H; destruct H as [? Hpf]
+                  | [H1:@eq bool ?a ?b,
+                        H2:@eq bool ?a ?b |- _] => destruct (UIP_bool H1 H2)
+                  end.
 
   Ltac nra_inverter2 :=
-    repeat (try unfold nra_wrap, nra_wrap_a1, nra_wrap_bind_a1, nra_context, nra_triple, nra_const_env, nra_bind, nra_wrap in *; (nra_inverter_ext || nra_inverter); try subst).
+    repeat (try unfold nra_wrap, nra_wrap_a1, nra_wrap_bind_a1, nra_context, nra_double, nra_bind, nra_wrap in *; (nra_inverter_ext || nra_inverter); try subst).
 
   Ltac tdot_inverter :=
     repeat
@@ -1020,8 +987,8 @@ Section TcNRAEnv.
             end
       end.
 
-  Lemma typed_nraenv_core_to_typed_nra_inv' {k τc pf0 τenv τin τout pf} (op:nraenv_core):
-    nra_type (nra_of_nraenv_core op) (Rec k [("PBIND"%string, τenv); ("PCONST"%string,  (Rec Closed τc pf0)); ("PDATA"%string, τin)] pf) τout ->
+  Lemma typed_nraenv_core_to_typed_nra_inv' {k τc τenv τin τout pf} (op:nraenv_core):
+    nra_type τc (nra_of_nraenv_core op) (Rec k [("PBIND"%string, τenv); ("PDATA"%string, τin)] pf) τout ->
     nraenv_core_type τc op τenv τin τout.
   Proof.
     Hint Constructors nraenv_core_type.
@@ -1040,32 +1007,14 @@ Section TcNRAEnv.
     - nra_inverter2; try tdot_inverter; eauto.
     - nra_inverter2; try tdot_inverter; eauto.
     - inversion H; clear H; subst.
-      unfold nra_const_env in H5.
-      inversion H5;  clear H5; subst.
-      inversion H6;  clear H6; subst.
-      inversion H1; clear H1; subst.
-      destruct τ'; simpl in H4; inversion H4; clear H4.
-      destruct τ'; simpl in H3; inversion H3; clear H3.
-      destruct τ'; simpl in H7; inversion H7; clear H7.
-      destruct τ'; simpl in H9; inversion H9; clear H9.
-      destruct p; destruct p0; destruct p1; simpl in *.
-      rtype_equalizer.
-      nra_inverter_ext.
-      subst.
-      unfold tdot,edot in H5.
-      simpl in H5.
-      inversion H5; clear H5; subst.
-      inversion H2; clear H2; subst.
-      rtype_equalizer.
-      subst.
       econstructor; trivial.
     - nra_inverter2; try tdot_inverter; eauto.
     - nra_inverter2; try tdot_inverter; eauto.
     - nra_inverter2; try tdot_inverter; eauto.
   Qed.
   
-  Theorem typed_nraenv_core_to_typed_nra_inv {τc} pf {τenv τin τout} (op:nraenv_core):
-    nra_type (nra_of_nraenv_core op) (nra_context_type  (Rec Closed τc pf) τenv τin) τout ->
+  Theorem typed_nraenv_core_to_typed_nra_inv {τc} {τenv τin τout} (op:nraenv_core):
+    nra_type τc (nra_of_nraenv_core op) (nra_context_type τenv τin) τout ->
     nraenv_core_type τc op τenv τin τout.
   Proof.
     unfold nra_context_type.

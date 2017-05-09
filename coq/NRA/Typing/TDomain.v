@@ -108,8 +108,8 @@ End TDomain.
 
 Section dom.
   Require Import TBrandModel.
-  Lemma nra_domain {m:basic_model} {τin τout} (op:nra) :
-    op ▷ τin >=> τout -> list string.
+  Lemma nra_domain {m:basic_model} {τc} {τin τout} (op:nra) :
+    op ▷ τin >=> τout ⊣ τc -> list string.
   Proof.
     intros.
     destruct τout.

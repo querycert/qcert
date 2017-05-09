@@ -89,7 +89,7 @@ Section TNRATest.
   Qed.
 
   Lemma qpersons_typed {τin} :
-    qpersons ▷ τin >=> persons_schema.
+    qpersons ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold qpersons.
     apply @ATConst.
@@ -113,16 +113,17 @@ Section TNRATest.
   (* count *)
 
   Lemma q0_wt {τin} :
-    q0 ▷ (Coll τin) >=> Nat.
+    q0 ▷ (Coll τin) >=> Nat ⊣ nil.
   Proof.
     unfold q0.
-    apply (@ATUnop _ (Coll τin) (Coll τin) Nat).
+    apply (@ATUnop _ nil (Coll τin) (Coll τin) Nat).
     apply ATCount.
     apply ATID.
   Qed.
 
-  Definition q0t {τin} (d:data) (pf: d ▹ (Coll τin)) : data :=
-    (q0 @▷ d) pf q0_wt.
+  Definition q0t {τin} (d:data) (bpf: bindings_type nil nil) (pf: d ▹ (Coll τin)) : data :=
+    (q0 @▷ d ⊣ nil) bpf
+                   pf q0_wt.
 
   (* Eval compute in q0@persons.                  (* untyped *) *)
   (* Eval compute in (q0t (normalize_data persons) persons_typed). (* typed *) *)
@@ -132,16 +133,16 @@ Section TNRATest.
   (* simple maps *)
 
   Lemma q1_wt {τin} :
-    q1 ▷ τin >=> persons_schema.
+    q1 ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold q1.
-    apply (@ATMap _ τin person_schema person_schema).
+    apply (@ATMap _ nil τin person_schema person_schema).
     apply @ATID.
     apply qpersons_typed.
   Qed.
 
-  Definition q1t {τin} (d:data) (pf: d ▹ τin) : data :=
-    (q1 @▷ nothing) nothing_typed q1_wt.
+  Definition q1t (d:data) (bpf: bindings_type nil nil) : data :=
+    (q1 @▷ nothing ⊣ nil) bpf nothing_typed q1_wt.
 
   (* Eval compute in q1@persons.                  (* untyped *) *)
   (* Eval compute in (q1t nothing nothing_typed). (* typed *) *)
@@ -149,11 +150,11 @@ Section TNRATest.
   (* Eval compute in (q1_wt ⊨ 𝓐(q1)). (* computes the 'record domain' of q1 *) *)
   
   Lemma q2_wt {τin} :
-    q2 ▷ τin >=> (Coll Nat).
+    q2 ▷ τin >=> (Coll Nat) ⊣ nil.
   Proof.
     unfold q2.
-    apply (@ATMap _ τin person_schema Nat).
-    - apply (@ATUnop trivial_basic_model person_schema person_schema Nat).
+    apply (@ATMap _ nil τin person_schema Nat).
+    - apply (@ATUnop trivial_basic_model nil person_schema person_schema Nat).
       apply (@ATDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
       apply @ATID.
     - apply qpersons_typed.
@@ -161,8 +162,8 @@ Section TNRATest.
 
   (* Print q2. *)
 
-  Definition q2t {τin} (d:data) (pf: d ▹ τin) : data :=
-    (q2 @▷ d) pf q2_wt.
+  Definition q2t {τin} (d:data) (bpf: bindings_type nil nil) (pf: d ▹ τin) : data :=
+    (q2 @▷ d ⊣ nil) bpf pf q2_wt.
 
   (* Eval compute in q2@nothing.                  (* untyped *) *)
   (* Eval compute in (q2t nothing nothing_typed). (* typed *) *)
@@ -172,7 +173,7 @@ Section TNRATest.
   (* simple select *)
 
   Lemma q3_wt {τin} :
-    q3 ▷ τin >=> persons_schema.
+    q3 ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold q3.
     apply @ATSelect.
@@ -181,8 +182,8 @@ Section TNRATest.
     apply qpersons_typed.
   Qed.
   
-  Definition q3t {τin} (d:data) (pf: d ▹ τin) : data :=
-    (q3 @▷ d) pf q3_wt.
+  Definition q3t {τin} (d:data) (bpf: bindings_type nil nil) (pf: d ▹ τin) : data :=
+    (q3 @▷ d ⊣ nil) bpf pf q3_wt.
 
   (* Print q3. *)
 
@@ -192,13 +193,13 @@ Section TNRATest.
   (* Eval compute in (q3_wt ⊨ 𝓐(q3)). (* computes the 'record domain' of q3 *) *)
 
   Lemma q4_wt {τin} :
-    q4 ▷ τin >=> persons_schema.
+    q4 ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold q4.
     apply @ATSelect.
-    - apply (@ATBinop trivial_basic_model person_schema Nat Nat Bool).
+    - apply (@ATBinop trivial_basic_model nil person_schema Nat Nat Bool).
       + apply ATEq.
-      + apply (@ATUnop trivial_basic_model person_schema person_schema Nat).
+      + apply (@ATUnop trivial_basic_model nil person_schema person_schema Nat).
         apply (@ATDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
         apply @ATID.
       + apply ATConst.
@@ -206,8 +207,8 @@ Section TNRATest.
     - apply qpersons_typed.
   Qed.
   
-  Definition q4t {τin} (d:data) (pf: d ▹ τin) : data :=
-    (q4 @▷ d) pf q4_wt.
+  Definition q4t {τin} (d:data) (bpf: bindings_type nil nil) (pf: d ▹ τin) : data :=
+    (q4 @▷ d ⊣ nil) bpf pf q4_wt.
 
   (* Print q4. *)
   (* Eval compute in q4@nothing.                  (* untyped *) *)

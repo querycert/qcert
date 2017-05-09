@@ -28,6 +28,8 @@ Section cNRAEnvEq.
 
   (* Equivalence for environment-enabled algebra *)
   
+  Hint Resolve dnrec_sort_content.
+
   Definition nraenv_core_eq (op1 op2:nraenv_core) : Prop :=
     forall
       (h:list(string*string))
@@ -48,7 +50,7 @@ Section cNRAEnvEq.
       (dn_env:data_normalized h env)
       (x:data)
       (dn_x:data_normalized h x),
-      h ⊢ (nra_of_nraenv_core op1) @ₐ (nra_context_data (drec (rec_sort c)) env x) = h ⊢ (nra_of_nraenv_core op2) @ₐ (nra_context_data (drec (rec_sort c)) env x).
+      h ⊢ (nra_of_nraenv_core op1) @ₐ (nra_context_data env x) ⊣ (rec_sort c) = h ⊢ (nra_of_nraenv_core op2) @ₐ (nra_context_data env x) ⊣ (rec_sort c).
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -132,18 +134,24 @@ Section cNRAEnvEq.
     rewrite unfold_env_nra_sort by trivial; simpl.
     rewrite unfold_env_nra_sort by trivial; simpl.
     specialize (H2 (nra_of_nraenv_core y0) (nra_of_nraenv_core y0)).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
-               data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3)).
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+                Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+                forall x3 : data,
+                  data_normalized h0 x3 ->
+                  h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c)).
     intros; reflexivity.
     specialize (H2 H3).
     specialize (H2 (nra_of_nraenv_core y1) (nra_of_nraenv_core y1)).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+                Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+                forall x3 : data,
                data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y1 @ₐ x3 = h0 ⊢ nra_of_nraenv_core y1 @ₐ x3)).
+               h0 ⊢ nra_of_nraenv_core y1 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y1 @ₐ x3 ⊣ c)).
     intros; reflexivity.
     specialize (H2 H4).
-    apply (H2 h).
+    simpl in H2.
+    apply (H2 h (rec_sort c)).
+    eauto.
     eauto.
   Qed.
 
@@ -164,12 +172,15 @@ Section cNRAEnvEq.
     unfold Proper, respectful, nraenv_core_eq, nra_eq; simpl; intros.
     specialize (H1 x y H).
     specialize (H1 (nra_of_nraenv_core y0) (nra_of_nraenv_core y0)).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+        Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+        forall x3 : data,
                    data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3)).
+               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c)).
     intros; reflexivity.
     specialize (H1 H2).
     apply (H1 h).
+    eauto.
     eauto.
   Qed.
 
@@ -188,7 +199,7 @@ Section cNRAEnvEq.
     unfold Proper, respectful, nraenv_core_eq; simpl; intros.
     rewrite H0 by trivial.
     rewrite unfold_env_nra_sort by trivial; simpl.
-    case_eq (nra_eval h (nra_of_nraenv_core y0) (nra_context_data (drec (rec_sort c)) env x1)); simpl; trivial.
+    case_eq (nra_eval h (rec_sort c) (nra_of_nraenv_core y0) (nra_context_data env x1)); simpl; trivial.
     destruct d; try reflexivity; simpl; intros.
     f_equal. apply rmap_ext; intros.
     apply H; eauto.
@@ -211,7 +222,6 @@ Section cNRAEnvEq.
     f_equal.
     apply rmap_concat_ext; intros.
     apply H; eauto.
-    
   Qed.
 
   Global Instance anmapconcateq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANMapConcat.
@@ -231,17 +241,20 @@ Section cNRAEnvEq.
     generalize aproduct_proper.
     unfold Proper, respectful, nra_eq; simpl; intros.
     specialize (H1 (nra_of_nraenv_core y) (nra_of_nraenv_core y)).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+        Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+        forall x3 : data,
                data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y @ₐ x3 = h0 ⊢ nra_of_nraenv_core y @ₐ x3))
+               h0 ⊢ nra_of_nraenv_core y @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y @ₐ x3 ⊣ c))
       by (intros; reflexivity).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+        Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+        forall x3 : data,
                data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3))
+               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c))
       by (intros; reflexivity).
     specialize (H1 H2 (nra_of_nraenv_core y0) (nra_of_nraenv_core y0) H3).
-    apply (H1 h).
-    eauto.      
+    apply (H1 h); eauto.      
   Qed.
 
   Global Instance anmapproducteq_proper : Proper (nra_eqenv ==> nra_eqenv ==> nra_eqenv) ANProduct.
@@ -280,15 +293,19 @@ Section cNRAEnvEq.
     generalize adefault_proper.
     unfold Proper, respectful, nraenv_core_eq, nra_eq; simpl; intros.
     specialize (H1 (nra_of_nraenv_core y) (nra_of_nraenv_core y)).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+        Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+        forall x3 : data,
                data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y @ₐ x3 = h0 ⊢ nra_of_nraenv_core y @ₐ x3)).
+               h0 ⊢ nra_of_nraenv_core y @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y @ₐ x3 ⊣ c)).
     intros; reflexivity.
     specialize (H1 H2).
     specialize (H1 (nra_of_nraenv_core y0) (nra_of_nraenv_core y0)).
-    assert ((forall (h0 : list (string * string)) (x3 : data),
+    assert ((forall (h0 : list (string * string)) (c : list (string * data)),
+        Forall (fun d : string * data => data_normalized h0 (snd d)) c ->
+        forall x3 : data,
                data_normalized h0 x3 ->
-               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3)).
+               h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c = h0 ⊢ nra_of_nraenv_core y0 @ₐ x3 ⊣ c)).
     intros; reflexivity.
     specialize (H1 H3).
     apply (H1 h); eauto.
@@ -429,15 +446,19 @@ Section cNRAEnvEq.
                   data_normalized h env ->
                   forall (x0 : data),
                   data_normalized h x0 ->
-                  (h ⊢ (nra_of_nraenv_core (nraenv_core_of_nra x)) @ₐ (nra_context_data (drec (rec_sort c)) env x0))%nra =
-                  (h ⊢ (nra_of_nraenv_core (nraenv_core_of_nra y)) @ₐ (nra_context_data (drec (rec_sort c)) env x0))%nra ).
-    { intros. repeat rewrite <- unfold_env_nra_sort; trivial. auto. }
+                  (h ⊢ (nra_of_nraenv_core (nraenv_core_of_nra x)) @ₐ (nra_context_data env x0) ⊣ c)%nra =
+                  (h ⊢ (nra_of_nraenv_core (nraenv_core_of_nra y)) @ₐ (nra_context_data env x0) ⊣ c)%nra ).
+    { intros. repeat rewrite <- unfold_env_nra; trivial. auto. }
     assert (eq2:forall (h : list (string * string))
                        (x0 : data),
+                  Forall (fun d : string * data => data_normalized h (snd d)) c ->
                   data_normalized h x0 ->
-                  h ⊢ nraenv_core_deenv_nra (nraenv_core_of_nra x) @ₐ x0 =
-                  h ⊢ nraenv_core_deenv_nra (nraenv_core_of_nra y) @ₐ x0).
-    { intros. specialize (eq1 h0 nil (Forall_nil _) dunit (dnunit _) x1 H1 ).
+                  h ⊢ nraenv_core_deenv_nra (nraenv_core_of_nra x) @ₐ x0 ⊣ c =
+                  h ⊢ nraenv_core_deenv_nra (nraenv_core_of_nra y) @ₐ x0 ⊣ c).
+    { intros.
+      assert (Forall (fun d : string * data => data_normalized h0 (snd d)) c).
+      eauto.
+      specialize (eq1 h0 c H2 dunit (dnunit _) x1 H1 ).
       do 2 rewrite nraenv_core_is_nra_deenv in eq1 by
           apply nraenv_core_of_nra_is_nra; trivial.
     }
@@ -454,8 +475,8 @@ Section cNRAEnvEq.
     (* apply nraenv_core_of_nra_proper in H. *)
     unfold nra_eq, nraenv_core_eq in *.
     intros.
-    specialize (H h (nra_context_data (drec (rec_sort c)) env x0)).
-    repeat rewrite <- unfold_env_nra_sort in H by trivial.
+    specialize (H h c dn_c (nra_context_data env x0)).
+    repeat rewrite <- unfold_env_nra in H by trivial.
     auto.
   Qed.
 

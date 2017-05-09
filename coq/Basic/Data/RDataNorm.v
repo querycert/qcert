@@ -223,6 +223,14 @@ Section RDataNorm.
     econstructor; trivial.
   Qed.
 
+  Lemma dnrec_sort_content c :
+    Forall (fun d : string * data => data_normalized (snd d)) c ->
+    Forall (fun d : string * data => data_normalized (snd d)) (rec_sort c).
+  Proof.
+    intros F.
+    apply Forall_sorted; trivial.
+  Qed.
+
   Lemma dnrec_sort c :
     Forall (fun d : string * data => data_normalized (snd d)) c ->
     data_normalized (drec (rec_sort c)).

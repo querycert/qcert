@@ -118,6 +118,7 @@ Section NRAExt.
   | AXEither : nraext -> nraext -> nraext
   | AXEitherConcat : nraext -> nraext -> nraext
   | AXApp : nraext -> nraext -> nraext
+  | AXGetConstant : string -> nraext
   (* Those are additional operators *)
   | AXJoin : nraext -> nraext -> nraext -> nraext
   | AXSemiJoin : nraext -> nraext -> nraext -> nraext
@@ -154,6 +155,7 @@ Section NRAExt.
       | AXEither opl opr => AEither (nra_of_nraext opl) (nra_of_nraext opr)
       | AXEitherConcat op1 op2 => AEitherConcat (nra_of_nraext op1) (nra_of_nraext op2)
       | AXApp e1 e2 => AApp (nra_of_nraext e1) (nra_of_nraext e2)
+      | AXGetConstant s => AGetConstant s
       | AXJoin e1 e2 e3 => join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
       | AXSemiJoin e1 e2 e3 => semi_join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
       | AXAntiJoin e1 e2 e3 => anti_join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
@@ -182,6 +184,7 @@ Section NRAExt.
       | AEither opl opr => AXEither (nraext_of_nra opl) (nraext_of_nra opr)
       | AEitherConcat op1 op2 => AXEitherConcat (nraext_of_nra op1) (nraext_of_nra op2)
       | AApp e1 e2 => AXApp (nraext_of_nra e1) (nraext_of_nra e2)
+      | AGetConstant s => AXGetConstant s
     end.
 
   Lemma nraext_roundtrip (a:nra) :
@@ -193,8 +196,8 @@ Section NRAExt.
     
   Context (h:list(string*string)).
   
-  Definition nraext_eval (e:nraext) (x:data) : option data :=
-    nra_eval h (nra_of_nraext e) x.
+  Definition nraext_eval c (e:nraext) (x:data) : option data :=
+    nra_eval h c (nra_of_nraext e) x.
 
   (** Nraebraic plan application *)
 
@@ -212,9 +215,10 @@ End NRAExt.
 (* begin hide *)
 Delimit Scope nraext_scope with nraext.
 
-Notation "h ⊢ EOp @ₓ x" := (nraext_eval h EOp x) (at level 10): nraext_scope.
+Notation "h ⊢ EOp @ₓ x ⊣ c" := (nraext_eval h c EOp x) (at level 10): nraext_scope.
 
 Notation "'ID'" := (AXID)  (at level 50) : nraext_scope.                                           (* ◇ = \Diamond *)
+Notation "CGET⟨ s ⟩" := (AXGetConstant s) (at level 50) : nraext_core_scope.
 
 Notation "‵‵ c" := (AXConst (dconst c))  (at level 0) : nraext_scope.                           (* ‵ = \backprime *)
 Notation "‵ c" := (AXConst c)  (at level 0) : nraext_scope.                                     (* ‵ = \backprime *)
@@ -291,6 +295,7 @@ Tactic Notation "nraext_cases" tactic(first) ident(c) :=
   | Case_aux c "AXEither"
   | Case_aux c "AXEitherConcat"
   | Case_aux c "AXApp"
+  | Case_aux c "AXGetConstant"
   | Case_aux c "AXJoin"
   | Case_aux c "AXSemiJoin"
   | Case_aux c "AXAntiJoin"

@@ -48,9 +48,9 @@ Build for the Java part of the code requires a recent version of ant.
 ### TypeScript (Optional)
 
 Finally, a Web demo for the compiler is included with the distribution
-and is built using js_of_ocaml and TypeScript.
+and requires js_of_ocaml and TypeScript.
 
-js_of_ocaml can be installed using opam:
+js_of_ocaml can be installed as other OCaml packages using opam:
 
 ```
 opam install js_of_ocaml
@@ -60,7 +60,7 @@ TypeScript can be obtained from (https://www.typescriptlang.org).
 
 ### Portability
 
-Q*cert should build on most Linux systems and on MacOS.
+Q*cert should build on most recent Linux systems and on MacOS.
 
 Windows isn't directly supported by the OCaml package manager. We do
 not currently have detailed instructions for how to build on Windows.
@@ -71,21 +71,23 @@ not currently have detailed instructions for how to build on Windows.
 
 1. Compile the Coq source:
 
-	make qcert
-	(Note: this will take a while, you can run make faster with 'make -j 8 qcert')
+```
+make qcert
+```
+
+(Note: this will take a while, you can run make faster with `make -j 8 qcert`)
 
 2. Extract the compiler and build the OCaml frontend:
 
-	make extraction
+```
+make extraction
+```
 
-This should produce the `./bin/qcert` executable.
+This should produce the `./bin/qcert` and `./bin/qdata` executables.
 
 ## Building SQL support (Optional)
 
-
-
 ## Building JRules support (Optional)
-
 
 
 ## Compile Queries

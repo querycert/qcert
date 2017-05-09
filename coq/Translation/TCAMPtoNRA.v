@@ -31,33 +31,33 @@ Section TCAMPtoNRA.
 
   Context {m:basic_model}.
 
-  Definition nra_context_type tconst tbind tpid : rtype := 
-    Rec Closed (("PBIND",tbind) :: ("PCONST",tconst) :: ("PDATA",tpid) :: nil) (eq_refl _).
+  Definition nra_context_type tbind tpid : rtype := 
+    Rec Closed (("PBIND",tbind) :: ("PDATA",tpid) :: nil) (eq_refl _).
 
-  Definition nra_wrap_a1_type tconst tbind tpid : rtype := 
-    Rec Closed (("PBIND",tbind) :: ("PCONST",tconst) :: ("a1",tpid) :: nil) (eq_refl _).
+  Definition nra_wrap_a1_type tbind tpid : rtype := 
+    Rec Closed (("PBIND",tbind) :: ("a1",tpid) :: nil) (eq_refl _).
   Local Open Scope camp_scope.
 
-  Lemma ATnra_match {n τin τout} :
-    n ▷ τin >=> τout ->
-    nra_match n ▷ τin >=> Coll τout.
+  Lemma ATnra_match {τc n τin τout} :
+    n ▷ τin >=> τout ⊣ τc ->
+    nra_match n ▷ τin >=> Coll τout ⊣ τc.
   Proof.
     intros; econstructor; eauto.
     econstructor.
   Qed.
 
-  Lemma ATnra_match_inv {n τin τout} :
-    nra_match n ▷ τin >=> τout ->
-    exists τout', τout = Coll τout' /\ n ▷ τin >=> τout'.
+  Lemma ATnra_match_inv {τc n τin τout} :
+    nra_match n ▷ τin >=> τout ⊣ τc ->
+    exists τout', τout = Coll τout' /\ n ▷ τin >=> τout' ⊣ τc.
   Proof.
     inversion 1; subst.
     inversion H2; subst.
     eauto.
   Qed.
 
-  Lemma ATnra_match_invcoll {n τin τout} :
-    nra_match n ▷ τin >=> Coll τout ->
-    n ▷ τin >=> τout .
+  Lemma ATnra_match_invcoll {τc n τin τout} :
+    nra_match n ▷ τin >=> Coll τout ⊣ τc ->
+    n ▷ τin >=> τout ⊣ τc.
   Proof.
     intros. apply ATnra_match_inv in H; destruct H as [?[??]].
     inversion H; rtype_equalizer.
@@ -69,19 +69,19 @@ Section TCAMPtoNRA.
   (** Auxiliary lemmas specific to some of the NRA expressions used in
   the translation *)
 
-  Lemma ATdot {p s τin τ pf τout k}:
-    p  ▷ τin >=> Rec k τ pf ->
+  Lemma ATdot {τc p s τin τ pf τout k}:
+    p  ▷ τin >=> Rec k τ pf ⊣ τc ->
     tdot τ s = Some τout ->
-    AUnop (ADot s) p ▷ τin >=> τout.
+    AUnop (ADot s) p ▷ τin >=> τout ⊣ τc.
   Proof.
     intros.
     repeat econstructor; eauto.
   Qed.
 
-  Lemma ATdot_inv {p s τin τout}:
-    AUnop (ADot s) p ▷ τin >=> τout ->
+  Lemma ATdot_inv {τc p s τin τout}:
+    AUnop (ADot s) p ▷ τin >=> τout ⊣ τc ->
     exists τ pf k,
-      p  ▷ τin >=> Rec k τ pf /\
+      p  ▷ τin >=> Rec k τ pf ⊣ τc /\
       tdot τ s = Some τout.
   Proof.
     inversion 1; subst.
@@ -90,7 +90,7 @@ Section TCAMPtoNRA.
   Qed.
 
   Lemma ATnra_data τc τ τin :
-    nra_data ▷ nra_context_type τc τ τin >=> τin.
+    nra_data ▷ nra_context_type τ τin >=> τin ⊣ τc.
   Proof.
     eapply ATdot.
     - econstructor.
@@ -104,12 +104,12 @@ Section TCAMPtoNRA.
        the type derivation is presented here, inline with the definition
    *)
 
-  Lemma ATunnest_two (s1 s2:string) (op:nra) τin τ₁ pf1 τs τrem pf2 :
-    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ->
+  Lemma ATunnest_two (s1 s2:string) (op:nra) τc τin τ₁ pf1 τs τrem pf2 :
+    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ⊣ τc ->
     tdot τ₁ s1 = Some (Coll τs) ->
     τrem = (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1) ->
     unnest_two s1 s2 op ▷ 
-               τin >=> Coll (Rec Closed τrem pf2).
+               τin >=> Coll (Rec Closed τrem pf2) ⊣ τc.
   Proof.
     intros; subst.
     econstructor; eauto.
@@ -124,10 +124,10 @@ Section TCAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma ATunnest_two_inv {s1 s2:string} {op:nra} {τin τout} :
-    unnest_two s1 s2 op ▷ τin >=> Coll τout ->
+  Lemma ATunnest_two_inv {s1 s2:string} {op:nra} {τc τin τout} :
+    unnest_two s1 s2 op ▷ τin >=> Coll τout ⊣ τc ->
     exists τ₁ pf1 τs pf2,
-    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) /\
+    op ▷ τin >=> (Coll (Rec Closed τ₁ pf1)) ⊣ τc /\
     tdot τ₁ s1 = Some (Coll τs) /\
     τout = Rec Closed (rremove (rec_concat_sort τ₁ ((s2,τs)::nil)) s1) pf2.
   Proof.
@@ -150,8 +150,8 @@ Section TCAMPtoNRA.
 
   (** Main lemma for the type preservation of the translation. *)
   Lemma nra_of_camp_type_preserve' τc Γ pf p τin τout :
-    camp_type (rec_sort τc) Γ p τin τout ->
-    nra_of_camp p ▷ (nra_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
+    camp_type τc Γ p τin τout ->
+    nra_of_camp p ▷ (nra_context_type (Rec Closed Γ pf) τin) >=> Coll τout ⊣ τc.
   Proof.
     Hint Resolve data_type_drec_nil.
     revert τc Γ pf τin τout.
@@ -162,7 +162,7 @@ Section TCAMPtoNRA.
     - eauto. 
     (* PTbinop *)
     - econstructor.
-      + eapply (@ATBinop m (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))); eauto.
+      + eapply (@ATBinop m τc (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))); eauto.
       + econstructor; eauto.
     (* PTmap *)
     - econstructor; eauto.
@@ -175,11 +175,6 @@ Section TCAMPtoNRA.
          eapply ATdot; eauto.
          * econstructor; eauto.
          * reflexivity.
-         * econstructor; eauto.
-           econstructor; eauto.
-           econstructor; eauto.
-           econstructor; eauto.
-           reflexivity.
       + reflexivity.
       + reflexivity.
     (* PTassert *)
@@ -197,8 +192,6 @@ Section TCAMPtoNRA.
          econstructor; eauto.
          eapply ATdot; eauto.
          econstructor.
-         reflexivity.
-         do 4 (econstructor; eauto).
          reflexivity.
       + reflexivity.
       + reflexivity.
@@ -227,9 +220,6 @@ Section TCAMPtoNRA.
            econstructor; eauto; try (
                                     econstructor; [|econstructor]; econstructor; reflexivity).
            econstructor; eauto.
-           econstructor; eauto; try (
-                                    econstructor; [|econstructor]; econstructor; reflexivity).
-           econstructor; eauto.
            eapply ATBinop.
            eapply ATMergeConcat.
            eauto.
@@ -248,17 +238,14 @@ Section TCAMPtoNRA.
       eauto. eauto. eauto. eauto. eauto. 
       eauto. eauto. eauto. eauto. eauto. 
       eauto. eauto. eauto. eauto. eauto.
-      eauto. eauto. eauto. eauto. eauto.
-      eauto. 
   Qed.
 
   Lemma nra_of_camp_type_preserve τc Γ pf p τin τout :
     camp_type τc Γ p τin τout ->
-    nra_of_camp p ▷ (nra_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed Γ pf) τin) >=> Coll τout.
+    nra_of_camp p ▷ (nra_context_type (Rec Closed Γ pf) τin) >=> Coll τout ⊣ τc.
   Proof.
     intros H.
     apply nra_of_camp_type_preserve'.
-    apply camp_type_const_sort.
     trivial.
   Qed.
 
@@ -266,8 +253,8 @@ Section TCAMPtoNRA.
 
   Lemma nra_of_camp_nra_of_camp_top p c τc τin τout :
     bindings_type c τc ->
-    nra_of_camp p ▷ (nra_context_type (Rec Closed (rec_sort τc) rec_sort_pf) (Rec Closed nil eq_refl) τin) >=> Coll τout ->
-    nra_of_camp_top c p ▷ τin >=> Coll τout.
+    nra_of_camp p ▷ (nra_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout ⊣ τc ->
+    nra_of_camp_top p ▷ τin >=> Coll τout ⊣ τc.
   Proof.
     Hint Resolve normalize_normalizes.
     Hint Resolve normalize_preserves_type.
@@ -276,31 +263,24 @@ Section TCAMPtoNRA.
     econstructor; [eauto | ].
     econstructor; [eauto | ].
     econstructor.
-    - apply (ATConcat (τ₁:=("PCONST", (Rec Closed (rec_sort τc) rec_sort_pf))::nil) (τ₂:=(("PBIND",Rec Closed nil eq_refl)::("PDATA",τin)::nil))).
+    - apply (ATConcat (τ₁:=("PBIND", (Rec Closed nil eq_refl))::nil) (τ₂:=(("PDATA",τin)::nil))).
       econstructor.
     - econstructor.
       + repeat (econstructor; eauto).
       + econstructor.
         simpl.
-        rewrite map_normalize_normalized_eq.
         * apply bindings_type_has_type.
-          apply bindings_type_sort.
-          trivial.
-        * eapply bindings_type_Forall_normalized; eauto.
-    - econstructor; [ | | eauto 3].
-      2: econstructor.
-      2:econstructor.
-      + econstructor.
-        reflexivity.
-      + eauto.
+          econstructor.
+    - econstructor; [ | eauto 2].
+      econstructor.
     Grab Existential Variables.
-    eauto. eauto. eauto. eauto. 
+    eauto. eauto.
   Qed.
     
   Theorem nra_of_camp_top_type_preserve p c τc τin τout :
     bindings_type c τc ->
     camp_type τc nil p τin τout ->
-    nra_of_camp_top c p ▷ τin >=> Coll τout.
+    nra_of_camp_top p ▷ τin >=> Coll τout ⊣ τc.
   Proof.
     intros.
     eapply nra_of_camp_nra_of_camp_top; eauto.
@@ -311,8 +291,8 @@ Section TCAMPtoNRA.
 
   (** Section dedicated to the reverse direction for type preservation *)
 
-  Lemma ATaid_inv {τin τout} :
-    AID ▷ τin >=> τout -> τin = τout.
+  Lemma ATaid_inv {τc τin τout} :
+    AID ▷ τin >=> τout ⊣ τc -> τin = τout.
   Proof.
      inversion 1; congruence.
   Qed.
@@ -329,41 +309,20 @@ Section TCAMPtoNRA.
     intros. apply (UIP_dec); auto.
   Qed.
 
-  (*
-  Lemma data_type_drec_nil_inv {τ}:
-    isTop τ = false ->
-    data_type m (drec nil) τ -> 
-    τ = Rec Closed nil (eq_refl _).
-  Proof.
-    intros H dt.
-    destruct (data_type_drec_inv m H dt) as [?[??]].
-    elim e; intros; clear e; subst.
-    apply data_type_Rec_domain in dt.
-    simpl in dt.
-    assert (domain x0 = nil) by
-        (apply sublist_nil_r; assumption).
-    symmetry in dt.
-    apply domain_nil in dt. subst.
-    simpl in *.
-    f_equal.
-    apply (UIP_refl_dec bool_dec).
-  Qed.
-*)
-    
   Ltac inverter := 
     match goal with
       | [H:Coll _ = Coll _ |- _] => inversion H; clear H
       | [H:unaryOp_type AColl _ _ |- _ ] => 
         inversion H; clear H; subst
-      | [H:nra_context _ _ ▷ _ >=> _ |- _ ] => unfold nra_context in H
-      | [H:nra_triple _ _ _ _ _ _ ▷ _ >=> _ |- _ ] => unfold nra_triple in H
-      | [H:nra_wrap_a1 _ ▷ _ >=> _ |- _ ] => unfold nra_wrap_a1 in H
-      | [H:nra_match _ ▷ _ >=> Coll _ |- _] =>
+      | [H:nra_context _ _ ▷ _ >=> _ ⊣ _ |- _ ] => unfold nra_context in H
+      | [H:nra_double _ _ _ _ _ ▷ _ >=> _  ⊣ _|- _ ] => unfold nra_double in H
+      | [H:nra_wrap_a1 _ ▷ _ >=> _ ⊣ _ |- _ ] => unfold nra_wrap_a1 in H
+      | [H:nra_match _ ▷ _ >=> Coll _ ⊣ _ |- _] =>
         apply ATnra_match_invcoll in H
-      | [H:nra_match _ ▷ _ >=> _ |- _] =>
+      | [H:nra_match _ ▷ _ >=> _ ⊣ _ |- _] =>
         apply ATnra_match_inv in H;
           destruct H as [? [??]]
-      | [H:AUnop _ (ADot _) _ ▷ _ >=> _ |- _] =>
+      | [H:AUnop _ (ADot _) _ ▷ _ >=> _ ⊣ _ |- _] =>
         apply ATdot_inv in H;
           destruct H as [? [? [??]]]
       | [H:unaryOp_type (ADot _) _ _ |- _ ] => inversion H; clear H
@@ -374,20 +333,20 @@ Section TCAMPtoNRA.
       | [H:binOp_type ADefault _ _ _ |- _ ] => inversion H; clear H
       | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
       | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
-      | [H:AID ▷ _ >=> _ |- _ ] => apply ATaid_inv in H
-      | [H:nra_data ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:nra_fail ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AMap _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AEither _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AEitherConcat _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:ADefault _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AApp _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AProduct _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:ASelect _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:ABinop _ _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AUnop _ _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:AConst _ ▷ _ >=> _ |- _ ] => inversion H; clear H
-      | [H:nra_bind ▷ _ >=> _ |- _ ] => inversion H; clear H
+      | [H:AID ▷ _ >=> _ ⊣ _ |- _ ] => apply ATaid_inv in H
+      | [H:nra_data ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:nra_fail ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AMap _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AEither _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AEitherConcat _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:ADefault _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AApp _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AProduct _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:ASelect _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:ABinop _ _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AUnop _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:AConst _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:nra_bind ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
       | [H:data_type _ (dcoll _) _ |- _ ] => inversion H; clear H
       | [H:Rec₀ _ _  = Rec₀ _ _ |- _ ] => inversion H; clear H
       | [H:(_,_)  = (_,_) |- _ ] => inversion H; clear H
@@ -419,7 +378,7 @@ Section TCAMPtoNRA.
                 (@sig rtype₀ (fun τ₀ : rtype₀ => @eq bool (wf_rtype₀ τ₀) true))
          |- _] =>
         destruct H
-      | [H:unnest_two _ _ _ ▷ _ >=> Coll _ |- _ ] =>
+      | [H:unnest_two _ _ _ ▷ _ >=> Coll _ ⊣ _ |- _ ] =>
         apply ATunnest_two_inv in H; destruct H as [?[?[?[?[?[??]]]]]]
       | [H:proj1_sig _ = Coll₀ (proj1_sig _) |- _ ] =>
         rewrite <- Coll_proj1 in H; rtype_equalizer
@@ -434,16 +393,16 @@ Section TCAMPtoNRA.
         => apply Rec₀_eq_proj1_Rec in H; destruct H as [??]
     end; try rtype_equalizer; try subst; simpl in *; try inverter.
   
-  Lemma nra_of_camp_type_form_output_weak p τin τout :
-    nra_of_camp p ▷ τin >=> τout ->
+  Lemma nra_of_camp_type_form_output_weak τc p τin τout :
+    nra_of_camp p ▷ τin >=> τout ⊣ τc ->
     exists τout',τout = Coll τout'.
   Proof.
     revert τin τout.
     induction p; simpl; intros; try inverter; eauto.
   Qed.
 
-  Theorem nra_of_camp_type_form_output p τin τout :
-    nra_of_camp p ▷ τin >=> τout ->
+  Theorem nra_of_camp_type_form_output τc p τin τout :
+    nra_of_camp p ▷ τin >=> τout ⊣ τc ->
     {τout' | τout = Coll τout'}.
   Proof.
     intros H.
@@ -455,16 +414,16 @@ Section TCAMPtoNRA.
     reflexivity.
   Qed.
 
-  Lemma nra_of_camp_top_type_form_output_weak p c τin τout :
-    nra_of_camp_top c p ▷ τin >=> τout ->
+  Lemma nra_of_camp_top_type_form_output_weak τc p τin τout :
+    nra_of_camp_top p ▷ τin >=> τout ⊣ τc ->
     exists τout', τout = Coll τout'.
   Proof.
     unfold nra_of_camp_top; intros; inverter.
     eauto.
   Qed.
 
-  Theorem nra_of_camp_top_type_form_output p c τin τout :
-    nra_of_camp_top c p ▷ τin >=> τout ->
+  Theorem nra_of_camp_top_type_form_output τc p τin τout :
+    nra_of_camp_top p ▷ τin >=> τout ⊣ τc ->
     {τout' | τout = Coll τout'}.
   Proof.
     intros H.
@@ -488,66 +447,6 @@ Section TCAMPtoNRA.
                   end
            end.
 
-  (* Leave for later -- JS
-  Lemma nra_of_camp_type_preserve_back Γ pf p τin τout :
-    nra_of_camp p ▷ (nra_context_type (Rec Closed Γ pf) τin) >=> (Coll τout) ->
-    camp_type m Γ p τin τout.
-  Proof.
-    Hint Resolve data_type_drec_nil. 
-    Ltac inst :=
-      repeat match goal with
-                 [H1:forall _ _ _ _ , nra_of_camp ?p ▷ _ >=> _ -> _,
-                    H2:nra_of_camp ?p ▷ ?i >=> _
-                    |- _] => apply H1 in H2
-             end.
-
-    revert m Γ pf τin τout.
-    induction p; simpl; intros; try inverter; tdi; try inverter; subst; try inst; eauto.
-  Qed.
-
-  Lemma nra_of_camp_top_nra_of_camp p τin τout :
-    nra_of_camp_top p ▷ τin >=> Coll τout ->
-    nra_of_camp p ▷ (nra_context_type (Rec Closed nil eq_refl) τin) >=> Coll τout.
-  Proof.
-    unfold nra_of_camp_top.
-    intros; inverter; subst; trivial.
-    inversion H1; clear H1.
-    subst.
-    inversion H3; clear H3; subst.
-  Qed.
-    
-  Theorem nra_of_camp_top_type_preserve_back p τin τout :
-    nra_of_camp_top p ▷ τin >=> Coll τout ->
-    nil |= p ; τin ~> τout.
-  Proof.
-    intros.
-    eapply nra_of_camp_type_preserve_back.
-    eapply nra_of_camp_top_nra_of_camp; eauto.
-  Qed.
- *)
-  (** Theorem 7.4: Pattern<->NRA.
-       Final iff Theorem of type preservation for the translation from Campterns to NRA *)
-  (*
-  Theorem nra_of_camp_type_preserve_iff Γ pf p τin τout :
-    Γ |= p ; τin ~> τout <->
-    nra_of_camp p ▷ (nra_context_type (Rec Γ pf) τin) >=> (Coll τout).
-  Proof.
- Hint Resolve 
-         nra_of_camp_type_preserve
-         nra_of_camp_type_preserve_back.
-    intuition eauto.
-  Qed.
-    
-  Lemma nra_of_camp_top_type_preserve_iff p τin τout :
-    nil |= p ; τin ~> τout <->
-    nra_of_camp_top p ▷ τin >=> Coll τout.
-  Proof.
-    Hint Resolve 
-         nra_of_camp_top_type_preserve
-         nra_of_camp_top_type_preserve_back.
-    intuition.
-  Qed.
-*)
 End TCAMPtoNRA.
 
 (* 

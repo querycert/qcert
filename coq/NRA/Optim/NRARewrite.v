@@ -34,7 +34,7 @@ Section ROptim.
     p2 ∧ p1 ≡ₐ p1 ∧ p2.
   Proof.
     unfold nra_eq; intros; simpl.
-    generalize (h ⊢ p1 @ₐ x); generalize (h ⊢ p2 @ₐ x); intros.
+    generalize (h ⊢ p1 @ₐ x ⊣ c); generalize (h ⊢ p2 @ₐ x ⊣ c); intros.
     destruct o; destruct o0; try reflexivity.
     unfold unbdbool.
     destruct d; destruct d0; try reflexivity; simpl.
@@ -47,9 +47,9 @@ Section ROptim.
     (p1 ⋃ p2) ⋃ p3 ≡ₐ p1 ⋃ (p2 ⋃ p3).
   Proof.
     unfold nra_eq; intros; simpl.
-    generalize (h ⊢ p1 @ₐ x) as d1.
-    generalize (h ⊢ p2 @ₐ x) as d2.
-    generalize (h ⊢ p3 @ₐ x) as d3.
+    generalize (h ⊢ p1 @ₐ x ⊣ c) as d1.
+    generalize (h ⊢ p2 @ₐ x ⊣ c) as d2.
+    generalize (h ⊢ p3 @ₐ x ⊣ c) as d3.
     intros.
     destruct d1; destruct d2; destruct d3; try reflexivity.
     destruct d; destruct d0; destruct d1; try reflexivity.
@@ -67,25 +67,25 @@ Section ROptim.
   Proof.
     unfold nra_eq; intros.
     simpl.
-    generalize (h ⊢ p1 @ₐ x) as d1.
-    generalize (h ⊢ p2 @ₐ x) as d2.
+    generalize (h ⊢ p1 @ₐ x ⊣ c) as d1.
+    generalize (h ⊢ p2 @ₐ x ⊣ c) as d2.
     intros.
     destruct d1; destruct d2; try (autorewrite with alg; reflexivity).
     - destruct d; try reflexivity.
       destruct d0; simpl; try (destruct (lift_filter
          (fun x' : data =>
-          match h ⊢ p @ₐ x' with
+          match h ⊢ p @ₐ x' ⊣ c with
           | Some (dbool b) => Some b
           | _ => None
           end) l); reflexivity).
       induction l; simpl.
       destruct (lift_filter
          (fun x' : data =>
-          match h ⊢ p @ₐ x' with
+          match h ⊢ p @ₐ x' ⊣ c with
           | Some (dbool b) => Some b
           | _ => None
           end) l0); reflexivity.
-      generalize(h ⊢ p @ₐ a); intros.
+      generalize(h ⊢ p @ₐ a ⊣ c); intros.
       unfold bunion.
       rewrite lift_app_filter.
       destruct o; try reflexivity.
@@ -93,13 +93,13 @@ Section ROptim.
       revert IHl.
       generalize ((lift_filter
             (fun x' : data =>
-             match h ⊢ p @ₐ x' with
+             match h ⊢ p @ₐ x' ⊣ c with
              | Some (dbool b0) => Some b0
              | _ => None
              end) l)).
       generalize (lift_filter
              (fun x' : data =>
-              match h ⊢ p @ₐ x' with
+              match h ⊢ p @ₐ x' ⊣ c with
               | Some (dbool b0) => Some b0
               | _ => None
               end) l0).
@@ -116,9 +116,9 @@ Section ROptim.
     χ⟨ p1 ⟩( ‵{| p2 |} ) ≡ₐ ‵{| p1 ◯ p2 |}.
   Proof.
     unfold nra_eq; intros; simpl.
-    generalize (h ⊢ p2 @ₐ x); intros.
+    generalize (h ⊢ p2 @ₐ x ⊣ c); intros.
     destruct o; try reflexivity; simpl.
-    generalize (h ⊢ p1 @ₐ d); intros; simpl.
+    generalize (h ⊢ p1 @ₐ d ⊣ c); intros; simpl.
     destruct o; reflexivity.
   Qed.
 
@@ -128,28 +128,28 @@ Section ROptim.
     ‵[| (s, ID) |] ◯ p ≡ₐ ‵[| (s, p) |].
   Proof.
     unfold nra_eq; intros; simpl.
-    generalize (h ⊢ p @ₐ x); intros.
+    generalize (h ⊢ p @ₐ x ⊣ c); intros.
     destruct o; reflexivity.
   Qed.
 
   Lemma flatten_map_coll p1 p2 :
     ♯flatten(χ⟨ ‵{| p1 |} ⟩( p2 )) ≡ₐ χ⟨ p1 ⟩( p2 ).
   Proof.
-    unfold nra_eq; intros h x _; simpl.
-    generalize (h ⊢ p2 @ₐ x); clear x p2; intros.
+    unfold nra_eq; intros h c _ x _; simpl.
+    generalize (h ⊢ p2 @ₐ x ⊣ c); clear x p2; intros.
     destruct o; try reflexivity.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    generalize (h ⊢ p1 @ₐ a); clear a; intros; simpl.
+    generalize (h ⊢ p1 @ₐ a ⊣ c); clear a; intros; simpl.
     destruct o; try reflexivity; simpl.
     unfold olift in *.
     revert IHl.
     generalize (rmap
              (fun x : data =>
-              match h ⊢ p1 @ₐ x with
+              match h ⊢ p1 @ₐ x ⊣ c with
               | Some x' => Some (dcoll (x' :: nil))
               | None => None
-              end) l); generalize (rmap (nra_eval h p1) l); intros.
+              end) l); generalize (rmap (nra_eval h c p1) l); intros.
     unfold lift in *; simpl.
     destruct o; destruct o0; simpl; try reflexivity; try congruence.
     - simpl in *.
@@ -180,8 +180,8 @@ Section ROptim.
   Lemma dot_from_duplicate_r s1 s2 p1 :
     (‵[| (s1, p1) |] ⊕ ‵[| (s2, p1) |])·s2 ≡ₐ p1.
   Proof.
-    unfold nra_eq; intros ? ? _; simpl.
-    generalize (h ⊢ p1 @ₐ x); clear p1 x; intros.
+    unfold nra_eq; intros ? ? _ x _; simpl.
+    generalize (h ⊢ p1 @ₐ x ⊣ c); clear p1 x; intros.
     destruct o; try reflexivity.
     unfold olift; simpl.
     destruct (StringOrder.lt_dec s1 s2); try reflexivity; simpl.
@@ -201,8 +201,8 @@ Section ROptim.
   Lemma dot_from_duplicate_l s1 s2 p1 :
     (‵[| (s1, p1) |] ⊕ ‵[| (s2, p1) |])·s1 ≡ₐ p1.
   Proof.
-    unfold nra_eq; intros ? ? _; simpl.
-    generalize (h ⊢ p1 @ₐ x); clear p1 x; intros.
+    unfold nra_eq; intros ? ? _ x _; simpl.
+    generalize (h ⊢ p1 @ₐ x ⊣ c); clear p1 x; intros.
     destruct o; try reflexivity.
     unfold olift; simpl.
     destruct (StringOrder.lt_dec s1 s2); try reflexivity; simpl.
@@ -223,8 +223,8 @@ Section ROptim.
   Lemma map_into_singleton p :
     χ⟨ ‵{| ID |} ⟩(‵{| p |}) ≡ₐ ‵{|‵{| p |}|}.
   Proof.
-    unfold nra_eq; intros ? ? _; simpl.
-    generalize (h ⊢ p @ₐ x); clear x p; intros.
+    unfold nra_eq; intros ? ? _ x _; simpl.
+    generalize (h ⊢ p @ₐ x ⊣ c); clear x p; intros.
     destruct o; reflexivity.
   Qed.
 
@@ -233,19 +233,19 @@ Section ROptim.
   Lemma flatten_over_map_into_singleton p1 p2:
     ♯flatten( χ⟨ ‵{|‵{| p1 |}|} ⟩( p2 ) ) ≡ₐ χ⟨ ‵{| p1 |} ⟩( p2 ).
   Proof.
-    unfold nra_eq; intros ? ? _; simpl.
-    generalize (h ⊢ p2 @ₐ x); clear p2 x; intros.
+    unfold nra_eq; intros ? ? _ ? _; simpl.
+    generalize (h ⊢ p2 @ₐ x ⊣ c); clear p2 x; intros.
     destruct o; try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
     unfold olift, lift in *; simpl.
-    generalize (h ⊢ p1 @ₐ a); clear a; intros; simpl.
+    generalize (h ⊢ p1 @ₐ a ⊣ c); clear a; intros; simpl.
     destruct o; try reflexivity; simpl.
     revert IHl.
     generalize (rmap
               (fun x : data =>
                match
-                 match h ⊢ p1 @ₐ x with
+                 match h ⊢ p1 @ₐ x ⊣ c with
                  | Some x' => Some (dcoll (x'::nil))
                  | None => None
                  end
@@ -255,7 +255,7 @@ Section ROptim.
                end) l);
     generalize (rmap
             (fun x : data =>
-             match h ⊢ p1 @ₐ x with
+             match h ⊢ p1 @ₐ x ⊣ c with
              | Some x' => Some (dcoll (x'::nil))
              | None => None
              end) l); intros.
@@ -317,8 +317,8 @@ Section ROptim.
     intros.
     elim H; clear H; intros.
     elim H0; clear H0; intros.
-    unfold nra_eq; intros ? ? _; simpl.
-    generalize (h ⊢ p1 @ₐ x); generalize(h ⊢ p2 @ₐ x); clear p1 p2 x; intros.
+    unfold nra_eq; intros ? ? _ ? _; simpl.
+    generalize (h ⊢ p1 @ₐ x ⊣ c); generalize(h ⊢ p2 @ₐ x ⊣ c); clear p1 p2 x; intros.
     destruct o; try reflexivity; simpl.
     - unfold olift, olift2; simpl.
       destruct o0; try reflexivity; simpl.
@@ -460,8 +460,8 @@ Section ROptim.
     χ⟨ (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PDATA"·"WORLD") |])·"PDATA" ⟩( ‵{| p |} )
      ≡ₐ ‵{|(‵[| ("PBIND", p·"PBIND") |] ⊕ ‵[| ("PDATA", p·"PDATA"·"WORLD") |])·"PDATA" |}.
   Proof.
-    unfold nra_eq, olift; intros ? ? _; simpl.
-    generalize (h ⊢ p @ₐ x); simpl; intros; clear p x.
+    unfold nra_eq, olift; intros ? ? _ ? _; simpl.
+    generalize (h ⊢ p @ₐ x ⊣ c); simpl; intros; clear p x.
     destruct o; try reflexivity.
     destruct d; try reflexivity.
     unfold olift, lift; simpl.
@@ -516,7 +516,7 @@ Section ROptim.
     (‵[| ("PBIND", ID·"PBIND") |] ⊕ ‵[| ("PDATA", ID·"PBIND"·"WORLD") |])·"PDATA"
      ≡ₐ ID·"PBIND"·"WORLD".
   Proof.
-    unfold nra_eq; intros ? ? _; simpl.
+    unfold nra_eq; intros ? ? _ ? _; simpl.
     destruct x; try reflexivity; simpl.
     generalize (edot l "PBIND"); clear l; intros.
     destruct o; try reflexivity; simpl.

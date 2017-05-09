@@ -30,164 +30,174 @@ Section TNRAtocNNRC.
 
   (** Type preservation for the translation from NRA to NNRC *)
 
+  Ltac elim_fresh e
+    := solve[(congruence
+            || apply fresh_var_fresh1 in e
+            || apply fresh_var_fresh2 in e
+            || apply fresh_var_fresh3 in e
+            || apply fresh_var_fresh4 in e); intuition].
+  
   Context {m:basic_model}.
-  Theorem tnra_sem_correct {τin τout} (op:nra) (tenv:tbindings) (v:var) :
-    (op ▷ τin >=> τout) ->
-    lookup equiv_dec tenv v = Some τin ->
-    nnrc_type tenv (nra_to_nnrc op v) τout.
+  Theorem tnra_sem_correct {τcenv} {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
+    prefix CONST_PREFIX vid = false ->
+    (forall x,
+        assoc_lookupr equiv_dec (mkConstants τcenv) x
+        = lookup equiv_dec (filterConstants tenv) x) ->
+    lookup equiv_dec tenv vid = Some τin ->
+    (op ▷ τin >=> τout ⊣ τcenv) ->
+    nnrc_type tenv (nra_to_nnrc op vid) τout.
   Proof.
+    Hint Constructors nra_type.
     Opaque fresh_var.
-    intros.
-    revert v tenv H0. 
-    dependent induction H; simpl; intros.
+    intros pre1 fpre; intros.
+    revert vid tenv pre1 fpre H.
+    dependent induction H0; simpl; intros.
     (* ATID *)
-    - apply TNNRCVar.
-      assumption.
+    - apply TNNRCVar; trivial.
     (* ATConst *)
-    - apply TNNRCConst.
-      assumption.
+    - apply TNNRCConst; trivial.
     (* ATBinop *)
-    - specialize (IHnra_type1 v tenv H2); specialize (IHnra_type2 v tenv H2).
-      apply (@TNNRCBinop m τ₁ τ₂); assumption.
+    - econstructor; eauto.
     (* ATUnop *)
-    - specialize (IHnra_type v tenv H1).
-      apply (@TNNRCUnop m τ); assumption.
+    - econstructor; eauto.
     (* ATMap *)
-    - specialize (IHnra_type2 v tenv H1).
-      apply (@TNNRCFor m τ₁); try assumption.
-      specialize (IHnra_type1 (fresh_var "tmap$" [v]) ((fresh_var "tmap$" [v],τ₁)::tenv)).
-      simpl in *.
-      revert IHnra_type1.
-      dest_eqdec; try congruence.
-      intros.
-      apply IHnra_type1; trivial.
+    - econstructor; [eauto| ].
+      apply (IHnra_type1 
+               (fresh_var "tmap$" [vid])
+               ((fresh_var "tmap$" [vid],τ₁)::tenv)); simpl; trivial.
+      + dest_eqdec; congruence.
     (* ATMapConcat *)
-    - specialize (IHnra_type2 v tenv H2).
+    - specialize (IHnra_type2 vid tenv).
       apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
-      apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
+      apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); [eauto | ].
       apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
-      specialize (IHnra_type1 (fresh_var "tmc$" [v]) (((fresh_var "tmc$" [v]), RType.Rec Closed τ₁ pf1) :: tenv)).
-      assert (lookup equiv_dec (((fresh_var "tmc$" [v]), RType.Rec Closed τ₁ pf1) :: tenv) (fresh_var "tmc$" [v]) =
-              Some (RType.Rec Closed τ₁ pf1)).
-      simpl; match_destr; try congruence.
-      specialize (IHnra_type1 H3); clear H3.
-      assumption.
-      apply (@TNNRCBinop m (RType.Rec Closed τ₁ pf1) (RType.Rec Closed τ₂ pf2)).
-      apply ATConcat; assumption.
-      + apply TNNRCVar; simpl.
-        dest_eqdec; try congruence.
-        elim (fresh_var2_distinct _ _ _ e).
-        dest_eqdec; try congruence.
-      + apply TNNRCVar; simpl.
-        dest_eqdec; try congruence.
+      + apply IHnra_type1; simpl; trivial;
+        match_destr; try elim_fresh e.
+      + econstructor; econstructor; eauto 2; simpl; match_destr; try elim_fresh e.
+        match_destr; elim_fresh e.
     (* ATProduct *)
-    - specialize (IHnra_type1 v tenv H2).
-      apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+    - apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
       apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
+      apply (IHnra_type1 vid tenv); assumption.
+      clear IHnra_type1 op1 H0_.
       apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
-      assert (lookup equiv_dec ((fresh_var "tprod$" [v], RType.Rec Closed τ₁ pf1) :: tenv) v =
-              Some τin).
-      simpl. match_destr; try congruence.
-      elim (fresh_var_fresh1 _ _ _ e).
-      specialize (IHnra_type2 v ((_, RType.Rec Closed τ₁ pf1) :: tenv) H3).
-      assumption.
-      apply (@TNNRCBinop m (RType.Rec Closed τ₁ pf1) (RType.Rec Closed τ₂ pf2)).
-      apply ATConcat; assumption.
-      + apply TNNRCVar; simpl.
-        dest_eqdec; try congruence.
-        elim (fresh_var_fresh1 _ _ _ e).
-        dest_eqdec; try congruence.
-      + apply TNNRCVar; simpl.
-        dest_eqdec; try congruence.
+      + apply IHnra_type2; simpl; trivial; match_destr; try elim_fresh e.
+      + econstructor; econstructor; eauto 2; simpl.
+        * match_destr.
+          elim_fresh e.
+          match_destr; congruence.
+        * match_destr; try congruence.
     (* ATSelect *)
     - apply (@TNNRCUnop m (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
-      apply (@TNNRCFor m τ); [apply (IHnra_type2 v tenv H1)|idtac].
+      apply (@TNNRCFor m τ); [apply (IHnra_type2 vid tenv )|idtac]; trivial.
       apply TNNRCIf.
-      apply (IHnra_type1 _ ((_, τ) :: tenv)).
-      simpl; match_destr; try congruence.
-      apply (@TNNRCUnop m τ); [apply ATColl|apply TNNRCVar].
-      simpl; match_destr; try congruence.
-      apply TNNRCConst; simpl.
-      apply TData.dtcoll; apply Forall_nil.
+      + apply IHnra_type1; simpl; trivial; match_destr; elim_fresh e.
+      + econstructor; eauto.
+        repeat econstructor. simpl.
+        repeat econstructor.
+        simpl.
+        match_destr; intuition.
+      + econstructor. simpl. repeat econstructor.
     (* ATDefault *)
     - econstructor; eauto.
       econstructor; eauto.
       econstructor; eauto.
-      Focus 2. econstructor; eauto.
-      simpl.
-      dest_eqdec; try reflexivity.
-      congruence.
-      repeat econstructor; eauto.
       econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      econstructor; eauto.
-      apply Forall_nil.
-      apply IHnra_type2.
-      simpl. match_destr; try congruence.
-      elim (fresh_var_fresh1 _ _ _ e).
-      econstructor; eauto.
-      simpl; match_destr; try congruence.
+      + simpl. repeat econstructor. simpl. match_destr; congruence.
+      + econstructor. econstructor; eauto.
+        econstructor; eauto.
+        econstructor; eauto.
+        eapply Forall_nil.
+      + apply IHnra_type2; simpl; trivial; match_destr; elim_fresh e.
+      + econstructor; eauto.
+        simpl; match_destr; elim_fresh e.
     (* ATEither *)
-    - repeat (econstructor; eauto);
-      [apply IHnra_type1 | apply IHnra_type2]; simpl;
-      match_destr; congruence.
+    - econstructor.
+      + econstructor; eauto.
+      + eapply IHnra_type1; simpl; trivial; match_destr; try elim_fresh e.
+      + eapply IHnra_type2; simpl; trivial; match_destr; try elim_fresh e.
     (* ATEitherConcat *)
-    - repeat (econstructor; eauto).
-      + apply IHnra_type1; simpl. match_destr.
-        elim (fresh_var_fresh1 _ _ _ e).
-      + simpl; match_destr; try congruence. 
-      + simpl; match_destr.
-        * elim (fresh_var_fresh1 _ _ _ (symmetry e)).
+    - econstructor; [eauto | ].
+      econstructor.
+      + eapply IHnra_type1; simpl; trivial; match_destr; try elim_fresh e.
+      + econstructor; [eauto | ].
+        econstructor; eauto.
+        econstructor; eauto.
+        repeat econstructor; eauto. simpl.
+        repeat econstructor; eauto. simpl.
+        match_destr; try congruence.
+        econstructor. simpl.
+        dest_eqdec.
+        * symmetry in e; elim_fresh e.
         * match_destr; try congruence.
-      + simpl. match_destr; try congruence.
-      + simpl; match_destr.
-        * elim (fresh_var_fresh1 _ _ _ (symmetry e)).
-        * match_destr; try congruence.
+      + econstructor; [econstructor | ].
+        econstructor; eauto.
+        * econstructor; simpl.
+          eauto.
+        * econstructor; simpl. match_destr; try congruence.
+        * econstructor; simpl.
+          { match_destr.
+            - symmetry in e; elim_fresh e.
+            - match_destr; try congruence.
+          }
     (* ATApp *)
-    - repeat (econstructor; eauto).
-      apply IHnra_type2.
-      simpl; match_destr; try congruence.
+    - repeat (econstructor; eauto 2).
+      apply IHnra_type2; simpl; trivial.
+      + simpl; match_destr; intuition.
+    (* ATGetConstant *)
+    - econstructor; eauto 2.
+      generalize (filterConstants_lookup_pre tenv s).
+      intros.
+      simpl in H1. rewrite <- H1.
+      rewrite <- fpre.
+      unfold equiv_dec.
+      generalize (@mkConstants_assoc_lookupr rtype); intros.
+      simpl in H2.
+      rewrite H2.
+      trivial.
   Qed.
 
   (** Reverse direction, main theorem *)
 
-  Theorem tnra_sem_correct_back {τin τout} (op:nra) (tenv:tbindings) (v:var) :
-    nnrc_type tenv (nra_to_nnrc op v) τout ->
-    lookup equiv_dec tenv v = Some τin ->
-    (op ▷ τin >=> τout).
+  Theorem tnra_sem_correct_back {τcenv} {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
+    prefix CONST_PREFIX vid = false ->
+    (forall x,
+        assoc_lookupr equiv_dec (mkConstants τcenv) x
+        = lookup equiv_dec (filterConstants tenv) x) ->
+    lookup equiv_dec tenv vid = Some τin ->
+    nnrc_type tenv (nra_to_nnrc op vid) τout ->
+    (op ▷ τin >=> τout ⊣ τcenv).
   Proof.
     Hint Constructors nra_type.
-    intros.
-    revert v tenv τin τout H H0.
-    induction op; simpl; intros; inversion H; subst.
-    (* AID *)
-    - rewrite H0 in H3; inversion H3; subst. eauto.
-    (* AConst *)
-    - eauto.
-    (* ABinop *)
-    - eauto. 
-    (* AUnop *)
-    - eauto.
-    (* AMap *)
-    - specialize (IHop2 _ _ _ _ H6 H0).
-      econstructor; eauto.
-      eapply (IHop1 _ _ _ _ H7).
-      simpl; match_destr; try congruence.
-    (* AMapConcat *)
-    - inversion H6; subst.
-      specialize (IHop2 _ _ _ _ H8 H0).
+    intros pre1 fpre; intros.
+    revert τin τout vid tenv pre1 fpre H H0.
+    nra_cases (induction op) Case; simpl; intros; inversion H0; subst.
+    - Case "AID"%string.
+      rewrite H in H3; inversion H3; subst. eauto.
+    - Case "AConst"%string.
+      eauto.
+    - Case "ABinop"%string.
+      eauto. 
+    - Case "AUnop"%string.
+      eauto.
+    - Case "AMap"%string.
+      econstructor; eauto 2.
+      eapply (IHop1 _ _ (fresh_var "tmap$" [vid])
+                    ((fresh_var "tmap$" [vid],
+                      τ₁) :: tenv)); simpl; trivial.
+      + match_destr; congruence.
+    - Case "AMapConcat"%string.
+      inversion H6; subst.
       inversion H9; subst.
       inversion H11; subst.
       inversion H13; subst.
       inversion H14; subst.
       simpl in H3,H5.
-      generalize (fresh_var2_distinct "tmc$" "tmc$" [v]); simpl.
-      match_destr_in H3; [intuition | ].
-      match_destr_in H3; try congruence.
-      match_destr_in H5; try congruence.
+      dest_eqdec; [ | congruence].
+      dest_eqdec; [elim_fresh e0 | ].
+      dest_eqdec; [ | congruence ].
       inversion H3; inversion H5.
       subst.
       inversion H7; subst.
@@ -197,13 +207,15 @@ Section TNRAtocNNRC.
       subst.
       destruct (to_Rec Closed (rec_concat_sort τ₁ τ₂1) e1) as [? rr].
       rewrite rr.
-      econstructor; eauto.
-      eapply IHop1; eauto.
-      simpl; match_destr; congruence.
-    (* AProduct *)
-    - inversion H4; subst.
+      econstructor; eauto 2.
+      clear H0 H4 H11 H6 H9.
+      eapply (IHop1 _ _ (fresh_var "tmc$" [vid]) (( fresh_var "tmc$" [vid], Rec Closed τ₁ pf1)
+           :: tenv)); eauto.
+      + simpl; match_destr.
+        congruence.
+    - Case "AProduct"%string.
+      inversion H4; subst.
       inversion H6; subst.
-      specialize (IHop1 _ _ _ _ H5 H0).
       destruct τ₂; simpl in *.
       subst.
       inversion H9; subst.
@@ -211,106 +223,111 @@ Section TNRAtocNNRC.
       subst.
       inversion H11; subst.
       inversion H13; inversion H14; subst.
-      generalize (fresh_var2_distinct "tprod$" "tprod$" [v]).
-      simpl in H3, H16.
-      match_destr_in H3; [ intuition | ].
-      match_destr_in H3; try congruence.
-      match_destr_in H16; try congruence.
+      simpl in H3,H16.
+      dest_eqdec; try congruence.
+      dest_eqdec; try elim_fresh e1.
+      dest_eqdec; try elim_fresh e2.
       inversion H3; inversion H16; subst.
       inversion H10; subst.
-      econstructor; eauto.
-      eapply IHop2; eauto.
-      simpl; match_destr.
-      elim (fresh_var_fresh1 _ _ _ e2).
-  (* ASelect *)
-    - inversion H4; subst.
-      inversion H6; subst.
-      inversion H9; subst.
-      inversion H13; subst.
-      inversion H12; subst.
-      inversion H15; subst.
-      simpl in H7.
-      match_destr_in H7; try congruence.
-      inversion H7; subst; clear H7.
-      inversion H11; subst.
-      inversion H8.
-      assert (τ₁0 = τ) by (apply rtype_fequal; assumption).
+      econstructor; eauto 2.
+      clear H13 H14 H0 H6 H9 H11 H10.
+      eapply (IHop2 _ _ vid ((fresh_var "tprod$" [vid], Rec Closed τ₁ pf1) :: tenv)); eauto.
+      + simpl.
+        match_destr.
+        elim_fresh e2.
+    - Case "ASelect"%string.
+      inversion H4; clear H4; subst.
+      inversion H6; clear H6; subst.
+      inversion H8; clear H8; subst.
+      inversion H11; clear H11; subst.
+      inversion H10; clear H10; subst.
+      inversion H11; clear H11; subst.
+      simpl in H5.
+      dest_eqdec; try elim_fresh e.
+      inversion H5; clear H5; subst.
+      inversion H8; clear H8; subst.
+      inversion H7; clear H7; subst.
+      rtype_equalizer.
       subst.
-      clear H2 H8.
-      inversion H3; subst.
-      rtype_equalizer. subst.
-      econstructor.
-      + eapply IHop1; eauto.
-        simpl; match_destr; congruence.
-      + eapply IHop2; eauto.
-    (* ADefault *)
-  - inversion H7; subst; clear H7.
-    inversion H10; subst. inversion H5; subst.
-    inversion H8; inversion H12; inversion H13;
+      econstructor; eauto 2.
+      eapply (IHop1 _ _ (fresh_var "tsel$" (vid::nil)) ((fresh_var "tsel$" (vid::nil), τ) :: tenv)); eauto; simpl;
+        match_destr; try elim_fresh e0.
+    - Case "ADefault"%string.
+      inversion H7; subst; clear H7.
+      inversion H10; subst. inversion H5; subst.
+      inversion H8; inversion H12; inversion H13;
       subst; clear H5 H10 H8 H12 H13.
-    simpl in H3, H11.
-    match_destr_in H3; try congruence.
-    invcs H3; invcs H11.
-    invcs H18.
-    econstructor; eauto 2.
-    eapply IHop2; eauto.
-    simpl; match_destr; try congruence.
-    elim (fresh_var_fresh1 _ _ _ e0).
-  (* AEither *)
-  - inversion H8; subst.
-    specialize (IHop1 _ _ τl _ H9).
-    specialize (IHop2 _ _ τr _ H10).
-    simpl in IHop1, IHop2.
-    match_destr_in IHop1; try congruence.
-    rewrite H0 in H3. inversion H3; subst.
-    eauto.
-  (* AEitherConcat *)
-  - clear H. inversion H7; subst; clear H7.
-    specialize (IHop2 _ _ _ _ H6 H0).
-    inversion H10; clear H10; subst.
-    inversion H3; clear H3; subst.
-    inversion H11; clear H11; subst.
-    inversion H3; clear H3; subst.
-    rtype_equalizer. subst.
-    inversion H5; clear H5; subst.
-    inversion H4; clear H4; subst.
-    inversion H7; clear H7; subst.
-    inversion H4; clear H4; subst.
-    inversion H8; clear H8; subst.
-    inversion H12; clear H12; subst.
-    inversion H10; clear H10; subst.
-    inversion H11; clear H11; subst.
-    simpl in H3,H5.
-    match_destr_in H3.
-    elim (fresh_var_fresh1 _ _ _ (symmetry e)).
-    match_destr_in H5; try congruence.
-    simpl in * .
-    match_destr_in H2; try congruence.
-    inversion H2; inversion H3;
-    inversion H4; inversion H5; subst.
-    clear H2 H3 H4 H5.
-    specialize (IHop1 _ _ τin _ H9).
-    simpl in IHop1.
-    match_destr_in IHop1.
-    elim (fresh_var_fresh1 _ _ _ e1).
-    specialize (IHop1 H0).
-    apply Rec_inv in H10. subst.
-    econstructor; eauto.
-    (* AApp *)
-  - inversion H; subst; clear H.
-    econstructor.
-    eapply IHop2; eauto.
-    eapply IHop1; simpl. eauto.
-    simpl; match_destr; try congruence.
+      invcs H18.
+      simpl in H3, H11.
+      dest_eqdec; try congruence.
+      inversion H3; subst; inversion H11; subst; clear H3 H11.
+      constructor; eauto 2.
+      eapply (IHop2 _ _ vid ((fresh_var "tdef$" [vid], Coll τ) :: tenv)); eauto; simpl; match_destr; elim_fresh e0.
+    - Case "AEither"%string.
+      inversion H8; subst.
+      rewrite H in H3; inversion H3; clear H3; subst.
+      econstructor.
+      + eapply IHop1; try eapply H9; trivial;
+          simpl; match_destr; try elim_fresh e.
+      + eapply IHop2; try eapply H10; trivial;
+        simpl; match_destr; try elim_fresh e.
+    - Case "AEitherConcat"%string.
+      inversion H7; clear H7; subst.
+      clear H0.
+      inversion H11; clear H11; subst.
+      inversion H3; clear H3; subst.
+      inversion H12; clear H12; subst.
+      inversion H3; clear H3; subst.
+      rtype_equalizer. subst.
+      inversion H5; clear H5; subst.
+      inversion H9; clear H9; subst.
+      inversion H7; clear H7; subst.
+      inversion H12; clear H12; subst.
+      inversion H13; clear H13; subst.
+      inversion H8; clear H8; subst.
+      inversion H4; clear H4; subst.
+      simpl in H2, H3.
+      dest_eqdec; try congruence.
+      inversion H2; clear H2; subst.
+      inversion H3; clear H3; subst.
+      inversion H11; clear H11; subst.
+      simpl in H2, H5.
+      dest_eqdec; try (symmetry in e0; elim_fresh e0).
+      dest_eqdec; try congruence.
+      inversion H5; clear H5; subst.
+      inversion H2; clear H2; subst.
+      rtype_equalizer. subst.
+      econstructor; try reflexivity; eauto 2.
+      eapply IHop1; try eapply H10; trivial;
+        simpl; match_destr; try elim_fresh e1.
+    - Case "AApp"%string.
+      inversion H; subst; clear H.
+      econstructor; eauto 2.
+      eapply (IHop1 _ _ (fresh_var "tapp$" [vid]) ((fresh_var "tapp$" [vid], τ₁) :: tenv)); simpl; trivial;
+        try (match_destr; try elim_fresh e).
+    - Case "AGetConstant"%string.
+      econstructor. eauto.
+      generalize (filterConstants_lookup_pre tenv s).
+      intros.
+      simpl in H1. rewrite <- H1 in H3.
+      rewrite <- fpre in H3.
+      generalize (@mkConstants_assoc_lookupr rtype); intros.
+      simpl in H2.
+      rewrite H2 in H3.
+      apply H3.
   Qed.
 
   (** Theorem 7.4: NRA<->NNRC.
        Final iff Theorem of type preservation for the translation from NRA to NNRC *)
 
-  Theorem tnra_sem_correct_iff {τin τout} (op:nra) (tenv:tbindings) (v:var) :
-    lookup equiv_dec tenv v = Some τin ->
-    (nnrc_type tenv (nra_to_nnrc op v) τout <->
-    (op ▷ τin >=> τout)).
+  Theorem tnraenv_sem_correct_iff {τcenv} {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
+    prefix CONST_PREFIX vid = false ->
+    (forall x,
+        assoc_lookupr equiv_dec (mkConstants τcenv) x
+        = lookup equiv_dec (filterConstants tenv) x) ->
+    lookup equiv_dec tenv vid = Some τin ->
+    nnrc_type tenv (nra_to_nnrc op vid) τout ->
+    (op ▷ τin >=> τout ⊣ τcenv).
   Proof.
     Hint Resolve tnra_sem_correct tnra_sem_correct_back.
     intuition; eauto.

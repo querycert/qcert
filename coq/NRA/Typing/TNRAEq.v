@@ -37,34 +37,40 @@ Section TNRAEq.
      for every well-typed input.  *)
 
   Context {m:basic_model}.
-  Definition typed_nra τin τout := {op:nra|op ▷ τin >=> τout}.
+  Definition typed_nra τc τin τout := {op:nra|op ▷ τin >=> τout ⊣ τc}.
 
-  Definition tnra_eq {τin τout} (op1 op2:typed_nra τin τout) : Prop :=
-    forall x:data, x ▹ τin -> brand_relation_brands ⊢ (proj1_sig op1) @ₐ x = brand_relation_brands ⊢ (proj1_sig op2) @ₐ x.
+  Definition tnra_eq {τc} {τin τout} (op1 op2:typed_nra τc τin τout) : Prop :=
+    forall (x:data) c
+           (dt_x:x ▹ τin)
+           (dt_c:bindings_type c τc),
+      brand_relation_brands ⊢ (proj1_sig op1) @ₐ x ⊣ c
+                 = brand_relation_brands ⊢ (proj1_sig op2) @ₐ x ⊣ c.
 
-  Global Instance tnra_equiv {τin τout:rtype} : Equivalence (@tnra_eq τin τout).
+  Global Instance tnra_equiv {τc} {τin τout:rtype} : Equivalence (@tnra_eq τc τin τout).
   Proof.
     constructor.
     - unfold Reflexive, tnra_eq.
       intros; reflexivity.
     - unfold Symmetric, tnra_eq.
-      intros; rewrite (H x0 H0); reflexivity.
+      intros; rewrite (H x0 c dt_x dt_c); reflexivity.
     - unfold Transitive, tnra_eq.
-      intros; rewrite (H x0 H1); rewrite (H0 x0 H1); reflexivity.
+      intros; rewrite (H x0 c dt_x dt_c); rewrite (H0 x0 c dt_x dt_c); reflexivity.
   Qed.
 
-  Notation "t1 ⇝ t2" := (typed_nra t1 t2) (at level 80).                        (* ≡ = \equiv *)
+  Notation "t1 ⇝ t2 ⊣ τc" := (typed_nra τc t1 t2) (at level 80).                        (* ≡ = \equiv *)
   Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80).                             (* ≡ = \equiv *)
 
-  Lemma nra_eq_impl_tnra_eq {τin τout} (op1 op2: τin ⇝ τout) :
+  Hint Resolve data_type_normalized.
+  Hint Resolve bindings_type_Forall_normalized.
+
+  Lemma nra_eq_impl_tnra_eq {τc} {τin τout} (op1 op2: τin ⇝ τout ⊣ τc) :
     `op1 ≡ₐ `op2 -> op1 ≡τ op2.
   Proof.
     unfold tnra_eq, nra_eq; intros.
-    apply (H brand_relation_brands x).
-    eauto.
+    eapply H; eauto.
   Qed.
 
-  Lemma nra_eq_pf_irrel {op} {τin τout} (pf1 pf2: op ▷ τin >=> τout) :
+  Lemma nra_eq_pf_irrel {op} {τc} {τin τout} (pf1 pf2: op ▷ τin >=> τout ⊣ τc) :
     tnra_eq (exist _ _ pf1) (exist _ _ pf2).
   Proof.
     red; intros; simpl.
@@ -73,33 +79,36 @@ Section TNRAEq.
 
   (* A different kind of type-based rewrite *)
 
-  Definition tnra_rewrites_to {τin τout} (op1 op2:nra) : Prop :=
-    op1 ▷ τin >=> τout ->
-    (op2 ▷ τin >=> τout) /\ (forall x:data, x ▹ τin -> brand_relation_brands ⊢ op1 @ₐ x = brand_relation_brands ⊢ op2 @ₐ x).
+  Definition tnra_rewrites_to {τc} {τin τout} (op1 op2:nra) : Prop :=
+    op1 ▷ τin >=> τout ⊣ τc ->
+    (op2 ▷ τin >=> τout ⊣ τc) /\ (forall (x:data) c
+                                         (dt_x:x ▹ τin)
+                                         (dt_c:bindings_type c τc),
+                                     brand_relation_brands ⊢ op1 @ₐ x ⊣ c = brand_relation_brands ⊢ op2 @ₐ x ⊣ c).
   
-  Notation "A ↦ₐ B ⊧ op1 ⇒ op2" := (@tnra_rewrites_to A B op1 op2) (at level 80).
+  Notation "A ↦ₐ B ⊣ C ⊧ op1 ⇒ op2" := (@tnra_rewrites_to C A B op1 op2) (at level 80).
 
-  Lemma rewrites_typed_and_untyped {τin τout} (op1 op2:nra):
-    (op1 ▷ τin >=> τout -> op2 ▷ τin >=> τout) -> op1 ≡ₐ op2 -> τin ↦ₐ τout ⊧ op1 ⇒ op2.
+  Lemma rewrites_typed_and_untyped {τc} {τin τout} (op1 op2:nra):
+    (op1 ▷ τin >=> τout ⊣ τc -> op2 ▷ τin >=> τout ⊣ τc) -> op1 ≡ₐ op2 -> τin ↦ₐ τout ⊣ τc ⊧ op1 ⇒ op2.
   Proof.
     intros.
     unfold tnra_rewrites_to; simpl; intros.
     split; eauto.
   Qed.
 
-  Lemma tnra_rewrites_eq_is_typed_eq {τin τout:rtype} (op1 op2:typed_nra τin τout):
-    (τin ↦ₐ τout ⊧ `op1 ⇒ `op2) -> op1 ≡τ op2.
+  Lemma tnra_rewrites_eq_is_typed_eq {τc} {τin τout:rtype} (op1 op2:typed_nra τc τin τout):
+    (τin ↦ₐ τout ⊣ τc ⊧ `op1 ⇒ `op2) -> op1 ≡τ op2.
   Proof.
     unfold tnra_rewrites_to, tnra_eq; intros.
     elim H; clear H; intros.
-    apply (H1 x H0).
+    apply (H0 x c dt_x dt_c).
     dependent induction op1; simpl.
     assumption.
   Qed.
 
-  Lemma tnra_typed_eq_and_type_propag {τin τout:rtype} (op1 op2:typed_nra τin τout):
+  Lemma tnra_typed_eq_and_type_propag {τc} {τin τout:rtype} (op1 op2:typed_nra τc τin τout):
     op1 ≡τ op2 ->
-    ((`op1) ▷ τin >=> τout -> (`op2) ▷ τin >=> τout) -> τin ↦ₐ τout ⊧ (`op1) ⇒ (`op2).
+    ((`op1) ▷ τin >=> τout ⊣ τc -> (`op2) ▷ τin >=> τout ⊣ τc) -> τin ↦ₐ τout ⊣ τc ⊧ (`op1) ⇒ (`op2).
   Proof.
     unfold tnra_rewrites_to, tnra_eq; intros.
     split.
@@ -109,9 +118,9 @@ Section TNRAEq.
 
 End TNRAEq.
 
-Notation "m ⊢ₐ A ↦ B ⊧ op1 ⇒ op2" := (@tnra_rewrites_to m A B op1 op2) (at level 80).
+Notation "m ⊢ₐ A ↦ B ⊣ C ⊧ op1 ⇒ op2" := (@tnra_rewrites_to m C A B op1 op2) (at level 80).
 
-Notation "t1 ⇝ t2" := (typed_nra t1 t2) (at level 80).
+Notation "t1 ⇝ t2 ⊣ tc" := (typed_nra tc t1 t2) (at level 80).
 Notation "X ≡τ Y" := (tnra_eq X Y) (at level 80).                             (* ≡ = \equiv *)
 Notation "X ≡τ' Y" := (tnra_eq (exist _ _ X) (exist _ _ Y)) (at level 80).    (* ≡ = \equiv *)
 

@@ -29,7 +29,7 @@ Section cNRAEnvtoNRA.
     Context (h:brand_relation_t).
 
     Definition nraenv_core_to_nra_top (q:nraenv_core) : nra :=
-      AApp (nra_of_nraenv_core q) (nra_context AID (AConst (drec nil)) (AConst dunit)).
+      AApp (nra_of_nraenv_core q) (nra_context (AConst (drec nil)) (AConst dunit)).
 
     Theorem nraenv_core_to_nra_top_correct :
       forall q:nraenv_core, forall global_env:bindings,

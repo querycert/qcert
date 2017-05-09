@@ -42,11 +42,6 @@ Section NRAtocNRAEnv.
       unfold nra_to_nraenv_core_top.
       simpl.
       rewrite <- nraenv_core_eval_of_nra.
-      simpl.
-      rewrite unfold_env_nra_sort.
-      simpl.
-      unfold nra_context_data.
-      rewrite drec_sort_idempotent.
       reflexivity.
     Qed.
   End Top.

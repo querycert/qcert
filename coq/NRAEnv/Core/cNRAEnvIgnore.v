@@ -44,7 +44,7 @@ Section cNRAEnvIgnore.
       | ANEither e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
       | ANEitherConcat e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
       | ANApp e1 e2 => (nraenv_core_is_nra e1) /\ (nraenv_core_is_nra e2)
-      | ANGetConstant _ => False
+      | ANGetConstant _ => True
       | ANEnv => False
       | ANAppEnv e1 e2 => False
       | ANMapEnv e1 => False
@@ -64,7 +64,7 @@ Section cNRAEnvIgnore.
       | ANEither e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
       | ANEitherConcat e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
       | ANApp e1 e2 => andb (nraenv_core_is_nra_fun e1) (nraenv_core_is_nra_fun e2)
-      | ANGetConstant _ => false
+      | ANGetConstant _ => true
       | ANEnv => false
       | ANAppEnv e1 e2 => false
       | ANMapEnv e1 => false
@@ -308,7 +308,7 @@ Section cNRAEnvIgnore.
       | ANEither ea1 ea2 => AEither (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
       | ANEitherConcat ea1 ea2 => AEitherConcat (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
       | ANApp ea1 ea2 => AApp (nraenv_core_deenv_nra ea1) (nraenv_core_deenv_nra ea2)
-      | ANGetConstant _ => AID
+      | ANGetConstant s => AGetConstant s
       | ANEnv => AID
       | ANAppEnv ea1 ea2 => AID
       | ANMapEnv ea1 => AID
@@ -450,8 +450,8 @@ Section cNRAEnvIgnore.
   Require Import NRASugar.
   Lemma nraenv_core_is_nra_deenv (h:list (string*string)) c (e:nraenv_core) (d1 d2:data) :
     nraenv_core_is_nra e ->
-        h ⊢ (nra_of_nraenv_core e) @ₐ (nra_context_data c d1 d2) =
-        h ⊢ (nraenv_core_deenv_nra e) @ₐ d2.
+        h ⊢ (nra_of_nraenv_core e) @ₐ (nra_context_data d1 d2) ⊣ c =
+        h ⊢ (nraenv_core_deenv_nra e) @ₐ d2 ⊣ c.
   Proof.
     intros.
     revert d1 d2; induction e; try reflexivity; simpl in *; try (inversion H; congruence); simpl; intros.
@@ -466,7 +466,7 @@ Section cNRAEnvIgnore.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (nra_eval h (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -477,19 +477,19 @@ Section cNRAEnvIgnore.
       unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl.
-      destruct (nra_eval h (nraenv_core_deenv_nra e1) a); try reflexivity.
+      destruct (nra_eval h c (nraenv_core_deenv_nra e1) a); try reflexivity.
       unfold lift; simpl.
       revert IHl.
-      generalize (rmap (nra_eval h (nra_of_nraenv_core e1))
-                       (map (fun x : data => drec (("PBIND"%string, d1) :: ("PCONST"%string, c):: ("PDATA"%string, x) :: nil)) l));
-        generalize (rmap (nra_eval h (nraenv_core_deenv_nra e1)) l); intros.
+      generalize (rmap (nra_eval h c (nra_of_nraenv_core e1))
+                       (map (fun x : data => drec (("PBIND"%string, d1) :: ("PDATA"%string, x) :: nil)) l));
+        generalize (rmap (nra_eval h c (nraenv_core_deenv_nra e1)) l); intros.
       destruct o; destruct o0; try congruence.
     - inversion H; clear H.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (nra_eval h (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -500,7 +500,7 @@ Section cNRAEnvIgnore.
       unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
-      generalize (nra_eval h (nraenv_core_deenv_nra e1) a); intros.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e1) a); intros.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
@@ -512,7 +512,7 @@ Section cNRAEnvIgnore.
                  oflat_map
          (fun a0 : data =>
           match
-            match nra_eval h (nra_of_nraenv_core e1) a0 with
+            match nra_eval h c (nra_of_nraenv_core e1) a0 with
             | Some (dcoll l1) =>
                 match
                   rmap (fun x : data => Some (drec (("PDATA2"%string, x) :: nil))) l1
@@ -525,12 +525,12 @@ Section cNRAEnvIgnore.
           with
           | Some (dcoll y) => omap_concat a0 y
           | _ => None
-          end) (map (fun x : data => drec (("PBIND"%string, d1) :: ("PCONST"%string, c):: ("PDATA"%string, x) :: nil)) l)
+          end) (map (fun x : data => drec (("PBIND"%string, d1) :: ("PDATA"%string, x) :: nil)) l)
 
         ); generalize (
      oflat_map
        (fun a0 : data =>
-        match nra_eval h (nraenv_core_deenv_nra e1) a0 with
+        match nra_eval h c (nraenv_core_deenv_nra e1) a0 with
         | Some (dcoll y) => omap_concat a0 y
         | _ => None
         end) l
@@ -617,7 +617,7 @@ Section cNRAEnvIgnore.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; clear IHe2.
       unfold olift, olift2; simpl.
-      generalize (nra_eval h (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl; clear e2.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       unfold lift, rmap_concat, oomap_concat; simpl.
@@ -628,17 +628,17 @@ Section cNRAEnvIgnore.
       unfold nra_context_data in *.
       induction l; try reflexivity; simpl.
       rewrite IHe1; simpl; clear IHe1.
-      generalize (nra_eval h (nraenv_core_deenv_nra e1) a); intros.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e1) a); intros.
       destruct o; try reflexivity.
       destruct d; try reflexivity.
       unfold lift_oncoll in *; simpl in *.
       revert IHl.
       generalize (lift_filter
          (fun x' : data =>
-          match nra_eval h (nra_of_nraenv_core e1) x' with
+          match nra_eval h c (nra_of_nraenv_core e1) x' with
           | Some (dbool b0) => Some b0
           | _ => None
-          end) (map (fun x : data => drec (("PBIND"%string, d1) :: ("PCONST"%string, c):: ("PDATA"%string, x) :: nil)) l)
+          end) (map (fun x : data => drec (("PBIND"%string, d1) :: ("PDATA"%string, x) :: nil)) l)
                  ); intros.
       destruct o; try reflexivity; try congruence; simpl.
       * destruct b; try reflexivity.
@@ -652,7 +652,7 @@ Section cNRAEnvIgnore.
           end) l0);
         generalize (lift_filter
        (fun x' : data =>
-        match nra_eval h (nraenv_core_deenv_nra e1) x' with
+        match nra_eval h c (nraenv_core_deenv_nra e1) x' with
         | Some (dbool b) => Some b
         | _ => None
         end) l
@@ -667,7 +667,7 @@ Section cNRAEnvIgnore.
           end) l0);
         generalize (lift_filter
        (fun x' : data =>
-        match nra_eval h (nraenv_core_deenv_nra e1) x' with
+        match nra_eval h c (nraenv_core_deenv_nra e1) x' with
         | Some (dbool b) => Some b
         | _ => None
         end) l
@@ -676,7 +676,7 @@ Section cNRAEnvIgnore.
       * revert IHl.
         generalize (lift_filter
        (fun x' : data =>
-        match nra_eval h (nraenv_core_deenv_nra e1) x' with
+        match nra_eval h c (nraenv_core_deenv_nra e1) x' with
         | Some (dbool b0) => Some b0
         | _ => None
         end) l); intros.
@@ -693,7 +693,7 @@ Section cNRAEnvIgnore.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; simpl; clear IHe2.
-      generalize (nra_eval h (nraenv_core_deenv_nra e2) d2); intros; simpl.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl;
       unfold nra_context_data in *;
       rewrite IHe1; reflexivity.
@@ -701,10 +701,10 @@ Section cNRAEnvIgnore.
       specialize (IHe1 H0); clear H0.
       specialize (IHe2 H1); clear H1.
       rewrite IHe2; simpl; clear IHe2.
-      generalize (nra_eval h (nraenv_core_deenv_nra e2) d2); intros; simpl.
+      generalize (nra_eval h c (nraenv_core_deenv_nra e2) d2); intros; simpl.
       destruct o; try reflexivity; simpl.
       unfold nra_context_data in *;
-      rewrite IHe1; reflexivity.
+        rewrite IHe1; reflexivity.
   Qed.
 
   (* TODO: try to define ANEitherConcat. *)
@@ -723,10 +723,11 @@ Section cNRAEnvIgnore.
       | AEither opl opr => ANEither (nraenv_core_of_nra opl) (nraenv_core_of_nra opr)
       | AEitherConcat op1 op2 => ANEitherConcat (nraenv_core_of_nra op1) (nraenv_core_of_nra op2)
       | AApp e1 e2 => ANApp (nraenv_core_of_nra e1) (nraenv_core_of_nra e2)
+      | AGetConstant s => ANGetConstant s
     end.
 
   Lemma nraenv_core_eval_of_nra h c e d env :
-    nra_eval h e d = nraenv_core_eval h c (nraenv_core_of_nra e) env d.
+    nra_eval h c e d = nraenv_core_eval h c (nraenv_core_of_nra e) env d.
   Proof.
     revert d env.
     induction e; simpl; trivial; intros;

@@ -102,7 +102,7 @@ Section CAMPtoNRAEnv.
   Qed.
   
   Lemma nraenv_of_camp_equiv_to_nra h c p bind d:
-    nra_eval h (nra_of_camp p) (nra_context_data (drec (rec_sort c)) (drec bind) d) =
+    nra_eval h c (nra_of_camp p) (nra_context_data (drec bind) d) =
     nraenv_eval h c (nraenv_of_camp p) (drec bind) d.
   Proof.
     rewrite <- nraenv_of_camp_correct.
@@ -111,7 +111,7 @@ Section CAMPtoNRAEnv.
 
   Lemma nraenv_of_camp_top_id h c p d :
     Forall (fun x => data_normalized h (snd x)) c ->
-    nra_eval h (nra_of_camp_top c p) d =
+    nra_eval h c (nra_of_camp_top p) d =
     nraenv_eval h c (nraenv_of_camp_top p) (drec nil) d.
   Proof.
     intros.
@@ -120,7 +120,6 @@ Section CAMPtoNRAEnv.
     unfold nraenv_eval in *; simpl in *.
     rewrite <- Hequiv.
     unfold nra_context_data.
-    rewrite map_normalize_normalized_eq by trivial.
     reflexivity.
   Qed.
   

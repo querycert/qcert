@@ -56,8 +56,11 @@ Section CompDriver.
   Require Import CAMPtoNRA.
   Require Import CAMPtocNRAEnv.
   Require Import CAMPtoNRAEnv.
-  Require Import NRAtocNNRC cNRAEnvtocNNRC NRAEnvtoNNRC.
+  Require Import NRAtocNNRC.
+  Require Import cNRAEnvtocNNRC.
+  Require Import NRAEnvtoNNRC.
   Require Import cNRAEnvtoNRA.
+  Require Import NRAtocNRAEnv.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import NNRCtoNNRCMR.
@@ -158,7 +161,7 @@ Section CompDriver.
     Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.camp_to_nraenv_top q.
 
     (** NRA/NRAEnv translations *)
-    Definition nra_to_nraenv_core (q: nra) : nraenv_core := nraenv_core_of_nra q.
+    Definition nra_to_nraenv_core (q: nra) : nraenv_core := NRAtocNRAEnv.nra_to_nraenv_core_top q.
 
     Definition nra_to_nnrc_core (q: nra) : nnrc_core := nra_to_nnrc_core q init_vid.
 

@@ -29,42 +29,46 @@ Section TNRAExt.
   (** Typing for NRA *)
 
   Context {m:basic_model}.
-  Definition nraext_type Op A B := nra_type (nra_of_nraext Op) A B.
-  
-  Notation "Op ▷ A >=> B" := (nraext_type Op A B) (at level 70) : nraext_scope.
+
+  Definition nraext_type Op C A B := nra_type C (nra_of_nraext Op) A B.
+
+  Notation "Op ▷ A >=> B ⊣ C" := (nraext_type Op C A B) (at level 70) : nraext_scope.
 
   (** Main typing soundness theorem for the Extended NRA *)
 
-  Theorem typed_nraext_yields_typed_data {τin τout} (d:data) (op:nraext):
-    (d ▹ τin) -> (op ▷ τin >=> τout) ->
-    (exists x, (brand_relation_brands ⊢ op @ₓ d = Some x /\ (x ▹ τout))).
+  Theorem typed_nraext_yields_typed_data {τc} {τin τout} (d:data) c (op:nraext):
+    (bindings_type c τc) ->
+    (d ▹ τin) -> (op ▷ τin >=> τout ⊣ τc) ->
+    (exists x, (brand_relation_brands ⊢ op @ₓ d ⊣ c = Some x /\ (x ▹ τout))).
   Proof.
     unfold nraext_eval, nraext_type; intros.
-    apply (@typed_nra_yields_typed_data m τin τout); assumption.
+    apply (@typed_nra_yields_typed_data m τc τin τout); assumption.
   Qed.
 
   (** Corrolaries of the main type soudness theorem *)
 
-  Definition typed_nraext_total {τin τout} (op:nraext) (d:data):
-    (d ▹ τin) -> (op ▷ τin >=> τout) ->             
+  Definition typed_nraext_total {τc} {τin τout} (op:nraext) (d:data) c :
+    (bindings_type c τc) ->
+    (d ▹ τin) -> (op ▷ τin >=> τout ⊣ τc) ->             
     { x:data | x ▹ τout }.
   Proof.
     unfold nraext_eval, nraext_type; intros.
-    apply (@typed_nra_total m τin τout (nra_of_nraext op) H0 d); assumption.
+    apply (@typed_nra_total m τc τin τout (nra_of_nraext op) H1 c d); assumption.
   Defined.
 
-  Definition tnraext_eval {τin τout} (op:nraext) (d:data):
-    (d ▹ τin) -> (op ▷ τin >=> τout) -> data.
+  Definition tnraext_eval {τc} {τin τout} (op:nraext) (d:data) c :
+    (bindings_type c τc) ->
+    (d ▹ τin) -> (op ▷ τin >=> τout ⊣ τc) -> data.
   Proof.
     unfold nraext_eval, nraext_type; intros.
-    apply (@tnra_eval m τin τout (nra_of_nraext op) H0 d); assumption.
+    apply (@tnra_eval m τc τin τout (nra_of_nraext op) H1 c d); assumption.
   Defined.
 End TNRAExt.
 
 (* Typed algebraic plan *)
 
-Notation "Op ▷ A >=> B" := (nraext_type Op A B) (at level 70) : nraext_scope.
-Notation "Op @▷ d" := (tnraext_eval Op d) (at level 70) : nraext_scope.
+Notation "Op ▷ A >=> B ⊣ C" := (nraext_type Op C A B) (at level 70) : nraext_scope.
+Notation "Op @▷ d ⊣ c" := (tnraext_eval Op d c) (at level 70) : nraext_scope.
 
 (* 
 *** Local Variables: ***

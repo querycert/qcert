@@ -154,18 +154,18 @@ Section cNRAEnvContext.
     data_normalized h env ->
     nraenv_core_eq_under h c env 
                     ((nraenv_core_of_nra (nra_of_nraenv_core e )
-                                    ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[|("PCONST", ‵(drec (rec_sort c)))|] ⊕‵[| ("PDATA", ID)|])))%nraenv_core)
+                                    ◯ (‵[| ("PBIND", ‵(env))|] ⊕ ‵[| ("PDATA", ID)|]))%nraenv_core)
                     e.
   Proof.
     red; intros.
     simpl.
     rewrite <- nraenv_core_eval_of_nra.
-    rewrite unfold_env_nra_sort.
-    rewrite (map_normalize_normalized_eq h (rec_sort c)).
-    - rewrite drec_sort_idempotent.
-      rewrite (normalize_normalized_eq h H0).
-      reflexivity.
-    - apply Forall_sorted; eauto.
+    rewrite unfold_env_nra.
+    unfold nra_context_data.
+    f_equal.
+    f_equal.
+    rewrite (normalize_normalized_eq h H0).
+    trivial.
   Qed.
 
   Instance ae_under_equiv h c env : Equivalence (nraenv_core_eq_under h c env).
@@ -501,7 +501,7 @@ Section cNRAEnvContext.
               (fun x : nat * nraenv_core =>
                (fst x,
                (nraenv_core_of_nra (nra_of_nraenv_core (snd x))
-                ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵(drec (rec_sort c)))|] ⊕ ‵[| ("PDATA", ID)|])))%nraenv_core))
+                ◯ (‵[| ("PBIND", ‵(env))|] ⊕ ‵[| ("PDATA", ID)|]))%nraenv_core))
               ps) ps.
    Proof.
      induction ps; simpl; trivial.
@@ -520,7 +520,7 @@ Section cNRAEnvContext.
     match_case; match_case; intros.
     red; intros h dl dnc env dnenv d dnd.
     specialize (H (map (fun xy => (fst xy,
-                                   (AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env)))) ps)).
+                                   (AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env)))) ps)).
     
       symmetry in Hequiv.
        generalize (equivlist_in Hequiv); intros Hin.
@@ -532,21 +532,21 @@ Section cNRAEnvContext.
          repeat rewrite aec_holes_lift; intuition. }
        repeat rewrite map_map in H.
        simpl in H.
-       generalize (ac_holes_saturated_subst (fun x => (nra_of_nraenv_core x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c1 ps c1incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_nraenv_core x ◯ make_fixed_nra_context_data env)%nra) c1 ps c1incl);
          intros c1nholes.
-       generalize (ac_holes_saturated_subst (fun x => (nra_of_nraenv_core x ◯ make_fixed_nra_context_data (drec (rec_sort dl)) env)%nra) c2 ps c2incl);
+       generalize (ac_holes_saturated_subst (fun x => (nra_of_nraenv_core x ◯ make_fixed_nra_context_data env)%nra) c2 ps c2incl);
          intros c2nholes.
        destruct (ac_simplify_nholes _ c1nholes) as [c1s c1seq].
        destruct (ac_simplify_nholes _ c2nholes) as [c2s c2seq].
        generalize (aec_simplify_lift_commute (ac_substs c1
              (map
                 (fun xy : nat * nraenv_core =>
-                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
+                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env))) ps)));
         intros leq1.
       generalize (aec_simplify_lift_commute (ac_substs c2
              (map
                 (fun xy : nat * nraenv_core =>
-                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data (drec (rec_sort dl)) env))) ps)));
+                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env))) ps)));
         intros leq2.
       rewrite lift_nra_context_substs in leq1, leq2.
       rewrite map_map in leq1, leq2. simpl in leq1, leq2.
@@ -556,13 +556,13 @@ Section cNRAEnvContext.
         (aec_substs_under_prop_part2 h dl env dnc dnenv c1
                                      (map (fun x => (fst x, 
                                      ((nraenv_core_of_nra (nra_of_nraenv_core (snd x)))
-                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|] ⊕ ‵[| ("PDATA", ID)|])))%nraenv_core)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s1eq.
+                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ ‵[| ("PDATA", ID)|]))%nraenv_core)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s1eq.
 
       generalize
         (aec_substs_under_prop_part2 h dl env dnc dnenv c2
                                      (map (fun x => (fst x, 
                                      ((nraenv_core_of_nra (nra_of_nraenv_core (snd x)))
-                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ (‵[| ("PCONST", ‵((drec (rec_sort dl))))|]⊕ ‵[| ("PDATA", ID)|])))%nraenv_core)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s2eq.
+                                        ◯ (‵[| ("PBIND", ‵(env))|] ⊕ ‵[| ("PDATA", ID)|]))%nraenv_core)) ps) ps (f2_roundtrip _ _ _ _ dnc dnenv)); intros s2eq.
       simpl in s1eq, s2eq.
       simpl in *.
       specialize (s1eq nil); specialize (s2eq nil).

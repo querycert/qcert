@@ -241,6 +241,7 @@ MODULES = \
 	Translation/NRAtocNNRC \
 	Translation/cNRAEnvtocNNRC \
 	Translation/cNRAEnvtoNRA \
+	Translation/NRAtocNRAEnv \
 	Translation/NRAEnvtoNNRC \
 	Translation/cNNRCtoCAMP \
 	Translation/NNRCtoNNRCMR \

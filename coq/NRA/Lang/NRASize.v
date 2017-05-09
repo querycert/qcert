@@ -34,6 +34,7 @@ Section NRASize.
     | AEither a₁ a₂=> S (nra_size a₁ + nra_size a₂)
     | AEitherConcat a₁ a₂ => S (nra_size a₁ + nra_size a₂)
     | AApp a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | AGetConstant s => 1
     end.
 
   Lemma nra_size_nzero (a:nra) : nra_size a <> 0.
@@ -56,6 +57,7 @@ Section NRASize.
     | AEither a₁ a₂=> max (nra_depth a₁) (nra_depth a₂)
     | AEitherConcat a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
     | AApp a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
+    | AGetConstant s => 0
     end.
 
 End NRASize.

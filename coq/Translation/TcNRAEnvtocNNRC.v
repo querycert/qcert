@@ -121,27 +121,27 @@ Section TcNRAEnvtocNNRC.
       + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
       + eapply IHnraenv_core_type2; simpl; trivial; match_destr; try elim_fresh e.
     (* ATEitherConcat *)
-    -  econstructor; [eauto | ].
-       econstructor.
-       + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
-       + econstructor; [eauto | ].
-         econstructor; eauto.
-         econstructor; eauto.
-         simpl.
-         match_destr; try congruence.
-         econstructor. simpl.
-         dest_eqdec.
-         * symmetry in e; elim_fresh e.
-         * match_destr; try congruence.
-       + econstructor; [econstructor | ].
-         econstructor; eauto.
-         * econstructor; simpl.
-           match_destr; try congruence.
-         * econstructor; simpl.
-           { match_destr.
-             - symmetry in e; elim_fresh e.
-             - match_destr; try congruence.
-           }
+    - econstructor; [eauto | ].
+      econstructor.
+      + eapply IHnraenv_core_type1; simpl; trivial; match_destr; try elim_fresh e.
+      + econstructor; [eauto | ].
+        econstructor; eauto.
+        econstructor; eauto.
+        simpl.
+        match_destr; try congruence.
+        econstructor. simpl.
+        dest_eqdec.
+        * symmetry in e; elim_fresh e.
+        * match_destr; try congruence.
+      + econstructor; [econstructor | ].
+        econstructor. econstructor. eauto.
+        * econstructor; simpl.
+          match_destr; try congruence.
+        * econstructor; simpl.
+          { match_destr.
+            - symmetry in e; elim_fresh e.
+            - match_destr; try congruence.
+          }
     (* ATApp *)
     - repeat (econstructor; eauto 2).
       apply IHnraenv_core_type2; simpl; trivial.

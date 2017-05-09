@@ -26,6 +26,7 @@ Section TNRA.
   (** Typing for NRA *)
   Section typ.
     Context {m:basic_model}.
+    Context (τconstants:tbindings).
 
   Inductive nra_type : nra -> rtype -> rtype -> Prop :=
   | ATID {τ} :
@@ -81,21 +82,26 @@ Section TNRA.
   | ATApp {τin τ1 τ2} op1 op2 :
       nra_type op2 τin τ1 ->
       nra_type op1 τ1 τ2 ->
-      nra_type (AApp op1 op2) τin τ2.
+      nra_type (AApp op1 op2) τin τ2
+  | ATGetConstant {τin τout} s :
+      tdot τconstants s = Some τout ->
+      nra_type (AGetConstant s) τin τout.
   End typ.
   
-  Notation "Op ▷ A >=> B" := (nra_type Op A B) (at level 70) (* \Vdash *).
+  Notation "Op ▷ A >=> B ⊣ C" := (nra_type C Op A B) (at level 70) (* \Vdash *).
 
   (** Type lemmas for individual algebraic expressions *)
   Context {m:basic_model}.
   
-  Lemma rmap_typed {τ₁ τ₂ : rtype} (op1 : nra) (dl : list data) :
+  Lemma rmap_typed {τc} {τ₁ τ₂ : rtype} c (op1 : nra) (dl : list data) :
+    (bindings_type c τc) ->
     (Forall (fun d : data => data_type d τ₁) dl) ->
-    (op1 ▷ τ₁ >=> τ₂) ->
+    (op1 ▷ τ₁ >=> τ₂ ⊣ τc) ->
     (forall d : data,
-       data_type d τ₁ -> exists x : data, brand_relation_brands ⊢ op1 @ₐ d = Some x /\ data_type x τ₂) ->
-    exists x : list data, (rmap (nra_eval brand_relation_brands op1) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
+       data_type d τ₁ -> exists x : data, brand_relation_brands ⊢ op1 @ₐ d ⊣ c = Some x /\ data_type x τ₂) ->
+    exists x : list data, (rmap (nra_eval brand_relation_brands c op1) dl = Some x) /\ data_type (dcoll x) (Coll τ₂).
   Proof.
+    intros Hcenv.
     intros.
     induction dl; simpl; intros.
     - exists (@nil data); split; [reflexivity|apply dtcoll;apply Forall_nil].
@@ -259,16 +265,18 @@ Section TNRA.
     rewrite H1 in H; rewrite H2 in H0; assumption.
   Qed.
 
-  Lemma rmap_concat_typed {τ₁ τ₂ τ₃ : list (string * rtype)} (op1 : nra) (dl: list data) pf1 pf2 pf3:
+  Lemma rmap_concat_typed {τc} {τ₁ τ₂ τ₃ : list (string * rtype)} (op1 : nra) c (dl: list data) pf1 pf2 pf3:
+    bindings_type c τc ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
     Forall (fun d : data => data_type d (Rec Closed τ₁ pf1)) dl ->
-    (op1 ▷ Rec Closed τ₁ pf1 >=> Coll (Rec Closed τ₂ pf2)) ->
+    (op1 ▷ Rec Closed τ₁ pf1 >=> Coll (Rec Closed τ₂ pf2) ⊣ τc) ->
     (forall d : data,
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
-                   brand_relation_brands ⊢ op1 @ₐ d = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_concat (nra_eval  brand_relation_brands op1) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+                   brand_relation_brands ⊢ op1 @ₐ d ⊣ c = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
+    exists x : list data, (rmap_concat (nra_eval brand_relation_brands c op1) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
+    intros Hcenv.
     intros; rewrite Forall_forall in *.
     induction dl; simpl in *; unfold rmap_concat in *; simpl.
     exists (@nil data); split; [reflexivity|apply dtcoll; apply Forall_nil].
@@ -302,16 +310,18 @@ Section TNRA.
     apply data_type_concat; assumption.
   Qed.
 
-  Lemma rmap_concat_typed2 {τ₁ τ₂ τ₃ : list (string * rtype)} τin (op1 : nra) y (dl: list data) pf1 pf2 pf3:
+  Lemma rmap_concat_typed2 {τc} {τ₁ τ₂ τ₃ : list (string * rtype)} τin (op1 : nra) c y (dl: list data) pf1 pf2 pf3:
+    bindings_type c τc ->
     rec_concat_sort τ₁ τ₂ = τ₃ ->
     Forall (fun d : data => data_type d (Rec Closed τ₁ pf1)) dl ->
-    (op1 ▷ τin >=> Coll (Rec Closed τ₂ pf2)) ->
+    (op1 ▷ τin >=> Coll (Rec Closed τ₂ pf2) ⊣ τc) ->
     (forall d : data,
                 data_type d (Rec Closed τ₁ pf1) ->
                 exists x : data,
-                   brand_relation_brands ⊢ op1 @ₐ y = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
-    exists x : list data, (rmap_concat (fun z =>  brand_relation_brands ⊢ op1@ₐ y) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
+                   brand_relation_brands ⊢ op1 @ₐ y  ⊣ c = Some x /\ data_type x (Coll (Rec Closed τ₂ pf2))) ->
+    exists x : list data, (rmap_concat (fun z =>  brand_relation_brands ⊢ op1@ₐ y ⊣ c) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed τ₃ pf3)).
   Proof.
+    intros Hcenv.
     intros; rewrite Forall_forall in *.
     induction dl; simpl in *; unfold rmap_concat in *; simpl.
     exists (@nil data); split; [reflexivity|apply dtcoll; apply Forall_nil].
@@ -349,10 +359,12 @@ Section TNRA.
   
   (** Main typing soundness theorem for the NRA *)
 
-  Theorem typed_nra_yields_typed_data {τin τout} (d:data) (op:nra):
-    (data_type d τin) -> (op ▷ τin >=> τout) ->
-    (exists x, brand_relation_brands ⊢ op @ₐ d = Some x /\ (data_type x τout)).
+  Theorem typed_nra_yields_typed_data {τc} {τin τout} cenv (d:data) (op:nra):
+    bindings_type cenv τc ->
+    (data_type d τin) -> (op ▷ τin >=> τout ⊣ τc) ->
+    (exists x, brand_relation_brands ⊢ op @ₐ d ⊣ cenv = Some x /\ (data_type x τout)).
   Proof.
+    intros Hcenv.
     intros.
     revert d H.
     nra_cases (dependent induction H0) Case; simpl; intros.
@@ -378,9 +390,9 @@ Section TNRA.
       rewrite H; clear H.
       invcs H1; rtype_equalizer.
       subst.
-      assert (exists x : list data, (rmap (nra_eval brand_relation_brands op1) dl = Some x)
+      assert (exists x : list data, (rmap (nra_eval brand_relation_brands cenv op1) dl = Some x)
                                     /\ data_type (dcoll x) (Coll τ₂)).
-      apply (rmap_typed op1 dl H2); assumption.
+      apply (rmap_typed cenv op1 dl Hcenv H2); assumption.
       destruct H as [? [eqq dt]].
       autorewrite with alg; rewrite eqq.
       exists (dcoll x); split; [reflexivity|assumption].
@@ -393,8 +405,8 @@ Section TNRA.
 
       rewrite H0; clear H0. simpl.
       
-      assert (exists x : list data, (rmap_concat (nra_eval brand_relation_brands op1) x0 = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
-      apply (rmap_concat_typed op1 x0 pf1 pf2 pf3); try assumption; try reflexivity.
+      assert (exists x : list data, (rmap_concat (nra_eval brand_relation_brands cenv op1) x0 = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      apply (rmap_concat_typed op1 cenv x0 pf1 pf2 pf3 Hcenv); try assumption; try reflexivity.
       elim H0; intros; clear H0.
       elim H4; intros; clear H4.
       autorewrite with alg; rewrite H0. simpl.
@@ -404,8 +416,8 @@ Section TNRA.
       elim H1; intros; clear H1.
       rewrite H2; clear H2.
       invcs H3.
-      assert (exists x : list data, (rmap_concat (fun _ : data =>  brand_relation_brands ⊢ op2 @ₐ d) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
-      apply (rmap_concat_typed2 τin op2 d dl pf1 pf2 pf3); try assumption; try reflexivity.
+      assert (exists x : list data, (rmap_concat (fun _ : data =>  brand_relation_brands ⊢ op2 @ₐ d ⊣ cenv) dl = Some x) /\ data_type (dcoll x) (Coll (Rec Closed (rec_concat_sort τ₁ τ₂) pf3))).
+      apply (rmap_concat_typed2 τin op2 cenv d dl pf1 pf2 pf3 Hcenv); try assumption; try reflexivity.
       apply (recover_rec_forall _ _ _ _ pf1 H4); trivial.
       destruct (IHnra_type2 d H0) as [? [eqq dt]]; intros.
       rewrite eqq; clear eqq.
@@ -422,7 +434,7 @@ Section TNRA.
       assert (exists c2, 
           (lift_filter
              (fun x' : data =>
-              match brand_relation_brands  ⊢ op1 @ₐ x' with
+              match brand_relation_brands  ⊢ op1 @ₐ x' ⊣ cenv with
               | Some (dbool b) => Some b
               | _ => None
               end) dl) = Some c2 /\ Forall (fun d : data => data_type d τ) c2).
@@ -492,19 +504,26 @@ Section TNRA.
       elim H; intros; clear H.
       rewrite H0; simpl.
       exists x0;split;[reflexivity|assumption].
+    - Case "AGetConstant"%string.
+      unfold tdot in *.
+      unfold edot in *.
+      destruct (Forall2_lookupr_some _ _ _ _ Hcenv H) as [? [eqq1 eqq2]].
+      rewrite eqq1.
+      eauto.
   Qed.
 
   (* Evaluation into single value for typed algebra *)
 
   (** Corrolaries of the main type soudness theorem *)
 
-  Definition typed_nra_total {τin τout} (op:nra) (HOpT: op ▷ τin >=> τout) (d:data):
+  Definition typed_nra_total {τc} {τin τout} (op:nra) (HOpT: op ▷ τin >=> τout ⊣ τc) c (d:data)
+    (dt_c: bindings_type c τc) :
     (data_type d τin) -> { x:data | data_type x τout }.
   Proof.
     intros HdT.
-    generalize (typed_nra_yields_typed_data d op HdT HOpT).
+    generalize (typed_nra_yields_typed_data c d op dt_c HdT HOpT).
     intros.
-    destruct (brand_relation_brands ⊢ op@ₐd).
+    destruct (brand_relation_brands ⊢ op@ₐd ⊣ c).
     assert (data_type d0 τout).
     - inversion H. inversion H0. inversion H1. trivial.
     - exists d0. trivial.
@@ -512,30 +531,31 @@ Section TNRA.
       destruct H0. inversion H0.
   Defined.
 
-  Lemma typed_nra_total_eq_matches_eval {τin τout} (op:nra) (HOpT: op ▷ τin >=> τout) (d:data)
+  Lemma typed_nra_total_eq_matches_eval {τc} {τin τout} (op:nra) (HOpT: op ▷ τin >=> τout ⊣ τc) c (d:data)
+    (dt_c: bindings_type c τc)
         (pf: data_type d τin) :
-    (brand_relation_brands ⊢ op @ₐd) = Some (proj1_sig (typed_nra_total op HOpT d pf)).
+    (brand_relation_brands ⊢ op @ₐd ⊣ c) = Some (proj1_sig (typed_nra_total op HOpT c d dt_c pf)).
   Proof.
     unfold typed_nra_total.
-    generalize (typed_nra_yields_typed_data d op pf HOpT); intros.
+    generalize (typed_nra_yields_typed_data c d op dt_c pf HOpT); intros.
     destruct e; simpl.
     destruct a; simpl.
     rewrite e.
     reflexivity.
   Qed.
   
-  Definition tnra_eval {τin τout} (op:nra) (HOpT: op ▷ τin >=> τout) (d:data):
+  Definition tnra_eval {τc} {τin τout} (op:nra) (HOpT: op ▷ τin >=> τout ⊣ τc) c (d:data) (dt_c: bindings_type c τc):
     (data_type d τin) -> data.
   Proof.
     intros HdT.
-    destruct (typed_nra_total op HOpT d HdT).
+    destruct (typed_nra_total op HOpT c d dt_c HdT).
     exact x.
   Defined.
 
 End TNRA.
 
 (* Typed algebraic plan *)
-Notation "Op ▷ A >=> B" := (nra_type Op A B) (at level 70).
+Notation "Op ▷ A >=> B ⊣ C" := (nra_type C Op A B) (at level 70).
 
 (* 
 *** Local Variables: ***

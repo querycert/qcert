@@ -114,6 +114,7 @@ Section TNRAInfer.
   (* Type inference for algebraic expressions *)
 
   Context {m:basic_model}.
+  Context (τconstants:list (string*rtype)).
 
   Fixpoint infer_nra_type (e:nra) (τin:rtype) : option rtype :=
     match e with
@@ -209,11 +210,13 @@ Section TNRAInfer.
       | AApp op1 op2 =>
         let appf (τ₁:rtype) := infer_nra_type op1 τ₁ in
         olift appf (infer_nra_type op2 τin)
+      | AGetConstant s =>
+        tdot τconstants s
     end.
 
   Lemma infer_nra_type_correct (τin τout:rtype) (e:nra) :
     infer_nra_type e τin = Some τout ->
-    nra_type e τin τout.
+    nra_type τconstants e τin τout.
   Proof.
     intros.
     revert τin τout H.
@@ -229,14 +232,14 @@ Section TNRAInfer.
       destruct (infer_nra_type e1 τin); destruct (infer_nra_type e2 τin); simpl in *;
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
-      apply (@ATBinop m τin r r0 τout); try assumption.
+      apply (@ATBinop m τconstants τin r r0 τout); try assumption.
       apply infer_binop_type_correct; assumption.
     - Case "AUnop"%string.
       specialize (IHe τin).
       destruct (infer_nra_type e τin); simpl in *;
       try discriminate.
       specialize (IHe r eq_refl).
-      apply (@ATUnop m τin r τout); try assumption.
+      apply (@ATUnop m τconstants τin r τout); try assumption.
       apply infer_unop_type_correct; assumption.
     - Case "AMap"%string.
       case_eq (infer_nra_type e2 τin); intros; simpl in *.
@@ -248,7 +251,7 @@ Section TNRAInfer.
         specialize (IHe1 r0 r1 H).
         rewrite H in H3.
         inversion H3.
-        apply (@ATMap m τin r0 r1); try assumption.
+        apply (@ATMap m τconstants τin r0 r1); try assumption.
         apply tuncoll_correct in H1.
         rewrite <- H1; assumption.
         rewrite H in H3; congruence.
@@ -289,7 +292,7 @@ Section TNRAInfer.
             by apply RecMaybe_pf_some.
           simpl in H.
           clear e eq22 H1 eq21 H0.
-          generalize (@ATMapConcat m τin l1' l2' (rec_concat_sort l1' l2')
+          generalize (@ATMapConcat m τconstants τin l1' l2' (rec_concat_sort l1' l2')
                                    e1 e2 pf1' pf2' H2 IHe1 IHe2 eq_refl); intros.
           assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
           assert ((@RecMaybe (@basic_model_foreign_type m)
@@ -357,7 +360,7 @@ Section TNRAInfer.
         assert (RecMaybe Closed (rec_concat_sort l1' l2') = Some (Rec Closed (rec_concat_sort l1' l2') H2))
           by apply RecMaybe_pf_some.
         clear e eq22 H1 eq21 srl0 H0.
-        generalize (@ATProduct m τin l1' l2' (rec_concat_sort l1' l2')
+        generalize (@ATProduct m τconstants τin l1' l2' (rec_concat_sort l1' l2')
                                e1 e2 pf1' pf2' H2 IHe1 IHe2 eq_refl); intros.
         assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
           assert ((@RecMaybe (@basic_model_foreign_type m)
@@ -408,7 +411,7 @@ Section TNRAInfer.
         destruct r1; try congruence; simpl in *.
         destruct x; try congruence; simpl in *.
         inversion H3; clear H3 H2.
-        apply (@ATSelect m τin r0); try assumption.
+        apply (@ATSelect m τconstants τin r0); try assumption.
         assert (exist (fun τ₀ : rtype₀ => wf_rtype₀ τ₀ = true) Bool₀ e = Bool).
         apply rtype_fequal; reflexivity.
         rewrite H0 in IHe1. assumption.
@@ -499,6 +502,8 @@ Section TNRAInfer.
       specialize (IHe2 r eq_refl).
       econstructor; eauto.
       simpl in *; congruence.
+    - Case "AGetConstant"%string.
+      apply ATGetConstant; assumption.
   Qed.
 
   (* Still should try and prove most specific and completeness theorems ... *)

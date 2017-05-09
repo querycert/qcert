@@ -41,10 +41,13 @@ Section NRAEq.
    *)
   
   Definition nra_eq (op1 op2:nra) : Prop :=
-    forall (h:list(string*string)),
-    forall x:data,
-      data_normalized h x ->
-      h ⊢ op1 @ₐ x = h ⊢ op2 @ₐ x.
+    forall
+      (h:list(string*string))
+      (c:list (string*data))
+      (dn_c:Forall (fun d => data_normalized h (snd d)) c)
+      (x:data)
+      (dn_x:data_normalized h x),
+      h ⊢ op1 @ₐ x ⊣ c = h ⊢ op2 @ₐ x ⊣ c.
 
   Global Instance nra_equiv : Equivalence nra_eq.
   Proof.
@@ -82,7 +85,7 @@ Section NRAEq.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
     rewrite H0, H1 by trivial.
-    case_eq (h ⊢ y1 @ₐ x2); case_eq (h ⊢ y0 @ₐ x2); simpl; trivial.
+    case_eq (h ⊢ y1 @ₐ x2 ⊣ c); case_eq (h ⊢ y0 @ₐ x2 ⊣ c); simpl; trivial.
     intros.
     rewrite (H h); eauto.
   Qed.
@@ -92,8 +95,8 @@ Section NRAEq.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
-    rewrite (H0 h x1) by trivial.
-    case_eq (h ⊢ y0 @ₐ x1); simpl; trivial; intros.
+    rewrite (H0 h c dn_c x1) by trivial.
+    case_eq (h ⊢ y0 @ₐ x1 ⊣ c); simpl; trivial; intros.
     rewrite (H h); eauto.
   Qed.
     
@@ -104,8 +107,8 @@ Section NRAEq.
   Proof.
     unfold Proper, respectful.
     intros; unfold nra_eq in *; intros; simpl.
-    rewrite (H0 h x1) by trivial.
-    case_eq (h ⊢ y0 @ₐ x1); simpl; trivial; intros.
+    rewrite (H0 h c dn_c x1) by trivial.
+    case_eq (h ⊢ y0 @ₐ x1 ⊣ c); simpl; trivial; intros.
     destruct d; try reflexivity.
     simpl; f_equal.
     apply rmap_ext.
@@ -115,8 +118,11 @@ Section NRAEq.
   (* AMapConcat *)
 
   Lemma oomap_concat_eq {h:list(string*string)} op1 op2 l:
-    (forall x : data, h ⊢ op1 @ₐ x = h ⊢ op2 @ₐ x) ->
-    oomap_concat (nra_eval h op1) l = oomap_concat (nra_eval h op2) l.
+    forall (c:list (string*data))
+           (dn_c:Forall (fun d => data_normalized h (snd d)) c),
+      (forall x : data, 
+          h ⊢ op1 @ₐ x ⊣ c = h ⊢ op2 @ₐ x ⊣ c) ->
+    oomap_concat (nra_eval h c op1) l = oomap_concat (nra_eval h c op2) l.
   Proof.
     intros.
     unfold oomap_concat; rewrite H; reflexivity.
@@ -126,7 +132,7 @@ Section NRAEq.
   Proof.
     unfold Proper, respectful.
     intros; unfold nra_eq in *; intros; simpl.
-    rewrite (H0 h x1); case_eq (h ⊢ y0 @ₐ x1); intros; trivial.
+    rewrite (H0 h c dn_c x1); case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intros; trivial.
     destruct d; try reflexivity.
     apply olift_ext; inversion 1; subst; intros.
     simpl. f_equal.
@@ -139,7 +145,7 @@ Section NRAEq.
   Proof.
     unfold Proper, respectful.
     intros; unfold nra_eq in *; intros; simpl.
-    rewrite (H0 h x1) by trivial; rewrite (H h x1) by trivial.
+    rewrite (H0 h c dn_c x1) by trivial; rewrite (H h c dn_c x1) by trivial.
     reflexivity.
   Qed.
 
@@ -148,8 +154,8 @@ Section NRAEq.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
-    rewrite (H0 h x1) by trivial.
-    case_eq (h ⊢ y0 @ₐ x1); intro; trivial.
+    rewrite (H0 h c dn_c x1) by trivial.
+    case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intro; trivial.
     destruct d; try reflexivity.
     intros. apply olift_ext; inversion 1; subst; intros.
     simpl.
@@ -163,31 +169,38 @@ Section NRAEq.
   Global Instance adefault_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) ADefault.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
-    rewrite (H0 h x1) by trivial; rewrite (H h x1) by trivial.
-    case_eq (h ⊢ y0 @ₐ x1); intros; case_eq (h ⊢ y @ₐ x1); intros; simpl; trivial.
+    rewrite (H0 h c dn_c x1) by trivial; rewrite (H h c dn_c x1) by trivial.
+    case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intros; case_eq (h ⊢ y @ₐ x1 ⊣ c); intros; simpl; trivial.
   Qed.
 
   (* AEither *)
   Global Instance aeither_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AEither.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
-    destruct x1; simpl; trivial; inversion H1; subst; auto.
+    destruct x1; simpl; trivial; inversion dn_x; subst; auto.
   Qed.
 
-    (* AEitherConcat *)
+  (* AEitherConcat *)
   Global Instance aeitherconcat_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AEitherConcat.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
-    rewrite (H0 h x1) by trivial; rewrite (H h x1) by trivial.
-    case_eq (h ⊢ y0 @ₐ x1); case_eq (h ⊢ y @ₐ x1); intros; simpl; trivial.
+    rewrite (H0 h c dn_c x1) by trivial; rewrite (H h c dn_c x1) by trivial.
+    case_eq (h ⊢ y0 @ₐ x1 ⊣ c); case_eq (h ⊢ y @ₐ x1 ⊣ c); intros; simpl; trivial.
   Qed.
 
   (* AApp *)
   Global Instance aapp_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AApp.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
-    rewrite (H0 h x1) by trivial. case_eq (h ⊢ y0 @ₐ x1); intros; simpl; trivial.
-    rewrite (H h d); eauto.
+    rewrite (H0 h c dn_c x1) by trivial. case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intros; simpl; trivial.
+    rewrite (H h c dn_c d); eauto.
+  Qed.
+
+  (* AGetConstant *)
+  Global Instance agetconstant_proper s : Proper (nra_eq) (AGetConstant s).
+  Proof.
+    unfold Proper, respectful, nra_eq; intros; simpl.
+    reflexivity.
   Qed.
 
 End NRAEq.

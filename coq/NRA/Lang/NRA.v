@@ -41,6 +41,7 @@ Section NRA.
   | AEither : nra -> nra -> nra
   | AEitherConcat : nra -> nra -> nra
   | AApp : nra -> nra -> nra
+  | AGetConstant : string -> nra
   .
 
   Global Instance nra_eqdec : EqDec nra eq.
@@ -53,10 +54,11 @@ Section NRA.
   (** NRA Semantics *)
 
   Context (h:list(string*string)).
-  Context (constant_env:list (string*data)).
+  Section Semantics.
+    Context (constant_env:list (string*data)).
   
-  Fixpoint nra_eval (op:nra) (x:data) : option data :=
-    match op with
+    Fixpoint nra_eval (op:nra) (x:data) : option data :=
+      match op with
       | AID => Some x
       | AConst rd => Some (normalize_data h rd)
       | ABinop bop op1 op2 =>
@@ -111,138 +113,145 @@ Section NRA.
         end
       | AApp op1 op2 =>
         olift (fun d => (nra_eval op1 d)) (nra_eval op2 x)
+      | AGetConstant s => edot constant_env s
     end.
 
+    Lemma data_normalized_orecconcat {x y z}:
+      orecconcat x y = Some z ->
+      data_normalized h x -> data_normalized h y ->
+      data_normalized h z.
+    Proof.
+      destruct x; simpl; try discriminate.
+      destruct y; simpl; try discriminate.
+      inversion 1; subst.
+      apply data_normalized_rec_concat_sort; trivial.
+    Qed.
 
-  Lemma data_normalized_orecconcat {x y z}:
-    orecconcat x y = Some z ->
-    data_normalized h x -> data_normalized h y ->
-    data_normalized h z.
-  Proof.
-    destruct x; simpl; try discriminate.
-    destruct y; simpl; try discriminate.
-    inversion 1; subst.
-    apply data_normalized_rec_concat_sort; trivial.
-  Qed.
-
-  (* evaluation preserves normalization *)
-  Lemma nra_eval_normalized {op:nra} {d:data} {o} :
-    Forall (fun x => data_normalized h (snd x)) constant_env ->
-    nra_eval op d = Some o ->
-    data_normalized h d ->
-    data_normalized h o.
-  Proof.
-    intro HconstNorm.
-    revert d o.
-    induction op; simpl.
-    - inversion 1; subst; trivial.
-    - inversion 1; subst; intros.
-      apply normalize_normalizes.
-    - intros.
-      specialize (IHop1 d).
-      specialize (IHop2 d).
-      destruct (nra_eval op1 d); simpl in *; try discriminate.
-      destruct (nra_eval op2 d); simpl in *; try discriminate.
-      apply (fun_of_binop_normalized h) in H; eauto.
-    - intros.
-      specialize (IHop d).
-      destruct (nra_eval op d); simpl in *; try discriminate.
-      apply fun_of_unaryop_normalized in H; eauto.
-    - intros;
-      specialize (IHop2 d);
-      destruct (nra_eval op2 d); simpl in *; try discriminate;
-      specialize (IHop2 _ (eq_refl _) H0).
-      destruct d0; simpl in *; try discriminate.
-      apply some_lift in H; destruct H; subst.
-      constructor.
-      inversion IHop2; subst.
-      apply (rmap_Forall e H1); eauto.
-    - intros;
-      specialize (IHop2 d);
-      destruct (nra_eval op2 d); simpl in *; try discriminate;
-      specialize (IHop2 _ (eq_refl _) H0).
-      destruct d0; simpl in *; try discriminate.
-      apply some_lift in H; destruct H; subst.
-      constructor.
-      inversion IHop2; subst.
-      unfold rmap_concat in *.
-      apply (oflat_map_Forall e H1); intros.
-      specialize (IHop1 x0).
-      unfold oomap_concat in H.
-      match_destr_in H.
-      specialize (IHop1 _ (eq_refl _) H2).
-      unfold omap_concat in H.
-      match_destr_in H.
-      inversion IHop1; subst.
-      apply (rmap_Forall H H4); intros.
-      eapply (data_normalized_orecconcat H3); trivial.
-    -  intros;
-      specialize (IHop1 d);
-      destruct (nra_eval op1 d); simpl in *; try discriminate.
-      specialize (IHop1 _ (eq_refl _) H0).
-      destruct d0; simpl in *; try discriminate.
-      apply some_lift in H; destruct H; subst.
-      constructor.
-      inversion IHop1; subst.
-      unfold rmap_concat in *.
-      apply (oflat_map_Forall e H1); intros.
-      specialize (IHop2 d).
-      unfold oomap_concat in H.
-      match_destr_in H.
-      specialize (IHop2 _ (eq_refl _) H0).
-      unfold omap_concat in H.
-      match_destr_in H.
-      inversion IHop2; subst.
-      apply (rmap_Forall H H4); intros.
-      eapply (data_normalized_orecconcat H3); trivial.
-    - intros;
-      specialize (IHop2 d);
-      destruct (nra_eval op2 d); simpl in *; try discriminate;
-      specialize (IHop2 _ (eq_refl _) H0).
-      destruct d0; simpl in *; try discriminate.
-      apply some_lift in H; destruct H; subst.      
-      constructor.
-      inversion IHop2; subst.
-      unfold rmap_concat in *.
-      apply (lift_filter_Forall e H1).
-    - intros;
-      specialize (IHop1 d);
-      destruct (nra_eval op1 d); simpl in *; try discriminate.
-      specialize (IHop1 _ (eq_refl _) H0).
-      destruct d0; simpl in *; try solve [inversion H; subst; trivial].
-      destruct l; simpl; eauto 3.
-      inversion H; subst; trivial.
-    - intros.
-      destruct d; try discriminate; inversion H0; subst; eauto.
-    - intros.
-      specialize (IHop1 d).
-      specialize (IHop2 d).
-      destruct (nra_eval op1 d); simpl in *; try discriminate.
-      destruct (nra_eval op2 d); simpl in *; try discriminate.
-      specialize (IHop1 _ (eq_refl _) H0).
-      specialize (IHop2 _ (eq_refl _) H0).
-      destruct d0; try discriminate.
-      + destruct d0; try discriminate.
-        destruct d1; try discriminate.
-        inversion IHop1; subst.
-        inversion H; subst.
+    (* evaluation preserves normalization *)
+    Lemma nra_eval_normalized {op:nra} {d:data} {o} :
+      Forall (fun x => data_normalized h (snd x)) constant_env ->
+      nra_eval op d = Some o ->
+      data_normalized h d ->
+      data_normalized h o.
+    Proof.
+      intro HconstNorm.
+      revert d o.
+      induction op; simpl.
+      - inversion 1; subst; trivial.
+      - inversion 1; subst; intros.
+        apply normalize_normalizes.
+      - intros.
+        specialize (IHop1 d).
+        specialize (IHop2 d).
+        destruct (nra_eval op1 d); simpl in *; try discriminate.
+        destruct (nra_eval op2 d); simpl in *; try discriminate.
+        apply (fun_of_binop_normalized h) in H; eauto.
+      - intros.
+        specialize (IHop d).
+        destruct (nra_eval op d); simpl in *; try discriminate.
+        apply fun_of_unaryop_normalized in H; eauto.
+      - intros;
+          specialize (IHop2 d);
+          destruct (nra_eval op2 d); simpl in *; try discriminate;
+            specialize (IHop2 _ (eq_refl _) H0).
+        destruct d0; simpl in *; try discriminate.
+        apply some_lift in H; destruct H; subst.
         constructor.
-        apply data_normalized_rec_concat_sort; trivial.
-      + destruct d0; try discriminate.
-        destruct d1; try discriminate.
-        inversion IHop1; subst.
-        inversion H; subst.
+        inversion IHop2; subst.
+        apply (rmap_Forall e H1); eauto.
+      - intros;
+          specialize (IHop2 d);
+          destruct (nra_eval op2 d); simpl in *; try discriminate;
+            specialize (IHop2 _ (eq_refl _) H0).
+        destruct d0; simpl in *; try discriminate.
+        apply some_lift in H; destruct H; subst.
         constructor.
-        apply data_normalized_rec_concat_sort; trivial.
-      + repeat (destruct d0; try discriminate).
-    - intros. specialize (IHop2 d).
-      destruct (nra_eval op2 d); simpl in *; try discriminate.
-      eauto.
-  Qed.
-
+        inversion IHop2; subst.
+        unfold rmap_concat in *.
+        apply (oflat_map_Forall e H1); intros.
+        specialize (IHop1 x0).
+        unfold oomap_concat in H.
+        match_destr_in H.
+        specialize (IHop1 _ (eq_refl _) H2).
+        unfold omap_concat in H.
+        match_destr_in H.
+        inversion IHop1; subst.
+        apply (rmap_Forall H H4); intros.
+        eapply (data_normalized_orecconcat H3); trivial.
+      -  intros;
+           specialize (IHop1 d);
+           destruct (nra_eval op1 d); simpl in *; try discriminate.
+         specialize (IHop1 _ (eq_refl _) H0).
+         destruct d0; simpl in *; try discriminate.
+         apply some_lift in H; destruct H; subst.
+         constructor.
+         inversion IHop1; subst.
+         unfold rmap_concat in *.
+         apply (oflat_map_Forall e H1); intros.
+         specialize (IHop2 d).
+         unfold oomap_concat in H.
+         match_destr_in H.
+         specialize (IHop2 _ (eq_refl _) H0).
+         unfold omap_concat in H.
+         match_destr_in H.
+         inversion IHop2; subst.
+         apply (rmap_Forall H H4); intros.
+         eapply (data_normalized_orecconcat H3); trivial.
+      - intros;
+          specialize (IHop2 d);
+          destruct (nra_eval op2 d); simpl in *; try discriminate;
+            specialize (IHop2 _ (eq_refl _) H0).
+        destruct d0; simpl in *; try discriminate.
+        apply some_lift in H; destruct H; subst.      
+        constructor.
+        inversion IHop2; subst.
+        unfold rmap_concat in *.
+        apply (lift_filter_Forall e H1).
+      - intros;
+          specialize (IHop1 d);
+          destruct (nra_eval op1 d); simpl in *; try discriminate.
+        specialize (IHop1 _ (eq_refl _) H0).
+        destruct d0; simpl in *; try solve [inversion H; subst; trivial].
+        destruct l; simpl; eauto 3.
+        inversion H; subst; trivial.
+      - intros.
+        destruct d; try discriminate; inversion H0; subst; eauto.
+      - intros.
+        specialize (IHop1 d).
+        specialize (IHop2 d).
+        destruct (nra_eval op1 d); simpl in *; try discriminate.
+        destruct (nra_eval op2 d); simpl in *; try discriminate.
+        specialize (IHop1 _ (eq_refl _) H0).
+        specialize (IHop2 _ (eq_refl _) H0).
+        destruct d0; try discriminate.
+        + destruct d0; try discriminate.
+          destruct d1; try discriminate.
+          inversion IHop1; subst.
+          inversion H; subst.
+          constructor.
+          apply data_normalized_rec_concat_sort; trivial.
+        + destruct d0; try discriminate.
+          destruct d1; try discriminate.
+          inversion IHop1; subst.
+          inversion H; subst.
+          constructor.
+          apply data_normalized_rec_concat_sort; trivial.
+        + repeat (destruct d0; try discriminate).
+      - intros. specialize (IHop2 d).
+        destruct (nra_eval op2 d); simpl in *; try discriminate.
+        eauto.
+      - intros.
+        unfold edot in H.
+        apply assoc_lookupr_in in H.
+        rewrite Forall_forall in HconstNorm.
+        specialize (HconstNorm (s,o)); simpl in *.
+        auto.
+    Qed.
+  End Semantics.
+  
   Section Top.
     Definition nra_eval_top (q:nra) (cenv:bindings) : option data :=
-      nra_eval q (drec (rec_sort cenv)).
+      nra_eval (rec_sort cenv) q dunit.
   End Top.
 End NRA.
 
@@ -250,7 +259,7 @@ End NRA.
 
 (** Nraebraic plan application *)
 
-Notation "h ⊢ Op @ₐ x" := (nra_eval h Op x) (at level 10). (* \vdash *)
+Notation "h ⊢ Op @ₐ x ⊣ c" := (nra_eval h c Op x) (at level 10). (* \vdash *)
 
 (* As much as possible, notations are aligned with those of [CM93]
    S. Cluet and G. Moerkotte. Nested queries in object bases. In
@@ -265,6 +274,7 @@ Notation "h ⊢ Op @ₐ x" := (nra_eval h Op x) (at level 10). (* \vdash *)
 Delimit Scope nra_scope with nra.
 
 Notation "'ID'" := (AID)  (at level 50) : nra_scope.
+Notation "CGET⟨ s ⟩" := (AGetConstant s) (at level 50) : nra_core_scope.
 
 Notation "‵‵ c" := (AConst (dconst c))  (at level 0) : nra_scope.                           (* ‵ = \backprime *)
 Notation "‵ c" := (AConst c)  (at level 0) : nra_scope.                                     (* ‵ = \backprime *)
@@ -315,7 +325,8 @@ Tactic Notation "nra_cases" tactic(first) ident(c) :=
   | Case_aux c "ADefault"
   | Case_aux c "AEither"
   | Case_aux c "AEitherConcat"
-  | Case_aux c "AApp"].
+  | Case_aux c "AApp"
+  | Case_aux c "AGetConstant" ].
 
 (* end hide *)
 

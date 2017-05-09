@@ -28,68 +28,60 @@ Section NRASugar.
   Open Scope string_scope.
 
   Definition nra_bind := AUnop (ADot "PBIND") AID.
-  Definition nra_const_env := AUnop (ADot "PCONST") AID.
   Definition nra_data := AUnop (ADot "PDATA") AID.
   Definition nra_data_op op := AUnop (ADot "PDATA") op.
 
   (* Match failure returns the empty sequence, success returns a singleton sequence *)
   Definition nra_fail := AConst (dcoll nil).
   Definition nra_match op := AUnop AColl op.
-  Definition nra_triple s1 s2 s3 (aconst:nra) (abind:nra) (adata:nra) :=
+  Definition nra_double s1 s2 (abind:nra) (adata:nra) :=
     ABinop AConcat
-           (AUnop (ARec s1) aconst)
-           (ABinop AConcat
-                   (AUnop (ARec s2) abind)
-                   (AUnop (ARec s3) adata)).
+           (AUnop (ARec s1) abind)
+           (AUnop (ARec s2) adata).
   
-  Definition nra_context (aconst:nra) (abind:nra) (adata:nra) :=
-    nra_triple "PCONST" "PBIND" "PDATA"  aconst abind adata.
+  Definition nra_context (abind:nra) (adata:nra) :=
+    nra_double "PBIND" "PDATA" abind adata.
   
   Definition nra_withbinding :=
-    nra_context nra_const_env nra_bind nra_bind.
+    nra_context nra_bind nra_bind.
   
-  Definition nra_context_data dconst dbind dpid : data :=
+  Definition nra_context_data dbind dpid : data :=
     drec (("PBIND",dbind)
-            ::("PCONST",dconst)
             ::("PDATA",dpid)
             :: nil).
 
   (* Variant used in context *)
-  Definition make_fixed_nra_context_data (const:data) (env:data) : nra
+  Definition make_fixed_nra_context_data (env:data) : nra
     := ABinop AConcat
               (AUnop (ARec "PBIND"%string) (AConst env))
-              (ABinop AConcat
-                      (AUnop (ARec "PCONST"%string) (AConst const))
-                      (AUnop (ARec "PDATA"%string) AID)).
+              (AUnop (ARec "PDATA"%string) AID).
 
   Definition nra_wrap op  :=
-    nra_triple "PCONST" "PBIND" "PDATA" nra_const_env nra_bind op.
+    nra_double "PBIND" "PDATA" nra_bind op.
   
   Definition nra_wrap_a1 op :=
-    nra_triple "PCONST" "PBIND" "a1" nra_const_env nra_bind op.
+    nra_double "PBIND" "a1" nra_bind op.
 
   Definition nra_wrap_bind_a1 op :=
-    nra_triple "PCONST" "a1" "PDATA" nra_const_env  nra_bind op.
+    nra_double "a1" "PDATA" nra_bind op.
 
   Definition nra_wrap_with_bind op1 :=
-    nra_context nra_const_env op1 AID.
+    nra_context op1 AID.
   
   Definition nra_project_wrap :=
     nra_wrap_with_bind nra_fail.
 
-  Lemma data_normalized_nra_context_data h constants env d:
-    data_normalized h constants ->
+  Lemma data_normalized_nra_context_data h env d:
     data_normalized h env ->
     data_normalized h d ->
-    data_normalized h (nra_context_data constants env d).
+    data_normalized h (nra_context_data env d).
   Proof.
     unfold nra_context_data.
     repeat (constructor; simpl; eauto).
   Qed.
 
-  Lemma data_normalized_nra_context_data_inv h constants env d:
-    data_normalized h (nra_context_data constants env d) ->
-     data_normalized h constants /\
+  Lemma data_normalized_nra_context_data_inv h env d:
+    data_normalized h (nra_context_data env d) ->
     data_normalized h env /\
     data_normalized h d.
   Proof.
