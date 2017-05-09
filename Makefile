@@ -395,6 +395,8 @@ clean:: Makefile.coq remove_all_derived
 	@rm -f *~
 	@rm -f index.html
 
+cleanall: clean remove_all_derived clean_detritus
+
 DISTDIR=../qcert-0.1.0
 
 $(DISTDIR):
@@ -405,17 +407,10 @@ $(DISTDIR):
 dist:
 	$(MAKE) $(DISTDIR)
 	tar cvf $(DISTDIR).tar $(DISTDIR)
-	gzip $(DISTDIR).tar 
+	gzip $(DISTDIR).tar
 
 cleandist:
 	rm -rf $(DISTDIR)
 	rm -f $(DISTDIR).tar.gz
 
-HTML=index.html
-
-index.html: index.v
-	@rm -f index.html
-	coqdoc -l -s --no-index index.v
-
 .PHONY: all clean clean_detritus html
-
