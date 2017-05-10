@@ -21,9 +21,9 @@ Section CAMPRule.
   Require Import String.
   Require Import List.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
-  Require Export CAMPSugar.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Export CAMPRuntime.
   
   Local Open Scope camp_scope.
   Local Open Scope string.
@@ -75,21 +75,21 @@ Section CAMPRule.
 
   Definition eval_camp_rule_debug (h:list(string*string)) (print_env:bool) (r:camp_rule) (world:list data)
     : presult_debug data
-    := interp_debug h (mkWorld world) print_env nil (camp_rule_to_camp r) nil dunit.
+    := camp_eval_debug h (mkWorld world) print_env nil (camp_rule_to_camp r) nil dunit.
 
   Definition eval_camp_rule_res_to_string
              (h:list(string*string)) (print_env:bool) (r:camp_rule) (world:list data)
     : string
     := let pp := (camp_rule_to_camp r) in
-       print_presult_debug pp
-                           (interp_debug h
+       print_presult_debug pp toString_camp_with_path
+                           (camp_eval_debug h
                                          (mkWorld world)
                                          print_env nil pp nil dunit).
 
   (** Semantics of CAMP rules, returning a presult *)
   Definition eval_camp_rule_res (h:list(string*string)) (r:camp_rule) (world:list data)
     : presult data
-    := interp h (mkWorld world) (camp_rule_to_camp r) nil dunit.
+    := camp_eval h (mkWorld world) (camp_rule_to_camp r) nil dunit.
 
   Definition eval_camp_rule (h:list(string*string)) (r:camp_rule) (world:list data)
     : option (list data)
@@ -103,11 +103,18 @@ Section CAMPRule.
     Context (h:brand_relation_t).
 
     Definition camp_rule_eval_top (q:camp_rule) (cenv:bindings) :=
-      match interp h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
+      match camp_eval h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
       | Success l => Some (dcoll (l::nil))
       | RecoverableError => Some (dcoll nil)
       | TerminalError => None
       end.
+
+    Definition camp_rule_eval_top_debug (debug:bool) (q:camp_rule) (cenv:bindings) :=
+      let pp := camp_rule_to_camp q in
+      print_presult_debug pp toString_camp_with_path
+                          (camp_eval_debug h
+                                           (rec_sort cenv)
+                                           debug nil pp nil dunit).
   End Top.
 
 End CAMPRule.

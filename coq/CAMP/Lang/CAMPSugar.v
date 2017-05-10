@@ -129,7 +129,7 @@ Section CAMPSugar.
     camp_reduce (fun p1 p2 => (pbinop b p1 p2)) l.
 
   (* Defines what it means for two patterns to be equivalent *)
-  Definition camp_equiv p₁ p₂ := forall h c b d, interp h c p₁ b d = interp h c p₂ b d.
+  Definition camp_equiv p₁ p₂ := forall h c b d, camp_eval h c p₁ b d = camp_eval h c p₂ b d.
 
   Theorem withAccept_id p : camp_equiv (pletIt pit p) p.
   Proof.
@@ -166,9 +166,9 @@ Section CAMPSugar.
 
   (** Useful definitions *)
   (* Java equivalent: CampNowMacro *)
-  Definition pnow := pgetconstant ("NOW").
+  Definition pnow := pgetConstant ("NOW").
 
-  Definition WW p := pletIt (pgetconstant ("WORLD")) p.
+  Definition WW p := pletIt (pgetConstant ("WORLD")) p.
 
   (* NB: This version does not use "fresh" as in the paper.  
    * See mapall_let in Translation/NNRCtoCAMP.v for a version

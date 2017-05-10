@@ -310,7 +310,7 @@ let rec camp_to_sexp (p : QLang.camp) : sexp =
   | PorElse (p1,p2) -> STerm ("PorElse", [camp_to_sexp p1; camp_to_sexp p2])
   | Pit -> STerm ("Pit", [])
   | PletIt (p1,p2) -> STerm ("PletIt", [camp_to_sexp p1; camp_to_sexp p2])
-  | Pgetconstant sl -> STerm ("Pgetconstant", [coq_string_to_sstring sl])
+  | PgetConstant sl -> STerm ("Pgetconstant", [coq_string_to_sstring sl])
   | Penv -> STerm ("Penv", [])
   | PletEnv (p1,p2) -> STerm ("PletEnv", [camp_to_sexp p1; camp_to_sexp p2])
   | Pleft -> STerm ("Pleft", [])
@@ -330,7 +330,7 @@ let rec sexp_to_camp (se : sexp) : QLang.camp =
   | STerm ("PorElse", [se1;se2]) -> PorElse (sexp_to_camp se1,sexp_to_camp se2)
   | STerm ("Pit", []) -> Pit
   | STerm ("PletIt", [se1;se2]) -> PletIt (sexp_to_camp se1,sexp_to_camp se2)
-  | STerm ("Pgetconstant", [sl]) -> Pgetconstant (sstring_to_coq_string sl)
+  | STerm ("Pgetconstant", [sl]) -> PgetConstant (sstring_to_coq_string sl)
   | STerm ("Penv", []) -> Penv
   | STerm ("PletEnv", [se1;se2]) -> PletEnv (sexp_to_camp se1,sexp_to_camp se2)
   | STerm ("Pleft", []) -> Pleft

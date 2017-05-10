@@ -1249,7 +1249,8 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
     protected mousedown = () => {
 		// Update source browser to point to the IL definition -JS
 		// Dealing with window focus is annoying, so disabled for now - JS
-   	        var illoc = makeLemmaURL(this.illocation,this.langid);
+   	        //var illoc = makeLemmaURL(this.illocation,this.langid);
+   	        var illoc = makeLemmaURL(fixLabel(this.label),this.langid);
    	        var win = window.open(illoc, 'codebrowser');
    		window.focus();
 		// Rest of logic for moving puzzle pieces
@@ -2295,9 +2296,11 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 }
 
 //const coqdocBaseURL = 'https://querycert.github.io/doc/';
-const coqdocBaseURL = 'file:///Users/js/git/querycert.github.io/doc/';
+//const coqdocBaseURL = '../..//querycert.github.io/doc/';
+const coqdocBaseURL = '../docs/html/';
 function makeLemmaURL(base:string, lemma:string) {
-	let url = coqdocBaseURL + "Qcert." + base + ".html";
+	//let url = coqdocBaseURL + "Qcert." + base + ".html";
+	let url = coqdocBaseURL + base + ".html";
 	if(lemma != undefined) {
 		url = url + "#" + lemma;
 	}
@@ -2313,10 +2316,12 @@ function makeTransitionURL(previouslangid, previouslabel, langid, label) {
     var label = fixLabel(label);
     var previouslabel = fixLabel(previouslabel);
     if (previouslangid == langid) {
-	return makeLemmaURL(label+".Optim."+label+"Optimizer","run_"+langid + "_optims");
+	//return makeLemmaURL(label+".Optim."+label+"Optimizer","run_"+langid + "_optims");
+	return makeLemmaURL(label+"Optimizer","run_"+langid + "_optims");
     }
     else {
-	return makeLemmaURL("Translation."+previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
+	//return makeLemmaURL("Translation."+previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
+	return makeLemmaURL(previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
     }
 }
 function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {

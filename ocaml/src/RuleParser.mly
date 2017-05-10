@@ -170,7 +170,7 @@ camp:
 | PRIGHT
     { QCAMP.pright }
 | PGETCONSTANT s = STRING
-    { QCAMP.pgetconstant (Util.char_list_of_string s) }
+    { QCAMP.pgetConstant (Util.char_list_of_string s) }
 (* Macros pattern *)
 | PNOW
     { QCAMP.pnow }

@@ -22,7 +22,7 @@ Section TCAMP.
   Require Import Program.
 
   Require Import BasicSystem.
-  Require Import CAMP.
+  Require Import CAMPUtil CAMP.
 
   (** Auxiliary lemmas *)
 
@@ -81,7 +81,7 @@ Section TCAMP.
         Γ |= pletIt p₁ p₂ ; τ₁ ~> τ₃
     | PTgetconstant {Γ} τ₁ s τout:
         tdot constants s = Some τout ->
-        Γ |= pgetconstant s; τ₁ ~> τout
+        Γ |= pgetConstant s; τ₁ ~> τout
     | PTenv {Γ} τ₁ pf :
         Γ |= penv ; τ₁ ~> Rec Closed Γ pf
     | PTletEnv {Γ τ₁ τ₂ p₁ p₂} Γ' pf Γ'' :
@@ -192,8 +192,8 @@ Section TCAMP.
      bindings_type env Γ ->
      ([τc & Γ] |= p ; τin ~> τout) ->
      (data_type d τin) ->
-        (exists x, interp brand_relation_brands c p env d = Success x /\  (data_type x τout)) 
-        \/ (interp brand_relation_brands c p env d = RecoverableError).
+        (exists x, camp_eval brand_relation_brands c p env d = Success x /\  (data_type x τout)) 
+        \/ (camp_eval brand_relation_brands c p env d = RecoverableError).
   Proof.
     simpl.
     intros tconst tenv tcamp tdat.
@@ -203,15 +203,15 @@ Section TCAMP.
     (* pconst *)
     - eauto. 
     (* unaryOp *)
-    - destruct (IHp _ _ _ _ _ tenv H2 tdat) as [[dout[interpeq tx]]|interpeq];
-        rewrite interpeq; simpl; [|eauto].
+    - destruct (IHp _ _ _ _ _ tenv H2 tdat) as [[dout[camp_evaleq tx]]|camp_evaleq];
+        rewrite camp_evaleq; simpl; [|eauto].
         destruct (typed_unop_yields_typed_data _ _ tx H5) as [?[??]].
         rewrite H; simpl. eauto.
     (* binOp *)
-    - destruct (IHp1 _ _ _ _ _ tenv H3 tdat) as [[dout1[interpeq1 tx1]]|interpeq1];
-        rewrite interpeq1; simpl; [|eauto].
-      destruct (IHp2 _ _ _ _ _ tenv H6 tdat) as [[dout2[interpeq2 tx2]]|interpeq2];
-        rewrite interpeq2; simpl; [|eauto].
+    - destruct (IHp1 _ _ _ _ _ tenv H3 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
+        rewrite camp_evaleq1; simpl; [|eauto].
+      destruct (IHp2 _ _ _ _ _ tenv H6 tdat) as [[dout2[camp_evaleq2 tx2]]|camp_evaleq2];
+        rewrite camp_evaleq2; simpl; [|eauto].
       destruct (typed_binop_yields_typed_data _ _ _ tx1 tx2 H7) as [?[??]].
       rewrite H; simpl. eauto.
     (* pmap *)
@@ -221,9 +221,9 @@ Section TCAMP.
       + left; econstructor; split; eauto. constructor; eauto.
       + inversion H2; subst.
          specialize (IHdl (dtcoll _ _ H4) H4).
-         destruct (IHp _ _ _ _ _ tenv H1 H3) as [[dout[interpeq tx]]|interpeq];
-           rewrite interpeq; simpl; [|eauto].
-        destruct  (gather_successes (map (interp brand_relation_brands _ p env) dl)); simpl in *; intuition.
+         destruct (IHp _ _ _ _ _ tenv H1 H3) as [[dout[camp_evaleq tx]]|camp_evaleq];
+           rewrite camp_evaleq; simpl; [|eauto].
+        destruct  (gather_successes (map (camp_eval brand_relation_brands _ p env) dl)); simpl in *; intuition.
         * destruct H as [?[??]].
           inversion H; subst. left; econstructor; split; eauto.
           inversion H0; subst; rtype_equalizer.
@@ -237,29 +237,29 @@ Section TCAMP.
       + left; econstructor; split; eauto. econstructor; eauto.
       + inversion H2; subst.
         specialize (IHdl (dtcoll _ _ H4) H4).
-        destruct (IHp _ _ _ _ _ tenv H1 H3) as [[dout[interpeq tx]]|[s interpeq]].
+        destruct (IHp _ _ _ _ _ tenv H1 H3) as [[dout[camp_evaleq tx]]|[s camp_evaleq]].
         addddmit.
         addddmit. *)
     (* passert *)
-    - destruct (IHp _ _ _ _ _ tenv H1 tdat) as [[dout[interpeq tx]]|interpeq];
-        rewrite interpeq; simpl; [|eauto].
+    - destruct (IHp _ _ _ _ _ tenv H1 tdat) as [[dout[camp_evaleq tx]]|camp_evaleq];
+        rewrite camp_evaleq; simpl; [|eauto].
       inversion tx; subst.
       destruct b; simpl; eauto.
     (* porElse *)
-    - destruct (IHp1 _ _ _ _ _ tenv H2 tdat) as [[dout1[interpeq1 tx1]]|interpeq1];
-        rewrite interpeq1; simpl; [|eauto].
-      destruct (IHp2 _ _ _ _ _ tenv H5 tdat) as [[dout2[interpeq2 tx2]]|interpeq2];
-        try rewrite interpeq2; simpl; [|eauto].
+    - destruct (IHp1 _ _ _ _ _ tenv H2 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
+        rewrite camp_evaleq1; simpl; [|eauto].
+      destruct (IHp2 _ _ _ _ _ tenv H5 tdat) as [[dout2[camp_evaleq2 tx2]]|camp_evaleq2];
+        try rewrite camp_evaleq2; simpl; [|eauto].
       eauto.
     (* pit *)
     - eauto.
     (* pletIt *)
-    - destruct (IHp1 _ _ _ _ _ tenv H2 tdat) as [[dout1[interpeq1 tx1]]|interpeq1];
-        rewrite interpeq1; simpl; [|eauto].
-      destruct (IHp2 _ _ _ _ _ tenv H5 tx1) as [[dout2[interpeq2 tx2]]|interpeq2];
-        rewrite interpeq2; simpl; [|eauto].
+    - destruct (IHp1 _ _ _ _ _ tenv H2 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
+        rewrite camp_evaleq1; simpl; [|eauto].
+      destruct (IHp2 _ _ _ _ _ tenv H5 tx1) as [[dout2[camp_evaleq2 tx2]]|camp_evaleq2];
+        rewrite camp_evaleq2; simpl; [|eauto].
       eauto.
-    (* pgetconstant *)
+    (* pgetConstant *)
     - left.
       unfold tdot in *.
       unfold edot in *.
@@ -270,14 +270,14 @@ Section TCAMP.
     (* penv *)
     - eauto.
     (* pletEnv *)
-    - destruct (IHp1 _ _ _ _ _ tenv H1 tdat) as [[dout1[interpeq1 tx1]]|interpeq1];
-        rewrite interpeq1; simpl; [|eauto].
+    - destruct (IHp1 _ _ _ _ _ tenv H1 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
+        rewrite camp_evaleq1; simpl; [|eauto].
         inversion tx1; subst; rtype_equalizer.
         subst.
         case_eq (merge_bindings env dl); [|eauto]. intros.
         cut (bindings_type l Γ''); intros.
-        destruct (IHp2 _ _ _ _ _ H0 H6 tdat) as [[dout2[interpeq2 tx2]]|interpeq2];
-        rewrite interpeq2; simpl; [|eauto].
+        destruct (IHp2 _ _ _ _ _ H0 H6 tdat) as [[dout2[camp_evaleq2 tx2]]|camp_evaleq2];
+        rewrite camp_evaleq2; simpl; [|eauto].
         eauto.
         specialize (H5 eq_refl). rewrite <- H5 in *; clear H5 rl.
         apply (@merge_bindings_type env dl l Γ Γ' Γ'' tenv); auto.

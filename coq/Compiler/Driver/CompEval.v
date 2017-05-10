@@ -84,22 +84,15 @@ Section CompEval.
     Definition eval_camp_rule (q:camp_rule) (cenv: bindings) : option data :=
       camp_rule_eval_top h q cenv.
 
-    Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: bindings) : string
-      := let pp := camp_rule_to_camp q in
-         print_presult_debug pp
-                             (interp_debug h
-                                           (rec_sort cenv)
-                                           debug nil pp nil dunit).
+    Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: bindings) : string :=
+      camp_rule_eval_top_debug h debug q cenv.
 
     (* Language: camp *)
     Definition eval_camp (q:camp) (cenv: bindings) : option data :=
       camp_eval_top h q cenv.
 
-    Definition eval_camp_debug (debug:bool) (q:camp) (cenv: bindings) : string
-      := print_presult_debug q
-                             (interp_debug h
-                                           (rec_sort cenv)
-                                           debug nil q nil dunit).
+    Definition eval_camp_debug (debug:bool) (q:camp) (cenv: bindings) : string :=
+      camp_eval_top_debug h debug q cenv.
 
     (* Language: oql *)
     Definition eval_oql (q:oql) (cenv: bindings) : option data

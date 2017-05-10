@@ -184,23 +184,23 @@ Require Import RSort.
 
 (* our translation does not look at the data *)
 Lemma nnrcToCamp_data_indep h cenv d d' b n:
-  interp h cenv (nnrcToCamp_ns n) b d = interp h cenv (nnrcToCamp_ns n) b d'.
+  camp_eval h cenv (nnrcToCamp_ns n) b d = camp_eval h cenv (nnrcToCamp_ns n) b d'.
 Proof.
   revert d d' b. 
   induction n; simpl in *; trivial; intros.
   - erewrite IHn1, IHn2; eauto; intuition.
   - erewrite IHn; eauto; intuition.
   - rewrite (IHn1 d d') by intuition.
-    destruct (interp h cenv (nnrcToCamp_ns n1) b d'); trivial.
+    destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d'); trivial.
   - rewrite (IHn1 d d') by intuition.
-    destruct (interp h cenv (nnrcToCamp_ns n1) b d'); trivial.
+    destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d'); trivial.
   - rewrite (IHn1 d d') by intuition.
-    destruct (interp h cenv (nnrcToCamp_ns n1) b d'); trivial.
+    destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d'); trivial.
     destruct res; trivial.
     destruct b0; simpl;
     repeat rewrite merge_bindings_nil_r.
     + rewrite (IHn2 d d').
-       destruct (interp h cenv (nnrcToCamp_ns n2) (rec_sort b) d'); trivial.
+       destruct (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort b) d'); trivial.
     + apply IHn3.
   - rewrite (IHn1 d d').
     unfold bindpr. match_destr.
@@ -248,10 +248,10 @@ Proof.
   omega.
 Qed.
 
-Lemma interp_mapall_cons h cenv p bind a l :
+Lemma camp_eval_mapall_cons h cenv p bind a l :
   RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
-  interp h cenv (mapall p) bind (dcoll (a::l)) =
-  match interp h cenv p bind a, (interp h cenv (mapall p) bind (dcoll l)) with
+  camp_eval h cenv (mapall p) bind (dcoll (a::l)) =
+  match camp_eval h cenv p bind a, (camp_eval h cenv (mapall p) bind (dcoll l)) with
       | Success x', Success (dcoll l') =>  Success (dcoll (x'::l'))
       | RecoverableError, Success (dcoll l') => RecoverableError
       | Success a, RecoverableError => RecoverableError
@@ -264,8 +264,8 @@ Lemma interp_mapall_cons h cenv p bind a l :
 Proof.
 Opaque data_eq_dec.
   simpl.
-  case_eq (interp h cenv p bind a); simpl; intros; trivial.
-  - case_eq ((gather_successes (map (interp h cenv p bind) l))); 
+  case_eq (camp_eval h cenv p bind a); simpl; intros; trivial.
+  - case_eq ((gather_successes (map (camp_eval h cenv p bind) l))); 
       intros; simpl; trivial.
     generalize (gather_successes_le _ _ _ H1); intros.
     destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
@@ -278,7 +278,7 @@ Opaque data_eq_dec.
       rewrite merge_bindings_nil_r.
       rewrite sort_sorted_is_id; trivial.
       rewrite H1; simpl; trivial.
-  - case_eq ((gather_successes (map (interp h cenv p bind) l))); 
+  - case_eq ((gather_successes (map (camp_eval h cenv p bind) l))); 
     intros; simpl; trivial.
     destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
               (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount res0))))); simpl.
@@ -314,26 +314,26 @@ Qed.
          | (Success a)::xs => liftpr (cons a) (prmapM xs)
        end.
 
-Lemma interp_mapall h cenv p bind l :
+Lemma camp_eval_mapall h cenv p bind l :
   RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
-  interp h cenv (mapall p) bind (dcoll l) = liftpr dcoll (prmapM (map (interp h cenv p bind) l)).
+  camp_eval h cenv (mapall p) bind (dcoll l) = liftpr dcoll (prmapM (map (camp_eval h cenv p bind) l)).
 Proof.
   revert p bind.
   induction l; intros.
   - simpl; destruct (data_eq_dec (dnat 0) (dnat 0)); [|intuition]; simpl.
     rewrite merge_bindings_nil_r; trivial.
-  - rewrite interp_mapall_cons by trivial.
+  - rewrite camp_eval_mapall_cons by trivial.
     rewrite IHl by trivial.
     simpl.
-    destruct (interp h cenv p bind a); simpl; trivial;
-     destruct (prmapM (map (interp h cenv p bind) l)); simpl; trivial.
+    destruct (camp_eval h cenv p bind a); simpl; trivial;
+     destruct (prmapM (map (camp_eval h cenv p bind) l)); simpl; trivial.
 Qed.
 
 Transparent data_eq_dec.
 
-Lemma interp_pletIt_eq h cenv p₁ p₂ bind d : 
-  interp h cenv (pletIt p₁ p₂) bind d=
-           bindpr (interp h cenv p₁ bind d) (interp h cenv p₂ bind).
+Lemma camp_eval_pletIt_eq h cenv p₁ p₂ bind d : 
+  camp_eval h cenv (pletIt p₁ p₂) bind d=
+           bindpr (camp_eval h cenv p₁ bind d) (camp_eval h cenv p₂ bind).
 Proof.
   reflexivity.
 Qed.
@@ -396,7 +396,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
     shadow_free n = true ->
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
-    isRecoverableError (interp h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit) = false.
+    isRecoverableError (camp_eval h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit) = false.
   Proof.
     Hint Resolve op2tpr_not_recoverable.
     intros Hiscore.
@@ -411,22 +411,22 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
       rewrite andb_true_iff in H; apply in_in_app_false in H1; intuition.
       specialize (IHn1 _ H2 H0).
       specialize (IHn2 _ H3 H0).
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit);
-        destruct (interp h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; intuition.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit);
+        destruct (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; intuition.
     - simpl in *.
       specialize (IHn Hiscore).
       specialize (IHn _ H H0).
-      destruct (interp h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; intuition.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; intuition.
     - simpl in Hiscore.
       elim Hiscore; clear Hiscore; intros Hcore1 Hcore2;
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
       unfold nnrcToCamp_ns; fold nnrcToCamp_ns.
       unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
-      rewrite interp_pletIt_eq.
+      rewrite camp_eval_pletIt_eq.
       match_destr_in H1.
       specialize (IHn1 _ H5 H0 H).
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit);
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit);
         unfold bindpr; [trivial|(elim IHn1; eauto)|idtac].
       simpl.
       unfold merge_bindings.
@@ -466,13 +466,13 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
       simpl in H, H1; repeat rewrite andb_true_iff in H; apply in_in_cons_app_false in H1; intuition.
       unfold nnrcToCamp_ns; fold nnrcToCamp_ns.
       unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
-      rewrite interp_pletIt_eq.
+      rewrite camp_eval_pletIt_eq.
       match_destr_in H1.
       specialize (IHn1 _ H5 H0 H).
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit);
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit);
         unfold bindpr; [trivial|(elim IHn1; eauto)|idtac].
       destruct res; trivial. 
-      rewrite interp_mapall; trivial.
+      rewrite camp_eval_mapall; trivial.
       rewrite isRecoverableError_liftpr.
       induction l; simpl; trivial.
       simpl in IHl.
@@ -489,7 +489,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
       (rec_sort (nnrc_to_camp_env ((v,a)::env))) by reflexivity.
       specialize (IHn2 ((v,a)::env)).
       rewrite (nnrcToCamp_data_indep _ _ _ dunit).
-      destruct (interp h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env ((v, a) :: env))) dunit); 
+      destruct (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env ((v, a) :: env))) dunit); 
         simpl in *; trivial.
       cut (true = false); [intuition|idtac].
       apply IHn2; eauto; intros ? [?|?] ?; subst; eauto.
@@ -519,11 +519,11 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
       specialize (IHn1 _ H1 H0 H).
       specialize (IHn2 _ H5 H0 H2).
       specialize (IHn3 _ H3 H0 H6).
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
       destruct res; trivial.
       simpl in *.
       destruct b; simpl; rewrite merge_bindings_nil_r; rewrite drec_sort_idempotent; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
     - simpl in Hiscore.
       elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
       elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
@@ -592,7 +592,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
   Lemma nnrcToCamp_norecoverable_top_ns h cenv n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    isRecoverableError (interp h cenv (nnrcToCamp_ns n) nil dunit) = false.
+    isRecoverableError (camp_eval h cenv (nnrcToCamp_ns n) nil dunit) = false.
   Proof.
     intros.
     generalize (nnrcToCamp_norecoverable_ns h cenv n nil); simpl; auto.
@@ -600,7 +600,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
 
   Theorem nnrcToCamp_norecoverable_top h cenv avoid n :
     nnrcIsCore n ->
-    isRecoverableError (interp h cenv (nnrcToCamp avoid n) nil dunit) = false.
+    isRecoverableError (camp_eval h cenv (nnrcToCamp avoid n) nil dunit) = false.
   Proof.
     intros Hiscore.
     generalize (unshadow_simpl_preserve_core avoid n Hiscore); intros.
@@ -633,7 +633,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
     shadow_free n = true ->
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
-    cNNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit).
+    cNNRC.nnrc_core_eval h env n = pr2op (camp_eval h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env)) dunit).
   Proof.
     intros HisCore.
     revert HisCore env; induction n; intro Hiscore; intros; trivial.
@@ -647,23 +647,23 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
     - simpl in *.
       rewrite andb_true_iff in H; apply in_in_app_false in H1.
       rewrite IHn1, IHn2; trivial; intuition.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
       rewrite pr2op_op2tpr; trivial.
     - simpl in *. 
       rewrite IHn; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env))); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n) (rec_sort (nnrc_to_camp_env env))); simpl; trivial.
       rewrite pr2op_op2tpr; trivial.
     - unfold nnrcToCamp_ns; fold nnrcToCamp_ns.
       unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
-      rewrite interp_pletIt_eq.
+      rewrite camp_eval_pletIt_eq.
       simpl in H, H1; repeat rewrite andb_true_iff in H; 
         apply in_in_cons_app_false in H1; intuition.
       destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
        intuition.
       rewrite IHn1; trivial.
       simpl.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env))  dunit);
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env))  dunit);
         [intuition|intuition|idtac]. simpl.
       rewrite IHn2; trivial. simpl.
       unfold merge_bindings.
@@ -689,17 +689,17 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
           reason about mapall, which is a definition *)
       unfold nnrcToCamp_ns; fold nnrcToCamp_ns.
       unfold cNNRC.nnrc_core_eval; fold cNNRC.nnrc_core_eval.
-      rewrite interp_pletIt_eq.
+      rewrite camp_eval_pletIt_eq.
       simpl in H, H1; repeat rewrite andb_true_iff in H; 
         apply in_in_cons_app_false in H1; intuition.
       destruct (in_dec string_eqdec v (nnrc_bound_vars n2));
        intuition.
       rewrite IHn1; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env))  dunit);
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env))  dunit);
         [intuition|intuition|idtac].
       unfold pr2op at 1.
       destruct res; trivial. unfold bindpr.
-      rewrite interp_mapall; trivial.
+      rewrite camp_eval_mapall; trivial.
       rewrite pr2op_liftpr.
       f_equal.
       induction l; simpl; trivial.
@@ -715,7 +715,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
         simpl.
         rewrite drec_sort_idempotent.
         rewrite (nnrcToCamp_data_indep h _ a dunit); trivial.
-        destruct ((interp h cenv (nnrcToCamp_ns n2)
+        destruct ((camp_eval h cenv (nnrcToCamp_ns n2)
           (RSort.insertion_sort_insert rec_field_lt_dec 
              (loop_var v, a) (rec_sort (nnrc_to_camp_env env))) dunit)); simpl; trivial;
           destruct (prmapM
@@ -725,7 +725,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
                merge_bindings (rec_sort (nnrc_to_camp_env env))
                               ((loop_var v, d) :: nil)
              with
-             | Some bind' => interp h cenv (nnrcToCamp_ns n2) bind' d
+             | Some bind' => camp_eval h cenv (nnrcToCamp_ns n2) bind' d
              | None => RecoverableError 
              end) l)); simpl; trivial.
         rewrite domain_app.
@@ -744,11 +744,11 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
       apply in_in_app_false in H1; intuition.
       apply in_in_app_false in H4; intuition.
       rewrite IHn1, IHn2, IHn3; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); simpl; trivial.
       simpl. destruct res; trivial.
       destruct b; simpl;
       rewrite merge_bindings_nil_r; rewrite drec_sort_idempotent; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort (nnrc_to_camp_env env)) dunit); trivial.
     - simpl in *.
       elim Hiscore; clear Hiscore; intros Hcore1 Hiscore;
       elim Hiscore; clear Hiscore; intros Hcore2 Hcore3;
@@ -759,7 +759,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
       apply in_in_cons_cons_app_app_false in H1; [| intuition.. ].
       rewrite IHn1 by intuition.
       unfold pr2op, bindpr.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort (nnrc_to_camp_env env)) dunit); trivial.
       destruct H1 as [?[?[?[??]]]].
       destruct res; trivial.
       + rewrite IHn2; trivial.
@@ -804,7 +804,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
   Lemma nnrcToCamp_sem_correct_top_ns h cenv n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToCamp_ns n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (camp_eval h cenv (nnrcToCamp_ns n) nil dunit).
   Proof.
     intros.
     apply nnrcToCamp_sem_correct_ns; simpl; auto.
@@ -812,7 +812,7 @@ Lemma nnrcToCamp_norecoverable_ns h cenv n env :
 
   Theorem nnrcToCamp_sem_correct_top h cenv avoid n :
     nnrcIsCore n ->
-    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToCamp avoid n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (camp_eval h cenv (nnrcToCamp avoid n) nil dunit).
   Proof.
     intro Hiscore.
     generalize (unshadow_simpl_preserve_core avoid n Hiscore); intros.
@@ -1073,7 +1073,7 @@ Hint Rewrite
     unfold Proper, respectful, equivlist; intros; subst; trivial.
   Qed.
 
-  Lemma interp_nnrcToCamp_ns_ignored_let_binding h cenv b x xv d n :
+  Lemma camp_eval_nnrcToCamp_ns_ignored_let_binding h cenv b x xv d n :
     shadow_free n = true ->
     RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
     fresh_bindings (domain b) (nnrcToCamp_ns n) ->
@@ -1081,11 +1081,11 @@ Hint Rewrite
     NoDup (domain b) ->
     ~ In (let_var x) (let_vars (nnrcToCamp_ns n)) ->
     ~ In (let_var x) (domain b) ->
-    (interp h cenv (nnrcToCamp_ns n)
+    (camp_eval h cenv (nnrcToCamp_ns n)
             (rec_concat_sort b
                              ((let_var x, xv)::nil)) d)
     = 
-    (interp h cenv (nnrcToCamp_ns n)
+    (camp_eval h cenv (nnrcToCamp_ns n)
             (rec_sort b) d).
   Proof.
     Hint Resolve loop_let_var_distinct.
@@ -1112,7 +1112,7 @@ Hint Rewrite
       intro nin; apply (H1 _ H6).
       destruct u; intuition.
     - unfold nnrcToCamp_ns; fold nnrcToCamp_ns.
-      repeat rewrite interp_pletIt_eq.
+      repeat rewrite camp_eval_pletIt_eq.
       simpl in H, H1,H2,H4. repeat rewrite andb_true_iff in H.
       rewrite map_app in H2.
       apply in_in_cons_app_false in H2.
@@ -1120,7 +1120,7 @@ Hint Rewrite
       autorewrite with fresh_bindings in *.
       intuition.
       rewrite IHn1; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort b) d); simpl; trivial.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort b) d); simpl; trivial.
       destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); try discriminate.
       repeat rewrite merge_bindings_single_nin; trivial.
       rewrite drec_concat_sort_pullout; auto.
@@ -1164,7 +1164,7 @@ Hint Rewrite
     - (* need to be careful about simplifications, since we want to
           reason about mapall, which is a definition *)
       unfold nnrcToCamp_ns; fold nnrcToCamp_ns.
-      repeat rewrite interp_pletIt_eq.
+      repeat rewrite camp_eval_pletIt_eq.
       simpl in H, H1,H2,H4. repeat rewrite andb_true_iff in H.
       rewrite map_app in H2.
       apply in_in_cons_app_false in H2.
@@ -1180,10 +1180,10 @@ Hint Rewrite
                                   destruct H4 as [x H4]).
       destruct H2 as [?[??]].
       rewrite IHn1; trivial.
-      destruct (interp h cenv (nnrcToCamp_ns n1) (rec_sort b) d); try reflexivity.
+      destruct (camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort b) d); try reflexivity.
       unfold bindpr.
       destruct res; try reflexivity.
-      repeat rewrite interp_mapall by intuition.
+      repeat rewrite camp_eval_mapall by intuition.
       f_equal; f_equal.
       apply Forall2_eq.
       rewrite <- Forall2_map.
@@ -1242,7 +1242,7 @@ Hint Rewrite
       destruct H1 as [[[??]?][[??]?]].
       specialize (IHn1 b x xv d).
       rewrite IHn1 by intuition.
-      destruct ((interp h cenv (nnrcToCamp_ns n1) (rec_sort b) d));
+      destruct ((camp_eval h cenv (nnrcToCamp_ns n1) (rec_sort b) d));
         simpl in *; intuition.
       destruct res; simpl; trivial.
       destruct b0; simpl; 
@@ -1250,7 +1250,7 @@ Hint Rewrite
       + rewrite drec_sort_drec_sort_concat, drec_sort_idempotent.
         specialize (IHn2 b x xv d).
         rewrite IHn2 by intuition.
-        destruct  (interp h cenv (nnrcToCamp_ns n2) (rec_sort b) d); simpl in *; intuition.
+        destruct  (camp_eval h cenv (nnrcToCamp_ns n2) (rec_sort b) d); simpl in *; intuition.
       + rewrite drec_sort_drec_sort_concat, drec_sort_idempotent.
         specialize (IHn3 b x xv d).
         rewrite IHn3 by intuition.
@@ -1276,11 +1276,11 @@ Hint Rewrite
                unfold rec_concat_sort in IHn2 |- *.
                repeat rewrite rec_sort_rec_sort_app1 in IHn2.
                repeat rewrite rec_sort_rec_sort_app1.
-               destruct  (interp h cenv (nnrcToCamp_ns n2)
+               destruct  (camp_eval h cenv (nnrcToCamp_ns n2)
                                  (rec_sort
                                     ((b ++ (loop_var v, res) :: nil) ++ (let_var x, xv) :: nil))
                                  res);
-                 destruct (interp h cenv (nnrcToCamp_ns n2)
+                 destruct (camp_eval h cenv (nnrcToCamp_ns n2)
                                   (rec_sort (b ++ (loop_var v, res) :: nil)) res);
                  simpl in *; intuition.
              * apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -1468,12 +1468,12 @@ Hint Rewrite
       + unfold fresh_bindings in *. eauto.
   Qed.
 
-Lemma interp_mapall_let_cons h cenv p bind a l :
+Lemma camp_eval_mapall_let_cons h cenv p bind a l :
     RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
     fresh_bindings (domain bind) (mapall_let p) -> 
     NoDup (domain bind) ->
-  interp h cenv (mapall_let p) bind (dcoll (a::l)) =
-  match interp h cenv p bind a, (interp h cenv (mapall_let p) bind (dcoll l)) with
+  camp_eval h cenv (mapall_let p) bind (dcoll (a::l)) =
+  match camp_eval h cenv p bind a, (camp_eval h cenv (mapall_let p) bind (dcoll l)) with
       | Success x', Success (dcoll l') =>  Success (dcoll (x'::l'))
       | RecoverableError, Success (dcoll l') => RecoverableError
       | Success a, RecoverableError => RecoverableError
@@ -1492,15 +1492,15 @@ Opaque data_eq_dec.
   intuition.
   unfold fresh_let_var, let_var in H0.
   eapply H0; trivial; reflexivity.
-  case_eq (interp h cenv p bind a); simpl; intros; trivial.
-  - case_eq (gather_successes (map (interp h cenv p bind) l)); simpl; trivial; intros.
+  case_eq (camp_eval h cenv p bind a); simpl; intros; trivial.
+  - case_eq (gather_successes (map (camp_eval h cenv p bind) l)); simpl; trivial; intros.
     rewrite merge_bindings_single_nin by trivial.
     rewrite edot_fresh_concat by trivial.
     simpl.
     destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
               (dnat (Z.of_nat (RBag.bcount res)))).
      trivial.
-    + generalize (gather_successes_le (interp h cenv p bind) l); intros.
+    + generalize (gather_successes_le (camp_eval h cenv p bind) l); intros.
       specialize (H4 _ H3).
       inversion e.
       assert False by (apply (bcount_false1 l res); assumption); contradiction.
@@ -1512,7 +1512,7 @@ Opaque data_eq_dec.
        rewrite merge_bindings_nil_r.
        rewrite sort_sorted_is_id; trivial.
        rewrite edot_fresh_concat; trivial.
-  - case_eq (gather_successes (map (interp h cenv p bind) l)); simpl; trivial; intros.
+  - case_eq (gather_successes (map (camp_eval h cenv p bind) l)); simpl; trivial; intros.
     rewrite merge_bindings_single_nin by trivial.
     rewrite edot_fresh_concat by trivial.
     simpl.
@@ -1549,11 +1549,11 @@ Qed.
 
 Transparent data_eq_dec.
 
-Lemma interp_mapall_let h cenv p bind l :
+Lemma camp_eval_mapall_let h cenv p bind l :
     RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
     fresh_bindings (domain bind) (mapall_let p) -> 
     NoDup (domain bind) ->
-  interp h cenv (mapall_let p) bind (dcoll l) = liftpr dcoll (prmapM (map (interp h cenv p bind) l)).
+  camp_eval h cenv (mapall_let p) bind (dcoll l) = liftpr dcoll (prmapM (map (camp_eval h cenv p bind) l)).
 Proof.
   revert p bind.
   induction l; intros.
@@ -1571,23 +1571,23 @@ Proof.
     rewrite drec_sort_drec_sort_concat.
     rewrite edot_fresh_concat by trivial.
     trivial.
-  - rewrite interp_mapall_let_cons by trivial.
+  - rewrite camp_eval_mapall_let_cons by trivial.
     rewrite IHl by trivial.
     simpl.
-    destruct (interp h cenv p bind a); simpl; trivial;
-     destruct (prmapM (map (interp h cenv p bind) l)); simpl; trivial.
+    destruct (camp_eval h cenv p bind a); simpl; trivial;
+     destruct (prmapM (map (camp_eval h cenv p bind) l)); simpl; trivial.
 Qed.
 
-Lemma interp_mapall_let_mapall h cenv p b d:
+Lemma camp_eval_mapall_let_mapall h cenv p b d:
     RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
     fresh_bindings (domain b) (mapall_let p) -> 
     NoDup (domain b) ->
-    (interp h cenv (mapall_let p) b d) = (interp h cenv (mapall p) b d).
+    (camp_eval h cenv (mapall_let p) b d) = (camp_eval h cenv (mapall p) b d).
 Proof.
   intros.
   destruct d; try solve[simpl; trivial].
-  rewrite interp_mapall by trivial.
-  rewrite interp_mapall_let by trivial.
+  rewrite camp_eval_mapall by trivial.
+  rewrite camp_eval_mapall_let by trivial.
   reflexivity.
 Qed.
 
@@ -1623,7 +1623,7 @@ Lemma nnrcToCamp_ns_let_equiv h cenv n b d :
     NoDup (domain b) ->
     shadow_free n = true ->
     (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
-    interp h cenv (nnrcToCamp_ns_let n) b d = interp h cenv (nnrcToCamp_ns n) b d.
+    camp_eval h cenv (nnrcToCamp_ns_let n) b d = camp_eval h cenv (nnrcToCamp_ns n) b d.
 Proof.
   Hint Resolve drec_sort_sorted fresh_bindings_let_to_naive.
 
@@ -1644,7 +1644,7 @@ Proof.
   - simpl in *. repeat rewrite andb_true_iff in *. intuition.
     rewrite IHn1; intuition.
     assert (vnin:~ In (loop_var v) (domain b)) by eauto.
-    destruct (interp h cenv (nnrcToCamp_ns n1) b d); simpl; trivial.
+    destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d); simpl; trivial.
     + repeat rewrite merge_bindings_single_nin by trivial.
       apply IHn2; trivial; intros.
       * apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -1678,12 +1678,12 @@ Proof.
   - Opaque mapall_let mapall.
     simpl in *. repeat rewrite andb_true_iff in *. intuition.
     rewrite IHn1; intuition.
-    + destruct (interp h cenv (nnrcToCamp_ns n1) b d); simpl; trivial.
+    + destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d); simpl; trivial.
       Transparent mapall_let mapall.
       destruct res;
         try solve [auto 2; simpl; trivial].
-      rewrite interp_mapall_let_mapall; 
-        repeat rewrite interp_mapall; auto 3.
+      rewrite camp_eval_mapall_let_mapall; 
+        repeat rewrite camp_eval_mapall; auto 3.
       f_equal; f_equal.
       assert (vnin:~ In (loop_var v) (domain b)) by eauto.
       apply map_ext; intros.
@@ -1730,7 +1730,7 @@ Proof.
     intuition. eapply H2. reflexivity.
     trivial.
     rewrite IHn1; intuition.
-    destruct (interp h cenv (nnrcToCamp_ns n1) b d); trivial.
+    destruct (camp_eval h cenv (nnrcToCamp_ns n1) b d); trivial.
     simpl.
     rewrite merge_bindings_single_nin by trivial.
     rewrite edot_fresh_concat by trivial.
@@ -1738,7 +1738,7 @@ Proof.
     destruct b0; simpl.
     + repeat rewrite merge_bindings_nil_r.
        cut (
-           (interp h cenv (nnrcToCamp_ns_let n2)
+           (camp_eval h cenv (nnrcToCamp_ns_let n2)
               (rec_sort
                  (rec_concat_sort b
                     ((fresh_let_var "if$"
@@ -1746,14 +1746,14 @@ Proof.
                          let_vars (nnrcToCamp_ns_let n2) ++
                          let_vars (nnrcToCamp_ns_let n3)), 
                      dbool true) :: nil))) d) =
-           (interp h cenv (nnrcToCamp_ns n2)
+           (camp_eval h cenv (nnrcToCamp_ns n2)
               (rec_sort b) d)).
        intros HH; rewrite HH.
        match_destr.
       rewrite IHn2; auto.
       * rewrite drec_sort_drec_sort_concat.
         rewrite fresh_let_var_as_let.
-        rewrite interp_nnrcToCamp_ns_ignored_let_binding; unfold rec_sort; intuition.
+        rewrite camp_eval_nnrcToCamp_ns_ignored_let_binding; unfold rec_sort; intuition.
         apply (H3 _ H4). repeat rewrite map_app, in_app_iff; intuition.
         apply let_vars_let_to_naive in H4.
         unfold let_var in H4.
@@ -1793,7 +1793,7 @@ Proof.
       rewrite IHn3; auto.
       * rewrite drec_sort_drec_sort_concat.
         rewrite fresh_let_var_as_let.
-        rewrite interp_nnrcToCamp_ns_ignored_let_binding; unfold rec_sort; intuition.
+        rewrite camp_eval_nnrcToCamp_ns_ignored_let_binding; unfold rec_sort; intuition.
         apply (H3 _ H4).   
         repeat rewrite map_app, in_app_iff.
         intuition.
@@ -1848,9 +1848,9 @@ Proof.
         specialize (IHn2  (rec_concat_sort b ((loop_var v, res) :: nil)) res).
         {
           cut_to IHn2; trivial.
-          - destruct (  interp h cenv (nnrcToCamp_ns_let n2)
+          - destruct (  camp_eval h cenv (nnrcToCamp_ns_let n2)
                                (rec_concat_sort b ((loop_var v, res) :: nil)) res);
-            destruct (  interp h cenv (nnrcToCamp_ns n2)
+            destruct (  camp_eval h cenv (nnrcToCamp_ns n2)
                                (rec_concat_sort b ((loop_var v, res) :: nil)) res); simpl in *;
               trivial.
           - apply (drec_concat_sort_sorted (odt:=ODT_string)).
@@ -1912,7 +1912,7 @@ Qed.
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars n)) ->
     (forall x, In x (domain (nnrc_to_camp_env env)) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
-    cNNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToCamp_ns_let n) (rec_sort (nnrc_to_camp_env env)) d).
+    cNNRC.nnrc_core_eval h env n = pr2op (camp_eval h cenv (nnrcToCamp_ns_let n) (rec_sort (nnrc_to_camp_env env)) d).
   Proof.
     intros.
     rewrite (nnrcToCamp_sem_correct_ns _ cenv); auto.
@@ -1931,7 +1931,7 @@ Qed.
     NoDup (domain env) ->
     (forall x, In x (domain env) -> ~ In x (nnrc_bound_vars (unshadow_simpl avoid n))) ->
     (forall x, In x (domain (nnrc_to_camp_env env)) -> ~ In x (map loop_var (nnrc_bound_vars (unshadow_simpl avoid n)))) ->
-    cNNRC.nnrc_core_eval h env n = pr2op (interp h cenv (nnrcToCamp_let avoid n) (rec_sort (nnrc_to_camp_env env)) d).
+    cNNRC.nnrc_core_eval h env n = pr2op (camp_eval h cenv (nnrcToCamp_let avoid n) (rec_sort (nnrc_to_camp_env env)) d).
   Proof.
     intro Hiscore.
     intros.
@@ -1949,7 +1949,7 @@ Qed.
     nnrcIsCore n ->
     NoDup (domain env) ->
     cNNRC.nnrc_core_eval h env n
-    = pr2op (interp h cenv (nnrcToCamp_let (domain env) n)
+    = pr2op (camp_eval h cenv (nnrcToCamp_let (domain env) n)
                     (rec_sort (nnrc_to_camp_env env)) d).
   Proof.
     Hint Resolve unshadow_avoid.
@@ -1974,7 +1974,7 @@ Qed.
   Lemma nnrcToCamp_let_sem_correct_top_ns h cenv n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToCamp_ns_let n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (camp_eval h cenv (nnrcToCamp_ns_let n) nil dunit).
   Proof.
     intro Hiscore.
     intros.
@@ -1986,7 +1986,7 @@ Qed.
 
   Theorem nnrcToCamp_let_sem_correct_top h cenv n :
     nnrcIsCore n ->
-    cNNRC.nnrc_core_eval h nil n = pr2op (interp h cenv (nnrcToCamp_let nil n) nil dunit).
+    cNNRC.nnrc_core_eval h nil n = pr2op (camp_eval h cenv (nnrcToCamp_let nil n) nil dunit).
   Proof.
     intros Hiscore.
     intros.

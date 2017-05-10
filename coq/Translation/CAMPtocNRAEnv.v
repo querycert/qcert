@@ -58,7 +58,7 @@ Section CAMPtocNRAEnv.
         ANUnop AFlatten
                (ANMap (nraenv_core_of_camp p₂)
                       (nraenv_core_of_camp p₁))
-      | pgetconstant s => nraenv_match (ANGetConstant s)
+      | pgetConstant s => nraenv_match (ANGetConstant s)
       | penv => nraenv_match ANEnv
       | pletEnv p₁ p₂ =>
         ANUnop AFlatten
@@ -77,19 +77,19 @@ Section CAMPtocNRAEnv.
   Local Open Scope nra_scope.
 
   Lemma nraenv_core_of_camp_correct h c q env d:
-    lift_failure (interp h c q env d) = nraenv_core_eval h c (nraenv_core_of_camp q) (drec env) d.
+    lift_failure (camp_eval h c q env d) = nraenv_core_eval h c (nraenv_core_of_camp q) (drec env) d.
   Proof.
     revert d env; induction q; simpl; intros.
     (* pconst *)
     - reflexivity.
     (* punop *)
     - rewrite <- IHq; clear IHq; simpl.
-      destruct (interp h c q env d); try reflexivity.
+      destruct (camp_eval h c q env d); try reflexivity.
       simpl; destruct (fun_of_unaryop h u res); reflexivity.
     (* pbinop *)
     - rewrite <- IHq1; rewrite <- IHq2; clear IHq1 IHq2.
-      destruct (interp h c q1 env d); try reflexivity.
-      destruct (interp h c q2 env d); try reflexivity.
+      destruct (camp_eval h c q1 env d); try reflexivity.
+      destruct (camp_eval h c q2 env d); try reflexivity.
       simpl; destruct (fun_of_binop h b res res0); reflexivity.
     (* pmap *)
     - destruct d; try reflexivity.
@@ -98,7 +98,7 @@ Section CAMPtocNRAEnv.
       induction l; try reflexivity; simpl.
       unfold lift_failure in *.
       rewrite <- (IHq a env); clear IHq.
-      destruct (interp h c q env a); try reflexivity; simpl.
+      destruct (camp_eval h c q env a); try reflexivity; simpl.
       * rewrite IHl; clear IHl; simpl.
         unfold lift; simpl.
         destruct (rmap (nraenv_core_eval h c (nraenv_core_of_camp q) (drec env)) l); try reflexivity; simpl.
@@ -112,7 +112,7 @@ Section CAMPtocNRAEnv.
       * unfold lift, liftpr in *; simpl in *.
         revert IHl; generalize (rmap (nraenv_core_eval h c (nraenv_core_of_camp q) (drec env)) l); intros.
         destruct o; simpl in *.
-        revert IHl; generalize (gather_successes (map (interp h c q env) l)); intros.
+        revert IHl; generalize (gather_successes (map (camp_eval h c q env) l)); intros.
         destruct p; unfold rflatten in *; simpl in *; try congruence;
         revert IHl; generalize (oflat_map
               (fun x : data =>
@@ -121,38 +121,38 @@ Section CAMPtocNRAEnv.
                | _ => None
                end) l0); simpl; intros;
         destruct o; simpl; congruence.
-        revert IHl; generalize (gather_successes (map (interp h c q env) l)); intros.
+        revert IHl; generalize (gather_successes (map (camp_eval h c q env) l)); intros.
         destruct p; try congruence.
     (* passert *)
     - rewrite <- IHq; clear IHq; simpl.
-      destruct (interp h c q env d); try reflexivity.
+      destruct (camp_eval h c q env d); try reflexivity.
       destruct res; try reflexivity; simpl.
       destruct b; reflexivity.
     (* porElse *)
     - rewrite <- IHq1; clear IHq1; simpl.
-      destruct (interp h c q1 env d); simpl; auto.
+      destruct (camp_eval h c q1 env d); simpl; auto.
     (* pit *)
     - reflexivity.
     (* pletIt *)
     - rewrite <- IHq1; clear IHq1; simpl.
-      destruct (interp h c q1 env d); try reflexivity.
+      destruct (camp_eval h c q1 env d); try reflexivity.
       simpl.
       specialize (IHq2 res).
       unfold nra_context_data in IHq2.
       rewrite <- IHq2; clear IHq2.
-      destruct (interp h c q2 env res); reflexivity.      
-    (* pgetconstant *)
+      destruct (camp_eval h c q2 env res); reflexivity.      
+    (* pgetConstant *)
     - destruct (edot c s); simpl; trivial.
     (* penv *)
     - eauto. 
     (* pletEnv *)
     - rewrite <- IHq1; clear IHq1; simpl.
-      destruct (interp h c q1 env d); try reflexivity; simpl.
+      destruct (camp_eval h c q1 env d); try reflexivity; simpl.
       destruct res; try reflexivity; simpl.
       destruct (merge_bindings env l); try reflexivity; simpl.
       specialize (IHq2 d l0).
       rewrite <- IHq2; clear IHq2; simpl.
-      destruct (interp h c q2 l0 d); try reflexivity.
+      destruct (camp_eval h c q2 l0 d); try reflexivity.
     (* pleft *)
     - destruct d; simpl; trivial.
     (* pright *)
@@ -189,8 +189,8 @@ Section CAMPtocNRAEnv.
   
   Lemma ecamp_trans_top_correct h c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    (* XXX Why nil for local-env there?! Probably should have a interp_top with fixed nil local-env XXX *)
-    lift_failure (interp h c p nil d) = nraenv_core_eval h c (nraenv_core_of_camp_top p) (drec nil) d.
+    (* XXX Why nil for local-env there?! Probably should have a camp_eval_top with fixed nil local-env XXX *)
+    lift_failure (camp_eval h c p nil d) = nraenv_core_eval h c (nraenv_core_of_camp_top p) (drec nil) d.
   Proof.
     intros.
     unfold nraenv_core_eval.

@@ -67,7 +67,7 @@ Section CAMPtoNRA.
                        "PDATA"
                        (AUnop AColl
                               (nra_wrap_a1 (nra_of_camp p₁)))))
-      | pgetconstant s => nra_match (AGetConstant s)
+      | pgetConstant s => nra_match (AGetConstant s)
       | penv => nra_match nra_bind
       | pletEnv p₁ p₂ =>
         AUnop AFlatten
@@ -195,7 +195,7 @@ Section CAMPtoNRA.
   (** Theorem 4.2: lemma of translation correctness for campterns *)
 
   Theorem camp_trans_correct {h:brand_relation_t} c p bind d:
-    lift_failure (interp h c p bind d) = nra_eval h c (nra_of_camp p) (nra_context_data (drec bind) d).
+    lift_failure (camp_eval h c p bind d) = nra_eval h c (nra_of_camp p) (nra_context_data (drec bind) d).
   Proof.
     revert d bind;
     camp_cases (induction p) Case; simpl; intros.
@@ -203,12 +203,12 @@ Section CAMPtoNRA.
       reflexivity.
     - Case "punop"%string.
       rewrite <- IHp; clear IHp; simpl.
-      destruct (interp h c p bind d); try reflexivity.
+      destruct (camp_eval h c p bind d); try reflexivity.
       simpl; destruct (fun_of_unaryop h u res); reflexivity.
     - Case "pbinop"%string.
       rewrite <- IHp1; rewrite <- IHp2; clear IHp1 IHp2.
-      destruct (interp h c p1 bind d); try reflexivity.
-      destruct (interp h c p2 bind d); try reflexivity.
+      destruct (camp_eval h c p1 bind d); try reflexivity.
+      destruct (camp_eval h c p2 bind d); try reflexivity.
       simpl; destruct (fun_of_binop h b res res0); reflexivity.
     - Case "pmap"%string.
       destruct d; try reflexivity.
@@ -227,7 +227,7 @@ Section CAMPtoNRA.
       rewrite H; clear H.
       rewrite <- (IHp a bind).
       clear IHp.
-      destruct (interp h c p bind a); try reflexivity; simpl.
+      destruct (camp_eval h c p bind a); try reflexivity; simpl.
       rewrite IHl; simpl.
       rewrite rflatten_lift1.
       reflexivity.
@@ -249,37 +249,37 @@ Section CAMPtoNRA.
                | _ => None
                end) l0)); simpl; intros;
         revert IHl;
-        destruct (gather_successes (map (interp h c p bind) l)); intros; simpl in *; try reflexivity; congruence.
+        destruct (gather_successes (map (camp_eval h c p bind) l)); intros; simpl in *; try reflexivity; congruence.
       * simpl.
-        destruct ((gather_successes (map (interp h c p bind) l))); simpl; intros.
+        destruct ((gather_successes (map (camp_eval h c p bind) l))); simpl; intros.
         reflexivity.
         congruence.
         congruence.
     - Case "passert"%string.
       rewrite <- IHp; clear IHp; simpl.
-      destruct (interp h c p bind d); try reflexivity.
+      destruct (camp_eval h c p bind d); try reflexivity.
       destruct res; try reflexivity; simpl.
       destruct b; reflexivity.
     - Case "porElse"%string.
       rewrite <- IHp1; clear IHp1; simpl.
-      destruct (interp h c p1 bind d); simpl; auto.
+      destruct (camp_eval h c p1 bind d); simpl; auto.
     - Case "pit"%string.
       reflexivity.
     - Case "pletIt"%string.
       rewrite <- IHp1; clear IHp1; simpl.
-      destruct (interp h c p1 bind d); try reflexivity.
+      destruct (camp_eval h c p1 bind d); try reflexivity.
       simpl.
       specialize (IHp2 res).
       unfold nra_context_data in IHp2.
       rewrite <- IHp2; clear IHp2.
-      destruct (interp h c p2 bind res); reflexivity.      
-    - Case "pgetconstant"%string.
+      destruct (camp_eval h c p2 bind res); reflexivity.      
+    - Case "pgetConstant"%string.
       destruct (edot c s); simpl; trivial.
     - Case "penv"%string.
       eauto. 
     - Case "pletEnv"%string.
       rewrite <- IHp1; clear IHp1; simpl.
-      destruct (interp h c p1 bind d); try reflexivity.
+      destruct (camp_eval h c p1 bind d); try reflexivity.
       destruct res; try reflexivity.
       simpl.
       destruct (merge_bindings bind l); try reflexivity.
@@ -287,7 +287,7 @@ Section CAMPtoNRA.
       unfold nra_context_data in *.
       simpl.
       rewrite <- IHp2; clear IHp2; simpl.
-      destruct (interp h c p2 l0 d); try reflexivity.
+      destruct (camp_eval h c p2 l0 d); try reflexivity.
     - Case "pleft"%string.
       unfold lift_failure. destruct d; simpl; trivial.
     - Case "pright"%string.
@@ -347,7 +347,7 @@ Section CAMPtoNRA.
 
   Lemma camp_trans_top_correct {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    lift_failure (interp h c p nil d) = nra_eval h c (nra_of_camp_top p) d.
+    lift_failure (camp_eval h c p nil d) = nra_eval h c (nra_of_camp_top p) d.
   Proof.
     intros.
     rewrite camp_trans_top_nra_context by trivial.
@@ -365,21 +365,21 @@ Section CAMPtoNRA.
     end.
 
   Lemma camp_trans_correct_r {h:brand_relation_t} c p bind d:
-      interp h c p bind d =
+      camp_eval h c p bind d =
       lift_camp_failure (nra_eval h c (nra_of_camp p) (nra_context_data (drec bind) d)).
   Proof.
     rewrite <- camp_trans_correct.
-    destruct (interp h c p bind d); intros; simpl; reflexivity.
+    destruct (camp_eval h c p bind d); intros; simpl; reflexivity.
   Qed.
 
   Lemma camp_trans_top_correct_r {h:brand_relation_t} c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-      interp h c p nil d =
+      camp_eval h c p nil d =
       lift_camp_failure (nra_eval h c (nra_of_camp_top p) d).
   Proof.
     intros.
     rewrite <- camp_trans_top_correct by trivial.
-    destruct (interp h c p nil d); intros; simpl; eauto.
+    destruct (camp_eval h c p nil d); intros; simpl; eauto.
   Qed.
 
   Section size.
@@ -441,6 +441,8 @@ Section CAMPtoNRA.
       unfold camp_eval_top.
       unfold nra_eval_top.
       unfold camp_to_nra_top.
+      unfold presult_to_result.
+      unfold camp_eval_top_to_presult.
       generalize (@camp_trans_correct h (rec_sort global_env) q nil dunit); intros.
       unfold lift_failure in H.
       rewrite H.

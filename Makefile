@@ -17,7 +17,10 @@
 CP=cp
 TSC?=tsc
 
+# This may have to be specialized
+COQ2HTML=../../opt/bin
 COQDOCFLAGS=-interpolate -utf8 --lib-subtitles --no-lib-name -l
+export COQ2HTML
 export COQDOCFLAGS
 
 DIST_DIR=
@@ -187,6 +190,7 @@ MODULES = \
 	DNNRC/DNNRCSystem \
 	DNNRC/Optim/tDNNRCOptimizer \
 	DNNRC/DNNRCOptim \
+	CAMP/Lang/CAMPUtil \
 	CAMP/Lang/CAMP \
 	CAMP/Lang/CAMPSize \
 	CAMP/Lang/CAMPSugar \
@@ -379,6 +383,9 @@ Makefile.coq: Makefile $(VS) $(FILES)
 html: Makefile.coq
 	@$(MAKE) -f Makefile.coq html
 
+gather_globs:
+	@find ./coq \( -name '*.glob' \) -print0 | xargs -0 ./scripts/gather_glob.sh
+
 clean_detritus:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 ./script/remove_detritus_derived_file.sh
 
@@ -412,5 +419,13 @@ dist:
 cleandist:
 	rm -rf $(DISTDIR)
 	rm -f $(DISTDIR).tar.gz
+
+documentation: $(COQ2HTML)/coq2html $(FILES)
+	@$(MAKE) gather_globs
+	mkdir -p docs/html
+	rm -f docs/html/*.html
+	$(COQ2HTML)/coq2html -o 'docs/html/%.html' docs/globs/*.glob \
+          $(filter-out $(COQ2HTML)/coq2html, $^)
+	cp docs/coq2html.css docs/coq2html.js docs/html/
 
 .PHONY: all clean clean_detritus html

@@ -46,8 +46,8 @@ Module QCAMP(runtime:CompilerRuntime).
     := CAMP.pit.
   Definition pletit : camp -> camp -> camp 
     := CAMP.pletIt.
-  Definition pgetconstant : String.string -> camp 
-    := CAMP.pgetconstant.
+  Definition pgetConstant : String.string -> camp 
+    := CAMP.pgetConstant.
   Definition penv : camp 
     := CAMP.penv.
   Definition pletenv : camp -> camp -> camp 

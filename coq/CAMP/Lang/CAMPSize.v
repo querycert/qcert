@@ -26,12 +26,11 @@ Section CAMPSize.
          | punop op p₁ => S (camp_size p₁)
          | pbinop op p₁ p₂ => S (camp_size p₁ + camp_size p₂)
          | pmap p₁ => S (camp_size p₁)
-(*       | pgroupBy p₁ => S (camp_size p₁) *)
          | passert p₁ => S (camp_size p₁)
          | porElse p₁ p₂ => S (camp_size p₁ + camp_size p₂)
          | pit => 1
          | pletIt p₁ p₂ => S (camp_size p₁ + camp_size p₂)
-         | pgetconstant _ => 1
+         | pgetConstant _ => 1
          | penv => 1
          | pletEnv p₁ p₂ => S (camp_size p₁ + camp_size p₂)
          | pleft => 1

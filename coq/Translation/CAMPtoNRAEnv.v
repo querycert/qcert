@@ -58,7 +58,7 @@ Section CAMPtoNRAEnv.
         NRAEnvUnop AFlatten
                (NRAEnvMap (nraenv_of_camp p₂)
                       (nraenv_of_camp p₁))
-      | pgetconstant s => nraenv_match (NRAEnvGetConstant s)
+      | pgetConstant s => nraenv_match (NRAEnvGetConstant s)
       | penv => nraenv_match NRAEnvEnv
       | pletEnv p₁ p₂ =>
         NRAEnvUnop AFlatten
@@ -93,7 +93,7 @@ Section CAMPtoNRAEnv.
   Qed.
   
   Lemma nraenv_of_camp_correct h c q env d:
-    lift_failure (interp h c q env d) = nraenv_eval h c (nraenv_of_camp q) (drec env) d.
+    lift_failure (camp_eval h c q env d) = nraenv_eval h c (nraenv_of_camp q) (drec env) d.
   Proof.
     rewrite nraenv_core_of_camp_correct.
     unfold nraenv_eval.
@@ -125,8 +125,7 @@ Section CAMPtoNRAEnv.
   
   Lemma ecamp_trans_top_correct h c p d:
     Forall (fun x => data_normalized h (snd x)) c ->
-    (* XXX Why nil for local-env there?! Probably should have a interp_top with fixed nil local-env XXX *)
-    lift_failure (interp h c p nil d) = nraenv_eval h c (nraenv_of_camp_top p) (drec nil) d.
+    lift_failure (camp_eval h c p nil d) = nraenv_eval h c (nraenv_of_camp_top p) (drec nil) d.
   Proof.
     intros.
     rewrite <- (nraenv_of_camp_top_id h c); trivial.
