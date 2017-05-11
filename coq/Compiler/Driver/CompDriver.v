@@ -19,19 +19,19 @@ Section CompDriver.
   Require Import String.
   Require Import Morphisms.
 
-  (** Core libraries *)
+  (* Core libraries *)
   Require Import BasicSystem.
   Require Import TypingRuntime.
 
-  (** Query languages *)
+  (* Query languages *)
   Require Import SQLRuntime.
   Require Import OQLRuntime.
   Require Import LambdaNRARuntime.
-  (** Rule languages *)
+  (* Rule languages *)
   Require Import CAMPRuleRuntime.
   Require Import TechRuleRuntime.
   Require Import DesignRuleRuntime.
-  (** Intermediate languages *)
+  (* Intermediate languages *)
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
@@ -39,14 +39,14 @@ Section CompDriver.
   Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
   Require Import CAMPRuntime.
-  (** Target languages *)
+  (* Target languages *)
   Require Import JavaScriptRuntime.
   Require Import JavaRuntime.
   Require Import SparkRDDRuntime.
   Require Import SparkDFRuntime.
   Require Import CloudantRuntime.
 
-  (** Translations *)
+  (* Translations *)
   Require Import OQLtoNRAEnv.
   Require Import SQLtoNRAEnv.
   Require Import LambdaNRAtoNRAEnv.
@@ -74,14 +74,14 @@ Section CompDriver.
   Require Import TDNNRCInfer DNNRCtotDNNRC.
   Require Import tDNNRCtoSparkDF.
 
-  (** Optimizers *)
+  (* Optimizers *)
   Require Import NRAEnvOptim.
   Require Import NNRCOptim.
   Require Import NNRCMROptim.
   Require Import DNNRCOptim.
   Require Import OptimizerLogger.
 
-  (** Foreign Datatypes Support *)
+  (* Foreign Datatypes Support *)
   Require Import ForeignToReduceOps.
   Require Import ForeignToSpark.
   Require Import ForeignCloudant.
@@ -91,7 +91,7 @@ Section CompDriver.
   Require Import ForeignToScala.
 
   (** Compiler Driver *)
-  
+
   Require Import CompLang CompEnv CompConfig.
 
   (* Some useful notations *)
@@ -114,7 +114,7 @@ Section CompDriver.
   Context {ftos:foreign_to_scala}.
   Context {ftospark:foreign_to_spark}.
 
-  (* Translation functions *)
+  (** Translation functions *)
   Section translations_util.
     (* Java equivalent: MROptimizer.nrc_mr_rename_local_for_cloudant *)
     Definition nnrcmr_rename_local_for_cloudant (mrl:nnrcmr)
@@ -129,14 +129,14 @@ Section CompDriver.
       := nnrcmr_rename_graph
            cldSafeSeparator
            cldIdentifierSanitize
-           cldAvoidList 
+           cldAvoidList
            mrl.
 
     (* Java equivalent: MROptimizer.nrc_mr_rename_for_cloudant *)
     Definition nnrcmr_rename_for_cloudant (mrl:nnrcmr)
       := nnrcmr_rename_graph_for_cloudant
            (nnrcmr_rename_local_for_cloudant mrl).
-    
+
   End translations_util.
 
   Section translations.
@@ -167,7 +167,7 @@ Section CompDriver.
 
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
       nraenv_core_to_nnrc_core_top init_vid init_venv q.
-    
+
     Definition nraenv_core_to_nra (q: nraenv_core) : nra := cNRAEnvtoNRA.nraenv_core_to_nra_top q.
 
     Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv := nraenv_of_nraenv_core q.
@@ -178,7 +178,7 @@ Section CompDriver.
 
     (** NNRC translations *)
     Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core := nnrc_to_nnrc_core q.
-  
+
     Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
       lift_nnrc_core (nnrcToCamp_let avoid) q. (* XXX avoid ? XXX *)
 
@@ -196,8 +196,6 @@ Section CompDriver.
     Definition nnrc_to_java (class_name:string) (imports:string) (q: nnrc) : java := (* XXX Expands GroupBy For now XXX *)
       lift_nnrc_core (nnrc_to_java_top class_name imports) (nnrc_to_nnrc_core q).
 
-    (** DNNRC translations *)
-    
     (** NNRCMR translations *)
     Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
 
@@ -218,21 +216,24 @@ Section CompDriver.
     Definition nnrcmr_to_spark_rdd (rulename: string) (q: nnrcmr) : spark_rdd :=
       nnrcmr_to_spark_rdd_top init_vinit rulename q. (* XXX init_vinit should be a parameter? *)
 
+    (** CldMR translations *)
+
+    Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
+      mapReducePairstoCloudant h q rulename.
+
+    (** DNNRC translations *)
+
     Definition dnnrc_dataset_to_dnnrc_typed_dataset (q: dnnrc_dataset) (tdenv: tdbindings)
       : option dnnrc_typed_dataset :=
       dnnrc_to_dnnrc_typed_top tdenv q.
-
-    (* Backend *)
 
     Definition dnnrc_typed_dataset_to_spark_dataset
                (tenv:tdbindings) (name:string) (q:dnnrc_typed_dataset) : spark_dataset :=
       @dnnrcToSpark2Top _ _ bm _ _ unit (mkConstants tenv) name q.
 
-    Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
-      mapReducePairstoCloudant h q rulename.
-
   End translations.
 
+  (** Optimization functions *)
   Section optimizations.
     Definition nraenv_optim (opc:optim_phases_config) (q: nraenv) : nraenv :=
       NRAEnvOptimizer.run_nraenv_optims opc q.
@@ -269,7 +270,7 @@ Section CompDriver.
       dnnrcToDatasetRewrite q.
   End optimizations.
 
-  (* Drivers *)
+  (** Drivers *)
 
   Inductive javascript_driver : Set :=
     | Dv_javascript_stop : javascript_driver.
@@ -449,8 +450,8 @@ Section CompDriver.
     | Case_aux c "Dv_cloudant"%string
     | Case_aux c "Dv_error"%string ].
 
-  (* Compilers function *)
 
+  (** Driver utility functions *)
   Section CompDriverUtil.
 
   Definition language_of_driver (dv: driver) :=
@@ -650,9 +651,9 @@ Section CompDriver.
     | Dv_error s => 1
     end.
 
-
   End CompDriverUtil.
 
+  (** Compilation functions*)
   Section CompDriverCompile.
   Definition compile_javascript (dv: javascript_driver) (q: javascript) : list query :=
     let queries :=
@@ -971,8 +972,7 @@ Section CompDriver.
 
   End CompDriverCompile.
 
-  (* Compilers config *)
-
+  (** Driver builder *)
   Section CompDriverConfig.
   Definition push_translation config lang dv :=
     match lang with
@@ -1746,7 +1746,7 @@ Section CompDriver.
         simpl.
         rewrite H; reflexivity.
   Qed.
-  
+
   Lemma target_language_of_driver_is_postfix_cnd:
     (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_camp dv)))
                                   (Dv_camp dv))
@@ -2093,7 +2093,7 @@ Section CompDriver.
       is_postfix_driver dv' dv ->
         exists rev_path,
           driver_of_rev_path config dv' rev_path = dv.
-  Proof. 
+  Proof.
     intros dv dv' config H_config.
     induction 1.
     - subst. exists nil; trivial.
@@ -2171,6 +2171,8 @@ Section CompDriver.
 
   End CompDriverConfig.
 
+
+  (** Paths builder *)
   Section CompPaths.
     Local Open Scope string_scope.
 
@@ -3917,7 +3919,7 @@ Section CompDriver.
     Qed.
 
     Hint Resolve exists_path_from_source_target_completeness_javascript : exists_path_hints.
-    
+
     Lemma exists_path_from_source_target_completeness_java :
         (forall dv,
             exists_path_from_source_target L_java (target_language_of_driver (Dv_java dv))).
@@ -3927,7 +3929,7 @@ Section CompDriver.
     Qed.
 
     Hint Resolve exists_path_from_source_target_completeness_java : exists_path_hints.
-        
+
     Ltac prove_exists_path_complete
       := simpl; try reflexivity; intros
          ; rewrite target_language_of_driver_equation
@@ -3941,7 +3943,7 @@ Section CompDriver.
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
-    
+
     Hint Resolve exists_path_from_source_target_completeness_cloudant : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_cldmr :
@@ -3959,25 +3961,25 @@ Section CompDriver.
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
-    
+
     Hint Resolve exists_path_from_source_target_completeness_spark_dataset : exists_path_hints.
-    
+
     Lemma exists_path_from_source_target_completeness_dnnrc_typed_dataset :
       (forall dv,
           exists_path_from_source_target L_dnnrc_typed_dataset (target_language_of_driver (Dv_dnnrc_typed_dataset dv))).
     Proof.
       induction dv; prove_exists_path_complete.
     Qed.
-    
+
     Hint Resolve exists_path_from_source_target_completeness_dnnrc_typed_dataset : exists_path_hints.
-    
+
     Lemma exists_path_from_source_target_completeness_dnnrc_dataset :
       (forall dv,
           exists_path_from_source_target L_dnnrc_dataset (target_language_of_driver (Dv_dnnrc_dataset dv))).
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
-    
+
     Hint Resolve exists_path_from_source_target_completeness_dnnrc_dataset : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_spark_rdd :
@@ -3986,28 +3988,28 @@ Section CompDriver.
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
-    
+
     Hint Resolve exists_path_from_source_target_completeness_spark_rdd : exists_path_hints.
-    
+
     Lemma exists_path_from_source_target_completeness_cnd :
         (forall dv,
             exists_path_from_source_target L_camp (target_language_of_driver (Dv_camp dv)))
-        /\ 
+        /\
         (forall dv,
             exists_path_from_source_target L_nra (target_language_of_driver (Dv_nra dv)))
-        /\ 
+        /\
         (forall dv,
             exists_path_from_source_target L_nraenv_core (target_language_of_driver (Dv_nraenv_core dv)))
-        /\ 
+        /\
         (forall dv,
             exists_path_from_source_target L_nraenv (target_language_of_driver (Dv_nraenv dv)))
-        /\ 
+        /\
         (forall dv,
             exists_path_from_source_target L_nnrc_core (target_language_of_driver (Dv_nnrc_core dv)))
-        /\ 
+        /\
         (forall dv,
             exists_path_from_source_target L_nnrc (target_language_of_driver (Dv_nnrc dv)))
-        /\ 
+        /\
         (forall dv,
             exists_path_from_source_target L_nnrcmr (target_language_of_driver (Dv_nnrcmr dv))).
   Proof.
@@ -4135,7 +4137,7 @@ Section CompDriver.
   Definition get_driver_from_source_target (conf: driver_config) (source:language) (target:language) : driver :=
     let path := get_path_from_source_target source target in
     driver_of_path conf path.
-  
+
   (* Some macros, that aren't really just about source-target *)
 
   Definition compile_from_source_target (conf: driver_config) (source:language) (target:language) (q: query) : query :=
@@ -4186,7 +4188,7 @@ Section CompDriver.
     match List.rev path with
     | lang :: _ => lang
     | nil => L_error "empty path"
-    end.    
+    end.
 
   Lemma get_source_target_from_path_rev path :
     get_source_from_path path = get_target_from_path (List.rev path).
