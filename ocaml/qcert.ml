@@ -89,7 +89,7 @@ let args_list gconf =
        " Print type annotations on ILs");
       ("-margin", Arg.Int (PrettyIL.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
-      ("-cld-prefix", Arg.String (CloudantUtil.set_prefix gconf.gconf_cld_conf),
+      ("-cloudant-prefix", Arg.String (CloudantUtil.set_prefix gconf.gconf_cld_conf),
        "<pref> Cloudant DB prefix");
       ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
        "<imports> Additional imports for the Java runtime");

@@ -365,8 +365,8 @@ Section CldMRtoCloudant.
 
     (* Java equivalent: CloudantBackend.mapReducePairstoCloudant *)    
     Definition mapReducePairstoCloudant (h:list (string*string)) (mrl : cldmr) (rulename:string) : cloudant :=
-      let mrpl := cld_mrToJS h true eol_backn quotel_backdouble mrl in
-      let last_fun := cld_mrToLastJS h true eol_backn quotel_backdouble (fst (mrl.(cldmr_last))) in
+      let mrpl := cld_mrToJS h true eol_backn quotel_double mrl in
+      let last_fun := cld_mrToLastJS h true eol_backn quotel_double (fst (mrl.(cldmr_last))) in
       let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cldmr_last))) in
       mapReduceStringstoDesignDocs mrpl last_fun cld_eff_params rulename.
 
