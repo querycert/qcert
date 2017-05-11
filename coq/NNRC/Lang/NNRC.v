@@ -14,6 +14,27 @@
  * limitations under the License.
  *)
 
+(** NNRC is the named nested relational calculus. It serves as an
+intermediate language to facilitate code generation for non-functional
+targets. *)
+
+(** NNRC is a thin layer over the core language cNNRC. As cNNRC, NNRC
+  is evaluated within a global (static) environment and local
+  environment. *)
+
+(** Additional operators in NNRC can be easily expressed in terms of
+  the core cNNRC, but are useful for optimization purposes. The main
+  such operator is group-by. *)
+
+(** Summary:
+- Language: NNRC (Named Nested Relational Calculus)
+- Based on: "Polymorphic type inference for the named nested
+  relational calculus." Jan Van den Bussche, and Stijn
+  Vansummeren. ACM Transactions on Computational Logic (TOCL) 9.1
+  (2007): 3.
+- translating to NNRC: NRAEnv, cNNRC
+- translating from NNRC: cNNRC, NNRCMR, DNNRC, Java, JavaScript *)
+
 Section NNRC.
 
   Require Import String.
@@ -31,8 +52,6 @@ Section NNRC.
   Require Import Utils BasicRuntime.
   Require Import cNNRC.
 
-  (** Named Nested Relational Calculus - Extended *)
-
   Section Language.
     Context {fruntime:foreign_runtime}.
     Context {h:brand_relation_t}.
@@ -40,8 +59,8 @@ Section NNRC.
     (** The AST for NNRC is fully defined in the core NNRC module *)
     Definition nnrc := nnrc.
   
-  Section macros.
-    (** e groupby[g,keys] ==
+    Section macros.
+      (** e groupby[g,keys] ==
          LET $group0 := e
          IN { [ g: ]
                 ⊕
@@ -50,431 +69,431 @@ Section NNRC.
                          ELSE {}
                        | $group3 ∈ $group0 })
             | $group2 ∈ ♯distinct({ π[keys]($group1) | $group1 ∈ $group0 }) }
-    *)
-    Definition nnrc_group_by (g:string) (sl:list string) (e:nnrc) : nnrc :=
-      let t0 := "$group0"%string in
-      let t1 := "$group1"%string in
-      let t2 := "$group2"%string in
-      let t3 := "$group3"%string in
-      NNRCLet t0 e
-             (NNRCFor t2
-                     (NNRCUnop ADistinct
-                              (NNRCFor t1 (NNRCVar t0) (NNRCUnop (ARecProject sl) (NNRCVar t1))))
-                     (NNRCBinop AConcat
-                               (NNRCUnop (ARec g)
-                                        (NNRCUnop AFlatten
-                                                 (NNRCFor t3 (NNRCVar t0)
-                                                          (NNRCIf (NNRCBinop AEq (NNRCUnop (ARecProject sl) (NNRCVar t3)) (NNRCVar t2))
-                                                                  (NNRCUnop AColl (NNRCVar t3))
-                                                                  (NNRCConst (dcoll nil))))))
-                               (NNRCVar t2))).
+       *)
+      Definition nnrc_group_by (g:string) (sl:list string) (e:nnrc) : nnrc :=
+        let t0 := "$group0"%string in
+        let t1 := "$group1"%string in
+        let t2 := "$group2"%string in
+        let t3 := "$group3"%string in
+        NNRCLet t0 e
+                (NNRCFor t2
+                         (NNRCUnop ADistinct
+                                   (NNRCFor t1 (NNRCVar t0) (NNRCUnop (ARecProject sl) (NNRCVar t1))))
+                         (NNRCBinop AConcat
+                                    (NNRCUnop (ARec g)
+                                              (NNRCUnop AFlatten
+                                                        (NNRCFor t3 (NNRCVar t0)
+                                                                 (NNRCIf (NNRCBinop AEq (NNRCUnop (ARecProject sl) (NNRCVar t3)) (NNRCVar t2))
+                                                                         (NNRCUnop AColl (NNRCVar t3))
+                                                                         (NNRCConst (dcoll nil))))))
+                                    (NNRCVar t2))).
     
-    Lemma nnrc_group_by_correct env
-          (g:string) (sl:list string)
-          (e:nnrc)
-          (incoll outcoll:list data):
-      nnrc_core_eval h env e = Some (dcoll incoll) ->
-      group_by_nested_eval_table g sl incoll = Some outcoll -> 
-      nnrc_core_eval h env (nnrc_group_by g sl e) = Some (dcoll outcoll).
-    Proof.
-      intros.
-      unfold nnrc_group_by; simpl.
-      rewrite H; simpl; clear H.
-      apply (group_by_table_correct g sl incoll outcoll H0).
-    Qed.
+      Lemma nnrc_group_by_correct env
+            (g:string) (sl:list string)
+            (e:nnrc)
+            (incoll outcoll:list data):
+        nnrc_core_eval h env e = Some (dcoll incoll) ->
+        group_by_nested_eval_table g sl incoll = Some outcoll -> 
+        nnrc_core_eval h env (nnrc_group_by g sl e) = Some (dcoll outcoll).
+      Proof.
+        intros.
+        unfold nnrc_group_by; simpl.
+        rewrite H; simpl; clear H.
+        apply (group_by_table_correct g sl incoll outcoll H0).
+      Qed.
 
-    Definition nnrc_group_by_from_nraenv (vid venv:var) (g:string) (sl:list string) (e:nnrc) :=
-    (NNRCLet (fresh_var "tappe$" (vid :: venv :: nil))
-       (NNRCUnop (ARec "$pregroup") e)
-       (NNRCFor
-          (fresh_var "tmap$"
-             (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
-          (NNRCUnop ADistinct
-             (NNRCFor
-                (fresh_var "tmap$"
-                   (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
-                (NNRCUnop (ADot "$pregroup")
-                   (NNRCVar (fresh_var "tappe$" (vid :: venv :: nil))))
-                (NNRCUnop (ARecProject sl)
-                   (NNRCVar
-                      (fresh_var "tmap$"
-                         (vid
-                          :: fresh_var "tappe$" (vid :: venv :: nil)
-                             :: nil))))))
-          (NNRCBinop AConcat
-             (NNRCUnop (ARec g)
-                (NNRCLet
-                   (fresh_var "tappe$"
-                      (fresh_var "tmap$"
-                         (vid
-                          :: fresh_var "tappe$" (vid :: venv :: nil)
-                             :: nil)
-                       :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
-                   (NNRCBinop AConcat
-                      (NNRCUnop (ARec "$key")
-                         (NNRCVar
-                            (fresh_var "tmap$"
-                               (vid
-                                :: fresh_var "tappe$" (vid :: venv :: nil)
-                                   :: nil))))
-                      (NNRCVar (fresh_var "tappe$" (vid :: venv :: nil))))
-                   (NNRCUnop AFlatten
-                      (NNRCFor
-                         (fresh_var "tsel$"
-                            (fresh_var "tmap$"
-                               (vid
-                                :: fresh_var "tappe$" (vid :: venv :: nil)
-                                   :: nil)
-                             :: fresh_var "tappe$"
-                                  (fresh_var "tmap$"
-                                     (vid
-                                      :: fresh_var "tappe$"
-                                           (vid :: venv :: nil) :: nil)
-                                   :: fresh_var "tappe$"
-                                        (vid :: venv :: nil) :: nil)
-                                :: nil))
-                         (NNRCUnop (ADot "$pregroup")
-                            (NNRCVar
-                               (fresh_var "tappe$"
-                                  (fresh_var "tmap$"
-                                     (vid
-                                      :: fresh_var "tappe$"
-                                           (vid :: venv :: nil) :: nil)
-                                   :: fresh_var "tappe$"
-                                        (vid :: venv :: nil) :: nil))))
-                         (NNRCIf
-                            (NNRCBinop AEq
-                               (NNRCUnop (ARecProject sl)
-                                  (NNRCVar
-                                     (fresh_var "tsel$"
-                                        (fresh_var "tmap$"
-                                           (vid
-                                            :: fresh_var "tappe$"
-                                                (vid :: venv :: nil)
-                                               :: nil)
-                                         :: fresh_var "tappe$"
+      Definition nnrc_group_by_from_nraenv (vid venv:var) (g:string) (sl:list string) (e:nnrc) :=
+        (NNRCLet (fresh_var "tappe$" (vid :: venv :: nil))
+                 (NNRCUnop (ARec "$pregroup") e)
+                 (NNRCFor
+                    (fresh_var "tmap$"
+                               (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
+                    (NNRCUnop ADistinct
+                              (NNRCFor
+                                 (fresh_var "tmap$"
+                                            (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
+                                 (NNRCUnop (ADot "$pregroup")
+                                           (NNRCVar (fresh_var "tappe$" (vid :: venv :: nil))))
+                                 (NNRCUnop (ARecProject sl)
+                                           (NNRCVar
                                               (fresh_var "tmap$"
-                                                (vid
-                                                :: 
-                                                fresh_var "tappe$"
-                                                (vid :: venv :: nil)
-                                                :: nil)
-                                               :: 
-                                               fresh_var "tappe$"
-                                                (vid :: venv :: nil)
-                                               :: nil) :: nil))))
-                               (NNRCUnop (ADot "$key")
-                                  (NNRCVar
-                                     (fresh_var "tappe$"
-                                        (fresh_var "tmap$"
-                                           (vid
-                                            :: fresh_var "tappe$"
-                                                (vid :: venv :: nil)
-                                               :: nil)
-                                         :: fresh_var "tappe$"
-                                              (vid :: venv :: nil) :: nil)))))
-                            (NNRCUnop AColl
+                                                         (vid
+                                                            :: fresh_var "tappe$" (vid :: venv :: nil)
+                                                            :: nil))))))
+                    (NNRCBinop AConcat
+                               (NNRCUnop (ARec g)
+                                         (NNRCLet
+                                            (fresh_var "tappe$"
+                                                       (fresh_var "tmap$"
+                                                                  (vid
+                                                                     :: fresh_var "tappe$" (vid :: venv :: nil)
+                                                                     :: nil)
+                                                                  :: fresh_var "tappe$" (vid :: venv :: nil) :: nil))
+                                            (NNRCBinop AConcat
+                                                       (NNRCUnop (ARec "$key")
+                                                                 (NNRCVar
+                                                                    (fresh_var "tmap$"
+                                                                               (vid
+                                                                                  :: fresh_var "tappe$" (vid :: venv :: nil)
+                                                                                  :: nil))))
+                                                       (NNRCVar (fresh_var "tappe$" (vid :: venv :: nil))))
+                                            (NNRCUnop AFlatten
+                                                      (NNRCFor
+                                                         (fresh_var "tsel$"
+                                                                    (fresh_var "tmap$"
+                                                                               (vid
+                                                                                  :: fresh_var "tappe$" (vid :: venv :: nil)
+                                                                                  :: nil)
+                                                                               :: fresh_var "tappe$"
+                                                                               (fresh_var "tmap$"
+                                                                                          (vid
+                                                                                             :: fresh_var "tappe$"
+                                                                                             (vid :: venv :: nil) :: nil)
+                                                                                          :: fresh_var "tappe$"
+                                                                                          (vid :: venv :: nil) :: nil)
+                                                                               :: nil))
+                                                         (NNRCUnop (ADot "$pregroup")
+                                                                   (NNRCVar
+                                                                      (fresh_var "tappe$"
+                                                                                 (fresh_var "tmap$"
+                                                                                            (vid
+                                                                                               :: fresh_var "tappe$"
+                                                                                               (vid :: venv :: nil) :: nil)
+                                                                                            :: fresh_var "tappe$"
+                                                                                            (vid :: venv :: nil) :: nil))))
+                                                         (NNRCIf
+                                                            (NNRCBinop AEq
+                                                                       (NNRCUnop (ARecProject sl)
+                                                                                 (NNRCVar
+                                                                                    (fresh_var "tsel$"
+                                                                                               (fresh_var "tmap$"
+                                                                                                          (vid
+                                                                                                             :: fresh_var "tappe$"
+                                                                                                             (vid :: venv :: nil)
+                                                                                                             :: nil)
+                                                                                                          :: fresh_var "tappe$"
+                                                                                                          (fresh_var "tmap$"
+                                                                                                                     (vid
+                                                                                                                        :: 
+                                                                                                                        fresh_var "tappe$"
+                                                                                                                        (vid :: venv :: nil)
+                                                                                                                        :: nil)
+                                                                                                                     :: 
+                                                                                                                     fresh_var "tappe$"
+                                                                                                                     (vid :: venv :: nil)
+                                                                                                                     :: nil) :: nil))))
+                                                                       (NNRCUnop (ADot "$key")
+                                                                                 (NNRCVar
+                                                                                    (fresh_var "tappe$"
+                                                                                               (fresh_var "tmap$"
+                                                                                                          (vid
+                                                                                                             :: fresh_var "tappe$"
+                                                                                                             (vid :: venv :: nil)
+                                                                                                             :: nil)
+                                                                                                          :: fresh_var "tappe$"
+                                                                                                          (vid :: venv :: nil) :: nil)))))
+                                                            (NNRCUnop AColl
+                                                                      (NNRCVar
+                                                                         (fresh_var "tsel$"
+                                                                                    (fresh_var "tmap$"
+                                                                                               (vid
+                                                                                                  :: fresh_var "tappe$"
+                                                                                                  (vid :: venv :: nil) :: nil)
+                                                                                               :: fresh_var "tappe$"
+                                                                                               (fresh_var "tmap$"
+                                                                                                          (vid
+                                                                                                             :: 
+                                                                                                             fresh_var "tappe$"
+                                                                                                             (vid :: venv :: nil)
+                                                                                                             :: nil)
+                                                                                                          :: fresh_var "tappe$"
+                                                                                                          (vid :: venv :: nil)
+                                                                                                          :: nil) :: nil))))
+                                                            (NNRCConst (dcoll nil)))))))
                                (NNRCVar
-                                  (fresh_var "tsel$"
-                                     (fresh_var "tmap$"
-                                        (vid
-                                         :: fresh_var "tappe$"
-                                              (vid :: venv :: nil) :: nil)
-                                      :: fresh_var "tappe$"
-                                           (fresh_var "tmap$"
-                                              (vid
-                                               :: 
-                                               fresh_var "tappe$"
-                                                (vid :: venv :: nil)
-                                               :: nil)
-                                            :: fresh_var "tappe$"
-                                                (vid :: venv :: nil)
-                                               :: nil) :: nil))))
-                            (NNRCConst (dcoll nil)))))))
-             (NNRCVar
-                (fresh_var "tmap$"
-                   (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil)))))).
+                                  (fresh_var "tmap$"
+                                             (vid :: fresh_var "tappe$" (vid :: venv :: nil) :: nil)))))).
+      
+      Lemma rmap1 sl l :
+        (rmap
+           (fun d1 : data =>
+              match d1 with
+              | dunit => None
+              | dnat _ => None
+              | dbool _ => None
+              | dstring _ => None
+              | dcoll _ => None
+              | drec r => Some (drec (rproject r sl))
+              | dleft _ => None
+              | dright _ => None
+              | dbrand _ _ => None
+              | dforeign _ => None
+              end) l) =
+        (rmap
+           (fun d1 : data =>
+              olift
+                (fun d0 : data =>
+                   match d0 with
+                   | dunit => None
+                   | dnat _ => None
+                   | dbool _ => None
+                   | dstring _ => None
+                   | dcoll _ => None
+                   | drec r => Some (drec (rproject r sl))
+                   | dleft _ => None
+                   | dright _ => None
+                   | dbrand _ _ => None
+                   | dforeign _ => None
+                   end) (Some d1)) l).
+      Proof.
+        apply rmap_ext; intros.
+        reflexivity.
+      Qed.
 
-    Lemma rmap1 sl l :
-      (rmap
-         (fun d1 : data =>
-            match d1 with
-            | dunit => None
-            | dnat _ => None
-            | dbool _ => None
-            | dstring _ => None
-            | dcoll _ => None
-            | drec r => Some (drec (rproject r sl))
-            | dleft _ => None
-            | dright _ => None
-            | dbrand _ _ => None
-            | dforeign _ => None
-            end) l) =
-      (rmap
-         (fun d1 : data =>
-            olift
-              (fun d0 : data =>
-                 match d0 with
-                 | dunit => None
-                 | dnat _ => None
-                 | dbool _ => None
-                 | dstring _ => None
-                 | dcoll _ => None
-                 | drec r => Some (drec (rproject r sl))
-                 | dleft _ => None
-                 | dright _ => None
-                 | dbrand _ _ => None
-                 | dforeign _ => None
-                 end) (Some d1)) l).
-    Proof.
-      apply rmap_ext; intros.
-      reflexivity.
-    Qed.
+      Lemma pick_fresh_distinct_second v v1 v2 rest:
+        exists v3,
+          v3 = (fresh_var v (v1 :: v2 :: rest)) /\
+          v2 <> v3.
+      Proof.
+        exists (fresh_var v (v1 :: v2 :: rest)).
+        split;[reflexivity| ].
+        apply fresh_var_fresh2.
+      Qed.
 
-    Lemma pick_fresh_distinct_second v v1 v2 rest:
-      exists v3,
-        v3 = (fresh_var v (v1 :: v2 :: rest)) /\
-        v2 <> v3.
-    Proof.
-      exists (fresh_var v (v1 :: v2 :: rest)).
-      split;[reflexivity| ].
-      apply fresh_var_fresh2.
-    Qed.
+      Lemma build_group_ext (x:data) (o1 o2:option data) :
+        o1 = o2 ->
+        match o1 with
+        | Some dunit => None
+        | Some (dnat _) => None
+        | Some (dbool _) => None
+        | Some (dstring _) => None
+        | Some (dcoll _) => None
+        | Some (drec r1) =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end
+        | Some (dleft _) => None
+        | Some (dright _) => None
+        | Some (dbrand _ _) => None
+        | Some (dforeign _) => None
+        | None => None
+        end =
+        match o2 with
+        | Some dunit => None
+        | Some (dnat _) => None
+        | Some (dbool _) => None
+        | Some (dstring _) => None
+        | Some (dcoll _) => None
+        | Some (drec r1) =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end
+        | Some (dleft _) => None
+        | Some (dright _) => None
+        | Some (dbrand _ _) => None
+        | Some (dforeign _) => None
+        | None => None
+        end.
+      Proof.
+        intros Hinput; rewrite Hinput; clear Hinput.
+        reflexivity.
+      Qed.
 
-    Lemma build_group_ext (x:data) (o1 o2:option data) :
-      o1 = o2 ->
-      match o1 with
-      | Some dunit => None
-      | Some (dnat _) => None
-      | Some (dbool _) => None
-      | Some (dstring _) => None
-      | Some (dcoll _) => None
-      | Some (drec r1) =>
-        match x with
-        | dunit => None
-        | dnat _ => None
-        | dbool _ => None
-        | dstring _ => None
-        | dcoll _ => None
-        | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
-        | dleft _ => None
-        | dright _ => None
-        | dbrand _ _ => None
-        | dforeign _ => None
-        end
-      | Some (dleft _) => None
-      | Some (dright _) => None
-      | Some (dbrand _ _) => None
-      | Some (dforeign _) => None
-      | None => None
-      end =
-      match o2 with
-      | Some dunit => None
-      | Some (dnat _) => None
-      | Some (dbool _) => None
-      | Some (dstring _) => None
-      | Some (dcoll _) => None
-      | Some (drec r1) =>
-        match x with
-        | dunit => None
-        | dnat _ => None
-        | dbool _ => None
-        | dstring _ => None
-        | dcoll _ => None
-        | drec r2 => Some (drec (rec_sort (r1 ++ r2)))
-        | dleft _ => None
-        | dright _ => None
-        | dbrand _ _ => None
-        | dforeign _ => None
-        end
-      | Some (dleft _) => None
-      | Some (dright _) => None
-      | Some (dbrand _ _) => None
-      | Some (dforeign _) => None
-      | None => None
-      end.
-    Proof.
-      intros Hinput; rewrite Hinput; clear Hinput.
-      reflexivity.
-    Qed.
+      Lemma nnrc_core_eval_group_by_eq env (g:string) (sl:list string) (e1 e2:nnrc):
+        nnrc_core_eval h env e1 = nnrc_core_eval h env e2 ->
+        forall vid venv,
+          nnrc_core_eval h env (nnrc_group_by g sl e1)
+          = nnrc_core_eval h env (nnrc_group_by_from_nraenv vid venv g sl e2).
+      Proof.
+        intro Heval; intros.
+        unfold nnrc_group_by, nnrc_group_by_from_nraenv.
+        Opaque fresh_var.
+        simpl.
+        rewrite <- Heval; clear Heval.
+        destruct (nnrc_core_eval h env e1); [|reflexivity]; simpl; clear e1 e2.
+        generalize (fresh_var "tappe$" (vid :: venv :: nil)); intro v0.
+        destruct (equiv_dec v0 v0); try congruence.
+        destruct d; try reflexivity; simpl.
+        generalize (pick_fresh_distinct_second "tmap$" vid v0 nil); intros Hpick.
+        elim Hpick; clear Hpick; intro v1; intros.
+        elim H; clear H; intros.
+        assert ((fresh_var
+                   (String
+                      (Ascii.Ascii false false true false true true true false)
+                      (String
+                         (Ascii.Ascii true false true true false true true false)
+                         (String
+                            (Ascii.Ascii true false false false false true true
+                                         false)
+                            (String
+                               (Ascii.Ascii false false false false true true true
+                                            false)
+                               (String
+                                  (Ascii.Ascii false false true false false true
+                                               false false) EmptyString)))))
+                   (@cons string vid (@cons string v0 (@nil string)))) =
+                fresh_var "tmap$" (vid :: v0 :: nil)).
+        reflexivity.
+        rewrite H1 in H; clear H1.
+        rewrite <- H; clear H.
+        destruct (equiv_dec v1 v1); try congruence; clear e0.
+        rewrite <- rmap1.
+        destruct (rmap
+                    (fun d1 : data =>
+                       match d1 with
+                       | dunit => None
+                       | dnat _ => None
+                       | dbool _ => None
+                       | dstring _ => None
+                       | dcoll _ => None
+                       | drec r => Some (drec (rproject r sl))
+                       | dleft _ => None
+                       | dright _ => None
+                       | dbrand _ _ => None
+                       | dforeign _ => None
+                       end) l); try reflexivity; simpl.
+        f_equal.
+        apply rmap_ext; intros. simpl.
+        destruct (equiv_dec v0 v1); try congruence; clear c; simpl.
+        destruct (equiv_dec (fresh_var "tappe$" (v1 :: v0 :: nil))
+                            (fresh_var "tappe$" (v1 :: v0 :: nil))); try congruence;
+          simpl; clear e0.
+        unfold olift2.
+        apply build_group_ext.
+        f_equal.
+        f_equal.
+        f_equal.
+        apply rmap_ext; intros.
+        unfold olift.
+        generalize (fresh_var "tappe$" (v1 :: v0 :: nil)); intros v2.
+        destruct (equiv_dec (fresh_var "tsel$" (v1 :: v2 :: nil))
+                            (fresh_var "tsel$" (v1 :: v2 :: nil))); try congruence;
+          clear e0; simpl.
+        generalize (pick_fresh_distinct_second "tsel$" v1 v2 nil); intros Hpick.
+        elim Hpick; clear Hpick; intro v3; intros.
+        elim H2; clear H2; intros.
+        rewrite <- H2; clear H2.
+        destruct (equiv_dec v2 v3); try congruence; clear c.
+        simpl.
+        reflexivity.
+      Qed.
 
-    Lemma nnrc_core_eval_group_by_eq env (g:string) (sl:list string) (e1 e2:nnrc):
-      nnrc_core_eval h env e1 = nnrc_core_eval h env e2 ->
-      forall vid venv,
-        nnrc_core_eval h env (nnrc_group_by g sl e1)
-        = nnrc_core_eval h env (nnrc_group_by_from_nraenv vid venv g sl e2).
-    Proof.
-      intro Heval; intros.
-      unfold nnrc_group_by, nnrc_group_by_from_nraenv.
-      Opaque fresh_var.
-      simpl.
-      rewrite <- Heval; clear Heval.
-      destruct (nnrc_core_eval h env e1); [|reflexivity]; simpl; clear e1 e2.
-      generalize (fresh_var "tappe$" (vid :: venv :: nil)); intro v0.
-      destruct (equiv_dec v0 v0); try congruence.
-      destruct d; try reflexivity; simpl.
-      generalize (pick_fresh_distinct_second "tmap$" vid v0 nil); intros Hpick.
-      elim Hpick; clear Hpick; intro v1; intros.
-      elim H; clear H; intros.
-      assert ((fresh_var
-           (String
-              (Ascii.Ascii false false true false true true true false)
-              (String
-                 (Ascii.Ascii true false true true false true true false)
-                 (String
-                    (Ascii.Ascii true false false false false true true
-                       false)
-                    (String
-                       (Ascii.Ascii false false false false true true true
-                          false)
-                       (String
-                          (Ascii.Ascii false false true false false true
-                             false false) EmptyString)))))
-           (@cons string vid (@cons string v0 (@nil string)))) =
-              fresh_var "tmap$" (vid :: v0 :: nil)).
-      reflexivity.
-      rewrite H1 in H; clear H1.
-      rewrite <- H; clear H.
-      destruct (equiv_dec v1 v1); try congruence; clear e0.
-      rewrite <- rmap1.
-      destruct (rmap
-            (fun d1 : data =>
-             match d1 with
-             | dunit => None
-             | dnat _ => None
-             | dbool _ => None
-             | dstring _ => None
-             | dcoll _ => None
-             | drec r => Some (drec (rproject r sl))
-             | dleft _ => None
-             | dright _ => None
-             | dbrand _ _ => None
-             | dforeign _ => None
-             end) l); try reflexivity; simpl.
-      f_equal.
-      apply rmap_ext; intros. simpl.
-      destruct (equiv_dec v0 v1); try congruence; clear c; simpl.
-      destruct (equiv_dec (fresh_var "tappe$" (v1 :: v0 :: nil))
-                          (fresh_var "tappe$" (v1 :: v0 :: nil))); try congruence;
-      simpl; clear e0.
-      unfold olift2.
-      apply build_group_ext.
-      f_equal.
-      f_equal.
-      f_equal.
-      apply rmap_ext; intros.
-      unfold olift.
-      generalize (fresh_var "tappe$" (v1 :: v0 :: nil)); intros v2.
-      destruct (equiv_dec (fresh_var "tsel$" (v1 :: v2 :: nil))
-                          (fresh_var "tsel$" (v1 :: v2 :: nil))); try congruence;
-      clear e0; simpl.
-      generalize (pick_fresh_distinct_second "tsel$" v1 v2 nil); intros Hpick.
-      elim Hpick; clear Hpick; intro v3; intros.
-      elim H2; clear H2; intros.
-      rewrite <- H2; clear H2.
-      destruct (equiv_dec v2 v3); try congruence; clear c.
-      simpl.
-      reflexivity.
-    Qed.
+    End macros.
 
-  End macros.
+    Section translation.
+      Fixpoint nnrc_ext_to_nnrc (e:nnrc) : nnrc :=
+        match e with
+        | NNRCVar v => NNRCVar v
+        | NNRCConst d => NNRCConst d
+        | NNRCBinop b e1 e2 =>
+          NNRCBinop b (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
+        | NNRCUnop u e1 =>
+          NNRCUnop u (nnrc_ext_to_nnrc e1)
+        | NNRCLet v e1 e2 =>
+          NNRCLet v (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
+        | NNRCFor v e1 e2 =>
+          NNRCFor v (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
+        | NNRCIf e1 e2 e3 =>
+          NNRCIf (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2) (nnrc_ext_to_nnrc e3)
+        | NNRCEither e1 v2 e2 v3 e3 =>
+          NNRCEither (nnrc_ext_to_nnrc e1) v2 (nnrc_ext_to_nnrc e2) v3 (nnrc_ext_to_nnrc e3)
+        | NNRCGroupBy g sl e1 =>
+          nnrc_group_by g sl (nnrc_ext_to_nnrc e1)
+        end.
 
-  Section translation.
-    Fixpoint nnrc_ext_to_nnrc (e:nnrc) : nnrc :=
-      match e with
-      | NNRCVar v => NNRCVar v
-      | NNRCConst d => NNRCConst d
-      | NNRCBinop b e1 e2 =>
-        NNRCBinop b (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
-      | NNRCUnop u e1 =>
-        NNRCUnop u (nnrc_ext_to_nnrc e1)
-      | NNRCLet v e1 e2 =>
-        NNRCLet v (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
-      | NNRCFor v e1 e2 =>
-        NNRCFor v (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
-      | NNRCIf e1 e2 e3 =>
-        NNRCIf (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2) (nnrc_ext_to_nnrc e3)
-      | NNRCEither e1 v2 e2 v3 e3 =>
-        NNRCEither (nnrc_ext_to_nnrc e1) v2 (nnrc_ext_to_nnrc e2) v3 (nnrc_ext_to_nnrc e3)
-      | NNRCGroupBy g sl e1 =>
-        nnrc_group_by g sl (nnrc_ext_to_nnrc e1)
-      end.
-
-    Lemma nnrc_ext_to_nnrc_is_core (e:nnrc) :
-      nnrcIsCore (nnrc_ext_to_nnrc e).
-    Proof.
-      induction e; intros; simpl in *; auto.
-      repeat (split; auto).
-    Qed.
+      Lemma nnrc_ext_to_nnrc_is_core (e:nnrc) :
+        nnrcIsCore (nnrc_ext_to_nnrc e).
+      Proof.
+        induction e; intros; simpl in *; auto.
+        repeat (split; auto).
+      Qed.
     
-    Lemma core_nnrc_to_nnrc_ext_id (e:nnrc) :
-      nnrcIsCore e ->
-      (nnrc_ext_to_nnrc e) = e.
-    Proof.
-      intros.
-      induction e; simpl in *.
-      - reflexivity.
-      - reflexivity.
-      - elim H; intros.
-        rewrite IHe1; auto; rewrite IHe2; auto.
-      - rewrite IHe; auto.
-      - elim H; intros.
-        rewrite IHe1; auto; rewrite IHe2; auto.
-      - elim H; intros.
-        rewrite IHe1; auto; rewrite IHe2; auto.
-      - elim H; intros.
-        elim H1; intros.
-        rewrite IHe1; auto; rewrite IHe2; auto; rewrite IHe3; auto.
-      - elim H; intros.
-        elim H1; intros.
-        rewrite IHe1; auto; rewrite IHe2; auto; rewrite IHe3; auto.
-      - contradiction. (* GroupBy case *)
-    Qed.
+      Lemma core_nnrc_to_nnrc_ext_id (e:nnrc) :
+        nnrcIsCore e ->
+        (nnrc_ext_to_nnrc e) = e.
+      Proof.
+        intros.
+        induction e; simpl in *.
+        - reflexivity.
+        - reflexivity.
+        - elim H; intros.
+          rewrite IHe1; auto; rewrite IHe2; auto.
+        - rewrite IHe; auto.
+        - elim H; intros.
+          rewrite IHe1; auto; rewrite IHe2; auto.
+        - elim H; intros.
+          rewrite IHe1; auto; rewrite IHe2; auto.
+        - elim H; intros.
+          elim H1; intros.
+          rewrite IHe1; auto; rewrite IHe2; auto; rewrite IHe3; auto.
+        - elim H; intros.
+          elim H1; intros.
+          rewrite IHe1; auto; rewrite IHe2; auto; rewrite IHe3; auto.
+        - contradiction. (* GroupBy case *)
+      Qed.
 
-    Lemma core_nnrc_to_nnrc_ext_idempotent (e1 e2:nnrc) :
-      e1 = nnrc_ext_to_nnrc e2 ->
-      nnrc_ext_to_nnrc e1 = e1.
-    Proof.
-      intros.
-      apply core_nnrc_to_nnrc_ext_id.
-      rewrite H.
-      apply nnrc_ext_to_nnrc_is_core.
-    Qed.
+      Lemma core_nnrc_to_nnrc_ext_idempotent (e1 e2:nnrc) :
+        e1 = nnrc_ext_to_nnrc e2 ->
+        nnrc_ext_to_nnrc e1 = e1.
+      Proof.
+        intros.
+        apply core_nnrc_to_nnrc_ext_id.
+        rewrite H.
+        apply nnrc_ext_to_nnrc_is_core.
+      Qed.
 
-    Corollary core_nnrc_to_nnrc_ext_idempotent_corr (e:nnrc) :
-      nnrc_ext_to_nnrc (nnrc_ext_to_nnrc e) = (nnrc_ext_to_nnrc e).
-    Proof.
-      apply (core_nnrc_to_nnrc_ext_idempotent _ e).
-      reflexivity.
-    Qed.
+      Corollary core_nnrc_to_nnrc_ext_idempotent_corr (e:nnrc) :
+        nnrc_ext_to_nnrc (nnrc_ext_to_nnrc e) = (nnrc_ext_to_nnrc e).
+      Proof.
+        apply (core_nnrc_to_nnrc_ext_idempotent _ e).
+        reflexivity.
+      Qed.
     
-  End translation.
+    End translation.
 
-  Section semantics.
-    (** Semantics of NNRCExt *)
-
-    Definition nnrc_ext_eval (env:bindings) (e:nnrc) : option data :=
-      nnrc_core_eval h env (nnrc_ext_to_nnrc e).
-
-    Remark nnrc_ext_to_nnrc_eq (e:nnrc):
-      forall env,
-        nnrc_ext_eval env e = nnrc_core_eval h env (nnrc_ext_to_nnrc e).
-    Proof.
-      intros; reflexivity.
-    Qed.
-
-    Remark nnrc_to_nnrc_ext_eq (e:nnrc):
-      nnrcIsCore e ->
-      forall env,
-        nnrc_core_eval h env e = nnrc_ext_eval env e.
-    Proof.
-      intros.
-      unfold nnrc_ext_eval.
-      rewrite core_nnrc_to_nnrc_ext_id.
-      reflexivity.
-      assumption.
-    Qed.
-
+    Section semantics.
+      (** Semantics of NNRCExt *)
+      
+      Definition nnrc_ext_eval (env:bindings) (e:nnrc) : option data :=
+        nnrc_core_eval h env (nnrc_ext_to_nnrc e).
+      
+      Remark nnrc_ext_to_nnrc_eq (e:nnrc):
+        forall env,
+          nnrc_ext_eval env e = nnrc_core_eval h env (nnrc_ext_to_nnrc e).
+      Proof.
+        intros; reflexivity.
+      Qed.
+      
+      Remark nnrc_to_nnrc_ext_eq (e:nnrc):
+        nnrcIsCore e ->
+        forall env,
+          nnrc_core_eval h env e = nnrc_ext_eval env e.
+      Proof.
+        intros.
+        unfold nnrc_ext_eval.
+        rewrite core_nnrc_to_nnrc_ext_id.
+        reflexivity.
+        assumption.
+      Qed.
+      
     (* we are only sensitive to the environment up to lookup *)
     Global Instance nnrc_ext_eval_lookup_equiv_prop :
       Proper (lookup_equiv ==> eq ==> eq) nnrc_ext_eval.
