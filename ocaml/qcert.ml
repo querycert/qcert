@@ -169,15 +169,17 @@ let parse_args () =
   Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complete_configuration gconf, List.rev !input_files)
 
+let process_file f file_name =
+  let file_content = string_of_file file_name in
+  try f (file_name,file_content) with
+  | Qcert_Error msg ->
+      raise (Qcert_Error ("In file [" ^ file_name ^ "] " ^ msg))
+
 let () =
   let gconf, input_files = parse_args () in
   (* XXX qcert goes quiet if in eval-validate mode... - to be discussed with Louis XXX *)
   if gconf.gconf_eval_validate then () else Format.printf "%a" QcertCore.fprint_compilation_path gconf;
-  let results =
-    List.map
-      (fun file_name -> QcertCore.main gconf (file_name, string_of_file file_name))
-      input_files
-  in
+  let results = List.map (process_file (QcertCore.main gconf)) input_files in
   let output_res file_res =
     if file_res.QcertCore.res_file <> "" then
       make_file file_res.QcertCore.res_file file_res.QcertCore.res_content

@@ -1,0 +1,16 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.entities.*;
+
+ruleset test15 {
+  rule R15 {
+    when {
+      a: aggregate {
+        c:Customer();
+      } do { max {c.age}; }
+    } then {
+      System.out.println("Customers maximum age is: " + a);
+    }
+  }
+}

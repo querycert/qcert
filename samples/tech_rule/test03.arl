@@ -1,0 +1,15 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.entities.*;
+
+ruleset test03 {
+  rule R03 {
+    when {
+      c:Customer();
+      p:Purchase(cid == c.cid);
+    } then {
+      System.out.println("Customer: " + c.name + " made purchase:" + p.name );
+    }
+  }
+}

@@ -1,0 +1,16 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.Entity;
+
+ruleset test16 {
+  rule R16 {
+    when {
+      cs: aggregate {
+        c:Entity();
+      } do { count {c}; }
+    } then {
+      System.out.println("Working memory contains: " + cs + " entities");
+    }
+  }
+}

@@ -1,0 +1,25 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.entities.*;
+
+ruleset test11 {
+  rule R11 {
+    when {
+      s:aggregate {
+        c:Customer(age <= 34);
+        pu: aggregate {
+          p:Purchase(cid == c.cid);
+        } do { count { p }; }
+      } do { sum { pu }; }
+      n:aggregate {
+        c:Customer(age <= 34);
+        pu: aggregate {
+          p:Purchase(cid == c.cid);
+        } do { count { p }; }
+      } do { count { pu }; }
+    } then {
+      System.out.println("Average nb purchases for customers below 34 is : " + s +s+ " / " +s+ n);
+    }
+  }
+}

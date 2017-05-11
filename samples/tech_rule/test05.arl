@@ -1,0 +1,16 @@
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import tests.entities.*;
+
+ruleset test05 {
+  rule R05 {
+    when {
+      cs: aggregate {
+        c:Customer(age == 32);
+      } do { count {c.name}; }
+    } then {
+      System.out.println("Customers with age 32: " + cs);
+    }
+  }
+}
