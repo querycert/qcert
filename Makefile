@@ -424,7 +424,7 @@ documentation: $(COQ2HTML)/coq2html $(FILES)
 	@$(MAKE) gather_globs
 	mkdir -p docs/html
 	rm -f docs/html/*.html
-	$(COQ2HTML)/coq2html -o 'docs/html/%.html' docs/globs/*.glob \
+	$(COQ2HTML)/coq2html -top-dir coq -o 'docs/html/%.html' docs/globs/*.glob \
           $(filter-out $(COQ2HTML)/coq2html, $^)
 	cp docs/coq2html.css docs/coq2html.js docs/html/
 

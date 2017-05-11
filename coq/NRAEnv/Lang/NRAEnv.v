@@ -14,22 +14,93 @@
  * limitations under the License.
  *)
 
+(** NRAEnv is nested relational algebra, extended with operations to
+  facilitate encoding of environment manipulation. It serves as the
+  main intermediate language for optimization. *)
+
+(** NRAEnv is a thin layer over the core language cNRAEnv. As cNRAEnv,
+  NRAEnv is combinators-based, i.e., it is evaluated with only a
+  static global environment, but no notion of local
+  variables. *)
+
+(** Additional operators in NRAEnv can be easily expressed in terms of
+  the core cNRAEnv, but are useful for optimization purposes. Those
+  operators notably include joins and group-by. *)
+
+(** NRAEnv builds on a large body of work from the database
+community. For a complete treatment on nested relational algebras, we
+refer to Guido Moerkotte's "Building Query Compilers", Chapter 7.
+
+   http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf *)
+
+(** Summary:
+
+- Language: NRAEnv (Nested Relational Algebra with Environments)
+- Based on: "Handling Environments in a Nested Relational Algebra with
+  Combinators and an Implementation in a Verified Query Compiler"
+  Joshua Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar, and
+  Jérôme Siméon. SIGMOD'2017.
+- translating to NRAEnv: LambdaNRA, SQL, OQL, CAMP, cNRAEnv
+- translating from NRAEnv: NNRC, cNRAEnv *)
+
 Section NRAEnv.
-  Require Import String List Compare_dec.
+  Require Import String.
+  Require Import List.
+  Require Import Compare_dec.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import BasicRuntime.
   Require Import cNRAEnv.
+  Require Import cNRAEnvEq.
 
-  (* Algebra *)
+(** * Abstract Syntax *)
 
-  (* By convention, "static" parameters come first, followed by
-     dependent operators. This allows for instanciation on those
-     parameters *)
-
-  (* Joins *)
-
+  Context (h:list(string*string)).
   Context {fruntime:foreign_runtime}.
+
+(** As much as possible, notations are aligned with those of [CM93]
+   S. Cluet and G. Moerkotte. Nested queries in object bases. In
+   Proc. Int.  Workshop on Database Programming Languages , pages
+   226-242, 1993. *)
+
+  Inductive nraenv : Set :=
+  | NRAEnvID : nraenv                                         (**r Current value *)
+  | NRAEnvConst : data -> nraenv                              (**r Constant value *)
+  | NRAEnvBinop : binOp -> nraenv -> nraenv -> nraenv         (**r Binary operator *)
+  | NRAEnvUnop : unaryOp -> nraenv -> nraenv                  (**r Unary operator *)
+  | NRAEnvMap : nraenv -> nraenv -> nraenv                    (**r Map (χ) *)
+  | NRAEnvMapConcat : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product (⋈ᵈ) *)
+  | NRAEnvProduct : nraenv -> nraenv -> nraenv                (**r Cartesian product (×) *)
+  | NRAEnvSelect : nraenv -> nraenv -> nraenv                 (**r Relational selection (σ) *) 
+  | NRAEnvDefault : nraenv -> nraenv -> nraenv                (**r Default for empty collection ∥ *)
+  | NRAEnvEither : nraenv -> nraenv -> nraenv                 (**r Choice *)
+  | NRAEnvEitherConcat : nraenv -> nraenv -> nraenv           (**r Choice with concatenation *)
+  | NRAEnvApp : nraenv -> nraenv -> nraenv                    (**r Composition *)
+  | NRAEnvGetConstant : string -> nraenv                      (**r Accesses a global constant *)
+  | NRAEnvEnv : nraenv                                        (**r Current environment *)
+  | NRAEnvAppEnv : nraenv -> nraenv -> nraenv                 (**r Composition over the environment *)
+  | NRAEnvMapEnv : nraenv -> nraenv                           (**r Map over the environment *)
+  | NRAEnvFlatMap : nraenv -> nraenv -> nraenv                (**r Flat map *)
+  | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv         (**r Join (⋈) *)
+  | NRAEnvProject : list string -> nraenv -> nraenv           (**r Projection (Π) *)
+  | NRAEnvGroupBy : string -> list string -> nraenv -> nraenv (**r GroupBy (Γ) *)
+  | NRAEnvUnnest : string -> string -> nraenv -> nraenv       (**r Unnesting (μ) *)
+  .
+
+  (** Equality between two NRAEnv expressions is decidable. *)
+  
+  Global Instance nraenv_eqdec : EqDec nraenv eq.
+  Proof.
+    change (forall x y : nraenv,  {x = y} + {x <> y}).
+    decide equality;
+      try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
+  Defined.
+
+  (** * Macros *)
+
+  (** All the additional operators are defined in terms of the core cNRAEnv. *)
+  
+  (** ** Join operations *)
 
   Definition join (op1 op2 op3 : nraenv_core) : nraenv_core :=
     (ANSelect op1 (ANProduct op2 op3)).
@@ -40,7 +111,7 @@ Section NRAEnv.
   Definition anti_join (op1 op2 op3 : nraenv_core) : nraenv_core :=
     ANSelect (ANBinop AEq (ANSelect op1 (ANProduct ((ANUnop AColl) ANID) op3)) (ANConst (dcoll nil))) op2.
 
-  (* Maps *)
+  (** ** Map operations *)
 
   Definition map_add_rec (s:string) (op1 op2 : nraenv_core) : nraenv_core :=
     ANMap ((ANBinop AConcat) ANID ((ANUnop (ARec s)) op1)) op2.
@@ -50,30 +121,25 @@ Section NRAEnv.
   Definition flat_map (op1 op2 : nraenv_core) : nraenv_core :=
     ANUnop AFlatten (ANMap op1 op2).
   
-  (* Projects *)
+  (** ** Projection *)
   Definition project (fields:list string) (op:nraenv_core) : nraenv_core
     := ANMap (ANUnop (ARecProject fields) ANID) op.
 
   Definition project_remove (s:string) (op:nraenv_core) : nraenv_core :=
     ANMap ((ANUnop (ARecRemove s)) ANID) op.
 
-  (* Renaming *)
+  (** ** Renaming *)
   (* renames field s1 to s2 *)
   Definition map_rename_rec (s1 s2:string) (op:nraenv_core) : nraenv_core :=
     ANMap ((ANBinop AConcat) ((ANUnop (ARec s2)) ((ANUnop (ADot s1)) ANID))
                   ((ANUnop (ARecRemove s1)) ANID)) op.
 
-  (* Grouping *)
+  (** ** Grouping *)
 
-  (* Tricky -- you need to do two passes, and compare elements with
+  (** Defining group-by in terms of the core is more tricky, but is
+     possible. You need to do two passes, and compare elements with
      the same set of attribute names which means you need to
-     encapsulate each branch with distinct record names... This is not
-     so great. *)
-
-  (*
-    group1 g s1 [{s1->1,r_1}, {s1->2,r_2}, {s1->1,r_3}] 
-  = [{s1->1,g->[{s1->1,r_1}, {s1->1,r_3}]}, {s1->2, g->[{s1->2,r_2}]}]
-  *)
+     encapsulate each branch with distinct record names. *)
 
   Import ListNotations.
   (* g: partition name ; sl: list of grouping attributes *)
@@ -103,13 +169,17 @@ Section NRAEnv.
          (ANUnop AColl (ANUnop (ARec "4") (map_to_rec "3" op)))
          (map_to_rec "2" (map_to_rec "1" (ANUnop ADistinct (project sl op))))).
 
-  (* Uses the environment to store the result of [op] -- less crazy inefficient *)
+  (** This is an alternative definition that isn't quite as
+      inefficient. It stores the result of the input operator in the
+      environment so it isn't computed twice. This is still
+      quadratic. *)
+  
   (* g: partition name ; sl: list of grouping attributes *)
   (* Γ[g][sl](op) ==
       (χ⟨ ID ⊕ [ g : σ⟨ ENV.$key = π[sl](ID) ⟩(ENV.$pregroup) ◯ᵉ ([$key:ID] ⊕ ENV) ] ⟩
         (♯distinct(Π[sl](ENV.$pregroup)))) ◯ᵉ [ $pregroup : op ]
 
- *)
+   *)
   Definition group_by_with_env (g:string) (sl:list string) (op : nraenv_core) : nraenv_core :=
     let op_pregroup := ANUnop (ADot "$pregroup") ANEnv in
     ANAppEnv
@@ -130,9 +200,7 @@ Section NRAEnv.
       )
       (ANUnop (ARec "$pregroup") op).
 
-  Require Import cNRAEnvEq.
-
-  (* Unnest *)
+  (** ** Unnesting *)
 
   Definition unnest_one (s:string) (op:nraenv_core) : nraenv_core :=
     ANMap ((ANUnop (ARecRemove s)) ANID) (ANMapConcat ((ANUnop (ADot s)) ANID) op).
@@ -140,43 +208,10 @@ Section NRAEnv.
   Definition unnest (a b:string) (op:nraenv_core) : nraenv_core :=
     ANMap ((ANUnop (ARecRemove a)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec b)) ANID) ((ANUnop (ADot a)) ANID)) op).
 
-  (* NRAEnv for Optim *)
-  (* A representation for the NRA with additional operators, usually
-     helpful when considering optimization *)
+  (** * Semantics *)
+
+  (** The semantics of NRAEnv is defined as macro-expansion to the core language cNRAEnv. *) 
   
-  Inductive nraenv : Set :=
-  (* Those correspond to operators in the underlying NRA *)
-  | NRAEnvID : nraenv
-  | NRAEnvConst : data -> nraenv
-  | NRAEnvBinop : binOp -> nraenv -> nraenv -> nraenv
-  | NRAEnvUnop : unaryOp -> nraenv -> nraenv
-  | NRAEnvMap : nraenv -> nraenv -> nraenv
-  | NRAEnvMapConcat : nraenv -> nraenv -> nraenv
-  | NRAEnvProduct : nraenv -> nraenv -> nraenv
-  | NRAEnvSelect : nraenv -> nraenv -> nraenv
-  | NRAEnvDefault : nraenv -> nraenv -> nraenv
-  | NRAEnvEither : nraenv -> nraenv -> nraenv
-  | NRAEnvEitherConcat : nraenv -> nraenv -> nraenv
-  | NRAEnvApp : nraenv -> nraenv -> nraenv
-  | NRAEnvGetConstant : string -> nraenv
-  | NRAEnvEnv : nraenv
-  | NRAEnvAppEnv : nraenv -> nraenv -> nraenv
-  | NRAEnvMapEnv : nraenv -> nraenv
-  (* Those are additional operators *)
-  | NRAEnvFlatMap : nraenv -> nraenv -> nraenv
-  | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv
-  | NRAEnvProject : list string -> nraenv -> nraenv
-  | NRAEnvGroupBy : string -> list string -> nraenv -> nraenv
-  | NRAEnvUnnest : string -> string -> nraenv -> nraenv
-  .
-
-  Global Instance nraenv_eqdec : EqDec nraenv eq.
-  Proof.
-    change (forall x y : nraenv,  {x = y} + {x <> y}).
-    decide equality;
-      try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
-  Defined.
-
   Fixpoint nraenv_core_of_nraenv (e:nraenv) : nraenv_core :=
     match e with
       | NRAEnvID => ANID
@@ -201,6 +236,14 @@ Section NRAEnv.
       | NRAEnvGroupBy s ls e1 => group_by_with_env s ls (nraenv_core_of_nraenv e1)
       | NRAEnvUnnest a b e1 => unnest a b (nraenv_core_of_nraenv e1)
     end.
+
+  Definition nraenv_eval c (e:nraenv) (env:data) (x:data) : option data :=
+    nraenv_core_eval h c (nraenv_core_of_nraenv e) env x.
+
+  (** * Round-tripping *)
+
+  (** Just checking that cNRAEnv can be lifted back to NRAEnv, and
+  showing that we can round-trip. *)
 
   Fixpoint nraenv_of_nraenv_core (a:nraenv_core) : nraenv :=
     match a with
@@ -227,21 +270,16 @@ Section NRAEnv.
   Proof.
     induction a; simpl; try reflexivity; try (rewrite IHa1; rewrite IHa2; try rewrite IHa3; reflexivity); rewrite IHa; reflexivity.
   Qed.
-    
-  Section Top.
-    Context (h:list(string*string)).
+
+  (** * Toplevel *)
   
-    Definition nraenv_eval c (e:nraenv) (env:data) (x:data) : option data :=
-      nraenv_core_eval h c (nraenv_core_of_nraenv e) env x.
+  (** Top-level evaluation is used externally by the Q*cert
+  compiler. It takes an NRAEnv expression and a global environment as
+  input. The initial current environment is set to an empty record,
+  and the initial current value to unit. *)
 
-    Lemma initial_nraenv_ident c (e:nraenv_core) (env:data) (x:data) :
-      nraenv_eval c (nraenv_of_nraenv_core e) env x = nraenv_core_eval h c e env x.
-    Proof.
-      unfold nraenv_eval.
-      rewrite nraenv_roundtrip.
-      reflexivity.
-    Qed.
-
+  Section Top.
+  
     Definition nraenv_eval_top (q:nraenv) (env:bindings) :=
       nraenv_eval (rec_sort env) q (drec nil) dunit.
 
@@ -253,16 +291,6 @@ End NRAEnv.
 Delimit Scope nraenv_scope with nraenv.
 
 Notation "h ⊢ EOp @ₓ x ⊣ c ; env" := (nraenv_eval h c EOp env x) (at level 10): nraenv_scope.
-
-(* As much as possible, notations are aligned with those of [CM93]
-   S. Cluet and G. Moerkotte. Nested queries in object bases. In
-   Proc. Int.  Workshop on Database Programming Languages , pages
-   226-242, 1993.
-
-   See also chapter 7.2 in:
-   http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf
- *)
-
 (* end hide *)
 
 Local Open Scope string_scope.

@@ -683,7 +683,8 @@ let rec pretty_nra_aux p sym ff a =
 	 (pretty_nra_aux p sym) a2
   | Hack.AEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
   | Hack.AApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
-
+  | Hack.AGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  
 (* resets precedence back to 0 *)
 and pretty_nra_exp p sym thissym ff a1 oa2 =
   match oa2 with

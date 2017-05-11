@@ -14,12 +14,16 @@
  * limitations under the License.
  *)
 
-Require Import List String.
-
-Require Import Utils BasicRuntime.
-Require Import NNRCRuntime CldMR.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import BasicRuntime.
+Require Import ForeignToJavaScript.
+Require Import ForeignCloudant.
+Require Import NNRCRuntime.
+Require Import CldMRRuntime.
+Require Import CloudantRuntime.
 Require Import NNRCtoJavaScript.
-Require Import ForeignToJavaScript ForeignCloudant.
 
 Local Open Scope string_scope.
 
@@ -293,21 +297,29 @@ Section CldMRtoCloudant.
       end.
 
 	(* Java equivalent: CloudantBackend.makeInputDesignDoc *)
-    Definition makeInputDesignDoc (quotel:string) (rulename:string) (mrp:option string * option string * option string * option string * string) : string * string :=
+    Definition makeInputDesignDoc
+               (quotel:string)
+               (rulename:string)
+               (mrp:option string * option string * option string * option string * string)
+      : cloudant_design :=
       match mrp with
       | (inputdb, outputdb, defaultdb, mreduce, mmap) =>
-        (makeInputDB rulename None, dataToJS quotel (buildDesignDoc rulename mmap mreduce outputdb defaultdb))
+        mkCloudantDesign
+          (makeInputDB rulename None)
+          (dataToJS quotel (buildDesignDoc rulename mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeDesignDoc *)
-    Definition makeDesignDoc (quotel:string) (rulename:string) (mrp:option string * option string * option string * option string * string) : string * string :=
+    Definition makeDesignDoc (quotel:string) (rulename:string) (mrp:option string * option string * option string * option string * string) : cloudant_design :=
       match mrp with
       | (inputdb, outputdb, defaultdb, mreduce, mmap) =>
-        (makeInputDB rulename inputdb, dataToJS quotel (buildDesignDoc rulename mmap mreduce outputdb defaultdb))
+        mkCloudantDesign
+          (makeInputDB rulename inputdb)
+          (dataToJS quotel (buildDesignDoc rulename mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeCloudantDesignDocs *)
-    Definition makeCloudantDesignDocs (quotel:string) (rulename:string) (mrp:list (option string * option string * option string * option string * string)) : list (string * string) :=
+    Definition makeCloudantDesignDocs (quotel:string) (rulename:string) (mrp:list (option string * option string * option string * option string * string)) : list cloudant_design :=
       List.map (fun x => makeDesignDoc quotel rulename x) mrp.
     
     (* Java equivalent: CloudantBackend.makeCloudantDesignDocsTop *)
@@ -317,11 +329,24 @@ Section CldMRtoCloudant.
                (mrp:list (option string * option string * option string * option string * string))
                (last_expr:string)
                (cld_eff:list string)
-      : (list (string * string)) * (string * list string) :=
+      : cloudant :=
       match mrp with
-      | nil => (nil,(last_expr, cld_eff))
-      | x :: nil => ((makeInputDesignDoc quotel rulename x) :: nil, (last_expr, cld_eff))
-      | x :: mrp' => ((makeInputDesignDoc quotel rulename x) :: (makeCloudantDesignDocs quotel rulename mrp'), (last_expr, cld_eff))
+      | nil =>
+        mkCloudant
+          nil
+          last_expr
+          cld_eff
+      | x :: nil =>
+        mkCloudant
+          ((makeInputDesignDoc quotel rulename x) :: nil)
+          last_expr
+          cld_eff
+      | x :: mrp' =>
+        mkCloudant
+          ((makeInputDesignDoc quotel rulename x)
+             :: (makeCloudantDesignDocs quotel rulename mrp'))
+          last_expr
+          cld_eff
      end.
     
     Definition makeOneCurl (mrp: string*string) : string :=
@@ -331,7 +356,7 @@ Section CldMRtoCloudant.
       end.
 
     (* Java equivalent: CloudantBackend.mapReduceStringstoDesignDocs *)
-    Definition mapReduceStringstoDesignDocs (mrp:list (option string * option string * option string * option string * string)) (last_expr:string) (cld_eff:list string) (rulename:string) : (list (string*string)) * (string * list string):=
+    Definition mapReduceStringstoDesignDocs (mrp:list (option string * option string * option string * option string * string)) (last_expr:string) (cld_eff:list string) (rulename:string) : cloudant :=
       makeCloudantDesignDocsTop quotel_double rulename mrp last_expr cld_eff.
 
     (* Java equivalent: CloudantBackend.cld_mrParamsLast *)
@@ -339,7 +364,7 @@ Section CldMRtoCloudant.
       map (db_of_var rulename) params.
 
     (* Java equivalent: CloudantBackend.mapReducePairstoCloudant *)    
-    Definition mapReducePairstoCloudant (h:list (string*string)) (mrl : cldmr) (rulename:string) : (list (string*string) * (string * list string)) :=
+    Definition mapReducePairstoCloudant (h:list (string*string)) (mrl : cldmr) (rulename:string) : cloudant :=
       let mrpl := cld_mrToJS h true eol_backn quotel_backdouble mrl in
       let last_fun := cld_mrToLastJS h true eol_backn quotel_backdouble (fst (mrl.(cldmr_last))) in
       let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cldmr_last))) in

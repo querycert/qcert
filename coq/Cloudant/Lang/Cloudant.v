@@ -14,11 +14,26 @@
  * limitations under the License.
  *)
 
+(** Cloudant is a representation for the emitted cloudant code. It is
+composed of a list of Cloudant design documents, a final expression,
+and a list of effective
+parameters.
+- The list of Cloudant design document describes map-reduce views evaluated on the server side. Those design documents are in JSON serialized form.
+- The final expression is used to compute the final result from the output of the views, and evaluated on the client side.
+- The list of effective parameters are the names of the databases where the result of the views are stored
+*)
+
 Section Cloudant.
   Require Import String.
 
-  (** Cloudant programs are in serialized form *)
-  Definition cloudant := (list (string * string) * (string * list string))%type.
+  Record cloudant_design := mkCloudantDesign
+                              { cloudant_design_inputdb : string;
+                                cloudant_design_doc : string; }.
+  
+  Record cloudant := mkCloudant
+                       { cloudant_designs: list cloudant_design;
+                         cloudant_final_expr : string;
+                         cloudant_effective_parameters : list string; }.
   
 End Cloudant.
 
