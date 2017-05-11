@@ -38,6 +38,9 @@ val set_no_type_annotations : pretty_config -> unit -> unit
 val set_margin : pretty_config -> int -> unit
 val get_margin : pretty_config -> int
 
+val set_hierarchy : pretty_config -> QData.json -> unit
+val set_harness : pretty_config -> string -> unit
+    
 (* Pretty data *)
 
 val pretty_data : Format.formatter -> QData.data -> unit

@@ -42,10 +42,11 @@ type content_input = (char list * QData.data) list
 type content_output = QData.data list
 
 type content_hierarchy = (char list * char list) list
+type full_content_hierarchy = (content_hierarchy * io_hierarchy)
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
-type content_schema = content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
+type content_schema = full_content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
 
 (* Optimization support *)
 type optim_phase =
@@ -200,7 +201,7 @@ let build_schema (j:QData.json) =
       let brandTypes = get_field_opt "brandTypes" r in
       let typeDefs = get_field_opt "typeDefs" r in
       let globals = get_field_opt "globals" r in
-      (build_hierarchy hierarchy,
+      ((build_hierarchy hierarchy,hierarchy),
        brandTypes,
        typeDefs,
        globals)
@@ -209,7 +210,7 @@ let build_schema (j:QData.json) =
   end
 
 let get_hierarchy io_schema =
-  let (h,_,_,_) = build_schema io_schema in h
+  let (h,_,_,_) = build_schema io_schema in fst h
 
 let build_input format h input =
   begin match input with

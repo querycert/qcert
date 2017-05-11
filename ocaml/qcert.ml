@@ -36,7 +36,7 @@ let args_list gconf =
        "<dir> Directory for the emited code");
       ("-dir-target", Arg.String (QcertArg.set_dir_target gconf),
        "<dir> Directory for the emitied code of target (if not specified use the one given by -dir)");
-      ("-js-runtime", Arg.String (CloudantUtil.set_harness gconf.gconf_cld_conf),
+      ("-js-runtime", Arg.String (QcertArg.set_harness gconf),
        "<harness.js> JavaScript runtime");
       ("-schema", Arg.String (QcertArg.set_schema_file gconf),
        "<file.schema> Schema");

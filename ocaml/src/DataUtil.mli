@@ -43,10 +43,11 @@ type content_input = (char list * QData.data) list
 type content_output = QData.data list
 
 type content_hierarchy = (char list * char list) list
+type full_content_hierarchy = (content_hierarchy * io_hierarchy)
 type content_brandTypes = (string * string) list
 type content_typeDefs = (string * rtype_content) list
 type content_globals = (string * vrtype_content) list
-type content_schema = content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
+type content_schema = full_content_hierarchy * io_brandTypes option * io_typeDefs option * io_globals option
 
 (* Optimization support *)
 type optim_phase =

@@ -48,3 +48,6 @@ val set_emit_optim_config : QcertConfig.global_config -> unit -> unit
 val set_optim : QcertConfig.global_config -> DataUtil.optim_language -> unit
 val set_optims : QcertConfig.global_config -> DataUtil.optim_config -> unit
 
+val set_harness : QcertConfig.global_config -> string -> unit
+
+

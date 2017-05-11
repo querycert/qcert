@@ -34,9 +34,11 @@ let set_prefix conf s = conf.prefix <- s
 
 (* Javascript harness (for inlining in Cloudant) *)
 
-let print_hierarchy d = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") (QData.json_to_data [] d))
+let print_hierarchy d =
+  Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") (QData.json_to_data [] d))
 
 let fix_harness harness h =
+  let harness = "var inheritance = %INHERITANCE%;\n" ^ harness in
   let hs =
     try print_hierarchy h with
     | _ -> "[]"
@@ -59,11 +61,14 @@ let unbox_design_doc design_doc =
   let db = design_doc.Compiler.cloudant_design_inputdb in
   let dd = design_doc.Compiler.cloudant_design_doc in
   (db,dd)
+
+let add_harness harness h s =
+  Str.global_replace (Str.regexp "%HARNESS%") (fix_harness harness h) s
     
 let add_harness_to_designdoc harness h (db,dd) =
   let dbname = (string_of_char_list db) in
   let designdoc = string_of_char_list dd in
-  let harnessed_designdoc = Str.global_replace (Str.regexp "%HARNESS%") (fix_harness harness h) designdoc in
+  let harnessed_designdoc = add_harness harness h designdoc in
   (char_list_of_string dbname, char_list_of_string harnessed_designdoc)
 
 let stringify_designdoc (db,dd) =
@@ -152,8 +157,11 @@ let add_harness harness h (cloudant: QLang.cloudant) : QLang.cloudant =
   let harnessed_design_docs =
     List.map (fun (x,y) -> { Compiler.cloudant_design_inputdb = x; Compiler.cloudant_design_doc = y; }) harnessed_design_docs
   in
+  let harnessed_last_expr =
+    add_harness harness h (Util.string_of_char_list last_expr)
+  in
   { Compiler.cloudant_designs = harnessed_design_docs;
-    Compiler.cloudant_final_expr = last_expr;
+    Compiler.cloudant_final_expr = Util.char_list_of_string harnessed_last_expr;
     Compiler.cloudant_effective_parameters = last_inputs }
 
 let string_of_cloudant cloudant =

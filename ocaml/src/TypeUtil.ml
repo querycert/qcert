@@ -61,8 +61,8 @@ let content_schema_to_model (mc: content_schema) : QType.brand_model option =
     | None -> []
     end
   in
-  let brand_context = make_brand_context h brand_types type_defs in
-  QType.make_brand_model h brand_context
+  let brand_context = make_brand_context (fst h) brand_types type_defs in
+  QType.make_brand_model (fst h) brand_context
 
 let localization_of_string (x:char list) =
   begin match Util.string_of_char_list x with
@@ -89,14 +89,14 @@ let lift_constant_types (bm:QType.brand_model) br glb =
   (Util.char_list_of_string vname, QDriver.mk_constant_config bm loc t)
     
 let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDriver.constants_config =
-  let (br, _, _, globals) = mc in
+  let (h, _, _, globals) = mc in
   let globals =
     begin match globals with
     | Some gb -> build_globals gb
     | None -> []
     end
   in
-  List.map (lift_constant_types bm br) globals
+  List.map (lift_constant_types bm (fst h)) globals
 (*  List.map (fun (x,y) -> let (z,k) =  in (Util.char_list_of_string x, QDriver.mk_constant_config bm (localization_of_string z) k)) globals *)
 
 let process_schema mc =
@@ -133,7 +133,13 @@ let schema_of_io_json (io:QData.json) =
 let hierarchy_of_schema sc =
   begin match sc.sch_io_schema with
   | None -> []
-  | Some (h,_,_,_) -> h
+  | Some (h,_,_,_) -> fst h
+  end
+
+let raw_hierarchy_of_schema sc =
+  begin match sc.sch_io_schema with
+  | None -> Compiler.Jarray []
+  | Some (h,_,_,_) -> snd h
   end
 
 type content_sdata = (char list * char list) list

@@ -30,17 +30,24 @@ type charkind =
 type pretty_config =
     { mutable margin : int;
       mutable charset : charkind;
-      mutable type_annotations : bool; }
+      mutable type_annotations : bool;
+      mutable hierarchy : QData.json;
+      mutable harness : string; }
 
 let make_pretty_config greek margin annot =
   { margin = margin;
     charset = if greek then Greek else Ascii;
-    type_annotations = annot; }
+    type_annotations = annot;
+    hierarchy = Hack.Jarray [];
+    harness = "[HARNESS]" ;
+  }
 
 let default_pretty_config () =
   { margin = 120;
     charset = Greek;
-    type_annotations = false; }
+    type_annotations = false;
+    hierarchy = Hack.Jarray [];
+    harness = "[HARNESS]" }
 
 let set_ascii conf () = conf.charset <- Ascii
 let set_greek conf () = conf.charset <- Greek
@@ -55,6 +62,9 @@ let set_no_type_annotations conf () = conf.type_annotations <- false
 let set_margin conf i = conf.margin <- i
 let get_margin conf = conf.margin
 
+let set_hierarchy conf h = conf.hierarchy <- h
+let set_harness conf harness = conf.harness <- harness
+    
 (* Charset dependent config *)
 (* Note: This should remain within the module *)
 
@@ -1139,6 +1149,8 @@ let pretty_query pconf q =
   let greek = get_charset_bool pconf in
   let margin = pconf.margin in
   let annot = pconf.type_annotations in
+  let hierarchy = pconf.hierarchy in
+  let harness = pconf.harness in
   begin match q with
   | Compiler.Q_camp_rule q -> "(* There is no camp rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_tech_rule q -> "(* There is no tech rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
@@ -1170,6 +1182,6 @@ let pretty_query pconf q =
   | Compiler.Q_java q -> Util.string_of_char_list q
   | Compiler.Q_spark_rdd q -> Util.string_of_char_list q
   | Compiler.Q_spark_dataset q -> Util.string_of_char_list q
-  | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant q
+  | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant (CloudantUtil.add_harness harness hierarchy q)
   | Compiler.Q_error q -> "Error: "^(Util.string_of_char_list q)
   end
