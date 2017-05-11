@@ -19,19 +19,6 @@
 open Util
 open Compiler.EnhancedCompiler
 
-(* Cloudant format *)
-
-type cld_config =
-    { mutable prefix : string;
-      mutable harness : string }
-
-let default_cld_config () =
-  { prefix = "";
-    harness = "" }
-
-let get_prefix conf = conf.prefix
-let set_prefix conf s = conf.prefix <- s
-
 (* Javascript harness (for inlining in Cloudant) *)
 
 let print_hierarchy d =
@@ -49,13 +36,10 @@ let fix_harness harness h =
   let s3 = Str.global_replace (Str.regexp Util.os_newline) "\\n" s2 in
   s3
 
-let get_harness conf = conf.harness
-let set_harness conf f = conf.harness <- Util.string_of_file f
-
 (* Cloudant stuff *)
 
-let idioticize pref dbname =
-  String.lowercase (pref ^ dbname)
+let idioticize pref (dbname:char list) : char list =
+  Util.char_list_of_string (String.lowercase (pref ^ (Util.string_of_char_list dbname)))
 
 let unbox_design_doc design_doc =
   let db = design_doc.Compiler.cloudant_design_inputdb in
@@ -65,8 +49,8 @@ let unbox_design_doc design_doc =
 let add_harness harness h s =
   Str.global_replace (Str.regexp "%HARNESS%") (fix_harness harness h) s
     
-let add_harness_to_designdoc harness h (db,dd) =
-  let dbname = (string_of_char_list db) in
+let add_harness_to_designdoc prefix harness h (db,dd) =
+  let dbname = (string_of_char_list (idioticize prefix db)) in
   let designdoc = string_of_char_list dd in
   let harnessed_designdoc = add_harness harness h designdoc in
   (char_list_of_string dbname, char_list_of_string harnessed_designdoc)
@@ -99,60 +83,15 @@ let fold_design (dds:(string * string) list) (last_expr:string) (last_inputs: ch
     last_expr
     last_inputs
 
-let cloudant_compile_from_nra harness nrule op h =
-  let input_locs = [] in (* XXX to fix XXX *)
-  let mr = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_optim input_locs op in
-  let cloudant = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (QDriver.nnrcmr_to_cldmr [] mr) in
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
-  let harnessed_design_docs = List.map (fun doc -> stringify_designdoc (add_harness_to_designdoc harness h (unbox_design_doc doc))) design_docs in
-  fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
-
-let cloudant_compile_from_nnrcmr harness nrule nnrcmr h =
-  let mr = nnrcmr in
-  let cloudant = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (QDriver.nnrcmr_to_cldmr [] mr) in
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
-  let harnessed_design_docs = List.map (fun doc -> stringify_designdoc (add_harness_to_designdoc harness h (unbox_design_doc doc))) design_docs in
-  fold_design harnessed_design_docs (Util.string_of_char_list last_expr) last_inputs
-
-let cloudant_compile_no_harness_from_nra nrule op =
-  let input_locs = [] in (* XXX to fix XXX *)
-  let mr = QDriver.nraenv_optim_to_nnrc_optim_to_nnrcmr_optim input_locs op in
-  let cloudant = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (QDriver.nnrcmr_to_cldmr [] mr) in
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
-  fold_design (List.map (fun doc -> stringify_designdoc (unbox_design_doc doc)) design_docs) (Util.string_of_char_list last_expr) last_inputs
-
-let cloudant_compile_no_harness_from_nnrcmr nrule nnrcmr =
-  let cloudant = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] (QDriver.nnrcmr_to_cldmr [] nnrcmr) in
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
-  fold_design (List.map (fun doc -> stringify_designdoc (unbox_design_doc doc)) design_docs) (Util.string_of_char_list last_expr) last_inputs
-
-let cloudant_translate_no_harness nnrcmr =
-  QDriver.nnrcmr_prepared_to_cldmr [] nnrcmr
-
-(* Java equivalent: CloudantBackend.generateCloudantDesign *)
-let cloudant_code_gen_no_harness nrule cldmr =
-  let cloudant = QDriver.cldmr_to_cloudant (char_list_of_string nrule) [] cldmr in
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
-  fold_design (List.map (fun doc -> stringify_designdoc (unbox_design_doc doc)) design_docs) (Util.string_of_char_list last_expr) last_inputs
-
 (* Important functions *)
 
-let add_harness harness h (cloudant: QLang.cloudant) : QLang.cloudant =
+let add_harness_top prefix harness h (cloudant: QLang.cloudant) : QLang.cloudant =
   let design_docs = cloudant.Compiler.cloudant_designs in
   let last_expr = cloudant.Compiler.cloudant_final_expr in
   let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
+  let last_inputs = List.map (idioticize prefix) last_inputs in
   let harnessed_design_docs =
-    List.map (fun doc -> (add_harness_to_designdoc harness h) (unbox_design_doc doc)) design_docs
+    List.map (fun doc -> (add_harness_to_designdoc prefix harness h) (unbox_design_doc doc)) design_docs
   in
   let harnessed_design_docs =
     List.map (fun (x,y) -> { Compiler.cloudant_design_inputdb = x; Compiler.cloudant_design_doc = y; }) harnessed_design_docs

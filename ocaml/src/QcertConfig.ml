@@ -34,7 +34,6 @@ type global_config = {
     mutable gconf_schema : TypeUtil.schema;
     mutable gconf_input : content_input;
     mutable gconf_output : content_output;
-    gconf_cld_conf : CloudantUtil.cld_config;
     mutable gconf_emit_all : bool;
     gconf_pretty_config : PrettyIL.pretty_config;
     mutable gconf_emit_sexp : bool;

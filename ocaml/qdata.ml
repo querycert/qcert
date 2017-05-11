@@ -52,7 +52,6 @@ let parse_args () =
       gconf_schema = TypeUtil.empty_schema;
       gconf_input = [];
       gconf_output = [];
-      gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;
       gconf_emit_sexp_all = false;

@@ -26,20 +26,17 @@ open QcertArg
 type lang_config =
     { mutable slang : string option;
       mutable tlang : string option;
-      mutable path : string list;
-      cld_conf : cld_config }
+      mutable path : string list }
 
 let default_eval_lang_config () =
   { slang = None; (* default: "rule" *)
     tlang = None; (* default: "rule" *)
-    path = [];
-    cld_conf = default_cld_config () }
+    path = [] }
 
 let default_comp_lang_config () =
   { slang = None; (* default: "rule" *)
     tlang = None; (* default: "js" *)
-    path = [];
-    cld_conf = default_cld_config () }
+    path = [] }
 
 let get_source_lang conf = conf.slang
 let change_source conf s = conf.slang <- Some s
@@ -72,8 +69,6 @@ let get_target_lang_caev conf =
 let add_path conf s = conf.path <- conf.path @ [s]
 let set_path conf path = conf.path <- conf.path @ path
 let get_path conf = conf.path
-
-let get_cld_config conf = conf.cld_conf
 
 (* Target language *)
 let suffix_camp_rule () = "_rule.camp"

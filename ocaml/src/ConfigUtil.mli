@@ -37,8 +37,6 @@ val change_target : lang_config -> string -> unit
 val add_path : lang_config -> string -> unit
 val set_path : lang_config -> string list -> unit
 
-val get_cld_config : lang_config -> CloudantUtil.cld_config
-
 (* Target language *)
 
 val suffix_nra : unit -> string

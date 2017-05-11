@@ -89,7 +89,6 @@ let global_config_of_json j =
       gconf_input = [];
       gconf_output = [];
       gconf_io = None;
-      gconf_cld_conf = CloudantUtil.default_cld_config ();
       gconf_emit_all = false;
       gconf_emit_sexp = false;
       gconf_emit_sexp_all = false;
@@ -125,9 +124,9 @@ let global_config_of_json j =
   apply QcertArg.set_input_content j##.input;
   (* Cloudant options *)
   Js.Optdef.iter j##.jsruntime
-    (fun s -> CloudantUtil.set_harness gconf.gconf_cld_conf (Js.to_string s));
+    (fun s -> PrettyIL.set_harness gconf.gconf_pretty_config (Js.to_string s));
   Js.Optdef.iter j##.cld_prefix
-    (fun s -> CloudantUtil.set_prefix gconf.gconf_cld_conf (Js.to_string s));
+    (fun s -> PrettyIL.set_prefix gconf.gconf_pretty_config (Js.to_string s));
   (* Emit options *)
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);
