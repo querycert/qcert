@@ -296,6 +296,10 @@ const:
     { Enhanced.Data.dfloat f }
 | s = STRING
     { QData.dstring (Util.char_list_of_string s) }
+| TRUE
+    { QData.dbool true }
+| FALSE
+    { QData.dbool false }
 
 bop:
 | FLOATPLUS
