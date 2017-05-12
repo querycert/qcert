@@ -58,21 +58,21 @@ Section NRAEnv.
   Context (h:list(string*string)).
   Context {fruntime:foreign_runtime}.
 
-(** As much as possible, notations are aligned with those of [CM93]
-   S. Cluet and G. Moerkotte. Nested queries in object bases. In
-   Proc. Int.  Workshop on Database Programming Languages , pages
-   226-242, 1993. *)
+(** As much as possible, notations are aligned with those of S. Cluet
+   and G. Moerkotte. Nested queries in object bases. In Proc. Int.
+   Workshop on Database Programming Languages , pages 226-242,
+   1993. *)
 
   Inductive nraenv : Set :=
   | NRAEnvID : nraenv                                         (**r Current value *)
   | NRAEnvConst : data -> nraenv                              (**r Constant value *)
   | NRAEnvBinop : binOp -> nraenv -> nraenv -> nraenv         (**r Binary operator *)
   | NRAEnvUnop : unaryOp -> nraenv -> nraenv                  (**r Unary operator *)
-  | NRAEnvMap : nraenv -> nraenv -> nraenv                    (**r Map (χ) *)
-  | NRAEnvMapConcat : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product (⋈ᵈ) *)
-  | NRAEnvProduct : nraenv -> nraenv -> nraenv                (**r Cartesian product (×) *)
-  | NRAEnvSelect : nraenv -> nraenv -> nraenv                 (**r Relational selection (σ) *) 
-  | NRAEnvDefault : nraenv -> nraenv -> nraenv                (**r Default for empty collection ∥ *)
+  | NRAEnvMap : nraenv -> nraenv -> nraenv                    (**r Map [χ] *)
+  | NRAEnvMapConcat : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product [⋈ᵈ] *)
+  | NRAEnvProduct : nraenv -> nraenv -> nraenv                (**r Cartesian product [×] *)
+  | NRAEnvSelect : nraenv -> nraenv -> nraenv                 (**r Relational selection [σ] *) 
+  | NRAEnvDefault : nraenv -> nraenv -> nraenv                (**r Default for empty collection [∥] *)
   | NRAEnvEither : nraenv -> nraenv -> nraenv                 (**r Choice *)
   | NRAEnvEitherConcat : nraenv -> nraenv -> nraenv           (**r Choice with concatenation *)
   | NRAEnvApp : nraenv -> nraenv -> nraenv                    (**r Composition *)
@@ -81,10 +81,10 @@ Section NRAEnv.
   | NRAEnvAppEnv : nraenv -> nraenv -> nraenv                 (**r Composition over the environment *)
   | NRAEnvMapEnv : nraenv -> nraenv                           (**r Map over the environment *)
   | NRAEnvFlatMap : nraenv -> nraenv -> nraenv                (**r Flat map *)
-  | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv         (**r Join (⋈) *)
-  | NRAEnvProject : list string -> nraenv -> nraenv           (**r Projection (Π) *)
-  | NRAEnvGroupBy : string -> list string -> nraenv -> nraenv (**r GroupBy (Γ) *)
-  | NRAEnvUnnest : string -> string -> nraenv -> nraenv       (**r Unnesting (μ) *)
+  | NRAEnvJoin : nraenv -> nraenv -> nraenv -> nraenv         (**r Join [⋈] *)
+  | NRAEnvProject : list string -> nraenv -> nraenv           (**r Projection [Π] *)
+  | NRAEnvGroupBy : string -> list string -> nraenv -> nraenv (**r GroupBy [Γ] *)
+  | NRAEnvUnnest : string -> string -> nraenv -> nraenv       (**r Unnesting [μ] *)
   .
 
   (** Equality between two NRAEnv expressions is decidable. *)

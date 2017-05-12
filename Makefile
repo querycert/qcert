@@ -149,6 +149,7 @@ MODULES = \
 	NNRC/Core/cNNRCNorm \
 	NNRC/Core/cNNRCEq \
 	NNRC/Lang/NNRC \
+	NNRC/Lang/NNRCSugar \
 	NNRC/Lang/NNRCShadow \
 	NNRC/Lang/NNRCEq \
 	NNRC/Lang/NNRCSize \

@@ -18,12 +18,19 @@
 composed of a list of Cloudant design documents, a final expression,
 and a list of effective
 parameters.
-- The list of Cloudant design document describes map-reduce views evaluated on the server side. Those design documents are in JSON serialized form. The corresponding format is described in:
-https://console.ng.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-
+- The list of Cloudant design document describes map-reduce views evaluated on the server side. Those design documents are in JSON serialized form.
 - The final expression is used to compute the final result from the output of the views, and evaluated on the client side.
 - The list of effective parameters are the names of the databases where the result of the views are stored
 *)
 
+(** Summary:
+- Language: Cloudant (Emitted code for Cloudant)
+- Based on: Cloudant DB documentation.
+- URL: https://console.ng.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-
+- Languages translating to Cloudant: CldMR
+- Languages translating from Cloudant: 
+*)
+  
 Section Cloudant.
   Require Import String.
 

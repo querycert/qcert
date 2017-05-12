@@ -1389,6 +1389,44 @@ Section SRProject.
     right; apply (IHl H).
   Qed.
   
+  Context {fdata:foreign_data}.
+
+  Lemma rmap_with_rproject sl l :
+    (rmap
+       (fun d1 : data =>
+          match d1 with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r => Some (drec (rproject r sl))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end) l) =
+    (rmap
+       (fun d1 : data =>
+          olift
+            (fun d0 : data =>
+               match d0 with
+               | dunit => None
+               | dnat _ => None
+               | dbool _ => None
+               | dstring _ => None
+               | dcoll _ => None
+               | drec r => Some (drec (rproject r sl))
+               | dleft _ => None
+               | dright _ => None
+               | dbrand _ _ => None
+               | dforeign _ => None
+               end) (Some d1)) l).
+  Proof.
+    apply rmap_ext; intros.
+    reflexivity.
+  Qed.
+    
 End SRProject.
 
 Hint Resolve @merge_bindings_sorted.
