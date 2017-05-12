@@ -19,6 +19,6 @@
 open Compiler.EnhancedCompiler
 
 (* Important functions *)
-val add_harness_top : string -> string -> QData.json -> QLang.cloudant -> QLang.cloudant
+val add_harness_top : string -> QData.json -> QLang.cloudant -> QLang.cloudant
 val string_of_cloudant : QLang.cloudant -> string
 

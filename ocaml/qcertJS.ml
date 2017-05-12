@@ -105,7 +105,8 @@ let global_config_of_json j =
       gconf_stat_tree = false;
       gconf_optim_config_file = None;
       gconf_emit_optim_config = false;
-      gconf_optim_config = []; }
+      gconf_optim_config = [];
+      gconf_prefix = ""; }
   in
   (* Specialize apply/iter for this given gconf *)
   let apply = apply gconf in
@@ -126,7 +127,7 @@ let global_config_of_json j =
   Js.Optdef.iter j##.jsruntime
     (fun s -> PrettyIL.set_harness gconf.gconf_pretty_config (Js.to_string s));
   Js.Optdef.iter j##.cld_prefix
-    (fun s -> PrettyIL.set_prefix gconf.gconf_pretty_config (Js.to_string s));
+    (fun s -> QcertArg.set_prefix gconf (Js.to_string s));
   (* Emit options *)
   Js.Optdef.iter j##.emitall (fun b -> gconf.gconf_emit_all <- Js.to_bool b);
   Js.Optdef.iter j##.emitsexp (fun b -> gconf.gconf_emit_sexp <- Js.to_bool b);

@@ -89,7 +89,7 @@ let args_list gconf =
        " Print type annotations on ILs");
       ("-margin", Arg.Int (PrettyIL.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
-      ("-cloudant-prefix", Arg.String (PrettyIL.set_prefix gconf.gconf_pretty_config),
+      ("-cloudant-prefix", Arg.String (QcertArg.set_prefix gconf),
        "<pref> Cloudant DB prefix");
       ("-java-imports", Arg.String (QcertArg.set_java_imports gconf),
        "<imports> Additional imports for the Java runtime");
@@ -163,7 +163,8 @@ let parse_args () =
       gconf_stat_tree = false;
       gconf_optim_config_file = None;
       gconf_emit_optim_config = false;
-      gconf_optim_config = []; }
+      gconf_optim_config = [];
+      gconf_prefix = ""; }
   in
   Arg.parse (args_list gconf) (anon_args input_files) usage;
   (complete_configuration gconf, List.rev !input_files)

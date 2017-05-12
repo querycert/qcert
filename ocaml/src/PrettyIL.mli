@@ -39,7 +39,6 @@ val set_margin : pretty_config -> int -> unit
 val get_margin : pretty_config -> int
 
 val set_hierarchy : pretty_config -> QData.json -> unit
-val set_prefix : pretty_config -> string -> unit
 val set_harness : pretty_config -> string -> unit
     
 (* Pretty data *)

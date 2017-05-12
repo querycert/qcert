@@ -38,9 +38,6 @@ let fix_harness harness h =
 
 (* Cloudant stuff *)
 
-let idioticize pref (dbname:char list) : char list =
-  Util.char_list_of_string (String.lowercase (pref ^ (Util.string_of_char_list dbname)))
-
 let unbox_design_doc design_doc =
   let db = design_doc.Compiler.cloudant_design_inputdb in
   let dd = design_doc.Compiler.cloudant_design_doc in
@@ -49,8 +46,8 @@ let unbox_design_doc design_doc =
 let add_harness harness h s =
   Str.global_replace (Str.regexp "%HARNESS%") (fix_harness harness h) s
     
-let add_harness_to_designdoc prefix harness h (db,dd) =
-  let dbname = (string_of_char_list (idioticize prefix db)) in
+let add_harness_to_designdoc harness h (db,dd) =
+  let dbname = string_of_char_list db in
   let designdoc = string_of_char_list dd in
   let harnessed_designdoc = add_harness harness h designdoc in
   (char_list_of_string dbname, char_list_of_string harnessed_designdoc)
@@ -85,13 +82,12 @@ let fold_design (dds:(string * string) list) (last_expr:string) (last_inputs: ch
 
 (* Important functions *)
 
-let add_harness_top prefix harness h (cloudant: QLang.cloudant) : QLang.cloudant =
+let add_harness_top harness h (cloudant: QLang.cloudant) : QLang.cloudant =
   let design_docs = cloudant.Compiler.cloudant_designs in
   let last_expr = cloudant.Compiler.cloudant_final_expr in
   let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
-  let last_inputs = List.map (idioticize prefix) last_inputs in
   let harnessed_design_docs =
-    List.map (fun doc -> (add_harness_to_designdoc prefix harness h) (unbox_design_doc doc)) design_docs
+    List.map (fun doc -> (add_harness_to_designdoc harness h) (unbox_design_doc doc)) design_docs
   in
   let harnessed_design_docs =
     List.map (fun (x,y) -> { Compiler.cloudant_design_inputdb = x; Compiler.cloudant_design_doc = y; }) harnessed_design_docs
@@ -108,3 +104,4 @@ let string_of_cloudant cloudant =
   let last_expr = cloudant.Compiler.cloudant_final_expr in
   let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
   fold_design (List.map (fun doc -> stringify_designdoc (unbox_design_doc doc)) design_docs) (Util.string_of_char_list last_expr) last_inputs
+

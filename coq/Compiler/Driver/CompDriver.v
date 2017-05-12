@@ -1329,7 +1329,7 @@ Section CompDriver.
       end
     | L_cldmr =>
       match dv with
-      | Dv_cloudant dv => Dv_cldmr (Dv_cldmr_to_cloudant config.(comp_qname) config.(comp_brand_rel) dv)
+      | Dv_cloudant dv => Dv_cldmr (Dv_cldmr_to_cloudant (config.(comp_qname_lowercase)) config.(comp_brand_rel) dv)
       | Dv_nraenv _
       | Dv_camp_rule _
       | Dv_tech_rule _
@@ -1526,7 +1526,7 @@ Section CompDriver.
         | Dv_nnrcmr (Dv_nnrcmr_to_cldmr brand_rel _) =>
           brand_rel = config.(comp_brand_rel)
         | Dv_cldmr (Dv_cldmr_to_cloudant qname brand_rel _) =>
-          qname = config.(comp_qname) /\ brand_rel = config.(comp_brand_rel)
+          qname = config.(comp_qname_lowercase) /\ brand_rel = config.(comp_brand_rel)
         | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset tdbindings _) =>
           tdbindings = tdbindings_of_constants_config config.(comp_constants)
         | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset tdbindings qname _) =>
@@ -1673,6 +1673,7 @@ Section CompDriver.
     ; simpl.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
+                 EmptyString
                  s
                  EmptyString
                  l
@@ -1698,6 +1699,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  s
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  (constants_config_of_tdbindings t)
@@ -1717,6 +1719,7 @@ Section CompDriver.
       ; simpl.
       eapply is_postfix_plus_one with
                (config:=mkDvConfig
+                 EmptyString
                  EmptyString
                  EmptyString
                  nil
@@ -1794,6 +1797,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  nil
@@ -1802,6 +1806,7 @@ Section CompDriver.
         [eassumption | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
+                 EmptyString
                  EmptyString
                  EmptyString
                  nil
@@ -1814,6 +1819,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  nil
@@ -1824,6 +1830,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  nil
@@ -1832,6 +1839,7 @@ Section CompDriver.
         [eassumption | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
+                 EmptyString
                  EmptyString
                  EmptyString
                  nil
@@ -1845,6 +1853,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  nil
@@ -1855,6 +1864,7 @@ Section CompDriver.
       elim H0; intros.
       eapply is_postfix_plus_one with
       (config:=mkDvConfig
+                 EmptyString
                  EmptyString
                  EmptyString
                  nil
@@ -1871,6 +1881,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  (constants_config_of_tdbindings x)
@@ -1885,6 +1896,7 @@ Section CompDriver.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
+                 EmptyString
                  s
                  nil
                  EmptyString
@@ -1896,6 +1908,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  s
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  nil
@@ -1906,6 +1919,7 @@ Section CompDriver.
       (config:=mkDvConfig
                  EmptyString
                  EmptyString
+                 EmptyString
                  nil
                  EmptyString
                  nil
@@ -1914,6 +1928,7 @@ Section CompDriver.
         [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
+                 EmptyString
                  EmptyString
                  EmptyString
                  l
@@ -2136,7 +2151,7 @@ Section CompDriver.
             reflexivity.
         * destruct (H_config (Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd (comp_qname config0) s)));
             reflexivity.
-        * destruct (H_config (Dv_cldmr (Dv_cldmr_to_cloudant (comp_qname config0) (comp_brand_rel config0) c)));
+        * destruct (H_config (Dv_cldmr (Dv_cldmr_to_cloudant (comp_qname_lowercase config0) (comp_brand_rel config0) c)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
         * destruct (H_config (Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (tdbindings_of_constants_config (comp_constants config0)) d)));

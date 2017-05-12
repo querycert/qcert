@@ -75,5 +75,5 @@ let set_optims gconf optims = gconf.gconf_optim_config <- (optim_conf_from_ocaml
 let set_optim gconf optim = gconf.gconf_optim_config <- gconf.gconf_optim_config@[optim_phases_config_from_ocaml_conf optim]
 
 let set_harness gconf harness_file = PrettyIL.set_harness gconf.gconf_pretty_config (Util.string_of_file harness_file)
-
+let set_prefix gconf prefix = gconf.gconf_prefix <- prefix
 

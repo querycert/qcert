@@ -49,6 +49,7 @@ type global_config = {
     mutable gconf_optim_config_file : string option;
     mutable gconf_emit_optim_config : bool;
     mutable gconf_optim_config : Compiler.optim_config;
+    mutable gconf_prefix : string;
   }
 
 val optim_phases_config_from_ocaml_conf : DataUtil.optim_language -> Compiler.language * Compiler.optim_phases_config

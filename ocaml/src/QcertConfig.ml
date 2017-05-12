@@ -51,6 +51,7 @@ type global_config = {
     mutable gconf_optim_config_file : string option;
     mutable gconf_emit_optim_config : bool;
     mutable gconf_optim_config : Compiler.optim_config;
+    mutable gconf_prefix : string;
   }
 
 let hierarchy_of_conf gconf =
@@ -152,6 +153,7 @@ let driver_conf_of_global_conf gconf qname cname =
   let brand_rel = TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model in
   let constants_config = gconf.gconf_schema.TypeUtil.sch_globals in
   { Compiler.comp_qname = char_list_of_string qname;
+    Compiler.comp_qname_lowercase = char_list_of_string (String.lowercase (gconf.gconf_prefix ^ qname));
     comp_class_name = char_list_of_string cname;
     comp_brand_rel = brand_rel;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;

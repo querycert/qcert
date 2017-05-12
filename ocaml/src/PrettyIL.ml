@@ -32,7 +32,6 @@ type pretty_config =
       mutable charset : charkind;
       mutable type_annotations : bool;
       mutable hierarchy : QData.json;
-      mutable prefix : string;
       mutable harness : string; }
 
 let make_pretty_config greek margin annot =
@@ -40,7 +39,6 @@ let make_pretty_config greek margin annot =
     charset = if greek then Greek else Ascii;
     type_annotations = annot;
     hierarchy = Hack.Jarray [];
-    prefix = "";
     harness = "[HARNESS]" ;
   }
 
@@ -49,7 +47,6 @@ let default_pretty_config () =
     charset = Greek;
     type_annotations = false;
     hierarchy = Hack.Jarray [];
-    prefix = "";
     harness = "[HARNESS]" }
 
 let set_ascii conf () = conf.charset <- Ascii
@@ -66,7 +63,6 @@ let set_margin conf i = conf.margin <- i
 let get_margin conf = conf.margin
 
 let set_hierarchy conf h = conf.hierarchy <- h
-let set_prefix conf p = conf.prefix <- p
 let set_harness conf harness = conf.harness <- harness
     
 (* Charset dependent config *)
@@ -1154,7 +1150,6 @@ let pretty_query pconf q =
   let margin = pconf.margin in
   let annot = pconf.type_annotations in
   let hierarchy = pconf.hierarchy in
-  let prefix = pconf.prefix in
   let harness = pconf.harness in
   begin match q with
   | Compiler.Q_camp_rule q -> "(* There is no camp rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
@@ -1187,6 +1182,6 @@ let pretty_query pconf q =
   | Compiler.Q_java q -> Util.string_of_char_list q
   | Compiler.Q_spark_rdd q -> Util.string_of_char_list q
   | Compiler.Q_spark_dataset q -> Util.string_of_char_list q
-  | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant (CloudantUtil.add_harness_top prefix harness hierarchy q)
+  | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant (CloudantUtil.add_harness_top harness hierarchy q)
   | Compiler.Q_error q -> "Error: "^(Util.string_of_char_list q)
   end

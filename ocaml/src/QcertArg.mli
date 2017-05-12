@@ -49,5 +49,5 @@ val set_optim : QcertConfig.global_config -> DataUtil.optim_language -> unit
 val set_optims : QcertConfig.global_config -> DataUtil.optim_config -> unit
 
 val set_harness : QcertConfig.global_config -> string -> unit
-
+val set_prefix : QcertConfig.global_config -> string -> unit
 

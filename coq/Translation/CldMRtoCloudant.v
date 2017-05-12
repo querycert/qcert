@@ -370,10 +370,6 @@ Section CldMRtoCloudant.
       let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cldmr_last))) in
       mapReduceStringstoDesignDocs mrpl last_fun cld_eff_params rulename.
 
-    Definition mapReducePairstoJSMRCloudant (h:list (string*string)) (mrl : cldmr) : string :=
-      let mrpl := cld_mrToJS h false eol_newline quotel_double mrl in
-      mapReduceStringstoJS eol_newline mrpl.
-
   End CloudantJS.
   
 End CldMRtoCloudant.

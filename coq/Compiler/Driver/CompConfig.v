@@ -196,6 +196,7 @@ Section CompConfig.
   Record driver_config :=
     mkDvConfig
       { comp_qname : string;
+        comp_qname_lowercase : string;
         comp_class_name : string; (* Class name different from rule name in Java case *)
         comp_brand_rel : list (string * string) (* brand_relation *);
         comp_mr_vinit : string;
@@ -209,6 +210,7 @@ Section CompConfig.
     := mkDvConfig
          EmptyString
          EmptyString
+         EmptyString
          nil
          EmptyString
          nil
@@ -220,6 +222,7 @@ Section CompConfig.
   Definition default_dv_config :=
     mkDvConfig
       (* comp_qname = *) "query"
+      (* comp_qname_lowercase = *) "query"
       (* class_name = *) "query"
       (* comp_brand_rel = *) nil
       (* comp_mr_vinit = *) init_vinit
