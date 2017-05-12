@@ -14,6 +14,49 @@
  * limitations under the License.
  *)
 
+(** CldMR is a language to describe chains of Map/Reduce views in the
+Cloudant Database, followed by some local computation over the result
+of the views. *)
+
+(** Cloudant's notion of 'views' provides some of the capabilities
+    that are available in more common Map/Reduce framework such as Hadoop,
+    but has a number of different properties. *)
+
+(** Cloudant notion of views is less expressive than general purpose
+    Map/Reduce but offers the following additional capabilities:
+- Cloudant views can be chained through a special directive called
+  dbcopy which creates a new database that can be the input to a
+  subsequent Cloudant view.
+- Cloudant views are computed in an incremental fashion, i.e., changes
+  on the input are propagated with limited recomputation and
+  exploiting results from previous executions which are cached. *)
+
+(** To achieve that, Cloudant views relies on a number of invariants,
+    which we expose and try to enforce. The most important invariants
+    are:
+- A [dbcopy] can only be present if a reduce is present as well.
+- the result of a [dbcopy] directive is implicitely coerced into a a
+  database in the form of key/value pairs, which are used to populate
+  the newly created database/view.
+- A subsequent map over that dbcopy must access data accordingly (in
+  such key/values JSON structure).
+- The "reduce" part of Cloudant views is heavily constrained and must
+  provide two distinct functions: one called [reduce], the other
+  called [rereduce]. The [rereduce] function must be associative and
+  commutative.  *)
+
+(** Finally, Cloudant views support special purposes reducers for the
+most common aggregate functions (count, sum, and average). We provide
+a representation to take advantage of those. *)
+
+(** Summary:
+- Language: CldMR (Cloudant Map/Reduce)
+- Based on: Cloudant DB documentation.
+- URL: https://console.ng.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-
+- Languages translating to CldMR: NNRCMR
+- Languages translating from CldMR: Cloudant
+*)
+
 Section CldMR.
   Require Import String.
   Require Import List.
@@ -32,69 +75,39 @@ Section CldMR.
 
   Context (h:list(string*string)).
 
-  (** This provides support for the specific kind of quote
-      "map/reduce" unquote that Cloudant actually provides.
+  (** * Abstract Syntax *)
 
-      In many ways, Cloudant's notion of 'views', despite being called
-      a map/reduce and providing some of the capabilities that are
-      available in more common M/R framework such as Hadoop, is quite
-      a different beast. Those differences are not entirely arbitrary,
-      and the framework is at once less expressive than M/R and also
-      more powerful and offers the following capabilities:
-
-      - Cloudant M/R can be chained through a special directive called
-        dbcopy which creates a new database that can be the input to a
-        subsequent Cloudant M/R view.
-
-      - Cloudant M/R can be executed in an incremental fashion, i.e.,
-        changes on the input are propagated with limited recomputation
-        and exploiting results from previous executions which are
-        cached.
-
-      To achieve that, Cloudant's M/R relies on a number of
-      invariants, which we here try and expse and enforce. The most
-      important such invariants are:
-
-      - dbcopy can only be present if a reduce is present as well
-
-      - the result of a dbcopy directive is implicitely cast into as
-        collection of JSON documents in the form of key/value pairs,
-        which are used to populate the newly created database/view.
-
-      - A subsequent map over that dbcopy must access data accordingly
-        (in such key/values JSON structure).
-
-      - The "reduce" part of Cloudant M/R is heavily constrained and
-        must provide two distinct functions: one called reduce, the
-        other called rereduce. The rereduce function must be
-        associative and commutative.
-
- *)
+  (** As in NNRCMR, all local computation inside the map or the reduce
+  in CldMR is described using NNRC expressions. *)
   
-  (** Named Nested Relational Calculus + Map Reduce FOR CLOUDANT *)
+  (** ** Map *)
+  
+  (** The [map] part of a Cloudant view is described using two
+  components:
+- a map function which can be either a map or a flat_map, which is
+  applied to every document in the input database.
+- an emit function which controls the generation of keys passed to the
+  reduce. The emit function is either: (i) [dist] which creates unique
+  id's for the result of the map and results in a distributed
+  collection, (ii) [collect] which is enforcing accumulation to a
+  single output document with a single key. *)
 
-  (* Cloudant maps are describes using two structures:
-
-       - a map function which can be either a map or a flat_map
-
-       - an emit function which can be either:
-          -- 'dist' which is enforcing unique id's on a distributed collection
-          -- 'collect' which is enforcing accumulation to a single key.
-
-      Note that as opposed to the NNRCMR form, the collect is specified
-      in the map, since it has to be obtained with an emit.
-
-   *)
+  (** Note that as opposed to NNRCMR, the collect is specified in the
+  map rather than the reduce, since it has to be controlled through an
+  emit. *)
+  
+  (** Also note that this model does not cover a group-by semantics
+  but only simpler forms of reduce. *)
   
   (* Java equivalent: CldMapFun *)
   Inductive cld_map_fun :=
-  | CldMapId : var * nnrc -> cld_map_fun           (* A -> B *)
-  | CldMapFlatten : var * nnrc -> cld_map_fun.     (* A -> coll B *)
+  | CldMapId : var * nnrc -> cld_map_fun           (**r [A -> B] *)
+  | CldMapFlatten : var * nnrc -> cld_map_fun.     (**r [A -> coll B] *)
 
   (* Java equivalent: CldMapEmit *)
   Inductive cld_map_emit :=
-  | CldEmitDist : cld_map_emit
-  | CldEmitCollect : nat -> cld_map_emit.
+  | CldEmitDist : cld_map_emit                     (**r Emit one key per input document *)
+  | CldEmitCollect : nat -> cld_map_emit.          (**r Emit a single key for all documents *)
   
   (* Java equivalent: CldMap *)
   Record cld_map :=
@@ -102,6 +115,8 @@ Section CldMR.
       { map_fun: cld_map_fun;
         map_emit: cld_map_emit }.
 
+  (** ** Reduce *)
+  
   Inductive cld_numeric_type :=
   | Cld_int
   | Cld_float.
@@ -114,43 +129,59 @@ Section CldMR.
   Defined.
   
   Inductive cld_reduce_op :=
-  | CldRedOpCount : cld_reduce_op
-  | CldRedOpSum (typ:cld_numeric_type): cld_reduce_op
-  | CldRedOpStats (typ:cld_numeric_type): cld_reduce_op.
+  | CldRedOpCount : cld_reduce_op                          (**r Special reducer: [_count] *)
+  | CldRedOpSum (typ:cld_numeric_type): cld_reduce_op      (**r Special reducer: [_sum] *)
+  | CldRedOpStats (typ:cld_numeric_type): cld_reduce_op.   (**r Special reducer: [_stat] *)
 
   (* Java equivalent: CldReduceFun *)
   Inductive cld_reduce_fun :=
-  | CldRedId : cld_reduce_fun
-  | CldRedAggregate : ((var * var) * nnrc) -> (var * nnrc) -> cld_reduce_fun
-  | CldRedOp : cld_reduce_op -> cld_reduce_fun.
-      (* first function : ((K * list B) -> C) function that computes the first reduce pass
-         second function : (list C) -> C) function that computes the subsequent reduceereduce passes *)
+  | CldRedId : cld_reduce_fun                                 (**r Reduce is identity *)
+  | CldRedAggregate :                                         (**r Arbitrary reduce + rereduce *)
+      ((var * var) * nnrc) -> (var * nnrc) -> cld_reduce_fun
+  | CldRedOp : cld_reduce_op -> cld_reduce_fun.               (**r Special reducer *)
+
+  (** In the case of the arbirary reduce operation: the first function
+      is the [reduce] and applied once on each key/value pair
+      resulting from the map [(K * list B) -> C]; the second function
+      is the [rereduce] and applied on the result of the first
+      function [(list C) -> C]. *)
 
   (* Java equivalent: CldReduce *)
   Record cld_reduce :=
     mkReduceCld
-      { reduce_fun: cld_reduce_fun;
-        reduce_output : option var (* where to put the result -- corresponds to dbcopy *) }.
+      { reduce_fun: cld_reduce_fun;   (**r reduce function *)
+        reduce_output : option var }. (**r Output database [dbcopy] *)
 
+  (** ** Map/Reduce View *)
+  
   (* Java equivalent: CldMr *)
   Record cldmr_step :=
     mkMRCld
-      { cldmr_step_input: var;               (* Input Cloudant Database *)
-        cldmr_step_map: cld_map;             (* Cloudant Map *)
-        cldmr_step_reduce: option cld_reduce; (* Cloudant Reduce *)
-        cldmr_step_reduce_default: option nnrc }.
+      { cldmr_step_input: var;                    (**r Input database *)
+        cldmr_step_map: cld_map;                  (**r Map *)
+        cldmr_step_reduce: option cld_reduce;     (**r Reduce *)
+        cldmr_step_reduce_default: option nnrc }. (**r Default when database is empty *)
 
+  (** ** Map/Reduce Chains *)
+
+  (** The top-level data structure includes a list of Map/Reduce
+  views, followed by an additional expressions which is used to gather
+  all the results from the views and compute the final results. This
+  is meant to be evaluated locally. *)
+  
   (* Java equivalent: CldMrl *)
   Record cldmr :=
     mkMRCldChain
       { cldmr_chain: list cldmr_step;
         cldmr_last: ((list var) * nnrc) * (list var) }.
-  (* Temporarily : localization should always be scalar *)
+
 
   (********************************
    ** Well formation constraints **
    ********************************)
 
+  (** * Well-formed properties *)
+  
   Definition cldmr_step_causally_consistent (mr1 mr2:cldmr_step) : bool
     := match mr2.(cldmr_step_reduce) with
        | Some r =>
@@ -201,11 +232,15 @@ Section CldMR.
   Definition init_vkey := "vkey$"%string.
   Definition init_vval := "vval$"%string.
 
+  (** * Evaluation Semantics *)
 
   (*********************************
    ** Semantics of ♥ CloudantMR ♥ **
    *********************************)
 
+  (** A few useful functions for key manipulation, lifting and
+  building the initial CldMR environment. *)
+  
   Definition add_keys_to_binding (binding: string * (list data)) : string * data :=
     (fst binding, pack_kvl (init_keys (snd binding))).
 
@@ -215,6 +250,11 @@ Section CldMR.
     | _ => None
     end.
 
+  (** The evaluation relies on the existence of an initial database
+  containing a single document with the unit value. This is necessary
+  in order to trigger computation when all other input databases are
+  empty. *)
+  
   Definition cld_load_init_env
              (initunit: var) (cenv: list (string * data)) : option bindings
     :=
@@ -225,6 +265,8 @@ Section CldMR.
       | None => None
       end.
 
+  (** ** Map *)
+  
   (********************
    * Semantics of map *
    ********************)
@@ -316,38 +358,14 @@ Section CldMR.
     destruct coll; reflexivity.
   Qed.
 
+  (* Should be revised -JS 
   Lemma mapIdCollect_is_map (map:var*nnrc) (n:nat) (coll:list data) :
     lift cld_get_values (cldmr_step_map_eval (mkMapCld (CldMapId map) (CldEmitCollect n)) (init_keys coll)) = (mr_map_eval h (MapDist map) (Ddistr coll)).
   Proof.
-    unfold cldmr_step_map_eval; simpl.
-    unfold init_keys; generalize 0.
-    induction coll; intros; simpl in *.
-    - destruct map; reflexivity.
-    - destruct map; simpl.
-      unfold apply_map_fun_without_keys in *; simpl.
-      destruct (nnrc_core_eval h ((v, a) :: nil) n1); try reflexivity; simpl.
-      rewrite <- (IHcoll (S n0)); simpl; clear IHcoll.
-      destruct (init_keys_aux nil (S n0) coll); try reflexivity; simpl.
-      destruct p; simpl.
-      destruct (nnrc_core_eval h ((v, d1) :: nil) n1); try reflexivity; simpl.
-      generalize ((lift (fun t' : list data => d2 :: t')
-           (rmap
-              (fun d3 : data * data =>
-               let (_, v0) := d3 in
-               match nnrc_core_eval h ((v, v0) :: nil) n1 with
-               | Some res => Some res
-               | None => None
-               end) l))); intros.
-      unfold cld_get_values; simpl.
-      destruct o; try reflexivity; simpl.
-      unfold rmap_index; simpl.
-      rewrite lift_map_boxed_cons; simpl.
-      unfold map_without_key; simpl.
-      unfold rmap_index in *; simpl in *.
-      admit.
-  Admitted.
+  *)
 
-
+  (** ** Reduce *)
+  
   (*************************
    * Semantics of group_by *
    *************************)
@@ -443,6 +461,8 @@ Section CldMR.
   Qed.
 
 
+  (** ** Map/Reduce View *)
+  
   (*******************************
    * Semantics of one map-reduce *
    *******************************)
@@ -458,7 +478,8 @@ Section CldMR.
       lift (fun x => (x, reduce.(reduce_output))) reduce_result
     end.
 
-  
+
+  (** ** Map/Reduce Chain *)
   
   (**************************************
    * Semantics of a chain of map-reduce *
@@ -523,6 +544,11 @@ Section CldMR.
     end.
 
 
+  (** * Map/Reduce Chain Library *)
+
+  (** The following are built-in map/reduce which are useful for
+  translations purposes. *)
+
   (*******************
    ** CLDMR library **
    *******************)
@@ -547,60 +573,23 @@ Section CldMR.
     
   End cldmr_step_library.
 
+  (** * Toplevel *)
+
+  (** Top-level evaluation is used externally by the Q*cert
+  compiler. It is parameterized by a given database name for the
+  'initial database'. It takes a CldMR chain and a global environment
+  as input. *)
+
+  Section Top.
+    Definition cldmr_eval_top (vinit:var) (q:cldmr) (cenv:bindings) : option data :=
+      let cenv := mkConstants (rec_sort cenv) in
+      match cld_load_init_env vinit cenv with
+      | Some cenv => cldmr_eval cenv q
+      | None => None
+      end.
+
+  End Top.
   
-  Section sanitize.
-    Require Import Ascii String List.
-    Import ListNotations.
-    Definition cldAllowedIdentifierInitialCharacters :=
-      ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z"]%char.
-
-    (* according to https://docs.cloudant.com/database.html,
-       this cldAllowedIdentifierCharacters_fromdocs work.  
-       But $ at least has been reported as causing problems with the UI.
-       So we conservatively use cldAllowedIdentifierCharacters instead.
-*)
-    Definition cldAllowedIdentifierCharacters_fromdocs := ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z";"0";"1";"2";"3";"4";"5";"6";"7";"8";"9";"_";"$";",";"+";"-";"/"]%char.
-    
-    Definition cldAllowedIdentifierCharacters := ["a";"b";"c";"d";"e";"f";"g";"h";"i";"j";"k";"l";"m";"n";"o";"p";"q";"r";"s";"t";"u";"v";"w";"x";"y";"z";"0";"1";"2";"3";"4";"5";"6";"7";"8";"9";"_"]%char.
-
-    Definition cldIdentifierInitialCharacterToAdd := "z"%char.
-    Definition cldIdenitiferCharacterForReplacement := "z"%char.
-
-	(* Java equivalent: MROptimizer.cldIdentifierFixInitial *)
-    Definition cldIdentifierFixInitial (ident:string) : string
-    := match ident with
-       (* We also don't want empty identifier names *)
-       | EmptyString =>
-         String cldIdentifierInitialCharacterToAdd EmptyString
-       | String a _ =>
-         if in_dec ascii_dec a cldAllowedIdentifierInitialCharacters
-         then ident
-         else String cldIdentifierInitialCharacterToAdd ident
-       end.
-
-    (* Java equivalent: MROptimizer.cldIdentifierSanitizeChar *)
-    Definition cldIdentifierSanitizeChar (a:ascii)
-      := if a == "$"%char (* special case for readability *)
-         then "_"%char
-         else if in_dec ascii_dec a cldAllowedIdentifierCharacters
-              then a
-              else cldIdenitiferCharacterForReplacement.
-
-  (* Java equivalent: MROptimizer.cldIdentifierSanitizeBody *)
-  Definition cldIdentifierSanitizeBody (ident:string)
-    := map_string cldIdentifierSanitizeChar ident.
-  
-  (* Java equivalent MROptimizer.cldIdentifierSanitize *)
-  Definition cldIdentifierSanitize (ident:string)
-    := cldIdentifierFixInitial (cldIdentifierSanitizeBody (mk_lower ident)).
-  
-  (* Java equivalent (used in): MROptimizer.nrcmr_rename_graph_for_cloudant *)
-  Definition cldSafeSeparator := "_"%string.
-
-  (* Java equivalent (used in): MROptimizer.nrcmr_rename_graph_for_cloudant *)
-  Definition cldAvoidList : list string := [].
-
-  End sanitize.
 End CldMR.
 
 (*

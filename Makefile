@@ -213,6 +213,7 @@ MODULES = \
 	CldMR/Lang/CldMRUtil \
 	CldMR/Lang/ForeignCloudant \
 	CldMR/Lang/CldMR \
+	CldMR/Lang/CldMRSanitize \
 	CldMR/CldMRRuntime \
 	CldMR/CldMRSystem \
 	LambdaNRA/Lang/LambdaNRA \

@@ -146,11 +146,7 @@ Section CompEval.
     (* Language: cldmr *)
     (* Note: eval_cldmr assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data
-      := let cenv := mkConstants (rec_sort cenv) in
-         match cld_load_init_env init_vinit cenv with
-         | Some cenv => cldmr_eval h cenv q
-         | None => None
-         end.
+      := cldmr_eval_top h init_vinit q cenv.
 
     (* Language: dnnrc_dataset *)
     (* WARNING: This doesn't work if using the Dataset part of the language *)

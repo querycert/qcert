@@ -14,6 +14,22 @@
  * limitations under the License.
  *)
 
+(** cNNRC is the core named nested relational calculus. It serves as
+the foundations for NNRC, an intermediate language to facilitate code
+generation for non-functional targets. *)
+
+(** cNNRC is a small pure language without functions. Expressions in
+cNNRC are evaluated within a local environment. *)
+
+(** Summary:
+- Language: cNNRC (Core Named Nested Relational Calculus)
+- Based on: "Polymorphic type inference for the named nested
+  relational calculus." Jan Van den Bussche, and Stijn
+  Vansummeren. ACM Transactions on Computational Logic (TOCL) 9.1
+  (2007): 3.
+- translating to cNNRC: NRA, cNRAEnv, NNRC
+- translating from cNNRC: NNRC, CAMP *)
+
 Section cNNRC.
 
   Require Import String.
@@ -21,31 +37,35 @@ Section cNNRC.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Morphisms.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import BasicRuntime.
 
   (** Named Nested Relational Calculus *)
 
   Context {fruntime:foreign_runtime}.
   
+  (** * Abstract Syntax *)
+  
+  (** Note that the AST is shared between cNNRC and NNRC. However,
+      semantics for extended operators are not defined for core
+      NNRC. *)
+
   Definition var := string.
 
-  (** Note that the AST is shared between core NNRC and NNRC.
-      However, semantics for extended operators are not defined for core NNRC. *)
   Inductive nnrc :=
-  | NNRCVar : var -> nnrc
-  | NNRCConst : data -> nnrc
-  | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc
-  | NNRCUnop : unaryOp -> nnrc -> nnrc
-  | NNRCLet : var -> nnrc -> nnrc -> nnrc
-  | NNRCFor : var -> nnrc -> nnrc -> nnrc
-  | NNRCIf : nnrc -> nnrc -> nnrc -> nnrc
-  | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc
-  (* Extended *)
-  | NNRCGroupBy : string -> list string -> nnrc -> nnrc.
+  | NNRCVar : var -> nnrc                                     (**r Variable lookup *)
+  | NNRCConst : data -> nnrc                                  (**r Constant value *)
+  | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc                 (**r Binary operator *)
+  | NNRCUnop : unaryOp -> nnrc -> nnrc                        (**r Unary operator *)
+  | NNRCLet : var -> nnrc -> nnrc -> nnrc                     (**r Let expression *)
+  | NNRCFor : var -> nnrc -> nnrc -> nnrc                     (**r For loop *)
+  | NNRCIf : nnrc -> nnrc -> nnrc -> nnrc                     (**r Conditional *)
+  | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc   (**r Choice expression *)
+  | NNRCGroupBy : string -> list string -> nnrc -> nnrc.      (**r Group by expression -- only in NNRC *)
 
-  (** The nnrcIsCore predicate defines what fragment is part of the core NNRC
-      and which part is not. *)
+  (** The nnrcIsCore predicate defines what fragment is part of this
+      abstract syntax is in the core cNNRC and which part is not. *)
+  
   Fixpoint nnrcIsCore (e:nnrc) : Prop :=
     match e with
     | NNRCVar _ => True
@@ -59,6 +79,17 @@ Section cNNRC.
     | NNRCGroupBy _ _ _ => False
     end.
 
+  (** cNNRC is defined as the dependent type of expressions in that
+  abstract syntax such that the [nnrcIsCore] predicate holds. *)
+  
+  Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
+
+  Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
+    proj1_sig e.
+
+  Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
+    f (proj1_sig e).
+    
   Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
     first;
     [ Case_aux c "NNRCVar"%string
@@ -71,6 +102,8 @@ Section cNNRC.
     | Case_aux c "NNRCEither"%string
     | Case_aux c "NNRCGroupBy"%string].
 
+  (** Equality between two NNRC expressions is decidable. *)
+  
   Global Instance nnrc_eqdec : EqDec nnrc eq.
   Proof.
     change (forall x y : nnrc,  {x = y} + {x <> y}).
@@ -80,65 +113,58 @@ Section cNNRC.
     - decide equality; apply string_dec.
   Defined.
 
-  Section core.
-    Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
-
-    Definition nnrc_core_to_nnrc (e:nnrc_core) : nnrc :=
-      proj1_sig e.
-
-    Definition lift_nnrc_core {A} (f:nnrc -> A) (e:nnrc_core) : A :=
-      f (proj1_sig e).
-    
-  End core.
-  
-  (** Semantics of NNRC Core *)
+  (** * Evaluation Semantics *)
 
   Context (h:brand_relation_t).
+  
+  (** Evaluation takes a cNNRC expression and a local environment. It
+    returns an optional value. A [None] being returned indicate an
+    error and is always propagated. *)
 
   Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
     match e with
-      | NNRCVar x =>
-        lookup equiv_dec env x
-      | NNRCConst d =>
-         Some (normalize_data h d)
-      | NNRCBinop bop e1 e2 =>
-        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nnrc_core_eval env e1) (nnrc_core_eval env e2)
-      | NNRCUnop uop e1 =>
-        olift (fun d1 => fun_of_unaryop h uop d1) (nnrc_core_eval env e1)
-      | NNRCLet x e1 e2 =>
-        match nnrc_core_eval env e1 with
-        | Some d => nnrc_core_eval ((x,d)::env) e2
-        | _ => None
-        end
-      | NNRCFor x e1 e2 =>
-        match nnrc_core_eval env e1 with
-        | Some (dcoll c1) =>
-          let inner_eval d1 :=
-              let env' := (x,d1) :: env in nnrc_core_eval env' e2
-          in
-          lift dcoll (rmap inner_eval c1)
-        | _ => None
-        end
-      | NNRCIf e1 e2 e3 =>
-        let aux_if d :=
-            match d with
-            | dbool b =>
-              if b then nnrc_core_eval env e2 else nnrc_core_eval env e3
-            | _ => None
-            end
-        in olift aux_if (nnrc_core_eval env e1)
-      | NNRCEither ed xl el xr er =>
-        match nnrc_core_eval env ed with
-        | Some (dleft dl) =>
-          nnrc_core_eval ((xl,dl)::env) el
-        | Some (dright dr) =>
-          nnrc_core_eval ((xr,dr)::env) er
-        | _ => None
-        end
-      | NNRCGroupBy _ _ _ => None (* Fails for core eval *)
+    | NNRCVar x =>
+      lookup equiv_dec env x
+    | NNRCConst d =>
+      Some (normalize_data h d)
+    | NNRCBinop bop e1 e2 =>
+      olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nnrc_core_eval env e1) (nnrc_core_eval env e2)
+    | NNRCUnop uop e1 =>
+      olift (fun d1 => fun_of_unaryop h uop d1) (nnrc_core_eval env e1)
+    | NNRCLet x e1 e2 =>
+      match nnrc_core_eval env e1 with
+      | Some d => nnrc_core_eval ((x,d)::env) e2
+      | _ => None
+      end
+    | NNRCFor x e1 e2 =>
+      match nnrc_core_eval env e1 with
+      | Some (dcoll c1) =>
+        let inner_eval d1 :=
+            let env' := (x,d1) :: env in nnrc_core_eval env' e2
+        in
+        lift dcoll (rmap inner_eval c1)
+      | _ => None
+      end
+    | NNRCIf e1 e2 e3 =>
+      let aux_if d :=
+          match d with
+          | dbool b =>
+            if b then nnrc_core_eval env e2 else nnrc_core_eval env e3
+          | _ => None
+          end
+      in olift aux_if (nnrc_core_eval env e1)
+    | NNRCEither ed xl el xr er =>
+      match nnrc_core_eval env ed with
+      | Some (dleft dl) =>
+        nnrc_core_eval ((xl,dl)::env) el
+      | Some (dright dr) =>
+        nnrc_core_eval ((xr,dr)::env) er
+      | _ => None
+      end
+    | NNRCGroupBy _ _ _ => None (**r Evaluation for GroupBy always fails for cNNRC *)
     end.
 
-  (* we are only sensitive to the environment up to lookup *)
+  (** cNNRC evaluation is only sensitive to the environment up to lookup. *)
   Global Instance nnrc_core_eval_lookup_equiv_prop :
     Proper (lookup_equiv ==> eq ==> eq) nnrc_core_eval.
   Proof.
@@ -169,12 +195,20 @@ Section cNNRC.
         simpl; match_destr.
   Qed.
 
+  (** * Toplevel *)
+  
+  (** The Top-level evaluation function is used externally by the
+  Q*cert compiler. It takes a cNNRC expression and an globale
+  environment as input. *)
+
   Section Top.
     Definition nnrc_core_eval_top (q:nnrc_core) (cenv:bindings) : option data :=
       lift_nnrc_core (nnrc_core_eval (rec_sort (mkConstants cenv))) q.
   End Top.
   
 End cNNRC.
+
+(** * Notations *)
 
 (* begin hide *)
 Notation "‵‵ c" := (NNRCConst (dconst c))  (at level 0) : nnrc_scope.                           (* ‵ = \backprime *)
@@ -219,7 +253,6 @@ Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
   | Case_aux c "NNRCIf"%string
   | Case_aux c "NNRCEither"%string
   | Case_aux c "NNRCGroupBy"%string].
-
 (* end hide *)
 
 (* 

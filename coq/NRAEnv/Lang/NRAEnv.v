@@ -208,7 +208,7 @@ Section NRAEnv.
   Definition unnest (a b:string) (op:nraenv_core) : nraenv_core :=
     ANMap ((ANUnop (ARecRemove a)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec b)) ANID) ((ANUnop (ADot a)) ANID)) op).
 
-  (** * Semantics *)
+  (** * Evaluation Semantics *)
 
   (** The semantics of NRAEnv is defined as macro-expansion to the core language cNRAEnv. *) 
   
