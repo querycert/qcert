@@ -298,6 +298,7 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside unop")
 
+
 (* CAMP Section *)
 
 let rec camp_to_sexp (p : QLang.camp) : sexp =
@@ -306,7 +307,7 @@ let rec camp_to_sexp (p : QLang.camp) : sexp =
   | Punop (u, p1) -> STerm ("Punop", (unop_to_sexp u) :: [camp_to_sexp p1])
   | Pbinop (b, p1, p2) -> STerm ("Pbinop", (binop_to_sexp b) :: [camp_to_sexp p1; camp_to_sexp p2])
   | Pmap p1 -> STerm ("Pmap", [camp_to_sexp p1])
-  | Passert p1 -> STerm ("Passert", [camp_to_sexp p1]) 
+  | Passert p1 -> STerm ("Passert", [camp_to_sexp p1])
   | PorElse (p1,p2) -> STerm ("PorElse", [camp_to_sexp p1; camp_to_sexp p2])
   | Pit -> STerm ("Pit", [])
   | PletIt (p1,p2) -> STerm ("PletIt", [camp_to_sexp p1; camp_to_sexp p2])
@@ -339,6 +340,39 @@ let rec sexp_to_camp (se : sexp) : QLang.camp =
       raise (Qcert_Error ("Not well-formed S-expr inside camp with name " ^ t))
   | _ ->
       raise (Qcert_Error "Not well-formed S-expr inside camp")
+
+(* CAMP Rule Section *)
+
+let rec camp_rule_to_sexp (p : QLang.camp_rule) : sexp =
+  match p with
+  | Rule_when (p1, p2) ->
+      STerm ("Rule_when", [camp_to_sexp p1; camp_rule_to_sexp p2])
+  | Rule_global (p1, p2) ->
+      STerm ("Rule_global", [camp_to_sexp p1; camp_rule_to_sexp p2])
+  | Rule_not (p1, p2) ->
+      STerm ("Rule_not", [camp_to_sexp p1; camp_rule_to_sexp p2])
+  | Rule_return p ->
+      STerm ("Rule_not", [camp_to_sexp p])
+  | Rule_match p ->
+      STerm ("Rule_match", [camp_to_sexp p])
+
+let rec sexp_to_camp_rule (se : sexp) : QLang.camp_rule =
+  match se with
+  | STerm ("Rule_when", [se1; se2]) ->
+      Rule_when (sexp_to_camp se1, sexp_to_camp_rule se2)
+  | STerm ("Rule_global", [se1; se2]) ->
+      Rule_global (sexp_to_camp se1, sexp_to_camp_rule se2)
+  | STerm ("Rule_not", [se1; se2]) ->
+      Rule_not (sexp_to_camp se1, sexp_to_camp_rule se2)
+  | STerm ("Rule_return", [se]) ->
+      Rule_return (sexp_to_camp se)
+  | STerm ("Rule_match", [se]) ->
+      Rule_match (sexp_to_camp se)
+  | STerm (t, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside camp with name " ^ t))
+  | _ ->
+      raise (Qcert_Error "Not well-formed S-expr inside camp")
+
 
 (* NRA Section *)
 
@@ -1164,8 +1198,7 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_tech_rule ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | L_designer_rule ->
-      raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | L_designer_rule -> Q_camp_rule (sexp_to_camp_rule se)
   | L_camp -> Q_camp (sexp_to_camp se)
   | L_oql ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
@@ -1201,8 +1234,7 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_designer_rule _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Q_camp_rule _ ->
-      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | Q_camp_rule q -> camp_rule_to_sexp q
   | Q_camp q -> camp_to_sexp q
   | Q_oql _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)

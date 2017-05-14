@@ -27,6 +27,9 @@ open SExp
 val sexp_to_data : sexp -> QData.data
 val data_to_sexp : QData.data -> sexp
 
+val sexp_to_camp_rule : sexp -> QLang.camp_rule
+val camp_rule_to_sexp : QLang.camp_rule -> sexp
+
 val sexp_to_camp : sexp -> QLang.camp
 val camp_to_sexp : QLang.camp -> sexp
 
