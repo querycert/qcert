@@ -246,12 +246,23 @@ public class RunCloudant {
 			}
 
 			/* Hydrate the input JSON String as a JSON object and load it into the first database */
+			System.out.printf("Waiting 1 second%n");
+			Thread.sleep(1000);
 			System.out.println("Loading inputs into database");
+			int rate = 0;
 			for (JsonElement e : inputJson) {
+			    // Rate limiter
 			    Object toStore = e.getAsJsonObject();
 			    String err = mainDB.save(toStore).getError();
+			    rate++;
 			    if (err != null) {
 				System.err.println(err);
+			    }
+			    // If reaching 10, wait a second
+			    if (rate >= 10) {
+				System.out.printf("Waiting 1 second%n");
+				rate = 0;
+				Thread.sleep(1000);
 			    }
 			}
 			
