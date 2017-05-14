@@ -49,6 +49,9 @@ public class RunCloudant {
 	/** Number of seconds to wait after submission to cloudant (and also on each retry) */
         public static final int CLOUDANT_QUERY_DELAY = 20;
 
+	/** Number of seconds to wait during document loading into cloudant (to fit within rate limitations constraints on free trial) */
+        public static final int CLOUDANT_RATE_DELAY = 1;
+
 	/** Number of retries to attempt with Cloudant before declaring failure */
         public static final int CLOUDANT_RETRY_LIMIT = 20;
 
@@ -246,8 +249,8 @@ public class RunCloudant {
 			}
 
 			/* Hydrate the input JSON String as a JSON object and load it into the first database */
-			System.out.printf("Waiting 1 second%n");
-			Thread.sleep(1000);
+			System.out.printf("Pausing for %d second (rate limitation)%n",CLOUDANT_RATE_DELAY);
+			Thread.sleep(CLOUDANT_RATE_DELAY * 1000);
 			System.out.println("Loading inputs into database");
 			int rate = 0;
 			for (JsonElement e : inputJson) {
@@ -260,8 +263,8 @@ public class RunCloudant {
 			    }
 			    // If reaching 10, wait a second
 			    if (rate >= 10) {
-				System.out.printf("Waiting 1 second%n");
-				rate = 0;
+				System.out.printf("Pausing for %d second (rate limitation)%n",CLOUDANT_RATE_DELAY);
+				Thread.sleep(CLOUDANT_RATE_DELAY * 1000);
 				Thread.sleep(1000);
 			    }
 			}
