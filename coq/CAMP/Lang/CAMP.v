@@ -46,7 +46,7 @@ Section CAMP.
 
   Context {fruntime:foreign_runtime}.
 
-  (** * Abstract Syntax *)
+  (** * Abstract Syntax Tree *)
 
   (** CAMP patterns are pure expressions. They match against a current
   value in the context of an environment. The environment has a

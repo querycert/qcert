@@ -14,6 +14,20 @@
  * limitations under the License.
  *)
 
+
+(** CAMPRule is a small language built on top of CAMP (Calculus for
+  Aggregating Matching Patterns). It help to bridge the gap between
+  the CAMP core calculus and real-world production rule languages such
+  as JRules.
+ *)
+
+(** The language is built as a set of macros on top of CAMP. It is
+    described in Section 3 of the article "A Pattern Calculus for Rule
+    Languages: Expressiveness, Compilation, and Mechanization" by Avraham
+    Shinnar, Jérôme Siméon, and Martin Hirzel (ECOOP'2015).
+ *)
+
+
 (* This file defines derived patterns, notations, and concepts *)
 Section CAMPRule.
 
@@ -24,26 +38,23 @@ Section CAMPRule.
   Require Import Utils.
   Require Import BasicRuntime.
   Require Export CAMPRuntime.
-  
+
   Local Open Scope camp_scope.
   Local Open Scope string.
   (* end hide *)
 
   Context {fruntime:foreign_runtime}.
 
-  (** rules and their semantics *)
+  (** * Abstract Syntax Tree *)
+
   Inductive camp_rule :=
-  (** a normal rule, matched against each working memory element in turn *)
-  | rule_when : camp -> camp_rule -> camp_rule
-  (** a rule that should run against the entire working memory (as a collection of elements) *)
-  | rule_global : camp -> camp_rule -> camp_rule
-  (** A rule that must not match any working memory element *)
-  | rule_not : camp -> camp_rule -> camp_rule
-  (** This is the last part of a rule, and it allow the 
-        rule to return a value for each successful match-set. pit can be used as the identity *)
-  | rule_return : camp -> camp_rule
-  (** This allows a rule to simply match a camp pattern *)
-  | rule_match : camp -> camp_rule.  
+  | rule_when : camp -> camp_rule -> camp_rule (**r Match against each element of the working memory. *)
+  | rule_global : camp -> camp_rule -> camp_rule (**r Match against the working memory as a collection *)
+  | rule_not : camp -> camp_rule -> camp_rule (**r A rule that must not match any working memory element. *)
+  | rule_return : camp -> camp_rule (**r Rule to return a value for each successful match-set. *)
+  | rule_match : camp -> camp_rule. (**r This allows a rule to simply match a camp pattern. *)
+
+  (** * Translate CAMPRule into the CAMP kernel *)
 
   (* Java equivalent: CampRule.convertToPattern *)
   Fixpoint camp_rule_to_camp (rule:camp_rule) : camp
@@ -72,6 +83,8 @@ Section CAMPRule.
          | rule_match p =>
            p
        end.
+
+  (** * Evaluation *)
 
   Definition eval_camp_rule_debug (h:list(string*string)) (print_env:bool) (r:camp_rule) (world:list data)
     : presult_debug data
@@ -119,7 +132,7 @@ Section CAMPRule.
 
 End CAMPRule.
 
-(* 
+(*
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
