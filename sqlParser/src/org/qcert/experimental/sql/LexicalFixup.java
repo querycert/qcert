@@ -28,7 +28,8 @@ import org.apache.asterix.lang.sqlpp.parser.Token;
 public interface LexicalFixup extends SQLPPParserConstants {
 	public List<LexicalFixup> list = Arrays.asList(
 			new FixupDateLiterals(),
-			new FixupIntervalLiterals()
+			new FixupIntervalLiterals(),
+			new FixupExtractExpr()
 			// Add more fixups here
 	);
 
@@ -38,6 +39,36 @@ public interface LexicalFixup extends SQLPPParserConstants {
 	 * @return the fixed up list of tokens
 	 */
 	public List<Token> apply(List<Token> tokens);
+	
+	/**
+	 * Convert a possible unit (year / month /day) into an actual unit or null if the text is not a unit
+	 * @param possible the Token that might be a unit
+	 * @return a Unit or null
+	 */
+	public static Unit getUnit(Token possible) {
+		switch (possible.image.toLowerCase()) {
+		case "day":
+			return Unit.D;
+		case "month":
+			return Unit.M;
+		case "year":
+			return Unit.Y;
+		default:
+			return null;
+		}
+	}
+
+	/**
+	 *  A variant of makeToken that assumes a single character image so that the begin/end line/column are the same
+	 * @param kind the kind
+	 * @param image the image
+	 * @param line the beginning and ending line
+	 * @param column the beginning and ending column
+	 * @return the new Token
+	 */
+	public static Token makeToken(int kind, String image, int line, int column) {
+		return makeToken(kind, image, line, column, line, column);
+	}
 	
 	/**
 	 * Augments the Token constructor with settings for begin/end line/column
@@ -57,16 +88,6 @@ public interface LexicalFixup extends SQLPPParserConstants {
 		ans.endColumn = endColumn;
 		return ans;
 	}
-	
-	/**
-	 *  A variant of makeToken that assumes a single character image so that the begin/end line/column are the same
-	 * @param kind the kind
-	 * @param image the image
-	 * @param line the beginning and ending line
-	 * @param column the beginning and ending column
-	 * @return the new Token
-	 */
-	public static Token makeToken(int kind, String image, int line, int column) {
-		return makeToken(kind, image, line, column, line, column);
-	}
+
+	public enum Unit { D, M, Y }
 }

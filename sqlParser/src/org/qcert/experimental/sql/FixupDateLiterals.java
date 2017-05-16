@@ -60,4 +60,8 @@ public class FixupDateLiterals implements LexicalFixup {
 		return output;
 	}
 
+	public Unit getUnit(Token possible) {
+		return null;
+	}
+
 }

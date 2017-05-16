@@ -119,6 +119,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		opNameMap.put(OperatorType.IN, "isIn");
 		opNameMap.put(OperatorType.MINUS, "subtract");
 		opNameMap.put(OperatorType.PLUS, "add");
+		opNameMap.put(OperatorType.OR, "or");
 		// TODO the rest of these
 
 		unaryExprMap.put(UnaryExprType.EXISTS, "exists");
@@ -144,7 +145,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 				args = Collections.emptyList();
 		}
 		// The following special cases are needed because AsterixDB treats "not" as a function and because we turn
-		// generic typed literals for dates and intervals (durations) into functions in keeping with AsterixDB practice.
+		// various things into functions to match SQL++ conventions.
 		if (args.size() == 1)
 			switch (name) {
 			case "not": 
@@ -153,6 +154,10 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 				return handleDate(args.get(0), builder);
 			case "duration":
 				return handleDuration(args.get(0), builder);
+			case "get_year":
+			case "get_month":
+			case "get_day":
+				return handleExtract(name.substring(4), args.get(0), builder);
 			default:
 				break;
 			}
@@ -186,12 +191,12 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		}
 		return builder.append(") ");
 	}
-	
+
 	@Override
 	public StringBuilder visit(CompactStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
 	}
-
+	
 	@Override
 	public StringBuilder visit(ConnectFeedStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -307,7 +312,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	public StringBuilder visit(FunctionDropStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
 	}
-	
+
 	@Override
 	public StringBuilder visit(GroupbyClause node, StringBuilder builder) throws CompilationException {
 		if (node.hasDecorList())
@@ -329,7 +334,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
     	}
 		return builder.append(") ");
 	}
-
+	
 	@Override
 	public StringBuilder visit(HavingClause node, StringBuilder builder) throws CompilationException {
 		builder = builder.append("(having ");
@@ -425,33 +430,27 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	public StringBuilder visit(OperatorExpr node, StringBuilder builder) throws CompilationException {
 		List<Expression> exprs = node.getExprList();
 		List<OperatorType> ops = node.getOpList();
-		if (exprs.size() == 2 && ops.size() == 1)
-			return processBinaryOperator(ops.get(0), exprs.get(0), exprs.get(1), builder);
+		if (ops.size() == 1 && (exprs.size() == 2 || exprs.size() == 3)) {
+			// Consider substitutions based on inferring that the operation involves dates
+			Expression alternative = maybeTransform(ops.get(0), exprs);
+			if (alternative != null)
+				return alternative.accept(this, builder);
+			// Otherwise, proceed with the normal case, which involves either 2 or 3 operands.  3 operand cases are handled
+			// individually.
+			if (exprs.size() == 3 && ops.get(0) == OperatorType.BETWEEN)
+				return handleBetween(exprs.get(0), exprs.get(1), exprs.get(2), builder);
+			else if (exprs.size() == 2)
+				return processBinaryOperator(ops.get(0), exprs.get(0), exprs.get(1), builder);
+			// else 3 exprs but not handled by the case logic; fall through to unsupported
+		}
 		else if (exprs.size() - ops.size() == 1) {
+			// This case is for chains of binary operators under associativity
 			assert ops.size() > 0;
 			return visit(makeBinary(exprs, ops), builder);
 		}
-		/* Non-binary cases are handled individually.  Note that "unary" operators don't come to this method at all */
-		if (ops.size() == 1 && exprs.size() == 3 && ops.get(0) == OperatorType.BETWEEN)
-			return handleBetween(exprs.get(0), exprs.get(1), exprs.get(2), builder);
-		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary");
-	}
-
-	/**
-	 * Handling for the 'between' expression
-	 * @param expr the expression being tested
-	 * @param limit1 the first limit
-	 * @param limit2 the second limit
-	 * @param builder the builder
-	 * @return the builder
-	 * @throws CompilationException
-	 */
-	private StringBuilder handleBetween(Expression expr, Expression limit1, Expression limit2, StringBuilder builder) throws CompilationException {
-		builder = builder.append("(isBetween ");
-		builder = expr.accept(this, builder);
-		builder = limit1.accept(this, builder);
-		builder = limit2.accept(this, builder);
-		return builder.append(") ");
+		/* Here we arrive when we have no handling for binary or n-ary cases.  
+		 * Note that "unary" operators don't come to this method at all */
+		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary or ternary");
 	}
 
 	@Override
@@ -708,6 +707,23 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	/**
+	 * Handling for the 'between' expression
+	 * @param expr the expression being tested
+	 * @param limit1 the first limit
+	 * @param limit2 the second limit
+	 * @param builder the builder
+	 * @return the builder
+	 * @throws CompilationException
+	 */
+	private StringBuilder handleBetween(Expression expr, Expression limit1, Expression limit2, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(isBetween ");
+		builder = expr.accept(this, builder);
+		builder = limit1.accept(this, builder);
+		builder = limit2.accept(this, builder);
+		return builder.append(") ");
+	}
+
+	/**
 	 * Special handling for date literals appearing as calls to the function "date"
 	 * TODO in SQL++ the date function really is a function operating on strings in general, not just literals.  We should
 	 *   be processing this as a general conversion from String to date.
@@ -746,6 +762,20 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder = builder.append("(interval ");
 		builder = appendString(lit.substring(1, lit.length() - 1), builder);
 		return builder.append(tag).append(")");
+	}
+
+	/**
+	 * Special handling for functions get_year, get_month, and get_day which are extract expressions
+	 * @param unit the unit being extracted (year, month, or day)
+	 * @param expression the expression from which it is being extracted
+	 * @param builder the builder
+	 * @return the builder
+	 * @throws CompilationException 
+	 */
+	private StringBuilder handleExtract(String unit, Expression expression, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(extract (").append(unit).append(") ");
+		builder = expression.accept(this, builder);
+		return builder.append(") ");
 	}
 
 	/**
@@ -802,7 +832,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		/* Look for function call with the name "duration" since this is how durations are expressed after lexical
 		 * fixup and parsing by AsterixDB SQL++
 		 */
-		return maybeInterval.getKind() == Kind.CALL_EXPRESSION && ((CallExpr) maybeInterval).getFunctionSignature().getName().equals("date");
+		return maybeInterval.getKind() == Kind.CALL_EXPRESSION && ((CallExpr) maybeInterval).getFunctionSignature().getName().equals("duration");
 	}
 
 	/**
@@ -888,9 +918,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			OperatorExpr opExpr = (OperatorExpr) expr;
 			List<Expression> exprs = opExpr.getExprList();
 			List<OperatorType> ops = opExpr.getOpList();
-			if (exprs.size() == 2 && ops.size() == 1) {
-				// TODO we need to reorganize the code a bit to make sure we catch other cases
-				Expression maybe = maybeTransform(ops.get(0), exprs.get(0), exprs.get(1));
+			if (ops.size() == 1) {
+				// TODO we might need to reorganize the code a bit to make sure we catch other cases
+				Expression maybe = maybeTransform(ops.get(0), exprs);
 				if (maybe != null)
 					return maybe;
 			}
@@ -900,13 +930,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	/** Selectively turn an operator node into a function call if it operates on dates.  Returns a new node or null if
 	 *  no safe transformation is available. */
-	private Expression maybeTransform(OperatorType operator, Expression operand1, Expression operand2) {
+	private Expression maybeTransform(OperatorType operator, List<Expression> operands) {
 		String name;
 		boolean arithmetic = false;
 		switch (operator) {
 		case BETWEEN:
+			name = "date_between";
+			break;
 		case NOT_BETWEEN:
-			throw new UnsupportedOperationException("A between predicate may need date transformation but it is not yet implemented");
+			throw new UnsupportedOperationException("A 'not between' predicate may need date transformation but it is not yet implemented");
 		case GE:
 			name = "date_ge";
 			break;
@@ -933,10 +965,23 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		default:
 			return null;
 		}
-		Expression left = maybeTransform(operand1);
-		Expression right = maybeTransform(operand2);
-		if (isDate(left) || arithmetic && isDateInterval(right) || !arithmetic && isDate(right))
-			return new CallExpr(new FunctionSignature(null, name, 2), Arrays.asList(left, right));
+		if (arithmetic) {
+			assert operands.size() == 2;
+			Expression left = maybeTransform(operands.get(0));
+			Expression right = maybeTransform(operands.get(1));
+			if (isDate(left) && isDateInterval(right))
+				return new CallExpr(new FunctionSignature(null, name, 2), Arrays.asList(left, right));
+		} else {
+			List<Expression> transformed = new ArrayList<>();
+			boolean date = false;
+			for (Expression operand : operands) {
+				Expression trans = maybeTransform(operand);
+				date |= isDate(trans);
+				transformed.add(trans);
+			}
+			if (date)
+				return new CallExpr(new FunctionSignature(null, name, transformed.size()), transformed);
+		}
 		return null;
 	}
 
@@ -967,11 +1012,6 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	 */
 	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
 			throws CompilationException {
-		// Consider substitutions based on inferring that the operation involves dates
-		Expression alternative = maybeTransform(operator, operand1, operand2);
-		if (alternative != null)
-			return alternative.accept(this, builder);
-		// Otherwise proceed with the normal case
 		String verb = opNameMap.get(operator);
 		if (verb == null)
 			throw new UnsupportedOperationException("No support for binary operator " + operator);

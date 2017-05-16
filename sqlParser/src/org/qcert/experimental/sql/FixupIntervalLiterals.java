@@ -49,7 +49,7 @@ public class FixupIntervalLiterals implements LexicalFixup {
 						continue;
 					}
 					Token next2 = tokens.next();
-					Unit unit = getUnit(next2);
+					Unit unit = LexicalFixup.getUnit(next2);
 					if (unit == null) {
 						output.add(tok);
 						output.add(next1);
@@ -103,24 +103,4 @@ public class FixupIntervalLiterals implements LexicalFixup {
 		output.add(second);
 		output.add(third);
 	}
-
-	/**
-	 * Convert a possible unit (year / month /day) into an actual unit or null if the text is not a unit
-	 * @param possible the Token that might be a unit
-	 * @return a Unit or null
-	 */
-	private Unit getUnit(Token possible) {
-		switch (possible.image.toLowerCase()) {
-		case "day":
-			return Unit.D;
-		case "month":
-			return Unit.M;
-		case "year":
-			return Unit.Y;
-		default:
-			return null;
-		}
-	}
-
-	enum Unit { D, M, Y }
 }
