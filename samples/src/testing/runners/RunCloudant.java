@@ -184,8 +184,9 @@ public class RunCloudant {
 	 * @param postInputs the input databases for the JS last expression 
 	 * @param inputJson the input to test with as JSON
 	 * @param outputJson the expected results as JSON
+	 * @param keepDB don't delete the DBs in Cloudant if true
 	 */
-         private static void runCloudantLast(CloudantClient client, JsonArray designList, String postExpr, JsonArray postInputs, JsonArray inputJson, JsonArray outputJson) throws Exception {
+         private static void runCloudantLast(CloudantClient client, JsonArray designList, String postExpr, JsonArray postInputs, JsonArray inputJson, JsonArray outputJson, boolean keepDB) throws Exception {
 		/* Declare resources to be cleaned up on failure */
 		List<String> allDBs = new ArrayList<>();
 		String lastDBCopy = null;
@@ -287,7 +288,7 @@ public class RunCloudant {
 			}
 			Assert.fail("No valid result after exhausting retries");
 		} finally {
-			if (client != null) {
+			if (client != null && !keepDB) {
 			    for (String db : allDBs) {
 				System.out.println("Deleting database " + db);
 				client.deleteDB(db);
@@ -453,13 +454,16 @@ public class RunCloudant {
 	    //}
 
 	    JsonObject ioParts = null;
-    
+	    boolean keepDB = false;
+
 	    for (int i = 0; i < args.length; i++) {
 		String arg = args[i];
 		// Must have a -input option for the input JSON
 		if ("-input".equals(arg)) {
 		    inputFile = args[i+1]; i++;
 		    ioParts = parseJsonFileToObject(inputFile);
+		} else if ("-keep-db".equals(arg)) {
+		    keepDB = true;
 		} else {
 		    JsonObject designs_and_post = parseJsonFileToObject(arg);
 		    /* Run the test */
@@ -468,7 +472,8 @@ public class RunCloudant {
 				    designs_and_post.get("post").getAsString(),
 				    designs_and_post.get("post_input").getAsJsonArray(),
 				    ioParts.get("input").getAsJsonObject().get("WORLD").getAsJsonArray(),
-				    ioParts.get("output").getAsJsonArray());
+				    ioParts.get("output").getAsJsonArray(),
+				    keepDB);
 		}
 	    }
 	}
