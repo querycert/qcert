@@ -64,8 +64,18 @@ val float_listmax : float list -> float
 
 val qcert_string_of_float : float -> string
 
-(**********************************)
 (* Timing function for CompStat   *)
-(**********************************)
 
 val time : ('a -> 'b) -> 'a -> char list * 'b
+
+
+(* String Manipulation *)
+
+val global_replace : string -> string -> string -> string
+(** [global_replace const templ s] returns a string identical to [s],
+except thta all substrings of [s] that match the string [const] have
+been replaced by [templ]. This is intended as a replacement for the
+corresponding function in Str when matching against a constant
+string. *)
+
+

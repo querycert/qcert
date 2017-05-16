@@ -30,10 +30,10 @@ let fix_harness harness h =
     try print_hierarchy h with
     | _ -> "[]"
   in
-  let harness_with_inh = Str.global_replace (Str.regexp "%INHERITANCE%") hs harness in
-  let s1 = Str.global_replace (Str.regexp "\t") " " harness_with_inh in
-  let s2 = Str.global_replace (Str.regexp "\"") "\\\"" s1 in
-  let s3 = Str.global_replace (Str.regexp Util.os_newline) "\\n" s2 in
+  let harness_with_inh = Util.global_replace "%INHERITANCE%" hs harness in
+  let s1 = Util.global_replace "\t" " " harness_with_inh in
+  let s2 = Util.global_replace "\"" "\\\"" s1 in
+  let s3 = Util.global_replace Util.os_newline "\\n" s2 in
   s3
 
 (* Cloudant stuff *)
@@ -44,7 +44,7 @@ let unbox_design_doc design_doc =
   (db,dd)
 
 let add_harness harness h s =
-  Str.global_replace (Str.regexp "%HARNESS%") (fix_harness harness h) s
+  Util.global_replace "%HARNESS%" (fix_harness harness h) s
     
 let add_harness_to_designdoc harness h (db,dd) =
   let dbname = string_of_char_list db in
