@@ -1,4 +1,4 @@
 select name
-from persons
+from employees
 where age > 32
 ;

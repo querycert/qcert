@@ -1,0 +1,18 @@
+{ "employees" :
+  [{"eid": 1, "name": "John Doe", "age":32, "company":101},
+   {"eid": 2, "name": "Jane Doe", "age":32, "company":104},
+   {"eid": 3, "name": "Jim Does", "age":34, "company":101},
+   {"eid": 4, "name": "Jill Does","age":32, "company":102},
+   {"eid": 5, "name": "Joan Doe", "age":34, "company":103},
+   {"eid": 6, "name": "James Do", "age":35, "company":104}],
+  "students" :
+  [{"sid": 1, "name": "Thandy Coe", "age":26, "univ":103},
+   {"sid": 2, "name": "Tedd Coes", "age":42, "univ":105},
+   {"sid": 3, "name": "Theo Co", "age":22, "univ":103},
+   {"sid": 4, "name": "Tim Coe","age":32, "univ":103}],
+  "organizations" :
+  [{"oid": 101, "name": "Blue Widget", "departments" : [ "Sales", "Manufacturing" ] },
+   {"oid": 102, "name": "Pimble", "departments" : [] },
+   {"oid": 103, "name": "BUNY", "departments" : [ "Computer Science", "HR" ] },
+   {"oid": 104, "name": "Unter", "departments" : ["IP","M&A","Sales"] },
+   {"oid": 105, "name": "UBass", "departments" : ["Comparative Literature","Engineering","Legal"] } ] }
