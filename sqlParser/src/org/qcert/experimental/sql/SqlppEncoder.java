@@ -15,6 +15,11 @@
  */
 package org.qcert.experimental.sql;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,7 +28,11 @@ import java.util.List;
 import org.apache.asterix.common.exceptions.CompilationException;
 import org.apache.asterix.lang.common.base.ILangExpression;
 import org.apache.asterix.lang.common.base.Statement;
+import org.apache.asterix.lang.sqlpp.parser.JavaCharStream;
+import org.apache.asterix.lang.sqlpp.parser.SQLPPParserConstants;
+import org.apache.asterix.lang.sqlpp.parser.SQLPPParserTokenManager;
 import org.apache.asterix.lang.sqlpp.parser.SqlppParserFactory;
+import org.apache.asterix.lang.sqlpp.parser.Token;
 
 /**
  * A highly preliminary experiment in using a SQL++ parser instead of a SQL parser as a baby-step toward supporting SQL++ as a source
@@ -78,12 +87,77 @@ public class SqlppEncoder {
 				continue;
 			}
 			try { 
-				System.out.println(encode(stmts, true));
+				outputResult(encode(stmts, true), arg);
+				System.out.println("Succeeded");
 			} catch (Throwable e) {
 				System.out.println(e.toString());
 			}
-			
 		}
+	}
+
+	/**
+	 * Parse a SQL source string.
+	 * @param query the SQL source string
+	 * @return the parsed statement(s) as a List<Statement>
+	 */
+	public static List<Statement> parse(String query) throws Exception {
+		query = applyLexicalFixups(query);
+		return new SqlppParserFactory().createParser(query).parse();
+	}
+
+	/**
+	 * Parse SQL source provided in a File
+	 * @param file the name of the file containing the source
+	 * @return the parsed statement(s) as a List<Statement>
+	 */
+	public static List<Statement> parseFile(String file) throws Exception {
+		// Note: SqlppParserFactory has a method that will make a parser from a Reader but we do not use it because it does not
+		// set up the error handling state fully, so you get an NPE instead of an informative error on things like syntax errors.
+		String query = new String(Files.readAllBytes(Paths.get(file)));
+		return parse(query);
+	}
+
+	/**
+	 * Adjust to mismatch between TPC's interpretation of SQL and the SQL++ parser's understanding.  We take TPC's view as canonical, despite misgivings.  Note that TPC-H and
+	 *   TPC-DS seem to like different dialects.  We try to accommodate both.
+	 * @param query the original query
+	 * @return an adjusted query with lexical fixups applied
+	 */
+	private static String applyLexicalFixups(String query) {
+		/* Read all the tokens into a list */
+		SQLPPParserTokenManager lexer = new SQLPPParserTokenManager(new JavaCharStream(new StringReader(query)));
+		List<Token> tokens = new ArrayList<>();
+		Token token = lexer.getNextToken();
+		while (token != null && token.kind != SQLPPParserConstants.EOF) {
+			tokens.add(token);
+			token = lexer.getNextToken();
+		}
+		/* Apply all the fixups */
+		for (LexicalFixup fixup : LexicalFixup.list)
+			tokens = fixup.apply(tokens);
+		/* Re-assemble the final tokens into a String again.  The token manager doesn't provide whitespace as tokens, so we reconstruct the original line/column structure somewhat 
+		 * painfully (and rely on the fixups not to mess with it) */
+		int line = 1;
+		int col = 0;
+		StringBuilder output = new StringBuilder();
+		String nl = String.format("%n");
+		for (Token tok : tokens) {
+			int nextLine = tok.beginLine;
+			int nextCol = tok.beginColumn;
+			while (nextLine > line) {
+				output.append(nl);
+				line++;
+				col = 0;
+			}
+			line = tok.endLine;
+			while (nextCol > col+1) {
+				output.append(" ");
+				col++;
+			}
+			col = tok.endColumn;
+			output.append(tok.image);
+		}
+		return output.toString();
 	}
 
 	/**
@@ -110,23 +184,15 @@ public class SqlppEncoder {
 	}
 
 	/**
-	 * Parse SQL source provided in a File
-	 * @param file the name of the file containing the source
-	 * @return the parsed statement(s) as a List<Statement>
+	 * Output an s-exp file after successfully parsing the source
+	 * @param parsed the parsed s-exp result as a String
+	 * @param arg the command line argument which was the name of the source file (assumed to have a suffix)
+	 * @throws IOException 
 	 */
-	public static List<Statement> parseFile(String file) throws Exception {
-		// Note: SqlppParserFactory has a method that will make a parser from a Reader but we do not use it because it does not
-		// set up the error handling state fully, so you get an NPE instead of an informative error on things like syntax errors.
-		String query = new String(Files.readAllBytes(Paths.get(file)));
-		return parse(query);
-	}
-
-	/**
-	 * Parse a SQL source string.
-	 * @param query the SQL source string
-	 * @return the parsed statement(s) as a List<Statement>
-	 */
-	public static List<Statement> parse(String query) throws Exception {
-		return new SqlppParserFactory().createParser(query).parse();
+	private static void outputResult(String parsed, String arg) throws IOException {
+		File output = new File(arg.substring(0, arg.lastIndexOf('.')) +".p.s-sql");
+		PrintWriter wtr = new PrintWriter(new FileWriter(output));
+		wtr.println(parsed);
+		wtr.close();
 	}
 }

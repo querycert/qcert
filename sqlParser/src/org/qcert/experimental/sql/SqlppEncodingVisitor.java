@@ -117,7 +117,10 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		opNameMap.put(OperatorType.DIV, "divide");
 		opNameMap.put(OperatorType.MUL, "multiply");
 		opNameMap.put(OperatorType.IN, "isIn");
+		opNameMap.put(OperatorType.MINUS, "subtract");
+		opNameMap.put(OperatorType.PLUS, "add");
 		// TODO the rest of these
+
 		unaryExprMap.put(UnaryExprType.EXISTS, "exists");
 		// TODO the rest of these
 	}
@@ -140,9 +143,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			if (lit.getValue().toString().equals("1"))
 				args = Collections.emptyList();
 		}
-		// The following is needed because AsterixDB treats "not" as a function
-		if (name.equals("not") && args.size() == 1)
-			return handleNot(args.get(0), builder);
+		// The following special cases are needed because AsterixDB treats "not" as a function and because we turn
+		// generic typed literals for dates and intervals (durations) into functions in keeping with AsterixDB practice.
+		if (args.size() == 1)
+			switch (name) {
+			case "not": 
+				return handleNot(args.get(0), builder);
+			case "date":
+				return handleDate(args.get(0), builder);
+			case "duration":
+				return handleDuration(args.get(0), builder);
+			default:
+				break;
+			}
 		builder = builder.append("(function ");
 		builder = appendString(name, builder);
 		for (Expression arg : args)
@@ -151,10 +164,29 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(CaseExpression caseExpression, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(CaseExpression node, StringBuilder builder) throws CompilationException {
+		builder.append("(cases ");
+		List<Expression> whens = node.getWhenExprs();
+		List<Expression> thens = node.getThenExprs();
+		Expression defaultValue = node.getElseExpr();
+		assert whens.size() == thens.size();
+		Iterator<Expression> thenIter = thens.iterator();
+		for (Expression when : node.getWhenExprs()) {
+			Expression then = thenIter.next();
+			builder = builder.append("(case (when ");
+			builder = when.accept(this,  builder);
+			builder = builder.append(") (then ");
+			builder = then.accept(this, builder);
+			builder = builder.append(")) ");
+		}
+		if (defaultValue != null) {
+			builder = builder.append("(default ");
+			builder = defaultValue.accept(this, builder);
+			builder = builder.append(")");
+		}
+		return builder.append(") ");
 	}
-
+	
 	@Override
 	public StringBuilder visit(CompactStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -265,7 +297,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			builder = expr.accept(this, builder);
 		return aliased ? builder.append(") ") : builder;
 	}
-	
+
 	@Override
 	public StringBuilder visit(FunctionDecl fd, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -275,7 +307,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	public StringBuilder visit(FunctionDropStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
 	}
-
+	
 	@Override
 	public StringBuilder visit(GroupbyClause node, StringBuilder builder) throws CompilationException {
 		if (node.hasDecorList())
@@ -399,7 +431,27 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			assert ops.size() > 0;
 			return visit(makeBinary(exprs, ops), builder);
 		}
+		/* Non-binary cases are handled individually.  Note that "unary" operators don't come to this method at all */
+		if (ops.size() == 1 && exprs.size() == 3 && ops.get(0) == OperatorType.BETWEEN)
+			return handleBetween(exprs.get(0), exprs.get(1), exprs.get(2), builder);
 		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary");
+	}
+
+	/**
+	 * Handling for the 'between' expression
+	 * @param expr the expression being tested
+	 * @param limit1 the first limit
+	 * @param limit2 the second limit
+	 * @param builder the builder
+	 * @return the builder
+	 * @throws CompilationException
+	 */
+	private StringBuilder handleBetween(Expression expr, Expression limit1, Expression limit2, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(isBetween ");
+		builder = expr.accept(this, builder);
+		builder = limit1.accept(this, builder);
+		builder = limit2.accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -656,6 +708,47 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	/**
+	 * Special handling for date literals appearing as calls to the function "date"
+	 * TODO in SQL++ the date function really is a function operating on strings in general, not just literals.  We should
+	 *   be processing this as a general conversion from String to date.
+	 * @param arg the argument to the apparent "date" function
+	 * @param builder the builder
+	 * @return the builder
+	 * @throws CompilationException
+	 */
+	private StringBuilder handleDate(Expression arg, StringBuilder builder) throws CompilationException {
+		if (arg.getKind() != Kind.LITERAL_EXPRESSION)
+			throw new UnsupportedOperationException("Not handling date constructors on non-literals");
+		builder = builder.append("(literal \"date\" ");
+		builder = arg.accept(this, builder);
+		return builder.append(")");
+	}
+
+	/**
+	 * Special handling for duration literals (confusingly called 'interval literals' by SQL but appearing as calls to the
+	 *  function "duration"
+	 * TODO in SQL++ the duration function really is a function operating on strings in general, not just literals.  We should
+	 *   be processing this as a general conversion from String to duration
+	 * @param arg the argument to the apparent "duration" function
+	 * @param builder the builder
+	 * @return the builder
+	 * @throws CompilationException
+	 */
+	private StringBuilder handleDuration(Expression arg, StringBuilder builder) throws CompilationException {
+		if (arg.getKind() != Kind.LITERAL_EXPRESSION)
+			throw new UnsupportedOperationException("Not handling duration constructors on non-literals");
+		String lit = ((LiteralExpr) arg).getValue().getStringValue();
+		char first = lit.charAt(0);
+		char last = lit.charAt(lit.length() - 1);
+		if (first != 'P' || last != 'D' && last != 'M' && last != 'Y')
+			throw new UnsupportedOperationException("Ill-formed duration literal: " + lit);
+		String tag = last == 'D' ? "(day)" : last == 'M' ? "(month)" : "(year)";  
+		builder = builder.append("(interval ");
+		builder = appendString(lit.substring(1, lit.length() - 1), builder);
+		return builder.append(tag).append(")");
+	}
+
+	/**
 	 * Handle the case of a "not" appearing as a function call
 	 * @param expression the expression that is the argument to the apparent function call
 	 * @param builder the builder
@@ -672,17 +765,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	 * This should not produce false positives.  It uses heuristics to find obvious cases only.
 	 */
 	private boolean isDate(Expression maybeDate) {
-		/* Look for date literals, since they are obviously dates */
-		// TODO it appears AsterixDB doesn't support date literals
-//		if (maybeDate instanceof GenericLiteral)
-//			return ((GenericLiteral) maybeDate).getType().equalsIgnoreCase("date");
 		/* Look for functions with method name date_plus or date_minus since these produce dates (and resulted from
-		 *  heuristic type inference on children).
+		 *  heuristic type inference on children).  Also, look for functions with method name "date" since that is how
+		 *  a date literal is expressed after lexical fixups and parsing by AsterixDB SQL++.
 		 */
 		if (maybeDate.getKind() == Kind.CALL_EXPRESSION)
 			switch(((CallExpr) maybeDate).getFunctionSignature().getName()) {
 			case "date_plus":
 			case "date_minus":
+			case "date":
 				return true;
 			}
 		/* if the date name heuristic is enabled and the expression is a ref or deref of a name, apply that heuristic */
@@ -704,15 +795,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return false;
 	}
 
-	/** Heuristic type inference: determine if an Expression has type 'date interval'.
+	/** Heuristic type inference: determine if an Expression has type 'date interval' (or "duration")
 	 * This should not produce false positives.  It uses heuristics to find obvious cases only.
 	 */
 	private boolean isDateInterval(Expression maybeInterval) {
-		/* Look for interval literals, since they are obviously intervals */
-		// TODO AsterixDB doesn't seem to support date intervals
-		return false;
-//		return maybeInterval instanceof IntervalLiteral;
-		/* That's all for now */
+		/* Look for function call with the name "duration" since this is how durations are expressed after lexical
+		 * fixup and parsing by AsterixDB SQL++
+		 */
+		return maybeInterval.getKind() == Kind.CALL_EXPRESSION && ((CallExpr) maybeInterval).getFunctionSignature().getName().equals("date");
 	}
 
 	/**
