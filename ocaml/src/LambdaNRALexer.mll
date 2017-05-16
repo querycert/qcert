@@ -25,6 +25,8 @@
       List.iter (fun (key, data) -> Hashtbl.add tbl key data)
 	[ ("null",NULL);
 	  ("struct",STRUCT);
+	  ("not",NOT);
+	  ("avg",AVG);
 	]; tbl
     end
     

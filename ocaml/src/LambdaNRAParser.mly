@@ -54,7 +54,7 @@
 %token <string> STRING
 %token <string> IDENT
 
-%token OR AND NOT
+%token OR AND NOT AVG
 %token STRUCT
 %token EQUAL NEQUAL EQUALGT
 %token GT LT
@@ -69,7 +69,7 @@
 %right PLUS MINUS
 %right AND OR
 %right STAR
-%left NOT DOT ARROW
+%left DOT ARROW
 
 %start <Compiler.EnhancedCompiler.QLambdaNRA.expr> main
 
@@ -109,12 +109,14 @@ expr:
     { QLambdaNRA.ladot (Util.char_list_of_string a) e }
 | e = expr ARROW a = IDENT
     { QLambdaNRA.laarrow (Util.char_list_of_string a) e }
+| e = expr DOT AVG LPAREN RPAREN
+    { QLambdaNRA.launop QOps.Unary.aarithmean e }
 | STRUCT LPAREN r = reclist RPAREN
     { QLambdaNRA.lastruct r }
 | e = expr DOT a = IDENT LPAREN el=params RPAREN
     { resolve_nra_operator a el e }
 (* Unary operators *)
-| NOT e1 = expr
+| NOT LPAREN e1 = expr RPAREN
     { QLambdaNRA.launop QOps.Unary.aneg e1 }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr

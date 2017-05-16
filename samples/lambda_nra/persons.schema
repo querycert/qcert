@@ -7,7 +7,8 @@
       "type" : { "$coll" : { "pid" : "Nat" ,
 			     "name" : "String",
 			     "age" : "Nat",
-			     "company" : "Nat" } } },
+			     "company" : "Nat",
+			     "salary" : "Nat" } } },
     "Companies" :
     { "dist" : "distr",
       "type" : { "$coll" : { "cid" : "Nat" ,
