@@ -1,6 +1,6 @@
 /* Example of simple select-from-where */
 
 select p
-from p in Persons
-where p.age = 32
+from p in Customers
+where p->age = 32
 

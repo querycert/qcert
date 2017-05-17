@@ -1,6 +1,6 @@
-/* Example of simple select-from-where */
+/* Example of order by */
 
 select p
-from p in Persons
-order by p.age
+from p in Customers
+order by p->age
 

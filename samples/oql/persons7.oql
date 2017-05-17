@@ -1,0 +1,9 @@
+define view as
+  select struct(name:c->name, purchased: p->name)
+  from c in Clients,
+       p in Purchases
+  where p->cid = c->id;
+
+select x.name
+from x in view
+where x.purchased = "Tomatoe"

@@ -1,6 +1,6 @@
 /* Example with distinct */
 
 select distinct d
-from c in Companies,
-     d in c.departments
+from c in Marketers,
+     d in c->clients
 

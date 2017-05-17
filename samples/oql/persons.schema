@@ -1,16 +1,29 @@
-{ "hierarchy": [],
-  "brandTypes" :[],
-  "typeDefs" :[],
-  "globals" :
-  { "Persons" :
-    { "dist" : "distr",
-      "type" : { "$coll" : { "pid" : "Nat" ,
-			     "name" : "String",
-			     "age" : "Nat",
-			     "company" : "Nat" } } },
-    "Companies" :
-    { "dist" : "distr",
-      "type" : { "$coll" : { "cid" : "Nat" ,
-			     "cname" : "String",
-			     "departments" : { "$coll" : "String" } } } }
-  } }
+{ 
+    "inheritance": [{"sub":"Purchase", "sup":"Object"},
+		    {"sub":"Customer", "sup":"Object"},
+		    {"sub":"Marketer", "sup":"Object"},
+		    {"sub":"ProductRep", "sup":"Marketer"},
+		    {"sub":"ProductRep", "sup":"Object"},
+		    {"sub":"Product", "sup":"Object"},
+		    {"sub":"Client", "sup":"Object"}],
+    "model": {"modelName": "testing",
+	      "brandTypes" :[{ "brand":"Object", "typeName":"tests_Object"},
+			     { "brand":"Customer", "typeName":"tests_entities_Customer"},
+			     { "brand":"Purchase", "typeName":"tests_entities_Purchase"},
+			     { "brand":"Client", "typeName":"tests_branding_Client"},
+			     { "brand":"Marketer", "typeName":"tests_branding_Marketer"},
+			     { "brand":"Product", "typeName":"tests_branding_Product"},
+			     { "brand":"ProductRep", "typeName":"tests_branding_ProductRep"}],
+	      "typeDefs" :[{ "typeName": "tests_Object", "typeDef": { }},
+			   { "typeName": "tests_entities_Customer", "typeDef": { "cid": "Nat", "age": "Nat", "name": "String"}},
+			   { "typeName": "tests_entities_Purchase", "typeDef": { "cid": "Nat", "pid": "Nat", "name": "String", "quantity": "Nat"}},
+			   { "typeName": "tests_branding_Client", "typeDef": { "capitalization": "Nat", "name": "String", "id": "String"}},
+			   { "typeName": "tests_branding_Marketer", "typeDef": { "clients": { "$coll" : "String"}, "name": "String", "id": "Nat"}},
+			   { "typeName": "tests_branding_Product", "typeDef": { "name": "String", "client": "String", "id": "String"}},
+			   { "typeName": "tests_branding_ProductRep", "typeDef": { "clients": { "$coll" : "String"}, "name": "String", "id": "String", "products": { "$coll" : "String"}}}],
+	      "globals" :
+	      { "Products" : { "dist" : "distr", "type" : { "$coll" : { "$brand" : ["Product"] } } },
+		"Marketers" : { "dist" : "distr", "type" : { "$coll" : { "$brand" : ["Marketer"] } } },
+		"Purchases" : { "dist" : "distr", "type" : { "$coll" : { "$brand" : ["Purchase"] } } } }
+	     }
+}

@@ -1,11 +1,12 @@
-/* Example of simple select-from-where */
+/* Example of view definition, including dropping a view */
 
-define t as Persons;
+define t as Clients;
 
-define s as select struct(name:p.name, worksfor: c.cname)
-from c in Companies,
-     p in t
-where p.company = c.cid;
+define s as select struct(name:c->name, purchased: p->name)
+from c in t,
+     p in Purchases
+where p->cid = c->id
+;
 
 undefine t;
 
