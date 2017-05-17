@@ -15,7 +15,6 @@
  */
 package org.qcert.experimental.sql;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,13 +27,8 @@ import org.apache.asterix.lang.sqlpp.parser.Token;
  */
 public class FixupDateLiterals implements LexicalFixup {
 
-	/* (non-Javadoc)
-	 * @see org.qcert.experimental.sql.LexicalFixup#apply(java.util.List)
-	 */
 	@Override
-	public List<Token> apply(List<Token> inputList) {
-		List<Token> output = new ArrayList<>();
-		Iterator<Token> tokens = inputList.iterator();
+	public void apply(Iterator<Token> tokens, List<Token> output) {
 		while (tokens.hasNext()) {
 			Token tok = tokens.next();
 			if (tokens.hasNext() && tok.image.equalsIgnoreCase("date")) {
@@ -57,7 +51,6 @@ public class FixupDateLiterals implements LexicalFixup {
 			} else
 				output.add(tok);
 		}
-		return output;
 	}
 
 	public Unit getUnit(Token possible) {

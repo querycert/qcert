@@ -109,17 +109,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	private static final EnumMap<UnaryExprType, String> unaryExprMap = new EnumMap<>(UnaryExprType.class);
 	static {
 		opNameMap.put(OperatorType.GT, "greater_than");
+		opNameMap.put(OperatorType.GE, "greater_than_or_equal");
 		opNameMap.put(OperatorType.LT, "less_than");
+		opNameMap.put(OperatorType.LE, "less_than_or_equal");
 		opNameMap.put(OperatorType.EQ, "equal");
 		opNameMap.put(OperatorType.NEQ, "not_equal");
 		opNameMap.put(OperatorType.AND, "and");
+		opNameMap.put(OperatorType.OR, "or");
 		opNameMap.put(OperatorType.LIKE, "like");
 		opNameMap.put(OperatorType.DIV, "divide");
 		opNameMap.put(OperatorType.MUL, "multiply");
 		opNameMap.put(OperatorType.IN, "isIn");
 		opNameMap.put(OperatorType.MINUS, "subtract");
 		opNameMap.put(OperatorType.PLUS, "add");
-		opNameMap.put(OperatorType.OR, "or");
 		// TODO the rest of these
 
 		unaryExprMap.put(UnaryExprType.EXISTS, "exists");
@@ -383,8 +385,13 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(ListConstructor lc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(ListConstructor node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(list ");
+		for (Expression e : node.getExprList()) {
+			builder = e.accept(this,  builder);
+		}
+		return builder.append(") ");
+
 	}
 
 	@Override
