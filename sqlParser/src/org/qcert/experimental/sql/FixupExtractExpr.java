@@ -15,6 +15,7 @@
  */
 package org.qcert.experimental.sql;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,58 +23,58 @@ import org.apache.asterix.lang.sqlpp.parser.Token;
 
 /**
  * Lexical fixup for expressions of the form extract(<unit> from <expr>).  If <unit> is one of year, month or day, we use the builtin
- * AsterixDB functions get_year, get_month, or get_day instead with the single argument <expr>.
+ * AsterixDB functions get_year, get_month, or get_day instead with the single argument <expr>.  Note that <expr> can consist of
+ * multiple tokens.  We make the simplifying assumption that parenthesis matching will suffice to find the end.  That might not
+ * be foolproof.
  */
 public class FixupExtractExpr implements LexicalFixup {
-
 	@Override
 	public void apply(Iterator<Token> tokens, List<Token> output) {
 		while (tokens.hasNext()) {
+			List<Token> accum = new ArrayList<>();
 			Token tok = tokens.next();
-			if (tok.image.equalsIgnoreCase("extract")) {
-				int index = 0;
-				Token[] pattern = new Token[5];
-				while (index < 5 && tokens.hasNext())
-					pattern[index++] = tokens.next();
-				if (index == 5 && pattern[0].kind == LEFTPAREN && pattern[4].kind == RIGHTPAREN && pattern[2].kind == FROM) {
-					String functionName;
-					switch (LexicalFixup.getUnit(pattern[1])) {
-					case D:
-						functionName = "get_day";
-						break;
-					case M:
-						functionName = "get_month";
-						break;
-					case Y:
-						functionName = "get_year";
-						break;
-					default:
-						functionName = null;
-						break;
-					}
-					if (functionName != null) {
-						Token function = LexicalFixup.makeToken(IDENTIFIER, functionName, tok.beginLine, tok.beginColumn, tok.endLine, 
-								tok.beginColumn + functionName.length());
-						output.add(function);
-						output.add(pattern[0]); // (
-						output.add(pattern[3]); // <expr>
-						output.add(pattern[4]); // )
-						continue;
+			accum.add(tok);
+			if (tok.image.equalsIgnoreCase("extract") && tokens.hasNext()) {
+				Token maybeOpen = tokens.next();
+				accum.add(maybeOpen);
+				if (maybeOpen.kind == LEFTPAREN && tokens.hasNext()) {
+					Token maybeUnit = tokens.next();
+					accum.add(maybeUnit);
+					Unit unit = LexicalFixup.getUnit(maybeUnit);
+					if (unit != null) {
+						Token maybeFrom = tokens.next();
+						accum.add(maybeFrom);
+						if (maybeFrom.kind == FROM) {
+							List<Token> exprAndClose = LexicalFixup.getExprAndClose(tokens, accum, RIGHTPAREN);
+							if (exprAndClose != null) {
+								String functionName;
+								switch (unit) {
+								case D:
+									functionName = "get_day";
+									break;
+								case M:
+									functionName = "get_month";
+									break;
+								case Y:
+									functionName = "get_year";
+									break;
+								default:
+									throw new IllegalStateException();
+								}
+								Token function = LexicalFixup.makeToken(IDENTIFIER, functionName, tok.beginLine, tok.beginColumn, tok.endLine, 
+										tok.beginColumn + functionName.length());
+								output.add(function);
+								output.add(maybeOpen);
+								output.addAll(exprAndClose);
+								continue;
+							}
+						}
 					}
 				}
-				// Here if we fail to match the expected pattern
-				output.add(tok);
-				for (Token pat : pattern) {
-					if (pat == null)
-						break;
-					output.add(pat);
-				}
-			} else
-				output.add(tok);
+			}
+			// Here on failure to match pattern
+			for (Token restore : accum)
+				output.add(restore);
 		}
-	}
-
-	public Unit getUnit(Token possible) {
-		return null;
 	}
 }

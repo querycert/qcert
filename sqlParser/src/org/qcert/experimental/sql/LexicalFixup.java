@@ -33,7 +33,10 @@ public interface LexicalFixup extends SQLPPParserConstants {
 			new FixupDateLiterals(),
 			new FixupIntervalLiterals(),
 			new FixupExtractExpr(),
-			new FixupInListConstructor()
+			new FixupInListConstructor(),
+			new FixupValueKeyword(),
+			new FixupSubstring(),
+			new FixupDistinct()
 			// Add more fixups here
 	);
 
@@ -60,6 +63,88 @@ public interface LexicalFixup extends SQLPPParserConstants {
 		throw new IllegalStateException("One of the two 'apply' methods must have a non-default implementation");
 	}
 	
+	/**
+	 * Provides a rough 'parse' in the absence of a real parsing grammar.  If there is a sequence of tokens, with balanced
+	 *   parentheses, brackets, and braces, ending in a token of a particular kind, return it.  Otherwise, return null.
+	 * Because this method is so permissive, it will only return null if all tokens are exhausted.  This can suppress finding
+	 *   other occurrances of the fixup that calls this method.  Thus, this method should be called only when a fixup has been
+	 *   identified with high probability and successful termination is highly likely.
+	 * In any case (whether a List is returned or null) echo all consumed tokens in the 'accum' argument, allowing recovery.
+	 * @param tokens the token stream, positioned at the start of the 'parse'
+	 * @param accum the place to echo all consumed tokens
+	 * @param closeTokenKind the kind of token that closes the sequence
+	 * @return an expsression in the form of a list of tokens or null
+	 */
+	public static List<Token> getExprAndClose(Iterator<Token> tokens, List<Token> accum, int closeTokenKind) {
+		int parenCount = 0, bracketCount = 0, braceCount = 0;
+		List<Token> answer = new ArrayList<>();
+		while (tokens.hasNext()) {
+			Token tok = tokens.next();
+			accum.add(tok);
+			answer.add(tok);
+			if (tok.kind == closeTokenKind && parenCount == 0 && bracketCount == 0 && braceCount == 0) {
+				return answer;
+			}
+			switch (tok.kind) {
+			case LEFTPAREN:
+				parenCount++;
+				break;
+			case LEFTBRACKET:
+				bracketCount++;
+				break;
+			case LEFTBRACE:
+				braceCount++;
+				break;
+			case RIGHTPAREN:
+				parenCount--;
+				break;
+			case RIGHTBRACKET:
+				bracketCount--;
+				break;
+			case RIGHTBRACE:
+				braceCount--;
+				break;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Test whether a list of tokens has a particular kind of token at "top level" (not nested in parens, brackets or braces)
+	 * @param toExamine the list to examine
+	 * @param tokenKind the kind of token we are looking for
+	 * @return true if the token kind exists at top level
+	 */
+	public static boolean hasTopLevel(List<Token> toExamine, int tokenKind) {
+		int parenCount = 0, bracketCount = 0, braceCount = 0;
+		for (Token tok : toExamine) {
+			if (tok.kind == tokenKind && parenCount == 0 && bracketCount == 0 && braceCount == 0) {
+				return true;
+			}
+			switch (tok.kind) {
+			case LEFTPAREN:
+				parenCount++;
+				break;
+			case LEFTBRACKET:
+				bracketCount++;
+				break;
+			case LEFTBRACE:
+				braceCount++;
+				break;
+			case RIGHTPAREN:
+				parenCount--;
+				break;
+			case RIGHTBRACKET:
+				bracketCount--;
+				break;
+			case RIGHTBRACE:
+				braceCount--;
+				break;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Convert a possible unit (year / month /day) into an actual unit or null if the text is not a unit
 	 * @param possible the Token that might be a unit

@@ -34,72 +34,38 @@ public class FixupInListConstructor implements LexicalFixup {
 	@Override
 	public void apply(Iterator<Token> tokens, List<Token> output) {
 		while (tokens.hasNext()) {
+			List<Token> accum = new ArrayList<>();
 			Token tok = tokens.next();
+			accum.add(tok);
 			if (tok.kind == IN && tokens.hasNext()) {
 				Token start = tokens.next();
+				accum.add(start);
 				if (start.kind == LEFTPAREN && tokens.hasNext()) {
-					/* Get a list, but only if it looks like a real list (with comma separators) */
-					List<Token> list = new ArrayList<>();
-					Token end = getList(tokens, list);
-					if (end != null) {
+					/* Get a list of tokens terminated by close paren; if this fails, bail */
+					List<Token> listBalance = LexicalFixup.getExprAndClose(tokens, accum, RIGHTPAREN);
+					if (listBalance == null) {
+						output.addAll(accum);
+						return;
+					}
+					/* See if the list contains a comma at top level */ 
+					if (LexicalFixup.hasTopLevel(listBalance, COMMA)) {
+						/* Looks enough like the kind of list we want, so proceed */
 						start.kind = LEFTBRACKET;
 						start.image = "[";
+						Token end = listBalance.get(listBalance.size() - 1);
 						end.kind = RIGHTBRACKET;
 						end.image = "]";
-					}						
-					// Both for success and failure, we flush all the tokens we have			
+					}
+					/* In any case, put the tokens we are holding back */
 					output.add(tok);
 					output.add(start);
-					output.addAll(list);
-					if (end != null)
-						output.add(end);
-					continue;
+					output.addAll(listBalance);
 				} else {
 					output.add(tok);
 					output.add(start);
-					continue;
 				}
 			} else
 				output.add(tok);
 		}
-	}
-
-	/**
-	 * Subroutine to get a list of tokens that form a valid paren-seperated list of expressions
-	 * @param tokens the Token stream in its current state (with 'in (' havin already been consumed)
-	 * @param list a list in which to put either the list contents (on success) or Tokens to be passed through (on failure)
-	 * @return the close paren token on success or null on failure
-	 */
-	private Token getList(Iterator<Token> tokens, List<Token> list) {
-		// TODO It is actually impractical to check whether this is really a valid list without building an actual AST with knowledge of the
-		// grammar.  Most generally, the elements of the list can themselves be arbitrary expressions containing parentheses and commas.  
-		// Here we accept only lists whose elements are literals or identifiers (single tokens).  That way, we succeed in the most common
-		// case and at least do no extra harm in the more exotic cases.  I'm not actually sure what standard SQL accepts as list elements
-		// anyway (since it isn't a truly expression-oriented language).
-		boolean testing = true;
-		Token current = null;
-		Token last = null;
-		while (testing) {
-			current = tokens.next();
-			switch (current.kind) {
-			case IDENTIFIER:
-			case INTEGER_LITERAL:
-			case STRING_LITERAL:
-			case DOUBLE_LITERAL:
-			case FLOAT_LITERAL:
-				list.add(current);
-				current = tokens.next();
-				testing = current.kind == COMMA;
-				if (testing)
-					list.add(current);
-				else
-					last = current;
-				break;
-			default:
-				list.add(current);
-				testing = false;
-			}
-		}
-		return (last != null && last.kind == RIGHTPAREN) ? last : null;
 	}
 }

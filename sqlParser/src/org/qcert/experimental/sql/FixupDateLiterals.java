@@ -57,4 +57,8 @@ public class FixupDateLiterals implements LexicalFixup {
 		return null;
 	}
 
+	public List<Token> getExprAndClose(Iterator<Token> tokens, List<Token> accum, int closeTokenKind) {
+		return null;
+	}
+
 }

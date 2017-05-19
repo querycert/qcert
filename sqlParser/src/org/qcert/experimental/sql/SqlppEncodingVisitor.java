@@ -106,6 +106,7 @@ import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
 
 public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
 	private static final EnumMap<OperatorType, String> opNameMap = new EnumMap<>(OperatorType.class);
+	private static final EnumMap<OperatorType, OperatorType> negations = new EnumMap<>(OperatorType.class);
 	private static final EnumMap<UnaryExprType, String> unaryExprMap = new EnumMap<>(UnaryExprType.class);
 	static {
 		opNameMap.put(OperatorType.GT, "greater_than");
@@ -123,6 +124,10 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		opNameMap.put(OperatorType.MINUS, "subtract");
 		opNameMap.put(OperatorType.PLUS, "add");
 		// TODO the rest of these
+		
+		negations.put(OperatorType.NOT_BETWEEN, OperatorType.BETWEEN);
+		negations.put(OperatorType.NOT_IN, OperatorType.IN);
+		negations.put(OperatorType.NOT_LIKE, OperatorType.LIKE);
 
 		unaryExprMap.put(UnaryExprType.EXISTS, "exists");
 		// TODO the rest of these
@@ -443,21 +448,31 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			if (alternative != null)
 				return alternative.accept(this, builder);
 			// Otherwise, proceed with the normal case, which involves either 2 or 3 operands.  3 operand cases are handled
-			// individually.
-			if (exprs.size() == 3 && ops.get(0) == OperatorType.BETWEEN)
-				return handleBetween(exprs.get(0), exprs.get(1), exprs.get(2), builder);
-			else if (exprs.size() == 2)
-				return processBinaryOperator(ops.get(0), exprs.get(0), exprs.get(1), builder);
-			// else 3 exprs but not handled by the case logic; fall through to unsupported
+			// individually.  First we look at negation.
+			boolean negated = false;
+			OperatorType op = ops.get(0);
+			OperatorType positive = negations.get(op);
+			if (positive != null) {
+				op = positive;
+				negated = true;
+				builder = builder.append("(not ");
+			}
+			if (exprs.size() == 3 && op == OperatorType.BETWEEN) {
+				builder = handleBetween(exprs.get(0), exprs.get(1), exprs.get(2), builder);
+				return negated ? builder.append(") ") : builder;
+			} else if (exprs.size() == 2) {
+				builder = processBinaryOperator(op, exprs.get(0), exprs.get(1), builder);
+				return negated ? builder.append(") ") : builder;
+			} // else 3 exprs but not handled by the case logic; fall through to unsupported
 		}
 		else if (exprs.size() - ops.size() == 1) {
 			// This case is for chains of binary operators under associativity
 			assert ops.size() > 0;
 			return visit(makeBinary(exprs, ops), builder);
 		}
-		/* Here we arrive when we have no handling for binary or n-ary cases.  
+		/* Here we arrive when we have no handling for binary or n-ary (n > 1) cases.  
 		 * Note that "unary" operators don't come to this method at all */
-		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary or ternary");
+		throw new UnsupportedOperationException("Not yet handling operator expressions that aren't binary or 'between'");
 	}
 
 	@Override
@@ -1009,7 +1024,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	/**
-	 * Process a binary operation whose verb has been identified.  Localizes any per-operator special handling required
+	 * Process a binary operation whose verb has been identified and that can be handled in a standard way.
 	 * @param operator the operator
 	 * @param operand1 the first operand		
 	 * @param operand2 the second operand	
