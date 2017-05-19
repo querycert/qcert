@@ -14,23 +14,23 @@
  * limitations under the License.
  *)
 
-Section DesignRuletoCAMP.
-
+Section DesignRuletoCAMPRule.
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import BasicRuntime.
   Require Import DesignRuleRuntime.
-  Require Import CAMPRuntime.
+  Require Import CAMPRuleRuntime.
   
   Section Top.
     Context {fr:foreign_runtime}.
 
-    (** Note: Translation from Design Rules to CAMP is done in Java *)
-    Definition designer_rule_to_camp_top (q:designer_rule) : camp := designer_rule_to_camp q.
+    (** Note: Translation from Design Rules to CAMP Rule is done in Java *)
+    Definition designer_rule_to_camp_rule_top (q:designer_rule) : camp_rule :=
+      designer_rule_to_camp_rule q.
   End Top.
     
-End DesignRuletoCAMP.
+End DesignRuletoCAMPRule.
 
 (* 
 *** Local Variables: ***

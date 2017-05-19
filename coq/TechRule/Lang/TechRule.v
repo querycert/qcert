@@ -14,18 +14,24 @@
  * limitations under the License.
  *)
 
-(* This file defines  *)
-Section TechRule.
+(** TechRule stands for ODM technical rules. This is merely a
+place-holder since the source language is effectively parsed in
+Java. *)
 
-  (* begin hide *)
-  Require Import Utils BasicRuntime.
-  Require Export CAMP.
-  (* end hide *)
+(** Summary:
+- Language: TechRule (Technical Rules)
+- translating to TechRule:
+- translating from TechRule: CAMPRule *)
+
+Section TechRule.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Export CAMPRuleRuntime.
 
   Context {fruntime:foreign_runtime}.
 
   Axiom tech_rule : Set.
-  Axiom tech_rule_to_camp : tech_rule -> camp.
+  Axiom tech_rule_to_camp_rule : tech_rule -> camp_rule.
 
 End TechRule.
 

@@ -14,23 +14,23 @@
  * limitations under the License.
  *)
 
-Section TechRuletoCAMP.
-
+Section TechRuletoCAMPRule.
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import BasicRuntime.
   Require Import TechRuleRuntime.
-  Require Import CAMPRuntime.
+  Require Import CAMPRuleRuntime.
   
   Section Top.
     Context {fr:foreign_runtime}.
 
-    (** Note: Translation from Tech Rules to CAMP is done in Java *)
-    Definition tech_rule_to_camp_top (q:tech_rule) : camp := tech_rule_to_camp q.
+    (** Note: Translation from Tech Rules to CAMP Rule is done in Java *)
+    Definition tech_rule_to_camp_rule_top (q:tech_rule) : camp_rule :=
+      tech_rule_to_camp_rule q.
   End Top.
     
-End TechRuletoCAMP.
+End TechRuletoCAMPRule.
 
 (* 
 *** Local Variables: ***

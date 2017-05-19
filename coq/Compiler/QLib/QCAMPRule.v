@@ -19,29 +19,29 @@ Require String.
 Require QOperators QData QCAMP.
 Require CAMPRuleRuntime.
 
-Module QRule(runtime:CompilerRuntime).
+Module QCAMPRule(runtime:CompilerRuntime).
 
   Module Data := QData.QData runtime.
   Module Ops := QOperators.QOperators runtime.
   Module CAMP := QCAMP.QCAMP runtime.
 
-  Definition rule : Set 
+  Definition camp_rule : Set 
     := CAMPRule.camp_rule.
   Definition t : Set 
-    := rule.
+    := camp_rule.
   
-  Definition rule_when : CAMP.camp -> rule -> rule 
+  Definition rule_when : CAMP.camp -> camp_rule -> camp_rule 
     := CAMPRule.rule_when.
-  Definition rule_global : CAMP.camp -> rule -> rule 
+  Definition rule_global : CAMP.camp -> camp_rule -> camp_rule 
     := CAMPRule.rule_global.
-  Definition rule_not : CAMP.camp -> rule -> rule 
+  Definition rule_not : CAMP.camp -> camp_rule -> camp_rule 
     := CAMPRule.rule_not.
-  Definition rule_return : CAMP.camp -> rule 
+  Definition rule_return : CAMP.camp -> camp_rule 
     := CAMPRule.rule_return.
-  Definition rule_match : CAMP.camp -> rule 
+  Definition rule_match : CAMP.camp -> camp_rule 
     := CAMPRule.rule_match.
 
-  Definition aggregate : (rule -> rule) -> Ops.Unary.op -> CAMP.camp -> nat -> CAMP.camp
+  Definition aggregate : (camp_rule -> camp_rule) -> Ops.Unary.op -> CAMP.camp -> nat -> CAMP.camp
     := CAMPRuleSugar.aggregate.
 
   Definition instanceOf : String.string -> BrandRelation.brands -> CAMP.camp -> CAMP.camp
@@ -53,7 +53,7 @@ Module QRule(runtime:CompilerRuntime).
   Definition fetchRef : BrandRelation.brands -> String.string -> String.string -> CAMP.camp -> CAMP.camp -> CAMP.camp
     := CAMPRuleSugar.fetchRef.
 
-End QRule.
+End QCAMPRule.
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***

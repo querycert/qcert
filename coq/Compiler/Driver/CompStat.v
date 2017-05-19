@@ -345,9 +345,9 @@ Section CompStat.
   Definition stat_tree_tech_rule (q:tech_rule) : data :=
     match stat_tech_rule q with
     | drec l =>
-      let (t_camp, q_camp) := time tech_rule_to_camp q in
-      drec (l ++ ("tech_rule_to_camp", stat_tree_camp q_camp)
-              :: ("tech_rule_to_camp", dstring t_camp)
+      let (t_camp_rule, q_camp_rule) := time tech_rule_to_camp_rule q in
+      drec (l ++ ("tech_rule_to_camp_rule", stat_tree_camp_rule q_camp_rule)
+              :: ("tech_rule_to_camp_rule", dstring t_camp_rule)
               :: nil)
     | s => s
     end.
@@ -355,9 +355,9 @@ Section CompStat.
   Definition stat_tree_designer_rule (q:designer_rule) : data :=
     match stat_designer_rule q with
     | drec l =>
-      let (t_camp, q_camp) := time designer_rule_to_camp q in
-      drec (l ++ ("designer_rule_to_camp", stat_tree_camp q_camp)
-              :: ("designer_rule_to_camp", dstring t_camp)
+      let (t_camp_rule, q_camp_rule) := time designer_rule_to_camp_rule q in
+      drec (l ++ ("designer_rule_to_camp_rule", stat_tree_camp_rule q_camp_rule)
+              :: ("designer_rule_to_camp_rule", dstring t_camp_rule)
               :: nil)
     | s => s
     end.

@@ -114,29 +114,29 @@ campmain:
 
 rule:
 | p = camp (* This allows pure CAMP tests to be compiled as rules *)
-    { QRule.rule_match p }
+    { QCAMPRule.rule_match p }
 | RULERETURN p = camp
-    { QRule.rule_return p }
+    { QCAMPRule.rule_return p }
 | RULEWHEN p = camp SEMISEMI r = rule
-    { QRule.rule_when p r }
+    { QCAMPRule.rule_when p r }
 | RULENOT p = camp SEMISEMI r = rule
-    { QRule.rule_not p r }
+    { QCAMPRule.rule_not p r }
 | RULEGLOBAL p = camp SEMISEMI r = rule
-    { QRule.rule_global p r }
+    { QCAMPRule.rule_global p r }
 
 rule_rule:
 | RULEWHEN p = camp
-    { (fun r -> QRule.rule_when p r) }
+    { (fun r -> QCAMPRule.rule_when p r) }
 | RULENOT p = camp
-    { (fun r -> QRule.rule_not p r) }
+    { (fun r -> QCAMPRule.rule_not p r) }
 | RULEGLOBAL p = camp
-    { (fun r -> QRule.rule_global p r) }
+    { (fun r -> QCAMPRule.rule_global p r) }
 | RULEWHEN p = camp SEMISEMISEMI r = rule_rule 
-    { (fun r1 -> (QRule.rule_when p (r r1))) }
+    { (fun r1 -> (QCAMPRule.rule_when p (r r1))) }
 | RULENOT p = camp SEMISEMISEMI r = rule_rule
-    { (fun r1 -> (QRule.rule_not p (r r1))) }
+    { (fun r1 -> (QCAMPRule.rule_not p (r r1))) }
 | RULEGLOBAL p = camp SEMISEMISEMI r = rule_rule
-    { (fun r1 -> (QRule.rule_global p (r r1))) }
+    { (fun r1 -> (QCAMPRule.rule_global p (r r1))) }
 
 camp:
 (* Parenthesized pattern *)
@@ -206,13 +206,13 @@ camp:
     { QCAMP.pnull }
 (* INSTANCEOF, FETCH, and MATCHES temporarily have hacks because of signature changes in RuleSugar.v.  TODO fix this *)
 | n = STRING INSTANCEOF LBRACKET t = stringlist RBRACKET WHERE p = camp %prec UINSTANCE
-    { QRule.instanceOf (Util.char_list_of_string n) t p }
+    { QCAMPRule.instanceOf (Util.char_list_of_string n) t p }
 | p = camp TEMPVAR t = STRING FETCH LBRACKET e = stringlist RBRACKET KEY a = STRING DO pcont = camp %prec UFETCH
-    { QRule.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
+    { QCAMPRule.fetchRef e (Util.char_list_of_string a) (Util.char_list_of_string t) p pcont }
 | MATCHES LBRACKET t = stringlist RBRACKET WHERE p = camp %prec UINSTANCE
-    { QRule.matches t p }
+    { QCAMPRule.matches t p }
 | AGGREGATE r = rule_rule DO u = uop OVER p = camp FLATTEN f = INT
-    { QRule.aggregate r u p (Util.coq_Z_of_int f) }
+    { QCAMPRule.aggregate r u p (Util.coq_Z_of_int f) }
 | VARIABLES LBRACKET v = stringlist RBRACKET
     { QCAMP.returnVariables v }
 data:

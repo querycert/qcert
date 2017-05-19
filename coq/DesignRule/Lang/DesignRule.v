@@ -14,18 +14,24 @@
  * limitations under the License.
  *)
 
-(* This file defines  *)
-Section DesignRule.
+(** DesignerRule stands for ODM designer rules. This is merely a
+place-holder since the source language is effectively parsed in
+Java. *)
 
-  (* begin hide *)
-  Require Import Utils BasicRuntime.
-  Require Export CAMP.
-  (* end hide *)
+(** Summary:
+- Language: DesignerRule (Designer Rules)
+- translating to DesignerRule:
+- translating from DesignerRule: CAMPRule *)
+
+Section DesignRule.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Export CAMPRuleRuntime.
 
   Context {fruntime:foreign_runtime}.
 
   Axiom designer_rule : Set.
-  Axiom designer_rule_to_camp : designer_rule -> camp.
+  Axiom designer_rule_to_camp_rule : designer_rule -> camp_rule.
   
 End DesignRule.
 

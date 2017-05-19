@@ -27,10 +27,10 @@ Require Import TechRule DesignRule.
 
 Extract Constant Digits.nat_to_string10 => "(fun x -> Util.char_list_of_string (string_of_int x))".
 
-Extract Constant TechRule.tech_rule => "camp".
-Extract Constant DesignRule.designer_rule => "camp".
-Extract Constant TechRule.tech_rule_to_camp => "(fun fruntime x -> x)".
-Extract Constant DesignRule.designer_rule_to_camp => "(fun fruntime x -> x)".
+Extract Constant TechRule.tech_rule => "camp_rule".
+Extract Constant DesignRule.designer_rule => "camp_rule".
+Extract Constant TechRule.tech_rule_to_camp_rule => "(fun fruntime x -> x)".
+Extract Constant DesignRule.designer_rule_to_camp_rule => "(fun fruntime x -> x)".
 
 (* Qcert modules *)
 

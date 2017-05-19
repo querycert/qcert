@@ -66,10 +66,13 @@ let parse_cldmr_sexp_from_string s : QLang.cldmr = parse_string parse_cldmr_sexp
  *******************)
 
 let parse_tech_rule_from_string s : QLang.tech_rule =
-  parse_camp_sexp_from_string (JavaService.main "techRule2CAMP" s)
+  QCAMPRule.rule_match
+    (parse_camp_sexp_from_string
+       (JavaService.main "techRule2CAMP" s))
 let parse_designer_rule_from_string s : QLang.designer_rule =
-  parse_camp_sexp_from_string 
-    (JavaService.main "serialRule2CAMP" (B64.encode s))
+  QCAMPRule.rule_match
+    (parse_camp_sexp_from_string 
+       (JavaService.main "serialRule2CAMP" (B64.encode s)))
     
 let parse_query_from_string l s : string * QLang.query =
   begin match l with

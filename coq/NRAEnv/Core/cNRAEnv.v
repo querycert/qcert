@@ -193,7 +193,8 @@ Section cNRAEnv.
                                      (AApp (ARecEither "PDATA") nra_data)
                                      (AUnop (ARec "PBIND") nra_bind))
       | ANEitherConcat ea1 ea2 => AEitherConcat (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-      | ANApp ea1 ea2 => AApp (nra_of_nraenv_core ea1) (nra_wrap (nra_of_nraenv_core ea2))
+      | ANApp ea1 ea2 => AApp (nra_of_nraenv_core ea1)
+                              (nra_wrap (nra_of_nraenv_core ea2))
       | ANGetConstant s => AGetConstant s
       | ANEnv => nra_bind
       | ANAppEnv ea1 ea2 =>

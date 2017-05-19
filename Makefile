@@ -257,8 +257,8 @@ MODULES = \
 	Translation/NNRCMRtoCldMR \
 	Translation/DNNRCtotDNNRC \
 	Translation/CAMPRuletoCAMP \
-	Translation/TechRuletoCAMP \
-	Translation/DesignRuletoCAMP \
+	Translation/TechRuletoCAMPRule \
+	Translation/DesignRuletoCAMPRule \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \
@@ -299,7 +299,7 @@ MODULES = \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QCAMP \
-	Compiler/QLib/QRule \
+	Compiler/QLib/QCAMPRule \
 	Compiler/QLib/QOQL \
 	Compiler/QLib/QSQL \
 	Compiler/QLib/QLambdaNRA \
