@@ -62,13 +62,6 @@ tracking asterixdb changes.
 You should now have projects asterix-common, asterix-lang-common, and asterix-lang-sqlpp, which should build 
 under eclipse with no errors (plenty of warnings though).
 
-6.  Copy the file .classpath from this directory into its parent directory, replacing the .classpath that is
-there.  This WILL dirty your qcert working directory, so you should take care to revert .classpath in the
-parent directory before doing commits.
-
-Note: I will create a better config eventually, perhaps using a branch or perhaps isolating new code in a
-separate build and using a reflection barrier to choose dynamically between Presto and asterixDB.
-
-7.  If you don't already have the parent directory (sqlParser) as an Eclipse projet, import it.  You may need
-to import additional projects from qcert to allow it to build.  I am assuming you already ran the ant scripts
-in the various Java projects to grab their dependencies, if not, you may need to do that also.
+6.  If you don't already, import the parent of this directory (the folder sqlppParser) as an eclipse Java project.
+Do not request to copy the project into the workspace.  The project should now build (if you had it earlier,
+before creating the dependent projects, it would not have built). 

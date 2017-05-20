@@ -8,6 +8,5 @@
 		<copy verbose="true" file="${ASTERIX}/asterix-lang-common/.project" tofile="asterix-lang-common.project"/>
 		<copy verbose="true" file="${ASTERIX}/asterix-lang-sqlpp/.classpath" tofile="asterix-lang-sqlpp.classpath"/>
 		<copy verbose="true" file="${ASTERIX}/asterix-lang-sqlpp/.project" tofile="asterix-lang-sqlpp.project"/>
-		<copy verbose="true" file="../.classpath" tofile=".classpath"/>
 	</target>
 </project>
