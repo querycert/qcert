@@ -1,0 +1,28 @@
+<project name="dependencies" default="get">
+
+<property name="repo" value="http://central.maven.org/maven2/"/>
+	
+<property name="asterix" value="org/apache/asterix/"/>
+<property name="hyracks" value="org/apache/hyracks/"/>
+<property name="sqlpp" value="asterix-lang-sqlpp/0.9.1/asterix-lang-sqlpp-0.9.1.jar"/>	
+<property name="lang-common" value="asterix-lang-common/0.9.1/asterix-lang-common-0.9.1.jar"/>	
+<property name="common" value="asterix-common/0.9.1/asterix-common-0.9.1.jar"/>
+<property name="algebricks.common" value="algebricks-common/0.3.1/algebricks-common-0.3.1.jar"/>
+<property name="algebricks.core" value="algebricks-core/0.3.1/algebricks-core-0.3.1.jar"/>
+<property name="dataflow.common" value="hyracks-dataflow-common/0.3.1/hyracks-dataflow-common-0.3.1.jar"/>
+<property name="hyracks.api" value="hyracks-api/0.3.1/hyracks-api-0.3.1.jar"/>
+<property name="log4j" value="log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+
+<target name="get">
+	<delete dir="lib"/>
+	<mkdir dir="lib"/>
+	<get src="${repo}${asterix}${sqlpp}" dest="lib"/>
+	<get src="${repo}${asterix}${lang-common}" dest="lib"/>
+	<get src="${repo}${asterix}${common}" dest="lib"/>
+	<get src="${repo}${hyracks}${algebricks.common}" dest="lib"/>
+	<get src="${repo}${hyracks}${algebricks.core}" dest="lib"/>
+	<get src="${repo}${hyracks}${dataflow.common}" dest="lib"/>
+	<get src="${repo}${hyracks}${hyracks.api}" dest="lib"/>
+	<get src="${repo}${log4j}" dest="lib"/>
+</target>
+</project>
