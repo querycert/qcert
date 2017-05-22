@@ -1,14 +1,16 @@
-This is a rough set of notes allowing duplication of JSA's setup for experimenting with asterixDB instead of
-presto as the SQL parser (ultimately, a SQL++ parser).
+This README describes how to set up the source of Asterixdb in some eclipse projects, which can then provide
+source attachments for the sqlppParser project.  To set up the sqlppParser itself, simply run the
+getDependencies.xml Ant script.  It is not necessary to do these steps in order to build this project; it is
+just sometimes helpful to be able to consult the actual source of some of the jar dependencies.
 
-Note: nothing is automated yet.  Only an eclipse-based approach is currently supported.
+Note:  only an eclipse-based approach is currently supported.  A Makefile will be coming soon.
 
 1.  Clone the asterixDB repository from https://github.com/apache/asterixdb.git.  It is not necessary to do
 this under eclipse nor do you initially import any projects into eclipse (this is done later with special
-metadata). 
+metadata).
 
-Currently I am using branch release-0.9.1.  I may switch to master if it becomes necessary to more
-closely track updates or participate in the project.
+Currently I am using branch release-0.9.1.  I may switch to master if it becomes necessary to more closely
+track updates or participate in the project.
 
 2.  Do a full build as instructed in the "Build from Source" item in the README.md of that project.  This
 requires Maven as listed there.  It's not necessary to start a server instance, unless you're curious.
@@ -59,9 +61,7 @@ the three locations you updated in the previous step.  I recommend that you not 
 into the workspace.  By importing them in place you permit further updates via git in the event that we are 
 tracking asterixdb changes.
 
-You should now have projects asterix-common, asterix-lang-common, and asterix-lang-sqlpp, which should build 
-under eclipse with no errors (plenty of warnings though).
-
-6.  If you don't already, import the parent of this directory (the folder sqlppParser) as an eclipse Java project.
-Do not request to copy the project into the workspace.  The project should now build (if you had it earlier,
-before creating the dependent projects, it would not have built). 
+You should now have projects asterix-common, asterix-lang-common, and asterix-lang-sqlpp, which should build
+under eclipse with no errors (plenty of warnings though).  These will be used as source attachments for the
+corresponding jars in this project.  Note that not all the dependent jars have source attachements, only the
+ones most likely to be consulted during development.
