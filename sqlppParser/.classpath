@@ -5,7 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/javaService"/>
 	<classpathentry kind="lib" path="lib/asterix-lang-sqlpp-0.9.1.jar" sourcepath="/asterix-lang-sqlpp"/>
 	<classpathentry kind="lib" path="lib/asterix-lang-common-0.9.1.jar" sourcepath="/asterix-lang-common"/>
-	<classpathentry kind="lib" path="lib/asterix-common-0.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/asterix-common-0.9.1.jar" sourcepath="/asterix-common"/>
 	<classpathentry kind="lib" path="lib/algebricks-common-0.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/hyracks-dataflow-common-0.3.1.jar"/>
 	<classpathentry kind="lib" path="lib/algebricks-core-0.3.1.jar"/>
