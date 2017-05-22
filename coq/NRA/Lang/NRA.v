@@ -253,6 +253,36 @@ Section NRA.
     Definition nra_eval_top (q:nra) (cenv:bindings) : option data :=
       nra_eval (rec_sort cenv) q dunit.
   End Top.
+
+  Section FreeVars.
+    Fixpoint nra_free_variables (q:nra) : list string :=
+      match q with
+      | AID => nil
+      | AConst _ => nil
+      | ABinop _ q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | AUnop _ q1 =>
+        (nra_free_variables q1)
+      | AMap q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | AMapConcat q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | AProduct q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | ASelect q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | ADefault q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | AEither ql qr =>
+        app (nra_free_variables ql) (nra_free_variables qr)
+      | AEitherConcat q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | AApp q1 q2 =>
+        app (nra_free_variables q1) (nra_free_variables q2)
+      | AGetConstant s => s :: nil
+    end.
+  End FreeVars.
+
 End NRA.
 
 (* Some notations for the paper and readability *)

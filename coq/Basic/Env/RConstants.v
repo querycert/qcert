@@ -186,6 +186,19 @@ Section RConstants.
       trivial.
     Qed.
 
+    Lemma rec_sort_mkConstants_comm {A} (l:list (string*A)) :
+      rec_sort (mkConstants l) = mkConstants (rec_sort l).
+    Proof.
+      unfold mkConstants.
+      rewrite <- map_rec_sort.
+      reflexivity.
+      intros.
+      unfold mkConstant; simpl.
+      destruct x; destruct y; simpl.
+      unfold mkConstantName.
+      split; intros; auto.
+    Qed.
+
   End ConstantsProp.
 
   Section World.

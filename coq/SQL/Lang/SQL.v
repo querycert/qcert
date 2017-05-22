@@ -203,7 +203,26 @@ Section SQL.
     | SQuery (SSelectColumnDeref _ _ :: nil) _ _ _ _ => true
     | SQuery _ _ _ _ _ => false
     end.
-  
+
+  (*
+  Section FreeVars.
+    Fixpoint sql_free_variables (q:sql_query) : list string :=
+    match q with
+    | SUnion _ q1 q2 =>
+      sql_free_variables q1 ++ sql_free_variables q2
+    | SIntersect _ q1 q2 =>
+      sql_free_variables q1 ++ sql_free_variables q2
+    | SExcept _ q1 q2 =>
+      sql_free_variables q1 ++ sql_free_variables q2
+    | SQuery (SSelectExpr _ expr :: nil) _ _ _ _ =>
+      sql_expr_free_variables expr
+      if (is_singleton_sql_expr expr) then false else true
+    | SQuery (SSelectColumn _ :: nil) _ _ _ _ => true
+    | SQuery (SSelectColumnDeref _ _ :: nil) _ _ _ _ => true
+    | SQuery _ _ _ _ _ => false
+    end.
+  End FreeVars.
+  *)
 End SQL.
 
 (* 

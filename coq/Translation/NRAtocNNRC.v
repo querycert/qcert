@@ -316,43 +316,172 @@ _var ⊕ [[ op2 ]]_var *)
       reflexivity.
   Qed.
 
-  (** Lemma and proof of linear size translation *)
-
-  Section size.
-
-  Require Import Omega.
-
-  Theorem nraToNNRC_size op v : 
-    nnrc_size (nra_to_nnrc op v) <= 10 * nra_size op.
+  Lemma nra_to_nnrc_is_core :
+    forall q:nra, forall init_vid,
+        nnrcIsCore (nra_to_nnrc q init_vid).
   Proof.
-    revert v.
-    induction op; simpl in *; intros; trivial.
-    - omega.
-    - omega.
-    - specialize (IHop1 v); specialize (IHop2 v); omega.
-    - specialize (IHop v); omega.
-    - generalize (IHop1 (fresh_var "tmap$" [v]));
-
-      generalize (IHop2 (fresh_var "tmap$" [v])).
-      specialize (IHop1 v); specialize (IHop2 v); omega.
-    - generalize (IHop1 (fresh_var "tmc$" [v])); generalize (IHop2 v).
-      specialize (IHop1 v); specialize (IHop2 v); omega.
-    - specialize (IHop1 v); specialize (IHop2 v); omega.
-    - generalize (IHop1 (fresh_var "tsel$" [v])); generalize (IHop2 v).
-      specialize (IHop1 v); specialize (IHop2 v); omega.
-    - specialize (IHop1 v); specialize (IHop2 v); omega.
-    - specialize (IHop1 v); specialize (IHop2 v); omega.
-    - specialize (IHop1 v); specialize (IHop2 v); omega.
-    - specialize (IHop2 v); specialize (IHop1 (fresh_var "tapp$" [v])); omega.
-    - omega.
+    intro q; simpl.
+    induction q; simpl; auto.
   Qed.
 
-  End size.
+  (** Lemma and proof of linear size translation *)
 
-  Section core.
-    Definition nra_to_nnrc_core q init_vid :=
-      nnrc_to_nnrc_core (nra_to_nnrc q init_vid).
-  End core.
+  Section Size.
+
+    Require Import Omega.
+
+    Theorem nraToNNRC_size op v : 
+      nnrc_size (nra_to_nnrc op v) <= 10 * nra_size op.
+    Proof.
+      revert v.
+      induction op; simpl in *; intros; trivial.
+      - omega.
+      - omega.
+      - specialize (IHop1 v); specialize (IHop2 v); omega.
+      - specialize (IHop v); omega.
+      - generalize (IHop1 (fresh_var "tmap$" [v]));
+          generalize (IHop2 (fresh_var "tmap$" [v])).
+        specialize (IHop1 v); specialize (IHop2 v); omega.
+      - generalize (IHop1 (fresh_var "tmc$" [v])); generalize (IHop2 v).
+        specialize (IHop1 v); specialize (IHop2 v); omega.
+      - specialize (IHop1 v); specialize (IHop2 v); omega.
+      - generalize (IHop1 (fresh_var "tsel$" [v])); generalize (IHop2 v).
+        specialize (IHop1 v); specialize (IHop2 v); omega.
+      - specialize (IHop1 v); specialize (IHop2 v); omega.
+      - specialize (IHop1 v); specialize (IHop2 v); omega.
+      - specialize (IHop1 v); specialize (IHop2 v); omega.
+      - specialize (IHop2 v); specialize (IHop1 (fresh_var "tapp$" [v])); omega.
+      - omega.
+    Qed.
+
+  End Size.
+
+  Section Top.
+    (* Canned initial variable for the current value *)
+    Definition init_vid := "id"%string.
+    
+    Definition nra_to_nnrc_top (q:nra) : nnrc :=
+      (NNRCLet init_vid (NNRCConst dunit)
+               (nra_to_nnrc q init_vid)).
+
+    Definition map_constants (constants:list var) (q:nnrc) : nnrc :=
+      fold_right (fun constant qacc =>
+                    NNRCLet (append CONST_PREFIX constant)
+                            (NNRCVar constant)
+                            qacc) q constants.
+                    
+    Lemma map_constants_is_core :
+      forall constants, forall q:nnrc,
+          nnrcIsCore q ->
+          nnrcIsCore (map_constants constants q).
+    Proof.
+      intros.
+      induction constants; simpl; auto.
+    Qed.
+      
+    Definition nra_to_nnrc_top_alt (q:nra) : nnrc :=
+      let constants := nra_free_variables q in
+      let topq := nra_to_nnrc_top q in
+      map_constants constants topq.
+
+    Lemma nra_to_nnrc_top_is_core :
+      forall q:nra, nnrcIsCore (nra_to_nnrc_top q).
+    Proof.
+      intros; simpl.
+      split; [trivial| ].
+      apply nra_to_nnrc_is_core.
+    Qed.
+
+    Lemma nra_to_nnrc_top_alt_is_core :
+      forall q:nra, nnrcIsCore (nra_to_nnrc_top_alt q).
+    Proof.
+      intros; simpl.
+      unfold nra_to_nnrc_top_alt.
+      apply map_constants_is_core.
+      apply nra_to_nnrc_top_is_core.
+    Qed.
+
+    Program Definition nra_to_nnrc_core_top (q:nra) : nnrc_core :=
+      exist _ (nra_to_nnrc_top q) _.
+    Next Obligation.
+      apply nra_to_nnrc_top_is_core.
+    Qed.
+
+    Program Definition nra_to_nnrc_core_top_alt (q:nra) : nnrc_core :=
+      exist _ (nra_to_nnrc_top_alt q) _.
+    Next Obligation.
+      apply nra_to_nnrc_top_alt_is_core.
+    Qed.
+
+    Theorem nra_to_nnrc_core_top_correct
+            (h:list (string*string)) (q:nra) (env:bindings) :
+      nnrc_core_eval_top h (nra_to_nnrc_core_top q) env = nra_eval_top h q env.
+    Proof.
+      intros.
+      unfold nnrc_core_eval_top.
+      unfold nra_eval_top.
+      unfold nra_to_nnrc_core_top.
+      unfold lift_nnrc_core.
+      simpl.
+      rewrite (nra_sem_correct h q
+                               ((init_vid,dunit)::(rec_sort (mkConstants env)))
+                               init_vid
+                               (rec_sort env)
+                               dunit); try reflexivity.
+      simpl.
+      intros.
+      rewrite rec_sort_mkConstants_comm.
+      rewrite filterConstants_mkConstants.
+      rewrite (assoc_lookupr_lookup equiv_dec x (mkConstants (rec_sort env))).
+      rewrite <- rec_sort_mkConstants_comm.
+      generalize (@lookup_rev_rec_sort string ODT_string data x (mkConstants env)).
+      intros.
+      assert (lookup ODT_eqdec (rev (rec_sort (mkConstants env))) x
+              = lookup equiv_dec (rev (rec_sort (mkConstants env))) x).
+      reflexivity.
+      rewrite H0 in *.
+      rewrite H.
+      reflexivity.
+    Qed.
+
+    Lemma revert_constants h (constants:list var) (env:bindings) (q:nnrc) :
+      constants = nnrc_free_vars q ->
+      (forall x, In x constants -> In x (domain env)) ->
+      nnrc_core_eval h (rec_sort env) (map_constants constants q) =
+      nnrc_core_eval h (rec_sort (mkConstants env)) q.
+    Proof.
+      revert env q.
+      induction constants; intros; simpl.
+      - apply nnrc_core_eval_equiv_free_in_env.
+        intros.
+        rewrite <- H in H1.
+        simpl in H1.
+        contradiction.
+      - case_eq (lookup equiv_dec (rec_sort env) a); intros.
+        admit.
+        admit.
+    Admitted.
+
+    Theorem nra_to_nnrc_core_top_alt_correct
+            (h:list (string*string)) (q:nra) (env:bindings) :
+      nnrc_core_eval_top_alt h (nra_to_nnrc_core_top_alt q) env = nra_eval_top h q env.
+    Proof.
+      unfold nra_to_nnrc_core_top_alt.
+      unfold nra_to_nnrc_top_alt.
+      unfold nnrc_core_eval_top_alt.
+      rewrite <- nra_to_nnrc_core_top_correct.
+      unfold lift_nnrc_core; simpl.
+      unfold nnrc_core_eval_top.
+      unfold lift_nnrc_core.
+      Opaque nra_to_nnrc_core_top.
+      simpl.
+      rewrite revert_constants.
+      reflexivity.
+      admit.
+      admit.
+    Admitted.
+      
+  End Top.
   
 End NRAtocNNRC.
 

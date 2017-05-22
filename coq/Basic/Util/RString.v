@@ -249,85 +249,85 @@ End StringOrder.
 
 Section ToString.
 
-Fixpoint string_reverse_helper (s:string) (acc:string)
-  := match s with
-         | EmptyString => acc
-         | String x xs => string_reverse_helper xs (String x acc)
-     end.
+  Fixpoint string_reverse_helper (s:string) (acc:string)
+    := match s with
+       | EmptyString => acc
+       | String x xs => string_reverse_helper xs (String x acc)
+       end.
 
-Definition string_reverse (s:string) := string_reverse_helper s EmptyString.
+  Definition string_reverse (s:string) := string_reverse_helper s EmptyString.
 
-Fixpoint string_to_list (s:string) : list ascii
-  := match s with
-         | EmptyString => nil
-         | String x xs => cons x (string_to_list xs)
-     end.
+  Fixpoint string_to_list (s:string) : list ascii
+    := match s with
+       | EmptyString => nil
+       | String x xs => cons x (string_to_list xs)
+       end.
 
-Fixpoint list_to_string (l:list ascii) : string
-  := match l with
-         | nil => EmptyString
-         | cons x xs => String x (list_to_string xs)
-     end.
+  Fixpoint list_to_string (l:list ascii) : string
+    := match l with
+       | nil => EmptyString
+       | cons x xs => String x (list_to_string xs)
+       end.
+  
+  Lemma string_to_list_to_string (s:string) :
+    list_to_string (string_to_list s) = s.
+  Proof.
+    induction s; simpl; intuition congruence.
+  Qed.
 
-Lemma string_to_list_to_string (s:string) :
-  list_to_string (string_to_list s) = s.
-Proof.
-  induction s; simpl; intuition congruence.
-Qed.
+  Lemma list_to_string_to_list (l:list ascii) :
+    string_to_list (list_to_string l) = l.
+  Proof.
+    induction l; simpl; intuition congruence.
+  Qed.
 
-Lemma list_to_string_to_list (l:list ascii) :
-  string_to_list (list_to_string l) = l.
-Proof.
-  induction l; simpl; intuition congruence.
-Qed.
+  Lemma string_to_list_inj (x y:string) : 
+    string_to_list x = string_to_list y -> x = y.
+  Proof.
+    intros.
+    generalize (f_equal list_to_string H); intros fe.
+    repeat rewrite  string_to_list_to_string in fe; trivial.
+  Qed.
 
-Lemma string_to_list_inj (x y:string) : 
-  string_to_list x = string_to_list y -> x = y.
-Proof.
-  intros.
-  generalize (f_equal list_to_string H); intros fe.
-  repeat rewrite  string_to_list_to_string in fe; trivial.
-Qed.
+  Lemma list_to_string_inj (x y:list ascii) : 
+    list_to_string x = list_to_string y -> x = y.
+  Proof.
+    intros.
+    generalize (f_equal string_to_list H); intros fe.
+    repeat rewrite  list_to_string_to_list in fe; trivial.
+  Qed.
 
-Lemma list_to_string_inj (x y:list ascii) : 
-  list_to_string x = list_to_string y -> x = y.
-Proof.
-  intros.
-  generalize (f_equal string_to_list H); intros fe.
-  repeat rewrite  list_to_string_to_list in fe; trivial.
-Qed.
+  Require List.
+  Lemma string_reverse_helper_reverse_append s acc:
+    string_reverse_helper s acc = list_to_string (List.rev_append (string_to_list s) (string_to_list acc)).
+  Proof.
+    revert acc.
+    induction s; simpl; intros.
+    - rewrite string_to_list_to_string; trivial.
+    - rewrite IHs. simpl; auto.
+  Qed.
 
-Require List.
-Lemma string_reverse_helper_reverse_append s acc:
-  string_reverse_helper s acc = list_to_string (List.rev_append (string_to_list s) (string_to_list acc)).
-Proof.
-  revert acc.
-  induction s; simpl; intros.
-  - rewrite string_to_list_to_string; trivial.
-  - rewrite IHs. simpl; auto.
-Qed.
+  Lemma string_reverse_reverse s :
+    string_reverse s = list_to_string (List.rev (string_to_list s)).
+  Proof.
+    rewrite List.rev_alt. apply string_reverse_helper_reverse_append.
+  Qed.
 
-Lemma string_reverse_reverse s :
-  string_reverse s = list_to_string (List.rev (string_to_list s)).
-Proof.
-  rewrite List.rev_alt. apply string_reverse_helper_reverse_append.
-Qed.
+  Lemma string_reverse_involutive x : string_reverse (string_reverse x) = x.
+  Proof.
+    repeat rewrite string_reverse_reverse.
+    rewrite list_to_string_to_list, List.rev_involutive, string_to_list_to_string.
+    trivial.
+  Qed.
 
-Lemma string_reverse_involutive x : string_reverse (string_reverse x) = x.
-Proof.
-  repeat rewrite string_reverse_reverse.
-  rewrite list_to_string_to_list, List.rev_involutive, string_to_list_to_string.
-  trivial.
-Qed.
-
-Lemma string_reverse_inj x y :
-  string_reverse x = string_reverse y -> 
-  x = y.
-Proof.
-  intros re.
-  generalize (f_equal string_reverse re); intros fe.
-  repeat rewrite string_reverse_involutive in fe; trivial.
-Qed.
+  Lemma string_reverse_inj x y :
+    string_reverse x = string_reverse y -> 
+    x = y.
+  Proof.
+    intros re.
+    generalize (f_equal string_reverse re); intros fe.
+    repeat rewrite string_reverse_involutive in fe; trivial.
+  Qed.
 
   Lemma lt_contr1 s1 s2 :
     ~StringOrder.lt s1 s2 -> ~StringOrder.lt s2 s1 -> StringOrder.eq s1 s2.
@@ -363,22 +363,61 @@ Qed.
 
 End ToString.
 
-Fixpoint map_string (f:ascii->ascii) (s:string)
-  := match s with
-     | EmptyString => EmptyString
-     | String a s' => String (f a) (map_string f s')
-     end.
+Section Prefix.
+  Lemma substring_zero s :
+    substring 0 0 s = ""%string.
+  Proof.
+    induction s; reflexivity.
+  Qed.
+  
+  Lemma substring_S a m s :
+    substring 0 (S m) (String a s) = String a (substring 0 m s).
+  Proof.
+    reflexivity.
+  Qed.
 
-Fixpoint flat_map_string (f:ascii->string) (s:string)
-  := match s with
-     | EmptyString => EmptyString
-     | String a s' => append (f a) (flat_map_string f s')
-     end.
+  Lemma append_string_distr a s1 s2 :
+    (String a s1 ++ s2 = String a (s1 ++ s2))%string.
+  Proof.
+    auto.
+  Qed.
 
-Global Instance ascii_dec : EqDec ascii eq
-  := ascii_dec.
+  (*
+  Lemma prefix_const_prefix_true (const_prefix s:string) :
+    prefix const_prefix (const_prefix ++ s) = true.
+  Proof.
+    rewrite prefix_correct.
+    induction const_prefix.
+    - apply substring_zero.
+    - simpl.
+      Check append_string_distr.
+      rewrite append_string_distr.
+      rewrite substring_S.
+      rewrite IHconst_prefix.
+      reflexivity.
+  Qed.
+  *)
 
-Section like.
+End Prefix.
+
+Section MapString.
+  Fixpoint map_string (f:ascii->ascii) (s:string)
+    := match s with
+       | EmptyString => EmptyString
+       | String a s' => String (f a) (map_string f s')
+       end.
+
+  Fixpoint flat_map_string (f:ascii->string) (s:string)
+    := match s with
+       | EmptyString => EmptyString
+       | String a s' => append (f a) (flat_map_string f s')
+       end.
+
+  Global Instance ascii_dec : EqDec ascii eq
+    := ascii_dec.
+End MapString.
+
+Section Like.
   Require Import RUtil.
 
   (* This is intended to be like the SQL like operation *)
@@ -407,7 +446,7 @@ Section like.
                then
                  match tail with
                  | EmptyString =>
-                 (* unclear what to do with an escape character at the end of the string.  We will interpret it as a literal character *)
+                   (* unclear what to do with an escape character at the end of the string.  We will interpret it as a literal character *)
                    like_literal (string_reverse (String h acc)) :: nil
                  | String "_"%char tail => make_like_literal_clause tail (String "_" acc)
                  | String "%"%char tail => make_like_literal_clause tail (String "%" acc)
@@ -421,8 +460,7 @@ Section like.
                else
                  make_like_literal_clause tail (String h acc)
              end
-                     ) other ""%string
-         
+         ) other ""%string
        end.
 
   Example make_like_clause_example1 := make_like_clause "hello_there^^^%%" None.
@@ -447,7 +485,7 @@ Section like.
        | nil => s ==b EmptyString
        | (like_literal literal)::rest =>
          andb (prefix literal s)
-                (like_clause_matches_string rest (substring (String.length literal) (String.length s - String.length literal) s))
+              (like_clause_matches_string rest (substring (String.length literal) (String.length s - String.length literal) s))
        | like_any_char::rest =>
          match s with
          | EmptyString => false
@@ -469,16 +507,16 @@ Section like.
   Example string_like_example5 := string_like "hello thethare" "he%th_re" None.
   Example string_like_example6 := string_like "hello thetheare" "he%th_re" None.
 
-  (*
+(*
   Eval vm_compute in string_like_example1.
   Eval vm_compute in string_like_example2.
   Eval vm_compute in string_like_example3.
   Eval vm_compute in string_like_example4.
   Eval vm_compute in string_like_example5.
   Eval vm_compute in string_like_example6.
-   *)
-
-End like.
+ *)
+  
+End Like.
 
 
 (* 

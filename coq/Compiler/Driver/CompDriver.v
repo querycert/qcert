@@ -163,7 +163,7 @@ Section CompDriver.
     (** NRA/NRAEnv translations *)
     Definition nra_to_nraenv_core (q: nra) : nraenv_core := NRAtocNRAEnv.nra_to_nraenv_core_top q.
 
-    Definition nra_to_nnrc_core (q: nra) : nnrc_core := nra_to_nnrc_core q init_vid.
+    Definition nra_to_nnrc_core (q: nra) : nnrc_core := NRAtocNNRC.nra_to_nnrc_core_top q.
 
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
       nraenv_core_to_nnrc_core_top init_vid init_venv q.

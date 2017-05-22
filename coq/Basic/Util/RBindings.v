@@ -1520,53 +1520,70 @@ Section RBindings.
       rewrite H; reflexivity.
     Qed.
 
-Lemma domain_rec_concat_sort_app_comm:
-  forall (A : Type) (l l' : list (K * A)),
-    domain (rec_concat_sort l l') = domain (rec_concat_sort l' l).
-Proof.
-  intros.
-  unfold rec_concat_sort.
-  repeat rewrite domain_rec_sort.
-  apply insertion_sort_equivlist; [apply ODT_lt_contr | ].
-  repeat rewrite domain_app.
-  rewrite app_commutative_equivlist.
-  reflexivity.
-Qed.
+    Lemma domain_rec_concat_sort_app_comm:
+      forall (A : Type) (l l' : list (K * A)),
+        domain (rec_concat_sort l l') = domain (rec_concat_sort l' l).
+    Proof.
+      intros.
+      unfold rec_concat_sort.
+      repeat rewrite domain_rec_sort.
+      apply insertion_sort_equivlist; [apply ODT_lt_contr | ].
+      repeat rewrite domain_app.
+      rewrite app_commutative_equivlist.
+      reflexivity.
+    Qed.
 
-Lemma incl_sort_sublist {A B} a b :
-        incl (@domain _ A a) (@domain _ B b) ->        
-        sublist (domain (rec_sort a)) (domain (rec_sort b)).
-Proof.
-  intros.
-  repeat erewrite domain_rec_sort.
-  apply Sorted_incl_sublist.
-  - apply insertion_sort_Sorted.
-  - apply insertion_sort_Sorted.
-  - intros. apply in_insertion_sort in H0.
-    specialize (H _ H0).
-    apply insertion_sort_in; [apply ODT_lt_contr | ].
-    trivial.
-Qed.
+    Lemma incl_sort_sublist {A B} a b :
+      incl (@domain _ A a) (@domain _ B b) ->        
+      sublist (domain (rec_sort a)) (domain (rec_sort b)).
+    Proof.
+      intros.
+      repeat erewrite domain_rec_sort.
+      apply Sorted_incl_sublist.
+      - apply insertion_sort_Sorted.
+      - apply insertion_sort_Sorted.
+      - intros. apply in_insertion_sort in H0.
+        specialize (H _ H0).
+        apply insertion_sort_in; [apply ODT_lt_contr | ].
+        trivial.
+    Qed.
 
-Lemma rec_concat_sort_sublist {B} l1 l2 :
+    Lemma rec_concat_sort_sublist {B} l1 l2 :
       sublist (@domain _ B (rec_sort l1)) (domain (rec_concat_sort l1 l2)).
-Proof.
-  apply incl_sort_sublist.
-  rewrite incl_appl; try reflexivity.
-  rewrite domain_app. reflexivity.
-Qed.
+    Proof.
+      apply incl_sort_sublist.
+      rewrite incl_appl; try reflexivity.
+      rewrite domain_app. reflexivity.
+    Qed.
 
-Lemma rec_concat_sort_sublist_sorted {B} l1 l2 :
-  is_list_sorted ODT_lt_dec (domain l1) = true ->
+    Lemma rec_concat_sort_sublist_sorted {B} l1 l2 :
+      is_list_sorted ODT_lt_dec (domain l1) = true ->
       sublist (@domain _ B l1) (domain (rec_concat_sort l1 l2)).
-Proof.
-  intros.
-  rewrite <- rec_concat_sort_sublist.
-  rewrite rec_sorted_id; trivial.
-  reflexivity.
-Qed.
+    Proof.
+      intros.
+      rewrite <- rec_concat_sort_sublist.
+      rewrite rec_sorted_id; trivial.
+      reflexivity.
+    Qed.
 
-End sublist.
+  End sublist.
+
+  Section rev.
+    Lemma lookup_rev_rec_sort {B} (x:K) (l:list (K*B)) :
+      lookup ODT_eqdec (rev (rec_sort l)) x = lookup ODT_eqdec (rec_sort l) x.
+    Proof.
+      case_eq (lookup ODT_eqdec (rec_sort l) x); intros.
+      - apply (@lookup_some_nodup_perm _ _ _ (rec_sort l) (rev (rec_sort l))).
+        + apply StronglySorted_NoDup.
+          rewrite <- (sorted_StronglySorted ODT_lt_dec).
+          apply rec_sort_pf.
+        + apply Permutation.Permutation_rev.
+        + assumption.
+      - apply (@lookup_none_perm _ _ _ (rec_sort l) (rev (rec_sort l))).
+        + apply Permutation.Permutation_rev.
+        + assumption.
+    Qed.
+  End rev.
 
 End RBindings.
 
