@@ -105,33 +105,46 @@ import org.apache.asterix.lang.sqlpp.struct.SetOperationInput;
 import org.apache.asterix.lang.sqlpp.struct.SetOperationRight;
 import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
 
+/**
+ * A visitor for a parsed SQL++ expression, turning it into S-expression form.
+ * At present, the S-expression form is designed to be consumed by qcert's SQL (as opposed to SQL++) support, since the latter is not yet in place.
+ */
 public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
 	private static final EnumMap<OperatorType, String> opNameMap = new EnumMap<>(OperatorType.class);
 	private static final EnumMap<OperatorType, OperatorType> negations = new EnumMap<>(OperatorType.class);
 	private static final EnumMap<UnaryExprType, String> unaryExprMap = new EnumMap<>(UnaryExprType.class);
 	static {
+		// All non-negated binary operators are here except 'concat', which is handled specially.  Note that 'between' is actually ternary 
+		// and is also handled specially.
 		opNameMap.put(OperatorType.GT, "greater_than");
 		opNameMap.put(OperatorType.GE, "greater_than_or_equal");
 		opNameMap.put(OperatorType.LT, "less_than");
 		opNameMap.put(OperatorType.LE, "less_than_or_equal");
 		opNameMap.put(OperatorType.EQ, "equal");
+		opNameMap.put(OperatorType.FUZZY_EQ, "equal"); // No distinction at this level
 		opNameMap.put(OperatorType.NEQ, "not_equal");
 		opNameMap.put(OperatorType.AND, "and");
 		opNameMap.put(OperatorType.OR, "or");
 		opNameMap.put(OperatorType.LIKE, "like");
 		opNameMap.put(OperatorType.DIV, "divide");
+		opNameMap.put(OperatorType.IDIV, "divide");    // No distinction at this level
+		opNameMap.put(OperatorType.MOD, "modulus");    // No support yet in sexp_to_sql_expr 
+		opNameMap.put(OperatorType.CARET, "exponent"); // No support yet in sexp_to_sql_expr
 		opNameMap.put(OperatorType.MUL, "multiply");
 		opNameMap.put(OperatorType.IN, "isIn");
 		opNameMap.put(OperatorType.MINUS, "subtract");
 		opNameMap.put(OperatorType.PLUS, "add");
-		// TODO the rest of these
 		
+		// Only negations of binary operators and 'between' are here; 'not exists' (unary) is handled specially as are the special forms
+		// starting with IS like IS NOT NULL (parser turns these into function calls).
 		negations.put(OperatorType.NOT_BETWEEN, OperatorType.BETWEEN);
 		negations.put(OperatorType.NOT_IN, OperatorType.IN);
 		negations.put(OperatorType.NOT_LIKE, OperatorType.LIKE);
 
+		// NOT_EXISTS is not in the following table because it is a negation and handled specially
 		unaryExprMap.put(UnaryExprType.EXISTS, "exists");
-		// TODO the rest of these
+		unaryExprMap.put(UnaryExprType.NEGATIVE, "minus");
+		unaryExprMap.put(UnaryExprType.POSITIVE, "plus");  // No support yet in sexp_to_sql_expr.  Perhaps we should simply elide.
 	}
 	
 	private boolean useDateNameHeuristic;
@@ -454,8 +467,8 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			Expression alternative = maybeTransform(ops.get(0), exprs);
 			if (alternative != null)
 				return alternative.accept(this, builder);
-			// Otherwise, proceed with the normal case, which involves either 2 or 3 operands.  3 operand cases are handled
-			// individually.  First we look at negation.
+			// Otherwise, proceed with the normal case, which involves either 2 or 3 operands.  3 operand cases are limited to
+			// 'between' which is handled individually below.  First we look at whether the operator is a negation form.
 			boolean negated = false;
 			OperatorType op = ops.get(0);
 			OperatorType positive = negations.get(op);
@@ -1054,10 +1067,16 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	 */
 	private StringBuilder processBinaryOperator(OperatorType operator, Expression operand1, Expression operand2, StringBuilder builder) 
 			throws CompilationException {
-		String verb = opNameMap.get(operator);
-		if (verb == null)
-			throw new UnsupportedOperationException("No support for binary operator " + operator);
-		builder.append("(").append(verb).append(" ");
+		if (operator == OperatorType.CONCAT) {
+			// Special case: turns into function
+			builder = builder.append("(function ");
+			builder = appendString("concat", builder);
+		} else {
+			String verb = opNameMap.get(operator);
+			if (verb == null)
+				throw new UnsupportedOperationException("No support for binary operator " + operator);
+			builder.append("(").append(verb).append(" ");
+		}
 		builder = operand1.accept(this, builder);
 		builder = operand2.accept(this, builder);
 		return builder.append(") ");
