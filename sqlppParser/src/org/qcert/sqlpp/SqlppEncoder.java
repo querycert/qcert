@@ -35,8 +35,10 @@ import org.apache.asterix.lang.sqlpp.parser.SqlppParserFactory;
 import org.apache.asterix.lang.sqlpp.parser.Token;
 
 /**
- * A highly preliminary experiment in using a SQL++ parser instead of a SQL parser as a baby-step toward supporting SQL++ as a source
- *  language.  Intended to more or less replace PrestoEncoder eventually.
+ * A parsing front-end for SQL++.  Allows the language to be consumed in S-expression form instead of requiring a Menhir grammar and
+ * supporting code.  The structure is similar to the Presto-based SQL parser front-end, and, originally, this encoder was going to
+ * subsume that older one.  It turns out that there are enough compatibility issues to require the retention of a SQL parser as well
+ * as this (SQL++) one.
  */
 public class SqlppEncoder {
 	/**
@@ -49,7 +51,7 @@ public class SqlppEncoder {
 	public static String encode(List<? extends ILangExpression> toEncode, boolean useDateNameHeuristic) throws CompilationException {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("(statements ");
-		for(ILangExpression node : toEncode) {
+		for (ILangExpression node : toEncode) {
 			encode(buffer, node, useDateNameHeuristic);
 		}
 		buffer.append(")");
@@ -68,7 +70,7 @@ public class SqlppEncoder {
 		return toEncode.accept(visitor, buffer);
 	}
 
-	/** Evolving main driver
+	/** Evolving main driver (for testing).
 	 * TODO move this to its own source file when it becomes elaborate enough
 	 */
 	public static void main(String[] args) throws Exception {

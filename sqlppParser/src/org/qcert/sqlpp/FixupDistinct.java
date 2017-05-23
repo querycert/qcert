@@ -22,13 +22,18 @@ import org.apache.asterix.lang.sqlpp.parser.Token;
 
 /**
  * This fixup elides the 'distinct' keyword except when it follows 'select', which allows TPC-H query 16 to be parsed.
- * The 'distinct' keyword is second-class in both SQL and SQL++.  In SQL, among other uses, it can appear
- * in aggregating functions, making those functions operate only on distinct values.  This is explicitly stated
- * to be "not supported" in SQL++.  In SQL++, 'distinct' is only supported as a keyword when it follows 'select'.
- * Strictly speaking, if we want to support SQL-style aggregation functions like count and sum, we need to pass through
- * the 'distinct' flag.  However, our Presto parser does not do this, so, simply eliding the keyword makes both encoders
- * behaviorally equivalent.  The s-exp parsing on the OCaml side does not expect or handle this flag.  Perhaps the semantics
- * that we currently assume are incorrect for bags that are not sets, for which the flag would matter.
+ * Lack of support for 
+ *    count(distinct X)
+ * (etc) is an explicit limitation of SQL++ in terms of its SQL compatibility.
+ * 
+ * The present fixup is a kluge.  It works because (1) in SQL++, 'distinct' is not allowed except following a 'select', and (2)
+ *    our Presto-based code is not currently passing along the 'distinct' flag on a function call and our S-expression
+ *    parser for SQL inside qcert wouldn't know what to do with it anyway.
+ * I think a more correct handling, to be substituted once we are no longer trying to imitate what the Presto parser does, would be that
+ *     count(distinct X)
+ * becomes
+ *     count((select distinct value foo from X))
+ * That should work because subqueries are just expressions in SQL++, a from clause may iterate over any expression.
  */
 public class FixupDistinct implements LexicalFixup {
 
