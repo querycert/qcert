@@ -96,8 +96,4 @@ public class FixupIntervalLiterals implements LexicalFixup {
 		output.add(second);
 		output.add(third);
 	}
-
-	public List<Token> getExprAndClose(Iterator<Token> tokens, List<Token> accum, int closeTokenKind) {
-		return null;
-	}
 }

@@ -46,8 +46,4 @@ public class FixupValueKeyword implements LexicalFixup {
 			output.add(tok);
 		}
 	}
-
-	public List<Token> getExprAndClose(Iterator<Token> tokens, List<Token> accum, int closeTokenKind) {
-		return null;
-	}
 }

@@ -52,13 +52,4 @@ public class FixupDateLiterals implements LexicalFixup {
 				output.add(tok);
 		}
 	}
-
-	public Unit getUnit(Token possible) {
-		return null;
-	}
-
-	public List<Token> getExprAndClose(Iterator<Token> tokens, List<Token> accum, int closeTokenKind) {
-		return null;
-	}
-
 }
