@@ -22,11 +22,9 @@ import org.apache.asterix.lang.sqlpp.parser.Token;
 
 /**
  * Lexical fixup to get out of the morass caused by whether or not 'value' is a reserved word.  It IS a reserved word in SQL 92 and beyond,
- *   but it is used as an identifier in TPC-H query 11 and Presto is willing to parse it as an identifier.  In SQL++, the word is always
- *   reserved.  The speculation is that it only needs to be reserved when following the keyword 'select' and so this fixup makes it
- *   into an identifier in all other contexts.
- * Kluge alert: this practice is highly questionable and is only here to avoid modifying query 11 in place.  It seems to me that value
- *   should NOT be used as an identifier even if it is correct in standard SQL.
+ *   but it is used as a (non-delimited) identifier in TPC-H query 11 and Presto is willing to parse it as an identifier.  
+ *   In SQL++, the word is always reserved, even though it is only significant when it follows 'select'.
+ * In all other contexts, we delimit it using the SQL++ convention.
  */
 public class FixupValueKeyword implements LexicalFixup {
 
@@ -40,7 +38,7 @@ public class FixupValueKeyword implements LexicalFixup {
 			} else if (tok.kind == VALUE) {
 				if (!sawSelect) {
 					tok.kind = IDENTIFIER;
-					tok.image = "valu_";
+					tok.image = "`value`";
 				} else
 					sawSelect = false;
 			} else

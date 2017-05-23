@@ -52,6 +52,7 @@ import org.apache.asterix.lang.common.expression.TypeReferenceExpression;
 import org.apache.asterix.lang.common.expression.UnaryExpr;
 import org.apache.asterix.lang.common.expression.UnorderedListTypeDefinition;
 import org.apache.asterix.lang.common.expression.VariableExpr;
+import org.apache.asterix.lang.common.literal.TrueLiteral;
 import org.apache.asterix.lang.common.statement.CompactStatement;
 import org.apache.asterix.lang.common.statement.ConnectFeedStatement;
 import org.apache.asterix.lang.common.statement.CreateDataverseStatement;
@@ -177,7 +178,13 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(CaseExpression node, StringBuilder builder) throws CompilationException {
-		builder.append("(cases ");
+		builder = builder.append("(cases ");
+		Expression operand = node.getConditionExpr();
+		if (operand != null && !isTrueLiteral(operand)) {
+			builder = builder.append("(operand ");
+			builder = operand.accept(this, builder);
+			builder = builder.append(") ");
+		}
 		List<Expression> whens = node.getWhenExprs();
 		List<Expression> thens = node.getThenExprs();
 		Expression defaultValue = node.getElseExpr();
@@ -203,12 +210,12 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	public StringBuilder visit(CompactStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
 	}
-	
+
 	@Override
 	public StringBuilder visit(ConnectFeedStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
 	}
-
+	
 	@Override
 	public StringBuilder visit(CreateDataverseStatement del, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -341,14 +348,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
     	}
 		return builder.append(") ");
 	}
-	
+
 	@Override
 	public StringBuilder visit(HavingClause node, StringBuilder builder) throws CompilationException {
 		builder = builder.append("(having ");
 		builder = node.getFilterExpression().accept(this, builder);
 		return builder.append(") ");
 	}
-
+	
 	@Override
 	public StringBuilder visit(IfExpr ifexpr, StringBuilder arg) throws CompilationException {
 		return notImplemented(new Object(){});
@@ -896,6 +903,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 			return true;
 		String varName = decodeVariableRef(id.getValue());
 		return isDistinctName(varName, expr);
+	}
+
+	/**
+	 * Check whether an expression (assumed non-null) is the true literal
+	 * @param expr the expression
+	 * @return true iff the expression is the true literal
+	 */
+	private boolean isTrueLiteral(Expression expr) {
+		if (expr.getKind() == Kind.LITERAL_EXPRESSION) {
+			Literal lit = ((LiteralExpr) expr).getValue();
+			return lit == TrueLiteral.INSTANCE;
+		}
+		return false;
 	}
 
 	/**
