@@ -17,9 +17,10 @@
 Section CAMPtocNRAEnv.
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicRuntime.
-  Require Import NRARuntime NRAEnvRuntime.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Import NRARuntime.
+  Require Import cNRAEnvRuntime.
   Require Import CAMPRuntime.
   Require Import CAMPtoNRA.
 

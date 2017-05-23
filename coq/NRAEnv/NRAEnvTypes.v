@@ -15,8 +15,9 @@
  *)
 
 Require Export BasicTypes.
-Require Export TcNRAEnv TcNRAEnvEq TcNRAEnvIgnore.
-Require Export TNRAEnv TNRAEnvEq.
+Require Export cNRAEnvTypes. (* Always include core support *)
+Require Export TNRAEnv.
+Require Export TNRAEnvEq.
 
 (* 
 *** Local Variables: ***

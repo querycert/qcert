@@ -15,8 +15,12 @@
  *)
 
 Require Export BasicRuntime.
-Require Export cNNRC cNNRCNorm cNNRCEq cNNRCShadow.
-Require Export NNRC NNRCSugar NNRCShadow NNRCEq NNRCSize.
+Require Export cNNRCRuntime. (* Always include core support *)
+Require Export NNRC.
+Require Export NNRCSugar.
+Require Export NNRCShadow.
+Require Export NNRCEq.
+Require Export NNRCSize.
 
 (* 
 *** Local Variables: ***

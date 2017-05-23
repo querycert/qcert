@@ -17,17 +17,16 @@
 Section Helpers.
   Require Import String.
   Definition eol := String (Ascii.ascii_of_nat 10) EmptyString.
-
 End Helpers.
 
-Require Import List String.
+Require Import List.
+Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
-
-Require Import Utils BasicSystem.
-Require Import NNRCRuntime ForeignToScala.
+Require Import BasicSystem.
+Require Import NNRCRuntime.
+Require Import ForeignToScala.
 Require Import DNNRC.
-Require Import RType.
 Require Import TDataInfer.
 Require Import TDNNRCInfer.
 Require Import TOpsInfer.

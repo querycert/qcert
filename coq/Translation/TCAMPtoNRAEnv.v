@@ -15,13 +15,15 @@
  *)
 
 Section TCAMPtoNRAEnv.
-
-  Require Import String List.
-
-  Require Import Utils BasicSystem.
-  Require Import NRASystem NRAEnvSystem.
+  Require Import String.
+  Require Import List.
+  Require Import BasicSystem.
+  Require Import NRASystem.
+  Require Import NRAEnvSystem.
   Require Import CAMPSystem.
-  Require Import CAMPtoNRAEnv TCAMPtoNRA TCAMPtocNRAEnv.
+  Require Import CAMPtoNRAEnv.
+  Require Import TCAMPtoNRA.
+  Require Import TCAMPtocNRAEnv.
 
   Local Open Scope string_scope.
   Local Open Scope list_scope.

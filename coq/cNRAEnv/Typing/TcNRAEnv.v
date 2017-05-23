@@ -23,7 +23,6 @@ Section TcNRAEnv.
   Require Import Utils BasicSystem.
 
   Require Import cNRAEnv cNRAEnvEq.
-  Require Import NRAEnv.
 
   Local Open Scope nraenv_core_scope.
   

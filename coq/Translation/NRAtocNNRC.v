@@ -15,19 +15,14 @@
  *)
 
 Section NRAtocNNRC.
-
-  (* begin hide *)
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Compare_dec.
   Require Import Program.
-
-  Require Import Utils BasicRuntime.
+  Require Import BasicRuntime.
   Require Import NRARuntime.
-  Require Import NNRCRuntime.
-
-  (* end hide *)
+  Require Import cNNRCRuntime.
 
   Context {fruntime:foreign_runtime}.
 
@@ -329,6 +324,7 @@ _var ⊕ [[ op2 ]]_var *)
   Section Size.
 
     Require Import Omega.
+    Require Import NNRC NNRCSize.
 
     Theorem nraToNNRC_size op v : 
       nnrc_size (nra_to_nnrc op v) <= 10 * nra_size op.

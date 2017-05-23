@@ -15,10 +15,12 @@
  *)
 
 Require Import Basics.
-Require Import List String.
+Require Import List.
+Require Import String.
 Require Import EquivDec.
 
-Require Import Types BasicRuntime.
+Require Import Types.
+Require Import BasicRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavaScript.
 Require Import JSON.

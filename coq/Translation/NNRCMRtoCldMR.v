@@ -19,11 +19,14 @@ Section NNRCMRToCldMR.
   Require Import List.
   Require Import Sorting.Mergesort.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
-  Require Import NNRCRuntime NNRCMRRuntime.
-  Require Import ForeignCloudant ForeignToCloudant.
-  Require Import CldMRUtil CldMR.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Import NNRCRuntime.
+  Require Import NNRCMRRuntime.
+  Require Import ForeignCloudant.
+  Require Import ForeignToCloudant.
+  Require Import CldMRUtil.
+  Require Import CldMR.
   
   Local Open Scope list_scope.
 

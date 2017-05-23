@@ -19,11 +19,15 @@ Section NNRCMRtoDNNRC.
   Require Import List.
   Require Import Sorting.Mergesort.
   Require Import EquivDec.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Import NNRCSystem.
+  Require Import NNRCMRSystem.
+  Require Import ForeignReduceOps.
+  Require Import ForeignToReduceOps.
+  Require Import DNNRC.
+  Require Import NNRCtoDNNRC.
 
-  Require Import Utils BasicRuntime.
-  Require Import NNRCSystem NNRCMRSystem.
-  Require Import ForeignReduceOps ForeignToReduceOps.
-  Require Import DNNRC NNRCtoDNNRC.
   Local Open Scope string_scope.
 
   Context {fruntime:foreign_runtime}.

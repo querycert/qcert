@@ -14,14 +14,15 @@
  * limitations under the License.
  *)
 
-Require Import List String.
+Require Import List.
+Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
+Require Import BasicRuntime.
+Require Import NNRCRuntime.
+Require Import ForeignToJava.
 
-Require Import Utils BasicRuntime.
-Require Import NNRCRuntime ForeignToJava.
 Local Open Scope string_scope.
-
 
 Section sanitizer.
   Import ListNotations.

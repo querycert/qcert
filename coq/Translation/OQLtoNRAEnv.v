@@ -15,16 +15,12 @@
  *)
 
 Section OQLtoNRAEnv.
-
   Require Import String.
   Require Import List.
   Require Import Arith Omega.
   Require Import EquivDec.
   Require Import Morphisms.
-
-
-  Require Import Utils BasicRuntime.
-
+  Require Import BasicRuntime.
   Require Import OQL.
   Require Import NRAEnvRuntime.
 

@@ -19,9 +19,12 @@ Section NRewMR.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
-  Require Import NNRCRuntime NNRCMR ForeignReduceOps.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Import cNNRCRuntime.
+  Require Import NNRCRuntime.
+  Require Import NNRCMR.
+  Require Import ForeignReduceOps.
 
   Local Open Scope list_scope.
 

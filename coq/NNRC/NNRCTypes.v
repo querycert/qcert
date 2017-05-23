@@ -15,8 +15,10 @@
  *)
 
 Require Export BasicTypes.
-Require Export TcNNRC TcNNRCEq TcNNRCShadow.
-Require Export TNNRC TNNRCEq TNNRCShadow.
+Require Export cNNRCTypes. (* Always include core support *)
+Require Export TNNRC.
+Require Export TNNRCEq.
+Require Export TNNRCShadow.
 
 (* 
 *** Local Variables: ***

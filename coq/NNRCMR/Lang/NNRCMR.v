@@ -29,7 +29,7 @@ Section NNRCMR.
   Require Import EquivDec.
   Require Import Utils.
   Require Import BasicRuntime.
-  Require Import NNRCRuntime.
+  Require Import cNNRCRuntime.
   Require Import ForeignReduceOps.
 
   Local Open Scope list_scope.

@@ -42,7 +42,6 @@ Section TcNNRCEq.
 
   Notation "e1 ⇒ᶜᶜ e2" := (tnnrc_rewrites_to e1 e2) (at level 80).
 
-  Require Import NNRCEq.
   Open Scope nnrc_scope.
 
   Lemma data_normalized_bindings_type_map env τenv :
@@ -76,7 +75,7 @@ Section TcNNRCEq.
   Hint Constructors unaryOp_type.
   Hint Constructors binOp_type.
 
-  Require Import ROpsEq NNRCEq.
+  Require Import ROpsEq.
   
   Global Instance  tnnrc_rewrites_to_pre : PreOrder tnnrc_rewrites_to.
   Proof.

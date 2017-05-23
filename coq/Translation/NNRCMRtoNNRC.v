@@ -19,9 +19,11 @@ Require Import ZArith.
 Require Import String.
 Require Import List.
 Require Import EquivDec.
-
-Require Import Utils BasicRuntime.
-Require Import NNRCRuntime NNRCMRRuntime ForeignToReduceOps.
+Require Import Utils.
+Require Import BasicRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCMRRuntime.
+Require Import ForeignToReduceOps.
 
 Local Open Scope list_scope.
 

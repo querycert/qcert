@@ -15,16 +15,16 @@
  *)
 
 Section NNRCtoDNNRC.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Morphisms.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import BasicRuntime.
   Require Import NNRCSystem.
-  Require Import DData DNNRC.
+  Require Import DData.
+  Require Import DNNRC.
 
   Context {fruntime:foreign_runtime}.
   

@@ -15,17 +15,16 @@
  *)
 
 Section TOQLtoNRAEnv.
-
   Require Import String.
   Require Import List.
-  Require Import Arith Omega.
+  Require Import Arith.
+  Require Import Omega.
   Require Import EquivDec.
   Require Import Morphisms.
-
-  Require Import Utils BasicSystem.
-
-  Require Import OQL TOQL OQLtoNRAEnv.
+  Require Import BasicSystem.
+  Require Import OQLSystem.
   Require Import NRAEnvSystem.
+  Require Import OQLtoNRAEnv.
 
   Context {m:basic_model}.
 

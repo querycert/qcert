@@ -19,8 +19,7 @@ Require Import List.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
-
-Require Import Utils BasicRuntime.
+Require Import BasicRuntime.
 
 Section LambdaNRAtoNRAEnv.
 

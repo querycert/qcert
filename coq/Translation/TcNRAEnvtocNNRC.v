@@ -15,17 +15,15 @@
  *)
 
 Section TcNRAEnvtocNNRC.
-
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Compare_dec.
   Require Import Program.
-  
-  Require Import Utils BasicSystem.
-  Require Import NRAEnvSystem.
-  Require Import NNRCSystem.
-
+  Require Import Utils.
+  Require Import BasicSystem.
+  Require Import cNRAEnvSystem.
+  Require Import cNNRCSystem.
   Require Import cNRAEnvtocNNRC.
 
   (** Type preservation for the translation from NRA to NNRC *)

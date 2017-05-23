@@ -120,45 +120,51 @@ MODULES = \
 	NRA/Optim/NRAExtRewrite \
 	NRA/Optim/TNRARewrite \
 	NRA/NRAOptim \
-	NRAEnv/Core/cNRAEnv \
-	NRAEnv/Core/cNRAEnvSize \
-	NRAEnv/Core/cNRAEnvIgnore \
-	NRAEnv/Core/cNRAEnvEq \
-        NRAEnv/Lang/NRAEnv \
+	cNRAEnv/Lang/cNRAEnv \
+	cNRAEnv/Lang/cNRAEnvSize \
+	cNRAEnv/Lang/cNRAEnvIgnore \
+	cNRAEnv/Lang/cNRAEnvEq \
+	cNRAEnv/Typing/TcNRAEnv \
+	cNRAEnv/Typing/TcNRAEnvInfer \
+	cNRAEnv/Typing/TcNRAEnvIgnore \
+        cNRAEnv/Typing/TcNRAEnvEq \
+        cNRAEnv/Context/cNRAEnvContext \
+	cNRAEnv/Context/cNRAEnvContextLift \
+	cNRAEnv/cNRAEnvRuntime \
+	cNRAEnv/cNRAEnvTypes \
+	cNRAEnv/cNRAEnvSystem \
+	NRAEnv/Lang/NRAEnv \
         NRAEnv/Lang/NRAEnvSize \
         NRAEnv/Lang/NRAEnvEq \
         NRAEnv/Lang/NRAEnvIgnore \
-	NRAEnv/Typing/TcNRAEnv \
-	NRAEnv/Typing/TcNRAEnvInfer \
-	NRAEnv/Typing/TcNRAEnvIgnore \
-        NRAEnv/Typing/TcNRAEnvEq \
 	NRAEnv/Typing/TNRAEnv \
 	NRAEnv/Typing/TNRAEnvEq \
 	NRAEnv/NRAEnvRuntime \
 	NRAEnv/NRAEnvTypes \
 	NRAEnv/NRAEnvSystem \
-	NRAEnv/Context/cNRAEnvContext \
-	NRAEnv/Context/cNRAEnvContextLift \
 	NRAEnv/Optim/NRAEnvRewrite \
 	NRAEnv/Optim/NRAEnvRewriteContext \
 	NRAEnv/Optim/TNRAEnvRewrite \
 	NRAEnv/Optim/NRAEnvOptimizer \
 	NRAEnv/NRAEnvOptim \
-	NNRC/Core/cNNRC \
-	NNRC/Core/cNNRCShadow \
-	NNRC/Core/cNNRCNorm \
-	NNRC/Core/cNNRCEq \
+	cNNRC/Lang/cNNRC \
+	cNNRC/Lang/cNNRCShadow \
+	cNNRC/Lang/cNNRCNorm \
+	cNNRC/Lang/cNNRCEq \
+	cNNRC/Typing/TcNNRC \
+	cNNRC/Typing/TcNNRCInfer \
+	cNNRC/Typing/TcNNRCEq \
+	cNNRC/Typing/TcNNRCShadow \
+	cNNRC/cNNRCRuntime \
+	cNNRC/cNNRCTypes \
+	cNNRC/cNNRCSystem \
 	NNRC/Lang/NNRC \
 	NNRC/Lang/NNRCSugar \
 	NNRC/Lang/NNRCShadow \
 	NNRC/Lang/NNRCEq \
 	NNRC/Lang/NNRCSize \
-	NNRC/Typing/TcNNRC \
 	NNRC/Typing/TNNRC \
-	NNRC/Typing/TcNNRCInfer \
-	NNRC/Typing/TcNNRCEq \
 	NNRC/Typing/TNNRCEq \
-	NNRC/Typing/TcNNRCShadow \
 	NNRC/Typing/TNNRCShadow \
 	NNRC/NNRCRuntime \
 	NNRC/NNRCTypes \

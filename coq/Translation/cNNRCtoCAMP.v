@@ -14,18 +14,16 @@
  * limitations under the License.
  *)
 
-(* begin hide *)
 Require Import String.
 Require Import Bool.
 Require Import List.
-Require Import EquivDec Decidable Morphisms.
+Require Import EquivDec.
+Require Import Decidable.
+Require Import Morphisms.
 Require Import Omega.
-
-Require Import Utils BasicRuntime.
+Require Import BasicRuntime.
 Require Import CAMPRuntime.
-Require Import NNRCRuntime.
-
-(* end hide *)
+Require Import cNNRCRuntime.
 
 Section NNRCtoCAMP.
 

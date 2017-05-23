@@ -15,11 +15,9 @@
  *)
 
 Section TCAMPtoNRA.
-
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicSystem.
+  Require Import BasicSystem.
   Require Import NRASystem.
   Require Import CAMPSystem.
   Require Import CAMPtoNRA.

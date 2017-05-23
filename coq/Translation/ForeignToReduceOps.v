@@ -15,9 +15,7 @@
  *)
 
 Section ForeignToReduceOps.
-
   Require Import EquivDec.
-
   Require Import Utils.
   Require Import BasicRuntime.
   Require Import NNRCMRRuntime.

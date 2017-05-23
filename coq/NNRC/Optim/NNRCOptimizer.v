@@ -26,9 +26,13 @@ Section NNRCOptimizer.
   Require Import EquivDec.
   Require Import Program.
 
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import BasicSystem.
+  Require Import cNNRCSystem.
   Require Import NNRCSystem.
-  Require Import NNRCRewriteUtil NNRCRewrite TNNRCRewrite.
+  Require Import NNRCRewriteUtil.
+  Require Import NNRCRewrite.
+  Require Import TNNRCRewrite.
   Require Import OptimizerLogger.
   Require Import OptimizerStep.
 

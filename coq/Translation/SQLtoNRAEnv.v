@@ -15,20 +15,17 @@
  *)
 
 Section SQLtoNRAEnv.
-
   Require Import String.
   Require Import ZArith.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
-
-  Require Import Utils BasicSystem.
-
-  Context {fruntime:foreign_runtime}.
-
+  Require Import BasicSystem.
   Require Import RDataSort. (* For SortCriterias *)
   Require Import SQL.
   Require Import NRAEnvRuntime.
+
+  Context {fruntime:foreign_runtime}.
 
   Definition sql_order_to_nraenv (acc:nraenv) (opt_order:option sql_order_spec) :=
     match opt_order with

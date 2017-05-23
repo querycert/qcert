@@ -14,13 +14,15 @@
  * limitations under the License.
  *)
 
-Require Import List String.
+Require Import List.
+Require Import String.
 Require Import EquivDec.
-
-Require Import Utils BasicRuntime.
-Require Import NNRCRuntime NNRCMRRuntime.
+Require Import BasicRuntime.
+Require Import NNRCRuntime.
+Require Import NNRCMRRuntime.
 Require Import NNRCtoJavaScript.
-Require Import ForeignToJavaScript ForeignToSpark.
+Require Import ForeignToJavaScript.
+Require Import ForeignToSpark.
 Require Import SparkRDDRuntime.
 
 Local Open Scope string_scope.

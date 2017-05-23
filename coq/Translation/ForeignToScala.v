@@ -14,9 +14,11 @@
  * limitations under the License.
  *)
 
-Require Import List String.
-
-Require Import Utils ForeignRuntime ForeignType.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import ForeignRuntime.
+Require Import ForeignType.
 
 Local Open Scope string_scope.
 

@@ -14,18 +14,20 @@
  * limitations under the License.
  *)
 
-Require Import String Bool List.
-Require Import Decidable EquivDec Permutation.
+Require Import String.
+Require Import Bool.
+Require Import List.
+Require Import Decidable.
+Require Import EquivDec.
+Require Import Permutation.
 Require Import EquivDec.
 Require Import Eqdep_dec.
-
-Require Import Utils BasicSystem.
-Require Import NNRCSystem.
+Require Import BasicSystem.
+Require Import cNNRCSystem.
 Require Import CAMPSystem.
-
 Require Import cNNRCtoCAMP.
   
-Section TNNRCtoCAMP.
+Section TcNNRCtoCAMP.
 
   (** Auxiliary definitions and lemmas *)
   Context {m:basic_model}.
@@ -2014,14 +2016,13 @@ Section TNNRCtoCAMP.
   Proof.
     intro Hiscore. intros. unfold nnrcToCamp_let in *.
     generalize (unshadow_simpl_preserve_core (domain Γ) n Hiscore); intros.
-    unfold unshadow_simpl in *.
+    unfold cNNRCShadow.unshadow_simpl in *.
     eapply unshadow_type.
     eapply (nnrc_to_camp_ns_type_preserve_back); trivial.
     - apply unshadow_preserve_core; assumption.
     - apply unshadow_shadow_free.
     - apply unshadow_avoid.
     - apply nnrc_to_camp_ns_let_type_equiv_back; eauto.
-      + apply unshadow_preserve_core; assumption.
       + apply fresh_bindings_from_tnnrc.
       + apply unshadow_shadow_free.
       + intros ? inn1 inn2.
@@ -2065,7 +2066,7 @@ Section TNNRCtoCAMP.
      intuition; eauto.
    Qed.
 
-End TNNRCtoCAMP.
+End TcNNRCtoCAMP.
 
 (* 
 *** Local Variables: ***

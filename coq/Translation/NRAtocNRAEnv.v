@@ -15,13 +15,11 @@
  *)
 
 Section NRAtocNRAEnv.
-
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicRuntime.
+  Require Import BasicRuntime.
   Require Import NRARuntime.
-  Require Import NRAEnvRuntime.
+  Require Import cNRAEnvRuntime.
 
   Context {fr:foreign_runtime}.
 

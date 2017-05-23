@@ -49,7 +49,7 @@ Section NNRC.
   Require Import EquivDec Decidable.
 
   Require Import Utils BasicRuntime.
-  Require Import cNNRC.
+  Require Import cNNRCRuntime.
 
   Context {fruntime:foreign_runtime}.
 

@@ -14,10 +14,11 @@
  * limitations under the License.
  *)
 
-Require Export NNRCRewriteUtil.
-Require Export NNRCRewrite.
-Require Export TNNRCRewrite.
-Require Export NNRCOptimizer.
+Require Export BasicRuntime.
+Require Export cNRAEnv.
+Require Export cNRAEnvEq.
+Require Export cNRAEnvSize.
+Require Export cNRAEnvIgnore.
 
 (* 
 *** Local Variables: ***

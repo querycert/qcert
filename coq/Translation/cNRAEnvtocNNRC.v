@@ -15,18 +15,13 @@
  *)
 
 Section cNRAEnvtocNNRC.
-
-  (* begin hide *)
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Compare_dec.
-
-  Require Import Utils BasicRuntime.
-  Require Import NRAEnvRuntime.
-  Require Import NNRCRuntime.
-
-  (* end hide *)
+  Require Import BasicRuntime.
+  Require Import cNRAEnvRuntime.
+  Require Import cNNRCRuntime.
 
   Context {fruntime:foreign_runtime}.
 
@@ -607,34 +602,35 @@ Section cNRAEnvtocNNRC.
   (** Lemma and proof of linear size translation *)
 
   Section size.
+    Require Import NNRC.
+    Require Import NNRCSize.
+    Require Import Omega.
 
-  Require Import Omega.
-
-  Theorem nraenv_coreToNNRC_size op vid venv : 
-    nnrc_size (nraenv_core_to_nnrc op vid venv) <= 10 * nraenv_core_size op.
-  Proof.
-    Transparent fresh_var2.
-    revert vid venv.
-    induction op; simpl in *; intros; trivial.
-    - omega.
-    - omega.
-    - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop vid venv); omega.
-    - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
-      specialize (IHop2 vid venv); omega.
-    - repeat match_destr.
-      specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
-    - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
-    - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
-    - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
-    - omega.
-    - omega.
-    - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
-    - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
-  Qed.
+    Theorem nraenv_coreToNNRC_size op vid venv : 
+      nnrc_size (nraenv_core_to_nnrc op vid venv) <= 10 * nraenv_core_size op.
+    Proof.
+      Transparent fresh_var2.
+      revert vid venv.
+      induction op; simpl in *; intros; trivial.
+      - omega.
+      - omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop vid venv); omega.
+      - specialize (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv);
+          specialize (IHop2 vid venv); omega.
+      - repeat match_destr.
+        specialize (IHop1 (fresh_var "tmc$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 (fresh_var "tsel$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 vid venv); specialize (IHop2 vid venv); omega.
+      - specialize (IHop1 (fresh_var "teitherL$" (vid :: venv :: nil)) venv); specialize (IHop2 (fresh_var "teitherR$" (fresh_var "teitherL$" (vid :: venv :: nil) :: vid :: venv :: nil)) venv); omega.
+      - specialize (IHop2 vid venv); specialize (IHop1 vid venv); omega.
+      - specialize (IHop1 (fresh_var "tapp$" (vid :: venv :: nil)) venv); specialize (IHop2 vid venv); omega.
+      - omega.
+      - omega.
+      - specialize (IHop1 vid (fresh_var "tappe$" (vid :: venv :: nil))); specialize (IHop2 vid venv); omega.
+      - specialize (IHop vid (fresh_var "tmape$" (vid :: venv :: nil))); omega.
+    Qed.
 
   End size.
 

@@ -14,10 +14,8 @@
  * limitations under the License.
  *)
 
-Require Export NNRCRewriteUtil.
-Require Export NNRCRewrite.
-Require Export TNNRCRewrite.
-Require Export NNRCOptimizer.
+Require Export BasicTypes.
+Require Export TcNNRC TcNNRCEq TcNNRCShadow.
 
 (* 
 *** Local Variables: ***

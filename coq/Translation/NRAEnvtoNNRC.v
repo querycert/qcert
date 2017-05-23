@@ -15,18 +15,13 @@
  *)
 
 Section NRAEnvtoNNRC.
-
-  (* begin hide *)
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Compare_dec.
-
-  Require Import Utils BasicRuntime.
+  Require Import BasicRuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
-
-  (* end hide *)
 
   Context {fruntime:foreign_runtime}.
 

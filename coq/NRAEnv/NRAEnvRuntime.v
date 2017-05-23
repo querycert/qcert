@@ -15,8 +15,11 @@
  *)
 
 Require Export BasicRuntime.
-Require Export cNRAEnv cNRAEnvEq cNRAEnvSize cNRAEnvIgnore.
-Require Export NRAEnv NRAEnvSize NRAEnvIgnore NRAEnvEq.
+Require Export cNRAEnvRuntime. (* Always include core support *)
+Require Export NRAEnv.
+Require Export NRAEnvSize.
+Require Export NRAEnvIgnore.
+Require Export NRAEnvEq.
 
 (* 
 *** Local Variables: ***
