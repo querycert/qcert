@@ -26,7 +26,7 @@ Require Import LambdaNRA LambdaNRAEq LambdaNRAtoNRAEnv.
 Require Import TrivialCompiler.
 Import TrivialCompiler.
 
-Section DatasetTests.
+Section tDNNRCTests.
   Require Import LambdaNRATest.
 
   
@@ -40,7 +40,7 @@ Section DatasetTests.
   (* LambdaNRA to DNNRC *)
   Definition a := lambda_nra_to_nraenv A4.
   Definition b := nraenv_to_nnrc a.
-  Definition c := nnrc_to_dnnrc_dataset (("Persons"%string,Vdistr)::nil) b.
+  Definition c := nnrc_to_dnnrc (("Persons"%string,Vdistr)::nil) b.
 
   (* Typing stuffs for then next steps *)
   Require Import CAMPTest.
@@ -57,20 +57,20 @@ Section DatasetTests.
 
   (* Eval vm_compute in c. *)
   
-  Definition d := dnnrc_dataset_to_dnnrc_typed_dataset c tdenv.
+  Definition d := dnnrc_to_dnnrc_typed c tdenv.
 
-  Definition e:= lift dnnrc_typed_dataset_optim d.
+  Definition e:= lift dnnrc_typed_optim d.
   
   (* Eval stuffs *)
   Require Import CompEval.
 
   Require Import NRATest.
   Definition env := (("CONST$Persons"%string,persons)::nil).
-  Definition ev := lift (fun x => @eval_dnnrc_typed_dataset _ _ _ [] x env) e.
+  Definition ev := lift (fun x => @eval_dnnrc_typed _ _ _ [] x env) e.
 
   (* Eval vm_compute in e. *)
 
-End DatasetTests.
+End tDNNRCTests.
 
 (* 
 *** Local Variables: ***

@@ -15,19 +15,17 @@
  *)
 
 Require Import Basics.
-Require Import List String.
+Require Import List.
+Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
-
-Require Import Utils BasicSystem.
+Require Import BasicSystem.
 Require Import NNRCRuntime.
-Require Import DNNRC DNNRCSize DNNRCEq.
-Require Import RType.
-Require Import TDNNRCInfer.
-Require Import TOpsInfer.
-Require Import Dataset DatasetSize.
-Require Import OptimizerStep OptimizerLogger.
-
+Require Import DNNRCSystem.
+Require Import tDNNRC.
+Require Import tDNNRCInfer.
+Require Import OptimizerStep.
+Require Import OptimizerLogger.
 
 Section tDNNRCOptimizer.
 
@@ -157,8 +155,8 @@ Section tDNNRCOptimizer.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataset) :
-    @dnnrc _ (type_annotation A) dataset
+             (e: @dnnrc _ (type_annotation A) dataframe) :
+    @dnnrc _ (type_annotation A) dataframe
     := match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x
@@ -167,7 +165,7 @@ Section tDNNRCOptimizer.
                                     leftVar
                                     leftE
                                     _
-                                    (DNNRC.DNNRCConst _ (dcoll nil)))) =>
+                                    (DNNRCConst _ (dcoll nil)))) =>
       if (x == x')
       then
         match olift tuneither (lift_tlocal (ta_inferred t4)) with
@@ -177,7 +175,7 @@ Section tDNNRCOptimizer.
           (* We need a fresh name for the DNNRCAlg environment that binds DNNRC terms to
            * be referred to by name in the algebra part.
            * I talked to Avi about it and this is what needs to happen:
-           * - TODO write a function that finds free (and possibly bound) names in Dataset
+           * - TODO write a function that finds free (and possibly bound) names in Dataframe
            * - TODO use existing fresh_var-related functions in Basic.Util.RFresh
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
@@ -250,8 +248,8 @@ Section tDNNRCOptimizer.
 
   Definition rec_lift_unbrand
              {A : Set}
-             (e: @dnnrc _ (type_annotation A) dataset):
-    (@dnnrc _ (type_annotation _) dataset) :=
+             (e: @dnnrc _ (type_annotation A) dataframe):
+    (@dnnrc _ (type_annotation _) dataframe) :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs as c) body =>
       match lift_tlocal (di_required_typeof c) with
@@ -304,7 +302,7 @@ Section tDNNRCOptimizer.
     end.
 
   Fixpoint condition_to_column {A: Set}
-           (e: @dnnrc _ (type_annotation A) dataset)
+           (e: @dnnrc _ (type_annotation A) dataframe)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
@@ -352,14 +350,14 @@ Section tDNNRCOptimizer.
     end.
 
   Definition rec_if_else_empty_to_filter {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataset):
-    (@dnnrc _ (type_annotation A) dataset) :=
+             (e: @dnnrc _ (type_annotation A) dataframe):
+    (@dnnrc _ (type_annotation A) dataframe) :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x (DNNRCCollect t3 xs)
                         (DNNRCIf _ condition
                                 thenE
-                                (DNNRC.DNNRCConst _ (dcoll nil)))) =>
+                                (DNNRCConst _ (dcoll nil)))) =>
       match condition_to_column condition (x, CCol "abc") with
       | Some c' =>
         let ALG :=
@@ -383,8 +381,8 @@ Section tDNNRCOptimizer.
          (@rec_if_else_empty_to_filter A) (* lemma *).
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataset):
-    @dnnrc _ (type_annotation A) dataset :=
+             (e: @dnnrc _ (type_annotation A) dataframe):
+    @dnnrc _ (type_annotation A) dataframe :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x xs
@@ -401,8 +399,8 @@ Section tDNNRCOptimizer.
          (@rec_remove_map_singletoncoll_flatten A) (* lemma *).
 
   Definition rec_for_to_select {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataset):
-    @dnnrc _ (type_annotation A) dataset :=
+             (e: @dnnrc _ (type_annotation A) dataframe):
+    @dnnrc _ (type_annotation A) dataframe :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
@@ -437,7 +435,7 @@ Section tDNNRCOptimizer.
   Import ListNotations.
 
   Definition dnnrc_optim_list {A} :
-    list (OptimizerStep (@dnnrc _ (type_annotation A) dataset))
+    list (OptimizerStep (@dnnrc _ (type_annotation A) dataframe))
     := [
         rec_cast_to_filter_step
         ; rec_lift_unbrand_step
@@ -455,12 +453,12 @@ Section tDNNRCOptimizer.
   Qed.
   
   Definition run_dnnrc_optims {A}
-             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataset)}
+             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataframe)}
              (phaseName:string)
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
-    : @dnnrc _ (type_annotation A) dataset -> @dnnrc _ (type_annotation A) dataset :=
-    run_phase dnnrc_map_deep (dnnrc_size (* dataset_size *)) dnnrc_optim_list
+    : @dnnrc _ (type_annotation A) dataframe -> @dnnrc _ (type_annotation A) dataframe :=
+    run_phase dnnrc_map_deep (dnnrc_size (* dataframe_size *)) dnnrc_optim_list
               ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
 
   Definition dnnrc_default_optim_list : list string
@@ -478,8 +476,8 @@ Section tDNNRCOptimizer.
     vm_compute; trivial.
   Qed.
 
-  Definition dnnrcToDatasetRewrite {A:Set}
-             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataset)}
+  Definition dnnrcToDataframeRewrite {A:Set}
+             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataframe)}
     := run_dnnrc_optims "" dnnrc_default_optim_list 6.
 
 End tDNNRCOptimizer.

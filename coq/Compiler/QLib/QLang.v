@@ -43,12 +43,12 @@ Module QLang(runtime:CompilerRuntime).
     Definition nnrc := nnrc.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
-    Definition dnnrc_dataset := dnnrc_dataset.
-    Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc_typed_dataset.
+    Definition dnnrc := dnnrc.
+    Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
     Definition javascript := javascript.
     Definition java := java.
     Definition spark_rdd := spark_rdd.
-    Definition spark_dataset := spark_dataset.
+    Definition spark_df := spark_df.
     Definition cloudant := cloudant.
 
     Definition language : Set := language.

@@ -36,6 +36,7 @@ Section CompStat.
   Require Import NNRCMRRuntime.
   Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
+  Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (** Target languages *)
   Require Import JavaScriptRuntime.
@@ -82,9 +83,9 @@ Section CompStat.
       (("cloudant_stat", dstring "no stat available")
          :: nil).
 
-  Definition stat_spark_dataset (q: spark_dataset) : data :=
+  Definition stat_spark_df (q: spark_df) : data :=
     drec
-      (("spark_dataset_stat", dstring "no stat available")
+      (("spark_df_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_spark_rdd (q: spark_rdd) : data :=
@@ -102,14 +103,14 @@ Section CompStat.
       (("javascript_stat", dstring "no stat available")
          :: nil).
 
-  Definition stat_dnnrc_typed_dataset (q: dnnrc_typed_dataset) : data :=
+  Definition stat_dnnrc_typed (q: dnnrc_typed) : data :=
     drec
-      (("dnnrc_typed_dataset_stat", dstring "no stat available")
+      (("dnnrc_typed_stat", dstring "no stat available")
          :: nil).
 
-  Definition stat_dnnrc_dataset (q: dnnrc_dataset) : data :=
+  Definition stat_dnnrc (q: dnnrc) : data :=
     drec
-      (("dnnrc_dataset_stat", dstring "no stat available")
+      (("dnnrc_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_cldmr (q: cldmr) : data :=
@@ -198,9 +199,9 @@ Section CompStat.
       (("cloudant", stat_cloudant q)
          :: nil).
 
-  Definition stat_tree_spark_dataset (q: spark_dataset) : data :=
+  Definition stat_tree_spark_df (q: spark_df) : data :=
     drec
-      (("spark_dataset", stat_spark_dataset q)
+      (("spark_df", stat_spark_df q)
          :: nil).
 
   Definition stat_tree_spark_rdd (q: spark_rdd) : data :=
@@ -218,14 +219,14 @@ Section CompStat.
       (("javascript", stat_javascript q)
          :: nil).
 
-  Definition stat_tree_dnnrc_typed_dataset (q: dnnrc_typed_dataset) : data :=
+  Definition stat_tree_dnnrc_typed (q: dnnrc_typed) : data :=
     drec
-      (("dnnrc_typed_dataset", stat_dnnrc_typed_dataset q)
+      (("dnnrc_typed", stat_dnnrc_typed q)
          :: nil).
 
-  Definition stat_tree_dnnrc_dataset (q: dnnrc_dataset) : data :=
+  Definition stat_tree_dnnrc (q: dnnrc) : data :=
     drec
-      (("dnnrc_dataset", stat_dnnrc_dataset q)
+      (("dnnrc", stat_dnnrc q)
          :: nil).
 
   Definition stat_tree_cldmr (q: cldmr) : data :=
@@ -411,12 +412,12 @@ Section CompStat.
         | Q_nnrc q => stat_nnrc q
         | Q_nnrcmr q => stat_nnrcmr q
         | Q_cldmr q => stat_cldmr q
-        | Q_dnnrc_dataset q => stat_dnnrc_dataset q
-        | Q_dnnrc_typed_dataset q => stat_dnnrc_typed_dataset q
+        | Q_dnnrc q => stat_dnnrc q
+        | Q_dnnrc_typed q => stat_dnnrc_typed q
         | Q_javascript q => stat_javascript q
         | Q_java q => stat_java q
         | Q_spark_rdd q => stat_spark_rdd q
-        | Q_spark_dataset q => stat_spark_dataset q
+        | Q_spark_df q => stat_spark_df q
         | Q_cloudant q => stat_cloudant q
         | Q_error q => stat_error q
         end
@@ -440,12 +441,12 @@ Section CompStat.
         | Q_nnrc q => stat_tree_nnrc q
         | Q_nnrcmr q => stat_tree_nnrcmr q
         | Q_cldmr q => stat_tree_cldmr q
-        | Q_dnnrc_dataset q => stat_tree_dnnrc_dataset q
-        | Q_dnnrc_typed_dataset q => stat_tree_dnnrc_typed_dataset q
+        | Q_dnnrc q => stat_tree_dnnrc q
+        | Q_dnnrc_typed q => stat_tree_dnnrc_typed q
         | Q_javascript q => stat_tree_javascript q
         | Q_java q => stat_tree_java q
         | Q_spark_rdd q => stat_tree_spark_rdd q
-        | Q_spark_dataset q => stat_tree_spark_dataset q
+        | Q_spark_df q => stat_tree_spark_df q
         | Q_cloudant q => stat_tree_cloudant q
         | Q_error q => stat_tree_error q
         end

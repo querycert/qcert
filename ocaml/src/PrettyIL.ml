@@ -1001,7 +1001,7 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
 	     "DISPATCH"
 	     (pretty_dnnrc_aux ann plug p sym) n1
   | Hack.DNNRCAlg (a,body,arglist) ->
-     fprintf ff "@[%adataset(@[fun $%a => @] %a)@[(%a)@]@]"
+     fprintf ff "@[%adataframe(@[fun $%a => @] %a)@[(%a)@]@]"
 	     ann a
              (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
              plug body
@@ -1114,17 +1114,17 @@ let rec pretty_column_aux p sym ff col =
 let pretty_named_column_aux p sym ff (name, col) =
   fprintf ff "%s%@%a" (Util.string_of_char_list name) (pretty_column_aux p sym) col
 
-let rec pretty_dataset_aux p sym ff ds =
+let rec pretty_dataframe_aux p sym ff ds =
   match ds with
   | Hack.DSVar v -> fprintf ff "$%s" (Util.string_of_char_list v)
   | Hack.DSSelect (cl,ds1) -> fprintf ff "@[select %a @[<hv 2>from %a@] @]"
-				      (pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataset_aux p sym) ds1
+				      (pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataframe_aux p sym) ds1
   | Hack.DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
-				      (pretty_column_aux p sym) c (pretty_dataset_aux p sym) ds1
-  | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataset_aux ff Hack.AConcat ds1 ds2
-  | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataset_aux p sym) ds
+				      (pretty_column_aux p sym) c (pretty_dataframe_aux p sym) ds1
+  | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataframe_aux ff Hack.AConcat ds1 ds2
+  | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataframe_aux p sym) ds
 
-let pretty_dataset greek margin annot ds =
+let pretty_dataframe greek margin annot ds =
   let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
@@ -1134,13 +1134,13 @@ let pretty_dataset greek margin annot ds =
       | Greek -> greeksym
       | Ascii -> textsym
     in
-    fprintf ff "@[%a@]@." (pretty_dataset_aux 0 sym) ds;
+    fprintf ff "@[%a@]@." (pretty_dataframe_aux 0 sym) ds;
     flush_str_formatter ()
   end
 
-let pretty_plug_dataset greek ff a =
+let pretty_plug_dataframe greek ff a =
   let sym = if greek then greeksym else textsym in
-  pretty_dataset_aux 0 sym ff a
+  pretty_dataframe_aux 0 sym ff a
 
 
 (* Pretty languages *)
@@ -1166,22 +1166,22 @@ let pretty_query pconf q =
   | Compiler.Q_nnrc q -> pretty_nnrc greek margin annot q
   | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin annot q
   | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_dnnrc_dataset q ->
+  | Compiler.Q_dnnrc q ->
       let ann = pretty_annotate_ignore in
-      let plug = pretty_plug_dataset greek in
+      let plug = pretty_plug_dataframe greek in
       pretty_dnnrc ann plug greek margin annot q
-  | Compiler.Q_dnnrc_typed_dataset q ->
+  | Compiler.Q_dnnrc_typed q ->
       let ann =
 	if annot
 	then pretty_annotate_annotated_rtype greek pretty_annotate_ignore
 	else pretty_annotate_ignore
       in
-      let plug = pretty_plug_dataset greek in
+      let plug = pretty_plug_dataframe greek in
       pretty_dnnrc ann plug greek margin annot q
   | Compiler.Q_javascript q -> Util.string_of_char_list q
   | Compiler.Q_java q -> Util.string_of_char_list q
   | Compiler.Q_spark_rdd q -> Util.string_of_char_list q
-  | Compiler.Q_spark_dataset q -> Util.string_of_char_list q
+  | Compiler.Q_spark_df q -> Util.string_of_char_list q
   | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant (CloudantUtil.add_harness_top harness hierarchy q)
   | Compiler.Q_error q -> "Error: "^(Util.string_of_char_list q)
   end

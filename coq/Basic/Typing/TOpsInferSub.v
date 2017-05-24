@@ -22,8 +22,16 @@ Section TOpsInferSub.
   Require Import Eqdep_dec.
   Require Import Bool.
   Require Import EquivDec.
-  
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import Types.
+  Require Import BasicRuntime.
+  Require Import ForeignDataTyping.
+  Require Import ForeignOpsTyping.
+  Require Import TUtil.
+  Require Import TData.
+  Require Import TOps.
+  Require Import TDataSort.
+  Require Import TOpsInfer.
 
   (* Lemma/definitions over types involved in the inference *)
   

@@ -37,12 +37,12 @@ Section CompLang.
     | L_nnrc : language
     | L_nnrcmr : language
     | L_cldmr : language
-    | L_dnnrc_dataset : language
-    | L_dnnrc_typed_dataset : language
+    | L_dnnrc : language
+    | L_dnnrc_typed : language
     | L_javascript : language
     | L_java : language
     | L_spark_rdd : language
-    | L_spark_dataset : language
+    | L_spark_df : language
     | L_cloudant : language
     | L_error : string -> language.
 
@@ -73,12 +73,12 @@ Section CompLang.
       | "nnrc"%string => L_nnrc
       | "nnrcmr"%string => L_nnrcmr
       | "cldmr"%string => L_cldmr
-      | "dnnrc"%string => L_dnnrc_dataset
-      | "dnnrc_typed"%string => L_dnnrc_typed_dataset
+      | "dnnrc"%string => L_dnnrc
+      | "dnnrc_typed"%string => L_dnnrc_typed
       | "js"%string | "rhino"%string | "javascript"%string => L_javascript
       | "java"%string => L_java
       | "spark_rdd"%string => L_spark_rdd
-      | "spark_dataset"%string => L_spark_dataset
+      | "spark_df"%string => L_spark_df
       | "cloudant"%string => L_cloudant
       | "error"%string => L_error ""
       | _ => L_error ("'"++name++"' is not a language name")
@@ -100,12 +100,12 @@ Section CompLang.
       | L_nnrc => "nnrc"%string
       | L_nnrcmr => "nnrcmr"%string
       | L_cldmr => "cldmr"%string
-      | L_dnnrc_dataset => "dnnrc"%string
-      | L_dnnrc_typed_dataset => "dnnrc_typed"%string
+      | L_dnnrc => "dnnrc"%string
+      | L_dnnrc_typed => "dnnrc_typed"%string
       | L_javascript => "js"%string
       | L_java => "java"%string
       | L_spark_rdd => "spark_rdd"%string
-      | L_spark_dataset => "spark_dataset"%string
+      | L_spark_df => "spark_df"%string
       | L_cloudant => "cloudant"%string
       | L_error _ => "error"%string
       end.
@@ -142,12 +142,12 @@ Section CompLang.
         :: (L_nnrc,CoreEnd,"NNRC","NNRC.Lang.NNRC","Named Nested Relational Calculus")
         :: (L_nnrcmr,DistrEnd,"NNRCMR","NNRCMR.Lang.NNRCMR","Named Nested Relational Calculus with Map/Reduce")
         :: (L_cldmr,DistrEnd,"CldMR","CldMR.Lang.CldMR","Named Nested Relational Calculus with Cloudant Map/Reduce")
-        :: (L_dnnrc_dataset,DistrEnd,"DNNRC","DNNRC.Lang.DNNRCDataset","Distributed Named Nested Relational Calculus")
-        :: (L_dnnrc_typed_dataset,DistrEnd,"tDNNRC","DNNRC.Typing.TDNNRCDataset","Typed Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc,DistrEnd,"DNNRC","DNNRC.Lang.DNNRC","Distributed Named Nested Relational Calculus")
+        :: (L_dnnrc_typed,DistrEnd,"tDNNRC","tDNNRC.Lang.tDNNRC","Typed Distributed Named Nested Relational Calculus")
         :: (L_javascript,BackEnd,"JavaScript","JavaScript.Lang.JavaScript","JavaScript")
         :: (L_java,BackEnd,"Java","Java.Lang.Java","Java")
         :: (L_spark_rdd,BackEnd,"SparkRDD","SparkRDD.Lang.SparkRDD","Spark (RDD API)")
-        :: (L_spark_dataset,BackEnd,"SparkDF","SparkDF.Lang.SparkDF","Spark (Dataframe API)")
+        :: (L_spark_df,BackEnd,"SparkDF","SparkDF.Lang.SparkDF","Spark (Dataframe API)")
         :: (L_cloudant,BackEnd,"Cloudant","Cloudant.Lang.Cloudant","Cloudant Map/Reduce Views")
         :: nil.
 
@@ -210,6 +210,7 @@ Section CompLang.
     Require Import NNRCMRRuntime.
     Require Import CldMRRuntime.
     Require Import DNNRCRuntime.
+    Require Import tDNNRCRuntime.
     Require Import CAMPRuntime.
     (** Target languages *)
     Require Import JavaScriptRuntime.
@@ -244,12 +245,12 @@ Section CompLang.
     Definition nnrc := nnrc.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
-    Definition dnnrc_dataset := dnnrc.
-    Definition dnnrc_typed_dataset {bm:brand_model} := dnnrc_typed.
+    Definition dnnrc := dnnrc_dataframe.
+    Definition dnnrc_typed {bm:brand_model} := dnnrc_dataframe_typed.
     Definition javascript := js.
     Definition java := java.
     Definition spark_rdd := spark_rdd.
-    Definition spark_dataset := spark_dataset.
+    Definition spark_df := spark_df.
     Definition cloudant := cloudant.
 
     Inductive query : Set :=
@@ -267,12 +268,12 @@ Section CompLang.
     | Q_nnrc : nnrc -> query
     | Q_nnrcmr : nnrcmr -> query
     | Q_cldmr : cldmr -> query
-    | Q_dnnrc_dataset : dnnrc_dataset -> query
-    | Q_dnnrc_typed_dataset : dnnrc_typed_dataset -> query
+    | Q_dnnrc : dnnrc -> query
+    | Q_dnnrc_typed : dnnrc_typed -> query
     | Q_javascript : javascript -> query
     | Q_java : java -> query
     | Q_spark_rdd : spark_rdd -> query
-    | Q_spark_dataset : spark_dataset -> query
+    | Q_spark_df : spark_df -> query
     | Q_cloudant : cloudant -> query
     | Q_error : string -> query.
 
@@ -292,12 +293,12 @@ Section CompLang.
       | Case_aux c "Q_nnrc"%string
       | Case_aux c "Q_nnrcmr"%string
       | Case_aux c "Q_cldmr"%string
-      | Case_aux c "Q_dnnrc_dataset"%string
-      | Case_aux c "Q_dnnrc_typed_dataset"%string
+      | Case_aux c "Q_dnnrc"%string
+      | Case_aux c "Q_dnnrc_typed"%string
       | Case_aux c "Q_javascript"%string
       | Case_aux c "Q_java"%string
       | Case_aux c "Q_spark_rdd"%string
-      | Case_aux c "Q_spark_dataset"%string
+      | Case_aux c "Q_spark_df"%string
       | Case_aux c "Q_cloudant"%string
       | Case_aux c "Q_error"%string].
 
@@ -317,12 +318,12 @@ Section CompLang.
       | Q_nnrc _ => L_nnrc
       | Q_nnrcmr _ => L_nnrcmr
       | Q_cldmr _ => L_cldmr
-      | Q_dnnrc_dataset _ => L_dnnrc_dataset
-      | Q_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
+      | Q_dnnrc _ => L_dnnrc
+      | Q_dnnrc_typed _ => L_dnnrc_typed
       | Q_javascript _ => L_javascript
       | Q_java _ => L_java
       | Q_spark_rdd _ => L_spark_rdd
-      | Q_spark_dataset _ => L_spark_dataset
+      | Q_spark_df _ => L_spark_df
       | Q_cloudant _ => L_cloudant
       | Q_error err =>
         L_error ("No language corresponding to error query '"++err++"'")
@@ -348,12 +349,12 @@ Section CompLang.
       | L_nnrc => nnrc
       | L_nnrcmr => nnrcmr
       | L_cldmr => cldmr
-      | L_dnnrc_dataset => dnnrc_dataset
-      | L_dnnrc_typed_dataset => dnnrc_typed_dataset
+      | L_dnnrc => dnnrc
+      | L_dnnrc_typed => dnnrc_typed
       | L_javascript => javascript
       | L_java => java
       | L_spark_rdd => spark_rdd
-      | L_spark_dataset => spark_dataset
+      | L_spark_df => spark_df
       | L_cloudant => cloudant
       | L_error _ => string
       end.
@@ -377,12 +378,12 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_nnrc"%string
   | Case_aux c "L_nnrcmr"%string
   | Case_aux c "L_cldmr"%string
-  | Case_aux c "L_dnnrc_dataset"%string
-  | Case_aux c "L_dnnrc_typed_dataset"%string
+  | Case_aux c "L_dnnrc"%string
+  | Case_aux c "L_dnnrc_typed"%string
   | Case_aux c "L_javascript"%string
   | Case_aux c "L_java"%string
   | Case_aux c "L_spark_rdd"%string
-  | Case_aux c "L_spark_dataset"%string
+  | Case_aux c "L_spark_df"%string
   | Case_aux c "L_cloudant"%string
   | Case_aux c "L_error"%string].
 

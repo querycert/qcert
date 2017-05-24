@@ -37,6 +37,7 @@ Section CompEval.
   Require Import NNRCMRRuntime.
   Require Import CldMRRuntime. (* XXX contains cld_load_init_env! XXX *)
   Require Import DNNRCRuntime.
+  Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (** Target languages *)
   Require Import JavaScriptRuntime.
@@ -102,7 +103,6 @@ Section CompEval.
     (* Note: eval for sql relies on translation to nraenv_core *)
     Definition eval_sql (q:sql) (cenv: bindings) : option data
       := nraenv_eval_top h (sql_to_nraenv_top q) cenv.
-
     (* Language: lambda_nra *)
     Definition eval_lambda_nra (q:lambda_nra) (cenv: bindings) : option data
       := lambda_nra_eval_top h q cenv.
@@ -148,11 +148,11 @@ Section CompEval.
     Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data
       := cldmr_eval_top h init_vinit q cenv.
 
-    (* Language: dnnrc_dataset *)
+    (* Language: dnnrc *)
     (* WARNING: This doesn't work if using the Dataset part of the language *)
 
-    Definition eval_dnnrc_dataset
-               (q:dnnrc_dataset) (cenv: bindings) : option data :=
+    Definition eval_dnnrc
+               (q:dnnrc) (cenv: bindings) : option data :=
       let cenv := mkConstants (rec_sort cenv) in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
@@ -160,10 +160,10 @@ Section CompEval.
       | None => None
       end.
 
-    (* Language: dnnrc_typed_dataset *)
+    (* Language: dnnrc_typed *)
 
-    Definition eval_dnnrc_typed_dataset
-               (q:dnnrc_typed_dataset) (cenv: bindings) : option data :=
+    Definition eval_dnnrc_typed
+               (q:dnnrc_typed) (cenv: bindings) : option data :=
       let cenv := mkConstants (rec_sort cenv) in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
@@ -209,12 +209,12 @@ Section CompEval.
       | Q_nnrc q => lift_output (eval_nnrc q cenv)
       | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
       | Q_cldmr q => lift_output (eval_cldmr q cenv)
-      | Q_dnnrc_dataset q => lift_output (eval_dnnrc_dataset q cenv)
-      | Q_dnnrc_typed_dataset q => lift_output (eval_dnnrc_typed_dataset q cenv)
+      | Q_dnnrc q => lift_output (eval_dnnrc q cenv)
+      | Q_dnnrc_typed q => lift_output (eval_dnnrc_typed q cenv)
       | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_rdd _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_spark_dataset _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_spark_df _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cloudant _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       end.
@@ -236,12 +236,12 @@ Section CompEval.
       | Q_nnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nnrcmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cldmr _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_dnnrc_dataset _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_dnnrc_typed_dataset _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_dnnrc _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_dnnrc_typed _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_javascript _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_rdd _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_spark_dataset _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_spark_df _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_cloudant _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       end.
@@ -292,11 +292,11 @@ Section CompEval.
     Definition eval_cldmr_world (q:cldmr) (world:list data) : option data :=
       eval_cldmr q (mkWorld world).
     
-    Definition eval_dnnrc_dataset_world (q:dnnrc_dataset) (world:list data) : option data :=
-      eval_dnnrc_dataset q (mkWorld world).
+    Definition eval_dnnrc_world (q:dnnrc) (world:list data) : option data :=
+      eval_dnnrc q (mkWorld world).
     
-    Definition eval_dnnrc_typed_dataset_world (q:dnnrc_dataset) (world:list data) : option data :=
-      eval_dnnrc_dataset q (mkWorld world).
+    Definition eval_dnnrc_typed_world (q:dnnrc) (world:list data) : option data :=
+      eval_dnnrc q (mkWorld world).
     
   End EvalWorld.
 

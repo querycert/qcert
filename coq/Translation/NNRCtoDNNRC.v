@@ -23,8 +23,7 @@ Section NNRCtoDNNRC.
   Require Import Utils.
   Require Import BasicRuntime.
   Require Import NNRCSystem.
-  Require Import DData.
-  Require Import DNNRC.
+  Require Import DNNRCSystem.
 
   Context {fruntime:foreign_runtime}.
   
@@ -235,16 +234,14 @@ Section NNRCtoDNNRC.
 
   Section Top.
     Require Import NRAEnvRuntime.
-    Require Import Dataset.
+    Require Import Dataframe.
     Context {ftype: ForeignType.foreign_type}.
 
-    Definition nnrc_to_dnnrc_dataset {A:Set} (annot:A) (tenv:vdbindings) (n:nnrc) :=
-      @nnrc_to_dnnrc A dataset annot (mkConstants tenv) n.
+    Definition nnrc_to_dnnrc_dataframe {A:Set} (annot:A) (tenv:vdbindings) (n:nnrc) :=
+      @nnrc_to_dnnrc A dataframe annot (mkConstants tenv) n.
 
-    Require Import DNNRCDataset.
-
-    Definition nnrc_to_dnnrc_top (tenv:vdbindings) (n:nnrc) : dnnrc :=
-      nnrc_to_dnnrc_dataset tt tenv n.
+    Definition nnrc_to_dnnrc_top (tenv:vdbindings) (n:nnrc) : dnnrc_dataframe :=
+      nnrc_to_dnnrc_dataframe tt tenv n.
 
     Theorem nnrc_to_dnnrc_top_correct h (tenv:vdbindings) (n:nnrc) :
       forall denv:dbindings,

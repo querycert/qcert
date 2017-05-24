@@ -14,10 +14,10 @@
  * limitations under the License.
  *)
 
+Require Import BasicRuntime.
 Require Import CompilerRuntime.
-
-Require Import BasicRuntime NNRCMRRuntime.
-Require Import TDNNRCInfer.
+Require Import NNRCMRRuntime.
+Require Import tDNNRCRuntime.
 Require Import CompEnv.
 
 Module QUtil(runtime:CompilerRuntime).
@@ -27,14 +27,14 @@ Module QUtil(runtime:CompilerRuntime).
 
   (* Access to type annotations *)
   Definition type_annotation {br:brand_relation} (A:Set): Set
-    := TDNNRCInfer.type_annotation A.
+    := tDNNRC.type_annotation A.
 
   Definition ta_base {br:brand_relation} (A:Set) (ta:type_annotation A)
-    := TDNNRCInfer.ta_base ta.
+    := tDNNRC.ta_base ta.
   Definition ta_inferred {br:brand_relation} (A:Set) (ta:type_annotation A)
-    := TDNNRCInfer.ta_inferred ta .
+    := tDNNRC.ta_inferred ta .
   Definition ta_required {br:brand_relation} (A:Set) (ta:type_annotation A)
-    := TDNNRCInfer.ta_required ta.
+    := tDNNRC.ta_required ta.
 
   (* Processing for input or output of queries *)
   Definition validate_lifted_success := validate_lifted_success.

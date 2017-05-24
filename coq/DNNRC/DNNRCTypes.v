@@ -15,8 +15,7 @@
  *)
 
 Require Export BasicTypes.
-Require Export TDNNRC TDNNRCInfer TDNNRCSub TOpsInferSub.
-Require Export TDNNRCDataset.
+Require Export TDNNRCBase.
 
 (* 
 *** Local Variables: ***

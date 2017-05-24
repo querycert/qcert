@@ -15,11 +15,19 @@
  *)
 
 Require Export Utils.
-Require Export BrandRelation RBag RData RDataNorm RDomain.
-Require Export RRelation RGroupBy.
-Require Export DData DDataNorm.
-Require Export RConstants DConstants.
-Require Export RUtilOps ROps.
+Require Export BrandRelation.
+Require Export RBag.
+Require Export RData.
+Require Export RDataNorm.
+Require Export RDomain.
+Require Export RRelation.
+Require Export RGroupBy.
+Require Export DData.
+Require Export DDataNorm.
+Require Export RConstants.
+Require Export DConstants.
+Require Export RUtilOps.
+Require Export ROps.
 Require Export ForeignRuntime.
 
 (* 

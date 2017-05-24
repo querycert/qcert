@@ -14,19 +14,8 @@
  * limitations under the License.
  *)
 
-Require Export Utils.
-Require Export Types.
-Require Export TUtil.
-Require Export TData.
-Require Export TDataInfer.
-Require Export TDData.
-Require Export TBindings.
-Require Export TDBindings.
-Require Export TOps.
-Require Export TOpsEq.
-Require Export TOpsInfer.
-Require Export TOpsInferSub.
-Require Export ForeignTyping.
+Require Export tDNNRCRuntime.
+Require Export tDNNRCTypes.
 
 (* 
 *** Local Variables: ***

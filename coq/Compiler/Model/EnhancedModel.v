@@ -14,22 +14,35 @@
  * limitations under the License.
  *)
 
-Require Import List EquivDec.
-
-Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavaScript ForeignToScala ForeignToJSON ForeignTypeToJSON.
+Require Import List.
+Require Import EquivDec.
+Require Import BasicSystem.
+Require Import ForeignToJava.
+Require Import ForeignToJavaScript.
+Require Import ForeignToScala.
+Require Import ForeignToJSON.
+Require Import ForeignTypeToJSON.
 Require Import ForeignToSpark.
-Require Import ForeignReduceOps ForeignToReduceOps.
-Require Import ForeignCloudant ForeignToCloudant.
-Require Import CompilerRuntime CompilerModel.
-
-Require Import FloatModelPart StringModelPart. 
+Require Import ForeignReduceOps.
+Require Import ForeignToReduceOps.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
+Require Import CompilerRuntime.
+Require Import CompilerModel.
+Require Import FloatModelPart.
+Require Import StringModelPart. 
 Require Import DateTimeModelPart.
 Require Import SqlDateModelPart.
-Require NNRCMR CldMR.
-Require Import OptimizerLogger String cNRAEnv NRAEnv cNNRC.
-Require Import DNNRC Dataset.
-Require Import TDNNRCInfer.
+Require NNRCMR.
+Require CldMR.
+Require Import OptimizerLogger.
+Require Import String.
+Require Import cNRAEnv.
+Require Import NRAEnv.
+Require Import cNNRC.
+Require Import DNNRCBase.
+Require Import tDNNRC.
+Require Import Dataframe.
 
 Import ListNotations.
 
@@ -1427,7 +1440,7 @@ Next Obligation.
 Defined.
 
 Definition dnnrc_for_log {br:brand_relation}
-  := (@dnnrc enhanced_foreign_runtime (type_annotation unit) dataset).
+  := (@dnnrc enhanced_foreign_runtime (type_annotation unit) dataframe).
 
   (* dnnrc optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_dnnrc_token_type : Set.
@@ -1493,7 +1506,7 @@ Module EnhancedRuntime <: CompilerRuntime.
     := foreign_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
-  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)
+  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe)
     := foreign_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
@@ -2491,7 +2504,7 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
-  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)
+  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe)
     := foreign_dnnrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.

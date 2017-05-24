@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section Dataset.
+Section Dataframe.
 
   Require Import Basics.
   Require Import String.
@@ -23,12 +23,8 @@ Section Dataset.
   Require Import ZArith.
   Require Import EquivDec.
   Require Import Morphisms.
-
-  Require Import Utils BasicSystem.
-  Require Import DData.
-  Require Import cNRAEnv.
-
-  Require Import RType.
+  Require Import BasicSystem.
+  Require Import DNNRCBase.
 
   Context {fruntime:foreign_runtime}.
   Context {ftype: ForeignType.foreign_type}.
@@ -52,18 +48,18 @@ Section Dataset.
   | CUDFCast : list string -> column -> column
   | CUDFUnbrand : rtype₀ -> column -> column.
 
-  Inductive dataset :=
-  | DSVar : string -> dataset
-  | DSSelect : list (string * column) -> dataset -> dataset
-  | DSFilter : column -> dataset -> dataset
-  | DSCartesian : dataset -> dataset -> dataset
-  | DSExplode : string -> dataset -> dataset.
+  Inductive dataframe :=
+  | DSVar : string -> dataframe
+  | DSSelect : list (string * column) -> dataframe -> dataframe
+  | DSFilter : column -> dataframe -> dataframe
+  | DSCartesian : dataframe -> dataframe -> dataframe
+  | DSExplode : string -> dataframe -> dataframe.
 
   Section eval.
     Context (h:brand_relation_t).
 
     (** Evaluate a column expression in an environment of toplevel columns
-     * i.e. a row in a dataset. *)
+     * i.e. a row in a dataframe. *)
     Fixpoint fun_of_column (c: column) (row: list (string * data)) : option data :=
       let fc := flip fun_of_column row in
       match c with
@@ -107,28 +103,27 @@ Section Dataset.
       | CUDFUnbrand _ _ => None (* TODO *)
       end.
 
-    Require Import DNNRC.
     (* NOTE: the semantics for records 
        (when fields are duplicated / in the wrong order)
        are as in Qcert, which is not the same as Spark.
        If we want to model this more accurately, we should have 
        an alternative "lower level" semantics, along with a translation
-       fix_names:dataset->dataset which uses renaming to ensure that
+       fix_names:dataframe->dataframe which uses renaming to ensure that
        everything works out ``naturally''.
-       and of course, we want fix_names to preserve (dataset_eval) semantics,
+       and of course, we want fix_names to preserve (dataframe_eval) semantics,
        and the two evaluation results should coincide for any output of 
        fix_names.
      *)
-    Fixpoint dataset_eval (dsenv : coll_bindings) (e: dataset) : option (list data) :=
+    Fixpoint dataframe_eval (dsenv : coll_bindings) (e: dataframe) : option (list data) :=
       match e with
       | DSVar s => lookup equiv_dec dsenv s
       | DSSelect cs d =>
-        match dataset_eval dsenv d with
+        match dataframe_eval dsenv d with
         | Some rows =>
           (* List of column names paired with their functions. *)
           let cfuns: list (string * (list (string * data) -> option data)) :=
               map (fun p => (fst p, fun_of_column (snd p))) (rec_sort cs) in
-          (* Call this function on every row in the input dataset.
+          (* Call this function on every row in the input dataframe.
            * It calls every column function in the context of the row. *)
           let rfun: data -> option (list (string * data)) :=
               fun row =>
@@ -154,9 +149,9 @@ Section Dataset.
                                end
                              | _ => false
                              end))
-                  (dataset_eval dsenv d)
+                  (dataframe_eval dsenv d)
       | DSCartesian d1 d2 =>
-        match dataset_eval dsenv d1, dataset_eval dsenv d2 with
+        match dataframe_eval dsenv d1, dataframe_eval dsenv d2 with
         | Some rs1, Some rs2 =>
           let data :=
               flat_map (fun r1 => map (fun r2 =>
@@ -170,7 +165,7 @@ Section Dataset.
         | _, _ => None
         end
       | DSExplode s d1 =>
-        match dataset_eval dsenv d1 with
+        match dataframe_eval dsenv d1 with
         | Some l =>
           let data :=
               flat_map (fun row =>
@@ -192,10 +187,10 @@ Section Dataset.
       end.
   End eval.
 
-  Section DatasetPlug.
+  Section DataframePlug.
 
-    Definition wrap_dataset_eval h dsenv q :=
-      lift dcoll (@dataset_eval h dsenv q).
+    Definition wrap_dataframe_eval h dsenv q :=
+      lift dcoll (@dataframe_eval h dsenv q).
 
     Lemma fun_of_column_normalized {h c r o}:
       Forall (fun d : string * data => data_normalized h (snd d)) r ->
@@ -249,13 +244,13 @@ Section Dataset.
       - discriminate.
     Qed.
 
-    Lemma dataset_eval_normalized h :
-      forall q:dataset, forall (constant_env:coll_bindings) (o:data),
+    Lemma dataframe_eval_normalized h :
+      forall q:dataframe, forall (constant_env:coll_bindings) (o:data),
       Forall (fun x => data_normalized h (snd x)) (bindings_of_coll_bindings constant_env) ->
-      wrap_dataset_eval h constant_env q = Some o ->
+      wrap_dataframe_eval h constant_env q = Some o ->
       data_normalized h o.
     Proof.
-      unfold wrap_dataset_eval, bindings_of_coll_bindings.
+      unfold wrap_dataframe_eval, bindings_of_coll_bindings.
       intros ds ce d Fb de.
       apply some_lift in de.
       destruct de as [dl de ?]; subst.
@@ -266,7 +261,7 @@ Section Dataset.
       induction ds; simpl; intros dl de.
       - apply lookup_in in de.
         specialize (Fb _ de); simpl in Fb; trivial.
-      - destruct (dataset_eval h ce ds); try discriminate.
+      - destruct (dataframe_eval h ce ds); try discriminate.
         specialize (IHds _ (eq_refl _)).
         apply listo_to_olist_some in de.
         unfold compose in de.
@@ -382,9 +377,9 @@ Section Dataset.
         apply Forall_filter.
         invcs IHds.
         trivial.
-      - destruct (dataset_eval h ce ds1); try discriminate.
+      - destruct (dataframe_eval h ce ds1); try discriminate.
         specialize (IHds1 _ (eq_refl _)).
-        destruct (dataset_eval h ce ds2); try discriminate.
+        destruct (dataframe_eval h ce ds2); try discriminate.
         specialize (IHds2 _ (eq_refl _)).
         constructor.
         invcs IHds1.
@@ -413,7 +408,7 @@ Section Dataset.
           invcs H0.
           constructor; auto.
           apply data_normalized_rec_concat_sort; trivial.
-      - destruct (dataset_eval h ce ds); try discriminate.
+      - destruct (dataframe_eval h ce ds); try discriminate.
         specialize (IHds _ (eq_refl _)).
         apply listo_to_olist_some in de.
         constructor.
@@ -454,12 +449,12 @@ Section Dataset.
             apply Forall_app; auto.
     Qed.
 
-    Global Program Instance SparkIRPlug : (@AlgPlug _ dataset) :=
-      mkAlgPlug wrap_dataset_eval dataset_eval_normalized.
+    Global Program Instance SparkIRPlug : (@AlgPlug _ dataframe) :=
+      mkAlgPlug wrap_dataframe_eval dataframe_eval_normalized.
 
-  End DatasetPlug.
+  End DataframePlug.
 
-End Dataset.
+End Dataframe.
 
 (*
 *** Local Variables: ***

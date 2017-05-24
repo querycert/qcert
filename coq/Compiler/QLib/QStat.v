@@ -16,19 +16,20 @@
 
 
 Require Import String.
+Require Import BasicSystem.
 Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMR.
-Require Import DNNRC Dataset.
+Require Import CldMRRuntime.
+Require Import DNNRCRuntime.
+Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
 Require Import OQLRuntime.
-
+Require Import CompLang.
+Require Import CompStat.
 Require Import CompilerRuntime.
-Require Import BasicSystem.
 Require Import TypingRuntime.
-Require Import CompLang CompStat.
 
 Module QStat(runtime:CompilerRuntime).
 

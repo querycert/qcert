@@ -14,11 +14,12 @@
  * limitations under the License.
  *)
 
-Section size.
+Section DataframeSize.
   
   Require Import List.
   Require Import Omega.
-  Require Import BasicRuntime ForeignType Dataset.
+  Require Import BasicSystem.
+  Require Import Dataframe.
 
   Context {fruntime:foreign_runtime}.
   Context {ftype: foreign_type}.
@@ -39,15 +40,15 @@ Section size.
        | CUDFUnbrand _ c0 => S (column_size c0)
        end.
 
-  Fixpoint dataset_size (d:dataset)
+  Fixpoint dataframe_size (d:dataframe)
     := match d with
        | DSVar _ => 1
        | DSSelect scl d0 => S ( 
                                 (fold_left (fun acc sc => column_size (snd sc) + acc) scl 0)
-                                  + dataset_size d0)
-       | DSFilter c0 d0 => S (column_size c0 + dataset_size d0)
-       | DSCartesian d1 d2 => S (dataset_size d1 + dataset_size d2)
-       | DSExplode _ d0 => S (dataset_size d0)
+                                  + dataframe_size d0)
+       | DSFilter c0 d0 => S (column_size c0 + dataframe_size d0)
+       | DSCartesian d1 d2 => S (dataframe_size d1 + dataframe_size d2)
+       | DSExplode _ d0 => S (dataframe_size d0)
        end.
 
 
@@ -56,12 +57,12 @@ Section size.
     induction c; simpl; omega.
   Qed.
 
-    Lemma dataset_size_nzero (d:dataset) : dataset_size d <> 0.
+    Lemma dataframe_size_nzero (d:dataframe) : dataframe_size d <> 0.
   Proof.
     induction d; simpl; omega.
   Qed.
 
-End size.
+End DataframeSize.
 
 (*
 *** Local Variables: ***

@@ -85,7 +85,7 @@ val pretty_dnnrc : (Format.formatter -> 'a -> unit) ->
 
 (* Pretty Spark IR *)
 
-val pretty_dataset : bool -> int -> bool -> Compiler.dataset -> string
+val pretty_dataframe : bool -> int -> bool -> Compiler.dataframe -> string
 
 
 (* Pretty printers for various annotation types *)
@@ -100,7 +100,7 @@ val pretty_annotate_annotated_rtype : bool ->
 (* Pretty printers for various plug types *)
 val pretty_plug_ignore : Format.formatter -> 'a -> unit
 val pretty_plug_nraenv : bool -> Format.formatter -> QLang.nraenv_core -> unit
-val pretty_plug_dataset : bool -> Format.formatter -> Compiler.dataset -> unit
+val pretty_plug_dataframe : bool -> Format.formatter -> Compiler.dataframe -> unit
 
 (* Pretty types *)
 

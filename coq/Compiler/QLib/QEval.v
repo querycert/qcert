@@ -14,11 +14,13 @@
  * limitations under the License.
  *)
 
-Require Import CompilerRuntime.
-Require Import String List String EquivDec.
-  
+Require Import List.
+Require Import String.
+Require Import EquivDec.
 Require Import BasicSystem.
-Require Import CompLang CompEval.
+Require Import CompilerRuntime.
+Require Import CompLang.
+Require Import CompEval.
 
 Module QEval(runtime:CompilerRuntime).
 
@@ -48,7 +50,7 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrcmr : nnrcmr -> constant_env -> option data := @eval_nnrcmr _ _ h.
   Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
-  Definition eval_dnnrc_dataset {bm:brand_model} : dnnrc_dataset -> constant_env -> option data := @eval_dnnrc_dataset _ _ h.
+  Definition eval_dnnrc {bm:brand_model} : dnnrc -> constant_env -> option data := @eval_dnnrc _ _ h.
 
   (* Eval driver *)
 
@@ -78,7 +80,7 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrcmr_world : nnrcmr -> world_env -> option data := @eval_nnrcmr_world _ _ h.
   Definition eval_cldmr_world : cldmr -> world_env -> option data := @eval_cldmr_world _ _ h.
-  Definition eval_dnnrc_dataset_world {bm:brand_model} : dnnrc_dataset -> world_env -> option data := @eval_dnnrc_dataset_world _ _ h.
+  Definition eval_dnnrc_world {bm:brand_model} : dnnrc -> world_env -> option data := @eval_dnnrc_world _ _ h.
   End QE.
 
 End QEval.

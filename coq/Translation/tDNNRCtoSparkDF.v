@@ -25,12 +25,8 @@ Require Import Peano_dec.
 Require Import EquivDec.
 Require Import BasicSystem.
 Require Import NNRCRuntime.
+Require Import tDNNRCSystem.
 Require Import ForeignToScala.
-Require Import DNNRC.
-Require Import TDataInfer.
-Require Import TDNNRCInfer.
-Require Import TOpsInfer.
-Require Import Dataset.
 Require Import DatatoSparkDF.
 
 Local Open Scope string_scope.
@@ -102,7 +98,7 @@ Section tDNNRCtoSparkDF.
     | Rec₀ _ _ => "Record"
     | Either₀ tl tr => "Either"
     | Brand₀ bs => "BrandedValue"
-    | Arrow₀ tin t => "CANNOT PUT AN ARROW INTO A DATASET"
+    | Arrow₀ tin t => "CANNOT PUT AN ARROW INTO A DATAFRAME"
     | Foreign₀ f => "FOREIGN?"
     end.
 
@@ -163,16 +159,16 @@ Section tDNNRCtoSparkDF.
       "unbrandUDF(" ++ rtype_to_spark_DataType t ++ ")(" ++ code_of_column c ++ ")"
     end.
 
-  Fixpoint code_of_dataset (e: dataset) : string :=
+  Fixpoint code_of_dataframe (e: dataframe) : string :=
     match e with
     | DSVar s => s
     | DSSelect cs d =>
       let columns :=
           map (fun nc => code_of_column (snd nc) ++ ".as(""" ++ fst nc ++ """)") cs in
-      code_of_dataset d ++ ".select(" ++ joinStrings ", " columns ++ ")"
-    | DSFilter c d => code_of_dataset d ++ ".filter(" ++ code_of_column c ++ ")"
-    | DSCartesian d1 d2 => code_of_dataset d1 ++ ".join(" ++ (code_of_dataset d2) ++ ")"
-    | DSExplode s d1 => code_of_dataset d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
+      code_of_dataframe d ++ ".select(" ++ joinStrings ", " columns ++ ")"
+    | DSFilter c d => code_of_dataframe d ++ ".filter(" ++ code_of_column c ++ ")"
+    | DSCartesian d1 d2 => code_of_dataframe d1 ++ ".join(" ++ (code_of_dataframe d2) ++ ")"
+    | DSExplode s d1 => code_of_dataframe d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
   Definition spark_of_unop (op: unaryOp) (x: string) : string :=
@@ -299,7 +295,7 @@ Section tDNNRCtoSparkDF.
     | Foreign₀ _ => false
     end.
 
-  Fixpoint scala_of_dnnrc {A: Set} (d: @dnnrc _ (type_annotation A) dataset) : string :=
+  Fixpoint scala_of_dnnrc {A: Set} (d:@dnnrc _ (type_annotation A) dataframe) : string :=
     let code :=
         match d with
         | DNNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
@@ -364,7 +360,7 @@ Section tDNNRCtoSparkDF.
         | DNNRCAlg t a ((x, d)::nil) =>
           (* TODO does this also need the lambda encoding for let? *)
           "{ val " ++ x ++ " = " ++ scala_of_dnnrc d ++ "; " ++
-                   code_of_dataset a
+                   code_of_dataframe a
                    ++ " }"
         | DNNRCAlg _ _ _ =>
           "NON_UNARY_ALG_CODEGEN_IS_NOT_CURRENTLY_IMPLEMENTED"
@@ -408,7 +404,7 @@ Section tDNNRCtoSparkDF.
 
   (** Toplevel entry to Spark2/Scala codegen *)
   Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
-             (e: @dnnrc _ (type_annotation A) dataset) : string :=
+             (e:dnnrc_dataframe_typed) : string :=
     ""
       ++ "import org.apache.spark.SparkContext" ++ eol
       ++ "import org.apache.spark.sql.functions._" ++ eol

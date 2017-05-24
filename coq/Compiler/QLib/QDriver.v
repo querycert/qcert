@@ -16,21 +16,22 @@
 
 
 Require Import String.
+Require Import BasicSystem.
 Require Import NRARuntime.
 Require Import NRAEnvRuntime.
 Require Import NNRCRuntime.
 Require Import NNRCMRRuntime.
-Require Import CldMR.
-Require Import DNNRC Dataset.
+Require Import CldMRRuntime.
+Require Import DNNRCRuntime.
+Require Import tDNNRCRuntime.
 Require Import CAMPRuntime.
 Require Import OQLRuntime.
-
-Require Import CompLang CompConfig CompDriver.
-
-Require Import CompilerRuntime.
-Require Import BasicSystem.
-Require Import TypingRuntime.
 Require Import CompEnv.
+Require Import CompLang.
+Require Import CompConfig.
+Require Import CompDriver.
+Require Import CompilerRuntime.
+Require Import TypingRuntime.
 
 Module QDriver(runtime:CompilerRuntime).
 
@@ -84,7 +85,7 @@ Module QDriver(runtime:CompilerRuntime).
     (* Used in CALib: *)
     Definition nraenv_optim_to_nnrc_optim : nraenv -> nnrc := nraenv_optim_to_nnrc_optim.
     Definition nraenv_optim_to_nnrc_optim_to_dnnrc :
-      vdbindings -> nraenv -> dnnrc_dataset
+      vdbindings -> nraenv -> dnnrc
       := nraenv_optim_to_nnrc_optim_to_dnnrc.
     Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_optim : vdbindings -> nraenv -> nnrcmr
       := nraenv_optim_to_nnrc_optim_to_nnrcmr_optim.
@@ -100,7 +101,7 @@ Module QDriver(runtime:CompilerRuntime).
     (* Used in queryTests: *)
     Definition camp_rule_to_nraenv_to_nnrc_optim : camp_rule -> nnrc := camp_rule_to_nraenv_to_nnrc_optim.
     Definition camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc :
-      vdbindings -> camp_rule -> dnnrc_dataset := camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc.
+      vdbindings -> camp_rule -> dnnrc := camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc.
     Definition camp_rule_to_nraenv_to_nnrc_optim_to_javascript :
       camp_rule -> string := camp_rule_to_nraenv_to_nnrc_optim_to_javascript.
     Definition camp_rule_to_nnrcmr : vdbindings -> camp_rule -> nnrcmr := camp_rule_to_nnrcmr.

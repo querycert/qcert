@@ -14,35 +14,35 @@
  * limitations under the License.
  *)
 
-  Require Import String.
-  Require Import List.
-  Require Import Arith.
-  Require Import Program.
-  Require Import EquivDec Morphisms.
+Require Import String.
+Require Import List.
+Require Import Arith.
+Require Import Program.
+Require Import EquivDec.
+Require Import Morphisms.
+Require Import BasicSystem.
+Require Import DNNRCBase.
 
-  Require Import Utils BasicSystem.
-  Require Import DNNRC.
+Section TDNNRCBase.
 
-  Section TDNNRC.
-
-    Context {m:basic_model}.
-    Section tplug.
+  Context {m:basic_model}.
+  Section tplug.
       
-      Class TAlgPlug {plug_type:Set} {plug:AlgPlug plug_type} :=
-        mkTAlgPlug {
-            plug_typing : plug_type -> tbindings -> rtype -> Prop;
-          }.
+    Class TAlgPlug {plug_type:Set} {plug:AlgPlug plug_type} :=
+      mkTAlgPlug {
+          plug_typing : plug_type -> tbindings -> rtype -> Prop;
+        }.
+    
+  End tplug.
 
-    End tplug.
+  (* Global Arguments TAlgPlug plug_type {plug} : clear implicits.  *)
 
-    (* Global Arguments TAlgPlug plug_type {plug} : clear implicits.  *)
+  (** Typing rules for NNRC *)
+  Section typ.
 
-    (** Typing rules for NNRC *)
-    Section typ.
-
-      (* When applying the parameters to an algebra closure, we need to check that
+    (* When applying the parameters to an algebra closure, we need to check that
          those parameters are distributed *)
-      Fixpoint tcombine (l:list string) (l':list drtype) {struct l} : option tbindings :=
+    Fixpoint tcombine (l:list string) (l':list drtype) {struct l} : option tbindings :=
       match l with
       | [] => Some []
       | x :: tl =>
@@ -57,72 +57,71 @@
         end
       end.
 
-      Inductive dnnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> @dnnrc _ A plug_type -> drtype -> Prop :=
-      | TDNNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnnrc_type tenv (DNNRCVar a v) τ
-      | TDNNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnnrc_type tenv (DNNRCConst a c) (Tlocal τ)
-      | TDNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
-          forall (a:A),
-            binOp_type b τ₁ τ₂ τ ->
-            dnnrc_type tenv e1 (Tlocal τ₁) ->
-            dnnrc_type tenv e2 (Tlocal τ₂) ->
-            dnnrc_type tenv (DNNRCBinop a b e1 e2) (Tlocal τ)
-      | TDNNRCUnop {τ₁ τ} tenv u e1 :
-          forall (a:A), 
-            unaryOp_type u τ₁ τ ->
-            dnnrc_type tenv e1 (Tlocal τ₁) ->
-            dnnrc_type tenv (DNNRCUnop a u e1) (Tlocal τ)
-      | TDNNRCLet {τ₁ τ₂} v tenv e1 e2 :
-          forall (a:A), 
-            dnnrc_type tenv e1 τ₁ ->
-            dnnrc_type ((v,τ₁)::tenv) e2 τ₂ ->
-            dnnrc_type tenv (DNNRCLet a v e1 e2) τ₂
-      | TDNNRCForLocal {τ₁ τ₂} v tenv e1 e2 :
-          forall (a:A),
-            dnnrc_type tenv e1 (Tlocal (Coll τ₁)) ->
-            dnnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
-            dnnrc_type tenv (DNNRCFor a v e1 e2) (Tlocal (Coll τ₂))
-      | TDNNRCForDist {τ₁ τ₂} v tenv e1 e2 :
-          forall (a:A),
-            dnnrc_type tenv e1 (Tdistr τ₁) ->
-            dnnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
-            dnnrc_type tenv (DNNRCFor a v e1 e2) (Tdistr τ₂)
-      | TDNNRCIf {τ} tenv e1 e2 e3 :
-          forall (a:A), 
-            dnnrc_type tenv e1 (Tlocal Bool) ->
-            dnnrc_type tenv e2 τ ->
-            dnnrc_type tenv e3 τ ->
-            dnnrc_type tenv (DNNRCIf a e1 e2 e3) τ
-      | TDNNRCEither {τ τl τr} tenv ed xl el xr er :
-          forall (a:A), 
-            dnnrc_type tenv ed (Tlocal (Either τl τr)) ->
-            dnnrc_type ((xl,(Tlocal τl))::tenv) el τ ->
-            dnnrc_type ((xr,(Tlocal τr))::tenv) er τ ->
-            dnnrc_type tenv (DNNRCEither a ed xl el xr er) τ
-      | TDNNRCCollect {τ} tenv e :
-          forall (a:A),
-            dnnrc_type tenv e (Tdistr τ) ->
-            dnnrc_type tenv (DNNRCCollect a e) (Tlocal (Coll τ))
-      | TDNNRCDispatch {τ} tenv e :
-          forall (a:A),
-            dnnrc_type tenv e (Tlocal (Coll τ)) ->
-            dnnrc_type tenv (DNNRCDispatch a e) (Tdistr τ)
-      (* Note: algebra 'plugged' expression is only well typed within distributed
+    Inductive dnnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> @dnnrc _ A plug_type -> drtype -> Prop :=
+    | TDNNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnnrc_type tenv (DNNRCVar a v) τ
+    | TDNNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnnrc_type tenv (DNNRCConst a c) (Tlocal τ)
+    | TDNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
+        forall (a:A),
+          binOp_type b τ₁ τ₂ τ ->
+          dnnrc_type tenv e1 (Tlocal τ₁) ->
+          dnnrc_type tenv e2 (Tlocal τ₂) ->
+          dnnrc_type tenv (DNNRCBinop a b e1 e2) (Tlocal τ)
+    | TDNNRCUnop {τ₁ τ} tenv u e1 :
+        forall (a:A), 
+          unaryOp_type u τ₁ τ ->
+          dnnrc_type tenv e1 (Tlocal τ₁) ->
+          dnnrc_type tenv (DNNRCUnop a u e1) (Tlocal τ)
+    | TDNNRCLet {τ₁ τ₂} v tenv e1 e2 :
+        forall (a:A), 
+          dnnrc_type tenv e1 τ₁ ->
+          dnnrc_type ((v,τ₁)::tenv) e2 τ₂ ->
+          dnnrc_type tenv (DNNRCLet a v e1 e2) τ₂
+    | TDNNRCForLocal {τ₁ τ₂} v tenv e1 e2 :
+        forall (a:A),
+          dnnrc_type tenv e1 (Tlocal (Coll τ₁)) ->
+          dnnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
+          dnnrc_type tenv (DNNRCFor a v e1 e2) (Tlocal (Coll τ₂))
+    | TDNNRCForDist {τ₁ τ₂} v tenv e1 e2 :
+        forall (a:A),
+          dnnrc_type tenv e1 (Tdistr τ₁) ->
+          dnnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
+          dnnrc_type tenv (DNNRCFor a v e1 e2) (Tdistr τ₂)
+    | TDNNRCIf {τ} tenv e1 e2 e3 :
+        forall (a:A), 
+          dnnrc_type tenv e1 (Tlocal Bool) ->
+          dnnrc_type tenv e2 τ ->
+          dnnrc_type tenv e3 τ ->
+          dnnrc_type tenv (DNNRCIf a e1 e2 e3) τ
+    | TDNNRCEither {τ τl τr} tenv ed xl el xr er :
+        forall (a:A), 
+          dnnrc_type tenv ed (Tlocal (Either τl τr)) ->
+          dnnrc_type ((xl,(Tlocal τl))::tenv) el τ ->
+          dnnrc_type ((xr,(Tlocal τr))::tenv) er τ ->
+          dnnrc_type tenv (DNNRCEither a ed xl el xr er) τ
+    | TDNNRCCollect {τ} tenv e :
+        forall (a:A),
+          dnnrc_type tenv e (Tdistr τ) ->
+          dnnrc_type tenv (DNNRCCollect a e) (Tlocal (Coll τ))
+    | TDNNRCDispatch {τ} tenv e :
+        forall (a:A),
+          dnnrc_type tenv e (Tlocal (Coll τ)) ->
+          dnnrc_type tenv (DNNRCDispatch a e) (Tdistr τ)
+    (* Note: algebra 'plugged' expression is only well typed within distributed
          NNNRC if it returns a collection *)
-      | TDNNRCAlg {τout} tenv tbindings op nl :
+    | TDNNRCAlg {τout} tenv tbindings op nl :
         forall (a:A),
           Forall2 (fun n τ => fst n = fst τ
                               /\ dnnrc_type tenv (snd n) (Tdistr (snd τ)))
                   nl tbindings ->
-           plug_typing op tbindings (Coll τout) -> 
-           dnnrc_type tenv (DNNRCAlg a op nl) (Tdistr τout)
-      .
-      
-      (* Print dnnrc_type_ind. We will need a special inductive principle because of the list of expressions in TDNRAlg *)
-      
+          plug_typing op tbindings (Coll τout) -> 
+          dnnrc_type tenv (DNNRCAlg a op nl) (Tdistr τout)
+    .
+
+    (* Print dnnrc_type_ind. We will need a special inductive principle because of the list of expressions in TDNRAlg *)
   End typ.
 
   (** Main lemma for the type correctness of DNNRC *)
-    Theorem typed_dnnrc_yields_typed_data {A:Set} {plug_type:Set} {τ} `{tplug:TAlgPlug plug_type} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
+  Theorem typed_dnnrc_yields_typed_data {A:Set} {plug_type:Set} {τ} `{tplug:TAlgPlug plug_type} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
     dbindings_type env tenv ->
     dnnrc_type tenv e τ ->
     (exists x, (dnnrc_eval brand_relation_brands env e) = Some x /\ (ddata_type x τ)).
@@ -356,7 +355,7 @@
       (* We will need a special inductive principle because of the list of expressions in TDNRAlg *)
   Admitted.
 
-End TDNNRC.
+End TDNNRCBase.
 
 (* Global Arguments TAlgPlug {m} plug_type {plug} : clear implicits.  *)
 

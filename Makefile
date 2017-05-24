@@ -92,6 +92,7 @@ MODULES = \
 	Basic/Typing/TOps \
 	Basic/Typing/TOpsEq \
 	Basic/Typing/TOpsInfer \
+	Basic/Typing/TOpsInferSub \
 	Basic/ForeignTyping \
 	Basic/JSON/JSON \
 	Basic/JSON/ForeignToJSON \
@@ -181,22 +182,24 @@ MODULES = \
 	NNRCMR/Optim/NNRCMRRewrite \
 	NNRCMR/Optim/NNRCMROptimizer \
 	NNRCMR/NNRCMROptim \
+	DNNRC/Lang/DNNRCBase \
+	DNNRC/Lang/DNNRCBaseSize \
+	DNNRC/Lang/DNNRCBaseEq \
+	DNNRC/Lang/Dataframe \
+	DNNRC/Lang/DataframeSize \
 	DNNRC/Lang/DNNRC \
-	DNNRC/Lang/DNNRCSize \
-	DNNRC/Lang/DNNRCEq \
-	DNNRC/Lang/Dataset \
-	DNNRC/Lang/DatasetSize \
-	DNNRC/Lang/DNNRCDataset \
-	DNNRC/Typing/TDNNRC \
-	DNNRC/Typing/TDNNRCSub \
-	DNNRC/Typing/TOpsInferSub \
-	DNNRC/Typing/TDNNRCInfer \
-	DNNRC/Typing/TDNNRCDataset \
+	DNNRC/Typing/TDNNRCBase \
 	DNNRC/DNNRCRuntime \
 	DNNRC/DNNRCTypes \
 	DNNRC/DNNRCSystem \
-	DNNRC/Optim/tDNNRCOptimizer \
-	DNNRC/DNNRCOptim \
+	tDNNRC/Lang/tDNNRC \
+	tDNNRC/Typing/tDNNRCSub \
+	tDNNRC/Typing/tDNNRCInfer \
+	tDNNRC/tDNNRCRuntime \
+	tDNNRC/tDNNRCTypes \
+	tDNNRC/tDNNRCSystem \
+	tDNNRC/Optim/tDNNRCOptimizer \
+	tDNNRC/tDNNRCOptim \
 	CAMP/Lang/CAMPUtil \
 	CAMP/Lang/CAMP \
 	CAMP/Lang/CAMPSize \
@@ -319,17 +322,17 @@ MODULES = \
 	Compiler/EnhancedCompiler \
 	Compiler/TrivialCompiler \
 	Compiler/CompilerExports \
+	Tests/TDataTest \
 	Tests/NRATest \
 	Tests/NRAEnvTest \
 	Tests/TNRATest \
 	Tests/CAMPTest \
 	Tests/TCAMPTest \
-	Tests/CompilerTest \
+	Tests/tDNNRCTest \
 	Tests/OQLTest \
 	Tests/SQLTest \
 	Tests/LambdaNRATest \
-	Tests/TDataTest \
-	Tests/DatasetTest
+	Tests/CompilerTest
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
 

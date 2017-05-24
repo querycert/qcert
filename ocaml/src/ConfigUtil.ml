@@ -86,20 +86,20 @@ let suffix_lambda_nrasexp () = "_lambda_nra.sexp"
 let suffix_nnrc_core () = "_nnrc_core.txt"
 let suffix_nnrc () = "_nnrc.txt"
 let suffix_nnrcsexp () = "_nnrc.sexp"
-let suffix_dnnrc_dataset () = "_dnnrc.txt"
-let suffix_dnnrc_typed_dataset () = "_dnnrc.txt"
+let suffix_dnnrc () = "_dnnrc.txt"
+let suffix_dnnrc_typed () = "_tdnnrc.txt"
 let suffix_dnnrcsexp () = "_dnnrc.sexp"
 let suffix_nnrcmr () = "_nnrcmr.txt"
 let suffix_nnrcmr_spark_rdd () = "_nnrcmr_spark_rdd.txt"
 let suffix_nnrcmr_spark_rddsexp () = "_nnrcmr_spark_rdd.sexp"
-let suffix_nnrcmr_spark_dataset () = "_nnrcmr_spark_dataset.txt"
-let suffix_nnrcmr_spark_datasetsexp () = "_nnrcmr_spark_dataset.sexp"
+let suffix_nnrcmr_spark_df () = "_nnrcmr_spark_df.txt"
+let suffix_nnrcmr_spark_dfsexp () = "_nnrcmr_spark_df.sexp"
 let suffix_nnrcmr_cldmr () = "_nnrcmr_cldmr.txt"
 let suffix_nnrcmr_cldmrsexp () = "_nnrcmr_cldmr.sexp"
 let suffix_java () = ".java"
 let suffix_javascript () = ".js"
 let suffix_spark_rdd () = "_spark_rdd.scala"
-let suffix_spark_dataset () = "_spark_dataset.scala"
+let suffix_spark_df () = "_spark_df.scala"
 let suffix_cld_design () = "_cloudant_design.json"
 let suffix_stats () = "_stats.json"
 let suffix_error () = ".error"
@@ -120,14 +120,14 @@ let suffix_of_language lang =
   | Compiler.L_nraenv_core -> suffix_nraenv_core ()
   | Compiler.L_nnrc_core -> suffix_nnrc_core ()
   | Compiler.L_nnrc -> suffix_nnrc ()
-  | Compiler.L_dnnrc_dataset -> suffix_dnnrc_dataset ()
-  | Compiler.L_dnnrc_typed_dataset -> suffix_dnnrc_typed_dataset ()
+  | Compiler.L_dnnrc -> suffix_dnnrc ()
+  | Compiler.L_dnnrc_typed -> suffix_dnnrc_typed ()
   | Compiler.L_nnrcmr -> suffix_nnrcmr ()
   | Compiler.L_cldmr -> suffix_nnrcmr_cldmr ()
   | Compiler.L_javascript -> suffix_javascript ()
   | Compiler.L_java -> suffix_java ()
   | Compiler.L_spark_rdd -> suffix_spark_rdd ()
-  | Compiler.L_spark_dataset -> suffix_spark_dataset ()
+  | Compiler.L_spark_df -> suffix_spark_df ()
   | Compiler.L_cloudant -> suffix_cld_design ()
   | Compiler.L_error _ -> suffix_error ()
 

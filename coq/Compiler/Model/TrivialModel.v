@@ -14,16 +14,29 @@
  * limitations under the License.
  *)
 
-Require Import Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavaScript ForeignToScala ForeignToJSON ForeignTypeToJSON.
-Require Import ForeignReduceOps ForeignToReduceOps.
+Require Import BasicSystem.
+Require Import ForeignToJava.
+Require Import ForeignToJavaScript.
+Require Import ForeignToScala.
+Require Import ForeignToJSON.
+Require Import ForeignTypeToJSON.
+Require Import ForeignReduceOps.
+Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant ForeignToCloudant.
-Require Import CompilerRuntime CompilerModel.
-Require NNRCMR CldMR.
-Require Import OptimizerLogger String cNRAEnv NRAEnv cNNRC.
-Require Import DNNRC Dataset.
-Require Import TDNNRCInfer.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
+Require Import CompilerRuntime.
+Require Import CompilerModel.
+Require NNRCMR.
+Require CldMR.
+Require Import OptimizerLogger.
+Require Import String.
+Require Import cNRAEnv.
+Require Import NRAEnv.
+Require Import cNNRC.
+Require Import DNNRCBase.
+Require Import tDNNRC.
+Require Import Dataframe.
 
 Program Instance trivial_foreign_data : foreign_data
   := mk_foreign_data Empty_set _ _ _ _ _ _.
@@ -346,8 +359,8 @@ Existing Instance silent_optimizer_logger.
       := silent_optimizer_logger string nraenv.
     Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
       := silent_optimizer_logger string nnrc.
-    Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)
-      := silent_optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
+    Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe)
+      := silent_optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe).
     Definition compiler_foreign_data_typing : foreign_data_typing
       := trivial_foreign_data_typing.
     
@@ -387,11 +400,12 @@ Existing Instance silent_optimizer_logger.
       := silent_optimizer_logger string nraenv.
     Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
       := silent_optimizer_logger string nnrc.
-    Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataset)   
-      := silent_optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
- Definition compiler_model_foreign_data_typing : foreign_data_typing
+    Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe)
+      := silent_optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe).
+    Definition compiler_model_foreign_data_typing : foreign_data_typing
       := trivial_foreign_data_typing.
   End TrivialModel.
+
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***

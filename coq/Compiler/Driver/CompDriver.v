@@ -38,6 +38,7 @@ Section CompDriver.
   Require Import NNRCMRRuntime.
   Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
+  Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
   (* Target languages *)
   Require Import JavaScriptRuntime.
@@ -71,14 +72,14 @@ Section CompDriver.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoCloudant.
   Require Import NNRCtoDNNRC.
-  Require Import TDNNRCInfer DNNRCtotDNNRC.
+  Require Import DNNRCtotDNNRC.
   Require Import tDNNRCtoSparkDF.
 
   (* Optimizers *)
   Require Import NRAEnvOptim.
   Require Import NNRCOptim.
   Require Import NNRCMROptim.
-  Require Import DNNRCOptim.
+  Require Import tDNNRCOptim.
   Require Import OptimizerLogger.
 
   (* Foreign Datatypes Support *)
@@ -108,7 +109,7 @@ Section CompDriver.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nnrc}.
-  Context {dnnrc_logger:optimizer_logger string (DNNRC.dnnrc fr (type_annotation unit) dataset)}.
+  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc fr (type_annotation unit) dataframe)}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
@@ -187,8 +188,8 @@ Section CompDriver.
     Definition nnrc_to_nnrcmr (vinit: var) (inputs_loc: vdbindings) (q: nnrc) : nnrcmr :=
       nnrc_to_nnrcmr_top vinit inputs_loc q.
 
-    Definition nnrc_to_dnnrc_dataset (inputs_loc: vdbindings) (q: nnrc) : dnnrc_dataset :=
-      nnrc_to_dnnrc_dataset tt inputs_loc q.
+    Definition nnrc_to_dnnrc (inputs_loc: vdbindings) (q: nnrc) : dnnrc :=
+      nnrc_to_dnnrc tt inputs_loc q.
 
     Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
       lift_nnrc_core nnrc_to_js_top (nnrc_to_nnrc_core q).
@@ -199,7 +200,7 @@ Section CompDriver.
     (** NNRCMR translations *)
     Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
 
-    Definition nnrcmr_to_dnnrc_dataset (q: nnrcmr) : option dnnrc_dataset := dnnrc_of_nnrcmr tt q.
+    Definition nnrcmr_to_dnnrc (q: nnrcmr) : option dnnrc := dnnrc_of_nnrcmr tt q.
 
     Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
       let q := foreign_to_cloudant_prepare_nnrcmr q in
@@ -223,12 +224,12 @@ Section CompDriver.
 
     (** DNNRC translations *)
 
-    Definition dnnrc_dataset_to_dnnrc_typed_dataset (q: dnnrc_dataset) (tdenv: tdbindings)
-      : option dnnrc_typed_dataset :=
+    Definition dnnrc_to_dnnrc_typed (q: dnnrc) (tdenv: tdbindings)
+      : option dnnrc_typed :=
       dnnrc_to_dnnrc_typed_top tdenv q.
 
-    Definition dnnrc_typed_dataset_to_spark_dataset
-               (tenv:tdbindings) (name:string) (q:dnnrc_typed_dataset) : spark_dataset :=
+    Definition dnnrc_typed_to_spark_df
+               (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
       @dnnrcToSpark2Top _ _ bm _ _ unit (mkConstants tenv) name q.
 
   End translations.
@@ -266,8 +267,8 @@ Section CompDriver.
 
     Definition nnrcmr_optim (q: nnrcmr) : nnrcmr := run_nnrcmr_optims q.
 
-    Definition dnnrc_typed_dataset_optim (q:dnnrc_typed_dataset) : dnnrc_typed_dataset :=
-      dnnrcToDatasetRewrite q.
+    Definition dnnrc_typed_optim (q:dnnrc_typed) : dnnrc_typed :=
+      dnnrcToDataframeRewrite q.
   End optimizations.
 
   (** Drivers *)
@@ -281,8 +282,8 @@ Section CompDriver.
   Inductive spark_rdd_driver : Set :=
     | Dv_spark_rdd_stop : spark_rdd_driver.
 
-  Inductive spark_dataset_driver : Set :=
-    | Dv_spark_dataset_stop : spark_dataset_driver.
+  Inductive spark_df_driver : Set :=
+    | Dv_spark_df_stop : spark_df_driver.
 
   Inductive cloudant_driver : Set :=
     | Dv_cloudant_stop : cloudant_driver.
@@ -291,15 +292,15 @@ Section CompDriver.
     | Dv_cldmr_stop : cldmr_driver
     | Dv_cldmr_to_cloudant : (* rulename *) string -> (* h *) list (string*string) -> cloudant_driver -> cldmr_driver.
 
-  Inductive dnnrc_typed_dataset_driver : Set :=
-    | Dv_dnnrc_typed_dataset_stop : dnnrc_typed_dataset_driver
-    | Dv_dnnrc_typed_dataset_optim : dnnrc_typed_dataset_driver -> dnnrc_typed_dataset_driver
-    | Dv_dnnrc_typed_dataset_to_spark_dataset : tdbindings -> string -> spark_dataset_driver -> dnnrc_typed_dataset_driver
+  Inductive dnnrc_typed_driver : Set :=
+    | Dv_dnnrc_typed_stop : dnnrc_typed_driver
+    | Dv_dnnrc_typed_optim : dnnrc_typed_driver -> dnnrc_typed_driver
+    | Dv_dnnrc_typed_to_spark_df : tdbindings -> string -> spark_df_driver -> dnnrc_typed_driver
   .
 
-  Inductive dnnrc_dataset_driver : Set :=
-    | Dv_dnnrc_dataset_stop : dnnrc_dataset_driver
-    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset : tdbindings -> dnnrc_typed_dataset_driver -> dnnrc_dataset_driver
+  Inductive dnnrc_driver : Set :=
+    | Dv_dnnrc_stop : dnnrc_driver
+    | Dv_dnnrc_to_dnnrc_typed : tdbindings -> dnnrc_typed_driver -> dnnrc_driver
   .
 
   (* Unset Elimination Schemes. *)
@@ -333,7 +334,7 @@ Section CompDriver.
     | Dv_nnrc_optim : optim_phases_config -> nnrc_driver -> nnrc_driver
     | Dv_nnrc_to_nnrc_core : nnrc_core_driver -> nnrc_driver
     | Dv_nnrc_to_nnrcmr : (* vinit *) var -> (* inputs_loc *) vdbindings -> nnrcmr_driver -> nnrc_driver
-    | Dv_nnrc_to_dnnrc_dataset : (* inputs_loc *) vdbindings -> dnnrc_dataset_driver -> nnrc_driver
+    | Dv_nnrc_to_dnnrc : (* inputs_loc *) vdbindings -> dnnrc_driver -> nnrc_driver
     | Dv_nnrc_to_javascript : javascript_driver -> nnrc_driver
     | Dv_nnrc_to_java : (* class_name *) string -> (* imports *) string -> java_driver -> nnrc_driver
 
@@ -348,7 +349,7 @@ Section CompDriver.
     | Dv_nnrcmr_optim : nnrcmr_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_spark_rdd : (* rulename *) string -> spark_rdd_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_nnrc : nnrc_driver -> nnrcmr_driver
-    | Dv_nnrcmr_to_dnnrc_dataset : dnnrc_dataset_driver -> nnrcmr_driver
+    | Dv_nnrcmr_to_dnnrc : dnnrc_driver -> nnrcmr_driver
     | Dv_nnrcmr_to_cldmr : (* h *) list (string*string) -> cldmr_driver -> nnrcmr_driver.
 
 (*  Set Elimination Scheme. *)
@@ -415,12 +416,12 @@ Section CompDriver.
   | Dv_nnrc : nnrc_driver -> driver
   | Dv_nnrcmr : nnrcmr_driver -> driver
   | Dv_cldmr : cldmr_driver -> driver
-  | Dv_dnnrc_dataset : dnnrc_dataset_driver -> driver
-  | Dv_dnnrc_typed_dataset : dnnrc_typed_dataset_driver -> driver
+  | Dv_dnnrc : dnnrc_driver -> driver
+  | Dv_dnnrc_typed : dnnrc_typed_driver -> driver
   | Dv_javascript : javascript_driver -> driver
   | Dv_java : java_driver -> driver
   | Dv_spark_rdd : spark_rdd_driver -> driver
-  | Dv_spark_dataset : spark_dataset_driver -> driver
+  | Dv_spark_df : spark_df_driver -> driver
   | Dv_cloudant : cloudant_driver -> driver
   | Dv_error : string -> driver.
 
@@ -441,12 +442,12 @@ Section CompDriver.
     | Case_aux c "Dv_nnrc"%string
     | Case_aux c "Dv_nnrcmr"%string
     | Case_aux c "Dv_cldmr"%string
-    | Case_aux c "Dv_dnnrc_dataset"%string
-    | Case_aux c "Dv_dnnrc_typed_dataset"%string
+    | Case_aux c "Dv_dnnrc"%string
+    | Case_aux c "Dv_dnnrc_typed"%string
     | Case_aux c "Dv_javascript"%string
     | Case_aux c "Dv_java"%string
     | Case_aux c "Dv_spark_rdd"%string
-    | Case_aux c "Dv_spark_dataset"%string
+    | Case_aux c "Dv_spark_df"%string
     | Case_aux c "Dv_cloudant"%string
     | Case_aux c "Dv_error"%string ].
 
@@ -470,12 +471,12 @@ Section CompDriver.
     | Dv_sql _ => L_sql
     | Dv_lambda_nra _ => L_lambda_nra
     | Dv_cldmr _ => L_cldmr
-    | Dv_dnnrc_dataset  _ => L_dnnrc_dataset
-    | Dv_dnnrc_typed_dataset _ => L_dnnrc_typed_dataset
+    | Dv_dnnrc  _ => L_dnnrc
+    | Dv_dnnrc_typed _ => L_dnnrc_typed
     | Dv_javascript _ => L_javascript
     | Dv_java _ => L_java
     | Dv_spark_rdd _ => L_spark_rdd
-    | Dv_spark_dataset _ => L_spark_dataset
+    | Dv_spark_df _ => L_spark_df
     | Dv_cloudant _ => L_cloudant
     | Dv_error err => L_error ("language of "++err)
     end.
@@ -498,9 +499,9 @@ Section CompDriver.
     | Dv_spark_rdd_stop => 1
     end.
 
-  Definition driver_length_spark_dataset (dv: spark_dataset_driver) :=
+  Definition driver_length_spark_df (dv: spark_df_driver) :=
     match dv with
-    | Dv_spark_dataset_stop => 1
+    | Dv_spark_df_stop => 1
     end.
 
   Definition driver_length_cloudant (dv: cloudant_driver) :=
@@ -514,17 +515,17 @@ Section CompDriver.
     | Dv_cldmr_to_cloudant rulename h dv => 1 + driver_length_cloudant dv
     end.
 
-  Fixpoint driver_length_dnnrc_typed_dataset {ftyping: foreign_typing} (dv: dnnrc_typed_dataset_driver) :=
+  Fixpoint driver_length_dnnrc_typed {ftyping: foreign_typing} (dv: dnnrc_typed_driver) :=
     match dv with
-    | Dv_dnnrc_typed_dataset_stop => 1
-    | Dv_dnnrc_typed_dataset_optim dv => 1 + driver_length_dnnrc_typed_dataset dv
-    | Dv_dnnrc_typed_dataset_to_spark_dataset rt rulename dv => 1 + driver_length_spark_dataset dv
+    | Dv_dnnrc_typed_stop => 1
+    | Dv_dnnrc_typed_optim dv => 1 + driver_length_dnnrc_typed dv
+    | Dv_dnnrc_typed_to_spark_df rt rulename dv => 1 + driver_length_spark_df dv
     end.
 
-  Definition driver_length_dnnrc_dataset (dv: dnnrc_dataset_driver) :=
+  Definition driver_length_dnnrc (dv: dnnrc_driver) :=
     match dv with
-    | Dv_dnnrc_dataset_stop => 1
-    | Dv_dnnrc_dataset_to_dnnrc_typed_dataset _ dv => 1 + driver_length_dnnrc_typed_dataset dv
+    | Dv_dnnrc_stop => 1
+    | Dv_dnnrc_to_dnnrc_typed _ dv => 1 + driver_length_dnnrc_typed dv
     end.
 
   Fixpoint driver_length_camp (dv: camp_driver) :=
@@ -574,7 +575,7 @@ Section CompDriver.
     | Dv_nnrc_optim opc dv => 1 + driver_length_nnrc dv
     | Dv_nnrc_to_nnrc_core dv => 1 + driver_length_nnrc_core dv
     | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => 1 + driver_length_nnrcmr dv
-    | Dv_nnrc_to_dnnrc_dataset inputs_loc dv => 1 + driver_length_dnnrc_dataset dv
+    | Dv_nnrc_to_dnnrc inputs_loc dv => 1 + driver_length_dnnrc dv
     | Dv_nnrc_to_javascript dv => 1 + driver_length_javascript dv
     | Dv_nnrc_to_java class_name imports dv => 1 + driver_length_java dv
     end
@@ -586,7 +587,7 @@ Section CompDriver.
     | Dv_nnrcmr_to_spark_rdd rulename dv => 1 + driver_length_spark_rdd dv
     | Dv_nnrcmr_to_nnrc dv => 1 + driver_length_nnrc dv
     | Dv_nnrcmr_to_cldmr h dv => 1 + driver_length_cldmr dv
-    | Dv_nnrcmr_to_dnnrc_dataset dv => 1 + driver_length_dnnrc_dataset dv
+    | Dv_nnrcmr_to_dnnrc dv => 1 + driver_length_dnnrc dv
     end.
 
   Definition driver_length_camp_rule (dv: camp_rule_driver) :=
@@ -641,12 +642,12 @@ Section CompDriver.
     | Dv_nnrc dv => driver_length_nnrc dv
     | Dv_nnrcmr dv => driver_length_nnrcmr dv
     | Dv_cldmr dv => driver_length_cldmr dv
-    | Dv_dnnrc_dataset dv => driver_length_dnnrc_dataset dv
-    | Dv_dnnrc_typed_dataset dv => driver_length_dnnrc_typed_dataset dv
+    | Dv_dnnrc dv => driver_length_dnnrc dv
+    | Dv_dnnrc_typed dv => driver_length_dnnrc_typed dv
     | Dv_javascript dv => driver_length_javascript dv
     | Dv_java dv => driver_length_java dv
     | Dv_spark_rdd dv => driver_length_spark_rdd dv
-    | Dv_spark_dataset dv => driver_length_spark_dataset dv
+    | Dv_spark_df dv => driver_length_spark_df dv
     | Dv_cloudant dv => driver_length_cloudant dv
     | Dv_error s => 1
     end.
@@ -679,13 +680,13 @@ Section CompDriver.
     in
     (Q_spark_rdd q) :: queries.
 
-  Definition compile_spark_dataset (dv: spark_dataset_driver) (q: spark_dataset) : list query :=
+  Definition compile_spark_df (dv: spark_df_driver) (q: spark_df) : list query :=
     let queries :=
         match dv with
-        | Dv_spark_dataset_stop => nil
+        | Dv_spark_df_stop => nil
         end
     in
-    (Q_spark_dataset q) :: queries.
+    (Q_spark_df q) :: queries.
 
   Definition compile_cloudant (dv: cloudant_driver) (q: cloudant) : list query :=
     let queries :=
@@ -706,33 +707,33 @@ Section CompDriver.
     in
     (Q_cldmr q) :: queries.
 
-  Fixpoint compile_dnnrc_typed_dataset (dv: dnnrc_typed_dataset_driver) (q: dnnrc_typed_dataset) : list query :=
+  Fixpoint compile_dnnrc_typed (dv: dnnrc_typed_driver) (q: dnnrc_typed) : list query :=
     let queries :=
         match dv with
-        | Dv_dnnrc_typed_dataset_stop => nil
-        | Dv_dnnrc_typed_dataset_optim dv =>
-          let q := dnnrc_typed_dataset_optim q in
-          compile_dnnrc_typed_dataset dv q
-        | Dv_dnnrc_typed_dataset_to_spark_dataset rt rulename dv =>
-          let q := dnnrc_typed_dataset_to_spark_dataset rt rulename q in
-          compile_spark_dataset dv q
+        | Dv_dnnrc_typed_stop => nil
+        | Dv_dnnrc_typed_optim dv =>
+          let q := dnnrc_typed_optim q in
+          compile_dnnrc_typed dv q
+        | Dv_dnnrc_typed_to_spark_df rt rulename dv =>
+          let q := dnnrc_typed_to_spark_df rt rulename q in
+          compile_spark_df dv q
         end
     in
-    (Q_dnnrc_typed_dataset q) :: queries.
+    (Q_dnnrc_typed q) :: queries.
 
-  Definition compile_dnnrc_dataset (dv: dnnrc_dataset_driver) (q: dnnrc_dataset) : list query :=
+  Definition compile_dnnrc (dv: dnnrc_driver) (q: dnnrc) : list query :=
     let queries :=
         match dv with
-        | Dv_dnnrc_dataset_stop => nil
-        | Dv_dnnrc_dataset_to_dnnrc_typed_dataset tdenv dv =>
-          let q := dnnrc_dataset_to_dnnrc_typed_dataset q tdenv in
+        | Dv_dnnrc_stop => nil
+        | Dv_dnnrc_to_dnnrc_typed tdenv dv =>
+          let q := dnnrc_to_dnnrc_typed q tdenv in
           match q with
-          | Some q => compile_dnnrc_typed_dataset dv q
+          | Some q => compile_dnnrc_typed dv q
           | None => (Q_error "Type checking failed for dnnrc query") :: nil
           end
         end
     in
-    (Q_dnnrc_dataset q) :: queries.
+    (Q_dnnrc q) :: queries.
 
   Fixpoint compile_camp (dv: camp_driver) (q: camp) : list query :=
     let queries :=
@@ -835,9 +836,9 @@ Section CompDriver.
         | Dv_nnrc_to_nnrcmr vinit inputs_loc dv =>
           let q := nnrc_to_nnrcmr vinit inputs_loc q in
           compile_nnrcmr dv q
-        | Dv_nnrc_to_dnnrc_dataset inputs_loc dv =>
-          let q := nnrc_to_dnnrc_dataset inputs_loc q in
-          compile_dnnrc_dataset dv q
+        | Dv_nnrc_to_dnnrc inputs_loc dv =>
+          let q := nnrc_to_dnnrc inputs_loc q in
+          compile_dnnrc dv q
         | Dv_nnrc_to_javascript dv =>
           let q := nnrc_to_javascript q in
           compile_javascript dv q
@@ -867,10 +868,10 @@ Section CompDriver.
         | Dv_nnrcmr_to_cldmr h dv =>
           let q := nnrcmr_to_cldmr h q in
           compile_cldmr dv q
-        | Dv_nnrcmr_to_dnnrc_dataset dv =>
-          let q_opt := nnrcmr_to_dnnrc_dataset q in
+        | Dv_nnrcmr_to_dnnrc dv =>
+          let q_opt := nnrcmr_to_dnnrc q in
           match q_opt with
-          | Some q => compile_dnnrc_dataset dv q
+          | Some q => compile_dnnrc dv q
           | None => (Q_error "Unable to compile NNRCMR to NNRC") :: nil
           end
         end
@@ -959,12 +960,12 @@ Section CompDriver.
     | (Dv_nnrc dv, Q_nnrc q) => compile_nnrc dv q
     | (Dv_nnrcmr dv, Q_nnrcmr q) => compile_nnrcmr dv q
     | (Dv_cldmr dv, Q_cldmr q) => compile_cldmr dv q
-    | (Dv_dnnrc_dataset dv, Q_dnnrc_dataset q) => compile_dnnrc_dataset dv q
-    | (Dv_dnnrc_typed_dataset dv, Q_dnnrc_typed_dataset q) => compile_dnnrc_typed_dataset dv q
+    | (Dv_dnnrc dv, Q_dnnrc q) => compile_dnnrc dv q
+    | (Dv_dnnrc_typed dv, Q_dnnrc_typed q) => compile_dnnrc_typed dv q
     | (Dv_javascript dv, Q_javascript q) => compile_javascript dv q
     | (Dv_java dv, Q_java q) => compile_java dv q
     | (Dv_spark_rdd dv, Q_spark_rdd q) => compile_spark_rdd dv q
-    | (Dv_spark_dataset dv, Q_spark_dataset q) => compile_spark_dataset dv q
+    | (Dv_spark_df dv, Q_spark_df q) => compile_spark_df dv q
     | (Dv_cloudant dv, Q_cloudant q) => compile_cloudant dv q
     | (Dv_error s, _) => (Q_error ("[Driver Error]" ++ s)) :: nil
     | (_, _) => (Q_error "incompatible query and driver") :: nil
@@ -992,12 +993,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1019,12 +1020,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1046,12 +1047,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1073,12 +1074,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1100,12 +1101,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1127,12 +1128,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1154,12 +1155,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1181,12 +1182,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1208,12 +1209,12 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1235,12 +1236,12 @@ Section CompDriver.
       | Dv_lambda_nra _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1253,7 +1254,7 @@ Section CompDriver.
       | Dv_nnrc dv => Dv_nnrc_core (Dv_nnrc_core_to_nnrc dv)
       | Dv_nraenv _
       | Dv_nnrcmr _
-      | Dv_dnnrc_dataset _
+      | Dv_dnnrc _
       | Dv_javascript _
       | Dv_java _
       | Dv_camp_rule _
@@ -1265,9 +1266,9 @@ Section CompDriver.
       | Dv_nra _
       | Dv_nraenv_core _
       | Dv_cldmr _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc_typed _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1276,7 +1277,7 @@ Section CompDriver.
     | L_nnrc =>
       match dv with
       | Dv_nnrcmr dv => Dv_nnrc (Dv_nnrc_to_nnrcmr config.(comp_mr_vinit) (vdbindings_of_constants_config config.(comp_constants)) dv)
-      | Dv_dnnrc_dataset dv => Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_constants_config config.(comp_constants)) dv)
+      | Dv_dnnrc dv => Dv_nnrc (Dv_nnrc_to_dnnrc (vdbindings_of_constants_config config.(comp_constants)) dv)
       | Dv_javascript dv => Dv_nnrc (Dv_nnrc_to_javascript dv)
       | Dv_java dv => Dv_nnrc (Dv_nnrc_to_java config.(comp_class_name) config.(comp_java_imports) dv)
       | Dv_nnrc dv => Dv_nnrc (Dv_nnrc_optim (get_optim_config L_nnrc config.(comp_optim_config)) dv)
@@ -1292,9 +1293,9 @@ Section CompDriver.
       | Dv_nra _
       | Dv_nraenv_core _
       | Dv_cldmr _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc_typed _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1304,7 +1305,7 @@ Section CompDriver.
       match dv with
       | Dv_spark_rdd dv => Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd config.(comp_qname) dv)
       | Dv_nnrc dv => Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv)
-      | Dv_dnnrc_dataset dv => Dv_nnrcmr (Dv_nnrcmr_to_dnnrc_dataset dv)
+      | Dv_dnnrc dv => Dv_nnrcmr (Dv_nnrcmr_to_dnnrc dv)
       | Dv_cldmr dv => Dv_nnrcmr (Dv_nnrcmr_to_cldmr config.(comp_brand_rel) dv)
       | Dv_nnrcmr dv => Dv_nnrcmr (Dv_nnrcmr_optim dv)
       | Dv_nraenv _
@@ -1318,10 +1319,10 @@ Section CompDriver.
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
@@ -1344,21 +1345,21 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
-      | Dv_dnnrc_typed_dataset _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _ =>
+      | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-    | L_dnnrc_dataset =>
+    | L_dnnrc =>
       match dv with
-      | Dv_dnnrc_typed_dataset dv =>
-          Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (tdbindings_of_constants_config config.(comp_constants)) dv)
-      | Dv_dnnrc_dataset _
+      | Dv_dnnrc_typed dv =>
+          Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed (tdbindings_of_constants_config config.(comp_constants)) dv)
+      | Dv_dnnrc _
       | Dv_nraenv _
       | Dv_camp_rule _
       | Dv_tech_rule _
@@ -1376,18 +1377,18 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_dataset _
+      | Dv_spark_df _
       | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
       end
-    | L_dnnrc_typed_dataset =>
+    | L_dnnrc_typed =>
       match dv with
-      | Dv_spark_dataset dv =>
-          Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset (tdbindings_of_constants_config config.(comp_constants)) config.(comp_qname) dv)
-      | Dv_dnnrc_typed_dataset dv =>
-        Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv)
+      | Dv_spark_df dv =>
+          Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df (tdbindings_of_constants_config config.(comp_constants)) config.(comp_qname) dv)
+      | Dv_dnnrc_typed dv =>
+        Dv_dnnrc_typed (Dv_dnnrc_typed_optim dv)
       | Dv_nraenv _
       | Dv_camp_rule _
       | Dv_tech_rule _
@@ -1402,7 +1403,7 @@ Section CompDriver.
       | Dv_nnrc _
       | Dv_nnrcmr _
       | Dv_cldmr _
-      | Dv_dnnrc_dataset _
+      | Dv_dnnrc _
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
@@ -1414,7 +1415,7 @@ Section CompDriver.
     | L_javascript
     | L_java
     | L_spark_rdd
-    | L_spark_dataset
+    | L_spark_df
     | L_cloudant =>
       Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
     | L_error err =>
@@ -1437,12 +1438,12 @@ Section CompDriver.
     | L_nnrc => Dv_nnrc Dv_nnrc_stop
     | L_nnrcmr => Dv_nnrcmr Dv_nnrcmr_stop
     | L_cldmr => Dv_cldmr Dv_cldmr_stop
-    | L_dnnrc_dataset => Dv_dnnrc_dataset Dv_dnnrc_dataset_stop
-    | L_dnnrc_typed_dataset => Dv_dnnrc_typed_dataset Dv_dnnrc_typed_dataset_stop
+    | L_dnnrc => Dv_dnnrc Dv_dnnrc_stop
+    | L_dnnrc_typed => Dv_dnnrc_typed Dv_dnnrc_typed_stop
     | L_javascript => Dv_javascript Dv_javascript_stop
     | L_java => Dv_java Dv_java_stop
     | L_spark_rdd => Dv_spark_rdd Dv_spark_rdd_stop
-    | L_spark_dataset => Dv_spark_dataset Dv_spark_dataset_stop
+    | L_spark_df => Dv_spark_df Dv_spark_df_stop
     | L_cloudant => Dv_cloudant Dv_cloudant_stop
     | L_error err => Dv_error ("No driver for error: "++err)
     end.
@@ -1505,7 +1506,7 @@ Section CompDriver.
         match dv' with
         | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings _) =>
           vinit = config.(comp_mr_vinit) /\ vdbindings = (vdbindings_of_constants_config config.(comp_constants))
-        | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset vdbindings _) =>
+        | Dv_nnrc (Dv_nnrc_to_dnnrc vdbindings _) =>
           vdbindings = (vdbindings_of_constants_config config.(comp_constants))
         | Dv_nnrc (Dv_nnrc_to_java class_name imports _) =>
           class_name = config.(comp_class_name) /\ imports = config.(comp_java_imports)
@@ -1527,9 +1528,9 @@ Section CompDriver.
           brand_rel = config.(comp_brand_rel)
         | Dv_cldmr (Dv_cldmr_to_cloudant qname brand_rel _) =>
           qname = config.(comp_qname_lowercase) /\ brand_rel = config.(comp_brand_rel)
-        | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset tdbindings _) =>
+        | Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed tdbindings _) =>
           tdbindings = tdbindings_of_constants_config config.(comp_constants)
-        | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset tdbindings qname _) =>
+        | Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df tdbindings qname _) =>
           (tdbindings = tdbindings_of_constants_config config.(comp_constants)) /\ qname = config.(comp_qname)
         | _ => True
         end.
@@ -1586,27 +1587,27 @@ Section CompDriver.
     | Dv_nnrc (Dv_nnrc_stop) => (L_nnrc, None)
     | Dv_nnrc (Dv_nnrc_to_nnrc_core dv) => (L_nnrc, Some (Dv_nnrc_core dv))
     | Dv_nnrc (Dv_nnrc_to_nnrcmr vinit vdbindings dv) => (L_nnrc, Some (Dv_nnrcmr dv))
-    | Dv_nnrc (Dv_nnrc_to_dnnrc_dataset inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc_dataset dv))
+    | Dv_nnrc (Dv_nnrc_to_dnnrc inputs_loc dv) => (L_nnrc, Some (Dv_dnnrc dv))
     | Dv_nnrc (Dv_nnrc_to_javascript dv) => (L_nnrc, Some (Dv_javascript dv))
     | Dv_nnrc (Dv_nnrc_to_java name java_imports dv) => (L_nnrc, Some (Dv_java dv))
     | Dv_nnrc (Dv_nnrc_optim opc dv) => (L_nnrc, Some (Dv_nnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_stop) => (L_nnrcmr, None)
     | Dv_nnrcmr (Dv_nnrcmr_to_spark_rdd name dv) => (L_nnrcmr, Some (Dv_spark_rdd dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_nnrc dv) => (L_nnrcmr, Some (Dv_nnrc dv))
-    | Dv_nnrcmr (Dv_nnrcmr_to_dnnrc_dataset dv) => (L_nnrcmr, Some (Dv_dnnrc_dataset dv))
+    | Dv_nnrcmr (Dv_nnrcmr_to_dnnrc dv) => (L_nnrcmr, Some (Dv_dnnrc dv))
     | Dv_nnrcmr (Dv_nnrcmr_to_cldmr brand_rel dv) => (L_nnrcmr, Some (Dv_cldmr dv))
     | Dv_nnrcmr (Dv_nnrcmr_optim dv) => (L_nnrcmr, Some (Dv_nnrcmr dv))
     | Dv_cldmr (Dv_cldmr_stop) => (L_cldmr, None)
     | Dv_cldmr (Dv_cldmr_to_cloudant name brand_rel dv) => (L_cldmr, Some (Dv_cloudant dv))
-    | Dv_dnnrc_dataset (Dv_dnnrc_dataset_stop) => (L_dnnrc_dataset, None)
-    | Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset rtype dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv)) (* XXX TO BE CHECKED XXX *)
-    | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_stop) => (L_dnnrc_typed_dataset, None)
-    | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_optim dv) => (L_dnnrc_typed_dataset, Some (Dv_dnnrc_typed_dataset dv)) (* XXX TO BE CHECKED XXX *)
-    | Dv_dnnrc_typed_dataset (Dv_dnnrc_typed_dataset_to_spark_dataset rtype _ dv) => (L_dnnrc_typed_dataset, Some (Dv_spark_dataset dv))
+    | Dv_dnnrc (Dv_dnnrc_stop) => (L_dnnrc, None)
+    | Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed rtype dv) => (L_dnnrc_typed, Some (Dv_dnnrc_typed dv)) (* XXX TO BE CHECKED XXX *)
+    | Dv_dnnrc_typed (Dv_dnnrc_typed_stop) => (L_dnnrc_typed, None)
+    | Dv_dnnrc_typed (Dv_dnnrc_typed_optim dv) => (L_dnnrc_typed, Some (Dv_dnnrc_typed dv)) (* XXX TO BE CHECKED XXX *)
+    | Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df rtype _ dv) => (L_dnnrc_typed, Some (Dv_spark_df dv))
     | Dv_javascript (Dv_javascript_stop) => (L_javascript, None)
     | Dv_java (Dv_java_stop) => (L_java, None)
     | Dv_spark_rdd (Dv_spark_rdd_stop) => (L_spark_rdd, None)
-    | Dv_spark_dataset (Dv_spark_dataset_stop) => (L_spark_dataset, None)
+    | Dv_spark_df (Dv_spark_df_stop) => (L_spark_df, None)
     | Dv_cloudant (Dv_cloudant_stop) => (L_cloudant, None)
     | Dv_error err => (L_error err, None)
     end.
@@ -1650,8 +1651,8 @@ Section CompDriver.
     reflexivity.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_spark_dataset:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark_dataset dv))) (Dv_spark_dataset dv)).
+  Lemma target_language_of_driver_is_postfix_spark_df:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_spark_df dv))) (Dv_spark_df dv)).
   Proof.
     destruct dv.
     reflexivity.
@@ -1685,15 +1686,15 @@ Section CompDriver.
       ; simpl; trivial.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_dnnrc_typed_dataset:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_typed_dataset dv))) (Dv_dnnrc_typed_dataset dv)).
+  Lemma target_language_of_driver_is_postfix_dnnrc_typed:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_typed dv))) (Dv_dnnrc_typed dv)).
   Proof.
     induction dv; simpl
     ; try reflexivity
     ; rewrite target_language_of_driver_equation
     ; simpl.
     - eapply is_postfix_plus_one with
-      (config:=trivial_driver_config) (lang:=L_dnnrc_typed_dataset)
+      (config:=trivial_driver_config) (lang:=L_dnnrc_typed)
       ; [eassumption | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
@@ -1704,14 +1705,14 @@ Section CompDriver.
                  EmptyString
                  (constants_config_of_tdbindings t)
                  EmptyString
-                 nil) (lang:=L_dnnrc_typed_dataset)
-      ; [ eapply target_language_of_driver_is_postfix_spark_dataset | | ]
+                 nil) (lang:=L_dnnrc_typed)
+      ; [ eapply target_language_of_driver_is_postfix_spark_df | | ]
       ; simpl; trivial.
       rewrite (constants_config_of_tdbindings_merges t); reflexivity.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_dnnrc_dataset:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc_dataset dv))) (Dv_dnnrc_dataset dv)).
+  Lemma target_language_of_driver_is_postfix_dnnrc:
+    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_dnnrc dv))) (Dv_dnnrc dv)).
   Proof.
     destruct dv; simpl.
     - reflexivity.
@@ -1726,8 +1727,8 @@ Section CompDriver.
                  EmptyString
                  (constants_config_of_tdbindings t)
                  EmptyString
-                 nil) (lang:=L_dnnrc_dataset)
-      ; [eapply target_language_of_driver_is_postfix_dnnrc_typed_dataset | | ]; simpl; trivial.
+                 nil) (lang:=L_dnnrc)
+      ; [eapply target_language_of_driver_is_postfix_dnnrc_typed | | ]; simpl; trivial.
       rewrite (constants_config_of_tdbindings_merges t); reflexivity.
   Qed.
 
@@ -1887,7 +1888,7 @@ Section CompDriver.
                  (constants_config_of_tdbindings x)
                  EmptyString
                  nil) (lang:=L_nnrc);
-        [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
+        [eapply target_language_of_driver_is_postfix_dnnrc | | ]; simpl; trivial.
       subst.
       rewrite vdbindings_of_constants_config_commutes; reflexivity.
     - eapply is_postfix_plus_one with
@@ -1925,7 +1926,7 @@ Section CompDriver.
                  nil
                  EmptyString
                  nil) (lang:=L_nnrcmr);
-        [eapply target_language_of_driver_is_postfix_dnnrc_dataset | | ]; simpl; trivial.
+        [eapply target_language_of_driver_is_postfix_dnnrc | | ]; simpl; trivial.
     - eapply is_postfix_plus_one with
       (config:=mkDvConfig
                  EmptyString
@@ -2057,11 +2058,11 @@ Section CompDriver.
          target_language_of_driver_is_postfix_javascript
          target_language_of_driver_is_postfix_java
          target_language_of_driver_is_postfix_spark_rdd
-         target_language_of_driver_is_postfix_spark_dataset
+         target_language_of_driver_is_postfix_spark_df
          target_language_of_driver_is_postfix_cloudant
          target_language_of_driver_is_postfix_cldmr
-         target_language_of_driver_is_postfix_dnnrc_typed_dataset
-         target_language_of_driver_is_postfix_dnnrc_dataset
+         target_language_of_driver_is_postfix_dnnrc_typed
+         target_language_of_driver_is_postfix_dnnrc
          target_language_of_driver_is_postfix_camp
          target_language_of_driver_is_postfix_nra
          target_language_of_driver_is_postfix_nraenv_core
@@ -2142,7 +2143,7 @@ Section CompDriver.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_nnrcmr (comp_mr_vinit config0) (vdbindings_of_constants_config (comp_constants config0)) n)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
-        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc_dataset (vdbindings_of_constants_config (comp_constants config0)) d)));
+        * destruct (H_config (Dv_nnrc (Dv_nnrc_to_dnnrc (vdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
         * destruct (H_config (Dv_nnrc (Dv_nnrc_to_java (comp_class_name config0) (comp_java_imports config0) j)));
             try reflexivity.
@@ -2154,10 +2155,10 @@ Section CompDriver.
         * destruct (H_config (Dv_cldmr (Dv_cldmr_to_cloudant (comp_qname_lowercase config0) (comp_brand_rel config0) c)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
-        * destruct (H_config (Dv_dnnrc_dataset (Dv_dnnrc_dataset_to_dnnrc_typed_dataset (tdbindings_of_constants_config (comp_constants config0)) d)));
+        * destruct (H_config (Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed (tdbindings_of_constants_config (comp_constants config0)) d)));
             reflexivity.
-        * destruct (H_config (Dv_dnnrc_typed_dataset
-                                (Dv_dnnrc_typed_dataset_to_spark_dataset (tdbindings_of_constants_config (comp_constants config0)) (comp_qname config0) s)));
+        * destruct (H_config (Dv_dnnrc_typed
+                                (Dv_dnnrc_typed_to_spark_df (tdbindings_of_constants_config (comp_constants config0)) (comp_qname config0) s)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
   Qed.
@@ -2298,37 +2299,37 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_camp_rule, L_dnnrc_dataset =>
+      | L_camp_rule, L_dnnrc =>
         L_camp_rule
           :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_camp_rule, L_dnnrc_typed_dataset =>
+      | L_camp_rule, L_dnnrc_typed =>
         L_camp_rule
           :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_camp_rule, L_spark_dataset =>
+      | L_camp_rule, L_spark_df =>
         L_camp_rule
           :: L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From tech_rule: *)
       | L_tech_rule, L_tech_rule =>
@@ -2451,7 +2452,7 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_tech_rule, L_dnnrc_dataset =>
+      | L_tech_rule, L_dnnrc =>
         L_tech_rule
           :: L_camp_rule
           :: L_camp
@@ -2459,9 +2460,9 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_tech_rule, L_dnnrc_typed_dataset =>
+      | L_tech_rule, L_dnnrc_typed =>
         L_tech_rule
           :: L_camp_rule
           :: L_camp
@@ -2469,11 +2470,11 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_tech_rule, L_spark_dataset =>
+      | L_tech_rule, L_spark_df =>
         L_tech_rule
           :: L_camp_rule
           :: L_camp
@@ -2481,10 +2482,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From designer_rule: *)
       | L_designer_rule, L_designer_rule =>
@@ -2607,7 +2608,7 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_designer_rule, L_dnnrc_dataset =>
+      | L_designer_rule, L_dnnrc =>
         L_designer_rule
           :: L_camp_rule
           :: L_camp
@@ -2615,9 +2616,9 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_designer_rule, L_dnnrc_typed_dataset =>
+      | L_designer_rule, L_dnnrc_typed =>
         L_designer_rule
           :: L_camp_rule
           :: L_camp
@@ -2625,11 +2626,11 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_designer_rule, L_spark_dataset =>
+      | L_designer_rule, L_spark_df =>
         L_designer_rule
           :: L_camp_rule
           :: L_camp
@@ -2637,10 +2638,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From camp: *)
       | L_camp, L_camp =>
@@ -2732,34 +2733,34 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_camp, L_dnnrc_dataset =>
+      | L_camp, L_dnnrc =>
         L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_camp, L_dnnrc_typed_dataset =>
+      | L_camp, L_dnnrc_typed =>
         L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_camp, L_spark_dataset =>
+      | L_camp, L_spark_df =>
         L_camp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From oql: *)
       | L_oql, L_oql =>
@@ -2862,34 +2863,34 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_oql, L_dnnrc_dataset =>
+      | L_oql, L_dnnrc =>
         L_oql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_oql, L_dnnrc_typed_dataset =>
+      | L_oql, L_dnnrc_typed =>
         L_oql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_oql, L_spark_dataset =>
+      | L_oql, L_spark_df =>
         L_oql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From sql: *)
       | L_sql, L_sql =>
@@ -2993,34 +2994,34 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_sql, L_dnnrc_dataset =>
+      | L_sql, L_dnnrc =>
         L_sql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_sql, L_dnnrc_typed_dataset =>
+      | L_sql, L_dnnrc_typed =>
         L_sql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_sql, L_spark_dataset =>
+      | L_sql, L_spark_df =>
         L_sql
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From lambda_nra: *)
       | L_lambda_nra, L_lambda_nra =>
@@ -3124,34 +3125,34 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_lambda_nra, L_dnnrc_dataset =>
+      | L_lambda_nra, L_dnnrc =>
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_lambda_nra, L_dnnrc_typed_dataset =>
+      | L_lambda_nra, L_dnnrc_typed =>
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_lambda_nra, L_spark_dataset =>
+      | L_lambda_nra, L_spark_df =>
         L_lambda_nra
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From nra: *)
       | L_nra, L_nra =>
@@ -3266,7 +3267,7 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nra, L_dnnrc_dataset =>
+      | L_nra, L_dnnrc =>
         L_nra
           :: L_nra
           :: L_nraenv_core
@@ -3274,9 +3275,9 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_nra, L_dnnrc_typed_dataset =>
+      | L_nra, L_dnnrc_typed =>
         L_nra
           :: L_nra
           :: L_nraenv_core
@@ -3284,11 +3285,11 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_nra, L_spark_dataset =>
+      | L_nra, L_spark_df =>
         L_nra
           :: L_nra
           :: L_nraenv_core
@@ -3296,10 +3297,10 @@ Section CompDriver.
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From nraenv_core: *)
       | L_nraenv_core, L_nraenv_core =>
@@ -3394,34 +3395,34 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nraenv_core, L_dnnrc_dataset =>
+      | L_nraenv_core, L_dnnrc =>
         L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_nraenv_core, L_dnnrc_typed_dataset =>
+      | L_nraenv_core, L_dnnrc_typed =>
         L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_nraenv_core, L_spark_dataset =>
+      | L_nraenv_core, L_spark_df =>
         L_nraenv_core
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From nraenv: *)
       | L_nraenv, L_nraenv =>
@@ -3510,31 +3511,31 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nraenv, L_dnnrc_dataset =>
+      | L_nraenv, L_dnnrc =>
         L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_nraenv, L_dnnrc_typed_dataset =>
+      | L_nraenv, L_dnnrc_typed =>
         L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_nraenv, L_spark_dataset =>
+      | L_nraenv, L_spark_df =>
         L_nraenv
           :: L_nraenv
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From nnrc: *)
       | L_nnrc_core, L_nnrc_core =>
@@ -3617,28 +3618,28 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nnrc_core, L_dnnrc_dataset =>
+      | L_nnrc_core, L_dnnrc =>
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_nnrc_core, L_dnnrc_typed_dataset =>
+      | L_nnrc_core, L_dnnrc_typed =>
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_nnrc_core, L_spark_dataset =>
+      | L_nnrc_core, L_spark_df =>
         L_nnrc_core
           :: L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From nnrc: *)
       | L_nnrc, L_nnrc =>
@@ -3719,25 +3720,25 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nnrc, L_dnnrc_dataset =>
+      | L_nnrc, L_dnnrc =>
         L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_nnrc, L_dnnrc_typed_dataset =>
+      | L_nnrc, L_dnnrc_typed =>
         L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_nnrc, L_spark_dataset =>
+      | L_nnrc, L_spark_df =>
         L_nnrc
           :: L_nnrc
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From nnrcmr: *)
       | L_nnrcmr, L_nnrcmr =>
@@ -3760,25 +3761,25 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nnrcmr, L_dnnrc_dataset =>
+      | L_nnrcmr, L_dnnrc =>
         L_nnrcmr
           :: L_nnrcmr
-          :: L_dnnrc_dataset
+          :: L_dnnrc
           :: nil
-      | L_nnrcmr, L_dnnrc_typed_dataset =>
+      | L_nnrcmr, L_dnnrc_typed =>
         L_nnrcmr
           :: L_nnrcmr
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_nnrcmr, L_spark_dataset =>
+      | L_nnrcmr, L_spark_df =>
         L_nnrcmr
           :: L_nnrcmr
-          :: L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       | L_nnrcmr, L_nnrc_core =>
         L_nnrcmr
@@ -3853,30 +3854,30 @@ Section CompDriver.
         L_cldmr
           :: L_cloudant
           :: nil
-      (* From dnnrc_dataset: *)
-      | L_dnnrc_dataset, L_dnnrc_dataset =>
-        L_dnnrc_dataset
+      (* From dnnrc: *)
+      | L_dnnrc, L_dnnrc =>
+        L_dnnrc
           :: nil
-      | L_dnnrc_dataset, L_dnnrc_typed_dataset =>
-        L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+      | L_dnnrc, L_dnnrc_typed =>
+        L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_dnnrc_dataset, L_spark_dataset =>
-        L_dnnrc_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+      | L_dnnrc, L_spark_df =>
+        L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
-      (* From dnnrc_typed_dataset: *)
-      | L_dnnrc_typed_dataset, L_dnnrc_typed_dataset =>
-        L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
+      (* From dnnrc_typed: *)
+      | L_dnnrc_typed, L_dnnrc_typed =>
+        L_dnnrc_typed
+          :: L_dnnrc_typed
           :: nil
-      | L_dnnrc_typed_dataset, L_spark_dataset =>
-        L_dnnrc_typed_dataset
-          :: L_dnnrc_typed_dataset
-          :: L_spark_dataset
+      | L_dnnrc_typed, L_spark_df =>
+        L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
           :: nil
       (* From javascript *)
       | L_javascript, L_javascript =>
@@ -3884,9 +3885,9 @@ Section CompDriver.
       (* From java *)
       | L_java, L_java =>
         L_java :: nil
-      (* From spark_dataset *)
-      | L_spark_dataset, L_spark_dataset =>
-        L_spark_dataset :: nil
+      (* From spark_df *)
+      | L_spark_df, L_spark_df =>
+        L_spark_df :: nil
       (* From spark_rdd *)
       | L_spark_rdd, L_spark_rdd =>
         L_spark_rdd :: nil
@@ -4008,32 +4009,32 @@ Section CompDriver.
 
     Hint Resolve exists_path_from_source_target_completeness_cldmr : exists_path_hints.
 
-    Lemma exists_path_from_source_target_completeness_spark_dataset :
+    Lemma exists_path_from_source_target_completeness_spark_df :
       (forall dv,
-          exists_path_from_source_target L_spark_dataset (target_language_of_driver (Dv_spark_dataset dv))).
+          exists_path_from_source_target L_spark_df (target_language_of_driver (Dv_spark_df dv))).
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_spark_dataset : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_spark_df : exists_path_hints.
 
-    Lemma exists_path_from_source_target_completeness_dnnrc_typed_dataset :
+    Lemma exists_path_from_source_target_completeness_dnnrc_typed :
       (forall dv,
-          exists_path_from_source_target L_dnnrc_typed_dataset (target_language_of_driver (Dv_dnnrc_typed_dataset dv))).
+          exists_path_from_source_target L_dnnrc_typed (target_language_of_driver (Dv_dnnrc_typed dv))).
     Proof.
       induction dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_dnnrc_typed_dataset : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_dnnrc_typed : exists_path_hints.
 
-    Lemma exists_path_from_source_target_completeness_dnnrc_dataset :
+    Lemma exists_path_from_source_target_completeness_dnnrc :
       (forall dv,
-          exists_path_from_source_target L_dnnrc_dataset (target_language_of_driver (Dv_dnnrc_dataset dv))).
+          exists_path_from_source_target L_dnnrc (target_language_of_driver (Dv_dnnrc dv))).
     Proof.
       destruct dv; prove_exists_path_complete.
     Qed.
 
-    Hint Resolve exists_path_from_source_target_completeness_dnnrc_dataset : exists_path_hints.
+    Hint Resolve exists_path_from_source_target_completeness_dnnrc : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_spark_rdd :
       (forall dv,
@@ -4210,8 +4211,8 @@ Section CompDriver.
   (* Used in CALib: *)
   Definition nraenv_optim_to_nnrc_optim (q:nraenv) : nnrc :=
     nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)).
-  Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc_dataset :=
-    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q))).
+  Definition nraenv_optim_to_nnrc_optim_to_dnnrc (inputs_loc:vdbindings) (q:nraenv) : dnnrc :=
+    nnrc_to_dnnrc inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q))).
   Definition nraenv_optim_to_nnrc_optim_to_nnrcmr_optim (inputs_loc:vdbindings) (q:nraenv) : nnrcmr :=
     nnrcmr_optim (nnrc_to_nnrcmr init_vinit inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default q)))).
 
@@ -4219,8 +4220,8 @@ Section CompDriver.
   Definition camp_rule_to_nraenv_to_nnrc_optim (q:camp_rule) : nnrc :=
     nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q))))).
   Definition camp_rule_to_nraenv_to_nnrc_optim_to_dnnrc
-             (inputs_loc:vdbindings) (q:camp_rule) : dnnrc_dataset :=
-    nnrc_to_dnnrc_dataset inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
+             (inputs_loc:vdbindings) (q:camp_rule) : dnnrc :=
+    nnrc_to_dnnrc inputs_loc (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
   Definition camp_rule_to_nraenv_to_nnrc_optim_to_javascript (q:camp_rule) : string :=
     nnrc_to_javascript (nnrc_optim_default (nraenv_to_nnrc (nraenv_optim_default (nraenv_core_to_nraenv (camp_to_nraenv_core (camp_rule_to_camp q)))))).
   Definition camp_rule_to_nnrcmr (inputs_loc:vdbindings) (q:camp_rule) : nnrcmr :=
@@ -4271,12 +4272,12 @@ Section CompDriver.
     | L_nnrc :: L_nnrc :: path => L_nnrc :: path
     | L_nnrcmr :: L_nnrcmr :: path => L_nnrcmr :: path
     | L_cldmr :: L_cldmr :: path => L_cldmr :: path
-    | L_dnnrc_dataset :: L_dnnrc_dataset :: path => L_dnnrc_dataset :: path
-    | L_dnnrc_typed_dataset :: L_dnnrc_typed_dataset :: path => L_dnnrc_typed_dataset :: path
+    | L_dnnrc :: L_dnnrc :: path => L_dnnrc :: path
+    | L_dnnrc_typed :: L_dnnrc_typed :: path => L_dnnrc_typed :: path
     | L_javascript :: L_javascript :: path => L_javascript :: path
     | L_java :: L_java :: path => L_java :: path
     | L_spark_rdd :: L_spark_rdd :: path => L_spark_rdd :: path
-    | L_spark_dataset :: L_spark_dataset :: path => L_spark_dataset :: path
+    | L_spark_df :: L_spark_df :: path => L_spark_df :: path
     | L_cloudant :: L_cloudant :: path => L_cloudant :: path
     | _ => path
     end.

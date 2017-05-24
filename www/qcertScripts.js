@@ -156,7 +156,7 @@ function addPath() {
 	addOption(sel, "js");
 	addOption(sel, "java");
 	addOption(sel, "spark_rdd");
-	addOption(sel, "spark_dataset");
+	addOption(sel, "spark_df");
 	addOption(sel, "cloudant");
 	document.getElementById("path").appendChild(li);
 	return false;

@@ -14,19 +14,34 @@
  * limitations under the License.
  *)
 
-Section DNNRC.
+Section tDNNRC.
 
-  Require Import Utils BasicSystem.
-
-  Require Import DNNRCBase.
-  Require Import Dataframe.
-
+  Require Import BasicSystem.
+  Require Import DNNRCSystem.
+  
   Context {fruntime:foreign_runtime}.
   Context {ftype: ForeignType.foreign_type}.
+  Context {br:brand_relation}.
 
-  Definition dnnrc_dataframe := @dnnrc _ unit dataframe.
+  Record type_annotation {A:Set} : Set :=
+    mkType_annotation {
+        ta_base:A
+        (* the inferred (actual most general) type of the expression *)
+        ; ta_inferred:drtype
+        (* the type as it is used by the context.
+           it should always be the case that
+           drtype_sub ta_inferred ta_required (proof obligation)
+         *)
+        ; ta_required:drtype
+                        
+      }.
 
-End DNNRC.
+  Global Arguments type_annotation : clear implicits. 
+  Global Arguments mkType_annotation {A} ta_base ta_inferred ta_required.
+  
+  Definition dnnrc_dataframe_typed := @dnnrc _ (type_annotation unit) dataframe.
+
+End tDNNRC.
 
 (* 
 *** Local Variables: ***

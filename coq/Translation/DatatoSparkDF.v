@@ -23,7 +23,10 @@ Require Import Types.
 Require Import BasicRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavaScript.
+Require Import ForeignToJSON.
 Require Import JSON.
+Require Import JSONtoData.
+
 
 Section DatatoSparkDF.
 
@@ -157,12 +160,8 @@ Section DatatoSparkDF.
                                    :: ("$type"%string, jarray (jstring "Person" :: nil)) :: nil) :: nil)) :: nil)) :: nil)).
   Proof. vm_compute. reflexivity. Qed.
 
-  (* Added calls for integration within the compiler interface *)
-  Require Import ForeignToJSON.
-  Require Import JSON JSONtoData.
-
+  (* Added call for integration within the compiler interface *)
   Context {ftojson:foreign_to_JSON}.
-
   Definition data_to_sjson (d:data) (r:rtype) : option string :=
     (* Some (typed_data_to_json_string d r) *)
     lift (jsonToJS """") (typed_data_to_json d (proj1_sig r)).

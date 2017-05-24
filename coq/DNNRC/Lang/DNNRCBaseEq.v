@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section DNNRCEq.
+Section DNNRCBaseEq.
 
   Require Import Equivalence.
   Require Import Morphisms.
@@ -26,7 +26,7 @@ Section DNNRCEq.
   Require Import Arith.
   
   Require Import Utils BasicRuntime.
-  Require Import DData DDataNorm DNNRC.
+  Require Import DData DDataNorm DNNRCBase.
 
   Context {fruntime:foreign_runtime}.
   Context {A plug_type:Set}.
@@ -241,7 +241,7 @@ Section DNNRCEq.
     trivial.
   Qed.
 
-End DNNRCEq.
+End DNNRCBaseEq.
 
 Notation "X ≡ᵈ Y" := (dnnrc_eq X Y) (at level 90) : dnnrc_scope.                             (* ≡ = \equiv *)
 

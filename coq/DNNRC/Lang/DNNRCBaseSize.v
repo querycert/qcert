@@ -18,7 +18,7 @@ Section size.
 
   Require Import List.
   Require Import Omega.
-  Require Import BasicRuntime DNNRC.
+  Require Import BasicRuntime DNNRCBase.
 
   Context {fruntime:foreign_runtime}.
   Context {A plug_type:Set}.

@@ -45,13 +45,13 @@ val suffix_nrasexp : unit -> string
 val suffix_nnrc_core : unit -> string
 val suffix_nnrc : unit -> string
 val suffix_nnrcsexp : unit -> string
-val suffix_dnnrc_dataset : unit -> string
+val suffix_dnnrc : unit -> string
 val suffix_dnnrcsexp : unit -> string
 val suffix_nnrcmr : unit -> string
 val suffix_nnrcmr_spark_rddsexp : unit -> string
 val suffix_nnrcmr_spark_rdd : unit -> string
-val suffix_nnrcmr_spark_datasetsexp : unit -> string
-val suffix_nnrcmr_spark_dataset : unit -> string
+val suffix_nnrcmr_spark_dfsexp : unit -> string
+val suffix_nnrcmr_spark_df : unit -> string
 val suffix_nnrcmr_cldmr : unit -> string
 val suffix_nnrcmr_cldmrsexp : unit -> string
 val suffix_stats : unit -> string

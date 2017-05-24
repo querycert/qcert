@@ -18,13 +18,14 @@ Section DNNRCtotDNNRC.
 
   Section Top.
     Require Import DNNRCSystem.
+    Require Import tDNNRCSystem.
     
     Context {ftype: ForeignType.foreign_type}.
     Context {fr:foreign_runtime}.
     Context {bm:brand_model}.
     Context {ftyping: foreign_typing}.
 
-    Definition dnnrc_to_dnnrc_typed_top (tdenv: tdbindings) (q:dnnrc) : option dnnrc_typed :=
+    Definition dnnrc_to_dnnrc_typed_top (tdenv: tdbindings) (q:dnnrc_dataframe) : option dnnrc_dataframe_typed :=
       infer_dnnrc_type (mkConstants tdenv) q.
 
   End Top.

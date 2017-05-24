@@ -15,10 +15,12 @@
  *)
 
 Require Export BasicRuntime.
-
-Require Export DNNRC DNNRCEq DNNRCSize.
-Require Export Dataset DatasetSize.
-Require Export DNNRCDataset.
+Require Export DNNRCBase.
+Require Export DNNRCBaseSize.
+Require Export DNNRCBaseEq.
+Require Export Dataframe.
+Require Export DataframeSize.
+Require Export DNNRC.
 
 (* 
 *** Local Variables: ***

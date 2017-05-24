@@ -18,7 +18,7 @@ Section SparkDF.
   Require Import String.
 
   (** Spark (Dataframe API) programs are in serialized form *)
-  Definition spark_dataset := string.
+  Definition spark_df := string.
   
 End SparkDF.
 

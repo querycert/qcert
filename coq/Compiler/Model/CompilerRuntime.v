@@ -15,16 +15,26 @@
  *)
 
 Require Import String.
-Require Import Utils BasicRuntime.
-Require Import ForeignToJava ForeignToJavaScript ForeignToScala ForeignToJSON ForeignTypeToJSON.
-Require Import ForeignReduceOps ForeignToReduceOps.
+Require Import BasicRuntime.
+Require Import ForeignToJava.
+Require Import ForeignToJavaScript.
+Require Import ForeignToScala.
+Require Import ForeignToJSON.
+Require Import ForeignTypeToJSON.
+Require Import ForeignReduceOps.
+Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant ForeignToCloudant.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
 Require Import OptimizerLogger.
-Require Import ForeignType ForeignDataTyping.
-Require Import cNNRC cNRAEnv NRAEnv.
-Require Import DNNRC Dataset.
-Require Import TDNNRCInfer.
+Require Import ForeignType.
+Require Import ForeignDataTyping.
+Require Import cNNRC.
+Require Import cNRAEnv.
+Require Import NRAEnv.
+Require Import DNNRC.
+Require Import tDNNRC.
+Require Import Dataframe.
 
 Module Type CompilerRuntime.
   Axiom compiler_foreign_type : foreign_type.
@@ -41,7 +51,7 @@ Module Type CompilerRuntime.
   Axiom compiler_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_nnrc_optimizer_logger : optimizer_logger string nnrc.
-  Axiom compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
+  Axiom compiler_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_dataframe_typed).
   Axiom compiler_foreign_data_typing : foreign_data_typing.
 End CompilerRuntime.
 

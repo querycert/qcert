@@ -15,16 +15,27 @@
  *)
 
 Require Import String.
-Require Import CompilerRuntime Utils BasicSystem.
-Require Import ForeignToJava ForeignToJavaScript ForeignToScala ForeignToJSON ForeignTypeToJSON.
-Require Import ForeignReduceOps ForeignToReduceOps.
+Require Import CompilerRuntime.
+Require Import BasicSystem.
+Require Import ForeignToJava.
+Require Import ForeignToJavaScript.
+Require Import ForeignToScala.
+Require Import ForeignToJSON.
+Require Import ForeignTypeToJSON.
+Require Import ForeignReduceOps.
+Require Import ForeignToReduceOps.
 Require Import ForeignToSpark.
-Require Import ForeignCloudant ForeignToCloudant.
+Require Import ForeignCloudant.
+Require Import ForeignToCloudant.
 Require Import OptimizerLogger.
-Require Import ForeignType ForeignDataTyping.
-Require Import cNNRC cNRAEnv NRAEnv.
-Require Import DNNRC Dataset.
-Require Import TDNNRCInfer.
+Require Import ForeignType.
+Require Import ForeignDataTyping.
+Require Import cNNRC.
+Require Import cNRAEnv.
+Require Import NRAEnv.
+Require Import DNNRC.
+Require Import Dataframe.
+Require Import tDNNRC.
 
 Module Type CompilerModel.
   Axiom compiler_basic_model : basic_model.
@@ -40,7 +51,7 @@ Module Type CompilerModel.
   Axiom compiler_model_foreign_to_cloudant : foreign_to_cloudant.
   Axiom compiler_model_nraenv_optimizer_logger : optimizer_logger string nraenv.
   Axiom compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc.
-  Axiom compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (@dnnrc _ (type_annotation unit) dataset).
+  Axiom compiler_model_dnnrc_optimizer_logger : forall {br:brand_relation}, optimizer_logger string (dnnrc_dataframe_typed).
   Axiom compiler_model_foreign_data_typing : foreign_data_typing.
 End CompilerModel.
 
@@ -73,7 +84,7 @@ Module CompilerModelRuntime(model:CompilerModel) <: CompilerRuntime.
     :=  model.compiler_model_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     :=  model.compiler_model_nnrc_optimizer_logger.
-  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string  (@dnnrc _ (type_annotation unit) dataset)
+  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string  (dnnrc_dataframe_typed)
     :=  model.compiler_model_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := model.compiler_model_foreign_data_typing.

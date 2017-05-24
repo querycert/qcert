@@ -114,12 +114,12 @@ let languages =
     Compiler.L_nnrc_core;
     Compiler.L_nnrcmr;
     Compiler.L_cldmr;
-    Compiler.L_dnnrc_dataset;
-    Compiler.L_dnnrc_typed_dataset;
+    Compiler.L_dnnrc;
+    Compiler.L_dnnrc_typed;
     Compiler.L_javascript;
     Compiler.L_java;
     Compiler.L_spark_rdd;
-    Compiler.L_spark_dataset;
+    Compiler.L_spark_df;
     Compiler.L_cloudant; ]
 
 

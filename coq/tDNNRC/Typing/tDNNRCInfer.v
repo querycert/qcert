@@ -14,78 +14,56 @@
  * limitations under the License.
  *)
 
-Section TDNNRCInfer.
-
+Section tDNNRCInfer.
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import Bool.
   Require Import Program.
-  Require Import EquivDec Morphisms.
-
-  Require Import Utils BasicSystem.
-  Require Import DNNRC.
-
-  Require Import TDNNRC.
+  Require Import EquivDec.
+  Require Import Morphisms.
+  Require Import BasicSystem.
+  Require Import DNNRCSystem.
+  Require Import tDNNRC.
 
   (** Type inference for NNNRC when given the type of the environment *)
-
-  Require Import TDataInfer.
-  Require Import TOpsInfer.
-  Require Import TOpsInferSub.
 
   Section helpers.
     Context {ftype:foreign_type}.
     Context {br:brand_relation}.
     
     Definition lift_tlocal (dτ:drtype) : option rtype :=
-    match dτ with
-    | Tlocal τ => Some τ
-    | Tdistr _ => None
-    end.  
+      match dτ with
+      | Tlocal τ => Some τ
+      | Tdistr _ => None
+      end.
   
-  Definition lift_tdistr (dτ:drtype) : option rtype :=
-    match dτ with
-    | Tlocal _ => None
-    | Tdistr τ => Some (Coll τ)
-    end.
+    Definition lift_tdistr (dτ:drtype) : option rtype :=
+      match dτ with
+      | Tlocal _ => None
+      | Tdistr τ => Some (Coll τ)
+      end.
 
-  Definition drtype_join (dτ₁ dτ₂:drtype) : option drtype
-    := match dτ₁, dτ₂ with
-       | Tlocal τ₁, Tlocal τ₂ => Some (Tlocal (τ₁ ⊔ τ₂))
-       | Tdistr τ₁, Tdistr τ₂ => Some (Tdistr (τ₁ ⊔ τ₂))
-       | _, _ => None
-       end.
-
-  Record type_annotation {A:Set} : Set :=
-    mkType_annotation {
-        ta_base:A
-        (* the inferred (actual most general) type of the expression *)
-        ; ta_inferred:drtype
-        (* the type as it is used by the context.
-           it should always be the case that
-           drtype_sub ta_inferred ta_required (proof obligation)
-         *)
-        ; ta_required:drtype
-
-      }.
+    Definition drtype_join (dτ₁ dτ₂:drtype) : option drtype
+      := match dτ₁, dτ₂ with
+         | Tlocal τ₁, Tlocal τ₂ => Some (Tlocal (τ₁ ⊔ τ₂))
+         | Tdistr τ₁, Tdistr τ₂ => Some (Tdistr (τ₁ ⊔ τ₂))
+         | _, _ => None
+         end.
 
     Definition drtype_map (f:rtype->rtype) (d:drtype) : drtype
-    := match d with
-       | Tlocal t => Tlocal (f t)
-       | Tdistr t => Tdistr (f t)
-       end.
+      := match d with
+         | Tlocal t => Tlocal (f t)
+         | Tdistr t => Tdistr (f t)
+         end.
 
     Definition drtype_omap (f:rtype->option rtype) (d:drtype) : option drtype
-    := match d with
-       | Tlocal t => lift Tlocal (f t)
-       | Tdistr t => lift Tdistr (f t)
-       end.
+      := match d with
+         | Tlocal t => lift Tlocal (f t)
+         | Tdistr t => lift Tdistr (f t)
+         end.
 
-  Global Arguments type_annotation : clear implicits. 
-  Global Arguments mkType_annotation {A} ta_base ta_inferred ta_required.
-
-    End helpers.
+  End helpers.
   
   Context {fruntime:foreign_runtime}.
   Context {ftype:foreign_type}.
@@ -95,7 +73,6 @@ Section TDNNRCInfer.
   Context {fuoptyping:foreign_unary_op_typing}.
   Context {plug_type:Set}.
   Context {plug:AlgPlug plug_type}.
-  (*  Context {tplug:TAlgPlug plug_type}. *)
 
   Definition di_typeof {A} (d:@dnnrc _ (type_annotation A) plug_type)
     := ta_inferred (dnnrc_annotation_get d).
@@ -505,7 +482,7 @@ Section TDNNRCInfer.
   Eval vm_compute in infer_dnnrc_type nil ex6.
  *)
 
-End TDNNRCInfer.
+End tDNNRCInfer.
 
 (* Global Arguments type_annotation {ftype br} A: clear implicits.  *)
 

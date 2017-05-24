@@ -1214,14 +1214,14 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_nnrc -> Q_nnrc (sexp_to_nnrc se)
   | L_nnrcmr -> Q_nnrcmr (sexp_to_nnrcmr se)
   | L_cldmr -> Q_cldmr (sexp_to_cldmr se)
-  | L_dnnrc_dataset ->
+  | L_dnnrc ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
-  | L_dnnrc_typed_dataset ->
+  | L_dnnrc_typed ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_javascript
   | L_java
   | L_spark_rdd
-  | L_spark_dataset
+  | L_spark_df
   | L_cloudant ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_error err ->
@@ -1251,9 +1251,9 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_nnrc q -> nnrc_to_sexp q
   | Q_nnrcmr q -> nnrcmr_to_sexp q
   | Q_cldmr q -> cldmr_to_sexp q
-  | Q_dnnrc_dataset _ ->
+  | Q_dnnrc _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Q_dnnrc_typed_dataset _ ->
+  | Q_dnnrc_typed _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_javascript _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
@@ -1261,7 +1261,7 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_spark_rdd _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Q_spark_dataset _ ->
+  | Q_spark_df _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_cloudant _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)

@@ -14,22 +14,13 @@
  * limitations under the License.
  *)
 
-Section DNNRCDataset.
-
-  Require Import Utils BasicSystem.
-
-  Require Import DNNRC.
-  Require Import Dataset.
-
-  Context {fruntime:foreign_runtime}.
-  Context {ftype: ForeignType.foreign_type}.
-
-  Definition dnnrc := @dnnrc _ unit dataset.
-
-End DNNRCDataset.
+Require Export BasicRuntime.
+Require Export DNNRCSystem.
+Require Export tDNNRC.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "Qcert")) ***
+*** coq-load-path: (("../../coq" "Qcert")) ***
 *** End: ***
 *)
+
