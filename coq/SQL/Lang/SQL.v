@@ -204,25 +204,96 @@ Section SQL.
     | SQuery _ _ _ _ _ => false
     end.
 
-  (*
   Section FreeVars.
-    Fixpoint sql_free_variables (q:sql_query) : list string :=
-    match q with
-    | SUnion _ q1 q2 =>
-      sql_free_variables q1 ++ sql_free_variables q2
-    | SIntersect _ q1 q2 =>
-      sql_free_variables q1 ++ sql_free_variables q2
-    | SExcept _ q1 q2 =>
-      sql_free_variables q1 ++ sql_free_variables q2
-    | SQuery (SSelectExpr _ expr :: nil) _ _ _ _ =>
-      sql_expr_free_variables expr
-      if (is_singleton_sql_expr expr) then false else true
-    | SQuery (SSelectColumn _ :: nil) _ _ _ _ => true
-    | SQuery (SSelectColumnDeref _ _ :: nil) _ _ _ _ => true
-    | SQuery _ _ _ _ _ => false
-    end.
+
+    Fixpoint sql_query_free_variables (q:sql_query) : list string :=
+      match q with
+      | SQuery q_select_clause q_from_clause (Some q_where_cond) (Some (ls,Some q_groupby_cond)) _ =>
+        (concat (map sql_select_free_variables q_select_clause))
+          ++ (concat (map sql_from_free_variables q_from_clause))
+          ++ (sql_condition_free_variables q_where_cond)
+          ++ (sql_condition_free_variables q_groupby_cond)
+      | SQuery q_select_clause q_from_clause None (Some (ls,Some q_groupby_cond)) _ =>
+        (concat (map sql_select_free_variables q_select_clause))
+          ++ (concat (map sql_from_free_variables q_from_clause))
+          ++ (sql_condition_free_variables q_groupby_cond)
+      | SQuery q_select_clause q_from_clause (Some q_where_cond) _ _ =>
+        (concat (map sql_select_free_variables q_select_clause))
+          ++ (concat (map sql_from_free_variables q_from_clause))
+          ++ (sql_condition_free_variables q_where_cond)
+      | SQuery q_select_clause q_from_clause None _ _ =>
+        (concat (map sql_select_free_variables q_select_clause))
+          ++ (concat (map sql_from_free_variables q_from_clause))
+      | SUnion _ q1 q2 =>
+        sql_query_free_variables q1 ++ sql_query_free_variables q2
+      | SIntersect _ q1 q2 =>
+        sql_query_free_variables q1 ++ sql_query_free_variables q2
+      | SExcept _ q1 q2 =>
+        sql_query_free_variables q1 ++ sql_query_free_variables q2
+      end
+    with sql_expr_free_variables (q_expr:sql_expr) : list string :=
+      match q_expr with
+      | SExprConst d => nil
+      | SExprColumn s => nil
+      | SExprColumnDeref s1 s2 => nil
+      | SExprStar => nil
+      | SExprUnary un q_expr1 =>
+        sql_expr_free_variables q_expr1
+      | SExprBinary bin q_expr1 q_expr2 =>
+        sql_expr_free_variables q_expr1 ++ sql_expr_free_variables q_expr2
+      | SExprCase q_cond q_expr1 q_expr2 =>
+        sql_condition_free_variables q_cond ++
+        sql_expr_free_variables q_expr1 ++ sql_expr_free_variables q_expr2
+      | SExprAggExpr agg q_expr1 =>
+        sql_expr_free_variables q_expr1
+      | SExprQuery q =>
+        sql_query_free_variables q
+      end
+    with sql_select_free_variables (q_select:sql_select) : list string :=
+      match q_select with
+      | SSelectColumn s => nil
+      | SSelectColumnDeref s1 s2 => nil
+      | SSelectStar => nil
+      | SSelectExpr s q_expr => sql_expr_free_variables q_expr
+      end
+    with sql_from_free_variables (q_from:sql_from) : list string :=
+      match q_from with
+      | SFromTable tablename => tablename :: nil (* The important case: table access *)
+      | SFromTableAlias aliasname tablename => tablename :: nil
+      | SFromQuery ts q => sql_query_free_variables q
+      end
+    with sql_condition_free_variables (q_cond:sql_condition) : list string :=
+      match q_cond with
+      | SCondAnd q_cond1 q_cond2 =>
+        sql_condition_free_variables q_cond1 ++ sql_condition_free_variables q_cond2
+      | SCondOr q_cond1 q_cond2 =>
+        sql_condition_free_variables q_cond1 ++ sql_condition_free_variables q_cond2
+      | SCondNot q_cond1 =>
+        sql_condition_free_variables q_cond1
+      | SCondBinary bin q_expr1 q_expr2 =>
+        sql_expr_free_variables q_expr1 ++ sql_expr_free_variables q_expr2
+      | SCondExists q_query =>
+        sql_query_free_variables q_query
+      | SCondIn q_expr1 q_expr2 =>
+        sql_expr_free_variables q_expr1 ++ sql_expr_free_variables q_expr2
+      | SCondLike q_expr1 s =>
+        sql_expr_free_variables q_expr1
+      | SCondBetween q_expr1 q_expr2 q_expr3 =>
+        sql_expr_free_variables q_expr1 ++ sql_expr_free_variables q_expr2
+                                 ++ sql_expr_free_variables q_expr3
+      end.
+    
+    Definition sql_statement_free_variables (q:sql_statement) : list string :=
+      match q with
+      | SRunQuery q => sql_query_free_variables q
+      | SCreateView s q => sql_query_free_variables q
+      | SDropView s => nil
+      end.
+    
+    Definition sql_free_variables (q:sql) : list string :=
+      bdistinct (concat (map sql_statement_free_variables q)).
+    
   End FreeVars.
-  *)
 End SQL.
 
 (* 

@@ -152,9 +152,12 @@ Section SQLTest.
   Definition nraenv1 :=
     sql_just_query_to_nraenv sql1.
 
-   (* Eval vm_compute in nraenv1. *)
-   (* Eval vm_compute in (sql_just_query_eval  sql1 tables). *)
-
+  Definition sql1_vars := sql_query_free_variables sql1.
+  
+  (* Eval vm_compute in nraenv1. *)
+  (* Eval vm_compute in (sql_just_query_eval  sql1 tables). *)
+  (* Eval vm_compute in sql1_vars. *)
+  
   (* sql2:
        select name,
               age
@@ -164,8 +167,11 @@ Section SQLTest.
     SQuery (SSelectColumn "name"::SSelectColumn "age"::nil)
            (SFromTable "persons"::nil) None None (Some (("age",Ascending)::nil)).
 
+  Definition sql2_vars := sql_query_free_variables sql2.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql2 tables). *)
-
+  (* Eval vm_compute in sql2_vars. *)
+  
   (* sql3:
        select name
        from persons
@@ -174,7 +180,10 @@ Section SQLTest.
     SQuery (SSelectColumn "name"::nil)
            (SFromTable "persons"::nil) None None (Some (("age",Ascending)::nil)).
 
+  Definition sql3_vars := sql_query_free_variables sql3.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql3 tables). *)
+  (* Eval vm_compute in sql3_vars. *)
 
   (* sql4:
        select name
@@ -188,8 +197,11 @@ Section SQLTest.
                               (SExprConst (dstring "IBM"))))
            None (Some (("age",Ascending)::nil)).
 
+  Definition sql4_vars := sql_query_free_variables sql4.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql4 tables). *)
-
+  (* Eval vm_compute in sql4_vars. *)
+  
   (* sql5:
        select sum(age)
        from persons *)
@@ -198,7 +210,10 @@ Section SQLTest.
                         (SExprAggExpr SSum (SExprColumn "age"))::nil)
            (SFromTable "persons"::nil) None None None)].
 
+  Definition sql5_vars := sql_free_variables sql5.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql5 tables). *)
+  (* Eval vm_compute in sql5_vars. *)
 
   (* sql6:
        select count( * )
@@ -208,7 +223,10 @@ Section SQLTest.
                         (SExprAggExpr SCount SExprStar)::nil)
            (SFromTable "persons"::nil) None None None.
 
+  Definition sql6_vars := sql_query_free_variables sql6.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql6 tables). *)
+  (* Eval vm_compute in sql6_vars. *)
 
   (* sql7:
        select count( * )
@@ -223,7 +241,10 @@ Section SQLTest.
                         (SExprAggExpr SCount SExprStar)::nil)
            (SFromQuery ("IBMers",None) sql4 :: nil) None None None.
 
+  Definition sql7_vars := sql_query_free_variables sql7.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql7 tables). *)
+  (* Eval vm_compute in sql7_vars. *)
 
   (* sql8:
        select *
@@ -233,8 +254,11 @@ Section SQLTest.
     SQuery (SSelectExpr "res" SExprStar::nil)
            (SFromTable "persons"::nil) None (Some (("age"::nil),None)) None.
 
+  Definition sql8_vars := sql_query_free_variables sql8.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql8 tables). *)
-
+  (* Eval vm_compute in sql8_vars. *)
+  
   (* sql9:
        select age, count( * ) as nb
        from persons
@@ -244,8 +268,11 @@ Section SQLTest.
                           (SExprAggExpr SCount SExprStar)::nil)
            (SFromTable "persons"::nil) None (Some (("age"::nil),None)) None.
 
+  Definition sql9_vars := sql_query_free_variables sql9.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql9 tables). *)
-
+  (* Eval vm_compute in sql9_vars. *)
+  
   (* sql10:
        select age, count( * ) as nb
        from persons
@@ -257,7 +284,10 @@ Section SQLTest.
            (SFromTable "persons"::nil) None
            (Some (("age"::nil),None)) (Some (("age",Ascending)::nil)).
 
+  Definition sql10_vars := sql_query_free_variables sql10.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql10 tables). *)
+  (* Eval vm_compute in sql10_vars. *)
 
   (* sql11:
        select age, count( * ) as nb
@@ -275,7 +305,10 @@ Section SQLTest.
                                          (SExprConst (dnat 1)))))
            (Some (("age",Ascending)::nil)).
 
+  Definition sql11_vars := sql_query_free_variables sql11.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql11 tables). *)
+  (* Eval vm_compute in sql11_vars. *)
 
   (* sql12:
        select age, company, count( * ) as nb
@@ -290,7 +323,10 @@ Section SQLTest.
            None
            (Some (("age"::"company"::nil),None)) None.
 
+  Definition sql12_vars := sql_query_free_variables sql12.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql12 tables). *)
+  (* Eval vm_compute in sql12_vars. *)
 
   (* sql13:
        select name
@@ -304,7 +340,10 @@ Section SQLTest.
                               (SExprConst (dstring "IBM"))))
            None (Some (("age",Ascending)::nil)).
 
+  Definition sql13_vars := sql_query_free_variables sql13.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql13 tables). *)
+  (* Eval vm_compute in sql13_vars. *)
 
   (* sql14:
          select nom
@@ -319,7 +358,10 @@ Section SQLTest.
            (SFromQuery ("IBMers",Some ("nom"::"age"::nil)) sql13 :: nil)
            None None None.
 
+  Definition sql14_vars := sql_query_free_variables sql14.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql14 tables).  *)
+  (* Eval vm_compute in sql14_vars. *)
 
   (* sql15:
        select cname, stock, count( * ) as nb_employees
@@ -340,9 +382,12 @@ Section SQLTest.
                                     (SExprConst (dnat 50)))))
            (Some (("stock"%string,Ascending)::nil)).                               (* Order By Clause *)
 
+  Definition sql15_vars := sql_query_free_variables sql15.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql15 tables). *)
   (* Size of the plan: *)
   (* Eval vm_compute in (sql_size sql15).*)
+  (* Eval vm_compute in sql15_vars. *)
 
   (* sql16:
        select name, company
@@ -369,36 +414,43 @@ Section SQLTest.
            None
            None.
 
+  Definition sql16_vars := sql_query_free_variables sql16.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql16 tables). *)
+  (* Eval vm_compute in sql16_vars. *)
 
   (* sql17:
        select p1.age,
               p1.company,
               p1.name as emp1,
               p2.name as emp2
-       from persons p1, person p2
+       from persons p1, persons p2
        where p1.age = p2.age
          and p1.company = p2.company
          and p1.name <> p2.name *)
   Definition sql17 :=
-    SQuery ((SSelectColumnDeref "p1" "age")
-              :: (SSelectColumnDeref "p1" "company")
-              :: (SSelectExpr "emp1" (SExprColumnDeref "p1" "name"))
-              :: (SSelectExpr "emp2" (SExprColumnDeref "p2" "name"))
-              :: nil)
-           (SFromTableAlias "p1" "persons"::SFromTableAlias "p2" "persons"::nil)
-           (Some (SCondAnd
-                    (SCondAnd
-                       (SCondBinary SEq (SExprColumnDeref "p1" "age")
-                                    (SExprColumnDeref "p2" "age"))
-                       (SCondBinary SEq (SExprColumnDeref "p1" "company")
-                                    (SExprColumnDeref "p2" "company")))
-                    (SCondBinary SDiff (SExprColumnDeref "p1" "name")
-                                 (SExprColumnDeref "p2" "name"))))
-           None
-           None.
+    [SRunQuery
+       (SQuery ((SSelectColumnDeref "p1" "age")
+                  :: (SSelectColumnDeref "p1" "company")
+                  :: (SSelectExpr "emp1" (SExprColumnDeref "p1" "name"))
+                  :: (SSelectExpr "emp2" (SExprColumnDeref "p2" "name"))
+                  :: nil)
+               (SFromTableAlias "p1" "persons"::SFromTableAlias "p2" "persons"::nil)
+               (Some (SCondAnd
+                        (SCondAnd
+                           (SCondBinary SEq (SExprColumnDeref "p1" "age")
+                                        (SExprColumnDeref "p2" "age"))
+                           (SCondBinary SEq (SExprColumnDeref "p1" "company")
+                                        (SExprColumnDeref "p2" "company")))
+                        (SCondBinary SDiff (SExprColumnDeref "p1" "name")
+                                     (SExprColumnDeref "p2" "name"))))
+               None
+               None)].
 
+  Definition sql17_vars := sql_free_variables sql17.
+  
   (* Eval vm_compute in (sql_just_query_eval  sql17 tables). *)
+  (* Eval vm_compute in sql17_vars. *)
 
 End SQLTest.
 
