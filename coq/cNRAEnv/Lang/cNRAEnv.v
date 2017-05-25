@@ -810,6 +810,40 @@ Section RcNRAEnv2.
       nraenv_core_eval h (rec_sort env) q (drec nil) dunit.
   End Top.
 
+  Section FreeVars.
+    Fixpoint nraenv_core_free_vars (q:nraenv_core) : list string :=
+      match q with
+      | ANID => nil
+      | ANConst rd => nil
+      | ANBinop _ q1 q2 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANUnop _ q1 =>
+        nraenv_core_free_vars q1
+      | ANMap q2 q1 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANMapConcat q2 q1 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANProduct q1 q2 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANSelect q2 q1 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANEither ql qr =>
+        nraenv_core_free_vars ql ++ nraenv_core_free_vars qr
+      | ANEitherConcat q1 q2 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANDefault q1 q2 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANApp q2 q1 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANGetConstant s => s :: nil
+      | ANEnv => nil
+      | ANAppEnv q2 q1 =>
+        nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
+      | ANMapEnv q1 =>
+        nraenv_core_free_vars q1
+      end.
+  End FreeVars.
+
 End RcNRAEnv2.
 
   

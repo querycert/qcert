@@ -290,7 +290,7 @@ Section SQL.
       | SDropView s => nil
       end.
     
-    Definition sql_free_variables (q:sql) : list string :=
+    Definition sql_free_vars (q:sql) : list string :=
       bdistinct (concat (map sql_statement_free_variables q)).
     
   End FreeVars.

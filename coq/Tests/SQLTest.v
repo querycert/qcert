@@ -210,7 +210,7 @@ Section SQLTest.
                         (SExprAggExpr SSum (SExprColumn "age"))::nil)
            (SFromTable "persons"::nil) None None None)].
 
-  Definition sql5_vars := sql_free_variables sql5.
+  Definition sql5_vars := sql_free_vars sql5.
   
   (* Eval vm_compute in (sql_just_query_eval  sql5 tables). *)
   (* Eval vm_compute in sql5_vars. *)
@@ -447,7 +447,7 @@ Section SQLTest.
                None
                None)].
 
-  Definition sql17_vars := sql_free_variables sql17.
+  Definition sql17_vars := sql_free_vars sql17.
   
   (* Eval vm_compute in (sql_just_query_eval  sql17 tables). *)
   (* Eval vm_compute in sql17_vars. *)

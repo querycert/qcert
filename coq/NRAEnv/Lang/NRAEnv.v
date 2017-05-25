@@ -285,6 +285,62 @@ Section NRAEnv.
 
   End Top.
 
+  Section FreeVars.
+    Fixpoint nraenv_free_vars (q:nraenv) : list string :=
+      match q with
+      | NRAEnvID => nil
+      | NRAEnvConst rd => nil
+      | NRAEnvBinop _ q1 q2 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvUnop _ q1 =>
+        nraenv_free_vars q1
+      | NRAEnvMap q2 q1 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvMapConcat q2 q1 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvProduct q1 q2 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvSelect q2 q1 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvEither ql qr =>
+        nraenv_free_vars ql ++ nraenv_free_vars qr
+      | NRAEnvEitherConcat q1 q2 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvDefault q1 q2 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvApp q2 q1 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvGetConstant s => s :: nil
+      | NRAEnvEnv => nil
+      | NRAEnvAppEnv q2 q1 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvMapEnv q1 =>
+        nraenv_free_vars q1
+      | NRAEnvFlatMap q2 q1 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2
+      | NRAEnvJoin q3 q1 q2 =>
+        nraenv_free_vars q1 ++ nraenv_free_vars q2 ++ nraenv_free_vars q3
+      | NRAEnvProject _ q1 =>
+        nraenv_free_vars q1
+      | NRAEnvGroupBy _ _ q1 =>
+        nraenv_free_vars q1
+      | NRAEnvUnnest _ _ q1 =>
+        nraenv_free_vars q1
+      end.
+
+    Lemma nraenv_free_vars_as_core (q:nraenv) :
+      nraenv_core_free_vars (nraenv_core_of_nraenv q) = nraenv_free_vars q.
+    Proof.
+      induction q; simpl; try reflexivity;
+        try solve[rewrite IHq1; rewrite IHq2; reflexivity|rewrite IHq;reflexivity].
+      - rewrite IHq1; rewrite IHq2; rewrite IHq3.
+        rewrite app_assoc; reflexivity.
+      - rewrite app_nil_r; rewrite IHq; reflexivity.
+      - rewrite app_nil_r; rewrite IHq; reflexivity.
+      - rewrite app_nil_r; rewrite app_nil_r; rewrite IHq; reflexivity.
+    Qed.
+  End FreeVars.
+
 End NRAEnv.
 
 (* begin hide *)
