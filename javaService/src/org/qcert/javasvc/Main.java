@@ -38,6 +38,7 @@ public class Main extends NanoHTTPD {
 	static {
 		// Extend this table as needed as verbs are added to the system
 		verbToClass.put("parseSQL", "org.qcert.sql.EncodingService");
+		verbToClass.put("parseSQLPP", "org.qcert.sqlpp.EncodingServicePP");
 		verbToClass.put("techRule2CAMP", "org.qcert.camp.translator.TechRule2CAMP");
 		verbToClass.put("serialRule2CAMP", "org.qcert.camp.translator.SerialRule2CAMP");
 		verbToClass.put("csv2JSON", CSV2JSON.class.getName());

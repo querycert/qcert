@@ -107,6 +107,17 @@ public class SqlppEncoder {
 		return new SqlppParserFactory().createParser(query).parse();
 	}
 
+	/** 
+	 * Convenience method combining parse and encode in one call.
+	 *   The encoding is done with useDateNameHeuristic set to true.
+	 * @param query the query
+	 * @return the S-expression encoding of the query
+	 * @throws Exception 
+	 */
+	public static String parseAndEncode(String query) throws Exception {
+		return encode(parse(query), true);
+	}
+
 	/**
 	 * Parse SQL source provided in a File
 	 * @param file the name of the file containing the source
