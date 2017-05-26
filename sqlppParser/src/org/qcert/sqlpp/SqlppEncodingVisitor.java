@@ -38,6 +38,7 @@ import org.apache.asterix.lang.common.clause.UpdateClause;
 import org.apache.asterix.lang.common.clause.WhereClause;
 import org.apache.asterix.lang.common.expression.CallExpr;
 import org.apache.asterix.lang.common.expression.FieldAccessor;
+import org.apache.asterix.lang.common.expression.FieldBinding;
 import org.apache.asterix.lang.common.expression.GbyVariableExpressionPair;
 import org.apache.asterix.lang.common.expression.IfExpr;
 import org.apache.asterix.lang.common.expression.IndexAccessor;
@@ -84,6 +85,7 @@ import org.apache.asterix.lang.common.statement.TypeDropStatement;
 import org.apache.asterix.lang.common.statement.UpdateStatement;
 import org.apache.asterix.lang.common.statement.WriteStatement;
 import org.apache.asterix.lang.common.struct.OperatorType;
+import org.apache.asterix.lang.common.struct.QuantifiedPair;
 import org.apache.asterix.lang.common.struct.UnaryExprType;
 import org.apache.asterix.lang.common.struct.VarIdentifier;
 import org.apache.asterix.lang.sqlpp.clause.FromClause;
@@ -260,8 +262,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(DataverseDecl dv, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(DataverseDecl node, StringBuilder builder) throws CompilationException {
+		// Do nothing.  This statement is often present but is outside the query semantics
+		return builder;
 	}
 
 	@Override
@@ -405,8 +408,11 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(LimitClause lc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(LimitClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(limit ");
+		builder = node.getLimitExpr().accept(this, builder);
+		builder = acceptIfPresent(node.getOffset(), builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -545,8 +551,17 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(QuantifiedExpression qe, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(QuantifiedExpression node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(").append(node.getQuantifier().name().toLowerCase()).append(" ");
+		for (QuantifiedPair pair : node.getQuantifiedList()) {
+			builder = builder.append("(varIn ");
+			builder = appendString(decodeVariableRef(pair.getVarExpr().toString()), builder);
+			builder = pair.getExpr().accept(this, builder);
+			builder = builder.append(") ");
+		}
+		builder = builder.append("(satisfies ");
+		builder = node.getSatisfiesExpr().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -557,8 +572,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(RecordConstructor rc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(RecordConstructor node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(record ");
+		for (FieldBinding field : node.getFbList()) {
+			builder = builder.append("(field ");
+			builder = field.getLeftExpr().accept(this, builder);
+			builder = field.getRightExpr().accept(this, builder);
+			builder = builder.append(") ");
+		}
+		return builder.append(") ");
 	}
 
 	@Override
@@ -571,7 +593,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder.append("(query (select ");
 		builder = node.getSelectClause().accept(this, builder);
 		builder = builder.append(") "); // for parity with what Presto encoder does.
-		builder = node.getFromClause().accept(this, builder);
+		builder = acceptIfPresent(node.getFromClause(), builder);
 		builder = acceptIfPresent(node.getWhereClause(), builder);
 		builder = acceptIfPresent(node.getGroupbyClause(), builder);
 		builder = acceptIfPresent(node.getHavingClause(), builder);
@@ -590,8 +612,10 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(SelectElement selectElement, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(SelectElement node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(select_expr ");
+		builder = node.getExpression().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override

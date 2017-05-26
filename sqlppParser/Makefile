@@ -27,7 +27,8 @@ BLANK=$(EMPTY) $(EMPTY)
 
 # Keep this list accurate as dependencies evolve or versions change
 DEPENDENCIES=lib/algebricks-common-0.3.1.jar lib/algebricks-core-0.3.1.jar lib/asterix-common-0.9.1.jar lib/asterix-lang-common-0.9.1.jar \
-	lib/asterix-lang-sqlpp-0.9.1.jar lib/hyracks-api-0.3.1.jar lib/hyracks-dataflow-common-0.3.1.jar lib/log4j-1.2.17.jar
+	lib/asterix-lang-sqlpp-0.9.1.jar lib/asterix-om-0.9.1.jar lib/asterix-runtime-0.9.1.jar lib/hyracks-api-0.3.1.jar \
+	lib/hyracks-dataflow-common-0.3.1.jar lib/log4j-1.2.17.jar
 
 CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.7.jar $(DEPENDENCIES))
 

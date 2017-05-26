@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="get_tests" name="Copy relevant tests from AsterixDB distro">
+
+	<target name="get_tests" depends="resolve">
+		<delete dir="tests"/>
+		<mkdir dir="tests"/>
+		<copy todir="tests">
+			<fileset dir="${source_dir}"/>
+		</copy>
+    </target>
+	
+	<target name="resolve">
+		<eclipse.convertPath resourcepath="sqlppParser/ASTERIXDB/asterix-app/src/test/resources/parserts/queries_sqlpp" property="source_dir"/>
+	</target>
+</project>
