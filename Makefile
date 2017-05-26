@@ -335,6 +335,9 @@ MODULES = \
 	Tests/CompilerTest
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
+SQL=
+SQLPP=
+ODM=
 
 all:
 	@$(MAKE) qcert
@@ -345,6 +348,25 @@ all:
 java-runtime:
 	@$(MAKE) -C runtime/java
 
+javacode:
+	@$(MAKE) java-runtime
+	@$(MAKE) -C samples
+ifneq ($(SQL)$(SQLPP)$(ODM),)
+	@$(MAKE) -C javaService
+endif
+ifneq ($(SQL),)
+	@$(MAKE) -C sqlParser
+endif
+ifneq ($(SQLPP),)
+	@$(MAKE) -C sqlppParser
+endif
+ifneq ($(ODM),)
+	@$(MAKE) -C jrules2CAMP
+endif
+ifneq ($(SQL)$(SQLPP)$(ODM),)
+	@$(MAKE) -C javaService install
+endif
+ 
 spark2-runtime:
 	@$(MAKE) -C runtime/spark2
 
