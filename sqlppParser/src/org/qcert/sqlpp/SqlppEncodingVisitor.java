@@ -88,6 +88,7 @@ import org.apache.asterix.lang.common.struct.OperatorType;
 import org.apache.asterix.lang.common.struct.QuantifiedPair;
 import org.apache.asterix.lang.common.struct.UnaryExprType;
 import org.apache.asterix.lang.common.struct.VarIdentifier;
+import org.apache.asterix.lang.sqlpp.clause.AbstractBinaryCorrelateClause;
 import org.apache.asterix.lang.sqlpp.clause.FromClause;
 import org.apache.asterix.lang.sqlpp.clause.FromTerm;
 import org.apache.asterix.lang.sqlpp.clause.HavingClause;
@@ -103,6 +104,7 @@ import org.apache.asterix.lang.sqlpp.clause.UnnestClause;
 import org.apache.asterix.lang.sqlpp.expression.CaseExpression;
 import org.apache.asterix.lang.sqlpp.expression.IndependentSubquery;
 import org.apache.asterix.lang.sqlpp.expression.SelectExpression;
+import org.apache.asterix.lang.sqlpp.optype.SetOpType;
 import org.apache.asterix.lang.sqlpp.struct.SetOperationInput;
 import org.apache.asterix.lang.sqlpp.struct.SetOperationRight;
 import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
@@ -314,7 +316,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	@Override
 	public StringBuilder visit(FromTerm node, StringBuilder builder) throws CompilationException {
 		if (node.hasCorrelateClauses())
-			throw new UnsupportedOperationException("Cannot handle correlate clauses in FromTerm");
+			for (AbstractBinaryCorrelateClause clause : node.getCorrelateClauses()) {
+				builder = clause.accept(this, builder);
+			}
 		if (node.hasPositionalVariable())
 			throw new UnsupportedOperationException("Cannot handle positional variables in FromTerm");
 		VariableExpr var = node.getLeftVariable();
@@ -334,8 +338,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(FunctionDecl fd, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(FunctionDecl node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(functionDecl ");
+		builder = appendString(node.getSignature().getName(), builder).append("(params ");
+		for (VarIdentifier id : node.getParamList())
+			builder = appendString(decodeVariableRef(id.getValue()), builder);
+		builder.append(") ");
+		builder = node.getFuncBody().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -358,7 +368,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
     		Expression expr = pair.getExpr();
     		VariableExpr var = pair.getVar();
     		if (isDistinctName(var, expr)) {
-    			builder = appendStringNode("as", decodeVariableRef(var.toString()), builder);
+    			builder = appendStringNode("as", decodeVariableRef(var), builder);
     		}
     		builder = expr.accept(this, builder);
     	}
@@ -383,8 +393,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(IndexAccessor ia, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(IndexAccessor node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(index ");
+		if (node.isAny())
+			builder.append("(any) ");
+		else
+			builder = node.getIndexExpr().accept(this, builder);
+		builder = node.getExpr().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -398,8 +414,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(JoinClause joinClause, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(JoinClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(join (").append(node.getJoinType().toString().toLowerCase()).append(") ");
+		builder = node.getRightExpression().accept(this,  builder);
+		VariableExpr asVar = node.getRightVariable();
+		if (asVar != null)
+			builder = appendStringNode("as", decodeVariableRef(asVar), builder);
+		builder.append("(on ");
+		builder = node.getConditionExpression().accept(this, builder);
+		return builder.append(")) ");
 	}
 
 	@Override
@@ -555,7 +578,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder = builder.append("(").append(node.getQuantifier().name().toLowerCase()).append(" ");
 		for (QuantifiedPair pair : node.getQuantifiedList()) {
 			builder = builder.append("(varIn ");
-			builder = appendString(decodeVariableRef(pair.getVarExpr().toString()), builder);
+			builder = appendString(decodeVariableRef(pair.getVarExpr()), builder);
 			builder = pair.getExpr().accept(this, builder);
 			builder = builder.append(") ");
 		}
@@ -566,8 +589,6 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(Query node, StringBuilder builder) throws CompilationException {
-		if (node.getBody().getKind() != Kind.SELECT_EXPRESSION)
-			throw new UnsupportedOperationException("Can't handle query whose body isn't a select expression");
 		return node.getBody().accept(this, builder);
 	}
 
@@ -640,30 +661,33 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SelectSetOperation node, StringBuilder builder) throws CompilationException {
-		SetOperationInput first = node.getLeftInput();
-		if (node.hasRightInputs()) {
-			List<SetOperationRight> rights = node.getRightInputs();
-			if (rights.size() > 1)
-				throw new UnsupportedOperationException("No support for multiple right inputs in a SelectSetOperation");
-			SetOperationRight rightInput = rights.get(0);
-			SetOperationInput second = rightInput.getSetOperationRightInput();
-			boolean distinct = rightInput.isSetSemantics();
-			String tag;
-			switch (rightInput.getSetOpType()) {
-			case INTERSECT:
-				tag = "intersect";
-				break;
-			case UNION:
-				tag = "union";
-				break;
-			default:
-				throw new UnsupportedOperationException("No support for operator: " + rightInput.getSetOpType());
-			}
-			builder = builder.append("(query (").append(tag).append(distinct ? " (distinct) " : " ");
-			builder = first.accept(this, builder);
-			return second.accept(this, builder).append(") ) ");
-		} else
+		if (!node.hasRightInputs())
 			return node.getLeftInput().accept(this, builder);
+		SetOperationInput current = node.getLeftInput();
+		List<SetOpType> ops = new ArrayList<>();
+		List<Boolean> distincts = new ArrayList<>();
+		List<SetOperationInput> rights = new ArrayList<>();
+		for (SetOperationRight right : node.getRightInputs()) {
+			ops.add(right.getSetOpType());
+			distincts.add(right.isSetSemantics());
+			rights.add(right.getSetOperationRightInput());
+		}
+		int closeCount = 0;
+		while (!ops.isEmpty()) {
+			SetOpType op = ops.remove(0);
+			boolean distinct = distincts.remove(0);
+			SetOperationInput right = rights.remove(0);
+			builder = builder.append("(query (").append(op.name().toLowerCase()).append(" ");
+			closeCount += 2;
+			if (distinct)
+				builder.append("(distinct) ");
+			builder = current.accept(this, builder);
+			current = right;
+		}
+		builder = current.accept(this, builder);
+		for (int i = 0; i < closeCount; i++)
+			builder = builder.append(") ");
+		return builder;
 	}
 
 	@Override
@@ -705,8 +729,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(UnnestClause unnestClause, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(UnnestClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(unnest (").append(node.getJoinType().name().toLowerCase()).append(") ");
+		builder = node.getRightExpression().accept(this, builder);
+		builder = appendStringNode("as", decodeVariableRef(node.getRightVariable()), builder);
+		VariableExpr posVar = node.getPositionalVariable();
+		if (posVar != null) {
+			builder = appendStringNode("at", decodeVariableRef(posVar), builder);
+		}
+		return builder.append(") ");
 	}
 
 	@Override
@@ -726,8 +757,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(VariableExpr node, StringBuilder builder) throws CompilationException {
-		String name = node.getVar().toString();
-		return appendStringNode("ref", decodeVariableRef(name), builder);
+		return appendStringNode("ref", decodeVariableRef(node), builder);
 	}
 
 	@Override
@@ -772,6 +802,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return (name.charAt(0) == '$') ? name.substring(1) : name;
 	}
 
+	/**
+	 * Wrap the other decodeVariableRef for convenience in the common case
+	 * @param expr a VariableExpr whose identifier is to be decoded
+	 * @return the decoded name
+	 */
+	private String decodeVariableRef(VariableExpr expr) {
+		return decodeVariableRef(expr.toString());
+	}
+	
 	/**
 	 * Handling for the 'between' expression
 	 * @param expr the expression being tested
@@ -880,7 +919,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 				name = ((FieldAccessor) maybeDate).getIdent().getValue();
 				break;
 			case VARIABLE_EXPRESSION:
-				name = decodeVariableRef(((VariableExpr) maybeDate).getVar().getValue());
+				name = decodeVariableRef(((VariableExpr) maybeDate));
 				break;
 			default:
 				break;
@@ -972,7 +1011,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		exprs = Arrays.asList(remainder, lastExpr);
 		return new OperatorExpr(exprs, Collections.emptyList(), Collections.singletonList(lastOp), false);
 	}
-	
+
 	/**
 	 * Subroutine of the FromClause visitor to build a left-associative recursive nest of implicit joins from the
 	 *   list of FromTerms
@@ -990,7 +1029,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder = last.accept(this, builder);
 		return builder.append(") ");
 	}
-
+	
 	/** Test whether a node is an operator node and call the main date transformation analysis if it is */
 	private Expression maybeTransform(Expression expr) {
 		if (expr.getKind() == Kind.OP_EXPRESSION) {
