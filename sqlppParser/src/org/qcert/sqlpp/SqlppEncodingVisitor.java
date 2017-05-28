@@ -327,7 +327,6 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		if (aliased)
 			// Use 'aliasAs' for tables or subquery-like things, instead of 'as', which is used for columns.
 			// This maintains the convention we had for Presto
-			// TODO the distinction may or may not be useful ... check what happens on qcert side
 			nodeWithString("aliasAs", decodeVariableRef(var.toString()), builder);
 		if (expr.getKind() == Kind.VARIABLE_EXPRESSION)
 			// Normal visit would use 'ref' but we want 'table' here to conform to our Presto encoding convention
