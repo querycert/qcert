@@ -225,42 +225,42 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(CompactStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("compact");
 	}
 
 	@Override
 	public StringBuilder visit(ConnectFeedStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("connect feed");
 	}
 	
 	@Override
 	public StringBuilder visit(CreateDataverseStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create dataverse");
 	}
 
 	@Override
 	public StringBuilder visit(CreateFeedPolicyStatement cfps, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create feed policy");
 	}
 
 	@Override
 	public StringBuilder visit(CreateFeedStatement cfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create feed");
 	}
 
 	@Override
 	public StringBuilder visit(CreateFunctionStatement cfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create policy");
 	}
 
 	@Override
 	public StringBuilder visit(CreateIndexStatement cis, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create index");
 	}
 
 	@Override
 	public StringBuilder visit(DatasetDecl dd, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create dataset");
 	}
 
 	@Override
@@ -271,32 +271,32 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(DataverseDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop dataverse");
 	}
 
 	@Override
 	public StringBuilder visit(DeleteStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("delete");
 	}
 
 	@Override
 	public StringBuilder visit(DisconnectFeedStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("disconnect feed");
 	}
 
 	@Override
 	public StringBuilder visit(DropDatasetStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop dataset");
 	}
 
 	@Override
 	public StringBuilder visit(FeedDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop feed");
 	}
 
 	@Override
 	public StringBuilder visit(FeedPolicyDropStatement dfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop feed policy");
 	}
 
 	@Override
@@ -350,7 +350,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(FunctionDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop function");
 	}
 
 	@Override
@@ -384,11 +384,13 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	
 	@Override
 	public StringBuilder visit(IfExpr ifexpr, StringBuilder arg) throws CompilationException {
+		// This may be unused
 		return notImplemented(new Object(){});
 	}
 
 	@Override
 	public StringBuilder visit(IndependentSubquery independentSubquery, StringBuilder arg) throws CompilationException {
+		// This may be unused
 		return notImplemented(new Object(){});
 	}
 
@@ -405,12 +407,12 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(IndexDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop index");
 	}
 
 	@Override
 	public StringBuilder visit(InsertStatement insert, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("insert");
 	}
 
 	@Override
@@ -426,8 +428,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(LetClause lc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(LetClause node, StringBuilder builder) throws CompilationException {
+		// For now, we use the encoding we used for 'with' in Presto, since the AsterixDB parser parses 'with' expressions as LetClauses.
+		// The scoping is a little more controllable with 'let' (its semantics are a superset of 'with') but we can probably accommodate
+		// that on the qcert side.
+		builder.append("(with ");
+		appendStringNode("as", decodeVariableRef(node.getVarExpr()), builder);
+		node.getBindingExpr().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -469,22 +477,23 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(LoadStatement stmtLoad, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("load");
 	}
 
 	@Override
 	public StringBuilder visit(NestClause nestClause, StringBuilder arg) throws CompilationException {
+		// May be unused
 		return notImplemented(new Object(){});
 	}
 
 	@Override
 	public StringBuilder visit(NodegroupDecl ngd, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create nodegroup");
 	}
 
 	@Override
 	public StringBuilder visit(NodeGroupDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop nodegroup");
 	}
 
 	@Override
@@ -554,7 +563,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(OrderedListTypeDefinition olte, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
@@ -606,7 +615,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(RecordTypeDefinition tre, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
@@ -641,6 +650,8 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SelectExpression node, StringBuilder builder) throws CompilationException {
+		for (LetClause let : node.getLetList())
+			builder = let.accept(this, builder);
 		builder = node.getSelectSetOperation().accept(this, builder);
 		// Because this is a top-level query, but visit(SelectBlock) assumes it might be nested, we have to strip the last paren
 		// before processing order by and limit.  We assume without checking that only whitespace follows the last paren.
@@ -692,32 +703,34 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SetStatement ss, StringBuilder arg) throws CompilationException {
+		// Is a statement in the "query" category, so we might want to support it but it isn't really
+		// documented.  It appears to be about setting properties
 		return notImplemented(new Object(){});
 	}
 
 	@Override
 	public StringBuilder visit(StartFeedStatement sfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("start feed");
 	}
 
 	@Override
 	public StringBuilder visit(StopFeedStatement sfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("stop feed");
 	}
 
 	@Override
 	public StringBuilder visit(TypeDecl td, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type");
 	}
 
 	@Override
 	public StringBuilder visit(TypeDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop type");
 	}
 
 	@Override
 	public StringBuilder visit(TypeReferenceExpression tre, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
@@ -742,17 +755,17 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(UnorderedListTypeDefinition ulte, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
 	public StringBuilder visit(UpdateClause del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("update");
 	}
 
 	@Override
 	public StringBuilder visit(UpdateStatement update, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("update");
 	}
 
 	@Override
@@ -769,7 +782,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(WriteStatement ws, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("write");
 	}
 
 	private StringBuilder acceptIfPresent(ILangExpression node, StringBuilder builder) throws CompilationException {
@@ -1109,7 +1122,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	/**
-	 * Convenient error thrower for identifying unimplemented things
+	 * Convenient error thrower for identifying unimplemented things that probably should be implemented eventually
 	 * @param o an object anonymously subclassed by the throwing method, allowing the method to be identified
 	 * @return a StringBuilder nominally, for composition, but never actually returns
 	 */
@@ -1117,6 +1130,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		Method method = o.getClass().getEnclosingMethod();
 		Class<?> type = method.getParameterTypes()[0];
 		throw new UnsupportedOperationException("Visitor not implemented for " + type.getSimpleName());
+	}
+
+	/**
+	 * Convenient error thrower for identifying things we don't support and probably won't ever support
+	 * @param verb the name (human readable) of the verb that we don't support
+	 * @return a StringBuilder nominally, for composition, but never actually returns
+	 */
+	private StringBuilder notSupported(String verb) {
+		throw new UnsupportedOperationException("The statement '" + verb + "' is not the query subset of SQL++ and is not supported");
 	}
 
 	/**
