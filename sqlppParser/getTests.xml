@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!-- WARNING: this script only works under Eclipse and only when the launch config specifies that it run under the same JRE instance
+  as does the workspace and only when the ASTERIXDB symbolic link is defined as described in the README.
+  I will gradually shed Eclipse dependencies ... for example, eliminating the resolve step and using an ANT property to specify
+  the AsterixDB location.  However, a clone of the AsterixDB repository will always be required. -->
+
 <project default="get_tests" name="Copy relevant tests from AsterixDB distro">
 
 	<target name="get_tests" depends="resolve">

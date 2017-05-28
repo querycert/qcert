@@ -1,11 +1,15 @@
-A Makefile is coming soon.  Right now, development is Eclipse-based.
+To Build:
+---------
 
-To acquire the necessary dependencies as jars, simply run the getDependencies.xml Ant script.  Then, import
-this project into Eclipse (indicate that it should NOT be copied into the workspace).
+In the batch, it is only necessary that you be connected to the network the first time you 'make' this 
+folder.  Dependencies will be acquired automatically.
 
-AsterixDB's Maven repository presence does not provide modular source attachments.  If you want to see the
+Under Eclipse, to have the project build, simply run the getDependencies.xml Ant script.  Then, refresh
+this project.
+
+AsterixDB's Maven repository contributions do not include modular source attachments.  If you want to see the
 source to the key dependencies, do the following steps.  The classpath of this project is already set up to
-use the result.  The steps are optional and can be omitted if you aren't interested in the AsterixDB source.
+use the result.  You will also need these steps to run the AsterixDB unit tests.
 
 1.  Clone the asterixDB repository from https://github.com/apache/asterixdb.git.  Use branch release-0.9.1 to
 match the jars.
@@ -13,8 +17,17 @@ match the jars.
 2.  In Eclipse preferences, go to General->Workspace->Linked Resources.  Check "Enable Linked Resources" if it
 is not already checked.  Then, in the "Path Variables" section, select New and define the variable ASTERIXDB.
 Specify as its value the location of the asterixdb subfolder of the working tree resulting from step 1.  As
-the top folder is also called asterixdb, the result will be something like:
+the top folder of the cloned working tree is also called asterixdb, the result will be something like:
 
 /Users/joshuaauerbach/git/asterixdb/asterixdb
 
 3.  Refresh this project.
+
+To run tests:
+-------------
+
+In batch: there is a target (make unit_tests) that will do this but only after you create and populate the
+tests subdirectory.  An automated way of doing that is coming soon.
+
+Under Eclipse: first populate the tests folder by executing 'getTests.xml' as an ant script.  Then
+switch to batch and use the Makefile.  Note that the script currently only works under Eclipse.

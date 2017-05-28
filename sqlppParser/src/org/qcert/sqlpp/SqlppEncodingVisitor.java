@@ -584,7 +584,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		}
 		builder = builder.append("(satisfies ");
 		builder = node.getSatisfiesExpr().accept(this, builder);
-		return builder.append(") ");
+		return builder.append(") ) ");
 	}
 
 	@Override

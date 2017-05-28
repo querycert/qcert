@@ -34,11 +34,39 @@ CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.
 
 JAVAC=javac
 
+TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp tests/addOperator.sqlpp tests/ANYInFieldAccessor.sqlpp \
+	tests/columnalias.sqlpp tests/columnalias2.sqlpp tests/columnalias3.sqlpp tests/constant.sqlpp tests/fieldAccessor.sqlpp \
+	tests/from_collection_array.sqlpp tests/from_collection_bag.sqlpp tests/from_inner_correlate.sqlpp tests/from_inner_flatten.sqlpp \
+	tests/from_inner_join.sqlpp tests/from_left_correlate.sqlpp tests/from_left_correlate2.sqlpp tests/from_left_outer_join.sqlpp \
+	tests/from_where_select_clause.sqlpp tests/functionDecl.sqlpp tests/functionDecl1.sqlpp tests/functionDecl2.sqlpp \
+	tests/functionDecl3.sqlpp tests/groupby_clause_count.sqlpp tests/IfInFLOWGR.sqlpp tests/IfThenElse.sqlpp tests/LetFor.sqlpp \
+	tests/ListConstructor.sqlpp tests/mulOperator.sqlpp tests/nestedFLWOGR.sqlpp tests/nestedFLWOGR1.sqlpp tests/nestedFLWOGR2.sqlpp \
+	tests/nestedFLWOGR3.sqlpp tests/nestedFor.sqlpp tests/numberInFieldAccessor.sqlpp tests/select_clause_sugar.sqlpp \
+	tests/select_from_where_sugar.sqlpp tests/tuple_nav.sqlpp tests/tuple_nav_delimited_identifier.sqlpp tests/tuple_nav_mutiple_steps.sqlpp \
+	tests/tuple_nav_quotes.sqlpp tests/union.sqlpp tests/utf-8.sqlpp tests/variables.sqlpp tests/where_clause.sqlpp
+
+S_EXPRESSIONS=$(patsubst %.sqlpp,%.p.s-sql,$(TESTS))
+
+JS=$(patsubst %.sqlpp,%.js,$(TESTS))
+
 all:
 	$(MAKE) classes
 	ant -f export.xml
 
 classes: $(CLASSES)
+
+echoes:
+	echo $(TESTS)
+	echo $(S_EXPRESSIONS)
+	echo $(JS)
+
+unit_tests:	$(JS)
+
+$(S_EXPRESSIONS):	$(TESTS)
+	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $(TESTS)
+
+tests/%.js:	tests/%.p.s-sql
+	-../bin/qcert -source sql -source-sexp $<
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
 	-mkdir -p bin
