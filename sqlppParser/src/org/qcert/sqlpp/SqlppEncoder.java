@@ -71,11 +71,13 @@ public class SqlppEncoder {
 	}
 
 	/** Evolving main driver (for testing).
-	 * TODO move this to its own source file when it becomes elaborate enough
+	 * TODO move this to its own source file when it becomes elaborate enough. 
 	 */
 	public static void main(String[] args) throws Exception {
 		if (args.length == 3 && isNumber(args[1]) && isNumber(args[2]))
 			args = generateRange(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]), ".sql");
+		else if (args.length == 4 && args[0].equalsIgnoreCase("-sqlpp") && isNumber(args[2]) && isNumber(args[3]))
+			args = generateRange(args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]), ".sqlpp");
 		for (String arg : args) {
 			System.out.print(arg + ": ");
 			List<Statement> stmts;
