@@ -11,11 +11,18 @@
 		<delete dir="tests"/>
 		<mkdir dir="tests"/>
 		<copy todir="tests">
-			<fileset dir="${source_dir}"/>
+			<fileset dir="${source_dir}/asterix-app/src/test/resources/parserts/queries_sqlpp"/>
+		</copy>
+		<copy todir="tests">
+			<fileset dir="${source_dir}/asterix-benchmark/src/main/resources/benchmarks/tpch/queries" includes="*.sqlpp"/>
+		</copy>
+		<copy todir="tests">
+			<fileset dir="${source_dir}/asterix-benchmark/src/main/resources/benchmarks/tpch/queries"/>
+			<globmapper from="*.sqlpp.dis" to = "*.sqlpp"/>
 		</copy>
     </target>
 	
 	<target name="resolve">
-		<eclipse.convertPath resourcepath="sqlppParser/ASTERIXDB/asterix-app/src/test/resources/parserts/queries_sqlpp" property="source_dir"/>
+		<eclipse.convertPath resourcepath="sqlppParser/ASTERIXDB" property="source_dir"/>
 	</target>
 </project>

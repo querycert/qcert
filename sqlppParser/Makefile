@@ -43,7 +43,10 @@ TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp test
 	tests/ListConstructor.sqlpp tests/mulOperator.sqlpp tests/nestedFLWOGR.sqlpp tests/nestedFLWOGR1.sqlpp tests/nestedFLWOGR2.sqlpp \
 	tests/nestedFLWOGR3.sqlpp tests/nestedFor.sqlpp tests/numberInFieldAccessor.sqlpp tests/select_clause_sugar.sqlpp \
 	tests/select_from_where_sugar.sqlpp tests/tuple_nav.sqlpp tests/tuple_nav_delimited_identifier.sqlpp tests/tuple_nav_mutiple_steps.sqlpp \
-	tests/tuple_nav_quotes.sqlpp tests/union.sqlpp tests/utf-8.sqlpp tests/variables.sqlpp tests/where_clause.sqlpp
+	tests/tuple_nav_quotes.sqlpp tests/union.sqlpp tests/utf-8.sqlpp tests/variables.sqlpp tests/where_clause.sqlpp \
+	tests/q1.sqlpp tests/q2.sqlpp tests/q3.sqlpp tests/q4.sqlpp tests/q5.sqlpp tests/q6.sqlpp tests/q7.sqlpp tests/q8.sqlpp \
+	tests/q9.sqlpp tests/q10.sqlpp tests/q11.sqlpp tests/q12.sqlpp tests/q13.sqlpp tests/q14.sqlpp tests/q15.sqlpp tests/q16.sqlpp \
+	tests/q17.sqlpp tests/q18.sqlpp tests/q19.sqlpp tests/q20.sqlpp tests/q21.sqlpp tests/q22.sqlpp
 
 S_EXPRESSIONS=$(patsubst %.sqlpp,%.p.s-sql,$(TESTS))
 
@@ -61,6 +64,8 @@ echoes:
 	echo $(JS)
 
 unit_tests:	$(JS)
+
+s_expr:	$(S_EXPRESSIONS)
 
 $(S_EXPRESSIONS):	$(TESTS)
 	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $(TESTS)
