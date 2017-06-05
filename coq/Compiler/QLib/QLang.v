@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ Module QLang(runtime:CompilerRuntime).
     Definition camp := camp.
     Definition oql := oql.
     Definition sql := sql.
+    Definition sqlpp := sqlpp.
     Definition lambda_nra := lambda_nra.
     Definition nra := nra.
     Definition nraenv_core := nraenv_core.

@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ Section CompStat.
 
   (** Query languages *)
   Require Import SQLRuntime.
+  Require Import SQLPPRuntime.
   Require Import OQLRuntime.
   Require Import LambdaNRARuntime.
   (** Rule languages *)
@@ -180,6 +181,12 @@ Section CompStat.
     drec
       (("sql_size", dnat (Z_of_nat (sql_size q)))
          :: ("sql_depth", dnat (Z_of_nat (sql_depth q)))
+         :: nil).
+
+  Definition stat_sqlpp (q:sqlpp) : data :=
+    drec
+      (("sqlpp_size", dnat (Z_of_nat (sqlpp_size q)))
+         :: ("sqlpp_depth", dnat (Z_of_nat (sqlpp_depth q)))
          :: nil).
 
   Definition stat_lambda_nra (q: lambda_nra) : data :=
@@ -383,6 +390,16 @@ Section CompStat.
     | s => s
     end.
 
+  Definition stat_tree_sqlpp (q:sqlpp) : data :=
+    match stat_sqlpp q with
+    | drec l =>
+      let (t_nraenv, q_nraenv) := time sqlpp_to_nraenv q in
+      drec (l ++ ("sqlpp_to_nraenv", stat_tree_nraenv q_nraenv)
+              :: ("sqlpp_to_nraenv_time", dstring t_nraenv)
+              :: nil)
+    | s => s
+    end.
+
   Definition stat_tree_lambda_nra (q:lambda_nra) : data :=
     match stat_lambda_nra q with
     | drec l =>
@@ -404,6 +421,7 @@ Section CompStat.
         | Q_camp q => stat_camp q
         | Q_oql q => stat_oql q
         | Q_sql q => stat_sql q
+        | Q_sqlpp q => stat_sqlpp q
         | Q_lambda_nra q => stat_lambda_nra q
         | Q_nra q => stat_nra q
         | Q_nraenv_core q => stat_nraenv_core q
@@ -433,6 +451,7 @@ Section CompStat.
         | Q_camp q => stat_tree_camp q
         | Q_oql q => stat_tree_oql q
         | Q_sql q => stat_tree_sql q
+        | Q_sqlpp q => stat_tree_sqlpp q
         | Q_lambda_nra q => stat_tree_lambda_nra q
         | Q_nra q => stat_tree_nra q
         | Q_nraenv_core q => stat_tree_nraenv_core q
