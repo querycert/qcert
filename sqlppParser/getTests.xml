@@ -5,7 +5,7 @@
   I will gradually shed Eclipse dependencies ... for example, eliminating the resolve step and using an ANT property to specify
   the AsterixDB location.  However, a clone of the AsterixDB repository will always be required. -->
 
-<project default="get_tests" name="Copy relevant tests from AsterixDB distro">
+<project default="get_tests" name="Copy relevant tests from AsterixDB distro and the samples/sql and samples/sql/tpc areas">
 
 	<target name="get_tests" depends="resolve">
 		<delete dir="tests"/>
@@ -19,6 +19,10 @@
 		<copy todir="tests">
 			<fileset dir="${source_dir}/asterix-benchmark/src/main/resources/benchmarks/tpch/queries"/>
 			<globmapper from="*.sqlpp.dis" to = "*.sqlpp"/>
+		</copy>
+		<copy todir="tests">
+			<fileset dir="../samples/sql" includes="*.sql"/>
+			<fileset dir="../samples/sql/tpc" includes="tpch_*.sql"/>
 		</copy>
     </target>
 	
