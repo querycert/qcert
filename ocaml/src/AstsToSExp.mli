@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,9 @@ val nraenv_to_sexp : QLang.nraenv_core -> sexp
 
 val sexp_to_sql : sexp -> QLang.sql
 (* val sql_to_sexp : QLang.sql -> sexp *)
+
+val sexp_to_sqlpp : sexp -> QLang.sqlpp
+(* val sqlpp_to_sexp : QLang.sqlpp -> sexp *)
 
 val sexp_to_nnrc : sexp -> QLang.nnrc
 val nnrc_to_sexp : QLang.nnrc -> sexp
