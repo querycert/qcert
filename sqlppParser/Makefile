@@ -46,22 +46,22 @@ TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp test
 	tests/tuple_nav_quotes.sqlpp tests/union.sqlpp tests/utf-8.sqlpp tests/variables.sqlpp tests/where_clause.sqlpp \
 	tests/q1.sqlpp tests/q2.sqlpp tests/q3.sqlpp tests/q4.sqlpp tests/q5.sqlpp tests/q6.sqlpp tests/q7.sqlpp tests/q8.sqlpp \
 	tests/q9.sqlpp tests/q10.sqlpp tests/q11.sqlpp tests/q12.sqlpp tests/q13.sqlpp tests/q14.sqlpp tests/q15.sqlpp tests/q16.sqlpp \
-	tests/q17.sqlpp tests/q18.sqlpp tests/q19.sqlpp tests/q20.sqlpp tests/q21.sqlpp tests/q22.sqlpp
+	tests/q17.sqlpp tests/q18.sqlpp tests/q19.sqlpp tests/q20.sqlpp tests/q21.sqlpp tests/q22.sqlpp \
+	tests/org1.sql tests/org2.sql tests/org3.sql tests/org4.sql tests/org5.sql \
+	tests/tpch_1.sql tests/tpch_2.sql tests/tpch_3.sql tests/tpch_4.sql tests/tpch_5.sql tests/tpch_6.sql tests/tpch_7.sql \
+	tests/tpch_8.sql tests/tpch_9.sql tests/tpch_10.sql tests/tpch_11.sql tests/tpch_12.sql tests/tpch_13.sql tests/tpch_14.sql \
+	tests/tpch_15.sql tests/tpch_16.sql tests/tpch_17.sql tests/tpch_18.sql tests/tpch_19.sql tests/tpch_20.sql tests/tpch_21.sql tests/tpch_22.sql
 
-S_EXPRESSIONS=$(patsubst %.sqlpp,%.p.s-sql,$(TESTS))
 
-JS=$(patsubst %.sqlpp,%.js,$(TESTS))
+S_EXPRESSIONS=$(patsubst %.sqlpp,%.p.s-sql,$(patsubst %.sql,%.p.s-sql,$(TESTS)))
+
+JS=$(patsubst %.sqlpp,%.js,$(patsubst %.sql,%.js,$(TESTS)))
 
 all:
 	$(MAKE) classes
 	ant -f export.xml
 
 classes: $(CLASSES)
-
-echoes:
-	echo $(TESTS)
-	echo $(S_EXPRESSIONS)
-	echo $(JS)
 
 unit_tests:	$(JS)
 
@@ -70,8 +70,11 @@ s_expr:	$(S_EXPRESSIONS)
 $(S_EXPRESSIONS):	$(TESTS)
 	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $(TESTS)
 
-tests/%.js:	tests/%.p.s-sql
-	-../bin/qcert -source sql -source-sexp $<
+tests/%.js:	tests/%.sqlpp
+	-../bin/qcert -source sql++ $<
+
+tests/%.js:	tests/%.sql
+	-../bin/qcert -source sql++ $<
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
 	-mkdir -p bin
