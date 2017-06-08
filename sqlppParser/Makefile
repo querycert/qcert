@@ -34,6 +34,8 @@ CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.
 
 JAVAC=javac
 
+LANG=sql++
+
 TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp tests/addOperator.sqlpp tests/ANYInFieldAccessor.sqlpp \
 	tests/columnalias.sqlpp tests/columnalias2.sqlpp tests/columnalias3.sqlpp tests/constant.sqlpp tests/fieldAccessor.sqlpp \
 	tests/from_collection_array.sqlpp tests/from_collection_bag.sqlpp tests/from_inner_correlate.sqlpp tests/from_inner_flatten.sqlpp \
@@ -70,11 +72,14 @@ s_expr:	$(S_EXPRESSIONS)
 $(S_EXPRESSIONS):	$(TESTS)
 	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $(TESTS)
 
+tests/%.js:	tests/%.p.s-sql
+	-../bin/qcert -source $(LANG) -source-sexp $<
+
 tests/%.js:	tests/%.sqlpp
-	-../bin/qcert -source sql++ $<
+	-../bin/qcert -source $(LANG) $<
 
 tests/%.js:	tests/%.sql
-	-../bin/qcert -source sql++ $<
+	-../bin/qcert -source $(LANG) $<
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
 	-mkdir -p bin
