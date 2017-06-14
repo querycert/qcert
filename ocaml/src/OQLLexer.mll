@@ -40,6 +40,7 @@
 	  (* Functions *)
 	  "flatten", FLATTEN;
 	  "avg", AVG;
+	  "favg", FAVG;
 	  "sum", SUM;
           "float_sum", FLOAT_SUM;
 	  "count", COUNT;
@@ -69,7 +70,7 @@ rule token sbuff = parse
 | "<" { LT }
 | ">" { GT }
 | "<=" { LTEQ }
-| ">=" { GT }
+| ">=" { GTEQ }
 | "+" { PLUS }
 | "*" { STAR }
 | "-" { MINUS }
