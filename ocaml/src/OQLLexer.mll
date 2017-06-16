@@ -47,6 +47,7 @@
 	  "min", MIN;
 	  "max", MAX;
 	  "struct", STRUCT;
+	  "bag", BAG;
 	   (* Data *)
 	  "nil", NIL
 	]; tbl

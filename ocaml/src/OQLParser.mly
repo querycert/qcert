@@ -27,7 +27,8 @@
 %token AS IN
 
 %token OR AND NOT
-%token STRUCT FLATTEN
+%token STRUCT BAG
+%token FLATTEN
 %token FAVG AVG SUM FLOAT_SUM COUNT MIN MAX
 
 %token NIL
@@ -102,6 +103,8 @@ expr:
     { QOQL.oarrow (Util.char_list_of_string a) e }
 | STRUCT LPAREN r = reclist RPAREN
     { QOQL.ostruct r }
+| BAG LPAREN e = expr RPAREN
+    { QOQL.ounop QOps.Unary.acoll e }
 (* Functions *)
 | NOT LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.aneg e }
