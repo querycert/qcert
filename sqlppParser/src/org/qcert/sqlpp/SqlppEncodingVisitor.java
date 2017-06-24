@@ -584,15 +584,14 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	@Override
 	public StringBuilder visit(QuantifiedExpression node, StringBuilder builder) throws CompilationException {
 		builder = builder.append("(").append(node.getQuantifier().name().toLowerCase()).append(" ");
+		builder = node.getSatisfiesExpr().accept(this, builder);
 		for (QuantifiedPair pair : node.getQuantifiedList()) {
 			builder = builder.append("(varIn ");
 			builder = appendString(decodeVariableRef(pair.getVarExpr()), builder);
 			builder = pair.getExpr().accept(this, builder);
 			builder = builder.append(") ");
 		}
-		builder = builder.append("(satisfies ");
-		builder = node.getSatisfiesExpr().accept(this, builder);
-		return builder.append(") ) ");
+		return builder.append(") ");
 	}
 
 	@Override
