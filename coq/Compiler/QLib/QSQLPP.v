@@ -25,65 +25,57 @@ Module QSQLPP(runtime:CompilerRuntime).
   Module QOps := QOperators.QOperators runtime.
 
   Definition sqlpp : Set := SQLPP.sqlpp.
-  Definition t : Set := sqlpp.
-  Definition column : Set := String.string.
-  Definition table : Set := String.string.
 
-  Definition sqlpp_table_spec : Set := SQLPP.sqlpp_table_spec.
-  Definition sqlpp_bin_cond : Set := SQLPP.sqlpp_bin_cond.
-  Definition sqlpp_un_expr : Set := SQLPP.sqlpp_un_expr.
-  Definition sqlpp_bin_expr : Set := SQLPP.sqlpp_bin_expr.
-  Definition sqlpp_agg : Set := SQLPP.sqlpp_agg.
-
-  Definition sqlpp_statement : Set := SQLPP.sqlpp_statement.
-  Definition sqlpp_query : Set := SQLPP.sqlpp_query.
+  Definition sqlpp_statement := SQLPP.sqlpp_select_statement.
+  Definition sqlpp_query : Set := sqlpp_statement.
   Definition sqlpp_select : Set := SQLPP.sqlpp_select.
   Definition sqlpp_from : Set := SQLPP.sqlpp_from.
-  Definition sqlpp_condition : Set := SQLPP.sqlpp_condition.
+  Definition sqlpp_where : Set := SQLPP.sqlpp_where.
   Definition sqlpp_expr : Set := SQLPP.sqlpp_expr.
+  Definition sqlpp_select_block : Set := SQLPP.sqlpp_select_block.
+  Definition sqlpp_union_element : Set := SQLPP.sqlpp_union_element.
+  Definition sqlpp_join_clause : Set := SQLPP.sqlpp_join_clause.
+  Definition sqlpp_group_by : Set := SQLPP.sqlpp_group_by.
+  Definition sqlpp_order_by : Set := SQLPP.sqlpp_order_by.
 
   Definition sqlpp_sqlpp_query := SQLPP.SPQuery.
-  Definition sqlpp_sqlpp_union := SQLPP.SPUnion.
-  Definition sqlpp_sqlpp_intersect := SQLPP.SPIntersect.
-  Definition sqlpp_sqlpp_except := SQLPP.SPExcept.
-  Definition sqlpp_select_column : column -> sqlpp_select := SQLPP.SPSelectColumn.
-  Definition sqlpp_select_column_deref : table -> column -> sqlpp_select := SQLPP.SPSelectColumnDeref.
-  Definition sqlpp_select_expr : column -> sqlpp_expr -> sqlpp_select := SQLPP.SPSelectExpr.
-  Definition sqlpp_select_star : sqlpp_select := SQLPP.SPSelectStar.
-
-  Definition sqlpp_condition_and : sqlpp_condition -> sqlpp_condition -> sqlpp_condition := SQLPP.SPCondAnd.
-  Definition sqlpp_condition_or : sqlpp_condition -> sqlpp_condition -> sqlpp_condition := SQLPP.SPCondOr.
-  Definition sqlpp_condition_not : sqlpp_condition -> sqlpp_condition := SQLPP.SPCondNot.
-
-  Definition sqlpp_from_table : table -> sqlpp_from := SQLPP.SPFromTable.
-  Definition sqlpp_from_table_alias : table -> table -> sqlpp_from := SQLPP.SPFromTableAlias.
-  Definition sqlpp_from_query : sqlpp_table_spec -> sqlpp_query -> sqlpp_from := SQLPP.SPFromQuery.
-
-  Definition sqlpp_cond_and := SQLPP.SPCondAnd.
-  Definition sqlpp_cond_or := SQLPP.SPCondOr.
-  Definition sqlpp_cond_not := SQLPP.SPCondNot.
-  Definition sqlpp_cond_binary := SQLPP.SPCondBinary.
-  Definition sqlpp_cond_exists := SQLPP.SPCondExists.
-  Definition sqlpp_cond_in := SQLPP.SPCondIn.
-  Definition sqlpp_cond_like := SQLPP.SPCondLike.
-  Definition sqlpp_cond_between := SQLPP.SPCondBetween.
-
-  Definition sqlpp_expr_const : QData.data -> sqlpp_expr := SQLPP.SPExprConst.
-  Definition sqlpp_expr_column : String.string -> sqlpp_expr := SQLPP.SPExprColumn.
-  Definition sqlpp_expr_column_deref : String.string -> String.string -> sqlpp_expr := SQLPP.SPExprColumnDeref.
-  Definition sqlpp_expr_star : sqlpp_expr := SQLPP.SPExprStar.
-  Definition sqlpp_expr_unary : sqlpp_un_expr -> sqlpp_expr -> sqlpp_expr := SQLPP.SPExprUnary.
-  Definition sqlpp_expr_binary : sqlpp_bin_expr -> sqlpp_expr -> sqlpp_expr -> sqlpp_expr := SQLPP.SPExprBinary.
-  Definition sqlpp_expr_case : sqlpp_condition -> sqlpp_expr -> sqlpp_expr -> sqlpp_expr := SQLPP.SPExprCase.
-  Definition sqlpp_expr_agg_expr : sqlpp_agg -> sqlpp_expr -> sqlpp_expr := SQLPP.SPExprAggExpr.
-  Definition sqlpp_expr_query : sqlpp_query -> sqlpp_expr := SQLPP.SPExprQuery.
-
-  Definition sqlpp_run_query : sqlpp_query -> sqlpp_statement
-    := SQLPP.SPRunQuery.
-  Definition sqlpp_create_view : String.string -> sqlpp_query -> sqlpp_statement
-    := SQLPP.SPCreateView.
-  Definition sqlpp_drop_view : String.string -> sqlpp_statement
-    := SQLPP.SPDropView.
+  Definition sqlpp_sqlpp_positive := SQLPP.SPPositive.
+  Definition sqlpp_sqlpp_negative := SQLPP.SPNegative.
+  Definition sqlpp_sqlpp_exists := SQLPP.SPExists.
+  Definition sqlpp_sqlpp_not := SQLPP.SPNot.
+  Definition sqlpp_sqlpp_is_null := SQLPP.SPIsNull.
+  Definition sqlpp_sqlpp_is_missing := SQLPP.SPIsMissing.
+  Definition sqlpp_sqlpp_is_unknown := SQLPP.SPIsUnknown.
+  Definition sqlpp_sqlpp_plus := SQLPP.SPPlus.
+  Definition sqlpp_sqlpp_minus := SQLPP.SPMinus.
+  Definition sqlpp_sqlpp_mult := SQLPP.SPMult.
+  Definition sqlpp_sqlpp_div := SQLPP.SPDiv.
+  Definition sqlpp_sqlpp_mod := SQLPP.SPMod.
+  Definition sqlpp_sqlpp_exp := SQLPP.SPExp.
+  Definition sqlpp_sqlpp_concat := SQLPP.SPConcat.
+  Definition sqlpp_sqlpp_in := SQLPP.SPIn.
+  Definition sqlpp_sqlpp_eq := SQLPP.SPEq.
+  Definition sqlpp_sqlpp_neq := SQLPP.SPNeq.
+  Definition sqlpp_sqlpp_lt := SQLPP.SPLt.
+  Definition sqlpp_sqlpp_gt := SQLPP.SPGt.
+  Definition sqlpp_sqlpp_le := SQLPP.SPLe.
+  Definition sqlpp_sqlpp_ge := SQLPP.SPGe.
+  Definition sqlpp_sqlpp_like := SQLPP.SPLike.
+  Definition sqlpp_sqlpp_and := SQLPP.SPAnd.
+  Definition sqlpp_sqlpp_or := SQLPP.SPOr.
+  Definition sqlpp_sqlpp_between := SQLPP.SPBetween.
+  Definition sqlpp_sqlpp_case := SQLPP.SPCase.
+  Definition sqlpp_sqlpp_some := SQLPP.SPSome.
+  Definition sqlpp_sqlpp_every := SQLPP.SPEvery.
+  Definition sqlpp_sqlpp_dot := SQLPP.SPDot.
+  Definition sqlpp_sqlpp_index := SQLPP.SPIndex.
+  Definition sqlpp_sqlpp_literal := SQLPP.SPLiteral.
+  Definition sqlpp_sqlpp_null := SQLPP.SPNull.
+  Definition sqlpp_sqlpp_var_ref := SQLPP.SPVarRef.
+  Definition sqlpp_sqlpp_function_call := SQLPP.SPFunctionCall.
+  Definition sqlpp_sqlpp_array := SQLPP.SPArray.
+  Definition sqlpp_sqlpp_bag := SQLPP.SPBag.
+  Definition sqlpp_sqlpp_object := SQLPP.SPObject.
 
 End QSQLPP.
 
