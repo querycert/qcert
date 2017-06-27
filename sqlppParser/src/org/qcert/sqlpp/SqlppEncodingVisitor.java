@@ -38,6 +38,7 @@ import org.apache.asterix.lang.common.clause.UpdateClause;
 import org.apache.asterix.lang.common.clause.WhereClause;
 import org.apache.asterix.lang.common.expression.CallExpr;
 import org.apache.asterix.lang.common.expression.FieldAccessor;
+import org.apache.asterix.lang.common.expression.FieldBinding;
 import org.apache.asterix.lang.common.expression.GbyVariableExpressionPair;
 import org.apache.asterix.lang.common.expression.IfExpr;
 import org.apache.asterix.lang.common.expression.IndexAccessor;
@@ -84,8 +85,10 @@ import org.apache.asterix.lang.common.statement.TypeDropStatement;
 import org.apache.asterix.lang.common.statement.UpdateStatement;
 import org.apache.asterix.lang.common.statement.WriteStatement;
 import org.apache.asterix.lang.common.struct.OperatorType;
+import org.apache.asterix.lang.common.struct.QuantifiedPair;
 import org.apache.asterix.lang.common.struct.UnaryExprType;
 import org.apache.asterix.lang.common.struct.VarIdentifier;
+import org.apache.asterix.lang.sqlpp.clause.AbstractBinaryCorrelateClause;
 import org.apache.asterix.lang.sqlpp.clause.FromClause;
 import org.apache.asterix.lang.sqlpp.clause.FromTerm;
 import org.apache.asterix.lang.sqlpp.clause.HavingClause;
@@ -101,6 +104,7 @@ import org.apache.asterix.lang.sqlpp.clause.UnnestClause;
 import org.apache.asterix.lang.sqlpp.expression.CaseExpression;
 import org.apache.asterix.lang.sqlpp.expression.IndependentSubquery;
 import org.apache.asterix.lang.sqlpp.expression.SelectExpression;
+import org.apache.asterix.lang.sqlpp.optype.SetOpType;
 import org.apache.asterix.lang.sqlpp.struct.SetOperationInput;
 import org.apache.asterix.lang.sqlpp.struct.SetOperationRight;
 import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
@@ -221,77 +225,78 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(CompactStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("compact");
 	}
 
 	@Override
 	public StringBuilder visit(ConnectFeedStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("connect feed");
 	}
 	
 	@Override
 	public StringBuilder visit(CreateDataverseStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create dataverse");
 	}
 
 	@Override
 	public StringBuilder visit(CreateFeedPolicyStatement cfps, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create feed policy");
 	}
 
 	@Override
 	public StringBuilder visit(CreateFeedStatement cfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create feed");
 	}
 
 	@Override
 	public StringBuilder visit(CreateFunctionStatement cfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create policy");
 	}
 
 	@Override
 	public StringBuilder visit(CreateIndexStatement cis, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create index");
 	}
 
 	@Override
 	public StringBuilder visit(DatasetDecl dd, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create dataset");
 	}
 
 	@Override
-	public StringBuilder visit(DataverseDecl dv, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(DataverseDecl node, StringBuilder builder) throws CompilationException {
+		// Do nothing.  This statement is often present but is outside the query semantics
+		return builder;
 	}
 
 	@Override
 	public StringBuilder visit(DataverseDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop dataverse");
 	}
 
 	@Override
 	public StringBuilder visit(DeleteStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("delete");
 	}
 
 	@Override
 	public StringBuilder visit(DisconnectFeedStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("disconnect feed");
 	}
 
 	@Override
 	public StringBuilder visit(DropDatasetStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop dataset");
 	}
 
 	@Override
 	public StringBuilder visit(FeedDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop feed");
 	}
 
 	@Override
 	public StringBuilder visit(FeedPolicyDropStatement dfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop feed policy");
 	}
 
 	@Override
@@ -311,7 +316,9 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	@Override
 	public StringBuilder visit(FromTerm node, StringBuilder builder) throws CompilationException {
 		if (node.hasCorrelateClauses())
-			throw new UnsupportedOperationException("Cannot handle correlate clauses in FromTerm");
+			for (AbstractBinaryCorrelateClause clause : node.getCorrelateClauses()) {
+				builder = clause.accept(this, builder);
+			}
 		if (node.hasPositionalVariable())
 			throw new UnsupportedOperationException("Cannot handle positional variables in FromTerm");
 		VariableExpr var = node.getLeftVariable();
@@ -320,7 +327,6 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		if (aliased)
 			// Use 'aliasAs' for tables or subquery-like things, instead of 'as', which is used for columns.
 			// This maintains the convention we had for Presto
-			// TODO the distinction may or may not be useful ... check what happens on qcert side
 			nodeWithString("aliasAs", decodeVariableRef(var.toString()), builder);
 		if (expr.getKind() == Kind.VARIABLE_EXPRESSION)
 			// Normal visit would use 'ref' but we want 'table' here to conform to our Presto encoding convention
@@ -331,13 +337,19 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(FunctionDecl fd, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(FunctionDecl node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(functionDecl ");
+		builder = appendString(node.getSignature().getName(), builder).append("(params ");
+		for (VarIdentifier id : node.getParamList())
+			builder = appendString(decodeVariableRef(id.getValue()), builder);
+		builder.append(") ");
+		builder = node.getFuncBody().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
 	public StringBuilder visit(FunctionDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop function");
 	}
 
 	@Override
@@ -355,7 +367,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
     		Expression expr = pair.getExpr();
     		VariableExpr var = pair.getVar();
     		if (isDistinctName(var, expr)) {
-    			builder = appendStringNode("as", decodeVariableRef(var.toString()), builder);
+    			builder = appendStringNode("as", decodeVariableRef(var), builder);
     		}
     		builder = expr.accept(this, builder);
     	}
@@ -371,42 +383,66 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	
 	@Override
 	public StringBuilder visit(IfExpr ifexpr, StringBuilder arg) throws CompilationException {
+		// This may be unused
 		return notImplemented(new Object(){});
 	}
 
 	@Override
 	public StringBuilder visit(IndependentSubquery independentSubquery, StringBuilder arg) throws CompilationException {
+		// This may be unused
 		return notImplemented(new Object(){});
 	}
 
 	@Override
-	public StringBuilder visit(IndexAccessor ia, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(IndexAccessor node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(index ");
+		if (node.isAny())
+			builder.append("(any) ");
+		else
+			builder = node.getIndexExpr().accept(this, builder);
+		builder = node.getExpr().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
 	public StringBuilder visit(IndexDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop index");
 	}
 
 	@Override
 	public StringBuilder visit(InsertStatement insert, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("insert");
 	}
 
 	@Override
-	public StringBuilder visit(JoinClause joinClause, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(JoinClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(join (").append(node.getJoinType().toString().toLowerCase()).append(") ");
+		builder = node.getRightExpression().accept(this,  builder);
+		VariableExpr asVar = node.getRightVariable();
+		if (asVar != null)
+			builder = appendStringNode("as", decodeVariableRef(asVar), builder);
+		builder.append("(on ");
+		builder = node.getConditionExpression().accept(this, builder);
+		return builder.append(")) ");
 	}
 
 	@Override
-	public StringBuilder visit(LetClause lc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(LetClause node, StringBuilder builder) throws CompilationException {
+		// For now, we use the encoding we used for 'with' in Presto, since the AsterixDB parser parses 'with' expressions as LetClauses.
+		// The scoping is a little more controllable with 'let' (its semantics are a superset of 'with') but we can probably accommodate
+		// that on the qcert side.
+		builder.append("(with ");
+		appendStringNode("as", decodeVariableRef(node.getVarExpr()), builder);
+		node.getBindingExpr().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
-	public StringBuilder visit(LimitClause lc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(LimitClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(limit ");
+		builder = node.getLimitExpr().accept(this, builder);
+		builder = acceptIfPresent(node.getOffset(), builder);
+		return builder.append(") ");
 	}
 
 	@Override
@@ -440,22 +476,23 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(LoadStatement stmtLoad, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("load");
 	}
 
 	@Override
 	public StringBuilder visit(NestClause nestClause, StringBuilder arg) throws CompilationException {
+		// May be unused
 		return notImplemented(new Object(){});
 	}
 
 	@Override
 	public StringBuilder visit(NodegroupDecl ngd, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create nodegroup");
 	}
 
 	@Override
 	public StringBuilder visit(NodeGroupDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop nodegroup");
 	}
 
 	@Override
@@ -525,7 +562,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(OrderedListTypeDefinition olte, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
@@ -545,25 +582,39 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(QuantifiedExpression qe, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(QuantifiedExpression node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(").append(node.getQuantifier().name().toLowerCase()).append(" ");
+		for (QuantifiedPair pair : node.getQuantifiedList()) {
+			builder = builder.append("(varIn ");
+			builder = appendString(decodeVariableRef(pair.getVarExpr()), builder);
+			builder = pair.getExpr().accept(this, builder);
+			builder = builder.append(") ");
+		}
+		builder = builder.append("(satisfies ");
+		builder = node.getSatisfiesExpr().accept(this, builder);
+		return builder.append(") ) ");
 	}
 
 	@Override
 	public StringBuilder visit(Query node, StringBuilder builder) throws CompilationException {
-		if (node.getBody().getKind() != Kind.SELECT_EXPRESSION)
-			throw new UnsupportedOperationException("Can't handle query whose body isn't a select expression");
 		return node.getBody().accept(this, builder);
 	}
 
 	@Override
-	public StringBuilder visit(RecordConstructor rc, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(RecordConstructor node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(record ");
+		for (FieldBinding field : node.getFbList()) {
+			builder = builder.append("(field ");
+			builder = field.getLeftExpr().accept(this, builder);
+			builder = field.getRightExpr().accept(this, builder);
+			builder = builder.append(") ");
+		}
+		return builder.append(") ");
 	}
 
 	@Override
 	public StringBuilder visit(RecordTypeDefinition tre, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
@@ -571,7 +622,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder.append("(query (select ");
 		builder = node.getSelectClause().accept(this, builder);
 		builder = builder.append(") "); // for parity with what Presto encoder does.
-		builder = node.getFromClause().accept(this, builder);
+		builder = acceptIfPresent(node.getFromClause(), builder);
 		builder = acceptIfPresent(node.getWhereClause(), builder);
 		builder = acceptIfPresent(node.getGroupbyClause(), builder);
 		builder = acceptIfPresent(node.getHavingClause(), builder);
@@ -590,12 +641,16 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(SelectElement selectElement, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(SelectElement node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(select_expr ");
+		builder = node.getExpression().accept(this, builder);
+		return builder.append(") ");
 	}
 
 	@Override
 	public StringBuilder visit(SelectExpression node, StringBuilder builder) throws CompilationException {
+		for (LetClause let : node.getLetList())
+			builder = let.accept(this, builder);
 		builder = node.getSelectSetOperation().accept(this, builder);
 		// Because this is a top-level query, but visit(SelectBlock) assumes it might be nested, we have to strip the last paren
 		// before processing order by and limit.  We assume without checking that only whitespace follows the last paren.
@@ -616,60 +671,65 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(SelectSetOperation node, StringBuilder builder) throws CompilationException {
-		SetOperationInput first = node.getLeftInput();
-		if (node.hasRightInputs()) {
-			List<SetOperationRight> rights = node.getRightInputs();
-			if (rights.size() > 1)
-				throw new UnsupportedOperationException("No support for multiple right inputs in a SelectSetOperation");
-			SetOperationRight rightInput = rights.get(0);
-			SetOperationInput second = rightInput.getSetOperationRightInput();
-			boolean distinct = rightInput.isSetSemantics();
-			String tag;
-			switch (rightInput.getSetOpType()) {
-			case INTERSECT:
-				tag = "intersect";
-				break;
-			case UNION:
-				tag = "union";
-				break;
-			default:
-				throw new UnsupportedOperationException("No support for operator: " + rightInput.getSetOpType());
-			}
-			builder = builder.append("(query (").append(tag).append(distinct ? " (distinct) " : " ");
-			builder = first.accept(this, builder);
-			return second.accept(this, builder).append(") ) ");
-		} else
+		if (!node.hasRightInputs())
 			return node.getLeftInput().accept(this, builder);
+		SetOperationInput current = node.getLeftInput();
+		List<SetOpType> ops = new ArrayList<>();
+		List<Boolean> distincts = new ArrayList<>();
+		List<SetOperationInput> rights = new ArrayList<>();
+		for (SetOperationRight right : node.getRightInputs()) {
+			ops.add(right.getSetOpType());
+			distincts.add(right.isSetSemantics());
+			rights.add(right.getSetOperationRightInput());
+		}
+		int closeCount = 0;
+		while (!ops.isEmpty()) {
+			SetOpType op = ops.remove(0);
+			boolean distinct = distincts.remove(0);
+			SetOperationInput right = rights.remove(0);
+			builder = builder.append("(query (").append(op.name().toLowerCase()).append(" ");
+			closeCount += 2;
+			if (distinct)
+				builder.append("(distinct) ");
+			builder = current.accept(this, builder);
+			current = right;
+		}
+		builder = current.accept(this, builder);
+		for (int i = 0; i < closeCount; i++)
+			builder = builder.append(") ");
+		return builder;
 	}
 
 	@Override
 	public StringBuilder visit(SetStatement ss, StringBuilder arg) throws CompilationException {
+		// Is a statement in the "query" category, so we might want to support it but it isn't really
+		// documented.  It appears to be about setting properties
 		return notImplemented(new Object(){});
 	}
 
 	@Override
 	public StringBuilder visit(StartFeedStatement sfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("start feed");
 	}
 
 	@Override
 	public StringBuilder visit(StopFeedStatement sfs, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("stop feed");
 	}
 
 	@Override
 	public StringBuilder visit(TypeDecl td, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type");
 	}
 
 	@Override
 	public StringBuilder visit(TypeDropStatement del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("drop type");
 	}
 
 	@Override
 	public StringBuilder visit(TypeReferenceExpression tre, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
@@ -681,29 +741,35 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	@Override
-	public StringBuilder visit(UnnestClause unnestClause, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+	public StringBuilder visit(UnnestClause node, StringBuilder builder) throws CompilationException {
+		builder = builder.append("(unnest (").append(node.getJoinType().name().toLowerCase()).append(") ");
+		builder = node.getRightExpression().accept(this, builder);
+		builder = appendStringNode("as", decodeVariableRef(node.getRightVariable()), builder);
+		VariableExpr posVar = node.getPositionalVariable();
+		if (posVar != null) {
+			builder = appendStringNode("at", decodeVariableRef(posVar), builder);
+		}
+		return builder.append(") ");
 	}
 
 	@Override
 	public StringBuilder visit(UnorderedListTypeDefinition ulte, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("create type"); // probably only reachable from a type definition
 	}
 
 	@Override
 	public StringBuilder visit(UpdateClause del, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("update");
 	}
 
 	@Override
 	public StringBuilder visit(UpdateStatement update, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("update");
 	}
 
 	@Override
 	public StringBuilder visit(VariableExpr node, StringBuilder builder) throws CompilationException {
-		String name = node.getVar().toString();
-		return appendStringNode("ref", decodeVariableRef(name), builder);
+		return appendStringNode("ref", decodeVariableRef(node), builder);
 	}
 
 	@Override
@@ -715,7 +781,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 
 	@Override
 	public StringBuilder visit(WriteStatement ws, StringBuilder arg) throws CompilationException {
-		return notImplemented(new Object(){});
+		return notSupported("write");
 	}
 
 	private StringBuilder acceptIfPresent(ILangExpression node, StringBuilder builder) throws CompilationException {
@@ -748,6 +814,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		return (name.charAt(0) == '$') ? name.substring(1) : name;
 	}
 
+	/**
+	 * Wrap the other decodeVariableRef for convenience in the common case
+	 * @param expr a VariableExpr whose identifier is to be decoded
+	 * @return the decoded name
+	 */
+	private String decodeVariableRef(VariableExpr expr) {
+		return decodeVariableRef(expr.toString());
+	}
+	
 	/**
 	 * Handling for the 'between' expression
 	 * @param expr the expression being tested
@@ -856,7 +931,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 				name = ((FieldAccessor) maybeDate).getIdent().getValue();
 				break;
 			case VARIABLE_EXPRESSION:
-				name = decodeVariableRef(((VariableExpr) maybeDate).getVar().getValue());
+				name = decodeVariableRef(((VariableExpr) maybeDate));
 				break;
 			default:
 				break;
@@ -948,7 +1023,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		exprs = Arrays.asList(remainder, lastExpr);
 		return new OperatorExpr(exprs, Collections.emptyList(), Collections.singletonList(lastOp), false);
 	}
-	
+
 	/**
 	 * Subroutine of the FromClause visitor to build a left-associative recursive nest of implicit joins from the
 	 *   list of FromTerms
@@ -966,7 +1041,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		builder = last.accept(this, builder);
 		return builder.append(") ");
 	}
-
+	
 	/** Test whether a node is an operator node and call the main date transformation analysis if it is */
 	private Expression maybeTransform(Expression expr) {
 		if (expr.getKind() == Kind.OP_EXPRESSION) {
@@ -1046,7 +1121,7 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 	}
 
 	/**
-	 * Convenient error thrower for identifying unimplemented things
+	 * Convenient error thrower for identifying unimplemented things that probably should be implemented eventually
 	 * @param o an object anonymously subclassed by the throwing method, allowing the method to be identified
 	 * @return a StringBuilder nominally, for composition, but never actually returns
 	 */
@@ -1054,6 +1129,15 @@ public class SqlppEncodingVisitor implements ISqlppVisitor<StringBuilder, String
 		Method method = o.getClass().getEnclosingMethod();
 		Class<?> type = method.getParameterTypes()[0];
 		throw new UnsupportedOperationException("Visitor not implemented for " + type.getSimpleName());
+	}
+
+	/**
+	 * Convenient error thrower for identifying things we don't support and probably won't ever support
+	 * @param verb the name (human readable) of the verb that we don't support
+	 * @return a StringBuilder nominally, for composition, but never actually returns
+	 */
+	private StringBuilder notSupported(String verb) {
+		throw new UnsupportedOperationException("The statement '" + verb + "' is not the query subset of SQL++ and is not supported");
 	}
 
 	/**

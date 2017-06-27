@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Export artifacts from sqlppParser project to bin">
+
+	<property name="dest" value="../javaService/services"/>
+
+	<target name="create_run_jar">
+		<delete file="${dest}/sqlppParser.jar"/>
+        <jar destfile="${dest}/sqlppParser.jar">
+            <fileset dir="bin"/>
+        </jar>
+        <copy file="lib/algebricks-common-0.3.1.jar" todir="${dest}"/>
+        <copy file="lib/asterix-common-0.9.1.jar" todir="${dest}"/>
+		<copy file="lib/asterix-lang-sqlpp-0.9.1.jar" todir="${dest}"/>
+		<copy file="lib/hyracks-dataflow-common-0.3.1.jar" todir="${dest}"/>
+		<copy file="lib/algebricks-core-0.3.1.jar" todir="${dest}"/>
+		<copy file="lib/asterix-lang-common-0.9.1.jar" todir="${dest}"/>
+		<copy file="lib/hyracks-api-0.3.1.jar" todir="${dest}"/>
+		<copy file="lib/log4j-1.2.17.jar" todir="${dest}"/>
+    </target>
+</project>

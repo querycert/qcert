@@ -7,6 +7,8 @@
 <property name="sqlpp" value="asterix-lang-sqlpp/0.9.1/asterix-lang-sqlpp-0.9.1.jar"/>	
 <property name="lang-common" value="asterix-lang-common/0.9.1/asterix-lang-common-0.9.1.jar"/>	
 <property name="common" value="asterix-common/0.9.1/asterix-common-0.9.1.jar"/>
+<property name="runtime" value="asterix-runtime/0.9.1/asterix-runtime-0.9.1.jar"/>
+<property name="om" value="asterix-om/0.9.1/asterix-om-0.9.1.jar"/>
 <property name="algebricks.common" value="algebricks-common/0.3.1/algebricks-common-0.3.1.jar"/>
 <property name="algebricks.core" value="algebricks-core/0.3.1/algebricks-core-0.3.1.jar"/>
 <property name="dataflow.common" value="hyracks-dataflow-common/0.3.1/hyracks-dataflow-common-0.3.1.jar"/>
@@ -19,6 +21,8 @@
 	<get src="${repo}${asterix}${sqlpp}" dest="lib"/>
 	<get src="${repo}${asterix}${lang-common}" dest="lib"/>
 	<get src="${repo}${asterix}${common}" dest="lib"/>
+	<get src="${repo}${asterix}${runtime}" dest="lib"/>
+	<get src="${repo}${asterix}${om}" dest="lib"/>
 	<get src="${repo}${hyracks}${algebricks.common}" dest="lib"/>
 	<get src="${repo}${hyracks}${algebricks.core}" dest="lib"/>
 	<get src="${repo}${hyracks}${dataflow.common}" dest="lib"/>

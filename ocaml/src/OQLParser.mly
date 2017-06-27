@@ -27,8 +27,9 @@
 %token AS IN
 
 %token OR AND NOT
-%token STRUCT FLATTEN
-%token AVG SUM FLOAT_SUM COUNT MIN MAX
+%token STRUCT BAG
+%token FLATTEN
+%token FAVG AVG SUM FLOAT_SUM COUNT MIN MAX
 
 %token NIL
 
@@ -43,10 +44,10 @@
 
 %right FROM IN WHERE
 %right COMMA
+%right AND OR
 %right EQUAL NEQUAL
 %right LT GT LTEQ GTEQ
 %right PLUS MINUS
-%right AND OR
 %right STAR
 %left DOT ARROW
 
@@ -102,6 +103,8 @@ expr:
     { QOQL.oarrow (Util.char_list_of_string a) e }
 | STRUCT LPAREN r = reclist RPAREN
     { QOQL.ostruct r }
+| BAG LPAREN e = expr RPAREN
+    { QOQL.ounop QOps.Unary.acoll e }
 (* Functions *)
 | NOT LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.aneg e }
@@ -113,6 +116,8 @@ expr:
     { QOQL.ounop Enhanced.Ops.Unary.float_sum e }
 | AVG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.aarithmean e }
+| FAVG LPAREN e = expr RPAREN
+    { QOQL.ounop (Compiler.AForeignUnaryOp (Obj.magic (Compiler.Enhanced_unary_float_op (Compiler.Uop_float_arithmean)))) e }
 | COUNT LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.acount e }
 | MAX LPAREN e = expr RPAREN

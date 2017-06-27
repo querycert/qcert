@@ -40,10 +40,13 @@ opam install js_of_ocaml
 
 ### Java (Recommended)
 
-SQL and ODM rules support, as well as part of the Q*cert runtime are
-written in Java and require a Java compiler (Java 8 required).
-
-Build for the Java part of the code requires a recent version of ant.
+SQL, SQL++, and ODM rules support, a part of the Q*cert runtime, and
+the harnesses for running the samples, are all written in Java and
+require a Java compiler (Java 8 required).  The builds for many of the
+Java components also require a recent version of ant (and the ODM
+rules support has an additional pre-requisite).  Both the `javac`
+command and the `ant` command must be executable from the command line
+PATH.
 
 ### TypeScript (Optional)
 
@@ -85,9 +88,81 @@ make extraction
 
 This should produce the `./bin/qcert` and `./bin/qdata` executables.
 
-## Building SQL support (Optional)
+## Building the Java components
 
-## Building JRules support (Optional)
+The Java components are built with the command
+```
+make javacode
+```
+
+By default, that command will build the Java runtime and the harnesses
+for running the samples, but not the SQL, SQL++, or ODM rules support.
+To build the additional components, you must be connected to the
+network and must have a copy of ant installed and accessible from the
+command line.  The additional components are built by adding make
+variable settings to the command line like this:
+
+```
+make SQL=yes SQLPP=yes ODM=yes javacode
+```
+
+Whichever of these additional components you choose to build, the
+selected components should be built together in one step because they
+are deployed as a set of interrelated jar files.  After javacode is
+built with any of these additional components, the qcert/bin directory
+should contain a file called `javaService.jar` and a subdirectory
+called `services`.
+
+Note that the ODM rules support will only build if you satisfy an
+additional dependency as outlined in the next section.
+
+## Building ODM Rules (JRules) support (Optional)
+
+The ODM rules support requires that you obtain a legal copy of the ODM
+Designer component that comes with various versions of ODM.
+
+ODM comes in (at least) two configurations called "ODM Rules" and "ODM
+Insights".  Each comes with its own Designer, which in turn supports a
+characteristic set of languages.  There are (at least) two license
+arrangements: "ODM Classic" has only the Rules configuration and "ODM
+Advanced" comes with both Rules and Insights.  There is also ODM in
+the cloud, based on the Rules configuration.  We hope that our support
+will work with either the Insights Designer or the Rules Designer but
+we have only tested it with the Rules Designer and it only covers the
+languages that are provided by that Designer.
+
+There is no free version of ODM, but some 30 day free trial programs
+will allow you to try out certain versions.  In order to use our
+"technical" rule support, you need a binary jar available only with an
+ODM Designer.  To use the "designer" rule support, you need to fully
+install and utilize an ODM Designer.
+
+One possible route is to sign up for the 30 day free trial of ODM in
+the Cloud (https://www.bpm.ibmcloud.com/odm/index.html).  Once you are
+authorized for the trial, you can log in to the cloud service and
+obtain a copy of the ODM Rules Designer (downloaded and installed on
+your own machine).
+
+Once you have a Designer component installed on your machine, the next
+step is to find the library called **jrules-engine.jar** and copy it to
+a directory in the qcert working tree.  Start by making the directory
+
+```
+jrules2CAMP/lib
+```
+
+if it does not already exist.
+
+If you installed the Designer using ODM in the cloud, there is a copy
+of `jrules-engine.jar` in the `studio/lib` directory of the
+directory where the Designer is installed.  Simply copy that file into
+the `jrules2CAMP/lib` directory.  If you have some other version of
+ODM Rule Designer or Insights Designer, find the location where the
+ODM plugins are located and look for a plugin jar whose name starts
+with "com.ibm.rules.engine...".  Inside this jar you may find a copy
+of jrules-engine.jar.  Unzipping the outer jar into the
+`jrules2CAMP` directory should put a copy of jrules-engine.jar in
+the `lib` subdirectory.  Beyond those suggestions, you are on your own.
 
 
 ## Compile Queries
@@ -142,27 +217,15 @@ query runners in the [`./samples`](./samples) directory in order to try the exam
 
 ### Prerequisites
 
-To compile the Java runtime library or the provided query runner, you
-will need a Java compiler (Java 7 or later).
-
-### Build the Q\*cert runtimes
-
-To compile the supporting runtime for the Java target:
+The Java runtime library and the sample query runners will have been built if
+you followed the instructions above to make the optional Java components
+via
 
 ```
-make java-runtime
+make javacode
 ```
 
-### Build the sample query runners
-
-To compile the small query runners:
-
-```
-cd samples
-make
-```
-
-Now, you're good to go! Next step: run your compiled queries.
+Otherwise, you can do it now.
 
 ### Run queries compiled to Javascript
 
