@@ -35,7 +35,7 @@ Section CompEval.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
-  Require Import CldMRRuntime. (* XXX contains cld_load_init_env! XXX *)
+  Require Import CldMRRuntime.
   Require Import DNNRCRuntime.
   Require Import tDNNRCRuntime.
   Require Import CAMPRuntime.
@@ -46,22 +46,16 @@ Section CompEval.
   Require Import SparkDFRuntime.
   Require Import CloudantRuntime.
 
-  (* Translations *)
-  Require Import SQLtoNRAEnv.       (* Used for SQL evaluation *)
-  Require Import LambdaNRAtoNRAEnv. (* Used for lambda_nra evaluation *)
-  Require Import NNRCtoNNRCMR.      (* XXX contains load_init_env! XXX *)
-
   (* Foreign Support *)
   Require Import ForeignToReduceOps.
   Require Import ForeignToSpark.
-  Require Import ForeignCloudant ForeignToCloudant.
+  Require Import ForeignCloudant.
+  Require Import ForeignToCloudant.
   
   (* Compiler Driver *)
-  Require Import CompLang CompEnv.
+  Require Import CompLang.
+  Require Import CompEnv.
 
-  (* Data *)
-  Require Import RData.
-  
   (* Some useful notations *)
   Local Open Scope list_scope.
 
@@ -78,99 +72,66 @@ Section CompEval.
   (* Evaluation functions *)
   Section EvalFunctions.
 
-    (* Note: this is top-level so cenv is always first 'normalized' by calling rec_sort *)
-    
     (* Language: camp_rule *)
-    (* Note: eval for camp_rule relies on translation to camp *)
     Definition eval_camp_rule (q:camp_rule) (cenv: bindings) : option data :=
-      camp_rule_eval_top h q cenv.
-
+      CAMPRule.camp_rule_eval_top h q cenv.
     Definition eval_camp_rule_debug (debug:bool) (q:camp_rule) (cenv: bindings) : string :=
-      camp_rule_eval_top_debug h debug q cenv.
+      CAMPRule.camp_rule_eval_top_debug h debug q cenv.
 
     (* Language: camp *)
     Definition eval_camp (q:camp) (cenv: bindings) : option data :=
-      camp_eval_top h q cenv.
-
+      CAMP.camp_eval_top h q cenv.
     Definition eval_camp_debug (debug:bool) (q:camp) (cenv: bindings) : string :=
-      camp_eval_top_debug h debug q cenv.
+      CAMP.camp_eval_top_debug h debug q cenv.
 
     (* Language: oql *)
-    Definition eval_oql (q:oql) (cenv: bindings) : option data
-      := oql_eval_top h q cenv.
+    Definition eval_oql (q:oql) (cenv: bindings) : option data :=
+      OQL.oql_eval_top h q cenv.
 
-    (* Language: sql *)
-    (* Note: eval for sql relies on translation to nraenv_core *)
-    Definition eval_sql (q:sql) (cenv: bindings) : option data
-      := nraenv_eval_top h (sql_to_nraenv_top q) cenv.
     (* Language: lambda_nra *)
-    Definition eval_lambda_nra (q:lambda_nra) (cenv: bindings) : option data
-      := lambda_nra_eval_top h q cenv.
+    Definition eval_lambda_nra (q:lambda_nra) (cenv: bindings) : option data :=
+      LambdaNRA.lambda_nra_eval_top h q cenv.
 
     (* Language: nra *)
-    Definition eval_nra (q:nra) (cenv: bindings) : option data
-      := nra_eval_top h q cenv.
-      (* XXX Passing just cenv as ID value is more natural, but not
-             consistent with nraenv_core to nra translation which encodes
-             ID and ENV in a records using the nra_context_data macro XXX *)
+    Definition eval_nra (q:nra) (cenv: bindings) : option data :=
+      NRA.nra_eval_top h q cenv.
 
     (* Language: nraenv_core *)
-    Definition eval_nraenv_core (q:nraenv_core) (cenv: bindings) : option data
-      := nraenv_core_eval_top h q cenv.
+    Definition eval_nraenv_core (q:nraenv_core) (cenv: bindings) : option data :=
+      cNRAEnv.nraenv_core_eval_top h q cenv.
 
     (* Language: nraenv *)
-    Definition eval_nraenv (q:nraenv) (cenv: bindings) : option data
-      := nraenv_eval_top h q cenv.
+    Definition eval_nraenv (q:nraenv) (cenv: bindings) : option data :=
+      NRAEnv.nraenv_eval_top h q cenv.
 
     (* Language: nnrc_core *)
-    Definition eval_nnrc_core (q:nnrc_core) (cenv: bindings) : option data
-      := nnrc_core_eval_top h q cenv.
+    Definition eval_nnrc_core (q:nnrc_core) (cenv: bindings) : option data :=
+      cNNRC.nnrc_core_eval_top h q cenv.
 
     (* Language: nnrc *)
-    Definition eval_nnrc (q:nnrc) (cenv: bindings) : option data
-      := nnrc_eval_top h q cenv.
+    Definition eval_nnrc (q:nnrc) (cenv: bindings) : option data :=
+      NNRC.nnrc_eval_top h q cenv.
 
     (* Language: nnrcmr *)
-    Definition eval_nnrcmr (q:nnrcmr) (cenv: bindings) : option data
-      := let cenv := rec_sort cenv in
-         (* Note: localize_bindings turns all variables distributed! *)
-         let loc_cenv := mkDistLocs cenv in
-         match load_init_env init_vinit loc_cenv cenv with
-         | Some mr_env => nnrcmr_eval h mr_env q
-         | None => None
-         end.
+    Definition eval_nnrcmr (q:nnrcmr) (cenv: bindings) : option data :=
+      NNRCMR.nnrcmr_eval_top h init_vinit q cenv.
 
     (* Language: cldmr *)
-    Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data
-      := cldmr_eval_top h init_vinit q cenv.
+    Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data :=
+      CldMR.cldmr_eval_top h init_vinit q cenv.
 
     (* Language: dnnrc *)
-    (* WARNING: This doesn't work if using the Dataset part of the language *)
-
-    Definition eval_dnnrc
-               (q:dnnrc) (cenv: bindings) : option data :=
-      let cenv := rec_sort cenv in
-      let loc_cenv := mkDistLocs (rec_sort cenv) in
-      match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h cenv SparkIRPlug nil q)
-      | None => None
-      end.
+    Definition eval_dnnrc (q:dnnrc) (cenv: bindings) : option data :=
+      DNNRC.dnnrc_dataframe_eval_top_lift_distr h q cenv.
 
     (* Language: dnnrc_typed *)
-
-    Definition eval_dnnrc_typed
-               (q:dnnrc_typed) (cenv: bindings) : option data :=
-      let cenv := rec_sort cenv in
-      let loc_cenv := mkDistLocs (rec_sort cenv) in
-      match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h cenv SparkIRPlug nil q)
-      | None => None
-      end.
+    Definition eval_dnnrc_typed (q:dnnrc_typed) (cenv: bindings) : option data :=
+      tDNNRC.dnnrc_dataframe_typed_eval_top_lift_distr h q cenv.
 
   End EvalFunctions.
 
   Section EvalDriver.
-    Definition eval_input : Set := list (string*ddata).
+    Definition eval_input : Set := dbindings.
 
     Definition lift_input (ev_in:eval_input) : bindings :=
       unlocalize_constants ev_in.
@@ -196,7 +157,7 @@ Section CompEval.
       | Q_designer_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_camp q => lift_output (eval_camp q cenv)
       | Q_oql q => lift_output (eval_oql q cenv)
-      | Q_sql q => lift_output (eval_sql q cenv)
+      | Q_sql _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
       | Q_nra q => lift_output (eval_nra q cenv)
       | Q_nraenv_core q => lift_output (eval_nraenv_core q cenv)
@@ -260,9 +221,6 @@ Section CompEval.
     
     Definition eval_oql_world (q:oql) (world:list data) : option data :=
       eval_oql q (mkWorld world).
-    
-    Definition eval_sql_world (q:sql) (world:list data) : option data :=
-      eval_sql q (mkWorld world).
     
     Definition eval_lambda_nra_world (q:lambda_nra) (world:list data) : option data :=
       eval_lambda_nra q (mkWorld world).

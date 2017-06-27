@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section NRewMR.
+Section NNRCMRRewrite.
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -1150,15 +1150,6 @@ Section NRewMR.
     repeat dest_eqdec; try congruence; simpl.
     unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl.
-    Set Printing All.
-    idtac.
-    assert (@nnrc_core_eval fruntime h (@empty_cenv fruntime)
-               (@cons (prod RVar.var (@data (@foreign_runtime_data fruntime)))
-                  (@pair RVar.var (@data (@foreign_runtime_data fruntime)) v0 d0)
-                  (@cons (prod var (@data (@foreign_runtime_data fruntime)))
-                     (@pair var (@data (@foreign_runtime_data fruntime)) v d)
-                     (@nil (prod var (@data (@foreign_runtime_data fruntime)))))) n0 = nnrc_core_eval h empty_cenv ((v0, d0) :: (v, d) :: nil) n0) by reflexivity.
-    rewrite H in *; clear H.
     assert (nnrc_core_eval h empty_cenv ((v0, d0) :: nil) n0 =
             nnrc_core_eval h empty_cenv ((v0, d0) :: (v, d) :: nil) n0) as Heq;
       [ | rewrite Heq; clear Heq ].
@@ -1493,7 +1484,7 @@ Section NRewMR.
   Definition get_nnrcmr_vars mrl :=
     get_mr_chain_vars mrl.(mr_chain).
 
-End NRewMR.
+End NNRCMRRewrite.
 
 
 (*

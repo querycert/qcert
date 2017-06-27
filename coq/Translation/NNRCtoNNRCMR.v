@@ -57,31 +57,6 @@ Section NNRCtoNNRCMR.
       This function also add to the map-reduce environment and entry
       [init] that contains the unit value.
    *)
-  Definition load_init_env' (initunit: var) (vars_loc: list (var * dlocalization)) (env: bindings) : option nrcmr_env :=
-    let mr_env :=
-        List.fold_left
-          (fun acc (x_loc: var * dlocalization) =>
-             let (x, loc) := x_loc in
-             match lookup equiv_dec env x with
-             | Some d =>
-               match loc with
-               | Vlocal => lift (fun env' => (x, Dlocal d) :: env') acc
-               | Vdistr =>
-                 match d with
-                 | dcoll coll => lift (fun env' => (x, Ddistr coll) :: env') acc
-                 | _ => None
-                 end
-               end
-             | None => None
-             end)
-          vars_loc
-          (Some nil)
-    in
-    match mr_env with
-    | Some env => Some ((initunit, Dlocal dunit) :: env)
-    | None => None
-    end.
-
   Definition load_init_env (initunit: var) (vars_loc: list (var * dlocalization)) (env: list (string*data)) : option (list (string*ddata)) :=
     let add_initunit (initunit:var) (env:list (string*ddata)) :=
         (initunit, Dlocal dunit) :: env
@@ -361,14 +336,10 @@ Section NNRCtoNNRCMR.
         simpl.
         dest_eqdec; try congruence.
         elim Hfv; clear Hfv; intros Hgv Hfv.
-        specialize (Hfv v).
+        specialize (Hfv x0).
         simpl in *.
         specialize (Hfv H2).
-        auto.
-        elim Hfv; clear Hfv; intros Hgv Hfv.
-        specialize (Hfv x0).
-        specialize (Hfv H2).
-        simpl in *. congruence.
+        specialize (c Hfv). contradiction.
       * destruct (nnrc_core_eval h empty_cenv nnrc_env n);
         simpl; try congruence.
         assert (@lookup var (@ddata (@foreign_runtime_data fruntime))

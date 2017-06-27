@@ -142,7 +142,7 @@ Section SQLTest.
     := sql_to_nraenv_top (SRunQuery q::nil).
 
   Definition sql_just_query_eval (q:sql_query)
-    := @eval_sql _ nil (SRunQuery q::nil).
+    := @eval_nraenv _ nil (sql_to_nraenv_top (SRunQuery q::nil)).
 
   (* sql1:
        select name
