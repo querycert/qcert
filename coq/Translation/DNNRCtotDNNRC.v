@@ -26,7 +26,7 @@ Section DNNRCtotDNNRC.
     Context {ftyping: foreign_typing}.
 
     Definition dnnrc_to_dnnrc_typed_top (tdenv: tdbindings) (q:dnnrc_dataframe) : option dnnrc_dataframe_typed :=
-      infer_dnnrc_type (mkConstants tdenv) q.
+      infer_dnnrc_type tdenv nil q.
 
   End Top.
   

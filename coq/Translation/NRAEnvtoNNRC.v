@@ -104,7 +104,7 @@ Section NRAEnvtoNNRC.
       let nrc1 := (nraenv_to_nnrc op1 t varenv) in
       (NNRCLet t nrc2 nrc1)
     (* [[ CENV v ]]_vid,venv = v *)
-    | NRAEnvGetConstant s => NNRCVar (append CONST_PREFIX s)
+    | NRAEnvGetConstant s => NNRCGetConstant s
     (* [[ ENV ]]_vid,venv = venv *)
     | NRAEnvEnv => NNRCVar varenv
     (* [[ op1 ◯ₑ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
@@ -179,36 +179,36 @@ Section NRAEnvtoNNRC.
     Qed.
   End negResult.
 
-  Lemma nnrc_core_eval_binop_eq h env b op1 op2 op1' op2' :
-    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
-    nnrc_core_eval h env op2 = nnrc_core_eval h env op2' ->
-    nnrc_core_eval h env (NNRCBinop b op1 op2) =
-    nnrc_core_eval h env (NNRCBinop b op1' op2').
+  Lemma nnrc_core_eval_binop_eq h cenv env b op1 op2 op1' op2' :
+    nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
+    nnrc_core_eval h cenv env op2 = nnrc_core_eval h cenv env op2' ->
+    nnrc_core_eval h cenv env (NNRCBinop b op1 op2) =
+    nnrc_core_eval h cenv env (NNRCBinop b op1' op2').
   Proof.
     intros eqq1 eqq2.
     simpl.
     rewrite eqq1, eqq2; trivial.
   Qed.
 
-  Lemma nnrc_core_eval_unop_eq h env u op1 op1' :
-    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
-    nnrc_core_eval h env (NNRCUnop u op1) =
-    nnrc_core_eval h env (NNRCUnop u op1').
+  Lemma nnrc_core_eval_unop_eq h cenv env u op1 op1' :
+    nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
+    nnrc_core_eval h cenv env (NNRCUnop u op1) =
+    nnrc_core_eval h cenv env (NNRCUnop u op1').
   Proof.
     intros eqq.
     simpl.
     rewrite eqq; trivial.
   Qed.
 
-  Lemma nnrc_core_eval_for_eq h env x op1 op2 op1' op2' :
-      nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+  Lemma nnrc_core_eval_for_eq h cenv env x op1 op2 op1' op2' :
+      nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
       (forall l,
-          nnrc_core_eval h env op1 = Some (dcoll l) ->
+          nnrc_core_eval h cenv env op1 = Some (dcoll l) ->
           forall d,
             In d l ->
-            nnrc_core_eval h  ((x,d)::env) op2 = nnrc_core_eval h  ((x,d)::env) op2') ->
-      nnrc_core_eval h env (NNRCFor x op1 op2) =
-      nnrc_core_eval h env (NNRCFor x op1' op2').
+            nnrc_core_eval h cenv ((x,d)::env) op2 = nnrc_core_eval h cenv ((x,d)::env) op2') ->
+      nnrc_core_eval h cenv env (NNRCFor x op1 op2) =
+      nnrc_core_eval h cenv env (NNRCFor x op1' op2').
   Proof.
     intros eqq1 eqq2.
     simpl.
@@ -220,12 +220,12 @@ Section NRAEnvtoNNRC.
     eauto.
   Qed.
 
-  Lemma nnrc_core_eval_if_eq h env bop bop' op1 op2 op1' op2' :
-    nnrc_core_eval h env bop = nnrc_core_eval h env bop' ->
-    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
-    nnrc_core_eval h env op2 = nnrc_core_eval h env op2' ->
-    nnrc_core_eval h env (NNRCIf bop op1 op2) =
-    nnrc_core_eval h env (NNRCIf bop' op1' op2').
+  Lemma nnrc_core_eval_if_eq h cenv env bop bop' op1 op2 op1' op2' :
+    nnrc_core_eval h cenv env bop = nnrc_core_eval h cenv env bop' ->
+    nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
+    nnrc_core_eval h cenv env op2 = nnrc_core_eval h cenv env op2' ->
+    nnrc_core_eval h cenv env (NNRCIf bop op1 op2) =
+    nnrc_core_eval h cenv env (NNRCIf bop' op1' op2').
   Proof.
     intros eqq1 eqq2 eqq3.
     simpl.
@@ -235,13 +235,13 @@ Section NRAEnvtoNNRC.
     match_destr.
   Qed.
   
-  Lemma nnrc_core_eval_let_eq h env x op1 op2 op1' op2' :
-      nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
+  Lemma nnrc_core_eval_let_eq h cenv env x op1 op2 op1' op2' :
+      nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
       (forall d,
-          nnrc_core_eval h env op1 = Some d ->
-            nnrc_core_eval h  ((x,d)::env) op2 = nnrc_core_eval h  ((x,d)::env) op2') ->
-      nnrc_core_eval h env (NNRCLet x op1 op2) =
-      nnrc_core_eval h env (NNRCLet x op1' op2').
+          nnrc_core_eval h cenv env op1 = Some d ->
+            nnrc_core_eval h cenv ((x,d)::env) op2 = nnrc_core_eval h cenv ((x,d)::env) op2') ->
+      nnrc_core_eval h cenv env (NNRCLet x op1 op2) =
+      nnrc_core_eval h cenv env (NNRCLet x op1' op2').
   Proof.
     intros eqq1 eqq2.
     simpl.
@@ -250,16 +250,16 @@ Section NRAEnvtoNNRC.
     auto.
   Qed.
 
-  Lemma nnrc_core_eval_either_eq h env x y eop eop' op1 op2 op1' op2' :
-      nnrc_core_eval h env eop = nnrc_core_eval h env eop' ->
+  Lemma nnrc_core_eval_either_eq h cenv env x y eop eop' op1 op2 op1' op2' :
+      nnrc_core_eval h cenv env eop = nnrc_core_eval h cenv env eop' ->
       (forall d,
-          nnrc_core_eval h env eop = Some (dleft d) ->
-            nnrc_core_eval h  ((x,d)::env) op1 = nnrc_core_eval h  ((x,d)::env) op1') ->
+          nnrc_core_eval h cenv env eop = Some (dleft d) ->
+            nnrc_core_eval h cenv ((x,d)::env) op1 = nnrc_core_eval h cenv ((x,d)::env) op1') ->
       (forall d,
-          nnrc_core_eval h env eop = Some (dright d) ->
-            nnrc_core_eval h  ((y,d)::env) op2 = nnrc_core_eval h  ((y,d)::env) op2') ->
-      nnrc_core_eval h env (NNRCEither eop x op1 y op2) =
-      nnrc_core_eval h env (NNRCEither eop' x op1' y op2').
+          nnrc_core_eval h cenv env eop = Some (dright d) ->
+            nnrc_core_eval h cenv ((y,d)::env) op2 = nnrc_core_eval h cenv ((y,d)::env) op2') ->
+      nnrc_core_eval h cenv env (NNRCEither eop x op1 y op2) =
+      nnrc_core_eval h cenv env (NNRCEither eop' x op1' y op2').
   Proof.
     intros eqq1 eqq2 eqq3.
     simpl.
@@ -268,14 +268,14 @@ Section NRAEnvtoNNRC.
     match_destr; auto.
   Qed.
 
-  Theorem nraenv_to_nnrc_codepaths_equivalent h env op vid venv:
-    nnrc_core_eval h env (nnrc_ext_to_nnrc (nraenv_to_nnrc op vid venv))
-    = nnrc_core_eval h env (nraenv_core_to_nnrc (nraenv_core_of_nraenv op) vid venv).
+  Theorem nraenv_to_nnrc_codepaths_equivalent h cenv env op vid venv:
+    nnrc_core_eval h cenv env (nnrc_ext_to_nnrc (nraenv_to_nnrc op vid venv))
+    = nnrc_core_eval h cenv env (nraenv_core_to_nnrc (nraenv_core_of_nraenv op) vid venv).
   Proof.
     Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq.
     Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq.
     Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq.
-    revert vid venv env; induction op; intros
+    revert vid venv cenv env; induction op; intros
     ; simpl nraenv_core_of_nraenv
     ; simpl nraenv_core_to_nnrc
     ; simpl nnrc_ext_to_nnrc
@@ -286,34 +286,24 @@ Section NRAEnvtoNNRC.
     - apply unnest_from_nraenv_and_nraenv_core_eq; auto.
   Qed.
   
-  Theorem nraenv_sem_correct (h:list (string*string)) (op:nraenv) (env:bindings) (vid venv:var) dcenv (did denv:data) :
-    prefix CONST_PREFIX vid = false ->
-    prefix CONST_PREFIX venv = false ->
+  Theorem nraenv_sem_correct (h:list (string*string)) (cenv:bindings) (op:nraenv) (env:bindings) (vid venv:var) (did denv:data) :
     vid <> venv ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants dcenv) x
-        = lookup equiv_dec (filterConstants env) x) ->
     lookup equiv_dec env vid = Some did ->
     lookup equiv_dec env venv = Some denv ->
-    @nnrc_ext_eval _ h env (nraenv_to_nnrc op vid venv) = nraenv_eval h dcenv op denv did.
+    @nnrc_ext_eval _ h cenv env (nraenv_to_nnrc op vid venv) = nraenv_eval h cenv op denv did.
   Proof.
     intros.
     unfold nnrc_ext_eval.
     unfold nraenv_eval.
     rewrite nraenv_to_nnrc_codepaths_equivalent.
-    apply nraenv_sem_correct; assumption.
+    apply nraenv_core_sem_correct; assumption.
   Qed.
 
   Lemma nraenv_to_nnrc_no_free_vars (op: nraenv):
     forall (vid venv: var),
     forall v,
       In v (nnrc_free_vars (nraenv_to_nnrc op vid venv)) ->
-      (prefix CONST_PREFIX v = true
-      (* It is also true that: *)
-      (* /\ In v (mkConstants (nraenv_constants op)) *)
-      (* but stating this requires defining nraenv_constants *)
-      )
-      \/ v = vid \/ v = venv.
+      v = vid \/ v = venv.
   Proof.
     nraenv_cases (induction op) Case.
     - Case "NRAEnvID"%string.
@@ -457,12 +447,8 @@ Section NRAEnvtoNNRC.
     - Case "NRAEnvGetConstant"%string.
       intros vid venv v.
       simpl.
-      intros [?|?]; [|intuition].
-      subst.
-      left.
-      simpl.
-      rewrite prefix_nil.
-      reflexivity.
+      intros.
+      contradiction.
     - Case "NRAEnvEnv"%string.
       simpl.
       intros vid venv v.
@@ -513,7 +499,8 @@ Section NRAEnvtoNNRC.
           rewrite in_app_iff in H.
           elim H; clear H; intros.
           auto.
-          auto.
+          simpl in H.
+          contradiction.
           apply remove_inv in H.
           elim H; clear H; intros.
           rewrite in_app_iff in H.
@@ -521,6 +508,9 @@ Section NRAEnvtoNNRC.
           auto.
           simpl in H.
           elim H; clear H; intros; auto.
+          subst.
+          congruence.
+          contradiction.
       + specialize (IHop1 ((fresh_var "tsel$" (vid :: venv :: nil))) venv v).
         clear IHop2.
         revert H IHop1.
@@ -577,15 +567,46 @@ Section NRAEnvtoNNRC.
   Qed.
 
   Section Top.
-    Definition bind_constants (einit:nnrc) (init_venv:var) (constants:list var) :=
-      fold_right (fun x acc =>
-                    NNRCLet (mkConstantName x) (NNRCUnop (ADot x) (NNRCVar init_venv))
-                            acc) einit constants.
+    (* Canned initial variable for the current value *)
+    Definition init_vid := "id"%string.
+    Definition init_venv := "env"%string.
     
-    Definition nraenv_to_nnrc_top (q:nraenv) (init_vid init_venv:var) : nnrc :=
+    Definition nraenv_to_nnrc_top (q:nraenv) : nnrc :=
       NNRCLet init_venv (NNRCConst (drec nil))
-             (NNRCLet init_vid (NNRCConst dunit)
-                     (nraenv_to_nnrc q init_vid init_venv)).
+              (NNRCLet init_vid (NNRCConst dunit)
+                       (nraenv_to_nnrc q init_vid init_venv)).
+
+    Lemma lift_nraenv_to_nnrc_top (h:list (string*string)) cenv q :
+      @nnrc_ext_eval _ h cenv nil
+                    (NNRCLet init_venv (NNRCConst (drec nil))
+                             (NNRCLet init_vid (NNRCConst dunit) q)) =
+      @nnrc_ext_eval _ h cenv ((init_vid,dunit)::(init_venv,drec nil)::nil) q.
+    Proof.
+      unfold nnrc_ext_eval; simpl.
+      reflexivity.
+    Qed.
+    
+    Theorem nraenv_core_to_nnrc_core_top_correct
+            (h:list (string*string)) (q:nraenv) (env:bindings) :
+      nnrc_eval_top h (nraenv_to_nnrc_top q) env = nraenv_eval_top h q env.
+    Proof.
+      intros.
+      unfold nnrc_eval_top.
+      unfold nraenv_eval_top.
+      unfold nraenv_to_nnrc_top.
+      simpl.
+      rewrite lift_nraenv_to_nnrc_top.
+      rewrite (nraenv_sem_correct h (rec_sort env) q
+                                  ((init_vid,dunit)::(init_venv,drec nil)::nil)
+                                  init_vid
+                                  init_venv
+                                  dunit
+                                  (drec nil)); try reflexivity.
+      unfold not; intros.
+      unfold init_vid, init_venv in *.
+      congruence.
+    Qed.
+
   End Top.
   
   (** Lemma and proof of linear size translation *)

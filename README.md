@@ -97,17 +97,17 @@ Once the compiler is built, it can be used to compile queries. The
 Query Language) syntax. For instance:
 
 ```
-$ cat samples/oql/test1.oql 
+$ cat samples/oql/persons1.oql 
 select p
-from p in Persons
-where p.age = 32
+from p in Customers
+where p->age = 32
 ```
 
 Calling the compiler on that sample with OQL as source language and
 Javascript as target language can be done as follows:
 
 ```
-$ ./bin/qcert -source oql -target js samples/oql/test1.oql
+$ ./bin/qcert -source oql -target js samples/oql/persons1.oql
 ```
 
 This will tell you the compilation steps being used:
@@ -117,15 +117,15 @@ Compiling from oql to js:
   oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
 ```
 
-and produce a javascript file called `samples/oql/test1.js`.
+and produce a javascript file called `samples/oql/persons1.js`.
 
 Similarly for Java:
 
 ```
-$ ./bin/qcert -source oql -target java samples/oql/test1.oql
+$ ./bin/qcert -source oql -target java samples/oql/persons1.oql
 ```
 
-This will produce a java file called `samples/oql/test1.java`.
+This will produce a java file called `samples/oql/persons1.java`.
 
 ## Run compiled queries
 
@@ -176,15 +176,15 @@ and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
 ```
-java -cp bin testing.runners.RunJavascript \
-     -input data/persons.json \
+java -cp bin:../lib/gson-2.7.jar testing.runners.RunJavascript \
+     -input oql/persons.input \
 	 -runtime ../runtime/javascript/qcert-runtime.js \
-	 oql/test1.js
+	 oql/persons1.js
 ```
 
 The input data in [`data/persons.json`](./samples/data/persons.json)
 contains a collection of persons and a collection of companies in JSON
-format and can be used for all the tests. If you run test1, it should
+format and can be used for all the tests. If you run persons1, it should
 return all persons whose age is 32:
 
 ```
@@ -197,7 +197,7 @@ Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
 can compile and run a given test for you:
 
 ```
-make run_js_test1
+make run_js_persons1
 ```
 ### Run queries compiled to Java
 
@@ -213,22 +213,22 @@ query. From the command line, you can do it as follows, first to
 compile the Java code:
 
 ```
-javac -cp bin:../runtime/java/bin:../lib/gson-2.7.jar oql/test1.java
+javac -cp bin:../runtime/java/bin:../lib/gson-2.7.jar oql/persons1.java
 ```
 
 Then to run the compiled Class:
 
 ```
 java -cp bin:../runtime/java/bin:../lib/gson-2.7.jar:oql testing.runners.RunJava \
-     -input data/persons.json \
-	 test1
+     -input oql/persons.input \
+	 persons1
 ```
 
 Alternatively the provided [`./samples/Makefile`](./samples/Makefile)
 can compile and run a given test for you:
 
 ```
-make run_java_test1
+make run_java_persons1
 ```
 
 ## Spark Dataset backend

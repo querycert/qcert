@@ -57,6 +57,7 @@ MODULES = \
 	Basic/Data/DDataNorm \
 	Basic/Env/RConstants \
 	Basic/Env/DConstants \
+	Basic/Env/RVar \
 	Basic/Operators/RUtilOps \
 	Basic/Operators/ForeignOps \
 	Basic/Operators/RUnaryOps \

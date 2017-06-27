@@ -234,9 +234,11 @@ Section NNRCMR.
     := mr_chain_causally_consistent mrl.(mr_chain).
 
   Definition function_with_no_free_vars (f: var * nnrc) :=
+    (nnrc_global_vars (snd f) = nil) /\
     (forall (x: var), In x (nnrc_free_vars (snd f)) -> x = fst f).
 
   Definition function2_with_no_free_vars (f: (var * var) * nnrc) :=
+    (nnrc_global_vars (snd f) = nil) /\
     (fst (fst f)) <> (snd (fst f)) /\
     (forall x, In x (nnrc_free_vars (snd f)) -> x = (fst (fst f)) \/ x = (snd (fst f))).
 
@@ -303,6 +305,9 @@ Section NNRCMR.
 
   Context (h:brand_relation_t).
 
+  Definition empty_dcenv : dbindings := nil.
+  Definition empty_cenv : bindings := nil.
+  
   (** ** Map *)
   
   (********************
@@ -315,7 +320,7 @@ Section NNRCMR.
     | MapDist f =>
       let f_map (d:data) : option data :=
           let (doc, body) := f in
-          nnrc_core_eval h ((doc,d)::nil) body
+          nnrc_core_eval h empty_cenv ((doc,d)::nil) body
       in
       match input_d with
       | Ddistr coll =>
@@ -325,7 +330,7 @@ Section NNRCMR.
     | MapDistFlatten f =>
       let f_map (d:data) : option data :=
           let (doc, body) := f in
-          nnrc_core_eval h ((doc,d)::nil) body
+          nnrc_core_eval h empty_cenv ((doc,d)::nil) body
       in
       match input_d with
       | Ddistr coll =>
@@ -336,7 +341,7 @@ Section NNRCMR.
     | MapScalar f =>
       let f_map (d:data) : option data :=
           let (doc, body) := f in
-          nnrc_core_eval h ((doc,d)::nil) body
+          nnrc_core_eval h empty_cenv ((doc,d)::nil) body
       in
       match input_d with
       | Ddistr coll => None
@@ -367,7 +372,7 @@ Section NNRCMR.
     | RedId => Some (Ddistr values_v)
     | RedCollect f =>
       let (values_arg, body) := f in
-      let v := nnrc_core_eval h ((values_arg, dcoll values_v) :: nil) body in
+      let v := nnrc_core_eval h empty_cenv ((values_arg, dcoll values_v) :: nil) body in
       lift (fun res => Dlocal res) v
     | RedOp op =>
       lift (fun res => Dlocal res) (reduce_op_eval op values_v)
@@ -464,7 +469,7 @@ Section NNRCMR.
     let (params, n) := fst mr_last in
     let args := snd mr_last in
     let nnrc_env := build_nnrc_env mr_env params args in
-    olift (fun env => nnrc_core_eval h env n) nnrc_env.
+    olift (fun env => nnrc_core_eval h empty_cenv env n) nnrc_env.
 
   Definition nnrcmr_eval (env:nrcmr_env) (mrl:nnrcmr) : option data :=
     match mr_chain_eval env mrl.(mr_chain) with
@@ -760,7 +765,7 @@ Section NNRCMR.
         get_mr_chain_result (mr_chain_eval h env (l ++ mr::nil)) = Some (normalize_data h res) ->
         (exists pre_res, snd (mr_chain_lazy_eval h env l) = Some pre_res) ->
         snd (mr_chain_lazy_eval h env (l ++ mr::nil)) = None ->
-        olift (fun n => nnrc_core_eval h nil n) (mr_reduce_empty mr) = Some (normalize_data h res).
+        olift (fun n => nnrc_core_eval h empty_cenv nil n) (mr_reduce_empty mr) = Some (normalize_data h res).
     Proof.
       induction l.
       - Case "l = nil"%string.
@@ -814,17 +819,17 @@ Section NNRCMR.
             SSSCase "RedCollect"%string. {
               simpl in *.
               destruct p; simpl in *.
-              assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                      nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+              assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                      nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                 [ | rewrite Heq in *; clear Heq ]. {
-                rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                 try reflexivity.
                 simpl.
                 unfold disjoint.
                 simpl; intros;
                 congruence.
               }
-              destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+              destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -925,17 +930,17 @@ Section NNRCMR.
               SSSSCase "RedCollect"%string. {
                 simpl in *.
                 destruct p0; simpl in *.
-                assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                        nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+                assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                        nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                   [ | rewrite Heq in *; clear Heq ]. {
-                  rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                  rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                   try reflexivity.
                   simpl.
                   unfold disjoint.
                   simpl; intros;
                   congruence.
                 }
-              destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+              destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -1027,17 +1032,17 @@ Section NNRCMR.
               SSSSCase "RedCollect"%string. {
                 simpl in *.
                 destruct p0; simpl in *.
-                assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                        nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+                assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                        nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                   [ | rewrite Heq in *; clear Heq ]. {
-                  rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                  rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                   try reflexivity.
                   simpl.
                   unfold disjoint.
                   simpl; intros;
                   congruence.
                 }
-                destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+                destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
@@ -1138,17 +1143,17 @@ Section NNRCMR.
             SSSSCase "RedCollect"%string. {
               simpl in *.
               destruct p; simpl in *.
-              assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                      nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+              assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                      nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                 [ | rewrite Heq in *; clear Heq ]. {
-                rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                 try reflexivity.
                 simpl.
                 unfold disjoint.
                 simpl; intros;
                 congruence.
               }
-              destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+              destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -1409,6 +1414,7 @@ Section NNRCMR.
 
     Lemma id_function_no_free_vars: function_with_no_free_vars id_function.
     Proof.
+      split; [reflexivity| ].
       intros x.
       unfold id_function.
       simpl.
@@ -1424,6 +1430,7 @@ Section NNRCMR.
 
     Lemma coll_function_no_free_vars: function_with_no_free_vars coll_function.
     Proof.
+      split; [reflexivity| ].
       intros x.
       unfold coll_function.
       simpl.
@@ -1439,6 +1446,7 @@ Section NNRCMR.
 
     Lemma constant_function_no_free_vars (d:data): function_with_no_free_vars (constant_function d).
     Proof.
+      split; [reflexivity| ].
       intros x.
       unfold constant_function.
       contradiction.

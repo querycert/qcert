@@ -142,40 +142,55 @@ Section CompDriver.
 
   Section translations.
     (** Source languages translations *)
-    Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.oql_to_nraenv_top q.
+    Definition oql_to_nraenv (q:oql) : nraenv :=
+      OQLtoNRAEnv.oql_to_nraenv_top q.
 
-    Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv_top q.
+    Definition sql_to_nraenv (q:sql) : nraenv :=
+      SQLtoNRAEnv.sql_to_nraenv_top q.
 
-    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := LambdaNRAtoNRAEnv.lambda_nra_to_nraenv_top q.
+    Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv :=
+      LambdaNRAtoNRAEnv.lambda_nra_to_nraenv_top q.
 
     (** Rules and CAMP translations *)
-    Definition camp_rule_to_camp (q:camp_rule) : camp := CAMPRuletoCAMP.camp_rule_to_camp_top q.
+    Definition camp_rule_to_camp (q:camp_rule) : camp :=
+      CAMPRuletoCAMP.camp_rule_to_camp_top q.
 
-    Definition tech_rule_to_camp_rule (q:tech_rule) : camp_rule := TechRuletoCAMPRule.tech_rule_to_camp_rule_top q.
+    Definition tech_rule_to_camp_rule (q:tech_rule) : camp_rule :=
+      TechRuletoCAMPRule.tech_rule_to_camp_rule_top q.
 
-    Definition designer_rule_to_camp_rule (q:designer_rule) : camp_rule := DesignRuletoCAMPRule.designer_rule_to_camp_rule_top q.
+    Definition designer_rule_to_camp_rule (q:designer_rule) : camp_rule :=
+      DesignRuletoCAMPRule.designer_rule_to_camp_rule_top q.
 
-    Definition camp_to_nra (q:camp) : nra := CAMPtoNRA.camp_to_nra_top q.
+    Definition camp_to_nra (q:camp) : nra :=
+      CAMPtoNRA.camp_to_nra_top q.
 
-    Definition camp_to_nraenv_core (q:camp) : nraenv_core := CAMPtocNRAEnv.camp_to_nraenv_core_top q.
+    Definition camp_to_nraenv_core (q:camp) : nraenv_core :=
+      CAMPtocNRAEnv.camp_to_nraenv_core_top q.
 
-    Definition camp_to_nraenv (q:camp) : nraenv := CAMPtoNRAEnv.camp_to_nraenv_top q.
+    Definition camp_to_nraenv (q:camp) : nraenv :=
+      CAMPtoNRAEnv.camp_to_nraenv_top q.
 
     (** NRA/NRAEnv translations *)
-    Definition nra_to_nraenv_core (q: nra) : nraenv_core := NRAtocNRAEnv.nra_to_nraenv_core_top q.
+    Definition nra_to_nraenv_core (q: nra) : nraenv_core :=
+      NRAtocNRAEnv.nra_to_nraenv_core_top q.
 
-    Definition nra_to_nnrc_core (q: nra) : nnrc_core := NRAtocNNRC.nra_to_nnrc_core_top q.
+    Definition nra_to_nnrc_core (q: nra) : nnrc_core :=
+      NRAtocNNRC.nra_to_nnrc_core_top q.
 
     Definition nraenv_core_to_nnrc_core (q: nraenv_core) : nnrc_core :=
-      nraenv_core_to_nnrc_core_top init_vid init_venv q.
+      cNRAEnvtocNNRC.nraenv_core_to_nnrc_core_top q.
 
-    Definition nraenv_core_to_nra (q: nraenv_core) : nra := cNRAEnvtoNRA.nraenv_core_to_nra_top q.
+    Definition nraenv_core_to_nra (q: nraenv_core) : nra :=
+      cNRAEnvtoNRA.nraenv_core_to_nra_top q.
 
-    Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv := nraenv_of_nraenv_core q.
+    Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv :=
+      nraenv_of_nraenv_core q.
 
-    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core := nraenv_core_of_nraenv q.
+    Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core :=
+      nraenv_core_of_nraenv q.
 
-    Definition nraenv_to_nnrc (q: nraenv) : nnrc := nraenv_to_nnrc_top q init_vid init_venv.
+    Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
+      nraenv_to_nnrc_top q.
 
     (** NNRC translations *)
     Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core := nnrc_to_nnrc_core q.
@@ -189,7 +204,7 @@ Section CompDriver.
       nnrc_to_nnrcmr_top vinit inputs_loc q.
 
     Definition nnrc_to_dnnrc (inputs_loc: vdbindings) (q: nnrc) : dnnrc :=
-      nnrc_to_dnnrc tt inputs_loc q.
+      nnrc_to_dnnrc_top inputs_loc q.
 
     Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
       lift_nnrc_core nnrc_to_js_top (nnrc_to_nnrc_core q).
@@ -230,7 +245,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_to_spark_df
                (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
-      @dnnrcToSpark2Top _ _ bm _ _ unit (mkConstants tenv) name q.
+      @dnnrcToSpark2Top _ _ bm _ _ unit tenv name q.
 
   End translations.
 

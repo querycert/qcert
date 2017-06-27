@@ -17,7 +17,6 @@
 (** This module contains some additional properties for extended operators in NNRC. Some of those are notably useful later on for proving translations from NRAEnv. *)
 
 Section NNRCSugar.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
@@ -222,18 +221,18 @@ Section NNRCSugar.
 
   (** The following states that the principal definition for group by and this alternative are equivalent. *)
   
-  Lemma nnrc_core_eval_group_by_eq env (g:string) (sl:list string) (e1 e2:nnrc):
-    nnrc_core_eval h env e1 = nnrc_core_eval h env e2 ->
+  Lemma nnrc_core_eval_group_by_eq {cenv} env (g:string) (sl:list string) (e1 e2:nnrc):
+    nnrc_core_eval h cenv env e1 = nnrc_core_eval h cenv env e2 ->
     forall vid venv,
-      nnrc_core_eval h env (nnrc_group_by g sl e1)
-      = nnrc_core_eval h env (nnrc_group_by_from_nraenv vid venv g sl e2).
+      nnrc_core_eval h cenv env (nnrc_group_by g sl e1)
+      = nnrc_core_eval h cenv env (nnrc_group_by_from_nraenv vid venv g sl e2).
   Proof.
     intro Heval; intros.
     unfold nnrc_group_by, nnrc_group_by_from_nraenv.
     Opaque fresh_var.
     simpl.
     rewrite <- Heval; clear Heval.
-    destruct (nnrc_core_eval h env e1); [|reflexivity]; simpl; clear e1 e2.
+    destruct (nnrc_core_eval h cenv env e1); [|reflexivity]; simpl; clear e1 e2.
     generalize (fresh_var "tappe$" (vid :: venv :: nil)); intro v0.
     destruct (equiv_dec v0 v0); try congruence.
     destruct d; try reflexivity; simpl.
@@ -339,16 +338,16 @@ Section NNRCSugar.
                                                             (fresh_var "tmc$" (vid :: venv :: nil) :: vid :: venv :: nil)))))))
              (NNRCUnop (ARecRemove a) (NNRCVar (fresh_var "tmap$" (vid :: venv :: nil))))).
 
-  Lemma unnest_from_nraenv_and_nraenv_core_eq vid venv env a b op1 op1' :
-    nnrc_core_eval h env op1 = nnrc_core_eval h env op1' ->
-    nnrc_core_eval h env (unnest_from_nraenv vid venv a b op1) =
-    nnrc_core_eval h env (unnest_from_nraenv_core vid venv a b op1').
+  Lemma unnest_from_nraenv_and_nraenv_core_eq {cenv} vid venv env a b op1 op1' :
+    nnrc_core_eval h cenv env op1 = nnrc_core_eval h cenv env op1' ->
+    nnrc_core_eval h cenv env (unnest_from_nraenv vid venv a b op1) =
+    nnrc_core_eval h cenv env (unnest_from_nraenv_core vid venv a b op1').
   Proof.
     intros Hind.
     Opaque fresh_var.
     simpl.
     rewrite Hind; clear Hind.
-    destruct (nnrc_core_eval h env op1'); try reflexivity; simpl.
+    destruct (nnrc_core_eval h cenv env op1'); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     destruct (equiv_dec (fresh_var "tmap$" (vid :: venv :: nil))
                         (fresh_var "tmap$" (vid :: venv :: nil))); try congruence.

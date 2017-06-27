@@ -27,6 +27,7 @@ Section size.
   
   Fixpoint dnnrc_size (d:@dnnrc _ A plug_type)
     := match d with
+       | DNNRCGetConstant _ _ => 1
        | DNNRCVar _ _ => 1
        | DNNRCConst _ _ => 1
        | DNNRCBinop _ _ d1 d2 => S (dnnrc_size d1 + dnnrc_size d2)

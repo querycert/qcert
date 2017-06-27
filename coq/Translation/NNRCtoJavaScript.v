@@ -252,6 +252,7 @@ Section NNRCtoJavaScript.
         * string                          (* JavaScript expression holding result *)
         * nat                             (* next available unused temporary *)
       := match n with
+         | NNRCGetConstant v => ("", "v" ++ v, t)
          | NNRCVar v =>
            match assoc_lookupr equiv_dec ivs v with
            | Some v_string => ("", v_string, t)
@@ -423,13 +424,12 @@ Section NNRCtoJavaScript.
     (* Free variables are assumed to be constant lookups *)
     (* Java equivalent: JavaScriptBackend.closeFreeVars *)
     Definition closeFreeVars (input:string) (e:nnrc) (params:list string) : nnrc :=
-      let all_free_vars := nnrc_free_vars e in
+      let all_free_vars := nnrc_global_vars e in
       let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (in_dec string_dec fv params)
           then e'
           else
-            let unconsted_fv := unConstVar fv in (* Removes CONST$ prefix added during compilation for consistency with external specification *)
-            (NNRCLet fv (NNRCUnop (ADot unconsted_fv) (NNRCVar input)) e')
+            (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
 

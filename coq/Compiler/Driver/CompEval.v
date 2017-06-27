@@ -123,19 +123,16 @@ Section CompEval.
       := nraenv_eval_top h q cenv.
 
     (* Language: nnrc_core *)
-    (* Note: eval_nnrc_core assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_nnrc_core (q:nnrc_core) (cenv: bindings) : option data
       := nnrc_core_eval_top h q cenv.
 
     (* Language: nnrc *)
-    (* Note: eval_nnrc assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_nnrc (q:nnrc) (cenv: bindings) : option data
       := nnrc_eval_top h q cenv.
 
     (* Language: nnrcmr *)
-    (* Note: eval_nnrcmr assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_nnrcmr (q:nnrcmr) (cenv: bindings) : option data
-      := let cenv := mkConstants (rec_sort cenv) in
+      := let cenv := rec_sort cenv in
          (* Note: localize_bindings turns all variables distributed! *)
          let loc_cenv := mkDistLocs cenv in
          match load_init_env init_vinit loc_cenv cenv with
@@ -144,7 +141,6 @@ Section CompEval.
          end.
 
     (* Language: cldmr *)
-    (* Note: eval_cldmr assumes constant environment has been prefixed with 'CONST$' *)
     Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data
       := cldmr_eval_top h init_vinit q cenv.
 
@@ -153,10 +149,10 @@ Section CompEval.
 
     Definition eval_dnnrc
                (q:dnnrc) (cenv: bindings) : option data :=
-      let cenv := mkConstants (rec_sort cenv) in
+      let cenv := rec_sort cenv in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h SparkIRPlug cenv q)
+      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h cenv SparkIRPlug nil q)
       | None => None
       end.
 
@@ -164,10 +160,10 @@ Section CompEval.
 
     Definition eval_dnnrc_typed
                (q:dnnrc_typed) (cenv: bindings) : option data :=
-      let cenv := mkConstants (rec_sort cenv) in
+      let cenv := rec_sort cenv in
       let loc_cenv := mkDistLocs (rec_sort cenv) in
       match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h SparkIRPlug cenv q)
+      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h cenv SparkIRPlug nil q)
       | None => None
       end.
 

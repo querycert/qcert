@@ -36,6 +36,8 @@ Section CAMPRuletoCAMP.
           camp_eval_top h (camp_rule_to_camp_top q) global_env.
     Proof.
       intros.
+      unfold camp_rule_eval_top.
+      unfold camp_eval_top.
       reflexivity.
     Qed.
   End Top.

@@ -35,20 +35,18 @@ targets. *)
 - translating from NNRC: cNNRC, NNRCMR, DNNRC, Java, JavaScript *)
 
 Section NNRC.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import Arith Max.
-
+  Require Import Arith.
+  Require Import Max.
   Require Import Bool.
-
   Require Import Peano_dec.
-  Require Import EquivDec Decidable.
-
-  Require Import Utils BasicRuntime.
+  Require Import EquivDec.
+  Require Import Decidable.
+  Require Import BasicRuntime.
   Require Import cNNRCRuntime.
 
   Context {fruntime:foreign_runtime}.
@@ -102,13 +100,13 @@ Section NNRC.
 
     (** This definition is equivalent to a nested evaluation group by algorithm. *)
     
-    Lemma nnrc_group_by_correct env
+    Lemma nnrc_group_by_correct cenv env
           (g:string) (sl:list string)
           (e:nnrc)
           (incoll outcoll:list data):
-      nnrc_core_eval h env e = Some (dcoll incoll) ->
+      nnrc_core_eval h cenv env e = Some (dcoll incoll) ->
       group_by_nested_eval_table g sl incoll = Some outcoll -> 
-      nnrc_core_eval h env (nnrc_group_by g sl e) = Some (dcoll outcoll).
+      nnrc_core_eval h cenv env (nnrc_group_by g sl e) = Some (dcoll outcoll).
     Proof.
       intros.
       unfold nnrc_group_by; simpl.
@@ -122,9 +120,11 @@ Section NNRC.
 
   Section Semantics.
     Context {h:brand_relation_t}.
+    Context {cenv:bindings}.
 
     Fixpoint nnrc_ext_to_nnrc (e:nnrc) : nnrc :=
       match e with
+      | NNRCGetConstant v => NNRCGetConstant v
       | NNRCVar v => NNRCVar v
       | NNRCConst d => NNRCConst d
       | NNRCBinop b e1 e2 =>
@@ -144,11 +144,11 @@ Section NNRC.
       end.
 
     Definition nnrc_ext_eval (env:bindings) (e:nnrc) : option data :=
-      nnrc_core_eval h env (nnrc_ext_to_nnrc e).
-      
+      nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e).
+
     Remark nnrc_ext_to_nnrc_eq (e:nnrc):
       forall env,
-        nnrc_ext_eval env e = nnrc_core_eval h env (nnrc_ext_to_nnrc e).
+        nnrc_ext_eval env e = nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e).
     Proof.
       intros; reflexivity.
     Qed.
@@ -179,6 +179,7 @@ Section NNRC.
     Proof.
       intros.
       induction e; simpl in *.
+      - reflexivity.
       - reflexivity.
       - reflexivity.
       - elim H; intros.
@@ -217,7 +218,7 @@ Section NNRC.
     Remark nnrc_to_nnrc_ext_eq (e:nnrc):
       nnrcIsCore e ->
       forall env,
-        nnrc_core_eval h env e = nnrc_ext_eval env e.
+        nnrc_core_eval h cenv env e = nnrc_ext_eval env e.
     Proof.
       intros.
       unfold nnrc_ext_eval.
@@ -233,7 +234,7 @@ Section NNRC.
       generalize nnrc_core_eval_lookup_equiv_prop; intros.
       unfold Proper, respectful, lookup_equiv in *; intros; subst.
       unfold nnrc_ext_eval.
-      rewrite (H h x y H0 (nnrc_ext_to_nnrc y0) (nnrc_ext_to_nnrc y0)).
+      rewrite (H h cenv x y H0 (nnrc_ext_to_nnrc y0) (nnrc_ext_to_nnrc y0)).
       reflexivity.
       reflexivity.
     Qed.
@@ -266,6 +267,7 @@ Section NNRC.
       In x (nnrc_bound_vars e) -> In x (nnrc_bound_vars (nnrc_ext_to_nnrc e)).
     Proof.
       induction e; simpl; unfold not in *; intros.
+      - auto.
       - auto.
       - auto.
       - intuition.
@@ -363,6 +365,7 @@ Section NNRC.
       nnrc_ext_to_nnrc (nnrc_rename_lazy e v1 v2).
     Proof.
       induction e; unfold nnrc_rename_lazy in *; simpl; try reflexivity.
+      - destruct (equiv_dec v1 v2); reflexivity.
       - destruct (equiv_dec v1 v2); try reflexivity.
         destruct (equiv_dec v v1); try reflexivity.
       - destruct (equiv_dec v1 v2); reflexivity.
@@ -429,11 +432,11 @@ Section NNRC.
       apply nnrc_ext_to_nnrc_is_core.
     Qed.
 
-    Lemma nnrc_ext_eval_cons_subst e env v x v' :
+    Lemma nnrc_ext_eval_cons_subst {cenv} e env v x v' :
       ~ (In v' (nnrc_free_vars e)) ->
       ~ (In v' (nnrc_bound_vars e)) ->
-      @nnrc_ext_eval h ((v',x)::env) (nnrc_subst e v (NNRCVar v')) = 
-      @nnrc_ext_eval h ((v,x)::env) e.
+      @nnrc_ext_eval h cenv ((v',x)::env) (nnrc_subst e v (NNRCVar v')) = 
+      @nnrc_ext_eval h cenv ((v,x)::env) e.
     Proof.
       revert env v x v'.
       nnrc_cases (induction e) Case; simpl; unfold equiv_dec;
@@ -448,40 +451,40 @@ Section NNRC.
         rewrite nin_app_or in H. f_equal; intuition.
       - f_equal; intuition.
       - rewrite nin_app_or in H. rewrite IHe1 by intuition.
-        case_eq (nnrc_core_eval h ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
+        case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
         destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
-        + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 d nil); 
+        + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 d nil); 
             simpl; intros rr1; rewrite rr1.
           destruct (string_eqdec v0 v'); unfold Equivalence.equiv in *; subst.
-          * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v' d nil); 
+          * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v' d nil); 
               simpl; auto.
-          * generalize (@nnrc_core_eval_remove_free_env _ h ((v0,d)::nil)); 
+          * generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v0,d)::nil)); 
               simpl; intros rr2; apply rr2. intuition.
             elim H3. apply remove_in_neq; auto.
             rewrite nnrc_ext_to_nnrc_free_vars_same; auto.
         + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
-          generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl; intros rr2; 
+          generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d); simpl; intros rr2; 
             repeat rewrite rr2 by trivial.
           apply IHe2.
           * intros nin; intuition. elim H2; apply remove_in_neq; auto.
           * intuition.
       - rewrite nin_app_or in H. rewrite IHe1 by intuition.
-        case_eq (nnrc_core_eval h ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
+        case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
         destruct d; trivial.
         f_equal.
         apply rmap_ext; intros.
         destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
-        + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 x0 nil); 
+        + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 x0 nil); 
             simpl; intros rr1; rewrite rr1.
           destruct (string_eqdec v0 v'); unfold Equivalence.equiv in *; subst.
-          * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v' x0 nil); 
+          * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v' x0 nil); 
               simpl; auto.
-          * generalize (@nnrc_core_eval_remove_free_env _ h ((v0,x0)::nil)); 
+          * generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v0,x0)::nil)); 
               simpl; intros rr2; apply rr2. intuition.
             elim H4. apply remove_in_neq; auto.
             rewrite nnrc_ext_to_nnrc_free_vars_same; auto.
         + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
-          generalize (@nnrc_core_eval_swap_neq _ h nil v x0); simpl; intros rr2; 
+          generalize (@nnrc_core_eval_swap_neq _ h cenv nil v x0); simpl; intros rr2; 
             repeat rewrite rr2 by trivial.
           apply IHe2.
           * intros nin; intuition. elim H3; apply remove_in_neq; auto.
@@ -498,21 +501,21 @@ Section NNRC.
         repeat rewrite <- remove_in_neq in H by congruence.
         match_destr. destruct d; trivial.
         + match_destr; unfold Equivalence.equiv in *; subst.
-          * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
+          * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v1 d nil); simpl;
               intros re2; rewrite re2 by trivial.
-            generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
+            generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v1,d)::nil)); 
               simpl; intros re3. rewrite re3. intuition.
             rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
-          * generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl;
+          * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d); simpl;
               intros re1; repeat rewrite re1 by trivial.
             rewrite IHe2; intuition.
         + match_destr; unfold Equivalence.equiv in *; subst.
-          * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
+          * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v1 d nil); simpl;
               intros re2; rewrite re2 by trivial.
-            generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
+            generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v1,d)::nil)); 
               simpl; intros re3. rewrite re3. intuition.
             rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
-          * generalize (@nnrc_core_eval_swap_neq _ h nil v0 d); simpl;
+          * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v0 d); simpl;
               intros re1; repeat rewrite re1 by trivial.
             rewrite IHe3; intuition.
       - rewrite IHe; try assumption.
@@ -530,7 +533,7 @@ Section NNRC.
   Section Top.
     Context (h:brand_relation_t).
     Definition nnrc_eval_top (q:nnrc) (cenv:bindings) : option data :=
-      @nnrc_ext_eval h (rec_sort (mkConstants cenv)) q.
+      @nnrc_ext_eval h (rec_sort cenv) nil q.
   End Top.
   
 End NNRC.

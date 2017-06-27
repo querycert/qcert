@@ -83,7 +83,7 @@ Section NRewMR.
     is_flatten_function (x,n) = true ->
     forall d,
       lookup equiv_dec env x = Some d ->
-      (nnrc_core_eval h env n) = lift_oncoll (fun l => (lift dcoll (rflatten l))) d.
+      (nnrc_core_eval h empty_cenv env n) = lift_oncoll (fun l => (lift dcoll (rflatten l))) d.
   Proof.
     intros Hfun d Henv.
     simpl in *.
@@ -394,8 +394,8 @@ Section NRewMR.
     repeat dest_eqdec; try congruence.
     simpl.
     clear e0 e H H1 H2 Hred'.
-    assert (nnrc_core_eval h ((v, dcoll coll) :: (v, dcoll (dcoll coll :: nil)) :: nil) n2 =
-            nnrc_core_eval h ((v, dcoll coll) :: nil) n2) as Heq;
+    assert (nnrc_core_eval h empty_cenv ((v, dcoll coll) :: (v, dcoll (dcoll coll :: nil)) :: nil) n2 =
+            nnrc_core_eval h empty_cenv ((v, dcoll coll) :: nil) n2) as Heq;
       [ | rewrite <- Heq; reflexivity ].
     apply nnrc_core_eval_equiv_free_in_env.
     intros x Hx.
@@ -667,7 +667,7 @@ Section NRewMR.
       destruct
         (rmap
            (fun d0 : data =>
-              let (doc, body) := p in nnrc_core_eval h ((doc, d0) :: nil) body) l);
+              let (doc, body) := p in nnrc_core_eval h empty_cenv ((doc, d0) :: nil) body) l);
         simpl; try reflexivity.
       destruct (rflatten l0);
         simpl; try reflexivity.
@@ -682,7 +682,7 @@ Section NRewMR.
       destruct
         (rmap
            (fun d : data =>
-              let (doc, body) := p in nnrc_core_eval h ((doc, d) :: nil) body) l);
+              let (doc, body) := p in nnrc_core_eval h empty_cenv ((doc, d) :: nil) body) l);
         simpl; try reflexivity.
       destruct (@equiv_dec string (@eq string) (@eq_equivalence string) string_eqdec v1 v);
       [ | unfold equiv_decb in *;
@@ -1072,7 +1072,7 @@ Section NRewMR.
     dest_eqdec; try congruence; simpl.
     destruct (rmap
                  (fun d : data =>
-                  let (doc, body) := p in nnrc_core_eval h ((doc, d) :: nil) body)
+                  let (doc, body) := p in nnrc_core_eval h empty_cenv ((doc, d) :: nil) body)
                  l);
       simpl in *; try congruence.
     rewrite (id_reduce_correct _ _ Hmr1_red_is_id).
@@ -1144,27 +1144,23 @@ Section NRewMR.
     simpl in *.
     destruct loc_d; simpl in *; try contradiction.
     dest_eqdec; try congruence; simpl.
-    destruct (nnrc_core_eval h ((v, d) :: nil) n); simpl; try congruence.
+    destruct (nnrc_core_eval h empty_cenv ((v, d) :: nil) n); simpl; try congruence.
     rewrite (singleton_reduce_correct _ _ Hmr1_red_is_singleton).
     simpl.
     repeat dest_eqdec; try congruence; simpl.
     unfold equiv_decb in *;
       repeat dest_eqdec; try congruence; simpl.
-    assert (@nnrc_core_eval fruntime h
-               (@cons
-                  (prod cNNRC.var (@data (@foreign_runtime_data fruntime)))
-                  (@pair cNNRC.var (@data (@foreign_runtime_data fruntime))
-                     v0 d0)
-                  (@cons
-                     (prod var (@data (@foreign_runtime_data fruntime)))
-                     (@pair var (@data (@foreign_runtime_data fruntime)) v
-                        d)
-                     (@nil
-                        (prod var (@data (@foreign_runtime_data fruntime))))))
-               n0 = nnrc_core_eval h ((v0, d0) :: (v, d) :: nil) n0) by reflexivity.
+    Set Printing All.
+    idtac.
+    assert (@nnrc_core_eval fruntime h (@empty_cenv fruntime)
+               (@cons (prod RVar.var (@data (@foreign_runtime_data fruntime)))
+                  (@pair RVar.var (@data (@foreign_runtime_data fruntime)) v0 d0)
+                  (@cons (prod var (@data (@foreign_runtime_data fruntime)))
+                     (@pair var (@data (@foreign_runtime_data fruntime)) v d)
+                     (@nil (prod var (@data (@foreign_runtime_data fruntime)))))) n0 = nnrc_core_eval h empty_cenv ((v0, d0) :: (v, d) :: nil) n0) by reflexivity.
     rewrite H in *; clear H.
-    assert (nnrc_core_eval h ((v0, d0) :: nil) n0 =
-            nnrc_core_eval h ((v0, d0) :: (v, d) :: nil) n0) as Heq;
+    assert (nnrc_core_eval h empty_cenv ((v0, d0) :: nil) n0 =
+            nnrc_core_eval h empty_cenv ((v0, d0) :: (v, d) :: nil) n0) as Heq;
       [ | rewrite Heq; clear Heq ].
     - apply nnrc_core_eval_equiv_free_in_env.
       intros x Hx.
@@ -1176,7 +1172,7 @@ Section NRewMR.
       simpl in *.
       apply Hmr2_map_wf.
       assumption.
-    - destruct (nnrc_core_eval h ((v0, d0) :: (v, d) :: nil) n0); simpl; try congruence.
+    - destruct (nnrc_core_eval h empty_cenv ((v0, d0) :: (v, d) :: nil) n0); simpl; try congruence.
       destruct (olift (mr_reduce_eval h (mr_reduce mr2))); simpl; try congruence.
       unfold merge_env; simpl.
       repeat dest_eqdec; try congruence; simpl.

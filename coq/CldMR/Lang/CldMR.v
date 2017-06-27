@@ -278,7 +278,7 @@ Section CldMR.
     fun coll =>
       let f_map (d:data*data) :=
           let '(k, v) := d in
-          match nnrc_core_eval h ((doc,v)::nil) body with
+          match nnrc_core_eval h empty_cenv ((doc,v)::nil) body with
           | None => None
           | Some res => Some (k, res)
           end
@@ -289,7 +289,7 @@ Section CldMR.
     fun coll =>
       let f_map (d:data*data) :=
           let (_, v) := d in
-          match nnrc_core_eval h ((doc,v)::nil) body with
+          match nnrc_core_eval h empty_cenv ((doc,v)::nil) body with
           | None => None
           | Some res => Some res
           end
@@ -334,16 +334,16 @@ Section CldMR.
     - destruct map; reflexivity.
     - destruct map; simpl.
       unfold apply_map_fun_with_keys in *; simpl.
-      destruct (nnrc_core_eval h ((v, a) :: nil) n0); try reflexivity; simpl.
+      destruct (nnrc_core_eval h empty_cenv ((v, a) :: nil) n0); try reflexivity; simpl.
       rewrite <- (IHcoll (S n)); simpl; clear IHcoll.
       destruct (init_keys_aux nil (S n) coll); try reflexivity; simpl.
       destruct p; simpl.
-      destruct (nnrc_core_eval h ((v, d1) :: nil) n0); try reflexivity; simpl.
+      destruct (nnrc_core_eval h empty_cenv ((v, d1) :: nil) n0); try reflexivity; simpl.
       generalize ((lift (fun t' : list (data * data) => (d0, d2) :: t')
            (rmap
               (fun d3 : data * data =>
                let (k, v0) := d3 in
-               match nnrc_core_eval h ((v, v0) :: nil) n0 with
+               match nnrc_core_eval h empty_cenv ((v, v0) :: nil) n0 with
                | Some res => Some (k, res)
                | None => None
                end) l))); intros.
@@ -385,7 +385,7 @@ Section CldMR.
     let (key_arg, values_arg) := key_values_args in
     let f_reduce (key_values_v: data * list data) : option (data * data) :=
         let (key_v, values_v) := key_values_v in
-        match nnrc_core_eval h ((values_arg, dcoll values_v) :: (key_arg, key_v) :: nil) body with
+        match nnrc_core_eval h empty_cenv ((values_arg, dcoll values_v) :: (key_arg, key_v) :: nil) body with
           None => None
         | Some res => Some (key_v, res)
         end
@@ -394,7 +394,7 @@ Section CldMR.
     let f_rereduce (key_value_v: (data * data)) : option (data * data) :=
         let '(key_v, value_v) := key_value_v in
         let '(values_arg, rebody) := f_rereduce in
-        match nnrc_core_eval h ((values_arg, dcoll (value_v::nil)) :: nil) rebody with
+        match nnrc_core_eval h empty_cenv ((values_arg, dcoll (value_v::nil)) :: nil) rebody with
         | None => None
         | Some res => Some (key_v, res)
         end
@@ -514,7 +514,7 @@ Section CldMR.
     let (formal_params, n) := fst mr_last in
     let effective_params := effective_params_from_bindings (snd mr_last) cld_env in
     let onrc_env := nnrc_env_of_cld_env formal_params effective_params in
-    olift (fun nnrc_env => nnrc_core_eval h nnrc_env n) onrc_env.
+    olift (fun nnrc_env => nnrc_core_eval h empty_cenv nnrc_env n) onrc_env.
 
   Definition cldmr_chain_eval_inner (env:bindings) (l:list cldmr_step) : option (bindings * list (data * data)) :=
     List.fold_left
@@ -584,7 +584,7 @@ Section CldMR.
 
   Section Top.
     Definition cldmr_eval_top (vinit:var) (q:cldmr) (cenv:bindings) : option data :=
-      let cenv := mkConstants (rec_sort cenv) in
+      let cenv := rec_sort cenv in
       match cld_load_init_env vinit cenv with
       | Some cenv => cldmr_eval cenv q
       | None => None

@@ -445,10 +445,10 @@ Section CAMPtoNRA.
       unfold camp_eval_top_to_presult.
       generalize (@camp_trans_correct h (rec_sort global_env) q nil dunit); intros.
       unfold lift_failure in H.
-      rewrite H.
-      simpl.
-      unfold nra_context_data.
-      reflexivity.
+      destruct (camp_eval h (rec_sort global_env) q nil dunit);
+      rewrite H;
+      simpl;
+      unfold nra_context_data in *; reflexivity.
     Qed.
       
   End Top.

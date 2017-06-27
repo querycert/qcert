@@ -36,19 +36,17 @@ Section TNRAtocNNRC.
             || apply fresh_var_fresh4 in e); intuition].
   
   Context {m:basic_model}.
-  Theorem tnra_sem_correct {τcenv} {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
-    prefix CONST_PREFIX vid = false ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants τcenv) x
-        = lookup equiv_dec (filterConstants tenv) x) ->
+  Context (τconstants:tbindings).
+
+  Theorem tnra_sem_correct {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->
-    (op ▷ τin >=> τout ⊣ τcenv) ->
-    nnrc_type tenv (nra_to_nnrc op vid) τout.
+    (op ▷ τin >=> τout ⊣ τconstants) ->
+    nnrc_type τconstants tenv (nra_to_nnrc op vid) τout.
   Proof.
     Hint Constructors nra_type.
     Opaque fresh_var.
-    intros pre1 fpre; intros.
-    revert vid tenv pre1 fpre H.
+    intros.
+    revert vid tenv H.
     dependent induction H0; simpl; intros.
     (* ATID *)
     - apply TNNRCVar; trivial.
@@ -66,21 +64,21 @@ Section TNRAtocNNRC.
       + dest_eqdec; congruence.
     (* ATMapConcat *)
     - specialize (IHnra_type2 vid tenv).
-      apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+      apply (@TNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
-      apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); [eauto | ].
-      apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
+      apply (@TNNRCFor m _ (RType.Rec Closed τ₁ pf1)); [eauto | ].
+      apply (@TNNRCFor m _ (RType.Rec Closed τ₂ pf2)).
       + apply IHnra_type1; simpl; trivial;
         match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl; match_destr; try elim_fresh e.
         match_destr; elim_fresh e.
     (* ATProduct *)
-    - apply (@TNNRCUnop m (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+    - apply (@TNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply ATFlatten.
-      apply (@TNNRCFor m (RType.Rec Closed τ₁ pf1)); try assumption.
+      apply (@TNNRCFor m _ (RType.Rec Closed τ₁ pf1)); try assumption.
       apply (IHnra_type1 vid tenv); assumption.
       clear IHnra_type1 op1 H0_.
-      apply (@TNNRCFor m (RType.Rec Closed τ₂ pf2)).
+      apply (@TNNRCFor m _ (RType.Rec Closed τ₂ pf2)).
       + apply IHnra_type2; simpl; trivial; match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl.
         * match_destr.
@@ -88,8 +86,8 @@ Section TNRAtocNNRC.
           match_destr; congruence.
         * match_destr; try congruence.
     (* ATSelect *)
-    - apply (@TNNRCUnop m (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
-      apply (@TNNRCFor m τ); [apply (IHnra_type2 vid tenv )|idtac]; trivial.
+    - apply (@TNNRCUnop m _ (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
+      apply (@TNNRCFor m _ τ); [apply (IHnra_type2 vid tenv )|idtac]; trivial.
       apply TNNRCIf.
       + apply IHnra_type1; simpl; trivial; match_destr; elim_fresh e.
       + econstructor; eauto.
@@ -146,31 +144,18 @@ Section TNRAtocNNRC.
       + simpl; match_destr; intuition.
     (* ATGetConstant *)
     - econstructor; eauto 2.
-      generalize (filterConstants_lookup_pre tenv s).
-      intros.
-      simpl in H1. rewrite <- H1.
-      rewrite <- fpre.
-      unfold equiv_dec.
-      generalize (@mkConstants_assoc_lookupr rtype); intros.
-      simpl in H2.
-      rewrite H2.
-      trivial.
   Qed.
 
   (** Reverse direction, main theorem *)
 
-  Theorem tnra_sem_correct_back {τcenv} {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
-    prefix CONST_PREFIX vid = false ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants τcenv) x
-        = lookup equiv_dec (filterConstants tenv) x) ->
+  Theorem tnra_sem_correct_back {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->
-    nnrc_type tenv (nra_to_nnrc op vid) τout ->
-    (op ▷ τin >=> τout ⊣ τcenv).
+    nnrc_type τconstants tenv (nra_to_nnrc op vid) τout ->
+    (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
     Hint Constructors nra_type.
-    intros pre1 fpre; intros.
-    revert τin τout vid tenv pre1 fpre H H0.
+    intros.
+    revert τin τout vid tenv H H0.
     nra_cases (induction op) Case; simpl; intros; inversion H0; subst.
     - Case "AID"%string.
       rewrite H in H3; inversion H3; subst. eauto.
@@ -305,27 +290,15 @@ Section TNRAtocNNRC.
         try (match_destr; try elim_fresh e).
     - Case "AGetConstant"%string.
       econstructor. eauto.
-      generalize (filterConstants_lookup_pre tenv s).
-      intros.
-      simpl in H1. rewrite <- H1 in H3.
-      rewrite <- fpre in H3.
-      generalize (@mkConstants_assoc_lookupr rtype); intros.
-      simpl in H2.
-      rewrite H2 in H3.
-      apply H3.
   Qed.
 
   (** Theorem 7.4: NRA<->NNRC.
        Final iff Theorem of type preservation for the translation from NRA to NNRC *)
 
-  Theorem tnraenv_sem_correct_iff {τcenv} {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
-    prefix CONST_PREFIX vid = false ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants τcenv) x
-        = lookup equiv_dec (filterConstants tenv) x) ->
+  Theorem tnraenv_sem_correct_iff {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->
-    nnrc_type tenv (nra_to_nnrc op vid) τout ->
-    (op ▷ τin >=> τout ⊣ τcenv).
+    nnrc_type τconstants tenv (nra_to_nnrc op vid) τout ->
+    (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
     Hint Resolve tnra_sem_correct tnra_sem_correct_back.
     intuition; eauto.

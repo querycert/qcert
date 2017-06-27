@@ -18,15 +18,14 @@
 
 Section NNRCOptimizer.
   Require Import String.
-  Require Import List ListSet.
+  Require Import List.
+  Require Import ListSet.
   Require Import Arith.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
-  Require Import Utils.
   Require Import BasicSystem.
   Require Import cNNRCSystem.
   Require Import NNRCSystem.
@@ -45,6 +44,7 @@ Section NNRCOptimizer.
 
     Definition nnrc_map (f: nnrc -> nnrc) (e:nnrc) :=
       match e with
+      | NNRCGetConstant v => NNRCGetConstant v
       | NNRCVar v => NNRCVar v
       | NNRCConst d => NNRCConst d
       | NNRCBinop bop e1 e2 => NNRCBinop bop (f e1) (f e2)
@@ -69,6 +69,7 @@ Section NNRCOptimizer.
     (** Apply the function f to all subexpression of e. *)
     Fixpoint nnrc_map_deep (f: nnrc -> nnrc) (e: nnrc) :=
       match e with
+      | NNRCGetConstant v => f (NNRCGetConstant v)
       | NNRCVar v => f (NNRCVar v)
       | NNRCConst d => f (NNRCConst d)
       | NNRCBinop bop e1 e2 => f (NNRCBinop bop (nnrc_map_deep f e1) (nnrc_map_deep f e2))

@@ -26,6 +26,7 @@ Require Export DData.
 Require Export DDataNorm.
 Require Export RConstants.
 Require Export DConstants.
+Require Export RVar.
 Require Export RUtilOps.
 Require Export ROps.
 Require Export ForeignRuntime.
