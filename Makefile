@@ -372,13 +372,9 @@ endif
 ifneq ($(SQL)$(SQLPP)$(ODM),)
 	@$(MAKE) -C javaService install
 endif
- 
+
 spark2-runtime:
 	@$(MAKE) -C runtime/spark2
-
-japi:
-	@$(MAKE) java-extraction
-	@$(MAKE) lib/QcertLibrary.jar
 
 demo: qcert jsapi
 	@echo "[Qcert] "
@@ -388,9 +384,6 @@ demo: qcert jsapi
 
 jsapi:
 	@$(MAKE) js-extraction
-
-lib/QcertLibrary.jar:
-	ant -f scripts/makeQcertLibrary.xml
 
 qcert: Makefile.coq
 	@echo "[Qcert] "
@@ -403,12 +396,6 @@ extraction:
 	@echo "[Qcert] Extracting compiler to OCaml"
 	@echo "[Qcert] "
 	@$(MAKE) -C ocaml realclean all
-
-java-extraction:
-	@echo "[Qcert] "
-	@echo "[Qcert] Extracting compiler to OCaml + Java"
-	@echo "[Qcert] "
-	@$(MAKE) -C ocaml clean japi
 
 js-extraction:
 	@echo "[Qcert] "

@@ -192,7 +192,7 @@ Compiling from oql to js:
   oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
 ```
 
-and produce a javascript file called `samples/oql/persons1.js`.
+and produce a JavaScript file called `samples/oql/persons1.js`.
 
 Similarly for Java:
 
@@ -205,7 +205,7 @@ This will produce a java file called `samples/oql/persons1.java`.
 ## Run compiled queries
 
 Q\*cert targets a number of languages and data processors as backends
-(currently: Javascript, Java, Cloudant and Spark). The way you run the
+(currently: JavaScript, Java, Cloudant and Spark). The way you run the
 compiled queries varies depending on the target. Usually you need two
 things: (i) a run-time library that implements some of the core
 operators assumed by the compiler (e.g., ways to access records or
@@ -227,14 +227,14 @@ make javacode
 
 Otherwise, you can do it now.
 
-### Run queries compiled to Javascript
+### Run queries compiled to JavaScript
 
 (In the [`./samples`](./samples) directory)
 
-To run a query compiled to Javascript, you can call `java` for the
-`RunJavascript` query runner (It uses uses the Nashorn Javascript
+To run a query compiled to JavaScript, you can call `java` for the
+`RunJavascript` query runner (It uses uses the Nashorn JavaScript
 engine for the JVM). You will need to pass it two pieces of
-information: (i) the location of the Q\*cert runtime for javascript,
+information: (i) the location of the Q\*cert runtime for JavaScript,
 and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
@@ -270,7 +270,7 @@ To run a query compiled to Java, you must first compile it by calling
 `javac` for the produced Java code, then call `java` with the
 `RunJava` query runner. You will need to pass it three pieces of
 information: (i) the location of the gson jar which is used to parse
-the input, (ii) the location of the Q\*cert runtime for java, both as
+the input, (ii) the location of the Q\*cert runtime for Java, both as
 part of the classpath, and (ii) some input data on which to run the
 query. From the command line, you can do it as follows, first to
 compile the Java code:
@@ -324,7 +324,7 @@ cd tests/spark2/
 The code is in three main directories:
 - [`./coq`](./coq) contains the Coq source code
 - [`./ocaml`](./ocaml) contains the toplevel compiler and code extraction from Coq
-- [`./runtime`](./runtime) contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, Javascript, and Spark 2.0).
+- [`./runtime`](./runtime) contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, JavaScript, and Spark 2.0).
 
 Inside the [`./coq`](./coq) directory, the organization is as follows.
 - Foundational modules:
@@ -368,7 +368,7 @@ Current source languages include:
 
 Current targets include:
 
-- Javascript [JS06], Java [Java7], Cloudant (CouchDB), and Spark
+- JavaScript [JS06], Java [Java7], Cloudant (CouchDB), and Spark
   [Zah12].
 
 The compiler relies a number of intermediate languages for
