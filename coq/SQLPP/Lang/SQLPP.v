@@ -30,7 +30,7 @@ Section SQLPP.
 
   Unset Elimination Schemes.
   
-  Definition sqlpp_order_spec : Set := SortCriterias.
+  Definition sqlpp_order_spec : Set := SortDesc.
   Inductive sqlpp_distinct : Set := SPDistinct | SPAll.
   Inductive sqlpp_join_type : Set := SPInner | SPLeftOuter.
 
@@ -125,7 +125,8 @@ SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression
 SearchedCaseExpression ::= <CASE> ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
  *)
 
-  | SPCase : option sqlpp_expr -> list (sqlpp_expr * sqlpp_expr) -> option sqlpp_expr -> sqlpp_expr (* First sqlpp omitted in 'searched' case *)
+  | SPSimpleCase : sqlpp_expr -> list sqlpp_when_then -> option sqlpp_expr -> sqlpp_expr
+  | SPSearchedCase : list sqlpp_when_then -> option sqlpp_expr -> sqlpp_expr
                                                                          
 (*                                                            
 QuantifiedExpression ::= ( (<ANY>|<SOME>) | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )*
@@ -148,6 +149,7 @@ Index           ::= "[" ( Expression | "?" ) "]"
  *)
 
   | SPIndex : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
+  | SPIndexAny : sqlpp_expr -> sqlpp_expr
 
 (*                                         
 PrimaryExpr ::= Literal
@@ -168,8 +170,8 @@ Literal        ::= StringLiteral
                    | <FALSE>
  *)
 
-  | SPLiteral : data -> sqlpp_expr
-  | SPNull | SPMissing | SPTrue | SPFalse                       
+  | SPLiteral : data -> sqlpp_expr (* For string, int, float, double, true and false *)
+  | SPNull | SPMissing
 
 (*
 VariableReference     ::= <IDENTIFIER>|<DelimitedIdentifier>
@@ -210,7 +212,7 @@ ObjectConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
 FieldBinding             ::= Expression ":" Expression
  *)
 
-  | SPObject : list (string * sqlpp_expr) -> sqlpp_expr
+  | SPObject : list (sqlpp_expr * sqlpp_expr) -> sqlpp_expr
                              
 (*
 SelectStatement    ::= ( WithClause )?
@@ -243,16 +245,23 @@ SelectBlock        ::= SelectClause
                        ( WhereClause )?
                        ( GroupbyClause ( LetClause )? ( HavingClause )? )?
                        SelectClause
-                       
-That is, a select block has a required select clause with optional from, where, and group by clauses.  The two branches
+
+HavingClause       ::= <HAVING> Expression
+
+That is, a select block has a required select clause with optional from, where, and group by clauses (also, up to two let clauses
+loosely tied to the from and groupby clauses, and an optional having clause tied to the groupby clause).  The two branches
 of the production say that the from clause, if present, can come first, which is meaningless at the AST level.                       
 
 FromClause         ::= <FROM> FromTerm ( "," FromTerm )*
 *)
 
 with sqlpp_select_block : Set :=
-	SPSelectBlock : sqlpp_select -> list sqlpp_from   (* The 'from' clause as a list of from terms.  Empty list if missing *) 
-        -> sqlpp_where -> sqlpp_group_by -> sqlpp_select_block
+	SPSelectBlock : sqlpp_select -> list sqlpp_from   (* The 'from' clause as a list of from terms.  Empty list if missing *)
+	    -> list (string * sqlpp_expr)  (* the first let clause, empty list if missing *)
+        -> sqlpp_where -> sqlpp_group_by
+        -> list (string * sqlpp_expr)  (* the second let clause, empty list if missing *)
+        -> option sqlpp_expr  (* the optional having clause *) 
+        -> sqlpp_select_block
 
 with sqlpp_union_element : Set :=
   | SPBlock : sqlpp_select_block -> sqlpp_union_element
@@ -269,8 +278,12 @@ Projection         ::= ( Expression ( <AS> )? Identifier | "*" )
 *)
 
 with sqlpp_select : Set :=
-  | SPSelectSQL : sqlpp_distinct -> list (sqlpp_expr * option string) -> sqlpp_select
+  | SPSelectSQL : sqlpp_distinct -> list sqlpp_project -> sqlpp_select
   | SPSelectValue: sqlpp_distinct -> sqlpp_expr -> sqlpp_select
+  
+with sqlpp_project : Set :=
+  | SPProject : (sqlpp_expr * option string) -> sqlpp_project
+  | SPProjectStar
   
 (*
 FromTerm           ::= Expression (( <AS> )? Variable)?
@@ -315,16 +328,10 @@ GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Exp
                        ( <GROUP> <AS> Variable
                          ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
                        )?
-
-HavingClause       ::= <HAVING> Expression
-
-In the grammar, a groupBy clause carries optional let and having clauses.  
 *)
 
 with sqlpp_group_by : Set :=
-	| SPGroupBy : list (string * sqlpp_expr)   (* let, empty if omitted *)
-		-> option sqlpp_expr                   (* having *)
-		-> list (sqlpp_expr * option string)   (* group by section *)
+	| SPGroupBy : list (sqlpp_expr * option string)   (* group by section *)
 		-> option (string * list (string * string))  (* group as section *)
 		-> sqlpp_group_by
     | SPNoGroupBy
@@ -336,6 +343,9 @@ OrderbyClause      ::= <ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Express
 with sqlpp_order_by : Set :=
 	| SPOrderBy : list (sqlpp_expr * sqlpp_order_spec) -> sqlpp_order_by
 	| SPNoOrderBy
+	
+with sqlpp_when_then : Set:=
+	| SPWhenThen : sqlpp_expr -> sqlpp_expr -> sqlpp_when_then	
 .	
 
   (* Let's finally give our languages a proper name! *)

@@ -59,7 +59,7 @@ public class SqlppEncoder {
 	}
 
 	/**
-	 * Encode an individual presto tree node as an S-expression using an existing buffer
+	 * Encode an individual SQL++ tree node as an S-expression using an existing buffer
 	 * @param buffer the existing buffer
 	 * @param toEncode the presto tree node
 	 * @return the buffer, for convenience

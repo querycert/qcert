@@ -64,7 +64,8 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_sqlpp_and := SQLPP.SPAnd.
   Definition sqlpp_sqlpp_or := SQLPP.SPOr.
   Definition sqlpp_sqlpp_between := SQLPP.SPBetween.
-  Definition sqlpp_sqlpp_case := SQLPP.SPCase.
+  Definition sqlpp_sqlpp_simple_case := SQLPP.SPSimpleCase.
+  Definition sqlpp_sqlpp_searched_case := SQLPP.SPSearchedCase.
   Definition sqlpp_sqlpp_some := SQLPP.SPSome.
   Definition sqlpp_sqlpp_every := SQLPP.SPEvery.
   Definition sqlpp_sqlpp_dot := SQLPP.SPDot.

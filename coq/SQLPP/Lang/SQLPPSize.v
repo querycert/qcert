@@ -33,7 +33,7 @@ Section SQLPPSize.
   	Definition sqlpp_expr_size (q:sqlpp_expr) := 1.
     Definition sqlpp_statement_size (stmt: sqlpp_select_statement) := 1.
 
-    (* The real one: 
+	(*
     Fixpoint sqlpp_expr_size (q:sqlpp_expr) := (* XXX To check XXX *)
       match q with
 	| SPPositive expr
@@ -64,8 +64,16 @@ Section SQLPPSize.
   		=> 1 + sqlpp_expr_size  e1 + sqlpp_expr_size  e2
 	| SPBetween  e1 e2 e3
 		=> 1 + sqlpp_expr_size  e1 + sqlpp_expr_size  e2 + sqlpp_expr_size  e3
-	| SpCase  oe1 l oe2
-		=> 1 + maybe_expr_size oe1 + list_expr_pair_size l + maybe_expr_size oe2 
+	| SPSimpleCase  e l o
+		=> match o with
+		| None => 1 + sqlpp_expr_size e + (List.fold_left (fun acc whenthen => acc + (whenthen_size whenthen)) l 0)
+		| Some oe => 1 + sqlpp_expr_size e + (List.fold_left (fun acc whenthen => acc + (whenthen_size whenthen)) l 0) + sqlpp_expr_size oe
+		end
+	| SPSearchedCase l o
+		=> match o with
+		| None => 1 + (List.fold_left (fun acc whenthen => acc (whenthen_size whenthen)) l 0)
+		| Some oe => 1 + (List.fold_left (fun acc whenthen => acc + (whenthen_size whenthen)) l 0) + sqlpp_expr_size oe
+		end
 	| SPSome  l e
     | SPEvery l e
 		=> 1 + list_string_expr_pair_size l + sqlpp_expr_size  e
@@ -86,30 +94,27 @@ Section SQLPPSize.
 	| SPObject l
 		=> 1 + list_string_expr_pair_size l
 	| SPQuery stmt
-		=> 1 + sqlpp_statement_size stmt
+		=> 1 + (sqlpp_statement_size stmt)
       end
       
   with sqlpp_statement_size (stmt: sqlpp_select_statement) :=
   	(* TODO *) 1       
 
-  with maybe_expr_size (expr: option sqlpp_expr) :=
-  	match expr with
-  	| None => 0
-  	| Some e => sqlpp_expr_size e
-  	end
-
-  with list_expr_pair_size (l : list (sqlpp_expr * sqlpp_expr)) :=
-	List.fold_left (fun acc pair => acc + sqlpp_expr_size (fst pair) + sqlpp_expr_size (snd pair)) l 0
+  with whenthen_size (wt : sqlpp_when_then) :=
+  	match wt with
+  	| SPWhenThen w t
+		=> 1 + (sqlpp_expr_size w) + (sqlpp_expr_size t)
+	end
       
   with list_string_expr_pair_size (l : list (string * sqlpp_expr)) :=
-	List.fold_left (fun acc pair => acc + 1 + sqlpp_expr_size (snd pair)) l 0
+	List.fold_left (fun acc pair => acc + 1 + (sqlpp_expr_size (snd pair))) l 0
   	  
   with list_expr_size (l : list sqlpp_expr) :=
-	List.fold_left (fun acc e => acc + sqlpp_expr_size  e) l 0.   		  	  
+	List.fold_left (fun acc e => acc + (sqlpp_expr_size  e)) l 0.   		  	  
 *)
 
   Definition sqlpp_size (l : list sqlpp_select_statement) :=
-	List.fold_left (fun acc e => acc + sqlpp_statement_size e) l 0.
+	List.fold_left (fun acc e => acc + (sqlpp_statement_size e)) l 0.
 
   End size.
 
