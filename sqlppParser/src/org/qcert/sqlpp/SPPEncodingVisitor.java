@@ -274,7 +274,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//  (Dot "Identifier" (primaryExpression))
 	@Override
 	public StringBuilder visit(FieldAccessor node, StringBuilder builder) throws CompilationException {
-		return makeNode("Dot", builder, node.getIdent().toString(), node.getExpr());
+		return makeNode("Dot", builder, getVar(node.getIdent()), node.getExpr());
 	}
 
 	// Grammar:
@@ -308,13 +308,13 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		builder = appendNodeList(node.getCorrelateClauses(), builder);
 		return endNode(builder);
 	}
-	
+
 	// Not in grammar or Coq.
 	@Override
 	public StringBuilder visit(FunctionDecl node, StringBuilder builder) throws CompilationException {
 		return notSupported("function declaration");
 	}
-
+	
 	// Not in grammar or Coq.
 	@Override
 	public StringBuilder visit(FunctionDropStatement node, StringBuilder builder) throws CompilationException {
@@ -341,7 +341,6 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	@Override
 	public StringBuilder visit(GroupbyClause node, StringBuilder builder) throws CompilationException {
 		List<GbyVariableExpressionPair> groupBySection = node.getGbyPairList();
-		String groupVar = node.getGroupVar().toString();
 		List<Pair<Expression, Identifier>> groupAsSection = node.getGroupFieldList();
 		builder = startNode("Grouping", builder);
 		builder = startNode("Keys", builder);
@@ -353,13 +352,13 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			builder = endNode(builder); // Key
 		}
 		builder = endNode(builder); // Keys
-		if (groupVar != null) {
+		if (node.hasGroupVar()) {
 			builder = startNode("GroupAs", builder);
-			builder = appendString(groupVar, builder);
+			builder = appendString(getVar(node.getGroupVar()), builder);
 			for (Pair<Expression, Identifier> pair : groupAsSection) {
 				builder = startNode("Rename", builder);
-				String first = decodeVariableRef(pair.first.toString());  // will be a variable ref
-				String second = pair.second.toString();
+				String first = getVar((VariableExpr) pair.first);  // No CCE; if one happens consider it an assertion failure
+				String second = getVar(pair.second);
 				builder = appendString(first, builder);
 				builder = appendString(second, builder);
 				builder = endNode(builder); // Rename
@@ -368,7 +367,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		}
 		return endNode(builder); // Grouping
 	}
-	
+
 	// Grammar:
 	//    HavingClause       ::= <HAVING> Expression
 	// Coq:
@@ -389,7 +388,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		// Not used by SQL++ grammar (present in AQL)?
 		return notSupported("if");
 	}
-
+	
 	// Not in grammar or Coq.
 	@Override
 	public StringBuilder visit(IndependentSubquery node, StringBuilder builder) throws CompilationException {
@@ -450,7 +449,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		builder = node.getConditionExpression().accept(this, builder);
 		return endNode(builder);
 	}
-	
+
 	// Grammar:
 	//	 WithClause         ::= <WITH> WithElement ( "," WithElement )*
 	//   LetClause          ::= (<LET> | <LETTING>) LetElement ( "," LetElement )*
@@ -468,7 +467,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//   (Lets (Let "string" (sqlpp_expr)) ...)
 	@Override
 	public StringBuilder visit(LetClause node, StringBuilder builder) throws CompilationException {
-		return makeNode("Let", builder, node.getVarExpr().toString(), node.getBindingExpr());
+		return makeNode("Let", builder, getVar(node.getVarExpr()), node.getBindingExpr());
 	}
 
 	// The limit clause is in the grammar but not in Coq and is current elided.
@@ -476,7 +475,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	public StringBuilder visit(LimitClause node, StringBuilder builder) throws CompilationException {
 		return builder; // elided
 	}
-
+	
 	// Grammar:
 	//	ArrayConstructor         ::= "[" ( Expression ( "," Expression )* )? "]"
 	//	MultisetConstructor      ::= "{{" ( Expression ( "," Expression )* )? "}}"
@@ -580,6 +579,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//	  | SPConcat : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPIn : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPEq : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
+	//    | SPFuzzyEq : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPNeq : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPLt : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPGt : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
@@ -629,7 +629,8 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			tag = "Eq";
 			break;
 		case FUZZY_EQ:
-			throw new IllegalStateException("Fuzzy equality is not a construct of SQL++, only of AQL");
+			tag = "FuzzyEQ";
+			break;
 		case GE:
 			tag = "Ge";
 			break;
@@ -740,7 +741,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		builder = startNode(tag, builder);
 		builder = startNode("Bindings", builder);
 		for (QuantifiedPair pair : node.getQuantifiedList())
-			builder = makeNode("VarIn", builder, pair.getVarExpr().toString(), pair.getExpr());
+			builder = makeNode("VarIn", builder, getVar(pair.getVarExpr()), pair.getExpr());
 		builder = endNode(builder); // Bindings
 		builder = node.getSatisfiesExpr().accept(this, builder);
 		return endNode(builder); // Every or Some
@@ -1040,7 +1041,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//   (VarRef "var")
 	@Override
 	public StringBuilder visit(VariableExpr node, StringBuilder builder) throws CompilationException {
-		return makeNode("VarRef", builder, 	decodeVariableRef(node.toString()));
+		return makeNode("VarRef", builder, 	decodeVariableRef(getVar(node)));
 	}
 
 	// Grammar:
@@ -1089,7 +1090,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			return builder;
 		if (isDistinctName(variable, expr)) {
 			builder = startNode("as", builder);
-			builder = appendString(decodeVariableRef(variable.toString()), builder);
+			builder = appendString(decodeVariableRef(getVar(variable)), builder);
 			builder = endNode(builder);
 		}
 		return builder;
@@ -1121,6 +1122,16 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	 */
 	private StringBuilder endNode(StringBuilder builder) {
 		return builder.append(") ");
+	}
+
+	/** Retrieve String from Identifier, ensuring no '$' prefix */
+	private String getVar(Identifier ident) {
+		return decodeVariableRef(ident.toString());
+	}
+
+	/** Retrieve String from VariableExpr, ensuring no '$' prefix */
+	private String getVar(VariableExpr var) {
+		return getVar(var.getVar());
 	}
 
 	/**
