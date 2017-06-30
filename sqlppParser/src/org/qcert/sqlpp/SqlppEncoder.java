@@ -44,15 +44,14 @@ public class SqlppEncoder {
 	/**
 	 * Encode a list of SQL++ tree nodes as an S-expression for importing into Coq code
 	 * @param toEncode the list of nodes to encode
-	 * @param useDateNameHeuristic flag indicating that field names ending in "date" denote dates 
 	 * @return the S-expression string
 	 * @throws CompilationException 
 	 */
-	public static String encode(List<? extends ILangExpression> toEncode, boolean useDateNameHeuristic) throws CompilationException {
+	public static String encode(List<? extends ILangExpression> toEncode) throws CompilationException {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("(statements ");
 		for (ILangExpression node : toEncode) {
-			encode(buffer, node, useDateNameHeuristic);
+			encode(buffer, node);
 		}
 		buffer.append(")");
 		return buffer.toString();
@@ -65,8 +64,8 @@ public class SqlppEncoder {
 	 * @return the buffer, for convenience
 	 * @throws CompilationException 
 	 */
-	public static StringBuilder encode(StringBuilder buffer, ILangExpression toEncode, boolean useDateNameHeuristic) throws CompilationException {
-		SqlppEncodingVisitor visitor = new SqlppEncodingVisitor(useDateNameHeuristic);
+	public static StringBuilder encode(StringBuilder buffer, ILangExpression toEncode) throws CompilationException {
+		SPPEncodingVisitor visitor = new SPPEncodingVisitor();
 		return toEncode.accept(visitor, buffer);
 	}
 
@@ -91,7 +90,7 @@ public class SqlppEncoder {
 				continue;
 			}
 			try { 
-				outputResult(encode(stmts, true), arg);
+				outputResult(encode(stmts), arg);
 				System.out.println("Succeeded");
 			} catch (Throwable e) {
 				System.out.println(e.toString());
@@ -111,13 +110,12 @@ public class SqlppEncoder {
 
 	/** 
 	 * Convenience method combining parse and encode in one call.
-	 *   The encoding is done with useDateNameHeuristic set to true.
 	 * @param query the query
 	 * @return the S-expression encoding of the query
 	 * @throws Exception 
 	 */
 	public static String parseAndEncode(String query) throws Exception {
-		return encode(parse(query), true);
+		return encode(parse(query));
 	}
 
 	/**
