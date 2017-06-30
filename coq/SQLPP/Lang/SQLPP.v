@@ -92,7 +92,8 @@ positive, negative, exists, not, isNull, isMissing, isUnknown
 
 (*                                 
 Valid operators for the second form (binary operators) are
-plus, minus, mult, div, mod, exp, concat, in, eq, neq, lt, gt, le, ge, like, and, or
+plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge, like, and, or
+(Actually, fuzzy-eq isn't listed in the SQL++ grammar, but it's in the AQL grammar and supported for SQL++ by AsterixDB).
 *)
 
   | SPPlus : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
@@ -104,6 +105,7 @@ plus, minus, mult, div, mod, exp, concat, in, eq, neq, lt, gt, le, ge, like, and
   | SPConcat : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPIn : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPEq : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
+  | SPFuzzyEq : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPNeq : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPLt : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPGt : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
