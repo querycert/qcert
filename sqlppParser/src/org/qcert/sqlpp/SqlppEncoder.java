@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.asterix.common.exceptions.CompilationException;
 import org.apache.asterix.lang.common.base.ILangExpression;
 import org.apache.asterix.lang.common.base.Statement;
+import org.apache.asterix.lang.common.statement.Query;
 import org.apache.asterix.lang.sqlpp.parser.JavaCharStream;
 import org.apache.asterix.lang.sqlpp.parser.SQLPPParserConstants;
 import org.apache.asterix.lang.sqlpp.parser.SQLPPParserTokenManager;
@@ -51,7 +52,9 @@ public class SqlppEncoder {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("(statements ");
 		for (ILangExpression node : toEncode) {
-			encode(buffer, node);
+			// For now, we only encode query statements
+			if (node instanceof Query)
+				encode(buffer, node);
 		}
 		buffer.append(")");
 		return buffer.toString();
