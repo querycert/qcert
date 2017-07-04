@@ -1193,9 +1193,71 @@ let sexp_to_sql (se : sexp) : QLang.sql =
     
 (* SQL++ Section *)
 
+let rec sexp_to_sqlpp_expr (stmt : sexp)  =
+  begin match stmt with
+	| STerm ("Positive", [s]) -> QSQLPP.sqlpp_sqlpp_positive (sexp_to_sqlpp_expr s) 
+  | STerm ("Negative", [s]) -> QSQLPP.sqlpp_sqlpp_negative (sexp_to_sqlpp_expr s)
+  | STerm ("Exists", [s]) -> QSQLPP.sqlpp_sqlpp_exists (sexp_to_sqlpp_expr s)
+  | STerm ("Not", [s]) -> QSQLPP.sqlpp_sqlpp_not (sexp_to_sqlpp_expr s)
+  | STerm ("IsNull", [s]) -> QSQLPP.sqlpp_sqlpp_is_null (sexp_to_sqlpp_expr s)
+  | STerm ("IsMissing", [s]) -> QSQLPP.sqlpp_sqlpp_is_missing (sexp_to_sqlpp_expr s)
+  | STerm ("IsUnknown", [s]) -> QSQLPP.sqlpp_sqlpp_is_unknown (sexp_to_sqlpp_expr s)
+	| STerm("Plus", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_plus (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Minus", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_minus (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Mult", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_mult (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Div", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_div (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Mod", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_mod (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Exp", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_exp (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Concat", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_concat (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("In", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_in (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Eq", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_eq (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Neq", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_neq (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Lt", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_lt (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Gt", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_gt (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Le", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_le (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Ge", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_ge (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Like", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_like (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("And", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_and (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Or", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_or (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Between", [e1;e2;e3]) -> QSQLPP.sqlpp_sqlpp_between (sexp_to_sqlpp_expr e1) (sexp_to_sqlpp_expr e2) (sexp_to_sqlpp_expr e3)
+	| STerm("SimpleCase", cond::STerm("Default", [els])::rest) -> 
+		QSQLPP.sqlpp_sqlpp_simple_case (sexp_to_sqlpp_expr cond) (List.map sexp_to_sqlpp_when_then rest) (Some (sexp_to_sqlpp_expr els))
+	| STerm("SimpleCase", cond::rest) -> 
+		QSQLPP.sqlpp_sqlpp_simple_case (sexp_to_sqlpp_expr cond) (List.map sexp_to_sqlpp_when_then rest) None
+	| STerm("SearchedCase", STerm("Default", [els])::rest) -> 
+		QSQLPP.sqlpp_sqlpp_searched_case (List.map sexp_to_sqlpp_when_then rest) (Some (sexp_to_sqlpp_expr els))
+	| STerm("SearchedCase", rest) -> 
+		QSQLPP.sqlpp_sqlpp_searched_case (List.map sexp_to_sqlpp_when_then rest) None
+	| STerm("Some", [STerm("Bindings", vars);sat]) ->
+		QSQLPP.sqlpp_sqlpp_some (List.map sexp_to_binding vars) (sexp_to_sqlpp_expr sat)
+	| STerm("Every", [STerm("Bindings", vars);sat]) ->
+		QSQLPP.sqlpp_sqlpp_every (List.map sexp_to_binding vars) (sexp_to_sqlpp_expr sat)
+  | STerm (sterm, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL++ expression: " ^ sterm))
+  | _ ->
+     raise (Qcert_Error "Not well-formed S-expr inside SQL++ expression")
+  end
+
+and sexp_to_sqlpp_when_then (se : sexp) : QSQLPP.sqlpp_when_then =
+	begin	match se with
+	| STerm("WhenThen", [e1;e2]) -> QSQLPP.sqlpp_sqlpp_when_then (sexp_to_sqlpp_expr e1) (sexp_to_sqlpp_expr e2)
+	| _ ->
+		raise (Qcert_Error "WhenThen node not found where expected in SQL++ case expression")
+		end
+		
+and sexp_to_binding (se : sexp) : (char list * sqlpp_expr) =
+	begin match se with
+	| STerm ("VarIn", [s;expr]) -> (sstring_to_coq_string s, sexp_to_sqlpp_expr expr)				
+	| _ ->
+		raise (Qcert_Error "VarIn node not found where expected in SQL++ quantified expression")
+		end
+
 let sexp_to_sqlpp (se : sexp) : QLang.sqlpp =
-	begin
-	raise (Qcert_Error ("S-expression translation not yet implemented for SQL++"))
+  begin match se with
+  | STerm ("statements",stmts) ->
+     map sexp_to_sqlpp_expr stmts
+  | _ ->
+     raise (Qcert_Error "Not well-formed S-expr in top SQL++ statements")
   end
 	
 (* Query translations *)
