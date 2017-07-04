@@ -149,8 +149,9 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//	 with sqlpp_when_then : Set:=
 	//	   | SPWhenThen : sqlpp_expr -> sqlpp_expr -> sqlpp_when_then
 	// Encoding:
-	//   (SimpleCase (sqlpp_expr) (WhenThen (sqlpp_expr) (sqlpp_expr)) ... (Else (sqlpp_expr)? ) 
-	//   (SearchedCase (WhenThen (sqlpp_expr) (sqlpp_expr)) ... (Else (sqlpp_expr)? ) 
+	//   (SimpleCase (sqlpp_expr)  (Default (sqlpp_expr)? (WhenThen (sqlpp_expr) (sqlpp_expr)) ...) 
+	//   (SearchedCase (Default (sqlpp_expr)? (WhenThen (sqlpp_expr) (sqlpp_expr)) ...)
+	//      The optional Default term is placed before the one or more WhenThen terms to facilitate pattern matching.
 	@Override
 	public StringBuilder visit(CaseExpression node, StringBuilder builder) throws CompilationException {
 		Expression operand = node.getConditionExpr();
@@ -159,6 +160,9 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			builder = operand.accept(this, builder);
 		} else
 			builder = startNode("SearchedCase", builder);
+		Expression defaultValue = node.getElseExpr();
+		if (defaultValue != null)
+			builder = makeNode("Else", builder, defaultValue);
 		List<Expression> whens = node.getWhenExprs();
 		List<Expression> thens = node.getThenExprs();
 		assert whens.size() == thens.size();
@@ -166,10 +170,6 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		for (Expression when : node.getWhenExprs()) {
 			Expression then = thenIter.next();
 			builder = makeNode("WhenThen", builder, when, then);
-		}
-		Expression defaultValue = node.getElseExpr();
-		if (defaultValue != null) {
-			builder = makeNode("Else", builder, defaultValue);
 		}
 		return endNode(builder);
 	}
