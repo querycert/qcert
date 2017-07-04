@@ -351,7 +351,7 @@ with sqlpp_when_then : Set:=
 .	
 
   (* Let's finally give our languages a proper name! *)
-  Definition sqlpp : Set := list sqlpp_select_statement.
+  Definition sqlpp : Set := list sqlpp_expr.
 
   
 End SQLPP.

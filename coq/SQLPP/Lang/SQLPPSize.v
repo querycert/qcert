@@ -113,8 +113,8 @@ Section SQLPPSize.
 	List.fold_left (fun acc e => acc + (sqlpp_expr_size  e)) l 0.   		  	  
 *)
 
-  Definition sqlpp_size (l : list sqlpp_select_statement) :=
-	List.fold_left (fun acc e => acc + (sqlpp_statement_size e)) l 0.
+  Definition sqlpp_size (l : list sqlpp_expr) :=
+	List.fold_left (fun acc e => acc + (sqlpp_expr_size e)) l 0.
 
   End size.
 
