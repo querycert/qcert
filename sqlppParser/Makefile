@@ -90,3 +90,7 @@ $(DEPENDENCIES):
 
 clean:
 	@rm -rf bin/*
+
+cleantests:
+	@rm tests/*.js tests/*.p.s-sql
+
