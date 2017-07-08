@@ -335,14 +335,14 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//				-> sqlpp_group_by
 	//		    | SPNoGroupBy
 	// Encoding:
-	//  (Grouping
+	//  (GroupBy
 	//    (Keys (Key (Expression) (as "Variable")?) ...)
 	//    (GroupAs "Variable" (Rename "Variable" "VariableReference") ...)? )
 	@Override
 	public StringBuilder visit(GroupbyClause node, StringBuilder builder) throws CompilationException {
 		List<GbyVariableExpressionPair> groupBySection = node.getGbyPairList();
 		List<Pair<Expression, Identifier>> groupAsSection = node.getGroupFieldList();
-		builder = startNode("Grouping", builder);
+		builder = startNode("GroupBy", builder);
 		builder = startNode("Keys", builder);
 		for (GbyVariableExpressionPair pair : groupBySection) {
 			builder = startNode("Key", builder);
@@ -748,7 +748,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	}
 
 	// This node in the AsterixDB AST is essentially vacuous for our purposes and merely serves to make an expression
-	// (which is typically a SelectStatement but doesn't have to be) into a top-level statement on a par with others.
+	// (which is typically a Select but doesn't have to be) into a top-level statement on a par with others.
 	public StringBuilder visit(Query node, StringBuilder builder) throws CompilationException {
 		return node.getBody().accept(this,  builder);
 	}
@@ -804,16 +804,28 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		builder = node.getSelectClause().accept(this, builder);
 		if (node.hasFromClause())
 			builder = node.getFromClause().accept(this, builder);
+		else
+			builder = makeNode("Froms", builder); // indicate absence for easier pattern match
 		if (node.hasLetClauses())
 			builder = makeNode("Lets", builder, node.getLetList());
+		else
+			builder = makeNode("Lets", builder); // etc.
 		if (node.hasWhereClause())
 			builder = node.getWhereClause().accept(this, builder);
+		else
+			builder = makeNode("Where", builder);
 		if (node.hasGroupbyClause())
 			builder = node.getGroupbyClause().accept(this, builder);
+		else
+			builder = makeNode("GroupBy", builder);
 		if (node.hasLetClausesAfterGroupby())
 			builder = makeNode("Lets", builder, node.getLetListAfterGroupby());
+		else
+			builder = makeNode("Lets", builder);
 		if (node.hasHavingClause())
 			builder = node.getHavingClause().accept(this, builder);
+		else
+			builder = makeNode("Having", builder);
 		return endNode(builder);
 	}
 
@@ -899,16 +911,17 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//			  | SPBlock : sqlpp_select_block -> sqlpp_union_element
 	//			  | SPSubquery : sqlpp_select_statement -> sqlpp_union_element        
 	// Encoding:
-	//   (SelectBlock ...) (SelectBlock | SelectStatement) ...
+	//   (SelectBlock ...) (Unions (SelectBlock | SelectStatement)* ) )
 	@Override
 	public StringBuilder visit(SelectSetOperation node, StringBuilder builder) throws CompilationException {
 		builder = node.getLeftInput().accept(this, builder);
+		builder = startNode("Unions", builder); // Empty if no unions.  Helps pattern matching
 		if (node.hasRightInputs())
 			for (SetOperationRight right : node.getRightInputs()) {
 				assert right.getSetOpType() == SetOpType.UNION;  // Other connectives shouldn't happen in SQL++
 				builder = right.getSetOperationRightInput().accept(this, builder);
 			}
-		return builder;
+		return endNode(builder);
 	}
 
 	// Not in grammar or Coq.
@@ -1007,6 +1020,8 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		VariableExpr var = node.getRightVariable();
 		Expression expr = node.getRightExpression();
 		builder = appendOptionalAlias(var, expr, builder);
+		if (node.hasPositionalVariable())
+			builder = makeNode("at", builder, getVar(node.getPositionalVariable()));
 		builder = expr.accept(this, builder);
 		return endNode(builder);
 	}

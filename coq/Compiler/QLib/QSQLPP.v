@@ -15,7 +15,7 @@
  *)
 
 Require Import CompilerRuntime.
-Require String.
+Require Import String.
 Require QData QOperators.
 Require SQLPP.
 
@@ -26,8 +26,7 @@ Module QSQLPP(runtime:CompilerRuntime).
 
   Definition sqlpp : Set := SQLPP.sqlpp.
 
-  Definition sqlpp_statement := SQLPP.sqlpp_select_statement.
-  Definition sqlpp_query : Set := sqlpp_statement.
+  Definition sqlpp_select_statement := SQLPP.sqlpp_select_statement.
   Definition sqlpp_select : Set := SQLPP.sqlpp_select.
   Definition sqlpp_from : Set := SQLPP.sqlpp_from.
   Definition sqlpp_where : Set := SQLPP.sqlpp_where.
@@ -38,6 +37,9 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_group_by : Set := SQLPP.sqlpp_group_by.
   Definition sqlpp_order_by : Set := SQLPP.sqlpp_order_by.
   Definition sqlpp_when_then : Set := SQLPP.sqlpp_when_then.
+  Definition sqlpp_distinct : Set := SQLPP.sqlpp_distinct.
+  Definition sqlpp_project : Set := SQLPP.sqlpp_project.
+  Definition sqlpp_join_type : Set := SQLPP.sqlpp_join_type.
 
   Definition sqlpp_sqlpp_query := SQLPP.SPQuery.
   Definition sqlpp_sqlpp_positive : sqlpp_expr->sqlpp_expr := SQLPP.SPPositive.
@@ -70,15 +72,38 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_sqlpp_searched_case : list sqlpp_when_then->option sqlpp_expr->sqlpp_expr := SQLPP.SPSearchedCase.
   Definition sqlpp_sqlpp_some := SQLPP.SPSome.
   Definition sqlpp_sqlpp_every := SQLPP.SPEvery.
-  Definition sqlpp_sqlpp_dot := SQLPP.SPDot.
+  Definition sqlpp_sqlpp_dot : sqlpp_expr->string->sqlpp_expr := SQLPP.SPDot.
   Definition sqlpp_sqlpp_index := SQLPP.SPIndex.
+  Definition sqlpp_sqlpp_index_any := SQLPP.SPIndexAny.
   Definition sqlpp_sqlpp_literal := SQLPP.SPLiteral.
   Definition sqlpp_sqlpp_null := SQLPP.SPNull.
+  Definition sqlpp_sqlpp_missing := SQLPP.SPMissing.
   Definition sqlpp_sqlpp_var_ref := SQLPP.SPVarRef.
   Definition sqlpp_sqlpp_function_call := SQLPP.SPFunctionCall.
   Definition sqlpp_sqlpp_array := SQLPP.SPArray.
   Definition sqlpp_sqlpp_bag := SQLPP.SPBag.
   Definition sqlpp_sqlpp_object := SQLPP.SPObject.
+  Definition sqlpp_sqlpp_select_stmt := SQLPP.SPSelectStmt.
+  Definition sqlpp_sqlpp_select_block := SQLPP.SPSelectBlock.
+  Definition sqlpp_sqlpp_block := SQLPP.SPBlock.
+  Definition sqlpp_sqlpp_subquery := SQLPP.SPSubquery.
+  Definition sqlpp_sqlpp_select_sql := SQLPP.SPSelectSQL.
+  Definition sqlpp_sqlpp_select_value := SQLPP.SPSelectValue.
+  Definition sqlpp_sqlpp_project := SQLPP.SPProject.
+  Definition sqlpp_sqlpp_project_star := SQLPP.SPProjectStar.
+  Definition sqlpp_sqlpp_from := SQLPP.SPFrom.
+  Definition sqlpp_sqlpp_join := SQLPP.SPJoin.
+  Definition sqlpp_sqlpp_unnest := SQLPP.SPUnnest.
+  Definition sqlpp_sqlpp_inner := SQLPP.SPInner.
+  Definition sqlpp_sqlpp_left_outer := SQLPP.SPLeftOuter.
+  Definition sqlpp_sqlpp_where := SQLPP.SPWhere.
+  Definition sqlpp_sqlpp_no_where := SQLPP.SPNoWhere.
+  Definition sqlpp_sqlpp_group_by := SQLPP.SPGroupBy.
+  Definition sqlpp_sqlpp_no_group_by := SQLPP.SPNoGroupBy.
+  Definition sqlpp_sqlpp_order_by := SQLPP.SPOrderBy.
+  Definition sqlpp_sqlpp_no_order_by := SQLPP.SPNoOrderBy.
+  Definition sqlpp_sqlpp_distinct := SQLPP.SPDistinct.
+  Definition sqlpp_sqlpp_all := SQLPP.SPAll.
 
 End QSQLPP.
 
