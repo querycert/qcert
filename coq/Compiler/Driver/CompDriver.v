@@ -61,17 +61,20 @@ Section CompDriver.
   Require Import cNRAEnvtocNNRC.
   Require Import NRAEnvtoNNRC.
   Require Import cNRAEnvtoNRA.
+  Require Import cNRAEnvtoNRAEnv.
+  Require Import NRAEnvtocNRAEnv.
   Require Import NRAtocNRAEnv.
+  Require Import NNRCtocNNRC.
+  Require Import NNRCtoDNNRC.
+  Require Import NNRCtoNNRCMR.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
-  Require Import NNRCtoNNRCMR.
   Require Import cNNRCtoCAMP.
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSparkRDD.
   Require Import NNRCMRtoCldMR.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoCloudant.
-  Require Import NNRCtoDNNRC.
   Require Import DNNRCtotDNNRC.
   Require Import tDNNRCtoSparkDF.
 
@@ -92,8 +95,9 @@ Section CompDriver.
   Require Import ForeignToScala.
 
   (** Compiler Driver *)
-
-  Require Import CompLang CompEnv CompConfig.
+  Require Import CompLang.
+  Require Import CompEnv.
+  Require Import CompConfig.
 
   (* Some useful notations *)
   Local Open Scope list_scope.
@@ -184,16 +188,17 @@ Section CompDriver.
       cNRAEnvtoNRA.nraenv_core_to_nra_top q.
 
     Definition nraenv_core_to_nraenv (q: nraenv_core) : nraenv :=
-      nraenv_of_nraenv_core q.
+      cNRAEnvtoNRAEnv.nraenv_core_to_nraenv_top q.
 
     Definition nraenv_to_nraenv_core (q: nraenv) : nraenv_core :=
-      nraenv_core_of_nraenv q.
+      NRAEnvtocNRAEnv.nraenv_to_nraenv_core_top q.
 
     Definition nraenv_to_nnrc (q: nraenv) : nnrc :=
-      nraenv_to_nnrc_top q.
+      NRAEnvtoNNRC.nraenv_to_nnrc_top q.
 
     (** NNRC translations *)
-    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core := nnrc_to_nnrc_core q.
+    Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
+      NNRCtocNNRC.nnrc_to_nnrc_core_top q.
 
     Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
       lift_nnrc_core (nnrcToCamp_let avoid) q. (* XXX avoid ? XXX *)

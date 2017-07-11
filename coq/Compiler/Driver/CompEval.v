@@ -67,7 +67,7 @@ Section CompEval.
   Context {ft:foreign_type}.            (* Necessary for DNNRC evaluation *)
   Context {bm:brand_model}.             (* Necessary for DNNRC evaluation *)
 
-  Context {h:list(string*string)}.
+  Context (h:list(string*string)).
 
   (* Evaluation functions *)
   Section EvalFunctions.
@@ -202,6 +202,16 @@ Section CompEval.
       | Q_cloudant _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_error err => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       end.
+
+    Definition equal_outputs o1 o2 :=
+      match (o1,o2) with
+      | (Ev_out_unsupported _, Ev_out_unsupported _) => True
+      | (Ev_out_failed,Ev_out_failed) => True
+      | (Ev_out_returned d1, Ev_out_returned d2) => if data_eq_dec d1 d2 then True else False
+      | (Ev_out_returned_debug _, Ev_out_returned_debug _) => True
+      | (_,_) => False
+      end.
+      
   End EvalDriver.
 
   (* Evaluation functions: variant with a single world collection as input *)

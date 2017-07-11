@@ -14,39 +14,37 @@
  * limitations under the License.
  *)
 
-Section cNRAEnvtoNRA.
+Section cNRAEnvtoNRAEnv.
   Require Import String.
   Require Import List.
   Require Import BasicRuntime.
   Require Import cNRAEnvRuntime.
-  Require Import NRARuntime.
+  Require Import NRAEnvRuntime.
 
   Context {fr:foreign_runtime}.
 
   Section Top.
     Context (h:brand_relation_t).
 
-    Definition nraenv_core_to_nra_top (q:nraenv_core) : nra :=
-      AApp (nra_of_nraenv_core q) (nra_context (AConst (drec nil)) (AConst dunit)).
+    Definition nraenv_core_to_nraenv_top (q:nraenv_core) : nraenv :=
+      nraenv_of_nraenv_core q.
 
-    Theorem nraenv_core_to_nra_top_correct :
+    Theorem nraenv_core_to_nraenv_top_correct :
       forall q:nraenv_core, forall global_env:bindings,
           nraenv_core_eval_top h q global_env =
-          nra_eval_top h (nraenv_core_to_nra_top q) global_env.
+          nraenv_eval_top h (nraenv_core_to_nraenv_top q) global_env.
     Proof.
       intros.
       unfold nraenv_core_eval_top.
-      unfold nra_eval_top.
-      unfold nraenv_core_to_nra_top.
-      rewrite unfold_env_nra_sort.
-      simpl.
-      unfold nra_context_data.
-      rewrite drec_sort_idempotent.
+      unfold nraenv_eval_top.
+      unfold nraenv_core_to_nraenv_top.
+      unfold nraenv_eval.
+      rewrite nraenv_roundtrip.
       reflexivity.
     Qed.
   End Top.
     
-End cNRAEnvtoNRA.
+End cNRAEnvtoNRAEnv.
 
 (* 
 *** Local Variables: ***
