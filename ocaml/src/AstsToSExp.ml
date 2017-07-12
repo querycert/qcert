@@ -1193,6 +1193,183 @@ let sexp_to_sql (se : sexp) : QLang.sql =
     
 (* SQL++ Section *)
 
+let rec sqlpp_expr_to_sexp (expr : QSQLPP.sqlpp_expr) : sexp =	 
+  begin match expr with
+  | SPPositive arg -> STerm("Positive", [sqlpp_expr_to_sexp arg])
+  | SPNegative arg -> STerm("Negative", [sqlpp_expr_to_sexp arg])
+  | SPExists arg -> STerm("Exists", [sqlpp_expr_to_sexp arg])
+  | SPNot arg -> STerm("Not", [sqlpp_expr_to_sexp arg])
+  | SPIsNull arg -> STerm("IsNull", [sqlpp_expr_to_sexp arg])
+  | SPIsMissing arg -> STerm("IsMissing", [sqlpp_expr_to_sexp arg])
+  | SPIsUnknown arg -> STerm("IsUnknown", [sqlpp_expr_to_sexp arg])                                  
+  | SPPlus (arg1, arg2) -> STerm("Plus", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPMinus (arg1, arg2) -> STerm("Minus", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPMult (arg1, arg2) -> STerm("Mult", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2]) 
+  | SPDiv (arg1, arg2) -> STerm("Div", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPMod (arg1, arg2) -> STerm("Mod", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPExp (arg1, arg2) -> STerm("Exp", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPConcat (arg1, arg2) -> STerm("Concat", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPIn (arg1, arg2) -> STerm("In", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPEq (arg1, arg2) -> STerm("Eq", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPFuzzyEq (arg1, arg2) -> STerm("FuzzyEq", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPNeq (arg1, arg2) -> STerm("Neq", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPLt (arg1, arg2) -> STerm("Lt", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPGt (arg1, arg2) -> STerm("Gt", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPLe (arg1, arg2) -> STerm("Le", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPGe (arg1, arg2) -> STerm("Ge", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPLike (arg1, arg2) -> STerm("Like", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPAnd (arg1, arg2) -> STerm("And", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPOr (arg1, arg2) -> STerm("Or", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPBetween (arg1, arg2, arg3) -> STerm("Between", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2;sqlpp_expr_to_sexp arg3])
+  | SPSimpleCase (expr, whenthens, Some default) -> STerm("SimpleCase", STerm("Default", [sqlpp_expr_to_sexp default])::(List.map sqlpp_whenthen_to_sexp whenthens))
+  | SPSimpleCase (expr, whenthens, None) -> STerm("SimpleCase", sqlpp_expr_to_sexp expr::(List.map sqlpp_whenthen_to_sexp whenthens))
+  | SPSearchedCase (whenthens, Some default) -> STerm("SearchedCase", STerm("Default", [sqlpp_expr_to_sexp default])::(List.map sqlpp_whenthen_to_sexp whenthens))
+  | SPSearchedCase (whenthens, None) -> STerm("SearchedCase", List.map sqlpp_whenthen_to_sexp whenthens)
+  | SPSome (bindings, sat) -> STerm("Some", [STerm("Bindings", List.map sqlpp_var_in_to_sexp bindings); sqlpp_expr_to_sexp sat])
+  | SPEvery (bindings, sat) -> STerm("Some", [STerm("Bindings", List.map sqlpp_var_in_to_sexp bindings); sqlpp_expr_to_sexp sat])
+  | SPDot (expr, field) -> STerm("Dot", [coq_string_to_sstring field; sqlpp_expr_to_sexp expr])
+  | SPIndex (prim, ind) -> STerm("Index", [sqlpp_expr_to_sexp ind; sqlpp_expr_to_sexp prim])
+  | SPIndexAny (prim) -> STerm("IndexAny", [sqlpp_expr_to_sexp prim])
+  | SPLiteral (data) -> data_to_sexp data
+  | SPNull -> STerm("Null", [])
+	| SPMissing -> STerm("Missing", [])
+  | SPVarRef (name) -> STerm("VarRef", [coq_string_to_sstring name])
+  | SPFunctionCall (name, exprs) -> STerm("FunctionCall", (coq_string_to_sstring name) :: (List.map sqlpp_expr_to_sexp exprs))
+  | SPArray (members) -> STerm("Array", (List.map sqlpp_expr_to_sexp members))
+  | SPBag (members) -> STerm("Bag", (List.map sqlpp_expr_to_sexp members))
+  | SPObject (fields) -> STerm("Object", (List.map sqlpp_field_to_sexp fields))
+  | SPQuery (stmt) -> sqlpp_select_to_sexp stmt
+	end
+	
+and sqlpp_whenthen_to_sexp (whenthen : QSQLPP.sqlpp_when_then) : sexp =
+	begin match whenthen with
+	| SPWhenThen (whenexp, thenexp) -> STerm("WhenThen", [sqlpp_expr_to_sexp whenexp; sqlpp_expr_to_sexp thenexp])
+	end
+
+and sqlpp_var_in_to_sexp (var_in : (char list * sqlpp_expr)) : sexp =
+	STerm("VarIn", [coq_string_to_sstring (fst var_in); sqlpp_expr_to_sexp (snd var_in)])
+	
+and sqlpp_field_to_sexp (field : (sqlpp_expr * sqlpp_expr)) : sexp =
+	STerm("Field", [sqlpp_expr_to_sexp (fst field) ; sqlpp_expr_to_sexp (snd field)])
+	
+and sqlpp_select_to_sexp (stmt : sqlpp_select_statement) : sexp =
+	begin match stmt with
+	| SPSelectStmt (lets, block, unions, SPOrderBy orderby) -> STerm("Select", STerm("Lets", List.map sqlpp_let_to_sexp lets) :: 
+		(sqlpp_select_block_to_sexp block) :: STerm("Unions", List.map sqlpp_union_to_sexp unions) :: 
+		STerm("Ordering", List.map sqlpp_order_by_to_sexp orderby)::[])
+	| SPSelectStmt (lets, block, unions, SPNoOrderBy) -> STerm("Select", STerm("Lets", List.map sqlpp_let_to_sexp lets) :: 
+		(sqlpp_select_block_to_sexp block) :: STerm("Unions", List.map sqlpp_union_to_sexp unions) ::
+		STerm("Ordering", [])::[])
+	end
+	
+and sqlpp_let_to_sexp (l : (char list * sqlpp_expr)) : sexp =
+	STerm("Let", [coq_string_to_sstring (fst l); sqlpp_expr_to_sexp (snd l)])
+	
+and sqlpp_select_block_to_sexp (block : sqlpp_select_block) : sexp =
+	begin match block with
+	| SPSelectBlock (select, froms, lets1, where, groupby, lets2, having) -> STerm("SelectBlock", [(sqlpp_select_clause_to_sexp select);
+			STerm("Froms", (List.map sqlpp_from_to_sexp froms)); STerm("Lets", (List.map sqlpp_let_to_sexp lets1)); 
+			(sqlpp_where_to_sexp where); (sqlpp_group_to_sexp groupby);
+			STerm("Lets", (List.map sqlpp_let_to_sexp lets2)); (sqlpp_having_to_sexp having)]) 
+	end
+
+and sqlpp_select_clause_to_sexp (clause : sqlpp_select) : sexp =
+	begin match clause with
+	| SPSelectSQL (distinct, projections) -> STerm("SelectSQL", sqlpp_distinct_to_sexp distinct::(List.map sqlpp_project_to_sexp projections))
+	| SPSelectValue (distinct, expr) -> STerm("SelectValue", [sqlpp_distinct_to_sexp distinct; sqlpp_expr_to_sexp expr])
+	end
+	
+and sqlpp_distinct_to_sexp (distinct : sqlpp_distinct) : sexp =
+	begin match distinct with
+	| SPDistinct -> STerm("Distinct", [])
+	| SPAll -> STerm("All", [])
+	end
+	
+and sqlpp_project_to_sexp (project : sqlpp_project) : sexp =
+	begin match project with
+	| SPProject (expr, Some name) -> STerm("Project", [sqlpp_expr_to_sexp expr; coq_string_to_sstring name])
+	| SPProject (expr, None) -> STerm("Project", [sqlpp_expr_to_sexp expr])
+	| SPProjectStar -> STerm("ProjectStar", [])
+	end
+	
+and sqlpp_from_to_sexp (clause : sqlpp_from) : sexp =
+	begin match clause with
+	| SPFrom (expr, Some name, joins) -> STerm("From", sqlpp_expr_to_sexp expr :: STerm("as", [coq_string_to_sstring name]) ::
+		(List.map sqlpp_join_clause_to_sexp joins))
+	| SPFrom (expr, None, joins) ->  STerm("From", sqlpp_expr_to_sexp expr :: (List.map sqlpp_join_clause_to_sexp joins))
+	end
+	
+and sqlpp_join_clause_to_sexp (clause : sqlpp_join_clause) : sexp =
+	begin match clause with
+	| SPJoin (jtype, expr1, Some var, expr2) -> STerm("Join", [sqlpp_join_type_to_sexp jtype; STerm("at", [coq_string_to_sstring var]); 
+			sqlpp_expr_to_sexp expr1; sqlpp_expr_to_sexp expr2])
+	| SPJoin (jtype, expr1, None, expr2) -> STerm("Join", [sqlpp_join_type_to_sexp jtype; sqlpp_expr_to_sexp expr1; 
+			sqlpp_expr_to_sexp expr2])
+	| SPUnnest (jtype, expr, Some var, Some positionVar) -> STerm("Unnest", [sqlpp_join_type_to_sexp jtype; 
+			STerm("as", [coq_string_to_sstring var]); STerm("at", [coq_string_to_sstring positionVar]); sqlpp_expr_to_sexp expr])
+	| SPUnnest (jtype, expr, Some var, None) -> STerm("Unnest", [sqlpp_join_type_to_sexp jtype; 
+			STerm("as", [coq_string_to_sstring var]); sqlpp_expr_to_sexp expr])
+	| SPUnnest (jtype, expr, None, Some positionVar) -> STerm("Unnest", [sqlpp_join_type_to_sexp jtype; 
+			STerm("at", [coq_string_to_sstring positionVar]); sqlpp_expr_to_sexp expr])
+	| SPUnnest (jtype, expr, None, None) -> STerm("Unnest", [sqlpp_join_type_to_sexp jtype; sqlpp_expr_to_sexp expr])
+	end
+	
+and sqlpp_join_type_to_sexp (jtype : sqlpp_join_type) : sexp =
+	begin match jtype with
+	| SPInner -> STerm("Inner", [])
+	| SPLeftOuter -> STerm("LeftOuter", [])
+	end
+	
+and sqlpp_group_to_sexp (clause : sqlpp_group_by) : sexp =
+	begin match clause with
+	| SPGroupBy (keys, Some aspart) -> STerm("GroupBy", [STerm("Keys", List.map sqlpp_group_key_to_sexp keys); sqlpp_group_as_to_sexp aspart])
+	| SPGroupBy (keys, None) -> STerm("GroupBy", [STerm("Keys", List.map sqlpp_group_key_to_sexp keys)])
+	| SPNoGroupBy -> STerm("GroupBy", [])
+	end
+	
+and sqlpp_group_as_to_sexp (aspart : (char list * ((char list * char list) list)))	: sexp =
+	begin match aspart with
+	| (name , renames) -> STerm("GroupAs", coq_string_to_sstring name :: (List.map sqlpp_rename_to_sexp renames))
+	end
+	
+and sqlpp_rename_to_sexp (rename : (char list * char list)) : sexp =
+	begin match rename with
+	| (var , varref) -> STerm("Rename", [coq_string_to_sstring var; coq_string_to_sstring varref])
+	end
+	
+and sqlpp_group_key_to_sexp (key : (sqlpp_expr * char list option)) : sexp =
+	begin match key with
+	| (expr, Some name) -> STerm("Key", [sqlpp_expr_to_sexp expr; STerm("as", [coq_string_to_sstring name])])
+	| (expr, None) -> STerm("Key", [sqlpp_expr_to_sexp expr])
+	end
+	
+and sqlpp_where_to_sexp (clause : sqlpp_where) : sexp =
+	begin match clause with
+	| SPWhere expr -> STerm("Where", [sqlpp_expr_to_sexp expr])
+	| SPNoWhere -> STerm("Where", [])
+	end
+	
+and sqlpp_having_to_sexp (having : sqlpp_expr option) : sexp =
+	begin match having with
+	| Some expr -> STerm("Having", [sqlpp_expr_to_sexp expr])
+	| None -> STerm("Having", [])
+	end
+	
+and sqlpp_union_to_sexp(union : sqlpp_union_element) : sexp = 
+	begin match union with
+	| SPBlock (block) -> sqlpp_select_block_to_sexp block
+	| SPSubquery (stmt) -> sqlpp_select_to_sexp stmt
+	end
+	
+and sqlpp_order_by_to_sexp(order : (sqlpp_expr * sqlpp_order_spec)) : sexp = 
+	begin match order with
+	| (expr , Ascending) -> STerm("OrderBy", [sqlpp_expr_to_sexp (fst order) ; SString "ASC"])
+	| (expr , Descending) -> STerm("OrderBy", [sqlpp_expr_to_sexp (fst order) ; SString "DESC"])
+	end
+
+let sqlpp_to_sexp (stmts : QLang.sqlpp) : sexp =
+	STerm("statements", List.map sqlpp_expr_to_sexp stmts)
+	
 let rec sexp_to_sqlpp_expr (stmt : sexp)  =
   begin match stmt with
 	| STerm ("Positive", [s]) -> QSQLPP.sqlpp_sqlpp_positive (sexp_to_sqlpp_expr s) 
@@ -1293,19 +1470,11 @@ and sexp_to_sqlpp_select_body (sl : sexp list) =
 	| STerm("Lets", lets)::STerm("SelectBlock", block)::STerm("Unions", unions)::[] ->
 		QSQLPP.sqlpp_sqlpp_select_stmt (List.map sexp_to_sqlpp_let lets) (sexp_to_sqlpp_select_block block) 
 		   (List.map sexp_to_sqlpp_union unions) QSQLPP.sqlpp_sqlpp_no_order_by
-	| STerm("Lets", lets)::STerm("SelectBlock", block)::STerm("Ordering", ordering)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt (List.map sexp_to_sqlpp_let lets) (sexp_to_sqlpp_select_block block) [] (sexp_to_sqlpp_order_by ordering)
-	| STerm("Lets", lets)::STerm("SelectBlock", block)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt (List.map sexp_to_sqlpp_let lets) (sexp_to_sqlpp_select_block block) [] QSQLPP.sqlpp_sqlpp_no_order_by
 	| STerm("SelectBlock", block)::STerm("Unions", unions)::STerm("Ordering", ordering)::[] ->
 		QSQLPP.sqlpp_sqlpp_select_stmt [] (sexp_to_sqlpp_select_block block) (List.map sexp_to_sqlpp_union unions) 
 		  (sexp_to_sqlpp_order_by ordering)
 	| STerm("SelectBlock", block)::STerm("Unions", unions)::[] ->
 		QSQLPP.sqlpp_sqlpp_select_stmt [] (sexp_to_sqlpp_select_block block) (List.map sexp_to_sqlpp_union unions) QSQLPP.sqlpp_sqlpp_no_order_by
-	| STerm("SelectBlock", block)::STerm("Ordering", ordering)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt [] (sexp_to_sqlpp_select_block block) [] (sexp_to_sqlpp_order_by ordering)
-	| STerm("SelectBlock", block)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt [] (sexp_to_sqlpp_select_block block) [] QSQLPP.sqlpp_sqlpp_no_order_by
 	| _ ->
 		raise (Qcert_Error "Not well-formed S-expr list in SQL++ select statement")
 	end
@@ -1516,8 +1685,7 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_sql _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Q_sqlpp _ ->
-      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | Q_sqlpp q -> sqlpp_to_sexp q
   | Q_lambda_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_nra _ ->
