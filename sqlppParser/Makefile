@@ -73,10 +73,10 @@ $(S_EXPRESSIONS):	$(TESTS)
 	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $(TESTS)
 
 tests/%.js:	tests/%.p.s-sql
-	-../bin/qcert -source $(LANG) -source-sexp $<
+	-../bin/qcert -source $(LANG) -source-sexp -target $(LANG) -emit-sexp $<
 
 tests/%.js:	tests/%.sqlpp
-	-../bin/qcert -source $(LANG) $<
+	-../bin/qcert -source $(LANG) -target $(LANG) -emit-sexp $<
 
 tests/%.js:	tests/%.sql
 	-../bin/qcert -source $(LANG) $<
@@ -92,5 +92,5 @@ clean:
 	@rm -rf bin/*
 
 cleantests:
-	@rm tests/*.js tests/*.p.s-sql
+	@rm tests/*.js tests/*.p.s-sql tests/*.txt tests/*.sexp
 
