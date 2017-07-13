@@ -879,9 +879,13 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		builder = startNode("Select", builder);
 		if (node.hasLetClauses())
 			builder = makeNode("Lets", builder, node.getLetList());
+		else
+			builder = makeNode("Lets", builder);
 		builder = node.getSelectSetOperation().accept(this, builder);
 		if (node.hasOrderby())
 			builder = node.getOrderbyClause().accept(this, builder);
+		else
+			builder = makeNode("Ordering", builder);
 		return endNode(builder);
 		
 	}

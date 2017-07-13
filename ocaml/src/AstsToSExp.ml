@@ -1467,14 +1467,6 @@ and sexp_to_sqlpp_select_body (sl : sexp list) =
 	| STerm("Lets", lets)::STerm("SelectBlock", block)::STerm("Unions", unions)::STerm("Ordering", ordering)::[] ->
 		QSQLPP.sqlpp_sqlpp_select_stmt (List.map sexp_to_sqlpp_let lets) (sexp_to_sqlpp_select_block block) 
 		   (List.map sexp_to_sqlpp_union unions) (sexp_to_sqlpp_order_by ordering)
-	| STerm("Lets", lets)::STerm("SelectBlock", block)::STerm("Unions", unions)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt (List.map sexp_to_sqlpp_let lets) (sexp_to_sqlpp_select_block block) 
-		   (List.map sexp_to_sqlpp_union unions) QSQLPP.sqlpp_sqlpp_no_order_by
-	| STerm("SelectBlock", block)::STerm("Unions", unions)::STerm("Ordering", ordering)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt [] (sexp_to_sqlpp_select_block block) (List.map sexp_to_sqlpp_union unions) 
-		  (sexp_to_sqlpp_order_by ordering)
-	| STerm("SelectBlock", block)::STerm("Unions", unions)::[] ->
-		QSQLPP.sqlpp_sqlpp_select_stmt [] (sexp_to_sqlpp_select_block block) (List.map sexp_to_sqlpp_union unions) QSQLPP.sqlpp_sqlpp_no_order_by
 	| _ ->
 		raise (Qcert_Error "Not well-formed S-expr list in SQL++ select statement")
 	end
@@ -1541,7 +1533,10 @@ and sexp_to_sqlpp_union (se : sexp) : QSQLPP.sqlpp_union_element =
 	end
 		
 and sexp_to_sqlpp_order_by (sl : sexp list) : QSQLPP.sqlpp_order_by =
-	QSQLPP.sqlpp_sqlpp_order_by (List.map sexp_to_sqlpp_order_by_element sl)
+	begin match sl with
+	| [] -> QSQLPP.sqlpp_sqlpp_no_order_by
+	| _ -> QSQLPP.sqlpp_sqlpp_order_by (List.map sexp_to_sqlpp_order_by_element sl)
+	end
 	
 and sexp_to_sqlpp_order_by_element (se: sexp) =
 	begin match se with
