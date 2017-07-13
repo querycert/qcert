@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package util;
+package org.qcert.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;

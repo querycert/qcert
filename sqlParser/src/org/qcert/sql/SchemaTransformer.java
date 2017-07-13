@@ -20,6 +20,8 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.qcert.util.FileUtil;
+
 import com.facebook.presto.sql.tree.ColumnDefinition;
 import com.facebook.presto.sql.tree.CreateTable;
 import com.facebook.presto.sql.tree.Statement;
@@ -28,8 +30,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
-
-import util.FileUtil;
 
 /**
  * Transforms SQL "schemas" (SQL sources containing 'create table' statements) into JSON schemas consumable by the rest of qcert
