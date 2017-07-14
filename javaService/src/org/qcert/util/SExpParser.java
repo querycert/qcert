@@ -29,11 +29,27 @@ import java.util.Stack;
  */
 public class SExpParser {
 	/**
-	 * Parse the file named in the cmdline and display the result
+	 * With a single argument, parse the file named and display the result.
+	 * With two arguments, parse both files and compare S-expression structures.  If they are the same, say so, but if they
+	 *   are different print them both using the same algorithm.  This is helpful in determining equivalence ignoring whitespace.
 	 */
 	public static void main(String[] args) throws IOException {
 		SExpression expr = parse(new File(args[0]));
-		System.out.println(expr);
+		if (args.length == 1)
+			System.out.println(expr);
+		else {
+			SExpression other = parse(new File(args[1]));
+			String first = expr.toString();
+			String second = other.toString();
+			if (first.equals(second))
+				System.out.println("S-expression structures are the same");
+			else {
+				System.out.println("S-expression structures differ.  First:");
+				System.out.println(first);
+				System.out.println("Second:");
+				System.out.println(second);
+			}
+		}
 	}
 	
 	/**

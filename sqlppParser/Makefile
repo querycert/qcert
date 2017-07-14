@@ -26,9 +26,9 @@ EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
 # Keep this list accurate as dependencies evolve or versions change
-DEPENDENCIES=lib/algebricks-common-0.3.1.jar lib/algebricks-core-0.3.1.jar lib/asterix-common-0.9.1.jar lib/asterix-lang-common-0.9.1.jar \
-	lib/asterix-lang-sqlpp-0.9.1.jar lib/asterix-om-0.9.1.jar lib/asterix-runtime-0.9.1.jar lib/hyracks-api-0.3.1.jar \
-	lib/hyracks-dataflow-common-0.3.1.jar lib/log4j-1.2.17.jar
+DEPENDENCIES=lib/asterix-lang-sqlpp-0.9.1.jar lib/asterix-lang-common-0.9.1.jar lib/asterix-common-0.9.1.jar \
+	lib/algebricks-common-0.3.1.jar lib/hyracks-dataflow-common-0.3.1.jar lib/algebricks-core-0.3.1.jar \
+	lib/hyracks-api-0.3.1.jar lib/log4j-1.2.17.jar lib/asterix-runtime-0.9.1.jar lib/asterix-om-0.9.1.jar
 
 CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.7.jar $(DEPENDENCIES))
 
@@ -55,9 +55,11 @@ TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp test
 	tests/tpch_15.sql tests/tpch_16.sql tests/tpch_17.sql tests/tpch_18.sql tests/tpch_19.sql tests/tpch_20.sql tests/tpch_21.sql tests/tpch_22.sql
 
 
-S_EXPRESSIONS=$(patsubst %.sqlpp,%.p.s-sql,$(patsubst %.sql,%.p.s-sql,$(TESTS)))
+J_SEXP=$(patsubst %.sqlpp,%_j.sexp,$(TESTS))
 
 JS=$(patsubst %.sqlpp,%.js,$(patsubst %.sql,%.js,$(TESTS)))
+
+O_SEXP=$(patsubst %.sqlpp,%_sql++.sexp,$(TESTS))
 
 all:
 	$(MAKE) classes
@@ -65,21 +67,21 @@ all:
 
 classes: $(CLASSES)
 
-unit_tests:	$(JS)
+# Right now, we are not testing .js generation routinely.  This tests the s-expression round trips for SQL++ through the Coq AST
+unit_tests:	$(O_SEXP)
 
-s_expr:	$(S_EXPRESSIONS)
-
-$(S_EXPRESSIONS):	$(TESTS)
-	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $(TESTS)
-
-tests/%.js:	tests/%.p.s-sql
-	-../bin/qcert -source $(LANG) -source-sexp -target $(LANG) -emit-sexp $<
+tests/%_j.sexp:	tests/%.sqlpp
+	java -cp bin$(PATH_SEP)$(CPATH) org.qcert.sqlpp.SqlppEncoder $<
 
 tests/%.js:	tests/%.sqlpp
-	-../bin/qcert -source $(LANG) -target $(LANG) -emit-sexp $<
+	-../bin/qcert -source $(LANG) $<
 
 tests/%.js:	tests/%.sql
 	-../bin/qcert -source $(LANG) $<
+
+tests/%_sql++.sexp:	tests/%.sqlpp tests/%_j.sexp
+	-../bin/qcert -source sql++ -target sql++ -emit-sexp $<
+	-java -cp bin$(PATH_SEP)$(CPATH) org.qcert.util.SExpParser tests/$*_j.sexp $@
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
 	-mkdir -p bin
@@ -92,5 +94,6 @@ clean:
 	@rm -rf bin/*
 
 cleantests:
-	@rm tests/*.js tests/*.p.s-sql tests/*.txt tests/*.sexp
+	-@rm tests/*.js tests/*.txt tests/*.sexp
 
+.PRECIOUS:	$(J_SEXP)

@@ -206,7 +206,7 @@ public class SqlppEncoder {
 	 * @throws IOException 
 	 */
 	private static void outputResult(String parsed, String arg) throws IOException {
-		File output = new File(arg.substring(0, arg.lastIndexOf('.')) +".p.s-sql");
+		File output = new File(arg.substring(0, arg.lastIndexOf('.')) +"_j.sexp");
 		PrintWriter wtr = new PrintWriter(new FileWriter(output));
 		wtr.println(parsed);
 		wtr.close();
