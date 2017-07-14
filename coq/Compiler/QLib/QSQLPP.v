@@ -58,6 +58,7 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_sqlpp_concat : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPConcat.
   Definition sqlpp_sqlpp_in : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPIn.
   Definition sqlpp_sqlpp_eq : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPEq.
+  Definition sqlpp_sqlpp_fuzzy_eq : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPFuzzyEq.
   Definition sqlpp_sqlpp_neq : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPNeq.
   Definition sqlpp_sqlpp_lt : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPLt.
   Definition sqlpp_sqlpp_gt : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPGt.

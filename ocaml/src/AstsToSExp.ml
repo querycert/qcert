@@ -1221,7 +1221,8 @@ let rec sqlpp_expr_to_sexp (expr : QSQLPP.sqlpp_expr) : sexp =
   | SPAnd (arg1, arg2) -> STerm("And", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
   | SPOr (arg1, arg2) -> STerm("Or", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
   | SPBetween (arg1, arg2, arg3) -> STerm("Between", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2;sqlpp_expr_to_sexp arg3])
-  | SPSimpleCase (expr, whenthens, Some default) -> STerm("SimpleCase", STerm("Default", [sqlpp_expr_to_sexp default])::(List.map sqlpp_whenthen_to_sexp whenthens))
+  | SPSimpleCase (expr, whenthens, Some default) -> STerm("SimpleCase", (sqlpp_expr_to_sexp expr) :: STerm("Default", [sqlpp_expr_to_sexp default]) ::
+			(List.map sqlpp_whenthen_to_sexp whenthens))
   | SPSimpleCase (expr, whenthens, None) -> STerm("SimpleCase", sqlpp_expr_to_sexp expr::(List.map sqlpp_whenthen_to_sexp whenthens))
   | SPSearchedCase (whenthens, Some default) -> STerm("SearchedCase", STerm("Default", [sqlpp_expr_to_sexp default])::(List.map sqlpp_whenthen_to_sexp whenthens))
   | SPSearchedCase (whenthens, None) -> STerm("SearchedCase", List.map sqlpp_whenthen_to_sexp whenthens)
@@ -1301,7 +1302,7 @@ and sqlpp_from_to_sexp (clause : sqlpp_from) : sexp =
 	
 and sqlpp_join_clause_to_sexp (clause : sqlpp_join_clause) : sexp =
 	begin match clause with
-	| SPJoin (jtype, expr1, Some var, expr2) -> STerm("Join", [sqlpp_join_type_to_sexp jtype; STerm("at", [coq_string_to_sstring var]); 
+	| SPJoin (jtype, expr1, Some var, expr2) -> STerm("Join", [sqlpp_join_type_to_sexp jtype; STerm("as", [coq_string_to_sstring var]); 
 			sqlpp_expr_to_sexp expr1; sqlpp_expr_to_sexp expr2])
 	| SPJoin (jtype, expr1, None, expr2) -> STerm("Join", [sqlpp_join_type_to_sexp jtype; sqlpp_expr_to_sexp expr1; 
 			sqlpp_expr_to_sexp expr2])
@@ -1388,6 +1389,7 @@ let rec sexp_to_sqlpp_expr (stmt : sexp)  =
 	| STerm("Concat", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_concat (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("In", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_in (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Eq", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_eq (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("FuzzyEq", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_fuzzy_eq (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Neq", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_neq (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Lt", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_lt (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Gt", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_gt (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
@@ -1444,8 +1446,10 @@ let rec sexp_to_sqlpp_expr (stmt : sexp)  =
 and sexp_to_sqlpp_when_then (se : sexp) : QSQLPP.sqlpp_when_then =
 	begin	match se with
 	| STerm("WhenThen", [e1;e2]) -> QSQLPP.sqlpp_sqlpp_when_then (sexp_to_sqlpp_expr e1) (sexp_to_sqlpp_expr e2)
+	| STerm("WhenThen", _) -> raise (Qcert_Error "Not well-formed operands to WhenThen node")
+	| STerm(sterm, _) -> raise (Qcert_Error ("Unexpected node where WhenThen expected: " ^ sterm))
 	| _ ->
-		raise (Qcert_Error "WhenThen node not found where expected in SQL++ case expression")
+		raise (Qcert_Error "Non STerm node found where WhenThen node expected in SQL++ case expression")
 	end
 		
 and sexp_to_sqlpp_binding (se : sexp) : (char list * sqlpp_expr) =
@@ -1589,8 +1593,8 @@ and sexp_to_sqlpp_join_clause (se : sexp) : QSQLPP.sqlpp_join_clause =
 	
 and sexp_to_sqlpp_join_type (se : sexp) : QSQLPP.sqlpp_join_type =
 	begin match se with
-	| SString "Inner" -> QSQLPP.sqlpp_sqlpp_inner
-	| SString "LeftOuter" -> QSQLPP.sqlpp_sqlpp_left_outer
+	| STerm("Inner", []) -> QSQLPP.sqlpp_sqlpp_inner
+	| STerm("LeftOuter", []) -> QSQLPP.sqlpp_sqlpp_left_outer
 	| _ -> raise (Qcert_Error "Not well-formed S-expr found where a join type is expected")
 	end
 	

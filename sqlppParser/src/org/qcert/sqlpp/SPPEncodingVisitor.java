@@ -162,7 +162,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			builder = startNode("SearchedCase", builder);
 		Expression defaultValue = node.getElseExpr();
 		if (defaultValue != null)
-			builder = makeNode("Else", builder, defaultValue);
+			builder = makeNode("Default", builder, defaultValue);
 		List<Expression> whens = node.getWhenExprs();
 		List<Expression> thens = node.getThenExprs();
 		assert whens.size() == thens.size();
@@ -629,7 +629,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			tag = "Eq";
 			break;
 		case FUZZY_EQ:
-			tag = "FuzzyEQ";
+			tag = "FuzzyEq";
 			break;
 		case GE:
 			tag = "Ge";
