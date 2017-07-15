@@ -143,9 +143,8 @@ Module QOperators(runtime:CompilerRuntime).
     Definition asconcat : op 
       := RBinaryOps.ASConcat.
 
-  (* Note that foreign operators should be encapuslated and 
-     exported as part of the model *)
-
+    (* Note that foreign operators should be encapuslated and 
+       exported as part of the model *)
   End Binary.
 End QOperators.
 

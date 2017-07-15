@@ -191,7 +191,7 @@ Section CompDriver.
       nnrc_to_nnrcmr_top vinit inputs_loc q.
 
     Definition nnrc_to_dnnrc (inputs_loc: vdbindings) (q: nnrc) : dnnrc :=
-      nnrc_to_dnnrc tt inputs_loc q.
+      nnrc_to_dnnrc_top inputs_loc q.
 
     Definition nnrc_to_javascript (q: nnrc) : javascript := (* XXX Expands GroupBy For now XXX *)
       lift_nnrc_core nnrc_to_js_top (nnrc_to_nnrc_core q).

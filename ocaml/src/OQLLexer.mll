@@ -40,12 +40,14 @@
 	  (* Functions *)
 	  "flatten", FLATTEN;
 	  "avg", AVG;
+	  "favg", FAVG;
 	  "sum", SUM;
           "float_sum", FLOAT_SUM;
 	  "count", COUNT;
 	  "min", MIN;
 	  "max", MAX;
 	  "struct", STRUCT;
+	  "bag", BAG;
 	   (* Data *)
 	  "nil", NIL
 	]; tbl
@@ -69,7 +71,7 @@ rule token sbuff = parse
 | "<" { LT }
 | ">" { GT }
 | "<=" { LTEQ }
-| ">=" { GT }
+| ">=" { GTEQ }
 | "+" { PLUS }
 | "*" { STAR }
 | "-" { MINUS }

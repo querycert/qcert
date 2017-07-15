@@ -81,7 +81,7 @@ Section CompLang.
       | "js"%string | "rhino"%string | "javascript"%string => L_javascript
       | "java"%string => L_java
       | "spark_rdd"%string => L_spark_rdd
-      | "spark_df"%string => L_spark_df
+      | "spark_df"%string | "spark_dataset"%string => L_spark_df
       | "cloudant"%string => L_cloudant
       | "error"%string => L_error ""
       | _ => L_error ("'"++name++"' is not a language name")
