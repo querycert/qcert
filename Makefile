@@ -18,15 +18,12 @@ CP=cp
 TSC?=tsc
 
 # This may have to be specialized
-COQ2HTML=../../opt/bin
-COQDOCFLAGS=-interpolate -utf8 --lib-subtitles --no-lib-name -l
-export COQ2HTML
-export COQDOCFLAGS
+export COQ2HTML=../../opt/bin
 
 DIST_DIR=
 
 #	Basic/Util/RTactics
-MODULES = \
+export MODULES = \
 	Basic/Util/Digits \
 	Basic/Util/Lattice \
 	Basic/Util/Monoid \
@@ -370,7 +367,7 @@ endif
 ifneq ($(SQL)$(SQLPP)$(ODM),)
 	@$(MAKE) -C javaService install
 endif
- 
+
 spark2-runtime:
 	@$(MAKE) -C runtime/spark2
 
@@ -417,12 +414,6 @@ js-extraction:
 Makefile.coq: Makefile $(VS) $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
 
-html: Makefile.coq
-	@$(MAKE) -f Makefile.coq html
-
-gather_globs:
-	@find ./coq \( -name '*.glob' \) -print0 | xargs -0 ./scripts/gather_glob.sh
-
 clean_detritus:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 ./script/remove_detritus_derived_file.sh
 
@@ -437,7 +428,6 @@ clean:: Makefile.coq remove_all_derived
 	@$(MAKE) -C samples clean
 	@rm -f Makefile.coq
 	@rm -f *~
-	@rm -f index.html
 
 cleanall: clean remove_all_derived clean_detritus
 
@@ -457,12 +447,7 @@ cleandist:
 	rm -rf $(DISTDIR)
 	rm -f $(DISTDIR).tar.gz
 
-documentation: $(COQ2HTML)/coq2html $(FILES)
-	@$(MAKE) gather_globs
-	mkdir -p docs/html
-	rm -f docs/html/*.html
-	$(COQ2HTML)/coq2html -physical-dir coq -logical-dir "Qcert" -o 'docs/html/%.html' docs/globs/*.glob \
-          $(filter-out $(COQ2HTML)/coq2html, $^)
-	cp docs/coq2html.css docs/coq2html.js docs/html/
+documentation:
+	$(MAKE) -C coq documentation
 
-.PHONY: all clean clean_detritus html
+.PHONY: all clean clean_detritus
