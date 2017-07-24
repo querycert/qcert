@@ -72,7 +72,7 @@ Section SQLPPSize.
 		end
 	| SPSome  l e
     | SPEvery l e
-		=> 1 + (List.fold_left (fun acc p => acc + (string_expr_pair_size p)) l 0) + (sqlpp_expr_size  e)
+		=> 1 + (List.fold_left (fun acc p => acc + (1 + (sqlpp_expr_size (snd p)))) l 0) + (sqlpp_expr_size  e)
 	| SPDot  expr _
 		=> 1 + (sqlpp_expr_size  expr)                                                              
 	| SPIndex  e i
@@ -91,7 +91,7 @@ Section SQLPPSize.
 	| SPBag l
 		=> 1 + (List.fold_left (fun acc expr => acc + 1 + sqlpp_expr_size expr) l 0)
 	| SPObject l
-		=> 1 + (List.fold_left (fun acc p => acc + (expr_pair_size p)) l 0)
+		=> 1 + (List.fold_left (fun acc pair => acc + (1 + (sqlpp_expr_size (fst pair)) + (sqlpp_expr_size (snd pair)))) l 0)
 	| SPQuery stmt
 		=> 1 + (sqlpp_statement_size stmt)
       end
@@ -99,11 +99,11 @@ Section SQLPPSize.
   with sqlpp_statement_size (stmt: sqlpp_select_statement) :=
   	match stmt with
   	| SPSelectStmt lets block unions (SPOrderBy orders)
-  		=> 1 + (List.fold_left (fun acc p => acc + (string_expr_pair_size p)) lets 0) + (sqlpp_select_block_size block) +
+  		=> 1 + (List.fold_left (fun acc p => acc + (1 + (sqlpp_expr_size (snd p)))) lets 0) + (sqlpp_select_block_size block) +
   			(List.fold_left (fun acc u => acc + sqlpp_union_size u) unions 0) + 
-  			(List.fold_left (fun acc o => acc + sqlpp_order_pair_size o) orders 0)
+  			(List.fold_left (fun acc o => acc + (let '(oo,_) := o in 1 + (sqlpp_expr_size oo))) orders 0)
   	| SPSelectStmt lets block unions SPNoOrderBy
-  		=> 1 + (List.fold_left (fun acc p => acc + (string_expr_pair_size p)) lets 0) + (sqlpp_select_block_size block) +
+  		=> 1 + (List.fold_left (fun acc p => acc + (1 + (sqlpp_expr_size (snd p)))) lets 0) + (sqlpp_select_block_size block) +
   			(List.fold_left (fun acc u => acc + sqlpp_union_size u) unions 0)
   	end
   	
@@ -111,12 +111,12 @@ Section SQLPPSize.
   	match block with
 	| SPSelectBlock select froms lets1 whr groupby lets2 having
 		=> 1 + (sqlpp_select_clause_size select) + (List.fold_left (fun acc fr => acc + (sqlpp_from_size fr)) froms 0) + 
-			(List.fold_left (fun acc p => acc + (string_expr_pair_size p)) lets1 0) +
+			(List.fold_left (fun acc p => acc + (1 + (sqlpp_expr_size (snd p)))) lets1 0) +
 	    match whr with
 	    | SPNoWhere => 0
 	    | SPWhere e =>	1 + (sqlpp_expr_size e)
 	    end + 
-		 	(sqlpp_group_by_size groupby) + (List.fold_left (fun acc p => acc + (string_expr_pair_size p)) lets1 0) +
+		 	(sqlpp_group_by_size groupby) + (List.fold_left (fun acc p => acc + (1 + (sqlpp_expr_size (snd p)))) lets1 0) +
 		match having with
 		| None => 0
 		| Some expr => sqlpp_expr_size expr
@@ -127,11 +127,6 @@ Section SQLPPSize.
   	match union with
   	| SPBlock block => 1 + (sqlpp_select_block_size block)
   	| SPSubquery q => 1 + (sqlpp_statement_size q)
-  	end
-
-  with sqlpp_order_pair_size (order : (sqlpp_expr * sqlpp_order_spec)) :=
-  	match order with
-  	| (o, _) => 1 + (sqlpp_expr_size o)
   	end
 
   with sqlpp_select_clause_size (select : sqlpp_select) := 
@@ -155,13 +150,8 @@ Section SQLPPSize.
   	| SPWhenThen w t
 		=> 1 + (sqlpp_expr_size w) + (sqlpp_expr_size t)
 	end
-      
-  with string_expr_pair_size (pair : (string * sqlpp_expr)) :=
-	 1 + (sqlpp_expr_size (snd pair))
-  	  
-  with expr_pair_size (pair : (sqlpp_expr * sqlpp_expr)) :=
-	1 + (sqlpp_expr_size (fst pair)) + (sqlpp_expr_size (snd pair)).
-  	  
+    .
+    
   Definition sqlpp_size (l : list sqlpp_expr) :=
 	List.fold_left (fun acc e => acc + (sqlpp_expr_size e)) l 0.
 
