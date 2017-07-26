@@ -23,7 +23,7 @@ documentation: $(FILES)
 	@$(MAKE) gather_globs
 	mkdir -p ../docs/html
 	rm -f ../docs/html/*.html
-	../$(COQ2HTML)/coq2html -d ../docs/html -base Qcert ../docs/globs/*.glob $^
+	coq2html -d ../docs/html -base Qcert ../docs/globs/*.glob $^
 	cp ../docs/coq2html.css ../docs/coq2html.js ../docs/html/
 
 .PHONY: all clean clean_detritus html

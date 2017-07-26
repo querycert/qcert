@@ -832,22 +832,12 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_cloudant; auto.
     Qed.
     
-    (** XXX This COULD BE the main correctness theorem. Currently
-          being worked on XXX if:
-
-            - the driver [dv] is correct (i.e., only follows verified
-            compilation paths) then for all input query [q]:
-
-            - for all produced compilation steps I.e., q' in the list
-            returned by compile dv q, we have:
-
-            - q equivalent to q' I.e., for all input data, evaluation
-            of q and q' over that data return the same output data
-     *)
-
     Definition query_preserves_eval (q1 q2:query) : Prop :=
       forall ev_in, equal_outputs (eval_query h q1 ev_in) (eval_query h q2 ev_in).
 
+    Ltac trivial_same_query :=
+      unfold query_preserves_eval; intros; simpl; prove_same_outputs.
+    
     Global Instance query_equiv : Equivalence query_preserves_eval.
     Proof.
       constructor.
@@ -881,9 +871,6 @@ Section CompCorrectness.
           contradiction.
         + contradiction.
     Qed.
-    
-    Ltac trivial_same_query :=
-      unfold query_preserves_eval; intros; simpl; prove_same_outputs.
     
     Lemma camp_rule_to_camp_preserves_eval (q:camp_rule) :
       query_preserves_eval (Q_camp_rule q) (Q_camp (camp_rule_to_camp q)).
@@ -1584,6 +1571,26 @@ Section CompCorrectness.
       - contradiction.
     Qed.
     
+    (** XXX This is an idea for what the main correctness theorem
+    could be.
+
+            Assuming:
+
+            - the driver [dv] is correct (i.e., only follows verified
+            compilation paths):
+
+            For every query [q] that matches the expected input of
+            driver [dv]:
+
+            For every produced compilation steps I.e., [q'] in the
+            list returned by [compile dv q], we have:
+
+            - [q'] preserves the evaluation semantics for [q]
+
+              I.e., for all input data, evaluation of [q] and [q'] over
+              that input data returns the same output data
+     *)
+
     Theorem compile_with_correct_driver_preserves_eval (dv:driver) (q:query) :
       driver_correct dv ->
       driver_matches_query dv q ->

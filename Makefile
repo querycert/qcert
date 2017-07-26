@@ -17,9 +17,6 @@
 CP=cp
 TSC?=tsc
 
-# This may have to be specialized
-export COQ2HTML=../../opt/bin
-
 DIST_DIR=
 
 #	Basic/Util/RTactics
