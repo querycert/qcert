@@ -432,7 +432,7 @@ Section CAMPtoNRA.
     Definition camp_to_nra_top (q:camp) : nra :=
       AApp (nra_of_camp q) (nra_context (AConst (drec nil)) (AConst dunit)).
 
-    Theorem camp_to_nraenv_top_correct :
+    Theorem camp_to_nra_top_correct :
       forall q:camp, forall global_env:bindings,
           camp_eval_top h q global_env =
           nra_eval_top h (camp_to_nra_top q) global_env.

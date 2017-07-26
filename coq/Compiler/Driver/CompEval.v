@@ -211,7 +211,7 @@ Section CompEval.
       | (Ev_out_returned_debug _, Ev_out_returned_debug _) => True
       | (_,_) => False
       end.
-      
+
   End EvalDriver.
 
   (* Evaluation functions: variant with a single world collection as input *)

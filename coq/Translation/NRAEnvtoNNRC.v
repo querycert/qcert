@@ -586,7 +586,7 @@ Section NRAEnvtoNNRC.
       reflexivity.
     Qed.
     
-    Theorem nraenv_core_to_nnrc_core_top_correct
+    Theorem nraenv_to_nnrc_top_correct
             (h:list (string*string)) (q:nraenv) (env:bindings) :
       nnrc_eval_top h (nraenv_to_nnrc_top q) env = nraenv_eval_top h q env.
     Proof.

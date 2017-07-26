@@ -15,7 +15,6 @@
  *)
 
 Section CompCorrectness.
-
   Require Import String.
   Require Import Morphisms.
 
@@ -70,6 +69,7 @@ Section CompCorrectness.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import cNNRCtoCAMP.
+  Require Import cNNRCtoNNRC.
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSparkRDD.
   Require Import NNRCMRtoCldMR.
@@ -313,14 +313,62 @@ Section CompCorrectness.
       end.
 
     Ltac prove_same_outputs :=
+      unfold eval_camp_rule, eval_camp,
+      eval_nra, eval_nraenv, eval_nraenv_core,
+      eval_nnrc, eval_nnrc_core, eval_nnrcmr,
+      eval_cldmr, eval_dnnrc, eval_dnnrc_typed;
       try match goal with
-      | [ |- equal_outputs (lift_output (eval_camp_rule ?h ?c (lift_input ?i)))
-                           (lift_output (eval_camp_rule ?h ?c (lift_input ?i))) ] =>
-        destruct  (lift_output (eval_camp_rule h c (lift_input i))); simpl; try reflexivity;
+      | [ |- equal_outputs (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (camp_rule_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (camp_rule_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (camp_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (camp_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (camp_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nraenv_core_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (nraenv_core_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (nraenv_core_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nraenv_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (nraenv_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (nraenv_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nra_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (nra_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (nra_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nnrc_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (nnrc_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (nnrc_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nnrc_core_eval_top ?h ?c (lift_input ?i)))
+                           (lift_output (nnrc_core_eval_top ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (nnrc_core_eval_top h c (lift_input i))); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (lift_output (eval_oql ?h ?c (lift_input ?i)))
                            (lift_output (eval_oql ?h ?c (lift_input ?i))) ] =>
         destruct  (lift_output (eval_oql h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (eval_lambda_nra ?h ?c (lift_input ?i)))
+                           (lift_output (eval_lambda_nra ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (eval_lambda_nra h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nnrcmr_eval_top ?h ?init ?c (lift_input ?i)))
+                           (lift_output (nnrcmr_eval_top ?h ?init ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (nnrcmr_eval_top h init c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i)))
+                           (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (cldmr_eval_top h init c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (dnnrc_dataframe_eval_top_lift_distr ?h ?c (lift_input ?i)))
+                           (lift_output (dnnrc_dataframe_eval_top_lift_distr ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (dnnrc_dataframe_eval_top_lift_distr h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (dnnrc_dataframe_typed_eval_top_lift_distr ?h ?c (lift_input ?i)))
+                           (lift_output (dnnrc_dataframe_typed_eval_top_lift_distr ?h ?c (lift_input ?i))) ] =>
+        destruct  (lift_output (dnnrc_dataframe_typed_eval_top_lift_distr h c (lift_input i))); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (Ev_out_unsupported ?s1)
                            (Ev_out_unsupported ?s2) ] =>
@@ -335,14 +383,6 @@ Section CompCorrectness.
       | _ => True
       end.
 
-
-    (** XXX This COULD BE the main correctness theorem. Currently being worked on XXX 
-          if:
-            the driver [dv] is correct (i.e., only follows verified compilation paths)
-          then for all input query [q]:
-            for all produced compilation steps I.e., q' in the list returned by compile dv q, we have:
-            q equivalent to q' I.e., for all input data, evaluation of q and q' over that data return the same output data
-     *)
 
     Definition driver_matches_query (dv:driver) (q:query) :=
     match (dv, q) with
@@ -792,21 +832,787 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_cloudant; auto.
     Qed.
     
-    Theorem compile_correct (dv:driver) :
-      driver_correct dv ->
-      (forall q:query,
-          Forall query_not_error (compile dv q) ->
-          (forall q':query,
-              In q' (compile dv q) ->
-              (forall ev_in, equal_outputs (eval_query h q' ev_in) (eval_query h q ev_in)))).
+    (** XXX This COULD BE the main correctness theorem. Currently
+          being worked on XXX if:
+
+            - the driver [dv] is correct (i.e., only follows verified
+            compilation paths) then for all input query [q]:
+
+            - for all produced compilation steps I.e., q' in the list
+            returned by compile dv q, we have:
+
+            - q equivalent to q' I.e., for all input data, evaluation
+            of q and q' over that data return the same output data
+     *)
+
+    Definition query_preserves_eval (q1 q2:query) : Prop :=
+      forall ev_in, equal_outputs (eval_query h q1 ev_in) (eval_query h q2 ev_in).
+
+    Global Instance query_equiv : Equivalence query_preserves_eval.
+    Proof.
+      constructor.
+      - unfold Reflexive, query_preserves_eval.
+        intros.
+        unfold equal_outputs.
+        match_destr.
+        match_destr.
+        congruence.
+      - unfold Symmetric, query_preserves_eval.
+        intros.
+        unfold equal_outputs in *.
+        specialize (H ev_in).
+        destruct (eval_query h x ev_in);
+          destruct (eval_query h y ev_in); auto.
+        destruct (data_eq_dec d d0).
+        rewrite e; match_destr; congruence.
+        contradiction.
+      - unfold Transitive, query_preserves_eval.
+        intros.
+        unfold equal_outputs in *.
+        specialize (H ev_in);
+        specialize (H0 ev_in).
+        destruct (eval_query h x ev_in);
+          destruct (eval_query h y ev_in);
+          destruct (eval_query h z ev_in); auto.
+        + contradiction.
+        + contradiction.
+        + destruct (data_eq_dec d d0).
+          rewrite e in *; assumption.
+          contradiction.
+        + contradiction.
+    Qed.
+    
+    Ltac trivial_same_query :=
+      unfold query_preserves_eval; intros; simpl; prove_same_outputs.
+    
+    Lemma camp_rule_to_camp_preserves_eval (q:camp_rule) :
+      query_preserves_eval (Q_camp_rule q) (Q_camp (camp_rule_to_camp q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_camp_rule.
+      unfold eval_camp.
+      unfold camp_rule_to_camp.
+      rewrite camp_rule_to_camp_top_correct.
+      trivial_same_query.
+    Qed.
+        
+    Lemma camp_to_nraenv_core_preserves_eval (q:camp) :
+      query_preserves_eval (Q_camp q) (Q_nraenv_core (camp_to_nraenv_core q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_camp.
+      unfold eval_nraenv_core.
+      unfold camp_to_nraenv_core.
+      rewrite camp_to_nraenv_core_top_correct.
+      trivial_same_query.
+    Qed.
+        
+    Lemma camp_to_nraenv_preserves_eval (q:camp) :
+      query_preserves_eval (Q_camp q) (Q_nraenv (camp_to_nraenv q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_camp.
+      unfold eval_nraenv.
+      unfold camp_to_nraenv.
+      rewrite camp_to_nraenv_top_correct.
+      trivial_same_query.
+    Qed.
+        
+    Lemma camp_to_nra_preserves_eval (q:camp) :
+      query_preserves_eval (Q_camp q) (Q_nra (camp_to_nra q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_camp.
+      unfold eval_nra.
+      unfold camp_to_nra.
+      rewrite camp_to_nra_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nra_to_nnrc_core_preserves_eval (q:nra) :
+      query_preserves_eval (Q_nra q) (Q_nnrc_core (nra_to_nnrc_core q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nra.
+      unfold eval_nnrc_core.
+      unfold nra_to_nnrc_core.
+      rewrite nra_to_nnrc_core_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nra_to_nraenv_core_preserves_eval (q:nra) :
+      query_preserves_eval (Q_nra q) (Q_nraenv_core (nra_to_nraenv_core q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nra.
+      unfold eval_nraenv_core.
+      unfold nra_to_nraenv_core.
+      rewrite nra_to_nraenv_core_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nraenv_core_to_nraenv_preserves_eval (q:nraenv_core) :
+      query_preserves_eval (Q_nraenv_core q) (Q_nraenv (nraenv_core_to_nraenv q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nraenv_core.
+      unfold eval_nraenv.
+      unfold nraenv_core_to_nraenv.
+      rewrite nraenv_core_to_nraenv_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nraenv_core_to_nnrc_core_preserves_eval (q:nraenv_core) :
+      query_preserves_eval (Q_nraenv_core q) (Q_nnrc_core (nraenv_core_to_nnrc_core q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nraenv_core.
+      unfold eval_nnrc_core.
+      unfold nraenv_core_to_nnrc_core.
+      rewrite nraenv_core_to_nnrc_core_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nraenv_core_to_nra_preserves_eval (q:nraenv_core) :
+      query_preserves_eval (Q_nraenv_core q) (Q_nra (nraenv_core_to_nra q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nraenv_core.
+      unfold eval_nra.
+      unfold nraenv_core_to_nra.
+      rewrite nraenv_core_to_nra_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nraenv_to_nnrc_preserves_eval (q:nraenv) :
+      query_preserves_eval (Q_nraenv q) (Q_nnrc (nraenv_to_nnrc q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nraenv.
+      unfold eval_nnrc.
+      unfold nraenv_to_nnrc.
+      rewrite nraenv_to_nnrc_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nraenv_to_nraenv_core_preserves_eval (q:nraenv) :
+      query_preserves_eval (Q_nraenv q) (Q_nraenv_core (nraenv_to_nraenv_core q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nraenv.
+      unfold eval_nraenv_core.
+      unfold nraenv_to_nraenv_core.
+      rewrite nraenv_to_nraenv_core_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma nnrc_core_to_nnrc_preserves_eval (q:nnrc_core) :
+      query_preserves_eval (Q_nnrc_core q) (Q_nnrc (nnrc_core_to_nnrc q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc_core.
+      unfold eval_nnrc.
+      unfold nnrc_core_to_nnrc.
+      destruct q; simpl.
+      rewrite nnrc_core_to_nnrc_top_correct.
+      simpl.
+      trivial_same_query.
+    Qed.
+
+    Lemma nnrc_to_nnrc_core_preserves_eval (q:nnrc) :
+      query_preserves_eval (Q_nnrc q) (Q_nnrc_core (nnrc_to_nnrc_core q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc.
+      unfold eval_nnrc_core.
+      unfold nnrc_to_nnrc_core.
+      rewrite nnrc_to_nnrc_core_top_correct.
+      trivial_same_query.
+    Qed.
+
+    Lemma oql_to_nraenv_preserves_eval (q:oql) :
+      query_preserves_eval (Q_oql q) (Q_nraenv (oql_to_nraenv q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_oql.
+      unfold eval_nraenv.
+      unfold oql_to_nraenv.
+      rewrite oql_to_nraenv_top_correct.
+      trivial_same_query.
+    Qed.
+        
+    Lemma lambda_nra_to_nraenv_preserves_eval (q:lambda_nra) :
+      query_preserves_eval (Q_lambda_nra q) (Q_nraenv (lambda_nra_to_nraenv q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_lambda_nra.
+      unfold eval_nraenv.
+      unfold lambda_nra_to_nraenv.
+      rewrite lambda_nra_to_nraenv_top_correct.
+      trivial_same_query.
+    Qed.
+        
+    Lemma correct_driver_preserves_eval_cnd:
+      (forall dv, driver_correct (Dv_camp dv)
+                  -> (forall q, Forall (query_preserves_eval (Q_camp q))
+                                       (compile (Dv_camp dv) (Q_camp q))))
+      /\ (forall dv, driver_correct (Dv_nra dv)
+                     -> (forall q, Forall (query_preserves_eval (Q_nra q))
+                                          (compile (Dv_nra dv) (Q_nra q))))
+      /\ (forall dv, driver_correct (Dv_nraenv_core dv)
+                     -> (forall q, Forall (query_preserves_eval (Q_nraenv_core q))
+                                          (compile (Dv_nraenv_core dv) (Q_nraenv_core q))))
+      /\ (forall dv, driver_correct (Dv_nraenv dv)
+                     -> (forall q, Forall (query_preserves_eval (Q_nraenv q))
+                                          (compile (Dv_nraenv dv) (Q_nraenv q))))
+      /\ (forall dv, driver_correct (Dv_nnrc_core dv)
+                     -> (forall q, Forall (query_preserves_eval (Q_nnrc_core q))
+                                          (compile (Dv_nnrc_core dv) (Q_nnrc_core q))))
+      /\ (forall dv, driver_correct (Dv_nnrc dv)
+                     -> (forall q, Forall (query_preserves_eval (Q_nnrc q))
+                                          (compile (Dv_nnrc dv) (Q_nnrc q))))
+      /\ (forall dv, driver_correct (Dv_nnrcmr dv)
+                     -> (forall q, Forall (query_preserves_eval (Q_nnrcmr q))
+                                          (compile (Dv_nnrcmr dv) (Q_nnrcmr q)))).
+    Proof.
+      apply cnd_combined_ind
+      ; simpl; try reflexivity; intros
+      ; apply Forall_forall; simpl; intros
+      ; elim H0; intros; try contradiction
+      ; clear H0; try (rewrite <- H1; simpl; trivial_same_query).
+      (* CAMP to cNRAEnv arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (camp_to_nraenv_core q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply camp_to_nraenv_core_preserves_eval.
+      (* CAMP to NRAEnv arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (camp_to_nraenv q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply camp_to_nraenv_preserves_eval.
+      (* CAMP to NRA arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (camp_to_nra q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply camp_to_nra_preserves_eval.
+      (* NRA to cNNRC arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nra_to_nnrc_core q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nra_to_nnrc_core_preserves_eval.
+      (* NRA to cNRAEnv arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nra_to_nraenv_core q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nra_to_nraenv_core_preserves_eval.
+      (* cNRAEnv to NRAEnv arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nraenv_core_to_nraenv q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nraenv_core_to_nraenv_preserves_eval.
+      (* cNRAEnv to cNNRC arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nraenv_core_to_nnrc_core q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nraenv_core_to_nnrc_core_preserves_eval.
+      (* cNRAEnv to NRA arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nraenv_core_to_nra q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nraenv_core_to_nra_preserves_eval.
+      (* NRAEnv to NNRC arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nraenv_to_nnrc q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nraenv_to_nnrc_preserves_eval.
+      (* NRAEnv to NNRC arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nraenv_to_nraenv_core q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nraenv_to_nraenv_core_preserves_eval.
+      (* cNNRC to NNRC arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nnrc_core_to_nnrc q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nnrc_core_to_nnrc_preserves_eval.
+      (* NNRC to cNNRC arrow *)
+      - elim H1; intros; clear H1.
+        rewrite <- H0; simpl; trivial_same_query.
+        specialize (H H3 (nnrc_to_nnrc_core q)).
+        rewrite Forall_forall in H; intros.
+        specialize (H x H0). clear H0.
+        rewrite <- H.
+        clear H2 H.
+        apply nnrc_to_nnrc_core_preserves_eval.
+      (* NNRC to DNNRC arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+      (* NNRC to JavaScript arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+      (* NNRC to Java arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+      (* NNRCMR to SparkRDD arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+      (* NNRCMR to DNNRC arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+      (* NNRCMR to CldMR arrow *)
+      - elim H; intros; contradiction. (* Not proved *)
+    Qed.
+
+    Lemma correct_driver_preserves_eval_camp_rule:
+      forall dv, driver_correct (Dv_camp_rule dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_camp_rule q))
+                                   (compile (Dv_camp_rule dv) (Q_camp_rule q))).
     Proof.
       intros.
-      Transparent compile.
-      destruct q.
-      - destruct dv; simpl in *.
-        + simpl in H0.
-      admit.
-    Admitted.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        generalize correct_driver_preserves_eval_cnd; intros.
+        elim H0; intros; clear H0 H3.
+        elim H; intros.
+        specialize (H2 c H3 (camp_rule_to_camp q)).
+        rewrite Forall_forall in H2.
+        specialize (H2 x).
+        rewrite <- H2.
+        apply camp_rule_to_camp_preserves_eval.
+        simpl.
+        apply H1.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_tech_rule:
+      forall dv, driver_correct (Dv_tech_rule dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_tech_rule q))
+                                   (compile (Dv_tech_rule dv) (Q_tech_rule q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_designer_rule:
+      forall dv, driver_correct (Dv_designer_rule dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_designer_rule q))
+                                   (compile (Dv_designer_rule dv) (Q_designer_rule q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_camp:
+      forall dv, driver_correct (Dv_camp dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_camp q))
+                                   (compile (Dv_camp dv) (Q_camp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      generalize correct_driver_preserves_eval_cnd; intros.
+      elim H1; intros; clear H1 H3.
+      specialize (H2 dv H q).
+      rewrite Forall_forall in H2.
+      auto.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nra:
+      forall dv, driver_correct (Dv_nra dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nra q))
+                                   (compile (Dv_nra dv) (Q_nra q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      generalize correct_driver_preserves_eval_cnd; intros.
+      elim H1; intros; clear H1 H2.
+      elim H3; intros; clear H3 H2.
+      specialize (H1 dv H q).
+      rewrite Forall_forall in H1.
+      auto.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nraenv:
+      forall dv, driver_correct (Dv_nraenv dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nraenv q))
+                                   (compile (Dv_nraenv dv) (Q_nraenv q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      generalize correct_driver_preserves_eval_cnd; intros.
+      elim H1; intros; clear H1 H2.
+      elim H3; intros; clear H3 H1.
+      elim H2; intros; clear H2 H1.
+      elim H3; intros; clear H3 H2.
+      specialize (H1 dv H q).
+      rewrite Forall_forall in H1.
+      auto.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nraenv_core:
+      forall dv, driver_correct (Dv_nraenv_core dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nraenv_core q))
+                                   (compile (Dv_nraenv_core dv) (Q_nraenv_core q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      generalize correct_driver_preserves_eval_cnd; intros.
+      elim H1; intros; clear H1 H2.
+      elim H3; intros; clear H3 H1.
+      elim H2; intros; clear H2 H3.
+      specialize (H1 dv H q).
+      rewrite Forall_forall in H1.
+      auto.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nnrc:
+      forall dv, driver_correct (Dv_nnrc dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrc q))
+                                   (compile (Dv_nnrc dv) (Q_nnrc q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      generalize correct_driver_preserves_eval_cnd; intros.
+      elim H1; intros; clear H1 H2.
+      elim H3; intros; clear H3 H1.
+      elim H2; intros; clear H2 H1.
+      elim H3; intros; clear H3 H1.
+      elim H2; intros; clear H2 H1.
+      elim H3; intros; clear H2 H3.
+      specialize (H1 dv H q).
+      rewrite Forall_forall in H1.
+      auto.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nnrc_core:
+      forall dv, driver_correct (Dv_nnrc_core dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrc_core q))
+                                   (compile (Dv_nnrc_core dv) (Q_nnrc_core q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      generalize correct_driver_preserves_eval_cnd; intros.
+      elim H1; intros; clear H1 H2.
+      elim H3; intros; clear H3 H1.
+      elim H2; intros; clear H2 H1.
+      elim H3; intros; clear H3 H1.
+      elim H2; intros; clear H2 H3.
+      specialize (H1 dv H q).
+      rewrite Forall_forall in H1.
+      auto.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_nnrcmr:
+      forall dv, driver_correct (Dv_nnrcmr dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_nnrcmr q))
+                                   (compile (Dv_nnrcmr dv) (Q_nnrcmr q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      destruct dv; simpl in *.
+      - elim H0; intros; clear H0.
+        rewrite <- H1; simpl. trivial_same_query.
+        contradiction.
+      - elim H; intros; contradiction.
+      - elim H; intros; contradiction.
+      - elim H; intros; contradiction.
+      - elim H; intros; contradiction.
+      - elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_cldmr:
+      forall dv, driver_correct (Dv_cldmr dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_cldmr q))
+                                   (compile (Dv_cldmr dv) (Q_cldmr q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros; clear H0.
+      rewrite <- H1; simpl; trivial_same_query.
+      destruct dv; simpl in H1; [contradiction| ].
+      elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_dnnrc:
+      forall dv, driver_correct (Dv_dnnrc dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_dnnrc q))
+                                   (compile (Dv_dnnrc dv) (Q_dnnrc q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros; clear H0.
+      rewrite <- H1; simpl; trivial_same_query.
+      destruct dv; simpl in H1; [contradiction| ].
+      elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_dnnrc_typed:
+      forall dv, driver_correct (Dv_dnnrc_typed dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_dnnrc_typed q))
+                                   (compile (Dv_dnnrc_typed dv) (Q_dnnrc_typed q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      - elim H0; intros; clear H0.
+        rewrite <- H1; simpl. trivial_same_query.
+        contradiction.
+      - elim H; intros; contradiction.
+      - elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_oql:
+      forall dv, driver_correct (Dv_oql dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_oql q))
+                                   (compile (Dv_oql dv) (Q_oql q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        generalize correct_driver_preserves_eval_cnd; intros.
+        elim H0; intros; clear H0 H2.
+        elim H3; intros; clear H0 H3.
+        elim H2; intros; clear H0 H2.
+        elim H3; intros; clear H2 H3.
+        elim H; intros.
+        specialize (H0 n H3 (oql_to_nraenv q)).
+        rewrite Forall_forall in H0.
+        specialize (H0 x).
+        rewrite <- H0.
+        apply oql_to_nraenv_preserves_eval.
+        simpl.
+        apply H1.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_lambda_nra:
+      forall dv, driver_correct (Dv_lambda_nra dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_lambda_nra q))
+                                   (compile (Dv_lambda_nra dv) (Q_lambda_nra q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        generalize correct_driver_preserves_eval_cnd; intros.
+        elim H0; intros; clear H0 H2.
+        elim H3; intros; clear H0 H3.
+        elim H2; intros; clear H0 H2.
+        elim H3; intros; clear H2 H3.
+        elim H; intros.
+        specialize (H0 n H3 (lambda_nra_to_nraenv q)).
+        rewrite Forall_forall in H0.
+        specialize (H0 x).
+        rewrite <- H0.
+        apply lambda_nra_to_nraenv_preserves_eval.
+        simpl.
+        apply H1.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_sql:
+      forall dv, driver_correct (Dv_sql dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_sql q))
+                                   (compile (Dv_sql dv) (Q_sql q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        elim H; intros; contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_javascript:
+      forall dv, driver_correct (Dv_javascript dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_javascript q))
+                                   (compile (Dv_javascript dv) (Q_javascript q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_java:
+      forall dv, driver_correct (Dv_java dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_java q))
+                                   (compile (Dv_java dv) (Q_java q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+
+    Lemma correct_driver_preserves_eval_spark_rdd:
+      forall dv, driver_correct (Dv_spark_rdd dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_spark_rdd q))
+                                   (compile (Dv_spark_rdd dv) (Q_spark_rdd q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+    
+    Lemma correct_driver_preserves_eval_spark_df:
+      forall dv, driver_correct (Dv_spark_df dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_spark_df q))
+                                   (compile (Dv_spark_df dv) (Q_spark_df q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+    
+    Lemma correct_driver_preserves_eval_cloudant:
+      forall dv, driver_correct (Dv_cloudant dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_cloudant q))
+                                   (compile (Dv_cloudant dv) (Q_cloudant q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+    
+    Theorem compile_with_correct_driver_preserves_eval (dv:driver) (q:query) :
+      driver_correct dv ->
+      driver_matches_query dv q ->
+      Forall (query_preserves_eval q) (compile dv q).
+    Proof.
+      intros.
+      destruct dv; destruct q; try contradiction; clear H0.
+      - apply correct_driver_preserves_eval_camp_rule; auto.
+      - apply correct_driver_preserves_eval_tech_rule; auto.
+      - apply correct_driver_preserves_eval_designer_rule; auto.
+      - apply correct_driver_preserves_eval_camp; auto.
+      - apply correct_driver_preserves_eval_oql; auto.
+      - apply correct_driver_preserves_eval_sql; auto.
+      - apply correct_driver_preserves_eval_lambda_nra; auto.
+      - apply correct_driver_preserves_eval_nra; auto.
+      - apply correct_driver_preserves_eval_nraenv_core; auto.
+      - apply correct_driver_preserves_eval_nraenv; auto.
+      - apply correct_driver_preserves_eval_nnrc_core; auto.
+      - apply correct_driver_preserves_eval_nnrc; auto.
+      - apply correct_driver_preserves_eval_nnrcmr; auto.
+      - apply correct_driver_preserves_eval_cldmr; auto.
+      - apply correct_driver_preserves_eval_dnnrc; auto.
+      - apply correct_driver_preserves_eval_dnnrc_typed; auto.
+      - apply correct_driver_preserves_eval_javascript; auto.
+      - apply correct_driver_preserves_eval_java; auto.
+      - apply correct_driver_preserves_eval_spark_rdd; auto.
+      - apply correct_driver_preserves_eval_spark_df; auto.
+      - apply correct_driver_preserves_eval_cloudant; auto.
+    Qed.
     
   End eval_preserved.
 

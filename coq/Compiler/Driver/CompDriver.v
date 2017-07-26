@@ -70,6 +70,7 @@ Section CompDriver.
   Require Import NNRCtoJavaScript.
   Require Import NNRCtoJava.
   Require Import cNNRCtoCAMP.
+  Require Import cNNRCtoNNRC.
   Require Import NNRCMRtoNNRC.
   Require Import NNRCMRtoSparkRDD.
   Require Import NNRCMRtoCldMR.
@@ -199,6 +200,9 @@ Section CompDriver.
     (** NNRC translations *)
     Definition nnrc_to_nnrc_core (q:nnrc) : nnrc_core :=
       NNRCtocNNRC.nnrc_to_nnrc_core_top q.
+
+    Definition nnrc_core_to_nnrc (q: nnrc_core) : nnrc :=
+      cNNRCtoNNRC.nnrc_core_to_nnrc_top q. (* XXX avoid ? XXX *)
 
     Definition nnrc_core_to_camp (avoid: list var) (q: nnrc_core) : camp :=
       lift_nnrc_core (nnrcToCamp_let avoid) q. (* XXX avoid ? XXX *)

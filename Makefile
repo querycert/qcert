@@ -259,6 +259,7 @@ export MODULES = \
 	Translation/NRAEnvtocNRAEnv \
 	Translation/NRAEnvtoNNRC \
 	Translation/cNNRCtoCAMP \
+	Translation/cNNRCtoNNRC \
 	Translation/NNRCtocNNRC \
 	Translation/NNRCtoNNRCMR \
 	Translation/NNRCtoDNNRC \
@@ -306,6 +307,7 @@ export MODULES = \
 	Compiler/Driver/CompDriver \
 	Compiler/Driver/CompStat \
 	Compiler/Driver/CompEval \
+	Compiler/Driver/CompCorrectness \
 	Compiler/QLib/QData \
 	Compiler/QLib/QOperators \
 	Compiler/QLib/QCAMP \
