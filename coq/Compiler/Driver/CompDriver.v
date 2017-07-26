@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,6 +145,8 @@ Section CompDriver.
     Definition oql_to_nraenv (q:oql) : nraenv := OQLtoNRAEnv.oql_to_nraenv_top q.
 
     Definition sql_to_nraenv (q:sql) : nraenv := SQLtoNRAEnv.sql_to_nraenv_top q.
+    
+    Definition sqlpp_to_nraenv (q:sqlpp) : nraenv := NRAEnvConst dunit.  (* Arbitrary placeholder, no translator exists yet *)
 
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv := LambdaNRAtoNRAEnv.lambda_nra_to_nraenv_top q.
 
@@ -397,6 +399,10 @@ Section CompDriver.
     | Dv_sql_stop : sql_driver
     | Dv_sql_to_nraenv : nraenv_driver -> sql_driver.
 
+  Inductive sqlpp_driver : Set :=
+    | Dv_sqlpp_stop : sqlpp_driver
+    | Dv_sqlpp_to_nraenv : nraenv_driver -> sqlpp_driver.
+
   Inductive lambda_nra_driver : Set :=
     | Dv_lambda_nra_stop : lambda_nra_driver
     | Dv_lambda_nra_to_nraenv : nraenv_driver -> lambda_nra_driver.
@@ -408,6 +414,7 @@ Section CompDriver.
   | Dv_camp : camp_driver -> driver
   | Dv_oql : oql_driver -> driver
   | Dv_sql : sql_driver -> driver
+  | Dv_sqlpp : sqlpp_driver -> driver
   | Dv_lambda_nra : lambda_nra_driver -> driver
   | Dv_nra : nra_driver -> driver
   | Dv_nraenv_core : nraenv_core_driver -> driver
@@ -469,6 +476,7 @@ Section CompDriver.
     | Dv_camp _ => L_camp
     | Dv_oql _ => L_oql
     | Dv_sql _ => L_sql
+    | Dv_sqlpp _ => L_sqlpp
     | Dv_lambda_nra _ => L_lambda_nra
     | Dv_cldmr _ => L_cldmr
     | Dv_dnnrc  _ => L_dnnrc
@@ -620,6 +628,12 @@ Section CompDriver.
     | Dv_sql_to_nraenv dv => 1 + driver_length_nraenv dv
     end.
 
+  Definition driver_length_sqlpp (dv: sqlpp_driver) :=
+    match dv with
+    | Dv_sqlpp_stop => 1
+    | Dv_sqlpp_to_nraenv dv => 1 + driver_length_nraenv dv
+    end.
+
   Definition driver_length_lambda_nra (dv: lambda_nra_driver) :=
     match dv with
     | Dv_lambda_nra_stop => 1
@@ -634,6 +648,7 @@ Section CompDriver.
     | Dv_camp dv => driver_length_camp dv
     | Dv_oql dv => driver_length_oql dv
     | Dv_sql dv => driver_length_sql dv
+    | Dv_sqlpp dv => driver_length_sqlpp dv
     | Dv_lambda_nra dv => driver_length_lambda_nra dv
     | Dv_nra dv => driver_length_nra dv
     | Dv_nraenv_core dv => driver_length_nraenv_core dv
@@ -933,6 +948,17 @@ Section CompDriver.
     in
     (Q_sql q) :: queries.
 
+  Definition compile_sqlpp (dv: sqlpp_driver) (q: sqlpp) : list query :=
+    let queries :=
+        match dv with
+        | Dv_sqlpp_stop => nil
+        | Dv_sqlpp_to_nraenv dv =>
+          let q := sqlpp_to_nraenv q in
+          compile_nraenv dv q
+        end
+    in
+    (Q_sqlpp q) :: queries.
+
   Definition compile_lambda_nra (dv: lambda_nra_driver) (q: lambda_nra) : list query :=
     let queries :=
         match dv with
@@ -952,6 +978,7 @@ Section CompDriver.
     | (Dv_camp dv, Q_camp q) => compile_camp dv q
     | (Dv_oql dv, Q_oql q) => compile_oql dv q
     | (Dv_sql dv, Q_sql q) => compile_sql dv q
+    | (Dv_sqlpp dv, Q_sqlpp q) => compile_sqlpp dv q
     | (Dv_lambda_nra dv, Q_lambda_nra q) => compile_lambda_nra dv q
     | (Dv_nra dv, Q_nra q) => compile_nra dv q
     | (Dv_nraenv_core dv, Q_nraenv_core q) => compile_nraenv_core dv q
@@ -988,6 +1015,7 @@ Section CompDriver.
       | Dv_designer_rule _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrc_core _
       | Dv_nnrc _
@@ -1015,6 +1043,7 @@ Section CompDriver.
       | Dv_designer_rule _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrc_core _
       | Dv_nnrc _
@@ -1042,6 +1071,7 @@ Section CompDriver.
       | Dv_designer_rule _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrc_core _
       | Dv_nnrc _
@@ -1069,6 +1099,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrc_core _
       | Dv_nnrc _
@@ -1094,6 +1125,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1121,6 +1153,35 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
+      | Dv_lambda_nra _
+      | Dv_nra _
+      | Dv_nraenv_core _
+      | Dv_nnrc_core _
+      | Dv_nnrc _
+      | Dv_nnrcmr _
+      | Dv_cldmr _
+      | Dv_dnnrc _
+      | Dv_dnnrc_typed _
+      | Dv_javascript _
+      | Dv_java _
+      | Dv_spark_rdd _
+      | Dv_spark_df _
+      | Dv_cloudant _ =>
+          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
+      | Dv_error err =>
+          Dv_error ("Cannot compile to error ("++err++")")
+      end
+  | L_sqlpp =>
+      match dv with
+      | Dv_nraenv dv => Dv_sqlpp (Dv_sqlpp_to_nraenv dv)
+      | Dv_camp_rule _
+      | Dv_tech_rule _
+      | Dv_designer_rule _
+      | Dv_camp _
+      | Dv_oql _
+      | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1148,6 +1209,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1178,6 +1240,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrc _
       | Dv_nnrcmr _
@@ -1205,6 +1268,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrc _
       | Dv_nnrcmr _
@@ -1233,6 +1297,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nnrcmr _
       | Dv_cldmr _
@@ -1262,6 +1327,7 @@ Section CompDriver.
       | Dv_designer_rule _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1289,6 +1355,7 @@ Section CompDriver.
       | Dv_designer_rule _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1316,6 +1383,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1338,6 +1406,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1367,6 +1436,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1396,6 +1466,7 @@ Section CompDriver.
       | Dv_camp _
       | Dv_oql _
       | Dv_sql _
+      | Dv_sqlpp _
       | Dv_lambda_nra _
       | Dv_nra _
       | Dv_nraenv_core _
@@ -1430,6 +1501,7 @@ Section CompDriver.
     | L_camp => Dv_camp Dv_camp_stop
     | L_oql => Dv_oql Dv_oql_stop
     | L_sql => Dv_sql Dv_sql_stop
+    | L_sqlpp => Dv_sqlpp Dv_sqlpp_stop
     | L_lambda_nra => Dv_lambda_nra Dv_lambda_nra_stop
     | L_nra => Dv_nra Dv_nra_stop
     | L_nraenv_core => Dv_nraenv_core Dv_nraenv_core_stop
@@ -1565,6 +1637,8 @@ Section CompDriver.
     | Dv_oql (Dv_oql_to_nraenv dv) => (L_oql, Some (Dv_nraenv dv))
     | Dv_sql (Dv_sql_stop) => (L_sql, None)
     | Dv_sql (Dv_sql_to_nraenv dv) => (L_sql, Some (Dv_nraenv dv))
+    | Dv_sqlpp (Dv_sqlpp_stop) => (L_sqlpp, None)
+    | Dv_sqlpp (Dv_sqlpp_to_nraenv dv) => (L_sqlpp, Some (Dv_nraenv dv))
     | Dv_lambda_nra (Dv_lambda_nra_stop) => (L_lambda_nra, None)
     | Dv_lambda_nra (Dv_lambda_nra_to_nraenv dv) => (L_lambda_nra, Some (Dv_nraenv dv))
     | Dv_nra (Dv_nra_stop) => (L_nra, None)
@@ -2026,6 +2100,17 @@ Section CompDriver.
       [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
   Qed.
 
+  Lemma target_language_of_driver_is_postfix_sqlpp:
+    (forall o, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_sqlpp o))) (Dv_sqlpp o)).
+  Proof.
+    destruct o; simpl; try reflexivity
+    ; rewrite target_language_of_driver_equation
+    ; simpl.
+    eapply is_postfix_plus_one with
+    (config:=trivial_driver_config) (lang:=L_sqlpp);
+      [apply target_language_of_driver_is_postfix_nraenv | | ]; simpl; trivial.
+  Qed.
+
   Lemma target_language_of_driver_is_postfix_oql:
     (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_oql dv))) (Dv_oql dv)).
   Proof.
@@ -2075,6 +2160,7 @@ Section CompDriver.
          target_language_of_driver_is_postfix_designer_rule
          target_language_of_driver_is_postfix_oql
          target_language_of_driver_is_postfix_sql
+         target_language_of_driver_is_postfix_sqlpp
          target_language_of_driver_is_postfix_lambda_nra
     : postfix_hints.
     simpl.
@@ -3014,6 +3100,137 @@ Section CompDriver.
           :: nil
       | L_sql, L_spark_df =>
         L_sql
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: L_spark_df
+          :: nil
+      (* From sqlpp: *)
+      | L_sqlpp, L_sqlpp =>
+        L_sqlpp
+          :: nil
+      | L_sqlpp, L_nraenv =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: nil
+      | L_sqlpp, L_nraenv_core =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nraenv_core
+          :: nil
+      | L_sqlpp, L_nra =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nraenv_core
+          :: L_nra
+          :: nil
+      | L_sqlpp, L_nnrc_core =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrc_core
+          :: nil
+      | L_sqlpp, L_nnrc =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: nil
+      | L_sqlpp, L_camp =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrc_core
+          :: L_camp
+          :: nil
+      | L_sqlpp, L_javascript =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_javascript
+          :: nil
+      | L_sqlpp, L_java =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_java
+          :: nil
+      | L_sqlpp, L_nnrcmr =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: nil
+      | L_sqlpp, L_spark_rdd =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_spark_rdd
+          :: nil
+      | L_sqlpp, L_cldmr =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: nil
+      | L_sqlpp, L_cloudant =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_nnrcmr
+          :: L_nnrcmr
+          :: L_cldmr
+          :: L_cloudant
+          :: nil
+      | L_sqlpp, L_dnnrc =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc
+          :: nil
+      | L_sqlpp, L_dnnrc_typed =>
+        L_sqlpp
+          :: L_nraenv
+          :: L_nraenv
+          :: L_nnrc
+          :: L_nnrc
+          :: L_dnnrc
+          :: L_dnnrc_typed
+          :: L_dnnrc_typed
+          :: nil
+      | L_sqlpp, L_spark_df =>
+        L_sqlpp
           :: L_nraenv
           :: L_nraenv
           :: L_nnrc
@@ -4165,6 +4382,15 @@ Section CompDriver.
   Qed.
 
   Hint Resolve exists_path_from_source_target_completeness_sql : exists_path_hints.
+
+  Lemma exists_path_from_source_target_completeness_sqlpp :
+    (forall dv,
+        exists_path_from_source_target L_sqlpp (target_language_of_driver (Dv_sqlpp dv))).
+  Proof.
+    destruct dv; prove_exists_path_complete.
+  Qed.
+
+  Hint Resolve exists_path_from_source_target_completeness_sqlpp : exists_path_hints.
 
   Lemma exists_path_from_source_target_completeness_lambda_nra :
     (forall dv,

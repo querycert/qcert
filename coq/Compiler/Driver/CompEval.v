@@ -1,5 +1,5 @@
 (*
- * COPYRight 2015-2016 IBM Corporation
+ * COPYRight 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,6 +201,7 @@ Section CompEval.
       | Q_camp q => lift_output (eval_camp q cenv)
       | Q_oql q => lift_output (eval_oql q cenv)
       | Q_sql q => lift_output (eval_sql q cenv)
+      | Q_sqlpp q => Ev_out_unsupported "SQL++ eval not yet implemented"
       | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
       | Q_nra q => lift_output (eval_nra q cenv)
       | Q_nraenv_core q => lift_output (eval_nraenv_core q cenv)
@@ -228,6 +229,7 @@ Section CompEval.
       | Q_camp q => Ev_out_returned_debug (eval_camp_debug true q cenv)
       | Q_oql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_sql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
+      | Q_sqlpp _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_lambda_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nra _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_nraenv_core _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
