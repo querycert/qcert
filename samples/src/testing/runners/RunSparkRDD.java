@@ -15,22 +15,55 @@
  */
 package testing.runners;
 
+import java.util.List;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
-// Uses JavaScript engine that ships with jdk e.g.,
-// http://docs.oracle.com/javase/7/docs/technotes/guides/scripting/programmer_guide/
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Iterator;
+
+import java.lang.reflect.Type;
+
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
+import org.apache.commons.collections.Bag;
+import org.apache.commons.collections.bag.HashBag;
+
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.reflect.TypeToken;
 
-public class RunJavascript {
+import org.junit.Assert;
+
+public class RunSparkRDD {
+	/** Name of the property turns off paranoid behavior of Array.sort */
+	private static final String LEGACY_MERGE_SORT = "java.util.Arrays.useLegacyMergeSort";
+
+	/** Template for submitting to spark */
+	private static final String SPARK_SUBMIT_TEMPLATE = "%s --class %s --master local[2] " +
+			"--driver-java-options -D" + LEGACY_MERGE_SORT + "=true %s %s %s %s";
 
 	// Small load-file method
 	private static String readFile(String fileName) throws IOException {
@@ -40,6 +73,53 @@ public class RunJavascript {
 	// Usage
 	private static void usage() {
 		System.err.println("Q*cert Javascript Runner expects two options:\n [-runtime filename] for the Q*cert Javscript runtime\n [-input filename] for the input data\nAnd the Javascript file\n");
+	}
+
+	/**
+	 * Get the I/O file in the old format 
+	 * @param ioFile the File to put the old format into
+	 * @param io the JsonObject containing the parsed new format I/O file
+	 * @return the name of the I/O file, having generated it
+	 * @throws Exception
+	 */
+	private static String createOldFormatIoFile(File ioFile, JsonObject io) throws Exception {
+		PrintWriter wtr = new PrintWriter(new FileWriter(ioFile));
+		wtr.format("var inheritance = %s;%n", io.get("schema").getAsJsonObject().get("hierarchy"));
+		wtr.format("var input = %s;%n", io.get("input").getAsJsonObject().get("WORLD"));
+		wtr.format("var output = %s;%n", io.get("output"));
+		wtr.close();
+		return ioFile.getAbsolutePath();
+	}
+
+	/**
+	 * Run a spark end-to-end test by submitting a jar (at a known path from the root of a spark staging area)
+	 * @param root the root of the spark staging area for a particular test
+	 * @param className the classname of the rule
+	 * @param ruleName the name of the rule (used to generate I/O file name for Qcert case)
+	 */
+        private static void runSpark(File root, String ioFile, String className, String ruleName, String runtime) throws Exception {
+		System.out.println("Submitting job to spark");
+		String jar = new File(root, SparkUtils.SCALA_JAR_NAME).getAbsolutePath();
+		Map<String, String> env = new HashMap<>(System.getenv());
+		String cmd = SparkUtils.isWindows() ? "spark-submit.cmd" : "spark-submit";
+		JsonObject io = Utils.parseJsonFileToObject(ioFile);
+		String ioString = createOldFormatIoFile(new File(root, "iofile"), io);
+		String resultFile = new File(root, "execution.results").getAbsolutePath();
+		String submitted = String.format(SPARK_SUBMIT_TEMPLATE, cmd, className, jar, runtime, ioFile, resultFile);
+		System.out.println(submitted);
+		BasicLauncher launcher = new BasicLauncher(true, true, null);
+		launcher.setCmd(submitted);
+		launcher.setEnv(env);
+		int result = launcher.launch();
+		String output = new String(launcher.getStdOut());
+		System.out.println(output);
+		String stderr = new String(launcher.getStderr());
+		if (result != 0) {
+			System.err.println(stderr);
+			throw new RunnerException("Spark execution exit code = " + result, output, stderr);
+		}
+		JsonArray expected = io.get("output").getAsJsonArray();
+ 		validate(Utils.parseJsonFileToArray(resultFile).toString(), expected);
 	}
 
 	// Main
