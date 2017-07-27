@@ -291,7 +291,7 @@ interface PuzzleSides {
 
 	function toSrcLangDescript(color, sides:PuzzleSides) {
 		return function(group:QcertLanguageDescription) {
-		    return {langid:group.langid, label:group.label, illocation:group.illoc, langdescription:group.description, fill:color, sides:sides};
+		    return {langid:group.langid, label:group.label, langdescription:group.description, fill:color, sides:sides};
 		}
 	}
 	
@@ -698,7 +698,6 @@ class BasicPuzzlePiece extends GriddablePuzzlePiece implements FrontingObject, D
 
 	langid:QcertLanguage;
 	langdescription:string;
-	illocation:string;
 	previouslangid:QcertLanguage|null;
 	previouslabel:string|null;
 
@@ -799,7 +798,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 	langid:QcertLanguage;
 	label:string;
 	langdescription:string;
-	illocation:string;
 	previouslangid:QcertLanguage|null;
 	previouslabel:string|null;
 	movePlace?:{left:number, top:number};
@@ -821,7 +819,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
-			this.illocation = options.illocation;
 			this.previouslangid = previouslangid;
 			this.previouslabel = previouslabel;
 		} else {
@@ -829,7 +826,6 @@ class InteractivePuzzlePiece extends BasicPuzzlePiece {
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
-			this.illocation = options.illocation;
 			this.previouslangid = previouslangid;
 			this.previouslabel = previouslabel;
 		}
@@ -1197,7 +1193,6 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 	langid:QcertLanguage;
 	label:string;
 	langdescription:string;
-	illocation:string;
 
 	protected constructor(canvas:fabric.ICanvas, options) {
 	    super(canvas, null, null, {options:options});	
@@ -1205,7 +1200,6 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
 		this.langid = options.langid;
 		this.label = options.label;
 		this.langdescription = options.langdescription;
-	        this.illocation = options.illocation;
 	};
 
 	associate() {
@@ -1249,9 +1243,9 @@ class SourcePuzzlePiece extends BasicPuzzlePiece {
     protected mousedown = () => {
 		// Update source browser to point to the IL definition -JS
 		// Dealing with window focus is annoying, so disabled for now - JS
-   	        //var illoc = makeLemmaURL(this.illocation,this.langid);
-   	        var illoc = makeLemmaURL(fixLabel(this.label),this.langid);
-   	        var win = window.open(illoc, 'codebrowser');
+   	        var illoc = fixLabel(this.label)+".Lang."+fixLabel(this.label);
+   	        var langURL = makeLemmaURL(illoc,this.langid);
+   	        var win = window.open(langURL, 'codebrowser');
    		window.focus();
 		// Rest of logic for moving puzzle pieces
 		this.backingObject.set({
@@ -1310,7 +1304,6 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 	langid:QcertLanguage;
 	label:string;
 	langdescription:string;
-	illocation:string;
 	previouslangid:QcertLanguage|null;
 	previouslabel:string|null;
 	movePlace?:{left:number, top:number};
@@ -1333,7 +1326,6 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
-	                this.illocation = options.illocation;
 	                this.previouslangid = previouslangid;
 	                this.previouslabel = previouslabel;
 		} else {
@@ -1341,7 +1333,6 @@ class TransientPuzzlePiece extends BasicPuzzlePiece {
 			this.langid = options.langid;
 			this.label = options.label;
 			this.langdescription = options.langdescription;
-	                this.illocation = options.illocation;
 	                this.previouslangid = previouslangid;
 	                this.previouslabel = previouslabel;
 		}
@@ -2299,8 +2290,8 @@ function getLanguageMarkedLabel(langpack:{id:QcertLanguage, explicit:boolean}):s
 //const coqdocBaseURL = '../..//querycert.github.io/doc/';
 const coqdocBaseURL = '../docs/html/';
 function makeLemmaURL(base:string, lemma:string) {
-	//let url = coqdocBaseURL + "Qcert." + base + ".html";
-	let url = coqdocBaseURL + base + ".html";
+	let url = coqdocBaseURL + "Qcert." + base + ".html";
+	//let url = coqdocBaseURL + base + ".html";
 	if(lemma != undefined) {
 		url = url + "#" + lemma;
 	}
@@ -2316,12 +2307,12 @@ function makeTransitionURL(previouslangid, previouslabel, langid, label) {
     var label = fixLabel(label);
     var previouslabel = fixLabel(previouslabel);
     if (previouslangid == langid) {
-	//return makeLemmaURL(label+".Optim."+label+"Optimizer","run_"+langid + "_optims");
-	return makeLemmaURL(label+"Optimizer","run_"+langid + "_optims");
+	return makeLemmaURL(label+".Optim."+label+"Optimizer","run_"+langid + "_optims");
+	//return makeLemmaURL(label+"Optimizer","run_"+langid + "_optims");
     }
     else {
-	//return makeLemmaURL("Translation."+previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
-	return makeLemmaURL(previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
+	return makeLemmaURL("Translation."+previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
+	//return makeLemmaURL(previouslabel+"to"+label,previouslangid + "_to_" + langid + "_top");
     }
 }
 function makeOptimElement(modulebase:string, o:QcertOptimStepDescription):HTMLLIElement {
