@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,7 @@ let parse_query l f : (string * QLang.query) =
   | Compiler.L_camp -> let (n,c) = parse_camp f in (n, Compiler.Q_camp c)
   | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
   | Compiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
+  | Compiler.L_sqlpp -> raise (Qcert_Error "SQL++ should be parsed from String, not lexer")
   | Compiler.L_tech_rule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
   | Compiler.L_designer_rule -> raise (Qcert_Error "Designer rule should be parsed from binary file contents, not lexer")
   | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))

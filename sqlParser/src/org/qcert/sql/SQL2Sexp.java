@@ -24,11 +24,11 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.facebook.presto.sql.parser.StatementSplitter;
+import org.qcert.util.FileUtil;
+import org.qcert.util.SExpParser;
+import org.qcert.util.SExpression;
 
-import util.FileUtil;
-import util.SExpParser;
-import util.SExpression;
+import com.facebook.presto.sql.parser.StatementSplitter;
 
 /**
  * Main program for translating SQL into S-expression form for import into qcert.

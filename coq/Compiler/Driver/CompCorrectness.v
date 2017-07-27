@@ -261,6 +261,12 @@ Section CompCorrectness.
     | Dv_sql_to_nraenv dv => False /\ driver_correct_nraenv dv
     end.
 
+  Definition driver_correct_sqlpp (dv: sqlpp_driver) :=
+    match dv with
+    | Dv_sqlpp_stop => True
+    | Dv_sqlpp_to_nraenv dv => False /\ driver_correct_nraenv dv
+    end.
+
   Definition driver_correct_lambda_nra (dv: lambda_nra_driver) :=
     match dv with
     | Dv_lambda_nra_stop => True
@@ -275,6 +281,7 @@ Section CompCorrectness.
     | Dv_camp dv => driver_correct_camp dv
     | Dv_oql dv => driver_correct_oql dv
     | Dv_sql dv => driver_correct_sql dv
+    | Dv_sqlpp dv => driver_correct_sqlpp dv
     | Dv_lambda_nra dv => driver_correct_lambda_nra dv
     | Dv_nra dv => driver_correct_nra dv
     | Dv_nraenv_core dv => driver_correct_nraenv_core dv
@@ -392,6 +399,7 @@ Section CompCorrectness.
     | (Dv_camp _, Q_camp _) => True
     | (Dv_oql _, Q_oql _) => True
     | (Dv_sql _, Q_sql _) => True
+    | (Dv_sqlpp _, Q_sqlpp _) => True
     | (Dv_lambda_nra _, Q_lambda_nra _) => True
     | (Dv_nra _, Q_nra _) => True
     | (Dv_nraenv_core _, Q_nraenv_core _) => True
@@ -677,6 +685,25 @@ Section CompCorrectness.
       auto.
     Qed.
       
+    Lemma correct_driver_succeeds_sqlpp:
+      forall dv, driver_correct (Dv_sqlpp dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_sqlpp dv) (Q_sqlpp q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; [simpl in *; contradiction| ].
+      simpl in H.
+      elim H; intros; clear H H1.
+      simpl in H0.
+      generalize (correct_driver_succeeds_nraenv n); intros. simpl in H.
+      specialize (H H2 (sqlpp_to_nraenv q)).
+      rewrite Forall_forall in H.
+      auto.
+    Qed.
+      
     Lemma correct_driver_succeeds_lambda_nra:
       forall dv, driver_correct (Dv_lambda_nra dv) ->
                  (forall q, Forall query_not_error
@@ -815,6 +842,7 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_camp; auto.
       - apply correct_driver_succeeds_oql; auto.
       - apply correct_driver_succeeds_sql; auto.
+      - apply correct_driver_succeeds_sqlpp; auto.
       - apply correct_driver_succeeds_lambda_nra; auto.
       - apply correct_driver_succeeds_nra; auto.
       - apply correct_driver_succeeds_nraenv_core; auto.
@@ -1501,6 +1529,22 @@ Section CompCorrectness.
         elim H; intros; contradiction.
     Qed.
 
+    Lemma correct_driver_preserves_eval_sqlpp:
+      forall dv, driver_correct (Dv_sqlpp dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_sqlpp q))
+                                   (compile (Dv_sqlpp dv) (Q_sqlpp q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - clear H0.
+        destruct dv; simpl in H1; [contradiction| ].
+        elim H; intros; contradiction.
+    Qed.
+
     Lemma correct_driver_preserves_eval_javascript:
       forall dv, driver_correct (Dv_javascript dv) ->
                  (forall q, Forall (query_preserves_eval (Q_javascript q))
@@ -1604,6 +1648,7 @@ Section CompCorrectness.
       - apply correct_driver_preserves_eval_camp; auto.
       - apply correct_driver_preserves_eval_oql; auto.
       - apply correct_driver_preserves_eval_sql; auto.
+      - apply correct_driver_preserves_eval_sqlpp; auto.
       - apply correct_driver_preserves_eval_lambda_nra; auto.
       - apply correct_driver_preserves_eval_nra; auto.
       - apply correct_driver_preserves_eval_nraenv_core; auto.

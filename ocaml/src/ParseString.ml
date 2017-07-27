@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ let parse_designer_rule_from_string s : QLang.designer_rule =
 let parse_query_from_string l s : string * QLang.query =
   begin match l with
   | Compiler.L_sql -> ("SQL", Compiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (JavaService.main "parseSQL" s))))
+  | Compiler.L_sqlpp -> ("SQLPP", Compiler.Q_sqlpp (AstsToSExp.sexp_to_sqlpp(parse_sexp_from_string (JavaService.main "parseSQLPP" s))))
   | Compiler.L_tech_rule -> ("TechRule", Compiler.Q_tech_rule (parse_tech_rule_from_string s))
   | Compiler.L_designer_rule -> ("DesignerRule", Compiler.Q_designer_rule (parse_designer_rule_from_string s))
   | _ ->  parse_string (parse_query l) s

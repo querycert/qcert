@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ let suffix_designer_rule () = "_sem.txt"
 let suffix_camp () = "_camp.camp"
 let suffix_oql () = "_oql.txt"
 let suffix_sql () = "_sql.txt"
+let suffix_sqlpp () = "_sqlpp.txt"
 let suffix_nra () = "_nra.txt"
 let suffix_lambda_nra () = "_lnra.txt"
 let suffix_nraenv () = "_nraenv.txt"
@@ -114,6 +115,7 @@ let suffix_of_language lang =
   | Compiler.L_designer_rule -> suffix_designer_rule ()
   | Compiler.L_oql -> suffix_oql ()
   | Compiler.L_sql -> suffix_sql ()
+  | Compiler.L_sqlpp -> suffix_sql ()
   | Compiler.L_lambda_nra -> suffix_lambda_nra ()
   | Compiler.L_nra -> suffix_nra ()
   | Compiler.L_nraenv -> suffix_nraenv ()

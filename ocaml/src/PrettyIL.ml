@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1160,6 +1160,7 @@ let pretty_query pconf q =
   | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
+  | Compiler.Q_sqlpp q -> "(* There is no sql++ pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
   | Compiler.Q_nra q -> pretty_nra greek margin annot q
   | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin annot (QDriver.nraenv_core_to_nraenv q)

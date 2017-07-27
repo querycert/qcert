@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ Section CompLang.
     | L_camp : language
     | L_oql : language
     | L_sql : language
+    | L_sqlpp : language
     | L_lambda_nra : language
     | L_nra : language
     | L_nraenv_core : language
@@ -65,6 +66,8 @@ Section CompLang.
       | "camp"%string => L_camp
       | "oql"%string => L_oql
       | "sql"%string => L_sql
+      | "sqlpp"%string => L_sqlpp
+      | "sql++"%string => L_sqlpp
       | "lambda_nra"%string => L_lambda_nra
       | "nra"%string => L_nra
       | "nraenv_core"%string => L_nraenv_core
@@ -92,6 +95,7 @@ Section CompLang.
       | L_camp => "camp"%string
       | L_oql => "oql"%string
       | L_sql => "sql"%string
+      | L_sqlpp => "sql++"%string
       | L_lambda_nra => "lambda_nra"%string
       | L_nra => "nra"%string
       | L_nraenv_core => "nraenv_core"%string
@@ -129,6 +133,7 @@ Section CompLang.
     Open Scope string.
     Definition language_descriptions :=
       (L_sql,FrontEnd,"SQL", "Structured Query Language")
+        :: (L_sqlpp,FrontEnd,"SQL++","SQL With Semi-Structured Data Extensions")
         :: (L_oql,FrontEnd,"OQL", "Object Query Language")
         :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
         :: (L_tech_rule,FrontEnd,"TechRule", "Technical Rules")
@@ -197,6 +202,7 @@ Section CompLang.
 
     (** Query languages *)
     Require Import SQLRuntime.
+    Require Import SQLPPRuntime.
     Require Import OQLRuntime.
     Require Import LambdaNRARuntime.
     (** Rule languages *)
@@ -237,6 +243,7 @@ Section CompLang.
     Definition camp := camp.
     Definition oql := oql.
     Definition sql := sql.
+    Definition sqlpp := sqlpp.
     Definition lambda_nra := lambda_nra.
     Definition nra := nra.
     Definition nraenv_core := nraenv_core.
@@ -260,6 +267,7 @@ Section CompLang.
     | Q_camp : camp -> query
     | Q_oql : oql -> query
     | Q_sql : sql -> query
+    | Q_sqlpp : sqlpp -> query
     | Q_lambda_nra : lambda_nra -> query
     | Q_nra : nra -> query
     | Q_nraenv_core : nraenv_core -> query
@@ -285,6 +293,7 @@ Section CompLang.
       | Case_aux c "Q_camp"%string
       | Case_aux c "Q_oql"%string
       | Case_aux c "Q_sql"%string
+      | Case_aux c "Q_sqlpp"%string
       | Case_aux c "Q_lambda_nra"%string
       | Case_aux c "Q_nra"%string
       | Case_aux c "Q_nraenv_core"%string
@@ -310,6 +319,7 @@ Section CompLang.
       | Q_camp _ => L_camp
       | Q_oql _ => L_oql
       | Q_sql _ => L_sql
+      | Q_sqlpp _ => L_sqlpp
       | Q_lambda_nra _ => L_lambda_nra
       | Q_nra _ => L_nra
       | Q_nraenv_core _ => L_nraenv_core
@@ -341,6 +351,7 @@ Section CompLang.
       | L_camp => camp
       | L_oql => oql
       | L_sql => sql
+      | L_sqlpp => sqlpp
       | L_lambda_nra => lambda_nra
       | L_nra => nra
       | L_nraenv_core => nraenv_core
@@ -370,6 +381,7 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_camp"%string
   | Case_aux c "L_oql"%string
   | Case_aux c "L_sql"%string
+  | Case_aux c "L_sqlpp"%string
   | Case_aux c "L_lambda_nra"%string
   | Case_aux c "L_nra"%string
   | Case_aux c "L_nraenv_core"%string

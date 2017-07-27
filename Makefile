@@ -229,6 +229,10 @@ export MODULES = \
 	SQL/Lang/SQLSize \
 	SQL/SQLRuntime \
 	SQL/SQLSystem \
+	SQLPP/Lang/SQLPP \
+	SQLPP/Lang/SQLPPSize \
+	SQLPP/SQLPPRuntime \
+	SQLPP/SQLPPSystem \
 	OQL/Lang/OQL \
 	OQL/Lang/OQLSugar \
 	OQL/Lang/OQLSize \
@@ -311,6 +315,7 @@ export MODULES = \
 	Compiler/QLib/QCAMPRule \
 	Compiler/QLib/QOQL \
 	Compiler/QLib/QSQL \
+	Compiler/QLib/QSQLPP \
 	Compiler/QLib/QLambdaNRA \
 	Compiler/QLib/QLang \
 	Compiler/QLib/QDriver \

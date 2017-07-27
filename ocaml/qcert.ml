@@ -1,5 +1,5 @@
 (*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2015-2017 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,7 @@ let languages =
     Compiler.L_designer_rule;
     Compiler.L_oql;
     Compiler.L_sql;
+    Compiler.L_sqlpp;
     Compiler.L_lambda_nra;
     Compiler.L_nra;
     Compiler.L_nraenv;
