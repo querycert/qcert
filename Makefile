@@ -283,6 +283,7 @@ MODULES = \
 	Translation/TCAMPtoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
+	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \
 	Translation/TOQLtoNRAEnv \
 	Translation/ForeignToJavaScript \
