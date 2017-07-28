@@ -48,15 +48,10 @@ SingleStatement ::= DatabaseDeclaration
                   | DeleteStatement
                   | Query ";"
 
-Only Query, DatabaseDeclaration and FunctionDeclaration are supported.  DatabaseDeclaration is "supported" by being
-silently elided.  FunctionDeclaration is encoded and passed along, as is, of course Query.  Other statement types
-cause an exception in the front end.
-
-DatabaseDeclaration ::= "USE" Identifier
-
-FunctionDeclaration  ::= "DECLARE" "FUNCTION" Identifier ParameterList "{" Expression "}"
-
-ParameterList        ::= "(" ( <VARIABLE> ( "," <VARIABLE> )* )? ")"
+We currently support source files containing all possible statement types but only Query statements are passed along
+by the initial front end.   Other statements are silently elided.  Of course, this can result in semantic nonsense when,
+for example, a FunctionDeclaration is elided but is then used in a subsequent Query.  However, eliding most other statement
+types works in practice since they are present for bookkeeping purposes and don't affect the semantics of ths Query statements.
 
 Query ::= (Expression | SelectStatement) ";" 
 
