@@ -25,25 +25,14 @@ OCAMLBUILD= ocamlbuild \
 		-no-links -classic-display \
 		-tags annot -use-ocamlfind -package unix -package base64
 
-OCAMLBUILDJAR= $(OCAMLJAVA)/bin/ocamlbuild \
-		-no-links -classic-display \
-		-tags annot
-
-OCAMLWRAP=$(OCAMLJAVA)/bin/ocamlwrap
-
 MENHIRFLAG=-use-menhir
 #MENHIRFLAG=
 
 MAIN=qcert
 MAIN2=qdata
 TARGET=native
-JAR=jar
-
-LIB=CALib
-LIBJS=CALibJS
 
 all: $(MAIN) $(MAIN2)
-jars: $(MAIN).$(JAR) $(MAIN2).$(JAR) $(LIB).jar
 js: ../lib/qcertJS.js
 
 generated: generated/StaticConfig.ml generated/Compiler.ml generated/Compiler.mli
@@ -67,41 +56,16 @@ $(MAIN): generated $(MAIN).$(TARGET)
 $(MAIN).$(TARGET): generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(TARGET)
 
-$(MAIN).$(JAR): generated
-	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(JAR)
-	cp _build/$(MAIN).$(JAR) $(MAIN).$(JAR)
-
 $(MAIN2): generated $(MAIN2).$(TARGET)
 	cp _build/$(MAIN2).$(TARGET) ../bin/$(MAIN2)
 
 $(MAIN2).$(TARGET): generated
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(TARGET)
 
-$(MAIN2).$(JAR): generated
-	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(JAR)
-	cp _build/$(MAIN2).$(JAR) $(MAIN2).$(JAR)
-
 $(LIBJS).cma: generated
 	$(OCAMLBUILD) -libs js_of_ocaml -pp "camlp4o -I /Users/simeon/.opam/4.02.1/lib/js_of_ocaml pa_js.cmo" \
         -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
 	cp _build/$(LIBJS).cma jsapi/$(LIBJS).cma
-
-../lib/$(LIB).jar ../lib/$(LIB).cmi _build/$(LIB).cmi: generated
-	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).jar
-	$(OCAMLBUILDJAR) $(MENHIRFLAG) -Is generated -Is src $(LIB).cmi
-	cp _build/$(LIB).jar ../lib/$(LIB).jar
-	cp _build/$(LIB).cmi ../lib/$(LIB).cmi
-
-# Java API
-
-japi: ../lib/$(LIB).jar ../lib/$(LIB).cmi _build/CALib.cmi
-	cd _build ; $(OCAMLWRAP) -package "org.qcert.calib" CALib.cmi
-	cp _build/CALibWrapper.java japi/src/org/qcert/calib
-	$(MAKE) -C japi all
-
-japi/lib/$(LIB).jar: $(LIB).jar
-	mkdir -p japi/lib
-	cp $(LIB).jar japi/lib/$(LIB).jar
 
 # JavaScript
 
@@ -111,6 +75,8 @@ japi/lib/$(LIB).jar: $(LIB).jar
 
 _build/qcertJS.byte: generated qcertJS.ml
 	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
+
+# Whisk
 
 wsk-update:
 	wsk action update qcert _build/qcertJS.js
@@ -125,12 +91,7 @@ wsk-invoke:
 clean:
 	ocamlbuild -clean -no-log
 	rm -rf _build
-	rm -f $(MAIN).$(JAR)
-	rm -f $(MAIN2).$(JAR)
-	rm -f ../$(LIB).cma ../$(LIB).jar ../$(LIB).cmi
-	rm -f japi/lib/CALib.jar
-	rm -f japi/src/org/qcert/calib/CALibWrapper.java
-	$(MAKE) -C japi clean
+	rm -f ../$(LIB).cma ../$(LIB).cmi
 	rm -f *.class
 	rm -rf java
 
@@ -143,8 +104,9 @@ realclean:
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
 	rm -rf *~ generated $(MAIN) $(MAIN2)
 	rm -f ../bin/$(MAIN) ../bin/$(MAIN2)
-	rm -f ../lib/$(LIB).jar ../lib/$(LIB).cmi ../lib/qcertJS.js
+	rm -f ../lib/$(LIB).cmi ../lib/qcertJS.js
 
 cleanall: realclean
 
 .NOTPARALLEL: 
+

@@ -1,7 +1,0 @@
-# Options
-<src/**/*.{cmj,jar}>: java-package(org.qcert.calib)
-<generated/**/*.{cmj,jar}>: java-package(org.qcert.calib)
-<CACo.{cmj,jar}>: java-package(org.qcert.caco)
-<CAEv.{cmj,jar}>: java-package(org.qcert.caev)
-<CADa.{cmj,jar}>: java-package(org.qcert.cada)
-<CALib.{cmj,jar}>: java-package(org.qcert.calib)

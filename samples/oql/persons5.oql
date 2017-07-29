@@ -1,6 +1,5 @@
-/* Example of order by */
+/* Example with count */
 
-select p
-from p in Customers
-order by p->age
-
+select m
+from m in Marketers
+where count(m->products) >= 3

@@ -25,6 +25,7 @@ Section CompDriver.
 
   (* Query languages *)
   Require Import SQLRuntime.
+  Require Import SQLPPRuntime.
   Require Import OQLRuntime.
   Require Import LambdaNRARuntime.
   (* Rule languages *)
@@ -50,6 +51,7 @@ Section CompDriver.
   (* Translations *)
   Require Import OQLtoNRAEnv.
   Require Import SQLtoNRAEnv.
+  Require Import SQLPPtoNRAEnv.
   Require Import LambdaNRAtoNRAEnv.
   Require Import CAMPRuletoCAMP.
   Require Import TechRuletoCAMPRule.
@@ -153,7 +155,7 @@ Section CompDriver.
     Definition sql_to_nraenv (q:sql) : nraenv :=
       SQLtoNRAEnv.sql_to_nraenv_top q.
     
-    Definition sqlpp_to_nraenv (q:sqlpp) : nraenv := NRAEnvConst dunit.  (* Arbitrary placeholder, no translator exists yet *)
+    Definition sqlpp_to_nraenv (q:sqlpp) : nraenv := SQLPPtoNRAEnv.sqlpp_to_nraenv_top q.
 
     Definition lambda_nra_to_nraenv (q:lambda_nra) : nraenv :=
       LambdaNRAtoNRAEnv.lambda_nra_to_nraenv_top q.

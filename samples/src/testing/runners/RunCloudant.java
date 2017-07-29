@@ -1,5 +1,17 @@
 /*
- * (c) Copyright IBM Corp. 2015 All Rights Reserved
+ * Copyright 2015-2016 IBM Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package testing.runners;
 
@@ -64,105 +76,6 @@ public class RunCloudant {
         }
 
 	/**
-	 * Parse the I/O file, producing a JsonObject with three members (input, output, inheritance)
-	 * @param ioFile the path name of the I/O file
-	 * @return a JsonObject resulting from the parsing
-	 */
-	public static JsonObject parseJsonFileToObject(String ioFile) throws Exception {
-		return new JsonParser().parse(new FileReader(ioFile)).getAsJsonObject();
-	}
-
-	/**
-	 * Flatten any embedded Json arrays into a one-level array
-	 * @param toFlatten the JsonArray to flatten
-	 * @param into the JsonArray we are flattening into
-	 * @return the into argument for convenience
-	 */
-	private static JsonArray flatten(JsonArray toFlatten, JsonArray into) {
-		for (JsonElement e : toFlatten.getAsJsonArray()) {
-			if (e.isJsonArray()) 
-				flatten((JsonArray) e, into);
-			else
-				into.add(e);
-		}
-		return into;
-	}
-
-	/**
-	 * Given a JsonObject, return another that has the same "real" information but is canonical in terms of
-	 * <ol><li>whether the type is called "type" (legacy CAMP project format) or "$class" (ODM format) and
-	 * <li>whether the non-type portion of the object is enclosed in a "data" object (legacy CAMP project
-	 *        format) or at the same level (ODM format)</ol>
-	 * @param object the JsonObject
-	 * @return the canonical form
-	 */
-	private static JsonObject canonicalize(JsonObject object) {
-		JsonElement cls = object.get("$class");
-		if (cls != null) {
-			JsonObject data = new JsonObject();
-			for (Entry<String, JsonElement> entry : object.entrySet()) {
-				String name = entry.getKey();
-				if (name.charAt(0) == '$') continue;
-				data.add(name, entry.getValue());
-			}
-			JsonObject replacement = new JsonObject();
-			JsonArray brands = new JsonArray();
-			brands.add(cls);
-			replacement.add("type", brands);
-			replacement.add("data", data);
-			return replacement;
-		}
-		return object;
-	}
-
-	/**
-	 * Convert a JsonElement into something (Bag, Map, or self) that will give an accurate answer to the
-	 *   equals() method, ignoring order
-	 * @param element the element to convert
-	 * @return the converted element
-	 */
-	private static Object makeComparable(JsonElement element) {
-		if (element instanceof JsonObject) {
-			JsonObject obj = canonicalize((JsonObject) element);
-			Map<String,Object> result = new HashMap<>();
-			for (Entry<String,JsonElement> entry : obj.entrySet()) {
-				result.put(entry.getKey(), makeComparable(entry.getValue()));
-			}
-			return result;
-		}
-		if (element instanceof JsonArray) {
-			JsonArray array = flatten((JsonArray) element, new JsonArray());
-			Bag result = new HashBag();
-			for (JsonElement e : array) {
-				result.add(makeComparable(e));
-			}
-			return result;
-		}
-		// JsonNull and JsonPrimitive already have reasonable equality methods
-		return element;
-	}
-
-	/**
-	 * Compare two JsonArray objects for logical equality as part of validating a test
-	 * @param expected the expected result
-	 * @param actual the actual result
-	 * @return true on successful comparison, false on failure
-	 */
-	private static boolean compareForValidity(JsonArray expected,
-			JsonArray actual) {
-		/* Compare the two */
-		Object actualCompare = makeComparable(actual);
-		Object expectedCompare = makeComparable(expected);
-		if (actualCompare.equals(expectedCompare)) {
-		    System.out.println("Success!  Expected and actual: " + actual);
-		    return true;
-		}
-		System.out.println("Expected: " + expectedCompare);
-		System.out.println("Actual: " + actualCompare);
-                return false;
-	}
-    
-	/**
 	 * Validate the result of a Cloudant query against the expected output from the JSON I/O file
 	 * @param result the cloudant query result as a JsonArray (requiring some pre-processing)
 	 * @param compare the expected results, also as a JsonArray
@@ -174,7 +87,7 @@ public class RunCloudant {
 			JsonObject elem = iterator.next().getAsJsonObject();
 			realResult.add(elem.get("value"));
 		}
-		return compareForValidity(compare, realResult);
+		return Utils.compareForValidity(compare, realResult);
 	}
 
 	/**
@@ -314,7 +227,7 @@ public class RunCloudant {
 	 */
 	private static void validateOutput(String result, JsonArray expected) {
 		JsonParser parser = new JsonParser();
-		if (!compareForValidity(expected, parser.parse(result).getAsJsonArray()))
+		if (!Utils.compareForValidity(expected, parser.parse(result).getAsJsonArray()))
 			Assert.fail("Results were incorrect");
 	}
     
@@ -461,11 +374,11 @@ public class RunCloudant {
 		// Must have a -input option for the input JSON
 		if ("-input".equals(arg)) {
 		    inputFile = args[i+1]; i++;
-		    ioParts = parseJsonFileToObject(inputFile);
+		    ioParts = Utils.parseJsonFileToObject(inputFile);
 		} else if ("-keep-db".equals(arg)) {
 		    keepDB = true;
 		} else {
-		    JsonObject designs_and_post = parseJsonFileToObject(arg);
+		    JsonObject designs_and_post = Utils.parseJsonFileToObject(arg);
 		    /* Run the test */
 		    runCloudantLast(client,
 				    designs_and_post.get("designs").getAsJsonArray(),

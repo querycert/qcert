@@ -50,7 +50,7 @@ run_js_%: oql/%.js
 
 run_java_%: oql/%.class
 	@echo
-	@echo "Running test: '"$<"' on data: data/persons.json"
+	@echo "Running test: '"$<"' on data: oql/persons.input"
 	@echo
 	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input oql/persons.input $*
 
