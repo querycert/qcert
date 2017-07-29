@@ -44,15 +44,15 @@ oql/%.class: oql/%.java
 
 run_js_%: oql/%.js
 	@echo
-	@echo "Running test: '"$<"' on data: data/persons.json"
+	@echo "Running test: '"$<"' on data: oql/persons.input"
 	@echo
-	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input data/persons.json -runtime ../runtime/javascript/qcert-runtime.js $< 
+	$(JAVA) -cp $(CPATH) testing.runners.RunJavascript -input oql/persons.input -runtime ../runtime/javascript/qcert-runtime.js $< 
 
 run_java_%: oql/%.class
 	@echo
-	@echo "Running test: '"$<"' on data: data/persons.json"
+	@echo "Running test: '"$<"' on data: oql/persons.input"
 	@echo
-	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input data/persons.json $*
+	$(JAVA) -cp $(CPATH):oql testing.runners.RunJava -input oql/persons.input $*
 
 clean:
 	@rm -rf bin/*

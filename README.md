@@ -8,7 +8,7 @@ http://github.com/querycert/qcert
 
 This is the source code for Q\*cert, a framework for the development
 and verification of query compilers. It supports a rich data model and
-a includes a fairly extensive compilation pipeline 'out of the box'.
+includes a fairly extensive compilation pipeline 'out of the box'.
 
 Q\*cert is built using the Coq proof assistant. A significant subset
 of the initial compilation pipeline has been mechanically checked for
@@ -40,18 +40,17 @@ opam install js_of_ocaml
 
 ### Java (Recommended)
 
-SQL, SQL++, and ODM rules support, a part of the Q*cert runtime, and
-the harnesses for running the samples, are all written in Java and
-require a Java compiler (Java 8 required).  The builds for many of the
-Java components also require a recent version of ant (and the ODM
-rules support has an additional pre-requisite).  Both the `javac`
-command and the `ant` command must be executable from the command line
-PATH.
+Parsers for SQL, SQL++, and ODM rules, parts of the Q\*cert runtime, as
+well as utilities for running compiled queries are written in Java and
+require a Java 8 compiler. Building those Java components also
+requires a recent version of ant (and the ODM rules support has
+additional pre-requisites). Both the `javac` and the `ant` executables
+must be available from the command line.
 
 ### TypeScript (Optional)
 
-Finally, a Web demo for the compiler is included with the distribution
-and requires js_of_ocaml and TypeScript.
+The Q\*cert distribution includes a Web demo for the compiler which
+requires js_of_ocaml and TypeScript.
 
 js_of_ocaml can be installed as other OCaml packages using opam:
 
@@ -63,14 +62,14 @@ TypeScript can be obtained from (https://www.typescriptlang.org).
 
 ### Portability
 
-Q*cert should build on most recent Linux systems and on MacOS.
+Q\*cert should build on most recent Linux systems and on MacOS.
 
 Windows isn't directly supported by the OCaml package manager. We do
 not currently have detailed instructions for how to build on Windows.
 
 ## Building Q\*cert core
 
-### Compile Q*cert
+### Compile Q\*cert
 
 1. Compile the Coq source:
 
@@ -91,6 +90,7 @@ This should produce the `./bin/qcert` and `./bin/qdata` executables.
 ## Building the Java components
 
 The Java components are built with the command
+
 ```
 make javacode
 ```
@@ -239,7 +239,7 @@ and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
 ```
-java -cp bin:../lib/gson-2.7.jar testing.runners.RunJavascript \
+java -cp bin:../lib/commons-collections-3.2.2.jar:../lib/gson-2.7.jar testing.runners.RunJavascript \
      -input oql/persons.input \
 	 -runtime ../runtime/javascript/qcert-runtime.js \
 	 oql/persons1.js
@@ -324,11 +324,11 @@ cd tests/spark2/
 The code is in three main directories:
 - [`./coq`](./coq) contains the Coq source code
 - [`./ocaml`](./ocaml) contains the toplevel compiler and code extraction from Coq
-- [`./runtime`](./runtime) contains libraries necessary to run queries compiled through Q*cert for various platforms (Java, JavaScript, and Spark 2.0).
+- [`./runtime`](./runtime) contains libraries necessary to run queries compiled through Q\*cert for various platforms (Java, JavaScript, and Spark 2.0).
 
 Inside the [`./coq`](./coq) directory, the organization is as follows.
 - Foundational modules:
-  - [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q*cert itself
+  - [`./Basic/Util`](./coq/Basic/Util) contains useful libraries and lemmas, independant of Q\*cert itself
   - [`./Basic/Data`](./coq/Basic/Data) contains the core data model
   - [`./Basic/Operators`](./coq/Basic/Operators) contains unary/binary operators shared across ILs
   - [`./Basic/TypeSystem`](./coq/Basic/TypeSystem) contains the core type system
@@ -351,11 +351,11 @@ Inside the [`./coq`](./coq) directory, the organization is as follows.
 
 ## License
 
-Q*cert is distributed under the terms of the Apache 2.0 License, see `./LICENSE.txt`
+Q\*cert is distributed under the terms of the Apache 2.0 License, see `./LICENSE.txt`
 
 ## Contributions
 
-Q*cert is still at an early phase of development and we welcome
+Q\*cert is still at an early phase of development and we welcome
 contributions. Contributors are expected to submit a 'Developer's
 Certificate of Origin' which can be found in ./DCO1.1.txt.
 
