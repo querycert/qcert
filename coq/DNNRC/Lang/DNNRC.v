@@ -29,18 +29,9 @@ Section DNNRC.
   Section Top.
     Context (h:brand_relation_t).
 
-    Definition dnnrc_dataframe_eval_top (q:dnnrc_dataframe) (cenv:dbindings) : option ddata :=
-      dnnrc_eval h (rec_sort cenv) nil q.
+    Definition dnnrc_dataframe_eval_top (q:dnnrc_dataframe) (cenv:dbindings) : option data :=
+      lift localize_data (dnnrc_eval h (rec_sort cenv) nil q).
 
-    Definition dnnrc_dataframe_eval_top_lift_distr
-               (q:dnnrc_dataframe) (cenv:bindings) : option data :=
-      (* XXX This always makes everything distributed -- THIS HAS TO BE FIXED in the driver and replaced by the previous call XXX *)
-      let cenv := rec_sort cenv in
-      let loc_cenv := mkDistLocs (rec_sort cenv) in
-      match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (dnnrc_eval h (rec_sort cenv) nil q)
-      | None => None
-      end.
   End Top.
 End DNNRC.
 

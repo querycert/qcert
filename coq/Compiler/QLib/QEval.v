@@ -29,6 +29,7 @@ Module QEval(runtime:CompilerRuntime).
 
   (* Inputs to eval *)
   Definition constant_env : Set := list (string*data).
+  Definition dconstant_env : Set := list (string*ddata).
   Definition world_env : Set := list data.
   
   (* Eval for arbitrary (local) constant environments *)
@@ -47,9 +48,9 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrc : nnrc -> constant_env -> option data := @eval_nnrc _ h.
 
-  Definition eval_nnrcmr : nnrcmr -> constant_env -> option data := @eval_nnrcmr _ _ h.
+  Definition eval_nnrcmr : nnrcmr -> dconstant_env -> option data := @eval_nnrcmr _ _ h.
   Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
-  Definition eval_dnnrc {bm:brand_model} : dnnrc -> constant_env -> option data := @eval_dnnrc _ _ h.
+  Definition eval_dnnrc {bm:brand_model} : dnnrc -> dconstant_env -> option data := @eval_dnnrc _ _ h.
 
   (* Eval driver *)
 

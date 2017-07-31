@@ -310,59 +310,15 @@ Section NNRCMR.
       This function also add to the map-reduce environment and entry
       [init] that contains the unit value.
      *)
-    Definition load_init_env (initunit: var) (vars_loc: list (var * dlocalization)) (env: list (string*data)) : option (list (string*ddata)) :=
-      let add_initunit (initunit:var) (env:list (string*ddata)) :=
-          (initunit, Dlocal dunit) :: env
-      in
-      let mr_env := mkDistConstants vars_loc env in
-      lift (add_initunit initunit) mr_env.
+    Definition load_init_env (initunit: var) (env: dbindings) : dbindings :=
+      (initunit, Dlocal dunit) :: env.
 
-    Definition load_init_env_success initunit vars_loc nnrc_env mr_env :=
-      load_init_env initunit vars_loc nnrc_env = Some mr_env /\
-      (forall x,
-          lookup equiv_dec vars_loc x = Some Vlocal ->
-          lift Dlocal (lookup equiv_dec nnrc_env x) = lookup equiv_dec mr_env x) /\
-      (forall x,
-          lookup equiv_dec vars_loc x = Some Vdistr ->
-          exists coll,
-            lookup equiv_dec nnrc_env x = Some (dcoll coll) /\
-            lookup equiv_dec mr_env x = Some (Ddistr coll)).
-
-    Lemma load_env_lookup_initunit initunit vars_loc nnrc_env mr_env:
-      load_init_env_success initunit vars_loc nnrc_env mr_env ->
-      lookup equiv_dec mr_env initunit = Some (Dlocal dunit).
+    Lemma load_env_lookup_initunit initunit env:
+      lookup equiv_dec (load_init_env initunit env) initunit = Some (Dlocal dunit).
     Proof.
-      intros Hmr_env.
-      unfold load_init_env_success in Hmr_env.
-      destruct Hmr_env.
-      destruct H0.
-      unfold load_init_env, mkDistConstants, mkDistConstant in H.
-      destruct (rmap
-                  (fun x_loc : string * dlocalization =>
-                     let (x, loc) := x_loc in
-                     olift
-                       (fun d : data =>
-                          lift (fun dd : ddata => (x, dd))
-                               match loc with
-                               | Vlocal => Some (Dlocal d)
-                               | Vdistr =>
-                                 match d with
-                                 | dunit => None
-                                 | dnat _ => None
-                                 | dbool _ => None
-                                 | dstring _ => None
-                                 | dcoll coll => Some (Ddistr coll)
-                                 | drec _ => None
-                                 | dleft _ => None
-                                 | dright _ => None
-                                 | dbrand _ _ => None
-                                 | dforeign _ => None
-                                 end
-                               end) (lookup equiv_dec nnrc_env x)) vars_loc);
-        simpl in *; try congruence.
-      inversion H.
       simpl.
-      dest_eqdec; try congruence.
+      match_destr.
+      congruence.
     Qed.
 
     Definition nnrcmr_env := list (var * ddata).
@@ -1567,13 +1523,10 @@ Section NNRCMR.
 
   Section Top.
     Context (h:brand_relation_t).
-  
-    Definition nnrcmr_eval_top (init_vinit:var) (q:nnrcmr) (cenv: bindings) : option data :=
-      let loc_cenv := mkDistLocs (rec_sort cenv) in
-      match load_init_env init_vinit loc_cenv cenv with
-      | Some mr_env => nnrcmr_eval h mr_env q
-      | None => None
-      end.
+
+    Definition nnrcmr_eval_top (init_vinit:var) (q:nnrcmr) (cenv: dbindings) : option data :=
+      nnrcmr_eval h (load_init_env init_vinit cenv) q.
+
   End Top.
   
 End NNRCMR.

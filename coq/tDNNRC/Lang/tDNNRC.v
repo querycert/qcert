@@ -44,15 +44,9 @@ Section tDNNRC.
   Section Top.
     Context (h:brand_relation_t).
 
-    Definition dnnrc_dataframe_typed_eval_top_lift_distr
-               (q:dnnrc_dataframe_typed) (cenv:bindings) : option data :=
-      (* XXX This always makes everything distributed -- THIS HAS TO BE FIXED XXX *)
-      let cenv := rec_sort cenv in
-      let loc_cenv := mkDistLocs (rec_sort cenv) in
-      match mkDistConstants loc_cenv cenv with
-      | Some cenv => lift localize_data (@dnnrc_eval _ _ _ h cenv SparkIRPlug nil q)
-      | None => None
-      end.
+    Definition dnnrc_dataframe_typed_eval_top
+               (q:dnnrc_dataframe_typed) (cenv:dbindings) : option data :=
+      lift localize_data (@dnnrc_eval _ _ _ h (rec_sort cenv) SparkIRPlug nil q).
   End Top.
   
 End tDNNRC.

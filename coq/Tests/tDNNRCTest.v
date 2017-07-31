@@ -53,7 +53,7 @@ Section tDNNRCTests.
   Require Import TCAMPTest.
   Existing Instance CPModel.
   Definition PersonsType := Tdistr CustomerType.
-  Definition tdenv :tdbindings := (("CONST$Persons"%string,PersonsType)::nil).
+  Definition tdenv :tdbindings := (("Persons"%string,PersonsType)::nil).
 
   (* Eval vm_compute in c. *)
   
@@ -65,8 +65,14 @@ Section tDNNRCTests.
   Require Import CompEval.
 
   Require Import NRATest.
-  Definition env := (("CONST$Persons"%string,persons)::nil).
-  Definition ev := lift (fun x => @eval_dnnrc_typed _ _ _ [] x env) e.
+
+  Definition env :=
+    mkDistConstants (("Persons"%string,Vdistr)::nil) (("Persons"%string,persons)::nil).
+  Definition ev :=
+    match env with
+    | Some denv => lift (fun x => @eval_dnnrc_typed _ _ _ [] x denv) e
+    | None => None
+    end.
 
   (* Eval vm_compute in e. *)
 

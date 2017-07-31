@@ -470,6 +470,20 @@ Section NNRCtoDNNRC.
       reflexivity. (* XXX TODO: Currently both fail in core NNRC and in DNNRC XXX *)
   Qed.
 
+  Lemma nnrc_to_dnnrc_correct_lift {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (ctenv tenv:list (var*dlocalization)) (n:nnrc) :
+    forall cdenv denv:list (var*ddata),
+      wf_cdenv ctenv cdenv ->
+      wf_denv tenv denv ->
+      nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n
+      = lift localize_data (dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n)).
+  Proof.
+    intros.
+    rewrite <- nnrc_to_dnnrc_correct; auto.
+    unfold localize_data.
+    unfold lift; simpl.
+    destruct (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv)); auto.
+  Qed.
+  
   Section Top.
     Require Import NRAEnvRuntime.
     Require Import Dataframe.
@@ -520,7 +534,7 @@ Section NNRCtoDNNRC.
     Theorem nnrc_to_dnnrc_top_correct h (tenv:vdbindings) (q:nnrc) :
       forall cdenv:dbindings,
         wf_cdenv tenv cdenv ->
-        lift Dlocal (nnrc_eval_top h q (localize_denv cdenv)) =
+        nnrc_eval_top h q (localize_denv cdenv) =
         dnnrc_dataframe_eval_top h (nnrc_to_dnnrc_top tenv q) cdenv.
     Proof.
       unfold nnrc_to_dnnrc_top.
@@ -534,7 +548,7 @@ Section NNRCtoDNNRC.
       rewrite H0.
       rewrite rec_sort_localize_denv_comm.
       generalize (wf_cdenv_rec_sort tenv cdenv H); intros; clear H.
-      apply (nnrc_to_dnnrc_correct tt).
+      apply (nnrc_to_dnnrc_correct_lift tt).
       assumption.
       unfold wf_denv.
       split; [reflexivity| ].

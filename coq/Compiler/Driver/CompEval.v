@@ -113,20 +113,20 @@ Section CompEval.
       NNRC.nnrc_eval_top h q cenv.
 
     (* Language: nnrcmr *)
-    Definition eval_nnrcmr (q:nnrcmr) (cenv: bindings) : option data :=
-      NNRCMR.nnrcmr_eval_top h init_vinit q cenv.
+    Definition eval_nnrcmr (q:nnrcmr) (dcenv: dbindings) : option data :=
+      NNRCMR.nnrcmr_eval_top h init_vinit q dcenv.
 
     (* Language: cldmr *)
     Definition eval_cldmr (q:cldmr) (cenv: bindings) : option data :=
       CldMR.cldmr_eval_top h init_vinit q cenv.
 
     (* Language: dnnrc *)
-    Definition eval_dnnrc (q:dnnrc) (cenv: bindings) : option data :=
-      DNNRC.dnnrc_dataframe_eval_top_lift_distr h q cenv.
+    Definition eval_dnnrc (q:dnnrc) (cenv: dbindings) : option data :=
+      DNNRC.dnnrc_dataframe_eval_top h q cenv.
 
     (* Language: dnnrc_typed *)
-    Definition eval_dnnrc_typed (q:dnnrc_typed) (cenv: bindings) : option data :=
-      tDNNRC.dnnrc_dataframe_typed_eval_top_lift_distr h q cenv.
+    Definition eval_dnnrc_typed (q:dnnrc_typed) (cenv: dbindings) : option data :=
+      tDNNRC.dnnrc_dataframe_typed_eval_top h q cenv.
 
   End EvalFunctions.
 
@@ -150,25 +150,24 @@ Section CompEval.
       end.
 
     Definition eval_query (q:query) (ev_in:eval_input) : eval_output :=
-      let cenv := lift_input ev_in in
       match q with
-      | Q_camp_rule q => lift_output (eval_camp_rule q cenv)
+      | Q_camp_rule q => lift_output (eval_camp_rule q (lift_input ev_in))
       | Q_tech_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_designer_rule _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_camp q => lift_output (eval_camp q cenv)
-      | Q_oql q => lift_output (eval_oql q cenv)
+      | Q_camp q => lift_output (eval_camp q (lift_input ev_in))
+      | Q_oql q => lift_output (eval_oql q (lift_input ev_in))
       | Q_sql _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_sqlpp q => Ev_out_unsupported "SQL++ eval not yet implemented"
-      | Q_lambda_nra q => lift_output (eval_lambda_nra q cenv)
-      | Q_nra q => lift_output (eval_nra q cenv)
-      | Q_nraenv_core q => lift_output (eval_nraenv_core q cenv)
-      | Q_nraenv q => lift_output (eval_nraenv q cenv)
-      | Q_nnrc_core q => lift_output (eval_nnrc_core q cenv)
-      | Q_nnrc q => lift_output (eval_nnrc q cenv)
-      | Q_nnrcmr q => lift_output (eval_nnrcmr q cenv)
-      | Q_cldmr q => lift_output (eval_cldmr q cenv)
-      | Q_dnnrc q => lift_output (eval_dnnrc q cenv)
-      | Q_dnnrc_typed q => lift_output (eval_dnnrc_typed q cenv)
+      | Q_lambda_nra q => lift_output (eval_lambda_nra q (lift_input ev_in))
+      | Q_nra q => lift_output (eval_nra q (lift_input ev_in))
+      | Q_nraenv_core q => lift_output (eval_nraenv_core q (lift_input ev_in))
+      | Q_nraenv q => lift_output (eval_nraenv q (lift_input ev_in))
+      | Q_nnrc_core q => lift_output (eval_nnrc_core q (lift_input ev_in))
+      | Q_nnrc q => lift_output (eval_nnrc q (lift_input ev_in))
+      | Q_nnrcmr q => lift_output (eval_nnrcmr q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
+      | Q_cldmr q => lift_output (eval_cldmr q (lift_input ev_in))
+      | Q_dnnrc q => lift_output (eval_dnnrc q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
+      | Q_dnnrc_typed q => lift_output (eval_dnnrc_typed q ev_in) (* XXX Does not localize, keeps distributed information XXX *)
       | Q_javascript _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_java _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
       | Q_spark_rdd _ => Ev_out_unsupported ("No evaluation support for "++(name_of_language (language_of_query q)))
@@ -178,12 +177,11 @@ Section CompEval.
       end.
 
     Definition eval_query_debug (q:query) (ev_in:eval_input) : eval_output :=
-      let cenv := lift_input ev_in in
       match q with
-      | Q_camp_rule q => Ev_out_returned_debug (eval_camp_rule_debug true q cenv)
+      | Q_camp_rule q => Ev_out_returned_debug (eval_camp_rule_debug true q (lift_input ev_in))
       | Q_tech_rule _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_designer_rule _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
-      | Q_camp q => Ev_out_returned_debug (eval_camp_debug true q cenv)
+      | Q_camp q => Ev_out_returned_debug (eval_camp_debug true q (lift_input ev_in))
       | Q_oql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_sql _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
       | Q_sqlpp _ => Ev_out_unsupported ("No debug evaluation support for "++(name_of_language (language_of_query q)))
@@ -253,16 +251,16 @@ Section CompEval.
       eval_nnrc q (mkWorld world).
     
     Definition eval_nnrcmr_world (q:nnrcmr) (world:list data) : option data :=
-      eval_nnrcmr q (mkWorld world).
+      eval_nnrcmr q (mkDistWorld world). (* XXX Creates a distributed WORLD collection XXX *)
     
     Definition eval_cldmr_world (q:cldmr) (world:list data) : option data :=
       eval_cldmr q (mkWorld world).
     
     Definition eval_dnnrc_world (q:dnnrc) (world:list data) : option data :=
-      eval_dnnrc q (mkWorld world).
+      eval_dnnrc q (mkDistWorld world).
     
     Definition eval_dnnrc_typed_world (q:dnnrc) (world:list data) : option data :=
-      eval_dnnrc q (mkWorld world).
+      eval_dnnrc q (mkDistWorld world).
     
   End EvalWorld.
 

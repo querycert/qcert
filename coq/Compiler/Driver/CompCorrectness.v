@@ -361,21 +361,21 @@ Section CompCorrectness.
                            (lift_output (eval_lambda_nra ?h ?c (lift_input ?i))) ] =>
         destruct  (lift_output (eval_lambda_nra h c (lift_input i))); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
-      | [ |- equal_outputs (lift_output (nnrcmr_eval_top ?h ?init ?c (lift_input ?i)))
-                           (lift_output (nnrcmr_eval_top ?h ?init ?c (lift_input ?i))) ] =>
-        destruct  (lift_output (nnrcmr_eval_top h init c (lift_input i))); simpl; try reflexivity;
+      | [ |- equal_outputs (lift_output (nnrcmr_eval_top ?h ?init ?c ?i))
+                           (lift_output (nnrcmr_eval_top ?h ?init ?c ?i)) ] =>
+        destruct  (lift_output (nnrcmr_eval_top h init c i)); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i)))
                            (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i))) ] =>
         destruct  (lift_output (cldmr_eval_top h init c (lift_input i))); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
-      | [ |- equal_outputs (lift_output (dnnrc_dataframe_eval_top_lift_distr ?h ?c (lift_input ?i)))
-                           (lift_output (dnnrc_dataframe_eval_top_lift_distr ?h ?c (lift_input ?i))) ] =>
-        destruct  (lift_output (dnnrc_dataframe_eval_top_lift_distr h c (lift_input i))); simpl; try reflexivity;
+      | [ |- equal_outputs (lift_output (dnnrc_dataframe_eval_top ?h ?c ?i))
+                           (lift_output (dnnrc_dataframe_eval_top ?h ?c ?i)) ] =>
+        destruct  (lift_output (dnnrc_dataframe_eval_top h c i)); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
-      | [ |- equal_outputs (lift_output (dnnrc_dataframe_typed_eval_top_lift_distr ?h ?c (lift_input ?i)))
-                           (lift_output (dnnrc_dataframe_typed_eval_top_lift_distr ?h ?c (lift_input ?i))) ] =>
-        destruct  (lift_output (dnnrc_dataframe_typed_eval_top_lift_distr h c (lift_input i))); simpl; try reflexivity;
+      | [ |- equal_outputs (lift_output (dnnrc_dataframe_typed_eval_top ?h ?c ?i))
+                           (lift_output (dnnrc_dataframe_typed_eval_top ?h ?c ?i)) ] =>
+        destruct  (lift_output (dnnrc_dataframe_typed_eval_top h c i)); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (Ev_out_unsupported ?s1)
                            (Ev_out_unsupported ?s2) ] =>
