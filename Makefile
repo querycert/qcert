@@ -268,9 +268,9 @@ export MODULES = \
 	Translation/NNRCMRtoDNNRC \
 	Translation/NNRCMRtoCldMR \
 	Translation/DNNRCtotDNNRC \
-	Translation/CAMPRuletoCAMP \
 	Translation/TechRuletoCAMPRule \
 	Translation/DesignRuletoCAMPRule \
+	Translation/CAMPRuletoCAMP \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \
 	Translation/CAMPtoNRAEnv \

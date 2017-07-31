@@ -46,7 +46,7 @@ Section tDNNRC.
 
     Definition dnnrc_dataframe_typed_eval_top
                (q:dnnrc_dataframe_typed) (cenv:dbindings) : option data :=
-      lift localize_data (@dnnrc_eval _ _ _ h (rec_sort cenv) SparkIRPlug nil q).
+      lift unlocalize_data (@dnnrc_eval _ _ _ h (rec_sort cenv) SparkIRPlug nil q).
   End Top.
   
 End tDNNRC.

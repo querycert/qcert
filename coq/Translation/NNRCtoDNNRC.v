@@ -189,7 +189,7 @@ Section NNRCtoDNNRC.
 
   Lemma lookup_denv_local v d denv :
     lookup equiv_dec denv v = Some (Dlocal d) ->
-    lift Dlocal (lookup equiv_dec (localize_denv denv) v) =
+    lift Dlocal (lookup equiv_dec (unlocalize_constants denv) v) =
     lookup equiv_dec denv v.
   Proof.
     intros; induction denv; simpl in *; [reflexivity| ].
@@ -202,16 +202,16 @@ Section NNRCtoDNNRC.
   Qed.
 
   Lemma rev_localize_comm denv :
-    rev (localize_denv denv) = localize_denv (rev denv).
+    rev (unlocalize_constants denv) = unlocalize_constants (rev denv).
   Proof.
-    unfold localize_denv.
+    unfold unlocalize_constants.
     rewrite map_rev.
     reflexivity.
   Qed.
 
   Lemma lookupr_denv_local v d denv :
     assoc_lookupr equiv_dec denv v = Some (Dlocal d) ->
-    lift Dlocal (assoc_lookupr equiv_dec (localize_denv denv) v) =
+    lift Dlocal (assoc_lookupr equiv_dec (unlocalize_constants denv) v) =
     assoc_lookupr equiv_dec denv v.
   Proof.
     intros.
@@ -224,7 +224,7 @@ Section NNRCtoDNNRC.
 
   Lemma lookup_denv_distr v l denv :
     lookup equiv_dec denv v = Some (Ddistr l) ->
-    lift Dlocal (lookup equiv_dec (localize_denv denv) v) =
+    lift Dlocal (lookup equiv_dec (unlocalize_constants denv) v) =
     lift Dlocal (olift checkDistrAndCollect (lookup equiv_dec denv v)).
   Proof.
     intros.
@@ -240,13 +240,13 @@ Section NNRCtoDNNRC.
     (forall (tenv : list (var * dlocalization))
             (denv : list (var * ddata)),
         wf_denv tenv denv ->
-        lift Dlocal (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n2) =
+        lift Dlocal (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n2) =
         dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n2)) ->
     rmap
       (fun d1 : data =>
          olift checkLocal
                (dnnrc_eval h cdenv ((v, Dlocal d1) :: denv)
-                          (nnrc_to_dnnrc annot ctenv ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nnrc_core_eval h (localize_denv cdenv) ((v, d1) :: localize_denv denv) n2) l.
+                          (nnrc_to_dnnrc annot ctenv ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv) ((v, d1) :: unlocalize_constants denv) n2) l.
   Proof.
     intros Hwf; intros.
     induction l; [reflexivity| ]; simpl.
@@ -254,20 +254,20 @@ Section NNRCtoDNNRC.
     specialize (H ((v, Vlocal) :: tenv) ((v, Dlocal a) :: denv)).
     rewrite <- H; simpl.
     unfold lift.
-    assert (@nnrc_core_eval fruntime h (@localize_denv (@foreign_runtime_data fruntime) cdenv)
+    assert (@nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
         (@cons (prod var (@data (@foreign_runtime_data fruntime)))
            (@pair var (@data (@foreign_runtime_data fruntime)) v a)
-           (@localize_denv (@foreign_runtime_data fruntime) denv)) n2 =
-            @nnrc_core_eval fruntime h (@localize_denv (@foreign_runtime_data fruntime) cdenv)
+           (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2 =
+            @nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
             (@cons (prod string (@data (@foreign_runtime_data fruntime)))
                (@pair string (@data (@foreign_runtime_data fruntime)) v a)
-               (@localize_denv (@foreign_runtime_data fruntime) denv)) n2).
+               (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2).
     reflexivity.
     rewrite H0; clear H0.
-    destruct (@nnrc_core_eval fruntime h (@localize_denv (@foreign_runtime_data fruntime) cdenv)
+    destruct (@nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
             (@cons (prod string (@data (@foreign_runtime_data fruntime)))
                (@pair string (@data (@foreign_runtime_data fruntime)) v a)
-               (@localize_denv (@foreign_runtime_data fruntime) denv)) n2); try reflexivity.
+               (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2); try reflexivity.
     rewrite <- IHl.
     reflexivity.
     apply wf_denv_cons.
@@ -309,7 +309,7 @@ Section NNRCtoDNNRC.
         (ctenv : list (var * dlocalization))
         (cdenv denv : list (var * ddata))
         (Hcdenv : wf_cdenv ctenv cdenv) :
-    lift Dlocal (edot (localize_denv cdenv) v) =
+    lift Dlocal (edot (unlocalize_constants cdenv) v) =
     dnnrc_eval h cdenv denv
                match assoc_lookupr equiv_dec ctenv v with
                | Some Vlocal => DNNRCGetConstant annot v
@@ -322,7 +322,7 @@ Section NNRCtoDNNRC.
     elim Hcdenv; clear Hcdenv; intros.
     specialize (H0 v).
     unfold wf_localization in H0.
-    unfold localize_denv.
+    unfold unlocalize_constants.
     rewrite assoc_lookupr_map_snd_comm.
     unfold lift in *.
     unfold equiv_dec in *; simpl in *.
@@ -358,7 +358,7 @@ Section NNRCtoDNNRC.
     forall cdenv denv:list (var*ddata),
       wf_cdenv ctenv cdenv ->
       wf_denv tenv denv ->
-      lift Dlocal (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n)
+      lift Dlocal (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n)
       = dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n).
   Proof.
     intros cdenv ? Hcdenv ?.
@@ -389,7 +389,7 @@ Section NNRCtoDNNRC.
         rewrite H in *.
         case_eq (lookup equiv_dec denv v); simpl; intros.
         rewrite H2 in H1; contradiction.
-        unfold localize_denv.
+        unfold unlocalize_constants.
         rewrite lookup_map_snd_comm.
         assert ((@lookup var (@ddata (@foreign_runtime_data fruntime))
                          (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec) denv v)
@@ -405,25 +405,25 @@ Section NNRCtoDNNRC.
       unfold lift in *.
       specialize (IHn1 tenv denv H).
       specialize (IHn2 tenv denv H).
-      case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n1);
-        case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n2); intros;
+      case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n1);
+        case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n2); intros;
         rewrite H0 in *; rewrite H1 in *; simpl in *;
         rewrite <- IHn1; rewrite <- IHn2; simpl in *; reflexivity.
     - Case "NNRCUnop"%string.
       specialize (IHn tenv denv H).
-      case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n); intros;
+      case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn; simpl in *; reflexivity.
     - Case "NNRCLet"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       specialize (IHn2 ((v, Vlocal) :: tenv) ((v, Dlocal d) :: denv)).
       apply IHn2; apply wf_denv_cons; apply H.
     - Case "NNRCFor"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl in *; try reflexivity.
@@ -431,23 +431,23 @@ Section NNRCtoDNNRC.
       rewrite rmap_nnrc_to_dnnrc_correct; try assumption.
       assert (@rmap (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
           (fun d1 : @data (@foreign_runtime_data fruntime) =>
-           @nnrc_core_eval fruntime h (@localize_denv (@foreign_runtime_data fruntime) cdenv)
+           @nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
              (@cons (prod RVar.var (@data (@foreign_runtime_data fruntime)))
                 (@pair RVar.var (@data (@foreign_runtime_data fruntime)) v d1)
-                (@localize_denv (@foreign_runtime_data fruntime) denv)) n2) l = @rmap (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
+                (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2) l = @rmap (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
         (fun d1 : @data (@foreign_runtime_data fruntime) =>
-         @nnrc_core_eval fruntime h (@localize_denv (@foreign_runtime_data fruntime) cdenv)
+         @nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
            (@cons (prod var (@data (@foreign_runtime_data fruntime)))
               (@pair var (@data (@foreign_runtime_data fruntime)) v d1)
-              (@localize_denv (@foreign_runtime_data fruntime) denv)) n2) l) by reflexivity.
+              (@unlocalize_constants (@foreign_runtime_data fruntime) denv)) n2) l) by reflexivity.
       rewrite <- H1. clear H1.
       destruct (rmap
-                  (fun d1 : data => nnrc_core_eval h (localize_denv cdenv)
-                  ((v, d1) :: localize_denv denv) n2)
+                  (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv)
+                  ((v, d1) :: unlocalize_constants denv) n2)
                   l); try reflexivity.
     - Case "NNRCIf"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl; try reflexivity.
@@ -456,15 +456,15 @@ Section NNRCtoDNNRC.
       + specialize (IHn3 tenv denv); apply IHn3; apply H.
     - Case "NNRCEither"%string.
       specialize (IHn1 tenv denv H).
-      case_eq (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n1); intros;
+      case_eq (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n1); intros;
       rewrite H0 in *; simpl in *;
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl; try reflexivity.
       + specialize (IHn2 ((v, Vlocal) :: tenv) ((v, Dlocal d) :: denv)).
-        rewrite <- localize_denv_cons.
+        rewrite <- unlocalize_constants_cons.
         apply IHn2; apply wf_denv_cons; apply H.
       + specialize (IHn3 ((v0, Vlocal) :: tenv) ((v0, Dlocal d) :: denv)).
-        rewrite <- localize_denv_cons.
+        rewrite <- unlocalize_constants_cons.
         apply IHn3; apply wf_denv_cons; apply H.
     - Case "NNRCGroupBy"%string.
       reflexivity. (* XXX TODO: Currently both fail in core NNRC and in DNNRC XXX *)
@@ -474,14 +474,14 @@ Section NNRCtoDNNRC.
     forall cdenv denv:list (var*ddata),
       wf_cdenv ctenv cdenv ->
       wf_denv tenv denv ->
-      nnrc_core_eval h (localize_denv cdenv) (localize_denv denv) n
-      = lift localize_data (dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n)).
+      nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n
+      = lift unlocalize_data (dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n)).
   Proof.
     intros.
     rewrite <- nnrc_to_dnnrc_correct; auto.
-    unfold localize_data.
+    unfold unlocalize_data.
     unfold lift; simpl.
-    destruct (nnrc_core_eval h (localize_denv cdenv) (localize_denv denv)); auto.
+    destruct (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv)); auto.
   Qed.
   
   Section Top.
@@ -496,10 +496,10 @@ Section NNRCtoDNNRC.
     Definition nnrc_to_dnnrc_top (tenv:vdbindings) (q:nnrc) : dnnrc_dataframe :=
       nnrc_to_dnnrc_dataframe tt tenv q.
 
-    Lemma rec_sort_localize_denv_comm l :
-      (rec_sort (localize_denv l) = (localize_denv (rec_sort l))).
+    Lemma rec_sort_unlocalize_constants_comm l :
+      (rec_sort (unlocalize_constants l) = (unlocalize_constants (rec_sort l))).
     Proof.
-      unfold localize_denv.
+      unfold unlocalize_constants.
       rewrite map_rec_sort.
       reflexivity.
       intros.
@@ -534,7 +534,7 @@ Section NNRCtoDNNRC.
     Theorem nnrc_to_dnnrc_top_correct h (tenv:vdbindings) (q:nnrc) :
       forall cdenv:dbindings,
         wf_cdenv tenv cdenv ->
-        nnrc_eval_top h q (localize_denv cdenv) =
+        nnrc_eval_top h q (unlocalize_constants cdenv) =
         dnnrc_dataframe_eval_top h (nnrc_to_dnnrc_top tenv q) cdenv.
     Proof.
       unfold nnrc_to_dnnrc_top.
@@ -544,9 +544,9 @@ Section NNRCtoDNNRC.
       unfold dnnrc_dataframe_eval_top.
       intros.
       unfold lift_nnrc_core.
-      assert (nil = localize_denv nil) by reflexivity.
+      assert (nil = unlocalize_constants nil) by reflexivity.
       rewrite H0.
-      rewrite rec_sort_localize_denv_comm.
+      rewrite rec_sort_unlocalize_constants_comm.
       generalize (wf_cdenv_rec_sort tenv cdenv H); intros; clear H.
       apply (nnrc_to_dnnrc_correct_lift tt).
       assumption.

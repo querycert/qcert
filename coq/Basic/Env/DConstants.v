@@ -69,7 +69,13 @@ Section DConstants.
 
   Definition unlocalize_constants (env:list (string*ddata)) : list (string*data) :=
     map (fun xy => (fst xy, unlocalize_data (snd xy))) env.
-  
+
+  Lemma unlocalize_constants_cons v d (denv:dbindings) :
+    unlocalize_constants ((v,Dlocal d) :: denv) = (v,d) :: unlocalize_constants denv.
+  Proof.
+    reflexivity.
+  Qed.
+
 End DConstants.
 
 (* 

@@ -216,7 +216,7 @@ Section CompCorrectness.
     | Dv_nnrc_optim opc dv => False /\ driver_correct_nnrc dv
     | Dv_nnrc_to_nnrc_core dv => True /\ driver_correct_nnrc_core dv
     | Dv_nnrc_to_nnrcmr vinit inputs_loc dv => False /\ driver_correct_nnrcmr dv
-    | Dv_nnrc_to_dnnrc inputs_loc dv => False /\ driver_correct_dnnrc dv (* XXX distr vs local issues *)
+    | Dv_nnrc_to_dnnrc inputs_loc dv => False /\ driver_correct_dnnrc dv
     | Dv_nnrc_to_javascript dv => False /\ driver_correct_javascript dv
     | Dv_nnrc_to_java class_name imports dv => False /\ driver_correct_java dv
     end
@@ -348,6 +348,10 @@ Section CompCorrectness.
       | [ |- equal_outputs (lift_output (nnrc_eval_top ?h ?c (lift_input ?i)))
                            (lift_output (nnrc_eval_top ?h ?c (lift_input ?i))) ] =>
         destruct  (lift_output (nnrc_eval_top h c (lift_input i))); simpl; try reflexivity;
+        unfold equal_outputs; simpl; match_destr; auto
+      | [ |- equal_outputs (lift_output (nnrc_eval_top ?h ?c (unlocalize_constants ?i)))
+                           (lift_output (nnrc_eval_top ?h ?c (unlocalize_constants ?i))) ] =>
+        destruct  (lift_output (nnrc_eval_top h c (unlocalize_constants i))); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (lift_output (nnrc_core_eval_top ?h ?c (lift_input ?i)))
                            (lift_output (nnrc_core_eval_top ?h ?c (lift_input ?i))) ] =>
@@ -482,8 +486,15 @@ Section CompCorrectness.
       - elim H1; intros; clear H1 H2; try (rewrite <- H0; simpl; trivial);
         specialize (H H3 (nnrc_to_nnrc_core q));
         rewrite Forall_forall in H; auto.
+      - elim H1; intros; clear H1.
+        try (rewrite <- H0; simpl; trivial).
+        elim H; intros; clear H1.
+        destruct d; simpl.
+        simpl in H0; contradiction.
+        elim H; intros; clear H H1.
+        simpl in H2.
+        elim H2; intros; contradiction.
       - elim H; intros; contradiction. (* Failure case for dnnrc to dnnrc_typed -- False on correctness branch *)
-      - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
       - elim H; intros; contradiction.
@@ -1057,6 +1068,23 @@ Section CompCorrectness.
       rewrite nnrc_to_nnrc_core_top_correct.
       trivial_same_query.
     Qed.
+
+    (*
+    Lemma nnrc_to_dnnrc_preserves_eval (inputs_loc: vdbindings) (q:nnrc) :
+      query_preserves_eval (Q_nnrc q) (Q_dnnrc (nnrc_to_dnnrc inputs_loc q)).
+    Proof.
+      unfold query_preserves_eval; intros.
+      simpl.
+      unfold eval_nnrc.
+      unfold eval_dnnrc.
+      unfold nnrc_to_dnnrc.
+      rewrite <- nnrc_to_dnnrc_top_correct.
+      unfold lift_input.
+      trivial_same_query.
+      assumption.
+      a dmit.
+    Qed.
+    *)
 
     Lemma oql_to_nraenv_preserves_eval (q:oql) :
       query_preserves_eval (Q_oql q) (Q_nraenv (oql_to_nraenv q)).
