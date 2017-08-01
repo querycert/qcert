@@ -109,9 +109,11 @@ Section NNRCMRtoNNRC.
     end.
 
   Definition nnrc_of_nnrcmr (l: nnrcmr) : option nnrc :=
+    let constants := map fst (mr_inputs_loc l) in
     let (last_fun, last_args) :=  mr_last l in
-    let k := gen_apply_fun_n last_fun last_args in
-    olift (nnrc_of_mr_chain nil (mr_chain l)) k.
+    let k := (gen_apply_fun_n last_fun last_args) in
+    lift (nnrc_subst_var_to_const constants)
+         (olift (nnrc_of_mr_chain nil (mr_chain l)) k).
 
 End NNRCMRtoNNRC.
 

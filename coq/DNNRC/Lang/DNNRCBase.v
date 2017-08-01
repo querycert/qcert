@@ -548,6 +548,52 @@ Section DNNRCBase.
       inversion H2; assumption.
     Qed.
          
+    Require Import String.
+    Require Import Decidable.
+    Require Import List.
+    
+    Fixpoint dnnrc_subst_var_to_const (constants:list string) (e:dnnrc) : dnnrc
+      := match e with
+         | DNNRCGetConstant a y => DNNRCGetConstant a y
+         | DNNRCVar a y => if in_dec string_eqdec y constants
+                        then DNNRCGetConstant a y
+                        else DNNRCVar a y
+         | DNNRCConst a d => DNNRCConst a d
+         | DNNRCBinop a bop e1 e2 => DNNRCBinop a bop
+                                            (dnnrc_subst_var_to_const constants e1)
+                                            (dnnrc_subst_var_to_const constants e2)
+         | DNNRCUnop a uop e1 => DNNRCUnop a uop (dnnrc_subst_var_to_const constants e1)
+         | DNNRCLet a y e1 e2 => 
+           DNNRCLet a y 
+                   (dnnrc_subst_var_to_const constants e1) 
+                   (if in_dec string_eqdec y constants
+                    then e2
+                    else dnnrc_subst_var_to_const constants e2)
+         | DNNRCFor a y e1 e2 => 
+           DNNRCFor a y 
+                   (dnnrc_subst_var_to_const constants e1) 
+                   (if in_dec string_eqdec y constants
+                    then e2
+                    else dnnrc_subst_var_to_const constants e2)
+         | DNNRCIf a e1 e2 e3 => DNNRCIf a
+                                 (dnnrc_subst_var_to_const constants e1)
+                                 (dnnrc_subst_var_to_const constants e2)
+                                 (dnnrc_subst_var_to_const constants e3)
+         | DNNRCEither a ed xl el xr er =>
+           DNNRCEither a (dnnrc_subst_var_to_const constants ed)
+                      xl
+                      (if in_dec string_eqdec xl constants
+                       then el
+                       else dnnrc_subst_var_to_const constants el)
+                      xr
+                      (if in_dec string_eqdec xr constants
+                       then er
+                       else dnnrc_subst_var_to_const constants er)
+         | DNNRCGroupBy a g sl e1 => DNNRCGroupBy a g sl (dnnrc_subst_var_to_const constants e1)
+         | DNNRCCollect a e1 => DNNRCCollect a (dnnrc_subst_var_to_const constants e1)
+         | DNNRCDispatch a e1 => DNNRCDispatch a (dnnrc_subst_var_to_const constants e1)
+         | DNNRCAlg a p l => DNNRCAlg a p l
+         end.
   End GenDNNRCBase.
 
   Section NraEnvPlug.

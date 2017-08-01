@@ -1782,6 +1782,48 @@ Section cNNRCShadow.
   Section FreeVars.
     Fixpoint nnrc_free_variables (q:nnrc) : list var := nnrc_free_vars q.
   End FreeVars.
+
+  Section Constants.
+    Fixpoint nnrc_subst_var_to_const (constants:list string) (e:nnrc) : nnrc 
+      := match e with
+         | NNRCGetConstant y => NNRCGetConstant y
+         | NNRCVar y => if in_dec string_eqdec y constants
+                        then NNRCGetConstant y
+                        else NNRCVar y
+         | NNRCConst d => NNRCConst d
+         | NNRCBinop bop e1 e2 => NNRCBinop bop
+                                            (nnrc_subst_var_to_const constants e1)
+                                            (nnrc_subst_var_to_const constants e2)
+         | NNRCUnop uop e1 => NNRCUnop uop (nnrc_subst_var_to_const constants e1)
+         | NNRCLet y e1 e2 => 
+           NNRCLet y 
+                   (nnrc_subst_var_to_const constants e1) 
+                   (if in_dec string_eqdec y constants
+                    then e2
+                    else nnrc_subst_var_to_const constants e2)
+         | NNRCFor y e1 e2 => 
+           NNRCFor y 
+                   (nnrc_subst_var_to_const constants e1) 
+                   (if in_dec string_eqdec y constants
+                    then e2
+                    else nnrc_subst_var_to_const constants e2)
+         | NNRCIf e1 e2 e3 =>  NNRCIf
+                                 (nnrc_subst_var_to_const constants e1)
+                                 (nnrc_subst_var_to_const constants e2)
+                                 (nnrc_subst_var_to_const constants e3)
+         | NNRCEither ed xl el xr er =>
+           NNRCEither (nnrc_subst_var_to_const constants ed)
+                      xl
+                      (if in_dec string_eqdec xl constants
+                       then el
+                       else nnrc_subst_var_to_const constants el)
+                      xr
+                      (if in_dec string_eqdec xr constants
+                       then er
+                       else nnrc_subst_var_to_const constants er)
+         | NNRCGroupBy g sl e1 => NNRCGroupBy g sl (nnrc_subst_var_to_const constants e1)
+         end.
+  End Constants.
   
 End cNNRCShadow.
 

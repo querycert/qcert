@@ -142,9 +142,11 @@ Section NNRCMRtoDNNRC.
     end.
 
   Definition dnnrc_of_nnrcmr (annot: A) (l: nnrcmr) : option (@dnnrc _ A plug_type) :=
+    let constants := map fst (mr_inputs_loc l) in
     let (last_fun, last_args) :=  mr_last l in
     let k := gen_apply_fun_n annot last_fun last_args in
-    olift (dnnrc_of_mr_chain annot nil (mr_chain l)) k.
+    lift (dnnrc_subst_var_to_const constants)
+         (olift (dnnrc_of_mr_chain annot nil (mr_chain l)) k).
 
 End NNRCMRtoDNNRC.
 
