@@ -180,7 +180,6 @@ Section CompCorrectness.
   with driver_correct_nra (dv: nra_driver)  :=
     match dv with
     | Dv_nra_stop => True
-    | Dv_nra_optim opc dv => False /\ driver_correct_nra dv
     | Dv_nra_to_nnrc_core dv => True /\ driver_correct_nnrc_core dv
     | Dv_nra_to_nraenv_core dv => True /\ driver_correct_nraenv_core dv
     end
@@ -188,7 +187,6 @@ Section CompCorrectness.
   with driver_correct_nraenv_core (dv: nraenv_core_driver) :=
     match dv with
     | Dv_nraenv_core_stop => True
-    | Dv_nraenv_core_optim opc dv => False /\ driver_correct_nraenv_core dv
     | Dv_nraenv_core_to_nraenv dv => True /\ driver_correct_nraenv dv
     | Dv_nraenv_core_to_nnrc_core dv => True /\ driver_correct_nnrc_core dv
     | Dv_nraenv_core_to_nra dv => True /\ driver_correct_nra dv
@@ -205,7 +203,6 @@ Section CompCorrectness.
   with driver_correct_nnrc_core (dv: nnrc_core_driver) :=
     match dv with
     | Dv_nnrc_core_stop => True
-    | Dv_nnrc_core_optim opc dv => False /\ driver_correct_nnrc_core dv
     | Dv_nnrc_core_to_nnrc dv => True /\ driver_correct_nnrc dv
     | Dv_nnrc_core_to_camp avoid dv => False /\ driver_correct_camp dv (** XXX lifting issue XXX *)
     end

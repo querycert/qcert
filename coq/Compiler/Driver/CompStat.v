@@ -250,11 +250,8 @@ Section CompStat.
          :: nil).
 
   Definition stat_tree_nnrc_core (q: nnrc_core) : data :=
-    let (t, q') := time nnrc_core_optim_default q in
     drec
-      (("nnrc_core_no_optim", stat_nnrc_core q)
-         :: ("nnrc_core_optim", stat_nnrc_core q')
-         :: ("nnrc_core_optim_time", dstring t)
+      (("nnrc_core", stat_nnrc_core q)
          :: nil).
 
   Definition stat_tree_nnrc (q: nnrc) : data :=
@@ -276,11 +273,8 @@ Section CompStat.
     end.
 
   Definition stat_tree_nra (q:nra) : data :=
-    let (t, q') := time nra_optim_default q in
     drec
-      (("nra_no_optim", stat_tree_body_nra q)
-         :: ("nra_optim", stat_tree_body_nra q')
-         :: ("nra_optim_time", dstring t)
+      (("nra", stat_tree_body_nra q)
          :: nil).
 
   Definition stat_tree_body_nraenv_core (q:nraenv_core) : data :=
@@ -297,11 +291,8 @@ Section CompStat.
     end.
 
   Definition stat_tree_nraenv_core (q:nraenv_core) : data :=
-    let (t, q') := time nraenv_core_optim_default q in
     drec
       (("nraenv_core_no_optim", stat_tree_body_nraenv_core q)
-         :: ("nraenv_core_optim", stat_tree_body_nraenv_core q')
-         :: ("nraenv_core_optim_time", dstring t)
          :: nil).
 
   Definition stat_tree_body_nraenv (q:nraenv) : data :=
