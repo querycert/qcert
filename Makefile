@@ -380,7 +380,7 @@ demo: qcert jsapi
 	@echo "[Qcert] "
 	@echo "[Qcert] Compiling typescript files to javascript"
 	@echo "[Qcert] "
-	cd www && $(TSC) -p "tsconfig.json"
+	cd webdemo && $(TSC) -p "tsconfig.json"
 
 jsapi:
 	@$(MAKE) js-extraction
