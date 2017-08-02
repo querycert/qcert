@@ -15,7 +15,7 @@ ALL_CAMP=p01.camp \
 	p13.camp \
 	p14.camp
 
-SQL=q1.sql \
+TPCH=q1.sql \
 	q2.sql \
 	q3.sql \
 	q4.sql \
@@ -37,58 +37,22 @@ SQL=q1.sql \
 	q21.sql \
 	q22.sql
 
-TPCDS=d01.sql \
-	d08.sql \
-	d09.sql \
-	d10.sql \
-	d13.sql \
-	d15.sql \
-	d19.sql \
-	d21.sql \
-	d25.sql \
-	d26.sql \
-	d28.sql \
-	d30.sql \
-	d32.sql \
-	d37.sql \
-	d38.sql \
-	d41.sql \
-	d43.sql \
-	d45.sql \
-	d48.sql \
-	d50.sql \
-	d55.sql \
-	d56.sql \
-	d58.sql \
-	d59.sql \
-	d60.sql \
-	d65.sql \
-	d66.sql \
-	d69.sql \
-	d71.sql \
-	d76.sql \
-	d81.sql \
-	d82.sql \
-	d87.sql \
-	d88.sql
-
 ALL_STATS=$(patsubst %.camp,%_stats.json,$(ALL_CAMP))
-SQL_STATS=$(patsubst %.sql,%_stats.json,$(SQL))
-TPCDS_STATS=$(patsubst %.sql,%_stats.json,$(TPCDS))
+TPCH_STATS=$(patsubst %.sql,%_stats.json,$(TPCH))
 
-all: test_all.json test_sql.json
+all: pdf
 
-pdf: test_sql.json test_all.json
-	./tools/print-sql.py test_sql.json
+pdf: test_tpch.json test_all.json
+	./tools/print-sql.py test_tpch.json
 	./tools/print-stats.py test_all.json
 	./tools/print-camp.py test_all.json
 
 
-test_all.json: $(ALL_STATS)
-	./tools/jsonpp $? > $@
+test_all.json: tools/jsonpp $(ALL_STATS)
+	./tools/jsonpp $(ALL_STATS) > $@
 
-test_sql.json: $(SQL_STATS)
-	./tools/jsonpp $? > $@
+test_tpch.json: tools/jsonpp $(TPCH_STATS)
+	./tools/jsonpp $(TPCH_STATS) > $@
 
 %_stats.json: %.camp
 	$(QCERT) -stat-tree $<
@@ -96,13 +60,17 @@ test_sql.json: $(SQL_STATS)
 %_stats.json: %.sql
 	$(QCERT) -source sql -stat-tree $<
 
+tools/jsonpp:
+	$(MAKE) -C tools jsonpp
+
 clean:
-	rm -f $(ALL_STATS) $(SQL_STATS) \
+	rm -f $(ALL_STATS) $(TPCH_STATS) \
 		$(patsubst %.camp,%.js,$(ALL_CAMP)) \
-		$(patsubst %.sql,%.js,$(SQL)) \
-		$(patsubst %.sql,%.js,$(TPCDS))
+		$(patsubst %.sql,%.js,$(TPCH))
 
 cleanall: clean
-	rm -f *~
+	rm -f *~ \
+		test_all.json test_all.json_*.pdf \
+		test_tpch.json test_tpch.json_*.pdf
 
 .PHONY: %_stats.json

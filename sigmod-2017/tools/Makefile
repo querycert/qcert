@@ -27,7 +27,7 @@ time_n.$(TARGET):
 
 clean:
 	$(OCAMLBUILD) -clean
-	rm -f analytics jsonpp
 
 cleanall: clean
 	rm -f *~
+	rm -f analytics jsonpp time_n
