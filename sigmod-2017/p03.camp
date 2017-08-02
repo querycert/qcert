@@ -1,0 +1,24 @@
+(* origin: data/standard/test03.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test03 {
+  rule R03 {
+    when {
+      c:Customer();
+      p:Purchase(cid == c.cid);
+    } then {
+      System.out.println("Customer: " + c.name + " made purchase:" + p.name );
+    }
+  }
+}
+ *)
+
+Example p03 :=
+  rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (paccept));;
+  rule_when ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit))))));;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Customer: ")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))) (toString (#` " made purchase:")))) (toString (pletIt ((lookup "p")) (pbdot "name" (pit)))))
+.

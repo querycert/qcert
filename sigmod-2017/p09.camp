@@ -1,0 +1,26 @@
+(* origin: data/standard/test06.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test06 {
+  rule R06 {
+    when {
+      ps: aggregate {
+        c:Customer(name == "John Doe");
+        p:Purchase(cid == c.cid );
+      } do { count {p.name}; }
+    } then {
+      System.out.println("Nb of purchases by John Doe: " + ps);
+    }
+  }
+}
+ *)
+
+Example p09 :=
+  rule_global ("ps" IS AGGREGATE   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop AEq (pbdot "name" (pit)) (#` "John Doe"))));;;
+  rule_when ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit)))))) DO ACount OVER pletIt ((lookup "p")) (pbdot "name" (pit)) FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (#` "Nb of purchases by John Doe: ")) (toString ((lookup "ps"))))
+.

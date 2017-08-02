@@ -1,0 +1,26 @@
+(* origin: data/standard/test07.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test07 {
+  rule R07 {
+    when {
+      c:Customer();
+      cs: aggregate {
+        c2:Customer( age == c.age );
+      } do { count {c2}; }
+    } then {
+      System.out.println("Customer: " + c.name + " has the same age (" + c.age + ") as " + cs + " other Customers");
+    }
+  }
+}
+ *)
+
+Example p10 :=
+  rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (paccept));;
+  rule_global ("cs" IS AGGREGATE   rule_when ("c2" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop AEq (pbdot "age" (pit)) (pletIt ((lookup "c")) (pbdot "age" (pit)))))) DO ACount OVER (lookup "c2") FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Customer: ")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))) (toString (#` " has the same age (")))) (toString (pletIt ((lookup "c")) (pbdot "age" (pit)))))) (toString (#` ") as ")))) (toString ((lookup "cs"))))) (toString (#` " other Customers")))
+.

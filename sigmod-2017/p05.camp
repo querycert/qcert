@@ -1,0 +1,26 @@
+(* origin: data/standard/test02.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test02 {
+  rule R02 {
+    when {
+      c1:Customer();
+      c2:Customer(age == c1.age);
+      not evaluate (c1 == c2);
+    } then {
+      System.out.println("Customer: " + c1.name + " and: " + c2.name + " have the same age: " + c1.age);
+    }
+  }
+}
+ *)
+
+Example p05 :=
+  rule_when ("c1" INSTANCEOF ["entities.Customer"] WHERE (paccept));;
+  rule_when ("c2" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop AEq (pbdot "age" (pit)) (pletIt ((lookup "c1")) (pbdot "age" (pit))))));;
+  rule_not (passert (pbinop AEq ((lookup "c1")) ((lookup "c2"))));;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Customer: ")) (toString (pletIt ((lookup "c1")) (pbdot "name" (pit)))))) (toString (#` " and: ")))) (toString (pletIt ((lookup "c2")) (pbdot "name" (pit)))))) (toString (#` " have the same age: ")))) (toString (pletIt ((lookup "c1")) (pbdot "age" (pit)))))
+.

@@ -1,0 +1,24 @@
+(* origin: data/standard/test04.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test04 {
+  rule R04 {
+    when {
+      c:Customer();
+      not p:Purchase(cid == c.cid);
+    } then {
+      System.out.println("Customer: " + c.name + " did not make a purchase");
+    }
+  }
+}
+ *)
+
+Example p04 :=
+  rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (paccept));;
+  rule_not ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit))))));;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Customer: ")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))) (toString (#` " did not make a purchase")))
+.

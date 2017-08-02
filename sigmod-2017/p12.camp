@@ -1,0 +1,27 @@
+(* origin: data/standard/test09.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+import meta.camp.translator.RuntimeUtils;
+
+ruleset test09 {
+  rule R09 {
+    when {
+      c:Customer();
+      pu: aggregate {
+        p:Purchase(cid == c.cid);
+      } do { ArrayList<String> { p.name }; }
+    } then {
+      System.out.println("Customer : " + c.name + " purchased: " + RuntimeUtils.stringListToString(pu));
+    }
+  }
+}
+ *)
+
+Example p12 :=
+  rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (paccept));;
+  rule_global ("pu" IS AGGREGATE   rule_when ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit)))))) DO AIdOp OVER pletIt ((lookup "p")) (pbdot "name" (pit)) FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Customer : ")) (toString (pletIt ((lookup "c")) (pbdot "name" (pit)))))) (toString (#` " purchased: ")))) (toString (toString ((lookup "pu")))))
+.

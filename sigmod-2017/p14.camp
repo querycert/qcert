@@ -1,0 +1,36 @@
+(* origin: data/standard/test11.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test11 {
+  rule R11 {
+    when {
+      s:aggregate {
+        c:Customer(age <= 34);
+        pu: aggregate {
+          p:Purchase(cid == c.cid);
+        } do { count { p }; }
+      } do { sum { pu }; }
+      n:aggregate {
+        c:Customer(age <= 34);
+        pu: aggregate {
+          p:Purchase(cid == c.cid);
+        } do { count { p }; }
+      } do { count { pu }; }
+    } then {
+      System.out.println("Average nb purchases for customers below 34 is : " + s +s+ " / " +s+ n);
+    }
+  }
+}
+ *)
+
+Example p14 :=
+  rule_global ("s" IS AGGREGATE   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop ALe (pbdot "age" (pit)) (#` 34))));;;
+  rule_global ("pu" IS AGGREGATE   rule_when ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit)))))) DO ACount OVER (lookup "p") FLATTEN 0) DO ASum OVER (lookup "pu") FLATTEN 0);;
+  rule_global ("n" IS AGGREGATE   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (passert (pbinop ALe (pbdot "age" (pit)) (#` 34))));;;
+  rule_global ("pu" IS AGGREGATE   rule_when ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit)))))) DO ACount OVER (lookup "p") FLATTEN 0) DO ACount OVER (lookup "pu") FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Average nb purchases for customers below 34 is : ")) (toString ((lookup "s"))))) (toString ((lookup "s"))))) (toString (#` " / ")))) (toString ((lookup "s"))))) (toString ((lookup "n"))))
+.

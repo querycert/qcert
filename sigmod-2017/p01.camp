@@ -1,0 +1,24 @@
+(* Example from Figure 5 in ECOOP 15 paper. *)
+
+Example p01 :=
+  rule_when
+    (pletEnv
+       (passert (pbinop AEq (punop (ADot "type") pit) (pconst (dstring "branding.Client"))))   (* it.type = “Client” *)
+       (pletEnv (punop (ARec "C") pit) (penv))                                                 (* let env+=[C:it] in env *)
+    );;
+  rule_when
+    (pletEnv
+       (passert (pbinop AEq (punop (ADot "type") pit) (pconst (dstring "branding.Marketer")))) (* it.type = “Marketer” *)
+       (pletEnv
+          (passert (pbinop AContains
+                           (punop (ADot "id") (punop (ADot "data") (punop (ADot "C") penv)))
+                           (punop (ADot "clients") (punop (ADot "data") pit))))                (* env.C.data.id ∈ it.data.clients *)
+
+          (pletEnv (punop (ARec "M") pit) (penv)))                                             (* let env+=[M:it] in env *)
+    );;
+  rule_return
+    (pbinop AConcat
+            (punop (ARec "type") (pconst (dstring "C2M")))
+            (punop (ARec "data") (pbinop AConcat
+                                         (punop (ARec "client") (punop (ADot "C") penv))
+                                         (punop (ARec "marketer") (punop (ADot "M") penv))))).

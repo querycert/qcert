@@ -1,0 +1,25 @@
+(* origin: data/standard/test16.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+import com.ibm.ia.model.*;
+
+ruleset test16 {
+  rule R16 {
+    when {
+      cs: aggregate {
+        c:Entity();
+      } do { count {c}; }
+    } then {
+      System.out.println("Working memory contains: " + cs + " entities");
+    }
+  }
+}
+ *)
+
+Example p06 :=
+  rule_global ("cs" IS AGGREGATE   rule_when ("c" INSTANCEOF ["com.ibm.ia.model.Entity"] WHERE (paccept)) DO ACount OVER (lookup "c") FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (pbinop ASConcat (toString (#` "Working memory contains: ")) (toString ((lookup "cs"))))) (toString (#` " entities")))
+.

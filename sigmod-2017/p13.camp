@@ -1,0 +1,28 @@
+(* origin: data/standard/test10.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test10 {
+  rule R10 {
+    when {
+      total:aggregate {
+        c:Customer();
+        pu: aggregate {
+          p:Purchase(cid == c.cid);
+        } do { ArrayList<String> { p.name }; }
+      } do { count { pu }; }
+    } then {
+      System.out.println("Total purchases are : " + total);
+    }
+  }
+}
+ *)
+
+Example p13 :=
+  rule_global ("total" IS AGGREGATE   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (paccept));;;
+  rule_global ("pu" IS AGGREGATE   rule_when ("p" INSTANCEOF ["entities.Purchase"] WHERE (passert (pbinop AEq (pbdot "cid" (pit)) (pletIt ((lookup "c")) (pbdot "cid" (pit)))))) DO AIdOp OVER pletIt ((lookup "p")) (pbdot "name" (pit)) FLATTEN 0) DO ACount OVER (lookup "pu") FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (#` "Total purchases are : ")) (toString ((lookup "total"))))
+.

@@ -1,0 +1,24 @@
+(* origin: data/standard/test14.arl
+
+import java.lang.*;
+import java.util.*;
+import rete.*;
+import entities.*;
+
+ruleset test14 {
+  rule R14 {
+    when {
+      a: aggregate {
+        c:Customer();
+      } do { min {c.age}; }
+    } then {
+      System.out.println("Customers minimum age is: " + a);
+    }
+  }
+}
+ *)
+
+Example p08 :=
+  rule_global ("a" IS AGGREGATE   rule_when ("c" INSTANCEOF ["entities.Customer"] WHERE (paccept)) DO ANumMin OVER pletIt ((lookup "c")) (pbdot "age" (pit)) FLATTEN 0);;
+  rule_return (pbinop ASConcat (toString (#` "Customers minimum age is: ")) (toString ((lookup "a"))))
+.
