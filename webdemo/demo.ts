@@ -54,6 +54,8 @@ interface PuzzleSides {
         switch (source) {
         case "sql":
             return {accept: ".sql", schemaForCompile: false};
+        case "sqlpp":
+            return {accept: ".sqlpp", schemaForCompile: false};
         case "oql":
             return {accept: ".oql", schemaForCompile: false};
         case "lambda_nra":
