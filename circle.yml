@@ -6,8 +6,8 @@ machine:
 
 general:
   artifacts:
-    - "tests/spark2/test01_nnrc/irs"
-    - "tests/spark2/test01_nnrcmr/irs"
+    - "samples/spark2/test01_nnrc/irs"
+    - "samples/spark2/test01_nnrcmr/irs"
 
 dependencies:
   cache_directories:
@@ -27,4 +27,4 @@ dependencies:
 test:
   override:
     - eval `opam config env` && make -j1 && make jsapi
-    - cd tests/spark2 && ./run.sh
+    - cd samples/spark2 && ./run.sh
