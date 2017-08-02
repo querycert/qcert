@@ -84,7 +84,11 @@ public class SExpParser {
 				processValue(stack, formatNumber(tokens.nval));
 				break;
 			case StreamTokenizer.TT_WORD:
-				throw new IllegalArgumentException(tokens.sval + " found in improper context");
+				if (tokens.sval.equals("true") || tokens.sval.equals("false")) {
+					processValue(stack, tokens.sval);
+					break;
+				} else
+					throw new IllegalArgumentException(tokens.sval + " found in improper context");
 			case '(':
 				processStartExpression(tokens, stack);
 				break;
@@ -144,7 +148,7 @@ public class SExpParser {
 	}
 
 	/**
-	 * Perform appropriate processing for a token (number or String literal) that is not an identifier or paren
+	 * Perform appropriate processing for a token (number or boolean or String literal) that is not an identifier or paren
 	 */
 	private static void processValue(Stack<SExpression> stack, String value) {
 		stack.peek().getChildren().add(value);

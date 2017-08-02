@@ -346,7 +346,7 @@ with sqlpp_when_then : Set:=
 .	
 
   (* Let's finally give our languages a proper name! *)
-  Definition sqlpp : Set := list sqlpp_expr.
+  Definition sqlpp : Set := sqlpp_expr.
 
   
 End SQLPP.
