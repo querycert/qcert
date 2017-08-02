@@ -3,3 +3,7 @@ p*.js
 q*.js
 p*_stats.json
 q*_stats.json
+test_all.json
+test_all.json_*.pdf
+test_sql.json
+test_sql.json_*.pdf
