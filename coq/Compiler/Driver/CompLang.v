@@ -67,7 +67,6 @@ Section CompLang.
       | "oql"%string => L_oql
       | "sql"%string => L_sql
       | "sqlpp"%string => L_sqlpp
-      | "sql++"%string => L_sqlpp
       | "lambda_nra"%string => L_lambda_nra
       | "nra"%string => L_nra
       | "nraenv_core"%string => L_nraenv_core
@@ -95,7 +94,7 @@ Section CompLang.
       | L_camp => "camp"%string
       | L_oql => "oql"%string
       | L_sql => "sql"%string
-      | L_sqlpp => "sql++"%string
+      | L_sqlpp => "sqlpp"%string
       | L_lambda_nra => "lambda_nra"%string
       | L_nra => "nra"%string
       | L_nraenv_core => "nraenv_core"%string

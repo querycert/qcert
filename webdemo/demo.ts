@@ -2298,6 +2298,7 @@ function makeLemmaURL(base:string, lemma:string) {
 	return url;
 }
 function fixLabel(label) {
+    if (label == "SQL++") return "SQLPP";
     if (label == "NRAᵉ") return "NRAEnv";
     if (label == "cNRAᵉ") return "cNRAEnv";
     if (label == "λNRA") return "LambdaNRA";
