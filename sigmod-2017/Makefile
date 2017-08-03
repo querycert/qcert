@@ -44,7 +44,6 @@ all: pdf
 
 pdf: test_tpch.json test_all.json
 	./tools/print-sql.py test_tpch.json
-	./tools/print-stats.py test_all.json
 	./tools/print-camp.py test_all.json
 
 
