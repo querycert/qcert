@@ -1,4 +1,4 @@
-QCERT=../bin/qcert
+QCERT=../../bin/qcert
 
 ALL_CAMP=p01.camp \
 	p02.camp \
@@ -71,5 +71,6 @@ cleanall: clean
 	rm -f *~ \
 		test_all.json test_all.json_*.pdf \
 		test_tpch.json test_tpch.json_*.pdf
+	$(MAKE) -C tools cleanall
 
 .PHONY: %_stats.json

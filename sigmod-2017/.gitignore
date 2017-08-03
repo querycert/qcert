@@ -7,4 +7,5 @@ test_all.json
 test_all.json_*.pdf
 test_tpch.json
 test_tpch.json_*.pdf
-tools/_build
+bench/tools/_build
+jsonpp
