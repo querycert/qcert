@@ -150,6 +150,20 @@ Section LambdaNRA.
       reflexivity.
     Qed.
 
+    Lemma lambda_nra_eval_table_eq env s :
+      lambda_nra_eval env (LNRATable s) = 
+      edot global_env s.
+    Proof.
+      reflexivity.
+    Qed.
+
+    Lemma lambda_nra_eval_const_eq env c :
+      lambda_nra_eval env (LNRAConst c) = 
+      Some (normalize_data h c).
+    Proof.
+      reflexivity.
+    Qed.
+
     Lemma lambda_nra_eval_binop_eq env b op1 op2 :
       lambda_nra_eval env (LNRABinop b op1 op2) = 
       olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
@@ -396,6 +410,82 @@ Section LambdaNRA.
       end.
 
   End LambdaNRAScope.
+
+  (* TODO: move these definitions and proofs *)
+  Definition assoc_lookupr_equiv {A B} {dec:EqDec A eq}
+             (l1 l2 : list (A * B))
+    := forall x : A, assoc_lookupr dec l1 x = assoc_lookupr dec l2 x.
+
+  Global Instance assoc_lookupr_equiv_equiv {A B} {dec:EqDec A eq} : Equivalence (@assoc_lookupr_equiv A B dec).
+  Proof.
+    constructor; red; unfold assoc_lookupr_equiv; congruence.
+  Qed.
+
+  Global Instance assoc_lookupr_equiv_app {A B} {dec:EqDec A eq}:
+    Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@app (A*B)).
+  Proof.
+    unfold Proper, respectful, assoc_lookupr_equiv; intros.
+    rewrite (assoc_lookupr_app x x0).
+    rewrite (assoc_lookupr_app y y0).
+    rewrite H, H0.
+    trivial.
+  Qed.
+  Print rec_sort.
+
+    Global Instance assoc_lookupr_equiv_rec_sort {K : Type} {odt : ODT} {A : Type} :
+      Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@rec_sort K odt A).
+    Proof.
+      unfold Proper, respectful, assoc_lookupr_equiv; intros.
+      repeat rewrite assoc_lookupr_drec_sort.
+      trivial.
+    Qed.
+
+  Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_product_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_filter_eq : lambda_nra.
+
+  Global Instance lambda_nra_eval_lookup_equiv_prop :
+    Proper (eq ==> assoc_lookupr_equiv ==> eq ==> eq) lambda_nra_eval.
+  Proof.
+    unfold Proper, respectful.
+    intros ? cenv ? env1 env2 enveq ? e ?; subst.
+    revert env1 env2 enveq.
+    induction e; intros; subst
+    ; autorewrite with lambda_nra
+    ; try rewrite (IHe _ _ enveq)
+    ; try rewrite (IHe1 _ _ enveq)
+    ; try rewrite (IHe2 _ _ enveq)
+    ; eauto.
+    - apply olift_ext; intros.
+      apply lift_oncoll_ext; intros.
+      f_equal.
+      apply rmap_ext; intros.
+      simpl.
+      apply IHe1.
+      rewrite enveq; reflexivity.
+    - apply olift_ext; intros.
+      apply lift_oncoll_ext; intros.
+      f_equal.
+      apply rmap_concat_ext; intros.
+      simpl.
+      apply IHe1.
+      rewrite enveq; reflexivity.
+    - apply olift_ext; intros.
+      apply lift_oncoll_ext; intros.
+      f_equal.
+      apply lift_filter_ext; intros.
+      simpl.
+      rewrite (IHe1 (rec_sort (env1 ++ (s, x) :: nil)) (rec_sort (env2 ++ (s, x) :: nil))); trivial.
+      rewrite enveq; reflexivity.
+  Qed.
+    
   
   Section Top.
     (* For top-level: Parametric query *)
@@ -410,10 +500,13 @@ Section LambdaNRA.
       lambda_nra_eval (rec_sort env) nil q.
   End Top.
 
+ 
 End LambdaNRA.
 
 Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
