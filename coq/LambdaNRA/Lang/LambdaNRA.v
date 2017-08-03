@@ -430,7 +430,6 @@ Section LambdaNRA.
     rewrite H, H0.
     trivial.
   Qed.
-  Print rec_sort.
 
     Global Instance assoc_lookupr_equiv_rec_sort {K : Type} {odt : ODT} {A : Type} :
       Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@rec_sort K odt A).
