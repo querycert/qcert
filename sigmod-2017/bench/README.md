@@ -1,5 +1,30 @@
-CAMP Tests
-----------
+# Sigmod 2017 benchmark
+
+This directory reproduce the figures of the paper _Handling
+Environments in a Nested Relational Algebra with Combinators and an
+Implementation in a Verified Query Compiler_ published at Sigmod 2017.
+
+
+It supposes that `qcert` is compiled and that the TPC-H queries name
+`q*.sql` are present in the directory. Then, to produce the figures,
+you have to type:
+```
+make
+```
+
+It generates the pdf files corresponding to the figures in the paper:
+- Figure 7 (a): `test_tpch.json_size.pdf`
+- Figure 7 (b): `test_tpch.json_depth.pdf`
+- Figure 7 (c): `test_tpch.json_timing.pdf`
+- Figure 8 (a): `test_all.json_camp_size.pdf`
+- Figure 8 (b): `test_all.json_camp_depth.pdf`
+- Figure 8 (c): `test_all.json_camp_timing.pdf`
+- Figure 9 (a): `test_all.json_nra_size.pdf`
+- Figure 9 (b): `test_all.json_nra_depth.pdf`
+- Figure 9 (c): `test_all.json_nnrc_size.pdf`
+
+
+## CAMP Tests
 
 JRules with Customer/Purchase model.
 
