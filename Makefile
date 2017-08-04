@@ -284,6 +284,7 @@ MODULES = \
 	Translation/TCAMPtocNRAEnv \
 	Translation/TCAMPtoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
+	Translation/TLambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \

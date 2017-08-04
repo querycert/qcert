@@ -45,6 +45,84 @@ Section LambdaNRAtoNRAEnv.
       NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID))
     end.
 
+  Lemma  lambda_nra_to_nraenv_var_eq x :
+      lambda_nra_to_nraenv (LNRAVar x) = 
+      NRAEnvUnop (ADot x) NRAEnvEnv.
+  Proof.
+    reflexivity.
+  Qed.
+  
+  Lemma  lambda_nra_to_nraenv_table_eq x :
+    lambda_nra_to_nraenv (LNRATable x) = NRAEnvGetConstant x.
+  Proof.
+    reflexivity.
+  Qed.
+  
+  
+  Lemma  lambda_nra_to_nraenv_const_eq d :
+    lambda_nra_to_nraenv (LNRAConst d) = NRAEnvConst d.
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_binop_eq b op1 op2 :
+    lambda_nra_to_nraenv (LNRABinop b op1 op2) =
+    NRAEnvBinop b (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_unop_eq u op :
+    lambda_nra_to_nraenv (LNRAUnop u op) =
+    NRAEnvUnop u (lambda_nra_to_nraenv op).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_map_eq lop1 op2 :
+    lambda_nra_to_nraenv (LNRAMap lop1 op2) = NRAEnvMap (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_map_concat_eq lop1 op2 :
+    lambda_nra_to_nraenv (LNRAMapConcat lop1 op2) = NRAEnvMapConcat (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_product_eq op1 op2 :
+    lambda_nra_to_nraenv (LNRAProduct op1 op2) = NRAEnvProduct (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_filter_eq lop1 op2 :
+    lambda_nra_to_nraenv (LNRAFilter lop1 op2) = NRAEnvSelect (nraenv_of_lnra_lambda lop1) (lambda_nra_to_nraenv op2).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Lemma  lambda_nra_to_nraenv_lambda_eq x op :
+    nraenv_of_lnra_lambda (LNRALambda x op) =
+    NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID)).
+  Proof.
+    reflexivity.
+  Qed.
+
+  Hint Rewrite @lambda_nra_to_nraenv_var_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_table_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_const_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_binop_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_unop_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_map_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_map_concat_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_product_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_filter_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_lambda_eq : lambda_nra_to_nraenv.
+
+
+
   Context (h:brand_relation_t).
 
   Section Translation.
@@ -234,6 +312,17 @@ Section LambdaNRAtoNRAEnv.
 
 End LambdaNRAtoNRAEnv.
 
+  Hint Rewrite @lambda_nra_to_nraenv_var_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_table_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_const_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_binop_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_unop_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_map_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_map_concat_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_product_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_filter_eq : lambda_nra_to_nraenv.
+  Hint Rewrite @lambda_nra_to_nraenv_lambda_eq : lambda_nra_to_nraenv.
+  
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../coq" "Qcert")) ***
