@@ -27,7 +27,12 @@ To run tests:
 -------------
 
 In batch: there is a target (make unit_tests) that will do this but only after you create and populate the
-tests subdirectory.  An automated way of doing that is coming soon.
+tests subdirectory.  To do that, you need to have cloned the asterixDB repository as described above.
+Then, run the getTestsBatch ant script as in the following example:
 
-Under Eclipse: first populate the tests folder by executing 'getTests.xml' as an ant script.  Then
-switch to batch and use the Makefile.  Note that the script currently only works under Eclipse.
+ant -Dsource_dir=/Users/joshuaauerbach/git/asterixdb/asterixdb -f getTestsBatch.xml
+
+Under Eclipse: first populate the tests folder by executing 'getTestsEclipse.xml' as an ant script.  Then
+switch to batch and use the Makefile.  The getTestsEclipse.xml script only works under Eclipse and is a
+minor convenience over getTestsBatch.xml since you don't have to specify the AsterixDB clone location if you have
+already defined an ASTERIXDB variable for source attachment purposes.

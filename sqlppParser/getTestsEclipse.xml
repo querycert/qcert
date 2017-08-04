@@ -2,8 +2,7 @@
 
 <!-- WARNING: this script only works under Eclipse and only when the launch config specifies that it run under the same JRE instance
   as does the workspace and only when the ASTERIXDB symbolic link is defined as described in the README.
-  I will gradually shed Eclipse dependencies ... for example, eliminating the resolve step and using an ANT property to specify
-  the AsterixDB location.  However, a clone of the AsterixDB repository will always be required. -->
+  In the batch, use getTestsBatch.xml as described in the README -->
 
 <project default="get_tests" name="Copy relevant tests from AsterixDB distro and the samples/sql and samples/sql/tpc areas">
 

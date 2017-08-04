@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<project default="get_tests" name="Copy relevant tests from AsterixDB distro and the samples/sql and samples/sql/tpc areas">
+	<target name="get_tests">
+		<fail unless="source_dir" message="the source_dir property must be specified"/>
+		<delete dir="tests"/>
+		<mkdir dir="tests"/>
+		<copy todir="tests">
+			<fileset dir="${source_dir}/asterix-app/src/test/resources/parserts/queries_sqlpp"/>
+		</copy>
+		<copy todir="tests">
+			<fileset dir="${source_dir}/asterix-benchmark/src/main/resources/benchmarks/tpch/queries" includes="*.sqlpp"/>
+		</copy>
+		<copy todir="tests">
+			<fileset dir="${source_dir}/asterix-benchmark/src/main/resources/benchmarks/tpch/queries"/>
+			<globmapper from="*.sqlpp.dis" to = "*.sqlpp"/>
+		</copy>
+		<copy todir="tests">
+			<fileset dir="../samples/sql" includes="*.sql"/>
+			<fileset dir="../samples/sql/tpc" includes="tpch_*.sql"/>
+		</copy>
+    </target>
+</project>
