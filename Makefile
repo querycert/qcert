@@ -228,7 +228,9 @@ MODULES = \
 	LambdaNRA/Lang/LambdaNRA \
 	LambdaNRA/Lang/LambdaNRASugar \
 	LambdaNRA/Lang/LambdaNRAEq \
+	LambdaNRA/Typing/TLambdaNRA \
 	LambdaNRA/LambdaNRARuntime \
+	LambdaNRA/LambdaNRATypes \
 	LambdaNRA/LambdaNRASystem \
 	SQL/Lang/SQL \
 	SQL/Lang/SQLSize \
