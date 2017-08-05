@@ -34,7 +34,7 @@ Section SQLPP.
   Inductive sqlpp_distinct : Set := SPDistinct | SPAll.
   Inductive sqlpp_join_type : Set := SPInner | SPLeftOuter.
 
-  (* The SQLPP grammar according to AsterixDB
+  (** The SQLPP grammar according to AsterixDB
 
 Statement ::= ( SingleStatement ( ";" )? )* <EOF>
 
@@ -65,7 +65,7 @@ is not needed in the AST.  So, the AST is basically a huge inductive set on Expr
 
   Inductive sqlpp_expr : Set :=
 
-(*
+(**
 Expression ::= OperatorExpression | CaseExpression | QuantifiedExpression
 
 OperatorExpression ::= PathExpression
@@ -85,7 +85,7 @@ positive, negative, exists, not, isNull, isMissing, isUnknown
   | SPIsMissing : sqlpp_expr -> sqlpp_expr
   | SPIsUnknown : sqlpp_expr -> sqlpp_expr                                  
 
-(*                                 
+(**                                 
 Valid operators for the second form (binary operators) are
 plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge, like, and, or
 (Actually, fuzzy-eq isn't listed in the SQL++ grammar, but it's in the AQL grammar and supported for SQL++ by AsterixDB).
@@ -110,11 +110,11 @@ plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge,
   | SPAnd : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPOr : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   
-(* Finally, the ternery BETWEEN operator *)
+(** Finally, the ternery BETWEEN operator *)
 
   | SPBetween : sqlpp_expr -> sqlpp_expr -> sqlpp_expr -> sqlpp_expr                                         
                                          
-(*    
+(**    
 CaseExpression ::= SimpleCaseExpression | SearchedCaseExpression
 
 SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
@@ -125,7 +125,7 @@ SearchedCaseExpression ::= <CASE> ( <WHEN> Expression <THEN> Expression )+ ( <EL
   | SPSimpleCase : sqlpp_expr -> list sqlpp_when_then -> option sqlpp_expr -> sqlpp_expr
   | SPSearchedCase : list sqlpp_when_then -> option sqlpp_expr -> sqlpp_expr
                                                                          
-(*                                                            
+(**                                                           
 QuantifiedExpression ::= ( (<ANY>|<SOME>) | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )*
                          <SATISFIES> Expression (<END>)?
  *)
@@ -133,7 +133,7 @@ QuantifiedExpression ::= ( (<ANY>|<SOME>) | <EVERY> ) Variable <IN> Expression (
   | SPSome : list (string * sqlpp_expr) -> sqlpp_expr -> sqlpp_expr
   | SPEvery : list (string * sqlpp_expr) -> sqlpp_expr -> sqlpp_expr
   
-(*
+(**
 PathExpression  ::= PrimaryExpression ( Field | Index )*
 
 Field           ::= "." Identifier
@@ -141,14 +141,14 @@ Field           ::= "." Identifier
 
   | SPDot : sqlpp_expr -> string -> sqlpp_expr                                                            
 
-(*                                    
+(**                                    
 Index           ::= "[" ( Expression | "?" ) "]"
  *)
 
   | SPIndex : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPIndexAny : sqlpp_expr -> sqlpp_expr
 
-(*                                         
+(**                                         
 PrimaryExpr ::= Literal
               | VariableReference
               | ParenthesizedExpression
@@ -170,7 +170,7 @@ Literal        ::= StringLiteral
   | SPLiteral : data -> sqlpp_expr (* For string, int, float, double, true and false *)
   | SPNull | SPMissing
 
-(*
+(**
 VariableReference     ::= <IDENTIFIER>|<DelimitedIdentifier>
 
 The parsing of delimited identifiers will be handled by the AsterixDB parser, so, in Coq we just have string
@@ -179,17 +179,17 @@ representations of identifiers, whether delimited or not (with the delimiters om
 
   | SPVarRef : string -> sqlpp_expr                                   
 
-(*
+(**
 ParenthesizedExpression ::= "(" Expression ")" | Subquery
 
-The parenthesized expression is needed for parsing but need to be distinguished in the AST
+The parenthesized expression is needed for parsing but does not need to be distinguished in the AST
 
 FunctionCallExpression ::= FunctionName "(" ( Expression ( "," Expression )* )? ")"
 *)
 
   | SPFunctionCall : string -> list sqlpp_expr -> sqlpp_expr
                         
-(*
+(**
 Constructor              ::= ArrayConstructor | MultisetConstructor | ObjectConstructor
 
 ArrayConstructor         ::= "[" ( Expression ( "," Expression )* )? "]"
@@ -197,13 +197,13 @@ ArrayConstructor         ::= "[" ( Expression ( "," Expression )* )? "]"
 
   | SPArray : list sqlpp_expr -> sqlpp_expr                                                   
 
-(*
+(**
 MultisetConstructor      ::= "{{" ( Expression ( "," Expression )* )? "}}"
  *)
 
   | SPBag : list sqlpp_expr -> sqlpp_expr                                  
 
-(*                                  
+(**                                  
 ObjectConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
 
 FieldBinding             ::= Expression ":" Expression
@@ -211,7 +211,7 @@ FieldBinding             ::= Expression ":" Expression
 
   | SPObject : list (sqlpp_expr * sqlpp_expr) -> sqlpp_expr
                              
-(*
+(**
 SelectStatement    ::= ( WithClause )?
                        SelectSetOperation (OrderbyClause )? ( LimitClause )?
                        
@@ -232,7 +232,7 @@ with sqlpp_select_statement : Set :=
 		-> sqlpp_order_by  (* order by; limit clause elided earlier *)
 		-> sqlpp_select_statement
 
-(*
+(**
 SelectBlock        ::= SelectClause
                        ( FromClause ( LetClause )?)?
                        ( WhereClause )?
@@ -264,7 +264,7 @@ with sqlpp_union_element : Set :=
   | SPBlock : sqlpp_select_block -> sqlpp_union_element
   | SPSubquery : sqlpp_select_statement -> sqlpp_union_element        
 
-(*
+(**
 SelectClause       ::= <SELECT> ( <ALL> | <DISTINCT> )? ( SelectRegular | SelectValue )
 
 SelectRegular      ::= Projection ( "," Projection )*
@@ -282,7 +282,7 @@ with sqlpp_project : Set :=
   | SPProject : (sqlpp_expr * option string) -> sqlpp_project
   | SPProjectStar
   
-(*
+(**
 FromTerm           ::= Expression (( <AS> )? Variable)?
                        ( ( JoinType )? ( JoinClause | UnnestClause ) )*
 
@@ -301,7 +301,7 @@ with sqlpp_join_clause : Set :=
   | SPJoin : sqlpp_join_type -> sqlpp_expr -> option string -> sqlpp_expr -> sqlpp_join_clause
   | SPUnnest : sqlpp_join_type -> sqlpp_expr -> option string -> option string -> sqlpp_join_clause  
 
-(*	
+(**	
 Let and with clauses are distinct in the grammar but use the same AsterixDB AST element so will not be distinct internally.
 When these clauses appear in the grammar, the AST simply uses (string * sqlpp_expr)
 
@@ -320,7 +320,7 @@ with sqlpp_where : Set :=
   | SPWhere : sqlpp_expr -> sqlpp_where
   | SPNoWhere
 
-(*  
+(**  
 GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )*
                        ( <GROUP> <AS> Variable
                          ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
@@ -333,7 +333,7 @@ with sqlpp_group_by : Set :=
 		-> sqlpp_group_by
     | SPNoGroupBy
 
-(*		
+(**		
 OrderbyClause      ::= <ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
  *)
  
