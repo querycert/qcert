@@ -28,8 +28,7 @@ Section TLambdaNRA.
   (** Typing for LambdaNRA *)
   Section typ.
     Context {m:basic_model}.
-    Context (τconstants:tbindings).
-   
+    Context (τconstants:tbindings).    
     Inductive lambda_nra_type : lambda_nra -> tbindings -> rtype -> Prop :=
     | LTVar {Γ τ} v :
         tdot Γ v = Some τ ->
@@ -55,11 +54,11 @@ Section TLambdaNRA.
       lambda_nra_type op Γ τ₀ ->
       lambda_nra_type (LNRAUnop u op) Γ τ
   | TLMap {Γ τ₀ τ} lop1 op2 :
-      lnra_lambda_type lop1 Γ τ₀ τ ->
+      lnra_lambda_type lop1 Γ (τ₀ ~~> τ) ->
       lambda_nra_type op2 Γ (Coll τ₀) ->
       lambda_nra_type (LNRAMap lop1 op2) Γ (Coll τ)
   | TLMapConcat {Γ τ₁ τ₂ τ} lop1 op2 pf1 pf2 pf3 :
-      lnra_lambda_type lop1 Γ (Rec Closed τ₁ pf1) (Coll (Rec Closed τ₂ pf2)) ->
+      lnra_lambda_type lop1 Γ ((Rec Closed τ₁ pf1)~~>(Coll (Rec Closed τ₂ pf2))) ->
       lambda_nra_type op2 Γ (Coll (Rec Closed τ₁ pf1)) ->
       rec_concat_sort τ₁ τ₂ = τ ->
       lambda_nra_type (LNRAMapConcat lop1 op2) Γ (Coll (Rec Closed τ pf3))
@@ -69,38 +68,32 @@ Section TLambdaNRA.
       rec_concat_sort τ₁ τ₂ = τ ->
       lambda_nra_type (LNRAProduct op1 op2) Γ(Coll (Rec Closed τ pf3))
   | ATFilter {Γ τ} lop1 op2 :
-      lnra_lambda_type lop1 Γ τ Bool ->
+      lnra_lambda_type lop1 Γ (τ~~>Bool) ->
       lambda_nra_type op2 Γ (Coll τ) ->
       lambda_nra_type (LNRAFilter lop1 op2) Γ (Coll τ)
     with
-    lnra_lambda_type :  lnra_lambda -> tbindings -> rtype -> rtype -> Prop :=
+    lnra_lambda_type :  lnra_lambda -> tbindings -> rtype -> Prop :=
     | TLLambda {Γ τin τout} x e :
         lambda_nra_type e (rec_sort (Γ++[(x,τin)])) τout ->
-        lnra_lambda_type (LNRALambda x e) Γ τin τout
+        lnra_lambda_type (LNRALambda x e) Γ (τin ~~> τout)
     .
-                                     
+
+    Lemma TLLambda_inv {Γ τin τout} x e :
+      lnra_lambda_type (LNRALambda x e) Γ (τin ~~> τout) ->
+      lambda_nra_type e (rec_sort (Γ++[(x,τin)])) τout.
+    Proof.
+      inversion 1.
+      rtype_equalizer; congruence.
+    Qed.
+    
   End typ.
 
+    
 
   (** Type lemmas for individual algebraic expressions *)
   Context {m:basic_model}.
 
   (** Main lemma for the type correctness of NNNRC *)
-
-  (* TODO: move this lemma *)
-  Lemma assoc_lookupr_equiv_cons_in {A B} {dec:EqDec A eq} (s:A) (d:B) l :
-    In s (domain l) -> 
-    assoc_lookupr_equiv l ((s, d) :: l).
-  Proof.
-    unfold assoc_lookupr_equiv; intros.
-    simpl.
-    match_case; intros.
-    match_case; intros.
-    unfold equiv in *; subst.
-    apply assoc_lookupr_none_nin in H0.
-    congruence.
-  Qed.
-
     Theorem typed_lambda_nra_yields_typed_data
           {τ}
           (cenv:bindings)
@@ -170,13 +163,12 @@ Section TLambdaNRA.
     - destruct (IHe2 _ _ _ bt H4) as [dd2 [edd2 tdd2]].
       rewrite edd2; simpl.
       dtype_inverter.
-      invcs H1.
+      apply TLLambda_inv in H1.
       invcs tdd2; rtype_equalizer; subst.
       clear edd2.
       induction dd2; simpl.
       + eexists; split; [reflexivity|]. repeat constructor.
-      + invcs H1.
-        destruct (IHdd2 H3) as [dd1 [edd1 tdd1]].
+      + invcs H2; destruct (IHdd2 H5) as [dd1 [edd1 tdd1]].
         apply some_lift in edd1.
         destruct edd1 as [dd11 ? tdd11]; subst.
         rewrite e.
@@ -188,7 +180,7 @@ Section TLambdaNRA.
           apply Forall2_app; trivial.
           constructor; simpl; intuition. 
         }
-        destruct (IHe1 _ _ _ bt1 H6) as [dd3 [edd3 tdd3]].
+        destruct (IHe1 _ _ _ bt1 H1) as [dd3 [edd3 tdd3]].
         rewrite edd3.
         simpl.
         eexists; split; [reflexivity | ].
@@ -197,13 +189,13 @@ Section TLambdaNRA.
     - destruct (IHe2 _ _ _ bt H2) as [dd2 [edd2 tdd2]].
       rewrite edd2; simpl.
       dtype_inverter.
-      invcs H1.
       apply Col_inv in tdd2.
+      apply TLLambda_inv in H1.
       clear edd2.
       induction dd2; simpl.
       + eexists; split; [reflexivity|]. repeat constructor.
       + invcs tdd2.
-        destruct (IHdd2 H3) as [dd1 [edd1 tdd1]].
+        destruct (IHdd2 H4) as [dd1 [edd1 tdd1]].
         apply some_lift in edd1.
         destruct edd1 as [dd11 ? tdd11]; subst.
         assert (bt1:bindings_type (rec_sort (env ++ [(s, a)])) (rec_sort (Γ ++ [(s, Rec Closed τ₁ pf1)])) ).
@@ -213,12 +205,12 @@ Section TLambdaNRA.
           apply Forall2_app; trivial.
           constructor; simpl; intuition. 
         }
-        destruct (IHe1 _ _ _ bt1 H6) as [dd3 [edd3 tdd3]].
+        destruct (IHe1 _ _ _ bt1 H1) as [dd3 [edd3 tdd3]].
         rewrite (rmap_concat_ext _  (fun d => lambda_nra_eval brand_relation_brands cenv (rec_sort (env ++ [(s, d)])) e1));
           [ | intros; apply lnra_lambda_eval_lambda_eq ].
         dtype_inverter.
-        apply Col_inv in tdd3.
         apply Col_inv in tdd1.
+        apply Col_inv in tdd3.
         assert (part1pf:exists part1, oomap_concat (fun d => lambda_nra_eval brand_relation_brands cenv 
                                                                              (rec_sort (env ++ [(s, d)])) e1) (drec a) = Some part1 /\ Forall (fun d : data => d ▹ Rec Closed (rec_concat_sort τ₁ τ₂) pf3) part1
 ).
@@ -227,19 +219,19 @@ Section TLambdaNRA.
           rewrite edd3.
           unfold omap_concat.
           clear edd3.
-          revert dd3 tdd3 H1; clear; intros.
+          revert dd3 tdd3 H3; clear; intros.
           induction dd3.
           - eexists; split; [reflexivity | ]; constructor.
           - invcs tdd3.
             dtype_inverter.
-            destruct (IHdd3 H3) as [part1 [part1eq part1t]].
+            destruct (IHdd3 H2) as [part1 [part1eq part1t]].
             unfold orecconcat in part1eq.
             rewrite part1eq.
             simpl.
             eexists; split; [reflexivity | ].
             constructor; trivial.
             apply dtrec_closed_inv in H1.
-            apply dtrec_closed_inv in H2.
+            apply dtrec_closed_inv in H3.
             apply dtrec_full.
             apply rec_concat_with_drec_concat_well_typed; auto.
         }
@@ -295,12 +287,12 @@ Section TLambdaNRA.
     - destruct (IHe2 _ _ _ bt H4) as [dd2 [edd2 tdd2]].
       rewrite edd2; simpl; clear edd2 H4.
       dtype_inverter.
-      invcs H1.
+      apply TLLambda_inv in H1.
       apply Col_inv in tdd2.
       induction dd2; simpl.
       + eexists; split; [reflexivity|]. repeat constructor.
       + invcs tdd2.
-        destruct (IHdd2 H2) as [dd1 [edd1 tdd1]].
+        destruct (IHdd2 H3) as [dd1 [edd1 tdd1]].
         apply some_lift in edd1.
         destruct edd1 as [dd11 dd11e dd11t]; subst.
         rewrite dd11e.
@@ -312,7 +304,7 @@ Section TLambdaNRA.
           apply Forall2_app; trivial.
           constructor; simpl; intuition. 
         }
-        destruct (IHe1 _ _ _ bt1 H5) as [dd3 [edd3 tdd3]].
+        destruct (IHe1 _ _ _ bt1 H1) as [dd3 [edd3 tdd3]].
         rewrite edd3.
         dtype_inverter.
         apply Col_inv in tdd1.
@@ -341,7 +333,7 @@ Section TLambdaNRA.
     induction e; simpl; inversion 2; subst; econstructor; eauto 3
     ; try solve [
             constructor
-            ; invcs H1
+            ; apply TLLambda_inv in H1
             ; eapply IHe1; [ | eassumption]
             ; rewrite eqs; reflexivity].
     - unfold tdot, edot in *; unfold assoc_lookupr_equiv in *; simpl in *.

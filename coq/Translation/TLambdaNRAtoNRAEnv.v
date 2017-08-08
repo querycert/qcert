@@ -54,13 +54,13 @@ Section TLambdaNRAtoNRAEnv.
       ; [ | apply IHe2; eassumption].
       econstructor.
       + econstructor; [ | eauto | eauto ]; eauto.
-      + invcs H1.
+      + apply TLLambda_inv in H1.
         eapply IHe1; eauto.
     - econstructor; fold nraenv_core_of_nraenv
       ; [ | apply IHe2; eassumption | reflexivity].
       econstructor.
       + econstructor; [ | eauto | eauto ]; eauto.
-      + invcs H1.
+      + apply TLLambda_inv in H1.
         eapply IHe1; eauto.
     - econstructor; fold nraenv_core_of_nraenv.
       + apply IHe1; eauto.
@@ -70,7 +70,7 @@ Section TLambdaNRAtoNRAEnv.
       ; [ | apply IHe2; eassumption].
       econstructor.
       + econstructor; [ | eauto | eauto ]; eauto.
-      + invcs H1.
+      + apply TLLambda_inv in H1.
         eapply IHe1; eauto.
     Grab Existential Variables.
     solve[eauto].

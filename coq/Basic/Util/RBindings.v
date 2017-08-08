@@ -1568,6 +1568,14 @@ Section RBindings.
 
   End sublist.
 
+  Global Instance assoc_lookupr_equiv_rec_sort  {A : Type} :
+    Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@rec_sort A).
+  Proof.
+    unfold Proper, respectful, assoc_lookupr_equiv; intros.
+    repeat rewrite assoc_lookupr_drec_sort.
+    trivial.
+  Qed.
+
   Section rev.
     Lemma lookup_rev_rec_sort {B} (x:K) (l:list (K*B)) :
       lookup ODT_eqdec (rev (rec_sort l)) x = lookup ODT_eqdec (rec_sort l) x.

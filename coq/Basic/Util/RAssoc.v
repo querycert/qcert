@@ -877,20 +877,52 @@ Section RAssoc.
         eapply lookup_none_perm in H1; eauto.
     Qed.
 
-  End lookup_eq.
-
-  Lemma assoc_lookupr_lookup_nodup {A B} dec x (ls:list (A*B)):
+  Lemma assoc_lookupr_lookup_nodup x (ls:list (A*B)):
     NoDup (domain ls) ->
       assoc_lookupr dec ls x = lookup dec ls x.
   Proof.
     intros nd.
-    rewrite assoc_lookupr_lookup.
+    rewrite @assoc_lookupr_lookup.
     apply lookup_equiv_perm_nodup; trivial.
     - rewrite domain_rev.
       rewrite <- Permutation_rev; trivial.
     - rewrite <- Permutation_rev. reflexivity.
   Qed.
-  
+
+    Definition assoc_lookupr_equiv 
+             (l1 l2:list (A*B))
+    := forall x : A, assoc_lookupr dec l1 x = assoc_lookupr dec l2 x.
+
+  Global Instance assoc_lookupr_equiv_equiv : Equivalence (assoc_lookupr_equiv).
+  Proof.
+    constructor; red; unfold assoc_lookupr_equiv; congruence.
+  Qed.
+
+  Global Instance assoc_lookupr_equiv_app:
+    Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@app (A*B)).
+  Proof.
+    unfold Proper, respectful, assoc_lookupr_equiv; intros.
+    rewrite (assoc_lookupr_app x x0).
+    rewrite (assoc_lookupr_app y y0).
+    rewrite H, H0.
+    trivial.
+  Qed.
+
+  Lemma assoc_lookupr_equiv_cons_in (s:A) (d:B) l :
+    In s (domain l) -> 
+    assoc_lookupr_equiv l ((s, d) :: l).
+  Proof.
+    unfold assoc_lookupr_equiv; intros.
+    simpl.
+    match_case; intros.
+    match_case; intros.
+    unfold equiv in *; subst.
+    apply assoc_lookupr_none_nin in H0.
+    congruence.
+  Qed.
+
+    End lookup_eq.
+
     Lemma remove_domain_filter {A B} `{dec:EqDec A eq} s l:
     remove equiv_dec s (domain l) = 
     domain (filter (fun x : A * B => s <>b fst x) l).

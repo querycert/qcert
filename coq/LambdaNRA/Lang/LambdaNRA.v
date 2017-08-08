@@ -411,34 +411,6 @@ Section LambdaNRA.
 
   End LambdaNRAScope.
 
-  (* TODO: move these definitions and proofs *)
-  Definition assoc_lookupr_equiv {A B} {dec:EqDec A eq}
-             (l1 l2 : list (A * B))
-    := forall x : A, assoc_lookupr dec l1 x = assoc_lookupr dec l2 x.
-
-  Global Instance assoc_lookupr_equiv_equiv {A B} {dec:EqDec A eq} : Equivalence (@assoc_lookupr_equiv A B dec).
-  Proof.
-    constructor; red; unfold assoc_lookupr_equiv; congruence.
-  Qed.
-
-  Global Instance assoc_lookupr_equiv_app {A B} {dec:EqDec A eq}:
-    Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@app (A*B)).
-  Proof.
-    unfold Proper, respectful, assoc_lookupr_equiv; intros.
-    rewrite (assoc_lookupr_app x x0).
-    rewrite (assoc_lookupr_app y y0).
-    rewrite H, H0.
-    trivial.
-  Qed.
-
-    Global Instance assoc_lookupr_equiv_rec_sort {K : Type} {odt : ODT} {A : Type} :
-      Proper (assoc_lookupr_equiv ==> assoc_lookupr_equiv) (@rec_sort K odt A).
-    Proof.
-      unfold Proper, respectful, assoc_lookupr_equiv; intros.
-      repeat rewrite assoc_lookupr_drec_sort.
-      trivial.
-    Qed.
-
   Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
