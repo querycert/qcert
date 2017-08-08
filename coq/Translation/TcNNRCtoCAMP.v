@@ -146,16 +146,17 @@ Section TcNNRCtoCAMP.
       + rewrite <- H; trivial.
   Qed.
 
-  Lemma nnrc_type_context_perm {Γ Γ'} τ n :
+  Lemma nnrc_type_context_perm {Γ Γ'} τc τ n :
     Permutation Γ Γ' ->
     NoDup (domain Γ) ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
-    nnrc_type Γ n τ ->
-    nnrc_type Γ' n τ.
+    nnrc_type τc Γ n τ ->
+    nnrc_type τc Γ' n τ.
   Proof.
     revert Γ Γ' τ.
     induction n; simpl; intros; inversion H3; subst; intros; repeat rewrite andb_true_iff in *; intuition.
+    - econstructor; eauto.
     - econstructor; eauto. rewrite <- (lookup_equiv_perm_nodup H); trivial.
     - econstructor; eauto.
     - apply in_in_app_false in H2. intuition. econstructor; eauto.
@@ -285,6 +286,8 @@ Section TcNNRCtoCAMP.
                   inversion H; subst; clear H
            | [H: [_ & _] |= pvar _ ; _ ~> _ |- _] =>
                   inversion H; subst; clear H
+           | [H: [_ & _] |= pgetConstant _ ; _ ~> _ |- _] =>
+                  inversion H; subst; clear H
            | [H: [_ & _] |= porElse _ _ ; _ ~> _ |- _] =>
                   inversion H; subst; clear H
            | [H: [_ & _] |= passert _ ; _ ~> _ |- _] =>
@@ -360,12 +363,12 @@ Section TcNNRCtoCAMP.
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
-    nnrc_type Γ n τout ->
+    nnrc_type τc Γ n τout ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
     revert Γ τout; induction n; intros;
-    inversion H2; subst; try solve [econstructor; eauto 3].
+      inversion H2; subst; try solve [econstructor; eauto 3].
     - simpl in H0, H1. simpt; econstructor; eauto.
     - simpl. 
       simpl in H, H0, H1. simpt. 
@@ -399,13 +402,13 @@ Section TcNNRCtoCAMP.
           apply drec_sort_domain in H5.
           apply loop_var_in_nnrc_to_camp_env in H5.
           simpl in H5; intuition; subst; [intuition|eauto].
-          apply (nnrc_type_context_perm _ _ perm'); auto.
+          apply (nnrc_type_context_perm _ _ _ perm'); auto.
           apply nnrc_to_camp_nodup; auto.
           simpl; intuition; [idtac|eauto].
           subst;
             destruct (in_dec string_eqdec x (nnrc_bound_vars n2)); 
             intuition.
-    - simpl. 
+    - simpl.
       simpl in H, H0, H1. simpt. 
       econstructor; eauto.
       eapply PTmapall; eauto.
@@ -439,7 +442,7 @@ Section TcNNRCtoCAMP.
           apply drec_sort_domain in H5.
           apply loop_var_in_nnrc_to_camp_env in H5.
           simpl in H5; intuition; subst; [intuition|eauto].
-          apply (nnrc_type_context_perm _ _ perm'); auto.
+          apply (nnrc_type_context_perm _ _ _ perm'); auto.
           apply nnrc_to_camp_nodup; auto.
           simpl; intuition; [idtac|eauto].
           subst;
@@ -491,7 +494,7 @@ Section TcNNRCtoCAMP.
           intros ? inn.
           symmetry in perm'.
           generalize (Permutation_in _ (dom_perm _ _ perm') inn); simpl; intros [inn'|inn']; subst; eauto.
-          apply (nnrc_type_context_perm _ _ perm'); trivial.
+          apply (nnrc_type_context_perm _ _ _ perm'); trivial.
           simpl.
           constructor; auto.
           simpl.
@@ -523,7 +526,7 @@ Section TcNNRCtoCAMP.
           intros ? inn.
           symmetry in perm'.
           generalize (Permutation_in _ (dom_perm _ _ perm') inn); simpl; intros [inn'|inn']; subst; eauto.
-          apply (nnrc_type_context_perm _ _ perm'); trivial.
+          apply (nnrc_type_context_perm _ _ _ perm'); trivial.
           simpl; constructor; auto.
           simpl.
           intros ? [?|?]; subst; eauto.
@@ -534,17 +537,17 @@ Section TcNNRCtoCAMP.
 
   Lemma nnrc_to_camp_ns_top_type_preserve n τc τout :
     shadow_free n = true ->
-    nnrc_type nil n τout ->
+    nnrc_type τc nil n τout ->
     forall τ₀,
       [τc&nil] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
     intros.
-    apply (nnrc_to_camp_ns_type_preserve n  τc nil); eauto.
+    apply (nnrc_to_camp_ns_type_preserve n τc nil); eauto.
   Qed.
 
   Lemma nnrc_to_camp_type_preserve n τc Γ τout :
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
-    nnrc_type Γ n τout ->
+    nnrc_type τc Γ n τout ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp (domain Γ) n) ; τ₀ ~> τout.
   Proof.
@@ -612,6 +615,7 @@ Section TcNNRCtoCAMP.
     induction n; intros; trivial; simpl in H1;
     try autorewrite with fresh_bindings in H1;
     simpt.
+    - simpl in *. t. econstructor; eauto.
     - simpl in *.
       t.
       repeat econstructor; eauto.
@@ -886,6 +890,7 @@ Section TcNNRCtoCAMP.
     inversion 1; subst;  simpl in freshb, shf, ninb;
     autorewrite with fresh_bindings in freshb;
     repeat rewrite andb_true_iff in *.
+    - eauto.
     - eauto.
     - eauto.
     - rewrite map_app in ninb; apply in_in_app_false in ninb; intuition; eauto.
@@ -1208,7 +1213,7 @@ Section TcNNRCtoCAMP.
   Lemma nnrc_to_camp_let_type_preserve n τc Γ τout :
     nnrcIsCore n ->
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
-    nnrc_type Γ n τout ->
+    nnrc_type τc Γ n τout ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout.
   Proof.
@@ -1238,7 +1243,7 @@ Section TcNNRCtoCAMP.
   Lemma nnrc_to_camp_ns_let_top_type_preserve n τc τout :
     nnrcIsCore n ->
     shadow_free n = true ->
-    nnrc_type nil n τout ->
+    nnrc_type τc nil n τout ->
     forall τ₀,
     [τc&nil] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout.
   Proof.
@@ -1258,11 +1263,12 @@ Section TcNNRCtoCAMP.
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
-                                                     nnrc_type Γ n τout.
+                                                     nnrc_type τc Γ n τout.
   Proof.
     intro Hiscore.
     revert Hiscore Γ τout; induction n; intros;
-    inversion H2; subst.
+      inversion H2; subst.
+    - econstructor; eauto.
     - t.
       econstructor.
       unfold tdot in H4.
@@ -1283,7 +1289,7 @@ Section TcNNRCtoCAMP.
         by (intros ? inn1 inn2; apply dom_perm in gperm;
             apply (Permutation_in _ gperm) in inn1;
             simpl in inn1; destruct inn1; subst; eauto).
-      apply (nnrc_type_context_perm _ _ gperm); try rewrite gperm; trivial.
+      apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
       + simpl; econstructor; eauto.
       + eapply IHn2; trivial;
           unfold rtype; rewrite <- grec; eauto.
@@ -1312,7 +1318,7 @@ Section TcNNRCtoCAMP.
         by (intros ? inn1 inn2; apply dom_perm in gperm;
             apply (Permutation_in _ gperm) in inn1;
             simpl in inn1; destruct inn1; subst; eauto).
-      apply (nnrc_type_context_perm _ _ gperm); try rewrite gperm; trivial.
+      apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
       + simpl; econstructor; eauto.
       + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         unfold merge_bindings in H14.
@@ -1361,7 +1367,7 @@ Section TcNNRCtoCAMP.
           by (intros ? inn1 inn2; apply dom_perm in gperm;
               apply (Permutation_in _ gperm) in inn1;
               simpl in inn1; destruct inn1; subst; eauto).
-        apply (nnrc_type_context_perm _ _ gperm); try rewrite gperm; trivial.
+        apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
         simpl; econstructor; eauto.
         eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H32.
@@ -1381,7 +1387,7 @@ Section TcNNRCtoCAMP.
           by (intros ? inn1 inn2; apply dom_perm in gperm;
               apply (Permutation_in _ gperm) in inn1;
               simpl in inn1; destruct inn1; subst; eauto).
-        apply (nnrc_type_context_perm _ _ gperm); try rewrite gperm; trivial.
+        apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
         simpl; econstructor; eauto.
         eapply IHn3; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H29.
@@ -1402,7 +1408,7 @@ Section TcNNRCtoCAMP.
     shadow_free n = true ->
     forall τ₀,
       [τc&nil] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
-                                     nnrc_type nil n τout.
+                                     nnrc_type τc nil n τout.
   Proof.
     intro Hiscore.
     intros.
@@ -1493,6 +1499,7 @@ Section TcNNRCtoCAMP.
     induction n; intro Hiscore; intros; trivial; simpl in H1;
     try autorewrite with fresh_bindings in H1;
     simpt.
+    - simpl in *. t. econstructor; eauto.
     - simpl in *.
       t.
       repeat econstructor; eauto.
@@ -1740,6 +1747,9 @@ Section TcNNRCtoCAMP.
     intro Hiscore.
     revert Hiscore Γ τout.
     induction n; intro Hiscore; simpl; intros Γ τout issort freshb shf ninb τ₀.
+    - inversion 1; subst; simpl in freshb, shf, ninb;
+      autorewrite with fresh_bindings in freshb;
+      simpt; t; eauto.
     - inversion 1; subst; simpl in freshb, shf, ninb;
       autorewrite with fresh_bindings in freshb;
       simpt; t; eauto.
@@ -2012,7 +2022,7 @@ Section TcNNRCtoCAMP.
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout ->
-      nnrc_type Γ n τout.
+      nnrc_type τc Γ n τout.
   Proof.
     intro Hiscore. intros. unfold nnrcToCamp_let in *.
     generalize (unshadow_simpl_preserve_core (domain Γ) n Hiscore); intros.
@@ -2043,7 +2053,7 @@ Section TcNNRCtoCAMP.
     shadow_free n = true ->
     forall τ₀,
       [τc&nil] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout ->
-                                         nnrc_type nil n τout.
+                                         nnrc_type τc nil n τout.
   Proof.
     intro Hiscore. intros.
     apply nnrc_to_camp_ns_let_type_equiv_back in H0; eauto.
@@ -2058,7 +2068,7 @@ Section TcNNRCtoCAMP.
   Theorem nnrc_to_camp_let_top_type_preserve_iff τc Γ n τout τ₀:
     nnrcIsCore n ->
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
-    (nnrc_type Γ n τout <->
+    (nnrc_type τc Γ n τout <->
     [τc&(nnrc_to_camp_env Γ)]  |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout).
    Proof.
      Hint Resolve nnrc_to_camp_let_type_preserve.

@@ -15,19 +15,16 @@
  *)
 
 Section TNRAEq.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
   Require Import List.
   Require Import String.
-
-  Require Import Utils BasicSystem.
-
-  Require Import NRA NRAEq.
+  Require Import BasicSystem.
+  Require Import NRA.
+  Require Import NRAEq.
   Require Import TNRA.
 
   Local Open Scope nra_scope.

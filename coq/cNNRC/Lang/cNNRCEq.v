@@ -15,7 +15,6 @@
  *)
 
 Section cNNRCEq.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -24,9 +23,9 @@ Section cNNRCEq.
   Require Import String.
   Require Import List.
   Require Import Arith.
-  
-  Require Import Utils BasicRuntime.
-  Require Import cNNRC cNNRCNorm.
+  Require Import BasicRuntime.
+  Require Import cNNRC.
+  Require Import cNNRCNorm.
 
   Context {fruntime:foreign_runtime}.
 
@@ -35,9 +34,11 @@ Section cNNRCEq.
   (** Semantics of NNRC *)
   Definition nnrc_eq (e1 e2:nnrc) : Prop :=
     forall (h:brand_relation_t),
+    forall (cenv:bindings),
     forall (env:bindings),
+      Forall (data_normalized h) (map snd cenv) ->
       Forall (data_normalized h) (map snd env) ->
-      nnrc_core_eval h env e1 = nnrc_core_eval h env e2.
+      nnrc_core_eval h cenv env e1 = nnrc_core_eval h cenv env e2.
 
   Global Instance nnrc_equiv : Equivalence nnrc_eq.
   Proof.
@@ -45,15 +46,23 @@ Section cNNRCEq.
     - unfold Reflexive, nnrc_eq.
       intros; reflexivity.
     - unfold Symmetric, nnrc_eq.
-      intros; rewrite (H h env) by trivial; reflexivity.
+      intros; rewrite (H h cenv env) by trivial; reflexivity.
     - unfold Transitive, nnrc_eq.
-      intros; rewrite (H h env) by trivial;
-      rewrite (H0 h env) by trivial; reflexivity.
+      intros; rewrite (H h cenv env) by trivial;
+      rewrite (H0 h cenv env) by trivial; reflexivity.
   Qed.
 
   (* all the nnrc constructors are proper wrt. equivalence *)
 
-  (* NRCVar *)
+  (* NNRCGetConstant *)
+  
+  Global Instance get_constant_proper : Proper (eq ==> nnrc_eq) NNRCGetConstant.
+  Proof.
+    unfold Proper, respectful, nnrc_eq.
+    intros; rewrite H; reflexivity.
+  Qed.
+
+  (* NNRCVar *)
   Global Instance var_proper : Proper (eq ==> nnrc_eq) NNRCVar.
   Proof.
     unfold Proper, respectful, nnrc_eq.
@@ -74,7 +83,8 @@ Section cNNRCEq.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl; rewrite H0 by trivial; rewrite H1 by trivial; clear H0 H1.
-    case_eq (nnrc_core_eval h env y0); case_eq (nnrc_core_eval h env y1); intros; simpl; trivial.
+    case_eq (nnrc_core_eval h cenv env y0);
+      case_eq (nnrc_core_eval h cenv env y1); intros; simpl; trivial.
     rewrite (H h); eauto.
   Qed.
 
@@ -84,7 +94,7 @@ Section cNNRCEq.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl; rewrite H0 by trivial; clear H0.
-    case_eq (nnrc_core_eval h env y0); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h cenv env y0); simpl; trivial; intros.
     rewrite (H h); eauto.
   Qed.
     
@@ -94,12 +104,12 @@ Section cNNRCEq.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. rewrite H0 by trivial; clear H0.
-    case_eq (nnrc_core_eval h env y0); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h cenv env y0); simpl; trivial; intros.
     rewrite H; clear H.
     rewrite H1; eauto.
     constructor; eauto.
   Qed.
-    
+
   (* NNRCFor *)
 
     Hint Resolve data_normalized_dcoll_in.
@@ -108,7 +118,7 @@ Section cNNRCEq.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. rewrite H0 by trivial; clear H0. subst.
-    case_eq (nnrc_core_eval h env y0); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h cenv env y0); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     f_equal.
     apply rmap_ext; intros.
@@ -121,7 +131,7 @@ Section cNNRCEq.
   Proof.
     unfold Proper, respectful, nnrc_eq.
     intros; simpl. rewrite H by trivial; clear H.
-    case_eq (nnrc_core_eval h env y); simpl; trivial; intros.
+    case_eq (nnrc_core_eval h cenv env y); simpl; trivial; intros.
     destruct d; try reflexivity; simpl.
     destruct b; eauto.
   Qed.

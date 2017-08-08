@@ -10,7 +10,7 @@ do
 	if [[ "$FILE" == "$BASE$ending" ]]
 	then
 	    echo "copying glob $FILE"
-	    cp "${FILE}" docs/globs
+	    cp "${FILE}" ../docs/globs
 	fi
     done
 done     

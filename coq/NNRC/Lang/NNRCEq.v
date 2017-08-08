@@ -15,7 +15,6 @@
  *)
 
 Section NNRCEq.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -24,9 +23,10 @@ Section NNRCEq.
   Require Import String.
   Require Import List.
   Require Import Arith.
-  
-  Require Import Utils BasicRuntime.
-  Require Import cNNRC cNNRCNorm cNNRCEq.
+  Require Import BasicRuntime.
+  Require Import cNNRC.
+  Require Import cNNRCNorm.
+  Require Import cNNRCEq.
   Require Import NNRC.
 
   Context {fruntime:foreign_runtime}.
@@ -36,9 +36,11 @@ Section NNRCEq.
   (** Semantics of NNRC *)
   Definition nnrc_ext_eq (e1 e2:nnrc) : Prop :=
     forall (h:brand_relation_t),
+    forall (cenv:bindings),
     forall (env:bindings),
+      Forall (data_normalized h) (map snd cenv) ->
       Forall (data_normalized h) (map snd env) ->
-      @nnrc_ext_eval _ h env e1 = @nnrc_ext_eval _ h env e2.
+      @nnrc_ext_eval _ h cenv env e1 = @nnrc_ext_eval _ h cenv env e2.
 
   Global Instance nnrc_ext_equiv : Equivalence nnrc_ext_eq.
   Proof.
@@ -46,15 +48,22 @@ Section NNRCEq.
     - unfold Reflexive, nnrc_ext_eq.
       intros; reflexivity.
     - unfold Symmetric, nnrc_ext_eq.
-      intros; rewrite (H h env) by trivial; reflexivity.
+      intros; rewrite (H h cenv env) by trivial; reflexivity.
     - unfold Transitive, nnrc_ext_eq.
-      intros; rewrite (H h env) by trivial;
-      rewrite (H0 h env) by trivial; reflexivity.
+      intros; rewrite (H h cenv env) by trivial;
+      rewrite (H0 h cenv env) by trivial; reflexivity.
   Qed.
 
   (* all the nnrc constructors are proper wrt. equivalence *)
 
-  (* NRCVar *)
+  (* NNRCGetConstant *)
+  Global Instance get_constant_ext_proper : Proper (eq ==> nnrc_ext_eq) NNRCGetConstant.
+  Proof.
+    unfold Proper, respectful, nnrc_ext_eq.
+    intros; rewrite H; reflexivity.
+  Qed.
+
+  (* NNRCVar *)
   Global Instance var_ext_proper : Proper (eq ==> nnrc_ext_eq) NNRCVar.
   Proof.
     unfold Proper, respectful, nnrc_ext_eq.
@@ -138,6 +147,7 @@ Section NNRCEq.
     simpl.
     rewrite H1.
     reflexivity.
+    assumption.
     assumption.
   Qed.
 

@@ -15,43 +15,46 @@
  *)
 
 Section TNNRC.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import Program.
-  Require Import EquivDec Morphisms.
-
-  Require Import Utils BasicSystem.
-  Require Import cNNRC NNRC.
+  Require Import EquivDec.
+  Require Import Morphisms.
+  Require Import BasicSystem.
+  Require Import cNNRC.
+  Require Import NNRC.
   Require Import TcNNRC.
 
   (** Typing rules for NNRC *)
   Section typ.
-
     Context {m:basic_model}.
+    Context (τconstants:tbindings).
+
     Definition nnrc_ext_type (env:tbindings) (n:nnrc) (t:rtype) : Prop :=
-      nnrc_type env (nnrc_ext_to_nnrc n) t.
+      nnrc_type τconstants env (nnrc_ext_to_nnrc n) t.
   End typ.
   
   (** Main lemma for the type correctness of NNNRC *)
 
-  Theorem typed_nnrc_ext_yields_typed_data {m:basic_model} {τ} (env:bindings) (tenv:tbindings) (e:nnrc) :
+  Theorem typed_nnrc_ext_yields_typed_data {m:basic_model} {τcenv} {τ} (cenv env:bindings) (tenv:tbindings) (e:nnrc) :
+    bindings_type cenv τcenv ->
     bindings_type env tenv ->
-    nnrc_ext_type tenv e τ ->
-    (exists x, (@nnrc_ext_eval _ brand_relation_brands env e) = Some x /\ (data_type x τ)).
+    nnrc_ext_type τcenv tenv e τ ->
+    (exists x, (@nnrc_ext_eval _ brand_relation_brands cenv env e) = Some x /\ (data_type x τ)).
   Proof.
     intros.
     unfold nnrc_ext_eval.
-    unfold nnrc_ext_type in H0.
-    apply (typed_nnrc_yields_typed_data env tenv).
+    unfold nnrc_ext_type in H1.
+    apply (@typed_nnrc_yields_typed_data _ τcenv _ cenv env tenv).
+    assumption.
     assumption.
     assumption.
   Qed.
 
   (* we are only sensitive to the environment up to lookup *)
   Global Instance nnrc_ext_type_lookup_equiv_prop {m:basic_model} :
-    Proper (lookup_equiv ==> eq ==> eq ==> iff) nnrc_ext_type.
+    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_ext_type.
   Proof.
     generalize nnrc_type_lookup_equiv_prop; intro Hnnrc_prop.
     unfold Proper, respectful, lookup_equiv, iff, impl in *; intros; subst.
@@ -67,9 +70,9 @@ Ltac nnrc_ext_inverter :=
 Ltac nnrc_ext_input_well_typed :=
   repeat progress
          match goal with
-         | [HO:nnrc_ext_type ?Γ ?op ?τout,
+         | [HO:nnrc_ext_type ?Γc ?Γ ?op ?τout,
                HE:bindings_type ?env ?Γ
-            |- context [(nnrc_ext_eval brand_relation_brands ?env ?op)]] =>
+            |- context [(nnrc_ext_eval brand_relation_brands ?cenv ?env ?op)]] =>
            let xout := fresh "dout" in
            let xtype := fresh "τout" in
            let xeval := fresh "eout" in
@@ -79,6 +82,6 @@ Ltac nnrc_ext_input_well_typed :=
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

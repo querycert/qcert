@@ -229,6 +229,44 @@ Section CAMPUtil.
     
   End Debug.
 
+  (** Maps the input/output(s) between NNRC and CAMP *)
+
+  Definition pr2op {A:Type} (pr:presult A) : option A
+    := match pr with
+       | Success a => Some a
+       | _ => None
+       end.
+
+  Lemma pr2op_op2tpr {A:Type} (op:option A) :
+    pr2op (op2tpr op) = op.
+  Proof.
+    destruct op; trivial.
+  Qed.
+
+  Lemma pr2op_op2rpr {A:Type} (op:option A) :
+    pr2op (op2rpr op) = op.
+  Proof.
+    destruct op; trivial.
+  Qed.
+
+  Definition isRecoverableError {A:Type} (pr:presult A)
+    := match pr with
+       | RecoverableError => true
+       | _ => false
+       end.
+  
+  Lemma op2tpr_not_recoverable {A:Type} (op:option A) :
+    isRecoverableError (op2tpr op) = false.
+  Proof.
+    destruct op; trivial.
+  Qed.
+
+  Lemma isRecoverableError_liftpr {A B:Type} (f:A->B) (pr:presult A) 
+    : isRecoverableError (liftpr f pr) = isRecoverableError pr.
+  Proof.
+    destruct pr; trivial.
+  Qed.
+
 End CAMPUtil.
 
 (* begin hide *)

@@ -39,6 +39,7 @@ Section TDNNRCBase.
 
   (** Typing rules for NNRC *)
   Section typ.
+    Context (τconstants:tdbindings).
 
     (* When applying the parameters to an algebra closure, we need to check that
          those parameters are distributed *)
@@ -58,19 +59,29 @@ Section TDNNRCBase.
       end.
 
     Inductive dnnrc_type `{tplug: TAlgPlug} {A} : tdbindings -> @dnnrc _ A plug_type -> drtype -> Prop :=
-    | TDNNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnnrc_type tenv (DNNRCVar a v) τ
-    | TDNNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnnrc_type tenv (DNNRCConst a c) (Tlocal τ)
-    | TDNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
+    | TDNNRCGetConstant {τout} tenv s :
         forall (a:A),
-          binOp_type b τ₁ τ₂ τ ->
+          tdot τconstants s = Some τout ->
+          dnnrc_type tenv (DNNRCGetConstant a s) τout
+    | TDNNRCVar {τout} tenv v :
+        forall (a:A),
+          lookup equiv_dec tenv v = Some τout ->
+          dnnrc_type tenv (DNNRCVar a v) τout
+    | TDNNRCConst {τout} tenv c :
+        forall (a:A),
+          data_type (normalize_data brand_relation_brands c) τout ->
+          dnnrc_type tenv (DNNRCConst a c) (Tlocal τout)
+    | TDNNRCBinop  {τ₁ τ₂ τout} tenv b e1 e2 :
+        forall (a:A),
+          binOp_type b τ₁ τ₂ τout ->
           dnnrc_type tenv e1 (Tlocal τ₁) ->
           dnnrc_type tenv e2 (Tlocal τ₂) ->
-          dnnrc_type tenv (DNNRCBinop a b e1 e2) (Tlocal τ)
-    | TDNNRCUnop {τ₁ τ} tenv u e1 :
+          dnnrc_type tenv (DNNRCBinop a b e1 e2) (Tlocal τout)
+    | TDNNRCUnop {τ₁ τout} tenv u e1 :
         forall (a:A), 
-          unaryOp_type u τ₁ τ ->
+          unaryOp_type u τ₁ τout ->
           dnnrc_type tenv e1 (Tlocal τ₁) ->
-          dnnrc_type tenv (DNNRCUnop a u e1) (Tlocal τ)
+          dnnrc_type tenv (DNNRCUnop a u e1) (Tlocal τout)
     | TDNNRCLet {τ₁ τ₂} v tenv e1 e2 :
         forall (a:A), 
           dnnrc_type tenv e1 τ₁ ->
@@ -86,18 +97,18 @@ Section TDNNRCBase.
           dnnrc_type tenv e1 (Tdistr τ₁) ->
           dnnrc_type ((v,(Tlocal τ₁))::tenv) e2 (Tlocal τ₂) ->
           dnnrc_type tenv (DNNRCFor a v e1 e2) (Tdistr τ₂)
-    | TDNNRCIf {τ} tenv e1 e2 e3 :
+    | TDNNRCIf {τout} tenv e1 e2 e3 :
         forall (a:A), 
           dnnrc_type tenv e1 (Tlocal Bool) ->
-          dnnrc_type tenv e2 τ ->
-          dnnrc_type tenv e3 τ ->
-          dnnrc_type tenv (DNNRCIf a e1 e2 e3) τ
-    | TDNNRCEither {τ τl τr} tenv ed xl el xr er :
+          dnnrc_type tenv e2 τout ->
+          dnnrc_type tenv e3 τout ->
+          dnnrc_type tenv (DNNRCIf a e1 e2 e3) τout
+    | TDNNRCEither {τout τl τr} tenv ed xl el xr er :
         forall (a:A), 
           dnnrc_type tenv ed (Tlocal (Either τl τr)) ->
-          dnnrc_type ((xl,(Tlocal τl))::tenv) el τ ->
-          dnnrc_type ((xr,(Tlocal τr))::tenv) er τ ->
-          dnnrc_type tenv (DNNRCEither a ed xl el xr er) τ
+          dnnrc_type ((xl,(Tlocal τl))::tenv) el τout ->
+          dnnrc_type ((xr,(Tlocal τr))::tenv) er τout ->
+          dnnrc_type tenv (DNNRCEither a ed xl el xr er) τout
     | TDNNRCCollect {τ} tenv e :
         forall (a:A),
           dnnrc_type tenv e (Tdistr τ) ->
@@ -121,14 +132,74 @@ Section TDNNRCBase.
   End typ.
 
   (** Main lemma for the type correctness of DNNRC *)
-  Theorem typed_dnnrc_yields_typed_data {A:Set} {plug_type:Set} {τ} `{tplug:TAlgPlug plug_type} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
-    dbindings_type env tenv ->
-    dnnrc_type tenv e τ ->
-    (exists x, (dnnrc_eval brand_relation_brands env e) = Some x /\ (ddata_type x τ)).
+
+  Lemma dForall2_lookupr_none  (l : list (string * ddata)) (l' : list (string * drtype)) (s:string):
+    (Forall2
+       (fun (d : string * ddata) (r : string * drtype) =>
+          fst d = fst r /\ ddata_type (snd d) (snd r)) l l') ->
+    assoc_lookupr ODT_eqdec l' s = None -> 
+    assoc_lookupr ODT_eqdec l s = None.
   Proof.
     intros.
+    induction H; simpl in *.
+    reflexivity.
+    destruct x; destruct y; simpl in *.
+    elim H; intros; clear H.
+    rewrite H2 in *; clear H2 H3.
+    revert H0 IHForall2.
+    elim (assoc_lookupr string_eqdec l' s); try congruence.
+    elim (string_eqdec s s1); intros; try congruence.
+    specialize (IHForall2 H0); rewrite IHForall2.
+    reflexivity.
+  Qed.    
+
+  Lemma dForall2_lookupr_some  (l : list (string * ddata)) (l' : list (string * drtype)) (s:string) (d':drtype):
+    (Forall2
+       (fun (d : string * ddata) (r : string * drtype) =>
+          fst d = fst r /\ ddata_type (snd d) (snd r)) l l') ->
+    assoc_lookupr ODT_eqdec l' s = Some d' -> 
+    (exists d'', assoc_lookupr ODT_eqdec l s = Some d'' /\ ddata_type d'' d').
+  Proof.
+    intros.
+    induction H; simpl in *.
+    - elim H0; intros; congruence.
+    - destruct x; destruct y; simpl in *.
+      assert ((exists d, assoc_lookupr string_eqdec l' s = Some d) \/
+              assoc_lookupr string_eqdec l' s = None)
+        by (destruct (assoc_lookupr string_eqdec l' s);
+            [left; exists d1; reflexivity|right; reflexivity]).
+      elim H2; intros; clear H2.
+      elim H3; intros; clear H3.
+      revert H0 IHForall2.
+      rewrite H2; intros.
+      elim (IHForall2 H0); intros; clear IHForall2.
+      elim H3; intros; clear H3.
+      rewrite H4. exists x0. split;[reflexivity|assumption].
+      clear IHForall2; assert (assoc_lookupr string_eqdec l s = None)
+          by apply (dForall2_lookupr_none l l' s H1 H3).
+      rewrite H3 in *; rewrite H2 in *; clear H2 H3.
+      elim H; intros; clear H.
+      rewrite H2 in *; clear H2.
+      revert H0; elim (string_eqdec s s1); intros.
+      exists d; split; try reflexivity.
+      inversion H0; rewrite H2 in *; assumption.
+      congruence.
+  Qed.      
+
+  Theorem typed_dnnrc_yields_typed_data {A:Set} {plug_type:Set} {τc} {τ} `{tplug:TAlgPlug plug_type} (cenv env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
+    dbindings_type cenv τc ->
+    dbindings_type env tenv ->
+    dnnrc_type τc tenv e τ ->
+    (exists x, (dnnrc_eval brand_relation_brands cenv env e) = Some x /\ (ddata_type x τ)).
+  Proof.
+    intro Hcenv; intros.
     revert env H.
     dependent induction H0; simpl; intros.
+    - unfold tdot in *.
+      unfold edot in *.
+      destruct (dForall2_lookupr_some _ _ _ _ Hcenv H) as [? [eqq1 eqq2]].
+      rewrite eqq1.
+      eauto.
     - unfold dbindings_type in *.
       dependent induction H0.
       simpl in *; congruence.
@@ -156,7 +227,7 @@ Section TDNNRCBase.
       simpl.
       inversion H3; clear H3; subst.
       inversion H4; clear H4; subst.
-      elim (@typed_binop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ₂ τ _ _ b H7 H6 H); intros.
+      elim (@typed_binop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ₂ τout _ _ b H7 H6 H); intros.
       elim H3; clear H3; intros.
       exists (Dlocal x); simpl.
       split.
@@ -167,7 +238,7 @@ Section TDNNRCBase.
       elim H2; clear H2; intros.
       rewrite H2; clear H2.
       inversion H3; clear H3; intros; subst.
-      elim (@typed_unop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ _ u H5 H); intros.
+      elim (@typed_unop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τout _ u H5 H); intros.
       elim H2; clear H2; intros.
       exists (Dlocal x); simpl.
       split.
@@ -201,13 +272,13 @@ Section TDNNRCBase.
         assert (exists x1, rmap
            (fun d1 : data =>
             olift checkLocal
-              (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2))
+              (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Dlocal (dcoll x1)) = x0).
         revert H1.
         elim (rmap
        (fun d1 : data =>
         olift checkLocal
-              (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
+              (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
         inversion H1; simpl in *. subst; clear H1.
         exists a1; split; reflexivity.
         congruence.
@@ -260,13 +331,13 @@ Section TDNNRCBase.
         assert (exists x1, rmap
            (fun d1 : data =>
             olift checkLocal
-              (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2))
+              (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Ddistr x1) = x).
         revert H0.
         elim (rmap
                 (fun d1 : data =>
                    olift checkLocal
-                         (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
+                         (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
         inversion H0; simpl in *. subst; clear H0.
         exists a1; split; reflexivity.
         congruence.
@@ -292,7 +363,7 @@ Section TDNNRCBase.
         elim (rmap
        (fun d1 : data =>
         olift checkLocal
-              (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
+              (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
         inversion H0.
         subst.
         reflexivity.

@@ -15,14 +15,14 @@
  *)
 
 Section NNRCRewriteUtil.
-  Require Import String List Arith.
+  Require Import String.
+  Require Import List.
+  Require Import Arith.
   Require Import Program.
   Require Import Peano_dec.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
-
-  Require Import cNNRC cNNRCEq cNNRCShadow.
+  Require Import BasicRuntime.
+  Require Import cNNRCRuntime.
 
   Context {fruntime:foreign_runtime}.
 
@@ -80,10 +80,11 @@ Section NNRCRewriteUtil.
     split; split; auto.
   Qed.
 
-  Lemma dupl_var_ignored {h:list (string*string)} (d1 d2:data) (env:bindings) (v:var) (e:nnrc):
-    nnrc_core_eval h ((v,d1) :: (v,d2) :: env) e = nnrc_core_eval h ((v,d1)::env) e.
+  Lemma dupl_var_ignored {h:list (string*string)} {cenv}
+        (d1 d2:data) (env:bindings) (v:var) (e:nnrc):
+    nnrc_core_eval h cenv ((v,d1) :: (v,d2) :: env) e = nnrc_core_eval h cenv ((v,d1)::env) e.
   Proof.
-    generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v d1 nil d2 env e); intros.
+    generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v d1 nil d2 env e); intros.
     rewrite app_nil_l in *.
     rewrite app_nil_l in *.
     rewrite app_nil_l in *.
@@ -153,10 +154,12 @@ Section NNRCRewriteUtil.
     x2 = really_fresh_in sep oldvar nil e2 ->
     nnrc_eq (NNRCLet x1 e1 e2) (NNRCLet x2 e1 (nnrc_subst e2 x1 (NNRCVar x2))).
   Proof.
-    unfold nnrc_eq; simpl; intros ? ? ? _.
+    unfold nnrc_eq; simpl; intros ? ? ? ? ? _.
     generalize (really_fresh_is_really_fresh nil e2 x2 H); intros. clear H.
-    destruct (nnrc_core_eval h env e1); try reflexivity.
+    destruct (nnrc_core_eval h cenv env e1); try reflexivity.
     revert env; nnrc_cases (induction e2) Case; intros; simpl.
+    - Case "NNRCGetConstant"%string.
+      reflexivity.
     - Case "NNRCVar"%string.
       simpl in * .
       match_destr; unfold Equivalence.equiv in *; subst; match_destr; try congruence; simpl; try congruence; match_destr;
@@ -166,139 +169,139 @@ Section NNRCRewriteUtil.
       reflexivity.
     - Case "NNRCBinop"%string.
       simpl in *.
-      generalize (split_really_fresh_app2 x2 _ _ _ _ H0); clear H0; intros.
+      generalize (split_really_fresh_app2 x2 _ _ _ _ H1); clear H1; intros.
       elim H; clear H; intros.
-      specialize (IHe2_1 H); specialize (IHe2_2 H0); clear H H0.
+      specialize (IHe2_1 H); specialize (IHe2_2 H1); clear H H1.
       rewrite IHe2_1; rewrite IHe2_2; reflexivity.
     - Case "NNRCUnop"%string.
-      specialize (IHe2 H0). rewrite IHe2; reflexivity.
+      specialize (IHe2 H1). rewrite IHe2; reflexivity.
     - Case "NNRCLet"%string.
       simpl in *.
-      generalize (split_really_fresh_app3 v x2 _ _ _ _ H0); clear H0; intros.
+      generalize (split_really_fresh_app3 v x2 _ _ _ _ H1); clear H1; intros.
       elim H; clear H; intros; simpl in *.
-      elim H0; clear H0; intros; simpl in *.
-      specialize (IHe2_1 H0). specialize (IHe2_2 H1).
+      elim H1; clear H1; intros; simpl in *.
+      specialize (IHe2_1 H1). specialize (IHe2_2 H2).
       rewrite IHe2_1; clear IHe2_1.
-      destruct (nnrc_core_eval h ((x2,d) :: env) (nnrc_subst e2_1 x1 (NNRCVar x2))); try reflexivity.
+      destruct (nnrc_core_eval h cenv ((x2,d) :: env) (nnrc_subst e2_1 x1 (NNRCVar x2))); try reflexivity.
       match_destr; unfold Equivalence.equiv in *; subst; simpl.
       + (* v === x1 so x1 is ignored and x2 too *)
         rewrite dupl_var_ignored.
-        generalize (@nnrc_core_eval_swap_neq _ h nil x1 d0 x2 d env e2_2 H); intros.
-        rewrite app_nil_l in H2.
-        rewrite app_nil_l in H2.
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil x1 d0 x2 d env e2_2 H); intros.
+        rewrite app_nil_l in H3.
+        rewrite app_nil_l in H3.
         unfold var in *.
-        rewrite H2; clear H2.
-        clear H H0 IHe2_2.
-        elim H1 ; clear H1; intros; clear H.
-        elim H0; clear H0; intros; clear H0.
-        generalize (@nnrc_core_eval_remove_free_env _ h nil x2 d ((x1,d0) :: env) e2_2 H); intros.
-        rewrite app_nil_l in H0.
-        rewrite app_nil_l in H0.
+        rewrite H3; clear H3.
+        clear H H1 IHe2_2.
+        elim H2 ; clear H2; intros; clear H.
+        elim H1; clear H1; intros; clear H1.
+        generalize (@nnrc_core_eval_remove_free_env _ h cenv nil x2 d ((x1,d0) :: env) e2_2 H); intros.
+        rewrite app_nil_l in H1.
+        rewrite app_nil_l in H1.
         unfold var in *.
-        rewrite H0; reflexivity.
+        rewrite H1; reflexivity.
       + (* v =/= x1 and substitution moves forward *)
-        generalize (@nnrc_core_eval_swap_neq _ h nil v d0 x1 d env e2_2); intros.
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d0 x1 d env e2_2); intros.
         assert (v <> x1) by auto.
-        specialize (H2 H3); clear H3.
-        rewrite app_nil_l in H2.
-        rewrite app_nil_l in H2.
+        specialize (H3 H4); clear H4.
+        rewrite app_nil_l in H3.
+        rewrite app_nil_l in H3.
         unfold var in *.
-        rewrite H2; clear H2.
-        generalize (@nnrc_core_eval_swap_neq _ h nil v d0 x2 d env (nnrc_subst e2_2 x1 (NNRCVar x2)) H); intros.
-        rewrite app_nil_l in H2.
-        rewrite app_nil_l in H2.
-        rewrite H2; clear H2.
+        rewrite H3; clear H3.
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d0 x2 d env (nnrc_subst e2_2 x1 (NNRCVar x2)) H); intros.
+        rewrite app_nil_l in H3.
+        rewrite app_nil_l in H3.
+        rewrite H3; clear H3.
         rewrite (IHe2_2 ((v, d0) :: env)).
         reflexivity.
     - Case "NNRCFor"%string.
       simpl in *.
-      generalize (split_really_fresh_app3 v x2 _ _ _ _ H0); clear H0; intros.
+      generalize (split_really_fresh_app3 v x2 _ _ _ _ H1); clear H1; intros.
       elim H; clear H; intros; simpl in *.
-      elim H0; clear H0; intros; simpl in *.
-      specialize (IHe2_1 H0). specialize (IHe2_2 H1).
+      elim H1; clear H1; intros; simpl in *.
+      specialize (IHe2_1 H1). specialize (IHe2_2 H2).
       rewrite IHe2_1; clear IHe2_1.
-      destruct (nnrc_core_eval h ((x2,d) :: env) (nnrc_subst e2_1 x1 (NNRCVar x2))); try reflexivity.
+      destruct (nnrc_core_eval h cenv ((x2,d) :: env) (nnrc_subst e2_1 x1 (NNRCVar x2))); try reflexivity.
       destruct (equiv_dec v x1); try reflexivity.
       + (* v === x1 so x1 is ignored and x2 too *)
         rewrite e in *; clear e.
         destruct d0; try reflexivity; simpl.
         induction l; try reflexivity; simpl.
         rewrite dupl_var_ignored.
-        generalize (@nnrc_core_eval_swap_neq _ h nil x1 a x2 d env e2_2 H); intros.
-        rewrite app_nil_l in H2.
-        rewrite app_nil_l in H2.
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil x1 a x2 d env e2_2 H); intros.
+        rewrite app_nil_l in H3.
+        rewrite app_nil_l in H3.
         unfold var in *.
-        rewrite H2; clear H2.
-        clear H H0 IHe2_2.
-        elim H1 ; clear H1; intros; clear H.
-        elim H0; clear H0; intros; clear H0.
-        generalize (@nnrc_core_eval_remove_free_env _ h nil x2 d ((x1,a) :: env) e2_2 H); intros.
-        rewrite app_nil_l in H0.
+        rewrite H3; clear H3.
+        clear H H1 IHe2_2.
+        elim H2 ; clear H2; intros; clear H.
+        elim H1; clear H1; intros; clear H1.
+        generalize (@nnrc_core_eval_remove_free_env _ h cenv nil x2 d ((x1,a) :: env) e2_2 H); intros.
+        rewrite app_nil_l in H1.
         unfold var in *.
-        rewrite app_nil_l in H0.
-        rewrite H0.
-        destruct (nnrc_core_eval h ((x1,a)::env) e2_2); try reflexivity.
+        rewrite app_nil_l in H1.
+        rewrite H1.
+        destruct (nnrc_core_eval h cenv ((x1,a)::env) e2_2); try reflexivity.
         unfold lift in *; simpl in *.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h ((x1, d1) :: (x1, d) :: env) e2_2)
-            l); destruct (rmap (fun d1 : data => nnrc_core_eval h ((x1, d1) :: (x2, d) :: env) e2_2)
+        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x1, d) :: env) e2_2)
+            l); destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((x1, d1) :: (x2, d) :: env) e2_2)
             l); congruence.
       + (* v =/= x1 and substitution moves forward *)
         destruct d0; try reflexivity; simpl.
         induction l; try reflexivity; simpl.
-        generalize (@nnrc_core_eval_swap_neq _ h nil v a x1 d env e2_2); intros.
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil v a x1 d env e2_2); intros.
         assert (v <> x1) by auto.
-        specialize (H2 H3); clear H3.
-        rewrite app_nil_l in H2.
-        rewrite app_nil_l in H2.
+        specialize (H3 H4); clear H4.
+        rewrite app_nil_l in H3.
+        rewrite app_nil_l in H3.
         unfold var in *.
-        rewrite H2; clear H2.
-        generalize (@nnrc_core_eval_swap_neq _ h nil v a x2 d env (nnrc_subst e2_2 x1 (NNRCVar x2)) H); intros.
-        rewrite app_nil_l in H2.
-        rewrite app_nil_l in H2.
-        rewrite H2; clear H2.
+        rewrite H3; clear H3.
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil v a x2 d env (nnrc_subst e2_2 x1 (NNRCVar x2)) H); intros.
+        rewrite app_nil_l in H3.
+        rewrite app_nil_l in H3.
+        rewrite H3; clear H3.
         rewrite (IHe2_2 ((v, a) :: env)).
-        destruct (nnrc_core_eval h ((x2, d) :: (v, a) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2))); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((x2, d) :: (v, a) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2))); try reflexivity.
         unfold lift in *; simpl in *.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h ((v, d1) :: (x1, d) :: env) e2_2)
-            l); destruct (rmap (fun d1 : data => nnrc_core_eval h ((v, d1) :: (x2, d) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2)))
+        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x1, d) :: env) e2_2)
+            l); destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v, d1) :: (x2, d) :: env) (nnrc_subst e2_2 x1 (NNRCVar x2)))
             l); congruence.
     - Case "NNRCIf"%string.
       simpl in *.
-      generalize (split_really_fresh_app2 x2 _ _ _ _ H0); clear H0; intros.
+      generalize (split_really_fresh_app2 x2 _ _ _ _ H1); clear H1; intros.
       elim H; clear H; intros.
-      generalize (split_really_fresh_app2 x2 _ _ _ _ H0); clear H0; intros.
-      elim H0; clear H0; intros.
-      specialize (IHe2_1 H); specialize (IHe2_2 H0); specialize (IHe2_3 H1); clear H H0 H1.
+      generalize (split_really_fresh_app2 x2 _ _ _ _ H1); clear H1; intros.
+      elim H1; clear H1; intros.
+      specialize (IHe2_1 H); specialize (IHe2_2 H1); specialize (IHe2_3 H2); clear H H1 H2.
       rewrite IHe2_1; rewrite IHe2_2; rewrite IHe2_3.
       reflexivity.
     - Case "NNRCEither"%string.
-      simpl in H0.
-      repeat rewrite nin_app_or in H0.
-      destruct H0 as [_[[?[??]]?]].
-      apply not_or in H2. destruct H2.
+      simpl in H1.
+      repeat rewrite nin_app_or in H1.
+      destruct H1 as [_[[?[??]]?]].
       apply not_or in H3. destruct H3.
-      repeat rewrite nin_app_or in H4.
-      destruct H4 as [?[??]].
+      apply not_or in H4. destruct H4.
+      repeat rewrite nin_app_or in H5.
+      destruct H5 as [?[??]].
       rewrite IHe2_1 by (simpl; intuition).
-      rewrite <- remove_in_neq in H0,H1 by congruence.
+      rewrite <- remove_in_neq in H1,H2 by congruence.
       match_destr. match_destr.
       + match_destr; unfold equiv, complement in *; subst.
-         * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil x1 d0 nil); simpl;
+         * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil x1 d0 nil); simpl;
             intros re1; rewrite re1.
-            generalize (@nnrc_core_eval_remove_free_env _ h ((x1,d0)::nil)); simpl;
+            generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x1,d0)::nil)); simpl;
             intros re2; rewrite re2 by trivial.
             trivial.
-         * generalize (@nnrc_core_eval_swap_neq _ h nil v d0); simpl;
+         * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d0); simpl;
             intros re1; repeat rewrite re1 by trivial.
             rewrite IHe2_2; trivial.
             simpl; intuition.
       + match_destr; unfold equiv, complement in *; subst.
-         * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil x1 d0 nil); simpl;
+         * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil x1 d0 nil); simpl;
             intros re1; rewrite re1.
-            generalize (@nnrc_core_eval_remove_free_env _ h ((x1,d0)::nil)); simpl;
+            generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x1,d0)::nil)); simpl;
             intros re2; rewrite re2 by trivial.
             trivial.
-         * generalize (@nnrc_core_eval_swap_neq _ h nil v0 d0); simpl;
+         * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v0 d0); simpl;
             intros re1; repeat rewrite re1 by trivial.
             rewrite IHe2_3; trivial.
             simpl; intuition.
@@ -406,6 +409,7 @@ Section NNRCRewriteUtil.
   (* Java equivalent: NnrcOptimizer.use_count *)
   Fixpoint use_count (x:var) (e:nnrc) : var_use :=
     match e with
+      | NNRCGetConstant x' => NotUsed
       | NNRCVar x' => (if x == x' then UsedOnce else NotUsed)
       | NNRCConst _ => NotUsed
       | NNRCBinop _ e1 e2 =>
@@ -435,6 +439,7 @@ Section NNRCRewriteUtil.
     repeat rewrite use_sum_not;
     repeat rewrite use_alt_not;
     repeat rewrite nin_app_or.
+    - intuition.
     - match_destr; intuition congruence.
     - intuition.
     - intuition.
@@ -459,11 +464,13 @@ Section NNRCRewriteUtil.
          intuition.
   Qed.
   
-  Lemma not_used_ignored {h:list(string*string)} (d:data) (env:bindings) (v:var) (e:nnrc) :
-    (use_count v e) = NotUsed -> nnrc_core_eval h ((v,d)::env) e = nnrc_core_eval h env e.
+  Lemma not_used_ignored {h:list(string*string)} {cenv}
+        (d:data) (env:bindings) (v:var) (e:nnrc) :
+    (use_count v e) = NotUsed ->
+    nnrc_core_eval h cenv ((v,d)::env) e = nnrc_core_eval h cenv env e.
   Proof.
     rewrite NotUsed_nfree.
-    generalize (@nnrc_core_eval_remove_free_env _ h nil v d env); simpl; auto.
+    generalize (@nnrc_core_eval_remove_free_env _ h cenv nil v d env); simpl; auto.
   Qed.
 
 End NNRCRewriteUtil.

@@ -29,6 +29,7 @@ Module QEval(runtime:CompilerRuntime).
 
   (* Inputs to eval *)
   Definition constant_env : Set := list (string*data).
+  Definition dconstant_env : Set := list (string*ddata).
   Definition world_env : Set := list data.
   
   (* Eval for arbitrary (local) constant environments *)
@@ -39,7 +40,6 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_camp_debug : bool -> camp -> constant_env -> string := @eval_camp_debug _ h.
 
   Definition eval_oql : oql -> constant_env -> option data := @eval_oql _ h.
-  Definition eval_sql : sql -> constant_env -> option data := @eval_sql _ h.
   Definition eval_lambda_nra : lambda_nra -> constant_env -> option data := @eval_lambda_nra _ h.
 
   Definition eval_nra : nra -> constant_env -> option data := @eval_nra _ h.
@@ -48,9 +48,9 @@ Module QEval(runtime:CompilerRuntime).
 
   Definition eval_nnrc : nnrc -> constant_env -> option data := @eval_nnrc _ h.
 
-  Definition eval_nnrcmr : nnrcmr -> constant_env -> option data := @eval_nnrcmr _ _ h.
+  Definition eval_nnrcmr : nnrcmr -> dconstant_env -> option data := @eval_nnrcmr _ _ h.
   Definition eval_cldmr : cldmr -> constant_env -> option data := @eval_cldmr _ _ h.
-  Definition eval_dnnrc {bm:brand_model} : dnnrc -> constant_env -> option data := @eval_dnnrc _ _ h.
+  Definition eval_dnnrc {bm:brand_model} : dnnrc -> dconstant_env -> option data := @eval_dnnrc _ _ h.
 
   (* Eval driver *)
 
@@ -69,7 +69,6 @@ Module QEval(runtime:CompilerRuntime).
   Definition eval_camp_world_debug : bool -> camp -> world_env -> string := @eval_camp_world_debug _ h.
 
   Definition eval_oql_world : oql -> world_env -> option data := @eval_oql_world _ h.
-  Definition eval_sql_world : sql -> world_env -> option data := @eval_sql_world _ h.
   Definition eval_lambda_nra_world : lambda_nra -> world_env -> option data := @eval_lambda_nra_world _ h.
 
   Definition eval_nra_world : nra -> world_env -> option data := @eval_nra_world _ h.

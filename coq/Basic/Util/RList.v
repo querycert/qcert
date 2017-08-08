@@ -359,10 +359,21 @@ Section RList.
       rewrite H, IHl; intuition.
     Qed.
 
+    Lemma filter_rev (f:A->bool) l :
+      filter f (rev l) = rev (filter f l).
+    Proof.
+      induction l; simpl; trivial.
+      rewrite filter_app, IHl.
+      simpl.
+      match_destr.
+      rewrite app_nil_r.
+      trivial.
+    Qed.
+    
   End filter.
 
-  
-        Lemma forall_in_dec {A:Type} P (l:list A)
+  Section in_dec.
+    Lemma forall_in_dec {A:Type} P (l:list A)
           (dec:forall x, In x l -> {P x} + {~ P x}):
       {forall x, In x l -> P x} + {~ forall x, In x l -> P x}.
     Proof.
@@ -381,7 +392,7 @@ Section RList.
           (dec:forall x, In x l -> {P x} + {~ P x}):
       {exists x, In x l /\ P x} + {~ exists x, In x l /\ P x}.
     Proof.
-       induction l; simpl.
+      induction l; simpl.
       - right. intros [??]; intuition.
       - simpl in dec.
         destruct (dec a); [intuition | | ].
@@ -396,7 +407,7 @@ Section RList.
           (dec:forall x, In x l -> {P x} + {~ P x}):
       {exists x, In x l /\ P x} + {forall x, In x l -> ~P x}.
     Proof.
-       induction l; simpl.
+      induction l; simpl.
       - right. intuition.
       - simpl in dec.
         destruct (dec a); [intuition | | ].
@@ -407,19 +418,19 @@ Section RList.
           * right. intros ? [?|?]; subst; intuition; eauto.
     Defined.
 
-      Lemma existsb_ex {A : Type} (f : A -> bool) (l : list A) :
-       existsb f l = true -> {x : A | In x l /\ f x = true}.
-  Proof.
-    induction l; simpl; intros.
-    - discriminate.
-    - case_eq (existsb f l); intros exx.
-      + destruct (IHl exx) as [?[??]].
-         exists x; intuition.
-      + case_eq (f a); intros faa.
-        * exists a; intuition.
-        * rewrite exx, faa in H. discriminate.
-  Qed.
-
+    Lemma existsb_ex {A : Type} (f : A -> bool) (l : list A) :
+      existsb f l = true -> {x : A | In x l /\ f x = true}.
+    Proof.
+      induction l; simpl; intros.
+      - discriminate.
+      - case_eq (existsb f l); intros exx.
+        + destruct (IHl exx) as [?[??]].
+          exists x; intuition.
+        + case_eq (f a); intros faa.
+          * exists a; intuition.
+          * rewrite exx, faa in H. discriminate.
+    Qed.
+  End in_dec.
 
   Section perm_equiv.
     Context {A:Type}.

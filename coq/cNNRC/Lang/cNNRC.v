@@ -19,7 +19,7 @@ the foundations for NNRC, an intermediate language to facilitate code
 generation for non-functional targets. *)
 
 (** cNNRC is a small pure language without functions. Expressions in
-cNNRC are evaluated within a local environment. *)
+cNNRC are evaluated within an environment. *)
 
 (** Summary:
 - Language: cNNRC (Core Named Nested Relational Calculus)
@@ -50,9 +50,8 @@ Section cNNRC.
       semantics for extended operators are not defined for core
       NNRC. *)
 
-  Definition var := string.
-
   Inductive nnrc :=
+  | NNRCGetConstant : var -> nnrc                             (**r Global variable lookup *)
   | NNRCVar : var -> nnrc                                     (**r Variable lookup *)
   | NNRCConst : data -> nnrc                                  (**r Constant value *)
   | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc                 (**r Binary operator *)
@@ -68,6 +67,7 @@ Section cNNRC.
   
   Fixpoint nnrcIsCore (e:nnrc) : Prop :=
     match e with
+    | NNRCGetConstant _ => True
     | NNRCVar _ => True
     | NNRCConst _ => True
     | NNRCBinop _ e1 e2 => (nnrcIsCore e1) /\ (nnrcIsCore e2)
@@ -92,7 +92,8 @@ Section cNNRC.
     
   Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
     first;
-    [ Case_aux c "NNRCVar"%string
+    [ Case_aux c "NNRCGetConstants"%string
+    | Case_aux c "NNRCVar"%string
     | Case_aux c "NNRCConst"%string
     | Case_aux c "NNRCBinop"%string
     | Case_aux c "NNRCUnop"%string
@@ -117,95 +118,99 @@ Section cNNRC.
 
   Context (h:brand_relation_t).
   
-  (** Evaluation takes a cNNRC expression and a local environment. It
-    returns an optional value. A [None] being returned indicate an
-    error and is always propagated. *)
+  Section Semantics.
+    Context (constant_env:list (string*data)).
 
-  Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
-    match e with
-    | NNRCVar x =>
-      lookup equiv_dec env x
-    | NNRCConst d =>
-      Some (normalize_data h d)
-    | NNRCBinop bop e1 e2 =>
-      olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nnrc_core_eval env e1) (nnrc_core_eval env e2)
-    | NNRCUnop uop e1 =>
-      olift (fun d1 => fun_of_unaryop h uop d1) (nnrc_core_eval env e1)
-    | NNRCLet x e1 e2 =>
-      match nnrc_core_eval env e1 with
-      | Some d => nnrc_core_eval ((x,d)::env) e2
-      | _ => None
-      end
-    | NNRCFor x e1 e2 =>
-      match nnrc_core_eval env e1 with
-      | Some (dcoll c1) =>
-        let inner_eval d1 :=
-            let env' := (x,d1) :: env in nnrc_core_eval env' e2
-        in
-        lift dcoll (rmap inner_eval c1)
-      | _ => None
-      end
-    | NNRCIf e1 e2 e3 =>
-      let aux_if d :=
-          match d with
-          | dbool b =>
-            if b then nnrc_core_eval env e2 else nnrc_core_eval env e3
-          | _ => None
-          end
-      in olift aux_if (nnrc_core_eval env e1)
-    | NNRCEither ed xl el xr er =>
-      match nnrc_core_eval env ed with
-      | Some (dleft dl) =>
-        nnrc_core_eval ((xl,dl)::env) el
-      | Some (dright dr) =>
-        nnrc_core_eval ((xr,dr)::env) er
-      | _ => None
-      end
-    | NNRCGroupBy _ _ _ => None (**r Evaluation for GroupBy always fails for cNNRC *)
-    end.
+    (** Evaluation takes a cNNRC expression and an environment. It
+        returns an optional value. A [None] being returned indicate an
+        error and is always propagated. *)
 
-  (** cNNRC evaluation is only sensitive to the environment up to lookup. *)
-  Global Instance nnrc_core_eval_lookup_equiv_prop :
-    Proper (lookup_equiv ==> eq ==> eq) nnrc_core_eval.
-  Proof.
-    unfold Proper, respectful, lookup_equiv; intros; subst.
-    rename y0 into e.
-    revert x y H.
-    induction e; simpl; intros; trivial;
-    try rewrite (IHe1 _ _ H); try rewrite (IHe2 _ _ H);
-    try rewrite (IHe _ _ H); trivial.
-    - match_destr.
-      apply IHe2; intros.
-      simpl; match_destr.
-    - match_destr.
-      destruct d; simpl; trivial.
-      f_equal.
-      apply rmap_ext; intros.
-      apply IHe2; intros.
-      simpl; match_destr.
-    - unfold olift.
-      match_destr.
-      destruct d; trivial.
-      destruct b; eauto.
-    - match_destr.
-      destruct d; trivial.
-      + apply IHe2; intros.
+    Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
+      match e with
+      | NNRCGetConstant x =>
+        edot constant_env x
+      | NNRCVar x =>
+        lookup equiv_dec env x
+      | NNRCConst d =>
+        Some (normalize_data h d)
+      | NNRCBinop bop e1 e2 =>
+        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nnrc_core_eval env e1) (nnrc_core_eval env e2)
+      | NNRCUnop uop e1 =>
+        olift (fun d1 => fun_of_unaryop h uop d1) (nnrc_core_eval env e1)
+      | NNRCLet x e1 e2 =>
+        match nnrc_core_eval env e1 with
+        | Some d => nnrc_core_eval ((x,d)::env) e2
+        | _ => None
+        end
+      | NNRCFor x e1 e2 =>
+        match nnrc_core_eval env e1 with
+        | Some (dcoll c1) =>
+          let inner_eval d1 :=
+              let env' := (x,d1) :: env in nnrc_core_eval env' e2
+          in
+          lift dcoll (rmap inner_eval c1)
+        | _ => None
+        end
+      | NNRCIf e1 e2 e3 =>
+        let aux_if d :=
+            match d with
+            | dbool b =>
+              if b then nnrc_core_eval env e2 else nnrc_core_eval env e3
+            | _ => None
+            end
+        in olift aux_if (nnrc_core_eval env e1)
+      | NNRCEither ed xl el xr er =>
+        match nnrc_core_eval env ed with
+        | Some (dleft dl) =>
+          nnrc_core_eval ((xl,dl)::env) el
+        | Some (dright dr) =>
+          nnrc_core_eval ((xr,dr)::env) er
+        | _ => None
+        end
+      | NNRCGroupBy _ _ _ => None (**r Evaluation for GroupBy always fails for cNNRC *)
+      end.
+
+    (** cNNRC evaluation is only sensitive to the environment up to lookup. *)
+    Global Instance nnrc_core_eval_lookup_equiv_prop :
+      Proper (lookup_equiv ==> eq ==> eq) nnrc_core_eval.
+    Proof.
+      unfold Proper, respectful, lookup_equiv; intros; subst.
+      rename y0 into e.
+      revert x y H.
+      induction e; simpl; intros; trivial;
+        try rewrite (IHe1 _ _ H); try rewrite (IHe2 _ _ H);
+          try rewrite (IHe _ _ H); trivial.
+      - match_destr.
+        apply IHe2; intros.
         simpl; match_destr.
-      + apply IHe3; intros.
+      - match_destr.
+        destruct d; simpl; trivial.
+        f_equal.
+        apply rmap_ext; intros.
+        apply IHe2; intros.
         simpl; match_destr.
-  Qed.
+      - unfold olift.
+        match_destr.
+        destruct d; trivial.
+        destruct b; eauto.
+      - match_destr.
+        destruct d; trivial.
+        + apply IHe2; intros.
+          simpl; match_destr.
+        + apply IHe3; intros.
+          simpl; match_destr.
+    Qed.
 
-  (** * Toplevel *)
+    (** * Toplevel *)
   
-  (** The Top-level evaluation function is used externally by the
-  Q*cert compiler. It takes a cNNRC expression and an globale
-  environment as input. *)
+    (** The Top-level evaluation function is used externally by the
+        Q*cert compiler. It takes a cNNRC expression and an global
+        environment as input. *)
+  End Semantics.
 
   Section Top.
     Definition nnrc_core_eval_top (q:nnrc_core) (cenv:bindings) : option data :=
-      lift_nnrc_core (nnrc_core_eval (rec_sort (mkConstants cenv))) q.
-    Definition nnrc_core_eval_top_alt (q:nnrc_core) (cenv:bindings) : option data :=
-      lift_nnrc_core (nnrc_core_eval (rec_sort cenv)) q.
+      lift_nnrc_core (nnrc_core_eval (rec_sort cenv) nil) q.
   End Top.
   
 End cNNRC.
@@ -246,7 +251,8 @@ Notation "e1 ? e2 : e3" := (NNRCIf e1 e2 e3) (at level 50, format "e1  '[hv' ?  
 
 Tactic Notation "nnrc_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "NNRCVar"%string
+  [ Case_aux c "NNRCGetConstant"%string
+  | Case_aux c "NNRCVar"%string
   | Case_aux c "NNRCConst"%string
   | Case_aux c "NNRCBinop"%string
   | Case_aux c "NNRCUnop"%string

@@ -26,8 +26,6 @@ Section QEnv.
 
   (* Initial variables for the input and environment *)
   (* Java equivalents: in NnrcToNrcmr as static fields *)
-  Definition init_vid := "id"%string.
-  Definition init_venv := "env"%string.
   Definition init_vinit := "init"%string.
 
   Context {fdata:foreign_data}.

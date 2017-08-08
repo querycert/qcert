@@ -38,6 +38,7 @@ Section tDNNRCOptimizer.
            (f: P -> P)
            (e: @dnnrc _ A P) : @dnnrc _ A P
     := match e with
+       | DNNRCGetConstant a e0 => DNNRCGetConstant a e0
        | DNNRCVar a e0 => DNNRCVar a e0
        | DNNRCConst a e0 => DNNRCConst a e0
        | DNNRCBinop a b e1 e2 =>
@@ -93,6 +94,8 @@ Section tDNNRCOptimizer.
            (f: @dnnrc _ A P -> @dnnrc _ A P)
            (e: @dnnrc _ A P) : @dnnrc _ A P
     := match e with
+       | DNNRCGetConstant a e0 =>
+         f (DNNRCGetConstant a e0)
        | DNNRCVar a e0 =>
          f (DNNRCVar a e0)
        | DNNRCConst a e0 =>
@@ -209,14 +212,22 @@ Section tDNNRCOptimizer.
            (s: string)
            (e: @dnnrc _ A P) : option (@dnnrc _ A P)
     := match e with
+    | DNNRCUnop t1 AUnbrand (DNNRCGetConstant t2 v) =>
+      if (s == v)
+      then Some (DNNRCGetConstant t1 s)
+      else None
     | DNNRCUnop t1 AUnbrand (DNNRCVar t2 v) =>
       if (s == v)
       then Some (DNNRCVar t1 s)
       else None
-    | DNNRCVar _ v =>
+    | DNNRCVar t1 v =>
       if (s == v)
       then None
-      else Some e
+      else Some (DNNRCVar t1 v)
+    | DNNRCGetConstant t1 v =>
+      if (s == v)
+      then None
+      else Some (DNNRCGetConstant t1 v)
     | DNNRCConst _ _ => Some e
     | DNNRCBinop a b x y =>
       lift2 (DNNRCBinop a b) (rewrite_unbrand_or_fail s x) (rewrite_unbrand_or_fail s y)
@@ -306,6 +317,11 @@ Section tDNNRCOptimizer.
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
+    | DNNRCUnop _ (ADot fld) (DNNRCGetConstant _ n) =>
+      let (var, _) := binding in
+      if (n == var)
+      then Some (CCol ("$known."%string ++ fld))
+      else None
     | DNNRCUnop _ (ADot fld) (DNNRCVar _ n) =>
       let (var, _) := binding in
       if (n == var)

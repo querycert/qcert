@@ -151,27 +151,28 @@ Section NNRCMRToCldMR.
     (rmap
        (fun d : data * data =>
           let (k, v0) := d in
-          match nnrc_core_eval h ((v, v0) :: nil) n with
+          match nnrc_core_eval h nil ((v, v0) :: nil) n with
           | Some res => Some (k, res)
           | None => None
           end) (init_keys_aux prefix i coll)) =
-    lift (init_keys_aux prefix i) (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) coll).
+    lift (init_keys_aux prefix i)
+         (rmap (fun d : data => nnrc_core_eval h nil ((v, d) :: nil) n) coll).
   Proof.
     revert i.
     induction coll; try reflexivity; simpl; intros.
-    destruct (nnrc_core_eval h ((v, a) :: nil) n); try reflexivity; simpl.
+    destruct (nnrc_core_eval h nil ((v, a) :: nil) n); try reflexivity; simpl.
     rewrite (IHcoll (S i)); clear IHcoll.
-    destruct ((rmap (fun d0 : data => nnrc_core_eval h ((v, d0) :: nil) n) coll)); reflexivity.
+    destruct ((rmap (fun d0 : data => nnrc_core_eval h nil ((v, d0) :: nil) n) coll)); reflexivity.
   Qed.
 
   Lemma rmap_eval_through_init_keys (l:list data) (n:nnrc) (v:var) :
     (rmap (fun d : data * data =>
              let (k, v0) := d in
-             match nnrc_core_eval h ((v, v0) :: nil) n with
+             match nnrc_core_eval h nil ((v, v0) :: nil) n with
              | Some res0 => Some (k, res0)
              | None => None
              end) (init_keys l))
-    = lift init_keys (rmap (fun d : data => nnrc_core_eval h ((v, d) :: nil) n) l).
+    = lift init_keys (rmap (fun d : data => nnrc_core_eval h nil ((v, d) :: nil) n) l).
   Proof.
     unfold init_keys.
     apply rmap_with_key.

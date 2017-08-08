@@ -20,14 +20,14 @@ Section TcNNRCInfer.
   Require Import List.
   Require Import Arith.
   Require Import Program.
-  Require Import EquivDec Morphisms.
-
-  Require Import Utils BasicSystem.
-
+  Require Import EquivDec.
+  Require Import Morphisms.
+  Require Import BasicSystem.
   Require Import cNNRC.
   Require Import TcNNRC.
 
   Context {m:basic_model}.
+  Context (τconstants:tbindings).
 
   (** Type inference for NNRC when given the type of the environment *)
 
@@ -36,6 +36,8 @@ Section TcNNRCInfer.
 
   Fixpoint infer_nnrc_type (tenv:tbindings) (n:nnrc) {struct n} : option rtype :=
     match n with
+    | NNRCGetConstant v =>
+      tdot τconstants v
     | NNRCVar v =>
       lookup equiv_dec tenv v
     | NNRCConst d => infer_data_type (normalize_data brand_relation_brands d)
@@ -88,13 +90,15 @@ Section TcNNRCInfer.
     | NNRCGroupBy g sl n1 =>
       None (* For core, always fails *)
     end.
-  
+
   Lemma infer_nnrc_type_correct {τout} (tenv:tbindings) (n:nnrc) :
     infer_nnrc_type tenv n = Some τout ->
-    nnrc_type tenv n τout.
+    nnrc_type τconstants tenv n τout.
   Proof.
     revert tenv τout.
     nnrc_cases (induction n) Case; intros; simpl in *.
+    - Case "NNRCGetConstant"%string.
+      apply TNNRCGetConstant; assumption.
     - Case "NNRCVar"%string.
       apply TNNRCVar; assumption.
     - Case "NNRCConst"%string.
@@ -105,14 +109,14 @@ Section TcNNRCInfer.
       destruct (infer_nnrc_type tenv n1); destruct (infer_nnrc_type tenv n2); simpl in *;
       try discriminate.
       specialize (IHn1 r eq_refl); specialize (IHn2 r0 eq_refl).
-      apply (@TNNRCBinop m r r0 τout tenv); try assumption.
+      apply (@TNNRCBinop m τconstants r r0 τout tenv); try assumption.
       apply infer_binop_type_correct; assumption.
     - Case "NNRCUnop"%string.
       specialize (IHn tenv).
       destruct (infer_nnrc_type tenv n); simpl in *;
       try discriminate.
       specialize (IHn r eq_refl).
-      apply (@TNNRCUnop m r τout tenv); try assumption.
+      apply (@TNNRCUnop m τconstants r τout tenv); try assumption.
       apply infer_unop_type_correct; assumption.
     - Case "NNRCLet"%string.
       specialize (IHn1 tenv).
@@ -122,7 +126,7 @@ Section TcNNRCInfer.
       inversion H; subst; clear H.
       specialize (IHn1 r eq_refl).
       specialize (IHn2 τout eq_refl).
-      apply (TNNRCLet v tenv n1 n2 IHn1 IHn2).
+      apply (TNNRCLet τconstants v tenv n1 n2 IHn1 IHn2).
     - Case "NNRCFor"%string.
       specialize (IHn1 tenv).
       destruct (infer_nnrc_type tenv n1); simpl in *; try discriminate.
@@ -133,7 +137,7 @@ Section TcNNRCInfer.
         inversion H; subst; clear H.
         specialize (IHn1 (Coll r0) eq_refl).
         specialize (IHn2 r1 eq_refl).
-        apply (TNNRCFor v tenv n1 n2 IHn1 IHn2).
+        apply (TNNRCFor τconstants v tenv n1 n2 IHn1 IHn2).
       + discriminate.
     - Case "NNRCIf"%string.
       specialize (IHn1 tenv).

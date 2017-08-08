@@ -136,7 +136,7 @@ Section CAMP.
            | dcoll l => liftpr dcoll (gather_successes (map (camp_eval p₁ bind) l))
            | _ => TerminalError
            end
-         | passert p₁ =>     
+         | passert p₁ =>
            bindpr (camp_eval p₁ bind d)
                   (fun d' => match d' with
                              | dbool true => Success (drec nil)
@@ -478,10 +478,17 @@ Section CAMP.
     Definition camp_eval_top (q:camp) (global_env:bindings) : option data :=
       presult_to_result (camp_eval_top_to_presult q global_env).
 
-    Definition presult_debug_to_result (pr:presult_debug data) : option data :=
+    Definition presult_to_result_debug (pr:presult_debug data) : option data :=
       match pr with
       | Success_debug l => Some (dcoll (l::nil))
       | RecoverableError_debug _ => Some (dcoll nil)
+      | TerminalError_debug _ _ => None
+      end.
+
+    Definition pr2op_debug (pr:presult_debug data) : option data :=
+      match pr with
+      | Success_debug l => Some (dsome l)
+      | RecoverableError_debug _ => Some dnone
       | TerminalError_debug _ _ => None
       end.
 
@@ -501,7 +508,7 @@ Section CAMP.
     
     Definition camp_eval_top_debug_to_data
                (debug:bool) (q:camp) (global_env:bindings) : option data :=
-      presult_debug_to_result (camp_eval_debug h (rec_sort global_env) debug nil q nil dunit).
+      presult_to_result_debug (camp_eval_debug h (rec_sort global_env) debug nil q nil dunit).
 
     (** The main top-level traced evaluation function for CAMP is as follows. *)
     

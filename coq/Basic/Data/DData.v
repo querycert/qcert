@@ -62,18 +62,6 @@ Section DData.
         right; congruence.
   Defined.
     
-  Definition localize_data (ld:ddata) :=
-    match ld with
-    | Dlocal d => d
-    | Ddistr coll => dcoll coll
-    end.
-
-  Lemma localize_distr_is_id (l:list data) :
-    localize_data (Ddistr l) = dcoll l.
-  Proof.
-    reflexivity.
-  Qed.
-
   Definition checkLocal (ld:ddata) : option data :=
     match ld with
     | Dlocal d => Some d
@@ -99,15 +87,6 @@ Section DData.
   Qed.
 
   Definition dbindings := list (string*ddata).
-
-  Definition localize_denv (denv:dbindings) : bindings :=
-    map (fun x => (fst x, localize_data (snd x))) denv.
-
-  Lemma localize_denv_cons v d (denv:dbindings) :
-    localize_denv ((v,Dlocal d) :: denv) = (v,d) :: localize_denv denv.
-  Proof.
-    reflexivity.
-  Qed.
 
   (* Localized variable annotations *)
   

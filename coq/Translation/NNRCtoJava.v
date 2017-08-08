@@ -248,6 +248,8 @@ Section NNRCtoJava.
         * java_json                          (* JavaScript expression holding result *)
         * nat                             (* next available unused temporary *)
       := match n with
+         | NNRCGetConstant v =>
+           ("", mk_java_json ("v" ++ v), t)
          | NNRCVar v =>
            match assoc_lookupr equiv_dec ivs v with
            | Some v_string => ("", mk_java_json v_string, t)
@@ -391,13 +393,12 @@ Section NNRCtoJava.
 
     (* Free variables are assumed to be constant lookups *)
     Definition closeFreeVars (input:string) (e:nnrc) (ivs:list(string*string)) : nnrc :=
-      let all_free_vars := nnrc_free_vars e in
+      let all_free_vars := nnrc_global_vars e in
       let wrap_one_free_var (e':nnrc) (fv:string) : nnrc :=
           if (assoc_lookupr equiv_dec ivs fv)
           then e'
           else
-            let unconsted_fv := unConstVar fv in (* Removes CONST$ prefix added during compilation for consistency with external specification *)
-            (NNRCLet fv (NNRCUnop (ADot unconsted_fv) (NNRCVar input)) e')
+            (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
     

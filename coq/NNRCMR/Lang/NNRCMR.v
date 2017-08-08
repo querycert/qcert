@@ -37,9 +37,6 @@ Section NNRCMR.
   Context {fruntime:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
 
-  Definition var := string.
-  Definition nrcmr_env := list (var * ddata).
-
   (** * Abstract Syntax *)
   
   (** Named Nested Relational Calculus + Map Reduce *)
@@ -234,9 +231,11 @@ Section NNRCMR.
     := mr_chain_causally_consistent mrl.(mr_chain).
 
   Definition function_with_no_free_vars (f: var * nnrc) :=
+    (nnrc_global_vars (snd f) = nil) /\
     (forall (x: var), In x (nnrc_free_vars (snd f)) -> x = fst f).
 
   Definition function2_with_no_free_vars (f: (var * var) * nnrc) :=
+    (nnrc_global_vars (snd f) = nil) /\
     (fst (fst f)) <> (snd (fst f)) /\
     (forall x, In x (nnrc_free_vars (snd f)) -> x = (fst (fst f)) \/ x = (snd (fst f))).
 
@@ -293,6 +292,39 @@ Section NNRCMR.
     | _, _ => False
     end.
 
+  (** * Environment support for NNRCMR *)
+
+  Section nnrcmr_env.
+    (** This translation supposes that the environment contains at a unit
+     that is used to trigger the comparisons of NNRC expressions
+     without free variables.
+     *)
+
+    (** [load_env unit_var vars env] takes the
+      environment [env] used to evaluate an NNRC expression and return
+      the environment to use to execute the translation of this
+      expression as a map-reduce chain. [vars] is the list of
+      variables that have to be stored in the map-reduce with
+      their dlocalization kind.
+
+      This function also add to the map-reduce environment and entry
+      [init] that contains the unit value.
+     *)
+    Definition load_init_env (initunit: var) (env: dbindings) : dbindings :=
+      (initunit, Dlocal dunit) :: env.
+
+    Lemma load_env_lookup_initunit initunit env:
+      lookup equiv_dec (load_init_env initunit env) initunit = Some (Dlocal dunit).
+    Proof.
+      simpl.
+      match_destr.
+      congruence.
+    Qed.
+
+    Definition nnrcmr_env := list (var * ddata).
+
+  End nnrcmr_env.
+  
   (** * Evaluation Semantics *)
 
   (*************************
@@ -303,6 +335,9 @@ Section NNRCMR.
 
   Context (h:brand_relation_t).
 
+  Definition empty_dcenv : dbindings := nil.
+  Definition empty_cenv : bindings := nil.
+  
   (** ** Map *)
   
   (********************
@@ -315,7 +350,7 @@ Section NNRCMR.
     | MapDist f =>
       let f_map (d:data) : option data :=
           let (doc, body) := f in
-          nnrc_core_eval h ((doc,d)::nil) body
+          nnrc_core_eval h empty_cenv ((doc,d)::nil) body
       in
       match input_d with
       | Ddistr coll =>
@@ -325,7 +360,7 @@ Section NNRCMR.
     | MapDistFlatten f =>
       let f_map (d:data) : option data :=
           let (doc, body) := f in
-          nnrc_core_eval h ((doc,d)::nil) body
+          nnrc_core_eval h empty_cenv ((doc,d)::nil) body
       in
       match input_d with
       | Ddistr coll =>
@@ -336,7 +371,7 @@ Section NNRCMR.
     | MapScalar f =>
       let f_map (d:data) : option data :=
           let (doc, body) := f in
-          nnrc_core_eval h ((doc,d)::nil) body
+          nnrc_core_eval h empty_cenv ((doc,d)::nil) body
       in
       match input_d with
       | Ddistr coll => None
@@ -367,7 +402,7 @@ Section NNRCMR.
     | RedId => Some (Ddistr values_v)
     | RedCollect f =>
       let (values_arg, body) := f in
-      let v := nnrc_core_eval h ((values_arg, dcoll values_v) :: nil) body in
+      let v := nnrc_core_eval h empty_cenv ((values_arg, dcoll values_v) :: nil) body in
       lift (fun res => Dlocal res) v
     | RedOp op =>
       lift (fun res => Dlocal res) (reduce_op_eval op values_v)
@@ -405,7 +440,7 @@ Section NNRCMR.
    * Semantics of a chain of map-reduce *
    **************************************)
 
-  Definition merge_env (x: var) (d: ddata) (env: nrcmr_env) : option nrcmr_env :=
+  Definition merge_env (x: var) (d: ddata) (env: nnrcmr_env) : option nnrcmr_env :=
     match d with
     | Ddistr coll =>
       match lookup equiv_dec env x with
@@ -420,7 +455,7 @@ Section NNRCMR.
       end
     end.
 
-  Definition mr_chain_eval (env:nrcmr_env) (l:list mr) : nrcmr_env * option ddata :=
+  Definition mr_chain_eval (env:nnrcmr_env) (l:list mr) : nnrcmr_env * option ddata :=
     List.fold_left
       (fun acc mr =>
          match acc with
@@ -435,7 +470,7 @@ Section NNRCMR.
          end)
       l (env, Some (Ddistr nil)).
 
-  Fixpoint build_nnrc_env' (mr_env:nrcmr_env) (params: list var) (args: list (var * dlocalization)) :=
+  Fixpoint build_nnrc_env' (mr_env:nnrcmr_env) (params: list var) (args: list (var * dlocalization)) :=
     match (params, args) with
     | (nil, nil) => Some nil
     | (x1::params, (x2, loc)::args) => (* Note: this ignores loc...i.e., doesn't check type consistency *)
@@ -450,30 +485,30 @@ Section NNRCMR.
   Definition nnrc_env_build (form:list var) (eff: option (list data)): option bindings :=
     olift (zip form) eff. 
 
-  Definition effective_params_from_bindings (args:list (var * dlocalization)) (mr_env:nrcmr_env) : option (list data) :=
+  Definition effective_params_from_bindings (args:list (var * dlocalization)) (mr_env:nnrcmr_env) : option (list data) :=
     lift_map
       (fun (v : var) =>
          lift unlocalize_data (lookup equiv_dec mr_env v))
       (map fst args).
   
-  Definition build_nnrc_env (mr_env:nrcmr_env) (params: list var) (args: list (var * dlocalization)) :=
+  Definition build_nnrc_env (mr_env:nnrcmr_env) (params: list var) (args: list (var * dlocalization)) :=
     let eff_params := effective_params_from_bindings args mr_env in
     nnrc_env_build params eff_params.
   
-  Definition mr_last_eval (mr_env:nrcmr_env) (mr_last: (list var * nnrc) * list (var * dlocalization)) :=
+  Definition mr_last_eval (mr_env:nnrcmr_env) (mr_last: (list var * nnrc) * list (var * dlocalization)) :=
     let (params, n) := fst mr_last in
     let args := snd mr_last in
     let nnrc_env := build_nnrc_env mr_env params args in
-    olift (fun env => nnrc_core_eval h env n) nnrc_env.
+    olift (fun env => nnrc_core_eval h empty_cenv env n) nnrc_env.
 
-  Definition nnrcmr_eval (env:nrcmr_env) (mrl:nnrcmr) : option data :=
+  Definition nnrcmr_eval (env:nnrcmr_env) (mrl:nnrcmr) : option data :=
     match mr_chain_eval env mrl.(mr_chain) with
     | (mr_env, Some _) =>
       mr_last_eval mr_env mrl.(mr_last)
     | (_, None) => None
     end.
 
-  Lemma mr_chain_eval_split (env: nrcmr_env) (l1:list mr) (r: mr) (l2: list mr):
+  Lemma mr_chain_eval_split (env: nnrcmr_env) (l1:list mr) (r: mr) (l2: list mr):
     forall env1 loc_d1,
       mr_chain_eval env l1 = (env1, Some loc_d1) ->
       mr_chain_eval env (l1 ++ (r :: l2)) = mr_chain_eval env1 (r :: l2).
@@ -509,7 +544,7 @@ Section NNRCMR.
     reflexivity.
   Qed.
 
-  Lemma mr_chain_eval_progress (env:nrcmr_env) (l1:list mr) (l2:list mr):
+  Lemma mr_chain_eval_progress (env:nnrcmr_env) (l1:list mr) (l2:list mr):
     forall env' loc_d,
       mr_chain_eval env (l1 ++ l2) = (env', Some loc_d) ->
       exists env1 loc_d1,
@@ -581,9 +616,9 @@ Section NNRCMR.
       end
     end.
 
-  Definition mr_chain_lazy_eval (env:nrcmr_env) (l:list mr) : nrcmr_env * option ddata :=
+  Definition mr_chain_lazy_eval (env:nnrcmr_env) (l:list mr) : nnrcmr_env * option ddata :=
     List.fold_left
-      (fun (acc: nrcmr_env * option ddata) mr =>
+      (fun (acc: nnrcmr_env * option ddata) mr =>
          match acc with
          | (env', None) => (env', None)
          | (env', Some _) =>
@@ -596,14 +631,14 @@ Section NNRCMR.
        end)
       l (env, Some (Ddistr nil)).
 
-  Definition nnrcmr_lazy_eval (env:nrcmr_env) (mrl:nnrcmr) : option data :=
+  Definition nnrcmr_lazy_eval (env:nnrcmr_env) (mrl:nnrcmr) : option data :=
     match mr_chain_lazy_eval env mrl.(mr_chain) with
     | (mr_env, Some _) =>
       mr_last_eval h mr_env mrl.(mr_last)
     | (_, None) => None
     end.
 
-  Lemma mr_chain_lazy_eval_split (env: nrcmr_env) (l1:list mr) (r: mr) (l2: list mr):
+  Lemma mr_chain_lazy_eval_split (env: nnrcmr_env) (l1:list mr) (r: mr) (l2: list mr):
     forall env1 loc_d1,
       mr_chain_lazy_eval env l1 = (env1, Some loc_d1) ->
       mr_chain_lazy_eval env (l1 ++ (r :: l2)) = mr_chain_lazy_eval env1 (r :: l2).
@@ -612,7 +647,7 @@ Section NNRCMR.
     unfold mr_chain_lazy_eval.
     rewrite fold_left_app.
     generalize (fold_left
-        (fun (acc : nrcmr_env * option ddata) (mr0 : NNRCMR.mr) =>
+        (fun (acc : nnrcmr_env * option ddata) (mr0 : NNRCMR.mr) =>
          let (env', o) := acc in
          match o with
          | Some _ =>
@@ -639,7 +674,7 @@ Section NNRCMR.
     reflexivity.
   Qed.
 
-  Lemma mr_chain_lazy_eval_progress (env:nrcmr_env) (l1:list mr) (l2:list mr):
+  Lemma mr_chain_lazy_eval_progress (env:nnrcmr_env) (l1:list mr) (l2:list mr):
     forall env' loc_d,
       mr_chain_lazy_eval env (l1 ++ l2) = (env', Some loc_d) ->
       exists env1 loc_d1,
@@ -649,7 +684,7 @@ Section NNRCMR.
     unfold mr_chain_lazy_eval.
     rewrite fold_left_app.
     case (fold_left
-        (fun (acc : nrcmr_env * option ddata) (mr : mr) =>
+        (fun (acc : nnrcmr_env * option ddata) (mr : mr) =>
          let (env'0, o) := acc in
          match o with
          | Some _ =>
@@ -684,7 +719,7 @@ Section NNRCMR.
       apply (IHl2 Hl2).
   Qed.
 
-  Lemma mr_chain_lazy_eval_correct (env:nrcmr_env) (l:list mr):
+  Lemma mr_chain_lazy_eval_correct (env:nnrcmr_env) (l:list mr):
     forall env' res,
       mr_chain_lazy_eval env l = (env', Some res) ->
       mr_chain_eval h env l = (env', Some res).
@@ -748,19 +783,19 @@ Section NNRCMR.
         end
       end.
 
-    Definition get_mr_chain_result (res: nrcmr_env * option ddata) : option data :=
+    Definition get_mr_chain_result (res: nnrcmr_env * option ddata) : option data :=
       match res with
       | (_, Some ld) => Some (unlocalize_data ld)
       | (_, None) => None
       end.
 
     Lemma mr_reduce_empty_correct:
-      forall (l:list mr) (mr:mr) (env:nrcmr_env),
+      forall (l:list mr) (mr:mr) (env:nnrcmr_env),
       forall res,
         get_mr_chain_result (mr_chain_eval h env (l ++ mr::nil)) = Some (normalize_data h res) ->
         (exists pre_res, snd (mr_chain_lazy_eval h env l) = Some pre_res) ->
         snd (mr_chain_lazy_eval h env (l ++ mr::nil)) = None ->
-        olift (fun n => nnrc_core_eval h nil n) (mr_reduce_empty mr) = Some (normalize_data h res).
+        olift (fun n => nnrc_core_eval h empty_cenv nil n) (mr_reduce_empty mr) = Some (normalize_data h res).
     Proof.
       induction l.
       - Case "l = nil"%string.
@@ -788,11 +823,11 @@ Section NNRCMR.
                               @lookup var ddata
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
-                                mr_output0 return (option nrcmr_env)
+                                mr_output0 return (option nnrcmr_env)
                             with
                             | Some l =>
-                                match l return (option nrcmr_env) with
-                                | Dlocal _ => @None nrcmr_env
+                                match l return (option nnrcmr_env) with
+                                | Dlocal _ => @None nnrcmr_env
                                 | Ddistr coll' =>
                                     @Some (list (prod var ddata))
                                       (@cons (prod var ddata)
@@ -814,17 +849,17 @@ Section NNRCMR.
             SSSCase "RedCollect"%string. {
               simpl in *.
               destruct p; simpl in *.
-              assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                      nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+              assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                      nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                 [ | rewrite Heq in *; clear Heq ]. {
-                rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                 try reflexivity.
                 simpl.
                 unfold disjoint.
                 simpl; intros;
                 congruence.
               }
-              destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+              destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -832,9 +867,9 @@ Section NNRCMR.
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
-                                mr_output0 return (option nrcmr_env)
+                                mr_output0 return (option nnrcmr_env)
                             with
-                            | Some _ => @None nrcmr_env
+                            | Some _ => @None nnrcmr_env
                             | None =>
                                 @Some
                                   (list
@@ -865,9 +900,9 @@ Section NNRCMR.
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
-                                mr_output0 return (option nrcmr_env)
+                                mr_output0 return (option nnrcmr_env)
                             with
-                            | Some _ => @None nrcmr_env
+                            | Some _ => @None nnrcmr_env
                             | None =>
                                 @Some
                                   (list
@@ -912,8 +947,8 @@ Section NNRCMR.
                 simpl in *.
                 destruct (lookup equiv_dec env mr_output0);
                   simpl in *; try congruence.
-                destruct (match d return (option nrcmr_env) with
-                            | Dlocal _ => @None nrcmr_env
+                destruct (match d return (option nnrcmr_env) with
+                            | Dlocal _ => @None nnrcmr_env
                             | Ddistr coll' =>
                                 @Some (list (prod var ddata))
                                   (@cons (prod var ddata)
@@ -925,17 +960,17 @@ Section NNRCMR.
               SSSSCase "RedCollect"%string. {
                 simpl in *.
                 destruct p0; simpl in *.
-                assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                        nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+                assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                        nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                   [ | rewrite Heq in *; clear Heq ]. {
-                  rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                  rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                   try reflexivity.
                   simpl.
                   unfold disjoint.
                   simpl; intros;
                   congruence.
                 }
-              destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+              destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -943,9 +978,9 @@ Section NNRCMR.
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
-                                mr_output0 return (option nrcmr_env)
+                                mr_output0 return (option nnrcmr_env)
                             with
-                            | Some _ => @None nrcmr_env
+                            | Some _ => @None nnrcmr_env
                             | None =>
                                 @Some
                                   (list
@@ -976,9 +1011,9 @@ Section NNRCMR.
                                      (@foreign_runtime_data fruntime))
                                   (@equiv_dec var (@eq var)
                                      (@eq_equivalence var) string_eqdec) env
-                                  mr_output0 return (option nrcmr_env)
+                                  mr_output0 return (option nnrcmr_env)
                               with
-                              | Some _ => @None nrcmr_env
+                              | Some _ => @None nnrcmr_env
                               | None =>
                                   @Some
                                     (list
@@ -1014,8 +1049,8 @@ Section NNRCMR.
                 simpl in *.
                 destruct (lookup equiv_dec env mr_output0);
                   simpl in *; try congruence.
-                destruct (match d return (option nrcmr_env) with
-                                | Dlocal _ => @None nrcmr_env
+                destruct (match d return (option nnrcmr_env) with
+                                | Dlocal _ => @None nnrcmr_env
                                 | Ddistr coll' =>
                                     @Some (list (prod var ddata))
                                       (@cons (prod var ddata)
@@ -1027,17 +1062,17 @@ Section NNRCMR.
               SSSSCase "RedCollect"%string. {
                 simpl in *.
                 destruct p0; simpl in *.
-                assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                        nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+                assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                        nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                   [ | rewrite Heq in *; clear Heq ]. {
-                  rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                  rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                   try reflexivity.
                   simpl.
                   unfold disjoint.
                   simpl; intros;
                   congruence.
                 }
-                destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+                destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                   simpl in *; try congruence.
                 destruct (match
                                 @lookup var
@@ -1045,9 +1080,9 @@ Section NNRCMR.
                                      (@foreign_runtime_data fruntime))
                                   (@equiv_dec var (@eq var)
                                      (@eq_equivalence var) string_eqdec) env
-                                  mr_output0 return (option nrcmr_env)
+                                  mr_output0 return (option nnrcmr_env)
                               with
-                              | Some _ => @None nrcmr_env
+                              | Some _ => @None nnrcmr_env
                               | None =>
                                   @Some
                                     (list
@@ -1078,9 +1113,9 @@ Section NNRCMR.
                                      (@foreign_runtime_data fruntime))
                                   (@equiv_dec var (@eq var)
                                      (@eq_equivalence var) string_eqdec) env
-                                  mr_output0 return (option nrcmr_env)
+                                  mr_output0 return (option nnrcmr_env)
                               with
-                              | Some _ => @None nrcmr_env
+                              | Some _ => @None nnrcmr_env
                               | None =>
                                   @Some
                                     (list
@@ -1125,8 +1160,8 @@ Section NNRCMR.
               simpl in *.
               destruct (lookup equiv_dec env mr_output0);
                 simpl in *; try congruence.
-              destruct (match d0 return (option nrcmr_env) with
-                              | Dlocal _ => @None nrcmr_env
+              destruct (match d0 return (option nnrcmr_env) with
+                              | Dlocal _ => @None nnrcmr_env
                               | Ddistr coll' =>
                                   @Some (list (prod var ddata))
                                     (@cons (prod var ddata)
@@ -1138,17 +1173,17 @@ Section NNRCMR.
             SSSSCase "RedCollect"%string. {
               simpl in *.
               destruct p; simpl in *.
-              assert (nnrc_core_eval h nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
-                      nnrc_core_eval h ((v, dcoll nil) :: nil) n) as Heq;
+              assert (nnrc_core_eval h empty_cenv nil (nnrc_subst n v (NNRCConst (dcoll nil))) =
+                      nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n) as Heq;
                 [ | rewrite Heq in *; clear Heq ]. {
-                rewrite (nnrc_core_eval_cons_subst_disjoint _ (NNRCConst (dcoll nil)));
+                rewrite (nnrc_core_eval_cons_subst_disjoint _ _ (NNRCConst (dcoll nil)));
                 try reflexivity.
                 simpl.
                 unfold disjoint.
                 simpl; intros;
                 congruence.
               }
-              destruct (nnrc_core_eval h ((v, dcoll nil) :: nil) n);
+              destruct (nnrc_core_eval h empty_cenv ((v, dcoll nil) :: nil) n);
                 simpl in *; try congruence.
               destruct (match
                               @lookup var
@@ -1156,9 +1191,9 @@ Section NNRCMR.
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
-                                mr_output0 return (option nrcmr_env)
+                                mr_output0 return (option nnrcmr_env)
                             with
-                            | Some _ => @None nrcmr_env
+                            | Some _ => @None nnrcmr_env
                             | None =>
                                 @Some
                                   (list
@@ -1190,9 +1225,9 @@ Section NNRCMR.
                                    (@foreign_runtime_data fruntime))
                                 (@equiv_dec var (@eq var)
                                    (@eq_equivalence var) string_eqdec) env
-                                mr_output0 return (option nrcmr_env)
+                                mr_output0 return (option nnrcmr_env)
                             with
-                            | Some _ => @None nrcmr_env
+                            | Some _ => @None nnrcmr_env
                             | None =>
                                 @Some
                                   (list
@@ -1409,6 +1444,7 @@ Section NNRCMR.
 
     Lemma id_function_no_free_vars: function_with_no_free_vars id_function.
     Proof.
+      split; [reflexivity| ].
       intros x.
       unfold id_function.
       simpl.
@@ -1424,6 +1460,7 @@ Section NNRCMR.
 
     Lemma coll_function_no_free_vars: function_with_no_free_vars coll_function.
     Proof.
+      split; [reflexivity| ].
       intros x.
       unfold coll_function.
       simpl.
@@ -1439,6 +1476,7 @@ Section NNRCMR.
 
     Lemma constant_function_no_free_vars (d:data): function_with_no_free_vars (constant_function d).
     Proof.
+      split; [reflexivity| ].
       intros x.
       unfold constant_function.
       contradiction.
@@ -1483,6 +1521,14 @@ Section NNRCMR.
 
   End mr_library.
 
+  Section Top.
+    Context (h:brand_relation_t).
+
+    Definition nnrcmr_eval_top (init_vinit:var) (q:nnrcmr) (cenv: dbindings) : option data :=
+      nnrcmr_eval h (load_init_env init_vinit cenv) q.
+
+  End Top.
+  
 End NNRCMR.
 
 

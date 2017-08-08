@@ -116,11 +116,7 @@ Section CAMPRule.
     Context (h:brand_relation_t).
 
     Definition camp_rule_eval_top (q:camp_rule) (cenv:bindings) :=
-      match camp_eval h (rec_sort cenv) (camp_rule_to_camp q) nil dunit with
-      | Success l => Some (dcoll (l::nil))
-      | RecoverableError => Some (dcoll nil)
-      | TerminalError => None
-      end.
+      presult_to_result (camp_eval h (rec_sort cenv) (camp_rule_to_camp q) nil dunit).
 
     Definition camp_rule_eval_top_debug (debug:bool) (q:camp_rule) (cenv:bindings) :=
       let pp := camp_rule_to_camp q in

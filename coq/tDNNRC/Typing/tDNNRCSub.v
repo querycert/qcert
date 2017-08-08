@@ -29,12 +29,23 @@ Section tDNNRCSub.
   Context {m:basic_model}.
 
   Section typ.
+    Context (τconstants:tdbindings).
       
     Inductive dnnrc_type_sub {A plug_type:Set}
               {plug:AlgPlug plug_type} {tplug: TAlgPlug} :
       tdbindings -> @dnnrc _ A plug_type -> drtype -> Prop :=
-    | TDNNRCVar {τ} tenv v : forall (a:A), lookup equiv_dec tenv v = Some τ -> dnnrc_type_sub tenv (DNNRCVar a v) τ
-    | TDNNRCConst {τ} tenv c : forall (a:A), data_type (normalize_data brand_relation_brands c) τ -> dnnrc_type_sub tenv (DNNRCConst a c) (Tlocal τ)
+    | TDNNRCGetConstant {τout} tenv s :
+        forall (a:A),
+          tdot τconstants s = Some τout ->
+          dnnrc_type_sub tenv (DNNRCGetConstant a s) τout
+    | TDNNRCVar {τ} tenv v :
+        forall (a:A),
+          lookup equiv_dec tenv v = Some τ ->
+          dnnrc_type_sub tenv (DNNRCVar a v) τ
+    | TDNNRCConst {τ} tenv c :
+        forall (a:A),
+          data_type (normalize_data brand_relation_brands c) τ ->
+          dnnrc_type_sub tenv (DNNRCConst a c) (Tlocal τ)
     | TDNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
         forall (a:A),
           binOp_type b τ₁ τ₂ τ ->
@@ -122,9 +133,9 @@ Section tDNNRCSub.
 
   Section lift.
     
-    Lemma dnnrc_type_to_dnnrc_type_sub {A} (plug_type:Set) (plug:AlgPlug plug_type) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
-      dnnrc_type tenv e τ ->
-      dnnrc_type_sub tenv e τ.
+    Lemma dnnrc_type_to_dnnrc_type_sub {A} (plug_type:Set) (plug:AlgPlug plug_type) {tplug:TAlgPlug} {τc} {τ} (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
+      dnnrc_type τc tenv e τ ->
+      dnnrc_type_sub τc tenv e τ.
     Proof.
       Hint Constructors dnnrc_type_sub.
       revert tenv τ.
@@ -140,14 +151,20 @@ Section tDNNRCSub.
   End lift.
   
 (** Main lemma for the type correctness of DNNNRC *)
-  Theorem typed_dnnrc_yields_typed_data {A} {plug_type:Set} (plug:AlgPlug plug_type) {tplug:TAlgPlug} {τ} (env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
+  Theorem typed_dnnrc_yields_typed_data {A} {plug_type:Set} (plug:AlgPlug plug_type) {tplug:TAlgPlug} {τc} {τ} (cenv env:dbindings) (tenv:tdbindings) (e:@dnnrc _ A plug_type) :
+    dbindings_type cenv τc ->
     dbindings_type env tenv ->
-    dnnrc_type_sub tenv e τ ->
-    (exists x, (dnnrc_eval brand_relation_brands env e) = Some x /\ (ddata_type x τ)).
+    dnnrc_type_sub τc tenv e τ ->
+    (exists x, (dnnrc_eval brand_relation_brands cenv env e) = Some x /\ (ddata_type x τ)).
   Proof.
-    intros.
+    intro Hcenv; intros.
     revert env H.
     dependent induction H0; simpl; intros.
+    - unfold tdot in *.
+      unfold edot in *.
+      destruct (dForall2_lookupr_some _ _ _ _ Hcenv H) as [? [eqq1 eqq2]].
+      rewrite eqq1.
+      eauto.
     - unfold dbindings_type in *.
       dependent induction H0.
       simpl in *; congruence.
@@ -200,18 +217,18 @@ Section tDNNRCSub.
         assert ((@dnnrc_eval (@basic_model_runtime m) A plug_type
              (@brand_relation_brands
                 (@brand_model_relation (@basic_model_foreign_type m)
-                   (@basic_model_brand_model m))) plug
+                   (@basic_model_brand_model m))) cenv plug
+             (@cons (prod string (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
+                (@pair string (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v x)
+                env) e2) = (@dnnrc_eval (@basic_model_runtime m) A plug_type
+             (@brand_relation_brands
+                (@brand_model_relation (@basic_model_foreign_type m)
+                   (@basic_model_brand_model m))) cenv plug
              (@cons
                 (prod DNNRCBase.var (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
                 (@pair DNNRCBase.var (@ddata (@foreign_runtime_data (@basic_model_runtime m)))
-                   v x) env) e2) = (@dnnrc_eval (@basic_model_runtime m) A plug_type
-             (@brand_relation_brands
-                (@brand_model_relation (@basic_model_foreign_type m)
-                   (@basic_model_brand_model m))) plug
-             (@cons (prod string (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
-                (@pair string (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v x)
-                env) e2)) by reflexivity.
-        rewrite <- H2 in re2; clear H2.
+                   v x) env) e2)) by reflexivity.
+        rewrite H2 in re2; clear H2.
         rewrite re2.
         eauto.
     - specialize (IHdnnrc_type_sub1 env H).
@@ -236,7 +253,7 @@ Section tDNNRCSub.
         assert (exists x1, rmap
            (fun d1 : data =>
             olift checkLocal
-              (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2))
+              (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2))
            dl = Some x1 /\ (Dlocal (dcoll x1)) = x0).
         revert H1.
         assert (@rmap (@data (@foreign_runtime_data (@basic_model_runtime m)))
@@ -248,7 +265,7 @@ Section tDNNRCSub.
                  (@dnnrc_eval (@basic_model_runtime m) A plug_type
                     (@brand_relation_brands
                        (@brand_model_relation (@basic_model_foreign_type m)
-                          (@basic_model_brand_model m))) plug
+                          (@basic_model_brand_model m))) cenv plug
                     (@cons
                        (prod DNNRCBase.var
                           (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
@@ -264,7 +281,7 @@ Section tDNNRCSub.
                 (@dnnrc_eval (@basic_model_runtime m) A plug_type
                    (@brand_relation_brands
                       (@brand_model_relation (@basic_model_foreign_type m)
-                         (@basic_model_brand_model m))) plug
+                         (@basic_model_brand_model m))) cenv plug
                    (@cons
                       (prod string (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
                       (@pair string (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v
@@ -274,7 +291,7 @@ Section tDNNRCSub.
         elim (rmap
                 (fun d1 : data =>
                    olift checkLocal
-                         (dnnrc_eval brand_relation_brands ((v, Dlocal d1) :: env) e2)) dl); intros.
+                         (dnnrc_eval brand_relation_brands cenv ((v, Dlocal d1) :: env) e2)) dl); intros.
         inversion H1; simpl in *. subst; clear H1;
         exists a1; split; congruence.
         congruence.
@@ -289,7 +306,7 @@ Section tDNNRCSub.
                (@dnnrc_eval (@basic_model_runtime m) A plug_type
                   (@brand_relation_brands
                      (@brand_model_relation (@basic_model_foreign_type m)
-                        (@basic_model_brand_model m))) plug
+                        (@basic_model_brand_model m))) cenv plug
                   (@cons
                      (prod string (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
                      (@pair string (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v
@@ -303,7 +320,7 @@ Section tDNNRCSub.
                          (@dnnrc_eval (@basic_model_runtime m) A plug_type
                             (@brand_relation_brands
                                (@brand_model_relation (@basic_model_foreign_type m)
-                                  (@basic_model_brand_model m))) plug
+                                  (@basic_model_brand_model m))) cenv plug
                             (@cons
                                (prod DNNRCBase.var
                                   (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
@@ -328,14 +345,14 @@ Section tDNNRCSub.
         assert ((@dnnrc_eval (@basic_model_runtime m) A plug_type
             (@brand_relation_brands
                (@brand_model_relation (@basic_model_foreign_type m)
-                  (@basic_model_brand_model m))) plug
+                  (@basic_model_brand_model m))) cenv plug
             (@cons (prod string (@ddata (@foreign_runtime_data (@basic_model_runtime m))))
                (@pair string (@ddata (@foreign_runtime_data (@basic_model_runtime m))) v
-                      (@Dlocal (@foreign_runtime_data (@basic_model_runtime m)) a0)) env) e2) =
+                  (@Dlocal (@foreign_runtime_data (@basic_model_runtime m)) a0)) env) e2) =
                (@dnnrc_eval (@basic_model_runtime m) A plug_type
                     (@brand_relation_brands
                        (@brand_model_relation (@basic_model_foreign_type m)
-                          (@basic_model_brand_model m))) plug
+                          (@basic_model_brand_model m))) cenv plug
                     (@cons
                        (prod DNNRCBase.var
                           (@ddata (@foreign_runtime_data (@basic_model_runtime m))))

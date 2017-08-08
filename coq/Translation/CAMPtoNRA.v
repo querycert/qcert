@@ -432,7 +432,7 @@ Section CAMPtoNRA.
     Definition camp_to_nra_top (q:camp) : nra :=
       AApp (nra_of_camp q) (nra_context (AConst (drec nil)) (AConst dunit)).
 
-    Theorem camp_to_nraenv_top_correct :
+    Theorem camp_to_nra_top_correct :
       forall q:camp, forall global_env:bindings,
           camp_eval_top h q global_env =
           nra_eval_top h (camp_to_nra_top q) global_env.
@@ -445,10 +445,10 @@ Section CAMPtoNRA.
       unfold camp_eval_top_to_presult.
       generalize (@camp_trans_correct h (rec_sort global_env) q nil dunit); intros.
       unfold lift_failure in H.
-      rewrite H.
-      simpl.
-      unfold nra_context_data.
-      reflexivity.
+      destruct (camp_eval h (rec_sort global_env) q nil dunit);
+      rewrite H;
+      simpl;
+      unfold nra_context_data in *; reflexivity.
     Qed.
       
   End Top.
