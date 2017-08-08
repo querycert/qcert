@@ -426,6 +426,7 @@ let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
 
 let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
   match n with
+  | NNRCGetConstant v -> STerm ("NNRCGetConstant", [SString (string_of_char_list v)])
   | NNRCVar v -> STerm ("NNRCVar", [SString (string_of_char_list v)])
   | NNRCConst d -> STerm ("NNRCConst", [data_to_sexp d])
   | NNRCBinop (b, n1, n2) -> STerm ("NNRCBinop", (binop_to_sexp b) :: [nnrc_to_sexp n1;nnrc_to_sexp n2])
@@ -444,6 +445,7 @@ let rec nnrc_to_sexp (n : QLang.nnrc) : sexp =
 
 let rec sexp_to_nnrc (se:sexp) : QLang.nnrc =
   match se with
+  | STerm ("NNRCGetConstant", [SString v]) -> NNRCGetConstant (char_list_of_string v)
   | STerm ("NNRCVar", [SString v]) -> NNRCVar (char_list_of_string v)
   | STerm ("NNRCConst", [d]) -> NNRCConst (sexp_to_data d)
   | STerm ("NNRCBinop", b :: [n1;n2]) -> NNRCBinop (sexp_to_binop b, sexp_to_nnrc n1, sexp_to_nnrc n2)
