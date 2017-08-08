@@ -179,7 +179,7 @@ where p->age = 32
 ```
 
 Calling the compiler on that sample with OQL as source language and
-Javascript as target language can be done as follows:
+JavaScript as target language can be done as follows:
 
 ```
 $ ./bin/qcert -source oql -target js samples/oql/persons1.oql

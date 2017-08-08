@@ -19,17 +19,20 @@ Section TcNNRC.
   Require Import List.
   Require Import Arith.
   Require Import Program.
-  Require Import EquivDec Morphisms.
-
-  Require Import Utils BasicSystem.
+  Require Import EquivDec.
+  Require Import Morphisms.
+  Require Import BasicSystem.
   Require Import cNNRC.
 
   (** Typing rules for NNRC *)
+  Context {m:basic_model}.
   Section typ.
-
-    Context {m:basic_model}.
+    Context (τconstants:tbindings).
 
     Inductive nnrc_type : tbindings -> nnrc -> rtype -> Prop :=
+    | TNNRCGetConstant {τout} tenv s :
+        tdot τconstants s = Some τout ->
+        nnrc_type tenv (NNRCGetConstant s) τout
     | TNNRCVar {τ} tenv v : lookup equiv_dec tenv v = Some τ -> nnrc_type tenv (NNRCVar v) τ
     | TNNRCConst {τ} tenv c : data_type (normalize_data brand_relation_brands c) τ -> nnrc_type tenv (NNRCConst c) τ
     | TNNRCBinop  {τ₁ τ₂ τ} tenv b e1 e2 :
@@ -64,14 +67,36 @@ Section TcNNRC.
   
   (** Main lemma for the type correctness of NNNRC *)
 
-  Theorem typed_nnrc_yields_typed_data {m:basic_model} {τ} (env:bindings) (tenv:tbindings) (e:nnrc) :
-    bindings_type env tenv ->
-    nnrc_type tenv e τ ->
-    (exists x, (nnrc_core_eval brand_relation_brands env e) = Some x /\ (data_type x τ)).
+  Lemma rmap_exists0 v (cenv:bindings) (env:bindings) e2 dl x0 :
+    match
+      rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2)
+           dl
+    with
+    | Some a' => Some (dcoll a')
+    | None => None
+    end = Some x0 ->
+    exists x1, rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2) dl = Some x1 /\ (dcoll x1) = x0.
   Proof.
-    intros.
+    elim (rmap (fun d1 : data => nnrc_core_eval brand_relation_brands cenv ((v, d1) :: env) e2) dl); intros.
+    exists a; split; try inversion H1. reflexivity.
+    congruence.
+    congruence.
+  Qed.    
+
+  Theorem typed_nnrc_yields_typed_data {τc} {τ} (cenv env:bindings) (tenv:tbindings) (e:nnrc) :
+    bindings_type cenv τc ->
+    bindings_type env tenv ->
+    nnrc_type τc tenv e τ ->
+    (exists x, (nnrc_core_eval brand_relation_brands cenv env e) = Some x /\ (data_type x τ)).
+  Proof.
+    intro Hcenv; intros.
     revert env H.
     dependent induction H0; simpl; intros.
+    - unfold tdot in *.
+      unfold edot in *.
+      destruct (Forall2_lookupr_some _ _ _ _ Hcenv H) as [? [eqq1 eqq2]].
+      rewrite eqq1.
+      eauto.
     - unfold bindings_type in *.
       dependent induction H0.
       simpl in *; congruence.
@@ -124,11 +149,7 @@ Section TcNNRC.
         elim H1; clear H1; intros.
         unfold lift in H1.
         unfold var in *.
-        assert (exists x1, rmap (fun d1 : data => nnrc_core_eval brand_relation_brands ((v, d1) :: env) e2) dl = Some x1 /\ (dcoll x1) = x0).
-        revert H1.
-        elim (rmap (fun d1 : data => nnrc_core_eval brand_relation_brands ((v, d1) :: env) e2) dl); intros.
-        exists a0; split; try inversion H1; reflexivity.
-        congruence.
+        generalize (rmap_exists0 v cenv env e2 dl x0 H1); intros.
         elim H3; clear H3; intros.
         elim H3; clear H3; intros.
         rewrite H3.
@@ -180,20 +201,20 @@ Section TcNNRC.
            unfold bindings_type in *; auto.
   Qed.
 
-    (* we are only sensitive to the environment up to lookup *)
+  (* we are only sensitive to the environment up to lookup *)
   Global Instance nnrc_type_lookup_equiv_prop {m:basic_model} :
-    Proper (lookup_equiv ==> eq ==> eq ==> iff) nnrc_type.
+    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_type.
   Proof.
-    cut (Proper (lookup_equiv ==> eq ==> eq ==> impl) nnrc_type);
+    cut (Proper (eq ==> lookup_equiv ==> eq ==> eq ==> impl) nnrc_type);
     unfold Proper, respectful, lookup_equiv, iff, impl; intros; subst;
       [intuition; eauto | ].
-    rename y0 into e.
-    rename y1 into τ.
-    rename x into b1.
-    rename y into b2.
-    revert b1 b2 τ H H2.
+    rename y1 into e.
+    rename y2 into τ.
+    rename x0 into b1.
+    rename y0 into b2.
+    revert b1 b2 τ H0 H3.
     induction e; simpl; inversion 2; subst; econstructor; eauto 3.
-    - rewrite <- H; trivial.
+    - rewrite <- H0; trivial.
     - eapply IHe2; try eassumption; intros.
       simpl; match_destr.
     - eapply IHe2; try eassumption; intros.
@@ -212,14 +233,14 @@ Ltac nnrc_inverter :=
     | [H: proj1_sig ?τ₁ = Coll₀ (proj1_sig ?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
     | [H:  Coll₀ (proj1_sig ?τ₂) = proj1_sig ?τ₁ |- _] => symmetry in H
     (* Note: do not generalize too hastily on unaryOp/binOp constructors *)
-    | [H:nnrc_type _ (NNRCVar _) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCConst _) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCBinop _ _ _ ) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCUnop _ _ ) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCLet _ _ _ ) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCFor _ _ _ ) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCIf _ _ _ ) _ |- _ ] => inversion H; clear H
-    | [H:nnrc_type _ (NNRCEither _ _ _ _ _ ) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCVar _) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCConst _) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCBinop _ _ _ ) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCUnop _ _ ) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCLet _ _ _ ) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCFor _ _ _ ) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCIf _ _ _ ) _ |- _ ] => inversion H; clear H
+    | [H:nnrc_type _ _ (NNRCEither _ _ _ _ _ ) _ |- _ ] => inversion H; clear H
     | [H: (_,_)  = (_,_) |- _ ] => inversion H; clear H
     | [H: map (fun x2 : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                  (fst x2, proj1_sig (snd x2))) ?x0 = nil |- _] => apply (map_rtype_nil x0) in H; simpl in H; subst
@@ -240,7 +261,7 @@ Ltac nnrc_inverter :=
                      (fun x : string * {τ₀ : rtype₀ | wf_rtype₀ τ₀ = true} =>
                         (fst x, proj1_sig (snd x))) _ = (_::nil) ] |- _] => apply map_eq_cons in H;
                                                                             destruct H as [? [? [? [??]]]]
-    | [H:nnrc_type _ _ (snd ?x) |- _ ] => destruct x
+    | [H:nnrc_type _ _ _ (snd ?x) |- _ ] => destruct x
     | [H: Coll₀ _ = Coll₀ _ |- _ ] => inversion H; clear H
     | [H: Rec₀ _ _ = Rec₀ _ _ |- _ ] => inversion H; clear H
     | [H:unaryOp_type AColl _ _ |- _ ] => inversion H; clear H; subst
@@ -279,13 +300,14 @@ Ltac nnrc_inverter :=
   Ltac nnrc_input_well_typed :=
   repeat progress
          match goal with
-           | [HO:nnrc_type ?Γ ?op ?τout,
+           | [HO:nnrc_type ?Γc ?Γ ?op ?τout,
+              HC:bindings_type ?cenv ?Γc,
               HE:bindings_type ?env ?Γ
-              |- context [(nnrc_core_eval brand_relation_brands ?env ?op)]] =>
+              |- context [(nnrc_core_eval brand_relation_brands ?cenv ?env ?op)]] =>
              let xout := fresh "dout" in
              let xtype := fresh "τout" in
              let xeval := fresh "eout" in
-             destruct (typed_nnrc_yields_typed_data env Γ op HE HO)
+             destruct (typed_nnrc_yields_typed_data cenv env Γ op HC HE HO)
                as [xout [xeval xtype]]; rewrite xeval in *; simpl
          end.
 

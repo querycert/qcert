@@ -19,12 +19,13 @@ Section NNRCShadow.
   Require Import List.
   Require Import Arith.
   Require Import Peano_dec.
-  Require Import EquivDec Decidable.
-
-  Require Import Utils BasicRuntime.
-
-  Require Import cNNRC cNNRCShadow.
-  Require Import NNRC NNRCSize.
+  Require Import EquivDec.
+  Require Import Decidable.
+  Require Import BasicRuntime.
+  Require Import cNNRC.
+  Require Import cNNRCShadow.
+  Require Import NNRC.
+  Require Import NNRCSize.
 
   Close Scope nnrc_scope.
   
@@ -35,25 +36,25 @@ Section NNRCShadow.
 
   Context {fruntime:foreign_runtime}.
 
-  Lemma nnrc_ext_eval_remove_duplicate_env {h:brand_relation_t} l v x l' x' l'' e :
-    @nnrc_ext_eval _ h (l ++ (v,x)::l' ++ (v,x')::l'') e =
-    @nnrc_ext_eval _ h (l ++ (v,x)::l' ++ l'') e.
+  Lemma nnrc_ext_eval_remove_duplicate_env {h:brand_relation_t} {cenv} l v x l' x' l'' e :
+    @nnrc_ext_eval _ h cenv (l ++ (v,x)::l' ++ (v,x')::l'') e =
+    @nnrc_ext_eval _ h cenv (l ++ (v,x)::l' ++ l'') e.
   Proof.
     rewrite lookup_remove_duplicate; trivial.
   Qed.
 
-  Lemma nnrc_ext_eval_remove_duplicate_env_weak {h:list (string*string)} v1 v2 x x' x'' l e :
-    @nnrc_ext_eval _ h ((v1,x)::(v2,x')::(v1,x'')::l) e =
-    @nnrc_ext_eval _ h ((v1,x)::(v2,x')::l) e.
+  Lemma nnrc_ext_eval_remove_duplicate_env_weak {h:list (string*string)} {cenv} v1 v2 x x' x'' l e :
+    @nnrc_ext_eval _ h cenv ((v1,x)::(v2,x')::(v1,x'')::l) e =
+    @nnrc_ext_eval _ h cenv ((v1,x)::(v2,x')::l) e.
   Proof.
     apply nnrc_ext_eval_lookup_equiv_prop; trivial.
     red; intros; simpl.
     match_destr.
   Qed.
 
-  Lemma nnrc_ext_eval_remove_duplicate_env_weak_cons {h:list (string*string)} v1 v2 x x' x'' l e :
-    @nnrc_ext_eval _ h ((v1,x)::(v2,x')::(v2,x'')::l) e =
-    @nnrc_ext_eval _ h ((v1,x)::(v2,x')::l) e.
+  Lemma nnrc_ext_eval_remove_duplicate_env_weak_cons {h:list (string*string)} {cenv} v1 v2 x x' x'' l e :
+    @nnrc_ext_eval _ h cenv ((v1,x)::(v2,x')::(v2,x'')::l) e =
+    @nnrc_ext_eval _ h cenv ((v1,x)::(v2,x')::l) e.
   Proof.
     apply nnrc_ext_eval_lookup_equiv_prop; trivial.
     red; intros; simpl.
@@ -61,9 +62,9 @@ Section NNRCShadow.
     match_destr.
   Qed.
 
-  Lemma nnrc_ext_eval_remove_free_env {h:list (string*string)} l v x l' e :
+  Lemma nnrc_ext_eval_remove_free_env {h:list (string*string)} {cenv} l v x l' e :
           ~ In v (nnrc_free_vars e) ->
-          @nnrc_ext_eval _ h (l ++ (v,x)::l') e = @nnrc_ext_eval _ h (l ++ l') e.
+          @nnrc_ext_eval _ h cenv (l ++ (v,x)::l') e = @nnrc_ext_eval _ h cenv (l ++ l') e.
   Proof.
     revert l v x l'.
     induction e; simpl; intros; trivial; unfold nnrc_ext_eval in *; simpl.
@@ -71,16 +72,16 @@ Section NNRCShadow.
     - apply nin_app_or in H. rewrite IHe1, IHe2; intuition.
     - rewrite IHe; intuition.
     - apply nin_app_or in H. rewrite IHe1 by intuition.
-      destruct (nnrc_core_eval h (l ++ l') (nnrc_ext_to_nnrc e1)); trivial. 
+      destruct (nnrc_core_eval h cenv (l ++ l') (nnrc_ext_to_nnrc e1)); trivial. 
       destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst.
-      + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 d l); simpl; auto.
+      + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 d l); simpl; auto.
       + generalize (IHe2 ((v,d)::l)); simpl; intros rr; rewrite rr; intuition.
          elim H2. apply remove_in_neq; auto.
     - apply nin_app_or in H. rewrite IHe1 by intuition.
-      destruct (nnrc_core_eval h (l ++ l') (nnrc_ext_to_nnrc e1)); trivial. destruct d; trivial.
+      destruct (nnrc_core_eval h cenv (l ++ l') (nnrc_ext_to_nnrc e1)); trivial. destruct d; trivial.
       f_equal. apply rmap_ext; intros.
       destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst.
-      + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 x0 l); simpl; auto.
+      + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 x0 l); simpl; auto.
       + generalize (IHe2 ((v,x0)::l)); simpl; intros rr; rewrite rr; intuition.
          elim H3. apply remove_in_neq; auto.
     - apply nin_app_or in H; destruct H as [? HH]; apply nin_app_or in HH.
@@ -89,14 +90,14 @@ Section NNRCShadow.
       rewrite IHe1 by intuition.
       match_destr. destruct d; trivial.
       + destruct (string_eqdec v v1); unfold Equivalence.equiv in * .
-        * subst. generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d l).
+        * subst. generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v1 d l).
           simpl; trivial.
         * generalize (IHe2 ((v,d)::l)); simpl; intros r.
           apply r.
           rewrite <- (remove_in_neq _ v1 v) in H by intuition.
           intuition.
       + destruct (string_eqdec v0 v1); unfold Equivalence.equiv in * .
-        * subst. generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d l).
+        * subst. generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v1 d l).
           simpl; trivial.
         * generalize (IHe3 ((v0,d)::l)); simpl; intros r.
           apply r.
@@ -105,9 +106,9 @@ Section NNRCShadow.
     - rewrite IHe; intuition.
   Qed.
 
-  Lemma nnrc_ext_eval_remove_free_env_weak {h:list (string*string)} v1 x1 v x e :
+  Lemma nnrc_ext_eval_remove_free_env_weak {h:list (string*string)} {cenv} v1 x1 v x e :
     ~ In v (nnrc_free_vars e) ->
-    @nnrc_ext_eval _ h ((v1,x1)::(v,x)::nil) e = @nnrc_ext_eval _ h ((v1,x1)::nil) e.
+    @nnrc_ext_eval _ h cenv ((v1,x1)::(v,x)::nil) e = @nnrc_ext_eval _ h cenv ((v1,x1)::nil) e.
   Proof.
     assert ((v1,x1)::(v,x)::nil =
             ((v1,x1)::nil) ++ (v,x)::nil).
@@ -118,20 +119,22 @@ Section NNRCShadow.
     apply nnrc_ext_eval_remove_free_env.
   Qed.
 
-  Lemma nnrc_ext_eval_swap_neq {h:list (string*string)} l1 v1 x1 v2 x2 l2 e : v1 <> v2 ->
-           @nnrc_ext_eval _ h (l1++(v1,x1)::(v2,x2)::l2) e = 
-           @nnrc_ext_eval _ h (l1++(v2,x2)::(v1,x1)::l2) e.
+  Lemma nnrc_ext_eval_swap_neq {h:list (string*string)} {cenv} l1 v1 x1 v2 x2 l2 e : v1 <> v2 ->
+           @nnrc_ext_eval _ h cenv (l1++(v1,x1)::(v2,x2)::l2) e = 
+           @nnrc_ext_eval _ h cenv (l1++(v2,x2)::(v1,x1)::l2) e.
   Proof.
     intros.
     rewrite lookup_swap_neq; trivial.
   Qed.
 
-  Lemma nnrc_ext_eval_subst_dunit {h:list (string*string)} env e v :
-    @nnrc_ext_eval _ h ((v,dunit)::env) e =
-    @nnrc_ext_eval _ h env (nnrc_subst e v (NNRCConst dunit)).
+  Lemma nnrc_ext_eval_subst_dunit {h:list (string*string)} {cenv} env e v :
+    @nnrc_ext_eval _ h cenv ((v,dunit)::env) e =
+    @nnrc_ext_eval _ h cenv env (nnrc_subst e v (NNRCConst dunit)).
   Proof.
     generalize env; clear env.
     nnrc_cases (induction e) Case; unfold nnrc_ext_eval in *; simpl.
+    - Case "NNRCGetConstant"%string.
+      reflexivity.
     - Case "NNRCVar"%string.
       simpl.
       case (string_eqdec v0 v).
@@ -160,24 +163,24 @@ Section NNRCShadow.
       intros env.
       simpl.
       rewrite IHe1.
-      destruct (@nnrc_core_eval _ h env (nnrc_ext_to_nnrc
+      destruct (@nnrc_core_eval _ h cenv env (nnrc_ext_to_nnrc
                                            (nnrc_subst e1 v (NNRCConst dunit))));
         try reflexivity.
       case (equiv_dec v0 v); unfold Equivalence.equiv in *.
       + SCase "v0 = v"%string.
         intros Hv; rewrite Hv in *; clear Hv.
-        generalize (nnrc_core_eval_remove_duplicate_env (h:=h) nil v d nil dunit env (nnrc_ext_to_nnrc e2)); intros.
+        generalize (nnrc_core_eval_remove_duplicate_env (h:=h) cenv nil v d nil dunit env (nnrc_ext_to_nnrc e2)); intros.
         simpl.
         trivial.
       + SCase "v0 <> v"%string.
         intros Hv.
-        generalize (nnrc_core_eval_swap_neq (h:=h) nil); simpl; intros eqq.
+        generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil); simpl; intros eqq.
         rewrite eqq; auto.
     - Case "NNRCFor"%string.
       intros env.
       simpl.
       rewrite IHe1.
-      destruct (@nnrc_core_eval _ h env (nnrc_ext_to_nnrc
+      destruct (@nnrc_core_eval _ h cenv env (nnrc_ext_to_nnrc
                                        (nnrc_subst e1 v (NNRCConst dunit)))); try reflexivity.
       destruct d; try reflexivity.
       apply lift_dcoll_inversion.
@@ -187,16 +190,16 @@ Section NNRCShadow.
       + SCase "v0 = v"%string.
         subst.
         generalize (nnrc_core_eval_remove_duplicate_env
-                      (h:=h) nil v d nil dunit env (nnrc_ext_to_nnrc e2)); simpl; trivial.
+                      (h:=h) cenv nil v d nil dunit env (nnrc_ext_to_nnrc e2)); simpl; trivial.
       + SCase "v0 <> v"%string.
-        generalize (nnrc_core_eval_swap_neq (h:=h) nil); simpl; intros eqq.
+        generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil); simpl; intros eqq.
         rewrite eqq; auto.
     - Case "NNRCIf"%string.
       intros env.
       simpl.
       unfold olift.
       rewrite IHe1.
-      destruct (@nnrc_core_eval _ h env
+      destruct (@nnrc_core_eval _ h cenv env
                               (nnrc_ext_to_nnrc (nnrc_subst e1 v (NNRCConst dunit))));
         try reflexivity.
       destruct d; try reflexivity.
@@ -211,7 +214,7 @@ Section NNRCShadow.
       intros env.
       simpl.
       rewrite IHe1.
-      destruct (@nnrc_core_eval _ h env
+      destruct (@nnrc_core_eval _ h cenv env
                                 (nnrc_ext_to_nnrc
                                    (nnrc_subst e1 v (NNRCConst dunit))));
         try reflexivity.
@@ -221,20 +224,20 @@ Section NNRCShadow.
         * SSCase "v0 = v"%string.
           subst.
           generalize (nnrc_core_eval_remove_duplicate_env
-                        (h:=h) nil v d nil dunit env (nnrc_ext_to_nnrc e2)).
+                        (h:=h) cenv nil v d nil dunit env (nnrc_ext_to_nnrc e2)).
           simpl; trivial.
         * SSCase "v0 <> v"%string.
-          generalize (nnrc_core_eval_swap_neq (h:=h) nil); simpl; intros eqq.
+          generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil); simpl; intros eqq.
           rewrite eqq; auto.
       + SCase "right"%string.
         match_destr; unfold Equivalence.equiv in * .
         * SSCase "v0 = v"%string.
           subst.
           generalize (nnrc_core_eval_remove_duplicate_env
-                        (h:=h) nil v d nil dunit env (nnrc_ext_to_nnrc e3)).
+                        (h:=h) cenv nil v d nil dunit env (nnrc_ext_to_nnrc e3)).
           simpl; trivial.
         * SSCase "v0 <> v"%string.
-          generalize (nnrc_core_eval_swap_neq (h:=h) nil); simpl; intros eqq.
+          generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil); simpl; intros eqq.
           rewrite eqq; auto.
     - Case "NNRCGroupBy"%string.
       intros env.
@@ -243,11 +246,11 @@ Section NNRCShadow.
       reflexivity.
   Qed.
 
-  Lemma nnrc_ext_eval_cons_subst {h:list (string*string)} e env v x v' :
+  Lemma nnrc_ext_eval_cons_subst {h:list (string*string)} {cenv} e env v x v' :
     ~ (In v' (nnrc_free_vars e)) ->
     ~ (In v' (nnrc_bound_vars e)) ->
-    @nnrc_ext_eval _ h ((v',x)::env) (nnrc_subst e v (NNRCVar v')) = 
-    @nnrc_ext_eval _ h ((v,x)::env) e.
+    @nnrc_ext_eval _ h cenv ((v',x)::env) (nnrc_subst e v (NNRCVar v')) = 
+    @nnrc_ext_eval _ h cenv ((v,x)::env) e.
   Proof.
     revert env v x v'.
     nnrc_cases (induction e) Case; simpl; unfold equiv_dec;
@@ -262,39 +265,40 @@ Section NNRCShadow.
       f_equal; intuition.
     - Case "NNRCLet"%string.
       rewrite nin_app_or in H. rewrite IHe1 by intuition.
-      case_eq (nnrc_core_eval h ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
+      case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_ext_to_nnrc e1));
+        trivial; intros d deq.
       destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
-      + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 d nil); 
+      + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 d nil); 
         simpl; intros rr1; rewrite rr1.
         destruct (string_eqdec v0 v'); unfold Equivalence.equiv in *; subst.
-        * generalize (@nnrc_ext_eval_remove_duplicate_env h nil v' d nil); 
+        * generalize (@nnrc_ext_eval_remove_duplicate_env h cenv nil v' d nil); 
           simpl; auto.
-        * generalize (@nnrc_ext_eval_remove_free_env h ((v0,d)::nil)); 
+        * generalize (@nnrc_ext_eval_remove_free_env h cenv ((v0,d)::nil)); 
           simpl; intros rr2; apply rr2. intuition.
           elim H3. apply remove_in_neq; auto.
       + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
-        generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl; intros rr2; 
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d); simpl; intros rr2; 
         repeat rewrite rr2 by trivial.
         apply IHe2.
         * intros nin; intuition. elim H2; apply remove_in_neq; auto.
         * intuition.
     - Case "NNRCFor"%string.
       rewrite nin_app_or in H. rewrite IHe1 by intuition.
-      case_eq (nnrc_core_eval h ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
+      case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
       destruct d; trivial.
       f_equal.
       apply rmap_ext; intros.
       destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
-      + generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v0 x0 nil); 
+      + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 x0 nil); 
         simpl; intros rr1; rewrite rr1.
         destruct (string_eqdec v0 v'); unfold Equivalence.equiv in *; subst.
-        * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v' x0 nil); 
+        * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v' x0 nil); 
           simpl; auto.
-        * generalize (@nnrc_ext_eval_remove_free_env h ((v0,x0)::nil)); 
+        * generalize (@nnrc_ext_eval_remove_free_env h cenv ((v0,x0)::nil)); 
           simpl; intros rr2; apply rr2. intuition.
           elim H4. apply remove_in_neq; auto.
       + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
-        generalize (@nnrc_core_eval_swap_neq _ h nil v x0); simpl; intros rr2; 
+        generalize (@nnrc_core_eval_swap_neq _ h cenv nil v x0); simpl; intros rr2; 
         repeat rewrite rr2 by trivial.
         apply IHe2.
         * intros nin; intuition. elim H3; apply remove_in_neq; auto.
@@ -313,21 +317,21 @@ Section NNRCShadow.
       repeat rewrite <- remove_in_neq in H by congruence.
       match_destr. destruct d; trivial.
       + match_destr; unfold Equivalence.equiv in *; subst.
-        * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
+        * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v1 d nil); simpl;
           intros re2; rewrite re2 by trivial.
-          generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
+          generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v1,d)::nil)); 
             simpl; intros re3. rewrite re3. intuition.
           rewrite <- nnrc_ext_to_nnrc_free_vars_same. intuition.
-        * generalize (@nnrc_core_eval_swap_neq _ h nil v d); simpl;
+        * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d); simpl;
           intros re1; repeat rewrite re1 by trivial.
           rewrite IHe2; intuition.
       +  match_destr; unfold Equivalence.equiv in *; subst.
-         * generalize (@nnrc_core_eval_remove_duplicate_env _ h nil v1 d nil); simpl;
+         * generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v1 d nil); simpl;
            intros re2; rewrite re2 by trivial.
-           generalize (@nnrc_core_eval_remove_free_env _ h ((v1,d)::nil)); 
+           generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v1,d)::nil)); 
              simpl; intros re3. rewrite re3. intuition.
           rewrite <- nnrc_ext_to_nnrc_free_vars_same. intuition.
-         * generalize (@nnrc_core_eval_swap_neq _ h nil v0 d); simpl;
+         * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v0 d); simpl;
            intros re1; repeat rewrite re1 by trivial.
            rewrite IHe3; intuition.
     - Case "NNRCGroupBy"%string.
@@ -335,16 +339,18 @@ Section NNRCShadow.
   Qed.
 
   (* This relation is finer then the Proper relation already shown *)
-  Lemma nnrc_ext_eval_equiv_free_in_env:
+  Lemma nnrc_ext_eval_equiv_free_in_env {cenv} :
     forall n,
     forall env1 env2,
       (forall x, In x (nnrc_free_vars n) -> lookup equiv_dec env1 x = lookup equiv_dec env2 x) ->
       forall h,
-        @nnrc_ext_eval _ h env1 n = @nnrc_ext_eval _ h env2 n.
+        @nnrc_ext_eval _ h cenv env1 n = @nnrc_ext_eval _ h cenv env2 n.
   Proof.
     intros n.
     nnrc_cases (induction n) Case; intros env1 env2 Henv_eq h;
     unfold nnrc_ext_eval in *; simpl.
+    - Case "NNRCGetConstant"%string.
+      reflexivity.
     - Case "NNRCVar"%string.
       simpl.
       apply Henv_eq.
@@ -384,7 +390,7 @@ Section NNRCShadow.
     - Case "NNRCLet"%string.
       simpl.
       rewrite (IHn1 env1 env2).
-      destruct (@nnrc_core_eval _ h env2 (nnrc_ext_to_nnrc n1)); try congruence.
+      destruct (@nnrc_core_eval _ h cenv env2 (nnrc_ext_to_nnrc n1)); try congruence.
       rewrite (IHn2 ((v, d) :: env1) ((v, d) :: env2)); try reflexivity.
       intros x.
       simpl.
@@ -407,11 +413,11 @@ Section NNRCShadow.
     - Case "NNRCFor"%string.
       simpl.
       rewrite (IHn1 env1 env2).
-      destruct (@nnrc_core_eval _ h env2 (nnrc_ext_to_nnrc n1)); try reflexivity.
+      destruct (@nnrc_core_eval _ h cenv env2 (nnrc_ext_to_nnrc n1)); try reflexivity.
       destruct d; try reflexivity.
       unfold lift.
-      assert (rmap (fun d1 : data => @nnrc_core_eval _ h ((v, d1) :: env1) (nnrc_ext_to_nnrc n2)) l
-              = rmap (fun d1 : data => @nnrc_core_eval _ h ((v, d1) :: env2) (nnrc_ext_to_nnrc n2)) l) as Hfun_eq;
+      assert (rmap (fun d1 : data => @nnrc_core_eval _ h cenv ((v, d1) :: env1) (nnrc_ext_to_nnrc n2)) l
+              = rmap (fun d1 : data => @nnrc_core_eval _ h cenv ((v, d1) :: env2) (nnrc_ext_to_nnrc n2)) l) as Hfun_eq;
         try solve [rewrite Hfun_eq; reflexivity].
       apply rmap_ext; intros d ind.
       rewrite (IHn2 ((v, d) :: env1) ((v, d) :: env2)); try reflexivity.
@@ -437,7 +443,7 @@ Section NNRCShadow.
       simpl.
       unfold olift.
       rewrite (IHn1 env1 env2).
-      destruct (@nnrc_core_eval _ h env2 (nnrc_ext_to_nnrc n1)); try reflexivity.
+      destruct (@nnrc_core_eval _ h cenv env2 (nnrc_ext_to_nnrc n1)); try reflexivity.
       destruct d; try reflexivity.
       destruct b.
       + rewrite (IHn2 env1 env2).
@@ -472,7 +478,7 @@ Section NNRCShadow.
     - Case "NNRCEither"%string.
       simpl.
       rewrite (IHn1 env1 env2).
-      destruct (@nnrc_core_eval _ h env2 (nnrc_ext_to_nnrc n1)); try reflexivity.
+      destruct (@nnrc_core_eval _ h cenv env2 (nnrc_ext_to_nnrc n1)); try reflexivity.
       destruct (d); try reflexivity.
       + rewrite (IHn2 ((v, d0) :: env1) ((v, d0) :: env2)); try reflexivity.
         simpl.
@@ -519,23 +525,23 @@ Section NNRCShadow.
         assumption.
   Qed.
 
-  Lemma nnrc_ext_eval_equiv_env:
+  Lemma nnrc_ext_eval_equiv_env {cenv} :
     forall n,
     forall env1 env2,
       (forall x, lookup equiv_dec env1 x = lookup equiv_dec env2 x) ->
       forall h,
-        @nnrc_ext_eval _ h env1 n = @nnrc_ext_eval _ h env2 n.
+        @nnrc_ext_eval _ h cenv env1 n = @nnrc_ext_eval _ h cenv env2 n.
   Proof.
     intros.
     apply nnrc_ext_eval_lookup_equiv_prop; trivial.
   Qed.
 
-  Lemma nnrc_no_free_vars_eval_equiv_env:
+  Lemma nnrc_no_free_vars_eval_equiv_env {cenv} :
     forall n,
     forall env1 env2,
       nnrc_free_vars n = nil ->
       forall h,
-        @nnrc_ext_eval _ h env1 n = @nnrc_ext_eval _ h env2 n.
+        @nnrc_ext_eval _ h cenv env1 n = @nnrc_ext_eval _ h cenv env2 n.
   Proof.
     intros.
     apply nnrc_ext_eval_equiv_free_in_env; intros.
@@ -543,9 +549,9 @@ Section NNRCShadow.
     contradiction.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var_uncons h env n v d:
+  Lemma nnrc_ext_eval_single_context_var_uncons h cenv env n v d:
     lookup equiv_dec env v = Some d ->
-    @nnrc_ext_eval _ h env n = @nnrc_ext_eval _ h ((v, d) :: env) n.
+    @nnrc_ext_eval _ h cenv env n = @nnrc_ext_eval _ h cenv ((v, d) :: env) n.
   Proof.
     intros.
     apply nnrc_ext_eval_equiv_env.
@@ -564,13 +570,13 @@ Section NNRCShadow.
       congruence.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var h env n v d:
+  Lemma nnrc_ext_eval_single_context_var h cenv env n v d:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
     lookup equiv_dec env v = Some d ->
-    @nnrc_ext_eval _ h ((v, d) :: nil) n = @nnrc_ext_eval _ h env n.
+    @nnrc_ext_eval _ h cenv ((v, d) :: nil) n = @nnrc_ext_eval _ h cenv env n.
   Proof.
     intros.
-    rewrite (nnrc_ext_eval_single_context_var_uncons h env n v d); try assumption.
+    rewrite (nnrc_ext_eval_single_context_var_uncons h cenv env n v d); try assumption.
     clear H0.
     induction env; try reflexivity.
     destruct a.
@@ -591,9 +597,9 @@ Section NNRCShadow.
       exact H'.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var_cons h env n v d:
+  Lemma nnrc_ext_eval_single_context_var_cons h cenv env n v d:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
-    @nnrc_ext_eval _ h ((v, d) :: nil) n = @nnrc_ext_eval _ h ((v,d)::env) n.
+    @nnrc_ext_eval _ h cenv ((v, d) :: nil) n = @nnrc_ext_eval _ h cenv ((v,d)::env) n.
   Proof.
     intros.
     apply nnrc_ext_eval_single_context_var; try assumption.
@@ -602,22 +608,22 @@ Section NNRCShadow.
     congruence.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var_cons_keepone h env n v d v1 d1:
+  Lemma nnrc_ext_eval_single_context_var_cons_keepone h cenv env n v d v1 d1:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
-    @nnrc_ext_eval _ h ((v, d) :: (v1, d1) :: nil) n =
-    @nnrc_ext_eval _ h ((v,d) :: (v1,d1) :: env) n.
+    @nnrc_ext_eval _ h cenv ((v, d) :: (v1, d1) :: nil) n =
+    @nnrc_ext_eval _ h cenv ((v,d) :: (v1,d1) :: env) n.
   Proof.
     intros.
-    rewrite <- (nnrc_ext_eval_single_context_var h ((v,d) :: (v1,d1) :: nil) n v d); try assumption.
-    - rewrite <- (nnrc_ext_eval_single_context_var h ((v,d) :: (v1,d1) :: env) n v d); try assumption; trivial.
+    rewrite <- (nnrc_ext_eval_single_context_var h cenv ((v,d) :: (v1,d1) :: nil) n v d); try assumption.
+    - rewrite <- (nnrc_ext_eval_single_context_var h cenv ((v,d) :: (v1,d1) :: env) n v d); try assumption; trivial.
       simpl; match_destr; congruence.
     - simpl; match_destr; congruence.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var_two_cons h env n v1 d1 v2 d2 :
+  Lemma nnrc_ext_eval_single_context_var_two_cons h cenv env n v1 d1 v2 d2 :
     (forall x, In x (nnrc_free_vars n) -> x = v1 \/ x = v2) ->
-    @nnrc_ext_eval _ h ((v1,d1) :: (v2,d2) :: nil) n =
-    @nnrc_ext_eval _ h ((v1,d1) :: (v2,d2) :: env) n.
+    @nnrc_ext_eval _ h cenv ((v1,d1) :: (v2,d2) :: nil) n =
+    @nnrc_ext_eval _ h cenv ((v1,d1) :: (v2,d2) :: env) n.
   Proof.
     intros.
     induction env; try reflexivity.
@@ -636,47 +642,47 @@ Section NNRCShadow.
     elim H; intros; congruence.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var_cons_rmap h env n v l:
+  Lemma nnrc_ext_eval_single_context_var_cons_rmap h cenv env n v l:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
-    rmap (fun d => @nnrc_ext_eval _ h ((v, d) :: nil) n) l =
-    rmap (fun d => @nnrc_ext_eval _ h ((v,d)::env) n) l.
+    rmap (fun d => @nnrc_ext_eval _ h cenv ((v, d) :: nil) n) l =
+    rmap (fun d => @nnrc_ext_eval _ h cenv ((v,d)::env) n) l.
   Proof.
     intros.
     induction l; simpl; try reflexivity.
-    rewrite (nnrc_ext_eval_single_context_var_cons h env n v a); try assumption.
-    destruct (@nnrc_ext_eval _ h ((v, a) :: env) n); try reflexivity.
+    rewrite (nnrc_ext_eval_single_context_var_cons h cenv env n v a); try assumption.
+    destruct (@nnrc_ext_eval _ h cenv ((v, a) :: env) n); try reflexivity.
     rewrite IHl.
     reflexivity.
   Qed.
 
-  Lemma nnrc_ext_eval_single_context_var_cons_keepone_rmap h env n v v1 d1 l:
+  Lemma nnrc_ext_eval_single_context_var_cons_keepone_rmap h cenv env n v v1 d1 l:
     (forall x, In x (nnrc_free_vars n) -> x = v) ->
-    rmap (fun d => @nnrc_ext_eval _ h ((v, d) :: (v1,d1) :: nil) n) l =
-    rmap (fun d => @nnrc_ext_eval _ h ((v,d) :: (v1,d1) :: env) n) l.
+    rmap (fun d => @nnrc_ext_eval _ h cenv ((v, d) :: (v1,d1) :: nil) n) l =
+    rmap (fun d => @nnrc_ext_eval _ h cenv ((v,d) :: (v1,d1) :: env) n) l.
   Proof.
     intros.
     induction l; simpl; try reflexivity.
-    rewrite (nnrc_ext_eval_single_context_var_cons_keepone h env n v a v1 d1); try assumption.
-    destruct (@nnrc_ext_eval _ h ((v, a) :: (v1,d1) :: env) n); try reflexivity.
+    rewrite (nnrc_ext_eval_single_context_var_cons_keepone h cenv env n v a v1 d1); try assumption.
+    destruct (@nnrc_ext_eval _ h cenv ((v, a) :: (v1,d1) :: env) n); try reflexivity.
     rewrite IHl.
     reflexivity.
   Qed.
 
-  Lemma rmap_skip_free_var h v1 v2 d2 n l:
+  Lemma rmap_skip_free_var h cenv v1 v2 d2 n l:
     ~ In v2 (nnrc_free_vars n) ->
-    (rmap (fun d : data => @nnrc_ext_eval _ h ((v1, d) :: (v2, d2) :: nil) n) l) =
-    (rmap (fun d : data => @nnrc_ext_eval _ h ((v1, d) :: nil) n) l).
+    (rmap (fun d : data => @nnrc_ext_eval _ h cenv ((v1, d) :: (v2, d2) :: nil) n) l) =
+    (rmap (fun d : data => @nnrc_ext_eval _ h cenv ((v1, d) :: nil) n) l).
   Proof.
     intros; induction l; try reflexivity; simpl.
     rewrite nnrc_ext_eval_remove_free_env_weak.
-    destruct (@nnrc_ext_eval _ h ((v1, a) :: nil) n); try reflexivity; rewrite IHl; reflexivity.
+    destruct (@nnrc_ext_eval _ h cenv ((v1, a) :: nil) n); try reflexivity; rewrite IHl; reflexivity.
     auto.
   Qed.
 
-  Lemma nnrc_ext_eval_cons_subst_disjoint {h: list (string*string)} e e' env v d :
+  Lemma nnrc_ext_eval_cons_subst_disjoint {h: list (string*string)} {cenv} e e' env v d :
     disjoint (nnrc_bound_vars e) (nnrc_free_vars e') ->
-         @nnrc_ext_eval _ h env e' = Some d ->
-         @nnrc_ext_eval _ h ((v,d)::env) e = @nnrc_ext_eval _ h env (nnrc_subst e v e').
+         @nnrc_ext_eval _ h cenv env e' = Some d ->
+         @nnrc_ext_eval _ h cenv ((v,d)::env) e = @nnrc_ext_eval _ h cenv env (nnrc_subst e v e').
   Proof.
     intros disj eval1.
     revert env e' v d disj eval1.
@@ -706,12 +712,12 @@ Section NNRCShadow.
       match_destr.
       + red in e; subst.
         unfold var in *.
-        generalize (nnrc_core_eval_remove_duplicate_env (h:=h) nil v' d0 nil d env (nnrc_ext_to_nnrc e2));
+        generalize (nnrc_core_eval_remove_duplicate_env (h:=h) cenv nil v' d0 nil d env (nnrc_ext_to_nnrc e2));
           simpl; intros re1; rewrite re1; trivial.
       + erewrite <- IHe2; try reflexivity; eauto 2.
-        * generalize (nnrc_core_eval_swap_neq (h:=h) nil v d0 v' d); simpl;
+        * generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil v d0 v' d); simpl;
           intros re1; rewrite re1; eauto.
-        * generalize (nnrc_core_eval_remove_free_env (h:=h) nil v d0 env);
+        * generalize (nnrc_core_eval_remove_free_env (h:=h) cenv nil v d0 env);
           simpl; intros re1; rewrite re1; eauto.
           rewrite <- nnrc_ext_to_nnrc_free_vars_same; auto.
     - Case "NNRCFor"%string.
@@ -727,14 +733,14 @@ Section NNRCShadow.
         unfold var in *.
         f_equal.
         apply rmap_ext; intros.
-        generalize (nnrc_core_eval_remove_duplicate_env (h:=h) nil v' x nil d env (nnrc_ext_to_nnrc e2));
+        generalize (nnrc_core_eval_remove_duplicate_env (h:=h) cenv nil v' x nil d env (nnrc_ext_to_nnrc e2));
           simpl; congruence.
       + f_equal.
         apply rmap_ext; intros.
-        generalize (nnrc_core_eval_swap_neq (h:=h) nil v x v' d); simpl;
+        generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil v x v' d); simpl;
           intros re1; rewrite re1; eauto 2.
         erewrite IHe2; try reflexivity; eauto 2.
-        generalize (nnrc_core_eval_remove_free_env (h:=h) nil v x env);
+        generalize (nnrc_core_eval_remove_free_env (h:=h) cenv nil v x env);
             simpl; intros re2; rewrite re2; eauto.
         rewrite <- nnrc_ext_to_nnrc_free_vars_same; auto.
     - Case "NNRCIf"%string.
@@ -743,7 +749,7 @@ Section NNRCShadow.
       apply disjoint_app_l in disj2.
       destruct disj2 as [disj2 disj3].
       erewrite IHe1; eauto 2.
-      destruct (nnrc_core_eval h env (nnrc_ext_to_nnrc (nnrc_subst e1 v' e'))); try reflexivity;
+      destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc (nnrc_subst e1 v' e'))); try reflexivity;
       simpl.
       match_destr.
       match_destr.
@@ -759,19 +765,19 @@ Section NNRCShadow.
       apply disjoint_app_l in disj2.
       destruct disj2 as [disj2 disj3].
       erewrite IHe1; eauto 2.
-      destruct (nnrc_core_eval h env (nnrc_ext_to_nnrc (nnrc_subst e1 v' e'))); try reflexivity;
+      destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc (nnrc_subst e1 v' e'))); try reflexivity;
       simpl.
       match_destr.
       + {
           match_destr.
           + red in e; subst.
             unfold var in *.
-            generalize (nnrc_core_eval_remove_duplicate_env (h:=h) nil v' d0 nil d env (nnrc_ext_to_nnrc e2));
+            generalize (nnrc_core_eval_remove_duplicate_env (h:=h) cenv nil v' d0 nil d env (nnrc_ext_to_nnrc e2));
               simpl; intros re1; rewrite re1; trivial.
-          + generalize (nnrc_core_eval_swap_neq (h:=h) nil v d0 v' d); simpl;
+          + generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil v d0 v' d); simpl;
                 intros re1; rewrite re1; eauto 2.
             erewrite IHe2; try reflexivity; eauto 2.
-            generalize (nnrc_core_eval_remove_free_env (h:=h) nil v d0 env);
+            generalize (nnrc_core_eval_remove_free_env (h:=h) cenv nil v d0 env);
                 simpl; intros re2; rewrite re2; trivial.
             rewrite <- nnrc_ext_to_nnrc_free_vars_same; auto.
         } 
@@ -779,11 +785,11 @@ Section NNRCShadow.
           match_destr.
           + red in e; subst.
             unfold var in *.
-            generalize (nnrc_core_eval_remove_duplicate_env (h:=h) nil v' d0 nil d env (nnrc_ext_to_nnrc e3)); simpl; intros re1; rewrite re1; trivial.
-          + generalize (nnrc_core_eval_swap_neq (h:=h) nil v0 d0 v' d); simpl;
+            generalize (nnrc_core_eval_remove_duplicate_env (h:=h) cenv nil v' d0 nil d env (nnrc_ext_to_nnrc e3)); simpl; intros re1; rewrite re1; trivial.
+          + generalize (nnrc_core_eval_swap_neq (h:=h) cenv nil v0 d0 v' d); simpl;
                 intros re1; rewrite re1; eauto 2.
             erewrite IHe3; try reflexivity; eauto 2.
-            generalize (nnrc_core_eval_remove_free_env (h:=h) nil v0 d0 env);
+            generalize (nnrc_core_eval_remove_free_env (h:=h) cenv nil v0 d0 env);
                 simpl; intros re2; rewrite re2; trivial.
             rewrite <- nnrc_ext_to_nnrc_free_vars_same; auto.
         }
@@ -809,10 +815,10 @@ Section NNRCShadow.
       + repeat rewrite in_app_iff in n; intuition.
   Qed.
 
-  Lemma nnrc_ext_eval_cons_rename_pick h sep renamer avoid v e d env:
-    @nnrc_ext_eval _ h ((nnrc_pick_name sep renamer avoid v e, d) :: env)
+  Lemma nnrc_ext_eval_cons_rename_pick h cenv sep renamer avoid v e d env:
+    @nnrc_ext_eval _ h cenv ((nnrc_pick_name sep renamer avoid v e, d) :: env)
              (nnrc_rename_lazy e v (nnrc_pick_name sep renamer avoid v e)) = 
-    @nnrc_ext_eval _ h ((v, d) :: env) e.
+    @nnrc_ext_eval _ h cenv ((v, d) :: env) e.
   Proof.
     unfold nnrc_rename_lazy.
     match_destr.
@@ -823,8 +829,8 @@ Section NNRCShadow.
       + apply nnrc_pick_name_bound.
   Qed.
 
-  Theorem unshadow_ext_eval {h:list (string*string)} sep renamer avoid e env :
-    @nnrc_ext_eval _ h env (unshadow sep renamer avoid e) = @nnrc_ext_eval _ h env e.
+  Theorem unshadow_ext_eval {h:list (string*string)} {cenv} sep renamer avoid e env :
+    @nnrc_ext_eval _ h cenv env (unshadow sep renamer avoid e) = @nnrc_ext_eval _ h cenv env e.
   Proof.
     revert env.
     generalize nnrc_ext_eval_cons_rename_pick; intros Hpick.
@@ -893,6 +899,6 @@ End NNRCShadow.
 
 (* 
 *** Local Variables: ***
-*** coq-load-path: (("../../../coq" "QCert")) ***
+*** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)

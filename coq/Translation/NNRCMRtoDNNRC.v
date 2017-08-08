@@ -48,7 +48,7 @@ Section NNRCMRtoDNNRC.
     let (x, e1) := f in
     DNNRCLet annot
             x e2
-            (nnrc_to_dnnrc annot ((x, Vlocal)::nil) e1).
+            (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) e1).
 
   (* Generates the DNNRC code corresponding to "(fun (x1, ..., xn) => e) (e1, ..., en)" that is:
        let x1 = e1 in
@@ -74,7 +74,7 @@ Section NNRCMRtoDNNRC.
               DNNRCLet annot
                       x (DNNRCVar annot y)
                       k)
-           (nnrc_to_dnnrc annot form_loc e)
+           (nnrc_to_dnnrc annot form_loc nil e)
            l)
     | None => None
     end.
@@ -83,27 +83,27 @@ Section NNRCMRtoDNNRC.
   Definition dnnrc_distr_of_mr_map (annot:A) (input: var) (mr_map: map_fun) : (@dnnrc _ A plug_type) :=
     match mr_map with
     | MapDist (x, n) =>
-      DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot ((x, Vlocal)::nil) n)
+      DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) n)
     | MapDistFlatten (x, n) =>
       let res_map :=
-          DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot ((x, Vlocal)::nil) n)
+          DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) n)
       in
       DNNRCUnop annot AFlatten res_map
     | MapScalar (x, n) =>
       let distr_input := DNNRCDispatch annot (DNNRCVar annot input) in
-      DNNRCFor annot x distr_input (nnrc_to_dnnrc annot ((x, Vlocal)::nil) n)
+      DNNRCFor annot x distr_input (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) n)
     end.
 
   Definition dnnrc_local_of_mr_map (annot:A) (input: var) (mr_map: map_fun) : (@dnnrc _ A plug_type) :=
     match mr_map with
     | MapDist (x, n) =>
-      let res_map := DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot ((x, Vlocal)::nil) n) in
+      let res_map := DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) n) in
       DNNRCCollect annot res_map
     | MapDistFlatten (x, n) =>
-      let res_map := DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot ((x, Vlocal)::nil) n) in
+      let res_map := DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) n) in
       DNNRCCollect annot (DNNRCUnop annot AFlatten res_map)
     | MapScalar (x, n) =>
-      DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot ((x, Vlocal)::nil) n)
+      DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc annot nil ((x, Vlocal)::nil) n)
     end.
 
   Definition dnnrc_of_mr (annot:A) (m:mr) : option (@dnnrc _ A plug_type) :=
@@ -142,9 +142,11 @@ Section NNRCMRtoDNNRC.
     end.
 
   Definition dnnrc_of_nnrcmr (annot: A) (l: nnrcmr) : option (@dnnrc _ A plug_type) :=
+    let constants := map fst (mr_inputs_loc l) in
     let (last_fun, last_args) :=  mr_last l in
     let k := gen_apply_fun_n annot last_fun last_args in
-    olift (dnnrc_of_mr_chain annot nil (mr_chain l)) k.
+    lift (dnnrc_subst_var_to_const constants)
+         (olift (dnnrc_of_mr_chain annot nil (mr_chain l)) k).
 
 End NNRCMRtoDNNRC.
 

@@ -14,35 +14,40 @@
  * limitations under the License.
  *)
 
-Section CAMPRuletoCAMP.
-
+Section cNNRCtoNNRC.
   Require Import String.
   Require Import List.
+  Require Import BasicRuntime.
+  Require Import cNNRC.
+  Require Import NNRC.
 
-  Require Import Utils BasicRuntime.
-  Require Import CAMPRuleRuntime.
-  Require Import CAMPRuntime.
-  
+  Context {fr:foreign_runtime}.
+
   Section Top.
-    Context {fr:foreign_runtime}.
-    (** Note: Translation from CAMP Rules to CAMP is really macro-expansion *)
-    Definition camp_rule_to_camp_top (q:camp_rule) : camp := camp_rule_to_camp q.
-
     Context (h:brand_relation_t).
 
-    Theorem camp_rule_to_camp_top_correct :
-      forall q:camp_rule, forall global_env:bindings,
-          camp_rule_eval_top h q global_env =
-          camp_eval_top h (camp_rule_to_camp_top q) global_env.
+    Definition nnrc_core_to_nnrc_top (q:nnrc_core) : nnrc :=
+      nnrc_core_to_nnrc q.
+
+    Theorem nnrc_core_to_nnrc_top_correct :
+      forall q:nnrc_core, forall global_env:bindings,
+          nnrc_core_eval_top h q global_env =
+          nnrc_eval_top h (nnrc_core_to_nnrc_top q) global_env.
     Proof.
       intros.
-      unfold camp_rule_eval_top.
-      unfold camp_eval_top.
+      unfold nnrc_eval_top.
+      unfold nnrc_core_eval_top.
+      unfold nnrc_core_to_nnrc_top.
+      unfold lift_nnrc_core.
+      unfold nnrc_ext_eval.
+      destruct q; simpl.
+      rewrite core_nnrc_to_nnrc_ext_id.
       reflexivity.
+      assumption.
     Qed.
   End Top.
     
-End CAMPRuletoCAMP.
+End cNNRCtoNNRC.
 
 (* 
 *** Local Variables: ***

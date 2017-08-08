@@ -15,33 +15,35 @@
  *)
 
 Section NNRCSize.
+  Require Import String.
   Require Import Omega.
-  Require Import BasicRuntime cNNRC.
+  Require Import EquivDec.
+  Require Import Decidable.
+  Require Import BasicRuntime.
+  Require Import cNNRC.
+  Require Import cNNRCShadow.
 
   Context {fruntime:foreign_runtime}.
 
   (* Java equivalent: NnnrcOptimizer.rew_size.nnrc_size *)
   Fixpoint nnrc_size (n:nnrc) : nat 
     := match n with
-         | NNRCVar v => 1
-         | NNRCConst d => 1
-         | NNRCBinop op n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
-         | NNRCUnop op n₁ => S (nnrc_size n₁)
-         | NNRCLet v n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
-         | NNRCFor v n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
-         | NNRCIf n₁ n₂ n₃ => S (nnrc_size n₁ + nnrc_size n₂ + nnrc_size n₃)
-         | NNRCEither nd vl nl vr nr => S (nnrc_size nd + nnrc_size nl + nnrc_size nr)
-         | NNRCGroupBy g sl n => S (nnrc_size n)
+       | NNRCGetConstant v => 1
+       | NNRCVar v => 1
+       | NNRCConst d => 1
+       | NNRCBinop op n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
+       | NNRCUnop op n₁ => S (nnrc_size n₁)
+       | NNRCLet v n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
+       | NNRCFor v n₁ n₂ => S (nnrc_size n₁ + nnrc_size n₂)
+       | NNRCIf n₁ n₂ n₃ => S (nnrc_size n₁ + nnrc_size n₂ + nnrc_size n₃)
+       | NNRCEither nd vl nl vr nr => S (nnrc_size nd + nnrc_size nl + nnrc_size nr)
+       | NNRCGroupBy g sl n => S (nnrc_size n)
        end.
 
   Lemma nnrc_size_nzero (n:nnrc) : nnrc_size n <> 0.
   Proof.
     induction n; simpl; omega.
   Qed.
-
-  Require Import cNNRCShadow.
-  Require Import EquivDec Decidable.
-  Require Import String.
 
   Lemma nnrc_rename_lazy_size n x1 x2:
     nnrc_size (nnrc_rename_lazy n x1 x2) = nnrc_size n.

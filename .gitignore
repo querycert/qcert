@@ -11,6 +11,4 @@ bin/qcertJS.js
 bin/*.jar
 bin/services/*.jar
 /.project
-/.README.md.html
-html
 .DS_Store

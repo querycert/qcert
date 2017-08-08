@@ -105,7 +105,7 @@ Section cNRAEnvtocNNRC.
         let nnrc1 := (nraenv_core_to_nnrc op1 t varenv) in
         (NNRCLet t nnrc2 nnrc1)
       (* [[ CENV v ]]_vid,venv = v *)
-      | ANGetConstant s => NNRCVar (append CONST_PREFIX s)
+      | ANGetConstant s => NNRCGetConstant s
       (* [[ ENV ]]_vid,venv = venv *)
       | ANEnv => NNRCVar varenv
       (* [[ op1 ◯ₑ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
@@ -124,35 +124,25 @@ Section cNRAEnvtocNNRC.
 
   (** Auxiliary lemmas used in the proof of correctness for the translation *)
 
-  Lemma map_sem_correct (h:list (string*string)) (op:nraenv_core) dcenv (denv:data) (l:list data) (env:bindings) (vid venv:var):
-    prefix CONST_PREFIX vid = false ->
-    prefix CONST_PREFIX venv = false ->
+  Lemma map_sem_correct (h:list (string*string)) (op:nraenv_core) cenv (denv:data) (l:list data) (env:bindings) (vid venv:var):
     vid <> venv ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants dcenv) x
-        = lookup equiv_dec (filterConstants env) x) ->
     lookup equiv_dec env venv = Some denv ->
-    (forall cenv (did denv : data) (env : bindings) (vid venv : var),
-    prefix CONST_PREFIX vid = false ->
-    prefix CONST_PREFIX venv = false ->
-    vid <> venv ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants cenv) x
-        = lookup equiv_dec (filterConstants env) x) ->
-      lookup equiv_dec env vid = Some did ->
-       lookup equiv_dec env venv = Some denv ->
-       nnrc_core_eval h env (nraenv_core_to_nnrc op vid venv) = (nraenv_core_eval h cenv op denv did)) ->
+    (forall (did denv : data) (env : bindings) (vid venv : var),
+        vid <> venv ->
+        lookup equiv_dec env vid = Some did ->
+        lookup equiv_dec env venv = Some denv ->
+        nnrc_core_eval h cenv env (nraenv_core_to_nnrc op vid venv) = (nraenv_core_eval h cenv op denv did)) ->
     rmap
       (fun x : data =>
-         nnrc_core_eval h ((vid, x) :: env) (nraenv_core_to_nnrc op vid venv)) l
+         nnrc_core_eval h cenv ((vid, x) :: env) (nraenv_core_to_nnrc op vid venv)) l
     =
-    rmap (nraenv_core_eval h dcenv op denv) l.
+    rmap (nraenv_core_eval h cenv op denv) l.
   Proof.
-    intros Hdiff1 Hdiff2 Hcenv Henv.
+    intros Hdiff1 Henv.
     intros; induction l.
     - reflexivity.
     - simpl in *.
-      rewrite (H0 dcenv a denv ((vid, a) :: env) vid venv);
+      rewrite (H a denv ((vid, a) :: env) vid venv);
         simpl; trivial; try solve [match_destr; congruence].
   Qed.
 
@@ -161,42 +151,37 @@ Section cNRAEnvtocNNRC.
   Local Open Scope nraenv_core_scope.
 
   Opaque append.
-  Theorem nraenv_sem_correct (h:list (string*string)) (op:nraenv_core) (env:bindings) (vid venv:var) dcenv (did denv:data) :
-    prefix CONST_PREFIX vid = false ->
-    prefix CONST_PREFIX venv = false ->
+  Theorem nraenv_core_sem_correct (h:list (string*string)) (cenv:bindings) (op:nraenv_core) (env:bindings) (vid venv:var) (did denv:data) :
     vid <> venv ->
-    (forall x,
-        assoc_lookupr equiv_dec (mkConstants dcenv) x
-        = lookup equiv_dec (filterConstants env) x) ->
     lookup equiv_dec env vid = Some did ->
     lookup equiv_dec env venv = Some denv ->
-    nnrc_core_eval h env (nraenv_core_to_nnrc op vid venv) = h ⊢ₑ op @ₑ did ⊣ dcenv;denv.
+    nnrc_core_eval h cenv env (nraenv_core_to_nnrc op vid venv) = h ⊢ₑ op @ₑ did ⊣ cenv;denv.
   Proof.
     Opaque fresh_var.
     Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
-    revert dcenv did denv env vid venv.
+    revert did denv env vid venv.
     nraenv_core_cases (induction op) Case; intros; simpl.
     - Case "ANID"%string.
       assumption.
     - Case "ANConst"%string.
       reflexivity.
     - Case "ANBinop"%string.
-      rewrite (IHop1 dcenv did denv env vid venv H H0 H1); trivial.
-      rewrite (IHop2 dcenv did denv env vid venv H H0 H1); trivial.
+      rewrite (IHop1 did denv env vid venv H); trivial.
+      rewrite (IHop2 did denv env vid venv H); trivial.
     - Case "ANUnop"%string.
-      rewrite (IHop dcenv did denv env vid venv H H0 H1); trivial.
+      rewrite (IHop did denv env vid venv H); trivial.
     - Case "ANMap"%string.
-      rewrite (IHop2 dcenv did denv env vid venv H H0 H1); trivial; clear IHop2.
-      destruct (h ⊢ₑ op2 @ₑ did ⊣ dcenv;denv); try reflexivity; simpl.
+      rewrite (IHop2 did denv env vid venv H); trivial; clear IHop2.
+      destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; simpl.
       destruct d; try reflexivity.
-      rewrite (map_sem_correct h op1 dcenv denv l); trivial.
+      rewrite (map_sem_correct h op1 cenv denv l); trivial.
       prove_fresh_nin.
     - Case "ANMapConcat"%string.
-      rewrite (IHop2 dcenv did denv env vid venv H H0 H1); trivial.
+      rewrite (IHop2 did denv env vid venv H); trivial.
       repeat (dest_eqdec; try congruence).
       prove_fresh_nin.
       simpl.
-      destruct (h ⊢ₑ op2 @ₑ did ⊣ dcenv;denv); try reflexivity; clear op2 IHop2; simpl;
+      destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; clear op2 IHop2; simpl;
         destruct d; try reflexivity;
         autorewrite with alg in *;
         apply lift_dcoll_inversion.
@@ -204,8 +189,8 @@ Section cNRAEnvtocNNRC.
       unfold rmap_concat in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
-      rewrite (IHop1 dcenv a denv ) at 1; clear IHop1; try assumption; simpl; auto 3.
-      + destruct (h ⊢ₑ op1 @ₑ a ⊣ dcenv;denv); try reflexivity; simpl.
+      rewrite (IHop1 a denv) at 1; clear IHop1; try assumption; simpl; auto 3.
+      + destruct (h ⊢ₑ op1 @ₑ a ⊣ cenv;denv); try reflexivity; simpl.
         destruct d; try reflexivity.
         unfold omap_concat, orecconcat, rec_concat_sort.
         simpl.
@@ -227,11 +212,11 @@ Section cNRAEnvtocNNRC.
       + match_destr; unfold Equivalence.equiv in *.
         elim (fresh_var_fresh2 _ _ _ _ e1).
     - Case "ANProduct"%string.
-      rewrite (IHop1 dcenv did denv env vid venv H H0 H1).
+      rewrite (IHop1 did denv env vid venv H).
       dest_eqdec; [elim (fresh_var_fresh1 _ _ _ e) | ].
       dest_eqdec; [ | congruence ].
       dest_eqdec; [ | congruence ].
-      destruct (h ⊢ₑ op1 @ₑ did ⊣ dcenv;denv); try reflexivity; clear op1 IHop1; simpl.
+      destruct (h ⊢ₑ op1 @ₑ did ⊣ cenv;denv); try reflexivity; clear op1 IHop1; simpl.
       destruct d; try reflexivity.
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
@@ -239,8 +224,8 @@ Section cNRAEnvtocNNRC.
       unfold rmap_concat in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
-      rewrite (IHop2 dcenv did denv _ vid venv) at 1; clear IHop2; trivial; try congruence.
-      + destruct (h ⊢ₑ op2 @ₑ did ⊣ dcenv;denv); try reflexivity; simpl;
+      rewrite (IHop2 did denv _ vid venv) at 1; clear IHop2; trivial; try congruence.
+      + destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; simpl;
         destruct d; try reflexivity;
         unfold omap_concat, orecconcat, rec_concat_sort;
         simpl.
@@ -264,10 +249,9 @@ Section cNRAEnvtocNNRC.
         elim (fresh_var_fresh2 _ _ _ _ e1).
       + trivial.
       + trivial.
-      + trivial.
     - Case "ANSelect"%string.
-      rewrite (IHop2 dcenv did denv env vid venv H H0 H1); trivial.
-      destruct (h ⊢ₑ op2 @ₑ did ⊣ dcenv;denv); try reflexivity; clear IHop2 op2; simpl.
+      rewrite (IHop2 did denv env vid venv H); trivial.
+      destruct (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); try reflexivity; clear IHop2 op2; simpl.
       destruct d; try reflexivity.
       autorewrite with alg.
       apply lift_dcoll_inversion.
@@ -275,8 +259,8 @@ Section cNRAEnvtocNNRC.
       dest_eqdec; [ | congruence ].
       rewrite <- IHl; clear IHl.
       simpl.
-      rewrite (IHop1 dcenv a denv ((_,a) :: env) _ venv) at 1; trivial.
-      + destruct (h ⊢ₑ op1 @ₑ a ⊣ dcenv;denv); try reflexivity; simpl.
+      rewrite (IHop1 a denv ((_,a) :: env) _ venv) at 1; trivial.
+      + destruct (h ⊢ₑ op1 @ₑ a ⊣ cenv;denv); try reflexivity; simpl.
         destruct d; simpl in *; try congruence.
         destruct b.
         * rewrite lift_cons_dcoll.
@@ -290,12 +274,12 @@ Section cNRAEnvtocNNRC.
       + simpl; match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e0).
     - Case "ANDefault"%string.
-      simpl. rewrite (IHop1 dcenv did denv env vid venv H H0 H1); trivial.
-      case_eq (h ⊢ₑ op1 @ₑ did ⊣ dcenv;denv); intros; try reflexivity; simpl.
+      simpl. rewrite (IHop1 did denv env vid venv H); trivial.
+      case_eq (h ⊢ₑ op1 @ₑ did ⊣ cenv;denv); intros; try reflexivity; simpl.
       dest_eqdec; [| congruence ].
       simpl.
       destruct (data_eq_dec d (dcoll nil)); subst; simpl.
-      + rewrite (IHop2 dcenv did denv ((_, dcoll nil) :: env)); simpl; trivial.
+      + rewrite (IHop2 did denv ((_, dcoll nil) :: env)); simpl; trivial.
         * match_destr.
           elim (fresh_var_fresh1 _ _ _ e0).
         * match_destr.
@@ -303,7 +287,7 @@ Section cNRAEnvtocNNRC.
       + destruct d; trivial.
         destruct l; congruence.
     - Case "ANEither"%string.
-      rewrite H3. match_destr.
+      rewrite H0. match_destr.
       + apply IHop1; trivial; simpl.
         * prove_fresh_nin.
         * match_destr; congruence.
@@ -315,12 +299,12 @@ Section cNRAEnvtocNNRC.
         * match_destr.
           elim (fresh_var_fresh3 _ _ _ _ _ e).
     - Case "ANEitherConcat"%string.
-      rewrite H3.
-      rewrite <- (IHop2 _ _ _ _ _ _ H H0 H1 H2 H3 H4).
+      rewrite H0.
+      rewrite <- (IHop2 _ _ _ _ _ H H0 H1).
       match_destr; [| repeat (match_destr; trivial)].
-      rewrite <- (IHop1 dcenv did denv ((fresh_var "tec$" (vid :: venv :: nil), d) :: env) vid venv); simpl; trivial.
+      rewrite <- (IHop1 did denv ((fresh_var "tec$" (vid :: venv :: nil), d) :: env) vid venv); simpl; trivial.
       + unfold var in *.
-        destruct (nnrc_core_eval h (_ :: env)); trivial.
+        destruct (nnrc_core_eval h cenv (_ :: env)); trivial.
         dest_eqdec; [| congruence].
         dest_eqdec; [elim (fresh_var_fresh1 _ _ _ (symmetry e0)) | ].
         dest_eqdec; [| congruence].
@@ -331,37 +315,33 @@ Section cNRAEnvtocNNRC.
       + match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e).
     - Case "ANApp"%string.
-      rewrite (IHop2 dcenv did denv env vid venv H H0 H1 H2 H3 H4).
-      case (h ⊢ₑ op2 @ₑ did ⊣ dcenv;denv); intros; try reflexivity; simpl.
-      rewrite (IHop1 dcenv d denv); trivial.
+      rewrite (IHop2 did denv env vid venv H H0 H1).
+      case (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); intros; try reflexivity; simpl.
+      rewrite (IHop1 d denv); trivial.
       + prove_fresh_nin.
       + simpl; match_destr.
         congruence.
       + simpl; match_destr.
         elim (fresh_var_fresh2 _ _ _ _ e).
     - Case "ANGetConstant"%string.
-      generalize (filterConstants_lookup_pre env s); simpl; intros eqq1.
-      rewrite <- eqq1.
-      rewrite <- H2.
-      rewrite mkConstants_assoc_lookupr.
       reflexivity.
     - Case "ANEnv"%string.
       assumption.
     - Case "ANAppEnv"%string.
-      rewrite (IHop2 dcenv did denv env vid venv H H0 H1); trivial.
-      case (h ⊢ₑ op2 @ₑ did ⊣ dcenv;denv); intros; trivial.
-      rewrite (IHop1 dcenv did d); simpl; try reflexivity; trivial; simpl.
+      rewrite (IHop2 did denv env vid venv H); trivial.
+      case (h ⊢ₑ op2 @ₑ did ⊣ cenv;denv); intros; trivial.
+      rewrite (IHop1 did d); simpl; try reflexivity; trivial; simpl.
       + match_destr.
         elim (fresh_var_fresh1 _ _ _ e).
       + match_destr.
         congruence.
     - Case "ANMapEnv"%string.
       intros.
-      rewrite H4.
+      rewrite H1.
       destruct denv; try reflexivity; simpl.
       f_equal.
       apply rmap_ext; intros.
-      specialize (IHop dcenv did x ((fresh_var "tmape$" (vid :: venv :: nil), x) :: env) vid (fresh_var "tmape$" (vid :: venv :: nil))).
+      specialize (IHop did x ((fresh_var "tmape$" (vid :: venv :: nil), x) :: env) vid (fresh_var "tmape$" (vid :: venv :: nil))).
       rewrite <- IHop; trivial; simpl.
       + match_destr.
         elim (fresh_var_fresh1 _ _ _ e).
@@ -375,12 +355,7 @@ Section cNRAEnvtocNNRC.
     forall (vid venv: var),
     forall v,
       In v (nnrc_free_vars (nraenv_core_to_nnrc op vid venv)) ->
-      (prefix CONST_PREFIX v = true
-      (* It is also true that: *)
-      (* /\ In v (mkConstants (nraenv_constants op)) *)
-      (* but stating this requires defining nraenv_constants *)
-      )
-      \/ v = vid \/ v = venv.
+      v = vid \/ v = venv.
   Proof.
     nraenv_core_cases (induction op) Case.
     - Case "ANID"%string.
@@ -524,12 +499,7 @@ Section cNRAEnvtocNNRC.
     - Case "ANGetConstant"%string.
       intros vid venv v.
       simpl.
-      intros [?|?]; [|intuition].
-      subst.
-      left.
-      simpl.
-      rewrite prefix_nil.
-      reflexivity.
+      intros; contradiction.
     - Case "ANEnv"%string.
       intros vid venv v.
       simpl.
@@ -559,8 +529,12 @@ Section cNRAEnvtocNNRC.
   Section Top.
     Context (h:brand_relation_t).
 
+    (* Canned initial variable for the current value *)
+    Definition init_vid := "id"%string.
+    Definition init_venv := "env"%string.
+    
     (** One more top-level part of the translation *)
-    Definition nraenv_core_to_nnrc_top (init_vid init_venv:var) (q:nraenv_core) : nnrc :=
+    Definition nraenv_core_to_nnrc_top (q:nraenv_core) : nnrc :=
       NNRCLet init_venv (NNRCConst (drec nil))
               (NNRCLet init_vid (NNRCConst dunit)
                        (nraenv_core_to_nnrc q init_vid init_venv)).
@@ -584,8 +558,8 @@ Section cNRAEnvtocNNRC.
 
     Hint Resolve nraenv_core_to_nnrc_is_core.
 
-    Lemma nraenv_core_to_nnrc_top_is_core (vid venv:var) (q:nraenv_core) :
-      nnrcIsCore (nraenv_core_to_nnrc_top vid venv q).
+    Lemma nraenv_core_to_nnrc_top_is_core (q:nraenv_core) :
+      nnrcIsCore (nraenv_core_to_nnrc_top q).
     Proof.
       simpl.
       auto.
@@ -593,10 +567,29 @@ Section cNRAEnvtocNNRC.
 
     Hint Resolve nraenv_core_to_nnrc_top_is_core.
 
-    Program Definition nraenv_core_to_nnrc_core_top
-               (init_vid init_venv:var) (q:nraenv_core) : nnrc_core :=
-      exist _ (nraenv_core_to_nnrc_top init_vid init_venv q) _.
+    Program Definition nraenv_core_to_nnrc_core_top (q:nraenv_core) : nnrc_core :=
+      exist _ (nraenv_core_to_nnrc_top q) _.
     
+    Theorem nraenv_core_to_nnrc_core_top_correct (q:nraenv_core) (env:bindings) :
+      nnrc_core_eval_top h (nraenv_core_to_nnrc_core_top q) env = nraenv_core_eval_top h q env.
+    Proof.
+      intros.
+      unfold nnrc_core_eval_top.
+      unfold nraenv_core_eval_top.
+      unfold nraenv_core_to_nnrc_core_top.
+      unfold lift_nnrc_core.
+      simpl.
+      rewrite (nraenv_core_sem_correct h (rec_sort env) q
+                                       ((init_vid,dunit)::(init_venv,drec nil)::nil)
+                                       init_vid
+                                       init_venv
+                                       dunit
+                                       (drec nil)); try reflexivity.
+      unfold not; intros.
+      unfold init_vid, init_venv in *.
+      congruence.
+    Qed.
+
   End Top.
 
   (** Lemma and proof of linear size translation *)

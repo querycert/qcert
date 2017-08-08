@@ -14,21 +14,20 @@
  * limitations under the License.
  *)
 
-Require Import Arith.
-Require Import ZArith.
-Require Import String.
-Require Import List.
-Require Import EquivDec.
-Require Import Utils.
-Require Import BasicRuntime.
-Require Import NNRCRuntime.
-Require Import NNRCMRRuntime.
-Require Import ForeignToReduceOps.
-Require Import NNRCRuntime .
-
-Local Open Scope list_scope.
-
 Section NNRCtoNNRCMR.
+  Require Import Arith.
+  Require Import ZArith.
+  Require Import String.
+  Require Import List.
+  Require Import EquivDec.
+  Require Import Utils.
+  Require Import BasicRuntime.
+  Require Import NNRCRuntime.
+  Require Import NNRCMRRuntime.
+  Require Import ForeignToReduceOps.
+  Require Import NNRCRuntime .
+
+  Local Open Scope list_scope.
 
   Context {fruntime:foreign_runtime}.
   Context {fredop:foreign_reduce_op}.
@@ -58,31 +57,6 @@ Section NNRCtoNNRCMR.
       This function also add to the map-reduce environment and entry
       [init] that contains the unit value.
    *)
-  Definition load_init_env' (initunit: var) (vars_loc: list (var * dlocalization)) (env: bindings) : option nrcmr_env :=
-    let mr_env :=
-        List.fold_left
-          (fun acc (x_loc: var * dlocalization) =>
-             let (x, loc) := x_loc in
-             match lookup equiv_dec env x with
-             | Some d =>
-               match loc with
-               | Vlocal => lift (fun env' => (x, Dlocal d) :: env') acc
-               | Vdistr =>
-                 match d with
-                 | dcoll coll => lift (fun env' => (x, Ddistr coll) :: env') acc
-                 | _ => None
-                 end
-               end
-             | None => None
-             end)
-          vars_loc
-          (Some nil)
-    in
-    match mr_env with
-    | Some env => Some ((initunit, Dlocal dunit) :: env)
-    | None => None
-    end.
-
   Definition load_init_env (initunit: var) (vars_loc: list (var * dlocalization)) (env: list (string*data)) : option (list (string*ddata)) :=
     let add_initunit (initunit:var) (env:list (string*ddata)) :=
         (initunit, Dlocal dunit) :: env
@@ -178,6 +152,7 @@ Section NNRCtoNNRCMR.
       ((output::nil, (NNRCVar output)), (output, Vlocal)::nil).
 
   Lemma nnrcmr_of_nnrc_with_no_free_var_wf (n: nnrc) (free_vars_loc: vdbindings) (initunit: var) (output: var):
+    nnrc_global_vars n = nil ->
     nnrc_free_vars n = nil ->
     nnrcmr_well_formed (nnrcmr_of_nnrc_with_no_free_var n free_vars_loc initunit output).
   Proof.
@@ -191,19 +166,32 @@ Section NNRCtoNNRCMR.
     unfold mr_well_formed.
     split; try split; try (rewrite <- H; simpl); auto.
     unfold function_with_no_free_vars.
+    simpl in *.
+    elim H; intros.
+    inversion H0.
+    subst.
     simpl.
+    split; simpl; [assumption| ].
     intros x Hx.
-    rewrite Hfv in Hx.
+    rewrite mr in Hx.
+    contradiction.
+    contradiction.
+    simpl in *.
+    elim H; intros.
+    inversion H0; subst.
+    simpl.
+    auto.
     contradiction.
   Qed.
 
-  Lemma nnrcmr_of_nnrc_with_no_free_var_correct h mr_env n:
+  Lemma nnrcmr_of_nnrc_with_no_free_var_correct h mr_env q:
     forall free_vars_loc initunit output,
-    forall (Hfv: nnrc_free_vars n = nil),
+    forall (Hfv: nnrc_free_vars q = nil),
+    forall (Hfg: nnrc_global_vars q = nil),
     forall (Hinitunit: lookup equiv_dec mr_env initunit = Some (Dlocal dunit)),
     forall (Houtput: lookup equiv_dec mr_env output = None),
-      nnrc_core_eval h nil n =
-      nnrcmr_eval h mr_env (nnrcmr_of_nnrc_with_no_free_var n free_vars_loc initunit output).
+      nnrc_core_eval h nil nil q =
+      nnrcmr_eval h mr_env (nnrcmr_of_nnrc_with_no_free_var q free_vars_loc initunit output).
   Proof.
     intros.
     unfold nnrcmr_of_nnrc_with_no_free_var.
@@ -211,22 +199,22 @@ Section NNRCtoNNRCMR.
     unfold mr_chain_eval; simpl.
     rewrite Hinitunit.
     unfold mr_eval; simpl.
-    assert (nnrc_core_eval h
+    assert (nnrc_core_eval h nil
                    (@cons (prod var data)
                       (@pair var data
                          (String
                             (Ascii.Ascii false false false true true true
                                true false) EmptyString) dunit)
-                      (@nil (prod var data))) n =
-            nnrc_core_eval h (@nil (prod string data)) n) as Heq;
-    [ | rewrite Heq; clear Heq ].
-    - rewrite (nnrc_core_eval_equiv_free_in_env n (("x"%string, dunit) :: nil) nil);
+                      (@nil (prod var data))) q =
+            nnrc_core_eval h nil (@nil (prod string data)) q) as Heq;
+      [ | unfold empty_cenv ;rewrite Heq; clear Heq ].
+    - rewrite (nnrc_core_eval_equiv_free_in_env q (("x"%string, dunit) :: nil) nil);
         [ reflexivity | ].
       intros x Hx.
       simpl.
       rewrite Hfv in *.
       contradiction.
-    - destruct (nnrc_core_eval h nil n); simpl; try reflexivity.
+    - case_eq (nnrc_core_eval h nil nil q); intros; simpl in *; try reflexivity.
       rewrite Houtput; simpl.
       unfold mr_last_eval; simpl.
       case (equiv_dec output output);
@@ -308,7 +296,7 @@ Section NNRCtoNNRCMR.
     forall (Hmr_env: load_init_env_success initunit (x_loc::nil) nnrc_env mr_env),
     forall (Hfv: function_with_no_free_vars (fst x_loc, n)),
     forall (Houtput: lookup equiv_dec mr_env output = None),
-      nnrc_core_eval h nnrc_env n =
+      nnrc_core_eval h empty_cenv nnrc_env n =
       nnrcmr_eval h mr_env (nnrcmr_of_nnrc_with_one_free_var n x_loc free_vars_loc output).
   Proof.
     intros.
@@ -341,20 +329,18 @@ Section NNRCtoNNRCMR.
               @Some data x) as Heq;
         [ auto | rewrite Heq; clear Heq ].
       unfold mr_eval; simpl.
-      assert (nnrc_core_eval h ((v, x) :: nil) n =
-              nnrc_core_eval h nnrc_env n) as Heq;
+      assert (nnrc_core_eval h empty_cenv ((v, x) :: nil) n =
+              nnrc_core_eval h empty_cenv nnrc_env n) as Heq;
         [ | rewrite Heq; clear Heq ].
       * apply nnrc_core_eval_equiv_free_in_env; intros.
         simpl.
         dest_eqdec; try congruence.
-        specialize (Hfv v).
+        elim Hfv; clear Hfv; intros Hgv Hfv.
+        specialize (Hfv x0).
         simpl in *.
         specialize (Hfv H2).
-        auto.
-        specialize (Hfv x0).
-        specialize (Hfv H2).
-        simpl in *. congruence.
-      * destruct (nnrc_core_eval h nnrc_env n);
+        specialize (c Hfv). contradiction.
+      * destruct (nnrc_core_eval h empty_cenv nnrc_env n);
         simpl; try congruence.
         assert (@lookup var (@ddata (@foreign_runtime_data fruntime))
             (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec)
@@ -391,10 +377,11 @@ Section NNRCtoNNRCMR.
       unfold mr_eval; simpl.
       rewrite rmap_id.
       simpl.
-      assert (nnrc_core_eval h ((v, dcoll x) :: nil) n =
-              nnrc_core_eval h nnrc_env n) as Heq.
+      assert (nnrc_core_eval h empty_cenv ((v, dcoll x) :: nil) n =
+              nnrc_core_eval h empty_cenv nnrc_env n) as Heq.
       * apply nnrc_core_eval_equiv_free_in_env; intros.
         simpl.
+        elim Hfv; clear Hfv; intros Hgv Hfv.
         specialize (Hfv x0).
         simpl in *.
         specialize (Hfv H2).
@@ -402,7 +389,7 @@ Section NNRCtoNNRCMR.
         rewrite <- H0.
         reflexivity.
       * rewrite Heq.
-        destruct (nnrc_core_eval h nnrc_env n);
+        destruct (nnrc_core_eval h empty_cenv nnrc_env n);
           simpl; try congruence.
         assert (@lookup var (@ddata (@foreign_runtime_data fruntime))
             (@equiv_dec var (@eq var) (@eq_equivalence var) string_eqdec)
@@ -537,7 +524,7 @@ Section NNRCtoNNRCMR.
    *)
   (* Java equivalent: NnrcToNrcmr.mr_chain_of_nnrc_with_free_vars *)
   Definition mr_chain_of_nnrc_with_free_vars (n: nnrc) (vars_loc: list (var * dlocalization)) (output: var): list mr :=
-    let free_vars := bdistinct (nnrc_free_vars n) in
+    let free_vars := bdistinct (nnrc_free_vars n ++ nnrc_global_vars n) in
     match
       List.fold_right
         (fun x oacc =>
@@ -741,7 +728,7 @@ Section NNRCtoNNRCMR.
     (forall x, In x (domain nnrc_env) -> In x (domain vars_loc)) ->
     (forall x, In x (nnrc_free_vars n) -> exists d, lookup equiv_dec mr_env x = Some d) ->
     lookup equiv_dec mr_env output = None ->
-    nnrc_core_eval h nnrc_env n =
+    nnrc_core_eval h empty_cenv nnrc_env n =
     nnrcmr_eval h mr_env (nnrcmr_of_nnrc_with_free_vars n vars_loc output).
   Proof.
     (* intros Hfree_vars_of_n Havoid Hfv Houtput. *)
@@ -789,7 +776,7 @@ Section NNRCtoNNRCMR.
   (* Java equivalent: NnrcToNrcmr.mr_chain_of_nnrc *)
   Definition mr_chain_of_nnrc (n: nnrc) (initunit: var) (vars_loc: list (var * dlocalization)) (output: var): list mr * list (var * dlocalization) :=
     let mr_chain :=
-        match bdistinct (nnrc_free_vars n) with
+        match bdistinct (nnrc_free_vars n ++ nnrc_global_vars n) with
         | nil =>
           mr_chain_of_nnrc_with_no_free_var n initunit output
         | x :: nil =>
@@ -846,7 +833,7 @@ Section NNRCtoNNRCMR.
 
   (* Java equivalent: NnrcToNrcmr.try_mk_loop *)
   Definition try_mk_loop (x: var) (n1: nnrc) (n2: nnrc) (mr_list1: list mr) (initunit: var) (vars_loc: list (var * dlocalization)) : option (nnrc * list mr * list (var * dlocalization)) :=
-    match bdistinct (nnrc_free_vars n2) with
+    match bdistinct (nnrc_free_vars n2 ++ nnrc_global_vars n2) with
     | nil =>
       Some (mk_loop x n1 n2 mr_list1 initunit vars_loc)
     | x' :: nil =>
@@ -887,6 +874,8 @@ Section NNRCtoNNRCMR.
       | None =>
         (NNRCFor x n1' n2, mr_list1, vars_loc)
       end
+    | NNRCGetConstant x =>
+      (n, nil, vars_loc)
     | NNRCVar x =>
       (n, nil, vars_loc)
     | NNRCConst d =>
@@ -1053,7 +1042,7 @@ Section NNRCtoNNRCMR.
 
   Theorem nnrc_to_nnrcmr_no_chain_correct h env initunit mr_env (n:nnrc) (inputs_loc: list (var * dlocalization)) :
       load_init_env initunit inputs_loc env = Some mr_env ->
-      nnrc_core_eval h env n = nnrcmr_eval h mr_env (nnrc_to_nnrcmr_no_chain n inputs_loc).
+      nnrc_core_eval h empty_cenv env n = nnrcmr_eval h mr_env (nnrc_to_nnrcmr_no_chain n inputs_loc).
   Proof.
     intros.
     unfold nnrc_to_nnrcmr_no_chain; simpl.
@@ -1066,10 +1055,40 @@ Section NNRCtoNNRCMR.
   Admitted.
 
   Section Top.
+    Fixpoint nnrc_deconst (e:nnrc) : nnrc 
+      := match e with
+         | NNRCGetConstant y => NNRCVar y
+         | NNRCVar y => NNRCVar y
+         | NNRCConst d => NNRCConst d
+         | NNRCBinop bop e1 e2 => NNRCBinop bop
+                                            (nnrc_deconst e1) 
+                                            (nnrc_deconst e2)
+         | NNRCUnop uop e1 => NNRCUnop uop (nnrc_deconst e1)
+         | NNRCLet y e1 e2 => 
+           NNRCLet y 
+                   (nnrc_deconst e1) 
+                   (nnrc_deconst e2)
+         | NNRCFor y e1 e2 => 
+           NNRCFor y 
+                   (nnrc_deconst e1) 
+                   (nnrc_deconst e2)
+         | NNRCIf e1 e2 e3 =>  NNRCIf
+                                 (nnrc_deconst e1)
+                                 (nnrc_deconst e2)
+                                 (nnrc_deconst e3)
+         | NNRCEither ed xl el xr er =>
+           NNRCEither (nnrc_deconst ed)
+                      xl
+                      (nnrc_deconst el)
+                      xr
+                      (nnrc_deconst er)
+         | NNRCGroupBy g sl e1 => NNRCGroupBy g sl (nnrc_deconst e1)
+         end.
+    
     Definition nnrc_to_nnrcmr_top (vinit: var) (inputs_loc:vdbindings) (q:nnrc) : nnrcmr :=
-      let inputs_loc := (vinit, Vlocal) :: mkConstants (inputs_loc) in
+      let inputs_loc := (vinit, Vlocal) :: inputs_loc in
       (* XXX Expands GroupBy For now XXX *)
-      let q := nnrc_to_nnrc_core q in
+      let q := nnrc_to_nnrc_core (nnrc_deconst q) in
       lift_nnrc_core (nnrc_to_nnrcmr_chain vinit inputs_loc) q.
   End Top.
   

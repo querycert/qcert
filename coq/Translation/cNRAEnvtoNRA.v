@@ -18,8 +18,8 @@ Section cNRAEnvtoNRA.
   Require Import String.
   Require Import List.
   Require Import BasicRuntime.
-  Require Import NRARuntime.
   Require Import cNRAEnvRuntime.
+  Require Import NRARuntime.
 
   Context {fr:foreign_runtime}.
 

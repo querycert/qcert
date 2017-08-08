@@ -298,6 +298,7 @@ Section tDNNRCtoSparkDF.
   Fixpoint scala_of_dnnrc {A: Set} (d:@dnnrc _ (type_annotation A) dataframe) : string :=
     let code :=
         match d with
+        | DNNRCGetConstant t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
         | DNNRCVar t n => n (* "(" ++ n ++ ": " ++ drtype_to_scala (di_typeof d) ++ ")" *)
         | DNNRCConst t c =>
           match (lift_tlocal (di_required_typeof d)) with

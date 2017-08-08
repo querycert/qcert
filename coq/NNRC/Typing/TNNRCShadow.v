@@ -19,27 +19,29 @@ Section TNNRCShadow.
   Require Import List.
   Require Import Arith.
   Require Import Peano_dec.
-  Require Import EquivDec Decidable.
-
-  Require Import Utils BasicSystem.
-
-  Require Import cNNRC cNNRCShadow TcNNRC TNNRC.
+  Require Import EquivDec.
+  Require Import Decidable.
+  Require Import BasicSystem.
+  Require Import cNNRC.
+  Require Import cNNRCShadow.
+  Require Import TcNNRC.
+  Require Import TNNRC.
   
   Hint Constructors nnrc_type.
 
   Context {m:basic_model}.
 
-  Lemma nnrc_ext_type_remove_duplicate_env  l v x l' x' l'' e τ:
-    nnrc_ext_type (l ++ (v,x)::l' ++ (v,x')::l'') e τ <->
-    nnrc_ext_type (l ++ (v,x)::l' ++ l'') e τ.
+  Lemma nnrc_ext_type_remove_duplicate_env {τcenv} l v x l' x' l'' e τ:
+    nnrc_ext_type τcenv (l ++ (v,x)::l' ++ (v,x')::l'') e τ <->
+    nnrc_ext_type τcenv (l ++ (v,x)::l' ++ l'') e τ.
   Proof.
     apply nnrc_ext_type_lookup_equiv_prop; trivial.
     apply lookup_remove_duplicate.
   Qed.
 
- Lemma nnrc_ext_type_remove_free_env  l v x l' e τ :
-          ~ In v (nnrc_free_vars e) ->
-          (nnrc_ext_type (l ++ (v,x)::l') e τ <-> nnrc_ext_type (l ++ l') e τ).
+  Lemma nnrc_ext_type_remove_free_env {τcenv} l v x l' e τ :
+    ~ In v (nnrc_free_vars e) ->
+    (nnrc_ext_type τcenv (l ++ (v,x)::l') e τ <-> nnrc_ext_type τcenv (l ++ l') e τ).
   Proof.
     split; revert l v x l' τ H;
     induction e; unfold nnrc_ext_type in *; simpl; inversion 2; subst; intuition; eauto 3.
@@ -124,25 +126,27 @@ Section TNNRCShadow.
       eauto.
   Qed.
 
-  Lemma nnrc_ext_type_swap_neq  l1 v1 x1 v2 x2 l2 e τ :
+  Lemma nnrc_ext_type_swap_neq {τcenv} l1 v1 x1 v2 x2 l2 e τ :
     v1 <> v2 ->
-    (nnrc_ext_type (l1++(v1,x1)::(v2,x2)::l2) e τ <-> 
-     nnrc_ext_type (l1++(v2,x2)::(v1,x1)::l2) e τ).
+    (nnrc_ext_type τcenv (l1++(v1,x1)::(v2,x2)::l2) e τ <-> 
+     nnrc_ext_type τcenv (l1++(v2,x2)::(v1,x1)::l2) e τ).
   Proof.
     intros.
     apply nnrc_ext_type_lookup_equiv_prop; trivial.
     apply lookup_swap_neq; trivial.
   Qed.
 
-  Lemma nnrc_ext_type_cons_subst  e Γ v τ₀ v' τ :
+  Lemma nnrc_ext_type_cons_subst {τcenv} e Γ v τ₀ v' τ :
     ~ (In v' (nnrc_free_vars e)) ->
     ~ (In v' (nnrc_bound_vars e)) ->
-    (nnrc_ext_type ((v',τ₀)::Γ) (nnrc_subst e v (NNRCVar v')) τ <->
-     nnrc_ext_type ((v,τ₀)::Γ) e τ).
+    (nnrc_ext_type τcenv ((v',τ₀)::Γ) (nnrc_subst e v (NNRCVar v')) τ <->
+     nnrc_ext_type τcenv ((v,τ₀)::Γ) e τ).
   Proof.
     split; revert Γ v τ₀ v' τ H H0;
     induction e; unfold nnrc_ext_type in *; simpl in *; unfold equiv_dec, string_eqdec; 
       trivial; intros Γ v₀ τ₀ v' τ nfree nbound.
+    -  intuition.
+       constructor. destruct (string_dec v v₀); simpl; subst; intuition; inversion H; subst; simpl in *; repeat dest_eqdec; intuition.
     -  intuition.
        constructor. destruct (string_dec v v₀); simpl; subst; intuition; inversion H; subst; simpl in *; repeat dest_eqdec; intuition.
     - inversion 1; subst. eauto.
@@ -156,7 +160,7 @@ Section TNNRCShadow.
       match_destr_in H; subst.
       + econstructor; eauto.
          apply (nnrc_ext_type_remove_duplicate_env nil v₀ τ₁ nil); simpl.
-         generalize (nnrc_ext_type_remove_free_env ((v₀,τ₁)::nil)); simpl; intros HH.
+         generalize (@nnrc_ext_type_remove_free_env τcenv ((v₀,τ₁)::nil)); simpl; intros HH.
          apply HH in H6; eauto.
          intro; elim H1. apply remove_in_neq; eauto.
       + econstructor; eauto.
@@ -171,7 +175,7 @@ Section TNNRCShadow.
       match_destr_in H6; subst.
       + econstructor; eauto.
          apply (nnrc_ext_type_remove_duplicate_env nil v₀ τ₁ nil); simpl.
-         generalize (nnrc_ext_type_remove_free_env ((v₀,τ₁)::nil)); simpl; intros HH.
+         generalize (@nnrc_ext_type_remove_free_env τcenv ((v₀,τ₁)::nil)); simpl; intros HH.
          apply HH in H6; eauto.
          intro; elim H1. apply remove_in_neq; eauto.
       + econstructor; eauto.
@@ -193,18 +197,18 @@ Section TNNRCShadow.
       econstructor.
       + eapply IHe1; eauto 2; intuition.
       + match_destr_in H7; subst.
-        * generalize (nnrc_ext_type_remove_free_env ((v₀,τl)::nil)); simpl;
+        * generalize (@nnrc_ext_type_remove_free_env τcenv ((v₀,τl)::nil)); simpl;
           intros re1. unfold nnrc_ext_type in *; simpl in *; rewrite re1 in H7 by intuition.
-          generalize (nnrc_ext_type_remove_duplicate_env nil v₀ τl nil); simpl;
+          generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil v₀ τl nil); simpl;
           intros re2. unfold nnrc_ext_type in *; simpl in *; rewrite re2 by intuition.
           trivial.
         * apply (nnrc_ext_type_swap_neq nil); eauto 2; simpl.
           apply (nnrc_ext_type_swap_neq nil) in H7; eauto 2; simpl in *.
            eapply IHe2; eauto 2; intuition.
       + match_destr_in H8; subst.
-        * generalize (nnrc_ext_type_remove_free_env ((v₀,τr)::nil)); simpl;
+        * generalize (@nnrc_ext_type_remove_free_env τcenv ((v₀,τr)::nil)); simpl;
           intros re1. unfold nnrc_ext_type in *; simpl in *; rewrite re1 in H8 by intuition.
-          generalize (nnrc_ext_type_remove_duplicate_env nil v₀ τr nil); simpl;
+          generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil v₀ τr nil); simpl;
           intros re2. unfold nnrc_ext_type in *; simpl in *; rewrite re2 by intuition.
           trivial.
         * apply (nnrc_ext_type_swap_neq nil); eauto 2; simpl.
@@ -224,6 +228,11 @@ Section TNNRCShadow.
         inversion H; subst; simpl in *; repeat dest_eqdec; intuition;
         inversion H4; subst; constructor; simpl;
         repeat dest_eqdec; intuition.
+    - intuition.
+      destruct (string_dec v v₀); simpl; subst; intuition; 
+        inversion H; subst; simpl in *; repeat dest_eqdec; intuition;
+        inversion H4; subst; constructor; simpl;
+        repeat dest_eqdec; intuition.
     - inversion 1; subst. eauto.
     - inversion 1; subst.
       rewrite nin_app_or in nfree, nbound.
@@ -236,7 +245,7 @@ Section TNNRCShadow.
       + econstructor; eauto.
          apply (nnrc_ext_type_remove_duplicate_env nil v₀ τ₁ nil) in H6; 
           simpl in H6.
-         generalize (nnrc_ext_type_remove_free_env ((v₀,τ₁)::nil)); simpl; intros HH.
+         generalize (@nnrc_ext_type_remove_free_env τcenv ((v₀,τ₁)::nil)); simpl; intros HH.
          apply HH; eauto.
          intro; elim H1. apply remove_in_neq; eauto.
       + econstructor; eauto.
@@ -252,7 +261,7 @@ Section TNNRCShadow.
       + econstructor; eauto.
          apply (nnrc_ext_type_remove_duplicate_env nil v₀ τ₁ nil) in H6; 
           simpl in H6.
-         generalize (nnrc_ext_type_remove_free_env ((v₀,τ₁)::nil)); simpl; intros HH.
+         generalize (@nnrc_ext_type_remove_free_env τcenv ((v₀,τ₁)::nil)); simpl; intros HH.
          apply HH; eauto.
          intro; elim H1. apply remove_in_neq; eauto.
       + econstructor; eauto.
@@ -274,14 +283,14 @@ Section TNNRCShadow.
       econstructor.
       + apply IHe1; eauto 2; intuition.
       + match_destr; subst.
-        * generalize (nnrc_ext_type_remove_duplicate_env nil v₀ τl nil); simpl;
+        * generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil v₀ τl nil); simpl;
           intros re1. unfold nnrc_ext_type in *; simpl in *; rewrite re1 in H7.
           apply (nnrc_ext_type_remove_free_env ((v₀,τl)::nil)); intuition.
         * apply (nnrc_ext_type_swap_neq nil); eauto; simpl.
           apply IHe2; eauto 2; intuition.
           apply (nnrc_ext_type_swap_neq nil); eauto; simpl.
       + match_destr; subst.
-        * generalize (nnrc_ext_type_remove_duplicate_env nil v₀ τr nil); simpl;
+        * generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil v₀ τr nil); simpl;
           intros re1. unfold nnrc_ext_type in *; simpl in *; rewrite re1 in H8.
           apply (nnrc_ext_type_remove_free_env ((v₀,τr)::nil)); intuition.
         * apply (nnrc_ext_type_swap_neq nil); eauto; simpl.
@@ -303,11 +312,11 @@ Section TNNRCShadow.
       eauto.
   Qed.
 
-  Lemma nnrc_ext_type_cons_subst_disjoint  e e' Γ v τ₀ τ :
+  Lemma nnrc_ext_type_cons_subst_disjoint {τcenv} e e' Γ v τ₀ τ :
     disjoint (nnrc_bound_vars e) (nnrc_free_vars e') ->
-         nnrc_ext_type Γ e' τ₀ ->
-         nnrc_ext_type ((v,τ₀)::Γ) e τ ->
-         nnrc_ext_type Γ (nnrc_subst e v e') τ.
+         nnrc_ext_type τcenv Γ e' τ₀ ->
+         nnrc_ext_type τcenv ((v,τ₀)::Γ) e τ ->
+         nnrc_ext_type τcenv Γ (nnrc_subst e v e') τ.
   Proof.
     intros disj typ'.
     revert Γ e' v τ₀ τ disj typ'.
@@ -316,6 +325,8 @@ Section TNNRCShadow.
       trivial; intros Γ v₀ τ₀ v' τ nfree nbound; simpl;
         intros typ; inversion typ; clear typ; subst;
           unfold equiv_dec in *; simpl in *.
+    - Case "NNRCGetConstant"%string.
+      econstructor; trivial.
     - Case "NNRCVar"%string.
       match_destr.
       + congruence.
@@ -336,12 +347,12 @@ Section TNNRCShadow.
       econstructor; eauto 2.
       match_destr.
       + red in e; subst.
-        generalize (nnrc_ext_type_remove_duplicate_env nil τ₀ τ₁ nil v' Γ);
+        generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil τ₀ τ₁ nil v' Γ);
           simpl; intros re1; apply re1; eauto.
       + eapply IHe2; eauto 2.
-        * generalize (nnrc_ext_type_remove_free_env nil v τ₁ Γ v₀);
+        * generalize (@nnrc_ext_type_remove_free_env τcenv nil v τ₁ Γ v₀);
             simpl; intros re1; apply re1; eauto.
-        * generalize (nnrc_ext_type_swap_neq nil τ₀ v' v τ₁ Γ e2 τ);
+        * generalize (@nnrc_ext_type_swap_neq τcenv nil τ₀ v' v τ₁ Γ e2 τ);
             simpl; intros re1; apply re1; eauto.
     - Case "NNRCFor"%string.
       apply disjoint_cons_inv1 in nfree.
@@ -351,12 +362,12 @@ Section TNNRCShadow.
       econstructor; eauto 2.
       match_destr.
       + red in e; subst.
-        generalize (nnrc_ext_type_remove_duplicate_env nil τ₀ τ₁ nil v' Γ);
+        generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil τ₀ τ₁ nil v' Γ);
           simpl; intros re1; apply re1; eauto.
       + eapply IHe2; eauto 2.
-        * generalize (nnrc_ext_type_remove_free_env nil v τ₁ Γ v₀);
+        * generalize (@nnrc_ext_type_remove_free_env τcenv nil v τ₁ Γ v₀);
             simpl; intros re1; apply re1; eauto.
-        * generalize (nnrc_ext_type_swap_neq nil τ₀ v' v τ₁ Γ e2 τ₂);
+        * generalize (@nnrc_ext_type_swap_neq τcenv nil τ₀ v' v τ₁ Γ e2 τ₂);
             simpl; intros re1; apply re1; eauto.
     - Case "NNRCIf"%string.
       apply disjoint_app_l in nfree.
@@ -376,23 +387,23 @@ Section TNNRCShadow.
       + {
           match_destr.
           + red in e; subst.
-            generalize (nnrc_ext_type_remove_duplicate_env nil τ₀ τl nil v' Γ);
+            generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil τ₀ τl nil v' Γ);
               simpl; intros re1; apply re1; eauto.
           + eapply IHe2; eauto 2.
-            * generalize (nnrc_ext_type_remove_free_env nil v τl Γ v₀);
+            * generalize (@nnrc_ext_type_remove_free_env τcenv nil v τl Γ v₀);
                 simpl; intros re1; apply re1; eauto.
-            * generalize (nnrc_ext_type_swap_neq nil τ₀ v' v τl Γ e2 τ);
+            * generalize (@nnrc_ext_type_swap_neq τcenv nil τ₀ v' v τl Γ e2 τ);
                 simpl; intros re1; apply re1; eauto.
         }  
       + {
           match_destr.
           + red in e; subst.
-            generalize (nnrc_ext_type_remove_duplicate_env nil τ₀ τr nil v' Γ);
+            generalize (@nnrc_ext_type_remove_duplicate_env τcenv nil τ₀ τr nil v' Γ);
               simpl; intros re1; apply re1; eauto.
           + eapply IHe3; eauto 2.
-            * generalize (nnrc_ext_type_remove_free_env nil v0 τr Γ v₀);
+            * generalize (@nnrc_ext_type_remove_free_env τcenv nil v0 τr Γ v₀);
                 simpl; intros re1; apply re1; eauto.
-            * generalize (nnrc_ext_type_swap_neq nil τ₀ v' v0 τr Γ e3 τ);
+            * generalize (@nnrc_ext_type_swap_neq τcenv nil τ₀ v' v0 τr Γ e3 τ);
                 simpl; intros re1; apply re1; eauto.
         }
     - unfold NNRC.nnrc_group_by in *.
@@ -407,9 +418,9 @@ Section TNNRCShadow.
       eauto.
   Qed.
 
-  Lemma nnrc_ext_type_rename_pick_subst sep renamer avoid e Γ v τ₀ τ :
-         (nnrc_ext_type ((nnrc_pick_name sep renamer avoid v e,τ₀)::Γ) (nnrc_rename_lazy e v (nnrc_pick_name sep renamer avoid v e)) τ <->
-         nnrc_ext_type ((v,τ₀)::Γ) e τ).
+  Lemma nnrc_ext_type_rename_pick_subst {τcenv} sep renamer avoid e Γ v τ₀ τ :
+         (nnrc_ext_type τcenv ((nnrc_pick_name sep renamer avoid v e,τ₀)::Γ) (nnrc_rename_lazy e v (nnrc_pick_name sep renamer avoid v e)) τ <->
+         nnrc_ext_type τcenv ((v,τ₀)::Γ) e τ).
   Proof.
     unfold nnrc_rename_lazy.
     match_destr.
@@ -421,8 +432,8 @@ Section TNNRCShadow.
       + apply nnrc_pick_name_bound.
   Qed.
 
-  Theorem unshadow_ext_type sep renamer avoid Γ n τ :
-    nnrc_ext_type Γ n τ <-> nnrc_ext_type Γ (unshadow sep renamer avoid n) τ.
+  Theorem unshadow_ext_type {τcenv} sep renamer avoid Γ n τ :
+    nnrc_ext_type τcenv Γ n τ <-> nnrc_ext_type τcenv Γ (unshadow sep renamer avoid n) τ.
   Proof.
     unfold nnrc_ext_type.
     Hint Resolve really_fresh_from_free  really_fresh_from_bound.

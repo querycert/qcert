@@ -800,6 +800,7 @@ let pretty_nraenv greek margin annot a =
 
 let rec pretty_nnrc_aux p sym ff n =
   match n with
+  | Hack.NNRCGetConstant v -> fprintf ff "$%s"  (Util.string_of_char_list v)
   | Hack.NNRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
   | Hack.NNRCConst d -> fprintf ff "%a" pretty_data d
   | Hack.NNRCBinop (b,n1,n2) -> (pretty_binop p sym pretty_nnrc_aux) ff b n1 n2
@@ -956,6 +957,7 @@ let pretty_nnrcmr greek margin annot mr_chain =
 
 let rec pretty_dnnrc_aux ann plug p sym ff n =
   match n with
+  | Hack.DNNRCGetConstant (a, v) -> fprintf ff "%a$%s" ann a (Util.string_of_char_list v)
   | Hack.DNNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v)
   | Hack.DNNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
   | Hack.DNNRCBinop (a, b,n1,n2) ->

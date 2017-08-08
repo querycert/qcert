@@ -95,9 +95,15 @@ Section tDNNRCInfer.
     | Tdistr τ => f2 τ
     end.
 
+  Context (τconstants:tdbindings).
+      
   Fixpoint infer_dnnrc_type {A} (tenv:tdbindings) (n:@dnnrc _ A plug_type) :
     option (@dnnrc _ (type_annotation A) plug_type)
     := match n with
+       | DNNRCGetConstant a v =>
+         lift (fun τ => DNNRCGetConstant (ta_mk a τ) v)
+              (tdot τconstants v)
+              
        | DNNRCVar a v =>
          lift (fun τ => DNNRCVar (ta_mk a τ) v)
               (lookup equiv_dec tenv v)

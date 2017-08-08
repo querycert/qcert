@@ -14,29 +14,17 @@
  * limitations under the License.
  *)
 
-Section RConstants.
+Require Import String.
 
-  Require Import String.
-  Require Import List.
-  
-  Section World.
-    Require Import RData.
-    Require Import ForeignData.
+Section RVar.
+  (** Variables are defined as strings *)
+  Definition var := string.
 
-    Context {fdata:foreign_data}.
-
-    Definition WORLD:string := "WORLD"%string.
-    
-    (* Declares single input collection containing world *)
-    Definition mkWorld (world:list data) : list (string*data)
-      := (WORLD,(dcoll world))::nil.
-
-  End World.
-
-End RConstants.
+End RVar.
 
 (* 
 *** Local Variables: ***
 *** coq-load-path: (("../../../coq" "Qcert")) ***
 *** End: ***
 *)
+
