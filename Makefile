@@ -223,7 +223,9 @@ export MODULES = \
 	LambdaNRA/Lang/LambdaNRA \
 	LambdaNRA/Lang/LambdaNRASugar \
 	LambdaNRA/Lang/LambdaNRAEq \
+	LambdaNRA/Typing/TLambdaNRA \
 	LambdaNRA/LambdaNRARuntime \
+	LambdaNRA/LambdaNRATypes \
 	LambdaNRA/LambdaNRASystem \
 	SQL/Lang/SQL \
 	SQL/Lang/SQLSize \
@@ -281,6 +283,7 @@ export MODULES = \
 	Translation/TCAMPtocNRAEnv \
 	Translation/TCAMPtoNRAEnv \
 	Translation/LambdaNRAtoNRAEnv \
+	Translation/TLambdaNRAtoNRAEnv \
 	Translation/SQLtoNRAEnv \
 	Translation/SQLPPtoNRAEnv \
 	Translation/OQLtoNRAEnv \

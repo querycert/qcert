@@ -1368,8 +1368,7 @@ and sqlpp_order_by_to_sexp(order : (sqlpp_expr * sqlpp_order_spec)) : sexp =
 	| (expr , Descending) -> STerm("OrderBy", [sqlpp_expr_to_sexp (fst order) ; SString "DESC"])
 	end
 
-let sqlpp_to_sexp (stmts : QLang.sqlpp) : sexp =
-	STerm("statements", List.map sqlpp_expr_to_sexp stmts)
+let sqlpp_to_sexp (e : QLang.sqlpp) : sexp = sqlpp_expr_to_sexp e
 	
 let rec sexp_to_sqlpp_expr (stmt : sexp)  =
   begin match stmt with
@@ -1626,13 +1625,7 @@ and sexp_to_sqlpp_rename (se : sexp) =
 	| _ -> raise (Qcert_Error "Not well-formed S-expr in group-by clause (group-as portion)")
 	end
 			
-let sexp_to_sqlpp (se : sexp) : QLang.sqlpp =
-  begin match se with
-  | STerm ("statements",stmts) ->
-     map sexp_to_sqlpp_expr stmts
-  | _ ->
-     raise (Qcert_Error "Not well-formed S-expr in top SQL++ statements")
-  end
+let sexp_to_sqlpp (se : sexp) : QLang.sqlpp = sexp_to_sqlpp_expr se
 	
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =

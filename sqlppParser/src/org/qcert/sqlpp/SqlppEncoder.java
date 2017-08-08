@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.asterix.common.exceptions.CompilationException;
 import org.apache.asterix.lang.common.base.ILangExpression;
 import org.apache.asterix.lang.common.base.Statement;
+import org.apache.asterix.lang.common.statement.FunctionDecl;
 import org.apache.asterix.lang.common.statement.Query;
 import org.apache.asterix.lang.sqlpp.parser.JavaCharStream;
 import org.apache.asterix.lang.sqlpp.parser.SQLPPParserConstants;
@@ -50,13 +51,16 @@ public class SqlppEncoder {
 	 */
 	public static String encode(List<? extends ILangExpression> toEncode) throws CompilationException {
 		StringBuilder buffer = new StringBuilder();
-		buffer.append("(statements ");
+		boolean querySeen = false;
 		for (ILangExpression node : toEncode) {
-			// For now, we only encode query statements
-			if (node instanceof Query)
+			// For now, we only encode query statements, and we don't encode more than one (the last one)
+			if (node instanceof Query) {
+				if (querySeen)
+					buffer.setLength(0);
 				encode(buffer, node);
+				querySeen = true;
+			}
 		}
-		buffer.append(")");
 		return buffer.toString();
 	}
 
@@ -92,6 +96,7 @@ public class SqlppEncoder {
 				e.printStackTrace();
 				continue;
 			}
+			checkAndWarn(stmts);
 			try { 
 				outputResult(encode(stmts), arg);
 				System.out.println("Succeeded");
@@ -174,6 +179,27 @@ public class SqlppEncoder {
 			output.append(tok.image);
 		}
 		return output.toString();
+	}
+
+	/** When running in test mode, displays useful warnings about source files with zero (or more than one) queries, and 
+	 * function definitions in association with queries.
+	 */
+	private static void checkAndWarn(List<Statement> stmts) {
+		int queryCount = 0;
+		boolean hasFunction = false;
+		for (Statement stmt : stmts) {
+			if (stmt instanceof Query)
+				queryCount++;
+			if (stmt instanceof FunctionDecl)
+				hasFunction = true;
+		}
+		if (queryCount == 0)
+			System.out.println("(warning) Source file does not contain any queries");
+		else if (queryCount > 1)
+			System.out.println("(warning) Source file contains multiple queries; only the last will be processed");
+		if (hasFunction && queryCount > 0)
+			System.out.println("(warning) Source file contains ignored function declarations that may be used in queries");
+		
 	}
 
 	/**

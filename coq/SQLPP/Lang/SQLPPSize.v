@@ -176,8 +176,7 @@ Section SQLPPSize.
 	end
     .
     
-  Definition sqlpp_size (l : list sqlpp_expr) :=
-	List.fold_left (fun acc e => acc + (sqlpp_expr_size e)) l 0.
+  Definition sqlpp_size (e : sqlpp_expr) := sqlpp_expr_size e.
 
   End size.
 
@@ -326,8 +325,7 @@ Section SQLPPSize.
 	end
     .
       
-   Definition sqlpp_depth (l : list sqlpp_expr) := 
-    	List.fold_left (fun acc e => max acc (sqlpp_expr_depth e)) l 0.
+   Definition sqlpp_depth (e : sqlpp_expr) := sqlpp_expr_depth e. 
 
   End depth.
 

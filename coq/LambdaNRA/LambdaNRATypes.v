@@ -14,8 +14,8 @@
  * limitations under the License.
  *)
 
-Require Export LambdaNRARuntime.
-Require Export LambdaNRATypes.
+Require Export BasicTypes.
+Require Export TLambdaNRA.
 
 (* 
 *** Local Variables: ***

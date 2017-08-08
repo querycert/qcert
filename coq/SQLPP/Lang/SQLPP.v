@@ -34,8 +34,9 @@ Section SQLPP.
   Inductive sqlpp_distinct : Set := SPDistinct | SPAll.
   Inductive sqlpp_join_type : Set := SPInner | SPLeftOuter.
 
-  (* The SQLPP grammar according to AsterixDB
+  (** The SQLPP grammar according to AsterixDB
 
+<<
 Statement ::= ( SingleStatement ( ";" )? )* <EOF>
 
 SingleStatement ::= DatabaseDeclaration
@@ -47,13 +48,16 @@ SingleStatement ::= DatabaseDeclaration
                   | InsertStatement
                   | DeleteStatement
                   | Query ";"
+>>
 
 We currently support source files containing all possible statement types but only Query statements are passed along
 by the initial front end.   Other statements are silently elided.  Of course, this can result in semantic nonsense when,
 for example, a FunctionDeclaration is elided but is then used in a subsequent Query.  However, eliding most other statement
-types works in practice since they are present for bookkeeping purposes and don't affect the semantics of ths Query statements.
+types works in practice since they are present for bookkeeping purposes and don't affect the semantics of the Query statements.
 
+<<
 Query ::= (Expression | SelectStatement) ";" 
+>>
 
 The distinction between Expression and SelectStatement is a superficial grammar technicality, because a
 parenthesized SelectStatement is an Expression.  The duality at this production amounts to saying it is ok to
@@ -65,14 +69,16 @@ is not needed in the AST.  So, the AST is basically a huge inductive set on Expr
 
   Inductive sqlpp_expr : Set :=
 
-(*
+(**
+<<`
 Expression ::= OperatorExpression | CaseExpression | QuantifiedExpression
 
 OperatorExpression ::= PathExpression
                        | Operator OperatorExpression
                        | OperatorExpression Operator (OperatorExpression)?
-                       | OperatorExpression <BETWEEN> OperatorExpression <AND> OperatorExpression
-
+                       | OperatorExpression <BETWEEN> OperatorExpression 
+                       <AND> OperatorExpression
+>>
 Valid operators for the first form (unary operators) are 
 positive, negative, exists, not, isNull, isMissing, isUnknown
 *)
@@ -85,7 +91,7 @@ positive, negative, exists, not, isNull, isMissing, isUnknown
   | SPIsMissing : sqlpp_expr -> sqlpp_expr
   | SPIsUnknown : sqlpp_expr -> sqlpp_expr                                  
 
-(*                                 
+(**                                 
 Valid operators for the second form (binary operators) are
 plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge, like, and, or
 (Actually, fuzzy-eq isn't listed in the SQL++ grammar, but it's in the AQL grammar and supported for SQL++ by AsterixDB).
@@ -110,53 +116,65 @@ plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge,
   | SPAnd : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPOr : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   
-(* Finally, the ternery BETWEEN operator *)
+(** Finally, the ternery BETWEEN operator *)
 
   | SPBetween : sqlpp_expr -> sqlpp_expr -> sqlpp_expr -> sqlpp_expr                                         
                                          
-(*    
+(**
+<<    
 CaseExpression ::= SimpleCaseExpression | SearchedCaseExpression
 
-SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
+SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression )+ 
+						( <ELSE> Expression )? <END>
 
-SearchedCaseExpression ::= <CASE> ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
+SearchedCaseExpression ::= <CASE> ( <WHEN> Expression <THEN> Expression )+ 
+						( <ELSE> Expression )? <END>
+>>
  *)
 
   | SPSimpleCase : sqlpp_expr -> list sqlpp_when_then -> option sqlpp_expr -> sqlpp_expr
   | SPSearchedCase : list sqlpp_when_then -> option sqlpp_expr -> sqlpp_expr
                                                                          
-(*                                                            
-QuantifiedExpression ::= ( (<ANY>|<SOME>) | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )*
-                         <SATISFIES> Expression (<END>)?
- *)
+(**
+<<                                                           
+QuantifiedExpression ::= ( (<ANY>|<SOME>) | <EVERY> ) 
+                           Variable <IN> Expression ( "," Variable "in" Expression )*
+                           f<SATISFIES> Expression (<END>)?
+>>
+*)
 
   | SPSome : list (string * sqlpp_expr) -> sqlpp_expr -> sqlpp_expr
   | SPEvery : list (string * sqlpp_expr) -> sqlpp_expr -> sqlpp_expr
   
-(*
+(**
+<<
 PathExpression  ::= PrimaryExpression ( Field | Index )*
 
 Field           ::= "." Identifier
+>>
  *)
 
   | SPDot : sqlpp_expr -> string -> sqlpp_expr                                                            
 
-(*                                    
+(**
+<<                                    
 Index           ::= "[" ( Expression | "?" ) "]"
+>>
  *)
 
   | SPIndex : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPIndexAny : sqlpp_expr -> sqlpp_expr
 
-(*                                         
+(**
+<<                                         
 PrimaryExpr ::= Literal
               | VariableReference
               | ParenthesizedExpression
               | FunctionCallExpression
               | Constructor
-
+>>
 Let's assume we can use existing support for literals, so I have omitted some details in the following:
-
+<<
 Literal        ::= StringLiteral
                    | IntegerLiteral
                    | FloatLiteral
@@ -165,13 +183,16 @@ Literal        ::= StringLiteral
                    | <MISSING>
                    | <TRUE>
                    | <FALSE>
+>>                   
  *)
 
   | SPLiteral : data -> sqlpp_expr (* For string, int, float, double, true and false *)
   | SPNull | SPMissing
 
-(*
+(**
+<<
 VariableReference     ::= <IDENTIFIER>|<DelimitedIdentifier>
+>>
 
 The parsing of delimited identifiers will be handled by the AsterixDB parser, so, in Coq we just have string
 representations of identifiers, whether delimited or not (with the delimiters omitted).
@@ -179,47 +200,57 @@ representations of identifiers, whether delimited or not (with the delimiters om
 
   | SPVarRef : string -> sqlpp_expr                                   
 
-(*
+(**
+<<
 ParenthesizedExpression ::= "(" Expression ")" | Subquery
-
-The parenthesized expression is needed for parsing but need to be distinguished in the AST
-
+>>
+The parenthesized expression is needed for parsing but does not need to be distinguished in the AST
+<<
 FunctionCallExpression ::= FunctionName "(" ( Expression ( "," Expression )* )? ")"
+>>
 *)
 
   | SPFunctionCall : string -> list sqlpp_expr -> sqlpp_expr
                         
-(*
+(**
+<<
 Constructor              ::= ArrayConstructor | MultisetConstructor | ObjectConstructor
 
 ArrayConstructor         ::= "[" ( Expression ( "," Expression )* )? "]"
+>>
  *)
 
   | SPArray : list sqlpp_expr -> sqlpp_expr                                                   
 
-(*
+(**
+<<
 MultisetConstructor      ::= "{{" ( Expression ( "," Expression )* )? "}}"
+>>
  *)
 
   | SPBag : list sqlpp_expr -> sqlpp_expr                                  
 
-(*                                  
+(**
+<<                                  
 ObjectConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
 
 FieldBinding             ::= Expression ":" Expression
+>>
  *)
 
   | SPObject : list (sqlpp_expr * sqlpp_expr) -> sqlpp_expr
                              
-(*
+(**
+<<
 SelectStatement    ::= ( WithClause )?
                        SelectSetOperation (OrderbyClause )? ( LimitClause )?
-                       
+>>                       
 For now, the front-end elides the limit clause                       
-
+<<
 SelectSetOperation ::= SelectBlock (<UNION> <ALL> ( SelectBlock | Subquery ) )*
 
 Subquery           ::= "(" SelectStatement ")"
+>>
 *)
 
   | SPQuery : sqlpp_select_statement -> sqlpp_expr
@@ -232,7 +263,8 @@ with sqlpp_select_statement : Set :=
 		-> sqlpp_order_by  (* order by; limit clause elided earlier *)
 		-> sqlpp_select_statement
 
-(*
+(**
+<<
 SelectBlock        ::= SelectClause
                        ( FromClause ( LetClause )?)?
                        ( WhereClause )?
@@ -244,12 +276,13 @@ SelectBlock        ::= SelectClause
                        SelectClause
 
 HavingClause       ::= <HAVING> Expression
-
+>>
 That is, a select block has a required select clause with optional from, where, and group by clauses (also, up to two let clauses
 loosely tied to the from and groupby clauses, and an optional having clause tied to the groupby clause).  The two branches
 of the production say that the from clause, if present, can come first, which is meaningless at the AST level.                       
-
+<<
 FromClause         ::= <FROM> FromTerm ( "," FromTerm )*
+>>
 *)
 
 with sqlpp_select_block : Set :=
@@ -264,7 +297,8 @@ with sqlpp_union_element : Set :=
   | SPBlock : sqlpp_select_block -> sqlpp_union_element
   | SPSubquery : sqlpp_select_statement -> sqlpp_union_element        
 
-(*
+(**
+<<
 SelectClause       ::= <SELECT> ( <ALL> | <DISTINCT> )? ( SelectRegular | SelectValue )
 
 SelectRegular      ::= Projection ( "," Projection )*
@@ -272,6 +306,7 @@ SelectRegular      ::= Projection ( "," Projection )*
 SelectValue      ::= ( <VALUE> | <ELEMENT> | <RAW> ) Expression
 
 Projection         ::= ( Expression ( <AS> )? Identifier | "*" )
+>>
 *)
 
 with sqlpp_select : Set :=
@@ -282,7 +317,8 @@ with sqlpp_project : Set :=
   | SPProject : (sqlpp_expr * option string) -> sqlpp_project
   | SPProjectStar
   
-(*
+(**
+<<
 FromTerm           ::= Expression (( <AS> )? Variable)?
                        ( ( JoinType )? ( JoinClause | UnnestClause ) )*
 
@@ -292,6 +328,7 @@ JoinClause         ::= <JOIN> Expression (( <AS> )? Variable)? <ON> Expression
 
 UnnestClause       ::= ( <UNNEST> | <CORRELATE> | <FLATTEN> ) Expression
                        ( <AS> )? Variable ( <AT> Variable )?
+>>
 *)
 
 with sqlpp_from : Set :=
@@ -301,10 +338,10 @@ with sqlpp_join_clause : Set :=
   | SPJoin : sqlpp_join_type -> sqlpp_expr -> option string -> sqlpp_expr -> sqlpp_join_clause
   | SPUnnest : sqlpp_join_type -> sqlpp_expr -> option string -> option string -> sqlpp_join_clause  
 
-(*	
+(**	
 Let and with clauses are distinct in the grammar but use the same AsterixDB AST element so will not be distinct internally.
 When these clauses appear in the grammar, the AST simply uses (string * sqlpp_expr)
-
+<<
 WithClause         ::= <WITH> WithElement ( "," WithElement )*
 
 LetClause          ::= (<LET> | <LETTING>) LetElement ( "," LetElement )*
@@ -314,17 +351,22 @@ LetElement         ::= Variable "=" Expression
 WithElement        ::= Variable <AS> Expression
 
 WhereClause        ::= <WHERE> Expression
+>>
 *)
 
 with sqlpp_where : Set :=
   | SPWhere : sqlpp_expr -> sqlpp_where
   | SPNoWhere
 
-(*  
-GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )*
+(**
+<<  
+GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? 
+                       ( "," Expression ( (<AS>)? Variable )? )*
                        ( <GROUP> <AS> Variable
-                         ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
+                       	  ("(" Variable <AS> VariableReference 
+                       	  ("," Variable <AS> VariableReference )* ")")?
                        )?
+>>                       
 *)
 
 with sqlpp_group_by : Set :=
@@ -333,8 +375,11 @@ with sqlpp_group_by : Set :=
 		-> sqlpp_group_by
     | SPNoGroupBy
 
-(*		
-OrderbyClause      ::= <ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
+(**
+<<		
+OrderbyClause      ::= <ORDER> <BY> Expression ( <ASC> | <DESC> )? 
+                            ( "," Expression ( <ASC> | <DESC> )? )*
+>>
  *)
  
 with sqlpp_order_by : Set :=
@@ -346,7 +391,7 @@ with sqlpp_when_then : Set:=
 .	
 
   (* Let's finally give our languages a proper name! *)
-  Definition sqlpp : Set := list sqlpp_expr.
+  Definition sqlpp : Set := sqlpp_expr.
 
   
 End SQLPP.
