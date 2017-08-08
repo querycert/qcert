@@ -321,7 +321,7 @@ Section RType.
 
     Notation "⊥" := Bottom.
     Notation "⊤" := Top.
-    
+
     Definition Option τ := Either τ Unit.
 
     (* (derived) induction principle for rtype.  Between the "smart"
@@ -1030,9 +1030,11 @@ End other.
 
 Notation "⊥₀" := Bottom₀.
 Notation "⊤₀" := Top₀.
+Notation "a ~~>₀ b" := (Arrow₀ a b) (at level 99, right associativity).
 
 Notation "⊥" := Bottom.
 Notation "⊤" := Top.
+Notation "a ~~> b" := (Arrow a b) (at level 99, right associativity).
 
 Ltac rtype_equalizer := 
   repeat match goal with 
