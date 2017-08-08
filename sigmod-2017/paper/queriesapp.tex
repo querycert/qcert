@@ -1,0 +1,221 @@
+\section{Translating Queries to \NRAEnv}
+\label{sec:queries}
+
+We now consider how to use \NRAEnv\ as the target for a query
+language. Because of space considerations, we focus on the following
+specific aspects: the complexity of the initial translation, the
+ability to optimize the resulting plan, and the practical benefits of
+\NRAEnv's environment support.
+
+\paragraph*{\NRALambda}
+\label{sec:queries:nralambda}
+
+Our first example is the nested relational algebra with explicit
+lambdas we used in the introduction to motivate the work.
+%
+The syntax of \NRALambda\ is the
+following\,\coqdef{LambdaNRA.Lang.LambdaNRA}{lnra}, where the data
+model and operators are the same as for \NRAEnv:
+$$
+\begin{array}{l@{\ }r@{\ }l}
+l & ::= &
+  x %lavar
+  \mid d %laconst
+  \mid   \opunop l % launop
+  \mid   l_1 \opbinop l_2 % labinop
+  \mid    \lmap{f}{l}\\   % Map
+  &\mid&    \ldjoin{f}{l}   % MapConcat
+  \mid    l_1 \times l_2      % Product 
+  \mid  \lsel {f} {l}  % Select
+\\
+f & ::= & \lambda x. l
+\end{array}
+$$
+
+The semantics of \NRALambda\ are
+unsurprising\,\coqdef{LambdaNRA.Lang.LambdaNRA}{lnra_eval}.  The
+main operations behave as in \NRAEnv, except that dependent operators
+are expressed explicitly as functions ($\lambda x.l$), which can
+access their input (as well as any other variables in scope).  The
+scoping rules are standard. Proceeding as for \NRAEnv, we can define
+an equivalence relation on \NRALambda\ similar to
+Definition~\ref{def:nraenv-equiv}\,\coqdef{LambdaNRA.Lang.LambdaNRAEq}{lnra_eq}. This can be used to prove the
+\NRALambda\ map fusion equivalence given in
+Figure~\ref{figure:threenras}\,\coqdef{Tests.LambdaNRATests}{T1lr_equiv}.
+
+\begin{figure}[thb]
+  \centering
+\begin{align*}
+\ltoe{x}&=\qENV.x\\
+\ltoe{d}&=d\\
+\ltoe{\opunop l}&=\opunop{\ltoe{l}}\\
+\ltoe{l_1 \opbinop l_2}&=\ltoe{l_1}\opbinop \ltoe{l_2}\\
+\ltoe{\lmap{f}{l}}&=\qmap{\ftoe{f}}{\ltoe{l}}\\
+\ltoe{\ldjoin{f}{l}}&=\qdjoin{\ftoe{f}}{\ltoe{l}}\\
+\ltoe{l_1\times l_2}&=\ltoe{l_1}\times\ltoe{l_2}\\
+\ltoe{\lsel{f}{l}}&=\qselect{\ftoe{f}}{\ltoe{l}}\\
+ % \\
+\ftoe{\lambda x. l}&=\ltoe{l}\circ^{e}\left(\qENV\opconcat \mbox{[}x : \qID\mbox{]}\right)
+\end{align*}
+\caption{From \NRALambda\ to
+    \NRAEnv\,\coqdef{Translation.LambdaNRAtoNRAEnv}{nraenv_of_lnra} 
+    \fbox{\(\ltoe{l} = q\quad \ftoe{f}=q\)}}
+  \label{fig:nralambda-tonraenv}
+\end{figure}
+
+The full translation from \NRALambda\ to \NRAEnv\ is both small and
+straightforward and is given in Figure~\ref{fig:nralambda-tonraenv}.
+Functions $f$ are translated into an \NRAEnv\ expression that adds the
+current input (the argument to the lambda) to the environment with the
+appropriate name.  The rules for record concatenation correctly
+enforce local shadowing as needed.  Variable lookups are translated
+into accesses of fields of the environment.  This simple translation
+is easily proved correct (semantics
+preserving)\,\coqdef{Translation.LambdaNRAtoNRAEnv}{nraenv_of_lnra_lambda_correct},
+validating the suitability of \NRAEnv\ for supporting languages with
+variables. Note that an alternative encoding into NRA would be
+significantly more complex and harder to prove correct.
+
+This validates the original intuition that we can model traditional
+variable scoping constructs. It can be useful for adapting rewrites
+from the literature which often make use of explicit lambda
+terms~\cite{CareyDFGRSM91,FegarasMS93,LeungMSVVZ93}, or to support
+language integrated queries written with closures. For instance, the
+following LINQ~\cite{Meijer11} expression in C\#:
+\begin{verbatim}
+Persons.Where(p => p.age < 30).Select(p => p.name)
+\end{verbatim}
+corresponds directly to the \NRALambda\ expression\,\coqdef{Tests.LambdaNRATests}{linq_example}:
+\[\lmap{\lambda p. (p.\mathit{name})}{(\lsel{\lambda p. (p.\mathit{age} < 30)}{(\mathit{Persons})})}\]
+
+\paragraph*{SQL}
+
+% \begin{figure*}[t]
+%   \begin{tabular}{@{}ccc@{}}
+%       \includegraphics[width=0.43\textwidth,height=45mm]{sql_size-crop}
+%     & \includegraphics[width=0.29\textwidth,height=45mm]{sql_depth-crop}
+%     & \includegraphics[width=0.24\textwidth,height=45mm]{sql_time-crop}
+%     \\
+%       (a) SQL, \NRAEnv, and NNRC query sizes.
+%     & (b) SQL and \NRAEnv query depths.
+%     & Compilation time.
+%   \end{tabular}
+%   \caption{\label{fig:sql-numbers}TPC-H benchmarks.}
+% \end{figure*}
+
+\begin{figure*}[t]
+  \begin{tabular}{@{}c@{}c@{}c@{}}
+      \includegraphics[width=0.45\textwidth,height=45mm]{sql_size}
+    & \includegraphics[width=0.28\textwidth,height=45mm]{sql_depth}
+    & \includegraphics[width=0.28\textwidth,height=45mm]{sql_time}
+    \\
+      (a) SQL, \NRAEnv, and NNRC query sizes.
+    & (b) SQL and \NRAEnv query depths.
+    & Compilation time (s).
+  \end{tabular}
+  \caption{\label{fig:sql-numbers}TPC-H benchmarks.}
+\end{figure*}
+
+To further evaluate the suitability of \NRAEnv as a target for query
+compilation, we implemented a translation from a subset of SQL to
+\NRAEnv. A full formal specification for SQL being a large
+undertaking, our focus here is on validating the compiler and
+optimizer. That infrastructure relies on an AST for a subset of
+SQL\,\coqdef{SQL.Lang.SQL}{sql_query}, along with a translation from
+that subset to
+\NRAEnv\,\coqdef{Translation.SQLtoNRAEnv}{sql_query_to_nraenv}. The
+compiler supports full select-from-where blocks including group by and
+order by, nested queries, set operations~(union, intersect, except),
+exists, between, view definitions, with clauses, case expressions,
+comparisons, aggregations, and essential operators on atomic types,
+including dates and aggregate operations. With that feature set, the
+compiler handles all TPC-H queries with the exception of one: TPC-H
+query 13 which uses a left outer join which we currently do not
+support.\footnote{Although our compiler handles null values, we do not
+  have a full specification for the null value semantics in SQL.}
+
+We used \projectname{} to compile the 21 TPC-H queries that we
+support, targeting JavaScript as a backend for execution. Since the
+translation from SQL to \NRAEnv\ has not been proven correct, we
+instead inspected the query results to ensure they were as expected
+according to the SQL semantics. Figure~\ref{fig:sql-numbers} reports
+on query size and depth for the \NRAEnv intermediate
+representation (with SQL size for comparison), as well as compilation
+times. The number of operations is relatively large (in the hundreds
+of operators), but validates that the translation to the algebra does
+not introduce any unexpected blow up. Compilation time is under two
+seconds for all queries, with most of the time spent on
+optimization~(translation time is negligible).
+
+As an additional evaluation, we also tried the compiler on TPC-DS
+queries (without checking for correctness), which are significantly
+more complex due to some use of rollup and windowing notably. We could
+compile 37 out of 99 queries, all of which compiled in under 4 seconds
+except for TPC-DS query 66 which took about 11~seconds. A specific
+investigation of that query shows a much larger \NRAEnv\,plan (around
+2200 operators), and most of the compilation time is spent on
+rewriting.
+
+\paragraph*{OQL}
+
+The Q*cert compiler also implements a frontend for a reasonable subset
+of OQL\,\coqdef{OQL.Lang.OQL}{oql_expr}, which is of interest as it
+provides a clean model for queries over nested relational data and
+objects, along with aggregation. We implemented the ``classic''
+translation from OQL to NRA proposed in~\cite{CluetM93} for that
+subset. That fragment includes select-from-where statements,
+aggregation, object access, casting and object creation, and arbitrary
+nesting. We wrote a formal semantics for that
+fragment\,\coqdef{OQL.Lang.OQL}{oql_interp} in order to prove the
+translation to
+\NRAEnv\ correct\,\coqdef{Translation.OQLtoNRAEnv}{nraenv_of_oql_correct}. Note
+that most of the translation for OQL does not use environment
+operators. This is a useful feature of the approach we propose:
+additional operations on the environment can be used at the discretion
+of the compiler developer when deemed useful. In the OQL case, all
+existing NRA optimization~\cite{CluetM93}, e.g., for query
+decorrelation, can be applied as-is on the resulting plans.
+
+\paragraph*{View declarations}
+
+One case where we found environment operations to be particularly
+convenient is in supporting view declaration (and
+undeclarations). Since we used a similar mechanism for both SQL and
+OQL views, we illustrate it here only on a SQL example.
+
+The intuition is straightforward: when a view is being defined, it is
+simply added to the environment with the view name bound to the
+corresponding query plan. Consider the following simple SQL view
+definition~(inspired by TPC-H query~15):
+
+% \begin{lstlisting}[language=sql, numbers=left]
+\begin{lstlisting}[language=sql]
+create view revenue0  (supplier_no, total) as
+  select l_suppkey, sum(l_extendedprice) from lineitem;
+  group by l_suppkey
+
+select s_name, total
+from supplier, revenue0
+where s_suppkey = supplier_no
+  and total = select max(total_revenue) from revenue0;
+\end{lstlisting}
+
+The corresponding translation to \NRAEnv\ has the structure $ q_{stmt}
+\circ^e [\mathtt{revenue0} : q_{view}]$, where $q_{view}$ is the query
+plan for the view definition, and $q_{stmt}$ is the query plan for the
+main SQL statement. Within the main SQL statement, access to the
+\texttt{revenue0} view is done by using environment access as
+$\qENV.\mathtt{revenue0}$. This approach cleanly handles views that
+rely on previously defined views, as well as dropping views.
+
+In SQL, we also use the same approach to support \texttt{with-as}
+clauses. Generally speaking, \NRAEnv operations provide a natural way
+to represent let bindings within the query plans. In other words,
+\NRAEnv\ provides a simple way to represent shared sub-plans in the
+query and can naturally be used to handle SQL views, \texttt{with-as}
+clauses, or could be used to capture common sub-expression elimination
+rewrites.
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

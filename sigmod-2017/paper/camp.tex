@@ -1,0 +1,192 @@
+\section{CAMP}
+\label{sec:CAMP}
+
+Section~\ref{sec:rules} discussed the CAMP calculus, which was
+originally described in~\cite{ShinnarSH15} as a useful intermediate
+language for compiling rule-based languages.  Section~\ref{sec:rules}
+reported on the results of translating and optimizing CAMP through
+\NRAEnv.  In this appendix, we formalize the translation from CAMP to
+\NRAEnv, and present some important NRA optimizations that help
+simplify the resulting \NRAEnv.
+
+The paper that introduced the CAMP calculus presents a translation
+into NRA in Figure~10 of \cite{ShinnarSH15}. This required encoding
+the input as a record with two components $D$ and $E$ representing the
+current data and environment.  \NRAEnv avoids the need for such an
+encoding, as the CAMP environment can be directly represented using
+the \NRAEnv environment.  Figure~\ref{fig:tonraenv-trans} presents the
+full translation from CAMP to \NRAEnv (on the right). For comparison,
+the original translation from~\cite{ShinnarSH15} is presented in
+parallel (on the left).
+
+Consider for example the translation of $\rmap{p}$. When we go to
+\NRAEnv, the translation produces a corresponding map in \NRAEnv, and
+uses a flattening to account for the fact that the result of
+translating~$p$ will return a collection:
+$$
+\pton{\rmap{p} } = \left\{\opflatten\left(\qmap{\ntop{p}}{\qID}\right)\right\}
+$$
+When we go to NRA, in addition to the flattening, the input must be manipulated
+to iterate on the data part and keep
+the environment. The translation function is:
+$$
+\begin{array}{l}
+\hspace*{-0.1cm}\pton{\rmap{p}} =
+\\
+  \left\{\opflatten\left(\qmap{\ntop{p}}{\quntwo{T}{D}{\{[E:\qID.E]\opconcat[T:\qID.D]\}}}\right)\right\}
+\end{array}
+$$
+where $\quntwo{A}{B}{q}$ is the unnest operator from
+Section~\ref{sec:nraenv:nra}.
+
+In addition to the \NRAEnv\ specific optimizations presented
+in Figure~\ref{tab:rewrites}, many standard NRA optimizations are useful for
+optimizing translated CAMP.  Figure~\ref{tab:rewrites-nra} presents a
+number of these optimizations, which serve to eliminate inefficiencies introduced either by
+the structure of the CAMP language or naive translation.  Similarly,
+Figure~\ref{tab:rewrites-nraenv} presents more complex \NRAEnv\
+optimizations that target common patterns produced by compilation
+from CAMP.
+\balance
+
+\begin{figure*}[b]
+  \centering
+  \[\begin{array}{>{\color{darkergray}}lcccll}
+\multicolumn{1}{c}{\color{darkergray}\text{NRA}} && \text{CAMP} && \multicolumn{1}{c}{\text{\NRAEnv}}\\
+\hline
+\{d\}&=&\pton{d}&=&\{d\}\\
+\qmap{\opunop \qID}{\pton{p}}&=&\pton{\opunop p}&=&\qmap{\oplus \qID}{\pton{p}}\\
+\Big(\chi\!_{\left\langle{\qID.T_1 \opbinop \qID.T_2}\right\rangle}&=&\pton{p_1 \opbinop p_2}&=&\Big(\chi\!_{\left\langle{\qID.T_1 \opbinop \qID.T_2}\right\rangle}\\
+\qquad\qmap{[T_1:\qID]}{\ntop{p_1}}\times \qmap{[T_2:\qID]}{\ntop{p_2}}\Big)&&&&\qquad\qmap{[T_1:\qID]}{\ntop{p_1}}\times \qmap{[T_2:\qID]}{\ntop{p_2}}\Big)\\
+\Big\{\opflatten\big(\chi_{\left\langle{\ntop{p}}\right\rangle}&=&\pton{\rmap{p} }&=&\left\{\opflatten\left(\qmap{\ntop{p}}{\qID}\right)\right\}\\
+\multicolumn{2}{l}{\color{darkergray}\qquad\left({\quntwo{T}{D}{\{[E:\qID.E]*[T:\qID.D]\}}}\right)\big))\Big\}}\\
+\qmap{[\,]}{\qselect{\qID}{\pton{p}}}&=&\pton{\rassert{p}}&=&\qmap{[\,]}{\qselect{\qID}{\pton{p}}}\\
+\ntop{p_1}\qor\ntop{p_2}&=&\pton{ p_1\ror p_2}&=&\pton{p_1}\qor\pton{p_2}\\
+\{\qID.D\}&=&\pton{\rit}&=&\{\qID\}\\
+\opflatten\Big(\chi\!_{\left\langle\pton{p_2}\right\rangle}&=&\pton{\rleti{p_1}{p_2}}&=&\opflatten\left(\qmap{\ntop{p_2}}{\pton{p_1}}\right)\\
+\multicolumn{2}{l}{\color{darkergray}\qquad \left({\quntwo{T}{D}{\{[E:\qID.E]*[T:\pton{p_1}]\}}}\right)\Big)}\\
+\{\qID.E\}&=&\pton{\renv}&=&\{\qENV\}\\
+\opflatten\Big(\chi\!_{\left\langle\pton{p_2}\right\rangle}(&=&\pton{\rlete{p_1}{p_2}}&=&\opflatten\Big(\qmapenv{\ntop{p_2}} \circ^e \opflatten\left(\qmap{\qID \opmergeconcat \qENV}{\ntop{p_1}}\right)\Big)\\
+\multicolumn{4}{l}{\color{darkergray}\qquad\qquad\quad\chi\!_{\left\langle[E:\qID.E_2]*[D:\qID.D]\right\rangle}(}\\
+\multicolumn{4}{l}{\color{darkergray}\qquad\qquad\qquad\quntwoop{T_2}{E_2}
+(
+\chi\!_{\left\langle\qID*[T_2:\qID.E+\qID.E_1]\right\rangle}
+(}\\
+\multicolumn{4}{l}{\color{darkergray}\qquad\qquad\qquad\quad\quntwo{T_1}{E_1}
+{
+ \{
+\qID*[T_1:\pton{p_1}]
+\}
+}
+)
+)))\Big)}
+\end{array}\]
+\caption{From CAMP {\color{darkergray}to NRA\,\coqdef{Translation.CAMPtoNRA}{nra_of_pat} and} \NRAEnv\,\coqdef{Translation.CAMPtoNRAEnv}{nraenv_of_pat} \fbox{\(\pton{p} = q\)}}
+  \label{fig:tonraenv-trans}
+\end{figure*}
+
+\begin{figure*}[hb]
+  \begin{minipage}{0.49\linewidth}
+    \centering
+    \[\begin{array}{r@{\ }c@{\ }ll}
+        [ a : q ].a & \Rightarrow & q
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tdot_over_rec_arrow}
+        \\
+        (q_1 \opconcat [ a_2 : q_2 ]).a_2 & \Rightarrow & q_2
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tdot_over_concat_eq_r_arrow}
+        \\
+        \mbox{if~} a_1 \neq a_2,\ (q \opconcat [ a_2 : q_2 ]).a_1 & \Rightarrow & q.a_1
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tdot_over_concat_neq_r_arrow}
+        \\
+        \mbox{if~} a_1 \neq a_2,\ ([ a_1 : q_1 ] \opconcat q).a_2 & \Rightarrow & q.a_2
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tdot_over_concat_neq_l_arrow}
+        \\
+        \,[\,] \opmergeconcat q & \Rightarrow & \{ q \}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmerge_empty_record_l_arrow}
+        \\
+        q \opmergeconcat [\,] & \Rightarrow & \{ q \}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmerge_empty_record_r_arrow}
+        \\
+        \{ [ a_1 : q_1 ] \} \times \{ [ a_2 : q_2 ] \} & \Rightarrow & \{ [ a_1 : q_1] \opconcat [ a_2 : q_2 ] \}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tproduct_singletons_arrow}
+        \\
+        \qID \circ q & \Rightarrow & q
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tapp_over_id_l_arrow}
+        \\
+        (\opunop(q_1)) \circ q_2 & \Rightarrow & \opunop(q_1 \circ q_2)
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tapp_over_unop_arrow}
+        \\
+        (q_2 \opbinop q_1) \circ q & \Rightarrow & (q_2 \circ q) \opbinop (q_1 \circ q)
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tapp_over_binop_arrow}
+        \\
+        \mbox{if~} \igni{q_1},\ q_1 \circ q_2 & \Rightarrow& q_1
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tapp_over_ignoreid_arrow}
+        \\
+      \end{array}
+     \]
+  \end{minipage}
+  \begin{minipage}{0.50\linewidth}
+    \centering
+    \[\begin{array}{r@{\ }c@{\ }ll}
+        \qmap{q_1}{q_2} \circ q & \Rightarrow & \qmap{q_1}{q_2 \circ q}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tapp_over_map_arrow}
+        \\
+        \opflatten(\qmap{\qmap{\{ q_3 \}}{q_1}}{q_2}) & \Rightarrow & \qmap{\{ q_3 \}}{\opflatten(\qmap{q_1}{q_2})}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tdouble_flatten_map_coll_arrow}
+        \\
+        \qmap{p_1}{\opflatten(p_2)} & \Rightarrow & \opflatten(\qmap{\qmap{p_1}{\qID}}{p_2})
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmap_over_flatten}
+        \\
+        \qmap{p_1}{\opflatten(\qmap{p_2}{p_3})} & \Rightarrow & \opflatten(\qmap{\qmap{p_1}{p_2}}{p_3})
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmap_over_flatten_map}
+        \\
+        \opflatten(\{ q \}) & \Rightarrow & q
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tenvflatten_coll_arrow}
+        \\
+        \opflatten(\qmap{\{ q_1 \}}{q_2}) & \Rightarrow & \qmap{q_1}{q_2}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tenvflatten_map_coll_arrow}
+        \\
+        \qmap{\qID}{q} & \Rightarrow & q
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tenvmap_into_id_arrow}
+        \\
+        \qmap{q_1}{\qmap{q_2}{q}} & \Rightarrow & \qmap{q_1 \circ q_2}{q}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tenvmap_map_compose_arrow}
+        \\
+        \qmap{q_1}{\{ q_2 \}} & \Rightarrow & \{ q_1 \circ q_2 \}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tenvmap_singleton_arrow}
+        \\
+        \qmap{q_2}{\qselect{q_1}{\{ q \}}} & \Rightarrow & \qmap{q_2 \circ q}{\qselect{q_1 \circ q}{\{ \qID \}}}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmap_full_over_select_arrow}
+        \\
+      \end{array}
+     \]
+  \end{minipage}
+ \vspace*{1.5mm}
+  \caption{NRA rewrites for CAMP.}
+  \label{tab:rewrites-nra}
+\end{figure*}
+
+\begin{figure*}[ht]
+  \begin{minipage}{0.99\linewidth}
+    \centering
+    \[\begin{array}{r@{\ }c@{\ }ll}
+    \opflatten(\qmapenv{\qmap{\qENV}{\qselect{q_1}{\{ \qID \}}}}) \circ^e \qmap{\qENV}{\qselect{q_2}{\{ \qID \}}} & \Rightarrow&\qmap{\qENV}{\qselect{q_1}{\qselect{q_2}{\{ \qID \}}}}
+    & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tcompose_selects_in_mapenv_arrow}
+    \\
+    (\qmapenv{q}) \circ^e (\qENV \opmergeconcat [ a : \qID ]) & \Rightarrow& \qmap{(q \circ \qENV.a) \circ^e \qID}{\qENV \opmergeconcat [ a : \qID ]}
+    & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_mapenv_to_map_arrow}
+    \\
+    \opflatten(\qmapenv{q}) \circ^e (\qENV \opmergeconcat [ a : \qID ]) & \Rightarrow& \opflatten(\qmap{( q \circ \qENV.a ) \circ^e \qID}{\qENV \opmergeconcat [ a : \qID ]})
+    & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_flatten_mapenv_to_map_arrow}
+    \\
+    \qmap{\qENV \opmergeconcat \qID}{\qselect{q_1}{\qENV \opmergeconcat q_2}} & \Rightarrow& \qmap{\{ \qID \}}{\qselect{q_1}{\qENV \opmergeconcat q_2}}
+    & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tflip_env6_arrow}
+    \end{array}\]
+  \end{minipage}  \vspace*{1.5mm}
+  \caption{\NRAEnv\ rewrites for CAMP.}
+  \label{tab:rewrites-nraenv}
+\end{figure*}
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

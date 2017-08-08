@@ -1,0 +1,306 @@
+% $Id: infer.sty,v 1.1 2014/06/11 17:43:31 simeon Exp $
+
+\NeedsTeXFormat{LaTeX2e}
+
+% User Command.
+
+\newenvironment{infer}[1][horizontal]{\vbox\bgroup
+ \expandafter\let\expandafter\infer@start\csname infer@start@#1\endcsname
+ \expandafter\let\expandafter\infer@end\csname infer@end@#1\endcsname
+ \expandafter\let\expandafter\infer@axiom\csname infer@axiom@#1\endcsname
+ \expandafter\let\expandafter\infer@inference\csname infer@inference@#1\endcsname
+ \expandafter\let\expandafter\infer@open\csname infer@open@#1\endcsname
+ \expandafter\let\expandafter\infer@close\csname infer@close@#1\endcsname
+ \infer@continued@false
+ \infer@start
+ \futurelet\next\infer@parse}{\infer@end\egroup}
+
+% Parser.
+
+\newif\ifinfer@continued@ % whether any premises have been collected so far at this level
+
+\newbox\infer@parsebox % box used for user parsing
+
+\ifx\undefined\space@ \def\space@.{\futurelet\space@\relax}\space@. \fi
+
+\def\infer@parse{%
+ \ifx\space@\next \let\next@=\infer@parse@space
+ \else\ifx\bgroup\next \let\next@=\infer@parse@axiom
+ \else\ifx<\next \let\next@=\infer@parse@inference %>
+ \else\ifx(\next \let\next@=\infer@parse@nesting@start
+ \else\ifx)\next \let\next@=\infer@parse@nesting@end
+ \else\ifx\relax\next \let\next@=\relax
+ \else\ifx\end\next \let\next@=\relax
+ \else \let\next@=\infer@parse@error \fi\fi\fi\fi\fi\fi\fi \next@}
+
+\def\infer@parse@space{\infer@parse@space@.}
+\def\infer@parse@space@. {\futurelet\next\infer@parse}
+
+\ifx\undefined\space@ \def\space@.{\futurelet\space@\relax}\space@. \fi
+
+\def\infer@parse@nesting@start({%
+ \infer@open \infer@continued@false
+ \futurelet\next\infer@parse}
+
+\def\infer@parse@nesting@end){%
+ \infer@close \infer@continued@true
+ \futurelet\next\infer@parse}
+
+\def\infer@parse@axiom{%
+ \infer@parse@setboxandcontinue\infer@parsebox{\infer@axiom\infer@parsebox\infer@parse@axiom@continue}}
+
+\def\infer@parse@axiom@continue{%
+ \infer@continued@true
+ \futurelet\next\infer@parse}
+
+\def\infer@parse@inference<#1>{%
+ \infer@parse@setboxandcontinue\infer@parsebox{\infer@parse@inference@continue{#1}}}
+
+\def\infer@parse@inference@continue#1{%
+ \infer@inference\infer@parsebox{#1}%
+ \infer@continued@true
+ \futurelet\next\infer@parse}
+
+\def\infer@parse@error{%
+ \errmessage{Inference system syntax error: `\meaning\next' unexpected.}}
+
+% ...special hack to populate boxes without scanning:
+% \infer@parse@setboxandcontinue B {CONTINUE} {MATH}
+% ==
+% \setbox B = \hbox{$\mathstrut MATH$} CONTINUE
+%
+\def\infer@parse@setboxandcontinue#1#2{%
+ \def\infer@parse@afterhbox{#2}%
+ \def\infer@parse@insidemybox{\aftergroup\infer@parse@afterhbox
+  $\mathstrut \def\infer@parse@aftermathcontent{$\egroup}%
+   \bgroup\aftergroup\infer@parse@aftermathcontent}%
+ \afterassignment\infer@parse@insidemybox \setbox#1=\hbox}
+
+% Horizontal style.
+
+\newdimen\inferrule@ \inferrule@=0.4pt % rule width
+\def\inferp@{.1em} % tiny distance ("point")
+\def\inferjot@{.3em} % small distance ("jot")
+\def\inferq@{1em} % q = width of quad space
+
+\newcount\infern@ % nesting depth
+\newdimen\inferw@ % w = width of finished premises
+\newdimen\infero@ % o = offset of first conclusion part of finished premises
+\newdimen\inferc@ % c = width of conclusion parts of finished premises
+\newdimen\infert@ % t = width of final tag of rightmost premise
+
+\newbox\inferbox@ % accumulated premises of current nesting level
+
+% ...stack of previous siblings with size merging actions...
+\def\push@{\advance\infern@\@ne
+ %%
+ \expandafter\ifx\csname infer@boxstack@\the\infern@\endcsname\relax
+  \expandafter\newbox\csname infer@boxstack@\the\infern@\endcsname
+ \fi
+ %%
+ \expandafter\setbox\csname infer@boxstack@\the\infern@\endcsname=\box\inferbox@
+ \expandafter\edef\csname infer@boxstack@\the\infern@ @pop\endcsname{%
+  \ifinfer@continued@
+   \noexpand\infer@continued@true
+   \noexpand\infer@horizontal@merge{\the\inferw@}{\the\infero@}{\the\inferc@}{\the\infert@}%
+  \else
+   \noexpand\infer@continued@false
+  \fi}}
+
+\def\pop@{\expandafter\box\csname infer@boxstack@\the\infern@\endcsname
+ \csname infer@boxstack@\the\infern@ @pop\endcsname
+ \advance\infern@\m@ne}
+
+% ... merge dimensions of two sibling...
+\def\infer@horizontal@merge#1#2#3#4{% #1=w1 #2=o1 #3=c1 #4=t1
+ \@tempdima=#4\relax \advance\@tempdima\inferq@
+ %% c := w1 - o1 + t1+q + o2 + c2
+ \advance\inferc@#1\relax \advance\inferc@-#2\relax \advance\inferc@\@tempdima \advance\inferc@\infero@
+ %% w := w1 + t1+q + w2
+ \advance\inferw@\@tempdima \advance\inferw@#1\relax
+ %% o := o1
+ \infero@=#2\relax}
+
+% ...style hooks
+
+\def\infer@start@horizontal{%
+ \infern@\z@ \inferw@\z@ \infero@\z@ \inferc@\z@ \infert@\z@
+}
+
+\def\infer@end@horizontal{\box\inferbox@}
+
+\def\infer@axiom@horizontal#1{% #1=axiom-box
+ \edef\tmp@{%
+  \ifinfer@continued@
+   \noexpand\infer@horizontal@merge{\the\inferw@}{\the\infero@}{\the\inferc@}{\the\infert@}%
+   \setbox\inferbox@=\hbox{\box\inferbox@\kern\the\infert@\kern\inferq@\box#1\relax}%
+  \else
+   \setbox\inferbox@=\box#1\relax
+  \fi}%
+ \inferw@=\wd#1\relax
+ \infero@=\z@
+ \inferc@=\wd#1\relax
+ \infert@=\z@
+ \tmp@}
+
+\def\infer@inference@horizontal#1#2{% #1=conclusion-box #2=tag
+ %% compute single conclusion width (next c)
+ \@tempdimc=\wd#1\relax
+ %% compute total width (new w)
+ \@tempdima=\inferw@ \ifdim\inferw@<\wd#1\relax \@tempdima=\wd#1\relax \fi
+ %% compute tag box, if any, and the width (new t)
+ \setbox\z@=\hbox{\def\tmp@{#2}\ifx\tmp@\empty\else{%
+   \@tempdima=\fontdimen22\textfont\tw@ \advance\@tempdima-\inferp@
+   ~\smash{\scriptsize\lower\@tempdima\hbox{(\tmp@)}}}\fi}%
+ \@tempdimb=\wd\z@
+ %% compose entire subtree in inferbox@
+ \setbox\inferbox@=\hbox to \@tempdima{\vbox{\offinterlineskip
+   %% premises
+   \hbox to \@tempdima{\hss\box\inferbox@\hss}%
+   %% small space
+   \kern\inferjot@
+   %% rule line that underlines the conclusions of the premises
+   \hbox{%
+    \kern\infero@\vrule % skip premise overhang
+    \vrule height.5\inferrule@ depth.5\inferrule@ width \@tempdima % rule
+    \rlap{\box\z@}}%
+   %% small space
+   \kern\inferjot@
+   %% conclusion
+   \hbox to \@tempdima{\hss\box#1\hss}%
+ }}%
+ \inferw@=\@tempdima
+ \infero@=\@tempdima \advance\infero@-\@tempdimc \infero@=.5\infero@
+ \inferc@=\@tempdimc
+ \infert@=\@tempdimb}
+
+\def\infer@open@horizontal{\push@}
+
+\def\infer@close@horizontal{%
+ \setbox\@tempboxa=\pop@ %% MUST be a toplevel assignment!
+ \ifinfer@continued@
+  \setbox\inferbox@=\hbox to \inferw@{\copy\@tempboxa \hss \copy\inferbox@}%
+ \fi}
+
+% Vertical style.
+
+% \infern@ nesting level
+% \inferw@ width of current stack
+
+% ...merge by picking largest width
+\def\infer@vertical@merge#1{\@tempdima=#1\relax
+ \advance\@tempdima\inferp@ \advance\@tempdima\inferrule@
+ \ifdim\inferw@<\@tempdima \inferw@=\@tempdima \fi}
+
+% ...every "line" prefixed with vertical "brackets"
+\def\infer@vertical@prefix{{%
+  \count@=\infern@
+  \loop\ifnum\count@>\z@
+   \vrule width\inferrule@ \kern\inferjot@
+   \advance\count@\m@ne
+  \repeat}}
+
+% ...style hooks
+
+\def\infer@start@vertical{}
+
+\def\infer@end@vertical{}
+
+\def\infer@axiom@vertical#1{% #1=axiom-box
+ \infer@open
+ \nointerlineskip\hbox{\infer@vertical@prefix\vrule width\z@ height\inferjot@ depth\z@}%
+ \infer@vertical@merge{\wd#1}%
+ \nointerlineskip\hbox{\infer@vertical@prefix\box#1}%
+ \nointerlineskip\hbox{\infer@vertical@prefix\vrule width\z@ height\inferp@ depth\z@}%
+ \infer@close}
+
+\def\infer@inference@vertical#1#2{% #1=conclusion-box #2=tag
+ %% inference rule
+ \nointerlineskip\hbox{\infer@vertical@prefix
+  %% line
+  \@tempdima=\wd#1\relax
+  \vrule width\z@ height\inferp@ depth\z@
+  \vrule height\inferp@ depth.5\inferrule@ width\inferrule@
+  \vrule height.5\inferrule@ depth.5\inferrule@ width
+   \ifdim\inferw@<\@tempdima \@tempdima \else \inferw@ \fi
+  %% tag
+  \def\tmp{#2}%
+  \ifx\tmp\empty\else {%
+   \@tempdima=\fontdimen22\textfont\tw@ \advance\@tempdima-\inferp@
+   ~\smash{\scriptsize\lower\@tempdima\hbox{(#2)}}}\fi}%
+ %% conclusion
+ \infer@vertical@merge{\wd#1}%
+ \@tempdima=\ht#1\advance\@tempdima\inferp@ \ht#1=\@tempdima
+ \@tempdima=\dp#1\advance\@tempdima\inferp@ \dp#1=\@tempdima
+ \nointerlineskip\hbox{\infer@vertical@prefix\box#1}}
+
+\def\infer@open@vertical{%
+ \expandafter\edef\csname inferw@\the\infern@\endcsname{\the\inferw@\relax}%
+ \inferw@=\z@
+ \ifinfer@continued@\else
+  \nointerlineskip \hbox{\infer@vertical@prefix
+   \vrule width\z@ height\inferjot@ depth\inferp@
+   \vrule height.5\inferrule@ depth\inferp@ width\inferrule@
+   \vrule height.5\inferrule@ depth.5\inferrule@ width\inferp@
+ }\fi
+ \advance\infern@\@ne}
+
+\def\infer@close@vertical{\advance\infern@\m@ne
+ \advance\inferw@\inferrule@ \advance\inferw@\inferjot@
+ \ifdim\inferw@<\csname inferw@\the\infern@\endcsname
+  \inferw@=\csname inferw@\the\infern@\endcsname\fi}
+
+% The End.
+
+\endinput
+
+% $Log: infer.sty,v $
+% Revision 1.1  2014/06/11 17:43:31  simeon
+% Committing full, compiling version for ICFP draft.
+%
+% Revision 1.8  2006-12-15 18:39:14  krisrose
+% Fix horizontal axioms.
+%
+% Revision 1.7  2006-12-15 06:37:39  krisrose
+% infer.sty revamped!
+%
+% Revision 1.6  2006-10-10 08:25:24  krisrose
+% Infer - bug fixed.
+%
+% Revision 1.5  2006-10-10 08:04:54  krisrose
+% Sample diagram and inference inserted.
+%
+% Revision 2.0  1999/03/30 21:57:51  krisrose
+% Fresh start for OOPSLA-99
+%
+% Revision 1.1  1998/04/16 20:33:36  evarose
+% tilfoejet infer.sty
+%
+% Revision 1.7  1996/09/30  04:40:15  kris
+% Last night of secretary function...
+%
+% Revision 1.6  1996/09/24  01:10:23  krisrose
+% Done editing for tonight!
+%
+% Revision 1.5  1996/09/23 22:08:17  krisrose
+% Reworked to work well in narrow mode *only* without *any* macros!
+%
+% Revision 1.4  1996/09/23 17:24:27  krisrose
+% Uses commands: next won't :-)
+%
+% Revision 1.3  1996/09/22 21:14:04  krisrose
+% Breaks semantic nest size.
+% Restart :-(
+%
+% Revision 1.2  1996/08/24 16:04:01  krisrose
+% Narrow proofs work; Wide proofs need trimming of hrules.
+%
+% Version 1.1 is fresh.
+
+% Tell Emacs what this is...
+% Local Variables:
+% mode:latex
+% fill-column:77
+% LaTeX-indent-level:1
+% TeX-brace-indent-level:1
+% End:

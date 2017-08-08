@@ -1,0 +1,48 @@
+\section{Related Work}
+\label{sec:related}
+
+There has been renewed interest in the formal verification of
+database systems or query
+languages~\cite{BenzakenCD14,CheneyU11,malecha2015,MalechaMSW10,ShinnarSH15}. So
+far, much of the work has focused on
+formalization~\cite{BenzakenCD14,CheneyU11,ShinnarSH15} or on
+evaluating challenges involved in
+mechanization~\cite{MalechaMSW10}. The closest related work is that of
+Cherniack and Zdonik~\cite{cherniack1996rule,CherniackZ98}, which
+focused on the formal specification of rule-based query optimizers and
+used the Larch~\cite{Larch89} theorem prover to verify
+correctness. Our work extends that approach in two ways: (i) we
+describe an alternative combinator-based algebra with built-in support
+for environments and (ii) we leverage recent advances in theorem
+proving technology to specify a much larger part of the query
+compiler.
+
+How to best deal with variables and environments in algebraic
+compilers has received relatively little attention. For SPJ
+(Select-Project-Join) queries, variables can be eliminated at
+translation time and equivalences can be simply defined for a given
+static environment~\cite{aho1979efficient}. For query languages over
+complex or nested data, reification of the environment as a record is
+appealing in that existing relational techniques can be readily
+applied. This idea has notably been used in algebraic compilers for
+query languages over nested or graph data such as OQL~\cite{CluetM93}
+and XQuery~\cite{MayHM04,re2006complete}. Full reification enables
+relational optimizations, but can result in large or highly nested
+plans in those languages as well. The algebra from~\cite{CluetM93}
+does combine environments and reification, but assumes that
+environments are fixed for the purpose of defining plan equivalence.
+
+Dealing with bindings is also important for the formalization of
+programming languages. The POPLmark
+challenge~\cite{AydemirBFFPSVWWZ05} has helped spur an assortment of
+techniques for representing and reasoning about bindings.  These are
+all focused on traditional bindings, as introduced by functions.  Our
+work uses explicit reified environments instead. It enables support
+for the standard shadowing semantics for occurrences of a variable
+while also supporting unification semantics, where the value of the
+variable added to the environment has to be compatible with 
+previous occurrences.
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

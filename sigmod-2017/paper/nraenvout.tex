@@ -1,0 +1,132 @@
+\section{Translating from \NRAEnv}
+\label{sec:export}
+
+This section defines the translations of \NRAEnv to NRA and to the
+Named Nested Relational Calculus (NNRC). The first translation is
+useful to show that \NRAEnv shares the same expressiveness as NRA,
+which is desirable since it establishes that we have not inadvertently
+targeted a more expressive language. The second translation provides a
+useful bridge to a representation with variables which can prove
+useful e.g., for code generation. We will come back to that second
+point in Section~\ref{section:implementation} where we describe our
+implementation.
+
+\paragraph*{From \NRAEnv\ to NRA}
+We first consider the relationship between \NRAEnv and NRA.
+%
+Figure~\ref{fig:nraenvtonra} defines the translation function~$\etoa{q}$
+from \NRAEnv to NRA.
+%
+It relies on the encoding of the two inputs of \NRAEnv~($\qID$ and
+$\qENV$) as a record with two fields: \textit{D} for the input datum
+and \textit{E} for the environment. This record is the single input
+$\qID$ of NRA. Therefore, the translation of $\qID$ (resp. $\qENV$)
+corresponds to accessing field \textit{D} (resp. \textit{E}).
+
+This encoding surfaces in the translation of most \NRAEnv\ constructs.
+%
+For example, the translation of composition needs to reconstruct
+the encoding of the input before the evaluation of the second part of
+the query:
+$$
+\etoa{q_2 \circ q_1} = \etoa{q_2} \circ ([E:\qID.E] \opconcat [D:\etoa{q_1}])
+$$
+This translation lifts each element of the collection which is mapped
+into a record containing the environment as field~$E$ and the element
+of the collection as field~$D$.
+
+The translation uses the unnest operator $\quntwo{A}{B}{q}$ defined
+in Section~\ref{sec:nraenv:nra}. Unsurprisingly, this re-introduces some
+of the nesting/complexity that was eliminated by supporting
+environments in \NRAEnv. The correctness of the translation is
+established by Theorem~\ref{thm:nraenvtonra-correctness}.
+
+\begin{theorem}[\NRAEnv\ to NRA Correctness\,\coqdef{NRAEnv.Core.cNRAEnv}{unfold_env_nra}]
+  \label{thm:nraenvtonra-correctness}
+{  \small
+  \begin{align*}
+    \gamma \vdash q \rapp d_1\Downarrowa d_2 & \iff \vdash \etoa{q} \qapp \left([E:\gamma] \opconcat [D:d_1]\right)\Downarrown d_2
+  \end{align*}}
+\end{theorem}
+
+We mentioned in Section~\ref{sec:nraenv:syntax} that NRA queries
+have the same behavior evaluated with either NRA or \NRAEnv
+semantics\,\coqdef{NRAEnv.Core.cNRAEnvIgnore}{cnraenv_of_nra}.
+Therefore, in conjunction with
+Theorem~\ref{thm:nraenvtonra-correctness}, we have a proof that
+\NRAEnv\ has the same expressiveness as NRA.
+
+
+\paragraph*{From \NRAEnv\ to NNRC}
+
+We present the translation of \NRAEnv to the Named Nested
+Relational Calculus (NNRC)~\cite{BusscheV07}, with a bag semantics.
+The syntax of the calculus is\,\coqdef{NNRC.Core.cNNRC}{nnrc}:
+\begin{gram}
+e & ::= & x \mid d \mid \opunop e_1 \mid e_1 \opbinop e_2
+\mid \elet{x}{e_1}{e_2}\\ &\mid& \efor{x}{e_1}{e_2} \mid \eif{e_1}{e_2}{e_3}
+\end{gram}
+Expressions can be variables~($x$), constants~($d$),
+operators ($\opunop e_1$ or $e_1 \opbinop e_2$), dependent
+sequencing~($\elet{x}{e_1}{e_2}$), bag
+comprehensions~($\efor{x}{e_1}{e_2}$), or conditionals~($\eif{e_1}{e_2}{e_3}$).
+%
+The bag comprehension $\efor{x}{e_1}{e_2}$ constructs a bag where each
+element is the result of the evaluation of $e_2$ in an environment in
+which $x$ is bound to an element of the bag created by the evaluation
+of~$e_1$.
+%
+We use the formal semantics of NNRC given
+in~\cite{ShinnarSH15}\,\coqdef{NNRC.Core.cNNRC}{nnrc_core_eval}.
+
+\begin{figure*}[th]
+  \centering
+  \begin{align*}
+    \nton{x_{d},x_{e}}{d} &= d\\
+    \nton{x_{d},x_{e}}{\qID} &= x_{d}\\
+    \nton{x_{d},x_{e}}{\opunop q} &= \opunop \nton{x_{d},x_{e}}{q}\\
+    \nton{x_{d},x_{e}}{q_1\opbinop q_2} &= \nton{x_{d},x_{e}}{q_1}\opbinop\nton{x_{d},x_{e}}{q_2}\\
+    \nton{x_{d},x_{e}}{q_2\circ q_1} &= \elet{x}{\nton{x_{d},x_{e}}{q_1}}{\nton{x,x_{e}}{q_2}}&x\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{\qmap{q_2}{q_1}} &= \efor{x}{\nton{x_{d},x_{e}}{q_1}}{\nton{x,x_{e}}{q_2}}&x\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{\qselect{q_2}{q_1}} &=\opflatten\left(\efor{x}{\nton{x_{d},x_{e}}{q_1}}{\eif{\nton{x,x_{e}}{q_2}}{\{x\}}{\emptyset}}\right) &x\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{q_1\times q_2} &=
+    \opflatten\left(\efor{x_1}{\nton{x_{d},x_{e}}{q_1}}{\efor{x_2}{\nton{x_{d},x_{e}}{q_2}}{x_1 \opconcat x_2}}\right)&x_1\textrm{ is }\nfresh\land x_2\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{\qdjoin{q_2}{q_1}} &=
+    \opflatten\left(\efor{x_1}{\nton{x_{d},x_{e}}{q_1}}{\efor{x_2}{\nton{x_1,x_{e}}{q_2}}{x_1 \opconcat x_2}}\right)&x_1\textrm{ is }\nfresh\land x_2\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{q_1~\qor~q_2} &= \elet{x}{\nton{x_{d},x_{e}}{q_1}}{\left(\eif{\left(x=\emptyset\right)}{\nton{x_{d},x_{e}}{q_2}}{x}\right)}&x\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{\qENV} &= x_{e}\\
+    \nton{x_{d},x_{e}}{q_2\circ^e q_1} &= \elet{x}{\nton{x_{d},x_{e}}{q_1}}{\nton{x_{d},x}{q_2}}&x\textrm{ is }\nfresh\\
+    \nton{x_{d},x_{e}}{\qmapenv{q_2}} &= \efor{x}{x_{e}}{\nton{x_{d},x}{q_2}}&x\textrm{ is }\nfresh
+  \end{align*}
+  \caption{From \NRAEnv to NNRC\,\coqdef{Translation.cNRAEnvtocNNRC}{cnraenv_to_nnrc}. \qquad \fbox{\(\nton{x_{d},x_{e}}{q} = e\)}}
+  \label{fig:tonrc-trans}
+\end{figure*}
+
+Figure~\ref{fig:tonrc-trans} defines the translation function
+$\nton{x_{d},x_{e}}{q}$ from \NRAEnv to
+NNRC.
+%
+The translation function is parameterized by two variables $x_{d}$ and
+$x_{e}$ that are used to encode the input value and the environment.
+%
+So, for example, the translation of $\qID$ (resp. $\qENV$) returns the
+corresponding variable $x_{d}$ (resp. $x_{e}$). This translation makes
+explicit the handling of the input and the environment. For example,
+in the translation of the composition the result of the evaluation of
+the first expression becomes the input of the second expression:
+$$
+\nton{x_{d},x_{e}}{q_2\circ q_1} = \elet{x}{\nton{x_{d},x_{e}}{q_1}}{\nton{x,x_{e}}{q_2}} \qquad x\textrm{ is }\nfresh
+$$
+
+The translation of \NRAEnv to NNRC is similar to the translation of
+NRA to NNRC presented
+in~\cite{ShinnarSH15}\,\coqdef{Translation.NRAtocNNRC}{nra_to_nnrc}. However,
+the two inputs of \NRAEnv can be translated directly to NNRC without encoding.
+%
+Both translations are proved
+correct\,\coqdef{Translation.NRAtocNNRC}{nra_sem_correct}\coqdef{Translation.cNRAEnvtocNNRC}{nraenv_sem_correct}.
+
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

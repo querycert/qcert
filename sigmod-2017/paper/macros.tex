@@ -1,0 +1,198 @@
+% macro for linking to the info docs
+
+\newcommand{\fleur}{\ding{95}}
+\newcommand{\coqtop}{\text{\href{\coqHTMLBase/index.html}{\fleur}}}
+\newcommand{\coqdef}[2]{\text{\href{\coqHTMLBase/\coqBaseModule#1.html\##2}{\fleur}}}
+
+
+% macros for typesetting rules (expressions of the rule calculus)
+\newcommand{\kkeyword}[1]{\textup{\textbf{{#1}}}}
+
+\newcommand{\rit}{\kkeyword{it}}
+\newcommand{\renv}{\kkeyword{env}}
+
+\newcommand{\rassert}[1]{\kkeyword{assert}~{#1}}
+\newcommand{\rleti}[2]{\kkeyword{let it} = {#1}~\kkeyword{in}~{#2}}
+\newcommand{\rlete}[2]{\kkeyword{let env}\;+\!\!= {#1}~\kkeyword{in}~{#2}}
+\newcommand{\rmap}[1]{\kkeyword{map}~{#1}}
+\newcommand{\rapp}{\:@\:}
+\newcommand{\rcast}[1]{\kkeyword{cast~{#1}}}
+
+\newcommand{\qapp}{\:@\:}
+
+\newcommand{\rerr}{\kkeyword{err}}
+\newcommand{\ror}{|\!|}
+
+% NRA queries
+\newcommand{\NRAEnv}{\texorpdfstring{NRA$^{\!\mbox{\it e}}$}{NRAe}\xspace}
+\newcommand{\NRALambda}{\texorpdfstring{NRA$^{\!\mbox{\it $\lambda$}}$}{NRAλ}\xspace}
+
+\newcommand{\qor}{|\!|}
+%\newcommand{\qdjoinop}{\raisebox{-2pt}{\ensuremath{\;\overset{d}{\bowtie}}}}
+\newcommand{\qdjoinop}{\raisebox{-2pt}{\ensuremath{{\bowtie^d}}}}
+\newcommand{\qdjoin}[2]{\ensuremath{\qdjoinop_{\left\langle#1\right\rangle}\!\left(#2\right)}}
+%\newcommand{\qmap}[2]{\pi_{\left\langle{#1}\right\rangle}\!\left({#2}\right)}
+\newcommand{\qmap}[2]{\chi_{\left\langle{#1}\right\rangle}\!\left({#2}\right)}
+\newcommand{\qmapenv}[1]{\chi^e_{\left\langle{#1}\right\rangle}}
+\newcommand{\qunnest}[3]{\rho_{#2/\{#1\}}\!\left({#3}\right)}
+\newcommand{\qselect}[2]{\sigma\!_{\left\langle{#1}\right\rangle}\!\left({#2}\right)}
+\newcommand{\qID}{\kkeyword{In}}
+\newcommand{\qENV}{\kkeyword{Env}}
+\newcommand{\qcomp}[2]{\ensuremath{\qdjoinop_{\left\langle#1\right\rangle}\!\left(#2\right)}}
+
+% derived rule constructs
+\newcommand{\rmapall}[1]{\kkeyword{mapall}~{#1}}
+\newcommand{\rmapsnone}[1]{\kkeyword{mapsnone}~{#1}}
+\newcommand{\raggregate}{\kkeyword{aggregate}}
+\newcommand{\rWW}[1]{\kkeyword{WW}\left({#1}\right)}
+\newcommand{\rRAB}[1]{\kkeyword{RAB}\left({#1}\right)}
+\newcommand{\rWORLD}{\textit{WORLD}}
+
+% rules to CAMP translation
+\newcommand{\rerp}[1]{\llbracket{#1}\rrbracket}
+
+% rule parts
+\newcommand{\makerp}[1]{\kkeyword{\emph{#1}}}
+\newcommand{\rpwhen}{\makerp{when}}
+\newcommand{\rpglobal}{\makerp{global}}
+\newcommand{\rpnot}{\makerp{not}}
+\newcommand{\rpreturn}{\makerp{return}}
+
+% NNRC expressions
+\newcommand{\elet}[3]{\kkeyword{let}~{#1} = {#2}~\kkeyword{in}~{#3}}
+\newcommand{\efor}[3]{\{{#3} \mid {#1} \in {#2}\}}
+\newcommand{\eif}[3]{{#1}~?~{#2} : {#3}}
+
+% operators
+\newcommand{\opunop}{\boxplus}
+\newcommand{\opbinop}{\boxtimes}
+\newcommand{\opand}{\&\&}
+\newcommand{\opnot}{\lnot}
+\newcommand{\opflatten}{\textit{flatten}}
+\newcommand{\opmergeconcat}{\otimes}
+\newcommand{\opconcat}{\oplus}
+
+% NNRC to CAMP translation 
+\newcommand{\ntop}[1]{\llbracket{#1}\rrbracket}
+
+% CAMP to NRA translation
+\newcommand{\pton}[1]{\llbracket{#1}\rrbracket_r}
+\newcommand{\etoa}[1]{\llbracket{#1}\rrbracket_a}
+\newcommand{\quntwoop}[2]{\rho_{{#2}/{\{#1\}}}}
+\newcommand{\quntwo}[3]{\rho_{{#2}/{\{#1\}}}\left({#3}\right)}
+
+% used as part of the efficient translation from NNRC to CAMP
+\newcommand{\rfresh}{\kkeyword{fresh}}
+
+% Lambda queries
+\newcommand{\llambda}[2]{\lambda#1.(#2)}
+\newcommand{\lmapop}{\kkeyword{map}}
+\newcommand{\lselop}{\kkeyword{filter}}
+\newcommand{\ldjoinop}{\kkeyword{d-join}}
+
+\newcommand{\lmap}[2]{\lmapop\left(#1\right)#2}
+\newcommand{\ldjoin}[2]{\ldjoinop\left(#1\right)#2}
+\newcommand{\lsel}[2]{\lselop\left(#1\right)#2}
+
+% used for nralambda to nraenv
+\newcommand{\ftoe}[1]{\llbracket{#1}\rrbracket_f}
+\newcommand{\ltoe}[1]{\llbracket{#1}\rrbracket_l}
+
+% NRA to NNRC
+\newcommand{\nton}[2]{\ensuremath{\llbracket{#2}\rrbracket_{#1}}}
+\newcommand{\nfresh}{\kkeyword{fresh}}
+
+% type system
+\newcommand{\tnil}{\texttt{NIL}}
+\newcommand{\tint}{\texttt{INT}}
+\newcommand{\tbool}{\texttt{BOOL}}
+\newcommand{\tstring}{\texttt{STRING}}
+
+% operator has type 
+\newcommand{\oht}{:}
+
+% data has type 
+\newcommand{\dht}{:}
+
+% CAMP pattern has type 
+\newcommand{\rht}{:}
+
+% NRA query has type 
+\newcommand{\qht}{:}
+
+% NNRC expression has type 
+\newcommand{\eht}{:}
+
+% data nil
+\newcommand{\dnil}{\textsf{nil}}
+
+\newcommand{\emptyrecord}{\ensuremath{[\,]}}
+\newcommand{\true}{\textsf{\small \mbox{true}}\xspace}
+\newcommand{\false}{\textsf{\small \mbox{false}}\xspace}
+\newcommand{\compatible}{\textsf{\small \mbox{compatible}}\xspace}
+
+\lstdefinelanguage{jrules}{
+  morekeywords={aggregate,do,emit,false,groupby,insert,new,rule,then,true,update,when},
+  numbers=none, columns=flexible, captionpos=b,
+  basicstyle={\small\selectfont\ttfamily}, keywordstyle=\bfseries,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  xleftmargin=0.5cm,
+  abovecaptionskip=0em,
+  belowcaptionskip=0em
+% ,frame=tlbr,framesep=4pt,framerule=0pt
+}
+
+\newcommand{\myparagraph}[1] { \noindent {\textbf {#1.}} }
+
+\newenvironment{gram}{
+  \[
+  \begin{array}{lcl}
+}{
+  \end{array}
+  \]
+}
+
+\newcommand{\Downarrowr}{\Downarrow_r} %rules
+\newcommand{\Downarrowa}{\Downarrow_a} %nra+env
+\newcommand{\Downarrown}{\Downarrow_n} %nra
+\newcommand{\Downarrowc}{\Downarrow_c} %calculus
+
+% Brands
+
+\newcommand{\brand}[1]{\mbox{\sf #1}}
+\newcommand{\branded}[2]{{\mbox{\sf brand #1}~({#2})}}
+\newcommand{\leftbranded}[1]{{\mbox{\sf brand #1}~}}
+\newcommand{\upcast}[2]{(\uparrow \mbox{\sf #1})~{#2}}
+\newcommand{\downcast}[2]{(\mbox{\sf #1})~{#2}}
+\newcommand{\cast}[2]{(\mbox{\sf #1})~{#2}}
+\newcommand{\BrandType}[1]{Brand~\mbox{\sf #1}}
+\newcommand{\derivesfrom}[2]{\delta(\mbox{\sf #1},\mbox{\sf #2})}
+
+% Typed Data
+
+\newcommand{\hastype}[3]{{#1} \vdash {#2} \dht {#3}}
+
+% Subtyping
+
+\newcommand{\subtype}[2]{{#1} \preccurlyeq {#2}}
+\newcommand{\subtyped}[2]{{#1} \preccurlyeq_{\delta} {#2}}
+
+% ignores stuff
+
+\newcommand{\nra}[1]{\mbox{NRA}(#1)}
+\newcommand{\igni}[1]{\mbox{$\cal I$}^i(#1)}
+\newcommand{\igne}[1]{\mbox{$\cal I$}^e(#1)}
+
+% environment stuff
+
+%\newcommand{\comment}[1]{\color{red}{#1}}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+
+%% Formattin/font stuff
+\renewcommand{\ttdefault}{lmtt}
+\vbadness=2000
+\newcommand\blueuline[1]{{\underline{\color{blue}{\color{black}{#1}}}}}

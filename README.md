@@ -4,6 +4,11 @@
 
 http://github.com/querycert/qcert
 
+## Reproduction
+
+For information about build the code and reproducing the SIGMOD-2017
+paper, see the [REPRO.MD](REPRO.MD) file.
+
 ## About
 
 This is the source code for the Q\*cert verified query compiler. The

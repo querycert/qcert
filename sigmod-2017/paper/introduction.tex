@@ -1,0 +1,210 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Some recent development around query languages and query processing is
+happening outside traditional database management systems, e.g.,
+language-integrated queries~\cite{cooper2007links,Meijer11},
+large-scale distributed processing
+infrastructure~\cite{armbrust2015spark,BeyerEGBEKOS11-full,OlstonRSKT08},
+NoSQL databases~\cite{OngPV14}, or domain specific
+languages~\cite{ShinnarSH15}. Understanding and guaranteeing
+correctness properties for those new data processing capabilities can
+be important when dealing with business critical or personal data. In
+relational systems, rule-based optimizers and optimizer
+generators~\cite{CareyDFGRSM91,cherniack1996rule,CherniackZ98,FegarasMS93,LeungMSVVZ93,PiraheshHH92}
+contribute to the high levels of performance and correctness
+confidence by enabling the specification, verification, and
+implementation of query compilers. This paper proposes to leverage
+modern theorem proving technology as a foundation for building
+well-specified and formally verified query compilers.
+
+Although our motivation stems from new query compilation scenarios,
+and specifically the extension of a rule-based language with a query
+DSL, we believe the approach can be applied in more traditional
+database contexts. As was shown in compilers for language integrated
+queries~\cite{grust2009ferry}, relying on traditional database
+algebras can bring numerous benefits. We follow a similar strategy and
+build on top of the nested relational algebra
+(NRA)~\cite{CluetM93,fegaras2000optimizing} which has been
+successfully used for building query compilers for nested data models,
+notably for OQL and XQuery~\cite{MayHM04,re2006complete}.
+
+As observed in prior work~\cite{cherniack1996rule,CherniackZ98},
+ensuring correctness remains hard even with a rule-based approach, and
+we have encountered similar challenges. Three of the main challenges
+are (i)~reasoning about scoping when variables are involved as part of
+the optimization rules, (ii)~providing tools to facilitate reasoning
+and correctness checking, and (iii)~handling code fragments as part of
+the rules. Although most of the previously proposed techniques and
+optimizations for NRA directly apply, those three challenges require
+special care and are the focus of this paper.
+
+\paragraph*{Handling Environments}
+
+The first challenge is intrinsically difficult for any
+compiler\footnote{Proper handling of variable scoping is known as one
+  of the main difficulties in solving the POPLmark
+  challenge~\cite{AydemirBFFPSVWWZ05}.} and is the central focus of
+the paper. Combinator-based
+algebras~\cite{cherniack1996rule,ShinnarSH15} have been used to
+eliminate variables in an attempt to facilitate reasoning.  However,
+they force the query translator to reify environments as part of the
+data being processed, which can result in larger and more complex
+query plans.
+
+This paper proposes \NRAEnv, an extension to a combinator-based nested
+relational algebra with native support for environments.  It avoids
+blow-ups in query plan size while facilitating correctness
+reasoning. This extension is conservative in the sense that existing
+NRA optimizations can be applied even to query plans containing the
+new constructs.
+
+\paragraph*{A Verified Query Compiler}
+
+To address the second challenge, we are developing a query compiler
+using the Coq proof assistant~\cite{coq} which we use for both the
+compiler specification and correctness proofs. A Coq feature called
+\emph{extraction}~\cite{coq:extraction} can then be used to
+automatically generate the query compiler's code from that
+specification.
+%
+Let us first illustrate the use of Coq for the implementation and
+verification of a simple algebraic rewrite. Throughout the paper, we
+will use the flower symbol~\coqtop\ to provide hyperlinks to the
+corresponding source code.
+
+As in rule-based optimizer generators, optimizations can be written in
+Coq as rewrites on algebraic terms. As an example, here is the Coq
+code for pushing down a selection operator over a union
+operator~(based on the classic distributivity law:
+${\qselect{q_0}{q_1 \cup q_2} \equiv \qselect{q_0}{q_1} \cup
+  {\qselect{q_0}{q_2}}}$):
+
+\begin{lstcoq}
+  Definition select_union_distr_fun q := $\mbox{\hspace*{2cm}\coqdef{NRAEnv.Optim.NRAEnvOptimizer}{select_union_distr_fun}}$
+    match q with
+    | NRAEnvSelect q0 (NRAEnvBinop AUnion q1 q2) =>
+        NRAEnvBinop AUnion (NRAEnvSelect q0 q1)
+                           (NRAEnvSelect q0 q2)
+    | _ => q
+    end.
+\end{lstcoq}
+This code is written in a functional style and defines a function with
+name \coqe{select_union_distr_fun} and one parameter \coqe{q} (the
+algebraic plan). The body of the function uses pattern matching to
+check whether the terms in \coqe{q} are indeed a selection over an
+union, in which case it applies the rewrite, or not, in which case it
+leaves the plan unchanged.
+%
+A key difference with most rule-based optimizer generators, is that
+Coq allows the query compiler developer to state (and also prove) the
+correctness of this rewrite:
+
+\begin{lstcoq}
+  Proposition select_union_distr_fun_correctness q: $\mbox{\hspace*{0.4cm}\coqdef{NRAEnv.Optim.NRAEnvOptimizer}{select_union_distr_fun_correctness}}$
+    select_union_distr_fun q ⇒ q.
+  Proof.
+    tprove_correctness p.
+    apply tselect_union_distr.
+  Qed.
+\end{lstcoq}
+This proposition states that for all query plans \coqe+q+, applying
+the function \coqe+tselect_union_distr_fun+ returns an equivalent
+query. Here the symbol \coqe+⇒+ denotes a notion of type-preserving
+equivalence which is used throughout our optimizer and is formally
+defined later in the paper.
+%
+The proposition statement is followed by a proof script that is
+mechanically checked. The proof relies on an automated proof tactic
+\coqe+tprove_correctness+ which eliminates all trivial cases except
+the important one which is solved using the lemma
+\coqe+tselect_union_distr+.
+%
+That lemma itself is simply a type preserving variant of the
+distributivity law for selection over union which we saw earlier:
+
+\begin{lstcoq}[mathescape=true]
+  Lemma tselect_union_distr q$\sb{0}$ q$\sb{1}$ q$\sb{2}$ : $\mbox{\hspace*{2.4cm}\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tselect_union_distr}}$
+    $\sigma$⟨ q$\sb{0}$ ⟩(q$\sb{1}$ ∪ q$\sb{2}$) ⇒ $\sigma$⟨ q$\sb{0}$ ⟩(q$\sb{1}$) ∪ $\sigma$⟨ q$\sb{0}$ ⟩(q$\sb{2}$).
+  Proof. ... Qed.
+\end{lstcoq}
+
+Formal verification techniques have been applied to the formalization
+of relational~\cite{BenzakenCD14,MalechaMSW10} and
+non-relational~\cite{CheneyU11,ShinnarSH15} query languages, but have
+seldom been used with query compilers implementation in mind. A
+notable exception is the Coko-Kola
+project~\cite{cherniack1996rule,CherniackZ98} which relied on the
+Larch~\cite{Larch89} theorem prover. Using Coq allowed us to apply
+those techniques beyond the query optimizer and prove correct a large
+subset of the compilation pipeline, including translations between
+intermediate languages and type checking.
+
+\paragraph*{Code Fragments}
+
+The third challenge is handling the need for code fragments as
+preconditions for rewrites. Here, we simply take advantage of the
+expressive specification language that Coq provides and which can be
+used to specify and reason about complex conditions (type conditions,
+ordering conditions, etc.) on the algebraic plans. Take for example
+the distinct elimination law:
+
+\begin{lstcoq}[mathescape=true]
+  Lemma tdup_elim q : nodupA q -> $\sharp$distinct(q) ⇒ q. $\mbox{\hspace*{0.3cm}\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tdup_elim}}$
+  Proof. ... Qed.
+\end{lstcoq}
+
+The predicate \coqe{nodupA q} holds when the query plan \coqe{q}
+always returns a collection without duplicates, and \coqe+->+ is the
+syntax for logical implication in Coq. In contrast to traditional
+rule-based optimizers, the \coqe{nodupA} predicate is not a
+subroutine written in a traditional programming language but is
+written in Coq itself and has also been proved correct.
+
+\paragraph*{Overview}
+
+The next section illustrates the distinction between variable-based
+and combinator-based algebras, how that distinction impacts algebraic
+equivalences, and introduces \NRAEnv through examples. The rest of the
+paper contains the formal treatment for the proposed NRA extension and
+its properties, applications, and implementation. This paper makes the
+following main contributions:
+\begin{itemize}
+\item It describes a new approach to handling environments in database
+  algebras and defines \NRAEnv, an extension of a combinator-based
+  nested relational algebra with support for environments
+  (Section~\ref{sec:nraenv}).
+\item It extends the traditional notion of algebraic equivalence for
+  \NRAEnv and defines algebraic rewrites for environment
+  manipulation. A main result is that all existing algebraic
+  equivalences for the original combinator-based NRA can be lifted
+  ``as is'' to \NRAEnv (Section~\ref{sec:optimization}).
+\item It shows that \NRAEnv\ can be effectively compiled back to
+  traditional NRA and calculus. This confirms that \NRAEnv has the
+  expected expressiveness and provides a bridge for integration into
+  existing systems (Section~\ref{sec:export}).
+\item It illustrates \NRAEnv on several use cases. We show it can
+  naturally encode an equivalent NRA with lambda terms. We also show
+  how environment operators provide an elegant way to represent view
+  declarations in SQL or OQL~(Section~\ref{sec:queries}). Finally, we
+  used \NRAEnv\ to radically simplify optimization for a query DSL
+  built on top of JRules~\cite{jrules-book}~(Section~\ref{sec:rules}).
+\end{itemize}
+
+There is more to a query compiler than its core algebra and
+optimizer. In Section~\ref{section:implementation}, we report on the
+status of our effort in building Q*cert, an end-to-end, formally
+verified, query compiler based on \NRAEnv. We review aspects that were
+left out of the main formal treatment in the paper, notably: front-end
+support, code generation, type checking and handling of user-defined
+types and functions.
+
+Although not necessary to follow the paper, the reader can consult the
+full compiler specification which we have made available at
+\url{https://querycert.github.io/sigmod17}.
+%
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:
+

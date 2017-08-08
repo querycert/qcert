@@ -1,4 +1,5 @@
-TPC_H=tpch_2_17_2/dbgen
+TPC_H_BASE=tpch_2_17_2
+TPC_H=${TPC_H_BASE}/dbgen
 TPCH_QGEN=$(TPC_H)/qgen
 
 TPCH_NUMBERS=1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22
@@ -32,7 +33,9 @@ $(TPCH_QGEN):	$(TPC_H)
 	$(MAKE) -C $(TPC_H)
 
 $(TPC_H):
-	unzip *tpc-h-tool.zip $(TPC_H)/*
+	mkdir tpch-tmp
+	cd tpch-tmp && unzip ../*tpc-h-tool.zip && mv * ../${TPC_H_BASE}
+	rmdir tpch-tmp
 
 ../dss.ddl:	$(TPC_H)/dss.ddl
 	cp $< $@

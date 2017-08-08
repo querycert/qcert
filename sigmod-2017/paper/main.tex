@@ -1,0 +1,144 @@
+\documentclass{sig-alternate-05-2015}
+
+\usepackage{hyperref}
+ \hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=magenta,
+    urlcolor=blue
+}
+\usepackage{pifont} % for \fleur macro
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage{url}
+\usepackage{array}
+\usepackage{infer}
+\usepackage{listings}
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{stmaryrd}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{alltt}
+\usepackage{subcaption}
+\usepackage{balance}
+
+\definecolor{darkergray}{gray}{0.38}
+
+\usepackage{lstcoq}
+\lstset{language=Coq,%
+   % basicstyle=\ttfamily,%
+   % keywordstyle=\color{blue}\ttfamily,%
+   columns=fullflexible,%
+   moredelim=[is][\itshape]{\#}{\#},%
+   showstringspaces=false,%
+}
+\lstnewenvironment{lstcoq}%
+{\footnotesize \lstset{language=Coq,keepspaces=true}}
+{}
+
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+
+%\pagenumbering{arabic}
+
+%%%%%%
+%%%%%% Hyperlinks to code
+\newcommand{\HTMLBase}{https://querycert.github.io}
+\newcommand{\coqHTMLBase}{\HTMLBase/sigmod17}
+\newcommand{\coqBaseModule}{Qcert.}
+\newcommand{\projectname}{Q*cert}
+%%%%%%
+%%%%%%
+
+%% Macros used in the paper
+
+\input{macros}
+
+\CopyrightYear{2017}
+\setcopyright{acmcopyright}
+\conferenceinfo{SIGMOD'17,}{May 14-19, 2017, Chicago, Illinois, USA}
+\isbn{978-1-4503-4197-4/17/05}\acmPrice{\$15.00}
+\doi{http://dx.doi.org/10.1145/3035918.3035961}
+
+\clubpenalty=10000 
+\widowpenalty = 10000
+
+%% End for macros used in the paper
+
+% Author macros::begin %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{Handling Environments in a Nested Relational Algebra with Combinators and an Implementation in a Verified Query Compiler}
+
+\numberofauthors{1}
+\author{\alignauthor
+Joshua S. Auerbach, Martin Hirzel, Louis Mandel,\\Avraham Shinnar \& J\'{e}r\^{o}me Sim\'{e}on\\
+       \affaddr{IBM Research}\\
+       \affaddr{1101 Kitchawan Rd}\\
+       \affaddr{Yorktown Heights, NY 10598}\\
+% 2nd. author
+}
+
+% Author macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  Algebras based on combinators, i.e., variable-free, have been
+  proposed as a better representation for query compilation and
+  optimization. A key benefit of combinators is that they avoid the
+  need to handle variable shadowing or accidental capture during
+  rewrites. This simplifies both the optimizer specification and its
+  correctness analysis, but the environment from the source language
+  has to be reified as records, which can lead to more complex query
+  plans.
+
+  This paper proposes \NRAEnv, an extension of a combinators-based
+  nested relational algebra (NRA) with built-in support for
+  environments. We show that it can naturally encode an equivalent NRA
+  with lambda terms and that all optimizations on NRA carry over to
+  \NRAEnv. This extension provides an elegant way to represent views
+  in query plans, and can radically simplify compilation and
+  optimization for source languages with rich environment
+  manipulations.
+  
+  We have specified a query compiler using the Coq proof assistant
+  with \NRAEnv at its heart. Most of the compiler, including the query
+  optimizer, is accompanied by a (machine-checked) correctness
+  proof. The implementation is automatically extracted from the
+  specification, resulting in a query compiler with a verified core.
+\end{abstract}
+
+\input{introduction}
+\input{variables}
+\input{nraenv}
+\input{optimization}
+\input{nraenvout}
+\input{queriesapp}
+\input{rulesapp}
+\input{mechanization}
+\input{related}
+\input{conclusion}
+
+\paragraph*{Acknowledgments} We would like to thank the anonymous
+reviewers for their comments and suggestions which greatly helped us
+improve the content and presentation of this work. We also thank
+Guillaume Baudart, Stefan Fehrenbach, and Erik Wittern for their
+feedback on earlier drafts.
+%
+Finally, we send this \text{\href{http://lucy-n.org/papers/Plateau-These-2010.pdf\#page=49}{\fleur}} to Florence Plateau.
+
+\bibliographystyle{abbrv}
+\bibliography{main}
+
+\appendix
+
+\input{camp}
+
+\end{document}
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

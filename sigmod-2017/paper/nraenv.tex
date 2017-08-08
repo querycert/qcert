@@ -1,0 +1,382 @@
+\begin{figure*}[tb]
+{\small
+{\color{darkergray}
+  \begin{gather*}
+\begin{infer}
+      {}
+      <Constant>
+      {\gamma \vdash d_0 \qapp\ d \Downarrowa d_0}
+    \end{infer} 
+    \qquad\qquad\qquad
+    \begin{infer}
+      {}
+      <ID>
+      {\gamma \vdash \qID \qapp\ d \Downarrowa d}
+    \end{infer} 
+    \qquad\qquad
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp\ d_0 \Downarrowa d_1}
+      {\gamma \vdash q_2 \qapp\ d_1 \Downarrowa d_2}
+      <\mbox{Comp}>
+      {\gamma \vdash q_2 \circ q_1 \qapp\ d_0 \Downarrowa d_2}
+    \end{infer} 
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q \qapp d \Downarrowa d_0}
+      {\opunop\, d_0 = d_1}
+      <Unary>
+      {\gamma \vdash \opunop\, q \qapp d \Downarrowa d_1}
+    \end{infer}
+    \qquad\qquad\qquad
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa d_1}
+      {\gamma \vdash q_2 \qapp d \Downarrowa d_2}
+      {\gamma \vdash d_1\opbinop d_2 = d_3}
+      <Binary>
+      {\gamma \vdash q_1\opbinop q_2 \qapp d \Downarrowa d_3}
+    \end{infer}
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \emptyset}
+      <Map $\emptyset$>
+      {\gamma \vdash \qmap{q_2}{q_1} \qapp d \Downarrowa \emptyset}
+    \end{infer}
+    \qquad\qquad\qquad
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \{d_1\}\cup s_1}
+      {\gamma \vdash q_2 \qapp d_1 \Downarrowa d_2}
+      {\gamma \vdash \qmap{q_2}{s_1} \qapp d \Downarrowa s_2}
+      <Map>
+      {\gamma \vdash \qmap{q_2}{q_1} \qapp d \Downarrowa \{d_2\}\cup s_2}
+    \end{infer}
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \{d_1\}\cup s_1}
+      {\gamma \vdash q_2 \qapp d_1 \Downarrowa \true}
+      {\gamma \vdash \qselect{q_2}{s_1} \qapp d \Downarrowa s_2}
+      <Sel$_{\mbox{T}}$>
+      {\gamma \vdash \qselect{q_2}{q_1} \qapp d \Downarrowa \{d_1\}\cup s_2}
+    \end{infer}
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \{d_1\}\cup s_1}
+      {\gamma \vdash q_2 \qapp d_1 \Downarrowa \false}
+      {\gamma \vdash \qselect{q_2}{s_1} \qapp d \Downarrowa s_2}
+      <Sel$_{\mbox{F}}$>
+      {\gamma \vdash \qselect{q_2}{q_1} \qapp d \Downarrowa s_2}
+    \end{infer}
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \emptyset}
+      <Sel$_\emptyset$>
+      {\gamma \vdash \qselect{q_2}{q_1} \qapp d \Downarrowa \emptyset}
+    \end{infer}
+    \qquad\qquad 
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \emptyset}
+      <Prod$^{l}_{\emptyset}$>
+      {\gamma \vdash q_1\times q_2 \qapp d \Downarrowa \emptyset}
+    \end{infer}
+    \qquad\qquad\quad
+    \begin{infer}
+      {\gamma \vdash q_2 \qapp d\Downarrowa \emptyset}
+      <Prod$^{r}_{\emptyset}$>
+      {\gamma \vdash q_1\times q_2 \qapp d \Downarrowa \emptyset}
+    \end{infer}
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q_1 \!\qapp\! d\!\Downarrowa\! \{d_1\}\!\cup\! s_1}
+      {\gamma \vdash q_2 \!\qapp\! d\!\Downarrowa\! \{d_2\}\!\cup\! s_2}
+      {\gamma \vdash \{d_1\}\!\times\! s_2 \!\qapp\! d\!\Downarrowa\! s_3}
+      {\gamma \vdash s_1\!\times\! \left(\{d_2\}\!\cup\! s_2\right) \!\qapp\! d\! \Downarrowa\! s_4}
+      <Prod>
+      {\gamma \vdash q_1\times q_2 \qapp d \Downarrowa \{d_1 \opconcat d_2\}\cup s_3\cup s_4}
+    \end{infer}
+    \\[\jot]
+    \hspace{-0.2in}
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \{d_1\}\cup s_1}
+      {\gamma \vdash \{d_1\}\!\times\! q_2 \!\qapp\! d_1\!\Downarrowa\! s_2}
+      {\gamma \vdash \qdjoin{q_2}{s_1} \qapp d \Downarrowa s_3}
+      <DJ>
+      {\gamma \vdash \qdjoin{q_2}{q_1} \qapp d \Downarrowa s_2 \cup s_3}
+    \end{infer}
+    \qquad\qquad
+    \begin{infer}
+      {\gamma \vdash q_1 \qapp d \Downarrowa \emptyset}
+      <DJ$_\emptyset$>
+      {\gamma \vdash \qdjoin{q_2}{q_1} \qapp d \Downarrowa \emptyset}
+    \end{infer}
+    \\[\jot]
+    \begin{infer}
+      {\gamma \vdash q_1\qapp d \Downarrowa d_1}
+      {d_1 \neq \emptyset}
+      <Default$_{\lnot\emptyset}$>
+      {\gamma \vdash q_1~\qor~q_2\qapp d \Downarrowa d_1}
+    \end{infer}
+    \qquad\qquad\qquad
+    \begin{infer}
+      {\gamma \vdash q_1\qapp d \Downarrowa \emptyset}
+      {\gamma \vdash q_2\qapp d \Downarrowa d_2}
+      <Default$_{\emptyset}$>
+      {\gamma \vdash q_1~\qor~q_2\qapp d \Downarrowa d_2}
+    \end{infer}
+  \end{gather*}
+}
+  \vspace*{-1.5em}
+  \begin{gather*}
+    \begin{infer}
+      {}
+      <\mbox{Env}>
+      {\gamma \vdash \qENV \qapp\ d \Downarrowa \gamma}
+    \end{infer} 
+    \qquad\qquad\qquad
+    \begin{infer}
+      {\gamma_1 \vdash q_1 \qapp\ d_1 \Downarrowa \gamma_2}
+      {\gamma_2 \vdash q_2 \qapp\ d_1 \Downarrowa d_2}
+      <\mbox{Comp$^e$}>
+      {\gamma_1 \vdash q_2 \circ^e q_1 \qapp\ d_1 \Downarrowa d_2}
+    \end{infer} 
+    \qquad\qquad\qquad
+    \\[\jot]
+    \begin{infer}
+      {}
+      <\mbox{Map$^e_\emptyset$}>
+      {\emptyset \vdash \qmapenv{q_2} \qapp d \Downarrowa \emptyset}
+    \end{infer}
+    \qquad\qquad\qquad\qquad\ 
+    \begin{infer}
+      {d_1 \vdash q_2 \qapp d \Downarrowa d_2}
+      {s_1 \vdash \qmapenv{q_2} \qapp d \Downarrowa s_2}
+      <\mbox{Map$^e$}>
+      {\{d_1\}\cup s_1 \vdash \qmapenv{q_2} \qapp d \Downarrowa \{d_2\}\cup s_2}
+    \end{infer}
+  \end{gather*}
+}
+  \vspace{-0.3cm}
+\caption{\NRAEnv\ Semantics\,\coqdef{NRAEnv.Core.cNRAEnv}{cnraenv_eval}.\qquad \fbox{\(\gamma \vdash q \rapp d \Downarrowa d\)}}
+  \vspace{-0.3cm}
+\label{fig:nra-semantics}
+\end{figure*}
+
+\section{\NRAEnv}
+\label{sec:nraenv}
+
+This section introduces \NRAEnv, our extension of NRA that supports
+environments. To do so, we first define a data model for complex
+values, operators on that data model, and a combinators-based NRA.
+
+\subsection{Data Model and Operators}
+\label{sec:nraenv:data}
+
+
+Values in our data model are constants, bags, or
+records\,\coqdef{Basic.Data.RData}{data}:
+$$
+\begin{array}{l@{\ }r@{\ }l}
+d & ::= &
+  c
+  \mid \emptyset
+  \mid \{\overline{d_i}\}
+  \mid [\,]
+  \mid [\overline{A_i\!:d_i}]
+\end{array}
+$$
+Constants~($c$) includes integers, strings, etc. 
+%
+A bag is a multiset of values. Let $\emptyset$ denote the empty bag
+and \mbox{$\{d_1,...,d_n\}$} the bag with values \mbox{$d_1,...,d_n$}.
+%
+A record is a mapping from a finite set of attributes to values, where
+attribute names are drawn from a sufficiently large set
+\mbox{$A,B,...$}.  Let $[\,]$ denote the empty record and
+\mbox{$[\overline{A_i\!:d_i}]$} the record mapping $A_i$ to $d_i$.
+$\textrm{dom}([\overline{A_i\!:d_i}])$ is the set of labels $A_i$.
+
+Unary and binary operators are basic operations over the data
+model. Unary operators include the
+following\,\coqdef{Basic.Operators.RUnaryOps}{unaryOp}\coqdef{Basic.Operators.RUnaryOpsSem}{fun_of_unaryop}:
+$$
+\begin{array}{l@{\ }c@{\ }ll}
+  \opunop\;d & ::= &
+  \textit{ident}\;d & \mbox{returns $d$}
+  \\ & \mid &
+  \opnot d              & \mbox{negates a Boolean}
+  \\ & \mid &
+  \{d\}                 & \mbox{the singleton bag containing~$d$}
+  \\ & \mid &
+  \opflatten\;d         & \mbox{flattens one level of a bag of bags}
+  \\ & \mid &
+  \mbox{[} A : d \mbox{]}  & \mbox{the record with attribute $A$ of value~$d$}
+  \\ & \mid &
+  d.A                   & \mbox{the value of attribute $A$ in record $d$}
+  \\ & \mid &
+  d - A                 & \mbox{removes attribute $A$ from record $d$}
+  \\ & \mid &
+  \pi_{\overline{A_i}}(d) & \mbox{the projection of record $d$ over $\overline{A_i}$}
+\end{array}
+$$
+Binary operators include the following\,\coqdef{Basic.Operators.RBinaryOps}{binOp}\coqdef{Basic.Operators.RBinaryOpsSem}{fun_of_binop}:
+$$
+\begin{array}{l@{\ }c@{\ }ll}
+  d_1 \opbinop d_2 & ::= &
+  % \\ & \mid &
+  d_1 = d_2 & \mbox{compares two data for equality}
+  \\ & \mid &
+  d_1 \in d_2 & \mbox{$\true$ if $d_1$ is an element of bag $d_2$}
+  \\ & \mid &
+  d_1 \cup d_2 & \mbox{the union of two bags}
+  \\ & \mid &
+  d_1 \opconcat d_2 & \mbox{concatenates two records, favoring}\\ &&&
+              \mbox{$d_2$ for overlapping attributes}
+  \\ & \mid &
+  d_1 \opmergeconcat d_2 & \mbox{returns a singleton with the record}\\ &&&
+              \mbox{concatenation if compatible,}\\ &&&
+              \mbox{and $\emptyset$ otherwise}
+\end{array}
+$$
+
+Compatibility-based concatenation is used to capture unification in
+binders (with the same semantics as in a natural join). Two records
+$x$ and $y$ are deemed \emph{compatible} if common attributes match:
+$\forall{A\in\textrm{dom}(x)\cap\textrm{dom}(y)}$, $x(A) = y(A)$.
+
+We only gave here a few key operators, but those can be easily
+extended (e.g, for arithmetic or aggregation). The record operations
+are sufficient to support all the classic relational and nested
+relational operators.
+
+\subsection{Combinator-based NRA}
+\label{sec:nraenv:nra}
+
+We first give a definition for the combinator-based NRA which is the
+basis for our extension.
+
+\begin{definition}[NRA syntax\,\coqdef{NRA.Lang.NRA}{nra}]
+\begin{gram}
+  \mbox{}~q & ::= & \phantom{\mid\,}
+          d
+     \mid \qID
+     \mid    q_2 \circ q_1 % Compose
+     \mid \opunop\, q \mid q_1 \opbinop q_2
+     \mid    \qmap{q_2}{q_1}   % Map
+     \\ &&
+     \mid  \qselect{q_2}{q_1}  % Select
+     \mid    q_1 \times q_2      % Product 
+     \mid    \qdjoin{q_2}{q_1}   % MapConcat
+     \mid    q_1~\qor~q_2        % Default
+\end{gram}
+\end{definition}
+
+This algebra is the one from~\cite{CluetM93,ShinnarSH15}.  Most
+operators should be familiar to the reader, with the exception of
+$\qor$, which was introduced in~\cite{ShinnarSH15} to handle aspects
+of error propagation and which will be needed in
+Section~\ref{sec:rules}.
+
+Here, $d$ returns constant data, $\qID$ returns the context
+value~(usually a bag or a record), and $q_2 \circ q_1$ denotes query
+plan composition, i.e., it evaluates $q_2$ using the result of $q_1$
+as input value. $\opunop$ and $\opbinop$ are unary and binary
+operators from Section~\ref{sec:nraenv:data}. $\chi$ is the map
+operation on bags, $\sigma$ is selection, and $\times$ is the
+Cartesian product. The \emph{dependent join} $\qdjoin{q_2}{q_1}$
+evaluates $q_2$ with its context set to each value in the bag
+resulting from evaluating $q_1$, then concatenates records from $q_1$
+and~$q_2$ as in a Cartesian product. The $\qor$ expression, called
+\emph{default}, evaluates its first operand and returns its value,
+unless that value is $\emptyset$, in which case it returns the value
+of its second operand (as default).
+
+Note that other NRA operators useful for optimization (e.g., joins or
+group-by) can be defined in terms of this core algebra. For example,
+the standard relational projection is defined as
+$\Pi_{\overline{A_i}}(q) = \qmap{\pi_{\overline{A_i}}}{q}$\,\coqdef{NRAEnv.Lang.NRAEnv}{project}, and
+unnest, which will be used in Section~\ref{sec:export}, is defined as:
+\[
+\quntwo{A}{B}{q} = \qmap{\qID\!-\!A}{\qdjoin{\qmap{[B:\qID]}{\qID.A}}{q}} \hfill\coqdef{NRAEnv.Lang.NRAEnv}{unnest}
+\]
+
+\subsection{\NRAEnv Syntax and Semantics}
+\label{sec:nraenv:syntax}
+
+The following gives the syntax for \NRAEnv, which is a proper
+extension from the combinator-based NRA from
+Section~\ref{sec:nraenv:nra}.
+
+\begin{definition}[\NRAEnv\ syntax\,\coqdef{NRAEnv.Core.cNRAEnv}{cnraenv}]
+\begin{gram}
+  \mbox{}~q & ::= & ...
+  \mid \qENV             % Env
+  \mid   q_2 \circ^{e} q_1  % Compose+Env
+  \mid   \qmapenv{q}       % Map+Env
+\end{gram}
+\end{definition}
+
+We denote by $\nra{q}$ the property that query $q$ does not use any of
+the new operators\,\coqdef{NRAEnv.Core.cNRAEnvIgnore}{cnraenv_is_nra}: the
+set of plans $q$ such that $\nra{q}$ is the standard NRA.
+%
+Let
+$\igne{q}$\,\coqdef{NRAEnv.Core.cNRAEnvIgnore}{cnraenv_ignores_env}
+~(resp.\
+$\igni{q}$\,\coqdef{NRAEnv.Core.cNRAEnvIgnore}{cnraenv_ignores_id})
+denote the property that query plan $q$ ignores the
+environment~$\qENV$ (resp.\ the input data~$\qID$).
+
+Figure~\ref{fig:nra-semantics} gives an operational semantics for
+\NRAEnv.  It is defined by a judgment of the form ${\gamma \vdash q
+  \rapp d \Downarrowa d'}$ which reads as: in the environment
+$\gamma$, the query~$q$ is evaluated against the input data~$d$ and
+produces output data $d'$.  The environment $\gamma$ can be any value,
+but in most cases, it is a record whose fields correspond to variable
+bindings.  The rules for the NRA constructs of \NRAEnv are the same as
+the rules for ${\vdash q \qapp d \Downarrowa d'}$ used to define the
+semantics of NRA in~\cite{ShinnarSH15}.
+
+Three operators are added to manipulate environments:
+%
+access to the environment~($\qENV$),
+%
+composition over the environment~($q_2 \circ^{e} q_1$),
+%
+and map over the environment~($\qmapenv{q}$). The semantics of $\qENV$
+is to return the current environment. Hence, for example, if we want
+to access the value of the variable $A$ in the environment, we can
+write $\qENV.A$.
+
+The semantics of ${q_2 \circ^{e} q_1}$ is to evaluate $q_2$ in the
+environment bound to the value returned by $q_1$. It is similar to
+query composition ($\circ$) but changes the environment rather than
+the input value.
+%
+This construct is useful for example to add a value~$d$ in the
+environment associated to the variable~$A$ for the evaluation of a
+query~$q$: ${q\;\circ^{e}\;\left(\qENV\;\opconcat\;[A:d]\right)}$,
+keeping in mind that the record concatenation operator $\opconcat$
+favors the right-most binding in case of conflict.
+
+The last operator, $\chi^e$, is dual to the standard map but
+iterates over the environment rather than over the input collection. It is
+mainly useful to handle the result of merging two environments using
+the $\opmergeconcat$ operator. The expression:
+${\qmapenv{q}\;\circ^{e}\;\left(\qENV\;\opmergeconcat\;[A:d]\right)}$
+merges a new binding for variable $A$ with value $d$ to an existing
+environment, and passes the resulting environment (if successful) to
+the subsequent query $q$. Let us assume the environment $\qENV$
+contains the record $[A : 1, B: 3]$, the following shows an example
+where merge succeeds (resp. fails) over the common variable $B$:
+\begin{align*}
+  \qmapenv{\qENV.A+\qENV.C}\;\circ^{e}\;\left(\qENV\;\opmergeconcat\;[B:3,C:4]\right) & \Rightarrow \{ 5 \}&\coqdef{Tests.NRAEnvTest}{merge_succeeds_result}\\
+  \qmapenv{\qENV.A+\qENV.C}\;\circ^{e}\;\left(\qENV\;\opmergeconcat\;[B:2,C:4]\right) & \Rightarrow \{ \}&\coqdef{Tests.NRAEnvTest}{merge_fails_result}
+\end{align*}
+After the merge, the environment contains a collection, in our example
+either $\{[A:1, B:3, C:4]\}$ or $\{\}$, and $\chi^e$ accounts for
+that. This feature is an important advantage of the combinators-based
+approach over a lambda-based approach: it allows it to capture
+environment unification which is notably useful for rule-based languages,
+e.g., in Sparql or the CAMP calculus in Section~\ref{sec:rules}.
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

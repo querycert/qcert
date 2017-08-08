@@ -1,0 +1,24 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper introduced \NRAEnv, the Nested Relational Algebra with
+Environments, which provides the foundation for a formally verified
+query compiler written using the Coq proof assistant. \NRAEnv extends
+a combinators-based nested relational algebra with explicit
+environment support in a way that facilitates the specification and
+verification of algebraic rewrites. A lifting theorem shows that all
+existing NRA optimizations also apply to \NRAEnv. We showed how the
+resulting compiler can be used for both traditional queries and for a
+query DSL in the context of a rules language. 
+
+Theorem proving techniques have greatly matured in recent years, and
+we feel that their application to databases could prove useful in a number
+of ways (for specification, prototyping, or to provide correctness
+guarantees in scenarios where security or privacy are important). We
+are currently working on further improvements to our compiler
+infrastructure, notably to the optimizer and backend, in order to
+support code-generation for distributed query plans.
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

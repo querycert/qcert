@@ -1,0 +1,259 @@
+\begin{figure*}
+  \begin{minipage}{0.52\linewidth}
+    \centering
+    \[\begin{array}{r@{\ }c@{\ }ll}
+        \multicolumn{4}{c}{\textbf{Environment constructs removal}}\\
+        q \circ^e \qENV & \Rightarrow& q
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_env_r_arrow}
+        \\
+        \qENV \circ^e q & \Rightarrow& q
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_env_l_arrow} 
+        \\
+        \mbox{if~} \igne{q_1},\ q_1 \circ^e q_2 & \Rightarrow& q_1
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_ignoreenv_arrow}
+        \\
+        \qmap{\qENV}{\qselect{q}{\{ \qID \}}} \circ^e \qID & \Rightarrow& \qselect{q}{\{ \qID \}} \circ^e \qID
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tflip_env1_arrow}
+        \\
+        \mbox{if~} \igne{q_1},\ \qmap{\qENV}{\qselect{q_1}{\{ \qID \}}} \circ^e q_2 & \Rightarrow& \qmap{q_2}{\qselect{q_1}{\{ \qID \}}}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tflip_env4_arrow}
+        \\
+        \qmapenv{\qENV} \circ q & \Rightarrow& \qENV
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmapenv_to_env_arrow}
+        \\
+        \qmapenv{q_1} \circ^e \{ q_2 \} & \Rightarrow &\{ q_1 \circ^e q_2 \}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmapenv_over_singleton_arrow}
+        \\
+        \mbox{if~} \igni{q_1},\ \qmapenv{q_1} \circ^e q_2 & \Rightarrow& \qmap{q_1 \circ^e \qID}{q_2}
+        & \coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tmapenv_to_map_arrow}
+    \end{array}\]
+  \end{minipage}
+  \begin{minipage}{0.45\linewidth}
+    \centering
+    \[\begin{array}{r@{\ }c@{\ }ll}
+      \multicolumn{4}{c}{\textbf{$\circ^e$ pushdown}}\\
+      (\opunop(q_1)) \circ^e q_2 & \Rightarrow& \opunop(q_1 \circ^e q_2)&\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_unop_arrow}\\
+      (q_1 \opbinop q_2) \circ^e q & \Rightarrow& (q_1 \circ^e q) \opbinop (q_2 \circ^e q)&\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_binop}\\
+      \mbox{if~} \igni{q},\ \qmap{q_1}{q_2} \circ^e q & \Rightarrow& \qmap{q_1 \circ^e q}{q_2 \circ^e q}&\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_map_arrow}\\
+      \mbox{if~} \igni{q},\ \qselect{q_1}{q_2} \circ^e q & \Rightarrow &\qselect{q_1 \circ^e q}{q_2 \circ^e q}&\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_select_arrow}\\
+      (q_1 \circ^e q_2) \circ^e q & \Rightarrow& q_1 \circ^e (q_2 \circ^e q) &\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_appenv_arrow}\\
+      \mbox{if~} \igne{q_1},\ (q_1 \circ q_2) \circ^e q & \Rightarrow& q_1 \circ (q_2 \circ^e q) &\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_app_ie_arrow}\\
+      \mbox{if~} \igne{q_1},\ q_1 \circ^e q_2 & \Rightarrow& q_1 &\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_ignoreenv_arrow}\\
+      \mbox{if~} \igne{q_1},\ (\qENV \opmergeconcat q_1) \circ^e q & \Rightarrow& q \opmergeconcat q_1 &\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tappenv_over_env_merge_l_arrow} \\
+      \qselect{q}{\{ \qID \}} \circ^e \qID & \Rightarrow& \qselect{q \circ^e \qID}{\{ \qID \}}&\coqdef{NRAEnv.Optim.TNRAEnvRewrite}{tflip_env2_arrow}\\
+    \end{array}\]
+  \end{minipage}
+  \vspace*{2mm}
+  \caption{Rewrites for \NRAEnv}
+  \label{tab:rewrites}
+\end{figure*}
+
+\section{Optimization}
+\label{sec:optimization}
+
+This section presents rewrites designed to optimize
+\NRAEnv query plans.  We also prove that any existing NRA rewrites can
+be applied to an \NRAEnv query plan, even if subexpressions manipulate
+the environment.
+%
+First, we define a notion of equivalence to capture rewrite correctness.
+
+\subsection{Equivalences}
+\label{sec:optimization:equiv}
+
+The semantics of equivalences we use to define and prove correctness
+follows the classic notion of \emph{strong equivalence} as defined
+in~\cite{aho1979efficient} (rather than \emph{weak equivalence}).
+
+\begin{definition}[Equivalence\,\coqdef{NRAEnv.Core.cNRAEnvEq}{cnraenv_eq}]
+\label{def:nraenv-equiv}
+  Two plans $q_1$ and $q_2$ are equivalent~($q_1 \equiv q_2$) iff for any environment
+  $\gamma$ and for any input data $d$, evaluating $q_1$ and $q_2$ over
+  data $d$ in environment $\gamma$ returns the same value. I.e., $\forall \gamma, d$
+  \begin{align*}
+    \left(\exists{d_1},\gamma \vdash q_1 \qapp d \Downarrowa d_1
+    \iff \exists{d_2}, \gamma \vdash q_2 \qapp d \Downarrowa d_2\right)
+  \wedge
+  \\
+  \forall{ d_1, d_2},
+    \left(\gamma \vdash q_1 \qapp d \Downarrowa d_1\right) \wedge \left(\gamma \vdash q_2 \qapp d \Downarrowa d_2\right) \implies d_1 = d_2
+  \end{align*}
+\end{definition}
+As in most database optimizers, we only consider rewriting for
+well-typed algebraic plans. In our context, we focus on directed
+equivalences, where the direction indicates the way those are used in
+the optimizer. Since we have omitted treatment of type checking from
+the paper, we leave that definition somewhat informal.
+
+\begin{definition}[Typed Rewrites\,\coqdef{NRAEnv.Typing.TcNRAEnvEq}{tcnraenv_rewrites_to}]
+  We say a query plan $q_1$ rewrites to query plan $q_2$,
+  written $q_1 \Rightarrow q_2$ iff, given a well-typed $q_1$, then
+  $q_2$ is also well typed, and for all well-typed input data and
+  environments, they return the same value.
+\end{definition}
+
+The corresponding equivalence and typed rewrite relation are defined similarly
+for NRA\,\coqdef{NRA.Lang.NRAEq}{nra_eq}\coqdef{NRA.Typing.TNRAEq}{tnra_rewrites_to}.
+
+Both plan equivalence and typed rewrites are contextual: given any
+plan $C_1$, and a sub-plan $q$ which is a sub-expression of $C$,
+replacing $q_1$ by $q_2$ (where $q_1 \equiv q_2$ or $q_1 \Rightarrow
+q_2$) yields a new $C_2$ such that $C_1 \equiv C_2$ or $C_1
+\Rightarrow C_2$ as appropriate. In the mechanization, this is
+expressed as a set of proofs that each type of expression preserves
+plan equivalence and typed rewrites.  For example, swapping two
+equivalent sub-plans inside a map operator yields an equivalent
+plan\,\coqdef{NRAEnv.Core.cNRAEnvEq}{anmap_proper}\coqdef{NRAEnv.Typing.TcNRAEnvEq}{anmap_tproper}.
+These proofs, when taken together, establish that plan equivalence and
+typed rewrites are contextual, and enables rewriting sub-expressions
+freely, which is critical for optimization.
+
+Note that, as in the relational context, plan equivalence implies
+typed rewrites as long as the result is well-typed (assuming the
+source
+is)\,\coqdef{NRA.Typing.TNRAEq}{rewrites_typed_and_untyped}\coqdef{NRAEnv.Typing.TcNRAEnvEq}{rewrites_typed_with_untyped}.
+Our implementation includes a full type checker and the correctness
+proofs for all the rewrites used in the optimizer have been verified
+for both untyped and typed cases (depending on the specific rewrites).
+
+\subsection{Lifting NRA Rewrites}
+\label{sec:nraenv:lifting}
+
+One of the most important properties of \NRAEnv\ is the ability to
+reuse existing known equivalences from NRA. This is a strong result
+since we allow lifting equivalences over query plans that may contain
+environment manipulations. To illustrate that idea, let us consider a
+simple selection pushdown equivalence from the relational literature:
+\[ \qselect{q_0}{q_1\cup q_2} \equiv \qselect{q_0}{q_1}\cup\qselect{q_0}{q_2}\]
+For NRA, $q_0$ is an arbitrary query plan returning a Boolean
+value. Our lifting result shows that if such an equivalence is true
+for any well typed $q_0$, $q_1$, $q_2$ in NRA, then it is also true
+for any well typed $q_0$, $q_1$, $q_2$ in \NRAEnv.
+
+This result relies on the fact that the NRA equivalences are
+effectively a form of parametric polymorphism in terms of $q_0$,
+$q_1$, $q_2$. To properly express this, we need a stronger notion of
+equivalence which is parametric. We first define parametric plans for
+both the NRA and \NRAEnv, which are query plans with some \emph{plan
+  variables}, along with parametric plan \textit{instantiation}. We
+use the set ${\cal PV} = \{ \$q_0,\ldots,\$q_n \}$ to denote plan
+variables.
+
+\begin{definition}[Parametric Plan\,\coqdef{NRA.Context.NRAContext}{nra_ctxt}\coqdef{NRAEnv.Context.cNRAEnvContext}{cnraenv_ctxt}]
+  A parametric plan $c$ over plan variables
+  $\$q_0,\ldots,\$q_n$ is an expression in the NRA
+  (resp. \NRAEnv) grammar extended with plan variables
+  $\$q_0,\ldots,\$q_n$.
+\end{definition}
+
+For example, $\qselect{\$q_0}{\$q_1\cup\$q_2}$ denotes a parametric
+plan over plan variables $\$q_0$ , $\$q_1$, $\$q_2$.
+
+\begin{definition}[Plan Instantiation\,\coqdef{NRA.Context.NRAContext}{ac_substs}\coqdef{NRAEnv.Context.cNRAEnvContext}{aec_substs}]
+  Given a \\ parametric plan $c$ over plan variables
+  $\$q_0,\ldots,\$q_n$, the instantiation of $c$ with
+  $q_0,\ldots,q_n$, denoted $c[q_0,\ldots,q_n]$, is the query plan
+  obtained by substituting $\$q_i$ by $q_i$ in $c$.
+\end{definition}
+
+We can now define parametric equivalence, which states that two
+parametric plans are equivalent if every plan instantiation for those
+two plans are equivalent.
+
+\begin{definition}[Parametric equiv.\,\coqdef{NRA.Context.NRAContext}{nra_ctxt_equiv}\coqdef{NRAEnv.Context.cNRAEnvContext}{cnraenv_ctxt_equiv}]
+  Given two \\ parametric plans $c_1$ and $c_2$ over
+  $\$q_1,\ldots,\$q_n$, we say that they are \textit{parametric
+    equivalent} iff, for every plans $q_1,\ldots,q_n$:
+  \[ c_1[q_0,\ldots,q_n] \equiv c_2[q_0,\ldots,q_n] \]
+  We use $c_1 \equiv_c c_2$ and $c_1 \equiv^e_c c_2$ to denote
+  parametric equivalence for the NRA and \NRAEnv respectively.
+\end{definition}
+
+For example,  the following holds for the NRA:
+\[ \qselect{\$q_0}{\$q_1\cup\$q_2} \equiv_c
+\qselect{\$q_0}{\$q_1}\cup\qselect{\$q_0}{\$q_2}\quad \coqdef{NRA.Optim.NRARewriteContext}{ctxt_select_union_distr} \]
+
+Most relational or nested relational equivalences are in fact
+parametric. Formalizing parametric equivalence
+enables the precise statement of the following key lifting theorem:
+
+\begin{theorem}[Equiv. Lifting\,\coqdef{NRAEnv.Context.cNRAEnvContextLift}{contextual_equivalence_lifting}]
+  \label{thm:lifting}
+  Every parametric \\ NRA equivalence is also a parametric \NRAEnv\ equivalence:
+  \[ c_1 \equiv_c c_2 \implies c_1 \equiv^e_c c_2 \]
+\end{theorem}
+
+This result and corresponding proof are non-trivial and deserve a few
+comments. First, recall that every NRA operator is also an \NRAEnv\
+operator. This means the theorem statement is well-formed in the sense
+that the operators in $c_1$ and $c_2$ are also \NRAEnv\ operators that
+can be used on the right-hand side. Second, the proof fundamentally
+relies on the ability to translate \NRAEnv\ back to NRA
+(Theorem~\ref{thm:nraenvtonra-correctness} in
+Section~\ref{sec:export}). It also relies on the observation that the
+part of the query that was lifted from NRA cannot \emph{change} the
+environment.  The instantiated \NRAEnv\ expressions can interact with
+the environment, but modifications are local.  The proof can thus
+treat the environment as mostly constant.
+
+\begin{figure*}[ht]
+  \centering
+\begin{align*}
+\etoa{d}&=d\\
+\etoa{\qID}&= \qID.D\\
+\etoa{q_2 \circ q_1}&= \etoa{q_2} \circ ([E:\qID.E] \opconcat [D:\etoa{q_1}])\\
+\etoa{\opunop q}&= \opunop \etoa{q}\\
+\etoa{q_1 \opbinop q_2}&= \etoa{q_1} \opbinop \etoa{q_2}\\
+\etoa{\qmap{q_2}{q_1}}&= \qmap{\etoa{q_2}}{\quntwo{T_1}{D}{ \{ [E:\qID.E] \opconcat [T_1:\etoa{q_1}] \} } }\\
+\etoa{\qselect{q_2}{q_1}}&= \qmap{ \qID.D }{\qselect{\etoa{q_2}}{\quntwo{T_1}{D}{ \{ [E:\qID.E] \opconcat [T_1:\etoa{q_1}] \} } } }\\
+\etoa{q_1 \times q_2}&= \etoa{q_1} \times \etoa{q_2}\\
+\etoa{\qdjoin{q_2}{q_1}}&= \qmap{ \qID.D \opconcat \qID.T_2 }{\qdjoin{\qmap{[T_2:\qID]}{\etoa{q_2}}}{\quntwo{T_1}{D}{ \{ [E:\qID.E] \opconcat [T_1:\etoa{q_1}] \} } } }\\
+\etoa{q_1 \qor q_2}&=\etoa{q_1} \qor \etoa{q_2}\\
+\etoa{\qENV}&= \qID.E\\
+\etoa{q_2 \circ^e q_1}&= \etoa{q_2} \circ ([E:\etoa{q_1}] \opconcat [D:\qID.D])\\
+\etoa{\qmapenv{q_2}}&= \qmap{\etoa{q_2}}{\quntwo{T_1}{E}{ \{
+                           [T1:\qID.E] \opconcat [D:\qID] \} } }
+\end{align*}
+  \caption{From \NRAEnv to NRA\,\coqdef{NRAEnv.Core.cNRAEnv}{nra_of_cnraenv}. \qquad \fbox{\(\etoa{q} = q'\)}}
+  \label{fig:nraenvtonra}
+\end{figure*}
+
+\subsection{\NRAEnv\ Rewrites}
+\label{sec:nraenv:rewrites}
+
+In addition to NRA optimizations lifted to \NRAEnv, we developed
+additional optimizations for our extended algebra. We report on two
+categories of rewrites, which are given in Figure~\ref{tab:rewrites}.
+%
+The first category contains rewrites that remove environment
+manipulation constructs.
+%
+For example, in the first rewrite~($q\ \circ^e\ \qENV \Rightarrow q$),
+it is possible to get rid of the composition over the environment
+because it replaces the value of the environment for the evaluation of
+$q$ by itself.
+
+Some of the rewrites use the predicates introduced in
+Section~\ref{sec:nraenv:syntax} that test if a query ignores the
+context data ($\igni{q}$) or the environment ($\igne{q}$).
+%
+For example, the third rewrite ($\mbox{if~} \igne{q_1}$, ${q_1 \circ^e
+  q_2 \Rightarrow q_1}$) shows that if the query on the left of a
+composition over the environment does not access the value of the
+environment, then it is not necessary to replace the value of the
+environment by the value of~$q_2$.  Like the \texttt{nodupA} example
+in the introduction, the $\igni{q}$ and $\igne{q}$ predicates are
+written in Coq and proved correct, showcasing the ability to use code
+fragments in pre-conditions.
+
+The $\circ^e$ pushdown category is central to the processing of the
+context. It corresponds to changing the scope for the environment. The
+general idea here is to push down the context close to the place where
+it is being used in order to eliminate it, which happens when the
+composition reaches a leaf. For instance if $\circ^e$ gets pushed down
+all the way to an $\qID$ it can be eliminated since the
+environment is not used.
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:

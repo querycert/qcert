@@ -1,0 +1,164 @@
+\section{Variables Revisited}
+\label{sec:variables}
+
+\begin{figure*}
+  \begin{center}
+\begin{subfigure}[b]{0.95\linewidth}
+\centering
+    \begin{minipage}{0.9\linewidth}
+      \centering
+      \[\begin{array}{l@{\ }r@{\ \equiv\ }l}
+        \textbf{T1 (lambdas):~} & \lmapop(\llambda{a}{a.\mathit{city}})(\lmapop(\llambda{p}{p.\mathit{addr}})(P)) & \lmapop(\llambda{p}{(p.\mathit{addr}).\mathit{city}})(P)\\
+        \textbf{T1$^c$ (combin.):~} & \qmap{\qID.\mathit{a}.\mathit{city}}{\qmap{[a:\qID]}{\qmap{\qID.\mathit{p}.\mathit{addr}}{\qmap{[p:\qID]}{P}}}} & \qmap{\qID.\mathit{p}.\mathit{addr}.\mathit{city}}{\qmap{[p:\qID]}{P}}\\
+        \textbf{T1$^e$ (\NRAEnv):~} & \qmap{\qENV.\mathit{a}.\mathit{city}\;\circ^e\;[a:\qID]}{\qmap{\qENV.\mathit{p}.\mathit{addr}\;\circ^e\;[p:\qID]}{P}} & \qmap{\qENV.\mathit{p}.\mathit{addr}.\mathit{city}\;\circ^e\;[p:\qID]}{P}\\
+      \end{array}\]
+    \end{minipage}
+  \end{subfigure}
+\begin{subfigure}[b]{0.95\linewidth}
+\centering
+    \begin{minipage}{0.9\linewidth}
+      \centering
+      \[\begin{array}{l@{\ }l}
+      \textbf{A4 (lambdas):~} & \lmapop(\llambda{p}{[ \mathit{person}: p,\;\mathit{kids}: \lselop(\llambda{c}{p.\mathit{age} > 25})(p.\mathit{child}) ]}(P)\\
+      \textbf{A4$^c$ (combin.):~} & \qmap{\Big[\textstyle \mathit{person}: \qID.p,\;\mathit{kids}: \qselect{\qID.p.\mathit{age} > 25}{\qdjoin{\qmap{[c:\qID]}{\qID.p.\mathit{child}}}{\{\qID\}}} \Big]}{\qmap{[p:\qID]}{P}}\\
+      \textbf{A4$^e$ (\NRAEnv):~} & \qmap{\textstyle [ \mathit{person}: \qENV.p,\;\mathit{kids}: \qselect{(\qENV.p.\mathit{age} > 25)\;\circ^e\;(\qENV \oplus [c:\qID])}{\qENV.p.\mathit{child}} ]\;\circ^e\;[p:\qID]}{P}
+      \end{array}\]
+    \end{minipage}
+  \end{subfigure}
+  \end{center}
+  \caption{Three styles of nested relational algebra for \textbf{T1} and \textbf{A4} (Examples from Cherniack and Zdonik~\cite{cherniack1996rule})}
+  \label{figure:threenras}
+\end{figure*}
+
+The treatment of variables and scoping in compilers is notoriously
+challenging, and a wide range of techniques have been proposed to
+encode variables in a way that facilitates reasoning, either for
+correctness or optimization purposes~\cite{AydemirBFFPSVWWZ05}. The
+topic has received less attention in the database context. One area
+where issues related to variable handling come to the fore is
+rule-based
+optimizers~\cite{CareyDFGRSM91,cherniack1996rule,CherniackZ98,FegarasMS93,LeungMSVVZ93,PiraheshHH92}.
+Cherniack and Zdonik clearly describe the challenges caused by
+variables in database algebras and propose a solution based on
+combinators~\cite{cherniack1996rule}. Figure~\ref{figure:threenras}
+shows two examples from that paper. We use $e.a$ (resp.\ $[a_1:e_1,
+  \ldots, a_n:e_n]$) to denote record access (resp.\ record
+construction).
+
+\paragraph*{Lambdas vs. Combinators}
+
+Most internal database algebras support some form of explicit binders,
+most commonly expressed as
+lambdas~\cite{CareyDFGRSM91,cherniack1996rule,FegarasMS93}.  Example
+\textbf{T1} in Figure~\ref{figure:threenras} shows an equivalence
+written in AQUA~\cite{LeungMSVVZ93} that illustrates how lambdas are
+used inside iterators with \lmapop\ (resp.\ \lselop) corresponding to
+functional map (resp.\ selection).
+
+Both query plans in \textbf{T1} return the content of the city fields
+within the addr fields in the records returned by~$P$. The rewrite is
+a classic loop fusion: in lambda form, it can be expressed using
+beta-reduction (or capture avoiding substitution) as suggested by
+Fegaras et al.~\cite{FegarasMS93}:
+\begin{align*}
+  \lmapop(\llambda{x}{e})(\lmapop(\llambda{y}{u})(v)) \equiv \lmapop(\llambda{y}{e[u/x]})(v)
+\end{align*}
+
+Although techniques exist (e.g.,~\cite{abadi1991explicit}) to
+implement or reason about binders and support such substitutions
+effectively, most of them remain challenging to mechanize and prove
+correct~\cite{AydemirBFFPSVWWZ05}. As Cherniack and Zdonik first
+pointed out~\cite{cherniack1996rule}, it is also unnecessarily complex
+in the database context as equivalent combinator-based algebras can
+avoid binders and variables. We use Cluet and Moerkotte's
+algebra~\cite{CluetM93} as our starting point, because (i) it has been
+used successfully for the compilation and optimization of nested query
+languages (notably OQL~\cite{CluetM93} and XQuery~\cite{MayHM04}), and
+(ii) it has already been provided with a complete
+formalization~\cite{ShinnarSH15} as combinators. In addition to $\chi$
+(map) and $\sigma$ (selection), two important combinators are $\qID$
+for accessing the input and $\circ$ for query composition. The
+following is a combinator-based query plan equivalent to the example
+\textbf{T1}:
+\begin{align*}
+  \textbf{T1':~} \qmap{\qID.\mathit{city}}{\qmap{\qID.\mathit{addr}}{P}} & \equiv \qmap{\qID.\mathit{addr}.\mathit{city}}{P}
+\end{align*}
+
+One immediately notices that lambdas are gone and variables have been
+replaced by $\qID$ (the implicit input). As Cherniack and Zdonik
+pointed out, combinators enable algebraic rewrites to be expressed
+without explicit variable substitution or renaming, and without having
+to compute (and prove correct) preconditions on the presence/absence
+of free variables~\cite{cherniack1996rule}. For instance, the previous
+map-fusion rewrite can be expressed simply with query composition:
+\begin{align*}
+  \qmap{P_1}{\qmap{P_2}{P}} \equiv \qmap{P_1 \circ P_2}{P}
+\end{align*}
+
+\vspace*{-0.2cm}
+\paragraph*{Reifying Environments}
+
+Despite those clear benefits, combinators come at a price: when the
+query plan actually requires environments containing more than one
+value, those have to be encoded in the structure of the query plan
+itself. To illustrate this, consider example \textbf{A4} from
+Figure~\ref{figure:threenras} which features a selection inside a map.
+%
+Two variables~($p$ and~$c$) are both in scope within the selection
+predicate. In algebras with combinators, the absence of variables
+forces environments to be \emph{reified} as records whose fields
+correspond to the variables in scope.
+
+Figure~\ref{figure:threenras} shows a systematic encoding with reified
+environments.  Compared to \textbf{T1'}, \textbf{T1$^c$} has an
+additional map to create a record with field $p$ corresponding to
+variable $p$, and accessing that variable has been replaced by
+$\qID.p$ and similarly for variable $a$. Although this looks
+relatively innocuous, the additional encoding required for example
+\textbf{A4} is more complex. The initial variable $p$ is reified
+similarly as in \textbf{T1$^c$} and passed as input to the nested plan
+within the top-level map operator. But adding variable $c$ to that
+initial environment corresponds to a dependent join (written
+$\qdjoinop$) combined with a map. The dependent join is an operator
+introduced by NRA for nested queries, and the semantics resemble a
+Cartesian product from relational algebra, except that the second
+operand ($\qmap{[c:\qID]}{\qID.p.\mathit{child}}$ in our example) can
+depend on the value of records returned by the first operand
+($\{\qID\}$ in our example). Here it is used to build records with
+both $p$ and $c$ fields, encoding the addition of variable $c$ to the
+environment. Despite the many techniques developed for optimization of
+nested-relational plans, the use of a dependent join and the
+additional nesting is a heavy price to pay for such a simple
+example. In our experience such encoding can inhibit optimization,
+making the query optimizer harder to develop and to apply in practical
+scenarios.
+
+\paragraph*{\NRAEnv}
+
+To address those shortcomings, we define \NRAEnv, an extension of a
+nested relational algebra with combinators that includes specific
+operators for environment manipulation. It keeps the benefits of the
+combinator-based approach for reasoning, but simplifies the encoding
+of source queries, making existing optimization techniques more
+effective in practice. The main intuition for the extension is as
+follows: instead of using combinators with one implicit input (the
+current value $\qID$), \NRAEnv uses combinators with two implicit
+inputs (one for the current value $\qID$ and one for the reified
+environment $\qENV$). To illustrate that idea, let us look again at
+example \textbf{T1} and the equivalent formulation \textbf{T1$^e$}
+written with \NRAEnv. The environment is reified similarly as
+\textbf{T1$^c$} with a record containing a field $p$, but that
+environment is passed using a special combinator $\circ^e$, which sets
+the environment part of the input. Once the environment has been set,
+it can be accessed using the $\qENV$ combinator. Similarly, the
+encoding for \textbf{A4} avoids additional nested maps and join
+operations. It sets the environment with $\circ^e$ and extends the
+environment with record concatenation ($\qENV \oplus [c:\qID]$).
+
+In the rest of the paper, we formally define \NRAEnv, study its formal
+properties, and illustrate its use in practice.
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:
+

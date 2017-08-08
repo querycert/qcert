@@ -1,0 +1,256 @@
+\section{Translating Rules to \NRAEnv}
+\label{sec:rules}
+
+The second application is a translation from a query DSL of
+JRules~\cite{jrules-book} to \NRAEnv.
+%
+It is the original motivation of the work~\cite{meta}.
+%
+While building a compiler for this language, we faced an explosion of
+the size of intermediate NRA queries.
+%
+This section reports on how \NRAEnv overcomes this problem.
+
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.329\textwidth}
+    \includegraphics[width=1.\textwidth]{camp_size}
+    \caption{\NRAEnv and NNRC query sizes.}
+    \label{fig:camp-numbers:camp-size}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.329\textwidth}
+    \includegraphics[width=1.\textwidth]{camp_depth}
+    \caption{\NRAEnv query depths.}
+    \label{fig:camp-numbers:camp-depth}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.329\textwidth}
+    \includegraphics[width=1.\textwidth]{camp_time}
+    \caption{Compilation time (s).}
+    \label{fig:camp-numbers:camp-time}
+  \end{subfigure}
+  \caption{CAMP tests.}
+  \label{fig:camp-numbers}
+\end{figure*}
+\vspace*{-0.3cm}
+\begin{figure*}[t]
+  \centering
+  \begin{subfigure}[b]{0.329\textwidth}
+    \includegraphics[width=1.\textwidth]{nra_size}
+    \caption{NRA query sizes.}
+    \label{fig:nra-numbers:nra-size}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.329\textwidth}
+    \includegraphics[width=1.\textwidth]{nra_depth}
+    \caption{NRA query depths.}
+    \label{fig:nra-numbers:nra-depth}
+  \end{subfigure}
+  \begin{subfigure}[b]{0.329\textwidth}
+    \includegraphics[width=1.\textwidth]{nnrc_size}
+    \caption{NNRC expression sizes.}
+    \label{fig:nra-numbers:nnrc-size}
+  \end{subfigure}
+  \caption{Comparison of the direct translation from CAMP to NRA with translation
+ through \NRAEnv.}
+  \label{fig:nra-numbers}
+\end{figure*}
+
+\paragraph*{From CAMP to \NRAEnv}
+
+To illustrate how \NRAEnv simplifies the compilation of a production
+rule language, we use the Calculus for Aggregating Matching
+Patterns~(CAMP) introduced in~\cite{ShinnarSH15}.
+%
+The syntax of the CAMP calculus\,\coqdef{CAMP.Lang.CAMP}{pat} is: 
+$$
+\begin{array}{l@{\ }r@{\ }l}
+p & ::= &
+ d %pconst
+  \mid   \opunop p % punop
+  \mid   p_1 \opbinop p_2 % pbinop
+  \mid   \rit %preturn
+  \mid   \renv
+  \mid   \ensuremath{\rleti{p_1}{p_2}} %pWithData
+\\
+ &\mid&  \rlete{p_1}{p_2} %pWith
+  \mid   \rmap{p} %pmap
+  \mid   \rassert{p} % passert
+  \mid   p_1\ror p_2 %pOrElse
+\end{array}
+$$
+We present here an intuitive semantics of CAMP; the formal semantics
+of the calculus is defined in~\cite{ShinnarSH15} on the same data
+model we use for \NRAEnv.
+% Therefore, constants~($d$) and unary~($\opunop$) and
+% binary~($\opbinop$) operators are the ones of \NRAEnv.
+The language operates over an implicit datum being matched
+and an environment. The $\rit$ construct obtains the implicit datum
+and $\renv$ the environment.
+%
+The $\rleti{p_1}{p_2}$ construct uses the value of $p_1$ as implicit
+datum for $p_2$ and $\rlete{p_1}{p_2}$ updates the environment for the
+evaluation of $p_2$.
+%
+The $\rmap{p}$ construct maps a pattern $p$ over the implicit
+datum~\rit.
+%
+The $\rassert{p}$ construct can introduce match failure and
+$p_1\ror p_2$ can recover from this kind of failure.
+
+% The $\rleti{p_1}{p_2}$ construct evaluates $p_2$ with the value of the
+% implicit data replaced by the value of $p_1$.
+% %
+% $\rlete{p_1}{p_2}$ evaluates $p_1$ to a record and merges it with the
+% environment to execute $p_2$.
+%
+% The $\rmap{p}$ construct maps a pattern $p$ over the implicit
+% data~\rit.
+% %
+% The $\rassert{p}$ construct evaluates $p$: if its value is \false,
+% matching fails, otherwise, the empty record $[\,]$ is returned.  The
+% $p_1\ror p_2$ construct enables recovery from match failure.
+
+In~\cite{ShinnarSH15}, the translation from CAMP to NRA relies on two
+principles.  (1)~To encode the notion of recoverable errors, the
+output is always a bag. This bag is guaranteed to be either empty
+(representing a recoverable error) or a singleton of the datum. (2)~The
+two inputs $\rit$ and $\renv$ of CAMP are encoded in the single
+input~$\qID$ of NRA. $\qID$ is always a record with two fields, $E$
+and $D$, storing the environment and datum.
+
+In translating from CAMP to \NRAEnv, we keep the first principle but
+eschew the second. Consider the
+translation of $\rit$ and $\renv$. When we go from CAMP to NRA, we
+have to project the field corresponding to the value we want to
+access~($\pton{p}$ is the translation function of a pattern~$p$):
+$$
+\pton{\rit} = \{\qID.D\} \qquad \pton{\renv} = \{\qID.E\}
+$$
+%
+This result is wrapped in a bag
+to encode the pattern matching semantics.
+%
+When going from CAMP to \NRAEnv, the two inputs of CAMP can be mapped
+to the two inputs of \NRAEnv. Hence, the translation of $\rit$ and
+$\renv$ becomes:
+$$
+\pton{\rit} = \{\qID\} \qquad \pton{\renv} = \{\qENV\}
+$$
+
+This direct mapping of the CAMP inputs to the \NRAEnv inputs
+simplifies the translation of other CAMP constructs.
+%
+% Consider for example the translation of $\rmap{p}$. When we go to
+% \NRAEnv, the translation produces a corresponding map in \NRAEnv, and
+% uses a flattening to account for the fact that the result of
+% translating~$p$ will return a collection:
+% $$
+% \pton{\rmap{p} } = \left\{\opflatten\left(\qmap{\ntop{p}}{\qID}\right)\right\}
+% $$
+% When we go to NRA, in addition to the flattening, the input must be manipulated
+% to iterate on the data part and keep
+% the environment. The translation function is:
+% $$
+% \begin{array}{l}
+% \pton{\rmap{p}} =
+%   \\ \qquad
+%   \left\{\opflatten\left(\qmap{\ntop{p}}{\quntwo{T}{D}{\{[E:\qID.E]\opconcat[T:\qID.D]\}}}\right)\right\}
+% \end{array}
+% $$
+% where $\quntwo{A}{B}{q}$ is the unnest operator defined
+% Section~\ref{sec:nraenv:nra}.
+The complete translation
+function\,\coqdef{Translation.CAMPtocNRAEnv}{cnraenv_of_pat} is given
+in Appendix~\ref{sec:CAMP} and has been proven
+correct\,\coqdef{Translation.CAMPtocNRAEnv}{cnraenv_of_pat_correct}. This
+simplification is similar to the one observed in the examples with
+lambdas from Section~\ref{sec:variables}. The ability to represent the
+environment operations directly in the algebra avoids having to encode
+them through nested queries. This allows the optimizer to simplify
+the query plan much more effectively.
+
+\paragraph*{Experiments}
+
+We report on experiments compiling several CAMP programs in
+Figure~\ref{fig:camp-numbers}. The first test, \texttt{p01}, is the
+example given as Figure~6 in~\cite{ShinnarSH15}, \texttt{p02} is an
+example of select, \texttt{p03} is a join, \texttt{p04} and
+\texttt{p05} are joins with negation, \texttt{p06} to \texttt{p08} are
+simple aggregations, and \texttt{p09} to \texttt{p14} are joins with
+aggregation.
+
+Figures~\ref{fig:camp-numbers:camp-size}
+and~\ref{fig:camp-numbers:camp-depth} show the size and the depth of
+the intermediate queries when compiling a CAMP program to NNRC.
+%
+Compared to the TPC-H benchmark queries, the
+\NRAEnv queries coming from CAMP programs have a similar size but they
+have a deeper level of nesting.
+%
+The optimizer is much more effective on these
+queries than on the queries from the TPC-H benchmark. This is because
+CAMP programs were our primary goal and there are optimization
+tailored to remove translation artifacts from CAMP to \NRAEnv.
+
+In term of compilation time~(Figure~\ref{fig:camp-numbers:camp-time}),
+compared to the TPC-H benchmark, the proportion spent in the \NRAEnv optimizer
+is higher than the one spent in the NNRC optimizer
+because more \NRAEnv optimizations are triggered
+and the NNRC terms to optimize are smaller.
+%
+The compilation time remains on the order of a few seconds.
+
+Figure~\ref{fig:nra-numbers} compares a direct translation
+from CAMP to NRA with a compilation path that goes through \NRAEnv.
+%
+Figures~\ref{fig:nra-numbers:nra-size}
+and~\ref{fig:nra-numbers:nra-depth} show for each of the examples the
+size and depth of NRA queries generated directly from CAMP or from
+CAMP to \NRAEnv and then to NRA.
+%   \NRAEnv for each test where the
+% size is the number of subexpressions in the query and the depth is the
+% maximal level of nesting of maps.
+%
+Figure~\ref{fig:nra-numbers:nnrc-size} shows the size of the NNRC
+expressions generated by going through NRA and \NRAEnv.
+%
+All the numbers are given after optimization.
+
+The \NRAEnv optimizer includes two distinct categories of rewrites:
+(i) \NRAEnv\ rewrites like the ones presented in
+Section~\ref{sec:nraenv:rewrites},
+%
+and (ii) classic NRA rewrites lifted to \NRAEnv~(some examples of
+rewrites are given Figure~\ref{tab:rewrites-nra} in
+Appendix~\ref{sec:CAMP}).
+%
+The second class of rewrites can thus also be applied on NRA queries.
+
+A detailed analysis of the results shows that, for example, for
+\texttt{p01}, while none of the rewrites dedicated to \NRAEnv reduce
+the depth, they allow the pure NRA rewrites to ``kick in'', e.g.,
+allowing the optimizer to recognize subqueries of the
+form~$\qmap{\qID}{q}$ which can be removed by the simple rewrite:
+$\qmap{\qID}{q} \Rightarrow q$. As it turns out, this specific rewrite
+is never triggered when we optimize the NRA query coming directly from
+CAMP.
+
+By comparing the \textsf{\NRAEnv opt} bars of
+Figure~\ref{fig:camp-numbers:camp-size} with the \textsf{through
+  \NRAEnv} bars of Figure~\ref{fig:nra-numbers:nra-size}, we can see
+that even before optimization, the
+\NRAEnv queries are much smaller than the NRA queries.
+%
+For example, \texttt{p01} goes from a size of~78 in \NRAEnv to~417 in
+NRA.
+%
+This difference make the generated NNRC code much
+smaller~(Figure~\ref{fig:nra-numbers:nnrc-size}).
+
+% Finally, we can notice that Figure~\ref{fig:nra-numbers:nnrc-size} shows
+% systematic improvements in the size of the NNRC expressions generated
+% by going through \NRAEnv rather than NRA.
+
+
+%%% Local Variables:
+%%% TeX-master: "main"
+%%% End:
