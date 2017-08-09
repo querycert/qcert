@@ -64,6 +64,10 @@ function qcertPreCompile(input: QcertCompilerConfig, callback: (result: QcertRes
         verb = "parseSQL";
         sourceCAMP = false;
         query = input.query;
+    } else if (input.source == "sqlpp") {
+        verb = "parseSQLPP";
+        sourceCAMP = false;
+        query = input.query;
     } else if (input.source == "tech_rule") {
         verb = "techRule2CAMP";
         sourceCAMP = true;
