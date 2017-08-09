@@ -70,7 +70,7 @@ is not needed in the AST.  So, the AST is basically a huge inductive set on Expr
   Inductive sqlpp_expr : Set :=
 
 (**
-<<`
+<<
 Expression ::= OperatorExpression | CaseExpression | QuantifiedExpression
 
 OperatorExpression ::= PathExpression
