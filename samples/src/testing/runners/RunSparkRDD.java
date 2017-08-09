@@ -99,9 +99,9 @@ public class RunSparkRDD {
 	 */
         private static void runSpark(File root, String ioFile, String className, String ruleName, String runtime) throws Exception {
 		System.out.println("Submitting job to spark");
-		String jar = new File(root, SparkUtils.SCALA_JAR_NAME).getAbsolutePath();
+		String jar = new File(root, Utils.SCALA_JAR_NAME).getAbsolutePath();
 		Map<String, String> env = new HashMap<>(System.getenv());
-		String cmd = SparkUtils.isWindows() ? "spark-submit.cmd" : "spark-submit";
+		String cmd = Utils.isWindows() ? "spark-submit.cmd" : "spark-submit";
 		JsonObject io = Utils.parseJsonFileToObject(ioFile);
 		String ioString = createOldFormatIoFile(new File(root, "iofile"), io);
 		String resultFile = new File(root, "execution.results").getAbsolutePath();
