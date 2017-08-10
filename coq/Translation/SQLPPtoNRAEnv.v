@@ -57,19 +57,35 @@ Section SQLPPtoNRAEnv.
 		      program out the logic (convert to floating point and back, or whatever) *)
   	| SPConcat e1 e2
         => NRAEnvBinop ASConcat (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
-  	| SPIn  _ _ (* TODO: remaining cases *)
-  	| SPEq  _ _
-  	| SPFuzzyEq _ _
-  	| SPNeq  _ _
-  	| SPLt  _ _
-  	| SPGt  _ _
-  	| SPLe  _ _
-  	| SPGe  _ _
-  	| SPLike  _ _
-  	| SPAnd  _ _
-  	| SPOr  _ _
-	| SPBetween  _ _ _
-	| SPSimpleCase  _ _ _
+  	| SPIn e1 e2
+        => NRAEnvBinop AContains (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  	| SPEq  e1 e2
+  	| SPFuzzyEq e1 e2 (* TODO.  We don't currently have "fuzzy equals" so translating as Eq for now *)
+  		=> NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  	| SPNeq  e1 e2
+        => NRAEnvUnop ANeg (NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2))
+  	| SPLt  e1 e2
+  		=> NRAEnvBinop ALt (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  	| SPGt  e1 e2
+  		=> NRAEnvBinop ALt (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
+  	| SPLe  e1 e2
+  		=> NRAEnvBinop ALe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  	| SPGe  e1 e2
+  		=> NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
+  	| SPLike  e s
+  		(* TODO: modeling on the SQL equivalent, it would be nice to use:
+  		=> NRAEnvUnop (ALike s None) (sqlpp_to_nraenv e)
+  		However, in SQL++ the RHS of 'like' may be any expression of string type, and is not constrained to be a string literal.  So,
+  		the static type of s is sqlpp_expr, not string. *)
+  		=> NRAEnvConst dunit
+  	| SPAnd  e1 e2
+  		=> NRAEnvBinop AAnd (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  	| SPOr  e1 e2
+  		=> NRAEnvBinop AOr (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+	| SPBetween  e1 e2 e3
+  		=> NRAEnvBinop AAnd (NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1))
+                         (NRAEnvBinop ALe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e3))
+	| SPSimpleCase  _ _ _ (* TODO: remainder *)
 	| SPSearchedCase _ _
 	| SPSome  _ _
     | SPEvery _ _
