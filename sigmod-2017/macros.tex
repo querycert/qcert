@@ -1,0 +1,69 @@
+\newcommand{\anonymize}[2]{#2}
+
+\newcommand{\coqHTMLBase}{https://querycert.github.io/icfp17}
+% \newcommand{\coqHTMLBase}{file:///Users/lmandel/Desktop/qcert}
+% \newcommand{\coqBaseModule}{doc/Qcert}
+\newcommand{\coqBaseModule}{doc}
+% \newcommand{\coqBaseModule}{html/Qcert}
+% \newcommand{\coqurl}[3]{\coqHTMLBase/\coqBaseModule.#1.#2.html\##3}
+\newcommand{\coqurl}[3]{\coqHTMLBase/\coqBaseModule/#2.html\##3}
+\newcommand{\projectname}{Q*cert}
+
+\newcommand{\fleur}{\ding{95}}
+\newcommand{\coqtop}{{\href{\coqHTMLBase}{\fleur}}\xspace}
+% \newcommand{\coqdef}[2]{{\href{\coqHTMLBase/\coqBaseModule.#1\##2}{\fleur}}\xspace}
+\newcommand{\coqdef}[3]{{\href{\coqurl{#1}{#2}{#3}}{\fleur}}\xspace}
+
+\newcommand{\NRAEnv}{\texorpdfstring{NRA$^{\!\mbox{\it e}}$}{NRAe}\xspace}
+\newcommand{\NRALambda}{\texorpdfstring{NRA$^{\lambda}$}{NRAλ}\xspace}
+
+
+%% Colors
+\definecolor{darkred}{rgb}{0.55, 0.0, 0.0}
+
+%%% textalltt
+
+\makeatletter
+\newcommand*{\textalltt}{}
+\DeclareRobustCommand*{\textalltt}{%
+  \begingroup
+    \let\do\@makeother
+    \dospecials
+    \catcode`\\=\z@
+    \catcode`\{=\@ne
+    \catcode`\}=\tw@
+    \verbatim@font\@noligs
+    \@vobeyspaces
+    \frenchspacing
+    \@textalltt
+}
+\newcommand*{\@textalltt}[1]{%
+    #1%
+  \endgroup
+}
+\makeatother
+
+
+%%% ODM
+\newcommand{\textblue}[1]{{\color{blue}{#1}}}
+\newcommand{\textred}[1]{{\color{darkred}{#1}}}
+\newcommand{\odmkw}[1]{\textblue{\textit{#1}}}
+\newcommand{\odmagg}[1]{{\color{darkred}{#1}}}
+
+\lstdefinelanguage{jrules}{
+  keywords={aggregate,do,emit,false,groupby,insert,new,rule,then,true,update,when},
+  numbers=none, columns=flexible, captionpos=b,
+  basicstyle={\small\selectfont\ttfamily}, keywordstyle=\bfseries,
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  xleftmargin=0.5cm,
+  abovecaptionskip=0em,
+  belowcaptionskip=0em
+% ,frame=tlbr,framesep=4pt,framerule=0pt
+}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "icfp17"
+%%% End:

@@ -1,0 +1,339 @@
+\documentclass[acmsmall]{acmart}
+
+\usepackage[utf8]{inputenc}
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{calc}
+
+\usepackage{alltt}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage{pifont} % for \fleur macro
+
+\usepackage{listings}
+
+\lstset{language=Sh,%
+   basicstyle=\ttfamily,%
+   keywordstyle=\ttfamily,%
+   columns=fullflexible,%
+   moredelim=[is][\itshape]{\#}{\#},%
+   showstringspaces=false,%
+   commentstyle={\ttfamily\color{darkred}},%
+}
+\lstnewenvironment{lstsh}%
+{\footnotesize \lstset{language=Sh,keepspaces=true}}
+{}
+
+\def\shline{\lstinline[language=Sh, basicstyle=\small\ttfamily]}
+
+\input{macros}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\avi}[1]{{\color{red}#1}}
+\newcommand{\jerome}[1]{{\color{orange}#1}}
+\newcommand{\louis}[1]{{\color{magenta}#1}}
+\newcommand{\martin}[1]{{\color{green}#1}}
+\newcommand{\josh}[1]{{\color{brown}#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{hyperref}
+ \hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    filecolor=magenta,
+    urlcolor=blue
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Conference information (used by SIGPLAN proceedings format)
+%% Supplied to authors by publisher for camera-ready submission
+\acmConference[PL'17]{ACM SIGPLAN Conference on Programming Languages}{January 01--03, 2017}{New York, NY, USA}
+\acmYear{2017}
+\acmISBN{978-x-xxxx-xxxx-x/YY/MM}
+\acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission
+\setcopyright{none}             %% For review submission
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2017}           %% If different from \acmYear
+
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%% Note: author/year citations are required for papers published as an
+%% issue of PACMPL.
+\citestyle{acmauthoryear}   %% For author/year citations
+
+
+
+\begin{document}
+
+\title{Readme for reproducibility submission of paper ID 294\\{\normalsize (Handling Environments in a Nested Relational Algebra with Combinators and an Implementation in a Verified Query Compiler)}}
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+\author{Joshua S. Auerbach}
+% \authornote{Emeritus}
+% \orcid{nnnn-nnnn-nnnn-nnnn}            %% \orcid is optional
+\affiliation{
+  % \position{Position1}
+  % \department{Department}              %% \department is recommended
+  \institution{IBM Research}             %% \institution is required
+  \streetaddress{1101 Kitchawan Rd}
+  \city{Yorktown Heights}
+  \state{NY}
+  \postcode{10598}
+  \country{USA}
+}
+\email{joshuaauerbachwatson@gmail.com}   %% \email is recommended
+
+\author{Martin Hirzel}
+% \orcid{nnnn-nnnn-nnnn-nnnn}            %% \orcid is optional
+\affiliation{
+  % \position{Position1}
+  % \department{Department}              %% \department is recommended
+  \institution{IBM Research}             %% \institution is required
+  \streetaddress{1101 Kitchawan Rd}
+  \city{Yorktown Heights}
+  \state{NY}
+  \postcode{10598}
+  \country{USA}
+}
+\email{hirzel@us.ibm.com}   %% \email is recommended
+
+\author{Louis Mandel}
+% \orcid{nnnn-nnnn-nnnn-nnnn}            %% \orcid is optional
+\affiliation{
+  % \position{Position1}
+  % \department{Department}              %% \department is recommended
+  \institution{IBM Research}             %% \institution is required
+  \streetaddress{1101 Kitchawan Rd}
+  \city{Yorktown Heights}
+  \state{NY}
+  \postcode{10598}
+  \country{USA}
+}
+\email{lmandel@us.ibm.com}   %% \email is recommended
+
+\author{Avraham Shinnar}
+% \orcid{nnnn-nnnn-nnnn-nnnn}            %% \orcid is optional
+\affiliation{
+  % \position{Position1}
+  % \department{Department}              %% \department is recommended
+  \institution{IBM Research}             %% \institution is required
+  \streetaddress{1101 Kitchawan Rd}
+  \city{Yorktown Heights}
+  \state{NY}
+  \postcode{10598}
+  \country{USA}
+}
+\email{shinnar@us.ibm.com}   %% \email is recommended
+
+\author{J\'{e}r\^{o}me Sim\'{e}on}
+% \orcid{nnnn-nnnn-nnnn-nnnn}            %% \orcid is optional
+\affiliation{
+  % \position{Position1}
+  % \department{Department}              %% \department is recommended
+  \institution{IBM Research}             %% \institution is required
+  \streetaddress{1101 Kitchawan Rd}
+  \city{Yorktown Heights}
+  \state{NY}
+  \postcode{10598}
+  \country{USA}
+}
+\email{simeon@us.ibm.com}   %% \email is recommended
+
+
+
+%% Paper note
+%% The \thanks command may be used to create a "paper note" ---
+%% similar to a title note or an author note, but not explicitly
+%% associated with a particular element.  It will appear immediately
+%% above the permission/copyright statement.
+% \thanks{with paper note}              %% \thanks is optional
+                                        %% can be repeated if necesary
+                                        %% contents suppressed with 'anonymous'
+% \thanks{An earlier version of this paper was published, in
+%   French, in \cite{jfla17}.}
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+% \input{abstract}
+
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+% \begin{CCSXML}
+% <ccs2012>
+% <concept>
+% <concept_id>10011007.10011006.10011041</concept_id>
+% <concept_desc>Software and its engineering~Compilers</concept_desc>
+% <concept_significance>500</concept_significance>
+% </concept>
+% <concept>
+% <concept_id>10002951.10002952.10003190.10003192</concept_id>
+% <concept_desc>Information systems~Database query processing</concept_desc>
+% <concept_significance>300</concept_significance>
+% </concept>
+% </ccs2012>
+% \end{CCSXML}
+
+% \ccsdesc[500]{Software and its engineering~Compilers}
+% \ccsdesc[300]{Information systems~Database query processing}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+% \keywords{query compiler, proof assistant, business rules}  %% \keywords is optional
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+The reproducibility artifact accompanying the SIGMOD 2017 paper
+entitled \textit{Handling Environments in a Nested Relational Algebra
+  with Combinators and an Implementation in a Verified Query Compiler}
+is distributed on github as a branch of the main Q*cert code-base on
+which the paper is based.
+
+In order to automate the artifact, it comes with a Docker script
+which: (i) sets up a Linux virtual machine, (ii) downloads the
+software dependencies, (iii) compile Q*cert, (iv) runs the experiments
+and (v) re-compile the paper for comparison with the one in the SIGMOD
+2017 proceedings.
+
+The rest of this README provides the steps through the complete
+process.
+
+\subsection*{Getting the code}
+
+The reproducibility artifact can either be obtained by cloning the
+Q*cert repository using git:
+\begin{verbatim}
+git clone https://github.com/querycert/qcert.git
+cd qcert
+git checkout sigmod-repro
+\end{verbatim}
+
+or by downloading it as a zip file at:
+\begin{verbatim}
+https://github.com/querycert/qcert/archive/sigmod-repro.zip
+\end{verbatim}
+
+and unzipping it.
+
+\subsection*{Getting the TPC-H Benchmark}
+
+The licensing for the TPC-H benchmarks that we use for evaluation does
+not allow redistribution as part of this artifact, so it must be
+obtained separately.
+
+Go to the TPC-H download page:
+\begin{verbatim}
+http://www.tpc.org/tpc_documents_current_versions/current_specifications.asp
+\end{verbatim}
+
+and click \verb+Download TPC-H_Tools_v2.17.2.zip+ under Source Code/TPC-H.
+
+Fill out the form and agree to the license.  You will then receive an
+email with a link to a individualized page hosting the TPC-H
+benchmarks.  Download the benchmarks (you will only be able to
+download them once; if you need to do this again, you must fill out
+the license form again).
+
+Please accept the suggested filename (which will look something like
+\verb+...-tpc-h-tool.zip+, where the leading part is some
+individualized string), and save it to the \verb+qcert+ directory (the
+top level directory of the code) with the following name:
+\verb+tpc-h-tool.zip+ (all lowercases).
+
+\subsection*{Getting Docker}
+
+In order to automatically fetch the dependencies and build the code,
+you will need to install Docker, which can be downloaded for your platform at:
+\begin{verbatim}
+https://www.docker.com/
+\end{verbatim}
+
+Once docker is installed you will need to launch it (as any other
+application for your system, which will start the Docker daemon). It
+will need to be running for the remainder of the process.
+
+\subsection*{Reproduce the paper}
+
+You can now run the full \verb+reproduce-paper.sh+ script from the
+\verb+qcert+ directory:
+\begin{verbatim}
+bash-3.2$ cd qcert
+bash-3.2$ ./reproduce-paper.sh 
+\end{verbatim}
+
+This will This will create a new docker image (i.e., a virtual
+machine) called \verb+qcert:repro+ with all required dependencies, and
+use it to build the code, run the experiments, and rebuild the
+submitted paper.
+
+It will then copy the rebuilt paper out of the image and put back on
+your local file system as:
+\begin{verbatim}
+qcert/qcert-sigmod-2017-paper-reproduction.pdf
+\end{verbatim}
+
+Note that the version of the paper published in sigmod 2017 is
+provided for convenience in the Q*cert source as:
+\begin{verbatim}
+qcert/qcert-sigmod-2017-paper-original.pdf
+\end{verbatim}
+
+\subsection*{Explore}
+
+After building the docker image with the
+\verb+qcert/reproduce-paper.sh+ script, you can get a shall to that image by running:
+
+\begin{verbatim}
+docker run -i -t qcert:repro bash
+\end{verbatim}
+
+This can be used to poke around and run the compiler against other
+examples, including new examples.
+
+Note that \verb+nano+ is provided in the image for basic editing needs
+and \verb+sudo apt-get+ can be used to install other editors as
+desired.
+
+\end{document}
+
