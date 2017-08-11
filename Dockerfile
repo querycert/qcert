@@ -26,7 +26,7 @@ RUN apt-get update && \
     dpkg -i sbt-0.13.16.deb 
 USER opam
 
-# install the required dependencies that are manager by opam
+# install the required dependencies that are managed by opam
 RUN opam install coq.8.5.3 ocamlbuild.0.11.0 menhir.20170418 base64.2.1.2 yojson
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
@@ -45,7 +45,7 @@ COPY runtime /qcert/runtime
 COPY javaService /qcert/javaService
 COPY sqlParser /qcert/sqlParser
 COPY samples /qcert/samples
-COPY *tpc*-tool.zip /qcert/samples/sql/tpc/linuxOnly/
+COPY *tpc*tool*.zip /qcert/samples/sql/tpc/linuxOnly/
 COPY sigmod-2017 /qcert/sigmod-2017
 
 # COPY sets the permissions of the files so that only root can access them, so we chown them over to our non-root user
@@ -55,7 +55,7 @@ RUN sudo chown -R opam /qcert
 RUN make -C javaService && make -C sqlParser && make -C javaService install && make -C samples/sql/tpc/linuxOnly
 
 # compile and extract the qcert compiler and its documentation
-RUN eval `opam config env` && make remove_all_derived && make -j 2 all && make html
+RUN eval `opam config env` && make remove_all_derived && make all && make html
 
 # Compile the qcert samples, including the TPC-H queries, and copy those queries over to the benchmark directory
 RUN make -C samples && \

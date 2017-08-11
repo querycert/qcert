@@ -23,7 +23,7 @@ In order to automatically fetch the dependencies and build the code, you will ne
 
 ## Reproduce the paper
 
-you can run the `qcert/reproduce-paper.sh` script.  This will
+you can run the `reproduce-paper.sh` script from the `qcert` directory.  This will
 This will create a new docker image (virtual machine, the image is called `qcert:repro`) with all required dependencies, and use it to build the code, run the experiments, and rebuild the submitted paper.
 It will then copy the rebuilt paper out of the image and put it as `qcert/qcert-sigmod-2017-paper-reproduction.pdf`.
 Note that the version of the paper published in sigmod 2017 was `qcert-sigmod-2017-paper-original.pdf` is provided 

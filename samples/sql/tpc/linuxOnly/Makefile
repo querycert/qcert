@@ -33,7 +33,7 @@ $(TPCH_QGEN):	$(TPC_H)
 	$(MAKE) -C $(TPC_H)
 
 $(TPC_H):
-	mkdir tpch-tmp
+	mkdir -p tpch-tmp
 	cd tpch-tmp && unzip ../*tpc-h-tool.zip && mv * ../${TPC_H_BASE}
 	rmdir tpch-tmp
 
