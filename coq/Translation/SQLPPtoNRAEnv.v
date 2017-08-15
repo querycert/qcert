@@ -23,11 +23,25 @@ Section SQLPPtoNRAEnv.
   Require Import BasicSystem.
   Require Import RDataSort. (* For SortCriterias *)
   Require Import SQLPP.
+  Require Import SQLtoNRAEnv.
   Require Import NRAEnvRuntime.
 
   Context {fruntime:foreign_runtime}.
 
-  Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
+(** Converts the most general form of a when/then clause
+  (in which the 'when' part isn't necessarily boolean) into a specific form where it is certainly boolean. *)	
+Definition sqlpp_make_when_then_boolean  (value : sqlpp) (whenthen : sqlpp_when_then) : sqlpp_when_then :=
+	match whenthen with
+	| SPWhenThen whn thn => SPWhenThen (SPEq whn value) thn
+	end.
+
+(** Convert the list of when/then clauses in a simple case expression to the form used in a searched case expression
+   to aid in efficient factoring of code *)
+Definition sqlpp_absorb_value (value : sqlpp) (whenthens : list sqlpp_when_then) : list sqlpp_when_then := 
+	List.map (sqlpp_make_when_then_boolean  value) whenthens.
+
+(* Central translation function *)	
+Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	match q with
 	| SPPositive expr
 		=> NRAEnvBinop (ABArith ArithPlus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
@@ -85,27 +99,54 @@ Section SQLPPtoNRAEnv.
 	| SPBetween  e1 e2 e3
   		=> NRAEnvBinop AAnd (NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1))
                          (NRAEnvBinop ALe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e3))
-	| SPSimpleCase  _ _ _ (* TODO: remainder *)
-	| SPSearchedCase _ _
+	| SPSimpleCase value whenthens deflt
+	    (* TODO: This is apparently not contractive enough to satisfy Coq
+		=> let canonical := sqlpp_absorb_value value whenthens in
+           let last := match deflt with
+	                   | Some dflt => sqlpp_to_nraenv dflt
+	                   | None => NRAEnvConst dunit
+	                   end 
+           in
+		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
+		     last canonical
+		 *)
+		=> NRAEnvConst dunit
+	| SPSearchedCase whenthens deflt
+	    (* TODO: This is apparently not contractive enough to satisfy Coq
+		=> let last := match deflt with
+	                   | Some dflt => sqlpp_to_nraenv dflt
+	                   | None => NRAEnvConst dunit
+	                   end 
+           in
+		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
+		     last whenthens
+		*)
+		=> NRAEnvConst dunit
+    (* TODO: deferring translation of quantified expressions since there is no good precedent in plain SQL *)
 	| SPSome  _ _
     | SPEvery _ _
-	| SPDot  _ _
+    	=> NRAEnvConst dunit
+	| SPDot  expr name
+		=> NRAEnvUnop (ADot name) (sqlpp_to_nraenv expr)
+    (* TODO the index operation has no obvious translation since our internal data model has only bags, not ordered lists *)
 	| SPIndex  _ _
 	| SPIndexAny _
-	| SPLiteral _
+    	=> NRAEnvConst dunit
+	| SPLiteral _(* TODO remainder *)
   	| SPNull
   	| SPMissing
 	| SPVarRef _
 	| SPFunctionCall _ _
-	| SPArray _
+	| SPArray _ (* TODO Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious *)
 	| SPBag _
-	| SPObject _
+	| SPObject _ (* TODO Note: the best we are likely to do is support objects whose field names are literals.  Consider adding that
+	    restriction to the SQL++ front-end *)
 	| SPQuery _
 		=> NRAEnvConst dunit (* TODO: placeholder *)
 	end.
-	
-	(* External entry point. *)
-	Definition sqlpp_to_nraenv_top := sqlpp_to_nraenv.
+
+(* External entry point. *)
+Definition sqlpp_to_nraenv_top := sqlpp_to_nraenv.
 
 End SQLPPtoNRAEnv.
 
