@@ -39,8 +39,8 @@ public class SExpParser {
 			System.out.println(expr);
 		else {
 			SExpression other = parse(new File(args[1]));
-			String first = expr.toString();
-			String second = other.toString();
+			String first = String.valueOf(expr);
+			String second = String.valueOf(other);
 			if (first.equals(second))
 				System.out.println("S-expression structures are the same");
 			else {
@@ -53,13 +53,15 @@ public class SExpParser {
 	}
 	
 	/**
-	 * Parse the contents of a file
+	 * Parse the contents of a file.  Result will be null if EITHER the file does not exist or is empty.
 	 * @param file the file
 	 * @return the SExpression
 	 * @throws IOException
 	 */
 	public static SExpression parse(File file) throws IOException {
-		return parse(new FileReader(file));
+		if (file.exists())
+			return parse(new FileReader(file));
+		return null;
 	}
 	
 	/**
@@ -100,7 +102,10 @@ public class SExpParser {
 			}
 			tokenState = tokens.nextToken();
 		}
-		assert stack.size() == 1;
+		if (stack.size() == 0)
+			return null;  // This happens when the file is empty, which, in turn, happens in some test scenarios
+		if (stack.size() > 1)
+			throw new IllegalStateException("Unexpected stack size " + stack.size());
 		return stack.pop();
 	}
 
