@@ -34,7 +34,7 @@ CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.
 
 JAVAC=javac
 
-LANG=sql++
+LANG=sqlpp
 
 TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp tests/addOperator.sqlpp tests/ANYInFieldAccessor.sqlpp \
 	tests/columnalias.sqlpp tests/columnalias2.sqlpp tests/columnalias3.sqlpp tests/constant.sqlpp tests/fieldAccessor.sqlpp \
@@ -59,7 +59,7 @@ J_SEXP=$(patsubst %.sqlpp,%_j.sexp,$(TESTS))
 
 JS=$(patsubst %.sqlpp,%.js,$(patsubst %.sql,%.js,$(TESTS)))
 
-O_SEXP=$(patsubst %.sqlpp,%_sql++.sexp,$(TESTS))
+O_SEXP=$(patsubst %.sqlpp,%_sqlpp.sexp,$(TESTS))
 
 all:
 	$(MAKE) classes
@@ -79,8 +79,8 @@ tests/%.js:	tests/%.sqlpp
 tests/%.js:	tests/%.sql
 	-../bin/qcert -source $(LANG) $<
 
-tests/%_sql++.sexp:	tests/%.sqlpp tests/%_j.sexp
-	-../bin/qcert -source sql++ -target sql++ -emit-sexp $<
+tests/%_sqlpp.sexp:	tests/%.sqlpp tests/%_j.sexp
+	-../bin/qcert -source sqlpp -target sqlpp -emit-sexp $<
 	-java -cp bin$(PATH_SEP)$(CPATH) org.qcert.util.SExpParser tests/$*_j.sexp $@
 
 $(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
