@@ -14,16 +14,17 @@
 # limitations under the License.
 #
 
-FILES = $(MODULES:%=%.v)
+###
+### WARNING: This file is meant to be invoked by the qcert/Makefile documentation target, not run directly
+###
 
-gather_globs:
-	@find . \( -name '*.glob' \) -print0 | xargs -0 ../scripts/gather_glob.sh
+COQ_FILES = $(MODULES:%=%.v)
+GLOB_FILES = $(MODULES:%=%.glob)
 
-documentation: $(FILES)
-	@$(MAKE) gather_globs
+documentation: $(GLOB_FILES) $(COQ_FILES)
 	mkdir -p ../docs/html
 	rm -f ../docs/html/*.html
-	coq2html -d ../docs/html -base Qcert ../docs/globs/*.glob $^
+	coq2html -d ../docs/html -base Qcert $^
 	cp ../docs/coq2html.css ../docs/coq2html.js ../docs/html/
 
-.PHONY: all clean clean_detritus html
+.PHONY: documentation

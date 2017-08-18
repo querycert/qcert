@@ -445,4 +445,7 @@ cleandist:
 documentation:
 	$(MAKE) -C coq documentation
 
-.PHONY: all clean clean_detritus
+documentation_old: Makefile.coq
+	@$(MAKE) -f Makefile.coq html
+
+.PHONY: all clean clean_detritus documentation documentation_old
