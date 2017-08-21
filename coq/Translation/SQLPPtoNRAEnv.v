@@ -51,11 +51,12 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
         => NRAEnvUnop ANeg (NRAEnvBinop ALe (NRAEnvUnop ACount (sqlpp_to_nraenv expr)) (NRAEnvConst (dnat 0)))
   	| SPNot expr
   		=> NRAEnvUnop ANeg (sqlpp_to_nraenv expr)
+ 	(* TODO: Our internal data model has null but not 'missing' (unless we add a new convention).  For now, both are translated
+	   to null.  Also, we should really be using sum types to get around type problems like comparing a nat to null. *)
   	| SPIsNull expr
   	| SPIsMissing expr
   	| SPIsUnknown expr
-		=> NRAEnvConst dunit (* TODO: what is the correct translation of null / missing / unknown in a data model in which (usually) only
-		 				objects are optional?  Do we need a revised data model for SQL++? *)
+		=> NRAEnvBinop AEq (sqlpp_to_nraenv expr) (NRAEnvConst dunit)
 	| SPPlus e1 e2
         => NRAEnvBinop (ABArith ArithPlus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMinus  e1 e2
@@ -67,8 +68,8 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPMod e1 e2
         => NRAEnvBinop (ABArith ArithRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPExp e1 e2
-		=> NRAEnvConst dunit (* TODO.  We either need our own binary exponent operator, or this is a foreign operator, or we need to
-		      program out the logic (convert to floating point and back, or whatever) *)
+		=> NRAEnvConst dunit (* TODO.  We either need our own binary exponent operator, or we need to
+		      program out the logic (convert to floating point, perform operation then convert back depending on the expected type) *)
   	| SPConcat e1 e2
         => NRAEnvBinop ASConcat (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPIn e1 e2
@@ -87,11 +88,11 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPGe  e1 e2
   		=> NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
   	| SPLike  e s
-  		(* TODO: modeling on the SQL equivalent, it would be nice to use:
-  		=> NRAEnvUnop (ALike s None) (sqlpp_to_nraenv e)
-  		However, in SQL++ the RHS of 'like' may be any expression of string type, and is not constrained to be a string literal.  So,
-  		the static type of s is sqlpp_expr, not string. *)
-  		=> NRAEnvConst dunit
+  		=> match s with 
+  		| SPLiteral (dstring x) => NRAEnvUnop (ALike x None) (sqlpp_to_nraenv e)
+  		| _ => NRAEnvConst dunit (* Placeholder. TODO: in SQL++ the RHS of 'like' may be any expression of string type, and is not 
+  			constrained to be a string literal.  So, the static type of s is sqlpp_expr, not string. *)
+  		end
   	| SPAnd  e1 e2
   		=> NRAEnvBinop AAnd (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPOr  e1 e2
@@ -109,7 +110,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
            in
 		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
 		     last canonical
-		 *)
+		 temp substitute: *)
 		=> NRAEnvConst dunit
 	| SPSearchedCase whenthens deflt
 	    (* TODO: This is apparently not contractive enough to satisfy Coq
@@ -120,21 +121,25 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
            in
 		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
 		     last whenthens
-		*)
+		temp substitute: *)
 		=> NRAEnvConst dunit
     (* TODO: deferring translation of quantified expressions since there is no good precedent in plain SQL *)
 	| SPSome  _ _
     | SPEvery _ _
-    	=> NRAEnvConst dunit
+    	=> NRAEnvConst dunit (* placeholder *)
 	| SPDot  expr name
 		=> NRAEnvUnop (ADot name) (sqlpp_to_nraenv expr)
     (* TODO the index operation has no obvious translation since our internal data model has only bags, not ordered lists *)
 	| SPIndex  _ _
 	| SPIndexAny _
-    	=> NRAEnvConst dunit
-	| SPLiteral _(* TODO remainder *)
+    	=> NRAEnvConst dunit (* placeholder *)
+	| SPLiteral d
+		=> NRAEnvConst d
+	(* TODO: Our internal data model has null but not 'missing' (unless we add a new convention).  For now, both are translated
+	   to null *)
   	| SPNull
   	| SPMissing
+  		=> NRAEnvConst dunit
 	| SPVarRef _
 	| SPFunctionCall _ _
 	| SPArray _ (* TODO Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious *)
