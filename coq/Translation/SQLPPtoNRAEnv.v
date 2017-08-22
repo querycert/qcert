@@ -40,6 +40,10 @@ Definition sqlpp_make_when_then_boolean  (value : sqlpp) (whenthen : sqlpp_when_
 Definition sqlpp_absorb_value (value : sqlpp) (whenthens : list sqlpp_when_then) : list sqlpp_when_then := 
 	List.map (sqlpp_make_when_then_boolean  value) whenthens.
 
+
+Definition sqlpp_to_nraenv_SPEq sqlpp_to_nraenv (e1 e2:sqlpp_expr) : nraenv
+  := NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2).
+           
 (* Central translation function *)	
 Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	match q with
@@ -76,7 +80,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
         => NRAEnvBinop AContains (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPEq  e1 e2
   	| SPFuzzyEq e1 e2 (* TODO.  We don't currently have "fuzzy equals" so translating as Eq for now *)
-  		=> NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  		=> sqlpp_to_nraenv_SPEq sqlpp_to_nraenv e1 e2
   	| SPNeq  e1 e2
         => NRAEnvUnop ANeg (NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2))
   	| SPLt  e1 e2
@@ -101,19 +105,21 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   		=> NRAEnvBinop AAnd (NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1))
                          (NRAEnvBinop ALe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e3))
 	| SPSimpleCase value whenthens deflt
-	    (* TODO: This is apparently not contractive enough to satisfy Coq
-		=> let canonical := sqlpp_absorb_value value whenthens in
+	  => 
            let last := match deflt with
 	                   | Some dflt => sqlpp_to_nraenv dflt
 	                   | None => NRAEnvConst dunit
 	                   end 
            in
-		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
-		     last canonical
-		 temp substitute: *)
-		=> NRAEnvConst dunit
+	   List.fold_right (fun wt acc =>
+                              match
+                                wt
+                              with
+                                SPWhenThen whn thn =>
+                                nraenv_if (sqlpp_to_nraenv_SPEq sqlpp_to_nraenv whn value) (sqlpp_to_nraenv thn) acc
+                              end) 
+		           last whenthens
 	| SPSearchedCase whenthens deflt
-	    (* TODO: This is apparently not contractive enough to satisfy Coq
 		=> let last := match deflt with
 	                   | Some dflt => sqlpp_to_nraenv dflt
 	                   | None => NRAEnvConst dunit
@@ -121,8 +127,6 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
            in
 		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
 		     last whenthens
-		temp substitute: *)
-		=> NRAEnvConst dunit
     (* TODO: deferring translation of quantified expressions since there is no good precedent in plain SQL *)
 	| SPSome  _ _
     | SPEvery _ _
