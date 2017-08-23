@@ -28,19 +28,7 @@ Section SQLPPtoNRAEnv.
 
   Context {fruntime:foreign_runtime}.
 
-(** Converts the most general form of a when/then clause
-  (in which the 'when' part isn't necessarily boolean) into a specific form where it is certainly boolean. *)	
-Definition sqlpp_make_when_then_boolean  (value : sqlpp) (whenthen : sqlpp_when_then) : sqlpp_when_then :=
-	match whenthen with
-	| SPWhenThen whn thn => SPWhenThen (SPEq whn value) thn
-	end.
-
-(** Convert the list of when/then clauses in a simple case expression to the form used in a searched case expression
-   to aid in efficient factoring of code *)
-Definition sqlpp_absorb_value (value : sqlpp) (whenthens : list sqlpp_when_then) : list sqlpp_when_then := 
-	List.map (sqlpp_make_when_then_boolean  value) whenthens.
-
-
+(* Translate two expressions and build the binary equality comparison (used as a subroutine for the SPSimpleCase clause) *)
 Definition sqlpp_to_nraenv_SPEq sqlpp_to_nraenv (e1 e2:sqlpp_expr) : nraenv
   := NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2).
            
