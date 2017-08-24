@@ -289,7 +289,7 @@ Section CldMRtoCloudant.
     (* Java equivalent: CloudantBackend.db_of_var *)    
     Definition db_of_var (rulename:string) (var:string) : string := rulename ++ var.
     
-	(* Java equivalent: CloudantBackend.makeInputDb *)
+    (* Java equivalent: CloudantBackend.makeInputDb *)
     Definition makeInputDB (rulename:string) (ins: option string) : string :=
       match ins with
       | None => rulename
@@ -304,18 +304,22 @@ Section CldMRtoCloudant.
       : cloudant_design :=
       match mrp with
       | (inputdb, outputdb, defaultdb, mreduce, mmap) =>
+        let view_name := rulename in (* XXX Is that right?!?! Might have to be revised. XXX *)
         mkCloudantDesign
           (makeInputDB rulename None)
-          (dataToJS quotel (buildDesignDoc rulename mmap mreduce outputdb defaultdb))
+          view_name
+          (dataToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeDesignDoc *)
     Definition makeDesignDoc (quotel:string) (rulename:string) (mrp:option string * option string * option string * option string * string) : cloudant_design :=
       match mrp with
       | (inputdb, outputdb, defaultdb, mreduce, mmap) =>
+        let view_name := rulename in (* XXX Is that right?!?! Might have to be revised. XXX *)
         mkCloudantDesign
           (makeInputDB rulename inputdb)
-          (dataToJS quotel (buildDesignDoc rulename mmap mreduce outputdb defaultdb))
+          view_name
+          (dataToJS quotel (buildDesignDoc view_name mmap mreduce outputdb defaultdb))
       end.
     
     (* Java equivalent: CloudantBackend.makeCloudantDesignDocs *)

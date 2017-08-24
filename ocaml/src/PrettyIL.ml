@@ -21,7 +21,7 @@ module Hack = Compiler
 open Compiler.EnhancedCompiler
 open QDriver
 
-(* Character sets *)
+(** Character sets *)
 
 type charkind =
   | Ascii
@@ -172,7 +172,25 @@ let greeksym =
     top = ("⊤",1);
     bot = ("⊥",1) }
 
-(* Data PP *)
+let pretty_sym ff sym =
+  begin
+    let (asym,asize) = sym in
+    pp_print_as ff asize asym
+  end
+
+let rec pretty_names ff nl =
+  match nl with
+    [] -> ()
+  | n :: [] -> fprintf ff "%s" (Util.string_of_char_list n)
+  | n :: nl' -> fprintf ff "%s,@ %a" (Util.string_of_char_list n) pretty_names nl'
+
+let pretty_squared_names sym ff nl =
+  fprintf ff "%a@[<hv 0>%a@]%a" pretty_sym sym.lfloor pretty_names nl pretty_sym sym.rfloor
+
+let rec pretty_sharp sym ff name =
+  fprintf ff "%a%s" pretty_sym sym.sharp name
+
+(** Pretty data *)
 
 let timescale_as_string ts =
   match ts with
@@ -233,12 +251,6 @@ let pretty_foreign_data ff fd =
   | Hack.Enhancedsqldate td -> raise Not_found
   | Hack.Enhancedsqldateinterval tp -> raise Not_found
 
-let rec pretty_names ff nl =
-  match nl with
-    [] -> ()
-  | n :: [] -> fprintf ff "%s" (Util.string_of_char_list n)
-  | n :: nl' -> fprintf ff "%s,@ %a" (Util.string_of_char_list n) pretty_names nl'
-
 let rec pretty_data ff d =
   match d with
   | Hack.Dunit -> fprintf ff "null"
@@ -267,19 +279,106 @@ and pretty_rec ff rl =
   | (ra,rd) :: [] -> fprintf ff "%s : %a" (Util.string_of_char_list ra) pretty_data rd
   | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (Util.string_of_char_list ra) pretty_data rd pretty_rec rl'
 
-(* Ops PP *)
+(** Pretty rtype *)
 
-let pretty_sym ff sym =
-    begin
-      let (asym,asize) = sym in
-      pp_print_as ff asize asym
-    end
+let rec pretty_rtype_aux sym ff rt =
+  match rt with
+  | Hack.Bottom_UU2080_ -> fprintf ff "%a" pretty_sym sym.bot
+  | Hack.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
+  | Hack.Unit_UU2080_ -> fprintf ff "Unit"
+  | Hack.Nat_UU2080_ -> fprintf ff "Nat"
+  | Hack.Bool_UU2080_ -> fprintf ff "Bool"
+  | Hack.String_UU2080_ -> fprintf ff "String"
+  | Hack.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
+  | Hack.Rec_UU2080_ (Hack.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
+  | Hack.Rec_UU2080_ (Hack.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
+  | Hack.Either_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Hack.Arrow_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
+  | Hack.Brand_UU2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
+  | Hack.Foreign_UU2080_ rf -> fprintf ff "Foreign"
 
-let pretty_squared_names sym ff nl =
-  fprintf ff "%a@[<hv 0>%a@]%a" pretty_sym sym.lfloor pretty_names nl pretty_sym sym.rfloor
+and pretty_rec_type sym ff rl =
+  match rl with
+    [] -> ()
+  | (ra,rd) :: [] -> fprintf ff "%s : %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd
+  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd (pretty_rec_type sym) rl'
 
-let rec pretty_sharp sym ff name =
-  fprintf ff "%a%s" pretty_sym sym.sharp name
+let pretty_rtype greek margin annot rt =
+  let conf = make_pretty_config greek margin annot in
+  let ff = str_formatter in
+  begin
+    pp_set_margin ff (get_margin conf);
+    let sym =
+      match (get_charset conf) with
+      | Greek -> greeksym
+      | Ascii -> textsym
+    in
+    fprintf ff "@[%a@]@." (pretty_rtype_aux sym) rt;
+    flush_str_formatter ()
+  end
+
+let pretty_annotate_rtype greek ff r =
+    let sym = if greek then greeksym else textsym in
+    fprintf ff "@[%a%a%a@]" pretty_sym sym.llangle (pretty_rtype_aux sym) r pretty_sym sym.rrangle
+
+let pretty_drtype_aux sym ff drt =
+  match drt with
+  | Hack.Tlocal tr -> fprintf ff "L%a" (pretty_rtype_aux sym) tr
+  | Hack.Tdistr tr -> fprintf ff "D%a" (pretty_rtype_aux sym) tr
+
+let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
+  let sym = if greek then greeksym else textsym in
+  let inf = Compiler.EnhancedCompiler.QUtil.ta_inferred [] at in
+  let req = Compiler.EnhancedCompiler.QUtil.ta_required [] at in
+  if Hack.equiv_dec (Hack.drtype_eqdec Hack.EnhancedRuntime.compiler_foreign_type []) inf req
+  then
+    fprintf ff "@[%a%a%a%a@]"
+	    pretty_sym sym.lpangle
+	    (pretty_drtype_aux sym) inf
+	    pretty_sym sym.rpangle
+            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
+  else
+    fprintf ff "@[%a%a -> %a%a%a@]"
+	    pretty_sym sym.lpangle
+	    (pretty_drtype_aux sym) inf
+	    (pretty_drtype_aux sym) req
+	    pretty_sym sym.rpangle
+            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
+
+(** Pretty operators *)
+
+(* Precedence:
+   Higher number means binds tighter
+
+   ID, Env, GetConstant, Const    	             27
+   { Op }                  	             26
+   not                                       25
+   !                       	             24
+   .                       	             23
+   Op<Op>(Op)              	             22
+   #Fun(Op)                	             21
+
+   Binary Ops
+   ----------
+   nat         bags           bool   string  rec
+
+   min, max    {min}, {max}	       	           20
+   *,/,%                      \/       	     [+]   19
+   +, -        U, \           /\     ^ 	     [*]   18
+   < <=                                	           17
+               in                      	           16
+   =                       	       	           15
+
+   Infix AlgOp
+   -----------
+   o^e                                             10
+   o                                                9
+   ||                                               8
+   [<->]                                            7
+   <->                                              6
+   x                                                5
+
+ *)
 
 (* pouter: precedence of enclosing expression.
    pinner: precedence of current expression.
@@ -445,41 +544,6 @@ let pretty_unop p sym callb ff u a =
   | Hack.ANumMax -> pretty_unary_exp sym callb "max" ff a
   | Hack.AForeignUnaryOp fu -> pretty_foreign_unop p sym callb ff (Obj.magic fu) a
 
-
-
-
-(* Precedence:
-   Higher number means binds tighter
-
-   ID, Env, GetConstant, Const    	             27
-   { Op }                  	             26
-   not                                       25
-   !                       	             24
-   .                       	             23
-   Op<Op>(Op)              	             22
-   #Fun(Op)                	             21
-
-   Binary Ops
-   ----------
-   nat         bags           bool   string  rec
-
-   min, max    {min}, {max}	       	           20
-   *,/,%                      \/       	     [+]   19
-   +, -        U, \           /\     ^ 	     [*]   18
-   < <=                                	           17
-               in                      	           16
-   =                       	       	           15
-
-   Infix AlgOp
-   -----------
-   o^e                                             10
-   o                                                9
-   ||                                               8
-   [<->]                                            7
-   <->                                              6
-   x                                                5
-
- *)
 
 let string_of_binarith ba =
   match ba with
@@ -674,7 +738,59 @@ let pretty_binop p sym callb ff b a1 a2 =
   | Hack.AForeignBinaryOp fb -> pretty_foreign_binop p sym callb ff (Obj.magic fb) a1 a2
 
 
-(* NRA PP *)
+(** Pretty query wrapper *)
+
+type 'a pretty_fun = bool -> int -> bool -> QData.json -> string -> 'a -> string
+	
+let pretty_query pconf (pretty_q:'a pretty_fun) (q:'a) =
+  let greek = get_charset_bool pconf in
+  let margin = pconf.margin in
+  let annot = pconf.type_annotations in
+  let hierarchy = pconf.hierarchy in
+  let harness = pconf.harness in
+  pretty_q greek margin annot hierarchy harness q
+
+(** Pretty CAMPRule *)
+
+let pretty_camp_rule greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for CAMPRule at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty TechRule *)
+
+let pretty_tech_rule greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for TechRule at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty DesignerRule *)
+
+let pretty_designer_rule greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for TechRule at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty CAMP *)
+
+let pretty_camp greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for CAMP at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty OQL *)
+
+let pretty_oql greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for OQL at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty SQL *)
+
+let pretty_sql greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for SQL at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty SQL++ *)
+
+let pretty_sqlpp greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for SQL++ at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty LambdaNRA *)
+
+let pretty_lambda_nra greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for LambdaNRA at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty NRA *)
 
 let rec pretty_nra_aux p sym ff a =
   match a with
@@ -712,7 +828,7 @@ and pretty_nra_exp p sym thissym ff a1 oa2 =
 	fprintf ff "@[<hv 2>%a%a%a%a(@,%a@;<0 -2>)@]" pretty_sym thissym pretty_sym sym.langle (pretty_nra_aux 0 sym) a1 pretty_sym sym.rangle (pretty_nra_aux 0 sym) a2
 
 
-let pretty_nra greek margin annot a =
+let pretty_nra greek margin annot hierarchy harness q =
   let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
@@ -722,11 +838,11 @@ let pretty_nra greek margin annot a =
       | Greek -> greeksym
       | Ascii -> textsym
     in
-    fprintf ff "@[%a@]@." (pretty_nra_aux 0 sym) a;
+    fprintf ff "@[%a@]@." (pretty_nra_aux 0 sym) q;
     flush_str_formatter ()
   end
 
-(* NRAEnv PP *)
+(** Pretty NRAEnv *)
 
 let rec pretty_nraenv_aux p sym ff a =
   match a with
@@ -782,7 +898,7 @@ and pretty_infix_dependent pouter pinner sym callb thissym ff a1 a2 a3 =
     fprintf ff "@[<hov 0>%a@ %a%a%a%a@ %a@]" (callb pinner sym) a1 pretty_sym thissym pretty_sym sym.langle (pretty_nraenv_aux 0 sym) a1 pretty_sym sym.rangle (callb pinner sym) a2
 
 
-let pretty_nraenv greek margin annot a =
+let pretty_nraenv greek margin annot hierarchy harness q =
   let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
@@ -792,11 +908,16 @@ let pretty_nraenv greek margin annot a =
       | Greek -> greeksym
       | Ascii -> textsym
     in
-    fprintf ff "@[%a@]@." (pretty_nraenv_aux 0 sym) a;
+    fprintf ff "@[%a@]@." (pretty_nraenv_aux 0 sym) q;
     flush_str_formatter ()
   end
 
-(* NNNRC PP *)
+(** Pretty cNRAEnv *)
+
+let pretty_nraenv_core greek margin annot hierarchy harness q =
+  pretty_nraenv greek margin annot hierarchy harness (QDriver.nraenv_core_to_nraenv q)
+    
+(** Pretty NNRC *)
 
 let rec pretty_nnrc_aux p sym ff n =
   match n with
@@ -828,7 +949,7 @@ let rec pretty_nnrc_aux p sym ff n =
   | Hack.NNRCGroupBy (g,atts,n1) ->
       fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_aux 0 sym) n1
 
-let pretty_nnrc greek margin annot n =
+let pretty_nnrc greek margin annot hierarchy harness q =
   let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
@@ -838,11 +959,17 @@ let pretty_nnrc greek margin annot n =
       | Greek -> greeksym
       | Ascii -> textsym
     in
-    fprintf ff "@[%a@]@." (pretty_nnrc_aux 0 sym) n;
+    fprintf ff "@[%a@]@." (pretty_nnrc_aux 0 sym) q;
     flush_str_formatter ()
   end
 
-(* NNRCMR PP *)
+(** Pretty cNNRC *)
+
+let pretty_nnrc_core greek margin annot hierarchy harness q =
+  pretty_nnrc greek margin annot hierarchy harness q
+
+(** Pretty NNRCMR *)
+
 let pretty_fun sym ff (x, n) =
   fprintf ff "@[fun ($v%s) ->@ %a@]"
     (Util.string_of_char_list x)
@@ -939,7 +1066,7 @@ let pretty_nnrcmr_aux sym ff mrl =
   pretty_mr_chain sym ff mrl.Hack.mr_chain;
   fprintf ff "@[%a@]@\n" (pretty_mr_last sym) mrl.Hack.mr_last
 
-let pretty_nnrcmr greek margin annot mr_chain =
+let pretty_nnrcmr greek margin annot hierarchy harness mr_chain =
   let conf = make_pretty_config greek margin annot in
   let ff = str_formatter in
   begin
@@ -953,7 +1080,12 @@ let pretty_nnrcmr greek margin annot mr_chain =
     flush_str_formatter ()
   end
 
-(* dnnrc PP *)
+(** Pretty CldMR *)
+
+let pretty_cldmr greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for CldMR at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty DNNRC *)
 
 let rec pretty_dnnrc_aux ann plug p sym ff n =
   match n with
@@ -1032,72 +1164,6 @@ let pretty_plug_nraenv greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_nraenv_aux 0 sym ff (nraenv_core_to_nraenv a)
 
-(* Pretty RType *)
-
-let rec pretty_rtype_aux sym ff rt =
-  match rt with
-  | Hack.Bottom_UU2080_ -> fprintf ff "%a" pretty_sym sym.bot
-  | Hack.Top_UU2080_ ->  fprintf ff "%a" pretty_sym sym.top
-  | Hack.Unit_UU2080_ -> fprintf ff "Unit"
-  | Hack.Nat_UU2080_ -> fprintf ff "Nat"
-  | Hack.Bool_UU2080_ -> fprintf ff "Bool"
-  | Hack.String_UU2080_ -> fprintf ff "String"
-  | Hack.Coll_UU2080_ rc -> fprintf ff "{@[<hv 0>%a@]}" (pretty_rtype_aux sym) rc
-  | Hack.Rec_UU2080_ (Hack.Closed,rl) -> fprintf ff "[@[<hv 0>%a@]|]" (pretty_rec_type sym) rl
-  | Hack.Rec_UU2080_ (Hack.Open,rl) -> fprintf ff "[@[<hv 0>%a@]..]" (pretty_rec_type sym) rl
-  | Hack.Either_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>left {@,%a@;<0 -2>}@,| right {@,%a@;<0 -2>}@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Hack.Arrow_UU2080_ (r1,r2) -> fprintf ff "@[<hv 2>(fun %a => %a)@]" (pretty_rtype_aux sym) r1 (pretty_rtype_aux sym) r2
-  | Hack.Brand_UU2080_ bds -> fprintf ff "@[<hv 2>Brands [BRANDS]@]"
-  | Hack.Foreign_UU2080_ rf -> fprintf ff "Foreign"
-
-and pretty_rec_type sym ff rl =
-  match rl with
-    [] -> ()
-  | (ra,rd) :: [] -> fprintf ff "%s : %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd
-  | (ra,rd) :: rl' -> fprintf ff "%s : %a;@ %a" (Util.string_of_char_list ra) (pretty_rtype_aux sym) rd (pretty_rec_type sym) rl'
-
-let pretty_rtype greek margin annot rt =
-  let conf = make_pretty_config greek margin annot in
-  let ff = str_formatter in
-  begin
-    pp_set_margin ff (get_margin conf);
-    let sym =
-      match (get_charset conf) with
-      | Greek -> greeksym
-      | Ascii -> textsym
-    in
-    fprintf ff "@[%a@]@." (pretty_rtype_aux sym) rt;
-    flush_str_formatter ()
-  end
-
-let pretty_annotate_rtype greek ff r =
-    let sym = if greek then greeksym else textsym in
-    fprintf ff "@[%a%a%a@]" pretty_sym sym.llangle (pretty_rtype_aux sym) r pretty_sym sym.rrangle
-
-let pretty_drtype_aux sym ff drt =
-  match drt with
-  | Hack.Tlocal tr -> fprintf ff "L%a" (pretty_rtype_aux sym) tr
-  | Hack.Tdistr tr -> fprintf ff "D%a" (pretty_rtype_aux sym) tr
-
-let pretty_annotate_annotated_rtype greek subpr ff (at:'a Compiler.type_annotation) =
-  let sym = if greek then greeksym else textsym in
-  let inf = Compiler.EnhancedCompiler.QUtil.ta_inferred [] at in
-  let req = Compiler.EnhancedCompiler.QUtil.ta_required [] at in
-  if Hack.equiv_dec (Hack.drtype_eqdec Hack.EnhancedRuntime.compiler_foreign_type []) inf req
-  then
-    fprintf ff "@[%a%a%a%a@]"
-	    pretty_sym sym.lpangle
-	    (pretty_drtype_aux sym) inf
-	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
-  else
-    fprintf ff "@[%a%a -> %a%a%a@]"
-	    pretty_sym sym.lpangle
-	    (pretty_drtype_aux sym) inf
-	    (pretty_drtype_aux sym) req
-	    pretty_sym sym.rpangle
-            subpr (Compiler.EnhancedCompiler.QUtil.ta_base [] at)
-
 (* Pretty Spark IR *)
 let rec pretty_column_aux p sym ff col =
   match col with
@@ -1144,47 +1210,54 @@ let pretty_plug_dataframe greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_dataframe_aux 0 sym ff a
 
+let pretty_dnnrc_dataframe greek margin annot hierarchy harness q =
+  let ann = pretty_annotate_ignore in
+  let plug = pretty_plug_dataframe greek in
+  pretty_dnnrc ann plug greek margin annot q
 
-(* Pretty languages *)
+(** Pretty tDNNRC *)
 
-let pretty_query pconf q =
-  let greek = get_charset_bool pconf in
-  let margin = pconf.margin in
-  let annot = pconf.type_annotations in
-  let hierarchy = pconf.hierarchy in
-  let harness = pconf.harness in
-  begin match q with
-  | Compiler.Q_camp_rule q -> "(* There is no camp rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_tech_rule q -> "(* There is no tech rule pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_designer_rule q -> "(* There is no designer pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_camp q -> "(* There is no camp pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_oql q -> "(* There is no oql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_sql q -> "(* There is no sql pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_sqlpp q -> "(* There is no sql++ pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_lambda_nra q -> "(* There is no lambda_nra pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_nra q -> pretty_nra greek margin annot q
-  | Compiler.Q_nraenv_core q -> pretty_nraenv greek margin annot (QDriver.nraenv_core_to_nraenv q)
-  | Compiler.Q_nraenv q -> pretty_nraenv greek margin annot q
-  | Compiler.Q_nnrc_core q -> pretty_nnrc greek margin annot q
-  | Compiler.Q_nnrc q -> pretty_nnrc greek margin annot q
-  | Compiler.Q_nnrcmr q -> pretty_nnrcmr greek margin annot q
-  | Compiler.Q_cldmr q -> "(* There is no cldmr pretty printer for the moment. *)\n"  (* XXX TODO XXX *)
-  | Compiler.Q_dnnrc q ->
-      let ann = pretty_annotate_ignore in
-      let plug = pretty_plug_dataframe greek in
-      pretty_dnnrc ann plug greek margin annot q
-  | Compiler.Q_dnnrc_typed q ->
-      let ann =
-	if annot
-	then pretty_annotate_annotated_rtype greek pretty_annotate_ignore
-	else pretty_annotate_ignore
-      in
-      let plug = pretty_plug_dataframe greek in
-      pretty_dnnrc ann plug greek margin annot q
-  | Compiler.Q_javascript q -> Util.string_of_char_list q
-  | Compiler.Q_java q -> Util.string_of_char_list q
-  | Compiler.Q_spark_rdd q -> Util.string_of_char_list q
-  | Compiler.Q_spark_df q -> Util.string_of_char_list q
-  | Compiler.Q_cloudant q -> CloudantUtil.string_of_cloudant (CloudantUtil.add_harness_top harness hierarchy q)
-  | Compiler.Q_error q -> "Error: "^(Util.string_of_char_list q)
-  end
+let pretty_dnnrc_dataframe_typed greek margin annot hierarchy harness q =
+  let ann =
+    if annot
+    then pretty_annotate_annotated_rtype greek pretty_annotate_ignore
+    else pretty_annotate_ignore
+  in
+  let plug = pretty_plug_dataframe greek in
+  pretty_dnnrc ann plug greek margin annot q
+    
+(** Pretty JavaScript *)
+
+let pretty_javascript greek margin annot hierarchy harness q =
+  Util.string_of_char_list q
+
+(** Pretty Java *)
+
+let pretty_java greek margin annot hierarchy harness q =
+  Util.string_of_char_list q
+
+(** Pretty SparkRDD *)
+
+let pretty_spark_rdd greek margin annot hierarchy harness q =
+  Util.string_of_char_list q
+
+(** Pretty SparkDF *)
+
+let pretty_spark_df greek margin annot hierarchy harness q =
+  Util.string_of_char_list q
+
+(** Pretty Cloudant *)
+
+let pretty_cloudant greek margin annot hierarchy harness q =
+  CloudantUtil.string_of_cloudant (CloudantUtil.add_harness_top harness hierarchy q)
+
+(** Pretty CloudantWhisk *)
+
+let pretty_cloudant_whisk greek margin annot hierarchy harness q =
+  "(* There is no pretty printer for CloudantWhisk at the moment. *)\n"  (* XXX TODO XXX *)
+
+(** Pretty Error *)
+
+let pretty_error greek margin annot hierarchy harness q =
+  "Error: "^(Util.string_of_char_list q)
+

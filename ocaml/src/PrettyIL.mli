@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-(* This module contains pretty-printers for intermediate languages *)
+(** This module contains pretty-printers for all languages *)
 
 open Compiler.EnhancedCompiler
 
@@ -65,49 +65,34 @@ val foreign_binop_of_string : string -> Compiler.enhanced_binary_op
 
 val string_of_binop : Compiler.binOp -> string
 
-(* Pretty NRA^e *)
+(* Pretty queries *)
 
-val pretty_nraenv : bool -> int -> bool -> QLang.nraenv -> string
+type 'a pretty_fun = bool -> int -> bool -> QData.json -> string -> 'a -> string
 
-(* Pretty NNRC *)
+val pretty_camp_rule : Compiler.camp_rule pretty_fun
+val pretty_tech_rule : Compiler.tech_rule pretty_fun
+val pretty_designer_rule : Compiler.designer_rule pretty_fun
+val pretty_camp : Compiler.camp pretty_fun
+val pretty_oql : Compiler.oql pretty_fun
+val pretty_sql : Compiler.sql pretty_fun
+val pretty_sqlpp : Compiler.sqlpp pretty_fun
+val pretty_lambda_nra : Compiler.lambda_nra pretty_fun
+val pretty_nra : Compiler.nra pretty_fun
+val pretty_nraenv_core : Compiler.nraenv_core pretty_fun
+val pretty_nraenv : Compiler.nraenv pretty_fun
+val pretty_nnrc_core : Compiler.nnrc_core pretty_fun
+val pretty_nnrc : Compiler.nnrc pretty_fun
+val pretty_nnrcmr : Compiler.nnrcmr pretty_fun
+val pretty_cldmr : Compiler.cldmr pretty_fun
+val pretty_dnnrc_dataframe : Compiler.dnnrc_dataframe pretty_fun
+val pretty_dnnrc_dataframe_typed : Compiler.dnnrc_typed pretty_fun
+val pretty_javascript : Compiler.javascript pretty_fun
+val pretty_java : Compiler.java pretty_fun
+val pretty_spark_rdd : Compiler.spark_rdd pretty_fun
+val pretty_spark_df : Compiler.spark_df pretty_fun
+val pretty_cloudant : Compiler.cloudant pretty_fun
+val pretty_cloudant_whisk : Compiler.cloudant_whisk pretty_fun
+val pretty_error : (char list) pretty_fun
 
-val pretty_nnrc : bool -> int -> bool -> QLang.nnrc -> string
-
-(* Pretty NNRCMR *)
-
-val pretty_nnrcmr : bool -> int -> bool -> QLang.nnrcmr -> string
-
-(* Pretty DNRC *)
-
-val pretty_dnnrc : (Format.formatter -> 'a -> unit) ->
-  (Format.formatter -> 'plug_type -> unit) ->
-    bool -> int -> bool -> ('a, 'plug_type) Compiler.dnnrc -> string
-
-(* Pretty Spark IR *)
-
-val pretty_dataframe : bool -> int -> bool -> Compiler.dataframe -> string
-
-
-(* Pretty printers for various annotation types *)
-val pretty_annotate_ignore : Format.formatter -> 'a -> unit
-val pretty_annotate_rtype : bool -> Format.formatter -> QType.camp_type -> unit
-val pretty_annotate_annotated_rtype : bool ->
-				      (Format.formatter -> 'a -> unit) ->
-				      Format.formatter ->
-				      'a Compiler.type_annotation -> unit
-
-
-(* Pretty printers for various plug types *)
-val pretty_plug_ignore : Format.formatter -> 'a -> unit
-val pretty_plug_nraenv : bool -> Format.formatter -> QLang.nraenv_core -> unit
-val pretty_plug_dataframe : bool -> Format.formatter -> Compiler.dataframe -> unit
-
-(* Pretty types *)
-
-val pretty_rtype : bool -> int -> bool -> QType.camp_type -> string
-
-(* Pretty query *)
-
-val pretty_query : pretty_config -> QLang.query -> string
-
+val pretty_query : pretty_config -> 'a pretty_fun -> 'a -> string
 

@@ -24,29 +24,33 @@ parameters.
 *)
 
 (** Summary:
-- Language: Cloudant (Emitted code for Cloudant)
-- Based on: Cloudant DB documentation.
+- Language: CloudantWhisk (Emitted code for Cloudant deployed on openWhisk)
+- Based on: Cloudant openWhisk documentation
 - URL: https://console.ng.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-
-- Languages translating to Cloudant: CldMR
-- Languages translating from Cloudant: CloudantWhisk
+- URL: http://openwhisk.incubator.apache.org
+- Languages translating to CloudantWhisk: Cloudant
+- Languages translating from CloudantWhisk: 
 *)
-  
-Section Cloudant.
+
+Require Import JavaScript.
+
+Section CloudantWhisk.
   Require Import String.
 
-  Record cloudant_design :=
-    mkCloudantDesign
-      { cloudant_design_inputdb : string;
-        cloudant_design_name : string; (* Keep the design name around *)
-        cloudant_design_doc : string; }.
+  (** The underlying structure for Cloudant targetting openWhisk is a set of actions containing JavaScript.
+
+      The actions fall into two classes:
+- Actions which deploy a Cloudant view
+- The action which compute the final result from the views *)
+
+  Definition whisk_action_name := string.
+  Definition whisk_action_code := javascript.
+
+  Definition whisk_action : Set := whisk_action_name * whisk_action_code.
+
+  Definition cloudant_whisk : Set := list whisk_action.
   
-  Record cloudant :=
-    mkCloudant
-      { cloudant_designs : list cloudant_design;
-        cloudant_final_expr : string;
-        cloudant_effective_parameters : list string; }.
-  
-End Cloudant.
+End CloudantWhisk.
 
 (* 
 *** Local Variables: ***

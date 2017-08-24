@@ -45,6 +45,7 @@ Section CompCorrectness.
   Require Import SparkRDDRuntime.
   Require Import SparkDFRuntime.
   Require Import CloudantRuntime.
+  Require Import CloudantWhiskRuntime.
 
   (* Translations *)
   Require Import OQLtoNRAEnv.
@@ -75,6 +76,7 @@ Section CompCorrectness.
   Require Import NNRCMRtoCldMR.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoCloudant.
+  Require Import CloudanttoCloudantWhisk.
   Require Import DNNRCtotDNNRC.
   Require Import tDNNRCtoSparkDF.
 
@@ -145,9 +147,15 @@ Section CompCorrectness.
     | Dv_spark_df_stop => True
     end.
 
+  Definition driver_correct_cloudant_whisk (dv: cloudant_whisk_driver) :=
+    match dv with
+    | Dv_cloudant_whisk_stop => True
+    end.
+
   Definition driver_correct_cloudant (dv: cloudant_driver) :=
     match dv with
     | Dv_cloudant_stop => True
+    | Dv_cloudant_to_cloudant_whisk action_name dv => False
     end.
 
   Definition driver_correct_cldmr (dv: cldmr_driver) :=
@@ -294,6 +302,7 @@ Section CompCorrectness.
     | Dv_spark_rdd dv => driver_correct_spark_rdd dv
     | Dv_spark_df dv => driver_correct_spark_df dv
     | Dv_cloudant dv => driver_correct_cloudant dv
+    | Dv_cloudant_whisk dv => driver_correct_cloudant_whisk dv
     | Dv_error s => True (* XXX ??? XXX *)
     end.
 
@@ -416,6 +425,7 @@ Section CompCorrectness.
     | (Dv_spark_rdd _, Q_spark_rdd _) => True
     | (Dv_spark_df _, Q_spark_df _) => True
     | (Dv_cloudant _, Q_cloudant _) => True
+    | (Dv_cloudant_whisk _, Q_cloudant_whisk _) => True
     | (_, _) => False
     end.
     
@@ -793,6 +803,18 @@ Section CompCorrectness.
       destruct dv; simpl in *; contradiction.
     Qed.
       
+    Lemma correct_driver_succeeds_cloudant_whisk:
+      forall dv, driver_correct (Dv_cloudant_whisk dv) ->
+                 (forall q, Forall query_not_error
+                                   (compile (Dv_cloudant_whisk dv) (Q_cloudant_whisk q))).
+    Proof.
+      intros.
+      rewrite Forall_forall; intros.
+      simpl in H0.
+      elim H0; clear H0; intros; [rewrite <- H0; simpl; trivial| ].
+      destruct dv; simpl in *; contradiction.
+    Qed.
+      
     Lemma correct_driver_succeeds_cloudant:
       forall dv, driver_correct (Dv_cloudant dv) ->
                  (forall q, Forall query_not_error
@@ -866,6 +888,7 @@ Section CompCorrectness.
       - apply correct_driver_succeeds_spark_rdd; auto.
       - apply correct_driver_succeeds_spark_df; auto.
       - apply correct_driver_succeeds_cloudant; auto.
+      - apply correct_driver_succeeds_cloudant_whisk; auto.
     Qed.
     
     Definition query_preserves_eval (q1 q2:query) : Prop :=
@@ -1626,6 +1649,20 @@ Section CompCorrectness.
       - contradiction.
     Qed.
     
+    Lemma correct_driver_preserves_eval_cloudant_whisk:
+      forall dv, driver_correct (Dv_cloudant_whisk dv) ->
+                 (forall q, Forall (query_preserves_eval (Q_cloudant_whisk q))
+                                   (compile (Dv_cloudant_whisk dv) (Q_cloudant_whisk q))).
+    Proof.
+      intros.
+      simpl in H.
+      rewrite Forall_forall; intros.
+      destruct dv; simpl in *.
+      elim H0; intros.
+      - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
+    Qed.
+    
     Lemma correct_driver_preserves_eval_cloudant:
       forall dv, driver_correct (Dv_cloudant dv) ->
                  (forall q, Forall (query_preserves_eval (Q_cloudant q))
@@ -1637,6 +1674,7 @@ Section CompCorrectness.
       destruct dv; simpl in *.
       elim H0; intros.
       - rewrite <- H1; simpl; trivial_same_query.
+      - contradiction.
       - contradiction.
     Qed.
     
@@ -1689,6 +1727,7 @@ Section CompCorrectness.
       - apply correct_driver_preserves_eval_spark_rdd; auto.
       - apply correct_driver_preserves_eval_spark_df; auto.
       - apply correct_driver_preserves_eval_cloudant; auto.
+      - apply correct_driver_preserves_eval_cloudant_whisk; auto.
     Qed.
     
   End eval_preserved.

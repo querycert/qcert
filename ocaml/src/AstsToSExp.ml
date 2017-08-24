@@ -1661,7 +1661,8 @@ let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   | L_java
   | L_spark_rdd
   | L_spark_df
-  | L_cloudant ->
+  | L_cloudant
+  | L_cloudant_whisk ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_error err ->
       raise (Qcert_Error ("sexp_to_query: "^(Util.string_of_char_list err)))
@@ -1704,6 +1705,8 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_spark_df _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_cloudant _ ->
+      SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | Q_cloudant_whisk _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_error err ->
       SString ("query_to_sexp: "^(Util.string_of_char_list err))
