@@ -35,36 +35,36 @@ TARGET=native
 all: $(MAIN) $(MAIN2)
 js: ../lib/qcertJS.js
 
-generated: generated/StaticConfig.ml generated/QcertCompiler.ml generated/QcertCompiler.mli
+extracted: extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 
 # Extraction from Coq
-generated/QcertCompiler.ml generated/QcertCompiler.mli:
-	mkdir -p generated
-	(cd generated; coqc -R ../../coq Qcert ../QcertExtraction.v)
+extracted/QcertCompiler.ml extracted/QcertCompiler.mli:
+	mkdir -p extracted
+	(cd extracted; coqc -R ../../coq Qcert ../QcertExtraction.v)
 
 # Configuration
-generated/StaticConfig.ml:
-	mkdir -p generated
-	echo "(* This file is generated *)" > generated/StaticConfig.ml
-	echo "let qcert_home = \"$(QCERT_HOME)\"" >> generated/StaticConfig.ml
+extracted/StaticConfig.ml:
+	mkdir -p extracted
+	echo "(* This file is generated *)" > extracted/StaticConfig.ml
+	echo "let qcert_home = \"$(QCERT_HOME)\"" >> extracted/StaticConfig.ml
 
 
 # OCaml build
-$(MAIN): generated $(MAIN).$(TARGET)
+$(MAIN): extracted $(MAIN).$(TARGET)
 	cp _build/$(MAIN).$(TARGET) ../bin/$(MAIN)
 
-$(MAIN).$(TARGET): generated
-	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN).$(TARGET)
+$(MAIN).$(TARGET): extracted
+	$(OCAMLBUILD) $(MENHIRFLAG) -Is extracted -Is src $(MAIN).$(TARGET)
 
-$(MAIN2): generated $(MAIN2).$(TARGET)
+$(MAIN2): extracted $(MAIN2).$(TARGET)
 	cp _build/$(MAIN2).$(TARGET) ../bin/$(MAIN2)
 
-$(MAIN2).$(TARGET): generated
-	$(OCAMLBUILD) $(MENHIRFLAG) -Is generated -Is src $(MAIN2).$(TARGET)
+$(MAIN2).$(TARGET): extracted
+	$(OCAMLBUILD) $(MENHIRFLAG) -Is extracted -Is src $(MAIN2).$(TARGET)
 
-$(LIBJS).cma: generated
+$(LIBJS).cma: extracted
 	$(OCAMLBUILD) -libs js_of_ocaml -pp "camlp4o -I /Users/simeon/.opam/4.02.1/lib/js_of_ocaml pa_js.cmo" \
-        -pkg js_of_ocaml -Is generated -Is src $(LIBJS).cma
+        -pkg js_of_ocaml -Is extracted -Is src $(LIBJS).cma
 	cp _build/$(LIBJS).cma jsapi/$(LIBJS).cma
 
 # JavaScript
@@ -73,8 +73,8 @@ $(LIBJS).cma: generated
 	js_of_ocaml _build/qcertJS.byte
 	cp _build/qcertJS.js ../lib/qcertJS.js
 
-_build/qcertJS.byte: generated qcertJS.ml
-	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is generated -Is src qcertJS.byte
+_build/qcertJS.byte: extracted qcertJS.ml
+	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is extracted -Is src qcertJS.byte
 
 # Whisk
 
@@ -102,7 +102,7 @@ realclean:
 	rm -f DataLexer.ml DataParser.ml DataParser.mli
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
 	rm -f Extraction.glob Extraction.vo .Extraction.aux
-	rm -rf *~ generated $(MAIN) $(MAIN2)
+	rm -rf *~ extracted $(MAIN) $(MAIN2)
 	rm -f ../bin/$(MAIN) ../bin/$(MAIN2)
 	rm -f ../lib/$(LIB).cmi ../lib/qcertJS.js
 

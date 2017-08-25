@@ -22,10 +22,10 @@ Module QData(runtime:CompilerRuntime).
   
   Definition json : Set 
     := JSON.json.
-  Definition data : Set 
+  Definition qdata : Set 
     := RData.data.
   Definition t : Set 
-    := data.
+    := qdata.
   
   Definition jnil : json
     := JSON.jnil.
@@ -40,34 +40,34 @@ Module QData(runtime:CompilerRuntime).
   Definition jobject jl : json
     := JSON.jobject jl.
 
-  Definition dunit : data 
+  Definition dunit : qdata 
     := RData.dunit.
-  Definition dnat z : data 
+  Definition dnat z : qdata 
     := RData.dnat z.
-  Definition dbool b : data 
+  Definition dbool b : qdata 
     := RData.dbool b.
-  Definition dstring s : data 
+  Definition dstring s : qdata 
     := RData.dstring s.
-  Definition dcoll dl : data 
+  Definition dcoll dl : qdata 
     := RData.dcoll dl.
-  Definition drec dl : data 
+  Definition drec dl : qdata 
     := RData.drec dl.
-  Definition dleft : data -> data 
+  Definition dleft : qdata -> qdata 
     := RData.dleft.
-  Definition dright : data -> data 
+  Definition dright : qdata -> qdata 
     := RData.dright.
-  Definition dbrand b : data -> data 
+  Definition dbrand b : qdata -> qdata 
     := RData.dbrand b.
   (* foreign data is supported via the model *)
   
   (** JSON -> data conversion (META variant) *)
-  Definition json_to_data br : JSON.json -> data 
+  Definition json_to_qdata br : JSON.json -> qdata 
     := JSONtoData.json_to_data br.
   (** JSON -> data conversion (Enhanced variant) *)
-  Definition json_enhanced_to_data br : JSON.json -> data 
+  Definition json_enhanced_to_qdata br : JSON.json -> qdata 
     := JSONtoData.json_enhanced_to_data br.
   (** data -> JSON *string* conversion *)
-  Definition dataToJS s : data -> String.string 
+  Definition qdataToJS s : qdata -> String.string 
     := NNRCtoJavaScript.dataToJS s.
 
   Definition jsonToJS s : JSON.json -> String.string 
@@ -75,9 +75,9 @@ Module QData(runtime:CompilerRuntime).
 
   Section dist.
     Import DData.
-    Definition ddata : Set := DData.ddata.
-    Definition dlocal : data -> ddata := DData.Dlocal.
-    Definition ddistr (x:data) : option ddata :=
+    Definition qddata : Set := DData.ddata.
+    Definition dlocal : qdata -> qddata := DData.Dlocal.
+    Definition ddistr (x:qdata) : option qddata :=
       match x with
       | RData.dcoll c => Some (DData.Ddistr c)
       | _ => None

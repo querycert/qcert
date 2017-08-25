@@ -56,7 +56,7 @@ let check_nraenv_result conf expected_res fname actual_res debug_res =
   else
     validate_result_debug conf expected_res actual_res debug_res
 
-let print_rule_result fname (actual_res : QData.data option) =
+let print_rule_result fname (actual_res : QData.qdata option) =
   match actual_res with
   | None -> Format.printf "Evaluation for file %s : [Type Error]@." fname
   | Some res ->

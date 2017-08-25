@@ -22,14 +22,14 @@ open QcertCompiler.EnhancedCompiler
 
 (* Check result *)
 
-val print_nraenv_result : string -> QData.data option -> unit
-val check_nraenv_result : eval_config -> QData.data list -> string -> QData.data option -> string -> unit
+val print_nraenv_result : string -> QData.qdata option -> unit
+val check_nraenv_result : eval_config -> QData.qdata list -> string -> QData.qdata option -> string -> unit
 
-val print_rule_result : string -> QData.data option -> unit
-val print_oql_result : string -> QData.data option -> unit
+val print_rule_result : string -> QData.qdata option -> unit
+val print_oql_result : string -> QData.qdata option -> unit
 
-val validate_result : QData.data list -> QData.data option -> unit
+val validate_result : QData.qdata list -> QData.qdata option -> unit
     
-val check_rule_result : eval_config -> QData.data list -> string -> QData.data option -> string -> unit
-val check_oql_result : QData.data list -> string -> QData.data option -> string -> unit
+val check_rule_result : eval_config -> QData.qdata list -> string -> QData.qdata option -> string -> unit
+val check_oql_result : QData.qdata list -> string -> QData.qdata option -> string -> unit
 

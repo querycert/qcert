@@ -23,7 +23,7 @@ open QcertCompiler.EnhancedCompiler
 (* Javascript harness (for inlining in Cloudant) *)
 
 let print_hierarchy d =
-  Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") (QData.json_to_data [] d))
+  Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") (QData.json_to_qdata [] d))
 
 let fix_harness harness h =
   let harness = "var inheritance = %INHERITANCE%;\n" ^ harness in

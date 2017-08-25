@@ -6,7 +6,7 @@
 /*.aux
 /Test
 /_build/
-/generated/
+/extracted/
 /out/
 /CACo.jar
 /CADa.jar

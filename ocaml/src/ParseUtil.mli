@@ -35,7 +35,7 @@ val parse_oql : Lexing.lexbuf -> QLang.oql
  ****************)
 
 val parse_sexp : Lexing.lexbuf -> SExp.sexp
-val parse_io_sexp : Lexing.lexbuf -> QData.data
+val parse_io_sexp : Lexing.lexbuf -> QData.qdata
 
 val parse_camp_sexp : Lexing.lexbuf -> QLang.camp
 val parse_nraenv_sexp : Lexing.lexbuf -> QLang.nraenv_core

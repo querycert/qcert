@@ -95,11 +95,11 @@ val pretty_squared_names : symbols -> Format.formatter -> (char list) list -> un
 
 (* Pretty data *)
 
-val pretty_data : Format.formatter -> QData.data -> unit
+val pretty_data : Format.formatter -> QData.qdata -> unit
 
-(* Pretty rtype *)
+(* Pretty qcert_type *)
 
-val pretty_rtype_aux : symbols -> Format.formatter -> QcertCompiler.rtype_UU2080_ -> unit
+val pretty_rtype_aux : symbols -> Format.formatter -> QType.qtype_struct -> unit
 val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a QcertCompiler.type_annotation -> unit
 
 (* Pretty operators *)

@@ -37,7 +37,7 @@ Module QLambdaNRA(runtime:CompilerRuntime).
     := LambdaNRA.LNRALambda.
   Definition lavar : var -> expr
     := LambdaNRA.LNRAVar.
-  Definition laconst : Data.data -> expr
+  Definition laconst : Data.qdata -> expr
     := LambdaNRA.LNRAConst.
   Definition ltable  : String.string -> expr
     := LambdaNRA.LNRATable.

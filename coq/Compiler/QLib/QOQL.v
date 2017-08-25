@@ -44,7 +44,7 @@ Module QOQL(runtime:CompilerRuntime).
   
   Definition ovar : var -> expr
     := OQL.OVar.
-  Definition oconst : Data.data -> expr
+  Definition oconst : Data.qdata -> expr
     := OQL.OConst.
   Definition otable  : String.string -> expr
     := OQL.OTable.

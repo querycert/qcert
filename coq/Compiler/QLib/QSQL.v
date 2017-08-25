@@ -68,7 +68,7 @@ Module QSQL(runtime:CompilerRuntime).
   Definition sql_cond_like := SQL.SCondLike.
   Definition sql_cond_between := SQL.SCondBetween.
 
-  Definition sql_expr_const : QData.data -> sql_expr := SQL.SExprConst.
+  Definition sql_expr_const : QData.qdata -> sql_expr := SQL.SExprConst.
   Definition sql_expr_column : String.string -> sql_expr := SQL.SExprColumn.
   Definition sql_expr_column_deref : String.string -> String.string -> sql_expr := SQL.SExprColumnDeref.
   Definition sql_expr_star : sql_expr := SQL.SExprStar.

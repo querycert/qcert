@@ -68,7 +68,7 @@ let foreign_data_to_sexp (fd:enhanced_data) : sexp =
   | Enhancedsqldate td -> raise Not_found
   | Enhancedsqldateinterval tp -> raise Not_found
 
-let rec data_to_sexp (d : QData.data) : sexp =
+let rec data_to_sexp (d : QData.qdata) : sexp =
   match d with
   | Dunit -> STerm ("dunit", [])
   | Dnat n -> SInt n
@@ -80,10 +80,10 @@ let rec data_to_sexp (d : QData.data) : sexp =
   | Dright d -> STerm ("dright", data_to_sexp d :: [])
   | Dbrand (bs,d) -> STerm ("dbrand", (STerm ("brands", dbrands_to_sexp bs)) :: (STerm ("value", (data_to_sexp d) :: [])) :: [])
   | Dforeign fdt -> foreign_data_to_sexp (Obj.magic fdt)
-and drec_to_sexp (ad : char list * QData.data) : sexp =
+and drec_to_sexp (ad : char list * QData.qdata) : sexp =
   STerm ("datt", (SString (string_of_char_list (fst ad))) :: (data_to_sexp (snd ad)) :: [])
 
-let rec sexp_to_data (se:sexp) : QData.data =
+let rec sexp_to_data (se:sexp) : QData.qdata =
   match se with
   | STerm ("dunit", []) -> Dunit
   | SBool b -> Dbool b
@@ -104,7 +104,7 @@ let rec sexp_to_data (se:sexp) : QData.data =
       Dforeign (Obj.magic (PrettyCommon.foreign_data_of_string s))
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr with name " ^ t))
-and sexp_to_drec (sel:sexp) : (char list * QData.data) =
+and sexp_to_drec (sel:sexp) : (char list * QData.qdata) =
   match sel with
   | STerm ("datt", (SString s) :: se :: []) ->
       (char_list_of_string s, sexp_to_data se)

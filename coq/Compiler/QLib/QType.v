@@ -35,35 +35,37 @@ Module QType(runtime:CompilerRuntime).
   Definition closed_kind : record_kind
     := RType.Closed.
 
-  Definition camp_type {m:brand_relation} : Set
+  Definition qtype_struct {m:brand_relation} : Set
+    := RType.rtype₀.
+  Definition qtype {m:brand_relation} : Set
     := RType.rtype.
   Definition t {m:brand_relation} : Set
-    := camp_type.
+    := qtype.
 
   Definition sorted_pf_type {m:brand_relation} srl
-      := RSort.is_list_sorted RBindings.ODT_lt_dec (@RAssoc.domain String.string camp_type srl) = true.
+      := RSort.is_list_sorted RBindings.ODT_lt_dec (@RAssoc.domain String.string qtype srl) = true.
 
-  Definition bottom {m:brand_relation} : camp_type
+  Definition bottom {m:brand_relation} : qtype
     := RType.Bottom.  
-  Definition top {m:brand_relation} : camp_type
+  Definition top {m:brand_relation} : qtype
     := RType.Top.
-  Definition unit {m:brand_relation} : camp_type
+  Definition unit {m:brand_relation} : qtype
     := RType.Unit.
-  Definition nat {m:brand_relation} : camp_type
+  Definition nat {m:brand_relation} : qtype
     := RType.Nat.
-  Definition bool {m:brand_relation} : camp_type
+  Definition bool {m:brand_relation} : qtype
     := RType.Bool.
-  Definition string {m:brand_relation} : camp_type
+  Definition string {m:brand_relation} : qtype
     := RType.String.
-  Definition bag {m:brand_relation} : camp_type -> camp_type
+  Definition bag {m:brand_relation} : qtype -> qtype
     := RType.Coll.
-  Definition record {m:brand_relation} : record_kind -> forall (r:list (String.string*camp_type)), sorted_pf_type r -> camp_type
+  Definition record {m:brand_relation} : record_kind -> forall (r:list (String.string*qtype)), sorted_pf_type r -> qtype
     := RType.Rec.
-  Definition either {m:brand_relation} : camp_type -> camp_type -> camp_type
+  Definition either {m:brand_relation} : qtype -> qtype -> qtype
     := RType.Either.
-  Definition arrow {m:brand_relation} : camp_type -> camp_type -> camp_type
+  Definition arrow {m:brand_relation} : qtype -> qtype -> qtype
     := RType.Arrow.
-  Definition brand {m:brand_relation} : list String.string -> camp_type
+  Definition brand {m:brand_relation} : list String.string -> qtype
     := RType.Brand.
 
   (* Additional support for brand models extraction -- will have to be tested/consolidated *)
@@ -80,24 +82,24 @@ Module QType(runtime:CompilerRuntime).
 
   (* Additional support for distributed types *)
   
-  Definition camp_dtype {m:brand_relation} : Set
+  Definition qcert_dtype {m:brand_relation} : Set
     := DType.drtype.
   Definition dt {m:brand_relation} : Set
-    := camp_dtype.
+    := qcert_dtype.
 
-  Definition json_to_drtype {m:brand_relation} : JSON.json -> camp_dtype := json_to_drtype.
+  Definition json_to_drtype {m:brand_relation} : JSON.json -> qcert_dtype := json_to_drtype.
 
-  Definition json_to_vrtype_with_fail {m:brand_relation} : JSON.json -> option (String.string * camp_type) := json_to_vrtype_with_fail.
+  Definition json_to_vrtype_with_fail {m:brand_relation} : JSON.json -> option (String.string * qtype) := json_to_vrtype_with_fail.
 
-  Definition tlocal {m:brand_relation}  : camp_type -> camp_dtype := DType.Tlocal.
-  Definition tdistr {m:brand_relation}  : camp_type -> camp_dtype := DType.Tdistr.
+  Definition tlocal {m:brand_relation}  : qtype -> qcert_dtype := DType.Tlocal.
+  Definition tdistr {m:brand_relation}  : qtype -> qcert_dtype := DType.Tdistr.
 
   (* JSON -> sdata string *)
 
-  Definition camp_type_uncoll (m:brand_model) : camp_type -> option camp_type
+  Definition qtype_uncoll (m:brand_model) : qtype -> option qtype
     := @TUtil.tuncoll _ m.
   
-  Definition data_to_sjson (m:brand_model) : data -> camp_type -> option String.string
+  Definition data_to_sjson (m:brand_model) : data -> qtype -> option String.string
     := @DatatoSparkDF.data_to_sjson _ _ _ m.
 
 End QType.

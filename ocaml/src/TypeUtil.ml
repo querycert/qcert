@@ -81,7 +81,7 @@ let lift_constant_types (bm:QType.brand_model) br glb =
     | QcertCompiler.Vlocal -> gbt
     | QcertCompiler.Vdistr ->
 	(* XXX We to 'uncoll' here to check that the type is a collection type and extract its content -- This is an assumption of the Compiler Driver XXX *)
-	begin match QType.camp_type_uncoll bm gbt with
+	begin match QType.qtype_uncoll bm gbt with
 	| None -> raise (Qcert_Error ("Type for distributed constant " ^ vname ^ " must be a collection type"))
 	| Some dt -> dt
 	end

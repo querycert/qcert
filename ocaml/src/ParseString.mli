@@ -37,7 +37,7 @@ val parse_oql_from_string : string -> QLang.oql
 (****************)
 
 val parse_sexp_from_string : string -> SExp.sexp
-val parse_io_sexp_from_string : string -> QData.data
+val parse_io_sexp_from_string : string -> QData.qdata
 val parse_camp_sexp_from_string : string -> QLang.camp
 val parse_nraenv_sexp_from_string : string -> QLang.nraenv_core
 val parse_nnrc_sexp_from_string : string -> QLang.nnrc

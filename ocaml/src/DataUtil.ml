@@ -39,8 +39,8 @@ type io_globals = QData.json
 type rtype_content = QData.json
 type vrtype_content = QData.json
 
-type content_input = (char list * QData.data) list
-type content_output = QData.data list
+type content_input = (char list * QData.qdata) list
+type content_output = QData.qdata list
 
 type content_hierarchy = (char list * char list) list
 type full_content_hierarchy = (content_hierarchy * io_hierarchy)
@@ -217,15 +217,15 @@ let build_input format h input =
   begin match input with
   | QcertCompiler.Jobject j ->
       begin match format with
-      | META -> List.map (fun (x,y) -> (x, QData.json_to_data h y)) j
-      | ENHANCED -> List.map (fun (x,y) -> (x, QData.json_enhanced_to_data h y)) j
+      | META -> List.map (fun (x,y) -> (x, QData.json_to_qdata h y)) j
+      | ENHANCED -> List.map (fun (x,y) -> (x, QData.json_enhanced_to_qdata h y)) j
       end
   | _ -> raise (Qcert_Error "Illed formed working memory: input")
   end
 
 let build_output h output =
   begin match output with
-  | QcertCompiler.Jarray l -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
+  | QcertCompiler.Jarray l -> List.map (QData.json_to_qdata h) l (* in coq so we can prove properties on conversions *)
   | _ -> raise (Qcert_Error "Ill-formed output")
   end
 

@@ -142,7 +142,7 @@ let emit_sio (ev_input:DataUtil.content_input) (schema: TypeUtil.schema) (file_n
 
 (* Eval *)
 
-let lift_data_to_ddata globals (var:char list * QData.data) =
+let lift_data_to_ddata globals (var:char list * QData.qdata) =
   let vname = fst var in
   let data = snd var in
   let loc =
@@ -161,21 +161,21 @@ let lift_data_to_ddata globals (var:char list * QData.data) =
 
 (* Debug *)
 
-let get_dist (dd:QData.ddata) =
+let get_dist (dd:QData.qddata) =
   begin match dd with
   | QcertCompiler.Ddistr _ -> "distributed"
   | QcertCompiler.Dlocal _ -> "local"
   end
 
-let get_value (dd:QData.ddata) =
+let get_value (dd:QData.qddata) =
   begin match dd with
   | QcertCompiler.Ddistr d ->
-      Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") (QData.dcoll d))
+      Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") (QData.dcoll d))
   | QcertCompiler.Dlocal d ->
-      Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") d)
+      Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") d)
   end
     
-let print_input_var (v:char list * QData.ddata) =
+let print_input_var (v:char list * QData.qddata) =
   Printf.printf "Var: %s is %s and has value:\n" (Util.string_of_char_list (fst v)) (get_dist (snd v));
   Printf.printf "%s\n" (get_value (snd v))
     
@@ -212,7 +212,7 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
     then CheckUtil.validate_result expected_output (Some ev_data)
     else ()
   in
-  let s = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") ev_data) in
+  let s = Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") ev_data) in
   let fpref = Filename.chop_extension file_name in
   let fpost = language_name in
   let fout = outname (target_f dir (fpref^"_"^fpost)) ".json" in
@@ -263,7 +263,7 @@ let emit_optim_config optim_config dir file_name =
   let fpref = Filename.chop_extension file_name in
   let fout = outname (target_f dir fpref) "_optim.json" in
   let optims_data = data_of_optim_config optim_config in
-  let optims = Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") optims_data) in
+  let optims = Util.string_of_char_list (QData.qdataToJS (Util.char_list_of_string "\"") optims_data) in
   { res_file = fout; res_lang = "json"; res_content = optims; }
     
 (* Main *)

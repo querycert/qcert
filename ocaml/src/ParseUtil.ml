@@ -65,7 +65,7 @@ let parse_lambda_nra f : QLang.lambda_nra = QLambdaNRA.latableify (parse LambdaN
 (****************)
 
 let parse_sexp f : SExp.sexp = parse SExpParser.main (SExpLexer.token (string_buff ())) f
-let parse_io_sexp f : QData.data = AstsToSExp.sexp_to_data (parse_sexp f)
+let parse_io_sexp f : QData.qdata = AstsToSExp.sexp_to_data (parse_sexp f)
 let parse_camp_sexp f : QLang.camp = AstsToSExp.sexp_to_camp (parse_sexp f)
 let parse_sql_sexp f : QLang.sql = AstsToSExp.sexp_to_sql (parse_sexp f)
 let parse_nraenv_sexp f : QLang.nraenv_core = AstsToSExp.sexp_to_nraenv (parse_sexp f)
