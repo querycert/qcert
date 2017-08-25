@@ -83,11 +83,11 @@ let args_list gconf =
        " Enable optimization logging for nrc");
       ("-log-optims-dnrc", Arg.String (Logger.dnrc_set_trace logger_dnrc_to_sexp),
        " Enable optimization logging for dnrc");
-      ("-ascii", Arg.Unit (PrettyIL.set_ascii gconf.gconf_pretty_config),
+      ("-ascii", Arg.Unit (PrettyCommon.set_ascii gconf.gconf_pretty_config),
        " Avoid unicode symbols in emited queries");
-      ("-type-annotations", Arg.Unit (PrettyIL.set_type_annotations gconf.gconf_pretty_config),
+      ("-type-annotations", Arg.Unit (PrettyCommon.set_type_annotations gconf.gconf_pretty_config),
        " Print type annotations on ILs");
-      ("-margin", Arg.Int (PrettyIL.set_margin gconf.gconf_pretty_config),
+      ("-margin", Arg.Int (PrettyCommon.set_margin gconf.gconf_pretty_config),
        "<n> Set right margin for emited queries");
       ("-cloudant-prefix", Arg.String (QcertArg.set_prefix gconf),
        "<pref> Cloudant DB prefix");
@@ -156,7 +156,7 @@ let parse_args () =
       gconf_eval_debug = false;
       gconf_eval_validate = false;
       gconf_source_sexp = false;
-      gconf_pretty_config = PrettyIL.default_pretty_config ();
+      gconf_pretty_config = PrettyCommon.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
       gconf_stat = false;

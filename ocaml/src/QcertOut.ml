@@ -17,7 +17,7 @@
 (** This module contains compiler output code *)
 
 open Compiler.EnhancedCompiler
-open PrettyIL
+open PrettyQuery
 
 (** Output languages *)
 

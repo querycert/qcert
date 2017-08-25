@@ -18,5 +18,5 @@
 
 open Compiler.EnhancedCompiler
 
-val output_query : PrettyIL.pretty_config -> QLang.query -> string
+val output_query : PrettyCommon.pretty_config -> QLang.query -> string
 

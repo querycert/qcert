@@ -14,8 +14,9 @@
  * limitations under the License.
  *)
 
-(** This module contains pretty-printers for all languages *)
+(** This module contains common code for pretty-printers *)
 
+module Hack = Compiler
 open Compiler.EnhancedCompiler
 
 (* Character sets *)
@@ -32,18 +33,80 @@ val set_ascii : pretty_config -> unit -> unit
 val set_greek : pretty_config -> unit -> unit
 val get_charset : pretty_config -> charkind
 val get_charset_bool : pretty_config -> bool
+
 val set_type_annotations : pretty_config -> unit -> unit
 val set_no_type_annotations : pretty_config -> unit -> unit
+val get_type_annotations : pretty_config -> bool
 
 val set_margin : pretty_config -> int -> unit
 val get_margin : pretty_config -> int
 
 val set_hierarchy : pretty_config -> QData.json -> unit
+val get_hierarchy : pretty_config -> QData.json
+
 val set_harness : pretty_config -> string -> unit
-    
+val get_harness : pretty_config -> string
+
+(* Pretty sym *)
+
+type symbols =
+    { chi: (string*int);
+      chiflat: (string*int);
+      chie: (string*int);
+      join: (string*int);
+      djoin: (string*int);
+      times: (string*int);
+      sigma: (string*int);
+      langle: (string*int);
+      rangle: (string*int);
+      llangle: (string*int);
+      rrangle: (string*int);
+      lpangle: (string*int);
+      rpangle: (string*int);
+      bars: (string*int);
+      lrarrow: (string*int);
+      sqlrarrow: (string*int);
+      lfloor: (string*int);
+      rfloor: (string*int);
+      circ: (string*int);
+      circe: (string*int);
+      sharp: (string*int);
+      pi: (string*int);
+      bpi: (string*int);
+      gamma: (string*int);
+      rho: (string*int);
+      cup: (string*int);
+      vee: (string*int);
+      wedge: (string*int);
+      leq: (string*int);
+      sin: (string*int);
+      neg: (string*int);
+      top: (string*int);
+      bot: (string*int) }
+
+val greeksym : symbols
+val textsym : symbols
+val pretty_sym : Format.formatter -> (string*int) -> unit
+
+(* Pretty utils *)
+
+type 'a pretty_fun = int -> symbols -> Format.formatter -> 'a -> unit
+val pretty_infix_exp : int -> int -> symbols -> 'a pretty_fun -> (string*int) -> Format.formatter -> 'a -> 'a -> unit
+val pretty_squared_names : symbols -> Format.formatter -> (char list) list -> unit
+
 (* Pretty data *)
 
 val pretty_data : Format.formatter -> QData.data -> unit
+
+(* Pretty rtype *)
+
+val pretty_rtype_aux : symbols -> Format.formatter -> Hack.rtype_UU2080_ -> unit
+val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Compiler.type_annotation -> unit
+
+(* Pretty operators *)
+
+val pretty_unop : int -> symbols -> 'a pretty_fun -> Format.formatter -> Hack.unaryOp -> 'a -> unit
+val pretty_binop : int -> symbols -> 'a pretty_fun -> Format.formatter -> Hack.binOp -> 'a -> 'a -> unit
 
 (* Useful for SExp support *)
 val timescale_as_string : Compiler.time_scale -> string
@@ -64,35 +127,4 @@ val binarith_of_string : string -> Compiler.arithBOp
 val foreign_binop_of_string : string -> Compiler.enhanced_binary_op
 
 val string_of_binop : Compiler.binOp -> string
-
-(* Pretty queries *)
-
-type 'a pretty_fun = bool -> int -> bool -> QData.json -> string -> 'a -> string
-
-val pretty_camp_rule : Compiler.camp_rule pretty_fun
-val pretty_tech_rule : Compiler.tech_rule pretty_fun
-val pretty_designer_rule : Compiler.designer_rule pretty_fun
-val pretty_camp : Compiler.camp pretty_fun
-val pretty_oql : Compiler.oql pretty_fun
-val pretty_sql : Compiler.sql pretty_fun
-val pretty_sqlpp : Compiler.sqlpp pretty_fun
-val pretty_lambda_nra : Compiler.lambda_nra pretty_fun
-val pretty_nra : Compiler.nra pretty_fun
-val pretty_nraenv_core : Compiler.nraenv_core pretty_fun
-val pretty_nraenv : Compiler.nraenv pretty_fun
-val pretty_nnrc_core : Compiler.nnrc_core pretty_fun
-val pretty_nnrc : Compiler.nnrc pretty_fun
-val pretty_nnrcmr : Compiler.nnrcmr pretty_fun
-val pretty_cldmr : Compiler.cldmr pretty_fun
-val pretty_dnnrc_dataframe : Compiler.dnnrc_dataframe pretty_fun
-val pretty_dnnrc_dataframe_typed : Compiler.dnnrc_typed pretty_fun
-val pretty_javascript : Compiler.javascript pretty_fun
-val pretty_java : Compiler.java pretty_fun
-val pretty_spark_rdd : Compiler.spark_rdd pretty_fun
-val pretty_spark_df : Compiler.spark_df pretty_fun
-val pretty_cloudant : Compiler.cloudant pretty_fun
-val pretty_cloudant_whisk : Compiler.cloudant_whisk pretty_fun
-val pretty_error : (char list) pretty_fun
-
-val pretty_query : pretty_config -> 'a pretty_fun -> 'a -> string
 

@@ -223,7 +223,7 @@ type comp_config =
       target_display_sexp : bool ref;
       test_sexp : bool ref;
       comp_lang_config : lang_config;
-      comp_pretty_config : PrettyIL.pretty_config;
+      comp_pretty_config : PrettyCommon.pretty_config;
       mutable java_imports : string }
 
 let default_comp_config () =
@@ -236,7 +236,7 @@ let default_comp_config () =
     target_display_sexp = ref false;
     test_sexp = ref false;
     comp_lang_config = default_comp_lang_config ();
-    comp_pretty_config = PrettyIL.default_pretty_config ();
+    comp_pretty_config = PrettyCommon.default_pretty_config ();
     java_imports = "" }
 
 let set_comp_io conf io = conf.comp_io <- Some io

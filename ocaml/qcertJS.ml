@@ -39,8 +39,8 @@ let compile source_lang_s target_lang_s q_s =
       let q_target =
         QDriver.compile_from_source_target brand_model foreign_typing dv_conf source_lang target_lang q
       in
-      let p_conf = PrettyIL.default_pretty_config () in
-      PrettyIL.pretty_query p_conf q_target
+      let p_conf = PrettyCommon.default_pretty_config () in
+      QcertOut.output_query p_conf q_target
     with Qcert_Error err -> "compilation error: "^err
     | _ -> "compilation error"
     end
@@ -97,7 +97,7 @@ let global_config_of_json j =
       gconf_eval_debug = false;
       gconf_eval_validate = false;
       gconf_source_sexp = false;
-      gconf_pretty_config = PrettyIL.default_pretty_config ();
+      gconf_pretty_config = PrettyCommon.default_pretty_config ();
       gconf_java_imports = "";
       gconf_mr_vinit = "init";
       gconf_stat = false;
@@ -125,7 +125,7 @@ let global_config_of_json j =
   apply QcertArg.set_input_content j##.input;
   (* Cloudant options *)
   Js.Optdef.iter j##.jsruntime
-    (fun s -> PrettyIL.set_harness gconf.gconf_pretty_config (Js.to_string s));
+    (fun s -> PrettyCommon.set_harness gconf.gconf_pretty_config (Js.to_string s));
   Js.Optdef.iter j##.cld_prefix
     (fun s -> QcertArg.set_prefix gconf (Js.to_string s));
   (* Emit options *)
@@ -140,13 +140,13 @@ let global_config_of_json j =
   (* Pretty-printing options *)
   Js.Optdef.iter j##.ascii
     (fun b -> if Js.to_bool b then
-      PrettyIL.set_ascii gconf.gconf_pretty_config ()
+      PrettyCommon.set_ascii gconf.gconf_pretty_config ()
     else
-      PrettyIL.set_greek gconf.gconf_pretty_config ());
+      PrettyCommon.set_greek gconf.gconf_pretty_config ());
   Js.Optdef.iter j##.margin
     (fun num ->
       let n = int_of_float (Js.float_of_number num) in
-      PrettyIL.set_margin gconf.gconf_pretty_config n);
+      PrettyCommon.set_margin gconf.gconf_pretty_config n);
   (* Java options *)
   apply QcertArg.set_java_imports j##.javaimports;
   (* NNRCMR options *)

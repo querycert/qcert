@@ -119,7 +119,7 @@ val get_test_sexp : comp_config -> bool ref
 val get_target_stats : comp_config -> bool ref
 val get_comp_inputs : comp_config -> string list
 val get_comp_lang_config : comp_config -> lang_config
-val get_pretty_config : comp_config -> PrettyIL.pretty_config
+val get_pretty_config : comp_config -> PrettyCommon.pretty_config
 
 (* Backend Section *)
 

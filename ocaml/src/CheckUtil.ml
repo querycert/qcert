@@ -27,7 +27,7 @@ let print_nraenv_result fname actual_res =
   match actual_res with
   | None -> Format.printf "Evaluation for file %s : [Type Error]@." fname
   | Some res ->
-      let res_string = PrettyIL.pretty_data str_formatter res; flush_str_formatter () in
+      let res_string = PrettyCommon.pretty_data str_formatter res; flush_str_formatter () in
       Format.printf "Evaluation for file %s : %s@." fname res_string
 
 let validate_result expected_res actual_res =
@@ -57,7 +57,7 @@ let print_rule_result fname (actual_res : QData.data option) =
   match actual_res with
   | None -> Format.printf "Evaluation for file %s : [Type Error]@." fname
   | Some res ->
-      let res_string = PrettyIL.pretty_data Format.str_formatter res; Format.flush_str_formatter () in
+      let res_string = PrettyCommon.pretty_data Format.str_formatter res; Format.flush_str_formatter () in
       Format.printf "Evaluation for file %s : %s@." fname res_string
 
 let print_oql_result = print_nraenv_result

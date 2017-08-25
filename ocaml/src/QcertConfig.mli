@@ -33,7 +33,7 @@ type global_config = {
     mutable gconf_input : DataUtil.content_input;
     mutable gconf_output : DataUtil.content_output;
     mutable gconf_emit_all : bool;
-    gconf_pretty_config : PrettyIL.pretty_config;
+    gconf_pretty_config : PrettyCommon.pretty_config;
     mutable gconf_emit_sexp : bool;
     mutable gconf_emit_sexp_all : bool;
     mutable gconf_eval : bool;

@@ -63,7 +63,7 @@ let foreign_data_to_sexp (fd:enhanced_data) : sexp =
   match fd with
   | Enhancedfloat f -> SFloat f
   | Enhancedstring s -> STerm ("enhanced_string", (SString s)::[])
-  | Enhancedtimescale ts -> STerm ("dtime_scale", (SString (PrettyIL.timescale_as_string ts))::[])
+  | Enhancedtimescale ts -> STerm ("dtime_scale", (SString (PrettyCommon.timescale_as_string ts))::[])
   | Enhancedtimeduration td -> raise Not_found
   | Enhancedtimepoint tp -> raise Not_found
   | Enhancedsqldate td -> raise Not_found
@@ -102,7 +102,7 @@ let rec sexp_to_data (se:sexp) : QData.data =
   | STerm ("dbrand", (STerm ("brands", bs)) :: (STerm ("value", se' :: [])) :: []) ->
       Dbrand (sexp_to_dbrands bs, sexp_to_data se')
   | STerm ("dtime_scale", [SString s]) ->
-      Dforeign (Obj.magic (PrettyIL.foreign_data_of_string s))
+      Dforeign (Obj.magic (PrettyCommon.foreign_data_of_string s))
   | STerm (t, _) ->
       raise (Qcert_Error ("Not well-formed S-expr with name " ^ t))
 and sexp_to_drec (sel:sexp) : (char list * QData.data) =
@@ -115,11 +115,11 @@ and sexp_to_drec (sel:sexp) : (char list * QData.data) =
 (* Operators Section *)
 
 let arithbop_to_sexp (b:arithBOp) : sexp =
-  STerm (PrettyIL.string_of_binarith b,[])
+  STerm (PrettyCommon.string_of_binarith b,[])
   
 let sexp_to_arithbop (se:sexp) : arithBOp =
   match se with
-  | STerm (s,[]) -> PrettyIL.binarith_of_string s
+  | STerm (s,[]) -> PrettyCommon.binarith_of_string s
   | _ ->
       raise  (Qcert_Error "Not well-formed S-expr inside arith binop")
   
@@ -139,7 +139,7 @@ let binop_to_sexp (b:binOp) : sexp =
   | AMax -> STerm ("AMax",[])
   | AContains -> STerm ("AContains",[])
   | ASConcat -> STerm ("ASConcat",[])
-  | AForeignBinaryOp fbop -> SString (PrettyIL.string_of_foreign_binop (Obj.magic fbop))
+  | AForeignBinaryOp fbop -> SString (PrettyCommon.string_of_foreign_binop (Obj.magic fbop))
 
 let sexp_to_binop (se:sexp) : binOp =
   match se with
@@ -157,7 +157,7 @@ let sexp_to_binop (se:sexp) : binOp =
   | STerm ("AMax",[]) -> AMax
   | STerm ("AContains",[]) -> AContains
   | STerm ("ASConcat",[]) -> ASConcat
-  | SString fbop -> AForeignBinaryOp (Obj.magic (PrettyIL.foreign_binop_of_string fbop))
+  | SString fbop -> AForeignBinaryOp (Obj.magic (PrettyCommon.foreign_binop_of_string fbop))
   (* WARNING: Those are not printed, only parsed *)
   | STerm ("AFloatPlus",[]) -> Enhanced.Ops.Binary.coq_AFloatPlus
   | STerm ("AFloatMinus",[]) -> Enhanced.Ops.Binary.coq_AFloatMinus
@@ -193,11 +193,11 @@ let sexp_to_binop (se:sexp) : binOp =
   | _ -> raise  (Qcert_Error "Not well-formed S-expr inside arith binop")
 
 let arithuop_to_sexp (b:arithUOp) : sexp =
-  STerm (PrettyIL.string_of_unarith b,[])
+  STerm (PrettyCommon.string_of_unarith b,[])
 
 let sexp_to_arithuop (se:sexp) : arithUOp =
   match se with
-  | STerm (s,[]) -> PrettyIL.unarith_of_string s
+  | STerm (s,[]) -> PrettyCommon.unarith_of_string s
   | _ ->
       raise  (Qcert_Error "Not well-formed S-expr inside arith unop")
 
@@ -230,7 +230,7 @@ let unop_to_sexp (u:unaryOp) : sexp =
   | ASingleton -> STerm ("ASingleton",[])
   | ANumMin -> STerm ("ANumMin",[])
   | ANumMax -> STerm ("ANumMax",[])
-  | AForeignUnaryOp fuop -> SString (PrettyIL.string_of_foreign_unop (Obj.magic fuop))
+  | AForeignUnaryOp fuop -> SString (PrettyCommon.string_of_foreign_unop (Obj.magic fuop))
 
 let sstring_to_sql_date_component (part:sexp) : Enhanced.Data.sql_date_part =
   match part with
@@ -271,7 +271,7 @@ let sexp_to_unop (se:sexp) : unaryOp =
   | STerm ("ASingleton",[]) -> ASingleton
   | STerm ("ANumMin",[]) -> ANumMin
   | STerm ("ANumMax",[]) -> ANumMax
-  | SString s -> AForeignUnaryOp (Obj.magic (PrettyIL.foreign_unop_of_string s))
+  | SString s -> AForeignUnaryOp (Obj.magic (PrettyCommon.foreign_unop_of_string s))
   (* WARNING: Those are not printed, only parsed *)
   | STerm ("AFloatNeg",[]) -> Enhanced.Ops.Unary.coq_AFloatNeg
   | STerm ("AFloatSqrt",[]) -> Enhanced.Ops.Unary.coq_AFloatSqrt
