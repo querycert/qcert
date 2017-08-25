@@ -16,11 +16,12 @@
 
 open Util
 open DataUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 type schema = {
     sch_brand_model : QType.brand_model;
-    sch_foreign_typing : Compiler.foreign_typing;
+    sch_foreign_typing : QcertCompiler.foreign_typing;
     sch_io_schema : content_schema option;
     sch_globals : QDriver.constants_config;
   }
@@ -77,8 +78,8 @@ let lift_constant_types (bm:QType.brand_model) br glb =
   let loc = localization_of_string locs in
   let t =
     begin match loc with
-    | Compiler.Vlocal -> gbt
-    | Compiler.Vdistr ->
+    | QcertCompiler.Vlocal -> gbt
+    | QcertCompiler.Vdistr ->
 	(* XXX We to 'uncoll' here to check that the type is a collection type and extract its content -- This is an assumption of the Compiler Driver XXX *)
 	begin match QType.camp_type_uncoll bm gbt with
 	| None -> raise (Qcert_Error ("Type for distributed constant " ^ vname ^ " must be a collection type"))
@@ -112,7 +113,7 @@ let process_schema mc =
 (* The functions that should be exported *)
 
 let brand_relation_of_brand_model brand_model =
-  brand_model.Compiler.brand_model_relation
+  brand_model.QcertCompiler.brand_model_relation
 
 let empty_schema =
   let brand_model = QType.empty_brand_model () in
@@ -138,20 +139,20 @@ let hierarchy_of_schema sc =
 
 let raw_hierarchy_of_schema sc =
   begin match sc.sch_io_schema with
-  | None -> Compiler.Jarray []
+  | None -> QcertCompiler.Jarray []
   | Some (h,_,_,_) -> snd h
   end
 
 type content_sdata = (char list * char list) list
 
-let get_type bm (glob_constant:Compiler.constant_config) =
+let get_type bm (glob_constant:QcertCompiler.constant_config) =
   let br = brand_relation_of_brand_model bm in
-  begin match glob_constant.Compiler.constant_localization with
-  | Compiler.Vlocal -> glob_constant.Compiler.constant_type
-  | Compiler.Vdistr -> QType.bag br glob_constant.Compiler.constant_type
+  begin match glob_constant.QcertCompiler.constant_localization with
+  | QcertCompiler.Vlocal -> glob_constant.QcertCompiler.constant_type
+  | QcertCompiler.Vdistr -> QType.bag br glob_constant.QcertCompiler.constant_type
   end
 
-let get_constant_name (glob_name:char list) (globs:QDriver.constants_config) : Compiler.constant_config =
+let get_constant_name (glob_name:char list) (globs:QDriver.constants_config) : QcertCompiler.constant_config =
   begin try
     List.assoc glob_name globs
   with

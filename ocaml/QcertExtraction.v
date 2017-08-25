@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-(* Qcert Compiler *)
+(* Qcert Compiler Extraction *)
 
 (* Configuration of the extraction *)
 
@@ -36,7 +36,7 @@ Extract Constant DesignRule.designer_rule_to_camp_rule => "(fun fruntime x -> x)
 
 Require EnhancedCompiler.
 
-Extraction "Compiler" EnhancedCompiler.EnhancedCompiler.
+Extraction "QcertCompiler" EnhancedCompiler.EnhancedCompiler.
 
 (*
 *** Local Variables: ***

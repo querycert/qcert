@@ -17,11 +17,11 @@
 (* This module contains pretty-printers for intermediate languages *)
 
 open Format
-module Hack = Compiler
-open Compiler.EnhancedCompiler
-open QDriver
 
 open PrettyCommon
+
+open QcertCompiler.EnhancedCompiler
+open QDriver
 
 (** Pretty query wrapper *)
 
@@ -79,22 +79,22 @@ let pretty_lambda_nra greek margin annot hierarchy harness q =
 
 let rec pretty_nra_aux p sym ff a =
   match a with
-  | Hack.AID -> fprintf ff "%s" "ID"
-  | Hack.AConst d -> fprintf ff "%a" pretty_data d
-  | Hack.ABinop (b,a1,a2) -> (pretty_binop p sym pretty_nra_aux) ff b a1 a2
-  | Hack.AUnop (u,a1) -> (pretty_unop p sym pretty_nra_aux) ff u a1
-  | Hack.AMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
-  | Hack.AMapConcat (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
-  | Hack.AProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
-  | Hack.ASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
-  | Hack.ADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
-  | Hack.AEither (a1,a2) ->
+  | QcertCompiler.AID -> fprintf ff "%s" "ID"
+  | QcertCompiler.AConst d -> fprintf ff "%a" pretty_data d
+  | QcertCompiler.ABinop (b,a1,a2) -> (pretty_binop p sym pretty_nra_aux) ff b a1 a2
+  | QcertCompiler.AUnop (u,a1) -> (pretty_unop p sym pretty_nra_aux) ff u a1
+  | QcertCompiler.AMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
+  | QcertCompiler.AMapConcat (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
+  | QcertCompiler.AProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
+  | QcertCompiler.ASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
+  | QcertCompiler.ADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
+  | QcertCompiler.AEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	 (pretty_nra_aux p sym) a1
 	 (pretty_nra_aux p sym) a2
-  | Hack.AEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
-  | Hack.AApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
-  | Hack.AGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  | QcertCompiler.AEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
+  | QcertCompiler.AApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
+  | QcertCompiler.AGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
   
 (* resets precedence back to 0 *)
 and pretty_nra_exp p sym thissym ff a1 oa2 =
@@ -126,32 +126,32 @@ let pretty_nra greek margin annot hierarchy harness q =
 
 let rec pretty_nraenv_aux p sym ff a =
   match a with
-  | Hack.NRAEnvID -> fprintf ff "%s" "ID"
-  | Hack.NRAEnvConst d -> fprintf ff "%a" pretty_data d
-  | Hack.NRAEnvBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
-  | Hack.NRAEnvUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
-  | Hack.NRAEnvMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
-  | Hack.NRAEnvMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
-  | Hack.NRAEnvProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
-  | Hack.NRAEnvSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
-  | Hack.NRAEnvDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
-  | Hack.NRAEnvEither (a1,a2) ->
+  | QcertCompiler.NRAEnvID -> fprintf ff "%s" "ID"
+  | QcertCompiler.NRAEnvConst d -> fprintf ff "%a" pretty_data d
+  | QcertCompiler.NRAEnvBinop (b,a1,a2) -> (pretty_binop p sym pretty_nraenv_aux) ff b a1 a2
+  | QcertCompiler.NRAEnvUnop (u,a1) -> (pretty_unop p sym pretty_nraenv_aux) ff u a1
+  | QcertCompiler.NRAEnvMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
+  | QcertCompiler.NRAEnvMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
+  | QcertCompiler.NRAEnvProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
+  | QcertCompiler.NRAEnvSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
+  | QcertCompiler.NRAEnvDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2
+  | QcertCompiler.NRAEnvEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	 (pretty_nraenv_aux p sym) a1
 	 (pretty_nraenv_aux p sym) a2
-  | Hack.NRAEnvEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
-  | Hack.NRAEnvApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
-  | Hack.NRAEnvGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
-  | Hack.NRAEnvEnv -> fprintf ff "%s" "ENV"
-  | Hack.NRAEnvAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
-  | Hack.NRAEnvMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
-  | Hack.NRAEnvFlatMap (a1,a2) -> pretty_nraenv_exp p sym sym.chiflat ff a1 (Some a2)
-  | Hack.NRAEnvJoin (a1,a2,a3) -> pretty_infix_dependent p 5 sym pretty_nraenv_aux sym.join ff a1 a2 a3
-  | Hack.NRAEnvProject (atts,a1) ->
+  | QcertCompiler.NRAEnvEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nraenv_aux sym.sqlrarrow ff a1 a2
+  | QcertCompiler.NRAEnvApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nraenv_aux sym.circ ff a1 a2
+  | QcertCompiler.NRAEnvGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  | QcertCompiler.NRAEnvEnv -> fprintf ff "%s" "ENV"
+  | QcertCompiler.NRAEnvAppEnv (a1,a2) ->  pretty_infix_exp p 10 sym pretty_nraenv_aux sym.circe ff a1 a2
+  | QcertCompiler.NRAEnvMapEnv a1 -> pretty_nraenv_exp p sym sym.chie ff a1 None
+  | QcertCompiler.NRAEnvFlatMap (a1,a2) -> pretty_nraenv_exp p sym sym.chiflat ff a1 (Some a2)
+  | QcertCompiler.NRAEnvJoin (a1,a2,a3) -> pretty_infix_dependent p 5 sym pretty_nraenv_aux sym.join ff a1 a2 a3
+  | QcertCompiler.NRAEnvProject (atts,a1) ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.bpi (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
-  | Hack.NRAEnvGroupBy (g,atts,a1) ->
+  | QcertCompiler.NRAEnvGroupBy (g,atts,a1) ->
       fprintf ff "@[<hv 0>%a%a%a(%a)@]" pretty_sym sym.gamma (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nraenv_aux 0 sym) a1
-  | Hack.NRAEnvUnnest (a,b,a1) ->
+  | QcertCompiler.NRAEnvUnnest (a,b,a1) ->
       fprintf ff "@[<hv 0>%a%a(%a)@]" pretty_sym sym.rho (pretty_squared_names sym) [a;b] (pretty_nraenv_aux 0 sym) a1
 
 (* resets precedence back to 0 *)
@@ -196,32 +196,32 @@ let pretty_nraenv_core greek margin annot hierarchy harness q =
 
 let rec pretty_nnrc_aux p sym ff n =
   match n with
-  | Hack.NNRCGetConstant v -> fprintf ff "$%s"  (Util.string_of_char_list v)
-  | Hack.NNRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
-  | Hack.NNRCConst d -> fprintf ff "%a" pretty_data d
-  | Hack.NNRCBinop (b,n1,n2) -> (pretty_binop p sym pretty_nnrc_aux) ff b n1 n2
-  | Hack.NNRCUnop (u,n1) -> (pretty_unop p sym pretty_nnrc_aux) ff u n1
-  | Hack.NNRCLet (v,n1,n2) ->
+  | QcertCompiler.NNRCGetConstant v -> fprintf ff "$%s"  (Util.string_of_char_list v)
+  | QcertCompiler.NNRCVar v -> fprintf ff "$v%s"  (Util.string_of_char_list v)
+  | QcertCompiler.NNRCConst d -> fprintf ff "%a" pretty_data d
+  | QcertCompiler.NNRCBinop (b,n1,n2) -> (pretty_binop p sym pretty_nnrc_aux) ff b n1 n2
+  | QcertCompiler.NNRCUnop (u,n1) -> (pretty_unop p sym pretty_nnrc_aux) ff u n1
+  | QcertCompiler.NNRCLet (v,n1,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
 	 (Util.string_of_char_list v)
 	(pretty_nnrc_aux p sym) n1
 	(pretty_nnrc_aux p sym) n2
-  | Hack.NNRCFor (v,n1,n2) ->
+  | QcertCompiler.NNRCFor (v,n1,n2) ->
       fprintf ff "@[<hv 0>{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
 	(pretty_nnrc_aux 0 sym) n2
 	 (Util.string_of_char_list v) pretty_sym sym.sin
 	(pretty_nnrc_aux 0 sym) n1
-  | Hack.NNRCIf (n1,n2,n3) ->
+  | QcertCompiler.NNRCIf (n1,n2,n3) ->
       fprintf ff "@[<hv 0>@[<hv 2>if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
 	(pretty_nnrc_aux p sym) n1
 	(pretty_nnrc_aux p sym) n2
 	(pretty_nnrc_aux p sym) n3
-  | Hack.NNRCEither (n0,v1,n1,v2,n2) ->
+  | QcertCompiler.NNRCEither (n0,v1,n1,v2,n2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	(pretty_nnrc_aux p sym) n0
 	 (Util.string_of_char_list v1) (pretty_nnrc_aux p sym) n1
 	(Util.string_of_char_list v2) (pretty_nnrc_aux p sym) n2
-  | Hack.NNRCGroupBy (g,atts,n1) ->
+  | QcertCompiler.NNRCGroupBy (g,atts,n1) ->
       fprintf ff "@[<hv 2>group by@ %a%a@[<hv 2>(%a)@]@]" (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_nnrc_aux 0 sym) n1
 
 let pretty_nnrc greek margin annot hierarchy harness q =
@@ -251,55 +251,55 @@ let pretty_default_fun sym ff n =
 
 let pretty_enhanced_numeric_type_to_prefix typ =
   match typ with
-  | Hack.Enhanced_numeric_int -> ""
-  | Hack.Enhanced_numeric_float -> "F"
+  | QcertCompiler.Enhanced_numeric_int -> ""
+  | QcertCompiler.Enhanced_numeric_float -> "F"
 
 let pretty_reduce_op_to_string op =
   match op with
-  | Hack.RedOpCount -> "count"
-  | Hack.RedOpSum typ -> "+"
-  | Hack.RedOpMin typ -> "min"
-  | Hack.RedOpMax typ -> "max"
-  | Hack.RedOpArithMean typ -> "arithmean"
-  | Hack.RedOpStats typ -> "stats"
+  | QcertCompiler.RedOpCount -> "count"
+  | QcertCompiler.RedOpSum typ -> "+"
+  | QcertCompiler.RedOpMin typ -> "min"
+  | QcertCompiler.RedOpMax typ -> "max"
+  | QcertCompiler.RedOpArithMean typ -> "arithmean"
+  | QcertCompiler.RedOpStats typ -> "stats"
 
 let pretty_nnrcmr_job_aux sym ff mr =
   let distributed = "distributed" in
   let scalar = "scalar" in
   let input_loc =
-    match mr.Hack.mr_map with
-    | Hack.MapDist _ -> distributed
-    | Hack.MapDistFlatten _ -> distributed
-    | Hack.MapScalar _ -> scalar
+    match mr.QcertCompiler.mr_map with
+    | QcertCompiler.MapDist _ -> distributed
+    | QcertCompiler.MapDistFlatten _ -> distributed
+    | QcertCompiler.MapScalar _ -> scalar
   in
   let output_loc =
-    match mr.Hack.mr_reduce with
-    | Hack.RedId -> distributed
-    | Hack.RedCollect _ -> scalar
-    | Hack.RedOp _ -> scalar
-    | Hack.RedSingleton -> scalar
+    match mr.QcertCompiler.mr_reduce with
+    | QcertCompiler.RedId -> distributed
+    | QcertCompiler.RedCollect _ -> scalar
+    | QcertCompiler.RedOp _ -> scalar
+    | QcertCompiler.RedSingleton -> scalar
   in
   fprintf ff "@[<hv 0>input = $v%s : %s;@\n"
-    (Util.string_of_char_list mr.Hack.mr_input) input_loc;
+    (Util.string_of_char_list mr.QcertCompiler.mr_input) input_loc;
   fprintf ff "output = $v%s : %s;@\n"
-    (Util.string_of_char_list mr.Hack.mr_output) output_loc;
-  begin match mr.Hack.mr_map with
-    | Hack.MapDist f -> fprintf ff "map(@[%a@]);" (pretty_fun sym) f
-    | Hack.MapDistFlatten f -> fprintf ff "flatMap(@[%a@]);" (pretty_fun sym) f
-    | Hack.MapScalar f -> fprintf ff "@[%a@];" (pretty_fun sym) f
+    (Util.string_of_char_list mr.QcertCompiler.mr_output) output_loc;
+  begin match mr.QcertCompiler.mr_map with
+    | QcertCompiler.MapDist f -> fprintf ff "map(@[%a@]);" (pretty_fun sym) f
+    | QcertCompiler.MapDistFlatten f -> fprintf ff "flatMap(@[%a@]);" (pretty_fun sym) f
+    | QcertCompiler.MapScalar f -> fprintf ff "@[%a@];" (pretty_fun sym) f
   end;
   fprintf ff "@\n";
-  begin match mr.Hack.mr_reduce with
-  | Hack.RedId -> ()
-  | Hack.RedCollect f -> fprintf ff "reduce(@[%a@]);" (pretty_fun sym) f
-  | Hack.RedOp op ->
+  begin match mr.QcertCompiler.mr_reduce with
+  | QcertCompiler.RedId -> ()
+  | QcertCompiler.RedCollect f -> fprintf ff "reduce(@[%a@]);" (pretty_fun sym) f
+  | QcertCompiler.RedOp op ->
      let op_s = pretty_reduce_op_to_string (Obj.magic op)
      in
       fprintf ff "reduce(%s);" op_s
-  | Hack.RedSingleton ->       fprintf ff "reduce(singleton);"
+  | QcertCompiler.RedSingleton ->       fprintf ff "reduce(singleton);"
   end;
   fprintf ff "@\n";
-  begin match Hack.EnhancedCompiler.QUtil.mr_reduce_empty [] mr with
+  begin match QUtil.mr_reduce_empty [] mr with
   | None -> ()
   | Some f -> fprintf ff "default(@[%a@]);" (pretty_default_fun sym) f
   end
@@ -324,8 +324,8 @@ let pretty_mr_last sym ff mr_last =
   in
   let pretty_arg ff (x, loc) =
     match loc with
-    | Hack.Vlocal ->  fprintf ff "(%s: Scalar)" (Util.string_of_char_list x)
-    | Hack.Vdistr ->  fprintf ff "(%s: Distributed)" (Util.string_of_char_list x)
+    | QcertCompiler.Vlocal ->  fprintf ff "(%s: Scalar)" (Util.string_of_char_list x)
+    | QcertCompiler.Vdistr ->  fprintf ff "(%s: Distributed)" (Util.string_of_char_list x)
   in
   fprintf ff "@[(fun (%a) => %a) (%a)@]@\n"
     (pretty_list pretty_param ",") params
@@ -333,8 +333,8 @@ let pretty_mr_last sym ff mr_last =
     (pretty_list pretty_arg ",") args
 
 let pretty_nnrcmr_aux sym ff mrl =
-  pretty_mr_chain sym ff mrl.Hack.mr_chain;
-  fprintf ff "@[%a@]@\n" (pretty_mr_last sym) mrl.Hack.mr_last
+  pretty_mr_chain sym ff mrl.QcertCompiler.mr_chain;
+  fprintf ff "@[%a@]@\n" (pretty_mr_last sym) mrl.QcertCompiler.mr_last
 
 let pretty_nnrcmr greek margin annot hierarchy harness mr_chain =
   let ff = str_formatter in
@@ -354,58 +354,58 @@ let pretty_cldmr greek margin annot hierarchy harness q =
 
 let rec pretty_dnnrc_aux ann plug p sym ff n =
   match n with
-  | Hack.DNNRCGetConstant (a, v) -> fprintf ff "%a$%s" ann a (Util.string_of_char_list v)
-  | Hack.DNNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v)
-  | Hack.DNNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
-  | Hack.DNNRCBinop (a, b,n1,n2) ->
+  | QcertCompiler.DNNRCGetConstant (a, v) -> fprintf ff "%a$%s" ann a (Util.string_of_char_list v)
+  | QcertCompiler.DNNRCVar (a, v) -> fprintf ff "%a$v%s" ann a (Util.string_of_char_list v)
+  | QcertCompiler.DNNRCConst (a, d) -> fprintf ff "%a%a" ann a pretty_data d
+  | QcertCompiler.DNNRCBinop (a, b,n1,n2) ->
       fprintf ff "%a(" ann a
     ; ((pretty_binop 0 sym (pretty_dnnrc_aux ann plug)) ff b n1 n2)
     ; fprintf ff ")"
-  | Hack.DNNRCUnop (a,u,n1) ->
+  | QcertCompiler.DNNRCUnop (a,u,n1) ->
      fprintf ff "%a(" ann a
     ; ((pretty_unop 0 sym (pretty_dnnrc_aux ann plug)) ff u n1)
     ; fprintf ff ")"
-  | Hack.DNNRCLet (a,v,n1,n2) ->
+  | QcertCompiler.DNNRCLet (a,v,n1,n2) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a let $v%s :=@ %a@]@;<1 0>@[<hv 2>in@ %a@]@]"
 	     ann a
 	 (Util.string_of_char_list v)
 	(pretty_dnnrc_aux ann plug p sym) n1
 	(pretty_dnnrc_aux ann plug p sym) n2
-  | Hack.DNNRCFor (a,v,n1,n2) ->
+  | QcertCompiler.DNNRCFor (a,v,n1,n2) ->
      fprintf ff "@[<hv 0>%a{ @[<hv 0>%a@]@;<1 0>@[<hv 2>| $v%s %a@ %a@] }@]"
 	     ann a
 	(pretty_dnnrc_aux ann plug 0 sym) n2
 	 (Util.string_of_char_list v) pretty_sym sym.sin
 	(pretty_dnnrc_aux ann plug 0 sym) n1
-  | Hack.DNNRCIf (a,n1,n2,n3) ->
+  | QcertCompiler.DNNRCIf (a,n1,n2,n3) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a if@;<1 0>%a@]@;<1 0>@[<hv 2>then@;<1 0>%a@]@;<1 0>@[<hv 2>else@;<1 0>%a@]@]"
 	     ann a
 	(pretty_dnnrc_aux ann plug p sym) n1
 	(pretty_dnnrc_aux ann plug p sym) n2
 	(pretty_dnnrc_aux ann plug p sym) n3
-  | Hack.DNNRCEither (a,n0,v1,n1,v2,n2) ->
+  | QcertCompiler.DNNRCEither (a,n0,v1,n1,v2,n2) ->
      fprintf ff "@[<hv 0>@[<hv 2>%a match@ %a@;<1 -2>with@]@;<1 0>@[<hv 2>| left as $v%s ->@ %a@]@;<1 0>@[<hv 2>| right as $v%s ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	     ann a
 	(pretty_dnnrc_aux ann plug p sym) n0
 	 (Util.string_of_char_list v1) (pretty_dnnrc_aux ann plug p sym) n1
 	 (Util.string_of_char_list v2) (pretty_dnnrc_aux ann plug p sym) n2
-  | Hack.DNNRCCollect (a,n1) ->
+  | QcertCompiler.DNNRCCollect (a,n1) ->
      fprintf ff "@[%a%s[@[%a@]]@]"
 	     ann a
 	     "COLLECT"
 	(pretty_dnnrc_aux ann plug p sym) n1
-  | Hack.DNNRCDispatch (a,n1) ->
+  | QcertCompiler.DNNRCDispatch (a,n1) ->
      fprintf ff "@[%a%s[@[%a@]]@]"
 	     ann a
 	     "DISPATCH"
 	     (pretty_dnnrc_aux ann plug p sym) n1
-  | Hack.DNNRCAlg (a,body,arglist) ->
+  | QcertCompiler.DNNRCAlg (a,body,arglist) ->
      fprintf ff "@[%adataframe(@[fun $%a => @] %a)@[(%a)@]@]"
 	     ann a
              (pretty_list (fun ff s -> fprintf ff "%s" s) ",") (List.map (fun x -> (Util.string_of_char_list (fst x))) arglist)
              plug body
 	     (pretty_list (pretty_dnnrc_aux ann plug p sym) ",") (List.map snd arglist)
-  | Hack.DNNRCGroupBy (a,g,atts,n1) ->
+  | QcertCompiler.DNNRCGroupBy (a,g,atts,n1) ->
       fprintf ff "@[<hv 2>%agroup by@ %a%a@[<hv 2>(%a)@]@]" ann a (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_dnnrc_aux ann plug 0 sym) n1
 
 let pretty_dnnrc ann plug greek margin annot n =
@@ -427,30 +427,30 @@ let pretty_plug_nraenv greek ff a =
 (* Pretty Spark IR *)
 let rec pretty_column_aux p sym ff col =
   match col with
-  | Hack.CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (Util.string_of_char_list v) pretty_sym sym.rangle
-  | Hack.CDot (v,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ADot v) c
-  | Hack.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
-  | Hack.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (Hack.ABArith Hack.ArithPlus) c1 c2
-  | Hack.CEq (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.AEq c1 c2
-  | Hack.CLessThan (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ALt c1 c2
-  | Hack.CNeg c -> pretty_unop p sym pretty_column_aux ff Hack.ANeg c
-  | Hack.CToString c -> pretty_unop p sym pretty_column_aux ff Hack.AToString c
-  | Hack.CSConcat (c1,c2) -> pretty_binop p sym pretty_column_aux ff Hack.ASConcat c1 c2
-  | Hack.CUDFCast (bs,c) -> pretty_unop p sym pretty_column_aux ff (Hack.ACast bs) c
-  | Hack.CUDFUnbrand (rt,c) -> fprintf ff "@[!%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle (pretty_column_aux p sym) c
+  | QcertCompiler.CCol v -> fprintf ff "%a%s%a" pretty_sym sym.langle (Util.string_of_char_list v) pretty_sym sym.rangle
+  | QcertCompiler.CDot (v,c) -> pretty_unop p sym pretty_column_aux ff (QcertCompiler.ADot v) c
+  | QcertCompiler.CLit (d,rt) -> fprintf ff "@[%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle pretty_data d
+  | QcertCompiler.CPlus (c1,c2) -> pretty_binop p sym pretty_column_aux ff (QcertCompiler.ABArith QcertCompiler.ArithPlus) c1 c2
+  | QcertCompiler.CEq (c1,c2) -> pretty_binop p sym pretty_column_aux ff QcertCompiler.AEq c1 c2
+  | QcertCompiler.CLessThan (c1,c2) -> pretty_binop p sym pretty_column_aux ff QcertCompiler.ALt c1 c2
+  | QcertCompiler.CNeg c -> pretty_unop p sym pretty_column_aux ff QcertCompiler.ANeg c
+  | QcertCompiler.CToString c -> pretty_unop p sym pretty_column_aux ff QcertCompiler.AToString c
+  | QcertCompiler.CSConcat (c1,c2) -> pretty_binop p sym pretty_column_aux ff QcertCompiler.ASConcat c1 c2
+  | QcertCompiler.CUDFCast (bs,c) -> pretty_unop p sym pretty_column_aux ff (QcertCompiler.ACast bs) c
+  | QcertCompiler.CUDFUnbrand (rt,c) -> fprintf ff "@[!%a%a%a@](@[%a@])" pretty_sym sym.llangle (pretty_rtype_aux sym) rt pretty_sym sym.rrangle (pretty_column_aux p sym) c
 
 let pretty_named_column_aux p sym ff (name, col) =
   fprintf ff "%s%@%a" (Util.string_of_char_list name) (pretty_column_aux p sym) col
 
 let rec pretty_dataframe_aux p sym ff ds =
   match ds with
-  | Hack.DSVar v -> fprintf ff "$%s" (Util.string_of_char_list v)
-  | Hack.DSSelect (cl,ds1) -> fprintf ff "@[select %a @[<hv 2>from %a@] @]"
+  | QcertCompiler.DSVar v -> fprintf ff "$%s" (Util.string_of_char_list v)
+  | QcertCompiler.DSSelect (cl,ds1) -> fprintf ff "@[select %a @[<hv 2>from %a@] @]"
 				      (pretty_list (pretty_named_column_aux p sym) ",") cl (pretty_dataframe_aux p sym) ds1
-  | Hack.DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
+  | QcertCompiler.DSFilter (c,ds1) -> fprintf ff "@[filter %a @[<hv 2>from %a@] @]"
 				      (pretty_column_aux p sym) c (pretty_dataframe_aux p sym) ds1
-  | Hack.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataframe_aux ff Hack.AConcat ds1 ds2
-  | Hack.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataframe_aux p sym) ds
+  | QcertCompiler.DSCartesian (ds1,ds2) ->  pretty_binop p sym pretty_dataframe_aux ff QcertCompiler.AConcat ds1 ds2
+  | QcertCompiler.DSExplode (s,ds) -> fprintf ff "@[explode %s @[<hv 2>from %a@] @]" (Util.string_of_char_list s) (pretty_dataframe_aux p sym) ds
 
 let pretty_dataframe greek margin annot ds =
   let ff = str_formatter in

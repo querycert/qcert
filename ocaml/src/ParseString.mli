@@ -16,7 +16,8 @@
 
 (* This module contains parsing utilities *)
 
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
+
 open ParseUtil
 
 (*********************)

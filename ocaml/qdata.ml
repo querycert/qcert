@@ -19,7 +19,8 @@
 open Util
 open QcertConfig
 open ParseFile
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 let verbose = ref false
   
@@ -42,8 +43,8 @@ let usage =
 let parse_args () =
   let input_files = ref [] in
   let gconf =
-    { gconf_source = Compiler.L_camp_rule;
-      gconf_target = Compiler.L_javascript;
+    { gconf_source = QcertCompiler.L_camp_rule;
+      gconf_target = QcertCompiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;

@@ -15,7 +15,7 @@
  *)
 
 %{
-  open Compiler.EnhancedCompiler
+  open QcertCompiler.EnhancedCompiler
 %}
 
 %token <int> INT
@@ -98,9 +98,9 @@
 %nonassoc UWITHVAR
 %nonassoc PASSERT
 
-%start <(string * Compiler.EnhancedCompiler.QLang.camp_rule)> rulemain
-%start <(string * Compiler.EnhancedCompiler.QLang.camp)> campmain
-%type <Compiler.EnhancedCompiler.QLang.camp_rule -> Compiler.EnhancedCompiler.QLang.camp_rule> rule_rule
+%start <(string * QcertCompiler.EnhancedCompiler.QLang.camp_rule)> rulemain
+%start <(string * QcertCompiler.EnhancedCompiler.QLang.camp)> campmain
+%type <QcertCompiler.EnhancedCompiler.QLang.camp_rule -> QcertCompiler.EnhancedCompiler.QLang.camp_rule> rule_rule
 
 %%
 

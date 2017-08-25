@@ -17,7 +17,7 @@
 %{
 
   open Util
-  open Compiler.EnhancedCompiler
+  open QcertCompiler.EnhancedCompiler
 
   type lambda_or_expression =
   | ParsedLambda of QLambdaNRA.lambda_expr
@@ -42,7 +42,7 @@
     | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
-    | "union" -> QLambdaNRA.labinop Compiler.AUnion e0 (resolve_one_expr a el)
+    | "union" -> QLambdaNRA.labinop QcertCompiler.AUnion e0 (resolve_one_expr a el)
     | _ -> raise (Qcert_Error ("[LambdaNRA Parser] " ^ a ^ " is not a valid operator"))
     end
 
@@ -71,7 +71,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <Compiler.EnhancedCompiler.QLambdaNRA.expr> main
+%start <QcertCompiler.EnhancedCompiler.QLambdaNRA.expr> main
 
 %%
 

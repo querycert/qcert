@@ -16,8 +16,8 @@
 
 open Util
 open QcertConfig
-open Compiler.EnhancedCompiler
 
+open QcertCompiler.EnhancedCompiler
 
 type result = {
     res_emit : result_file;
@@ -77,7 +77,7 @@ let parse_string (gconf: QcertConfig.global_config) (query_s: string) =
   let slang = gconf.gconf_source in
   let the_query =
     begin match slang with
-    | Compiler.L_tech_rule -> src_and_schema query_s schema
+    | QcertCompiler.L_tech_rule -> src_and_schema query_s schema
     | _ -> query_s
     end in
   let qname, q =
@@ -146,13 +146,13 @@ let lift_data_to_ddata globals (var:char list * QData.data) =
   let vname = fst var in
   let data = snd var in
   let loc =
-    begin try (List.assoc vname globals).Compiler.constant_localization with
-    | Not_found -> Compiler.Vlocal
+    begin try (List.assoc vname globals).QcertCompiler.constant_localization with
+    | Not_found -> QcertCompiler.Vlocal
     end
   in
   begin match loc with
-  | Compiler.Vlocal -> (vname,QData.dlocal data)
-  | Compiler.Vdistr ->
+  | QcertCompiler.Vlocal -> (vname,QData.dlocal data)
+  | QcertCompiler.Vdistr ->
       begin match QData.ddistr data with
       | Some dd -> (vname,dd)
       | None -> raise  (Qcert_Error ("Distributed variable " ^ (Util.string_of_char_list vname) ^ " should be initialized with an input collection"))
@@ -163,15 +163,15 @@ let lift_data_to_ddata globals (var:char list * QData.data) =
 
 let get_dist (dd:QData.ddata) =
   begin match dd with
-  | Compiler.Ddistr _ -> "distributed"
-  | Compiler.Dlocal _ -> "local"
+  | QcertCompiler.Ddistr _ -> "distributed"
+  | QcertCompiler.Dlocal _ -> "local"
   end
 
 let get_value (dd:QData.ddata) =
   begin match dd with
-  | Compiler.Ddistr d ->
+  | QcertCompiler.Ddistr d ->
       Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") (QData.dcoll d))
-  | Compiler.Dlocal d ->
+  | QcertCompiler.Dlocal d ->
       Util.string_of_char_list (QData.dataToJS (Util.char_list_of_string "\"") d)
   end
     
@@ -197,13 +197,13 @@ let eval_string (validate:bool) (debug:bool) (ev_input:DataUtil.content_input) (
   in
   let ev_data =
     begin match ev_output with
-    | Compiler.Ev_out_unsupported msg ->
+    | QcertCompiler.Ev_out_unsupported msg ->
 	QData.drec [(Util.char_list_of_string "error", QData.dstring msg)]
-    | Compiler.Ev_out_failed ->
+    | QcertCompiler.Ev_out_failed ->
 	QData.drec [(Util.char_list_of_string "error", QData.dstring (Util.char_list_of_string "Eval failed"))]
-    | Compiler.Ev_out_returned d ->
+    | QcertCompiler.Ev_out_returned d ->
 	d
-    | Compiler.Ev_out_returned_debug s ->
+    | QcertCompiler.Ev_out_returned_debug s ->
 	QData.drec [(Util.char_list_of_string "debug", QData.dstring s)]
     end
   in
@@ -245,11 +245,11 @@ let data_of_optim_phase optim_phase =
 	      (Util.char_list_of_string "iter", QData.dnat phase_iter);]
   
 let data_of_optim_language optim_lang =
-  let language_name = Compiler.name_of_language (fst optim_lang) in
+  let language_name = QcertCompiler.name_of_language (fst optim_lang) in
   let optim_phases = List.map data_of_optim_phase (snd optim_lang) in
   QData.drec [(Util.char_list_of_string "language", QData.dstring language_name);
 	      (Util.char_list_of_string "phases", QData.dcoll optim_phases);]
-let data_of_optim_config (optim_config:Compiler.optim_config) =
+let data_of_optim_config (optim_config:QcertCompiler.optim_config) =
   let optim_config =
     if optim_config = []
     then

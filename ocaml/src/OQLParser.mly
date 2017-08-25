@@ -15,7 +15,7 @@
  *)
 
 %{
-  open Compiler.EnhancedCompiler
+  open QcertCompiler.EnhancedCompiler
 %}
 
 %token <int> INT
@@ -51,7 +51,7 @@
 %right STAR
 %left DOT ARROW
 
-%start <Compiler.EnhancedCompiler.QOQL.program> main
+%start <QcertCompiler.EnhancedCompiler.QOQL.program> main
 
 %%
 
@@ -117,7 +117,7 @@ expr:
 | AVG LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.aarithmean e }
 | FAVG LPAREN e = expr RPAREN
-    { QOQL.ounop (Compiler.AForeignUnaryOp (Obj.magic (Compiler.Enhanced_unary_float_op (Compiler.Uop_float_arithmean)))) e }
+    { QOQL.ounop (QcertCompiler.AForeignUnaryOp (Obj.magic (QcertCompiler.Enhanced_unary_float_op (QcertCompiler.Uop_float_arithmean)))) e }
 | COUNT LPAREN e = expr RPAREN
     { QOQL.ounop QOps.Unary.acount e }
 | MAX LPAREN e = expr RPAREN

@@ -19,7 +19,8 @@
 open Util
 open LexUtil
 open ParseUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (*****************)
 (* Generic Parse *)

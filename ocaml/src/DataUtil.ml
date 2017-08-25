@@ -15,7 +15,8 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
@@ -75,27 +76,27 @@ let get_field name r =
   end
 let get_string j =
   begin match j with
-  | Compiler.Jstring s -> Util.string_of_char_list s
+  | QcertCompiler.Jstring s -> Util.string_of_char_list s
   | _ ->
       raise (Qcert_Error ("JSON value not a string"))
   end
 let get_field_string name r =
   begin match get_field name r with
-  | Compiler.Jstring s -> Util.string_of_char_list s
+  | QcertCompiler.Jstring s -> Util.string_of_char_list s
   | _ ->
       raise (Qcert_Error ("Field " ^ name ^ " not a string"))
   end
 
 let get_field_string_array name r =
   begin match get_field name r with
-  | Compiler.Jarray l -> List.map get_string l
+  | QcertCompiler.Jarray l -> List.map get_string l
   | _ ->
       raise (Qcert_Error ("Field " ^ name ^ " not a string"))
   end
    
 let get_field_int name r =
   begin match get_field name r with
-  | Compiler.Jnumber i -> i
+  | QcertCompiler.Jnumber i -> i
   | _ ->
       raise (Qcert_Error ("Field " ^ name ^ " not an integer"))
   end
@@ -120,7 +121,7 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
       begin
 	try
 	  match d with
-	  | Compiler.Jobject r ->
+	  | QcertCompiler.Jobject r ->
 	      let input = get_field_opt "input" r in
 	      let output = get_field_opt "output" r in
 	      let schema = get_field_opt "schema" r in
@@ -141,11 +142,11 @@ let get_io_components (od:QData.json option) : QData.json option * QData.json op
 
 let build_hierarchy h =
   begin match h with
-  | Compiler.Jarray l ->
+  | QcertCompiler.Jarray l ->
       List.map (function
-        | Compiler.Jobject
-            ( [(['s';'u';'b'], Compiler.Jstring sub); (['s';'u';'p'], Compiler.Jstring sup)]
-        | [(['s';'u';'p'], Compiler.Jstring sup); (['s';'u';'b'], Compiler.Jstring sub)] ) ->
+        | QcertCompiler.Jobject
+            ( [(['s';'u';'b'], QcertCompiler.Jstring sub); (['s';'u';'p'], QcertCompiler.Jstring sup)]
+        | [(['s';'u';'p'], QcertCompiler.Jstring sup); (['s';'u';'b'], QcertCompiler.Jstring sub)] ) ->
             (sub, sup)
         | _ ->
             raise (Qcert_Error "Ill-formed hierarchy"))
@@ -156,11 +157,11 @@ let build_hierarchy h =
 
 let build_brandTypes bts =
   begin match bts with
-  | Compiler.Jarray l ->
+  | QcertCompiler.Jarray l ->
       List.map (function
-        | Compiler.Jobject
-            ( [(['b';'r';'a';'n';'d'], Compiler.Jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName)]
-        | [(['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName); (['b';'r';'a';'n';'d'], Compiler.Jstring brandName)] ) ->
+        | QcertCompiler.Jobject
+            ( [(['b';'r';'a';'n';'d'], QcertCompiler.Jstring brandName); (['t';'y';'p';'e';'N';'a';'m';'e'], QcertCompiler.Jstring typeName)]
+        | [(['t';'y';'p';'e';'N';'a';'m';'e'], QcertCompiler.Jstring typeName); (['b';'r';'a';'n';'d'], QcertCompiler.Jstring brandName)] ) ->
             (Util.string_of_char_list brandName, Util.string_of_char_list typeName)
         | _ ->
             raise (Qcert_Error "Ill-formed brandTypes"))
@@ -171,11 +172,11 @@ let build_brandTypes bts =
 
 let build_typeDefs bts =
   begin match bts with
-  | Compiler.Jarray l ->
+  | QcertCompiler.Jarray l ->
       List.map (function
-        | Compiler.Jobject
-            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
-        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], Compiler.Jstring typeName)] ) ->
+        | QcertCompiler.Jobject
+            ( [(['t';'y';'p';'e';'N';'a';'m';'e'], QcertCompiler.Jstring typeName); (['t';'y';'p';'e';'D';'e';'f'], typeDef)]
+        | [(['t';'y';'p';'e';'D';'e';'f'], typeDef); (['t';'y';'p';'e';'N';'a';'m';'e'], QcertCompiler.Jstring typeName)] ) ->
             (Util.string_of_char_list typeName, typeDef)
         | _ ->
             raise (Qcert_Error "Ill-formed typeDefs"))
@@ -186,7 +187,7 @@ let build_typeDefs bts =
 
 let build_globals globals =
   begin match globals with
-  | Compiler.Jobject l ->
+  | QcertCompiler.Jobject l ->
       List.map (function (varname, typeDef) -> (Util.string_of_char_list varname, typeDef)) l
   | _ ->
       raise (Qcert_Error "Ill-formed globals")
@@ -196,7 +197,7 @@ let missing_hierarchy_default = QData.jarray []  (* Empty array i.e., empty hier
 
 let build_schema (j:QData.json) =
   begin match j with
-  | Compiler.Jobject r ->
+  | QcertCompiler.Jobject r ->
       let hierarchy = get_field_defaults "hierarchy" r missing_hierarchy_default in
       let brandTypes = get_field_opt "brandTypes" r in
       let typeDefs = get_field_opt "typeDefs" r in
@@ -214,7 +215,7 @@ let get_hierarchy io_schema =
 
 let build_input format h input =
   begin match input with
-  | Compiler.Jobject j ->
+  | QcertCompiler.Jobject j ->
       begin match format with
       | META -> List.map (fun (x,y) -> (x, QData.json_to_data h y)) j
       | ENHANCED -> List.map (fun (x,y) -> (x, QData.json_enhanced_to_data h y)) j
@@ -224,13 +225,13 @@ let build_input format h input =
 
 let build_output h output =
   begin match output with
-  | Compiler.Jarray l -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
+  | QcertCompiler.Jarray l -> List.map (QData.json_to_data h) l (* in coq so we can prove properties on conversions *)
   | _ -> raise (Qcert_Error "Ill-formed output")
   end
 
 let build_phase_config j =
   begin match j with
-  | Compiler.Jobject r ->
+  | QcertCompiler.Jobject r ->
       let phase_name = get_field_string "name" r in
       let phase_iter = get_field_int "iter" r in
       let phase_optims = get_field_string_array "optims" r in
@@ -242,7 +243,7 @@ let build_phase_config j =
   end
 let build_phases_config j =
   begin match j with
-  | Compiler.Jarray l ->
+  | QcertCompiler.Jarray l ->
       List.map build_phase_config l
   | _ ->
       raise (Qcert_Error "Illed formed phase optim configuration")
@@ -250,7 +251,7 @@ let build_phases_config j =
 
 let build_language_config j =
   begin match j with
-  | Compiler.Jobject r ->
+  | QcertCompiler.Jobject r ->
       let language_name = get_field_string "language" r in
       let phases = build_phases_config (get_field "phases" r) in
       { optim_language_name = language_name;
@@ -260,7 +261,7 @@ let build_language_config j =
   end
 let build_optim_config j =
   begin match j with
-  | Compiler.Jarray l ->
+  | QcertCompiler.Jarray l ->
       List.map build_language_config l
   | _ ->
       raise (Qcert_Error "Illed formed optim configuration")

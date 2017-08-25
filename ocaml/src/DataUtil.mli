@@ -15,7 +15,7 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
 
 type serialization_format =
   | META

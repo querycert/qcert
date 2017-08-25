@@ -17,8 +17,6 @@
 open Util
 open QcertUtil
 open QcertConfig
-open Compiler.EnhancedCompiler
-
 
 let set_source gconf s = gconf.gconf_source <- language_of_name s
 let set_target gconf s = gconf.gconf_target <- language_of_name s

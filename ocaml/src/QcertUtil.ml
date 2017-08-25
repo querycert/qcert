@@ -15,14 +15,15 @@
  *)
 
 open Util
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 let language_of_name name =
   let name =
     char_list_of_string (String.lowercase name)
   in
   begin match QLang.language_of_name_case_sensitive name with
-  | Compiler.L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))
+  | QcertCompiler.L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))
   | lang -> lang
   end
 
@@ -37,19 +38,19 @@ let name_of_query (q: QLang.query) =
 
 let driver_no_error dv =
   begin match dv with
-  | Compiler.Dv_error err -> raise (Qcert_Error (string err))
+  | QcertCompiler.Dv_error err -> raise (Qcert_Error (string err))
   | _ -> ()
   end
 
 let language_no_error lang =
   begin match lang with
-  | Compiler.L_error err -> raise (Qcert_Error (string err))
+  | QcertCompiler.L_error err -> raise (Qcert_Error (string err))
   | _ -> ()
   end
 
 let query_no_error q =
   begin match q with
-  | Compiler.Q_error err ->
+  | QcertCompiler.Q_error err ->
       Format.eprintf "[Compilation error] %s@." (string err)
   | _ -> ()
   end

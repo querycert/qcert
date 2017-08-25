@@ -19,7 +19,8 @@
 open Util
 open LexUtil
 open ParseUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (*****************)
 (* Generic Parse *)
@@ -76,9 +77,9 @@ let parse_designer_rule_from_string s : QLang.designer_rule =
     
 let parse_query_from_string l s : string * QLang.query =
   begin match l with
-  | Compiler.L_sql -> ("SQL", Compiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (JavaService.main "parseSQL" s))))
-  | Compiler.L_sqlpp -> ("SQLPP", Compiler.Q_sqlpp (AstsToSExp.sexp_to_sqlpp(parse_sexp_from_string (JavaService.main "parseSQLPP" s))))
-  | Compiler.L_tech_rule -> ("TechRule", Compiler.Q_tech_rule (parse_tech_rule_from_string s))
-  | Compiler.L_designer_rule -> ("DesignerRule", Compiler.Q_designer_rule (parse_designer_rule_from_string s))
+  | QcertCompiler.L_sql -> ("SQL", QcertCompiler.Q_sql (AstsToSExp.sexp_to_sql(parse_sexp_from_string (JavaService.main "parseSQL" s))))
+  | QcertCompiler.L_sqlpp -> ("SQLPP", QcertCompiler.Q_sqlpp (AstsToSExp.sexp_to_sqlpp(parse_sexp_from_string (JavaService.main "parseSQLPP" s))))
+  | QcertCompiler.L_tech_rule -> ("TechRule", QcertCompiler.Q_tech_rule (parse_tech_rule_from_string s))
+  | QcertCompiler.L_designer_rule -> ("DesignerRule", QcertCompiler.Q_designer_rule (parse_designer_rule_from_string s))
   | _ ->  parse_string (parse_query l) s
   end

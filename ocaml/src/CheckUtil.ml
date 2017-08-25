@@ -17,10 +17,13 @@
 (* Result checking *)
 
 open Format
+
 open Util
 open ConfigUtil
 open DataUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
+
 (* Check result *)
 
 let print_nraenv_result fname actual_res =

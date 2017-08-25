@@ -16,7 +16,7 @@
 
 (** This module contains pretty-printers for all languages *)
 
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
 
 open PrettyCommon
 
@@ -24,29 +24,29 @@ open PrettyCommon
 
 type 'a pretty_fun = bool -> int -> bool -> QData.json -> string -> 'a -> string
 
-val pretty_camp_rule : Compiler.camp_rule pretty_fun
-val pretty_tech_rule : Compiler.tech_rule pretty_fun
-val pretty_designer_rule : Compiler.designer_rule pretty_fun
-val pretty_camp : Compiler.camp pretty_fun
-val pretty_oql : Compiler.oql pretty_fun
-val pretty_sql : Compiler.sql pretty_fun
-val pretty_sqlpp : Compiler.sqlpp pretty_fun
-val pretty_lambda_nra : Compiler.lambda_nra pretty_fun
-val pretty_nra : Compiler.nra pretty_fun
-val pretty_nraenv_core : Compiler.nraenv_core pretty_fun
-val pretty_nraenv : Compiler.nraenv pretty_fun
-val pretty_nnrc_core : Compiler.nnrc_core pretty_fun
-val pretty_nnrc : Compiler.nnrc pretty_fun
-val pretty_nnrcmr : Compiler.nnrcmr pretty_fun
-val pretty_cldmr : Compiler.cldmr pretty_fun
-val pretty_dnnrc_dataframe : Compiler.dnnrc_dataframe pretty_fun
-val pretty_dnnrc_dataframe_typed : Compiler.dnnrc_typed pretty_fun
-val pretty_javascript : Compiler.javascript pretty_fun
-val pretty_java : Compiler.java pretty_fun
-val pretty_spark_rdd : Compiler.spark_rdd pretty_fun
-val pretty_spark_df : Compiler.spark_df pretty_fun
-val pretty_cloudant : Compiler.cloudant pretty_fun
-val pretty_cloudant_whisk : Compiler.cloudant_whisk pretty_fun
+val pretty_camp_rule : QcertCompiler.camp_rule pretty_fun
+val pretty_tech_rule : QcertCompiler.tech_rule pretty_fun
+val pretty_designer_rule : QcertCompiler.designer_rule pretty_fun
+val pretty_camp : QcertCompiler.camp pretty_fun
+val pretty_oql : QcertCompiler.oql pretty_fun
+val pretty_sql : QcertCompiler.sql pretty_fun
+val pretty_sqlpp : QcertCompiler.sqlpp pretty_fun
+val pretty_lambda_nra : QcertCompiler.lambda_nra pretty_fun
+val pretty_nra : QcertCompiler.nra pretty_fun
+val pretty_nraenv_core : QcertCompiler.nraenv_core pretty_fun
+val pretty_nraenv : QcertCompiler.nraenv pretty_fun
+val pretty_nnrc_core : QcertCompiler.nnrc_core pretty_fun
+val pretty_nnrc : QcertCompiler.nnrc pretty_fun
+val pretty_nnrcmr : QcertCompiler.nnrcmr pretty_fun
+val pretty_cldmr : QcertCompiler.cldmr pretty_fun
+val pretty_dnnrc_dataframe : QcertCompiler.dnnrc_dataframe pretty_fun
+val pretty_dnnrc_dataframe_typed : QcertCompiler.dnnrc_typed pretty_fun
+val pretty_javascript : QcertCompiler.javascript pretty_fun
+val pretty_java : QcertCompiler.java pretty_fun
+val pretty_spark_rdd : QcertCompiler.spark_rdd pretty_fun
+val pretty_spark_df : QcertCompiler.spark_df pretty_fun
+val pretty_cloudant : QcertCompiler.cloudant pretty_fun
+val pretty_cloudant_whisk : QcertCompiler.cloudant_whisk pretty_fun
 val pretty_error : (char list) pretty_fun
 
 val pretty_query : pretty_config -> 'a pretty_fun -> 'a -> string

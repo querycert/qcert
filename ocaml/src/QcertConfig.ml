@@ -16,7 +16,8 @@
 
 open Util
 open DataUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 type io_kind =
   | IO_file of string option
@@ -50,7 +51,7 @@ type global_config = {
     mutable gconf_stat_tree : bool;
     mutable gconf_optim_config_file : string option;
     mutable gconf_emit_optim_config : bool;
-    mutable gconf_optim_config : Compiler.optim_config;
+    mutable gconf_optim_config : QcertCompiler.optim_config;
     mutable gconf_prefix : string;
   }
 
@@ -88,15 +89,15 @@ let optim_phase_from_ocaml_conf (gp: optim_phase)
   ((phase_name, phase_list),phase_iter)
     
 let optim_phases_config_from_ocaml_conf (gpc: optim_language)
-    : Compiler.language * Compiler.optim_phases_config =
+    : QcertCompiler.language * QcertCompiler.optim_phases_config =
   let language_name =
-    Compiler.language_of_name_case_sensitive
+    QcertCompiler.language_of_name_case_sensitive
       (Util.char_list_of_string gpc.optim_language_name)
   in
   let optim_phases = List.map optim_phase_from_ocaml_conf gpc.optim_phases in
   (language_name,optim_phases)
 
-let optim_conf_from_ocaml_conf (gc:optim_config) : Compiler.optim_config =
+let optim_conf_from_ocaml_conf (gc:optim_config) : QcertCompiler.optim_config =
   List.map optim_phases_config_from_ocaml_conf gc
 
 let complete_configuration gconf =
@@ -152,8 +153,8 @@ let complete_configuration gconf =
 let driver_conf_of_global_conf gconf qname cname =
   let brand_rel = TypeUtil.brand_relation_of_brand_model gconf.gconf_schema.TypeUtil.sch_brand_model in
   let constants_config = gconf.gconf_schema.TypeUtil.sch_globals in
-  { Compiler.comp_qname = char_list_of_string qname;
-    Compiler.comp_qname_lowercase = char_list_of_string (String.lowercase (gconf.gconf_prefix ^ qname));
+  { QcertCompiler.comp_qname = char_list_of_string qname;
+    QcertCompiler.comp_qname_lowercase = char_list_of_string (String.lowercase (gconf.gconf_prefix ^ qname));
     comp_class_name = char_list_of_string cname;
     comp_brand_rel = brand_rel;
     comp_mr_vinit = char_list_of_string gconf.gconf_mr_vinit;

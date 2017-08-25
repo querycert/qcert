@@ -16,7 +16,7 @@
 
 (* Some Cloudant Utils *)
 
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
 
 (* Important functions *)
 val add_harness_top : string -> QData.json -> QLang.cloudant -> QLang.cloudant

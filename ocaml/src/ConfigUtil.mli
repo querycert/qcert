@@ -15,7 +15,8 @@
  *)
 
 open DataUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 

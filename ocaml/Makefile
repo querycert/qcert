@@ -35,12 +35,12 @@ TARGET=native
 all: $(MAIN) $(MAIN2)
 js: ../lib/qcertJS.js
 
-generated: generated/StaticConfig.ml generated/Compiler.ml generated/Compiler.mli
+generated: generated/StaticConfig.ml generated/QcertCompiler.ml generated/QcertCompiler.mli
 
 # Extraction from Coq
-generated/Compiler.ml generated/Compiler.mli:
+generated/QcertCompiler.ml generated/QcertCompiler.mli:
 	mkdir -p generated
-	(cd generated; coqc -R ../../coq Qcert ../Extraction.v)
+	(cd generated; coqc -R ../../coq Qcert ../QcertExtraction.v)
 
 # Configuration
 generated/StaticConfig.ml:

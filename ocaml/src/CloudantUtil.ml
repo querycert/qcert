@@ -17,7 +17,8 @@
 (* Some Cloudant Utils *)
 
 open Util
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (* Javascript harness (for inlining in Cloudant) *)
 
@@ -42,15 +43,15 @@ let add_harness harness h s =
   Util.global_replace "%HARNESS%" (fix_harness harness h) s
     
 let add_harness_to_designdoc harness h design_doc =
-  let designdoc = string_of_char_list design_doc.Compiler.cloudant_design_doc in
+  let designdoc = string_of_char_list design_doc.QcertCompiler.cloudant_design_doc in
   let harnessed_designdoc = add_harness harness h designdoc in
-  { Compiler.cloudant_design_inputdb = design_doc.Compiler.cloudant_design_inputdb;
-    Compiler.cloudant_design_name = design_doc.Compiler.cloudant_design_name;
-    Compiler.cloudant_design_doc = char_list_of_string harnessed_designdoc; }
+  { QcertCompiler.cloudant_design_inputdb = design_doc.QcertCompiler.cloudant_design_inputdb;
+    QcertCompiler.cloudant_design_name = design_doc.QcertCompiler.cloudant_design_name;
+    QcertCompiler.cloudant_design_doc = char_list_of_string harnessed_designdoc; }
     
 let stringify_designdoc design_doc =
-  let dbname = string_of_char_list design_doc.Compiler.cloudant_design_inputdb in
-  let designdoc = string_of_char_list design_doc.Compiler.cloudant_design_doc in
+  let dbname = string_of_char_list design_doc.QcertCompiler.cloudant_design_inputdb in
+  let designdoc = string_of_char_list design_doc.QcertCompiler.cloudant_design_doc in
   (dbname, designdoc)
 
 (* Java equivalent: CloudantBackend.makeOneDesign *)
@@ -79,22 +80,22 @@ let fold_design (dds:(string * string) list) (last_expr:string) (last_inputs: ch
 (* Important functions *)
 
 let add_harness_top harness h (cloudant: QLang.cloudant) : QLang.cloudant =
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
+  let design_docs = cloudant.QcertCompiler.cloudant_designs in
+  let last_expr = cloudant.QcertCompiler.cloudant_final_expr in
+  let last_inputs = cloudant.QcertCompiler.cloudant_effective_parameters in
   let harnessed_design_docs =
     List.map (fun doc -> (add_harness_to_designdoc harness h) doc) design_docs
   in
   let harnessed_last_expr =
     add_harness harness h (Util.string_of_char_list last_expr)
   in
-  { Compiler.cloudant_designs = harnessed_design_docs;
-    Compiler.cloudant_final_expr = Util.char_list_of_string harnessed_last_expr;
-    Compiler.cloudant_effective_parameters = last_inputs }
+  { QcertCompiler.cloudant_designs = harnessed_design_docs;
+    QcertCompiler.cloudant_final_expr = Util.char_list_of_string harnessed_last_expr;
+    QcertCompiler.cloudant_effective_parameters = last_inputs }
 
 let string_of_cloudant cloudant =
-  let design_docs = cloudant.Compiler.cloudant_designs in
-  let last_expr = cloudant.Compiler.cloudant_final_expr in
-  let last_inputs = cloudant.Compiler.cloudant_effective_parameters in
+  let design_docs = cloudant.QcertCompiler.cloudant_designs in
+  let last_expr = cloudant.QcertCompiler.cloudant_final_expr in
+  let last_inputs = cloudant.QcertCompiler.cloudant_effective_parameters in
   fold_design (List.map stringify_designdoc design_docs) (Util.string_of_char_list last_expr) last_inputs
 

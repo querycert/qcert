@@ -17,8 +17,9 @@
 open Util
 open CloudantUtil
 open DataUtil
-open Compiler.EnhancedCompiler
 open QcertArg
+
+open QcertCompiler.EnhancedCompiler
 
 (* Configuration utils for the Camp evaluator and compiler *)
 
@@ -110,30 +111,30 @@ let suffix_sdata () = ".sio"
 
 let suffix_of_language lang =
   match lang with
-  | Compiler.L_camp_rule -> suffix_camp_rule ()
-  | Compiler.L_camp -> suffix_camp ()
-  | Compiler.L_tech_rule -> suffix_tech_rule ()
-  | Compiler.L_designer_rule -> suffix_designer_rule ()
-  | Compiler.L_oql -> suffix_oql ()
-  | Compiler.L_sql -> suffix_sql ()
-  | Compiler.L_sqlpp -> suffix_sql ()
-  | Compiler.L_lambda_nra -> suffix_lambda_nra ()
-  | Compiler.L_nra -> suffix_nra ()
-  | Compiler.L_nraenv -> suffix_nraenv ()
-  | Compiler.L_nraenv_core -> suffix_nraenv_core ()
-  | Compiler.L_nnrc_core -> suffix_nnrc_core ()
-  | Compiler.L_nnrc -> suffix_nnrc ()
-  | Compiler.L_dnnrc -> suffix_dnnrc ()
-  | Compiler.L_dnnrc_typed -> suffix_dnnrc_typed ()
-  | Compiler.L_nnrcmr -> suffix_nnrcmr ()
-  | Compiler.L_cldmr -> suffix_nnrcmr_cldmr ()
-  | Compiler.L_javascript -> suffix_javascript ()
-  | Compiler.L_java -> suffix_java ()
-  | Compiler.L_spark_rdd -> suffix_spark_rdd ()
-  | Compiler.L_spark_df -> suffix_spark_df ()
-  | Compiler.L_cloudant -> suffix_cld_design ()
-  | Compiler.L_cloudant_whisk -> suffix_cld_whisk ()
-  | Compiler.L_error _ -> suffix_error ()
+  | QcertCompiler.L_camp_rule -> suffix_camp_rule ()
+  | QcertCompiler.L_camp -> suffix_camp ()
+  | QcertCompiler.L_tech_rule -> suffix_tech_rule ()
+  | QcertCompiler.L_designer_rule -> suffix_designer_rule ()
+  | QcertCompiler.L_oql -> suffix_oql ()
+  | QcertCompiler.L_sql -> suffix_sql ()
+  | QcertCompiler.L_sqlpp -> suffix_sql ()
+  | QcertCompiler.L_lambda_nra -> suffix_lambda_nra ()
+  | QcertCompiler.L_nra -> suffix_nra ()
+  | QcertCompiler.L_nraenv -> suffix_nraenv ()
+  | QcertCompiler.L_nraenv_core -> suffix_nraenv_core ()
+  | QcertCompiler.L_nnrc_core -> suffix_nnrc_core ()
+  | QcertCompiler.L_nnrc -> suffix_nnrc ()
+  | QcertCompiler.L_dnnrc -> suffix_dnnrc ()
+  | QcertCompiler.L_dnnrc_typed -> suffix_dnnrc_typed ()
+  | QcertCompiler.L_nnrcmr -> suffix_nnrcmr ()
+  | QcertCompiler.L_cldmr -> suffix_nnrcmr_cldmr ()
+  | QcertCompiler.L_javascript -> suffix_javascript ()
+  | QcertCompiler.L_java -> suffix_java ()
+  | QcertCompiler.L_spark_rdd -> suffix_spark_rdd ()
+  | QcertCompiler.L_spark_df -> suffix_spark_df ()
+  | QcertCompiler.L_cloudant -> suffix_cld_design ()
+  | QcertCompiler.L_cloudant_whisk -> suffix_cld_whisk ()
+  | QcertCompiler.L_error _ -> suffix_error ()
 
 (* let suffix_target conf = *)
 (*   suffix_of_language (language_of_name (conf.tlang)) *)

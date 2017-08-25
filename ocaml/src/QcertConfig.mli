@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
 
 type io_kind =
   | IO_file of string option
@@ -48,12 +48,12 @@ type global_config = {
     mutable gconf_stat_tree : bool;
     mutable gconf_optim_config_file : string option;
     mutable gconf_emit_optim_config : bool;
-    mutable gconf_optim_config : Compiler.optim_config;
+    mutable gconf_optim_config : QcertCompiler.optim_config;
     mutable gconf_prefix : string;
   }
 
-val optim_phases_config_from_ocaml_conf : DataUtil.optim_language -> Compiler.language * Compiler.optim_phases_config
-val optim_conf_from_ocaml_conf : DataUtil.optim_config -> Compiler.optim_config
+val optim_phases_config_from_ocaml_conf : DataUtil.optim_language -> QcertCompiler.language * QcertCompiler.optim_phases_config
+val optim_conf_from_ocaml_conf : DataUtil.optim_config -> QcertCompiler.optim_config
 
 val complete_configuration : global_config -> global_config
 

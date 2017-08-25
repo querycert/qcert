@@ -16,7 +16,7 @@
 
 open Util
 open QcertConfig
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
 open Logger
 open LoggerToSexp
 
@@ -100,28 +100,29 @@ let args_list gconf =
 let anon_args input_files f = input_files := f :: !input_files
 
 let languages =
-  [ Compiler.L_camp_rule;
-    Compiler.L_camp;
-    Compiler.L_tech_rule;
-    Compiler.L_designer_rule;
-    Compiler.L_oql;
-    Compiler.L_sql;
-    Compiler.L_sqlpp;
-    Compiler.L_lambda_nra;
-    Compiler.L_nra;
-    Compiler.L_nraenv;
-    Compiler.L_nraenv_core;
-    Compiler.L_nnrc;
-    Compiler.L_nnrc_core;
-    Compiler.L_nnrcmr;
-    Compiler.L_cldmr;
-    Compiler.L_dnnrc;
-    Compiler.L_dnnrc_typed;
-    Compiler.L_javascript;
-    Compiler.L_java;
-    Compiler.L_spark_rdd;
-    Compiler.L_spark_df;
-    Compiler.L_cloudant; ]
+  [ QcertCompiler.L_camp_rule;
+    QcertCompiler.L_camp;
+    QcertCompiler.L_tech_rule;
+    QcertCompiler.L_designer_rule;
+    QcertCompiler.L_oql;
+    QcertCompiler.L_sql;
+    QcertCompiler.L_sqlpp;
+    QcertCompiler.L_lambda_nra;
+    QcertCompiler.L_nra;
+    QcertCompiler.L_nraenv;
+    QcertCompiler.L_nraenv_core;
+    QcertCompiler.L_nnrc;
+    QcertCompiler.L_nnrc_core;
+    QcertCompiler.L_nnrcmr;
+    QcertCompiler.L_cldmr;
+    QcertCompiler.L_dnnrc;
+    QcertCompiler.L_dnnrc_typed;
+    QcertCompiler.L_javascript;
+    QcertCompiler.L_java;
+    QcertCompiler.L_spark_rdd;
+    QcertCompiler.L_spark_df;
+    QcertCompiler.L_cloudant;
+    QcertCompiler.L_cloudant_whisk; ]
 
 
 let languages_string =
@@ -138,8 +139,8 @@ let usage =
 let parse_args () =
   let input_files = ref [] in
   let gconf =
-    { gconf_source = Compiler.L_camp_rule;
-      gconf_target = Compiler.L_javascript;
+    { gconf_source = QcertCompiler.L_camp_rule;
+      gconf_target = QcertCompiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;

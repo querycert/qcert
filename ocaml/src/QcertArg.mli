@@ -14,8 +14,6 @@
  * limitations under the License.
  *)
 
-open Compiler.EnhancedCompiler
-
 val set_source : QcertConfig.global_config -> string -> unit
 val set_target : QcertConfig.global_config -> string -> unit
 val set_exact_path : QcertConfig.global_config -> unit -> unit

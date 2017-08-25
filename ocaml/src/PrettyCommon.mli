@@ -16,8 +16,7 @@
 
 (** This module contains common code for pretty-printers *)
 
-module Hack = Compiler
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
 
 (* Character sets *)
 
@@ -100,31 +99,31 @@ val pretty_data : Format.formatter -> QData.data -> unit
 
 (* Pretty rtype *)
 
-val pretty_rtype_aux : symbols -> Format.formatter -> Hack.rtype_UU2080_ -> unit
-val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a Compiler.type_annotation -> unit
+val pretty_rtype_aux : symbols -> Format.formatter -> QcertCompiler.rtype_UU2080_ -> unit
+val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a QcertCompiler.type_annotation -> unit
 
 (* Pretty operators *)
 
-val pretty_unop : int -> symbols -> 'a pretty_fun -> Format.formatter -> Hack.unaryOp -> 'a -> unit
-val pretty_binop : int -> symbols -> 'a pretty_fun -> Format.formatter -> Hack.binOp -> 'a -> 'a -> unit
+val pretty_unop : int -> symbols -> 'a pretty_fun -> Format.formatter -> QcertCompiler.unaryOp -> 'a -> unit
+val pretty_binop : int -> symbols -> 'a pretty_fun -> Format.formatter -> QcertCompiler.binOp -> 'a -> 'a -> unit
 
 (* Useful for SExp support *)
-val timescale_as_string : Compiler.time_scale -> string
+val timescale_as_string : QcertCompiler.time_scale -> string
 
-val string_of_foreign_data : Compiler.enhanced_data -> string
-val foreign_data_of_string : string -> Compiler.enhanced_data
+val string_of_foreign_data : QcertCompiler.enhanced_data -> string
+val foreign_data_of_string : string -> QcertCompiler.enhanced_data
 
-val string_of_foreign_unop : Compiler.enhanced_unary_op -> string
-val string_of_unarith : Compiler.arithUOp -> string
+val string_of_foreign_unop : QcertCompiler.enhanced_unary_op -> string
+val string_of_unarith : QcertCompiler.arithUOp -> string
 
-val foreign_unop_of_string : string -> Compiler.enhanced_unary_op
-val unarith_of_string : string -> Compiler.arithUOp
+val foreign_unop_of_string : string -> QcertCompiler.enhanced_unary_op
+val unarith_of_string : string -> QcertCompiler.arithUOp
 
-val string_of_foreign_binop : Compiler.enhanced_binary_op -> string
-val string_of_binarith : Compiler.arithBOp -> string
+val string_of_foreign_binop : QcertCompiler.enhanced_binary_op -> string
+val string_of_binarith : QcertCompiler.arithBOp -> string
 
-val binarith_of_string : string -> Compiler.arithBOp
-val foreign_binop_of_string : string -> Compiler.enhanced_binary_op
+val binarith_of_string : string -> QcertCompiler.arithBOp
+val foreign_binop_of_string : string -> QcertCompiler.enhanced_binary_op
 
-val string_of_binop : Compiler.binOp -> string
+val string_of_binop : QcertCompiler.binOp -> string
 

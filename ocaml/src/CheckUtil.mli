@@ -17,7 +17,8 @@
 (* Result checking *)
 
 open ConfigUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (* Check result *)
 

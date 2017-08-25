@@ -16,13 +16,14 @@
 
 open Util
 open DataUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 (* Data utils for the Camp evaluator and compiler *)
 
 type schema = {
     sch_brand_model : QType.brand_model;
-    sch_foreign_typing : Compiler.foreign_typing;
+    sch_foreign_typing : QcertCompiler.foreign_typing;
     sch_io_schema : content_schema option;
     sch_globals : QDriver.constants_config;
   }
@@ -32,7 +33,7 @@ val schema_of_io_json : QData.json -> schema
 val hierarchy_of_schema : schema -> (char list * char list) list
 val raw_hierarchy_of_schema : schema -> QData.json
 
-val brand_relation_of_brand_model : QType.brand_model -> Compiler.brand_relation
+val brand_relation_of_brand_model : QType.brand_model -> QcertCompiler.brand_relation
 
 type content_sdata = (char list * char list) list
 val content_sdata_of_data : schema -> DataUtil.content_input -> content_sdata

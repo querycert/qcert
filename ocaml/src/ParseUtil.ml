@@ -18,7 +18,8 @@
 
 open Util
 open LexUtil
-open Compiler.EnhancedCompiler
+
+open QcertCompiler.EnhancedCompiler
 
 
 (*****************)
@@ -78,30 +79,30 @@ let parse_cldmr_sexp f : QLang.cldmr = AstsToSExp.sexp_to_cldmr (parse_sexp f)
 
 let parse_query l f : (string * QLang.query) =
   begin match l with
-  | Compiler.L_camp_rule -> let (n,r) = parse_rule f in (n, Compiler.Q_camp_rule r)
-  | Compiler.L_camp -> let (n,c) = parse_camp f in (n, Compiler.Q_camp c)
-  | Compiler.L_oql -> ("OQL", Compiler.Q_oql (parse_oql f))
-  | Compiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
-  | Compiler.L_sqlpp -> raise (Qcert_Error "SQL++ should be parsed from String, not lexer")
-  | Compiler.L_tech_rule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
-  | Compiler.L_designer_rule -> raise (Qcert_Error "Designer rule should be parsed from binary file contents, not lexer")
-  | Compiler.L_lambda_nra -> ("LambdaNRA", Compiler.Q_lambda_nra (parse_lambda_nra f))
-  | Compiler.L_nra -> raise (Qcert_Error "No parser for NRA available")
-  | Compiler.L_nraenv_core -> ("NRAEnvCore", Compiler.Q_nraenv_core (parse_nraenv_sexp f))
-  | Compiler.L_nraenv -> raise (Qcert_Error "No parser for NRAEnv available")
-  | Compiler.L_nnrc_core -> ("NNRCCore", Compiler.Q_nnrc_core (parse_nnrc_sexp f))
-  | Compiler.L_nnrc -> ("NNRC", Compiler.Q_nnrc (parse_nnrc_sexp f))
-  | Compiler.L_nnrcmr -> ("NNRCMR", Compiler.Q_nnrcmr (parse_nnrcmr_sexp f))
-  | Compiler.L_cldmr -> ("CldMR", Compiler.Q_cldmr (parse_cldmr_sexp f))
-  | Compiler.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
-  | Compiler.L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")
-  | Compiler.L_javascript -> raise (Qcert_Error "No parser for Javascript available")
-  | Compiler.L_java -> raise (Qcert_Error "No parser for Java available")
-  | Compiler.L_spark_rdd -> raise (Qcert_Error "No parser for Spark (RDD) available")
-  | Compiler.L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
-  | Compiler.L_cloudant -> raise (Qcert_Error "No parser for Cloudant available")
-  | Compiler.L_cloudant_whisk -> raise (Qcert_Error "No parser for Cloudant available")
-  | Compiler.L_error err ->
+  | QcertCompiler.L_camp_rule -> let (n,r) = parse_rule f in (n, QcertCompiler.Q_camp_rule r)
+  | QcertCompiler.L_camp -> let (n,c) = parse_camp f in (n, QcertCompiler.Q_camp c)
+  | QcertCompiler.L_oql -> ("OQL", QcertCompiler.Q_oql (parse_oql f))
+  | QcertCompiler.L_sql -> raise (Qcert_Error "SQL should be parsed from String, not lexer")
+  | QcertCompiler.L_sqlpp -> raise (Qcert_Error "SQL++ should be parsed from String, not lexer")
+  | QcertCompiler.L_tech_rule -> raise (Qcert_Error "Technical rule should be parsed from String, not lexer")
+  | QcertCompiler.L_designer_rule -> raise (Qcert_Error "Designer rule should be parsed from binary file contents, not lexer")
+  | QcertCompiler.L_lambda_nra -> ("LambdaNRA", QcertCompiler.Q_lambda_nra (parse_lambda_nra f))
+  | QcertCompiler.L_nra -> raise (Qcert_Error "No parser for NRA available")
+  | QcertCompiler.L_nraenv_core -> ("NRAEnvCore", QcertCompiler.Q_nraenv_core (parse_nraenv_sexp f))
+  | QcertCompiler.L_nraenv -> raise (Qcert_Error "No parser for NRAEnv available")
+  | QcertCompiler.L_nnrc_core -> ("NNRCCore", QcertCompiler.Q_nnrc_core (parse_nnrc_sexp f))
+  | QcertCompiler.L_nnrc -> ("NNRC", QcertCompiler.Q_nnrc (parse_nnrc_sexp f))
+  | QcertCompiler.L_nnrcmr -> ("NNRCMR", QcertCompiler.Q_nnrcmr (parse_nnrcmr_sexp f))
+  | QcertCompiler.L_cldmr -> ("CldMR", QcertCompiler.Q_cldmr (parse_cldmr_sexp f))
+  | QcertCompiler.L_dnnrc -> raise (Qcert_Error "No parser for DNNRC available")
+  | QcertCompiler.L_dnnrc_typed -> raise (Qcert_Error "No parser for typed DNNRC available")
+  | QcertCompiler.L_javascript -> raise (Qcert_Error "No parser for Javascript available")
+  | QcertCompiler.L_java -> raise (Qcert_Error "No parser for Java available")
+  | QcertCompiler.L_spark_rdd -> raise (Qcert_Error "No parser for Spark (RDD) available")
+  | QcertCompiler.L_spark_df -> raise (Qcert_Error "No parser for Spark (Dataframe) available")
+  | QcertCompiler.L_cloudant -> raise (Qcert_Error "No parser for Cloudant available")
+  | QcertCompiler.L_cloudant_whisk -> raise (Qcert_Error "No parser for Cloudant available")
+  | QcertCompiler.L_error err ->
       let err = string_of_char_list err in
       raise (Qcert_Error ("No parser for Error language available: "^err))
   end

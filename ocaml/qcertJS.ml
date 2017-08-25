@@ -18,8 +18,7 @@ open Util
 open DataUtil
 open QcertUtil
 open QcertConfig
-module Hack = Compiler
-open Compiler.EnhancedCompiler
+open QcertCompiler.EnhancedCompiler
    
 
 (**********************************)
@@ -79,8 +78,8 @@ let optim_config_from_json s : optim_config =
   
 let global_config_of_json j =
   let gconf =
-    { gconf_source = Compiler.L_camp_rule;
-      gconf_target = Compiler.L_javascript;
+    { gconf_source = QcertCompiler.L_camp_rule;
+      gconf_target = QcertCompiler.L_javascript;
       gconf_path = [];
       gconf_exact_path = false;
       gconf_dir = None;
@@ -198,10 +197,10 @@ let json_of_exported_languages exported_languages =
     end
   in
   object%js
-    val frontend = Js.def (wrap_all wrap exported_languages.Compiler.frontend)
-    val core = Js.def (wrap_all wrap exported_languages.Compiler.coreend)
-    val distributed = Js.def (wrap_all wrap exported_languages.Compiler.distrend)
-    val backend =  Js.def (wrap_all wrap exported_languages.Compiler.backend)
+    val frontend = Js.def (wrap_all wrap exported_languages.QcertCompiler.frontend)
+    val core = Js.def (wrap_all wrap exported_languages.QcertCompiler.coreend)
+    val distributed = Js.def (wrap_all wrap exported_languages.QcertCompiler.distrend)
+    val backend =  Js.def (wrap_all wrap exported_languages.QcertCompiler.backend)
   end
 let language_specs () =
   let exported_languages = QLang.export_language_descriptions  in
@@ -220,7 +219,7 @@ let json_of_source_to_target_path j =
 let json_of_optim x =
   Js.string (Util.string_of_char_list x)
 
-let js_of_optim_step_list {Hack.optim_step_name; Hack.optim_step_description; Hack.optim_step_lemma} =
+let js_of_optim_step_list {QcertCompiler.optim_step_name; QcertCompiler.optim_step_description; QcertCompiler.optim_step_lemma} =
   object%js
     val name = Js.string (Util.string_of_char_list optim_step_name)
     val description = Js.string (Util.string_of_char_list optim_step_description)
@@ -229,7 +228,7 @@ let js_of_optim_step_list {Hack.optim_step_name; Hack.optim_step_description; Ha
   
 let json_of_optim_list () =
   let ocl = QDriver.optim_config_list in
-  let wrap (Hack.ExistT (x, (optim_module_name, y))) =
+  let wrap (QcertCompiler.ExistT (x, (optim_module_name, y))) =
     object%js
       val language =
 	object%js

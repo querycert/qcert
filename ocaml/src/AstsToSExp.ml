@@ -17,11 +17,10 @@
 (* This module contains parsing utilities *)
 
 open Util
-open Compiler.EnhancedCompiler
-open Compiler
-
 open SExp
 
+open QcertCompiler
+open QcertCompiler.EnhancedCompiler
 
 (****************
  * AST <-> SExp *
@@ -1024,7 +1023,7 @@ and sexp_to_sql_expr expr =
 (*  | STerm ("const_list",const_list) ->
       List.fold_left (QSQL.sql_binary (map (fun e -> (QSQL.sql_unary sexp_to_sql_expr const_list)) *)
   | STerm ("cast",[STerm ("as",[SString "DATE"]); expr1]) ->
-      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Compiler.Enhanced_unary_sql_date_op Compiler.Uop_sql_date_from_string)))
+      QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (QcertCompiler.Enhanced_unary_sql_date_op QcertCompiler.Uop_sql_date_from_string)))
 	(sexp_to_sql_expr expr1)
   | STerm ("literal",[SString "date"; SString sdate]) ->
       QSQL.sql_expr_unary (SUnaryForeignExpr (Obj.magic (Enhanced_unary_sql_date_op Uop_sql_date_from_string)))
