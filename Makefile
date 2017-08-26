@@ -352,25 +352,25 @@ ODM=
 
 all:
 	@$(MAKE) qcert
-	@echo "[Qcert] "
-	@echo "[Qcert] To compile the runtimes, do:"
-	@echo "[Qcert]   make qcert-runtimes"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] To compile the runtimes, do:"
+	@echo "[Q*cert]   make qcert-runtimes"
+	@echo "[Q*cert] "
 
 qcert-runtimes:
 	@$(MAKE) java-runtime
 	@$(MAKE) spark2-runtime
 
 java-runtime:
-	@echo "[Qcert] "
-	@echo "[Qcert] Compiling Java runtime"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling Java runtime"
+	@echo "[Q*cert] "
 	@$(MAKE) -C runtime/java
 
 spark2-runtime:
-	@echo "[Qcert] "
-	@echo "[Qcert] Compiling Spark2 runtime"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling Spark2 runtime"
+	@echo "[Q*cert] "
 	@$(MAKE) -C runtime/spark2
 
 javacode:
@@ -393,27 +393,27 @@ ifneq ($(SQL)$(SQLPP)$(ODM),)
 endif
 
 demo: qcert qcert-javascript
-	@echo "[Qcert] "
-	@echo "[Qcert] Compiling TypeScript files to JavaScript"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling TypeScript files to JavaScript"
+	@echo "[Q*cert] "
 	cd webdemo && $(TSC) -p "tsconfig.json"
 
 qcert-coq: Makefile.coq
-	@echo "[Qcert] "
-	@echo "[Qcert] Compiling Coq source"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling Coq source"
+	@echo "[Q*cert] "
 	@$(MAKE) -f Makefile.coq
 
 qcert-ocaml:
-	@echo "[Qcert] "
-	@echo "[Qcert] Extracting compiler to OCaml"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Extracting compiler to OCaml"
+	@echo "[Q*cert] "
 	@$(MAKE) -C ocaml all
 
 qcert-javascript:
-	@echo "[Qcert] "
-	@echo "[Qcert] Extracting compiler to JavaScript"
-	@echo "[Qcert] "
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Extracting compiler to JavaScript"
+	@echo "[Q*cert] "
 	@$(MAKE) -C ocaml js
 
 qcert: Makefile.coq

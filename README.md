@@ -20,12 +20,12 @@ compilation pipeline has been mechanically checked for correctness.
 
 To build Q\*cert from the source, you will need:
 
- - OCaml 4.05.0 or later (http://ocaml.org/) along with the following libraries:
+- OCaml 4.05.0 or later (http://ocaml.org/) along with the following libraries:
   - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
-  - base64, a library for base64 encoding and decoding
- - Coq 8.6.1 (https://coq.inria.fr/)
+  - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
+- Coq 8.6.1 (https://coq.inria.fr/)
 
 An easy way to get set up on most platforms is to use the OCaml
 package manager (https://opam.ocaml.org). Once opam is installed, you
@@ -53,14 +53,14 @@ must be available from the command line.
 The Q\*cert distribution includes a Web demo for the compiler which
 requires js\_of\_ocaml and TypeScript.
 
-js\_of\_ocaml (http://ocsigen.org/js\_of\_ocaml/) can be installed as other OCaml packages using opam:
+js\_of\_ocaml (http://ocsigen.org/js_of_ocaml/) can be installed as other OCaml packages using opam:
 
 ```
 opam install js_of_ocaml
 opam install js_of_ocaml-ppx
 ```
 
-TypeScript can be obtained from (https://www.typescriptlang.org).
+TypeScript can be obtained from: https://www.typescriptlang.org.
 
 ### Portability
 
@@ -76,10 +76,10 @@ not currently have detailed instructions for how to build on Windows.
 1. Compile the Coq source:
 
 ```
-make qcert
+make all
 ```
 
-(Note: this will take a while, you can run make faster with `make -j 8 qcert`)
+(Note: this will take a while, you can run make faster with `make -j 8 all`)
 
 This should produce the `./bin/qcert` and `./bin/qdata` executables.
 
@@ -326,5 +326,5 @@ Certificate of Origin' which can be found in ./DCO1.1.txt.
 
 ## Documentation
 
-Code documentation and background information can be found at (https://querycert.github.io)
+Code documentation and background information can be found at: https://querycert.github.io
 
