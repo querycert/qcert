@@ -27,7 +27,7 @@ let identchar = ['A'-'Z' 'a'-'z' '_' '\'' '0'-'9']
 let digit = ['0'-'9']
 let frac = '.' digit*
 let exp = ['e' 'E'] ['-' '+']? digit+
-let float = digit* (frac exp? | exp)
+let float = '-'? digit* (frac exp? | exp)
 
 rule token sbuff = parse
 | eof
