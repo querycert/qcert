@@ -83,7 +83,7 @@ make all
 
 This should produce the `./bin/qcert` and `./bin/qdata` executables.
 
-## Building the Java components
+### Building the Java components
 
 The Java components are built with the command
 
@@ -112,7 +112,7 @@ called `services`.
 Note that the ODM rules support will only build if you satisfy an
 additional dependency as outlined in the next section.
 
-## Building ODM Rules (JRules) support (Optional)
+### Building ODM Rules (JRules) support (Optional)
 
 The ODM rules support requires that you obtain a legal copy of the ODM
 Designer component that comes with various versions of ODM.
@@ -161,7 +161,9 @@ of jrules-engine.jar.  Unzipping the outer jar into the
 the `lib` subdirectory.  Beyond those suggestions, you are on your own.
 
 
-## Compile Queries with Q\*cert
+## Using Q\*cert
+
+### Compiling Queries
 
 The [`./samples`](./samples) directory contains a few examples written
 in OQL (Object Query Language) syntax. For instance:
@@ -197,7 +199,7 @@ $ ./bin/qcert -source oql -target java samples/oql/persons1.oql
 
 This will produce a java file called `samples/oql/persons1.java`.
 
-## Run queries compiled with Q\*cert
+### Run the compiled queries
 
 Q\*cert targets a number of languages and data processors as backends
 (currently: JavaScript, Java, Cloudant and Spark). The way you run the
@@ -210,7 +212,7 @@ execute the query on some input data.
 Runtime libraries are in the [`./runtime`](./runtime) directory. We include simple
 query runners in the [`./samples`](./samples) directory in order to try the examples.
 
-### Prerequisites
+#### Prerequisites
 
 The Java runtime library and the sample query runners will have been built if
 you followed the instructions above to make the optional Java components
@@ -222,7 +224,7 @@ make javacode
 
 Otherwise, you can do it now.
 
-### Run queries compiled to JavaScript
+#### Run queries compiled to JavaScript
 
 (In the [`./samples`](./samples) directory)
 
@@ -257,7 +259,7 @@ can compile and run a given test for you:
 ```
 make run_js_persons1
 ```
-### Run queries compiled to Java
+#### Run queries compiled to Java
 
 (In the [`./samples`](./samples) directory)
 
@@ -289,7 +291,7 @@ can compile and run a given test for you:
 make run_java_persons1
 ```
 
-## Spark Dataset backend
+#### Spark Dataset backend
 
 To compile the Spark runtime and run queries on Spark you need `sbt`
 and `spark-submit` on your path.
