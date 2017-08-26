@@ -12,7 +12,7 @@ general:
 dependencies:
   cache_directories:
     - "~/.opam"
-    - "~/spark-2.1.0-bin-hadoop2.7"
+    - "~/spark-2.1.1-bin-hadoop2.7"
   pre:
     - sudo add-apt-repository -y ppa:avsm/ppa
     - sudo apt-get -qq update
@@ -20,7 +20,7 @@ dependencies:
     - opam init -a
     - opam install -y ocamlbuild menhir camlp5 base64 coq.8.6.1 js_of_ocaml js_of_ocaml-ppx:
         timeout: 1200
-    - if [[ ! -d ~/spark-2.1.0-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.1/spark-2.1.1-bin-hadoop2.7.tgz && tar xf spark-2.1.0-bin-hadoop2.7.tgz ; fi
+    - if [[ ! -d ~/spark-2.1.1-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.1/spark-2.1.1-bin-hadoop2.7.tgz && tar xf spark-2.1.1-bin-hadoop2.7.tgz ; fi
   override:
     - make spark2-runtime
 
