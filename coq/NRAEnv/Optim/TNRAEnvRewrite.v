@@ -3026,7 +3026,7 @@ Section TOptimEnv.
               discriminate.
             - apply none_lift in eqq2.
               apply some_lift in eqq3; destruct eqq3 as [? eqq3 ?]; subst.
-              destruct eqq3 as [? eqq3 ?]; subst.
+              destruct eqq3; subst.
               simpl in IHl.
               discriminate.
             - apply none_lift in eqq2.

@@ -208,7 +208,7 @@ Section TUtil.
         generalize (from_Rec₀ srl0 e0); intros.
         destruct H; destruct H0.
         generalize (merge_bindings x x0); intros.
-        destruct H as [rSome|rNone].
+        destruct H as [rSome|].
         destruct k; destruct k0; simpl in *.
         * exact (RecMaybe Open rSome).
         * exact None.
@@ -279,7 +279,7 @@ Section TUtil.
     case_eq H; case_eq H0; intros.
     destruct p; destruct p0; simpl in *.
     generalize (merge_bindings l l0); intros.
-    - destruct H3 as [rSome|rNone].
+    - destruct H3 as [rSome|].
       destruct r; destruct r0; simpl in *.
       * exact (RecMaybe Open rSome).
       * exact None.
