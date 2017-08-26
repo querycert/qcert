@@ -18,13 +18,15 @@ dependencies:
     - sudo apt-get -qq update
     - sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
     - opam init -a
+    - opam switch 4.5.0
+    - eval `opam config env`
     - opam install -y ocamlbuild menhir camlp5 base64 coq.8.6.1 js_of_ocaml js_of_ocaml-ppx:
         timeout: 1200
     - if [[ ! -d ~/spark-2.1.1-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.1/spark-2.1.1-bin-hadoop2.7.tgz && tar xf spark-2.1.1-bin-hadoop2.7.tgz ; fi
   override:
-    - make spark2-runtime
+    - make qcert-runtimes
 
 test:
   override:
-    - eval `opam config env` && make -j1 && make jsapi
+    - eval `opam config env` && make -j1 && make qcert-javascript
     - cd samples/spark2 && ./run.sh

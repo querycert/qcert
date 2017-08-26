@@ -19,7 +19,6 @@ TSC?=tsc
 
 DIST_DIR=
 
-#	Basic/Util/RTactics
 export MODULES = \
 	Basic/Util/Digits \
 	Basic/Util/Lattice \
@@ -353,11 +352,26 @@ ODM=
 
 all:
 	@$(MAKE) qcert
+	@echo "[Qcert] "
+	@echo "[Qcert] To compile the runtimes, do:"
+	@echo "[Qcert]   make qcert-runtimes"
+	@echo "[Qcert] "
+
+qcert-runtimes:
 	@$(MAKE) java-runtime
 	@$(MAKE) spark2-runtime
 
 java-runtime:
+	@echo "[Qcert] "
+	@echo "[Qcert] Compiling Java runtime"
+	@echo "[Qcert] "
 	@$(MAKE) -C runtime/java
+
+spark2-runtime:
+	@echo "[Qcert] "
+	@echo "[Qcert] Compiling Spark2 runtime"
+	@echo "[Qcert] "
+	@$(MAKE) -C runtime/spark2
 
 javacode:
 	@$(MAKE) java-runtime
@@ -377,9 +391,6 @@ endif
 ifneq ($(SQL)$(SQLPP)$(ODM),)
 	@$(MAKE) -C javaService install
 endif
-
-spark2-runtime:
-	@$(MAKE) -C runtime/spark2
 
 demo: qcert qcert-javascript
 	@echo "[Qcert] "
