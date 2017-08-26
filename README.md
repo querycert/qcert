@@ -310,7 +310,7 @@ cd samples/spark2/
 
 ## Caveats
 
-- There is no official support for Windows, although some success has been reported (See [Issue #1](https://github.com/querycert/qcert/issues/1))
+- There is no official support for Windows, although some success has been reported using Cygwin
 - The Spark 2 target is in development, and not yet operational
 - The documentation is based on an early version of the compiler and is outdated
 - Support for the source miniOQL language is preliminary
