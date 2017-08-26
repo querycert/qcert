@@ -164,7 +164,7 @@ let set_eval_schema conf schema = conf.eval_schema <- Some schema
 let set_input conf f = conf.eval_inputs <- f :: conf.eval_inputs
 
 let set_format conf s =
-  match String.lowercase s with
+  match String.lowercase_ascii s with
   | "meta" -> conf.format <- META
   | "enhanced" -> conf.format <- ENHANCED
   | _ -> ()
@@ -197,7 +197,7 @@ let set_json conf json =
   conf.in_jsons <- json :: conf.in_jsons
 
 let set_data_format conf s =
-  match String.lowercase s with
+  match String.lowercase_ascii s with
   | "meta" -> conf.data_format <- META
   | "enhanced" -> conf.data_format <- ENHANCED
   | _ -> ()

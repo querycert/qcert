@@ -353,7 +353,6 @@ ODM=
 
 all:
 	@$(MAKE) qcert
-	@$(MAKE) extraction
 	@$(MAKE) java-runtime
 	@$(MAKE) spark2-runtime
 
@@ -382,32 +381,33 @@ endif
 spark2-runtime:
 	@$(MAKE) -C runtime/spark2
 
-demo: qcert jsapi
+demo: qcert qcert-javascript
 	@echo "[Qcert] "
-	@echo "[Qcert] Compiling typescript files to javascript"
+	@echo "[Qcert] Compiling TypeScript files to JavaScript"
 	@echo "[Qcert] "
 	cd webdemo && $(TSC) -p "tsconfig.json"
 
-jsapi:
-	@$(MAKE) js-extraction
-
-qcert: Makefile.coq
+qcert-coq: Makefile.coq
 	@echo "[Qcert] "
 	@echo "[Qcert] Compiling Coq source"
 	@echo "[Qcert] "
 	@$(MAKE) -f Makefile.coq
 
-extraction:
+qcert-ocaml:
 	@echo "[Qcert] "
 	@echo "[Qcert] Extracting compiler to OCaml"
 	@echo "[Qcert] "
-	@$(MAKE) -C ocaml realclean all
+	@$(MAKE) -C ocaml all
 
-js-extraction:
+qcert-javascript:
 	@echo "[Qcert] "
-	@echo "[Qcert] Extracting compiler to OCaml + Javascript"
+	@echo "[Qcert] Extracting compiler to JavaScript"
 	@echo "[Qcert] "
 	@$(MAKE) -C ocaml js
+
+qcert: Makefile.coq
+	@$(MAKE) qcert-coq
+	@$(MAKE) qcert-ocaml
 
 Makefile.coq: Makefile $(VS) $(FILES)
 	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
@@ -420,7 +420,7 @@ remove_all_derived:
 
 clean:: Makefile.coq remove_all_derived
 	@$(MAKE) -f Makefile.coq clean
-	@$(MAKE) -C ocaml realclean
+	@$(MAKE) -C ocaml cleanall
 	@$(MAKE) -C runtime/java clean
 	@$(MAKE) -C runtime/spark2 clean
 	@$(MAKE) -C samples clean

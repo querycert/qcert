@@ -20,7 +20,7 @@ open QcertCompiler.EnhancedCompiler
 
 let language_of_name name =
   let name =
-    char_list_of_string (String.lowercase name)
+    char_list_of_string (String.lowercase_ascii name)
   in
   begin match QLang.language_of_name_case_sensitive name with
   | QcertCompiler.L_error err -> raise (Qcert_Error ("Unknown language: "^(string err)))

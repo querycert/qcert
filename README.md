@@ -20,22 +20,23 @@ compilation pipeline has been mechanically checked for correctness.
 
 To build Q\*cert from the source, you will need:
 
- - OCaml 4.02 or later (http://ocaml.org/) along with the following libraries:
-  - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
+ - OCaml 4.05.0 or later (http://ocaml.org/) along with the following libraries:
   - ocamlbuild, a build system (https://github.com/ocaml/ocamlbuild)
+  - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
- - Coq 8.6 (https://coq.inria.fr/)
+  - base64, a library for base64 encoding and decoding
+ - Coq 8.6.1 (https://coq.inria.fr/)
 
 An easy way to get set up on most platforms is to use the OCaml
 package manager (https://opam.ocaml.org). Once opam is installed, you
 can just add the corresponding libraries:
 
 ```
-opam install menhir
 opam install ocamlbuild
+opam install menhir
 opam install camlp5
-opam install coq.8.6
-opam install js_of_ocaml
+opam install base64
+opam install coq.8.6.1
 ```
 
 ### Java (Recommended)
@@ -50,12 +51,13 @@ must be available from the command line.
 ### TypeScript (Optional)
 
 The Q\*cert distribution includes a Web demo for the compiler which
-requires js_of_ocaml and TypeScript.
+requires js\_of\_ocaml and TypeScript.
 
-js_of_ocaml can be installed as other OCaml packages using opam:
+js\_of\_ocaml (http://ocsigen.org/js\_of\_ocaml/) can be installed as other OCaml packages using opam:
 
 ```
 opam install js_of_ocaml
+opam install js_of_ocaml-ppx
 ```
 
 TypeScript can be obtained from (https://www.typescriptlang.org).
@@ -67,9 +69,9 @@ Q\*cert should build on most recent Linux systems and on MacOS.
 Windows isn't directly supported by the OCaml package manager. We do
 not currently have detailed instructions for how to build on Windows.
 
-## Building Q\*cert core
+## Installing Q\*cert
 
-### Compile Q\*cert
+### Building the compiler
 
 1. Compile the Coq source:
 
@@ -78,12 +80,6 @@ make qcert
 ```
 
 (Note: this will take a while, you can run make faster with `make -j 8 qcert`)
-
-2. Extract the compiler and build the OCaml frontend:
-
-```
-make extraction
-```
 
 This should produce the `./bin/qcert` and `./bin/qdata` executables.
 
@@ -165,11 +161,10 @@ of jrules-engine.jar.  Unzipping the outer jar into the
 the `lib` subdirectory.  Beyond those suggestions, you are on your own.
 
 
-## Compile Queries
+## Compile Queries with Q\*cert
 
-Once the compiler is built, it can be used to compile queries. The
-[`./samples`](./samples) directory contains a few examples written in OQL (Object
-Query Language) syntax. For instance:
+The [`./samples`](./samples) directory contains a few examples written
+in OQL (Object Query Language) syntax. For instance:
 
 ```
 $ cat samples/oql/persons1.oql 
@@ -202,7 +197,7 @@ $ ./bin/qcert -source oql -target java samples/oql/persons1.oql
 
 This will produce a java file called `samples/oql/persons1.java`.
 
-## Run compiled queries
+## Run queries compiled with Q\*cert
 
 Q\*cert targets a number of languages and data processors as backends
 (currently: JavaScript, Java, Cloudant and Spark). The way you run the

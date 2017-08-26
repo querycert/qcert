@@ -101,7 +101,7 @@ realclean:
 	rm -f CampLexer.ml CampParser.ml CampParser.mli
 	rm -f DataLexer.ml DataParser.ml DataParser.mli
 	rm -f SexpLexer.ml SexpParser.ml SexpParser.mli
-	rm -f Extraction.glob Extraction.vo .Extraction.aux
+	rm -f QcertExtraction.glob QcertExtraction.vo .QcertExtraction.aux
 	rm -rf *~ extracted $(MAIN) $(MAIN2)
 	rm -f ../bin/$(MAIN) ../bin/$(MAIN2)
 	rm -f ../lib/$(LIB).cmi ../lib/qcertJS.js
