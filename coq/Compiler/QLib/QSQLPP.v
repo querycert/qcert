@@ -64,7 +64,7 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_sqlpp_gt : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPGt.
   Definition sqlpp_sqlpp_le : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPLe.
   Definition sqlpp_sqlpp_ge : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPGe.
-  Definition sqlpp_sqlpp_like : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPLike.
+  Definition sqlpp_sqlpp_like : sqlpp_expr->string->sqlpp_expr := SQLPP.SPLike.
   Definition sqlpp_sqlpp_and : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPAnd.
   Definition sqlpp_sqlpp_or : sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPOr.
   Definition sqlpp_sqlpp_between : sqlpp_expr->sqlpp_expr->sqlpp_expr->sqlpp_expr := SQLPP.SPBetween.

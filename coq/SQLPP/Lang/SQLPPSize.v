@@ -60,10 +60,11 @@ Section SQLPPSize.
   	| SPGt  e1 e2
   	| SPLe  e1 e2
   	| SPGe  e1 e2
-  	| SPLike  e1 e2
   	| SPAnd  e1 e2
   	| SPOr  e1 e2
   		=> 1 + (sqlpp_expr_size  e1) + (sqlpp_expr_size  e2)
+  	| SPLike  e1 e2
+  		=> 1 + (sqlpp_expr_size  e1)
 	| SPBetween  e1 e2 e3
 		=> 1 + (sqlpp_expr_size  e1) + (sqlpp_expr_size  e2) + (sqlpp_expr_size  e3)
 	| SPSimpleCase  e l o
@@ -97,7 +98,7 @@ Section SQLPPSize.
 	| SPBag l
 		=> 1 + (List.fold_left (fun acc expr => acc + 1 + sqlpp_expr_size expr) l 0)
 	| SPObject l
-		=> 1 + (List.fold_left (fun acc pair => acc + (1 + (sqlpp_expr_size (fst pair)) + (sqlpp_expr_size (snd pair)))) l 0)
+		=> 1 + (List.fold_left (fun acc pair => acc + (1 + (sqlpp_expr_size (snd pair)))) l 0)
 	| SPQuery stmt
 		=> 1 + (sqlpp_statement_size stmt)
       end
@@ -206,10 +207,11 @@ Section SQLPPSize.
   	| SPGt  e1 e2
   	| SPLe  e1 e2
   	| SPGe  e1 e2
-  	| SPLike  e1 e2
   	| SPAnd  e1 e2
   	| SPOr  e1 e2
   		=> max (sqlpp_expr_depth e1) (sqlpp_expr_depth e2)
+  	| SPLike  e1 e2
+  		=> sqlpp_expr_depth e1
 	| SPBetween  e1 e2 e3
 		=> max (sqlpp_expr_depth e1) (max (sqlpp_expr_depth e2) (sqlpp_expr_depth e3))
 	| SPSimpleCase  e l o
@@ -244,7 +246,7 @@ Section SQLPPSize.
 	| SPBag l
 		=> (List.fold_left (fun acc expr => max acc (sqlpp_expr_depth expr)) l 0)
 	| SPObject l
-		=> (List.fold_left (fun acc pair => max (max acc (sqlpp_expr_depth (fst pair))) (sqlpp_expr_depth (snd pair))) l 0)
+		=> List.fold_left (fun acc pair => max acc (sqlpp_expr_depth (snd pair))) l 0
 	| SPQuery stmt
 		=> sqlpp_statement_depth stmt
 	end

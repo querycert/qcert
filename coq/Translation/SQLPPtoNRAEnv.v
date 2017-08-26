@@ -31,6 +31,10 @@ Section SQLPPtoNRAEnv.
 (* Translate two expressions and build the binary equality comparison (used as a subroutine for the SPSimpleCase clause) *)
 Definition sqlpp_to_nraenv_SPEq sqlpp_to_nraenv (e1 e2:sqlpp_expr) : nraenv
   := NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2).
+  
+(* Indicates that expected functionality is not yet implemented.  *)
+Definition sqlpp_to_nraenv_not_implemented (what : string) : nraenv :=
+	NRAEnvConst (dstring ("NRAEnv translation not Implemented: " ++ what)).
            
 (* Central translation function *)	
 Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
@@ -60,7 +64,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPMod e1 e2
         => NRAEnvBinop (ABArith ArithRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPExp e1 e2
-		=> NRAEnvConst dunit (* TODO.  We either need our own binary exponent operator, or we need to
+		=> sqlpp_to_nraenv_not_implemented "exp operator" (* TODO.  We either need our own binary exponent operator, or we need to
 		      program out the logic (convert to floating point, perform operation then convert back depending on the expected type) *)
   	| SPConcat e1 e2
         => NRAEnvBinop ASConcat (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
@@ -80,11 +84,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPGe  e1 e2
   		=> NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
   	| SPLike  e s
-  		=> match s with 
-  		| SPLiteral (dstring x) => NRAEnvUnop (ALike x None) (sqlpp_to_nraenv e)
-  		| _ => NRAEnvConst dunit (* Placeholder. TODO: in SQL++ the RHS of 'like' may be any expression of string type, and is not 
-  			constrained to be a string literal.  So, the static type of s is sqlpp_expr, not string. *)
-  		end
+  		=> NRAEnvUnop (ALike s None) (sqlpp_to_nraenv e)
   	| SPAnd  e1 e2
   		=> NRAEnvBinop AAnd (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPOr  e1 e2
@@ -118,13 +118,13 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
     (* TODO: deferring translation of quantified expressions since there is no good precedent in plain SQL *)
 	| SPSome  _ _
     | SPEvery _ _
-    	=> NRAEnvConst dunit (* placeholder *)
+    	=> sqlpp_to_nraenv_not_implemented "quantified expressions (SOME | EVERY)"
 	| SPDot  expr name
 		=> NRAEnvUnop (ADot name) (sqlpp_to_nraenv expr)
     (* TODO the index operation has no obvious translation since our internal data model has only bags, not ordered lists *)
 	| SPIndex  _ _
 	| SPIndexAny _
-    	=> NRAEnvConst dunit (* placeholder *)
+    	=> sqlpp_to_nraenv_not_implemented "indexing expressions"
 	| SPLiteral d
 		=> NRAEnvConst d
 	(* TODO: Our internal data model has null but not 'missing' (unless we add a new convention).  For now, both are translated
@@ -132,14 +132,24 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPNull
   	| SPMissing
   		=> NRAEnvConst dunit
-	| SPVarRef _
-	| SPFunctionCall _ _
-	| SPArray _ (* TODO Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious *)
-	| SPBag _
-	| SPObject _ (* TODO Note: the best we are likely to do is support objects whose field names are literals.  Consider adding that
+	| SPVarRef name
+		=> NRAEnvUnop (ADot name) NRAEnvID
+	| SPFunctionCall _ _ (* TODO: there are really two cases here.  (1) Many built-in functions that are documented as part of the SQL++
+	   specification; these are really operations in disguise.  (2) User-defined functions.  These may not be supported for a while if ever *)
+    	=> sqlpp_to_nraenv_not_implemented "function call expressions"
+	(* TODO Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious.  We construct what our
+	  data model calls a bag in both cases.  Because the elements of the constructor can be arbitrary expressions, we have to
+	  construct the list programmatically.  Perhaps we should have a special case for when the elements are all constants, in which case
+	  the resulting expression can be bag constant.  *)
+	| SPArray items
+	| SPBag items
+		=> List.fold_right (fun expr acc => NRAEnvBinop AUnion (sqlpp_to_nraenv expr) acc) (NRAEnvConst (dcoll nil)) items
+	| SPObject items (* TODO Note: the best we are likely to do is support objects whose field names are literals.  Consider adding that
 	    restriction to the SQL++ front-end *)
+        => List.fold_right (fun (item : (string * sqlpp)) acc => let (name , expr) := item in 
+			NRAEnvBinop AConcat (NRAEnvUnop (ARec name) (sqlpp_to_nraenv expr)) acc) (NRAEnvConst (drec nil)) items
 	| SPQuery _
-		=> NRAEnvConst dunit (* TODO: placeholder *)
+    	=> sqlpp_to_nraenv_not_implemented "select expressions"
 	end.
 
 (* External entry point. *)

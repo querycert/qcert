@@ -585,13 +585,14 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	//	  | SPGt : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPLe : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPGe : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
-	//	  | SPLike : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
+	//	  | SPLike : sqlpp_expr -> string -> sqlpp_expr (* Special restriction, not in the SQL++ spec *)
 	//	  | SPAnd : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPOr : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
 	//	  | SPBetween : sqlpp_expr -> sqlpp_expr -> sqlpp_expr -> sqlpp_expr                                         
 	// Encoding:
 	//   (Plus|Minus|Mult|Div|Mod|Exp|Concat|In|Eq|Neq|Lt|Gt|Le|Ge|Like|And|Or (sqlpp_expr) (sqlpp_expr))
 	//   (Between (sqlpp_expr) (sqlpp_expr) (sqlpp_expr))
+	//
 	@Override
 	public StringBuilder visit(OperatorExpr node, StringBuilder builder) throws CompilationException {
 		List<Expression> exprs = node.getExprList();
@@ -678,7 +679,11 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		}
 		if (negated)
 			builder = startNode("Not", builder);
-		builder = makeNode(tag, builder, exprs);
+		if (op == OperatorType.LIKE)
+			/* Impleent special restriction on RHS */
+			builder = makeNode(tag, builder, exprs.get(0), getStringLiteral(exprs.get(1), "LIKE expressions"));
+		else
+			builder = makeNode(tag, builder, exprs);
 		return negated ? endNode(builder) : builder;
 	}
 
@@ -752,21 +757,23 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	public StringBuilder visit(Query node, StringBuilder builder) throws CompilationException {
 		return node.getBody().accept(this,  builder);
 	}
-
+	
 	// Grammar:
 	//	  ObjectConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
 	// 	  FieldBinding             ::= Expression ":" Expression
 	//  Apparently SQL++ is serious about the fact that the the field name is just an expression.  It must have type String,
-	//  but its value need not be statically known.
+	//  but its value need not be statically known.  In our own implementation we restrict the name to being a string literal
+	//  and reject violating cases here.
 	// Coq:
-	//    | SPObject : list (sqlpp_expr * sqlpp_expr) -> sqlpp_expr
+	//    | SPObject : list (string * sqlpp_expr) -> sqlpp_expr
 	// Encoding:
-	//   (Object  (Field (sqlpp_expr) (sqlpp_expr)) ...)
+	//   (Object  (Field name (sqlpp_expr)) ...)
 	@Override
 	public StringBuilder visit(RecordConstructor node, StringBuilder builder) throws CompilationException {
 		builder = startNode("Object", builder);
 		for (FieldBinding field : node.getFbList()) {
-			builder = makeNode("Field", builder, field.getLeftExpr(), field.getRightExpr());
+			String name = getStringLiteral(field.getLeftExpr(), "object field names");
+			builder = makeNode("Field", builder, name, field.getRightExpr());
 		}
 		return endNode(builder);
 	}
@@ -1141,6 +1148,24 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	 */
 	private StringBuilder endNode(StringBuilder builder) {
 		return builder.append(") ");
+	}
+
+	/**
+	 * In object constructions and 'like' expressions (at least) we restrict the language of certain arguments to be string literals
+	 *   instead of arbitrary expressions.  This is checked here and the String form extracted.
+	 * @param expr the Expression from which a String is extracted or else the Expression is rejected as not literal
+	 * @param context a phrase to use in the error message
+	 * @return a string if the expression is a String literal
+	 * @throws UnsupportedOperationException with an informative message if expr is not a String literal
+	 */
+	private String getStringLiteral(Expression expr, String context) {
+		if (expr.getKind() == Kind.LITERAL_EXPRESSION) {
+			Literal name = ((LiteralExpr) expr).getValue();
+			if (name.getLiteralType() == Literal.Type.STRING) {
+				return name.getStringValue();
+			}
+		}
+		throw new UnsupportedOperationException("We don't support anything except string literals in " + context);
 	}
 
 	/** Retrieve String from Identifier, ensuring no '$' prefix */

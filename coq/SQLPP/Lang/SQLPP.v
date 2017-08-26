@@ -95,6 +95,7 @@ positive, negative, exists, not, isNull, isMissing, isUnknown
 Valid operators for the second form (binary operators) are
 plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge, like, and, or
 (Actually, fuzzy-eq isn't listed in the SQL++ grammar, but it's in the AQL grammar and supported for SQL++ by AsterixDB).
+Note that we restrict the RHS of 'like' to be a String literal, which is more restrictive than the language spec.
 *)
 
   | SPPlus : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
@@ -112,7 +113,7 @@ plus, minus, mult, div, mod, exp, concat, in, fuzzy-eq, eq, neq, lt, gt, le, ge,
   | SPGt : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPLe : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPGe : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
-  | SPLike : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
+  | SPLike : sqlpp_expr -> string -> sqlpp_expr (* Note special restriction *)
   | SPAnd : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   | SPOr : sqlpp_expr -> sqlpp_expr -> sqlpp_expr
   
@@ -236,9 +237,11 @@ ObjectConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
 
 FieldBinding             ::= Expression ":" Expression
 >>
+Although SQL++ does not restrict the first expression to be a string literal, we impose that restriction in our implementation.  The
+front-end rejects violating cases.
  *)
 
-  | SPObject : list (sqlpp_expr * sqlpp_expr) -> sqlpp_expr
+  | SPObject : list (string * sqlpp_expr) -> sqlpp_expr
                              
 (**
 <<
