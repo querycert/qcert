@@ -18,7 +18,7 @@ dependencies:
     - sudo apt-get -qq update
     - sudo apt-get install -y ocaml-nox ocaml-native-compilers opam
     - opam init -a
-    - opam switch 4.5.0
+    - opam switch 4.05.0
     - eval `opam config env`
     - opam install -y ocamlbuild menhir camlp5 base64 coq.8.6.1 js_of_ocaml js_of_ocaml-ppx:
         timeout: 1200
