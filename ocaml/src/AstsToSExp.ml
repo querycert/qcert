@@ -1218,7 +1218,7 @@ let rec sqlpp_expr_to_sexp (expr : QSQLPP.sqlpp_expr) : sexp =
   | SPGt (arg1, arg2) -> STerm("Gt", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
   | SPLe (arg1, arg2) -> STerm("Le", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
   | SPGe (arg1, arg2) -> STerm("Ge", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
-  | SPLike (arg1, arg2) -> STerm("Like", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
+  | SPLike (arg1, arg2) -> STerm("Like", [sqlpp_expr_to_sexp arg1;coq_string_to_sstring arg2])
   | SPAnd (arg1, arg2) -> STerm("And", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
   | SPOr (arg1, arg2) -> STerm("Or", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2])
   | SPBetween (arg1, arg2, arg3) -> STerm("Between", [sqlpp_expr_to_sexp arg1;sqlpp_expr_to_sexp arg2;sqlpp_expr_to_sexp arg3])
@@ -1251,8 +1251,8 @@ and sqlpp_whenthen_to_sexp (whenthen : QSQLPP.sqlpp_when_then) : sexp =
 and sqlpp_var_in_to_sexp (var_in : (char list * sqlpp_expr)) : sexp =
 	STerm("VarIn", [coq_string_to_sstring (fst var_in); sqlpp_expr_to_sexp (snd var_in)])
 	
-and sqlpp_field_to_sexp (field : (sqlpp_expr * sqlpp_expr)) : sexp =
-	STerm("Field", [sqlpp_expr_to_sexp (fst field) ; sqlpp_expr_to_sexp (snd field)])
+and sqlpp_field_to_sexp (field : (char list * sqlpp_expr)) : sexp =
+	STerm("Field", [coq_string_to_sstring (fst field) ; sqlpp_expr_to_sexp (snd field)])
 	
 and sqlpp_select_to_sexp (stmt : sqlpp_select_statement) : sexp =
 	begin match stmt with
@@ -1395,7 +1395,7 @@ let rec sexp_to_sqlpp_expr (stmt : sexp)  =
 	| STerm("Gt", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_gt (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Le", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_le (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Ge", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_ge (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
-	| STerm("Like", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_like (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
+	| STerm("Like", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_like (sexp_to_sqlpp_expr expr1) (sstring_to_coq_string expr2)
 	| STerm("And", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_and (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Or", [expr1;expr2]) -> QSQLPP.sqlpp_sqlpp_or (sexp_to_sqlpp_expr expr1) (sexp_to_sqlpp_expr expr2)
 	| STerm("Between", [e1;e2;e3]) -> QSQLPP.sqlpp_sqlpp_between (sexp_to_sqlpp_expr e1) (sexp_to_sqlpp_expr e2) (sexp_to_sqlpp_expr e3)
@@ -1459,9 +1459,9 @@ and sexp_to_sqlpp_binding (se : sexp) : (char list * sqlpp_expr) =
 		raise (Qcert_Error "VarIn node not found where expected in SQL++ quantified expression")
 	end
 
-and sexp_to_sqlpp_field (se : sexp) : (sqlpp_expr * sqlpp_expr) =
+and sexp_to_sqlpp_field (se : sexp) : (char list * sqlpp_expr) =
 	begin match se with
-	| STerm ("Field", [name;value]) -> (sexp_to_sqlpp_expr name, sexp_to_sqlpp_expr value)
+	| STerm ("Field", [name;value]) -> (sstring_to_coq_string name, sexp_to_sqlpp_expr value)
 	| _ ->
 		raise (Qcert_Error "Field not found where expected in SQL++ object constructor")
 	end
