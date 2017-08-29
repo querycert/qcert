@@ -25,6 +25,5 @@ documentation: $(GLOB_FILES) $(COQ_FILES)
 	mkdir -p ../docs/html
 	rm -f ../docs/html/*.html
 	coq2html -d ../docs/html -base Qcert $^
-	cp ../docs/coq2html.css ../docs/coq2html.js ../docs/html/
 
 .PHONY: documentation

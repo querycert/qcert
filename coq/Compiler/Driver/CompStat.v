@@ -45,7 +45,6 @@ Section CompStat.
   Require Import SparkRDDRuntime.
   Require Import SparkDFRuntime.
   Require Import CloudantRuntime.
-  Require Import CloudantWhiskRuntime.
 
   Require Import CompilerRuntime.
   Require Import BasicSystem.
@@ -78,11 +77,6 @@ Section CompStat.
   Definition stat_error (q: string) : data :=
     drec
       (("error_stat", dstring "no stat available")
-         :: nil).
-
-  Definition stat_cloudant_whisk (q: cloudant_whisk) : data :=
-    drec
-      (("cloudant_whisk_stat", dstring "no stat available")
          :: nil).
 
   Definition stat_cloudant (q: cloudant) : data :=
@@ -205,11 +199,6 @@ Section CompStat.
   Definition stat_tree_error (q: string) : data :=
     drec
       (("error", stat_error q)
-         :: nil).
-
-  Definition stat_tree_cloudant_whisk (q: cloudant_whisk) : data :=
-    drec
-      (("cloudant_whisk", stat_cloudant_whisk q)
          :: nil).
 
   Definition stat_tree_cloudant (q: cloudant) : data :=
@@ -439,7 +428,6 @@ Section CompStat.
         | Q_spark_rdd q => stat_spark_rdd q
         | Q_spark_df q => stat_spark_df q
         | Q_cloudant q => stat_cloudant q
-        | Q_cloudant_whisk q => stat_cloudant_whisk q
         | Q_error q => stat_error q
         end
     in
@@ -470,7 +458,6 @@ Section CompStat.
         | Q_spark_rdd q => stat_tree_spark_rdd q
         | Q_spark_df q => stat_tree_spark_df q
         | Q_cloudant q => stat_tree_cloudant q
-        | Q_cloudant_whisk q => stat_tree_cloudant_whisk q
         | Q_error q => stat_tree_error q
         end
     in

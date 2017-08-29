@@ -45,7 +45,6 @@ Section CompLang.
     | L_spark_rdd : language
     | L_spark_df : language
     | L_cloudant : language
-    | L_cloudant_whisk : language
     | L_error : string -> language.
 
     Lemma language_eq_dec : EqDec language eq.
@@ -83,7 +82,6 @@ Section CompLang.
       | "spark_rdd"%string => L_spark_rdd
       | "spark_df"%string | "spark_dataset"%string => L_spark_df
       | "cloudant"%string => L_cloudant
-      | "cloudant_whisk"%string => L_cloudant_whisk
       | "error"%string => L_error ""
       | _ => L_error ("'"++name++"' is not a language name")
       end.
@@ -112,7 +110,6 @@ Section CompLang.
       | L_spark_rdd => "spark_rdd"%string
       | L_spark_df => "spark_df"%string
       | L_cloudant => "cloudant"%string
-      | L_cloudant_whisk => "cloudant_whisk"%string
       | L_error _ => "error"%string
       end.
 
@@ -156,7 +153,6 @@ Section CompLang.
         :: (L_spark_rdd,BackEnd,"SparkRDD", "Spark (RDD API)")
         :: (L_spark_df,BackEnd,"SparkDF", "Spark (Dataframe API)")
         :: (L_cloudant,BackEnd,"Cloudant", "Cloudant Map/Reduce Views")
-        :: (L_cloudant_whisk,BackEnd,"CloudantWhisk", "Cloudant Whisk Actions")
         :: nil.
 
     Definition add_id_to_language_description (ld:language * language_kind * string * string) :=
@@ -227,7 +223,6 @@ Section CompLang.
     Require Import SparkRDDRuntime.
     Require Import SparkDFRuntime.
     Require Import CloudantRuntime.
-    Require Import CloudantWhiskRuntime.
 
     Require Import NNRCMRtoDNNRC.
     Require Import DNNRCTypes.
@@ -263,7 +258,6 @@ Section CompLang.
     Definition spark_rdd := spark_rdd.
     Definition spark_df := spark_df.
     Definition cloudant := cloudant.
-    Definition cloudant_whisk := cloudant_whisk.
 
     Inductive query : Set :=
     | Q_camp_rule : camp_rule -> query
@@ -288,7 +282,6 @@ Section CompLang.
     | Q_spark_rdd : spark_rdd -> query
     | Q_spark_df : spark_df -> query
     | Q_cloudant : cloudant -> query
-    | Q_cloudant_whisk : cloudant_whisk -> query
     | Q_error : string -> query.
 
     Tactic Notation "query_cases" tactic(first) ident(c) :=
@@ -315,7 +308,6 @@ Section CompLang.
       | Case_aux c "Q_spark_rdd"%string
       | Case_aux c "Q_spark_df"%string
       | Case_aux c "Q_cloudant"%string
-      | Case_aux c "Q_cloudant_whisk"%string
       | Case_aux c "Q_error"%string].
 
     Definition language_of_query q :=
@@ -342,7 +334,6 @@ Section CompLang.
       | Q_spark_rdd _ => L_spark_rdd
       | Q_spark_df _ => L_spark_df
       | Q_cloudant _ => L_cloudant
-      | Q_cloudant_whisk _ => L_cloudant_whisk
       | Q_error err =>
         L_error ("No language corresponding to error query '"++err++"'")
       end.
@@ -375,7 +366,6 @@ Section CompLang.
       | L_spark_rdd => spark_rdd
       | L_spark_df => spark_df
       | L_cloudant => cloudant
-      | L_cloudant_whisk => cloudant_whisk
       | L_error _ => string
       end.
   End Query.
@@ -406,7 +396,6 @@ Tactic Notation "language_cases" tactic(first) ident(c) :=
   | Case_aux c "L_spark_rdd"%string
   | Case_aux c "L_spark_df"%string
   | Case_aux c "L_cloudant"%string
-  | Case_aux c "L_cloudant_whisk"%string
   | Case_aux c "L_error"%string].
 
 

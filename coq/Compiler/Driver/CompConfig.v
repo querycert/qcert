@@ -102,7 +102,8 @@ Section CompConfig.
     (* Each global variable has a localization and a local type *)
     Record constant_config :=
       mkConstantConfig { constant_localization : dlocalization;
-                         constant_type : rtype; }.
+                         constant_type : rtype;
+                         constant_source : option string }.
 
     Definition constants_config := list (string * constant_config).
 
@@ -122,13 +123,13 @@ Section CompConfig.
     (* Used to show a constant_config exists for a given tdbindings *)
     Definition constant_config_of_tdbinding_opt (td:string * drtype) : string * constant_config :=
       match td with
-      | (s,Tlocal t) => (s,mkConstantConfig Vlocal t)
-      | (s,Tdistr t) => (s,mkConstantConfig Vdistr (Coll t))
+      | (s,Tlocal t) => (s,mkConstantConfig Vlocal t None)
+      | (s,Tdistr t) => (s,mkConstantConfig Vdistr (Coll t) None)
       end.
     Definition constant_config_of_tdbinding (td:string * drtype) : string * constant_config :=
       match td with
-      | (s,Tlocal t) => (s,mkConstantConfig Vlocal t)
-      | (s,Tdistr t) => (s,mkConstantConfig Vdistr t)
+      | (s,Tlocal t) => (s,mkConstantConfig Vlocal t None)
+      | (s,Tdistr t) => (s,mkConstantConfig Vdistr t None)
       end.
     Definition constants_config_of_tdbindings (tds:tdbindings) : constants_config :=
       map constant_config_of_tdbinding tds.

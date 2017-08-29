@@ -251,8 +251,6 @@ export MODULES = \
 	SparkDF/SparkDFRuntime \
 	Cloudant/Lang/Cloudant \
 	Cloudant/CloudantRuntime \
-	CloudantWhisk/Lang/CloudantWhisk \
-	CloudantWhisk/CloudantWhiskRuntime \
 	Translation/ForeignToReduceOps \
 	Translation/ForeignToCloudant \
 	Translation/NRAtocNNRC \
@@ -294,7 +292,6 @@ export MODULES = \
 	Translation/ForeignToScala \
 	Translation/ForeignToSpark \
 	Translation/CldMRtoCloudant \
-	Translation/CloudanttoCloudantWhisk \
 	Translation/NNRCtoJava \
 	Translation/NNRCtoJavaScript \
 	Translation/NNRCMRtoSparkRDD \

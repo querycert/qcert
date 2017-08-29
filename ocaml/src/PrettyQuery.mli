@@ -46,7 +46,6 @@ val pretty_java : QcertCompiler.java pretty_fun
 val pretty_spark_rdd : QcertCompiler.spark_rdd pretty_fun
 val pretty_spark_df : QcertCompiler.spark_df pretty_fun
 val pretty_cloudant : QcertCompiler.cloudant pretty_fun
-val pretty_cloudant_whisk : QcertCompiler.cloudant_whisk pretty_fun
 val pretty_error : (char list) pretty_fun
 
 val pretty_query : pretty_config -> 'a pretty_fun -> 'a -> string

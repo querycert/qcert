@@ -30,12 +30,7 @@ Section DConstants.
 
   Context {fdata:foreign_data}.
 
-  (* Java equivalent: NnrcToNrcmr.localize_names *)
-  Definition mkDistNames (names: list string) : list (string * dlocalization) :=
-    map (fun x => (x, Vdistr)) names.
-
-  Definition mkDistLocs {A} (cenv: list (string * A)) : list (string * dlocalization) :=
-    mkDistNames (map fst cenv).
+  Definition source : Set := string.
 
   Definition mkDistConstant (loc:dlocalization) (d:data) :=
     match loc with
@@ -63,7 +58,7 @@ Section DConstants.
       := (WORLD, Ddistr world)::nil.
 
     (* Declares single *distributed* input collection containing world *)
-    Definition mkDistLoc : list (string*dlocalization)
+    Definition mkDistWorldLoc : list (string*dlocalization)
       := (WORLD, Vdistr)::nil.
   End World.
 

@@ -47,7 +47,6 @@ Section CompDriver.
   Require Import SparkRDDRuntime.
   Require Import SparkDFRuntime.
   Require Import CloudantRuntime.
-  Require Import CloudantWhiskRuntime.
 
   (* Translations *)
   Require Import OQLtoNRAEnv.
@@ -79,7 +78,6 @@ Section CompDriver.
   Require Import NNRCMRtoCldMR.
   Require Import NNRCMRtoDNNRC.
   Require Import CldMRtoCloudant.
-  Require Import CloudanttoCloudantWhisk.
   Require Import DNNRCtotDNNRC.
   Require Import tDNNRCtoSparkDF.
 
@@ -252,11 +250,6 @@ Section CompDriver.
     Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
       mapReducePairstoCloudant h q rulename.
 
-    (** Cloudant translations *)
-
-    Definition cloudant_to_cloudant_whisk (action_name:string) (q:cloudant) : cloudant_whisk :=
-      cloudant_to_cloudant_whisk action_name q.
-
     (** DNNRC translations *)
 
     Definition dnnrc_to_dnnrc_typed (q: dnnrc) (tdenv: tdbindings)
@@ -300,12 +293,8 @@ Section CompDriver.
   Inductive spark_df_driver : Set :=
     | Dv_spark_df_stop : spark_df_driver.
 
-  Inductive cloudant_whisk_driver : Set :=
-    | Dv_cloudant_whisk_stop : cloudant_whisk_driver.
-
   Inductive cloudant_driver : Set :=
-    | Dv_cloudant_stop : cloudant_driver
-    | Dv_cloudant_to_cloudant_whisk : (* action_name *) string -> cloudant_whisk_driver -> cloudant_driver.
+    | Dv_cloudant_stop : cloudant_driver.
 
   Inductive cldmr_driver : Set :=
     | Dv_cldmr_stop : cldmr_driver
@@ -444,7 +433,6 @@ Section CompDriver.
   | Dv_spark_rdd : spark_rdd_driver -> driver
   | Dv_spark_df : spark_df_driver -> driver
   | Dv_cloudant : cloudant_driver -> driver
-  | Dv_cloudant_whisk : cloudant_whisk_driver -> driver
   | Dv_error : string -> driver.
 
 
@@ -471,7 +459,6 @@ Section CompDriver.
     | Case_aux c "Dv_spark_rdd"%string
     | Case_aux c "Dv_spark_df"%string
     | Case_aux c "Dv_cloudant"%string
-    | Case_aux c "Dv_cloudant_whisk"%string
     | Case_aux c "Dv_error"%string ].
 
 
@@ -502,7 +489,6 @@ Section CompDriver.
     | Dv_spark_rdd _ => L_spark_rdd
     | Dv_spark_df _ => L_spark_df
     | Dv_cloudant _ => L_cloudant
-    | Dv_cloudant_whisk _ => L_cloudant_whisk
     | Dv_error err => L_error ("language of "++err)
     end.
 
@@ -529,15 +515,9 @@ Section CompDriver.
     | Dv_spark_df_stop => 1
     end.
 
-  Definition driver_length_cloudant_whisk (dv: cloudant_whisk_driver) :=
-    match dv with
-    | Dv_cloudant_whisk_stop => 1
-    end.
-
   Definition driver_length_cloudant (dv: cloudant_driver) :=
     match dv with
     | Dv_cloudant_stop => 1
-    | Dv_cloudant_to_cloudant_whisk action_name dv => 1 + driver_length_cloudant_whisk dv
     end.
 
   Definition driver_length_cldmr (dv: cldmr_driver) :=
@@ -684,7 +664,6 @@ Section CompDriver.
     | Dv_spark_rdd dv => driver_length_spark_rdd dv
     | Dv_spark_df dv => driver_length_spark_df dv
     | Dv_cloudant dv => driver_length_cloudant dv
-    | Dv_cloudant_whisk dv => driver_length_cloudant_whisk dv
     | Dv_error s => 1
     end.
 
@@ -724,21 +703,10 @@ Section CompDriver.
       in
       (Q_spark_df q) :: queries.
 
-    Definition compile_cloudant_whisk (dv: cloudant_whisk_driver) (q: cloudant_whisk) : list query :=
-      let queries :=
-          match dv with
-          | Dv_cloudant_whisk_stop => nil
-          end
-      in
-      (Q_cloudant_whisk q) :: queries.
-
     Definition compile_cloudant (dv: cloudant_driver) (q: cloudant) : list query :=
       let queries :=
           match dv with
           | Dv_cloudant_stop => nil
-          | Dv_cloudant_to_cloudant_whisk action_name dv =>
-            let q := cloudant_to_cloudant_whisk action_name q in
-            compile_cloudant_whisk dv q
           end
       in
       (Q_cloudant q) :: queries.
@@ -1017,7 +985,6 @@ Section CompDriver.
       | (Dv_spark_rdd dv, Q_spark_rdd q) => compile_spark_rdd dv q
       | (Dv_spark_df dv, Q_spark_df q) => compile_spark_df dv q
       | (Dv_cloudant dv, Q_cloudant q) => compile_cloudant dv q
-      | (Dv_cloudant_whisk dv, Q_cloudant_whisk q) => compile_cloudant_whisk dv q
       | (Dv_error s, _) => (Q_error ("[Driver Error]" ++ s)) :: nil
       | (_, _) => (Q_error "incompatible query and driver") :: nil
       end.
@@ -1051,8 +1018,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1080,8 +1046,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1109,8 +1074,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1138,8 +1102,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1167,8 +1130,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1196,8 +1158,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1225,8 +1186,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1254,8 +1214,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1283,8 +1242,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1312,8 +1270,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1341,8 +1298,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1370,8 +1326,7 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1399,8 +1354,7 @@ Section CompDriver.
       | Dv_dnnrc_typed _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1428,8 +1382,7 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1457,37 +1410,7 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_spark_df _
-      | Dv_cloudant_whisk _ =>
-          Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
-      | Dv_error err =>
-          Dv_error ("Cannot compile to error ("++err++")")
-      end
-    | L_cloudant =>
-      match dv with
-      | Dv_cloudant_whisk dv => Dv_cloudant (Dv_cloudant_to_cloudant_whisk (config.(comp_qname_lowercase)) dv)
-      | Dv_nraenv _
-      | Dv_camp_rule _
-      | Dv_tech_rule _
-      | Dv_designer_rule _
-      | Dv_camp _
-      | Dv_oql _
-      | Dv_sql _
-      | Dv_sqlpp _
-      | Dv_lambda_nra _
-      | Dv_nra _
-      | Dv_nraenv_core _
-      | Dv_nnrc_core _
-      | Dv_nnrc _
-      | Dv_nnrcmr _
-      | Dv_cldmr _
-      | Dv_dnnrc _
-      | Dv_dnnrc_typed _
-      | Dv_javascript _
-      | Dv_java _
-      | Dv_spark_rdd _
-      | Dv_spark_df _
-      | Dv_cloudant _ =>
+      | Dv_spark_df _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1516,8 +1439,7 @@ Section CompDriver.
       | Dv_java _
       | Dv_spark_rdd _
       | Dv_spark_df _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1547,8 +1469,7 @@ Section CompDriver.
       | Dv_javascript _
       | Dv_java _
       | Dv_spark_rdd _
-      | Dv_cloudant _
-      | Dv_cloudant_whisk _ =>
+      | Dv_cloudant _ =>
           Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
       | Dv_error err =>
           Dv_error ("Cannot compile to error ("++err++")")
@@ -1557,7 +1478,7 @@ Section CompDriver.
     | L_java
     | L_spark_rdd
     | L_spark_df
-    | L_cloudant_whisk =>
+    | L_cloudant =>
       Dv_error ("No compilation path from "++(name_of_language lang)++" to "++(name_of_driver dv))
     | L_error err =>
       Dv_error ("No compilation from error ("++err++")")
@@ -1587,7 +1508,6 @@ Section CompDriver.
     | L_spark_rdd => Dv_spark_rdd Dv_spark_rdd_stop
     | L_spark_df => Dv_spark_df Dv_spark_df_stop
     | L_cloudant => Dv_cloudant Dv_cloudant_stop
-    | L_cloudant_whisk => Dv_cloudant_whisk Dv_cloudant_whisk_stop
     | L_error err => Dv_error ("No driver for error: "++err)
     end.
 
@@ -1665,8 +1585,6 @@ Section CompDriver.
           brand_rel = config.(comp_brand_rel)
         | Dv_cldmr (Dv_cldmr_to_cloudant qname brand_rel _) =>
           qname = config.(comp_qname_lowercase) /\ brand_rel = config.(comp_brand_rel)
-        | Dv_cloudant (Dv_cloudant_to_cloudant_whisk qname _) =>
-          qname = config.(comp_qname_lowercase)
         | Dv_dnnrc (Dv_dnnrc_to_dnnrc_typed tdbindings _) =>
           tdbindings = tdbindings_of_constants_config config.(comp_constants)
         | Dv_dnnrc_typed (Dv_dnnrc_typed_to_spark_df tdbindings qname _) =>
@@ -1747,8 +1665,6 @@ Section CompDriver.
     | Dv_spark_rdd (Dv_spark_rdd_stop) => (L_spark_rdd, None)
     | Dv_spark_df (Dv_spark_df_stop) => (L_spark_df, None)
     | Dv_cloudant (Dv_cloudant_stop) => (L_cloudant, None)
-    | Dv_cloudant (Dv_cloudant_to_cloudant_whisk name dv) => (L_cloudant, Some (Dv_cloudant_whisk dv))
-    | Dv_cloudant_whisk (Dv_cloudant_whisk_stop) => (L_cloudant_whisk, None)
     | Dv_error err => (L_error err, None)
     end.
 
@@ -1798,32 +1714,11 @@ Section CompDriver.
     reflexivity.
   Qed.
 
-  Lemma target_language_of_driver_is_postfix_cloudant_whisk:
-    (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_cloudant_whisk dv))) (Dv_cloudant_whisk dv)).
-  Proof.
-    destruct dv.
-    reflexivity.
-  Qed.
-
   Lemma target_language_of_driver_is_postfix_cloudant:
     (forall dv, is_postfix_driver (driver_of_language (target_language_of_driver (Dv_cloudant dv))) (Dv_cloudant dv)).
   Proof.
-    destruct dv; simpl
-    ; try reflexivity
-    ; rewrite target_language_of_driver_equation
-    ; simpl.
-    - eapply is_postfix_plus_one with
-      (config:=mkDvConfig
-                 EmptyString
-                 s
-                 EmptyString
-                 nil
-                 EmptyString
-                 nil
-                 EmptyString
-                 nil) (lang:=L_cloudant)
-      ; [ eapply target_language_of_driver_is_postfix_cloudant_whisk | | ]
-      ; simpl; trivial.
+    destruct dv.
+    reflexivity.
   Qed.
 
   Lemma target_language_of_driver_is_postfix_cldmr:
@@ -2199,7 +2094,6 @@ Section CompDriver.
          target_language_of_driver_is_postfix_spark_rdd
          target_language_of_driver_is_postfix_spark_df
          target_language_of_driver_is_postfix_cloudant
-         target_language_of_driver_is_postfix_cloudant_whisk
          target_language_of_driver_is_postfix_cldmr
          target_language_of_driver_is_postfix_dnnrc_typed
          target_language_of_driver_is_postfix_dnnrc
@@ -2296,8 +2190,6 @@ Section CompDriver.
                                 (Dv_dnnrc_typed_to_spark_df (tdbindings_of_constants_config (comp_constants config0)) (comp_qname config0) s)));
             try reflexivity.
           rewrite H0; rewrite H3; reflexivity.
-        * destruct (H_config (Dv_cloudant (Dv_cloudant_to_cloudant_whisk (comp_qname_lowercase config0) c)));
-            try reflexivity.
   Qed.
 
   Theorem driver_of_path_completeness:
@@ -2433,19 +2325,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_camp_rule, L_cloudant_whisk =>
-        L_camp_rule
-          :: L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_camp_rule, L_dnnrc =>
         L_camp_rule
@@ -2597,20 +2476,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_tech_rule, L_cloudant_whisk =>
-        L_tech_rule
-          :: L_camp_rule
-          :: L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_tech_rule, L_dnnrc =>
         L_tech_rule
@@ -2766,20 +2631,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_designer_rule, L_cloudant_whisk =>
-        L_designer_rule
-          :: L_camp_rule
-          :: L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_designer_rule, L_dnnrc =>
         L_designer_rule
           :: L_camp_rule
@@ -2902,18 +2753,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_camp, L_cloudant_whisk =>
-        L_camp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_camp, L_dnnrc =>
         L_camp
@@ -3044,18 +2883,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_oql, L_cloudant_whisk =>
-        L_oql
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_oql, L_dnnrc =>
         L_oql
@@ -3188,18 +3015,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_sql, L_cloudant_whisk =>
-        L_sql
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_sql, L_dnnrc =>
         L_sql
           :: L_nraenv
@@ -3330,18 +3145,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_sqlpp, L_cloudant_whisk =>
-        L_sqlpp
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_sqlpp, L_dnnrc =>
         L_sqlpp
@@ -3474,18 +3277,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_lambda_nra, L_cloudant_whisk =>
-        L_lambda_nra
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_lambda_nra, L_dnnrc =>
         L_lambda_nra
           :: L_nraenv
@@ -3613,19 +3404,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nra, L_cloudant_whisk =>
-        L_nra
-          :: L_nraenv_core
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_nra, L_dnnrc =>
         L_nra
           :: L_nraenv_core
@@ -3747,18 +3525,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nraenv_core, L_cloudant_whisk =>
-        L_nraenv_core
-          :: L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_nraenv_core, L_dnnrc =>
         L_nraenv_core
           :: L_nraenv
@@ -3875,17 +3641,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nraenv, L_cloudant_whisk =>
-        L_nraenv
-          :: L_nraenv
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_nraenv, L_dnnrc =>
         L_nraenv
           :: L_nraenv
@@ -3985,16 +3740,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_nnrc_core, L_cloudant_whisk =>
-        L_nnrc_core
-          :: L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_nnrc_core, L_dnnrc =>
         L_nnrc_core
@@ -4096,15 +3841,6 @@ Section CompDriver.
           :: L_cldmr
           :: L_cloudant
           :: nil
-      | L_nnrc, L_cloudant_whisk =>
-        L_nnrc
-          :: L_nnrc
-          :: L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       | L_nnrc, L_dnnrc =>
         L_nnrc
           :: L_nnrc
@@ -4145,13 +3881,6 @@ Section CompDriver.
           :: L_nnrcmr
           :: L_cldmr
           :: L_cloudant
-          :: nil
-      | L_nnrcmr, L_cloudant_whisk =>
-        L_nnrcmr
-          :: L_nnrcmr
-          :: L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
           :: nil
       | L_nnrcmr, L_dnnrc =>
         L_nnrcmr
@@ -4244,11 +3973,6 @@ Section CompDriver.
         L_cldmr
           :: L_cloudant
           :: nil
-      | L_cldmr, L_cloudant_whisk =>
-        L_cldmr
-          :: L_cloudant
-          :: L_cloudant_whisk
-          :: nil
       (* From dnnrc: *)
       | L_dnnrc, L_dnnrc =>
         L_dnnrc
@@ -4289,14 +4013,6 @@ Section CompDriver.
       (* From cloudant *)
       | L_cloudant, L_cloudant =>
         L_cloudant :: nil
-      | L_cloudant, L_cloudant_whisk =>
-        L_cloudant
-          :: L_cloudant_whisk
-          :: nil
-      (* From cloudant_whisk *)
-      | L_cloudant_whisk, L_cloudant_whisk =>
-        L_cloudant_whisk
-          :: nil
       | _, _ =>
         let err :=
             "No default path defined from "++(name_of_language source)++" to "++(name_of_language target)
@@ -4394,15 +4110,6 @@ Section CompDriver.
          ; simpl
          ; trivial
          ; try solve [etransitivity; eauto with exists_path_hints; reflexivity].
-
-    Lemma exists_path_from_source_target_completeness_cloudant_whisk :
-      (forall dv,
-          exists_path_from_source_target L_cloudant_whisk (target_language_of_driver (Dv_cloudant_whisk dv))).
-    Proof.
-      destruct dv; prove_exists_path_complete.
-    Qed.
-
-    Hint Resolve exists_path_from_source_target_completeness_cloudant_whisk : exists_path_hints.
 
     Lemma exists_path_from_source_target_completeness_cloudant :
       (forall dv,
@@ -4701,7 +4408,6 @@ Section CompDriver.
     | L_spark_rdd :: L_spark_rdd :: path => L_spark_rdd :: path
     | L_spark_df :: L_spark_df :: path => L_spark_df :: path
     | L_cloudant :: L_cloudant :: path => L_cloudant :: path
-    | L_cloudant_whisk :: L_cloudant_whisk :: path => L_cloudant_whisk :: path
     | _ => path
     end.
 

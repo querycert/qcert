@@ -44,7 +44,6 @@ let output_query pconf q =
   | QcertCompiler.Q_spark_rdd q -> pretty_query pconf pretty_spark_rdd q
   | QcertCompiler.Q_spark_df q -> pretty_query pconf pretty_spark_df q
   | QcertCompiler.Q_cloudant q -> pretty_query pconf pretty_cloudant q
-  | QcertCompiler.Q_cloudant_whisk q -> pretty_query pconf pretty_cloudant_whisk q
   | QcertCompiler.Q_error q -> pretty_query pconf pretty_error q
   end
 

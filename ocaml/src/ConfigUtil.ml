@@ -103,7 +103,6 @@ let suffix_javascript () = ".js"
 let suffix_spark_rdd () = "_spark_rdd.scala"
 let suffix_spark_df () = "_spark_df.scala"
 let suffix_cld_design () = "_cloudant_design.json"
-let suffix_cld_whisk () = "_cloudant_whisk.json"
 let suffix_stats () = "_stats.json"
 let suffix_error () = ".error"
 
@@ -133,7 +132,6 @@ let suffix_of_language lang =
   | QcertCompiler.L_spark_rdd -> suffix_spark_rdd ()
   | QcertCompiler.L_spark_df -> suffix_spark_df ()
   | QcertCompiler.L_cloudant -> suffix_cld_design ()
-  | QcertCompiler.L_cloudant_whisk -> suffix_cld_whisk ()
   | QcertCompiler.L_error _ -> suffix_error ()
 
 (* let suffix_target conf = *)

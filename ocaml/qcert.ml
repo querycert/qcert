@@ -121,8 +121,7 @@ let languages =
     QcertCompiler.L_java;
     QcertCompiler.L_spark_rdd;
     QcertCompiler.L_spark_df;
-    QcertCompiler.L_cloudant;
-    QcertCompiler.L_cloudant_whisk; ]
+    QcertCompiler.L_cloudant; ]
 
 
 let languages_string =
