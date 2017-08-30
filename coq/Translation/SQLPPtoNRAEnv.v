@@ -115,13 +115,16 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
            in
 		   List.fold_right (fun wt acc => match wt with SPWhenThen w t => nraenv_if (sqlpp_to_nraenv w) (sqlpp_to_nraenv t) acc end) 
 		     last whenthens
-    (* TODO: deferring translation of quantified expressions since there is no good precedent in plain SQL *)
+    (* TODO: deferring translation of quantified expressions until select is translated since some of the infrastructure can be
+       reused *)
 	| SPSome  _ _
     | SPEvery _ _
     	=> sqlpp_to_nraenv_not_implemented "quantified expressions (SOME | EVERY)"
 	| SPDot  expr name
 		=> NRAEnvUnop (ADot name) (sqlpp_to_nraenv expr)
-    (* TODO the index operation has no obvious translation since our internal data model has only bags, not ordered lists *)
+    (* TODO: the index operation has no obvious translation since our internal data model has only bags, not ordered lists.  We could
+      implement Index Any without fixing this since order doesn't matter in a random selection, but we would have to tackle the issue
+      of how to achieve randomness in Coq *)
 	| SPIndex  _ _
 	| SPIndexAny _
     	=> sqlpp_to_nraenv_not_implemented "indexing expressions"
@@ -137,15 +140,14 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
 	| SPFunctionCall _ _ (* TODO: there are really two cases here.  (1) Many built-in functions that are documented as part of the SQL++
 	   specification; these are really operations in disguise.  (2) User-defined functions.  These may not be supported for a while if ever *)
     	=> sqlpp_to_nraenv_not_implemented "function call expressions"
-	(* TODO Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious.  We construct what our
+	(* Note: we don't have ordered lists in our data model so the distinction between array and bag isn't obvious.  We construct what our
 	  data model calls a bag in both cases.  Because the elements of the constructor can be arbitrary expressions, we have to
 	  construct the list programmatically.  Perhaps we should have a special case for when the elements are all constants, in which case
 	  the resulting expression can be bag constant.  *)
 	| SPArray items
 	| SPBag items
 		=> List.fold_right (fun expr acc => NRAEnvBinop AUnion (sqlpp_to_nraenv expr) acc) (NRAEnvConst (dcoll nil)) items
-	| SPObject items (* TODO Note: the best we are likely to do is support objects whose field names are literals.  Consider adding that
-	    restriction to the SQL++ front-end *)
+	| SPObject items (*Note: we only support objects whose field names are literals. *)
         => List.fold_right (fun (item : (string * sqlpp)) acc => let (name , expr) := item in 
 			NRAEnvBinop AConcat (NRAEnvUnop (ARec name) (sqlpp_to_nraenv expr)) acc) (NRAEnvConst (drec nil)) items
 	| SPQuery _
