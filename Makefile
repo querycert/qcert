@@ -405,7 +405,7 @@ qcert-ocaml:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Extracting compiler to OCaml"
 	@echo "[Q*cert] "
-	@$(MAKE) -C ocaml all
+	@$(MAKE) -C ocaml realclean all
 
 qcert-javascript:
 	@echo "[Q*cert] "

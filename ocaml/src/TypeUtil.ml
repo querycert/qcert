@@ -87,7 +87,7 @@ let lift_constant_types (bm:QType.brand_model) br glb =
 	end
     end
   in
-  (Util.char_list_of_string vname, QDriver.mk_constant_config bm loc t)
+  (Util.char_list_of_string vname, QDriver.mk_constant_config bm loc t None)
     
 let content_schema_to_globals (bm:QType.brand_model) (mc: content_schema) : QDriver.constants_config =
   let (h, _, _, globals) = mc in
