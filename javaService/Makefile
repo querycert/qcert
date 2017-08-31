@@ -19,7 +19,7 @@ else
   PATH_SEP=':'
 endif
 
-JAVA_SRCS=$(wildcard src/org/qcert/javasvc/*.java)
+JAVA_SRCS=$(wildcard src/org/qcert/javasvc/*.java src/org/qcert/util/*.java)
 CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
 
 EMPTY=
