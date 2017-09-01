@@ -355,18 +355,30 @@ all:
 	@echo "[Q*cert] "
 
 qcert-runtimes:
+	@$(MAKE) javascript-runtime
 	@$(MAKE) java-runtime
 	@$(MAKE) spark2-runtime
 
+clean-runtimes:
+	@$(MAKE) -C runtime/javascript clean
+	@$(MAKE) -C runtime/java clean
+	@$(MAKE) -C runtime/spark2 clean
+
+javascript-runtime:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Building JavaScript runtime"
+	@echo "[Q*cert] "
+	@$(MAKE) -C runtime/javascript
+
 java-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling Java runtime"
+	@echo "[Q*cert] Building Java runtime"
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtime/java
 
 spark2-runtime:
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling Spark2 runtime"
+	@echo "[Q*cert] Building Spark2 runtime"
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtime/spark2
 
@@ -429,9 +441,7 @@ remove_all_derived:
 clean:: Makefile.coq remove_all_derived
 	@$(MAKE) -f Makefile.coq clean
 	@$(MAKE) -C ocaml cleanall
-	@$(MAKE) -C runtime/java clean
-	@$(MAKE) -C runtime/spark2 clean
-	@$(MAKE) -C samples clean
+	@$(MAKE) clean-runtimes
 	@rm -f Makefile.coq
 	@rm -f *~
 
