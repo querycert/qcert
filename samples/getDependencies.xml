@@ -1,0 +1,42 @@
+<project name="dependencies" default="get">
+
+<property name="repo" value="http://central.maven.org/maven2/"/>
+	
+<property name="cloudantclient" value="com/cloudant/cloudant-client/1.2.3/cloudant-client-1.2.3.jar"/>
+<property name="cloudantclient-src" value="com/cloudant/cloudant-client/1.2.3/cloudant-client-1.2.3-sources.jar"/>
+<property name="commonscodec" value="commons-codec/commons-codec/1.9/commons-codec-1.9.jar"/>
+<property name="commonscodec-src" value="commons-codec/commons-codec/1.9/commons-codec-1.9-sources.jar"/>
+<property name="commonscollections" value="commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar"/>
+<property name="commonscollections-src" value="commons-collections/commons-collections/3.2.2/commons-collections-3.2.2-sources.jar"/>
+<property name="commonslogging" value="commons-logging/commons-logging/1.2/commons-logging-1.2.jar"/>
+<property name="commonslogging-src" value="commons-logging/commons-logging/1.2/commons-logging-1.2-sources.jar"/>
+<property name="gson" value="com/google/code/gson/gson/2.7/gson-2.7.jar"/>
+<property name="gson-src" value="com/google/code/gson/gson/2.7/gson-2.7-sources.jar"/>
+<property name="httpclient" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
+<property name="httpclient-src" value="org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2-sources.jar"/>
+<property name="httpcore" value="org/apache/httpcomponents/httpcore/4.4.5/httpcore-4.4.5.jar"/>
+<property name="httpcore-src" value="org/apache/httpcomponents/httpcore/4.4.5/httpcore-4.4.5-sources.jar"/>
+<property name="junit" value="junit/junit/4.9/junit-4.9.jar"/>
+<property name="junit-src" value="junit/junit/4.9/junit-4.9-sources.jar"/>
+
+<target name="get">
+	<delete dir="lib"/>
+	<mkdir dir="lib"/>
+	<get src="${repo}${cloudantclient}" dest="lib"/>
+	<get src="${repo}${cloudantclient-src}" dest="lib"/>
+	<get src="${repo}${commonscodec}" dest="lib"/>
+	<get src="${repo}${commonscodec-src}" dest="lib"/>
+	<get src="${repo}${commonscollections}" dest="lib"/>
+ 	<get src="${repo}${commonscollections-src}" dest="lib"/>
+ 	<get src="${repo}${commonslogging}" dest="lib"/>
+ 	<get src="${repo}${commonslogging-src}" dest="lib"/>
+	<get src="${repo}${gson}" dest="lib"/>
+	<get src="${repo}${gson-src}" dest="lib"/>
+	<get src="${repo}${httpclient}" dest="lib"/>
+	<get src="${repo}${httpclient-src}" dest="lib"/>
+	<get src="${repo}${httpcore}" dest="lib"/>
+	<get src="${repo}${httpcore-src}" dest="lib"/>
+	<get src="${repo}${junit}" dest="lib"/>
+	<get src="${repo}${junit-src}" dest="lib"/>
+</target>
+</project>

@@ -93,6 +93,9 @@ $(DEPENDENCIES):
 clean:
 	@rm -rf bin/*
 
+cleanall: clean
+	@rm -f $(DEPENDENCIES)
+
 cleantests:
 	-@rm tests/*.js tests/*.txt tests/*.sexp
 

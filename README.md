@@ -8,10 +8,10 @@ http://github.com/querycert/qcert
 
 This is the source code for Q\*cert, a framework for the development
 and verification of query compilers. It supports a rich data model and
-includes a fairly extensive compilation pipeline 'out of the box'.
+includes an extensive compilation pipeline 'out of the box'.
 
 Q\*cert is built using the Coq proof assistant
-(https://coq.inria.fr). A significant subset of the existing
+(https://coq.inria.fr). A significant subset of the provided
 compilation pipeline has been mechanically checked for correctness.
 
 ## Prerequisites
@@ -25,6 +25,7 @@ To build Q\*cert from the source, you will need:
   - menhir, a parser generator (http://gallium.inria.fr/~fpottier/menhir/)
   - camlp5, a pre-processor (http://camlp5.gforge.inria.fr)
   - base64, a library for base64 encoding and decoding (https://github.com/mirage/ocaml-base64)
+  - js\_of\_ocaml, a compiler from OCaml to JavaScript
 - Coq 8.6.1 (https://coq.inria.fr/)
 
 An easy way to get set up on most platforms is to use the OCaml
@@ -36,29 +37,35 @@ opam install ocamlbuild
 opam install menhir
 opam install camlp5
 opam install base64
+opam install js_of_ocaml js_of_ocaml-ppx
 opam install coq.8.6.1
 ```
 
 ### Java (Recommended)
 
-Parsers for SQL, SQL++, and ODM rules, parts of the Q\*cert runtime, as
-well as utilities for running compiled queries are written in Java and
-require a Java 8 compiler. Building those Java components also
-requires a recent version of ant (and the ODM rules support has
-additional pre-requisites). Both the `javac` and the `ant` executables
-must be available from the command line.
+Parsers for SQL, SQL++, and ODM rules, parts of the Q\*cert runtime,
+as well as utilities for running compiled queries are written in Java
+and require a Java 8 compiler.
+
+Building those Java components also requires a recent version of ant
+(and the ODM rules support has additional pre-requisites).
+
+Both the `javac` and the `ant` executables must be available from the
+command line.
+
+### Scala (Optional)
+
+The Q\*cert compile can generate code for Spark execution which
+requires a Scala compiler and the Scala Build Tool (sbt).
+
+Scala can be obtained from: https://www.scala-lang.org.
+
+sbt can be obtained from: http://www.scala-sbt.org.
 
 ### TypeScript (Optional)
 
 The Q\*cert distribution includes a Web demo for the compiler which
-requires js\_of\_ocaml and TypeScript.
-
-js\_of\_ocaml (http://ocsigen.org/js_of_ocaml/) can be installed as other OCaml packages using opam:
-
-```
-opam install js_of_ocaml
-opam install js_of_ocaml-ppx
-```
+is written in TypeScript.
 
 TypeScript can be obtained from: https://www.typescriptlang.org.
 
@@ -71,95 +78,96 @@ not currently have detailed instructions for how to build on Windows.
 
 ## Installing Q\*cert
 
-### Building the compiler
+### Configuration
 
-1. Compile the Coq source:
+Copy the provided configuration template:
 
 ```
-make all
+cp Makefile.config_tmpl Makefile.config
+````
+
+The default configuration assumes you have Java and Ant installed and
+attempt to build the SQL and SQL++ support. Additional configuration
+parameters can be set to support other source languages (e.g., ODM
+rules) and backends (e.g., Spark).
+
+### Building the compiler
+
+To compile Q*cert from the source, do:
+
+```
+make qcert
 ```
 
 (Note: this will take a while, you can run make faster with `make -j 8 all`)
 
-This should produce the `./bin/qcert` and `./bin/qdata` executables.
+This should produce the `qcert` and `qdata` executables in the `./bin`
+directory.
 
-### Building the Java components
+If configured for SQL or SQL++, it should also produce a file called
+`javaService.jar` and a subdirectory called `services` in the `./bin`
+directory.
 
-The Java components are built with the command
-
-```
-make javacode
-```
-
-By default, that command will build the Java runtime and the harnesses
-for running the samples, but not the SQL, SQL++, or ODM rules support.
-To build the additional components, you must be connected to the
-network and must have a copy of ant installed and accessible from the
-command line.  The additional components are built by adding make
-variable settings to the command line like this:
+You can override the configuration from the command line to build
+specific components, for instance:
 
 ```
-make SQL=yes SQLPP=yes ODM=yes javacode
+make SQL=yes SQLPP=yes JRULES=yes qcert
 ```
 
 Whichever of these additional components you choose to build, the
 selected components should be built together in one step because they
-are deployed as a set of interrelated jar files.  After javacode is
-built with any of these additional components, the qcert/bin directory
-should contain a file called `javaService.jar` and a subdirectory
-called `services`.
+are deployed as a set of interrelated jar files.
 
 Note that the ODM rules support will only build if you satisfy an
-additional dependency as outlined in the next section.
+additional dependency as outlined in README-ODM.md.
 
-### Building ODM Rules (JRules) support (Optional)
+### Building the Q\*cert runtimes
 
-The ODM rules support requires that you obtain a legal copy of the ODM
-Designer component that comes with various versions of ODM.
+To run the compiled queries, you will also need a small
+target-specific runtime (e.g., for JavaScript, Java or Spark).
 
-ODM comes in (at least) two configurations called "ODM Rules" and "ODM
-Insights".  Each comes with its own Designer, which in turn supports a
-characteristic set of languages.  There are (at least) two license
-arrangements: "ODM Classic" has only the Rules configuration and "ODM
-Advanced" comes with both Rules and Insights.  There is also ODM in
-the cloud, based on the Rules configuration.  We hope that our support
-will work with either the Insights Designer or the Rules Designer but
-we have only tested it with the Rules Designer and it only covers the
-languages that are provided by that Designer.
-
-There is no free version of ODM, but some 30 day free trial programs
-will allow you to try out certain versions.  In order to use our
-"technical" rule support, you need a binary jar available only with an
-ODM Designer.  To use the "designer" rule support, you need to fully
-install and utilize an ODM Designer.
-
-One possible route is to sign up for the 30 day free trial of ODM in
-the Cloud (https://www.bpm.ibmcloud.com/odm/index.html).  Once you are
-authorized for the trial, you can log in to the cloud service and
-obtain a copy of the ODM Rules Designer (downloaded and installed on
-your own machine).
-
-Once you have a Designer component installed on your machine, the next
-step is to find the library called **jrules-engine.jar** and copy it to
-a directory in the qcert working tree.  Start by making the directory
+To build the runtimes, do:
 
 ```
-jrules2CAMP/lib
+make qcert-runtimes
 ```
 
-if it does not already exist.
+You can override the configuration from the command line to build
+specific components, for instance:
 
-If you installed the Designer using ODM in the cloud, there is a copy
-of `jrules-engine.jar` in the `studio/lib` directory of the
-directory where the Designer is installed.  Simply copy that file into
-the `jrules2CAMP/lib` directory.  If you have some other version of
-ODM Rule Designer or Insights Designer, find the location where the
-ODM plugins are located and look for a plugin jar whose name starts
-with "com.ibm.rules.engine...".  Inside this jar you may find a copy
-of jrules-engine.jar.  Unzipping the outer jar into the
-`jrules2CAMP` directory should put a copy of jrules-engine.jar in
-the `lib` subdirectory.  Beyond those suggestions, you are on your own.
+```
+make SPARK=yes qcert-runtimes
+```
 
+### Building the Web demo (Optional)
+
+To compile the web demo, do:
+
+```
+make demo
+```
+
+If you have built Q*cert for any of the optional source languages
+(SQL, SQL++ and ODM rules), you will need to run the javaService as
+follows:
+
+```
+cd bin
+java -jar javaService.jar -server 9879
+```
+
+The Web demo can be started by opening the following HTML page:
+
+```
+webdemo/demo.html
+```
+
+A simple version for development purposes can be started by opening the following HTML page:
+
+```
+webdemo/qcert.html
+```
 
 ## Using Q\*cert
 
@@ -199,30 +207,18 @@ $ ./bin/qcert -source oql -target java samples/oql/persons1.oql
 
 This will produce a java file called `samples/oql/persons1.java`.
 
-### Run the compiled queries
+### Running the compiled queries
 
-Q\*cert targets a number of languages and data processors as backends
-(currently: JavaScript, Java, Cloudant and Spark). The way you run the
-compiled queries varies depending on the target. Usually you need two
-things: (i) a run-time library that implements some of the core
-operators assumed by the compiler (e.g., ways to access records or
-manipulate collections), and (ii) a *query runner* which allows to
-execute the query on some input data.
+We include simple query runners in the [`./samples`](./samples)
+directory in order to try the examples.
 
-Runtime libraries are in the [`./runtime`](./runtime) directory. We include simple
-query runners in the [`./samples`](./samples) directory in order to try the examples.
+#### Build the query runners
 
-#### Prerequisites
-
-The Java runtime library and the sample query runners will have been built if
-you followed the instructions above to make the optional Java components
-via
+To build the query runners, do:
 
 ```
-make javacode
+make qcert-runners
 ```
-
-Otherwise, you can do it now.
 
 #### Run queries compiled to JavaScript
 
@@ -236,7 +232,8 @@ and (ii) some input data on which to run the query. From the command
 line, you can do it as follows:
 
 ```
-java -cp bin:../lib/commons-collections-3.2.2.jar:../lib/gson-2.7.jar testing.runners.RunJavascript \
+cd samples
+java -cp bin:lib/* testing.runners.RunJavascript \
      -input oql/persons.input \
 	 -runtime ../runtime/javascript/qcert-runtime.js \
 	 oql/persons1.js
@@ -273,13 +270,13 @@ query. From the command line, you can do it as follows, first to
 compile the Java code:
 
 ```
-javac -cp bin:../runtime/java/bin:../lib/gson-2.7.jar oql/persons1.java
+javac -cp ../runtime/java/bin:bin:lib/* oql/persons1.java
 ```
 
 Then to run the compiled Class:
 
 ```
-java -cp bin:../runtime/java/bin:../lib/gson-2.7.jar:oql testing.runners.RunJava \
+java -cp ../runtime/java/bin:bin:lib/*:oql testing.runners.RunJava \
      -input oql/persons.input \
 	 persons1
 ```
@@ -293,13 +290,7 @@ make run_java_persons1
 
 #### Spark Dataset backend
 
-To compile the Spark runtime and run queries on Spark you need `sbt`
-and `spark-submit` on your path.
-
-- [sbt](http://www.scala-sbt.org/)
-- [Spark](https://spark.apache.org/)
-
-Currently there is only one Spark example. You can compile and run it like this:
+We provide a Spark example in `samples/spark2`. To compile and run it, do:
 
 ```
 make spark2-runtime
@@ -307,13 +298,16 @@ cd samples/spark2/
 ./run.sh
 ```
 
+## Documentation
+
+Code documentation and background information can be found at: https://querycert.github.io
+
 
 ## Caveats
 
 - There is no official support for Windows, although some success has been reported using Cygwin
-- The Spark 2 target is in development, and not yet operational
-- The documentation is based on an early version of the compiler and is outdated
-- Support for the source miniOQL language is preliminary
+- The Spark 2 target is under development
+- Some of the source languages are only partially supported
 
 
 ## License
@@ -325,8 +319,4 @@ Q\*cert is distributed under the terms of the Apache 2.0 License, see `./LICENSE
 Q\*cert is still at an early phase of development and we welcome
 contributions. Contributors are expected to submit a 'Developer's
 Certificate of Origin' which can be found in ./DCO1.1.txt.
-
-## Documentation
-
-Code documentation and background information can be found at: https://querycert.github.io
 

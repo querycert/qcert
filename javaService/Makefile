@@ -36,12 +36,8 @@ all:
 	$(MAKE) classes
 
 # Install target must execute AFTER various services (statically dependent on this code) have been built and exported	
-install:	sqlparser
+install:
 	ant -f export.xml
-
-# Builds SQL parser service
-sqlparser:
-	$(MAKE) -C ../sqlParser	
 
 classes: $(CLASSES)
 
@@ -54,3 +50,7 @@ $(DEPENDENCIES):
 
 clean:
 	@rm -rf bin/*
+
+cleanall: clean
+	@rm -f $(DEPENDENCIES)
+

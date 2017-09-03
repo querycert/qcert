@@ -27,3 +27,6 @@ $(CLASSES): $(JAVA_SRCS)
 
 clean:
 	@rm -rf bin/*
+
+cleanall: clean
+

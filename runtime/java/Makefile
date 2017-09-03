@@ -13,40 +13,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-OSTYPE=$(shell uname -o)
-
-JAVA_SRCS=src/JavaTestRunner.java $(wildcard src/org/qcert/runtime/*.java)
-CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
-
-ifeq ($(OSTYPE),Cygwin)
+ifeq ($(OS),Windows_NT)
   PATH_SEP=';'
 else
-  ifeq ($(OSTYPE),Msys)
-    PATH_SEP=';'
-  else
-    PATH_SEP=':'
-  endif
+  PATH_SEP=':'
 endif
+
+JAVA_SRCS=$(wildcard src/*.java src/org/qcert/runtime/*.java)
+CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
 
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-RAWCPATH=bin $(wildcard ../../lib/*.jar)
-CPATH=$(subst $(BLANK),$(PATH_SEP),$(RAWCPATH))
+# Keep this list accurate as dependencies evolve or versions change
+DEPENDENCIES=lib/gson-2.7.jar
+CPATH=$(subst $(BLANK),$(PATH_SEP),$(DEPENDENCIES))
 
+JAVAC=javac
+
+# Default target just builds the code
 all:
 	$(MAKE) classes
 
 classes: $(CLASSES)
 
-$(CLASSES): $(JAVA_SRCS)
+$(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
 	-mkdir -p bin
 	$(JAVABASE)javac -g -sourcepath src -d bin -cp $(CPATH) $(JAVA_SRCS)
 
+$(DEPENDENCIES):
+	ant -f getDependencies.xml
+
 clean:
 	-rm -fr bin/*
-	-rm -f *~
 
-.PRECIOUS: bin/*/*.class bin/*/*/*.class
+cleanall: clean
+	@rm -f $(DEPENDENCIES)
+

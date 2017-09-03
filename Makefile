@@ -14,10 +14,11 @@
 # limitations under the License.
 #
 
+include Makefile.config
+
+#
 CP=cp
 TSC?=tsc
-
-DIST_DIR=
 
 export MODULES = \
 	Basic/Util/Digits \
@@ -343,26 +344,111 @@ export MODULES = \
 	Tests/CompilerTest
 
 FILES = $(addprefix coq/,$(MODULES:%=%.v))
-SQL=
-SQLPP=
-ODM=
 
+## Compiler
 all:
 	@$(MAKE) qcert
+
+qcert: Makefile.coq
+	@$(MAKE) qcert-coq
+	@$(MAKE) qcert-ocaml
+	@$(MAKE) qcert-javascript
+	@$(MAKE) qcert-java
 	@echo "[Q*cert] "
 	@echo "[Q*cert] To compile the runtimes, do:"
 	@echo "[Q*cert]   make qcert-runtimes"
 	@echo "[Q*cert] "
 
+qcert-coq: Makefile.coq
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling Coq source"
+	@echo "[Q*cert] "
+	@$(MAKE) -f Makefile.coq
+
+qcert-ocaml:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Extracting compiler to OCaml"
+	@echo "[Q*cert] "
+	@$(MAKE) -C ocaml cleanall all
+
+qcert-javascript:
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Extracting compiler to JavaScript"
+	@echo "[Q*cert] "
+	@$(MAKE) -C ocaml js
+
+qcert-java:
+ifneq ($(SQL)$(SQLPP)$(JRULES),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling Java service"
+	@echo "[Q*cert] "
+	@$(MAKE) -C javaService
+endif
+ifneq ($(SQL),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling SQL support"
+	@echo "[Q*cert] "
+	@$(MAKE) -C sqlParser
+endif
+ifneq ($(SQLPP),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling SQL++ support"
+	@echo "[Q*cert] "
+	@$(MAKE) -C sqlppParser
+endif
+ifneq ($(JRULES),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Compiling ODM rules support"
+	@echo "[Q*cert] "
+	@$(MAKE) -C camp-java
+	@$(MAKE) -C jrules2CAMP
+endif
+ifneq ($(SQL)$(SQLPP)$(JRULES),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Deploying Java service"
+	@echo "[Q*cert] "
+	@$(MAKE) -C javaService install
+endif
+
+clean-coq:
+	@$(MAKE) -f Makefile.coq clean
+
+cleanall-coq: clean-coq
+
+clean-ocaml:
+	@$(MAKE) -C ocaml clean
+
+cleanall-ocaml:
+	@$(MAKE) -C ocaml cleanall
+
+clean-java:
+	@$(MAKE) -C javaService clean
+	@$(MAKE) -C sqlParser clean
+	@$(MAKE) -C sqlppParser clean
+	@$(MAKE) -C camp-java clean
+	@$(MAKE) -C jrules2CAMP clean
+	@rm -rf bin/services
+	@rm -f bin/javaService.jar
+
+cleanall-java:
+	@$(MAKE) -C javaService cleanall
+	@$(MAKE) -C sqlParser cleanall
+	@$(MAKE) -C sqlppParser cleanall
+	@$(MAKE) -C camp-java cleanall
+	@$(MAKE) -C jrules2CAMP cleanall
+	@rm -rf bin/services
+	@rm -f bin/javaService.jar
+
+
+## Runtime
 qcert-runtimes:
 	@$(MAKE) javascript-runtime
+ifneq ($(JAVA),)
 	@$(MAKE) java-runtime
+endif
+ifneq ($(SPARK),)
 	@$(MAKE) spark2-runtime
-
-clean-runtimes:
-	@$(MAKE) -C runtime/javascript clean
-	@$(MAKE) -C runtime/java clean
-	@$(MAKE) -C runtime/spark2 clean
+endif
 
 javascript-runtime:
 	@echo "[Q*cert] "
@@ -382,55 +468,53 @@ spark2-runtime:
 	@echo "[Q*cert] "
 	@$(MAKE) -C runtime/spark2
 
-javacode:
-	@$(MAKE) java-runtime
-	@$(MAKE) -C samples
-ifneq ($(SQL)$(SQLPP)$(ODM),)
-	@$(MAKE) -C javaService
-endif
-ifneq ($(SQL),)
-	@$(MAKE) -C sqlParser
-endif
-ifneq ($(SQLPP),)
-	@$(MAKE) -C sqlppParser
-endif
-ifneq ($(ODM),)
-	@$(MAKE) -C jrules2CAMP
-endif
-ifneq ($(SQL)$(SQLPP)$(ODM),)
-	@$(MAKE) -C javaService install
-endif
+clean-runtimes:
+	@$(MAKE) -C runtime/javascript clean
+	@$(MAKE) -C runtime/java clean
+	@$(MAKE) -C runtime/spark2 clean
 
-demo: qcert qcert-javascript
+cleanall-runtimes: clean-runtimes
+
+
+## Demo
+demo: bin/qcertJS.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling TypeScript files to JavaScript"
 	@echo "[Q*cert] "
 	cd webdemo && $(TSC) -p "tsconfig.json"
 
-qcert-coq: Makefile.coq
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling Coq source"
-	@echo "[Q*cert] "
-	@$(MAKE) -f Makefile.coq
 
-qcert-ocaml:
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Extracting compiler to OCaml"
-	@echo "[Q*cert] "
-	@$(MAKE) -C ocaml realclean all
+## Runners
+qcert-runners:
+	@$(MAKE) -C samples
 
-qcert-javascript:
-	@echo "[Q*cert] "
-	@echo "[Q*cert] Extracting compiler to JavaScript"
-	@echo "[Q*cert] "
-	@$(MAKE) -C ocaml js
+clean-runners:
+	@$(MAKE) -C samples clean
 
-qcert: Makefile.coq
-	@$(MAKE) qcert-coq
-	@$(MAKE) qcert-ocaml
+cleanall-runners:
+	@$(MAKE) -C samples cleanall
 
-Makefile.coq: Makefile $(VS) $(FILES)
-	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
+## Documentation
+documentation:
+	$(MAKE) -C coq documentation
+
+
+## Cleanup
+clean: Makefile.coq remove_all_derived
+	@$(MAKE) clean-coq
+	@$(MAKE) clean-ocaml
+	@$(MAKE) clean-java
+	@$(MAKE) clean-runtimes
+	@rm -f Makefile.coq
+	@rm -f *~
+
+cleanall: Makefile.coq remove_all_derived
+	@$(MAKE) cleanall-coq
+	@$(MAKE) cleanall-ocaml
+	@$(MAKE) cleanall-java
+	@$(MAKE) cleanall-runtimes
+	@rm -f Makefile.coq
+	@rm -f *~
 
 clean_detritus:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 ./script/remove_detritus_derived_file.sh
@@ -438,35 +522,9 @@ clean_detritus:
 remove_all_derived:
 	@find . \( -name '*.vo' -or -name '*.v.d' -or -name '*.glob'  -or -name '*.aux' \) -print0 | xargs -0 rm -f
 
-clean:: Makefile.coq remove_all_derived
-	@$(MAKE) -f Makefile.coq clean
-	@$(MAKE) -C ocaml cleanall
-	@$(MAKE) clean-runtimes
-	@rm -f Makefile.coq
-	@rm -f *~
-
-cleanall: clean remove_all_derived clean_detritus
-
-DISTDIR=../qcert-0.1.0
-
-$(DISTDIR):
-	@cp -R ../qcert $(DISTDIR)
-	@rm -rf $(DISTDIR)/.git
-	@$(MAKE) -C $(DISTDIR) clean remove_all_derived
-
-dist:
-	$(MAKE) $(DISTDIR)
-	tar cvf $(DISTDIR).tar $(DISTDIR)
-	gzip $(DISTDIR).tar
-
-cleandist:
-	rm -rf $(DISTDIR)
-	rm -f $(DISTDIR).tar.gz
-
-documentation:
-	$(MAKE) -C coq documentation
-
-documentation_old: Makefile.coq
-	@$(MAKE) -f Makefile.coq html
+##
+Makefile.coq: Makefile $(VS) $(FILES)
+	@coq_makefile -f _CoqProject $(FILES) -o Makefile.coq
 
 .PHONY: all clean clean_detritus documentation documentation_old
+

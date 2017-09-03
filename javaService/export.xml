@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_server_jar" name="Export artifacts from sqlParser project to bin">
+<project default="create_server_jar" name="Export artifacts from javaService project to bin">
 
 	<property name="dest" value="../bin"/>
 

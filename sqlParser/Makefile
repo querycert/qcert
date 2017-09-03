@@ -47,3 +47,7 @@ $(DEPENDENCIES):
 
 clean:
 	@rm -rf bin/*
+
+cleanall: clean
+	@rm -f $(DEPENDENCIES)
+
