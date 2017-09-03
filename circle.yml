@@ -25,9 +25,8 @@ dependencies:
     - if [[ ! -d ~/spark-2.1.1-bin-hadoop2.7 ]]; then cd ~/ && wget http://www.mirrorservice.org/sites/ftp.apache.org/spark/spark-2.1.1/spark-2.1.1-bin-hadoop2.7.tgz && tar xf spark-2.1.1-bin-hadoop2.7.tgz ; fi
   override:
     - cp Makefile.config_circle Makefile.config
-    - make qcert-runtimes
 
 test:
   override:
-    - eval `opam config env` && make -j1 && make qcert-javascript
+    - eval `opam config env` && make -j1 qcert && make qcert-runtimes
     - cd samples/spark2 && ./run.sh
