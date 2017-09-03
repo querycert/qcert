@@ -120,7 +120,7 @@ selected components should be built together in one step because they
 are deployed as a set of interrelated jar files.
 
 Note that the ODM rules support will only build if you satisfy an
-additional dependency as outlined in README-ODM.md.
+additional dependency as outlined in [README-ODM](README-ODM.md).
 
 ### Building the Q\*cert runtimes
 
