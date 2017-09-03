@@ -26,7 +26,7 @@ EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
 # Keep this list accurate as dependencies evolve or versions change
-DEPENDENCIES=lib/gson-2.7.jar
+DEPENDENCIES=lib/gson-2.7.jar lib/gson-2.7-sources.jar
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(DEPENDENCIES))
 
 JAVAC=javac

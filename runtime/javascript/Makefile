@@ -25,3 +25,5 @@ clean:
 	-rm -f qcert-runtime.js
 	-rm -f *~
 
+cleanall: clean
+

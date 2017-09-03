@@ -31,3 +31,6 @@ all:
 
 clean:
 	-rm -fr target project
+
+cleanall: clean
+

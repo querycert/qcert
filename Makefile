@@ -473,7 +473,10 @@ clean-runtimes:
 	@$(MAKE) -C runtime/java clean
 	@$(MAKE) -C runtime/spark2 clean
 
-cleanall-runtimes: clean-runtimes
+cleanall-runtimes:
+	@$(MAKE) -C runtime/javascript cleanall
+	@$(MAKE) -C runtime/java cleanall
+	@$(MAKE) -C runtime/spark2 cleanall
 
 
 ## Demo
@@ -505,6 +508,7 @@ clean: Makefile.coq remove_all_derived
 	@$(MAKE) clean-ocaml
 	@$(MAKE) clean-java
 	@$(MAKE) clean-runtimes
+	@$(MAKE) clean-runners
 	@rm -f Makefile.coq
 	@rm -f *~
 
@@ -513,6 +517,7 @@ cleanall: Makefile.coq remove_all_derived
 	@$(MAKE) cleanall-ocaml
 	@$(MAKE) cleanall-java
 	@$(MAKE) cleanall-runtimes
+	@$(MAKE) cleanall-runners
 	@rm -f Makefile.coq
 	@rm -f *~
 
