@@ -26,7 +26,17 @@ EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
 # Keep this list accurate as dependencies evolve or versions change
-DEPENDENCIES=lib/nanohttpd-2.3.1.jar lib/gson-2.7.jar lib/commons-csv-1.1.jar
+DEPENDENCIES=lib/nanohttpd-2.3.1.jar \
+	     lib/nanohttpd-2.3.1-sources.jar \
+	     lib/gson-2.7.jar \
+	     lib/gson-2.7-sources.jar \
+	     lib/commons-csv-1.1.jar \
+	     lib/commons-csv-1.1-sources.jar \
+	     lib/httpclient-4.5.2.jar \
+	     lib/httpclient-4.5.2-sources.jar \
+	     lib/httpcore-4.4.5.jar \
+	     lib/httpcore-4.4.5-sources.jar \
+	     lib/commons-logging-1.2.jar
 CPATH=$(subst $(BLANK),$(PATH_SEP),$(DEPENDENCIES))
 
 JAVAC=javac
@@ -53,4 +63,5 @@ clean:
 
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
+	@rm -f javaService.zip
 

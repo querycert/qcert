@@ -104,3 +104,6 @@ clean:
 	-rm -f data/*_output.json
 	-rm -f data/*_test.json
 
+cleanall: clean
+	@rm -f $(OSS_DEPENDENCIES) # Be careful not to delete jrules-engine.jar
+
