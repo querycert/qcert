@@ -63,5 +63,6 @@ clean:
 
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
+	@rm -f services/*.jar
 	@rm -f javaService.zip
 
