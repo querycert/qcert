@@ -1,0 +1,19 @@
+### Uncomment to support a given source or target language
+
+### Source languages configuration
+
+## SQL and SQL++ support requires Java and Ant
+SQL=yes
+SQLPP=yes
+
+## ODM rules support requires Java and Ant, plus a copy of the jrules-engine.jar (See README.md)
+#JRULES=yes
+
+### Target languages configuration
+
+## Java support requires Java and Ant
+JAVA=yes
+
+## Spark support requires Scala, SBT (Scala Built Tool), and Ant
+SPARK=yes
+
