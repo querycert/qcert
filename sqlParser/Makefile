@@ -37,6 +37,7 @@ CPATH=$(subst $(BLANK),$(PATH_SEP),../javaService/bin ../javaService/lib/gson-2.
 JAVAC=javac
 
 all:
+	$(MAKE) -C ../javaService all
 	$(MAKE) classes
 	ant -f export.xml
 

@@ -400,8 +400,7 @@ ifneq ($(JRULES),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling ODM rules support"
 	@echo "[Q*cert] "
-	@$(MAKE) -C camp-java
-	@$(MAKE) -C jrules2CAMP
+	@$(MAKE) -C jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
@@ -425,8 +424,7 @@ clean-java:
 	@$(MAKE) -C javaService clean
 	@$(MAKE) -C sqlParser clean
 	@$(MAKE) -C sqlppParser clean
-	@$(MAKE) -C camp-java clean
-	@$(MAKE) -C jrules2CAMP clean
+	@$(MAKE) -C jrulesParser clean
 	@rm -rf bin/services
 	@rm -f bin/javaService.jar
 
@@ -434,8 +432,7 @@ cleanall-java:
 	@$(MAKE) -C javaService cleanall
 	@$(MAKE) -C sqlParser cleanall
 	@$(MAKE) -C sqlppParser cleanall
-	@$(MAKE) -C camp-java cleanall
-	@$(MAKE) -C jrules2CAMP cleanall
+	@$(MAKE) -C jrulesParser cleanall
 	@rm -rf bin/services
 	@rm -f bin/javaService.jar
 

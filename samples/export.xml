@@ -3,8 +3,8 @@
   <property name="dest" value=".."/>
 
   <target name="create_run_jar">
-    <delete file="${dest}/bin/runners.jar"/>
-      <jar destfile="${dest}/bin/runners.jar">
+    <delete file="${dest}/bin/qcert-runners.jar"/>
+      <jar destfile="${dest}/bin/qcert-runners.jar">
         <fileset dir="bin"/>
       </jar>
       <copy todir="${dest}/lib">

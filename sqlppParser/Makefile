@@ -68,6 +68,7 @@ JS=$(patsubst %.sqlpp,%.js,$(patsubst %.sql,%.js,$(TESTS)))
 O_SEXP=$(patsubst %.sqlpp,%_sqlpp.sexp,$(TESTS))
 
 all:
+	$(MAKE) -C ../javaService all
 	$(MAKE) classes
 	ant -f export.xml
 

@@ -31,7 +31,7 @@ to a directory in the qcert working tree.  Start by making the
 directory
 
 ```
-jrules2CAMP/lib
+jrulesParser/lib
 ```
 
 if it does not already exist.
@@ -39,11 +39,11 @@ if it does not already exist.
 If you installed the Designer using ODM in the cloud, there is a copy
 of `jrules-engine.jar` in the `studio/lib` directory of the directory
 where the Designer is installed.  Simply copy that file into the
-`jrules2CAMP/lib` directory.  If you have some other version of ODM
+`jrulesParser/lib` directory.  If you have some other version of ODM
 Rule Designer or Insights Designer, find the location where the ODM
 plugins are located and look for a plugin jar whose name starts with
 "com.ibm.rules.engine...".  Inside this jar you may find a copy of
-jrules-engine.jar.  Unzipping the outer jar into the `jrules2CAMP`
+jrules-engine.jar.  Unzipping the outer jar into the `jrulesParser`
 directory should put a copy of jrules-engine.jar in the `lib`
 subdirectory.  Beyond those suggestions, you are on your own.
 

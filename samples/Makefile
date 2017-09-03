@@ -106,3 +106,10 @@ clean:
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
 
+# There's no 21, and 20 uses the not-yet-implemented groupBy.
+TESTNUMBERS = 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 22
+# Note that test 06 executes and produce a result we believe to be correct.  For some reason, ODM produces what we think is an incorrect result.
+# All other tests in TESTNUMBERS produce results identical to ODM.
+CAMPTESTS = $(foreach N,$(TESTNUMBERS),data/test$(N).camp)
+JSTESTS =  $(foreach N,$(TESTNUMBERS),data/test$(N).js)
+RUNTESTS = $(foreach N,$(TESTNUMBERS),run_test$(N))
