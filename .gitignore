@@ -1,5 +1,4 @@
 Makefile.coq
-Makefile.config
 bin/qdata
 bin/qcert
 bin/qcertJS.js

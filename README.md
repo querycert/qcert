@@ -78,19 +78,6 @@ not currently have detailed instructions for how to build on Windows.
 
 ## Installing Q\*cert
 
-### Configuration
-
-Copy the provided configuration template:
-
-```
-cp Makefile.config_tmpl Makefile.config
-````
-
-The default configuration assumes you have Java and Ant installed and
-attempt to build the SQL and SQL++ support. Additional configuration
-parameters can be set to support other source languages (e.g., ODM
-rules) and backends (e.g., Spark).
-
 ### Building the compiler
 
 To compile Q*cert from the source, do:
@@ -99,28 +86,43 @@ To compile Q*cert from the source, do:
 make qcert
 ```
 
-(Note: this will take a while, you can run make faster with `make -j 8 all`)
+(Note: this will take a while, you can run make faster with `make -j 8 qcert`)
 
 This should produce the `qcert` and `qdata` executables in the `./bin`
-directory.
 
-If configured for SQL or SQL++, it should also produce a file called
-`javaService.jar` and a subdirectory called `services` in the `./bin`
-directory.
-
-You can override the configuration from the command line to build
-specific components, for instance:
+By default, this assumes you have Java and Ant installed and attempt
+to build the SQL and SQL++ support. As a result, it should also
+produce a file called `javaService.jar` and a subdirectory called
+`services` in the `./bin` directory. The default can be changed by
+editing the following configuration file:
 
 ```
-make SQL=yes SQLPP=yes JRULES=yes qcert
+Makefile.config
 ```
 
-Whichever of these additional components you choose to build, the
-selected components should be built together in one step because they
-are deployed as a set of interrelated jar files.
+Additional configuration parameters can be set in that file to support
+other source languages (e.g., ODM rules) and backends (e.g., Spark).
+
+You can also override the configuration from the command line to build
+specific components, for instance you can turn off SQL and SQL++
+support by calling:
+
+```
+make SQL= SQLPP= qcert
+```
+
+Or you can compile with support for ODM rules by calling:
+
+```
+make ODM=yes qcert
+```
 
 Note that the ODM rules support will only build if you satisfy an
 additional dependency as outlined in [README-ODM](README-ODM.md).
+
+Whichever of these components you choose to build, they should be
+built together in one step because they are deployed as a set of
+interrelated jar files.
 
 ### Building the Q\*cert runtimes
 
@@ -161,12 +163,6 @@ The Web demo can be started by opening the following HTML page:
 
 ```
 webdemo/demo.html
-```
-
-A simple version for development purposes can be started by opening the following HTML page:
-
-```
-webdemo/qcert.html
 ```
 
 ## Using Q\*cert

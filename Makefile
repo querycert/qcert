@@ -351,9 +351,9 @@ all:
 
 qcert: Makefile.coq
 	@$(MAKE) qcert-coq
-	@$(MAKE) -j1 qcert-ocaml
-	@$(MAKE) -j1 qcert-javascript
-	@$(MAKE) -j1 qcert-java
+	@$(MAKE) MAKEFLAGS= qcert-ocaml
+	@$(MAKE) MAKEFLAGS= qcert-javascript
+	@$(MAKE) MAKEFLAGS= qcert-java
 	@echo "[Q*cert] "
 	@echo "[Q*cert] To compile the runtimes, do:"
 	@echo "[Q*cert]   make qcert-runtimes"
