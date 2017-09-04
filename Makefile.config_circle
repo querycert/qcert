@@ -14,6 +14,6 @@ SQLPP=yes
 ## Java support requires Java and Ant
 JAVA=yes
 
-## Spark support requires Scala, SBT (Scala Built Tool), and Ant
+## Spark support requires Scala and SBT (Scala Built Tool)
 SPARK=yes
 
