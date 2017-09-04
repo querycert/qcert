@@ -3,9 +3,13 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="../lib/gson-2.7.jar"/>
-	<classpathentry kind="lib" path="../lib/cloudant-client-1.2.3.jar"/>
-	<classpathentry kind="lib" path="../lib/commons-collections-3.2.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/qcertJavaRuntime"/>
+	<classpathentry kind="lib" path="lib/cloudant-client-1.2.3.jar" sourcepath="lib/cloudant-client-1.2.3-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.9.jar" sourcepath="lib/commons-codec-1.9-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.2.jar" sourcepath="lib/commons-collections-3.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar" sourcepath="lib/commons-logging-1.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.7.jar" sourcepath="lib/gson-2.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.5.2.jar" sourcepath="lib/httpclient-4.5.2-sources.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.4.5.jar" sourcepath="lib/httpcore-4.4.5-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
