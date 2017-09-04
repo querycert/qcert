@@ -32,23 +32,23 @@ MAIN3=qcertJS
 
 TARGET=native
 
+VO_FILES = $(MODULES:%=../coq/%.vo)
+
 ## Toplevel
 all: ../bin/$(MAIN) ../bin/$(MAIN2)
 
 js: ../bin/$(MAIN3).js
 
 ## Extraction
+
 extracted: extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 
-extracted/QcertCompiler.ml extracted/QcertCompiler.mli:
-	mkdir -p extracted
-	(cd extracted; coqc -R ../../coq Qcert ../QcertExtraction.v)
-
-extracted/StaticConfig.ml:
+extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli: $(VO_FILES)
+	rm -rf extracted
 	mkdir -p extracted
 	echo "(* This file is generated *)" > extracted/StaticConfig.ml
 	echo "let qcert_home = \"$(QCERT_HOME)\"" >> extracted/StaticConfig.ml
-
+	(cd extracted; coqc -R ../../coq Qcert ../QcertExtraction.v)
 
 ## Native
 ../bin/$(MAIN): extracted $(MAIN).$(TARGET)
@@ -64,12 +64,12 @@ $(MAIN2).$(TARGET): extracted
 	$(OCAMLBUILD) $(MENHIRFLAG) -Is extracted -Is src $(MAIN2).$(TARGET)
 
 ## JavaScript
-../bin/$(MAIN3).js: extracted _build/$(MAIN3).byte
-	js_of_ocaml _build/$(MAIN3).byte
-	cp _build/$(MAIN3).js ../bin/$(MAIN3).js
+../bin/$(MAIN3).js: extracted _build_js/$(MAIN3).byte
+	js_of_ocaml _build_js/$(MAIN3).byte
+	cp _build_js/$(MAIN3).js ../bin/$(MAIN3).js
 
-_build/$(MAIN3).byte: extracted $(MAIN3).ml
-	$(OCAMLBUILD) $(MENHIRFLAG) -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is extracted -Is src $(MAIN3).byte
+_build_js/$(MAIN3).byte: extracted $(MAIN3).ml
+	$(OCAMLBUILD) $(MENHIRFLAG) -build-dir _build_js -use-ocamlfind -package js_of_ocaml -package js_of_ocaml.ppx -Is extracted -Is src $(MAIN3).byte
 
 ## Whisk
 wsk-update:
