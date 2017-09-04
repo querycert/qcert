@@ -20,7 +20,7 @@
 // is going on too long.
 
 // Get dependencies.  We put our merged runtime functions at global scope so they are available to the query
-importScripts("../runtime/javascript/qcert-merged-runtime.js", "qcertPreCompiler.js", "../lib/qcertJS.js");
+importScripts("../runtime/javascript/qcert-runtime.js", "qcertPreCompiler.js", "../bin/qcertJS.js");
 
 // Here upon receiving the activation message from the main thread.  This has two possible forms.
 // 1.  An array of Strings containing inputText, schemaText, and compiledQuery (requesting Javascript execution).

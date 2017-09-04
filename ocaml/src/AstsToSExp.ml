@@ -367,10 +367,11 @@ let rec sexp_to_camp_rule (se : sexp) : QLang.camp_rule =
       Rule_return (sexp_to_camp se)
   | STerm ("Rule_match", [se]) ->
       Rule_match (sexp_to_camp se)
-  | STerm (t, _) ->
-      raise (Qcert_Error ("Not well-formed S-expr inside camp with name " ^ t))
+  (* Falls back to CAMP *)
+  | STerm (_, _) ->
+      Rule_match (sexp_to_camp se)
   | _ ->
-      raise (Qcert_Error "Not well-formed S-expr inside camp")
+      raise (Qcert_Error "Not well-formed S-expr inside camp_rule")
 
 
 (* NRA Section *)
@@ -1631,18 +1632,17 @@ let sexp_to_sqlpp (se : sexp) : QLang.sqlpp = sexp_to_sqlpp_expr se
 (* Query translations *)
 let sexp_to_query (lang: QLang.language) (se: sexp) : QLang.query =
   begin match lang with
-  | L_camp_rule ->
-      raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_tech_rule ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_designer_rule -> Q_camp_rule (sexp_to_camp_rule se)
-  | L_camp -> Q_camp (sexp_to_camp se)
   | L_oql ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_sql -> Q_sql (sexp_to_sql se)
 	| L_sqlpp -> Q_sqlpp (sexp_to_sqlpp se)
   | L_lambda_nra ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
+  | L_camp_rule -> Q_camp_rule (sexp_to_camp_rule se)
+  | L_camp -> Q_camp (sexp_to_camp se)
   | L_nra ->
       raise (Qcert_Error ("sexp to "^(QcertUtil.name_of_language lang)^" not yet implemented")) (* XXX TODO XXX *)
   | L_nraenv_core -> Q_nraenv_core (sexp_to_nraenv se)
@@ -1672,8 +1672,6 @@ let query_to_sexp (q: QLang.query) : sexp =
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_designer_rule _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
-  | Q_camp_rule q -> camp_rule_to_sexp q
-  | Q_camp q -> camp_to_sexp q
   | Q_oql _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_sql _ ->
@@ -1681,6 +1679,8 @@ let query_to_sexp (q: QLang.query) : sexp =
   | Q_sqlpp q -> sqlpp_to_sexp q
   | Q_lambda_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
+  | Q_camp_rule q -> camp_rule_to_sexp q
+  | Q_camp q -> camp_to_sexp q
   | Q_nra _ ->
       SString ((QcertUtil.name_of_query q)^" to sexp not yet implemented") (* XXX TODO XXX *)
   | Q_nraenv_core q -> nraenv_to_sexp q

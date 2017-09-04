@@ -145,7 +145,7 @@ make SPARK=yes qcert-runtimes
 To compile the web demo, do:
 
 ```
-make demo
+make qcert-demo
 ```
 
 If you have built Q*cert for any of the optional source languages

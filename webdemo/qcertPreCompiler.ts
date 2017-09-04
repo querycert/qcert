@@ -93,8 +93,8 @@ function qcertPreCompile(input: QcertCompilerConfig, callback: (result: QcertRes
             input.query = result;
             input.sourcesexp = true;
             if (sourceCAMP) {
-                input.source = "CAMP";
-                if (input.path[0].toLowerCase() == "camp")
+                input.source = "camp_rule";
+                if (input.path[0].toLowerCase() == "camp_rule")
                     input.path.shift();
             }
             console.log("Doing qcertCompile after successful preProcess");

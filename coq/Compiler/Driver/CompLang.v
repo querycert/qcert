@@ -137,7 +137,7 @@ Section CompLang.
         :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
         :: (L_tech_rule,FrontEnd,"TechRule", "Technical Rules")
         :: (L_designer_rule,FrontEnd,"DesignRule", "Designer Rules")
-        :: (L_camp_rule,FrontEnd,"CAMPRule", "Rules for CAMP")
+        :: (L_camp_rule,CoreEnd,"CAMPRule", "Rules for CAMP")
         :: (L_camp,CoreEnd,"CAMP", "Calculus of Aggregating Matching Patterns")
         :: (L_nra,CoreEnd,"NRA", "Nested Relational Algebra")
         :: (L_nraenv_core,CoreEnd,"cNRAᵉ", "Core Nested Relational Algebra with Environments")

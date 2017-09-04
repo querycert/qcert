@@ -477,7 +477,7 @@ cleanall-runtimes:
 
 
 ## Demo
-demo: bin/qcertJS.js
+qcert-demo: bin/qcertJS.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling TypeScript files to JavaScript"
 	@echo "[Q*cert] "

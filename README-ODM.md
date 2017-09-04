@@ -47,4 +47,3 @@ jrules-engine.jar.  Unzipping the outer jar into the `jrulesParser`
 directory should put a copy of jrules-engine.jar in the `lib`
 subdirectory.  Beyond those suggestions, you are on your own.
 
-
