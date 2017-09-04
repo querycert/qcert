@@ -1,15 +1,18 @@
 \begin{tikzpicture}[
    align=center,
-   node distance=1em and 1.25em,
+   node distance=1.25em and 1.5em,
    font=\footnotesize,
    every loop/.style={latex-},
  ]
 
  % Sources
  \node[lang,source]
-      (semrule) {SemRule};
+      (techrule) {TechRule};
  \node[lang,source,
-       below=of semrule]
+       below=of techrule]
+      (designrule) {\hspace*{-0.52cm}DesignerRule};
+ \node[lang,source,
+       below=of designrule]
       (lnra-src) {\hfill \NRALambda};
  \node[lang,source,
        below=of lnra-src]
@@ -23,7 +26,7 @@
 
  % ASTs
  \node[lang, coqp, hyperlink node=\coqurl{CAMPRule.Lang}{CAMPRule}{camp_rule},
-       right=of semrule]
+       right=of designrule]
       (rule) {CAMPRule};
  \node[lang, coqp, hyperlink node=\coqurl{LambdaNRA.Lang}{LambdaNRA}{lambda_nra},
        right=of lnra-src]
@@ -98,7 +101,8 @@
 
 
  % Sources
- \path[trans, tcoqc] (semrule.east) -- (rule.west);
+ \path[trans, tcoqc] (techrule.east) -- (rule.west);
+ \path[trans, tcoqc] (designrule.east) -- (rule.west);
  \path[trans, tcoqc] (lnra-src.east) -- (lnra.west);
  \path[trans, tcoqc] (sql-src.east) -- (sql.west);
  \path[trans, tcoqc] (sqlpp-src.east) -- (sqlpp.west);
