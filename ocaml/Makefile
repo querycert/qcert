@@ -32,14 +32,13 @@ MAIN3=qcertJS
 
 TARGET=native
 
-VO_FILES = $(MODULES:%=../coq/%.vo)
-
 ## Toplevel
 all: ../bin/$(MAIN) ../bin/$(MAIN2)
 
 js: ../bin/$(MAIN3).js
 
 ## Extraction
+VO_FILES = $(MODULES:%=../coq/%.vo)
 
 extracted: extracted/StaticConfig.ml extracted/QcertCompiler.ml extracted/QcertCompiler.mli
 
