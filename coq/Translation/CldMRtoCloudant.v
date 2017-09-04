@@ -368,7 +368,7 @@ Section CldMRtoCloudant.
       map (db_of_var rulename) params.
 
     (* Java equivalent: CloudantBackend.mapReducePairstoCloudant *)    
-    Definition mapReducePairstoCloudant (h:list (string*string)) (mrl : cldmr) (rulename:string) : cloudant :=
+    Definition cldmr_to_cloudant_top (h:list (string*string)) (mrl : cldmr) (rulename:string) : cloudant :=
       let mrpl := cld_mrToJS h true eol_backn quotel_double mrl in
       let last_fun := cld_mrToLastJS h true eol_backn quotel_backdouble (fst (mrl.(cldmr_last))) in
       let cld_eff_params := cld_mrParamsLast rulename (snd (mrl.(cldmr_last))) in

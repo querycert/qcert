@@ -108,7 +108,7 @@ Section NNRCMRtoNNRC.
       end
     end.
 
-  Definition nnrc_of_nnrcmr (l: nnrcmr) : option nnrc :=
+  Definition nnrc_of_nnrcmr_top (l: nnrcmr) : option nnrc :=
     let constants := map fst (mr_inputs_loc l) in
     let (last_fun, last_args) :=  mr_last l in
     let k := (gen_apply_fun_n last_fun last_args) in

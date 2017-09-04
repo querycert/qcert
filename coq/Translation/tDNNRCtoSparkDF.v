@@ -404,7 +404,7 @@ Section tDNNRCtoSparkDF.
     end.
 
   (** Toplevel entry to Spark2/Scala codegen *)
-  Definition dnnrcToSpark2Top {A : Set} (tenv:tdbindings) (name: string)
+  Definition dnnrc_typed_to_spark_df_top {A : Set} (tenv:tdbindings) (name: string)
              (e:dnnrc_dataframe_typed) : string :=
     ""
       ++ "import org.apache.spark.SparkContext" ++ eol

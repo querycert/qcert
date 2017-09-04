@@ -1,0 +1,199 @@
+\begin{tikzpicture}[
+   align=center,
+   node distance=1em and 1.25em,
+   font=\footnotesize,
+   every loop/.style={latex-},
+ ]
+
+ % Sources
+ \node[lang,source]
+      (semrule) {SemRule};
+ \node[lang,source,
+       below=of semrule]
+      (lnra-src) {\hfill \NRALambda};
+ \node[lang,source,
+       below=of lnra-src]
+      (sql-src) {SQL};
+ \node[lang,source,
+       below=of sql-src]
+      (sqlpp-src) {SQL$++$};
+ \node[lang,source,
+       below=of sqlpp-src]
+      (oql-src) {OQL};
+
+ % ASTs
+ \node[lang, coqp, hyperlink node=\coqurl{CAMPRule.Lang}{CAMPRule}{camp_rule},
+       right=of semrule]
+      (rule) {CAMPRule};
+ \node[lang, coqp, hyperlink node=\coqurl{LambdaNRA.Lang}{LambdaNRA}{lambda_nra},
+       right=of lnra-src]
+      (lnra) {\NRALambda};
+ \node[lang, coqc, hyperlink node=\coqurl{SQL.Lang}{SQL}{sql},
+       right=of sql-src]
+      (sql) {SQL};
+ \node[lang, coqc, hyperlink node=\coqurl{SQLPP.Lang}{SQLPP}{sqlpp},
+       right=of sqlpp-src]
+      (sqlpp) {SQL$++$};
+ \node[lang, coqp, hyperlink node=\coqurl{OQL.Lang}{OQL}{oql},
+       right=of oql-src]
+      (oql) {OQL};
+
+ % Core
+ \node[lang, coqp, hyperlink node=\coqurl{CAMP.Lang}{CAMP}{camp},
+       right=of rule]
+      (camp) {CAMP};
+
+ \node[lang, coqp, hyperlink node=\coqurl{NRAEnv.Lang}{NRAEnv}{nraenv},
+       right=of camp]
+      (nraenv) {\NRAEnv};
+ \node[lang, coqp, hyperlink node=\coqurl{cNRAEnv.Lang}{cNRAEnv}{nraenv_core},
+       below=2em of nraenv]
+      (cnraenv) {c\NRAEnv};
+ \node[lang, coqp, hyperlink node=\coqurl{NRA.Lang}{NRA}{nra},
+       below=2em of cnraenv]
+      (nra) {NRA};
+
+ \node[lang, coqp, hyperlink node=\coqurl{NNRC.Lang}{NNRC}{nnrc},
+       right=of nraenv]
+      (nnrc) {NNRC};
+ \node[lang, coqp, hyperlink node=\coqurl{cNNRC.Lang}{cNNRC}{nnrc_core},
+       below=2em of nnrc]
+      (cnnrc) {cNNRC};
+
+ % NNRCMR/CldMR
+ \node[lang, coqc, hyperlink node=\coqurl{NNRCMR.Lang}{NNRCMR}{nnrcmr},
+       right=of nnrc]
+      (nnrcmr) {NNRCMR};
+ \node[lang, coqc, hyperlink node=\coqurl{CldMR.Lang}{CldMR}{cldmr},
+       right=of nnrcmr]
+      (cldmr) {CldMR};
+
+
+ % Target
+ \node[lang, target, hyperlink node=\coqurl{Cloudant.Lang}{Cloudant}{cloudant},
+       right=of cldmr]
+      (cloudant) {Cloudant\\(map/reduce)};
+ \node[lang, target, hyperlink node=\coqurl{Java.Lang}{Java}{java},
+       above=0.25em of cloudant]
+      (java) {Java};
+ \node[lang, target, hyperlink node=\coqurl{JavaScript.Lang}{JavaScript}{js},
+       above=0.25em of java]
+      (js) {JavaScript};
+ \node[lang, target,
+       hyperlink node=\coqurl{SparkRDD.Lang}{SparkRDD}{spark_rdd},
+       below=0.25em of cloudant]
+      (sparkmr) {Spark\\(map/reduce)};
+ \node[lang, target,
+       hyperlink node=\coqurl{SparkDF.Lang}{SparkDF}{spark_df},
+       below=0.25em of sparkmr]
+      (sparkdf) {Spark\\(dataframes)};
+
+% DNNRC
+ \node[lang, coqc, hyperlink node=\coqurl{tDNNRC.Lang}{tDNNRC}{dnnrc_dataframe_typed},
+       below=of cldmr, left=of sparkdf]
+      (tdnnrc) {tDNNRC};
+ \node[lang, coqp, hyperlink node=\coqurl{DNNRC.Lang}{DNNRC}{dnnrc_dataframe}]
+      at (nnrcmr |- tdnnrc)
+      (dnnrc) {DNNRC};
+
+
+ % Sources
+ \path[trans, tcoqc] (semrule.east) -- (rule.west);
+ \path[trans, tcoqc] (lnra-src.east) -- (lnra.west);
+ \path[trans, tcoqc] (sql-src.east) -- (sql.west);
+ \path[trans, tcoqc] (sqlpp-src.east) -- (sqlpp.west);
+ \path[trans, tcoqc] (oql-src.east) -- (oql.west);
+
+ % ASTs
+ \path[trans, tcoqp] (rule) -- (camp)
+   \transref{3}{\coqurl{Translation}{CAMPRuletoCAMP}{camp_rule_to_camp_top}};
+ \path[trans, tcoqp] (lnra.east) -- (nraenv)
+   \transref{10}{\coqurl{Translation}{LambdaNRAtoNRAEnv}{lambda_nra_to_nraenv_top}};
+ \path[trans, tcoqc] (sql.east) -- (nraenv)
+   \transref{10}{\coqurl{Translation}{SQLtoNRAEnv}{sql_to_nraenv_top}};
+ \path[trans, tcoqc] (sqlpp.east) -- (nraenv)
+   \transref{10}{\coqurl{Translation}{SQLPPtoNRAEnv}{sqlpp_to_nraenv_top}};
+ \path[trans, tcoqp] (oql.east) -- (nraenv)
+   \transref{15}{\coqurl{Translation}{OQLtoNRAEnv}{oql_to_nraenv_top}};
+
+ % CAMP
+ \path[trans, tcoqp] (camp.east) -- (nraenv.west)
+   \transref{3}{\coqurl{Translation}{CAMPtoNRAEnv}{camp_to_nraenv_top}};
+
+ % *NRA*
+ \tikzoptimdotted[ccoqp]{nraenv}{\coqurl{NRAEnv.Optim}{NRAEnvOptimizer}{run_nraenv_optims}}
+ \path[trans, tcoqp] (nraenv.east) -- (nnrc.west)
+   \transref{3}{\coqurl{Translation}{NRAEnvtoNNRC}{nraenv_to_nnrc_top}};
+ \path[trans, tcoqp] ([xshift=0.25em] nraenv.south) -- ([xshift=0.25em] cnraenv.north)
+   \transref{3}{\coqurl{Translation}{NRAEnvtocNRAEnv}{nraenv_to_nraenv_top}};
+ \path[trans, tcoqp] ([xshift=-0.25em] cnraenv.north) -- ([xshift=-0.25em] nraenv.south)
+   \transref{3}{\coqurl{Translation}{cNRAEnvtoNRAEnv}{nraenv_core_to_nraenv_top}};
+
+ \path[trans, tcoqp] ([xshift=0.25em] cnraenv.south) -- ([xshift=0.25em] nra.north)
+   \transref{3}{\coqurl{Translation}{cNRAEnvtoNRA}{nraenv_core_to_nra_top}};
+ \path[trans, tcoqp] ([xshift=-0.25em] nra.north) -- ([xshift=-0.25em] cnraenv.south)
+   \transref{3}{\coqurl{Translation}{NRAtocNRAEnv}{nra_to_nraenv_core_top}};
+ \path[trans, tcoqp] (cnraenv) -- (cnnrc)
+   \transref{3}{\coqurl{Translation}{cNRAEnvtocNNRC}{nraenv_core_to_nnrc_core_top}};
+
+ \path[trans, tcoqp] (nra.east) -- (cnnrc)
+   \transref{5}{\coqurl{Translation}{NRAtocNNRC}{nra_to_nnrc_core_top}};
+
+ % *NNRC
+ \tikzoptimdotted[ccoqp]{nnrc}{\coqurl{NNRC.Optim}{NNRCOptimizer}{run_nnrc_optims}}
+ \path[trans, tcoqc] ([yshift=0.25em] nnrc.east) -- ([yshift=0.25em] nnrcmr.west)
+   \transref{3}{\coqurl{Translation}{NNRCtoNNRCMR}{nnrc_to_nnrcmr_top}};
+ \path[trans, tcoqc] ([yshift=-0.25em] nnrcmr.west) -- ([yshift=-0.25em] nnrc.east)
+   \transref{3}{\coqurl{Translation}{NNRCMRtoNNRC}{nnrc_of_nnrcmr_top}};
+ \path[trans, tcoqp, dotted] (nnrc) -- (dnnrc)
+   \transref{6}{\coqurl{Translation}{NNRCtoDNNRC}{nnrc_to_dnnrc_top}};
+ \path[trans, tcoqc] (nnrc)
+   .. controls ([yshift=3em] nnrcmr.north) ..
+   (js.west)
+   \transref{30}{\coqurl{Translation}{NNRCtoJavaScript}{nnrc_to_js_top}};
+ \path[trans, tcoqc] (nnrc)
+   .. controls ([yshift=2em] nnrcmr.north) ..
+   (java.west)
+   \transref{30}{\coqurl{Translation}{NNRCtoJava}{nnrc_to_java_top}};
+
+ \path[trans, tcoqp] ([xshift=0.25em] nnrc.south) -- ([xshift=0.25em] cnnrc.north)
+   \transref{3}{\coqurl{Translation}{NNRCtocNNRC}{nnrc_to_nnrc_core_top}};
+ \path[trans, tcoqp] ([xshift=-0.25em] cnnrc.north) -- ([xshift=-0.25em] nnrc.south)
+   \transref{3}{\coqurl{Translation}{cNNRCtoNNRC}{nnrc_core_to_nnrc_top}};
+
+ \path[trans, tcoqp, dotted] (cnnrc.south)
+   .. controls ([yshift=-7em] nra.south) and +(0, -1.5) ..
+   (camp.south)
+   \transref{30}{\coqurl{Translation}{cNNRCtoCAMP}{nnrc_core_to_camp_top}};
+
+
+ % NNRCMR
+ \tikzoptim[ccoqc]{nnrcmr}{\coqurl{NNRCMR.Optim}{NNRCMROptimizer}{run_nnrcmr_optims}}
+ \path[trans, tcoqc] (nnrcmr) -- (cldmr)
+   \transref{3}{\coqurl{Translation}{NNRCMRtoCldMR}{nnrcmr_to_cldmr_top}};
+ \path[trans, tcoqc] (nnrcmr)
+   .. controls ([yshift=-1em] cldmr.south) ..
+   (sparkmr)
+   \transref{10}{\coqurl{Translation}{NNRCMRtoSparkRDD}{nnrcmr_to_spark_rdd_top}};
+ \path[trans, tcoqc] (nnrcmr) -- (dnnrc)
+   \transref{5}{\coqurl{Translation}{NNRCMRtoDNNRC}{dnnrc_of_nnrcmr}};
+
+ % CldMR
+ \path[trans, tcoqc] (cldmr) -- (cloudant)
+   \transref{3}{\coqurl{Translation}{CldMRtoCloudant}{cldmr_to_cloudant_top}};
+
+ % DNNRC
+ \path[trans, tcoqc] (dnnrc) -- (tdnnrc)
+   \transref{3}{\coqurl{Translation}{DNNRCtotDNNRC}{dnnrc_to_dnnrc_typed_top}};
+
+ \tikzoptim[ccoqc]{tdnnrc}{\coqurl{DNNRC.Optim}{tDNNRCOptimizer}{run_dnnrc_optims}}
+ \path[trans, tcoqc] (tdnnrc) -- (sparkdf)
+   \transref{3}{\coqurl{Translation}{tDNNRCtoSparkDF}{dnnrc_typed_to_spark_df_top}};
+
+\end{tikzpicture}
+\vspace*{-5em}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../icfp17"
+%%% End:

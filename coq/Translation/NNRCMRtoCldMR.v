@@ -676,16 +676,16 @@ Proof.
 *)
 
   (* Java equivalent: NrcmrToCldmr.convert *)
-  Definition NNRCMRtoNNRCMRCloudantTop (mrl: nnrcmr) : cldmr :=
+  Definition nnrcmr_to_cldmr_top (mrl: nnrcmr) : cldmr :=
     let avoiddb := List.map mr_input mrl.(mr_chain) ++ List.map mr_output mrl.(mr_chain) in
     NNRCMRtoNNRCMRCloudant avoiddb mrl.
 
-  Lemma NNRCMRtoNNRCMRCloudantTop_causally_consistent mrl :
+  Lemma nnrcmr_to_cldmr_top_causally_consistent mrl :
     nnrcmr_causally_consistent mrl = true ->
-    cldmr_chain_causally_consistent (NNRCMRtoNNRCMRCloudantTop mrl).(cldmr_chain) = true.
+    cldmr_chain_causally_consistent (nnrcmr_to_cldmr_top mrl).(cldmr_chain) = true.
   Proof.
     intros cc.
-    unfold NNRCMRtoNNRCMRCloudantTop.
+    unfold nnrcmr_to_cldmr_top.
   (*   generalize (NNRCMRtoNNRCMRCloudantInit_causally_consistent *)
   (*                 (List.map mr_input l ++ List.map mr_output l) l cc nil); simpl; *)
   (*     intros HH. *)

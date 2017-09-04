@@ -141,7 +141,7 @@ Section NNRCMRtoDNNRC.
       end
     end.
 
-  Definition dnnrc_of_nnrcmr (annot: A) (l: nnrcmr) : option (@dnnrc _ A plug_type) :=
+  Definition dnnrc_of_nnrcmr_top (annot: A) (l: nnrcmr) : option (@dnnrc _ A plug_type) :=
     let constants := map fst (mr_inputs_loc l) in
     let (last_fun, last_args) :=  mr_last l in
     let k := gen_apply_fun_n annot last_fun last_args in

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Q*cert</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="./bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="navbar.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <div class="container theme-showcase" role="main">
+
+      <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">Q*cert</a>
+        </div>
+        <div class="container-fluid">
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="index.html">Home</a></li>
+              <li><a href="demo.html">Demo</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://github.com/querycert/qcert">github</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+<!-- ============ Body ============ -->
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+  <img class="img-responsive pull-right" src="qcert-logo.png" width="120" alt="Q*cert"/>
+  <h2>Q*cert</h2>
+  <p>
+    A query compiler written using
+    the <a href="https://coq.inria.fr">Coq proof assistant</a><br>
+    and a platform for implementing and verifying query compilers.
+  </p>
+
+  <div id="content" class="row spaced">
+    <div class="col-md-4">
+      <p>
+        <a class="btn btn-default btn-lg fixed-size"
+           href="http://github.com/querycert/qcert">
+          Source code
+        </a>
+      </p>
+    </div>
+    <div class="col-md-4">
+      <p>
+        <a class="btn btn-default btn-lg fixed-size"
+           href="demo.html">
+          Try it online
+        </a>
+      </p>
+    </div>
+    <!-- 
+    <div class="col-md-4">
+      <p>
+        <a class="btn btn-default btn-lg btn-warning fixed-size"
+           href="../qcert/www/demo.html">
+          SIGMOD'2017 Demo
+        </a>
+      </p>
+    </div>
+    -->
+  </div>
+
+</div><!--/.jumbotron -->
+
+<h3>What is Q*cert?</h3>
+
+<p>
+  Q*cert is a query compiler: it takes some input query and generates
+  code for execution. It can compile several source query languages,
+  such as (subsets of) SQL and OQL. It can produce code for several
+  target backends, such as Java, JavaScript, Cloudant and Spark.
+</p>
+<p>
+  Q*cert implements several intermediate languages useful for
+  compilation and optimization. The semantics of each of them is
+  precisely defined using the Coq proof assistant. Using Coq allows to
+  prove properties on these languages, to verify the correctness of
+  the translation from one to another, and to check that optimizations
+  are correct.
+</p>
+<p>
+  An architecture made of small and well defined components makes
+  Q*cert a promising platform for implementing or verifying new query
+  languages and to develop new optimizations.
+</p>
+
+<h3>Q*cert Specification</h3>
+
+<p>
+  The code for the compiler is available as open-source
+  on <a href="https://github.com/querycert/qcert">github</a>.
+</p>
+
+<p>
+  The compiler architecture and the compilation paths are discribed in
+  the <a href="html/Qcert.Compiler.Driver.CompDriver.html#driver">compiler
+  driver</a> and can be represented by the following figure:
+</p>
+
+<img src="figure/figure.svg" width="800" alt="Compilation Paths"/>
+
+<p>
+  The supported languages are:
+  <ul>
+    <li><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">𝝀NRA</a>: NRA with Lambdas</li>
+    <li><a href="html/Qcert.SQL.Lang.SQL.html#sql">SQL</a>: Structured Query Language</li>
+    <li><a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">SQL++</a>: Structured Query Language extended for JSON</li>
+    <li><a href="html/Qcert.OQL.Lang.OQL.html#oql">OQL</a>: Object Query Language</li>
+    <li><a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">TechRule</a>: ODM technical rules</li>
+    <li><a href="html/Qcert.DesignRule.Lang.DesignRule.html#designer_rule">DesignerRule</a>: ODM designer rules</li>
+    <li><a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">CAMPRule</a>: Rule Macros for CAMP</li>
+    <li><a href="html/Qcert.CAMP.Lang.CAMP.html#camp">CAMP</a>: Calculus of Aggregating Matching Patterns</li>
+    <li><a href="html/Qcert.NRA.Lang.NRA.html#nra">NRA</a>: Nested Relational Algebra</li>
+    <li><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">NRAe</a>: NRA with Environments</li>
+    <li><a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">cNRAe</a>: Core NRAe</li>
+    <li><a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc">NNRC</a>: Named Nested Relational Calculus</li>
+    <li><a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">cNNRC</a>: Core NNRC</li>
+    <li><a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe">DNNRC</a>: Distributed NNRC</li>
+    <li><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed">tDNNRC</a>: Typed DNNRC</li>
+    <li><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr">NNRCMR</a>: NNRC + Map/Reduce</li>
+    <li><a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">CldMR</a>: NNRC + Cloudant Map/Reduce</li>
+  </ul>
+</p>
+
+<h3>References</h3>
+
+<p>
+  The Q*cert development, notably the choices of intermediate
+  representations, builds on earlier work:
+</p>
+<ul>
+  <li>
+    The most complete treatment for the Nested Relational Algebra
+    (NRA) used by Q*cert can be found in Guido Moerkotte's
+    <a href="http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf">Building
+      Query Compilers</a> book (See Chapter 7: An Algebra for
+    Sets, Bags, and Sequences).
+  </li>
+  <li>
+    Our main reference for the Named Nested Relational Calculus
+    (NNRC)
+    is <a href="http://alpha.uhasselt.be/~lucp1080/polynrc.pdf">Polymorphic
+      Type Inference for the Named Nested Relational Calculus</a>
+    by Jan Van den Bussche and Stijn Vansummeren.
+  </li>
+  <li>
+    The Object Query Language (OQL) supported by Q*cert is based on
+    the <a href="http://www.odbms.org/odmg-standard/">ODMG
+      standard</a> and
+    was <a href="http://www.sciencedirect.com/science/article/pii/S0306437998000131">originally
+      designed</a> by Sophie Cluet.
+  </li>
+</ul>
+
+<h3>Publications</h3>
+
+<p>
+  Additional information on some of the novel aspects of the Q*cert
+  work can be found in research publications:
+<p>
+
+  <ul>
+    <li>
+      Initially, the Q*cert compiler has been developed as part of the
+      project <a href="https://doi.org/10.1147/JRD.2016.2527419">META:
+      Middleware for Events, Transactions, and Analytics</a> (IBM
+      Journal of Research and Development).
+    </li>
+    <li>
+      The Calculus for Aggregating Matching Patterns (CAMP) and its
+      translation to NRA and NNRC were first proposed
+      in <a href="http://drops.dagstuhl.de/opus/volltexte/2015/5237/">A
+	Pattern Calculus for Rule Languages: Expressiveness,
+	Compilation, and Mechanization</a> by Avraham Shinnar, Jerome
+      Simeon and Martin Hirzel.
+    </li>
+    <li>
+      The type system allowing a mix of nominal and structural
+      subtyping has been presented
+      in <a href="http://rd.springer.com/chapter/10.1007/978-3-319-30936-1_20?cm_mc_uid=18475580378714936652973&cm_mc_sid_50200000=">A
+      Branding Strategy for Business Types</a> by Avraham Shinnar,
+      Jerome Simeon.
+    </li>
+    <li>
+      Details on the use of Q*cert for prototyping a query compiler
+      for business rules aggregations can be found in "Experience
+      Report: Prototyping a Query Compiler Using Coq", by Joshua
+      Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and
+      Jerome Simeon (to appear at the ACM SIGPLAN ICFP'2017
+      conference, <a href="papers/jfla2017.pdf">French version</a>).
+    </li>
+    <li>
+      Details on the extension to NRA used in Q*cert and its algebraic
+      optimizer can be found in "Handling Environments in a Nested
+      Relational Algebra with Combinators and an Implementation in a
+      Verified Query Compiler", by Joshua Auerbach, Martin Hirzel,
+      Louis Mandel, Avraham Shinnar and Jerome Simeon (ACM SIGMOD'2017
+      conference).
+    </li>
+    <li>
+      A description for a full demonstration of the system can be
+      found in "Q*cert: A Platform for Implementing and Verifying
+      Query Compilers", by Joshua Auerbach, Martin Hirzel, Louis
+      Mandel, Avraham Shinnar and Jerome Simeon (ACM SIGMOD'2017
+      conference).
+    </li>
+  </ul>
+
+<h3>Related Projects</h3>
+
+<p>
+  Applying formal verification techniques to query languages and
+  compilers is an active research area. The following projects
+  have close connections with our work:
+</p>
+<ul>
+  <li>
+    Gregory Malecha and Ryan Wisnesky have recently developed
+    techniques for <a href="http://wisnesky.net/dbpl15.pdf">semantics
+      optimization of language integrated queries</a> using the Coq
+    proof assistant.
+  </li>
+  <li>
+    Veronique Benzaken, Evelyne Contejean, and Stefania Dumbrava have
+    developed
+    a <a href="https://www.lri.fr/~benzaken/papers/esop14.pdf">A
+      Coq Formalization of the Relational Data Model</a> as part
+    of the <a href="https://vals.lri.fr/contracts.html">Datacert
+      project</a>.
+  </li>
+  <li>
+    James Cheney and Christian Urban have developed a mechanization
+    for a subset of XQuery, the XML query language
+    in <a href="http://homepages.inf.ed.ac.uk/jcheney/projects/XQuery/">Mechanizing
+      the metatheory of mini-XQuery</a>.
+  </li>
+  <li>
+    Some earlier work on building a verified relational database was
+    presented
+    in <a href="http://ynot.cs.harvard.edu/papers/popl10.pdf">Toward
+      a Verified Relational Database Management System</a> by
+    Gregory Malecha, Greg Morrisett, Avraham Shinnar and Ryan
+    Wisnesky.
+  </li>
+  <li>
+    To the best of our knowledge, the first attempt at applying
+    theorem proving technology to query compilers was done as
+    part of
+    the <a href="http://www.cs.brandeis.edu/~cokokola/">Coko-Kola</a>
+    project, using
+    the <a href="http://www.sds.lcs.mit.edu/spd/larch/index.html">Larch
+      theorem prover</a>.
+  </li>
+</ul>
+
+<h3>Credits</h3>
+
+<p>
+  Q*cert initial source code was developed at the IBM T.J. Watson
+  Research Center.
+</p>
+
+
+<!-- ============================== -->
+
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="./assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script>
+    <script src="./assets/js/docs.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="./assets/js/ie10-viewport-bug-workaround.js"></script>
+
+  </body>
+</html>

@@ -226,9 +226,9 @@ Section CompDriver.
       lift_nnrc_core (nnrc_to_java_top class_name imports) (nnrc_to_nnrc_core q).
 
     (** NNRCMR translations *)
-    Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr q.
+    Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr_top q.
 
-    Definition nnrcmr_to_dnnrc (q: nnrcmr) : option dnnrc := dnnrc_of_nnrcmr tt q.
+    Definition nnrcmr_to_dnnrc (q: nnrcmr) : option dnnrc := dnnrc_of_nnrcmr_top tt q.
 
     Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
       let q := foreign_to_cloudant_prepare_nnrcmr q in
@@ -237,7 +237,7 @@ Section CompDriver.
       nnrcmr_rename_for_cloudant q.
 
     Definition nnrcmr_prepared_to_cldmr (h:list (string*string)) (q: nnrcmr) : cldmr :=
-      NNRCMRtoNNRCMRCloudantTop h q.
+      nnrcmr_to_cldmr_top h q.
 
     Definition nnrcmr_to_cldmr  (h:list (string*string)) (q: nnrcmr) : cldmr :=
       nnrcmr_prepared_to_cldmr h (nnrcmr_to_nnrcmr_cldmr_prepare q).
@@ -248,7 +248,7 @@ Section CompDriver.
     (** CldMR translations *)
 
     Definition cldmr_to_cloudant (rulename:string) (h:list (string*string)) (q:cldmr) : cloudant :=
-      mapReducePairstoCloudant h q rulename.
+      cldmr_to_cloudant_top h q rulename.
 
     (** DNNRC translations *)
 
@@ -258,7 +258,7 @@ Section CompDriver.
 
     Definition dnnrc_typed_to_spark_df
                (tenv:tdbindings) (name:string) (q:dnnrc_typed) : spark_df :=
-      @dnnrcToSpark2Top _ _ bm _ _ unit tenv name q.
+      @dnnrc_typed_to_spark_df_top _ _ bm _ _ unit tenv name q.
 
   End translations.
 

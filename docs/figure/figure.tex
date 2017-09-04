@@ -1,0 +1,28 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{xspace}
+\usepackage{pifont} % for \fleur macro
+
+\usepackage{tikz}
+\usepackage{calc}
+\usetikzlibrary{automata}
+\usetikzlibrary{positioning,calc,decorations.markings,shapes,graphs}
+
+\newcommand{\coqHTMLBase}{https://querycert.github.io}
+\newcommand{\coqBaseModule}{doc}
+\newcommand{\coqurl}[3]{\coqHTMLBase/\coqBaseModule/Qcert.#1.#2.html\##3}
+\newcommand{\projectname}{Q*cert}
+
+\newcommand{\fleur}{\ding{95}}
+\newcommand{\coqtop}{{\href{\coqHTMLBase}{\fleur}}\xspace}
+\newcommand{\coqdef}[3]{{\href{\coqurl{#1}{#2}{#3}}{\fleur}}\xspace}
+
+\newcommand{\NRAEnv}{\texorpdfstring{NRA$^{\!\mbox{\it e}}$}{NRAe}\xspace}
+\newcommand{\NRALambda}{\texorpdfstring{NRA$^{\lambda}$}{NRAλ}\xspace}
+
+
+\usepackage{hyperref}
+\begin{document}
+\input{tikzmacros}
+\input{compiler-coq}
+\end{document}
