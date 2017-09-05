@@ -23,6 +23,7 @@ CP=cp
 deploy:
 	$(CP) index.html $(QUERYCERTDOTIO)
 	$(CP) demo.html $(QUERYCERTDOTIO)
+	$(CP) doc.html $(QUERYCERTDOTIO)
 	$(CP) figure/* $(QUERYCERTDOTIO)/figure
 	$(CP) html/* $(QUERYCERTDOTIO)/html
 	$(CP) -r demo/* $(QUERYCERTDOTIO)/demo
