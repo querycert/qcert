@@ -19,11 +19,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.asterix.common.exceptions.CompilationException;
-import org.apache.asterix.common.functions.FunctionSignature;
 import org.apache.asterix.lang.common.base.Expression;
 import org.apache.asterix.lang.common.base.Expression.Kind;
 import org.apache.asterix.lang.common.base.ILangExpression;
@@ -111,6 +112,36 @@ import org.apache.asterix.lang.sqlpp.visitor.base.ISqlppVisitor;
 import org.apache.hyracks.algebricks.common.utils.Pair;
 
 public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
+	/** Pre-screening map for legal function calls.  Note that there are a few others that are turned into
+	 *  operations; they are special cases not listed here.*/
+	private static final Map<String, FunctionTemplate> functionTemplates = new HashMap<>();
+	static {
+		functionTemplates.put("get_year", new FunctionTemplate(1, 1));
+		functionTemplates.put("get_month", new FunctionTemplate(1, 1));
+		functionTemplates.put("get_day", new FunctionTemplate(1, 1));
+		functionTemplates.put("get_hour", new FunctionTemplate(1, 1));
+		functionTemplates.put("get_minute", new FunctionTemplate(1, 1));
+		functionTemplates.put("get_second", new FunctionTemplate(1, 1));
+		functionTemplates.put("get_millisecond", new FunctionTemplate(1, 1));
+		functionTemplates.put("regexp_contains", new FunctionTemplate(1, 1));
+		functionTemplates.put("avg", new FunctionTemplate(1, 1));
+		functionTemplates.put("min", new FunctionTemplate(1, 1));
+		functionTemplates.put("max", new FunctionTemplate(1, 1));
+		functionTemplates.put("count", new FunctionTemplate(1, 1));
+		functionTemplates.put("sum", new FunctionTemplate(1, 1));
+		functionTemplates.put("coll_avg", new FunctionTemplate(1, 1));
+		functionTemplates.put("coll_min", new FunctionTemplate(1, 1));
+		functionTemplates.put("coll_max", new FunctionTemplate(1, 1));
+		functionTemplates.put("coll_count", new FunctionTemplate(1, 1));
+		functionTemplates.put("coll_sum", new FunctionTemplate(1, 1));
+		functionTemplates.put("array_avg", new FunctionTemplate(1, 1));
+		functionTemplates.put("array_min", new FunctionTemplate(1, 1));
+		functionTemplates.put("array_max", new FunctionTemplate(1, 1));
+		functionTemplates.put("array_count", new FunctionTemplate(1, 1));
+		functionTemplates.put("array_sum", new FunctionTemplate(1, 1));
+		functionTemplates.put("sqrt", new FunctionTemplate(1, 1));
+		functionTemplates.put("substring", new FunctionTemplate(2, 3));
+	}
 
 	// Grammar:
 	//	 FunctionCallExpression ::= FunctionName "(" ( Expression ( "," Expression )* )? ")"
@@ -122,25 +153,26 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	// be undone here.
 	@Override
 	public StringBuilder visit(CallExpr node, StringBuilder builder) throws CompilationException {
-		FunctionSignature signature = node.getFunctionSignature();
-		String namespace = signature.getNamespace();
-		String name = namespace != null && namespace.length() > 0 ? namespace + "." + signature.getName() : signature.getName();
+		String name = node.getFunctionSignature().getName().toLowerCase();
+		List<Expression> args = node.getExprList();
 		// Handle special cases that are really unary operators
 		if (name.equals("not"))
-			return makeNode("Not", builder, node.getExprList().get(0));
+			return makeNode("Not", builder, args.get(0));
 		else if (name.equals("is-null"))
-			return makeNode("IsNull", builder, node.getExprList().get(0));
+			return makeNode("IsNull", builder, args.get(0));
 		else if (name.equals("is-missing"))
-			return makeNode("IsMissing", builder, node.getExprList().get(0));
+			return makeNode("IsMissing", builder, args.get(0));
 		else if (name.equals("is-unknown"))
-			return makeNode("IsUnknown", builder, node.getExprList().get(0));
+			return makeNode("IsUnknown", builder, args.get(0));
 		else
-			// Typical case: actually a function call.
-			return makeNode("FunctionCall", builder, name, node.getExprList());
+			// Typical case: actually a function call.  We let it through if it is on the "approved list" but boot it if not,
+			// since we can't handle arbitrary user-defined or system-extension functions (and actually can't handle many built-in
+			// AsterixDB functions at this point, either).
+			return makeNode("FunctionCall", builder, preApprove(name, args.size()), args);
 	}
 
 	// Grammar:
-	//	CaseExpression ::= SimpleCaseExpression | SearchedCaseExpression
+ 	//	CaseExpression ::= SimpleCaseExpression | SearchedCaseExpression
 	//			SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
 	//			SearchedCaseExpression ::= <CASE> ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
 	// Coq:
@@ -314,13 +346,13 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	public StringBuilder visit(FunctionDecl node, StringBuilder builder) throws CompilationException {
 		return notSupported("function declaration");
 	}
-	
+
 	// Not in grammar or Coq.
 	@Override
 	public StringBuilder visit(FunctionDropStatement node, StringBuilder builder) throws CompilationException {
 		return notSupported("drop function");
 	}
-
+	
 	// Grammar:
 	//	GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )*
 	//            ( <GROUP> <AS> Variable
@@ -388,14 +420,14 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		// Not used by SQL++ grammar (present in AQL)?
 		return notSupported("if");
 	}
-	
+
 	// Not in grammar or Coq.
 	@Override
 	public StringBuilder visit(IndependentSubquery node, StringBuilder builder) throws CompilationException {
 		// Not used by SQL++ grammar (present in AQL)?
 		return notSupported("independent subquery");
 	}
-
+	
 	// Grammar:
 	//   PathExpression  ::= PrimaryExpression ( Field | Index )*
 	//    Index           ::= "[" ( Expression | "?" ) "]"
@@ -475,7 +507,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	public StringBuilder visit(LimitClause node, StringBuilder builder) throws CompilationException {
 		return builder; // elided
 	}
-	
+
 	// Grammar:
 	//	ArrayConstructor         ::= "[" ( Expression ( "," Expression )* )? "]"
 	//	MultisetConstructor      ::= "{{" ( Expression ( "," Expression )* )? "}}"
@@ -492,7 +524,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		else
 			return makeNode("Bag", builder, node.getExprList());
 	}
-
+	
 	// Grammar:
 	//   Literal ::= StringLiteral
 	//          | IntegerLiteral
@@ -757,7 +789,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	public StringBuilder visit(Query node, StringBuilder builder) throws CompilationException {
 		return node.getBody().accept(this,  builder);
 	}
-	
+
 	// Grammar:
 	//	  ObjectConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
 	// 	  FieldBinding             ::= Expression ":" Expression
@@ -777,7 +809,7 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		}
 		return endNode(builder);
 	}
-
+	
 	// Not in grammar or Coq.
 	@Override
 	public StringBuilder visit(RecordTypeDefinition node, StringBuilder builder) throws CompilationException {
@@ -1294,6 +1326,22 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	}
 
 	/**
+	 * Check a function call to see if it is on the "approved list."  
+	 * @param name the name of the function
+	 * @param argCount the number of arguments
+	 * @return the name if approved
+	 * @throws UnsupportedOperationException with informative message if not approved
+	 */
+	private Object preApprove(String name, int argCount) {
+		FunctionTemplate t = functionTemplates.get(name);
+		if (t == null)
+			throw new UnsupportedOperationException(name + " is not a supported function");
+		if (argCount < t.minArgs || argCount > t.maxArgs)
+			throw new UnsupportedOperationException(name + " requires from " + t.minArgs + " to " + t.maxArgs + " arguments");
+		return name;
+	}
+
+	/**
 	 * Start a node
 	 * @param nodeTag the tag
 	 * @param builder the builder
@@ -1301,5 +1349,14 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	 */
 	private StringBuilder startNode(String nodeTag, StringBuilder builder) {
 		return builder.append("(").append(nodeTag).append(" ");
+	}
+	
+	private static class FunctionTemplate {
+		int minArgs;
+		int maxArgs;
+		FunctionTemplate(int minArgs, int maxArgs) {
+			this.minArgs = minArgs;
+			this.maxArgs = maxArgs;
+		}
 	}
 }
