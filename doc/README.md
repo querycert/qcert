@@ -27,7 +27,7 @@ documentation.
 
 You will need a copy of `coq2html` checked out and compiled from the
 source. You can find `coq2html` at
-`https://github.com/xavierleroy/coq2html`. It's written in OCaml and
+(https://github.com/xavierleroy/coq2html). It's written in OCaml and
 should compile easily. Once compiled you need to move the produced
 `coq2html` executable into your PATH.
 
@@ -42,7 +42,7 @@ This will regenerate the `./html` directory
 
 # To update the compilation pipeline
 
-Edit the LaTeX file `compiler-coq.tex`, then do:
+Edit the LaTeX file `figure/compiler-coq.tex`, then do:
 
 ```
 cd figure
