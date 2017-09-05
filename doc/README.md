@@ -1,7 +1,17 @@
-# The structure of the documentation
+# Overview and WARNING
 
 This directory contains the main Q*cert Web page, the Coq
 documentation in navigable form, and the Web demos.
+
+This is the official source for the documentation and the external Web
+site.
+
+*WARNING: you should never edit the external web site directly*.
+
+Instead: edit the files in this directory, then redeploy to the
+external Web site (see below).
+
+# The structure of the documentation
 
 - `demo.html` is the old demo
 - `doc.html` contains a starting point for a _Commented Coq Development_ document that helps navigate the code
@@ -39,7 +49,7 @@ cd figure
 make
 ```
 
-# To deploy the demo and documentation
+# To re-deploy the demo and documentation
 
 To deploy the demo and new documentation to the external Q*cert Web
 site, first check that the `QUERYCERTDOTIO` has the right location for
