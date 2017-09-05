@@ -157,12 +157,26 @@ cleanall-runtimes:
 
 
 ## Demo
-qcert-demo: bin/qcertJS.js
+bin/qcertJS.js:
+	@$(MAKE) qcert-javascript
+
+runtime/javascript/qcert-runtime.js:
+	@$(MAKE) javascript-runtime
+
+qcert-demo: bin/qcertJS.js runtime/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling TypeScript files to JavaScript"
 	@echo "[Q*cert] "
-	cd webdemo && $(TSC) -p "tsconfig.json"
+	$(CP) bin/qcertJS.js doc/demo
+	$(CP) runtime/javascript/qcert-runtime.js doc/demo
+	cd doc/demo && $(TSC) -p "tsconfig.json"
 
+clean-demo:
+	@rm -f doc/demo/qcertJS.js doc/demo/qcert-runtime.js
+	@rm -f doc/demo/demo.js doc/demo/qcertPreCompiler.js
+	@rm -f doc/demo/demo.js.map doc/demo/qcertPreCompiler.js.map
+
+cleanall-demo: clean-demo
 
 ## Runners
 qcert-runners:
@@ -185,6 +199,7 @@ clean: Makefile.coq remove_all_derived
 	@$(MAKE) clean-ocaml
 	@$(MAKE) clean-java
 	@$(MAKE) clean-runtimes
+	@$(MAKE) clean-demo
 	@$(MAKE) clean-runners
 	@rm -f Makefile.coq
 	@rm -f *~
@@ -194,6 +209,7 @@ cleanall: Makefile.coq remove_all_derived
 	@$(MAKE) cleanall-ocaml
 	@$(MAKE) cleanall-java
 	@$(MAKE) cleanall-runtimes
+	@$(MAKE) cleanall-demo
 	@$(MAKE) cleanall-runners
 	@rm -f Makefile.coq
 	@rm -f *~

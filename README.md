@@ -93,15 +93,15 @@ This should produce the `qcert` and `qdata` executables in the `./bin`
 By default, this assumes you have Java and Ant installed and attempt
 to build the SQL and SQL++ support. As a result, it should also
 produce a file called `javaService.jar` and a subdirectory called
-`services` in the `./bin` directory. The default can be changed by
+`services` in the `./bin` directory. The defaults can be changed by
 editing the following configuration file:
 
 ```
 Makefile.config
 ```
 
-Additional configuration parameters can be set in that file to support
-other source languages (e.g., ODM rules) and backends (e.g., Spark).
+Parameters can be set in that file to support other source languages
+(e.g., ODM rules) and backends (e.g., Spark).
 
 You can also override the configuration from the command line to build
 specific components, for instance you can turn off SQL and SQL++
@@ -111,7 +111,7 @@ support by calling:
 make SQL= SQLPP= qcert
 ```
 
-Or you can compile with support for ODM rules by calling:
+You can compile with support for ODM rules by calling:
 
 ```
 make ODM=yes qcert
@@ -135,8 +135,9 @@ To build the runtimes, do:
 make qcert-runtimes
 ```
 
-You can override the configuration from the command line to build
-specific components, for instance:
+You can override the default targets (JavaScript, Java and Cloudant),
+from the command line. For instance, you can compile the Spark runtime
+by calling:
 
 ```
 make SPARK=yes qcert-runtimes
@@ -150,19 +151,18 @@ To compile the web demo, do:
 make qcert-demo
 ```
 
-If you have built Q*cert for any of the optional source languages
-(SQL, SQL++ and ODM rules), you will need to run the javaService as
-follows:
-
-```
-cd bin
-java -jar javaService.jar -server 9879
-```
-
 The Web demo can be started by opening the following HTML page:
 
 ```
-webdemo/demo.html
+doc/demo/demo.html
+```
+
+If you want support for any of the optional source languages (SQL,
+SQL++ and ODM rules) in the demo, you will need to run the javaService
+as follows:
+
+```
+cd bin; java -jar javaService.jar -server 9879
 ```
 
 ## Using Q\*cert
