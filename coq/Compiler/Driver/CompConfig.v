@@ -52,10 +52,7 @@ Section CompConfig.
     Definition optim_config_list_type := list {l:language & (string * list (OptimizerStep (optim_type_of_language l)))}%type.
 
     Definition optim_config_list : optim_config_list_type
-      := existT _ L_nra ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
-        :: existT _ L_nraenv_core ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
-        :: existT _ L_nraenv ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
-        :: existT _ L_nnrc_core ("NNRC.Optim.TNNRCOptimizer"%string,tnnrc_optim_list)
+      := existT _ L_nraenv ("NRAEnv.Optim.NRAEnvOptimizer"%string, tnraenv_optim_list)
         :: existT _ L_nnrc ("NNRC.Optim.TNNRCOptimizer"%string,tnnrc_optim_list)
         :: nil.
 
@@ -63,12 +60,9 @@ Section CompConfig.
       list (language * optim_phases_config).
 
     Definition optim_config_default : optim_config :=
-      (* Same default optimizations for NRA, NRAEnv and NRAEnvCore *)
-      (L_nra, default_nraenv_optim_phases)
-        :: (L_nraenv_core, default_nraenv_optim_phases)
-        :: (L_nraenv, default_nraenv_optim_phases)
-        (* Same default optimizations for NNRC and NNRCCore *)
-        :: (L_nnrc_core, default_nnrc_optim_phases)
+      (* Default optimizations for NRAEnv *)
+      (L_nraenv, default_nraenv_optim_phases)
+        (* Default optimizations for NNRC *)
         :: (L_nnrc, default_nnrc_optim_phases)
         :: nil.
 
