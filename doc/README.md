@@ -52,12 +52,12 @@ make
 # To re-deploy the demo and documentation
 
 To deploy the demo and new documentation to the external Q*cert Web
-site, first check that the `QUERYCERTDOTIO` has the right location for
-your checkout of the `querycert.github.io` project. By default, it's
-assumed to be checked out from github as a sibbling of the `qcert`
-repository.
+site, first check that the `QUERYCERTDOTIO` in `doc/Makefile` has the
+right location for your git checkout of the `querycert.github.io`
+project. By default, it's assumed to be checked out from github as a
+sibbling of the `qcert` repository.
 
-Then do:
+Then from the `doc` directory, do:
 ```
 make deploy
 ```
