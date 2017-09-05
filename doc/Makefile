@@ -14,18 +14,14 @@
 # limitations under the License.
 #
 
-###
-### WARNING: This file is meant to be invoked by the qcert/Makefile documentation target, not run directly
-###
+QUERYCERTDOTIO=../../querycert.github.io
 
-include ../Makefile.coq_modules
+#
+CP=cp
 
-COQ_FILES = $(MODULES:%=%.v)
-GLOB_FILES = $(MODULES:%=%.glob)
+## Deploy documentation
+deploy:
+	$(CP) index.html $(QUERYCERTDOTIO)
+	$(CP) figure/* $(QUERYCERTDOTIO)/figure
+	$(CP) html/* $(QUERYCERTDOTIO)/html
 
-documentation: $(GLOB_FILES) $(COQ_FILES)
-	mkdir -p ../doc/html
-	rm -f ../doc/html/*.html
-	coq2html -d ../doc/html -base Qcert $^
-
-.PHONY: documentation

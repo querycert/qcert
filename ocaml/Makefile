@@ -14,6 +14,8 @@
 # limitations under the License.
 #
 
+include ../Makefile.coq_modules
+
 ## Configuraton
 QCERT_HOME=$(CURDIR)/..
 
