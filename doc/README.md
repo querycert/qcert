@@ -26,8 +26,8 @@ If you make changes to the Coq code, you may want to re-generate the
 documentation.
 
 You will need a copy of `coq2html` checked out and compiled from the
-source. You can find `coq2html` at
-(https://github.com/xavierleroy/coq2html). It's written in OCaml and
+source. You can find `coq2html` at:
+https://github.com/xavierleroy/coq2html. It's written in OCaml and
 should compile easily. Once compiled you need to move the produced
 `coq2html` executable into your PATH.
 
@@ -38,11 +38,11 @@ make qcert
 make documentation
 ```
 
-This will regenerate the `./html` directory
+This will regenerate the `doc/html` directory
 
 # To update the compilation pipeline
 
-Edit the LaTeX file `figure/compiler-coq.tex`, then do:
+Edit the LaTeX file `doc/figure/compiler-coq.tex`, then do:
 
 ```
 cd figure
