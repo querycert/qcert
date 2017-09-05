@@ -39,6 +39,18 @@ public class SExpParser {
 			System.out.println(expr);
 		else {
 			SExpression other = parse(new File(args[1]));
+			if (expr == null) {
+				if (other == null) 
+					System.out.println("S-expression structures are the same (both empty or missing)");
+				else
+					System.out.println("First S-expression structure is empty or missing but the second is not");
+				return;
+			}
+			else if (other == null) {
+				System.out.println("Second S-expression structure is empty or missing but the first is not");
+				return;
+			}
+			// Neither is null.
 			String first = String.valueOf(expr);
 			String second = String.valueOf(other);
 			if (first.equals(second))
