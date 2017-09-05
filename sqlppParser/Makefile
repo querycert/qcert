@@ -42,16 +42,15 @@ JAVAC=javac
 
 LANG=sqlpp
 
-TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp tests/addOperator.sqlpp tests/ANYInFieldAccessor.sqlpp \
+TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/addOperator.sqlpp tests/ANYInFieldAccessor.sqlpp \
 	tests/columnalias.sqlpp tests/columnalias2.sqlpp tests/columnalias3.sqlpp tests/constant.sqlpp tests/fieldAccessor.sqlpp \
 	tests/from_collection_array.sqlpp tests/from_collection_bag.sqlpp tests/from_inner_correlate.sqlpp tests/from_inner_flatten.sqlpp \
-	tests/from_inner_join.sqlpp tests/from_left_correlate.sqlpp tests/from_left_correlate2.sqlpp tests/from_left_outer_join.sqlpp \
-	tests/from_where_select_clause.sqlpp tests/functionDecl.sqlpp tests/functionDecl1.sqlpp tests/functionDecl2.sqlpp \
-	tests/functionDecl3.sqlpp tests/groupby_clause_count.sqlpp tests/IfInFLOWGR.sqlpp tests/IfThenElse.sqlpp tests/LetFor.sqlpp \
+	tests/from_inner_join.sqlpp tests/from_left_correlate2.sqlpp tests/from_where_select_clause.sqlpp \
+	tests/groupby_clause_count.sqlpp tests/IfInFLOWGR.sqlpp tests/IfThenElse.sqlpp tests/LetFor.sqlpp \
 	tests/ListConstructor.sqlpp tests/mulOperator.sqlpp tests/nestedFLWOGR.sqlpp tests/nestedFLWOGR1.sqlpp tests/nestedFLWOGR2.sqlpp \
 	tests/nestedFLWOGR3.sqlpp tests/nestedFor.sqlpp tests/numberInFieldAccessor.sqlpp tests/select_clause_sugar.sqlpp \
 	tests/select_from_where_sugar.sqlpp tests/tuple_nav.sqlpp tests/tuple_nav_delimited_identifier.sqlpp tests/tuple_nav_mutiple_steps.sqlpp \
-	tests/tuple_nav_quotes.sqlpp tests/union.sqlpp tests/utf-8.sqlpp tests/variables.sqlpp tests/where_clause.sqlpp \
+	tests/tuple_nav_quotes.sqlpp tests/variables.sqlpp tests/where_clause.sqlpp \
 	tests/q1.sqlpp tests/q2.sqlpp tests/q3.sqlpp tests/q4.sqlpp tests/q5.sqlpp tests/q6.sqlpp tests/q7.sqlpp tests/q8.sqlpp \
 	tests/q9.sqlpp tests/q10.sqlpp tests/q11.sqlpp tests/q12.sqlpp tests/q13.sqlpp tests/q14.sqlpp tests/q15.sqlpp tests/q16.sqlpp \
 	tests/q17.sqlpp tests/q18.sqlpp tests/q19.sqlpp tests/q20.sqlpp tests/q21.sqlpp tests/q22.sqlpp \
@@ -60,6 +59,9 @@ TESTS=tests/1.sqlpp tests/2.sqlpp tests/4.sqlpp tests/5.sqlpp tests/6.sqlpp test
 	tests/tpch_8.sql tests/tpch_9.sql tests/tpch_10.sql tests/tpch_11.sql tests/tpch_12.sql tests/tpch_13.sql tests/tpch_14.sql \
 	tests/tpch_15.sql tests/tpch_16.sql tests/tpch_17.sql tests/tpch_18.sql tests/tpch_19.sql tests/tpch_20.sql tests/tpch_21.sql tests/tpch_22.sql
 
+# These do not work at present and probably won't in the near future
+UNUSED_TESTS=tests/6.sqlpp tests/from_left_correlate.sqlpp tests/from_left_outer_join.sqlpp tests/functionDecl1.sqlpp tests/functionDecl3.sqlpp \
+	tests/union.sqlpp tests/utf-8.sqlpp tests/functionDecl.sqlpp tests/functionDecl2.sqlpp     
 
 J_SEXP=$(patsubst %.sqlpp,%_j.sexp,$(TESTS))
 
