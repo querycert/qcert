@@ -123,6 +123,10 @@
  % CAMP
  \path[trans, tcoqp] (camp.east) -- (nraenv.west)
    \transref{3}{\coqurl{Translation}{CAMPtoNRAEnv}{camp_to_nraenv_top}};
+ \path[trans, tcoqp] (camp.east) -- (cnraenv.west)
+   \transref{3}{\coqurl{Translation}{CAMPtocNRAEnv}{camp_to_nraenv_core_top}};
+ \path[trans, tcoqp] (camp.east) -- (nra.west)
+   \transref{3}{\coqurl{Translation}{CAMPtoNRA}{camp_to_nra_top}};
 
  % *NRA*
  \tikzoptimdotted[ccoqp]{nraenv}{\coqurl{NRAEnv.Optim}{NRAEnvOptimizer}{run_nraenv_optims}}

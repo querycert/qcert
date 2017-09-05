@@ -52,7 +52,10 @@
 <!-- ============ Body ============ -->
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
-<h2>Q*cert: Commented Coq Development</h2>
+<h2 align="center">Q*cert: Commented Coq Development</h2>
+<h4 align="center">Joshua Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and Jérôme Siméon</h4>
+
+<h3>Overview</h3>
 
 <p>
   Q*cert is a query compiler: it takes some input query and generates
@@ -63,50 +66,253 @@
 <p>
   Q*cert implements several intermediate languages useful for
   compilation and optimization. The semantics of each of them is
-  precisely defined using the Coq proof assistant. Using Coq allows to
-  prove properties on these languages, to verify the correctness of
-  the translation from one to another, and to check that optimizations
-  are correct.
-</p>
-<p>
-  An architecture made of small and well defined components makes
-  Q*cert a promising platform for implementing or verifying new query
-  languages and to develop new optimizations.
+  defined using the Coq proof assistant.
 </p>
 
 <h3>Compilation Pipeline</h3>
 
+<img src="figure/figure.svg" width="700" alt="Compilation Paths"/>
+
 <p>
-  The compiler architecture and the compilation paths are discribed in
-  the <a href="html/Qcert.Compiler.Driver.CompDriver.html#driver">compiler
-  driver</a> and can be represented by the following figure:
+  This figure represents the general architecture of the compiler with
+  its
+  <a href="html/Qcert.Compiler.Driver.CompLang.html">all
+  intermediate languages</a> and the
+  different <a href="html/Qcert.Compiler.Driver.CompDriver.html#driver">compilation
+  paths</a>.
 </p>
 
-<img src="figure/figure.svg" width="700" alt="Compilation Paths"/>
+<h3>Code Organization</h3>
+
+<p>The general organization of the source code available in Q*cert is
+the following:</p>
+<ul>
+<li><code>bin</code>: directory where binaries are installed </li>
+<li><code>coq</code>: the Coq source code of the compiler </li>
+<li><code>doc</code>: documentation and Web demo </li>
+<li><code>javaService</code>: code to integrate the Java parsers (for SQL, SQL++, and ODM rules)</li>
+<li><code>jrulesParser</code>: ODM rules parser </li>
+<li><code>ocaml</code>: OCaml code of the command line compiler </li>
+<li><code>runtime</code>: runtime libraries for the different backends </li>
+<li><code>samples</code>: examples of queries in various source languages </li>
+<li><code>scripts</code>: utility scripts </li>
+<li><code>sqlParser</code>: SQL parser </li>
+<li><code>sqlppParser</code>: SQL++ parser </li>
+</ul>
+
+<h3>General-purpose libraries, data model, type system, operators</h3>
+
+<p>
+  The <code>coq/Basic</code> directory contains some the data-model
+  which is shared between all languages. This directory also contains
+  some utility functions.
+</p>
 
 <h3>Languages</h3>
 
 <p>
+  In the <code>coq</code> directory, each language has its own
+  directory with a subdirectory <code>Lang</code> containing the
+  syntax (Abstract Syntax Tree) and the definition of the semantics of
+  the language. Then, depending on the language, some additional
+  subdirectory can be present. For example, it is possible to find
+  a <code>Optim</code> subdirectory containing the optimizer for the
+  language, or a <code>Typing</code> subdirectory containing the type
+  checker.
+</p>
+
+<p>
   The supported languages are:
   <ul>
-    <li><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">𝝀NRA</a>: NRA with Lambdas</li>
-    <li><a href="html/Qcert.SQL.Lang.SQL.html#sql">SQL</a>: Structured Query Language</li>
-    <li><a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">SQL++</a>: Structured Query Language extended for JSON</li>
-    <li><a href="html/Qcert.OQL.Lang.OQL.html#oql">OQL</a>: Object Query Language</li>
-    <li><a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">TechRule</a>: ODM technical rules</li>
-    <li><a href="html/Qcert.DesignRule.Lang.DesignRule.html#designer_rule">DesignerRule</a>: ODM designer rules</li>
-    <li><a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">CAMPRule</a>: Rule Macros for CAMP</li>
-    <li><a href="html/Qcert.CAMP.Lang.CAMP.html#camp">CAMP</a>: Calculus of Aggregating Matching Patterns</li>
-    <li><a href="html/Qcert.NRA.Lang.NRA.html#nra">NRA</a>: Nested Relational Algebra</li>
-    <li><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">NRAe</a>: NRA with Environments</li>
-    <li><a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">cNRAe</a>: Core NRAe</li>
-    <li><a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc">NNRC</a>: Named Nested Relational Calculus</li>
-    <li><a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">cNNRC</a>: Core NNRC</li>
-    <li><a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe">DNNRC</a>: Distributed NNRC</li>
-    <li><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed">tDNNRC</a>: Typed DNNRC</li>
-    <li><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr">NNRCMR</a>: NNRC + Map/Reduce</li>
-    <li><a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">CldMR</a>: NNRC + Cloudant Map/Reduce</li>
+    <li><a href="html/Qcert.TechRule.Lang.TechRule.html">TechRule</a>: ODM technical rules
+      (<a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">Syntax</a>)</li>
+    <li><a href="html/Qcert.DesignRule.Lang.DesignRule.html">DesignerRule</a>: ODM designer rules
+      (<a href="html/Qcert.DesignRule.Lang.DesignRule.html#designer_rule">Syntax</a>)</li>
+    <li><a href="html/Qcert.CAMPRule.Lang.CAMPRule.html">CAMPRule</a>: Rule Macros for CAMP
+      (<a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">Syntax</a>,
+       <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule_eval_top">Semantics</a>)</li>
+    <li><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html">NRA<sup>𝝀</sup></a>: NRA with Lambdas
+      (<a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Syntax</a>,
+       <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">Semantics</a>)</li>
+    <li><a href="html/Qcert.SQL.Lang.SQL.html">SQL</a>: Structured Query Language
+      (<a href="html/Qcert.SQL.Lang.SQL.html#sql">Syntax</a>)</li>
+    <li><a href="html/Qcert.SQLPP.Lang.SQLPP.html">SQL++</a>: Structured Query Language extended for JSON
+      (<a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">Syntax</a>)</li>
+    <li><a href="html/Qcert.OQL.Lang.OQL.html">OQL</a>: Object Query Language
+      (<a href="html/Qcert.OQL.Lang.OQL.html#oql">Syntax</a>,
+       <a href="html/Qcert.OQL.Lang.OQL.html#oql_eval_top">Semantics</a>)</li>
+    <li><a href="html/Qcert.CAMP.Lang.CAMP.html">CAMP</a>: Calculus of Aggregating Matching Patterns
+      (<a href="html/Qcert.CAMP.Lang.CAMP.html#camp">Syntax</a>,
+       <a href="html/Qcert.CAMP.Lang.CAMP.html#camp_eval_top">Semantics</a>,
+       <a href="html/Qcert.CAMP.Typing.TCAMP.html#camp_type">Typing</a>)</li>
+    <li><a href="html/Qcert.NRA.Lang.NRA.html">NRA</a>: Nested Relational Algebra
+      (<a href="html/Qcert.NRA.Lang.NRA.html#nra">Syntax</a>,
+       <a href="html/Qcert.NRA.Lang.NRA.html#nra_eval_top">Semantics</a>,
+       <a href="html/Qcert.NRA.Typing.TNRA.html#nra_type">Typing</a>)</li>
+    <li><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>: NRA with Environments
+      (<a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">Syntax</a>,
+       <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">Semantics</a>,
+       <a href="html/Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">Typing</a>,
+       <a href="html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims">Optimizer</a>)</li>
+    <li><a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html">cNRA<sup>e</sup></a>: Core NRA<sup>e</sup>
+      (<a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">Syntax</a>,
+       <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core_eval_top">Semantics</a>,
+       <a href="html/Qcert.cNRAEnv.Typing.TcNRAEnv.html#nraenv_core_type">Typing</a>)</li>
+    <li><a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>: Named Nested Relational Calculus
+      (<a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc">Syntax</a>,
+       <a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc_eval_top">Semantics</a>,
+       <a href="html/Qcert.NNRC.Typing.TNNRC.html#nnrc_ext_type">Typing</a>,
+       <a href="html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">Optimizer</a>)</li>
+    <li><a href="html/Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a>: Core NNRC
+      (<a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">Syntax</a>,
+       <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">Semantics</a>,
+       <a href="html/Qcert.cNNRC.Typing.TcNNRC.html#nnrc_type">Typing</a>)</li>
+    <li><a href="html/Qcert.DNNRC.Lang.DNNRC.html">DNNRC</a>: Distributed NNRC
+      (<a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe">Syntax</a>,
+       <a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe_eval_top">Semantics</a>,
+       <a href="html/Qcert.DNNRC.Typing.TDNNRCBase.html#dnnrc_type">Typing</a>)</li>
+    <li><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html">tDNNRC</a>: Typed DNNRC
+      (<a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed">Syntax</a>,
+       <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed_eval_top">Semantics</a>,
+       <a href="html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#dnnrcToDataframeRewrite">Optimizer</a>)</li>
+    <li><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html">NNRCMR</a>: NNRC extended with Map/Reduce
+      (<a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr">Syntax</a>,
+       <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval_top">Semantics</a>,
+       <a href="html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims">Optimizer</a>)</li>
+    <li><a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">CldMR</a>: NNRC extended with Map/Reduce for Cloudant
+      (<a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">Syntax</a>,
+       <a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr_eval_top">Semantics</a>)</li>
   </ul>
+</p>
+
+<h3>Translations</h3>
+
+<p>
+  The <code>coq/Translation</code> directory contains all the
+  translation functions that compiles a language into another.
+</p>
+
+<p>
+  When possible, a corresponding proof of correctness (semantics
+  preservation) and a proof of type preservation for the translation
+  are also included.
+</p>
+
+<p>
+  The existing translations are:
+  <ul>
+    <li>From <a href="html/Qcert.TechRule.Lang.TechRule.html">TechRule</a>:
+      <ul><li>To <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html">CAMPRule</a>
+	  (<a href="html/Qcert.Translation.TechRuletoCAMPRule.html">Translation</a> in Java)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.DesignRule.Lang.DesignRule.html">DesignerRule</a>:
+      <ul><li>To <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html">CAMPRule</a>
+	  (<a href="html/Qcert.Translation.DesignRuletoCAMPRule.html">Translation</a> in Java)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html">CAMPRule</a>
+      <ul><li>To <a href="html/Qcert.CAMP.Lang.CAMP.html">CAMP</a>
+	  (<a href="html/Qcert.Translation.CAMPRuletoCAMP.html#camp_rule_to_camp_top">Translation</a> through macro-expansion,
+	   <a href="html/Qcert.Translation.CAMPRuletoCAMP.html#camp_rule_to_camp_top_correct">Correctness</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html">NRA<sup>𝝀</sup></a>:
+      <ul><li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>
+	  (<a href="html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top">Translation</a>,
+	  <a href="html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top_correct">Correctness</a>,
+	  <a href="html/Qcert.Translation.TLambdaNRAtoNRAEnv.html#tlambda_nra_sem_correct">Type Preservation</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.SQL.Lang.SQL.html">SQL</a>:
+      <ul><li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>
+	  (<a href="html/Qcert.Translation.SQLtoNRAEnv.html#sql_to_nraenv_top">Translation</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.SQLPP.Lang.SQLPP.html">SQL++</a>:
+      <ul><li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>
+	  (<a href="html/Qcert.Translation.SQLPPtoNRAEnv.html#sqlpp_to_nraenv_top">Translation</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.OQL.Lang.OQL.html">OQL</a>:
+      <ul><li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>
+	  (<a href="html/Qcert.Translation.OQLtoNRAEnv.html#oql_to_nraenv_top">Translation</a>,
+	  <a href="html/Qcert.Translation.OQLtoNRAEnv.html#oql_to_nraenv_top_correct">Correctness</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.CAMP.Lang.CAMP.html">CAMP</a>:
+      <ul><li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>
+	  (<a href="html/Qcert.Translation.CAMPtoNRAEnv.html#camp_to_nraenv_top">Translation</a>,
+	  <a href="html/Qcert.Translation.CAMPtoNRAEnv.html#camp_to_nraenv_top_correct">Correctness</a>,
+	  <a href="html/Qcert.Translation.TCAMPtoNRAEnv.html#alg_of_camp_top_type_preserve">Type Preservation</a>)</li>
+          <li>To <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html">cNRA<sup>e</sup></a>
+	  (<a href="html/Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top">Translation</a>,
+	  <a href="html/Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top_correct">Correctness</a>,
+	  <a href="html/Qcert.Translation.TCAMPtocNRAEnv.html#alg_of_camp_top_type_preserve">Type Preservation</a>)</li>
+          <li>To <a href="html/Qcert.NRA.Lang.NRA.html">NRA</a>
+	  (<a href="html/Qcert.Translation.CAMPtoNRA.html#camp_to_nra_top">Translation</a>,
+	  <a href="html/Qcert.Translation.CAMPtoNRA.html#camp_to_nra_top_correct">Correctness</a>,
+	  <a href="html/Qcert.Translation.TCAMPtoNRA.html#nra_of_camp_top_type_preserve">Type Preservation</a>)</li>
+          </ul>
+    </li>
+    <li>From <a href="html/Qcert.NRA.Lang.NRA.html">NRA</a>:
+      <ul><li>To <a href="html/Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a>
+	  (<a href="html/Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core_top">Translation</a>,
+	  <a href="html/Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core_correct">Correctness</a>,
+	  <a href="html/Qcert.Translation.TNRAtocNNRC.html#tnra_sem_correct">Type Preservation</a>)</li>
+          <li>To <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html">cNRAEnv</a>
+	  (<a href="html/Qcert.Translation.NRAtocNRAEnv.html#nra_to_nraenv_core_top">Translation</a>,
+	  <a href="html/Qcert.Translation.NRAtocNRAEnv.html#nra_to_nraenv_core_top_correct">Correctness</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>:
+      <ul><li>To <a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>
+	  (<a href="html/Qcert.Translation.NRAEnvtoNNRC.html#nraenv_to_nnrc_top">Translation</a>,
+	  <a href="html/Qcert.Translation.NRAEnvtoNNRC.html#nraenv_to_nnrc_top_correct">Correctness</a>)</li>
+          <li>To <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html">cNRAEnv</a>
+	  (<a href="html/Qcert.Translation.NRAEnvtocNRAEnv.html#nraenv_to_nraenv_core_top">Translation</a> through macro expansion,
+	  <a href="html/Qcert.Translation.NRAEnvtocNRAEnv.html#nraenv_to_nraenv_core_top_correct">Correctness</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html">cNRA<sup>e</sup></a>:
+      <ul><li>To <a href="html/Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a>
+	  (<a href="html/Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core_top">Translation</a>,
+	  <a href="html/Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core_top_correct">Correctness</a>,
+	  <a href="html/Qcert.Translation.TcNRAEnvtocNNRC.html#tnraenv_sem_correct">Type Preservation</a>)</li>
+          <li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRAEnv</a>
+	  (<a href="html/Qcert.Translation.cNRAEnvtoNRAEnv.html#nraenv_core_to_nraenv_top">Translation</a>,
+	   <a href="html/Qcert.Translation.cNRAEnvtoNRAEnv.html#nraenv_core_to_nraenv_top_correct">Correctness</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>:
+      <ul><li>To <a href="html/Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a>
+	  (<a href="html/Qcert.Translation.NNRCtocNNRC.html#nnrc_to_nnrc_core_top">Translation</a> through macro expansion,
+	  <a href="html/Qcert.Translation.NNRCtocNNRC.html#nnrc_to_nnrc_core_top_correct">Correctness</a>)</li>
+          <li>To <a href="html/Qcert.DNNRC.Lang.DNNRC.html">DNNRC</a>
+	  (<a href="html/Qcert.Translation.NNRCtoDNNRC.html#nnrc_to_dnnrc_top">Translation</a>,
+	   <a href="html/Qcert.Translation.NNRCtoDNNRC.html#nnrc_to_dnnrc_top_correct">Correctness</a>)</li>
+          <li>To <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html">NNRCMR</a>
+	  (<a href="html/Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_top">Translation</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a>:
+      <ul><li>To <a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>
+	  (<a href="html/Qcert.Translation.cNNRCtoNNRC.html#nnrc_core_to_nnrc_top">Translation</a> through direct inclusion,
+	  <a href="html/Qcert.Translation.cNNRCtoNNRC.html#nnrc_core_to_nnrc_top_correct">Correctness</a>)</li>
+          <li>To <a href="html/Qcert.CAMP.Lang.CAMP.html">CAMP</a>
+	  (<a href="html/Qcert.Translation.cNNRCtoCAMP.html#nnrc_core_to_camp_top">Translation</a>,
+	   <a href="html/Qcert.Translation.cNNRCtoCAMP.html#nnrcToCamp_let_sem_correct_top">Correctness</a>,
+	  <a href="html/Qcert.Translation.TcNNRCtoCAMP.html#nnrc_to_camp_let_type_preserve">Type Preservation</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.DNNRC.Lang.DNNRC.html">DNNRC</a>:
+      <ul><li>To <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html">tDNNRC</a>
+	  (<a href="html/Qcert.Translation.DNNRCtotDNNRC.html#dnnrc_to_dnnrc_typed_top">Translation</a> through type inference)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html">tDNNRC</a>:</li>
+    <li>From <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html">NNRCMR</a>:
+      <ul><li>To <a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>
+	  (<a href="html/Qcert.Translation.NNRCMRtoNNRC.html#nnrc_of_nnrcmr_top">Translation</a>)</li>
+          <li>To <a href="html/Qcert.CldMR.Lang.CldMR.html">CldMR</a>
+	  (<a href="html/Qcert.Translation.NNRCMRtoCldMR.html#nnrcmr_to_cldmr_top">Translation</a>)</li></ul>
+    </li>
+    <li>From <a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">CldMR</a>:</li>
+  </ul>
+</p>
+
+<h3>Compiler Driver</h3>
+
+<p>
+  The <code>coq/Compiler</code> directory contains the compiler
+  driver.
 </p>
 
 <h3>References</h3>
