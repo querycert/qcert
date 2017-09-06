@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
+Require Export CommonRuntime.
 Require Export cNNRCRuntime. (* Always include core support *)
 Require Export NNRC.
 Require Export NNRCSugar.

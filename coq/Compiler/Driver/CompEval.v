@@ -15,11 +15,10 @@
  *)
 
 Section CompEval.
-
   Require Import String.
 
-  (* Basic *)
-  Require Import BasicSystem.
+  (* Common *)
+  Require Import CommonSystem.
   Require Import TypingRuntime.
 
   (** Query languages *)

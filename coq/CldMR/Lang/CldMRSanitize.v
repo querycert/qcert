@@ -23,10 +23,12 @@ Section CldMRSanitize.
   Require Import List.
   Require Import Sorting.Mergesort.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
-  Require Import NNRCRuntime NNRCMRRuntime.
-  Require Import CldMRUtil ForeignCloudant.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import NNRCRuntime.
+  Require Import NNRCMRRuntime.
+  Require Import CldMRUtil.
+  Require Import ForeignCloudant.
   
   Local Open Scope list_scope.
 

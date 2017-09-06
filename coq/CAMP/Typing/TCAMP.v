@@ -15,19 +15,17 @@
  *)
 
 Section TCAMP.
- 
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Program.
-
-  Require Import BasicSystem.
-  Require Import CAMPUtil CAMP.
+  Require Import Utils.
+  Require Import CommonSystem.
+  Require Import CAMPUtil.
+  Require Import CAMP.
 
   (** Auxiliary lemmas *)
 
-  Require Import RSort.
-  Require RString.
   Lemma rec_sort_is_sorted {A} (l:list (string*A)) :
     is_list_sorted ODT_lt_dec (domain (rec_sort l)) = true.
   Proof.
@@ -127,9 +125,9 @@ Section TCAMP.
      bindings_type env Γ ->
      data_type d r ->
      bindings_type
-     (RSort.insertion_sort_insert rec_field_lt_dec 
+     (insertion_sort_insert rec_field_lt_dec 
         (s, d) env)
-     (RSort.insertion_sort_insert rec_field_lt_dec 
+     (insertion_sort_insert rec_field_lt_dec 
         (s, r) Γ).
    Proof.
      revert Γ. induction env; inversion 1; subst; simpl; intuition.
@@ -176,8 +174,8 @@ Section TCAMP.
         bindings_type env₃ Γ₃.
   Proof.
     unfold merge_bindings.
-    destruct (compatible env₁ env₂); simpl; try discriminate.
-    destruct (compatible Γ₁ Γ₂); simpl; try discriminate.
+    destruct (Compat.compatible env₁ env₂); simpl; try discriminate.
+    destruct (Compat.compatible Γ₁ Γ₂); simpl; try discriminate.
     inversion 3; inversion 1; subst.
     apply rec_concat_sort_bindings_type; trivial.
   Qed.
@@ -305,7 +303,7 @@ Section TCAMP.
       eauto.
     - econstructor; eauto.
       unfold merge_bindings in *.      
-      case_eq (compatible Γ Γ'); 
+      case_eq (Compat.compatible Γ Γ'); 
         intros comp; rewrite comp in *; try discriminate.
       inversion H; subst.
       assert (perm:Permutation Γ (rec_sort Γ)) 

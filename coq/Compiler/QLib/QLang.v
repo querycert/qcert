@@ -15,10 +15,9 @@
  *)
 
 Require Import String.
+Require Import CommonSystem.
 Require Import CompLang.
-
 Require Import CompilerRuntime.
-Require Import BasicSystem.
 
 Module QLang(runtime:CompilerRuntime).
 

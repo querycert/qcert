@@ -34,12 +34,12 @@
 *)
   
 Section CAMP.
-
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import CAMPUtil.
   
   Local Open Scope string.

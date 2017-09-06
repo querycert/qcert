@@ -18,9 +18,7 @@ Section TNRAExt.
   Require Import String.
   Require Import List.
   Require Import Compare_dec.
-
-  Require Import Utils BasicSystem.
-
+  Require Import CommonSystem.
   Require Import NRAExt.
   Require Import TNRA.
 

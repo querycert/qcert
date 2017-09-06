@@ -17,7 +17,7 @@
 Section NRAtocNRAEnv.
   Require Import String.
   Require Import List.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import NRARuntime.
   Require Import cNRAEnvRuntime.
 

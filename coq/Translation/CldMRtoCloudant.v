@@ -17,7 +17,7 @@
 Require Import List.
 Require Import String.
 Require Import Utils.
-Require Import BasicRuntime.
+Require Import CommonRuntime.
 Require Import ForeignToJavaScript.
 Require Import ForeignCloudant.
 Require Import NNRCRuntime.

@@ -15,11 +15,10 @@
  *)
 
 Section CAMPRuletoCAMP.
-
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import CAMPRuleRuntime.
   Require Import CAMPRuntime.
   

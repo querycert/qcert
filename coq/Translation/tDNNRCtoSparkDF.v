@@ -23,7 +23,7 @@ Require Import List.
 Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
-Require Import BasicSystem.
+Require Import CommonSystem.
 Require Import NNRCRuntime.
 Require Import tDNNRCSystem.
 Require Import ForeignToScala.

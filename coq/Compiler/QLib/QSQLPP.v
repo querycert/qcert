@@ -16,7 +16,8 @@
 
 Require Import CompilerRuntime.
 Require Import String.
-Require QData QOperators.
+Require QData.
+Require QOperators.
 Require SQLPP.
 
 Module QSQLPP(runtime:CompilerRuntime).

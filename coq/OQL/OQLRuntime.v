@@ -14,8 +14,10 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export OQL OQLSugar OQLSize.
+Require Export CommonRuntime.
+Require Export OQL.
+Require Export OQLSugar.
+Require Export OQLSize.
 
 (* 
 *** Local Variables: ***

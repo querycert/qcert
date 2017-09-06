@@ -15,11 +15,12 @@
  *)
 
 Section ROptim.
-
-  Require Import List String.
-
-  Require Import Utils BasicRuntime.
-  Require Import NRA NRAEq.
+  Require Import List.
+  Require Import String.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import NRA.
+  Require Import NRAEq.
   
   Local Open Scope nra_scope.
 
@@ -481,7 +482,7 @@ Section ROptim.
          | Some (drec r2) =>
              Some
                (drec
-                  (RSort.insertion_sort_insert rec_field_lt_dec 
+                  (SortingAdd.insertion_sort_insert rec_field_lt_dec 
                      ("PBIND"%string, d0) (rec_sort r2)))
          | _ => None
          end

@@ -23,7 +23,7 @@ Section TNNRCEq.
   Require Import String.
   Require Import List.
   Require Import Arith.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import cNNRCSystem.
   Require Import NNRC.
   Require Import NNRCEq.

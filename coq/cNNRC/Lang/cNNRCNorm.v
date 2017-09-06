@@ -20,7 +20,8 @@ Section cNNRCNorm.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import cNNRC.
 
   (** Named Nested Relational Calculus *)

@@ -15,10 +15,12 @@
  *)
 
 Section QEnv.
-
-  Require Import String List String EquivDec.
-  
-  Require Import BasicRuntime.
+  Require Import String.
+  Require Import List.
+  Require Import String.
+  Require Import EquivDec.
+  Require Import Utils.
+  Require Import CommonRuntime.
 
   (*********
    * Utils *

@@ -16,12 +16,11 @@
 
 (* This file defines derived patterns, notations, and concepts *)
 Section CAMPSugar.
-
   Require Import String.
   Require Import List.
   Require Import EquivDec.
-
-  Require Import BasicRuntime.  
+  Require Import Utils.
+  Require Import CommonRuntime.  
   Require Export CAMP.
 
   Context {fruntime:foreign_runtime}.

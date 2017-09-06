@@ -14,8 +14,9 @@
  * limitations under the License.
  *)
 
-Require Export BasicTypes.
-Require Export TCAMP TCAMPSugar.
+Require Export CommonTypes.
+Require Export TCAMP.
+Require Export TCAMPSugar.
 
 (* 
 *** Local Variables: ***

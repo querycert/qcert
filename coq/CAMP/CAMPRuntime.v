@@ -14,8 +14,11 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export CAMPUtil CAMP CAMPSize CAMPSugar.
+Require Export CommonRuntime.
+Require Export CAMPUtil.
+Require Export CAMP.
+Require Export CAMPSize.
+Require Export CAMPSugar.
 
 (* 
 *** Local Variables: ***

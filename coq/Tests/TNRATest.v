@@ -17,7 +17,7 @@
 Section TNRATest.
   Require Import List String.
 
-  Require Import Utils BasicSystem.
+  Require Import Utils CommonSystem.
   Require Import NRASystem.
   
   Require Import NRATest.

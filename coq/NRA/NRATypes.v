@@ -14,8 +14,11 @@
  * limitations under the License.
  *)
 
-Require Export BasicTypes.
-Require Export TNRA TNRAEq TNRAExt TDomain.
+Require Export CommonTypes.
+Require Export TNRA.
+Require Export TNRAEq.
+Require Export TNRAExt.
+Require Export TDomain.
 
 (* 
 *** Local Variables: ***

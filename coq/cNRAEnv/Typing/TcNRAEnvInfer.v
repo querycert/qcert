@@ -14,6 +14,8 @@
  * limitations under the License.
  *)
 
+(** Type inference for NRA when given the type of the input *)
+
 Section TcNRAEnvInfer.
   Require Import String.
   Require Import List.
@@ -21,16 +23,11 @@ Section TcNRAEnvInfer.
   Require Import Eqdep_dec.
   Require Import Bool.
   Require Import EquivDec.
-
-  Require Import Utils BasicSystem.
-
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import cNRAEnv.
   Require Import TcNRAEnv.
-
   Require Import Program.
-
-  (** Type inference for NRA when given the type of the input *)
-
   Require Import TDataInfer.
   Require Import TOpsInfer.
   Require Import TNRAInfer. (* Only for a few auxiliary Lemmas that should probably be moved *)

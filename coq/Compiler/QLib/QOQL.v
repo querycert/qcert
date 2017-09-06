@@ -16,8 +16,10 @@
 
 Require Import CompilerRuntime.
 Require String.
-Require QData QOperators.
-Require OQL OQLSugar.
+Require QData.
+Require QOperators.
+Require OQL.
+Require OQLSugar.
 
 Module QOQL(runtime:CompilerRuntime).
 

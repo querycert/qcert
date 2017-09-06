@@ -14,8 +14,9 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export SQLPP SQLPPSize.
+Require Export CommonRuntime.
+Require Export SQLPP.
+Require Export SQLPPSize.
 
 (* 
 *** Local Variables: ***

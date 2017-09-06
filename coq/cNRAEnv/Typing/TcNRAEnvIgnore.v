@@ -15,13 +15,14 @@
  *)
 
 Section TcNRAEnvIgnore.
-
-  Require Import List String.
-
-  Require Import Utils BasicSystem.
-
-  Require Import NRA NRAEq cNRAEnv cNRAEnvEq.
-
+  Require Import List.
+  Require Import String.
+  Require Import Utils.
+  Require Import CommonSystem.
+  Require Import NRA.
+  Require Import NRAEq.
+  Require Import cNRAEnv.
+  Require Import cNRAEnvEq.
   Require Import cNRAEnvIgnore.
   Require Import TcNRAEnv.
 

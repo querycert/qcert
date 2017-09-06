@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export BasicTypes.
+Require Export CommonTypes.
 Require Export TcNRAEnv.
 Require Export TcNRAEnvEq.
 Require Export TcNRAEnvIgnore.

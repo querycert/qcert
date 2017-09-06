@@ -19,7 +19,8 @@ Section NNRCSize.
   Require Import Omega.
   Require Import EquivDec.
   Require Import Decidable.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import cNNRC.
   Require Import cNNRCShadow.
 

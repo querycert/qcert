@@ -15,8 +15,7 @@
  *)
 
 Section tDNNRC.
-
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import DNNRCSystem.
   
   Context {fruntime:foreign_runtime}.

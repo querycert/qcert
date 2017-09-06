@@ -22,7 +22,8 @@ Section NNRCRewrite.
   Require Import ListSet.
   Require Import Arith.
   Require Import EquivDec.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import cNNRCRuntime.
   Require Import NNRC.
   Require Import NNRCShadow.

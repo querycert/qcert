@@ -47,7 +47,7 @@ Section CompStat.
   Require Import CloudantRuntime.
 
   Require Import CompilerRuntime.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
 
   Require Import NNRCtoJavaScript.
 

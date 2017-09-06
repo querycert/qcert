@@ -26,7 +26,7 @@ Import ListNotations.
 (* This module encodes the examples in sample-rules.txt *)
 Section MRCompilerTest.
 
-  Require Import BasicSystem CAMPRuntime.
+  Require Import CommonSystem CAMPRuntime.
   Local Open Scope rule_scope.
   Require Import TrivialModel.
   

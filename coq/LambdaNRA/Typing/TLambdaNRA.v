@@ -21,8 +21,8 @@ Section TLambdaNRA.
   Require Import Program.
   Require Import EquivDec.
   Require Import Morphisms.
-  
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import LambdaNRA.
 
   (** Typing for LambdaNRA *)

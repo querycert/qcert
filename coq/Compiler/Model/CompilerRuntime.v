@@ -15,7 +15,7 @@
  *)
 
 Require Import String.
-Require Import BasicRuntime.
+Require Import CommonRuntime.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToScala.

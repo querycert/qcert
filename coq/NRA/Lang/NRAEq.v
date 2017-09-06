@@ -19,17 +19,14 @@
  *******************************)
 
 Section NRAEq.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
   Require Import List.
   Require Import String.
-
-  Require Import Utils BasicRuntime.
+  Require Import CommonRuntime.
   Require Import NRA.
 
   Local Open Scope nra_scope.

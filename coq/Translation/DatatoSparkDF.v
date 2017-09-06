@@ -18,9 +18,9 @@ Require Import Basics.
 Require Import List.
 Require Import String.
 Require Import EquivDec.
-
 Require Import Types.
-Require Import BasicRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
 Require Import ForeignDataTyping.
 Require Import NNRCtoJavaScript.
 Require Import ForeignToJSON.

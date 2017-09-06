@@ -20,7 +20,7 @@ Section SQLPPtoNRAEnv.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import RDataSort. (* For SortCriterias *)
   Require Import SQLPP.
   Require Import SQLtoNRAEnv.

@@ -15,10 +15,8 @@
  *)
 
 Section CompLang.
-
   Require Import String.
   Require Import List.
-  
   Require Import EquivDec.
 
   Section Lang.
@@ -197,7 +195,7 @@ Section CompLang.
   End Lang.
 
   Section Query.
-    Require Import BasicSystem.
+    Require Import CommonSystem.
 
     (** Query languages *)
     Require Import SQLRuntime.

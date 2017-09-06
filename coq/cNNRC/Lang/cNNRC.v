@@ -31,14 +31,13 @@ cNNRC are evaluated within an environment. *)
 - translating from cNNRC: NNRC, CAMP *)
 
 Section cNNRC.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Morphisms.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
 
   (** Named Nested Relational Calculus *)
 

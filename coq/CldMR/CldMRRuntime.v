@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
+Require Export CommonRuntime.
 Require Export ForeignCloudant.
 Require Export CldMRUtil.
 Require Export CldMR.

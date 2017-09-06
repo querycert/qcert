@@ -15,11 +15,12 @@
  *)
 
 Section ROptimExt.
-
   Require Import List.
-
-  Require Import Utils BasicRuntime.
-  Require Import NRA NRAEq NRAExt NRAExtEq.
+  Require Import CommonRuntime.
+  Require Import NRA.
+  Require Import NRAEq.
+  Require Import NRAExt.
+  Require Import NRAExtEq.
   Require Import NRARewrite.
 
   Local Open Scope nra_scope.

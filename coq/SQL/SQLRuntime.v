@@ -14,8 +14,9 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export SQL SQLSize.
+Require Export CommonRuntime.
+Require Export SQL.
+Require Export SQLSize.
 
 (* 
 *** Local Variables: ***

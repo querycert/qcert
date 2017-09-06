@@ -24,12 +24,16 @@ Section ROptimContext.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
-  Require Import Arith NPeano Omega List.
-  
-  Require Import Utils BasicRuntime.
-  Require Import NRA NRAEq.
-  Require Import NRAContext NRARewrite.
+  Require Import Arith.
+  Require Import NPeano.
+  Require Import Omega.
+  Require Import List.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import NRA.
+  Require Import NRAEq.
+  Require Import NRAContext.
+  Require Import NRARewrite.
 
   Local Open Scope nra_ctxt.
 

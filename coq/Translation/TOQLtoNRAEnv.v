@@ -21,7 +21,7 @@ Section TOQLtoNRAEnv.
   Require Import Omega.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import OQLSystem.
   Require Import NRAEnvSystem.
   Require Import OQLtoNRAEnv.

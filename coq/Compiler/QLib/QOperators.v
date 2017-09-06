@@ -15,9 +15,10 @@
  *)
 
 Require Import CompilerRuntime.
-Require String Ascii.
-Require BrandRelation.
+Require String.
+Require Ascii.
 Require Import ZArith.
+Require BrandRelation.
 Require RBinaryOps.
 
 Module QOperators(runtime:CompilerRuntime).

@@ -14,9 +14,10 @@
  * limitations under the License.
  *)
 
-Require Import List String.
-
-Require Import Utils BasicRuntime.
+Require Import List.
+Require Import String.
+Require Import Utils.
+Require Import CommonRuntime.
 
 
 Local Open Scope string_scope.

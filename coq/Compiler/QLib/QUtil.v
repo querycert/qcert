@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Import BasicRuntime.
+Require Import CommonRuntime.
 Require Import CompilerRuntime.
 Require Import NNRCMRRuntime.
 Require Import tDNNRCRuntime.

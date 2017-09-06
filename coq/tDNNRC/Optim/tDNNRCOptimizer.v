@@ -19,7 +19,7 @@ Require Import List.
 Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
-Require Import BasicSystem.
+Require Import CommonSystem.
 Require Import NNRCRuntime.
 Require Import DNNRCSystem.
 Require Import tDNNRC.
@@ -179,7 +179,7 @@ Section tDNNRCOptimizer.
            * be referred to by name in the algebra part.
            * I talked to Avi about it and this is what needs to happen:
            * - TODO write a function that finds free (and possibly bound) names in Dataframe
-           * - TODO use existing fresh_var-related functions in Basic.Util.RFresh
+           * - TODO use existing fresh_var-related functions in Utils.Fresh
            * - TODO also need to avoid runtime helpers, Spark(SQL) names, scala keywords, ...
            *)
           let ALG := (DNNRCAlg algTypeA

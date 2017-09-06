@@ -20,10 +20,11 @@ Section CldMRUtil.
   Require Import List.
   Require Import Sorting.Mergesort.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
-
-  Require Import ZArith Zdigits Znat.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import ZArith.
+  Require Import Zdigits.
+  Require Import Znat.
 
   Context {fruntime:foreign_runtime}.
 

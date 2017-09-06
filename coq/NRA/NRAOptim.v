@@ -15,7 +15,9 @@
  *)
 
 Require Export NRAContext.
-Require Export NRARewrite NRARewriteContext NRAExtRewrite.
+Require Export NRARewrite.
+Require Export NRARewriteContext.
+Require Export NRAExtRewrite.
 Require Export TNRARewrite.
 
 (* 

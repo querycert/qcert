@@ -15,9 +15,11 @@
  *)
 
 Section NRAEnvIgnore.
-
-  Require Import Bool List String.
-  Require Import Utils BasicRuntime.
+  Require Import Bool.
+  Require Import List.
+  Require Import String.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import NRAEnv.
 
   (* Some of algebraic equivalences for NRA with environment *)

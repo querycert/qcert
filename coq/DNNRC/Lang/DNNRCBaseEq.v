@@ -15,7 +15,6 @@
  *)
 
 Section DNNRCBaseEq.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -24,9 +23,11 @@ Section DNNRCBaseEq.
   Require Import String.
   Require Import List.
   Require Import Arith.
-  
-  Require Import Utils BasicRuntime.
-  Require Import DData DDataNorm DNNRCBase.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import DData.
+  Require Import DDataNorm.
+  Require Import DNNRCBase.
 
   Context {fruntime:foreign_runtime}.
   Context {A plug_type:Set}.

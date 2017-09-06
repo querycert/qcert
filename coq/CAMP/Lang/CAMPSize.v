@@ -16,7 +16,8 @@
 
 Section CAMPSize.
   Require Import Omega.
-  Require Import BasicRuntime CAMP.
+  Require Import CommonRuntime.
+  Require Import CAMP.
 
   Context {fruntime:foreign_runtime}.
 

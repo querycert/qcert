@@ -19,7 +19,8 @@ Section NRAEnvtoNNRC.
   Require Import List.
   Require Import EquivDec.
   Require Import Compare_dec.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import NRAEnvRuntime.
   Require Import NNRCRuntime.
 

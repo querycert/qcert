@@ -15,14 +15,13 @@
  *)
 
 Section DNNRCBase.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Morphisms.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import DData.
 
   Context {fruntime:foreign_runtime}.

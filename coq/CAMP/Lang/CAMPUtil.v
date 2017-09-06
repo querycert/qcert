@@ -18,12 +18,13 @@
 over CAMP patterns. *)
 
 Section CAMPUtil.
-
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
+
   Local Open Scope string.
 
   (** Evaluating a CAMP pattern returns a presult, which includes two

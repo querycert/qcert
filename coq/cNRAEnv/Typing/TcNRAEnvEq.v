@@ -15,18 +15,17 @@
  *)
 
 Section TcNRAEnvEq.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
   Require Import List.
   Require Import String.
-
-  Require Import Utils BasicSystem.
-  Require Import cNRAEnv cNRAEnvEq.
+  Require Import Utils.
+  Require Import CommonSystem.
+  Require Import cNRAEnv.
+  Require Import cNRAEnvEq.
   Require Import TcNRAEnv.
 
   Local Open Scope nraenv_core_scope.

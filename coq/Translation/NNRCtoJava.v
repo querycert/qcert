@@ -18,7 +18,8 @@ Require Import List.
 Require Import String.
 Require Import Peano_dec.
 Require Import EquivDec.
-Require Import BasicRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
 Require Import NNRCRuntime.
 Require Import ForeignToJava.
 

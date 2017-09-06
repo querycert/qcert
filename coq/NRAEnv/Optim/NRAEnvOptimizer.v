@@ -15,20 +15,22 @@
  *)
 
 Section NRAEnvOptimizer.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-  Require Import String List ListSet.
-
-  Require Import Utils BasicSystem.
-  Require Import cNRAEnv cNRAEnvEq TcNRAEnv TcNRAEnvEq.
-  Require Import NRAEnv NRAEnvEq TNRAEnv TNRAEnvEq NRAEnvRewrite TNRAEnvRewrite.
-  Require Import cNRAEnvIgnore TcNRAEnvIgnore NRAEnvIgnore cNRAEnvSize NRAEnvSize.
-  
-  Require Import OptimizerStep OptimizerLogger.
+  Require Import String.
+  Require Import List.
+  Require Import ListSet.
+  Require Import Utils.
+  Require Import CommonSystem.
+  Require Import cNRAEnvSystem.
+  Require Import NRAEnvSystem.
+  Require Import OptimizerStep.
+  Require Import OptimizerLogger.
+  Require Import NRAEnvRewrite.
+  Require Import TNRAEnvRewrite.
 
   Open Scope nraenv_scope.
   

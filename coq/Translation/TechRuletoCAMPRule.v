@@ -17,7 +17,7 @@
 Section TechRuletoCAMPRule.
   Require Import String.
   Require Import List.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import TechRuleRuntime.
   Require Import CAMPRuleRuntime.
   

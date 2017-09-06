@@ -15,14 +15,13 @@
  *)
 
 Section TcNNRCInfer.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import Program.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import cNNRC.
   Require Import TcNNRC.
 

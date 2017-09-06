@@ -16,19 +16,15 @@
 
 (* This file defines derived patterns, notations, and concepts *)
 Section TCAMPRule.
-
-  (* begin hide *)
   Require Import String.
   Require Import List.
   Require Import EquivDec.
-
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Export CAMPRule.
   Require Import TCAMP.
 
   Local Open Scope camp_scope.
   Local Open Scope string.
-  (* end hide *)
 
   (* Some typing wrappers *)
 

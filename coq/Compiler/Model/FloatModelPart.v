@@ -16,8 +16,10 @@
 
 Require Import String.
 Require Import ZArith.
-Require Import ForeignData ForeignOps.
-Require Import EquivDec Equivalence.
+Require Import ForeignData.
+Require Import ForeignOps.
+Require Import EquivDec.
+Require Import Equivalence.
 
 (** Defines the foreign support for Floating point numbers.  
      Posits axioms for the basic data/operators, and 

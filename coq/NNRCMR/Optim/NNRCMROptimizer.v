@@ -25,15 +25,16 @@ Section NNRCMROptimizer.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import cNNRCSystem.
   Require Import NNRCOptim.
   Require Import OptimizerLogger.
   Require Import OptimizerStep.
-
-  Require Import NNRCMR NNRCMRRewrite.
+  Require Import NNRCMR.
+  Require Import NNRCMRRewrite.
   Require Import ForeignReduceOps.
+
   Definition trew_nnrcmr
              {fruntime:foreign_runtime} {fredop:foreign_reduce_op} {logger:optimizer_logger string nnrc}
              (l: nnrcmr) :=

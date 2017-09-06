@@ -22,7 +22,8 @@ Require Import EquivDec.
 Require Import Permutation.
 Require Import EquivDec.
 Require Import Eqdep_dec.
-Require Import BasicSystem.
+Require Import Utils.
+Require Import CommonSystem.
 Require Import cNNRCSystem.
 Require Import CAMPSystem.
 Require Import cNNRCtoCAMP.
@@ -36,7 +37,7 @@ Section TcNNRCtoCAMP.
 
   Lemma  PTdot {τc} {Γ Γ₁:tbindings} {τ₁ τ₂ p k} (s:string) pf :
     NoDup (domain Γ₁) ->
-    RAssoc.lookup equiv_dec Γ₁ s = Some τ₁ ->
+    Assoc.lookup equiv_dec Γ₁ s = Some τ₁ ->
     [τc&Γ] |= p ; τ₁ ~> τ₂ ->
     [τc&Γ] |= pdot (loop_var s) p ; (Rec k (nnrc_to_camp_env Γ₁) pf) ~> τ₂.
   Proof.
@@ -123,7 +124,7 @@ Section TcNNRCtoCAMP.
 
   Hint Resolve is_list_sorted_nnrc_to_camp_env_nodup.
 
-  (* TODO: move to RAssoc *)
+  (* TODO: move to Assoc *)
   Lemma lookup_incl_perm_nodup {A B} {dec:EqDec A eq} {l1 l2:list (A*B)} :
     Permutation l1 l2 ->
     NoDup (@domain A B l1) ->
@@ -241,11 +242,11 @@ Section TcNNRCtoCAMP.
 
   Lemma fresh_bindings_some {A} `{EqDec A eq} (g g1 g2:list (string*A)) :
          Some g = merge_bindings g1 g2 <->
-         compatible g1 g2 = true /\
+         Compat.compatible g1 g2 = true /\
          g = rec_concat_sort g1 g2.
   Proof.
     unfold merge_bindings.
-    destruct (compatible g1 g2); simpl; intuition; congruence.
+    destruct (Compat.compatible g1 g2); simpl; intuition; congruence.
   Qed.
 
  Ltac t :=  match goal with 
@@ -599,7 +600,7 @@ Section TcNNRCtoCAMP.
   Lemma nnrcToCamp_ns_type_ignored_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
+    is_list_sorted ODT_lt_dec (domain b) = true ->
     fresh_bindings (domain b) (nnrcToCamp_ns n) ->
     (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     NoDup (domain b) ->
@@ -1322,7 +1323,7 @@ Section TcNNRCtoCAMP.
       + simpl; econstructor; eauto.
       + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         unfold merge_bindings in H14.
-        destruct (compatible (nnrc_to_camp_env Γ) [(loop_var v, s2)]);
+        destruct (Compat.compatible (nnrc_to_camp_env Γ) [(loop_var v, s2)]);
             [idtac|discriminate].
             t.
             unfold rec_concat_sort in H20.
@@ -1436,7 +1437,7 @@ Section TcNNRCtoCAMP.
   Qed.
 
   Lemma PTmapall_let_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
-    RSort.is_list_sorted ODT_lt_dec (domain Γ) = true ->
+    is_list_sorted ODT_lt_dec (domain Γ) = true ->
     fresh_bindings (domain Γ) (mapall_let p) ->
     [τc&Γ] |= mapall_let p; τ₁ ~> τ₂ ->
                             exists τ₁' τ₂',
@@ -1480,7 +1481,7 @@ Section TcNNRCtoCAMP.
   Lemma nnrcToCamp_ns_type_weaken_let_binding τc b x xv τ₁ τ₂ n :
     nnrcIsCore n ->
     shadow_free n = true ->
-    RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
+    is_list_sorted ODT_lt_dec (domain b) = true ->
     fresh_bindings (domain b) (nnrcToCamp_ns n) ->
     (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
     NoDup (domain b) ->

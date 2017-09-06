@@ -15,10 +15,13 @@
  *)
 
 Section NRAEnvEq.
-  Require Import String List Compare_dec.
-
-  Require Import Utils BasicRuntime.
-  Require Import cNRAEnv cNRAEnvEq.
+  Require Import String.
+  Require Import List.
+  Require Import Compare_dec.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import cNRAEnv.
+  Require Import cNRAEnvEq.
   Require Import NRAEnv.
 
   (* Equivalence for extended algebra *)

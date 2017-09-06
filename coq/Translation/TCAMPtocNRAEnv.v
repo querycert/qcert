@@ -17,7 +17,7 @@
 Section TCAMPtocNRAEnv.
   Require Import String.
   Require Import List.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import NRASystem.
   Require Import cNRAEnvSystem.
   Require Import CAMPSystem.

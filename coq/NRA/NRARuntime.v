@@ -14,8 +14,13 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export NRA NRASugar NRAEq NRAExt NRAExtEq NRASize.
+Require Export CommonRuntime.
+Require Export NRA.
+Require Export NRASugar.
+Require Export NRAEq.
+Require Export NRAExt.
+Require Export NRAExtEq.
+Require Export NRASize.
 
 (* 
 *** Local Variables: ***

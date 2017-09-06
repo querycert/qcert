@@ -100,12 +100,74 @@ the following:</p>
 <li><code>sqlppParser</code>: SQL++ parser </li>
 </ul>
 
-<h3>General-purpose libraries, data model, type system, operators</h3>
+<h3>General-purpose libraries</h3>
 
 <p>
-  The <code>coq/Basic</code> directory contains some the data-model
-  which is shared between all languages. This directory also contains
-  some utility functions.
+  The <code>coq/Utils</code> directory contains general purpose
+  libraries, tactics and lemmas used throughout the system.
+</p>
+<ul>
+<li><a href="html/Qcert.Utils.CoqLibAdd.html">CoqLibAdd</a>:
+ definitions and lemmas complementing those found in the Coq
+ Library.</li>
+<li><a href="html/Qcert.Utils.ListAdd.html">ListAdd</a>: Additional
+ definitions and lemmas on lists.
+ </li>
+<li><a href="html/Qcert.Utils.StringAdd.html">StringAdd</a>:
+ Additional definitions and lemmas on strings, including the
+ definition of a total order relation on strings.
+ </li>
+<li><a href="html/Qcert.Utils.SortingAdd.html">SortingAdd</a>:
+ insertion sort, and additional lemmas on sorting
+ </li>
+<li><a href="html/Qcert.Utils.Digits.html">Digits</a>: definition and
+ properties of integers, represented as list of digits in base 'n'
+</li>
+<li><a href="html/Qcert.Utils.Lattice.html">Lattice</a>: definition of
+ a lattice (loosely based on ideas
+ from <a href="http://www.cs.ox.ac.uk/people/daniel.james/lattice.html">A
+ reflection-based proof tactic for lattices in Coq</a>
+ and <a href="http://www.pps.univ-paris-diderot.fr/~sozeau/repos/coq/order">http://www.pps.univ-paris-diderot.fr/~sozeau/repos/coq/order</a>).
+ </li>
+<li><a href="html/Qcert.Utils.Lift.html">Lift</a>: definitions and
+ properties of lifting operations over option types.
+ </li>
+<li><a href="html/Qcert.Utils.Assoc.html">Assoc</a>: definitions and
+ properties of association lists.
+ </li>
+<li><a href="html/Qcert.Utils.Sublist.html">Sublist</a>: definitions
+ and properties of sub-lists.
+ </li>
+<li><a href="html/Qcert.Utils.Compat.html">Compat</a>: notion of
+compatibility between two association lists.
+ </li>
+<li><a href="html/Qcert.Utils.Fresh.html">Fresh</a>: support for
+creating and reasoning about fresh names (represented as strings).
+ </li>
+<li><a href="html/Qcert.Utils.Bindings.html">Bindings</a>
+and <a href="html/Qcert.Utils.BindingsNat.html">BindingsNat</a>:
+support for association lists for which the keys are ordered and with
+no duplicates.
+ </li>
+<li><a href="html/Qcert.Utils.Bag.html">Bag</a>: support for bags (or
+multisets).
+ </li>
+</ul>
+
+<h3>Common components, data model, type system, built-in operators</h3>
+
+<p>
+  The <code>coq/Common</code> directory contains components shared
+  across languages. It includes:
+<ul>
+<li><code>Common/Logger</code>: support for producing log traces</li>
+<li><code>Common/Data</code>: definition and properties of the data model</li>
+<li><code>Common/Env</code>: support for environments</li>
+<li><code>Common/Operators</code>: syntax and semantics for built-in operators</li>
+<li><code>Common/TypeSystem</code>: definition and properties of the type system </li>
+<li><code>Common/Typing</code>: typing for the data model and the built-in operators </li>
+<li><code>Common/JSON</code>: JSON conversions for data and types </li>
+</ul>  
 </p>
 
 <h3>Languages</h3>

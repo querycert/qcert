@@ -20,8 +20,8 @@ Require Import Arith.
 Require Import EquivDec.
 
 Section LambdaNRASugar.
-
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import LambdaNRA.
 
   Context {fruntime:foreign_runtime}.

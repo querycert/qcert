@@ -17,7 +17,7 @@
 Section cNRAEnvtoNRAEnv.
   Require Import String.
   Require Import List.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import cNRAEnvRuntime.
   Require Import NRAEnvRuntime.
 

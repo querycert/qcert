@@ -66,14 +66,13 @@ Note: Do we want to support 'create view' (q15) -- seems relatively trivial thro
 *)
 
 Section SQL.
-
   Require Import String.
   Require Import ZArith.
   Require Import List.
   Require Import Arith.
   Require Import EquivDec.
-
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import CommonSystem.
 
   Context {fruntime:foreign_runtime}.
 

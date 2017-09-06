@@ -22,7 +22,7 @@ Section TNRAEq.
   Require Import Program.
   Require Import List.
   Require Import String.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import NRA.
   Require Import NRAEq.
   Require Import TNRA.

@@ -20,8 +20,8 @@ Require Import Arith.
 Require Import EquivDec.
 
 Section OQLSugar.
-
-  Require Import Utils BasicSystem.
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import OQL.
 
   Context {fruntime:foreign_runtime}.

@@ -29,7 +29,7 @@ Section NNRCSugar.
   Require Import EquivDec.
   Require Import Decidable.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import cNNRC.
   Require Import NNRC.
 

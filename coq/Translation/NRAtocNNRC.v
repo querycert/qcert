@@ -20,7 +20,8 @@ Section NRAtocNNRC.
   Require Import EquivDec.
   Require Import Compare_dec.
   Require Import Program.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import NRARuntime.
   Require Import cNNRCRuntime.
 

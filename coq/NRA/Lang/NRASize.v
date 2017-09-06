@@ -16,7 +16,8 @@
 
 Section NRASize.
   Require Import Omega.
-  Require Import BasicRuntime NRA.
+  Require Import CommonRuntime.
+  Require Import NRA.
 
   Context {fruntime:foreign_runtime}.
 

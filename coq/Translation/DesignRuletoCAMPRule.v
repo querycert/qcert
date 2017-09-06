@@ -18,7 +18,7 @@ Section DesignRuletoCAMPRule.
   Require Import String.
   Require Import List.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import DesignRuleRuntime.
   Require Import CAMPRuleRuntime.
   

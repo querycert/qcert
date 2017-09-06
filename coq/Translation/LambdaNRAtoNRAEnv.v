@@ -19,11 +19,12 @@ Require Import List.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
-Require Import BasicRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
 
 Section LambdaNRAtoNRAEnv.
-
-  Require Import LambdaNRA NRAEnvRuntime.
+  Require Import LambdaNRARuntime.
+  Require Import NRAEnvRuntime.
 
   Context {fruntime:foreign_runtime}.
 

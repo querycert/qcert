@@ -16,7 +16,7 @@
 
 Section cNRAEnvSize.
   Require Import Omega.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import cNRAEnv.
 
   Context {fruntime:foreign_runtime}.

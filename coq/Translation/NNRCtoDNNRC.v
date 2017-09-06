@@ -21,7 +21,7 @@ Section NNRCtoDNNRC.
   Require Import EquivDec.
   Require Import Morphisms.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import NNRCSystem.
   Require Import DNNRCSystem.
 

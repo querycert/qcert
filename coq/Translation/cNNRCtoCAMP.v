@@ -15,7 +15,6 @@
  *)
 
 Section cNNRCtoCAMP.
-
   Require Import String.
   Require Import Bool.
   Require Import List.
@@ -23,7 +22,8 @@ Section cNNRCtoCAMP.
   Require Import Decidable.
   Require Import Morphisms.
   Require Import Omega.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import CAMPRuntime.
   Require Import cNNRCRuntime.
 
@@ -112,7 +112,7 @@ Section cNNRCtoCAMP.
 
   Lemma env_lookup_edot {A} (env:list (string*A)) (v:string) :
     NoDup (domain env) ->
-     RAssoc.lookup equiv_dec env v =
+     Assoc.lookup equiv_dec env v =
      edot (nnrc_to_camp_env env) (loop_var v).
   Proof.
     intros nd.
@@ -122,21 +122,19 @@ Section cNNRCtoCAMP.
     rewrite <- IHenv by trivial.
     dest_eqdec.
     - match_case; intros.
-      + apply RAssoc.lookup_in in H.
+      + apply Assoc.lookup_in in H.
         apply in_dom in H.
         tauto.
       + destruct (string_eqdec s s); simpl; [ | congruence ].
         trivial.
     - match_case.
       destruct (string_eqdec v s); simpl; trivial; intros nin.
-      apply RAssoc.lookup_none_nin in nin.
+      apply Assoc.lookup_none_nin in nin.
       congruence.
   Qed.
 
-  Require Import RLift.
-
   Lemma compatible_nin v (env:list (string*data)) a :
-        ~ In v (domain env) -> RCompat.compatible (nnrc_to_camp_env env) ((loop_var v, a) :: nil) = true.
+        ~ In v (domain env) -> Compat.compatible (nnrc_to_camp_env env) ((loop_var v, a) :: nil) = true.
   Proof.
     revert v a. induction env; simpl; trivial.
     destruct a; simpl. intuition.
@@ -169,7 +167,7 @@ Section cNNRCtoCAMP.
   Lemma compatible_drec_sort_nin v (env: bindings) a :
     NoDup (domain env) ->
     ~ In v (domain env) ->
-    RCompat.compatible (rec_sort (nnrc_to_camp_env env)) ((loop_var v, a) :: nil) = true.
+    Compat.compatible (rec_sort (nnrc_to_camp_env env)) ((loop_var v, a) :: nil) = true.
   Proof.
     intros.
     eapply compatible_perm_proper_l; try eapply compatible_nin; eauto.
@@ -206,8 +204,8 @@ Section cNNRCtoCAMP.
 
   Lemma gather_successes_le {A B} (f:A->presult B) l a :
     (gather_successes (map f l)) = Success a ->
-    (RBag.bcount a) <=
-    (RBag.bcount l).
+    (bcount a) <=
+    (bcount l).
   Proof.
     revert a.
     induction l; simpl; auto.
@@ -232,19 +230,19 @@ Section cNNRCtoCAMP.
   Require Import Omega.
 
   Lemma bcount_false1 {A} (l1 l2: list A) :
-    (RBag.bcount l2 <= RBag.bcount l1)%nat ->
-    Z.of_nat (S (RBag.bcount l1)) = Z.of_nat (RBag.bcount l2) ->
+    (bcount l2 <= bcount l1)%nat ->
+    Z.of_nat (S (bcount l1)) = Z.of_nat (bcount l2) ->
     False.
   Proof.
     intros.
     inversion H0.
-    assert (S (RBag.bcount l1) = (RBag.bcount l2)).
+    assert (S (bcount l1) = (bcount l2)).
     apply of_nat_inv; assumption.
     omega.
   Qed.
 
   Lemma camp_eval_mapall_cons h cenv p bind a l :
-    RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
+    is_list_sorted ODT_lt_dec (domain bind) = true ->
     camp_eval h cenv (mapall p) bind (dcoll (a::l)) =
     match camp_eval h cenv p bind a, (camp_eval h cenv (mapall p) bind (dcoll l)) with
     | Success x', Success (dcoll l') =>  Success (dcoll (x'::l'))
@@ -263,35 +261,35 @@ Section cNNRCtoCAMP.
     - case_eq ((gather_successes (map (camp_eval h cenv p bind) l))); 
         intros; simpl; trivial.
       generalize (gather_successes_le _ _ _ H1); intros.
-      destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
-                            (dnat (Z.of_nat (RBag.bcount res)))).
+      destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (bcount l))))
+                            (dnat (Z.of_nat (bcount res)))).
       inversion e. assert False by (apply (bcount_false1 l res); assumption); contradiction.
-      destruct (data_eq_dec (dnat (Z.of_nat (RBag.bcount l)))
-                            (dnat (Z.of_nat (RBag.bcount res)))); simpl; trivial.
+      destruct (data_eq_dec (dnat (Z.of_nat (bcount l)))
+                            (dnat (Z.of_nat (bcount res)))); simpl; trivial.
       inversion e; simpl.
-      assert (RBag.bcount l = RBag.bcount res) by (apply of_nat_inv; assumption).
+      assert (bcount l = bcount res) by (apply of_nat_inv; assumption).
       rewrite merge_bindings_nil_r.
       rewrite sort_sorted_is_id; trivial.
       rewrite H1; simpl; trivial.
     - case_eq ((gather_successes (map (camp_eval h cenv p bind) l))); 
         intros; simpl; trivial.
-      destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
-                            (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount res0))))); simpl.
+      destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (bcount l))))
+                            (dnat (Z.pos (Pos.of_succ_nat (bcount res0))))); simpl.
       + rewrite merge_bindings_nil_r.
         rewrite sort_sorted_is_id; trivial.
         rewrite H,H1; simpl.
         inversion e.
-        assert (RBag.bcount l = RBag.bcount res0)
-          by apply (pos_succ_nat_inv (RBag.bcount l) (RBag.bcount res0) H3).
+        assert (bcount l = bcount res0)
+          by apply (pos_succ_nat_inv (bcount l) (bcount res0) H3).
         rewrite H2.
-        destruct (data_eq_dec (dnat (Z_of_nat (RBag.bcount res0))) (dnat (Z_of_nat (RBag.bcount res0)))); [|intuition].
+        destruct (data_eq_dec (dnat (Z_of_nat (bcount res0))) (dnat (Z_of_nat (bcount res0)))); [|intuition].
         simpl.
         rewrite merge_bindings_nil_r.
         rewrite sort_sorted_is_id; trivial.
         rewrite H1; simpl; trivial.
-      + destruct (data_eq_dec (dnat (Z_of_nat (RBag.bcount l))) (dnat (Z_of_nat (RBag.bcount res0)))).
+      + destruct (data_eq_dec (dnat (Z_of_nat (bcount l))) (dnat (Z_of_nat (bcount res0)))).
         inversion e.
-        assert (RBag.bcount l = RBag.bcount res0) by (apply of_nat_inv; assumption).
+        assert (bcount l = bcount res0) by (apply of_nat_inv; assumption).
         congruence.
         simpl; trivial.
   Qed.
@@ -310,7 +308,7 @@ Section cNNRCtoCAMP.
        end.
 
   Lemma camp_eval_mapall h cenv p bind l :
-    RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
+    is_list_sorted ODT_lt_dec (domain bind) = true ->
     camp_eval h cenv (mapall p) bind (dcoll l) = liftpr dcoll (prmapM (map (camp_eval h cenv p bind) l)).
   Proof.
     revert p bind.
@@ -398,7 +396,7 @@ Section cNNRCtoCAMP.
       simpl.
       unfold rec_concat_sort.
       simpl. rewrite drec_sort_idempotent.
-      replace (RSort.insertion_sort_insert rec_field_lt_dec 
+      replace (insertion_sort_insert rec_field_lt_dec 
             (loop_var v, res) (rec_sort (nnrc_to_camp_env env))) with
       (rec_sort (nnrc_to_camp_env ((v,res)::env))) by reflexivity.
       rewrite (nnrcToCamp_data_indep _ _ _ dunit).
@@ -445,7 +443,7 @@ Section cNNRCtoCAMP.
       unfold rec_concat_sort.
       simpl.
       rewrite drec_sort_idempotent.
-      replace (RSort.insertion_sort_insert rec_field_lt_dec 
+      replace (insertion_sort_insert rec_field_lt_dec 
             (loop_var v, a) (rec_sort (nnrc_to_camp_env env))) with
       (rec_sort (nnrc_to_camp_env ((v,a)::env))) by reflexivity.
       specialize (IHn2 ((v,a)::env)).
@@ -679,7 +677,7 @@ Section cNNRCtoCAMP.
         rewrite drec_sort_idempotent.
         rewrite (nnrcToCamp_data_indep h _ a dunit); trivial.
         destruct ((camp_eval h cenv (nnrcToCamp_ns n2)
-          (RSort.insertion_sort_insert rec_field_lt_dec 
+          (insertion_sort_insert rec_field_lt_dec 
              (loop_var v, a) (rec_sort (nnrc_to_camp_env env))) dunit)); simpl; trivial;
           destruct (prmapM
                       (map
@@ -1038,7 +1036,7 @@ Section cNNRCtoCAMP.
 
     Lemma camp_eval_nnrcToCamp_ns_ignored_let_binding h cenv b x xv d n :
       shadow_free n = true ->
-      RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
+      is_list_sorted ODT_lt_dec (domain b) = true ->
       fresh_bindings (domain b) (nnrcToCamp_ns n) ->
       (forall x, In x (domain b) -> ~ In x (map loop_var (nnrc_bound_vars n))) ->
       NoDup (domain b) ->
@@ -1150,7 +1148,7 @@ Section cNNRCtoCAMP.
         f_equal; f_equal.
         apply Forall2_eq.
         rewrite <- Forall2_map.
-        apply RList.Forall2_refl.
+        apply ListAdd.Forall2_refl.
         red; intros.
         simpl.
         destruct (in_dec string_eqdec v (nnrc_bound_vars n2)); try discriminate.
@@ -1432,7 +1430,7 @@ Section cNNRCtoCAMP.
     Qed.
     
     Lemma camp_eval_mapall_let_cons h cenv p bind a l :
-      RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
+      is_list_sorted ODT_lt_dec (domain bind) = true ->
       fresh_bindings (domain bind) (mapall_let p) -> 
       NoDup (domain bind) ->
       camp_eval h cenv (mapall_let p) bind (dcoll (a::l)) =
@@ -1460,16 +1458,16 @@ Section cNNRCtoCAMP.
         rewrite merge_bindings_single_nin by trivial.
         rewrite edot_fresh_concat by trivial.
         simpl.
-        destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
-                              (dnat (Z.of_nat (RBag.bcount res)))).
+        destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (bcount l))))
+                              (dnat (Z.of_nat (bcount res)))).
         trivial.
         + generalize (gather_successes_le (camp_eval h cenv p bind) l); intros.
           specialize (H4 _ H3).
           inversion e.
           assert False by (apply (bcount_false1 l res); assumption); contradiction.
         + simpl.
-          destruct (data_eq_dec (dnat (Z.of_nat (RBag.bcount l)))
-                                (dnat (Z.of_nat (RBag.bcount res))));
+          destruct (data_eq_dec (dnat (Z.of_nat (bcount l)))
+                                (dnat (Z.of_nat (bcount res))));
             simpl; trivial.
           inversion e.
           rewrite merge_bindings_nil_r.
@@ -1479,8 +1477,8 @@ Section cNNRCtoCAMP.
         rewrite merge_bindings_single_nin by trivial.
         rewrite edot_fresh_concat by trivial.
         simpl.
-        destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount l))))
-                              (dnat (Z.pos (Pos.of_succ_nat (RBag.bcount res0))))).
+        destruct (data_eq_dec (dnat (Z.pos (Pos.of_succ_nat (bcount l))))
+                              (dnat (Z.pos (Pos.of_succ_nat (bcount res0))))).
         trivial; simpl.
         + rewrite merge_bindings_nil_r.
           rewrite sort_sorted_is_id; trivial.
@@ -1489,31 +1487,31 @@ Section cNNRCtoCAMP.
           rewrite edot_fresh_concat; trivial.
           simpl.
           inversion e.
-          destruct (data_eq_dec (dnat (Z.of_nat (RBag.bcount l)))
-                                (dnat (Z.of_nat (RBag.bcount res0)))); simpl; trivial.
+          destruct (data_eq_dec (dnat (Z.of_nat (bcount l)))
+                                (dnat (Z.of_nat (bcount res0)))); simpl; trivial.
           * rewrite merge_bindings_nil_r.
             rewrite sort_sorted_is_id; trivial.
             rewrite edot_fresh_concat; trivial.
           * inversion e.
-            assert (RBag.bcount l = RBag.bcount res0)
-              by apply (pos_succ_nat_inv (RBag.bcount l) (RBag.bcount res0) H6).
+            assert (bcount l = bcount res0)
+              by apply (pos_succ_nat_inv (bcount l) (bcount res0) H6).
             rewrite H4 in *. congruence.
         + rewrite merge_bindings_single_nin by trivial.
           rewrite edot_fresh_concat; trivial.
           simpl.
-          destruct (data_eq_dec (dnat (Z.of_nat (RBag.bcount l)))
-                                (dnat (Z.of_nat (RBag.bcount res0))));
+          destruct (data_eq_dec (dnat (Z.of_nat (bcount l)))
+                                (dnat (Z.of_nat (bcount res0))));
             simpl; trivial.
           inversion e.
-          assert (RBag.bcount l = RBag.bcount res0)
-            by apply (of_nat_inv (RBag.bcount l) (RBag.bcount res0) H5).
+          assert (bcount l = bcount res0)
+            by apply (of_nat_inv (bcount l) (bcount res0) H5).
           congruence.
     Qed.
 
     Transparent data_eq_dec.
 
     Lemma camp_eval_mapall_let h cenv p bind l :
-      RSort.is_list_sorted ODT_lt_dec (domain bind) = true ->
+      is_list_sorted ODT_lt_dec (domain bind) = true ->
       fresh_bindings (domain bind) (mapall_let p) -> 
       NoDup (domain bind) ->
       camp_eval h cenv (mapall_let p) bind (dcoll l) = liftpr dcoll (prmapM (map (camp_eval h cenv p bind) l)).
@@ -1541,7 +1539,7 @@ Section cNNRCtoCAMP.
     Qed.
 
     Lemma camp_eval_mapall_let_mapall h cenv p b d:
-      RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
+      is_list_sorted ODT_lt_dec (domain b) = true ->
       fresh_bindings (domain b) (mapall_let p) -> 
       NoDup (domain b) ->
       (camp_eval h cenv (mapall_let p) b d) = (camp_eval h cenv (mapall p) b d).
@@ -1580,7 +1578,7 @@ Section cNNRCtoCAMP.
     Qed.
   
     Lemma nnrcToCamp_ns_let_equiv h cenv n b d :
-      RSort.is_list_sorted ODT_lt_dec (domain b) = true ->
+      is_list_sorted ODT_lt_dec (domain b) = true ->
       fresh_bindings (domain b) (nnrcToCamp_ns_let n) ->
       NoDup (domain b) ->
       shadow_free n = true ->

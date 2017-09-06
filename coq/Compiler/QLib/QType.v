@@ -14,8 +14,10 @@
  * limitations under the License.
  *)
 
-Require Import CompilerRuntime Types.
-Require RType String.
+Require Import CompilerRuntime.
+Require Import Types.
+Require RType.
+Require String.
 Require Import TypingRuntime.
 Require Import JSONtoData.
 Require DatatoSparkDF.
@@ -43,7 +45,7 @@ Module QType(runtime:CompilerRuntime).
     := qtype.
 
   Definition sorted_pf_type {m:brand_relation} srl
-      := RSort.is_list_sorted RBindings.ODT_lt_dec (@RAssoc.domain String.string qtype srl) = true.
+      := SortingAdd.is_list_sorted Bindings.ODT_lt_dec (@Assoc.domain String.string qtype srl) = true.
 
   Definition bottom {m:brand_relation} : qtype
     := RType.Bottom.  

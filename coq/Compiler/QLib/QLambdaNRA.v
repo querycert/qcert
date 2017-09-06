@@ -16,8 +16,10 @@
 
 Require Import CompilerRuntime.
 Require String.
-Require QData QOperators.
-Require LambdaNRA LambdaNRASugar.
+Require QData.
+Require QOperators.
+Require LambdaNRA.
+Require LambdaNRASugar.
 
 Module QLambdaNRA(runtime:CompilerRuntime).
 

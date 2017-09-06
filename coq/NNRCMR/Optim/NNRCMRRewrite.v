@@ -20,7 +20,7 @@ Section NNRCMRRewrite.
   Require Import Arith.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import cNNRCRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMR.

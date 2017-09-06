@@ -30,18 +30,15 @@
 
 (* This file defines derived patterns, notations, and concepts *)
 Section CAMPRule.
-
-  (* begin hide *)
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Export CAMPRuntime.
 
   Local Open Scope camp_scope.
   Local Open Scope string.
-  (* end hide *)
 
   Context {fruntime:foreign_runtime}.
 

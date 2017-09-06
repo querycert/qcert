@@ -15,11 +15,10 @@
  *)
 
 Section CAMPtoNRA.
-
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import NRARuntime.
   Require Import CAMPRuntime.
   

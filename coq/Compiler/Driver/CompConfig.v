@@ -18,8 +18,8 @@ Section CompConfig.
   Require Import List.
   Require Import String.
   
-  (* Basic *)
-  Require Import BasicSystem.
+  (* Common *)
+  Require Import CommonSystem.
   Require Import TypingRuntime.
   Require Import ForeignReduceOps.
 

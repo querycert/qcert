@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
+Require Export CommonRuntime.
 Require Export cNNRC.
 Require Export cNNRCNorm.
 Require Export cNNRCEq.

@@ -15,10 +15,10 @@
  *)
 
 Section size.
-
   Require Import List.
   Require Import Omega.
-  Require Import BasicRuntime DNNRCBase.
+  Require Import CommonRuntime.
+  Require Import DNNRCBase.
 
   Context {fruntime:foreign_runtime}.
   Context {A plug_type:Set}.

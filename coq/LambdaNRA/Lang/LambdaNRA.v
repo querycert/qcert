@@ -19,8 +19,9 @@ Require Import List.
 Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
+Require Import Utils.
+Require Import CommonRuntime.
 
-Require Import Utils BasicRuntime.
 Section LambdaNRA.
 
   Context {fruntime:foreign_runtime}.

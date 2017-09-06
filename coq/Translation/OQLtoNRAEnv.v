@@ -20,7 +20,8 @@ Section OQLtoNRAEnv.
   Require Import Arith Omega.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import OQL.
   Require Import NRAEnvRuntime.
 

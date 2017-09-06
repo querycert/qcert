@@ -20,8 +20,7 @@ Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
 Require Import Utils.
-
-Require Import BasicSystem.
+Require Import CommonSystem.
 Require Import NRAEnvSystem.
 Require Import LambdaNRASystem.
 Require Import LambdaNRAtoNRAEnv.

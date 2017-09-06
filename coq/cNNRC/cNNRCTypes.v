@@ -14,8 +14,10 @@
  * limitations under the License.
  *)
 
-Require Export BasicTypes.
-Require Export TcNNRC TcNNRCEq TcNNRCShadow.
+Require Export CommonTypes.
+Require Export TcNNRC.
+Require Export TcNNRCEq.
+Require Export TcNNRCShadow.
 
 (* 
 *** Local Variables: ***

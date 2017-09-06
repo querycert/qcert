@@ -23,7 +23,8 @@ Section cNNRCEq.
   Require Import String.
   Require Import List.
   Require Import Arith.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import cNNRC.
   Require Import cNNRCNorm.
 

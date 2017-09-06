@@ -27,7 +27,7 @@ Import ListNotations.
 Section TDataTest.
 
   Require Import CAMPTest.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import TrivialModel.
 
   Require Import Program.

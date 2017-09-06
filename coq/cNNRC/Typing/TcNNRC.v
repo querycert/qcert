@@ -21,7 +21,7 @@ Section TcNNRC.
   Require Import Program.
   Require Import EquivDec.
   Require Import Morphisms.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import cNNRC.
 
   (** Typing rules for NNRC *)

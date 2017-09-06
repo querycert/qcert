@@ -21,7 +21,7 @@ Section TNRAtocNNRC.
   Require Import Compare_dec.
   Require Import Program.
   Require Import Utils.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import NRASystem.
   Require Import cNNRCSystem.
   Require Import NRAtocNNRC.

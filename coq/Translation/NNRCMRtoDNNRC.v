@@ -20,7 +20,7 @@ Section NNRCMRtoDNNRC.
   Require Import Sorting.Mergesort.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import ForeignReduceOps.
   Require Import ForeignToReduceOps.
   Require Import NNRCSystem.

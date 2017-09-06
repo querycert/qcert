@@ -49,7 +49,7 @@ Section NRAEnv.
   Require Import Compare_dec.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import cNRAEnv.
   Require Import cNRAEnvEq.
 

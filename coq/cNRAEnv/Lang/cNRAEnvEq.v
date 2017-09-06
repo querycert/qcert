@@ -15,11 +15,14 @@
  *)
 
 Section cNRAEnvEq.
-  Require Import String List Compare_dec.
-  
-  Require Import Utils BasicRuntime.
+  Require Import String.
+  Require Import List.
+  Require Import Compare_dec.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import NRARuntime.
-  Require Import cNRAEnv cNRAEnvIgnore.
+  Require Import cNRAEnv.
+  Require Import cNRAEnvIgnore.
 
   Local Open Scope string.
   Local Open Scope nraenv_core_scope.

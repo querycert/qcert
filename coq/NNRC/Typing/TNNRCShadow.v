@@ -21,7 +21,7 @@ Section TNNRCShadow.
   Require Import Peano_dec.
   Require Import EquivDec.
   Require Import Decidable.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import cNNRC.
   Require Import cNNRCShadow.
   Require Import TcNNRC.

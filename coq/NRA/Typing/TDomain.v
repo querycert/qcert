@@ -16,12 +16,9 @@
 
 Section TDomain.
   (* Record fields and record domain manipulation *)
-
   Require Import String.
   Require Import List.
-
-  Require Import Utils BasicSystem.
-
+  Require Import CommonSystem.
   Require Import NRA.
   Require Import TNRA.
 

@@ -16,7 +16,7 @@
 
 Require Import List.
 Require Import EquivDec.
-Require Import BasicSystem.
+Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToScala.

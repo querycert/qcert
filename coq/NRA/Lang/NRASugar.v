@@ -15,10 +15,11 @@
  *)
 
 Section NRASugar.
-  Require Import String List Compare_dec.
+  Require Import String.
+  Require Import List.
+  Require Import Compare_dec.
   Require Import EquivDec.
-  
-  Require Import Utils BasicRuntime.
+  Require Import CommonRuntime.
   Require Import NRA.
 
   (* Some macros used by extended algebras and patterns *)

@@ -15,10 +15,13 @@
  *)
 
 Section NRAExt.
-  Require Import String List Compare_dec.
-
-  Require Import Utils BasicRuntime.
-  Require Import NRA NRAEq NRAExt.
+  Require Import String.
+  Require Import List.
+  Require Import Compare_dec.
+  Require Import CommonRuntime.
+  Require Import NRA.
+  Require Import NRAEq.
+  Require Import NRAExt.
 
   (* Equivalence for extended algebra *)
 

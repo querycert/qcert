@@ -20,20 +20,19 @@
 
 (* those equivalences are for all well-typed expressions *)
 
-Section TOptimEnv.
-
+Section TNRAEnvRewrite.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-  Require Import Bool String List ListSet.
-  
-  Require Import BasicSystem.
-
-  Require Import cNRAEnv cNRAEnvIgnore cNRAEnvEq.
-  Require Import TcNRAEnv TcNRAEnvIgnore TcNRAEnvEq.
-
+  Require Import Bool.
+  Require Import String.
+  Require Import List.
+  Require Import ListSet.
+  Require Import Utils.
+  Require Import CommonSystem.
+  Require Import cNRAEnvSystem.
   Require Import NRAEnvRewrite.
 
   Local Open Scope nraenv_core_scope.
@@ -2472,9 +2471,9 @@ Section TOptimEnv.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
     econstructor; eauto.
-    - assert (RSort.is_list_sorted ODT_lt_dec (domain τ₃) = true)
+    - assert (is_list_sorted ODT_lt_dec (domain τ₃) = true)
         by (unfold merge_bindings in *;
-             destruct (compatible τ₁0 [x]); try discriminate;
+             destruct (Compat.compatible τ₁0 [x]); try discriminate;
             inversion H3;
             apply (@rec_concat_sort_sorted string ODT_string _ τ₁0 [x] (rec_concat_sort τ₁0 [x])); reflexivity).
       rename H into pf3.
@@ -2521,9 +2520,9 @@ Section TOptimEnv.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
     econstructor; eauto.
-    - assert (RSort.is_list_sorted ODT_lt_dec (domain τ₃) = true)
+    - assert (is_list_sorted ODT_lt_dec (domain τ₃) = true)
         by (unfold merge_bindings in *;
-             destruct (compatible τ₁0 [x]); try discriminate;
+             destruct (Compat.compatible τ₁0 [x]); try discriminate;
             inversion H3;
             apply (@rec_concat_sort_sorted string ODT_string _ τ₁0 [x] (rec_concat_sort τ₁0 [x])); reflexivity).
       rename H into pf3.
@@ -3187,7 +3186,7 @@ Section TOptimEnv.
     rewrite tapp_over_id_l_arrow.
     reflexivity.
   Qed.
-  
+
   Lemma tdup_elim (q:nraenv_core) :
     nodupA q -> ♯distinct(q) ⇒ q.
   Proof.
@@ -3216,7 +3215,7 @@ Section TOptimEnv.
       trivial.
   Qed.
     
-End TOptimEnv.
+End TNRAEnvRewrite.
 
 (* begin hide *)
 (* Hints for optimization tactic

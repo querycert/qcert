@@ -15,10 +15,12 @@
  *)
 
 Require Import String.
-Require Import EquivDec Equivalence.
-
-Require Import ForeignData ForeignOps.
-Require Import Utils ZArith.
+Require Import ZArith.
+Require Import EquivDec.
+Require Import Equivalence.
+Require Import Utils.
+Require Import ForeignData.
+Require Import ForeignOps.
 
 (*********  <WARNING>*********************)
 (** Extraction to OCaml is currently a stub **)

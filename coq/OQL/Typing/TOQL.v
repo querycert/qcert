@@ -15,15 +15,14 @@
  *)
 
 Section TOQL.
-
   Require Import String.
   Require Import List.
   Require Import Arith.
   Require Import Program.
-  Require Import EquivDec Morphisms.
-
-  Require Import Utils BasicSystem.
-
+  Require Import EquivDec.
+  Require Import Morphisms.
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import OQL.
   
   (** Typing for CAMP *)

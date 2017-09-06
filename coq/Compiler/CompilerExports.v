@@ -32,7 +32,7 @@ Require Export List.
 Export ListNotations.
 
 (* Some additional modules, notably rules and notations *)
-Require Export Utils BasicSystem.
+Require Export Utils CommonSystem.
 Require Export CAMPRule CAMPRuleSugar CompEnv.
 Open Scope camp_scope.
 

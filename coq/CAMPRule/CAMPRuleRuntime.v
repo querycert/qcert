@@ -14,8 +14,9 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export CAMPRule CAMPRuleSugar.
+Require Export CommonRuntime.
+Require Export CAMPRule.
+Require Export CAMPRuleSugar.
 
 (* 
 *** Local Variables: ***

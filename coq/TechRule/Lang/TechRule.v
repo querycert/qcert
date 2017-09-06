@@ -25,7 +25,7 @@ Java. *)
 
 Section TechRule.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Export CAMPRuleRuntime.
 
   Context {fruntime:foreign_runtime}.

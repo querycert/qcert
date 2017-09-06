@@ -18,8 +18,8 @@ Section CompCorrectness.
   Require Import String.
   Require Import Morphisms.
 
-  (* Core libraries *)
-  Require Import BasicSystem.
+  (* Common libraries *)
+  Require Import CommonSystem.
   Require Import TypingRuntime.
 
   (* Query languages *)

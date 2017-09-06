@@ -19,21 +19,23 @@
  *******************************)
 
 Section cNRAEnvContext.
-
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
   Require Import List.
   Require Import String.
   Require Import NPeano.
   Require Import Arith.
-
-  Require Import Utils BasicRuntime.
-  Require Import NRARuntime NRAOptim.
-  Require Import cNRAEnv cNRAEnvIgnore cNRAEnvEq cNRAEnvContext.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import NRARuntime.
+  Require Import NRAOptim.
+  Require Import cNRAEnv.
+  Require Import cNRAEnvIgnore.
+  Require Import cNRAEnvEq.
+  Require Import cNRAEnvContext.
 
 (*
     Lemma aec_substs_prop_part2 c ps1 ps2 :

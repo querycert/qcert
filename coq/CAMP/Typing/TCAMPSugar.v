@@ -15,13 +15,12 @@
  *)
 
 Section TCAMPSugar.
- 
   Require Import String.
   Require Import List.
   Require Import EquivDec.
   Require Import Program.
-
-  Require Import BasicSystem.
+  Require Import Utils.
+  Require Import CommonSystem.
   Require Import CAMPSugar.
   Require Export TCAMP.
 
@@ -56,10 +55,8 @@ Section TCAMPSugar.
       eauto.
   Qed.
 
-  Require Import RString.
-
   Lemma PTmapall_inv τc {Γ : tbindings} {τ₁ τ₂ : rtype} {p : camp} :
-    RSort.is_list_sorted ODT_lt_dec (domain Γ) = true ->
+    is_list_sorted ODT_lt_dec (domain Γ) = true ->
     [τc&Γ] |= mapall p; τ₁ ~> τ₂ ->
                        exists τ₁' τ₂',
                          τ₁ = Coll τ₁' /\

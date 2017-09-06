@@ -15,10 +15,14 @@
  *)
 
 Section cNRAEnvIgnore.
-
-  Require Import Bool List String.
-  Require Import Utils BasicRuntime.
-  Require Import NRA NRAEq cNRAEnv.
+  Require Import Bool.
+  Require Import List.
+  Require Import String.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import NRA.
+  Require Import NRAEq.
+  Require Import cNRAEnv.
 
   (* Some of algebraic equivalences for NRA with environment *)
   (* Those are valid without type *)

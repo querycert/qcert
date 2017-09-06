@@ -20,7 +20,7 @@ Section NNRCMRToCldMR.
   Require Import Sorting.Mergesort.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
   Require Import ForeignCloudant.

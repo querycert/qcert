@@ -19,10 +19,10 @@ Section TcNRAEnv.
   Require Import List.
   Require Import Compare_dec.
   Require Import Program.
-
-  Require Import Utils BasicSystem.
-
-  Require Import cNRAEnv cNRAEnvEq.
+  Require Import Utils.
+  Require Import CommonSystem.
+  Require Import cNRAEnv.
+  Require Import cNRAEnvEq.
 
   Local Open Scope nraenv_core_scope.
   

@@ -22,7 +22,7 @@ Section TNNRCRewrite.
   Require Import ListSet.
   Require Import Arith.
   Require Import EquivDec.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import cNNRCSystem.
   Require Import NNRCSystem.
   Require Import NNRCRewriteUtil.

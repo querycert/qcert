@@ -15,10 +15,12 @@
  *)
 
 Section cNRAEnv.
-  Require Import String List Compare_dec.
+  Require Import String.
+  Require Import List.
+  Require Import Compare_dec.
   Require Import EquivDec.
-
-  Require Import Utils BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
 
   (** Nested Relational Algebra *)
 
@@ -148,7 +150,6 @@ Section cNRAEnv.
   (* Input encoding *)
 
   Require Import NRARuntime.
-  Require Import String List RList.
   
   Local Open Scope string_scope.
   Local Open Scope list_scope.

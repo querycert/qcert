@@ -21,7 +21,7 @@ Section NNRCtoNNRCMR.
   Require Import List.
   Require Import EquivDec.
   Require Import Utils.
-  Require Import BasicRuntime.
+  Require Import CommonRuntime.
   Require Import NNRCRuntime.
   Require Import NNRCMRRuntime.
   Require Import ForeignToReduceOps.

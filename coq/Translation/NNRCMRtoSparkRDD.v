@@ -17,7 +17,8 @@
 Require Import List.
 Require Import String.
 Require Import EquivDec.
-Require Import BasicRuntime.
+Require Import Utils.
+Require Import CommonRuntime.
 Require Import NNRCRuntime.
 Require Import NNRCMRRuntime.
 Require Import NNRCtoJavaScript.

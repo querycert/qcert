@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Require Import BasicSystem.
+Require Import CommonSystem.
 Require Import ForeignToJava.
 Require Import ForeignToJavaScript.
 Require Import ForeignToScala.

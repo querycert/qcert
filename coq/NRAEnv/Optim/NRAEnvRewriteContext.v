@@ -18,20 +18,24 @@
  * Algebra contexts *
  *******************************)
 
-Section ROptimEnvContext.
+Section NRAEnvRewriteContext.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-
-  Require Import Arith List.
+  Require Import Arith.
+  Require Import List.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Import NRARuntime.
+  Require Import cNRAEnvRuntime.
+  Require Import NRAContext.
+  Require Import NRARewriteContext.
+  Require Import cNRAEnvContext.
+  Require Import cNRAEnvContextLift.
+  Require Import NRAEnvRewrite.
   
-  Require Import Utils BasicRuntime.
-  Require Import NRA cNRAEnv cNRAEnvEq.
-  
-  Require Import NRAContext NRAEnvRewrite NRARewriteContext.
-  Require Import cNRAEnvContext cNRAEnvContextLift.
   Local Open Scope nraenv_core_ctxt.
 
   Context {fruntime:foreign_runtime}.
@@ -93,7 +97,7 @@ Section ROptimEnvContext.
   Qed.
 
 
-End ROptimEnvContext.
+End NRAEnvRewriteContext.
   
 (* 
 *** Local Variables: ***

@@ -20,7 +20,7 @@ Require Import Arith.
 Require Import EquivDec.
 Require Import Morphisms.
 
-Require Import Utils BasicRuntime.
+Require Import Utils CommonRuntime.
 
 Require Import LambdaNRA LambdaNRAEq LambdaNRAtoNRAEnv.
 Require Import TrivialCompiler.
@@ -44,7 +44,7 @@ Section tDNNRCTests.
 
   (* Typing stuffs for then next steps *)
   Require Import CAMPTest.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import TrivialModel.
   Require Import TDataTest.
 

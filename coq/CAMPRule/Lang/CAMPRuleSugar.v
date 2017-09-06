@@ -16,17 +16,15 @@
 
 (* This file defines derived patterns, notations, and concepts *)
 Section CAMPRuleSugar.
-
-  (* begin hide *)
   Require Import String.
   Require Import List.
-
-  Require Import BasicRuntime.
-  Require Export CAMPSugar CAMPRule.
+  Require Import Utils.
+  Require Import CommonRuntime.
+  Require Export CAMPSugar.
+  Require Export CAMPRule.
   
   Local Open Scope camp_scope.
   Local Open Scope string.
-  (* end hide *)
 
   Context {fruntime:foreign_runtime}.
 

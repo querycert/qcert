@@ -14,8 +14,10 @@
  * limitations under the License.
  *)
 
-Require Export BasicRuntime.
-Require Export LambdaNRA LambdaNRAEq LambdaNRASugar.
+Require Export CommonRuntime.
+Require Export LambdaNRA.
+Require Export LambdaNRAEq.
+Require Export LambdaNRASugar.
 
 (* 
 *** Local Variables: ***

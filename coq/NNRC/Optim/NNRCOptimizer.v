@@ -26,7 +26,7 @@ Section NNRCOptimizer.
   Require Import Setoid.
   Require Import EquivDec.
   Require Import Program.
-  Require Import BasicSystem.
+  Require Import CommonSystem.
   Require Import cNNRCSystem.
   Require Import NNRCSystem.
   Require Import NNRCRewriteUtil.

@@ -21,12 +21,9 @@ Section TNRAInfer.
   Require Import Eqdep_dec.
   Require Import Bool.
   Require Import EquivDec.
-
-  Require Import Utils BasicSystem.
-
+  Require Import CommonSystem.
   Require Import NRA.
   Require Import TNRA.
-
   Require Import Program.
 
   (** Type inference for NRA when given the type of the input *)

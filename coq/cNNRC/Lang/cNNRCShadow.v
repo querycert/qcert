@@ -21,7 +21,8 @@ Section cNNRCShadow.
   Require Import Peano_dec.
   Require Import EquivDec.
   Require Import Decidable.
-  Require Import BasicRuntime.
+  Require Import Utils.
+  Require Import CommonRuntime.
   Require Import cNNRC.
 
   Close Scope nnrc_scope.
