@@ -2192,24 +2192,23 @@ Section CompDriver.
           rewrite H0; rewrite H3; reflexivity.
   Qed.
 
+
   Theorem driver_of_path_completeness:
     forall dv,
     forall config,
       no_dv_error dv ->
       is_driver_config config dv ->
-      exists target_lang path,
-        driver_of_path config (path ++ target_lang :: nil) = dv.
+      exists path,
+        driver_of_path config path = dv.
   Proof.
     intros dv config H_no_dv_error H_dv_config.
     unfold driver_of_path.
-    exists (target_language_of_driver dv).
     assert (is_postfix_driver (driver_of_language (target_language_of_driver dv)) dv) as Hpost;
       [ apply (target_language_of_driver_is_postfix dv H_no_dv_error) | ].
     generalize (driver_of_rev_path_completeness dv ((driver_of_language (target_language_of_driver dv))) config H_dv_config Hpost).
     intros H_exists.
     destruct H_exists.
-    exists (List.rev x).
-    rewrite List.rev_unit.
+    exists (List.rev ((target_language_of_driver dv) :: x)).
     rewrite List.rev_involutive.
     assumption.
   Qed.
