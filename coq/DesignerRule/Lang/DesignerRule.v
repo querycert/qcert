@@ -23,7 +23,7 @@ Java. *)
 - translating to DesignerRule:
 - translating from DesignerRule: CAMPRule *)
 
-Section DesignRule.
+Section DesignerRule.
   Require Import Utils.
   Require Import CommonRuntime.
   Require Export CAMPRuleRuntime.
@@ -33,7 +33,7 @@ Section DesignRule.
   Axiom designer_rule : Set.
   Axiom designer_rule_to_camp_rule : designer_rule -> camp_rule.
   
-End DesignRule.
+End DesignerRule.
 
 (* 
 *** Local Variables: ***

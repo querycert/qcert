@@ -206,8 +206,8 @@ MODULES = \
 	CAMPRule/CAMPRuleSystem \
 	TechRule/Lang/TechRule \
 	TechRule/TechRuleRuntime \
-	DesignRule/Lang/DesignRule \
-	DesignRule/DesignRuleRuntime \
+	DesignerRule/Lang/DesignerRule \
+	DesignerRule/DesignerRuleRuntime \
 	CldMR/Lang/CldMRUtil \
 	CldMR/Lang/ForeignCloudant \
 	CldMR/Lang/CldMR \
@@ -265,7 +265,7 @@ MODULES = \
 	Translation/NNRCMRtoCldMR \
 	Translation/DNNRCtotDNNRC \
 	Translation/TechRuletoCAMPRule \
-	Translation/DesignRuletoCAMPRule \
+	Translation/DesignerRuletoCAMPRule \
 	Translation/CAMPRuletoCAMP \
 	Translation/CAMPtoNRA \
 	Translation/CAMPtocNRAEnv \

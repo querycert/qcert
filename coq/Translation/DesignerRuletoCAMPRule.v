@@ -14,12 +14,12 @@
  * limitations under the License.
  *)
 
-Section DesignRuletoCAMPRule.
+Section DesignerRuletoCAMPRule.
   Require Import String.
   Require Import List.
   Require Import Utils.
   Require Import CommonRuntime.
-  Require Import DesignRuleRuntime.
+  Require Import DesignerRuleRuntime.
   Require Import CAMPRuleRuntime.
   
   Section Top.
@@ -30,7 +30,7 @@ Section DesignRuletoCAMPRule.
       designer_rule_to_camp_rule q.
   End Top.
     
-End DesignRuletoCAMPRule.
+End DesignerRuletoCAMPRule.
 
 (* 
 *** Local Variables: ***

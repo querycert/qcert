@@ -29,7 +29,7 @@ Section CompCorrectness.
   (* Rule languages *)
   Require Import CAMPRuleRuntime.
   Require Import TechRuleRuntime.
-  Require Import DesignRuleRuntime.
+  Require Import DesignerRuleRuntime.
   (* Intermediate languages *)
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
@@ -52,7 +52,7 @@ Section CompCorrectness.
   Require Import LambdaNRAtoNRAEnv.
   Require Import CAMPRuletoCAMP.
   Require Import TechRuletoCAMPRule.
-  Require Import DesignRuletoCAMPRule.
+  Require Import DesignerRuletoCAMPRule.
   Require Import CAMPtoNRA.
   Require Import CAMPtocNRAEnv.
   Require Import CAMPtoNRAEnv.

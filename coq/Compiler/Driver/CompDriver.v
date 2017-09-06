@@ -31,7 +31,7 @@ Section CompDriver.
   (* Rule languages *)
   Require Import CAMPRuleRuntime.
   Require Import TechRuleRuntime.
-  Require Import DesignRuleRuntime.
+  Require Import DesignerRuleRuntime.
   (* Intermediate languages *)
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.
@@ -55,7 +55,7 @@ Section CompDriver.
   Require Import LambdaNRAtoNRAEnv.
   Require Import CAMPRuletoCAMP.
   Require Import TechRuletoCAMPRule.
-  Require Import DesignRuletoCAMPRule.
+  Require Import DesignerRuletoCAMPRule.
   Require Import CAMPtoNRA.
   Require Import CAMPtocNRAEnv.
   Require Import CAMPtoNRAEnv.
@@ -168,7 +168,7 @@ Section CompDriver.
       TechRuletoCAMPRule.tech_rule_to_camp_rule_top q.
 
     Definition designer_rule_to_camp_rule (q:designer_rule) : camp_rule :=
-      DesignRuletoCAMPRule.designer_rule_to_camp_rule_top q.
+      DesignerRuletoCAMPRule.designer_rule_to_camp_rule_top q.
 
     Definition camp_to_nra (q:camp) : nra :=
       CAMPtoNRA.camp_to_nra_top q.

@@ -14,7 +14,6 @@
     <link href="./bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap theme -->
     <link href="./bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-
     <!-- Custom styles for this template -->
     <link href="navbar.css" rel="stylesheet">
 
@@ -76,8 +75,8 @@
 <p>
   This figure represents the general architecture of the compiler with
   its
-  <a href="html/Qcert.Compiler.Driver.CompLang.html">all
-  intermediate languages</a> and the
+  <a href="html/Qcert.Compiler.Driver.CompLang.html">all supported
+  languages</a> and the
   different <a href="html/Qcert.Compiler.Driver.CompDriver.html#driver">compilation
   paths</a>.
 </p>
@@ -172,86 +171,262 @@ multisets).
 
 <h3>Languages</h3>
 
-<p>
-  In the <code>coq</code> directory, each language has its own
+<p>In the <code>coq</code> directory, each language has its own
   directory with a subdirectory <code>Lang</code> containing the
   syntax (Abstract Syntax Tree) and the definition of the semantics of
-  the language. Then, depending on the language, some additional
-  subdirectory can be present. For example, it is possible to find
-  a <code>Optim</code> subdirectory containing the optimizer for the
-  language, or a <code>Typing</code> subdirectory containing the type
-  checker.
+  the language.
 </p>
+
+<p>When that language comes with a type checker, the type checker can
+  be found in a separate <code>Typing</code> subdirectory.
+</p>
+
+<h4>Source Languages</h4>
+
+  <p>The following languages can be passed in source (text/file) form
+  to the compiler and are provided with a parser. The parsers for OQL
+  and NRA<sup>&lambda;</sup> are written in OCaml and part of the
+  Q*cert distribution. The parsers for TechRule, DesignerRule, SQL and
+  SQL++ are written in Java and require third-party libraries which
+  must be downloaded separately during installation.</p>
+
+  <table class="table">
+    <tr><th>Name</th>
+      <th>Language</th>
+      <th>On Command Line</th>
+      <th>Code Location</th>
+      <th>Annotated Code</th>
+      <th>Reference</th></tr>
+    <tr><th>TechRule</th>
+      <td>ODM technical rules</td>
+      <td><code>tech_rule</code></td>
+      <td><code>coq/TechRule<code></td>
+      <td><a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">Syntax</a></td>
+      <td></td></tr>
+    <tr><th>DesignerRule</th>
+      <td>ODM designer rules</td>
+      <td><code>designer_rule</code></td>
+      <td><code>coq/DesignerRule<code></td>
+      <td><a href="html/Qcert.DesignerRule.Lang.DesignerRule.html#designer_rule">Syntax</a><br/></td>
+      <td></td></tr>
+    <tr><th>NRA<sup>&lambda;</sup></th>
+      <td>Lambda-NRA</td>
+      <td><code>lambda_nra</code></td>
+      <td><code>coq/LambdaNRA<code></td>
+      <td><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Syntax</a><br/>
+          <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">Semantics</a><br/>
+	  <a href="html/Qcert.LambdaNRA.Typing.LambdaNRA.html#lambda_nra_type">Typing</a><br/></td>
+      <td><a href="#nraenv">[AHMSS2017]</a></td></tr>
+    <tr><th>SQL</th>
+      <td>Structured Query Language</td>
+      <td><code>sql</code></td>
+      <td><code>coq/SQL<code></td>
+      <td><a href="html/Qcert.SQL.Lang.SQL.html#sql">Syntax</a><br/></td>
+      <td></td></tr>
+    <tr><th>SQL++</th>
+      <td>SQL extended for JSON</td>
+      <td><code>sqlpp</code></td>
+      <td><code>coq/SQLPP<code></td>
+      <td><a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">Syntax</a><br/></td>
+      <td></td></tr>
+    <tr><th>OQL</th>
+      <td>Object Query Language</td>
+      <td><code>oql</code></td>
+      <td><code>coq/OQL<code></td>
+      <td><a href="html/Qcert.OQL.Lang.OQL.html#oql">Syntax</a><br/>
+          <a href="html/Qcert.OQL.Lang.OQL.html#oql_eval_top">Semantics</a></td>
+      <td><a href="#oql">[ODMG]</a></td></tr>
+  </table>
+
+  <h4>Local Intermediate Languages</h4>
+
+  <p>The following languages are intermediate representations used for
+  compilation and optimization. They all assume the data is accessed
+  locally (i.e., do not take distribution into consideration). Most of
+  that part of the code comes with type checkers and mechanized proofs
+  of correctness (when translating between those languages or applying
+  optimizations).</p>
+  
+  <table class="table">
+    <tr><th>Name</th>
+      <th>Language</th>
+      <th>On Command Line</th>
+      <th>Code Location</th>
+      <th>Annotated Code</th>
+      <th>Reference</th></tr>
+    <tr><th>CAMPRule</th>
+      <td>CAMP rules</td>
+      <td><code>camp_rule</code></td>
+      <td><code>coq/CAMPRule<code></td>
+      <td><a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">Syntax</a><br/>
+          <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule_eval_top">Semantics</a></td>
+      <td><a href="#camp">[AHS2015]</a></td></tr>
+    <tr><th>CAMP</th>
+      <td>Calculus of Aggregating Matching Patterns</td>
+      <td><code>camp</code></td>
+      <td><code>coq/CAMP<code></td>
+      <td><a href="html/Qcert.CAMP.Lang.CAMP.html#camp">Syntax</a><br/>
+          <a href="html/Qcert.CAMP.Lang.CAMP.html#camp_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.CAMP.Typing.TCAMP.html#camp_type">Typing</a></td>
+      <td><a href="#camp">[AHS2015]</a></td></tr>
+    <tr><th>NRA</th>
+      <td>Nested Relational Algebra</td>
+      <td><code>nra</code></td>
+      <td><code>coq/NRA<code></td>
+      <td><a href="html/Qcert.NRA.Lang.NRA.html#nra">Syntax</a><br/>
+          <a href="html/Qcert.NRA.Lang.NRA.html#nra_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.NRA.Typing.TNRA.html#nra_type">Typing</a></td>
+      <td><a href="#nra">[Moer2017]</a></td></tr>
+    <tr><th>NRA<sup>e</sup></th>
+      <td>NRA with Environments</td>
+      <td><code>nraenv</code></td>
+      <td><code>coq/NRAEnv<code></td>
+      <td><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">Syntax</a><br/>
+          <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">Typing</a></td>
+      <td></td></tr>
+    <tr><th>cNRA<sup>e</sup></th>
+      <td>Core NRA with Environments</td>
+      <td><code>nraenv_core</code></td>
+      <td><code>coq/cNRAEnv<code></td>
+      <td><a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">Syntax</a><br/>
+          <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.cNRAEnv.Typing.TcNRAEnv.html#nraenv_core_type">Typing</a></td>
+      <td><a href="#nraenv">[AHMSS2017]</a></td></tr>
+    <tr><th>NNRC</th>
+      <td>Named Nested Relational Calculus</td>
+      <td><code>nnrc</code></td>
+      <td><code>coq/NNRC<code></td>
+      <td><a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc">Syntax</a><br/>
+          <a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.NNRC.Typing.TNNRC.html#nnrc_ext_type">Typing</a></td>
+      <td></td></tr>
+    <tr><th>cNNRC</th>
+      <td>Core Named Nested Relational Calculus</td>
+      <td><code>nnrc_core</code></td>
+      <td><code>coq/cNNRC<code></td>
+      <td><a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">Syntax</a><br/>
+          <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.cNNRC.Typing.TcNNRC.html#nnrc_type">Typing</a></td>
+      <td><a href="#nnrc">[BV2007]</a></td></tr>
+  </table>
+  
+  <h4>Distributed Intermediate Languages</h4>
+  
+  <p>The following languages are intermediate representations used for
+  compilation and optimization. They take distribution into
+  consideration. Most of that part of the code comes with no
+  mechanized proofs (when translating to/from those languages or when
+  applying optimizations).</p>
+  
+  <table class="table">
+    <tr><th>Name</th>
+      <th>Language</th>
+      <th>On Command Line</th>
+      <th>Code Location</th>
+      <th>Annotated Code</th>
+      <th>Reference</th></tr>
+    <tr><th>DNNRC</th>
+      <td>Distributed Named Nested Relational Calculus</td>
+      <td><code>dnnrc</code></td>
+      <td><code>coq/DNNRC<code></td>
+      <td><a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe">Syntax</a><br/>
+          <a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe_eval_top">Semantics</a><br/>
+          <a href="html/Qcert.DNNRC.Typing.TDNNRCBase.html#dnnrc_type">Typing</a></td>
+      <td></td></tr>
+    <tr><th>DNNRC</th>
+      <td>Typed DNNRC</td>
+      <td><code>dnnrc_typed</code></td>
+      <td><code>coq/tDNNRC<code></td>
+      <td><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed">Syntax</a><br/>
+          <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed_eval_top">Semantics</a></td>
+      <td></td></tr>
+    <tr><th>NNRCMR</th>
+      <td>NNRC extended with Map/Reduce</td>
+      <td><code>nnrcmr</code></td>
+      <td><code>coq/NNRCMR<code></td>
+      <td><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr">Syntax</a><br/>
+          <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval_top">Semantics</a></td>
+      <td></td></tr>
+    <tr><th>CldMR</th>
+      <td>NNRC extended with Map/Reduce for Cloudant</td>
+      <td><code>cldmr</code></td>
+      <td><code>coq/CldMR<code></td>
+      <td><a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">Syntax</a><br/>
+          <a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr_eval_top">Semantics</a></td>
+      <td></td></tr>
+  </table>
+
+  <h4>Target Languages</h4>
+
+  <p>The following languages are usually represented as character
+  strings containing code corresponding to the target. The
+  corresponding code needs to be linked to a small runtime for
+  execution. The runtimes are located in the <code>runtime</code>
+  directory in the Q*cert source code.</p>
+
+  <table class="table">
+    <tr><th>Language</th>
+      <th>On Command Line</th>
+      <th>Code Location</th>
+      <th>Annotated Code</th>
+      <th>Runtime</th>
+      <th>Reference</th></tr>
+    <tr><td>JavaScript</td>
+      <td><code>javascript</code></td>
+      <td><code>coq/JavaScript<code></td>
+      <td><a href="html/Qcert.JavaScript.Lang.JavaScript.html#javascript">Syntax</a></td>
+      <td><code>runtime/javascript</code></td>
+      <td></td></tr>
+    <tr><td>Java</td>
+      <td><code>java</code></td>
+      <td><code>coq/Java<code></td>
+      <td><a href="html/Qcert.Java.Lang.Java.html#java">Syntax</a></td>
+      <td><code>runtime/java</code></td>
+      <td></td></tr>
+    <tr><td>Cloudant</td>
+      <td><code>cloudant</code></td>
+      <td><code>coq/Cloudant<code></td>
+      <td><a href="html/Qcert.Cloudant.Lang.Cloudant.html#cloudant">Syntax</a></td>
+      <td><code>runtime/javascript</code></td>
+      <td><a href="#cloudant">[Cloudant]</a></td></tr>
+    <tr><td>Spark, Resilient Distributed Datasets API</td>
+      <td><code>spark_rdd</code></td>
+      <td><code>coq/SparkRDD<code></td>
+      <td><a href="html/Qcert.SparkRDD.Lang.SparkRDD.html#spark_rdd">Syntax</a></td>
+      <td><code>runtime/javascript</code></td>
+      <td><a href="#spark_rdd">[SparkRDD]</a></td></tr>
+    <tr><td>Spark, DataFrames API</td>
+      <td><code>spark_df</code></td>
+      <td><code>coq/SparkDF<code></td>
+      <td><a href="html/Qcert.SparkDF.Lang.SparkDF.html#spark_df">Syntax</a></td>
+      <td><code>runtime/spark2</code></td>
+      <td><a href="#spark_df">[SparkDF]</a></td></tr>
+  </table>
+
+<h3>Optimization Passes</h3>
 
 <p>
-  The supported languages are:
-  <ul>
-    <li><a href="html/Qcert.TechRule.Lang.TechRule.html">TechRule</a>: ODM technical rules
-      (<a href="html/Qcert.TechRule.Lang.TechRule.html#tech_rule">Syntax</a>)</li>
-    <li><a href="html/Qcert.DesignRule.Lang.DesignRule.html">DesignerRule</a>: ODM designer rules
-      (<a href="html/Qcert.DesignRule.Lang.DesignRule.html#designer_rule">Syntax</a>)</li>
-    <li><a href="html/Qcert.CAMPRule.Lang.CAMPRule.html">CAMPRule</a>: Rule Macros for CAMP
-      (<a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">Syntax</a>,
-       <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule_eval_top">Semantics</a>)</li>
-    <li><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html">NRA<sup>𝝀</sup></a>: NRA with Lambdas
-      (<a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Syntax</a>,
-       <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">Semantics</a>)</li>
-    <li><a href="html/Qcert.SQL.Lang.SQL.html">SQL</a>: Structured Query Language
-      (<a href="html/Qcert.SQL.Lang.SQL.html#sql">Syntax</a>)</li>
-    <li><a href="html/Qcert.SQLPP.Lang.SQLPP.html">SQL++</a>: Structured Query Language extended for JSON
-      (<a href="html/Qcert.SQLPP.Lang.SQLPP.html#sqlpp">Syntax</a>)</li>
-    <li><a href="html/Qcert.OQL.Lang.OQL.html">OQL</a>: Object Query Language
-      (<a href="html/Qcert.OQL.Lang.OQL.html#oql">Syntax</a>,
-       <a href="html/Qcert.OQL.Lang.OQL.html#oql_eval_top">Semantics</a>)</li>
-    <li><a href="html/Qcert.CAMP.Lang.CAMP.html">CAMP</a>: Calculus of Aggregating Matching Patterns
-      (<a href="html/Qcert.CAMP.Lang.CAMP.html#camp">Syntax</a>,
-       <a href="html/Qcert.CAMP.Lang.CAMP.html#camp_eval_top">Semantics</a>,
-       <a href="html/Qcert.CAMP.Typing.TCAMP.html#camp_type">Typing</a>)</li>
-    <li><a href="html/Qcert.NRA.Lang.NRA.html">NRA</a>: Nested Relational Algebra
-      (<a href="html/Qcert.NRA.Lang.NRA.html#nra">Syntax</a>,
-       <a href="html/Qcert.NRA.Lang.NRA.html#nra_eval_top">Semantics</a>,
-       <a href="html/Qcert.NRA.Typing.TNRA.html#nra_type">Typing</a>)</li>
-    <li><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>: NRA with Environments
-      (<a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">Syntax</a>,
-       <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">Semantics</a>,
-       <a href="html/Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">Typing</a>,
-       <a href="html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims">Optimizer</a>)</li>
-    <li><a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html">cNRA<sup>e</sup></a>: Core NRA<sup>e</sup>
-      (<a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">Syntax</a>,
-       <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core_eval_top">Semantics</a>,
-       <a href="html/Qcert.cNRAEnv.Typing.TcNRAEnv.html#nraenv_core_type">Typing</a>)</li>
-    <li><a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>: Named Nested Relational Calculus
-      (<a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc">Syntax</a>,
-       <a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc_eval_top">Semantics</a>,
-       <a href="html/Qcert.NNRC.Typing.TNNRC.html#nnrc_ext_type">Typing</a>,
-       <a href="html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">Optimizer</a>)</li>
-    <li><a href="html/Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a>: Core NNRC
-      (<a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">Syntax</a>,
-       <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">Semantics</a>,
-       <a href="html/Qcert.cNNRC.Typing.TcNNRC.html#nnrc_type">Typing</a>)</li>
-    <li><a href="html/Qcert.DNNRC.Lang.DNNRC.html">DNNRC</a>: Distributed NNRC
-      (<a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe">Syntax</a>,
-       <a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_dataframe_eval_top">Semantics</a>,
-       <a href="html/Qcert.DNNRC.Typing.TDNNRCBase.html#dnnrc_type">Typing</a>)</li>
-    <li><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html">tDNNRC</a>: Typed DNNRC
-      (<a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed">Syntax</a>,
-       <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_dataframe_typed_eval_top">Semantics</a>,
-       <a href="html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#dnnrcToDataframeRewrite">Optimizer</a>)</li>
-    <li><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html">NNRCMR</a>: NNRC extended with Map/Reduce
-      (<a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr">Syntax</a>,
-       <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval_top">Semantics</a>,
-       <a href="html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims">Optimizer</a>)</li>
-    <li><a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">CldMR</a>: NNRC extended with Map/Reduce for Cloudant
-      (<a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">Syntax</a>,
-       <a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr_eval_top">Semantics</a>)</li>
-  </ul>
-</p>
+  Optimizers, when present, are located within the
+  <code>Optim</code> directory of the corresponding language. The
+  following four languages support optimization passes:</p>
 
-<h3>Translations</h3>
+  <ul>
+    <li><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>: NRA with Environments
+      (<a href="html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims">Optimizer</a>)</li>
+    <li><a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>: Named Nested Relational Calculus
+      (<a href="html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">Optimizer</a>)</li>
+    <li><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html">tDNNRC</a>: Typed DNNRC
+      (<a href="html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#dnnrcToDataframeRewrite">Optimizer</a>)</li>
+    <li><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html">NNRCMR</a>: NNRC extended with Map/Reduce
+      (<a href="html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims">Optimizer</a>)</li>
+  </ul>
+
+<h3>Translation Passes</h3>
 
 <p>
   The <code>coq/Translation</code> directory contains all the
-  translation functions that compiles a language into another.
+  functions translating between languages inside the compiler.
 </p>
 
 <p>
@@ -276,7 +451,7 @@ multisets).
 	  (<a href="html/Qcert.Translation.CAMPRuletoCAMP.html#camp_rule_to_camp_top">Translation</a> through macro-expansion,
 	   <a href="html/Qcert.Translation.CAMPRuletoCAMP.html#camp_rule_to_camp_top_correct">Correctness</a>)</li></ul>
     </li>
-    <li>From <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html">NRA<sup>𝝀</sup></a>:
+    <li>From <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html">NRA<sup>&lambda;</sup></a>:
       <ul><li>To <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>
 	  (<a href="html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top">Translation</a>,
 	  <a href="html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top_correct">Correctness</a>,
@@ -379,33 +554,40 @@ multisets).
 
 <h3>References</h3>
 
-<p>
-  The Q*cert development, notably the choices of intermediate
-  representations, builds on earlier work:
-</p>
-<ul>
-  <li>
-    The most complete treatment for the Nested Relational Algebra
-    (NRA) used by Q*cert can be found in Guido Moerkotte's
+<table class="table table-borderless">
+  <tbody>
+    <tr id="nra"><th>[Moer2014]</th><td>The most complete treatment
+      for the Nested Relational Algebra (NRA) can be found in Guido
+      Moerkotte's
     <a href="http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf">Building
-      Query Compilers</a> book (See Chapter 7: An Algebra for
-    Sets, Bags, and Sequences).
-  </li>
-  <li>
-    Our main reference for the Named Nested Relational Calculus
-    (NNRC)
-    is <a href="http://alpha.uhasselt.be/~lucp1080/polynrc.pdf">Polymorphic
-      Type Inference for the Named Nested Relational Calculus</a>
-    by Jan Van den Bussche and Stijn Vansummeren.
-  </li>
-  <li>
-    The Object Query Language (OQL) supported by Q*cert is based on
-    the <a href="http://www.odbms.org/odmg-standard/">ODMG
-      standard</a> and
-    was <a href="http://www.sciencedirect.com/science/article/pii/S0306437998000131">originally
-      designed</a> by Sophie Cluet.
-  </li>
-</ul>
+      Query Compilers</a> book (See Chapter 7: An Algebra for Sets,
+      Bags, and Sequences).</td></tr>
+    <tr id="nnrc"><th>[BV2007]</th><td><a href="http://alpha.uhasselt.be/~lucp1080/polynrc.pdf">Polymorphic
+      Type Inference for the Named Nested Relational Calculus</a> by
+      Jan Van den Bussche and Stijn Vansummeren.</td></tr>
+    <tr id="oql"><th>[ODMG]</th><td><a href="http://www.odbms.org/odmg-standard/odmg-book/">The
+      Object Data Management Standard: ODMG 3.0</a></td></tr>
+    <tr id="nraenv"><th>[AHMSS2017]</th><td>"Handling Environments in
+      a Nested Relational Algebra with Combinators and an
+      Implementation in a Verified Query Compiler", by Joshua
+      Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and
+      Jerome Simeon (ACM SIGMOD'2017 conference).</td></tr>
+    <tr id="camp"><th>[SSH2015]</th><td><a href="http://drops.dagstuhl.de/opus/volltexte/2015/5237/">A
+	Pattern Calculus for Rule Languages: Expressiveness,
+	Compilation, and Mechanization</a> by Avraham Shinnar, Jerome
+	Simeon and Martin Hirzel.</td></tr>
+    <tr id="cloudant"><th>[Cloudant]</th><td><a href="https://console.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-">Cloudant
+    Views (Map/Reduce)</a>, IBM Bluemix Cloudant API
+	Documentation.</td></tr>
+    
+    <tr id="spark_rdd"><th>[SparkRDD]</th><td><a href="https://spark.apache.org/docs/2.1.1/programming-guide.html">Spark
+    Programming Guide</a>, Version 2.1.1.</td></tr>
+    
+    <tr id="spark_df"><th>[SparkDF]</th><td><a href="https://spark.apache.org/docs/2.1.1/sql-programming-guide.html">Spark
+    SQL, DataFrames and Datasets Guide</a>, Version 2.1.1.</td></tr>
+    
+  </tbody>
+</table>
 
 <!-- ============================== -->
 

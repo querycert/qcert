@@ -29,7 +29,7 @@ Section CompStat.
   (** Rule languages *)
   Require Import CAMPRuleRuntime.
   Require Import TechRuleRuntime.
-  Require Import DesignRuleRuntime.
+  Require Import DesignerRuleRuntime.
   (** Intermediate languages *)
   Require Import NRARuntime.
   Require Import NRAEnvRuntime.

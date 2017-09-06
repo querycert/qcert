@@ -15,7 +15,7 @@
  *)
 
 Require Export CommonRuntime.
-Require Export DesignRule.
+Require Export DesignerRule.
 
 (* 
 *** Local Variables: ***

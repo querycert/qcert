@@ -134,7 +134,7 @@ Section CompLang.
         :: (L_oql,FrontEnd,"OQL", "Object Query Language")
         :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
         :: (L_tech_rule,FrontEnd,"TechRule", "Technical Rules")
-        :: (L_designer_rule,FrontEnd,"DesignRule", "Designer Rules")
+        :: (L_designer_rule,FrontEnd,"DesignerRule", "Designer Rules")
         :: (L_camp_rule,CoreEnd,"CAMPRule", "Rules for CAMP")
         :: (L_camp,CoreEnd,"CAMP", "Calculus of Aggregating Matching Patterns")
         :: (L_nra,CoreEnd,"NRA", "Nested Relational Algebra")
@@ -205,7 +205,7 @@ Section CompLang.
     (** Rule languages *)
     Require Import CAMPRuleRuntime.
     Require Import TechRuleRuntime.
-    Require Import DesignRuleRuntime.
+    Require Import DesignerRuleRuntime.
     (** Intermediate languages *)
     Require Import NRARuntime.
     Require Import NRAEnvRuntime.

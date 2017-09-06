@@ -66,25 +66,25 @@ ifneq ($(SQL)$(SQLPP)$(JRULES),)
 endif
 ifneq ($(SQL),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling SQL support"
+	@echo "[Q*cert] Compiling SQL parser"
 	@echo "[Q*cert] "
 	@$(MAKE) -C sqlParser
 endif
 ifneq ($(SQLPP),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling SQL++ support"
+	@echo "[Q*cert] Compiling SQL++ parser"
 	@echo "[Q*cert] "
 	@$(MAKE) -C sqlppParser
 endif
 ifneq ($(JRULES),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling ODM rules support"
+	@echo "[Q*cert] Compiling ODM rules parsers"
 	@echo "[Q*cert] "
 	@$(MAKE) -C jrulesParser
 endif
 ifneq ($(SQL)$(SQLPP)$(JRULES),)
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Deploying Java service"
+	@echo "[Q*cert] Installing Java service"
 	@echo "[Q*cert] "
 	@$(MAKE) -C javaService install
 endif
