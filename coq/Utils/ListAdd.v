@@ -14,8 +14,8 @@
  * limitations under the License.
  *)
 
-(** This module contains a set of definitions, and lemmas on lists,
-complementing those found in the Coq Library. *)
+(** This module contains additional definitions and lemmas on
+lists. *)
 
 Section ListAdd.
   Require Import List.

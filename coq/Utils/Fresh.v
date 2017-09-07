@@ -29,7 +29,8 @@ Section Fresh.
   Require Import Digits.
   Require Import Lift.
   Require Import Sublist.
-
+  Require Import Permutation.
+  
   Section finder.
     Context {A:Type}.
     Context (incr:A->A).
@@ -55,7 +56,6 @@ Section Fresh.
         + inversion H; congruence.
         + eauto.
     Qed.
-    
   End finder.
 
   Lemma find_bounded_S_ge f bound init y :
@@ -79,8 +79,6 @@ Section Fresh.
     match_destr; auto.
   Qed.
 
-  Require Import Permutation.
-  
   Lemma incl_NoDup_sublist_perm {A} {dec:EqDec A eq} {l1 l2:list A} :
     NoDup l1 ->
     incl l1 l2 ->
@@ -116,21 +114,21 @@ Section Fresh.
         * intros ? inn.
           destruct (H0 _ inn); subst; intuition.
         * exists x; split; trivial.
-            apply sublist_skip.
-            trivial.
+          apply sublist_skip.
+          trivial.
   Qed.
 
-    Lemma incl_NoDup_length_le {A} {dec:EqDec A eq} {l1 l2:list A} :
+  Lemma incl_NoDup_length_le {A} {dec:EqDec A eq} {l1 l2:list A} :
     NoDup l1 ->
     incl l1 l2 ->
     length l1 <= length l2.
-    Proof.
-      intros nd inc.
-      destruct (incl_NoDup_sublist_perm nd inc) as [l1' [perm subl]].
-      rewrite (Permutation_length perm).
-      apply sublist_length.
-      trivial.
-    Qed.
+  Proof.
+    intros nd inc.
+    destruct (incl_NoDup_sublist_perm nd inc) as [l1' [perm subl]].
+    rewrite (Permutation_length perm).
+    apply sublist_length.
+    trivial.
+  Qed.
 
   Lemma find_fresh_from {A:Type} {dec:EqDec A eq} (bad l:list A) :
     length l > length bad ->
@@ -179,11 +177,11 @@ Section Fresh.
   Lemma find_bounded_S_nin_finds' {A:Type} f {dec:EqDec A eq} (dom:list A)
         (bound:nat) (pf:bound > length dom)
         (inj:forall x y, f x = f y -> x = y) :
-        {y:A | lift f (find_bounded S
-                 (fun x =>
-                    if in_dec equiv_dec (f x) dom
-                    then false else true)
-                 bound 0) = Some y}.
+    {y:A | lift f (find_bounded S
+                                (fun x =>
+                                   if in_dec equiv_dec (f x) dom
+                                   then false else true)
+                                bound 0) = Some y}.
   Proof.
     rewrite find_bounded_S_seq.
     rewrite <- (find_over_map (fun x  => if in_dec equiv_dec x dom then false else true) f).
@@ -197,17 +195,17 @@ Section Fresh.
 
   (* This version has better computational properties *)
   Definition find_bounded_S_nin_finds {A:Type} f {dec:EqDec A eq} (dom:list A)
-        (bound:nat) (pf:bound > length dom)
-        (inj:forall x y, f x = f y -> x = y) :
-        {y:A | lift f (find_bounded S
-                 (fun x =>
-                    if in_dec equiv_dec (f x) dom
-                    then false else true)
-                 bound 0) = Some y}.
+             (bound:nat) (pf:bound > length dom)
+             (inj:forall x y, f x = f y -> x = y) :
+    {y:A | lift f (find_bounded S
+                                (fun x =>
+                                   if in_dec equiv_dec (f x) dom
+                                   then false else true)
+                                bound 0) = Some y}.
   Proof.
     case_eq (find_bounded S
-        (fun x : nat => if in_dec equiv_dec (f x) dom then false else true)
-        bound 0).
+                          (fun x : nat => if in_dec equiv_dec (f x) dom then false else true)
+                          bound 0).
     - intros; simpl.
       exists (f n); reflexivity.
     - destruct (find_bounded_S_nin_finds' f dom bound pf inj); intros.
@@ -231,7 +229,7 @@ Section Fresh.
   Proof.
     unfold find_fresh_inj_f.
     match goal with
-      | [|- context[ proj1_sig ?x ]] => destruct x
+    | [|- context[ proj1_sig ?x ]] => destruct x
     end; simpl.
     apply some_lift in e.
     destruct e as [? e ?]; subst.

@@ -19,16 +19,16 @@ MODULES = \
 	Utils/ListAdd \
 	Utils/StringAdd \
 	Utils/SortingAdd \
-	Utils/Digits \
 	Utils/Lattice \
 	Utils/Monoid \
 	Utils/Lift \
 	Utils/Assoc \
 	Utils/Sublist \
 	Utils/Compat \
-	Utils/Fresh \
 	Utils/Bindings \
 	Utils/BindingsNat \
+	Utils/Digits \
+	Utils/Fresh \
 	Utils/Bag \
 	Utils/Utils \
 	Common/Logger/OptimizerStep \

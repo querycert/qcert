@@ -14,13 +14,15 @@
  * limitations under the License.
  *)
 
-(** Definitions and corresponding properties for lifting over option
-types. They are used extensively through the code to propagate
-errors. *)
+(** This module contains definitions and properties of lifting
+operations over option types. They are used extensively through the
+code to propagate errors. *)
 
 Section Lift.
 
   Require Import List.
+
+  (** * Lifting over option types *)
 
   Definition lift {A B:Type} (f:A->B) : (option A -> option B) 
     := fun a => 
@@ -37,6 +39,12 @@ Section Lift.
 
   Definition bind {A B:Type} a b := (@olift A B b a).
 
+  Definition lift2 {A B C:Type} (f:A -> B -> C) (x:option A) (y:option B) : option C :=
+    match x,y with
+      | Some x', Some y' => Some (f x' y')
+      | _,_ => None
+    end.
+
   Definition olift_some {A B} (f:A -> option B) (x:A) :
     olift f (Some x) = f x.
   Proof. reflexivity. Qed.
@@ -47,16 +55,8 @@ Section Lift.
       | _,_ => None
     end.
 
-  Lemma olift2_none_r {A B C} (f:A -> B -> option C) (x1:option A) :
-    olift2 f x1 None = None.
-  Proof.
-    destruct x1; reflexivity.
-  Qed.
-
-  Lemma olift2_somes {A B C} (f:A -> B -> option C) (x1:A) (x2:B) :
-    olift2 f (Some x1) (Some x2) = f x1 x2.
-  Proof. reflexivity. Qed.
-
+  (** * Lift properties *)
+  
   Lemma lift_some_simpl {A B:Type} (f:A->B) x : lift f (Some x) = Some (f x).
   Proof.
     reflexivity.
@@ -109,6 +109,33 @@ Section Lift.
     f_equal; auto.
   Qed.
 
+  Lemma lift_id {A} (x:option A) :
+    lift (fun l'' => l'') x = x.
+  Proof.
+    destruct x; reflexivity.
+  Qed.
+
+  Lemma match_lift_id {A} (x:option A) :
+    match x with
+      | None => None
+      | Some l'' => Some l''
+    end = x.
+  Proof.
+    destruct x; reflexivity.
+  Qed.
+
+  Lemma olift2_none_r {A B C} (f:A -> B -> option C) (x1:option A) :
+    olift2 f x1 None = None.
+  Proof.
+    destruct x1; reflexivity.
+  Qed.
+
+  Lemma olift2_somes {A B C} (f:A -> B -> option C) (x1:A) (x2:B) :
+    olift2 f (Some x1) (Some x2) = f x1 x2.
+  Proof. reflexivity. Qed.
+
+  (** * Lift iterators *)
+  
   Fixpoint lift_map {A B:Type} (f:A -> option B) (l:list A) : option (list B) :=
     match l with
       | nil => Some nil
@@ -144,12 +171,8 @@ Section Lift.
       | _,_ => None
     end.
 
-  Definition lift2 {A B C:Type} (f:A -> B -> C) (x:option A) (y:option B) : option C :=
-    match x,y with
-      | Some x', Some y' => Some (f x' y')
-      | _,_ => None
-    end.
-
+  (** * Lift iterators properties *)
+  
   Lemma lift_filter_eq {A} (f g:A -> option bool) l :
     (forall a, In a l -> f a = g a) ->
     lift_filter f l = lift_filter g l.
@@ -178,26 +201,13 @@ Section Lift.
     destruct b; destruct (lift_filter p l2); reflexivity.
   Qed.
 
-  Lemma lift_id {A} (x:option A) :
-    lift (fun l'' => l'') x = x.
-  Proof.
-    destruct x; reflexivity.
-  Qed.
-
-  Lemma match_lift_id {A} (x:option A) :
-    match x with
-      | None => None
-      | Some l'' => Some l''
-    end = x.
-  Proof.
-    destruct x; reflexivity.
-  Qed.
-
 End Lift.
 
 Hint Rewrite @olift_some : alg.
 Hint Rewrite @olift2_none_r : alg.
 Hint Rewrite @olift2_somes : alg.
+
+(** * Tactics *)
 
 Ltac case_option 
   := match goal with

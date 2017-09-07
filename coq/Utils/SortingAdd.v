@@ -14,8 +14,8 @@
  * limitations under the License.
  *)
 
-(** This module defines an (inefficient) insert sort, used in various
-parts of the specification, notably underlying records. *)
+(** This module defines a simple (inefficient) insert sort, used in
+various parts of the specification. *)
 
 Require Export Sorting.
 Require Import EquivDec.

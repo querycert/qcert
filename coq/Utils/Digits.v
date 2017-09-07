@@ -14,10 +14,9 @@
  * limitations under the License.
  *)
 
-(** Definitions and theorems about integers represented as list of
-digits in base 'n'.
-
-Also include conversions between numbers and strings. *)
+(** This modules defines conversions between numbers and strings. This
+relies on an intermediate representation of numbers in base 'n'. The
+main use for this is when defining fresh names. *)
 
 Require Import Orders.
 Require Import Ascii.

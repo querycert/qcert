@@ -14,16 +14,18 @@
  * limitations under the License.
  *)
 
-(** This module contains some definitions and lemmas complementing
-those found in the Coq Library. *)
+(** This module contains additional definitions and lemmas on strings,
+ including a total order relation. *)
 
+Require Import Bool.
 Require Import List.
 Require Import Sumbool.
 Require Import Permutation.
-Require Import Equivalence.
 Require Import Morphisms.
 Require Import Setoid.
+Require Import RelationClasses.
 Require Import EquivDec.
+Require Import Equivalence.
 Require Import Peano_dec.
 
 Section CoqLibAdd.
@@ -32,7 +34,6 @@ Section CoqLibAdd.
   
   Section Booleans.
   
-    Require Import Bool.
     Lemma andb_true_inversion:
       forall b1 b2 : bool,
         andb b1 b2 = true <-> b1 = true /\ b2 = true.
@@ -226,12 +227,7 @@ Section CoqLibAdd.
       split; intuition; try solve[eapply H; eauto; repeat rewrite in_app_iff; auto].
     Qed.
 
-  End In.
-  
-  (** * Decidability properties of [In] *)
-  
-  Section In_dec.
-    Lemma forall_in_dec {A:Type} P (l:list A)
+    Lemma forall_in_dec P (l:list A)
           (dec:forall x, In x l -> {P x} + {~ P x}):
       {forall x, In x l -> P x} + {~ forall x, In x l -> P x}.
     Proof.
@@ -246,7 +242,7 @@ Section CoqLibAdd.
         + right. intuition.
     Defined.
 
-    Lemma exists_in_dec {A:Type} P (l:list A)
+    Lemma exists_in_dec P (l:list A)
           (dec:forall x, In x l -> {P x} + {~ P x}):
       {exists x, In x l /\ P x} + {~ exists x, In x l /\ P x}.
     Proof.
@@ -261,7 +257,7 @@ Section CoqLibAdd.
           * right. intros [?[[?|?]?]]; subst; intuition; eauto.
     Defined.
 
-    Lemma exists_nforall_in_dec {A:Type} P (l:list A)
+    Lemma exists_nforall_in_dec P (l:list A)
           (dec:forall x, In x l -> {P x} + {~ P x}):
       {exists x, In x l /\ P x} + {forall x, In x l -> ~P x}.
     Proof.
@@ -276,7 +272,7 @@ Section CoqLibAdd.
           * right. intros ? [?|?]; subst; intuition; eauto.
     Defined.
 
-    Lemma existsb_ex {A : Type} (f : A -> bool) (l : list A) :
+    Lemma existsb_ex (f : A -> bool) (l : list A) :
       existsb f l = true -> {x : A | In x l /\ f x = true}.
     Proof.
       induction l; simpl; intros.
@@ -288,7 +284,7 @@ Section CoqLibAdd.
           * exists a; intuition.
           * rewrite exx, faa in H. discriminate.
     Qed.
-  End In_dec.
+  End In.
 
   (** * Properties of [Forallt] *)
 
@@ -342,10 +338,6 @@ Section CoqLibAdd.
     Proof.
       intros; inversion X; assumption.
     Qed.
-
-    Require Import RelationClasses.
-    Require Import EquivDec.
-    Require Import Equivalence.
 
     Lemma Forallt_In {A:Type} {P:A->Type} {r} {eq:EqDec A eq}: 
       Forallt P r -> forall a, In a r -> P a.
@@ -525,13 +517,12 @@ Section CoqLibAdd.
 
   End Pairs.
 
-  Require Import Omega.
-  
   (** * Arithmetics *)
 
   (** ** Natural numbers *)
   
   Section Nutil.
+    Require Import Omega.
 
     Lemma min_zero:
       forall (n1 n2:nat), min n1 (S n2) = 0 -> n1 = 0.

@@ -14,9 +14,8 @@
  * limitations under the License.
  *)
 
-(** This module contains definitions and lemmas on strings.
-
-It notably defines a total order on strings. *)
+(** This module contains additional definitions and lemmas on strings,
+ including a total order relation. *)
 
 Require Import Orders.
 Require Import Ascii.

@@ -14,7 +14,8 @@
  * limitations under the License.
  *)
 
-(** Association lists and some of their properties. *)
+(** This module contains definitions and properties of association
+lists. *)
 
 Require Import List.
 Require Import Sumbool.
@@ -31,7 +32,9 @@ Require Import StringAdd.
 
 Section Assoc.
 
-  Section assoc.
+  (** * Association lists *)
+ 
+  Section Defn.
     Context {A B:Type}.
     Context (dec:forall a a':A, {a=a'} + {a<>a'}).
 
@@ -106,12 +109,12 @@ Section Assoc.
       eauto.
     Qed.
 
-   Lemma lookup_nin_none {l x} : ~ In x (domain l) -> lookup l x = None.
-   Proof.
+    Lemma lookup_nin_none {l x} : ~ In x (domain l) -> lookup l x = None.
+    Proof.
       induction l; simpl; intros; auto. 
       destruct a; simpl in *. intuition.
       destruct (dec x a); subst; intuition.
-   Qed.
+    Qed.
 
     Lemma NoDup_domain_NoDup {l} : NoDup (domain l) -> NoDup l.
     Proof.
@@ -324,7 +327,7 @@ Section Assoc.
       reflexivity.
     Qed.
     
-  End assoc.
+  End Defn.
 
   Lemma cut_down_to_incl_to
         {A B} {dec:EqDec A eq}
@@ -337,7 +340,7 @@ Section Assoc.
     apply cut_down_to_in in inn.
     simpl in inn; intuition.
   Qed.
-  
+
   Lemma incl_domain_cut_down_incl
         {A B} {dec:EqDec A eq}
         (l:list (A*B)) l2 :
@@ -385,8 +388,6 @@ Section Assoc.
       | None => None :: (projectr eqd l ats')
       end
     end.
-
-  Require Import Permutation.
 
   Lemma assoc_lookupr_app {A B:Type} (l1 l2:list (A*B)) x (dec:forall x y, {x=y} + {x <> y}) :
     assoc_lookupr dec (l1++l2) x = 
@@ -976,7 +977,7 @@ Section Assoc.
 
      Definition swap {A B} (xy:A*B) := (snd xy, fst xy).
 
-  Section swap.
+  Section Swap.
     Lemma swap_idempotent {A B} (a:A*B) : swap (swap a) = a.
     Proof.
       destruct a; unfold swap; simpl; trivial.
@@ -998,9 +999,9 @@ Section Assoc.
       rewrite in_swap, swap_idempotent; intuition.
     Qed.
     
-  End swap.
+  End Swap.
 
-  Section ldiff.
+  Section Lookup_diff.
 
     (* should really be replaced by a filter *)
     Fixpoint lookup_diff {A B C:Type} (dec:forall a a':A, {a=a'} + {a<>a'}) (l₁:list (A*B)) (l₂:list (A*C)) :=
@@ -1166,9 +1167,9 @@ Section Assoc.
       congruence.
     Qed.
     
-  End ldiff.
+  End Lookup_diff.
 
-  Section substlist.
+  Section Substlist.
     
 	(* Java equivalent: MROptimizer.substlist_subst *)
     Definition substlist_subst {A} {dec:EqDec A eq}
@@ -1178,9 +1179,9 @@ Section Assoc.
          | None => inp
          end.
     
-  End substlist.
+  End Substlist.
 
-  Section conv.
+  Section Conv.
     Require Import List Ascii String.
     Import ListNotations.
     
@@ -1198,7 +1199,7 @@ Section Assoc.
     Definition mk_lower (s:string) : string
       := map_string ascii_mk_lower s.
 
-  End conv.
+  End Conv.
   
 End Assoc.
 
