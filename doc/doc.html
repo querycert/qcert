@@ -51,35 +51,41 @@
 <!-- ============ Body ============ -->
 
 <!-- Main jumbotron for a primary marketing message or call to action -->
-<h2 align="center">Q*cert: Commented Coq Development</h2>
-<h4 align="center">Joshua Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and Jérôme Siméon</h4>
+<h2 align="center">Commented Coq Development</h2>
+<h3 align="center">The Q*cert development team</h3>
+<h4 align="center">(Joshua Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and Jérôme Siméon)</h4>
 
 <h3>Overview</h3>
 
-<p>
-  Q*cert is a query compiler: it takes some input query and generates
-  code for execution. It can compile several source query languages,
-  such as (subsets of) SQL and OQL. It can produce code for several
-  target backends, such as Java, JavaScript, Cloudant and Spark.
-</p>
-<p>
-  Q*cert implements several intermediate languages useful for
-  compilation and optimization. The semantics of each of them is
-  defined using the Coq proof assistant.
-</p>
+<p>This is the source code for Q*cert, a framework for the development
+  and verification of query compilers built using the Coq proof
+  assistant <a href="#coq">[Coq]</a>.</p>
+
+<p>From a traditional database view point, it mostly covers the
+  so-called logical layer of a query compiler. At the present time,
+  the physical layer consists of a simple code-generation step
+  targeting either an imperative language (JavaScript or Java), or a
+  distributed data-processing platform (Spark or Cloudant).</p>
+
+<p>While a significant subset of the initial compilation pipeline has
+  been mechanically checked for correctness, Q*cert is still a work in
+  progress. This page documents the state of the development, and
+  serves as an entry point to navigate the code. It describes the
+  architecture of the compiler, lists the languages in the compilation
+  pipeline, the existing translation and optimization passes, and
+  links to the corresponding code, including proofs, when
+  available.</p>
 
 <h3>Compilation Pipeline</h3>
 
 <img src="figure/figure.svg" width="700" alt="Compilation Paths"/>
 
-<p>
-  This figure represents the general architecture of the compiler with
-  its
+<p>This figure represents the general architecture of the compiler
+  with its
   <a href="html/Qcert.Compiler.Driver.CompLang.html">all supported
   languages</a> and the
   different <a href="html/Qcert.Compiler.Driver.CompDriver.html#driver">compilation
-  paths</a>.
-</p>
+  paths</a>.</p>
 
 <h3>Code Organization</h3>
 
@@ -585,36 +591,35 @@ multisets).
 
 <table class="table table-borderless">
   <tbody>
+    <tr id="nraenv"><th>[AHMSS2017]</th><td>"Handling Environments in
+      a Nested Relational Algebra with Combinators and an
+      Implementation in a Verified Query Compiler", by Joshua
+      Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and
+      Jerome Simeon (ACM SIGMOD'2017 conference).</td></tr>
+    <tr id="nnrc"><th>[BV2007]</th><td><a href="http://alpha.uhasselt.be/~lucp1080/polynrc.pdf">Polymorphic
+      Type Inference for the Named Nested Relational Calculus</a> by
+      Jan Van den Bussche and Stijn Vansummeren.</td></tr>
+    <tr id="cloudant"><th>[Cloudant]</th><td><a href="https://console.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-">Cloudant
+      Views (Map/Reduce)</a>, IBM Bluemix Cloudant API
+      Documentation.</td></tr>
+    <tr id="coq"><th>[Coq]</th><td><a href="https://coq.inria.fr">The
+      Coq proof assistant</a>, version 8.6.1.</td></tr>
     <tr id="nra"><th>[Moer2014]</th><td>The most complete treatment
       for the Nested Relational Algebra (NRA) can be found in Guido
       Moerkotte's
     <a href="http://pi3.informatik.uni-mannheim.de/~moer/querycompiler.pdf">Building
       Query Compilers</a> book (See Chapter 7: An Algebra for Sets,
       Bags, and Sequences).</td></tr>
-    <tr id="nnrc"><th>[BV2007]</th><td><a href="http://alpha.uhasselt.be/~lucp1080/polynrc.pdf">Polymorphic
-      Type Inference for the Named Nested Relational Calculus</a> by
-      Jan Van den Bussche and Stijn Vansummeren.</td></tr>
     <tr id="oql"><th>[ODMG]</th><td><a href="http://www.odbms.org/odmg-standard/odmg-book/">The
       Object Data Management Standard: ODMG 3.0</a></td></tr>
-    <tr id="nraenv"><th>[AHMSS2017]</th><td>"Handling Environments in
-      a Nested Relational Algebra with Combinators and an
-      Implementation in a Verified Query Compiler", by Joshua
-      Auerbach, Martin Hirzel, Louis Mandel, Avraham Shinnar and
-      Jerome Simeon (ACM SIGMOD'2017 conference).</td></tr>
-    <tr id="camp"><th>[SSH2015]</th><td><a href="http://drops.dagstuhl.de/opus/volltexte/2015/5237/">A
-	Pattern Calculus for Rule Languages: Expressiveness,
-	Compilation, and Mechanization</a> by Avraham Shinnar, Jerome
-	Simeon and Martin Hirzel.</td></tr>
-    <tr id="cloudant"><th>[Cloudant]</th><td><a href="https://console.bluemix.net/docs/services/Cloudant/api/creating_views.html#views-mapreduce-">Cloudant
-    Views (Map/Reduce)</a>, IBM Bluemix Cloudant API
-	Documentation.</td></tr>
-    
     <tr id="spark_rdd"><th>[SparkRDD]</th><td><a href="https://spark.apache.org/docs/2.1.1/programming-guide.html">Spark
-    Programming Guide</a>, Version 2.1.1.</td></tr>
-    
+      Programming Guide</a>, Version 2.1.1.</td></tr>
     <tr id="spark_df"><th>[SparkDF]</th><td><a href="https://spark.apache.org/docs/2.1.1/sql-programming-guide.html">Spark
-    SQL, DataFrames and Datasets Guide</a>, Version 2.1.1.</td></tr>
-    
+      SQL, DataFrames and Datasets Guide</a>, Version 2.1.1.</td></tr>
+    <tr id="camp"><th>[SSH2015]</th><td><a href="http://drops.dagstuhl.de/opus/volltexte/2015/5237/">A
+      Pattern Calculus for Rule Languages: Expressiveness,
+      Compilation, and Mechanization</a> by Avraham Shinnar, Jerome
+      Simeon and Martin Hirzel.</td></tr>
   </tbody>
 </table>
 
