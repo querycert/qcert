@@ -59,8 +59,8 @@ command line.
 
 ### Scala (Optional)
 
-The Q\*cert compile can generate code for Spark execution which
-requires a Scala compiler and the Scala Build Tool (sbt).
+The Spark targets require a Scala compiler and the Scala Build Tool
+(sbt).
 
 Scala can be obtained from: https://www.scala-lang.org.
 
