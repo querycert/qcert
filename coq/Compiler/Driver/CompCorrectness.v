@@ -1640,25 +1640,19 @@ Section CompCorrectness.
       - contradiction.
     Qed.
     
-    (** XXX This is an idea for what the main correctness theorem
-    could be.
+    (** This is an initial version of correctness theorem for the
+compiler driver as a whole. *)
 
-            Assuming:
+(** Assuming the driver [dv] is correct (i.e., only follows
+verified compilation paths), then:
+- For every query [q] that matches
+the expected input of driver [dv]
+- for every produced compilation
+steps I.e., [q'] in the list returned by [compile dv q], we have:
+- [q'] preserves the evaluation semantics for [q]
 
-            - the driver [dv] is correct (i.e., only follows verified
-            compilation paths):
-
-            For every query [q] that matches the expected input of
-            driver [dv]:
-
-            For every produced compilation steps I.e., [q'] in the
-            list returned by [compile dv q], we have:
-
-            - [q'] preserves the evaluation semantics for [q]
-
-              I.e., for all input data, evaluation of [q] and [q'] over
-              that input data returns the same output data
-     *)
+I.e., for all input data, evaluation of [q] and [q'] over that
+input data returns the same output data. *)
 
     Theorem compile_with_correct_driver_preserves_eval (dv:driver) (q:query) :
       driver_correct dv ->

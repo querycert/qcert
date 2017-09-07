@@ -87,6 +87,14 @@
   different <a href="html/Qcert.Compiler.Driver.CompDriver.html#driver">compilation
   paths</a>.</p>
 
+<p>The colors on the figure indicate the level of Coq development. The
+part in blue has not been fully mechanized. The part in red has been
+mechanized in Coq and comes with a proof of correctness. The dotted
+red arrows indicate correctness proofs that have not yet been fully
+integrated in
+a <a href="html/Qcert.Compiler.Driver.CompCorrectness.html#compile_with_correct_driver_preserves_eval">proof
+of correctness for the compiler driver as a whole</a>.</p>
+
 <h3>Code Organization</h3>
 
 <p>The general organization of the source code available in Q*cert is
@@ -191,10 +199,10 @@ multisets).
 
   <p>The following languages can be passed in source (text/file) form
   to the compiler and are provided with a parser. The parsers for OQL
-  and NRA<sup>&lambda;</sup> are written in OCaml and part of the
-  Q*cert distribution. The parsers for TechRule, DesignerRule, SQL and
-  SQL++ are written in Java and require third-party libraries which
-  must be downloaded separately during installation.</p>
+  and &lambda;-NRA are written in OCaml and part of the Q*cert
+  distribution. The parsers for TechRule, DesignerRule, SQL and SQL++
+  are written in Java and require third-party libraries which must be
+  downloaded separately during installation.</p>
 
   <table class="table">
     <tr><th>Name</th>
@@ -215,8 +223,8 @@ multisets).
       <td><code>coq/DesignerRule<code></td>
       <td><a href="html/Qcert.DesignerRule.Lang.DesignerRule.html#designer_rule">Syntax</a></td>
       <td></td></tr>
-    <tr><th>NRA<sup>&lambda;</sup></th>
-      <td>Lambda-NRA</td>
+    <tr><th>&lambda;-NRA</th>
+      <td>Lambda NRA</td>
       <td><code>lambda_nra</code></td>
       <td><code>coq/LambdaNRA<code></td>
       <td><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Syntax</a>,
@@ -373,37 +381,43 @@ multisets).
   directory in the Q*cert source code.</p>
 
   <table class="table">
-    <tr><th>Language</th>
+    <tr><th>Name</th>
+      <th>Language</th>
       <th>On Command Line</th>
       <th>Code Location</th>
       <th>Annotated Code</th>
       <th>Runtime</th>
       <th>Reference</th></tr>
     <tr><td>JavaScript</td>
+      <td>JavaScript</td>
       <td><code>javascript</code></td>
       <td><code>coq/JavaScript<code></td>
       <td><a href="html/Qcert.JavaScript.Lang.JavaScript.html#javascript">Syntax</a></td>
       <td><code>runtime/javascript</code></td>
       <td></td></tr>
     <tr><td>Java</td>
+      <td>Java</td>
       <td><code>java</code></td>
       <td><code>coq/Java<code></td>
       <td><a href="html/Qcert.Java.Lang.Java.html#java">Syntax</a></td>
       <td><code>runtime/java</code></td>
       <td></td></tr>
     <tr><td>Cloudant</td>
+      <td>Cloudant Map/Reduce Views</td>
       <td><code>cloudant</code></td>
       <td><code>coq/Cloudant<code></td>
       <td><a href="html/Qcert.Cloudant.Lang.Cloudant.html#cloudant">Syntax</a></td>
       <td><code>runtime/javascript</code></td>
       <td><a href="#cloudant">[Cloudant]</a></td></tr>
-    <tr><td>Spark, Resilient Distributed Datasets API</td>
+    <tr><td>Spark RDDs</td>
+      <td>Spark (Resilient Distributed Datasets)</td>
       <td><code>spark_rdd</code></td>
       <td><code>coq/SparkRDD<code></td>
       <td><a href="html/Qcert.SparkRDD.Lang.SparkRDD.html#spark_rdd">Syntax</a></td>
       <td><code>runtime/javascript</code></td>
       <td><a href="#spark_rdd">[SparkRDD]</a></td></tr>
-    <tr><td>Spark, DataFrames API</td>
+    <tr><td>Spark DataFrames</td>
+      <td>Spark (DataFrames)</td>
       <td><code>spark_df</code></td>
       <td><code>coq/SparkDF<code></td>
       <td><a href="html/Qcert.SparkDF.Lang.SparkDF.html#spark_df">Syntax</a></td>
@@ -458,7 +472,7 @@ multisets).
       <td><a href="html/Qcert.Translation.DesignRuletoCAMPRule.html">Translation</a></td>
       <td>In Java</td>
       <td></td></tr>
-    <tr><td>NRA<sup>&lambda;</sup></td>
+    <tr><td>&lambda;-NRA</td>
       <td>NRA<sup>e</sup></td>
       <td><a href="html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top">Translation</a>,
 	  <a href="html/Qcert.Translation.LambdaNRAtoNRAEnv.html#lambda_nra_to_nraenv_top_correct">Correctness</a>,

@@ -132,7 +132,7 @@ Section CompLang.
       (L_sql,FrontEnd,"SQL", "Structured Query Language")
         :: (L_sqlpp,FrontEnd,"SQL++","SQL With Semi-Structured Data Extensions")
         :: (L_oql,FrontEnd,"OQL", "Object Query Language")
-        :: (L_lambda_nra,FrontEnd,"λNRA", "Lambda Nested Relational Algebra")
+        :: (L_lambda_nra,FrontEnd,"λ-NRA", "Lambda Nested Relational Algebra")
         :: (L_tech_rule,FrontEnd,"TechRule", "Technical Rules")
         :: (L_designer_rule,FrontEnd,"DesignerRule", "Designer Rules")
         :: (L_camp_rule,CoreEnd,"CAMPRule", "Rules for CAMP")

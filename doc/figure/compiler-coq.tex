@@ -10,7 +10,7 @@
       (techrule) {TechRule};
  \node[lang,source,
        below=of techrule]
-      (designrule) {\hspace*{-0.52cm}DesignerRule};
+      (designrule) {\hspace*{-0.5cm}DesignerRule};
  \node[lang,source,
        below=of designrule]
       (lnra-src) {\hfill \NRALambda};
@@ -75,7 +75,7 @@
  % Target
  \node[lang, target, hyperlink node=\coqurl{Cloudant.Lang}{Cloudant}{cloudant},
        right=of cldmr]
-      (cloudant) {Cloudant\\(map/reduce)};
+      (cloudant) {Cloudant};
  \node[lang, target, hyperlink node=\coqurl{Java.Lang}{Java}{java},
        above=0.25em of cloudant]
       (java) {Java};
@@ -85,11 +85,11 @@
  \node[lang, target,
        hyperlink node=\coqurl{SparkRDD.Lang}{SparkRDD}{spark_rdd},
        below=0.25em of cloudant]
-      (sparkmr) {Spark\\(map/reduce)};
+      (sparkmr) {Spark RDDs};
  \node[lang, target,
        hyperlink node=\coqurl{SparkDF.Lang}{SparkDF}{spark_df},
        below=0.25em of sparkmr]
-      (sparkdf) {Spark\\(dataframes)};
+      (sparkdf) {Spark DataFrames};
 
 % DNNRC
  \node[lang, coqc, hyperlink node=\coqurl{tDNNRC.Lang}{tDNNRC}{dnnrc_dataframe_typed},
