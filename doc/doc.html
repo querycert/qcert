@@ -93,7 +93,7 @@ mechanized in Coq and comes with a proof of correctness. The dotted
 red arrows indicate correctness proofs that have not yet been fully
 integrated in
 a <a href="html/Qcert.Compiler.Driver.CompCorrectness.html#compile_with_correct_driver_preserves_eval">proof
-of correctness for the compiler driver as a whole</a>.</p>
+of correctness for the compiler as a whole</a>.</p>
 
 <h3>Code Organization</h3>
 
@@ -291,7 +291,7 @@ multisets).
       <td><a href="html/Qcert.NRA.Lang.NRA.html#nra">Syntax</a>,
           <a href="html/Qcert.NRA.Lang.NRA.html#nra_eval_top">Semantics</a>,
           <a href="html/Qcert.NRA.Typing.TNRA.html#nra_type">Typing</a></td>
-      <td><a href="#nra">[Moer2017]</a></td></tr>
+      <td><a href="#nra">[Moer2014]</a></td></tr>
     <tr><th>NRA<sup>e</sup></th>
       <td>NRA with Environments</td>
       <td><code>nraenv</code></td>
@@ -424,24 +424,6 @@ multisets).
       <td><code>runtime/spark2</code></td>
       <td><a href="#spark_df">[SparkDF]</a></td></tr>
   </table>
-
-<h3>Optimization Passes</h3>
-
-<p>
-  Optimizers, when present, are located within the
-  <code>Optim</code> directory of the corresponding language. The
-  following four languages support optimization passes:</p>
-
-  <ul>
-    <li><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html">NRA<sup>e</sup></a>: NRA with Environments
-      (<a href="html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims">Optimizer</a>)</li>
-    <li><a href="html/Qcert.NNRC.Lang.NNRC.html">NNRC</a>: Named Nested Relational Calculus
-      (<a href="html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">Optimizer</a>)</li>
-    <li><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html">tDNNRC</a>: Typed DNNRC
-      (<a href="html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#dnnrcToDataframeRewrite">Optimizer</a>)</li>
-    <li><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html">NNRCMR</a>: NNRC extended with Map/Reduce
-      (<a href="html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims">Optimizer</a>)</li>
-  </ul>
 
 <h3>Translation Passes</h3>
 
@@ -591,6 +573,38 @@ multisets).
       <td><a href="html/Qcert.Translation.CldMRtoCloudant.html#cldmr_to_cloudant_top">Translation</a>
       </td>
       <td>Code-generation</td>
+      <td></td></tr>
+  </table>
+
+<h3>Optimization Passes</h3>
+
+<p>
+  Optimizers, when present, are located within the
+  <code>Optim</code> directory of the corresponding language. The
+  following four languages support optimization passes:</p>
+
+  <table class="table">
+    <tr><th>Name</th>
+      <th>Language</th>
+      <th>Annotated Code</th>
+      <th>Reference</th></tr>
+    <tr><td>NRA<sup>e</sup></td>
+      <td>NRA with Environments</td>
+      <td><a href="html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims">Optimizer</a>,
+	  <a href="html/Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#run_nraenv_optims_correctness">Correctness</a></td>
+      <td><a href="#nra">[Moer2014]</a>, <a href="#nraenv">[AHMSS2017]</a></td></tr>
+    <tr><td>NNRC</td>
+      <td>Named Nested Relational Calculus</td>
+      <td><a href="html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">Optimizer</a>,
+	  <a href="html/Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims_correctness">Correctness</a></td>
+      <td></td></tr>
+    <tr><td>tDNNRC</td>
+      <td>Typed DNNRC</td>
+      <td><a href="html/Qcert.tDNNRC.Optim.tDNNRCOptimizer.html#dnnrcToDataframeRewrite">Optimizer</a></td>
+      <td></td></tr>
+    <tr><td>NNRCMR</td>
+      <td>NNRC extended with Map/Reduce</td>
+      <td><a href="html/Qcert.NNRCMR.Optim.NNRCMROptimizer.html#run_nnrcmr_optims">Optimizer</a></td>
       <td></td></tr>
   </table>
 
