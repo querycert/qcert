@@ -2,7 +2,8 @@
 
 [![CircleCI](https://circleci.com/gh/querycert/qcert.svg?style=svg)](https://circleci.com/gh/querycert/qcert)
 
-Git: http://github.com/querycert/qcert / Web Site: http://querycert.github.io
+Git: http://github.com/querycert/qcert
+Web Site: http://querycert.github.io
 
 
 ## About
