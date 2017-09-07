@@ -60,42 +60,42 @@ Section DNNRCBase.
 
     Unset Elimination Schemes.
 
-    Inductive dnnrc  : Set :=
-    | DNNRCGetConstant : A -> var -> dnnrc
-    | DNNRCVar : A -> var -> dnnrc
-    | DNNRCConst : A -> data -> dnnrc
-    | DNNRCBinop : A -> binOp -> dnnrc -> dnnrc -> dnnrc
-    | DNNRCUnop : A -> unaryOp -> dnnrc -> dnnrc
-    | DNNRCLet : A -> var -> dnnrc -> dnnrc -> dnnrc
-    | DNNRCFor : A -> var -> dnnrc -> dnnrc -> dnnrc
-    | DNNRCIf : A -> dnnrc -> dnnrc -> dnnrc -> dnnrc
-    | DNNRCEither : A -> dnnrc -> var -> dnnrc -> var -> dnnrc -> dnnrc
-    | DNNRCGroupBy : A -> string -> list string -> dnnrc -> dnnrc
-    | DNNRCCollect : A -> dnnrc -> dnnrc
-    | DNNRCDispatch : A -> dnnrc -> dnnrc
-    | DNNRCAlg : A -> plug_type -> list (string * dnnrc) -> dnnrc.
+    Inductive dnnrc_base  : Set :=
+    | DNNRCGetConstant : A -> var -> dnnrc_base
+    | DNNRCVar : A -> var -> dnnrc_base
+    | DNNRCConst : A -> data -> dnnrc_base
+    | DNNRCBinop : A -> binOp -> dnnrc_base -> dnnrc_base -> dnnrc_base
+    | DNNRCUnop : A -> unaryOp -> dnnrc_base -> dnnrc_base
+    | DNNRCLet : A -> var -> dnnrc_base -> dnnrc_base -> dnnrc_base
+    | DNNRCFor : A -> var -> dnnrc_base -> dnnrc_base -> dnnrc_base
+    | DNNRCIf : A -> dnnrc_base -> dnnrc_base -> dnnrc_base -> dnnrc_base
+    | DNNRCEither : A -> dnnrc_base -> var -> dnnrc_base -> var -> dnnrc_base -> dnnrc_base
+    | DNNRCGroupBy : A -> string -> list string -> dnnrc_base -> dnnrc_base
+    | DNNRCCollect : A -> dnnrc_base -> dnnrc_base
+    | DNNRCDispatch : A -> dnnrc_base -> dnnrc_base
+    | DNNRCAlg : A -> plug_type -> list (string * dnnrc_base) -> dnnrc_base.
 
     Set Elimination Schemes.
 
-    (** Induction principles used as backbone for inductive proofs on dnnrc *)
+    (** Induction principles used as backbone for inductive proofs on dnnrc_base *)
 
-    Definition dnnrc_rect (P : dnnrc -> Type)
+    Definition dnnrc_base_rect (P : dnnrc_base -> Type)
                (fdgetconstant : forall a, forall v, P (DNNRCGetConstant a v))
                (fdvar : forall a, forall v, P (DNNRCVar a v))
                (fdconst : forall a, forall d : data, P (DNNRCConst a d))
-               (fdbinop : forall a, forall b, forall n1 n2 : dnnrc, P n1 -> P n2 -> P (DNNRCBinop a b n1 n2))
-               (fdunop : forall a, forall u, forall n : dnnrc, P n -> P (DNNRCUnop a u n))
-               (fdlet : forall a, forall v, forall n1 n2 : dnnrc, P n1 -> P n2 -> P (DNNRCLet a v n1 n2))
-               (fdfor : forall a, forall v, forall n1 n2 : dnnrc, P n1 -> P n2 -> P (DNNRCFor a v n1 n2))
-               (fdif : forall a, forall n1 n2 n3 : dnnrc, P n1 -> P n2 -> P n3 -> P (DNNRCIf a n1 n2 n3))
+               (fdbinop : forall a, forall b, forall n1 n2 : dnnrc_base, P n1 -> P n2 -> P (DNNRCBinop a b n1 n2))
+               (fdunop : forall a, forall u, forall n : dnnrc_base, P n -> P (DNNRCUnop a u n))
+               (fdlet : forall a, forall v, forall n1 n2 : dnnrc_base, P n1 -> P n2 -> P (DNNRCLet a v n1 n2))
+               (fdfor : forall a, forall v, forall n1 n2 : dnnrc_base, P n1 -> P n2 -> P (DNNRCFor a v n1 n2))
+               (fdif : forall a, forall n1 n2 n3 : dnnrc_base, P n1 -> P n2 -> P n3 -> P (DNNRCIf a n1 n2 n3))
                (fdeither : forall a, forall n0 n1 n2, forall v1 v2,
                        P n0 -> P n1 -> P n2 -> P (DNNRCEither a n0 v1 n1 v2 n2))
-               (fdgroupby : forall a, forall g, forall sl, forall n : dnnrc, P n -> P (DNNRCGroupBy a g sl n))
-               (fdcollect : forall a, forall n : dnnrc, P n -> P (DNNRCCollect a n))
-               (fddispatch : forall a, forall n : dnnrc, P n -> P (DNNRCDispatch a n))
-               (fdalg : forall a, forall op:plug_type, forall r : list (string*dnnrc), Forallt (fun n => P (snd n)) r -> P (DNNRCAlg a op r))
+               (fdgroupby : forall a, forall g, forall sl, forall n : dnnrc_base, P n -> P (DNNRCGroupBy a g sl n))
+               (fdcollect : forall a, forall n : dnnrc_base, P n -> P (DNNRCCollect a n))
+               (fddispatch : forall a, forall n : dnnrc_base, P n -> P (DNNRCDispatch a n))
+               (fdalg : forall a, forall op:plug_type, forall r : list (string*dnnrc_base), Forallt (fun n => P (snd n)) r -> P (DNNRCAlg a op r))
       :=
-        fix F (n : dnnrc) : P n :=
+        fix F (n : dnnrc_base) : P n :=
           match n as n0 return (P n0) with
           | DNNRCGetConstant a v => fdgetconstant a v
           | DNNRCVar a v => fdvar a v
@@ -110,31 +110,31 @@ Section DNNRCBase.
           | DNNRCCollect a n => fdcollect a n (F n)
           | DNNRCDispatch a n => fddispatch a n (F n)
           | DNNRCAlg a op r =>
-            fdalg a op r ((fix F3 (r : list (string * dnnrc)) : Forallt (fun n => P (snd n)) r :=
+            fdalg a op r ((fix F3 (r : list (string * dnnrc_base)) : Forallt (fun n => P (snd n)) r :=
                              match r as c0 with
                              | nil => Forallt_nil _
                              | cons n c0 => @Forallt_cons _ _ _ _ (F (snd n)) (F3 c0)
                              end) r)
           end.
 
-    (** Induction principles used as backbone for inductive proofs on dnnrc *)
-    Definition dnnrc_ind (P : dnnrc -> Prop)
+    (** Induction principles used as backbone for inductive proofs on dnnrc_base *)
+    Definition dnnrc_base_ind (P : dnnrc_base -> Prop)
                (fdgetconstant : forall a, forall v, P (DNNRCGetConstant a v))
                (fdvar : forall a, forall v, P (DNNRCVar a v))
                (fdconst : forall a, forall d : data, P (DNNRCConst a d))
-               (fdbinop : forall a, forall b, forall n1 n2 : dnnrc, P n1 -> P n2 -> P (DNNRCBinop a b n1 n2))
-               (fdunop : forall a, forall u, forall n : dnnrc, P n -> P (DNNRCUnop a u n))
-               (fdlet : forall a, forall v, forall n1 n2 : dnnrc, P n1 -> P n2 -> P (DNNRCLet a v n1 n2))
-               (fdfor : forall a, forall v, forall n1 n2 : dnnrc, P n1 -> P n2 -> P (DNNRCFor a v n1 n2))
-               (fdif : forall a, forall n1 n2 n3 : dnnrc, P n1 -> P n2 -> P n3 -> P (DNNRCIf a n1 n2 n3))
+               (fdbinop : forall a, forall b, forall n1 n2 : dnnrc_base, P n1 -> P n2 -> P (DNNRCBinop a b n1 n2))
+               (fdunop : forall a, forall u, forall n : dnnrc_base, P n -> P (DNNRCUnop a u n))
+               (fdlet : forall a, forall v, forall n1 n2 : dnnrc_base, P n1 -> P n2 -> P (DNNRCLet a v n1 n2))
+               (fdfor : forall a, forall v, forall n1 n2 : dnnrc_base, P n1 -> P n2 -> P (DNNRCFor a v n1 n2))
+               (fdif : forall a, forall n1 n2 n3 : dnnrc_base, P n1 -> P n2 -> P n3 -> P (DNNRCIf a n1 n2 n3))
                (fdeither : forall a, forall n0 n1 n2, forall v1 v2,
                        P n0 -> P n1 -> P n2 -> P (DNNRCEither a n0 v1 n1 v2 n2))
-               (fdgroupby : forall a, forall g, forall sl, forall n : dnnrc, P n -> P (DNNRCGroupBy a g sl n))
-               (fdcollect : forall a, forall n : dnnrc, P n -> P (DNNRCCollect a n))
-               (fddispatch : forall a, forall n : dnnrc, P n -> P (DNNRCDispatch a n))
-               (fdalg : forall a, forall op:plug_type, forall r : list (string*dnnrc), Forall (fun n => P (snd n)) r -> P (DNNRCAlg a op r))
+               (fdgroupby : forall a, forall g, forall sl, forall n : dnnrc_base, P n -> P (DNNRCGroupBy a g sl n))
+               (fdcollect : forall a, forall n : dnnrc_base, P n -> P (DNNRCCollect a n))
+               (fddispatch : forall a, forall n : dnnrc_base, P n -> P (DNNRCDispatch a n))
+               (fdalg : forall a, forall op:plug_type, forall r : list (string*dnnrc_base), Forall (fun n => P (snd n)) r -> P (DNNRCAlg a op r))
       :=
-        fix F (n : dnnrc) : P n :=
+        fix F (n : dnnrc_base) : P n :=
           match n as n0 return (P n0) with
           | DNNRCGetConstant a v => fdgetconstant a v
           | DNNRCVar a v => fdvar a v
@@ -149,37 +149,37 @@ Section DNNRCBase.
           | DNNRCCollect a n => fdcollect a n (F n)
           | DNNRCDispatch a n => fddispatch a n (F n)
           | DNNRCAlg a op r =>
-            fdalg a op r ((fix F3 (r : list (string*dnnrc)) : Forall (fun n => P (snd n)) r :=
+            fdalg a op r ((fix F3 (r : list (string*dnnrc_base)) : Forall (fun n => P (snd n)) r :=
                              match r as c0 with
                              | nil => Forall_nil _
                              | cons n c0 => @Forall_cons _ _ _ _ (F (snd n)) (F3 c0)
                              end) r)
           end.
 
-    Definition dnnrc_rec (P:dnnrc->Set) := @dnnrc_rect P.
+    Definition dnnrc_base_rec (P:dnnrc_base->Set) := @dnnrc_base_rect P.
 
-    Lemma dnnrcInd2 (P : dnnrc -> Prop)
+    Lemma dnnrc_baseInd2 (P : dnnrc_base -> Prop)
           (fdgetconstant : forall a, forall v, P (DNNRCGetConstant a v))
           (fdvar : forall a, forall v, P (DNNRCVar a v))
           (fdconst : forall a, forall d : data, P (DNNRCConst a d))
-          (fdbinop : forall a, forall b, forall n1 n2 : dnnrc, P (DNNRCBinop a b n1 n2))
-          (fdunop : forall a, forall u, forall n : dnnrc, P (DNNRCUnop a u n))
-          (fdlet : forall a, forall v, forall n1 n2 : dnnrc, P (DNNRCLet a v n1 n2))
-          (fdfor : forall a, forall v, forall n1 n2 : dnnrc, P (DNNRCFor a v n1 n2))
-          (fdif : forall a, forall n1 n2 n3 : dnnrc, P (DNNRCIf a n1 n2 n3))
+          (fdbinop : forall a, forall b, forall n1 n2 : dnnrc_base, P (DNNRCBinop a b n1 n2))
+          (fdunop : forall a, forall u, forall n : dnnrc_base, P (DNNRCUnop a u n))
+          (fdlet : forall a, forall v, forall n1 n2 : dnnrc_base, P (DNNRCLet a v n1 n2))
+          (fdfor : forall a, forall v, forall n1 n2 : dnnrc_base, P (DNNRCFor a v n1 n2))
+          (fdif : forall a, forall n1 n2 n3 : dnnrc_base, P (DNNRCIf a n1 n2 n3))
           (fdeither : forall a, forall n0 n1 n2, forall v1 v2,
                   P (DNNRCEither a n0 v1 n1 v2 n2))
-          (fdgroupby : forall a, forall g, forall sl, forall n : dnnrc, P n -> P (DNNRCGroupBy a g sl n))
-          (fdcollect : forall a, forall n : dnnrc, P (DNNRCCollect a n))
-          (fddispatch : forall a, forall n : dnnrc, P (DNNRCDispatch a n))
-          (fdalg : forall a, forall op:plug_type, forall r : list (string*dnnrc), Forall (fun n => P (snd n)) r -> P (DNNRCAlg a op r))
+          (fdgroupby : forall a, forall g, forall sl, forall n : dnnrc_base, P n -> P (DNNRCGroupBy a g sl n))
+          (fdcollect : forall a, forall n : dnnrc_base, P (DNNRCCollect a n))
+          (fddispatch : forall a, forall n : dnnrc_base, P (DNNRCDispatch a n))
+          (fdalg : forall a, forall op:plug_type, forall r : list (string*dnnrc_base), Forall (fun n => P (snd n)) r -> P (DNNRCAlg a op r))
 : forall n, P n.
     Proof.
       intros.
-      apply dnnrc_ind; trivial.
+      apply dnnrc_base_ind; trivial.
     Qed.
 
-    Definition dnnrc_annotation_get (d:dnnrc) : A
+    Definition dnnrc_base_annotation_get (d:dnnrc_base) : A
       := match d with
          | DNNRCGetConstant a _ => a
          | DNNRCVar a _ => a
@@ -196,7 +196,7 @@ Section DNNRCBase.
          | DNNRCAlg a _ _ => a
          end.
 
-    Definition dnnrc_annotation_update (f:A->A) (d:dnnrc) : dnnrc
+    Definition dnnrc_base_annotation_update (f:A->A) (d:dnnrc_base) : dnnrc_base
       := match d with
          | DNNRCGetConstant a v => DNNRCGetConstant (f a) v
          | DNNRCVar a v => DNNRCVar (f a) v
@@ -215,7 +215,7 @@ Section DNNRCBase.
 
     Context (h:brand_relation_t).
     Context (constant_env:list (string*ddata)).
-    Fixpoint dnnrc_eval `{plug: AlgPlug plug_type} (env:dbindings) (e:dnnrc) : option ddata :=
+    Fixpoint dnnrc_base_eval `{plug: AlgPlug plug_type} (env:dbindings) (e:dnnrc_base) : option ddata :=
       match e with
       | DNNRCGetConstant _ x =>
         edot constant_env x
@@ -225,24 +225,24 @@ Section DNNRCBase.
         Some (Dlocal (normalize_data h d))
       | DNNRCBinop _ bop e1 e2 =>
         olift2 (fun d1 d2 => lift Dlocal (fun_of_binop h bop d1 d2))
-               (olift checkLocal (dnnrc_eval env e1)) (olift checkLocal (dnnrc_eval env e2))
+               (olift checkLocal (dnnrc_base_eval env e1)) (olift checkLocal (dnnrc_base_eval env e2))
       | DNNRCUnop _ uop e1 =>
-        olift (fun d1 => lift Dlocal (fun_of_unaryop h uop d1)) (olift checkLocal (dnnrc_eval env e1))
+        olift (fun d1 => lift Dlocal (fun_of_unaryop h uop d1)) (olift checkLocal (dnnrc_base_eval env e1))
       | DNNRCLet _ x e1 e2 =>
-        match dnnrc_eval env e1 with
-        | Some d => dnnrc_eval ((x,d)::env) e2
+        match dnnrc_base_eval env e1 with
+        | Some d => dnnrc_base_eval ((x,d)::env) e2
         | _ => None
         end
       | DNNRCFor _ x e1 e2 =>
-        match dnnrc_eval env e1 with
+        match dnnrc_base_eval env e1 with
         | Some (Ddistr c1) =>
           let inner_eval d1 :=
-              let env' := (x,Dlocal d1) :: env in olift checkLocal (dnnrc_eval env' e2)
+              let env' := (x,Dlocal d1) :: env in olift checkLocal (dnnrc_base_eval env' e2)
           in
           lift (fun coll => Ddistr coll) (rmap inner_eval c1)
         | Some (Dlocal (dcoll c1)) =>
           let inner_eval d1 :=
-              let env' := (x,Dlocal d1) :: env in olift checkLocal (dnnrc_eval env' e2)
+              let env' := (x,Dlocal d1) :: env in olift checkLocal (dnnrc_base_eval env' e2)
           in
           lift (fun coll => Dlocal (dcoll coll)) (rmap inner_eval c1)
         | Some (Dlocal _) => None
@@ -252,32 +252,32 @@ Section DNNRCBase.
         let aux_if d :=
             match d with
             | dbool b =>
-              if b then dnnrc_eval env e2 else dnnrc_eval env e3
+              if b then dnnrc_base_eval env e2 else dnnrc_base_eval env e3
             | _ => None
             end
-        in olift aux_if (olift checkLocal (dnnrc_eval env e1))
+        in olift aux_if (olift checkLocal (dnnrc_base_eval env e1))
       | DNNRCEither _ ed xl el xr er =>
-        match olift checkLocal (dnnrc_eval env ed) with
+        match olift checkLocal (dnnrc_base_eval env ed) with
         | Some (dleft dl) =>
-          dnnrc_eval ((xl,Dlocal dl)::env) el
+          dnnrc_base_eval ((xl,Dlocal dl)::env) el
         | Some (dright dr) =>
-          dnnrc_eval ((xr,Dlocal dr)::env) er
+          dnnrc_base_eval ((xr,Dlocal dr)::env) er
         | _ => None
         end
       | DNNRCGroupBy _ g sl e1 =>
         None (* XXX TODO XXX *)
       | DNNRCCollect _ e1 =>
-        let collected := olift checkDistrAndCollect (dnnrc_eval env e1) in
+        let collected := olift checkDistrAndCollect (dnnrc_base_eval env e1) in
         lift Dlocal collected
       | DNNRCDispatch _ e1 =>
-        match olift checkLocal (dnnrc_eval env e1) with
+        match olift checkLocal (dnnrc_base_eval env e1) with
         | Some (dcoll c1) =>
           Some (Ddistr c1)
         | _ => None
         end
       | DNNRCAlg _ plug nnrcbindings =>
         match listo_to_olist (map (fun x =>
-               match dnnrc_eval env (snd x) with
+               match dnnrc_base_eval env (snd x) with
                | Some (Ddistr coll) => Some (fst x, coll)
                | _ => None
                end) nnrcbindings) with 
@@ -348,16 +348,16 @@ Section DNNRCBase.
       apply Forall_dcoll_map_lift.
     Qed.
 
-    Lemma dnnrc_alg_bindings_normalized {plug:AlgPlug plug_type} denv l r :
+    Lemma dnnrc_base_alg_bindings_normalized {plug:AlgPlug plug_type} denv l r :
       Forall (ddata_normalized h) (map snd denv) ->
       Forall
-        (fun n : string * dnnrc =>
+        (fun n : string * dnnrc_base =>
            forall (denv : dbindings) (o : ddata),
-             dnnrc_eval denv (snd n) = Some o ->
+             dnnrc_base_eval denv (snd n) = Some o ->
              Forall (ddata_normalized h) (map snd denv) -> ddata_normalized h o) r ->
       rmap
-         (fun x : string * dnnrc =>
-          match dnnrc_eval denv (snd x) with
+         (fun x : string * dnnrc_base =>
+          match dnnrc_base_eval denv (snd x) with
           | Some (Dlocal _) => None
           | Some (Ddistr coll) => Some (fst x, coll)
           | None => None
@@ -367,7 +367,7 @@ Section DNNRCBase.
       revert r; induction l; intros; trivial.
       destruct r; simpl in * ; [invcs H1 | ] .
       invcs H0.
-      case_eq (dnnrc_eval denv (snd p))
+      case_eq (dnnrc_base_eval denv (snd p))
       ; intros; rewrite H0 in H1
       ; try discriminate.
       destruct d; try discriminate.
@@ -382,10 +382,10 @@ Section DNNRCBase.
       constructor; trivial.
     Qed.
 
-    Lemma dnnrc_eval_normalized {plug:AlgPlug plug_type} denv e {o} :
+    Lemma dnnrc_base_eval_normalized {plug:AlgPlug plug_type} denv e {o} :
       Forall (ddata_normalized h) (map snd constant_env) ->
       Forall (ddata_normalized h) (map snd denv) ->
-      dnnrc_eval denv e = Some o ->
+      dnnrc_base_eval denv e = Some o ->
       ddata_normalized h o.
     Proof.
       intros Hc.
@@ -402,9 +402,9 @@ Section DNNRCBase.
         exists (v,o); eauto.
       - inversion H; subst; intros.
         apply dnormalize_normalizes_local.
-      - case_eq (dnnrc_eval denv e1); [intros ? eqq1 | intros eqq1];
+      - case_eq (dnnrc_base_eval denv e1); [intros ? eqq1 | intros eqq1];
         (rewrite eqq1 in *;
-          case_eq (dnnrc_eval denv e2); [intros ? eqq2 | intros eqq2];
+          case_eq (dnnrc_base_eval denv e2); [intros ? eqq2 | intros eqq2];
           rewrite eqq2 in *); simpl in *; try discriminate.
          + destruct d; destruct d0; simpl in H; try congruence;
            destruct o; simpl in *; unfold lift in H;
@@ -418,7 +418,7 @@ Section DNNRCBase.
            inversion IHe2; assumption.
          + unfold olift2 in H; simpl in H.
            destruct d; simpl in H; congruence.
-      - case_eq (dnnrc_eval denv e); [intros ? eqq1 | intros eqq1];
+      - case_eq (dnnrc_base_eval denv e); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;
         simpl in *; try discriminate.
         destruct d; simpl in H; try congruence;
@@ -428,16 +428,16 @@ Section DNNRCBase.
         constructor;
         eapply fun_of_unaryop_normalized; eauto.
         specialize (IHe denv (Dlocal d) H0 eqq1); inversion IHe; assumption.
-      - case_eq (dnnrc_eval denv e1); [intros ? eqq1 | intros eqq1];
+      - case_eq (dnnrc_base_eval denv e1); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;
         simpl in *; try discriminate;
-        case_eq (dnnrc_eval ((v,d)::denv) e2); [intros ? eqq2 | intros eqq2];
+        case_eq (dnnrc_base_eval ((v,d)::denv) e2); [intros ? eqq2 | intros eqq2];
         rewrite eqq2 in *;
         simpl in *; try discriminate.
         inversion H; subst; clear H.
         eapply (IHe2 ((v, d) :: denv)); eauto.
         constructor; eauto.
-      - case_eq (dnnrc_eval denv e1); [intros ? eqq1 | intros eqq1];
+      - case_eq (dnnrc_base_eval denv e1); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;
         simpl in *; try discriminate;
         unfold checkLocal in H; simpl in H.
@@ -450,7 +450,7 @@ Section DNNRCBase.
           constructor; constructor.
           inversion H2; subst; clear H2.
           apply (rmap_Forall e H1); intros.
-          case_eq (dnnrc_eval ((v, Dlocal x0) :: denv) e2); intros;
+          case_eq (dnnrc_base_eval ((v, Dlocal x0) :: denv) e2); intros;
           rewrite H3 in H; simpl in H; try congruence.
           destruct d; simpl in H; try congruence.
           inversion H; subst; clear H.
@@ -466,7 +466,7 @@ Section DNNRCBase.
           destruct H; subst.
           constructor.
           apply (rmap_Forall e H2); intros.
-          case_eq (dnnrc_eval ((v, Dlocal x0) :: denv) e2); intros;
+          case_eq (dnnrc_base_eval ((v, Dlocal x0) :: denv) e2); intros;
           rewrite H3 in H; simpl in H; try congruence.
           destruct d; simpl in H; try congruence.
           inversion H; subst; clear H.
@@ -476,14 +476,14 @@ Section DNNRCBase.
           constructor; eauto; try assumption.
           constructor; assumption. assumption.
           inversion H; assumption. }
-      - case_eq (dnnrc_eval denv e1); [intros ? eqq1 | intros eqq1];
+      - case_eq (dnnrc_base_eval denv e1); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;
         simpl in *; try discriminate.
         destruct d; try discriminate.
         destruct d; try discriminate.
         simpl in *.
         destruct b; eauto.
-      - case_eq (dnnrc_eval denv e1); [intros ? eqq1 | intros eqq1];
+      - case_eq (dnnrc_base_eval denv e1); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;
         simpl in *; try discriminate.
         specialize (IHe1 _ _ H0 eqq1).
@@ -500,13 +500,13 @@ Section DNNRCBase.
           inversion H2; assumption.
       - congruence. (* XXX GroupBy Case TODO XXX *)
       - unfold lift in H.
-        case_eq (dnnrc_eval denv e); intros; rewrite H1 in H; simpl in H;
+        case_eq (dnnrc_base_eval denv e); intros; rewrite H1 in H; simpl in H;
         try discriminate.
         destruct d; simpl in *; try discriminate.
         inversion H; subst; clear H.
         specialize (IHe denv (Ddistr l) H0 H1).
         inversion IHe; constructor; constructor; assumption.
-      - case_eq (dnnrc_eval denv e); intros; rewrite H1 in H; simpl in H;
+      - case_eq (dnnrc_base_eval denv e); intros; rewrite H1 in H; simpl in H;
         try discriminate.
         destruct d; simpl in *; try discriminate.
         destruct d; simpl in *; try discriminate.
@@ -516,8 +516,8 @@ Section DNNRCBase.
       - simpl in H1.
         rewrite <- listo_to_olist_simpl_rmap in H1.
         case_eq (rmap
-           (fun x : string * dnnrc =>
-            match dnnrc_eval denv (snd x) with
+           (fun x : string * dnnrc_base =>
+            match dnnrc_base_eval denv (snd x) with
             | Some (Dlocal _) => None
             | Some (Ddistr coll) => Some (fst x, coll)
             | None => None
@@ -530,20 +530,20 @@ Section DNNRCBase.
         + apply (plug_normalized h op l (dcoll l0)); trivial.
           apply Forall_dcoll_map_lift.
           unfold bindings_of_coll_bindings.
-          apply (@dnnrc_alg_bindings_normalized _ denv l r H0); eauto.
+          apply (@dnnrc_base_alg_bindings_normalized _ denv l r H0); eauto.
           rewrite Forall_forall in *. eauto.
         + econstructor; inversion H1; assumption.
     Qed.
 
-    Corollary dnnrc_eval_normalized_local {plug:AlgPlug plug_type} denv e {d} :
+    Corollary dnnrc_base_eval_normalized_local {plug:AlgPlug plug_type} denv e {d} :
       Forall (ddata_normalized h) (map snd constant_env) ->
       Forall (ddata_normalized h) (map snd denv) ->
-      dnnrc_eval denv e = Some (Dlocal d) ->
+      dnnrc_base_eval denv e = Some (Dlocal d) ->
       data_normalized h d.
     Proof.
       intros.
       assert (ddata_normalized h (Dlocal d)).
-      apply (dnnrc_eval_normalized denv e); assumption.
+      apply (dnnrc_base_eval_normalized denv e); assumption.
       inversion H2; assumption.
     Qed.
          
@@ -551,7 +551,7 @@ Section DNNRCBase.
     Require Import Decidable.
     Require Import List.
     
-    Fixpoint dnnrc_subst_var_to_const (constants:list string) (e:dnnrc) : dnnrc
+    Fixpoint dnnrc_base_subst_var_to_const (constants:list string) (e:dnnrc_base) : dnnrc_base
       := match e with
          | DNNRCGetConstant a y => DNNRCGetConstant a y
          | DNNRCVar a y => if in_dec string_eqdec y constants
@@ -559,38 +559,38 @@ Section DNNRCBase.
                         else DNNRCVar a y
          | DNNRCConst a d => DNNRCConst a d
          | DNNRCBinop a bop e1 e2 => DNNRCBinop a bop
-                                            (dnnrc_subst_var_to_const constants e1)
-                                            (dnnrc_subst_var_to_const constants e2)
-         | DNNRCUnop a uop e1 => DNNRCUnop a uop (dnnrc_subst_var_to_const constants e1)
+                                            (dnnrc_base_subst_var_to_const constants e1)
+                                            (dnnrc_base_subst_var_to_const constants e2)
+         | DNNRCUnop a uop e1 => DNNRCUnop a uop (dnnrc_base_subst_var_to_const constants e1)
          | DNNRCLet a y e1 e2 => 
            DNNRCLet a y 
-                   (dnnrc_subst_var_to_const constants e1) 
+                   (dnnrc_base_subst_var_to_const constants e1) 
                    (if in_dec string_eqdec y constants
                     then e2
-                    else dnnrc_subst_var_to_const constants e2)
+                    else dnnrc_base_subst_var_to_const constants e2)
          | DNNRCFor a y e1 e2 => 
            DNNRCFor a y 
-                   (dnnrc_subst_var_to_const constants e1) 
+                   (dnnrc_base_subst_var_to_const constants e1) 
                    (if in_dec string_eqdec y constants
                     then e2
-                    else dnnrc_subst_var_to_const constants e2)
+                    else dnnrc_base_subst_var_to_const constants e2)
          | DNNRCIf a e1 e2 e3 => DNNRCIf a
-                                 (dnnrc_subst_var_to_const constants e1)
-                                 (dnnrc_subst_var_to_const constants e2)
-                                 (dnnrc_subst_var_to_const constants e3)
+                                 (dnnrc_base_subst_var_to_const constants e1)
+                                 (dnnrc_base_subst_var_to_const constants e2)
+                                 (dnnrc_base_subst_var_to_const constants e3)
          | DNNRCEither a ed xl el xr er =>
-           DNNRCEither a (dnnrc_subst_var_to_const constants ed)
+           DNNRCEither a (dnnrc_base_subst_var_to_const constants ed)
                       xl
                       (if in_dec string_eqdec xl constants
                        then el
-                       else dnnrc_subst_var_to_const constants el)
+                       else dnnrc_base_subst_var_to_const constants el)
                       xr
                       (if in_dec string_eqdec xr constants
                        then er
-                       else dnnrc_subst_var_to_const constants er)
-         | DNNRCGroupBy a g sl e1 => DNNRCGroupBy a g sl (dnnrc_subst_var_to_const constants e1)
-         | DNNRCCollect a e1 => DNNRCCollect a (dnnrc_subst_var_to_const constants e1)
-         | DNNRCDispatch a e1 => DNNRCDispatch a (dnnrc_subst_var_to_const constants e1)
+                       else dnnrc_base_subst_var_to_const constants er)
+         | DNNRCGroupBy a g sl e1 => DNNRCGroupBy a g sl (dnnrc_base_subst_var_to_const constants e1)
+         | DNNRCCollect a e1 => DNNRCCollect a (dnnrc_base_subst_var_to_const constants e1)
+         | DNNRCDispatch a e1 => DNNRCDispatch a (dnnrc_base_subst_var_to_const constants e1)
          | DNNRCAlg a p l => DNNRCAlg a p l
          end.
   End GenDNNRCBase.
@@ -620,7 +620,7 @@ Section DNNRCBase.
     Global Program Instance NRAEnvPlug : (@AlgPlug nraenv_core) :=
       mkAlgPlug nraenv_eval nraenv_eval_normalized.
 
-    Definition dnnrc_nraenv_core {A} := @dnnrc A nraenv_core.
+    Definition dnnrc_nraenv_core {A} := @dnnrc_base A nraenv_core.
 
   End NraEnvPlug.
 
@@ -630,7 +630,7 @@ End DNNRCBase.
 (* Global Arguments AlgPlug {fruntime} plug_type : clear implicits.  *)
 (* Global Arguments dnnrc {fruntime} A plug_type: clear implicits.  *)
 
-Tactic Notation "dnnrc_cases" tactic(first) ident(c) :=
+Tactic Notation "dnnrc_base_cases" tactic(first) ident(c) :=
   first;
   [ Case_aux c "DNNRCGetConstant"%string
   | Case_aux c "DNNRCVar"%string

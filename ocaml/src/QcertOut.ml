@@ -37,8 +37,8 @@ let output_query pconf q =
   | QcertCompiler.Q_nnrc q -> pretty_query pconf pretty_nnrc q
   | QcertCompiler.Q_nnrcmr q -> pretty_query pconf pretty_nnrcmr q
   | QcertCompiler.Q_cldmr q -> pretty_query pconf pretty_cldmr q
-  | QcertCompiler.Q_dnnrc q -> pretty_query pconf pretty_dnnrc_dataframe q
-  | QcertCompiler.Q_dnnrc_typed q -> pretty_query pconf pretty_dnnrc_dataframe_typed q
+  | QcertCompiler.Q_dnnrc q -> pretty_query pconf pretty_dnnrc q
+  | QcertCompiler.Q_dnnrc_typed q -> pretty_query pconf pretty_dnnrc_typed q
   | QcertCompiler.Q_javascript q -> pretty_query pconf pretty_javascript q
   | QcertCompiler.Q_java q -> pretty_query pconf pretty_java q
   | QcertCompiler.Q_spark_rdd q -> pretty_query pconf pretty_spark_rdd q

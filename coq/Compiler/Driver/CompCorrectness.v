@@ -115,7 +115,7 @@ Section CompCorrectness.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nnrc}.
-  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc fr (type_annotation unit) dataframe)}.
+  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
@@ -370,13 +370,13 @@ Section CompCorrectness.
                            (lift_output (cldmr_eval_top ?h ?init ?c (lift_input ?i))) ] =>
         destruct  (lift_output (cldmr_eval_top h init c (lift_input i))); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
-      | [ |- equal_outputs (lift_output (dnnrc_dataframe_eval_top ?h ?c ?i))
-                           (lift_output (dnnrc_dataframe_eval_top ?h ?c ?i)) ] =>
-        destruct  (lift_output (dnnrc_dataframe_eval_top h c i)); simpl; try reflexivity;
+      | [ |- equal_outputs (lift_output (dnnrc_eval_top ?h ?c ?i))
+                           (lift_output (dnnrc_eval_top ?h ?c ?i)) ] =>
+        destruct  (lift_output (dnnrc_eval_top h c i)); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
-      | [ |- equal_outputs (lift_output (dnnrc_dataframe_typed_eval_top ?h ?c ?i))
-                           (lift_output (dnnrc_dataframe_typed_eval_top ?h ?c ?i)) ] =>
-        destruct  (lift_output (dnnrc_dataframe_typed_eval_top h c i)); simpl; try reflexivity;
+      | [ |- equal_outputs (lift_output (dnnrc_typed_eval_top ?h ?c ?i))
+                           (lift_output (dnnrc_typed_eval_top ?h ?c ?i)) ] =>
+        destruct  (lift_output (dnnrc_typed_eval_top h c i)); simpl; try reflexivity;
         unfold equal_outputs; simpl; match_destr; auto
       | [ |- equal_outputs (Ev_out_unsupported ?s1)
                            (Ev_out_unsupported ?s2) ] =>

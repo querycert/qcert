@@ -121,11 +121,11 @@ Section CompEval.
 
     (* Language: dnnrc *)
     Definition eval_dnnrc (q:dnnrc) (cenv: dbindings) : option data :=
-      DNNRC.dnnrc_dataframe_eval_top h q cenv.
+      DNNRC.dnnrc_eval_top h q cenv.
 
     (* Language: dnnrc_typed *)
     Definition eval_dnnrc_typed (q:dnnrc_typed) (cenv: dbindings) : option data :=
-      tDNNRC.dnnrc_dataframe_typed_eval_top h q cenv.
+      tDNNRC.dnnrc_typed_eval_top h q cenv.
 
   End EvalFunctions.
 

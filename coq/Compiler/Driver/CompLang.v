@@ -148,8 +148,8 @@ Section CompLang.
         :: (L_dnnrc_typed,DistrEnd,"tDNNRC", "Typed Distributed Named Nested Relational Calculus")
         :: (L_javascript,BackEnd,"JavaScript", "JavaScript")
         :: (L_java,BackEnd,"Java", "Java")
-        :: (L_spark_rdd,BackEnd,"SparkRDD", "Spark (RDD API)")
-        :: (L_spark_df,BackEnd,"SparkDF", "Spark (Dataframe API)")
+        :: (L_spark_rdd,BackEnd,"SparkRDD", "Spark (RDDs API)")
+        :: (L_spark_df,BackEnd,"SparkDF", "Spark (DataFrames API)")
         :: (L_cloudant,BackEnd,"Cloudant", "Cloudant Map/Reduce Views")
         :: nil.
 
@@ -249,9 +249,9 @@ Section CompLang.
     Definition nnrc := nnrc.
     Definition nnrcmr := nnrcmr.
     Definition cldmr := cldmr.
-    Definition dnnrc := dnnrc_dataframe.
-    Definition dnnrc_typed {bm:brand_model} := dnnrc_dataframe_typed.
-    Definition javascript := js.
+    Definition dnnrc := dnnrc.
+    Definition dnnrc_typed {bm:brand_model} := dnnrc_typed.
+    Definition javascript := javascript.
     Definition java := java.
     Definition spark_rdd := spark_rdd.
     Definition spark_df := spark_df.

@@ -27,7 +27,7 @@ Section NNRCtoDNNRC.
 
   Context {fruntime:foreign_runtime}.
   
-  Fixpoint nnrc_to_dnnrc {A:Set} {plug_type:Set} (annot:A) (ctenv tenv:list (var*dlocalization)) (n:nnrc) : @dnnrc _ A plug_type :=
+  Fixpoint nnrc_to_dnnrc_base {A:Set} {plug_type:Set} (annot:A) (ctenv tenv:list (var*dlocalization)) (n:nnrc) : @dnnrc_base _ A plug_type :=
     match n with
     | NNRCGetConstant v =>
       match assoc_lookupr equiv_dec ctenv v with
@@ -42,15 +42,15 @@ Section NNRCtoDNNRC.
       | Some Vdistr => DNNRCCollect annot (DNNRCVar annot v)
       end
     | NNRCConst d => DNNRCConst annot d
-    | NNRCBinop b n1 n2 => DNNRCBinop annot b (nnrc_to_dnnrc annot ctenv tenv n1) (nnrc_to_dnnrc annot ctenv tenv n2)
-    | NNRCUnop u n1 => DNNRCUnop annot u (nnrc_to_dnnrc annot ctenv tenv n1)
-    | NNRCLet v n1 n2 => DNNRCLet annot v (nnrc_to_dnnrc annot ctenv tenv n1) (nnrc_to_dnnrc annot ctenv ((v,Vlocal)::tenv) n2)
-    | NNRCFor v n1 n2 => DNNRCFor annot v (nnrc_to_dnnrc annot ctenv tenv n1) (nnrc_to_dnnrc annot ctenv ((v,Vlocal)::tenv) n2)
-    | NNRCIf n1 n2 n3 => DNNRCIf annot (nnrc_to_dnnrc annot ctenv tenv n1) (nnrc_to_dnnrc annot ctenv tenv n2) (nnrc_to_dnnrc annot ctenv tenv n3)
+    | NNRCBinop b n1 n2 => DNNRCBinop annot b (nnrc_to_dnnrc_base annot ctenv tenv n1) (nnrc_to_dnnrc_base annot ctenv tenv n2)
+    | NNRCUnop u n1 => DNNRCUnop annot u (nnrc_to_dnnrc_base annot ctenv tenv n1)
+    | NNRCLet v n1 n2 => DNNRCLet annot v (nnrc_to_dnnrc_base annot ctenv tenv n1) (nnrc_to_dnnrc_base annot ctenv ((v,Vlocal)::tenv) n2)
+    | NNRCFor v n1 n2 => DNNRCFor annot v (nnrc_to_dnnrc_base annot ctenv tenv n1) (nnrc_to_dnnrc_base annot ctenv ((v,Vlocal)::tenv) n2)
+    | NNRCIf n1 n2 n3 => DNNRCIf annot (nnrc_to_dnnrc_base annot ctenv tenv n1) (nnrc_to_dnnrc_base annot ctenv tenv n2) (nnrc_to_dnnrc_base annot ctenv tenv n3)
     | NNRCEither n0 v1 n1 v2 n2 =>
-      DNNRCEither annot (nnrc_to_dnnrc annot ctenv tenv n0) v1 (nnrc_to_dnnrc annot ctenv ((v1,Vlocal)::tenv) n1) v2 (nnrc_to_dnnrc annot ctenv ((v2,Vlocal)::tenv) n2)
+      DNNRCEither annot (nnrc_to_dnnrc_base annot ctenv tenv n0) v1 (nnrc_to_dnnrc_base annot ctenv ((v1,Vlocal)::tenv) n1) v2 (nnrc_to_dnnrc_base annot ctenv ((v2,Vlocal)::tenv) n2)
     | NNRCGroupBy g sl n1 =>
-      DNNRCGroupBy annot g sl (nnrc_to_dnnrc annot ctenv tenv n1)
+      DNNRCGroupBy annot g sl (nnrc_to_dnnrc_base annot ctenv tenv n1)
     end.
 
   Definition wf_localization (tl:option dlocalization) (dl:option ddata) :=
@@ -235,18 +235,18 @@ Section NNRCtoDNNRC.
     - apply IHdenv. apply H.
   Qed.
 
-  Lemma rmap_nnrc_to_dnnrc_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) ctenv tenv cdenv denv v l n2 :
+  Lemma rmap_nnrc_to_dnnrc_base_correct {A:Set} {plug_type:Set} {plug:AlgPlug plug_type} (h:brand_relation_t) (annot:A) ctenv tenv cdenv denv v l n2 :
     wf_denv tenv denv ->
     (forall (tenv : list (var * dlocalization))
             (denv : list (var * ddata)),
         wf_denv tenv denv ->
         lift Dlocal (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n2) =
-        dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n2)) ->
+        dnnrc_base_eval h cdenv denv (nnrc_to_dnnrc_base annot ctenv tenv n2)) ->
     rmap
       (fun d1 : data =>
          olift checkLocal
-               (dnnrc_eval h cdenv ((v, Dlocal d1) :: denv)
-                          (nnrc_to_dnnrc annot ctenv ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv) ((v, d1) :: unlocalize_constants denv) n2) l.
+               (dnnrc_base_eval h cdenv ((v, Dlocal d1) :: denv)
+                          (nnrc_to_dnnrc_base annot ctenv ((v, Vlocal) :: tenv) n2))) l = rmap (fun d1 : data => nnrc_core_eval h (unlocalize_constants cdenv) ((v, d1) :: unlocalize_constants denv) n2) l.
   Proof.
     intros Hwf; intros.
     induction l; [reflexivity| ]; simpl.
@@ -303,14 +303,14 @@ Section NNRCtoDNNRC.
       reflexivity.
   Qed.
 
-  Lemma nnrc_to_dnnrc_get_constant_correct
+  Lemma nnrc_to_dnnrc_base_get_constant_correct
         h
         (A plug_type:Set) (plug:AlgPlug plug_type) (annot:A) (v : var)
         (ctenv : list (var * dlocalization))
         (cdenv denv : list (var * ddata))
         (Hcdenv : wf_cdenv ctenv cdenv) :
     lift Dlocal (edot (unlocalize_constants cdenv) v) =
-    dnnrc_eval h cdenv denv
+    dnnrc_base_eval h cdenv denv
                match assoc_lookupr equiv_dec ctenv v with
                | Some Vlocal => DNNRCGetConstant annot v
                | Some Vdistr => DNNRCCollect annot (DNNRCGetConstant annot v)
@@ -353,18 +353,18 @@ Section NNRCtoDNNRC.
       reflexivity.
   Qed.
     
-  Global Arguments dnnrc : clear implicits.
-  Lemma nnrc_to_dnnrc_correct {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (ctenv tenv:list (var*dlocalization)) (n:nnrc) :
+  Global Arguments dnnrc_base : clear implicits.
+  Lemma nnrc_to_dnnrc_base_correct {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (ctenv tenv:list (var*dlocalization)) (n:nnrc) :
     forall cdenv denv:list (var*ddata),
       wf_cdenv ctenv cdenv ->
       wf_denv tenv denv ->
       lift Dlocal (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n)
-      = dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n).
+      = dnnrc_base_eval h cdenv denv (nnrc_to_dnnrc_base annot ctenv tenv n).
   Proof.
     intros cdenv ? Hcdenv ?.
     revert tenv denv H; nnrc_cases (induction n) Case; intros; simpl; intros.
     - Case "NNRCGetConstant"%string.
-      rewrite (nnrc_to_dnnrc_get_constant_correct h A plug_type plug annot v ctenv cdenv denv).
+      rewrite (nnrc_to_dnnrc_base_get_constant_correct h A plug_type plug annot v ctenv cdenv denv).
       reflexivity.
       assumption.
     - Case "NNRCVar"%string.
@@ -428,7 +428,7 @@ Section NNRCtoDNNRC.
       rewrite <- IHn1; simpl in *; try reflexivity.
       destruct d; simpl in *; try reflexivity.
       unfold lift.
-      rewrite rmap_nnrc_to_dnnrc_correct; try assumption.
+      rewrite rmap_nnrc_to_dnnrc_base_correct; try assumption.
       assert (@rmap (@data (@foreign_runtime_data fruntime)) (@data (@foreign_runtime_data fruntime))
           (fun d1 : @data (@foreign_runtime_data fruntime) =>
            @nnrc_core_eval fruntime h (@unlocalize_constants (@foreign_runtime_data fruntime) cdenv)
@@ -470,31 +470,31 @@ Section NNRCtoDNNRC.
       reflexivity. (* XXX TODO: Currently both fail in core NNRC and in DNNRC XXX *)
   Qed.
 
-  Lemma nnrc_to_dnnrc_correct_lift {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (ctenv tenv:list (var*dlocalization)) (n:nnrc) :
+  Lemma nnrc_to_dnnrc_base_correct_lift {A plug_type:Set} (annot:A) {plug:AlgPlug plug_type} h (ctenv tenv:list (var*dlocalization)) (n:nnrc) :
     forall cdenv denv:list (var*ddata),
       wf_cdenv ctenv cdenv ->
       wf_denv tenv denv ->
       nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv) n
-      = lift unlocalize_data (dnnrc_eval h cdenv denv (nnrc_to_dnnrc annot ctenv tenv n)).
+      = lift unlocalize_data (dnnrc_base_eval h cdenv denv (nnrc_to_dnnrc_base annot ctenv tenv n)).
   Proof.
     intros.
-    rewrite <- nnrc_to_dnnrc_correct; auto.
+    rewrite <- nnrc_to_dnnrc_base_correct; auto.
     unfold unlocalize_data.
     unfold lift; simpl.
     destruct (nnrc_core_eval h (unlocalize_constants cdenv) (unlocalize_constants denv)); auto.
   Qed.
-  
+
   Section Top.
     Require Import NRAEnvRuntime.
     Require Import Dataframe.
     Context {ftype: ForeignType.foreign_type}.
 
-    Definition nnrc_to_dnnrc_dataframe {A:Set} (annot:A) (tenv:vdbindings) (q:nnrc) :=
-      @nnrc_to_dnnrc A dataframe annot (rec_sort tenv) nil
+    Definition nnrc_to_dnnrc {A:Set} (annot:A) (tenv:vdbindings) (q:nnrc) :=
+      @nnrc_to_dnnrc_base A dataframe annot (rec_sort tenv) nil
                      (nnrc_to_nnrc_base q).
 
-    Definition nnrc_to_dnnrc_top (tenv:vdbindings) (q:nnrc) : dnnrc_dataframe :=
-      nnrc_to_dnnrc_dataframe tt tenv q.
+    Definition nnrc_to_dnnrc_top (tenv:vdbindings) (q:nnrc) : dnnrc :=
+      nnrc_to_dnnrc tt tenv q.
 
     Lemma rec_sort_unlocalize_constants_comm l :
       (rec_sort (unlocalize_constants l) = (unlocalize_constants (rec_sort l))).
@@ -535,20 +535,20 @@ Section NNRCtoDNNRC.
       forall cdenv:dbindings,
         wf_cdenv tenv cdenv ->
         nnrc_eval_top h q (unlocalize_constants cdenv) =
-        dnnrc_dataframe_eval_top h (nnrc_to_dnnrc_top tenv q) cdenv.
+        dnnrc_eval_top h (nnrc_to_dnnrc_top tenv q) cdenv.
     Proof.
       unfold nnrc_to_dnnrc_top.
       unfold nnrc_eval_top.
       unfold nnrc_eval.
-      unfold nnrc_to_dnnrc_dataframe.
-      unfold dnnrc_dataframe_eval_top.
+      unfold nnrc_to_dnnrc.
+      unfold dnnrc_eval_top.
       intros.
       unfold lift_nnrc_core.
       assert (nil = unlocalize_constants nil) by reflexivity.
       rewrite H0.
       rewrite rec_sort_unlocalize_constants_comm.
       generalize (wf_cdenv_rec_sort tenv cdenv H); intros; clear H.
-      apply (nnrc_to_dnnrc_correct_lift tt).
+      apply (nnrc_to_dnnrc_base_correct_lift tt).
       assumption.
       unfold wf_denv.
       split; [reflexivity| ].

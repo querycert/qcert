@@ -25,24 +25,25 @@ Section size.
 
   Context (plug_size:plug_type->nat).
   
-  Fixpoint dnnrc_size (d:@dnnrc _ A plug_type)
+  Fixpoint dnnrc_base_size (d:@dnnrc_base _ A plug_type)
     := match d with
        | DNNRCGetConstant _ _ => 1
        | DNNRCVar _ _ => 1
        | DNNRCConst _ _ => 1
-       | DNNRCBinop _ _ d1 d2 => S (dnnrc_size d1 + dnnrc_size d2)
-       | DNNRCUnop _ _ d0 => S (dnnrc_size d0)
-       | DNNRCLet _ _ d1 d2 => S (dnnrc_size d1 + dnnrc_size d2)
-       | DNNRCFor _ _ d1 d2 => S (dnnrc_size d1 + dnnrc_size d2)
-       | DNNRCIf _ d1 d2 d3 => S (dnnrc_size d1 + dnnrc_size d2 + dnnrc_size d3)
-       | DNNRCEither _ d1 _ d2 _ d3 => S (dnnrc_size d1 + dnnrc_size d2 + dnnrc_size d3)
-       | DNNRCGroupBy _ _ _ d0 => S (dnnrc_size d0)
-       | DNNRCCollect _ d0 => S (dnnrc_size d0)
-       | DNNRCDispatch _ d0 => S (dnnrc_size d0)
-       | DNNRCAlg _ pt sdl => S ((* plug_size pt + *) 0) (* (fold_left (fun acc sc => dnnrc_size (snd sc) + acc) sdl 0)) *)
+       | DNNRCBinop _ _ d1 d2 => S (dnnrc_base_size d1 + dnnrc_base_size d2)
+       | DNNRCUnop _ _ d0 => S (dnnrc_base_size d0)
+       | DNNRCLet _ _ d1 d2 => S (dnnrc_base_size d1 + dnnrc_base_size d2)
+       | DNNRCFor _ _ d1 d2 => S (dnnrc_base_size d1 + dnnrc_base_size d2)
+       | DNNRCIf _ d1 d2 d3 => S (dnnrc_base_size d1 + dnnrc_base_size d2 + dnnrc_base_size d3)
+       | DNNRCEither _ d1 _ d2 _ d3 =>
+         S (dnnrc_base_size d1 + dnnrc_base_size d2 + dnnrc_base_size d3)
+       | DNNRCGroupBy _ _ _ d0 => S (dnnrc_base_size d0)
+       | DNNRCCollect _ d0 => S (dnnrc_base_size d0)
+       | DNNRCDispatch _ d0 => S (dnnrc_base_size d0)
+       | DNNRCAlg _ pt sdl => S ((* plug_size pt + *) 0) (* (fold_left (fun acc sc => dnnrc_base_size (snd sc) + acc) sdl 0)) *)
        end.
 
-  Lemma dnnrc_size_nzero (d:@dnnrc _ A plug_type) : dnnrc_size d <> 0.
+  Lemma dnnrc_base_size_nzero (d:@dnnrc_base _ A plug_type) : dnnrc_base_size d <> 0.
   Proof.
     induction d; simpl; omega.
   Qed.

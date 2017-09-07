@@ -1440,7 +1440,7 @@ Next Obligation.
 Defined.
 
 Definition dnnrc_for_log {br:brand_relation}
-  := (@dnnrc enhanced_foreign_runtime (type_annotation unit) dataframe).
+  := (@dnnrc_base enhanced_foreign_runtime (type_annotation unit) dataframe).
 
   (* dnnrc optimizer logger support *)
   Axiom OPTIMIZER_LOGGER_dnnrc_token_type : Set.
@@ -1506,7 +1506,7 @@ Module EnhancedRuntime <: CompilerRuntime.
     := foreign_nraenv_optimizer_logger.
   Definition compiler_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
-  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe)
+  Definition compiler_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc_base _ (type_annotation unit) dataframe)
     := foreign_dnnrc_optimizer_logger.
   Definition compiler_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.
@@ -2504,7 +2504,7 @@ Module EnhancedModel(bm:CompilerBrandModel(EnhancedForeignType)) <: CompilerMode
     := foreign_nraenv_optimizer_logger.
   Definition compiler_model_nnrc_optimizer_logger : optimizer_logger string nnrc
     := foreign_nnrc_optimizer_logger.
-  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc _ (type_annotation unit) dataframe)
+  Definition compiler_model_dnnrc_optimizer_logger {br:brand_relation}: optimizer_logger string (@dnnrc_base _ (type_annotation unit) dataframe)
     := foreign_dnnrc_optimizer_logger.
   Definition compiler_model_foreign_data_typing : foreign_data_typing
     := enhanced_foreign_data_typing.

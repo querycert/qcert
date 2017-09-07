@@ -408,7 +408,7 @@ let rec pretty_dnnrc_aux ann plug p sym ff n =
   | QcertCompiler.DNNRCGroupBy (a,g,atts,n1) ->
       fprintf ff "@[<hv 2>%agroup by@ %a%a@[<hv 2>(%a)@]@]" ann a (pretty_squared_names sym) [g] (pretty_squared_names sym) atts (pretty_dnnrc_aux ann plug 0 sym) n1
 
-let pretty_dnnrc ann plug greek margin annot n =
+let pretty_dnnrc_base ann plug greek margin annot n =
   let ff = str_formatter in
   let sym = if greek then greeksym else textsym in
   begin
@@ -465,21 +465,21 @@ let pretty_plug_dataframe greek ff a =
   let sym = if greek then greeksym else textsym in
   pretty_dataframe_aux 0 sym ff a
 
-let pretty_dnnrc_dataframe greek margin annot hierarchy harness q =
+let pretty_dnnrc greek margin annot hierarchy harness q =
   let ann = pretty_annotate_ignore in
   let plug = pretty_plug_dataframe greek in
-  pretty_dnnrc ann plug greek margin annot q
+  pretty_dnnrc_base ann plug greek margin annot q
 
 (** Pretty tDNNRC *)
 
-let pretty_dnnrc_dataframe_typed greek margin annot hierarchy harness q =
+let pretty_dnnrc_typed greek margin annot hierarchy harness q =
   let ann =
     if annot
     then pretty_annotate_annotated_rtype greek pretty_annotate_ignore
     else pretty_annotate_ignore
   in
   let plug = pretty_plug_dataframe greek in
-  pretty_dnnrc ann plug greek margin annot q
+  pretty_dnnrc_base ann plug greek margin annot q
     
 (** Pretty JavaScript *)
 

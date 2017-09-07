@@ -116,7 +116,7 @@ Section CompDriver.
   Context {ftyping: foreign_typing}.
   Context {nraenv_logger:optimizer_logger string nraenv}.
   Context {nnrc_logger:optimizer_logger string nnrc}.
-  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc fr (type_annotation unit) dataframe)}.
+  Context {dnnrc_logger:optimizer_logger string (DNNRCBase.dnnrc_base fr (type_annotation unit) dataframe)}.
   Context {ftojs:foreign_to_javascript}.
   Context {ftojava:foreign_to_java}.
   Context {ftos:foreign_to_scala}.
@@ -228,7 +228,7 @@ Section CompDriver.
     (** NNRCMR translations *)
     Definition nnrcmr_to_nnrc (q: nnrcmr) : option nnrc := nnrc_of_nnrcmr_top q.
 
-    Definition nnrcmr_to_dnnrc (q: nnrcmr) : option dnnrc := dnnrc_of_nnrcmr_top tt q.
+    Definition nnrcmr_to_dnnrc (q: nnrcmr) : option dnnrc := dnnrc_base_of_nnrcmr_top tt q.
 
     Definition nnrcmr_to_nnrcmr_cldmr_prepare (q: nnrcmr) : nnrcmr :=
       let q := foreign_to_cloudant_prepare_nnrcmr q in

@@ -38,14 +38,14 @@ Section tDNNRC.
   Global Arguments type_annotation : clear implicits. 
   Global Arguments mkType_annotation {A} ta_base ta_inferred ta_required.
   
-  Definition dnnrc_dataframe_typed := @dnnrc _ (type_annotation unit) dataframe.
+  Definition dnnrc_typed := @dnnrc_base _ (type_annotation unit) dataframe.
 
   Section Top.
     Context (h:brand_relation_t).
 
-    Definition dnnrc_dataframe_typed_eval_top
-               (q:dnnrc_dataframe_typed) (cenv:dbindings) : option data :=
-      lift unlocalize_data (@dnnrc_eval _ _ _ h (rec_sort cenv) SparkIRPlug nil q).
+    Definition dnnrc_typed_eval_top
+               (q:dnnrc_typed) (cenv:dbindings) : option data :=
+      lift unlocalize_data (@dnnrc_base_eval _ _ _ h (rec_sort cenv) SparkIRPlug nil q).
   End Top.
   
 End tDNNRC.

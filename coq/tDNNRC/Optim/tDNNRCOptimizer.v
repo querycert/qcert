@@ -34,44 +34,44 @@ Section tDNNRCOptimizer.
      Practical note: the appropriate map_deep should probably 
      be used on the provided rewrite *)
   
-  Fixpoint dnnrc_map_plug {A: Set} {P: Set}
+  Fixpoint dnnrc_base_map_plug {A: Set} {P: Set}
            (f: P -> P)
-           (e: @dnnrc _ A P) : @dnnrc _ A P
+           (e: @dnnrc_base _ A P) : @dnnrc_base _ A P
     := match e with
        | DNNRCGetConstant a e0 => DNNRCGetConstant a e0
        | DNNRCVar a e0 => DNNRCVar a e0
        | DNNRCConst a e0 => DNNRCConst a e0
        | DNNRCBinop a b e1 e2 =>
-         DNNRCBinop a b (dnnrc_map_plug f e1) (dnnrc_map_plug f e2)
+         DNNRCBinop a b (dnnrc_base_map_plug f e1) (dnnrc_base_map_plug f e2)
        | DNNRCUnop a u e0 =>
-         DNNRCUnop a u (dnnrc_map_plug f e0)
+         DNNRCUnop a u (dnnrc_base_map_plug f e0)
        | DNNRCLet a x e1 e2 =>
-         DNNRCLet a x (dnnrc_map_plug f e1) (dnnrc_map_plug f e2)
+         DNNRCLet a x (dnnrc_base_map_plug f e1) (dnnrc_base_map_plug f e2)
        | DNNRCFor a x e1 e2 =>
-         DNNRCFor a x (dnnrc_map_plug f e1) (dnnrc_map_plug f e2)
+         DNNRCFor a x (dnnrc_base_map_plug f e1) (dnnrc_base_map_plug f e2)
        | DNNRCIf a e1 e2 e3 =>
          DNNRCIf a
-                (dnnrc_map_plug f e1)
-                (dnnrc_map_plug f e2)
-                (dnnrc_map_plug f e3)
+                (dnnrc_base_map_plug f e1)
+                (dnnrc_base_map_plug f e2)
+                (dnnrc_base_map_plug f e3)
        | DNNRCEither a e0 x1 e1 x2 e2 =>
-         DNNRCEither a (dnnrc_map_plug f e0) x1 (dnnrc_map_plug f e1) x2 (dnnrc_map_plug f e2)
+         DNNRCEither a (dnnrc_base_map_plug f e0) x1 (dnnrc_base_map_plug f e1) x2 (dnnrc_base_map_plug f e2)
        | DNNRCGroupBy a g sl e0 =>
-         DNNRCGroupBy a g sl (dnnrc_map_plug f e0)
+         DNNRCGroupBy a g sl (dnnrc_base_map_plug f e0)
        | DNNRCCollect a e0 =>
-         DNNRCCollect a (dnnrc_map_plug f e0)
+         DNNRCCollect a (dnnrc_base_map_plug f e0)
        | DNNRCDispatch a e0 =>
-         DNNRCDispatch a (dnnrc_map_plug f e0)
+         DNNRCDispatch a (dnnrc_base_map_plug f e0)
        | DNNRCAlg a p sdl =>
-         DNNRCAlg a (f p) (map (fun sd => (fst sd, (dnnrc_map_plug f (snd sd)))) sdl)
+         DNNRCAlg a (f p) (map (fun sd => (fst sd, (dnnrc_base_map_plug f (snd sd)))) sdl)
     end.
 
-  Lemma dnnrc_map_plug_correct {A: Set} {P: Set}  
+  Lemma dnnrc_base_map_plug_correct {A: Set} {P: Set}  
         {plug:AlgPlug P}
         {f: P -> P}
-        (pf:forall (a:A) e env, dnnrc_eq (DNNRCAlg a e env) (DNNRCAlg a (f e) env))
-        (e: @dnnrc _ A P) :
-    dnnrc_eq e (dnnrc_map_plug f e).
+        (pf:forall (a:A) e env, dnnrc_base_eq (DNNRCAlg a e env) (DNNRCAlg a (f e) env))
+        (e: @dnnrc_base _ A P) :
+    dnnrc_base_eq e (dnnrc_base_map_plug f e).
   Proof.
     induction e; simpl; 
       try reflexivity.
@@ -90,9 +90,9 @@ Section tDNNRCOptimizer.
       revert H; apply Forall_impl; intros; simpl; tauto.
   Qed.
 
-  Fixpoint dnnrc_map_deep {A: Set} {P: Set}
-           (f: @dnnrc _ A P -> @dnnrc _ A P)
-           (e: @dnnrc _ A P) : @dnnrc _ A P
+  Fixpoint dnnrc_base_map_deep {A: Set} {P: Set}
+           (f: @dnnrc_base _ A P -> @dnnrc_base _ A P)
+           (e: @dnnrc_base _ A P) : @dnnrc_base _ A P
     := match e with
        | DNNRCGetConstant a e0 =>
          f (DNNRCGetConstant a e0)
@@ -101,36 +101,36 @@ Section tDNNRCOptimizer.
        | DNNRCConst a e0 =>
          f (DNNRCConst a e0)
        | DNNRCBinop a b e1 e2 =>
-         f (DNNRCBinop a b (dnnrc_map_deep f e1) (dnnrc_map_deep f e2))
+         f (DNNRCBinop a b (dnnrc_base_map_deep f e1) (dnnrc_base_map_deep f e2))
        | DNNRCUnop a u e0 =>
-         f (DNNRCUnop a u (dnnrc_map_deep f e0))
+         f (DNNRCUnop a u (dnnrc_base_map_deep f e0))
        | DNNRCLet a x e1 e2 =>
-         f (DNNRCLet a x (dnnrc_map_deep f e1) (dnnrc_map_deep f e2))
+         f (DNNRCLet a x (dnnrc_base_map_deep f e1) (dnnrc_base_map_deep f e2))
        | DNNRCFor a x e1 e2 =>
-         f (DNNRCFor a x (dnnrc_map_deep f e1) (dnnrc_map_deep f e2))
+         f (DNNRCFor a x (dnnrc_base_map_deep f e1) (dnnrc_base_map_deep f e2))
        | DNNRCIf a e1 e2 e3 =>
          f (DNNRCIf a
-                (dnnrc_map_deep f e1)
-                (dnnrc_map_deep f e2)
-                (dnnrc_map_deep f e3))
+                (dnnrc_base_map_deep f e1)
+                (dnnrc_base_map_deep f e2)
+                (dnnrc_base_map_deep f e3))
        | DNNRCEither a e0 x1 e1 x2 e2 =>
-         f (DNNRCEither a (dnnrc_map_deep f e0) x1 (dnnrc_map_deep f e1) x2 (dnnrc_map_deep f e2))
+         f (DNNRCEither a (dnnrc_base_map_deep f e0) x1 (dnnrc_base_map_deep f e1) x2 (dnnrc_base_map_deep f e2))
        | DNNRCGroupBy a g sl e0 =>
-         f (DNNRCGroupBy a g sl (dnnrc_map_deep f e0))
+         f (DNNRCGroupBy a g sl (dnnrc_base_map_deep f e0))
        | DNNRCCollect a e0 =>
-         f (DNNRCCollect a (dnnrc_map_deep f e0))
+         f (DNNRCCollect a (dnnrc_base_map_deep f e0))
        | DNNRCDispatch a e0 =>
-         f (DNNRCDispatch a (dnnrc_map_deep f e0))
+         f (DNNRCDispatch a (dnnrc_base_map_deep f e0))
        | DNNRCAlg a p sdl =>
-         f (DNNRCAlg a p (map (fun sd => (fst sd, (dnnrc_map_deep f (snd sd)))) sdl))
+         f (DNNRCAlg a p (map (fun sd => (fst sd, (dnnrc_base_map_deep f (snd sd)))) sdl))
     end.
 
-    Lemma dnnrc_map_deep_correctness {A: Set} {P: Set} 
+    Lemma dnnrc_base_map_deep_correctness {A: Set} {P: Set} 
           {plug:AlgPlug P}
-          {f: @dnnrc _ A P -> @dnnrc _ A P}
-          (pf:forall e, dnnrc_eq e (f e))
-          (e: @dnnrc _ A P) :
-      dnnrc_eq e (dnnrc_map_deep f e).
+          {f: @dnnrc_base _ A P -> @dnnrc_base _ A P}
+          (pf:forall e, dnnrc_base_eq e (f e))
+          (e: @dnnrc_base _ A P) :
+      dnnrc_base_eq e (dnnrc_base_map_deep f e).
     Proof.
       induction e; simpl; try auto 2
       ;  (etransitivity; [| apply pf]).
@@ -158,8 +158,8 @@ Section tDNNRCOptimizer.
    * We do not inline unbranding, as we would have to make sure that we don't use the branded value anywhere.
    *)
   Definition rec_cast_to_filter {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataframe) :
-    @dnnrc _ (type_annotation A) dataframe
+             (e: @dnnrc_base _ (type_annotation A) dataframe) :
+    @dnnrc_base _ (type_annotation A) dataframe
     := match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x
@@ -210,7 +210,7 @@ Section tDNNRCOptimizer.
   Fixpoint rewrite_unbrand_or_fail
            {A: Set} {P: Set}
            (s: string)
-           (e: @dnnrc _ A P) : option (@dnnrc _ A P)
+           (e: @dnnrc_base _ A P) : option (@dnnrc_base _ A P)
     := match e with
     | DNNRCUnop t1 AUnbrand (DNNRCGetConstant t2 v) =>
       if (s == v)
@@ -259,8 +259,8 @@ Section tDNNRCOptimizer.
 
   Definition rec_lift_unbrand
              {A : Set}
-             (e: @dnnrc _ (type_annotation A) dataframe):
-    (@dnnrc _ (type_annotation _) dataframe) :=
+             (e: @dnnrc_base _ (type_annotation A) dataframe):
+    (@dnnrc_base _ (type_annotation _) dataframe) :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs as c) body =>
       match lift_tlocal (di_required_typeof c) with
@@ -270,7 +270,7 @@ Section tDNNRCOptimizer.
         | Some e' =>
           let ALG :=
               (* TODO fresh name for lift_unbrand! *)
-              DNNRCAlg (dnnrc_annotation_get xs)
+              DNNRCAlg (dnnrc_base_annotation_get xs)
                        (DSSelect (("$blob"%string, CCol "unbranded.$blob")
                                     :: ("$known"%string, CCol "unbranded.$known")::nil)
                                  (DSSelect (("unbranded"%string, CUDFUnbrand t (CCol "$data"))::nil)
@@ -313,7 +313,7 @@ Section tDNNRCOptimizer.
     end.
 
   Fixpoint condition_to_column {A: Set}
-           (e: @dnnrc _ (type_annotation A) dataframe)
+           (e: @dnnrc_base _ (type_annotation A) dataframe)
            (binding: (string * column)) :=
     match e with
     (* TODO figure out how to properly handle vars and projections *)
@@ -366,8 +366,8 @@ Section tDNNRCOptimizer.
     end.
 
   Definition rec_if_else_empty_to_filter {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataframe):
-    (@dnnrc _ (type_annotation A) dataframe) :=
+             (e: @dnnrc_base _ (type_annotation A) dataframe):
+    (@dnnrc_base _ (type_annotation A) dataframe) :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x (DNNRCCollect t3 xs)
@@ -377,7 +377,7 @@ Section tDNNRCOptimizer.
       match condition_to_column condition (x, CCol "abc") with
       | Some c' =>
         let ALG :=
-            DNNRCAlg (dnnrc_annotation_get xs)
+            DNNRCAlg (dnnrc_base_annotation_get xs)
                     (DSFilter c' (DSVar "if_else_empty_to_filter"))
                     (("if_else_empty_to_filter"%string, xs)::nil)
         in
@@ -397,8 +397,8 @@ Section tDNNRCOptimizer.
          (@rec_if_else_empty_to_filter A) (* lemma *).
 
   Definition rec_remove_map_singletoncoll_flatten {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataframe):
-    @dnnrc _ (type_annotation A) dataframe :=
+             (e: @dnnrc_base _ (type_annotation A) dataframe):
+    @dnnrc_base _ (type_annotation A) dataframe :=
     match e with
     | DNNRCUnop t1 AFlatten
                (DNNRCFor t2 x xs
@@ -415,8 +415,8 @@ Section tDNNRCOptimizer.
          (@rec_remove_map_singletoncoll_flatten A) (* lemma *).
 
   Definition rec_for_to_select {A: Set}
-             (e: @dnnrc _ (type_annotation A) dataframe):
-    @dnnrc _ (type_annotation A) dataframe :=
+             (e: @dnnrc_base _ (type_annotation A) dataframe):
+    @dnnrc_base _ (type_annotation A) dataframe :=
     match e with
     | DNNRCFor t1 x (DNNRCCollect t2 xs) body =>
       match lift_tlocal (di_typeof body) with
@@ -451,7 +451,7 @@ Section tDNNRCOptimizer.
   Import ListNotations.
 
   Definition dnnrc_optim_list {A} :
-    list (OptimizerStep (@dnnrc _ (type_annotation A) dataframe))
+    list (OptimizerStep (@dnnrc_base _ (type_annotation A) dataframe))
     := [
         rec_cast_to_filter_step
         ; rec_lift_unbrand_step
@@ -469,12 +469,12 @@ Section tDNNRCOptimizer.
   Qed.
   
   Definition run_dnnrc_optims {A}
-             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataframe)}
+             {logger:optimizer_logger string (@dnnrc_base _ (type_annotation A) dataframe)}
              (phaseName:string)
              (optims:list string)
              (iterationsBetweenCostCheck:nat)
-    : @dnnrc _ (type_annotation A) dataframe -> @dnnrc _ (type_annotation A) dataframe :=
-    run_phase dnnrc_map_deep (dnnrc_size (* dataframe_size *)) dnnrc_optim_list
+    : @dnnrc_base _ (type_annotation A) dataframe -> @dnnrc_base _ (type_annotation A) dataframe :=
+    run_phase dnnrc_base_map_deep (dnnrc_base_size (* dataframe_size *)) dnnrc_optim_list
               ("[dnnrc] " ++ phaseName) optims iterationsBetweenCostCheck.
 
   Definition dnnrc_default_optim_list : list string
@@ -493,7 +493,7 @@ Section tDNNRCOptimizer.
   Qed.
 
   Definition dnnrcToDataframeRewrite {A:Set}
-             {logger:optimizer_logger string (@dnnrc _ (type_annotation A) dataframe)}
+             {logger:optimizer_logger string (@dnnrc_base _ (type_annotation A) dataframe)}
     := run_dnnrc_optims "" dnnrc_default_optim_list 6.
 
 End tDNNRCOptimizer.
