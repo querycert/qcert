@@ -2,7 +2,8 @@
 
 [![CircleCI](https://circleci.com/gh/querycert/qcert.svg?style=svg)](https://circleci.com/gh/querycert/qcert)
 
-http://github.com/querycert/qcert
+Git: http://github.com/querycert/qcert / Web Site: http://querycert.github.io
+
 
 ## About
 
@@ -13,6 +14,7 @@ includes an extensive compilation pipeline 'out of the box'.
 Q\*cert is built using the Coq proof assistant
 (https://coq.inria.fr). A significant subset of the provided
 compilation pipeline has been mechanically checked for correctness.
+
 
 ## Prerequisites
 
@@ -75,6 +77,7 @@ Q\*cert should build on most recent Linux systems and on MacOS.
 
 Windows isn't directly supported by the OCaml package manager. We do
 not currently have detailed instructions for how to build on Windows.
+
 
 ## Installing Q\*cert
 
@@ -164,6 +167,7 @@ as follows:
 ```
 cd bin; java -jar javaService.jar -server 9879
 ```
+
 
 ## Using Q\*cert
 
@@ -294,9 +298,11 @@ cd samples/spark2/
 ./run.sh
 ```
 
+
 ## Documentation
 
-Code documentation and background information can be found at: https://querycert.github.io
+Code documentation and background information can be found in `./doc`
+or on the Q*cert Web site: https://querycert.github.io
 
 
 ## Caveats
@@ -304,6 +310,7 @@ Code documentation and background information can be found at: https://querycert
 - There is no official support for Windows, although some success has been reported using Cygwin
 - The Spark 2 target is under development
 - Some of the source languages are only partially supported
+- Only part of the compilation pipeline has been mechanically verified for correctness
 
 
 ## License
