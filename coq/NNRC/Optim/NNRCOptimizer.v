@@ -59,7 +59,7 @@ Section NNRCOptimizer.
     Lemma nnrc_map_correctness:
       forall f: nnrc -> nnrc,
       forall e: nnrc,
-        (forall e', nnrc_ext_eq (f e') e') -> nnrc_ext_eq (nnrc_map f e) e.
+        (forall e', nnrc_eq (f e') e') -> nnrc_eq (nnrc_map f e) e.
     Proof.
       intros f e Hf.
       nnrc_cases (induction e) Case;
@@ -84,7 +84,7 @@ Section NNRCOptimizer.
     Lemma nnrc_map_deep_corretness:
       forall f: nnrc -> nnrc,
       forall e: nnrc,
-        (forall e', nnrc_ext_eq (f e') e') -> nnrc_ext_eq (nnrc_map_deep f e) e.
+        (forall e', nnrc_eq (f e') e') -> nnrc_eq (nnrc_map_deep f e) e.
     Proof.
       intros f e Hf.
       nnrc_cases (induction e) Case; simpl;
@@ -113,10 +113,10 @@ Section NNRCOptimizer.
       (nunshadow e).
     
     Lemma head_rew_correctness e:
-      nnrc_ext_eq (head_rew e) e.
+      nnrc_eq (head_rew e) e.
     Proof.
       unfold head_rew.
-    apply unshadow_ext_preserves.
+    apply nnrc_unshadow_preserves.
     Qed.
 
     Lemma rewriter_simpl_rew_no_free_var :
@@ -141,14 +141,14 @@ Section NNRCOptimizer.
     destruct p;
     tcorrectness_prover.
 
-  Lemma tnnrc_ext_rewrites_to_trans {model:basic_model} e1 e2 e3:
-    tnnrc_ext_rewrites_to e1 e2 -> tnnrc_ext_rewrites_to e2 e3 -> tnnrc_ext_rewrites_to e1 e3.
+  Lemma tnnrc_rewrites_to_trans {model:basic_model} e1 e2 e3:
+    tnnrc_rewrites_to e1 e2 -> tnnrc_rewrites_to e2 e3 -> tnnrc_rewrites_to e1 e3.
   Proof.
     apply transitivity.
   Qed.
 
   Lemma AUX {model:basic_model} f e e' :
-    (forall e, tnnrc_ext_rewrites_to e (f e)) -> tnnrc_ext_rewrites_to e e' -> tnnrc_ext_rewrites_to e (f e').
+    (forall e, tnnrc_rewrites_to e (f e)) -> tnnrc_rewrites_to e e' -> tnnrc_rewrites_to e (f e').
   Proof.
     intros.
     rewrite H0 at 1.
@@ -161,7 +161,7 @@ Section NNRCOptimizer.
   Lemma tnnrc_map_correctness {model:basic_model}:
     forall f: nnrc -> nnrc,
     forall p: nnrc,
-      (forall p', tnnrc_ext_rewrites_to p' (f p')) -> tnnrc_ext_rewrites_to p (tnnrc_map f p).
+      (forall p', tnnrc_rewrites_to p' (f p')) -> tnnrc_rewrites_to p (tnnrc_map f p).
   Proof.
     intros.
     nnrc_cases (induction p) Case; try solve [simpl; apply Hf]; simpl;
@@ -180,7 +180,7 @@ Section NNRCOptimizer.
   Lemma tnnrc_map_deep_correctness {model:basic_model}:
     forall f: nnrc -> nnrc,
     forall p: nnrc,
-      (forall p', tnnrc_ext_rewrites_to p' (f p')) -> tnnrc_ext_rewrites_to p (tnnrc_map_deep f p).
+      (forall p', tnnrc_rewrites_to p' (f p')) -> tnnrc_rewrites_to p (tnnrc_map_deep f p).
   Proof.
     intros f p Hf.
     nnrc_cases (induction p) Case; try solve [simpl; apply Hf];
@@ -198,7 +198,7 @@ Section NNRCOptimizer.
     unshadow_simpl nil e.
 
   Lemma tunshadow_preserves_fun_correctness {model:basic_model} (e:nnrc):
-    tnnrc_ext_rewrites_to e (tunshadow_preserves_fun e).
+    tnnrc_rewrites_to e (tunshadow_preserves_fun e).
   Proof.
     unfold tunshadow_preserves_fun, unshadow_simpl.
     apply tunshadow_preserves_arrow.
@@ -223,7 +223,7 @@ Section NNRCOptimizer.
     end.
   
   Lemma tfor_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tfor_nil_fun e).
+    tnnrc_rewrites_to e (tfor_nil_fun e).
   Proof.
     tprove_correctness e.
     apply tfor_nil_arrow.
@@ -248,7 +248,7 @@ Section NNRCOptimizer.
     end.
 
   Lemma tfor_singleton_to_let_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tfor_singleton_to_let_fun e).
+    tnnrc_rewrites_to e (tfor_singleton_to_let_fun e).
   Proof.
     tprove_correctness e.
     apply tfor_singleton_to_let_arrow.
@@ -272,7 +272,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tflatten_singleton_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tflatten_singleton_fun e).
+    tnnrc_rewrites_to e (tflatten_singleton_fun e).
   Proof.
     tprove_correctness e.
     apply tflatten_singleton_nnrc_arrow.
@@ -296,7 +296,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tflatten_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tflatten_nil_fun e).
+    tnnrc_rewrites_to e (tflatten_nil_fun e).
   Proof.
     tprove_correctness e.
     apply tflatten_nil_nnrc_arrow.
@@ -328,7 +328,7 @@ Section NNRCOptimizer.
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)
 
   Lemma tsigma_to_if_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tsigma_to_if_fun e).
+    tnnrc_rewrites_to e (tsigma_to_if_fun e).
   Proof.
     tprove_correctness e.
     apply tsigma_to_if_arrow.
@@ -370,7 +370,7 @@ Section NNRCOptimizer.
     end.
 
   Lemma tmap_sigma_fusion_samevar_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tmap_sigma_fusion_samevar_fun e).
+    tnnrc_rewrites_to e (tmap_sigma_fusion_samevar_fun e).
   Proof.
     tprove_correctness e.
     apply tmap_sigma_fusion_samevar_arrow.
@@ -398,7 +398,7 @@ Section NNRCOptimizer.
     end.
 
   Lemma tdot_of_rec_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tdot_of_rec_fun e).
+    tnnrc_rewrites_to e (tdot_of_rec_fun e).
   Proof.
     tprove_correctness e.
     apply tdot_of_rec.
@@ -425,7 +425,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tmerge_concat_to_concat_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tmerge_concat_to_concat_fun e).
+    tnnrc_rewrites_to e (tmerge_concat_to_concat_fun e).
   Proof.
     destruct e; simpl; try reflexivity.
     destruct b; simpl; try reflexivity.
@@ -459,7 +459,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tdot_of_concat_rec_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tdot_of_concat_rec_fun e).
+    tnnrc_rewrites_to e (tdot_of_concat_rec_fun e).
   Proof.
     destruct e; simpl; try reflexivity.
     destruct u; simpl; try reflexivity.
@@ -537,7 +537,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tinline_let_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tinline_let_fun e).
+    tnnrc_rewrites_to e (tinline_let_fun e).
   Proof.
     tprove_correctness e.
     apply tlet_inline_arrow.
@@ -564,7 +564,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tfor_over_if_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tfor_over_if_nil_fun e).
+    tnnrc_rewrites_to e (tfor_over_if_nil_fun e).
   Proof.
     tprove_correctness e.
     rewrite tfor_over_if_arrow; simpl.
@@ -596,7 +596,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tfor_over_either_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tfor_over_either_nil_fun e).
+    tnnrc_rewrites_to e (tfor_over_either_nil_fun e).
   Proof.
     tprove_correctness e.
     rewrite tfor_over_either_arrow; simpl.
@@ -624,7 +624,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tunop_over_either_const_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tunop_over_either_const_fun e).
+    tnnrc_rewrites_to e (tunop_over_either_const_fun e).
   Proof.
     tprove_correctness e.
     apply tnnrcunop_over_either_arrow.
@@ -649,7 +649,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tunop_over_if_const_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tunop_over_if_const_fun e).
+    tnnrc_rewrites_to e (tunop_over_if_const_fun e).
   Proof.
     tprove_correctness e.
     apply tnnrcunop_over_if_arrow.
@@ -890,7 +890,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tcount_over_flat_for_either_if_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tcount_over_flat_for_either_if_nil_fun e).
+    tnnrc_rewrites_to e (tcount_over_flat_for_either_if_nil_fun e).
   Proof.
     destruct e; simpl; try reflexivity.
     repeat (match_destr; try reflexivity).
@@ -921,7 +921,7 @@ Section NNRCOptimizer.
        end.
 
   Lemma tcount_over_flat_for_either_either_nil_fun_correctness {model:basic_model} (e:nnrc) :
-    tnnrc_ext_rewrites_to e (tcount_over_flat_for_either_either_nil_fun e).
+    tnnrc_rewrites_to e (tcount_over_flat_for_either_either_nil_fun e).
   Proof.
     destruct e; simpl; try reflexivity.
     repeat (match_destr; try reflexivity).
@@ -966,7 +966,7 @@ Section NNRCOptimizer.
           ; tcount_over_flat_for_either_either_nil_step
         ].
 
-    Definition tnnrc_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrc_ext_rewrites_to)
+    Definition tnnrc_optim_model_list {model:basic_model} : list (OptimizerStepModel tnnrc_rewrites_to)
       := [
           tfor_nil_step_correct
           ; tfor_singleton_to_let_step_correct
@@ -1000,7 +1000,7 @@ Section NNRCOptimizer.
   Qed.
 
   Definition tnnrc_optim_list_correct {model:basic_model}
-    : optim_list_correct tnnrc_ext_rewrites_to tnnrc_optim_list
+    : optim_list_correct tnnrc_rewrites_to tnnrc_optim_list
     := optim_list_correct_from_model tnnrc_optim_model_list_complete.
 
   Lemma tnnrc_optim_list_distinct {fruntime:foreign_runtime}:
@@ -1023,7 +1023,7 @@ Section NNRCOptimizer.
         {model:basic_model} {logger:optimizer_logger string nnrc}
         (opc:optim_phases_config)
         (p:nnrc) :
-    tnnrc_ext_rewrites_to p (run_nnrc_optims opc p).
+    tnnrc_rewrites_to p (run_nnrc_optims opc p).
   Proof.
     unfold run_nnrc_optims.
     apply run_phases_correctness.
@@ -1078,7 +1078,7 @@ Section NNRCOptimizer.
 
   Lemma run_nnrc_optims_default_correct
         {model:basic_model} {logger:optimizer_logger string nnrc} p:
-    tnnrc_ext_rewrites_to p (run_nnrc_optims_default p).
+    tnnrc_rewrites_to p (run_nnrc_optims_default p).
   Proof.
     unfold run_nnrc_optims_default.
     apply run_nnrc_optims_correctness.

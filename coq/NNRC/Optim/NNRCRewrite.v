@@ -35,24 +35,24 @@ Section NNRCRewrite.
 
   Context {fruntime:foreign_runtime}.
 
-  Lemma unshadow_ext_preserves sep renamer avoid (e:nnrc) :
-    nnrc_ext_eq (unshadow sep renamer avoid e) e.
+  Lemma nnrc_unshadow_preserves sep renamer avoid (e:nnrc) :
+    nnrc_eq (unshadow sep renamer avoid e) e.
   Proof.
-    unfold nnrc_ext_eq.
+    unfold nnrc_eq.
     intros.
     simpl.
-    apply unshadow_ext_eval.
+    apply nnrc_unshadow_eval.
   Qed.
 
   (* { a: e }.a ≡ e *)
 
   Lemma dot_of_rec a (e:nnrc) :
-    nnrc_ext_eq (NNRCUnop (ADot a) (NNRCUnop (ARec a) e)) e.
+    nnrc_eq (NNRCUnop (ADot a) (NNRCUnop (ARec a) e)) e.
   Proof.
-    unfold nnrc_ext_eq; intros ? ? ? ? _.
-    unfold nnrc_ext_eval.
+    unfold nnrc_eq; intros ? ? ? ? _.
+    unfold nnrc_eval.
     simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e)); [|reflexivity]; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e)); [|reflexivity]; simpl.
     unfold edot; simpl.
     destruct (string_eqdec a a); congruence.
   Qed.
@@ -62,9 +62,9 @@ Section NNRCRewrite.
     ‵[| (s1, p1)|] ⊗ ‵[| (s2, p2)|] ≡ᶜ ‵{|‵[| (s1, p1)|] ⊕ ‵[| (s2, p2)|]|}.
   Proof.
     red; intros; simpl.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p1)); simpl; trivial.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p2)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p1)); simpl; trivial.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p2)); simpl; trivial.
     unfold merge_bindings.
     simpl.
     unfold compatible_with; simpl.
@@ -74,23 +74,23 @@ Section NNRCRewrite.
   Qed.
   
   Lemma for_nil x e2 :
-    nnrc_ext_eq (NNRCFor x ‵{||} e2) ‵{||}.
+    nnrc_eq (NNRCFor x ‵{||} e2) ‵{||}.
   Proof.
     red; simpl; trivial.
   Qed.
 
   Lemma for_singleton_to_let x e1 e2:
-    nnrc_ext_eq (NNRCFor x (NNRCUnop AColl e1) e2)
+    nnrc_eq (NNRCFor x (NNRCUnop AColl e1) e2)
                 (NNRCUnop AColl (NNRCLet x e1 e2)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e1)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
     match_destr.
   Qed.
 
   Lemma flatten_nil_nnrc  :
-    nnrc_ext_eq (♯flatten(‵{||})) ‵{||}.
+    nnrc_eq (♯flatten(‵{||})) ‵{||}.
   Proof.
     red; simpl; trivial.
   Qed.
@@ -100,7 +100,7 @@ Section NNRCRewrite.
 
   Lemma map_sigma_fusion (e1 e2 e3:nnrc) (v1 v2:var) :
     ~ In v1 (nnrc_free_vars e3) ->
-    nnrc_ext_eq
+    nnrc_eq
       (NNRCFor v2 
               (NNRCUnop AFlatten
                        (NNRCFor v1 e1
@@ -113,14 +113,14 @@ Section NNRCRewrite.
                               (NNRCConst (dcoll nil))))).
   Proof.
     intro notinfree.
-    unfold nnrc_ext_eq; intros ? ? ? ? _.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e1)); try reflexivity; simpl.
+    unfold nnrc_eq; intros ? ? ? ? _.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); try reflexivity; simpl.
     dest_eqdec; try congruence.
     clear e1 e.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    destruct ((nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e2))); try reflexivity; simpl.
+    destruct ((nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e2))); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     case_eq b; intros.
     - autorewrite with alg.
@@ -129,9 +129,9 @@ Section NNRCRewrite.
       unfold olift in *.
       case_eq (rmap
               (fun d1 : data =>
-               match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e2) with
+               match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                | Some (dbool true) =>
-                   match nnrc_core_eval h cenv ((v2, d1) :: (v1, d1) :: env) (nnrc_ext_to_nnrc e3) with
+                   match nnrc_core_eval h cenv ((v2, d1) :: (v1, d1) :: env) (nnrc_to_nnrc_base e3) with
                    | Some x'0 => Some (dcoll (x'0 :: nil))
                    | None => None
                    end
@@ -139,7 +139,7 @@ Section NNRCRewrite.
                | _ => None
                end) l); intros; rewrite H1 in IHl; case_eq (rmap
                 (fun d1 : data =>
-                 match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e2) with
+                 match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                  | Some (dbool true) => Some (dcoll (d1 :: nil))
                  | Some (dbool false) => Some (dcoll nil)
                  | _ => None
@@ -148,49 +148,49 @@ Section NNRCRewrite.
         unfold lift in *.
         case_eq (rflatten l1); case_eq (rflatten l0); intros;  rewrite H1 in *; rewrite H2 in *.
         * simpl.
-          assert (exists l4, rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_ext_to_nnrc e3)) l3 = Some l4).
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_ext_to_nnrc e3)) l3); try congruence.
+          assert (exists l4, rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l3 = Some l4).
+          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l3); try congruence.
           exists l4; reflexivity.
           elim H3; clear H3; intros.
           rewrite H3 in *; clear H3.
           simpl.
           inversion IHl. subst; clear IHl.
-          assert (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_ext_to_nnrc e3)
-                  = nnrc_core_eval h cenv((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)).
-          rewrite nnrc_ext_to_nnrc_free_vars_same in notinfree.
-          generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v2,a)::nil) v1 a env (nnrc_ext_to_nnrc e3) notinfree); intros.
+          assert (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_to_nnrc_base e3)
+                  = nnrc_core_eval h cenv((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)).
+          rewrite nnrc_to_nnrc_base_free_vars_same in notinfree.
+          generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v2,a)::nil) v1 a env (nnrc_to_nnrc_base e3) notinfree); intros.
           simpl in H0.
           rewrite H0; clear H0; reflexivity.
           rewrite H0; clear H0.
-          destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+          destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite (rflatten_cons (d::nil) l0 l2).
           reflexivity.
           assumption.
         * simpl.
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_ext_to_nnrc e3)) l2); try congruence.
+          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l2); try congruence.
           simpl.
-          destruct (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-          destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+          destruct (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+          destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite rflatten_cons_none; [reflexivity|assumption].
-          destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+          destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite rflatten_cons_none; [reflexivity|assumption].
         * congruence.
-        * destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+        * destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite rflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
         case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
-        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
         rewrite rflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
         case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
         simpl in *.
-        destruct (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_ext_to_nnrc e3)) l1); try reflexivity; try congruence.
+        destruct (nnrc_core_eval h cenv ((v2, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v2, d1) :: env) (nnrc_to_nnrc_base e3)) l1); try reflexivity; try congruence.
         simpl.
-        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-      + destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+      + destruct (nnrc_core_eval h cenv ((v2, a) :: (v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
     - autorewrite with alg.
       rewrite lift_empty_dcoll.
       rewrite lift_empty_dcoll.
@@ -203,7 +203,7 @@ Section NNRCRewrite.
        ≡ ♯flatten({| e2 ? ‵{| LET $t2 := $t1 IN e3 ]|} : ‵{||} | $t1 ∈ e1 |}) *)
 
   Lemma map_sigma_fusion_samevar (e1 e2 e3:nnrc) (v1:var) :
-    nnrc_ext_eq
+    nnrc_eq
       (NNRCFor v1 
               (NNRCUnop AFlatten
                        (NNRCFor v1 e1
@@ -215,14 +215,14 @@ Section NNRCRewrite.
                               (NNRCUnop AColl e3)
                               (NNRCConst (dcoll nil))))).
   Proof.
-    unfold nnrc_ext_eq; intros ? ? ? ? _.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e1)); try reflexivity; simpl.
+    unfold nnrc_eq; intros ? ? ? ? _.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); try reflexivity; simpl.
     dest_eqdec; try congruence.
     clear e1 e.
     destruct d; try reflexivity; simpl.
     induction l; try reflexivity; simpl.
-    destruct ((nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e2))); try reflexivity; simpl.
+    destruct ((nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e2))); try reflexivity; simpl.
     destruct d; try reflexivity; simpl.
     case_eq b; intros.
     - autorewrite with alg.
@@ -231,9 +231,9 @@ Section NNRCRewrite.
       unfold olift in *.
       case_eq (rmap
               (fun d1 : data =>
-               match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e2) with
+               match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                | Some (dbool true) =>
-                   match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e3) with
+                   match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3) with
                    | Some x'0 => Some (dcoll (x'0 :: nil))
                    | None => None
                    end
@@ -241,7 +241,7 @@ Section NNRCRewrite.
                | _ => None
                end) l); intros; rewrite H1 in IHl; case_eq (rmap
                 (fun d1 : data =>
-                 match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e2) with
+                 match nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e2) with
                  | Some (dbool true) => Some (dcoll (d1 :: nil))
                  | Some (dbool false) => Some (dcoll nil)
                  | _ => None
@@ -250,37 +250,37 @@ Section NNRCRewrite.
         unfold lift in *.
         case_eq (rflatten l1); case_eq (rflatten l0); intros;  rewrite H1 in *; rewrite H2 in *.
         * simpl.
-          assert (exists l4, rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e3)) l3 = Some l4).
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e3)) l3); try congruence.
+          assert (exists l4, rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l3 = Some l4).
+          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l3); try congruence.
           exists l4; reflexivity.
           elim H3; clear H3; intros.
           rewrite H3 in *; clear H3.
           simpl.
           inversion IHl. subst; clear IHl.
-          destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+          destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite (rflatten_cons (d::nil) l0 l2).
           reflexivity.
           assumption.
         * simpl.
-          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e3)) l2); try congruence.
+          destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l2); try congruence.
           simpl.
-          destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+          destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite rflatten_cons_none; [reflexivity|assumption].
         * congruence.
-        * destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+        * destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
           rewrite rflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
         case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
-        destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
         rewrite rflatten_cons_none; [reflexivity|assumption].
       + unfold lift in *.
         case_eq (rflatten l0); intros; rewrite H3 in *; try congruence.
         simpl in *.
-        destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_ext_to_nnrc e3)) l1); try reflexivity; try congruence.
+        destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+        destruct (rmap (fun d1 : data => nnrc_core_eval h cenv ((v1, d1) :: env) (nnrc_to_nnrc_base e3)) l1); try reflexivity; try congruence.
         simpl.
-        destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
-      + destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_ext_to_nnrc e3)); try reflexivity.
+        destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
+      + destruct (nnrc_core_eval h cenv ((v1, a) :: env) (nnrc_to_nnrc_base e3)); try reflexivity.
     - autorewrite with alg.
       rewrite lift_empty_dcoll.
       rewrite lift_empty_dcoll.
@@ -290,54 +290,54 @@ Section NNRCRewrite.
   Qed.
 
   Lemma for_over_if x e1 e2  e3 ebody :
-    nnrc_ext_eq (NNRCFor x (NNRCIf e1 e2 e3) ebody)
+    nnrc_eq (NNRCFor x (NNRCIf e1 e2 e3) ebody)
             (NNRCIf e1 (NNRCFor x e2 ebody)
                    (NNRCFor x e3 ebody)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e1)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
     destruct d; simpl; trivial.
     destruct b; simpl; trivial.
   Qed.
     
   Lemma for_over_either_disjoint x e1 xl el xr er ebody:
     disjoint (xl::xr::nil) (nnrc_free_vars ebody) ->
-    nnrc_ext_eq (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
+    nnrc_eq (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
             (NNRCEither e1
                        xl (NNRCFor x el ebody)
                        xr (NNRCFor x er ebody)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
+    unfold nnrc_eval; simpl.
     apply disjoint_cons_inv1 in H.
     destruct H as [disj nin1].
     apply disjoint_cons_inv1 in disj.
     destruct disj as [_ nin2].
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e1)); simpl; trivial.
-    rewrite nnrc_ext_to_nnrc_free_vars_same in nin2, nin1.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
+    rewrite nnrc_to_nnrc_base_free_vars_same in nin2, nin1.
     destruct d; simpl; trivial;
       (destruct (equiv_dec (A:=string) xl xl); [|congruence]);
       match_case; simpl; intros; match_destr;
         f_equal;
       apply rmap_ext; intros.
-    - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xl d env (nnrc_ext_to_nnrc ebody)); simpl; intros re1; rewrite re1; trivial.
-    - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xr d env (nnrc_ext_to_nnrc ebody)); simpl; intros re1; rewrite re1; trivial.
+    - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xl d env (nnrc_to_nnrc_base ebody)); simpl; intros re1; rewrite re1; trivial.
+    - generalize (@nnrc_core_eval_remove_free_env _ h cenv ((x,x0)::nil) xr d env (nnrc_to_nnrc_base ebody)); simpl; intros re1; rewrite re1; trivial.
   Qed.
 
   Lemma nnrceither_rename_l e1 xl el xr er xl' :
     ~ In xl' (nnrc_free_vars el) ->
     ~ In xl' (nnrc_bound_vars el) ->
-    nnrc_ext_eq (NNRCEither e1 xl el xr er)
+    nnrc_eq (NNRCEither e1 xl el xr er)
             (NNRCEither e1 xl' (nnrc_subst el xl (NNRCVar xl')) xr er).
   Proof.
     red; simpl; intros nfree nbound; intros.
-    generalize (@nnrc_ext_eval_cons_subst _ h cenv el env xl);
-      unfold nnrc_ext_eval; simpl; intros.
+    generalize (@nnrc_eval_cons_subst _ h cenv el env xl);
+      unfold nnrc_eval; simpl; intros.
     do 2 match_destr.
-    rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+    rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
     specialize (H1 d xl' nfree nbound).
-    rewrite <- nnrc_ext_to_nnrc_subst_comm in H1. simpl in H1.
+    rewrite <- nnrc_to_nnrc_base_subst_comm in H1. simpl in H1.
     rewrite H1.
     trivial.
   Qed.
@@ -345,23 +345,23 @@ Section NNRCRewrite.
   Lemma nnrceither_rename_r e1 xl el xr er xr' :
     ~ In xr' (nnrc_free_vars er) ->
     ~ In xr' (nnrc_bound_vars er) ->
-    nnrc_ext_eq (NNRCEither e1 xl el xr er)
+    nnrc_eq (NNRCEither e1 xl el xr er)
                 (NNRCEither e1 xl el xr' (nnrc_subst er xr (NNRCVar xr'))).
   Proof.
     red; simpl; intros nfree nbound; intros.
-    generalize (@nnrc_ext_eval_cons_subst _ h cenv er env xr);
-      unfold nnrc_ext_eval; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
+    generalize (@nnrc_eval_cons_subst _ h cenv er env xr);
+      unfold nnrc_eval; simpl; intros.
+    unfold nnrc_eval; simpl.
     do 2 match_destr.
-    rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+    rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
     specialize (H1 d xr' nfree nbound).
-    rewrite <- nnrc_ext_to_nnrc_subst_comm in H1. simpl in H1.
+    rewrite <- nnrc_to_nnrc_base_subst_comm in H1. simpl in H1.
     rewrite H1.
     trivial.
   Qed.
 
   Lemma for_over_either sep x e1 xl el xr er ebody:
-    nnrc_ext_eq (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
+    nnrc_eq (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
             (    let xl' := really_fresh_in_ext sep xl (nnrc_free_vars el ++ nnrc_bound_vars el) ebody in
                  let xr' := really_fresh_in_ext sep xr (nnrc_free_vars er ++ nnrc_bound_vars er) ebody in
               (NNRCEither e1
@@ -398,8 +398,8 @@ Section NNRCRewrite.
                by (rewrite in_app_iff; intuition).
         apply really_fresh_from_avoid in inn2; trivial.
     - assert ((nnrc_free_vars ebody) =
-              (nnrc_free_vars (nnrc_ext_to_nnrc ebody))).
-      apply nnrc_ext_to_nnrc_free_vars_same.
+              (nnrc_free_vars (nnrc_to_nnrc_base ebody))).
+      apply nnrc_to_nnrc_base_free_vars_same.
       apply for_over_either_disjoint.
       red; simpl; intuition; subst.
       rewrite H in H1.
@@ -411,28 +411,28 @@ Section NNRCRewrite.
   Qed.
 
   Lemma nnrcunop_over_either op e1 xl el xr er:
-    nnrc_ext_eq (NNRCUnop op (NNRCEither e1 xl el xr er))
+    nnrc_eq (NNRCUnop op (NNRCEither e1 xl el xr er))
                 (NNRCEither e1 xl (NNRCUnop op el) xr (NNRCUnop op er)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
+    unfold nnrc_eval; simpl.
     repeat match_destr.
   Qed.
 
   Lemma nnrcunop_over_if op e1 e2 e3:
-    nnrc_ext_eq (NNRCUnop op (NNRCIf e1 e2 e3))
+    nnrc_eq (NNRCUnop op (NNRCIf e1 e2 e3))
                 (NNRCIf e1 (NNRCUnop op e2) (NNRCUnop op e3)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e1)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e1)); simpl; trivial.
     repeat match_destr.
   Qed.
 
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)
 
   Lemma sigma_to_if (e1 e2:nnrc) (v:var) :
-    nnrc_ext_eq
+    nnrc_eq
       (NNRCUnop AFlatten
                 (NNRCFor v (NNRCUnop AColl e2)
                          (NNRCIf e1
@@ -440,11 +440,11 @@ Section NNRCRewrite.
                                  (NNRCConst (dcoll nil)))))
       (NNRCLet v e2 (NNRCIf e1 (NNRCUnop AColl (NNRCVar v)) (NNRCConst (dcoll nil)))).
   Proof.
-    unfold nnrc_ext_eq; intros ? ? ? ? _.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e2)); try reflexivity; simpl.
+    unfold nnrc_eq; intros ? ? ? ? _.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base e2)); try reflexivity; simpl.
     dest_eqdec; try congruence.
-    destruct (nnrc_core_eval h cenv ((v,d) :: env) (nnrc_ext_to_nnrc e1)); try reflexivity; simpl.
+    destruct (nnrc_core_eval h cenv ((v,d) :: env) (nnrc_to_nnrc_base e1)); try reflexivity; simpl.
     destruct d0; try reflexivity; simpl.
     destruct b; reflexivity.
   Qed.
@@ -462,9 +462,9 @@ Section NNRCRewrite.
           ≡ᶜ π[sl](p1) ⊕ π[sl](p2).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p2));
-      destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p1)); simpl.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p2));
+      destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p1)); simpl.
     - destruct d; destruct d0; simpl; trivial.
       rewrite rproject_rec_sort_commute, rproject_app.
       trivial.
@@ -477,7 +477,7 @@ Section NNRCRewrite.
     π[sl](NNRCConst (drec l)) ≡ᶜ NNRCConst (drec (rproject l sl)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
+    unfold nnrc_eval; simpl.
     rewrite rproject_rec_sort_commute.
     rewrite rproject_map_fst_same; intuition.
   Qed.
@@ -487,8 +487,8 @@ Section NNRCRewrite.
     π[sl](‵[| (s, p) |]) ≡ᶜ ‵[| (s, p) |].
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p)); simpl; trivial.
     destruct (in_dec string_dec s sl); intuition.
   Qed.
 
@@ -496,8 +496,8 @@ Section NNRCRewrite.
     π[sl1](π[sl2](p)) ≡ᶜ π[set_inter string_dec sl2 sl1](p).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p)); simpl; trivial.
     destruct d; simpl; trivial.
     rewrite rproject_rproject.
     trivial.
@@ -507,8 +507,8 @@ Section NNRCRewrite.
     π[sl](NNRCEither p xl p1 xr p2) ≡ᶜ NNRCEither p xl (π[sl](p1)) xr (π[sl](p2)).
   Proof.
     red; simpl; intros.
-    unfold nnrc_ext_eval; simpl.
-    destruct (nnrc_core_eval h cenv env (nnrc_ext_to_nnrc p)); simpl; trivial.
+    unfold nnrc_eval; simpl.
+    destruct (nnrc_core_eval h cenv env (nnrc_to_nnrc_base p)); simpl; trivial.
     destruct d; simpl; trivial.
   Qed.
 

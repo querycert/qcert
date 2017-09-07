@@ -39,7 +39,7 @@ Section cNNRCtoNNRC.
       unfold nnrc_core_eval_top.
       unfold nnrc_core_to_nnrc_top.
       unfold lift_nnrc_core.
-      unfold nnrc_ext_eval.
+      unfold nnrc_eval.
       destruct q; simpl.
       rewrite core_nnrc_to_nnrc_ext_id.
       reflexivity.

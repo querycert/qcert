@@ -7,24 +7,11 @@ body {
   margin-bottom: 20px;
 }
 
-.borderless td,
-.borderless th {
-    border: 0;
-}
-
 .table-borderless > tbody > tr > td,
 .table-borderless > tbody > tr > th,
 .table-borderless > tfoot > tr > td,
 .table-borderless > tfoot > tr > th,
 .table-borderless > thead > tr > td,
 .table-borderless > thead > tr > th {
-    border: none;
-}
-.tr-borderless td,
-.tr-borderless th,
-.tr-borderless td,
-.tr-borderless th,
-.tr-borderless td,
-.tr-borderless th {
-    border: none;
+    border: 0;
 }

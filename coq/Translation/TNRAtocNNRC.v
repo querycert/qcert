@@ -41,7 +41,7 @@ Section TNRAtocNNRC.
   Theorem tnra_sem_correct {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->
     (op ▷ τin >=> τout ⊣ τconstants) ->
-    nnrc_type τconstants tenv (nra_to_nnrc op vid) τout.
+    nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout.
   Proof.
     Hint Constructors nra_type.
     Opaque fresh_var.
@@ -150,7 +150,7 @@ Section TNRAtocNNRC.
 
   Theorem tnra_sem_correct_back {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->
-    nnrc_type τconstants tenv (nra_to_nnrc op vid) τout ->
+    nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout ->
     (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
     Hint Constructors nra_type.
@@ -297,7 +297,7 @@ Section TNRAtocNNRC.
 
   Theorem tnraenv_sem_correct_iff {τin τout} (op:nra) (tenv:tbindings) (vid:var) :
     lookup equiv_dec tenv vid = Some τin ->
-    nnrc_type τconstants tenv (nra_to_nnrc op vid) τout ->
+    nnrc_core_type τconstants tenv (nra_to_nnrc_core op vid) τout ->
     (op ▷ τin >=> τout ⊣ τconstants).
   Proof.
     Hint Resolve tnra_sem_correct tnra_sem_correct_back.

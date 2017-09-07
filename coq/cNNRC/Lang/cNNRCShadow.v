@@ -1615,7 +1615,7 @@ Section cNNRCShadow.
       + apply nnrc_pick_name_bound.
   Qed.
 
-  Theorem unshadow_eval {h:list (string*string)} c sep renamer avoid e env :
+  Theorem nnrc_core_unshadow_eval {h:list (string*string)} c sep renamer avoid e env :
     nnrc_core_eval h c env (unshadow sep renamer avoid e) = nnrc_core_eval h c env e.
   Proof.
     revert env.

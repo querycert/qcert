@@ -33,74 +33,60 @@ Section TNNRCRewrite.
 
   Context {m:basic_model}.
   
-  Transparent nnrc_ext_type.
-  Transparent nnrc_ext_eval.
-  Transparent nnrc_ext_to_nnrc.
+  Transparent nnrc_type.
+  Transparent nnrc_eval.
+  Transparent nnrc_to_nnrc_base.
 
   Lemma tunshadow_preserves_arrow sep renamer avoid (e:nnrc) :
-    tnnrc_ext_rewrites_to e (unshadow sep renamer avoid e).
+    tnnrc_rewrites_to e (unshadow sep renamer avoid e).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
-    rewrite unshadow_ext_preserves; reflexivity.
+    apply nnrc_rewrites_typed_with_untyped.
+    rewrite nnrc_unshadow_preserves; reflexivity.
     intros.
-    apply unshadow_ext_type.
+    apply nnrc_unshadow_type.
     assumption.
   Qed.
 
   (* [ a : e ].a ≡ e *)
 
   Lemma tdot_of_rec a (e:nnrc) :
-    tnnrc_ext_rewrites_to (NNRCUnop (ADot a) (NNRCUnop (ARec a) e)) e.
+    tnnrc_rewrites_to (NNRCUnop (ADot a) (NNRCUnop (ARec a) e)) e.
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - rewrite dot_of_rec; reflexivity.
     - intros.
-      unfold nnrc_ext_type, nnrc_ext_to_nnrc in *.
+      unfold nnrc_type, nnrc_to_nnrc_base in *.
       nnrc_inverter.
       unfold tdot, edot in *; simpl in * .
       nnrc_inverter.
       trivial.
   Qed.
 
-  Ltac nnrc_ext_input_well_typed :=
-  repeat progress
-         match goal with
-         | [HO:nnrc_ext_type ?Γc ?Γ ?op ?τout,
-               HC:bindings_type ?cenv ?Γc,
-               HE:bindings_type ?env ?Γ
-            |- context [(nnrc_ext_eval ?cenv ?env ?op)]] =>
-           let xout := fresh "dout" in
-           let xtype := fresh "τout" in
-           let xeval := fresh "eout" in
-           destruct (typed_nnrc_ext_yields_typed_data cenv env Γc Γ op HC HE HO)
-             as [xout [xeval xtype]]; rewrite xeval in *; simpl
-         end.
-
   (* (e₁ ⊕ [ a : e₂ ]).a ≡ e₂ *)
 
   Lemma tnnrc_dot_of_concat_rec_eq_arrow a (e1 e2:nnrc) :
-    tnnrc_ext_rewrites_to (NNRCUnop (ADot a) (NNRCBinop AConcat e1 (NNRCUnop (ARec a) e2))) e2.
+    tnnrc_rewrites_to (NNRCUnop (ADot a) (NNRCBinop AConcat e1 (NNRCUnop (ARec a) e2))) e2.
   Proof.
     red; intros ? ? ? typ1.
     split.
-    - nnrc_ext_inverter.
+    - nnrc_inverter.
       unfold tdot,edot,rec_concat_sort in H0.
       rewrite assoc_lookupr_drec_sort in H0.
       rewrite (assoc_lookupr_app τ₁ ((s, s0) :: nil)) in H0.
       simpl in H0.
       nnrc_inverter. trivial.
     - intros.
-      unfold nnrc_ext_eval in *.
-      unfold nnrc_ext_type in *.
+      unfold nnrc_eval in *.
+      unfold nnrc_type in *.
       simpl in *.
-      nnrc_inverter.
-      nnrc_input_well_typed.
+      nnrc_core_inverter.
+      nnrc_core_input_well_typed.
       dtype_inverter.
       unfold edot.
       rewrite assoc_lookupr_drec_sort.
       rewrite (assoc_lookupr_app _ ((s, _) :: nil)).
       simpl.
-      nnrc_inverter.
+      nnrc_core_inverter.
       trivial.
   Qed.
 
@@ -108,10 +94,10 @@ Section TNNRCRewrite.
 
   Lemma tnnrc_dot_of_concat_rec_neq_arrow a1 a2 (e1 e2:nnrc) :
     a1 <> a2 ->
-    tnnrc_ext_rewrites_to (NNRCUnop (ADot a1) (NNRCBinop AConcat e1 (NNRCUnop (ARec a2) e2))) (NNRCUnop (ADot a1) e1).
+    tnnrc_rewrites_to (NNRCUnop (ADot a1) (NNRCBinop AConcat e1 (NNRCUnop (ARec a2) e2))) (NNRCUnop (ADot a1) e1).
   Proof.
     red; intros neq ? ? ? typ1.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     rewrite tdot_rec_concat_sort_neq in H0 by auto.
     unfold tdot, edot in H0.
     rewrite assoc_lookupr_drec_sort in H0.
@@ -119,11 +105,11 @@ Section TNNRCRewrite.
     - econstructor; eauto 2.
       econstructor; eauto 2.
     - intros.
-      unfold nnrc_ext_eval in *.
-      unfold nnrc_ext_type in *.
+      unfold nnrc_eval in *.
+      unfold nnrc_type in *.
       simpl in *.
-      nnrc_ext_inverter.
-      nnrc_input_well_typed.
+      nnrc_inverter.
+      nnrc_core_input_well_typed.
       dtype_inverter.
       unfold edot.
       rewrite assoc_lookupr_drec_sort.
@@ -137,15 +123,15 @@ Section TNNRCRewrite.
 
   Lemma tnnrc_merge_concat_to_concat_arrow a1 a2 p1 p2:
     a1 <> a2 ->
-    tnnrc_ext_rewrites_to (‵[| (a1, p1)|] ⊗ ‵[| (a2, p2)|]) (‵{|‵[| (a1, p1)|] ⊕ ‵[| (a2, p2)|]|}).
+    tnnrc_rewrites_to (‵[| (a1, p1)|] ⊗ ‵[| (a2, p2)|]) (‵{|‵[| (a1, p1)|] ⊕ ‵[| (a2, p2)|]|}).
   Proof.
     intros.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrc_merge_concat_to_concat; trivial.
     - intros ? ? ? typ.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor.
       + econstructor.
       + econstructor; econstructor; try econstructor; eauto 2.
@@ -160,14 +146,14 @@ Section TNNRCRewrite.
   (* { e | x ∈ {} } ≡ {} *)
 
   Lemma tfor_nil_arrow x e :
-    tnnrc_ext_rewrites_to (NNRCFor x ‵{||} e) ‵{||}.
+    tnnrc_rewrites_to (NNRCFor x ‵{||} e) ‵{||}.
   Proof.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply for_nil.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor.
       simpl.
       repeat econstructor.
@@ -176,15 +162,15 @@ Section TNNRCRewrite.
   (* { e₁ | $t ∈ {e₁} } ≡ { LET $t := e₁ IN e₂ } *)
 
   Lemma tfor_singleton_to_let_arrow x e1 e2:
-    tnnrc_ext_rewrites_to (NNRCFor x (NNRCUnop AColl e1) e2)
+    tnnrc_rewrites_to (NNRCFor x (NNRCUnop AColl e1) e2)
             (NNRCUnop AColl (NNRCLet x e1 e2)).
   Proof.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply for_singleton_to_let.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor.
       + econstructor.
       + econstructor; eauto.
@@ -193,29 +179,29 @@ Section TNNRCRewrite.
   (* ♯flatten({}) ≡ {} *)
 
   Lemma tflatten_nil_nnrc_arrow  :
-    tnnrc_ext_rewrites_to (♯flatten(‵{||})) ‵{||}.
+    tnnrc_rewrites_to (♯flatten(‵{||})) ‵{||}.
   Proof.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply flatten_nil_nnrc.
     - intros ? ? ? typ.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; simpl).
   Qed.
 
   (* ♯flatten({e}) ≡ e *)
 
   Lemma tflatten_singleton_nnrc_arrow e :
-    tnnrc_ext_rewrites_to (♯flatten(‵{| e |})) e.
+    tnnrc_rewrites_to (♯flatten(‵{| e |})) e.
   Proof.
     red; intros; simpl.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    nnrc_ext_inverter.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    nnrc_inverter.
     split; trivial.
     intros.
-    nnrc_input_well_typed.
+    nnrc_core_input_well_typed.
     dtype_inverter.
     rewrite app_nil_r.
     trivial.
@@ -227,7 +213,7 @@ Section TNNRCRewrite.
 
   Lemma tmap_sigma_fusion_arrow (v1 v2:var) (e1 e2 e3:nnrc) :
     ~ In v1 (nnrc_free_vars e3) ->
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCFor v2 
               (NNRCUnop AFlatten
                        (NNRCFor v1 e1
@@ -240,17 +226,17 @@ Section TNNRCRewrite.
                               (NNRCConst (dcoll nil))))).
   Proof.
     intros.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    apply nnrc_rewrites_typed_with_untyped.
     - rewrite (map_sigma_fusion e1 e2 e3 v1 v2 H); reflexivity.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
       + simpl. 
         match_destr.
         congruence.
-      + generalize (@nnrc_ext_type_remove_free_env _ τcenv ((v2, τ₁)::nil) v1 τ₁ τenv e3 τ₂ H); intros nt.
+      + generalize (@nnrc_type_remove_free_env _ τcenv ((v2, τ₁)::nil) v1 τ₁ τenv e3 τ₂ H); intros nt.
         simpl in nt.
         rewrite nt.
         trivial.
@@ -260,7 +246,7 @@ Section TNNRCRewrite.
        ≡ ♯flatten({ e₂ ? { LET $t₂ := $t₁ IN e₃ } : {} | $t₁ ∈ e₁ }) *)
 
   Lemma tmap_sigma_fusion_samevar_arrow (v1:var) (e1 e2 e3:nnrc) :
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCFor v1 
               (NNRCUnop AFlatten
                        (NNRCFor v1 e1
@@ -273,12 +259,12 @@ Section TNNRCRewrite.
                               (NNRCConst (dcoll nil))))).
   Proof.
     intros.
-    unfold nnrc_ext_eval in *.
-    unfold nnrc_ext_type in *.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    unfold nnrc_eval in *.
+    unfold nnrc_type in *.
+    apply nnrc_rewrites_typed_with_untyped.
     - rewrite (map_sigma_fusion_samevar e1 e2 e3 v1); reflexivity.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
   Qed.
 
@@ -287,34 +273,34 @@ Section TNNRCRewrite.
 
   Lemma tlet_inline_disjoint_arrow x e1 e2 :
     disjoint (nnrc_bound_vars e2) (nnrc_free_vars e1) ->
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCLet x e1 e2)
       (nnrc_subst e2 x e1).
   Proof.
     red; simpl; intros.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     split.
-    - generalize (@nnrc_ext_type_cons_subst_disjoint _  τcenv); intro Hdisjoint.
+    - generalize (@nnrc_type_cons_subst_disjoint _  τcenv); intro Hdisjoint.
       eapply Hdisjoint; eauto.
     - intros.
-      generalize (@nnrc_ext_eval_cons_subst_disjoint _ brand_relation_brands); intro Hdisjoint.
-      unfold nnrc_ext_eval in *.
-      unfold nnrc_ext_type in *.
-      nnrc_ext_inverter.
+      generalize (@nnrc_eval_cons_subst_disjoint _ brand_relation_brands); intro Hdisjoint.
+      unfold nnrc_eval in *.
+      unfold nnrc_type in *.
+      nnrc_inverter.
       simpl in *.
-      nnrc_input_well_typed.
+      nnrc_core_input_well_typed.
       erewrite <- Hdisjoint; eauto.
   Qed.
 
   (* LET $t := e₁ IN e₂ ≡ rename(e₂,free(e₁))[$t ↦ e₁] *)
 
   Lemma tlet_inline_arrow sep renamer x e1 e2 :
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCLet x e1 e2)
       (nnrc_subst (unshadow sep renamer (nnrc_free_vars e1) e2) x e1).
   Proof.
     transitivity (NNRCLet x e1 (unshadow sep renamer (nnrc_free_vars e1) e2)).
-    - apply nnrc_ext_let_tproper; trivial.
+    - apply nnrc_let_tproper; trivial.
       + reflexivity.
       + apply tunshadow_preserves_arrow.
     - apply tlet_inline_disjoint_arrow.
@@ -327,14 +313,14 @@ Section TNNRCRewrite.
        ≡ IF e1 THEN { e₀ | $t ∈ e₂ } ELSE  { e₀ | $t ∈ e₃ } *)
 
   Lemma tfor_over_if_arrow x e1 e2  e3 ebody :
-    tnnrc_ext_rewrites_to (NNRCFor x (NNRCIf e1 e2 e3) ebody)
+    tnnrc_rewrites_to (NNRCFor x (NNRCIf e1 e2 e3) ebody)
                      (NNRCIf e1 (NNRCFor x e2 ebody)
                             (NNRCFor x e3 ebody)).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply for_over_if.
     - intros ? ? ? typ.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
   Qed.
 
@@ -344,69 +330,69 @@ Section TNNRCRewrite.
 
   Lemma tfor_over_either_disjoint_arrow x e1 xl el xr er ebody:
     disjoint (xl::xr::nil) (nnrc_free_vars ebody) ->
-    tnnrc_ext_rewrites_to (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
+    tnnrc_rewrites_to (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
             (NNRCEither e1
                        xl (NNRCFor x el ebody)
                        xr (NNRCFor x er ebody)).
   Proof.
     intros disj.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply for_over_either_disjoint; trivial.
     - intros ? ? ? typ.
       apply disjoint_cons_inv1 in disj.
       destruct disj as [disj nin1].
       apply disjoint_cons_inv1 in disj.
       destruct disj as [_ nin2].
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor; eauto 2.
       + econstructor; eauto 2.
-        generalize (@nnrc_ext_type_remove_free_env m τcenv ((x,τ₁)::nil) xl τl τenv ebody)
-        ; simpl; intros re1; unfold nnrc_ext_eval in *;
-        unfold nnrc_ext_type in *; simpl in *; rewrite re1; trivial.
+        generalize (@nnrc_type_remove_free_env m τcenv ((x,τ₁)::nil) xl τl τenv ebody)
+        ; simpl; intros re1; unfold nnrc_eval in *;
+        unfold nnrc_type in *; simpl in *; rewrite re1; trivial.
       + econstructor; eauto 2.
-        generalize (@nnrc_ext_type_remove_free_env m τcenv ((x,τ₁)::nil) xr τr τenv ebody)
-        ; simpl; intros re1; unfold nnrc_ext_eval in *;
-        unfold nnrc_ext_type in *; simpl in *; rewrite re1; trivial.
+        generalize (@nnrc_type_remove_free_env m τcenv ((x,τ₁)::nil) xr τr τenv ebody)
+        ; simpl; intros re1; unfold nnrc_eval in *;
+        unfold nnrc_type in *; simpl in *; rewrite re1; trivial.
   Qed.
 
   Lemma tnnrceither_rename_l_arrow e1 xl el xr er xl' :
     ~ In xl' (nnrc_free_vars el) ->
     ~ In xl' (nnrc_bound_vars el) ->
-    tnnrc_ext_rewrites_to (NNRCEither e1 xl el xr er)
+    tnnrc_rewrites_to (NNRCEither e1 xl el xr er)
             (NNRCEither e1 xl' (nnrc_subst el xl (NNRCVar xl')) xr er).
   Proof.
     intros nfree nbound.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrceither_rename_l; trivial.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor; eauto 2.
-      generalize (@nnrc_ext_type_cons_subst _ τcenv); intros Hsubst;
-      unfold nnrc_ext_eval in *;
-      unfold nnrc_ext_type in *; simpl in *; 
+      generalize (@nnrc_type_cons_subst _ τcenv); intros Hsubst;
+      unfold nnrc_eval in *;
+      unfold nnrc_type in *; simpl in *; 
       apply Hsubst; trivial.
   Qed.
 
   Lemma tnnrceither_rename_r_arrow e1 xl el xr er xr' :
     ~ In xr' (nnrc_free_vars er) ->
     ~ In xr' (nnrc_bound_vars er) ->
-    tnnrc_ext_rewrites_to (NNRCEither e1 xl el xr er)
+    tnnrc_rewrites_to (NNRCEither e1 xl el xr er)
             (NNRCEither e1 xl el xr' (nnrc_subst er xr (NNRCVar xr'))).
   Proof.
     intros nfree nbound.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrceither_rename_r; trivial.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor; eauto 2.
-      generalize (@nnrc_ext_type_cons_subst _ τcenv); intros Hsubst;
-      unfold nnrc_ext_eval in *;
-      unfold nnrc_ext_type in *; simpl in *; 
+      generalize (@nnrc_type_cons_subst _ τcenv); intros Hsubst;
+      unfold nnrc_eval in *;
+      unfold nnrc_type in *; simpl in *; 
       apply Hsubst; trivial.
   Qed.
 
   Lemma tfor_over_either_arrow sep x e1 xl el xr er ebody:
-    tnnrc_ext_rewrites_to (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
+    tnnrc_rewrites_to (NNRCFor x (NNRCEither e1 xl el xr er) ebody)
             (    let xl' := really_fresh_in sep xl (nnrc_free_vars el ++ nnrc_bound_vars el) ebody in
                  let xr' := really_fresh_in sep xr (nnrc_free_vars er ++ nnrc_bound_vars er) ebody in
               (NNRCEither e1
@@ -448,33 +434,33 @@ Section TNNRCRewrite.
   Qed.  
 
   Lemma tnnrcunop_over_either_arrow op e1 xl el xr er:
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCUnop op (NNRCEither e1 xl el xr er))
       (NNRCEither e1 xl (NNRCUnop op el) xr (NNRCUnop op er)).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrcunop_over_either.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
     Qed.
 
   Lemma tnnrcunop_over_if_arrow op e1 e2 e3:
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCUnop op (NNRCIf e1 e2 e3))
       (NNRCIf e1 (NNRCUnop op e2) (NNRCUnop op e3)).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrcunop_over_if.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
     Qed.
 
   (* ♯flatten({ e1 ? { $t1 } : {} | $t1 ∈ { e2 } }) ≡ LET $t1 := e2 IN e1 ? { $t1 } : {} *)
 
   Lemma tsigma_to_if_arrow (e1 e2:nnrc) (v:var) :
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (NNRCUnop AFlatten
                (NNRCFor v (NNRCUnop AColl e2)
                        (NNRCIf e1
@@ -482,13 +468,13 @@ Section TNNRCRewrite.
                               (NNRCConst (dcoll nil)))))
       (NNRCLet v e2 (NNRCIf e1 (NNRCUnop AColl (NNRCVar v)) (NNRCConst (dcoll nil)))).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - rewrite sigma_to_if; reflexivity.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
       simpl.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       trivial.
   Qed.
 
@@ -500,7 +486,7 @@ Section TNNRCRewrite.
              end; simpl in H.
 
   Lemma tcount_over_flat_for_either_if_nil_arrow v e1 xl e11 e12 xr ehead :
-    tnnrc_ext_rewrites_to
+    tnnrc_rewrites_to
       (♯count(♯flatten(NNRCFor v
                               ehead (NNRCEither e1 xl
                                                (NNRCIf e11(‵{| e12|}) ‵{||}) xr ‵{||}))))
@@ -532,9 +518,9 @@ Section TNNRCRewrite.
         * repeat (econstructor; simpl). 
       + repeat (econstructor; simpl). 
     - intros; simpl.
-      destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H H0 H2) as [?[eqq1 typ1]].
-      unfold nnrc_ext_eval in *;
-      unfold nnrc_ext_type in *; simpl in *;
+      destruct (typed_nnrc_yields_typed_data _ _ _ _ H H0 H2) as [?[eqq1 typ1]].
+      unfold nnrc_eval in *;
+      unfold nnrc_type in *; simpl in *;
       rewrite eqq1; simpl.
       destruct x; simpl; trivial.
       clear eqq1 ehead H2.
@@ -549,8 +535,8 @@ Section TNNRCRewrite.
       + simpl.
         assert (bt2:bindings_type ((v, a) :: env) ((v, τ₁) :: τenv))
           by (econstructor; eauto).
-        destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H bt2 H8) as [?[eqq2 typ2]].
-        unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+        destruct (typed_nnrc_yields_typed_data _ _ _ _ H bt2 H8) as [?[eqq2 typ2]].
+        unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
         rewrite eqq2.
         invcs H7.
         invcs H6.
@@ -560,12 +546,12 @@ Section TNNRCRewrite.
         * subst.
           assert (tb12:bindings_type ((xl,d)::(v,a)::env) ((xl,τl)::(v,τ₁)::τenv))
             by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb12 H4) as [?[eqq12 typ12]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb12 H4) as [?[eqq12 typ12]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq12; simpl.
           dtype_inverter.
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb12 H13) as [?[eqq3 typ3]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb12 H13) as [?[eqq3 typ3]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq3.
           simpl.
           { case_eq (rflatten l0);
@@ -610,15 +596,15 @@ Section TNNRCRewrite.
         apply (IHl H12 typ1'); clear IHl.
         assert (tb:bindings_type ((v,a0)::env) ((v,τ₁)::τenv))
         by (econstructor; eauto).
-        destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb H8) as [?[eqq1 typ1]].
-        unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+        destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb H8) as [?[eqq1 typ1]].
+        unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
         rewrite eqq1 in eqq0; simpl in eqq0.
         destruct x; inversion typ1; rtype_equalizer.
         * subst.
           assert (tb2:bindings_type ((xl,x)::(v,a0)::env) ((xl,τl)::(v,τ₁)::τenv))
                  by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb2 H4) as [?[eqq2 typ2]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb2 H4) as [?[eqq2 typ2]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq2 in eqq0; simpl in eqq0.
           dtype_inverter.
           destruct x1; simpl in eqq0;
@@ -637,23 +623,23 @@ Section TNNRCRewrite.
         apply (IHl H12 typ1'); clear IHl.
         assert (tb:bindings_type ((v,a0)::env) ((v,τ₁)::τenv))
         by (econstructor; eauto).
-        destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb H8) as [?[eqq1 typ1]].
-        unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+        destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb H8) as [?[eqq1 typ1]].
+        unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
         rewrite eqq1 in eqq; simpl in eqq.
         destruct x; inversion typ1; rtype_equalizer.
         * subst.
           assert (tb2:bindings_type ((xl,x)::(v,a0)::env) ((xl,τl)::(v,τ₁)::τenv))
                  by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb2 H4) as [?[eqq2 typ2]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb2 H4) as [?[eqq2 typ2]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq2 in eqq; simpl in eqq.
           dtype_inverter.
           invcs H6.
           invcs H10.
           rtype_equalizer.
           subst.
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ H tb2 H15) as [?[eqq3 typ3]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ H tb2 H15) as [?[eqq3 typ3]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq3 in eqq.
           destruct x1; simpl in eqq;
           apply none_lift in eqq; trivial.
@@ -662,7 +648,7 @@ Section TNNRCRewrite.
   Qed.
     
   Lemma tcount_over_flat_for_either_either_nil_arrow v e1 xl e11 xll e12 xrr xr ehead :
-      tnnrc_ext_rewrites_to
+      tnnrc_rewrites_to
         (♯count(♯flatten(NNRCFor v
                                 ehead (NNRCEither e1 xl
                                            (NNRCEither e11 xll (‵{| e12|}) xrr ‵{||}) xr ‵{||}))))
@@ -694,8 +680,8 @@ Section TNNRCRewrite.
         * repeat (econstructor; simpl). 
       + repeat (econstructor; simpl). 
     - intros ? ? Hcenv; intros; simpl.
-      destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv H H2) as [?[eqq1 typ1]].
-      unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+      destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv H H2) as [?[eqq1 typ1]].
+      unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
       rewrite eqq1; simpl.
       destruct x; simpl; trivial.
       clear eqq1 ehead H2.
@@ -711,8 +697,8 @@ Section TNNRCRewrite.
       + simpl.
         assert (bt2:bindings_type ((v, a) :: env) ((v, τ₁) :: τenv))
                by (econstructor; eauto).
-        destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv bt2 H8) as [?[eqq2 typ2]].
-        unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+        destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv bt2 H8) as [?[eqq2 typ2]].
+        unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
         rewrite eqq2.
         invcs H11.
         invcs H4.
@@ -722,15 +708,15 @@ Section TNNRCRewrite.
         * subst.
           assert (tb12:bindings_type ((xl,d)::(v,a)::env) ((xl,τl)::(v,τ₁)::τenv))
             by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb12 H7) as [?[eqq12 typ12]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb12 H7) as [?[eqq12 typ12]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq12; simpl.
           { invcs typ12; rtype_equalizer.
             * subst.
               assert (tb122:bindings_type ((xll,d0)::(xl,d)::(v,a)::env) ((xll,τl0)::(xl,τl)::(v,τ₁)::τenv))
             by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb122 H6) as [?[eqq3 typ3]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb122 H6) as [?[eqq3 typ3]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq3.
           simpl.
           { case_eq (rflatten l0);
@@ -788,15 +774,15 @@ Section TNNRCRewrite.
         apply (IHl typ1'); clear IHl.
         assert (tb:bindings_type ((v,a0)::env) ((v,τ₁)::τenv))
         by (econstructor; eauto).
-        destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb H8) as [?[eqq1 typ1]].
-        unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+        destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb H8) as [?[eqq1 typ1]].
+        unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
         rewrite eqq1 in eqq0; simpl in eqq0.
         destruct x; invcs typ1; rtype_equalizer.
         * subst.
           assert (tb2:bindings_type ((xl,x)::(v,a0)::env) ((xl,τl)::(v,τ₁)::τenv))
                  by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb2 H7) as [?[eqq2 typ2]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb2 H7) as [?[eqq2 typ2]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq2 in eqq0; simpl in eqq0.
           { invcs typ2; rtype_equalizer.
             * subst; simpl in eqq0.
@@ -821,15 +807,15 @@ Section TNNRCRewrite.
         apply (IHl typ1'); clear IHl.
         assert (tb:bindings_type ((v,a0)::env) ((v,τ₁)::τenv))
         by (econstructor; eauto).
-        destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb H8) as [?[eqq1 typ1]].
-        unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+        destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb H8) as [?[eqq1 typ1]].
+        unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
         rewrite eqq1 in eqq; simpl in eqq.
         destruct x; inversion typ1; rtype_equalizer.
         * subst.
           assert (tb2:bindings_type ((xl,x)::(v,a0)::env) ((xl,τl)::(v,τ₁)::τenv))
                  by (econstructor; eauto).
-          destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb2 H7) as [?[eqq2 typ2]].
-          unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+          destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb2 H7) as [?[eqq2 typ2]].
+          unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
           rewrite eqq2 in eqq; simpl in eqq.
           { invcs typ2; rtype_equalizer.
             * subst.
@@ -839,8 +825,8 @@ Section TNNRCRewrite.
               subst.
               assert (tb12:bindings_type ((xll,d)::(xl,x)::(v,a0)::env) ((xll,τl0)::(xl,τl)::(v,τ₁)::τenv))
                  by (econstructor; eauto).
-              destruct (typed_nnrc_ext_yields_typed_data _ _ _ _ Hcenv tb12 H14) as [?[eqq12 typ12]].
-              unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *; simpl in *.
+              destruct (typed_nnrc_yields_typed_data _ _ _ _ Hcenv tb12 H14) as [?[eqq12 typ12]].
+              unfold nnrc_eval in *; unfold nnrc_type in *; simpl in *.
               rewrite eqq12 in eqq.
               simpl in eqq.
               unfold lift in eqq.
@@ -862,14 +848,14 @@ Section TNNRCRewrite.
     π[nil](p) ⇒ᶜ  ‵[||].
   Proof.
     red; simpl; intros.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     split.
     - econstructor. apply dtrec_full.
       simpl. rewrite rproject_nil_r; trivial.
     - intros.
-      unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *.
-      nnrc_ext_inverter.
-      nnrc_input_well_typed.
+      unfold nnrc_eval in *; unfold nnrc_type in *.
+      nnrc_inverter.
+      nnrc_core_input_well_typed.
       dtype_inverter.
       rewrite rproject_nil_r.
       trivial.
@@ -880,7 +866,7 @@ Section TNNRCRewrite.
     π[sl](p₁ ⊕ ‵[| (s, p₂) |]) ⇒ᶜ π[remove string_dec s sl](p₁) ⊕ ‵[| (s, p₂) |] .
   Proof.
     red; simpl; intros.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     split.
     - econstructor.
       3: econstructor; [| eauto]; eauto 2; econstructor.
@@ -907,9 +893,9 @@ Section TNNRCRewrite.
         apply filter_sublist.
       * apply sorted_over_filter; trivial.
     - intros.
-      unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *.
-      nnrc_ext_inverter.
-      nnrc_input_well_typed.
+      unfold nnrc_eval in *; unfold nnrc_type in *.
+      nnrc_inverter.
+      nnrc_core_input_well_typed.
       destruct dout; simpl; trivial.
       rewrite rproject_rec_sort_commute, rproject_app.
       rewrite <- (rec_sort_rproject_remove_in s) by (simpl; intuition).
@@ -927,10 +913,10 @@ Section TNNRCRewrite.
    Lemma tnnrcproject_over_const sl l :
     π[sl](NNRCConst (drec l)) ⇒ᶜ NNRCConst (drec (rproject l sl)).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrcproject_over_const.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       inversion H1; subst.
       rtype_equalizer. subst.
       econstructor.
@@ -946,10 +932,10 @@ Section TNNRCRewrite.
     π[sl](‵[| (s, p) |]) ⇒ᶜ ‵[| (s, p) |].
   Proof.
     intros.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrcproject_over_rec_in; trivial.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor; eauto.
       destruct (@in_dec string string_dec
               s sl); [| intuition].
@@ -961,7 +947,7 @@ Section TNNRCRewrite.
     π[sl](‵[| (s, p) |]) ⇒ᶜ ‵[||].
   Proof.
     red; simpl; intros.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     split.
     - econstructor; eauto 2.
       econstructor; eauto 2.
@@ -971,9 +957,9 @@ Section TNNRCRewrite.
         simpl.
         econstructor; eauto.
     - intros.
-      unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *.
-      nnrc_ext_inverter.
-      nnrc_input_well_typed.
+      unfold nnrc_eval in *; unfold nnrc_type in *.
+      nnrc_inverter.
+      nnrc_core_input_well_typed.
       destruct (@in_dec string string_dec
                         s sl); intuition.
   Qed.
@@ -983,7 +969,7 @@ Section TNNRCRewrite.
     π[sl](p₁ ⊕ ‵[| (s, p₂) |]) ⇒ᶜ π[sl](p₁).
   Proof.
     red; simpl; intros.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     split.
     - econstructor; [ | eauto].
       revert pf2.
@@ -1010,9 +996,9 @@ Section TNNRCRewrite.
         * apply sorted_over_filter; trivial.
       + apply sorted_over_filter; trivial.
     - intros.
-      unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *.
-      nnrc_ext_inverter.
-      nnrc_input_well_typed.
+      unfold nnrc_eval in *; unfold nnrc_type in *.
+      nnrc_inverter.
+      nnrc_core_input_well_typed.
       destruct dout; simpl; trivial.
       rewrite rproject_rec_sort_commute, rproject_app.
       simpl.
@@ -1029,7 +1015,7 @@ Section TNNRCRewrite.
     π[sl](‵[| (s, p₁) |] ⊕ p₂) ⇒ᶜ π[sl](p₂).
   Proof.
     red; intros.
-    nnrc_ext_inverter.
+    nnrc_inverter.
     split.
     - econstructor; [ | eauto].
       revert pf2.
@@ -1055,9 +1041,9 @@ Section TNNRCRewrite.
         * apply sorted_over_filter; trivial.
       + apply sorted_over_filter; trivial.
     - intros.
-      unfold nnrc_ext_eval in *; unfold nnrc_ext_type in *.
-      nnrc_ext_inverter.
-      nnrc_input_well_typed.
+      unfold nnrc_eval in *; unfold nnrc_type in *.
+      nnrc_inverter.
+      nnrc_core_input_well_typed.
       destruct dout0; trivial.
       simpl.
       replace (insertion_sort_insert rec_field_lt_dec (s, dout) (rec_sort l)) with
@@ -1076,12 +1062,12 @@ Section TNNRCRewrite.
     π[sl](‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |]) ⇒ᶜ ‵[| (s₁, p₁) |] ⊕ ‵[| (s₂, p₂) |].
   Proof.
     intros.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - rewrite nnrcproject_over_concat.
       repeat rewrite nnrcproject_over_rec_in by trivial.
       reflexivity.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       econstructor; eauto 2.
       2: repeat (econstructor; eauto 2).
       2: repeat (econstructor; eauto 2).
@@ -1100,10 +1086,10 @@ Section TNNRCRewrite.
   Lemma tnnrcproject_over_nnrcproject sl1 sl2 p :
     π[sl1](π[sl2](p)) ⇒ᶜ π[set_inter string_dec sl2 sl1](p).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrcproject_over_nnrcproject.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       generalize pf3.
       rewrite (rproject_rproject τ sl1 sl2).
       econstructor; eauto.
@@ -1115,10 +1101,10 @@ Section TNNRCRewrite.
   Lemma tnnrcproject_over_either sl p xl p1 xr p2 :
     π[sl](NNRCEither p xl p1 xr p2) ⇒ᶜ NNRCEither p xl (π[sl](p1)) xr (π[sl](p2)).
   Proof.
-    apply nnrc_ext_rewrites_typed_with_untyped.
+    apply nnrc_rewrites_typed_with_untyped.
     - apply nnrcproject_over_either.
     - intros.
-      nnrc_ext_inverter.
+      nnrc_inverter.
       repeat (econstructor; eauto 2).
   Qed.
 

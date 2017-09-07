@@ -781,7 +781,7 @@ Section cNNRCtoCAMP.
                                              H (unshadow_shadow_free _ _ _ _)); intros.
     unfold nnrcToCamp.
     unfold unshadow_simpl in H0.
-    rewrite unshadow_eval in H0. trivial.
+    rewrite nnrc_core_unshadow_eval in H0. trivial.
   Qed.
 
   Section trans_let.
@@ -1898,7 +1898,7 @@ Section cNNRCtoCAMP.
                                             H2 (unshadow_shadow_free _ _ _ _)); intros HH.
       unfold nnrcToCamp_let.
       unfold unshadow_simpl in HH.
-      rewrite unshadow_eval in HH.
+      rewrite nnrc_core_unshadow_eval in HH.
       auto.
     Qed.
 
@@ -1955,7 +1955,7 @@ Section cNNRCtoCAMP.
                                                     H (unshadow_shadow_free _ _ _ _)); intros H0.
       unfold nnrcToCamp_let.
       unfold unshadow_simpl in H0.
-      rewrite unshadow_eval in H0. trivial.
+      rewrite nnrc_core_unshadow_eval in H0. trivial.
     Qed.
     
     Require Import NNRCSize.

@@ -42,7 +42,7 @@ Section TcNRAEnvtocNNRC.
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv) ->
-    nnrc_type τconstants tenv (nraenv_core_to_nnrc op vid venv) τout.
+    nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout.
   Proof.
     Opaque fresh_var.
     Opaque append.
@@ -160,7 +160,7 @@ Section TcNRAEnvtocNNRC.
   Theorem tnraenv_sem_correct_back {τin τenv τout} (op:nraenv_core) (tenv:tbindings) (vid venv:var) :
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
-    nnrc_type τconstants tenv (nraenv_core_to_nnrc op vid venv) τout ->
+    nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv).
   Proof.
     Hint Constructors nraenv_core_type.
@@ -330,7 +330,7 @@ Section TcNRAEnvtocNNRC.
   Theorem tnraenv_sem_correct_iff {τin τenv τout} (op:nraenv_core) (tenv:tbindings) (vid venv:var) :
     lookup equiv_dec tenv vid = Some τin ->
     lookup equiv_dec tenv venv = Some τenv ->
-    nnrc_type τconstants tenv (nraenv_core_to_nnrc op vid venv) τout ->
+    nnrc_core_type τconstants tenv (nraenv_core_to_nnrc_core op vid venv) τout ->
     (op ▷ τin >=> τout ⊣ τconstants;τenv).
   Proof.
     Hint Resolve tnraenv_sem_correct tnraenv_sem_correct_back.

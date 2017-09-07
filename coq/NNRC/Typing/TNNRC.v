@@ -31,32 +31,32 @@ Section TNNRC.
     Context {m:basic_model}.
     Context (τconstants:tbindings).
 
-    Definition nnrc_ext_type (env:tbindings) (n:nnrc) (t:rtype) : Prop :=
-      nnrc_type τconstants env (nnrc_ext_to_nnrc n) t.
+    Definition nnrc_type (env:tbindings) (n:nnrc) (t:rtype) : Prop :=
+      nnrc_core_type τconstants env (nnrc_to_nnrc_base n) t.
   End typ.
   
   (** Main lemma for the type correctness of NNNRC *)
 
-  Theorem typed_nnrc_ext_yields_typed_data {m:basic_model} {τcenv} {τ} (cenv env:bindings) (tenv:tbindings) (e:nnrc) :
+  Theorem typed_nnrc_yields_typed_data {m:basic_model} {τcenv} {τ} (cenv env:bindings) (tenv:tbindings) (e:nnrc) :
     bindings_type cenv τcenv ->
     bindings_type env tenv ->
-    nnrc_ext_type τcenv tenv e τ ->
-    (exists x, (@nnrc_ext_eval _ brand_relation_brands cenv env e) = Some x /\ (data_type x τ)).
+    nnrc_type τcenv tenv e τ ->
+    (exists x, (@nnrc_eval _ brand_relation_brands cenv env e) = Some x /\ (data_type x τ)).
   Proof.
     intros.
-    unfold nnrc_ext_eval.
-    unfold nnrc_ext_type in H1.
-    apply (@typed_nnrc_yields_typed_data _ τcenv _ cenv env tenv).
+    unfold nnrc_eval.
+    unfold nnrc_type in H1.
+    apply (@typed_nnrc_core_yields_typed_data _ τcenv _ cenv env tenv).
     assumption.
     assumption.
     assumption.
   Qed.
 
   (* we are only sensitive to the environment up to lookup *)
-  Global Instance nnrc_ext_type_lookup_equiv_prop {m:basic_model} :
-    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_ext_type.
+  Global Instance nnrc_type_lookup_equiv_prop {m:basic_model} :
+    Proper (eq ==> lookup_equiv ==> eq ==> eq ==> iff) nnrc_type.
   Proof.
-    generalize nnrc_type_lookup_equiv_prop; intro Hnnrc_prop.
+    generalize nnrc_core_type_lookup_equiv_prop; intro Hnnrc_prop.
     unfold Proper, respectful, lookup_equiv, iff, impl in *; intros; subst.
     apply Hnnrc_prop; try reflexivity;
       try assumption.
@@ -64,19 +64,19 @@ Section TNNRC.
 
 End TNNRC.
 
-Ltac nnrc_ext_inverter :=
-  unfold nnrc_ext_type, nnrc_ext_to_nnrc in *; simpl in *; try nnrc_inverter.
+Ltac nnrc_inverter :=
+  unfold nnrc_type, nnrc_to_nnrc_base in *; simpl in *; try nnrc_core_inverter.
 
-Ltac nnrc_ext_input_well_typed :=
+Ltac nnrc_input_well_typed :=
   repeat progress
          match goal with
-         | [HO:nnrc_ext_type ?Γc ?Γ ?op ?τout,
+         | [HO:nnrc_type ?Γc ?Γ ?op ?τout,
                HE:bindings_type ?env ?Γ
-            |- context [(nnrc_ext_eval brand_relation_brands ?cenv ?env ?op)]] =>
+            |- context [(nnrc_eval brand_relation_brands ?cenv ?env ?op)]] =>
            let xout := fresh "dout" in
            let xtype := fresh "τout" in
            let xeval := fresh "eout" in
-           destruct (typed_nnrc_ext_yields_typed_data env Γ op HE HO)
+           destruct (typed_nnrc_yields_typed_data env Γ op HE HO)
              as [xout [xeval xtype]]; rewrite xeval in *; simpl
          end.
 

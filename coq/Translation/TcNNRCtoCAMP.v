@@ -147,13 +147,13 @@ Section TcNNRCtoCAMP.
       + rewrite <- H; trivial.
   Qed.
 
-  Lemma nnrc_type_context_perm {Γ Γ'} τc τ n :
+  Lemma nnrc_core_type_context_perm {Γ Γ'} τc τ n :
     Permutation Γ Γ' ->
     NoDup (domain Γ) ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
-    nnrc_type τc Γ n τ ->
-    nnrc_type τc Γ' n τ.
+    nnrc_core_type τc Γ n τ ->
+    nnrc_core_type τc Γ' n τ.
   Proof.
     revert Γ Γ' τ.
     induction n; simpl; intros; inversion H3; subst; intros; repeat rewrite andb_true_iff in *; intuition.
@@ -364,7 +364,7 @@ Section TcNNRCtoCAMP.
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     shadow_free n = true ->
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
-    nnrc_type τc Γ n τout ->
+    nnrc_core_type τc Γ n τout ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
@@ -403,7 +403,7 @@ Section TcNNRCtoCAMP.
           apply drec_sort_domain in H5.
           apply loop_var_in_nnrc_to_camp_env in H5.
           simpl in H5; intuition; subst; [intuition|eauto].
-          apply (nnrc_type_context_perm _ _ _ perm'); auto.
+          apply (nnrc_core_type_context_perm _ _ _ perm'); auto.
           apply nnrc_to_camp_nodup; auto.
           simpl; intuition; [idtac|eauto].
           subst;
@@ -443,7 +443,7 @@ Section TcNNRCtoCAMP.
           apply drec_sort_domain in H5.
           apply loop_var_in_nnrc_to_camp_env in H5.
           simpl in H5; intuition; subst; [intuition|eauto].
-          apply (nnrc_type_context_perm _ _ _ perm'); auto.
+          apply (nnrc_core_type_context_perm _ _ _ perm'); auto.
           apply nnrc_to_camp_nodup; auto.
           simpl; intuition; [idtac|eauto].
           subst;
@@ -495,7 +495,7 @@ Section TcNNRCtoCAMP.
           intros ? inn.
           symmetry in perm'.
           generalize (Permutation_in _ (dom_perm _ _ perm') inn); simpl; intros [inn'|inn']; subst; eauto.
-          apply (nnrc_type_context_perm _ _ _ perm'); trivial.
+          apply (nnrc_core_type_context_perm _ _ _ perm'); trivial.
           simpl.
           constructor; auto.
           simpl.
@@ -527,7 +527,7 @@ Section TcNNRCtoCAMP.
           intros ? inn.
           symmetry in perm'.
           generalize (Permutation_in _ (dom_perm _ _ perm') inn); simpl; intros [inn'|inn']; subst; eauto.
-          apply (nnrc_type_context_perm _ _ _ perm'); trivial.
+          apply (nnrc_core_type_context_perm _ _ _ perm'); trivial.
           simpl; constructor; auto.
           simpl.
           intros ? [?|?]; subst; eauto.
@@ -538,7 +538,7 @@ Section TcNNRCtoCAMP.
 
   Lemma nnrc_to_camp_ns_top_type_preserve n τc τout :
     shadow_free n = true ->
-    nnrc_type τc nil n τout ->
+    nnrc_core_type τc nil n τout ->
     forall τ₀,
       [τc&nil] |= (nnrcToCamp_ns n) ; τ₀ ~> τout.
   Proof.
@@ -548,7 +548,7 @@ Section TcNNRCtoCAMP.
 
   Lemma nnrc_to_camp_type_preserve n τc Γ τout :
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
-    nnrc_type τc Γ n τout ->
+    nnrc_core_type τc Γ n τout ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp (domain Γ) n) ; τ₀ ~> τout.
   Proof.
@@ -556,7 +556,7 @@ Section TcNNRCtoCAMP.
     apply nnrc_to_camp_ns_type_preserve; eauto.
     - apply unshadow_shadow_free.
     - apply unshadow_avoid.
-    - apply unshadow_type; trivial.
+    - apply nnrc_core_unshadow_type; trivial.
   Qed.
 
   Hint Rewrite 
@@ -1214,7 +1214,7 @@ Section TcNNRCtoCAMP.
   Lemma nnrc_to_camp_let_type_preserve n τc Γ τout :
     nnrcIsCore n ->
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
-    nnrc_type τc Γ n τout ->
+    nnrc_core_type τc Γ n τout ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout.
   Proof.
@@ -1238,13 +1238,13 @@ Section TcNNRCtoCAMP.
     - apply nnrc_to_camp_ns_type_preserve; eauto.
     + apply unshadow_shadow_free.
     + apply unshadow_avoid.
-    + apply unshadow_type; trivial.
+    + apply nnrc_core_unshadow_type; trivial.
   Qed.
 
   Lemma nnrc_to_camp_ns_let_top_type_preserve n τc τout :
     nnrcIsCore n ->
     shadow_free n = true ->
-    nnrc_type τc nil n τout ->
+    nnrc_core_type τc nil n τout ->
     forall τ₀,
     [τc&nil] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout.
   Proof.
@@ -1264,7 +1264,7 @@ Section TcNNRCtoCAMP.
     (forall x, In x (domain Γ) -> ~ In x (nnrc_bound_vars n)) ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
-                                                     nnrc_type τc Γ n τout.
+                                                     nnrc_core_type τc Γ n τout.
   Proof.
     intro Hiscore.
     revert Hiscore Γ τout; induction n; intros;
@@ -1290,7 +1290,7 @@ Section TcNNRCtoCAMP.
         by (intros ? inn1 inn2; apply dom_perm in gperm;
             apply (Permutation_in _ gperm) in inn1;
             simpl in inn1; destruct inn1; subst; eauto).
-      apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
+      apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
       + simpl; econstructor; eauto.
       + eapply IHn2; trivial;
           unfold rtype; rewrite <- grec; eauto.
@@ -1319,7 +1319,7 @@ Section TcNNRCtoCAMP.
         by (intros ? inn1 inn2; apply dom_perm in gperm;
             apply (Permutation_in _ gperm) in inn1;
             simpl in inn1; destruct inn1; subst; eauto).
-      apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
+      apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
       + simpl; econstructor; eauto.
       + eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         unfold merge_bindings in H14.
@@ -1368,7 +1368,7 @@ Section TcNNRCtoCAMP.
           by (intros ? inn1 inn2; apply dom_perm in gperm;
               apply (Permutation_in _ gperm) in inn1;
               simpl in inn1; destruct inn1; subst; eauto).
-        apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
+        apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
         simpl; econstructor; eauto.
         eapply IHn2; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H32.
@@ -1388,7 +1388,7 @@ Section TcNNRCtoCAMP.
           by (intros ? inn1 inn2; apply dom_perm in gperm;
               apply (Permutation_in _ gperm) in inn1;
               simpl in inn1; destruct inn1; subst; eauto).
-        apply (nnrc_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
+        apply (nnrc_core_type_context_perm _ _ _ gperm); try rewrite gperm; trivial.
         simpl; econstructor; eauto.
         eapply IHn3; unfold rtype; trivial; rewrite <- grec; eauto.
         * unfold rec_concat_sort in H29.
@@ -1409,7 +1409,7 @@ Section TcNNRCtoCAMP.
     shadow_free n = true ->
     forall τ₀,
       [τc&nil] |= (nnrcToCamp_ns n) ; τ₀ ~> τout ->
-                                     nnrc_type τc nil n τout.
+                                     nnrc_core_type τc nil n τout.
   Proof.
     intro Hiscore.
     intros.
@@ -2023,12 +2023,12 @@ Section TcNNRCtoCAMP.
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
     forall τ₀,
       [τc&(nnrc_to_camp_env Γ)] |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout ->
-      nnrc_type τc Γ n τout.
+      nnrc_core_type τc Γ n τout.
   Proof.
     intro Hiscore. intros. unfold nnrcToCamp_let in *.
     generalize (unshadow_simpl_preserve_core (domain Γ) n Hiscore); intros.
     unfold cNNRCShadow.unshadow_simpl in *.
-    eapply unshadow_type.
+    eapply nnrc_core_unshadow_type.
     eapply (nnrc_to_camp_ns_type_preserve_back); trivial.
     - apply unshadow_preserve_core; assumption.
     - apply unshadow_shadow_free.
@@ -2047,14 +2047,14 @@ Section TcNNRCtoCAMP.
         revert inn2.
         apply unshadow_avoid.
         eapply in_dom; eauto.
-   Qed.
+  Qed.
 
   Lemma nnrc_to_camp_ns_let_top_type_preserve_back n τc τout :
     nnrcIsCore n ->
     shadow_free n = true ->
     forall τ₀,
       [τc&nil] |= (nnrcToCamp_ns_let n) ; τ₀ ~> τout ->
-                                         nnrc_type τc nil n τout.
+                                          nnrc_core_type τc nil n τout.
   Proof.
     intro Hiscore. intros.
     apply nnrc_to_camp_ns_let_type_equiv_back in H0; eauto.
@@ -2069,7 +2069,7 @@ Section TcNNRCtoCAMP.
   Theorem nnrc_to_camp_let_top_type_preserve_iff τc Γ n τout τ₀:
     nnrcIsCore n ->
     is_list_sorted ODT_lt_dec (domain (nnrc_to_camp_env Γ)) = true ->
-    (nnrc_type τc Γ n τout <->
+    (nnrc_core_type τc Γ n τout <->
     [τc&(nnrc_to_camp_env Γ)]  |= (nnrcToCamp_let (domain Γ) n) ; τ₀ ~> τout).
    Proof.
      Hint Resolve nnrc_to_camp_let_type_preserve.

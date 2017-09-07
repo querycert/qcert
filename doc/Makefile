@@ -21,6 +21,7 @@ CP=cp
 
 ## Deploy documentation
 deploy:
+	$(CP) qcertsite.css $(QUERYCERTDOTIO)
 	$(CP) index.html $(QUERYCERTDOTIO)
 	$(CP) demo.html $(QUERYCERTDOTIO)
 	$(CP) doc.html $(QUERYCERTDOTIO)

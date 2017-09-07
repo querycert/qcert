@@ -491,7 +491,7 @@ Section NNRCtoDNNRC.
 
     Definition nnrc_to_dnnrc_dataframe {A:Set} (annot:A) (tenv:vdbindings) (q:nnrc) :=
       @nnrc_to_dnnrc A dataframe annot (rec_sort tenv) nil
-                     (nnrc_ext_to_nnrc q).
+                     (nnrc_to_nnrc_base q).
 
     Definition nnrc_to_dnnrc_top (tenv:vdbindings) (q:nnrc) : dnnrc_dataframe :=
       nnrc_to_dnnrc_dataframe tt tenv q.
@@ -539,7 +539,7 @@ Section NNRCtoDNNRC.
     Proof.
       unfold nnrc_to_dnnrc_top.
       unfold nnrc_eval_top.
-      unfold nnrc_ext_eval.
+      unfold nnrc_eval.
       unfold nnrc_to_dnnrc_dataframe.
       unfold dnnrc_dataframe_eval_top.
       intros.

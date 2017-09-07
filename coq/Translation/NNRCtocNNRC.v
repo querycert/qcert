@@ -40,7 +40,7 @@ Section NNRCtocNNRC.
       unfold nnrc_to_nnrc_core_top.
       unfold lift_nnrc_core.
       simpl.
-      unfold nnrc_ext_eval.
+      unfold nnrc_eval.
       reflexivity.
     Qed.
   End Top.

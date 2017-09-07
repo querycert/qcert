@@ -123,41 +123,41 @@ Section NNRC.
     Context {h:brand_relation_t}.
     Context {cenv:bindings}.
 
-    Fixpoint nnrc_ext_to_nnrc (e:nnrc) : nnrc :=
+    Fixpoint nnrc_to_nnrc_base (e:nnrc) : nnrc :=
       match e with
       | NNRCGetConstant v => NNRCGetConstant v
       | NNRCVar v => NNRCVar v
       | NNRCConst d => NNRCConst d
       | NNRCBinop b e1 e2 =>
-        NNRCBinop b (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
+        NNRCBinop b (nnrc_to_nnrc_base e1) (nnrc_to_nnrc_base e2)
       | NNRCUnop u e1 =>
-        NNRCUnop u (nnrc_ext_to_nnrc e1)
+        NNRCUnop u (nnrc_to_nnrc_base e1)
       | NNRCLet v e1 e2 =>
-        NNRCLet v (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
+        NNRCLet v (nnrc_to_nnrc_base e1) (nnrc_to_nnrc_base e2)
       | NNRCFor v e1 e2 =>
-        NNRCFor v (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2)
+        NNRCFor v (nnrc_to_nnrc_base e1) (nnrc_to_nnrc_base e2)
       | NNRCIf e1 e2 e3 =>
-        NNRCIf (nnrc_ext_to_nnrc e1) (nnrc_ext_to_nnrc e2) (nnrc_ext_to_nnrc e3)
+        NNRCIf (nnrc_to_nnrc_base e1) (nnrc_to_nnrc_base e2) (nnrc_to_nnrc_base e3)
       | NNRCEither e1 v2 e2 v3 e3 =>
-        NNRCEither (nnrc_ext_to_nnrc e1) v2 (nnrc_ext_to_nnrc e2) v3 (nnrc_ext_to_nnrc e3)
+        NNRCEither (nnrc_to_nnrc_base e1) v2 (nnrc_to_nnrc_base e2) v3 (nnrc_to_nnrc_base e3)
       | NNRCGroupBy g sl e1 =>
-        nnrc_group_by g sl (nnrc_ext_to_nnrc e1)
+        nnrc_group_by g sl (nnrc_to_nnrc_base e1)
       end.
 
-    Definition nnrc_ext_eval (env:bindings) (e:nnrc) : option data :=
-      nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e).
+    Definition nnrc_eval (env:bindings) (e:nnrc) : option data :=
+      nnrc_core_eval h cenv env (nnrc_to_nnrc_base e).
 
-    Remark nnrc_ext_to_nnrc_eq (e:nnrc):
+    Remark nnrc_to_nnrc_base_eq (e:nnrc):
       forall env,
-        nnrc_ext_eval env e = nnrc_core_eval h cenv env (nnrc_ext_to_nnrc e).
+        nnrc_eval env e = nnrc_core_eval h cenv env (nnrc_to_nnrc_base e).
     Proof.
       intros; reflexivity.
     Qed.
 
     (** Since we rely on cNNRC abstract syntax for the whole NNRC, it is important to check that translating to the core does not reuse the additional operations only present in NNRC. *)
     
-    Lemma nnrc_ext_to_nnrc_is_core (e:nnrc) :
-      nnrcIsCore (nnrc_ext_to_nnrc e).
+    Lemma nnrc_to_nnrc_base_is_core (e:nnrc) :
+      nnrcIsCore (nnrc_to_nnrc_base e).
     Proof.
       induction e; intros; simpl in *; auto.
       repeat (split; auto).
@@ -167,16 +167,16 @@ Section NNRC.
     tree with the right type for cNNRC. *)
     
     Program Definition nnrc_to_nnrc_core (e:nnrc) : nnrc_core :=
-      nnrc_ext_to_nnrc e.
+      nnrc_to_nnrc_base e.
     Next Obligation.
-      apply nnrc_ext_to_nnrc_is_core.
+      apply nnrc_to_nnrc_base_is_core.
     Defined.
 
     (** Additional properties of the translation from NNRC to cNNRC. *)
     
     Lemma core_nnrc_to_nnrc_ext_id (e:nnrc) :
       nnrcIsCore e ->
-      (nnrc_ext_to_nnrc e) = e.
+      (nnrc_to_nnrc_base e) = e.
     Proof.
       intros.
       induction e; simpl in *.
@@ -200,17 +200,17 @@ Section NNRC.
     Qed.
     
     Lemma core_nnrc_to_nnrc_ext_idempotent (e1 e2:nnrc) :
-      e1 = nnrc_ext_to_nnrc e2 ->
-      nnrc_ext_to_nnrc e1 = e1.
+      e1 = nnrc_to_nnrc_base e2 ->
+      nnrc_to_nnrc_base e1 = e1.
     Proof.
       intros.
       apply core_nnrc_to_nnrc_ext_id.
       rewrite H.
-      apply nnrc_ext_to_nnrc_is_core.
+      apply nnrc_to_nnrc_base_is_core.
     Qed.
 
     Corollary core_nnrc_to_nnrc_ext_idempotent_corr (e:nnrc) :
-      nnrc_ext_to_nnrc (nnrc_ext_to_nnrc e) = (nnrc_ext_to_nnrc e).
+      nnrc_to_nnrc_base (nnrc_to_nnrc_base e) = (nnrc_to_nnrc_base e).
     Proof.
       apply (core_nnrc_to_nnrc_ext_idempotent _ e).
       reflexivity.
@@ -219,23 +219,23 @@ Section NNRC.
     Remark nnrc_to_nnrc_ext_eq (e:nnrc):
       nnrcIsCore e ->
       forall env,
-        nnrc_core_eval h cenv env e = nnrc_ext_eval env e.
+        nnrc_core_eval h cenv env e = nnrc_eval env e.
     Proof.
       intros.
-      unfold nnrc_ext_eval.
+      unfold nnrc_eval.
       rewrite core_nnrc_to_nnrc_ext_id.
       reflexivity.
       assumption.
     Qed.
     
     (** we are only sensitive to the environment up to lookup *)
-    Global Instance nnrc_ext_eval_lookup_equiv_prop :
-      Proper (lookup_equiv ==> eq ==> eq) nnrc_ext_eval.
+    Global Instance nnrc_eval_lookup_equiv_prop :
+      Proper (lookup_equiv ==> eq ==> eq) nnrc_eval.
     Proof.
       generalize nnrc_core_eval_lookup_equiv_prop; intros.
       unfold Proper, respectful, lookup_equiv in *; intros; subst.
-      unfold nnrc_ext_eval.
-      rewrite (H h cenv x y H0 (nnrc_ext_to_nnrc y0) (nnrc_ext_to_nnrc y0)).
+      unfold nnrc_eval.
+      rewrite (H h cenv x y H0 (nnrc_to_nnrc_base y0) (nnrc_to_nnrc_base y0)).
       reflexivity.
       reflexivity.
     Qed.
@@ -250,8 +250,8 @@ Section NNRC.
     Context {h:brand_relation_t}.
     Require Import cNNRCShadow.
     
-    Lemma nnrc_ext_to_nnrc_free_vars_same e:
-      nnrc_free_vars e = nnrc_free_vars (nnrc_ext_to_nnrc e).
+    Lemma nnrc_to_nnrc_base_free_vars_same e:
+      nnrc_free_vars e = nnrc_free_vars (nnrc_to_nnrc_base e).
     Proof.
       induction e; simpl; try reflexivity.
       - rewrite IHe1; rewrite IHe2; reflexivity.
@@ -264,8 +264,8 @@ Section NNRC.
         assumption.
     Qed.
 
-    Lemma nnrc_ext_to_nnrc_bound_vars_impl x e:
-      In x (nnrc_bound_vars e) -> In x (nnrc_bound_vars (nnrc_ext_to_nnrc e)).
+    Lemma nnrc_to_nnrc_base_bound_vars_impl x e:
+      In x (nnrc_bound_vars e) -> In x (nnrc_bound_vars (nnrc_to_nnrc_base e)).
     Proof.
       induction e; simpl; unfold not in *; intros.
       - auto.
@@ -306,31 +306,31 @@ Section NNRC.
         auto.
     Qed.
 
-    Lemma nnrc_ext_to_nnrc_bound_vars_impl_not x e:
-      ~ In x (nnrc_bound_vars (nnrc_ext_to_nnrc e)) -> ~ In x (nnrc_bound_vars e).
+    Lemma nnrc_to_nnrc_base_bound_vars_impl_not x e:
+      ~ In x (nnrc_bound_vars (nnrc_to_nnrc_base e)) -> ~ In x (nnrc_bound_vars e).
     Proof.
       unfold not.
       intros.
       apply H.
-      apply nnrc_ext_to_nnrc_bound_vars_impl.
+      apply nnrc_to_nnrc_base_bound_vars_impl.
       assumption.
     Qed.
 
     Definition really_fresh_in_ext sep oldvar avoid e :=
-      really_fresh_in sep oldvar avoid (nnrc_ext_to_nnrc e).
+      really_fresh_in sep oldvar avoid (nnrc_to_nnrc_base e).
     
     Lemma really_fresh_from_free_ext sep old avoid (e:nnrc) :
-      ~ In (really_fresh_in_ext sep old avoid e) (nnrc_free_vars (nnrc_ext_to_nnrc e)).
+      ~ In (really_fresh_in_ext sep old avoid e) (nnrc_free_vars (nnrc_to_nnrc_base e)).
     Proof.
       unfold really_fresh_in_ext.
       intros inn1.
-      apply (really_fresh_in_fresh sep old avoid (nnrc_ext_to_nnrc e)).
+      apply (really_fresh_in_fresh sep old avoid (nnrc_to_nnrc_base e)).
       repeat rewrite in_app_iff; intuition.
     Qed.
 
-    Lemma nnrc_ext_to_nnrc_subst_comm e1 v1 e2:
-      nnrc_subst (nnrc_ext_to_nnrc e1) v1 (nnrc_ext_to_nnrc e2) =
-      nnrc_ext_to_nnrc (nnrc_subst e1 v1 e2).
+    Lemma nnrc_to_nnrc_base_subst_comm e1 v1 e2:
+      nnrc_subst (nnrc_to_nnrc_base e1) v1 (nnrc_to_nnrc_base e2) =
+      nnrc_to_nnrc_base (nnrc_subst e1 v1 e2).
     Proof.
       induction e1; simpl; try reflexivity.
       - destruct (equiv_dec v v1); reflexivity.
@@ -361,9 +361,9 @@ Section NNRC.
         destruct (equiv_dec "$group3"%string v1); try congruence; try reflexivity.
     Qed.
 
-    Lemma nnrc_ext_to_nnrc_rename_lazy_comm e v1 v2:
-      nnrc_rename_lazy (nnrc_ext_to_nnrc e) v1 v2 =
-      nnrc_ext_to_nnrc (nnrc_rename_lazy e v1 v2).
+    Lemma nnrc_to_nnrc_base_rename_lazy_comm e v1 v2:
+      nnrc_rename_lazy (nnrc_to_nnrc_base e) v1 v2 =
+      nnrc_to_nnrc_base (nnrc_rename_lazy e v1 v2).
     Proof.
       induction e; unfold nnrc_rename_lazy in *; simpl; try reflexivity.
       - destruct (equiv_dec v1 v2); reflexivity.
@@ -376,13 +376,13 @@ Section NNRC.
         simpl. rewrite <- IHe; reflexivity.
       - destruct (equiv_dec v1 v2); try reflexivity.
         rewrite IHe1.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
         destruct (equiv_dec v v1); try reflexivity.
         rewrite <- IHe1; reflexivity.
         rewrite <- IHe1; rewrite <- IHe2; simpl; reflexivity.
       - destruct (equiv_dec v1 v2); try reflexivity.
         rewrite IHe1.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
         destruct (equiv_dec v v1); try reflexivity.
         rewrite <- IHe1; reflexivity.
         rewrite <- IHe1; rewrite <- IHe2; simpl; reflexivity.
@@ -393,17 +393,17 @@ Section NNRC.
         rewrite IHe1.
         destruct (equiv_dec v v1); try reflexivity.
         destruct (equiv_dec v0 v1); try reflexivity.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
         rewrite <- IHe3.
         reflexivity.
         destruct (equiv_dec v0 v1); try reflexivity.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
         rewrite <- IHe2.
         reflexivity.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
-        rewrite <- nnrc_ext_to_nnrc_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
+        rewrite <- nnrc_to_nnrc_base_subst_comm; simpl.
         rewrite <- IHe2.
         rewrite <- IHe3.
         reflexivity.
@@ -423,25 +423,25 @@ Section NNRC.
 
     (** Unshadow properties for the full NNRC. *)
     Lemma unshadow_over_nnrc_ext_idem sep renamer avoid e:
-      (nnrc_ext_to_nnrc (unshadow sep renamer avoid (nnrc_ext_to_nnrc e))) =
-      (unshadow sep renamer avoid (nnrc_ext_to_nnrc e)).
+      (nnrc_to_nnrc_base (unshadow sep renamer avoid (nnrc_to_nnrc_base e))) =
+      (unshadow sep renamer avoid (nnrc_to_nnrc_base e)).
     Proof.
-      generalize (unshadow_preserve_core sep renamer avoid (nnrc_ext_to_nnrc e)); intros.
+      generalize (unshadow_preserve_core sep renamer avoid (nnrc_to_nnrc_base e)); intros.
       rewrite core_nnrc_to_nnrc_ext_id.
       reflexivity.
       apply H.
-      apply nnrc_ext_to_nnrc_is_core.
+      apply nnrc_to_nnrc_base_is_core.
     Qed.
 
-    Lemma nnrc_ext_eval_cons_subst {cenv} e env v x v' :
+    Lemma nnrc_eval_cons_subst {cenv} e env v x v' :
       ~ (In v' (nnrc_free_vars e)) ->
       ~ (In v' (nnrc_bound_vars e)) ->
-      @nnrc_ext_eval h cenv ((v',x)::env) (nnrc_subst e v (NNRCVar v')) = 
-      @nnrc_ext_eval h cenv ((v,x)::env) e.
+      @nnrc_eval h cenv ((v',x)::env) (nnrc_subst e v (NNRCVar v')) = 
+      @nnrc_eval h cenv ((v,x)::env) e.
     Proof.
       revert env v x v'.
       nnrc_cases (induction e) Case; simpl; unfold equiv_dec;
-        unfold nnrc_ext_eval in *; unfold var in *; trivial; intros; simpl.
+        unfold nnrc_eval in *; unfold var in *; trivial; intros; simpl.
       - Case "NNRCVar"%string.
         intuition. destruct (string_eqdec v0 v); simpl; subst; intuition.
         + match_destr; intuition. simpl. dest_eqdec; intuition.
@@ -452,7 +452,7 @@ Section NNRC.
         rewrite nin_app_or in H. f_equal; intuition.
       - f_equal; intuition.
       - rewrite nin_app_or in H. rewrite IHe1 by intuition.
-        case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
+        case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_to_nnrc_base e1)); trivial; intros d deq.
         destruct (string_eqdec v v0); unfold Equivalence.equiv in *; subst; simpl.
         + generalize (@nnrc_core_eval_remove_duplicate_env _ h cenv nil v0 d nil); 
             simpl; intros rr1; rewrite rr1.
@@ -462,7 +462,7 @@ Section NNRC.
           * generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v0,d)::nil)); 
               simpl; intros rr2; apply rr2. intuition.
             elim H3. apply remove_in_neq; auto.
-            rewrite nnrc_ext_to_nnrc_free_vars_same; auto.
+            rewrite nnrc_to_nnrc_base_free_vars_same; auto.
         + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
           generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d); simpl; intros rr2; 
             repeat rewrite rr2 by trivial.
@@ -470,7 +470,7 @@ Section NNRC.
           * intros nin; intuition. elim H2; apply remove_in_neq; auto.
           * intuition.
       - rewrite nin_app_or in H. rewrite IHe1 by intuition.
-        case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_ext_to_nnrc e1)); trivial; intros d deq.
+        case_eq (nnrc_core_eval h cenv ((v0, x) :: env) (nnrc_to_nnrc_base e1)); trivial; intros d deq.
         destruct d; trivial.
         f_equal.
         apply rmap_ext; intros.
@@ -483,7 +483,7 @@ Section NNRC.
           * generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v0,x0)::nil)); 
               simpl; intros rr2; apply rr2. intuition.
             elim H4. apply remove_in_neq; auto.
-            rewrite nnrc_ext_to_nnrc_free_vars_same; auto.
+            rewrite nnrc_to_nnrc_base_free_vars_same; auto.
         + destruct (string_eqdec v v'); unfold Equivalence.equiv in *; subst; [intuition | ].
           generalize (@nnrc_core_eval_swap_neq _ h cenv nil v x0); simpl; intros rr2; 
             repeat rewrite rr2 by trivial.
@@ -506,7 +506,7 @@ Section NNRC.
               intros re2; rewrite re2 by trivial.
             generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v1,d)::nil)); 
               simpl; intros re3. rewrite re3. intuition.
-            rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
+            rewrite <- nnrc_to_nnrc_base_free_vars_same; intuition.
           * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v d); simpl;
               intros re1; repeat rewrite re1 by trivial.
             rewrite IHe2; intuition.
@@ -515,7 +515,7 @@ Section NNRC.
               intros re2; rewrite re2 by trivial.
             generalize (@nnrc_core_eval_remove_free_env _ h cenv ((v1,d)::nil)); 
               simpl; intros re3. rewrite re3. intuition.
-            rewrite <- nnrc_ext_to_nnrc_free_vars_same; intuition.
+            rewrite <- nnrc_to_nnrc_base_free_vars_same; intuition.
           * generalize (@nnrc_core_eval_swap_neq _ h cenv nil v0 d); simpl;
               intros re1; repeat rewrite re1 by trivial.
             rewrite IHe3; intuition.
@@ -534,7 +534,7 @@ Section NNRC.
   Section Top.
     Context (h:brand_relation_t).
     Definition nnrc_eval_top (q:nnrc) (cenv:bindings) : option data :=
-      @nnrc_ext_eval h (rec_sort cenv) nil q.
+      @nnrc_eval h (rec_sort cenv) nil q.
   End Top.
   
 End NNRC.

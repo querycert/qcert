@@ -172,8 +172,8 @@ Section NRAEnvtoNNRC.
     Require Import cNRAEnvtocNNRC.
     Example nraenv_to_nnrc_codepaths_different vid venv:
       exists op,
-        ~ (nnrc_ext_to_nnrc (nraenv_to_nnrc op vid venv)
-           = nraenv_core_to_nnrc (nraenv_core_of_nraenv op) vid venv).
+        ~ (nnrc_to_nnrc_base (nraenv_to_nnrc op vid venv)
+           = nraenv_core_to_nnrc_core (nraenv_core_of_nraenv op) vid venv).
     Proof.
       exists (NRAEnvGroupBy "a"%string nil%string NRAEnvID).
       simpl; inversion 1.
@@ -270,16 +270,16 @@ Section NRAEnvtoNNRC.
   Qed.
 
   Theorem nraenv_to_nnrc_codepaths_equivalent h cenv env op vid venv:
-    nnrc_core_eval h cenv env (nnrc_ext_to_nnrc (nraenv_to_nnrc op vid venv))
-    = nnrc_core_eval h cenv env (nraenv_core_to_nnrc (nraenv_core_of_nraenv op) vid venv).
+    nnrc_core_eval h cenv env (nnrc_to_nnrc_base (nraenv_to_nnrc op vid venv))
+    = nnrc_core_eval h cenv env (nraenv_core_to_nnrc_core (nraenv_core_of_nraenv op) vid venv).
   Proof.
     Hint Resolve nnrc_core_eval_unop_eq nnrc_core_eval_binop_eq.
     Hint Resolve nnrc_core_eval_for_eq nnrc_core_eval_if_eq.
     Hint Resolve nnrc_core_eval_let_eq nnrc_core_eval_either_eq.
     revert vid venv cenv env; induction op; intros
     ; simpl nraenv_core_of_nraenv
-    ; simpl nraenv_core_to_nnrc
-    ; simpl nnrc_ext_to_nnrc
+    ; simpl nraenv_core_to_nnrc_core
+    ; simpl nnrc_to_nnrc_base
     ; simpl nraenv_to_nnrc
     ; eauto 4.
     - apply nnrc_core_eval_unop_eq; auto.
@@ -291,10 +291,10 @@ Section NRAEnvtoNNRC.
     vid <> venv ->
     lookup equiv_dec env vid = Some did ->
     lookup equiv_dec env venv = Some denv ->
-    @nnrc_ext_eval _ h cenv env (nraenv_to_nnrc op vid venv) = nraenv_eval h cenv op denv did.
+    @nnrc_eval _ h cenv env (nraenv_to_nnrc op vid venv) = nraenv_eval h cenv op denv did.
   Proof.
     intros.
-    unfold nnrc_ext_eval.
+    unfold nnrc_eval.
     unfold nraenv_eval.
     rewrite nraenv_to_nnrc_codepaths_equivalent.
     apply nraenv_core_sem_correct; assumption.
@@ -578,12 +578,12 @@ Section NRAEnvtoNNRC.
                        (nraenv_to_nnrc q init_vid init_venv)).
 
     Lemma lift_nraenv_to_nnrc_top (h:list (string*string)) cenv q :
-      @nnrc_ext_eval _ h cenv nil
+      @nnrc_eval _ h cenv nil
                     (NNRCLet init_venv (NNRCConst (drec nil))
                              (NNRCLet init_vid (NNRCConst dunit) q)) =
-      @nnrc_ext_eval _ h cenv ((init_vid,dunit)::(init_venv,drec nil)::nil) q.
+      @nnrc_eval _ h cenv ((init_vid,dunit)::(init_venv,drec nil)::nil) q.
     Proof.
-      unfold nnrc_ext_eval; simpl.
+      unfold nnrc_eval; simpl.
       reflexivity.
     Qed.
     

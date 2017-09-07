@@ -153,9 +153,9 @@ Section NNRCRewriteUtil.
 
   Lemma nnrc_subst_rename {sep} {oldvar} (e1 e2:nnrc) (x1 x2:var) :
     x2 = really_fresh_in sep oldvar nil e2 ->
-    nnrc_eq (NNRCLet x1 e1 e2) (NNRCLet x2 e1 (nnrc_subst e2 x1 (NNRCVar x2))).
+    nnrc_core_eq (NNRCLet x1 e1 e2) (NNRCLet x2 e1 (nnrc_subst e2 x1 (NNRCVar x2))).
   Proof.
-    unfold nnrc_eq; simpl; intros ? ? ? ? ? _.
+    unfold nnrc_core_eq; simpl; intros ? ? ? ? ? _.
     generalize (really_fresh_is_really_fresh nil e2 x2 H); intros. clear H.
     destruct (nnrc_core_eval h cenv env e1); try reflexivity.
     revert env; nnrc_cases (induction e2) Case; intros; simpl.

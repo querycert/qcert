@@ -29,7 +29,7 @@ Section NRAtocNNRC.
 
   (** Translation from NRA to Named Nested Relational Calculus *)
 
-  Fixpoint nra_to_nnrc (op:nra) (var:var) : nnrc :=
+  Fixpoint nra_to_nnrc_core (op:nra) (var:var) : nnrc :=
     match op with
     (* [[ ID ]]_var = var *)
     | AID => NNRCVar var
@@ -38,29 +38,29 @@ Section NRAtocNNRC.
     (* [[ op1 ⊕ op2 ]]_var == [[ op1 ]]
 _var ⊕ [[ op2 ]]_var *)
     | ABinop bop op1 op2 =>
-      NNRCBinop bop (nra_to_nnrc op1 var) (nra_to_nnrc op2 var)
+      NNRCBinop bop (nra_to_nnrc_core op1 var) (nra_to_nnrc_core op2 var)
     (* [[ UOP op1 ]]_var = UOP [[ op1 ]]_var *)
     | AUnop uop op1 =>
-      NNRCUnop uop (nra_to_nnrc op1 var)
+      NNRCUnop uop (nra_to_nnrc_core op1 var)
     (* [[ χ⟨ op1 ⟩( op2 ) ]]_var = { [[ op1 ]]_t | t ∈ [[ op2 ]]_var } *)
     | AMap op1 op2 =>
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tmap$" (var::nil) in
-      NNRCFor t nnrc2 (nra_to_nnrc op1 t)
+      NNRCFor t nnrc2 (nra_to_nnrc_core op1 t)
     (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1 } | t1 ∈ [[ op2 ]]_var } *)
     | AMapConcat op1 op2 =>
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let (t1,t2) := fresh_var2 "tmc$" "tmc$" (var::nil) in
       NNRCUnop AFlatten
                (NNRCFor t1 nnrc2
-                        (NNRCFor t2 (nra_to_nnrc op1 t1)
+                        (NNRCFor t2 (nra_to_nnrc_core op1 t1)
                                  ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ op1 × op2 ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_var } | t1 ∈ [[ op1 ]]_var } *)
     | AProduct op1 op2 =>
-      let nnrc1 := (nra_to_nnrc op1 var) in
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc1 := (nra_to_nnrc_core op1 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let (t1,t2) := fresh_var2 "tprod$" "tprod$" (var::nil) in
       NNRCUnop AFlatten
                (NNRCFor t1 nnrc1
@@ -69,9 +69,9 @@ _var ⊕ [[ op2 ]]_var *)
     (* [[ σ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ if [[ op1 ]]_t1 then { t1 } else {} | t1 ∈ [[ op2 ]]_var } *)
     | ASelect op1 op2 =>
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tsel$" (var::nil) in
-      let nnrc1 := (nra_to_nnrc op1 t) in
+      let nnrc1 := (nra_to_nnrc_core op1 t) in
       NNRCUnop AFlatten
                (NNRCFor t nnrc2
                         (NNRCIf nnrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
@@ -80,8 +80,8 @@ _var ⊕ [[ op2 ]]_var *)
                                   then [[ op2 ]]_var
                                   else t *)
     | ADefault op1 op2 =>
-      let nnrc1 := (nra_to_nnrc op1 var) in
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc1 := (nra_to_nnrc_core op1 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tdef$" (var::nil) in
       (NNRCLet t nnrc1
                (NNRCIf (NNRCBinop AEq
@@ -91,20 +91,20 @@ _var ⊕ [[ op2 ]]_var *)
     (* [[ op1 ◯ op2 ]]_var == let t := [[ op2 ]]_var
                                   in [[ op1 ]]_t *)
     | AEither opl opr =>
-      let nnrcl := (nra_to_nnrc opl var) in
-      let nnrcr := (nra_to_nnrc opr var) in
+      let nnrcl := (nra_to_nnrc_core opl var) in
+      let nnrcr := (nra_to_nnrc_core opr var) in
       NNRCEither (NNRCVar var) var nnrcl var nnrcr
     | AEitherConcat op1 op2 =>
-      let nnrc1 := (nra_to_nnrc op1 var) in
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc1 := (nra_to_nnrc_core op1 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "ec$" (var::nil) in 
       NNRCLet t nnrc2
               (NNRCEither nnrc1 var (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar var) (NNRCVar t)))
                           var (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar var) (NNRCVar t))))
     | AApp op1 op2 =>
-      let nnrc2 := (nra_to_nnrc op2 var) in
+      let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tapp$" (var::nil) in
-      let nnrc1 := (nra_to_nnrc op1 t) in
+      let nnrc1 := (nra_to_nnrc_core op1 t) in
       (NNRCLet t nnrc2 nnrc1)
     | AGetConstant s =>
       NNRCGetConstant s
@@ -115,10 +115,10 @@ _var ⊕ [[ op2 ]]_var *)
   Lemma map_sem_correct (h:list (string*string)) (op:nra) cenv (l:list data) (env:bindings) (vid:var):
     (forall (did: data) (env : bindings) (vid : var),
         lookup equiv_dec env vid = Some did ->
-        nnrc_core_eval h cenv env (nra_to_nnrc op vid) = (nra_eval h cenv op did)) ->
+        nnrc_core_eval h cenv env (nra_to_nnrc_core op vid) = (nra_eval h cenv op did)) ->
     rmap
       (fun x : data =>
-         nnrc_core_eval h cenv ((vid, x) :: env) (nra_to_nnrc op vid)) l
+         nnrc_core_eval h cenv ((vid, x) :: env) (nra_to_nnrc_core op vid)) l
     =
     rmap (nra_eval h cenv op) l.
   Proof.
@@ -135,7 +135,7 @@ _var ⊕ [[ op2 ]]_var *)
   Opaque append.
   Theorem nra_sem_correct (h:list (string*string)) (cenv:bindings) (op:nra) (env:bindings) (vid:var) (did:data) :
     lookup equiv_dec env vid = Some did ->
-    nnrc_core_eval h cenv env (nra_to_nnrc op vid) = h ⊢ op @ₐ did ⊣ cenv.
+    nnrc_core_eval h cenv env (nra_to_nnrc_core op vid) = h ⊢ op @ₐ did ⊣ cenv.
   Proof.
     Opaque fresh_var.
     Hint Resolve fresh_var_fresh1 fresh_var_fresh2 fresh_var_fresh3 fresh_var2_distinct.
@@ -284,9 +284,9 @@ _var ⊕ [[ op2 ]]_var *)
       reflexivity.
   Qed.
 
-  Lemma nra_to_nnrc_is_core :
+  Lemma nra_to_nnrc_core_is_core :
     forall q:nra, forall init_vid,
-        nnrcIsCore (nra_to_nnrc q init_vid).
+        nnrcIsCore (nra_to_nnrc_core q init_vid).
   Proof.
     intro q; simpl.
     induction q; simpl; auto.
@@ -300,7 +300,7 @@ _var ⊕ [[ op2 ]]_var *)
     Require Import NNRC NNRCSize.
 
     Theorem nraToNNRC_size op v : 
-      nnrc_size (nra_to_nnrc op v) <= 10 * nra_size op.
+      nnrc_size (nra_to_nnrc_core op v) <= 10 * nra_size op.
     Proof.
       revert v.
       induction op; simpl in *; intros; trivial.
@@ -329,22 +329,22 @@ _var ⊕ [[ op2 ]]_var *)
     (* Canned initial variable for the current value *)
     Definition init_vid := "id"%string.
     
-    Definition nra_to_nnrc_top (q:nra) : nnrc :=
+    Definition nra_to_nnrc_base_top (q:nra) : nnrc :=
       (NNRCLet init_vid (NNRCConst dunit)
-               (nra_to_nnrc q init_vid)).
+               (nra_to_nnrc_core q init_vid)).
 
-    Lemma nra_to_nnrc_top_is_core :
-      forall q:nra, nnrcIsCore (nra_to_nnrc_top q).
+    Lemma nra_to_nnrc_base_top_is_core :
+      forall q:nra, nnrcIsCore (nra_to_nnrc_base_top q).
     Proof.
       intros; simpl.
       split; [trivial| ].
-      apply nra_to_nnrc_is_core.
+      apply nra_to_nnrc_core_is_core.
     Qed.
 
     Program Definition nra_to_nnrc_core_top (q:nra) : nnrc_core :=
-      exist _ (nra_to_nnrc_top q) _.
+      exist _ (nra_to_nnrc_base_top q) _.
     Next Obligation.
-      apply nra_to_nnrc_top_is_core.
+      apply nra_to_nnrc_base_top_is_core.
     Qed.
 
     Theorem nra_to_nnrc_core_top_correct
