@@ -1195,6 +1195,36 @@ let sexp_to_sql (se : sexp) : QLang.sql =
     
 (* SQL++ Section *)
 
+let sqlpp_function_name_to_sexp_tag (name : QSQLPP.sqlpp_function_name) : string =
+	begin match name with
+	| SPFget_year -> "get_year"
+	| SPFget_month -> "get_month"
+	| SPFget_day -> "get_day"
+	| SPFget_hour -> "get_hour"
+	| SPFget_minute -> "get_minute"
+	| SPFget_second -> "get_second"
+	| SPFget_millisecond -> "get_millisecond"
+	| SPFavg -> "avg"
+	| SPFmin  -> "min"
+	| SPFmax  -> "max"
+	| SPFcount  -> "count"
+	| SPFsum  -> "sum"
+	| SPFcoll_avg -> "coll_avg"
+	| SPFcoll_min -> "coll_min"
+	| SPFcoll_max -> "coll_max"
+	| SPFcoll_count -> "coll_count"
+	| SPFcoll_sum -> "coll_sum"
+	| SPFarray_avg -> "array_avg"
+	| SPFarray_min -> "array_min"
+	| SPFarray_max -> "array_max"
+	| SPFarray_count -> "array_count"
+	| SPFarray_sum -> "array_sum"
+	| SPFsqrt -> "sqrt"
+	| SPFsubstring -> "substring"
+	| SPFregexp_contains -> "regexp_contains"
+	| SPFcontains -> "contains"
+	end
+
 let rec sqlpp_expr_to_sexp (expr : QSQLPP.sqlpp_expr) : sexp =	 
   begin match expr with
   | SPPositive arg -> STerm("Positive", [sqlpp_expr_to_sexp arg])
@@ -1237,7 +1267,7 @@ let rec sqlpp_expr_to_sexp (expr : QSQLPP.sqlpp_expr) : sexp =
   | SPNull -> STerm("Null", [])
 	| SPMissing -> STerm("Missing", [])
   | SPVarRef (name) -> STerm("VarRef", [coq_string_to_sstring name])
-  | SPFunctionCall (name, exprs) -> STerm("FunctionCall", (coq_string_to_sstring name) :: (List.map sqlpp_expr_to_sexp exprs))
+  | SPFunctionCall (name, exprs) -> STerm("FunctionCall", STerm((sqlpp_function_name_to_sexp_tag name), []) :: (List.map sqlpp_expr_to_sexp exprs))
   | SPArray (members) -> STerm("Array", (List.map sqlpp_expr_to_sexp members))
   | SPBag (members) -> STerm("Bag", (List.map sqlpp_expr_to_sexp members))
   | SPObject (fields) -> STerm("Object", (List.map sqlpp_field_to_sexp fields))
@@ -1371,6 +1401,38 @@ and sqlpp_order_by_to_sexp(order : (sqlpp_expr * sqlpp_order_spec)) : sexp =
 	end
 
 let sqlpp_to_sexp (e : QLang.sqlpp) : sexp = sqlpp_expr_to_sexp e
+
+let sexp_to_sqlpp_function_name (s : sexp) : sqlpp_function_name =
+	begin match s with
+	| STerm("get_year", []) -> SPFget_year
+	| STerm("get_month", []) -> SPFget_month 
+	| STerm("get_day", []) -> SPFget_day
+	| STerm("get_hour", []) -> SPFget_hour
+	| STerm("get_minute", []) -> SPFget_minute
+	| STerm("get_second", []) -> SPFget_second
+	| STerm("get_millisecond", []) -> SPFget_millisecond
+	| STerm("avg", []) -> SPFavg
+	| STerm("min", []) -> SPFmin
+	| STerm("max", []) -> SPFmax
+	| STerm("count", []) -> SPFcount
+	| STerm("sum", []) -> SPFsum
+	| STerm("coll_avg", []) -> SPFcoll_avg
+	| STerm("coll_min", []) -> SPFcoll_min
+	| STerm("coll_max", []) -> SPFcoll_max
+	| STerm("coll_count", []) -> SPFcoll_count
+	| STerm("coll_sum", []) -> SPFcoll_sum
+	| STerm("array_avg", []) -> SPFarray_avg
+	| STerm("array_min", []) -> SPFarray_min
+	| STerm("array_max", []) -> SPFarray_max
+	| STerm("array_count", []) -> SPFarray_count
+	| STerm("array_sum", []) -> SPFarray_sum
+	| STerm("sqrt", []) -> SPFsqrt
+	| STerm("substring", []) -> SPFsubstring
+	| STerm("regexp_contains", []) -> SPFregexp_contains
+	| STerm("contains", []) -> SPFcontains
+	| STerm(x, _) ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL++ function call expression: " ^ x))
+	end
 	
 let rec sexp_to_sqlpp_expr (stmt : sexp)  =
   begin match stmt with
@@ -1431,7 +1493,7 @@ let rec sexp_to_sqlpp_expr (stmt : sexp)  =
 	| STerm("VarRef", [s]) -> 
 		QSQLPP.sqlpp_sqlpp_var_ref (sstring_to_coq_string s)
 	| STerm("FunctionCall", s::args) ->
-		QSQLPP.sqlpp_sqlpp_function_call (sstring_to_coq_string s) (List.map sexp_to_sqlpp_expr args)
+		QSQLPP.sqlpp_sqlpp_function_call (sexp_to_sqlpp_function_name s) (List.map sexp_to_sqlpp_expr args)
 	| STerm("Array", members) ->
 		QSQLPP.sqlpp_sqlpp_array (List.map sexp_to_sqlpp_expr members)
 	| STerm("Bag", members) ->

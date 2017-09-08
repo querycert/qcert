@@ -33,6 +33,36 @@ Section SQLPP.
   Inductive sqlpp_distinct : Set := SPDistinct | SPAll.
   Inductive sqlpp_join_type : Set := SPInner | SPLeftOuter.
 
+  (** The set of function names currently supported *)
+  Inductive sqlpp_function_name : Set :=
+  		  SPFget_year
+		| SPFget_month
+		| SPFget_day
+		| SPFget_hour
+		| SPFget_minute
+		| SPFget_second
+		| SPFget_millisecond
+		| SPFavg
+		| SPFmin
+		| SPFmax
+		| SPFcount
+		| SPFsum
+		| SPFcoll_avg
+		| SPFcoll_min
+		| SPFcoll_max
+		| SPFcoll_count
+		| SPFcoll_sum
+		| SPFarray_avg
+		| SPFarray_min
+		| SPFarray_max
+		| SPFarray_count
+		| SPFarray_sum
+		| SPFsqrt
+		| SPFsubstring
+		| SPFregexp_contains
+		| SPFcontains
+		.
+  
   (** The SQLPP grammar according to AsterixDB
 
 <<
@@ -210,7 +240,7 @@ FunctionCallExpression ::= FunctionName "(" ( Expression ( "," Expression )* )? 
 >>
 *)
 
-  | SPFunctionCall : string -> list sqlpp_expr -> sqlpp_expr
+  | SPFunctionCall : sqlpp_function_name -> list sqlpp_expr -> sqlpp_expr
                         
 (**
 <<
