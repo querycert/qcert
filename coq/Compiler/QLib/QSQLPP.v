@@ -41,7 +41,8 @@ Module QSQLPP(runtime:CompilerRuntime).
   Definition sqlpp_distinct : Set := SQLPP.sqlpp_distinct.
   Definition sqlpp_project : Set := SQLPP.sqlpp_project.
   Definition sqlpp_join_type : Set := SQLPP.sqlpp_join_type.
-
+  Definition sqlpp_function_name := SQLPP.sqlpp_function_name.
+  
   Definition sqlpp_sqlpp_query := SQLPP.SPQuery.
   Definition sqlpp_sqlpp_positive : sqlpp_expr->sqlpp_expr := SQLPP.SPPositive.
   Definition sqlpp_sqlpp_negative : sqlpp_expr->sqlpp_expr := SQLPP.SPNegative.

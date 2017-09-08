@@ -113,7 +113,9 @@ import org.apache.hyracks.algebricks.common.utils.Pair;
 
 public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBuilder> {
 	/** Pre-screening map for legal function calls.  Note that there are a few others that are turned into
-	 *  operations; they are special cases not listed here.*/
+	 *  operations; they are special cases not listed here.
+	 *  The "enumeration" implied by the following static block must correspond to the enumeration sqlpp_function_name in the Coq AST, except that the members
+	 *  of that enumeration are prefixed with 'SPF', e.g. 'SPFget_year'. */
 	private static final Map<String, FunctionTemplate> functionTemplates = new HashMap<>();
 	static {
 		functionTemplates.put("get_year", new FunctionTemplate(1, 1));
@@ -123,7 +125,6 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		functionTemplates.put("get_minute", new FunctionTemplate(1, 1));
 		functionTemplates.put("get_second", new FunctionTemplate(1, 1));
 		functionTemplates.put("get_millisecond", new FunctionTemplate(1, 1));
-		functionTemplates.put("regexp_contains", new FunctionTemplate(1, 1));
 		functionTemplates.put("avg", new FunctionTemplate(1, 1));
 		functionTemplates.put("min", new FunctionTemplate(1, 1));
 		functionTemplates.put("max", new FunctionTemplate(1, 1));
@@ -141,6 +142,8 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 		functionTemplates.put("array_sum", new FunctionTemplate(1, 1));
 		functionTemplates.put("sqrt", new FunctionTemplate(1, 1));
 		functionTemplates.put("substring", new FunctionTemplate(2, 3));
+		functionTemplates.put("regexp_contains", new FunctionTemplate(2, 3));
+		functionTemplates.put("contains", new FunctionTemplate(2, 2));
 	}
 
 	// Grammar:
@@ -164,11 +167,17 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 			return makeNode("IsMissing", builder, args.get(0));
 		else if (name.equals("is-unknown"))
 			return makeNode("IsUnknown", builder, args.get(0));
-		else
+		else {
 			// Typical case: actually a function call.  We let it through if it is on the "approved list" but boot it if not,
 			// since we can't handle arbitrary user-defined or system-extension functions (and actually can't handle many built-in
 			// AsterixDB functions at this point, either).
-			return makeNode("FunctionCall", builder, preApprove(name, args.size()), args);
+			builder = startNode("FunctionCall", builder);
+			// UnsupportedOperationException here if name is not approved
+			builder = startNode(preApprove(name, args.size()), builder);
+			builder = endNode(builder);
+			builder = appendNodeList(args, builder);
+			return endNode(builder);
+		}
 	}
 
 	// Grammar:
@@ -1326,13 +1335,17 @@ public class SPPEncodingVisitor implements ISqlppVisitor<StringBuilder, StringBu
 	}
 
 	/**
-	 * Check a function call to see if it is on the "approved list."  
+	 * Check a function call to see if it is on the "approved list"
 	 * @param name the name of the function
 	 * @param argCount the number of arguments
 	 * @return the name if approved
 	 * @throws UnsupportedOperationException with informative message if not approved
 	 */
-	private Object preApprove(String name, int argCount) {
+	private String preApprove(String name, int argCount) {
+		// There is some evidence from test cases that AsterixDB (at least) accepts a hyphen in place of an underscore for some
+		//	functions, although the documentation for built-in functions uses only the underscore.  It is unclear whether this 
+		// is to be taken as a SQL++ feature (I suspect not).  But, we're mimicking that behavior for now.
+		name = name.replace('-', '_'); // TODO consider eliminating this and just fixing up test cases that expect it.
 		FunctionTemplate t = functionTemplates.get(name);
 		if (t == null)
 			throw new UnsupportedOperationException(name + " is not a supported function");
