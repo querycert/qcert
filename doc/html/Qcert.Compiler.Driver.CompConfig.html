@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Compiler.Driver.CompConfig</title>
+<meta name="description" content="Documentation of Coq module Qcert.Compiler.Driver.CompConfig" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Compiler.Driver.CompConfig</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="CompConfig">CompConfig</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonSystem.html">CommonSystem</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.TypingRuntime.html">TypingRuntime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NNRCMR.Lang.ForeignReduceOps.html">ForeignReduceOps</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ft</span>:<span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fr</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">bm</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>}.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html">OptimizerLogger</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html">CompLang</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompEnv.html">CompEnv</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Section</span> <span class="id"><a name="CompConfig.optim">optim</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html">NNRCOptimizer</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvOptimizer.html">NRAEnvOptimizer</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html">OptimizerStep</a></span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="optim_type_of_language">optim_type_of_language</a></span> (<span class="id">l</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language">language</a></span>) : <span class="kwd">Set</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#l">l</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nra">L_nra</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nraenv_core">L_nraenv_core</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nraenv">L_nraenv</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrc_core">L_nnrc_core</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrc">nnrc</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrc">L_nnrc</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrc">nnrc</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Empty_set">Empty_set</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="optim_config_list_type">optim_config_list_type</a></span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> {<span class="id">l</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language">language</a></span> &amp; (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#OptimizerStep">OptimizerStep</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_type_of_language">optim_type_of_language</a></span> <span class="id">l</span>)))}%<span class="id">type</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="optim_config_list">optim_config_list</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config_list_type">optim_config_list_type</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nraenv">L_nraenv</a></span> ("<span class="id">NRAEnv.Optim.NRAEnvOptimizer</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#tnraenv_optim_list">tnraenv_optim_list</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#existT">existT</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrc">L_nnrc</a></span> ("<span class="id">NNRC.Optim.TNNRCOptimizer</span>"%<span class="id">string</span>,<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_optim_list">tnnrc_optim_list</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="optim_config">optim_config</a></span> : <span class="kwd">Set</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language">language</a></span> * <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optim_phases_config">optim_phases_config</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="optim_config_default">optim_config_default</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config">optim_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nraenv">L_nraenv</a></span>, <span class="id"><a href="Qcert.NRAEnv.Optim.NRAEnvOptimizer.html#default_nraenv_optim_phases">default_nraenv_optim_phases</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: (<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#L_nnrc">L_nnrc</a></span>, <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#default_nnrc_optim_phases">default_nnrc_optim_phases</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="get_default_optim_config">get_default_optim_config</a></span> (<span class="id">l</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language">language</a></span>) : <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optim_phases_config">optim_phases_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language_eq_dec">language_eq_dec</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config_default">optim_config_default</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#l">l</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">x</span> =&gt; <span class="id">x</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="get_optim_config">get_optim_config</a></span> (<span class="id">l</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language">language</a></span>) (<span class="id">oc</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config">optim_config</a></span>) : <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optim_phases_config">optim_phases_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language_eq_dec">language_eq_dec</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#oc">oc</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#l">l</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">opc</span> =&gt; <span class="id">opc</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#get_default_optim_config">get_default_optim_config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#l">l</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html">Permutation</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Remark</span> <span class="id"><a name="optim_config_list_default_in_sync">optim_config_list_default_in_sync</a></span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation">Permutation</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (@<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#projT1">projT1</a></span> <span class="id">_</span> <span class="id">_</span>) <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config_list">optim_config_list</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config_default">optim_config_default</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3158')">Proof.</div>
+<div class="proofscript" id="proof3158">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#permutation_prover">permutation_prover</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">vm_compute</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#CompConfig.optim">optim</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Section</span> <span class="id"><a name="CompConfig.constants">constants</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Record</span> <span class="id"><a name="constant_config">constant_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="mkConstantConfig">mkConstantConfig</a></span> { <span class="id"><a name="constant_localization">constant_localization</a></span> : <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="constant_type">constant_type</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="constant_source">constant_source</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> }.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="constants_config">constants_config</a></span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_config">constant_config</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="vdbindings_of_constants_config">vdbindings_of_constants_config</a></span> (<span class="id">cconf</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config">constants_config</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">xy</span> =&gt; (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#xy">xy</a></span>, (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#xy">xy</a></span>).(<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_localization">constant_localization</a></span>))) <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#cconf">cconf</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tbindings_of_constants_config">tbindings_of_constants_config</a></span> (<span class="id">cconf</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config">constants_config</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">xy</span> =&gt; (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#xy">xy</a></span>, (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#xy">xy</a></span>).(<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_type">constant_type</a></span>))) <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#cconf">cconf</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tdbinding_of_constant_config">tdbinding_of_constant_config</a></span> (<span class="id">gc</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_config">constant_config</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> (<span class="id">s</span>,<span class="id">cc</span>) := <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#gc">gc</a></span> <span class="kwd">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#s">s</a></span>,<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#v_and_t_to_dt">v_and_t_to_dt</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#cc">cc</a></span>.(<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_localization">constant_localization</a></span>) <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#cc">cc</a></span>.(<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_type">constant_type</a></span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tdbindings_of_constants_config">tdbindings_of_constants_config</a></span> (<span class="id">gc</span>:<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config">constants_config</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tdbinding_of_constant_config">tdbinding_of_constant_config</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#gc">gc</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="constant_config_of_tdbinding_opt">constant_config_of_tdbinding_opt</a></span> (<span class="id">td</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.TypeSystem.DType.html#drtype">drtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_config">constant_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#td">td</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">s</span>,<span class="id"><a href="Qcert.Common.TypeSystem.DType.html#Tlocal">Tlocal</a></span> <span class="id">t</span>) =&gt; (<span class="id">s</span>,<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#mkConstantConfig">mkConstantConfig</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#Vlocal">Vlocal</a></span> <span class="id">t</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">s</span>,<span class="id"><a href="Qcert.Common.TypeSystem.DType.html#Tdistr">Tdistr</a></span> <span class="id">t</span>) =&gt; (<span class="id">s</span>,<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#mkConstantConfig">mkConstantConfig</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#Vdistr">Vdistr</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> <span class="id">t</span>) <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="constant_config_of_tdbinding">constant_config_of_tdbinding</a></span> (<span class="id">td</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.TypeSystem.DType.html#drtype">drtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_config">constant_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#td">td</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">s</span>,<span class="id"><a href="Qcert.Common.TypeSystem.DType.html#Tlocal">Tlocal</a></span> <span class="id">t</span>) =&gt; (<span class="id">s</span>,<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#mkConstantConfig">mkConstantConfig</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#Vlocal">Vlocal</a></span> <span class="id">t</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">s</span>,<span class="id"><a href="Qcert.Common.TypeSystem.DType.html#Tdistr">Tdistr</a></span> <span class="id">t</span>) =&gt; (<span class="id">s</span>,<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#mkConstantConfig">mkConstantConfig</a></span> <span class="id"><a href="Qcert.Common.Data.DData.html#Vdistr">Vdistr</a></span> <span class="id">t</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="constants_config_of_tdbindings">constants_config_of_tdbindings</a></span> (<span class="id">tds</span>:<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>) : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config">constants_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constant_config_of_tdbinding">constant_config_of_tdbinding</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tds">tds</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="constants_config_of_tdbindings_merges">constants_config_of_tdbindings_merges</a></span> (<span class="id">tds</span>:<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tdbindings_of_constants_config">tdbindings_of_constants_config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config_of_tdbindings">constants_config_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tds">tds</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tds">tds</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3159')">Proof.</div>
+<div class="proofscript" id="proof3159">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">tds</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tdbindings_of_constants_config">tdbindings_of_constants_config</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHtds</span>; <span class="tactic">clear</span> <span class="id">IHtds</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="vdbindings_of_constants_config_commutes">vdbindings_of_constants_config_commutes</a></span> <span class="id">x</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#vdbindings_of_constants_config">vdbindings_of_constants_config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config_of_tdbindings">constants_config_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#x">x</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#vdbindings_of_tdbindings">vdbindings_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#x">x</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3160')">Proof.</div>
+<div class="proofscript" id="proof3160">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">IHx</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="one_tdbindings_of_avoid_list">one_tdbindings_of_avoid_list</a></span> (<span class="id">avoid</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) : <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#x">x</a></span>,<span class="id"><a href="Qcert.Common.TypeSystem.DType.html#Tlocal">Tlocal</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>)) <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#avoid">avoid</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="one_constant_config_of_avoid_list">one_constant_config_of_avoid_list</a></span> (<span class="id">avoid</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config">constants_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config_of_tdbindings">constants_config_of_tdbindings</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#one_tdbindings_of_avoid_list">one_tdbindings_of_avoid_list</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#avoid">avoid</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="one_constant_config_of_avoid_list_extracts">one_constant_config_of_avoid_list_extracts</a></span> (<span class="id">avoid</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#vdbindings_of_constants_config">vdbindings_of_constants_config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#one_constant_config_of_avoid_list">one_constant_config_of_avoid_list</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#avoid">avoid</a></span>)) = <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#avoid">avoid</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3161')">Proof.</div>
+<div class="proofscript" id="proof3161">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#one_constant_config_of_avoid_list">one_constant_config_of_avoid_list</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">avoid</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">IHavoid</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#CompConfig.constants">constants</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Record</span> <span class="id"><a name="driver_config">driver_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="mkDvConfig">mkDvConfig</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id"><a name="comp_qname">comp_qname</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_qname_lowercase">comp_qname_lowercase</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_class_name">comp_class_name</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_brand_rel">comp_brand_rel</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) ;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_mr_vinit">comp_mr_vinit</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_constants">comp_constants</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config">constants_config</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_java_imports">comp_java_imports</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="comp_optim_config">comp_optim_config</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config">optim_config</a></span>; }.<br/>
+<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="trivial_driver_config">trivial_driver_config</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#driver_config">driver_config</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#mkDvConfig">mkDvConfig</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#EmptyString">EmptyString</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#EmptyString">EmptyString</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#EmptyString">EmptyString</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#EmptyString">EmptyString</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#EmptyString">EmptyString</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="default_dv_config">default_dv_config</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#mkDvConfig">mkDvConfig</a></span><br/>
+ "<span class="id">query</span>"<br/>
+ "<span class="id">query</span>"<br/>
+ "<span class="id">query</span>"<br/>
+ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span><br/>
+ <span class="id"><a href="Qcert.Compiler.Driver.CompEnv.html#init_vinit">init_vinit</a></span><br/>
+ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span><br/>
+ ""<br/>
+ <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#CompConfig">CompConfig</a></span>.<br/>
+<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

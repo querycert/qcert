@@ -1,0 +1,79 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Compiler.QLib.QLang</title>
+<meta name="description" content="Documentation of Coq module Qcert.Compiler.QLib.QLang" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Compiler.QLib.QLang</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonSystem.html">CommonSystem</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html">CompLang</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html">CompilerRuntime</a></span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="QLang">QLang</a></span>(<span class="id">runtime</span>:<span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html#CompilerRuntime">CompilerRuntime</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">list_scope</span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Section</span> <span class="id"><a name="QLang.QL">QL</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">bm</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>}.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftyping</span>: <span class="id"><a href="Qcert.Common.ForeignTyping.html#foreign_typing">foreign_typing</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.camp_rule">camp_rule</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp_rule">camp_rule</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.tech_rule">tech_rule</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#tech_rule">tech_rule</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.designer_rule">designer_rule</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#designer_rule">designer_rule</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.camp">camp</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp">camp</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.oql">oql</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#oql">oql</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.sql">sql</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#sql">sql</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.sqlpp">sqlpp</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#sqlpp">sqlpp</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.lambda_nra">lambda_nra</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#lambda_nra">lambda_nra</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.nra">nra</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nra">nra</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.nraenv_core">nraenv_core</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv_core">nraenv_core</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.nraenv">nraenv</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.nnrc">nnrc</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrc">nnrc</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.nnrcmr">nnrcmr</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrcmr">nnrcmr</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.cldmr">cldmr</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#cldmr">cldmr</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.dnnrc">dnnrc</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc">dnnrc</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.dnnrc_typed">dnnrc_typed</a></span> {<span class="id">bm</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>} := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#dnnrc_typed">dnnrc_typed</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.javascript">javascript</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#javascript">javascript</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.java">java</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#java">java</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.spark_rdd">spark_rdd</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#spark_rdd">spark_rdd</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.spark_df">spark_df</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#spark_df">spark_df</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.cloudant">cloudant</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#cloudant">cloudant</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.language">language</a></span> : <span class="kwd">Set</span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language">language</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.query">query</a></span> : <span class="kwd">Set</span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#query">query</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.language_of_name_case_sensitive">language_of_name_case_sensitive</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.language">language</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language_of_name_case_sensitive">language_of_name_case_sensitive</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.name_of_language">name_of_language</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.language">language</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#name_of_language">name_of_language</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.language_of_query">language_of_query</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.query">query</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.language">language</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#language_of_query">language_of_query</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.name_of_query">name_of_query</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.query">query</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#name_of_query">name_of_query</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.export_desc">export_desc</a></span> : <span class="kwd">Set</span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#export_desc">export_desc</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.export_language_descriptions">export_language_descriptions</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.export_desc">export_desc</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#export_language_descriptions">export_language_descriptions</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.vdistr">vdistr</a></span> := <span class="id"><a href="Qcert.Common.Data.DData.html#Vdistr">Vdistr</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.vlocal">vlocal</a></span> := <span class="id"><a href="Qcert.Common.Data.DData.html#Vlocal">Vlocal</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.vdbindings">vdbindings</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#vdbindings">vdbindings</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QLang.tdbindings">tdbindings</a></span> := <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang.QL">QL</a></span>.<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang">QLang</a></span>.<br/>
+<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

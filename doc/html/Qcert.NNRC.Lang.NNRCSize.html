@@ -1,0 +1,96 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.NNRC.Lang.NNRCSize</title>
+<meta name="description" content="Documentation of Coq module Qcert.NNRC.Lang.NNRCSize" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.NNRC.Lang.NNRCSize</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="NNRCSize">NNRCSize</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.omega.Omega.html">Omega</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Logic.Decidable.html">Decidable</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html">cNNRC</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html">cNNRCShadow</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="nnrc_size">nnrc_size</a></span> (<span class="id">n</span>:<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc">nnrc</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGetConstant">NNRCGetConstant</a></span> <span class="id">v</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCVar">NNRCVar</a></span> <span class="id">v</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCConst">NNRCConst</a></span> <span class="id">d</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCBinop">NNRCBinop</a></span> <span class="id">op</span> <span class="id">n</span>₁ <span class="id">n</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₁ + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCUnop">NNRCUnop</a></span> <span class="id">op</span> <span class="id">n</span>₁ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₁)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCLet">NNRCLet</a></span> <span class="id">v</span> <span class="id">n</span>₁ <span class="id">n</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₁ + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCFor">NNRCFor</a></span> <span class="id">v</span> <span class="id">n</span>₁ <span class="id">n</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₁ + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCIf">NNRCIf</a></span> <span class="id">n</span>₁ <span class="id">n</span>₂ <span class="id">n</span>₃ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₁ + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₂ + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">n</span>₃)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCEither">NNRCEither</a></span> <span class="id">nd</span> <span class="id">vl</span> <span class="id">nl</span> <span class="id">vr</span> <span class="id">nr</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">nd</span> + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">nl</span> + <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id">nr</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGroupBy">NNRCGroupBy</a></span> <span class="id">g</span> <span class="id">sl</span> <span class="id">n</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_size_nzero">nnrc_size_nzero</a></span> (<span class="id">n</span>:<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc">nnrc</a></span>) : <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span> &lt;&gt; 0.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2459')">Proof.</div>
+<div class="proofscript" id="proof2459">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">n</span>; <span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_rename_lazy_size">nnrc_rename_lazy_size</a></span> <span class="id">n</span> <span class="id">x1</span> <span class="id">x2</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_rename_lazy">nnrc_rename_lazy</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#x1">x1</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#x2">x2</a></span>) = <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2460')">Proof.</div>
+<div class="proofscript" id="proof2460">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">n</span>) <span class="id">Case</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_rename_lazy">nnrc_rename_lazy</a></span> <span class="kwd">in</span> *;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">x1</span> <span class="id">x2</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">reflexivity</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">rewrite</span> <span class="id">IHn1</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHn2</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHn3</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span> ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">rewrite</span> <span class="id">IHn1</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHn2</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span> ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">rewrite</span> <span class="id">IHn</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span> ];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">rewrite</span> <span class="id">IHn1</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">v</span> <span class="id">x1</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHn2</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span> ].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">NNRCVar</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">v</span> <span class="id">x1</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">NNRCEither</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHn1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">v</span> <span class="id">x1</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id">v0</span> <span class="id">x1</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">rewrite</span> <span class="id">IHn3</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">rewrite</span> <span class="id">IHn2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">rewrite</span> <span class="id">IHn2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHn3</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#NNRCSize">NNRCSize</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

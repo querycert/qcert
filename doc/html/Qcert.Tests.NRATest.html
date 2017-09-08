@@ -1,0 +1,222 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Tests.NRATest</title>
+<meta name="description" content="Documentation of Coq module Qcert.Tests.NRATest" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Tests.NRATest</h1>
+<div class="coq">
+<br/>
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
+<br/>
+<span class="kwd">Delimit</span> <span class="kwd">Scope</span> <span class="id">data_scope</span> <span class="kwd">with</span> <span class="id">data</span>.<br/>
+<br/>
+<span class="kwd">Notation</span> "⊥" := (<span class="id"><a href="Qcert.Common.Data.RData.html#dunit">dunit</a></span>) : <span class="id">data_scope</span>. <br/>
+<br/>
+<span class="kwd">Notation</span> "[||]" := (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) : <span class="id">data_scope</span>. <br/>
+<span class="kwd">Notation</span> "[| <span class="id">x1</span> ; .. ; <span class="id">xn</span> |]" := (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">RData.drec</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#cons">cons</a></span> <span class="id">x1</span> .. (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#cons">cons</a></span> <span class="id">xn</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) ..)) : <span class="id">data_scope</span>.<br/>
+<br/>
+<span class="kwd">Notation</span> "{||}" := (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) : <span class="id">data_scope</span>. <br/>
+<span class="kwd">Notation</span> "{| <span class="id">x1</span> ; .. ; <span class="id">xn</span> |}" := (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#cons">cons</a></span> <span class="id">x1</span> .. (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#cons">cons</a></span> <span class="id">xn</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) ..)) : <span class="id">data_scope</span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="NRATest">NRATest</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NRA.NRARuntime.html">NRARuntime</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">nraext_scope</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">data_scope</span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html">TrivialModel</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="natcoll_aux">natcoll_aux</a></span> (<span class="id">n</span> <span class="id">n0</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Tests.NRATest.html#n">n</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#O">O</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> <span class="id">n</span>' =&gt; (<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z_of_nat">Z_of_nat</a></span> (<span class="id"><a href="Qcert.Tests.NRATest.html#n0">n0</a></span> - <span class="id"><a href="Qcert.Tests.NRATest.html#n">n</a></span>))) :: (<span class="id"><a href="Qcert.Tests.NRATest.html#natcoll_aux">natcoll_aux</a></span> <span class="id">n</span>' <span class="id"><a href="Qcert.Tests.NRATest.html#n0">n0</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="natcoll">natcoll</a></span> (<span class="id">n</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.Tests.NRATest.html#natcoll_aux">natcoll_aux</a></span> <span class="id"><a href="Qcert.Tests.NRATest.html#n">n</a></span> (<span class="id"><a href="Qcert.Tests.NRATest.html#n">n</a></span>+1))).<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="ex1">ex1</a></span> := [||].   <br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="one_to_ten">one_to_ten</a></span> := (<span class="id"><a href="Qcert.Tests.NRATest.html#natcoll">natcoll</a></span> 10).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="h">h</a></span> := (@<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>)).<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mkperson">mkperson</a></span> (<span class="id">name</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">age</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) (<span class="id">zip</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) (<span class="id">company</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[| ("<span class="id">name</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.Tests.NRATest.html#name">name</a></span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">age</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> <span class="id"><a href="Qcert.Tests.NRATest.html#age">age</a></span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">zip</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> <span class="id"><a href="Qcert.Tests.NRATest.html#zip">zip</a></span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">company</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.Tests.NRATest.html#company">company</a></span>) |].<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mkpersons_aux">mkpersons_aux</a></span> <span class="id">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Tests.NRATest.html#x">x</a></span> <span class="kwd">with</span> (<span class="id">name</span>, <span class="id">age</span>, <span class="id">zip</span>, <span class="id">company</span>) =&gt; <span class="id"><a href="Qcert.Tests.NRATest.html#mkperson">mkperson</a></span> <span class="id">name</span> <span class="id">age</span> <span class="id">zip</span> <span class="id">company</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Tests.NRATest.html#l">l</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="p1">p1</a></span> := <span class="id"><a href="Qcert.Tests.NRATest.html#mkperson">mkperson</a></span> "<span class="id">John</span>" 23 1008 "<span class="id">IBM</span>".<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="p2">p2</a></span> := <span class="id"><a href="Qcert.Tests.NRATest.html#mkperson">mkperson</a></span> "<span class="id">Jane</span>" 24 1009 "<span class="id">AIG</span>".<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="myc">myc</a></span> <span class="id">x1</span> <span class="id">x2</span> :=<br/>
+&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Tests.NRATest.html#x1">x1</a></span>,<span class="id"><a href="Qcert.Tests.NRATest.html#x2">x2</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id">d1</span>, <span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id">d2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id">d1</span> <span class="id">d2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">_</span>,<span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
+&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mkpersons">mkpersons</a></span> <span class="id">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.Tests.NRATest.html#mkpersons_aux">mkpersons_aux</a></span> <span class="id"><a href="Qcert.Tests.NRATest.html#l">l</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="persons">persons</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.NRATest.html#mkpersons">mkpersons</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(("<span class="id">John</span>",23,1008,"<span class="id">IBM</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">Jane</span>",24,1009,"<span class="id">AIG</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">Jill</span>",25,1010,"<span class="id">IBM</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">Jack</span>",27,1010,"<span class="id">CMU</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="companies">companies</a></span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{| [|("<span class="id">cname</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">IBM</span>"); ("<span class="id">stock</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 200); ("<span class="id">ticker</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">IBM</span>") |];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[|("<span class="id">cname</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">AIG</span>"); ("<span class="id">stock</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 20);  ("<span class="id">ticker</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">AIG</span>") |];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[|("<span class="id">cname</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">AMD</span>"); ("<span class="id">stock</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 25);  ("<span class="id">ticker</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">AMD</span>") |] |}.<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tables">tables</a></span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[| ("<span class="id">persons</span>",<span class="id"><a href="Qcert.Tests.NRATest.html#persons">persons</a></span>); ("<span class="id">companies</span>",<span class="id"><a href="Qcert.Tests.NRATest.html#companies">companies</a></span>) |].<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="qtpersons">qtpersons</a></span> := <span class="id">ID</span>·"<span class="id">persons</span>".<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="qtcompanies">qtcompanies</a></span> := <span class="id">ID</span>·"<span class="id">companies</span>".<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nothing">nothing</a></span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> := <span class="id"><a href="Qcert.Common.Data.RData.html#dunit">dunit</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="qpersons">qpersons</a></span> := (<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#AXConst">AXConst</a></span> (<span class="id"><a href="Qcert.Tests.NRATest.html#persons">persons</a></span>)).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="qcompanies">qcompanies</a></span> := (<span class="id"><a href="Qcert.NRA.Lang.NRAExt.html#AXConst">AXConst</a></span> (<span class="id"><a href="Qcert.Tests.NRATest.html#companies">companies</a></span>)).<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q0">q0</a></span> := ♯<span class="id">count</span>(<span class="id">ID</span>).<br/>
+<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id">q0</span>' := ‵<span class="id"><a href="Qcert.Tests.NRATest.html#one_to_ten">one_to_ten</a></span>⌈"<span class="id">n</span>"⌋.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q1">q1</a></span> := χ⟨ <span class="id">ID</span> ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q2">q2</a></span> := χ⟨ <span class="id">ID</span>·"<span class="id">age</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id">q2</span>' := χ⌈"<span class="id">n</span>"⌋⟨ <span class="id">ID</span>·"<span class="id">age</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>).<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q3">q3</a></span> := (σ⟨ ‵‵<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>)).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q4">q4</a></span> := (σ⟨ <span class="id">ID</span>·"<span class="id">age</span>" ≐ ‵‵23 ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>)).<br/>
+<br/>
+<br/>
+&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q5">q5</a></span> := (<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span> × <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span>).<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q6">q6</a></span> := σ⟨ <span class="id">ID</span>·"<span class="id">company</span>" ≐ <span class="id">ID</span>·"<span class="id">cname</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span> × <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span>).<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id">q6</span>' := ⋈⟨ <span class="id">ID</span>·"<span class="id">company</span>" ≐ <span class="id">ID</span>·"<span class="id">cname</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>, <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span>).<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q61">q61</a></span> := ⋉⟨ <span class="id">ID</span>·"<span class="id">company</span>" ≐ <span class="id">ID</span>·"<span class="id">cname</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>, <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span>).<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q62">q62</a></span> := ▷⟨ <span class="id">ID</span>·"<span class="id">company</span>" ≐ <span class="id">ID</span>·"<span class="id">cname</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>, <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span>).<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q7">q7</a></span> := ⋈ᵈ⟨ ‵{|‵[| ("<span class="id">emps</span>", σ⟨ <span class="id">ID</span>·"<span class="id">company</span>" ≐ <span class="id">ID</span>·"<span class="id">cname</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span> × ‵{|<span class="id">ID</span>|})) |]|} ⟩( <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span> ).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q8">q8</a></span> := ⋈ᵈ⟨ ‵{|‵[| ("<span class="id">emp_count</span>",♯<span class="id">count</span>(σ⟨ <span class="id">ID</span>·"<span class="id">company</span>" ≐ <span class="id">ID</span>·"<span class="id">cname</span>" ⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span> × ‵{|<span class="id">ID</span>|}))) |]|} ⟩( <span class="id"><a href="Qcert.Tests.NRATest.html#qcompanies">qcompanies</a></span> ).<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q9">q9</a></span> := Π[](<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q10">q10</a></span> := Π["<span class="id">name</span>"](<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q11">q11</a></span> := Π["<span class="id">name</span>","<span class="id">company</span>"](<span class="id"><a href="Qcert.Tests.NRATest.html#qpersons">qpersons</a></span>).<br/>
+<br/>
+&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q12">q12</a></span> := Π["<span class="id">name</span>","<span class="id">company</span>","<span class="id">cname</span>"](<span class="id">q6</span>').<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q13">q13</a></span> := Π["<span class="id">name</span>","<span class="id">company</span>","<span class="id">cname</span>","<span class="id">stock</span>"](<span class="id">q6</span>').<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q14">q14</a></span> := ¬Π["<span class="id">name</span>"](<span class="id">q6</span>').<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q15">q15</a></span> := ρ[ "<span class="id">name</span>" ↦ "<span class="id">nom</span>" ](<span class="id">q6</span>').<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q16">q16</a></span> := μ["<span class="id">emps</span>"](<span class="id"><a href="Qcert.Tests.NRATest.html#q7">q7</a></span>).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id">q7</span>' := Π["<span class="id">cname</span>","<span class="id">zips</span>"](χ⌈"<span class="id">zips</span>"⌋⟨χ⟨ <span class="id">ID</span>·"<span class="id">zip</span>" ⟩(<span class="id">ID</span>·"<span class="id">emps</span>")⟩(<span class="id"><a href="Qcert.Tests.NRATest.html#q7">q7</a></span>)).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q17">q17</a></span> := μ["<span class="id">zips</span>"]["<span class="id">zip</span>"](<span class="id">q7</span>').<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="q18">q18</a></span> := Γ["<span class="id">g</span>"]["<span class="id">cname</span>"](<span class="id">q6</span>').<br/>
+<br/>
+<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Tests.NRATest.html#NRATest">NRATest</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

@@ -1,0 +1,61 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Compiler.QLib.QCAMPRule</title>
+<meta name="description" content="Documentation of Coq module Qcert.Compiler.QLib.QCAMPRule" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Compiler.QLib.QCAMPRule</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html">CompilerRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.Compiler.QLib.QOperators.html">QOperators</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QData.html">QData</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMP.html">QCAMP</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.CAMPRule.CAMPRuleRuntime.html">CAMPRuleRuntime</a></span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="QCAMPRule">QCAMPRule</a></span>(<span class="id">runtime</span>:<span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html#CompilerRuntime">CompilerRuntime</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QCAMPRule.Data">Data</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QData.html#QData">QData.QData</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QCAMPRule.Ops">Ops</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QOperators.html#QOperators">QOperators.QOperators</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QCAMPRule.CAMP">CAMP</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QCAMP.html#QCAMP">QCAMP.QCAMP</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#runtime">runtime</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.camp_rule">camp_rule</a></span> : <span class="kwd">Set</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">CAMPRule.camp_rule</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.t">t</a></span> : <span class="kwd">Set</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.rule_when">rule_when</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_when">CAMPRule.rule_when</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.rule_global">rule_global</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_global">CAMPRule.rule_global</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.rule_not">rule_not</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_not">CAMPRule.rule_not</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.rule_return">rule_return</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_return">CAMPRule.rule_return</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.rule_match">rule_match</a></span> : <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_match">CAMPRule.rule_match</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.aggregate">aggregate</a></span> : (<span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp_rule">camp_rule</a></span>) -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.op">Ops.Unary.op</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRuleSugar.html#aggregate">CAMPRuleSugar.aggregate</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.instanceOf">instanceOf</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">BrandRelation.brands</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRuleSugar.html#instanceOf">CAMPRuleSugar.instanceOf</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.matches">matches</a></span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">BrandRelation.brands</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRuleSugar.html#matches">CAMPRuleSugar.matches</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QCAMPRule.fetchRef">fetchRef</a></span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brands">BrandRelation.brands</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule.camp">CAMP.camp</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRuleSugar.html#fetchRef">CAMPRuleSugar.fetchRef</a></span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule">QCAMPRule</a></span>.<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

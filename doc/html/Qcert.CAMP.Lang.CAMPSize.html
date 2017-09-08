@@ -1,0 +1,53 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.CAMP.Lang.CAMPSize</title>
+<meta name="description" content="Documentation of Coq module Qcert.CAMP.Lang.CAMPSize" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.CAMP.Lang.CAMPSize</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="CAMPSize">CAMPSize</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.omega.Omega.html">Omega</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html">CAMP</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="camp_size">camp_size</a></span> (<span class="id">p</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp">camp</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#p">p</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pconst">pconst</a></span> <span class="id">d</span>' =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#punop">punop</a></span> <span class="id">op</span> <span class="id">p</span>₁ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pbinop">pbinop</a></span> <span class="id">op</span> <span class="id">p</span>₁ <span class="id">p</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁ + <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pmap">pmap</a></span> <span class="id">p</span>₁ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#passert">passert</a></span> <span class="id">p</span>₁ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#porElse">porElse</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁ + <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pit">pit</a></span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pletIt">pletIt</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁ + <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pgetConstant">pgetConstant</a></span> <span class="id">_</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#penv">penv</a></span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pletEnv">pletEnv</a></span> <span class="id">p</span>₁ <span class="id">p</span>₂ =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₁ + <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id">p</span>₂)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pleft">pleft</a></span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#pright">pright</a></span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_size_nzero">camp_size_nzero</a></span> (<span class="id">a</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp">camp</a></span>) : <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#a">a</a></span> &lt;&gt; 0.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2681')">Proof.</div>
+<div class="proofscript" id="proof2681">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#CAMPSize">CAMPSize</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

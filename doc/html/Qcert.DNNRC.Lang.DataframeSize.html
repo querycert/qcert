@@ -1,0 +1,71 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.DNNRC.Lang.DataframeSize</title>
+<meta name="description" content="Documentation of Coq module Qcert.DNNRC.Lang.DataframeSize" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.DNNRC.Lang.DataframeSize</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="DataframeSize">DataframeSize</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.omega.Omega.html">Omega</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonSystem.html">CommonSystem</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html">Dataframe</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftype</span>: <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="column_size">column_size</a></span> (<span class="id">c</span>:<span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#column">column</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#c">c</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CCol">CCol</a></span> <span class="id">_</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CDot">CDot</a></span> <span class="id">_</span> <span class="id">c0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CLit">CLit</a></span> <span class="id">_</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CPlus">CPlus</a></span> <span class="id">c1</span> <span class="id">c2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c1</span> + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CEq">CEq</a></span> <span class="id">c1</span> <span class="id">c2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c1</span> + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CLessThan">CLessThan</a></span>  <span class="id">c1</span> <span class="id">c2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c1</span> + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CNeg">CNeg</a></span> <span class="id">c0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CToString">CToString</a></span> <span class="id">c0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CSConcat">CSConcat</a></span> <span class="id">c1</span> <span class="id">c2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c1</span> + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CUDFCast">CUDFCast</a></span> <span class="id">_</span> <span class="id">c0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#CUDFUnbrand">CUDFUnbrand</a></span> <span class="id">_</span> <span class="id">c0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="dataframe_size">dataframe_size</a></span> (<span class="id">d</span>:<span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#dataframe">dataframe</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#d">d</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#DSVar">DSVar</a></span> <span class="id">_</span> =&gt; 1<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#DSSelect">DSSelect</a></span> <span class="id">scl</span> <span class="id">d0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> ( <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_left">fold_left</a></span> (<span class="kwd">fun</span> <span class="id">acc</span> <span class="id">sc</span> =&gt; <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#sc">sc</a></span>) + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#acc">acc</a></span>) <span class="id">scl</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#dataframe_size">dataframe_size</a></span> <span class="id">d0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#DSFilter">DSFilter</a></span> <span class="id">c0</span> <span class="id">d0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id">c0</span> + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#dataframe_size">dataframe_size</a></span> <span class="id">d0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#DSCartesian">DSCartesian</a></span> <span class="id">d1</span> <span class="id">d2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#dataframe_size">dataframe_size</a></span> <span class="id">d1</span> + <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#dataframe_size">dataframe_size</a></span> <span class="id">d2</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#DSExplode">DSExplode</a></span> <span class="id">_</span> <span class="id">d0</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#S">S</a></span> (<span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#dataframe_size">dataframe_size</a></span> <span class="id">d0</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="column_size_nzero">column_size_nzero</a></span> (<span class="id">c</span>:<span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#column">column</a></span>) : <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#column_size">column_size</a></span> <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#c">c</a></span> &lt;&gt; 0.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2654')">Proof.</div>
+<div class="proofscript" id="proof2654">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">c</span>; <span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dataframe_size_nzero">dataframe_size_nzero</a></span> (<span class="id">d</span>:<span class="id"><a href="Qcert.DNNRC.Lang.Dataframe.html#dataframe">dataframe</a></span>) : <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#dataframe_size">dataframe_size</a></span> <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#d">d</a></span> &lt;&gt; 0.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof2655')">Proof.</div>
+<div class="proofscript" id="proof2655">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.DNNRC.Lang.DataframeSize.html#DataframeSize">DataframeSize</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

@@ -1,0 +1,279 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Compiler.Model.SqlDateModelPart</title>
+<meta name="description" content="Documentation of Coq module Qcert.Compiler.Model.SqlDateModelPart" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Compiler.Model.SqlDateModelPart</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html">Equivalence</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.ForeignData.html">ForeignData</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html">ForeignOps</a></span>.<br/>
+<br/>
+<div class="doc">Extraction to OCaml is currently a stub *</div>
+<br/>
+<br/>
+<div class="doc">Defines the foreign support for sql dates
+     Posits axioms for the basic data/operators, and 
+     defines how they are extracted to ocaml (using helper functions
+     defined in qcert/ocaml/...../Util.ml)
+     </div>
+<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span> : <span class="kwd">Set</span>.<br/>
+<span class="id">Extract</span> <span class="id">Constant</span> <span class="id">SQL_DATE_INTERVAL</span> =&gt; "<span class="id">string</span>".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_INTERVAL_eq">SQL_DATE_INTERVAL_eq</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_INTERVAL_eq</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> = <span class="id">y</span>)".<br/>
+<br/>
+<span class="id">Conjecture</span> <span class="id"><a name="SQL_DATE_INTERVAL_eq_correct">SQL_DATE_INTERVAL_eq_correct</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f1</span> <span class="id">f2</span>, (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_eq">SQL_DATE_INTERVAL_eq</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f1">f1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f2">f2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f1">f1</a></span> = <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f2">f2</a></span>).<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_INTERVAL_tostring">SQL_DATE_INTERVAL_tostring</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_INTERVAL_tostring</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> -&gt; <span class="id">Util.char_list_of_string</span> <span class="id">x</span>)".<br/>
+<br/>
+<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="sql_date_interval_foreign_data">sql_date_interval_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
+&nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3046')">Next Obligation.</div>
+<div class="proofscript" id="proof3046">
+&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
+&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_eq">SQL_DATE_INTERVAL_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
+&nbsp;&nbsp;+ <span class="id">left</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_eq_correct">SQL_DATE_INTERVAL_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;+ <span class="id">right</span>; <span class="tactic">intros</span> <span class="id">eqq2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span> <span class="kwd">in</span> <span class="id">eqq2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_eq_correct">SQL_DATE_INTERVAL_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3047')">Next Obligation.</div>
+<div class="proofscript" id="proof3047">
+&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3048')">Next Obligation.</div>
+<div class="proofscript" id="proof3048">
+&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3049')">Next Obligation.</div>
+<div class="proofscript" id="proof3049">
+&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_tostring">SQL_DATE_INTERVAL_tostring</a></span> <span class="id">f</span>).<br/>
+Defined.</div>
+<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE">SQL_DATE</a></span> : <span class="kwd">Set</span>.<br/>
+<span class="id">Extract</span> <span class="id">Constant</span> <span class="id">SQL_DATE</span> =&gt; "<span class="id">string</span>".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_eq">SQL_DATE_eq</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_eq</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> = <span class="id">y</span>)".<br/>
+<br/>
+<span class="id">Conjecture</span> <span class="id"><a name="SQL_DATE_eq_correct">SQL_DATE_eq_correct</a></span> :<br/>
+&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f1</span> <span class="id">f2</span>, (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_eq">SQL_DATE_eq</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f1">f1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f2">f2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f1">f1</a></span> = <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f2">f2</a></span>).<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_tostring">SQL_DATE_tostring</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_tostring</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> -&gt; <span class="id">Util.char_list_of_string</span> <span class="id">x</span>)".<br/>
+<br/>
+<span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="sql_date_foreign_data">sql_date_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
+&nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3050')">Next Obligation.</div>
+<div class="proofscript" id="proof3050">
+&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
+&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_eq">SQL_DATE_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
+&nbsp;&nbsp;+ <span class="id">left</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">f_equal</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_eq_correct">SQL_DATE_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;+ <span class="id">right</span>; <span class="tactic">intros</span> <span class="id">eqq2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span> <span class="kwd">in</span> <span class="id">eqq2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_eq_correct">SQL_DATE_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3051')">Next Obligation.</div>
+<div class="proofscript" id="proof3051">
+&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3052')">Next Obligation.</div>
+<div class="proofscript" id="proof3052">
+&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3053')">Next Obligation.</div>
+<div class="proofscript" id="proof3053">
+&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
+&nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_tostring">SQL_DATE_tostring</a></span> <span class="id">f</span>).<br/>
+Defined.</div>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_from_string">SQL_DATE_from_string</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_from_string</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> -&gt; <span class="id">Util.string_of_char_list</span> <span class="id">x</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_INTERVAL_from_string">SQL_DATE_INTERVAL_from_string</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_INTERVAL_from_string</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> -&gt; <span class="id">Util.string_of_char_list</span> <span class="id">x</span>)".<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="sql_date_component">sql_date_component</a></span><br/>
+&nbsp;&nbsp;:=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="sql_date_DAY">sql_date_DAY</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="sql_date_MONTH">sql_date_MONTH</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="sql_date_YEAR">sql_date_YEAR</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_component_tostring">sql_date_component_tostring</a></span> (<span class="id">part</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component">sql_date_component</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#part">part</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_DAY">sql_date_DAY</a></span> =&gt; "<span class="id">DAY</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_MONTH">sql_date_MONTH</a></span> =&gt; "<span class="id">MONTH</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_YEAR">sql_date_YEAR</a></span> =&gt; "<span class="id">YEAR</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sql_date_component_to_string">sql_date_component_to_string</a></span> : <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#ToString">ToString</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component">sql_date_component</a></span><br/>
+&nbsp;&nbsp;:= { <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> := <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component_tostring">sql_date_component_tostring</a></span> }.<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_get_component">SQL_DATE_get_component</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component">sql_date_component</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_get_component</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; 0)".<br/>
+&nbsp;&nbsp;<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="sql_date_unary_op">sql_date_unary_op</a></span><br/>
+&nbsp;&nbsp;:=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="uop_sql_get_date_component">uop_sql_get_date_component</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component">sql_date_component</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_unary_op">sql_date_unary_op</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="uop_sql_date_from_string">uop_sql_date_from_string</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="uop_sql_date_interval_from_string">uop_sql_date_interval_from_string</a></span><br/>
+.<br/>
+<br/>
+<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_unary_op_tostring">sql_date_unary_op_tostring</a></span> (<span class="id">f</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_unary_op">sql_date_unary_op</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f">f</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_get_date_component">uop_sql_get_date_component</a></span> <span class="id">part</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"(<span class="id">ASqlGetDateComponent</span>" ++ (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component_tostring">sql_date_component_tostring</a></span> <span class="id">part</span>) ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_date_from_string">uop_sql_date_from_string</a></span> =&gt; "<span class="id">ASqlDateFromString</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_date_interval_from_string">uop_sql_date_interval_from_string</a></span> =&gt; "<span class="id">ASqlDateDurationFromString</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Translation.ForeignToJava.html">ForeignToJava</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoJava.html">NNRCtoJava</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_component_to_java_string">sql_date_component_to_java_string</a></span> (<span class="id">part</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component">sql_date_component</a></span>): <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#part">part</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_DAY">sql_date_DAY</a></span> =&gt; "<span class="id">UnaryOperators.DAY</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_MONTH">sql_date_MONTH</a></span> =&gt; "<span class="id">UnaryOperators.MONTH</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_YEAR">sql_date_YEAR</a></span> =&gt; "<span class="id">UnaryOperators.YEAR</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_to_java_unary_op">sql_date_to_java_unary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">indent</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">eol</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">quotel</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>) (<span class="id">fu</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_unary_op">sql_date_unary_op</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">d</span>:<span class="id"><a href="Qcert.Translation.ForeignToJava.html#java_json">java_json</a></span>) : <span class="id"><a href="Qcert.Translation.ForeignToJava.html#java_json">java_json</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#fu">fu</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_get_date_component">uop_sql_get_date_component</a></span> <span class="id">part</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_unary_op1">mk_java_unary_op1</a></span> "<span class="id">sql_get_date_component</span>" (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_component_to_java_string">sql_date_component_to_java_string</a></span> <span class="id">part</span>) <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d">d</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_date_from_string">uop_sql_date_from_string</a></span> =&gt; <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_unary_op0">mk_java_unary_op0</a></span> "<span class="id">sql_date_from_string</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d">d</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_date_interval_from_string">uop_sql_date_interval_from_string</a></span> =&gt; <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_unary_op0">mk_java_unary_op0</a></span> "<span class="id">sql_date_interval_from_string</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d">d</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_to_javascript_unary_op">sql_date_to_javascript_unary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">indent</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">eol</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">quotel</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>) (<span class="id">fu</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_unary_op">sql_date_unary_op</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">d</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#fu">fu</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_get_date_component">uop_sql_get_date_component</a></span> <span class="id">part</span>=&gt; "<span class="id">sqlGetDateComponent</span>(" ++ (<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">part</span>) ++ ", " ++ <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d">d</a></span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_date_from_string">uop_sql_date_from_string</a></span> =&gt; "<span class="id">sqlDateFromString</span>(" ++ <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d">d</a></span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#uop_sql_date_interval_from_string">uop_sql_date_interval_from_string</a></span> =&gt; "<span class="id">sqlDateDurationFromString</span>(" ++ <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d">d</a></span> ++ ")"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_plus">SQL_DATE_plus</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_plus</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_minus">SQL_DATE_minus</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_minus</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_ne">SQL_DATE_ne</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_ne</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> &lt;&gt; <span class="id">y</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_lt">SQL_DATE_lt</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_lt</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> &lt; <span class="id">y</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_le">SQL_DATE_le</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_le</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> &lt;= <span class="id">y</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_gt">SQL_DATE_gt</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_gt</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> &gt; <span class="id">y</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_ge">SQL_DATE_ge</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#bool">bool</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_ge</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; <span class="id">x</span> &gt;= <span class="id">y</span>)".<br/>
+<br/>
+<span class="kwd">Axiom</span> <span class="id"><a name="SQL_DATE_INTERVAL_between">SQL_DATE_INTERVAL_between</a></span> : <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span> -&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span>.<br/>
+<span class="id">Extract</span> <span class="id">Inlined</span> <span class="id">Constant</span> <span class="id">SQL_DATE_INTERVAL_between</span> =&gt; "(<span class="kwd">fun</span> <span class="id">x</span> <span class="id">y</span> -&gt; """")".<br/>
+<br/>
+<span class="kwd">Inductive</span> <span class="id"><a name="sql_date_binary_op">sql_date_binary_op</a></span><br/>
+&nbsp;&nbsp;:=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_plus">bop_sql_date_plus</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_minus">bop_sql_date_minus</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_ne">bop_sql_date_ne</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_lt">bop_sql_date_lt</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_le">bop_sql_date_le</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_gt">bop_sql_date_gt</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_ge">bop_sql_date_ge</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="bop_sql_date_interval_between">bop_sql_date_interval_between</a></span><br/>
+.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_binary_op_tostring">sql_date_binary_op_tostring</a></span> (<span class="id">f</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_binary_op">sql_date_binary_op</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#f">f</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_plus">bop_sql_date_plus</a></span> =&gt; "<span class="id">ASqlDatePlus</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_minus">bop_sql_date_minus</a></span> =&gt; "<span class="id">ASqlDateMinus</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_ne">bop_sql_date_ne</a></span> =&gt; "<span class="id">ASqlDateNe</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_lt">bop_sql_date_lt</a></span> =&gt; "<span class="id">ASqlDateLt</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_le">bop_sql_date_le</a></span> =&gt; "<span class="id">ASqlDateLe</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_gt">bop_sql_date_gt</a></span> =&gt; "<span class="id">ASqlDateGt</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_ge">bop_sql_date_ge</a></span> =&gt; "<span class="id">ASqlDateGe</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_interval_between">bop_sql_date_interval_between</a></span> =&gt; "<span class="id">ASqlDateDurationBetween</span>"<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="jsFunc">jsFunc</a></span> (<span class="id">name</span> <span class="id">d1</span> <span class="id">d2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>)<br/>
+&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#name">name</a></span> ++ "(" ++ <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> ++ ", " ++ <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span> ++ ")".<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_to_java_binary_op">sql_date_to_java_binary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">indent</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">eol</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">quotel</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>) (<span class="id">fb</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_binary_op">sql_date_binary_op</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">d1</span> <span class="id">d2</span>:<span class="id"><a href="Qcert.Translation.ForeignToJava.html#java_json">java_json</a></span>) : <span class="id"><a href="Qcert.Translation.ForeignToJava.html#java_json">java_json</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#fb">fb</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_plus">bop_sql_date_plus</a></span> =&gt; <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_plus</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_minus">bop_sql_date_minus</a></span> =&gt; <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_minus</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_ne">bop_sql_date_ne</a></span> =&gt;  <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_ne</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_lt">bop_sql_date_lt</a></span> =&gt;  <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_lt</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_le">bop_sql_date_le</a></span> =&gt;  <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_le</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_gt">bop_sql_date_gt</a></span> =&gt;  <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_gt</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_ge">bop_sql_date_ge</a></span> =&gt; <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_ge</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_interval_between">bop_sql_date_interval_between</a></span> =&gt; <span class="id"><a href="Qcert.Translation.NNRCtoJava.html#mk_java_binary_op0">mk_java_binary_op0</a></span> "<span class="id">sql_date_interval_between</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="sql_date_to_javascript_binary_op">sql_date_to_javascript_binary_op</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">indent</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nat">nat</a></span>) (<span class="id">eol</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">quotel</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>) (<span class="id">fb</span>:<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_binary_op">sql_date_binary_op</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">d1</span> <span class="id">d2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">String.string</a></span><br/>
+&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#fb">fb</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_plus">bop_sql_date_plus</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointPlus</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_minus">bop_sql_date_minus</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointMinus</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_ne">bop_sql_date_ne</a></span> =&gt;  <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointNe</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_lt">bop_sql_date_lt</a></span> =&gt;  <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointLt</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_le">bop_sql_date_le</a></span> =&gt;  <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointLe</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_gt">bop_sql_date_gt</a></span> =&gt;  <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointGt</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_ge">bop_sql_date_ge</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDatePointGe</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#bop_sql_date_interval_between">bop_sql_date_interval_between</a></span> =&gt; <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#jsFunc">jsFunc</a></span> "<span class="id">sqlDateDurationBetween</span>" <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d1">d1</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#d2">d2</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.  <br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Compiler.QLib</title>
+<meta name="description" content="Documentation of Coq module Qcert.Compiler.QLib" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Compiler.QLib</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html">CompilerRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.Compiler.QLib.QData.html">QData</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QOperators.html">QOperators</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.Compiler.QLib.QOQL.html">QOQL</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QSQL.html">QSQL</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QSQLPP.html">QSQLPP</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QLambdaNRA.html">QLambdaNRA</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMP.html">QCAMP</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html">QCAMPRule</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html">QUtil</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QType.html">QType</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QEval.html">QEval</a></span>.<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.Compiler.QLib.QLang.html">QLang</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QDriver.html">QDriver</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QStat.html">QStat</a></span>. <br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="QLib">QLib</a></span>(<span class="id">runtime</span>:<span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html#CompilerRuntime">CompilerRuntime</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QType">QType</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QType.html#QType">QType.QType</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QData">QData</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QData.html#QData">QData.QData</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QOps">QOps</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QOperators.html#QOperators">QOperators.QOperators</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QOQL">QOQL</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QOQL.html#QOQL">QOQL.QOQL</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QSQL">QSQL</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QSQL.html#QSQL">QSQL.QSQL</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QSQLPP">QSQLPP</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QSQLPP.html#QSQLPP">QSQLPP.QSQLPP</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QLambdaNRA">QLambdaNRA</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QLambdaNRA.html#QLambdaNRA">QLambdaNRA.QLambdaNRA</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QCAMP">QCAMP</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QCAMP.html#QCAMP">QCAMP.QCAMP</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QCAMPRule">QCAMPRule</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QCAMPRule.html#QCAMPRule">QCAMPRule.QCAMPRule</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QLang">QLang</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QLang.html#QLang">QLang.QLang</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QDriver">QDriver</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QDriver.html#QDriver">QDriver.QDriver</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QStat">QStat</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QStat.html#QStat">QStat.QStat</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QUtil">QUtil</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#QUtil">QUtil.QUtil</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="QLib.QEval">QEval</a></span> := <span class="id"><a href="Qcert.Compiler.QLib.QEval.html#QEval">QEval.QEval</a></span> <span class="id"><a href="Qcert.Compiler.QLib.html#runtime">runtime</a></span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.QLib.html#QLib">QLib</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

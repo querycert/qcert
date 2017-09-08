@@ -1,0 +1,46 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Compiler.QLib.QUtil</title>
+<meta name="description" content="Documentation of Coq module Qcert.Compiler.QLib.QUtil" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Compiler.QLib.QUtil</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html">CompilerRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NNRCMR.NNRCMRRuntime.html">NNRCMRRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.tDNNRC.tDNNRCRuntime.html">tDNNRCRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Driver.CompEnv.html">CompEnv</a></span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="QUtil">QUtil</a></span>(<span class="id">runtime</span>:<span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html#CompilerRuntime">CompilerRuntime</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.mr_reduce_empty">mr_reduce_empty</a></span> := <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_reduce_empty">mr_reduce_empty</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.type_annotation">type_annotation</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">A</span>:<span class="kwd">Set</span>): <span class="kwd">Set</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#type_annotation">tDNNRC.type_annotation</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#A">A</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.ta_base">ta_base</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">A</span>:<span class="kwd">Set</span>) (<span class="id">ta</span>:<span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#QUtil.type_annotation">type_annotation</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#A">A</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#ta_base">tDNNRC.ta_base</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#ta">ta</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.ta_inferred">ta_inferred</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">A</span>:<span class="kwd">Set</span>) (<span class="id">ta</span>:<span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#QUtil.type_annotation">type_annotation</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#A">A</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#ta_inferred">tDNNRC.ta_inferred</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#ta">ta</a></span> .<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.ta_required">ta_required</a></span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>} (<span class="id">A</span>:<span class="kwd">Set</span>) (<span class="id">ta</span>:<span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#QUtil.type_annotation">type_annotation</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#A">A</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.tDNNRC.Lang.tDNNRC.html#ta_required">tDNNRC.ta_required</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#ta">ta</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.validate_lifted_success">validate_lifted_success</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompEnv.html#validate_lifted_success">validate_lifted_success</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="QUtil.mkDistWorld">mkDistWorld</a></span> <span class="id">env</span> := <span class="id"><a href="Qcert.Common.Env.DConstants.html#mkDistWorld">mkDistWorld</a></span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#env">env</a></span>.<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Compiler.QLib.QUtil.html#QUtil">QUtil</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

@@ -1,0 +1,104 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.NRA.Lang.NRASugar</title>
+<meta name="description" content="Documentation of Coq module Qcert.NRA.Lang.NRASugar" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.NRA.Lang.NRASugar</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="NRASugar">NRASugar</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html">Compare_dec</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonRuntime.html">CommonRuntime</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.NRA.Lang.NRA.html">NRA</a></span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string_scope</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_bind">nra_bind</a></span> := <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PBIND</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_data">nra_data</a></span> := <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PDATA</span>") <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_data_op">nra_data_op</a></span> <span class="id">op</span> := <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> "<span class="id">PDATA</span>") <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#op">op</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_fail">nra_fail</a></span> := <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AConst">AConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_match">nra_match</a></span> <span class="id">op</span> := <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AColl">AColl</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#op">op</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_double">nra_double</a></span> <span class="id">s1</span> <span class="id">s2</span> (<span class="id">abind</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) (<span class="id">adata</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRA.html#ABinop">ABinop</a></span> <span class="id"><a href="Qcert.Common.Operators.RBinaryOps.html#AConcat">AConcat</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#s1">s1</a></span>) <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#abind">abind</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#s2">s2</a></span>) <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#adata">adata</a></span>).<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_context">nra_context</a></span> (<span class="id">abind</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) (<span class="id">adata</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_double">nra_double</a></span> "<span class="id">PBIND</span>" "<span class="id">PDATA</span>" <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#abind">abind</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#adata">adata</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_withbinding">nra_withbinding</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context">nra_context</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_bind">nra_bind</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_bind">nra_bind</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_context_data">nra_context_data</a></span> <span class="id">dbind</span> <span class="id">dpid</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> (("<span class="id">PBIND</span>",<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#dbind">dbind</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::("<span class="id">PDATA</span>",<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#dpid">dpid</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="make_fixed_nra_context_data">make_fixed_nra_context_data</a></span> (<span class="id">env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) : <span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.NRA.Lang.NRA.html#ABinop">ABinop</a></span> <span class="id"><a href="Qcert.Common.Operators.RBinaryOps.html#AConcat">AConcat</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> "<span class="id">PBIND</span>"%<span class="id">string</span>) (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AConst">AConst</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#env">env</a></span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRA.Lang.NRA.html#AUnop">AUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> "<span class="id">PDATA</span>"%<span class="id">string</span>) <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_wrap">nra_wrap</a></span> <span class="id">op</span>  :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_double">nra_double</a></span> "<span class="id">PBIND</span>" "<span class="id">PDATA</span>" <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_bind">nra_bind</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#op">op</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_wrap_a1">nra_wrap_a1</a></span> <span class="id">op</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_double">nra_double</a></span> "<span class="id">PBIND</span>" "<span class="id">a1</span>" <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_bind">nra_bind</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#op">op</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_wrap_bind_a1">nra_wrap_bind_a1</a></span> <span class="id">op</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_double">nra_double</a></span> "<span class="id">a1</span>" "<span class="id">PDATA</span>" <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_bind">nra_bind</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#op">op</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_wrap_with_bind">nra_wrap_with_bind</a></span> <span class="id">op1</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context">nra_context</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#op1">op1</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRA.html#AID">AID</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nra_project_wrap">nra_project_wrap</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_wrap_with_bind">nra_wrap_with_bind</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_fail">nra_fail</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_nra_context_data">data_normalized_nra_context_data</a></span> <span class="id">h</span> <span class="id">env</span> <span class="id">d</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#h">h</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#env">env</a></span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#h">h</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#d">d</a></span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#h">h</a></span> (<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#env">env</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#d">d</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1498')">Proof.</div>
+<div class="proofscript" id="proof1498">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> (<span class="id">constructor</span>; <span class="tactic">simpl</span>; <span class="tactic">eauto</span>).<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_nra_context_data_inv">data_normalized_nra_context_data_inv</a></span> <span class="id">h</span> <span class="id">env</span> <span class="id">d</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#h">h</a></span> (<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#env">env</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#d">d</a></span>) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#h">h</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#env">env</a></span> /\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#h">h</a></span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#d">d</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1499')">Proof.</div>
+<div class="proofscript" id="proof1499">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">clear</span> <span class="id">H</span>; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H1</span>; <span class="tactic">clear</span> <span class="id">H1</span>; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H4</span>; <span class="tactic">clear</span> <span class="id">H4</span>; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H5</span>; <span class="tactic">clear</span> <span class="id">H5</span>; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">tauto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#NRASugar">NRASugar</a></span>.<br/>
+<br/>
+<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">data_normalized_nra_context_data</span>.  <br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

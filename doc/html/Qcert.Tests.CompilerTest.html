@@ -1,0 +1,225 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Tests.CompilerTest</title>
+<meta name="description" content="Documentation of Coq module Qcert.Tests.CompilerTest" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Tests.CompilerTest</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
+<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string</span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+<span class="kwd">Import</span> <span class="id">ListNotations</span>.<br/>
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonSystem.html">CommonSystem</a></span> <span class="id"><a href="Qcert.CAMP.CAMPRuntime.html">CAMPRuntime</a></span> <span class="id"><a href="Qcert.CAMPRule.CAMPRuleRuntime.html">CAMPRuleRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html">TrivialModel</a></span>.<br/>
+<br/>
+<span class="kwd">Require</span> <span class="id"><a href="Qcert.Compiler.Model.CompilerRuntime.html">CompilerRuntime</a></span>.<br/>
+<br/>
+<span class="kwd">Definition</span> <span class="id"><a name="CPRModel">CPRModel</a></span> := ("<span class="id">MainEntity</span>", "<span class="id">Entity</span>") :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>.<br/>
+<span class="kwd">Instance</span> <span class="id"><a name="CPRModel_relation">CPRModel_relation</a></span> : <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span><br/>
+&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#mkBrand_relation">mkBrand_relation</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPRModel">CPRModel</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span> <span class="id">_</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span> <span class="id">_</span>).<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="TR">TR</a></span> := <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#TrivialRuntime">TrivialRuntime</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html">CompLang</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html">CompDriver</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="CompilerUntypedTest">CompilerUntypedTest</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">camp_scope</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Local</span> <span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">string</span>.<br/>
+<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="makeMainEntity">makeMainEntity</a></span> (<span class="id">db</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) (<span class="id">id</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">i</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#class">class</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> [("<span class="id">doubleAttribute</span>",<span class="id"><a href="Qcert.Common.Data.RData.html#dconst">dconst</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#db">db</a></span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">intAttribute</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dconst">dconst</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#i">i</a></span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">id</span>",<span class="id"><a href="Qcert.Common.Data.RData.html#dconst">dconst</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#id">id</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="MainEntity">MainEntity</a></span> (<span class="id">inp</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>*<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#inp">inp</a></span>)) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#inp">inp</a></span>)) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#inp">inp</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="exampleWM">exampleWM</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= [<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> 120 "<span class="id">string1</span>" 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> 50 "<span class="id">string2</span>" 2;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> 125 "<span class="id">string3</span>" 3;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> 50 "<span class="id">string4</span>" 4].<br/>
+<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id">Example1</span>' :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">total</span>-<span class="id">attribute</span>" <span class="id">IS</span> <span class="id">AGGREGATE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_when">rule_when</a></span> ("<span class="id">e</span>" <span class="id">INSTANCEOF</span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>") <span class="id">WHERE</span> ("<span class="id">doubleAttribute</span>" !#-&gt; … ≐ ‵50)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">DO</span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ACount">ACount</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">OVER</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#withVar">withVar</a></span> "<span class="id">e</span>" …)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">FLATTEN</span> 0).<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="Example1">Example1</a></span> := <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_global">rule_global</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">total</span>-<span class="id">attribute</span>" <span class="id">IS</span> <span class="id">AGGREGATE</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_when">rule_when</a></span> ("<span class="id">e</span>" <span class="id">INSTANCEOF</span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>") <span class="id">WHERE</span> ("<span class="id">doubleAttribute</span>" !#-&gt; … ≐ ‵50)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">DO</span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ACount">ACount</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">OVER</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#withVar">withVar</a></span> "<span class="id">e</span>" …)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">FLATTEN</span> 0)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;; <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#rule_return">rule_return</a></span> (‵"<span class="id">MainEntitys</span> <span class="kwd">with</span> <span class="id">doubleAttribute</span> 50: "<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+<span class="id">s</span>+ <span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#toString">toString</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#lookup">lookup</a></span> "<span class="id">total</span>-<span class="id">attribute</span>")).<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="Example1_result">Example1_result</a></span> := <span class="id"><a href="Qcert.CAMPRule.Lang.CAMPRule.html#eval_camp_rule">eval_camp_rule</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#Example1">Example1</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#exampleWM">exampleWM</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="Example1_expected">Example1_expected</a></span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#dconst">dconst</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;["<span class="id">MainEntitys</span> <span class="kwd">with</span> <span class="id">doubleAttribute</span> 50: 2"].<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="camp5">camp5</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp">camp</a></span> := <span class="kwd">Eval</span> <span class="tactic">compute</span> <span class="kwd">in</span> <span class="id">Example1</span>'.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="algopt5">algopt5</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv_core">nraenv_core</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv_core">camp_to_nraenv_core</a></span> <span class="id">Example1</span>'.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="rcamp5">rcamp5</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#camp_rule">camp_rule</a></span> := <span class="kwd">Eval</span> <span class="tactic">compute</span> <span class="kwd">in</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#Example1">Example1</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="ralgopt5">ralgopt5</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nraenv">nraenv</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_rule_to_nraenv_optim">camp_rule_to_nraenv_optim</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#Example1">Example1</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="rnnrc5">rnnrc5</a></span> : <span class="id"><a href="Qcert.Compiler.Driver.CompLang.html#nnrc">nnrc</a></span> := <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_rule_to_nnrc_optim">camp_rule_to_nnrc_optim</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#Example1">Example1</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="inp1">inp1</a></span> : (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>)) := (("<span class="id">WORLD</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#exampleWM">exampleWM</a></span>)::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="inp2">inp2</a></span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> := <span class="id"><a href="Qcert.Common.Data.RData.html#dunit">dunit</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CompilerUntypedTest">CompilerUntypedTest</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Section</span> <span class="id"><a name="CompilerBrandModelTest">CompilerBrandModelTest</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="MainEntityDataType">MainEntityDataType</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> (("<span class="id">doubleAttribute</span>", <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>) :: ("<span class="id">id</span>", <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>) :: ("<span class="id">intAttribute</span>", <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id">_</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="EntityType">EntityType</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="kwd">Open</span> [] <span class="id">_</span>.<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="CPTModelTypes">CPTModelTypes</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[("<span class="id">Entity</span>", <span class="id"><a href="Qcert.Tests.CompilerTest.html#EntityType">EntityType</a></span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;("<span class="id">MainEntity</span>", <span class="id"><a href="Qcert.Tests.CompilerTest.html#MainEntityDataType">MainEntityDataType</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;].<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="CPTModel">CPTModel</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= @<span class="id"><a href="Qcert.Common.TypeSystem.TBrandContext.html#mkBrand_context">mkBrand_context</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPRModel_relation">CPRModel_relation</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPTModelTypes">CPTModelTypes</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span> <span class="id">_</span>).<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Instance</span> <span class="id"><a name="CPModel">CPModel</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#mkBrand_model">mkBrand_model</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPRModel_relation">CPRModel_relation</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPTModel">CPTModel</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span> <span class="id">_</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span> <span class="id">_</span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CompilerBrandModelTest">CompilerBrandModelTest</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Compiler.Model.CompilerModel.html">CompilerModel</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="MyBrandModel">MyBrandModel</a></span> &lt;: <span class="id"><a href="Qcert.Compiler.Model.CompilerModel.html#CompilerBrandModel">CompilerBrandModel</a></span>(<span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#TrivialForeignType">TrivialForeignType</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="MyBrandModel.compiler_brand_model">compiler_brand_model</a></span> := <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">End</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#MyBrandModel">MyBrandModel</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Module</span> <span class="id"><a name="TM">TM</a></span> := <span class="id"><a href="Qcert.Compiler.Model.TrivialModel.html#TrivialModel">TrivialModel</a></span>(<span class="id"><a href="Qcert.Tests.CompilerTest.html#MyBrandModel">MyBrandModel</a></span>).<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Section</span> <span class="id"><a name="CompilerTypedTest">CompilerTypedTest</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Existing</span> <span class="kwd">Instance</span> <span class="id">CPModel</span>.<br/>
+&nbsp;&nbsp;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="makeMainEntity_typed">makeMainEntity_typed</a></span> <span class="id">db</span> <span class="id">id</span> <span class="id">i</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#normalize_data">normalize_data</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#db">db</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#id">id</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#i">i</a></span>)) ▹ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>")).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3318')">Proof.</div>
+<div class="proofscript" id="proof3318">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id">dtbrand</span>' <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> (@<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_singleton">canon_brands_singleton</a></span> (@<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model_relation">brand_model_relation</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.TBrandModelProp.html#brands_type_singleton">brands_type_singleton</a></span>. <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Common.Typing.TData.html#dtrec_full">dtrec_full</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="tactic">reflexivity</span>|<span class="id">constructor</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="tactic">reflexivity</span>|<span class="id">constructor</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_cons">Forall2_cons</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="tactic">reflexivity</span>|<span class="id">constructor</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_nil">Forall2_nil</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> (@<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_singleton">canon_brands_singleton</a></span> (@<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model_relation">brand_model_relation</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tout1">tout1</a></span> := <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> (("<span class="id">total</span>-<span class="id">attribute</span>", <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>)::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tinp1">tinp1</a></span> := (("<span class="id">WORLD</span>", <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>")))::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html">TCAMP</a></span> <span class="id"><a href="Qcert.Common.Typing.TOps.html">TOps</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id">Example1</span>'<span class="id">_wt</span> τ :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#camp_type">camp_type</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#tinp1">tinp1</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id">Example1</span>' τ <span class="id"><a href="Qcert.Tests.CompilerTest.html#tout1">tout1</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3319')">Proof.</div>
+<div class="proofscript" id="proof3319">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.TypeSystem.TBrandModelProp.html#brands_type_singleton">brands_type_singleton</a></span>. <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Grab</span> <span class="id">Existential</span> <span class="kwd">Variables</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eauto</span>. <span class="tactic">eauto</span>. <span class="tactic">eauto</span>. <span class="tactic">eauto</span>. <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnv.html">TcNRAEnv</a></span> <span class="id"><a href="Qcert.Translation.TCAMPtocNRAEnv.html">TCAMPtocNRAEnv</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="alg5_wt">alg5_wt</a></span> τ :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.CompilerTest.html#algopt5">algopt5</a></span> ▷ τ &gt;=&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#tout1">tout1</a></span> ⊣ <span class="id"><a href="Qcert.Tests.CompilerTest.html#tinp1">tinp1</a></span>;(<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof3320')">Proof.</div>
+<div class="proofscript" id="proof3320">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#algopt5">algopt5</a></span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv_core">camp_to_nraenv_core</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top">CAMPtocNRAEnv.camp_to_nraenv_core_top</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#nraenv_core_of_camp">CAMPtocNRAEnv.nraenv_core_of_camp</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Focus</span> 2.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Translation.TCAMPtocNRAEnv.html#nraenv_core_of_camp_type_preserve">nraenv_core_of_camp_type_preserve</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">Example1</span>'<span class="id">_wt</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Grab</span> <span class="id">Existential</span> <span class="kwd">Variables</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CompilerTypedTest">CompilerTypedTest</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

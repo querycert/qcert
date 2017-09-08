@@ -1,0 +1,57 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.OQL.Lang.OQLSugar</title>
+<meta name="description" content="Documentation of Coq module Qcert.OQL.Lang.OQLSugar" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.OQL.Lang.OQLSugar</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Arith.html">Arith</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="OQLSugar">OQLSugar</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.CommonSystem.html">CommonSystem</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html">OQL</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="OStruct">OStruct</a></span> (<span class="id">el</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>)) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#el">el</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> =&gt; <span class="id"><a href="Qcert.OQL.Lang.OQL.html#OConst">OConst</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| (<span class="id">s0</span>,<span class="id">x</span>) :: <span class="id">rest</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">init_rec</span> := <span class="id"><a href="Qcert.OQL.Lang.OQL.html#OUnop">OUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> <span class="id">s0</span>) <span class="id">x</span> <span class="kwd">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">proc_one</span> (<span class="id">e</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>) <span class="id">acc</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OBinop">OBinop</a></span> <span class="id"><a href="Qcert.Common.Operators.RBinaryOps.html#AConcat">AConcat</a></span> (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OUnop">OUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ARec">ARec</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span>)) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span>)) <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#acc">acc</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_right">fold_right</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#proc_one">proc_one</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#init_rec">init_rec</a></span> <span class="id">rest</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="ODot">ODot</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">e</span>:<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>) := <span class="id"><a href="Qcert.OQL.Lang.OQL.html#OUnop">OUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#s">s</a></span>) <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="OArrow">OArrow</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">e</span>:<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>) := <span class="id"><a href="Qcert.OQL.Lang.OQL.html#OUnop">OUnop</a></span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#ADot">ADot</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#s">s</a></span>) (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OUnop">OUnop</a></span> <span class="id"><a href="Qcert.Common.Operators.RUnaryOps.html#AUnbrand">AUnbrand</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span>).<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tableify_one_var">tableify_one_var</a></span> (<span class="id">e</span>:<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>) (<span class="id">v</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) : <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_subst">oql_subst</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#v">v</a></span> (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OTable">OTable</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#v">v</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tableify">tableify</a></span> (<span class="id">e</span>:<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>) : <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">free_vars</span> := <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_free_vars">oql_free_vars</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span> <span class="kwd">in</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#fold_left">fold_left</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#tableify_one_var">tableify_one_var</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#free_vars">free_vars</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#e">e</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.OQL.Lang.OQLSugar.html#OQLSugar">OQLSugar</a></span>.<br/>
+<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

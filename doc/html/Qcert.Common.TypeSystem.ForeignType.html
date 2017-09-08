@@ -1,0 +1,41 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Common.TypeSystem.ForeignType</title>
+<meta name="description" content="Documentation of Coq module Qcert.Common.TypeSystem.ForeignType" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Common.TypeSystem.ForeignType</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="TForeign">TForeign</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Lattice.html">Lattice</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Class</span> <span class="id"><a name="foreign_type">foreign_type</a></span> : <span class="kwd">Type</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a name="mk_foreign_type">mk_foreign_type</a></span> {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a name="foreign_type_type">foreign_type_type</a></span> : <span class="kwd">Set</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_dec">foreign_type_dec</a></span> :&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_type">foreign_type_type</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_lattice">foreign_type_lattice</a></span> :&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#Lattice">Lattice</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_type">foreign_type_type</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_sub">foreign_type_sub</a></span> (<span class="id">a</span> <span class="id">b</span> : <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_type">foreign_type_type</a></span>) : <span class="kwd">Prop</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_sub_dec">foreign_type_sub_dec</a></span> (<span class="id">a</span> <span class="id">b</span> : <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_type">foreign_type_type</a></span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_sub">foreign_type_sub</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#b">b</a></span>} + {~ <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_sub">foreign_type_sub</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#a">a</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#b">b</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_sub_pre">foreign_type_sub_pre</a></span> :&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_sub">foreign_type_sub</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_sub_part">foreign_type_sub_part</a></span> :&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_sub">foreign_type_sub</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a name="foreign_type_olattice">foreign_type_olattice</a></span> :&gt; <span class="id"><a href="Qcert.Utils.Lattice.html#OLattice">OLattice</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type_sub">foreign_type_sub</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
+&nbsp;&nbsp;<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#TForeign">TForeign</a></span>.<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

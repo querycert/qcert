@@ -1,0 +1,120 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Common.TypeSystem.RTypeNorm</title>
+<meta name="description" content="Documentation of Coq module Qcert.Common.TypeSystem.RTypeNorm" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Common.TypeSystem.RTypeNorm</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="RTypeNorm">RTypeNorm</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Sorting.html">Sorting</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Logic.Eqdep_dec.html">Eqdep_dec</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html">Bool</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html">Morphisms</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html">BrandRelation</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html">ForeignType</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html">RType</a></span>.<br/>
+<br/>
+<div class="doc">Syntax of types. Note that there is no guarantee yet that records are well formed. i.e., having distinct fields. </div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftype</span>:<span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span>}.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">br</span>:<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation">brand_relation</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id">normalize_rtype</span>₀ (<span class="id">r</span>:<span class="id">rtype</span>₀) : <span class="id">rtype</span>₀ :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#r">r</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Bottom</span>₀ =&gt; <span class="id">Bottom</span>₀<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Top</span>₀ =&gt; <span class="id">Top</span>₀<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Unit</span>₀ =&gt; <span class="id">Unit</span>₀<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Nat</span>₀ =&gt; <span class="id">Nat</span>₀<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Bool</span>₀ =&gt; <span class="id">Bool</span>₀<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">String</span>₀ =&gt; <span class="id">String</span>₀<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Coll</span>₀ <span class="id">r</span>' =&gt; <span class="id">Coll</span>₀ (<span class="id">normalize_rtype</span>₀ <span class="id">r</span>')<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Rec</span>₀ <span class="id">k</span> <span class="id">srl</span> =&gt; <span class="id">Rec</span>₀ <span class="id">k</span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">sr</span> =&gt; ((<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#sr">sr</a></span>), (<span class="id">normalize_rtype</span>₀ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#sr">sr</a></span>)))) <span class="id">srl</span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Either</span>₀ <span class="id">tl</span> <span class="id">tr</span> =&gt; <span class="id">Either</span>₀ (<span class="id">normalize_rtype</span>₀ <span class="id">tl</span>) (<span class="id">normalize_rtype</span>₀ <span class="id">tr</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Arrow</span>₀ <span class="id">tin</span> <span class="id">tout</span> =&gt; <span class="id">Arrow</span>₀ (<span class="id">normalize_rtype</span>₀ <span class="id">tin</span>) (<span class="id">normalize_rtype</span>₀ <span class="id">tout</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Brand</span>₀ <span class="id">bl</span> =&gt; <span class="id">Brand</span>₀ (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">bl</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">Foreign</span>₀ <span class="id">ft</span> =&gt; <span class="id">Foreign</span>₀ <span class="id">ft</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html">RRelation</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="exists_normalized_in_rec_sort">exists_normalized_in_rec_sort</a></span> <span class="id">x</span> <span class="id">r</span>:<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#x">x</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">sr</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id">rtype</span>₀ =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#sr">sr</a></span>, <span class="id">normalize_rtype</span>₀ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#sr">sr</a></span>))) <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#r">r</a></span>)) -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">y</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#y">y</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#r">r</a></span> /\<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#x">x</a></span> = (<span class="id">normalize_rtype</span>₀ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#y">y</a></span>))).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1101')">Proof.</div>
+<div class="proofscript" id="proof1101">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">contradiction</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">x</span> = (<span class="id">s</span>, <span class="id">normalize_rtype</span>₀ <span class="id">r0</span>) \/ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id">x</span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">sr</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id">rtype</span>₀ =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#sr">sr</a></span>, <span class="id">normalize_rtype</span>₀ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#sr">sr</a></span>))) <span class="id">r</span>))) <span class="tactic">by</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#in_rec_sort_insert">in_rec_sort_insert</a></span>; <span class="tactic">assumption</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">clear</span> <span class="id">H0</span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">exists</span> (<span class="id">s</span>, <span class="id">r0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="id">left</span>;<span class="tactic">reflexivity</span>|].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H0</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">elim</span> (<span class="id">IHr</span> <span class="id">H0</span>); <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">clear</span> <span class="id">H1</span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">x0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="id">right</span>;<span class="tactic">assumption</span>|<span class="tactic">assumption</span>].<br/>
+&nbsp;&nbsp;Qed.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id">normalize_rtype</span>₀<span class="id">_wf</span> (<span class="id">r</span>:<span class="id">rtype</span>₀) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">wf_rtype</span>₀ (<span class="id">normalize_rtype</span>₀ <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#r">r</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1102')">Proof.</div>
+<div class="proofscript" id="proof1102">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">r</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#andb_true_intro">andb_true_intro</a></span>; <span class="tactic">split</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">apply</span> (@<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort_pf">rec_sort_pf</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#ODT_string">ODT_string</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb_forall">forallb_forall</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#exists_normalized_in_rec_sort">exists_normalized_in_rec_sort</a></span> <span class="id">x</span> <span class="id">r</span> <span class="id">H0</span>); <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">clear</span> <span class="id">H1</span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id">H</span> <span class="id">x0</span> <span class="id">H1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#andb_true_intro">andb_true_intro</a></span>; <span class="tactic">split</span>; <span class="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#andb_true_intro">andb_true_intro</a></span>; <span class="tactic">split</span>; <span class="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#is_canon_brands_dec">is_canon_brands_dec</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands">canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">b</span>)).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.BrandRelation.html#canon_brands_is_canon_brands">canon_brands_is_canon_brands</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id">b</span>); <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id">normalize_rtype</span>₀<span class="id">_to_rtype</span> (<span class="id">r</span>₀:<span class="id">rtype</span>₀) : <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> (<span class="id">normalize_rtype</span>₀ <span class="id">r</span>₀) <span class="id">_</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1103')">Next Obligation.</div>
+<div class="proofscript" id="proof1103">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">normalize_rtype</span>₀<span class="id">_wf</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+&nbsp;&nbsp;<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.TypeSystem.RTypeNorm.html#RTypeNorm">RTypeNorm</a></span>.<br/>
+<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>

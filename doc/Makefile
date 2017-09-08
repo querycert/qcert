@@ -20,6 +20,9 @@ QUERYCERTDOTIO=../../querycert.github.io
 CP=cp
 
 ## Deploy documentation
+all:
+	make -C ../coq documentation
+
 deploy:
 	$(CP) qcertsite.css $(QUERYCERTDOTIO)
 	$(CP) index.html $(QUERYCERTDOTIO)
@@ -28,3 +31,4 @@ deploy:
 	$(CP) figure/* $(QUERYCERTDOTIO)/figure
 	$(CP) html/* $(QUERYCERTDOTIO)/html
 	$(CP) -r demo/* $(QUERYCERTDOTIO)/demo
+

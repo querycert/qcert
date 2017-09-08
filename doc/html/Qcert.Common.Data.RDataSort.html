@@ -1,0 +1,632 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Module Qcert.Common.Data.RDataSort</title>
+<meta name="description" content="Documentation of Coq module Qcert.Common.Data.RDataSort" />
+<link href="coq2html.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="coq2html.js"> </script>
+</head>
+
+<body onload="hideAll('proofscript')">
+<h1 class="title">Module Qcert.Common.Data.RDataSort</h1>
+<div class="coq">
+<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Structures.Orders.html">Orders</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html">Equivalence</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html">EquivDec</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Arith.Compare_dec.html">Compare_dec</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.omega.Omega.html">Omega</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html">String</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html">List</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith.html">ZArith</a></span>.<br/>
+<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="SortableData">SortableData</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="SortDesc">SortDesc</a></span> : <span class="kwd">Set</span> := | <span class="id"><a name="Descending">Descending</a></span> | <span class="id"><a name="Ascending">Ascending</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortCriteria">SortCriteria</a></span> : <span class="kwd">Set</span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortDesc">SortDesc</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortCriterias">SortCriterias</a></span> : <span class="kwd">Set</span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriteria">SortCriteria</a></span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Inductive</span> <span class="id"><a name="sdata">sdata</a></span> :=<br/>
+&nbsp;&nbsp;| <span class="id"><a name="sdnat">sdnat</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span><br/>
+&nbsp;&nbsp;| <span class="id"><a name="sdstring">sdstring</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span><br/>
+&nbsp;&nbsp;.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sort_desc_eq_dec">sort_desc_eq_dec</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortDesc">SortDesc</a></span>, {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>=<span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>}+{<span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>&lt;&gt;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof964')">Proof.</div>
+<div class="proofscript" id="proof964">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+&nbsp;&nbsp;<br/>
+<div class="doc">Equality is decidable for sdata </div>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sdata_eq_dec">sdata_eq_dec</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>, {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>=<span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>}+{<span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>&lt;&gt;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof965')">Proof.</div>
+<div class="proofscript" id="proof965">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span>[<span class="id">right</span>; <span class="tactic">inversion</span> 1].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.ZArith_dec.html#Z_eq_dec">Z_eq_dec</a></span> <span class="id">z</span> <span class="id">z0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">left</span>; <span class="tactic">f_equal</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">right</span>;<span class="tactic">intro</span>;<span class="tactic">apply</span> <span class="id">n</span>;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">left</span>; <span class="tactic">f_equal</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">right</span>;<span class="tactic">intro</span>;<span class="tactic">apply</span> <span class="id">n</span>;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_eqdec">oql_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortDesc">SortDesc</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> := <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sort_desc_eq_dec">sort_desc_eq_dec</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="sdata_eqdec">sdata_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> := <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata_eq_dec">sdata_eq_dec</a></span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableData">SortableData</a></span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="SortableDataOrder">SortableDataOrder</a></span> &lt;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Structures.Orders.html#OrderedTypeFull">OrderedTypeFull</a></span> <span class="kwd">with</span> <span class="kwd">Definition</span> <span class="id">t</span>:=<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.t">t</a></span>:=<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.eq">eq</a></span> := @<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.t">t</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.eq_equiv">eq_equiv</a></span> : (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span>) := <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#eq_equivalence">eq_equivalence</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.eq_dec">eq_dec</a></span> := <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata_eq_dec">sdata_eq_dec</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.compare">compare</a></span> (<span class="id">d1</span> <span class="id">d2</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.t">t</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#comparison">comparison</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d1">d1</a></span>,<span class="id"><a href="Qcert.Common.Data.RDataSort.html#d2">d2</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> <span class="id">n</span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> <span class="id">s</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> <span class="id">s</span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> <span class="id">n</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> <span class="id">n1</span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> <span class="id">n2</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.compare">Z.compare</a></span> <span class="id">n1</span> <span class="id">n2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> <span class="id">s1</span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> <span class="id">s2</span> =&gt; <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare">StringOrder.compare</a></span> <span class="id">s1</span> <span class="id">s2</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.lt">lt</a></span> (<span class="id">d1</span> <span class="id">d2</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) : <span class="kwd">Prop</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d1">d1</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d2">d2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="SortableDataOrder.compare_spec">compare_spec</a></span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#CompareSpec">CompareSpec</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof966')">Proof.</div>
+<div class="proofscript" id="proof966">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">generalize</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.compare_spec">Z.compare_spec</a></span> <span class="id">z</span> <span class="id">z0</span>); <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">subst</span>; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">constructor</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">constructor</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare_spec">StringOrder.compare_spec</a></span> <span class="id">s</span> <span class="id">s0</span>); <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">s</span> = <span class="id">s0</span>) <span class="tactic">by</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare_eq_iff">StringOrder.compare_eq_iff</a></span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H0</span>; <span class="tactic">reflexivity</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="SortableDataOrder.trichotemy">trichotemy</a></span> <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof967')">Proof.</div>
+<div class="proofscript" id="proof967">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">intros</span> <span class="id">nc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id">a</span> <span class="id">b</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id">left</span>; <span class="id">right</span>|<span class="id">left</span>;<span class="id">left</span>|<span class="id">right</span>]; <span class="tactic">inversion</span> <span class="id">nc</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="SortableDataOrder.compare_refl_eq">compare_refl_eq</a></span> <span class="id">a</span>: <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof968')">Proof.</div>
+<div class="proofscript" id="proof968">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.Zcompare.html#Zcompare_refl">Zcompare_refl</a></span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare_refl_eq">StringOrder.compare_refl_eq</a></span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="SortableDataOrder.compare_eq_iff">compare_eq_iff</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof969')">Proof.</div>
+<div class="proofscript" id="proof969">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [| <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_refl_eq">compare_refl_eq</a></span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">b</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">eauto</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.compare_eq_iff">Z.compare_eq_iff</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">subst</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare_eq_iff">StringOrder.compare_eq_iff</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">subst</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Instance</span> <span class="id"><a name="SortableDataOrder.lt_strorder">lt_strorder</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#StrictOrder">StrictOrder</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof970')">Proof.</div>
+<div class="proofscript" id="proof970">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">repeat</span> <span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">x</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> ((<span class="id">z</span> ?= <span class="id">z</span>)%<span class="id">Z</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.BinInt.html#Z.compare_eq_iff">Z.compare_eq_iff</a></span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare">StringOrder.compare</a></span> <span class="id">s</span> <span class="id">s</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.compare_eq_iff">StringOrder.compare_eq_iff</a></span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">destruct</span> <span class="id">z</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.ZArith.Zorder.html#Zlt_trans">Zlt_trans</a></span> <span class="id">z0</span> <span class="id">z1</span> <span class="id">z</span> <span class="id">H</span> <span class="id">H0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">generalize</span> (@<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#StrictOrder_Transitive">StrictOrder_Transitive</a></span> <span class="id">_</span> <span class="id">_</span> (<span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt_strorder">StringOrder.lt_strorder</a></span>) <span class="id">s</span> <span class="id">s0</span> <span class="id">s1</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.StringAdd.html#StringOrder.lt">StringOrder.lt</a></span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="SortableDataOrder.lt_compat">lt_compat</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#iff">iff</a></span>) <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof971')">Proof.</div>
+<div class="proofscript" id="proof971">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.lt_dec">lt_dec</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) : {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof972')">Next Obligation.</div>
+<div class="proofscript" id="proof972">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof973')">Next Obligation.</div>
+<div class="proofscript" id="proof973">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H0</span>. <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#irreflexivity">irreflexivity</a></span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof974')">Next Obligation.</div>
+<div class="proofscript" id="proof974">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">l2</span>. <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#asymmetry">asymmetry</a></span> <span class="id">H0</span> <span class="id">l2</span>).<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.le">le</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#False">False</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="SortableDataOrder.le_lteq">le_lteq</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.t">t</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le">le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> \/ <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof975')">Proof.</div>
+<div class="proofscript" id="proof975">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">inversion</span> 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le">le</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">lt</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">eq</a></span> <span class="kwd">in</span> *;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intuition</span> <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="SortableDataOrder.le_dec">le_dec</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) : {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le">le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le">le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof976')">Next Obligation.</div>
+<div class="proofscript" id="proof976">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le_lteq">le_lteq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof977')">Next Obligation.</div>
+<div class="proofscript" id="proof977">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le_lteq">le_lteq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof978')">Next Obligation.</div>
+<div class="proofscript" id="proof978">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">l2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.le_lteq">le_lteq</a></span> <span class="kwd">in</span> <span class="id">l2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">l2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#asymmetry">asymmetry</a></span> <span class="id">H0</span> <span class="id">H1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">H1</span> <span class="kwd">in</span> <span class="id">H0</span>. <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#irreflexivity">irreflexivity</a></span> <span class="id">H0</span>).<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder">SortableDataOrder</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="LexicographicData">LexicographicData</a></span>.<br/>
+<div class="doc">Equality is decidable for lists of sortable data </div>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="list_sdata_eq_dec">list_sdata_eq_dec</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>, {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>=<span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>}+{<span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>&lt;&gt;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof979')">Proof.</div>
+<div class="proofscript" id="proof979">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span>[<span class="id">right</span>; <span class="tactic">inversion</span> 1].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata_eq_dec">sdata_eq_dec</a></span> <span class="id">a</span> <span class="id">s</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">IHx</span> <span class="id">y</span>); <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">right</span>; <span class="tactic">inversion</span> 1; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">right</span>; <span class="tactic">inversion</span> 1; <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="list_sdata_eqdec">list_sdata_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> := <span class="id"><a href="Qcert.Common.Data.RDataSort.html#list_sdata_eq_dec">list_sdata_eq_dec</a></span>.<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicData">LexicographicData</a></span>.<br/>
+<br/>
+<span class="kwd">Module</span> <span class="id"><a name="LexicographicDataOrder">LexicographicDataOrder</a></span> &lt;: <span class="id"><a href="http://coq.inria.fr/library/Coq.Structures.Orders.html#OrderedTypeFull">OrderedTypeFull</a></span> <span class="kwd">with</span> <span class="kwd">Definition</span> <span class="id">t</span>:=<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.t">t</a></span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.eq">eq</a></span> := @<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.t">t</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.eq_equiv">eq_equiv</a></span> : (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#Equivalence">Equivalence</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span>) := <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#eq_equivalence">eq_equivalence</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.eq_dec">eq_dec</a></span> := <span class="id"><a href="Qcert.Common.Data.RDataSort.html#list_sdata_eq_dec">list_sdata_eq_dec</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Fixpoint</span> <span class="id"><a name="LexicographicDataOrder.compare">compare</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#comparison">comparison</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l1">l1</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l2">l2</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>, <span class="id">_</span> :: <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">_</span> :: <span class="id">_</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">d1</span> :: <span class="id">l1</span>', <span class="id">d2</span> :: <span class="id">l2</span>' =&gt; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">SortableDataOrder.compare</a></span> <span class="id">d1</span> <span class="id">d2</span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#compare">compare</a></span> <span class="id">l1</span>' <span class="id">l2</span>'<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.lt">lt</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.t">t</a></span>) : <span class="kwd">Prop</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l2">l2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="LexicographicDataOrder.compare_spec">compare_spec</a></span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.t">t</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#CompareSpec">CompareSpec</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof980')">Proof.</div>
+<div class="proofscript" id="proof980">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHx</span> <span class="id">y</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_spec">SortableDataOrder.compare_spec</a></span> <span class="id">a</span> <span class="id">s</span>); <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.eq">SortableDataOrder.eq</a></span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">IHx</span>; <span class="tactic">simpl</span>; <span class="tactic">subst</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_refl_eq">SortableDataOrder.compare_refl_eq</a></span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">SortableDataOrder.lt</a></span> <span class="kwd">in</span> *. <span class="tactic">rewrite</span> <span class="id">l</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="LexicographicDataOrder.trichotemy">trichotemy</a></span> <span class="id">a</span> <span class="id">b</span> : {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof981')">Proof.</div>
+<div class="proofscript" id="proof981">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">intros</span> <span class="id">nc</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id">a</span> <span class="id">b</span>);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;[<span class="id">left</span>; <span class="id">right</span>|<span class="id">left</span>;<span class="id">left</span>|<span class="id">right</span>]; <span class="tactic">inversion</span> <span class="id">nc</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="LexicographicDataOrder.compare_refl_eq">compare_refl_eq</a></span> <span class="id">a</span>: <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof982')">Proof.</div>
+<div class="proofscript" id="proof982">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_refl_eq">SortableDataOrder.compare_refl_eq</a></span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="LexicographicDataOrder.compare_eq_iff">compare_eq_iff</a></span> <span class="id">a</span> <span class="id">b</span>: <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> = <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof983')">Proof.</div>
+<div class="proofscript" id="proof983">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [| <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_refl_eq">compare_refl_eq</a></span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">b</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">eauto</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_eq_iff">SortableDataOrder.compare_eq_iff</a></span> <span class="id">a</span> <span class="id">s</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="id">specialize</span> (<span class="id">IHa</span> <span class="id">b</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">SortableDataOrder.compare</a></span> <span class="id">a</span> <span class="id">s</span>); <span class="tactic">intuition</span>; <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Instance</span> <span class="id"><a name="LexicographicDataOrder.lt_strorder">lt_strorder</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#StrictOrder">StrictOrder</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof984')">Proof.</div>
+<div class="proofscript" id="proof984">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">repeat</span> <span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intros</span> <span class="id">a</span> <span class="id">H</span>; <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_refl_eq">compare_refl_eq</a></span> <span class="kwd">in</span> <span class="id">H</span>. <span class="tactic">discriminate</span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">destruct</span> <span class="id">z</span>; <span class="tactic">simpl</span>; <span class="tactic">eauto</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>. <span class="id">specialize</span> (<span class="id">IHx</span> <span class="id">y</span> <span class="id">z</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (@<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#StrictOrder_Transitive">StrictOrder_Transitive</a></span> <span class="id">_</span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt_strorder">SortableDataOrder.lt_strorder</a></span>) <span class="id">a</span> <span class="id">s</span> <span class="id">s0</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.lt">SortableDataOrder.lt</a></span>. <span class="tactic">intros</span> <span class="id">AC</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">SortableDataOrder.compare</a></span> <span class="id">a</span> <span class="id">s</span>); <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">re</span>; <span class="tactic">rewrite</span> <span class="id">re</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare">SortableDataOrder.compare</a></span> <span class="id">s</span> <span class="id">s0</span>); <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">re2</span>; <span class="tactic">rewrite</span> <span class="id">re2</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_eq_iff">SortableDataOrder.compare_eq_iff</a></span> <span class="kwd">in</span> *; <span class="tactic">subst</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id">re</span> <span class="kwd">in</span>*; <span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id">re2</span> <span class="kwd">in</span> *;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id">AC</span> <span class="tactic">by</span> <span class="tactic">trivial</span>; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortableDataOrder.compare_refl_eq">SortableDataOrder.compare_refl_eq</a></span>; <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="LexicographicDataOrder.lt_compat">lt_compat</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#iff">iff</a></span>) <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof985')">Proof.</div>
+<div class="proofscript" id="proof985">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.lt_dec">lt_dec</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) : {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof986')">Next Obligation.</div>
+<div class="proofscript" id="proof986">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof987')">Next Obligation.</div>
+<div class="proofscript" id="proof987">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H0</span>.  <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#irreflexivity">irreflexivity</a></span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof988')">Next Obligation.</div>
+<div class="proofscript" id="proof988">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">l2</span>. <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#asymmetry">asymmetry</a></span> <span class="id">H0</span> <span class="id">l2</span>).<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.le">le</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.t">t</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#False">False</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="LexicographicDataOrder.le_lteq">le_lteq</a></span> : <span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.t">t</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le">le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> &lt;-&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> \/ <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof989')">Proof.</div>
+<div class="proofscript" id="proof989">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">inversion</span> 1;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le">le</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.lt">lt</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.eq">eq</a></span> <span class="kwd">in</span> *;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intuition</span> <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="LexicographicDataOrder.le_dec">le_dec</a></span> (<span class="id">a</span> <span class="id">b</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.t">t</a></span>) : {<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le">le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le">le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare">compare</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Lt">Lt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Eq">Eq</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#left">left</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Gt">Gt</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#right">right</a></span> <span class="id">_</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof990')">Next Obligation.</div>
+<div class="proofscript" id="proof990">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le_lteq">le_lteq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof991')">Next Obligation.</div>
+<div class="proofscript" id="proof991">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le_lteq">le_lteq</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof992')">Next Obligation.</div>
+<div class="proofscript" id="proof992">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.compare_spec">compare_spec</a></span> <span class="id">a</span> <span class="id">b</span>); <span class="tactic">rewrite</span> &lt;- <span class="id">Heq_anonymous</span>; <span class="tactic">inversion</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">l2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder.le_lteq">le_lteq</a></span> <span class="kwd">in</span> <span class="id">l2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">l2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#asymmetry">asymmetry</a></span> <span class="id">H0</span> <span class="id">H1</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">H1</span> <span class="kwd">in</span> <span class="id">H0</span>. <span class="tactic">apply</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#irreflexivity">irreflexivity</a></span> <span class="id">H0</span>).<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#LexicographicDataOrder">LexicographicDataOrder</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+<span class="kwd">Section</span> <span class="id"><a name="DataSort">DataSort</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.RData.html">RData</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="ODT_lexdata">ODT_lexdata</a></span> : (@<span class="id"><a href="Qcert.Utils.Bindings.html#ODT">ODT</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Utils.Bindings.html#mkODT">mkODT</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#lt">LexicographicDataOrder.lt</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#lt_strorder">LexicographicDataOrder.lt_strorder</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#lt_dec">LexicographicDataOrder.lt_dec</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#compare">LexicographicDataOrder.compare</a></span> <span class="id">_</span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof993')">Next Obligation.</div>
+<div class="proofscript" id="proof993">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#compare_spec">LexicographicDataOrder.compare_spec</a></span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html">RRelation</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.ForeignData.html">ForeignData</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="theotherdot">theotherdot</a></span> <span class="id">d</span> <span class="id">s</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id">r</span> =&gt; <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id">r</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#s">s</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+&nbsp;&nbsp;<br/>
+<div class="doc">Can be sorted:
+      - Empty collection
+      - Collection of integers
+      - Collection of strings
+   </div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sortable_data">sortable_data</a></span> : <span class="kwd">Set</span> := (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) * <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sortable_coll">sortable_coll</a></span> : <span class="kwd">Set</span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data">sortable_data</a></span>.<br/>
+<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="dict_field_le">dict_field_le</a></span> {<span class="id">A</span>} (<span class="id">a</span> <span class="id">b</span>:(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>)*<span class="id"><a href="Qcert.Common.Data.RDataSort.html#A">A</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#le">LexicographicDataOrder.le</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dict_field_le_dec">dict_field_le_dec</a></span> {<span class="id">A</span>} (<span class="id">a</span> <span class="id">b</span>:(<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>)*<span class="id"><a href="Qcert.Common.Data.RDataSort.html#A">A</a></span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>} + {~<span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#b">b</a></span>}.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof994')">Proof.</div>
+<div class="proofscript" id="proof994">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#le_dec">LexicographicDataOrder.le_dec</a></span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="dict_sort">dict_sort</a></span> {<span class="id">A</span>} :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@<span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort">insertion_sort</a></span> ((<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>)*<span class="id"><a href="Qcert.Common.Data.RDataSort.html#A">A</a></span>) <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le_dec">dict_field_le_dec</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sort_sortable_coll">sort_sortable_coll</a></span> (<span class="id">sc</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_coll">sortable_coll</a></span>) : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_coll">sortable_coll</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_sort">dict_sort</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sc">sc</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="coll_of_sortable_coll">coll_of_sortable_coll</a></span> (<span class="id">sc</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_coll">sortable_coll</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sc">sc</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Example</span> <span class="id"><a name="scoll1">scoll1</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> 2::<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> "<span class="id">a</span>"::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>,<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 10)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> 3::<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> "<span class="id">x</span>"::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>,<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 11)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> 2::<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> "<span class="id">b</span>"::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>,<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 12)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> 2::<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> "<span class="id">b</span>"::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>,<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 2000)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> 1::<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> "<span class="id">a</span>"::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>,<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> 13)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="get_criteria">get_criteria</a></span> (<span class="id">d</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) (<span class="id">sc</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriteria">SortCriteria</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> (<span class="id">att</span>,<span class="id">sk</span>) := <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sc">sc</a></span> <span class="kwd">in</span> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#theotherdot">theotherdot</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#att">att</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> <span class="id">n</span>) =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdnat">sdnat</a></span> <span class="id">n</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id">s</span>) =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdstring">sdstring</a></span> <span class="id">s</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="get_criterias">get_criterias</a></span> (<span class="id">d</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) (<span class="id">scl</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sdata">sdata</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift_map">lift_map</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#get_criteria">get_criteria</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span>) <span class="id"><a href="Qcert.Common.Data.RDataSort.html#scl">scl</a></span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sortable_data_of_data">sortable_data_of_data</a></span> (<span class="id">d</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) (<span class="id">scl</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data">sortable_data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> (<span class="kwd">fun</span> <span class="id">c</span> =&gt; (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#c">c</a></span>,<span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span>)) (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#get_criterias">get_criterias</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#scl">scl</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="sortable_coll_of_coll">sortable_coll_of_coll</a></span> (<span class="id">scl</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span>) (<span class="id">coll</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data">sortable_data</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="Qcert.Utils.Lift.html#lift_map">lift_map</a></span> (<span class="kwd">fun</span> <span class="id">d</span> =&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#scl">scl</a></span>) <span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll">coll</a></span>.<br/>
+&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="data_sort">data_sort</a></span> (<span class="id">scl</span>:<span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span>) (<span class="id">d</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="kwd">with</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id">coll</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sort_sortable_coll">sort_sortable_coll</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_coll_of_coll">sortable_coll_of_coll</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#scl">scl</a></span> <span class="id">coll</span>)))<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id">_</span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mkperson">mkperson</a></span> (<span class="id">name</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">age</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) (<span class="id">zip</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Numbers.BinNums.html#Z">Z</a></span>) (<span class="id">company</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> (("<span class="id">name</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#name">name</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">age</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#age">age</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">zip</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dnat">dnat</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#zip">zip</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">company</span>", <span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#company">company</a></span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mkpersons_aux">mkpersons_aux</a></span> <span class="id">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="kwd">with</span> (<span class="id">name</span>, <span class="id">age</span>, <span class="id">zip</span>, <span class="id">company</span>) =&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#mkperson">mkperson</a></span> <span class="id">name</span> <span class="id">age</span> <span class="id">zip</span> <span class="id">company</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>) <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mkpersons">mkpersons</a></span> <span class="id">l</span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#mkpersons_aux">mkpersons_aux</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>).<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Open</span> <span class="kwd">Scope</span> <span class="id">Z_scope</span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="persons">persons</a></span> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#mkpersons">mkpersons</a></span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(("<span class="id">John</span>",23,1008,"<span class="id">IBM</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">Jane</span>",24,1009,"<span class="id">AIG</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">Jill</span>",25,1010,"<span class="id">IBM</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("<span class="id">Jack</span>",27,1010,"<span class="id">CMU</span>")<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)%<span class="id">string</span>.<br/>
+<br/>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#DataSort">DataSort</a></span>.<br/>
+<br/>
+<span class="kwd">Section</span> <span class="id"><a name="DataSortProps">DataSortProps</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.RDataNorm.html">RDataNorm</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Common.Data.ForeignData.html">ForeignData</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Require</span> <span class="kwd">Import</span> <span class="id"><a href="Qcert.Utils.Utils.html">Utils</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">fdata</span>:<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span>}.<br/>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dict_field_le_anti">dict_field_le_anti</a></span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data">sortable_data</a></span>, ~ <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> -&gt; ~ <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Data.RDataSort.html#y">y</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof995')">Proof.</div>
+<div class="proofscript" id="proof995">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le">dict_field_le</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#le_lteq">LexicographicDataOrder.le_lteq</a></span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#compare_spec">LexicographicDataOrder.compare_spec</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id">x</span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id">y</span>)); <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="in_sort_sortable">in_sort_sortable</a></span> <span class="id">d</span> <span class="id">l</span> : <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sort_sortable_coll">sort_sortable_coll</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>) &lt;-&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof996')">Proof.</div>
+<div class="proofscript" id="proof996">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sort_sortable_coll">sort_sortable_coll</a></span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_sort">dict_sort</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span> <span class="id">ind</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#in_insertion_sort">in_insertion_sort</a></span> <span class="kwd">in</span> <span class="id">ind</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort_in">insertion_sort_in</a></span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#dict_field_le_anti">dict_field_le_anti</a></span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="in_csc_ssc">in_csc_ssc</a></span> <span class="id">d</span> <span class="id">l</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sort_sortable_coll">sort_sortable_coll</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>)) &lt;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof997')">Proof.</div>
+<div class="proofscript" id="proof997">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_map_iff">in_map_iff</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span> [[??] [??]]; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#in_sort_sortable">in_sort_sortable</a></span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">eexists</span>; <span class="tactic">split</span>; <span class="tactic">try</span> <span class="id">eassumption</span>; <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">exists</span> (<span class="id">l0</span>, <span class="id">d</span>); <span class="tactic">split</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#in_sort_sortable">in_sort_sortable</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="in_csc_cons">in_csc_cons</a></span> <span class="id">d</span> <span class="id">s</span> <span class="id">l</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#s">s</a></span> :: <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>)) &lt;-&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#s">s</a></span> \/ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#l">l</a></span>)).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof998')">Proof.</div>
+<div class="proofscript" id="proof998">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#coll_of_sortable_coll">coll_of_sortable_coll</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#in_map_iff">in_map_iff</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">s</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span> <span class="id">ind</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">ind</span> <span class="kwd">as</span> [[? ?] [? <span class="id">ind</span>]]; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">ind</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">invcs</span> <span class="id">H</span>; <span class="tactic">tauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">right</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> (<span class="id">l1</span>, <span class="id">d</span>); <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">ind</span> <span class="kwd">as</span> [| [[??] [??]]].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> (<span class="id">l0</span>, <span class="id">d0</span>); <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> (<span class="id">l1</span>, <span class="id">d</span>); <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sortable_data_normalized">sortable_data_normalized</a></span> <span class="id">h</span> <span class="id">a</span> <span class="id">sc</span> <span class="id">sd</span> :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#h">h</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sc">sc</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sd">sd</a></span> -&gt;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#h">h</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sd">sd</a></span>).<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof999')">Proof.</div>
+<div class="proofscript" id="proof999">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span>; <span class="tactic">intros</span> <span class="id">dn</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Lift.html#some_lift">some_lift</a></span> <span class="kwd">in</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">eqs</span> <span class="kwd">as</span> [? <span class="id">eqs</span> ?]; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_sort_normalized">data_sort_normalized</a></span> <span class="id">h</span> <span class="id">s</span> (<span class="id">d</span> <span class="id">sd</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataSort.html#data_sort">data_sort</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#s">s</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sd">sd</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#h">h</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#h">h</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sd">sd</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1000')">Proof.</div>
+<div class="proofscript" id="proof1000">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">eqs</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">inversion</span> <span class="id">eqs</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> (<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Lift.html#some_lift">some_lift</a></span> <span class="kwd">in</span> <span class="id">eqs</span>;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">eqs</span> <span class="kwd">as</span> [? <span class="id">eqs</span> ? ]; <span class="tactic">subst</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dn</span>; <span class="id">invcs</span> <span class="id">dn</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">x</span> <span class="id">eqs</span> <span class="id">H0</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">x</span> <span class="id">eqs</span> <span class="id">dn</span> <span class="id">d</span> <span class="id">ind</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_coll_of_coll">sortable_coll_of_coll</a></span> <span class="kwd">in</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">invcs</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">tauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_coll_of_coll">sortable_coll_of_coll</a></span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span> <span class="id">a</span> <span class="id">s</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; [<span class="tactic">intros</span> ? <span class="id">eqq1</span> | <span class="tactic">intros</span> <span class="id">eqq1</span>]; <span class="tactic">rewrite</span> <span class="id">eqq1</span> <span class="kwd">in</span> <span class="id">eqs</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Lift.html#lift_map">lift_map</a></span> (<span class="kwd">fun</span> <span class="id">d</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> =&gt; <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#d">d</a></span> <span class="id">s</span>) <span class="id">l</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; [<span class="tactic">intros</span> ? <span class="id">eqq2</span> | <span class="tactic">intros</span> <span class="id">eqq2</span>]; <span class="tactic">rewrite</span> <span class="id">eqq2</span> <span class="kwd">in</span> <span class="id">eqs</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">invcs</span> <span class="id">eqs</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">dnimpl</span>:(<span class="kwd">forall</span> <span class="id">x</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span> <span class="id">l</span> -&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id">h</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#x">x</a></span>)) <span class="tactic">by</span> <span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHl</span> <span class="id">_</span> <span class="id">eqq2</span> <span class="id">dnimpl</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#in_csc_ssc">in_csc_ssc</a></span> <span class="kwd">in</span> <span class="id">ind</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">ind</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_normalized">sortable_data_normalized</a></span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Common.Data.RDataSort.html#in_csc_ssc">in_csc_ssc</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">auto</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+<span class="kwd">End</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#DataSortProps">DataSortProps</a></span>.<br/>
+<br/>
+<br/>
+
+</div>
+<div class="footer"><hr/>Generated by <a href="https://github.com/xavierleroy/coq2html/">coq2html</div>
+</body>
+</html>
