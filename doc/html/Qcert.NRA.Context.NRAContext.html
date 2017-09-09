@@ -159,7 +159,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">IHc1</span> <span class="id">s10</span>) <span class="kwd">as</span> [<span class="id">a1</span> <span class="id">e1</span>];<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">IHc2</span> <span class="id">s20</span>) <span class="kwd">as</span> [<span class="id">a2</span> <span class="id">e2</span>];<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">e1</span>, <span class="id">e2</span>; <span class="tactic">eauto</span> 2].<br/>
-&nbsp;unary&nbsp;operator&nbsp;case&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">s0</span>; <span class="tactic">destruct</span> (<span class="id">IHc</span> <span class="id">s0</span>) <span class="kwd">as</span> [<span class="id">a</span> <span class="id">e</span>];<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;unary&nbsp;operator&nbsp;case&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">s0</span>; <span class="tactic">destruct</span> (<span class="id">IHc</span> <span class="id">s0</span>) <span class="kwd">as</span> [<span class="id">a</span> <span class="id">e</span>];<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">e</span>; <span class="tactic">eauto</span> 2.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -246,7 +247,8 @@
 <div class="proofscript" id="proof1582">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">c</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>; <span class="tactic">try</span> <span class="id">solve</span>[ <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#remove_all_app">remove_all_app</a></span>; <span class="tactic">congruence</span>].<br/>
-&nbsp;CHole&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>; <span class="id">match_destr</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#app_nil_r">app_nil_r</a></span>; <span class="tactic">congruence</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;CHole&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>; <span class="id">match_destr</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#app_nil_r">app_nil_r</a></span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ac_substp_holes_remove">ac_substp_holes_remove</a></span> <span class="id">c</span> <span class="id">xp</span> :<br/>

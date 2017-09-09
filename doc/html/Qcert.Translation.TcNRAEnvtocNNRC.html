@@ -50,18 +50,24 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">vid</span> <span class="id">venv</span> <span class="id">tenv</span> <span class="id">H</span> <span class="id">H0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">dependent</span> <span class="tactic">induction</span> <span class="id">H1</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
-&nbsp;ATID&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCVar">TNNRCVar</a></span>; <span class="tactic">trivial</span>.<br/>
-&nbsp;ATConst&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCConst">TNNRCConst</a></span>; <span class="tactic">trivial</span>.<br/>
-&nbsp;ATBinop&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
-&nbsp;ATUnop&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span>. <br/>
-&nbsp;ATMap&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; [<span class="tactic">eauto</span> | ].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATID&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCVar">TNNRCVar</a></span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATConst&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCConst">TNNRCConst</a></span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATBinop&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATUnop&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATMap&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; [<span class="tactic">eauto</span> | ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id">IHnraenv_core_type1</span> <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span> "<span class="id">tmap</span>$" [<span class="id">vid</span>; <span class="id">venv</span>]) <span class="id">venv</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((<span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span> "<span class="id">tmap</span>$" [<span class="id">vid</span>; <span class="id">venv</span>],τ₁)::<span class="id">tenv</span>)); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">dest_eqdec</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">dest_eqdec</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
-&nbsp;ATMapConcat&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">specialize</span> (<span class="id">IHnraenv_core_type2</span> <span class="id">vid</span> <span class="id">venv</span> <span class="id">tenv</span>).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATMapConcat&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">specialize</span> (<span class="id">IHnraenv_core_type2</span> <span class="id">vid</span> <span class="id">venv</span> <span class="id">tenv</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCUnop">TNNRCUnop</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">RType.Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> τ₃ <span class="id">pf3</span>)))).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TOps.html#ATFlatten">ATFlatten</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCFor">TNNRCFor</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">RType.Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> τ₁ <span class="id">pf1</span>)); [<span class="tactic">eauto</span> | ].<br/>
@@ -70,7 +76,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>; <span class="tactic">try</span> <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">econstructor</span>; <span class="id">econstructor</span>; <span class="tactic">eauto</span> 2; <span class="tactic">simpl</span>; <span class="id">match_destr</span>; <span class="tactic">try</span> <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
-&nbsp;ATProduct&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCUnop">TNNRCUnop</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">RType.Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> τ₃ <span class="id">pf3</span>)))).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATProduct&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCUnop">TNNRCUnop</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">RType.Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> τ₃ <span class="id">pf3</span>)))).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TOps.html#ATFlatten">ATFlatten</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCFor">TNNRCFor</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">RType.Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> τ₁ <span class="id">pf1</span>)); <span class="tactic">try</span> <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id">IHnraenv_core_type1</span> <span class="id">vid</span> <span class="id">venv</span> <span class="id">tenv</span>); <span class="tactic">assumption</span>.<br/>
@@ -82,7 +89,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* <span class="id">match_destr</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
-&nbsp;ATSelect&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCUnop">TNNRCUnop</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> τ))); [<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TOps.html#ATFlatten">ATFlatten</a></span>|<span class="id">idtac</span>].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATSelect&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCUnop">TNNRCUnop</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">RType.Coll</a></span> τ))); [<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TOps.html#ATFlatten">ATFlatten</a></span>|<span class="id">idtac</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCFor">TNNRCFor</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#TcNRAEnvtocNNRC.m">m</a></span> <span class="id">_</span> τ); [<span class="tactic">apply</span> (<span class="id">IHnraenv_core_type2</span> <span class="id">vid</span> <span class="id">venv</span> <span class="id">tenv</span> )|<span class="id">idtac</span>]; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCIf">TNNRCIf</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">apply</span> <span class="id">IHnraenv_core_type1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
@@ -90,7 +98,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>. <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_destr</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">econstructor</span>. <span class="tactic">simpl</span>. <span class="tactic">repeat</span> <span class="id">econstructor</span>.<br/>
-&nbsp;ATDefault&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATDefault&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
@@ -102,11 +111,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">apply</span> <span class="id">IHnraenv_core_type2</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="id">match_destr</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
-&nbsp;ATEither&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATEither&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">eapply</span> <span class="id">IHnraenv_core_type1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="tactic">try</span> <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">eapply</span> <span class="id">IHnraenv_core_type2</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="tactic">try</span> <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
-&nbsp;ATEitherConcat&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; [<span class="tactic">eauto</span> | ].<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATEitherConcat&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; [<span class="tactic">eauto</span> | ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">eapply</span> <span class="id">IHnraenv_core_type1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="tactic">try</span> <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">econstructor</span>; [<span class="tactic">eauto</span> | ].<br/>
@@ -127,16 +138,21 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">symmetry</span> <span class="kwd">in</span> <span class="id">e</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">match_destr</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
-&nbsp;ATApp&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> (<span class="id">econstructor</span>; <span class="tactic">eauto</span> 2).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATApp&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> (<span class="id">econstructor</span>; <span class="tactic">eauto</span> 2).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHnraenv_core_type2</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">simpl</span>; <span class="id">match_destr</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">simpl</span>; <span class="id">match_destr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
-&nbsp;ATGetConstant&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span> 2.<br/>
-&nbsp;ATEnv&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCVar">TNNRCVar</a></span>; <span class="tactic">assumption</span>.<br/>
-&nbsp;ATAppEnv&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> (<span class="id">econstructor</span>; <span class="tactic">eauto</span> 2).<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATGetConstant&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">econstructor</span>; <span class="tactic">eauto</span> 2.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATEnv&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#TNNRCVar">TNNRCVar</a></span>; <span class="tactic">assumption</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATAppEnv&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> (<span class="id">econstructor</span>; <span class="tactic">eauto</span> 2).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHnraenv_core_type2</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
-&nbsp;ATMapEnv&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span> 2.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;ATMapEnv&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">repeat</span> <span class="id">econstructor</span>; <span class="tactic">eauto</span> 2.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHnraenv_core_type</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>; <span class="id">match_destr</span>; <span class="id">elim_fresh</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>

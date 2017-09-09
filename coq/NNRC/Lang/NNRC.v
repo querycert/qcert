@@ -67,14 +67,12 @@ Section NNRC.
 
     (** The following macro defines group-by in terms of existing cNNRC expressions. *)
 
-    (** [e groupby[g,keys] ==
-         LET $group0 := e
-         IN { [ g: ♯flatten({ IF ($group3 = π[keys])
-                              THEN {$group3}
-                              ELSE {}
-                              | $group3 ∈ $group0 }) ]
+    (** <<e groupby[g,keys] ==
+         let $group0 := e
+         in { [ g: ♯flatten({ $group3 = π[keys] ? {$group3} {}
+                            | $group3 ∈ $group0 }) ]
             | $group2 ∈ ♯distinct({ π[keys]($group1)
-                                  | $group1 ∈ $group0 }) }]
+                                  | $group1 ∈ $group0 }) }>>
      *)
 
     Definition nnrc_group_by (g:string) (sl:list string) (e:nnrc) : nnrc :=

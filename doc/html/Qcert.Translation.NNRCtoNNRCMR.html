@@ -537,11 +537,31 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">right</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_same_elemts">bdistinct_same_elemts</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&nbsp;*)</span><br/>
-&nbsp;assumption.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">free_vars</span> &lt;&gt; <span class="id">nil</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;assumption.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">free_vars</span> &lt;&gt; <span class="id">nil</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hx</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">Hx</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&nbsp;*)</span><br/>
-&nbsp;destruct&nbsp;Hx;&nbsp;subst;&nbsp;simpl;&nbsp;[intuition&nbsp;|&nbsp;].&nbsp;*)</span>&nbsp;destruct&nbsp;(string_eqdec&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fresh_var&nbsp;"unpack$"&nbsp;(closure_env_name&nbsp;::&nbsp;nil))&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fresh_var&nbsp;"unpack$"&nbsp;(closure_env_name&nbsp;::&nbsp;nil)));&nbsp;[&nbsp;|&nbsp;congruence].&nbsp;*)</span>&nbsp;rewrite&nbsp;in_app_iff&nbsp;in&nbsp;H.&nbsp;*)</span>&nbsp;destruct&nbsp;H;&nbsp;apply&nbsp;remove_inv&nbsp;in&nbsp;H;&nbsp;destruct&nbsp;H.&nbsp;*)</span>&nbsp;+&nbsp;rewrite&nbsp;in_app_iff&nbsp;in&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;destruct&nbsp;H;&nbsp;[&nbsp;|&nbsp;intuition&nbsp;].&nbsp;*)</span>&nbsp;&nbsp;&nbsp;apply&nbsp;remove_inv&nbsp;in&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;destruct&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;dest_eqdec;&nbsp;simpl&nbsp;in&nbsp;H;&nbsp;intuition.&nbsp;*)</span>&nbsp;+&nbsp;specialize&nbsp;(IHfree_vars&nbsp;H).&nbsp;*)</span>&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;IHfree_vars.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;intuition.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;right.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;rewrite&nbsp;&lt;-&nbsp;mult_pos_equiv_in&nbsp;in&nbsp;H1&nbsp;|-&nbsp;*.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;rewrite&nbsp;bminus_mult&nbsp;in&nbsp;H1&nbsp;|-&nbsp;*.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;rewrite&nbsp;mult_on_remove;&nbsp;trivial.&nbsp;*)</span>&nbsp;&nbsp;Admitted.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;destruct&nbsp;Hx;&nbsp;subst;&nbsp;simpl;&nbsp;[intuition&nbsp;|&nbsp;].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;destruct&nbsp;(string_eqdec&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fresh_var&nbsp;"unpack$"&nbsp;(closure_env_name&nbsp;::&nbsp;nil))&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fresh_var&nbsp;"unpack$"&nbsp;(closure_env_name&nbsp;::&nbsp;nil)));&nbsp;[&nbsp;|&nbsp;congruence].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;rewrite&nbsp;in_app_iff&nbsp;in&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;destruct&nbsp;H;&nbsp;apply&nbsp;remove_inv&nbsp;in&nbsp;H;&nbsp;destruct&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;+&nbsp;rewrite&nbsp;in_app_iff&nbsp;in&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;destruct&nbsp;H;&nbsp;[&nbsp;|&nbsp;intuition&nbsp;].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;apply&nbsp;remove_inv&nbsp;in&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;destruct&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;dest_eqdec;&nbsp;simpl&nbsp;in&nbsp;H;&nbsp;intuition.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;+&nbsp;specialize&nbsp;(IHfree_vars&nbsp;H).&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;IHfree_vars.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;intuition.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;right.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;rewrite&nbsp;&lt;-&nbsp;mult_pos_equiv_in&nbsp;in&nbsp;H1&nbsp;|-&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;rewrite&nbsp;bminus_mult&nbsp;in&nbsp;H1&nbsp;|-&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;rewrite&nbsp;mult_on_remove;&nbsp;trivial.&nbsp;*)</span><br/>
+&nbsp;&nbsp;Admitted.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrcmr_of_nnrc_with_free_vars_wf">nnrcmr_of_nnrc_with_free_vars_wf</a></span> (<span class="id">n</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) (<span class="id">vars_loc</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>)) (<span class="id">output</span>: <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x">x</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span>) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x">x</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">List.map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span>)) -&gt;<br/>
@@ -554,8 +574,46 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_free_vars">nnrcmr_of_nnrc_with_free_vars</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hmr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXX&nbsp;TODO&nbsp;XXXXXXXXXX&nbsp;*)</span><br/>
-&nbsp;destruct&nbsp;(List.fold_right&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;(x&nbsp;:&nbsp;var)&nbsp;(oacc&nbsp;:&nbsp;option&nbsp;(list&nbsp;(var&nbsp;*&nbsp;dlocalization)))&nbsp;=&gt;&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;olift&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;loc&nbsp;:&nbsp;dlocalization&nbsp;=&gt;&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lift&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;acc&nbsp;:&nbsp;list&nbsp;(var&nbsp;*&nbsp;dlocalization)&nbsp;=&gt;&nbsp;(x,&nbsp;loc)&nbsp;::&nbsp;acc)&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oacc)&nbsp;(lookup&nbsp;equiv_dec&nbsp;vars_loc&nbsp;x))&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Some&nbsp;nil)&nbsp;(bdistinct&nbsp;(nnrc_free_vars&nbsp;n)));&nbsp;*)</span>&nbsp;&nbsp;&nbsp;[&nbsp;|&nbsp;apply&nbsp;in_nil&nbsp;in&nbsp;Hmr;&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contradiction&nbsp;].&nbsp;*)</span>&nbsp;simpl&nbsp;in&nbsp;Hmr.&nbsp;*)</span>&nbsp;apply&nbsp;in_app_or&nbsp;in&nbsp;Hmr.&nbsp;*)</span>&nbsp;inversion&nbsp;Hmr;&nbsp;clear&nbsp;Hmr.&nbsp;*)</span>&nbsp;-&nbsp;Case&nbsp;"pack_closure_env"%string.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;admit.&nbsp;<span class="comment">(*&nbsp;XXXXXXXXX&nbsp;TODO&nbsp;XXXXXXXXXX&nbsp;*)</span>&nbsp;*)</span>&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;generalize&nbsp;(pack_closure_env_wf&nbsp;inputdb&nbsp;(bdistinct&nbsp;free_vars_of_n)&nbsp;(really_fresh_in&nbsp;output&nbsp;(output&nbsp;::&nbsp;avoid)&nbsp;n)&nbsp;mr).&nbsp;*)</span>&nbsp;*)</span>&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;auto.&nbsp;*)</span>&nbsp;*)</span>&nbsp;-&nbsp;Case&nbsp;"final_mr"%string.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;inversion&nbsp;H;&nbsp;try&nbsp;contradiction;&nbsp;clear&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;rewrite&nbsp;&lt;-&nbsp;H0;&nbsp;clear&nbsp;H0.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;unfold&nbsp;mr_well_formed.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;simpl.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;repeat&nbsp;split.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;+&nbsp;apply&nbsp;coll_function_no_free_vars.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;+&nbsp;intros&nbsp;f&nbsp;Hf.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;*.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apply&nbsp;unpack_closure_env_free_vars&nbsp;in&nbsp;Hf;&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try&nbsp;solve&nbsp;[&nbsp;apply&nbsp;bdistinct_same_elemts&nbsp;].&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;(Hvars_loc&nbsp;f)&nbsp;in&nbsp;Hf.&nbsp;*)</span><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;Hfree_vars_of_n&nbsp;in&nbsp;Hf.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;(bminus&nbsp;(bdistinct&nbsp;(nnrc_free_vars&nbsp;n))&nbsp;(bdistinct&nbsp;(nnrc_free_vars&nbsp;n))&nbsp;=&nbsp;nil)&nbsp;as&nbsp;Hbminus;&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try&nbsp;solve&nbsp;[&nbsp;apply&nbsp;bminus_self&nbsp;].&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;Hbminus&nbsp;in&nbsp;Hf;&nbsp;clear&nbsp;Hbminus.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apply&nbsp;in_inv&nbsp;in&nbsp;Hf.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;Hf;&nbsp;try&nbsp;contradiction.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;&lt;-&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reflexivity.&nbsp;*)</span>&nbsp;&nbsp;Admitted.</div>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;destruct&nbsp;(List.fold_right&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;(x&nbsp;:&nbsp;var)&nbsp;(oacc&nbsp;:&nbsp;option&nbsp;(list&nbsp;(var&nbsp;*&nbsp;dlocalization)))&nbsp;=&gt;&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;olift&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;loc&nbsp;:&nbsp;dlocalization&nbsp;=&gt;&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lift&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(fun&nbsp;acc&nbsp;:&nbsp;list&nbsp;(var&nbsp;*&nbsp;dlocalization)&nbsp;=&gt;&nbsp;(x,&nbsp;loc)&nbsp;::&nbsp;acc)&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oacc)&nbsp;(lookup&nbsp;equiv_dec&nbsp;vars_loc&nbsp;x))&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Some&nbsp;nil)&nbsp;(bdistinct&nbsp;(nnrc_free_vars&nbsp;n)));&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;[&nbsp;|&nbsp;apply&nbsp;in_nil&nbsp;in&nbsp;Hmr;&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contradiction&nbsp;].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;simpl&nbsp;in&nbsp;Hmr.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;apply&nbsp;in_app_or&nbsp;in&nbsp;Hmr.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;inversion&nbsp;Hmr;&nbsp;clear&nbsp;Hmr.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;-&nbsp;Case&nbsp;"pack_closure_env"%string.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;admit.&nbsp;<span class="comment">(*&nbsp;XXXXXXXXX&nbsp;TODO&nbsp;XXXXXXXXXX&nbsp;*)</span>&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;generalize&nbsp;(pack_closure_env_wf&nbsp;inputdb&nbsp;(bdistinct&nbsp;free_vars_of_n)&nbsp;(really_fresh_in&nbsp;output&nbsp;(output&nbsp;::&nbsp;avoid)&nbsp;n)&nbsp;mr).&nbsp;*)</span>&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;auto.&nbsp;*)</span>&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;-&nbsp;Case&nbsp;"final_mr"%string.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;inversion&nbsp;H;&nbsp;try&nbsp;contradiction;&nbsp;clear&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;rewrite&nbsp;&lt;-&nbsp;H0;&nbsp;clear&nbsp;H0.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;unfold&nbsp;mr_well_formed.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;simpl.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;repeat&nbsp;split.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;+&nbsp;apply&nbsp;coll_function_no_free_vars.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;+&nbsp;intros&nbsp;f&nbsp;Hf.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;simpl&nbsp;in&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apply&nbsp;unpack_closure_env_free_vars&nbsp;in&nbsp;Hf;&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try&nbsp;solve&nbsp;[&nbsp;apply&nbsp;bdistinct_same_elemts&nbsp;].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;(Hvars_loc&nbsp;f)&nbsp;in&nbsp;Hf.&nbsp;*)</span><br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;Hfree_vars_of_n&nbsp;in&nbsp;Hf.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;assert&nbsp;(bminus&nbsp;(bdistinct&nbsp;(nnrc_free_vars&nbsp;n))&nbsp;(bdistinct&nbsp;(nnrc_free_vars&nbsp;n))&nbsp;=&nbsp;nil)&nbsp;as&nbsp;Hbminus;&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try&nbsp;solve&nbsp;[&nbsp;apply&nbsp;bminus_self&nbsp;].&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;Hbminus&nbsp;in&nbsp;Hf;&nbsp;clear&nbsp;Hbminus.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;apply&nbsp;in_inv&nbsp;in&nbsp;Hf.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;Hf;&nbsp;try&nbsp;contradiction.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;rewrite&nbsp;&lt;-&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reflexivity.&nbsp;*)</span><br/>
+&nbsp;&nbsp;Admitted.</div>
 <br/>
 <br/>
 <br/>
@@ -568,7 +626,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_free_vars">nnrcmr_of_nnrc_with_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof2859')">Proof.</div>
 <div class="proofscript" id="proof2859">
-&nbsp;intros&nbsp;Hfree_vars_of_n&nbsp;Havoid&nbsp;Hfv&nbsp;Houtput.&nbsp;*)</span>&nbsp;unfold&nbsp;nnrcmr_of_nnrc_with_free_vars.&nbsp;*)</span>&nbsp;unfold&nbsp;nnrcmr_eval.&nbsp;*)</span>&nbsp;rewrite&nbsp;fold_left_app.&nbsp;*)</span>&nbsp;simpl.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXXXXXXX&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;intros&nbsp;Hfree_vars_of_n&nbsp;Havoid&nbsp;Hfv&nbsp;Houtput.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;unfold&nbsp;nnrcmr_of_nnrc_with_free_vars.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;unfold&nbsp;nnrcmr_eval.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;rewrite&nbsp;fold_left_app.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;simpl.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXXXXXXX&nbsp;*)</span><br/>
 &nbsp;&nbsp;Admitted.</div>
 <br/>
 <br/>

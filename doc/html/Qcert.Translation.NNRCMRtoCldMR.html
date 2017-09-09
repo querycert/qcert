@@ -344,7 +344,11 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">l</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXXXXX&nbsp;*)</span><br/>
-&nbsp;rewrite&nbsp;app_nil_r.&nbsp;*)</span>&nbsp;apply&nbsp;MRtoMRCldLast_causually_consistent;&nbsp;trivial.&nbsp;*)</span>&nbsp;simpl&nbsp;in&nbsp;*.&nbsp;*)</span>&nbsp;unfold&nbsp;incl&nbsp;in&nbsp;*;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;intuition.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">match_case</span>; <span class="tactic">intros</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;rewrite&nbsp;app_nil_r.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;apply&nbsp;MRtoMRCldLast_causually_consistent;&nbsp;trivial.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;simpl&nbsp;in&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;unfold&nbsp;incl&nbsp;in&nbsp;*;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;intuition.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">match_case</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#app_ass">app_ass</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id">IHl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="tactic">simpl</span> <span class="kwd">in</span> * .<br/>
@@ -433,7 +437,15 @@
 <div class="proofscript" id="proof2896">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">cc</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCMRtoCldMR.html#nnrcmr_to_cldmr_top">nnrcmr_to_cldmr_top</a></span>.<br/>
-&nbsp;&nbsp;&nbsp;generalize&nbsp;(NNRCMRtoNNRCMRCloudantInit_causally_consistent&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(List.map&nbsp;mr_input&nbsp;l&nbsp;++&nbsp;List.map&nbsp;mr_output&nbsp;l)&nbsp;l&nbsp;cc&nbsp;nil);&nbsp;simpl;&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;intros&nbsp;HH.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;apply&nbsp;HH.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;-&nbsp;reflexivity.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;-&nbsp;rewrite&nbsp;forallb_forall;&nbsp;intuition.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;-&nbsp;rewrite&nbsp;app_nil_r.&nbsp;reflexivity.&nbsp;*)</span>&nbsp;Qed.&nbsp;*)</span>&nbsp;&nbsp;Admitted.</div>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;generalize&nbsp;(NNRCMRtoNNRCMRCloudantInit_causally_consistent&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(List.map&nbsp;mr_input&nbsp;l&nbsp;++&nbsp;List.map&nbsp;mr_output&nbsp;l)&nbsp;l&nbsp;cc&nbsp;nil);&nbsp;simpl;&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;intros&nbsp;HH.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;apply&nbsp;HH.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;-&nbsp;reflexivity.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;-&nbsp;rewrite&nbsp;forallb_forall;&nbsp;intuition.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;-&nbsp;rewrite&nbsp;app_nil_r.&nbsp;reflexivity.&nbsp;*)</span><br/>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;Qed.&nbsp;*)</span><br/>
+&nbsp;&nbsp;Admitted.</div>
 <br/>
 <span class="kwd">End</span> <span class="id"><a href="Qcert.Translation.NNRCMRtoCldMR.html#NNRCMRToCldMR">NNRCMRToCldMR</a></span>.<br/>
 <br/>

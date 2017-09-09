@@ -368,12 +368,12 @@ Section cNNRC.
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *; simpl in H.
           destruct d0; simpl in H; try congruence.
           destruct b.
-          (** condition true *)
+          (* condition true *)
           + case_eq (nnrc_core_eval env e2); intros; rewrite H1 in *.
             * specialize (IHe1 (dbool true) eq_refl); specialize (IHe2 d0 eq_refl);
                 inversion H; subst; eapply sem_NNRCIf_true; eauto.
             * simpl in H; congruence.
-          (** condition false *)
+          (* condition false *)
           + case_eq (nnrc_core_eval env e3); intros; rewrite H1 in *.
             * specialize (IHe1 (dbool false) eq_refl); specialize (IHe3 d0 eq_refl);
                 inversion H; subst; eapply sem_NNRCIf_false; eauto.
@@ -382,11 +382,11 @@ Section cNNRC.
         - specialize (IHe1 env).
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *; simpl in H.
           destruct d0; simpl in H; try congruence.
-          (** left case *)
+          (* left case *)
           + specialize (IHe2 ((v,d0)::env)).
             * specialize (IHe1 (dleft d0) eq_refl); specialize (IHe2 d H);
                 inversion H; subst; eapply sem_NNRCEither_left; eauto.
-          (** right case *)
+          (* right case *)
           + specialize (IHe3 ((v0,d0)::env)).
             * specialize (IHe1 (dright d0) eq_refl); specialize (IHe3 d H);
                 inversion H; subst; eapply sem_NNRCEither_right; eauto.
@@ -435,14 +435,14 @@ Section cNNRC.
           rewrite (IHe1 env (dcoll c1) H5).
           apply nnrc_core_for_eval_complete; auto.
         - inversion H; subst; simpl; auto.
-          (** condition true *)
+          (* condition true *)
           + rewrite (IHe1 env (dbool true) H5); simpl; auto.
-          (** condition false *)
+          (* condition false *)
           + rewrite (IHe1 env (dbool false) H5); simpl; auto.
         - inversion H; subst; simpl; auto.
-          (** left case *)
+          (* left case *)
           + rewrite (IHe1 env (dleft d0) H7); simpl; auto.
-          (** right case *)
+          (* right case *)
           + rewrite (IHe1 env (dright d0) H7); simpl; auto.
         - inversion H.
       Qed.

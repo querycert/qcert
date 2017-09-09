@@ -529,7 +529,19 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">destruct</span> <span class="id">r</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">congruence</span> ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_eval">mr_eval</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">loc_d</span>.<br/>
-&nbsp;-&nbsp;Case&nbsp;"loc_d&nbsp;is&nbsp;scalar"%string.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;rewrite&nbsp;Hmap;&nbsp;simpl.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;destruct&nbsp;p;&nbsp;simpl&nbsp;in&nbsp;*.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;destruct&nbsp;n;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;try&nbsp;congruence.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;*&nbsp;unfold&nbsp;equiv_decb&nbsp;in&nbsp;*.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeat&nbsp;dest_eqdec;&nbsp;try&nbsp;congruence.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reflexivity.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;*&nbsp;destruct&nbsp;u;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;try&nbsp;congruence.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;n;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;try&nbsp;congruence.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unfold&nbsp;equiv_decb&nbsp;in&nbsp;*.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeat&nbsp;dest_eqdec;&nbsp;try&nbsp;congruence.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reflexivity.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">loc_d</span> <span class="id">is</span> <span class="id">scalar</span>"%<span class="id">string</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;-&nbsp;Case&nbsp;"loc_d&nbsp;is&nbsp;scalar"%string.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;rewrite&nbsp;Hmap;&nbsp;simpl.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;destruct&nbsp;p;&nbsp;simpl&nbsp;in&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;destruct&nbsp;n;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;try&nbsp;congruence.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;*&nbsp;unfold&nbsp;equiv_decb&nbsp;in&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeat&nbsp;dest_eqdec;&nbsp;try&nbsp;congruence.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reflexivity.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;*&nbsp;destruct&nbsp;u;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;try&nbsp;congruence.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;destruct&nbsp;n;&nbsp;simpl&nbsp;in&nbsp;*;&nbsp;try&nbsp;congruence.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unfold&nbsp;equiv_decb&nbsp;in&nbsp;*.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;repeat&nbsp;dest_eqdec;&nbsp;try&nbsp;congruence.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;reflexivity.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">loc_d</span> <span class="id">is</span> <span class="id">scalar</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr_map</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">contradiction</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>

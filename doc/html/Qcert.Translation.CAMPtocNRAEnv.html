@@ -77,15 +77,19 @@
 <div class="toggleproof" onclick="toggleDisplay('proof2911')">Proof.</div>
 <div class="proofscript" id="proof2911">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">d</span> <span class="id">env</span>; <span class="tactic">induction</span> <span class="id">q</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
-&nbsp;pconst&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
-&nbsp;punop&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq</span>; <span class="tactic">clear</span> <span class="id">IHq</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pconst&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;punop&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq</span>; <span class="tactic">clear</span> <span class="id">IHq</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Operators.RUnaryOpsSem.html#fun_of_unaryop">fun_of_unaryop</a></span> <span class="id">h</span> <span class="id">u</span> <span class="id">res</span>); <span class="tactic">reflexivity</span>.<br/>
-&nbsp;pbinop&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">rewrite</span> &lt;- <span class="id">IHq2</span>; <span class="tactic">clear</span> <span class="id">IHq1</span> <span class="id">IHq2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pbinop&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">rewrite</span> &lt;- <span class="id">IHq2</span>; <span class="tactic">clear</span> <span class="id">IHq1</span> <span class="id">IHq2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q1</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q2</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Operators.RBinaryOpsSem.html#fun_of_binop">fun_of_binop</a></span> <span class="id">h</span> <span class="id">b</span> <span class="id">res</span> <span class="id">res0</span>); <span class="tactic">reflexivity</span>.<br/>
-&nbsp;pmap&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pmap&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap_concat">rmap_concat</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Lift.html#olift">olift</a></span>, <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#liftpr">liftpr</a></span> ; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
@@ -116,31 +120,40 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">o</span>; <span class="tactic">simpl</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">IHl</span>; <span class="tactic">generalize</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#gather_successes">gather_successes</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q</span> <span class="id">env</span>) <span class="id">l</span>)); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
-&nbsp;passert&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq</span>; <span class="tactic">clear</span> <span class="id">IHq</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;passert&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq</span>; <span class="tactic">clear</span> <span class="id">IHq</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">res</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">reflexivity</span>.<br/>
-&nbsp;porElse&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">clear</span> <span class="id">IHq1</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;porElse&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">clear</span> <span class="id">IHq1</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q1</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">simpl</span>; <span class="tactic">auto</span>.<br/>
-&nbsp;pit&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
-&nbsp;pletIt&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">clear</span> <span class="id">IHq1</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pit&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pletIt&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">clear</span> <span class="id">IHq1</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q1</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHq2</span> <span class="id">res</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span> <span class="kwd">in</span> <span class="id">IHq2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">IHq2</span>; <span class="tactic">clear</span> <span class="id">IHq2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q2</span> <span class="id">env</span> <span class="id">res</span>); <span class="tactic">reflexivity</span>.      <br/>
-&nbsp;pgetConstant&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id">c</span> <span class="id">s</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
-&nbsp;penv&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eauto</span>. <br/>
-&nbsp;pletEnv&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">clear</span> <span class="id">IHq1</span>; <span class="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pgetConstant&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id">c</span> <span class="id">s</span>); <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;penv&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eauto</span>. <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pletEnv&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> &lt;- <span class="id">IHq1</span>; <span class="tactic">clear</span> <span class="id">IHq1</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q1</span> <span class="id">env</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">res</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#merge_bindings">merge_bindings</a></span> <span class="id">env</span> <span class="id">l</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">IHq2</span> <span class="id">d</span> <span class="id">l0</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">IHq2</span>; <span class="tactic">clear</span> <span class="id">IHq2</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q2</span> <span class="id">l0</span> <span class="id">d</span>); <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
-&nbsp;pleft&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
-&nbsp;pright&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pleft&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;pright&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_core_of_camp_equiv_to_nra">nraenv_core_of_camp_equiv_to_nra</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">p</span> <span class="id">bind</span> <span class="id">d</span>:<br/>

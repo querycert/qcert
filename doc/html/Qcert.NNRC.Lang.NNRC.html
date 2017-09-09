@@ -77,14 +77,12 @@ targets. </div>
 <br/>
 <div class="doc">The following macro defines group-by in terms of existing cNNRC expressions. </div>
 <br/>
-<div class="doc"><span class="bracket"><span class="id">e</span> <span class="id">groupby</span>[<span class="id">g</span>,<span class="id">keys</span>] ==
-         <span class="id">LET</span> $<span class="id">group0</span> := <span class="id">e</span>
-         <span class="id">IN</span> { [ <span class="id">g</span>: ♯<span class="id">flatten</span>({ <span class="id">IF</span> ($<span class="id">group3</span> = π[<span class="id">keys</span>])
-                              <span class="id">THEN</span> {$<span class="id">group3</span>}
-                              <span class="id">ELSE</span> {}
-                              | $<span class="id">group3</span> ∈ $<span class="id">group0</span> }) ]
-            | $<span class="id">group2</span> ∈ ♯<span class="id">distinct</span>({ π[<span class="id">keys</span>]($<span class="id">group1</span>)
-                                  | $<span class="id">group1</span> ∈ $<span class="id">group0</span> }) }</span>
+<div class="doc">&lt;&lt;e groupby<span class="bracket"><span class="id">g</span>,<span class="id">keys</span></span> ==
+         let $group0 := e
+         in { <span class="bracket"> <span class="id">g</span>: ♯<span class="id">flatten</span>({ $<span class="id">group3</span> = π[<span class="id">keys</span>] ? {$<span class="id">group3</span>} {}
+                            | $<span class="id">group3</span> ∈ $<span class="id">group0</span> }) </span>
+            | $group2 ∈ ♯distinct({ π<span class="bracket"><span class="id">keys</span></span>($group1)
+                                  | $group1 ∈ $group0 }) }&gt;&gt;
      </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="nnrc_group_by">nnrc_group_by</a></span> (<span class="id">g</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">sl</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) : <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span> :=<br/>

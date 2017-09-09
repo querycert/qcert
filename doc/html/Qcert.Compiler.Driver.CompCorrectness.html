@@ -1151,7 +1151,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">elim</span> <span class="id">H0</span>; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="id">contradiction</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">clear</span> <span class="id">H0</span>; <span class="tactic">try</span> (<span class="tactic">rewrite</span> &lt;- <span class="id">H1</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>).<br/>
-&nbsp;CAMP&nbsp;to&nbsp;cNRAEnv&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;CAMP&nbsp;to&nbsp;cNRAEnv&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv_core">camp_to_nraenv_core</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1159,7 +1160,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#camp_to_nraenv_core_preserves_eval">camp_to_nraenv_core_preserves_eval</a></span>.<br/>
-&nbsp;CAMP&nbsp;to&nbsp;NRAEnv&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;CAMP&nbsp;to&nbsp;NRAEnv&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv">camp_to_nraenv</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1167,7 +1169,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#camp_to_nraenv_preserves_eval">camp_to_nraenv_preserves_eval</a></span>.<br/>
-&nbsp;CAMP&nbsp;to&nbsp;NRA&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;CAMP&nbsp;to&nbsp;NRA&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nra">camp_to_nra</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1175,7 +1178,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#camp_to_nra_preserves_eval">camp_to_nra_preserves_eval</a></span>.<br/>
-&nbsp;NRA&nbsp;to&nbsp;cNNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NRA&nbsp;to&nbsp;cNNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nra_to_nnrc_core">nra_to_nnrc_core</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1183,7 +1187,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nra_to_nnrc_core_preserves_eval">nra_to_nnrc_core_preserves_eval</a></span>.<br/>
-&nbsp;NRA&nbsp;to&nbsp;cNRAEnv&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NRA&nbsp;to&nbsp;cNRAEnv&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nra_to_nraenv_core">nra_to_nraenv_core</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1191,7 +1196,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nra_to_nraenv_core_preserves_eval">nra_to_nraenv_core_preserves_eval</a></span>.<br/>
-&nbsp;cNRAEnv&nbsp;to&nbsp;NRAEnv&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;cNRAEnv&nbsp;to&nbsp;NRAEnv&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_core_to_nraenv">nraenv_core_to_nraenv</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1199,7 +1205,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nraenv_core_to_nraenv_preserves_eval">nraenv_core_to_nraenv_preserves_eval</a></span>.<br/>
-&nbsp;cNRAEnv&nbsp;to&nbsp;cNNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;cNRAEnv&nbsp;to&nbsp;cNNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_core_to_nnrc_core">nraenv_core_to_nnrc_core</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1207,7 +1214,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nraenv_core_to_nnrc_core_preserves_eval">nraenv_core_to_nnrc_core_preserves_eval</a></span>.<br/>
-&nbsp;cNRAEnv&nbsp;to&nbsp;NRA&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;cNRAEnv&nbsp;to&nbsp;NRA&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_core_to_nra">nraenv_core_to_nra</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1215,7 +1223,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nraenv_core_to_nra_preserves_eval">nraenv_core_to_nra_preserves_eval</a></span>.<br/>
-&nbsp;NRAEnv&nbsp;to&nbsp;NNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NRAEnv&nbsp;to&nbsp;NNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_to_nnrc">nraenv_to_nnrc</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1223,7 +1232,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nraenv_to_nnrc_preserves_eval">nraenv_to_nnrc_preserves_eval</a></span>.<br/>
-&nbsp;NRAEnv&nbsp;to&nbsp;NNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NRAEnv&nbsp;to&nbsp;NNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nraenv_to_nraenv_core">nraenv_to_nraenv_core</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1231,7 +1241,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nraenv_to_nraenv_core_preserves_eval">nraenv_to_nraenv_core_preserves_eval</a></span>.<br/>
-&nbsp;cNNRC&nbsp;to&nbsp;NNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;cNNRC&nbsp;to&nbsp;NNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nnrc_core_to_nnrc">nnrc_core_to_nnrc</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1239,7 +1250,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nnrc_core_to_nnrc_preserves_eval">nnrc_core_to_nnrc_preserves_eval</a></span>.<br/>
-&nbsp;NNRC&nbsp;to&nbsp;cNNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRC&nbsp;to&nbsp;cNNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H1</span>; <span class="tactic">intros</span>; <span class="tactic">clear</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H0</span>; <span class="tactic">simpl</span>; <span class="id">trivial_same_query</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">H3</span> (<span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#nnrc_to_nnrc_core">nnrc_to_nnrc_core</a></span> <span class="id">q</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
@@ -1247,12 +1259,18 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">clear</span> <span class="id">H2</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Driver.CompCorrectness.html#nnrc_to_nnrc_core_preserves_eval">nnrc_to_nnrc_core_preserves_eval</a></span>.<br/>
-&nbsp;NNRC&nbsp;to&nbsp;DNNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
-&nbsp;NNRC&nbsp;to&nbsp;JavaScript&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
-&nbsp;NNRC&nbsp;to&nbsp;Java&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
-&nbsp;NNRCMR&nbsp;to&nbsp;SparkRDD&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
-&nbsp;NNRCMR&nbsp;to&nbsp;DNNRC&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
-&nbsp;NNRCMR&nbsp;to&nbsp;CldMR&nbsp;arrow&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRC&nbsp;to&nbsp;DNNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRC&nbsp;to&nbsp;JavaScript&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRC&nbsp;to&nbsp;Java&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRCMR&nbsp;to&nbsp;SparkRDD&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRCMR&nbsp;to&nbsp;DNNRC&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;NNRCMR&nbsp;to&nbsp;CldMR&nbsp;arrow&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">elim</span> <span class="id">H</span>; <span class="tactic">intros</span>; <span class="id">contradiction</span>. <span class="comment">(*&nbsp;Not&nbsp;proved&nbsp;*)</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="correct_driver_preserves_eval_camp_rule">correct_driver_preserves_eval_camp_rule</a></span>:<br/>

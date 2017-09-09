@@ -495,7 +495,8 @@
 <div class="toggleproof" onclick="toggleDisplay('proof1763')">Proof.</div>
 <div class="proofscript" id="proof1763">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>; <span class="tactic">intros</span>.<br/>
-&nbsp;apply&nbsp;nraenv_core_of_nra_proper&nbsp;in&nbsp;H.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span> <span class="kwd">in</span> *.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;apply&nbsp;nraenv_core_of_nra_proper&nbsp;in&nbsp;H.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRAEq.html#nra_eq">nra_eq</a></span>, <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnvEq.html#nraenv_core_eq">nraenv_core_eq</a></span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">specialize</span> (<span class="id">H</span> <span class="id">h</span> <span class="id">c</span> <span class="id">dn_c</span> (<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span> <span class="id">env</span> <span class="id">x0</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#unfold_env_nra">unfold_env_nra</a></span> <span class="kwd">in</span> <span class="id">H</span> <span class="tactic">by</span> <span class="tactic">trivial</span>.<br/>

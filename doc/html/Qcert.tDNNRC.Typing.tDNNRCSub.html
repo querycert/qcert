@@ -427,7 +427,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">r</span> = τ) <span class="tactic">by</span> (<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_fequal">rtype_fequal</a></span>; <span class="tactic">assumption</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">subst</span>; <span class="tactic">assumption</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">admit</span>.<br/>
-&nbsp;We&nbsp;will&nbsp;need&nbsp;a&nbsp;special&nbsp;inductive&nbsp;principle&nbsp;because&nbsp;of&nbsp;the&nbsp;list&nbsp;of&nbsp;expressions&nbsp;in&nbsp;TDNRAlg&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">H</span> <span class="kwd">in</span> <span class="id">H2</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;We&nbsp;will&nbsp;need&nbsp;a&nbsp;special&nbsp;inductive&nbsp;principle&nbsp;because&nbsp;of&nbsp;the&nbsp;list&nbsp;of&nbsp;expressions&nbsp;in&nbsp;TDNRAlg&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">H</span> <span class="kwd">in</span> <span class="id">H2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">IHdnnrc_base_type_sub</span> <span class="id">_</span> <span class="id">H2</span>) <span class="kwd">as</span> [<span class="id">dd</span> [<span class="id">dd_eval</span> <span class="id">dd_typ</span>]].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H0</span> <span class="kwd">in</span> <span class="id">dd_typ</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eauto</span>.<br/>

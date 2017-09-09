@@ -127,7 +127,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dt</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">dtype_inverter</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TData.html#Col_inv">Col_inv</a></span> <span class="kwd">in</span> <span class="id">dt</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;revert&nbsp;τ&nbsp;pf1&nbsp;pf2&nbsp;dt.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">dt</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;revert&nbsp;τ&nbsp;pf1&nbsp;pf2&nbsp;dt.&nbsp;*)</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">dt</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d1</span>; <span class="tactic">simpl</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">intros</span> <span class="id">dt</span> <span class="id">sub</span> <span class="id">ob</span>. <span class="comment">(*&nbsp;τ&nbsp;pf1&nbsp;pf2&nbsp;dt&nbsp;sub&nbsp;ob.&nbsp;*)</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">eexists</span>; <span class="tactic">split</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
