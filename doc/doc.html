@@ -186,12 +186,14 @@ multisets).
 <p>In the <code>coq</code> directory, each language has its own
   directory with a subdirectory <code>Lang</code> containing the
   syntax (Abstract Syntax Tree) and the definition of the semantics of
-  the language.
-</p>
+  the language.</p>
+
+<p>For most language, the semantics is given through an evaluation
+  function. In a few cases, a denotational semantics is also provided
+  (e.g., for cNNRC).</p>
 
 <p>When that language comes with a type checker, the type checker can
-  be found in a separate <code>Typing</code> subdirectory.
-</p>
+  be found in a separate <code>Typing</code> subdirectory.</p>
 
 <h4>Source Languages</h4>
 
@@ -226,7 +228,7 @@ multisets).
       <td><code>lambda_nra</code></td>
       <td><code>coq/LambdaNRA<code></td>
       <td><a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra">Syntax</a>,
-          <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">Semantics</a>,
+          <a href="html/Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval_top">Eval</a>,
 	  <a href="html/Qcert.LambdaNRA.Typing.LambdaNRA.html#lambda_nra_type">Typing</a></td>
       <td><a href="#nraenv">[AHMSS2017]</a></td></tr>
     <tr><th>SQL</th>
@@ -246,7 +248,7 @@ multisets).
       <td><code>oql</code></td>
       <td><code>coq/OQL<code></td>
       <td><a href="html/Qcert.OQL.Lang.OQL.html#oql">Syntax</a>,
-          <a href="html/Qcert.OQL.Lang.OQL.html#oql_eval_top">Semantics</a></td>
+          <a href="html/Qcert.OQL.Lang.OQL.html#oql_eval_top">Eval</a></td>
       <td><a href="#oql">[ODMG]</a></td>
       <td></td></tr>
   </table>
@@ -272,14 +274,14 @@ multisets).
       <td><code>camp_rule</code></td>
       <td><code>coq/CAMPRule<code></td>
       <td><a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule">Syntax</a>,
-          <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule_eval_top">Semantics</a></td>
+          <a href="html/Qcert.CAMPRule.Lang.CAMPRule.html#camp_rule_eval_top">Eval</a></td>
       <td><a href="#camp">[SSH2015]</a></td></tr>
     <tr><th>CAMP</th>
       <td>Calculus of Aggregating Matching Patterns</td>
       <td><code>camp</code></td>
       <td><code>coq/CAMP<code></td>
       <td><a href="html/Qcert.CAMP.Lang.CAMP.html#camp">Syntax</a>,
-          <a href="html/Qcert.CAMP.Lang.CAMP.html#camp_eval_top">Semantics</a>,
+          <a href="html/Qcert.CAMP.Lang.CAMP.html#camp_eval_top">Eval</a>,
           <a href="html/Qcert.CAMP.Typing.TCAMP.html#camp_type">Typing</a></td>
       <td><a href="#camp">[SSH2015]</a></td></tr>
     <tr><th>NRA</th>
@@ -287,7 +289,7 @@ multisets).
       <td><code>nra</code></td>
       <td><code>coq/NRA<code></td>
       <td><a href="html/Qcert.NRA.Lang.NRA.html#nra">Syntax</a>,
-          <a href="html/Qcert.NRA.Lang.NRA.html#nra_eval_top">Semantics</a>,
+          <a href="html/Qcert.NRA.Lang.NRA.html#nra_eval_top">Eval</a>,
           <a href="html/Qcert.NRA.Typing.TNRA.html#nra_type">Typing</a></td>
       <td><a href="#nra">[Moer2014]</a></td></tr>
     <tr><th>NRA<sup>e</sup></th>
@@ -295,7 +297,7 @@ multisets).
       <td><code>nraenv</code></td>
       <td><code>coq/NRAEnv<code></td>
       <td><a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">Syntax</a>,
-          <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">Semantics</a>,
+          <a href="html/Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">Eval</a>,
           <a href="html/Qcert.NRAEnv.Typing.TNRAEnv.html#nraenv_type">Typing</a></td>
       <td></td></tr>
     <tr><th>cNRA<sup>e</sup></th>
@@ -303,7 +305,7 @@ multisets).
       <td><code>nraenv_core</code></td>
       <td><code>coq/cNRAEnv<code></td>
       <td><a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">Syntax</a>,
-          <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core_eval_top">Semantics</a>,
+          <a href="html/Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core_eval_top">Eval</a>,
           <a href="html/Qcert.cNRAEnv.Typing.TcNRAEnv.html#nraenv_core_type">Typing</a></td>
       <td><a href="#nraenv">[AHMSS2017]</a></td></tr>
     <tr><th>NNRC</th>
@@ -311,7 +313,7 @@ multisets).
       <td><code>nnrc</code></td>
       <td><code>coq/NNRC<code></td>
       <td><a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc">Syntax</a>,
-          <a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc_eval_top">Semantics</a>,
+          <a href="html/Qcert.NNRC.Lang.NNRC.html#nnrc_eval_top">Eval</a>,
           <a href="html/Qcert.NNRC.Typing.TNNRC.html#nnrc_type">Typing</a></td>
       <td></td></tr>
     <tr><th>cNNRC</th>
@@ -319,7 +321,8 @@ multisets).
       <td><code>nnrc_core</code></td>
       <td><code>coq/cNNRC<code></td>
       <td><a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">Syntax</a>,
-          <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">Semantics</a>,
+          <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_sem_top">Denotational</a>,
+          <a href="html/Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">Eval</a>,
           <a href="html/Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">Typing</a></td>
       <td><a href="#nnrc">[BV2007]</a></td></tr>
   </table>
@@ -344,7 +347,7 @@ multisets).
       <td><code>dnnrc</code></td>
       <td><code>coq/DNNRC<code></td>
       <td><a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc">Syntax</a>,
-          <a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_eval_top">Semantics</a>,
+          <a href="html/Qcert.DNNRC.Lang.DNNRC.html#dnnrc_eval_top">Eval</a>,
           <a href="html/Qcert.DNNRC.Typing.TDNNRCBase.html#dnnrc_base_type">Typing</a></td>
       <td></td></tr>
     <tr><th>DNNRC</th>
@@ -352,21 +355,21 @@ multisets).
       <td><code>dnnrc_typed</code></td>
       <td><code>coq/tDNNRC<code></td>
       <td><a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_typed">Syntax</a>,
-          <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_typed_eval_top">Semantics</a></td>
+          <a href="html/Qcert.tDNNRC.Lang.tDNNRC.html#dnnrc_typed_eval_top">Eval</a></td>
       <td></td></tr>
     <tr><th>NNRCMR</th>
       <td>NNRC extended with Map/Reduce</td>
       <td><code>nnrcmr</code></td>
       <td><code>coq/NNRCMR<code></td>
       <td><a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr">Syntax</a>,
-          <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval_top">Semantics</a></td>
+          <a href="html/Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval_top">Eval</a></td>
       <td></td></tr>
     <tr><th>CldMR</th>
       <td>NNRC extended with Map/Reduce for Cloudant</td>
       <td><code>cldmr</code></td>
       <td><code>coq/CldMR<code></td>
       <td><a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr">Syntax</a>,
-          <a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr_eval_top">Semantics</a></td>
+          <a href="html/Qcert.CldMR.Lang.CldMR.html#cldmr_eval_top">Eval</a></td>
       <td></td></tr>
   </table>
 

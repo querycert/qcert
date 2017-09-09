@@ -208,8 +208,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">fswf4</span> : <span class="kwd">forall</span> <span class="id">e1</span> : <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_select_expr">oql_select_expr</a></span>, <span class="kwd">forall</span> <span class="id">el</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_in_expr">oql_in_expr</a></span>, <span class="kwd">forall</span> <span class="id">ew</span> : <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>, <span class="kwd">forall</span> <span class="id">eob</span> : <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>, <span class="kwd">forall</span> <span class="id">sc</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortDesc">SortDesc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.OQL.Lang.OQL.html#P">P</a></span> (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oselect_expr">oselect_expr</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#e1">e1</a></span>) -&gt; (<span class="kwd">forall</span> <span class="id">ab</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#ab">ab</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#el">el</a></span> -&gt; <span class="id"><a href="Qcert.OQL.Lang.OQL.html#P">P</a></span> (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oin_expr">oin_expr</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#ab">ab</a></span>)) -&gt; <span class="id"><a href="Qcert.OQL.Lang.OQL.html#P">P</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#ew">ew</a></span> -&gt; <span class="id"><a href="Qcert.OQL.Lang.OQL.html#P">P</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#eob">eob</a></span> -&gt; <span class="id"><a href="Qcert.OQL.Lang.OQL.html#P">P</a></span> (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OSFW">OSFW</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#e1">e1</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#el">el</a></span> (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OWhere">OWhere</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#ew">ew</a></span>) (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#OOrderBy">OOrderBy</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#eob">eob</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#sc">sc</a></span>))) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">e</span>, <span class="id"><a href="Qcert.OQL.Lang.OQL.html#P">P</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#e">e</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2741')">Proof.</div>
-<div class="proofscript" id="proof2741">
+<div class="toggleproof" onclick="toggleDisplay('proof2744')">Proof.</div>
+<div class="proofscript" id="proof2744">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr_ind">oql_expr_ind</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intros</span>. <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall_forall">Forall_forall</a></span> <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -223,8 +223,8 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_expr_eqdec">oql_expr_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.  <br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2742')">Proof.</div>
-<div class="proofscript" id="proof2742">
+<div class="toggleproof" onclick="toggleDisplay('proof2745')">Proof.</div>
+<div class="proofscript" id="proof2745">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr">oql_expr</a></span>,  {<span class="id"><a href="Qcert.OQL.Lang.OQL.html#x">x</a></span> = <span class="id"><a href="Qcert.OQL.Lang.OQL.html#y">y</a></span>} + {<span class="id"><a href="Qcert.OQL.Lang.OQL.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.OQL.Lang.OQL.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span>[<span class="id">right</span>; <span class="tactic">inversion</span> 1].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.Data.RData.html#data_eqdec">data_eqdec</a></span> <span class="id">d</span> <span class="id">d0</span>).<br/>
@@ -391,16 +391,16 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_select_expr_eqdec">oql_select_expr_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_select_expr">oql_select_expr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2743')">Proof.</div>
-<div class="proofscript" id="proof2743">
+<div class="toggleproof" onclick="toggleDisplay('proof2746')">Proof.</div>
+<div class="proofscript" id="proof2746">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id">o</span> == <span class="id">o0</span>); [<span class="id">left</span>|<span class="id">right</span>]; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id">o</span> == <span class="id">o0</span>); [<span class="id">left</span>|<span class="id">right</span>]; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_in_expr_eqdec">oql_in_expr_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_in_expr">oql_in_expr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2744')">Proof.</div>
-<div class="proofscript" id="proof2744">
+<div class="toggleproof" onclick="toggleDisplay('proof2747')">Proof.</div>
+<div class="proofscript" id="proof2747">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span> <span class="id">s</span> <span class="id">s0</span>); <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">inversion</span> 1; <span class="tactic">congruence</span>]; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">o</span> == <span class="id">o0</span>); [<span class="id">left</span>|<span class="id">right</span>]; <span class="tactic">congruence</span>.<br/>
@@ -410,16 +410,16 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_where_expr_eqdec">oql_where_expr_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_where_expr">oql_where_expr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2745')">Proof.</div>
-<div class="proofscript" id="proof2745">
+<div class="toggleproof" onclick="toggleDisplay('proof2748')">Proof.</div>
+<div class="proofscript" id="proof2748">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id">o</span> == <span class="id">o0</span>); [<span class="id">left</span>|<span class="id">right</span>]; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_order_by_expr_eqdec">oql_order_by_expr_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_order_by_expr">oql_order_by_expr</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2746')">Proof.</div>
-<div class="proofscript" id="proof2746">
+<div class="toggleproof" onclick="toggleDisplay('proof2749')">Proof.</div>
+<div class="proofscript" id="proof2749">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id">o</span> == <span class="id">o0</span>); <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">inversion</span> 1; <span class="tactic">congruence</span>]; <span class="tactic">subst</span>.<br/>
@@ -427,8 +427,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_query_program_eqdec">oql_query_program_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_query_program">oql_query_program</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2747')">Proof.</div>
-<div class="proofscript" id="proof2747">
+<div class="toggleproof" onclick="toggleDisplay('proof2750')">Proof.</div>
+<div class="proofscript" id="proof2750">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id">s</span> == <span class="id">s0</span>); [ | <span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id">o</span> == <span class="id">o0</span>); [ | <span class="id">right</span>; <span class="tactic">congruence</span>].<br/>
@@ -441,8 +441,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="oql_eqdec">oql_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql">oql</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2748')">Proof.</div>
-<div class="proofscript" id="proof2748">
+<div class="toggleproof" onclick="toggleDisplay('proof2751')">Proof.</div>
+<div class="proofscript" id="proof2751">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_query_program_eqdec">oql_query_program_eqdec</a></span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>

@@ -93,8 +93,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="infer_nnrc_core_type_correct">infer_nnrc_core_type_correct</a></span> {τ<span class="id">out</span>} (<span class="id">tenv</span>:<span class="id"><a href="Qcert.Common.Typing.TBindings.html#tbindings">tbindings</a></span>) (<span class="id">n</span>:<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRCInfer.html#infer_nnrc_core_type">infer_nnrc_core_type</a></span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRCInfer.html#tenv">tenv</a></span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRCInfer.html#n">n</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">nnrc_core_type</a></span> τ<span class="id">constants</span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRCInfer.html#tenv">tenv</a></span> <span class="id"><a href="Qcert.cNNRC.Typing.TcNNRCInfer.html#n">n</a></span> τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2382')">Proof.</div>
-<div class="proofscript" id="proof2382">
+<div class="toggleproof" onclick="toggleDisplay('proof2385')">Proof.</div>
+<div class="proofscript" id="proof2385">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">tenv</span> τ<span class="id">out</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">n</span>) <span class="id">Case</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">NNRCGetConstant</span>"%<span class="id">string</span>.<br/>

@@ -41,15 +41,15 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_size_nzero">nnrc_size_nzero</a></span> (<span class="id">n</span>:<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc">nnrc</a></span>) : <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span> &lt;&gt; 0.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2459')">Proof.</div>
-<div class="proofscript" id="proof2459">
+<div class="toggleproof" onclick="toggleDisplay('proof2462')">Proof.</div>
+<div class="proofscript" id="proof2462">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">n</span>; <span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrc_rename_lazy_size">nnrc_rename_lazy_size</a></span> <span class="id">n</span> <span class="id">x1</span> <span class="id">x2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_rename_lazy">nnrc_rename_lazy</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#x1">x1</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#x2">x2</a></span>) = <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#n">n</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2460')">Proof.</div>
-<div class="proofscript" id="proof2460">
+<div class="toggleproof" onclick="toggleDisplay('proof2463')">Proof.</div>
+<div class="proofscript" id="proof2463">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">n</span>) <span class="id">Case</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_rename_lazy">nnrc_rename_lazy</a></span> <span class="kwd">in</span> *;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>;<br/>

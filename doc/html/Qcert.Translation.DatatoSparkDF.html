@@ -42,8 +42,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dataToJS_correctly_escapes_quote_inside_string">dataToJS_correctly_escapes_quote_inside_string</a></span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.NNRCtoJavaScript.html#dataToJS">dataToJS</a></span> """" (<span class="id"><a href="Qcert.Common.Data.RData.html#dstring">dstring</a></span> "<span class="id">abc</span>""<span class="id">cde</span>") = """<span class="id">abc</span>\""<span class="id">cde</span>"""%<span class="id">string</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3030')">Proof.</div>
-<div class="proofscript" id="proof3030">
+<div class="toggleproof" onclick="toggleDisplay('proof3033')">Proof.</div>
+<div class="proofscript" id="proof3033">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">vm_compute</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -128,8 +128,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"{""<span class="id">age</span>"": 35, ""<span class="id">name</span>"": ""<span class="id">Fred</span>"", ""<span class="id">friends</span>"": [{""<span class="id">type</span>"": [""<span class="id">Person</span>""], ""<span class="id">data</span>"": {""<span class="id">age</span>"": 42, ""<span class="id">name</span>"": ""<span class="id">Berta</span>"", ""<span class="id">friends</span>"": []}}]}")<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("$<span class="id">type</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.Common.JSON.JSON.html#jarray">jarray</a></span> (<span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span> "<span class="id">Person</span>" :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3031')">Proof.</div>
-<div class="proofscript" id="proof3031">
+<div class="toggleproof" onclick="toggleDisplay('proof3034')">Proof.</div>
+<div class="proofscript" id="proof3034">
  <span class="id">vm_compute</span>. <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="test_json_with_nested_brand">test_json_with_nested_brand</a></span>:<br/>
@@ -155,8 +155,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.JSON.JSON.html#jobject">jobject</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(("$<span class="id">data</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span> "{""<span class="id">age</span>"": 42, ""<span class="id">name</span>"": ""<span class="id">Berta</span>"", ""<span class="id">friends</span>"": []}")<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:: ("$<span class="id">type</span>"%<span class="id">string</span>, <span class="id"><a href="Qcert.Common.JSON.JSON.html#jarray">jarray</a></span> (<span class="id"><a href="Qcert.Common.JSON.JSON.html#jstring">jstring</a></span> "<span class="id">Person</span>" :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3032')">Proof.</div>
-<div class="proofscript" id="proof3032">
+<div class="toggleproof" onclick="toggleDisplay('proof3035')">Proof.</div>
+<div class="proofscript" id="proof3035">
  <span class="id">vm_compute</span>. <span class="tactic">reflexivity</span>. Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Context</span> {<span class="id">ftojson</span>:<span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html#foreign_to_JSON">foreign_to_JSON</a></span>}.<br/>

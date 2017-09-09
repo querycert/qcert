@@ -46,8 +46,8 @@
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="sql_date_interval_foreign_data">sql_date_interval_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL">SQL_DATE_INTERVAL</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3046')">Next Obligation.</div>
-<div class="proofscript" id="proof3046">
+<div class="toggleproof" onclick="toggleDisplay('proof3049')">Next Obligation.</div>
+<div class="proofscript" id="proof3049">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_eq">SQL_DATE_INTERVAL_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;+ <span class="id">left</span>.<br/>
@@ -59,16 +59,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_eq_correct">SQL_DATE_INTERVAL_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3047')">Next Obligation.</div>
-<div class="proofscript" id="proof3047">
+<div class="toggleproof" onclick="toggleDisplay('proof3050')">Next Obligation.</div>
+<div class="proofscript" id="proof3050">
 &nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3048')">Next Obligation.</div>
-<div class="proofscript" id="proof3048">
+<div class="toggleproof" onclick="toggleDisplay('proof3051')">Next Obligation.</div>
+<div class="proofscript" id="proof3051">
 &nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3049')">Next Obligation.</div>
-<div class="proofscript" id="proof3049">
+<div class="toggleproof" onclick="toggleDisplay('proof3052')">Next Obligation.</div>
+<div class="proofscript" id="proof3052">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_INTERVAL_tostring">SQL_DATE_INTERVAL_tostring</a></span> <span class="id">f</span>).<br/>
@@ -89,8 +89,8 @@ Defined.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="sql_date_foreign_data">sql_date_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE">SQL_DATE</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3050')">Next Obligation.</div>
-<div class="proofscript" id="proof3050">
+<div class="toggleproof" onclick="toggleDisplay('proof3053')">Next Obligation.</div>
+<div class="proofscript" id="proof3053">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_eq">SQL_DATE_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;+ <span class="id">left</span>.<br/>
@@ -102,16 +102,16 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_eq_correct">SQL_DATE_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3051')">Next Obligation.</div>
-<div class="proofscript" id="proof3051">
+<div class="toggleproof" onclick="toggleDisplay('proof3054')">Next Obligation.</div>
+<div class="proofscript" id="proof3054">
 &nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3052')">Next Obligation.</div>
-<div class="proofscript" id="proof3052">
+<div class="toggleproof" onclick="toggleDisplay('proof3055')">Next Obligation.</div>
+<div class="proofscript" id="proof3055">
 &nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3053')">Next Obligation.</div>
-<div class="proofscript" id="proof3053">
+<div class="toggleproof" onclick="toggleDisplay('proof3056')">Next Obligation.</div>
+<div class="proofscript" id="proof3056">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#SQL_DATE_tostring">SQL_DATE_tostring</a></span> <span class="id">f</span>).<br/>

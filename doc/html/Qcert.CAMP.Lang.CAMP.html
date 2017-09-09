@@ -108,8 +108,8 @@
 <div class="doc">Equality between two CAMP patterns is decidable. </div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="camp_eqdec">camp_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp">camp</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2678')">Proof.</div>
-<div class="proofscript" id="proof2678">
+<div class="toggleproof" onclick="toggleDisplay('proof2681')">Proof.</div>
+<div class="proofscript" id="proof2681">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp">camp</a></span>, {<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#x">x</a></span> = <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#y">y</a></span>} + {<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RData.html#data_eqdec">data_eqdec</a></span>.<br/>
@@ -424,8 +424,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#CAMP.EvaluationDebug.h">h</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#CAMP.EvaluationDebug.constant_env">constant_env</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#p">p</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#bind">bind</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#d">d</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_debug">camp_eval_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#loc">loc</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#p">p</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#bind">bind</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#d">d</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2679')">Proof.</div>
-<div class="proofscript" id="proof2679">
+<div class="toggleproof" onclick="toggleDisplay('proof2682')">Proof.</div>
+<div class="proofscript" id="proof2682">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">loc</span> <span class="id">bind</span> <span class="id">d</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">camp_cases</span> (<span class="tactic">induction</span> <span class="id">p</span>) <span class="id">Case</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">trivial</span>.<br/>
@@ -510,8 +510,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_top_to_presult">camp_eval_top_to_presult</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#p">p</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#global_env">global_env</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_top_debug_to_presult_debug">camp_eval_top_debug_to_presult_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#debug">debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#p">p</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#global_env">global_env</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2680')">Proof.</div>
-<div class="proofscript" id="proof2680">
+<div class="toggleproof" onclick="toggleDisplay('proof2683')">Proof.</div>
+<div class="proofscript" id="proof2683">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_top_to_presult">camp_eval_top_to_presult</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_top_debug_to_presult_debug">camp_eval_top_debug_to_presult_debug</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_debug_correct">camp_eval_debug_correct</a></span>.<br/>

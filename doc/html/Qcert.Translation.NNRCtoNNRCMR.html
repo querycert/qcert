@@ -69,8 +69,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="load_env_lookup_initunit">load_env_lookup_initunit</a></span> <span class="id">initunit</span> <span class="id">vars_loc</span> <span class="id">nnrc_env</span> <span class="id">mr_env</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#load_init_env_success">load_init_env_success</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrc_env">nnrc_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#dunit">dunit</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2848')">Proof.</div>
-<div class="proofscript" id="proof2848">
+<div class="toggleproof" onclick="toggleDisplay('proof2851')">Proof.</div>
+<div class="proofscript" id="proof2851">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hmr_env</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#load_init_env_success">load_init_env_success</a></span> <span class="kwd">in</span> <span class="id">Hmr_env</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">Hmr_env</span>.<br/>
@@ -130,8 +130,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_global_vars">nnrc_global_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_no_free_var">nnrcmr_of_nnrc_with_no_free_var</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2849')">Proof.</div>
-<div class="proofscript" id="proof2849">
+<div class="toggleproof" onclick="toggleDisplay('proof2852')">Proof.</div>
+<div class="proofscript" id="proof2852">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hfv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr</span>.<br/>
@@ -168,8 +168,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">Houtput</span>: <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#q">q</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_no_free_var">nnrcmr_of_nnrc_with_no_free_var</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#q">q</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2850')">Proof.</div>
-<div class="proofscript" id="proof2850">
+<div class="toggleproof" onclick="toggleDisplay('proof2853')">Proof.</div>
+<div class="proofscript" id="proof2853">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_no_free_var">nnrcmr_of_nnrc_with_no_free_var</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span>; <span class="tactic">simpl</span>.<br/>
@@ -243,8 +243,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrcmr_of_nnrc_with_one_free_var_wf">nnrcmr_of_nnrc_with_one_free_var_wf</a></span> (<span class="id">free_vars_loc</span>: <span class="id"><a href="Qcert.Common.Data.DData.html#vdbindings">vdbindings</a></span>) (<span class="id">n</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) (<span class="id">x_loc</span>: <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>) (<span class="id">output</span>:<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#function_with_no_free_vars">function_with_no_free_vars</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x_loc">x_loc</a></span>, <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_one_free_var">nnrcmr_of_nnrc_with_one_free_var</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x_loc">x_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2851')">Proof.</div>
-<div class="proofscript" id="proof2851">
+<div class="toggleproof" onclick="toggleDisplay('proof2854')">Proof.</div>
+<div class="proofscript" id="proof2854">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hfv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr</span>.<br/>
@@ -272,8 +272,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">Houtput</span>: <span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#empty_cenv">empty_cenv</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrc_env">nnrc_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_one_free_var">nnrcmr_of_nnrc_with_one_free_var</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x_loc">x_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2852')">Proof.</div>
-<div class="proofscript" id="proof2852">
+<div class="toggleproof" onclick="toggleDisplay('proof2855')">Proof.</div>
+<div class="proofscript" id="proof2855">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#load_init_env_success">load_init_env_success</a></span>, <span class="id"><a href="Qcert.Common.Env.DConstants.html#mkDistConstants">mkDistConstants</a></span> <span class="kwd">in</span> <span class="id">Hmr_env</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">Hmr_env</span>.<br/>
@@ -488,8 +488,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pack_closure_env_wf">pack_closure_env_wf</a></span> (<span class="id">free_vars_loc</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>)) (<span class="id">closure_env_name</span>: <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_chain_well_formed">mr_chain_well_formed</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#pack_closure_env">pack_closure_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#closure_env_name">closure_env_name</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2853')">Proof.</div>
-<div class="proofscript" id="proof2853">
+<div class="toggleproof" onclick="toggleDisplay('proof2856')">Proof.</div>
+<div class="proofscript" id="proof2856">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">free_vars_loc</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">free_vars_loc</span> = <span class="id">nil</span>"%<span class="id">string</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
@@ -527,8 +527,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> <span class="id">free_vars</span> := <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">List.map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x">x</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#unpack_closure_env">unpack_closure_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#closure_env_name">closure_env_name</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars_loc">free_vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#k">k</a></span>)) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x">x</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#closure_env_name">closure_env_name</a></span> :: (<span class="id"><a href="Qcert.Utils.Bag.html#bminus">bminus</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#free_vars">free_vars</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#k">k</a></span>)))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2854')">Proof.</div>
-<div class="proofscript" id="proof2854">
+<div class="toggleproof" onclick="toggleDisplay('proof2857')">Proof.</div>
+<div class="proofscript" id="proof2857">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">free_vars</span>.<br/>
@@ -546,8 +546,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrcmr_of_nnrc_with_free_vars_wf">nnrcmr_of_nnrc_with_free_vars_wf</a></span> (<span class="id">n</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) (<span class="id">vars_loc</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>)) (<span class="id">output</span>: <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x">x</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span>) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#x">x</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">List.map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span>)) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_free_vars">nnrcmr_of_nnrc_with_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2855')">Proof.</div>
-<div class="proofscript" id="proof2855">
+<div class="toggleproof" onclick="toggleDisplay('proof2858')">Proof.</div>
+<div class="proofscript" id="proof2858">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hvars_loc</span> <span class="id">mr</span>.<br/>
@@ -566,8 +566,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#empty_cenv">empty_cenv</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrc_env">nnrc_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc_with_free_vars">nnrcmr_of_nnrc_with_free_vars</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2856')">Proof.</div>
-<div class="proofscript" id="proof2856">
+<div class="toggleproof" onclick="toggleDisplay('proof2859')">Proof.</div>
+<div class="proofscript" id="proof2859">
 &nbsp;intros&nbsp;Hfree_vars_of_n&nbsp;Havoid&nbsp;Hfv&nbsp;Houtput.&nbsp;*)</span>&nbsp;unfold&nbsp;nnrcmr_of_nnrc_with_free_vars.&nbsp;*)</span>&nbsp;unfold&nbsp;nnrcmr_eval.&nbsp;*)</span>&nbsp;rewrite&nbsp;fold_left_app.&nbsp;*)</span>&nbsp;simpl.&nbsp;*)</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXXXXXXXXXXXXX&nbsp;*)</span><br/>
 &nbsp;&nbsp;Admitted.</div>
 <br/>
@@ -611,8 +611,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nnrcmr_of_nnrc_wf">nnrcmr_of_nnrc_wf</a></span> (<span class="id">n</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) (<span class="id">initunit</span>: <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>) (<span class="id">vars_loc</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>)) (<span class="id">output</span>: <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_well_formed">nnrcmr_well_formed</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc">nnrcmr_of_nnrc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#output">output</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2857')">Proof.</div>
-<div class="proofscript" id="proof2857">
+<div class="toggleproof" onclick="toggleDisplay('proof2860')">Proof.</div>
+<div class="proofscript" id="proof2860">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrcmr_of_nnrc">nnrcmr_of_nnrc</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> <span class="id">n</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">admit</span>. <span class="comment">(*&nbsp;XXXX&nbsp;TODO&nbsp;XXXX&nbsp;*)</span><br/>
@@ -722,26 +722,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#NNRCGroupBy">NNRCGroupBy</a></span> <span class="id">g</span> <span class="id">sl</span> <span class="id">n1</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">n</span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>, <span class="id">vars_loc</span>) <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2858')">Next Obligation.</div>
-<div class="proofscript" id="proof2858">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
-&nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof2859')">Next Obligation.</div>
-<div class="proofscript" id="proof2859">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
-&nbsp;&nbsp;Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof2860')">Next Obligation.</div>
-<div class="proofscript" id="proof2860">
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
-&nbsp;&nbsp;Defined.</div>
 <div class="toggleproof" onclick="toggleDisplay('proof2861')">Next Obligation.</div>
 <div class="proofscript" id="proof2861">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <div class="toggleproof" onclick="toggleDisplay('proof2862')">Next Obligation.</div>
 <div class="proofscript" id="proof2862">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_rename_lazy_size">nnrc_rename_lazy_size</a></span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <div class="toggleproof" onclick="toggleDisplay('proof2863')">Next Obligation.</div>
 <div class="proofscript" id="proof2863">
@@ -753,6 +740,19 @@
 &nbsp;&nbsp;Defined.</div>
 <div class="toggleproof" onclick="toggleDisplay('proof2865')">Next Obligation.</div>
 <div class="proofscript" id="proof2865">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_rename_lazy_size">nnrc_rename_lazy_size</a></span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof2866')">Next Obligation.</div>
+<div class="proofscript" id="proof2866">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof2867')">Next Obligation.</div>
+<div class="proofscript" id="proof2867">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
+&nbsp;&nbsp;Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof2868')">Next Obligation.</div>
+<div class="proofscript" id="proof2868">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
@@ -760,8 +760,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#shadow_free">shadow_free</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">let</span> '(<span class="id">_</span>, <span class="id">mr_chain</span>, <span class="id">_</span>) := <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_chain_ns_aux">nnrc_to_nnrcmr_chain_ns_aux</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="kwd">in</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_chain_causally_consistent">mr_chain_causally_consistent</a></span> <span class="id">mr_chain</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2866')">Proof.</div>
-<div class="proofscript" id="proof2866">
+<div class="toggleproof" onclick="toggleDisplay('proof2869')">Proof.</div>
+<div class="proofscript" id="proof2869">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">n</span>) <span class="id">Case</span>; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [ <span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_causally_consistent">nnrcmr_causally_consistent</a></span>; <span class="tactic">reflexivity</span> ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">NNRCBinop</span>"%<span class="id">string</span>.<br/>
@@ -814,8 +814,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="load_init_env_build_nnrc_env_id">load_init_env_build_nnrc_env_id</a></span> <span class="id">env</span> <span class="id">initunit</span> <span class="id">mr_env</span> <span class="id">vars_loc</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#load_init_env">load_init_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#env">env</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#build_nnrc_env">build_nnrc_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span>) <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#vars_loc">vars_loc</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> ((<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span>, <span class="id"><a href="Qcert.Common.Data.RData.html#dunit">dunit</a></span>) :: <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#env">env</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2867')">Proof.</div>
-<div class="proofscript" id="proof2867">
+<div class="toggleproof" onclick="toggleDisplay('proof2870')">Proof.</div>
+<div class="proofscript" id="proof2870">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">env</span> <span class="id">mr_env</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">vars_loc</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">intros</span>.<br/>
@@ -824,8 +824,8 @@
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nnrc_to_nnrcmr_no_chain_correct">nnrc_to_nnrcmr_no_chain_correct</a></span> <span class="id">h</span> <span class="id">env</span> <span class="id">initunit</span> <span class="id">mr_env</span> (<span class="id">n</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) (<span class="id">inputs_loc</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#dlocalization">dlocalization</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#load_init_env">load_init_env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#initunit">initunit</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#inputs_loc">inputs_loc</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#env">env</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#empty_cenv">empty_cenv</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#env">env</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> = <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#mr_env">mr_env</a></span> (<span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_no_chain">nnrc_to_nnrcmr_no_chain</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#n">n</a></span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#inputs_loc">inputs_loc</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2868')">Proof.</div>
-<div class="proofscript" id="proof2868">
+<div class="toggleproof" onclick="toggleDisplay('proof2871')">Proof.</div>
+<div class="proofscript" id="proof2871">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.NNRCtoNNRCMR.html#nnrc_to_nnrcmr_no_chain">nnrc_to_nnrcmr_no_chain</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#nnrcmr_eval">nnrcmr_eval</a></span>; <span class="tactic">simpl</span>.<br/>

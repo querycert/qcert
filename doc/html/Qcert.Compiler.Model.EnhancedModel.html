@@ -134,8 +134,8 @@
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_data">enhanced_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.Data.ForeignData.html#mk_foreign_data">mk_foreign_data</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_data">enhanced_data</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3054')">Next Obligation.</div>
-<div class="proofscript" id="proof3054">
+<div class="toggleproof" onclick="toggleDisplay('proof3057')">Next Obligation.</div>
+<div class="proofscript" id="proof3057">
 &nbsp;&nbsp;<span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">inversion</span> 1].<br/>
@@ -173,8 +173,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">left</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">right</span>; <span class="tactic">congruence</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3055')">Next Obligation.</div>
-<div class="proofscript" id="proof3055">
+<div class="toggleproof" onclick="toggleDisplay('proof3058')">Next Obligation.</div>
+<div class="proofscript" id="proof3058">
 &nbsp;normalized?&nbsp;*)</span>&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_normalized">foreign_data_normalized</a></span> <span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#float_foreign_data">float_foreign_data</a></span> <span class="id">f</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
@@ -184,8 +184,8 @@ Defined.</div>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_normalized">foreign_data_normalized</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_foreign_data">sql_date_foreign_data</a></span> <span class="id">s</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_normalized">foreign_data_normalized</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_interval_foreign_data">sql_date_interval_foreign_data</a></span> <span class="id">s</span>).<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3056')">Next Obligation.</div>
-<div class="proofscript" id="proof3056">
+<div class="toggleproof" onclick="toggleDisplay('proof3059')">Next Obligation.</div>
+<div class="proofscript" id="proof3059">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_normalize_normalizes">foreign_data_normalize_normalizes</a></span> <span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#float_foreign_data">float_foreign_data</a></span> <span class="id">f</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -195,8 +195,8 @@ Defined.</div>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_normalize_normalizes">foreign_data_normalize_normalizes</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_foreign_data">sql_date_foreign_data</a></span> <span class="id">s</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_normalize_normalizes">foreign_data_normalize_normalizes</a></span> <span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_interval_foreign_data">sql_date_interval_foreign_data</a></span> <span class="id">s</span>).<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3057')">Next Obligation.</div>
-<div class="proofscript" id="proof3057">
+<div class="toggleproof" onclick="toggleDisplay('proof3060')">Next Obligation.</div>
+<div class="proofscript" id="proof3060">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> 1.<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (@<span class="id"><a href="Qcert.Utils.CoqLibAdd.html#toString">toString</a></span> <span class="id">_</span> (@<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_tostring">foreign_data_tostring</a></span> <span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#float_foreign_data">float_foreign_data</a></span>) <span class="id">f</span>).<br/>
@@ -318,8 +318,8 @@ Defined.</div>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_unary_op">enhanced_foreign_unary_op</a></span> : <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_unary_op">foreign_unary_op</a></span><br/>
 &nbsp;&nbsp;:= { <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_unary_op_type">foreign_unary_op_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op">enhanced_unary_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_unary_op_interp">foreign_unary_op_interp</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_interp">enhanced_unary_op_interp</a></span> }.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3058')">Next Obligation.</div>
-<div class="proofscript" id="proof3058">
+<div class="toggleproof" onclick="toggleDisplay('proof3061')">Next Obligation.</div>
+<div class="proofscript" id="proof3061">
 &nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="id">change</span> ({<span class="id">x</span> = <span class="id">y</span>} + {<span class="id">x</span> &lt;&gt; <span class="id">y</span>}).<br/>
 &nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
@@ -328,16 +328,16 @@ Defined.</div>
 &nbsp;&nbsp;- <span class="id">decide</span> <span class="id">equality</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3059')">Next Obligation.</div>
-<div class="proofscript" id="proof3059">
+<div class="toggleproof" onclick="toggleDisplay('proof3062')">Next Obligation.</div>
+<div class="proofscript" id="proof3062">
 &nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">intros</span> <span class="id">op</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#float_unary_op_tostring">float_unary_op_tostring</a></span> <span class="id">f</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#time_unary_op_tostring">time_unary_op_tostring</a></span> <span class="id">t</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_unary_op_tostring">sql_date_unary_op_tostring</a></span> <span class="id">s</span>).<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3060')">Next Obligation.</div>
-<div class="proofscript" id="proof3060">
+<div class="toggleproof" onclick="toggleDisplay('proof3063')">Next Obligation.</div>
+<div class="proofscript" id="proof3063">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#rondfloat">rondfloat</a></span>, <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#rondcollfloat">rondcollfloat</a></span>, <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="kwd">in</span> <span class="id">H</span>;<br/>
@@ -486,8 +486,8 @@ Qed.</div>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_binary_op">enhanced_foreign_binary_op</a></span> : <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_binary_op">foreign_binary_op</a></span><br/>
 &nbsp;&nbsp;:= { <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_binary_op_type">foreign_binary_op_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op">enhanced_binary_op</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a href="Qcert.Common.Operators.ForeignOps.html#foreign_binary_op_interp">foreign_binary_op_interp</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_interp">enhanced_binary_op_interp</a></span> }.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3061')">Next Obligation.</div>
-<div class="proofscript" id="proof3061">
+<div class="toggleproof" onclick="toggleDisplay('proof3064')">Next Obligation.</div>
+<div class="proofscript" id="proof3064">
 &nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="id">change</span> ({<span class="id">x</span> = <span class="id">y</span>} + {<span class="id">x</span> &lt;&gt; <span class="id">y</span>}).<br/>
 &nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
@@ -495,16 +495,16 @@ Qed.</div>
 &nbsp;&nbsp;- <span class="id">decide</span> <span class="id">equality</span>.<br/>
 &nbsp;&nbsp;- <span class="id">decide</span> <span class="id">equality</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3062')">Next Obligation.</div>
-<div class="proofscript" id="proof3062">
+<div class="toggleproof" onclick="toggleDisplay('proof3065')">Next Obligation.</div>
+<div class="proofscript" id="proof3065">
 &nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">intros</span> <span class="id">op</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.FloatModelPart.html#float_binary_op_tostring">float_binary_op_tostring</a></span> <span class="id">f</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#time_binary_op_tostring">time_binary_op_tostring</a></span> <span class="id">t</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.SqlDateModelPart.html#sql_date_binary_op_tostring">sql_date_binary_op_tostring</a></span> <span class="id">s</span>).<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3063')">Next Obligation.</div>
-<div class="proofscript" id="proof3063">
+<div class="toggleproof" onclick="toggleDisplay('proof3066')">Next Obligation.</div>
+<div class="proofscript" id="proof3066">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#rondfloat2">rondfloat2</a></span>, <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#rondboolfloat2">rondboolfloat2</a></span>, <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="kwd">in</span> <span class="id">H</span><br/>
@@ -654,12 +654,12 @@ Qed.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_to_JSON">enhanced_foreign_to_JSON</a></span> : <span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html#foreign_to_JSON">foreign_to_JSON</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.JSON.ForeignToJSON.html#mk_foreign_to_JSON">mk_foreign_to_JSON</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_foreign_data">enhanced_foreign_data</a></span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3064')">Next Obligation.</div>
-<div class="proofscript" id="proof3064">
+<div class="toggleproof" onclick="toggleDisplay('proof3067')">Next Obligation.</div>
+<div class="proofscript" id="proof3067">
 &nbsp;TODO:&nbsp;For&nbsp;now,&nbsp;we&nbsp;assume&nbsp;that&nbsp;JSON&nbsp;supports&nbsp;floating&nbsp;point&nbsp;*)</span>&nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3065')">Next Obligation.</div>
-<div class="proofscript" id="proof3065">
+<div class="toggleproof" onclick="toggleDisplay('proof3068')">Next Obligation.</div>
+<div class="proofscript" id="proof3068">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fd</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#jenhancedfloat">jenhancedfloat</a></span> <span class="id">f</span>).<br/>
 &nbsp;&nbsp;- <span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#jenhancedstring">jenhancedstring</a></span> <span class="id">s</span>).<br/>
@@ -675,8 +675,8 @@ Defined.</div>
 &nbsp;&nbsp;| <span class="id"><a name="enhanced_numeric_float">enhanced_numeric_float</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_numeric_type_eqdec">enhanced_numeric_type_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_numeric_type">enhanced_numeric_type</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3066')">Proof.</div>
-<div class="proofscript" id="proof3066">
+<div class="toggleproof" onclick="toggleDisplay('proof3069')">Proof.</div>
+<div class="proofscript" id="proof3069">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>. <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_numeric_type">enhanced_numeric_type</a></span>, {<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#x">x</a></span> = <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
@@ -785,19 +785,19 @@ Defined.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_reduce_op">enhanced_foreign_reduce_op</a></span> : <span class="id"><a href="Qcert.NNRCMR.Lang.ForeignReduceOps.html#foreign_reduce_op">foreign_reduce_op</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.NNRCMR.Lang.ForeignReduceOps.html#mk_foreign_reduce_op">mk_foreign_reduce_op</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_foreign_data">enhanced_foreign_data</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_reduce_op">enhanced_reduce_op</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_reduce_op_interp">enhanced_reduce_op_interp</a></span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3067')">Next Obligation.</div>
-<div class="proofscript" id="proof3067">
+<div class="toggleproof" onclick="toggleDisplay('proof3070')">Next Obligation.</div>
+<div class="proofscript" id="proof3070">
 &nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span>:<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_reduce_op">enhanced_reduce_op</a></span>, {<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#x">x</a></span> = <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="id">decide</span> <span class="id">equality</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3068')">Next Obligation.</div>
-<div class="proofscript" id="proof3068">
+<div class="toggleproof" onclick="toggleDisplay('proof3071')">Next Obligation.</div>
+<div class="proofscript" id="proof3071">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_reduce_op_tostring">enhanced_reduce_op_tostring</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3069')">Next Obligation.</div>
-<div class="proofscript" id="proof3069">
+<div class="toggleproof" onclick="toggleDisplay('proof3072')">Next Obligation.</div>
+<div class="proofscript" id="proof3072">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="id">invcs</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;- <span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">typ</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -911,15 +911,15 @@ Qed.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_to_reduce_op">enhanced_foreign_to_reduce_op</a></span> : <span class="id"><a href="Qcert.Translation.ForeignToReduceOps.html#foreign_to_reduce_op">foreign_to_reduce_op</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.Translation.ForeignToReduceOps.html#mk_foreign_to_reduce_op">mk_foreign_to_reduce_op</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_foreign_runtime">enhanced_foreign_runtime</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_foreign_reduce_op">enhanced_foreign_reduce_op</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_to_reduce_op">enhanced_to_reduce_op</a></span> <span class="id">_</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_of_reduce_op">enhanced_of_reduce_op</a></span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3070')">Next Obligation.</div>
-<div class="proofscript" id="proof3070">
+<div class="toggleproof" onclick="toggleDisplay('proof3073')">Next Obligation.</div>
+<div class="proofscript" id="proof3073">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#reduce_op_eval">NNRCMR.reduce_op_eval</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">uop</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="id">invcs</span> <span class="id">H</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">f</span>; <span class="id">invcs</span> <span class="id">H1</span>; <span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3071')">Next Obligation.</div>
-<div class="proofscript" id="proof3071">
+<div class="toggleproof" onclick="toggleDisplay('proof3074')">Next Obligation.</div>
+<div class="proofscript" id="proof3074">
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#reduce_op_eval">NNRCMR.reduce_op_eval</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">rop</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="id">invcs</span> <span class="id">H</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">f</span>; <span class="id">invcs</span> <span class="id">H1</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -1114,8 +1114,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a href="Qcert.Translation.ForeignToCloudant.html#foreign_to_cloudant_prepare_nnrcmr">foreign_to_cloudant_prepare_nnrcmr</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#to_cloudant_nnrcmr">to_cloudant_nnrcmr</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a href="Qcert.Translation.ForeignToCloudant.html#foreign_to_cloudant_nnrcmr_prepared">foreign_to_cloudant_nnrcmr_prepared</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#to_cloudant_nnrcmr_prepared">to_cloudant_nnrcmr_prepared</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3072')">Next Obligation.</div>
-<div class="proofscript" id="proof3072">
+<div class="toggleproof" onclick="toggleDisplay('proof3075')">Next Obligation.</div>
+<div class="proofscript" id="proof3075">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#to_cloudant_nnrcmr">to_cloudant_nnrcmr</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#to_cloudant_nnrcmr_prepared">to_cloudant_nnrcmr_prepared</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#min_max_free_nnrcmr">min_max_free_nnrcmr</a></span>, <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#min_max_free_mr_chain">min_max_free_mr_chain</a></span>, <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#min_max_free_mr">min_max_free_mr</a></span>, <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#min_max_free_reduce">min_max_free_reduce</a></span>.<br/>
@@ -1302,16 +1302,16 @@ Qed.</div>
 | <span class="id"><a name="enhanced_subtype_refl">enhanced_subtype_refl</a></span> <span class="id">t</span> : <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_subtype">enhanced_subtype</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#t">t</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#t">t</a></span>.<br/>
 <br/>
 <span class="kwd">Instance</span> <span class="id"><a name="enhanced_subtype_pre">enhanced_subtype_pre</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_subtype">enhanced_subtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3073')">Proof.</div>
-<div class="proofscript" id="proof3073">
+<div class="toggleproof" onclick="toggleDisplay('proof3076')">Proof.</div>
+<div class="proofscript" id="proof3076">
 &nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">red</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">x</span>; <span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">inversion</span> <span class="id">H0</span>; <span class="tactic">subst</span>; <span class="tactic">try</span> <span class="id">constructor</span>; <span class="tactic">congruence</span>.<br/>
 Qed.</div>
 <br/>
 <span class="kwd">Instance</span> <span class="id"><a name="enhanced_subtype_post">enhanced_subtype_post</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_subtype">enhanced_subtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3074')">Proof.</div>
-<div class="proofscript" id="proof3074">
+<div class="toggleproof" onclick="toggleDisplay('proof3077')">Proof.</div>
+<div class="proofscript" id="proof3077">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>; <span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">red</span>.<br/>
@@ -1325,8 +1325,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Lattice.html#join">join</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_type_join">enhanced_type_join</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;; <span class="id"><a href="Qcert.Utils.Lattice.html#meet">meet</a></span> := <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_type_meet">enhanced_type_meet</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3075')">Proof.</div>
-<div class="proofscript" id="proof3075">
+<div class="toggleproof" onclick="toggleDisplay('proof3078')">Proof.</div>
+<div class="proofscript" id="proof3078">
 &nbsp;&nbsp;- <span class="tactic">red</span>; <span class="tactic">intros</span> <span class="id">t1</span> <span class="id">t2</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">t1</span>; <span class="tactic">destruct</span> <span class="id">t2</span>; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -1354,8 +1354,8 @@ Qed.</div>
 Defined.</div>
 <br/>
 <span class="kwd">Instance</span> <span class="id"><a name="enhanced_type_olattice">enhanced_type_olattice</a></span> : <span class="id"><a href="Qcert.Utils.Lattice.html#OLattice">OLattice</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_subtype">enhanced_subtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3076')">Proof.</div>
-<div class="proofscript" id="proof3076">
+<div class="toggleproof" onclick="toggleDisplay('proof3079')">Proof.</div>
+<div class="proofscript" id="proof3079">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">split</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">inversion</span> 1; <span class="tactic">simpl</span>; <span class="tactic">reflexivity</span>.<br/>
@@ -1365,27 +1365,27 @@ Qed.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_type">enhanced_foreign_type</a></span> : <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#foreign_type">foreign_type</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.TypeSystem.ForeignType.html#mk_foreign_type">mk_foreign_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_type">enhanced_type</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3077')">Next Obligation.</div>
-<div class="proofscript" id="proof3077">
+<div class="toggleproof" onclick="toggleDisplay('proof3080')">Next Obligation.</div>
+<div class="proofscript" id="proof3080">
 &nbsp;&nbsp;<span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="id">change</span> ({<span class="id">x</span> = <span class="id">y</span>} + {<span class="id">x</span> &lt;&gt; <span class="id">y</span>}).<br/>
 &nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3078')">Next Obligation.</div>
-<div class="proofscript" id="proof3078">
+<div class="toggleproof" onclick="toggleDisplay('proof3081')">Next Obligation.</div>
+<div class="proofscript" id="proof3081">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">left</span>; <span class="id">constructor</span> | <span class="id">right</span>; <span class="tactic">inversion</span> 1].<br/>
 Defined.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="enhanced_foreign_type_to_JSON">enhanced_foreign_type_to_JSON</a></span> : <span class="id"><a href="Qcert.Common.JSON.ForeignTypeToJSON.html#foreign_type_to_JSON">foreign_type_to_JSON</a></span><br/>
 &nbsp;&nbsp;:= <span class="id"><a href="Qcert.Common.JSON.ForeignTypeToJSON.html#mk_foreign_type_to_JSON">mk_foreign_type_to_JSON</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_foreign_type">enhanced_foreign_type</a></span> <span class="id">_</span> <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3079')">Next Obligation.</div>
-<div class="proofscript" id="proof3079">
+<div class="toggleproof" onclick="toggleDisplay('proof3082')">Next Obligation.</div>
+<div class="proofscript" id="proof3082">
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#string_to_enhanced_type">string_to_enhanced_type</a></span> <span class="id">s</span>).<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3080')">Next Obligation.</div>
-<div class="proofscript" id="proof3080">
+<div class="toggleproof" onclick="toggleDisplay('proof3083')">Next Obligation.</div>
+<div class="proofscript" id="proof3083">
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_type_to_string">enhanced_type_to_string</a></span> <span class="id">fd</span>).<br/>
 Defined.</div>
 <br/>
@@ -1419,8 +1419,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_has_type">enhanced_has_type</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_infer_type">enhanced_infer_type</a></span> <span class="id">_</span> <span class="id">_</span> <span class="id">_</span><br/>
 .<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3081')">Next Obligation.</div>
-<div class="proofscript" id="proof3081">
+<div class="toggleproof" onclick="toggleDisplay('proof3084')">Next Obligation.</div>
+<div class="proofscript" id="proof3084">
 &nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="id">constructor</span>.<br/>
@@ -1430,27 +1430,27 @@ Defined.</div>
 &nbsp;&nbsp;- <span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;- <span class="id">constructor</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3082')">Next Obligation.</div>
-<div class="proofscript" id="proof3082">
+<div class="toggleproof" onclick="toggleDisplay('proof3085')">Next Obligation.</div>
+<div class="proofscript" id="proof3085">
 &nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H0</span>; <span class="tactic">subst</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;- <span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">inversion</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">trivial</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3083')">Next Obligation.</div>
-<div class="proofscript" id="proof3083">
-&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">inversion</span> <span class="id">H0</span>; <span class="tactic">subst</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="id">constructor</span>; <span class="tactic">congruence</span>.<br/>
-Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3084')">Next Obligation.</div>
-<div class="proofscript" id="proof3084">
-&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="id">eexists</span>; <span class="tactic">reflexivity</span>.<br/>
-Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3085')">Next Obligation.</div>
-<div class="proofscript" id="proof3085">
-&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">invcs</span> <span class="id">H</span>; <span class="id">constructor</span>.<br/>
-Defined.</div>
 <div class="toggleproof" onclick="toggleDisplay('proof3086')">Next Obligation.</div>
 <div class="proofscript" id="proof3086">
+&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H</span>; <span class="tactic">inversion</span> <span class="id">H0</span>; <span class="tactic">subst</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="id">constructor</span>; <span class="tactic">congruence</span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3087')">Next Obligation.</div>
+<div class="proofscript" id="proof3087">
+&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <span class="id">eexists</span>; <span class="tactic">reflexivity</span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3088')">Next Obligation.</div>
+<div class="proofscript" id="proof3088">
+&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="id">invcs</span> <span class="id">H</span>; <span class="id">constructor</span>.<br/>
+Defined.</div>
+<div class="toggleproof" onclick="toggleDisplay('proof3089')">Next Obligation.</div>
+<div class="proofscript" id="proof3089">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>, <span class="id">H0</span><br/>
 &nbsp;&nbsp;; <span class="id">invcs</span> <span class="id">H</span>; <span class="id">invcs</span> <span class="id">H0</span>; <span class="id">constructor</span>.<br/>
 Defined.</div>
@@ -1603,8 +1603,8 @@ Defined.</div>
 .<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tuncoll">tuncoll</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.TypeSystem.TBrandModel.html#brand_model">brand_model</a></span>} (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3087')">Proof.</div>
-<div class="proofscript" id="proof3087">
+<div class="toggleproof" onclick="toggleDisplay('proof3090')">Proof.</div>
+<div class="proofscript" id="proof3090">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -1685,8 +1685,8 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">z</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#rondcollfloat">rondcollfloat</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#f">f</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#z">z</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\  <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#z">z</a></span> ▹ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#Float">Float</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3088')">Proof.</div>
-<div class="proofscript" id="proof3088">
+<div class="toggleproof" onclick="toggleDisplay('proof3091')">Proof.</div>
+<div class="proofscript" id="proof3091">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dt</span>.<br/>
 &nbsp;&nbsp;<span class="id">invcs</span> <span class="id">dt</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">assert</span> (<span class="id">eqq</span>:<span class="id">r</span> = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Foreign">Foreign</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhancedFloat">enhancedFloat</a></span>)<br/>
@@ -1715,8 +1715,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> ▹ τ<span class="kwd">in</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#float_unary_op_interp">float_unary_op_interp</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3089')">Proof.</div>
-<div class="proofscript" id="proof3089">
+<div class="toggleproof" onclick="toggleDisplay('proof3092')">Proof.</div>
+<div class="proofscript" id="proof3092">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span>[<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">invcs</span> <span class="id">H0</span>;<br/>
@@ -1763,8 +1763,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> ▹ τ<span class="kwd">in</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#time_unary_op_interp">time_unary_op_interp</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3090')">Proof.</div>
-<div class="proofscript" id="proof3090">
+<div class="toggleproof" onclick="toggleDisplay('proof3093')">Proof.</div>
+<div class="proofscript" id="proof3093">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span>[<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">invcs</span> <span class="id">H0</span>;<br/>
@@ -1809,8 +1809,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> ▹ τ<span class="kwd">in</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#sql_date_unary_op_interp">sql_date_unary_op_interp</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3091')">Proof.</div>
-<div class="proofscript" id="proof3091">
+<div class="toggleproof" onclick="toggleDisplay('proof3094')">Proof.</div>
+<div class="proofscript" id="proof3094">
 &nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span>[<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">invcs</span> <span class="id">H0</span>;<br/>
@@ -1845,8 +1845,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ₁ τ<span class="id">out</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_typing_infer">enhanced_unary_op_typing_infer</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> τ₁ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_has_type">enhanced_unary_op_has_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> τ₁ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3092')">Proof.</div>
-<div class="proofscript" id="proof3092">
+<div class="toggleproof" onclick="toggleDisplay('proof3095')">Proof.</div>
+<div class="proofscript" id="proof3095">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *;<br/>
@@ -1907,8 +1907,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_typing_infer">enhanced_unary_op_typing_infer</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> τ₁ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">out</span>₁ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_has_type">enhanced_unary_op_has_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> τ₁ τ<span class="id">out</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;τ<span class="id">out</span>₁ ≤ τ<span class="id">out</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3093')">Proof.</div>
-<div class="proofscript" id="proof3093">
+<div class="toggleproof" onclick="toggleDisplay('proof3096')">Proof.</div>
+<div class="proofscript" id="proof3096">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *;<br/>
@@ -1979,8 +1979,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ₁ τ<span class="id">out</span>} : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_typing_infer">enhanced_unary_op_typing_infer</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> τ₁ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_has_type">enhanced_unary_op_has_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> τ₁ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3094')">Proof.</div>
-<div class="proofscript" id="proof3094">
+<div class="toggleproof" onclick="toggleDisplay('proof3097')">Proof.</div>
+<div class="proofscript" id="proof3097">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fu</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *;<br/>
@@ -2023,8 +2023,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> ▹ τ<span class="kwd">in</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_unary_op_interp">enhanced_unary_op_interp</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#din">din</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3095')">Proof.</div>
-<div class="proofscript" id="proof3095">
+<div class="toggleproof" onclick="toggleDisplay('proof3098')">Proof.</div>
+<div class="proofscript" id="proof3098">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">eapply</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#float_unary_op_typing_sound">float_unary_op_typing_sound</a></span>; <span class="tactic">eauto</span>.<br/>
@@ -2108,8 +2108,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">din</span>₂ ▹ τ<span class="kwd">in</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#float_binary_op_interp">float_binary_op_interp</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> <span class="id">din</span>₁ <span class="id">din</span>₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3096')">Proof.</div>
-<div class="proofscript" id="proof3096">
+<div class="toggleproof" onclick="toggleDisplay('proof3099')">Proof.</div>
+<div class="proofscript" id="proof3099">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
@@ -2193,8 +2193,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">din</span>₂ ▹ τ<span class="kwd">in</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#time_binary_op_interp">time_binary_op_interp</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> <span class="id">din</span>₁ <span class="id">din</span>₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3097')">Proof.</div>
-<div class="proofscript" id="proof3097">
+<div class="toggleproof" onclick="toggleDisplay('proof3100')">Proof.</div>
+<div class="proofscript" id="proof3100">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
@@ -2274,8 +2274,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">din</span>₂ ▹ τ<span class="kwd">in</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#sql_date_binary_op_interp">sql_date_binary_op_interp</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> <span class="id">din</span>₁ <span class="id">din</span>₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3098')">Proof.</div>
-<div class="proofscript" id="proof3098">
+<div class="toggleproof" onclick="toggleDisplay('proof3101')">Proof.</div>
+<div class="proofscript" id="proof3101">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>;<br/>
@@ -2330,8 +2330,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ₁ τ₂ τ<span class="id">out</span>} :<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_typing_infer">enhanced_binary_op_typing_infer</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> τ₁ τ₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_has_type">enhanced_binary_op_has_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> τ₁ τ₂ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3099')">Proof.</div>
-<div class="proofscript" id="proof3099">
+<div class="toggleproof" onclick="toggleDisplay('proof3102')">Proof.</div>
+<div class="proofscript" id="proof3102">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *;<br/>
@@ -2378,8 +2378,8 @@ Qed.</div>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_typing_infer">enhanced_binary_op_typing_infer</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> τ₁ τ₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">out</span>₁ -&gt;<br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_has_type">enhanced_binary_op_has_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> τ₁ τ₂ τ<span class="id">out</span>₂ -&gt;<br/>
 &nbsp;&nbsp;τ<span class="id">out</span>₁ ≤ τ<span class="id">out</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3100')">Proof.</div>
-<div class="proofscript" id="proof3100">
+<div class="toggleproof" onclick="toggleDisplay('proof3103')">Proof.</div>
+<div class="proofscript" id="proof3103">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *;<br/>
@@ -2426,8 +2426,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{τ₁ τ₂ τ<span class="id">out</span>} : <br/>
 &nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_typing_infer">enhanced_binary_op_typing_infer</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> τ₁ τ₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> -&gt;<br/>
 &nbsp;&nbsp;~ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_has_type">enhanced_binary_op_has_type</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fb">fb</a></span> τ₁ τ₂ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3101')">Proof.</div>
-<div class="proofscript" id="proof3101">
+<div class="toggleproof" onclick="toggleDisplay('proof3104')">Proof.</div>
+<div class="proofscript" id="proof3104">
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">fb</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">intro</span> <span class="id">HH</span>; <span class="id">invcs</span> <span class="id">HH</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">f</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="id">invcs</span> <span class="id">H1</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
@@ -2452,8 +2452,8 @@ Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">din</span>₂ ▹ τ<span class="kwd">in</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">dout</span> : <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#enhanced_binary_op_interp">enhanced_binary_op_interp</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#fu">fu</a></span> <span class="id">din</span>₁ <span class="id">din</span>₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> /\ <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#dout">dout</a></span> ▹ τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3102')">Proof.</div>
-<div class="proofscript" id="proof3102">
+<div class="toggleproof" onclick="toggleDisplay('proof3105')">Proof.</div>
+<div class="proofscript" id="proof3105">
 &nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;- <span class="tactic">eapply</span> <span class="id"><a href="Qcert.Compiler.Model.EnhancedModel.html#float_binary_op_typing_sound">float_binary_op_typing_sound</a></span>; <span class="tactic">eauto</span>.<br/>

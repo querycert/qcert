@@ -74,8 +74,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">d</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#env">env</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#x">x</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#empty_cenv">empty_cenv</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#env">env</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#n">n</a></span>) = <span class="id"><a href="Qcert.Common.Data.RRelation.html#lift_oncoll">lift_oncoll</a></span> (<span class="kwd">fun</span> <span class="id">l</span> =&gt; (<span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#rflatten">rflatten</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#l">l</a></span>))) <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2607')">Proof.</div>
-<div class="proofscript" id="proof2607">
+<div class="toggleproof" onclick="toggleDisplay('proof2610')">Proof.</div>
+<div class="proofscript" id="proof2610">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hfun</span> <span class="id">d</span> <span class="id">Henv</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">n</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -123,8 +123,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="id_scalar_map_correct">id_scalar_map_correct</a></span> <span class="id">mr_map</span> <span class="id">d</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_id_scalar_map">is_id_scalar_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2608')">Proof.</div>
-<div class="proofscript" id="proof2608">
+<div class="toggleproof" onclick="toggleDisplay('proof2611')">Proof.</div>
+<div class="proofscript" id="proof2611">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">H_is_id_map</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr_map</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -147,8 +147,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="id_dist_map_correct">id_dist_map_correct</a></span> <span class="id">mr_map</span> <span class="id">coll</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_id_dist_map">is_id_dist_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Ddistr">Ddistr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2609')">Proof.</div>
-<div class="proofscript" id="proof2609">
+<div class="toggleproof" onclick="toggleDisplay('proof2612')">Proof.</div>
+<div class="proofscript" id="proof2612">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">H_is_id_dist_map</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr_map</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">Case</span> "<span class="id">MapDist</span>"%<span class="id">string</span>.<br/>
@@ -188,8 +188,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dispatch_map_correct">dispatch_map_correct</a></span> <span class="id">mr_map</span> <span class="id">coll</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_dispatch_map">is_dispatch_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2610')">Proof.</div>
-<div class="proofscript" id="proof2610">
+<div class="toggleproof" onclick="toggleDisplay('proof2613')">Proof.</div>
+<div class="proofscript" id="proof2613">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr_map</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
@@ -221,8 +221,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="flatten_dist_map_correct">flatten_dist_map_correct</a></span> <span class="id">mr_map</span> <span class="id">coll</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_flatten_dist_map">is_flatten_dist_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_map">mr_map</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Ddistr">Ddistr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>) = <span class="id"><a href="Qcert.Common.Data.RRelation.html#rflatten">rflatten</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2611')">Proof.</div>
-<div class="proofscript" id="proof2611">
+<div class="toggleproof" onclick="toggleDisplay('proof2614')">Proof.</div>
+<div class="proofscript" id="proof2614">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr_map</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
@@ -264,8 +264,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="id_reduce_correct">id_reduce_correct</a></span> <span class="tactic">red</span> <span class="id">coll</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_id_reduce">is_id_reduce</a></span> <span class="tactic">red</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_reduce_eval">mr_reduce_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="tactic">red</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Ddistr">Ddistr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2612')">Proof.</div>
-<div class="proofscript" id="proof2612">
+<div class="toggleproof" onclick="toggleDisplay('proof2615')">Proof.</div>
+<div class="proofscript" id="proof2615">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="tactic">red</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -281,8 +281,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="id_collect_correct">id_collect_correct</a></span> <span class="tactic">red</span> <span class="id">coll</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_id_collect">is_id_collect</a></span> <span class="tactic">red</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_reduce_eval">mr_reduce_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="tactic">red</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2613')">Proof.</div>
-<div class="proofscript" id="proof2613">
+<div class="toggleproof" onclick="toggleDisplay('proof2616')">Proof.</div>
+<div class="proofscript" id="proof2616">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hred</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="tactic">red</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">destruct</span> <span class="id">r</span>; <span class="tactic">simpl</span>; <span class="tactic">congruence</span>].<br/>
@@ -306,8 +306,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="singleton_reduce_correct">singleton_reduce_correct</a></span> <span class="tactic">red</span> <span class="id">d</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_singleton_reduce">is_singleton_reduce</a></span> <span class="tactic">red</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_reduce_eval">mr_reduce_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="tactic">red</span> (<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2614')">Proof.</div>
-<div class="proofscript" id="proof2614">
+<div class="toggleproof" onclick="toggleDisplay('proof2617')">Proof.</div>
+<div class="proofscript" id="proof2617">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hred</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="tactic">red</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">destruct</span> <span class="id">r</span>; <span class="tactic">simpl</span>; <span class="tactic">congruence</span>].<br/>
@@ -345,8 +345,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#suppress_uncoll_in_collect_reduce">suppress_uncoll_in_collect_reduce</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#reduce">reduce</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">reduce</span>' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_reduce_eval">mr_reduce_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#reduce">reduce</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span> :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_reduce_eval">mr_reduce_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id">reduce</span>' <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2615')">Proof.</div>
-<div class="proofscript" id="proof2615">
+<div class="toggleproof" onclick="toggleDisplay('proof2618')">Proof.</div>
+<div class="proofscript" id="proof2618">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">reduce</span>' <span class="id">Hwf</span> <span class="id">Hred</span> <span class="id">Hred</span>'.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">reduce</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">congruence</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">destruct</span> <span class="id">r</span>; <span class="tactic">simpl</span>; <span class="tactic">congruence</span>].<br/>
@@ -399,8 +399,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id">d</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_eval">mr_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#loc_d">loc_d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Ddistr">Ddistr</a></span> (<span class="id">d</span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2616')">Proof.</div>
-<div class="proofscript" id="proof2616">
+<div class="toggleproof" onclick="toggleDisplay('proof2619')">Proof.</div>
+<div class="proofscript" id="proof2619">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">H_is_id_mr</span> <span class="id">loc_d</span> <span class="id">H_well_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_id_dist_mr">is_id_dist_mr</a></span> <span class="kwd">in</span> <span class="id">H_is_id_mr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -435,8 +435,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id">d</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_eval">mr_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#loc_d">loc_d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id">d</span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2617')">Proof.</div>
-<div class="proofscript" id="proof2617">
+<div class="toggleproof" onclick="toggleDisplay('proof2620')">Proof.</div>
+<div class="proofscript" id="proof2620">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">H_is_id_mr</span> <span class="id">loc_d</span> <span class="id">H_well_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_id_scalar_mr">is_id_scalar_mr</a></span> <span class="kwd">in</span> <span class="id">H_is_id_mr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -467,8 +467,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id">d</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_eval">mr_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#loc_d">loc_d</a></span> = <span class="id"><a href="Qcert.Utils.Lift.html#lift">lift</a></span> (<span class="kwd">fun</span> <span class="id">l</span> =&gt; <span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#l">l</a></span>)) (<span class="id"><a href="Qcert.Common.Data.RRelation.html#rflatten">rflatten</a></span> (<span class="id">d</span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2618')">Proof.</div>
-<div class="proofscript" id="proof2618">
+<div class="toggleproof" onclick="toggleDisplay('proof2621')">Proof.</div>
+<div class="proofscript" id="proof2621">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hmr</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_kindofflatten_mr">is_kindofflatten_mr</a></span> <span class="kwd">in</span> <span class="id">Hmr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#andb_true_iff">Bool.andb_true_iff</a></span> <span class="kwd">in</span> <span class="id">Hmr</span>.<br/>
@@ -518,8 +518,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> <span class="id">d</span> =&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_eval">mr_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#loc_d">loc_d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id">d</span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2619')">Proof.</div>
-<div class="proofscript" id="proof2619">
+<div class="toggleproof" onclick="toggleDisplay('proof2622')">Proof.</div>
+<div class="proofscript" id="proof2622">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hmr</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_collect_mr">is_collect_mr</a></span> <span class="kwd">in</span> <span class="id">Hmr</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#andb_true_iff">Bool.andb_true_iff</a></span> <span class="kwd">in</span> <span class="id">Hmr</span>.<br/>
@@ -560,8 +560,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="mr_dispatch_correct">mr_dispatch_correct</a></span> (<span class="id">mr</span>:<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr">mr</a></span>) (<span class="id">coll</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_dispatch_mr">is_dispatch_mr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_eval">mr_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Dlocal">Dlocal</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.DData.html#Ddistr">Ddistr</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#coll">coll</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2620')">Proof.</div>
-<div class="proofscript" id="proof2620">
+<div class="toggleproof" onclick="toggleDisplay('proof2623')">Proof.</div>
+<div class="proofscript" id="proof2623">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#is_dispatch_mr">is_dispatch_mr</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -596,8 +596,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#map_collect_flatten_to_map_flatten_collect">map_collect_flatten_to_map_flatten_collect</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_chain">mr_chain</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">env</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_chain_eval">mr_chain_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#env">env</a></span> (<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr">mr</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_chain_eval">mr_chain_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#env">env</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr_chain">mr_chain</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2621')">Proof.</div>
-<div class="proofscript" id="proof2621">
+<div class="toggleproof" onclick="toggleDisplay('proof2624')">Proof.</div>
+<div class="proofscript" id="proof2624">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr_chain</span> <span class="id">Hmr_chain</span> <span class="id">env</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#map_collect_flatten_to_map_flatten_collect">map_collect_flatten_to_map_flatten_collect</a></span> <span class="kwd">in</span> <span class="id">Hmr_chain</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">mr</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -698,8 +698,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_collect_dispatch_correct">merge_collect_dispatch_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_collect_dispatch">merge_collect_dispatch</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2622')">Proof.</div>
-<div class="proofscript" id="proof2622">
+<div class="toggleproof" onclick="toggleDisplay('proof2625')">Proof.</div>
+<div class="proofscript" id="proof2625">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr3</span> <span class="id">Hcycle1</span> <span class="id">Hcycle2</span> <span class="id">Hcycle3</span> <span class="id">Hmerge</span> <span class="id">loc_d</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_collect_dispatch">merge_collect_dispatch</a></span> <span class="kwd">in</span> <span class="id">Hmerge</span>.<br/>
@@ -753,8 +753,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_mr_id_dist_l_correct">merge_mr_id_dist_l_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_mr_id_dist_l">merge_mr_id_dist_l</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2623')">Proof.</div>
-<div class="proofscript" id="proof2623">
+<div class="toggleproof" onclick="toggleDisplay('proof2626')">Proof.</div>
+<div class="proofscript" id="proof2626">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr3</span> <span class="id">Hcycle1</span> <span class="id">Hcycle2</span> <span class="id">Hcycle3</span> <span class="id">Hmerge_mr</span> <span class="id">loc_d</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_mr_id_dist_l">merge_mr_id_dist_l</a></span> <span class="kwd">in</span> <span class="id">Hmerge_mr</span>.<br/>
@@ -804,8 +804,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_mr_id_scalar_l_correct">merge_mr_id_scalar_l_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_mr_id_scalar_l">merge_mr_id_scalar_l</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2624')">Proof.</div>
-<div class="proofscript" id="proof2624">
+<div class="toggleproof" onclick="toggleDisplay('proof2627')">Proof.</div>
+<div class="proofscript" id="proof2627">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr3</span> <span class="id">Hcycle1</span> <span class="id">Hcycle2</span> <span class="id">Hcycle3</span> <span class="id">Hmerge_mr</span> <span class="id">loc_d</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_mr_id_scalar_l">merge_mr_id_scalar_l</a></span> <span class="kwd">in</span> <span class="id">Hmerge_mr</span>.<br/>
@@ -863,8 +863,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_id_reduce_id_dist_map_correct">merge_id_reduce_id_dist_map_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_id_reduce_id_dist_map">merge_id_reduce_id_dist_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2625')">Proof.</div>
-<div class="proofscript" id="proof2625">
+<div class="toggleproof" onclick="toggleDisplay('proof2628')">Proof.</div>
+<div class="proofscript" id="proof2628">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr3</span> <span class="id">Hcycle1</span> <span class="id">Hcycle2</span> <span class="id">Hcycle3</span> <span class="id">Hmerge_mr</span> <span class="id">loc_d</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_id_reduce_id_dist_map">merge_id_reduce_id_dist_map</a></span> <span class="kwd">in</span> <span class="id">Hmerge_mr</span>.<br/>
@@ -911,8 +911,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_singleton_reduce_id_scalar_map_correct">merge_singleton_reduce_id_scalar_map_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">loc_d</span>, <span class="id">exists</span> <span class="id">d</span>, <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map_eval">mr_map_eval</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#NNRCMRRewrite.h">h</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span>.(<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_map">mr_map</a></span>) <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#loc_d">loc_d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#d">d</a></span>::<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>)) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_singleton_reduce_id_scalar_map">merge_singleton_reduce_id_scalar_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2626')">Proof.</div>
-<div class="proofscript" id="proof2626">
+<div class="toggleproof" onclick="toggleDisplay('proof2629')">Proof.</div>
+<div class="proofscript" id="proof2629">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hmap1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr3</span> <span class="id">Hcycle1</span> <span class="id">Hcycle2</span> <span class="id">Hcycle3</span> <span class="id">Hmerge_mr</span> <span class="id">loc_d</span> <span class="id">Hwell_localized</span>.<br/>
@@ -967,8 +967,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_reduce_id_flatten_map_correct">merge_reduce_id_flatten_map_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_reduce_id_flatten_map">merge_reduce_id_flatten_map</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2627')">Proof.</div>
-<div class="proofscript" id="proof2627">
+<div class="toggleproof" onclick="toggleDisplay('proof2630')">Proof.</div>
+<div class="proofscript" id="proof2630">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">mr3</span> <span class="id">Hcycle1</span> <span class="id">Hcycle2</span> <span class="id">Hcycle3</span> <span class="id">Hmerge_mr</span> <span class="id">loc_d</span> <span class="id">Hwell_localized</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_reduce_id_flatten_map">merge_reduce_id_flatten_map</a></span> <span class="kwd">in</span> <span class="id">Hmerge_mr</span>.<br/>
@@ -1032,8 +1032,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="merge_scalar_singleton_scalar_correct">merge_scalar_singleton_scalar_correct</a></span> <span class="id">mr1</span> <span class="id">mr2</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_well_formed">mr_well_formed</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_correct">merge_correct</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#merge_scalar_singleton_scalar">merge_scalar_singleton_scalar</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr1">mr1</a></span> <span class="id"><a href="Qcert.NNRCMR.Optim.NNRCMRRewrite.html#mr2">mr2</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2628')">Proof.</div>
-<div class="proofscript" id="proof2628">
+<div class="toggleproof" onclick="toggleDisplay('proof2631')">Proof.</div>
+<div class="proofscript" id="proof2631">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hmr2_wf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRCMR.Lang.NNRCMR.html#mr_well_formed">mr_well_formed</a></span> <span class="kwd">in</span> <span class="id">Hmr2_wf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">Hmr2_wf</span> <span class="kwd">as</span> [ <span class="id">Hmr2_map_wf</span> <span class="id">Hmr2_red_wf</span> ].<br/>

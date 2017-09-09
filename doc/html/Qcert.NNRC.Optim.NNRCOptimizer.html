@@ -59,8 +59,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span> -&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">e</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">e</span>', <span class="id"><a href="Qcert.NNRC.Lang.NNRCEq.html#nnrc_eq">nnrc_eq</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id">e</span>') <span class="id">e</span>') -&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRCEq.html#nnrc_eq">nnrc_eq</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#nnrc_map">nnrc_map</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>) <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2557')">Proof.</div>
-<div class="proofscript" id="proof2557">
+<div class="toggleproof" onclick="toggleDisplay('proof2560')">Proof.</div>
+<div class="proofscript" id="proof2560">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span> <span class="id">e</span> <span class="id">Hf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">e</span>) <span class="id">Case</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">simpl</span>; <span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id">Hf</span>; <span class="tactic">reflexivity</span>].<br/>
@@ -85,8 +85,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span> -&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">e</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">e</span>', <span class="id"><a href="Qcert.NNRC.Lang.NNRCEq.html#nnrc_eq">nnrc_eq</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id">e</span>') <span class="id">e</span>') -&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRCEq.html#nnrc_eq">nnrc_eq</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#nnrc_map_deep">nnrc_map_deep</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>) <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2558')">Proof.</div>
-<div class="proofscript" id="proof2558">
+<div class="toggleproof" onclick="toggleDisplay('proof2561')">Proof.</div>
+<div class="proofscript" id="proof2561">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span> <span class="id">e</span> <span class="id">Hf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">e</span>) <span class="id">Case</span>; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id">Hf</span>; <span class="tactic">reflexivity</span>];<br/>
@@ -104,8 +104,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="head_rew_correctness">head_rew_correctness</a></span> <span class="id">e</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Lang.NNRCEq.html#nnrc_eq">nnrc_eq</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#head_rew">head_rew</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>) <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2559')">Proof.</div>
-<div class="proofscript" id="proof2559">
+<div class="toggleproof" onclick="toggleDisplay('proof2562')">Proof.</div>
+<div class="proofscript" id="proof2562">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#head_rew">head_rew</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCRewrite.html#nnrc_unshadow_preserves">nnrc_unshadow_preserves</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -113,8 +113,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rewriter_simpl_rew_no_free_var">rewriter_simpl_rew_no_free_var</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> (<span class="id">op</span> : <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) (<span class="id">x</span> : <span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>),<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#x">x</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#head_rew">head_rew</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#op">op</a></span>)) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#x">x</a></span> (<span class="id"><a href="Qcert.cNNRC.Lang.cNNRCShadow.html#nnrc_free_vars">nnrc_free_vars</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#op">op</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2560')">Proof.</div>
-<div class="proofscript" id="proof2560">
+<div class="toggleproof" onclick="toggleDisplay('proof2563')">Proof.</div>
+<div class="proofscript" id="proof2563">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#head_rew">head_rew</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCRewrite.html#unshadow_free_vars">unshadow_free_vars</a></span>; <span class="tactic">eapply</span> <span class="id">H</span>.<br/>
@@ -134,15 +134,15 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tnnrc_rewrites_to_trans">tnnrc_rewrites_to_trans</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">e1</span> <span class="id">e2</span> <span class="id">e3</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e1">e1</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e2">e2</a></span> -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e2">e2</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e3">e3</a></span> -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e1">e1</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e3">e3</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2561')">Proof.</div>
-<div class="proofscript" id="proof2561">
+<div class="toggleproof" onclick="toggleDisplay('proof2564')">Proof.</div>
+<div class="proofscript" id="proof2564">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="tactic">transitivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="AUX">AUX</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">f</span> <span class="id">e</span> <span class="id">e</span>' :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">e</span>, <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>)) -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> <span class="id">e</span>' -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id">e</span>').<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2562')">Proof.</div>
-<div class="proofscript" id="proof2562">
+<div class="toggleproof" onclick="toggleDisplay('proof2565')">Proof.</div>
+<div class="proofscript" id="proof2565">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">H0</span> <span class="tactic">at</span> 1.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> (<span class="id">H</span> <span class="id">e</span>') <span class="tactic">at</span> 1.<br/>
@@ -155,8 +155,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span> -&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">p</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">p</span>', <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id">p</span>' (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id">p</span>')) -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_map">tnnrc_map</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2563')">Proof.</div>
-<div class="proofscript" id="proof2563">
+<div class="toggleproof" onclick="toggleDisplay('proof2566')">Proof.</div>
+<div class="proofscript" id="proof2566">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">p</span>) <span class="id">Case</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">simpl</span>; <span class="tactic">apply</span> <span class="id">Hf</span>]; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">reflexivity</span>;<br/>
@@ -175,8 +175,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span> -&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">p</span>: <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">p</span>', <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id">p</span>' (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id">p</span>')) -&gt; <span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_map_deep">tnnrc_map_deep</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#f">f</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2564')">Proof.</div>
-<div class="proofscript" id="proof2564">
+<div class="toggleproof" onclick="toggleDisplay('proof2567')">Proof.</div>
+<div class="proofscript" id="proof2567">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span> <span class="id">p</span> <span class="id">Hf</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nnrc_cases</span> (<span class="tactic">induction</span> <span class="id">p</span>) <span class="id">Case</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">simpl</span>; <span class="tactic">apply</span> <span class="id">Hf</span>];<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>;<br/>
@@ -192,8 +192,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tunshadow_preserves_fun_correctness">tunshadow_preserves_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>):<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tunshadow_preserves_fun">tunshadow_preserves_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2565')">Proof.</div>
-<div class="proofscript" id="proof2565">
+<div class="toggleproof" onclick="toggleDisplay('proof2568')">Proof.</div>
+<div class="proofscript" id="proof2568">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tunshadow_preserves_fun">tunshadow_preserves_fun</a></span>, <span class="id"><a href="Qcert.NNRC.Lang.NNRCShadow.html#unshadow_simpl">unshadow_simpl</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tunshadow_preserves_arrow">tunshadow_preserves_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -217,8 +217,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tfor_nil_fun_correctness">tfor_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tfor_nil_fun">tfor_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2566')">Proof.</div>
-<div class="proofscript" id="proof2566">
+<div class="toggleproof" onclick="toggleDisplay('proof2569')">Proof.</div>
+<div class="proofscript" id="proof2569">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tfor_nil_arrow">tfor_nil_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -242,8 +242,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tfor_singleton_to_let_fun_correctness">tfor_singleton_to_let_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tfor_singleton_to_let_fun">tfor_singleton_to_let_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2567')">Proof.</div>
-<div class="proofscript" id="proof2567">
+<div class="toggleproof" onclick="toggleDisplay('proof2570')">Proof.</div>
+<div class="proofscript" id="proof2570">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tfor_singleton_to_let_arrow">tfor_singleton_to_let_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -266,8 +266,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tflatten_singleton_fun_correctness">tflatten_singleton_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tflatten_singleton_fun">tflatten_singleton_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2568')">Proof.</div>
-<div class="proofscript" id="proof2568">
+<div class="toggleproof" onclick="toggleDisplay('proof2571')">Proof.</div>
+<div class="proofscript" id="proof2571">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tflatten_singleton_nnrc_arrow">tflatten_singleton_nnrc_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -290,8 +290,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tflatten_nil_fun_correctness">tflatten_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tflatten_nil_fun">tflatten_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2569')">Proof.</div>
-<div class="proofscript" id="proof2569">
+<div class="toggleproof" onclick="toggleDisplay('proof2572')">Proof.</div>
+<div class="proofscript" id="proof2572">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tflatten_nil_nnrc_arrow">tflatten_nil_nnrc_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -322,8 +322,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tsigma_to_if_fun_correctness">tsigma_to_if_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tsigma_to_if_fun">tsigma_to_if_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2570')">Proof.</div>
-<div class="proofscript" id="proof2570">
+<div class="toggleproof" onclick="toggleDisplay('proof2573')">Proof.</div>
+<div class="proofscript" id="proof2573">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tsigma_to_if_arrow">tsigma_to_if_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -362,8 +362,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tmap_sigma_fusion_samevar_fun_correctness">tmap_sigma_fusion_samevar_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tmap_sigma_fusion_samevar_fun">tmap_sigma_fusion_samevar_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2571')">Proof.</div>
-<div class="proofscript" id="proof2571">
+<div class="toggleproof" onclick="toggleDisplay('proof2574')">Proof.</div>
+<div class="proofscript" id="proof2574">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tmap_sigma_fusion_samevar_arrow">tmap_sigma_fusion_samevar_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -390,8 +390,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tdot_of_rec_fun_correctness">tdot_of_rec_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tdot_of_rec_fun">tdot_of_rec_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2572')">Proof.</div>
-<div class="proofscript" id="proof2572">
+<div class="toggleproof" onclick="toggleDisplay('proof2575')">Proof.</div>
+<div class="proofscript" id="proof2575">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tdot_of_rec">tdot_of_rec</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -417,8 +417,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tmerge_concat_to_concat_fun_correctness">tmerge_concat_to_concat_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tmerge_concat_to_concat_fun">tmerge_concat_to_concat_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2573')">Proof.</div>
-<div class="proofscript" id="proof2573">
+<div class="toggleproof" onclick="toggleDisplay('proof2576')">Proof.</div>
+<div class="proofscript" id="proof2576">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">e</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">b</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">e1</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -451,8 +451,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tdot_of_concat_rec_fun_correctness">tdot_of_concat_rec_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tdot_of_concat_rec_fun">tdot_of_concat_rec_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2574')">Proof.</div>
-<div class="proofscript" id="proof2574">
+<div class="toggleproof" onclick="toggleDisplay('proof2577')">Proof.</div>
+<div class="proofscript" id="proof2577">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">e</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">u</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">e</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
@@ -523,8 +523,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tinline_let_fun_correctness">tinline_let_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tinline_let_fun">tinline_let_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2575')">Proof.</div>
-<div class="proofscript" id="proof2575">
+<div class="toggleproof" onclick="toggleDisplay('proof2578')">Proof.</div>
+<div class="proofscript" id="proof2578">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tlet_inline_arrow">tlet_inline_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -549,8 +549,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tfor_over_if_nil_fun_correctness">tfor_over_if_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tfor_over_if_nil_fun">tfor_over_if_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2576')">Proof.</div>
-<div class="proofscript" id="proof2576">
+<div class="toggleproof" onclick="toggleDisplay('proof2579')">Proof.</div>
+<div class="proofscript" id="proof2579">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tfor_over_if_arrow">tfor_over_if_arrow</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tfor_nil_arrow">tfor_nil_arrow</a></span>.<br/>
@@ -581,8 +581,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tfor_over_either_nil_fun_correctness">tfor_over_either_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tfor_over_either_nil_fun">tfor_over_either_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2577')">Proof.</div>
-<div class="proofscript" id="proof2577">
+<div class="toggleproof" onclick="toggleDisplay('proof2580')">Proof.</div>
+<div class="proofscript" id="proof2580">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tfor_over_either_arrow">tfor_over_either_arrow</a></span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tfor_nil_arrow">tfor_nil_arrow</a></span>.<br/>
@@ -609,8 +609,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tunop_over_either_const_fun_correctness">tunop_over_either_const_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tunop_over_either_const_fun">tunop_over_either_const_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2578')">Proof.</div>
-<div class="proofscript" id="proof2578">
+<div class="toggleproof" onclick="toggleDisplay('proof2581')">Proof.</div>
+<div class="proofscript" id="proof2581">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcunop_over_either_arrow">tnnrcunop_over_either_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -634,8 +634,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tunop_over_if_const_fun_correctness">tunop_over_if_const_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tunop_over_if_const_fun">tunop_over_if_const_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2579')">Proof.</div>
-<div class="proofscript" id="proof2579">
+<div class="toggleproof" onclick="toggleDisplay('proof2582')">Proof.</div>
+<div class="proofscript" id="proof2582">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">e</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcunop_over_if_arrow">tnnrcunop_over_if_arrow</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -660,8 +660,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_nil_fun_correctness">tproject_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_nil_fun">tproject_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2580')">Proof.</div>
-<div class="proofscript" id="proof2580">
+<div class="toggleproof" onclick="toggleDisplay('proof2583')">Proof.</div>
+<div class="proofscript" id="proof2583">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_nil">tnnrcproject_nil</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -688,8 +688,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_over_const_fun_correctness">tproject_over_const_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_over_const_fun">tproject_over_const_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2581')">Proof.</div>
-<div class="proofscript" id="proof2581">
+<div class="toggleproof" onclick="toggleDisplay('proof2584')">Proof.</div>
+<div class="proofscript" id="proof2584">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_const">tnnrcproject_over_const</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -718,8 +718,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_over_rec_fun_correctness">tproject_over_rec_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_over_rec_fun">tproject_over_rec_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2582')">Proof.</div>
-<div class="proofscript" id="proof2582">
+<div class="toggleproof" onclick="toggleDisplay('proof2585')">Proof.</div>
+<div class="proofscript" id="proof2585">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_rec_in">tnnrcproject_over_rec_in</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_rec_nin">tnnrcproject_over_rec_nin</a></span>; <span class="tactic">trivial</span>. <br/>
@@ -752,8 +752,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_over_concat_r_fun_correctness">tproject_over_concat_r_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_over_concat_r_fun">tproject_over_concat_r_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2583')">Proof.</div>
-<div class="proofscript" id="proof2583">
+<div class="toggleproof" onclick="toggleDisplay('proof2586')">Proof.</div>
+<div class="proofscript" id="proof2586">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_concat_rec_r_in">tnnrcproject_over_concat_rec_r_in</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_concat_rec_r_nin">tnnrcproject_over_concat_rec_r_nin</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -785,8 +785,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_over_concat_l_fun_correctness">tproject_over_concat_l_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_over_concat_l_fun">tproject_over_concat_l_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2584')">Proof.</div>
-<div class="proofscript" id="proof2584">
+<div class="toggleproof" onclick="toggleDisplay('proof2587')">Proof.</div>
+<div class="proofscript" id="proof2587">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_concat_rec_l_nin">tnnrcproject_over_concat_rec_l_nin</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -813,8 +813,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_over_project_fun_correctness">tproject_over_project_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_over_project_fun">tproject_over_project_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2585')">Proof.</div>
-<div class="proofscript" id="proof2585">
+<div class="toggleproof" onclick="toggleDisplay('proof2588')">Proof.</div>
+<div class="proofscript" id="proof2588">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_nnrcproject">tnnrcproject_over_nnrcproject</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -841,8 +841,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tproject_over_either_fun_correctness">tproject_over_either_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> ⇒ᶜ <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tproject_over_either_fun">tproject_over_either_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2586')">Proof.</div>
-<div class="proofscript" id="proof2586">
+<div class="toggleproof" onclick="toggleDisplay('proof2589')">Proof.</div>
+<div class="proofscript" id="proof2589">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">tprove_correctness</span> <span class="id">p</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tnnrcproject_over_either">tnnrcproject_over_either</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -872,8 +872,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tcount_over_flat_for_either_if_nil_fun_correctness">tcount_over_flat_for_either_if_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tcount_over_flat_for_either_if_nil_fun">tcount_over_flat_for_either_if_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2587')">Proof.</div>
-<div class="proofscript" id="proof2587">
+<div class="toggleproof" onclick="toggleDisplay('proof2590')">Proof.</div>
+<div class="proofscript" id="proof2590">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">e</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> (<span class="id">match_destr</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tcount_over_flat_for_either_if_nil_arrow">tcount_over_flat_for_either_if_nil_arrow</a></span>.<br/>
@@ -903,8 +903,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tcount_over_flat_for_either_either_nil_fun_correctness">tcount_over_flat_for_either_either_nil_fun_correctness</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} (<span class="id">e</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tcount_over_flat_for_either_either_nil_fun">tcount_over_flat_for_either_either_nil_fun</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#e">e</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2588')">Proof.</div>
-<div class="proofscript" id="proof2588">
+<div class="toggleproof" onclick="toggleDisplay('proof2591')">Proof.</div>
+<div class="proofscript" id="proof2591">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">e</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> (<span class="id">match_destr</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.TNNRCRewrite.html#tcount_over_flat_for_either_either_nil_arrow">tcount_over_flat_for_either_either_nil_arrow</a></span>.<br/>
@@ -976,8 +976,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tnnrc_optim_model_list_complete">tnnrc_optim_model_list_complete</a></span> {<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>}<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#optim_model_list_complete">optim_model_list_complete</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_optim_list">tnnrc_optim_list</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_optim_model_list">tnnrc_optim_model_list</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2589')">Proof.</div>
-<div class="proofscript" id="proof2589">
+<div class="toggleproof" onclick="toggleDisplay('proof2592')">Proof.</div>
+<div class="proofscript" id="proof2592">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">optim_correct_list_complete_prover</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -987,8 +987,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tnnrc_optim_list_distinct">tnnrc_optim_list_distinct</a></span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#optim_list_distinct">optim_list_distinct</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_optim_list">tnnrc_optim_list</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2590')">Proof.</div>
-<div class="proofscript" id="proof2590">
+<div class="toggleproof" onclick="toggleDisplay('proof2593')">Proof.</div>
+<div class="proofscript" id="proof2593">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#optim_list_distinct_prover">optim_list_distinct_prover</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">vm_compute</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span>.<br/>
@@ -1006,8 +1006,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">opc</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optim_phases_config">optim_phases_config</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">p</span>:<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">run_nnrc_optims</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#opc">opc</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2591')">Proof.</div>
-<div class="proofscript" id="proof2591">
+<div class="toggleproof" onclick="toggleDisplay('proof2594')">Proof.</div>
+<div class="proofscript" id="proof2594">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims">run_nnrc_optims</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#run_phases_correctness">run_phases_correctness</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intros</span>. <span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_map_deep_correctness">tnnrc_map_deep_correctness</a></span>; <span class="tactic">auto</span>.<br/>
@@ -1044,8 +1044,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Remark</span> <span class="id"><a name="nnrc_default_optim_list_all_valid">nnrc_default_optim_list_all_valid</a></span> {<span class="id">fruntime</span>:<span class="id"><a href="Qcert.Common.ForeignRuntime.html#foreign_runtime">foreign_runtime</a></span>}<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="Qcert.Common.Logger.OptimizerStep.html#valid_optims">valid_optims</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#tnnrc_optim_list">tnnrc_optim_list</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#nnrc_default_optim_list">nnrc_default_optim_list</a></span> = (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#nnrc_default_optim_list">nnrc_default_optim_list</a></span>,<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2592')">Proof.</div>
-<div class="proofscript" id="proof2592">
+<div class="toggleproof" onclick="toggleDisplay('proof2595')">Proof.</div>
+<div class="proofscript" id="proof2595">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">vm_compute</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;<br/>
@@ -1061,8 +1061,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="run_nnrc_optims_default_correct">run_nnrc_optims_default_correct</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">model</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} {<span class="id">logger</span>:<span class="id"><a href="Qcert.Common.Logger.OptimizerLogger.html#optimizer_logger">optimizer_logger</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc">nnrc</a></span>} <span class="id">p</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Typing.TNNRCEq.html#tnnrc_rewrites_to">tnnrc_rewrites_to</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span> (<span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims_default">run_nnrc_optims_default</a></span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#p">p</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2593')">Proof.</div>
-<div class="proofscript" id="proof2593">
+<div class="toggleproof" onclick="toggleDisplay('proof2596')">Proof.</div>
+<div class="proofscript" id="proof2596">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims_default">run_nnrc_optims_default</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.NNRC.Optim.NNRCOptimizer.html#run_nnrc_optims_correctness">run_nnrc_optims_correctness</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>

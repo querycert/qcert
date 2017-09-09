@@ -103,8 +103,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#cenv">cenv</a></span> ((<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#vid">vid</a></span>, <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#x">x</a></span>) :: <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#env">env</a></span>) (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core">nra_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#op">op</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#vid">vid</a></span>)) <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#l">l</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RRelation.html#rmap">rmap</a></span> (<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra_eval">nra_eval</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#op">op</a></span>) <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#l">l</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2754')">Proof.</div>
-<div class="proofscript" id="proof2754">
+<div class="toggleproof" onclick="toggleDisplay('proof2757')">Proof.</div>
+<div class="proofscript" id="proof2757">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
@@ -119,8 +119,8 @@
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nra_sem_correct">nra_sem_correct</a></span> (<span class="id">h</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>)) (<span class="id">cenv</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>) (<span class="id">op</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) (<span class="id">env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>) (<span class="id">vid</span>:<span class="id"><a href="Qcert.Common.Env.RVar.html#var">var</a></span>) (<span class="id">did</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#env">env</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#vid">vid</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#did">did</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#env">env</a></span> (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core">nra_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#op">op</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#vid">vid</a></span>) = <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#h">h</a></span> ⊢ <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#op">op</a></span> @ₐ <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#did">did</a></span> ⊣ <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#cenv">cenv</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2755')">Proof.</div>
-<div class="proofscript" id="proof2755">
+<div class="toggleproof" onclick="toggleDisplay('proof2758')">Proof.</div>
+<div class="proofscript" id="proof2758">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">fresh_var_fresh1</span> <span class="id">fresh_var_fresh2</span> <span class="id">fresh_var_fresh3</span> <span class="id">fresh_var2_distinct</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">did</span> <span class="id">env</span> <span class="id">vid</span>.<br/>
@@ -271,8 +271,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nra_to_nnrc_core_is_core">nra_to_nnrc_core_is_core</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">q</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>, <span class="kwd">forall</span> <span class="id">init_vid</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrcIsCore">nnrcIsCore</a></span> (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core">nra_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#q">q</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#init_vid">init_vid</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2756')">Proof.</div>
-<div class="proofscript" id="proof2756">
+<div class="toggleproof" onclick="toggleDisplay('proof2759')">Proof.</div>
+<div class="proofscript" id="proof2759">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">q</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">q</span>; <span class="tactic">simpl</span>; <span class="tactic">auto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -286,8 +286,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nraToNNRC_size">nraToNNRC_size</a></span> <span class="id">op</span> <span class="id">v</span> : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Lang.NNRCSize.html#nnrc_size">nnrc_size</a></span> (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core">nra_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#op">op</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#v">v</a></span>) &lt;= 10 * <span class="id"><a href="Qcert.NRA.Lang.NRASize.html#nra_size">nra_size</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#op">op</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2757')">Proof.</div>
-<div class="proofscript" id="proof2757">
+<div class="toggleproof" onclick="toggleDisplay('proof2760')">Proof.</div>
+<div class="proofscript" id="proof2760">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">v</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">op</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">intros</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">omega</span>.<br/>
@@ -320,8 +320,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nra_to_nnrc_base_top_is_core">nra_to_nnrc_base_top_is_core</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">q</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>, <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrcIsCore">nnrcIsCore</a></span> (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_base_top">nra_to_nnrc_base_top</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#q">q</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2758')">Proof.</div>
-<div class="proofscript" id="proof2758">
+<div class="toggleproof" onclick="toggleDisplay('proof2761')">Proof.</div>
+<div class="proofscript" id="proof2761">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; [<span class="tactic">trivial</span>| ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core_is_core">nra_to_nnrc_core_is_core</a></span>.<br/>
@@ -329,16 +329,16 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Program</span> <span class="kwd">Definition</span> <span class="id"><a name="nra_to_nnrc_core_top">nra_to_nnrc_core_top</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) : <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core">nnrc_core</a></span> :=<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#exist">exist</a></span> <span class="id">_</span> (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_base_top">nra_to_nnrc_base_top</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#q">q</a></span>) <span class="id">_</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2759')">Next Obligation.</div>
-<div class="proofscript" id="proof2759">
+<div class="toggleproof" onclick="toggleDisplay('proof2762')">Next Obligation.</div>
+<div class="proofscript" id="proof2762">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_base_top_is_core">nra_to_nnrc_base_top_is_core</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="nra_to_nnrc_core_top_correct">nra_to_nnrc_core_top_correct</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">h</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>)) (<span class="id">q</span>:<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra">nra</a></span>) (<span class="id">env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">nnrc_core_eval_top</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#h">h</a></span> (<span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#nra_to_nnrc_core_top">nra_to_nnrc_core_top</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#q">q</a></span>) <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#env">env</a></span> = <span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra_eval_top">nra_eval_top</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#q">q</a></span> <span class="id"><a href="Qcert.Translation.NRAtocNNRC.html#env">env</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2760')">Proof.</div>
-<div class="proofscript" id="proof2760">
+<div class="toggleproof" onclick="toggleDisplay('proof2763')">Proof.</div>
+<div class="proofscript" id="proof2763">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval_top">nnrc_core_eval_top</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra_eval_top">nra_eval_top</a></span>.<br/>

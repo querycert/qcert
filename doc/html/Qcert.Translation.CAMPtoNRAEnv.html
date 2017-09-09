@@ -82,8 +82,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_of_camp_nraenv_core_of_camp_ident">nraenv_of_camp_nraenv_core_of_camp_ident</a></span> <span class="id">q</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_core_of_nraenv">nraenv_core_of_nraenv</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#q">q</a></span>) = <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#nraenv_core_of_camp">nraenv_core_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#q">q</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2915')">Proof.</div>
-<div class="proofscript" id="proof2915">
+<div class="toggleproof" onclick="toggleDisplay('proof2918')">Proof.</div>
+<div class="proofscript" id="proof2918">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">q</span>; <span class="tactic">intros</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> (<span class="tactic">rewrite</span> <span class="id">IHq</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>);<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> (<span class="tactic">rewrite</span> <span class="id">IHq1</span>; <span class="tactic">rewrite</span> <span class="id">IHq2</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>).<br/>
@@ -91,8 +91,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_of_camp_correct">nraenv_of_camp_correct</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">q</span> <span class="id">env</span> <span class="id">d</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.CAMPtoNRA.html#lift_failure">lift_failure</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#q">q</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#env">env</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#q">q</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#env">env</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2916')">Proof.</div>
-<div class="proofscript" id="proof2916">
+<div class="toggleproof" onclick="toggleDisplay('proof2919')">Proof.</div>
+<div class="proofscript" id="proof2919">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#nraenv_core_of_camp_correct">nraenv_core_of_camp_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_nraenv_core_of_camp_ident">nraenv_of_camp_nraenv_core_of_camp_ident</a></span>.<br/>
@@ -102,8 +102,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_of_camp_equiv_to_nra">nraenv_of_camp_equiv_to_nra</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">p</span> <span class="id">bind</span> <span class="id">d</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra_eval">nra_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRA.html#nra_of_camp">nra_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>) (<span class="id"><a href="Qcert.NRA.Lang.NRASugar.html#nra_context_data">nra_context_data</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#bind">bind</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#bind">bind</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2917')">Proof.</div>
-<div class="proofscript" id="proof2917">
+<div class="toggleproof" onclick="toggleDisplay('proof2920')">Proof.</div>
+<div class="proofscript" id="proof2920">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_correct">nraenv_of_camp_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Translation.CAMPtoNRA.html#camp_trans_correct">camp_trans_correct</a></span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -112,8 +112,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#x">x</a></span>)) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRA.Lang.NRA.html#nra_eval">nra_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRA.html#nra_of_camp_top">nra_of_camp_top</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_top">nraenv_of_camp_top</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2918')">Proof.</div>
-<div class="proofscript" id="proof2918">
+<div class="toggleproof" onclick="toggleDisplay('proof2921')">Proof.</div>
+<div class="proofscript" id="proof2921">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_top">nraenv_of_camp_top</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_equiv_to_nra">nraenv_of_camp_equiv_to_nra</a></span>; <span class="tactic">intros</span> <span class="id">Hequiv</span>.<br/>
@@ -126,8 +126,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="ecamp_trans_top_correct">ecamp_trans_top_correct</a></span> <span class="id">h</span> <span class="id">c</span> <span class="id">p</span> <span class="id">d</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#x">x</a></span>)) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.CAMPtoNRA.html#lift_failure">lift_failure</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval">nraenv_eval</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#c">c</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_top">nraenv_of_camp_top</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>) (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2919')">Proof.</div>
-<div class="proofscript" id="proof2919">
+<div class="toggleproof" onclick="toggleDisplay('proof2922')">Proof.</div>
+<div class="proofscript" id="proof2922">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> &lt;- (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_top_id">nraenv_of_camp_top_id</a></span> <span class="id">h</span> <span class="id">c</span>); <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Translation.CAMPtoNRA.html#camp_trans_correct">camp_trans_correct</a></span>.<br/>
@@ -144,8 +144,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">q</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp">camp</a></span>, <span class="kwd">forall</span> <span class="id">global_env</span>:<span class="id"><a href="Qcert.Common.Data.RData.html#bindings">bindings</a></span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval_top">camp_eval_top</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#CAMPtoNRAEnv.Top.h">h</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#q">q</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#global_env">global_env</a></span> =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_eval_top">nraenv_eval_top</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#CAMPtoNRAEnv.Top.h">h</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#camp_to_nraenv_top">camp_to_nraenv_top</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#q">q</a></span>) <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#global_env">global_env</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2920')">Proof.</div>
-<div class="proofscript" id="proof2920">
+<div class="toggleproof" onclick="toggleDisplay('proof2923')">Proof.</div>
+<div class="proofscript" id="proof2923">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp_correct">nraenv_of_camp_correct</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -158,8 +158,8 @@
 <div class="doc">Proof showing linear size translation </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_trans_size">camp_trans_size</a></span> <span class="id">p</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnvSize.html#nraenv_size">nraenv_size</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>) &lt;= 13 * <span class="id"><a href="Qcert.CAMP.Lang.CAMPSize.html#camp_size">camp_size</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p">p</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2921')">Proof.</div>
-<div class="proofscript" id="proof2921">
+<div class="toggleproof" onclick="toggleDisplay('proof2924')">Proof.</div>
+<div class="proofscript" id="proof2924">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">p</span>; <span class="tactic">simpl</span>; <span class="tactic">omega</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -179,8 +179,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_of_pand_works">nraenv_of_pand_works</a></span> (<span class="id">p1</span> <span class="id">p2</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp">camp</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPSugar.html#pand">pand</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p1">p1</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p2">p2</a></span>) = <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_for_pand">nraenv_for_pand</a></span> (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p1">p1</a></span>) (<span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#nraenv_of_camp">nraenv_of_camp</a></span> <span class="id"><a href="Qcert.Translation.CAMPtoNRAEnv.html#p2">p2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2922')">Proof.</div>
-<div class="proofscript" id="proof2922">
+<div class="toggleproof" onclick="toggleDisplay('proof2925')">Proof.</div>
+<div class="proofscript" id="proof2925">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>

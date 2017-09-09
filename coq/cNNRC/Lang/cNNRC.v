@@ -15,11 +15,11 @@
  *)
 
 (** cNNRC is the core named nested relational calculus. It serves as
-the foundations for NNRC, an intermediate language to facilitate code
-generation for non-functional targets. *)
+the foundations for NNRC, an intermediate language that we use to
+facilitate code generation to non-functional targets. *)
 
 (** cNNRC is a small pure language without functions. Expressions in
-cNNRC are evaluated within an environment. *)
+cNNRC are evaluated within a global and a local environment. *)
 
 (** Summary:
 - Language: cNNRC (Core Named Nested Relational Calculus)
@@ -33,9 +33,9 @@ cNNRC are evaluated within an environment. *)
 (** Compared to the version proposed by Van den Bussche and Vansummerren:
 - We add a notion of global variables, distinct from local variables
 - We add a let expression: [let x := e1 in e2]
-- Conditional expression allow arbitrary boolean conditions, not just equality, so
-instead of [e1 = e2 ? e3 : e4], we have [e1 ? e2 : e3]
-- We add a matching expression for either values (left/right)
+- Conditional expressions allow arbitrary boolean conditions, not just equality, so
+instead of: [e1 = e2 ? e3 : e4], we have: [e1 ? e2 : e3]
+- We add a case expression for either values: [either e left v₁ : e₁ | right v₂ : e₂]
 *)
 
 Section cNNRC.
@@ -46,8 +46,6 @@ Section cNNRC.
   Require Import Morphisms.
   Require Import Utils.
   Require Import CommonRuntime.
-
-  (** Named Nested Relational Calculus *)
 
   Context {fruntime:foreign_runtime}.
   
@@ -60,19 +58,20 @@ Section cNNRC.
         NNRC. *)
 
     Inductive nnrc :=
-    | NNRCGetConstant : var -> nnrc                             (**r Global variable lookup *)
-    | NNRCVar : var -> nnrc                                     (**r Variable lookup *)
-    | NNRCConst : data -> nnrc                                  (**r Constant value *)
-    | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc                 (**r Binary operator *)
-    | NNRCUnop : unaryOp -> nnrc -> nnrc                        (**r Unary operator *)
-    | NNRCLet : var -> nnrc -> nnrc -> nnrc                     (**r Let expression *)
-    | NNRCFor : var -> nnrc -> nnrc -> nnrc                     (**r For loop *)
-    | NNRCIf : nnrc -> nnrc -> nnrc -> nnrc                     (**r Conditional *)
-    | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc   (**r Choice expression *)
-    | NNRCGroupBy : string -> list string -> nnrc -> nnrc.      (**r Group by expression -- only in NNRC *)
+    | NNRCGetConstant : var -> nnrc                           (**r global variable lookup ([$$v]) *)
+    | NNRCVar : var -> nnrc                                   (**r local variable lookup ([$v])*)
+    | NNRCConst : data -> nnrc                                (**r constant data ([d]) *)
+    | NNRCBinop : binOp -> nnrc -> nnrc -> nnrc               (**r binary operator ([e₁ ⊠ e₂]) *)
+    | NNRCUnop : unaryOp -> nnrc -> nnrc                      (**r unary operator ([⊞ e]) *)
+    | NNRCLet : var -> nnrc -> nnrc -> nnrc                   (**r let expression ([let $v := e₁ in e₂]) *)
+    | NNRCFor : var -> nnrc -> nnrc -> nnrc                   (**r for loop ([{ e₂ | $v in e₁ }]) *)
+    | NNRCIf : nnrc -> nnrc -> nnrc -> nnrc                   (**r conditional ([e₁ ? e₂ : e₃]) *)
+    | NNRCEither : nnrc -> var -> nnrc -> var -> nnrc -> nnrc (**r case expression ([either e left v₁ : e₁ | right v₂ : e₂]) *)
+    | NNRCGroupBy : string -> list string -> nnrc -> nnrc.    (**r group by expression ([e groupby g fields]) -- only in full NNRC *)
 
-    (** The nnrcIsCore predicate defines what fragment is part of this
-        abstract syntax is in the core cNNRC and which part is not. *)
+    (** The [nnrcIsCore] predicate defines what fragment is part of
+        this abstract syntax is in the core named nested relational
+        calculus and which part is not. *)
   
     Fixpoint nnrcIsCore (e:nnrc) : Prop :=
       match e with
@@ -88,8 +87,8 @@ Section cNNRC.
       | NNRCGroupBy _ _ _ => False
       end.
 
-    (** cNNRC is defined as the dependent type of expressions in that
-        abstract syntax such that the [nnrcIsCore] predicate holds. *)
+    (** cNNRC is defined as the expressions in that abstract syntax
+        for which the [nnrcIsCore] predicate holds. *)
   
     Definition nnrc_core : Set := {e:nnrc | nnrcIsCore e}.
 
@@ -127,7 +126,11 @@ Section cNNRC.
   
   (** * Semantics *)
 
-  (** For Core NNRC, we provide two kinds of semantics: a denotational semantics, and an evaluation semantics. Both are shown to be consistent. The denotational semantics is used for illustration purposes, as most of the rest of the code relies on evaluation as the primary semantics. *)
+  (** For cNNRC, we provide two kinds of semantics: a denotational
+  semantics, and an evaluation semantics. Both are shown to be
+  equivalent. The denotational semantics is used for documentation
+  purposes, as most of the rest of the code relies on evaluation as
+  the primary semantics. *)
   
   Section Semantics.
     (** Part of the context is fixed for the rest of the development:
@@ -137,67 +140,77 @@ Section cNNRC.
     Context (h:brand_relation_t).
     Context (constant_env:list (string*data)).
 
-    (** ** Semantics *)
-  
-    Section DenotSemantics.
+    (** ** Denotational Semantics *)
+
+    (** The semantics is defined using the main judgment [Γc ; Γ ⊢〚e〛⇓ d]
+    ([nnrc_core_sem]) where [Γc] is the global environment, [Γ] is the
+    local environment, [e] the expression and [d] the resulting value. *)
+    
+    (** Conditionals and matching expressions only evaluate one of
+    their branches. The auxiliary judgment [Γc ; Γ ; v ; c₁ ⊢ 〚e〛φ ⇓ c₂]
+    ([nnrc_core_sem_for]) is used in the definition of [for]
+    expressions. *)
+    
+    Section DenoteSemantics.
       Inductive nnrc_core_sem: bindings -> nnrc -> data -> Prop :=
-      | sem_NNRCGetConstant: forall env c dres,
-          edot constant_env c = Some dres ->
-          nnrc_core_sem env (NNRCGetConstant c) dres
-      | sem_NNRCVar: forall env c dres,
-          lookup equiv_dec env c = Some dres ->
-          nnrc_core_sem env (NNRCVar c) dres
-      | sem_NNRCConst: forall env d,
-          nnrc_core_sem env (NNRCConst d) (normalize_data h d)
-      | sem_NNRCBinop: forall bop env e1 e2 d1 d2 dres,
-          nnrc_core_sem env e1 d1 ->
-          nnrc_core_sem env e2 d2 ->
-          fun_of_binop h bop d1 d2 = Some dres ->
-          nnrc_core_sem env (NNRCBinop bop e1 e2) dres
-      | sem_NNRCUnop: forall uop env e d dres,
-          nnrc_core_sem env e d ->
-          fun_of_unaryop h uop d = Some dres ->
-          nnrc_core_sem env (NNRCUnop uop e) dres
-      | sem_NNRCLet: forall env e1 x e2 d1 dres,
-          nnrc_core_sem env e1 d1 ->
-          nnrc_core_sem ((x,d1)::env) e2 dres ->
-          nnrc_core_sem env (NNRCLet x e1 e2) dres
-      | sem_NNRCFor: forall env e1 x e2 c1 cres,
-          nnrc_core_sem env e1 (dcoll c1) ->
-          nnrc_core_sem_for x env e2 c1 cres ->
-          nnrc_core_sem env (NNRCFor x e1 e2) (dcoll cres)
-      | sem_NNRCIf_true: forall env e1 e2 e3 dres,
-          nnrc_core_sem env e1 (dbool true) ->
-          nnrc_core_sem env e2 dres ->
-          nnrc_core_sem env (NNRCIf e1 e2 e3) dres
-      | sem_NNRCIf_false: forall env e1 e2 e3 dres,
-          nnrc_core_sem env e1 (dbool false) ->
-          nnrc_core_sem env e3 dres ->
-          nnrc_core_sem env (NNRCIf e1 e2 e3) dres
-      | sem_NNRCEither_left: forall env e1 xl el xr er dl dres,
-          nnrc_core_sem env e1 (dleft dl) ->
-          nnrc_core_sem ((xl,dl)::env) el dres ->
-          nnrc_core_sem env (NNRCEither e1 xl el xr er) dres
-      | sem_NNRCEither_right: forall env e1 xl el xr er dr dres,
-          nnrc_core_sem env e1 (dright dr) ->
-          nnrc_core_sem ((xr,dr)::env) er dres ->
-          nnrc_core_sem env (NNRCEither e1 xl el xr er) dres
+      | sem_NNRCGetConstant: forall env v d,
+          edot constant_env v = Some d ->                 (**r   [Γc(v) = d] *)
+          nnrc_core_sem env (NNRCGetConstant v) d         (**r ⇒ [Γc ; Γ ⊢〚$$v〛⇓ d] *)
+      | sem_NNRCVar: forall env v d,
+          lookup equiv_dec env v = Some d ->              (**r   [Γ(v) = d] *)
+          nnrc_core_sem env (NNRCVar v) d                 (**r ⇒ [Γc ; Γ ⊢〚$v〛⇓ d] *)
+      | sem_NNRCConst: forall env d1 d2,
+          normalize_data h d1 = d2 ->                     (**r   [norm(d₁) = d₂] *)
+          nnrc_core_sem env (NNRCConst d1) d2             (**r ⇒ [Γc ; Γ ⊢〚d₁〛⇓ d₂] *)
+      | sem_NNRCBinop: forall bop env e1 e2 d1 d2 d3,
+          nnrc_core_sem env e1 d1 ->                      (**r   [Γc ; Γ ⊢〚e₁〛⇓ d₁] *)
+          nnrc_core_sem env e2 d2 ->                      (**r ∧ [Γc ; Γ ⊢〚e₂〛⇓ d₂] *)
+          fun_of_binop h bop d1 d2 = Some d3 ->           (**r ∧ [d₁ ⊠ d₂ = d₃] *)
+          nnrc_core_sem env (NNRCBinop bop e1 e2) d3      (**r ⇒ [Γc ; Γ ⊢〚e₁ ⊠ e₂〛⇓ d₃] *)
+      | sem_NNRCUnop: forall uop env e d1 d2,
+          nnrc_core_sem env e d1 ->                       (**r   [Γc ; Γ ⊢〚e〛⇓ d₁] *)
+          fun_of_unaryop h uop d1 = Some d2 ->            (**r ∧ [⊞ d₁ = d₂] *)
+          nnrc_core_sem env (NNRCUnop uop e) d2           (**r ⇒ [Γc ; Γ ⊢〚⊞ e〛⇓ d₂] *)
+      | sem_NNRCLet: forall env e1 v e2 d1 d2,
+          nnrc_core_sem env e1 d1 ->                      (**r   [Γc ; Γ ⊢〚e₁〛⇓ d₁] *)
+          nnrc_core_sem ((v,d1)::env) e2 d2 ->            (**r ∧ [Γc ; (v,d₁),Γ ⊢〚e₂〛⇓ d₂] *)
+          nnrc_core_sem env (NNRCLet v e1 e2) d2          (**r ⇒ [Γc ; Γ ⊢〚let v := e₁ in e₂〛⇓ d₂] *)
+      | sem_NNRCFor: forall env e1 v e2 c1 c2,
+          nnrc_core_sem env e1 (dcoll c1) ->              (**r   [Γc ; Γ ⊢〚e₁〛= {c₁}] *)
+          nnrc_core_sem_for v env e2 c1 c2 ->             (**r ∧ [Γc ; Γ ; v ; {c₁} ⊢〚e₂〛φ ⇓ {c₂}] *)
+          nnrc_core_sem env (NNRCFor v e1 e2) (dcoll c2)  (**r ⇒ [Γc ; Γ ⊢ 〚for v := e₁ in e₂〛⇓ {c₂}] *)
+      | sem_NNRCIf_true: forall env e1 e2 e3 d,
+          nnrc_core_sem env e1 (dbool true) ->            (**r   [Γc ; Γ ⊢〚e₁〛⇓ true] *)
+          nnrc_core_sem env e2 d ->                       (**r ∧ [Γc ; Γ ⊢〚e₂〛⇓ d] *)
+          nnrc_core_sem env (NNRCIf e1 e2 e3) d           (**r ⇒ [Γc ; Γ ⊢〚e₁ ? e₂ : e₃〛⇓ d] *)
+      | sem_NNRCIf_false: forall env e1 e2 e3 d,
+          nnrc_core_sem env e1 (dbool false) ->           (**r   [Γc ; Γ ⊢〚e₁〛⇓ false] *)
+          nnrc_core_sem env e3 d ->                       (**r ∧ [Γc ; Γ ⊢〚e₃〛⇓ d] *)
+          nnrc_core_sem env (NNRCIf e1 e2 e3) d           (**r ⇒ [Γc ; Γ ⊢〚e₁ ? e₂ : e₃〛⇓ d] *)
+      | sem_NNRCEither_left: forall env e v1 e1 v2 e2 d d1,
+          nnrc_core_sem env e (dleft d) ->                (**r   [Γc ; Γ ⊢〚e〛⇓ left d] *)
+          nnrc_core_sem ((v1,d)::env) e1 d1 ->            (**r ∧ [Γc ; (v₁,d),Γ ⊢〚e₁〛⇓ d₁] *)
+          nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d1 (**r ⇒ [Γc ; Γ ⊢〚either e left v₁ : e₁ | right v₂ : e₂〛⇓ d₁] *)
+      | sem_NNRCEither_right: forall env e v1 e1 v2 e2 d d2,
+          nnrc_core_sem env e (dright d) ->               (**r   [Γc ; Γ ⊢〚e〛⇓ right d] *)
+          nnrc_core_sem ((v2,d)::env) e2 d2 ->            (**r ∧ [Γc ; (v₂,d),Γ ⊢〚e₂〛⇓ d₂] *)
+          nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d2 (**r ⇒ [Γc ; Γ ⊢〚either e left v₁ : e₁ | right v₂ : e₂〛⇓ d₂] *)
       with nnrc_core_sem_for: var -> bindings -> nnrc -> list data -> list data -> Prop :=
-           | sem_NNRCFor_empty x: forall env e,
-               nnrc_core_sem_for x env e nil nil
-           | sem_NNRCFor_cons x: forall env e d c dres cres,
-               nnrc_core_sem ((x,d)::env) e dres ->
-               nnrc_core_sem_for x env e c cres ->
-               nnrc_core_sem_for x env e (d::c) (dres::cres).
+      | sem_NNRCFor_empty v: forall env e,
+          nnrc_core_sem_for v env e nil nil            (**r   [Γc ; Γ ; v ; {} ⊢〚e〛φ ⇓ {}] *)
+      | sem_NNRCFor_cons v: forall env e d1 c1 d2 c2,
+          nnrc_core_sem ((v,d1)::env) e d2 ->          (**r   [Γc ; (v,d₁),Γ ⊢〚e₂〛⇓ d₂]  *)
+          nnrc_core_sem_for v env e c1 c2 ->           (**r ∧ [Γc ; Γ ; v ; {c₁} ⊢〚e〛φ ⇓ {c₂}] *)
+          nnrc_core_sem_for v env e (d1::c1) (d2::c2). (**r ⇒ [Γc ; Γ ; v ; {d₁::c₁} ⊢〚e〛φ ⇓ {d₂::c₂}] *)
 
-    End DenotSemantics.
+    End DenoteSemantics.
 
-    (** * Evaluation Semantics *)
+    (** ** Evaluation Semantics *)
     Section EvalSemantics.
 
       (** Evaluation takes a cNNRC expression and an environment. It
-          returns an optional value. A [None] being returned indicate
-          an error and is always propagated. *)
+          returns an optional value. When [None] is returned, it
+          denotes an error. An error is always propagated. *)
 
       Fixpoint nnrc_core_eval (env:bindings) (e:nnrc) : option data :=
         match e with
@@ -223,7 +236,8 @@ Section cNNRC.
           match nnrc_core_eval env e1 with
           | Some (dcoll c1) =>
             let inner_eval d1 :=
-                let env' := (x,d1) :: env in nnrc_core_eval env' e2
+                let env' := (x,d1) :: env
+                in nnrc_core_eval env' e2
             in
             lift dcoll (rmap inner_eval c1)
           | _ => None
@@ -232,7 +246,9 @@ Section cNNRC.
           let aux_if d :=
               match d with
               | dbool b =>
-                if b then nnrc_core_eval env e2 else nnrc_core_eval env e3
+                if b
+                then nnrc_core_eval env e2
+                else nnrc_core_eval env e3
               | _ => None
               end
           in olift aux_if (nnrc_core_eval env e1)
@@ -247,7 +263,8 @@ Section cNNRC.
         | NNRCGroupBy _ _ _ => None (**r Evaluation for GroupBy always fails for cNNRC *)
         end.
 
-      (** cNNRC evaluation is only sensitive to the environment up to lookup. *)
+      (** cNNRC evaluation is only sensitive to the environment modulo
+      lookup. *)
       Global Instance nnrc_core_eval_lookup_equiv_prop :
         Proper (lookup_equiv ==> eq ==> eq) nnrc_core_eval.
       Proof.
@@ -280,61 +297,65 @@ Section cNNRC.
 
     End EvalSemantics.
 
+    (** * Correctness of evaluation *)
+    
+    (** The evaluation and denotational semantics are equivalent. *)
+    
     Section EvalCorrect.
-      (** Auxiliary lemma for the semantics of [for] loops *)
-      Lemma nnrc_core_for_eval_correct v env e l lres:
-        (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l = Some lres) ->
-        (forall (env : bindings) (dres : data),
-            nnrc_core_eval env e = Some dres -> nnrc_core_sem env e dres) ->
-        nnrc_core_sem_for v env e l lres.
+      (** Auxiliary lemma on [for] loops used in the correctness theorem *)
+
+      Lemma nnrc_core_for_eval_correct v env e l1 l2:
+        (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l1 = Some l2) ->
+        (forall (env : bindings) (d : data),
+            nnrc_core_eval env e = Some d -> nnrc_core_sem env e d) ->
+        nnrc_core_sem_for v env e l1 l2.
       Proof.
-        revert lres; induction l; simpl; intros.
+        revert l2; induction l1; simpl; intros.
         - inversion H; subst; econstructor.
         - case_eq (nnrc_core_eval ((v, a) :: env) e); intros;
             rewrite H1 in *.
           + unfold lift in H.
-            case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l);
+            case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) l1);
               intros; rewrite H2 in *; clear H2; [|congruence].
             inversion H; subst; clear H.
-            specialize (IHl l0 eq_refl H0).
+            specialize (IHl1 l eq_refl H0).
             econstructor.
             apply H0; auto.
             auto.
           + congruence.
       Qed.
 
-      (** If NNRC eval returns a value, this value is consistent with the semantics *)
-      Lemma nnrc_core_eval_correct : forall e env dres,
-          nnrc_core_eval env e = Some dres ->
-          nnrc_core_sem env e dres.
+      Lemma nnrc_core_eval_correct : forall e env d,
+          nnrc_core_eval env e = Some d ->
+          nnrc_core_sem env e d.
       Proof.
         induction e; simpl; intros.
         - constructor; trivial.
         - constructor; trivial.
-        - inversion H; constructor.
+        - constructor; inversion H; trivial.
         - specialize (IHe1 env); specialize (IHe2 env).
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *.
           + case_eq (nnrc_core_eval env e2); intros; rewrite H1 in *.
-            * specialize (IHe1 d eq_refl); specialize (IHe2 d0 eq_refl);
+            * specialize (IHe1 d0 eq_refl); specialize (IHe2 d1 eq_refl);
                 econstructor; eauto.
             * simpl in H; congruence.
           + simpl in H; congruence.
         - specialize (IHe env).
           case_eq (nnrc_core_eval env e); intros; rewrite H0 in *.
-          + specialize (IHe d eq_refl); econstructor; eauto.
+          + specialize (IHe d0 eq_refl); econstructor; eauto.
           + simpl in H; congruence.
         - specialize (IHe1 env).
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *.
-          + case_eq (nnrc_core_eval ((v,d)::env) e2); intros.
-            * specialize (IHe2 ((v,d)::env)).
+          + case_eq (nnrc_core_eval ((v,d0)::env) e2); intros.
+            * specialize (IHe2 ((v,d0)::env)).
               rewrite H1 in *; inversion H; subst; clear H.
-              specialize (IHe2 dres eq_refl);
+              specialize (IHe2 d eq_refl);
                 econstructor; eauto.
             * simpl in H; congruence.
           + simpl in H; congruence.
         - specialize (IHe1 env).
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *.
-          + destruct d; simpl in H; try congruence.
+          + destruct d0; simpl in H; try congruence.
             specialize (IHe1 (dcoll l) eq_refl).
             unfold lift in H.
             case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e2) l);
@@ -345,32 +366,95 @@ Section cNNRC.
           + simpl in H; congruence.
         - specialize (IHe1 env); specialize (IHe2 env); specialize (IHe3 env).
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *; simpl in H.
-          destruct d; simpl in H; try congruence.
+          destruct d0; simpl in H; try congruence.
           destruct b.
-          (* condition true *)
+          (** condition true *)
           + case_eq (nnrc_core_eval env e2); intros; rewrite H1 in *.
-            * specialize (IHe1 (dbool true) eq_refl); specialize (IHe2 d eq_refl);
+            * specialize (IHe1 (dbool true) eq_refl); specialize (IHe2 d0 eq_refl);
                 inversion H; subst; eapply sem_NNRCIf_true; eauto.
             * simpl in H; congruence.
-          (* condition false *)
+          (** condition false *)
           + case_eq (nnrc_core_eval env e3); intros; rewrite H1 in *.
-            * specialize (IHe1 (dbool false) eq_refl); specialize (IHe3 d eq_refl);
+            * specialize (IHe1 (dbool false) eq_refl); specialize (IHe3 d0 eq_refl);
                 inversion H; subst; eapply sem_NNRCIf_false; eauto.
             * simpl in H; congruence.
           + simpl in H; congruence.
         - specialize (IHe1 env).
           case_eq (nnrc_core_eval env e1); intros; rewrite H0 in *; simpl in H.
-          destruct d; simpl in H; try congruence.
-          (* left case *)
-          + specialize (IHe2 ((v,d)::env)).
-            * specialize (IHe1 (dleft d) eq_refl); specialize (IHe2 dres H);
+          destruct d0; simpl in H; try congruence.
+          (** left case *)
+          + specialize (IHe2 ((v,d0)::env)).
+            * specialize (IHe1 (dleft d0) eq_refl); specialize (IHe2 d H);
                 inversion H; subst; eapply sem_NNRCEither_left; eauto.
-          (* right case *)
-          + specialize (IHe3 ((v0,d)::env)).
-            * specialize (IHe1 (dright d) eq_refl); specialize (IHe3 dres H);
+          (** right case *)
+          + specialize (IHe3 ((v0,d0)::env)).
+            * specialize (IHe1 (dright d0) eq_refl); specialize (IHe3 d H);
                 inversion H; subst; eapply sem_NNRCEither_right; eauto.
           + simpl in H; congruence.
         - congruence.
+      Qed.
+
+      (** Auxiliary lemma on [for] loops used in the completeness theorem *)
+
+      Lemma nnrc_core_for_eval_complete e v env c1 c2:
+        (forall (env : bindings) (d : data),
+            nnrc_core_sem env e d -> nnrc_core_eval env e = Some d) ->
+        (nnrc_core_sem_for v env e c1 c2) ->
+        lift dcoll (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) c1) =
+        Some (dcoll c2).
+      Proof.
+        intro Hcomp.
+        revert c2; induction c1; intros; simpl in *.
+        - inversion H; auto.
+        - inversion H; subst.
+          rewrite (Hcomp ((v,a)::env) d2); auto.
+          unfold lift in *.
+          specialize (IHc1 c3 H7).
+          case_eq (rmap (fun d1 : data => nnrc_core_eval ((v, d1) :: env) e) c1); intros;
+            rewrite H0 in *; [|congruence].
+          inversion IHc1; subst; auto.
+      Qed.
+
+      Lemma nnrc_core_eval_complete : forall e env d,
+          nnrc_core_sem env e d ->
+          nnrc_core_eval env e = Some d.
+      Proof.
+        induction e; intros.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe1 env d1 H4);
+            rewrite (IHe2 env d2 H6); simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe env d1 H3); simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe1 env d1 H5);
+            rewrite (IHe2 ((v,d1)::env) d H6); simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe1 env (dcoll c1) H5).
+          apply nnrc_core_for_eval_complete; auto.
+        - inversion H; subst; simpl; auto.
+          (** condition true *)
+          + rewrite (IHe1 env (dbool true) H5); simpl; auto.
+          (** condition false *)
+          + rewrite (IHe1 env (dbool false) H5); simpl; auto.
+        - inversion H; subst; simpl; auto.
+          (** left case *)
+          + rewrite (IHe1 env (dleft d0) H7); simpl; auto.
+          (** right case *)
+          + rewrite (IHe1 env (dright d0) H7); simpl; auto.
+        - inversion H.
+      Qed.
+
+      (** Main equivalence theorem. *)
+      
+      Theorem nnrc_core_eval_correct_and_complete : forall e env d,
+          nnrc_core_eval env e = Some d <-> nnrc_core_sem env e d.
+      Proof.
+        split.
+        apply nnrc_core_eval_correct.
+        apply nnrc_core_eval_complete.
       Qed.
 
     End EvalCorrect.
@@ -387,10 +471,10 @@ Section cNNRC.
     Context (h:brand_relation_t).
 
     (** Top-level semantics is always with an initial empty environment *)
-    Inductive nnrc_core_top_sem : nnrc_core -> bindings -> data -> Prop :=
-    | sem_NNRCTop: forall e cenv dres,
-        nnrc_core_sem h cenv nil (proj1_sig e) dres ->
-        nnrc_core_top_sem e cenv dres.
+    Inductive nnrc_core_sem_top : nnrc_core -> bindings -> data -> Prop :=
+    | sem_NNRCTop: forall e cenv d,
+        nnrc_core_sem h cenv nil (proj1_sig e) d ->
+        nnrc_core_sem_top e cenv d.
 
     Definition nnrc_core_eval_top (q:nnrc_core) (cenv:bindings) : option data :=
       lift_nnrc_core (nnrc_core_eval h (rec_sort cenv) nil) q.
@@ -400,11 +484,11 @@ Section cNNRC.
     Theorem nnrc_core_eval_top_correct:
       forall cenv,
       rec_sort cenv = cenv -> (* This assumption should be part of constant_env *)
-      forall (q:nnrc_core) (dres:data),
-        nnrc_core_eval_top q cenv = Some dres ->
-        nnrc_core_top_sem q cenv dres.
+      forall (q:nnrc_core) (d:data),
+        nnrc_core_eval_top q cenv = Some d ->
+        nnrc_core_sem_top q cenv d.
     Proof.
-      intros cenv HconstNorm q dres.
+      intros cenv HconstNorm q d.
       destruct q; simpl in *.
       econstructor; simpl.
       unfold nnrc_core_eval_top in H.

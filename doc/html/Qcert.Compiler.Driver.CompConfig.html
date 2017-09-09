@@ -78,8 +78,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation">Permutation</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> (@<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Specif.html#projT1">projT1</a></span> <span class="id">_</span> <span class="id">_</span>) <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config_list">optim_config_list</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#optim_config_default">optim_config_default</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3158')">Proof.</div>
-<div class="proofscript" id="proof3158">
+<div class="toggleproof" onclick="toggleDisplay('proof3161')">Proof.</div>
+<div class="proofscript" id="proof3161">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#permutation_prover">permutation_prover</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">vm_compute</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">trivial</span>.<br/>
@@ -124,8 +124,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="constants_config_of_tdbindings_merges">constants_config_of_tdbindings_merges</a></span> (<span class="id">tds</span>:<span class="id"><a href="Qcert.Common.Typing.TDBindings.html#tdbindings">tdbindings</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tdbindings_of_constants_config">tdbindings_of_constants_config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config_of_tdbindings">constants_config_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tds">tds</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tds">tds</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3159')">Proof.</div>
-<div class="proofscript" id="proof3159">
+<div class="toggleproof" onclick="toggleDisplay('proof3162')">Proof.</div>
+<div class="proofscript" id="proof3162">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">tds</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#tdbindings_of_constants_config">tdbindings_of_constants_config</a></span> <span class="kwd">in</span> *; <span class="tactic">simpl</span>.<br/>
@@ -137,8 +137,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="vdbindings_of_constants_config_commutes">vdbindings_of_constants_config_commutes</a></span> <span class="id">x</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#vdbindings_of_constants_config">vdbindings_of_constants_config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#constants_config_of_tdbindings">constants_config_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#x">x</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.Common.Typing.TDBindings.html#vdbindings_of_tdbindings">vdbindings_of_tdbindings</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#x">x</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3160')">Proof.</div>
-<div class="proofscript" id="proof3160">
+<div class="toggleproof" onclick="toggleDisplay('proof3163')">Proof.</div>
+<div class="proofscript" id="proof3163">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">x</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">IHx</span>.<br/>
@@ -154,8 +154,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="one_constant_config_of_avoid_list_extracts">one_constant_config_of_avoid_list_extracts</a></span> (<span class="id">avoid</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#vdbindings_of_constants_config">vdbindings_of_constants_config</a></span> (<span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#one_constant_config_of_avoid_list">one_constant_config_of_avoid_list</a></span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#avoid">avoid</a></span>)) = <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#avoid">avoid</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3161')">Proof.</div>
-<div class="proofscript" id="proof3161">
+<div class="toggleproof" onclick="toggleDisplay('proof3164')">Proof.</div>
+<div class="proofscript" id="proof3164">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Compiler.Driver.CompConfig.html#one_constant_config_of_avoid_list">one_constant_config_of_avoid_list</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">avoid</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">reflexivity</span>.<br/>

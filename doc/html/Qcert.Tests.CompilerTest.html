@@ -125,8 +125,8 @@
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="makeMainEntity_typed">makeMainEntity_typed</a></span> <span class="id">db</span> <span class="id">id</span> <span class="id">i</span>:<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#normalize_data">normalize_data</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="Qcert.Tests.CompilerTest.html#makeMainEntity">makeMainEntity</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#db">db</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#id">id</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#i">i</a></span>)) ▹ (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> (<span class="id"><a href="Qcert.Utils.ListAdd.html#singleton">singleton</a></span> "<span class="id">MainEntity</span>")).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3318')">Proof.</div>
-<div class="proofscript" id="proof3318">
+<div class="toggleproof" onclick="toggleDisplay('proof3321')">Proof.</div>
+<div class="proofscript" id="proof3321">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (@<span class="id">dtbrand</span>' <span class="id">_</span> <span class="id">_</span> <span class="id">_</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#CPModel">CPModel</a></span>).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">eauto</span>.<br/>
@@ -153,8 +153,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id">Example1</span>'<span class="id">_wt</span> τ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#camp_type">camp_type</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#tinp1">tinp1</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id">Example1</span>' τ <span class="id"><a href="Qcert.Tests.CompilerTest.html#tout1">tout1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3319')">Proof.</div>
-<div class="proofscript" id="proof3319">
+<div class="toggleproof" onclick="toggleDisplay('proof3322')">Proof.</div>
+<div class="proofscript" id="proof3322">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>; <span class="tactic">eauto</span>.<br/>
@@ -201,8 +201,8 @@
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="alg5_wt">alg5_wt</a></span> τ :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Tests.CompilerTest.html#algopt5">algopt5</a></span> ▷ τ &gt;=&gt; <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#tout1">tout1</a></span> ⊣ <span class="id"><a href="Qcert.Tests.CompilerTest.html#tinp1">tinp1</a></span>;(<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq_refl">eq_refl</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3320')">Proof.</div>
-<div class="proofscript" id="proof3320">
+<div class="toggleproof" onclick="toggleDisplay('proof3323')">Proof.</div>
+<div class="proofscript" id="proof3323">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Tests.CompilerTest.html#algopt5">algopt5</a></span>, <span class="id"><a href="Qcert.Compiler.Driver.CompDriver.html#camp_to_nraenv_core">camp_to_nraenv_core</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#camp_to_nraenv_core_top">CAMPtocNRAEnv.camp_to_nraenv_core_top</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Translation.CAMPtocNRAEnv.html#nraenv_core_of_camp">CAMPtocNRAEnv.nraenv_core_of_camp</a></span>.<br/>

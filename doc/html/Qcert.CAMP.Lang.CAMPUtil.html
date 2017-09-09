@@ -44,8 +44,8 @@ over CAMP patterns. </div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="presult_eqdec">presult_eqdec</a></span> {<span class="id">A</span>} {<span class="id">dec</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult">presult</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>) <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2668')">Proof.</div>
-<div class="proofscript" id="proof2668">
+<div class="toggleproof" onclick="toggleDisplay('proof2671')">Proof.</div>
+<div class="proofscript" id="proof2671">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">simpl</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">inversion</span> 1]; <span class="tactic">eauto</span> 2.<br/>
@@ -82,8 +82,8 @@ over CAMP patterns. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="liftpr_bindpr">liftpr_bindpr</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#B">B</a></span>) <span class="id">pr</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#liftpr">liftpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr">pr</a></span> = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#bindpr">bindpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr">pr</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#Success">Success</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#x">x</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2669')">Proof.</div>
-<div class="proofscript" id="proof2669">
+<div class="toggleproof" onclick="toggleDisplay('proof2672')">Proof.</div>
+<div class="proofscript" id="proof2672">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">pr</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -157,8 +157,8 @@ over CAMP patterns. </div>
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="liftpr_debug_bindpr_debug">liftpr_debug_bindpr_debug</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#B">B</a></span>) <span class="id">pr</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#liftpr_debug">liftpr_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr">pr</a></span> = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#bindpr_debug">bindpr_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr">pr</a></span> (<span class="kwd">fun</span> <span class="id">x</span> =&gt; <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#Success_debug">Success_debug</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#x">x</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2670')">Proof.</div>
-<div class="proofscript" id="proof2670">
+<div class="toggleproof" onclick="toggleDisplay('proof2673')">Proof.</div>
+<div class="proofscript" id="proof2673">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">pr</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
@@ -201,8 +201,8 @@ over CAMP patterns. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="liftpr_presult_same">liftpr_presult_same</a></span> {<span class="id">A</span> <span class="id">B</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#B">B</a></span>) <span class="id">d1</span> <span class="id">d2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d1">d1</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d2">d2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#liftpr">liftpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d1">d1</a></span>) (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#liftpr_debug">liftpr_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d2">d2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2671')">Proof.</div>
-<div class="proofscript" id="proof2671">
+<div class="toggleproof" onclick="toggleDisplay('proof2674')">Proof.</div>
+<div class="proofscript" id="proof2674">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d1</span>; <span class="tactic">destruct</span> <span class="id">d2</span>; <span class="tactic">simpl</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -210,8 +210,8 @@ over CAMP patterns. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="gather_successes_presult_same">gather_successes_presult_same</a></span> {<span class="id">A</span>} <span class="id">d1</span> <span class="id">d2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2">Forall2</a></span> (@<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>) <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d1">d1</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d2">d2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#gather_successes">gather_successes</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d1">d1</a></span>) (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#gather_successes_debug">gather_successes_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d2">d2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2672')">Proof.</div>
-<div class="proofscript" id="proof2672">
+<div class="toggleproof" onclick="toggleDisplay('proof2675')">Proof.</div>
+<div class="proofscript" id="proof2675">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> 1; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#gather_successes">gather_successes</a></span> <span class="id">l</span>); <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#gather_successes_debug">gather_successes_debug</a></span> <span class="id">l</span>'); <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">subst</span>; <span class="tactic">intuition</span>.<br/>
@@ -221,8 +221,8 @@ over CAMP patterns. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d1">d1</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d2">d2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">forall</span> <span class="id">x</span>, <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f1">f1</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#x">x</a></span>) (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f2">f2</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#x">x</a></span>)) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult_same">presult_same</a></span> (@<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#bindpr">bindpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#B">B</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d1">d1</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f1">f1</a></span>) (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#bindpr_debug">bindpr_debug</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#d2">d2</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f2">f2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2673')">Proof.</div>
-<div class="proofscript" id="proof2673">
+<div class="toggleproof" onclick="toggleDisplay('proof2676')">Proof.</div>
+<div class="proofscript" id="proof2676">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">d1</span>; <span class="tactic">destruct</span> <span class="id">d2</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *; <span class="tactic">try</span> <span class="tactic">tauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>; <span class="tactic">subst</span>; <span class="tactic">auto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -239,15 +239,15 @@ over CAMP patterns. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pr2op_op2tpr">pr2op_op2tpr</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">op</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr2op">pr2op</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op2tpr">op2tpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op">op</a></span>) = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op">op</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2674')">Proof.</div>
-<div class="proofscript" id="proof2674">
+<div class="toggleproof" onclick="toggleDisplay('proof2677')">Proof.</div>
+<div class="proofscript" id="proof2677">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="pr2op_op2rpr">pr2op_op2rpr</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">op</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr2op">pr2op</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op2rpr">op2rpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op">op</a></span>) = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op">op</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2675')">Proof.</div>
-<div class="proofscript" id="proof2675">
+<div class="toggleproof" onclick="toggleDisplay('proof2678')">Proof.</div>
+<div class="proofscript" id="proof2678">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -259,15 +259,15 @@ over CAMP patterns. </div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="op2tpr_not_recoverable">op2tpr_not_recoverable</a></span> {<span class="id">A</span>:<span class="kwd">Type</span>} (<span class="id">op</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#isRecoverableError">isRecoverableError</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op2tpr">op2tpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#op">op</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2676')">Proof.</div>
-<div class="proofscript" id="proof2676">
+<div class="toggleproof" onclick="toggleDisplay('proof2679')">Proof.</div>
+<div class="proofscript" id="proof2679">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">op</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="isRecoverableError_liftpr">isRecoverableError_liftpr</a></span> {<span class="id">A</span> <span class="id">B</span>:<span class="kwd">Type</span>} (<span class="id">f</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>-&gt;<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#B">B</a></span>) (<span class="id">pr</span>:<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#presult">presult</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#A">A</a></span>) <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;: <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#isRecoverableError">isRecoverableError</a></span> (<span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#liftpr">liftpr</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#f">f</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr">pr</a></span>) = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#isRecoverableError">isRecoverableError</a></span> <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#pr">pr</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2677')">Proof.</div>
-<div class="proofscript" id="proof2677">
+<div class="toggleproof" onclick="toggleDisplay('proof2680')">Proof.</div>
+<div class="proofscript" id="proof2680">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">pr</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>

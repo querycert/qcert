@@ -80,8 +80,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#oql_expr_type">oql_expr_type</a></span> τ<span class="id">c</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#q">q</a></span> τ<span class="id">out</span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">exists</span> <span class="id">x</span>, (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_expr_interp">oql_expr_interp</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#c">c</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#q">q</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#env">env</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#x">x</a></span> /\ (<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#x">x</a></span> ▹ τ<span class="id">out</span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2749')">Proof.</div>
-<div class="proofscript" id="proof2749">
+<div class="toggleproof" onclick="toggleDisplay('proof2752')">Proof.</div>
+<div class="proofscript" id="proof2752">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">c</span> <span class="id">env</span> <span class="id">H</span> <span class="id">H0</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">dependent</span> <span class="tactic">induction</span> <span class="id">H1</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
@@ -112,8 +112,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bindings_type_app">bindings_type_app</a></span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>}  <span class="id">l1</span> <span class="id">l2</span> <span class="id">r1</span> <span class="id">r2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l1">l1</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r1">r1</a></span> -&gt; <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l2">l2</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r2">r2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> (<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l1">l1</a></span> ++ <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l2">l2</a></span>) (<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r1">r1</a></span> ++ <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r2">r2</a></span>) .<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2750')">Proof.</div>
-<div class="proofscript" id="proof2750">
+<div class="toggleproof" onclick="toggleDisplay('proof2753')">Proof.</div>
+<div class="proofscript" id="proof2753">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_app">Forall2_app</a></span>; <span class="tactic">trivial</span>; <span class="tactic">tauto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -121,8 +121,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bindings_type_rec_concat_sort">bindings_type_rec_concat_sort</a></span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>}  <span class="id">l1</span> <span class="id">l2</span> <span class="id">r1</span> <span class="id">r2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l1">l1</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r1">r1</a></span> -&gt; <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l2">l2</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r2">r2</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l1">l1</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#l2">l2</a></span>) (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r1">r1</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#r2">r2</a></span>) .<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2751')">Proof.</div>
-<div class="proofscript" id="proof2751">
+<div class="toggleproof" onclick="toggleDisplay('proof2754')">Proof.</div>
+<div class="proofscript" id="proof2754">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type_sort">bindings_type_sort</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#bindings_type_app">bindings_type_app</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -134,8 +134,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#env">env</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#oql_query_program_type">oql_query_program_type</a></span> τ<span class="id">c</span> τ<span class="id">defls</span> τ<span class="id">env</span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#q">q</a></span> τ<span class="id">out</span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">exists</span> <span class="id">x</span>, (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_query_program_interp">oql_query_program_interp</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#c">c</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#defls">defls</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#q">q</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#env">env</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#x">x</a></span> /\ (<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#x">x</a></span> ▹ τ<span class="id">out</span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2752')">Proof.</div>
-<div class="proofscript" id="proof2752">
+<div class="toggleproof" onclick="toggleDisplay('proof2755')">Proof.</div>
+<div class="proofscript" id="proof2755">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">c</span> <span class="id">defls</span> <span class="id">env</span> <span class="id">H</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">dependent</span> <span class="tactic">induction</span> <span class="id">H2</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
@@ -161,8 +161,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#c">c</a></span> τ<span class="id">c</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#oql_type">oql_type</a></span> τ<span class="id">c</span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#q">q</a></span> τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">exists</span> <span class="id">x</span>, (<span class="id"><a href="Qcert.OQL.Lang.OQL.html#oql_interp">oql_interp</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#c">c</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#q">q</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#x">x</a></span> /\ (<span class="id"><a href="Qcert.OQL.Typing.TOQL.html#x">x</a></span> ▹ τ<span class="id">out</span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2753')">Proof.</div>
-<div class="proofscript" id="proof2753">
+<div class="toggleproof" onclick="toggleDisplay('proof2756')">Proof.</div>
+<div class="proofscript" id="proof2756">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.OQL.Typing.TOQL.html#typed_oql_query_program_yields_typed_data">typed_oql_query_program_yields_typed_data</a></span>; <span class="tactic">eauto</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="id">constructor</span>.<br/>

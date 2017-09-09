@@ -43,8 +43,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#tenv">tenv</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#venv">venv</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#op">op</a></span> ▷ τ<span class="kwd">in</span> &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">constants</span>;τ<span class="id">env</span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">nnrc_core_type</a></span> τ<span class="id">constants</span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#tenv">tenv</a></span> (<span class="id"><a href="Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core">nraenv_core_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#op">op</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#vid">vid</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#venv">venv</a></span>) τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2926')">Proof.</div>
-<div class="proofscript" id="proof2926">
+<div class="toggleproof" onclick="toggleDisplay('proof2929')">Proof.</div>
+<div class="proofscript" id="proof2929">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#append">append</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
@@ -147,8 +147,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#tenv">tenv</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#venv">venv</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">nnrc_core_type</a></span> τ<span class="id">constants</span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#tenv">tenv</a></span> (<span class="id"><a href="Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core">nraenv_core_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#op">op</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#vid">vid</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#venv">venv</a></span>) τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#op">op</a></span> ▷ τ<span class="kwd">in</span> &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">constants</span>;τ<span class="id">env</span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2927')">Proof.</div>
-<div class="proofscript" id="proof2927">
+<div class="toggleproof" onclick="toggleDisplay('proof2930')">Proof.</div>
+<div class="proofscript" id="proof2930">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#nraenv_core_type">nraenv_core_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> τ<span class="kwd">in</span> τ<span class="id">env</span> τ<span class="id">out</span> <span class="id">vid</span> <span class="id">venv</span> <span class="id">tenv</span> <span class="id">H</span> <span class="id">H0</span> <span class="id">H1</span>.<br/>
@@ -318,8 +318,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#lookup">lookup</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#equiv_dec">equiv_dec</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#tenv">tenv</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#venv">venv</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">env</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Typing.TcNNRC.html#nnrc_core_type">nnrc_core_type</a></span> τ<span class="id">constants</span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#tenv">tenv</a></span> (<span class="id"><a href="Qcert.Translation.cNRAEnvtocNNRC.html#nraenv_core_to_nnrc_core">nraenv_core_to_nnrc_core</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#op">op</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#vid">vid</a></span> <span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#venv">venv</a></span>) τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Translation.TcNRAEnvtocNNRC.html#op">op</a></span> ▷ τ<span class="kwd">in</span> &gt;=&gt; τ<span class="id">out</span> ⊣ τ<span class="id">constants</span>;τ<span class="id">env</span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2928')">Proof.</div>
-<div class="proofscript" id="proof2928">
+<div class="toggleproof" onclick="toggleDisplay('proof2931')">Proof.</div>
+<div class="proofscript" id="proof2931">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">tnraenv_sem_correct</span> <span class="id">tnraenv_sem_correct_back</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>

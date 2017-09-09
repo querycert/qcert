@@ -156,8 +156,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">v3</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#v3">v3</a></span> = (<span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#v">v</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#v1">v1</a></span> :: <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#v2">v2</a></span> :: <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#rest">rest</a></span>)) /\<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#v2">v2</a></span> &lt;&gt; <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#v3">v3</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2419')">Proof.</div>
-<div class="proofscript" id="proof2419">
+<div class="toggleproof" onclick="toggleDisplay('proof2422')">Proof.</div>
+<div class="proofscript" id="proof2422">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> (<span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span> <span class="id">v</span> (<span class="id">v1</span> :: <span class="id">v2</span> :: <span class="id">rest</span>)).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>;[<span class="tactic">reflexivity</span>| ].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var_fresh2">fresh_var_fresh2</a></span>.<br/>
@@ -215,8 +215,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dforeign">dforeign</a></span> <span class="id">_</span>) =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;| <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2420')">Proof.</div>
-<div class="proofscript" id="proof2420">
+<div class="toggleproof" onclick="toggleDisplay('proof2423')">Proof.</div>
+<div class="proofscript" id="proof2423">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hinput</span>; <span class="tactic">rewrite</span> <span class="id">Hinput</span>; <span class="tactic">clear</span> <span class="id">Hinput</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -228,8 +228,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">vid</span> <span class="id">venv</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#NNRCSugar.h">h</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#env">env</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_group_by">nnrc_group_by</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#g">g</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#sl">sl</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#e1">e1</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#NNRCSugar.h">h</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#env">env</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#nnrc_group_by_from_nraenv">nnrc_group_by_from_nraenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#vid">vid</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#venv">venv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#g">g</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#sl">sl</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#e2">e2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2421')">Proof.</div>
-<div class="proofscript" id="proof2421">
+<div class="toggleproof" onclick="toggleDisplay('proof2424')">Proof.</div>
+<div class="proofscript" id="proof2424">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intro</span> <span class="id">Heval</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.NNRC.Lang.NNRC.html#nnrc_group_by">nnrc_group_by</a></span>, <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#nnrc_group_by_from_nraenv">nnrc_group_by_from_nraenv</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span>.<br/>
@@ -345,8 +345,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#NNRCSugar.h">h</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#env">env</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#op1">op1</a></span> = <span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#NNRCSugar.h">h</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#env">env</a></span> <span class="id">op1</span>' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#NNRCSugar.h">h</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#env">env</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#unnest_from_nraenv">unnest_from_nraenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#vid">vid</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#venv">venv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#a">a</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#b">b</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#op1">op1</a></span>) =<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNNRC.Lang.cNNRC.html#nnrc_core_eval">nnrc_core_eval</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#NNRCSugar.h">h</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#env">env</a></span> (<span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#unnest_from_nraenv_core">unnest_from_nraenv_core</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#vid">vid</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#venv">venv</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#a">a</a></span> <span class="id"><a href="Qcert.NNRC.Lang.NNRCSugar.html#b">b</a></span> <span class="id">op1</span>').<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2422')">Proof.</div>
-<div class="proofscript" id="proof2422">
+<div class="toggleproof" onclick="toggleDisplay('proof2425')">Proof.</div>
+<div class="proofscript" id="proof2425">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">Hind</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">Opaque</span> <span class="id"><a href="Qcert.Utils.Fresh.html#fresh_var">fresh_var</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>

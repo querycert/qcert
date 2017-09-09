@@ -28,8 +28,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="rec_sort_is_sorted">rec_sort_is_sorted</a></span> {<span class="id">A</span>} (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#A">A</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.SortingAdd.html#is_list_sorted">is_list_sorted</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#ODT_lt_dec">ODT_lt_dec</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#l">l</a></span>)) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2684')">Proof.</div>
-<div class="proofscript" id="proof2684">
+<div class="toggleproof" onclick="toggleDisplay('proof2687')">Proof.</div>
+<div class="proofscript" id="proof2687">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (@<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort_sorted">rec_sort_sorted</a></span>). <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -98,8 +98,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span>  <span class="id"><a name="data_type_drec_nil">data_type_drec_nil</a></span> <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#pf">pf</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2685')">Proof.</div>
-<div class="proofscript" id="proof2685">
+<div class="toggleproof" onclick="toggleDisplay('proof2688')">Proof.</div>
+<div class="proofscript" id="proof2688">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Typing.TData.html#dtrec_full">dtrec_full</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall2_nil">Forall2_nil</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -113,8 +113,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id">env</span>₂ Γ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> (<span class="id">env</span>₁ ++ <span class="id">env</span>₂)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Γ₁ ++ Γ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2686')">Proof.</div>
-<div class="proofscript" id="proof2686">
+<div class="toggleproof" onclick="toggleDisplay('proof2689')">Proof.</div>
+<div class="proofscript" id="proof2689">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">env</span>₁; <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">intuition</span>.<br/>
@@ -129,8 +129,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#s">s</a></span>, <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#d">d</a></span>) <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#env">env</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.SortingAdd.html#insertion_sort_insert">insertion_sort_insert</a></span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_field_lt_dec">rec_field_lt_dec</a></span> <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#s">s</a></span>, <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#r">r</a></span>) Γ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2687')">Proof.</div>
-<div class="proofscript" id="proof2687">
+<div class="toggleproof" onclick="toggleDisplay('proof2690')">Proof.</div>
+<div class="proofscript" id="proof2690">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> Γ. <span class="tactic">induction</span> <span class="id">env</span>; <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">simpl</span>; <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">constructor</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *. <span class="tactic">subst</span>.<br/>
@@ -147,8 +147,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#env">env</a></span> Γ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#env">env</a></span>)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> Γ).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2688')">Proof.</div>
-<div class="proofscript" id="proof2688">
+<div class="toggleproof" onclick="toggleDisplay('proof2691')">Proof.</div>
+<div class="proofscript" id="proof2691">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> Γ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">env</span>; <span class="tactic">inversion</span> 1; <span class="tactic">simpl</span>; <span class="tactic">subst</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">destruct</span> <span class="id">y</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -161,8 +161,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id">env</span>₂ Γ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id">env</span>₁ <span class="id">env</span>₂)<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> Γ₁ Γ₂).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2689')">Proof.</div>
-<div class="proofscript" id="proof2689">
+<div class="toggleproof" onclick="toggleDisplay('proof2692')">Proof.</div>
+<div class="proofscript" id="proof2692">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#rec_sort_bindings_type">rec_sort_bindings_type</a></span>.<br/>
@@ -175,8 +175,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">env</span>₃ = <span class="id"><a href="Qcert.Common.Data.RRelation.html#merge_bindings">merge_bindings</a></span> <span class="id">env</span>₁ <span class="id">env</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> Γ₃ = <span class="id"><a href="Qcert.Common.Data.RRelation.html#merge_bindings">merge_bindings</a></span> Γ₁ Γ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Typing.TBindings.html#bindings_type">bindings_type</a></span> <span class="id">env</span>₃ Γ₃.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2690')">Proof.</div>
-<div class="proofscript" id="proof2690">
+<div class="toggleproof" onclick="toggleDisplay('proof2693')">Proof.</div>
+<div class="proofscript" id="proof2693">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#merge_bindings">merge_bindings</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Compat.html#compatible">Compat.compatible</a></span> <span class="id">env</span>₁ <span class="id">env</span>₂); <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Utils.Compat.html#compatible">Compat.compatible</a></span> Γ₁ Γ₂); <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
@@ -196,8 +196,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#d">d</a></span> τ<span class="kwd">in</span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">exists</span> <span class="id">x</span>, <span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#c">c</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#env">env</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#d">d</a></span> = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#Success">Success</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#x">x</a></span> /\  (<span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#x">x</a></span> τ<span class="id">out</span>)) <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\/ (<span class="id"><a href="Qcert.CAMP.Lang.CAMP.html#camp_eval">camp_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#c">c</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#env">env</a></span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#d">d</a></span> = <span class="id"><a href="Qcert.CAMP.Lang.CAMPUtil.html#RecoverableError">RecoverableError</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2691')">Proof.</div>
-<div class="proofscript" id="proof2691">
+<div class="toggleproof" onclick="toggleDisplay('proof2694')">Proof.</div>
+<div class="proofscript" id="proof2694">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">tconst</span> <span class="id">tenv</span> <span class="id">tcamp</span> <span class="id">tdat</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">d</span> <span class="id">env</span> Γ τ<span class="kwd">in</span> τ<span class="id">out</span> <span class="id">tenv</span> <span class="id">tcamp</span> <span class="id">tdat</span>.<br/>
@@ -287,8 +287,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> Γ) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[τ<span class="id">c</span> &amp; <span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2692')">Proof.</div>
-<div class="proofscript" id="proof2692">
+<div class="toggleproof" onclick="toggleDisplay('proof2695')">Proof.</div>
+<div class="proofscript" id="proof2695">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">nod</span> <span class="id">tdev</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">dependent</span> <span class="tactic">induction</span> <span class="id">tdev</span>; <span class="tactic">simpl</span>; <span class="tactic">eauto</span>.<br/>
@@ -311,8 +311,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_type_const_sort_f">camp_type_const_sort_f</a></span> {τ<span class="id">c</span> Γ <span class="id">p</span> τ₁ τ₂} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2693')">Proof.</div>
-<div class="proofscript" id="proof2693">
+<div class="toggleproof" onclick="toggleDisplay('proof2696')">Proof.</div>
+<div class="proofscript" id="proof2696">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> τ<span class="id">c</span> Γ τ₁ τ₂.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">p</span>; <span class="tactic">simpl</span>; <span class="tactic">inversion</span> 1; <span class="id">rtype_equalizer</span>; <span class="tactic">subst</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Typing.TUtil.html#tdot">tdot</a></span>, <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="kwd">in</span> *.<br/>
@@ -323,8 +323,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_type_const_sort_b">camp_type_const_sort_b</a></span> {τ<span class="id">c</span> Γ <span class="id">p</span> τ₁ τ₂} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2694')">Proof.</div>
-<div class="proofscript" id="proof2694">
+<div class="toggleproof" onclick="toggleDisplay('proof2697')">Proof.</div>
+<div class="proofscript" id="proof2697">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> τ<span class="id">c</span> Γ τ₁ τ₂.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">p</span>; <span class="tactic">simpl</span>; <span class="tactic">inversion</span> 1; <span class="id">rtype_equalizer</span>; <span class="tactic">subst</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">econstructor</span>.<br/>
@@ -336,8 +336,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="camp_type_const_sort">camp_type_const_sort</a></span> {τ<span class="id">c</span> Γ <span class="id">p</span> τ₁ τ₂} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂ &lt;-&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;[τ<span class="id">c</span> &amp; Γ] |= <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#p">p</a></span>; τ₁ ~&gt; τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2695')">Proof.</div>
-<div class="proofscript" id="proof2695">
+<div class="toggleproof" onclick="toggleDisplay('proof2698')">Proof.</div>
+<div class="proofscript" id="proof2698">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">split</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#camp_type_const_sort_f">camp_type_const_sort_f</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.CAMP.Typing.TCAMP.html#camp_type_const_sort_b">camp_type_const_sort_b</a></span>; <span class="tactic">trivial</span>.<br/>

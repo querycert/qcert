@@ -42,8 +42,8 @@
 &nbsp;&nbsp;&nbsp;| <span class="id"><a name="ts_year">ts_year</a></span>.<br/>
 <br/>
 <span class="kwd">Instance</span> <span class="id"><a name="time_scale_eqdec">time_scale_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#time_scale">time_scale</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3037')">Proof.</div>
-<div class="proofscript" id="proof3037">
+<div class="toggleproof" onclick="toggleDisplay('proof3040')">Proof.</div>
+<div class="proofscript" id="proof3040">
 &nbsp;&nbsp;<span class="tactic">red</span>; <span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Equivalence.html#equiv">equiv</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#complement">complement</a></span>.<br/>
 &nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#time_scale">time_scale</a></span>, {<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#x">x</a></span> = <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
@@ -92,8 +92,8 @@ Defined.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="time_duration_foreign_data">time_duration_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_DURATION">TIME_DURATION</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3038')">Next Obligation.</div>
-<div class="proofscript" id="proof3038">
+<div class="toggleproof" onclick="toggleDisplay('proof3041')">Next Obligation.</div>
+<div class="proofscript" id="proof3041">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_DURATION_eq">TIME_DURATION_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;+ <span class="id">left</span>.<br/>
@@ -105,16 +105,16 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_DURATION_eq_correct">TIME_DURATION_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3039')">Next Obligation.</div>
-<div class="proofscript" id="proof3039">
+<div class="toggleproof" onclick="toggleDisplay('proof3042')">Next Obligation.</div>
+<div class="proofscript" id="proof3042">
 &nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3040')">Next Obligation.</div>
-<div class="proofscript" id="proof3040">
+<div class="toggleproof" onclick="toggleDisplay('proof3043')">Next Obligation.</div>
+<div class="proofscript" id="proof3043">
 &nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3041')">Next Obligation.</div>
-<div class="proofscript" id="proof3041">
+<div class="toggleproof" onclick="toggleDisplay('proof3044')">Next Obligation.</div>
+<div class="proofscript" id="proof3044">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_DURATION_tostring">TIME_DURATION_tostring</a></span> <span class="id">f</span>).<br/>
@@ -135,8 +135,8 @@ Defined.</div>
 <br/>
 <span class="kwd">Program</span> <span class="kwd">Instance</span> <span class="id"><a name="time_point_foreign_data">time_point_foreign_data</a></span> : <span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data">foreign_data</a></span><br/>
 &nbsp;&nbsp;:= {<span class="id"><a href="Qcert.Common.Data.ForeignData.html#foreign_data_type">foreign_data_type</a></span> := <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_POINT">TIME_POINT</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof3042')">Next Obligation.</div>
-<div class="proofscript" id="proof3042">
+<div class="toggleproof" onclick="toggleDisplay('proof3045')">Next Obligation.</div>
+<div class="proofscript" id="proof3045">
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">x</span> <span class="id">y</span>.<br/>
 &nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_POINT_eq">TIME_POINT_eq</a></span> <span class="id">x</span> <span class="id">y</span>); <span class="tactic">intros</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;+ <span class="id">left</span>.<br/>
@@ -148,16 +148,16 @@ Defined.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_POINT_eq_correct">TIME_POINT_eq_correct</a></span> <span class="kwd">in</span> <span class="id">eqq2</span>. <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">congruence</span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3043')">Next Obligation.</div>
-<div class="proofscript" id="proof3043">
+<div class="toggleproof" onclick="toggleDisplay('proof3046')">Next Obligation.</div>
+<div class="proofscript" id="proof3046">
 &nbsp;&nbsp;<span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#True">True</a></span>.<br/>
 Defined.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3044')">Next Obligation.</div>
-<div class="proofscript" id="proof3044">
+<div class="toggleproof" onclick="toggleDisplay('proof3047')">Next Obligation.</div>
+<div class="proofscript" id="proof3047">
 &nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 Qed.</div>
-<div class="toggleproof" onclick="toggleDisplay('proof3045')">Next Obligation.</div>
-<div class="proofscript" id="proof3045">
+<div class="toggleproof" onclick="toggleDisplay('proof3048')">Next Obligation.</div>
+<div class="proofscript" id="proof3048">
 &nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">f</span>.<br/>
 &nbsp;&nbsp;<span class="tactic">exact</span> (<span class="id"><a href="Qcert.Compiler.Model.DateTimeModelPart.html#TIME_POINT_tostring">TIME_POINT_tostring</a></span> <span class="id">f</span>).<br/>

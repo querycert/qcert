@@ -76,8 +76,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="TLLambda_inv">TLLambda_inv</a></span> {Γ τ<span class="kwd">in</span> τ<span class="id">out</span>} <span class="id">x</span> <span class="id">e</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#lnra_lambda_type">lnra_lambda_type</a></span> (<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#LNRALambda">LNRALambda</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#x">x</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#e">e</a></span>) Γ (τ<span class="kwd">in</span> ~~&gt; τ<span class="id">out</span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#lambda_nra_type">lambda_nra_type</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#e">e</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> (Γ++[(<span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#x">x</a></span>,τ<span class="kwd">in</span>)])) τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2738')">Proof.</div>
-<div class="proofscript" id="proof2738">
+<div class="toggleproof" onclick="toggleDisplay('proof2741')">Proof.</div>
+<div class="proofscript" id="proof2741">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_equalizer</span>; <span class="tactic">congruence</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;Qed.</div>
@@ -103,8 +103,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">exists</span> <span class="id">x</span>,<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.LambdaNRA.Lang.LambdaNRA.html#lambda_nra_eval">lambda_nra_eval</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#cenv">cenv</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#env">env</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#e">e</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#x">x</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/\ (<span class="id"><a href="Qcert.Common.Typing.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#x">x</a></span> τ)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2739')">Proof.</div>
-<div class="proofscript" id="proof2739">
+<div class="toggleproof" onclick="toggleDisplay('proof2742')">Proof.</div>
+<div class="proofscript" id="proof2742">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">cbt</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">env</span> Γ τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">e</span>; <span class="tactic">intros</span> <span class="id">env</span> Γ τ <span class="id">bt</span> <span class="id">et</span><br/>
@@ -312,8 +312,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nnrc_type_lookup_equiv_prop">nnrc_type_lookup_equiv_prop</a></span> {<span class="id">m</span>:<span class="id"><a href="Qcert.Common.CommonSystem.html#basic_model">basic_model</a></span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr_equiv">assoc_lookupr_equiv</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr_equiv">assoc_lookupr_equiv</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#iff">iff</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#lambda_nra_type">lambda_nra_type</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof2740')">Proof.</div>
-<div class="proofscript" id="proof2740">
+<div class="toggleproof" onclick="toggleDisplay('proof2743')">Proof.</div>
+<div class="proofscript" id="proof2743">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">cut</span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr_equiv">assoc_lookupr_equiv</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr_equiv">assoc_lookupr_equiv</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#impl">impl</a></span>) <span class="id"><a href="Qcert.LambdaNRA.Typing.TLambdaNRA.html#lambda_nra_type">lambda_nra_type</a></span>);<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#iff">iff</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#impl">impl</a></span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr_equiv">assoc_lookupr_equiv</a></span> <span class="kwd">in</span> *; <span class="tactic">intuition</span>; <span class="tactic">eauto</span> | ].<br/>
