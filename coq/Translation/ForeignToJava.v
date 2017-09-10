@@ -18,7 +18,7 @@ Require Import List.
 Require Import String.
 Require Import Utils.
 Require Import ForeignRuntime.
-Require Import RUtilOps.
+Require Import OperatorsUtils.
 
 Local Open Scope string_scope.
 

@@ -362,45 +362,45 @@ bop:
 | SQLDATEINTERVALBETWEEN
   { Enhanced.Ops.Binary.sql_date_interval_between }
 | AEQ
-    { QOps.Binary.aeq }
+    { QOps.Binary.opequal }
 | AUNION
-    { QOps.Binary.aunion }
+    { QOps.Binary.opbagunion }
 | ACONCAT
-    { QOps.Binary.aconcat }
+    { QOps.Binary.oprecconcat }
 | AMERGECONCAT
-    { QOps.Binary.amergeconcat }
+    { QOps.Binary.oprecmerge }
 | AAND
-    { QOps.Binary.aand }
+    { QOps.Binary.opand }
 | AOR
-    { QOps.Binary.aor }
+    { QOps.Binary.opor }
 | ALT
-    { QOps.Binary.alt }
+    { QOps.Binary.oplt }
 | ALE
-    { QOps.Binary.ale }
+    { QOps.Binary.ople }
 | AMINUS
-    { QOps.Binary.aminus }
+    { QOps.Binary.opbagdiff }
 | AMIN
-    { QOps.Binary.amin }
+    { QOps.Binary.opbagmin }
 | AMAX
-    { QOps.Binary.amax }
+    { QOps.Binary.opbagmax }
 | ACONTAINS
-    { QOps.Binary.acontains }
+    { QOps.Binary.opcontains }
 | ASCONCAT
-    { QOps.Binary.asconcat }
+    { QOps.Binary.opstringconcat }
 | LPAREN ABARITH ARITHPLUS RPAREN
-    { QOps.Binary.ZArith.aplus }
+    { QOps.Binary.ZArith.opplus }
 | LPAREN ABARITH ARITHMINUS RPAREN
-    { QOps.Binary.ZArith.aminus }
+    { QOps.Binary.ZArith.opminus }
 | LPAREN ABARITH ARITHMULT RPAREN
-    { QOps.Binary.ZArith.amult }
+    { QOps.Binary.ZArith.opmult }
 | LPAREN ABARITH ARITHMIN RPAREN
-    { QOps.Binary.ZArith.amin }
+    { QOps.Binary.ZArith.opmin }
 | LPAREN ABARITH ARITHMAX RPAREN
-    { QOps.Binary.ZArith.amax }
+    { QOps.Binary.ZArith.opmax }
 | LPAREN ABARITH ARITHDIVIDE RPAREN
-    { QOps.Binary.ZArith.adiv }
+    { QOps.Binary.ZArith.opdiv }
 | LPAREN ABARITH ARITHREM RPAREN
-    { QOps.Binary.ZArith.arem }
+    { QOps.Binary.ZArith.oprem }
 
 sql_date_component:
 | DAY
@@ -432,54 +432,54 @@ uop:
 | FLOATABS
   { Enhanced.Ops.Unary.float_abs }
 | AIDOP
-    { QOps.Unary.aidop }
+    { QOps.Unary.opidentity }
 | ANEG
-    { QOps.Unary.aneg }
+    { QOps.Unary.opneg }
 | ACOLL
-    { QOps.Unary.acoll }
+    { QOps.Unary.opbag }
 | ACOUNT
-    { QOps.Unary.acount }
+    { QOps.Unary.opcount }
 | AFLATTEN
-    { QOps.Unary.aflatten }
+    { QOps.Unary.opflatten }
 | ADISTINCT
-    { QOps.Unary.adistinct }
+    { QOps.Unary.opdistinct }
 | ASUM
-    { QOps.Unary.asum }
+    { QOps.Unary.opsum }
 | ATOSTRING
-    { QOps.Unary.atostring }
+    { QOps.Unary.optostring }
 | ASUBSTRING LPAREN s = INT RPAREN
-  { QOps.Unary.asubstring s None }
+  { QOps.Unary.opsubstring s None }
 | ASUBSTRING LPAREN s = INT COMMA len = INT RPAREN
-  { QOps.Unary.asubstring s (Some len) }
+  { QOps.Unary.opsubstring s (Some len) }
 | ALIKE LPAREN s = STRING RPAREN
-  { QOps.Unary.alike (Util.char_list_of_string s) None }
+  { QOps.Unary.oplike (Util.char_list_of_string s) None }
 (* This should really be a CHAR escape character, but I don't know how to do that *)
 | ALIKE LPAREN s = STRING ESCAPE esc = STRING RPAREN
-    { QOps.Unary.alike (Util.char_list_of_string s) (Some (esc.[0])) }
+    { QOps.Unary.oplike (Util.char_list_of_string s) (Some (esc.[0])) }
 | ANUMMIN
-    { QOps.Unary.anummin }
+    { QOps.Unary.opnummin }
 | ANUMMAX
-    { QOps.Unary.anummax }
+    { QOps.Unary.opnummax }
 | AARITHMEAN
-    { QOps.Unary.aarithmean }
+    { QOps.Unary.opnummean }
 | LPAREN AUARITH ARITHABS RPAREN
-    { QOps.Unary.ZArith.aabs }
+    { QOps.Unary.ZArith.opabs }
 | LPAREN AUARITH ARITHLOG2 RPAREN
-    { QOps.Unary.ZArith.alog2 }
+    { QOps.Unary.ZArith.oplog2 }
 | LPAREN AUARITH ARITHSQRT RPAREN
-    { QOps.Unary.ZArith.asqrt }
+    { QOps.Unary.ZArith.opsqrt }
 | LPAREN ACAST LBRACKET s = stringlist RBRACKET RPAREN
-    { QOps.Unary.acast s }
+    { QOps.Unary.opcast s }
 | LPAREN ARECPROJECT LBRACKET s = stringlist RBRACKET RPAREN
-    { QOps.Unary.arecproject s }
+    { QOps.Unary.oprecproject s }
 | LPAREN AREC s = STRING RPAREN
-    { QOps.Unary.arec (Util.char_list_of_string s) }
+    { QOps.Unary.oprec (Util.char_list_of_string s) }
 | LPAREN ADOT s = STRING RPAREN
-    { QOps.Unary.adot (Util.char_list_of_string s) }
+    { QOps.Unary.opdot (Util.char_list_of_string s) }
 | AUNBRAND
-    { QOps.Unary.aunbrand }
+    { QOps.Unary.opunbrand }
 | ASINGLETON
-    { QOps.Unary.asingleton }
+    { QOps.Unary.opsingleton }
 | AFLOATSUM
     { Enhanced.Ops.Unary.float_sum }
 | AFLOATARITHMEAN

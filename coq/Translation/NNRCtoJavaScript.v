@@ -215,7 +215,7 @@ Section NNRCtoJavaScript.
       := jsonToJS quotel (sortCriteriaToJson scl).
     
     (* Java equivalent: JavaScriptBackend.uarithToJS *)
-    Definition uarithToJs (u:ArithUOp) (e:string) :=
+    Definition uarithToJs (u:arith_unary_op) (e:string) :=
       match u with
       | ArithAbs => "Math.abs (" ++ e ++ ")"
       | ArithLog2 => "Math.log2(" ++ e ++ ")"
@@ -223,7 +223,7 @@ Section NNRCtoJavaScript.
       end.
 
     (* Java equivalent: JavaScriptBackend.barithToJs *)
-    Definition barithToJs (b:ArithBOp) (e1 e2:string) :=
+    Definition barithToJs (b:arith_binary_op) (e1 e2:string) :=
       match b with
       | ArithPlus => e1 ++ "+" ++ e2
       | ArithMinus => e1 ++ "-" ++ e2
@@ -263,40 +263,40 @@ Section NNRCtoJavaScript.
          | NNRCUnop op n1 =>
            let '(s1, e1, t0) := nnrcToJS n1 t i eol quotel ivs in
            let e0 := match op with
-                     | AIdOp => e1
-                     | AUArith u => uarithToJs u e1
-                     | ANeg => "!(" ++ e1 ++ ")"
-                     | AColl => "[" ++ e1 ++ "]"
-                     | ACount => e1 ++ ".length"
-                     | AFlatten => "flatten(" ++ e1 ++ ")"
-                     | ARec s => "{" ++ quotel ++ s ++ quotel ++ ": " ++ e1 ++ "}"
-                     | ADot s => "deref(" ++ e1 ++ ", " ++ quotel ++ s  ++ quotel ++ ")"
-                     | ARecRemove s => "remove(" ++ e1 ++ ", " ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ")"
-                     | ARecProject sl => "project(" ++ e1 ++ ", " ++ (brandsToJs quotel sl) ++ ")"
-                     | ADistinct => "distinct(" ++ e1 ++ ")"
-                     | AOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
-                     | ASum => "sum(" ++ e1 ++ ")"
-                     | AArithMean => "arithMean(" ++ e1 ++ ")"
-                     | AToString => "toString(" ++ e1 ++ ")"
-                     | ASubstring start olen =>
+                     | OpIdentity => e1
+                     | OpNeg => "!(" ++ e1 ++ ")"
+                     | OpRec s => "{" ++ quotel ++ s ++ quotel ++ ": " ++ e1 ++ "}"
+                     | OpDot s => "deref(" ++ e1 ++ ", " ++ quotel ++ s  ++ quotel ++ ")"
+                     | OpRecRemove s => "remove(" ++ e1 ++ ", " ++ quotel ++ "" ++ s ++ "" ++ quotel ++ ")"
+                     | OpRecProject sl => "project(" ++ e1 ++ ", " ++ (brandsToJs quotel sl) ++ ")"
+                     | OpBag => "[" ++ e1 ++ "]"
+                     | OpSingleton => "singleton(" ++ e1 ++ ")"
+                     | OpFlatten => "flatten(" ++ e1 ++ ")"
+                     | OpDistinct => "distinct(" ++ e1 ++ ")"
+                     | OpOrderBy scl => "sort(" ++ e1 ++ ", " ++ (sortCriteriaToJs quotel scl) ++ ")"
+                     | OpCount => e1 ++ ".length"
+                     | OpSum => "sum(" ++ e1 ++ ")"
+                     | OpNumMin => "Math.min.apply(Math," ++ e1 ++ ")"
+                     | OpNumMax => "Math.max.apply(Math," ++ e1 ++ ")"
+                     | OpNumMean => "arithMean(" ++ e1 ++ ")"
+                     | OpToString => "toString(" ++ e1 ++ ")"
+                     | OpSubstring start olen =>
                        "(" ++ e1 ++ ").substring(" ++ toString start ++
                        match olen with
                        | Some len => ", " ++ toString len
                        | None => ""
                        end ++ ")"
-                     | ALike pat oescape =>
+                     | OpLike pat oescape =>
                        let lc := make_like_clause pat oescape in
                        let regex := "new RegExp([" ++ (joinStrings "," (map like_clause_to_javascript lc)) ++ "].join(" ++ quotel ++ quotel ++ "))" in
                        regex ++ ".test(" ++ e1 ++ ")"
-                     | ALeft => "{" ++ quotel ++ "left" ++ quotel ++ " : " ++ e1 ++ "}"
-                     | ARight => "{" ++ quotel ++ "right" ++ quotel ++ " : " ++ e1 ++ "}"
-                     | ABrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
-                     | AUnbrand => "unbrand(" ++ e1 ++ ")"
-                     | ACast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
-                     | ASingleton => "singleton(" ++ e1 ++ ")"
-                     | ANumMin => "Math.min.apply(Math," ++ e1 ++ ")"
-                     | ANumMax => "Math.max.apply(Math," ++ e1 ++ ")"
-                     | AForeignUnaryOp fu
+                     | OpLeft => "{" ++ quotel ++ "left" ++ quotel ++ " : " ++ e1 ++ "}"
+                     | OpRight => "{" ++ quotel ++ "right" ++ quotel ++ " : " ++ e1 ++ "}"
+                     | OpBrand b => "brand(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
+                     | OpUnbrand => "unbrand(" ++ e1 ++ ")"
+                     | OpCast b => "cast(" ++ brandsToJs quotel b ++ "," ++ e1 ++ ")"
+                     | OpArithUnary u => uarithToJs u e1
+                     | OpForeignUnary fu
                        => foreign_to_javascript_unary_op i eol quotel fu e1
                      end in
            (s1, e0, t0)
@@ -304,21 +304,21 @@ Section NNRCtoJavaScript.
            let '(s1, e1, t2) := nnrcToJS n1 t i eol quotel ivs in
            let '(s2, e2, t0) := nnrcToJS n2 t2 i eol quotel ivs in
            let e0 := match op with
-                     | ABArith b => barithToJs b e1 e2
-                     | AEq => "equal(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AUnion => "bunion(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AConcat => "concat(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AMergeConcat => "mergeConcat(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AAnd => "(" ++ e1 ++ " && " ++ e2 ++ ")"
-                     | AOr => "(" ++ e1 ++ " || " ++ e2 ++ ")"
-                     | ALt => "(" ++ e1 ++ " < " ++ e2 ++ ")"
-                     | ALe => "(" ++ e1 ++ " <= " ++ e2 ++ ")"
-                     | AMinus => "bminus(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AMin => "bmin(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AMax => "bmax(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | AContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
-                     | ASConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
-                     | AForeignBinaryOp fb
+                     | OpEqual => "equal(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpRecConcat => "concat(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpRecMerge => "mergeConcat(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpAnd => "(" ++ e1 ++ " && " ++ e2 ++ ")"
+                     | OpOr => "(" ++ e1 ++ " || " ++ e2 ++ ")"
+                     | OpLt => "(" ++ e1 ++ " < " ++ e2 ++ ")"
+                     | OpLe => "(" ++ e1 ++ " <= " ++ e2 ++ ")"
+                     | OpBagUnion => "bunion(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpBagDiff => "bminus(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpBagMin => "bmin(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpBagMax => "bmax(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpContains => "contains(" ++ e1 ++ ", " ++ e2 ++ ")"
+                     | OpStringConcat => "(" ++ e1 ++ " + " ++ e2 ++ ")"
+                     | OpArithBinary b => barithToJs b e1 e2
+                     | OpForeignBinary fb
                        => foreign_to_javascript_binary_op i eol quotel fb e1 e2
                      end in
            (s1 ++ s2, e0, t0)
@@ -430,7 +430,7 @@ Section NNRCtoJavaScript.
           if (in_dec string_dec fv params)
           then e'
           else
-            (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
+            (NNRCLet fv (NNRCUnop (OpDot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
 

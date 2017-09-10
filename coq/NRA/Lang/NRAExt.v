@@ -36,22 +36,22 @@ Section NRAExt.
   Definition join op1 op2 op3 := (ASelect op1 (AProduct op2 op3)).
 
   Definition semi_join op1 op2 op3 :=
-    ASelect (AUnop ANeg (ABinop AEq (ASelect op1 (AProduct ((AUnop AColl) AID) op3)) (AConst (dcoll nil)))) op2.
+    ASelect (AUnop OpNeg (ABinop OpEqual (ASelect op1 (AProduct ((AUnop OpBag) AID) op3)) (AConst (dcoll nil)))) op2.
 
   Definition anti_join op1 op2 op3 :=
-    ASelect (ABinop AEq (ASelect op1 (AProduct ((AUnop AColl) AID) op3)) (AConst (dcoll nil))) op2.
+    ASelect (ABinop OpEqual (ASelect op1 (AProduct ((AUnop OpBag) AID) op3)) (AConst (dcoll nil))) op2.
 
   (* Maps *)
 
-  Definition map_add_rec (s:string) op1 op2 := AMap ((ABinop AConcat) AID ((AUnop (ARec s)) op1)) op2.
-  Definition map_to_rec (s:string) op := AMap ((AUnop (ARec s)) AID) op.
+  Definition map_add_rec (s:string) op1 op2 := AMap ((ABinop OpRecConcat) AID ((AUnop (OpRec s)) op1)) op2.
+  Definition map_to_rec (s:string) op := AMap ((AUnop (OpRec s)) AID) op.
 
   (* Projects *)
   Fixpoint rproject (fields:list string) (op:nra) 
     := match fields with
          | nil => AConst (drec nil)
-         | s::xs => ABinop AConcat
-                           ((AUnop (ARec s)) ((AUnop (ADot s)) op))
+         | s::xs => ABinop OpRecConcat
+                           ((AUnop (OpRec s)) ((AUnop (OpDot s)) op))
                            (rproject xs op)
        end.
 
@@ -59,13 +59,13 @@ Section NRAExt.
     := AMap (rproject fields AID) op.
 
   Definition project_remove s op :=
-    AMap ((AUnop (ARecRemove s)) AID) op.
+    AMap ((AUnop (OpRecRemove s)) AID) op.
 
  (* Renaming *)
   (* renames field s1 to s2 *)
   Definition map_rename_rec (s1 s2:string) op :=
-    AMap ((ABinop AConcat) ((AUnop (ARec s2)) ((AUnop (ADot s1)) AID))
-                  ((AUnop (ARecRemove s1)) AID)) op.
+    AMap ((ABinop OpRecConcat) ((AUnop (OpRec s2)) ((AUnop (OpDot s1)) AID))
+                  ((AUnop (OpRecRemove s1)) AID)) op.
 
   (* Grouping *)
 
@@ -82,24 +82,24 @@ Section NRAExt.
   Import ListNotations.
   Definition group1 (g:string) (s1:string) op :=
     AMap
-      ((ABinop AConcat) ((AUnop (ADot "1")) ((AUnop (ADot "2")) AID))
-               ((AUnop (ARec g))
-                     (AMap ((AUnop (ADot "3")) AID)
+      ((ABinop OpRecConcat) ((AUnop (OpDot "1")) ((AUnop (OpDot "2")) AID))
+               ((AUnop (OpRec g))
+                     (AMap ((AUnop (OpDot "3")) AID)
                            (ASelect
-                              (ABinop AEq ((AUnop (ADot s1)) ((AUnop (ADot "1")) AID)) ((AUnop (ADot s1)) ((AUnop (ADot "3")) AID)))
-                              (AProduct ((AUnop AColl) ((AUnop (ADot "2")) AID))
-                                        ((AUnop (ADot "4")) AID))))))
+                              (ABinop OpEqual ((AUnop (OpDot s1)) ((AUnop (OpDot "1")) AID)) ((AUnop (OpDot s1)) ((AUnop (OpDot "3")) AID)))
+                              (AProduct ((AUnop OpBag) ((AUnop (OpDot "2")) AID))
+                                        ((AUnop (OpDot "4")) AID))))))
       (AMapConcat
-         ((AUnop AColl) ((AUnop (ARec "4")) (AMap ((AUnop (ARec "3")) AID) op)))
-         (map_to_rec "2" (map_to_rec "1" ((AUnop ADistinct) (project (s1::nil) op))))).
+         ((AUnop OpBag) ((AUnop (OpRec "4")) (AMap ((AUnop (OpRec "3")) AID) op)))
+         (map_to_rec "2" (map_to_rec "1" ((AUnop OpDistinct) (project (s1::nil) op))))).
 
   (* Unnest *)
 
   Definition unnest_one s op :=
-    AMap ((AUnop (ARecRemove s)) AID) (AMapConcat ((AUnop (ADot s)) AID) op).
+    AMap ((AUnop (OpRecRemove s)) AID) (AMapConcat ((AUnop (OpDot s)) AID) op).
 
   Definition unnest_two s1 s2 op :=
-    AMap ((AUnop (ARecRemove s1)) AID) (AMapConcat (AMap ((AUnop (ARec s2)) AID) ((AUnop (ADot s1)) AID)) op).
+    AMap ((AUnop (OpRecRemove s1)) AID) (AMapConcat (AMap ((AUnop (OpRec s2)) AID) ((AUnop (OpDot s1)) AID)) op).
 
 
   (* NRA for Optim *)
@@ -110,8 +110,8 @@ Section NRAExt.
   (* Those correspond to operators in the underlying NRA *)
   | AXID : nraext
   | AXConst : data -> nraext
-  | AXBinop : binOp -> nraext -> nraext -> nraext
-  | AXUnop : unaryOp -> nraext -> nraext
+  | AXBinop : binary_op -> nraext -> nraext -> nraext
+  | AXUnop : unary_op -> nraext -> nraext
   | AXMap : nraext -> nraext -> nraext
   | AXMapConcat : nraext -> nraext -> nraext
   | AXProduct : nraext -> nraext -> nraext
@@ -140,7 +140,7 @@ Section NRAExt.
   Proof.
     change (forall x y : nraext,  {x = y} + {x <> y}).
     decide equality;
-      try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
+      try solve [apply binary_op_eqdec | apply unary_op_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
   Qed.
 
   Fixpoint nra_of_nraext (e:nraext) : nra :=
@@ -227,25 +227,25 @@ Notation "‵ c" := (AXConst c)  (at level 0) : nraext_scope.                   
 Notation "‵{||}" := (AXConst (dcoll nil))  (at level 0) : nraext_scope.                         (* ‵ = \backprime *)
 Notation "‵[||]" := (AXConst (drec nil)) (at level 50) : nraext_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (AXBinop AAnd r1 r2) (right associativity, at level 65): nraext_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (AXBinop AOr r1 r2) (right associativity, at level 70): nraext_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (AXBinop AEq r1 r2) (right associativity, at level 70): nraext_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (AXBinop ALt r1 r2) (no associativity, at level 70): nraext_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (AXBinop AUnion r1 r2) (right associativity, at level 70): nraext_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (AXBinop AMinus r1 r2) (right associativity, at level 70): nraext_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (AXBinop AMin r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (AXBinop AMax r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((AXBinop AConcat) p r) (at level 70) : nraext_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((AXBinop AMergeConcat) p r) (at level 70) : nraext_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (AXBinop OpAnd r1 r2) (right associativity, at level 65): nraext_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (AXBinop OpOr r1 r2) (right associativity, at level 70): nraext_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (AXBinop OpEqual r1 r2) (right associativity, at level 70): nraext_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (AXBinop OpLt r1 r2) (no associativity, at level 70): nraext_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (AXBinop OpBagUnion r1 r2) (right associativity, at level 70): nraext_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (AXBinop OpBagDiff r1 r2) (right associativity, at level 70): nraext_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (AXBinop OpBagMin r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (AXBinop OpBagMax r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((AXBinop OpRecConcat) p r) (at level 70) : nraext_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((AXBinop OpRecMerge) p r) (at level 70) : nraext_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (AXUnop ANeg r1) (right associativity, at level 70): nraext_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (AXUnop ADistinct r1) (right associativity, at level 70): nraext_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (AXUnop ACount r1) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (AXUnop AFlatten d) (at level 50) : nraext_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((AXUnop AColl) d)  (at level 50) : nraext_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((AXUnop (ARec s)) r) (at level 50) : nraext_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((AXUnop (ARecRemove s1)) r) (at level 50) : nraext_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((AXUnop (ADot r)) p) (left associativity, at level 40): nraext_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (AXUnop OpNeg r1) (right associativity, at level 70): nraext_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (AXUnop OpDistinct r1) (right associativity, at level 70): nraext_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (AXUnop OpCount r1) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (AXUnop OpFlatten d) (at level 50) : nraext_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((AXUnop OpBag) d)  (at level 50) : nraext_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((AXUnop (OpRec s)) r) (at level 50) : nraext_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((AXUnop (OpRecRemove s1)) r) (at level 50) : nraext_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((AXUnop (OpDot r)) p) (left associativity, at level 40): nraext_scope.      (* · = \cdot *)
 
 Notation "χ⟨ p ⟩( r )" := (AXMap p r) (at level 70) : nraext_scope.                              (* χ = \chi *)
 Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (AXMapConcat e2 e1) (at level 70) : nraext_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)

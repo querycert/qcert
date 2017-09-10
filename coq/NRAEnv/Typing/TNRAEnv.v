@@ -120,8 +120,8 @@ Notation "Op @▷ₓ d ⊣ C ; e" := (tnraenv_eval C Op e d) (at level 70).
 (* Used to prove type portion of typed directed rewrites *)
   
 Hint Unfold nraenv_type.
-Hint Constructors unaryOp_type.
-Hint Constructors binOp_type.
+Hint Constructors unary_op_type.
+Hint Constructors binary_op_type.
 
 (* inverts, then tries and solve *)
 Ltac nraenv_inferer :=

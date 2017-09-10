@@ -212,14 +212,14 @@ Section NNRCtoJava.
     Definition mk_java_binary_op0 (opname:string) (e1 e2:java_json) : java_json
       := mk_java_json ("BinaryOperators." ++ opname ++ "(" ++ (from_java_json e1) ++ ", " ++ (from_java_json e2) ++ ")").
 
-    Definition uarithToJavaMethod (u:ArithUOp) :=
+    Definition uarithToJavaMethod (u:arith_unary_op) :=
       match u with
       | ArithAbs => "abs"
       | ArithLog2 => "log2"
       | ArithSqrt =>"sqrt"
       end.
 
-    Definition barithToJavaMethod (b:ArithBOp)  :=
+    Definition barithToJavaMethod (b:arith_binary_op)  :=
       match b with
       | ArithPlus => "plus"
       | ArithMinus => "minus "
@@ -260,38 +260,38 @@ Section NNRCtoJava.
          | NNRCUnop op n1 =>
            let '(s1, e1, t0) := nnrcToJava n1 t i eol quotel ivs in
            let e0 := match op with
-                     | AIdOp => e1
-                     | AUArith u => mk_java_unary_op0 (uarithToJavaMethod u) e1
-                     | ANeg => mk_java_unary_op0 "neg" e1
-                     | AColl => mk_java_unary_op0 "coll" e1
-                     | ACount => mk_java_unary_op0 "count" e1
-                     | AFlatten => mk_java_unary_op0 "flatten" e1
-                     | ARec s => mk_java_unary_op1 "rec" (mk_java_string s) e1
-                     | ADot s => mk_java_unary_op1 "dot" (mk_java_string s) e1
-                     | ARecRemove s => mk_java_unary_op1 "remove"  (mk_java_string s) e1
-                     | ARecProject sl => mk_java_unary_op1 "project" (mk_java_string_collection sl) e1
-                     | ADistinct => mk_java_unary_op0 "distinct" e1
-                     | AOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
-                     | ASum =>  mk_java_unary_op0 "sum" e1
-                     | AArithMean => mk_java_unary_op0 "list_mean" e1
-                     | AToString =>  mk_java_unary_op0 "tostring" e1
-                     | ASubstring start olen =>
+                     | OpIdentity => e1
+                     | OpNeg => mk_java_unary_op0 "neg" e1
+                     | OpRec s => mk_java_unary_op1 "rec" (mk_java_string s) e1
+                     | OpDot s => mk_java_unary_op1 "dot" (mk_java_string s) e1
+                     | OpRecRemove s => mk_java_unary_op1 "remove"  (mk_java_string s) e1
+                     | OpRecProject sl => mk_java_unary_op1 "project" (mk_java_string_collection sl) e1
+                     | OpBag => mk_java_unary_op0 "coll" e1
+                     | OpSingleton => mk_java_unary_op0 "singleton" e1
+                     | OpFlatten => mk_java_unary_op0 "flatten" e1
+                     | OpDistinct => mk_java_unary_op0 "distinct" e1
+                     | OpOrderBy sl => mk_java_unary_op1 "sort" (mk_java_string_collection (List.map fst sl)) e1 (* XXX TO FIX XXX *)
+                     | OpCount => mk_java_unary_op0 "count" e1
+                     | OpSum =>  mk_java_unary_op0 "sum" e1
+                     | OpNumMin => mk_java_unary_op0 "list_min" e1
+                     | OpNumMax =>  mk_java_unary_op0 "list_max" e1
+                     | OpNumMean => mk_java_unary_op0 "list_mean" e1
+                     | OpToString =>  mk_java_unary_op0 "tostring" e1
+                     | OpSubstring start olen =>
                        match olen with
                        | Some len => mk_java_unary_opn "substring" (map toString [start; len]) e1
                        | None => mk_java_unary_op1 "substring" (toString start) e1
                        end
-                     | ALike pat oescape =>
+                     | OpLike pat oescape =>
                        let lc := make_like_clause pat oescape in
                        mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_java lc)) ++ "}") e1
-                     | ALeft => mk_java_unary_op0 "left" e1
-                     | ARight => mk_java_unary_op0 "right" e1
-                     | ABrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1
-                     | AUnbrand => mk_java_unary_op0 "unbrand" e1
-                     | ACast b => mk_java_unary_opn "cast" ["hierarchy"; (mk_java_string_collection b)] e1
-                     | ASingleton => mk_java_unary_op0 "singleton" e1
-                     | ANumMin => mk_java_unary_op0 "list_min" e1
-                     | ANumMax =>  mk_java_unary_op0 "list_max" e1
-                     | AForeignUnaryOp fu
+                     | OpLeft => mk_java_unary_op0 "left" e1
+                     | OpRight => mk_java_unary_op0 "right" e1
+                     | OpBrand b =>mk_java_unary_op1 "brand" (mk_java_string_collection b) e1
+                     | OpUnbrand => mk_java_unary_op0 "unbrand" e1
+                     | OpCast b => mk_java_unary_opn "cast" ["hierarchy"; (mk_java_string_collection b)] e1
+                     | OpArithUnary u => mk_java_unary_op0 (uarithToJavaMethod u) e1
+                     | OpForeignUnary fu
                        => foreign_to_java_unary_op i eol quotel fu e1
                      end in
            (s1, e0, t0)
@@ -299,21 +299,21 @@ Section NNRCtoJava.
            let '(s1, e1, t2) := nnrcToJava n1 t i eol quotel ivs in
            let '(s2, e2, t0) := nnrcToJava n2 t2 i eol quotel ivs in
            let e0 := match op with
-                     | ABArith b => mk_java_binary_op0 (barithToJavaMethod b) e1 e2
-                     | AEq => mk_java_binary_op0 "equals" e1 e2
-                     | AUnion => mk_java_binary_op0 "union" e1 e2
-                     | AConcat => mk_java_binary_op0 "concat" e1 e2
-                     | AMergeConcat => mk_java_binary_op0 "mergeConcat" e1 e2
-                     | AAnd => mk_java_binary_op0 "and" e1 e2
-                     | AOr => mk_java_binary_op0 "or" e1 e2
-                     | ALt =>  mk_java_binary_op0 "lt" e1 e2
-                     | ALe =>  mk_java_binary_op0 "le" e1 e2
-                     | AMinus =>  mk_java_binary_op0 "bag_minus" e1 e2
-                     | AMin =>  mk_java_binary_op0 "bag_min" e1 e2
-                     | AMax =>  mk_java_binary_op0 "bag_max" e1 e2
-                     | AContains =>  mk_java_binary_op0 "contains" e1 e2
-                     | ASConcat => mk_java_binary_op0 "stringConcat" e1 e2
-                     | AForeignBinaryOp fb
+                     | OpEqual => mk_java_binary_op0 "equals" e1 e2
+                     | OpRecConcat => mk_java_binary_op0 "concat" e1 e2
+                     | OpRecMerge => mk_java_binary_op0 "mergeConcat" e1 e2
+                     | OpAnd => mk_java_binary_op0 "and" e1 e2
+                     | OpOr => mk_java_binary_op0 "or" e1 e2
+                     | OpLt =>  mk_java_binary_op0 "lt" e1 e2
+                     | OpLe =>  mk_java_binary_op0 "le" e1 e2
+                     | OpBagUnion => mk_java_binary_op0 "union" e1 e2
+                     | OpBagDiff =>  mk_java_binary_op0 "bag_minus" e1 e2
+                     | OpBagMin =>  mk_java_binary_op0 "bag_min" e1 e2
+                     | OpBagMax =>  mk_java_binary_op0 "bag_max" e1 e2
+                     | OpContains =>  mk_java_binary_op0 "contains" e1 e2
+                     | OpStringConcat => mk_java_binary_op0 "stringConcat" e1 e2
+                     | OpArithBinary b => mk_java_binary_op0 (barithToJavaMethod b) e1 e2
+                     | OpForeignBinary fb
                        => foreign_to_java_binary_op i eol quotel fb e1 e2
                      end in
            (s1 ++ s2, e0, t0)
@@ -399,7 +399,7 @@ Section NNRCtoJava.
           if (assoc_lookupr equiv_dec ivs fv)
           then e'
           else
-            (NNRCLet fv (NNRCUnop (ADot fv) (NNRCVar input)) e')
+            (NNRCLet fv (NNRCUnop (OpDot fv) (NNRCVar input)) e')
       in
       fold_left wrap_one_free_var all_free_vars e.
     

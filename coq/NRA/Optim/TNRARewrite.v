@@ -14,7 +14,7 @@
  * limitations under the License.
  *)
 
-Section TOptim.
+Section TNRARewrite.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -59,7 +59,7 @@ Section TOptim.
     - inversion H; clear H; try eauto; subst.
       inversion H3; clear H3; subst.
       eapply ATBinop; try eauto.
-      eapply TOps.ATAnd; assumption.
+      eapply type_OpAnd; assumption.
     - intros; rewrite and_comm; eauto.
   Qed.
 
@@ -425,7 +425,7 @@ Section TOptim.
     eapply lift_filter_over_bminus; eauto.
   Qed.
  
-End TOptim.
+End TNRARewrite.
 
 (* 
 *** Local Variables: ***

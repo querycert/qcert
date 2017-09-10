@@ -46,22 +46,22 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;:= <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb">forallb</a></span> (<span class="kwd">fun</span> <span class="id">xy</span> =&gt; <span class="id"><a href="Qcert.Utils.Compat.html#compatible_with">compatible_with</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#xy">xy</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#xy">xy</a></span>) <span class="id">l</span>₂) <span class="id">l</span>₁.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_nil_l">compatible_nil_l</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span> * <span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>))  : <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof422')">Proof.</div>
-<div class="proofscript" id="proof422">
+<div class="toggleproof" onclick="toggleDisplay('proof423')">Proof.</div>
+<div class="proofscript" id="proof423">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_nil_r">compatible_nil_r</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span> * <span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>))  : <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof423')">Proof.</div>
-<div class="proofscript" id="proof423">
+<div class="toggleproof" onclick="toggleDisplay('proof424')">Proof.</div>
+<div class="proofscript" id="proof424">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">simpl</span>; <span class="tactic">auto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_with_cons_inv">compatible_with_cons_inv</a></span>  {<span class="id">x</span>:<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span>} {<span class="id">y</span>:<span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>} {<span class="id">a</span> <span class="id">l</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible_with">compatible_with</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#y">y</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span> :: <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible_with">compatible_with</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#x">x</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#y">y</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof424')">Proof.</div>
-<div class="proofscript" id="proof424">
+<div class="toggleproof" onclick="toggleDisplay('proof425')">Proof.</div>
+<div class="proofscript" id="proof425">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible_with">compatible_with</a></span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">match_case</span>; <span class="tactic">intros</span>.<br/>
@@ -71,8 +71,8 @@ for their common keys are equal. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_cons_inv_r">compatible_cons_inv_r</a></span> {<span class="id">a</span>} {<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span>*<span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span>::<span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt; <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof425')">Proof.</div>
-<div class="proofscript" id="proof425">
+<div class="toggleproof" onclick="toggleDisplay('proof426')">Proof.</div>
+<div class="proofscript" id="proof426">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb_forall">forallb_forall</a></span>. <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible_with_cons_inv">compatible_with_cons_inv</a></span>; <span class="tactic">eauto</span>.<br/>
@@ -88,8 +88,8 @@ for their common keys are equal. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_middle">compatible_middle</a></span> (<span class="id">l1</span> <span class="id">l2</span> <span class="id">l3</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span> * <span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)) <span class="id">a</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> ++ <span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span> :: <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Compat.html#l3">l3</a></span> = <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span>::<span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span>++<span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span>) <span class="id"><a href="Qcert.Utils.Compat.html#l3">l3</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof426')">Proof.</div>
-<div class="proofscript" id="proof426">
+<div class="toggleproof" onclick="toggleDisplay('proof427')">Proof.</div>
+<div class="proofscript" id="proof427">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHl1</span>. <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#andb_assoc">andb_assoc</a></span>.<br/>
@@ -103,8 +103,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> <span class="id">l</span>' = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible_with">compatible_with</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span>) <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#a">a</a></span> :: <span class="id">l</span>') = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof427')">Proof.</div>
-<div class="proofscript" id="proof427">
+<div class="toggleproof" onclick="toggleDisplay('proof428')">Proof.</div>
+<div class="proofscript" id="proof428">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb_forall">forallb_forall</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="kwd">in</span> *.<br/>
@@ -138,8 +138,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l3">l3</a></span>) -&gt; <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l3">l3</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l3">l3</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof428')">Proof.</div>
-<div class="proofscript" id="proof428">
+<div class="toggleproof" onclick="toggleDisplay('proof429')">Proof.</div>
+<div class="proofscript" id="proof429">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">l2</span> <span class="id">l3</span>. <span class="tactic">induction</span> <span class="id">l1</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Sorting.Permutation.html#Permutation_nil">Permutation_nil</a></span> <span class="kwd">in</span> <span class="id">H1</span>. <span class="tactic">subst</span>. <span class="tactic">simpl</span>. <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">assert</span> (<span class="id">inl</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id">a</span> <span class="id">l2</span>)<br/>
@@ -155,8 +155,8 @@ for their common keys are equal. </div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_refl">compatible_refl</a></span> (<span class="id">l</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span> * <span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)) : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span>) -&gt; <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l">l</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof429')">Proof.</div>
-<div class="proofscript" id="proof429">
+<div class="toggleproof" onclick="toggleDisplay('proof430')">Proof.</div>
+<div class="proofscript" id="proof430">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">l</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> <span class="id">H1</span>; <span class="tactic">clear</span> <span class="id">H1</span>; <span class="tactic">subst</span>.<br/>
@@ -184,8 +184,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_single_nin">compatible_single_nin</a></span> (<span class="id">b</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span>*<span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)) <span class="id">x</span> <span class="id">d</span> : <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;~ <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#In">In</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#x">x</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#b">b</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#b">b</a></span> ((<span class="id"><a href="Qcert.Utils.Compat.html#x">x</a></span>, <span class="id"><a href="Qcert.Utils.Compat.html#d">d</a></span>) :: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#nil">nil</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof430')">Proof.</div>
-<div class="proofscript" id="proof430">
+<div class="toggleproof" onclick="toggleDisplay('proof431')">Proof.</div>
+<div class="proofscript" id="proof431">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">x</span> <span class="id">d</span>. <span class="tactic">induction</span> <span class="id">b</span>; <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">a</span>; <span class="tactic">simpl</span>. <span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">IHb</span>; <span class="tactic">trivial</span>.<br/>
@@ -198,8 +198,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_true_sym">compatible_true_sym</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span>*<span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span>) -&gt; <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof431')">Proof.</div>
-<div class="proofscript" id="proof431">
+<div class="toggleproof" onclick="toggleDisplay('proof432')">Proof.</div>
+<div class="proofscript" id="proof432">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span>. <span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#forallb_forall">forallb_forall</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible_with">compatible_with</a></span> <span class="kwd">in</span> *.<br/>
@@ -214,8 +214,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_false_sym">compatible_false_sym</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span>*<span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span>) -&gt; <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#false">false</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof432')">Proof.</div>
-<div class="proofscript" id="proof432">
+<div class="toggleproof" onclick="toggleDisplay('proof433')">Proof.</div>
+<div class="proofscript" id="proof433">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="tactic">rewrite</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#forallb_not_existb">forallb_not_existb</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Bool.Bool.html#negb_false_iff">negb_false_iff</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#existsb_exists">existsb_exists</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> ? [?[??]].<br/>
@@ -235,8 +235,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="compatible_sym">compatible_sym</a></span> (<span class="id">l1</span> <span class="id">l2</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="Qcert.Utils.Compat.html#Compat.A">A</a></span>*<span class="id"><a href="Qcert.Utils.Compat.html#Compat.B">B</a></span>)) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span>) -&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#NoDup">NoDup</a></span> (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> = <span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l2">l2</a></span> <span class="id"><a href="Qcert.Utils.Compat.html#l1">l1</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof433')">Proof.</div>
-<div class="proofscript" id="proof433">
+<div class="toggleproof" onclick="toggleDisplay('proof434')">Proof.</div>
+<div class="proofscript" id="proof434">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id">l1</span> <span class="id">l2</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">symmetry</span>. <span class="tactic">eapply</span> <span class="id"><a href="Qcert.Utils.Compat.html#compatible_true_sym">compatible_true_sym</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -248,8 +248,8 @@ for their common keys are equal. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₁ = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">l</span>₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Compat.html#compatible">compatible</a></span> <span class="id">l</span>₁ <span class="id">l</span>₂ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#true">true</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">l</span>₁ = <span class="id">l</span>₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof434')">Proof.</div>
-<div class="proofscript" id="proof434">
+<div class="toggleproof" onclick="toggleDisplay('proof435')">Proof.</div>
+<div class="proofscript" id="proof435">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">nd</span> <span class="id">eqq</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">rewrite</span> <span class="id">eqq</span> <span class="kwd">in</span> <span class="id">nd</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">nd</span> <span class="id">eqq</span>.<br/>

@@ -118,8 +118,6 @@ Section TcNRAEnvEq.
    * Proper stuff *
    ****************)
 
-  Require Import ROpsEq.
-  
   Global Instance  tnraenv_core_rewrites_to_pre : PreOrder tnraenv_core_rewrites_to.
   Proof.
     constructor; red; intros.

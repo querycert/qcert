@@ -124,7 +124,7 @@ Section tDNNRCInfer.
                                     b
                                     (ta_require (Tlocal τ₁') n₁)
                                     (ta_require (Tlocal τ₂') n₂))
-                          (infer_binop_type_sub b τ₁ τ₂))
+                          (infer_binary_op_type_sub b τ₁ τ₂))
                        (lift_tlocal dτ₁) (lift_tlocal dτ₂)
          in
          olift2 binf (infer_dnnrc_base_type tenv n1) (infer_dnnrc_base_type tenv n2)
@@ -141,52 +141,52 @@ Section tDNNRCInfer.
                                               (ta_mk a (Tlocal τ))
                                               u
                                               (ta_require (Tlocal τ₁') n₁))
-                                         (infer_unop_type_sub u τ₁))
+                                         (infer_unary_op_type_sub u τ₁))
                                  (* Infer for distributed values *)
                                  (* Note: one example of unop from distr to local ;
                                           one example from distr to distr ... *)
                                  (fun τ₁ =>
                                     match u with
-                                    | ACount =>
+                                    | OpCount =>
                                       lift (fun τs =>
                                               let '(τ, τ₁') := τs in
                                               DNNRCUnop
                                                 (ta_mk a (Tlocal τ))
-                                                ACount
+                                                OpCount
                                                 (ta_require (Tlocal τ₁') n₁))
-                                           (infer_unop_type_sub ACount (Coll τ₁))
-                                    | ASum =>
+                                           (infer_unary_op_type_sub OpCount (Coll τ₁))
+                                    | OpSum =>
                                       lift (fun τs =>
                                               let '(τ, τ₁') := τs in
                                               DNNRCUnop
                                                 (ta_mk a (Tlocal τ))
-                                                ASum
+                                                OpSum
                                                 (ta_require (Tlocal τ₁') n₁))
-                                           (infer_unop_type_sub ASum (Coll τ₁))
-                                    | ADistinct =>
+                                           (infer_unary_op_type_sub OpSum (Coll τ₁))
+                                    | OpDistinct =>
                                       olift (fun τs =>
                                               let '(τ, τ₁') := τs in
                                               lift2 (fun τc =>
                                                        fun τc₁' =>
                                                          DNNRCUnop
                                                            (ta_mk a (Tdistr τc))
-                                                           ADistinct
+                                                           OpDistinct
                                                            (ta_require (Tdistr τc₁') n₁))
                                                     (tuncoll τ)
                                                     (tuncoll τ₁')) (* Note: tuncoll is safe because the inference for ADistinct does a join with (Coll ⊥) ensuring that tuncoll would work *)
-                                           (infer_unop_type_sub ADistinct (Coll τ₁))
-                                    | AFlatten =>
+                                           (infer_unary_op_type_sub OpDistinct (Coll τ₁))
+                                    | OpFlatten =>
                                       olift (fun τs =>
                                               let '(τ, τ₁') := τs in
                                               lift2 (fun τc =>
                                                        fun τc₁' =>
                                                          DNNRCUnop
                                                            (ta_mk a (Tdistr τc))
-                                                           AFlatten
+                                                           OpFlatten
                                                            (ta_require (Tdistr τc₁') n₁))
                                                     (tuncoll τ)
                                                     (tuncoll τ₁')) (* Note: tuncoll is safe because the inference for ADistinct does a join with (Coll ⊥) ensuring that tuncoll would work *)
-                                           (infer_unop_type_sub AFlatten (Coll τ₁))
+                                           (infer_unary_op_type_sub OpFlatten (Coll τ₁))
                                     | _ => None
                                     end
                                  )
@@ -325,15 +325,15 @@ Section tDNNRCInfer.
                                                            (ta_mk a (Tlocal (Coll τ₃)))
                                                            g sl
                                                            (ta_require (Tlocal (Coll τ₁l')) n₁))
-                                                      (infer_binop_type_sub AConcat τ₂ τ)
+                                                      (infer_binary_op_type_sub OpRecConcat τ₂ τ)
                                                )
-                                               (infer_unop_type_sub (ARec g) τ₁l'))
-                                       (infer_unop_type_sub (ARecProject sl) τ₁))))
+                                               (infer_unary_op_type_sub (OpRec g) τ₁l'))
+                                       (infer_unary_op_type_sub (OpRecProject sl) τ₁))))
        | DNNRCAlg _ _ _ => None
        end.
 
   Example ex1 : @dnnrc_base _ unit plug_type
-    := DNNRCLet tt "x"%string (DNNRCConst tt (dnat 3)) (DNNRCBinop tt ALt (DNNRCVar tt "x"%string)
+    := DNNRCLet tt "x"%string (DNNRCConst tt (dnat 3)) (DNNRCBinop tt OpLt (DNNRCVar tt "x"%string)
                  (DNNRCConst tt (dnat 5))).
 
   Example ex2 : @dnnrc_base _ unit plug_type
@@ -352,33 +352,33 @@ Section tDNNRCInfer.
                (DNNRCEither tt
                            (DNNRCVar tt "x"%string)
                            "x1"%string
-                           (DNNRCUnop tt ASum (DNNRCConst tt (dcoll (nil))))
+                           (DNNRCUnop tt OpSum (DNNRCConst tt (dcoll (nil))))
                            "x2"%string
                            (DNNRCConst tt (dcoll ((dbool true)::nil)))).
 
   Example ex4 : @dnnrc_base _ unit plug_type :=
     DNNRCFor tt "el"%string
             (DNNRCCollect tt (DNNRCVar tt "WORLD"%string))
-            (DNNRCUnop tt AToString (DNNRCVar tt "el"%string)).
+            (DNNRCUnop tt OpToString (DNNRCVar tt "el"%string)).
 
   Example ex5 : @dnnrc_base _ unit plug_type :=
     DNNRCFor tt "el"%string
             (DNNRCVar tt "WORLD"%string)
-            (DNNRCUnop tt AToString (DNNRCVar tt "el"%string)).
+            (DNNRCUnop tt OpToString (DNNRCVar tt "el"%string)).
 
   Example ex6 : @dnnrc_base _ unit plug_type :=
-    DNNRCUnop tt ACount
+    DNNRCUnop tt OpCount
              (DNNRCCollect tt (DNNRCVar tt "WORLD"%string)).
 
   Example ex7 : @dnnrc_base _ unit plug_type :=
-    DNNRCUnop tt ACount (DNNRCVar tt "WORLD"%string).
+    DNNRCUnop tt OpCount (DNNRCVar tt "WORLD"%string).
 
   Example ex8 : @dnnrc_base _ unit plug_type :=
-    DNNRCUnop tt ADistinct
+    DNNRCUnop tt OpDistinct
              (DNNRCCollect tt (DNNRCVar tt "WORLD"%string)).
 
   Example ex9 : @dnnrc_base _ unit plug_type :=
-    DNNRCUnop tt ADistinct (DNNRCVar tt "WORLD"%string).
+    DNNRCUnop tt OpDistinct (DNNRCVar tt "WORLD"%string).
 
   Example ex10 : @dnnrc_base _ unit plug_type :=
     DNNRCVar tt "WORLD"%string.
@@ -461,16 +461,16 @@ Section tDNNRCInfer.
   Example ex13 : @dnnrc_base _ unit plug_type :=
     DNNRCFor tt
              "$vtmap$0"%string
-             (DNNRCUnop tt AFlatten
+             (DNNRCUnop tt OpFlatten
                         (DNNRCFor tt
                                   "$vtprod$0"%string
                                   (DNNRCCollect tt (DNNRCVar tt "$vConst$WORLD"%string))
-                                  (DNNRCUnop tt AColl
-                                             (DNNRCBinop tt AConcat
+                                  (DNNRCUnop tt OpBag
+                                             (DNNRCBinop tt OpRecConcat
                                                          (DNNRCVar tt "$vtprod$0"%string)
                                                          (DNNRCConst tt (drec nil))))))
-             (DNNRCUnop tt (ARec "name")
-                        (DNNRCUnop tt (ADot "name") (DNNRCVar tt "$vtmap$0"%string))).
+             (DNNRCUnop tt (OpRec "name")
+                        (DNNRCUnop tt (OpDot "name") (DNNRCVar tt "$vtmap$0"%string))).
 
   (*
   Eval vm_compute in (lift unwrap_pf_compute

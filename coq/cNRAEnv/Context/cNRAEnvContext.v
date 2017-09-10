@@ -43,8 +43,8 @@ Section cNRAEnvContext.
   Inductive nraenv_core_ctxt : Set :=
   | CNHole : nat -> nraenv_core_ctxt
   | CNPlug : nraenv_core -> nraenv_core_ctxt
-  | CANBinop : binOp -> nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANUnop : unaryOp -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CANBinop : binary_op -> nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CANUnop : unary_op -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANMap : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANMapConcat : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
@@ -417,7 +417,7 @@ Section cNRAEnvContext.
        aec_substs_AppEnv
        aec_substs_MapEnv : aec_substs.
   
-  Lemma aec_simplify_holes_binop b c1 c2:
+  Lemma aec_simplify_holes_binary_op b c1 c2:
     aec_holes (CANBinop b c1 c2) <> nil ->
     aec_simplify (CANBinop b c1 c2) = CANBinop b (aec_simplify c1) (aec_simplify c2).
   Proof.
@@ -431,7 +431,7 @@ Section cNRAEnvContext.
     simpl in H; intuition.
   Qed.
 
-  Lemma aec_simplify_holes_unop u c:
+  Lemma aec_simplify_holes_unary_op u c:
     aec_holes (CANUnop u c ) <> nil ->
     aec_simplify (CANUnop u c) = CANUnop u (aec_simplify c).
   Proof.
@@ -616,13 +616,13 @@ Section cNRAEnvContext.
     induction c.
     - simpl; match_destr.
     - simpl; trivial.
-    - destr_solv IHc1 IHc2 (CANBinop b c1 c2) aec_simplify_holes_binop.
+    - destr_solv IHc1 IHc2 (CANBinop b c1 c2) aec_simplify_holes_binary_op.
     -  destruct (is_nil_dec (aec_holes (CANUnop u c))) as [h|h].
       + rewrite (aec_subst_nholes _ _ _ h).
         rewrite (aec_subst_simplify_nholes _ _ _ h).
         rewrite aec_simplify_idempotent.
         trivial.
-      + rewrite aec_simplify_holes_unop; [| eauto].
+      + rewrite aec_simplify_holes_unary_op; [| eauto].
         simpl.
         rewrite IHc.
         trivial.
@@ -1153,25 +1153,25 @@ Notation "‵ c" := (CANConst c)  (at level 0) : nraenv_core_ctxt_scope.        
 Notation "‵{||}" := (CANConst (dcoll nil))  (at level 0) : nraenv_core_ctxt_scope.                         (* ‵ = \baeckprime *)
 Notation "‵[||]" := (CANConst (drec nil)) (at level 50) : nraenv_core_ctxt_scope.                          (* ‵ = \baeckprime *)
 
-Notation "r1 ∧ r2" := (CANBinop AAnd r1 r2) (right associativity, at level 65): nraenv_core_ctxt_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (CANBinop AOr r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (CANBinop AEq r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (CANBinop ALt r1 r2) (no associativity, at level 70): nraenv_core_ctxt_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (CANBinop AUnion r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (CANBinop AMinus r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (CANBinop AMin r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (CANBinop AMax r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((CANBinop AConcat) p r) (at level 70) : nraenv_core_ctxt_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((CANBinop AMergeConcat) p r) (at level 70) : nraenv_core_ctxt_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (CANBinop OpAnd r1 r2) (right associativity, at level 65): nraenv_core_ctxt_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (CANBinop OpOr r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (CANBinop OpEqual r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (CANBinop OpLe r1 r2) (no associativity, at level 70): nraenv_core_ctxt_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (CANBinop OpBagUnion r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (CANBinop OpBagDiff r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (CANBinop OpBagMin r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (CANBinop OpBagMax r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((CANBinop OpRecConcat) p r) (at level 70) : nraenv_core_ctxt_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((CANBinop OpRecMerge) p r) (at level 70) : nraenv_core_ctxt_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (CANUnop ANeg r1) (right associativity, at level 70): nraenv_core_ctxt_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (CANUnop ADistinct r1) (right associativity, at level 70): nraenv_core_ctxt_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (CANUnop ACount r1) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (CANUnop AFlatten d) (at level 50) : nraenv_core_ctxt_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((CANUnop AColl) d)  (at level 50) : nraenv_core_ctxt_scope.                        (* ‵ = \baeckprime *)
-Notation "‵[| ( s , r ) |]" := ((CANUnop (ARec s)) r) (at level 50) : nraenv_core_ctxt_scope.              (* ‵ = \baeckprime *)
-Notation "¬π[ s1 ]( r )" := ((CANUnop (ARecRemove s1)) r) (at level 50) : nraenv_core_ctxt_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((CANUnop (ADot r)) p) (left associativity, at level 40): nraenv_core_ctxt_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (CANUnop OpNeg r1) (right associativity, at level 70): nraenv_core_ctxt_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (CANUnop OpDistinct r1) (right associativity, at level 70): nraenv_core_ctxt_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (CANUnop OpCount r1) (right associativity, at level 70): nraenv_core_ctxt_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (CANUnop OpFlatten d) (at level 50) : nraenv_core_ctxt_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((CANUnop OpBag) d)  (at level 50) : nraenv_core_ctxt_scope.                        (* ‵ = \baeckprime *)
+Notation "‵[| ( s , r ) |]" := ((CANUnop (OpRec s)) r) (at level 50) : nraenv_core_ctxt_scope.              (* ‵ = \baeckprime *)
+Notation "¬π[ s1 ]( r )" := ((CANUnop (OpRecRemove s1)) r) (at level 50) : nraenv_core_ctxt_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((CANUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_ctxt_scope.      (* · = \cdot *)
 
 Notation "χ⟨ p ⟩( r )" := (CANMap p r) (at level 70) : nraenv_core_ctxt_scope.                              (* χ = \chi *)
 Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CANMapConcat e2 e1) (at level 70) : nraenv_core_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)

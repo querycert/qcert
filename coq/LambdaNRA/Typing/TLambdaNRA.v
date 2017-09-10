@@ -45,12 +45,12 @@ Section TLambdaNRA.
          op₂ : τin -> τ₂
          ==========================
          b (op₁,op₂) : τin -> τout *)
-      binOp_type b τ₁ τ₂ τ ->
+      binary_op_type b τ₁ τ₂ τ ->
       lambda_nra_type op1 Γ τ₁ ->
       lambda_nra_type op2 Γ τ₂ ->
       lambda_nra_type (LNRABinop b op1 op2) Γ τ
   | TLUnop {Γ τ₀ τ } u op :
-      unaryOp_type u τ₀ τ ->
+      unary_op_type u τ₀ τ ->
       lambda_nra_type op Γ τ₀ ->
       lambda_nra_type (LNRAUnop u op) Γ τ
   | TLMap {Γ τ₀ τ} lop1 op2 :
@@ -156,10 +156,10 @@ Section TLambdaNRA.
     - destruct (IHe1 _ _ _ bt H5) as [dd1 [edd1 tdd1]]; 
       destruct (IHe2 _ _ _ bt H6) as [dd2 [edd2 tdd2]].
       rewrite edd1; rewrite edd2.
-      simpl; apply (@typed_binop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ₂ τ); assumption.
+      simpl; apply (@typed_binary_op_yields_typed_data _ _ _ _ _ _ τ₁ τ₂ τ); assumption.
     - destruct (IHe _ _ _ bt H4) as [dd [edd tdd]].
       rewrite edd.
-      simpl; apply (@typed_unop_yields_typed_data _ _ _ _ _ _ _ _ τ₀ τ); assumption.
+      simpl; apply (@typed_unary_op_yields_typed_data _ _ _ _ _ _ τ₀ τ); assumption.
     - destruct (IHe2 _ _ _ bt H4) as [dd2 [edd2 tdd2]].
       rewrite edd2; simpl.
       dtype_inverter.

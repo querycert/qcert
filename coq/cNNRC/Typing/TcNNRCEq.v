@@ -77,14 +77,10 @@ Section TcNNRCEq.
    * Proper stuff *
    ****************)
 
-  Require Import TOps.
-  
   Hint Constructors nnrc_core_type.
-  Hint Constructors unaryOp_type.
-  Hint Constructors binOp_type.
+  Hint Constructors unary_op_type.
+  Hint Constructors binary_op_type.
 
-  Require Import ROpsEq.
-  
   Global Instance  tnncr_core_rewrites_to_pre : PreOrder tnncr_core_rewrites_to.
   Proof.
     constructor; red; intros.

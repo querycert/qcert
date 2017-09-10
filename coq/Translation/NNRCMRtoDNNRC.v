@@ -88,7 +88,7 @@ Section NNRCMRtoDNNRC.
       let res_map :=
           DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc_base annot nil ((x, Vlocal)::nil) n)
       in
-      DNNRCUnop annot AFlatten res_map
+      DNNRCUnop annot OpFlatten res_map
     | MapScalar (x, n) =>
       let distr_input := DNNRCDispatch annot (DNNRCVar annot input) in
       DNNRCFor annot x distr_input (nnrc_to_dnnrc_base annot nil ((x, Vlocal)::nil) n)
@@ -101,14 +101,14 @@ Section NNRCMRtoDNNRC.
       DNNRCCollect annot res_map
     | MapDistFlatten (x, n) =>
       let res_map := DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc_base annot nil ((x, Vlocal)::nil) n) in
-      DNNRCCollect annot (DNNRCUnop annot AFlatten res_map)
+      DNNRCCollect annot (DNNRCUnop annot OpFlatten res_map)
     | MapScalar (x, n) =>
       DNNRCFor annot x (DNNRCVar annot input) (nnrc_to_dnnrc_base annot nil ((x, Vlocal)::nil) n)
     end.
 
   Definition dnnrc_base_of_mr (annot:A) (m:mr) : option (@dnnrc_base _ A plug_type) :=
     match (m.(mr_map), m.(mr_reduce)) with
-    | (MapScalar (x, NNRCUnop AColl n), RedSingleton) =>
+    | (MapScalar (x, NNRCUnop OpBag n), RedSingleton) =>
       Some (gen_apply_fun annot (x, n) (DNNRCVar annot m.(mr_input)))
     | (_, RedSingleton) =>
       None
@@ -134,7 +134,7 @@ Section NNRCMRtoDNNRC.
         Some (DNNRCLet annot
                       (mr_output mr)
                       (if in_dec equiv_dec (mr_output mr) outputs then
-                         DNNRCBinop annot AUnion (DNNRCVar annot (mr_output mr)) n
+                         DNNRCBinop annot OpBagUnion (DNNRCVar annot (mr_output mr)) n
                        else n)
                       k)
       | _ => None

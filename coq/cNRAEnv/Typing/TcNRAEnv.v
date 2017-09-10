@@ -37,12 +37,12 @@ Section TcNRAEnv.
   | ANTConst {τenv τin τout} c :
       data_type (normalize_data brand_relation_brands c) τout -> nraenv_core_type (ANConst c) τenv τin τout
   | ANTBinop {τenv τin τ₁ τ₂ τout} b op1 op2 :
-      binOp_type b τ₁ τ₂ τout ->
+      binary_op_type b τ₁ τ₂ τout ->
       nraenv_core_type op1 τenv τin τ₁ ->
       nraenv_core_type op2 τenv τin τ₂ ->
       nraenv_core_type (ANBinop b op1 op2) τenv τin τout
   | ANTUnop {τenv τin τ τout} u op :
-      unaryOp_type u τ τout ->
+      unary_op_type u τ τout ->
       nraenv_core_type op τenv τin τ ->
       nraenv_core_type (ANUnop u op) τenv τin τout
   | ANTMap {τenv τin τ₁ τ₂} op1 op2 :
@@ -422,12 +422,12 @@ Section TcNRAEnv.
       elim H1; elim H2; intros; clear H1 H2.
       rewrite H3; simpl.
       rewrite H5; simpl.
-      apply (typed_binop_yields_typed_data x0 x b H4 H6); assumption.
+      apply (typed_binary_op_yields_typed_data x0 x b H4 H6); assumption.
     (* ANTUnop *)
     - elim (IHnraenv_core_type env Henv d H1); intros.
       elim H2; intros; clear H2.
       rewrite H3.
-      apply (typed_unop_yields_typed_data x u H4); assumption.
+      apply (typed_unary_op_yields_typed_data x u H4); assumption.
     (* ANTMap *)
     - elim (IHnraenv_core_type2 env Henv d H); intros; clear H IHnraenv_core_type2.
       elim H0; intros; clear H0.
@@ -610,14 +610,14 @@ Section TcNRAEnv.
   Lemma ATdot {p s τc τin τ pf τout}:
       p  ▷ τin >=> Rec Closed τ pf ⊣ τc ->
       tdot τ s = Some τout ->
-      AUnop (ADot s) p ▷ τin >=> τout ⊣ τc.
+      AUnop (OpDot s) p ▷ τin >=> τout ⊣ τc.
   Proof.
     intros.
     repeat econstructor; eauto.
   Qed.
 
   Lemma ATdot_inv {p s τc τin τout}:
-      AUnop (ADot s) p ▷ τin >=> τout ⊣ τc ->
+      AUnop (OpDot s) p ▷ τin >=> τout ⊣ τc ->
       exists τ pf k,
       p  ▷ τin >=> Rec k τ pf ⊣ τc /\
       tdot τ s = Some τout.
@@ -660,7 +660,7 @@ Section TcNRAEnv.
     apply ATnra_data_inv'.
   Qed.
 
-  Hint Constructors nra_type unaryOp_type binOp_type.
+  Hint Constructors nra_type unary_op_type binary_op_type.
   Hint Resolve ATdot ATnra_data.
   (*  type rule for unnest_two.  Since it is a bit complicated,
        the type derivation is presented here, inline with the definition
@@ -702,7 +702,7 @@ Section TcNRAEnv.
     | [H:Coll _ = Coll _ |- _] => inversion H; clear H
     | [H: `?τ₁ = Coll₀ (`?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
     | [H:  Coll₀ (`?τ₂) = `?τ₁ |- _] => symmetry in H
-    (* Note: do not generalize too hastily on unaryOp/binOp constructors *)
+    (* Note: do not generalize too hastily on unary_op/binary_op constructors *)
     | [H:@nra_type _ _ AID _ _ |- _ ] => inversion H; clear H
     | [H:@nra_type _ _ (AMap _ _) _ _ |- _ ] => inversion H; clear H
     | [H:@nra_type _ _ (AMapConcat _ _) _ _ |- _ ] => inversion H; clear H
@@ -741,16 +741,16 @@ Section TcNRAEnv.
     | [H: Coll₀ _ = Coll₀ _ |- _ ] => inversion H; clear H
     | [H: Rec₀ _ _ = Rec₀ _ _ |- _ ] => inversion H; clear H
     | [H: nraenv_core_type _ _ (snd ?x) _ |- _] => destruct x; simpl in *; subst
-    | [H:unaryOp_type AColl _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type AFlatten _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARec _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ADot _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARecRemove _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type ARight _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type ALeft _ _ |- _ ] => inversion H; clear H; subst
-    | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
-    | [H:binOp_type AAnd _ _ _ |- _ ] => inversion H; clear H
-    | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
+    | [H:unary_op_type OpBag _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpFlatten _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRec _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpDot _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRecRemove _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpRight _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpLeft _ _ |- _ ] => inversion H; clear H; subst
+    | [H:binary_op_type OpRecConcat _ _ _ |- _ ] => inversion H; clear H
+    | [H:binary_op_type OpAnd _ _ _ |- _ ] => inversion H; clear H
+    | [H:binary_op_type OpRecMerge _ _ _ |- _ ] => inversion H; clear H
   end; try rtype_equalizer; try assumption; try subst; simpl in *; try nra_inverter.
 
   Lemma ATunnest_two_inv (s1 s2:string) (op:NRA.nra) τc τin rec  :
@@ -768,7 +768,7 @@ Section TcNRAEnv.
     destruct x; simpl in *.
     repeat eexists; intuition; eauto.
   Qed.
-    
+
   Lemma ATRecEither s τc τl τr pf1 pf2:
     nra_type τc (ARecEither s) (Either τl τr)
              (Either
@@ -799,7 +799,7 @@ Section TcNRAEnv.
       eapply ATBinop. eauto.
       eapply (ATUnop). eauto.
       eapply ATUnop; eauto.
-      eapply ATDot. unfold tdot, edot; simpl. auto.
+      eapply type_OpDot. unfold tdot, edot; simpl. auto.
       eapply (ATUnop). eauto.
       eauto.
       unfold tdot, edot; auto.
@@ -818,13 +818,13 @@ Section TcNRAEnv.
                           [("PBIND"%string, τenv); ("PDATA"%string, Rec Closed τ₁ pf1)]
                           [("PDATA2"%string, (Rec Closed τ₂ pf2))]
                           [("PBIND"%string, τenv); ("PDATA"%string, Rec Closed τ₁ pf1); ("PDATA2"%string, Rec Closed τ₂ pf2)]
-                          (AMap (AUnop (ARec "PDATA2") AID) (nra_of_nraenv_core op1))
-                          (unnest_two "a1" "PDATA" (AUnop AColl (nra_wrap_a1 (nra_of_nraenv_core op2))))
+                          (AMap (AUnop (OpRec "PDATA2") AID) (nra_of_nraenv_core op1))
+                          (unnest_two "a1" "PDATA" (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core op2))))
                           eq_refl eq_refl
             ); try reflexivity.
       eauto.
       unfold nra_wrap_a1.
-      apply (ATunnest_two "a1" "PDATA" (AUnop AColl (nra_double "PBIND" "a1" nra_bind (nra_of_nraenv_core op2))) τc (nra_context_type τenv τin) [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
+      apply (ATunnest_two "a1" "PDATA" (AUnop OpBag (nra_double "PBIND" "a1" nra_bind (nra_of_nraenv_core op2))) τc (nra_context_type τenv τin) [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl (Rec Closed τ₁ pf1)); try reflexivity.
       apply (@ATUnop m τc (nra_context_type τenv τin) (Rec Closed [("PBIND"%string, τenv); ("a1"%string, Coll (Rec Closed τ₁ pf1))] eq_refl)).
       econstructor; eauto.
       unfold nra_double, nra_bind.
@@ -1062,15 +1062,15 @@ Notation "Op @▷ d ⊣ C ; e" := (tnraenv_core_eval C Op e d) (at level 70).
 (* Used to prove type portion of typed directed rewrites *)
   
 Hint Constructors nraenv_core_type.
-Hint Constructors unaryOp_type.
-Hint Constructors binOp_type.
+Hint Constructors unary_op_type.
+Hint Constructors binary_op_type.
 
 Ltac nraenv_core_inverter := 
   match goal with
     | [H:Coll _ = Coll _ |- _] => inversion H; clear H
     | [H: `?τ₁ = Coll₀ (`?τ₂) |- _] => rewrite (Coll_right_inv τ₁ τ₂) in H; subst
     | [H:  Coll₀ (`?τ₂) = `?τ₁ |- _] => symmetry in H
-    (* Note: do not generalize too hastily on unaryOp/binOp constructors *)
+    (* Note: do not generalize too hastily on unary_op/binary_op constructors *)
     | [H:ANID ▷ _ >=> _ ⊣ _ ; _ |- _ ] => inversion H; clear H
     | [H:ANEnv ▷ _ >=> _ ⊣  _ ;_ |- _ ] => inversion H; clear H
     | [H:ANMap _ _ ▷ _ >=> _ ⊣  _ ;_ |- _ ] => inversion H; clear H
@@ -1109,17 +1109,17 @@ Ltac nraenv_core_inverter :=
     | [H: Coll₀ _ = Coll₀ _ |- _ ] => inversion H; clear H
     | [H: Rec₀ _ _ = Rec₀ _ _ |- _ ] => inversion H; clear H
     | [H: _ ▷ _ >=> snd ?x ⊣  _ ;_ |- _] => destruct x; simpl in *; subst
-    | [H:unaryOp_type AColl _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type AFlatten _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARec _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ADot _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARecProject _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type (ARecRemove _) _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type ALeft _ _ |- _ ] => inversion H; clear H; subst
-    | [H:unaryOp_type ARight _ _ |- _ ] => inversion H; clear H; subst
-    | [H:binOp_type AConcat _ _ _ |- _ ] => inversion H; clear H
-    | [H:binOp_type AAnd _ _ _ |- _ ] => inversion H; clear H
-    | [H:binOp_type AMergeConcat _ _ _ |- _ ] => inversion H; clear H
+    | [H:unary_op_type OpBag _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpFlatten _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRec _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpDot _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRecProject _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type (OpRecRemove _) _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpLeft _ _ |- _ ] => inversion H; clear H; subst
+    | [H:unary_op_type OpRight _ _ |- _ ] => inversion H; clear H; subst
+    | [H:binary_op_type OpRecConcat _ _ _ |- _ ] => inversion H; clear H
+    | [H:binary_op_type OpAnd _ _ _ |- _ ] => inversion H; clear H
+    | [H:binary_op_type OpRecMerge _ _ _ |- _ ] => inversion H; clear H
   end; try rtype_equalizer; try assumption; try subst; simpl in *; try nraenv_core_inverter.
 
 (* inverts, then tries and solve *)

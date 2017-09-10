@@ -30,17 +30,17 @@ Section LambdaNRASugar.
     match el with
     | nil => LNRAConst (drec nil)
     | (s0,x) :: rest =>
-      let init_rec := LNRAUnop (ARec s0) x in
+      let init_rec := LNRAUnop (OpRec s0) x in
       let proc_one (e:string * lambda_nra) acc :=
-          LNRABinop AConcat (LNRAUnop (ARec (fst e)) (snd e)) acc
+          LNRABinop OpRecConcat (LNRAUnop (OpRec (fst e)) (snd e)) acc
       in
       fold_right proc_one init_rec rest
     end.
 
-  Definition LNRADot (s:string) (e:lambda_nra) := LNRAUnop (ADot s) e.
-  Definition LNRAArrow (s:string) (e:lambda_nra) := LNRAUnop (ADot s) (LNRAUnop AUnbrand e).
+  Definition LNRADot (s:string) (e:lambda_nra) := LNRAUnop (OpDot s) e.
+  Definition LNRAArrow (s:string) (e:lambda_nra) := LNRAUnop (OpDot s) (LNRAUnop OpUnbrand e).
   Definition LNRAFlatMap (l:lnra_lambda) (e:lambda_nra) :=
-    LNRAUnop AFlatten (LNRAMap l e).
+    LNRAUnop OpFlatten (LNRAMap l e).
   
   (* replaces free variables by table lookups -- used in parser *)
   Definition la_tableify_one_var (e:lambda_nra) (v:string) : lambda_nra :=

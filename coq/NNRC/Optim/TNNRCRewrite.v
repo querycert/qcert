@@ -50,7 +50,7 @@ Section TNNRCRewrite.
   (* [ a : e ].a ≡ e *)
 
   Lemma tdot_of_rec a (e:nnrc) :
-    tnnrc_rewrites_to (NNRCUnop (ADot a) (NNRCUnop (ARec a) e)) e.
+    tnnrc_rewrites_to (NNRCUnop (OpDot a) (NNRCUnop (OpRec a) e)) e.
   Proof.
     apply nnrc_rewrites_typed_with_untyped.
     - rewrite dot_of_rec; reflexivity.
@@ -65,7 +65,7 @@ Section TNNRCRewrite.
   (* (e₁ ⊕ [ a : e₂ ]).a ≡ e₂ *)
 
   Lemma tnnrc_dot_of_concat_rec_eq_arrow a (e1 e2:nnrc) :
-    tnnrc_rewrites_to (NNRCUnop (ADot a) (NNRCBinop AConcat e1 (NNRCUnop (ARec a) e2))) e2.
+    tnnrc_rewrites_to (NNRCUnop (OpDot a) (NNRCBinop OpRecConcat e1 (NNRCUnop (OpRec a) e2))) e2.
   Proof.
     red; intros ? ? ? typ1.
     split.
@@ -94,7 +94,7 @@ Section TNNRCRewrite.
 
   Lemma tnnrc_dot_of_concat_rec_neq_arrow a1 a2 (e1 e2:nnrc) :
     a1 <> a2 ->
-    tnnrc_rewrites_to (NNRCUnop (ADot a1) (NNRCBinop AConcat e1 (NNRCUnop (ARec a2) e2))) (NNRCUnop (ADot a1) e1).
+    tnnrc_rewrites_to (NNRCUnop (OpDot a1) (NNRCBinop OpRecConcat e1 (NNRCUnop (OpRec a2) e2))) (NNRCUnop (OpDot a1) e1).
   Proof.
     red; intros neq ? ? ? typ1.
     nnrc_inverter.
@@ -162,8 +162,8 @@ Section TNNRCRewrite.
   (* { e₁ | $t ∈ {e₁} } ≡ { LET $t := e₁ IN e₂ } *)
 
   Lemma tfor_singleton_to_let_arrow x e1 e2:
-    tnnrc_rewrites_to (NNRCFor x (NNRCUnop AColl e1) e2)
-            (NNRCUnop AColl (NNRCLet x e1 e2)).
+    tnnrc_rewrites_to (NNRCFor x (NNRCUnop OpBag e1) e2)
+            (NNRCUnop OpBag (NNRCLet x e1 e2)).
   Proof.
     unfold nnrc_eval in *.
     unfold nnrc_type in *.
@@ -215,14 +215,14 @@ Section TNNRCRewrite.
     ~ In v1 (nnrc_free_vars e3) ->
     tnnrc_rewrites_to
       (NNRCFor v2 
-              (NNRCUnop AFlatten
+              (NNRCUnop OpFlatten
                        (NNRCFor v1 e1
-                               (NNRCIf e2 (NNRCUnop AColl (NNRCVar v1)) (NNRCConst (dcoll nil)))))
+                               (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil)))))
               e3)
-      (NNRCUnop AFlatten
+      (NNRCUnop OpFlatten
                (NNRCFor v1 e1
                        (NNRCIf e2
-                              (NNRCUnop AColl (NNRCLet v2 (NNRCVar v1) e3))
+                              (NNRCUnop OpBag (NNRCLet v2 (NNRCVar v1) e3))
                               (NNRCConst (dcoll nil))))).
   Proof.
     intros.
@@ -248,14 +248,14 @@ Section TNNRCRewrite.
   Lemma tmap_sigma_fusion_samevar_arrow (v1:var) (e1 e2 e3:nnrc) :
     tnnrc_rewrites_to
       (NNRCFor v1 
-              (NNRCUnop AFlatten
+              (NNRCUnop OpFlatten
                        (NNRCFor v1 e1
-                               (NNRCIf e2 (NNRCUnop AColl (NNRCVar v1)) (NNRCConst (dcoll nil)))))
+                               (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil)))))
               e3)
-      (NNRCUnop AFlatten
+      (NNRCUnop OpFlatten
                (NNRCFor v1 e1
                        (NNRCIf e2
-                              (NNRCUnop AColl e3)
+                              (NNRCUnop OpBag e3)
                               (NNRCConst (dcoll nil))))).
   Proof.
     intros.
@@ -300,7 +300,7 @@ Section TNNRCRewrite.
       (nnrc_subst (unshadow sep renamer (nnrc_free_vars e1) e2) x e1).
   Proof.
     transitivity (NNRCLet x e1 (unshadow sep renamer (nnrc_free_vars e1) e2)).
-    - apply nnrc_let_tproper; trivial.
+    - apply tproper_NNRCLet; trivial.
       + reflexivity.
       + apply tunshadow_preserves_arrow.
     - apply tlet_inline_disjoint_arrow.
@@ -461,12 +461,12 @@ Section TNNRCRewrite.
 
   Lemma tsigma_to_if_arrow (e1 e2:nnrc) (v:var) :
     tnnrc_rewrites_to
-      (NNRCUnop AFlatten
-               (NNRCFor v (NNRCUnop AColl e2)
+      (NNRCUnop OpFlatten
+               (NNRCFor v (NNRCUnop OpBag e2)
                        (NNRCIf e1
-                              (NNRCUnop AColl (NNRCVar v))
+                              (NNRCUnop OpBag (NNRCVar v))
                               (NNRCConst (dcoll nil)))))
-      (NNRCLet v e2 (NNRCIf e1 (NNRCUnop AColl (NNRCVar v)) (NNRCConst (dcoll nil)))).
+      (NNRCLet v e2 (NNRCIf e1 (NNRCUnop OpBag (NNRCVar v)) (NNRCConst (dcoll nil)))).
   Proof.
     apply nnrc_rewrites_typed_with_untyped.
     - rewrite sigma_to_if; reflexivity.
@@ -841,7 +841,7 @@ Section TNNRCRewrite.
   Qed.
 
   (****************
-   * ARecProject *
+   * OpRecProject *
    ****************)
   
   Lemma tnnrcproject_nil p :

@@ -33,8 +33,8 @@ Section cNRAEnv.
   Inductive nraenv_core : Set :=
   | ANID : nraenv_core
   | ANConst : data -> nraenv_core
-  | ANBinop : binOp -> nraenv_core -> nraenv_core -> nraenv_core
-  | ANUnop : unaryOp -> nraenv_core -> nraenv_core
+  | ANBinop : binary_op -> nraenv_core -> nraenv_core -> nraenv_core
+  | ANUnop : unary_op -> nraenv_core -> nraenv_core
   | ANMap : nraenv_core -> nraenv_core -> nraenv_core
   | ANMapConcat : nraenv_core -> nraenv_core -> nraenv_core
   | ANProduct : nraenv_core -> nraenv_core -> nraenv_core
@@ -72,7 +72,7 @@ Section cNRAEnv.
   Proof.
     change (forall x y : nraenv_core,  {x = y} + {x <> y}).
     decide equality;
-      try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec].
+      try solve [apply binary_op_eqdec | apply unary_op_eqdec | apply data_eqdec | apply string_eqdec].
   Defined.
 
   (** NRA+Env Semantics *)
@@ -84,9 +84,9 @@ Section cNRAEnv.
       | ANID => Some x
       | ANConst rd => Some (normalize_data h rd)
       | ANBinop bop op1 op2 =>
-        olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (nraenv_core_eval op1 env x) (nraenv_core_eval op2 env x)
+        olift2 (fun d1 d2 => binary_op_eval h bop d1 d2) (nraenv_core_eval op1 env x) (nraenv_core_eval op2 env x)
       | ANUnop uop op1 =>
-        olift (fun d1 => fun_of_unaryop h uop d1) (nraenv_core_eval op1 env x)
+        olift (fun d1 => unary_op_eval h uop d1) (nraenv_core_eval op1 env x)
       | ANMap op1 op2 =>
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (rmap (nraenv_core_eval op1 env) c1)) d
@@ -155,7 +155,7 @@ Section cNRAEnv.
   Local Open Scope list_scope.
 
   Definition ARecEither f :=
-    AEither (AUnop ALeft (AUnop (ARec f) AID)) (AUnop ARight (AUnop (ARec f) AID)).
+    AEither (AUnop OpLeft (AUnop (OpRec f) AID)) (AUnop OpRight (AUnop (OpRec f) AID)).
   
   Fixpoint nra_of_nraenv_core (ae:nraenv_core) : nra :=
     match ae with
@@ -168,31 +168,31 @@ Section cNRAEnv.
              (unnest_two
                 "a1"
                 "PDATA"
-                (AUnop AColl (nra_wrap_a1 (nra_of_nraenv_core ea2))))
+                (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))
       | ANMapConcat ea1 ea2 =>
-        (AMap (ABinop AConcat
-                      (AUnop (ADot "PDATA") AID)
-                      (AUnop (ADot "PDATA2") AID))
+        (AMap (ABinop OpRecConcat
+                      (AUnop (OpDot "PDATA") AID)
+                      (AUnop (OpDot "PDATA2") AID))
               (AMapConcat
-                 (AMap (AUnop (ARec "PDATA2") AID) (nra_of_nraenv_core ea1))
+                 (AMap (AUnop (OpRec "PDATA2") AID) (nra_of_nraenv_core ea1))
                  (unnest_two
                     "a1"
                     "PDATA"
-                    (AUnop AColl (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
+                    (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
       | ANProduct ea1 ea2 => AProduct (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
       | ANSelect ea1 ea2 =>
-        (AMap (AUnop (ADot "PDATA") AID)
+        (AMap (AUnop (OpDot "PDATA") AID)
               (ASelect (nra_of_nraenv_core ea1)
                        (unnest_two
                           "a1"
                           "PDATA"
-                          (AUnop AColl (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
+                          (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
       | ANDefault ea1 ea2 => ADefault (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
       | ANEither eal ear => AApp
                                   (AEither (nra_of_nraenv_core eal) (nra_of_nraenv_core ear))
                                   (AEitherConcat
                                      (AApp (ARecEither "PDATA") nra_data)
-                                     (AUnop (ARec "PBIND") nra_bind))
+                                     (AUnop (OpRec "PBIND") nra_bind))
       | ANEitherConcat ea1 ea2 => AEitherConcat (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
       | ANApp ea1 ea2 => AApp (nra_of_nraenv_core ea1)
                               (nra_wrap (nra_of_nraenv_core ea2))
@@ -207,7 +207,7 @@ Section cNRAEnv.
              (unnest_two
                 "a1"
                 "PBIND"
-                (AUnop AColl (nra_wrap_bind_a1 nra_data)))
+                (AUnop OpBag (nra_wrap_bind_a1 nra_data)))
     end.
 
   Lemma rmap_map_rec1 l s:
@@ -857,33 +857,33 @@ Notation "‵ c" := (ANConst c)  (at level 0) : nraenv_core_scope.              
 Notation "‵{||}" := (ANConst (dcoll nil))  (at level 0) : nraenv_core_scope.                         (* ‵ = \backprime *)
 Notation "‵[||]" := (ANConst (drec nil)) (at level 50) : nraenv_core_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (ANBinop AAnd r1 r2) (right associativity, at level 65): nraenv_core_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (ANBinop AOr r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (ANBinop AEq r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (ANBinop ALt r1 r2) (no associativity, at level 70): nraenv_core_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (ANBinop AUnion r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (ANBinop AMinus r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* − = \minus *)
-Notation "r1 ⋂min r2" := (ANBinop AMin r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
-Notation "r1 ⋃max r2" := (ANBinop AMax r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((ANBinop AConcat) p r) (at level 70) : nraenv_core_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((ANBinop AMergeConcat) p r) (at level 70) : nraenv_core_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (ANBinop OpAnd r1 r2) (right associativity, at level 65): nraenv_core_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (ANBinop OpOr r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (ANBinop OpEqual r1 r2) (right associativity, at level 70): nraenv_core_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (ANBinop OpLe r1 r2) (no associativity, at level 70): nraenv_core_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (ANBinop OpBagUnion r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (ANBinop OpBagDiff r1 r2) (right associativity, at level 70): nraenv_core_scope.  (* − = \minus *)
+Notation "r1 ⋂min r2" := (ANBinop OpBagMin r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
+Notation "r1 ⋃max r2" := (ANBinop OpBagMax r1 r2) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((ANBinop OpRecConcat) p r) (at level 70) : nraenv_core_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((ANBinop OpRecMerge) p r) (at level 70) : nraenv_core_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (ANUnop ANeg r1) (right associativity, at level 70): nraenv_core_scope.        (* ¬ = \neg *)
-Notation "♯distinct( r1 )" := (ANUnop ADistinct r1) (right associativity, at level 70): nraenv_core_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (ANUnop ACount r1) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (ANUnop AFlatten d) (at level 50) : nraenv_core_scope.                   (* ♯ = \sharp *)
+Notation "¬( r1 )" := (ANUnop OpNeg r1) (right associativity, at level 70): nraenv_core_scope.        (* ¬ = \neg *)
+Notation "♯distinct( r1 )" := (ANUnop OpDistinct r1) (right associativity, at level 70): nraenv_core_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (ANUnop OpCount r1) (right associativity, at level 70): nraenv_core_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (ANUnop OpFlatten d) (at level 50) : nraenv_core_scope.                   (* ♯ = \sharp *)
 
-Notation "a1 ♯+ a2" := (ANBinop (ABArith ArithPlus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
+Notation "a1 ♯+ a2" := (ANBinop (OpArithBinary ArithPlus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
    (* ♯ = \sharp *)
 
-Notation "a1 ♯- a2" := (ANBinop (ABArith ArithMinus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
+Notation "a1 ♯- a2" := (ANBinop (OpArithBinary ArithMinus) a1 a2) (right associativity, at level 70): nraenv_core_scope.
    (* ♯ = \sharp *)
 
-Notation "‵{| d |}" := ((ANUnop AColl) d)  (at level 50) : nraenv_core_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((ANUnop (ARec s)) r) (at level 50) : nraenv_core_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((ANUnop (ARecRemove s1)) r) (at level 50) : nraenv_core_scope.          (* ¬ = \neg and π = \pi *)
-Notation "π[ s1 ]( r )" := ((ANUnop (ARecProject s1)) r) (at level 50) : nraenv_core_scope.          (* π = \pi *)
-Notation "p · r" := ((ANUnop (ADot r)) p) (left associativity, at level 40): nraenv_core_scope.      (* · = \cdot *)
+Notation "‵{| d |}" := ((ANUnop OpBag) d)  (at level 50) : nraenv_core_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((ANUnop (OpRec s)) r) (at level 50) : nraenv_core_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((ANUnop (OpRecRemove s1)) r) (at level 50) : nraenv_core_scope.          (* ¬ = \neg and π = \pi *)
+Notation "π[ s1 ]( r )" := ((ANUnop (OpRecProject s1)) r) (at level 50) : nraenv_core_scope.          (* π = \pi *)
+Notation "p · r" := ((ANUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_scope.      (* · = \cdot *)
 
 Notation "χ⟨ p ⟩( r )" := (ANMap p r) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
 Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (ANMapConcat e2 e1) (at level 70) : nraenv_core_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)

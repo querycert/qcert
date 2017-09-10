@@ -127,8 +127,8 @@ Section NRAEnvOptimizer.
 
     Fixpoint nodupA_checker {fruntime:foreign_runtime} (p:nraenv) : bool
     := match p with
-       | NRAEnvUnop ADistinct _ => true
-       | NRAEnvBinop AMinus p₁ p₂ => nodupA_checker p₂
+       | NRAEnvUnop OpDistinct _ => true
+       | NRAEnvBinop OpBagDiff p₁ p₂ => nodupA_checker p₂
        | _ => false
        end.
 
@@ -177,7 +177,7 @@ Section NRAEnvOptimizer.
 
     Definition dup_elim_fun {fruntime:foreign_runtime} (p:nraenv) :=
       match p with
-      | NRAEnvUnop ADistinct q  =>
+      | NRAEnvUnop OpDistinct q  =>
         if nodupA_checker q then q else p
       | _ => p
       end.
@@ -234,7 +234,7 @@ Section NRAEnvOptimizer.
 
   Definition tand_comm_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvBinop AAnd op1 op2 => NRAEnvBinop AAnd op2 op1
+      | NRAEnvBinop OpAnd op1 op2 => NRAEnvBinop OpAnd op2 op1
       | _ => p
     end.
 
@@ -260,8 +260,8 @@ Section NRAEnvOptimizer.
 
   Definition tselect_and_comm_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvSelect (NRAEnvBinop AAnd op1 op2) op =>
-        NRAEnvSelect (NRAEnvBinop AAnd op2 op1) op
+      | NRAEnvSelect (NRAEnvBinop OpAnd op1 op2) op =>
+        NRAEnvSelect (NRAEnvBinop OpAnd op2 op1) op
       | _ => p
     end.
 
@@ -287,8 +287,8 @@ Section NRAEnvOptimizer.
 
   Definition select_union_distr_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvSelect op (NRAEnvBinop AUnion op1 op2) =>
-        NRAEnvBinop AUnion (NRAEnvSelect op op1) (NRAEnvSelect op op2)
+      | NRAEnvSelect op (NRAEnvBinop OpBagUnion op1 op2) =>
+        NRAEnvBinop OpBagUnion (NRAEnvSelect op op1) (NRAEnvSelect op op2)
       | _ => p
     end.
 
@@ -315,7 +315,7 @@ Section NRAEnvOptimizer.
   Definition tselect_and_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
         NRAEnvSelect op1 (NRAEnvSelect op2 op) =>
-        NRAEnvSelect (NRAEnvBinop AAnd op2 op1) op
+        NRAEnvSelect (NRAEnvBinop OpAnd op2 op1) op
       | _ => p
     end.
 
@@ -341,8 +341,8 @@ Section NRAEnvOptimizer.
 
   Definition tdot_from_duplicate_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvUnop (ADot s2)
-               (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1) op1) (NRAEnvUnop (ARec s2') op2)) =>
+      | NRAEnvUnop (OpDot s2)
+               (NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec s1) op1) (NRAEnvUnop (OpRec s2') op2)) =>
         if s2 == s2' then
           op2
         else
@@ -372,8 +372,8 @@ Section NRAEnvOptimizer.
 
   Definition tdot_from_duplicate_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvUnop (ADot s1)
-               (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1') op1) (NRAEnvUnop (ARec s2) op2)) =>
+      | NRAEnvUnop (OpDot s1)
+               (NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec s1') op1) (NRAEnvUnop (OpRec s2) op2)) =>
         if (s1 <> s2) then
           if s1 == s1' then op1
           else p
@@ -403,7 +403,7 @@ Section NRAEnvOptimizer.
   (* ♯flatten({ p }) ⇒ₓ p when p's output type is a collection *)
   Definition tflatten_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvUnop AFlatten (NRAEnvUnop AColl p) => p
+      | NRAEnvUnop OpFlatten (NRAEnvUnop OpBag p) => p
       | _ => p
     end.
 
@@ -428,7 +428,7 @@ Section NRAEnvOptimizer.
   (* p ⊕ [] ⇒ₓ p when p returns a record *)
   Definition tconcat_empty_record_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  NRAEnvBinop AConcat p (NRAEnvConst (drec [])) =>
+      |  NRAEnvBinop OpRecConcat p (NRAEnvConst (drec [])) =>
         p
       | _ => p
     end.
@@ -454,7 +454,7 @@ Section NRAEnvOptimizer.
   (* [] ⊕ p ⇒ₓ p when p returns a record *)
   Definition tconcat_empty_record_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  NRAEnvBinop AConcat (NRAEnvConst (drec [])) p =>
+      |  NRAEnvBinop OpRecConcat (NRAEnvConst (drec [])) p =>
          p
       | _ => p
     end.
@@ -479,10 +479,10 @@ Section NRAEnvOptimizer.
 
   Definition tdot_over_concat_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    |  NRAEnvUnop (ADot a₂) (NRAEnvBinop AConcat q₁ (NRAEnvUnop (ARec a₁) q₂)) =>
+    |  NRAEnvUnop (OpDot a₂) (NRAEnvBinop OpRecConcat q₁ (NRAEnvUnop (OpRec a₁) q₂)) =>
        if a₁ == a₂
        then q₂
-       else NRAEnvUnop (ADot a₂) q₁
+       else NRAEnvUnop (OpDot a₂) q₁
       | _ => p
     end.
 
@@ -508,10 +508,10 @@ Section NRAEnvOptimizer.
 
   Definition tdot_over_concat_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    |  NRAEnvUnop (ADot a₂) (NRAEnvBinop AConcat (NRAEnvUnop (ARec a₁) q₁) q₂) =>
+    |  NRAEnvUnop (OpDot a₂) (NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec a₁) q₁) q₂) =>
        if a₁ == a₂
        then p
-       else NRAEnvUnop (ADot a₂) q₂
+       else NRAEnvUnop (OpDot a₂) q₂
       | _ => p
     end.
 
@@ -537,8 +537,8 @@ Section NRAEnvOptimizer.
   (* p ⊗ [] ⇒ₓ { p } when p returns a record *)
   Definition tmerge_empty_record_r_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  NRAEnvBinop AMergeConcat p (NRAEnvConst (drec [])) =>
-         NRAEnvUnop AColl p
+      |  NRAEnvBinop OpRecMerge p (NRAEnvConst (drec [])) =>
+         NRAEnvUnop OpBag p
       | _ => p
     end.
 
@@ -563,8 +563,8 @@ Section NRAEnvOptimizer.
   (* [] ⊗ p ⇒ₓ { p } when p returns a record *)
   Definition tmerge_empty_record_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  NRAEnvBinop AMergeConcat (NRAEnvConst (drec [])) p =>
-         NRAEnvUnop AColl p
+      |  NRAEnvBinop OpRecMerge (NRAEnvConst (drec [])) p =>
+         NRAEnvUnop OpBag p
       | _ => p
     end.
 
@@ -614,7 +614,7 @@ Section NRAEnvOptimizer.
   (* ♯flatten(χ⟨ { p1 } ⟩( p2 )) ⇒ₓ χ⟨ p1 ⟩( p2 ) *)
   Definition tflatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvUnop AColl p1) p2) =>
+        NRAEnvUnop OpFlatten (NRAEnvMap (NRAEnvUnop OpBag p1) p2) =>
         NRAEnvMap p1 p2
       | _ => p
     end.
@@ -639,10 +639,10 @@ Section NRAEnvOptimizer.
 
   Definition tflatten_flatten_map_either_nil_fun {fruntime:foreign_runtime} (p: nraenv) :=
       match p with
-        NRAEnvUnop AFlatten
-                   (NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvApp (NRAEnvEither p₁ (NRAEnvConst (dcoll nil))) p₂) p₃)) =>
-        NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvApp
-                                          (NRAEnvEither (NRAEnvUnop AFlatten p₁)
+        NRAEnvUnop OpFlatten
+                   (NRAEnvUnop OpFlatten (NRAEnvMap (NRAEnvApp (NRAEnvEither p₁ (NRAEnvConst (dcoll nil))) p₂) p₃)) =>
+        NRAEnvUnop OpFlatten (NRAEnvMap (NRAEnvApp
+                                          (NRAEnvEither (NRAEnvUnop OpFlatten p₁)
                                                         (NRAEnvConst (dcoll nil))) p₂) p₃)
       | _ => p
     end.
@@ -694,7 +694,7 @@ Section NRAEnvOptimizer.
   (* χ⟨ P1 ⟩( { P2 } ) ⇒ₓ { P1 ◯ P2 } *)
   Definition tmap_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        NRAEnvMap p1 (NRAEnvUnop AColl p2) => NRAEnvUnop AColl (NRAEnvApp p1 p2)
+        NRAEnvMap p1 (NRAEnvUnop OpBag p2) => NRAEnvUnop OpBag (NRAEnvApp p1 p2)
       | _ => p
     end.
 
@@ -1341,10 +1341,10 @@ Section NRAEnvOptimizer.
   (* { [ s1 : p1 ] } × { [ s2 : p2 ] } ⇒ₓ { [ s1 : p1; s2 : p2 ] } *)
   Definition tproduct_singletons_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        NRAEnvProduct (NRAEnvUnop AColl (NRAEnvUnop (ARec s1) p1))
-                  (NRAEnvUnop AColl (NRAEnvUnop (ARec s2) p2)) =>
-        NRAEnvUnop AColl
-               (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1) p1) (NRAEnvUnop (ARec s2) p2))
+        NRAEnvProduct (NRAEnvUnop OpBag (NRAEnvUnop (OpRec s1) p1))
+                  (NRAEnvUnop OpBag (NRAEnvUnop (OpRec s2) p2)) =>
+        NRAEnvUnop OpBag
+               (NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec s1) p1) (NRAEnvUnop (OpRec s2) p2))
       | _ => p
     end.
 
@@ -1369,7 +1369,7 @@ Section NRAEnvOptimizer.
   (* { p1 × { [] } ⇒ₓ p1 *)
   Definition tproduct_empty_right_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvProduct p1 (NRAEnvUnop AColl (NRAEnvConst (drec nil))) => p1
+    | NRAEnvProduct p1 (NRAEnvUnop OpBag (NRAEnvConst (drec nil))) => p1
     | _ => p
     end.
 
@@ -1394,7 +1394,7 @@ Section NRAEnvOptimizer.
   (* { { [] } × p1 ⇒ₓ p1 *)
   Definition tproduct_empty_left_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvProduct (NRAEnvUnop AColl (NRAEnvConst (drec nil))) p1 => p1
+    | NRAEnvProduct (NRAEnvUnop OpBag (NRAEnvConst (drec nil))) p1 => p1
     | _ => p
     end.
 
@@ -1419,10 +1419,10 @@ Section NRAEnvOptimizer.
   (* ♯flatten(χ⟨ χ⟨ { p3 } ⟩( p1 ) ⟩( p2 )) ⇒ₓ χ⟨ { p3 } ⟩(♯flatten(χ⟨ p1 ⟩( p2 ))) *)
   Definition tdouble_flatten_map_coll_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        NRAEnvUnop AFlatten
-               (NRAEnvMap (NRAEnvMap (NRAEnvUnop AColl p3) p1) p2) =>
-        NRAEnvMap (NRAEnvUnop AColl p3)
-              (NRAEnvUnop AFlatten (NRAEnvMap p1 p2))
+        NRAEnvUnop OpFlatten
+               (NRAEnvMap (NRAEnvMap (NRAEnvUnop OpBag p3) p1) p2) =>
+        NRAEnvMap (NRAEnvUnop OpBag p3)
+              (NRAEnvUnop OpFlatten (NRAEnvMap p1 p2))
       | _ => p
     end.
 
@@ -1447,8 +1447,8 @@ Section NRAEnvOptimizer.
   (* TODO: horribly named *)
   Definition tflatten_over_double_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | (NRAEnvUnop AFlatten
-                (NRAEnvMap (NRAEnvMap q₁ (NRAEnvSelect q₂ (NRAEnvUnop AColl NRAEnvID))) q₃))
+      | (NRAEnvUnop OpFlatten
+                (NRAEnvMap (NRAEnvMap q₁ (NRAEnvSelect q₂ (NRAEnvUnop OpBag NRAEnvID))) q₃))
         => (NRAEnvMap q₁ (NRAEnvSelect q₂ q₃))
       | _ => p
     end.
@@ -1474,19 +1474,19 @@ Section NRAEnvOptimizer.
   (* TODO: poorly named *)
   Definition tflatten_over_double_map_with_either_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | (NRAEnvUnop AFlatten
+    | (NRAEnvUnop OpFlatten
               (NRAEnvMap
                  (NRAEnvMap q₁
                         (NRAEnvSelect q₂
                                   (NRAEnvApp
-                                     (NRAEnvEither (NRAEnvUnop AColl NRAEnvID) (NRAEnvConst (dcoll []))) q₃)))
+                                     (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll []))) q₃)))
                  q₄)) =>
       (NRAEnvMap q₁
              (NRAEnvSelect q₂
-                       (NRAEnvUnop AFlatten
+                       (NRAEnvUnop OpFlatten
                                (NRAEnvMap
                                   (NRAEnvApp
-                                     (NRAEnvEither (NRAEnvUnop AColl NRAEnvID) (NRAEnvConst (dcoll []))) q₃)
+                                     (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID) (NRAEnvConst (dcoll []))) q₃)
                                   q₄))))
     | _ => p
     end.
@@ -1512,9 +1512,9 @@ Section NRAEnvOptimizer.
   (* ignores_env p1 -> (ENV ⊗ p1) ◯ₑ p2 ⇒ₓ p2 ⊗ p1 *)
   Definition tappenv_over_env_merge_l_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvAppEnv (NRAEnvBinop AMergeConcat NRAEnvEnv p1) p2 =>
+      | NRAEnvAppEnv (NRAEnvBinop OpRecMerge NRAEnvEnv p1) p2 =>
         if (nraenv_ignores_env_fun p1)
-        then (NRAEnvBinop AMergeConcat p2 p1)
+        then (NRAEnvBinop OpRecMerge p2 p1)
         else p
       | _ => p
     end.
@@ -1547,12 +1547,12 @@ Section NRAEnvOptimizer.
 
   Definition ttostring_on_string_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvUnop AToString (NRAEnvConst (dstring s)) =>
+      | NRAEnvUnop OpToString (NRAEnvConst (dstring s)) =>
         NRAEnvConst (dstring s)
-      | NRAEnvUnop AToString (NRAEnvUnop AToString p) =>
-        NRAEnvUnop AToString p
-      | NRAEnvUnop AToString (NRAEnvBinop ASConcat p1 p2) =>
-        (NRAEnvBinop ASConcat p1 p2)
+      | NRAEnvUnop OpToString (NRAEnvUnop OpToString p) =>
+        NRAEnvUnop OpToString p
+      | NRAEnvUnop OpToString (NRAEnvBinop OpStringConcat p1 p2) =>
+        (NRAEnvBinop OpStringConcat p1 p2)
       | _ => p
     end.
 
@@ -1577,9 +1577,9 @@ Section NRAEnvOptimizer.
 
   Definition tmap_full_over_select_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop AColl NRAEnvID)) => p
-      | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop AColl p2)) =>
-        NRAEnvMap (NRAEnvApp p0 p2) (NRAEnvSelect (NRAEnvApp p1 p2) (NRAEnvUnop AColl NRAEnvID))
+      | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop OpBag NRAEnvID)) => p
+      | NRAEnvMap p0 (NRAEnvSelect p1 (NRAEnvUnop OpBag p2)) =>
+        NRAEnvMap (NRAEnvApp p0 p2) (NRAEnvSelect (NRAEnvApp p1 p2) (NRAEnvUnop OpBag NRAEnvID))
       | _ => p
     end.
 
@@ -1605,10 +1605,10 @@ Section NRAEnvOptimizer.
   Definition tcompose_selects_in_mapenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
       | (NRAEnvAppEnv
-           (NRAEnvUnop AFlatten
-                   (NRAEnvMapEnv (NRAEnvMap NRAEnvEnv (NRAEnvSelect p1 (NRAEnvUnop AColl NRAEnvID)))))
-           (NRAEnvMap NRAEnvEnv (NRAEnvSelect p2 (NRAEnvUnop AColl NRAEnvID)))) =>
-        (NRAEnvMap NRAEnvEnv (NRAEnvSelect p1 (NRAEnvSelect p2 (NRAEnvUnop AColl NRAEnvID))))
+           (NRAEnvUnop OpFlatten
+                   (NRAEnvMapEnv (NRAEnvMap NRAEnvEnv (NRAEnvSelect p1 (NRAEnvUnop OpBag NRAEnvID)))))
+           (NRAEnvMap NRAEnvEnv (NRAEnvSelect p2 (NRAEnvUnop OpBag NRAEnvID)))) =>
+        (NRAEnvMap NRAEnvEnv (NRAEnvSelect p1 (NRAEnvSelect p2 (NRAEnvUnop OpBag NRAEnvID))))
       | _ => p
     end.
   
@@ -1677,7 +1677,7 @@ Section NRAEnvOptimizer.
 
   Definition tflatten_mapenv_coll_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop AFlatten (NRAEnvMapEnv (NRAEnvUnop AColl p1)) =>
+      | NRAEnvUnop OpFlatten (NRAEnvMapEnv (NRAEnvUnop OpBag p1)) =>
         NRAEnvMapEnv p1
       | _ => p
     end.
@@ -1701,7 +1701,7 @@ Section NRAEnvOptimizer.
 
   Definition tflatten_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop AFlatten (NRAEnvConst (dcoll nil)) =>
+      | NRAEnvUnop OpFlatten (NRAEnvConst (dcoll nil)) =>
         NRAEnvConst (dcoll nil)
       | _ => p
     end.
@@ -1725,8 +1725,8 @@ Section NRAEnvOptimizer.
 
   Definition tflatten_through_appenv_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | NRAEnvUnop AFlatten (NRAEnvAppEnv p1 p2) =>
-        NRAEnvAppEnv (NRAEnvUnop AFlatten p1) p2
+      | NRAEnvUnop OpFlatten (NRAEnvAppEnv p1 p2) =>
+        NRAEnvAppEnv (NRAEnvUnop OpFlatten p1) p2
       | _ => p
     end.
 
@@ -1749,11 +1749,11 @@ Section NRAEnvOptimizer.
 
   Definition tappenv_flatten_mapenv_to_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      | (NRAEnvAppEnv (NRAEnvUnop AFlatten (NRAEnvMapEnv p2))
-            (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec s) NRAEnvID))) =>
-         (NRAEnvUnop AFlatten
-            (NRAEnvMap (NRAEnvAppEnv (NRAEnvApp p2 (NRAEnvUnop (ADot s) NRAEnvEnv)) NRAEnvID)
-                   (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec s) NRAEnvID))))
+      | (NRAEnvAppEnv (NRAEnvUnop OpFlatten (NRAEnvMapEnv p2))
+            (NRAEnvBinop OpRecMerge NRAEnvEnv (NRAEnvUnop (OpRec s) NRAEnvID))) =>
+         (NRAEnvUnop OpFlatten
+            (NRAEnvMap (NRAEnvAppEnv (NRAEnvApp p2 (NRAEnvUnop (OpDot s) NRAEnvEnv)) NRAEnvID)
+                   (NRAEnvBinop OpRecMerge NRAEnvEnv (NRAEnvUnop (OpRec s) NRAEnvID))))
       | _ => p
     end.
   
@@ -1931,8 +1931,8 @@ Section NRAEnvOptimizer.
 
   Definition tselect_over_flatten_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvSelect p₁ (NRAEnvUnop AFlatten p₂) =>
-      NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvSelect p₁ NRAEnvID) p₂)
+    | NRAEnvSelect p₁ (NRAEnvUnop OpFlatten p₂) =>
+      NRAEnvUnop OpFlatten (NRAEnvMap (NRAEnvSelect p₁ NRAEnvID) p₂)
     | _ => p
     end.
 
@@ -1957,8 +1957,8 @@ Section NRAEnvOptimizer.
 
   Definition tmap_over_flatten_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvMap p₁ (NRAEnvUnop AFlatten p₂) =>
-      NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvMap p₁ NRAEnvID) p₂)
+    | NRAEnvMap p₁ (NRAEnvUnop OpFlatten p₂) =>
+      NRAEnvUnop OpFlatten (NRAEnvMap (NRAEnvMap p₁ NRAEnvID) p₂)
     | _ => p
     end.
 
@@ -1983,8 +1983,8 @@ Section NRAEnvOptimizer.
 
   Definition tmap_over_flatten_map_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvMap p₁ (NRAEnvUnop AFlatten (NRAEnvMap p₂ p₃)) =>
-      NRAEnvUnop AFlatten (NRAEnvMap (NRAEnvMap p₁ p₂) p₃)
+    | NRAEnvMap p₁ (NRAEnvUnop OpFlatten (NRAEnvMap p₂ p₃)) =>
+      NRAEnvUnop OpFlatten (NRAEnvMap (NRAEnvMap p₁ p₂) p₃)
       | _ => p
     end.
 
@@ -2009,10 +2009,10 @@ Section NRAEnvOptimizer.
 
   Definition tconcat_over_rec_eq_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | (NRAEnvBinop AConcat
-                 (NRAEnvUnop (ARec s₁) p₁) (NRAEnvUnop (ARec s₂) p₂))
+      | (NRAEnvBinop OpRecConcat
+                 (NRAEnvUnop (OpRec s₁) p₁) (NRAEnvUnop (OpRec s₂) p₂))
         => if string_dec s₁ s₂ 
-           then (NRAEnvUnop (ARec s₂) p₂)
+           then (NRAEnvUnop (OpRec s₂) p₂)
            else p
       | _ => p
     end.
@@ -2086,12 +2086,12 @@ Section NRAEnvOptimizer.
 
   Definition tflip_env1_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvAppEnv (NRAEnvMap NRAEnvEnv (NRAEnvSelect q₁ (NRAEnvUnop AColl NRAEnvID))) q₂ =>
+    | NRAEnvAppEnv (NRAEnvMap NRAEnvEnv (NRAEnvSelect q₁ (NRAEnvUnop OpBag NRAEnvID))) q₂ =>
       match q₂ with
-      | NRAEnvID => (NRAEnvAppEnv (NRAEnvSelect q₁ (NRAEnvUnop AColl NRAEnvID)) NRAEnvID)
+      | NRAEnvID => (NRAEnvAppEnv (NRAEnvSelect q₁ (NRAEnvUnop OpBag NRAEnvID)) NRAEnvID)
       | _ =>
         if (nraenv_ignores_env_fun q₁)
-        then NRAEnvMap q₂ (NRAEnvSelect q₁ (NRAEnvUnop AColl NRAEnvID))
+        then NRAEnvMap q₂ (NRAEnvSelect q₁ (NRAEnvUnop OpBag NRAEnvID))
         else p
       end
     | _ => p
@@ -2129,8 +2129,8 @@ Section NRAEnvOptimizer.
 
   Definition tflip_env2_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      (NRAEnvAppEnv (NRAEnvSelect p (NRAEnvUnop AColl NRAEnvID)) NRAEnvID) =>
-      (NRAEnvSelect (NRAEnvAppEnv p NRAEnvID) (NRAEnvUnop AColl NRAEnvID))
+      (NRAEnvAppEnv (NRAEnvSelect p (NRAEnvUnop OpBag NRAEnvID)) NRAEnvID) =>
+      (NRAEnvSelect (NRAEnvAppEnv p NRAEnvID) (NRAEnvUnop OpBag NRAEnvID))
     | _ => p
     end.
   
@@ -2153,8 +2153,8 @@ Section NRAEnvOptimizer.
 
   Definition tmapenv_over_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      (NRAEnvAppEnv (NRAEnvMapEnv p1) (NRAEnvUnop AColl p2)) =>
-      (NRAEnvUnop AColl (NRAEnvAppEnv p1 p2))
+      (NRAEnvAppEnv (NRAEnvMapEnv p1) (NRAEnvUnop OpBag p2)) =>
+      (NRAEnvUnop OpBag (NRAEnvAppEnv p1 p2))
     | _ => p
     end.
 
@@ -2201,10 +2201,10 @@ Section NRAEnvOptimizer.
 
   Definition tflip_env6_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvMap (NRAEnvBinop AMergeConcat NRAEnvEnv NRAEnvID)
-                (NRAEnvSelect p1 (NRAEnvBinop AMergeConcat NRAEnvEnv p2)) =>
-      NRAEnvMap (NRAEnvUnop AColl NRAEnvID)
-                (NRAEnvSelect p1 (NRAEnvBinop AMergeConcat NRAEnvEnv p2))
+    | NRAEnvMap (NRAEnvBinop OpRecMerge NRAEnvEnv NRAEnvID)
+                (NRAEnvSelect p1 (NRAEnvBinop OpRecMerge NRAEnvEnv p2)) =>
+      NRAEnvMap (NRAEnvUnop OpBag NRAEnvID)
+                (NRAEnvSelect p1 (NRAEnvBinop OpRecMerge NRAEnvEnv p2))
     | _ => p
     end.
   
@@ -2261,13 +2261,13 @@ Section NRAEnvOptimizer.
 
   Definition tmerge_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvBinop AMergeConcat (NRAEnvUnop (ARec s1) p1) (NRAEnvUnop (ARec s2) p2) =>
+    | NRAEnvBinop OpRecMerge (NRAEnvUnop (OpRec s1) p1) (NRAEnvUnop (OpRec s2) p2) =>
       if (s1 == s2)
       then p
-      else NRAEnvUnop AColl
-                      (NRAEnvBinop AConcat
-                                   (NRAEnvUnop (ARec s1) p1)
-                                   (NRAEnvUnop (ARec s2) p2))
+      else NRAEnvUnop OpBag
+                      (NRAEnvBinop OpRecConcat
+                                   (NRAEnvUnop (OpRec s1) p1)
+                                   (NRAEnvUnop (OpRec s2) p2))
     | _ => p
     end.
 
@@ -2291,18 +2291,18 @@ Section NRAEnvOptimizer.
 
   Definition tmerge_with_concat_to_concat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-    | NRAEnvBinop AMergeConcat (NRAEnvUnop (ARec s1) p1)
-                  (NRAEnvBinop AConcat (NRAEnvUnop (ARec s1') p1')
-                               (NRAEnvUnop (ARec s2) p2)) =>
+    | NRAEnvBinop OpRecMerge (NRAEnvUnop (OpRec s1) p1)
+                  (NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec s1') p1')
+                               (NRAEnvUnop (OpRec s2) p2)) =>
         if (s1 == s2)
         then p
         else
           if (s1 == s1')
           then
             if (p1 == p1')
-            then NRAEnvUnop AColl (NRAEnvBinop AConcat
-                                               (NRAEnvUnop (ARec s1) p1)
-                                               (NRAEnvUnop (ARec s2) p2))
+            then NRAEnvUnop OpBag (NRAEnvBinop OpRecConcat
+                                               (NRAEnvUnop (OpRec s1) p1)
+                                               (NRAEnvUnop (OpRec s2) p2))
             else p
           else p
       | _ => p
@@ -2328,8 +2328,8 @@ Section NRAEnvOptimizer.
 
   Definition tdot_over_rec_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | NRAEnvUnop (ADot s2)
-                 (NRAEnvUnop (ARec s1) p1) =>
+    | NRAEnvUnop (OpDot s2)
+                 (NRAEnvUnop (OpRec s1) p1) =>
       if (s1 == s2) then p1
       else p
     | _ => p
@@ -2354,8 +2354,8 @@ Section NRAEnvOptimizer.
 
   Definition tnested_map_over_singletons_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | NRAEnvUnop AFlatten
-                 (NRAEnvMap (NRAEnvSelect q₁ (NRAEnvUnop AColl q₂)) q₃) =>
+    | NRAEnvUnop OpFlatten
+                 (NRAEnvMap (NRAEnvSelect q₁ (NRAEnvUnop OpBag q₂)) q₃) =>
       NRAEnvSelect q₁ (NRAEnvMap q₂ q₃)
     | _ => p
     end.
@@ -2380,9 +2380,9 @@ Section NRAEnvOptimizer.
   Definition tappenv_mapenv_to_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
     | NRAEnvAppEnv (NRAEnvMapEnv q)
-                   (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec a) NRAEnvID)) =>
-      NRAEnvMap (NRAEnvAppEnv (NRAEnvApp q (NRAEnvUnop (ADot a) NRAEnvEnv)) NRAEnvID)
-                (NRAEnvBinop AMergeConcat NRAEnvEnv (NRAEnvUnop (ARec a) NRAEnvID))
+                   (NRAEnvBinop OpRecMerge NRAEnvEnv (NRAEnvUnop (OpRec a) NRAEnvID)) =>
+      NRAEnvMap (NRAEnvAppEnv (NRAEnvApp q (NRAEnvUnop (OpDot a) NRAEnvEnv)) NRAEnvID)
+                (NRAEnvBinop OpRecMerge NRAEnvEnv (NRAEnvUnop (OpRec a) NRAEnvID))
     | _ => p
     end.
 
@@ -2407,7 +2407,7 @@ Section NRAEnvOptimizer.
 
    Definition trproject_nil_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject nil) p₁
+      | NRAEnvUnop (OpRecProject nil) p₁
         => NRAEnvConst (drec nil)
       | _ => p
     end.
@@ -2433,7 +2433,7 @@ Section NRAEnvOptimizer.
 
   Definition trproject_over_const_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject sl)
+      | NRAEnvUnop (OpRecProject sl)
           (NRAEnvConst (drec l))
         => NRAEnvConst (drec (rproject l sl))
       | _ => p
@@ -2460,10 +2460,10 @@ Section NRAEnvOptimizer.
 
   Definition trproject_over_rec_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject sl)
-          (NRAEnvUnop (ARec s) p₁)
+      | NRAEnvUnop (OpRecProject sl)
+          (NRAEnvUnop (OpRec s) p₁)
         => if in_dec string_dec s sl
-           then NRAEnvUnop (ARec s) p₁
+           then NRAEnvUnop (OpRec s) p₁
            else NRAEnvConst (drec nil)
       | _ => p
     end.
@@ -2490,14 +2490,14 @@ Section NRAEnvOptimizer.
 
   Definition trproject_over_concat_r_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject sl)
-               (NRAEnvBinop AConcat
-                        p₁ (NRAEnvUnop (ARec s) p₂))
+      | NRAEnvUnop (OpRecProject sl)
+               (NRAEnvBinop OpRecConcat
+                        p₁ (NRAEnvUnop (OpRec s) p₂))
         => if in_dec string_dec s sl
-           then NRAEnvBinop AConcat
-                        (NRAEnvUnop (ARecProject (remove string_dec s sl)) p₁)
-                        (NRAEnvUnop (ARec s) p₂)
-           else (NRAEnvUnop (ARecProject sl) p₁)
+           then NRAEnvBinop OpRecConcat
+                        (NRAEnvUnop (OpRecProject (remove string_dec s sl)) p₁)
+                        (NRAEnvUnop (OpRec s) p₂)
+           else (NRAEnvUnop (OpRecProject sl) p₁)
       | _ => p
     end.
 
@@ -2523,14 +2523,14 @@ Section NRAEnvOptimizer.
 
   Definition trproject_over_concat_l_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject sl)
-               (NRAEnvBinop AConcat
-                        (NRAEnvUnop (ARec s) p₁) p₂)
+      | NRAEnvUnop (OpRecProject sl)
+               (NRAEnvBinop OpRecConcat
+                        (NRAEnvUnop (OpRec s) p₁) p₂)
         => if in_dec string_dec s sl
                      (* this case would need shape/type inference to handle, since we don't know if s is in p₂ *)
 
            then p
-           else (NRAEnvUnop (ARecProject sl) p₂)
+           else (NRAEnvUnop (OpRecProject sl) p₂)
       | _ => p
     end.
 
@@ -2555,9 +2555,9 @@ Section NRAEnvOptimizer.
 
   Definition trproject_over_rproject_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject sl1)
-          (NRAEnvUnop (ARecProject sl2) p1)
-        => NRAEnvUnop (ARecProject (set_inter string_dec sl2 sl1)) p1
+      | NRAEnvUnop (OpRecProject sl1)
+          (NRAEnvUnop (OpRecProject sl2) p1)
+        => NRAEnvUnop (OpRecProject (set_inter string_dec sl2 sl1)) p1
       | _ => p
     end.
 
@@ -2582,9 +2582,9 @@ Section NRAEnvOptimizer.
 
   Definition trproject_over_either_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop (ARecProject sl)
+      | NRAEnvUnop (OpRecProject sl)
           (NRAEnvEither p₁ p₂)
-        => NRAEnvEither (NRAEnvUnop (ARecProject sl) p₁) (NRAEnvUnop (ARecProject sl) p₂)
+        => NRAEnvEither (NRAEnvUnop (OpRecProject sl) p₁) (NRAEnvUnop (OpRecProject sl) p₂)
       | _ => p
     end.
 
@@ -2609,7 +2609,7 @@ Section NRAEnvOptimizer.
 
   Definition tcount_over_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-      | NRAEnvUnop ACount (NRAEnvMap p₁ p₂) => NRAEnvUnop ACount p₂
+      | NRAEnvUnop OpCount (NRAEnvMap p₁ p₂) => NRAEnvUnop OpCount p₂
       | _ => p
     end.
 
@@ -2634,10 +2634,10 @@ Section NRAEnvOptimizer.
 
   Definition tcount_over_flat_map_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
+    | NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
                              (NRAEnvMap (NRAEnvMap p₁ p₂) p₃)) =>
-      NRAEnvUnop ACount (NRAEnvUnop AFlatten (NRAEnvMap p₂ p₃))
+      NRAEnvUnop OpCount (NRAEnvUnop OpFlatten (NRAEnvMap p₂ p₃))
     | _ => p
     end.
 
@@ -2663,13 +2663,13 @@ Section NRAEnvOptimizer.
 
   Definition tcount_over_flat_map_either_nil_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
+    | NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
                              (NRAEnvMap (NRAEnvEither (NRAEnvMap p₁ p₂)
                                                       (NRAEnvConst (dcoll nil)))
                                         p₃)) =>
-      NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
+      NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
                              (NRAEnvMap (NRAEnvEither p₂
                                                       (NRAEnvConst (dcoll nil))) p₃))
     | _ => p
@@ -2696,13 +2696,13 @@ Section NRAEnvOptimizer.
 
   Definition tcount_over_flat_map_either_nil_app_map_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
+    | NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
                              (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvMap p₁ p₂)
                                                                  (NRAEnvConst (dcoll nil))) p₄)
                                         p₃)) =>
-      NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
+      NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
                              (NRAEnvMap (NRAEnvApp
                                            (NRAEnvEither p₂ (NRAEnvConst (dcoll nil)))
                                            p₄)
@@ -2731,13 +2731,13 @@ Section NRAEnvOptimizer.
 
   Definition tcount_over_flat_map_either_nil_app_singleton_fun {fruntime:foreign_runtime} (p:nraenv) :=
     match p with
-    | NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
-                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvUnop AColl p₁)
+    | NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
+                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvUnop OpBag p₁)
                                                                  (NRAEnvConst (dcoll nil))) p₃) p₂)) =>
-      NRAEnvUnop ACount
-                 (NRAEnvUnop AFlatten
-                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvUnop AColl (NRAEnvConst dunit))
+      NRAEnvUnop OpCount
+                 (NRAEnvUnop OpFlatten
+                             (NRAEnvMap (NRAEnvApp (NRAEnvEither (NRAEnvUnop OpBag (NRAEnvConst dunit))
                                                                  (NRAEnvConst (dcoll nil))) p₃) p₂))
     | _ => p
     end.
@@ -2766,7 +2766,7 @@ Section NRAEnvOptimizer.
   (* ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ₓ p₁ ◯ (‵[||]) *)
   Definition tmapconcat_over_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  NRAEnvMapConcat p (NRAEnvUnop AColl (NRAEnvConst (drec []))) =>
+      |  NRAEnvMapConcat p (NRAEnvUnop OpBag (NRAEnvConst (drec []))) =>
          NRAEnvApp p (NRAEnvConst (drec []))
       | _ => p
     end.

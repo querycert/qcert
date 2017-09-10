@@ -64,8 +64,8 @@ Section CAMP.
   
   Inductive camp : Set :=
   | pconst : data -> camp                  (**r Constant value *)
-  | punop : unaryOp -> camp -> camp        (**r Unary operators *)
-  | pbinop : binOp -> camp -> camp -> camp (**r Binary operators *)
+  | punop : unary_op -> camp -> camp        (**r Unary operators *)
+  | pbinop : binary_op -> camp -> camp -> camp (**r Binary operators *)
   | pmap : camp -> camp                    (**r Functional map *)
   | passert : camp -> camp                 (**r Assert pattern-matching success *)
   | porElse : camp -> camp -> camp         (**r Recover from failure *)
@@ -102,8 +102,8 @@ Section CAMP.
     change (forall x y : camp, {x = y} + {x <> y}).
     decide equality.
     apply data_eqdec.
-    apply unaryOp_eqdec.
-    apply binOp_eqdec.
+    apply unary_op_eqdec.
+    apply binary_op_eqdec.
     apply string_dec.
   Qed.
 
@@ -125,12 +125,12 @@ Section CAMP.
       := match p with
          | pconst d' => Success (normalize_data h d')
          | punop op p₁ => bindpr (camp_eval p₁ bind d)
-                                 (fun d' => (op2tpr (fun_of_unaryop h op d')))
+                                 (fun d' => (op2tpr (unary_op_eval h op d')))
          | pbinop op p₁ p₂ => 
            bindpr (camp_eval p₁ bind d)
                   (fun d'₁ => 
                      bindpr (camp_eval p₂ bind d)
-                            (fun d'₂ =>  (op2tpr (fun_of_binop h op d'₁ d'₂))))
+                            (fun d'₂ =>  (op2tpr (binary_op_eval h op d'₁ d'₂))))
          | pmap p₁ =>
            match d with
            | dcoll l => liftpr dcoll (gather_successes (map (camp_eval p₁ bind) l))
@@ -327,7 +327,7 @@ Section CAMP.
            | TerminalError_debug s loc' => TerminalError_debug s loc'
            | RecoverableError_debug s => RecoverableError_debug s
            | Success_debug d' => 
-             match fun_of_unaryop h op d' with
+             match unary_op_eval h op d' with
              | None => TerminalError_debug (punop_err (punop op p₁) bind d d')  loc
              | Some x => Success_debug x
              end
@@ -341,7 +341,7 @@ Section CAMP.
              | TerminalError_debug s loc' => TerminalError_debug s loc'
              | RecoverableError_debug s => RecoverableError_debug s
              | Success_debug d'₂ =>
-               match fun_of_binop h op d'₁ d'₂ with
+               match binary_op_eval h op d'₁ d'₂ with
                | None => TerminalError_debug (binop_err (pbinop op p₁ p₂) bind d d'₁ d'₂)  loc
                | Some x => Success_debug x
                end
@@ -420,10 +420,10 @@ Section CAMP.
       camp_cases (induction p) Case; simpl; intros.
       - trivial.
       - apply bindpr_presult_same; [eauto | ]; intros.
-        destruct (fun_of_unaryop h u x); simpl; trivial. 
+        destruct (unary_op_eval h u x); simpl; trivial. 
       - apply bindpr_presult_same; [eauto | ]; intros.
         apply bindpr_presult_same; [eauto | ]; intros.
-        destruct (fun_of_binop h b x x0); simpl; trivial.
+        destruct (binary_op_eval h b x x0); simpl; trivial.
       - destruct d; simpl; trivial.
         apply liftpr_presult_same.
         apply gather_successes_presult_same.

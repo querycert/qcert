@@ -33,7 +33,7 @@ Section tDNNRCTests.
   (* A4 : Persons.map{p => p.name} *)
 
   Definition A4 :=
-    LNRAMap (LNRALambda "p" (LNRAUnop (ADot "name") (LNRAVar "p"))) (LNRATable "Persons").
+    LNRAMap (LNRALambda "p" (LNRAUnop (OpDot "name") (LNRAVar "p"))) (LNRATable "Persons").
 
   Require Import CompDriver.
 

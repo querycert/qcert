@@ -52,29 +52,29 @@ _var ⊕ [[ op2 ]]_var *)
     | AMapConcat op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let (t1,t2) := fresh_var2 "tmc$" "tmc$" (var::nil) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
                (NNRCFor t1 nnrc2
                         (NNRCFor t2 (nra_to_nnrc_core op1 t1)
-                                 ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                 ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ op1 × op2 ]]_var
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_var } | t1 ∈ [[ op1 ]]_var } *)
     | AProduct op1 op2 =>
       let nnrc1 := (nra_to_nnrc_core op1 var) in
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let (t1,t2) := fresh_var2 "tprod$" "tprod$" (var::nil) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
                (NNRCFor t1 nnrc1
                         (NNRCFor t2 nnrc2
-                                 ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                 ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ σ⟨ op1 ⟩(op2) ]]_var
                == ⋃{ if [[ op1 ]]_t1 then { t1 } else {} | t1 ∈ [[ op2 ]]_var } *)
     | ASelect op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tsel$" (var::nil) in
       let nnrc1 := (nra_to_nnrc_core op1 t) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
                (NNRCFor t nnrc2
-                        (NNRCIf nnrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
+                        (NNRCIf nnrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
     (* [[ op1 ∥ op2 ]]_var == let t := [[ op1 ]]_var in
                                   if (t = {})
                                   then [[ op2 ]]_var
@@ -84,9 +84,9 @@ _var ⊕ [[ op2 ]]_var *)
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tdef$" (var::nil) in
       (NNRCLet t nnrc1
-               (NNRCIf (NNRCBinop AEq
+               (NNRCIf (NNRCBinop OpEqual
                                   (NNRCVar t)
-                                  (NNRCUnop AFlatten (NNRCConst (dcoll nil))))
+                                  (NNRCUnop OpFlatten (NNRCConst (dcoll nil))))
                        nnrc2 (NNRCVar t)))
     (* [[ op1 ◯ op2 ]]_var == let t := [[ op2 ]]_var
                                   in [[ op1 ]]_t *)
@@ -99,8 +99,9 @@ _var ⊕ [[ op2 ]]_var *)
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "ec$" (var::nil) in 
       NNRCLet t nnrc2
-              (NNRCEither nnrc1 var (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar var) (NNRCVar t)))
-                          var (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar var) (NNRCVar t))))
+              (NNRCEither nnrc1
+                          var (NNRCUnop OpLeft (NNRCBinop OpRecConcat (NNRCVar var) (NNRCVar t)))
+                          var (NNRCUnop OpRight (NNRCBinop OpRecConcat (NNRCVar var) (NNRCVar t))))
     | AApp op1 op2 =>
       let nnrc2 := (nra_to_nnrc_core op2 var) in
       let t := fresh_var "tapp$" (var::nil) in

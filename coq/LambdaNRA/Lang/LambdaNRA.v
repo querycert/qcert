@@ -33,8 +33,8 @@ Section LambdaNRA.
   | LNRAVar : string -> lambda_nra (* Variable access *)
   | LNRATable : string -> lambda_nra
   | LNRAConst : data -> lambda_nra
-  | LNRABinop : binOp -> lambda_nra -> lambda_nra -> lambda_nra
-  | LNRAUnop : unaryOp -> lambda_nra -> lambda_nra
+  | LNRABinop : binary_op -> lambda_nra -> lambda_nra -> lambda_nra
+  | LNRAUnop : unary_op -> lambda_nra -> lambda_nra
   | LNRAMap : lnra_lambda -> lambda_nra -> lambda_nra (* 'dependent operators' use lambdas *)
   | LNRAMapConcat : lnra_lambda -> lambda_nra -> lambda_nra
   | LNRAProduct : lambda_nra -> lambda_nra -> lambda_nra
@@ -65,8 +65,8 @@ Section LambdaNRA.
               (fvar : forall s : string, P (LNRAVar s))
               (ftable : forall t : string, P (LNRATable t))
               (fconst : forall d : data, P (LNRAConst d))
-              (fbinop : forall (b : binOp) (l0 l1: lambda_nra), P l0 -> P l1 -> P (LNRABinop b l0 l1))
-              (funop : forall (u : unaryOp) (l : lambda_nra), P l -> P (LNRAUnop u l))
+              (fbinop : forall (b : binary_op) (l0 l1: lambda_nra), P l0 -> P l1 -> P (LNRABinop b l0 l1))
+              (funop : forall (u : unary_op) (l : lambda_nra), P l -> P (LNRAUnop u l))
               (fmap : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMap (LNRALambda s l0) l1))
               (fmapconcat : forall (s:string) (l0 l1 : lambda_nra), P l0 -> P l1 -> P (LNRAMapConcat (LNRALambda s l0) l1))
               (fproduct : forall l : lambda_nra, P l -> forall l0 : lambda_nra, P l0 -> P (LNRAProduct l l0))
@@ -101,9 +101,9 @@ Section LambdaNRA.
       | LNRATable t => edot global_env t
       | LNRAConst d => Some (normalize_data h d)
       | LNRABinop b op1 op2 =>
-        olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
+        olift2 (fun d1 d2 => binary_op_eval h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2)
       | LNRAUnop u op1 =>
-        olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1)
+        olift (fun d1 => unary_op_eval h u d1) (lambda_nra_eval env op1)
       | LNRAMap lop1 op2 =>
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (rmap (lnra_lambda_eval env lop1) c1)) d
@@ -165,16 +165,16 @@ Section LambdaNRA.
       reflexivity.
     Qed.
 
-    Lemma lambda_nra_eval_binop_eq env b op1 op2 :
+    Lemma lambda_nra_eval_binary_op_eq env b op1 op2 :
       lambda_nra_eval env (LNRABinop b op1 op2) = 
-      olift2 (fun d1 d2 => fun_of_binop h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
+      olift2 (fun d1 d2 => binary_op_eval h b d1 d2) (lambda_nra_eval env op1) (lambda_nra_eval env op2).
     Proof.
       reflexivity.
     Qed.
 
     Lemma lambda_nra_eval_unop_eq env u op1 :
       lambda_nra_eval env (LNRAUnop u op1) = 
-      olift (fun d1 => fun_of_unaryop h u d1) (lambda_nra_eval env op1).
+      olift (fun d1 => unary_op_eval h u d1) (lambda_nra_eval env op1).
     Proof.
       reflexivity.
     Qed.
@@ -252,11 +252,11 @@ Section LambdaNRA.
         unfold olift2 in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
         match_case_in H; intros; rewrite H3 in H; try discriminate.
-        eapply fun_of_binop_normalized; eauto.
+        eapply binary_op_eval_normalized; eauto.
       - Case "LNRAUnop"%string.
         unfold olift in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
-        eapply fun_of_unaryop_normalized; eauto.
+        eapply unary_op_eval_normalized; eauto.
       - Case "LNRAMap"%string.
         unfold olift in H.
         match_case_in H; intros; rewrite H2 in H; try discriminate.
@@ -416,7 +416,7 @@ Section LambdaNRA.
   Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
-  Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
+  Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
   Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.
@@ -479,7 +479,7 @@ Hint Rewrite @lnra_lambda_eval_lambda_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_var_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_table_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_const_eq : lambda_nra.
-Hint Rewrite @lambda_nra_eval_binop_eq : lambda_nra.
+Hint Rewrite @lambda_nra_eval_binary_op_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_unop_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_map_eq : lambda_nra.
 Hint Rewrite @lambda_nra_eval_map_concat_eq : lambda_nra.

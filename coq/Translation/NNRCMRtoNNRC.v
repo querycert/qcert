@@ -68,14 +68,14 @@ Section NNRCMRtoNNRC.
       let res_map :=
           NNRCFor x (NNRCVar input) n
       in
-      NNRCUnop AFlatten res_map
+      NNRCUnop OpFlatten res_map
     | MapScalar (x, n) =>
       NNRCFor x (NNRCVar input) n
     end.
 
   Definition nnrc_of_mr (m:mr) : option nnrc :=
     match (m.(mr_map), m.(mr_reduce)) with
-    | (MapScalar (x, NNRCUnop AColl n), RedSingleton) =>
+    | (MapScalar (x, NNRCUnop OpBag n), RedSingleton) =>
       Some (gen_apply_fun (x, n) (NNRCVar m.(mr_input)))
     | (_, RedSingleton) =>
       None
@@ -101,7 +101,7 @@ Section NNRCMRtoNNRC.
         Some (NNRCLet
                 (mr_output mr)
                 (if in_dec equiv_dec (mr_output mr) outputs then
-                   NNRCBinop AUnion (NNRCVar (mr_output mr)) n
+                   NNRCBinop OpBagUnion (NNRCVar (mr_output mr)) n
                  else n)
                 k)
       | _ => None

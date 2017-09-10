@@ -45,7 +45,7 @@ Section NNRCMRRewrite.
     let (x, n) := f in
     match n with
     | NNRCVar y => equiv_decb x y
-    | NNRCUnop AIdOp (NNRCVar y) => equiv_decb x y
+    | NNRCUnop OpIdentity (NNRCVar y) => equiv_decb x y
     | _ => false
     end.
 
@@ -55,7 +55,7 @@ Section NNRCMRRewrite.
   Definition is_coll_function (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NNRCUnop AColl (NNRCVar y) => equiv_decb x y
+    | NNRCUnop OpBag (NNRCVar y) => equiv_decb x y
     | _ => false
     end.
 
@@ -74,8 +74,8 @@ Section NNRCMRRewrite.
   Definition is_flatten_function (f: var * nnrc) :=
     let (x, n) := f in
     match n with
-    | NNRCUnop AFlatten (NNRCVar y) => equiv_decb x y
-    | NNRCLet a (NNRCUnop AFlatten (NNRCVar y)) (NNRCVar b) => equiv_decb x y && equiv_decb a b
+    | NNRCUnop OpFlatten (NNRCVar y) => equiv_decb x y
+    | NNRCLet a (NNRCUnop OpFlatten (NNRCVar y)) (NNRCVar b) => equiv_decb x y && equiv_decb a b
     | _ => false
     end.
 
@@ -112,7 +112,7 @@ Section NNRCMRRewrite.
     let (x, n) := f in
     match n with
     | NNRCLet a
-             (NNRCEither (NNRCUnop ASingleton (NNRCVar y))
+             (NNRCEither (NNRCUnop OpSingleton (NNRCVar y))
                         b (NNRCVar b')
                         c (NNRCConst dunit))
              n' =>
@@ -1097,7 +1097,7 @@ Section NNRCMRRewrite.
     if equiv_decb mr1.(mr_output) mr2.(mr_input)
        && is_singleton_reduce mr1.(mr_reduce) then
       match mr1.(mr_map), mr2.(mr_map) with
-      | MapScalar (x1, NNRCUnop AColl n1), MapScalar (x2, n2) =>
+      | MapScalar (x1, NNRCUnop OpBag n1), MapScalar (x2, n2) =>
         let map :=
             MapScalar (x1, NNRCLet x2 n1 n2)
         in
@@ -1252,8 +1252,8 @@ Section NNRCMRRewrite.
   (*          && is_id_flat_map mr2.(mr_flat_map) then *)
   (*       let map := *)
   (*           match mr1.(mr_flat_map) with *)
-  (*           | (x, NNRCUnop AColl n) => (x, n) *)
-  (*           | (x, n) => (x, NNRCUnop AFlatten n) *)
+  (*           | (x, NNRCUnop OpBag n) => (x, n) *)
+  (*           | (x, n) => (x, NNRCUnop OpFlatten n) *)
   (*           end *)
   (*       in *)
   (*       let mr := *)
@@ -1291,7 +1291,7 @@ Section NNRCMRRewrite.
   (*       let map := *)
   (*           let (x1, n1) := mr1.(mr_flat_map) in *)
   (*           let (x2, n2) := mr2.(mr_flat_map) in *)
-  (*           (x1, NNRCUnop AFlatten (NNRCFor x2 n1 n2)) *)
+  (*           (x1, NNRCUnop OpFlatten (NNRCFor x2 n1 n2)) *)
   (*       in *)
   (*       let mr := *)
   (*           mkMR *)
@@ -1317,7 +1317,7 @@ Section NNRCMRRewrite.
     | (x::nil, (output, Vscalar)::nil) =>
       if equiv_decb output mr.(mr_output) && is_singleton_reduce mr.(mr_reduce) then
         match mr.(mr_map) with
-        | MapScalar (x1, NNRCUnop AColl n1) =>
+        | MapScalar (x1, NNRCUnop OpBag n1) =>
           Some ((mr.(mr_input)::nil, NNRCLet x
                                             (NNRCLet x1 (NNRCVar mr.(mr_input)) n1)
                                             n),

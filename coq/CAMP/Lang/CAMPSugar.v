@@ -32,29 +32,29 @@ Section CAMPSugar.
   Definition paccept := pconst (drec nil).
 
   Definition pfail : camp := passert (pconst (dconst false)).
-  Definition makeSingleton (p:camp) : camp := punop AColl p.
+  Definition makeSingleton (p:camp) : camp := punop OpBag p.
 
   (* Some operators macros *)
     
   Definition pand (p1 p2:camp):= pletEnv (passert p1) p2.
     
   (* Java equivalent: CampToStringMacro *)
-  Definition toString p := punop AToString p.
+  Definition toString p := punop OpToString p.
 
   Definition psome := pleft.
   Definition pnone := pright.
   Definition pnull := (pconst dnone).
   
   (* Used in the expansion of Java macro CampUnbrandDotMacro *)
-  Definition punbrand' p := punop AUnbrand p.
+  Definition punbrand' p := punop OpUnbrand p.
   (* Used in the expansion of Java macro CampUnbrandDotMacro *)
   Definition punbrand := punbrand' pit.
 
-  Definition pcast' b p:= pletIt (punop (ACast b) p) psome.
+  Definition pcast' b p:= pletIt (punop (OpCast b) p) psome.
   (* Java equivalent: CampCastMacro *)
   Definition pcast b := pcast' b pit.
 
-  Definition psingleton' p := pletIt (punop ASingleton p) psome.
+  Definition psingleton' p := pletIt (punop OpSingleton p) psome.
   Definition psingleton := psingleton' pit.
 
   (* Some var/env macros *)
@@ -62,11 +62,11 @@ Section CAMPSugar.
   (* Java equivalent: CampBindingsMacro *)
   Definition pWithBindings : camp -> camp := pletIt penv.
   (* Java equivalent: CampVarwithMacro *)
-  Definition pvarwith f : camp -> camp := punop (ARec f).
+  Definition pvarwith f : camp -> camp := punop (OpRec f).
   (* Inlined in several Java macro definitions *)
   Definition pvar f : camp := pvarwith f pit.
   (* Used in the expansion of Java macro CampUnbrandDotMacro *)
-  Definition pdot f : camp -> camp := pletIt (punop (ADot f) pit).
+  Definition pdot f : camp -> camp := pletIt (punop (OpDot f) pit).
   (* Java equivalent: CampUnbrandDotMacro *)
   Definition pbdot s p : camp := (pletIt punbrand (pdot s p)).
   Definition pbsomedot s p : camp := (pletIt (pbdot s p) psome).
@@ -83,7 +83,7 @@ Section CAMPSugar.
     
   Example empty_binding := @nil (string*data).
 
-  Definition stringConcat a b := pbinop ASConcat (toString a) (toString b).
+  Definition stringConcat a b := pbinop OpStringConcat (toString a) (toString b).
     
   (* Some notations *)
 
@@ -124,7 +124,7 @@ Section CAMPSugar.
                    end
        end.
 
-  Definition camp_binop_reduce (b:binOp) (l:list camp) : camp :=
+  Definition camp_binop_reduce (b:binary_op) (l:list camp) : camp :=
     camp_reduce (fun p1 p2 => (pbinop b p1 p2)) l.
 
   (* Defines what it means for two patterns to be equivalent *)
@@ -161,7 +161,7 @@ Section CAMPSugar.
 
   (* Java equivalent: CampVariablesMacro *)
   Definition returnVariables (sl:list string) : camp
-    := punop (ARecProject (insertion_sort ODT_lt_dec sl)) penv.
+    := punop (OpRecProject (insertion_sort ODT_lt_dec sl)) penv.
 
   (** Useful definitions *)
   (* Java equivalent: CampNowMacro *)
@@ -173,21 +173,21 @@ Section CAMPSugar.
    * See mapall_let in Translation/NNRCtoCAMP.v for a version
    * that uses a fresh variable to avoid recomputing (pmap p) 
    *)
-  Notation "p1 ≐ p2" := (passert (pbinop AEq p1 p2)) (right associativity, at level 70, only parsing).     (* ≐ = \doteq *)
+  Notation "p1 ≐ p2" := (passert (pbinop OpEqual p1 p2)) (right associativity, at level 70, only parsing).     (* ≐ = \doteq *)
   Notation "‵ c" := (pconst (dconst c)) (at level 0). (* ‵ = \backprime *)
 
   Definition mapall p :=
-    pletEnv (punop ACount pit ≐ punop ACount (pmap p))
+    pletEnv (punop OpCount pit ≐ punop OpCount (pmap p))
             (pmap p).
 
   Require Import ZArith.
   
   (* p does not hold for any element in the list *)
   (* Java equivalent: CampBasicFunctionRule.mapsnone *)
-  Definition mapsnone p := (punop ACount (pmap p) ≐ ‵(0%Z)).
+  Definition mapsnone p := (punop OpCount (pmap p) ≐ ‵(0%Z)).
 
   (* p holds for exactly one element in the list *)
-  Definition mapsone p := (punop ACount (pmap p) ≐ ‵(1%Z)).
+  Definition mapsone p := (punop OpCount (pmap p) ≐ ‵(1%Z)).
 
   (* Java equivalent: CampBasicFunctionRule.notholds *)
   Definition notholds p := WW (mapsnone p).
@@ -196,25 +196,25 @@ End CAMPSugar.
   
 Delimit Scope camp_scope with camp.
 
-Notation "p1 |p-eq| p2" := (pbinop AEq p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-union| p2" := (pbinop AUnion p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-concat| p2" := (pbinop AConcat p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-mergeconcat| p2" := (pbinop AMergeConcat p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-and| p2" := (pbinop AAnd p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-or| p2" := (pbinop AOr p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-lt| p2" := (pbinop ALt p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-le| p2" := (pbinop ALe p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-minus| p2" := (pbinop AMinus p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-min| p2" := (pbinop AMin p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-max| p2" := (pbinop AMax p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-contains| p2" := (pbinop AContains p1 p2) (right associativity, at level 70): camp_scope.
-Notation "p1 |p-sconcat| p2" := (pbinop ASConcat p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-eq| p2" := (pbinop OpEqual p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-union| p2" := (pbinop OpBagUnion p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-concat| p2" := (pbinop OpRecConcat p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-mergeconcat| p2" := (pbinop OpRecMerge p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-and| p2" := (pbinop OpAnd p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-or| p2" := (pbinop OpOr p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-lt| p2" := (pbinop OpLt p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-le| p2" := (pbinop OpLe p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-bagdiff| p2" := (pbinop OpBagDiff p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-bagmin| p2" := (pbinop OpBagMin p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-bagmax| p2" := (pbinop OpBagMax p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-contains| p2" := (pbinop OpContains p1 p2) (right associativity, at level 70): camp_scope.
+Notation "p1 |p-stringconcat| p2" := (pbinop OpStringConcat p1 p2) (right associativity, at level 70): camp_scope.
 Notation "a '+s+' b" := (stringConcat a b) (right associativity, at level 60) : camp_scope.
 
-Notation "|p-min-num|( p )" := (punop ANumMin p) (right associativity, at level 70): camp_scope.
-Notation "|p-max-num|( p )" := (punop ANumMin p) (right associativity, at level 70): camp_scope.
+Notation "|p-min-num|( p )" := (punop OpNumMin p) (right associativity, at level 70): camp_scope.
+Notation "|p-max-num|( p )" := (punop OpNumMin p) (right associativity, at level 70): camp_scope.
 
-Notation "p1 ≐ p2" := (passert (pbinop AEq p1 p2)) (right associativity, at level 70, only parsing): camp_scope.     (* ≐ = \doteq *)
+Notation "p1 ≐ p2" := (passert (pbinop OpEqual p1 p2)) (right associativity, at level 70, only parsing): camp_scope.     (* ≐ = \doteq *)
 Notation "p1 ∧ p2" := (pand p1 p2) (right associativity, at level 65): camp_scope. (* ∧ = \wedge *)
 Notation "…" := pit.
 Notation "s ↓ p" := (pdot s p) (right associativity, at level 30): camp_scope. (* ↓ = \downarrow *)
@@ -234,7 +234,7 @@ Notation "#` c" := (pconst (dconst c)) (only parsing, at level 0) : camp_scope.
 Notation "s #-> p" := (pdot s p) (only parsing, right associativity, at level 30): camp_scope.
 Notation "s !#-> p" := (pbdot s p) (only parsing, right associativity, at level 30): camp_scope.
 Notation "#_" := pit (only parsing): camp_scope.
-Notation "p1 #= p2" := (passert (pbinop AEq p1 p2)) (only parsing, right associativity, at level 70): camp_scope.
+Notation "p1 #= p2" := (passert (pbinop OpEqual p1 p2)) (only parsing, right associativity, at level 70): camp_scope.
 
 (* 
 *** Local Variables: ***

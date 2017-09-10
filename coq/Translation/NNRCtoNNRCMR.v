@@ -134,7 +134,7 @@ Section NNRCtoNNRCMR.
   Definition mr_chain_of_nnrc_with_no_free_var (n: nnrc) (initunit: var) (output: var) :=
     let coll_n :=
         let var := "x"%string in
-        (var, NNRCUnop AColl n)
+        (var, NNRCUnop OpBag n)
     in
     let mr :=
         mkMR
@@ -244,7 +244,7 @@ Section NNRCtoNNRCMR.
           mkMR
             x
             output
-            (MapScalar (x, NNRCUnop AColl n))
+            (MapScalar (x, NNRCUnop OpBag n))
             RedSingleton
       in
       (mr::nil)
@@ -439,8 +439,8 @@ Section NNRCtoNNRCMR.
          | Vlocal =>
            let mr_map_brand :=
                let d:var := "x"%string in
-               (d, NNRCUnop AColl
-                           (NNRCUnop (ABrand (singleton (brand_of_var fv))) (NNRCVar d)))
+               (d, NNRCUnop OpBag
+                           (NNRCUnop (OpBrand (singleton (brand_of_var fv))) (NNRCVar d)))
            in
            mkMR
              fv
@@ -450,7 +450,7 @@ Section NNRCtoNNRCMR.
          | Vdistr =>
            let mr_map_brand :=
                let d:var := "x"%string in
-               (d, NNRCUnop (ABrand (singleton (brand_of_var fv))) (NNRCVar d))
+               (d, NNRCUnop (OpBrand (singleton (brand_of_var fv))) (NNRCVar d))
            in
            mkMR
              fv
@@ -493,20 +493,20 @@ Section NNRCtoNNRCMR.
          | (fv, Vdistr) =>
            let d : var := fresh_var "unpackdistributed$" (closure_env_name :: nil) in
            NNRCLet fv
-                  (NNRCUnop AFlatten
+                  (NNRCUnop OpFlatten
                            (NNRCFor d (NNRCVar closure_env_name)
-                                   (NNRCEither (NNRCUnop (ACast (singleton (brand_of_var fv))) (NNRCVar d))
-                                              d (NNRCUnop AColl (NNRCUnop AUnbrand (NNRCVar d)))
+                                   (NNRCEither (NNRCUnop (OpCast (singleton (brand_of_var fv))) (NNRCVar d))
+                                              d (NNRCUnop OpBag (NNRCUnop OpUnbrand (NNRCVar d)))
                                               d (NNRCConst (dcoll nil)))))
                   k
          | (fv, Vlocal) =>
            let d : var := fresh_var "unpackscalar$" (closure_env_name :: nil) in
            NNRCLet fv
-                  (NNRCEither (NNRCUnop ASingleton
-                                      (NNRCUnop AFlatten
+                  (NNRCEither (NNRCUnop OpSingleton
+                                      (NNRCUnop OpFlatten
                                                (NNRCFor d (NNRCVar closure_env_name)
-                                                       (NNRCEither (NNRCUnop (ACast (singleton (brand_of_var fv))) (NNRCVar d))
-                                                                  d (NNRCUnop AColl (NNRCUnop AUnbrand (NNRCVar d)))
+                                                       (NNRCEither (NNRCUnop (OpCast (singleton (brand_of_var fv))) (NNRCVar d))
+                                                                  d (NNRCUnop OpBag (NNRCUnop OpUnbrand (NNRCVar d)))
                                                                   d (NNRCConst (dcoll nil))))))
                              fv (NNRCVar fv)
                              fv (NNRCConst dunit)) (* must not be executed *)
@@ -897,7 +897,7 @@ Section NNRCtoNNRCMR.
         (NNRCVar result_var, mr_list1 ++ mr_n1 ++ (mr :: nil), vars_loc)
       | None =>
         match op with
-        | AFlatten =>
+        | OpFlatten =>
           let (n1_distributed_result_var, vars_loc) := fresh_mr_var "distcoll$"%string Vdistr vars_loc in
           let (mr_n1, vars_loc) := mr_chain_distributed_of_nnrc n1' initunit vars_loc n1_distributed_result_var in
           let (flatten_result_var, vars_loc) := fresh_mr_var "flat$"%string Vdistr vars_loc in

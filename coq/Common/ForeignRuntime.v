@@ -14,7 +14,8 @@
  * limitations under the License.
  *)
 
-Require Export ForeignData ForeignOps.
+Require Export ForeignData.
+Require Export ForeignOperators.
 
 Class foreign_runtime : Type
   := mk_foreign_runtime {

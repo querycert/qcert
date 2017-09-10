@@ -81,7 +81,7 @@ Section DNNRCBaseEq.
 
   (* DNNRCBinop *)
   
-  Global Instance dbinop_proper : Proper (eq ==> binop_eq ==> dnnrc_base_eq ==> dnnrc_base_eq ==> dnnrc_base_eq) DNNRCBinop.
+  Global Instance dbinary_op_proper : Proper (eq ==> binary_op_eq ==> dnnrc_base_eq ==> dnnrc_base_eq ==> dnnrc_base_eq) DNNRCBinop.
   Proof.
     unfold Proper, respectful, dnnrc_base_eq.
     intros; simpl. subst.
@@ -97,7 +97,7 @@ Section DNNRCBaseEq.
 
   (* DNNRCUnnop *)
   
-  Global Instance dunop_proper : Proper (eq ==> unaryop_eq ==> dnnrc_base_eq ==> dnnrc_base_eq) DNNRCUnop.
+  Global Instance dunary_op_proper : Proper (eq ==> unary_op_eq ==> dnnrc_base_eq ==> dnnrc_base_eq) DNNRCUnop.
   Proof.
     unfold Proper, respectful, dnnrc_base_eq.
     intros; simpl. subst.

@@ -110,7 +110,7 @@ Section TcNNRCtoCAMP.
        eauto.
   Qed.
 
-  Hint Constructors TOps.unaryOp_type TOps.binOp_type data_type.
+  Hint Constructors unary_op_type binary_op_type data_type.
 
   Lemma is_list_sorted_nnrc_to_camp_env_nodup {B} {tenv} :
     is_list_sorted ODT_lt_dec (@domain _ B (nnrc_to_camp_env tenv)) = true ->
@@ -306,9 +306,9 @@ Section TcNNRCtoCAMP.
            | [H: [_ & _] |= pletEnv _ _; _ ~> _ |- _] => 
              inversion H; try subst; clear H
 
-           | [H:TOps.unaryOp_type _ _ _ |- _] => 
+           | [H:unary_op_type _ _ _ |- _] => 
              inversion H; subst; clear H
-(*           | [H:TOps.binOp_type _ _ _ _ |- _] => 
+(*           | [H:binary_op_type _ _ _ _ |- _] => 
              inversion H; subst; clear H
 *)
            | [H: camp_type ?c ?g pit ?t1 ?t2 |- _] => 
@@ -1209,7 +1209,7 @@ Section TcNNRCtoCAMP.
     destruct H as [? [??]].
     apply loop_let_var_distinct in H.
     intuition.
-  Qed.  
+  Qed.
 
   Lemma nnrc_to_camp_let_type_preserve n τc Γ τout :
     nnrcIsCore n ->
@@ -1282,7 +1282,7 @@ Section TcNNRCtoCAMP.
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt. t. 
       destruct x0; destruct x; simpl in *; subst.
-      eapply TNNRCLet; eauto.
+      eapply type_cNNRCLet; eauto.
       destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; simpl; [econstructor; eauto|idtac].
       symmetry in gperm.
@@ -1311,7 +1311,7 @@ Section TcNNRCtoCAMP.
       specialize (IHn1 Hcore1); specialize (IHn2 Hcore2).
       simpl in *. simpt. t. 
       destruct x0; destruct x; simpl in *; subst.
-      eapply TNNRCFor; eauto.
+      eapply type_cNNRCFor; eauto.
       destruct (rec_sort_nnrc_to_camp_env_pullback ((v, s2) :: Γ)) 
         as [g' [grec gperm]]; [simpl; econstructor; eauto|idtac].
       symmetry in gperm.
@@ -1841,7 +1841,7 @@ Section TcNNRCtoCAMP.
           { econstructor.
             - econstructor.
               econstructor.
-              apply ATRec.
+              apply type_OpRec.
             - rewrite rec_sorted_id; eauto 2.
             - unfold mapall_let in H1.
               autorewrite with fresh_bindings in H1.

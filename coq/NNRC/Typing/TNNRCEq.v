@@ -76,8 +76,8 @@ Section TNNRCEq.
    ****************)
 
   Hint Constructors nnrc_core_type.
-  Hint Constructors unaryOp_type.
-  Hint Constructors binOp_type.
+  Hint Constructors unary_op_type.
+  Hint Constructors binary_op_type.
 
   Global Instance tnnrc_rewrites_to_pre : PreOrder tnnrc_rewrites_to.
   Proof.
@@ -95,10 +95,9 @@ Section TNNRCEq.
       rewrite (H3 cenv env); try assumption.
       reflexivity.
   Qed.
-  
   (* NNRCGetConstant *)
 
-  Global Instance nnrc_get_constant_tproper:
+  Global Instance tproper_NNRCGetConstant:
     Proper (eq ==> tnnrc_rewrites_to) NNRCGetConstant.
   Proof.
     unfold Proper, respectful, tnnrc_rewrites_to; intros.
@@ -109,7 +108,7 @@ Section TNNRCEq.
 
   (* NNRCVar *)
 
-  Global Instance nnrc_var_tproper:
+  Global Instance tproper_NNRCVar:
     Proper (eq ==> tnnrc_rewrites_to) NNRCVar.
   Proof.
     unfold Proper, respectful, tnnrc_rewrites_to; intros.
@@ -120,7 +119,7 @@ Section TNNRCEq.
   
   (* NNRCConst *)
 
-  Global Instance nnrc_const_tproper:
+  Global Instance tproper_NNRCConst:
     Proper (eq ==> tnnrc_rewrites_to) NNRCConst.
   Proof.
     unfold Proper, respectful, tnnrc_rewrites_to; intros.
@@ -131,7 +130,7 @@ Section TNNRCEq.
 
   (* NNRCBinop *)
 
-  Global Instance nnrc_binop_tproper:
+  Global Instance tproper_NNRCBinop:
     Proper (eq ==> tnnrc_rewrites_to
                ==> tnnrc_rewrites_to
                ==> tnnrc_rewrites_to) NNRCBinop.
@@ -153,7 +152,7 @@ Section TNNRCEq.
   
   (* NNRCUnop *)
 
-  Global Instance nnrc_unop_tproper :
+  Global Instance tproper_NNRCUnop :
     Proper (eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCUnop.
   Proof.
     unfold Proper, respectful, tnnrc_rewrites_to; intros.
@@ -170,7 +169,7 @@ Section TNNRCEq.
 
   (* NNRCLet *)
 
-  Global Instance nnrc_let_tproper :
+  Global Instance tproper_NNRCLet :
     Proper (eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCLet.
   Proof.
     unfold Proper, respectful, tnnrc_rewrites_to; intros.
@@ -195,7 +194,7 @@ Section TNNRCEq.
     rewrite H5 in H7.
     inversion H7; assumption.
   Qed.
-    
+
   (* NNRCFor *)
 
   Lemma dcoll_wt (l:list data) (τ:rtype) (τcenv τenv:tbindings) (cenv env:bindings) (e:nnrc):
@@ -219,7 +218,7 @@ Section TNNRCEq.
     apply (H2 x0 H3).
   Qed.
 
-  Global Instance nnrc_for_tproper :
+  Global Instance tproper_NNRCFor :
     Proper (eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCFor.
   Proof.
     unfold Proper, respectful, tnnrc_rewrites_to; intros.
@@ -255,8 +254,7 @@ Section TNNRCEq.
   Qed.
     
   (* NNRCIf *)
-
-  Global Instance nnrc_if_tproper :
+  Global Instance tproper_NNRCIf :
     Proper (tnnrc_rewrites_to ==> tnnrc_rewrites_to
                               ==> tnnrc_rewrites_to
                               ==> tnnrc_rewrites_to) NNRCIf.
@@ -275,8 +273,7 @@ Section TNNRCEq.
   Qed.
 
   (* NNRCEither *)
-
-  Global Instance nnrc_either_tproper :
+  Global Instance tproper_NNRCEither :
     Proper (tnnrc_rewrites_to ==> eq ==> tnnrc_rewrites_to
                               ==> eq ==> tnnrc_rewrites_to
                               ==> tnnrc_rewrites_to) NNRCEither.
@@ -302,7 +299,6 @@ Section TNNRCEq.
   Qed.
 
   (* NNRCGroupBy *)
-
   Lemma group_by_macro_eq g sl n1 n2 :
     NNRCGroupBy g sl n1 ⇒ᶜ NNRCGroupBy g sl n2
     <-> nnrc_group_by g sl n1 ⇒ᶜ nnrc_group_by g sl n2.
@@ -317,7 +313,7 @@ Section TNNRCEq.
     Transparent nnrc_group_by.
   Qed.
 
-  Global Instance nnrc_groupby_tproper :
+  Global Instance tproper_NNRCGroupBy :
     Proper (eq ==> eq ==> tnnrc_rewrites_to ==> tnnrc_rewrites_to) NNRCGroupBy.
   Proof.
     unfold Proper, respectful; intros.

@@ -73,13 +73,13 @@ Section TDNNRCBase.
           dnnrc_base_type tenv (DNNRCConst a c) (Tlocal τout)
     | TDNNRCBinop  {τ₁ τ₂ τout} tenv b e1 e2 :
         forall (a:A),
-          binOp_type b τ₁ τ₂ τout ->
+          binary_op_type b τ₁ τ₂ τout ->
           dnnrc_base_type tenv e1 (Tlocal τ₁) ->
           dnnrc_base_type tenv e2 (Tlocal τ₂) ->
           dnnrc_base_type tenv (DNNRCBinop a b e1 e2) (Tlocal τout)
     | TDNNRCUnop {τ₁ τout} tenv u e1 :
         forall (a:A), 
-          unaryOp_type u τ₁ τout ->
+          unary_op_type u τ₁ τout ->
           dnnrc_base_type tenv e1 (Tlocal τ₁) ->
           dnnrc_base_type tenv (DNNRCUnop a u e1) (Tlocal τout)
     | TDNNRCLet {τ₁ τ₂} v tenv e1 e2 :
@@ -227,7 +227,7 @@ Section TDNNRCBase.
       simpl.
       inversion H3; clear H3; subst.
       inversion H4; clear H4; subst.
-      elim (@typed_binop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τ₂ τout _ _ b H7 H6 H); intros.
+      elim (@typed_binary_op_yields_typed_data _ _ _ _ _ _ τ₁ τ₂ τout _ _ b H7 H6 H); intros.
       elim H3; clear H3; intros.
       exists (Dlocal x); simpl.
       split.
@@ -238,7 +238,7 @@ Section TDNNRCBase.
       elim H2; clear H2; intros.
       rewrite H2; clear H2.
       inversion H3; clear H3; intros; subst.
-      elim (@typed_unop_yields_typed_data _ _ _ _ _ _ _ _ τ₁ τout _ u H5 H); intros.
+      elim (@typed_unary_op_yields_typed_data _ _ _ _ _ _ τ₁ τout _ u H5 H); intros.
       elim H2; clear H2; intros.
       exists (Dlocal x); simpl.
       split.

@@ -30,7 +30,7 @@ Section LambdaNRAtoNRAEnv.
 
   Fixpoint lambda_nra_to_nraenv (op:lambda_nra) : nraenv :=
     match op with
-    | LNRAVar x => NRAEnvUnop (ADot x) NRAEnvEnv
+    | LNRAVar x => NRAEnvUnop (OpDot x) NRAEnvEnv
     | LNRATable x => NRAEnvGetConstant x
     | LNRAConst d => NRAEnvConst d
     | LNRABinop b op1 op2 => NRAEnvBinop b (lambda_nra_to_nraenv op1) (lambda_nra_to_nraenv op2)
@@ -43,12 +43,13 @@ Section LambdaNRAtoNRAEnv.
   with nraenv_of_lnra_lambda (lop:lnra_lambda) : nraenv :=
     match lop with
     | LNRALambda x op =>
-      NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID))
+      NRAEnvAppEnv (lambda_nra_to_nraenv op)
+                   (NRAEnvBinop OpRecConcat NRAEnvEnv (NRAEnvUnop (OpRec x) NRAEnvID))
     end.
 
   Lemma  lambda_nra_to_nraenv_var_eq x :
       lambda_nra_to_nraenv (LNRAVar x) = 
-      NRAEnvUnop (ADot x) NRAEnvEnv.
+      NRAEnvUnop (OpDot x) NRAEnvEnv.
   Proof.
     reflexivity.
   Qed.
@@ -106,7 +107,8 @@ Section LambdaNRAtoNRAEnv.
 
   Lemma  lambda_nra_to_nraenv_lambda_eq x op :
     nraenv_of_lnra_lambda (LNRALambda x op) =
-    NRAEnvAppEnv (lambda_nra_to_nraenv op) (NRAEnvBinop AConcat NRAEnvEnv (NRAEnvUnop (ARec x) NRAEnvID)).
+    NRAEnvAppEnv (lambda_nra_to_nraenv op)
+                 (NRAEnvBinop OpRecConcat NRAEnvEnv (NRAEnvUnop (OpRec x) NRAEnvID)).
   Proof.
     reflexivity.
   Qed.

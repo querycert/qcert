@@ -43,8 +43,8 @@ Section NRAContext.
   Inductive nra_ctxt : Set :=
   | CHole : nat -> nra_ctxt
   | CPlug : nra -> nra_ctxt
-  | CABinop : binOp -> nra_ctxt -> nra_ctxt -> nra_ctxt
-  | CAUnop : unaryOp -> nra_ctxt -> nra_ctxt
+  | CABinop : binary_op -> nra_ctxt -> nra_ctxt -> nra_ctxt
+  | CAUnop : unary_op -> nra_ctxt -> nra_ctxt
   | CAMap : nra_ctxt -> nra_ctxt -> nra_ctxt
   | CAMapConcat : nra_ctxt -> nra_ctxt -> nra_ctxt
   | CAProduct : nra_ctxt -> nra_ctxt -> nra_ctxt
@@ -373,7 +373,7 @@ Section NRAContext.
        ac_substs_EitherConcat
        ac_substs_App : ac_substs.
   
-  Lemma ac_simplify_holes_binop b c1 c2:
+  Lemma ac_simplify_holes_binary_op b c1 c2:
     ac_holes (CABinop b c1 c2) <> nil ->
     ac_simplify (CABinop b c1 c2) = CABinop b (ac_simplify c1) (ac_simplify c2).
   Proof.
@@ -387,7 +387,7 @@ Section NRAContext.
     simpl in H; intuition.
   Qed.
 
-  Lemma ac_simplify_holes_unop u c:
+  Lemma ac_simplify_holes_unary_op u c:
     ac_holes (CAUnop u c ) <> nil ->
     ac_simplify (CAUnop u c) = CAUnop u (ac_simplify c).
   Proof.
@@ -545,13 +545,13 @@ Section NRAContext.
     induction c.
     - simpl; match_destr.
     - simpl; trivial.
-    - destr_solv IHc1 IHc2 (CABinop b c1 c2) ac_simplify_holes_binop.
+    - destr_solv IHc1 IHc2 (CABinop b c1 c2) ac_simplify_holes_binary_op.
     -  destruct (is_nil_dec (ac_holes (CAUnop u c))) as [h|h].
       + rewrite (ac_subst_nholes _ _ _ h).
         rewrite (ac_subst_simplify_nholes _ _ _ h).
         rewrite ac_simplify_idempotent.
         trivial.
-      + rewrite ac_simplify_holes_unop; [| eauto].
+      + rewrite ac_simplify_holes_unary_op; [| eauto].
         simpl.
         rewrite IHc.
         trivial.
@@ -1068,25 +1068,25 @@ Notation "‵ c" := (CAConst c)  (at level 0) : nra_ctxt_scope.                 
 Notation "‵{||}" := (CAConst (dcoll nil))  (at level 0) : nra_ctxt_scope.                         (* ‵ = \backprime *)
 Notation "‵[||]" := (CAConst (drec nil)) (at level 50) : nra_ctxt_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (CABinop AAnd r1 r2) (right associativity, at level 65): nra_ctxt_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (CABinop AOr r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (CABinop AEq r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (CABinop ALt r1 r2) (no associativity, at level 70): nra_ctxt_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (CABinop AUnion r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (CABinop AMinus r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (CABinop AMin r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (CABinop AMax r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((CABinop AConcat) p r) (at level 70) : nra_ctxt_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((CABinop AMergeConcat) p r) (at level 70) : nra_ctxt_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (CABinop OpAnd r1 r2) (right associativity, at level 65): nra_ctxt_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (CABinop OpOr r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (CABinop OpEqual r1 r2) (right associativity, at level 70): nra_ctxt_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (CABinop OpLt r1 r2) (no associativity, at level 70): nra_ctxt_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (CABinop OpBagUnion r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (CABinop OpBagDiff r1 r2) (right associativity, at level 70): nra_ctxt_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (CABinop OpBagMin r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (CABinop OpBagMax r1 r2) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((CABinop OpRecConcat) p r) (at level 70) : nra_ctxt_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((CABinop OpRecMerge) p r) (at level 70) : nra_ctxt_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (CAUnop ANeg r1) (right associativity, at level 70): nra_ctxt_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (CAUnop ADistinct r1) (right associativity, at level 70): nra_ctxt_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (CAUnop ACount r1) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (CAUnop AFlatten d) (at level 50) : nra_ctxt_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((CAUnop AColl) d)  (at level 50) : nra_ctxt_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((CAUnop (ARec s)) r) (at level 50) : nra_ctxt_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((CAUnop (ARecRemove s1)) r) (at level 50) : nra_ctxt_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((CAUnop (ADot r)) p) (left associativity, at level 40): nra_ctxt_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (CAUnop OpNeg r1) (right associativity, at level 70): nra_ctxt_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (CAUnop OpDistinct r1) (right associativity, at level 70): nra_ctxt_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (CAUnop OpCount r1) (right associativity, at level 70): nra_ctxt_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (CAUnop OpFlatten d) (at level 50) : nra_ctxt_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((CAUnop OpBag) d)  (at level 50) : nra_ctxt_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((CAUnop (OpRec s)) r) (at level 50) : nra_ctxt_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((CAUnop (OpRecRemove s1)) r) (at level 50) : nra_ctxt_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((CAUnop (OpDot r)) p) (left associativity, at level 40): nra_ctxt_scope.      (* · = \cdot *)
 
 Notation "χ⟨ p ⟩( r )" := (CAMap p r) (at level 70) : nra_ctxt_scope.                              (* χ = \chi *)
 Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CAMapConcat e2 e1) (at level 70) : nra_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)

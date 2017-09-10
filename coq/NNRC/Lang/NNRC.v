@@ -83,17 +83,17 @@ Section NNRC.
       NNRCLet
         t0 e
         (NNRCFor t2
-                 (NNRCUnop ADistinct
-                           (NNRCFor t1 (NNRCVar t0) (NNRCUnop (ARecProject sl) (NNRCVar t1))))
-                 (NNRCBinop AConcat
-                            (NNRCUnop (ARec g)
-                                      (NNRCUnop AFlatten
+                 (NNRCUnop OpDistinct
+                           (NNRCFor t1 (NNRCVar t0) (NNRCUnop (OpRecProject sl) (NNRCVar t1))))
+                 (NNRCBinop OpRecConcat
+                            (NNRCUnop (OpRec g)
+                                      (NNRCUnop OpFlatten
                                                 (NNRCFor t3 (NNRCVar t0)
-                                                         (NNRCIf (NNRCBinop AEq
-                                                                            (NNRCUnop (ARecProject sl)
+                                                         (NNRCIf (NNRCBinop OpEqual
+                                                                            (NNRCUnop (OpRecProject sl)
                                                                                       (NNRCVar t3))
                                                                             (NNRCVar t2))
-                                                                       (NNRCUnop AColl (NNRCVar t3))
+                                                                       (NNRCUnop OpBag (NNRCVar t3))
                                                                        (NNRCConst (dcoll nil))))))
                             (NNRCVar t2))).
 

@@ -104,49 +104,51 @@ expr:
 | STRUCT LPAREN r = reclist RPAREN
     { QOQL.ostruct r }
 | BAG LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.acoll e }
+    { QOQL.ounop QOps.Unary.opbag e }
 (* Functions *)
 | NOT LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.aneg e }
+    { QOQL.ounop QOps.Unary.opneg e }
 | FLATTEN LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.aflatten e }
+    { QOQL.ounop QOps.Unary.opflatten e }
 | SUM LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.asum e }
+    { QOQL.ounop QOps.Unary.opsum e }
 | FLOAT_SUM LPAREN e = expr RPAREN
     { QOQL.ounop Enhanced.Ops.Unary.float_sum e }
 | AVG LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.aarithmean e }
+    { QOQL.ounop QOps.Unary.opnummean e }
 | FAVG LPAREN e = expr RPAREN
-    { QOQL.ounop (QcertCompiler.AForeignUnaryOp (Obj.magic (QcertCompiler.Enhanced_unary_float_op (QcertCompiler.Uop_float_arithmean)))) e }
+    { QOQL.ounop (QcertCompiler.OpForeignUnary
+		    (Obj.magic (QcertCompiler.Enhanced_unary_float_op
+				  (QcertCompiler.Uop_float_arithmean)))) e }
 | COUNT LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.acount e }
+    { QOQL.ounop QOps.Unary.opcount e }
 | MAX LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.anummax e }
+    { QOQL.ounop QOps.Unary.opnummax e }
 | MIN LPAREN e = expr RPAREN
-    { QOQL.ounop QOps.Unary.anummin e }
+    { QOQL.ounop QOps.Unary.opnummin e }
 (* Binary operators *)
 | e1 = expr EQUAL e2 = expr
-    { QOQL.obinop QOps.Binary.aeq e1 e2 }
+    { QOQL.obinop QOps.Binary.opequal e1 e2 }
 | e1 = expr NEQUAL e2 = expr
-    { QOQL.ounop QOps.Unary.aneg (QOQL.obinop QOps.Binary.aeq e1 e2) }
+    { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.opequal e1 e2) }
 | e1 = expr LT e2 = expr
-    { QOQL.obinop QOps.Binary.alt e1 e2 }
+    { QOQL.obinop QOps.Binary.oplt e1 e2 }
 | e1 = expr LTEQ e2 = expr
-    { QOQL.obinop QOps.Binary.ale e1 e2 }
+    { QOQL.obinop QOps.Binary.ople e1 e2 }
 | e1 = expr GT e2 = expr
-    { QOQL.ounop QOps.Unary.aneg (QOQL.obinop QOps.Binary.ale e1 e2) }
+    { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.ople e1 e2) }
 | e1 = expr GTEQ e2 = expr
-    { QOQL.ounop QOps.Unary.aneg (QOQL.obinop QOps.Binary.alt e1 e2) }
+    { QOQL.ounop QOps.Unary.opneg (QOQL.obinop QOps.Binary.oplt e1 e2) }
 | e1 = expr MINUS e2 = expr
-    { QOQL.obinop QOps.Binary.ZArith.aminus e1 e2 }
+    { QOQL.obinop QOps.Binary.ZArith.opminus e1 e2 }
 | e1 = expr PLUS e2 = expr
-    { QOQL.obinop QOps.Binary.ZArith.aplus e1 e2 }
+    { QOQL.obinop QOps.Binary.ZArith.opplus e1 e2 }
 | e1 = expr STAR e2 = expr
-    { QOQL.obinop QOps.Binary.ZArith.amult e1 e2 }
+    { QOQL.obinop QOps.Binary.ZArith.opmult e1 e2 }
 | e1 = expr AND e2 = expr
-    { QOQL.obinop QOps.Binary.aand e1 e2 }
+    { QOQL.obinop QOps.Binary.opand e1 e2 }
 | e1 = expr OR e2 = expr
-    { QOQL.obinop QOps.Binary.aor e1 e2 }
+    { QOQL.obinop QOps.Binary.opor e1 e2 }
 
 from_clause:
 | v = IDENT IN e = expr

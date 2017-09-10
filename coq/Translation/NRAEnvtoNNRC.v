@@ -49,29 +49,29 @@ Section NRAEnvtoNNRC.
     | NRAEnvMapConcat op1 op2 =>
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
               (NNRCFor t1 nrc2
                       (NNRCFor t2 (nraenv_to_nnrc op1 t1 varenv)
-                              ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                              ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ op1 × op2 ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op2 ]]_vid,venv } | t1 ∈ [[ op1 ]]_vid,venv } *)
     | NRAEnvProduct op1 op2 =>
       let nrc1 := (nraenv_to_nnrc op1 varid varenv) in
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let (t1,t2) := fresh_var2 "tprod$" "tprod$" (varid::varenv::nil) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
               (NNRCFor t1 nrc1
                       (NNRCFor t2 nrc2
-                              ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                              ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
     (* [[ σ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ if [[ op1 ]]_t1,venv then { t1 } else {} | t1 ∈ [[ op2 ]]_vid,venv } *)
     | NRAEnvSelect op1 op2 =>
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let t := fresh_var "tsel$" (varid::varenv::nil) in
       let nrc1 := (nraenv_to_nnrc op1 t varenv) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
               (NNRCFor t nrc2
-                      (NNRCIf nrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
+                      (NNRCIf nrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
     (* [[ op1 ∥ op2 ]]_vid,venv == let t := [[ op1 ]]_vid,venv in
                                        if (t = {})
                                        then [[ op2 ]]_vid,venv
@@ -81,9 +81,9 @@ Section NRAEnvtoNNRC.
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let t := fresh_var "tdef$" (varid::varenv::nil) in
       (NNRCLet t nrc1
-              (NNRCIf (NNRCBinop AEq
+              (NNRCIf (NNRCBinop OpEqual
                                (NNRCVar t)
-                               (NNRCUnop AFlatten (NNRCConst (dcoll nil))))
+                               (NNRCUnop OpFlatten (NNRCConst (dcoll nil))))
                      nrc2 (NNRCVar t)))
     (* [[ op1 ◯ op2 ]]_vid,venv == let t := [[ op2 ]]_vid,venv
                                      in [[ op1 ]]_t,venv *)
@@ -97,8 +97,11 @@ Section NRAEnvtoNNRC.
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let t := fresh_var "tec$" (varid::varenv::nil) in 
       NNRCLet t nrc2
-             (NNRCEither nrc1 varid (NNRCUnop ALeft (NNRCBinop AConcat (NNRCVar varid) (NNRCVar t)))
-                        varid (NNRCUnop ARight (NNRCBinop AConcat (NNRCVar varid) (NNRCVar t))))
+              (NNRCEither nrc1
+                          varid (NNRCUnop OpLeft
+                                          (NNRCBinop OpRecConcat (NNRCVar varid) (NNRCVar t)))
+                          varid (NNRCUnop OpRight
+                                          (NNRCBinop OpRecConcat (NNRCVar varid) (NNRCVar t))))
     | NRAEnvApp op1 op2 =>
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let t := fresh_var "tapp$" (varid::varenv::nil) in
@@ -124,25 +127,25 @@ Section NRAEnvtoNNRC.
     | NRAEnvFlatMap op1 op2 =>
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let t := fresh_var "tmap$" (varid::varenv::nil) in
-      NNRCUnop AFlatten (NNRCFor t nrc2 (nraenv_to_nnrc op1 t varenv))
+      NNRCUnop OpFlatten (NNRCFor t nrc2 (nraenv_to_nnrc op1 t varenv))
     | NRAEnvJoin op1 op2 op3 =>
       let nrc2 :=
           let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
           let nrc3 := (nraenv_to_nnrc op3 varid varenv) in
           let (t2,t3) := fresh_var2 "tprod$" "tprod$" (varid::varenv::nil) in
-          NNRCUnop AFlatten
+          NNRCUnop OpFlatten
                        (NNRCFor t2 nrc2
                                     (NNRCFor t3 nrc3
-                                                 ((NNRCBinop AConcat) (NNRCVar t2) (NNRCVar t3))))
+                                                 ((NNRCBinop OpRecConcat) (NNRCVar t2) (NNRCVar t3))))
       in
       let t := fresh_var "tsel$" (varid::varenv::nil) in
       let nrc1 := (nraenv_to_nnrc op1 t varenv) in
-      NNRCUnop AFlatten
+      NNRCUnop OpFlatten
               (NNRCFor t nrc2
-                      (NNRCIf nrc1 (NNRCUnop AColl (NNRCVar t)) (NNRCConst (dcoll nil))))
+                      (NNRCIf nrc1 (NNRCUnop OpBag (NNRCVar t)) (NNRCConst (dcoll nil))))
     | NRAEnvProject sl op1 =>
       let t := fresh_var "tmap$" (varid::varenv::nil) in
-      NNRCFor t (nraenv_to_nnrc op1 varid varenv) (NNRCUnop (ARecProject sl) (NNRCVar t))
+      NNRCFor t (nraenv_to_nnrc op1 varid varenv) (NNRCUnop (OpRecProject sl) (NNRCVar t))
     | NRAEnvGroupBy g sl op1 =>
       NNRCGroupBy g sl (nraenv_to_nnrc op1 varid varenv)
     | NRAEnvUnnest a b op1 =>
@@ -150,17 +153,17 @@ Section NRAEnvtoNNRC.
       let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in (* new vars for op3 *)
       let nrc2 := (* op2 = (ANMap ((ANUnop (ARec b)) ANID) ((ANUnop (ADot a)) ANID)) *)
           let t := fresh_var "tmap$" (varid::varenv::nil) in
-          NNRCFor t (NNRCUnop (ADot a) (NNRCVar t1)) (NNRCUnop (ARec b) (NNRCVar t))
+          NNRCFor t (NNRCUnop (OpDot a) (NNRCVar t1)) (NNRCUnop (OpRec b) (NNRCVar t))
       in
       let nrc3 := (* op3 = (ANMapConcat op2 op1) *)
-          NNRCUnop AFlatten
+          NNRCUnop OpFlatten
                    (NNRCFor t1 nrc1
                             (NNRCFor t2 nrc2
-                                     ((NNRCBinop AConcat) (NNRCVar t1) (NNRCVar t2))))
+                                     ((NNRCBinop OpRecConcat) (NNRCVar t1) (NNRCVar t2))))
       in
       let nrc4 := (* op4 = (ANMap ((ANUnop (ARecRemove a)) ANID) op3) *)
           let t := fresh_var "tmap$" (varid::varenv::nil) in
-          NNRCFor t nrc3 (NNRCUnop (ARecRemove a) (NNRCVar t))
+          NNRCFor t nrc3 (NNRCUnop (OpRecRemove a) (NNRCVar t))
       in
       nrc4
     end.

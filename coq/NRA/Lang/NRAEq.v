@@ -77,7 +77,7 @@ Section NRAEq.
 
   (* ABinop *)
 
-  Global Instance abinop_proper : Proper (binop_eq ==> nra_eq ==> nra_eq ==> nra_eq) ABinop.
+  Global Instance abinary_op_proper : Proper (binary_op_eq ==> nra_eq ==> nra_eq ==> nra_eq) ABinop.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
@@ -88,7 +88,7 @@ Section NRAEq.
   Qed.
 
   (* AUnop *)
-  Global Instance aunop_proper : Proper (unaryop_eq ==> nra_eq ==> nra_eq) AUnop.
+  Global Instance aunary_op_proper : Proper (unary_op_eq ==> nra_eq ==> nra_eq) AUnop.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
