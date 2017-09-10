@@ -1456,7 +1456,7 @@ Section NNRCMR.
     (** The function (fun d => coll d) *)
     Definition coll_function :=
       let d := "x"%string in
-      (d, NNRCUnop AColl (NNRCVar d)).
+      (d, NNRCUnop OpBag (NNRCVar d)).
 
     Lemma coll_function_no_free_vars: function_with_no_free_vars coll_function.
     Proof.

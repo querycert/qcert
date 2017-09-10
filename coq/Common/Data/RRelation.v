@@ -278,6 +278,18 @@ Section RRelation.
       destruct o0; destruct o; reflexivity.
   Qed.
 
+  Lemma rmap_data_exists {A} (f: A -> option data) dl x :
+    match rmap f dl with
+    | Some a' => Some (dcoll a')
+    | None => None
+    end = Some x ->
+    exists x1, rmap f dl = Some x1 /\ (dcoll x1) = x.
+  Proof.
+    elim (rmap f dl); intros.
+    - exists a; split; [|inversion H]; reflexivity.
+    - congruence.
+  Qed.
+
   (* sometimes useful when coq compiler chokes on Fixpoints with rmap *)
   Fixpoint listo_to_olist {a: Type} (l: list (option a)) : option (list a) :=
     match l with

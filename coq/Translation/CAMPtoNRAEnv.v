@@ -33,7 +33,7 @@ Section CAMPtoNRAEnv.
   (* Java equivalent: CampToNra.nraenv_fail *)
   Definition nraenv_fail := NRAEnvConst (dcoll nil).
   (* Java equivalent: CampToNra.nraenv_match *)
-  Definition nraenv_match op := NRAEnvUnop AColl op.
+  Definition nraenv_match op := NRAEnvUnop OpBag op.
 
   (** Translation from CAMP to EnvNRA *)
 
@@ -43,12 +43,13 @@ Section CAMPtoNRAEnv.
       | pconst d' => nraenv_match (NRAEnvConst d')
       | punop uop p₁ => NRAEnvMap (NRAEnvUnop uop NRAEnvID) (nraenv_of_camp p₁)
       | pbinop bop p₁ p₂ =>
-        NRAEnvMap (NRAEnvBinop bop (NRAEnvUnop (ADot "a1") NRAEnvID) (NRAEnvUnop (ADot "a2") NRAEnvID))
-              (NRAEnvProduct (NRAEnvMap (NRAEnvUnop (ARec "a1") NRAEnvID) (nraenv_of_camp p₁))
-                         (NRAEnvMap (NRAEnvUnop (ARec "a2") NRAEnvID) (nraenv_of_camp p₂)))
+        NRAEnvMap
+          (NRAEnvBinop bop (NRAEnvUnop (OpDot "a1") NRAEnvID) (NRAEnvUnop (OpDot "a2") NRAEnvID))
+          (NRAEnvProduct (NRAEnvMap (NRAEnvUnop (OpRec "a1") NRAEnvID) (nraenv_of_camp p₁))
+                         (NRAEnvMap (NRAEnvUnop (OpRec "a2") NRAEnvID) (nraenv_of_camp p₂)))
       | pmap p₁ =>
         nraenv_match
-          (NRAEnvUnop AFlatten
+          (NRAEnvUnop OpFlatten
                   (NRAEnvMap
                      (nraenv_of_camp p₁) NRAEnvID))
       | passert p₁ =>
@@ -56,17 +57,19 @@ Section CAMPtoNRAEnv.
       | porElse p₁ p₂ => NRAEnvDefault (nraenv_of_camp p₁) (nraenv_of_camp p₂)
       | pit => nraenv_match NRAEnvID
       | pletIt p₁ p₂ =>
-        NRAEnvUnop AFlatten
+        NRAEnvUnop OpFlatten
                (NRAEnvMap (nraenv_of_camp p₂)
                       (nraenv_of_camp p₁))
       | pgetConstant s => nraenv_match (NRAEnvGetConstant s)
       | penv => nraenv_match NRAEnvEnv
       | pletEnv p₁ p₂ =>
-        NRAEnvUnop AFlatten
+        NRAEnvUnop OpFlatten
                (NRAEnvAppEnv
                   (NRAEnvMapEnv (nraenv_of_camp p₂))
-                  (NRAEnvUnop AFlatten
-                          (NRAEnvMap (NRAEnvBinop AMergeConcat NRAEnvEnv NRAEnvID) (nraenv_of_camp p₁))))
+                  (NRAEnvUnop OpFlatten
+                              (NRAEnvMap
+                                 (NRAEnvBinop OpRecMerge NRAEnvEnv NRAEnvID)
+                                 (nraenv_of_camp p₁))))
       | pleft =>
         NRAEnvEither (nraenv_match NRAEnvID) (nraenv_fail)
       | pright =>
@@ -78,8 +81,8 @@ Section CAMPtoNRAEnv.
   *)
 
   Definition nraenv_of_camp_top p :=
-    NRAEnvUnop AFlatten
-           (NRAEnvMap (nraenv_of_camp p) (NRAEnvUnop AColl NRAEnvID)).
+    NRAEnvUnop OpFlatten
+           (NRAEnvMap (nraenv_of_camp p) (NRAEnvUnop OpBag NRAEnvID)).
   
   (** Theorem 4.2: lemma of translation correctness for patterns *)
 
@@ -170,10 +173,10 @@ Section CAMPtoNRAEnv.
       nraenv_of_camp (pand p1 p2).
 
     Definition nraenv_for_pand (q1 q2: nraenv) : nraenv :=
-      NRAEnvUnop AFlatten
+      NRAEnvUnop OpFlatten
                  (NRAEnvAppEnv (NRAEnvMapEnv q2)
-                               (NRAEnvUnop AFlatten
-                                           (NRAEnvMap (NRAEnvBinop AMergeConcat NRAEnvEnv NRAEnvID)
+                               (NRAEnvUnop OpFlatten
+                                           (NRAEnvMap (NRAEnvBinop OpRecMerge NRAEnvEnv NRAEnvID)
                                                       (NRAEnvMap (NRAEnvConst (drec nil))
                                                                  (NRAEnvSelect NRAEnvID q1))))).
   

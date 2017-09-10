@@ -171,63 +171,63 @@ Section tDNNRCtoSparkDF.
     | DSExplode s d1 => code_of_dataframe d1 ++ ".select(explode(" ++ code_of_column (CCol s) ++ ").as(""" ++ s ++ """))"
     end.
 
-  Definition spark_of_unop (op: unaryOp) (x: string) : string :=
+  Definition spark_of_unary_op (op: unary_op) (x: string) : string :=
     match op with
       (* ACount, ASum are distributed to local *)
-      | ACount => x ++ ".count()" (* This returns a long, is this a problem? *)
-      | ASum => x ++ ".select(sum(""value"")).first().getLong(0)" (* This is not pretty, but there does not seem to be a .sum() *)
+      | OpCount => x ++ ".count()" (* This returns a long, is this a problem? *)
+      | OpSum => x ++ ".select(sum(""value"")).first().getLong(0)" (* This is not pretty, but there does not seem to be a .sum() *)
       (* AFlatten is distributed to distributed *)
       (* TODO FIXME ...but this implementation is distributed to local, right?
         Fix this. Might make the whole collect unwrap issue go away *)
-      | AFlatten => x ++ ".flatMap(r => r)"
-      | _ => "SPARK_OF_UNOP don't know how to generate Spark code for this operator"
+      | OpFlatten => x ++ ".flatMap(r => r)"
+      | _ => "SPARK_OF_UNARY_OP don't know how to generate Spark code for this operator"
     end.
 
-  Definition scala_of_unop (required_type: drtype) (op: unaryOp) (x: string) : string :=
+  Definition scala_of_unary_op (required_type: drtype) (op: unary_op) (x: string) : string :=
     let prefix s := s ++ "(" ++ x ++ ")" in
     let postfix s := x ++ "." ++ s in
     match op with
-    | AArithMean => prefix "arithMean"
-    | ABrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
-    | ACast bs =>
-      "cast(HIERARCHY, " ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
-    | AColl => prefix "Array"
-    | ACount => postfix "length"
-    | ADot n =>
-      match lift_tlocal required_type with
-      | Some r =>
-        prefix ("dot[" ++ rtype_to_scala_type (proj1_sig r) ++ "](""" ++ n ++ """)")
-      | None => "NONLOCAL EXPECTED TYPE IN DOT"
-      end
-    | AFlatten => postfix "flatten.sorted(QcertOrdering)"
-    | AIdOp => prefix "identity"
-    | ALeft => prefix "left"
-    | ANeg => "(!" ++ x ++ ")"
-    | ANumMax => prefix "anummax"
-    | ANumMin => prefix "anummin"
-    | ARec n =>
+    | OpIdentity => prefix "identity"
+    | OpNeg => "(!" ++ x ++ ")"
+    | OpRec n =>
       match lift_tlocal required_type with
       | Some (exist _ (Rec₀ Closed ((_, ft)::nil)) _) =>
         "singletonRecord(" ++ quote_string n ++ ", " ++ rtype_to_spark_DataType ft ++ ", " ++ x ++ ")"
       | _ => "AREC_WITH_UNEXPECTED_REQUIRED_TYPE"
       end
-    | ARecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
-    | ARight => prefix "right"
-    | ASum => postfix "sum"
-    | AToString => prefix "toQcertString"
-    | ASubstring start olen =>
+    | OpDot n =>
+      match lift_tlocal required_type with
+      | Some r =>
+        prefix ("dot[" ++ rtype_to_scala_type (proj1_sig r) ++ "](""" ++ n ++ """)")
+      | None => "NONLOCAL EXPECTED TYPE IN DOT"
+      end
+    | OpRecProject fs => prefix ("recProject(" ++ joinStrings ", " (map quote_string fs) ++ ")")
+    | OpBag => prefix "Array"
+    | OpFlatten => postfix "flatten.sorted(QcertOrdering)"
+    | OpDistinct => postfix "distinct"
+    | OpCount => postfix "length"
+    | OpSum => postfix "sum"
+    | OpNumMax => prefix "anummax"
+    | OpNumMin => prefix "anummin"
+    | OpNumMean => prefix "arithMean"
+    | OpToString => prefix "toQcertString"
+    | OpSubstring start olen =>
       "(" ++ x ++ ").substring(" ++ toString start ++
           match olen with
           | Some len => ", " ++ toString len
           | None => ""
           end ++ ")"
-    | ALike pat oescape =>
+    | OpLike pat oescape =>
       "ALike currently implemented.  Please implement as in the java backend"
 (*      let lc := make_like_clause pat oescape in
       mk_java_unary_op1 "string_like" ("new LikeClause[]{" ++ (joinStrings "," (map like_clause_to_scala lc)) ++ "}") e1
 *)
-    | AUArith ArithAbs => prefix "Math.abs"
-    | AUnbrand =>
+    | OpLeft => prefix "left"
+    | OpRight => prefix "right"
+    | OpBrand bs => "brand(" ++ joinStrings ", " (x::(map quote_string bs)) ++ ")"
+    | OpCast bs =>
+      "cast(HIERARCHY, " ++ x ++ ", " ++ joinStrings ", " (map quote_string bs) ++ ")"
+    | OpUnbrand =>
       match lift_tlocal required_type with
       | Some (exist _ r _) =>
         let schema := rtype_to_spark_DataType r in
@@ -235,55 +235,55 @@ Section tDNNRCtoSparkDF.
         "unbrand[" ++ scala ++ "](" ++ schema ++ ", " ++ x ++ ")"
       | None => "UNBRAND_REQUIRED_TYPE_ISSUE"
       end
-    | ADistinct => postfix "distinct"
-    | AOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
-    | AForeignUnaryOp o => foreign_to_scala_unary_op o x
+    | OpArithUnary ArithAbs => prefix "Math.abs"
+    | OpForeignUnary o => foreign_to_scala_unary_op o x
 
     (* TODO *)
-    | ARecRemove _ => "ARECREMOVE???"
-    | ASingleton => "SINGLETON???"
-    | AUArith ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
-    | AUArith ArithSqrt => "SQRT???" (* Integer sqrt? Not sure what the Coq semantics are. *)
+    | OpOrderBy scl => "SORT???" (* XXX Might be nice to try and support -JS XXX *)
+    | OpRecRemove _ => "ARECREMOVE???"
+    | OpSingleton => "SINGLETON???"
+    | OpArithUnary ArithLog2 => "LOG2???" (* Integer log2? Not sure what the Coq semantics are. *)
+    | OpArithUnary ArithSqrt => "SQRT???" (* Integer sqrt? Not sure what the Coq semantics are. *)
     end.
 
-  Definition spark_of_binop (op: binOp) (x: string) (y: string) : string :=
+  Definition spark_of_binary_op (op: binary_op) (x: string) (y: string) : string :=
     match op with
-    | AUnion => x ++ ".union(" ++ y ++ ")"
-    | _ => "SPARK_OF_BINOP don't know how to generate Spark code for this operator"
+    | OpBagUnion => x ++ ".union(" ++ y ++ ")"
+    | _ => "SPARK_OF_BINARY_OP don't know how to generate Spark code for this operator"
     end.
 
-  Definition scala_of_binop (op: binOp) (l: string) (r: string) : string :=
+  Definition scala_of_binary_op (op: binary_op) (l: string) (r: string) : string :=
     (* Put parens outside? (l op r) *)
     let infix s := l ++ "." ++ s ++ "(" ++ r ++ ")" in
     let infix' s := "(" ++ l ++ " " ++ s ++ " " ++ r ++ ")" in
     let prefix s := s ++ "(" ++ l ++ ", " ++ r ++ ")" in
     match op with
-    | AAnd => infix "&&"
-    | ABArith ArithDivide => infix "/"
-    | ABArith ArithMax => infix "max"
-    | ABArith ArithMin => infix "min"
-    | ABArith ArithMinus => infix "-"
-    | ABArith ArithMult => infix "*"
-    | ABArith ArithPlus => infix "+"
-    | ABArith ArithRem => infix "%" (* TODO double check the exact semantics of this *)
-    | AConcat => prefix "recordConcat"
-    | AContains => prefix "AContains" (* left argument is the element, right element is the collection *)
+    | OpEqual => prefix "equal"
+    | OpRecConcat => prefix "recordConcat"
+    | OpRecMerge => prefix "mergeConcat"
+    | OpAnd => infix "&&"
+    | OpOr => infix "||"
+    | OpLe => prefix "lessOrEqual"
+    | OpLt => prefix "lessThan"
     (* TODO We also need to fix operators that use equality internally:
-     *      Contains, comparisons, AMax, AMin, AMinus, AUnion *)
-    | AEq => prefix "equal"
-    | ALe => prefix "lessOrEqual"
-    | ALt => prefix "lessThan"
+     *      Contains, comparisons, OpBagMax, OpBagMin, OpBagDiff, OpBagUnion *)
     (* TODO we might want to put convenience helpers into the runtime for these *)
-    | AMax => l ++ ".++(" ++ r ++ ".diff(" ++ l ++ "))" (* l1 ⊎ (l2 ⊖ l1) *)
-    | AMin => l ++ ".diff(" ++ l ++ ".diff(" ++ r ++ "))" (* l1 ⊖ (l1 ⊖ l2) Can't make recursive calls, but AMinus is weird anyways... *)
-    | AMinus => r ++ ".diff(" ++ l ++ ")" (* bag minus has operands "the wrong way" around *)
-    | AMergeConcat => prefix "mergeConcat"
-    | AOr => infix "||"
-    | ASConcat => infix "+" (* string concat *)
-    | AUnion => infix "++" ++ ".sorted(QcertOrdering)" (* bag union *)
+    | OpBagUnion => infix "++" ++ ".sorted(QcertOrdering)" (* bag union *)
+    | OpBagDiff => r ++ ".diff(" ++ l ++ ")" (* bag minus has operands "the wrong way" around *)
+    | OpBagMax => l ++ ".++(" ++ r ++ ".diff(" ++ l ++ "))" (* l1 ⊎ (l2 ⊖ l1) *)
+    | OpBagMin => l ++ ".diff(" ++ l ++ ".diff(" ++ r ++ "))" (* l1 ⊖ (l1 ⊖ l2) Can't make recursive calls, but AMinus is weird anyways... *)
+    | OpContains => prefix "AContains" (* left argument is the element, right element is the collection *)
+    | OpStringConcat => infix "+" (* string concat *)
+    | OpArithBinary ArithDivide => infix "/"
+    | OpArithBinary ArithMax => infix "max"
+    | OpArithBinary ArithMin => infix "min"
+    | OpArithBinary ArithMinus => infix "-"
+    | OpArithBinary ArithMult => infix "*"
+    | OpArithBinary ArithPlus => infix "+"
+    | OpArithBinary ArithRem => infix "%" (* TODO double check the exact semantics of this *)
 
     (* TODO *)
-    | AForeignBinaryOp op => "FOREIGNBINARYOP???"
+    | OpForeignBinary op => "FOREIGNBINARYOP???"
     end.
 
   (* TODO Move this somewhere, I think rewriting needs something similar *)
@@ -307,14 +307,14 @@ Section tDNNRCtoSparkDF.
           end
         | DNNRCBinop t op x y =>
           match di_typeof x, di_typeof y with
-          | Tlocal _, Tlocal _ => scala_of_binop op (scala_of_dnnrc_base x) (scala_of_dnnrc_base y)
-          | Tdistr _, Tdistr _ => spark_of_binop op (scala_of_dnnrc_base x) (scala_of_dnnrc_base y)
+          | Tlocal _, Tlocal _ => scala_of_binary_op op (scala_of_dnnrc_base x) (scala_of_dnnrc_base y)
+          | Tdistr _, Tdistr _ => spark_of_binary_op op (scala_of_dnnrc_base x) (scala_of_dnnrc_base y)
           | _, _ => "DONT_SUPPORT_MIXED_LOCAL_DISTRIBUTED_BINARY_OPERATORS"
           end
         | DNNRCUnop t op x =>
           match di_typeof x with
-          | Tlocal _ => scala_of_unop (di_required_typeof d) op (scala_of_dnnrc_base x)
-          | Tdistr _ => spark_of_unop op (scala_of_dnnrc_base x)
+          | Tlocal _ => scala_of_unary_op (di_required_typeof d) op (scala_of_dnnrc_base x)
+          | Tdistr _ => spark_of_unary_op op (scala_of_dnnrc_base x)
           end
         | DNNRCLet t n x y => (* Scala val is letrec, use anonymous function instead *)
           "((( " ++ n ++ ": " ++ drtype_to_scala (di_typeof x) ++ ") => " ++ scala_of_dnnrc_base y ++ ")(" ++ scala_of_dnnrc_base x ++ "))"

@@ -906,8 +906,8 @@ Section ROptimEnv.
   (* (ANBinop b p2 (ANConst d) ◯ p1) ≡ (ANBinop b (p2 ◯ p1) (ANConst d)) *)
   
   Lemma app_over_binop_env b p1 p2 s:
-    (ANBinop b p1 p2 ◯ (ANUnop (ADot s) ANEnv))
-      ≡ₑ (ANBinop b (p1 ◯ (ANUnop (ADot s) ANEnv)) (p2 ◯ (ANUnop (ADot s) ANEnv))).
+    (ANBinop b p1 p2 ◯ (ANUnop (OpDot s) ANEnv))
+      ≡ₑ (ANBinop b (p1 ◯ (ANUnop (OpDot s) ANEnv)) (p2 ◯ (ANUnop (OpDot s) ANEnv))).
   Proof.
     unfold nra_eq, nraenv_core_eq; intros; simpl.
     destruct env; try reflexivity; simpl.
@@ -1024,7 +1024,7 @@ Section ROptimEnv.
   (* χᵉ⟨ { ENV } ⟩ ◯ₑ ♯flatten(p) ≡ χ⟨ { ID } ⟩(♯flatten(p)) *)
   
   Lemma appenv_over_mapenv p:
-    ANAppEnv (ANMapEnv (ANUnop AColl ANEnv)) (ANUnop AFlatten p) ≡ₑ (ANMap (ANUnop AColl ANID) (ANUnop AFlatten p)).
+    ANAppEnv (ANMapEnv (ANUnop OpBag ANEnv)) (ANUnop OpFlatten p) ≡ₑ (ANMap (ANUnop OpBag ANID) (ANUnop OpFlatten p)).
   Proof.
     unfold nra_eq, nraenv_core_eq; intros; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); intros.
@@ -1034,7 +1034,7 @@ Section ROptimEnv.
    (* (χᵉ⟨ { { ENV } } ⟩ ◯ₑ ♯flatten(p)) ≡ χ⟨ { { ID } } ⟩(♯flatten(p)) *)
 
   Lemma appenv_over_mapenv_coll p:
-    ANAppEnv (ANMapEnv (ANUnop AColl (ANUnop AColl ANEnv))) (ANUnop AFlatten p) ≡ₑ (ANMap (ANUnop AColl (ANUnop AColl ANID)) (ANUnop AFlatten p)).
+    ANAppEnv (ANMapEnv (ANUnop OpBag (ANUnop OpBag ANEnv))) (ANUnop OpFlatten p) ≡ₑ (ANMap (ANUnop OpBag (ANUnop OpBag ANID)) (ANUnop OpFlatten p)).
   Proof.
     unfold nra_eq, nraenv_core_eq; intros; simpl.
     generalize (h ⊢ₑ p @ₑ x ⊣ c;env); intros.
@@ -1044,8 +1044,8 @@ Section ROptimEnv.
   (* χᵉ⟨ { ENV.e } ⟩ ◯ₑ (ENV ⊗ ID) ≡ χ⟨ { ID.e } ⟩(ENV ⊗ ID) *)
   
   Lemma appenv_over_mapenv_merge s:
-    ANAppEnv (ANMapEnv (ANUnop AColl ((ENV) · s))) (ENV ⊗ ID)
-             ≡ₑ ANMap (ANUnop AColl ((ID) · s)) (ENV ⊗ ID).
+    ANAppEnv (ANMapEnv (ANUnop OpBag ((ENV) · s))) (ENV ⊗ ID)
+             ≡ₑ ANMap (ANUnop OpBag ((ID) · s)) (ENV ⊗ ID).
   Proof.
     unfold nra_eq, nraenv_core_eq; intros; simpl.
     destruct x; reflexivity.
@@ -1300,7 +1300,7 @@ Section ROptimEnv.
   (* #toString(s) ≡ s *)
   
   Lemma tostring_dstring s:
-    (ANUnop AToString (ANConst (dstring s))) ≡ₑ (ANConst (dstring s)).
+    (ANUnop OpToString (ANConst (dstring s))) ≡ₑ (ANConst (dstring s)).
   Proof.
     unfold nraenv_core_eq; intros ? ? _ ? _ ? _; reflexivity.
   Qed.
@@ -1308,7 +1308,7 @@ Section ROptimEnv.
   (* #toString(#toString(p)) ≡ #toString(p) *)
   
   Lemma tostring_tostring p:
-    (ANUnop AToString (ANUnop AToString p)) ≡ₑ (ANUnop AToString p).
+    (ANUnop OpToString (ANUnop OpToString p)) ≡ₑ (ANUnop OpToString p).
   Proof.
     unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p @ₑ x ⊣ c;env); reflexivity.
@@ -1457,7 +1457,7 @@ Section ROptimEnv.
   Qed.
 
   Lemma flip_env4 p1 p2 s :
-     (ANUnop (ADot s) p1) ◯ₑ p2 ≡ₑ (ANUnop (ADot s) (p1 ◯ₑ p2)).
+     (ANUnop (OpDot s) p1) ◯ₑ p2 ≡ₑ (ANUnop (OpDot s) (p1 ◯ₑ p2)).
   Proof.
     unfold nraenv_core_eq; intros ? ? _ ? _ ? _; simpl.
     destruct (h ⊢ₑ p2 @ₑ x ⊣ c;env); reflexivity.
@@ -1608,7 +1608,7 @@ Section ROptimEnv.
   Qed.
 
   Lemma either_app_over_aleft p₁ p₂ p :
-    (ANEither p₁ p₂) ◯ (ANUnop ALeft p) ≡ₑ p₁ ◯ p.
+    (ANEither p₁ p₂) ◯ (ANUnop OpLeft p) ≡ₑ p₁ ◯ p.
   Proof.
     red; simpl; intros.
     unfold olift.
@@ -1616,7 +1616,7 @@ Section ROptimEnv.
   Qed.
   
   Lemma either_app_over_aright p₁ p₂ p :
-    (ANEither p₁ p₂) ◯ (ANUnop ARight p) ≡ₑ p₂ ◯ p.
+    (ANEither p₁ p₂) ◯ (ANUnop OpRight p) ≡ₑ p₂ ◯ p.
   Proof.
     red; simpl; intros.
     unfold olift.
@@ -1742,7 +1742,7 @@ Section ROptimEnv.
                 end).
   
   Lemma dup_elim (q:nraenv_core) :
-    nodupA q -> ANUnop ADistinct q  ≡ₑ  q.
+    nodupA q -> ANUnop OpDistinct q  ≡ₑ  q.
   Proof.
     intros nd.
     red; intros.

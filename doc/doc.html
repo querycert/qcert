@@ -165,21 +165,23 @@ multisets).
  </li>
 </ul>
 
-<h3>Common components, data model, type system, built-in operators</h3>
+<h3>Common components, data model, built-in operators, type system</h3>
 
 <p>
   The <code>coq/Common</code> directory contains components shared
-  across languages. It includes:
+  across languages.</p>
+
 <ul>
-<li><code>Common/Logger</code>: support for producing log traces</li>
 <li><code>Common/Data</code>: definition and properties of the data model</li>
 <li><code>Common/Env</code>: support for environments</li>
 <li><code>Common/Operators</code>: syntax and semantics for built-in operators</li>
 <li><code>Common/TypeSystem</code>: definition and properties of the type system </li>
-<li><code>Common/Typing</code>: typing for the data model and the built-in operators </li>
+<li><code>Common/DataTyping</code>: typing for the data model </li>
+<li><code>Common/EnvTyping</code>: typing for the environment </li>
+<li><code>Common/OperatorsTyping</code>: typing for the built-in operators </li>
+<li><code>Common/Logger</code>: support for producing log traces</li>
 <li><code>Common/JSON</code>: JSON conversions for data and types </li>
-</ul>  
-</p>
+</ul>
 
 <h3>Languages</h3>
 

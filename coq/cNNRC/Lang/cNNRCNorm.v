@@ -24,13 +24,11 @@ Section cNNRCNorm.
   Require Import CommonRuntime.
   Require Import cNNRC.
 
-  (** Named Nested Relational Calculus *)
-
   Context {fruntime:foreign_runtime}. 
   Context (h:brand_relation_t).
   Context (c:bindings).
  
-  (* evaluation preserves normalization *)
+  (** cNNRC evaluation preserves data normalization. *)
   Lemma nnrc_core_eval_normalized env e {o} :
     Forall (data_normalized h) (map snd c) ->
     nnrc_core_eval h c env e = Some o ->
@@ -58,12 +56,12 @@ Section cNNRCNorm.
       (rewrite eqq1 in *;
       case_eq (nnrc_core_eval h c env e2); [intros ? eqq2 | intros eqq2];
       rewrite eqq2 in *); simpl in *; try discriminate.
-      eapply fun_of_binop_normalized; eauto.
+      eapply binary_op_eval_normalized; eauto.
     - Case "NNRCUnop"%string.
       case_eq (nnrc_core_eval h c env e); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;
         simpl in *; try discriminate.
-      eapply fun_of_unaryop_normalized; eauto.
+      eapply unary_op_eval_normalized; eauto.
     - Case "NNRCLet"%string.
       case_eq (nnrc_core_eval h c env e1); [intros ? eqq1 | intros eqq1];
       rewrite eqq1 in *;

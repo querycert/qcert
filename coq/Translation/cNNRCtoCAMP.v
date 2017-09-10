@@ -52,7 +52,7 @@ Section cNNRCtoCAMP.
     | pconst _ => nil
     | punop uop p => 
       match uop with
-      | ARec f => f::nil
+      | OpRec f => f::nil
       | _ => nil
       end ++ let_vars p
     | pbinop bop p₁ p₂ => let_vars p₁ ++ let_vars p₂
@@ -89,9 +89,9 @@ Section cNNRCtoCAMP.
          let n1trans := (nnrcToCamp_ns n1) in
          let n2trans := (nnrcToCamp_ns n2) in
          (porElse 
-            (pand (pbinop AAnd ‵true ctrans) n1trans)
+            (pand (pbinop OpAnd ‵true ctrans) n1trans)
             (* it could have failed because of n1, but then this will also fail *)
-            (pand (punop ANeg ctrans) n2trans))
+            (pand (punop OpNeg ctrans) n2trans))
        | cNNRC.NNRCEither nd xl nl xr nr =>
          pletIt (nnrcToCamp_ns nd)
                 (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nnrcToCamp_ns nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nnrcToCamp_ns nr))))
@@ -845,7 +845,7 @@ Section cNNRCtoCAMP.
     Lemma fresh_bindings_punop l u p:
       fresh_bindings l (punop u p) <->
       (match u with
-       | ARec f => forall n, f = let_var n -> ~ In f l
+       | OpRec f => forall n, f = let_var n -> ~ In f l
        | _ => True
        end /\ fresh_bindings l p).
     Proof.
@@ -981,8 +981,8 @@ Section cNNRCtoCAMP.
     Definition mapall_let p :=
       let freshVar := fresh_let_var "ma$" (let_vars p) in
       (* calculate the map and store it in a "temporary variable" *)
-      ((pletEnv (punop (ARec freshVar) (pmap p))
-                (pletEnv (punop ACount pit ≐ punop ACount (lookup freshVar))
+      ((pletEnv (punop (OpRec freshVar) (pmap p))
+                (pletEnv (punop OpCount pit ≐ punop OpCount (lookup freshVar))
                          (lookup freshVar))))%camp.
 
     Fixpoint nnrcToCamp_ns_let (n:cNNRC.nnrc) : camp
@@ -1007,11 +1007,11 @@ Section cNNRCtoCAMP.
            let n1trans := (nnrcToCamp_ns_let n1) in
            let n2trans := (nnrcToCamp_ns_let n2) in
            let freshVar := fresh_let_var "if$" (let_vars ctrans ++ let_vars n1trans ++ let_vars n2trans) in
-           pletEnv (punop (ARec freshVar) ctrans)
+           pletEnv (punop (OpRec freshVar) ctrans)
                    (porElse 
-                      (pand (pbinop AAnd ‵true (lookup freshVar)) n1trans)
+                      (pand (pbinop OpAnd ‵true (lookup freshVar)) n1trans)
                       (* it could have failed because of n1, but then this will also fail *)
-                      (pand (punop ANeg (lookup freshVar)) n2trans))
+                      (pand (punop OpNeg (lookup freshVar)) n2trans))
          | cNNRC.NNRCEither nd xl nl xr nr =>
            pletIt (nnrcToCamp_ns_let nd)
                   (porElse (pletIt pleft (pletEnv (pvar (loop_var xl)) (nnrcToCamp_ns_let nl))) (pletIt pright (pletEnv (pvar (loop_var xr)) (nnrcToCamp_ns_let nr))))

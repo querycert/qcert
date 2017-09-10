@@ -14,8 +14,10 @@
  * limitations under the License.
  *)
 
-Require Export Types ForeignRuntime.
-Require Export ForeignDataTyping ForeignOpsTyping.
+Require Export Types.
+Require Export ForeignRuntime.
+Require Export ForeignDataTyping.
+Require Export ForeignOperatorsTyping.
 
 Class foreign_typing
       {fruntime:foreign_runtime}

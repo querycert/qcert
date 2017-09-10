@@ -30,7 +30,7 @@ Section SQLPPtoNRAEnv.
 
 (* Translate two expressions and build the binary equality comparison (used as a subroutine for the SPSimpleCase clause) *)
 Definition sqlpp_to_nraenv_SPEq sqlpp_to_nraenv (e1 e2:sqlpp_expr) : nraenv
-  := NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2).
+  := NRAEnvBinop OpEqual (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2).
   
 (* Indicates that expected functionality is not yet implemented.  *)
 Definition sqlpp_to_nraenv_not_implemented (what : string) : nraenv :=
@@ -40,58 +40,58 @@ Definition sqlpp_to_nraenv_not_implemented (what : string) : nraenv :=
 Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	match q with
 	| SPPositive expr
-		=> NRAEnvBinop (ABArith ArithPlus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
+		=> NRAEnvBinop (OpArithBinary ArithPlus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
 	| SPNegative expr
-        => NRAEnvBinop (ABArith ArithMinus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
+        => NRAEnvBinop (OpArithBinary ArithMinus) (NRAEnvConst (dnat 0)) (sqlpp_to_nraenv expr)
   	| SPExists expr
-        => NRAEnvUnop ANeg (NRAEnvBinop ALe (NRAEnvUnop ACount (sqlpp_to_nraenv expr)) (NRAEnvConst (dnat 0)))
+        => NRAEnvUnop OpNeg (NRAEnvBinop OpLe (NRAEnvUnop OpCount (sqlpp_to_nraenv expr)) (NRAEnvConst (dnat 0)))
   	| SPNot expr
-  		=> NRAEnvUnop ANeg (sqlpp_to_nraenv expr)
+  		=> NRAEnvUnop OpNeg (sqlpp_to_nraenv expr)
  	(* TODO: Our internal data model has null but not 'missing' (unless we add a new convention).  For now, both are translated
 	   to null.  Also, we should really be using sum types to get around type problems like comparing a nat to null. *)
   	| SPIsNull expr
   	| SPIsMissing expr
   	| SPIsUnknown expr
-		=> NRAEnvBinop AEq (sqlpp_to_nraenv expr) (NRAEnvConst dunit)
+		=> NRAEnvBinop OpEqual (sqlpp_to_nraenv expr) (NRAEnvConst dunit)
 	| SPPlus e1 e2
-        => NRAEnvBinop (ABArith ArithPlus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpArithBinary ArithPlus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMinus  e1 e2
-        => NRAEnvBinop (ABArith ArithMinus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpArithBinary ArithMinus) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMult e1 e2
-        => NRAEnvBinop (ABArith ArithMult) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpArithBinary ArithMult) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPDiv e1 e2
-        => NRAEnvBinop (ABArith ArithDivide) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpArithBinary ArithDivide) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPMod e1 e2
-        => NRAEnvBinop (ABArith ArithRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop (OpArithBinary ArithRem) (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPExp e1 e2
 		=> sqlpp_to_nraenv_not_implemented "exp operator" (* TODO.  We either need our own binary exponent operator, or we need to
 		      program out the logic (convert to floating point, perform operation then convert back depending on the expected type) *)
   	| SPConcat e1 e2
-        => NRAEnvBinop ASConcat (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop OpStringConcat (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPIn e1 e2
-        => NRAEnvBinop AContains (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+        => NRAEnvBinop OpContains (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPEq  e1 e2
   	| SPFuzzyEq e1 e2 (* TODO.  We don't currently have "fuzzy equals" so translating as Eq for now *)
   		=> sqlpp_to_nraenv_SPEq sqlpp_to_nraenv e1 e2
   	| SPNeq  e1 e2
-        => NRAEnvUnop ANeg (NRAEnvBinop AEq (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2))
+        => NRAEnvUnop OpNeg (NRAEnvBinop OpEqual (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2))
   	| SPLt  e1 e2
-  		=> NRAEnvBinop ALt (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  		=> NRAEnvBinop OpLt (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPGt  e1 e2
-  		=> NRAEnvBinop ALt (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
+  		=> NRAEnvBinop OpLt (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
   	| SPLe  e1 e2
-  		=> NRAEnvBinop ALe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  		=> NRAEnvBinop OpLe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPGe  e1 e2
-  		=> NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
+  		=> NRAEnvBinop OpLe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1)
   	| SPLike  e s
-  		=> NRAEnvUnop (ALike s None) (sqlpp_to_nraenv e)
+  		=> NRAEnvUnop (OpLike s None) (sqlpp_to_nraenv e)
   	| SPAnd  e1 e2
-  		=> NRAEnvBinop AAnd (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  		=> NRAEnvBinop OpAnd (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
   	| SPOr  e1 e2
-  		=> NRAEnvBinop AOr (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
+  		=> NRAEnvBinop OpOr (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e2)
 	| SPBetween  e1 e2 e3
-  		=> NRAEnvBinop AAnd (NRAEnvBinop ALe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1))
-                         (NRAEnvBinop ALe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e3))
+  		=> NRAEnvBinop OpAnd (NRAEnvBinop OpLe (sqlpp_to_nraenv e2) (sqlpp_to_nraenv e1))
+                         (NRAEnvBinop OpLe (sqlpp_to_nraenv e1) (sqlpp_to_nraenv e3))
 	| SPSimpleCase value whenthens deflt
 	  => 
            let last := match deflt with
@@ -121,7 +121,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
     | SPEvery _ _
     	=> sqlpp_to_nraenv_not_implemented "quantified expressions (SOME | EVERY)"
 	| SPDot  expr name
-		=> NRAEnvUnop (ADot name) (sqlpp_to_nraenv expr)
+		=> NRAEnvUnop (OpDot name) (sqlpp_to_nraenv expr)
     (* TODO: the index operation has no obvious translation since our internal data model has only bags, not ordered lists.  We could
       implement Index Any without fixing this since order doesn't matter in a random selection, but we would have to tackle the issue
       of how to achieve randomness in Coq *)
@@ -136,7 +136,7 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
   	| SPMissing
   		=> NRAEnvConst dunit
 	| SPVarRef name
-		=> NRAEnvUnop (ADot name) NRAEnvID
+		=> NRAEnvUnop (OpDot name) NRAEnvID
 	| SPFunctionCall _ _ (* TODO: there are really two cases here.  (1) Many built-in functions that are documented as part of the SQL++
 	   specification; these are really operations in disguise.  (2) User-defined functions.  These may not be supported for a while if ever *)
     	=> sqlpp_to_nraenv_not_implemented "function call expressions"
@@ -146,10 +146,10 @@ Fixpoint sqlpp_to_nraenv (q:sqlpp) : nraenv :=
 	  the resulting expression can be bag constant.  *)
 	| SPArray items
 	| SPBag items
-		=> List.fold_right (fun expr acc => NRAEnvBinop AUnion (sqlpp_to_nraenv expr) acc) (NRAEnvConst (dcoll nil)) items
+		=> List.fold_right (fun expr acc => NRAEnvBinop OpBagUnion (sqlpp_to_nraenv expr) acc) (NRAEnvConst (dcoll nil)) items
 	| SPObject items (*Note: we only support objects whose field names are literals. *)
         => List.fold_right (fun (item : (string * sqlpp)) acc => let (name , expr) := item in 
-			NRAEnvBinop AConcat (NRAEnvUnop (ARec name) (sqlpp_to_nraenv expr)) acc) (NRAEnvConst (drec nil)) items
+			NRAEnvBinop OpRecConcat (NRAEnvUnop (OpRec name) (sqlpp_to_nraenv expr)) acc) (NRAEnvConst (drec nil)) items
 	| SPQuery _
     	=> sqlpp_to_nraenv_not_implemented "select expressions"
 	end.

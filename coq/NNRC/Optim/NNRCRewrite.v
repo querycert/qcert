@@ -47,7 +47,7 @@ Section NNRCRewrite.
   (* { a: e }.a ≡ e *)
 
   Lemma dot_of_rec a (e:nnrc) :
-    nnrc_eq (NNRCUnop (ADot a) (NNRCUnop (ARec a) e)) e.
+    nnrc_eq (NNRCUnop (OpDot a) (NNRCUnop (OpRec a) e)) e.
   Proof.
     unfold nnrc_eq; intros ? ? ? ? _.
     unfold nnrc_eval.
@@ -80,8 +80,8 @@ Section NNRCRewrite.
   Qed.
 
   Lemma for_singleton_to_let x e1 e2:
-    nnrc_eq (NNRCFor x (NNRCUnop AColl e1) e2)
-                (NNRCUnop AColl (NNRCLet x e1 e2)).
+    nnrc_eq (NNRCFor x (NNRCUnop OpBag e1) e2)
+                (NNRCUnop OpBag (NNRCLet x e1 e2)).
   Proof.
     red; simpl; intros.
     unfold nnrc_eval; simpl.
@@ -102,14 +102,14 @@ Section NNRCRewrite.
     ~ In v1 (nnrc_free_vars e3) ->
     nnrc_eq
       (NNRCFor v2 
-              (NNRCUnop AFlatten
+              (NNRCUnop OpFlatten
                        (NNRCFor v1 e1
-                               (NNRCIf e2 (NNRCUnop AColl (NNRCVar v1)) (NNRCConst (dcoll nil)))))
+                               (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil)))))
               e3)
-      (NNRCUnop AFlatten
+      (NNRCUnop OpFlatten
                (NNRCFor v1 e1
                        (NNRCIf e2
-                              (NNRCUnop AColl (NNRCLet v2 (NNRCVar v1) e3))
+                              (NNRCUnop OpBag (NNRCLet v2 (NNRCVar v1) e3))
                               (NNRCConst (dcoll nil))))).
   Proof.
     intro notinfree.
@@ -205,14 +205,14 @@ Section NNRCRewrite.
   Lemma map_sigma_fusion_samevar (e1 e2 e3:nnrc) (v1:var) :
     nnrc_eq
       (NNRCFor v1 
-              (NNRCUnop AFlatten
+              (NNRCUnop OpFlatten
                        (NNRCFor v1 e1
-                               (NNRCIf e2 (NNRCUnop AColl (NNRCVar v1)) (NNRCConst (dcoll nil)))))
+                               (NNRCIf e2 (NNRCUnop OpBag (NNRCVar v1)) (NNRCConst (dcoll nil)))))
               e3)
-      (NNRCUnop AFlatten
+      (NNRCUnop OpFlatten
                (NNRCFor v1 e1
                        (NNRCIf e2
-                              (NNRCUnop AColl e3)
+                              (NNRCUnop OpBag e3)
                               (NNRCConst (dcoll nil))))).
   Proof.
     unfold nnrc_eq; intros ? ? ? ? _.
@@ -433,12 +433,12 @@ Section NNRCRewrite.
 
   Lemma sigma_to_if (e1 e2:nnrc) (v:var) :
     nnrc_eq
-      (NNRCUnop AFlatten
-                (NNRCFor v (NNRCUnop AColl e2)
+      (NNRCUnop OpFlatten
+                (NNRCFor v (NNRCUnop OpBag e2)
                          (NNRCIf e1
-                                 (NNRCUnop AColl (NNRCVar v))
+                                 (NNRCUnop OpBag (NNRCVar v))
                                  (NNRCConst (dcoll nil)))))
-      (NNRCLet v e2 (NNRCIf e1 (NNRCUnop AColl (NNRCVar v)) (NNRCConst (dcoll nil)))).
+      (NNRCLet v e2 (NNRCIf e1 (NNRCUnop OpBag (NNRCVar v)) (NNRCConst (dcoll nil)))).
   Proof.
     unfold nnrc_eq; intros ? ? ? ? _.
     unfold nnrc_eval; simpl.

@@ -78,17 +78,17 @@ Section NRAExt.
 
   (* AXBinOp *)
 
-  Global Instance eabinop_proper : Proper (binop_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXBinop.
+  Global Instance eabinary_op_proper : Proper (binary_op_eq ==> nraext_eq ==> nraext_eq ==> nraext_eq) AXBinop.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros.
-    apply abinop_proper; assumption.
+    apply abinary_op_proper; assumption.
   Qed.
 
   (* AXUnop *)
-  Global Instance eaunop_proper : Proper (unaryop_eq ==> nraext_eq ==> nraext_eq) AXUnop.
+  Global Instance eaunop_proper : Proper (unary_op_eq ==> nraext_eq ==> nraext_eq) AXUnop.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros.
-    apply aunop_proper; assumption.
+    apply aunary_op_proper; assumption.
   Qed.
 
   (* AXMap *)
@@ -168,8 +168,8 @@ Section NRAExt.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aselect_proper; try assumption.
-    apply aunop_proper; try assumption; try reflexivity.
-    apply abinop_proper; try assumption; try reflexivity.
+    apply aunary_op_proper; try assumption; try reflexivity.
+    apply abinary_op_proper; try assumption; try reflexivity.
     apply aselect_proper; try assumption; try reflexivity.
     apply aproduct_proper; try assumption; reflexivity.
   Qed.
@@ -179,7 +179,7 @@ Section NRAExt.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply aselect_proper; try assumption.
-    apply abinop_proper; try assumption; try reflexivity.
+    apply abinary_op_proper; try assumption; try reflexivity.
     apply aselect_proper; try assumption; try reflexivity.
     apply aproduct_proper; try assumption; reflexivity.
   Qed.
@@ -197,8 +197,8 @@ Section NRAExt.
   Proof.
     unfold Proper, respectful, nraext_eq, nraext_eval; intros.
     apply amap_proper; try assumption.
-    apply abinop_proper; try assumption; try reflexivity.
-    apply aunop_proper; try assumption; try reflexivity.
+    apply abinary_op_proper; try assumption; try reflexivity.
+    apply aunary_op_proper; try assumption; try reflexivity.
     rewrite H; reflexivity.
   Qed.    
 
@@ -281,8 +281,8 @@ Section NRAExt.
     unfold Proper, respectful, group1; intros; subst; simpl.
     repeat (apply amap_proper
                   || apply amapconcat_proper
-                  || apply aunop_proper
-                  || apply abinop_proper
+                  || apply aunary_op_proper
+                  || apply abinary_op_proper
                   || assumption
                   || reflexivity).
   Qed.

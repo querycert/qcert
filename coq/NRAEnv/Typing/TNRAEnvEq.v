@@ -192,7 +192,7 @@ Section TNRAEnvEq.
    * Proper stuff *
    ****************)
 
-  Require Import ROpsEq NRAEnvEq.
+  Require Import NRAEnvEq.
   
   Global Instance  tnraenv_rewrites_to_pre : PreOrder tnraenv_rewrites_to.
   Proof.

@@ -66,8 +66,8 @@ Section NRAEnv.
   Inductive nraenv : Set :=
   | NRAEnvID : nraenv                                         (**r Current value *)
   | NRAEnvConst : data -> nraenv                              (**r Constant value *)
-  | NRAEnvBinop : binOp -> nraenv -> nraenv -> nraenv         (**r Binary operator *)
-  | NRAEnvUnop : unaryOp -> nraenv -> nraenv                  (**r Unary operator *)
+  | NRAEnvBinop : binary_op -> nraenv -> nraenv -> nraenv         (**r Binary operator *)
+  | NRAEnvUnop : unary_op -> nraenv -> nraenv                  (**r Unary operator *)
   | NRAEnvMap : nraenv -> nraenv -> nraenv                    (**r Map [χ] *)
   | NRAEnvMapConcat : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product [⋈ᵈ] *)
   | NRAEnvProduct : nraenv -> nraenv -> nraenv                (**r Cartesian product [×] *)
@@ -93,7 +93,7 @@ Section NRAEnv.
   Proof.
     change (forall x y : nraenv,  {x = y} + {x <> y}).
     decide equality;
-      try solve [apply binOp_eqdec | apply unaryOp_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
+      try solve [apply binary_op_eqdec | apply unary_op_eqdec | apply data_eqdec | apply string_eqdec | apply list_eqdec; apply string_eqdec].
   Defined.
 
   (** * Macros *)
@@ -106,33 +106,33 @@ Section NRAEnv.
     (ANSelect op1 (ANProduct op2 op3)).
 
   Definition semi_join (op1 op2 op3 : nraenv_core) : nraenv_core :=
-    ANSelect (ANUnop ANeg (ANBinop AEq (ANSelect op1 (ANProduct ((ANUnop AColl) ANID) op3)) (ANConst (dcoll nil)))) op2.
+    ANSelect (ANUnop OpNeg (ANBinop OpEqual (ANSelect op1 (ANProduct ((ANUnop OpBag) ANID) op3)) (ANConst (dcoll nil)))) op2.
 
   Definition anti_join (op1 op2 op3 : nraenv_core) : nraenv_core :=
-    ANSelect (ANBinop AEq (ANSelect op1 (ANProduct ((ANUnop AColl) ANID) op3)) (ANConst (dcoll nil))) op2.
+    ANSelect (ANBinop OpEqual (ANSelect op1 (ANProduct ((ANUnop OpBag) ANID) op3)) (ANConst (dcoll nil))) op2.
 
   (** ** Map operations *)
 
   Definition map_add_rec (s:string) (op1 op2 : nraenv_core) : nraenv_core :=
-    ANMap ((ANBinop AConcat) ANID ((ANUnop (ARec s)) op1)) op2.
+    ANMap ((ANBinop OpRecConcat) ANID ((ANUnop (OpRec s)) op1)) op2.
   Definition map_to_rec (s:string) (op : nraenv_core) : nraenv_core :=
-    ANMap (ANUnop (ARec s) ANID) op.
+    ANMap (ANUnop (OpRec s) ANID) op.
 
   Definition flat_map (op1 op2 : nraenv_core) : nraenv_core :=
-    ANUnop AFlatten (ANMap op1 op2).
+    ANUnop OpFlatten (ANMap op1 op2).
   
   (** ** Projection *)
   Definition project (fields:list string) (op:nraenv_core) : nraenv_core
-    := ANMap (ANUnop (ARecProject fields) ANID) op.
+    := ANMap (ANUnop (OpRecProject fields) ANID) op.
 
   Definition project_remove (s:string) (op:nraenv_core) : nraenv_core :=
-    ANMap ((ANUnop (ARecRemove s)) ANID) op.
+    ANMap ((ANUnop (OpRecRemove s)) ANID) op.
 
   (** ** Renaming *)
   (* renames field s1 to s2 *)
   Definition map_rename_rec (s1 s2:string) (op:nraenv_core) : nraenv_core :=
-    ANMap ((ANBinop AConcat) ((ANUnop (ARec s2)) ((ANUnop (ADot s1)) ANID))
-                  ((ANUnop (ARecRemove s1)) ANID)) op.
+    ANMap ((ANBinop OpRecConcat) ((ANUnop (OpRec s2)) ((ANUnop (OpDot s1)) ANID))
+                  ((ANUnop (OpRecRemove s1)) ANID)) op.
 
   (** ** Grouping *)
 
@@ -155,19 +155,19 @@ Section NRAEnv.
   
   Definition group_by_no_env (g:string) (sl:list string) (op : nraenv_core) : nraenv_core :=
     ANMap
-      (ANBinop AConcat
-               (ANUnop (ADot "1") (ANUnop (ADot "2") ANID))
-               (ANUnop (ARec g)
-                       (ANMap (ANUnop (ADot "3") ANID)
+      (ANBinop OpRecConcat
+               (ANUnop (OpDot "1") (ANUnop (OpDot "2") ANID))
+               (ANUnop (OpRec g)
+                       (ANMap (ANUnop (OpDot "3") ANID)
                               (ANSelect
-                                 (ANBinop AEq
-                                          (ANUnop (ARecProject sl) (ANUnop (ADot "1") ANID))
-                                          (ANUnop (ARecProject sl) (ANUnop (ADot "3") ANID)))
-                                 (ANProduct (ANUnop AColl (ANUnop (ADot "2") ANID))
-                                            (ANUnop (ADot "4") ANID))))))
+                                 (ANBinop OpEqual
+                                          (ANUnop (OpRecProject sl) (ANUnop (OpDot "1") ANID))
+                                          (ANUnop (OpRecProject sl) (ANUnop (OpDot "3") ANID)))
+                                 (ANProduct (ANUnop OpBag (ANUnop (OpDot "2") ANID))
+                                            (ANUnop (OpDot "4") ANID))))))
       (ANProduct
-         (ANUnop AColl (ANUnop (ARec "4") (map_to_rec "3" op)))
-         (map_to_rec "2" (map_to_rec "1" (ANUnop ADistinct (project sl op))))).
+         (ANUnop OpBag (ANUnop (OpRec "4") (map_to_rec "3" op)))
+         (map_to_rec "2" (map_to_rec "1" (ANUnop OpDistinct (project sl op))))).
 
   (** This is an alternative definition that isn't quite as
       inefficient. It stores the result of the input operator in the
@@ -181,32 +181,32 @@ Section NRAEnv.
 
    *)
   Definition group_by_with_env (g:string) (sl:list string) (op : nraenv_core) : nraenv_core :=
-    let op_pregroup := ANUnop (ADot "$pregroup") ANEnv in
+    let op_pregroup := ANUnop (OpDot "$pregroup") ANEnv in
     ANAppEnv
       (ANMap
-         (ANBinop AConcat
-                  (ANUnop (ARec g)
-                          (ANAppEnv (ANSelect (ANBinop AEq
-                                                       (ANUnop (ARecProject sl) ANID)
-                                                       (ANUnop (ADot "$key") ANEnv))
+         (ANBinop OpRecConcat
+                  (ANUnop (OpRec g)
+                          (ANAppEnv (ANSelect (ANBinop OpEqual
+                                                       (ANUnop (OpRecProject sl) ANID)
+                                                       (ANUnop (OpDot "$key") ANEnv))
                                               op_pregroup
                                     )
-                                    (ANBinop AConcat (ANUnop (ARec "$key") ANID) ANEnv)
+                                    (ANBinop OpRecConcat (ANUnop (OpRec "$key") ANID) ANEnv)
                           )
                   )
                   ANID
          )
-         (ANUnop ADistinct (project sl op_pregroup))
+         (ANUnop OpDistinct (project sl op_pregroup))
       )
-      (ANUnop (ARec "$pregroup") op).
+      (ANUnop (OpRec "$pregroup") op).
 
   (** ** Unnesting *)
 
   Definition unnest_one (s:string) (op:nraenv_core) : nraenv_core :=
-    ANMap ((ANUnop (ARecRemove s)) ANID) (ANMapConcat ((ANUnop (ADot s)) ANID) op).
+    ANMap ((ANUnop (OpRecRemove s)) ANID) (ANMapConcat ((ANUnop (OpDot s)) ANID) op).
 
   Definition unnest (a b:string) (op:nraenv_core) : nraenv_core :=
-    ANMap ((ANUnop (ARecRemove a)) ANID) (ANMapConcat (ANMap ((ANUnop (ARec b)) ANID) ((ANUnop (ADot a)) ANID)) op).
+    ANMap ((ANUnop (OpRecRemove a)) ANID) (ANMapConcat (ANMap ((ANUnop (OpRec b)) ANID) ((ANUnop (OpDot a)) ANID)) op).
 
   (** * Evaluation Semantics *)
 

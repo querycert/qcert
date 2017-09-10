@@ -117,7 +117,7 @@ Section TNRATest.
   Proof.
     unfold q0.
     apply (@ATUnop _ nil (Coll τin) (Coll τin) Nat).
-    apply ATCount.
+    apply type_OpCount.
     apply ATID.
   Qed.
 
@@ -155,7 +155,7 @@ Section TNRATest.
     unfold q2.
     apply (@ATMap _ nil τin person_schema Nat).
     - apply (@ATUnop trivial_basic_model nil person_schema person_schema Nat).
-      apply (@ATDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
+      apply (@type_OpDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
       apply @ATID.
     - apply qpersons_typed.
   Qed.
@@ -198,9 +198,9 @@ Section TNRATest.
     unfold q4.
     apply @ATSelect.
     - apply (@ATBinop trivial_basic_model nil person_schema Nat Nat Bool).
-      + apply ATEq.
+      + apply type_OpEqual.
       + apply (@ATUnop trivial_basic_model nil person_schema person_schema Nat).
-        apply (@ATDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
+        apply (@type_OpDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
         apply @ATID.
       + apply ATConst.
         apply dtnat.

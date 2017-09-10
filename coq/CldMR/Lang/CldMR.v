@@ -403,19 +403,19 @@ Section CldMR.
 
   Definition cloudant_sum_op (typ:cld_numeric_type)
     := match typ with
-       | Cld_int => ASum
+       | Cld_int => OpSum
        | Cld_float => cloudant_float_sum_op
        end.
 
     Definition cloudant_min_op (typ:cld_numeric_type)
     := match typ with
-       | Cld_int => ANumMin
+       | Cld_int => OpNumMin
        | Cld_float => cloudant_float_min_op
        end.
 
     Definition cloudant_max_op (typ:cld_numeric_type)
     := match typ with
-       | Cld_int => ANumMax
+       | Cld_int => OpNumMax
        | Cld_float => cloudant_float_max_op
        end.
   
@@ -426,21 +426,21 @@ Section CldMR.
       let groups := cldmr_step_group_by_eval coll in
       cldmr_step_aggregate_eval f_reduce f_rereduce groups
     | CldRedOp CldRedOpCount =>
-      let uop := ACount in
-      let v := fun_of_unaryop h uop (dcoll (List.map snd coll)) in
+      let uop := OpCount in
+      let v := unary_op_eval h uop (dcoll (List.map snd coll)) in
       let key := dcoll (dnat 0::nil) in (* XXX Question for Jerome: what to do? XXX *)
       lift (fun res => (key, res)::nil) v
     | CldRedOp (CldRedOpSum typ) =>
       let uop := cloudant_sum_op typ in
-      let v := fun_of_unaryop h uop (dcoll (List.map snd coll)) in
+      let v := unary_op_eval h uop (dcoll (List.map snd coll)) in
       let key := dcoll (dnat 0::nil) in (* XXX Question for Jerome: what to do? XXX *)
       lift (fun res => (key, res)::nil) v
     | CldRedOp (CldRedOpStats typ) =>
       let coll := dcoll (List.map snd coll) in
-      let count := fun_of_unaryop h ACount coll in
-      let sum := fun_of_unaryop h (cloudant_sum_op typ) coll in
-      let min := fun_of_unaryop h (cloudant_min_op typ) coll in
-      let max := fun_of_unaryop h (cloudant_max_op typ) coll in
+      let count := unary_op_eval h OpCount coll in
+      let sum := unary_op_eval h (cloudant_sum_op typ) coll in
+      let min := unary_op_eval h (cloudant_min_op typ) coll in
+      let max := unary_op_eval h (cloudant_max_op typ) coll in
       let v :=
           match (count, sum, min, max) with
           | (Some count, Some sum, Some min, Some max) =>
@@ -564,7 +564,7 @@ Section CldMR.
     (* Java equivalent: NrcmrToCldmr.collectReduce *)
     Definition collectReduce (v_out:option var) : cld_reduce :=
       mkReduceCld (CldRedAggregate (init_vkey, init_vval, NNRCVar init_vval)
-                                   (init_vval, NNRCUnop AFlatten (NNRCVar init_vval))) v_out.
+                                   (init_vval, NNRCUnop OpFlatten (NNRCVar init_vval))) v_out.
 
     (* Java equivalent: NrcmrToCldmr.opReduce *)
     Definition opReduce (op: cld_reduce_op) (v_out:option var) : cld_reduce :=

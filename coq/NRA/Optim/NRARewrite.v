@@ -496,18 +496,18 @@ Section ROptim.
   (* [ PBIND : ID.PBIND; PDATA : ID.PBIND ].PDATA ≡ₐ ID.PBIND *)
 
   Lemma dot_from_duplicate_bind_r :
-    (‵[| ("PBIND", (AUnop (ADot "PBIND") AID)) |] ⊕ ‵[| ("PDATA", (AUnop (ADot "PBIND") AID)) |])·"PDATA" ≡ₐ (AUnop (ADot "PBIND") AID).
+    (‵[| ("PBIND", (AUnop (OpDot "PBIND") AID)) |] ⊕ ‵[| ("PDATA", (AUnop (OpDot "PBIND") AID)) |])·"PDATA" ≡ₐ (AUnop (OpDot "PBIND") AID).
   Proof.
-    rewrite (dot_from_duplicate_r "PBIND" "PDATA" (AUnop (ADot "PBIND") AID)).
+    rewrite (dot_from_duplicate_r "PBIND" "PDATA" (AUnop (OpDot "PBIND") AID)).
     reflexivity.
   Qed.
 
   (* [ PBIND : ID.PBIND; PDATA : ID.PBIND ].PBIND ≡ₐ ID.PBIND *)
 
   Lemma dot_from_duplicate_bind_l :
-    (‵[| ("PBIND", (AUnop (ADot "PBIND") AID)) |] ⊕ ‵[| ("PDATA", (AUnop (ADot "PBIND") AID)) |])·"PBIND" ≡ₐ (AUnop (ADot "PBIND") AID).
+    (‵[| ("PBIND", (AUnop (OpDot "PBIND") AID)) |] ⊕ ‵[| ("PDATA", (AUnop (OpDot "PBIND") AID)) |])·"PBIND" ≡ₐ (AUnop (OpDot "PBIND") AID).
   Proof.
-    rewrite (dot_from_duplicate_l "PBIND" "PDATA" (AUnop (ADot "PBIND") AID)).
+    rewrite (dot_from_duplicate_l "PBIND" "PDATA" (AUnop (OpDot "PBIND") AID)).
     reflexivity.
   Qed.
 

@@ -50,9 +50,9 @@ Section TcNRAEnvtocNNRC.
     revert vid venv tenv H H0.
     dependent induction H1; simpl; intros.
     (* ATID *)
-    - apply TNNRCVar; trivial.
+    - apply type_cNNRCVar; trivial.
     (* ATConst *)
-    - apply TNNRCConst; trivial.
+    - apply type_cNNRCConst; trivial.
     (* ATBinop *)
     - econstructor; eauto.
     (* ATUnop *)
@@ -67,21 +67,21 @@ Section TcNRAEnvtocNNRC.
         elim_fresh e.
     (* ATMapConcat *)
     - specialize (IHnraenv_core_type2 vid venv tenv).
-      apply (@TNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
-      apply ATFlatten.
-      apply (@TNNRCFor m _ (RType.Rec Closed τ₁ pf1)); [eauto | ].
-      apply (@TNNRCFor m _ (RType.Rec Closed τ₂ pf2)).
+      apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+      apply type_OpFlatten.
+      apply (@type_cNNRCFor m _ (RType.Rec Closed τ₁ pf1)); [eauto | ].
+      apply (@type_cNNRCFor m _ (RType.Rec Closed τ₂ pf2)).
       + apply IHnraenv_core_type1; simpl; trivial;
         match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl; match_destr; try elim_fresh e.
         match_destr; elim_fresh e.
     (* ATProduct *)
-    - apply (@TNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
-      apply ATFlatten.
-      apply (@TNNRCFor m _ (RType.Rec Closed τ₁ pf1)); try assumption.
+    - apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
+      apply type_OpFlatten.
+      apply (@type_cNNRCFor m _ (RType.Rec Closed τ₁ pf1)); try assumption.
       apply (IHnraenv_core_type1 vid venv tenv); assumption.
       clear IHnraenv_core_type1 op1 H1_.
-      apply (@TNNRCFor m _ (RType.Rec Closed τ₂ pf2)).
+      apply (@type_cNNRCFor m _ (RType.Rec Closed τ₂ pf2)).
       + apply IHnraenv_core_type2; simpl; trivial; match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl.
         * match_destr.
@@ -89,9 +89,9 @@ Section TcNRAEnvtocNNRC.
           match_destr; congruence.
         * match_destr; try congruence.
     (* ATSelect *)
-    - apply (@TNNRCUnop m _ (RType.Coll (RType.Coll τ))); [apply ATFlatten|idtac].
-      apply (@TNNRCFor m _ τ); [apply (IHnraenv_core_type2 vid venv tenv )|idtac]; trivial.
-      apply TNNRCIf.
+    - apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll τ))); [apply type_OpFlatten|idtac].
+      apply (@type_cNNRCFor m _ τ); [apply (IHnraenv_core_type2 vid venv tenv )|idtac]; trivial.
+      apply type_cNNRCIf.
       + apply IHnraenv_core_type1; simpl; trivial; match_destr; elim_fresh e.
       + econstructor; eauto.
         econstructor. simpl.
@@ -146,7 +146,7 @@ Section TcNRAEnvtocNNRC.
     (* ATGetConstant *)
     - econstructor; eauto 2.
     (* ATEnv *)
-    - apply TNNRCVar; assumption.
+    - apply type_cNNRCVar; assumption.
     (* ATAppEnv *)
     - repeat (econstructor; eauto 2).
       apply IHnraenv_core_type2; simpl; trivial; match_destr; elim_fresh e.

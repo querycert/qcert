@@ -104,8 +104,8 @@ val pretty_annotate_annotated_rtype : bool -> (Format.formatter -> 'a -> unit) -
 
 (* Pretty operators *)
 
-val pretty_unop : int -> symbols -> 'a pretty_fun -> Format.formatter -> QcertCompiler.unaryOp -> 'a -> unit
-val pretty_binop : int -> symbols -> 'a pretty_fun -> Format.formatter -> QcertCompiler.binOp -> 'a -> 'a -> unit
+val pretty_unary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> QcertCompiler.unary_op -> 'a -> unit
+val pretty_binary_op : int -> symbols -> 'a pretty_fun -> Format.formatter -> QcertCompiler.binary_op -> 'a -> 'a -> unit
 
 (* Useful for SExp support *)
 val timescale_as_string : QcertCompiler.time_scale -> string
@@ -113,17 +113,17 @@ val timescale_as_string : QcertCompiler.time_scale -> string
 val string_of_foreign_data : QcertCompiler.enhanced_data -> string
 val foreign_data_of_string : string -> QcertCompiler.enhanced_data
 
-val string_of_foreign_unop : QcertCompiler.enhanced_unary_op -> string
-val string_of_unarith : QcertCompiler.arithUOp -> string
+val string_of_foreign_unary_op : QcertCompiler.enhanced_unary_op -> string
+val string_of_arith_unary_op : QcertCompiler.arith_unary_op -> string
 
-val foreign_unop_of_string : string -> QcertCompiler.enhanced_unary_op
-val unarith_of_string : string -> QcertCompiler.arithUOp
+val foreign_unary_op_of_string : string -> QcertCompiler.enhanced_unary_op
+val arith_unary_op_of_string : string -> QcertCompiler.arith_unary_op
 
-val string_of_foreign_binop : QcertCompiler.enhanced_binary_op -> string
-val string_of_binarith : QcertCompiler.arithBOp -> string
+val string_of_foreign_binary_op : QcertCompiler.enhanced_binary_op -> string
+val string_of_arith_binary_op : QcertCompiler.arith_binary_op -> string
 
-val binarith_of_string : string -> QcertCompiler.arithBOp
-val foreign_binop_of_string : string -> QcertCompiler.enhanced_binary_op
+val arith_binary_op_of_string : string -> QcertCompiler.arith_binary_op
+val foreign_binary_op_of_string : string -> QcertCompiler.enhanced_binary_op
 
-val string_of_binop : QcertCompiler.binOp -> string
+val string_of_binary_op : QcertCompiler.binary_op -> string
 

@@ -33,8 +33,8 @@ Section OQL.
   | OConst : data -> oql_expr
   | OVar : string -> oql_expr
   | OTable : string -> oql_expr
-  | OBinop : binOp -> oql_expr -> oql_expr -> oql_expr
-  | OUnop : unaryOp -> oql_expr -> oql_expr
+  | OBinop : binary_op -> oql_expr -> oql_expr -> oql_expr
+  | OUnop : unary_op -> oql_expr -> oql_expr
   | OSFW : oql_select_expr -> (list oql_in_expr) -> oql_where_expr -> oql_order_by_expr -> oql_expr
   with oql_select_expr : Set :=
   | OSelect : oql_expr -> oql_select_expr
@@ -77,9 +77,9 @@ Section OQL.
              (fconst : forall d : data, P (OConst d))
              (fvar : forall v : string, P (OVar v))
              (ftable : forall t : string, P (OTable t))
-             (fbinop : forall b : binOp,
+             (fbinop : forall b : binary_op,
                  forall e1 e2 : oql_expr, P e1 -> P e2 -> P (OBinop b e1 e2))
-             (funop : forall u : unaryOp,
+             (funop : forall u : unary_op,
                  forall e1 : oql_expr, P e1 -> P (OUnop u e1))
              (fswf1 : forall e1 : oql_select_expr, forall el : list oql_in_expr,
                    P (oselect_expr e1) -> Forallt (fun ab => P (oin_expr ab)) el -> P (OSFW e1 el OTrue ONoOrder))
@@ -135,9 +135,9 @@ Section OQL.
              (fconst : forall d : data, P (OConst d))
              (fvar : forall v : string, P (OVar v))
              (ftable : forall t : string, P (OTable t))
-             (fbinop : forall b : binOp,
+             (fbinop : forall b : binary_op,
                  forall e1 e2 : oql_expr, P e1 -> P e2 -> P (OBinop b e1 e2))
-             (funop : forall u : unaryOp,
+             (funop : forall u : unary_op,
                  forall e1 : oql_expr, P e1 -> P (OUnop u e1))
              (fswf1 : forall e1 : oql_select_expr, forall el : list oql_in_expr,
                    P (oselect_expr e1) -> Forall (fun ab => P (oin_expr ab)) el -> P (OSFW e1 el OTrue ONoOrder))
@@ -195,9 +195,9 @@ Section OQL.
              (fconst : forall d : data, P (OConst d))
              (fvar : forall v : string, P (OVar v))
              (ftable : forall t : string, P (OTable t))
-             (fbinop : forall b : binOp,
+             (fbinop : forall b : binary_op,
                  forall e1 e2 : oql_expr, P e1 -> P e2 -> P (OBinop b e1 e2))
-             (funop : forall u : unaryOp,
+             (funop : forall u : unary_op,
                  forall e1 : oql_expr, P e1 -> P (OUnop u e1))
              (fswf1 : forall e1 : oql_select_expr, forall el : list oql_in_expr,
                    P (oselect_expr e1) -> (forall ab, In ab el -> P (oin_expr ab)) -> P (OSFW e1 el OTrue ONoOrder))
@@ -501,8 +501,12 @@ Section OQL.
     | OConst d => Some (normalize_data h d)
     | OVar n => edot env n
     | OTable t => edot constant_env t
-    | OBinop bop q1 q2 => olift2 (fun d1 d2 => fun_of_binop h bop d1 d2) (oql_expr_interp q1 env) (oql_expr_interp q2 env)
-    | OUnop uop q1 => olift (fun d1 => fun_of_unaryop h uop d1) (oql_expr_interp q1 env)
+    | OBinop bop q1 q2 =>
+      olift2 (fun d1 d2 => binary_op_eval h bop d1 d2)
+             (oql_expr_interp q1 env)
+             (oql_expr_interp q2 env)
+    | OUnop uop q1 =>
+      olift (fun d1 => unary_op_eval h uop d1) (oql_expr_interp q1 env)
     | OSFW select_clause from_clause where_clause order_by_clause =>
       let init_env := Some (env :: nil) in
       let from_interp (envl:option (list oql_env)) (from_in_expr : oql_in_expr) :=
@@ -684,25 +688,25 @@ Notation "‵ c" := (OConst c)  (at level 0) : oql_scope.                       
 Notation "‵{||}" := (OConst (dcoll nil))  (at level 0) : oql_scope.                         (* ‵ = \backprime *)
 Notation "‵[||]" := (OConst (drec nil)) (at level 50) : oql_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (OBinop AAnd r1 r2) (right associativity, at level 65): oql_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (OBinop AOr r1 r2) (right associativity, at level 70): oql_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (OBinop AEq r1 r2) (right associativity, at level 70): oql_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (OBinop ALt r1 r2) (no associativity, at level 70): oql_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (OBinop AUnion r1 r2) (right associativity, at level 70): oql_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (OBinop AMinus r1 r2) (right associativity, at level 70): oql_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (OBinop AMin r1 r2) (right associativity, at level 70): oql_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (OBinop AMax r1 r2) (right associativity, at level 70): oql_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((OBinop AConcat) p r) (at level 70) : oql_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((OBinop AMergeConcat) p r) (at level 70) : oql_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (OBinop OpAnd r1 r2) (right associativity, at level 65): oql_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (OBinop OpOr r1 r2) (right associativity, at level 70): oql_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (OBinop OpEqual r1 r2) (right associativity, at level 70): oql_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (OBinop OpLe r1 r2) (no associativity, at level 70): oql_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (OBinop OpBagUnion r1 r2) (right associativity, at level 70): oql_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (OBinop OpBagDiff r1 r2) (right associativity, at level 70): oql_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (OBinop OpBagMin r1 r2) (right associativity, at level 70): oql_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (OBinop OpBagMax r1 r2) (right associativity, at level 70): oql_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((OBinop OpRecConcat) p r) (at level 70) : oql_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((OBinop OpRecMerge) p r) (at level 70) : oql_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (OUnop ANeg r1) (right associativity, at level 70): oql_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (OUnop ADistinct r1) (right associativity, at level 70): oql_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (OUnop ACount r1) (right associativity, at level 70): oql_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (OUnop AFlatten d) (at level 50) : oql_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((OUnop AColl) d)  (at level 50) : oql_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((OUnop (ARec s)) r) (at level 50) : oql_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((OUnop (ARecRemove s1)) r) (at level 50) : oql_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((OUnop (ADot r)) p) (left associativity, at level 40): oql_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (OUnop OpNeg r1) (right associativity, at level 70): oql_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (OUnop OpDistinct r1) (right associativity, at level 70): oql_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (OUnop OpCount r1) (right associativity, at level 70): oql_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (OUnop OpFlatten d) (at level 50) : oql_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((OUnop OpBag) d)  (at level 50) : oql_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((OUnop (OpRec s)) r) (at level 50) : oql_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((OUnop (OpRecRemove s1)) r) (at level 50) : oql_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((OUnop (OpDot r)) p) (left associativity, at level 40): oql_scope.      (* · = \cdot *)
 
 Notation "'$' v" := (OVar v%string) (at level 50, format "'$' v") : oql_scope.
 Notation "'$$' v" := (OTable v%string) (at level 50, format "'$$' v") : oql_scope.

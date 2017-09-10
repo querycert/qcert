@@ -215,7 +215,8 @@ Section CAMPTest.
   Example R5 := 
         rule_global
        ("cs" IS AGGREGATE
-             (rule_when ("c" INSTANCEOF (singleton "Customer") WHERE ("age" !#-> … ≐ ‵32)))             DO ACount
+             (rule_when ("c" INSTANCEOF (singleton "Customer") WHERE ("age" !#-> … ≐ ‵32)))
+             DO OpCount
              OVER (withBrandedVar "c" ("name"↓…))
        FLATTEN 0)
       ;; rule_return (‵"Customers with age 32: "
@@ -253,7 +254,7 @@ Section CAMPTest.
                              WHERE ("name" !#-> … ≐ ‵"John Doe"))
               ;;; rule_when ("p" INSTANCEOF (singleton "Purchase") 
                               WHERE  ("cid" !#-> … ≐ withBrandedVar "c" ("cid"↓…))))
-             DO ACount
+             DO OpCount
              OVER (withBrandedVar "p" ("name"↓…))
              FLATTEN 0)
      ;; rule_return (‵"Nb of John Doe's purchases: " +s+ 
@@ -273,7 +274,7 @@ Section CAMPTest.
     ;; rule_global
         ("cs" IS AGGREGATE
               (rule_when ("c2" INSTANCEOF (singleton "Customer") WHERE ("age" !#-> … ≐ (withBrandedVar "c" ("age"↓…)))))
-              DO ACount
+              DO OpCount
               OVER (lookup "c2")
               FLATTEN 0)
      ;; rule_return (‵"Customer: "  +s+ (withBrandedVar "c" ("name"↓…)) 
@@ -301,7 +302,7 @@ Section CAMPTest.
     ;; rule_global
         ("cs" IS AGGREGATE
               (rule_when ("c2" INSTANCEOF (singleton "Customer") WHERE ("age" !#-> … ≐ (withBrandedVar "c" ("age"↓…)))))
-              DO ACount
+              DO OpCount
               OVER (withVar "c2" …)
               FLATTEN 0)
       ;; rule_not ((lookup "cs") ≐ ‵1)
@@ -347,7 +348,7 @@ Section CAMPTest.
         ("pu" IS AGGREGATE
               (rule_when ("p" INSTANCEOF (singleton "Purchase") 
                               WHERE ("cid" !#-> … ≐ withBrandedVar "c" ("cid"↓…))))
-              DO AIdOp
+              DO OpIdentity
               OVER (withBrandedVar "p" ("name"↓…))
               FLATTEN 0)
       ;; rule_return (‵"Customer : "  +s+ (withBrandedVar "c" ("name"↓…)) 
@@ -395,10 +396,10 @@ all customers. *)
                   ;;; rule_global ("pu" IS AGGREGATE 
                                      (rule_when ("p" INSTANCEOF (singleton "Purchase") 
                               WHERE ("cid" !#-> … ≐ withBrandedVar "c" ("cid"↓…))))
-                                     DO AIdOp
+                                     DO OpIdentity
                                      OVER (withBrandedVar "p" ("name"↓…))
                                      FLATTEN 0))
-         DO ACount
+         DO OpCount
          OVER (withVar "pu" …)
          FLATTEN 0)
       ;; rule_return (‵"Total purchases are : " 
@@ -437,20 +438,20 @@ all customers. *)
         ("total" IS AGGREGATE
                  (   rule_when ("c" INSTANCEOF (singleton "Customer") 
                                  WHERE (passert 
-                                          (pbinop ALe ("age"↓…) ‵34))) 
+                                          (pbinop OpLe ("age"↓…) ‵34))) 
                   ;;; rule_global ("pu" IS AGGREGATE 
                                      (rule_when ("p" INSTANCEOF (singleton "Purchase") 
                               WHERE ("cid" !#-> … ≐ withBrandedVar "c" ("cid"↓…))))
-                                     DO ACount
+                                     DO OpCount
                                      OVER (withBrandedVar "p" …)
                                      FLATTEN 0))
-         DO AIdOp
+         DO OpIdentity
          OVER (withVar "pu" …)
          FLATTEN 0)
       ;; rule_return (‵"Average nb purchases for customers below 34 is : " 
-                 +s+ toString (punop ASum (lookup "total"))
+                 +s+ toString (punop OpSum (lookup "total"))
                  +s+ ‵" / " 
-                 +s+ toString (punop ACount (lookup "total")))
+                 +s+ toString (punop OpCount (lookup "total")))
                 .
 
 

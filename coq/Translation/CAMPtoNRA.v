@@ -43,51 +43,51 @@ Section CAMPtoNRA.
       | pconst d' => nra_match (AConst d')
       | punop uop p₁ => AMap (AUnop uop AID) (nra_of_camp p₁)
       | pbinop bop p₁ p₂ =>
-        AMap (ABinop bop (AUnop (ADot "a1") AID) (AUnop (ADot "a2") AID))
-             (AProduct (AMap (AUnop (ARec "a1") AID) (nra_of_camp p₁))
-                       (AMap (AUnop (ARec "a2") AID) (nra_of_camp p₂)))
+        AMap (ABinop bop (AUnop (OpDot "a1") AID) (AUnop (OpDot "a2") AID))
+             (AProduct (AMap (AUnop (OpRec "a1") AID) (nra_of_camp p₁))
+                       (AMap (AUnop (OpRec "a2") AID) (nra_of_camp p₂)))
       | pmap p₁ =>
         nra_match
-          (AUnop AFlatten
+          (AUnop OpFlatten
                  (AMap
                     (nra_of_camp p₁)
                     (unnest_two
                        "a1"
                        "PDATA"
-                       (AUnop AColl (nra_wrap_a1 (AUnop (ADot "PDATA") AID))))))
+                       (AUnop OpBag (nra_wrap_a1 (AUnop (OpDot "PDATA") AID))))))
       | passert p₁ => AMap (AConst (drec nil)) (ASelect AID (nra_of_camp p₁))
       | porElse p₁ p₂ => ADefault (nra_of_camp p₁) (nra_of_camp p₂)
       | pit => nra_match nra_data
       | pletIt p₁ p₂ =>
-        AUnop AFlatten
+        AUnop OpFlatten
               (AMap (nra_of_camp p₂)
                     (unnest_two
                        "a1"
                        "PDATA"
-                       (AUnop AColl
+                       (AUnop OpBag
                               (nra_wrap_a1 (nra_of_camp p₁)))))
       | pgetConstant s => nra_match (AGetConstant s)
       | penv => nra_match nra_bind
       | pletEnv p₁ p₂ =>
-        AUnop AFlatten
+        AUnop OpFlatten
               (AMap
                  (nra_of_camp p₂)
                  (unnest_two (* Needed because MergeConcat may fail so is a
                                 collection which must be unnested *)
                     "PBIND1"
                     "PBIND"
-                    (AMap (ABinop AConcat
-                                  (AUnop (ARec "PDATA") (AUnop (ADot "PDATA") AID))
-                                  (AUnop (ARec "PBIND1") (ABinop AMergeConcat
-                                                                 (AUnop (ADot "PBIND") AID)
-                                                                 (AUnop (ADot "PBIND1") AID))))
+                    (AMap (ABinop OpRecConcat
+                                  (AUnop (OpRec "PDATA") (AUnop (OpDot "PDATA") AID))
+                                  (AUnop (OpRec "PBIND1") (ABinop OpRecMerge
+                                                                 (AUnop (OpDot "PBIND") AID)
+                                                                 (AUnop (OpDot "PBIND1") AID))))
                           (unnest_two
                              "a1"
                              "PBIND1"
-                             (AUnop AColl
-                                    (ABinop AConcat
+                             (AUnop OpBag
+                                    (ABinop OpRecConcat
                                             AID
-                                            (AUnop (ARec "a1") (nra_of_camp p₁))))))))
+                                            (AUnop (OpRec "a1") (nra_of_camp p₁))))))))
       | pleft =>
         AApp (AEither (nra_match AID) (nra_fail)) nra_data
       | pright =>
@@ -99,9 +99,9 @@ Section CAMPtoNRA.
   *)
 
   Definition nra_of_camp_top p :=
-    AUnop AFlatten
+    AUnop OpFlatten
           (AMap (nra_of_camp p)
-                (AUnop AColl
+                (AUnop OpBag
                        (nra_context (AConst (drec nil)) AID))).
 
   (** Auxiliary lemmas -- all used inside pmap proof *)
@@ -203,12 +203,12 @@ Section CAMPtoNRA.
     - Case "punop"%string.
       rewrite <- IHp; clear IHp; simpl.
       destruct (camp_eval h c p bind d); try reflexivity.
-      simpl; destruct (fun_of_unaryop h u res); reflexivity.
+      simpl; destruct (unary_op_eval h u res); reflexivity.
     - Case "pbinop"%string.
       rewrite <- IHp1; rewrite <- IHp2; clear IHp1 IHp2.
       destruct (camp_eval h c p1 bind d); try reflexivity.
       destruct (camp_eval h c p2 bind d); try reflexivity.
-      simpl; destruct (fun_of_binop h b res res0); reflexivity.
+      simpl; destruct (binary_op_eval h b res res0); reflexivity.
     - Case "pmap"%string.
       destruct d; try reflexivity.
       unfold rmap_concat in *; simpl.

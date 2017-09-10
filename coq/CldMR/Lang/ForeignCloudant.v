@@ -27,9 +27,9 @@ Section ForeignCloudant.
   Class foreign_cloudant
         {fruntime:foreign_runtime} : Type
     := mk_foreign_cloudant {
-           cloudant_float_sum_op : unaryOp
-           ; cloudant_float_min_op : unaryOp
-           ; cloudant_float_max_op : unaryOp
+           cloudant_float_sum_op : unary_op
+           ; cloudant_float_min_op : unary_op
+           ; cloudant_float_max_op : unary_op
        }.
 
 End ForeignCloudant.

@@ -284,6 +284,20 @@ Section CoqLibAdd.
           * exists a; intuition.
           * rewrite exx, faa in H. discriminate.
     Qed.
+    
+    Lemma forall_in_weaken (P Q:A -> Prop) l:
+      (forall x : A, P x \/ In x l -> Q x)
+      -> (forall x : A, In x l -> Q x).
+    Proof.
+      intros.
+      induction l.
+      simpl in H; contradiction.
+      simpl in *.
+      specialize (H x). elim H0; intros; clear H0; apply H.
+      right; left; assumption.
+      right; right; assumption.
+    Qed.
+  
   End In.
 
   (** * Properties of [Forallt] *)

@@ -30,9 +30,6 @@ Section TcNNRCInfer.
 
   (** Type inference for NNRC when given the type of the environment *)
 
-  Require Import TDataInfer.
-  Require Import TOpsInfer.
-
   Fixpoint infer_nnrc_core_type (tenv:tbindings) (n:nnrc) {struct n} : option rtype :=
     match n with
     | NNRCGetConstant v =>
@@ -41,10 +38,10 @@ Section TcNNRCInfer.
       lookup equiv_dec tenv v
     | NNRCConst d => infer_data_type (normalize_data brand_relation_brands d)
     | NNRCBinop b n1 n2 =>
-      let binf (τ₁ τ₂:rtype) := infer_binop_type b τ₁ τ₂ in
+      let binf (τ₁ τ₂:rtype) := infer_binary_op_type b τ₁ τ₂ in
       olift2 binf (infer_nnrc_core_type tenv n1) (infer_nnrc_core_type tenv n2)
     | NNRCUnop u n1 =>
-        let unf (τ₁:rtype) := infer_unop_type u τ₁ in
+        let unf (τ₁:rtype) := infer_unary_op_type u τ₁ in
         olift unf (infer_nnrc_core_type tenv n1)
     | NNRCLet v n1 n2 =>
       let τ₁ := infer_nnrc_core_type tenv n1 in
@@ -97,26 +94,26 @@ Section TcNNRCInfer.
     revert tenv τout.
     nnrc_cases (induction n) Case; intros; simpl in *.
     - Case "NNRCGetConstant"%string.
-      apply TNNRCGetConstant; assumption.
+      apply type_cNNRCGetConstant; assumption.
     - Case "NNRCVar"%string.
-      apply TNNRCVar; assumption.
+      apply type_cNNRCVar; assumption.
     - Case "NNRCConst"%string.
-      apply TNNRCConst.
+      apply type_cNNRCConst.
       apply infer_data_type_correct. assumption.
     - Case "NNRCBinop"%string.
       specialize (IHn1 tenv); specialize (IHn2 tenv).
       destruct (infer_nnrc_core_type tenv n1); destruct (infer_nnrc_core_type tenv n2); simpl in *;
       try discriminate.
       specialize (IHn1 r eq_refl); specialize (IHn2 r0 eq_refl).
-      apply (@TNNRCBinop m τconstants r r0 τout tenv); try assumption.
-      apply infer_binop_type_correct; assumption.
+      apply (@type_cNNRCBinop m τconstants r r0 τout tenv); try assumption.
+      apply infer_binary_op_type_correct; assumption.
     - Case "NNRCUnop"%string.
       specialize (IHn tenv).
       destruct (infer_nnrc_core_type tenv n); simpl in *;
       try discriminate.
       specialize (IHn r eq_refl).
-      apply (@TNNRCUnop m τconstants r τout tenv); try assumption.
-      apply infer_unop_type_correct; assumption.
+      apply (@type_cNNRCUnop m τconstants r τout tenv); try assumption.
+      apply infer_unary_op_type_correct; assumption.
     - Case "NNRCLet"%string.
       specialize (IHn1 tenv).
       destruct (infer_nnrc_core_type tenv n1); simpl in *; try discriminate.
@@ -125,7 +122,7 @@ Section TcNNRCInfer.
       inversion H; subst; clear H.
       specialize (IHn1 r eq_refl).
       specialize (IHn2 τout eq_refl).
-      apply (TNNRCLet τconstants v tenv n1 n2 IHn1 IHn2).
+      apply (type_cNNRCLet τconstants v tenv n1 n2 IHn1 IHn2).
     - Case "NNRCFor"%string.
       specialize (IHn1 tenv).
       destruct (infer_nnrc_core_type tenv n1); simpl in *; try discriminate.
@@ -136,7 +133,7 @@ Section TcNNRCInfer.
         inversion H; subst; clear H.
         specialize (IHn1 (Coll r0) eq_refl).
         specialize (IHn2 r1 eq_refl).
-        apply (TNNRCFor τconstants v tenv n1 n2 IHn1 IHn2).
+        apply (type_cNNRCFor τconstants v tenv n1 n2 IHn1 IHn2).
       + discriminate.
     - Case "NNRCIf"%string.
       specialize (IHn1 tenv).
@@ -155,7 +152,7 @@ Section TcNNRCInfer.
       specialize (IHn1 Bool eq_refl).
       specialize (IHn2 τout eq_refl).
       specialize (IHn3 τout eq_refl).
-      apply TNNRCIf; assumption.
+      apply type_cNNRCIf; assumption.
     - Case "NNRCEither"%string.
       specialize (IHn1 tenv).
       destruct (infer_nnrc_core_type tenv n1); simpl in *; try discriminate.
@@ -171,7 +168,7 @@ Section TcNNRCInfer.
                               (Either₀ x1 x2) e) eq_refl).
       specialize (IHn2 _ _ H0).
       specialize (IHn3 _ _ H1).
-      eapply TNNRCEither; eauto.
+      eapply type_cNNRCEither; eauto.
       erewrite <- Either_canon; eauto.
     - Case "NNRCGroupBy"%string.
       congruence. (* Type checking always fails for groupby in core NNRC *)

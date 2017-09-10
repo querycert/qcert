@@ -64,8 +64,8 @@ Section DNNRCBase.
     | DNNRCGetConstant : A -> var -> dnnrc_base
     | DNNRCVar : A -> var -> dnnrc_base
     | DNNRCConst : A -> data -> dnnrc_base
-    | DNNRCBinop : A -> binOp -> dnnrc_base -> dnnrc_base -> dnnrc_base
-    | DNNRCUnop : A -> unaryOp -> dnnrc_base -> dnnrc_base
+    | DNNRCBinop : A -> binary_op -> dnnrc_base -> dnnrc_base -> dnnrc_base
+    | DNNRCUnop : A -> unary_op -> dnnrc_base -> dnnrc_base
     | DNNRCLet : A -> var -> dnnrc_base -> dnnrc_base -> dnnrc_base
     | DNNRCFor : A -> var -> dnnrc_base -> dnnrc_base -> dnnrc_base
     | DNNRCIf : A -> dnnrc_base -> dnnrc_base -> dnnrc_base -> dnnrc_base
@@ -224,10 +224,10 @@ Section DNNRCBase.
       | DNNRCConst _ d =>
         Some (Dlocal (normalize_data h d))
       | DNNRCBinop _ bop e1 e2 =>
-        olift2 (fun d1 d2 => lift Dlocal (fun_of_binop h bop d1 d2))
+        olift2 (fun d1 d2 => lift Dlocal (binary_op_eval h bop d1 d2))
                (olift checkLocal (dnnrc_base_eval env e1)) (olift checkLocal (dnnrc_base_eval env e2))
       | DNNRCUnop _ uop e1 =>
-        olift (fun d1 => lift Dlocal (fun_of_unaryop h uop d1)) (olift checkLocal (dnnrc_base_eval env e1))
+        olift (fun d1 => lift Dlocal (unary_op_eval h uop d1)) (olift checkLocal (dnnrc_base_eval env e1))
       | DNNRCLet _ x e1 e2 =>
         match dnnrc_base_eval env e1 with
         | Some d => dnnrc_base_eval ((x,d)::env) e2
@@ -408,10 +408,10 @@ Section DNNRCBase.
           rewrite eqq2 in *); simpl in *; try discriminate.
          + destruct d; destruct d0; simpl in H; try congruence;
            destruct o; simpl in *; unfold lift in H;
-           case_eq (fun_of_binop h b d d0); intros; rewrite H1 in *; try congruence;
+           case_eq (binary_op_eval h b d d0); intros; rewrite H1 in *; try congruence;
            inversion H; subst; clear H;
            constructor;
-           eapply fun_of_binop_normalized; eauto.
+           eapply binary_op_eval_normalized; eauto.
            specialize (IHe1 denv (Dlocal d) H0 eqq1);
            inversion IHe1; assumption.
            specialize (IHe2 denv (Dlocal d0) H0 eqq2);
@@ -423,10 +423,10 @@ Section DNNRCBase.
         simpl in *; try discriminate.
         destruct d; simpl in H; try congruence;
         destruct o; simpl in H; unfold lift in H;
-        case_eq (fun_of_unaryop h u d); intros; rewrite H1 in H;
+        case_eq (unary_op_eval h u d); intros; rewrite H1 in H;
         inversion H; subst; clear H;
         constructor;
-        eapply fun_of_unaryop_normalized; eauto.
+        eapply unary_op_eval_normalized; eauto.
         specialize (IHe denv (Dlocal d) H0 eqq1); inversion IHe; assumption.
       - case_eq (dnnrc_base_eval denv e1); [intros ? eqq1 | intros eqq1];
         rewrite eqq1 in *;

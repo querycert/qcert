@@ -28,9 +28,6 @@ Section TNRAInfer.
 
   (** Type inference for NRA when given the type of the input *)
 
-  Require Import TDataInfer.
-  Require Import TOpsInfer.
-
   (* Auxiliary lemmas/definitions *)
 
   Section aux.
@@ -118,10 +115,10 @@ Section TNRAInfer.
       | AID => Some τin
       | AConst d => infer_data_type (normalize_data brand_relation_brands d)
       | ABinop b op1 op2 =>
-        let binf (τ₁ τ₂:rtype) := infer_binop_type b τ₁ τ₂ in
+        let binf (τ₁ τ₂:rtype) := infer_binary_op_type b τ₁ τ₂ in
         olift2 binf (infer_nra_type op1 τin) (infer_nra_type op2 τin)
       | AUnop u op1 =>
-        let unf (τ₁:rtype) := infer_unop_type u τ₁ in
+        let unf (τ₁:rtype) := infer_unary_op_type u τ₁ in
         olift unf (infer_nra_type op1 τin)
       | AMap op1 op2 =>
         let mapf (τ₁:rtype) :=
@@ -230,14 +227,14 @@ Section TNRAInfer.
       try discriminate.
       specialize (IHe1 r eq_refl); specialize (IHe2 r0 eq_refl).
       apply (@ATBinop m τconstants τin r r0 τout); try assumption.
-      apply infer_binop_type_correct; assumption.
+      apply infer_binary_op_type_correct; assumption.
     - Case "AUnop"%string.
       specialize (IHe τin).
       destruct (infer_nra_type e τin); simpl in *;
       try discriminate.
       specialize (IHe r eq_refl).
       apply (@ATUnop m τconstants τin r τout); try assumption.
-      apply infer_unop_type_correct; assumption.
+      apply infer_unary_op_type_correct; assumption.
     - Case "AMap"%string.
       case_eq (infer_nra_type e2 τin); intros; simpl in *.
       + specialize (IHe2 τin r H0). rewrite H0 in H. simpl in *.

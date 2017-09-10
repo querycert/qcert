@@ -151,17 +151,17 @@ Section NRAEnvEq.
 
   (* NRAEnvBinOp *)
 
-  Global Instance nraenv_binop_proper : Proper (binop_eq ==> nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvBinop.
+  Global Instance nraenv_binary_op_proper : Proper (binary_op_eq ==> nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvBinop.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anbinop_proper; assumption.
+    apply anbinary_op_proper; assumption.
   Qed.
 
   (* NRAEnvUnop *)
-  Global Instance nraenv_unop_proper : Proper (unaryop_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnop.
+  Global Instance nraenv_unary_op_proper : Proper (unary_op_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvUnop.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anunop_proper; assumption.
+    apply anunary_op_proper; assumption.
   Qed.
 
   (* NRAEnvMap *)
@@ -253,7 +253,7 @@ Section NRAEnvEq.
   Global Instance nraenv_flatmap_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvFlatMap.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
-    apply anunop_proper; try assumption; try reflexivity.
+    apply anunary_op_proper; try assumption; try reflexivity.
     apply anmap_proper; assumption.
   Qed.
 

@@ -17,7 +17,7 @@
 Require Import String.
 Require Import ZArith.
 Require Import ForeignData.
-Require Import ForeignOps.
+Require Import ForeignOperators.
 Require Import EquivDec.
 Require Import Equivalence.
 

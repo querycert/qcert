@@ -88,7 +88,7 @@ Section CompilerUntypedTest.
   Example Example1' :=
     ("total-attribute" IS AGGREGATE
                        (rule_when ("e" INSTANCEOF (singleton "MainEntity") WHERE ("doubleAttribute" !#-> … ≐ ‵50)))
-                       DO ACount
+                       DO OpCount
                        OVER (withVar "e" …)
                        FLATTEN 0).
   
@@ -96,7 +96,7 @@ Section CompilerUntypedTest.
         rule_global
           ("total-attribute" IS AGGREGATE
                              (rule_when ("e" INSTANCEOF (singleton "MainEntity") WHERE ("doubleAttribute" !#-> … ≐ ‵50)))
-                             DO ACount
+                             DO OpCount
                              OVER (withVar "e" …)
                              FLATTEN 0)
           ;; rule_return (‵"MainEntitys with doubleAttribute 50: "
@@ -191,8 +191,7 @@ Section CompilerUntypedTest.
   
   Definition tinp1 := (("WORLD", Coll (Brand (singleton "MainEntity")))::nil).
 
-  Require Import TCAMP TOps.
-
+  Require Import CAMPSystem.
   (* This is collapsed using econstructor, but not sure how systematic that would be... -JS *)
   Lemma Example1'_wt τ :
     camp_type tinp1 nil Example1' τ tout1.

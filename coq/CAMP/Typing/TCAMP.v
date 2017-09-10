@@ -52,12 +52,12 @@ Section TCAMP.
         Γ  |= pconst d ; τ₁ ~> τ₂
     | PTunop {Γ τ₁ τ₂ τ₃ u p} :
         Γ |= p ; τ₁ ~> τ₂ ->
-        unaryOp_type u τ₂ τ₃ ->
+        unary_op_type u τ₂ τ₃ ->
         Γ |= punop u p ; τ₁ ~> τ₃
     | PTbinop {Γ τ₁ τ₂₁ τ₂₂ τ₃ b p₁ p₂} :
         Γ |= p₁ ; τ₁ ~> τ₂₁ ->
         Γ |= p₂ ; τ₁ ~> τ₂₂ ->
-        binOp_type b τ₂₁ τ₂₂ τ₃ ->
+        binary_op_type b τ₂₁ τ₂₂ τ₃ ->
         Γ |= pbinop b p₁ p₂ ; τ₁ ~> τ₃
     | PTmap {Γ τ₁ τ₂ p} :
         Γ |= p ; τ₁ ~> τ₂ ->
@@ -200,17 +200,17 @@ Section TCAMP.
     inversion tcamp; subst.
     (* pconst *)
     - eauto. 
-    (* unaryOp *)
+    (* punop *)
     - destruct (IHp _ _ _ _ _ tenv H2 tdat) as [[dout[camp_evaleq tx]]|camp_evaleq];
         rewrite camp_evaleq; simpl; [|eauto].
-        destruct (typed_unop_yields_typed_data _ _ tx H5) as [?[??]].
+        destruct (typed_unary_op_yields_typed_data _ _ tx H5) as [?[??]].
         rewrite H; simpl. eauto.
-    (* binOp *)
+    (* pbinop *)
     - destruct (IHp1 _ _ _ _ _ tenv H3 tdat) as [[dout1[camp_evaleq1 tx1]]|camp_evaleq1];
         rewrite camp_evaleq1; simpl; [|eauto].
       destruct (IHp2 _ _ _ _ _ tenv H6 tdat) as [[dout2[camp_evaleq2 tx2]]|camp_evaleq2];
         rewrite camp_evaleq2; simpl; [|eauto].
-      destruct (typed_binop_yields_typed_data _ _ _ tx1 tx2 H7) as [?[??]].
+      destruct (typed_binary_op_yields_typed_data _ _ _ tx1 tx2 H7) as [?[??]].
       rewrite H; simpl. eauto.
     (* pmap *)
     - inversion tdat; subst.

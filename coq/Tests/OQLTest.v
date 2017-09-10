@@ -149,7 +149,7 @@ Section OQLTest.
   
   (* Simple count over a table *)
 
-  Definition q0 : oql_expr := OUnop ACount (OTable "Companies").
+  Definition q0 : oql_expr := OUnop OpCount (OTable "Companies").
   Definition q0_eval : option data := oql_expr_interp CPRModel tables q0 init_env.
 
 (*  Eval vm_compute in q0_eval. *)
@@ -162,9 +162,9 @@ Section OQLTest.
 
   Definition q1 : oql_expr :=
     OSFW
-      (OSelect (OUnop (ADot "age") (OUnop AUnbrand (OVar "e"))))
+      (OSelect (OUnop (OpDot "age") (OUnop OpUnbrand (OVar "e"))))
       ((OIn "e"  (OTable "Employees"))::nil)
-      (OWhere (OBinop AEq (OUnop (ADot "name") (OUnop AUnbrand (OVar "e"))) (OConst (dstring "John"))))
+      (OWhere (OBinop OpEqual (OUnop (OpDot "name") (OUnop OpUnbrand (OVar "e"))) (OConst (dstring "John"))))
       ONoOrder.
   
   Definition q1_eval : option data := oql_expr_interp CPRModel tables q1 init_env.
@@ -180,13 +180,13 @@ Section OQLTest.
   
   Definition q2 : oql_expr :=
     OSFW
-      (OSelect (OBinop AConcat
-                       (OUnop (ARec "employee") (OUnop (ADot "name") (OUnop AUnbrand (OVar "e"))))
-                       (OUnop (ARec "worksfor") (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))))
+      (OSelect (OBinop OpRecConcat
+                       (OUnop (OpRec "employee") (OUnop (OpDot "name") (OUnop OpUnbrand (OVar "e"))))
+                       (OUnop (OpRec "worksfor") (OUnop (OpDot "cname") (OUnop OpUnbrand (OVar "c"))))))
       ((OIn "e"  (OTable "Employees"))::(OIn "c" (OTable "Companies"))::nil)
-      (OWhere (OBinop AEq
-                      (OUnop (ADot "company") (OUnop AUnbrand (OVar "e")))
-                      (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c")))))
+      (OWhere (OBinop OpEqual
+                      (OUnop (OpDot "company") (OUnop OpUnbrand (OVar "e")))
+                      (OUnop (OpDot "cname") (OUnop OpUnbrand (OVar "c")))))
       ONoOrder.
 
   Definition q2_eval : option data := oql_expr_interp CPRModel tables q2 init_env.
@@ -197,13 +197,13 @@ Section OQLTest.
   
   Definition q2' : oql_expr :=
     OSFW
-      (OSelect (OStruct (("employee", (OUnop (ADot "name") (OUnop AUnbrand (OVar "e"))))
-                           :: ("worksfor", (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))
+      (OSelect (OStruct (("employee", (OUnop (OpDot "name") (OUnop OpUnbrand (OVar "e"))))
+                           :: ("worksfor", (OUnop (OpDot "cname") (OUnop OpUnbrand (OVar "c"))))
                            :: nil)))
       ((OIn "e"  (OTable "Employees"))::(OIn "c" (OTable "Companies"))::nil)
-      (OWhere (OBinop AEq
-                      (OUnop (ADot "company") (OUnop AUnbrand (OVar "e")))
-                      (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c")))))
+      (OWhere (OBinop OpEqual
+                      (OUnop (OpDot "company") (OUnop OpUnbrand (OVar "e")))
+                      (OUnop (OpDot "cname") (OUnop OpUnbrand (OVar "c")))))
       ONoOrder.
 
   Definition q2'_eval : option data := oql_expr_interp CPRModel tables q2' init_env.
@@ -217,10 +217,10 @@ Section OQLTest.
   
   Definition q3 : oql_expr :=
     OSFW
-      (OSelect (OBinop AConcat
-                       (OUnop (ARec "company") (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))
-                       (OUnop (ARec "dept") (OVar "d"))))
-      ((OIn "c"  (OTable "Companies"))::(OIn "d" (OUnop (ADot "departments") (OUnop AUnbrand (OVar "c"))))::nil)
+      (OSelect (OBinop OpRecConcat
+                       (OUnop (OpRec "company") (OUnop (OpDot "cname") (OUnop OpUnbrand (OVar "c"))))
+                       (OUnop (OpRec "dept") (OVar "d"))))
+      ((OIn "c"  (OTable "Companies"))::(OIn "d" (OUnop (OpDot "departments") (OUnop OpUnbrand (OVar "c"))))::nil)
       OTrue
       ONoOrder.
 
@@ -238,10 +238,10 @@ Section OQLTest.
   
   Definition q3wrong : oql_expr :=
     OSFW
-      (OSelect (OBinop AConcat
-                       (OUnop (ARec "company") (OUnop (ADot "cname") (OUnop AUnbrand (OVar "c"))))
-                       (OUnop (ARec "dept") (OVar "d"))))
-      ((OIn "d" (OUnop (ADot "departments") (OUnop AUnbrand (OVar "c"))))::(OIn "c"  (OTable "Companies"))::nil)
+      (OSelect (OBinop OpRecConcat
+                       (OUnop (OpRec "company") (OUnop (OpDot "cname") (OUnop OpUnbrand (OVar "c"))))
+                       (OUnop (OpRec "dept") (OVar "d"))))
+      ((OIn "d" (OUnop (OpDot "departments") (OUnop OpUnbrand (OVar "c"))))::(OIn "c"  (OTable "Companies"))::nil)
       OTrue
       ONoOrder.
 

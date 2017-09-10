@@ -38,12 +38,12 @@ Section TNRA.
          op₂ : τin -> τ₂
          ==========================
          b (op₁,op₂) : τin -> τout *)
-      binOp_type b τ₁ τ₂ τout ->
+      binary_op_type b τ₁ τ₂ τout ->
       nra_type op1 τin τ₁ ->
       nra_type op2 τin τ₂ ->
       nra_type (ABinop b op1 op2) τin τout
   | ATUnop {τin τ τout} u op :
-      unaryOp_type u τ τout ->
+      unary_op_type u τ τout ->
       nra_type op τin τ ->
       nra_type (AUnop u op) τin τout
   | ATMap {τin τ₁ τ₂} op1 op2 :
@@ -377,12 +377,12 @@ Section TNRA.
       elim H1; elim H2; intros; clear H1 H2.
       rewrite H3; simpl.
       rewrite H5; simpl.
-      apply (typed_binop_yields_typed_data x0 x b H4 H6); assumption.
+      apply (typed_binary_op_yields_typed_data x0 x b H4 H6); assumption.
     - Case "AUnop"%string.
       elim (IHnra_type d H1); intros.
       elim H2; intros; clear H2.
       rewrite H3.
-      apply (typed_unop_yields_typed_data x u H4); assumption.
+      apply (typed_unary_op_yields_typed_data x u H4); assumption.
     - Case "AMap"%string.
       elim (IHnra_type2 d H); intros; clear H IHnra_type2.
       elim H0; intros; clear H0.

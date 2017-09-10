@@ -2466,7 +2466,7 @@ Section TNRAEnvRewrite.
   
   Lemma tappenv_mapenv_to_map_arrow q a:
     ANAppEnv (ANMapEnv q) (ENV ⊗ ‵[| (a, ID)|]) ⇒
-             χ⟨(q ◯ (ANUnop (ADot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) ).
+             χ⟨(q ◯ (ANUnop (OpDot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) ).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2489,12 +2489,13 @@ Section TNRAEnvRewrite.
       rewrite <- H.
       destruct x; simpl in *.
       assert (tdot τ₃ s = Some s0) by (apply (edot_merge_bindings τ₁0 τ₃ s s0); assumption).
-      apply ATDot; assumption.
+      apply type_OpDot; assumption.
       econstructor; eauto.
       assert (Rec Closed τ₃ pf3 = τenv0)
       by (apply rtype_fequal; simpl in *; assumption).
       rewrite <- H in *.
-      generalize (@ATMergeConcat _ _ _ _ _ _ τ₁0 [(fst x, snd x)] τ₃ pf1 eq_refl pf3); intros.
+      generalize (@type_OpRecMerge_closed
+                    _ _ _ _ _ _ τ₁0 [(fst x, snd x)] τ₃ pf1 eq_refl pf3); intros.
       destruct x; simpl in *.
       apply (H2 H3).
     - intros.
@@ -2515,7 +2516,7 @@ Section TNRAEnvRewrite.
   
   Lemma tappenv_flatten_mapenv_to_map_arrow q a:
     ANAppEnv (♯flatten(ANMapEnv q)) (ENV ⊗ ‵[| (a, ID)|]) ⇒
-           ♯flatten(χ⟨(q ◯ (ANUnop (ADot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) )).
+           ♯flatten(χ⟨(q ◯ (ANUnop (OpDot a) ANEnv)) ◯ₑ ID⟩( (ENV ⊗ ‵[| (a, ID)|]) )).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
@@ -2538,12 +2539,13 @@ Section TNRAEnvRewrite.
       rewrite <- H.
       destruct x; simpl in *.
       assert (tdot τ₃ s = Some s0) by (apply (edot_merge_bindings τ₁0 τ₃ s s0); assumption).
-      apply ATDot; assumption.
+      apply type_OpDot; assumption.
       econstructor; eauto.
       assert (Rec Closed τ₃ pf3 = τenv0)
       by (apply rtype_fequal; simpl in *; assumption).
       rewrite <- H in *.
-      generalize (@ATMergeConcat _ _ _ _ _ _ τ₁0 [(fst x, snd x)] τ₃ pf1 eq_refl pf3); intros.
+      generalize (@type_OpRecMerge_closed
+                    _ _ _ _ _ _ τ₁0 [(fst x, snd x)] τ₃ pf1 eq_refl pf3); intros.
       destruct x; simpl in *.
       apply (H2 H3).
     - intros.
@@ -2566,7 +2568,7 @@ Section TNRAEnvRewrite.
   (* ♯toString(s) ⇒ s *)
   
   Lemma ttostring_dstring_arrow s:
-    (ANUnop AToString (ANConst (dstring s))) ⇒ (ANConst (dstring s)).
+    (ANUnop OpToString (ANConst (dstring s))) ⇒ (ANConst (dstring s)).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (tostring_dstring s)).
     intros; nraenv_core_inferer.
@@ -2578,7 +2580,7 @@ Section TNRAEnvRewrite.
   (* ♯toString(♯toString(q)) ⇒ ♯toString(q) *)
   
   Lemma ttostring_tostring_arrow q:
-    (ANUnop AToString (ANUnop AToString q)) ⇒ (ANUnop AToString q).
+    (ANUnop OpToString (ANUnop OpToString q)) ⇒ (ANUnop OpToString q).
   Proof.
     apply (rewrites_typed_with_untyped _ _ (tostring_tostring q)).
     intros.
@@ -2591,7 +2593,7 @@ Section TNRAEnvRewrite.
   (* ♯toString(♯sConcat q₁ q₂) ⇒ ♯toString(♯sConcat q₁ q₂) *)
   
   Lemma ttostring_sconcat_arrow q₁ q₂:
-    (ANUnop AToString (ANBinop ASConcat q₁ q₂)) ⇒ (ANBinop ASConcat q₁ q₂).
+    (ANUnop OpToString (ANBinop OpStringConcat q₁ q₂)) ⇒ (ANBinop OpStringConcat q₁ q₂).
   Proof.
     unfold tnraenv_core_rewrites_to; intros; simpl.
     nraenv_core_inferer.
