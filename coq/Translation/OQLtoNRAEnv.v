@@ -50,9 +50,9 @@ Section OQLtoNRAEnv.
       let nraenv_of_from (opacc:nraenv) (from_in_expr : oql_in_expr) :=
           match from_in_expr with
             | OIn in_v from_expr =>
-              NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr from_expr)) opacc
+              NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr from_expr)) opacc
             | OInCast in_v brand_name from_expr =>
-              NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
+              NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID)
                                  (NRAEnvUnop OpFlatten
                                          (NRAEnvMap
                                             (NRAEnvEither (NRAEnvUnop OpBag NRAEnvID)
@@ -366,14 +366,14 @@ Section OQLtoNRAEnv.
      ***************************)
 
     (* first off, prove the one-step used in the fold correctly adds one
-     variable and does cartesian product (i.e., MapConcat) *)
+     variable and does cartesian product (i.e., MapProduct) *)
     Lemma one_from_fold_step_is_map_concat defls s o op xenv envs envs0:
       (h ⊢ op @ₓ envs ⊣ constant_env ; (drec (rec_concat_sort xenv defls)))%nraenv =
       lift (fun x : list (list (string * data)) => dcoll (map drec x)) envs0 ->
       (forall xenv0 (env : oql_env),
           oql_expr_interp h (rec_concat_sort constant_env defls) o env =
           (h ⊢ oql_to_nraenv_expr (domain defls) o @ₓ drec env ⊣ constant_env; (drec (rec_concat_sort xenv0 defls)))%nraenv) ->
-      ((h ⊢ (NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (OpRec s) NRAEnvID) (oql_to_nraenv_expr (domain defls) o)) op) @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
+      ((h ⊢ (NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec s) NRAEnvID) (oql_to_nraenv_expr (domain defls) o)) op) @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
        lift (fun x : list (list (string * data)) => dcoll (map drec x))
             (match envs0 with
              | Some envl' =>
@@ -387,7 +387,7 @@ Section OQLtoNRAEnv.
       destruct envs0; [|reflexivity]; simpl.
       induction l; try reflexivity; simpl.
       unfold env_map_concat in *; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *; simpl.
       unfold oenv_map_concat_single in *; simpl.
       rewrite (H0 xenv).
@@ -436,7 +436,7 @@ Section OQLtoNRAEnv.
 
     (* re-first off, prove the one-step used in the fold for from-cast
        correctly adds one variable and does cartesian product (i.e.,
-       MapConcat) as well *)
+       MapProduct) as well *)
 
     Lemma one_from_cast_fold_step_is_map_concat_cast defls s bn o op xenv envs envs0:
       (h ⊢ op @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
@@ -444,7 +444,7 @@ Section OQLtoNRAEnv.
       (forall xenv0 (env : oql_env),
           oql_expr_interp h (rec_concat_sort constant_env defls) o env =
           (h ⊢ oql_to_nraenv_expr (domain defls) o @ₓ drec env ⊣ constant_env; (drec (rec_concat_sort xenv0 defls)))%nraenv) ->
-      ((h ⊢ (NRAEnvMapConcat
+      ((h ⊢ (NRAEnvMapProduct
                (NRAEnvMap
                   (NRAEnvUnop (OpRec s) NRAEnvID)
                   (NRAEnvUnop OpFlatten(
@@ -467,7 +467,7 @@ Section OQLtoNRAEnv.
       destruct envs0; [|reflexivity]; simpl.
       induction l; try reflexivity; simpl.
       unfold env_map_concat_cast in *; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *; simpl.
       unfold oenv_map_concat_single_with_cast in *; simpl.
       rewrite (H0 xenv).
@@ -576,11 +576,11 @@ Section OQLtoNRAEnv.
           (h ⊢ oql_to_nraenv_expr (domain defls) o @ₓ drec env0 ⊣ constant_env; (drec (rec_concat_sort xenv0 defls)))%nraenv) ->
       (lift (fun x : list (list (string * data)) => dcoll (map drec x))
             (env_map_concat s (oql_expr_interp h (rec_concat_sort constant_env defls) o) (env :: nil))) =
-      (nraenv_eval h constant_env (NRAEnvMapConcat (NRAEnvMap (NRAEnvUnop (OpRec s) NRAEnvID) (oql_to_nraenv_expr (domain defls) o)) (NRAEnvUnop OpBag NRAEnvID)) (drec (rec_concat_sort xenv defls)) (drec env)).
+      (nraenv_eval h constant_env (NRAEnvMapProduct (NRAEnvMap (NRAEnvUnop (OpRec s) NRAEnvID) (oql_to_nraenv_expr (domain defls) o)) (NRAEnvUnop OpBag NRAEnvID)) (drec (rec_concat_sort xenv defls)) (drec env)).
     Proof.
       intros; simpl.
       unfold nraenv_eval; simpl.
-      unfold rmap_concat; simpl.
+      unfold rmap_product; simpl.
       unfold env_map_concat; simpl.
       unfold oomap_concat; simpl.
       unfold oenv_map_concat_single; simpl.
@@ -631,11 +631,11 @@ Section OQLtoNRAEnv.
          (fun (opacc : nraenv) (from_in_expr : oql_in_expr) =>
             match from_in_expr with
             | OIn in_v from_expr =>
-              NRAEnvMapConcat
+              NRAEnvMapProduct
                 (NRAEnvMap (NRAEnvUnop (OpRec in_v) NRAEnvID) (oql_to_nraenv_expr (domain defls) from_expr))
                 opacc
             | OInCast in_v brand_name from_expr =>
-              NRAEnvMapConcat
+              NRAEnvMapProduct
                 (NRAEnvMap
                    (NRAEnvUnop (OpRec in_v) NRAEnvID)
                    (NRAEnvUnop OpFlatten
@@ -656,10 +656,10 @@ Section OQLtoNRAEnv.
       (* OIn case *)
       - inversion H; subst; simpl in *.
         specialize (IHel H4); clear H H4.
-        specialize (IHel (NRAEnvMapConcat
+        specialize (IHel (NRAEnvMapProduct
                             (NRAEnvMap (NRAEnvUnop (OpRec s) NRAEnvID)
                                        (oql_to_nraenv_expr (domain defls) o)) op)%nraenv).
-        assert ((h ⊢ (NRAEnvMapConcat
+        assert ((h ⊢ (NRAEnvMapProduct
                         (NRAEnvMap (NRAEnvUnop (OpRec s) NRAEnvID)
                                    (oql_to_nraenv_expr (domain defls) o)) op)%nraenv
                    @ₓ envs ⊣ constant_env; (drec (rec_concat_sort xenv defls)))%nraenv =
@@ -679,7 +679,7 @@ Section OQLtoNRAEnv.
       - inversion H; subst; simpl in *.
         specialize (IHel H4); clear H H4.
         specialize
-          (IHel (NRAEnvMapConcat
+          (IHel (NRAEnvMapProduct
                    (NRAEnvMap
                       (NRAEnvUnop (OpRec s) NRAEnvID)
                       (NRAEnvUnop OpFlatten
@@ -688,7 +688,7 @@ Section OQLtoNRAEnv.
                                                    (NRAEnvConst (dcoll nil)))
                                      (NRAEnvMap (NRAEnvUnop (OpCast (s0 :: nil)) NRAEnvID)
                                                 (oql_to_nraenv_expr (domain defls) o))))) (op))%nraenv).
-        assert ((h ⊢ (NRAEnvMapConcat
+        assert ((h ⊢ (NRAEnvMapProduct
                         (NRAEnvMap
                            (NRAEnvUnop (OpRec s) NRAEnvID)
                            (NRAEnvUnop OpFlatten

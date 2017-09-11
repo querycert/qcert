@@ -47,7 +47,7 @@ Section cNRAEnvtocNNRC.
         NNRCFor t nnrc2 (nraenv_core_to_nnrc_core op1 t varenv)
       (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1,venv } | t1 ∈ [[ op2 ]]_vid,venv } *)
-      | ANMapConcat op1 op2 =>
+      | ANMapProduct op1 op2 =>
         let nnrc2 := (nraenv_core_to_nnrc_core op2 varid varenv) in
         let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in
         NNRCUnop OpFlatten
@@ -180,7 +180,7 @@ Section cNRAEnvtocNNRC.
       destruct d; try reflexivity.
       rewrite (map_sem_correct h op1 cenv denv l); trivial.
       prove_fresh_nin.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       rewrite (IHop2 did denv env vid venv H); trivial.
       repeat (dest_eqdec; try congruence).
       prove_fresh_nin.
@@ -190,7 +190,7 @@ Section cNRAEnvtocNNRC.
         autorewrite with alg in *;
         apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop1 a denv) at 1; clear IHop1; try assumption; simpl; auto 3.
@@ -225,7 +225,7 @@ Section cNRAEnvtocNNRC.
       autorewrite with alg in *.
       apply lift_dcoll_inversion.
       induction l; try reflexivity; simpl.
-      unfold rmap_concat in *; simpl.
+      unfold rmap_product in *; simpl.
       unfold oomap_concat in *.
       rewrite <- IHl; clear IHl.
       rewrite (IHop2 did denv _ vid venv) at 1; clear IHop2; trivial; try congruence.
@@ -384,7 +384,7 @@ Section cNRAEnvtocNNRC.
       + auto.
       + apply remove_inv in H.
         destruct (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv v); intuition.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       intros vid venv v.
       Opaque fresh_var2.
       simpl.
@@ -549,7 +549,7 @@ Section cNRAEnvtocNNRC.
     Proof.
       revert vid venv.
       nraenv_core_cases (induction q) Case; intros; simpl; auto.
-      - Case "ANMapConcat"%string.
+      - Case "ANMapProduct"%string.
         destruct (fresh_var2 "tmc$" "tmc$" (vid :: venv :: nil));simpl.
         auto.
       - Case "ANProduct"%string.

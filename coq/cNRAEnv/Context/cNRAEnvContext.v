@@ -46,7 +46,7 @@ Section cNRAEnvContext.
   | CANBinop : binary_op -> nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANUnop : unary_op -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANMap : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
-  | CANMapConcat : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
+  | CANMapProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANProduct : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANSelect : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
   | CANDefault : nraenv_core_ctxt -> nraenv_core_ctxt -> nraenv_core_ctxt
@@ -76,7 +76,7 @@ Section cNRAEnvContext.
       | CANBinop b c1 c2 => aec_holes c1 ++ aec_holes c2
       | CANUnop u c' => aec_holes c'
       | CANMap c1 c2 => aec_holes c1 ++ aec_holes c2
-      | CANMapConcat c1 c2 => aec_holes c1 ++ aec_holes c2
+      | CANMapProduct c1 c2 => aec_holes c1 ++ aec_holes c2
       | CANProduct c1 c2 => aec_holes c1 ++ aec_holes c2
       | CANSelect c1 c2 => aec_holes c1 ++ aec_holes c2
       | CANDefault c1 c2 => aec_holes c1 ++ aec_holes c2
@@ -106,10 +106,10 @@ Section cNRAEnvContext.
           | (CNPlug a1), (CNPlug a2) => CNPlug (ANMap a1 a2)
           | c1', c2' => CANMap c1' c2'
         end
-      | CANMapConcat c1 c2 =>
+      | CANMapProduct c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
-          | (CNPlug a1), (CNPlug a2) => CNPlug (ANMapConcat a1 a2)
-          | c1', c2' => CANMapConcat c1' c2'
+          | (CNPlug a1), (CNPlug a2) => CNPlug (ANMapProduct a1 a2)
+          | c1', c2' => CANMapProduct c1' c2'
         end
       | CANProduct c1 c2 =>
         match aec_simplify c1, aec_simplify c2 with
@@ -218,8 +218,8 @@ Section cNRAEnvContext.
         => CANUnop u (aec_subst c x p)
       | CANMap c1 c2
         => CANMap (aec_subst c1 x p) (aec_subst c2 x p)
-      | CANMapConcat c1 c2
-        => CANMapConcat (aec_subst c1 x p) (aec_subst c2 x p)
+      | CANMapProduct c1 c2
+        => CANMapProduct (aec_subst c1 x p) (aec_subst c2 x p)
       | CANProduct c1 c2
         => CANProduct (aec_subst c1 x p) (aec_subst c2 x p)
       | CANSelect c1 c2
@@ -321,9 +321,9 @@ Section cNRAEnvContext.
     destruct a; simpl; auto.
   Qed.
 
-  Lemma aec_substs_MapConcat c1 c2 ps :
-    aec_substs ( CANMapConcat c1 c2) ps =
-    CANMapConcat (aec_substs c1 ps) (aec_substs c2 ps).
+  Lemma aec_substs_MapProduct c1 c2 ps :
+    aec_substs ( CANMapProduct c1 c2) ps =
+    CANMapProduct (aec_substs c1 ps) (aec_substs c2 ps).
   Proof.
     revert c1 c2.
     induction ps; simpl; trivial; intros.
@@ -407,7 +407,7 @@ Section cNRAEnvContext.
        aec_substs_Binop
        aec_substs_Unop
        aec_substs_Map
-       aec_substs_MapConcat
+       aec_substs_MapProduct
        aec_substs_Product
        aec_substs_Select
        aec_substs_Default
@@ -459,8 +459,8 @@ Section cNRAEnvContext.
   Qed.
 
     Lemma aec_simplify_holes_mapconcat c1 c2:
-    aec_holes (CANMapConcat c1 c2) <> nil ->
-    aec_simplify (CANMapConcat c1 c2) = CANMapConcat (aec_simplify c1) (aec_simplify c2).
+    aec_holes (CANMapProduct c1 c2) <> nil ->
+    aec_simplify (CANMapProduct c1 c2) = CANMapProduct (aec_simplify c1) (aec_simplify c2).
   Proof.
     intros.
     simpl in H.
@@ -627,7 +627,7 @@ Section cNRAEnvContext.
         rewrite IHc.
         trivial.
     - destr_solv IHc1 IHc2 (CANMap c1 c2) aec_simplify_holes_map.
-    - destr_solv IHc1 IHc2 (CANMapConcat c1 c2) aec_simplify_holes_mapconcat.
+    - destr_solv IHc1 IHc2 (CANMapProduct c1 c2) aec_simplify_holes_mapconcat.
     - destr_solv IHc1 IHc2 (CANProduct c1 c2) aec_simplify_holes_product.
     - destr_solv IHc1 IHc2 (CANSelect c1 c2) aec_simplify_holes_select.
     - destr_solv IHc1 IHc2 (CANDefault c1 c2) aec_simplify_holes_default.
@@ -1174,7 +1174,7 @@ Notation "¬π[ s1 ]( r )" := ((CANUnop (OpRecRemove s1)) r) (at level 50) : nra
 Notation "p · r" := ((CANUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_ctxt_scope.      (* · = \cdot *)
 
 Notation "χ⟨ p ⟩( r )" := (CANMap p r) (at level 70) : nraenv_core_ctxt_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CANMapConcat e2 e1) (at level 70) : nraenv_core_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (CANMapProduct e2 e1) (at level 70) : nraenv_core_ctxt_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
 Notation "r1 × r2" := (CANProduct r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.       (* × = \times *)
 Notation "σ⟨ p ⟩( r )" := (CANSelect p r) (at level 70) : nraenv_core_ctxt_scope.                           (* σ = \sigma *)
 Notation "r1 ∥ r2" := (CANDefault r1 r2) (right associativity, at level 70): nraenv_core_ctxt_scope.       (* ∥ = \parallel *)
@@ -1193,7 +1193,7 @@ Notation "X ≡ₑ Y" := (nraenv_core_ctxt_equiv nraenv_core_eq X Y) (at level 9
        @aec_substs_Binop
        @aec_substs_Unop
        @aec_substs_Map
-       @aec_substs_MapConcat
+       @aec_substs_MapProduct
        @aec_substs_Product
        @aec_substs_Select
        @aec_substs_Default

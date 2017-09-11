@@ -53,15 +53,15 @@
 &nbsp;&nbsp;.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="arith_binary_op_eqdec">arith_binary_op_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#arith_binary_op">arith_binary_op</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1033')">Proof.</div>
-<div class="proofscript" id="proof1033">
+<div class="toggleproof" onclick="toggleDisplay('proof1035')">Proof.</div>
+<div class="proofscript" id="proof1035">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#arith_binary_op">arith_binary_op</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="binary_op_eqdec">binary_op_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#binary_op">binary_op</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1034')">Proof.</div>
-<div class="proofscript" id="proof1034">
+<div class="toggleproof" onclick="toggleDisplay('proof1036')">Proof.</div>
+<div class="proofscript" id="proof1036">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#binary_op">binary_op</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#arith_binary_op_eqdec">arith_binary_op_eqdec</a></span>.<br/>

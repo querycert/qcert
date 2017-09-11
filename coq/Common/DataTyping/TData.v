@@ -971,12 +971,12 @@ Section rmap.
   Context {fdtyping:foreign_data_typing}.
   Context {m:brand_model}.
 
-  Lemma rmap_concat_empty_right τ pf l:
+  Lemma rmap_product_empty_right τ pf l:
     Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
-    (rmap_concat (fun _ : data => Some (dcoll (drec nil :: nil))) l) = Some l.
+    (rmap_product (fun _ : data => Some (dcoll (drec nil :: nil))) l) = Some l.
   Proof.
     intros.
-    induction l; simpl; unfold rmap_concat in *; simpl.
+    induction l; simpl; unfold rmap_product in *; simpl.
     - reflexivity.
     - inversion H; clear H; subst.
       specialize (IHl H3); clear H3.
@@ -1000,17 +1000,90 @@ Section rmap.
         reflexivity.
   Qed.
   
-  Lemma rmap_concat_empty_left τ pf l:
+  Lemma rproduct_empty_right τ pf l:
     Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
-    (rmap_concat (fun _ : data => Some (dcoll l)) (drec nil::nil)) = Some l.
+    (rproduct l (drec nil :: nil)) = Some l.
   Proof.
     intros.
-    induction l; simpl; unfold rmap_concat in *; simpl.
+    induction l; simpl; unfold rmap_product in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      unfold rproduct in *; simpl in *; rewrite IHl.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort.
+      rewrite app_nil_r.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        assert (domain dl = domain rl).
+        apply (sorted_forall_same_domain); assumption.
+        auto.
+        assumption.
+      + rewrite H.
+        reflexivity.
+  Qed.
+  
+  Lemma rmap_product_empty_left τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (rmap_product (fun _ : data => Some (dcoll l)) (drec nil::nil)) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold rmap_product in *; simpl.
     - reflexivity.
     - inversion H; clear H; subst.
       specialize (IHl H3); clear H3.
       unfold oflat_map in IHl.
       unfold oomap_concat in *.
+      unfold omap_concat in *.
+      simpl in *.
+      inversion H2.
+      dtype_inverter. subst.
+      unfold rec_concat_sort in *.
+      rewrite app_nil_l in *.
+      assert (rec_sort dl = dl).
+      + clear a e.
+        rewrite sort_sorted_is_id.
+        reflexivity.
+        rewrite (same_domain_same_sorted rl dl).
+        reflexivity.
+        clear pf' H0 H2 H4 H1 rl_sub IHl pf.
+        assert (domain dl = domain rl).
+        apply (sorted_forall_same_domain); assumption.
+        auto.
+        assumption.
+      + destruct (rmap
+         (fun x : data =>
+          match x with
+          | dunit => None
+          | dnat _ => None
+          | dbool _ => None
+          | dstring _ => None
+          | dcoll _ => None
+          | drec r1 => Some (drec (rec_sort (nil ++ r1)))
+          | dleft _ => None
+          | dright _ => None
+          | dbrand _ _ => None
+          | dforeign _ => None
+          end) l); simpl in *; congruence.
+  Qed.
+    
+  Lemma rproduct_empty_left τ pf l:
+    Forall (fun d : data => d ▹ Rec Closed τ pf) l ->
+    (rproduct (drec nil::nil) l) = Some l.
+  Proof.
+    intros.
+    induction l; simpl; unfold rmap_product in *; simpl.
+    - reflexivity.
+    - inversion H; clear H; subst.
+      specialize (IHl H3); clear H3.
+      simpl in *.
+      unfold rproduct in *; simpl in *.
       unfold omap_concat in *.
       simpl in *.
       inversion H2.

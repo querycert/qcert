@@ -69,7 +69,7 @@ Section NRAEnv.
   | NRAEnvBinop : binary_op -> nraenv -> nraenv -> nraenv         (**r Binary operator *)
   | NRAEnvUnop : unary_op -> nraenv -> nraenv                  (**r Unary operator *)
   | NRAEnvMap : nraenv -> nraenv -> nraenv                    (**r Map [χ] *)
-  | NRAEnvMapConcat : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product [⋈ᵈ] *)
+  | NRAEnvMapProduct : nraenv -> nraenv -> nraenv              (**r Dependent cartesian product [⋈ᵈ] *)
   | NRAEnvProduct : nraenv -> nraenv -> nraenv                (**r Cartesian product [×] *)
   | NRAEnvSelect : nraenv -> nraenv -> nraenv                 (**r Relational selection [σ] *) 
   | NRAEnvDefault : nraenv -> nraenv -> nraenv                (**r Default for empty collection [∥] *)
@@ -203,10 +203,10 @@ Section NRAEnv.
   (** ** Unnesting *)
 
   Definition unnest_one (s:string) (op:nraenv_core) : nraenv_core :=
-    ANMap ((ANUnop (OpRecRemove s)) ANID) (ANMapConcat ((ANUnop (OpDot s)) ANID) op).
+    ANMap ((ANUnop (OpRecRemove s)) ANID) (ANMapProduct ((ANUnop (OpDot s)) ANID) op).
 
   Definition unnest (a b:string) (op:nraenv_core) : nraenv_core :=
-    ANMap ((ANUnop (OpRecRemove a)) ANID) (ANMapConcat (ANMap ((ANUnop (OpRec b)) ANID) ((ANUnop (OpDot a)) ANID)) op).
+    ANMap ((ANUnop (OpRecRemove a)) ANID) (ANMapProduct (ANMap ((ANUnop (OpRec b)) ANID) ((ANUnop (OpDot a)) ANID)) op).
 
   (** * Evaluation Semantics *)
 
@@ -219,7 +219,7 @@ Section NRAEnv.
       | NRAEnvBinop b e1 e2 => ANBinop b (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
       | NRAEnvUnop u e1 => ANUnop u (nraenv_core_of_nraenv e1)
       | NRAEnvMap e1 e2 => ANMap (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
-      | NRAEnvMapConcat e1 e2 => ANMapConcat (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
+      | NRAEnvMapProduct e1 e2 => ANMapProduct (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
       | NRAEnvProduct e1 e2 => ANProduct (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
       | NRAEnvSelect e1 e2 => ANSelect (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
       | NRAEnvDefault e1 e2 => ANDefault (nraenv_core_of_nraenv e1) (nraenv_core_of_nraenv e2)
@@ -252,7 +252,7 @@ Section NRAEnv.
       | ANBinop b e1 e2 => NRAEnvBinop b (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
       | ANUnop u e1 => NRAEnvUnop u (nraenv_of_nraenv_core e1)
       | ANMap e1 e2 => NRAEnvMap (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
-      | ANMapConcat e1 e2 => NRAEnvMapConcat (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
+      | ANMapProduct e1 e2 => NRAEnvMapProduct (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
       | ANProduct e1 e2 => NRAEnvProduct (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
       | ANSelect e1 e2 => NRAEnvSelect (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
       | ANDefault e1 e2 => NRAEnvDefault (nraenv_of_nraenv_core e1) (nraenv_of_nraenv_core e2)
@@ -296,7 +296,7 @@ Section NRAEnv.
         nraenv_free_vars q1
       | NRAEnvMap q2 q1 =>
         nraenv_free_vars q1 ++ nraenv_free_vars q2
-      | NRAEnvMapConcat q2 q1 =>
+      | NRAEnvMapProduct q2 q1 =>
         nraenv_free_vars q1 ++ nraenv_free_vars q2
       | NRAEnvProduct q1 q2 =>
         nraenv_free_vars q1 ++ nraenv_free_vars q2
@@ -357,7 +357,7 @@ Tactic Notation "nraenv_cases" tactic(first) ident(c) :=
   | Case_aux c "NRAEnvBinop"
   | Case_aux c "NRAEnvUnop"
   | Case_aux c "NRAEnvMap"
-  | Case_aux c "NRAEnvMapConcat"
+  | Case_aux c "NRAEnvMapProduct"
   | Case_aux c "NRAEnvProduct"
   | Case_aux c "NRAEnvSelect"
   | Case_aux c "NRAEnvDefault"

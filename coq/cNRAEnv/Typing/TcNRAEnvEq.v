@@ -208,10 +208,10 @@ Section TcNRAEnvEq.
     destruct (rmap (nraenv_core_eval brand_relation_brands c x env) dout); destruct (rmap (nraenv_core_eval brand_relation_brands c y env) dout); congruence.
   Qed.
 
-  (* ANMapConcat *)
+  (* ANMapProduct *)
   
   Global Instance anmapconcat_tproper :
-    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANMapConcat.
+    Proper (tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to ==> tnraenv_core_rewrites_to) ANMapProduct.
   Proof.
     unfold Proper, respectful, tnraenv_core_rewrites_to; intros.
     nraenv_core_inferer.
@@ -230,7 +230,7 @@ Section TcNRAEnvEq.
     assert (data_type a (Rec Closed τ₁ pf1)).
     - assert (Rec Closed τ₁ pf1 = Rec Closed τ₁ x2) by (apply rtype_fequal; reflexivity).
       rewrite H3 in *; clear H3; assumption.
-    - unfold rmap_concat in *; simpl in *.
+    - unfold rmap_product in *; simpl in *.
       unfold oomap_concat in *; simpl in *.
       rewrite (H2 a c env H3 dt_c dt_env).
       input_well_typed.

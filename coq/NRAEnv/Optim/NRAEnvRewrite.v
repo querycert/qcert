@@ -1125,7 +1125,7 @@ Section ROptimEnv.
       destruct o0; try reflexivity; simpl.
       destruct (StringOrder.lt_dec s3 s1); try reflexivity; simpl.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try reflexivity; simpl.
@@ -1190,7 +1190,7 @@ Section ROptimEnv.
       destruct (StringOrder.lt_dec s3 s2); try reflexivity; try congruence; simpl.
       destruct (StringOrder.lt_dec s1 s3); try reflexivity; try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s3); try congruence; simpl.
@@ -1204,7 +1204,7 @@ Section ROptimEnv.
       destruct (string_dec s1 s3); try congruence; simpl.
       destruct (string_dec s1 s2); try congruence; simpl.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try congruence; simpl.
@@ -1219,7 +1219,7 @@ Section ROptimEnv.
       assert (StringOrder.eq s1 s3) by (apply lt_contr1; assumption).
       congruence.
       unfold lift; simpl.
-      unfold rmap_concat, oomap_concat; simpl.
+      unfold rmap_product, oomap_concat; simpl.
       unfold edot; simpl.
       unfold string_eqdec.
       destruct (string_dec s1 s1); try congruence; simpl.
@@ -1781,10 +1781,10 @@ This is the first operation that
              | (ANID, r) => (ANMap e1 e2, ANID)
              | (e2last, e2rest) => (e2last, ANMap e1 e2rest)
            end
-         | ANMapConcat e1 e2 =>
+         | ANMapProduct e1 e2 =>
            match nraenv_core_split_last e2 with
-             | (ANID, r) => (ANMapConcat e1 e2, ANID)
-             | (e2last, e2rest) => (e2last, ANMapConcat e1 e2rest)
+             | (ANID, r) => (ANMapProduct e1 e2, ANID)
+             | (e2last, e2rest) => (e2last, ANMapProduct e1 e2rest)
            end
          | ANProduct e1 e2 => (ANProduct e1 e2,ANID)
          | ANSelect e1 e2 =>

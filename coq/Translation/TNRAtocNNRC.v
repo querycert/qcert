@@ -48,21 +48,23 @@ Section TNRAtocNNRC.
     intros.
     revert vid tenv H.
     dependent induction H0; simpl; intros.
-    (* ATID *)
+    (* type_NRAGetConstant *)
+    - econstructor; eauto 2.
+    (* type_NRAID *)
     - apply type_cNNRCVar; trivial.
-    (* ATConst *)
+    (* type_NRAConst *)
     - apply type_cNNRCConst; trivial.
-    (* ATBinop *)
+    (* type_NRABinop *)
     - econstructor; eauto.
-    (* ATUnop *)
+    (* type_NRAUnop *)
     - econstructor; eauto.
-    (* ATMap *)
+    (* type_NRAMap *)
     - econstructor; [eauto| ].
       apply (IHnra_type1 
                (fresh_var "tmap$" [vid])
                ((fresh_var "tmap$" [vid],τ₁)::tenv)); simpl; trivial.
       + dest_eqdec; congruence.
-    (* ATMapConcat *)
+    (* type_NRAMapProduct *)
     - specialize (IHnra_type2 vid tenv).
       apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply type_OpFlatten.
@@ -72,7 +74,7 @@ Section TNRAtocNNRC.
         match_destr; try elim_fresh e.
       + econstructor; econstructor; eauto 2; simpl; match_destr; try elim_fresh e.
         match_destr; elim_fresh e.
-    (* ATProduct *)
+    (* type_NRAProduct *)
     - apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply type_OpFlatten.
       apply (@type_cNNRCFor m _ (RType.Rec Closed τ₁ pf1)); try assumption.
@@ -85,7 +87,7 @@ Section TNRAtocNNRC.
           elim_fresh e.
           match_destr; congruence.
         * match_destr; try congruence.
-    (* ATSelect *)
+    (* type_NRASelect *)
     - apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll τ))); [apply type_OpFlatten|idtac].
       apply (@type_cNNRCFor m _ τ); [apply (IHnra_type2 vid tenv )|idtac]; trivial.
       apply type_cNNRCIf.
@@ -96,7 +98,7 @@ Section TNRAtocNNRC.
         simpl.
         match_destr; intuition.
       + econstructor. simpl. repeat econstructor.
-    (* ATDefault *)
+    (* type_NRADefault *)
     - econstructor; eauto.
       econstructor; eauto.
       econstructor; eauto.
@@ -109,12 +111,12 @@ Section TNRAtocNNRC.
       + apply IHnra_type2; simpl; trivial; match_destr; elim_fresh e.
       + econstructor; eauto.
         simpl; match_destr; elim_fresh e.
-    (* ATEither *)
+    (* type_NRAEither *)
     - econstructor.
       + econstructor; eauto.
       + eapply IHnra_type1; simpl; trivial; match_destr; try elim_fresh e.
       + eapply IHnra_type2; simpl; trivial; match_destr; try elim_fresh e.
-    (* ATEitherConcat *)
+    (* type_NRAEitherConcat *)
     - econstructor; [eauto | ].
       econstructor.
       + eapply IHnra_type1; simpl; trivial; match_destr; try elim_fresh e.
@@ -138,12 +140,10 @@ Section TNRAtocNNRC.
             - symmetry in e; elim_fresh e.
             - match_destr; try congruence.
           }
-    (* ATApp *)
+    (* type_NRAApp *)
     - repeat (econstructor; eauto 2).
       apply IHnra_type2; simpl; trivial.
       + simpl; match_destr; intuition.
-    (* ATGetConstant *)
-    - econstructor; eauto 2.
   Qed.
 
   (** Reverse direction, main theorem *)
@@ -157,21 +157,23 @@ Section TNRAtocNNRC.
     intros.
     revert τin τout vid tenv H H0.
     nra_cases (induction op) Case; simpl; intros; inversion H0; subst.
-    - Case "AID"%string.
+    - Case "NRAGetConstant"%string.
+      econstructor. eauto.
+    - Case "NRAID"%string.
       rewrite H in H3; inversion H3; subst. eauto.
-    - Case "AConst"%string.
+    - Case "NRAConst"%string.
       eauto.
-    - Case "ABinop"%string.
+    - Case "NRABinop"%string.
       eauto. 
-    - Case "AUnop"%string.
+    - Case "NRAUnop"%string.
       eauto.
-    - Case "AMap"%string.
+    - Case "NRAMap"%string.
       econstructor; eauto 2.
       eapply (IHop1 _ _ (fresh_var "tmap$" [vid])
                     ((fresh_var "tmap$" [vid],
                       τ₁) :: tenv)); simpl; trivial.
       + match_destr; congruence.
-    - Case "AMapConcat"%string.
+    - Case "NRAMapProduct"%string.
       inversion H6; subst.
       inversion H9; subst.
       inversion H11; subst.
@@ -196,7 +198,7 @@ Section TNRAtocNNRC.
            :: tenv)); eauto.
       + simpl; match_destr.
         congruence.
-    - Case "AProduct"%string.
+    - Case "NRAProduct"%string.
       inversion H4; subst.
       inversion H6; subst.
       destruct τ₂; simpl in *.
@@ -218,7 +220,7 @@ Section TNRAtocNNRC.
       + simpl.
         match_destr.
         elim_fresh e2.
-    - Case "ASelect"%string.
+    - Case "NRASelect"%string.
       inversion H4; clear H4; subst.
       inversion H6; clear H6; subst.
       inversion H8; clear H8; subst.
@@ -235,7 +237,7 @@ Section TNRAtocNNRC.
       econstructor; eauto 2.
       eapply (IHop1 _ _ (fresh_var "tsel$" (vid::nil)) ((fresh_var "tsel$" (vid::nil), τ) :: tenv)); eauto; simpl;
         match_destr; try elim_fresh e0.
-    - Case "ADefault"%string.
+    - Case "NRADefault"%string.
       inversion H7; subst; clear H7.
       inversion H10; subst. inversion H5; subst.
       inversion H8; inversion H12; inversion H13;
@@ -246,7 +248,7 @@ Section TNRAtocNNRC.
       inversion H3; subst; inversion H11; subst; clear H3 H11.
       constructor; eauto 2.
       eapply (IHop2 _ _ vid ((fresh_var "tdef$" [vid], Coll τ) :: tenv)); eauto; simpl; match_destr; elim_fresh e0.
-    - Case "AEither"%string.
+    - Case "NRAEither"%string.
       inversion H8; subst.
       rewrite H in H3; inversion H3; clear H3; subst.
       econstructor.
@@ -254,7 +256,7 @@ Section TNRAtocNNRC.
           simpl; match_destr; try elim_fresh e.
       + eapply IHop2; try eapply H10; trivial;
         simpl; match_destr; try elim_fresh e.
-    - Case "AEitherConcat"%string.
+    - Case "NRAEitherConcat"%string.
       inversion H7; clear H7; subst.
       clear H0.
       inversion H11; clear H11; subst.
@@ -283,13 +285,11 @@ Section TNRAtocNNRC.
       econstructor; try reflexivity; eauto 2.
       eapply IHop1; try eapply H10; trivial;
         simpl; match_destr; try elim_fresh e1.
-    - Case "AApp"%string.
+    - Case "NRAApp"%string.
       inversion H; subst; clear H.
       econstructor; eauto 2.
       eapply (IHop1 _ _ (fresh_var "tapp$" [vid]) ((fresh_var "tapp$" [vid], τ₁) :: tenv)); simpl; trivial;
         try (match_destr; try elim_fresh e).
-    - Case "AGetConstant"%string.
-      econstructor. eauto.
   Qed.
 
   (** Theorem 7.4: NRA<->NNRC.

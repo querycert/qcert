@@ -61,23 +61,30 @@ Section NRAEq.
 
   (* all the algebraic constructors are proper wrt. equivalence *)
 
-  (* AID *)
-  Global Instance aid_proper : Proper nra_eq AID.
+  (* NRAGetConstant *)
+  Global Instance proper_NRAGetConstant s : Proper (nra_eq) (NRAGetConstant s).
+  Proof.
+    unfold Proper, respectful, nra_eq; intros; simpl.
+    reflexivity.
+  Qed.
+
+  (* NRAID *)
+  Global Instance proper_NRAID : Proper nra_eq NRAID.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; reflexivity.
   Qed.
 
-  (* AConst *)
-  Global Instance aconst_proper : Proper (eq ==> nra_eq) AConst.
+  (* NRAConst *)
+  Global Instance proper_NRAConst : Proper (eq ==> nra_eq) NRAConst.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; rewrite H; reflexivity.
   Qed.
 
-  (* ABinop *)
+  (* NRABinop *)
 
-  Global Instance abinary_op_proper : Proper (binary_op_eq ==> nra_eq ==> nra_eq ==> nra_eq) ABinop.
+  Global Instance proper_NRABinop : Proper (binary_op_eq ==> nra_eq ==> nra_eq ==> nra_eq) NRABinop.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
@@ -87,8 +94,8 @@ Section NRAEq.
     rewrite (H h); eauto.
   Qed.
 
-  (* AUnop *)
-  Global Instance aunary_op_proper : Proper (unary_op_eq ==> nra_eq ==> nra_eq) AUnop.
+  (* NRAUnop *)
+  Global Instance proper_NRAUnop : Proper (unary_op_eq ==> nra_eq ==> nra_eq) NRAUnop.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
@@ -99,8 +106,8 @@ Section NRAEq.
     
   Hint Resolve data_normalized_dcoll_in.
 
-  (* AMap *)
-  Global Instance amap_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AMap.
+  (* NRAMap *)
+  Global Instance proper_NRAMap : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAMap.
   Proof.
     unfold Proper, respectful.
     intros; unfold nra_eq in *; intros; simpl.
@@ -112,7 +119,7 @@ Section NRAEq.
     eauto.
   Qed.
 
-  (* AMapConcat *)
+  (* NRAMapProduct *)
 
   Lemma oomap_concat_eq {h:list(string*string)} op1 op2 l:
     forall (c:list (string*data))
@@ -125,7 +132,7 @@ Section NRAEq.
     unfold oomap_concat; rewrite H; reflexivity.
   Qed.
 
-  Global Instance amapconcat_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AMapConcat.
+  Global Instance proper_NRAMapProduct : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAMapProduct.
   Proof.
     unfold Proper, respectful.
     intros; unfold nra_eq in *; intros; simpl.
@@ -133,12 +140,12 @@ Section NRAEq.
     destruct d; try reflexivity.
     apply olift_ext; inversion 1; subst; intros.
     simpl. f_equal.
-    apply rmap_concat_ext; intros.
+    apply rmap_product_ext; intros.
     eauto.
   Qed.
 
-  (* AProduct *)
-  Global Instance aproduct_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AProduct.
+  (* NRAProduct *)
+  Global Instance proper_NRAProduct : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAProduct.
   Proof.
     unfold Proper, respectful.
     intros; unfold nra_eq in *; intros; simpl.
@@ -146,8 +153,8 @@ Section NRAEq.
     reflexivity.
   Qed.
 
-  (* ASelect *)
-  Global Instance aselect_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) ASelect.
+  (* NRASelect *)
+  Global Instance proper_NRASelect : Proper (nra_eq ==> nra_eq ==> nra_eq) NRASelect.
   Proof.
     unfold Proper, respectful, nra_eq.
     intros; simpl.
@@ -162,42 +169,35 @@ Section NRAEq.
     eauto.
   Qed.
 
-  (* ADefault *)
-  Global Instance adefault_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) ADefault.
+  (* NRADefault *)
+  Global Instance proper_NRADefault : Proper (nra_eq ==> nra_eq ==> nra_eq) NRADefault.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
     rewrite (H0 h c dn_c x1) by trivial; rewrite (H h c dn_c x1) by trivial.
     case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intros; case_eq (h ⊢ y @ₐ x1 ⊣ c); intros; simpl; trivial.
   Qed.
 
-  (* AEither *)
-  Global Instance aeither_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AEither.
+  (* NRAEither *)
+  Global Instance proper_NRAEither : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAEither.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
     destruct x1; simpl; trivial; inversion dn_x; subst; auto.
   Qed.
 
-  (* AEitherConcat *)
-  Global Instance aeitherconcat_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AEitherConcat.
+  (* NRAEitherConcat *)
+  Global Instance proper_NRAEitherConcat : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAEitherConcat.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
     rewrite (H0 h c dn_c x1) by trivial; rewrite (H h c dn_c x1) by trivial.
     case_eq (h ⊢ y0 @ₐ x1 ⊣ c); case_eq (h ⊢ y @ₐ x1 ⊣ c); intros; simpl; trivial.
   Qed.
 
-  (* AApp *)
-  Global Instance aapp_proper : Proper (nra_eq ==> nra_eq ==> nra_eq) AApp.
+  (* NRAApp *)
+  Global Instance proper_NRAApp : Proper (nra_eq ==> nra_eq ==> nra_eq) NRAApp.
   Proof.
     unfold Proper, respectful, nra_eq; intros; simpl.
     rewrite (H0 h c dn_c x1) by trivial. case_eq (h ⊢ y0 @ₐ x1 ⊣ c); intros; simpl; trivial.
     rewrite (H h c dn_c d); eauto.
-  Qed.
-
-  (* AGetConstant *)
-  Global Instance agetconstant_proper s : Proper (nra_eq) (AGetConstant s).
-  Proof.
-    unfold Proper, respectful, nra_eq; intros; simpl.
-    reflexivity.
   Qed.
 
 End NRAEq.

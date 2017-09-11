@@ -39,7 +39,7 @@
     begin match a with
     | "map" -> QLambdaNRA.lamap (resolve_one_lambda a el) e0
     | "flatmap" -> QLambdaNRA.laflatmap (resolve_one_lambda a el) e0
-    | "mapconcat" -> QLambdaNRA.lamapconcat (resolve_one_lambda a el) e0
+    | "mapproduct" -> QLambdaNRA.lamapproduct (resolve_one_lambda a el) e0
     | "filter" -> QLambdaNRA.lafilter (resolve_one_lambda a el) e0
     | "product" -> QLambdaNRA.laproduct (resolve_one_expr a el) e0
     | "union" -> QLambdaNRA.labinop QcertCompiler.OpBagUnion e0 (resolve_one_expr a el)

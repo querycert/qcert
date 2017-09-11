@@ -454,6 +454,27 @@ Section Fresh.
     apply fresh_var_fresh1.
   Qed.
 
+  Definition fresh_var3 pre1 pre2 pre3 (dom:list string) :=
+    let fresh_var1 := fresh_var pre1 dom in
+    let fresh_var2 := fresh_var pre2 (fresh_var1::dom) in
+    let fresh_var3 := fresh_var pre3 (fresh_var2::fresh_var1::dom) in
+    (fresh_var1, fresh_var2, fresh_var3).
+  
+  Lemma fresh_var3_distinct pre1 pre2 pre3 dom :
+    (fst (fst (fresh_var3 pre1 pre2 pre3 dom))) <>
+    (snd (fst (fresh_var3 pre1 pre2 pre3 dom))) /\
+    (snd (fst (fresh_var3 pre1 pre2 pre3 dom))) <>
+    (snd (fresh_var3 pre1 pre2 pre3 dom)) /\
+    (fst (fst (fresh_var3 pre1 pre2 pre3 dom))) <>
+    (snd (fresh_var3 pre1 pre2 pre3 dom)).
+  Proof.
+    unfold fresh_var3; simpl.
+    split;[|split].
+    - apply fresh_var_fresh1.
+    - apply fresh_var_fresh1.
+    - apply fresh_var_fresh2.
+  Qed.
+
   (* given a variable, gets the "base": the part before the last seperator *)
   Definition get_var_base (sep:string) (var:string)
     := match index 0 (string_reverse sep) (string_reverse var) with

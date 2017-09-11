@@ -57,11 +57,11 @@ Section TLambdaNRA.
       lnra_lambda_type lop1 Γ (τ₀ ~~> τ) ->
       lambda_nra_type op2 Γ (Coll τ₀) ->
       lambda_nra_type (LNRAMap lop1 op2) Γ (Coll τ)
-  | TLMapConcat {Γ τ₁ τ₂ τ} lop1 op2 pf1 pf2 pf3 :
+  | TLMapProduct {Γ τ₁ τ₂ τ} lop1 op2 pf1 pf2 pf3 :
       lnra_lambda_type lop1 Γ ((Rec Closed τ₁ pf1)~~>(Coll (Rec Closed τ₂ pf2))) ->
       lambda_nra_type op2 Γ (Coll (Rec Closed τ₁ pf1)) ->
       rec_concat_sort τ₁ τ₂ = τ ->
-      lambda_nra_type (LNRAMapConcat lop1 op2) Γ (Coll (Rec Closed τ pf3))
+      lambda_nra_type (LNRAMapProduct lop1 op2) Γ (Coll (Rec Closed τ pf3))
   | ATProduct {Γ τ₁ τ₂ τ} op1 op2 pf1 pf2 pf3 :
       lambda_nra_type op1 Γ (Coll (Rec Closed τ₁ pf1)) ->
       lambda_nra_type op2 Γ (Coll (Rec Closed τ₂ pf2)) ->
@@ -206,7 +206,7 @@ Section TLambdaNRA.
           constructor; simpl; intuition. 
         }
         destruct (IHe1 _ _ _ bt1 H1) as [dd3 [edd3 tdd3]].
-        rewrite (rmap_concat_ext _  (fun d => lambda_nra_eval brand_relation_brands cenv (rec_sort (env ++ [(s, d)])) e1));
+        rewrite (rmap_product_ext _  (fun d => lambda_nra_eval brand_relation_brands cenv (rec_sort (env ++ [(s, d)])) e1));
           [ | intros; apply lnra_lambda_eval_lambda_eq ].
         dtype_inverter.
         apply Col_inv in tdd1.
@@ -236,7 +236,7 @@ Section TLambdaNRA.
             apply rec_concat_with_drec_concat_well_typed; auto.
         }
         destruct part1pf as [part1 [part1eq part1t]].
-        erewrite rmap_concat_cons; eauto.
+        erewrite rmap_product_cons; eauto.
         simpl; eexists; split; [reflexivity | ].
         constructor.
         apply Forall_app; trivial.
@@ -280,7 +280,7 @@ Section TLambdaNRA.
         dtype_inverter.
         apply Col_inv in ddt3.
         destruct part1pf as [part1 [part1eq part1t]].
-        erewrite rmap_concat_cons; eauto.
+        erewrite rmap_product_cons; eauto.
         simpl; eexists; split; [reflexivity | ].
         constructor.
         apply Forall_app; trivial.

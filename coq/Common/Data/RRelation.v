@@ -134,6 +134,12 @@ Section RRelation.
       | _ => None
     end.
 
+  Definition lift_ondcoll2 (f:list data -> list data -> option (list data)) (d1 d2:data) : option data :=
+    match d1,d2 with
+      | dcoll l1, dcoll l2 => lift dcoll (f l1 l2)
+      | _,_ => None
+    end.
+
   Lemma lift_oncoll_dcoll {A} (f : list data -> option A) (dl : list data) :
     lift_oncoll f (dcoll dl) = f dl.
   Proof. reflexivity. Qed.
@@ -489,19 +495,19 @@ Section RRelation.
       | _ => None
     end.
 
-  Definition rmap_concat (f:data -> option data) (d:list data) : option (list data) :=
+  Definition rmap_product (f:data -> option data) (d:list data) : option (list data) :=
     oflat_map (oomap_concat f) d.
 
-  Lemma rmap_concat_cons f d a x y :
-    rmap_concat f d = Some x ->
+  Lemma rmap_product_cons f d a x y :
+    rmap_product f d = Some x ->
     (oomap_concat f a) = Some y ->
-    rmap_concat f (a :: d) = Some (y ++ x).
+    rmap_product f (a :: d) = Some (y ++ x).
   Proof.
     intros.
     induction d.
-    - unfold rmap_concat in *; simpl in *.
+    - unfold rmap_product in *; simpl in *.
       rewrite H0; inversion H; reflexivity.
-    - unfold rmap_concat in *.
+    - unfold rmap_product in *.
       simpl in *.
       revert H; elim (oomap_concat f a0); intros; simpl in *; try congruence.
       rewrite H0 in *; simpl in *.
@@ -509,11 +515,11 @@ Section RRelation.
       reflexivity.
   Qed.
 
-  Lemma rmap_concat_cons_none f d a :
-    rmap_concat f d = None -> rmap_concat f ((drec a) :: d) = None.
+  Lemma rmap_product_cons_none f d a :
+    rmap_product f d = None -> rmap_product f ((drec a) :: d) = None.
   Proof.
     intros.
-    unfold rmap_concat, oflat_map in *.
+    unfold rmap_product, oflat_map in *.
     destruct (oomap_concat f (drec a)).
     - revert H. elim (oflat_map
                       (fun x : data =>
@@ -522,12 +528,34 @@ Section RRelation.
     - reflexivity.
   Qed.
 
-  Lemma rmap_concat_cons_none_first f d a :
-    (oomap_concat f a) = None -> rmap_concat f (a :: d) = None.
+  Lemma rmap_product_cons_none_first f d a :
+    (oomap_concat f a) = None -> rmap_product f (a :: d) = None.
   Proof.
     intros.
-    unfold rmap_concat, oflat_map in *.
+    unfold rmap_product, oflat_map in *.
     destruct (oomap_concat f a); [congruence|reflexivity].
+  Qed.
+
+  Lemma rmap_product_cons_inv f d a l :
+    rmap_product f (a :: d) = Some l ->
+    exists x, exists y,
+        (oomap_concat f a) = Some x /\
+        rmap_product f d = Some y /\
+        x ++ y = l.
+  Proof.
+    intros.
+    case_eq (rmap_product f d); intros;
+    case_eq (oomap_concat f a); intros;
+      unfold rmap_product in *;
+      unfold oflat_map in *;
+      rewrite H0 in H; simpl in ; clear H0.
+    - rewrite H1 in H; simpl in H.
+      inversion H; subst.
+      exists l1; exists l0.
+      split; [reflexivity|]; split; reflexivity.
+    - rewrite H1 in H; simpl in H; congruence.
+    - rewrite H1 in H; simpl in H; congruence.
+    - rewrite H1 in H; simpl in H; congruence.
   Qed.
 
   Definition rproduct (d1 d2:list data) : option (list data) :=
@@ -705,11 +733,11 @@ Section RRelation.
     rewrite H. trivial.
   Qed.
   
-  Lemma rmap_concat_ext  f g l :
+  Lemma rmap_product_ext  f g l :
     (forall x, In x l -> f x = g x) ->
-    rmap_concat f l = rmap_concat g l.
+    rmap_product f l = rmap_product g l.
   Proof.
-    unfold rmap_concat.
+    unfold rmap_product.
     intros.
     apply oflat_map_ext; intros.
     apply oomap_concat_ext_weak.
