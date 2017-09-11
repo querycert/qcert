@@ -1432,6 +1432,8 @@ let sexp_to_sqlpp_function_name (s : sexp) : sqlpp_function_name =
 	| STerm("contains", []) -> SPFcontains
 	| STerm(x, _) ->
       raise (Qcert_Error ("Not well-formed S-expr inside SQL++ function call expression: " ^ x))
+	| _ ->
+      raise (Qcert_Error ("Not well-formed S-expr inside SQL++ function call expression"))
 	end
 	
 let rec sexp_to_sqlpp_expr (stmt : sexp)  =
