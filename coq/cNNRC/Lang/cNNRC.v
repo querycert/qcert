@@ -153,52 +153,52 @@ Section cNNRC.
     
     Section Denotation.
       Inductive nnrc_core_sem: bindings -> nnrc -> data -> Prop :=
-      | sem_cNNRCGetConstant: forall env v d,
+      | sem_cNNRCGetConstant : forall env v d,
           edot constant_env v = Some d ->                 (**r   [Γc(v) = d] *)
           nnrc_core_sem env (NNRCGetConstant v) d         (**r ⇒ [Γc ; Γ ⊢〚$$v〛⇓ d] *)
-      | sem_cNNRCVar: forall env v d,
+      | sem_cNNRCVar : forall env v d,
           lookup equiv_dec env v = Some d ->              (**r   [Γ(v) = d] *)
           nnrc_core_sem env (NNRCVar v) d                 (**r ⇒ [Γc ; Γ ⊢〚$v〛⇓ d] *)
-      | sem_cNNRCConst: forall env d1 d2,
+      | sem_cNNRCConst : forall env d1 d2,
           normalize_data h d1 = d2 ->                     (**r   [norm(d₁) = d₂] *)
           nnrc_core_sem env (NNRCConst d1) d2             (**r ⇒ [Γc ; Γ ⊢〚d₁〛⇓ d₂] *)
-      | sem_cNNRCBinop: forall bop env e1 e2 d1 d2 d3,
+      | sem_cNNRCBinop : forall bop env e1 e2 d1 d2 d3,
           nnrc_core_sem env e1 d1 ->                      (**r   [Γc ; Γ ⊢〚e₁〛⇓ d₁] *)
           nnrc_core_sem env e2 d2 ->                      (**r ∧ [Γc ; Γ ⊢〚e₂〛⇓ d₂] *)
           binary_op_eval h bop d1 d2 = Some d3 ->         (**r ∧ [d₁ ⊠ d₂ = d₃] *)
           nnrc_core_sem env (NNRCBinop bop e1 e2) d3      (**r ⇒ [Γc ; Γ ⊢〚e₁ ⊠ e₂〛⇓ d₃] *)
-      | sem_cNNRCUnop: forall uop env e d1 d2,
+      | sem_cNNRCUnop : forall uop env e d1 d2,
           nnrc_core_sem env e d1 ->                       (**r   [Γc ; Γ ⊢〚e〛⇓ d₁] *)
           unary_op_eval h uop d1 = Some d2 ->             (**r ∧ [⊞ d₁ = d₂] *)
           nnrc_core_sem env (NNRCUnop uop e) d2           (**r ⇒ [Γc ; Γ ⊢〚⊞ e〛⇓ d₂] *)
-      | sem_cNNRCLet: forall env e1 v e2 d1 d2,
+      | sem_cNNRCLet : forall env e1 v e2 d1 d2,
           nnrc_core_sem env e1 d1 ->                      (**r   [Γc ; Γ ⊢〚e₁〛⇓ d₁] *)
           nnrc_core_sem ((v,d1)::env) e2 d2 ->            (**r ∧ [Γc ; (v,d₁),Γ ⊢〚e₂〛⇓ d₂] *)
           nnrc_core_sem env (NNRCLet v e1 e2) d2          (**r ⇒ [Γc ; Γ ⊢〚let 4v := e₁ in e₂〛⇓ d₂] *)
-      | sem_cNNRCFor: forall env e1 v e2 c1 c2,
+      | sem_cNNRCFor : forall env e1 v e2 c1 c2,
           nnrc_core_sem env e1 (dcoll c1) ->              (**r   [Γc ; Γ ⊢〚e₁〛= {c₁}] *)
           nnrc_core_sem_for v env e2 c1 c2 ->             (**r ∧ [Γc ; Γ ; v ; {c₁} ⊢〚e₂〛φ ⇓ {c₂}] *)
           nnrc_core_sem env (NNRCFor v e1 e2) (dcoll c2)  (**r ⇒ [Γc ; Γ ⊢ 〚{ e₂ | $v in e₁ }〛⇓ {c₂}] *)
-      | sem_cNNRCIf_true: forall env e1 e2 e3 d,
+      | sem_cNNRCIf_true : forall env e1 e2 e3 d,
           nnrc_core_sem env e1 (dbool true) ->            (**r   [Γc ; Γ ⊢〚e₁〛⇓ true] *)
           nnrc_core_sem env e2 d ->                       (**r ∧ [Γc ; Γ ⊢〚e₂〛⇓ d] *)
           nnrc_core_sem env (NNRCIf e1 e2 e3) d           (**r ⇒ [Γc ; Γ ⊢〚e₁ ? e₂ : e₃〛⇓ d] *)
-      | sem_cNNRCIf_false: forall env e1 e2 e3 d,
+      | sem_cNNRCIf_false : forall env e1 e2 e3 d,
           nnrc_core_sem env e1 (dbool false) ->           (**r   [Γc ; Γ ⊢〚e₁〛⇓ false] *)
           nnrc_core_sem env e3 d ->                       (**r ∧ [Γc ; Γ ⊢〚e₃〛⇓ d] *)
           nnrc_core_sem env (NNRCIf e1 e2 e3) d           (**r ⇒ [Γc ; Γ ⊢〚e₁ ? e₂ : e₃〛⇓ d] *)
-      | sem_cNNRCEither_left: forall env e v1 e1 v2 e2 d d1,
+      | sem_cNNRCEither_left : forall env e v1 e1 v2 e2 d d1,
           nnrc_core_sem env e (dleft d) ->                (**r   [Γc ; Γ ⊢〚e〛⇓ left d] *)
           nnrc_core_sem ((v1,d)::env) e1 d1 ->            (**r ∧ [Γc ; (v₁,d),Γ ⊢〚e₁〛⇓ d₁] *)
           nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d1 (**r ⇒ [Γc ; Γ ⊢〚either e left $v₁ : e₁ | right $v₂ : e₂〛⇓ d₁] *)
-      | sem_cNNRCEither_right: forall env e v1 e1 v2 e2 d d2,
+      | sem_cNNRCEither_right : forall env e v1 e1 v2 e2 d d2,
           nnrc_core_sem env e (dright d) ->               (**r   [Γc ; Γ ⊢〚e〛⇓ right d] *)
           nnrc_core_sem ((v2,d)::env) e2 d2 ->            (**r ∧ [Γc ; (v₂,d),Γ ⊢〚e₂〛⇓ d₂] *)
           nnrc_core_sem env (NNRCEither e v1 e1 v2 e2) d2 (**r ⇒ [Γc ; Γ ⊢〚either e left $v₁ : e₁ | right $v₂ : e₂〛⇓ d₂] *)
       with nnrc_core_sem_for: var -> bindings -> nnrc -> list data -> list data -> Prop :=
-      | sem_cNNRCFor_empty v: forall env e,
+      | sem_cNNRCFor_empty v : forall env e,
           nnrc_core_sem_for v env e nil nil            (**r   [Γc ; Γ ; v ; {} ⊢〚e〛φ ⇓ {}] *)
-      | sem_cNNRCFor_cons v: forall env e d1 c1 d2 c2,
+      | sem_cNNRCFor_cons v : forall env e d1 c1 d2 c2,
           nnrc_core_sem ((v,d1)::env) e d2 ->          (**r   [Γc ; (v,d₁),Γ ⊢〚e₂〛⇓ d₂]  *)
           nnrc_core_sem_for v env e c1 c2 ->           (**r ∧ [Γc ; Γ ; v ; {c₁} ⊢〚e〛φ ⇓ {c₂}] *)
           nnrc_core_sem_for v env e (d1::c1) (d2::c2). (**r ⇒ [Γc ; Γ ; v ; {d₁::c₁} ⊢〚e〛φ ⇓ {d₂::c₂}] *)

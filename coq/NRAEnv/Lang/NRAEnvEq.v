@@ -171,8 +171,8 @@ Section NRAEnvEq.
     apply anmap_proper; assumption.
   Qed.
 
-  (* NRAEnvMapConcat *)
-  Global Instance nraenv_mapconcat_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvMapConcat.
+  (* NRAEnvMapProduct *)
+  Global Instance nraenv_mapconcat_proper : Proper (nraenv_eq ==> nraenv_eq ==> nraenv_eq) NRAEnvMapProduct.
   Proof.
     unfold Proper, respectful, nraenv_eq, nraenv_eval; intros.
     apply anmapconcat_proper; assumption.

@@ -18,7 +18,7 @@
  * Algebra contexts *
  *******************************)
 
-Section ROptimContext.
+Section NRARewriteContext.
   Require Import Equivalence.
   Require Import Morphisms.
   Require Import Setoid.
@@ -102,7 +102,7 @@ Section ROptimContext.
     apply union_select_distr.
   Qed.
 
-End ROptimContext.
+End NRARewriteContext.
   
 (* 
 *** Local Variables: ***

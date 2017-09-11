@@ -68,14 +68,14 @@ Section TCAMPtoNRA.
   Lemma ATdot {τc p s τin τ pf τout k}:
     p  ▷ τin >=> Rec k τ pf ⊣ τc ->
     tdot τ s = Some τout ->
-    AUnop (OpDot s) p ▷ τin >=> τout ⊣ τc.
+    NRAUnop (OpDot s) p ▷ τin >=> τout ⊣ τc.
   Proof.
     intros.
     repeat econstructor; eauto.
   Qed.
 
   Lemma ATdot_inv {τc p s τin τout}:
-    AUnop (OpDot s) p ▷ τin >=> τout ⊣ τc ->
+    NRAUnop (OpDot s) p ▷ τin >=> τout ⊣ τc ->
     exists τ pf k,
       p  ▷ τin >=> Rec k τ pf ⊣ τc /\
       tdot τ s = Some τout.
@@ -158,7 +158,7 @@ Section TCAMPtoNRA.
     - eauto. 
     (* PTbinop *)
     - econstructor.
-      + eapply (@ATBinop m τc (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))); eauto.
+      + eapply (@type_NRABinop m τc (Rec Closed (("a1", τ₂₁)::("a2", τ₂₂)::nil) (eq_refl _))); eauto.
       + econstructor; eauto.
     (* PTmap *)
     - econstructor; eauto.
@@ -216,7 +216,7 @@ Section TCAMPtoNRA.
            econstructor; eauto; try (
                                     econstructor; [|econstructor]; econstructor; reflexivity).
            econstructor; eauto.
-           eapply ATBinop.
+           eapply type_NRABinop.
            eapply type_OpRecMerge_closed.
            eauto.
            econstructor; eauto.
@@ -288,7 +288,7 @@ Section TCAMPtoNRA.
   (** Section dedicated to the reverse direction for type preservation *)
 
   Lemma ATaid_inv {τc τin τout} :
-    AID ▷ τin >=> τout ⊣ τc -> τin = τout.
+    NRAID ▷ τin >=> τout ⊣ τc -> τin = τout.
   Proof.
      inversion 1; congruence.
   Qed.
@@ -318,7 +318,7 @@ Section TCAMPtoNRA.
       | [H:nra_match _ ▷ _ >=> _ ⊣ _ |- _] =>
         apply ATnra_match_inv in H;
           destruct H as [? [??]]
-      | [H:AUnop _ (OpDot _) _ ▷ _ >=> _ ⊣ _ |- _] =>
+      | [H:NRAUnop _ (OpDot _) _ ▷ _ >=> _ ⊣ _ |- _] =>
         apply ATdot_inv in H;
           destruct H as [? [? [??]]]
       | [H:unary_op_type (OpDot _) _ _ |- _ ] => inversion H; clear H
@@ -328,19 +328,19 @@ Section TCAMPtoNRA.
       | [H:unary_op_type (OpRec _) _ _ |- _ ] => inversion H; clear H
       | [H:binary_op_type OpRecConcat _ _ _ |- _ ] => inversion H; clear H
       | [H:binary_op_type OpRecMerge _ _ _ |- _ ] => inversion H; clear H
-      | [H:AID ▷ _ >=> _ ⊣ _ |- _ ] => apply ATaid_inv in H
+      | [H:NRAID ▷ _ >=> _ ⊣ _ |- _ ] => apply ATaid_inv in H
       | [H:nra_data ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
       | [H:nra_fail ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AMap _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AEither _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AEitherConcat _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:ADefault _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AApp _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AProduct _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:ASelect _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:ABinop _ _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AUnop _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
-      | [H:AConst _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAMap _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAEither _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAEitherConcat _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRADefault _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAApp _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAProduct _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRASelect _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRABinop _ _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAUnop _ _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
+      | [H:NRAConst _ ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
       | [H:nra_bind ▷ _ >=> _ ⊣ _ |- _ ] => inversion H; clear H
       | [H:data_type _ (dcoll _) _ |- _ ] => inversion H; clear H
       | [H:Rec₀ _ _  = Rec₀ _ _ |- _ ] => inversion H; clear H

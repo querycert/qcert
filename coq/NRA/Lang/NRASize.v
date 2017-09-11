@@ -23,19 +23,19 @@ Section NRASize.
 
   Fixpoint nra_size (a:nra) : nat :=
     match a with
-    | AID => 1
-    | AConst d => 1
-    | ABinop op a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | AUnop op a₁ => S (nra_size a₁)
-    | AMap a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | AMapConcat a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | AProduct a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | ASelect a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | ADefault a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | AEither a₁ a₂=> S (nra_size a₁ + nra_size a₂)
-    | AEitherConcat a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | AApp a₁ a₂ => S (nra_size a₁ + nra_size a₂)
-    | AGetConstant s => 1
+    | NRAGetConstant s => 1
+    | NRAID => 1
+    | NRAConst d => 1
+    | NRABinop op a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRAUnop op a₁ => S (nra_size a₁)
+    | NRAMap a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRAMapProduct a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRAProduct a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRASelect a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRADefault a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRAEither a₁ a₂=> S (nra_size a₁ + nra_size a₂)
+    | NRAEitherConcat a₁ a₂ => S (nra_size a₁ + nra_size a₂)
+    | NRAApp a₁ a₂ => S (nra_size a₁ + nra_size a₂)
     end.
 
   Lemma nra_size_nzero (a:nra) : nra_size a <> 0.
@@ -46,19 +46,19 @@ Section NRASize.
   Fixpoint nra_depth (a:nra) : nat :=
     (* Better to start at zero, level one is at least one nested plan *)
     match a with
-    | AID => 0
-    | AConst d => 0
-    | ABinop op a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
-    | AUnop op a₁ => nra_depth a₁
-    | AMap a₁ a₂ => max (S (nra_depth a₁)) (nra_depth a₂)
-    | AMapConcat a₁ a₂ => max (S (nra_depth a₁)) (nra_depth a₂)
-    | AProduct a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
-    | ASelect a₁ a₂ => max (S (nra_depth a₁)) (nra_depth a₂)
-    | ADefault a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
-    | AEither a₁ a₂=> max (nra_depth a₁) (nra_depth a₂)
-    | AEitherConcat a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
-    | AApp a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
-    | AGetConstant s => 0
+    | NRAGetConstant s => 0
+    | NRAID => 0
+    | NRAConst d => 0
+    | NRABinop op a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
+    | NRAUnop op a₁ => nra_depth a₁
+    | NRAMap a₁ a₂ => max (S (nra_depth a₁)) (nra_depth a₂)
+    | NRAMapProduct a₁ a₂ => max (S (nra_depth a₁)) (nra_depth a₂)
+    | NRAProduct a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
+    | NRASelect a₁ a₂ => max (S (nra_depth a₁)) (nra_depth a₂)
+    | NRADefault a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
+    | NRAEither a₁ a₂=> max (nra_depth a₁) (nra_depth a₂)
+    | NRAEitherConcat a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
+    | NRAApp a₁ a₂ => max (nra_depth a₁) (nra_depth a₂)
     end.
 
 End NRASize.

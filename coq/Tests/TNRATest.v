@@ -92,7 +92,7 @@ Section TNRATest.
     qpersons ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold qpersons.
-    apply @ATConst.
+    apply @type_NRAConst.
     apply persons_typed.
   Qed.
 
@@ -116,9 +116,9 @@ Section TNRATest.
     q0 ▷ (Coll τin) >=> Nat ⊣ nil.
   Proof.
     unfold q0.
-    apply (@ATUnop _ nil (Coll τin) (Coll τin) Nat).
+    apply (@type_NRAUnop _ nil (Coll τin) (Coll τin) Nat).
     apply type_OpCount.
-    apply ATID.
+    apply type_NRAID.
   Qed.
 
   Definition q0t {τin} (d:data) (bpf: bindings_type nil nil) (pf: d ▹ (Coll τin)) : data :=
@@ -136,8 +136,8 @@ Section TNRATest.
     q1 ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold q1.
-    apply (@ATMap _ nil τin person_schema person_schema).
-    apply @ATID.
+    apply (@type_NRAMap _ nil τin person_schema person_schema).
+    apply @type_NRAID.
     apply qpersons_typed.
   Qed.
 
@@ -153,10 +153,10 @@ Section TNRATest.
     q2 ▷ τin >=> (Coll Nat) ⊣ nil.
   Proof.
     unfold q2.
-    apply (@ATMap _ nil τin person_schema Nat).
-    - apply (@ATUnop trivial_basic_model nil person_schema person_schema Nat).
+    apply (@type_NRAMap _ nil τin person_schema Nat).
+    - apply (@type_NRAUnop trivial_basic_model nil person_schema person_schema Nat).
       apply (@type_OpDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
-      apply @ATID.
+      apply @type_NRAID.
     - apply qpersons_typed.
   Qed.
 
@@ -176,8 +176,8 @@ Section TNRATest.
     q3 ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold q3.
-    apply @ATSelect.
-    apply ATConst.
+    apply @type_NRASelect.
+    apply type_NRAConst.
     apply dtbool.
     apply qpersons_typed.
   Qed.
@@ -196,13 +196,13 @@ Section TNRATest.
     q4 ▷ τin >=> persons_schema ⊣ nil.
   Proof.
     unfold q4.
-    apply @ATSelect.
-    - apply (@ATBinop trivial_basic_model nil person_schema Nat Nat Bool).
+    apply @type_NRASelect.
+    - apply (@type_NRABinop trivial_basic_model nil person_schema Nat Nat Bool).
       + apply type_OpEqual.
-      + apply (@ATUnop trivial_basic_model nil person_schema person_schema Nat).
+      + apply (@type_NRAUnop trivial_basic_model nil person_schema person_schema Nat).
         apply (@type_OpDot _ _ _ _ _ _ person_rec_schema Nat) with (pf:= person_rec_schema_pf); try reflexivity.
-        apply @ATID.
-      + apply ATConst.
+        apply type_NRAID.
+      + apply type_NRAConst.
         apply dtnat.
     - apply qpersons_typed.
   Qed.

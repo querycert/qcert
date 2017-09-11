@@ -36,7 +36,7 @@ Section cNRAEnv.
   | ANBinop : binary_op -> nraenv_core -> nraenv_core -> nraenv_core
   | ANUnop : unary_op -> nraenv_core -> nraenv_core
   | ANMap : nraenv_core -> nraenv_core -> nraenv_core
-  | ANMapConcat : nraenv_core -> nraenv_core -> nraenv_core
+  | ANMapProduct : nraenv_core -> nraenv_core -> nraenv_core
   | ANProduct : nraenv_core -> nraenv_core -> nraenv_core
   | ANSelect : nraenv_core -> nraenv_core -> nraenv_core
   | ANDefault : nraenv_core -> nraenv_core -> nraenv_core
@@ -56,7 +56,7 @@ Section cNRAEnv.
   | Case_aux c "ANBinop"%string
   | Case_aux c "ANUnop"%string
   | Case_aux c "ANMap"%string
-  | Case_aux c "ANMapConcat"%string
+  | Case_aux c "ANMapProduct"%string
   | Case_aux c "ANProduct"%string
   | Case_aux c "ANSelect"%string
   | Case_aux c "ANDefault"%string
@@ -91,18 +91,19 @@ Section cNRAEnv.
         let aux_map d :=
             lift_oncoll (fun c1 => lift dcoll (rmap (nraenv_core_eval op1 env) c1)) d
         in olift aux_map (nraenv_core_eval op2 env x)
-      | ANMapConcat op1 op2 =>
+      | ANMapProduct op1 op2 =>
         let aux_mapconcat d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (nraenv_core_eval op1 env) c1)) d
+            lift_oncoll (fun c1 => lift dcoll (rmap_product (nraenv_core_eval op1 env) c1)) d
         in olift aux_mapconcat (nraenv_core_eval op2 env x)
       | ANProduct op1 op2 =>
-        (* Note: (fun y => nraenv_core_eval op2 x) does not depend on input,
-           but we still use a nested look and delay op2 evaluation so it does not
-           fail in case the op1 operand is an empty collection -- this makes sure
-           to align the semantics with the NNRC version. - Jerome *)
-        let aux_product d :=
-            lift_oncoll (fun c1 => lift dcoll (rmap_concat (fun _ => nraenv_core_eval op2 env x) c1)) d
-        in olift aux_product (nraenv_core_eval op1 env x)
+          (* Note: (fun y => nra_eval op2 x) does not depend on input,
+             but we still use a nested loop and delay op2 evaluation
+             so it does not fail in case the op1 operand is an empty
+             collection -- this makes sure to align the semantics with
+             the NNRC version. - Jerome *)
+          let aux_product d :=
+              lift_oncoll (fun c1 => lift dcoll (rmap_product (fun _ => nraenv_core_eval op2 env x) c1)) d
+          in olift aux_product (nraenv_core_eval op1 env x)
       | ANSelect op1 op2 =>
         let pred x' :=
             match nraenv_core_eval op1 env x' with
@@ -154,60 +155,71 @@ Section cNRAEnv.
   Local Open Scope string_scope.
   Local Open Scope list_scope.
 
-  Definition ARecEither f :=
-    AEither (AUnop OpLeft (AUnop (OpRec f) AID)) (AUnop OpRight (AUnop (OpRec f) AID)).
+  Definition NRARecEither f :=
+    NRAEither (NRAUnop OpLeft (NRAUnop (OpRec f) NRAID))
+              (NRAUnop OpRight (NRAUnop (OpRec f) NRAID)).
   
   Fixpoint nra_of_nraenv_core (ae:nraenv_core) : nra :=
     match ae with
-      | ANID => nra_data
-      | ANConst d => (AConst d)
-      | ANBinop b ae1 ae2 => ABinop b (nra_of_nraenv_core ae1) (nra_of_nraenv_core ae2)
-      | ANUnop u ae1 => AUnop u (nra_of_nraenv_core ae1)
-      | ANMap ea1 ea2 =>
-        AMap (nra_of_nraenv_core ea1)
+    | ANID =>
+      nra_data
+    | ANConst d =>
+      NRAConst d
+    | ANBinop b ae1 ae2 =>
+      NRABinop b (nra_of_nraenv_core ae1) (nra_of_nraenv_core ae2)
+    | ANUnop u ae1 =>
+      NRAUnop u (nra_of_nraenv_core ae1)
+    | ANMap ea1 ea2 =>
+      NRAMap (nra_of_nraenv_core ea1)
              (unnest_two
                 "a1"
                 "PDATA"
-                (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))
-      | ANMapConcat ea1 ea2 =>
-        (AMap (ABinop OpRecConcat
-                      (AUnop (OpDot "PDATA") AID)
-                      (AUnop (OpDot "PDATA2") AID))
-              (AMapConcat
-                 (AMap (AUnop (OpRec "PDATA2") AID) (nra_of_nraenv_core ea1))
+                (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))
+    | ANMapProduct ea1 ea2 =>
+      (NRAMap (NRABinop OpRecConcat
+                        (NRAUnop (OpDot "PDATA") NRAID)
+                        (NRAUnop (OpDot "PDATA2") NRAID))
+              (NRAMapProduct
+                 (NRAMap (NRAUnop (OpRec "PDATA2") NRAID) (nra_of_nraenv_core ea1))
                  (unnest_two
                     "a1"
                     "PDATA"
-                    (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
-      | ANProduct ea1 ea2 => AProduct (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-      | ANSelect ea1 ea2 =>
-        (AMap (AUnop (OpDot "PDATA") AID)
-              (ASelect (nra_of_nraenv_core ea1)
-                       (unnest_two
-                          "a1"
-                          "PDATA"
-                          (AUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
-      | ANDefault ea1 ea2 => ADefault (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-      | ANEither eal ear => AApp
-                                  (AEither (nra_of_nraenv_core eal) (nra_of_nraenv_core ear))
-                                  (AEitherConcat
-                                     (AApp (ARecEither "PDATA") nra_data)
-                                     (AUnop (OpRec "PBIND") nra_bind))
-      | ANEitherConcat ea1 ea2 => AEitherConcat (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
-      | ANApp ea1 ea2 => AApp (nra_of_nraenv_core ea1)
-                              (nra_wrap (nra_of_nraenv_core ea2))
-      | ANGetConstant s => AGetConstant s
-      | ANEnv => nra_bind
-      | ANAppEnv ea1 ea2 =>
-        AApp (nra_of_nraenv_core ea1)
+                    (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
+    | ANProduct ea1 ea2 =>
+      NRAProduct (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
+    | ANSelect ea1 ea2 =>
+      (NRAMap (NRAUnop (OpDot "PDATA") NRAID)
+              (NRASelect (nra_of_nraenv_core ea1)
+                         (unnest_two
+                            "a1"
+                            "PDATA"
+                            (NRAUnop OpBag (nra_wrap_a1 (nra_of_nraenv_core ea2))))))
+    | ANDefault ea1 ea2 =>
+      NRADefault (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
+    | ANEither eal ear =>
+      NRAApp
+        (NRAEither (nra_of_nraenv_core eal) (nra_of_nraenv_core ear))
+        (NRAEitherConcat
+           (NRAApp (NRARecEither "PDATA") nra_data)
+           (NRAUnop (OpRec "PBIND") nra_bind))
+    | ANEitherConcat ea1 ea2 =>
+      NRAEitherConcat (nra_of_nraenv_core ea1) (nra_of_nraenv_core ea2)
+    | ANApp ea1 ea2 =>
+      NRAApp (nra_of_nraenv_core ea1)
+             (nra_wrap (nra_of_nraenv_core ea2))
+    | ANGetConstant s =>
+      NRAGetConstant s
+    | ANEnv => nra_bind
+    | ANAppEnv ea1 ea2 =>
+      NRAApp (nra_of_nraenv_core ea1)
              (nra_context (nra_of_nraenv_core ea2) nra_data)
-      | ANMapEnv ea1 =>
-        (* fix this: the nra_data should change to a nra_pair *)
-        AMap (nra_of_nraenv_core ea1)
+    | ANMapEnv ea1 =>
+      (* fix this: the nra_data should change to a nra_pair *)
+      NRAMap (nra_of_nraenv_core ea1)
              (unnest_two
                 "a1"
                 "PBIND"
-                (AUnop OpBag (nra_wrap_bind_a1 nra_data)))
+                (NRAUnop OpBag (nra_wrap_bind_a1 nra_data)))
     end.
 
   Lemma rmap_map_rec1 l s:
@@ -497,7 +509,7 @@ Section cNRAEnv.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl; unfold lift in *; simpl.
-      unfold rmap_concat, oomap_concat in *; simpl in *.
+      unfold rmap_product, oomap_concat in *; simpl in *.
       unfold lift in *; simpl.
       revert IHl; rewrite rmap_map_rec1; simpl; intros.
       rewrite omap_concat_unnest; simpl.
@@ -516,14 +528,14 @@ Section cNRAEnv.
            drec
              (("PBIND", env)
               :: ("PDATA", x) :: nil)) l)); try reflexivity; try congruence; simpl; destruct (rmap (nraenv_core_eval ae1 env) l); try reflexivity; try congruence.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       rewrite IHae2; clear IHae2.
       generalize (h ⊢ (nra_of_nraenv_core ae2) @ₐ (nra_context_data env x) ⊣ constant_env); intros; clear ae2 x.
       unfold olift.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl; unfold lift in *; simpl.
-      unfold rmap_concat, oomap_concat in *; simpl in *.
+      unfold rmap_product, oomap_concat in *; simpl in *.
       unfold lift in *; simpl.
       revert IHl; rewrite rmap_map_rec1; simpl; intros.
       rewrite omap_concat_unnest; simpl.
@@ -632,7 +644,7 @@ Section cNRAEnv.
       destruct o; try reflexivity; simpl.
       destruct d; try reflexivity; simpl.
       induction l; try reflexivity; simpl; unfold lift in *; simpl.
-      unfold rmap_concat, oomap_concat in *; simpl in *.
+      unfold rmap_product, oomap_concat in *; simpl in *.
       unfold lift in *; simpl.
       revert IHl; rewrite rmap_map_rec1; simpl; intros.
       rewrite omap_concat_unnest; simpl.
@@ -718,10 +730,10 @@ Section cNRAEnv.
       destruct o; try reflexivity; simpl.
       apply IHae1.
     - Case "ANMapEnv"%string.
-      unfold lift, olift, rmap_concat, oomap_concat; simpl.
+      unfold lift, olift, rmap_product, oomap_concat; simpl.
       destruct env; try reflexivity; simpl.
       induction l; try reflexivity; simpl; unfold lift in *; simpl.
-      unfold rmap_concat, oomap_concat in *; simpl in *.
+      unfold rmap_product, oomap_concat in *; simpl in *.
       unfold lift in *; simpl.
       revert IHl; rewrite rmap_map_rec1; simpl; intros.
       rewrite omap_concat_unnest2; simpl.
@@ -764,7 +776,7 @@ Section RcNRAEnv2.
     - match_destr.
       apply lift_oncoll_ext; intros.
       f_equal.
-      apply rmap_concat_ext; intros.
+      apply rmap_product_ext; intros.
       congruence.
     - match_destr.
       apply lift_oncoll_ext; intros.
@@ -822,7 +834,7 @@ Section RcNRAEnv2.
         nraenv_core_free_vars q1
       | ANMap q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
-      | ANMapConcat q2 q1 =>
+      | ANMapProduct q2 q1 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
       | ANProduct q1 q2 =>
         nraenv_core_free_vars q1 ++ nraenv_core_free_vars q2
@@ -886,7 +898,7 @@ Notation "π[ s1 ]( r )" := ((ANUnop (OpRecProject s1)) r) (at level 50) : nraen
 Notation "p · r" := ((ANUnop (OpDot r)) p) (left associativity, at level 40): nraenv_core_scope.      (* · = \cdot *)
 
 Notation "χ⟨ p ⟩( r )" := (ANMap p r) (at level 70) : nraenv_core_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (ANMapConcat e2 e1) (at level 70) : nraenv_core_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (ANMapProduct e2 e1) (at level 70) : nraenv_core_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
 Notation "r1 × r2" := (ANProduct r1 r2) (right associativity, at level 70): nraenv_core_scope.       (* × = \times *)
 Notation "σ⟨ p ⟩( r )" := (ANSelect p r) (at level 70) : nraenv_core_scope.                           (* σ = \sigma *)
 Notation "r1 ∥ r2" := (ANDefault r1 r2) (right associativity, at level 70): nraenv_core_scope.       (* ∥ = \parallel *)
@@ -904,7 +916,7 @@ Tactic Notation "nraenv_core_cases" tactic(first) ident(c) :=
   | Case_aux c "ANBinop"%string
   | Case_aux c "ANUnop"%string
   | Case_aux c "ANMap"%string
-  | Case_aux c "ANMapConcat"%string
+  | Case_aux c "ANMapProduct"%string
   | Case_aux c "ANProduct"%string
   | Case_aux c "ANSelect"%string
   | Case_aux c "ANDefault"%string

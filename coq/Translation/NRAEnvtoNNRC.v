@@ -46,7 +46,7 @@ Section NRAEnvtoNNRC.
       NNRCFor t nrc2 (nraenv_to_nnrc op1 t varenv)
     (* [[ ⋈ᵈ⟨ op1 ⟩(op2) ]]_vid,venv
                == ⋃{ { t1 ⊕ t2 | t2 ∈ [[ op1 ]]_t1,venv } | t1 ∈ [[ op2 ]]_vid,venv } *)
-    | NRAEnvMapConcat op1 op2 =>
+    | NRAEnvMapProduct op1 op2 =>
       let nrc2 := (nraenv_to_nnrc op2 varid varenv) in
       let (t1,t2) := fresh_var2 "tmc$" "tmc$" (varid::varenv::nil) in
       NNRCUnop OpFlatten
@@ -155,7 +155,7 @@ Section NRAEnvtoNNRC.
           let t := fresh_var "tmap$" (varid::varenv::nil) in
           NNRCFor t (NNRCUnop (OpDot a) (NNRCVar t1)) (NNRCUnop (OpRec b) (NNRCVar t))
       in
-      let nrc3 := (* op3 = (ANMapConcat op2 op1) *)
+      let nrc3 := (* op3 = (ANMapProduct op2 op1) *)
           NNRCUnop OpFlatten
                    (NNRCFor t1 nrc1
                             (NNRCFor t2 nrc2
@@ -332,7 +332,7 @@ Section NRAEnvtoNNRC.
       + auto.
       + apply remove_inv in H.
         destruct (IHop1 (fresh_var "tmap$" (vid :: venv :: nil)) venv v); intuition.
-    - Case "NRAEnvMapConcat"%string.
+    - Case "NRAEnvMapProduct"%string.
       intros vid venv v.
       Opaque fresh_var2.
       simpl.

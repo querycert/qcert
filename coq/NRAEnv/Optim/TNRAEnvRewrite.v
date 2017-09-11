@@ -415,7 +415,7 @@ Section TNRAEnvRewrite.
       simpl.
       dtype_inverter.
       subst.
-      rewrite (rmap_concat_empty_right τ₁ x1).
+      rewrite (rmap_product_empty_right τ₁ x1).
       reflexivity.
       assumption.
   Qed.
@@ -459,7 +459,7 @@ Section TNRAEnvRewrite.
       simpl.
       dtype_inverter.
       subst.
-      rewrite (rmap_concat_empty_left τ₂ x1).
+      rewrite (rmap_product_empty_left τ₂ x1).
       reflexivity.
       assumption.
   Qed.
@@ -3108,9 +3108,9 @@ Section TNRAEnvRewrite.
           }
   Qed.
 
-  (*************
-   * MapConcat *
-   *************)
+  (**************
+   * MapProduct *
+   **************)
 
   (* ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ p₁ ◯ (‵[||]) *)
   
@@ -3139,7 +3139,7 @@ Section TNRAEnvRewrite.
       apply dtrec_full. auto.
     - intros.
       simpl.
-      unfold rmap_concat; simpl.
+      unfold rmap_product; simpl.
       unfold oomap_concat; simpl.
       nraenv_core_inferer.
       assert (Rec Closed τ₁ pf1 = τ)

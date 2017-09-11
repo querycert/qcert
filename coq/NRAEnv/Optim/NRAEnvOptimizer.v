@@ -73,7 +73,7 @@ Section NRAEnvOptimizer.
       | NRAEnvBinop bop op1 op2 => NRAEnvBinop bop (f op1) (f op2)
       | NRAEnvUnop uop op1 => NRAEnvUnop uop (f op1)
       | NRAEnvMap op1 op2 => NRAEnvMap (f op1) (f op2)
-      | NRAEnvMapConcat op1 op2 => NRAEnvMapConcat (f op1) (f op2)
+      | NRAEnvMapProduct op1 op2 => NRAEnvMapProduct (f op1) (f op2)
       | NRAEnvProduct op1 op2 => NRAEnvProduct (f op1) (f op2)
       | NRAEnvSelect op1 op2 => NRAEnvSelect (f op1) (f op2)
       | NRAEnvEither op1 op2 => NRAEnvEither (f op1) (f op2)
@@ -101,7 +101,7 @@ Section NRAEnvOptimizer.
       | NRAEnvBinop bop op1 op2 => f (NRAEnvBinop bop (nraenv_map_deep f op1) (nraenv_map_deep f op2))
       | NRAEnvUnop uop op1 => f (NRAEnvUnop uop (nraenv_map_deep f op1))
       | NRAEnvMap op1 op2 => f (NRAEnvMap (nraenv_map_deep f op1) (nraenv_map_deep f op2))
-      | NRAEnvMapConcat op1 op2 => f (NRAEnvMapConcat (nraenv_map_deep f op1) (nraenv_map_deep f op2))
+      | NRAEnvMapProduct op1 op2 => f (NRAEnvMapProduct (nraenv_map_deep f op1) (nraenv_map_deep f op2))
       | NRAEnvProduct op1 op2 => f (NRAEnvProduct (nraenv_map_deep f op1) (nraenv_map_deep f op2))
       | NRAEnvSelect op1 op2 => f (NRAEnvSelect (nraenv_map_deep f op1) (nraenv_map_deep f op2))
       | NRAEnvDefault op1 op2 => f (NRAEnvDefault (nraenv_map_deep f op1) (nraenv_map_deep f op2))
@@ -1165,8 +1165,8 @@ Section NRAEnvOptimizer.
 
   Definition tapp_over_mapconcat_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-        NRAEnvApp (NRAEnvMapConcat p1 p2) p0 =>
-        NRAEnvMapConcat p1 (NRAEnvApp p2 p0)
+        NRAEnvApp (NRAEnvMapProduct p1 p2) p0 =>
+        NRAEnvMapProduct p1 (NRAEnvApp p2 p0)
       | _ => p
     end.
 
@@ -2766,7 +2766,7 @@ Section NRAEnvOptimizer.
   (* ⋈ᵈ⟨ p₁ ⟩(‵{| ‵[||] |}) ⇒ₓ p₁ ◯ (‵[||]) *)
   Definition tmapconcat_over_singleton_fun {fruntime:foreign_runtime} (p: nraenv) :=
     match p with
-      |  NRAEnvMapConcat p (NRAEnvUnop OpBag (NRAEnvConst (drec []))) =>
+      |  NRAEnvMapProduct p (NRAEnvUnop OpBag (NRAEnvConst (drec []))) =>
          NRAEnvApp p (NRAEnvConst (drec []))
       | _ => p
     end.

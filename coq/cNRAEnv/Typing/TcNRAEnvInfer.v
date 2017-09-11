@@ -50,7 +50,7 @@ Section TcNRAEnvInfer.
             olift (fun x => lift (fun y => Coll y) (infer_nraenv_core_type op1 τenv x)) (tuncoll τ₁)
         in
         olift mapf (infer_nraenv_core_type op2 τenv τin)
-      | ANMapConcat op1 op2 =>
+      | ANMapProduct op1 op2 =>
         let mapconcatf (τ₁:list (string*rtype)) :=
             match RecMaybe Closed τ₁ with
               | None => None
@@ -187,7 +187,7 @@ Section TcNRAEnvInfer.
         rewrite H in H3; congruence.
         rewrite H1 in H; simpl in H; congruence.
       + rewrite H0 in H. simpl in H; congruence.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       case_eq (infer_nraenv_core_type e2 τenv τin); intros.
       + specialize (IHe2 τenv τin r H0). rewrite H0 in H; simpl in *.
         unfold tmapConcatInput in H.
@@ -221,7 +221,7 @@ Section TcNRAEnvInfer.
             by apply RecMaybe_pf_some.
           simpl in H.
           clear e eq22 H1 eq21 srl0 H0.
-          generalize (@ANTMapConcat m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
+          generalize (@ANTMapProduct m τconstants τenv τin l1' l2' (rec_concat_sort l1' l2')
                                    e1 e2 pf1' pf2' H2 IHe1 IHe2 eq_refl); intros.
           assert (τout = (Coll (Rec Closed (rec_concat_sort l1' l2') H2))).
           assert ((@RecMaybe (@basic_model_foreign_type m)

@@ -58,7 +58,7 @@ Section TNRARewrite.
     split.
     - inversion H; clear H; try eauto; subst.
       inversion H3; clear H3; subst.
-      eapply ATBinop; try eauto.
+      eapply type_NRABinop; try eauto.
       eapply type_OpAnd; assumption.
     - intros; rewrite and_comm; eauto.
   Qed.
@@ -182,15 +182,15 @@ Section TNRARewrite.
     unfold tnra_eq in H.
     specialize (H τ op1 op2 op).
     assert (σ⟨ `op1 ⟩( σ⟨ `op2 ⟩( ` op)) ▷ τin >=> Coll τ ⊣ τc).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op1).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op2).
     apply (proj2_sig op).
     assert (σ⟨ `op2 ⟩( σ⟨ `op1 ⟩( ` op)) ▷ τin >=> Coll τ ⊣ τc).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op2).
-    apply ATSelect.
+    apply type_NRASelect.
     apply (proj2_sig op1).
     apply (proj2_sig op).
     assert (exists opl:τin ⇝ Coll τ ⊣ τc, `opl = σ⟨ `op1 ⟩( σ⟨ `op2 ⟩(`op))).

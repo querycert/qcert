@@ -95,8 +95,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">end</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">r</span>' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> <span class="id">r</span>'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1423')">Proof.</div>
-<div class="proofscript" id="proof1423">
+<div class="toggleproof" onclick="toggleDisplay('proof1427')">Proof.</div>
+<div class="proofscript" id="proof1427">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> <span class="id">r</span>'.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d</span>; <span class="tactic">simpl</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">inversion</span> 1; <span class="tactic">subst</span>. <span class="tactic">simpl</span>; <span class="tactic">trivial</span>.<br/>
@@ -111,8 +111,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id">infer_data_type_normalized</span>' {<span class="id">d</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{τ | <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1424')">Proof.</div>
-<div class="proofscript" id="proof1424">
+<div class="toggleproof" onclick="toggleDisplay('proof1428')">Proof.</div>
+<div class="proofscript" id="proof1428">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d</span>; <span class="tactic">intros</span> <span class="id">dn</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">simpl</span>; <span class="id">eexists</span>; <span class="id">invcs</span> <span class="id">dn</span>; <span class="tactic">reflexivity</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">simpl</span>.<br/>
@@ -182,8 +182,8 @@
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="infer_data_type_normalized">infer_data_type_normalized</a></span> {<span class="id">d</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{τ | <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1425')">Proof.</div>
-<div class="proofscript" id="proof1425">
+<div class="toggleproof" onclick="toggleDisplay('proof1429')">Proof.</div>
+<div class="proofscript" id="proof1429">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id">d</span>); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">eexists</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id">infer_data_type_normalized</span>' <span class="kwd">in</span> <span class="id">H0</span>.<br/>
@@ -193,8 +193,8 @@
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="infer_data_type_correct">infer_data_type_correct</a></span> {<span class="id">d</span> τ} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> ▹ τ.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1426')">Proof.</div>
-<div class="proofscript" id="proof1426">
+<div class="toggleproof" onclick="toggleDisplay('proof1430')">Proof.</div>
+<div class="proofscript" id="proof1430">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#Forall">Forall</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#Forallt">Forallt</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d</span>; <span class="tactic">simpl</span>; <br/>
@@ -271,8 +271,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ₁ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> ▹τ₂ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;τ₁ &lt;: τ₂.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1427')">Proof.</div>
-<div class="proofscript" id="proof1427">
+<div class="toggleproof" onclick="toggleDisplay('proof1431')">Proof.</div>
+<div class="proofscript" id="proof1431">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#subtype">subtype</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> τ₁ τ₂.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">d</span>; <span class="tactic">simpl</span>;<br/>
@@ -398,8 +398,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="infer_data_type_complete">infer_data_type_complete</a></span> {<span class="id">d</span> τ} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> ▹τ -&gt; {τ' | <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ'}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1428')">Proof.</div>
-<div class="proofscript" id="proof1428">
+<div class="toggleproof" onclick="toggleDisplay('proof1432')">Proof.</div>
+<div class="proofscript" id="proof1432">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type_normalized">data_type_normalized</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type_normalized">infer_data_type_normalized</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
@@ -409,8 +409,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="normalized_data_type_infer">normalized_data_type_infer</a></span> {<span class="id">d</span> τ} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1429')">Proof.</div>
-<div class="proofscript" id="proof1429">
+<div class="toggleproof" onclick="toggleDisplay('proof1433')">Proof.</div>
+<div class="proofscript" id="proof1433">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">i</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type_correct">infer_data_type_correct</a></span> <span class="kwd">in</span> <span class="id">i</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type_normalized">data_type_normalized</a></span>; <span class="tactic">eauto</span>.<br/>
@@ -423,8 +423,8 @@
        by seeing if its inferred type (if any) is a subtype of the
        given type. </div>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Theorem</span> <span class="id"><a name="data_type_dec">data_type_dec</a></span> <span class="id">d</span> τ : {<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> τ} + {~ <span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#d">d</a></span> τ}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1430')">Proof.</div>
-<div class="proofscript" id="proof1430">
+<div class="toggleproof" onclick="toggleDisplay('proof1434')">Proof.</div>
+<div class="proofscript" id="proof1434">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> (<span class="id"><a href="Qcert.Common.DataTyping.TDataInfer.html#infer_data_type">infer_data_type</a></span> <span class="id">d</span>); [<span class="tactic">intros</span> <span class="id">r</span> <span class="id">eqr</span>|<span class="tactic">intros</span> <span class="id">neqr</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RSubtype.html#subtype_dec">subtype_dec</a></span> <span class="id">r</span> τ).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;+ <span class="id">left</span>.<br/>

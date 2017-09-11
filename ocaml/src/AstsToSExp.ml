@@ -383,7 +383,7 @@ let rec nraenv_to_sexp (op : QLang.nraenv_core) : sexp =
   | ANBinop (b, op1, op2) -> STerm ("ANBinop", (binary_op_to_sexp b) :: [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANUnop (u, op1) -> STerm ("ANUnop", (unary_op_to_sexp u) :: [nraenv_to_sexp op1])
   | ANMap (op1,op2) -> STerm ("ANMap", [nraenv_to_sexp op1;nraenv_to_sexp op2])
-  | ANMapConcat (op1,op2) -> STerm ("ANMapConcat", [nraenv_to_sexp op1;nraenv_to_sexp op2])
+  | ANMapProduct (op1,op2) -> STerm ("ANMapProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANProduct (op1,op2) -> STerm ("ANProduct", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANSelect (op1,op2) -> STerm ("ANSelect", [nraenv_to_sexp op1;nraenv_to_sexp op2])
   | ANDefault (op1,op2) -> STerm ("ANDefault", [nraenv_to_sexp op1;nraenv_to_sexp op2])
@@ -406,7 +406,7 @@ let rec sexp_to_nraenv (se : sexp) : QLang.nraenv_core =
       let u = sexp_to_unary_op use in
       ANUnop (u, sexp_to_nraenv se1)
   | STerm ("ANMap", [se1;se2]) -> ANMap (sexp_to_nraenv se1, sexp_to_nraenv se2)
-  | STerm ("ANMapConcat", [se1;se2]) -> ANMapConcat (sexp_to_nraenv se1, sexp_to_nraenv se2)
+  | STerm ("ANMapProduct", [se1;se2]) -> ANMapProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANProduct", [se1;se2]) -> ANProduct (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANSelect", [se1;se2]) -> ANSelect (sexp_to_nraenv se1, sexp_to_nraenv se2)
   | STerm ("ANDefault", [se1;se2]) -> ANDefault (sexp_to_nraenv se1, sexp_to_nraenv se2)

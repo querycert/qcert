@@ -61,25 +61,25 @@ Section cNRAEnvContext.
         => CNHole x'
       | CPlug a
         => CNPlug (nraenv_core_of_nra a)
-      | CABinop b c1 c2
+      | CNRABinop b c1 c2
         => CANBinop b (lift_nra_context c1) (lift_nra_context c2)
-      | CAUnop u c
+      | CNRAUnop u c
         => CANUnop u (lift_nra_context c)
-      | CAMap c1 c2
+      | CNRAMap c1 c2
         => CANMap (lift_nra_context c1) (lift_nra_context c2)
-      | CAMapConcat c1 c2
-        => CANMapConcat (lift_nra_context c1) (lift_nra_context c2)
-      | CAProduct c1 c2
+      | CNRAMapProduct c1 c2
+        => CANMapProduct (lift_nra_context c1) (lift_nra_context c2)
+      | CNRAProduct c1 c2
         => CANProduct (lift_nra_context c1) (lift_nra_context c2)
-      | CASelect c1 c2
+      | CNRASelect c1 c2
         => CANSelect (lift_nra_context c1) (lift_nra_context c2)
-      | CADefault c1 c2
+      | CNRADefault c1 c2
         => CANDefault (lift_nra_context c1) (lift_nra_context c2)
-      | CAEither c1 c2
+      | CNRAEither c1 c2
         => CANEither (lift_nra_context c1) (lift_nra_context c2)
-      | CAEitherConcat c1 c2
+      | CNRAEitherConcat c1 c2
         => CANEitherConcat (lift_nra_context c1) (lift_nra_context c2)
-      | CAApp c1 c2
+      | CNRAApp c1 c2
         => CANApp (lift_nra_context c1) (lift_nra_context c2)
     end.
 
@@ -184,7 +184,7 @@ Section cNRAEnvContext.
               | [|- lift dcoll _ = lift dcoll _ ] => f_equal
               | [|- lift_oncoll _ ?x = lift_oncoll _ ?x ] => apply lift_oncoll_ext; intros
               | [|- rmap _ ?x = rmap _ ?x ] => apply rmap_ext; intros
-              | [|- rmap_concat _ ?x = rmap_concat _ ?x ] => apply rmap_concat_ext; intros
+              | [|- rmap_product _ ?x = rmap_product _ ?x ] => apply rmap_product_ext; intros
               | [|- olift _ ?x = olift _ ?x ] => apply olift_ext; intros
               | [|- lift_filter _ ?x = lift_filter _ ?x ] => apply lift_filter_ext; intros
               end; try subst.
@@ -231,11 +231,11 @@ Section cNRAEnvContext.
     goal_eq_simpler; eauto.
   Qed.
 
-  Instance aeu_MapConcat_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
+  Instance aeu_MapProduct_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
     Proper
       (nraenv_core_eq_under h c env ==>
                        nraenv_core_eq_under h c env ==>
-                       nraenv_core_eq_under h c env) ANMapConcat.
+                       nraenv_core_eq_under h c env) ANMapProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
     rewrite H0 by trivial.
@@ -249,7 +249,7 @@ Section cNRAEnvContext.
                        nraenv_core_eq_under h c env) ANProduct.
   Proof.
     unfold Proper, respectful, nraenv_core_eq_under; simpl; intros.
-    rewrite H by trivial.
+    rewrite H, H0 by trivial.
     goal_eq_simpler; eauto.
   Qed.
 
@@ -367,18 +367,18 @@ Section cNRAEnvContext.
      apply aeu_Map_proper; trivial.
    Qed.
 
-   Instance aecu_MapConcat_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
+   Instance aecu_MapProduct_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
      Proper
        (nraenv_core_ctxt_equiv_under h c env ==>
                         nraenv_core_ctxt_equiv_under h c env ==>
-                        nraenv_core_ctxt_equiv_under h c env) CANMapConcat.
+                        nraenv_core_ctxt_equiv_under h c env) CANMapProduct.
    Proof.
      unfold Proper, respectful, nraenv_core_ctxt_equiv_under.
      intros; subst.
      autorewrite with aec_substs; simpl.
      specialize (H ps); specialize (H0 ps).
      do 2 (match_destr_in H; match_destr_in H0).
-     apply aeu_MapConcat_proper; trivial.
+     apply aeu_MapProduct_proper; trivial.
    Qed.
 
    Instance aecu_Product_proper h c env (dn_c:Forall (fun x => data_normalized h (snd x)) c) (dn_env:data_normalized h env) :
@@ -484,7 +484,7 @@ Section cNRAEnvContext.
      - apply aecu_Binop_proper; auto.
      - apply aecu_Unop_proper; auto.
      - apply aecu_Map_proper; auto.
-     - apply aecu_MapConcat_proper; auto.
+     - apply aecu_MapProduct_proper; auto.
      - apply aecu_Product_proper; auto.
      - apply aecu_Select_proper; auto.
      - apply aecu_Default_proper; auto.
@@ -522,7 +522,7 @@ Section cNRAEnvContext.
     match_case; match_case; intros.
     red; intros h dl dnc env dnenv d dnd.
     specialize (H (map (fun xy => (fst xy,
-                                   (AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env)))) ps)).
+                                   (NRAApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env)))) ps)).
     
       symmetry in Hequiv.
        generalize (equivlist_in Hequiv); intros Hin.
@@ -543,12 +543,12 @@ Section cNRAEnvContext.
        generalize (aec_simplify_lift_commute (ac_substs c1
              (map
                 (fun xy : nat * nraenv_core =>
-                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env))) ps)));
+                   (fst xy, NRAApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env))) ps)));
         intros leq1.
       generalize (aec_simplify_lift_commute (ac_substs c2
              (map
                 (fun xy : nat * nraenv_core =>
-                   (fst xy, AApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env))) ps)));
+                   (fst xy, NRAApp (nra_of_nraenv_core (snd xy)) (make_fixed_nra_context_data env))) ps)));
         intros leq2.
       rewrite lift_nra_context_substs in leq1, leq2.
       rewrite map_map in leq1, leq2. simpl in leq1, leq2.

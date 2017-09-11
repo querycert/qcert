@@ -94,7 +94,7 @@ Section CAMPtocNRAEnv.
       simpl; destruct (binary_op_eval h b res res0); reflexivity.
     (* pmap *)
     - destruct d; try reflexivity.
-      unfold rmap_concat in *; simpl in *.
+      unfold rmap_product in *; simpl in *.
       unfold olift, liftpr ; simpl.
       induction l; try reflexivity; simpl.
       unfold lift_failure in *.

@@ -79,22 +79,22 @@ let pretty_lambda_nra greek margin annot hierarchy harness q =
 
 let rec pretty_nra_aux p sym ff a =
   match a with
-  | QcertCompiler.AID -> fprintf ff "%s" "ID"
-  | QcertCompiler.AConst d -> fprintf ff "%a" pretty_data d
-  | QcertCompiler.ABinop (b,a1,a2) -> (pretty_binary_op p sym pretty_nra_aux) ff b a1 a2
-  | QcertCompiler.AUnop (u,a1) -> (pretty_unary_op p sym pretty_nra_aux) ff u a1
-  | QcertCompiler.AMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
-  | QcertCompiler.AMapConcat (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
-  | QcertCompiler.AProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
-  | QcertCompiler.ASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
-  | QcertCompiler.ADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
-  | QcertCompiler.AEither (a1,a2) ->
+  | QcertCompiler.NRAID -> fprintf ff "%s" "ID"
+  | QcertCompiler.NRAConst d -> fprintf ff "%a" pretty_data d
+  | QcertCompiler.NRABinop (b,a1,a2) -> (pretty_binary_op p sym pretty_nra_aux) ff b a1 a2
+  | QcertCompiler.NRAUnop (u,a1) -> (pretty_unary_op p sym pretty_nra_aux) ff u a1
+  | QcertCompiler.NRAMap (a1,a2) -> pretty_nra_exp p sym sym.chi ff a1 (Some a2)
+  | QcertCompiler.NRAMapProduct (a1,a2) -> pretty_nra_exp p sym sym.djoin ff a1 (Some a2)
+  | QcertCompiler.NRAProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nra_aux sym.times ff a1 a2
+  | QcertCompiler.NRASelect (a1,a2) -> pretty_nra_exp p sym sym.sigma ff a1 (Some a2)
+  | QcertCompiler.NRADefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nra_aux sym.bars ff a1 a2
+  | QcertCompiler.NRAEither (a1,a2) ->
       fprintf ff "@[<hv 0>@[<hv 2>match@ ID@;<1 -2>with@]@;<1 0>@[<hv 2>| left as ID ->@ %a@]@;<1 0>@[<hv 2>| right as ID ->@ %a@]@;<1 -2>@[<hv 2>end@]@]"
 	 (pretty_nra_aux p sym) a1
 	 (pretty_nra_aux p sym) a2
-  | QcertCompiler.AEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
-  | QcertCompiler.AApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
-  | QcertCompiler.AGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
+  | QcertCompiler.NRAEitherConcat (a1,a2) -> pretty_infix_exp p 7 sym pretty_nra_aux sym.sqlrarrow ff a1 a2
+  | QcertCompiler.NRAApp (a1,a2) -> pretty_infix_exp p 9 sym pretty_nra_aux sym.circ ff a1 a2
+  | QcertCompiler.NRAGetConstant s -> fprintf ff "Table%a%s%a" pretty_sym sym.lfloor (Util.string_of_char_list s) pretty_sym sym.rfloor
   
 (* resets precedence back to 0 *)
 and pretty_nra_exp p sym thissym ff a1 oa2 =
@@ -131,7 +131,7 @@ let rec pretty_nraenv_aux p sym ff a =
   | QcertCompiler.NRAEnvBinop (b,a1,a2) -> (pretty_binary_op p sym pretty_nraenv_aux) ff b a1 a2
   | QcertCompiler.NRAEnvUnop (u,a1) -> (pretty_unary_op p sym pretty_nraenv_aux) ff u a1
   | QcertCompiler.NRAEnvMap (a1,a2) -> pretty_nraenv_exp p sym sym.chi ff a1 (Some a2)
-  | QcertCompiler.NRAEnvMapConcat (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
+  | QcertCompiler.NRAEnvMapProduct (a1,a2) -> pretty_nraenv_exp p sym sym.djoin ff a1 (Some a2)
   | QcertCompiler.NRAEnvProduct (a1,a2) -> pretty_infix_exp p 5 sym pretty_nraenv_aux sym.times ff a1 a2
   | QcertCompiler.NRAEnvSelect (a1,a2) -> pretty_nraenv_exp p sym sym.sigma ff a1 (Some a2)
   | QcertCompiler.NRAEnvDefault (a1,a2) -> pretty_infix_exp p 8 sym pretty_nraenv_aux sym.bars ff a1 a2

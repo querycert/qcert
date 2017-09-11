@@ -65,7 +65,7 @@ Section TcNRAEnvtocNNRC.
       + dest_eqdec; congruence.
       + dest_eqdec; trivial.
         elim_fresh e.
-    (* ATMapConcat *)
+    (* ATMapProduct *)
     - specialize (IHnraenv_core_type2 vid venv tenv).
       apply (@type_cNNRCUnop m _ (RType.Coll (RType.Coll (RType.Rec Closed τ₃ pf3)))).
       apply type_OpFlatten.
@@ -183,7 +183,7 @@ Section TcNRAEnvtocNNRC.
                       τ₁) :: tenv)); simpl; trivial.
       + match_destr; congruence.
       + match_destr. elim_fresh e.
-    - Case "ANMapConcat"%string.
+    - Case "ANMapProduct"%string.
       inversion H7; subst.
       inversion H10; subst.
       inversion H12; subst.

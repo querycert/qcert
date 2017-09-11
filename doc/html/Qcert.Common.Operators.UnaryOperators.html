@@ -68,15 +68,15 @@
 &nbsp;&nbsp;.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="arith_unary_op_eqdec">arith_unary_op_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1022')">Proof.</div>
-<div class="proofscript" id="proof1022">
+<div class="toggleproof" onclick="toggleDisplay('proof1024')">Proof.</div>
+<div class="proofscript" id="proof1024">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#arith_unary_op">arith_unary_op</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>.<br/>
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="SortCriterias_eqdec">SortCriterias_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1023')">Proof.</div>
-<div class="proofscript" id="proof1023">
+<div class="toggleproof" onclick="toggleDisplay('proof1025')">Proof.</div>
+<div class="proofscript" id="proof1025">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Data.RDataSort.html#SortCriterias">SortCriterias</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
@@ -84,8 +84,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="unary_op_eqdec">unary_op_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1024')">Proof.</div>
-<div class="proofscript" id="proof1024">
+<div class="toggleproof" onclick="toggleDisplay('proof1026')">Proof.</div>
+<div class="proofscript" id="proof1026">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op">unary_op</a></span>,  {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> = <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>} + {<span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">try</span> <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">induction</span> <span class="id">l</span>; <span class="id">decide</span> <span class="id">equality</span>; <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string_dec">string_dec</a></span>.<br/>

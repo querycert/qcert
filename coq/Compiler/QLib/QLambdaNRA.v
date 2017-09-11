@@ -51,8 +51,8 @@ Module QLambdaNRA(runtime:CompilerRuntime).
     := LambdaNRA.LNRAMap.
   Definition lafilter : lambda_expr -> expr -> expr
     := LambdaNRA.LNRAFilter.
-  Definition lamapconcat : lambda_expr -> expr -> expr
-    := LambdaNRA.LNRAMapConcat.
+  Definition lamapproduct : lambda_expr -> expr -> expr
+    := LambdaNRA.LNRAMapProduct.
   Definition laproduct : expr -> expr -> expr
     := LambdaNRA.LNRAProduct.
 

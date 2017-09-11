@@ -38,7 +38,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => (is_nra e1) /\ (is_nra e2)
       | NRAEnvUnop uop e1 => is_nra e1
       | NRAEnvMap e1 e2 => (is_nra e1) /\ (is_nra e2)
-      | NRAEnvMapConcat e1 e2 => (is_nra e1) /\ (is_nra e2)
+      | NRAEnvMapProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
       | NRAEnvProduct e1 e2 => (is_nra e1) /\ (is_nra e2)
       | NRAEnvSelect e1 e2 => (is_nra e1) /\ (is_nra e2)
       | NRAEnvDefault e1 e2 => (is_nra e1) /\ (is_nra e2)
@@ -64,7 +64,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
       | NRAEnvUnop uop e1 => is_nra_fun e1
       | NRAEnvMap e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
-      | NRAEnvMapConcat e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
+      | NRAEnvMapProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
       | NRAEnvProduct e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
       | NRAEnvSelect e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
       | NRAEnvDefault e1 e2 => andb (is_nra_fun e1) (is_nra_fun e2)
@@ -116,7 +116,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
       | NRAEnvUnop uop e1 => nraenv_ignores_env e1
       | NRAEnvMap e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
-      | NRAEnvMapConcat e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
+      | NRAEnvMapProduct e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
       | NRAEnvProduct e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
       | NRAEnvSelect e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
       | NRAEnvDefault e1 e2 => (nraenv_ignores_env e1) /\ (nraenv_ignores_env e2)
@@ -143,7 +143,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
       | NRAEnvUnop uop e1 => nraenv_ignores_env_fun e1
       | NRAEnvMap e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
-      | NRAEnvMapConcat e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
+      | NRAEnvMapProduct e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
       | NRAEnvProduct e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
       | NRAEnvSelect e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
       | NRAEnvDefault e1 e2 => andb (nraenv_ignores_env_fun e1) (nraenv_ignores_env_fun e2)
@@ -199,7 +199,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => (fixed_env e1) /\ (fixed_env e2)
       | NRAEnvUnop uop e1 => fixed_env e1
       | NRAEnvMap e1 e2 => (fixed_env e1) /\ (fixed_env e2)
-      | NRAEnvMapConcat e1 e2 => (fixed_env e1) /\ (fixed_env e2)
+      | NRAEnvMapProduct e1 e2 => (fixed_env e1) /\ (fixed_env e2)
       | NRAEnvProduct e1 e2 => (fixed_env e1) /\ (fixed_env e2)
       | NRAEnvSelect e1 e2 => (fixed_env e1) /\ (fixed_env e2)
       | NRAEnvDefault e1 e2 => (fixed_env e1) /\ (fixed_env e2)
@@ -225,7 +225,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
       | NRAEnvUnop uop e1 => fixed_env_fun e1
       | NRAEnvMap e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
-      | NRAEnvMapConcat e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
+      | NRAEnvMapProduct e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
       | NRAEnvProduct e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
       | NRAEnvSelect e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
       | NRAEnvDefault e1 e2 => andb (fixed_env_fun e1) (fixed_env_fun e2)
@@ -279,7 +279,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => (nraenv_ignores_id e1) /\ (nraenv_ignores_id e2)
       | NRAEnvUnop uop e1 => nraenv_ignores_id e1
       | NRAEnvMap e1 e2 => nraenv_ignores_id e2
-      | NRAEnvMapConcat e1 e2 => nraenv_ignores_id e2
+      | NRAEnvMapProduct e1 e2 => nraenv_ignores_id e2
       | NRAEnvProduct e1 e2 => (nraenv_ignores_id e1) /\ (nraenv_ignores_id e2)
       | NRAEnvSelect e1 e2 => (nraenv_ignores_id e2)
       | NRAEnvDefault e1 e2 => (nraenv_ignores_id e1) /\ (nraenv_ignores_id e2)
@@ -306,7 +306,7 @@ Section NRAEnvIgnore.
       | NRAEnvBinop bop e1 e2 => andb (nraenv_ignores_id_fun e1) (nraenv_ignores_id_fun e2)
       | NRAEnvUnop uop e1 => nraenv_ignores_id_fun e1
       | NRAEnvMap e1 e2 => nraenv_ignores_id_fun e2
-      | NRAEnvMapConcat e1 e2 => nraenv_ignores_id_fun e2
+      | NRAEnvMapProduct e1 e2 => nraenv_ignores_id_fun e2
       | NRAEnvProduct e1 e2 => andb (nraenv_ignores_id_fun e1) (nraenv_ignores_id_fun e2)
       | NRAEnvSelect e1 e2 => (nraenv_ignores_id_fun e2)
       | NRAEnvDefault e1 e2 => andb (nraenv_ignores_id_fun e1) (nraenv_ignores_id_fun e2)

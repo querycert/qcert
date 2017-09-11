@@ -29,7 +29,7 @@ Section cNRAEnvSize.
          | ANBinop op a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
          | ANUnop op a₁ => S (nraenv_core_size a₁)
          | ANMap a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
-         | ANMapConcat a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
+         | ANMapProduct a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
          | ANProduct a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
          | ANSelect a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
          | ANDefault a₁ a₂ => S (nraenv_core_size a₁ + nraenv_core_size a₂)
@@ -55,7 +55,7 @@ Section cNRAEnvSize.
     | ANBinop op a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
     | ANUnop op a₁ => nraenv_core_depth a₁
     | ANMap a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
-    | ANMapConcat a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
+    | ANMapProduct a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
     | ANProduct a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)
     | ANSelect a₁ a₂ => max (S (nraenv_core_depth a₁)) (nraenv_core_depth a₂)
     | ANDefault a₁ a₂ => max (nraenv_core_depth a₁) (nraenv_core_depth a₂)

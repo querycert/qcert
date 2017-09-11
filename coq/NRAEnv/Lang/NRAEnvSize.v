@@ -29,7 +29,7 @@ Section NRAEnvSize.
          | NRAEnvBinop op a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
          | NRAEnvUnop op a₁ => S (nraenv_size a₁)
          | NRAEnvMap a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
-         | NRAEnvMapConcat a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
+         | NRAEnvMapProduct a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
          | NRAEnvProduct a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
          | NRAEnvSelect a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
          | NRAEnvDefault a₁ a₂ => S (nraenv_size a₁ + nraenv_size a₂)
@@ -61,7 +61,7 @@ Section NRAEnvSize.
     | NRAEnvBinop op a₁ a₂ => max (nraenv_depth a₁) (nraenv_depth a₂)
     | NRAEnvUnop op a₁ => nraenv_depth a₁
     | NRAEnvMap a₁ a₂ => max (S (nraenv_depth a₁)) (nraenv_depth a₂)
-    | NRAEnvMapConcat a₁ a₂ => max (S (nraenv_depth a₁)) (nraenv_depth a₂)
+    | NRAEnvMapProduct a₁ a₂ => max (S (nraenv_depth a₁)) (nraenv_depth a₂)
     | NRAEnvProduct a₁ a₂ => max (nraenv_depth a₁) (nraenv_depth a₂)
     | NRAEnvSelect a₁ a₂ => max (S (nraenv_depth a₁)) (nraenv_depth a₂)
     | NRAEnvDefault a₁ a₂ => max (nraenv_depth a₁) (nraenv_depth a₂)

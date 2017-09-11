@@ -14,6 +14,10 @@
  * limitations under the License.
  *)
 
+(** This module is not in use, but is kept around as a referent to
+some of the additional operators commonly found in the nested
+relational algebra. *)
+
 Section NRAExt.
   Require Import String.
   Require Import List.
@@ -33,39 +37,44 @@ Section NRAExt.
 
   (* Joins *)
 
-  Definition join op1 op2 op3 := (ASelect op1 (AProduct op2 op3)).
+  Definition join op1 op2 op3 := (NRASelect op1 (NRAProduct op2 op3)).
 
   Definition semi_join op1 op2 op3 :=
-    ASelect (AUnop OpNeg (ABinop OpEqual (ASelect op1 (AProduct ((AUnop OpBag) AID) op3)) (AConst (dcoll nil)))) op2.
-
+    NRASelect (NRAUnop OpNeg (NRABinop OpEqual
+                                       (NRASelect op1 (NRAProduct ((NRAUnop OpBag) NRAID) op3))
+                                       (NRAConst (dcoll nil)))) op2.
   Definition anti_join op1 op2 op3 :=
-    ASelect (ABinop OpEqual (ASelect op1 (AProduct ((AUnop OpBag) AID) op3)) (AConst (dcoll nil))) op2.
+    NRASelect (NRABinop OpEqual
+                        (NRASelect op1 (NRAProduct ((NRAUnop OpBag) NRAID) op3))
+                        (NRAConst (dcoll nil))) op2.
 
   (* Maps *)
 
-  Definition map_add_rec (s:string) op1 op2 := AMap ((ABinop OpRecConcat) AID ((AUnop (OpRec s)) op1)) op2.
-  Definition map_to_rec (s:string) op := AMap ((AUnop (OpRec s)) AID) op.
+  Definition map_add_rec (s:string) op1 op2 :=
+    NRAMap ((NRABinop OpRecConcat) NRAID ((NRAUnop (OpRec s)) op1)) op2.
+  Definition map_to_rec (s:string) op :=
+    NRAMap ((NRAUnop (OpRec s)) NRAID) op.
 
   (* Projects *)
   Fixpoint rproject (fields:list string) (op:nra) 
     := match fields with
-         | nil => AConst (drec nil)
-         | s::xs => ABinop OpRecConcat
-                           ((AUnop (OpRec s)) ((AUnop (OpDot s)) op))
-                           (rproject xs op)
+         | nil => NRAConst (drec nil)
+         | s::xs => NRABinop OpRecConcat
+                             ((NRAUnop (OpRec s)) ((NRAUnop (OpDot s)) op))
+                             (rproject xs op)
        end.
 
-  Definition project (fields:list string) (op:nra) 
-    := AMap (rproject fields AID) op.
+  Definition project (fields:list string) (op:nra)  :=
+    NRAMap (rproject fields NRAID) op.
 
   Definition project_remove s op :=
-    AMap ((AUnop (OpRecRemove s)) AID) op.
+    NRAMap ((NRAUnop (OpRecRemove s)) NRAID) op.
 
  (* Renaming *)
   (* renames field s1 to s2 *)
   Definition map_rename_rec (s1 s2:string) op :=
-    AMap ((ABinop OpRecConcat) ((AUnop (OpRec s2)) ((AUnop (OpDot s1)) AID))
-                  ((AUnop (OpRecRemove s1)) AID)) op.
+    NRAMap ((NRABinop OpRecConcat) ((NRAUnop (OpRec s2)) ((NRAUnop (OpDot s1)) NRAID))
+                                   ((NRAUnop (OpRecRemove s1)) NRAID)) op.
 
   (* Grouping *)
 
@@ -81,25 +90,27 @@ Section NRAExt.
 
   Import ListNotations.
   Definition group1 (g:string) (s1:string) op :=
-    AMap
-      ((ABinop OpRecConcat) ((AUnop (OpDot "1")) ((AUnop (OpDot "2")) AID))
-               ((AUnop (OpRec g))
-                     (AMap ((AUnop (OpDot "3")) AID)
-                           (ASelect
-                              (ABinop OpEqual ((AUnop (OpDot s1)) ((AUnop (OpDot "1")) AID)) ((AUnop (OpDot s1)) ((AUnop (OpDot "3")) AID)))
-                              (AProduct ((AUnop OpBag) ((AUnop (OpDot "2")) AID))
-                                        ((AUnop (OpDot "4")) AID))))))
-      (AMapConcat
-         ((AUnop OpBag) ((AUnop (OpRec "4")) (AMap ((AUnop (OpRec "3")) AID) op)))
-         (map_to_rec "2" (map_to_rec "1" ((AUnop OpDistinct) (project (s1::nil) op))))).
+    NRAMap
+      ((NRABinop OpRecConcat) ((NRAUnop (OpDot "1")) ((NRAUnop (OpDot "2")) NRAID))
+                              ((NRAUnop (OpRec g))
+                                 (NRAMap ((NRAUnop (OpDot "3")) NRAID)
+                                         (NRASelect
+                                            (NRABinop OpEqual ((NRAUnop (OpDot s1)) ((NRAUnop (OpDot "1")) NRAID)) ((NRAUnop (OpDot s1)) ((NRAUnop (OpDot "3")) NRAID)))
+                                            (NRAProduct ((NRAUnop OpBag) ((NRAUnop (OpDot "2")) NRAID))
+                                                        ((NRAUnop (OpDot "4")) NRAID))))))
+      (NRAMapProduct
+         ((NRAUnop OpBag) ((NRAUnop (OpRec "4")) (NRAMap ((NRAUnop (OpRec "3")) NRAID) op)))
+         (map_to_rec "2" (map_to_rec "1" ((NRAUnop OpDistinct) (project (s1::nil) op))))).
 
   (* Unnest *)
 
   Definition unnest_one s op :=
-    AMap ((AUnop (OpRecRemove s)) AID) (AMapConcat ((AUnop (OpDot s)) AID) op).
+    NRAMap ((NRAUnop (OpRecRemove s)) NRAID) (NRAMapProduct ((NRAUnop (OpDot s)) NRAID) op).
 
   Definition unnest_two s1 s2 op :=
-    AMap ((AUnop (OpRecRemove s1)) AID) (AMapConcat (AMap ((AUnop (OpRec s2)) AID) ((AUnop (OpDot s1)) AID)) op).
+    NRAMap ((NRAUnop (OpRecRemove s1)) NRAID)
+           (NRAMapProduct (NRAMap ((NRAUnop (OpRec s2)) NRAID)
+                                  ((NRAUnop (OpDot s1)) NRAID)) op).
 
 
   (* NRA for Optim *)
@@ -108,32 +119,32 @@ Section NRAExt.
   
   Inductive nraext : Set :=
   (* Those correspond to operators in the underlying NRA *)
-  | AXID : nraext
-  | AXConst : data -> nraext
-  | AXBinop : binary_op -> nraext -> nraext -> nraext
-  | AXUnop : unary_op -> nraext -> nraext
-  | AXMap : nraext -> nraext -> nraext
-  | AXMapConcat : nraext -> nraext -> nraext
-  | AXProduct : nraext -> nraext -> nraext
-  | AXSelect : nraext -> nraext -> nraext
-  | AXDefault : nraext -> nraext -> nraext
-  | AXEither : nraext -> nraext -> nraext
-  | AXEitherConcat : nraext -> nraext -> nraext
-  | AXApp : nraext -> nraext -> nraext
-  | AXGetConstant : string -> nraext
+  | xNRAID : nraext
+  | xNRAConst : data -> nraext
+  | xNRABinop : binary_op -> nraext -> nraext -> nraext
+  | xNRAUnop : unary_op -> nraext -> nraext
+  | xNRAMap : nraext -> nraext -> nraext
+  | xNRAMapProduct : nraext -> nraext -> nraext
+  | xNRAProduct : nraext -> nraext -> nraext
+  | xNRASelect : nraext -> nraext -> nraext
+  | xNRADefault : nraext -> nraext -> nraext
+  | xNRAEither : nraext -> nraext -> nraext
+  | xNRAEitherConcat : nraext -> nraext -> nraext
+  | xNRAApp : nraext -> nraext -> nraext
+  | xNRAGetConstant : string -> nraext
   (* Those are additional operators *)
-  | AXJoin : nraext -> nraext -> nraext -> nraext
-  | AXSemiJoin : nraext -> nraext -> nraext -> nraext
-  | AXAntiJoin : nraext -> nraext -> nraext -> nraext
-  | AXMapToRec : string -> nraext -> nraext
-  | AXMapAddRec : string -> nraext -> nraext -> nraext
-  | AXRProject : list string -> nraext -> nraext
-  | AXProject : list string -> nraext -> nraext
-  | AXProjectRemove : string -> nraext -> nraext
-  | AXMapRename : string -> string -> nraext -> nraext
-  | AXUnnestOne : string -> nraext -> nraext
-  | AXUnnestTwo : string -> string -> nraext -> nraext
-  | AXGroupBy : string -> string -> nraext -> nraext
+  | xNRAJoin : nraext -> nraext -> nraext -> nraext
+  | xNRASemiJoin : nraext -> nraext -> nraext -> nraext
+  | xNRAAntiJoin : nraext -> nraext -> nraext -> nraext
+  | xNRAMapToRec : string -> nraext -> nraext
+  | xNRAMapAddRec : string -> nraext -> nraext -> nraext
+  | xNRARProject : list string -> nraext -> nraext
+  | xNRAProject : list string -> nraext -> nraext
+  | xNRAProjectRemove : string -> nraext -> nraext
+  | xNRAMapRename : string -> string -> nraext -> nraext
+  | xNRAUnnestOne : string -> nraext -> nraext
+  | xNRAUnnestTwo : string -> string -> nraext -> nraext
+  | xNRAGroupBy : string -> string -> nraext -> nraext
   .
 
   Global Instance nraext_eqdec : EqDec nraext eq.
@@ -145,48 +156,48 @@ Section NRAExt.
 
   Fixpoint nra_of_nraext (e:nraext) : nra :=
     match e with
-      | AXID => AID
-      | AXConst d => AConst d
-      | AXBinop b e1 e2 => ABinop b (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXUnop u e1 => AUnop u (nra_of_nraext e1)
-      | AXMap e1 e2 => AMap (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXMapConcat e1 e2 => AMapConcat (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXProduct e1 e2 => AProduct (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXSelect e1 e2 => ASelect (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXDefault e1 e2 => ADefault (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXEither opl opr => AEither (nra_of_nraext opl) (nra_of_nraext opr)
-      | AXEitherConcat op1 op2 => AEitherConcat (nra_of_nraext op1) (nra_of_nraext op2)
-      | AXApp e1 e2 => AApp (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXGetConstant s => AGetConstant s
-      | AXJoin e1 e2 e3 => join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
-      | AXSemiJoin e1 e2 e3 => semi_join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
-      | AXAntiJoin e1 e2 e3 => anti_join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
-      | AXMapToRec s e1 => map_to_rec s (nra_of_nraext e1)
-      | AXMapAddRec s e1 e2 => map_add_rec s (nra_of_nraext e1) (nra_of_nraext e2)
-      | AXRProject ls e1 => rproject ls (nra_of_nraext e1)
-      | AXProject ls e1 => project ls (nra_of_nraext e1)
-      | AXProjectRemove s e1 => project_remove s (nra_of_nraext e1)
-      | AXMapRename s1 s2 e1 => map_rename_rec s1 s2 (nra_of_nraext e1)
-      | AXUnnestOne s1 e1 => unnest_one s1 (nra_of_nraext e1)
-      | AXUnnestTwo s1 s2 e1 => unnest_two s1 s2 (nra_of_nraext e1)
-      | AXGroupBy s1 s2 e1 => group1 s1 s2 (nra_of_nraext e1)
+      | xNRAID => NRAID
+      | xNRAConst d => NRAConst d
+      | xNRABinop b e1 e2 => NRABinop b (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRAUnop u e1 => NRAUnop u (nra_of_nraext e1)
+      | xNRAMap e1 e2 => NRAMap (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRAMapProduct e1 e2 => NRAMapProduct (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRAProduct e1 e2 => NRAProduct (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRASelect e1 e2 => NRASelect (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRADefault e1 e2 => NRADefault (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRAEither opl opr => NRAEither (nra_of_nraext opl) (nra_of_nraext opr)
+      | xNRAEitherConcat op1 op2 => NRAEitherConcat (nra_of_nraext op1) (nra_of_nraext op2)
+      | xNRAApp e1 e2 => NRAApp (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRAGetConstant s => NRAGetConstant s
+      | xNRAJoin e1 e2 e3 => join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
+      | xNRASemiJoin e1 e2 e3 => semi_join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
+      | xNRAAntiJoin e1 e2 e3 => anti_join (nra_of_nraext e1) (nra_of_nraext e2) (nra_of_nraext e3)
+      | xNRAMapToRec s e1 => map_to_rec s (nra_of_nraext e1)
+      | xNRAMapAddRec s e1 e2 => map_add_rec s (nra_of_nraext e1) (nra_of_nraext e2)
+      | xNRARProject ls e1 => rproject ls (nra_of_nraext e1)
+      | xNRAProject ls e1 => project ls (nra_of_nraext e1)
+      | xNRAProjectRemove s e1 => project_remove s (nra_of_nraext e1)
+      | xNRAMapRename s1 s2 e1 => map_rename_rec s1 s2 (nra_of_nraext e1)
+      | xNRAUnnestOne s1 e1 => unnest_one s1 (nra_of_nraext e1)
+      | xNRAUnnestTwo s1 s2 e1 => unnest_two s1 s2 (nra_of_nraext e1)
+      | xNRAGroupBy s1 s2 e1 => group1 s1 s2 (nra_of_nraext e1)
     end.
 
   Fixpoint nraext_of_nra (a:nra) : nraext :=
     match a with
-      | AID => AXID
-      | AConst d => AXConst d
-      | ABinop b e1 e2 => AXBinop b (nraext_of_nra e1) (nraext_of_nra e2)
-      | AUnop u e1 => AXUnop u (nraext_of_nra e1)
-      | AMap e1 e2 => AXMap (nraext_of_nra e1) (nraext_of_nra e2)
-      | AMapConcat e1 e2 => AXMapConcat (nraext_of_nra e1) (nraext_of_nra e2)
-      | AProduct e1 e2 => AXProduct (nraext_of_nra e1) (nraext_of_nra e2)
-      | ASelect e1 e2 => AXSelect (nraext_of_nra e1) (nraext_of_nra e2)
-      | ADefault e1 e2 => AXDefault (nraext_of_nra e1) (nraext_of_nra e2)
-      | AEither opl opr => AXEither (nraext_of_nra opl) (nraext_of_nra opr)
-      | AEitherConcat op1 op2 => AXEitherConcat (nraext_of_nra op1) (nraext_of_nra op2)
-      | AApp e1 e2 => AXApp (nraext_of_nra e1) (nraext_of_nra e2)
-      | AGetConstant s => AXGetConstant s
+    | NRAGetConstant s => xNRAGetConstant s
+    | NRAID => xNRAID
+    | NRAConst d => xNRAConst d
+    | NRABinop b e1 e2 => xNRABinop b (nraext_of_nra e1) (nraext_of_nra e2)
+    | NRAUnop u e1 => xNRAUnop u (nraext_of_nra e1)
+    | NRAMap e1 e2 => xNRAMap (nraext_of_nra e1) (nraext_of_nra e2)
+    | NRAMapProduct e1 e2 => xNRAMapProduct (nraext_of_nra e1) (nraext_of_nra e2)
+    | NRAProduct e1 e2 => xNRAProduct (nraext_of_nra e1) (nraext_of_nra e2)
+    | NRASelect e1 e2 => xNRASelect (nraext_of_nra e1) (nraext_of_nra e2)
+    | NRADefault e1 e2 => xNRADefault (nraext_of_nra e1) (nraext_of_nra e2)
+    | NRAEither opl opr => xNRAEither (nraext_of_nra opl) (nraext_of_nra opr)
+    | NRAEitherConcat op1 op2 => xNRAEitherConcat (nraext_of_nra op1) (nraext_of_nra op2)
+    | NRAApp e1 e2 => xNRAApp (nraext_of_nra e1) (nraext_of_nra e2)
     end.
 
   Lemma nraext_roundtrip (a:nra) :
@@ -219,96 +230,96 @@ Delimit Scope nraext_scope with nraext.
 
 Notation "h ⊢ EOp @ₓ x ⊣ c" := (nraext_eval h c EOp x) (at level 10): nraext_scope.
 
-Notation "'ID'" := (AXID)  (at level 50) : nraext_scope.                                           (* ◇ = \Diamond *)
-Notation "CGET⟨ s ⟩" := (AXGetConstant s) (at level 50) : nraext_core_scope.
+Notation "'ID'" := (xNRAID)  (at level 50) : nraext_scope.                                           (* ◇ = \Diamond *)
+Notation "CGET⟨ s ⟩" := (xNRAGetConstant s) (at level 50) : nraext_core_scope.
 
-Notation "‵‵ c" := (AXConst (dconst c))  (at level 0) : nraext_scope.                           (* ‵ = \backprime *)
-Notation "‵ c" := (AXConst c)  (at level 0) : nraext_scope.                                     (* ‵ = \backprime *)
-Notation "‵{||}" := (AXConst (dcoll nil))  (at level 0) : nraext_scope.                         (* ‵ = \backprime *)
-Notation "‵[||]" := (AXConst (drec nil)) (at level 50) : nraext_scope.                          (* ‵ = \backprime *)
+Notation "‵‵ c" := (xNRAConst (dconst c))  (at level 0) : nraext_scope.                           (* ‵ = \backprime *)
+Notation "‵ c" := (xNRAConst c)  (at level 0) : nraext_scope.                                     (* ‵ = \backprime *)
+Notation "‵{||}" := (xNRAConst (dcoll nil))  (at level 0) : nraext_scope.                         (* ‵ = \backprime *)
+Notation "‵[||]" := (xNRAConst (drec nil)) (at level 50) : nraext_scope.                          (* ‵ = \backprime *)
 
-Notation "r1 ∧ r2" := (AXBinop OpAnd r1 r2) (right associativity, at level 65): nraext_scope.    (* ∧ = \wedge *)
-Notation "r1 ∨ r2" := (AXBinop OpOr r1 r2) (right associativity, at level 70): nraext_scope.     (* ∨ = \vee *)
-Notation "r1 ≐ r2" := (AXBinop OpEqual r1 r2) (right associativity, at level 70): nraext_scope.     (* ≐ = \doteq *)
-Notation "r1 ≤ r2" := (AXBinop OpLt r1 r2) (no associativity, at level 70): nraext_scope.     (* ≤ = \leq *)
-Notation "r1 ⋃ r2" := (AXBinop OpBagUnion r1 r2) (right associativity, at level 70): nraext_scope.  (* ⋃ = \bigcup *)
-Notation "r1 − r2" := (AXBinop OpBagDiff r1 r2) (right associativity, at level 70): nraext_scope.  (* − = \minus *)
-Notation "r1 ♯min r2" := (AXBinop OpBagMin r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
-Notation "r1 ♯max r2" := (AXBinop OpBagMax r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
-Notation "p ⊕ r"   := ((AXBinop OpRecConcat) p r) (at level 70) : nraext_scope.                     (* ⊕ = \oplus *)
-Notation "p ⊗ r"   := ((AXBinop OpRecMerge) p r) (at level 70) : nraext_scope.                (* ⊗ = \otimes *)
+Notation "r1 ∧ r2" := (xNRABinop OpAnd r1 r2) (right associativity, at level 65): nraext_scope.    (* ∧ = \wedge *)
+Notation "r1 ∨ r2" := (xNRABinop OpOr r1 r2) (right associativity, at level 70): nraext_scope.     (* ∨ = \vee *)
+Notation "r1 ≐ r2" := (xNRABinop OpEqual r1 r2) (right associativity, at level 70): nraext_scope.     (* ≐ = \doteq *)
+Notation "r1 ≤ r2" := (xNRABinop OpLt r1 r2) (no associativity, at level 70): nraext_scope.     (* ≤ = \leq *)
+Notation "r1 ⋃ r2" := (xNRABinop OpBagUnion r1 r2) (right associativity, at level 70): nraext_scope.  (* ⋃ = \bigcup *)
+Notation "r1 − r2" := (xNRABinop OpBagDiff r1 r2) (right associativity, at level 70): nraext_scope.  (* − = \minus *)
+Notation "r1 ♯min r2" := (xNRABinop OpBagMin r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
+Notation "r1 ♯max r2" := (xNRABinop OpBagMax r1 r2) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
+Notation "p ⊕ r"   := ((xNRABinop OpRecConcat) p r) (at level 70) : nraext_scope.                     (* ⊕ = \oplus *)
+Notation "p ⊗ r"   := ((xNRABinop OpRecMerge) p r) (at level 70) : nraext_scope.                (* ⊗ = \otimes *)
 
-Notation "¬( r1 )" := (AXUnop OpNeg r1) (right associativity, at level 70): nraext_scope.        (* ¬ = \neg *)
-Notation "ε( r1 )" := (AXUnop OpDistinct r1) (right associativity, at level 70): nraext_scope.   (* ε = \epsilon *)
-Notation "♯count( r1 )" := (AXUnop OpCount r1) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
-Notation "♯flatten( d )" := (AXUnop OpFlatten d) (at level 50) : nraext_scope.                   (* ♯ = \sharp *)
-Notation "‵{| d |}" := ((AXUnop OpBag) d)  (at level 50) : nraext_scope.                        (* ‵ = \backprime *)
-Notation "‵[| ( s , r ) |]" := ((AXUnop (OpRec s)) r) (at level 50) : nraext_scope.              (* ‵ = \backprime *)
-Notation "¬π[ s1 ]( r )" := ((AXUnop (OpRecRemove s1)) r) (at level 50) : nraext_scope.          (* ¬ = \neg and π = \pi *)
-Notation "p · r" := ((AXUnop (OpDot r)) p) (left associativity, at level 40): nraext_scope.      (* · = \cdot *)
+Notation "¬( r1 )" := (xNRAUnop OpNeg r1) (right associativity, at level 70): nraext_scope.        (* ¬ = \neg *)
+Notation "ε( r1 )" := (xNRAUnop OpDistinct r1) (right associativity, at level 70): nraext_scope.   (* ε = \epsilon *)
+Notation "♯count( r1 )" := (xNRAUnop OpCount r1) (right associativity, at level 70): nraext_scope. (* ♯ = \sharp *)
+Notation "♯flatten( d )" := (xNRAUnop OpFlatten d) (at level 50) : nraext_scope.                   (* ♯ = \sharp *)
+Notation "‵{| d |}" := ((xNRAUnop OpBag) d)  (at level 50) : nraext_scope.                        (* ‵ = \backprime *)
+Notation "‵[| ( s , r ) |]" := ((xNRAUnop (OpRec s)) r) (at level 50) : nraext_scope.              (* ‵ = \backprime *)
+Notation "¬π[ s1 ]( r )" := ((xNRAUnop (OpRecRemove s1)) r) (at level 50) : nraext_scope.          (* ¬ = \neg and π = \pi *)
+Notation "p · r" := ((xNRAUnop (OpDot r)) p) (left associativity, at level 40): nraext_scope.      (* · = \cdot *)
 
-Notation "χ⟨ p ⟩( r )" := (AXMap p r) (at level 70) : nraext_scope.                              (* χ = \chi *)
-Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (AXMapConcat e2 e1) (at level 70) : nraext_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
-Notation "r1 × r2" := (AXProduct r1 r2) (right associativity, at level 70): nraext_scope.       (* × = \times *)
-Notation "σ⟨ p ⟩( r )" := (AXSelect p r) (at level 70) : nraext_scope.                           (* σ = \sigma *)
-Notation "r1 ∥ r2" := (AXDefault r1 r2) (right associativity, at level 70): nraext_scope.       (* ∥ = \parallel *)
-Notation "r1 ◯ r2" := (AXApp r1 r2) (right associativity, at level 60): nraext_scope.           (* ◯ = \bigcirc *)
+Notation "χ⟨ p ⟩( r )" := (xNRAMap p r) (at level 70) : nraext_scope.                              (* χ = \chi *)
+Notation "⋈ᵈ⟨ e2 ⟩( e1 )" := (xNRAMapProduct e2 e1) (at level 70) : nraext_scope.                   (* ⟨ ... ⟩ = \rangle ...  \langle *)
+Notation "r1 × r2" := (xNRAProduct r1 r2) (right associativity, at level 70): nraext_scope.       (* × = \times *)
+Notation "σ⟨ p ⟩( r )" := (xNRASelect p r) (at level 70) : nraext_scope.                           (* σ = \sigma *)
+Notation "r1 ∥ r2" := (xNRADefault r1 r2) (right associativity, at level 70): nraext_scope.       (* ∥ = \parallel *)
+Notation "r1 ◯ r2" := (xNRAApp r1 r2) (right associativity, at level 60): nraext_scope.           (* ◯ = \bigcirc *)
 
 (* Operators only in the extended nraebra *)
-Notation "⋈⟨ p ⟩( r1 , r2 )" := (AXJoin p r1 r2) (at level 70) : nraext_scope.                     (* ⋈ = \Join *)
-Notation "⋉⟨ p ⟩( r1 , r2 )" := (AXSemiJoin p r1 r2) (at level 70) : nraext_scope.                (* ⋉ = \ltimes *)
-Notation "▷⟨ p ⟩( r1 , r2 )" := (AXAntiJoin p r1 r2) (at level 70) : nraext_scope.                (* ▷ = \rhd *)
+Notation "⋈⟨ p ⟩( r1 , r2 )" := (xNRAJoin p r1 r2) (at level 70) : nraext_scope.                     (* ⋈ = \Join *)
+Notation "⋉⟨ p ⟩( r1 , r2 )" := (xNRASemiJoin p r1 r2) (at level 70) : nraext_scope.                (* ⋉ = \ltimes *)
+Notation "▷⟨ p ⟩( r1 , r2 )" := (xNRAAntiJoin p r1 r2) (at level 70) : nraext_scope.                (* ▷ = \rhd *)
 
-Notation "p ⌈ a ⌋" := (AXMapToRec a p) (at level 70) : nraext_scope.
-Notation "χ⌈ a ⌋⟨ p1 ⟩( p2 )" := (AXMapAddRec a p1 p2) (at level 70) : nraext_scope.
+Notation "p ⌈ a ⌋" := (xNRAMapToRec a p) (at level 70) : nraext_scope.
+Notation "χ⌈ a ⌋⟨ p1 ⟩( p2 )" := (xNRAMapAddRec a p1 p2) (at level 70) : nraext_scope.
 
 (*
-Notation "π[  ]( r )" := (AXRProject nil r) (at level 70) : nraext_scope.
-Notation "π[ x ]( r )" := (AXRProject (cons x nil) r) (at level 70) : nraext_scope.
-Notation "π[ x , .. , y ]( r )" := (AXRProject (cons x .. (cons y nil) ..) r) (at level 70) : nraext_scope.
+Notation "π[  ]( r )" := (xNRARProject nil r) (at level 70) : nraext_scope.
+Notation "π[ x ]( r )" := (xNRARProject (cons x nil) r) (at level 70) : nraext_scope.
+Notation "π[ x , .. , y ]( r )" := (xNRARProject (cons x .. (cons y nil) ..) r) (at level 70) : nraext_scope.
 *)
-Notation "Π[ ]( r )" := (AXProject nil r) (at level 70) : nraext_scope.
-Notation "Π[ x ]( r )" := (AXProject (cons x nil) r) (at level 70) : nraext_scope.
-Notation "Π[ x , .. , y ]( r )" := (AXProject (cons x .. (cons y nil) ..) r) (at level 70) : nraext_scope.
+Notation "Π[ ]( r )" := (xNRAProject nil r) (at level 70) : nraext_scope.
+Notation "Π[ x ]( r )" := (xNRAProject (cons x nil) r) (at level 70) : nraext_scope.
+Notation "Π[ x , .. , y ]( r )" := (xNRAProject (cons x .. (cons y nil) ..) r) (at level 70) : nraext_scope.
 
-Notation "¬Π[ s1 ]( r )" := (AXProjectRemove s1 r) (at level 70) : nraext_scope.
+Notation "¬Π[ s1 ]( r )" := (xNRAProjectRemove s1 r) (at level 70) : nraext_scope.
 
-Notation "ρ[ s1 ↦ s2 ]( r )" := (AXMapRename s1 s2 r) (at level 70) : nraext_scope.
+Notation "ρ[ s1 ↦ s2 ]( r )" := (xNRAMapRename s1 s2 r) (at level 70) : nraext_scope.
 
-Notation "μ[ s1 ]( r )" := (AXUnnestOne s1 r) (at level 70) : nraext_scope.
-Notation "μ[ s1 ][ s2 ]( r )" := (AXUnnestTwo s1 s2 r) (at level 70) : nraext_scope.
+Notation "μ[ s1 ]( r )" := (xNRAUnnestOne s1 r) (at level 70) : nraext_scope.
+Notation "μ[ s1 ][ s2 ]( r )" := (xNRAUnnestTwo s1 s2 r) (at level 70) : nraext_scope.
 
-Notation "Γ[ g ][ s1 ]( r )" := (AXGroupBy g s1 r) (at level 70) : nraext_scope.
+Notation "Γ[ g ][ s1 ]( r )" := (xNRAGroupBy g s1 r) (at level 70) : nraext_scope.
 
 (* end hide *)
 
 Local Open Scope string_scope.
 Tactic Notation "nraext_cases" tactic(first) ident(c) :=
   first;
-  [ Case_aux c "AXID"
-  | Case_aux c "AXConst"
-  | Case_aux c "AXBinop"
-  | Case_aux c "AXUnop"
-  | Case_aux c "AXMap"
-  | Case_aux c "AXMapConcat"
-  | Case_aux c "AXProduct"
-  | Case_aux c "AXSelect"
-  | Case_aux c "AXDefault"
-  | Case_aux c "AXEither"
-  | Case_aux c "AXEitherConcat"
-  | Case_aux c "AXApp"
-  | Case_aux c "AXGetConstant"
-  | Case_aux c "AXJoin"
-  | Case_aux c "AXSemiJoin"
-  | Case_aux c "AXAntiJoin"
-  | Case_aux c "AXMapToRec"
-  | Case_aux c "AXRProject"
-  | Case_aux c "AXProject"
-  | Case_aux c "AXProjectRemove"
-  | Case_aux c "AXMapRename"
-  | Case_aux c "AXUnnestOne"
-  | Case_aux c "AXUnnestTwo"
-  | Case_aux c "AXGroupBy" ].
+  [ Case_aux c "xNRAID"
+  | Case_aux c "xNRAConst"
+  | Case_aux c "xNRABinop"
+  | Case_aux c "xNRAUnop"
+  | Case_aux c "xNRAMap"
+  | Case_aux c "xNRAMapProduct"
+  | Case_aux c "xNRAProduct"
+  | Case_aux c "xNRASelect"
+  | Case_aux c "xNRADefault"
+  | Case_aux c "xNRAEither"
+  | Case_aux c "xNRAEitherConcat"
+  | Case_aux c "xNRAApp"
+  | Case_aux c "xNRAGetConstant"
+  | Case_aux c "xNRAJoin"
+  | Case_aux c "xNRASemiJoin"
+  | Case_aux c "xNRAAntiJoin"
+  | Case_aux c "xNRAMapToRec"
+  | Case_aux c "xNRARProject"
+  | Case_aux c "xNRAProject"
+  | Case_aux c "xNRAProjectRemove"
+  | Case_aux c "xNRAMapRename"
+  | Case_aux c "xNRAUnnestOne"
+  | Case_aux c "xNRAUnnestTwo"
+  | Case_aux c "xNRAGroupBy" ].
 
 (* 
 *** Local Variables: ***
