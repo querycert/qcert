@@ -98,8 +98,8 @@ refer to Guido Moerkotte's "Building Query Compilers", Chapter 7.
 <div class="doc">Equality between two NRAEnv expressions is decidable. </div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="nraenv_eqdec">nraenv_eqdec</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#EqDec">EqDec</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">nraenv</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1936')">Proof.</div>
-<div class="proofscript" id="proof1936">
+<div class="toggleproof" onclick="toggleDisplay('proof1937')">Proof.</div>
+<div class="proofscript" id="proof1937">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">change</span> (<span class="kwd">forall</span> <span class="id">x</span> <span class="id">y</span> : <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">nraenv</a></span>,  {<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#x">x</a></span> = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#y">y</a></span>} + {<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#x">x</a></span> &lt;&gt; <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#y">y</a></span>}).<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">decide</span> <span class="id">equality</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span> [<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.BinaryOperators.html#binary_op_eqdec">binary_op_eqdec</a></span> | <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperators.html#unary_op_eqdec">unary_op_eqdec</a></span> | <span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Data.RData.html#data_eqdec">data_eqdec</a></span> | <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span> | <span class="tactic">apply</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.EquivDec.html#list_eqdec">list_eqdec</a></span>; <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.CoqLibAdd.html#string_eqdec">string_eqdec</a></span>].<br/>
@@ -259,8 +259,8 @@ refer to Guido Moerkotte's "Building Query Compilers", Chapter 7.
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_roundtrip">nraenv_roundtrip</a></span> (<span class="id">a</span>:<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;(<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_core_of_nraenv">nraenv_core_of_nraenv</a></span> (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_of_nraenv_core">nraenv_of_nraenv_core</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#a">a</a></span>)) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#a">a</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1937')">Proof.</div>
-<div class="proofscript" id="proof1937">
+<div class="toggleproof" onclick="toggleDisplay('proof1938')">Proof.</div>
+<div class="proofscript" id="proof1938">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">a</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>; <span class="tactic">try</span> (<span class="tactic">rewrite</span> <span class="id">IHa1</span>; <span class="tactic">rewrite</span> <span class="id">IHa2</span>; <span class="tactic">try</span> <span class="tactic">rewrite</span> <span class="id">IHa3</span>; <span class="tactic">reflexivity</span>); <span class="tactic">rewrite</span> <span class="id">IHa</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -323,8 +323,8 @@ refer to Guido Moerkotte's "Building Query Compilers", Chapter 7.
 <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="nraenv_free_vars_as_core">nraenv_free_vars_as_core</a></span> (<span class="id">q</span>:<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv">nraenv</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core_free_vars">nraenv_core_free_vars</a></span> (<span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_core_of_nraenv">nraenv_core_of_nraenv</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#q">q</a></span>) = <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#nraenv_free_vars">nraenv_free_vars</a></span> <span class="id"><a href="Qcert.NRAEnv.Lang.NRAEnv.html#q">q</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1938')">Proof.</div>
-<div class="proofscript" id="proof1938">
+<div class="toggleproof" onclick="toggleDisplay('proof1939')">Proof.</div>
+<div class="proofscript" id="proof1939">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">q</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="tactic">reflexivity</span>;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">try</span> <span class="id">solve</span>[<span class="tactic">rewrite</span> <span class="id">IHq1</span>; <span class="tactic">rewrite</span> <span class="id">IHq2</span>; <span class="tactic">reflexivity</span>|<span class="tactic">rewrite</span> <span class="id">IHq</span>;<span class="tactic">reflexivity</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">rewrite</span> <span class="id">IHq1</span>; <span class="tactic">rewrite</span> <span class="id">IHq2</span>; <span class="tactic">rewrite</span> <span class="id">IHq3</span>.<br/>
