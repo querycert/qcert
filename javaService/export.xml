@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_server_jar" name="Export artifacts from javaService project to bin">
-
+<project default="create_javaservice_artifacts" name="Export artifacts from javaService project">
+	<!-- This script creates three sets of artifacts.  (1) Jar files in the local QCert binary directory.
+	(2) A 'javaService.zip' to be deployed as a long-running server in some convenient location (to support demo.html).
+	(3) A 'qcertJavaWhiskAction.jar' to be deployed as a whisk action (an alternative to the previous). -->
+	
+	<!-- The target directory for the JavaService artifacts that support local execution -->
 	<property name="dest" value="../bin"/>
+	
+	<target name="create_javaservice_artifacts">
 
-	<target name="create_server_jar">
-        <delete dir="${dest}/services"/>
+		<!-- Populate the bin/services directory with dependent jars -->
+		<delete dir="${dest}/services"/>
 		<copy todir="${dest}/services">
 			<fileset file="lib/nanohttpd-2.3.1.jar"/>
 			<fileset file="lib/gson-2.7.jar"/>
 			<fileset file="lib/commons-csv-1.1.jar"/>
 			<fileset dir="services"/>
 		</copy>
+
+		<!-- Create 'depends' property listing the dependent jars for inclusion in the jar manifest of the main jar -->
 		<pathconvert property="depends" pathsep=" ">
 			<fileset dir="${dest}/services"/>
 			<chainedmapper>
@@ -18,6 +26,8 @@
 				<globmapper from="*" to="services/*"/>
 			</chainedmapper>
 		</pathconvert>
+		
+		<!-- Build javaService.jar in the bin location -->
 		<delete file="${dest}/javaService.jar"/>
 		<jar destfile="${dest}/javaService.jar">
             <manifest>
@@ -27,9 +37,21 @@
             </manifest>
             <fileset dir="bin" excludes="test/**"/>
         </jar>
-	<delete file="javaService.zip"/>
-	<zip destfile="javaService.zip">
-	  <fileset dir="${dest}" includes="**/*.jar"/>
-	</zip>
+		
+		<!-- Zip up the jars from bin for re-deployment as a remote long-running server.  Note well: in this case, we include
+		  the JRules dependencies since some of these deployments will be internal to legal ODM licensees.  But, for a fully
+		  public deployment, the JRules jars should be deleted after unzipping. -->
+		<delete file="javaService.zip"/>
+		<zip destfile="javaService.zip">
+			<fileset dir="${dest}" includes="**/*.jar"/>
+		</zip>
+		
+		<!-- Build the whisk action jar.  This requires merging dependent jars for those dependencies that will be needed for whisk.
+		This is not _all_ of the dependencies, since some of them are only to support the long-running server deployment.
+		For the moment, we also omit the JRules dependencies since the whisk action is destined to always be public. -->
+		<delete file="qcertJavaWhiskAction.jar"/>
+		<jar destfile="qcertJavaWhiskAction.jar">
+			<zipgroupfileset dir ="${dest}" includesfile="whiskjars"/>
+		</jar>
     </target>
 </project>

@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.qcert.util.CSV2JSON;
-
 import fi.iki.elonen.NanoHTTPD;
 
 /**
@@ -33,21 +31,6 @@ import fi.iki.elonen.NanoHTTPD;
  *   from Coq.
  */
 public class Main extends NanoHTTPD {
-	/** Mapping from verb names to class names where the class implements the Command interface and provides the logic for the verb */
-	private static Map<String, String> verbToClass = new HashMap<>();
-	static {
-		// Extend this table as needed as verbs are added to the system
-		verbToClass.put("parseSQL", "org.qcert.sql.EncodingService");
-		verbToClass.put("parseSQLPP", "org.qcert.sqlpp.EncodingServicePP");
-		verbToClass.put("techRule2CAMP", "org.qcert.camp.translator.TechRule2CAMP");
-		verbToClass.put("serialRule2CAMP", "org.qcert.camp.translator.SerialRule2CAMP");
-		verbToClass.put("csv2JSON", CSV2JSON.class.getName());
-		verbToClass.put("sqlSchema2JSON", "org.qcert.sql.SQLSchema2JSON");
-	}
-	
-	/** Mapping from class names to Command instances (conserves instantiations) */
-	private static Map<String, Command> classToInstance = new HashMap<>(); 
-
 	/** Pass-through constructor */
 	private Main(int port) {
 		super(port);
@@ -76,7 +59,7 @@ public class Main extends NanoHTTPD {
                 return respond(re.getStatus(), re.getMessage());
             }
             String arg = files.get("postData");
-            String response = dispatch(verb.get(0), arg);
+            String response = Dispatcher.dispatch(verb.get(0), arg);
 			return respond(Response.Status.OK, response);
         } else {
         	System.out.println("Rejecting non-post request");
@@ -116,27 +99,6 @@ public class Main extends NanoHTTPD {
 		else
 			runAsCmdline(args[0]);
 	}
-
-	/**
-	 * Dispatch a request no matter how it arrived.  
-	 * @param verb the request verb
-	 * @param arg the request argument
-	 * @return the request result
-	 */
-	private static String dispatch(String verb, String arg) {
-		String implClass = verbToClass.get(verb);
-		if (implClass == null)
-			return "ERROR: no implementation class for verb " + verb;
-		Command cmd = instantiate(implClass);
-		if (cmd == null)
-			return "ERROR: implementation of " + verb + " is not available";
-		try {
-			return cmd.invoke(arg);
-		} catch (Throwable t) {
-			return "ERROR: implementation of " + verb + " failed with the error -- " + t.getMessage();
-		}
-	}
-
 	/**
 	 * Print a message and exit.  The message is printed to stdout, not stderr, and is prepended with the ERROR: token in case
 	 *   the invokation came from qcert.
@@ -145,23 +107,6 @@ public class Main extends NanoHTTPD {
 	private static void error(String msg) {
 		System.out.println("ERROR: " + msg);
 		System.exit(-1);
-	}
-
-	/**
-	 * Retrieve a valid instance of a class that implements Command
-	 * @param implClass the class name
-	 * @return the Command or null if the class could not be instantiated
-	 */
-	private static Command instantiate(String implClass) {
-		Command cmd = classToInstance.get(implClass);
-		if (cmd == null) {
-			try {
-				cmd = (Command) Class.forName(implClass).newInstance();
-				classToInstance.put(implClass, cmd);
-			} catch (Exception e) {
-			}
-		}
-		return cmd;
 	}
 
 	/** Read stdin into a String until eos (in a pipeline) 
@@ -193,7 +138,7 @@ public class Main extends NanoHTTPD {
 			error("Problem reading stdin");
 			return; // not reached
 		}
-		System.out.println(dispatch(verb, arg));
+		System.out.println(Dispatcher.dispatch(verb, arg));
 	}
 
 	/**
