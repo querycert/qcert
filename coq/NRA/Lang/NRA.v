@@ -262,11 +262,10 @@ Section NRA.
           nra_sem e1 din (dcoll c1) ->
           nra_sem_map_product e2 c1 c2 ->
           nra_sem (NRAMapProduct e2 e1) din (dcoll c2)
-      | sem_NRAProduct : forall e1 e2 din c1 c2 c3,
+      | sem_NRAProduct : forall e1 e2 din c1 c2,
           nra_sem e1 din (dcoll c1) ->
-          nra_sem e2 din (dcoll c2) ->
-          product_sem c1 c2 c3 ->
-          nra_sem (NRAProduct e1 e2) din (dcoll c3)
+          nra_sem_product e2 din c1 c2 ->
+          nra_sem (NRAProduct e1 e2) din (dcoll c2)
       | sem_NRASelect : forall e1 e2 din c1 c2,
           nra_sem e1 din (dcoll c1) ->
           nra_sem_select e2 c1 c2 ->
@@ -312,6 +311,13 @@ Section NRA.
           map_concat_sem d1 c3 c4 ->                  (**r ∧ d₁ χ⊕ c₃ ⇓ c₄ *)
           nra_sem_map_product e c1 c2 ->              (**r ∧ [Γc ; {c₁} ⊢〚e〛⋈ᵈ ⇓ {c₂}] *)
           nra_sem_map_product e (d1::c1) (c4 ++ c2)   (**r ⇒ [Γc ; {d₁::c₁} ⊢〚e〛⋈ᵈ ⇓ {c₄}∪{c₂}] *)
+      with nra_sem_product: nra -> data -> list data -> list data -> Prop :=
+      | sem_NRAProduct_empty : forall e d,
+          nra_sem_product e d nil nil                 (**r   [Γc ; d ; {} ⊢〚e〛× ⇓ {}] *)
+      | sem_NRAProduct_cons : forall e d d1 c1 c2 c3,
+          nra_sem e d (dcoll c2) ->                   (**r   [Γc ; d ⊢〚e〛× ⇓ {c₂}]  *)
+          product_sem (d1::c1) c2 c3 ->               (**r ∧ {d₁::c₁} × c2 ⇓ c₃ *)
+          nra_sem_product e d (d1::c1) c3             (**r ⇒ [Γc ; {d₁::c₁} ⊢〚e〛× ⇓ c₃] *)
       with nra_sem_select: nra -> list data -> list data -> Prop :=
       | sem_NRASelect_empty : forall e,
           nra_sem_select e nil nil                    (**r   [Γc ; {} ⊢〚e〛σ ⇓ {}] *)
@@ -497,6 +503,19 @@ Section NRA.
           + congruence.
       Qed.
 
+              Lemma rmap_product_some_is_rproduct d1 d2 l1 l2 :
+                rmap_product (fun _ : data => Some d2) (d1 :: l1) = Some l2 ->
+                exists l, d2 = dcoll l /\ rproduct (d1::l1) l = Some l2.
+              Proof.
+                intros.
+                unfold rmap_product, rproduct in *; simpl in *.
+                case_eq d2; intros; rewrite H0 in *; simpl in *; try congruence.
+                exists l; split; [reflexivity| ].
+                unfold oomap_concat in H.
+                destruct (omap_concat d1 l); [|congruence].
+                assumption.
+              Qed.                
+              
       Lemma nra_eval_correct : forall e d1 d2,
           nra_eval e d1 = Some d2 ->
           nra_sem e d1 d2.
@@ -532,19 +551,29 @@ Section NRA.
           econstructor; eauto.
           apply nra_eval_map_product_correct; auto.
         - unfold olift2 in H.
-          (*
-          case_eq (nra_eval e1 d1); intros; rewrite H0 in *; [|congruence].
-          case_eq (nra_eval e2 d1); intros; rewrite H1 in *; [|congruence].
-          unfold lift_ondcoll2 in H.
-          destruct d; try congruence.
-          destruct d0; try congruence.
-          unfold lift in H.
-          case_eq (rproduct l l0); intros; rewrite H2 in *; [|congruence].
-          inversion H; subst; clear H.
-          econstructor; eauto.
-          rewrite <- rproduct_correct_and_complete. assumption.
-           *)
-          admit.
+          case_eq (nra_eval e1 d1); intros; rewrite H0 in *; simpl in *; [|congruence].
+          destruct d; simpl in *; try congruence.
+          destruct l; simpl in *.
+          (* Left collection is empty *)
+          + inversion H; subst.
+            econstructor; eauto.
+            econstructor; eauto.
+          (* Left collection is not empty *)
+          + specialize (IHe1 d1 (dcoll (d::l)) H0).
+            unfold lift in H.
+            case_eq (rmap_product (fun _ : data => nra_eval e2 d1) (d :: l)); intros;
+              rewrite H1 in *; simpl in *; [|congruence].
+            inversion H; subst.
+            econstructor; eauto.
+            case_eq (nra_eval e2 d1); intros; rewrite H2 in *.
+            * elim (rmap_product_some_is_rproduct d d0 l l0 H1); intros.
+              elim H3; clear H3; intros; subst.
+              econstructor; eauto.
+              apply rproduct_correct; assumption.
+            * elim (rmap_product_cons_inv (fun _ : data => None) l d l0 H1); intros.
+              elim H3; clear H3; intros.
+              elim H3; clear H3; intros.
+              simpl in H3; unfold oomap_concat in H3; congruence.
         - unfold olift in H.
           case_eq (nra_eval e2 d1); intros; rewrite H0 in *; [|congruence].
           unfold lift_oncoll in H.
@@ -597,7 +626,7 @@ Section NRA.
         - unfold olift in H.
           case_eq (nra_eval e2 d1); intros; rewrite H0 in *; [|congruence].
           econstructor; eauto.
-      Admitted.
+      Qed.
  
     End EvalCorrect.
 
