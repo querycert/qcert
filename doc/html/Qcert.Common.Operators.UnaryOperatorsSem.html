@@ -152,8 +152,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#s">s</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#o">o</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#o">o</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1027')">Proof.</div>
-<div class="proofscript" id="proof1027">
+<div class="toggleproof" onclick="toggleDisplay('proof1036')">Proof.</div>
+<div class="proofscript" id="proof1036">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#edot">edot</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 2; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Assoc.html#assoc_lookupr_in">assoc_lookupr_in</a></span> <span class="kwd">in</span> <span class="id">H</span>.<br/>
@@ -165,8 +165,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_filter">data_normalized_filter</a></span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">f</span>, <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#filter">filter</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#f">f</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1028')">Proof.</div>
-<div class="proofscript" id="proof1028">
+<div class="toggleproof" onclick="toggleDisplay('proof1037')">Proof.</div>
+<div class="proofscript" id="proof1037">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#Forall_filter">Forall_filter</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -176,8 +176,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_rremove">data_normalized_rremove</a></span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">s</span>, <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#rremove">rremove</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#s">s</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1029')">Proof.</div>
-<div class="proofscript" id="proof1029">
+<div class="toggleproof" onclick="toggleDisplay('proof1038')">Proof.</div>
+<div class="proofscript" id="proof1038">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rremove">rremove</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#data_normalized_filter">data_normalized_filter</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
@@ -185,8 +185,8 @@
 &nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_rproject">data_normalized_rproject</a></span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">forall</span> <span class="id">l2</span>, <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> (<span class="id"><a href="Qcert.Common.Data.RRelation.html#rproject">rproject</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l2">l2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1030')">Proof.</div>
-<div class="proofscript" id="proof1030">
+<div class="toggleproof" onclick="toggleDisplay('proof1039')">Proof.</div>
+<div class="proofscript" id="proof1039">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rremove">rremove</a></span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RRelation.html#rproject">rproject</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#data_normalized_filter">data_normalized_filter</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -194,24 +194,24 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="data_normalized_bdistinct">data_normalized_bdistinct</a></span> <span class="id">l</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>) -&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dcoll">dcoll</a></span> (<span class="id"><a href="Qcert.Utils.Bag.html#bdistinct">bdistinct</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#l">l</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1031')">Proof.</div>
-<div class="proofscript" id="proof1031">
+<div class="toggleproof" onclick="toggleDisplay('proof1040')">Proof.</div>
+<div class="proofscript" id="proof1040">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bag.html#bdistinct_Forall">bdistinct_Forall</a></span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dnnone">dnnone</a></span> : <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> <span class="id"><a href="Qcert.Common.Data.RData.html#dnone">dnone</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1032')">Proof.</div>
-<div class="proofscript" id="proof1032">
+<div class="toggleproof" onclick="toggleDisplay('proof1041')">Proof.</div>
+<div class="proofscript" id="proof1041">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">constructor</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="dnsome">dnsome</a></span> <span class="id">d</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#d">d</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#dsome">dsome</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#d">d</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1033')">Proof.</div>
-<div class="proofscript" id="proof1033">
+<div class="toggleproof" onclick="toggleDisplay('proof1042')">Proof.</div>
+<div class="proofscript" id="proof1042">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">repeat</span> <span class="id">constructor</span>; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
@@ -219,8 +219,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#unary_op_eval">unary_op_eval</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#u">u</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#d">d</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#o">o</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#d">d</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#UnaryOperatorsSem.h">h</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#o">o</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1034')">Proof.</div>
-<div class="proofscript" id="proof1034">
+<div class="toggleproof" onclick="toggleDisplay('proof1043')">Proof.</div>
+<div class="proofscript" id="proof1043">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="id">Constructors</span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Operators.UnaryOperatorsSem.html#Forall">Forall</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">Hint</span> <span class="kwd">Resolve</span> <span class="id">dnnone</span> <span class="id">dnsome</span>.<br/>
 <br/>

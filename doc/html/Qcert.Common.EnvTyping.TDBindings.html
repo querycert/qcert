@@ -47,8 +47,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">d</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.Data.DData.html#ddata">ddata</a></span> =&gt; <span class="id"><a href="Qcert.Common.Data.DDataNorm.html#ddata_normalized">ddata_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#d">d</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#c">c</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1438')">Proof.</div>
-<div class="proofscript" id="proof1438">
+<div class="toggleproof" onclick="toggleDisplay('proof1447')">Proof.</div>
+<div class="proofscript" id="proof1447">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> 1; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>.<br/>
@@ -64,24 +64,24 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="eq_and_drtype_pre">eq_and_drtype_pre</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> <br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">xy1</span> <span class="id">xy2</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.TypeSystem.DType.html#drtype">drtype</a></span> =&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#xy1">xy1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#xy2">xy2</a></span> /\ <span class="id"><a href="Qcert.Common.DataTyping.TDData.html#drtype_sub">drtype_sub</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#xy1">xy1</a></span>) (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#xy2">xy2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1439')">Proof.</div>
-<div class="proofscript" id="proof1439">
+<div class="toggleproof" onclick="toggleDisplay('proof1448')">Proof.</div>
+<div class="proofscript" id="proof1448">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">constructor</span>; <span class="tactic">red</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intuition</span>; <span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">intuition</span>; <span class="id">etransitivity</span>; <span class="tactic">eauto</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 &nbsp;&nbsp;&nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tdbindings_sub_pre">tdbindings_sub_pre</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PreOrder">PreOrder</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings_sub">tdbindings_sub</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1440')">Proof.</div>
-<div class="proofscript" id="proof1440">
+<div class="toggleproof" onclick="toggleDisplay('proof1449')">Proof.</div>
+<div class="proofscript" id="proof1449">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings_sub">tdbindings_sub</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#Forall2_pre">Forall2_pre</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#eq_and_drtype_pre">eq_and_drtype_pre</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tdbindings_sub_part">tdbindings_sub_part</a></span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.RelationClasses.html#PartialOrder">PartialOrder</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings_sub">tdbindings_sub</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1441')">Proof.</div>
-<div class="proofscript" id="proof1441">
+<div class="toggleproof" onclick="toggleDisplay('proof1450')">Proof.</div>
+<div class="proofscript" id="proof1450">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings_sub">tdbindings_sub</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eapply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#Forall2_part_eq">Forall2_part_eq</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">sd</span>τ₁ <span class="id">sd</span>τ₂.<br/>
@@ -97,8 +97,8 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Global</span> <span class="kwd">Instance</span> <span class="id"><a name="tdbindings_type_sub">tdbindings_type_sub</a></span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Logic.html#eq">eq</a></span> ==&gt; <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#tdbindings_sub">tdbindings_sub</a></span> ==&gt; <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#impl">impl</a></span>) <span class="id"><a href="Qcert.Common.EnvTyping.TDBindings.html#dbindings_type">dbindings_type</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1442')">Proof.</div>
-<div class="proofscript" id="proof1442">
+<div class="toggleproof" onclick="toggleDisplay('proof1451')">Proof.</div>
+<div class="proofscript" id="proof1451">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#Proper">Proper</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Classes.Morphisms.html#respectful">respectful</a></span>, <span class="id"><a href="http://coq.inria.fr/library/Coq.Program.Basics.html#impl">impl</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">intros</span> <span class="id">d</span> <span class="id">d</span>' ? <span class="id">d</span>τ₁ <span class="id">d</span>τ₂ <span class="id">sub</span> <span class="id">typ</span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;; <span class="tactic">subst</span> <span class="id">d</span>'.<br/>

@@ -822,6 +822,156 @@ Section RRelation.
     induction l2; [unfold rflatten|idtac]; reflexivity.
   Qed.
 
+  Section Denotational.
+    Inductive rec_concat_sem: data -> data -> data -> Prop :=
+    | sem_rec_concat:
+        forall r1 r2,
+          rec_concat_sem (drec r1) (drec r2)
+                         (drec (rec_concat_sort r1 r2)).
+
+    Lemma orecconcat_correct : forall d d1 d2,
+        orecconcat d d1 = Some d2 ->
+        rec_concat_sem d d1 d2.
+    Proof.
+      intros.
+      destruct d; destruct d1; simpl in *; try congruence.
+      inversion H; econstructor; reflexivity.
+    Qed.
+
+    Lemma orecconcat_complete : forall d d1 d2,
+        rec_concat_sem d d1 d2 ->
+        orecconcat d d1 = Some d2.
+    Proof.
+      intros.
+      inversion H; subst.
+      reflexivity.
+    Qed.
+
+    Lemma orecconcat_correct_and_complete : forall d d1 d2,
+        orecconcat d d1 = Some d2 <->
+        rec_concat_sem d d1 d2.
+    Proof.
+      split.
+      apply orecconcat_correct.
+      apply orecconcat_complete.
+    Qed.
+
+    (** Semantics of the [map_concat] operator. It takes a record [d]
+     and a collection of record [c], and returns a new collection of
+     records [c'] where [d] has been concatenated to all the records
+     in [c]. *)
+
+    Inductive map_concat_sem: data -> list data -> list data -> Prop :=
+    | sem_map_concat_empty : forall d,
+        map_concat_sem d nil nil                     (**r   [d χ⊕ {} ⇓ {}] *)
+    | sem_map_concat_cons : forall d d1 d2 c1 c2,
+        rec_concat_sem d d1 d2 ->                    (**r   [d ⊕ d₁ ⇓ d₂] *)
+        map_concat_sem d c1 c2 ->                    (**r ∧ [d χ⊕ {c₁} ⇓ {c₂}] *)
+        map_concat_sem d (d1::c1) (d2::c2).          (**r ⇒ [d χ⊕ {d₁::c₁} ⇓ {d₂::c₂}] *)
+    
+    (* [omap_concat] is correct and complete wrt. the [map_concat_sem]
+       semantics. *)
+      
+    Lemma omap_concat_correct d c1 c2:
+      omap_concat d c1 = Some c2 ->
+      map_concat_sem d c1 c2.
+    Proof.
+      unfold omap_concat.
+      revert c2.
+      induction c1; simpl; intros.
+      - inversion H; subst; econstructor.
+      - case_eq (orecconcat d a); intros; rewrite H0 in *; [|congruence].
+        rewrite orecconcat_correct_and_complete in H0.
+        unfold lift in H.
+        case_eq (rmap (fun x : data => orecconcat d x) c1); intros;
+          rewrite H1 in *; clear H1; [|congruence].
+        inversion H; subst; clear H.
+        specialize (IHc1 l eq_refl).
+        econstructor; eauto.
+    Qed.
+      
+    Lemma omap_concat_complete d c1 c2:
+      map_concat_sem d c1 c2 ->
+      omap_concat d c1 = Some c2.
+    Proof.
+      unfold omap_concat.
+      revert c2.
+      induction c1; simpl; intros.
+      - inversion H; reflexivity.
+      - inversion H; subst; simpl in *.
+        rewrite <- orecconcat_correct_and_complete in H3.
+        rewrite H3; simpl.
+        unfold lift.
+        rewrite (IHc1 c3 H5); reflexivity.
+    Qed.
+      
+    Lemma omap_concat_correct_and_complete d c1 c2:
+      omap_concat d c1 = Some c2 <->
+      map_concat_sem d c1 c2.
+    Proof.
+      split.
+      apply omap_concat_correct.
+      apply omap_concat_complete.
+    Qed.
+
+    (** Semantics of the [product] operator. It takes two collections
+     of records [c₁] and [c₂] and returns the Cartesian product. *)
+
+    Inductive product_sem: list data -> list data -> list data -> Prop :=
+    | sem_product_empty : forall c,
+        product_sem nil c nil                   (**r   [{c} × {} ⇓ {}] *)
+    | sem_product_cons : forall d1 c1 c2 c3 c4,
+        map_concat_sem d1 c2 c3 ->              (**r ∧ [d₁ χ⊕ {c₂} ⇓ {c₃}] *)
+        product_sem c1 c2 c4 ->                 (**r ∧ [{c₁} × {c₂} ⇓ {c₄}] *)
+        product_sem (d1::c1) c2 (c3 ++ c4).     (**r ⇒ [{d₁::c₁} × {c₂} ⇓ {c₃}∪{c₄}] *)
+
+    (* [rproduct] is correct and complete wrt. the [product_sem]
+     semantics. *)
+      
+    Lemma rproduct_correct c1 c2 c3:
+      rproduct c1 c2 = Some c3 ->
+      product_sem c1 c2 c3.
+    Proof.
+      unfold rproduct.
+      revert c2 c3.
+      induction c1; simpl; intros.
+      - inversion H; econstructor.
+      - case_eq (omap_concat a c2); intros; rewrite H0 in *; [|congruence].
+        unfold lift in H.
+        case_eq (oflat_map (fun x : data => omap_concat x c2) c1);
+          intros; rewrite H1 in *; [|congruence].
+        inversion H; subst; clear H.
+        specialize (IHc1 c2 l0 H1).
+        econstructor;[|assumption].
+        rewrite omap_concat_correct_and_complete in H0;assumption.
+    Qed.
+
+    Lemma rproduct_complete c1 c2 c3:
+      product_sem c1 c2 c3 ->
+      rproduct c1 c2 = Some c3.
+    Proof.
+      unfold rproduct.
+      revert c2 c3.
+      induction c1; simpl; intros.
+      - inversion H; subst; reflexivity.
+      - inversion H; subst.
+        rewrite <- omap_concat_correct_and_complete in H2.
+        rewrite H2.
+        unfold lift; rewrite (IHc1 c2 c6 H5).
+        reflexivity.
+    Qed.
+
+    Lemma rproduct_correct_and_complete c1 c2 c3:
+      rproduct c1 c2 = Some c3 <->
+      product_sem c1 c2 c3.
+    Proof.
+      split.
+      apply rproduct_correct.
+      apply rproduct_complete.
+    Qed.
+
+  End Denotational.
+
 End RRelation.
 
 Section Misc.

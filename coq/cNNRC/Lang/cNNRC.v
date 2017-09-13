@@ -142,9 +142,10 @@ Section cNNRC.
 
     (** ** Denotational Semantics *)
 
-    (** The semantics is defined using the main judgment [Γc ; Γ ⊢〚e〛⇓ d]
-    ([nnrc_core_sem]) where [Γc] is the global environment, [Γ] is the
-    local environment, [e] the expression and [d] the resulting value. *)
+    (** The semantics is defined using the main judgment [Γc ; Γ ⊢〚e
+    〛⇓ d] ([nnrc_core_sem]) where [Γc] is the global environment, [Γ]
+    is the local environment, [e] the cNNRC expression and [d] the
+    resulting value. *)
     
     (** Conditionals and matching expressions only evaluate one of
     their branches. The auxiliary judgment [Γc ; Γ ; v ; c₁ ⊢ 〚e〛φ ⇓ c₂]
@@ -325,6 +326,8 @@ Section cNNRC.
           + congruence.
       Qed.
 
+      (** Evaluation is correct wrt. the cNNRC semantics. *)
+
       Lemma nnrc_core_eval_correct : forall e env d,
           nnrc_core_eval env e = Some d ->
           nnrc_core_sem env e d.
@@ -414,6 +417,8 @@ Section cNNRC.
             rewrite H0 in *; [|congruence].
           inversion IHc1; subst; auto.
       Qed.
+
+      (** Evaluation is complete wrt. the cNNRC semantics. *)
 
       Lemma nnrc_core_eval_complete : forall e env d,
           nnrc_core_sem env e d ->

@@ -43,8 +43,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#satts">satts</a></span>.<br/>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="sortable_type_dec">sortable_type_dec</a></span> (τ : <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : {<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sortable_type">sortable_type</a></span> τ} + {~ <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sortable_type">sortable_type</a></span> τ}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1423')">Proof.</div>
-<div class="proofscript" id="proof1423">
+<div class="toggleproof" onclick="toggleDisplay('proof1432')">Proof.</div>
+<div class="proofscript" id="proof1432">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sortable_type">sortable_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ; <span class="tactic">destruct</span> <span class="id">x</span>; <span class="tactic">simpl</span>; <span class="tactic">try</span> <span class="id">solve</span> [<span class="id">right</span>; <span class="tactic">intuition</span> <span class="tactic">discriminate</span>].<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="id">left</span>. <span class="id">left</span>.<br/>
@@ -56,8 +56,8 @@
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="order_by_has_sortable_type_dec">order_by_has_sortable_type_dec</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(τ<span class="id">r</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>*<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id">satts</span>: <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) : {<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#order_by_has_sortable_type">order_by_has_sortable_type</a></span> τ<span class="id">r</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#satts">satts</a></span>} + {~<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#order_by_has_sortable_type">order_by_has_sortable_type</a></span> τ<span class="id">r</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#satts">satts</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1424')">Proof.</div>
-<div class="proofscript" id="proof1424">
+<div class="toggleproof" onclick="toggleDisplay('proof1433')">Proof.</div>
+<div class="proofscript" id="proof1433">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#order_by_has_sortable_type">order_by_has_sortable_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.ListAdd.html#Forall_dec_defined">Forall_dec_defined</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
@@ -73,8 +73,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#order_by_has_sortable_type">order_by_has_sortable_type</a></span> τ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sl">sl</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#a">a</a></span> ▹ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#k">k</a></span> τ <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#pf1">pf1</a></span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">x</span> | <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#a">a</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sl">sl</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id">x</span> /\  <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id">x</span> ▹ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#k">k</a></span> τ <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#pf1">pf1</a></span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1425')">Proof.</div>
-<div class="proofscript" id="proof1425">
+<div class="toggleproof" onclick="toggleDisplay('proof1434')">Proof.</div>
+<div class="proofscript" id="proof1434">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#sortable_data_of_data">sortable_data_of_data</a></span>, <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#order_by_has_sortable_type">order_by_has_sortable_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.Data.RDataSort.html#get_criterias">get_criterias</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> <span class="id">sl</span>; <span class="tactic">simpl</span>; <span class="tactic">intros</span> <span class="id">sub</span> <span class="id">sts</span> <span class="id">dt</span>.<br/>
@@ -121,8 +121,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Utils.Sublist.html#sublist">sublist</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sl">sl</a></span>) (<span class="id"><a href="Qcert.Utils.Assoc.html#domain">domain</a></span> τ) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#order_by_has_sortable_type">order_by_has_sortable_type</a></span> τ (<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#map">map</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#fst">fst</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sl">sl</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">exists</span> <span class="id">x</span>, <span class="id"><a href="Qcert.Common.Data.RDataSort.html#data_sort">data_sort</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#sl">sl</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#d1">d1</a></span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#x">x</a></span> /\ <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#x">x</a></span> ▹ <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#k">k</a></span> τ <span class="id"><a href="Qcert.Common.DataTyping.TDataSort.html#pf2">pf2</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1426')">Proof.</div>
-<div class="proofscript" id="proof1426">
+<div class="toggleproof" onclick="toggleDisplay('proof1435')">Proof.</div>
+<div class="proofscript" id="proof1435">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span> <span class="id">dt</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">dtype_inverter</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html#Col_inv">Col_inv</a></span> <span class="kwd">in</span> <span class="id">dt</span>.<br/>

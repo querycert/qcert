@@ -67,19 +67,19 @@ Section NRA.
      on those parameters *)
 
     Inductive nra : Set :=
-    | NRAGetConstant : string -> nra
-    | NRAID : nra
-    | NRAConst : data -> nra
-    | NRABinop : binary_op -> nra -> nra -> nra
-    | NRAUnop : unary_op -> nra -> nra
-    | NRAMap : nra -> nra -> nra
-    | NRAMapProduct : nra -> nra -> nra
-    | NRAProduct : nra -> nra -> nra
-    | NRASelect : nra -> nra -> nra
-    | NRADefault : nra -> nra -> nra
-    | NRAEither : nra -> nra -> nra
-    | NRAEitherConcat : nra -> nra -> nra
-    | NRAApp : nra -> nra -> nra.
+    | NRAGetConstant : string -> nra              (**r global variable lookup ([$$v]) *)
+    | NRAID : nra                                 (**r current value ([ID]) *)
+    | NRAConst : data -> nra                      (**r constant data ([d]) *)
+    | NRABinop : binary_op -> nra -> nra -> nra   (**r binary operator ([e₁ ⊠ e₂]) *)
+    | NRAUnop : unary_op -> nra -> nra            (**r unary operator ([⊞ e]) *)
+    | NRAMap : nra -> nra -> nra                  (**r map operator ([χ⟨e₂⟩(e₁)]) *)
+    | NRAMapProduct : nra -> nra -> nra           (**r dependent product operator ([⋈ᵈ⟨e₂⟩(e₁)]) *)
+    | NRAProduct : nra -> nra -> nra              (**r product operator ([e₁ × e₂]) *)
+    | NRASelect : nra -> nra -> nra               (**r selection operator ([σ⟨e₂⟩(e₁)]) *)
+    | NRADefault : nra -> nra -> nra              (**r default operator ([e₁ ∥ e₂]) *)
+    | NRAEither : nra -> nra -> nra               (**r either operator ([either e₁ e₂]) *)
+    | NRAEitherConcat : nra -> nra -> nra         (**r either-concat operator ([either⊕ e₁ e₂]) *)
+    | NRAApp : nra -> nra -> nra.                 (**r compose operator ([e₂ ∘ e₁]) *)
 
     Tactic Notation "nra_cases" tactic(first) ident(c) :=
       first;
@@ -118,205 +118,93 @@ Section NRA.
     Context (h:list(string*string)).
     Context (constant_env:list (string*data)).
 
+    (** ** Denotational Semantics *)
+
+    (** The semantics is defined using the main judgment [Γc ; d ⊢〚e
+    〛⇓ d'] ([nra_sem]) where [Γc] is the global environment, [d] is
+    the input value, [e] the NRA expression and [d'] the resulting
+    value. *)
+    
+    (** The auxiliary judgment [Γc ; {c₁} ⊢〚e〛χ ⇓ {c₂}]
+    ([nra_sem_map]) is used in the definition of the map [χ]
+    operator. *)
+    
+    (** The auxiliary judgment [Γc ; {c₁} ⊢〚e〛⋈ᵈ ⇓ {c₂}]
+    ([nra_map_product_select]) is used in the definition of the
+    dependant product [⋈ᵈ] operator. *)
+    
+    (** The auxiliary judgment [Γc ; {c₁} ⊢〚e〛σ ⇓ {c₂}]
+    ([nra_sem_select]) is used in the definition of the selection [σ]
+    operator. *)
+    
     Section Denotation.
-      Inductive rec_concat_sem: data -> data -> data -> Prop :=
-      | sem_rec_concat:
-          forall r1 r2,
-            rec_concat_sem (drec r1) (drec r2)
-                           (drec (rec_concat_sort r1 r2)).
-
-      Lemma orecconcat_correct : forall d d1 d2,
-          orecconcat d d1 = Some d2 ->
-          rec_concat_sem d d1 d2.
-      Proof.
-        intros.
-        destruct d; destruct d1; simpl in *; try congruence.
-        inversion H; econstructor; reflexivity.
-      Qed.
-
-      Lemma orecconcat_complete : forall d d1 d2,
-          rec_concat_sem d d1 d2 ->
-          orecconcat d d1 = Some d2.
-      Proof.
-        intros.
-        inversion H; subst.
-        reflexivity.
-      Qed.
-
-      Lemma orecconcat_correct_and_complete : forall d d1 d2,
-          orecconcat d d1 = Some d2 <->
-          rec_concat_sem d d1 d2.
-      Proof.
-        split.
-        apply orecconcat_correct.
-        apply orecconcat_complete.
-      Qed.
-        
-      Inductive map_concat_sem: data -> list data -> list data -> Prop :=
-      | sem_map_concat_empty : forall d,
-          map_concat_sem d nil nil                     (**r   d χ⊕ {} ⇓ {} *)
-      | sem_map_concat_cons : forall d d1 d2 c1 c2,
-          rec_concat_sem d d1 d2 ->                    (**r   d ⊕ d₁ ⇓ d₂ *)
-          map_concat_sem d c1 c2 ->                    (**r ∧ d χ⊕ {c₁} ⇓ {c₂} *)
-          map_concat_sem d (d1::c1) (d2::c2).          (**r ⇒ d χ⊕ {d₁::c₁} ⇓ {d₂::c₂} *)
-
-      Lemma omap_concat_correct d c1 c2:
-        omap_concat d c1 = Some c2 ->
-        map_concat_sem d c1 c2.
-      Proof.
-        unfold omap_concat.
-        revert c2.
-        induction c1; simpl; intros.
-        - inversion H; subst; econstructor.
-        - case_eq (orecconcat d a); intros; rewrite H0 in *; [|congruence].
-          rewrite orecconcat_correct_and_complete in H0.
-          unfold lift in H.
-          case_eq (rmap (fun x : data => orecconcat d x) c1); intros;
-            rewrite H1 in *; clear H1; [|congruence].
-          inversion H; subst; clear H.
-          specialize (IHc1 l eq_refl).
-          econstructor; eauto.
-      Qed.
-      
-      Lemma omap_concat_complete d c1 c2:
-        map_concat_sem d c1 c2 ->
-        omap_concat d c1 = Some c2.
-      Proof.
-        unfold omap_concat.
-        revert c2.
-        induction c1; simpl; intros.
-        - inversion H; reflexivity.
-        - inversion H; subst; simpl in *.
-          rewrite <- orecconcat_correct_and_complete in H3.
-          rewrite H3; simpl.
-          unfold lift.
-          rewrite (IHc1 c3 H5); reflexivity.
-      Qed.
-      
-      Lemma omap_concat_correct_and_complete d c1 c2:
-        omap_concat d c1 = Some c2 <->
-        map_concat_sem d c1 c2.
-      Proof.
-        split.
-        apply omap_concat_correct.
-        apply omap_concat_complete.
-      Qed.
-
-      Inductive product_sem: list data -> list data -> list data -> Prop :=
-      | sem_product_empty : forall c,
-          product_sem nil c nil                   (**r   [{c} × {} ⇓ {}] *)
-      | sem_product_cons : forall d1 c1 c2 c3 c4,
-          map_concat_sem d1 c2 c3 ->              (**r ∧ [d₁ χ⊕ {c₂} ⇓ {c₃}] *)
-          product_sem c1 c2 c4 ->                 (**r ∧ [{c₁} × {c₂} ⇓ {c₄}] *)
-          product_sem (d1::c1) c2 (c3 ++ c4).     (**r ⇒ [{d₁::c₁} × {c₂} ⇓ {c₃}∪{c₄}] *)
-
-      Lemma rproduct_correct c1 c2 c3:
-        rproduct c1 c2 = Some c3 ->
-        product_sem c1 c2 c3.
-      Proof.
-        unfold rproduct.
-        revert c2 c3.
-        induction c1; simpl; intros.
-        - inversion H; econstructor.
-        - case_eq (omap_concat a c2); intros; rewrite H0 in *; [|congruence].
-          unfold lift in H.
-          case_eq (oflat_map (fun x : data => omap_concat x c2) c1);
-            intros; rewrite H1 in *; [|congruence].
-          inversion H; subst; clear H.
-          specialize (IHc1 c2 l0 H1).
-          econstructor;[|assumption].
-          rewrite omap_concat_correct_and_complete in H0;assumption.
-      Qed.
-
-      Lemma rproduct_complete c1 c2 c3:
-        product_sem c1 c2 c3 ->
-        rproduct c1 c2 = Some c3.
-      Proof.
-        unfold rproduct.
-        revert c2 c3.
-        induction c1; simpl; intros.
-        - inversion H; subst; reflexivity.
-        - inversion H; subst.
-          rewrite <- omap_concat_correct_and_complete in H2.
-          rewrite H2.
-          unfold lift; rewrite (IHc1 c2 c6 H5).
-          reflexivity.
-      Qed.
-
-      Lemma rproduct_correct_and_complete c1 c2 c3:
-        rproduct c1 c2 = Some c3 <->
-        product_sem c1 c2 c3.
-      Proof.
-        split.
-        apply rproduct_correct.
-        apply rproduct_complete.
-      Qed.
-
       Inductive nra_sem: nra -> data -> data -> Prop :=
       | sem_NRAGetConstant : forall v d d1,
-          edot constant_env v = Some d1 ->                 (**r   [Γc(v) = d₁] *)
-          nra_sem (NRAGetConstant v) d d1                  (**r ⇒ [Γc ; d ⊢〚$$v〛⇓ d₁] *)
+          edot constant_env v = Some d1 ->                (**r   [Γc(v) = d₁] *)
+          nra_sem (NRAGetConstant v) d d1                 (**r ⇒ [Γc ; d ⊢〚$$v〛⇓ d₁] *)
       | sem_NRAID : forall d,
-          nra_sem NRAID d d                                (**r   [Γc ; d ⊢ ID ⇓ d] *)
+          nra_sem NRAID d d                               (**r   [Γc ; d ⊢ ID ⇓ d] *)
       | sem_NRAConst : forall d d1 d2,
-          normalize_data h d1 = d2 ->                      (**r   [norm(d₁) = d₂] *)
-          nra_sem (NRAConst d1) d d2                       (**r ⇒ [Γc ; d ⊢〚d₁〛⇓ d₂] *)
+          normalize_data h d1 = d2 ->                     (**r   [norm(d₁) = d₂] *)
+          nra_sem (NRAConst d1) d d2                      (**r ⇒ [Γc ; d ⊢〚d₁〛⇓ d₂] *)
       | sem_NRABinop : forall bop e1 e2 d d1 d2 d3,
-          nra_sem e1 d d1 ->                               (**r   [Γc ; d ⊢〚e₁〛⇓ d₁] *)
-          nra_sem e2 d d2 ->                               (**r ∧ [Γc ; d ⊢〚e₂〛⇓ d₂] *)
-          binary_op_eval h bop d1 d2 = Some d3 ->          (**r ∧ [d₁ ⊠ d₂ = d₃] *)
-          nra_sem (NRABinop bop e1 e2) d d3                (**r ⇒ [Γc ; d ⊢〚e₁ ⊠ e₂〛⇓ d₃] *)
+          nra_sem e1 d d1 ->                              (**r   [Γc ; d ⊢〚e₁〛⇓ d₁] *)
+          nra_sem e2 d d2 ->                              (**r ∧ [Γc ; d ⊢〚e₂〛⇓ d₂] *)
+          binary_op_eval h bop d1 d2 = Some d3 ->         (**r ∧ [d₁ ⊠ d₂ = d₃] *)
+          nra_sem (NRABinop bop e1 e2) d d3               (**r ⇒ [Γc ; d ⊢〚e₁ ⊠ e₂〛⇓ d₃] *)
       | sem_NRAUnop : forall uop e d d1 d2,
-          nra_sem e d d1 ->                                (**r   [Γc ; d ⊢〚e〛⇓ d₁] *)
-          unary_op_eval h uop d1 = Some d2 ->              (**r ∧ [⊞ d₁ = d₂] *)
-          nra_sem (NRAUnop uop e) d d2                     (**r ⇒ [Γc ; d ⊢〚⊞ e〛⇓ d₂] *)
+          nra_sem e d d1 ->                               (**r   [Γc ; d ⊢〚e〛⇓ d₁] *)
+          unary_op_eval h uop d1 = Some d2 ->             (**r ∧ [⊞ d₁ = d₂] *)
+          nra_sem (NRAUnop uop e) d d2                    (**r ⇒ [Γc ; d ⊢〚⊞ e〛⇓ d₂] *)
       | sem_NRAMap : forall e1 e2 d c1 c2,
-          nra_sem e1 d (dcoll c1) ->                       (**r   [Γc ; d ⊢〚e₁〛= {c₁}] *)
-          nra_sem_map e2 c1 c2 ->                          (**r ∧ [Γc ; {c₁} ⊢〚e₂〛χ ⇓ {c₂}] *)
-          nra_sem (NRAMap e2 e1) d (dcoll c2)              (**r ⇒ [Γc ; d ⊢〚χ⟨e₂⟩(e₁)〛 ⇓ {c₂}] *)
+          nra_sem e1 d (dcoll c1) ->                      (**r   [Γc ; d ⊢〚e₁〛⇓ {c₁}] *)
+          nra_sem_map e2 c1 c2 ->                         (**r ∧ [Γc ; {c₁} ⊢〚e₂〛χ ⇓ {c₂}] *)
+          nra_sem (NRAMap e2 e1) d (dcoll c2)             (**r ⇒ [Γc ; d ⊢〚χ⟨e₂⟩(e₁)〛⇓ {c₂}] *)
       | sem_NRAMapProduct : forall e1 e2 d c1 c2,
-          nra_sem e1 d (dcoll c1) ->                       (**r   [Γc ; d ⊢〚e₁〛= {c₁}] *)
-          nra_sem_map_product e2 c1 c2 ->                  (**r ∧ [Γc ; {c₁} ⊢〚e₂〛⋈ᵈ ⇓ {c₂}] *)
-          nra_sem (NRAMapProduct e2 e1) d (dcoll c2)       (**r ⇒ [Γc ; d ⊢〚⋈ᵈ⟨e₂⟩(e₁)〛 ⇓ {c₂}] *)
-      | sem_NRAProduct_empty : forall e1 e2 d,             (**r Does not evaluate [e₂] if [e₁] is empty. This facilitates translation to cNNRC *)
-          nra_sem e1 d (dcoll nil) ->                      (**r   [Γc ; d ⊢〚e₁〛= {}] *)
-          nra_sem (NRAProduct e1 e2) d (dcoll nil)         (**r ⇒ [Γc ; d ⊢〚e₁ × e₂〛 ⇓ {}] *)
+          nra_sem e1 d (dcoll c1) ->                      (**r   [Γc ; d ⊢〚e₁〛⇓ {c₁}] *)
+          nra_sem_map_product e2 c1 c2 ->                 (**r ∧ [Γc ; {c₁} ⊢〚e₂〛⋈ᵈ ⇓ {c₂}] *)
+          nra_sem (NRAMapProduct e2 e1) d (dcoll c2)      (**r ⇒ [Γc ; d ⊢〚⋈ᵈ⟨e₂⟩(e₁)〛⇓ {c₂}] *)
+      | sem_NRAProduct_empty : forall e1 e2 d,            (**r Does not evaluate [e₂] if [e₁] is empty. This facilitates translation to cNNRC *)
+          nra_sem e1 d (dcoll nil) ->                     (**r   [Γc ; d ⊢〚e₁〛⇓ {}] *)
+          nra_sem (NRAProduct e1 e2) d (dcoll nil)        (**r ⇒ [Γc ; d ⊢〚e₁ × e₂〛⇓ {}] *)
       | sem_NRAProduct_nonEmpty : forall e1 e2 d c1 c2 c3,
-          nra_sem e1 d (dcoll c1) ->                       (**r   [Γc ; d ⊢〚e₁〛= {c₁}] *)
-          c1 <> nil ->                                     (**r ∧ [c₁ ≠ {}] *)
-          nra_sem e2 d (dcoll c2) ->                       (**r ∧ [Γc ; d ⊢〚e₂〛= {c₂}] *)
-          product_sem c1 c2 c3 ->                          (**r ∧ {c₁} × {c2} ⇓ {c₃} *)
-          nra_sem (NRAProduct e1 e2) d (dcoll c3)          (**r ⇒ [Γc ; d ⊢〚e₁ × e₂〛 ⇓ {c₃}] *)
+          nra_sem e1 d (dcoll c1) ->                      (**r   [Γc ; d ⊢〚e₁〛⇓ {c₁}] *)
+          c1 <> nil ->                                    (**r ∧ [{c₁} ≠ {}] *)
+          nra_sem e2 d (dcoll c2) ->                      (**r ∧ [Γc ; d ⊢〚e₂〛⇓ {c₂}] *)
+          product_sem c1 c2 c3 ->                         (**r ∧ [{c₁} × {c₂} ⇓ {c₃}] *)
+          nra_sem (NRAProduct e1 e2) d (dcoll c3)         (**r ⇒ [Γc ; d ⊢〚e₁ × e₂〛⇓ {c₃}] *)
       | sem_NRASelect : forall e1 e2 d c1 c2,
-          nra_sem e1 d (dcoll c1) ->                       (**r   [Γc ; d ⊢〚e₁〛= {c₁}] *)
-          nra_sem_select e2 c1 c2 ->                       (**r ∧ [Γc ; {c₁} ⊢〚e₂〛σ ⇓ {c₂}] *)
-          nra_sem (NRASelect e2 e1) d (dcoll c2)           (**r ⇒ [Γc ; d ⊢〚σ⟨e₂⟩(e₁)〛 ⇓ {c₂}] *)
-      | sem_NRADefault_empty : forall e1 e2 din d2,
-          nra_sem e1 din (dcoll nil) ->
-          nra_sem e2 din d2 ->
-          nra_sem (NRADefault e1 e2) din d2
-      | sem_NRADefault_not_empty : forall e1 e2 din d1,
-          d1 <> dcoll nil ->
-          nra_sem e1 din d1 ->
-          nra_sem (NRADefault e1 e2) din d1
-      | sem_NRAEither_left : forall e1 e2 d1 d3,
-          nra_sem e1 d1 d3 ->
-          nra_sem (NRAEither e1 e2) (dleft d1) d3
-      | sem_NRAEither_right : forall e1 e2 d1 d3,
-          nra_sem e2 d1 d3 ->
-          nra_sem (NRAEither e1 e2) (dright d1) d3
+          nra_sem e1 d (dcoll c1) ->                      (**r   [Γc ; d ⊢〚e₁〛⇓ {c₁}] *)
+          nra_sem_select e2 c1 c2 ->                      (**r ∧ [Γc ; {c₁} ⊢〚e₂〛σ ⇓ {c₂}] *)
+          nra_sem (NRASelect e2 e1) d (dcoll c2)          (**r ⇒ [Γc ; d ⊢〚σ⟨e₂⟩(e₁)〛⇓ {c₂}] *)
+      | sem_NRADefault_empty : forall e1 e2 d d2,
+          nra_sem e1 d  (dcoll nil) ->                    (**r   [Γc ; d ⊢〚e₁〛⇓ {}] *)
+          nra_sem e2 d d2 ->                              (**r ∧ [Γc ; d ⊢〚e₂〛⇓ d₂] *)
+          nra_sem (NRADefault e1 e2) d d2                 (**r ⇒ [Γc ; d ⊢〚e₁ ∥ e₂〛⇓ d₂] *)
+      | sem_NRADefault_not_empty : forall e1 e2 d d1,
+          nra_sem e1 d d1 ->                              (**r   [Γc ; d ⊢〚e₁〛⇓ d₁] *)
+          d1 <> dcoll nil ->                              (**r ∧ [d₁ ≠ {}] *)
+          nra_sem (NRADefault e1 e2) d d1                 (**r ⇒ [Γc ; d ⊢〚e₁ ∥ e₂〛⇓ d₁] *)
+      | sem_NRAEither_left : forall e1 e2 d d1,
+          nra_sem e1 d d1 ->                              (**r   [Γc ; d ⊢〚e₁〛⇓ d₁] *)
+          nra_sem (NRAEither e1 e2) (dleft d) d1          (**r ⇒ [Γc ; (dleft d) ⊢〚either e₁ e₂〛⇓ d₁] *)
+      | sem_NRAEither_right : forall e1 e2 d d2,
+          nra_sem e2 d d2 ->                              (**r   [Γc ; d ⊢〚e₂〛⇓ d₂] *)
+          nra_sem (NRAEither e1 e2) (dright d) d2         (**r ⇒ [Γc ; (dright d) ⊢〚either e₁ e₂〛⇓ d₂] *)
       | sem_NRAEitherConcat_left : forall e1 e2 d r1 r2,
-          nra_sem e1 d (dleft (drec r1)) ->
-          nra_sem e2 d (drec r2) ->
-          nra_sem (NRAEitherConcat e1 e2) d (dleft (drec (rec_concat_sort r1 r2)))
+          nra_sem e1 d (dleft (drec r1)) ->               (**r   [Γc ; d ⊢〚e₁〛⇓ (dleft [r₁])] *)
+          nra_sem e2 d (drec r2) ->                       (**r ∧ [Γc ; d ⊢〚e₂〛⇓ [r₂]] *)
+          nra_sem (NRAEitherConcat e1 e2) d               (**r ⇒ [Γc ; d ⊢〚either⊕ e₁ e₂〛⇓ (dleft [r₁]⊕[r₂]]) *)
+                  (dleft (drec (rec_concat_sort r1 r2)))
       | sem_NRAEitherConcat_right : forall e1 e2 d r1 r2,
-          nra_sem e1 d (dright (drec r1)) ->
-          nra_sem e2 d (drec r2) ->
-          nra_sem (NRAEitherConcat e1 e2) d (dright (drec (rec_concat_sort r1 r2)))
-      | sem_NRAApp : forall e1 e2 din d1 d2,
-          nra_sem e1 din d1 ->
-          nra_sem e2 d1 d2 ->
-          nra_sem (NRAApp e2 e1) din d2
+          nra_sem e1 d (dright (drec r1)) ->              (**r   [Γc ; d ⊢〚e₁〛⇓ (dright [r₁])] *)
+          nra_sem e2 d (drec r2) ->                       (**r ∧ [Γc ; d ⊢〚e₂〛⇓ [r₂]] *)
+          nra_sem (NRAEitherConcat e1 e2) d               (**r ⇒ [Γc ; d ⊢〚either⊕ e₁ e₂〛⇓ (dright [r₁]⊕[r₂]]) *)
+                  (dright (drec (rec_concat_sort r1 r2)))
+      | sem_NRAApp : forall e1 e2 d d1 d2,
+          nra_sem e1 d d1 ->                              (**r   [Γc ; d ⊢〚e₁〛⇓ d₁] *)
+          nra_sem e2 d1 d2 ->                             (**r   [Γc ; d₁ ⊢〚e₂〛⇓ d₂] *)
+          nra_sem (NRAApp e2 e1) d d2                     (**r ⇒ [Γc ; d ⊢〚e₂ ∘ e₁〛⇓ d₂] *)
       with nra_sem_map: nra -> list data -> list data -> Prop :=
       | sem_NRAMMap_empty : forall e,
           nra_sem_map e nil nil                       (**r   [Γc ; {} ⊢〚e〛χ ⇓ {}] *)
@@ -344,11 +232,6 @@ Section NRA.
           nra_sem_select e c1 c2 ->                   (**r ∧ [Γc ; {c₁} ⊢〚e〛σ ⇓ {c₂}] *)
           nra_sem_select e (d1::c1) c2                (**r ⇒ [Γc ; {d₁::c₁} ⊢〚e〛σ ⇓ {c₂}] *)
       .
-
-    (** Note that there is (resp is not) a call to [nra_sem] inside
-    the [nra_sem_map] (resp [nra_sem_map_concat]) judgment, which
-    shows the distinction between so-called dependent product and a
-    regular Cartesian product. *)
 
     End Denotation.
 
@@ -423,6 +306,7 @@ Section NRA.
     End Evaluation.
 
     Section EvalCorrect.
+      (** Auxiliary correctness lemmas for map, map_product and select judgments. *)
       Lemma nra_eval_map_correct : forall e l1 l2,
         (forall d1 d2 : data, nra_eval e d1 = Some d2 -> nra_sem e d1 d2) ->
         rmap (nra_eval e) l1 = Some l2 ->
@@ -528,6 +412,8 @@ Section NRA.
         destruct (omap_concat d1 l); [|congruence].
         assumption.
       Qed.
+
+      (** Evaluation is correct wrt. the NRA semantics. *)
 
       Lemma nra_eval_correct : forall e d1 d2,
           nra_eval e d1 = Some d2 ->
@@ -637,6 +523,192 @@ Section NRA.
           econstructor; eauto.
       Qed.
  
+      (** Auxiliary lemmas used in the completeness theorem *)
+
+      Lemma nra_map_eval_complete e c1 c2:
+        (forall d1 d2 : data, nra_sem e d1 d2 -> nra_eval e d1 = Some d2) ->
+        (nra_sem_map e c1 c2) ->
+        lift dcoll (rmap (nra_eval e) c1) = Some (dcoll c2).
+      Proof.
+        intros.
+        revert c2 H0.
+        induction c1; simpl in *; intros.
+        - inversion H0; reflexivity.
+        - inversion H0; clear H0; subst.
+          rewrite (H a d2 H4); simpl.
+          specialize (IHc1 c3 H6).
+          unfold lift in *.
+          case_eq (rmap (nra_eval e) c1); intros; rewrite H0 in *; [|congruence].
+          inversion IHc1; clear IHc1; subst; reflexivity.
+      Qed.
+        
+      Lemma nra_map_product_eval_complete e c1 c2:
+        (forall d1 d2 : data, nra_sem e d1 d2 -> nra_eval e d1 = Some d2) ->
+        (nra_sem_map_product e c1 c2) ->
+        lift dcoll (rmap_product (nra_eval e) c1) = Some (dcoll c2).
+      Proof.
+        intros.
+        revert c2 H0.
+        induction c1; simpl in *; intros.
+        - inversion H0; reflexivity.
+        - inversion H0; clear H0; subst.
+          unfold rmap_product in *.
+          unfold oomap_concat in *; simpl.
+          rewrite (H a (dcoll c4) H3); simpl.
+          rewrite <- omap_concat_correct_and_complete in H5.
+          rewrite H5; simpl.
+          specialize (IHc1 c3 H7).
+          unfold lift in *.
+          destruct (oflat_map
+             (fun a : data =>
+              match nra_eval e a with
+              | Some dunit => None
+              | Some (dnat _) => None
+              | Some (dbool _) => None
+              | Some (dstring _) => None
+              | Some (dcoll y) => omap_concat a y
+              | Some (drec _) => None
+              | Some (dleft _) => None
+              | Some (dright _) => None
+              | Some (dbrand _ _) => None
+              | Some (dforeign _) => None
+              | None => None
+              end) c1); [|congruence].
+          inversion IHc1; reflexivity.
+      Qed.
+        
+      Lemma nra_select_eval_complete e c1 c2:
+        (forall d1 d2 : data, nra_sem e d1 d2 -> nra_eval e d1 = Some d2) ->
+        (nra_sem_select e c1 c2) ->
+        lift dcoll
+             (lift_filter
+                (fun d0 : data =>
+                   match nra_eval e d0 with
+                   | Some dunit => None
+                   | Some (dnat _) => None
+                   | Some (dbool b) => Some b
+                   | Some (dstring _) => None
+                   | Some (dcoll _) => None
+                   | Some (drec _) => None
+                   | Some (dleft _) => None
+                   | Some (dright _) => None
+                   | Some (dbrand _ _) => None
+                   | Some (dforeign _) => None
+                   | None => None
+                   end) c1) = Some (dcoll c2).
+      Proof.
+        intros.
+        revert c2 H0.
+        induction c1; simpl in *; intros.
+        - inversion H0; reflexivity.
+        - inversion H0; clear H0; subst.
+          (* condition is true *)
+          + rewrite (H a (dbool true) H4); simpl.
+            specialize (IHc1 c3 H6).
+            destruct
+              (lift_filter
+                 (fun d0 : data =>
+                    match nra_eval e d0 with
+                    | Some dunit => None
+                    | Some (dnat _) => None
+                    | Some (dbool b) => Some b
+                    | Some (dstring _) => None
+                    | Some (dcoll _) => None
+                    | Some (drec _) => None
+                    | Some (dleft _) => None
+                    | Some (dright _) => None
+                    | Some (dbrand _ _) => None
+                    | Some (dforeign _) => None
+                    | None => None
+                    end) c1); simpl in *; [|congruence].
+            inversion IHc1; reflexivity.
+          + rewrite (H a (dbool false) H4); simpl.
+            specialize (IHc1 c2 H6).
+            destruct
+              (lift_filter
+                 (fun d0 : data =>
+                    match nra_eval e d0 with
+                    | Some dunit => None
+                    | Some (dnat _) => None
+                    | Some (dbool b) => Some b
+                    | Some (dstring _) => None
+                    | Some (dcoll _) => None
+                    | Some (drec _) => None
+                    | Some (dleft _) => None
+                    | Some (dright _) => None
+                    | Some (dbrand _ _) => None
+                    | Some (dforeign _) => None
+                    | None => None
+                    end) c1); simpl in *; [|congruence].
+            inversion IHc1; reflexivity.
+      Qed.
+
+      (** Evaluation is complete wrt. the NRA semantics. *)
+
+      Lemma nra_eval_complete : forall e d1 d2,
+          nra_sem e d1 d2 ->
+          nra_eval e d1 = Some d2.
+      Proof.
+        induction e; intros.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe1 d1 d0 H3);
+            rewrite (IHe2 d1 d3 H6); simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe d1 d0 H2); simpl; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe2 d1 (dcoll c1) H2); simpl.
+          apply nra_map_eval_complete; auto.
+        - inversion H; subst; simpl.
+          rewrite (IHe2 d1 (dcoll c1) H2); simpl.
+          apply nra_map_product_eval_complete; auto.
+        - inversion H; subst; simpl.
+          (* empty first collection *)
+          + rewrite (IHe1 d1 (dcoll nil) H4); reflexivity.
+          + destruct c1; [congruence| ]; clear H3.
+            rewrite (IHe1 d1 (dcoll (d :: c1)) H2); simpl.
+            rewrite <- rproduct_correct_and_complete in H7.
+            rewrite (IHe2 d1 (dcoll c2) H4).
+            unfold rproduct in H7.
+            unfold rmap_product.
+            unfold oomap_concat.
+            unfold omap_concat in *.
+            rewrite H7; reflexivity.
+        - inversion H; subst; simpl.
+          rewrite (IHe2 d1 (dcoll c1) H2); simpl.
+          apply nra_select_eval_complete; auto.
+        - inversion H; subst; simpl.
+          (* empty collection case *)
+          + rewrite (IHe1 d1 (dcoll nil) H2); simpl; auto.
+          (* non-empty collection case *)
+          + rewrite (IHe1 d1 d2 H2); simpl; auto.
+            destruct d2; try congruence.
+            destruct l; congruence.
+        - inversion H; subst; simpl; auto.
+        - inversion H; subst; simpl.
+          (* left case *)
+          + rewrite (IHe1 d1 (dleft (drec r1)) H2); simpl.
+            rewrite (IHe2 d1 (drec r2) H5); reflexivity.
+          (* right case *)
+          + rewrite (IHe1 d1 (dright (drec r1)) H2); simpl.
+            rewrite (IHe2 d1 (drec r2) H5); reflexivity.
+        - inversion H; subst; simpl.
+          rewrite (IHe2 d1 d0 H2); simpl.
+          rewrite (IHe1 d0 d2 H5); reflexivity.
+      Qed.
+
+      (** Main equivalence theorem. *)
+      
+      Theorem nra_eval_correct_and_complete : forall e d d',
+          nra_eval e d = Some d' <-> nra_sem e d d'.
+      Proof.
+        split.
+        apply nra_eval_correct.
+        apply nra_eval_complete.
+      Qed.
+
     End EvalCorrect.
 
     Section EvalNormalized.
