@@ -44,8 +44,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bindings_type_has_type">bindings_type_has_type</a></span> {<span class="id">env</span> Γ} <span class="id">pf</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span>  <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#env">env</a></span> Γ -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TData.html#data_type">data_type</a></span> (<span class="id"><a href="Qcert.Common.Data.RData.html#drec">drec</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#env">env</a></span>) (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Closed">Closed</a></span> Γ <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#pf">pf</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1444')">Proof.</div>
-<div class="proofscript" id="proof1444">
+<div class="toggleproof" onclick="toggleDisplay('proof1445')">Proof.</div>
+<div class="proofscript" id="proof1445">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.DataTyping.TData.html#dtrec_full">dtrec_full</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">assumption</span>.<br/>
@@ -54,8 +54,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="bindings_type_sort">bindings_type_sort</a></span> <span class="id">c</span> τ<span class="id">c</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#c">c</a></span> τ<span class="id">c</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#c">c</a></span>) (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort">rec_sort</a></span> τ<span class="id">c</span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1445')">Proof.</div>
-<div class="proofscript" id="proof1445">
+<div class="toggleproof" onclick="toggleDisplay('proof1446')">Proof.</div>
+<div class="proofscript" id="proof1446">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">unfold</span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#bindings_type">bindings_type</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Utils.Bindings.html#rec_sort_Forall2">rec_sort_Forall2</a></span>; <span class="tactic">trivial</span>.<br/>
@@ -68,8 +68,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="http://coq.inria.fr/library/Coq.Lists.List.html#Forall">Forall</a></span><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<span class="kwd">fun</span> <span class="id">d</span> : <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.Data.RData.html#data">data</a></span> =&gt; <span class="id"><a href="Qcert.Common.Data.RDataNorm.html#data_normalized">data_normalized</a></span> <span class="id"><a href="Qcert.Common.Data.BrandRelation.html#brand_relation_brands">brand_relation_brands</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#snd">snd</a></span> <span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#d">d</a></span>))<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.EnvTyping.TBindings.html#c">c</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1446')">Proof.</div>
-<div class="proofscript" id="proof1446">
+<div class="toggleproof" onclick="toggleDisplay('proof1447')">Proof.</div>
+<div class="proofscript" id="proof1447">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">induction</span> 1; <span class="tactic">trivial</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intuition</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">eauto</span>.<br/>

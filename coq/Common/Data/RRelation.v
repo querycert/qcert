@@ -101,6 +101,7 @@ Section RRelation.
   Qed.
 
   Definition ondcoll2 {A} : (list data -> list data -> A) -> data -> data -> option A.
+  Proof.
     intros f d1 d2.
     destruct d1.
     exact None. exact None. exact None. exact None.
@@ -142,7 +143,9 @@ Section RRelation.
 
   Lemma lift_oncoll_dcoll {A} (f : list data -> option A) (dl : list data) :
     lift_oncoll f (dcoll dl) = f dl.
-  Proof. reflexivity. Qed.
+  Proof.
+    reflexivity.
+  Qed.
 
   Lemma olift_on_lift_dcoll (f:list data->option data) (d1:option (list data)):
     olift (lift_oncoll f) (lift dcoll d1) =

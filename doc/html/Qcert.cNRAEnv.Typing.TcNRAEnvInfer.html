@@ -145,8 +145,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="infer_nraenv_core_type_correct">infer_nraenv_core_type_correct</a></span> (τ<span class="id">env</span> τ<span class="kwd">in</span> τ<span class="id">out</span>:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) (<span class="id">e</span>:<span class="id"><a href="Qcert.cNRAEnv.Lang.cNRAEnv.html#nraenv_core">nraenv_core</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvInfer.html#infer_nraenv_core_type">infer_nraenv_core_type</a></span> <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvInfer.html#e">e</a></span> τ<span class="id">env</span> τ<span class="kwd">in</span> = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ<span class="id">out</span> -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnv.html#nraenv_core_type">nraenv_core_type</a></span> τ<span class="id">constants</span> <span class="id"><a href="Qcert.cNRAEnv.Typing.TcNRAEnvInfer.html#e">e</a></span> τ<span class="id">env</span> τ<span class="kwd">in</span> τ<span class="id">out</span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1816')">Proof.</div>
-<div class="proofscript" id="proof1816">
+<div class="toggleproof" onclick="toggleDisplay('proof1817')">Proof.</div>
+<div class="proofscript" id="proof1817">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">revert</span> τ<span class="id">env</span> τ<span class="kwd">in</span> τ<span class="id">out</span> <span class="id">H</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">nraenv_core_cases</span> (<span class="tactic">induction</span> <span class="id">e</span>) <span class="id">Case</span>; <span class="tactic">intros</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> <span class="id">H</span>.<br/>

@@ -36,8 +36,8 @@
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tuneither">tuneither</a></span> (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span> * <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1325')">Proof.</div>
-<div class="proofscript" id="proof1325">
+<div class="toggleproof" onclick="toggleDisplay('proof1326')">Proof.</div>
+<div class="proofscript" id="proof1326">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -57,8 +57,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tuncoll">tuncoll</a></span> (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1326')">Proof.</div>
-<div class="proofscript" id="proof1326">
+<div class="toggleproof" onclick="toggleDisplay('proof1327')">Proof.</div>
+<div class="proofscript" id="proof1327">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -78,16 +78,16 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tuncoll_correct">tuncoll_correct</a></span> (τ τ':<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tuncoll">tuncoll</a></span> τ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> τ' -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;τ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1327')">Proof.</div>
-<div class="proofscript" id="proof1327">
+<div class="toggleproof" onclick="toggleDisplay('proof1328')">Proof.</div>
+<div class="proofscript" id="proof1328">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ <span class="kwd">using</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_rect">rtype_rect</a></span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tsingleton">tsingleton</a></span> (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1328')">Proof.</div>
-<div class="proofscript" id="proof1328">
+<div class="toggleproof" onclick="toggleDisplay('proof1329')">Proof.</div>
+<div class="proofscript" id="proof1329">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -107,8 +107,8 @@
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tsingleton_correct">tsingleton_correct</a></span> (τ τ':<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tsingleton">tsingleton</a></span> τ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Option">Option</a></span> τ') -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;τ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ'.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1329')">Proof.</div>
-<div class="proofscript" id="proof1329">
+<div class="toggleproof" onclick="toggleDisplay('proof1330')">Proof.</div>
+<div class="proofscript" id="proof1330">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ <span class="kwd">using</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_rect">rtype_rect</a></span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id">rtype_equalizer</span>; <span class="tactic">subst</span>.<br/>
@@ -116,8 +116,8 @@
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tunrec">tunrec</a></span> (τ: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#record_kind">record_kind</a></span> * (<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> (<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span> * <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>))).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1330')">Proof.</div>
-<div class="proofscript" id="proof1330">
+<div class="toggleproof" onclick="toggleDisplay('proof1331')">Proof.</div>
+<div class="proofscript" id="proof1331">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ; <span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -138,8 +138,8 @@
 &nbsp;&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="tunrec_correct">tunrec_correct</a></span> <span class="id">k</span> (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) {<span class="id">l</span>} :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#k">k</a></span>,<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l">l</a></span>) -&gt;<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;{<span class="id">pf</span> | τ =  <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#k">k</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l">l</a></span> <span class="id">pf</span>}.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1331')">Proof.</div>
-<div class="proofscript" id="proof1331">
+<div class="toggleproof" onclick="toggleDisplay('proof1332')">Proof.</div>
+<div class="proofscript" id="proof1332">
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ <span class="kwd">using</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_rect">rtype_rect</a></span>; <span class="tactic">try</span> <span class="tactic">discriminate</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">inversion</span> 1; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kwd">match</span> <span class="id">goal</span> <span class="kwd">with</span><br/>
@@ -155,8 +155,8 @@
 &nbsp;&nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="trecConcat">trecConcat</a></span> (τ₁ τ₂: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1332')">Proof.</div>
-<div class="proofscript" id="proof1332">
+<div class="toggleproof" onclick="toggleDisplay('proof1333')">Proof.</div>
+<div class="proofscript" id="proof1333">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -193,8 +193,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tmergeConcat">tmergeConcat</a></span> (τ₁ τ₂: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1333')">Proof.</div>
-<div class="proofscript" id="proof1333">
+<div class="toggleproof" onclick="toggleDisplay('proof1334')">Proof.</div>
+<div class="proofscript" id="proof1334">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">destruct</span> <span class="id">x</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">exact</span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#None">None</a></span>.<br/>
@@ -233,8 +233,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tunrecdot">tunrecdot</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1334')">Proof.</div>
-<div class="proofscript" id="proof1334">
+<div class="toggleproof" onclick="toggleDisplay('proof1335')">Proof.</div>
+<div class="proofscript" id="proof1335">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -243,8 +243,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tunrecremove">tunrecremove</a></span> (<span class="id">s</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1335')">Proof.</div>
-<div class="proofscript" id="proof1335">
+<div class="toggleproof" onclick="toggleDisplay('proof1336')">Proof.</div>
+<div class="proofscript" id="proof1336">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -253,8 +253,8 @@
 &nbsp;&nbsp;Defined.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="tunrecproject">tunrecproject</a></span> (<span class="id">sl</span>:<span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#list">list</a></span> <span class="id"><a href="http://coq.inria.fr/library/Coq.Strings.String.html#string">string</a></span>) (τ:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1336')">Proof.</div>
-<div class="proofscript" id="proof1336">
+<div class="toggleproof" onclick="toggleDisplay('proof1337')">Proof.</div>
+<div class="proofscript" id="proof1337">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -266,8 +266,8 @@
 <br/>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="recConcat">recConcat</a></span> (τ₁ τ₂: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1337')">Proof.</div>
-<div class="proofscript" id="proof1337">
+<div class="toggleproof" onclick="toggleDisplay('proof1338')">Proof.</div>
+<div class="proofscript" id="proof1338">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ₁); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> <span class="id">H</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;- <span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ₂); <span class="tactic">intros</span>.<br/>
@@ -284,8 +284,8 @@
 &nbsp;&nbsp;Defined.</div>
 &nbsp;&nbsp;<br/>
 &nbsp;&nbsp;<span class="kwd">Definition</span> <span class="id"><a name="mergeConcat">mergeConcat</a></span> (τ₁ τ₂: <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>) : <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#option">option</a></span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1338')">Proof.</div>
-<div class="proofscript" id="proof1338">
+<div class="toggleproof" onclick="toggleDisplay('proof1339')">Proof.</div>
+<div class="proofscript" id="proof1339">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ₁); <span class="tactic">generalize</span> (<span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#tunrec">tunrec</a></span> τ₂); <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id">case_eq</span> <span class="id">H</span>; <span class="id">case_eq</span> <span class="id">H0</span>; <span class="tactic">intros</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> <span class="id">p</span>; <span class="tactic">destruct</span> <span class="id">p0</span>; <span class="tactic">simpl</span> <span class="kwd">in</span> *.<br/>
@@ -304,99 +304,99 @@
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="RecMaybe_rec_concat_sort">RecMaybe_rec_concat_sort</a></span> <span class="id">k</span> <span class="id">l1</span> <span class="id">l2</span> :<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#RecMaybe">RecMaybe</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#k">k</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l2">l2</a></span>) = <span class="id"><a href="http://coq.inria.fr/library/Coq.Init.Datatypes.html#Some">Some</a></span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Rec">Rec</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#k">k</a></span> (<span class="id"><a href="Qcert.Utils.Bindings.html#rec_concat_sort">rec_concat_sort</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l2">l2</a></span>) (<span class="id"><a href="Qcert.Utils.Bindings.html#drec_concat_sort_sorted">drec_concat_sort_sorted</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l1">l1</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#l2">l2</a></span>)).<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1339')">Proof.</div>
-<div class="proofscript" id="proof1339">
+<div class="toggleproof" onclick="toggleDisplay('proof1340')">Proof.</div>
+<div class="proofscript" id="proof1340">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> (<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#RecMaybe_pf_some">RecMaybe_pf_some</a></span> <span class="id">_</span>).<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Bottom_proj">Bottom_proj</a></span> : <span class="id">Bottom</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bottom">Bottom</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1340')">Proof.</div>
-<div class="proofscript" id="proof1340">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
-&nbsp;&nbsp;Qed.</div>
-<br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Top_proj">Top_proj</a></span> : <span class="id">Top</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Top">Top</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1341')">Proof.</div>
 <div class="proofscript" id="proof1341">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Unit_proj">Unit_proj</a></span> : <span class="id">Unit</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Top_proj">Top_proj</a></span> : <span class="id">Top</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Top">Top</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1342')">Proof.</div>
 <div class="proofscript" id="proof1342">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Nat_proj">Nat_proj</a></span> : <span class="id">Nat</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Unit_proj">Unit_proj</a></span> : <span class="id">Unit</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1343')">Proof.</div>
 <div class="proofscript" id="proof1343">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Bool_proj">Bool_proj</a></span> : <span class="id">Bool</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Nat_proj">Nat_proj</a></span> : <span class="id">Nat</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1344')">Proof.</div>
 <div class="proofscript" id="proof1344">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="String_proj">String_proj</a></span> : <span class="id">String</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Bool_proj">Bool_proj</a></span> : <span class="id">Bool</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1345')">Proof.</div>
 <div class="proofscript" id="proof1345">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Brand_canon">Brand_canon</a></span> {<span class="id">b</span>} {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Brand</span>₀ <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#b">b</a></span> -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#b">b</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="String_proj">String_proj</a></span> : <span class="id">String</span>₀ = ` <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1346')">Proof.</div>
 <div class="proofscript" id="proof1346">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Brand_canon">Brand_canon</a></span> {<span class="id">b</span>} {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Brand</span>₀ <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#b">b</a></span> -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Brand">Brand</a></span> <span class="id"><a href="Qcert.Common.DataTyping.TUtil.html#b">b</a></span>.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1347')">Proof.</div>
+<div class="proofscript" id="proof1347">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#brand_ext">brand_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
 &nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Bottom_canon">Bottom_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Bottom</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bottom">Bottom</a></span>.<br/>
-<div class="toggleproof" onclick="toggleDisplay('proof1347')">Proof.</div>
-<div class="proofscript" id="proof1347">
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
-&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
-&nbsp;&nbsp;Qed.</div>
-<br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Top_canon">Top_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Top</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Top">Top</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1348')">Proof.</div>
 <div class="proofscript" id="proof1348">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Unit_canon">Unit_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Unit</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Top_canon">Top_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Top</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Top">Top</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1349')">Proof.</div>
 <div class="proofscript" id="proof1349">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Nat_canon">Nat_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Nat</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Unit_canon">Unit_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Unit</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Unit">Unit</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1350')">Proof.</div>
 <div class="proofscript" id="proof1350">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Bool_canon">Bool_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Bool</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Nat_canon">Nat_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Nat</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Nat">Nat</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1351')">Proof.</div>
 <div class="proofscript" id="proof1351">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="String_canon">String_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">String</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Bool_canon">Bool_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Bool</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Bool">Bool</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1352')">Proof.</div>
 <div class="proofscript" id="proof1352">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
 <br/>
-&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Coll_canon">Coll_canon</a></span> {τ₁ τ₀:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Coll</span>₀ (` τ₀) -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₀.<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="String_canon">String_canon</a></span> {τ₁:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">String</span>₀ -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#String">String</a></span>.<br/>
 <div class="toggleproof" onclick="toggleDisplay('proof1353')">Proof.</div>
 <div class="proofscript" id="proof1353">
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
+&nbsp;&nbsp;Qed.</div>
+<br/>
+&nbsp;&nbsp;<span class="kwd">Lemma</span> <span class="id"><a name="Coll_canon">Coll_canon</a></span> {τ₁ τ₀:<span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype">rtype</a></span>} :` τ₁ = <span class="id">Coll</span>₀ (` τ₀) -&gt; τ₁ = <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#Coll">Coll</a></span> τ₀.<br/>
+<div class="toggleproof" onclick="toggleDisplay('proof1354')">Proof.</div>
+<div class="proofscript" id="proof1354">
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">destruct</span> τ₁; <span class="tactic">simpl</span>; <span class="tactic">intros</span>; <span class="tactic">subst</span>.<br/>
 &nbsp;&nbsp;&nbsp;&nbsp;<span class="tactic">apply</span> <span class="id"><a href="Qcert.Common.TypeSystem.RType.html#rtype_ext">rtype_ext</a></span>.<br/>
 &nbsp;&nbsp;Qed.</div>
