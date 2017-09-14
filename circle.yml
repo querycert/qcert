@@ -28,6 +28,6 @@ dependencies:
 
 test:
   override:
-    - eval `opam config env` && make -j1 qcert && make qcert-runtimes && make qcert-runners
+    - eval `opam config env` && make 
     - cd samples/spark2 && ./run.sh
 

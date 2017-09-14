@@ -19,7 +19,7 @@
 			</chainedmapper>
 		</pathconvert>
 		<delete file="${dest}/javaService.jar"/>
-        <jar destfile="${dest}/javaService.jar">
+		<jar destfile="${dest}/javaService.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.qcert.javasvc.Main"/>
                 <attribute name="Class-Path" 
@@ -27,9 +27,9 @@
             </manifest>
             <fileset dir="bin" excludes="test/**"/>
         </jar>
-		<delete file="javaService.zip"/>
-		<zip destfile="javaService.zip">
-			<fileset dir="${dest}" includes="**/*.jar"/>
-		</zip>
+	<delete file="javaService.zip"/>
+	<zip destfile="javaService.zip">
+	  <fileset dir="${dest}" includes="**/*.jar"/>
+	</zip>
     </target>
 </project>

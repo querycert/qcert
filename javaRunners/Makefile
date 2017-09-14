@@ -69,5 +69,4 @@ clean:
 cleanall: clean
 	@rm -f $(DEPENDENCIES)
 	@rm -f lib/*.jar
-	@rm -f queryRunners.zip
 

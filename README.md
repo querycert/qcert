@@ -37,11 +37,7 @@ package manager (https://opam.ocaml.org). Once opam is installed, you
 can just add the corresponding libraries:
 
 ```
-opam install ocamlbuild
-opam install menhir
-opam install camlp5
-opam install base64
-opam install js_of_ocaml js_of_ocaml-ppx
+opam install ocamlbuild menhir camlp5 base64 js_of_ocaml js_of_ocaml-ppx
 opam install coq.8.6.1
 ```
 
@@ -81,102 +77,37 @@ Windows isn't directly supported by the OCaml package manager. We do
 not currently have detailed instructions for how to build on Windows.
 
 
-## Installing Q\*cert
+## Getting started
 
-### Building the compiler
+### Build the compiler
 
 To compile Q*cert from the source, do:
 
 ```
-make qcert
+make
 ```
 
-(Note: this will take a while, you can run make faster with `make -j 8 qcert`)
+(Note: this will take a while, you can run make faster with `make -j 8`)
 
-This should produce the `qcert` and `qdata` executables in the `./bin`
+If all goes well, this should:
+- Build the compiler itself (the executable `bin/qcert`)
+- Build the supporting parsers in Java for SQL and SQL++ (a jar file
+called `bin/javaService.jar` and a subdirectory called `bin/services`
+containing dependencies)
+- Build the Q\*cert runtime libraries for JavaScript and Java (in
+  `runtimes`)
+- Build sample query runners in Java in order to run the queries (a
+  jar file called `bin/javaRunners.jar` and a subdirectory called
+  `bin/lib` containing dependencies)
 
-By default, this assumes you have Java and Ant installed and attempt
-to build the SQL and SQL++ support. As a result, it should also
-produce a file called `javaService.jar` and a subdirectory called
-`services` in the `./bin` directory. The defaults can be changed by
-editing the following configuration file:
+By default, this assumes you have Java and ant installed, and an
+internet connection (needed the first time you do `make` in order to
+download the libraries needed for the Java part of the code). If you
+want or need to change the default configuration (e.g., you do not
+have Java installed, want to build support for Spark, etc), consult
+the detailed instructions below.
 
-```
-Makefile.config
-```
-
-Parameters can be set in that file to support other source languages
-(e.g., ODM rules) and backends (e.g., Spark).
-
-You can also override the configuration from the command line to build
-specific components, for instance you can turn off SQL and SQL++
-support by calling:
-
-```
-make SQL= SQLPP= qcert
-```
-
-You can compile with support for ODM rules by calling:
-
-```
-make ODM=yes qcert
-```
-
-Note that the ODM rules support will only build if you satisfy an
-additional dependency as outlined in [README-ODM](README-ODM.md).
-
-Whichever of these components you choose to build, they should be
-built together in one step because they are deployed as a set of
-interrelated jar files.
-
-### Building the Q\*cert runtimes
-
-To run the compiled queries, you will also need a small
-target-specific runtime (e.g., for JavaScript, Java or Spark).
-
-To build the runtimes, do:
-
-```
-make qcert-runtimes
-```
-
-You can override the default targets (JavaScript, Java and Cloudant),
-from the command line. For instance, you can compile the Spark runtime
-by calling:
-
-```
-make SPARK=yes qcert-runtimes
-```
-
-### Building the Web demo (Optional)
-
-To compile the web demo, do:
-
-```
-make demo
-```
-
-The Web demo can be started by opening the following HTML page:
-
-```
-doc/demo/demo.html
-```
-
-If you want support for any of the optional source languages (SQL,
-SQL++ and ODM rules) in the demo, you will need to run the javaService
-as follows:
-
-```
-cd bin; java -jar javaService.jar -server 9879
-```
-
-
-## Using Q\*cert
-
-### Compiling Queries
-
-The [`./samples`](./samples) directory contains a few examples written
-in OQL (Object Query Language) syntax. For instance:
+For instance:
 
 ```
 $ cat samples/oql/persons1.oql 
@@ -201,19 +132,177 @@ Compiling from oql to js:
 
 and produce a JavaScript file called `samples/oql/persons1.js`.
 
-Similarly for Java:
+
+### Compile a query
+
+Once the compiler is built, you can try it on a sample query, for
+instance:
 
 ```
-$ ./bin/qcert -source oql -target java samples/oql/persons1.oql
+$ cat samples/oql/persons1.oql 
+select p
+from p in Customers
+where p->age = 32
 ```
 
-This will produce a java file called `samples/oql/persons1.java`.
+Calling the compiler on that sample with OQL as source language and
+JavaScript as target language can be done as follows:
+
+```
+$ ./bin/qcert -source oql -target js samples/oql/persons1.oql
+```
+
+This will tell you the compilation steps being used:
+
+```
+Compiling from oql to js:
+  oql -> nraenv -> nraenv -> nnrc -> nnrc -> js
+```
+
+and produce a JavaScript file called `samples/oql/persons1.js`.
+
+
+### Run a compiled query
+
+To run a query compiled to JavaScript, you can call `java` for the
+`RunJavascript` query runner (It uses uses the Nashorn JavaScript
+engine for the JVM). You will need to pass it two pieces of
+information: (i) the location of the Q\*cert runtime for JavaScript,
+and (ii) some input data on which to run the query. From the command
+line, you can do it as follows:
+
+```
+cd samples
+java -cp ../bin/*:../bin/lib/* testing.runners.RunJavascript \
+     -input oql/persons.input \
+	 -runtime ../runtimes/javascript/qcert-runtime.js \
+	 oql/persons1.js > oql/persons1.out 
+```
+
+The input data in [`data/persons.json`](./samples/data/persons.json)
+contains a collection of persons and a collection of companies in JSON
+format. If you run persons1, it should return all persons whose age is
+32:
+
+```
+[{"pid":1,"name":"John Doe","age":32,"company":101},
+ {"pid":2,"name":"Jane Doe","age":32,"company":103},
+ {"pid":4,"name":"Jill Does","age":32,"company":102}]
+```
+
+## Build configuration
+
+The build relies on a small configuration file, which controls what
+source and target languages should be supported:
+
+```
+Makefile.config
+```
+
+You can edit that file, which by default assumes you have Java and Ant
+installed and attempts to build the SQL and SQL++ support, as well as
+the Java runtime.
+
+You can also override the configuration from the command line to build
+specific components, for instance, to build only for JavaScript:
+
+```
+make SQL= SQLPP= JAVA=
+```
+
+To add support for all sources and target languages, including ODM
+rules and Spark:
+
+```
+make JRULES=yes SPARK=yes
+```
+
+Note that the ODM rules support will only build if you satisfy an
+additional dependency as outlined in [README-ODM](README-ODM.md).
+
+Whichever of these components you choose to build, they should be
+built together in one step because some of the Java components are
+deployed as a set of interrelated jar files.
+
+## Cleaning up
+
+If you want to rebuild the compiler from scratch, first clean up by
+calling:
+
+```
+make clean
+```
+
+or, if you also want to remove the external (Java dependencies) that
+may have downloaded, by calling:
+
+```
+make cleanall
+```
+
+## Building the Web demo
+
+To compile the web demo, do:
+
+```
+make demo
+```
+
+Once, compiler, the Web demo can be started by opening the following
+HTML page:
+
+```
+doc/demo/demo.html
+```
+
+If you want support for any of the optional source languages (SQL,
+SQL++ and ODM rules) in the demo, you will also need to run the
+javaService as follows:
+
+```
+cd bin; java -jar javaService.jar -server 9879
+```
+
+## Documentation
+
+Code documentation and background information, notably references for
+all supported languages, can be found on the Q*cert Web site:
+https://querycert.github.io
+
+If you want to re-generated the documentation from the source itself,
+you will need to install the
+[coq2html](https://github.com/xavierleroy/coq2html) tool. Detailed
+instructions are provided in [./doc/README.md](./doc/README.md)
+
+
+## Using Q\*cert
+
+### Compiling Queries
+
+The `./bin/qcert` can simply be called by giving a source and target
+language. For instance, to compile the sample query
+`samples/sql/org2.sql` from SQL to Java, do:
+
+```
+./bin/qcert -source sql -target java samples/sql/org2.sql
+
+```
+
+The compiler will always list the chosen compilation path:
+
+```
+Compiling from sql to java:
+  sql -> nraenv -> nraenv -> nnrc -> nnrc -> java
+```
+
+A list of all the available languages, along with options for the
+compiler can be found from the command line:
+
+```
+./bin/qcert -help
+```
 
 ### Running the compiled queries
-
-We include simple query runners in the [`./runners`](./runners)
-directory in order to try the examples. If you have JAVA enabled,
-those will be built along with the compiler.
 
 #### Run queries compiled to JavaScript
 
@@ -292,12 +381,6 @@ make spark2-runtime
 cd samples/spark2/
 ./run.sh
 ```
-
-
-## Documentation
-
-Code documentation and background information can be found in `./doc`
-or on the Q*cert Web site: https://querycert.github.io
 
 
 ## Caveats

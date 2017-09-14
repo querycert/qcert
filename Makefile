@@ -28,14 +28,14 @@ FILES = $(addprefix coq/,$(MODULES:%=%.v))
 ## Compiler
 all:
 	@$(MAKE) qcert
+	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) MAKEFLAGS= qcert-runners
 
 qcert: Makefile.coq
 	@$(MAKE) qcert-coq
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
 	@$(MAKE) MAKEFLAGS= qcert-javascript
 	@$(MAKE) MAKEFLAGS= qcert-java
-	@$(MAKE) MAKEFLAGS= qcert-runtimes
-	@$(MAKE) MAKEFLAGS= qcert-runners
 
 qcert-coq: Makefile.coq
 	@echo "[Q*cert] "
@@ -103,8 +103,10 @@ clean-java:
 	@$(MAKE) -C sqlParser clean
 	@$(MAKE) -C sqlppParser clean
 	@$(MAKE) -C jrulesParser clean
+	@rm -rf bin/services
+	@rm -f bin/javaService.jar
 
-cleanall-java: clean
+cleanall-java:
 	@$(MAKE) -C javaService cleanall
 	@$(MAKE) -C sqlParser cleanall
 	@$(MAKE) -C sqlppParser cleanall
@@ -159,9 +161,12 @@ bin/qcertJS.js:
 runtimes/javascript/qcert-runtime.js:
 	@$(MAKE) javascript-runtime
 
-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
+demo:
+	@$(MAKE) qcert-demo
+
+qcert-demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
-	@echo "[Q*cert] Compiling TypeScript files to JavaScript"
+	@echo "[Q*cert] Compiling Web Demo in TypeScript"
 	@echo "[Q*cert] "
 	$(CP) bin/qcertJS.js doc/demo
 	$(CP) runtimes/javascript/qcert-runtime.js doc/demo
@@ -180,7 +185,7 @@ ifneq ($(JAVA),)
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building the query runners"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runners all install
+	@$(MAKE) -C javaRunners all install
 else
 	@echo "[Q*cert] "
 	@echo "[Q*cert] JAVA is not enabled: Not building the query runners"
@@ -188,12 +193,25 @@ else
 endif
 
 clean-runners:
-	@$(MAKE) -C samples clean
+	@$(MAKE) -C javaRunners clean
 	@rm -rf bin/lib
 	@rm -f bin/javaRunners.jar
 
 cleanall-runners:
-	@$(MAKE) -C runners cleanall
+	@$(MAKE) -C javaRunners cleanall
+	@rm -rf bin/lib
+	@rm -f bin/javaRunners.jar
+
+## Tests
+
+tests:
+	$(MAKE) -C samples
+
+clean-tests:
+	$(MAKE) -C samples clean
+
+cleanall-tests:
+	$(MAKE) -C samples cleanall
 
 ## Documentation
 documentation:
@@ -208,6 +226,7 @@ clean: Makefile.coq remove_all_derived
 	@$(MAKE) clean-runtimes
 	@$(MAKE) clean-demo
 	@$(MAKE) clean-runners
+	@$(MAKE) clean-tests
 	@rm -f Makefile.coq
 	@rm -f *~
 
@@ -218,6 +237,7 @@ cleanall: Makefile.coq remove_all_derived
 	@$(MAKE) cleanall-runtimes
 	@$(MAKE) cleanall-demo
 	@$(MAKE) cleanall-runners
+	@$(MAKE) cleanall-tests
 	@rm -f Makefile.coq
 	@rm -f *~
 
