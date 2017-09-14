@@ -153,7 +153,7 @@ make SPARK=yes qcert-runtimes
 To compile the web demo, do:
 
 ```
-make qcert-demo
+make demo
 ```
 
 The Web demo can be started by opening the following HTML page:
@@ -211,16 +211,9 @@ This will produce a java file called `samples/oql/persons1.java`.
 
 ### Running the compiled queries
 
-We include simple query runners in the [`./samples`](./samples)
-directory in order to try the examples.
-
-#### Build the query runners
-
-To build the query runners, do:
-
-```
-make qcert-runners
-```
+We include simple query runners in the [`./runners`](./runners)
+directory in order to try the examples. If you have JAVA enabled,
+those will be built along with the compiler.
 
 #### Run queries compiled to JavaScript
 
@@ -235,10 +228,10 @@ line, you can do it as follows:
 
 ```
 cd samples
-java -cp bin:lib/* testing.runners.RunJavascript \
+java -cp ../bin/*:../bin/lib/* testing.runners.RunJavascript \
      -input oql/persons.input \
-	 -runtime ../runtime/javascript/qcert-runtime.js \
-	 oql/persons1.js
+	 -runtime ../runtimes/javascript/qcert-runtime.js \
+	 oql/persons1.js > oql/persons1.out 
 ```
 
 The input data in [`data/persons.json`](./samples/data/persons.json)
@@ -272,13 +265,13 @@ query. From the command line, you can do it as follows, first to
 compile the Java code:
 
 ```
-javac -cp ../runtime/java/bin:bin:lib/* oql/persons1.java
+javac -cp ../runtimes/java/bin:../bin/lib/* oql/persons1.java
 ```
 
 Then to run the compiled Class:
 
 ```
-java -cp ../runtime/java/bin:bin:lib/*:oql testing.runners.RunJava \
+java -cp ../runtimes/java/bin:../bin/*:../bin/lib/*:oql testing.runners.RunJava \
      -input oql/persons.input \
 	 persons1
 ```

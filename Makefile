@@ -34,10 +34,8 @@ qcert: Makefile.coq
 	@$(MAKE) MAKEFLAGS= qcert-ocaml
 	@$(MAKE) MAKEFLAGS= qcert-javascript
 	@$(MAKE) MAKEFLAGS= qcert-java
-	@echo "[Q*cert] "
-	@echo "[Q*cert] To compile the runtimes, do:"
-	@echo "[Q*cert]   make qcert-runtimes"
-	@echo "[Q*cert] "
+	@$(MAKE) MAKEFLAGS= qcert-runtimes
+	@$(MAKE) MAKEFLAGS= qcert-runners
 
 qcert-coq: Makefile.coq
 	@echo "[Q*cert] "
@@ -105,10 +103,8 @@ clean-java:
 	@$(MAKE) -C sqlParser clean
 	@$(MAKE) -C sqlppParser clean
 	@$(MAKE) -C jrulesParser clean
-	@rm -rf bin/services
-	@rm -f bin/javaService.jar
 
-cleanall-java:
+cleanall-java: clean
 	@$(MAKE) -C javaService cleanall
 	@$(MAKE) -C sqlParser cleanall
 	@$(MAKE) -C sqlppParser cleanall
@@ -131,44 +127,44 @@ javascript-runtime:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building JavaScript runtime"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runtime/javascript
+	@$(MAKE) -C runtimes/javascript
 
 java-runtime:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building Java runtime"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runtime/java
+	@$(MAKE) -C runtimes/java
 
 spark2-runtime:
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Building Spark2 runtime"
 	@echo "[Q*cert] "
-	@$(MAKE) -C runtime/spark2
+	@$(MAKE) -C runtimes/spark2
 
 clean-runtimes:
-	@$(MAKE) -C runtime/javascript clean
-	@$(MAKE) -C runtime/java clean
-	@$(MAKE) -C runtime/spark2 clean
+	@$(MAKE) -C runtimes/javascript clean
+	@$(MAKE) -C runtimes/java clean
+	@$(MAKE) -C runtimes/spark2 clean
 
 cleanall-runtimes:
-	@$(MAKE) -C runtime/javascript cleanall
-	@$(MAKE) -C runtime/java cleanall
-	@$(MAKE) -C runtime/spark2 cleanall
+	@$(MAKE) -C runtimes/javascript cleanall
+	@$(MAKE) -C runtimes/java cleanall
+	@$(MAKE) -C runtimes/spark2 cleanall
 
 
 ## Demo
 bin/qcertJS.js:
 	@$(MAKE) qcert-javascript
 
-runtime/javascript/qcert-runtime.js:
+runtimes/javascript/qcert-runtime.js:
 	@$(MAKE) javascript-runtime
 
-qcert-demo: bin/qcertJS.js runtime/javascript/qcert-runtime.js
+demo: bin/qcertJS.js runtimes/javascript/qcert-runtime.js
 	@echo "[Q*cert] "
 	@echo "[Q*cert] Compiling TypeScript files to JavaScript"
 	@echo "[Q*cert] "
 	$(CP) bin/qcertJS.js doc/demo
-	$(CP) runtime/javascript/qcert-runtime.js doc/demo
+	$(CP) runtimes/javascript/qcert-runtime.js doc/demo
 	cd doc/demo && $(TSC) -p "tsconfig.json"
 
 clean-demo:
@@ -180,13 +176,24 @@ cleanall-demo: clean-demo
 
 ## Runners
 qcert-runners:
-	@$(MAKE) -C samples
+ifneq ($(JAVA),)
+	@echo "[Q*cert] "
+	@echo "[Q*cert] Building the query runners"
+	@echo "[Q*cert] "
+	@$(MAKE) -C runners all install
+else
+	@echo "[Q*cert] "
+	@echo "[Q*cert] JAVA is not enabled: Not building the query runners"
+	@echo "[Q*cert] "
+endif
 
 clean-runners:
 	@$(MAKE) -C samples clean
+	@rm -rf bin/lib
+	@rm -f bin/javaRunners.jar
 
 cleanall-runners:
-	@$(MAKE) -C samples cleanall
+	@$(MAKE) -C runners cleanall
 
 ## Documentation
 documentation:

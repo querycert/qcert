@@ -19,53 +19,23 @@ else
   PATH_SEP=':'
 endif
 
-JAVA_SRCS=$(wildcard src/testing/runners/*.java)
-CLASSES=$(patsubst %.java,%.class,$(patsubst src/%,bin/%,$(JAVA_SRCS)))
-
 EMPTY=
 BLANK=$(EMPTY) $(EMPTY)
 
-# Keep this list accurate as dependencies evolve or versions change
-DEPENDENCIES=lib/cloudant-client-1.2.3-sources.jar \
-	     lib/cloudant-client-1.2.3.jar \
-	     lib/commons-codec-1.9-sources.jar \
-	     lib/commons-codec-1.9.jar \
-	     lib/commons-collections-3.2.2-sources.jar \
-	     lib/commons-collections-3.2.2.jar \
-	     lib/commons-logging-1.2-sources.jar \
-	     lib/commons-logging-1.2.jar \
-	     lib/gson-2.7-sources.jar \
-	     lib/gson-2.7.jar \
-	     lib/httpclient-4.5.2-sources.jar \
-	     lib/httpclient-4.5.2.jar \
-	     lib/httpcore-4.4.5-sources.jar \
-	     lib/httpcore-4.4.5.jar \
-	     lib/junit-4.9-sources.jar \
-	     lib/junit-4.9.jar
-CPATH=$(subst $(BLANK),$(PATH_SEP),../runtime/java/bin $(DEPENDENCIES))
-
+CPATH=$(subst $(BLANK),$(PATH_SEP),../runtimes/java/bin ../bin/javaRunners.jar ../bin/lib/*)
 JAVAC=javac
+
+#
+QCERTCOMP=../bin/qcert
+QCERTEVAL=../bin/qcert -eval
 
 # Default target just builds the code
 all:
-	$(MAKE) classes
+	$(MAKE) tests
 
-# Install target
-install:
-	ant -f export.xml
-
-classes: $(CLASSES)
-
-$(CLASSES): $(JAVA_SRCS) $(DEPENDENCIES)
-	-mkdir -p bin
-	$(JAVABASE)javac -g -sourcepath src -d bin -cp $(CPATH) $(JAVA_SRCS)
-
-$(DEPENDENCIES):
-	ant -f getDependencies.xml
+tests: ## Disabled for now
 
 # Compilation targets
-QCERTCOMP=../bin/qcert
-QCERTEVAL=../bin/qcert -eval
 
 oql/%.js: oql/%.oql
 	@echo
@@ -89,7 +59,7 @@ run_js_%: oql/%.js
 	@echo
 	@echo "Running test: '"$<"' on data: oql/persons.input"
 	@echo
-	$(JAVA) -cp bin:$(CPATH) testing.runners.RunJavascript -input oql/persons.input -runtime ../runtime/javascript/qcert-runtime.js $< 
+	$(JAVA) -cp bin:$(CPATH) testing.runners.RunJavascript -input oql/persons.input -runtime ../runtimes/javascript/qcert-runtime.js $< 
 
 run_java_%: oql/%.class
 	@echo
